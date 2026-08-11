@@ -38,6 +38,9 @@ to the output so a failed run is debuggable.
 - [ ] Plate planning is handed the same hold cap the render used (the trap
       `docs/skills/editing.md` and `plates.md` both already warn about).
 - [ ] Missing source media is reported and skipped, as `render.py` does today.
+- [ ] Every roster contributor gets a plate, or is named in the report's
+      `uncredited contributors` counter. Rotation is by login order — no ranking
+      by contribution volume, ever.
 - [ ] Every stage's ffmpeg invocation prints which ffmpeg it resolved, as
       `render.py` does today.
 - [ ] No new logic: a test asserts the orchestrator's output equals running the

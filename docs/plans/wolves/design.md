@@ -344,7 +344,7 @@ the dependency optional — the same posture `scenedetect` already has, and a
 practical one: librosa drags in numba, which still gates it on Python 3.13, and
 `aubio`'s official wheels stopped at 2019.
 
-**And the mix stays mixed.** Two quotas, both plain counting:
+**And the mix stays mixed.** Three quotas, all plain counting:
 
 - **Source diversity** — at most two consecutive shots from the same `video_id`,
   so a highlight reel surveys the footage instead of re-cutting one trailer.
@@ -352,6 +352,13 @@ practical one: librosa drags in numba, which still gates it on Python 3.13, and
   which already distinguishes "choir/orchestral" from "radio chatter and
   gunfire"), and the matcher biases toward shots at that register. That is the
   whole of "the shots always match the song", and it costs one weight.
+- **Contributor coverage** — every login on the month's roster gets a plate
+  somewhere in the cut, and nobody gets two before everybody has one. Rotation is
+  by login order, not by contribution volume: `tools/ensemble.py` already
+  deliberately sorts by login rather than by commit count, and this is the same
+  decision applied to screen time. Anyone who still does not fit is **reported as
+  uncredited** — the counter exists so that "everybody made it" and "we quietly
+  ran out of room" cannot look the same.
 
 ## 8. One command, and the project stays alive
 
