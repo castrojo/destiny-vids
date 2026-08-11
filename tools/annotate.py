@@ -21,6 +21,7 @@ from __future__ import annotations
 import abc
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -80,6 +81,10 @@ TAGGER_FIELDS = (
 
 DEFAULT_WINDOW_SEC = 3.0  # gameplay fixed-window sampling (~2-4s, pipeline.md §1)
 
+# Shots shorter than this are merged into their neighbour by the detector. See
+# the Destiny false-cut hazard in docs/pipeline.md §1.
+DEFAULT_MIN_SHOT_SEC = 0.5
+
 
 def sec_to_tc(seconds):
     """Seconds -> 'm:ss' or 'h:mm:ss' (schema start_tc/end_tc pattern)."""
@@ -116,10 +121,15 @@ def _fixed_window_beats(duration_sec, window_sec=DEFAULT_WINDOW_SEC):
     return beats
 
 
-def _scenedetect_beats(video_path):
+def _scenedetect_beats(video_path, min_shot_sec=DEFAULT_MIN_SHOT_SEC):
     video = open_video(str(video_path))
     manager = SceneManager()
-    manager.add_detector(ContentDetector())
+    # Destiny is full of super activations, explosions and muzzle flash, all of
+    # which read to a frame-difference detector as a cut (docs/pipeline.md §1).
+    # A minimum shot length merges those sub-threshold "shots" back into their
+    # neighbours instead of littering the index with 3-frame beats.
+    min_len = max(1, int(round(min_shot_sec * (video.frame_rate or 30.0))))
+    manager.add_detector(ContentDetector(min_scene_len=min_len))
     manager.detect_scenes(video)
     scenes = manager.get_scene_list()
     if not scenes:  # no cuts found: the whole video is one beat
@@ -135,7 +145,8 @@ def _scenedetect_beats(video_path):
     ]
 
 
-def detect_beats(video_path, fps_or_duration, window_sec=DEFAULT_WINDOW_SEC):
+def detect_beats(video_path, fps_or_duration, window_sec=DEFAULT_WINDOW_SEC,
+                 min_shot_sec=DEFAULT_MIN_SHOT_SEC):
     """Shot-boundary detection -> list of {start_sec, end_sec, start_tc, end_tc}.
 
     Uses PySceneDetect's content detector when scenedetect is installed AND
@@ -144,7 +155,7 @@ def detect_beats(video_path, fps_or_duration, window_sec=DEFAULT_WINDOW_SEC):
     (seconds, or a ``(fps, total_frames)`` pair).
     """
     if HAVE_SCENEDETECT and open_video is not None and video_path and Path(video_path).exists():
-        return _scenedetect_beats(video_path)
+        return _scenedetect_beats(video_path, min_shot_sec)
     return _fixed_window_beats(_coerce_duration_sec(fps_or_duration), window_sec)
 
 
@@ -326,6 +337,105 @@ def validate_segment(segment):
     return segment
 
 
+# --- Keyframes ---------------------------------------------------------------
+
+
+def extract_keyframes(video_path, beats, out_dir, ffmpeg=None):
+    """One representative still per beat, written as ``<index>.jpg``.
+
+    The frame is taken from the *middle* of the beat, not its first frame: a
+    cut's opening frames are frequently mid-dissolve or mid-flash, which is
+    exactly the material a tagger reads wrong.
+
+    Returns the list of written paths, ordered by beat.
+    """
+    if ffmpeg is None:
+        from tools.render import find_ffmpeg
+
+        ffmpeg = find_ffmpeg()
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    video_path = Path(video_path).resolve()
+
+    written = []
+    for i, beat in enumerate(beats):
+        mid = (float(beat["start_sec"]) + float(beat["end_sec"])) / 2.0
+        dest = (out_dir / f"{i:03d}.jpg").resolve()
+        cmd = [*ffmpeg, "-nostdin", "-y", "-ss", f"{mid:.3f}", "-i", str(video_path),
+               "-frames:v", "1", "-q:v", "3", str(dest)]
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+        if proc.returncode != 0 or not dest.exists():
+            raise RuntimeError(
+                f"keyframe extraction failed for beat {i} at {mid:.3f}s: "
+                f"{proc.stderr.strip().splitlines()[-1] if proc.stderr.strip() else 'no output'}"
+            )
+        written.append(dest)
+    return written
+
+
+# --- Indexing a real video ---------------------------------------------------
+
+
+def index_video(video_path, video_record, tags_path=None, keyframes_dir=None,
+                out_dir=None, min_shot_sec=DEFAULT_MIN_SHOT_SEC, log=print):
+    """Detect beats, optionally extract keyframes, optionally assemble segments.
+
+    Deliberately runs in two passes, because tagging happens out-of-band:
+
+      1. no ``tags_path``  -> detect + write keyframes, and stop. This is the
+         pass whose output a vision model or human reads.
+      2. ``tags_path`` set -> replay those tags through ``JsonTagger`` and write
+         schema-valid segments.
+
+    Both passes run the *same* detector settings, so beat indices line up. A
+    tag file is only ever valid against the shot list its own detection pass
+    produced.
+    """
+    beats = detect_beats(video_path, 0.0, min_shot_sec=min_shot_sec)
+    log(f"{len(beats)} beat(s) detected in {video_path}")
+    if len(beats) == 1:
+        log("WARNING: exactly 1 beat for the whole video. On a cut-heavy source "
+            "this means OpenCV could not decode it -- check for AV1 "
+            "(docs/rendering.md).")
+
+    if keyframes_dir:
+        paths = extract_keyframes(video_path, beats, keyframes_dir)
+        # The beat list travels with the stills: a tag file is only valid
+        # against the shot list its own detection pass produced, and whoever
+        # tags these frames needs their timecodes.
+        manifest = Path(keyframes_dir) / "beats.json"
+        with manifest.open("w", encoding="utf-8") as fh:
+            json.dump([dict(b, beat_index=i, keyframe=str(Path(p).name))
+                       for i, (b, p) in enumerate(zip(beats, paths))], fh, indent=2)
+            fh.write("\n")
+        log(f"wrote {len(paths)} keyframe(s) to {keyframes_dir}")
+
+    if not tags_path:
+        return beats, []
+
+    tagger = JsonTagger.from_file(tags_path)
+    leads = derive.load_leads()
+    out_dir = Path(out_dir or REPO_ROOT / "segments")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    segments = []
+    for i, beat in enumerate(beats):
+        beat = dict(beat, beat_index=i)
+        segment = assemble_segment(video_record, beat, tagger.tag_beat(
+            video_record["video_id"], beat, []), leads)
+        validate_segment(segment)
+        dest = out_dir / f"{segment['segment_id']}.json"
+        with dest.open("w", encoding="utf-8") as fh:
+            json.dump(segment, fh, indent=2)
+            fh.write("\n")
+        segments.append(segment)
+
+    clean = sum(1 for s in segments if s.get("clean"))
+    log(f"wrote {len(segments)} segment(s) to {out_dir} ({clean} clean, "
+        f"{len(segments) - clean} rejected by the clean gate)")
+    return beats, segments
+
+
 # --- CLI demo ----------------------------------------------------------------
 
 _DEMO_VIDEO_RECORD = {
@@ -345,15 +455,7 @@ _DEMO_VIDEO_RECORD = {
 }
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(
-        description="Run the stub annotator pipeline end-to-end on a fake video."
-    )
-    parser.add_argument("--duration", type=float, default=12.0, help="fake video duration (sec)")
-    parser.add_argument("--window", type=float, default=DEFAULT_WINDOW_SEC, help="fallback window (sec)")
-    parser.add_argument("--video", default=None, help="real video path (uses scenedetect if installed)")
-    args = parser.parse_args(argv)
-
+def _demo(args):
     backend = "scenedetect" if HAVE_SCENEDETECT else "fixed-window fallback (scenedetect not installed)"
     print(f"shot detection backend: {backend}")
 
@@ -366,6 +468,53 @@ def main(argv=None):
         print(json.dumps(segment, indent=2))
     print(f"OK: {len(beats)} segment(s) validated against schema/segment.schema.json")
     return 0
+
+
+def _index(args):
+    if not HAVE_SCENEDETECT:
+        print("scenedetect is not installed: beats would be fixed-window, not shot "
+              "boundaries. pip install scenedetect opencv-python-headless", file=sys.stderr)
+        return 2
+    with Path(args.video_record).open(encoding="utf-8") as fh:
+        record = json.load(fh)
+    index_video(
+        args.video,
+        record,
+        tags_path=args.tags,
+        keyframes_dir=args.keyframes_dir,
+        out_dir=args.out_dir,
+        min_shot_sec=args.min_shot_sec,
+    )
+    return 0
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Annotator pipeline: index a real video, or run the stub demo."
+    )
+    sub = parser.add_subparsers(dest="command")
+
+    demo = sub.add_parser("demo", help="run the stub pipeline on a fake video")
+    for target in (parser, demo):
+        target.add_argument("--duration", type=float, default=12.0, help="fake video duration (sec)")
+        target.add_argument("--window", type=float, default=DEFAULT_WINDOW_SEC, help="fallback window (sec)")
+        target.add_argument("--video", default=None, help="real video path (uses scenedetect if installed)")
+
+    idx = sub.add_parser(
+        "index",
+        help="detect beats + keyframes for a real video, and assemble segments once tagged",
+    )
+    idx.add_argument("--video", required=True, help="source media file")
+    idx.add_argument("--video-record", required=True, help="videos/<video_id>.json from tools/ingest.py")
+    idx.add_argument("--keyframes-dir", default=None, help="write one still per beat here")
+    idx.add_argument("--tags", default=None,
+                     help="tag file to replay; omit for the detect+keyframe pass")
+    idx.add_argument("--out-dir", default=None, help="segment output dir (default: segments/)")
+    idx.add_argument("--min-shot-sec", type=float, default=DEFAULT_MIN_SHOT_SEC,
+                     help="merge shots shorter than this (Destiny false-cut mitigation)")
+
+    args = parser.parse_args(argv)
+    return _index(args) if args.command == "index" else _demo(args)
 
 
 if __name__ == "__main__":

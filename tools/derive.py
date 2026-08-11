@@ -80,6 +80,7 @@ def load_leads(path=None):
             "display_name": entry.get("display_name"),
             "aka": list(entry.get("aka") or []),
             "constraints": dict(entry.get("constraints") or {}),
+            "plate": dict(entry.get("plate") or {}) or None,
         }
         for character_id, entry in values.items()
     }

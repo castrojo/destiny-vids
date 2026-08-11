@@ -117,3 +117,27 @@ def test_concat_list_is_written_beside_output_not_tmp(tmp_path, monkeypatch):
     assert seen["dir"] != Path(os.environ.get("TMPDIR", "/tmp"))
     assert str(clips[0].resolve()) in seen["contents"]
     assert not list(workdir.glob("concat_list.txt")), "list file must be cleaned up"
+
+
+def test_cap_holds_trims_from_the_tail_only():
+    """The in-point is what the index worked to find; trims come off the end."""
+    shots = [
+        {"segment_id": "a", "start_sec": 10.0, "end_sec": 35.0, "duration": 25.0},
+        {"segment_id": "b", "start_sec": 4.0, "end_sec": 6.0, "duration": 2.0},
+    ]
+    capped = render.cap_holds(shots, 8.0)
+    assert capped[0]["start_sec"] == 10.0
+    assert capped[0]["end_sec"] == 18.0
+    assert capped[0]["duration"] == 8.0
+    assert capped[1] == shots[1]          # under the cap, untouched
+    assert shots[0]["duration"] == 25.0   # input list is not mutated
+
+
+def test_cap_holds_without_a_cap_is_a_passthrough():
+    shots = [{"segment_id": "a", "start_sec": 0.0, "end_sec": 30.0, "duration": 30.0}]
+    assert render.cap_holds(shots, None) == shots
+
+
+def test_cap_holds_derives_duration_when_absent():
+    shots = [{"segment_id": "a", "start_sec": 2.0, "end_sec": 22.0}]
+    assert render.cap_holds(shots, 5.0)[0]["end_sec"] == 7.0

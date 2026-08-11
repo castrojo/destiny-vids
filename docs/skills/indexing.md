@@ -1,0 +1,122 @@
+---
+name: indexing
+version: "1.0"
+last_updated: "2026-08-11"
+id: indexing
+one_line_purpose: Index a source video into schema-valid, searchable segments.
+entry_point: docs/skills/indexing.md
+category: indexing
+mcp_compliance_level: partial
+optimization_status: draft
+status: active
+dependencies: []
+tags: [segments, scenedetect, keyframes, tagging, schema]
+description: >-
+  Turns a source video into schema-valid segment records via detection,
+  keyframes, and out-of-band tagging. Use when indexing new footage, writing a
+  Tagger, or debugging beat counts and the clean gate.
+metadata:
+  type: procedure
+---
+
+# Indexing a video
+
+## When to Use
+
+- Adding a new Bungie video to the index
+- Writing or reviewing tagger output (`tags/<video_id>.json`)
+- Debugging a suspicious beat count, or segments that all derive `clean = false`
+
+## When NOT to Use
+
+- Assembling a cut from an existing index → [`editing.md`](editing.md)
+- Deciding *who* a shot depicts → [`casting.md`](casting.md)
+
+## Core Process
+
+Indexing is **two passes over the same detection**, because tagging happens
+out-of-band and beat index is positional:
+
+```bash
+yt-dlp -S "vcodec:h264,res:1080" --merge-output-format mp4 \
+  -o "media/<video_id>.%(ext)s" <url>
+python3 tools/ingest.py <url> --id <video_id>
+
+# pass 1 — beats + one keyframe each, plus keyframes/<dir>/beats.json
+python3 tools/annotate.py index --video media/<video_id>.mp4 \
+    --video-record videos/<video_id>.json --keyframes-dir keyframes/<dir>
+
+# ...tag every keyframe into tags/<video_id>.json...
+
+# pass 2 — replay tags into segments/
+python3 tools/annotate.py index --video media/<video_id>.mp4 \
+    --video-record videos/<video_id>.json --tags tags/<video_id>.json
+```
+
+Both passes must use identical detector settings. A tag file is only valid
+against the shot list its own detection pass produced, which is why the beat
+manifest is written next to the stills.
+
+Keyframes come from the **middle** of each beat, not the first frame: a cut's
+opening frames are frequently mid-dissolve or mid-flash, which is exactly the
+material a tagger reads wrong.
+
+## Tagging rules
+
+- **`overlays` is mandatory on every beat.** It is the input to the `clean`
+  gate, which derives `false` when untagged. Use `[]` for a clean shot.
+- **Do not tag the source's own letterbox.** Bungie cinematics are 2.39:1 inside
+  a 16:9 frame; tagging `letterbox` would reject the entire video.
+- **Never return a derived field.** `clean`, `footage_tier`, `traversal_hero`
+  and `casting` are computed at assembly; `assemble_segment` raises on anything
+  outside `TAGGER_FIELDS`.
+- **Name a character only when visible in that frame** — see
+  [`casting.md`](casting.md).
+- Batch a long video across parallel taggers, but hand every batch the same enum
+  list and the same reference entry, or the tags will not be comparable.
+
+Expect a few rejects per video: ratings, title and date cards carry
+`burned_text` and correctly derive `clean = false`. That is the gate working —
+1/50 on the Curse of Osiris cinematic, 9/69 on the TFS launch trailer.
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "The shot is obviously clean, I'll skip `overlays`." | Skipping it derives `clean = false` and removes the shot from every cut. It is one field; set it. |
+| "The detector found 1 scene, so it's one long take." | Check the codec. AV1 + OpenCV silently yields one scene. |
+| "I'll just fix the derived field in the segment JSON." | It is recomputed on the next assembly. Fix the tag or the vocab. |
+| "I can re-use these tags after re-running detection." | Beat index is positional. New detection settings mean a new tag file. |
+
+## Red Flags
+
+- **Exactly 1 beat for a cut-heavy video.** The codec is wrong, not the
+  detector: OpenCV cannot decode AV1 and silently returns one scene. Re-fetch
+  with `-S "vcodec:h264"` (`docs/rendering.md`).
+- **A flood of sub-second beats.** Destiny super activations, explosions and
+  muzzle flash read as cuts to a frame-difference detector. `--min-shot-sec`
+  (default 0.5) merges them; raise it rather than hand-deleting segments.
+- Editing a segment file to change a derived field. Fix the tag or the vocab and
+  re-assemble.
+- Committing anything under `media/`, `keyframes/` or `renders/`.
+
+## Verification
+
+```bash
+# beat count and clean split for a video
+python3 - <<'PY'
+import json, glob
+segs = [json.load(open(p)) for p in glob.glob('segments/*<video_id>*.json')]
+print(len(segs), 'segments,', sum(s['clean'] for s in segs), 'clean')
+PY
+
+# the source really is H.264
+ffprobe -v error -select_streams v -show_entries stream=codec_name \
+  -of csv=p=0 media/<video_id>.mp4
+
+python3 -m pytest -q tests/test_annotate.py
+```
+
+Field definitions and the axis reference are in `docs/taxonomy.md`; the cost
+model, and why boundaries are computed before any model runs, is
+`docs/pipeline.md`.

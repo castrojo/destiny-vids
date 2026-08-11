@@ -180,6 +180,28 @@ def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None):
         list_path.unlink(missing_ok=True)
 
 
+def cap_holds(shots, max_shot_sec, log=None):
+    """Trim any shot held longer than ``max_shot_sec``, from its tail.
+
+    A detector-derived beat can be far longer than an edit wants — this
+    cinematic ends on a 25-second static gateway shot, which is a fine *beat*
+    and a terrible final *cut*. The in-point is what the index worked to find,
+    so the trim always comes off the end and never moves the start.
+    """
+    if not max_shot_sec:
+        return list(shots)
+    out = []
+    for shot in shots:
+        duration = shot.get("duration") or (shot["end_sec"] - shot["start_sec"])
+        if duration > max_shot_sec:
+            if log:
+                log(f"  trimmed {shot['segment_id']} {duration:.1f}s -> {max_shot_sec:.1f}s")
+            shot = dict(shot, duration=float(max_shot_sec),
+                        end_sec=shot["start_sec"] + float(max_shot_sec))
+        out.append(shot)
+    return out
+
+
 def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=True,
            ffmpeg=None):
     ffmpeg = ffmpeg or find_ffmpeg()
@@ -218,12 +240,15 @@ def main(argv=None):
     ap.add_argument("--audio", help="lay this audio file over the finished cut")
     ap.add_argument("--no-container", action="store_true",
                     help="skip the ffmpeg container and use a local binary")
+    ap.add_argument("--max-shot-sec", type=float, default=None,
+                    help="trim any shot held longer than this, from its tail")
     args = ap.parse_args(argv)
 
     ffmpeg = find_ffmpeg(prefer_container=not args.no_container)
     shots = load_shots(args.shotlist)
     print(f"ffmpeg: {' '.join(ffmpeg)}")
     print(f"rendering {len(shots)} shot(s) -> {args.out}")
+    shots = cap_holds(shots, args.max_shot_sec, log=print)
     rendered, missing = render(shots, args.media, args.out,
                                keep_audio=not args.mute and not args.audio,
                                audio_bed=args.audio, ffmpeg=ffmpeg)

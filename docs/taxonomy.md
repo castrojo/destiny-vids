@@ -188,6 +188,7 @@ tiers, and the difference between them is the whole model:
 | `cayde_6` | `castrojo` (castrojo) | `cayde`, `cayde6` | — |
 | `saladin` | `jeefy` (Jeefy) | `lord_saladin`, `iron_lord_saladin` | `require_helmet`, `require_far` |
 | `osiris` | `mrbobbytables` | — | — |
+| `sagira` | `lindsay_gendreau` (Lindsay Gendreau) | `sagira_ghost` | — |
 | `saint_14` | `kat` (Kat) | `saint`, `saint14` | — |
 | `mara_sov` | `karena_angel` (Karena Angel) | `queen_mara_sov` | — |
 | `petra_venj` | `lenka` (Lenka) | `petra` | — |
@@ -204,7 +205,16 @@ derivation input; the field is free text and `compute_casting` never reads it.
 `iron_lord_red_haired` is the red-haired Iron Lord who dies in the *Rise of
 Iron* intro — her canonical Destiny name is unconfirmed, so the key is
 descriptive on purpose and should be renamed (with the old id kept in `aka`)
-once she's identified.
+once she's identified. `sagira` is the one binding that is **not a Guardian** —
+she is Osiris's Ghost, so no framing or helmet question applies and she is cast
+on presence in frame alone; her nameplate accordingly carries no subclass line.
+
+A binding may also carry an optional `plate` block: the on-screen nameplate copy
+in the same four-field form as the reference deck (`label`, `class`, `name`,
+`title`, plus `trustee` for the silver chrome). Keeping it beside the
+character→person binding is what stops the credit and the casting from drifting
+apart — recast a role and the plate follows, with no other edit. Derivation
+never reads it; `tools/plate.py` does.
 
 Querying either half of a binding retrieves the same footage — "Zavala" and
 "Kelsey" are the same lead, so both resolve to it. Alongside these, `leads`

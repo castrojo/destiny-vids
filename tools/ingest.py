@@ -53,7 +53,8 @@ DESTINATION_RULES = [
     ("tangled shore", "tangled_shore"), ("cosmodrome", "cosmodrome"),
     ("europa", "europa"), ("nessus", "nessus"), ("the traveler", "the_traveler"),
     ("traveler", "the_traveler"), ("the moon", "moon"), ("edz", "edz"),
-    ("mars", "mars"), ("io", "io"),
+    ("mars", "mars"), ("infinite forest", "mercury"), ("mercury", "mercury"),
+    ("io", "io"),
 ]
 
 

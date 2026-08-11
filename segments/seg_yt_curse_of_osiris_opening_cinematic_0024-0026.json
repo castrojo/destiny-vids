@@ -1,0 +1,178 @@
+{
+  "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0024-0026",
+  "video_id": "yt_curse_of_osiris_opening_cinematic",
+  "start_sec": 24.966667,
+  "end_sec": 26.566667,
+  "start_tc": "0:25",
+  "end_tc": "0:27",
+  "era": "curse_of_osiris",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "class": "hunter",
+  "element": "void",
+  "faction": [
+    "vex"
+  ],
+  "shot_scale": "MS",
+  "composition": [
+    "two_shot"
+  ],
+  "camera_movement": [
+    "handheld_shaky"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "ability_cast",
+    "combat"
+  ],
+  "mood": [
+    "triumphant"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "A hooded Guardian leaps into the air with void energy blazing around a raised fist as a Vex Minotaur aims its weapon in response.",
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 1
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.75
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

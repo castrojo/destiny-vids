@@ -46,16 +46,34 @@ base image, no Homebrew build. It is already running.
 ## Host setup: make the container *be* `ffmpeg`
 
 Rather than teaching every tool to find a working ffmpeg, put one on `PATH`.
-`~/.local/bin/ffmpeg` is a shim that runs the container image, with
-`~/.local/bin/ffprobe` symlinked to it (it dispatches on `$0`):
+`tools/ffmpeg-container-shim.sh` is that shim: it runs the container image, and
+installs as `~/.local/bin/ffmpeg` with `~/.local/bin/ffprobe` symlinked to it
+(it dispatches on `$0`).
+
+```bash
+install -Dm755 tools/ffmpeg-container-shim.sh ~/.local/bin/ffmpeg
+ln -sf ffmpeg ~/.local/bin/ffprobe
+
+cat > ~/.config/ffmpeg-container.conf <<'EOF'
+FFMPEG_CONTAINER_IMAGE="ghcr.io/jrottenberg/ffmpeg:latest"
+FFMPEG_CONTAINER_NAME="bluefin-thumbnailer"
+EOF
+```
 
 ```bash
 ffmpeg -version          # => ffmpeg version 8.1  (container)
-FFMPEG_NO_CONTAINER=1 ffmpeg -version   # => 7.1.3 host ffmpeg-free (escape hatch)
+FFMPEG_NO_CONTAINER=1 ffmpeg -version   # => the host binary (escape hatch)
 ```
 
-Configured in `~/.config/ffmpeg-container.conf`, pinned to the digest the
-thumbnailer service already runs so it never triggers a pull.
+Pin `FFMPEG_CONTAINER_IMAGE` to the digest the thumbnailer service already runs
+and the shim never triggers a pull. If that image is gone (a prune, a tag move),
+it falls back to whatever image the running container actually uses rather than
+failing.
+
+The escape hatch does not assume a specific host ffmpeg: `FFMPEG_NO_CONTAINER=1`
+tries `/usr/bin/<tool>` first and then `/home/linuxbrew/.linuxbrew/bin/<tool>`,
+so it lands on the Fedora `ffmpeg-free` build if that is all there is, and on a
+Homebrew build with H.264 when one is installed.
 
 ### Why an ephemeral `podman run`, not `podman exec`
 
@@ -196,6 +214,23 @@ the entire point of the index.
 
 If a future change drops the fps normalization (e.g. all clips from one
 source at native rate), input seeking becomes safe and is worth the 2.6x.
+
+## Burning plates onto a cut
+
+`tools/plate.py` is a separate stage from `render.py`, deliberately: cutting and
+titling are different concerns, and keeping them apart means a re-title does not
+re-cut. It composites every plate in **one** ffmpeg pass — an `overlay` chain
+where each plate is gated by `enable='between(t,in,out)'` — and stream-copies
+the audio, so titling never costs the soundtrack a second generation.
+
+Two consequences worth stating:
+
+1. **Plate timings are on the *rendered* timeline**, not the source. `plate.py
+   plan` therefore has to be given the same `--max-shot-sec` the render used, or
+   every plate after the first trimmed shot lands late.
+2. **The plates are rendered at 1920×1080**, the same size `render.py`
+   normalizes every clip to, so the overlay needs no scaling and the chrome
+   stays pixel-exact.
 
 ## Sources
 

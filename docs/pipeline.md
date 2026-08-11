@@ -39,6 +39,29 @@ PySceneDetect's content detector fires on large abrupt frame deltas — and Dest
 
 Mitigations, in order of cheapness: raise the detection threshold above the default on gameplay sources; apply a **minimum shot length** (~0.5–1.0s) and merge sub-threshold "shots" back into their neighbors; treat a detected cut whose surrounding keyframes carry identical tags as a coalescing no-op. TransNetV2 is the better answer where false cuts matter (it's trained against exactly these), which is why it's the upgrade path for cinematics.
 
+`tools/annotate.py index` applies the minimum-shot-length mitigation by default (`--min-shot-sec 0.5`).
+
+### Running a real video through it
+
+Indexing is **two passes over the same detection**, because tagging happens
+out-of-band:
+
+```bash
+# pass 1: beats + one keyframe each (plus keyframes/<dir>/beats.json)
+python3 tools/annotate.py index --video media/<id>.mp4 \
+    --video-record videos/<id>.json --keyframes-dir keyframes/<dir>
+
+# pass 2: replay the tags produced from those stills into segments/
+python3 tools/annotate.py index --video media/<id>.mp4 \
+    --video-record videos/<id>.json --tags tags/<id>.json
+```
+
+Beat index is positional, so a tag file is only valid against the shot list its
+own detection pass produced — which is exactly why both passes run identical
+detector settings and why the beat manifest travels with the stills. If pass 1
+reports **1 beat** for a cut-heavy source, the codec is wrong, not the detector
+(see the AV1 trap in `docs/rendering.md`).
+
 ---
 
 ## 2. Metadata inheritance (metadata-first, frames-second)
@@ -152,9 +175,17 @@ concatenates. Clips are re-encoded rather than stream-copied, because a stream
 copy snaps the in-point to the nearest keyframe and discards the precise
 boundary §1 spent a detector pass to find.
 
+`tools/plate.py` then names the cast on screen. It is a separate stage from the
+cut for the same reason segmentation is separate from tagging: a re-title should
+not re-cut. Plate copy is read from `vocab/casting.yaml`, so the on-screen
+credit and the casting binding cannot drift apart — recasting a character
+changes the plate and nothing else. Ensemble credits come from the deterministic
+monthly assignment in `tools/ensemble.py`, so a re-render never re-credits a
+different person.
+
 See `docs/rendering.md` for the resolution order, the container's same-path bind
-mount, and the matching AV1 hazard in shot detection (OpenCV cannot decode AV1
-and silently reports the whole video as a single beat).
+mount, the plate burn, and the matching AV1 hazard in shot detection (OpenCV
+cannot decode AV1 and silently reports the whole video as a single beat).
 
 ---
 

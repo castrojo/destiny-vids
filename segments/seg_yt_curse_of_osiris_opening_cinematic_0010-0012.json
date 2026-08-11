@@ -1,0 +1,176 @@
+{
+  "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0010-0012",
+  "video_id": "yt_curse_of_osiris_opening_cinematic",
+  "start_sec": 10.3,
+  "end_sec": 12.566667,
+  "start_tc": "0:10",
+  "end_tc": "0:13",
+  "era": "curse_of_osiris",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [],
+  "shot_scale": "MS",
+  "composition": [
+    "OTS",
+    "group"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "combat"
+  ],
+  "mood": [
+    "tense"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "An armored Guardian's back fills the foreground while two more Guardians aim their weapons down a rubble-strewn stairwell in the ruins beyond.",
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 3
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.75
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

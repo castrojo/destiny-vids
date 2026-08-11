@@ -1,0 +1,187 @@
+{
+  "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0089-0091",
+  "video_id": "yt_curse_of_osiris_opening_cinematic",
+  "start_sec": 89.4,
+  "end_sec": 91.533333,
+  "start_tc": "1:29",
+  "end_tc": "1:32",
+  "era": "curse_of_osiris",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "class": "warlock",
+  "element": "unknown",
+  "shot_scale": "MLS",
+  "composition": [
+    "group"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "back_only",
+  "character_identifiability": "explicit",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "traversal"
+  ],
+  "mood": [
+    "ominous",
+    "tense"
+  ],
+  "register": 1,
+  "character": [
+    {
+      "name": "Osiris",
+      "kind": "guardian_npc"
+    },
+    {
+      "name": "Sagira",
+      "kind": "guardian_npc"
+    }
+  ],
+  "caption": "Osiris and Sagira move deeper into a dim, green-lit Vex ruin as a Goblin perches on wreckage nearby and a distant Guardian trades fire in the haze beyond.",
+  "faction": [
+    "vex"
+  ],
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": true,
+  "casting": {
+    "role": "lead",
+    "character": "osiris",
+    "person": "mrbobbytables",
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.75
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.5
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.65
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.65
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.65
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

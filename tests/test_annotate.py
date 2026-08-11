@@ -130,3 +130,92 @@ def test_cli_demo_runs(capsys):
     out = capsys.readouterr().out
     assert "shot detection backend:" in out
     assert "2 segment(s) validated" in out
+
+
+def test_cli_demo_subcommand_runs(capsys):
+    """The demo keeps working now that `index` exists beside it."""
+    assert annotate.main(["demo", "--duration", "6.0"]) == 0
+    assert "2 segment(s) validated" in capsys.readouterr().out
+
+
+def _fake_beats(monkeypatch, count=3):
+    beats = [
+        {"start_sec": float(i), "end_sec": float(i + 1),
+         "start_tc": annotate.sec_to_tc(i), "end_tc": annotate.sec_to_tc(i + 1)}
+        for i in range(count)
+    ]
+    monkeypatch.setattr(annotate, "detect_beats", lambda *a, **k: beats)
+    return beats
+
+
+def _stub_tags(beats):
+    tagger = annotate.StubTagger()
+    return {
+        str(i): tagger.tag_beat("yt_test_fake", beat, [])
+        for i, beat in enumerate(beats)
+    }
+
+
+def test_index_video_first_pass_writes_keyframes_and_a_beat_manifest(tmp_path, monkeypatch):
+    """Pass one produces the stills a tagger reads, and the timecodes with them."""
+    import json
+
+    beats = _fake_beats(monkeypatch)
+    written = []
+
+    def fake_extract(video, bts, out_dir, ffmpeg=None):
+        from pathlib import Path
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for i in range(len(bts)):
+            p = out_dir / f"{i:03d}.jpg"
+            p.write_bytes(b"")
+            written.append(p)
+        return written
+
+    monkeypatch.setattr(annotate, "extract_keyframes", fake_extract)
+    kf = tmp_path / "kf"
+    got_beats, segments = annotate.index_video(
+        "fake.mp4", FAKE_VIDEO_RECORD, keyframes_dir=kf, log=lambda *a: None)
+
+    assert got_beats == beats
+    assert segments == []  # no tags yet: nothing is assembled
+    manifest = json.loads((kf / "beats.json").read_text())
+    assert [m["beat_index"] for m in manifest] == [0, 1, 2]
+    assert [m["keyframe"] for m in manifest] == ["000.jpg", "001.jpg", "002.jpg"]
+
+
+def test_index_video_second_pass_writes_validated_segments(tmp_path, monkeypatch):
+    import json
+
+    beats = _fake_beats(monkeypatch)
+    tags = tmp_path / "tags.json"
+    tags.write_text(json.dumps(_stub_tags(beats)))
+
+    out_dir = tmp_path / "segments"
+    _, segments = annotate.index_video(
+        "fake.mp4", FAKE_VIDEO_RECORD, tags_path=tags, out_dir=out_dir,
+        log=lambda *a: None)
+
+    assert len(segments) == 3
+    files = sorted(p.name for p in out_dir.glob("*.json"))
+    assert len(files) == 3
+    for segment in segments:
+        annotate.validate_segment(segment)
+        # derived fields are computed here, never replayed from the tag file
+        assert "clean" in segment and "casting" in segment
+
+
+def test_index_video_tag_file_must_cover_every_beat(tmp_path, monkeypatch):
+    """A tag file is only valid against the shot list its own pass produced."""
+    import json
+
+    beats = _fake_beats(monkeypatch)
+    tags = tmp_path / "tags.json"
+    partial = _stub_tags(beats)
+    partial.pop("2")
+    tags.write_text(json.dumps(partial))
+
+    with pytest.raises(KeyError, match="no tags for beat 2"):
+        annotate.index_video("fake.mp4", FAKE_VIDEO_RECORD, tags_path=tags,
+                             out_dir=tmp_path / "segments", log=lambda *a: None)

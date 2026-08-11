@@ -1,0 +1,82 @@
+{
+  "generated_at": "2026-08-11",
+  "schema_version": "1.0",
+  "skills": [
+    {
+      "id": "casting",
+      "name": "casting",
+      "one_line_purpose": "Bind a Destiny character to a person and credit the monthly ensemble.",
+      "entry_point": "docs/skills/casting.md",
+      "category": "indexing",
+      "status": "active",
+      "tags": [
+        "casting",
+        "vocab",
+        "ensemble",
+        "leads",
+        "contributors"
+      ],
+      "description": "Covers lead bindings, ensemble slots, and how casting is derived rather than tagged. Use when adding or changing a cast member, crediting contributors, or debugging a casting role that did not derive.",
+      "version": "1.0",
+      "last_updated": "2026-08-11",
+      "doc_type": "reference"
+    },
+    {
+      "id": "editing",
+      "name": "editing",
+      "one_line_purpose": "Turn a plain-language outline into a rendered cut.",
+      "entry_point": "docs/skills/editing.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "story",
+        "cut-list",
+        "render",
+        "ffmpeg",
+        "outline"
+      ],
+      "description": "Covers outline authoring, shot matching, hold caps, and rendering a cut list to video. Use when writing a story outline, debugging a beat that matched the wrong shot, or rendering a cut.",
+      "version": "1.0",
+      "last_updated": "2026-08-11",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "indexing",
+      "name": "indexing",
+      "one_line_purpose": "Index a source video into schema-valid, searchable segments.",
+      "entry_point": "docs/skills/indexing.md",
+      "category": "indexing",
+      "status": "active",
+      "tags": [
+        "segments",
+        "scenedetect",
+        "keyframes",
+        "tagging",
+        "schema"
+      ],
+      "description": "Turns a source video into schema-valid segment records via detection, keyframes, and out-of-band tagging. Use when indexing new footage, writing a Tagger, or debugging beat counts and the clean gate.",
+      "version": "1.0",
+      "last_updated": "2026-08-11",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "plates",
+      "name": "plates",
+      "one_line_purpose": "Put Guardian nameplates and title cards on a rendered cut.",
+      "entry_point": "docs/skills/plates.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "nameplates",
+        "overlay",
+        "credits",
+        "bluefin",
+        "ffmpeg"
+      ],
+      "description": "Plans, renders, and burns Project Bluefin Guardian nameplates onto a cut. Use when crediting cast or contributors on screen, or changing plate copy, timing, or chrome.",
+      "version": "1.0",
+      "last_updated": "2026-08-11",
+      "doc_type": "procedure"
+    }
+  ]
+}

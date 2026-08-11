@@ -69,19 +69,21 @@ def test_build_record_validates():
 
 
 def test_ingested_real_records_present_and_valid():
-    """The 5 real Bungie videos ingested via oEmbed should be on disk & valid."""
-    import glob, json
+    """The real Bungie videos ingested via oEmbed should be on disk & valid."""
+    import glob, json, yaml
     root = os.path.join(os.path.dirname(__file__), "..")
     files = glob.glob(os.path.join(root, "videos", "*.json"))
     if not files:  # ingestion is network-dependent; skip if none present
         return
+    # vocab/ is the single source of truth for every enum, so the era check is
+    # made against it rather than a hand-maintained list that goes stale the
+    # moment a video from a new expansion is ingested.
+    with open(os.path.join(root, "vocab", "domain.yaml")) as fh:
+        eras = set(yaml.safe_load(fh)["era"]["values"]) | {"unknown"}
     for f in files:
         rec = json.load(open(f))
         assert ingest.validate_video(rec) == [], f
-        assert rec["era"] in {
-            "the_final_shape", "lightfall", "beyond_light", "witch_queen",
-            "shadowkeep", "forsaken", "d2_base", "rise_of_iron", "unknown",
-        }
+        assert rec["era"] in eras, f
 
 
 if __name__ == "__main__":

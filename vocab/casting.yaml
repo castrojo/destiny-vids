@@ -35,6 +35,13 @@ leads:
     display_name: How the person is credited on their tile.
     aka:          Alternate spellings/ids for the SAME character, normalized to this key.
     note:         OPTIONAL free-text standing direction for the binding. Documentation only — derivation never reads it.
+    plate:        >
+      OPTIONAL on-screen nameplate copy, read by tools/plate.py when it plans a
+      cut's plates. Keys mirror the reference deck (~/Videos/nameplates.json):
+      `label` (the uppercase eyebrow), `class`, `name`, `title` and `trustee`
+      (the burnished-silver treatment), plus `kind` (`ghost` drops the class
+      line, since a Ghost has no subclass). Derivation never reads it — a
+      binding without one simply gets no plate.
     constraints:  >
       OPTIONAL per-binding usability constraints, for a person who does not
       resemble their character. Keys: `require_helmet` (identity_visibility must
@@ -81,6 +88,27 @@ leads:
       person: mrbobbytables
       display_name: mrbobbytables
       aka: []
+      # On-screen nameplate copy (tools/plate.py), in the same four-field form
+      # as the reference deck: label / class / name / title, plus `trustee`.
+      # The subclass is lore-true to Osiris rather than to the performer's usual
+      # Bluefin plate: he is a solar Warlock, and the plate names the ROLE.
+      plate:
+        label: TRUSTEE // GUARDIAN
+        class: Dawnblade Warlock
+        name: Bob Killen
+        title: Reconciler of the Plane
+        trustee: true
+    sagira:
+      # Osiris's Ghost. A Ghost is not a Guardian, so nothing about framing or
+      # helmets applies -- she is cast on presence in frame alone.
+      person: lindsay_gendreau
+      display_name: Lindsay Gendreau
+      aka: [sagira_ghost]
+      plate:
+        label: EMOTIONAL SUPPORT // GHOST
+        name: Lindsay Gendreau
+        title: Master of the Labyrinths
+        kind: ghost
     saint_14:
       person: kat
       display_name: Kat

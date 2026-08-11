@@ -8,6 +8,9 @@ Bungie explicitly permits and encourages fan-made music videos built from this
 footage. This repo is the **categorization schema plus the assembly tools** —
 ingestion at scale, storage, and search infra live elsewhere.
 
+**Working on this repo as an agent?** Start with [`AGENTS.md`](AGENTS.md), then
+[`docs/SKILL.md`](docs/SKILL.md) to load the one skill your task needs.
+
 ## The governing idea
 
 **The fiction bends to the footage.** You do not hunt for shots that fit a
@@ -40,6 +43,7 @@ first-party footage.
 | Zavala | Kelsey Hightower | |
 | Cayde-6 | castrojo | |
 | Osiris | mrbobbytables | |
+| Sagira | Lindsay Gendreau | Osiris's Ghost; cast on presence, no framing constraint |
 | Saint-14 | Kat | remains the bubble in the original Wolves |
 | Mara Sov | Karena Angel | |
 | Petra Venj | Lenka | |
@@ -80,12 +84,15 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `tools/ingest.py` | Video-level ingestion: Bungie YouTube title (oEmbed, no API key) → inherited defaults → `video.schema.json` record. |
 | `tools/annotate.py` | Annotator pipeline: shot detection → keyframes → pluggable tagger → schema-valid records. |
 | `tools/derive.py` | Pure derivation of `clean`, `footage_tier`, `traversal_hero` and `casting`. |
+| `tools/plate.py` | **Cut list → Guardian nameplates.** Plans timed plates from the casting vocab + contributor roster, renders them as transparent PNGs, and burns them into a cut. |
+| `tools/ffmpeg-container-shim.sh` | Host setup, not a pipeline stage: installs a containerized `ffmpeg`/`ffprobe` on `PATH` so the whole machine has H.264. See `docs/rendering.md`. |
 | `stories/` | Worked outlines. |
-| `videos/` | Ingested video-level records (5 real Bungie trailers, metadata-only). |
+| `videos/` | Ingested video-level records (6 real Bungie videos, metadata-only). |
 | `tags/` | Tagger output per video, keyed by beat index — replayed by `annotate.JsonTagger`. |
-| `segments/` | Assembled, schema-valid segment records for real footage (69 real shots from the TFS launch trailer). |
+| `segments/` | Assembled, schema-valid segment records for real footage — 69 shots from the TFS launch trailer and 50 from the Curse of Osiris opening cinematic. |
 | `tests/` | `pytest` suite across search, derivation, story assembly, ensemble casting, ingestion, the stub pipeline, and ffmpeg resolution. |
-| `docs/` | `taxonomy.md` (axis reference), `pipeline.md` (segmentation + cost tiers), `agent-retrieval.md` (query mapping), `rendering.md` (which ffmpeg, and why). |
+| `docs/` | `SKILL.md` (agent skill router) and `skills/`, plus the design docs: `taxonomy.md` (axis reference), `pipeline.md` (segmentation + cost tiers), `agent-retrieval.md` (query mapping), `rendering.md` (which ffmpeg, and why). |
+| `AGENTS.md` | Agent operating contract: commands, boundaries, and the three rules that outrank convenience. |
 
 ## The unit: a "beat"
 
@@ -179,11 +186,60 @@ also what lets the concat demuxer join the clips at all — it requires identica
 stream properties across inputs. A shot whose source file is absent is
 **reported and skipped**, never silently dropped.
 
+`--max-shot-sec` caps how long any one shot is held, trimming from its tail — a
+detector-derived beat can be a fine *beat* and a terrible *cut* (the Curse of
+Osiris cinematic ends on a 25-second static gateway shot). The in-point is what
+the index worked to find, so a trim never moves the start.
+
 **Which ffmpeg?** On Bluefin, the already-running `bluefin-thumbnailer`
 container — the host's `ffmpeg-free` has no H.264 decoder and fails only once
 decoding starts. `render.py` resolves the container first and prints what it
 chose; `--no-container` forces a local binary. Full rationale, resolution order,
 and the AV1 shot-detection trap: `docs/rendering.md`.
+
+To give the whole machine a working ffmpeg instead, install the shim:
+
+```bash
+install -Dm755 tools/ffmpeg-container-shim.sh ~/.local/bin/ffmpeg
+ln -sf ffmpeg ~/.local/bin/ffprobe          # it dispatches on $0
+ffmpeg -version                             # => 8.1 (container)
+FFMPEG_NO_CONTAINER=1 ffmpeg -version       # => the host binary (escape hatch)
+```
+
+## Name the cast on screen
+
+`tools/plate.py` puts the casting on the frame, in the Project Bluefin Guardian
+nameplate treatment (ported from the website's Wolves intro overlay):
+
+```bash
+python3 tools/ensemble.py roster --month 2026-08 --out roster.json
+python3 tools/plate.py plan cut.json --roster roster.json --max-shot-sec 9 --out plates.json
+python3 tools/plate.py burn --video renders/cut.mp4 --manifest plates.json \
+    --out renders/cut-plated.mp4
+```
+
+`plan` reads the plate copy from `vocab/casting.yaml` — the same file that binds
+a character to a person — so a recast changes the plate with no other edits. The
+copy is the reference deck's vocabulary and nothing more: `label`, `class`,
+`name`, `title`, `trustee` (`~/Videos/nameplates.json`), plus a `kind: "title"`
+card for the ensemble roster. Do not invent fields; a plate that says something
+the deck has no slot for is a plate that says something nobody wrote.
+
+Each lead is plated **once**, on the first appearance long enough to read, and
+never on a shot that failed its binding's constraints (that shot is already
+excluded from the character's retrieval, so it is not a reveal). Ensemble
+contributors come from the deterministic assignment in `tools/ensemble.py`;
+anyone whose shot is too short to hold a plate is credited together on a roster
+title card over the tail, because dropping a month's contributors silently is
+the one unacceptable outcome.
+
+Plates are anchored to a shot but not confined to it — a lower third routinely
+rides across a cut, and Destiny cinematics are full of two-second shots that
+could otherwise never carry a reveal. Two plates are never visible at once;
+`plan` and `burn` both refuse a manifest where the windows overlap.
+
+Pass `plan` the **same** `--max-shot-sec` the render used, so plate timings land
+on the finished file rather than on the source timeline.
 
 ## Editorial direction
 
@@ -236,9 +292,34 @@ python3 tools/ingest.py https://www.youtube.com/watch?v=6Gm5mbwrqSA --playlist "
 python3 tools/ingest.py --id yt_demo --title "Destiny 2: Lightfall | Neomuna Gameplay Trailer"  # offline
 ```
 
-`videos/` already holds 5 real ingested Bungie trailers. Segment-level tagging
-still needs the frame pass (`tools/annotate.py`), where `overlays` is a
-**required** tagger field — a tagger that skips it silently marks its whole output
+## Index a video end to end
+
+Indexing runs in two passes, because tagging happens out-of-band. The first
+detects beats and writes one keyframe per beat — the stills a vision model or a
+human reads. The second replays the resulting tags into schema-valid segments:
+
+```bash
+yt-dlp -S "vcodec:h264,res:1080" -o "media/<video_id>.%(ext)s" <url>
+python3 tools/ingest.py <url> --id <video_id>
+
+# pass 1 — detect + keyframes (also writes keyframes/<dir>/beats.json)
+python3 tools/annotate.py index --video media/<video_id>.mp4 \
+    --video-record videos/<video_id>.json --keyframes-dir keyframes/<dir>
+
+# ...tag every keyframe into tags/<video_id>.json...
+
+# pass 2 — assemble
+python3 tools/annotate.py index --video media/<video_id>.mp4 \
+    --video-record videos/<video_id>.json --tags tags/<video_id>.json
+```
+
+Both passes run the **same detector settings**, so beat indices line up; a tag
+file is only ever valid against the shot list its own detection pass produced.
+`--min-shot-sec` (default 0.5s) merges the sub-second "shots" Destiny's ability
+flashes and explosions provoke out of a frame-difference detector.
+
+`overlays` is a **required** tagger field — an untagged `overlays` derives
+`clean = false`, so a tagger that skips it silently marks its whole output
 unusable.
 
 ## Cost posture

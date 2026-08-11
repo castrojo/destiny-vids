@@ -1,0 +1,178 @@
+{
+  "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0086-0089",
+  "video_id": "yt_curse_of_osiris_opening_cinematic",
+  "start_sec": 86.633333,
+  "end_sec": 89.4,
+  "start_tc": "1:27",
+  "end_tc": "1:29",
+  "era": "curse_of_osiris",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+    "group"
+  ],
+  "camera_movement": [
+    "handheld_shaky"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "enemy_threat",
+  "action": [
+    "combat"
+  ],
+  "mood": [
+    "tense",
+    "ominous"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "A massive red Vex war-frame lunges through rubble in the foreground while a lone Guardian fires into a blinding teleport flash across a debris-filled battlefield.",
+  "faction": [
+    "vex"
+  ],
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.75
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.5
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.4
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.65
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}
