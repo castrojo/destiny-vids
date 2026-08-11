@@ -99,7 +99,11 @@ def test_a_tag_file_never_carries_a_derived_field(path):
     allowed = set(TAGGER_FIELDS) | {"provenance"}
     offenders = {}
     for beat, tags in _load(path).items():
-        extra = sorted(set(tags) - allowed)
+        # Underscore-prefixed keys are worksheet scaffolding (tools/worksheet.py
+        # records the keyframe and timecodes each judgement was made from). They
+        # are metadata about the tagging task, not tags about the shot, and
+        # JsonTagger strips them at replay so they never reach a segment.
+        extra = sorted(k for k in set(tags) - allowed if not k.startswith("_"))
         if extra:
             offenders[beat] = extra
     assert not offenders, (

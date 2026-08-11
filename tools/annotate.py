@@ -280,6 +280,11 @@ class JsonTagger(Tagger):
     live Tagger would return. Beat index is positional: it is the order
     ``detect_beats`` returned, so a tag file is only valid against the shot list
     the same detector settings produce.
+
+    Underscore-prefixed keys (``_worksheet``, from tools/worksheet.py) are
+    scaffolding — the keyframe a tagger looked at, the timecodes it saw — and
+    are stripped here, so ``assemble_segment``'s tagger-fields strictness keeps
+    catching genuine mistakes instead of metadata.
     """
 
     def __init__(self, tag_map):
@@ -296,7 +301,7 @@ class JsonTagger(Tagger):
         key = str(beat.get("beat_index", self._i))
         if key not in self._tags:
             raise KeyError(f"no tags for beat {key} of {video_id}")
-        return dict(self._tags[key])
+        return {k: v for k, v in self._tags[key].items() if not k.startswith("_")}
 
 
 # --- Assembly ----------------------------------------------------------------

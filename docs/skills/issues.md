@@ -63,6 +63,13 @@ Writing the block is **not the owner's job**. An agent proposes it; the owner
 confirms it. That division is the point: it puts a human at the exact moment
 where a guess would otherwise be made.
 
+A brief's `plates[]` deserve a special mention: copy there is the owner
+speaking, and the **one** place a new claim about a real person may enter the
+system — issue #1 plates Paris Pittman, who has no binding in
+`vocab/casting.yaml`. `tools/plate.py plan --brief` turns them into fixed,
+owner-timed credits; the rules (closed field set, the vocab wins a conflict,
+provenance on every plate) are in [`plates.md`](plates.md).
+
 ```bash
 python3 tools/brief.py normalize 3   # prose -> a PROPOSED block, printed
 python3 tools/brief.py parse 3       # a confirmed block -> validated JSON

@@ -118,10 +118,12 @@ if [ -z "$VIDEO_ID" ]; then
     VIDEO_ID="$(python3 - "$SOURCE_URL" <<'PY'
 import json, pathlib, sys
 from tools.ingest import parse_video_id
-wanted = parse_video_id(sys.argv[1])
+# parse_video_id returns (canonical_watch_url, youtube_id) -- match on the
+# canonical URL, the same spelling ingest writes into the record.
+watch_url, _youtube_id = parse_video_id(sys.argv[1])
 for path in sorted(pathlib.Path("videos").glob("*.json")):
     record = json.loads(path.read_text())
-    if wanted in record.get("youtube_url", ""):
+    if watch_url in record.get("youtube_url", ""):
         print(record["video_id"])
         break
 PY
@@ -166,18 +168,32 @@ fi
 BEATS="$(python3 -c "import json;print(len(json.load(open('$KEYFRAMES/beats.json'))))")"
 
 # ---------------------------------------------------------------- 5. tag
+#
+# The tag file starts life as a generated worksheet: every beat index already
+# present, paired with its keyframe and timecodes, and null for every value.
+# The mechanical half (file shape) is generated so the expensive half (looking
+# at frames) is all that is left. null is not a default -- overlays in
+# particular must be positively established per frame, never inherited from a
+# skeleton -- so the check below, not the file's existence, is what lets the
+# script continue.
 if [ ! -f "$TAGS" ]; then
+    say "worksheet for $VIDEO_ID"
+    python3 tools/worksheet.py generate "$VIDEO_ID" \
+        --keyframes-dir "$KEYFRAMES" --out "$TAGS"
+fi
+
+if ! python3 tools/worksheet.py check "$TAGS" --keyframes-dir "$KEYFRAMES"; then
     cat >&2 <<EOF
 
 Stopping at tagging, which is where a person looks at frames.
 
-    $BEATS keyframes in $KEYFRAMES/
-    write $TAGS, keyed by beat index as a string ("0" .. "$((BEATS - 1))")
+    $TAGS is waiting: $BEATS beats to fill, one keyframe each in $KEYFRAMES/
 
 Every beat needs \`overlays\`: it is the input to the \`clean\` gate, and an
 untagged beat derives clean = false and leaves every cut. Use [] for a clean
 frame. Name a character only where they are visibly in frame.
 
+Progress: python3 tools/worksheet.py check $TAGS
 Format and rules: docs/skills/indexing.md
 Then run this script again -- it resumes here.
 EOF

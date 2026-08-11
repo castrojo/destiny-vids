@@ -46,7 +46,11 @@ python3 tools/ingest.py <url> --id <video_id>
 python3 tools/annotate.py index --video media/<video_id>.mp4 \
     --video-record videos/<video_id>.json
 
-# ...tag every keyframe into tags/<video_id>.json...
+# scaffold the tag file: every beat present, every value null
+python3 tools/worksheet.py generate <video_id>
+
+# ...look at each keyframe and fill tags/<video_id>.json...
+python3 tools/worksheet.py check tags/<video_id>.json   # what is left to fill
 
 # pass 2 — replay tags into segments/
 python3 tools/annotate.py index --video media/<video_id>.mp4 \
@@ -71,8 +75,17 @@ material a tagger reads wrong.
 
 ## Tagging rules
 
+- **Start from the worksheet, not an empty file.** `tools/worksheet.py
+  generate` writes the skeleton: every beat index as a string key, the
+  keyframe and timecodes to judge from (in a `_worksheet` block — scaffolding
+  that replay strips), and `null` for every value. Null is not a default; it
+  means "nobody has looked". The file's shape is generated so the tagger's
+  time goes to the judgement that cannot be automated.
 - **`overlays` is mandatory on every beat.** It is the input to the `clean`
-  gate, which derives `false` when untagged. Use `[]` for a clean shot.
+  gate, which derives `false` when untagged. Use `[]` for a clean shot. The
+  worksheet leaves it `null` — never `[]` — because an inherited "clean" is
+  how a HUD gets into a finished cut. `tools/worksheet.py check` is the
+  done-ness signal; `make_video.sh` gates stage 5 on it.
 - **Do not tag the source's own letterbox.** Bungie cinematics are 2.39:1 inside
   a 16:9 frame; tagging `letterbox` would reject the entire video.
 - **Never return a derived field.** `clean`, `footage_tier`, `traversal_hero`

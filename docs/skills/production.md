@@ -52,7 +52,7 @@ re-fetching 200 MB:
 | 2 | ingest a video record | `videos/<id>.json` exists |
 | 3 | fetch the media (H.264) | `media/<id>.mp4` exists |
 | 4 | detect beats + keyframes | `keyframes/<id>/beats.json` exists |
-| 5 | **tag** | `tags/<id>.json` exists |
+| 5 | **tag** | `tags/<id>.json` exists *and* `worksheet.py check` passes |
 | 6 | assemble segments | never — it is cheap and idempotent |
 | 7 | finish: a **cut**, or the **uncut** credited build | nothing asked for |
 
@@ -107,6 +107,8 @@ A video that refuses here does not need the gate relaxed. It needs cutting.
 feature. `clean` is the gate the whole repo rests on, it must be positively
 established, and "nobody has looked at this frame" is not evidence the frame is
 clean. A script that guessed here would eventually put a HUD in a finished cut.
+What the stop hands over is a generated worksheet; what lets the script
+continue is `tools/worksheet.py check` passing, not the file merely existing.
 
 **A brief with `automatable: no` stops at stage 1**, prints what it is waiting
 on, and exits 0 — stopping is the correct result, not a failure. A brief with
@@ -157,6 +159,16 @@ reads a filename.
 Tagging is the slow stage and the only one that needs eyes, so it is the one
 worth parallelizing: hand each video to its own tagger with its own context.
 
+- Start each tagger from the **generated worksheet**, not an empty file:
+  `tools/worksheet.py generate <video_id>` writes every beat with its keyframe
+  path, its timecodes, and `null` for every value, so batch output is
+  comparable by construction. `make_video.sh` stage 5 generates it when no tag
+  file exists. `null` is never a default — `overlays` and `character` must be
+  earned per frame (see [`indexing.md`](indexing.md)).
+- `tools/worksheet.py check tags/<id>.json` reports which beats still need
+  which fields, `overlays` first — progress, instead of the old binary "no
+  tags yet". Stage 5 stops on this check, so a half-filled file no longer
+  reaches assembly to fail there.
 - Give every tagger **the same enum list and the same reference tag file**, or
   their output is not comparable across videos.
 - A tagger reads *its own* `keyframes/<video_id>/beats.json`. Beat index is
