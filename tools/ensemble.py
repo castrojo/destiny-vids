@@ -192,18 +192,42 @@ def load_shotlist(path=None, directory=None):
     return segs
 
 
-def assign(roster, segments):
+def lead_people(leads=None):
+    """Logins of people cast as a named lead character.
+
+    A person cannot be both a named character and a nameless Guardian in the
+    same project: crediting castrojo as an anonymous "Bluefin Blueberry" while
+    he is cast as Cayde-6 contradicts the casting, and puts a real person in a
+    video their character is not in. Lead bindings therefore remove someone
+    from the ensemble pool entirely; they are credited where their character
+    actually appears, from the `plate:` block on their binding.
+    """
+    if leads is None:
+        from tools.derive import load_leads
+
+        leads = load_leads()
+    return {entry.get("person") for entry in leads.values() if entry.get("person")}
+
+
+def assign(roster, segments, leads=None):
     """Fill every ensemble slot in ``segments`` from ``roster``.
 
     Round-robins a month-seeded rotation of the pool, so each contributor is
     placed once before anyone is placed twice. Returns the tile manifest.
+
+    People cast as leads are excluded from the pool -- see ``lead_people``.
     """
-    pool = [c["login"] for c in roster.get("contributors", [])]
+    cast_as_lead = lead_people(leads)
+    pool = [c["login"] for c in roster.get("contributors", [])
+            if c["login"] not in cast_as_lead]
+    excluded = [c["login"] for c in roster.get("contributors", [])
+                if c["login"] in cast_as_lead]
     tiles = []
     assignments = []
     if not pool:
         return {"month": roster.get("month"), "pool_size": 0,
-                "assignments": [], "tiles": [], "unfilled_slots": 0}
+                "assignments": [], "tiles": [], "unfilled_slots": 0,
+                "cast_as_lead": excluded}
 
     offset = month_offset(roster["month"], len(pool))
     rotated = pool[offset:] + pool[:offset]
@@ -249,6 +273,9 @@ def assign(roster, segments):
         "assignments": assignments,
         "tiles": tiles,
         "uncredited": uncredited,
+        # Reported, not silently omitted: someone missing from the credits
+        # because they are cast as a lead should be visible in the output.
+        "cast_as_lead": excluded,
     }
 
 

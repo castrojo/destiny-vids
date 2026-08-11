@@ -1,12 +1,13 @@
 {
   "video_id": "yt_curse_of_osiris_opening_cinematic",
-  "note": "Burned-in publisher copy on an otherwise usable frame. Boxes are in source pixels at 1920x1080 and windows are source seconds, so a redaction survives any later re-encode of the same source. Only non-diegetic text is covered: the Vex glyphs in the ruins are in-fiction and stay.",
+  "note": "Burned-in publisher copy on an otherwise usable frame. Boxes are in source pixels at 1920x1080 and windows are source seconds, so a redaction survives any later re-encode of the same source. Only non-diegetic text is covered: the Vex glyphs in the ruins are in-fiction and stay. All three cards here fill the whole frame, so their action is 'cut' -- the video starts and ends on picture rather than opening or closing on a painted black rectangle. The two logo records share one window; the union of cut windows is what sets the kept range.",
   "redactions": [
     {
       "id": "pegi_card",
       "start_sec": 0.0,
       "end_sec": 3.4,
       "reason": "PEGI 16 age-rating card on black",
+      "action": "cut",
       "boxes": "full"
     },
     {
@@ -14,6 +15,7 @@
       "start_sec": 163.6,
       "end_sec": 173.194,
       "reason": "DESTINY 2 / EXPANSION I / CURSE OF OSIRIS lockup",
+      "action": "cut",
       "boxes": [
         {"x": 360, "y": 296, "w": 1200, "h": 232}
       ]
@@ -23,6 +25,7 @@
       "start_sec": 163.6,
       "end_sec": 173.194,
       "reason": "Bungie and Activision logos plus the copyright line",
+      "action": "cut",
       "boxes": [
         {"x": 0, "y": 892, "w": 1920, "h": 140}
       ]

@@ -84,6 +84,13 @@ re-render must not re-credit a different person.
 Slots are a pure function of the tags, never hand-set: `crowd` → 6, `group` or
 `crowd_group` salience → 3, otherwise 1.
 
+On-screen credit copy lives beside the casting decision in `vocab/casting.yaml`:
+the generic ensemble copy under `ensemble.plate`, and — under `ensemble.titles`,
+keyed by GitHub login — the Guardian identity of any contributor whose plate is
+genuinely authored in the reference deck (castrojo's is `np_jorge`). Most
+contributors have no entry: an unknown seal is `Bluefin Blueberry`, never an
+invented title. [`plates.md`](plates.md) covers how the two are scheduled.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |

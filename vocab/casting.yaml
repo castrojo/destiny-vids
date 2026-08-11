@@ -72,6 +72,18 @@ leads:
       person: castrojo
       display_name: castrojo
       aka: [cayde, cayde6]
+      # castrojo's Guardian identity is authored in the reference deck
+      # (~/Videos/nameplates.json, np_jorge), so it lives on his LEAD binding
+      # and is reproduced verbatim. Because he is cast as a lead, he is also
+      # excluded from the anonymous-Guardian ensemble pool: a person cannot be
+      # a named character and a nameless blueberry in the same project. He is
+      # therefore credited only in cuts where Cayde-6 is actually on screen.
+      plate:
+        label: TRUSTEE // GUARDIAN
+        class: Harbinger Titan
+        name: Jorge Castro
+        title: "Upender of Antipatterns | The First Disciple"
+        trustee: true
     saladin:
       # CONSTRAINED binding. jeefy plays the Iron Lord, but does not resemble
       # Saladin, so the shot has to do the work: FAR and HELMETED only, where the
@@ -90,8 +102,9 @@ leads:
       aka: []
       # On-screen nameplate copy (tools/plate.py), in the same four-field form
       # as the reference deck: label / class / name / title, plus `trustee`.
-      # The subclass is lore-true to Osiris rather than to the performer's usual
-      # Bluefin plate: he is a solar Warlock, and the plate names the ROLE.
+      # Every field is Bob Killen's OWN plate from the deck (np_bob) -- a real
+      # person's subclass is deck data, never a lore call about the character
+      # they happen to play.
       #
       # `variant: leader` is the complete gold treatment from
       # WolvesIntroOverlay.vue (.wolves-guardian-plate-leader) -- the one the
@@ -100,7 +113,7 @@ leads:
       # is a trustee, and he is plated as the leader.
       plate:
         label: TRUSTEE // GUARDIAN
-        class: Dawnblade Warlock
+        class: Voidwalker Warlock
         name: Bob Killen
         title: Reconciler of the Plane
         trustee: true
@@ -114,7 +127,10 @@ leads:
       plate:
         label: EMOTIONAL SUPPORT // GHOST
         name: Lindsay Gendreau
-        title: Master of the Labyrinths
+        # Nobody has authored a seal for Lindsay, so the title is the project's
+        # standing answer for an unknown one (the owner's rule), the same as an
+        # ensemble slot's.
+        title: Bluefin Blueberry
         kind: ghost
     saint_14:
       person: kat
@@ -192,6 +208,37 @@ ensemble:
     # the in-game name for an unnamed Guardian you get randomly grouped with,
     # which is exactly what an ensemble slot is.
     title: Bluefin Blueberry
+    # The headline of the roster card that closes the cut (the title card's
+    # `title` field). Owner-supplied copy; the card's `subtitle` carries the
+    # month context and is assembled by tools/plate.py from the roster key.
+    roster_title: Thanks for working on Bluefin!
+  # AUTHORED Guardian identities for individual contributors, keyed by GitHub
+  # login. Most contributors are anonymous Guardians: nobody knows their seal,
+  # so they get the generic plate copy above. A few people's Guardian identity
+  # is genuinely authored in the reference deck (~/Videos/nameplates.json), and
+  # a credit that knows it must reproduce it verbatim, never a paraphrase and
+  # never the generic fallback. tools/plate.py prefers an entry here over the
+  # generic copy wherever the person lands, including over the tail sign-off
+  # card, which never flattens an authored identity into a name line while the
+  # cut still has room for the real plate.
+  #
+  # A person CAST AS A LEAD does not belong here: their identity lives on the
+  # lead binding, and they are excluded from the ensemble pool entirely. That
+  # is why castrojo is not in this map -- he is Cayde-6, so his plate is on the
+  # `cayde_6` binding above and he is credited only where Cayde is on screen.
+  #
+  # Add a login ONLY with copy that exists in the deck: inventing a title, a
+  # class, or a pronoun for a real person is the one thing this file must
+  # never do.
+  titles:
+    description: >
+      Authored Guardian identities for individual contributors, keyed by GitHub
+      login (see the comment above). Values are full plate copies in the
+      reference deck's closed field set; tools/derive.py loads them with
+      load_ensemble_titles() and tools/plate.py prefers them over the generic
+      ensemble copy. Derivation never reads this block. Empty is normal: it
+      only ever holds people whose identity is genuinely authored AND who are
+      not cast as a lead.
   org:
     description: >
       GitHub organisation whose members are credited as maintainers. Recorded

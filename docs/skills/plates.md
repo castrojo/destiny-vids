@@ -41,7 +41,7 @@ A Guardian nameplate carries **exactly**:
 | Field | Example |
 |---|---|
 | `label` | `TRUSTEE // GUARDIAN` |
-| `class` | `Dawnblade Warlock` |
+| `class` | `Voidwalker Warlock` |
 | `name` | `Bob Killen` |
 | `title` | `Reconciler of the Plane` |
 | `trustee` | `true` — the burnished-silver chrome |
@@ -63,6 +63,11 @@ and it **takes precedence over `trustee`**, mirroring the CSS selector
 `.wolves-guardian-plate-trustee:not(.wolves-guardian-plate-leader)`, so a
 binding may carry both flags and plate gold. The leader block deliberately does
 not restyle the class row, which stays the default blue).
+
+The deck's `gp_*` entries add three **placement** fields, which are deck data,
+not new copy: `position: "group"` with an absolute `x` (measured against the
+picture, never the raw frame), a `scale` factor that shrinks the card, and a
+`group` key marking which row a card belongs to.
 
 ## Core Process
 
@@ -94,11 +99,43 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   across a cut, and Destiny cinematics are full of two-second shots that could
   otherwise never carry a reveal. The anchor must still be long enough to
   register (`MIN_ANCHOR`).
-- **Two plates are never visible at once.** `plan` and `burn` both refuse an
-  overlapping manifest.
+- **Two plates are never visible at once — unless they share a row.** `plan`
+  and `burn` both refuse an overlapping manifest, with one narrow exception:
+  members of the same group row carry a shared `group` key and are one row by
+  construction. A group member overlapping anything outside its row is still
+  an error.
+- **A crowded shot's ensemble credits are a staggered row, not a queue.** A
+  shot with several ensemble slots spreads its cards across the frame like the
+  reference deck's roll call (`gp_*`): doubly staggered, with entrances
+  cascading `GROUP_STAGGER` (0.4s) apart and every card ending together. `x`
+  is an **even spread centred on the picture**, computed from the actual
+  rendered card widths — deliberately *not* a pointer at a specific body,
+  because the casting model says the anonymous crowd is fillable by anyone and
+  a plate that singles out a Guardian overclaims it. The row renders at
+  `GROUP_SCALE` (0.78, the deck's value) and shrinks until it fits the row
+  margins; six cards still fit one row. Past `GROUP_MIN_SCALE` the type is too
+  small to be a credit, so the slots split into the fewest balanced rows that
+  each fit (an unusually wide mix goes 3+3 in separate windows), and a shot
+  that cannot hold a readable row at all falls back to the old sequential
+  right-hand plates. Either way contributors are never dropped over a layout:
+  whoever the shot cannot hold still goes through the re-home pass and the
+  tail roster card.
 - Contributors whose shot is too short are credited together on a roster title
-  card over the tail. Dropping a month's contributors silently is the one
-  unacceptable outcome.
+  card over the tail — the card's headline is the owner-supplied
+  `roster_title` in `vocab/casting.yaml` ("Thanks for working on Bluefin!"),
+  its `subtitle` carries the month context. Dropping a month's contributors
+  silently is the one unacceptable outcome.
+- **That card is the cut's last beat, not just an overflow list.** It plays
+  whether or not anyone is left to credit; its `body` (the leftover names) may
+  be absent. Gating it on leftovers meant that crediting everyone in the body
+  silently deleted the ending.
+- **A person cast as a lead is never an anonymous Guardian.** `tools/ensemble.py`
+  excludes anyone bound to a lead character from the contributor pool and
+  reports them as `cast_as_lead`. castrojo is Cayde-6, so he is not a blueberry
+  in the crowd: his authored plate lives on the `cayde_6` binding, and he is
+  credited in cuts where Cayde is actually on screen. Being a named character
+  and a nameless Guardian at once is a contradiction, and it puts a real person
+  in a video their character is not in.
 - **A maintainer is not a passing contributor.** `tools/ensemble.py roster`
   records `org_member` per person from the GitHub org (`gh api
   orgs/<org>/members`, falling back to public members), and the eyebrow follows
@@ -107,6 +144,15 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   `org_member` is **tri-state** — `null` means the lookup failed, which is not
   the same as "not a member", so it takes a neutral `GUARDIAN` eyebrow rather
   than silently demoting everyone when a token expires.
+- **An authored identity beats the generic copy.** `ensemble.titles` in
+  `vocab/casting.yaml` maps a GitHub login to that person's Guardian plate
+  exactly as authored in the reference deck (castrojo's is `np_jorge`). A
+  contributor with an entry gets that plate verbatim wherever they land;
+  everyone else falls back to `Bluefin Blueberry`, because an unknown seal is
+  never a made-up one. A specially-titled contributor who would otherwise land
+  on the roster card gets first claim on the tail window, so the card never
+  flattens an authored identity into a name line while the cut has room for
+  the real plate. Add a login only with copy that exists in the deck.
 
 `burn` composites every plate in one ffmpeg pass — an `overlay` chain gated by
 `enable='between(t,in,out)'` — and stream-copies audio, so titling never costs
@@ -248,7 +294,7 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 |---|---|
 | "One extra line makes the plate clearer." | It makes the plate say something nobody wrote. The deck's fields are the contract. |
 | "I'll hardcode the copy just for this render." | Then the credit and the casting drift apart the first time a role is recast. Copy lives in `vocab/casting.yaml`. |
-| "The plate is short, it can share the screen." | Two plates at once is unreadable; both `plan` and `burn` refuse it. |
+| "The plate is short, it can share the screen." | Two plates at once is unreadable; both `plan` and `burn` refuse it. The only exception is a group row, whose members are built to be seen together. |
 | "The shot is only two seconds, so nobody can be plated there." | The plate rides across the cut. Only the *anchor* must be long enough to register. |
 
 ## Red Flags

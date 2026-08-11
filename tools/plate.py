@@ -16,7 +16,7 @@ A manifest entry follows the authoring contract in the
 improvised text:
 
     {"id": "osiris", "at": 12.4, "dur": 6.0, "position": "left",
-     "label": "TRUSTEE // GUARDIAN", "class": "Dawnblade Warlock",
+     "label": "TRUSTEE // GUARDIAN", "class": "Voidwalker Warlock",
      "name": "Bob Killen", "title": "Reconciler of the Plane", "trustee": true}
 
 The four text fields plus ``trustee`` are exactly the vocabulary of the
@@ -120,13 +120,46 @@ CHAMFER = 16             # clip-path: polygon(16px ...)
 CORNER_RADIUS = 12       # border-radius: 0.75rem, on the two corners not cut
 CREST = 2.5 * REM        # .wolves-guardian-plate-crest
 
-# The CSS caps the plate at 44rem and lets the browser wrap. Only the chat card
-# carries copy long enough to need it, so it is the only shape that wraps.
-MAX_INNER_W = 44 * REM
+# --- chat card (wolves-*/render/plate.html -- the baked dialogue pill) -------
+# The other videos' talking card is neither the reveal plate nor the site's
+# .wc-nameplate: it is the one-line pill plate.html bakes -- [crest] SPEAKER |
+# message, shrink-to-fit, never wrapped. plate.html renders at 2x for the 4K
+# master, so every constant here is the 1x half, named after the rule it came
+# from. Where plate.html and the site disagree (pill vs chamfered box, one
+# line vs stacked rows, gradient message vs solid uppercase label) the baked
+# reference wins: it is what the videos were actually rendered from
+# (docs/skills/plates.md: where the site and the videos disagree, the videos win).
+CHAT_AVATAR = 42         # .avatar/.pfp: 84px circle; the crest is the no-pfp fallback
+CHAT_GAP = 13            # .plate { gap: 26px }
+CHAT_PAD_L = 12          # .plate { padding: 20px 44px 20px 24px }
+CHAT_PAD_R = 22
+CHAT_PAD_Y = 10
+CHAT_MAX_W = 1550        # .plate { max-width: 3100px }
+CHAT_FS_SPEAKER = 17     # .eyebrow { font-size: 34px }
+CHAT_LS_SPEAKER = 0.28   # .eyebrow { letter-spacing: 0.28em }
+CHAT_FS_TEXT_MAX = 28    # render script MAX_FONT 56px -- the preferred size
+CHAT_FS_TEXT_MIN = 19    # ...MIN_FONT 38px -- the shrink-to-fit floor
+CHAT_RULE_W = 2          # .rule { width: 3px } -- 1.5px at 1x, rounded up
+CHAT_RULE_H = 23         # .rule { height: 46px }
 
 # Row placement: bottom 10%, left/right 5% (.wolves-guardian-plate-row).
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
+
+# --- group rows (the reference deck's roll call, ~/Videos/nameplates.json) ---
+# The deck's gp_* entries are one row of credits, doubly staggered: spatially,
+# each card carries an absolute `x` measured against the picture; temporally,
+# entrances cascade GROUP_STAGGER seconds apart and every card ends together.
+# They are deliberately NOT aimed at individual bodies: the casting model says
+# the anonymous crowd is fillable by anyone (vocab/casting.yaml `ensemble`), so
+# an even spread reads as a row of credits rather than arrows at people.
+GROUP_SCALE = 0.78      # the deck's gp_* scale
+GROUP_MIN_SCALE = 0.4   # below this the type is too small to be a credit
+GROUP_GAP = 24          # px between cards in a row
+GROUP_STAGGER = 0.4     # the cascade between entrances; the row ends together
+# The roll call spans nearly the whole picture width (the deck's row runs
+# x=51 -> ~1920, ~2.7% margins), wider than a corner plate's 5%.
+GROUP_MARGIN_X = 0.03
 
 # The CSS stack is `ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace`
 # (wolves-*/render/reveal.html, and --wc-font-mono on the site). Neither Apple's
@@ -175,27 +208,6 @@ def _draw_tracked(draw, xy, text, font, fill, tracking_em):
     for ch in text:
         draw.text((x, y), ch, font=font, fill=fill)
         x += draw.textlength(ch, font=font) + extra
-
-
-def _wrap(text, font, max_width):
-    """Greedy word wrap to ``max_width``, mirroring the CSS 44rem cap.
-
-    A word longer than the line box is left over-long rather than broken: the
-    copy is recovered dialogue, and hyphenating it would put characters on
-    screen that nobody said.
-    """
-    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
-    lines, current = [], ""
-    for word in (text or "").split():
-        trial = f"{current} {word}".strip()
-        if current and probe.textlength(trial, font=font) > max_width:
-            lines.append(current)
-            current = word
-        else:
-            current = trial
-    if current:
-        lines.append(current)
-    return lines
 
 
 def _gradient_text(size, text, font, stops):
@@ -310,6 +322,112 @@ def _horizon(width, height, accent, to_left=False):
     return img
 
 
+def _pill(size, fill, border):
+    """plate.html's `.plate`: `border-radius: 999px` under a 1px (2px at 2x) rule.
+
+    The fill is a supersampled mask so the round caps antialias. The hairline
+    is STROKED, not mask-minus-eroded: `_chamfered`'s erosion trick only shows
+    where its mask slopes, but a pill is all straight runs between the caps and
+    the browser's border is visible the whole way around.
+    """
+    w, h = size
+    scale = 4
+    big = (w * scale, h * scale)
+    mask = Image.new("L", big, 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, big[0] - 1, big[1] - 1],
+                                           radius=big[1] // 2, fill=255)
+    mask = mask.resize(size, Image.LANCZOS)
+
+    img = Image.new("RGBA", size, (0, 0, 0, 0))
+    img.paste(fill, (0, 0, w, h), mask)
+
+    ring = Image.new("RGBA", big, (0, 0, 0, 0))
+    ImageDraw.Draw(ring).rounded_rectangle([0, 0, big[0] - 1, big[1] - 1],
+                                           radius=big[1] // 2,
+                                           outline=border, width=scale)
+    img.alpha_composite(ring.resize(size, Image.LANCZOS))
+    return img
+
+
+def _render_chat(spec):
+    """The dialogue pill from wolves-*/render/plate.html: `[crest] SPEAKER | message`.
+
+    One horizontal line on a pill -- the small talking card the other videos
+    use, not the Guardian reveal's centered stack. The reveal names the person
+    once; every line after that rides in this. Both fields are recovered copy:
+    `speaker` from vocab/casting.yaml, `text` from dialogue/<id>/dialogue.json.
+    """
+    chrome = VARIANTS["default"]  # plate.html bakes only the blue chrome
+    # .eyebrow { text-transform: uppercase } -- the speaker is chrome.
+    speaker = (spec.get("speaker") or "").upper()
+    # NOT uppercased. The site's .wc-nameplate-label shouts its label, but
+    # plate.html's .message carries no text-transform and the baked plates
+    # prove it ("I guess I'm taking the long way around."): recovered dialogue
+    # is real speech, and shouting it would put an emphasis on it nobody said.
+    text = spec.get("text") or ""
+
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    f_speaker = _font("regular", CHAT_FS_SPEAKER)
+    speaker_w = _tracked_width(probe, speaker, f_speaker, CHAT_LS_SPEAKER)
+
+    def pill_width(f_text):
+        # the flex row: pad, avatar, gap, eyebrow, gap, rule, gap, message, pad
+        return (CHAT_PAD_L + CHAT_AVATAR + CHAT_GAP + speaker_w + CHAT_GAP
+                + CHAT_RULE_W + CHAT_GAP
+                + probe.textlength(text, font=f_text) + CHAT_PAD_R)
+
+    # plate.html's shrink-to-fit: start at MAX_FONT and step down until the
+    # pill fits max-width -- one wide line, never a wrap ("Prefer one wide
+    # line", authoring-interview-chat-plates). The loop stops at MIN_FONT just
+    # like the browser's, so a line that still overflows renders whole rather
+    # than clipping recovered dialogue.
+    size = CHAT_FS_TEXT_MAX
+    f_text = _font("bold", size)
+    while size > CHAT_FS_TEXT_MIN and pill_width(f_text) > CHAT_MAX_W:
+        size -= 1
+        f_text = _font("bold", size)
+
+    box_w = int(math.ceil(pill_width(f_text)))
+    # border-box: the avatar is the tallest item, padding above and below.
+    box_h = int(round(CHAT_AVATAR + 2 * CHAT_PAD_Y))
+    img = _pill((box_w, box_h), INK, chrome["border"])
+    mid = box_h / 2
+
+    # The avatar slot holds a pfp in the videos; with no pfp in the field set,
+    # the crest is plate.html's own fallback.
+    img.alpha_composite(_crest(CHAT_AVATAR, chrome["accent"], chrome["glow"]),
+                        (CHAT_PAD_L, int(mid - CHAT_AVATAR / 2)))
+
+    # Text goes on its own layer so one text-shadow sits under all of it
+    # (plate.html: text-shadow: 0 4px 20px at 2x == 0 2px 10px here). The rule
+    # is chrome, not type, so it stays out from under the shadow layer.
+    text_layer = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_layer)
+
+    x = CHAT_PAD_L + CHAT_AVATAR + CHAT_GAP
+    if speaker:
+        a, d = f_speaker.getmetrics()
+        _draw_tracked(draw, (x, mid - (a + d) / 2), speaker, f_speaker,
+                      chrome["label"], CHAT_LS_SPEAKER)
+    x += speaker_w + CHAT_GAP
+    img.alpha_composite(
+        Image.new("RGBA", (CHAT_RULE_W, CHAT_RULE_H), chrome["border"]),
+        (int(x), int(mid - CHAT_RULE_H / 2)))
+    x += CHAT_RULE_W + CHAT_GAP
+
+    if text:
+        a, d = f_text.getmetrics()
+        layer = _gradient_text(
+            (int(math.ceil(probe.textlength(text, font=f_text))) + 4,
+             int(f_text.size * 1.4)),
+            text, f_text,
+            [(0.0, (255, 255, 255, 255)), (0.6, NAME_MID), (1.0, NAME_BOTTOM)])
+        text_layer.alpha_composite(layer, (int(x), int(mid - (a + d) / 2)))
+
+    img.alpha_composite(_with_text_shadow(text_layer))
+    return img
+
+
 def _variant_for(spec):
     """The reference deck flags chrome with `trustee`; `variant` adds `leader`.
 
@@ -332,12 +450,15 @@ def render_plate(spec):
     Guardian plate (`label` / `class` / `name` / `title`) and the title card
     (`title` / `subtitle` / `body`). The third is the chat card (`speaker` /
     `text`), added to the data model deliberately so a cut can show a recovered
-    conversation without a plate line anybody had to invent.
+    conversation without a plate line anybody had to invent. The chat card is
+    a different component -- the plate.html dialogue pill -- so it dispatches
+    to `_render_chat` instead of sharing the reveal's centered stack.
     """
+    if spec.get("kind") == "chat":
+        return _render_chat(spec)
     variant = _variant_for(spec)
     ghost = spec.get("kind") == "ghost"
     card = spec.get("kind") == "title"
-    chat = spec.get("kind") == "chat"
     scale = 0.82 if ghost else 1.0
 
     f_label = _font("regular", FS_LABEL * scale)
@@ -353,13 +474,6 @@ def render_plate(spec):
         name = spec.get("title") or ""
         title = spec.get("subtitle") or ""
         body = list(spec.get("body") or [])
-    elif chat:
-        # The chat card names the PERSON speaking and shows what they said.
-        # It deliberately carries no character row: who plays whom is
-        # established by the Guardian reveal, not restated on every line.
-        label = (spec.get("speaker") or "").upper()
-        klass, name, title = "", "", ""
-        body = _wrap(spec.get("text") or "", f_class, MAX_INNER_W)
     else:
         label = (spec.get("label") or "").upper()
         # NOT uppercased. The site stylesheet puts `text-transform: uppercase`
@@ -447,18 +561,32 @@ def render_plate(spec):
     return img
 
 
-def place(plate, position="left", picture=None):
+def place(plate, position="left", picture=None, x=None, scale=1.0):
     """Composite a plate onto a full 1920x1080 transparent frame.
 
     ``picture`` is the real image area ``(x, y, w, h)`` inside the frame. The
     row margins are measured against *it*, not the frame, so on a letterboxed
     2.39:1 cinematic the plate sits on the picture instead of hanging onto the
     black bar. Defaults to the whole frame.
+
+    ``position: "group"`` is the reference deck's roll call: the card carries
+    an absolute ``x`` measured from the *picture's* left edge (never the raw
+    frame's, so it cannot drift onto a letterbox bar) and a ``scale`` that
+    shrinks the rendered card, the same lever ``render_plate``'s ghost scale
+    pulls. A group plate without an ``x`` is a bug, not a default.
     """
     frame = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+    if scale != 1.0:
+        plate = plate.resize((max(1, int(round(plate.width * scale))),
+                              max(1, int(round(plate.height * scale)))),
+                             Image.LANCZOS)
     px, py, pw, ph = picture or (0, 0, FRAME_W, FRAME_H)
     y = py + int(ph * (1 - MARGIN_BOTTOM)) - plate.height
-    if position == "right":
+    if position == "group":
+        if x is None:
+            raise ValueError("a group plate needs an absolute x")
+        x = px + int(round(x))
+    elif position == "right":
         x = px + int(pw * (1 - MARGIN_X)) - plate.width
     elif position == "center":
         x = px + (pw - plate.width) // 2
@@ -556,9 +684,17 @@ def _ensemble_entry(item, at, dur, copy):
     a credit that flattens the two says something untrue about a real person.
     Which one applies comes from the roster's ``org_member``; the words come
     from vocab/casting.yaml, never from here.
-    """
-    from tools.derive import ensemble_label
 
+    A contributor whose Guardian identity is genuinely authored -- recorded
+    under ``ensemble.titles`` in vocab/casting.yaml, straight from the
+    reference deck -- gets that plate verbatim instead of the generic copy.
+    """
+    from tools.derive import ensemble_label, load_ensemble_titles
+
+    authored = load_ensemble_titles().get(item["login"])
+    if authored:
+        return {"id": f"ensemble_{item['login']}", "at": at, "dur": dur,
+                "position": "right", **authored}
     entry = {
         "id": f"ensemble_{item['login']}", "at": at, "dur": dur,
         "position": "right",
@@ -568,6 +704,88 @@ def _ensemble_entry(item, at, dur, copy):
     if copy.get("title"):
         entry["title"] = copy["title"]
     return entry
+
+
+def _ensemble_group_rows(items, start, duration, hold, total, busy, copy):
+    """A shot's ensemble slots as staggered rows of credits across the frame.
+
+    The reference deck's roll call (~/Videos/nameplates.json gp_*) is staggered
+    twice: spatially, each card gets an absolute ``x``; temporally, entrances
+    cascade GROUP_STAGGER apart and every card in the row ends together. ``x``
+    here is an EVEN SPREAD across the frame width, never a pointer at a body:
+    the casting model says the anonymous crowd is fillable by anyone, so a
+    plate that appears to single out a specific Guardian overclaims it. Each
+    row is centred on the frame -- ``place()`` anchors that ``x`` to the
+    picture's left edge, and Bungie's letterboxed cinematics are full-width, so
+    the two coincide.
+
+    The layout is computed from the actual rendered card widths (``render`` is
+    deterministic, so what ``plan`` measures is what ``burn`` draws): a row
+    starts at GROUP_SCALE and shrinks until it fits inside the row margins.
+    When one row of all the shot's slots would have to shrink past
+    GROUP_MIN_SCALE, the slots split into the fewest balanced rows that each
+    fit (six cards is still one row; an unusually wide mix may go 3+3). Rows
+    after the first take the next free window, and a row whose last,
+    latest-arriving card could not be read stops the cascade -- anything
+    unplaced is returned for the caller's sequential fallback, so nobody is
+    dropped over a layout.
+    """
+    n = len(items)
+    if n < 2:
+        return [], items
+    cards = [_ensemble_entry(item, 0.0, 0.0, copy) for item in items]
+    widths = [render_plate(card).width for card in cards]
+    usable_w = FRAME_W * (1 - 2 * GROUP_MARGIN_X)
+
+    def chunk_scale(i, j):
+        """The scale a row of cards ``i..j`` needs to fit the row margins."""
+        k = j - i
+        fit = (usable_w - (k - 1) * GROUP_GAP) / sum(widths[i:j])
+        return math.floor(min(GROUP_SCALE, fit) * 100) / 100  # never wider than fits
+
+    def balanced_chunks(r):
+        """``r`` contiguous rows, sizes differing by at most one card."""
+        base, extra = divmod(n, r)
+        spans, i = [], 0
+        for row_i in range(r):
+            j = i + base + (1 if row_i < extra else 0)
+            spans.append((i, j))
+            i = j
+        return spans
+
+    layout = None
+    for r in range(1, n):
+        spans = balanced_chunks(r)
+        scales = [chunk_scale(i, j) for i, j in spans]
+        if all(s >= GROUP_MIN_SCALE for s in scales):
+            layout = list(zip(spans, scales))
+            break
+    if layout is None:
+        return [], items
+
+    entries, cursor = [], start
+    for row_i, ((i, j), scale) in enumerate(layout):
+        stagger = (j - i - 1) * GROUP_STAGGER
+        window = _first_free_window(start, duration, hold + stagger, total,
+                                    busy, cursor)
+        if not window or window[1] - stagger < MIN_HOLD:
+            break  # the last card in would arrive too late to be read
+        at, dur = window
+        end = round(at + dur, 3)
+        scaled = [int(round(w * scale)) for w in widths[i:j]]
+        row_w = sum(scaled) + (j - i - 1) * GROUP_GAP
+        x = (FRAME_W - row_w) / 2
+        row_id = f"ensemble_row:{items[i]['segment_id']}:{row_i}"
+        for k, (card, w) in enumerate(zip(cards[i:j], scaled)):
+            card_at = round(at + k * GROUP_STAGGER, 3)
+            card.update({"at": card_at, "dur": round(end - card_at, 3),
+                         "position": "group", "group": row_id,
+                         "x": int(round(x)), "scale": scale})
+            x += w + GROUP_GAP
+        entries.extend(cards[i:j])
+        busy.append((at, end))
+        cursor = end + TAIL_OUT
+    return entries, items[len(entries):]
 
 
 def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
@@ -681,14 +899,34 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
 
     credited, pending = set(), []
     for start, duration, shot in timeline:
-        # A shot with several ensemble slots credits several people, one after
-        # another rather than all at its head: the plate rides across the cut,
-        # so a six-Guardian firefight can name six contributors instead of
-        # burning five of them onto the roster card for want of a start time.
+        items = [item for item in by_segment.get(shot.get("segment_id"), [])
+                 if item["login"] not in credited]
+        # One credit per person per shot: a pool smaller than the slot count
+        # assigns the same login twice, and a row cannot name someone twice.
+        items = list({item["login"]: item for item in items}.values())
+        if not items:
+            continue
+        # A shot with several ensemble slots credits them as staggered rows
+        # spread across the frame -- the reference deck's roll call -- instead
+        # of a queue of right-hand plates arriving one at a time in the same
+        # corner. Each row shares one busy window, so the rest of the cut
+        # still sees one plate at a time outside the row.
+        row, leftover = _ensemble_group_rows(items, start, duration, hold,
+                                             total, busy, ensemble_copy)
+        if row:
+            entries.extend(row)
+            for item in items[:len(row)]:
+                credited.add(item["login"])
+            if log:
+                for card, item in zip(row, items):
+                    log(f"  {'ensemble':<10} {card['at']:6.2f}s +{card['dur']:.1f}s  "
+                        f"{item['display_name']} (group row x={card['x']})")
+        # Single slot, or a row that cannot fit/readably stagger: the plates
+        # ride across the cut one after another instead, so a six-Guardian
+        # firefight can still name six contributors rather than burning five of
+        # them onto the roster card for want of a start time.
         cursor = start
-        for item in by_segment.get(shot.get("segment_id"), []):
-            if item["login"] in credited:
-                continue
+        for item in leftover:
             window = _first_free_window(start, duration, hold, total, busy, cursor)
             if not window:
                 pending.append(item)
@@ -730,35 +968,82 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         if not placed:
             still_pending.append(item)
 
-    # Whoever the body of the cut could not hold is credited together on one
-    # roster plate over the tail, in rotation order. The month's contributors
-    # are the ensemble; dropping them silently would be the one unacceptable
-    # outcome.
+    # The sign-off card over the tail. It has two jobs, and they are separable:
+    #
+    #   1. It is the cut's LAST BEAT -- the card's headline (roster_title in
+    #      vocab/casting.yaml) is how the video says goodbye, so it plays
+    #      whether or not anyone is left to credit. Gating it on leftovers
+    #      meant that crediting everyone in the body silently deleted the
+    #      ending.
+    #   2. Its `body` credits whoever the body of the cut could not hold, in
+    #      rotation order. That list may be empty; the card still plays.
+    #
+    # Dropping a contributor silently remains the one unacceptable outcome.
     pending = [item for item in still_pending if item["login"] not in credited]
-    if pending and timeline:
+    if timeline:
         tail_start, tail_dur, _ = timeline[-1]
         cursor = max([tail_start + LEAD_IN] + [b_end + TAIL_OUT for b_start, b_end in busy
                                                if b_end > tail_start])
-        remaining = min(tail_start + tail_dur - TAIL_OUT - cursor, MAX_ROSTER_HOLD)
-        seen, names = set(), []
+        # A contributor whose Guardian identity is authored (ensemble.titles in
+        # vocab/casting.yaml) is never reduced to a name line on the card while
+        # the cut still has room for the real plate: they get first claim on
+        # the tail the card was about to occupy -- but not at the price of
+        # pushing anyone else off the card, since dropping a contributor is the
+        # one unacceptable outcome. When the tail cannot hold both, the card
+        # credits everyone and the authored plate waits for a cut with room.
+        from tools.derive import load_ensemble_titles
+        titled = load_ensemble_titles()
+
+        def card_names(extra_credited=()):
+            seen, names = set(), []
+            for item in pending:
+                if (item["login"] not in seen and item["login"] not in credited
+                        and item["login"] not in extra_credited):
+                    seen.add(item["login"])
+                    names.append(item["display_name"])
+            return names
+
+        def tail_room(at_cursor):
+            return min(tail_start + tail_dur - TAIL_OUT - at_cursor,
+                       MAX_ROSTER_HOLD)
+
         for item in pending:
-            if item["login"] not in seen:
-                seen.add(item["login"])
-                names.append(item["display_name"])
+            if item["login"] in credited or item["login"] not in titled:
+                continue
+            window = _first_free_window(tail_start, tail_dur, hold, total, busy, cursor)
+            if not window:
+                continue  # no room for the real plate; the card carries them
+            at, dur = window
+            would_cursor = at + dur + TAIL_OUT
+            rest = card_names(extra_credited={item["login"]})
+            if rest and tail_room(would_cursor) < MIN_HOLD <= tail_room(cursor):
+                continue  # plating them would strand the rest off the card
+            cursor = would_cursor
+            entries.append(_ensemble_entry(item, at, dur, ensemble_copy))
+            busy.append((at, at + dur))
+            credited.add(item["login"])
+            if log:
+                log(f"  {'ensemble':<10} {at:6.2f}s +{dur:.1f}s  "
+                    f"{item['display_name']} (authored plate)")
+        remaining = tail_room(cursor)
+        names = card_names()
         if remaining >= MIN_HOLD:
-            entries.append({
+            card = {
                 "id": "ensemble_roster", "at": round(cursor, 3),
                 "dur": round(remaining, 3), "position": "right", "kind": "title",
-                "title": "The Ensemble",
+                "title": ensemble_copy["roster_title"],
                 "subtitle": f"Project Bluefin contributors, {result['month']}",
-                "body": names,
-            })
-            credited.update(seen)
+            }
+            if names:
+                card["body"] = names
+            entries.append(card)
             if log:
-                log(f"  {'roster':<10} {cursor:6.2f}s +{remaining:.1f}s  "
-                    f"{', '.join(names)}")
-        elif log:
+                log(f"  {'sign-off':<10} {cursor:6.2f}s +{remaining:.1f}s  "
+                    f"{', '.join(names) if names else '(everyone credited in the cut)'}")
+        elif names and log:
             log(f"  UNCREDITED (no room in the cut): {', '.join(names)}")
+        elif log:
+            log("  NO SIGN-OFF: the tail has no room for the card")
 
     return sorted(entries, key=lambda e: e["at"])
 
@@ -781,13 +1066,23 @@ def load_manifest_entries(entries):
         if float(e["dur"]) <= 0:
             raise ValueError(f"plate {e['id']!r} has non-positive dur")
         start = float(e["at"])
-        windows.append((start, start + float(e["dur"]), e["id"]))
+        windows.append((start, start + float(e["dur"]), e["id"],
+                        e.get("group")))
 
     # One plate at a time (authoring-interview-chat-plates): overlapping visible
-    # windows are a bug, not a style choice.
-    for (a_start, a_end, a_id), (b_start, b_end, b_id) in zip(
-            sorted(windows), sorted(windows)[1:]):
-        if b_start < a_end:
+    # windows are a bug, not a style choice. One narrow exception: members of
+    # the same group row share a `group` key and are one row by construction --
+    # the reference deck's roll call is *meant* to be visible together. A group
+    # member overlapping anything outside its own row is still an error, so the
+    # check is pairwise rather than the old adjacent-pair scan (an exempt pair
+    # must not shield a later collider behind it).
+    ordered = sorted(windows)
+    for i, (a_start, a_end, a_id, a_group) in enumerate(ordered):
+        for b_start, b_end, b_id, b_group in ordered[i + 1:]:
+            if b_start >= a_end:
+                break
+            if a_group and a_group == b_group:
+                continue
             raise ValueError(
                 f"plates {a_id!r} and {b_id!r} are visible at the same time "
                 f"({b_start:.2f}s < {a_end:.2f}s)"
@@ -801,7 +1096,8 @@ def render_all(entries, out_dir, picture=None):
     written = []
     for e in entries:
         dest = out_dir / f"plate_{e['id']}.png"
-        place(render_plate(e), e.get("position", "left"), picture).save(dest)
+        place(render_plate(e), e.get("position", "left"), picture,
+              x=e.get("x"), scale=float(e.get("scale", 1.0))).save(dest)
         written.append(dest)
     return written
 

@@ -10,6 +10,14 @@ nothing is being re-cut. They are painted out instead.
 What this does NOT do is invent picture: a redaction only ever *removes*, and
 the boxes are authored in ``redactions/<video_id>.json`` against source pixels
 so they can be reviewed without running a render.
+
+A record carries an ``action``: ``box`` (the default) paints its window out;
+``cut`` removes the window from the video entirely. A redaction whose content
+is the whole frame -- the ratings card at the head, the logo card at the tail
+-- should be cut, not boxed: a full-frame black rectangle reads as a defect,
+not a fade, where the video should simply start and end on picture. ``cut``
+windows trim the encode to ``kept_range``, and tools/uncut.py clamps its cut
+list to the same range, so the two never disagree about where the picture is.
 """
 import argparse
 import json
@@ -20,6 +28,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+from tools.search import load_segments  # noqa: E402
 
 REDACTIONS_DIR = REPO_ROOT / "redactions"
 
@@ -32,8 +42,94 @@ def load_redactions(video_id, root=REDACTIONS_DIR):
         return json.load(fh)
 
 
+def action_of(item):
+    """A record's fate: ``box`` paints the window out, ``cut`` removes it.
+
+    Records that predate the field default to ``box``: a window whose content
+    is less than the whole frame has nothing to cut *to*.
+    """
+    action = item.get("action", "box")
+    if action not in ("box", "cut"):
+        raise ValueError(
+            f"redaction {item.get('id')!r} has unknown action {action!r}")
+    return action
+
+
+def _window(item):
+    start, end = float(item["start_sec"]), float(item["end_sec"])
+    if end <= start:
+        raise ValueError(f"redaction {item['id']!r} ends before it starts")
+    return start, end
+
+
+#: Slop on "touches the head/tail", in seconds (~1.5 frames at 29.97): a cut
+#: window authored a frame short of the end still reaches it. Anything more
+#: and the window leaves a hole, which is an error, not a trim.
+EDGE_SLOP = 0.05
+
+
+def kept_range(redactions, video_end):
+    """The [start, end) of picture surviving the ``cut`` windows, source seconds.
+
+    ``video_end`` is the source's duration -- the index's last segment end for
+    the video. It is required because without it a cut window near the tail
+    cannot be told apart from one in the middle of the picture. With no cut
+    windows the range is the whole video: ``(0.0, video_end)``.
+
+    tools/uncut.py clamps its cut list to this range and the encode below is
+    trimmed to it; both must agree exactly, or every plate timed against the
+    cut list lands at the wrong moment on the redacted file.
+
+    A cut window has to touch the head or the tail: removing the middle of an
+    uncut video would split it in two, which one trimmed encode cannot express,
+    so a middle window is rejected loudly rather than handled differently by
+    the two consumers.
+    """
+    merged = []
+    for start, end in sorted(_window(i) for i in redactions
+                             if action_of(i) == "cut"):
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    start, end = 0.0, float(video_end)
+    if merged and merged[0][0] <= EDGE_SLOP:
+        start = merged.pop(0)[1]
+    if merged and merged[-1][1] >= end - EDGE_SLOP:
+        end = merged.pop(-1)[0]
+    if merged:
+        raise ValueError(
+            "a `cut` redaction must start at 0 or reach the end of the video "
+            f"({float(video_end):.2f}s); window "
+            f"{merged[0][0]:.2f}-{merged[0][1]:.2f}s would leave a hole that "
+            "one trimmed encode cannot express")
+    if end <= start:
+        raise ValueError("the `cut` redactions cover the whole video")
+    return start, end
+
+
+def video_extent(video_id, segments_dir=None):
+    """The indexed end of ``video_id`` in source seconds.
+
+    The index covers its videos end to end (tools/uncut.py reports any gap),
+    so the last segment's end IS the video's end.
+    """
+    segments_dir = str(segments_dir or (REPO_ROOT / "segments"))
+    ends = [float(s["end_sec"]) for s in load_segments(segments_dir)
+            if s.get("video_id") == video_id]
+    if not ends:
+        raise SystemExit(
+            f"`cut` redactions need the indexed extent of {video_id!r}, "
+            f"but no segments for it exist in {segments_dir}")
+    return max(ends)
+
+
 def drawbox_filters(redactions):
     """Redaction records -> ffmpeg ``drawbox`` filters, one per box.
+
+    Only ``box`` records paint: a ``cut`` record's window is removed from the
+    video by the trim, so drawing a box over it would paint frames that no
+    longer exist.
 
     ``enable`` is FFmpeg's timeline-editing option: the expression is evaluated
     per frame and the filter passes the frame through untouched when it is
@@ -41,9 +137,9 @@ def drawbox_filters(redactions):
     """
     filters = []
     for item in redactions:
-        start, end = float(item["start_sec"]), float(item["end_sec"])
-        if end <= start:
-            raise ValueError(f"redaction {item['id']!r} ends before it starts")
+        if action_of(item) != "box":
+            continue
+        start, end = _window(item)
         boxes = item["boxes"]
         if boxes == "full":
             boxes = [{"x": 0, "y": 0, "w": FRAME_W, "h": FRAME_H}]
@@ -56,18 +152,35 @@ def drawbox_filters(redactions):
     return filters
 
 
-def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None):
-    """One pass: paint out the boxes, and swap or keep the audio.
+def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
+                  trim=None):
+    """One pass: paint out the boxes, trim to the kept range, swap or keep audio.
 
     The music bed replaces the source audio rather than mixing with it, so a
     cut that is scored is scored on purpose. ``-shortest`` keeps a long track
     from extending the picture.
+
+    ``trim`` is the kept ``(start, end)`` from ``kept_range``, applied as a
+    filter at the END of the chain so the box windows keep their source-second
+    meaning (a None end trims to the end of the source). A filter, not ``-ss`` on the
+    input: input seeking would rebase only the video, and an output-side
+    ``-ss`` would skip the music bed's head -- either way the bed no longer
+    starts at the start of the trimmed picture. The bed itself is never
+    trimmed: it plays from its own beginning and ``-shortest`` stops it where
+    the trimmed picture ends. Without a bed, a trimmed source track can no
+    longer be stream-copied, so it is ``atrim``med and re-encoded instead.
     """
     cmd = [*ffmpeg, "-nostdin", "-y", "-i", str(video)]
     if audio:
         cmd += ["-i", str(audio)]
 
-    cmd += ["-vf", ",".join(filters)] if filters else []
+    vfilters = list(filters)
+    if trim:
+        spec = f"trim=start={trim[0]:.3f}"
+        if trim[1] is not None:
+            spec += f":end={trim[1]:.3f}"
+        vfilters += [spec, "setpts=PTS-STARTPTS"]
+    cmd += ["-vf", ",".join(vfilters)] if vfilters else []
     cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
             "-pix_fmt", "yuv420p"]
 
@@ -76,20 +189,36 @@ def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None)
             cmd += ["-af", f"volume={audio_gain}"]
         cmd += ["-map", "0:v:0", "-map", "1:a:0", "-shortest",
                 "-c:a", "aac", "-b:a", "192k"]
+    elif trim:
+        spec = f"atrim=start={trim[0]:.3f}"
+        if trim[1] is not None:
+            spec += f":end={trim[1]:.3f}"
+        cmd += ["-af", spec + ",asetpts=PTS-STARTPTS",
+                "-map", "0:v:0", "-map", "0:a?", "-c:a", "aac", "-b:a", "192k"]
     else:
         cmd += ["-map", "0:v:0", "-map", "0:a?", "-c:a", "copy"]
     cmd += [str(out_path)]
     return cmd
 
 
-def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None):
+def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
+          video_end=None):
     if ffmpeg is None:
         from tools.render import find_ffmpeg
 
         ffmpeg = find_ffmpeg()
+    trim = None
+    if any(action_of(i) == "cut" for i in redactions):
+        if video_end is None:
+            raise ValueError("`cut` redactions need video_end -- the source's "
+                             "duration -- to tell a tail cut from a hole")
+        start, end = kept_range(redactions, video_end)
+        if start > 0 or end < float(video_end):
+            trim = (start, end)
     cmd = build_command(ffmpeg, Path(video).resolve(), drawbox_filters(redactions),
                         Path(out_path).resolve(),
-                        Path(audio).resolve() if audio else None, audio_gain)
+                        Path(audio).resolve() if audio else None, audio_gain,
+                        trim=trim)
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
@@ -113,9 +242,14 @@ def main(argv=None):
     data = load_redactions(args.video_id)
     for item in data["redactions"]:
         print(f"  {item['id']:<18} {item['start_sec']:7.2f}-{item['end_sec']:7.2f}s  "
-              f"{item['reason']}")
+              f"{action_of(item):<4}  {item['reason']}")
+    video_end = None
+    if any(action_of(i) == "cut" for i in data["redactions"]):
+        video_end = video_extent(args.video_id)
+        start, end = kept_range(data["redactions"], video_end)
+        print(f"kept range: {start:.2f}s -> {end:.2f}s")
     apply(args.video, data["redactions"], args.out,
-          audio=args.audio, audio_gain=args.audio_gain)
+          audio=args.audio, audio_gain=args.audio_gain, video_end=video_end)
     print(f"wrote {args.out}")
     return 0
 

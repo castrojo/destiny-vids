@@ -101,6 +101,24 @@ def load_ensemble_plate(path=None):
     return block
 
 
+def load_ensemble_titles(path=None):
+    """Load the authored per-contributor Guardian identities from vocab/casting.yaml.
+
+    Returns ``{github_login: {label, class, name, title, trustee, ...}}``. Most
+    contributors have no entry and are credited with the generic copy from
+    ``load_ensemble_plate``; an entry exists only when the person's Guardian
+    identity is genuinely authored in the reference deck
+    (``~/Videos/nameplates.json`` -- castrojo's is ``np_jorge``), in which case
+    the credit must reproduce it verbatim.
+    """
+    path = Path(path) if path else DEFAULT_CASTING_PATH
+    with path.open(encoding="utf-8") as fh:
+        data = yaml.safe_load(fh)
+    titles = dict((((data or {}).get("ensemble") or {}).get("titles") or {}))
+    titles.pop("description", None)
+    return titles
+
+
 def ensemble_label(copy, org_member):
     """The eyebrow for one ensemble credit, given org membership.
 
