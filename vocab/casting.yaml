@@ -92,12 +92,19 @@ leads:
       # as the reference deck: label / class / name / title, plus `trustee`.
       # The subclass is lore-true to Osiris rather than to the performer's usual
       # Bluefin plate: he is a solar Warlock, and the plate names the ROLE.
+      #
+      # `variant: leader` is the complete gold treatment from
+      # WolvesIntroOverlay.vue (.wolves-guardian-plate-leader) -- the one the
+      # wolves video reserves for Christoph Blecker. It takes precedence over
+      # `trustee` in the CSS and in _variant_for(), so both flags are kept: Bob
+      # is a trustee, and he is plated as the leader.
       plate:
         label: TRUSTEE // GUARDIAN
         class: Dawnblade Warlock
         name: Bob Killen
         title: Reconciler of the Plane
         trustee: true
+        variant: leader
     sagira:
       # Osiris's Ghost. A Ghost is not a Guardian, so nothing about framing or
       # helmets applies -- she is cast on presence in frame alone.

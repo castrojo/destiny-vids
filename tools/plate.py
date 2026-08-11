@@ -85,7 +85,11 @@ VARIANTS = {
         "border": (250, 204, 21, 140),    # rgb(250 204 21 / 55%)
         "accent": (250, 204, 21, 255),    # #facc15
         "label": (250, 204, 21, 255),
-        "klass": (253, 230, 138, 255),
+        # The leader block overrides the label and the title but NOT
+        # .wolves-guardian-plate-class, so the subclass row stays the default
+        # blue even on the gold plate. Christoph Blecker's "Broodweaver Warlock"
+        # renders exactly this way in the wolves trailer.
+        "klass": (191, 219, 254, 255),    # #bfdbfe
         "title": (253, 230, 138, 255),    # #fde68a
         "glow": (250, 204, 21, 140),
     },
@@ -235,7 +239,13 @@ def _horizon(width, height, accent, to_left=False):
 
 
 def _variant_for(spec):
-    """The reference deck flags chrome with `trustee`; `variant` adds `leader`."""
+    """The reference deck flags chrome with `trustee`; `variant` adds `leader`.
+
+    `leader` is checked first because the CSS does the same:
+    `.wolves-guardian-plate-trustee:not(.wolves-guardian-plate-leader)` means
+    the gold leader treatment takes precedence over burnished silver, so a
+    binding can carry both flags and be plated as the leader.
+    """
     if spec.get("variant"):
         return VARIANTS[spec["variant"]]
     if spec.get("kind") == "title":

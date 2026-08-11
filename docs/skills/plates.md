@@ -58,7 +58,11 @@ needs to say something new, add the field to the data model deliberately.
 
 Local additions to the deck's shape are limited to chrome flags: `kind: ghost`
 (drops the class line, because a Ghost has no subclass) and `variant` (for the
-`leader` gold treatment).
+`leader` gold treatment — the wolves trailer reserves it for Christoph Blecker,
+and it **takes precedence over `trustee`**, mirroring the CSS selector
+`.wolves-guardian-plate-trustee:not(.wolves-guardian-plate-leader)`, so a
+binding may carry both flags and plate gold. The leader block deliberately does
+not restyle the class row, which stays the default blue).
 
 ## Core Process
 

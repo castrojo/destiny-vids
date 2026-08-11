@@ -337,3 +337,40 @@ def test_a_right_hand_plate_stays_inside_the_picture_width():
     right_most = max(x for x in range(img.width)
                      if alpha.crop((x, 0, x + 1, img.height)).getextrema()[1] > 0)
     assert right_most <= picture[0] + picture[2]
+
+
+def test_the_gold_leader_treatment_beats_trustee_silver():
+    """`variant: leader` is the wolves trailer's gold plate (Christoph Blecker).
+
+    The CSS reads `.wolves-guardian-plate-trustee:not(.wolves-guardian-plate-leader)`,
+    so a cue carrying BOTH flags renders gold, not silver. Bob Killen's binding
+    carries both, and this pins which one wins.
+    """
+    leader = plate._variant_for(dict(GUARDIAN, variant="leader"))
+    assert leader is plate.VARIANTS["leader"]
+    assert leader["accent"] == (250, 204, 21, 255)      # #facc15
+    assert leader["label"] == (250, 204, 21, 255)
+    assert leader["title"] == (253, 230, 138, 255)      # #fde68a
+    # ...but the leader block never overrides .wolves-guardian-plate-class, so
+    # the subclass row keeps the default blue.
+    assert leader["klass"] == plate.VARIANTS["default"]["klass"]
+    assert plate._variant_for(GUARDIAN) is plate.VARIANTS["trustee"]
+
+
+def test_osiris_is_plated_gold():
+    """The casting vocabulary, not a render, is what makes Bob Killen gold."""
+    import yaml
+    from pathlib import Path
+
+    casting = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "vocab" / "casting.yaml").read_text())
+    copy = casting["leads"]["values"]["osiris"]["plate"]
+    assert copy["variant"] == "leader"
+    assert plate._variant_for(copy) is plate.VARIANTS["leader"]
+
+
+def test_the_gold_plate_actually_renders_gold_pixels():
+    silver = plate.render_plate(GUARDIAN)
+    gold = plate.render_plate(dict(GUARDIAN, variant="leader"))
+    assert silver.size == gold.size, "chrome must not change the layout"
+    assert silver.tobytes() != gold.tobytes()
