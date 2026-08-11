@@ -49,6 +49,36 @@ DEFAULT_REPOS = [
 # Bot accounts never get a Guardian tile.
 BOT_LOGINS = {"dependabot", "github-actions", "renovate", "mergeraptor", "copilot"}
 
+# The GitHub org whose members are credited as maintainers rather than
+# contributors. Derived from the repos above rather than hardcoded twice.
+DEFAULT_ORG = DEFAULT_REPOS[0].split("/")[0]
+
+
+def fetch_org_members(org):
+    """Logins in ``org``, via ``gh``. Returns a set, empty if it cannot tell.
+
+    Tries the full member list first and falls back to public members, since an
+    unauthenticated or low-scope token can only see the latter. **Failure is
+    not "everyone is a contributor"** -- it is "membership is unknown", and the
+    caller records that, because silently demoting every maintainer would be an
+    incorrect on-screen credit rather than a missing one.
+    """
+    for endpoint in (f"orgs/{org}/members", f"orgs/{org}/public_members"):
+        cmd = ["gh", "api", "--paginate", f"{endpoint}?per_page=100",
+               "--jq", ".[].login // empty"]
+        try:
+            out = subprocess.run(cmd, capture_output=True, text=True,
+                                 timeout=120, check=True)
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired,
+                FileNotFoundError):
+            continue
+        members = {login for login in out.stdout.split() if login}
+        if members:
+            return members
+    print(f"  ! could not read members of {org} — membership unknown",
+          file=sys.stderr)
+    return set()
+
 
 def month_bounds(month):
     """Return ISO 8601 (since, until) timestamps bounding a ``YYYY-MM`` month."""
@@ -87,9 +117,22 @@ def fetch_repo_contributors(repo, since, until):
     return counts
 
 
-def build_roster(month, repos=None):
-    """Collect the month's contributors across ``repos`` into a roster record."""
+def build_roster(month, repos=None, org=None, members=None):
+    """Collect the month's contributors across ``repos`` into a roster record.
+
+    Each contributor is marked ``org_member``, which is what decides whether
+    they are credited as a MAINTAINER or a CONTRIBUTOR Guardian. ``members`` may
+    be passed in to keep this offline; otherwise it is fetched once.
+
+    ``org_member`` is a tri-state on purpose: ``None`` means membership could
+    not be read, which is not the same as "not a member". The label copy for
+    each case lives in vocab/casting.yaml, not here.
+    """
     repos = repos or DEFAULT_REPOS
+    org = org or DEFAULT_ORG
+    if members is None:
+        members = fetch_org_members(org)
+    known = members is not None and len(members) > 0
     since, until = month_bounds(month)
     totals = {}
     per_repo = {}
@@ -102,9 +145,11 @@ def build_roster(month, repos=None):
         "month": month,
         "since": since,
         "until": until,
+        "org": org,
         "repos": repos,
         "contributors": [
-            {"login": login, "commits": totals[login], "display_name": login}
+            {"login": login, "commits": totals[login], "display_name": login,
+             "org_member": (login in members) if known else None}
             # Sort by login, not by commit count: the pool is a cast list, not a
             # leaderboard, and a stable alphabetical order keeps assignment
             # reproducible when commit counts shift.
@@ -164,6 +209,7 @@ def assign(roster, segments):
     rotated = pool[offset:] + pool[:offset]
     display = {c["login"]: c.get("display_name") or c["login"]
                for c in roster["contributors"]}
+    member = {c["login"]: c.get("org_member") for c in roster["contributors"]}
 
     cursor = 0
     for seg in segments:
@@ -182,6 +228,7 @@ def assign(roster, segments):
                 "slot": slot_index,
                 "login": login,
                 "display_name": display[login],
+                "org_member": member.get(login),
             })
 
     by_login = {}

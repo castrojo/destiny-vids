@@ -99,6 +99,14 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
 - Contributors whose shot is too short are credited together on a roster title
   card over the tail. Dropping a month's contributors silently is the one
   unacceptable outcome.
+- **A maintainer is not a passing contributor.** `tools/ensemble.py roster`
+  records `org_member` per person from the GitHub org (`gh api
+  orgs/<org>/members`, falling back to public members), and the eyebrow follows
+  it: `MAINTAINER // GUARDIAN` for org members, `CONTRIBUTOR // GUARDIAN`
+  otherwise. Both strings live in `vocab/casting.yaml`, never in the renderer.
+  `org_member` is **tri-state** — `null` means the lookup failed, which is not
+  the same as "not a member", so it takes a neutral `GUARDIAN` eyebrow rather
+  than silently demoting everyone when a token expires.
 
 `burn` composites every plate in one ffmpeg pass — an `overlay` chain gated by
 `enable='between(t,in,out)'` — and stream-copies audio, so titling never costs

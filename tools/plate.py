@@ -549,6 +549,27 @@ def _first_free_window(start, duration, hold, total, busy, cursor=None):
         cursor = max(blockers) + TAIL_OUT
 
 
+def _ensemble_entry(item, at, dur, copy):
+    """One contributor's credit plate.
+
+    The eyebrow distinguishes a maintainer from a passing contributor, because
+    a credit that flattens the two says something untrue about a real person.
+    Which one applies comes from the roster's ``org_member``; the words come
+    from vocab/casting.yaml, never from here.
+    """
+    from tools.derive import ensemble_label
+
+    entry = {
+        "id": f"ensemble_{item['login']}", "at": at, "dur": dur,
+        "position": "right",
+        "label": ensemble_label(copy, item.get("org_member")),
+        "name": item["display_name"],
+    }
+    if copy.get("title"):
+        entry["title"] = copy["title"]
+    return entry
+
+
 def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
          busy=None, only="all", soft_busy=None):
     """Cut list -> plate manifest.
@@ -649,8 +670,10 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     if not roster or only == "leads":
         return sorted(entries, key=lambda e: e["at"])
 
+    from tools.derive import load_ensemble_plate
     from tools.ensemble import assign
 
+    ensemble_copy = load_ensemble_plate()
     result = assign(roster, [s for _, _, s in timeline])
     by_segment = {}
     for item in result["assignments"]:
@@ -672,12 +695,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 continue
             at, dur = window
             cursor = at + dur + TAIL_OUT
-            entries.append({
-                "id": f"ensemble_{item['login']}", "at": at, "dur": dur,
-                "position": "right", "label": "CONTRIBUTOR // GUARDIAN",
-                "name": item["display_name"],
-                "title": f"Project Bluefin, {result['month']}",
-            })
+            entries.append(_ensemble_entry(item, at, dur, ensemble_copy))
             busy.append((at, at + dur))
             credited.add(item["login"])
             if log:
@@ -701,12 +719,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             if not window:
                 continue
             at, dur = window
-            entries.append({
-                "id": f"ensemble_{item['login']}", "at": at, "dur": dur,
-                "position": "right", "label": "CONTRIBUTOR // GUARDIAN",
-                "name": item["display_name"],
-                "title": f"Project Bluefin, {result['month']}",
-            })
+            entries.append(_ensemble_entry(item, at, dur, ensemble_copy))
             busy.append((at, at + dur))
             credited.add(item["login"])
             placed = True

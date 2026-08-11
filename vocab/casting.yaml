@@ -174,6 +174,30 @@ ensemble:
     pool is rebuilt per calendar month by tools/ensemble.py from repository
     contribution history, then deterministically assigned to the ensemble slots
     across a shot list, producing one credit TILE per contributor.
+  plate:
+    description: >
+      On-screen nameplate copy for an ensemble credit, read by tools/plate.py.
+      Same closed field set as a lead's `plate:` block. The eyebrow depends on
+      whether the person is a member of the GitHub org: a maintainer is not a
+      passing contributor and the credit should not say they are.
+
+      `label_unknown` exists because org membership is a lookup that can fail
+      (no network, no token, insufficient scope). Failing to read it is NOT
+      evidence that someone is not a maintainer, so it gets the neutral
+      GUARDIAN eyebrow rather than silently demoting the whole cast.
+    label: CONTRIBUTOR // GUARDIAN        # not in the org
+    label_member: MAINTAINER // GUARDIAN  # in the org
+    label_unknown: GUARDIAN               # membership could not be read
+    # A Destiny "title" is a seal, and we do not know anyone's. "Blueberry" is
+    # the in-game name for an unnamed Guardian you get randomly grouped with,
+    # which is exactly what an ensemble slot is.
+    title: Bluefin Blueberry
+  org:
+    description: >
+      GitHub organisation whose members are credited as maintainers. Recorded
+      per roster by tools/ensemble.py as `org_member` on each contributor:
+      true, false, or null when the lookup failed.
+    value: projectbluefin
   pool:
     source: Project Bluefin repositories, contributions within a calendar month.
     rotation: monthly

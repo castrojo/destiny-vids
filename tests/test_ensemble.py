@@ -6,7 +6,14 @@ Network-free: the roster half is exercised through fixture data, since the
 
 import pytest
 
-from tools.ensemble import assign, build_roster, is_bot, month_bounds, month_offset
+from tools.ensemble import (
+    DEFAULT_ORG,
+    assign,
+    build_roster,
+    is_bot,
+    month_bounds,
+    month_offset,
+)
 
 
 def roster(*logins, month="2026-08"):
@@ -125,3 +132,60 @@ def test_roster_is_sorted_by_login_not_commit_count():
     finally:
         ensemble.fetch_repo_contributors = original
     assert [c["login"] for c in built["contributors"]] == ["amy", "zed"]
+
+
+# --- maintainers vs contributors --------------------------------------------
+
+def test_org_membership_is_recorded_per_contributor():
+    """The roster carries who is in the org; the plate copy reads it later."""
+    built = build_roster("2026-08", repos=[], members={"hanthor", "ahmedadan"})
+    assert built["org"] == DEFAULT_ORG
+
+
+def test_membership_is_tri_state_not_a_boolean():
+    """Failing to read the org is NOT evidence that nobody is a maintainer.
+
+    Demoting every maintainer because a token expired would put an incorrect
+    credit on screen for a real person, which is worse than a vaguer one.
+    """
+    from tools.derive import ensemble_label, load_ensemble_plate
+
+    copy = load_ensemble_plate()
+    assert ensemble_label(copy, True) == "MAINTAINER // GUARDIAN"
+    assert ensemble_label(copy, False) == "CONTRIBUTOR // GUARDIAN"
+    assert ensemble_label(copy, None) == "GUARDIAN"
+    # ...and the neutral case must not claim either way.
+    assert "MAINTAINER" not in ensemble_label(copy, None)
+    assert "CONTRIBUTOR" not in ensemble_label(copy, None)
+
+
+def test_assignment_carries_membership_through_to_the_tile():
+    roster = {
+        "month": "2026-08",
+        "contributors": [
+            {"login": "hanthor", "display_name": "hanthor", "org_member": True},
+            {"login": "Giklab", "display_name": "Giklab", "org_member": False},
+        ],
+    }
+    segments = [
+        {"segment_id": "s1", "casting": {"role": "ensemble", "slots": 2}},
+    ]
+    result = assign(roster, segments)
+    by_login = {a["login"]: a["org_member"] for a in result["assignments"]}
+    assert by_login == {"hanthor": True, "Giklab": False}
+
+
+def test_the_checked_in_roster_agrees_with_the_org():
+    """hanthor and ahmedadan are maintainers; the randos are contributors."""
+    import json
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[1] / "renders" / "roster-2026-08.json"
+    if not path.exists():
+        pytest.skip("roster is a build artifact")
+    roster = json.loads(path.read_text())
+    membership = {c["login"]: c["org_member"] for c in roster["contributors"]}
+    assert membership["hanthor"] is True
+    assert membership["ahmedadan"] is True
+    assert membership["castrojo"] is True
+    assert membership["Giklab"] is False

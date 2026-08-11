@@ -86,6 +86,34 @@ def load_leads(path=None):
     }
 
 
+def load_ensemble_plate(path=None):
+    """Load the ensemble credit's nameplate copy from vocab/casting.yaml.
+
+    Kept out of tools/plate.py for the same reason a lead's copy is: on-screen
+    text lives beside the casting decision, so changing how contributors are
+    credited is a vocabulary edit, not a renderer edit.
+    """
+    path = Path(path) if path else DEFAULT_CASTING_PATH
+    with path.open(encoding="utf-8") as fh:
+        data = yaml.safe_load(fh)
+    block = dict((((data or {}).get("ensemble") or {}).get("plate") or {}))
+    block.pop("description", None)
+    return block
+
+
+def ensemble_label(copy, org_member):
+    """The eyebrow for one ensemble credit, given org membership.
+
+    ``org_member`` is tri-state: True (in the org), False (not), or None (the
+    lookup failed). None is deliberately not treated as False -- being unable
+    to check is not evidence that someone is not a maintainer, and the credit
+    names a real person.
+    """
+    if org_member is None:
+        return copy.get("label_unknown") or copy.get("label")
+    return copy.get("label_member" if org_member else "label")
+
+
 def lead_alias_index(leads):
     """Flatten a lead map into ``{alias_or_canonical_id: canonical_id}``."""
     index = {}

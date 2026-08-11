@@ -264,6 +264,22 @@ def test_no_plate_field_is_invented_beyond_the_reference_deck():
             continue
         assert set(copy) <= allowed, (character, set(copy) - allowed)
 
+    # The ensemble credit is the same closed set, plus the two eyebrow variants
+    # that pick between a maintainer and a contributor.
+    ensemble = dict(casting["ensemble"]["plate"])
+    ensemble.pop("description", None)
+    assert set(ensemble) <= allowed | {"label_member", "label_unknown"}
+
+
+def test_no_plate_copy_is_written_in_the_renderer():
+    """Copy lives in vocab/casting.yaml so a recast changes the credit only."""
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parents[1] / "tools" / "plate.py").read_text()
+    for phrase in ("CONTRIBUTOR // GUARDIAN", "MAINTAINER // GUARDIAN",
+                   "Bluefin Blueberry"):
+        assert phrase not in source, f"{phrase!r} is hardcoded in tools/plate.py"
+
 
 def test_title_card_renders_its_body_lines():
     card = plate.render_plate(TITLE_CARD)
