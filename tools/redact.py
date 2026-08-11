@@ -21,6 +21,7 @@ list to the same range, so the two never disagree about where the picture is.
 """
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -152,6 +153,47 @@ def drawbox_filters(redactions):
     return filters
 
 
+# Headroom for the music bed, in dBTP. Intersample peaks exceed sample peaks,
+# and a lossy decoder can overshoot further still, so a deliverable that sits at
+# 0 dBFS clips on playback. ~1 dB of headroom is the usual delivery allowance.
+DEFAULT_TARGET_DBTP = -1.1
+
+
+def measure_true_peak(path, ffmpeg=None):
+    """True peak of ``path`` in dBFS, via ffmpeg's ebur128 (ITU-R BS.1770).
+
+    True peak, not sample peak: the question is whether the reconstructed
+    analogue waveform clips, and intersample peaks routinely exceed the highest
+    sample by a dB or more.
+    """
+    if ffmpeg is None:
+        from tools.render import find_ffmpeg
+
+        ffmpeg = find_ffmpeg()
+    proc = subprocess.run(
+        [*ffmpeg, "-nostdin", "-hide_banner", "-nostats", "-i", str(Path(path).resolve()),
+         "-af", "ebur128=peak=true", "-f", "null", "-"],
+        capture_output=True, text=True)
+    peaks = re.findall(r"Peak:\s*(-?\d+(?:\.\d+)?)\s*dBFS", proc.stderr)
+    if not peaks:
+        raise RuntimeError(f"could not measure true peak of {path}")
+    return float(peaks[-1])
+
+
+def gain_for_headroom(path, target_dbtp=DEFAULT_TARGET_DBTP, ffmpeg=None):
+    """Linear gain that lands ``path`` at ``target_dbtp``.
+
+    A STATIC gain, deliberately: the alternative is a normaliser, and
+    loudnorm/compression would rewrite the dynamics the artist chose. This only
+    ever scales; it never reshapes. A track already quieter than the target is
+    left alone (gain 1.0) rather than being pushed up to meet it.
+    """
+    peak = measure_true_peak(path, ffmpeg)
+    if peak <= target_dbtp:
+        return 1.0, peak
+    return 10 ** ((target_dbtp - peak) / 20.0), peak
+
+
 def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
                   trim=None):
     """One pass: paint out the boxes, trim to the kept range, swap or keep audio.
@@ -235,7 +277,11 @@ def main(argv=None):
     ap.add_argument("--audio", default=None,
                     help="replace the source audio with this music bed")
     ap.add_argument("--audio-gain", type=float, default=None,
-                    help="linear gain on the music bed, e.g. 0.8")
+                    help="linear gain on the music bed, e.g. 0.8. Omit to derive "
+                         "it from the bed's measured true peak (--target-dbtp)")
+    ap.add_argument("--target-dbtp", type=float, default=DEFAULT_TARGET_DBTP,
+                    help="deliverable headroom in dBTP when --audio-gain is not "
+                         f"given (default {DEFAULT_TARGET_DBTP})")
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
 
@@ -248,8 +294,13 @@ def main(argv=None):
         video_end = video_extent(args.video_id)
         start, end = kept_range(data["redactions"], video_end)
         print(f"kept range: {start:.2f}s -> {end:.2f}s")
+    gain = args.audio_gain
+    if args.audio and gain is None:
+        gain, peak = gain_for_headroom(args.audio, args.target_dbtp)
+        print(f"music bed: true peak {peak:+.1f} dBTP -> gain {gain:.3f} "
+              f"(target {args.target_dbtp:+.1f} dBTP)")
     apply(args.video, data["redactions"], args.out,
-          audio=args.audio, audio_gain=args.audio_gain, video_end=video_end)
+          audio=args.audio, audio_gain=gain, video_end=video_end)
     print(f"wrote {args.out}")
     return 0
 

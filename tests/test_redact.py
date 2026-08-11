@@ -1,4 +1,5 @@
 """Tests for the burned-in-copy redactor (tools/redact.py)."""
+import math
 import os
 import sys
 
@@ -148,3 +149,37 @@ def test_a_trimmed_encode_with_a_bed_starts_the_bed_at_the_trimmed_picture():
     af = cmd[cmd.index("-af") + 1]
     assert "atrim" not in af and af == "volume=0.9"
     assert "trim=start=3.400:end=163.600" in cmd[cmd.index("-vf") + 1]
+
+
+# --- music bed headroom ------------------------------------------------------
+
+def test_gain_is_derived_from_the_beds_true_peak(monkeypatch):
+    """A hot master is scaled to leave headroom, by a STATIC gain.
+
+    Intersample peaks exceed sample peaks, so a bed that measures +1.5 dBTP
+    clips on lossy playback even though no sample is over. The fix is a gain,
+    never a normaliser: loudnorm would rewrite the dynamics the artist chose.
+    """
+    monkeypatch.setattr(redact, "measure_true_peak", lambda *a, **k: 1.5)
+    gain, peak = redact.gain_for_headroom("bed.mp3", target_dbtp=-1.1)
+    assert peak == 1.5
+    # 1.5 dBTP down to -1.1 dBTP is -2.6 dB.
+    assert gain == pytest.approx(10 ** (-2.6 / 20), rel=1e-6)
+    # ...and applying it lands on the target.
+    assert 1.5 + 20 * math.log10(gain) == pytest.approx(-1.1)
+
+
+def test_a_quiet_bed_is_never_pushed_up_to_the_target(monkeypatch):
+    """The target is a ceiling, not a loudness mandate."""
+    monkeypatch.setattr(redact, "measure_true_peak", lambda *a, **k: -8.0)
+    gain, peak = redact.gain_for_headroom("bed.mp3", target_dbtp=-1.1)
+    assert gain == 1.0 and peak == -8.0
+
+
+def test_true_peak_is_read_from_the_last_ebur128_summary(monkeypatch):
+    """ebur128 prints running peaks; only the final summary is the answer."""
+    class Proc:
+        stderr = ("Peak: -6.0 dBFS\n"
+                  "  True peak:\n    Peak:        0.5 dBFS\n")
+    monkeypatch.setattr(redact.subprocess, "run", lambda *a, **k: Proc())
+    assert redact.measure_true_peak("x.mp3", ffmpeg=["ffmpeg"]) == 0.5

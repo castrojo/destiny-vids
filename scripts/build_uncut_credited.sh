@@ -62,7 +62,7 @@ python3 tools/plate.py merge "$WORK/leads.json" "$WORK/chat.json" \
 echo "==> redact burned-in copy${MUSIC:+ and score}"
 if [ -n "$MUSIC" ]; then
     python3 tools/redact.py --video "media/$VIDEO_ID.mp4" --video-id "$VIDEO_ID" \
-        --audio "$MUSIC" --audio-gain 0.9 --out "$BASE"
+        --audio "$MUSIC" --out "$BASE"
 else
     python3 tools/redact.py --video "media/$VIDEO_ID.mp4" --video-id "$VIDEO_ID" \
         --out "$BASE"
