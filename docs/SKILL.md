@@ -16,6 +16,7 @@ load only that skill, then act.
 | Index a new video: detect beats, extract keyframes, tag, assemble segments | [`indexing.md`](skills/indexing.md) |
 | Cast a character, add a lead binding, or credit the monthly ensemble | [`casting.md`](skills/casting.md) |
 | Write an outline, assemble a cut list, or render it to video | [`editing.md`](skills/editing.md) |
+| Score a cut to a music bed, cut a section out of it, or land a shot on a beat | [`scoring.md`](skills/scoring.md) |
 | Put a name on screen — Guardian nameplates and title cards | [`plates.md`](skills/plates.md) |
 | Get a working ffmpeg on an atomic host | [`../docs/rendering.md`](rendering.md) |
 
