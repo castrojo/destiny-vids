@@ -34,6 +34,7 @@ than restating them:
 | [`pipeline.md`](pipeline.md) | Segmentation, inheritance, review tiers, cost posture. |
 | [`agent-retrieval.md`](agent-retrieval.md) | How a natural-language query maps to filters and ranking. |
 | [`rendering.md`](rendering.md) | Which ffmpeg, why, and the seeking/AV1 traps. |
+| [`plans/wolves/design.md`](plans/wolves/design.md) | **Planned, not built.** The comm-line system: `WOLVES.md`, identity, affiliation, tempo. |
 
 ## Writing a skill here
 
