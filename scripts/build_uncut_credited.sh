@@ -69,7 +69,8 @@ else
 fi
 
 echo "==> burn the deck"
-python3 tools/plate.py render --manifest "$MANIFEST" --out-dir "$PLATES_DIR" >/dev/null
+python3 tools/plate.py render --manifest "$MANIFEST" --out-dir "$PLATES_DIR" \
+    --fit-video "media/$VIDEO_ID.mp4" >/dev/null
 python3 tools/plate.py burn --video "$BASE" --manifest "$MANIFEST" \
     --plates-dir "$PLATES_DIR" --out "$FINAL"
 

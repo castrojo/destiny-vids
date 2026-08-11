@@ -353,16 +353,23 @@ def render_plate(spec):
     return img
 
 
-def place(plate, position="left"):
-    """Composite a plate onto a full 1920x1080 transparent frame."""
+def place(plate, position="left", picture=None):
+    """Composite a plate onto a full 1920x1080 transparent frame.
+
+    ``picture`` is the real image area ``(x, y, w, h)`` inside the frame. The
+    row margins are measured against *it*, not the frame, so on a letterboxed
+    2.39:1 cinematic the plate sits on the picture instead of hanging onto the
+    black bar. Defaults to the whole frame.
+    """
     frame = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
-    y = int(FRAME_H * (1 - MARGIN_BOTTOM)) - plate.height
+    px, py, pw, ph = picture or (0, 0, FRAME_W, FRAME_H)
+    y = py + int(ph * (1 - MARGIN_BOTTOM)) - plate.height
     if position == "right":
-        x = int(FRAME_W * (1 - MARGIN_X)) - plate.width
+        x = px + int(pw * (1 - MARGIN_X)) - plate.width
     elif position == "center":
-        x = (FRAME_W - plate.width) // 2
+        x = px + (pw - plate.width) // 2
     else:
-        x = int(FRAME_W * MARGIN_X)
+        x = px + int(pw * MARGIN_X)
     frame.alpha_composite(plate, (x, y))
     return frame
 
@@ -440,7 +447,7 @@ def _first_free_window(start, duration, hold, total, busy, cursor=None):
 
 
 def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
-         busy=None, only="all"):
+         busy=None, only="all", soft_busy=None):
     """Cut list -> plate manifest.
 
     Leads are plated on their first appearance long enough to read, using the
@@ -450,46 +457,61 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     so the month's contributors are never silently dropped.
 
     ``busy`` seeds the occupied windows with something already fixed on the
-    timeline. ``only`` (``leads`` / ``ensemble`` / ``all``) runs one tier at a
-    time, which is what lets a scored cut be planned in priority order: the
-    lead reveals are placed first because they are the credit the whole index
-    exists to get right, the dialogue is fitted around them, and the ensemble
-    then takes what is left.
+    timeline. ``soft_busy`` is a *preference*: windows a plate should avoid if
+    it can (in practice a dialogue pre-pass), but which it may take rather than
+    not being placed at all. A reveal that yields until it disappears is worse
+    than a reveal that costs one line -- so the preference is tried first for
+    every shot, and only then the fallback.
+
+    ``only`` (``leads`` / ``ensemble`` / ``all``) runs one tier at a time,
+    which is what lets a scored cut be planned in priority order: the lead
+    reveals are placed first because they are the credit the whole index exists
+    to get right, the dialogue is fitted around them, and the ensemble then
+    takes what is left.
     """
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     entries, plated = [], set()
     busy = list(busy or [])  # occupied windows, so nothing double-books the screen
+    soft_busy = list(soft_busy or [])
 
     def free(start, duration):
         end = start + duration
         return all(end <= b_start or start >= b_end for b_start, b_end in busy)
 
-    for start, duration, shot in timeline:
-        if only == "ensemble":
-            break
-        casting = shot.get("casting") or {}
-        character = casting.get("character")
-        if casting.get("role") != "lead" or not character or character in plated:
-            continue
-        if not casting.get("usable", True):
-            continue  # a shot that fails its binding's constraints is not a reveal
-        copy = (leads.get(character) or {}).get("plate")
-        if not copy:
-            continue
-        # Walk forward through the shot: if dialogue (or an earlier plate) holds
-        # its head, the reveal waits for the next opening inside its own anchor
-        # rather than being lost for the whole cut.
-        window = _first_free_window(start, duration, hold, total, busy)
-        if not window:
-            continue
-        at, dur = window
-        entries.append({"id": character, "at": at, "dur": dur, "position": "left",
-                        **copy})
-        busy.append((at, at + dur))
-        plated.add(character)
-        if log:
-            log(f"  {character:<10} {at:6.2f}s +{dur:.1f}s  {copy.get('name')}")
+    def place_leads(avoid):
+        for start, duration, shot in timeline:
+            casting = shot.get("casting") or {}
+            character = casting.get("character")
+            if casting.get("role") != "lead" or not character or character in plated:
+                continue
+            if not casting.get("usable", True):
+                continue  # a shot failing its binding's constraints is no reveal
+            copy = (leads.get(character) or {}).get("plate")
+            if not copy:
+                continue
+            # Walk forward through the shot: if dialogue (or an earlier plate)
+            # holds its head, the reveal waits for the next opening inside its
+            # own anchor rather than being lost for the whole cut.
+            window = _first_free_window(start, duration, hold, total, avoid)
+            if not window:
+                continue
+            at, dur = window
+            entries.append({"id": character, "at": at, "dur": dur,
+                            "position": "left", **copy})
+            busy.append((at, at + dur))
+            plated.add(character)
+            if log:
+                note = " (clear of dialogue)" if avoid is not busy else ""
+                log(f"  {character:<10} {at:6.2f}s +{dur:.1f}s  "
+                    f"{copy.get('name')}{note}")
+
+    if only != "ensemble":
+        # Preferred: a reveal that does not land on top of a line of dialogue.
+        if soft_busy:
+            place_leads(busy + soft_busy)
+        # Fallback: a reveal that costs a line still beats no reveal at all.
+        place_leads(busy)
 
     if not roster or only == "leads":
         return sorted(entries, key=lambda e: e["at"])
@@ -627,13 +649,13 @@ def load_manifest_entries(entries):
     return entries
 
 
-def render_all(entries, out_dir):
+def render_all(entries, out_dir, picture=None):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
     for e in entries:
         dest = out_dir / f"plate_{e['id']}.png"
-        place(render_plate(e), e.get("position", "left")).save(dest)
+        place(render_plate(e), e.get("position", "left"), picture).save(dest)
         written.append(dest)
     return written
 
@@ -690,12 +712,18 @@ def main(argv=None):
     r = sub.add_parser("render", help="manifest -> transparent PNG per plate")
     r.add_argument("--manifest", required=True)
     r.add_argument("--out-dir", default=str(REPO_ROOT / "renders" / "plates"))
+    r.add_argument("--fit-video", default=None,
+                   help="keep plates on the picture of this letterboxed video "
+                        "instead of the raw 16:9 frame")
 
     b = sub.add_parser("burn", help="composite rendered plates onto a cut")
     b.add_argument("--video", required=True)
     b.add_argument("--manifest", required=True)
     b.add_argument("--plates-dir", default=str(REPO_ROOT / "renders" / "plates"))
     b.add_argument("--out", required=True)
+    b.add_argument("--fit-picture", action="store_true",
+                   help="re-render the plates onto the video's picture area first, "
+                        "so nothing sits on a letterbox bar")
 
     p = sub.add_parser("plan", help="cut list (+ roster) -> timed plate manifest")
     p.add_argument("shotlist", help="JSON shot list from tools/story.py --format json")
@@ -706,6 +734,9 @@ def main(argv=None):
     p.add_argument("--around", default=None,
                    help="a manifest of already-fixed windows (e.g. dialogue) that "
                         "the plates must not collide with")
+    p.add_argument("--prefer-clear-of", default=None,
+                   help="a manifest (e.g. a dialogue pre-pass) that plates should "
+                        "avoid if they can, but may overlap rather than be dropped")
     p.add_argument("--only", choices=("all", "leads", "ensemble"), default="all",
                    help="plan one tier at a time, so a scored cut can be planned "
                         "in priority order: leads, then dialogue, then ensemble")
@@ -741,9 +772,13 @@ def main(argv=None):
         if args.around:
             busy = [(float(e["at"]), float(e["at"]) + float(e["dur"]))
                     for e in load_manifest(args.around)]
+        soft = []
+        if args.prefer_clear_of:
+            soft = [(float(e["at"]), float(e["at"]) + float(e["dur"]))
+                    for e in load_manifest(args.prefer_clear_of)]
         entries = plan(load_shots(args.shotlist), load_leads(), roster,
                        max_shot_sec=args.max_shot_sec, hold=args.hold, log=print,
-                       busy=busy, only=args.only)
+                       busy=busy, only=args.only, soft_busy=soft)
         load_manifest_entries(entries)  # same validation the burn path applies
         with Path(args.out).open("w", encoding="utf-8") as fh:
             json.dump(entries, fh, indent=2)
@@ -754,12 +789,25 @@ def main(argv=None):
     entries = load_manifest(args.manifest)
 
     if args.command == "render":
-        written = render_all(entries, args.out_dir)
+        picture = None
+        if args.fit_video:
+            from tools.render import detect_picture
+
+            picture = detect_picture(args.fit_video)
+            if picture:
+                print(f"picture area: {picture[2]}x{picture[3]} at "
+                      f"+{picture[0]}+{picture[1]}")
+        written = render_all(entries, args.out_dir, picture)
         for path in written:
             print(f"wrote {path}")
         return 0
 
-    render_all(entries, args.plates_dir)
+    picture = None
+    if getattr(args, "fit_picture", False):
+        from tools.render import detect_picture
+
+        picture = detect_picture(args.video)
+    render_all(entries, args.plates_dir, picture)
     out = burn(args.video, entries, args.plates_dir, args.out)
     print(f"wrote {out}")
     return 0

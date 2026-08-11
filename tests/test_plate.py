@@ -307,3 +307,33 @@ def test_a_chat_card_carries_no_guardian_rows():
     with_ignored_rows = plate.render_plate(
         dict(CHAT, label="TRUSTEE // GUARDIAN", **{"class": "Dawnblade Warlock"}))
     assert card.size == with_ignored_rows.size
+
+
+def test_plates_sit_on_the_picture_not_on_the_letterbox_bar():
+    """A 2.39:1 cinematic in a 16:9 file has ~140px of baked-in black.
+
+    Measuring the row margin against the frame drops the plate onto that bar,
+    which reads as a mistake rather than a style.
+    """
+    picture = (0, 140, 1920, 800)
+    card = plate.render_plate(GUARDIAN)
+    framed = plate.place(card, "left")
+    fitted = plate.place(card, "left", picture)
+
+    def lowest_opaque_row(img):
+        alpha = img.split()[3]
+        return max(y for y in range(img.height)
+                   if alpha.crop((0, y, img.width, y + 1)).getextrema()[1] > 0)
+
+    picture_bottom = picture[1] + picture[3]
+    assert lowest_opaque_row(framed) > picture_bottom, "baseline hangs off the picture"
+    assert lowest_opaque_row(fitted) <= picture_bottom, "fitted plate must stay on it"
+
+
+def test_a_right_hand_plate_stays_inside_the_picture_width():
+    picture = (0, 140, 1920, 800)
+    img = plate.place(plate.render_plate(GHOST), "right", picture)
+    alpha = img.split()[3]
+    right_most = max(x for x in range(img.width)
+                     if alpha.crop((x, 0, x + 1, img.height)).getextrema()[1] > 0)
+    assert right_most <= picture[0] + picture[2]
