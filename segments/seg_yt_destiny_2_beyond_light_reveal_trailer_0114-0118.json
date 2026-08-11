@@ -1,0 +1,181 @@
+{
+  "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0114-0118",
+  "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+  "start_sec": 114.75,
+  "end_sec": 118.875,
+  "start_tc": "1:55",
+  "end_tc": "1:59",
+  "era": "beyond_light",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [],
+  "shot_scale": "MS",
+  "composition": [
+    "single"
+  ],
+  "camera_movement": [
+    "push_in"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "explicit",
+  "substitutability": 1,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "traversal"
+  ],
+  "mood": [
+    "lonely",
+    "serene"
+  ],
+  "register": 2,
+  "character": [
+    {
+      "name": "Elsie Bray",
+      "kind": "guardian_npc"
+    }
+  ],
+  "caption": "The Exo Stranger walks across the ice toward camera, her pale face and glowing blue eyes clearly lit, Jupiter and its moons in the sky behind her.",
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": true,
+  "casting": {
+    "role": "lead",
+    "character": "elsie_bray",
+    "person": "laura_santamaria",
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.78
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.68
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.68
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.88
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

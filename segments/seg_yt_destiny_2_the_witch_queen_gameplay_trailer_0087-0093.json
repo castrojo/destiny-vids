@@ -1,0 +1,183 @@
+{
+  "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0087-0093",
+  "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+  "start_sec": 87.733333,
+  "end_sec": 93.33333333333333,
+  "start_tc": "1:28",
+  "end_tc": "1:33",
+  "era": "witch_queen",
+  "activity": "unknown",
+  "content_type": "trailer",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [
+    "hive"
+  ],
+  "shot_scale": "LS",
+  "composition": [
+    "group"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "slow",
+  "lighting": "silhouette",
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [
+    "burned_text"
+  ],
+  "subject_salience": "crowd_group",
+  "action": [],
+  "mood": [
+    "ominous",
+    "triumphant"
+  ],
+  "register": 1,
+  "character": [
+    {
+      "name": "Savathun",
+      "kind": "enemy_boss"
+    }
+  ],
+  "caption": "Three Guardians stand before Savathun's towering silhouette in key art for Destiny 2: The Witch Queen, releasing 2.22.22.",
+  "clean": false,
+  "footage_tier": "mixed",
+  "traversal_hero": false,
+  "casting": {
+    "role": "lead",
+    "character": "savathun",
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.65
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.92
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

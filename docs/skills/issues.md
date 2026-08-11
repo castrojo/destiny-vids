@@ -1,0 +1,165 @@
+---
+name: issues
+version: "1.0"
+last_updated: "2026-08-11"
+id: issues
+one_line_purpose: File work, pick it up, and know when to stop and ask.
+entry_point: docs/skills/issues.md
+category: meta
+mcp_compliance_level: partial
+optimization_status: draft
+status: active
+dependencies: []
+tags: [issues, brief, backlog, automatable, gaps]
+description: >-
+  GitHub issues are the backlog, and a fenced `brief` block is the executable
+  part of one. Use when filing work, picking work up, normalizing a prose
+  request, or deciding whether something is an agent's call at all.
+metadata:
+  type: procedure
+---
+
+# Working from issues
+
+## When to Use
+
+- Filing a video idea, or a defect in the index
+- Picking up work as an agent, and deciding whether you may finish it
+- Turning a prose request into something a tool can execute
+- Finding out what in the index is unfinished
+
+## When NOT to Use
+
+- Indexing a video once you have the brief → [`indexing.md`](indexing.md)
+- Assembling and rendering the cut → [`production.md`](production.md)
+- Deciding who a shot depicts → [`casting.md`](casting.md)
+
+## The shape of the backlog
+
+Issues are the only backlog. There is no TODO file, no notes doc, and no
+planning markdown in the repo — those go stale and mislead the next agent.
+
+An issue carries two things, and they have different jobs:
+
+- **The prose** is how the owner thinks. It stays exactly as written.
+- **The `brief` block** is the same request in YAML, matching
+  [`schema/brief.schema.json`](../../schema/brief.schema.json). Tools read it.
+
+````markdown
+```brief
+title: Harbringer — All shall burn
+sources:
+  - url: https://www.youtube.com/watch?v=0B9v8VoZrMU
+music:
+  url: https://music.youtube.com/watch?v=oKXIo7EOgXY
+  note: melancholy; make it all fit
+characters: [saint_14]
+automatable: partly
+blocked_on: the source is not indexed yet
+```
+````
+
+Writing the block is **not the owner's job**. An agent proposes it; the owner
+confirms it. That division is the point: it puts a human at the exact moment
+where a guess would otherwise be made.
+
+```bash
+python3 tools/brief.py normalize 3   # prose -> a PROPOSED block, printed
+python3 tools/brief.py parse 3       # a confirmed block -> validated JSON
+python3 tools/brief.py check         # every open issue's block
+```
+
+A proposal always comes back `automatable: no`. It is a reading of what
+somebody meant, and it is not executable until they say it is right.
+
+## Picking up work
+
+1. Read the issue, prose included. The prose carries intent the block cannot.
+2. `python3 tools/brief.py parse <issue>`. No block yet? Normalize, post the
+   proposal, and wait — do not start from your own reading of the prose.
+3. Check `automatable`. `no` means stop now and say what you need.
+4. Work on a branch, one issue per branch. `vocab/casting.yaml` is the file
+   every video touches, so a casting change belongs in its own small PR rather
+   than buried in a cut.
+5. Open a PR saying `Closes #NNN`.
+
+## Labels
+
+Four, and they are deliberately few:
+
+| Label | Meaning |
+|---|---|
+| `triage` | Filed. Nobody has looked at it. |
+| `agent-ready` | Enough detail that an agent can start. |
+| `blocked` | Waiting on an owner decision. |
+| `automatable/no` | Needs human judgement, permanently. |
+
+`python3 scripts/sync_labels.py --check` reports drift; `--write` fixes it.
+
+**Characters are not labels.** They live in the brief block, keyed by the lead
+ids in `vocab/casting.yaml`, because that is the same vocabulary the segment
+index tags — one spelling of a name across the whole repo. Find them with
+`gh issue list --search 'saint_14'`. Adding a `character/*` label set would
+mean a second vocabulary that drifts from the first.
+
+## What is not an agent's call
+
+Three classes of work in this repo cannot be automated. Not "are not yet" —
+cannot be. An agent that reaches one, names it, and stops has **succeeded**.
+
+| Class | Why | Worked example |
+|---|---|---|
+| A visual judgement about a frame | "Nobody has looked at this" is not evidence the frame is clean. | 61 unreviewed beats keeping a video out of every cut |
+| A claim about a real person | Casting, plate copy, a subclass, a pronoun. Inventing one puts words on a colleague under the owner's authority. | Karena's missing subclass word |
+| A licensing decision | Rights are the owner's to accept. | CC BY-NC-ND photographs blocking a Ken Burns push |
+
+Say `automatable: no`, put the exact missing decision in `blocked_on`, and
+stop. Never guess past one to keep a queue moving.
+
+## Finding the unfinished
+
+```bash
+python3 tools/gaps.py                    # unindexed, unreviewed, uncast
+python3 tools/gaps.py --file --dry-run   # what filing would do
+python3 tools/gaps.py --file             # open/update the issues
+```
+
+Each filed issue carries a fingerprint, so a rerun edits its own issue instead
+of filing a second one, and a gap a person already described in their own words
+is skipped rather than buried under a robot copy.
+
+`gaps.py` never closes an issue. Opening one and closing one are very different
+amounts of trust.
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "The prose is clear enough, I'll just start." | Two agents reading the same prose build two different cuts. Normalize, confirm, then work. |
+| "I'll add a `character/paris` label." | Characters live in the brief, in the index's own vocabulary. A label set is a second vocabulary that drifts. |
+| "The owner obviously means Paris is a Titan." | That is a claim about a real person. `automatable: no`. |
+| "I'll mark it automatable so it isn't stuck." | Stopping is a result here. A wrong credit is not recoverable by a revert. |
+| "I'll note the remaining work in NOTES.md." | It goes in an issue. Files like that go stale and mislead the next agent. |
+
+## Red Flags
+
+- A brief that sets `clean`, `footage_tier`, `traversal_hero` or `casting`.
+  Those are derived by `tools/derive.py`; a brief that carries one is
+  overwritten. `tools/brief.py` refuses it.
+- A character id that is not in `vocab/casting.yaml`. That is a casting
+  decision wearing a typo's clothes.
+- `automatable: no` with an empty `blocked_on` — the next agent has to
+  rediscover the blocker.
+- A planning or notes markdown file appearing in the repo.
+
+## Verification
+
+```bash
+python3 tools/brief.py check
+python3 tools/gaps.py
+python3 -m pytest -q tests/test_brief.py tests/test_gaps.py
+```
+
+The field-by-field brief reference is
+[`schema/brief.schema.json`](../../schema/brief.schema.json); what happens once
+a brief is executable is [`production.md`](production.md).

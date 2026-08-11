@@ -1,0 +1,8 @@
+# These files name real people or carry rights decisions, so the owner
+# reviews every change to them (AGENTS.md: casting names real people, and
+# the rights posture is what keeps the project shippable).
+
+/AGENTS.md           @castrojo
+/vocab/casting.yaml  @castrojo
+/dialogue/           @castrojo
+/redactions/         @castrojo

@@ -1,0 +1,55 @@
+name: Video idea
+description: I want a video made
+title: "video: "
+labels: [triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        File the idea however it comes to you — a link, a timecode, half a
+        sentence typed from your phone. Freeform is fine; everything below
+        except the first box is optional.
+
+        After you file, an agent will normalize the request into a
+        machine-readable `brief` block (YAML in a comment, using the lead
+        keys from `vocab/casting.yaml` for people) and post it back here.
+        Reply with one word — **yes** — to confirm it, or say what to
+        change. Nothing is cut until you confirm.
+  - type: textarea
+    id: want
+    attributes:
+      label: What do you want?
+      description: Say it however you'd say it in a text message. Links, timecodes, vibes — all fine here.
+      placeholder: "Harbinger cinematic, starring Kat. Melancholy. Make it all fit."
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Source YouTube link(s)
+      description: One per line. Optional — an agent can also search the index for footage.
+      placeholder: "https://www.youtube.com/watch?v=…"
+    validations:
+      required: false
+  - type: input
+    id: music
+    attributes:
+      label: Music link
+      placeholder: "https://music.youtube.com/watch?v=…"
+    validations:
+      required: false
+  - type: input
+    id: timecodes
+    attributes:
+      label: Start/end timecodes
+      placeholder: "e.g. start 6:23, end 7:10"
+    validations:
+      required: false
+  - type: textarea
+    id: plates
+    attributes:
+      label: Who should be plated?
+      description: Who gets a nameplate and roughly when (e.g. "bluefin maintainer at 4:03"). Agents map these to real people via vocab/casting.yaml — they never invent a person.
+      placeholder: "0:14 Kat, drop her plate right after the helmet comes off"
+    validations:
+      required: false

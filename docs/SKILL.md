@@ -13,6 +13,8 @@ load only that skill, then act.
 
 | I need to... | Load |
 |---|---|
+| File work, pick up an issue, or normalize a request into a brief | [`issues.md`](skills/issues.md) |
+| Take an issue all the way to a rendered cut, or make videos in volume | [`production.md`](skills/production.md) |
 | Index a new video: detect beats, extract keyframes, tag, assemble segments | [`indexing.md`](skills/indexing.md) |
 | Cast a character, add a lead binding, or credit the monthly ensemble | [`casting.md`](skills/casting.md) |
 | Write an outline, assemble a cut list, or render it to video | [`editing.md`](skills/editing.md) |
@@ -34,6 +36,7 @@ than restating them:
 | [`pipeline.md`](pipeline.md) | Segmentation, inheritance, review tiers, cost posture. |
 | [`agent-retrieval.md`](agent-retrieval.md) | How a natural-language query maps to filters and ranking. |
 | [`rendering.md`](rendering.md) | Which ffmpeg, why, and the seeking/AV1 traps. |
+| [`../schema/brief.schema.json`](../schema/brief.schema.json) | Every field of an issue's `brief` block. |
 
 ## Writing a skill here
 

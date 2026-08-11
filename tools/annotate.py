@@ -227,6 +227,52 @@ class StubTagger(Tagger):
         return out
 
 
+def verify_tags_match_detection(tags_path, beats, manifest_path=None, log=print):
+    """Refuse tags that were written against a different shot list.
+
+    Beat index is positional, so a tag file and a detection pass agree only if
+    they describe the same shots. Nothing in the data says so, which makes the
+    dangerous case silent: re-fetch a video at a different resolution, or bump
+    ``--min-shot-sec``, and every tag slides onto a neighbouring shot. The
+    result still validates, still assembles, and now says a HUD-bearing beat is
+    clean and names a real person in a shot they are not in.
+
+    Two checks, cheapest first: the number of beats, and -- when the manifest
+    from pass 1 is still on disk -- the actual boundaries. The manifest is the
+    stronger signal, because a re-detection can easily land on the same count
+    with different cuts.
+    """
+    with Path(tags_path).open(encoding="utf-8") as fh:
+        tags = json.load(fh)
+
+    if len(tags) != len(beats):
+        raise ValueError(
+            f"{tags_path} has {len(tags)} tagged beat(s) but this detection "
+            f"found {len(beats)}. Beat index is positional, so these tags "
+            "describe different shots. Re-tag against the current keyframes, "
+            "or restore the detector settings the tags were written for "
+            "(docs/skills/indexing.md)."
+        )
+
+    manifest_path = Path(manifest_path) if manifest_path else None
+    if not (manifest_path and manifest_path.exists()):
+        return
+    with manifest_path.open(encoding="utf-8") as fh:
+        recorded = json.load(fh)
+    drifted = [
+        i for i, (was, now) in enumerate(zip(recorded, beats))
+        if abs(float(was["start_sec"]) - float(now["start_sec"])) > 0.05
+        or abs(float(was["end_sec"]) - float(now["end_sec"])) > 0.05
+    ]
+    if drifted:
+        raise ValueError(
+            f"detection no longer matches {manifest_path}: {len(drifted)} beat "
+            f"boundar(ies) moved, first at index {drifted[0]}. The tags were "
+            "written against the keyframes of the earlier pass, so replaying "
+            "them now would tag the wrong shots. Re-run pass 1 and re-tag."
+        )
+
+
 class JsonTagger(Tagger):
     """Replays tags produced out-of-band (a vision model, or a human) from JSON.
 
@@ -376,6 +422,21 @@ def extract_keyframes(video_path, beats, out_dir, ffmpeg=None):
 # --- Indexing a real video ---------------------------------------------------
 
 
+def keyframes_dir_for(video_record, root=None):
+    """Where one video's stills belong: ``keyframes/<video_id>/``.
+
+    Derived from the record rather than chosen at the command line, because
+    choosing was the bug. ``--keyframes-dir keyframes/`` puts one video's
+    ``000.jpg`` at the root of the tree, where the next video's ``000.jpg``
+    overwrites it and the beats manifest with it -- silently, since the stills
+    are gitignored and nothing downstream reads a filename. One directory per
+    video_id makes that collision impossible and makes "which video is this
+    frame from" answerable from the path.
+    """
+    root = Path(root) if root else REPO_ROOT / "keyframes"
+    return root / video_record["video_id"]
+
+
 def index_video(video_path, video_record, tags_path=None, keyframes_dir=None,
                 out_dir=None, min_shot_sec=DEFAULT_MIN_SHOT_SEC, log=print):
     """Detect beats, optionally extract keyframes, optionally assemble segments.
@@ -412,6 +473,13 @@ def index_video(video_path, video_record, tags_path=None, keyframes_dir=None,
 
     if not tags_path:
         return beats, []
+
+    # Before replaying a single tag: do these tags describe THESE shots?
+    verify_tags_match_detection(
+        tags_path, beats,
+        manifest_path=keyframes_dir_for(video_record) / "beats.json",
+        log=log,
+    )
 
     tagger = JsonTagger.from_file(tags_path)
     leads = derive.load_leads()
@@ -481,7 +549,10 @@ def _index(args):
         args.video,
         record,
         tags_path=args.tags,
-        keyframes_dir=args.keyframes_dir,
+        # Pass 1 is the one that writes stills, and its destination is the
+        # record's own video_id unless someone deliberately overrides it.
+        keyframes_dir=(args.keyframes_dir
+                       or (None if args.tags else keyframes_dir_for(record))),
         out_dir=args.out_dir,
         min_shot_sec=args.min_shot_sec,
     )
@@ -506,7 +577,8 @@ def main(argv=None):
     )
     idx.add_argument("--video", required=True, help="source media file")
     idx.add_argument("--video-record", required=True, help="videos/<video_id>.json from tools/ingest.py")
-    idx.add_argument("--keyframes-dir", default=None, help="write one still per beat here")
+    idx.add_argument("--keyframes-dir", default=None,
+                     help="override the still destination (default: keyframes/<video_id>/)")
     idx.add_argument("--tags", default=None,
                      help="tag file to replay; omit for the detect+keyframe pass")
     idx.add_argument("--out-dir", default=None, help="segment output dir (default: segments/)")

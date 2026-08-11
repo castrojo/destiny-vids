@@ -42,9 +42,9 @@ yt-dlp -S "vcodec:h264,res:1080" --merge-output-format mp4 \
   -o "media/<video_id>.%(ext)s" <url>
 python3 tools/ingest.py <url> --id <video_id>
 
-# pass 1 — beats + one keyframe each, plus keyframes/<dir>/beats.json
+# pass 1 — beats + one keyframe each, plus keyframes/<video_id>/beats.json
 python3 tools/annotate.py index --video media/<video_id>.mp4 \
-    --video-record videos/<video_id>.json --keyframes-dir keyframes/<dir>
+    --video-record videos/<video_id>.json
 
 # ...tag every keyframe into tags/<video_id>.json...
 
@@ -52,6 +52,14 @@ python3 tools/annotate.py index --video media/<video_id>.mp4 \
 python3 tools/annotate.py index --video media/<video_id>.mp4 \
     --video-record videos/<video_id>.json --tags tags/<video_id>.json
 ```
+
+Stills land in `keyframes/<video_id>/`, derived from the video record rather
+than chosen at the command line. Choosing was the bug: `--keyframes-dir
+keyframes/` put one video's `000.jpg` at the root of the tree, where the next
+video's `000.jpg` overwrote it and the beats manifest with it — silently, since
+stills are gitignored and nothing downstream reads a filename.
+
+`scripts/make_video.sh` runs both passes and stops in between, at tagging.
 
 Both passes must use identical detector settings. A tag file is only valid
 against the shot list its own detection pass produced, which is why the beat
@@ -98,6 +106,9 @@ Expect a few rejects per video: ratings, title and date cards carry
   (default 0.5) merges them; raise it rather than hand-deleting segments.
 - Editing a segment file to change a derived field. Fix the tag or the vocab and
   re-assemble.
+- Hand-correcting a value in a committed tag or segment. It does not fail now;
+  it fails at the next rebuild, on a value like `label_source: "human"` that is
+  not in the enum. `tests/test_index_integrity.py` catches it.
 - Committing anything under `media/`, `keyframes/` or `renders/`.
 
 ## Verification

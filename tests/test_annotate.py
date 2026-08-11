@@ -216,6 +216,87 @@ def test_index_video_tag_file_must_cover_every_beat(tmp_path, monkeypatch):
     partial.pop("2")
     tags.write_text(json.dumps(partial))
 
+    # Caught up front, on the count, before a single segment is written.
+    with pytest.raises(ValueError, match="tagged beat"):
+        annotate.index_video("fake.mp4", FAKE_VIDEO_RECORD, tags_path=tags,
+                             out_dir=tmp_path / "segments", log=lambda *a: None)
+
+
+def test_a_tag_file_of_the_right_size_but_wrong_keys_still_fails(tmp_path, monkeypatch):
+    import json
+
+    beats = _fake_beats(monkeypatch)
+    tags = tmp_path / "tags.json"
+    renamed = _stub_tags(beats)
+    renamed["99"] = renamed.pop("2")
+    tags.write_text(json.dumps(renamed))
+
     with pytest.raises(KeyError, match="no tags for beat 2"):
         annotate.index_video("fake.mp4", FAKE_VIDEO_RECORD, tags_path=tags,
                              out_dir=tmp_path / "segments", log=lambda *a: None)
+
+
+def test_tags_from_a_different_detection_are_refused(tmp_path, monkeypatch):
+    """The silent case: same count, shifted boundaries.
+
+    Re-fetching a video at another resolution or changing --min-shot-sec can
+    land on the same number of beats with different cuts. Replaying old tags
+    then slides every label onto a neighbouring shot -- and the result still
+    validates, now calling a HUD-bearing beat clean.
+    """
+    import json
+
+    from tools.annotate import verify_tags_match_detection
+
+    beats = _fake_beats(monkeypatch)
+    tags = tmp_path / "tags.json"
+    tags.write_text(json.dumps(_stub_tags(beats)))
+
+    manifest = tmp_path / "beats.json"
+    shifted = [dict(b, start_sec=float(b["start_sec"]) + 5.0,
+                    end_sec=float(b["end_sec"]) + 5.0) for b in beats]
+    manifest.write_text(json.dumps(shifted))
+
+    with pytest.raises(ValueError, match="no longer matches"):
+        verify_tags_match_detection(tags, beats, manifest_path=manifest)
+
+
+def test_matching_detection_passes_verification(tmp_path, monkeypatch):
+    import json
+
+    from tools.annotate import verify_tags_match_detection
+
+    beats = _fake_beats(monkeypatch)
+    tags = tmp_path / "tags.json"
+    tags.write_text(json.dumps(_stub_tags(beats)))
+    manifest = tmp_path / "beats.json"
+    manifest.write_text(json.dumps([dict(b) for b in beats]))
+
+    verify_tags_match_detection(tags, beats, manifest_path=manifest)
+
+
+def test_verification_without_a_manifest_still_checks_the_count(tmp_path, monkeypatch):
+    import json
+
+    from tools.annotate import verify_tags_match_detection
+
+    beats = _fake_beats(monkeypatch)
+    tags = tmp_path / "tags.json"
+    tags.write_text(json.dumps(_stub_tags(beats)))
+
+    verify_tags_match_detection(tags, beats, manifest_path=tmp_path / "absent.json")
+
+
+def test_keyframes_land_under_their_own_video_id(tmp_path):
+    from tools.annotate import keyframes_dir_for
+
+    record = {"video_id": "yt_some_trailer"}
+    assert keyframes_dir_for(record, root=tmp_path) == tmp_path / "yt_some_trailer"
+
+
+def test_two_videos_cannot_collide_on_the_same_still(tmp_path):
+    from tools.annotate import keyframes_dir_for
+
+    a = keyframes_dir_for({"video_id": "yt_a"}, root=tmp_path)
+    b = keyframes_dir_for({"video_id": "yt_b"}, root=tmp_path)
+    assert a != b

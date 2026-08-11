@@ -1,0 +1,175 @@
+{
+  "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0039-0040",
+  "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+  "start_sec": 39.4,
+  "end_sec": 40.533333,
+  "start_tc": "0:39",
+  "end_tc": "0:41",
+  "era": "witch_queen",
+  "activity": "unknown",
+  "content_type": "cutscene",
+  "class": "hunter",
+  "element": "unknown",
+  "faction": [],
+  "shot_scale": "MS",
+  "composition": [
+    "group"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "medium",
+  "lighting": "bright",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "idle"
+  ],
+  "mood": [
+    "triumphant"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "Three masked Hunters stand together in a warmly lit, ornate hall, the center Guardian holding a rifle raised.",
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 3
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.65
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.92
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

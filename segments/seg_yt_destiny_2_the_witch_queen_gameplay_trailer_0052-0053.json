@@ -1,0 +1,175 @@
+{
+  "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0052-0053",
+  "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+  "start_sec": 52.933333,
+  "end_sec": 53.5,
+  "start_tc": "0:53",
+  "end_tc": "0:54",
+  "era": "witch_queen",
+  "activity": "unknown",
+  "content_type": "cutscene",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [
+    "hive"
+  ],
+  "shot_scale": "ECU",
+  "composition": [
+    "single"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "medium",
+  "lighting": "high_contrast",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 3,
+  "overlays": [],
+  "subject_salience": "enemy_threat",
+  "action": [],
+  "mood": [
+    "ominous"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "A crystalline creature's fractured head catches the light, one green eye glowing faintly within.",
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.65
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.92
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

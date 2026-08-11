@@ -1,0 +1,175 @@
+{
+  "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0100-0102",
+  "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+  "start_sec": 100.208333,
+  "end_sec": 102.458333,
+  "start_tc": "1:40",
+  "end_tc": "1:42",
+  "era": "beyond_light",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "class": "unknown",
+  "element": "stasis",
+  "faction": [],
+  "shot_scale": "ECU",
+  "composition": [
+    "cutaway"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "enemy_threat",
+  "action": [
+    "ability_cast"
+  ],
+  "mood": [
+    "ominous"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "A ringed hand cups a swirling disc of frost-white energy in extreme close-up.",
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.78
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.68
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.68
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.88
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

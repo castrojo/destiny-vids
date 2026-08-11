@@ -11,6 +11,25 @@ The repo stores **metadata and timestamps, never footage**.
 3. The design docs the skill points at (`docs/taxonomy.md`, `docs/pipeline.md`,
    `docs/agent-retrieval.md`, `docs/rendering.md`).
 
+## Where the work lives
+
+**GitHub issues are the backlog.** There is no TODO file, no notes doc, and no
+planning markdown in the repo — those go stale and mislead the next agent.
+Session state stays in the agent's session folder.
+
+An issue carries the owner's prose *and* a fenced `brief` block: the same
+request in YAML, matching [`schema/brief.schema.json`](schema/brief.schema.json).
+Tools read the block, humans read the prose. Writing the block is not the
+owner's job — an agent proposes one with `tools/brief.py normalize` and the
+owner confirms it, which puts a person at the exact moment a guess would
+otherwise be made. Start at [`docs/skills/issues.md`](docs/skills/issues.md).
+
+**Three classes of work here can never be automated:** a visual judgement about
+a frame, a claim about a real person, and a licensing decision. An agent that
+reaches one, records `automatable: no` with the missing decision in
+`blocked_on`, and stops has **succeeded**. Never guess past one to keep a queue
+moving — a wrong credit is not recoverable by a revert.
+
 ## Build, test, and lint
 
 ```bash
@@ -56,6 +75,11 @@ Run both before every commit.
   records an owner's rewrite as theirs rather than overwriting the recovery).
   Likewise `redactions/<video_id>.json` only ever *removes* burned-in publisher
   copy.
+- **Never hand-edit a committed record.** A one-word correction to a tag or a
+  segment does not fail loudly — it fails months later, when a rebuild dies on
+  a value like `label_source: "human"` that is not in the enum. Fix the tag
+  file and re-run assembly. `tests/test_index_integrity.py` now validates every
+  committed segment, video and tag file against its schema.
 
 ## Rights
 

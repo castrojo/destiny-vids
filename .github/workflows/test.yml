@@ -1,0 +1,91 @@
+# CI for destiny-vids — deliberately metadata-only.
+#
+# This workflow runs the four checks that need no footage: the offline pytest
+# suite, the skill-catalog freshness check, label drift, and validation of the
+# YAML `brief` blocks on open issues. That is all CI can ever do here, for two
+# reasons:
+#
+#   * The repo stores metadata and timestamps, never footage — media/,
+#     keyframes/, renders/ and *.mp4 are gitignored, so a runner has nothing
+#     to decode. The frame-touching stages (ingest, annotate, plate, render)
+#     exist only where the video files exist.
+#   * The ffmpeg story is host-dependent and documented in docs/rendering.md:
+#     on an atomic Fedora/Bluefin host the default `ffmpeg-free` build has no
+#     H.264 decoder, and it fails only once decoding starts. CI is not the
+#     place to rediscover that.
+#
+# Keep this light: one job, no build/promote/release ceremony. This is a
+# creative repo, not an engineering factory.
+
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  issues: read # tools/brief.py check and scripts/sync_labels.py read via gh
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Authenticates gh for the two GitHub-reading checks below. Read-only.
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        # The repo has no requirements.txt or pyproject.toml — the tools are
+        # stdlib-first by design, so the suite's real third-party needs are
+        # small enough to name here. Taken from the imports in tools/ and
+        # tests/: pyyaml (yaml) and jsonschema validate the metadata, pytest
+        # runs the suite, and Pillow is required because tools/plate.py
+        # imports PIL unconditionally and tests/test_plate.py does not skip
+        # without it. scenedetect / opencv / imageio-ffmpeg stay optional:
+        # the tests exercise their documented fallbacks instead.
+        run: python3 -m pip install pyyaml jsonschema pytest pillow
+
+      - name: Run the offline suite
+        run: python3 -m pytest -q
+
+      - name: Check skill catalog freshness
+        run: python3 scripts/generate_skill_index.py --check
+
+      - name: Check label drift
+        # Tolerant by design: when gh is missing, unauthenticated, or the
+        # network is down, the script prints a SKIP notice and exits 0 rather
+        # than failing CI spuriously. A nonzero exit here means the owned
+        # labels genuinely drifted; fix with `python3 scripts/sync_labels.py
+        # --write`, never by hand.
+        run: python3 scripts/sync_labels.py --check
+
+      - name: Validate brief blocks on open issues
+        # brief.py exits 2 when gh itself fails (not installed, unauthenticated,
+        # network down). That is an environment problem, not a validation
+        # result, so it is tolerated here explicitly rather than by luck.
+        # Exit 1 means a real brief block failed validation and SHOULD fail CI.
+        run: |
+          rc=0
+          python3 tools/brief.py check || rc=$?
+          if [ "$rc" -eq 2 ]; then
+            echo "::warning::tools/brief.py could not reach GitHub; skipping issue validation"
+            exit 0
+          fi
+          exit "$rc"

@@ -1,0 +1,173 @@
+{
+  "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0031-0033",
+  "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+  "start_sec": 31.875,
+  "end_sec": 33.125,
+  "start_tc": "0:32",
+  "end_tc": "0:33",
+  "era": "beyond_light",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [],
+  "shot_scale": "MS",
+  "composition": [
+    "cutaway"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "mood": [
+    "ominous"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "An icy moon marked with red fissures hangs isolated against a smoke- or fire-tinted backdrop.",
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.78
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.68
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.68
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.88
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}
