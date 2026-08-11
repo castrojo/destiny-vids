@@ -219,3 +219,29 @@ def test_index_video_tag_file_must_cover_every_beat(tmp_path, monkeypatch):
     with pytest.raises(KeyError, match="no tags for beat 2"):
         annotate.index_video("fake.mp4", FAKE_VIDEO_RECORD, tags_path=tags,
                              out_dir=tmp_path / "segments", log=lambda *a: None)
+
+
+def test_missing_scenedetect_warns_instead_of_failing_quietly(tmp_path, capsys,
+                                                              monkeypatch):
+    """Fixed-window fallback on a real video must say so.
+
+    The slices it returns look like a plausible shot list and are not one, so
+    the mistake is invisible in the output and only surfaces much later as cuts
+    that land mid-shot.
+    """
+    video = tmp_path / "fake.mp4"
+    video.write_bytes(b"not really a video")
+    monkeypatch.setattr(annotate, "HAVE_SCENEDETECT", False)
+
+    beats = annotate.detect_beats(str(video), 12.0)
+    err = capsys.readouterr().err
+    assert beats, "the fallback must still produce beats"
+    assert "scenedetect" in err
+    assert "fixed" in err
+
+
+def test_no_warning_when_there_is_no_video_to_detect(tmp_path, capsys, monkeypatch):
+    """The offline/demo path is a legitimate use of fixed windows, not a fault."""
+    monkeypatch.setattr(annotate, "HAVE_SCENEDETECT", False)
+    annotate.detect_beats(None, 12.0)
+    assert "scenedetect" not in capsys.readouterr().err

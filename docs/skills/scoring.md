@@ -18,6 +18,9 @@ description: >-
   moment.
 metadata:
   type: procedure
+  context7-sources:
+    - /librosa/librosa
+    - /websites/ffmpeg_documentation
 ---
 
 # Scoring a cut to a bed
@@ -34,12 +37,13 @@ metadata:
   the `audio-quality-tenet` and `scoring-cuts-with-replacement-music` skills
 - Assembling the picture → [`editing.md`](editing.md)
 
-## The bed record
+## Core Process
 
-A bed gets a record in `music/<bed_id>.json`, which is to a track what
-`videos/<video_id>.json` is to a source video: provenance plus measurements,
-**never the media**. Same rights posture — `usage_class` and
-`source_rights_note` on every record.
+1. **Measure** the bed. Never take a duration from a search result.
+2. **Check the metrical level** before trusting the tempo (see below).
+3. **Excise** any unwanted section — it snaps to bar lines.
+4. **Map** the anchor timecode between the source and edited timelines.
+5. **Render** the edited bed, lossless.
 
 ```bash
 python3 tools/bed.py measure media/<bed>.wav --id <bed_id> \
@@ -48,6 +52,13 @@ python3 tools/bed.py excise music/<bed_id>.json --from 2:59 --to 3:12
 python3 tools/bed.py render music/<bed_id>.json --out renders/bed-edited.wav
 python3 tools/bed.py map music/<bed_id>.json --at 3:48 --edited
 ```
+
+## The bed record
+
+A bed gets a record in `music/<bed_id>.json`, which is to a track what
+`videos/<video_id>.json` is to a source video: provenance plus measurements,
+**never the media**. Same rights posture — `usage_class` and
+`source_rights_note` on every record.
 
 ## The grid is cached on purpose
 
@@ -80,6 +91,27 @@ in the record:
 
 A tempo outside roughly 60–160 bpm, or one exactly double what you tapped, is
 the tell.
+
+### `beat_track` returns tempo as an array, and the official example is stale
+
+librosa's own tutorial still prints the tempo like a scalar:
+
+```python
+tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
+print('Estimated tempo: {:.2f} beats per minute'.format(tempo))   # raises
+beat_times = librosa.frames_to_time(beat_frames, sr=sr)
+```
+
+`source: /librosa/librosa` (tutorial quickstart)
+
+On **librosa 0.11.0** that `format` call raises
+`TypeError: unsupported format string passed to numpy.ndarray.__format__`,
+because `tempo` is now `ndarray` of shape `(1,)`. Verified on this host, not
+inferred. Take it as `float(np.atleast_1d(tempo)[0])`.
+
+The wider lesson is why the tempo is *not* trusted for the bar length here:
+`bar_sec` is derived from the median tracked beat interval instead, so the
+reported tempo and the grid can never disagree.
 
 ## Excisions are snapped to bar lines
 

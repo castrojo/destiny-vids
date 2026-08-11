@@ -316,5 +316,5 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 python3 -m pytest -q tests/test_plate.py     # includes the closed-vocabulary test
 
 # eyeball a plate inside its window
-ffmpeg -ss <at+1> -i renders/cut-plated.mp4 -frames:v 1 /tmp/plate.jpg
+ffmpeg -ss <at+1> -i renders/cut-plated.mp4 -frames:v 1 /var/tmp/plate.jpg
 ```
