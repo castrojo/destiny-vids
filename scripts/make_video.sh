@@ -38,8 +38,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 usage() {
-    echo "usage: $0 <issue-number> [roster.json]" >&2
-    echo "       $0 --video-id <video_id> [roster.json]" >&2
+    echo "usage: $0 <issue-number> [roster.json] [--outline FILE]" >&2
+    echo "       $0 --video-id <video_id> [roster.json] [--outline FILE]" >&2
     exit 2
 }
 
@@ -47,6 +47,7 @@ usage() {
 
 ISSUE=""
 VIDEO_ID=""
+OUTLINE=""
 if [ "$1" = "--video-id" ]; then
     [ $# -ge 2 ] || usage
     VIDEO_ID="$2"
@@ -55,7 +56,13 @@ else
     ISSUE="$1"
     shift
 fi
-ROSTER="${1:-}"
+ROSTER=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --outline) OUTLINE="${2:?--outline needs a file}"; shift 2 ;;
+        *)         ROSTER="$1"; shift ;;
+    esac
+done
 
 say() { printf '==> %s\n' "$*"; }
 skip() { printf '    (have %s, skipping)\n' "$*"; }
@@ -194,10 +201,44 @@ if mine and clean == 0:
 PY
 
 # ---------------------------------------------------------------- 7. build
+#
+# Two ways to finish, and which one applies is a property of the footage.
+#
+#   CUT      -- an outline picks clean shots out of the index and orders them.
+#               tools/story.py draws only from the clean pool, so a trailer
+#               full of HUD and title cards is fine: the unusable material
+#               simply never gets chosen.
+#   UNCUT    -- the whole video, credited end to end. Right for a cinematic
+#               that already tells its story; wrong for anything whose unclean
+#               beats are scattered through the middle.
+#
+# An outline is editorial work and this script does not invent one. But once
+# one exists, the path from it to a rendered file is mechanical, and leaving
+# that out was what made a freshly indexed trailer unreachable.
+if [ -z "$OUTLINE" ] && [ -f "stories/$VIDEO_ID.txt" ]; then
+    OUTLINE="stories/$VIDEO_ID.txt"
+fi
+
+if [ -n "$OUTLINE" ]; then
+    [ -f "$OUTLINE" ] || { echo "no outline at $OUTLINE" >&2; exit 1; }
+    mkdir -p renders
+    CUT="renders/$VIDEO_ID-cut.json"
+    say "cut list from $OUTLINE"
+    python3 tools/story.py "$OUTLINE" --dir segments --format json --out "$CUT"
+    say "render"
+    python3 tools/render.py "$CUT" --out "renders/$VIDEO_ID-cut.mp4"
+    say "renders/$VIDEO_ID-cut.mp4"
+    echo "    Plates next, once you are happy with the cut:"
+    echo "    python3 tools/plate.py plan $CUT --only leads --out plates.json"
+    echo "    (docs/skills/plates.md)"
+    exit 0
+fi
+
 if [ -z "$ROSTER" ]; then
-    say "indexed. No roster given, so stopping before the credited build."
-    echo "    python3 tools/ensemble.py roster --out renders/roster.json"
-    echo "    $0 ${ISSUE:---video-id $VIDEO_ID} renders/roster.json"
+    say "indexed. Nothing further asked for."
+    echo "    A cut:   $0 ${ISSUE:---video-id $VIDEO_ID} --outline stories/$VIDEO_ID.txt"
+    echo "    Uncut:   python3 tools/ensemble.py roster --out renders/roster.json"
+    echo "             $0 ${ISSUE:---video-id $VIDEO_ID} renders/roster.json"
     exit 0
 fi
 
@@ -237,12 +278,14 @@ if not mine:
     raise SystemExit(1)
 
 start, end = 0.0, max(float(s["end_sec"]) for s in mine)
+redactions = []
 try:
     data = load_redactions(video_id, root=REDACTIONS_DIR)
 except FileNotFoundError:
     pass
 else:
-    start, end = kept_range(data["redactions"], end)
+    redactions = data["redactions"]
+    start, end = kept_range(redactions, end)
 
 exposed, clipped = [], []
 for s in mine:
@@ -254,26 +297,37 @@ for s in mine:
     if s0 >= start and s1 <= end:
         exposed.append(s)             # survives whole, untouched
     else:
-        clipped.append(s)             # the owner drew a boundary through it
+        clipped.append(s)             # a redaction boundary runs through it
+
+# A beat the redaction range cuts through is the one case the index cannot
+# resolve alone: tags are beat-level and redaction is frame-level, so a long
+# clean shot that dissolves into a logo card in its final seconds is tagged
+# unclean as a whole while only its tail is. Trusting every such straddle
+# would be too generous -- a head cut made for a ratings card would silently
+# grandfather an unrelated HUD beat that happens to overlap it. So the trust
+# is explicit: the redaction record names the segments it accounts for, in a
+# file the owner reviews (CODEOWNERS).
+acknowledged = set()
+for item in redactions:
+    acknowledged.update(item.get("acknowledges") or [])
 
 for s in clipped:
-    # A beat the redaction range cuts through is one somebody has looked at: the
-    # boundary is in redactions/<video_id>.json because a human put it there.
-    # Tags are beat-level and redaction is frame-level, so this is exactly the
-    # case the index cannot resolve on its own -- e.g. a long clean shot that
-    # dissolves into a logo card in its final seconds.
-    print(f"    note: {s['start_tc']}-{s['end_tc']} is unclean "
-          f"({s.get('overlays')}) but the redaction range cuts through it; "
-          "trusting that boundary.")
+    if s["segment_id"] in acknowledged:
+        print(f"    note: {s['start_tc']}-{s['end_tc']} is unclean "
+              f"({s.get('overlays')}); the redaction acknowledges it.")
+    else:
+        exposed.append(s)
 
 if exposed:
+    exposed.sort(key=lambda s: float(s["start_sec"]))
     print()
-    print(f"REFUSING to build: {len(exposed)} unclean beat(s) survive redaction")
-    print("whole. The uncut build renders the entire video, so each of these")
-    print("would be in the finished file -- HUD, nameplates or burned-in text,")
-    print("under real people's names.")
+    print(f"REFUSING to build: {len(exposed)} unclean beat(s) survive redaction.")
+    print("The uncut build renders the entire video, so each of these would be")
+    print("in the finished file -- HUD, nameplates or burned-in text, under")
+    print("real people's names.")
     for s in exposed[:8]:
-        print(f"    {s['start_tc']}-{s['end_tc']}  overlays={s.get('overlays')}")
+        print(f"    {s['start_tc']}-{s['end_tc']}  overlays={s.get('overlays')}"
+              f"  {s['segment_id']}")
     if len(exposed) > 8:
         print(f"    ... and {len(exposed) - 8} more")
     print()
@@ -281,8 +335,9 @@ if exposed:
     print("    python3 tools/story.py <outline> --format json --out cut.json")
     print("    python3 tools/render.py cut.json --out renders/cut.mp4")
     print("(tools/story.py draws only from the clean pool.)")
-    print("If the unclean material is head/tail publisher copy, redact it:")
-    print(f"    redactions/{video_id}.json")
+    print("If a redaction boundary already handles the unclean part of a beat,")
+    print(f"say so in redactions/{video_id}.json:")
+    print('    "acknowledges": ["<segment_id>"]')
     raise SystemExit(1)
 PY
 
@@ -300,7 +355,25 @@ if result.returncode != 0:
     print("re-reading the brief for its music failed:", result.stderr.strip(),
           file=sys.stderr)
     raise SystemExit(1)
-print((json.loads(result.stdout).get("music") or {}).get("path") or "")
+
+music = json.loads(result.stdout).get("music") or {}
+if not music:
+    raise SystemExit                     # genuinely unscored, by request
+
+path = music.get("path")
+if not path:
+    # The common shape is `music: {url: ...}`, and nothing here fetches audio.
+    # Rendering anyway would hand back a silent cut for a brief that asked for
+    # a score -- the failure looks like an editorial choice, so it has to be
+    # loud. Music is referenced, never committed, like all media.
+    print("the brief asks for music but gives no local path.", file=sys.stderr)
+    if music.get("url"):
+        print(f"    yt-dlp -x --audio-format mp3 -o 'media/%(title)s.%(ext)s' "
+              f"{music['url']}", file=sys.stderr)
+    print("    then add `path: media/<file>.mp3` to the brief's music block.",
+          file=sys.stderr)
+    raise SystemExit(1)
+print(path)
 PY
 )" || exit 1
 

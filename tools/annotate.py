@@ -492,11 +492,24 @@ def index_video(video_path, video_record, tags_path=None, keyframes_dir=None,
         segment = assemble_segment(video_record, beat, tagger.tag_beat(
             video_record["video_id"], beat, []), leads)
         validate_segment(segment)
+        segments.append(segment)
+
+    # Every segment is built and validated before anything is written, and the
+    # video's previous segments are cleared first. A segment_id encodes its own
+    # timecodes, so a re-index with different boundaries writes new filenames
+    # and leaves the old ones behind -- orphans that are still schema-valid,
+    # still loaded by search and by story.py's clean pool, and now describing
+    # shots that no longer exist. Replacing the set is the only way the index
+    # can be said to reflect one detection pass.
+    written = set()
+    for stale in out_dir.glob(f"seg_{video_record['video_id']}_*.json"):
+        stale.unlink()
+    for segment in segments:
         dest = out_dir / f"{segment['segment_id']}.json"
         with dest.open("w", encoding="utf-8") as fh:
             json.dump(segment, fh, indent=2)
             fh.write("\n")
-        segments.append(segment)
+        written.add(dest.name)
 
     clean = sum(1 for s in segments if s.get("clean"))
     log(f"wrote {len(segments)} segment(s) to {out_dir} ({clean} clean, "

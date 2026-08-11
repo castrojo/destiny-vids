@@ -6,3 +6,9 @@
 /vocab/casting.yaml  @castrojo
 /dialogue/           @castrojo
 /redactions/         @castrojo
+
+# Tags decide two things nothing downstream can second-guess: `overlays`,
+# which is the input to the `clean` gate, and `character`, which routes a real
+# person's credit onto a shot. They are produced in volume by agents, so they
+# are exactly the files where a wrong value arrives quietly.
+/tags/               @castrojo

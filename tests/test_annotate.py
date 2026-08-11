@@ -300,3 +300,30 @@ def test_two_videos_cannot_collide_on_the_same_still(tmp_path):
     a = keyframes_dir_for({"video_id": "yt_a"}, root=tmp_path)
     b = keyframes_dir_for({"video_id": "yt_b"}, root=tmp_path)
     assert a != b
+
+
+def test_re_indexing_replaces_the_videos_segments(tmp_path, monkeypatch):
+    """A shorter or shifted detection must not leave orphans behind.
+
+    segment_id encodes timecodes, so new boundaries mean new filenames. The
+    stale files stay schema-valid and keep being loaded by search and by
+    story.py's clean pool, describing shots that no longer exist.
+    """
+    import json
+
+    beats = _fake_beats(monkeypatch)
+    tags = tmp_path / "tags.json"
+    tags.write_text(json.dumps(_stub_tags(beats)))
+    out = tmp_path / "segments"
+    out.mkdir()
+
+    orphan = out / f"seg_{FAKE_VIDEO_RECORD['video_id']}_9999-9999.json"
+    orphan.write_text("{}")
+    other = out / "seg_yt_another_video_0000-0001.json"
+    other.write_text("{}")
+
+    annotate.index_video("fake.mp4", FAKE_VIDEO_RECORD, tags_path=tags,
+                         out_dir=out, log=lambda *a: None)
+
+    assert not orphan.exists(), "a stale segment of this video survived"
+    assert other.exists(), "another video's segments must not be touched"

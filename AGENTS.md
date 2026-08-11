@@ -17,12 +17,10 @@ The repo stores **metadata and timestamps, never footage**.
 planning markdown in the repo — those go stale and mislead the next agent.
 Session state stays in the agent's session folder.
 
-An issue carries the owner's prose *and* a fenced `brief` block: the same
-request in YAML, matching [`schema/brief.schema.json`](schema/brief.schema.json).
-Tools read the block, humans read the prose. Writing the block is not the
-owner's job — an agent proposes one with `tools/brief.py normalize` and the
-owner confirms it, which puts a person at the exact moment a guess would
-otherwise be made. Start at [`docs/skills/issues.md`](docs/skills/issues.md).
+An issue carries the owner's prose *and* a fenced `brief` block that makes it
+executable. How to file work, pick it up, and normalize prose into a brief is
+[`docs/skills/issues.md`](docs/skills/issues.md); the field reference is
+[`schema/brief.schema.json`](schema/brief.schema.json).
 
 **Three classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, and a licensing decision. An agent that

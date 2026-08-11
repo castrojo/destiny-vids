@@ -54,7 +54,27 @@ re-fetching 200 MB:
 | 4 | detect beats + keyframes | `keyframes/<id>/beats.json` exists |
 | 5 | **tag** | `tags/<id>.json` exists |
 | 6 | assemble segments | never — it is cheap and idempotent |
-| 7 | plates, dialogue, ensemble, redact, render | no roster given, or `automatable: partly` |
+| 7 | finish: a **cut**, or the **uncut** credited build | nothing asked for |
+
+## Two ways to finish
+
+Which one applies is a property of the footage, not a preference:
+
+```bash
+scripts/make_video.sh 3 --outline stories/yt_foo.txt   # CUT
+scripts/make_video.sh 3 renders/roster.json            # UNCUT, credited
+```
+
+- **Cut** — `tools/story.py` picks clean shots out of the index and orders them
+  to an outline. It draws **only** from the clean pool, so a trailer full of
+  HUD and title cards is fine: the unusable material is never chosen. This is
+  the path for almost every trailer.
+- **Uncut** — the whole video, credited end to end. Right for a cinematic that
+  already tells its story. `tools/uncut.py` does not filter on `clean`, by
+  design, which is why stage 7 checks before it builds.
+
+`make_video.sh` picks up `stories/<video_id>.txt` automatically if it exists.
+Writing the outline is editorial work; the script does not invent one.
 
 ## The gate at stage 7
 
@@ -63,20 +83,23 @@ right for a cinematic — the source already tells the story, and
 `redactions/<video_id>.json` trims publisher copy off the head and tail. It is
 exactly wrong for a trailer whose unclean beats are scattered HUD and title
 cards, because rendering the whole thing puts every one of them on screen.
-`tools/uncut.py` does not filter on `clean`, by design.
 
 So `make_video.sh` checks before it builds, and **fails closed**:
 
-- An unclean beat that survives redaction **whole** → refuse, and point at
-  `tools/story.py`, which draws only from the clean pool.
-- An unclean beat the redaction range **cuts through** → note it and continue.
-  Somebody drew that boundary by hand. Tags are beat-level and redaction is
-  frame-level, so this is the case the index cannot resolve alone: on Curse of
-  Osiris the last beat is clean footage that dissolves into a logo card, and
-  the redaction ends at 163.6s precisely to clip it.
+- An unclean beat that survives redaction **whole** → refuse, and point at the
+  cut path.
+- An unclean beat a redaction boundary **cuts through** → refuse *unless* that
+  redaction record names the segment in `acknowledges`.
 
-A video that refuses here does not need the gate relaxed. It needs cutting
-instead of crediting end to end.
+That second case is the one the index cannot resolve alone: tags are beat-level
+and redaction is frame-level, so on Curse of Osiris the last beat is clean
+footage that dissolves into a logo card, and the 163.6s cut removes exactly the
+card. Trusting *every* straddle would be too generous — a head cut made for a
+ratings card would silently grandfather an unrelated HUD beat that happens to
+overlap it. `acknowledges` makes the trust explicit, per beat, in a file
+CODEOWNERS puts in front of the owner.
+
+A video that refuses here does not need the gate relaxed. It needs cutting.
 
 ## Where it stops, and why that is the design
 

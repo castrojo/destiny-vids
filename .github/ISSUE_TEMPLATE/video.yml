@@ -11,10 +11,12 @@ body:
         except the first box is optional.
 
         After you file, an agent will normalize the request into a
-        machine-readable `brief` block (YAML in a comment, using the lead
-        keys from `vocab/casting.yaml` for people) and post it back here.
+        machine-readable `brief` block (YAML, using the lead keys from
+        `vocab/casting.yaml` for people) and post it back here as a comment.
         Reply with one word — **yes** — to confirm it, or say what to
-        change. Nothing is cut until you confirm.
+        change. The agent then edits the confirmed block into this issue's
+        body, which is the only place the tools read it from. Nothing is
+        cut until you confirm.
   - type: textarea
     id: want
     attributes:

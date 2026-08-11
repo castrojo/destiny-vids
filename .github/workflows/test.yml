@@ -77,10 +77,16 @@ jobs:
         run: python3 scripts/sync_labels.py --check
 
       - name: Validate brief blocks on open issues
+        # Warn-only, deliberately. A brief block lives in an issue body, which
+        # anyone can edit at any time -- so a typo while editing issue #12
+        # would otherwise turn every open pull request red, coupling unrelated
+        # work to unrelated edits. The signal is still worth having; it is not
+        # worth blocking a change that did not cause it. Run
+        # `python3 tools/brief.py check` locally for the authoritative answer.
+        #
         # brief.py exits 2 when gh itself fails (not installed, unauthenticated,
-        # network down). That is an environment problem, not a validation
-        # result, so it is tolerated here explicitly rather than by luck.
-        # Exit 1 means a real brief block failed validation and SHOULD fail CI.
+        # network down) and 1 when a block genuinely fails validation.
+        continue-on-error: true
         run: |
           rc=0
           python3 tools/brief.py check || rc=$?
@@ -88,4 +94,7 @@ jobs:
             echo "::warning::tools/brief.py could not reach GitHub; skipping issue validation"
             exit 0
           fi
-          exit "$rc"
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning::an open issue's brief block does not validate"
+          fi
+          exit 0

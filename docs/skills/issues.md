@@ -78,29 +78,53 @@ somebody meant, and it is not executable until they say it is right.
 2. `python3 tools/brief.py parse <issue>`. No block yet? Normalize, post the
    proposal, and wait — do not start from your own reading of the prose.
 3. Check `automatable`. `no` means stop now and say what you need.
-4. Work on a branch, one issue per branch. `vocab/casting.yaml` is the file
+4. Check the issue is `agent-ready` and unassigned, then assign yourself.
+5. Work on a branch, one issue per branch. `vocab/casting.yaml` is the file
    every video touches, so a casting change belongs in its own small PR rather
    than buried in a cut.
-5. Open a PR saying `Closes #NNN`.
+6. Open a PR saying `Closes #NNN`.
 
 ## Labels
 
 Four, and they are deliberately few:
 
-| Label | Meaning |
-|---|---|
-| `triage` | Filed. Nobody has looked at it. |
-| `agent-ready` | Enough detail that an agent can start. |
-| `blocked` | Waiting on an owner decision. |
-| `automatable/no` | Needs human judgement, permanently. |
+| Label | Meaning | Applied by |
+|---|---|---|
+| `triage` | Filed. Nobody has looked at it. | the issue form, automatically |
+| `agent-ready` | Enough detail that an agent can start. | **the owner, and only the owner** |
+| `blocked` | Waiting on an owner decision. | whoever discovers the blocker |
+| `automatable/no` | Needs human judgement, permanently. | whoever establishes it |
 
 `python3 scripts/sync_labels.py --check` reports drift; `--write` fixes it.
+
+**`agent-ready` is the confirmation.** A brief block lives in an issue body,
+which anyone with write access can edit — so "the owner confirmed this brief"
+cannot be read from the block itself. The label can: GitHub records who applied
+it. That is why an agent must not apply `agent-ready` to its own proposal, and
+why the labels are worth having at all when the brief already carries
+`automatable`. The brief says what the work needs; the label says a person
+agreed to it.
 
 **Characters are not labels.** They live in the brief block, keyed by the lead
 ids in `vocab/casting.yaml`, because that is the same vocabulary the segment
 index tags — one spelling of a name across the whole repo. Find them with
 `gh issue list --search 'saint_14'`. Adding a `character/*` label set would
 mean a second vocabulary that drifts from the first.
+
+## Two agents, one issue
+
+Branch-per-issue keeps two agents off the same files, but nothing stops two
+agents picking up the same issue. **Assign yourself before you start**, and
+check before you do:
+
+```bash
+gh issue view <n> --json assignees
+gh issue edit <n> --add-assignee @me
+```
+
+`tools/gaps.py --file` races the same way when two runs overlap; it is
+self-healing, because the second run finds the first run's fingerprint and
+updates rather than duplicating.
 
 ## What is not an agent's call
 
