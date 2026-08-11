@@ -50,9 +50,12 @@ Run both before every commit.
   the two agree, and that every cast binding is queryable.
 - **Never invent on-screen copy.** Nameplate fields are a closed set — see
   [`docs/skills/plates.md`](docs/skills/plates.md). Dialogue shown on screen is
-  *recovered*, not written: it lives in `dialogue/<video_id>.json` with its
-  source timecodes and per-line evidence for who is speaking. Likewise
-  `redactions/<video_id>.json` only ever *removes* burned-in publisher copy.
+  *recovered*, not written: it lives in `dialogue/<video_id>/dialogue.json` with
+  its source timecodes and per-line evidence for who is speaking, beside the
+  `DIALOGUE.md` the owner edits (`tools/dialogue_md.py` round-trips the two, and
+  records an owner's rewrite as theirs rather than overwriting the recovery).
+  Likewise `redactions/<video_id>.json` only ever *removes* burned-in publisher
+  copy.
 
 ## Rights
 

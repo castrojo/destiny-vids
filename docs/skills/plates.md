@@ -110,9 +110,34 @@ skill forbids. Both of its fields are recovered, never authored here:
 
 - `speaker` comes from `vocab/casting.yaml`, preferring the character's `plate:`
   name, so a line and that character's reveal credit the person identically.
-- `text` comes from `dialogue/<video_id>.json`, which carries the source
-  timecodes, the recovery method, and per-line `evidence` for who is speaking.
-  Fix a wrong line **there**, not in a render.
+- `text` comes from `dialogue/<video_id>/dialogue.json`, which carries the
+  source timecodes, the recovery method, and per-line `evidence` for who is
+  speaking. Fix a wrong line **there**, not in a render.
+
+Each video's conversation lives in its own folder, beside the Markdown the
+owner actually edits:
+
+```text
+dialogue/<video_id>/DIALOGUE.md    the conversation, as prose
+dialogue/<video_id>/dialogue.json  the provenance record the pipeline reads
+```
+
+`tools/dialogue_md.py` keeps the two in step, and is the only supported way to
+rewrite a line:
+
+```bash
+python3 tools/dialogue_md.py export <video_id>            # record -> DIALOGUE.md
+python3 tools/dialogue_md.py apply  <video_id> --dry-run  # preview the edits
+python3 tools/dialogue_md.py apply  <video_id>            # DIALOGUE.md -> record
+```
+
+Editing the Markdown never loses provenance. Timecodes and evidence ride in the
+heading and are restored verbatim; a line the owner rewrites is marked
+`text_source: owner_supplied` and keeps the recovered wording in
+`recovered_text`; a deleted section moves to `dropped` with a reason. The
+owner supplying copy is allowed — an *agent* inventing it is not, and keeping
+both versions is what tells the two apart. A test asserts the checked-in
+`DIALOGUE.md` still matches the record, so the pair cannot drift.
 
 It deliberately carries no `class` row and no character line: who plays whom is
 established once by the Guardian reveal.

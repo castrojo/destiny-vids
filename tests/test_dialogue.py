@@ -108,7 +108,8 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
     assert data["cues"], "no cues recovered"
     for cue in data["cues"]:
         assert cue["character"] in ("osiris", "sagira")
-        assert cue["evidence"] in ("vocative", "alternation", "uncertain")
+        assert cue["evidence"] in ("vocative", "alternation", "uncertain",
+                                   "owner_supplied")
         assert cue["end_sec"] > cue["start_sec"]
         assert cue["text"].strip()
     # Provenance is the point: the copy is recovered, not authored here.

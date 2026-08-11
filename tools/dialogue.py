@@ -2,10 +2,11 @@
 """Recovered dialogue -> timed chat plates on a rendered cut.
 
 The repo never invents on-screen copy, so a conversation shown on screen has to
-come from somewhere: ``dialogue/<video_id>.json`` holds the recovered lines,
-their source timecodes, and which cast character said each one. This module
-maps those source-timed cues onto the timeline a cut actually produced, and
-emits chat-card entries for tools/plate.py.
+come from somewhere: ``dialogue/<video_id>/dialogue.json`` holds the recovered
+lines, their source timecodes, and which cast character said each one, beside
+the ``DIALOGUE.md`` the owner edits. This module maps those source-timed cues
+onto the timeline a cut actually produced, and emits chat-card entries for
+tools/plate.py.
 
 Two rules follow from the repo contract:
 
@@ -29,14 +30,33 @@ from tools.plate import MIN_HOLD, TAIL_OUT, cut_timeline  # noqa: E402
 
 DIALOGUE_DIR = REPO_ROOT / "dialogue"
 
+# One folder per video, so a video's conversation sits beside the Markdown the
+# owner actually edits (``DIALOGUE.md``) instead of being a lone JSON file named
+# after it. The record the pipeline reads is ``dialogue.json``; the Markdown is
+# the authoring surface, and tools/dialogue_md.py keeps the two in step.
+RECORD_NAME = "dialogue.json"
+MARKDOWN_NAME = "DIALOGUE.md"
+
+
+def video_dir(video_id, root=DIALOGUE_DIR):
+    """The folder holding one video's conversation."""
+    return Path(root) / video_id
+
+
+def record_path(video_id, root=DIALOGUE_DIR):
+    return video_dir(video_id, root) / RECORD_NAME
+
+
+def markdown_path(video_id, root=DIALOGUE_DIR):
+    return video_dir(video_id, root) / MARKDOWN_NAME
+
 # A dialogue card is read, not studied: long enough to finish the line, short
 # enough that it does not outstay the shot it belongs to.
 MAX_CHAT_HOLD = 6.0
 
 
 def load_dialogue(video_id, root=DIALOGUE_DIR):
-    path = Path(root) / f"{video_id}.json"
-    with path.open(encoding="utf-8") as fh:
+    with record_path(video_id, root).open(encoding="utf-8") as fh:
         return json.load(fh)
 
 
@@ -198,7 +218,7 @@ def main(argv=None):
         description="Plan chat plates from recovered dialogue.")
     ap.add_argument("shotlist", help="JSON cut list from tools/story.py")
     ap.add_argument("--video-id", required=True,
-                    help="which dialogue/<video_id>.json to read")
+                    help="which dialogue/<video_id>/dialogue.json to read")
     ap.add_argument("--max-shot-sec", type=float, default=None,
                     help="the same hold cap render.py was given, so timings line up")
     ap.add_argument("--hold", type=float, default=MAX_CHAT_HOLD)
