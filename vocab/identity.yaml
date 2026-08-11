@@ -1,0 +1,61 @@
+# vocab/identity.yaml
+# Anonymity axis. DEMOTED: this used to be the primary retrieval filter, back
+# when one performer had to stand in for every Guardian. Now the anonymous crowd
+# is cast from a whole pool of Bluefin contributors (vocab/casting.yaml), so
+# anonymity is no longer scarce. `substitutability` is now a TIE-BREAKER — it
+# measures how comfortably an ensemble slot reads as "could be anyone" when
+# choosing between two otherwise equal clean shots. The primary filter is
+# `clean` (vocab/cleanliness.yaml).
+
+substitutability:
+  description: >
+    Ordinal score 0-5 of how easily a shot's subject can be replaced by a
+    stand-in performer without breaking the edit. Higher = more substitutable.
+    A tie-breaker for ensemble shots, NOT a usability gate: a face-clear lead
+    is fully usable at 0.
+  ordinal: true
+  values:
+    0: Clear identifiable face; named/recognizable character; not substitutable.
+    1: Face visible but partially (shadow, angle); weakly substitutable.
+    2: Face obscured but head/identity cues present (hair, distinctive helmet).
+    3: Helmet on or face turned away; generic Guardian silhouette, mid-frame.
+    4: Helmet on AND small in frame or back to camera; strongly substitutable.
+    5: "Fully anonymous: helmet on, face away/obscured, small in frame, or only armor/hands/weapon visible; drop-in replacement."
+
+identity_visibility:
+  description: How much of the subject's face/identity is visible.
+  values:
+    face_clear:    Face clearly visible.
+    partial_face:  Some facial features visible (profile, partial shadow).
+    face_obscured: Face hidden by helmet, mask, bloom, or angle.
+    back_only:     Only the back of the subject is visible.
+    silhouette:    Subject rendered as unlit shape.
+    none:          No person in frame.
+
+character_identifiability:
+  description: Whether the subject is a specific identifiable character.
+  values:
+    explicit:            Recognizable named character (Zavala, Ikora, Cayde-6...).
+    inferred:            Identity inferable from context though not seen clearly.
+    implied_by_costume:  Not a specific person, but costume implies a role/class.
+    unidentifiable:      No identity cues at all.
+
+helmet_simplicity:
+  # Reliably determinable ONLY from armor-set metadata or a heavier dedicated
+  # visual pass; per-frame observation is unreliable. DEFAULT to 'unknown'.
+  description: Ornateness of helmet silhouette. Default 'unknown'.
+  default: unknown
+  values:
+    simple:  Plain, generic helmet silhouette.
+    ornate:  Distinctive/exotic silhouette (horns, crests, unique profiles).
+    unknown: Not assessed; the safe default.
+
+# Evidence fields recorded alongside the enums above. These are raw observations
+# that feed the derived labels, not enums themselves.
+evidence_fields:
+  face_count:
+    type: integer
+    description: Number of faces visible in frame (0 if none).
+  subject_facing_camera:
+    type: [boolean, unknown]
+    description: Whether the primary subject faces the camera; 'unknown' when ambiguous.

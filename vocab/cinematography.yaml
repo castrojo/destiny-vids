@@ -1,0 +1,85 @@
+# vocab/cinematography.yaml
+# Canonical shot-level cinematography vocabulary. Values are observed from frame
+# evidence unless marked otherwise.
+
+shot_scale:
+  description: Distance of subject from camera. Single-valued.
+  values:
+    ELS:     Extreme long shot; subject tiny or absent, environment dominates.
+    LS:      Long shot; full figure visible with large surroundings.
+    MLS:     Medium long shot; knees-up.
+    MS:      Medium shot; waist-up.
+    MCU:     Medium close-up; chest-up.
+    CU:      Close-up; face/helmet fills frame.
+    ECU:     Extreme close-up; eyes, detail of object.
+    INSERT:  Cutaway detail insert (weapon, ghost, relic).
+    UNKNOWN: Scale not determinable.
+
+composition:
+  # MULTI-VALUED: e.g. a shot can be both 'OTS' and 'two_shot'.
+  description: Compositional arrangement of subjects in frame.
+  multi: true
+  values:
+    establishing: Wide environmental frame establishing place/scale.
+    single:       One dominant subject.
+    two_shot:     Two subjects in balanced frame.
+    group:        Three or more subjects.
+    crowd:        A mass of subjects too many to count individually — the largest ensemble slot.
+    OTS:          Over-the-shoulder framing.
+    POV:          First-person point of view (includes FPS gameplay).
+    cutaway:      Brief insert away from main action.
+
+camera_angle:
+  description: Vertical/oblique camera angle relative to subject.
+  values:
+    eye_level:    Camera at subject eye height.
+    high:         Looking down on subject.
+    low:          Looking up at subject (heroic framing).
+    dutch:        Tilted horizon.
+    overhead:     Directly above (bird's-eye / top-down).
+    ground_level: Camera at ground/floor height.
+    UNKNOWN:      Angle not determinable.
+
+camera_movement:
+  # MULTI-VALUED and deliberately COARSE: dolly vs zoom vs tracking are NOT
+  # cheaply distinguishable from single clips, so they are collapsed into
+  # push_in / pull_out / track rather than enumerated.
+  description: Camera motion during the shot. Coarse by design.
+  multi: true
+  values:
+    static:         Locked-off frame.
+    pan:            Horizontal rotation on axis.
+    tilt:           Vertical rotation on axis.
+    push_in:        Moves or zooms toward subject (dolly/zoom collapsed).
+    pull_out:       Moves or zooms away from subject (dolly/zoom collapsed).
+    track:          Lateral/parallel movement with subject (dolly/truck collapsed).
+    handheld_shaky: Unstabilized handheld shake.
+    orbit:          Arcs around subject.
+    crane:          Large vertical boom/jib move.
+    UNKNOWN:        Movement not determinable.
+
+pacing:
+  description: Editing/motion pace felt within the shot.
+  values:
+    slow:    Held frames, drift, contemplative.
+    medium:  Default gameplay/cinematic tempo.
+    fast:    Rapid action, quick cuts, heavy motion.
+    UNKNOWN: Pacing not determinable.
+
+content_type:
+  description: Kind of source content the shot comes from.
+  values:
+    cinematic: Pre-rendered/high-fidelity cinematic.
+    gameplay:  In-engine interactive gameplay.
+    cutscene:  In-engine scripted cutscene.
+    trailer:   Marketing trailer/edit (may mix all of the above).
+    UNKNOWN:   Type not determinable.
+
+lighting:
+  description: Dominant lighting character of the shot.
+  values:
+    bright:        Evenly/strongly lit; daylight or full interior.
+    dim:           Low-key, dark ambient.
+    high_contrast: Strong key/fill contrast, hard shadows.
+    silhouette:    Subjects backlit to shape-only.
+    UNKNOWN:       Lighting not determinable.

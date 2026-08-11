@@ -1,0 +1,187 @@
+{
+ "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0102-0103",
+ "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+ "start_sec": 102.368933,
+ "end_sec": 103.369933,
+ "start_tc": "1:42",
+ "end_tc": "1:43",
+ "era": "the_final_shape",
+ "activity": "cinematic",
+ "content_type": "cinematic",
+ "destination": "the_pale_heart",
+ "subclass_version": "prismatic",
+ "class": "unknown",
+ "element": "unknown",
+ "shot_scale": "MS",
+ "composition": [
+  "cutaway"
+ ],
+ "camera_movement": [
+  "track"
+ ],
+ "pacing": "fast",
+ "lighting": "dim",
+ "identity_visibility": "none",
+ "character_identifiability": "unidentifiable",
+ "substitutability": 0,
+ "overlays": [],
+ "subject_salience": "enemy_threat",
+ "action": [
+  "combat"
+ ],
+ "mood": [
+  "tense"
+ ],
+ "register": -2,
+ "character": [],
+ "caption": "A dark limb lashes across frame in red gloom.",
+ "faction": [],
+ "clean": true,
+ "footage_tier": "cinematic",
+ "traversal_hero": false,
+ "casting": {
+  "role": "none",
+  "character": null,
+  "person": null,
+  "usable": false,
+  "constraints_failed": [],
+  "slots": 0
+ },
+ "provenance": {
+  "era": {
+   "source": "inherited",
+   "label_source": "heuristic",
+   "confidence": 0.9
+  },
+  "activity": {
+   "source": "inherited",
+   "label_source": "heuristic",
+   "confidence": 0.8
+  },
+  "content_type": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "destination": {
+   "source": "inherited",
+   "label_source": "model",
+   "confidence": 0.5
+  },
+  "subclass_version": {
+   "source": "inherited",
+   "label_source": "model",
+   "confidence": 0.5
+  },
+  "class": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "element": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "shot_scale": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "composition": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "camera_movement": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "pacing": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "lighting": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "identity_visibility": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "character_identifiability": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "substitutability": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "overlays": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.95
+  },
+  "subject_salience": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "action": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "mood": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "register": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "character": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.7
+  },
+  "caption": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "faction": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "clean": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  },
+  "footage_tier": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  },
+  "traversal_hero": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  },
+  "casting": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  }
+ }
+}

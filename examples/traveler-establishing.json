@@ -1,0 +1,215 @@
+{
+  "segment_id": "seg_traveler_establishing_0003-0011",
+  "video_id": "yt_lightfall_reveal_trailer",
+  "start_tc": "0:03",
+  "end_tc": "0:11",
+  "start_sec": 3,
+  "end_sec": 11,
+  "era": "lightfall",
+  "activity": "cinematic",
+  "content_type": "trailer",
+  "overlays": [],
+  "clean": true,
+  "footage_tier": "mixed",
+  "destination": "the_traveler",
+  "subclass_version": "unknown",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [],
+  "shot_scale": "ELS",
+  "composition": [
+    "establishing"
+  ],
+  "camera_angle": "low",
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "slow",
+  "lighting": "bright",
+  "substitutability": 5,
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "helmet_simplicity": "unknown",
+  "face_count": 0,
+  "subject_facing_camera": null,
+  "register": 2,
+  "mood": [
+    "reverent",
+    "serene"
+  ],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "traversal_hero": false,
+  "character": [
+    {
+      "name": "The Traveler",
+      "kind": "other"
+    }
+  ],
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "caption": "Extreme wide static establishing shot: the Traveler hovers above the Last City at dawn, tiny ships crossing its face while clouds drift beneath it. Serene, reverent, mythic in scale — no person in frame, so any Guardian story can be laid over it.",
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "destination": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "subclass_version": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.5
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "camera_angle": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "helmet_simplicity": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "face_count": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "subject_facing_camera": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.98
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

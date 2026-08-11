@@ -1,0 +1,211 @@
+{
+  "segment_id": "seg_lightfall_titlecard_0206-0212",
+  "video_id": "yt_lightfall_launch_trailer",
+  "start_tc": "2:06",
+  "end_tc": "2:12",
+  "start_sec": 126,
+  "end_sec": 132,
+  "era": "lightfall",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "overlays": [
+    "burned_text"
+  ],
+  "clean": false,
+  "footage_tier": "cinematic",
+  "destination": "neptune_neomuna",
+  "subclass_version": "unknown",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [],
+  "shot_scale": "LS",
+  "composition": [
+    "establishing"
+  ],
+  "camera_angle": "eye_level",
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "slow",
+  "lighting": "high_contrast",
+  "substitutability": 0,
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "helmet_simplicity": "unknown",
+  "face_count": 0,
+  "subject_facing_camera": null,
+  "register": 1,
+  "mood": [
+    "ominous"
+  ],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "traversal_hero": false,
+  "character": [],
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "caption": "Neomuna skyline at dusk with the LIGHTFALL logo and release date burned into the lower third. Beautiful, pre-rendered, and unusable: the card cannot be removed.",
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "destination": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.3
+    },
+    "subclass_version": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.5
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.4
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.3
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "camera_angle": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "helmet_simplicity": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "face_count": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "subject_facing_camera": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

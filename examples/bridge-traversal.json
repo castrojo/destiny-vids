@@ -1,0 +1,212 @@
+{
+  "segment_id": "seg_tfs_launch_bridge_0047-0054",
+  "video_id": "yt_final_shape_launch_trailer",
+  "start_tc": "0:47",
+  "end_tc": "0:54",
+  "start_sec": 47,
+  "end_sec": 54,
+  "era": "the_final_shape",
+  "activity": "cinematic",
+  "content_type": "trailer",
+  "overlays": [],
+  "clean": true,
+  "footage_tier": "mixed",
+  "destination": "unknown",
+  "subclass_version": "unknown",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [],
+  "shot_scale": "LS",
+  "composition": [
+    "group"
+  ],
+  "camera_angle": "low",
+  "camera_movement": [
+    "track"
+  ],
+  "pacing": "medium",
+  "lighting": "high_contrast",
+  "substitutability": 5,
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "helmet_simplicity": "unknown",
+  "face_count": 0,
+  "subject_facing_camera": false,
+  "register": 2,
+  "mood": [
+    "triumphant",
+    "reverent"
+  ],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "traversal"
+  ],
+  "traversal_hero": true,
+  "character": [],
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 3
+  },
+  "caption": "Wide low-angle tracking shot: three Guardians sprint and parkour across a collapsed bridge toward a wall of golden light, capes and class scarves snapping behind them. Faces never seen — a fireteam-sized ensemble slot.",
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "destination": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.3
+    },
+    "subclass_version": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.5
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.4
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.3
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "camera_angle": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "helmet_simplicity": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "face_count": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "subject_facing_camera": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

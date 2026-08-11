@@ -1,0 +1,8735 @@
+{
+ "0": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [
+   "burned_text"
+  ],
+  "subject_salience": "ambient",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "ESRB TEEN rating card on black. Burned-in ratings text; never cuttable.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "1": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "group"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [
+   "burned_text"
+  ],
+  "subject_salience": "crowd_group",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "serene"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "Tracking shot down a crowded Last City market street, a Guardian walking away from camera through civilians. Warm, lived-in. Burned-in 'Not Actual Gameplay' disclaimer.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "2": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "CU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "bright",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [
+   "burned_text"
+  ],
+  "subject_salience": "ambient",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "serene"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "Close-up of a young city child being led by the hand through the market. Burned-in disclaimer text.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "3": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [
+   "burned_text"
+  ],
+  "subject_salience": "ambient",
+  "action": [
+   "emote"
+  ],
+  "mood": [
+   "serene"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "An Eliksni busker plays a stringed instrument in the market crowd \u2014 the alliance made ordinary. Burned-in disclaimer.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "4": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "push_in"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [
+   "burned_text"
+  ],
+  "subject_salience": "ambient",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "serene"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "Push-in on the child holding a piece of fruit, lit warm against the stalls. Burned-in disclaimer.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "5": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "crane"
+  ],
+  "pacing": "slow",
+  "lighting": "bright",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [
+   "burned_text"
+  ],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "mood": [
+   "serene"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "High crane over market stalls and awnings, produce crates and banners. Burned-in disclaimer.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "6": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "ambient",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "Full black transition frame.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "7": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "Two distant lights burn through heavy red fog \u2014 something enormous implied but never shown.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "8": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "push_in"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "object_artifact",
+  "action": [],
+  "mood": [
+   "lonely"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "A Ghost lies still on a floor in raking amber light, shell open and dim. Quiet aftermath insert.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "9": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [
+   "burned_text"
+  ],
+  "subject_salience": "ambient",
+  "action": [],
+  "mood": [
+   "serene"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "Bungie logo card on black.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "10": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "inferred",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "dialogue"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [
+   {
+    "name": "Mara Sov",
+    "kind": "other"
+   }
+  ],
+  "caption": "Mara Sov in fur mantle and gold sigil, hand raised mid-sentence, teal rim light. Commanding, wary.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "11": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "enemy_threat",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": -2,
+  "character": [],
+  "caption": "A tall pale figure stands in a dark hall, backlit red \u2014 the antagonist glimpsed, not examined.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "12": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ECU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "push_in"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "inferred",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "dialogue"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [
+   {
+    "name": "Elsie Bray",
+    "kind": "guardian_npc"
+   }
+  ],
+  "caption": "Extreme close-up on a white Exo faceplate, dark eyes catching red light. Still and resolute.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "13": {
+  "class": "titan",
+  "element": "unknown",
+  "shot_scale": "MLS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "lonely"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "Low shot of armored Titan boots planted on grey lunar rock, mountains beyond. Anonymous, monumental.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "14": {
+  "class": "titan",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "explicit",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "lonely"
+  ],
+  "register": 1,
+  "character": [
+   {
+    "name": "Zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "caption": "Zavala kneels on a windswept ridge, shield on his back, staring off. Weary command.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "15": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "bright",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "reverent"
+  ],
+  "register": 2,
+  "character": [
+   {
+    "name": "The Traveler",
+    "kind": "other"
+   }
+  ],
+  "caption": "A single silhouetted Guardian dwarfed by the vast pale sphere of the Traveler in cloud.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "16": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "high_contrast",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": -2,
+  "character": [],
+  "caption": "The curve of a world seen from orbit, its surface veined with fire.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "17": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "OTS"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "dialogue"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "Over-the-shoulder on two helmeted Guardians in a dim briefing space, teal light.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "18": {
+  "class": "warlock",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "two_shot"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "explicit",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "dialogue"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [
+   {
+    "name": "Ikora Rey",
+    "kind": "vanguard"
+   }
+  ],
+  "caption": "Ikora Rey braces a hand against a comrade, lit teal and gold, urgent mid-conversation.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "19": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "group"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [],
+  "subject_salience": "crowd_group",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "A helmeted Guardian sits amid crew in a dim hold, framed between two foreground figures.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "20": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "group"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "crowd_group",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "lonely"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "A ring of Guardians resting on crates and rock in low red light \u2014 the quiet before.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "21": {
+  "class": "hunter",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "A Hunter in a hooded helm with a green visor stands still against teal haze. Fully anonymous, fully iconic.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "22": {
+  "class": "titan",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "push_in"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "explicit",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [
+   {
+    "name": "Zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "caption": "Zavala lit cold blue in a cockpit, jaw set, looking out past camera.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "23": {
+  "class": "unknown",
+  "element": "prismatic",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "ability_cast"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A lone Guardian silhouetted at the center of an enormous violet detonation, debris hanging in the shockwave.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "24": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "ominous"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "A cloaked Guardian looks down over the lit city at dusk, a vast dark hull hanging above it.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "25": {
+  "class": "titan",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "bright",
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "A Guardian stands on a ridge in pale cloud, facing a distant black pyramid. Small figure, huge sky.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "26": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "Jagged red rock spires under a bruised sky, a rift glowing violet in the distance.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "27": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "two_shot"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "medium",
+  "lighting": "high_contrast",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "combat"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "Two Guardians advance shoulder to shoulder with rifles raised, drenched in red light.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "28": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "push_in"
+  ],
+  "pacing": "slow",
+  "lighting": "bright",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "mood": [
+   "reverent"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A blast door parts on a bright impossible garden \u2014 white architecture, green growth, a pyramid of light.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "29": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "object_artifact",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "lonely"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "A Ghost hovers alone in blue fog, its light the only warm thing in frame.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "30": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "bright",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "object_artifact",
+  "action": [],
+  "mood": [
+   "lonely"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "Wreckage half-buried in blowing sand, a broken hull ring in the foreground.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "31": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "object_artifact",
+  "action": [],
+  "mood": [
+   "lonely"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "A scorched red helmet lies abandoned against dark stonework.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "32": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "object_artifact",
+  "action": [],
+  "mood": [
+   "lonely"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "Discarded rifles lie scattered in wet grass \u2014 a field after the fighting.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "33": {
+  "class": "unknown",
+  "element": "solar",
+  "shot_scale": "ECU",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "fast",
+  "lighting": "bright",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "ambient",
+  "action": [
+   "ability_cast"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A solar detonation blooms straight into camera, orange filaments tearing outward.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "34": {
+  "class": "hunter",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "push_in"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "explicit",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [
+   {
+    "name": "Cayde-6",
+    "kind": "guardian_npc"
+   }
+  ],
+  "caption": "Cayde-6 under a hood, blue Exo faceplate and burning eyes emerging from shadow. The return shot.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "35": {
+  "class": "titan",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "bright",
+  "identity_visibility": "partial_face",
+  "character_identifiability": "inferred",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "reverent"
+  ],
+  "register": 1,
+  "character": [
+   {
+    "name": "Zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "caption": "Profile of a helmeted Titan against pale sky, visor catching the light.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "36": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "traversal"
+  ],
+  "mood": [
+   "lonely"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "A lone cloaked figure walks out across an enormous grey-green plain under storm cloud. Pure scale.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "37": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "group"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "crowd_group",
+  "action": [
+   "traversal"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "Guardians move up through red-lit ruins in loose formation, dust in the air.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "38": {
+  "class": "titan",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "explicit",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [
+   {
+    "name": "Zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "caption": "Zavala framed against a burning orange horizon, shield over his shoulder, eyes forward.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "39": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "object_artifact",
+  "action": [],
+  "mood": [
+   "tense"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "Insert on an armored gauntlet reaching out through gloom.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "40": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "two_shot"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "ambient",
+  "action": [
+   "ritual"
+  ],
+  "mood": [
+   "reverent"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "Two hands reach toward each other across a dark room \u2014 one gloved and red, one bare.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "41": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "ambient",
+  "action": [
+   "ritual"
+  ],
+  "mood": [
+   "reverent"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "The gauntleted hand closes the last of the distance, fingers spread.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "42": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "ritual"
+  ],
+  "mood": [
+   "lonely"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "A helmeted Guardian stands over a shrouded body laid out on pale cloth. Blue, still, funerary.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "43": {
+  "class": "titan",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "bright",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "explicit",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "reverent"
+  ],
+  "register": 1,
+  "character": [
+   {
+    "name": "Zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "caption": "Zavala stands full-height against grey cloud, shield rigged on his back.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "44": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "silhouette",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "explicit",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "enemy_threat",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "ominous"
+  ],
+  "register": -2,
+  "character": [
+   {
+    "name": "The Witness",
+    "kind": "enemy_boss"
+   }
+  ],
+  "caption": "A winged silhouette stands centered in a vast ring of white light. Held at distance; face never given.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "45": {
+  "class": "titan",
+  "element": "unknown",
+  "shot_scale": "CU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "explicit",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "dialogue"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [
+   {
+    "name": "Zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "caption": "Tight profile of Zavala in blue light, the ghost of a smile breaking through.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "46": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "traversal"
+  ],
+  "mood": [
+   "lonely"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "A single red-armored Guardian walks alone through violet fog, tiny against the dark.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "47": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "fast",
+  "lighting": "bright",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "combat"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A helmeted Guardian pushes into blinding white light, lens flares streaking across frame.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "48": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "ambient",
+  "action": [],
+  "mood": [
+   "tense"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "Fire pours down a monolithic dark structure, embers filling the lower frame.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "49": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "silhouette",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "enemy_threat",
+  "action": [
+   "idle"
+  ],
+  "mood": [
+   "ominous"
+  ],
+  "register": -2,
+  "character": [],
+  "caption": "A shape moves in the red dark, barely resolved. Deliberately unreadable.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "50": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "group"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "combat"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A Guardian swings a blade mid-charge as allies close in, violet and fire light colliding.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "51": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "fast",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "enemy_threat",
+  "action": [
+   "combat"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": -2,
+  "character": [],
+  "caption": "A dark limb lashes across frame in red gloom.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "52": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "enemy_threat",
+  "action": [
+   "dialogue"
+  ],
+  "mood": [
+   "ominous"
+  ],
+  "register": -2,
+  "character": [],
+  "caption": "An antagonist's face turns into the light, eyes burning amber. Held only a beat.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "53": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "high_contrast",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": -2,
+  "character": [],
+  "caption": "A blazing white gate opens in a red hall, a shape rising in front of it.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "54": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": -1,
+  "character": [],
+  "caption": "A vast scorched valley under a churning violet storm.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "55": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "group"
+  ],
+  "camera_movement": [
+   "handheld_shaky"
+  ],
+  "pacing": "fast",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "crowd_group",
+  "action": [
+   "combat"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "Guardians charge through smoke, motion-blurred, weapons up.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "56": {
+  "class": "unknown",
+  "element": "arc",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "ability_cast"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "Overhead wide: a Guardian at the center of an arc detonation, blue lightning branching across the ground.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "57": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "inferred",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "combat"
+  ],
+  "mood": [
+   "tense"
+  ],
+  "register": 1,
+  "character": [
+   {
+    "name": "Mara Sov",
+    "kind": "other"
+   }
+  ],
+  "caption": "Mara Sov levels a hand cannon into the dark, pale hair and scaled mantle catching low light.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "58": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "LS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": -2,
+  "character": [],
+  "caption": "Red spires under a burning sky, a raised hand entering frame at the edge.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "59": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MS",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "enemy_threat",
+  "action": [],
+  "mood": [
+   "ominous"
+  ],
+  "register": -2,
+  "character": [],
+  "caption": "A single red eye glows through a wall of flame.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "60": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "combat"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A Guardian drives a blade forward through a wall of fire, face lit gold by the blast.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "61": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "ambient",
+  "action": [],
+  "mood": [
+   "tense"
+  ],
+  "register": 0,
+  "character": [],
+  "caption": "Full black beat between cuts.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "62": {
+  "class": "hunter",
+  "element": "arc",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "push_in"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "ability_cast"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A hooded Hunter raises a crackling arc weapon overhead against a night sky. Anonymous and heroic.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "63": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "ELS",
+  "composition": [
+   "establishing"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [],
+  "subject_salience": "environment_establishing",
+  "action": [
+   "vehicle"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "A fleet of ships streams into a bright rift over a shattered landscape.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "64": {
+  "class": "unknown",
+  "element": "arc",
+  "shot_scale": "LS",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "medium",
+  "lighting": "high_contrast",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "ability_cast"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A Guardian hurls a torrent of blue-white energy across a dark field, hands trailing light.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "65": {
+  "class": "hunter",
+  "element": "solar",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 5,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "combat"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A hooded Guardian turns through drifting embers, orange firelight raking the helmet.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "66": {
+  "class": "warlock",
+  "element": "prismatic",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "camera_movement": [
+   "track"
+  ],
+  "pacing": "medium",
+  "lighting": "high_contrast",
+  "identity_visibility": "face_clear",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "overlays": [],
+  "subject_salience": "guardian_hero",
+  "action": [
+   "ability_cast"
+  ],
+  "mood": [
+   "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A Warlock draws violet and white prismatic light up into both hands, face lit from below.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "67": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [
+   "burned_text"
+  ],
+  "subject_salience": "ambient",
+  "action": [],
+  "mood": [
+   "reverent"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "THE FINAL SHAPE title card.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ },
+ "68": {
+  "class": "unknown",
+  "element": "unknown",
+  "shot_scale": "INSERT",
+  "composition": [
+   "cutaway"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "pacing": "slow",
+  "lighting": "dim",
+  "identity_visibility": "none",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "overlays": [
+   "burned_text"
+  ],
+  "subject_salience": "ambient",
+  "action": [],
+  "mood": [
+   "reverent"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "'BECOME LEGEND' end card on black.",
+  "faction": [],
+  "content_type": "cinematic",
+  "provenance": {
+   "class": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "register": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.7
+   },
+   "caption": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "model",
+    "confidence": 0.85
+   }
+  }
+ }
+}

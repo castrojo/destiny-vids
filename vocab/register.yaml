@@ -1,0 +1,31 @@
+# vocab/register.yaml
+# Register axis: how mythic/fantasy vs tactical/sci-fi a shot reads.
+
+register:
+  # DERIVED, never a standalone subjective pass: compute from proxies such as
+  # subject_salience, Light/Traveler/ritual iconography presence, pacing, HUD
+  # presence (gameplay HUD pulls tactical; its absence pulls mythic), and audio
+  # cues (choir/orchestral vs radio chatter/gunfire).
+  description: >
+    Ordinal -2..+2 from tactical/sci-fi/mechanical (-2) to
+    mythic/heroic/fantasy (+2). Derived from proxies, not judged directly.
+  ordinal: true
+  derived: true
+  values:
+    "-2": "Most tactical/sci-fi/mechanical: HUD gameplay, comms chatter, gunplay loops."
+    "-1": Largely tactical with some heroic framing.
+    "0":  Balanced/neutral; neither register dominates.
+    "+1": Largely mythic with some grounded elements.
+    "+2": "Most mythic/heroic/fantasy: Traveler iconography, ritual, Light FX, score-led."
+
+mood:
+  # MULTI-VALUED.
+  description: Emotional tone of the shot.
+  multi: true
+  values:
+    reverent:   Awe and devotion; sacred imagery, Traveler/Light worship.
+    triumphant: Victory, exaltation, heroic uplift.
+    lonely:     Isolation, solitary figure in vast space.
+    ominous:    Dread, encroaching threat, dark portents.
+    serene:     Calm, peaceful, pastoral or cosmic stillness.
+    tense:      Suspense, imminent conflict, unease.

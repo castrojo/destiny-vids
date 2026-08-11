@@ -1,0 +1,217 @@
+{
+  "segment_id": "seg_bl_elsie_hero_0102-0108",
+  "video_id": "yt_beyond_light_story_trailer",
+  "start_tc": "1:02",
+  "end_tc": "1:08",
+  "start_sec": 62,
+  "end_sec": 68,
+  "era": "beyond_light",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "overlays": [],
+  "clean": true,
+  "footage_tier": "cinematic",
+  "destination": "europa",
+  "subclass_version": "stasis",
+  "class": "unknown",
+  "element": "stasis",
+  "faction": [],
+  "shot_scale": "CU",
+  "composition": [
+    "single"
+  ],
+  "camera_angle": "low",
+  "camera_movement": [
+    "push_in"
+  ],
+  "pacing": "slow",
+  "lighting": "high_contrast",
+  "substitutability": 1,
+  "identity_visibility": "face_clear",
+  "character_identifiability": "explicit",
+  "helmet_simplicity": "unknown",
+  "face_count": 1,
+  "subject_facing_camera": true,
+  "register": 2,
+  "mood": [
+    "reverent",
+    "ominous"
+  ],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "dialogue"
+  ],
+  "traversal_hero": false,
+  "character": [
+    {
+      "name": "Elsie Bray",
+      "kind": "guardian_npc"
+    }
+  ],
+  "casting": {
+    "role": "lead",
+    "character": "elsie_bray",
+    "person": "laura_santamaria",
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "caption": "Slow push-in to an identifiable close-up of Elsie Bray, the Exo Stranger: her distinctive white-and-blue robotic Exo head is fully face-clear, lit by cold stasis glow. Normally a named-character CU like this is low-value for a stand-in — substitutability 1, unmistakable identity — but Elsie Bray is canonically cast to Laura Santamaria, so by the casting rule this IS first-party Laura footage: prime hero material despite the low substitutability score.",
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "destination": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "subclass_version": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "camera_angle": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.98
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.98
+    },
+    "helmet_simplicity": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.3
+    },
+    "face_count": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "subject_facing_camera": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "character": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

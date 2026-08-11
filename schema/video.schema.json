@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destiny-vids.local/schema/video.schema.json",
+  "title": "Destiny2FootageVideo",
+  "type": "object",
+  "description": "Video-level record for one Bungie official Destiny YouTube video in the retrieval index. PROVENANCE PATTERN: all tagged fields are stored as plain typed values at the top level of the record (flat fields), and every tagged field MAY have a matching entry in the parallel `provenance` object, keyed by the exact field name, with {source, label_source, confidence}. `source` is 'observed' when the value was determined from this video's own metadata/frames and 'inherited' when copied from a parent record (at video level, values are normally 'observed'; segments inherit these video-scoped defaults). `label_source` is who/what produced the label: manual | heuristic | model. `confidence` is 0..1. Video-scoped defaults (era, activity, content_type, destination) are inherited by every segment of this video unless the segment overrides them with its own observed value.",
+  "additionalProperties": false,
+  "required": [
+    "video_id",
+    "youtube_url",
+    "title",
+    "era",
+    "activity",
+    "content_type",
+    "usage_class",
+    "source_rights_note"
+  ],
+  "properties": {
+    "video_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable unique identifier for this video within the index (e.g. 'yt_final_shape_launch_trailer'). Segments reference this via segment.video_id."
+    },
+    "youtube_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Canonical YouTube watch URL for the video."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "YouTube video title as published by Bungie."
+    },
+    "description": {
+      "type": "string",
+      "description": "YouTube video description text as published by Bungie."
+    },
+    "youtube_tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Creator-supplied YouTube tags on the video."
+    },
+    "playlist": {
+      "type": "string",
+      "description": "Name of the Bungie YouTube playlist this video was sourced from, if any."
+    },
+    "era": { "$ref": "#/$defs/era" },
+    "activity": { "$ref": "#/$defs/activity" },
+    "content_type": { "$ref": "#/$defs/content_type" },
+    "destination": { "$ref": "#/$defs/destination" },
+    "usage_class": {
+      "const": "third_party_copyrighted",
+      "description": "Rights bucket for this asset. Always 'third_party_copyrighted': the footage is Bungie, Inc. copyrighted material."
+    },
+    "source_rights_note": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable rights note. Should state that Bungie's fan-content policy permits non-commercial fan creations (including fan music videos) using Bungie assets, and that this index stores metadata and timestamps only, not the footage."
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Parallel provenance map, keyed by tagged field name (era, activity, content_type, destination). Each value is a provenanceEntry. Convention: every tagged field present on this record SHOULD have a matching entry here.",
+      "propertyNames": {
+        "enum": ["era", "activity", "content_type", "destination"]
+      },
+      "additionalProperties": { "$ref": "#/$defs/provenanceEntry" }
+    }
+  },
+  "$defs": {
+    "provenanceEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "label_source", "confidence"],
+      "properties": {
+        "source": {
+          "enum": ["inherited", "observed"],
+          "description": "inherited = copied from a parent scope (segment inherits from video); observed = determined directly from this record's own metadata or frames."
+        },
+        "label_source": {
+          "enum": ["manual", "heuristic", "model"],
+          "description": "Who/what produced the label: a human (manual), a deterministic rule (heuristic), or an ML model (model)."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence in this label, 0 (guess) to 1 (certain)."
+        }
+      }
+    },
+    "era": {
+      "enum": [
+        "d1_base",
+        "the_dark_below",
+        "house_of_wolves",
+        "the_taken_king",
+        "rise_of_iron",
+        "d2_base",
+        "curse_of_osiris",
+        "warmind",
+        "forsaken",
+        "shadowkeep",
+        "beyond_light",
+        "witch_queen",
+        "lightfall",
+        "the_final_shape",
+        "unknown"
+      ],
+      "description": "Destiny release era the footage belongs to (d1_base = original Destiny through the_final_shape). Use 'unknown' when it cannot be determined. Default for all segments of this video."
+    },
+    "activity": {
+      "enum": [
+        "cinematic",
+        "patrol",
+        "strike",
+        "raid",
+        "crucible_pvp",
+        "gambit",
+        "dungeon",
+        "story_mission",
+        "unknown"
+      ],
+      "description": "Activity type depicted. 'cinematic' covers pre-rendered or engine cinematics not tied to a playable activity. Default for all segments of this video."
+    },
+    "content_type": {
+      "enum": ["cinematic", "gameplay", "cutscene", "trailer", "UNKNOWN"],
+      "description": "Nature of the footage itself. 'trailer' = edited promotional trailer; 'cinematic' = pre-rendered cinematic; 'cutscene' = in-engine story cutscene; 'gameplay' = captured play. Default for all segments; a segment MAY override (e.g. a gameplay shot inside a trailer video)."
+    },
+    "destination": {
+      "enum": [
+        "edz",
+        "cosmodrome",
+        "moon",
+        "dreaming_city",
+        "europa",
+        "nessus",
+        "the_traveler",
+        "io",
+        "mars",
+        "tangled_shore",
+        "savathun_throne_world",
+        "neptune_neomuna",
+        "the_pale_heart",
+        "orbit_space",
+        "unknown"
+      ],
+      "description": "Controlled vocabulary of in-fiction Destiny locations. Use 'unknown' when the destination is unclear or not in the controlled list. Optional at video level (a trailer may span many destinations)."
+    }
+  }
+}

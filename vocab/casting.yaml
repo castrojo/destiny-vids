@@ -1,0 +1,226 @@
+# vocab/casting.yaml
+# CASTING axis — inverted.
+#
+# The old model was "one performer must stand in for many Guardians", which made
+# anonymity a scarce resource and forced per-binding resemblance constraints
+# (only usable far + helmeted, etc). That is gone. The fiction now bends to the
+# footage: Bungie's cinematics ALREADY tell a good story, so we simply ASSIGN
+# names to the cast that is on screen.
+#
+# Two tiers, and the difference between them is the whole model:
+#
+#   LEAD    — a named Destiny NPC is bound 1:1 to one real person. Fixed for the
+#             whole project so the character reads consistently across shots.
+#             Usually unconstrained: naming a role does not require a lookalike.
+#             A binding MAY carry `constraints` where the project still wants the
+#             figure to read as the character (jeefy -> Saladin: far + helmeted
+#             only), in which case violating shots derive usable = false.
+#
+#   ENSEMBLE— every anonymous Guardian in frame is a SLOT, filled from a
+#             rotating monthly pool of Project Bluefin contributors. The
+#             cinematics are full of nameless Guardians; that crowd is the
+#             project's diverse cast, and it gets filled with real people.
+#             Slots are assigned programmatically by tools/ensemble.py, NOT
+#             tagged by hand, so the pool can be re-rolled each month without
+#             retagging a single segment.
+
+leads:
+  description: >
+    Named Destiny characters bound to a real person for the life of the project.
+    OPEN and EXTENSIBLE — this map is the place to add bindings. `person: null`
+    means the role is written into the story but not yet cast; retrieval still
+    works (the character is identified), the tile just has no name on it yet.
+  entry_fields:
+    person:       snake_case id of the real person cast, or null when uncast.
+    display_name: How the person is credited on their tile.
+    aka:          Alternate spellings/ids for the SAME character, normalized to this key.
+    note:         OPTIONAL free-text standing direction for the binding. Documentation only — derivation never reads it.
+    constraints:  >
+      OPTIONAL per-binding usability constraints, for a person who does not
+      resemble their character. Keys: `require_helmet` (identity_visibility must
+      read as face-concealed) and `require_far` (shot_scale must be wide enough
+      to hide facial detail). When present and unmet, the derived
+      `casting.usable` is false and the unmet keys are listed in
+      `casting.constraints_failed`; such shots are excluded from that
+      character's retrieval. Most bindings have NO constraints: naming a role
+      does not require a lookalike. Constraints exist only where the project
+      wants the figure to read as the character rather than as the person.
+  values:
+    # --- CAST ------------------------------------------------------------
+    elsie_bray:
+      person: laura_santamaria
+      display_name: Laura Santamaria
+      aka: [elsie_gray, the_exo_stranger, exo_stranger]
+    anna_bray:
+      # Elsie's sister — the Bray line is the project's through-thread, so both
+      # sisters are cast.
+      person: joanna_lee
+      display_name: Joanna Lee
+      aka: [ana_bray]
+    zavala:
+      person: kelsey_hightower
+      display_name: Kelsey Hightower
+      aka: [commander_zavala]
+    cayde_6:
+      person: castrojo
+      display_name: castrojo
+      aka: [cayde, cayde6]
+    saladin:
+      # CONSTRAINED binding. jeefy plays the Iron Lord, but does not resemble
+      # Saladin, so the shot has to do the work: FAR and HELMETED only, where the
+      # armored silhouette reads as the character. Tight or face-clear Saladin
+      # derives usable = false and is excluded from retrieval. There is enough
+      # far/helmeted footage for this to be a real cast rather than a compromise.
+      person: jeefy
+      display_name: Jeefy
+      aka: [lord_saladin, iron_lord_saladin]
+      constraints:
+        require_helmet: true   # identity_visibility must be face-concealed
+        require_far: true      # shot_scale must be wide-ish (ELS/LS/MLS/MS)
+    osiris:
+      person: mrbobbytables
+      display_name: mrbobbytables
+      aka: []
+    saint_14:
+      person: kat
+      display_name: Kat
+      # STANDING NOTE, not a constraint: Saint-14 is Kat from here on, EXCEPT in
+      # the original Wolves material, where she stays the bubble (Ward of Dawn).
+      # Recorded so the exception is not silently lost; it does not affect
+      # derivation, which has no per-binding constraints any more.
+      note: >
+        Kat from now on, but she remains the bubble in the original Wolves.
+      aka: [saint, saint14]
+    mara_sov:
+      person: karena_angel
+      display_name: Karena Angel
+      aka: [queen_mara_sov]
+    petra_venj:
+      person: lenka
+      display_name: Lenka
+      aka: [petra]
+    variks:
+      person: nate_waddington
+      display_name: Nate Waddington
+      aka: [variks_the_loyal]
+    the_speaker:
+      person: jonathan_bryce
+      display_name: Jonathan Bryce
+      aka: [speaker]
+    amanda_holliday:
+      person: ashley_willis
+      display_name: Ashley Willis
+      aka: [amanda, holliday]
+    iron_lord_red_haired:
+      # The red-haired Iron Lord who dies in the Rise of Iron intro. Her CANONICAL
+      # Destiny name is UNCONFIRMED — the binding is keyed on the description so
+      # the casting is not blocked on identifying her. Rename this key (and add
+      # the old id to `aka`) once the character is pinned down.
+      person: paris_pittman
+      display_name: Paris Pittman
+      aka: [red_haired_iron_lord, dying_iron_lord]
+
+    # --- WRITTEN, NOT YET CAST -------------------------------------------
+    # Named characters that recur across the cinematics and therefore need a
+    # person eventually. Fill in `person`/`display_name` to cast one.
+    ikora_rey:   { person: null, display_name: null, aka: [ikora] }
+    the_drifter: { person: null, display_name: null, aka: [drifter] }
+    crow:        { person: null, display_name: null, aka: [uldren_sov, the_crow] }
+    caiatl:      { person: null, display_name: null, aka: [empress_caiatl] }
+    eris_morn:   { person: null, display_name: null, aka: [eris] }
+    shaxx:       { person: null, display_name: null, aka: [lord_shaxx] }
+    ghost:       { person: null, display_name: null, aka: [little_light] }
+    savathun:    { person: null, display_name: null, aka: [savathun_witch_queen] }
+    the_witness: { person: null, display_name: null, aka: [witness] }
+
+ensemble:
+  description: >
+    The anonymous-Guardian crowd, cast from Project Bluefin contributors. The
+    pool is rebuilt per calendar month by tools/ensemble.py from repository
+    contribution history, then deterministically assigned to the ensemble slots
+    across a shot list, producing one credit TILE per contributor.
+  pool:
+    source: Project Bluefin repositories, contributions within a calendar month.
+    rotation: monthly
+    # Assignment must be reproducible: the same (month, shot list) always yields
+    # the same tiles, so a re-render does not reshuffle who played whom.
+    assignment: >
+      Deterministic round-robin over the month's contributors, seeded by the
+      month key, walking the shot list in timeline order and filling each
+      segment's ensemble `slots`. Contributors are reused only after every
+      member of the pool has been placed at least once.
+  slots:
+    description: >
+      How many ensemble Guardians a shot can credit — the number of distinct
+      anonymous bodies plausibly in frame. DERIVED, not tagged: a 'group' or
+      'crowd' composition carries a fireteam's worth, a solo shot carries one.
+    formula: >
+      role != ensemble                              -> 0;
+      composition contains crowd                    -> 6;
+      composition contains group, or subject_salience == crowd_group -> 3;
+      otherwise                                     -> 1.
+
+derived_fields:
+  casting:
+    type: object
+    label_source: heuristic
+    # CHEAP: pure function of already-tagged fields (character, subject_salience,
+    # substitutability, composition). No vision pass, no model call.
+    description: >
+      DERIVED per-segment casting decision. Says which tier the shot belongs to
+      and, for leads, who plays it. Ensemble `person` is intentionally left null
+      here — it is filled later by tools/ensemble.py once a month's contributor
+      pool exists, so segment records never go stale when the pool rotates.
+    fields:
+      role:
+        type: enum
+        values:
+          lead:     A named cast character is on screen; `character` and `person` identify them.
+          ensemble: An anonymous Guardian slot fillable by contributors.
+          none:     Neither — environment, enemy, or artifact shot with nobody to cast.
+      character:
+        type: [string, "null"]
+        description: Canonical `leads` key matched (aka spellings normalize to it). null unless role = lead.
+      person:
+        type: [string, "null"]
+        description: >
+          The cast person's id. Set for role = lead when that character is cast;
+          null for uncast leads and for ensemble (assigned later, per month).
+      usable:
+        type: boolean
+        description: >
+          Whether the shot can actually be used for `person`. True for
+          unconstrained leads and for ensemble. For a CONSTRAINED binding
+          (jeefy -> Saladin: far + helmeted) it is false when the shot violates
+          the constraints; such a shot gets no lead boost and is excluded from
+          that character's retrieval.
+      constraints_failed:
+        type: array
+        description: >
+          Constraint keys the shot fails, e.g. [require_far, require_helmet] for
+          a tight, face-clear Saladin. Empty when usable, or when the binding has
+          no constraints.
+      slots:
+        type: integer
+        description: Contributor tiles this shot can carry. 0 for lead/none, >= 1 for ensemble.
+    formula: >
+      Normalize each character[].name to snake_case, then:
+      if any name matches a `leads` key or its `aka`
+        -> role = lead, character = the canonical key, person = that entry's
+        `person` (may be null if uncast), slots = 0; if the binding has
+        `constraints`, evaluate them: usable = (nothing failed),
+        constraints_failed = the unmet keys (require_helmet fails unless
+        identity_visibility is face-concealed; require_far fails unless
+        shot_scale is in {ELS,LS,MLS,MS}); unconstrained leads are always usable;
+      elif subject_salience in {guardian_hero, crowd_group}
+        -> role = ensemble, character = null, person = null, usable = true,
+        constraints_failed = [], slots = per the `ensemble.slots` formula;
+      else
+        -> role = none, character = null, person = null, usable = false,
+        constraints_failed = [], slots = 0.
+
+# RELATIONSHIP TO identity.yaml: `substitutability` survives, but its job
+# changed. It no longer gates whether a shot is USABLE — it now only measures
+# how comfortably an ensemble slot reads as "could be anyone", which is a
+# tie-breaker when choosing between two otherwise equal clean shots. A
+# face-clear lead shot is fully usable at substitutability 0.

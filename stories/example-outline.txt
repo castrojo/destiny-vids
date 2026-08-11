@@ -1,0 +1,11 @@
+# A worked outline. One beat per line, in timeline order, in plain language.
+# tools/story.py casts each beat to a distinct CLEAN shot.
+# Beats with no clean match are reported so you can rewrite them — the fiction
+# bends to the footage, never the other way round.
+
+wide establishing shot of the Traveler
+a crowd of guardians gathered beneath it
+close up on a lone titan helmet
+Elsie Bray hero shot
+Lord Saladin speaking by firelight
+guardians parkouring across a bridge toward the light

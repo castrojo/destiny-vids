@@ -1,0 +1,192 @@
+{
+ "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0080-0082",
+ "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+ "start_sec": 80.8808,
+ "end_sec": 82.9829,
+ "start_tc": "1:21",
+ "end_tc": "1:23",
+ "era": "the_final_shape",
+ "activity": "cinematic",
+ "content_type": "cinematic",
+ "destination": "the_pale_heart",
+ "subclass_version": "prismatic",
+ "class": "titan",
+ "element": "unknown",
+ "shot_scale": "MS",
+ "composition": [
+  "single"
+ ],
+ "camera_movement": [
+  "static"
+ ],
+ "pacing": "slow",
+ "lighting": "bright",
+ "identity_visibility": "face_clear",
+ "character_identifiability": "explicit",
+ "substitutability": 0,
+ "overlays": [],
+ "subject_salience": "guardian_hero",
+ "action": [
+  "idle"
+ ],
+ "mood": [
+  "reverent"
+ ],
+ "register": 1,
+ "character": [
+  {
+   "name": "Zavala",
+   "kind": "vanguard"
+  }
+ ],
+ "caption": "Zavala stands full-height against grey cloud, shield rigged on his back.",
+ "faction": [],
+ "clean": true,
+ "footage_tier": "cinematic",
+ "traversal_hero": false,
+ "casting": {
+  "role": "lead",
+  "character": "zavala",
+  "person": "kelsey_hightower",
+  "usable": true,
+  "constraints_failed": [],
+  "slots": 0
+ },
+ "provenance": {
+  "era": {
+   "source": "inherited",
+   "label_source": "heuristic",
+   "confidence": 0.9
+  },
+  "activity": {
+   "source": "inherited",
+   "label_source": "heuristic",
+   "confidence": 0.8
+  },
+  "content_type": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "destination": {
+   "source": "inherited",
+   "label_source": "model",
+   "confidence": 0.5
+  },
+  "subclass_version": {
+   "source": "inherited",
+   "label_source": "model",
+   "confidence": 0.5
+  },
+  "class": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "element": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "shot_scale": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "composition": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "camera_movement": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "pacing": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "lighting": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "identity_visibility": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "character_identifiability": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "substitutability": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "overlays": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.95
+  },
+  "subject_salience": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "action": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "mood": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "register": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "character": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.7
+  },
+  "caption": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "faction": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "clean": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  },
+  "footage_tier": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  },
+  "traversal_hero": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  },
+  "casting": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  }
+ }
+}

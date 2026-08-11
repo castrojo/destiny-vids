@@ -1,0 +1,32 @@
+# vocab/provenance.yaml
+# Provenance axis: where each field value came from and how much to trust it.
+# Every labeled field in the schema carries source, label_source, and confidence.
+
+source:
+  # NOTE: source video metadata (YouTube title/description/tags/playlist) sets
+  # VIDEO-SCOPED 'inherited' defaults — e.g. a "The Final Shape Launch Trailer"
+  # video inherits era=the_final_shape for all its shots unless overridden by
+  # observation at shot level.
+  description: Whether a value was inherited from enclosing scope or observed at this level.
+  values:
+    inherited: Value propagated from video/playlist-level metadata defaults.
+    observed:  Value determined directly from this shot's evidence.
+
+label_source:
+  description: Who/what produced the label.
+  values:
+    manual:    Labeled by a human.
+    heuristic: Labeled by a deterministic rule/derivation (e.g. subclass_version from era).
+    model:     Labeled by a machine-learning model (captioner, classifier, VLM).
+
+confidence:
+  description: Confidence in the label, 0.0 (guess) to 1.0 (certain).
+  type: float
+  range: [0.0, 1.0]
+
+usage_class:
+  description: Copyright/usage classification of the underlying footage.
+  values:
+    third_party_copyrighted: >
+      Bungie-owned footage indexed for non-infringing reference/retrieval;
+      timestamps are returned, not the footage itself.

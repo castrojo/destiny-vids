@@ -1,0 +1,33 @@
+# vocab/action.yaml
+# Action axis: what the subject is doing in the shot.
+
+action:
+  # MULTI-VALUED. 'traversal' is FIRST-CLASS on purpose: parkour, sparrow-less
+  # running-across-a-bridge, and jumping-puzzle beats are core music-video fodder
+  # and must be retrievable directly.
+  description: Actions depicted in the shot. Multi-valued.
+  multi: true
+  values:
+    idle:         Standing, sitting, waiting; no significant motion.
+    combat:       Shooting, melee, taking fire.
+    ability_cast: Grenade/melee/super/class ability use.
+    traversal:    Running, jumping, gliding, climbing, platforming across space.
+    emote:        Deliberate social/cosmetic gesture.
+    dialogue:     Speaking/conversation beat.
+    ritual:       Ceremony, summoning, communion with Light or relic.
+    vehicle:      Sparrow, ship, tank, or other vehicle use.
+    unknown:      Action not determinable.
+
+# Derived booleans documented here so downstream consumers compute them
+# identically instead of re-deriving ad hoc.
+derived_fields:
+  traversal_hero:
+    type: boolean
+    description: >
+      Heroic anonymous traversal beat — the money shot for performer
+      substitution. TRUE iff ALL of:
+        - action contains 'traversal'
+        - shot_scale in {ELS, LS, MLS, MS}
+        - substitutability >= 3
+        - camera_movement does NOT contain 'handheld_shaky'
+    formula: "'traversal' in action AND shot_scale IN {ELS,LS,MLS,MS} AND substitutability >= 3 AND 'handheld_shaky' NOT IN camera_movement"

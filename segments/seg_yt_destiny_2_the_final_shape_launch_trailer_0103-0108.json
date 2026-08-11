@@ -1,0 +1,187 @@
+{
+ "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0103-0108",
+ "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+ "start_sec": 103.369933,
+ "end_sec": 108.575133,
+ "start_tc": "1:43",
+ "end_tc": "1:49",
+ "era": "the_final_shape",
+ "activity": "cinematic",
+ "content_type": "cinematic",
+ "destination": "the_pale_heart",
+ "subclass_version": "prismatic",
+ "class": "unknown",
+ "element": "unknown",
+ "shot_scale": "MCU",
+ "composition": [
+  "single"
+ ],
+ "camera_movement": [
+  "static"
+ ],
+ "pacing": "medium",
+ "lighting": "dim",
+ "identity_visibility": "face_clear",
+ "character_identifiability": "unidentifiable",
+ "substitutability": 0,
+ "overlays": [],
+ "subject_salience": "enemy_threat",
+ "action": [
+  "dialogue"
+ ],
+ "mood": [
+  "ominous"
+ ],
+ "register": -2,
+ "character": [],
+ "caption": "An antagonist's face turns into the light, eyes burning amber. Held only a beat.",
+ "faction": [],
+ "clean": true,
+ "footage_tier": "cinematic",
+ "traversal_hero": false,
+ "casting": {
+  "role": "none",
+  "character": null,
+  "person": null,
+  "usable": false,
+  "constraints_failed": [],
+  "slots": 0
+ },
+ "provenance": {
+  "era": {
+   "source": "inherited",
+   "label_source": "heuristic",
+   "confidence": 0.9
+  },
+  "activity": {
+   "source": "inherited",
+   "label_source": "heuristic",
+   "confidence": 0.8
+  },
+  "content_type": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "destination": {
+   "source": "inherited",
+   "label_source": "model",
+   "confidence": 0.5
+  },
+  "subclass_version": {
+   "source": "inherited",
+   "label_source": "model",
+   "confidence": 0.5
+  },
+  "class": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "element": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "shot_scale": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "composition": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "camera_movement": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "pacing": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "lighting": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "identity_visibility": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "character_identifiability": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "substitutability": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "overlays": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.95
+  },
+  "subject_salience": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "action": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "mood": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "register": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "character": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.7
+  },
+  "caption": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "faction": {
+   "source": "observed",
+   "label_source": "model",
+   "confidence": 0.85
+  },
+  "clean": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  },
+  "footage_tier": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  },
+  "traversal_hero": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  },
+  "casting": {
+   "source": "observed",
+   "label_source": "heuristic",
+   "confidence": 1.0
+  }
+ }
+}

@@ -1,0 +1,217 @@
+{
+  "segment_id": "seg_arc_hunter_crucible_0134-0220",
+  "video_id": "yt_arc30_crucible_viDoc",
+  "start_tc": "2:14",
+  "end_tc": "3:40",
+  "start_sec": 134,
+  "end_sec": 220,
+  "era": "witch_queen",
+  "activity": "crucible_pvp",
+  "content_type": "gameplay",
+  "overlays": [
+    "hud",
+    "nameplates"
+  ],
+  "clean": false,
+  "footage_tier": "gameplay",
+  "destination": "unknown",
+  "subclass_version": "arc_3",
+  "class": "hunter",
+  "element": "arc",
+  "faction": [],
+  "shot_scale": "MS",
+  "composition": [
+    "single"
+  ],
+  "camera_angle": "eye_level",
+  "camera_movement": [
+    "track",
+    "pan"
+  ],
+  "pacing": "fast",
+  "lighting": "bright",
+  "substitutability": 4,
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "implied_by_costume",
+  "helmet_simplicity": "simple",
+  "face_count": 0,
+  "subject_facing_camera": false,
+  "register": 1,
+  "mood": [
+    "triumphant",
+    "tense"
+  ],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "combat",
+    "ability_cast"
+  ],
+  "traversal_hero": false,
+  "character": [],
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 1
+  },
+  "caption": "A Hunter in sleek, faceless armor whirls through an Arc Staff super in a sunlit Crucible arena, chain lightning crackling off the staff as opposing Guardians scatter. The canonical 'show us Hunters with Arc' beat: fast, anonymous, triumphant.",
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.98
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.98
+    },
+    "destination": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.2
+    },
+    "subclass_version": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.97
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "camera_angle": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "helmet_simplicity": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "face_count": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "subject_facing_camera": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.8
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.8
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

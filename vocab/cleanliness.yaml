@@ -1,0 +1,61 @@
+# vocab/cleanliness.yaml
+# CLEAN-FOOTAGE axis. The project stitches a story out of Bungie's shipped
+# footage, so the governing question for any shot is no longer "can our
+# performer stand in for this Guardian?" but "is this frame CLEAN enough to cut
+# into a sequence?" — i.e. free of overlays that betray it as a screengrab and
+# that no edit can remove.
+#
+# Gameplay footage is NOT excluded. It is TIERED: cinematic footage cuts first,
+# gameplay cuts as B-roll. Cleanliness and tier are independent — clean gameplay
+# (photo-mode-style, HUD off) is perfectly usable, and a cinematic with a burned
+# in date card is not.
+
+overlays:
+  description: >
+    OBSERVED multi-value list of overlays burned into the frame. These cannot be
+    removed in the edit, so any DISQUALIFYING overlay makes the shot unclean.
+    Tag [] or [none] for a frame with nothing burned in.
+  multi_value: true
+  values:
+    hud:          Gameplay HUD — reticle, ability/super icons, ammo, radar.
+    nameplates:   Player nameplates, damage numbers, kill feed, scoreboard.
+    burned_text:  Burned-in text — titles, subtitles, logos, date/pre-order cards, legal.
+    talking_head: Developer/talking-head or other non-diegetic to-camera footage.
+    letterbox:    Aspect-ratio mismatch — pillarbox/letterbox bars baked into the frame.
+    none:         Nothing burned in; a clean frame.
+
+# Overlays that DISQUALIFY a shot from the clean pool. `letterbox` is
+# deliberately NOT here: bars can be cropped, so it is a warning, not a veto.
+disqualifying_overlays: [hud, nameplates, burned_text, talking_head]
+
+derived_fields:
+  clean:
+    type: boolean
+    label_source: heuristic
+    # TIER 0 derivation: pure set arithmetic over an already-tagged field.
+    description: >
+      DERIVED gate. True when the frame carries none of `disqualifying_overlays`
+      — i.e. it can be cut into the story as-is. The story assembler
+      (tools/story.py) considers ONLY clean shots; search ranks them first.
+    formula: >
+      clean = overlays contains none of {hud, nameplates, burned_text,
+      talking_head}. An untagged/absent `overlays` is treated as UNKNOWN and
+      therefore NOT clean — cleanliness must be positively established, because
+      a false positive puts a HUD in the finished cut.
+
+  footage_tier:
+    type: enum
+    label_source: heuristic
+    # TIER 0 derivation from the already-inherited content_type.
+    description: >
+      DERIVED cutting tier. Keeps gameplay in the index but ranked beneath
+      cinematics, so a story built from these shots defaults to the cinematic
+      look and falls back to gameplay only for coverage.
+    values:
+      cinematic: Pre-rendered cinematic or in-engine cutscene. Cuts first.
+      gameplay:  In-engine interactive gameplay. B-roll / coverage tier.
+      mixed:     Trailer edit or undetermined source; treat as cinematic-ish, verify by eye.
+    formula: >
+      content_type in {cinematic, cutscene} -> cinematic;
+      content_type == gameplay              -> gameplay;
+      otherwise (trailer, UNKNOWN, absent)  -> mixed.

@@ -1,0 +1,220 @@
+{
+  "segment_id": "seg_roi_saladin_far_0032-0041",
+  "video_id": "yt_rise_of_iron_reveal_trailer",
+  "start_tc": "0:32",
+  "end_tc": "0:41",
+  "start_sec": 32,
+  "end_sec": 41,
+  "era": "rise_of_iron",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "overlays": [],
+  "clean": true,
+  "footage_tier": "cinematic",
+  "destination": "cosmodrome",
+  "subclass_version": "unknown",
+  "class": "titan",
+  "element": "unknown",
+  "faction": [
+    "fallen_eliksni"
+  ],
+  "shot_scale": "LS",
+  "composition": [
+    "single",
+    "establishing"
+  ],
+  "camera_angle": "low",
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "slow",
+  "lighting": "high_contrast",
+  "substitutability": 4,
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "inferred",
+  "helmet_simplicity": "ornate",
+  "face_count": 0,
+  "subject_facing_camera": false,
+  "register": 2,
+  "mood": [
+    "reverent",
+    "ominous"
+  ],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "ritual"
+  ],
+  "character": [
+    {
+      "name": "Lord Saladin",
+      "kind": "guardian_npc"
+    }
+  ],
+  "caption": "Wide low-angle shot: Lord Saladin stands helmeted and still on the wolf-banner ramparts of Felwinter Peak, wolf pelt on his shoulders, the Plaguelands smoldering behind him. Far and face-concealed — usable first-party jeefy footage.",
+  "traversal_hero": false,
+  "casting": {
+    "role": "lead",
+    "character": "saladin",
+    "person": "jeefy",
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "destination": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "subclass_version": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "camera_angle": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "helmet_simplicity": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "face_count": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "subject_facing_camera": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

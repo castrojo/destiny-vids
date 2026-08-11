@@ -1,0 +1,212 @@
+{
+  "segment_id": "seg_titan_helmet_cu_0112-0118",
+  "video_id": "yt_beyond_light_story_trailer",
+  "start_tc": "1:12",
+  "end_tc": "1:18",
+  "start_sec": 72,
+  "end_sec": 78,
+  "era": "beyond_light",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "overlays": [],
+  "clean": true,
+  "footage_tier": "cinematic",
+  "destination": "europa",
+  "subclass_version": "stasis",
+  "class": "titan",
+  "element": "stasis",
+  "faction": [],
+  "shot_scale": "CU",
+  "composition": [
+    "single"
+  ],
+  "camera_angle": "eye_level",
+  "camera_movement": [
+    "push_in"
+  ],
+  "pacing": "slow",
+  "lighting": "high_contrast",
+  "substitutability": 4,
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "implied_by_costume",
+  "helmet_simplicity": "simple",
+  "face_count": 0,
+  "subject_facing_camera": true,
+  "register": 1,
+  "mood": [
+    "ominous",
+    "tense"
+  ],
+  "subject_salience": "guardian_hero",
+  "action": [
+    "idle"
+  ],
+  "traversal_hero": false,
+  "character": [],
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 1
+  },
+  "caption": "Slow push-in to a tight close-up of a Titan's plain, featureless helmet, cold blue stasis light raking across the visor. Proof that identity is independent of shot scale: despite the tight CU, there is no face and no name — any Guardian could be inside that armor.",
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "destination": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "subclass_version": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.7
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.92
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.8
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "camera_angle": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.98
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "helmet_simplicity": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "face_count": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "subject_facing_camera": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.9
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

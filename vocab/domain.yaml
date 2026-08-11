@@ -1,0 +1,115 @@
+# vocab/domain.yaml
+# Canonical Destiny 2 domain vocabulary. These values are the SINGLE SOURCE OF
+# TRUTH; other artifacts must reference them exactly (snake_case as written).
+
+class:
+  description: Guardian class. Single-valued per shot subject; 'unknown' when not visually determinable.
+  values:
+    titan:   Heavy plate armor, broad shoulders, Titan mark at hip.
+    hunter:  Cloak and slim silhouette, Hunter cloak clasp.
+    warlock: Robes, long coat, Warlock bond on upper arm.
+    unknown: Class not determinable from frame evidence.
+
+element:
+  # VISUAL signal only (color/FX of abilities, subclass icon tint), independent of
+  # which subclass version was live in that era.
+  description: Elemental affinity as seen on screen. Era-independent.
+  values:
+    arc:       Blue/purple lightning and arcs.
+    solar:     Orange/yellow fire and radiance.
+    void:      Violet/purple gravity wells and smoke.
+    stasis:    Cyan/white ice crystals (Beyond Light+).
+    strand:    Green threads/weaves (Lightfall+).
+    prismatic: Mixed Light/Dark FX (The Final Shape+).
+    unknown:   No element visible or indeterminate.
+
+faction:
+  # MULTI-VALUED: a shot may contain several enemy factions or mixes.
+  description: Enemy/hostile factions visible in frame.
+  multi: true
+  values:
+    cabal:           Red Legion / Caiatl's empire; bulky armored rhino-like troops.
+    fallen_eliksni:  Four-armed Eliksni; House banners, ketches, shanks.
+    hive:            Chitinous undead; Thrall, Acolytes, Knights, Wizards, Ogres.
+    vex:             Brass/white machine frames; radiolaria, confluxes, portals.
+    taken:           Blighted, black-veined duplicates of other races.
+    scorn:           Resurrected deranged Eliksni; patchwork flesh and ether.
+    witness_forces:  "The Witness's units: Tormentors, Subjugators, Dread, Shadow Legion."
+    unknown:         Hostiles present but faction indeterminate.
+
+destination:
+  # Destinations recur across expansions (e.g. cosmodrome in D1 and D2), so this
+  # axis is ORTHOGONAL to era. Single-valued per shot.
+  description: Playable space / destination depicted.
+  values:
+    edz:                    European Dead Zone, Earth.
+    cosmodrome:             Old Russian cosmodrome, Earth.
+    moon:                   Luna; Hellmouth, Scarlet Keep.
+    dreaming_city:          Awoken city of the Reef; ascendant plane.
+    europa:                 Jovian ice moon; Clovis Bray ruins.
+    nessus:                 Vex-terraformed centaur planetoid.
+    io:                     Jovian moon; Taken and Vex; last place the Traveler touched.
+    mars:                   Meridian Bay / BrayTech; also Escalation Protocol zones.
+    tangled_shore:          Lawless Reef debris field (Forsaken).
+    savathun_throne_world:  Savathun's throne world (Witch Queen).
+    neptune_neomuna:        Neomuna, Neptune (Lightfall).
+    the_pale_heart:         Inside the Traveler (The Final Shape).
+    the_traveler:           On/around the Traveler's exterior or immediate vicinity.
+    orbit_space:            Orbital, deep space, jumpship/transit shots.
+    unknown:                Destination not determinable.
+
+era:
+  # Expansion/era the footage belongs to. Inherited from video-level metadata
+  # (release date, playlist), not observed per frame.
+  description: Expansion era of the source footage. Inherited from video metadata.
+  values:
+    d1_base:         Destiny 1 launch (year 1 base).
+    the_dark_below:  D1 year 1 DLC I.
+    house_of_wolves: D1 year 1 DLC II.
+    the_taken_king:  D1 year 2.
+    rise_of_iron:    D1 year 3.
+    d2_base:         Destiny 2 launch (year 1 base).
+    curse_of_osiris: D2 year 1 DLC I.
+    warmind:         D2 year 1 DLC II.
+    forsaken:        D2 year 2.
+    shadowkeep:      D2 year 3.
+    beyond_light:    D2 year 4.
+    witch_queen:     D2 year 5.
+    lightfall:       D2 year 6.
+    the_final_shape: D2 year 7.
+    unknown:         Era not determinable.
+
+activity:
+  description: Activity type depicted in the shot.
+  values:
+    cinematic:     Pre-rendered or in-engine narrative cinematic.
+    patrol:        Open-world exploration gameplay.
+    strike:        3-player strike mission gameplay.
+    raid:          6-player raid gameplay.
+    crucible_pvp:  Player-vs-player Crucible.
+    gambit:        Gambit hybrid PvE/PvP.
+    dungeon:       3-player dungeon gameplay.
+    story_mission: Campaign/story mission gameplay.
+    unknown:       Activity not determinable.
+
+subclass_version:
+  # NOT frame-visible: Arc 2.0 vs 3.0 (or Void 1/2/3) cannot be told from pixels
+  # alone in a single shot. This value MUST be DERIVED from era (plus element),
+  # never labeled by direct observation. It encodes which iteration of the
+  # subclass system was live when the footage shipped.
+  description: Subclass system iteration. DERIVE from era; NEVER observe from pixels.
+  derived: true
+  values:
+    arc_1:     Original Arc subclasses (D1 / D2 launch).
+    arc_2:     Forsaken-era reworked Arc trees.
+    arc_3:     Arc 3.0 (post-Lightfall sandbox).
+    void_1:    Original Void subclasses.
+    void_2:    Forsaken-era reworked Void trees.
+    void_3:    Void 3.0 (Witch Queen sandbox).
+    solar_1:   Original Solar subclasses.
+    solar_2:   Forsaken-era reworked Solar trees.
+    solar_3:   Solar 3.0 (Season of the Haunted sandbox).
+    stasis:    Stasis (Beyond Light+); single iteration.
+    strand:    Strand (Lightfall+); single iteration.
+    prismatic: Prismatic (The Final Shape+); single iteration.
+    unknown:   Subclass version not derivable.

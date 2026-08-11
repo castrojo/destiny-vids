@@ -1,0 +1,22 @@
+# vocab/salience.yaml
+# Subject salience axis.
+
+subject_salience:
+  # SINGLE-VALUED and REQUIRED for every shot.
+  # Encodes the project's Guardian-centric stance: enemies are wanted as
+  # THREAT/STAKES, not as the subject of the shot. Retrieval agents should
+  # DOWN-WEIGHT shots whose salience is NOT in `preferred_for_retrieval`.
+  description: What the shot is fundamentally about. Single-valued, required.
+  multi: false
+  required: true
+  # crowd_group is PREFERRED: the anonymous crowd is the ensemble cast that
+  # carries the month's contributor tiles, not background noise. Kept in sync
+  # with PREFERRED_SALIENCE in tools/search.py.
+  preferred_for_retrieval: [guardian_hero, crowd_group, environment_establishing, object_artifact]
+  values:
+    guardian_hero:            A Guardian is the clear subject; an ensemble slot unless a named lead is in frame.
+    environment_establishing: Place/scale/vista is the subject; people small or absent.
+    enemy_threat:             Enemy force is the subject; usable as stakes, not hero beats.
+    object_artifact:          A weapon, relic, Ghost, or artifact is the subject.
+    crowd_group:              A crowd/ensemble is the subject; no single hero. The largest ensemble slot count.
+    ambient:                  Texture/atmosphere only; no narrative subject.

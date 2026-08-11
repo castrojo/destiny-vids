@@ -1,0 +1,548 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destiny-vids.local/schema/segment.schema.json",
+  "title": "Destiny2FootageSegment",
+  "type": "object",
+  "description": "Segment-level record: one shot/beat range of a Bungie official Destiny video, tagged along every retrieval axis for natural-language search. PROVENANCE PATTERN: flat fields + parallel provenance map. All tagged fields are plain typed values at the top level of the record; every tagged field SHOULD have a matching entry in `provenance` keyed by the exact field name, with {source, label_source, confidence}. `source`: 'observed' = tagged from the segment's own frames/audio; 'inherited' = copied from the parent video record's video-scoped defaults (era, activity, content_type, destination, subclass_version). `label_source`: manual | heuristic | model. `confidence`: 0..1. Convention for multi-value fields (faction, composition, camera_movement, mood, action): use an empty array when the axis is genuinely not present in the shot; use ['unknown'] only when tagging was attempted but could not be determined; do not mix 'unknown' with other values. DERIVED FIELDS (all label_source 'heuristic', all pure functions of tagged fields, none requiring a model call): `clean` = overlays contains none of {hud, nameplates, burned_text, talking_head} and is the PRIMARY gate — only clean shots get cut into the story; `footage_tier` = cinematic | gameplay | mixed, from content_type, keeping gameplay in the index but beneath cinematics; `traversal_hero` = action includes 'traversal' AND shot_scale in {ELS,LS,MLS,MS} AND camera_movement excludes 'handheld_shaky'; `casting` = the lead/ensemble decision (see $defs/casting).",
+  "additionalProperties": false,
+  "required": [
+    "segment_id",
+    "video_id",
+    "start_sec",
+    "end_sec",
+    "subject_salience"
+  ],
+  "properties": {
+    "segment_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable unique identifier for this segment within the index."
+    },
+    "video_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the parent video record (see video.schema.json)."
+    },
+    "start_tc": {
+      "type": "string",
+      "pattern": "^([0-9]{1,2}:)?[0-9]{1,2}:[0-9]{2}$",
+      "description": "Start of the shot/beat range as a timecode string, mm:ss or HH:MM:SS."
+    },
+    "end_tc": {
+      "type": "string",
+      "pattern": "^([0-9]{1,2}:)?[0-9]{1,2}:[0-9]{2}$",
+      "description": "End of the shot/beat range as a timecode string, mm:ss or HH:MM:SS."
+    },
+    "start_sec": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Start of the range in seconds (numeric, for indexing)."
+    },
+    "end_sec": {
+      "type": "number",
+      "minimum": 0,
+      "description": "End of the range in seconds (numeric, for indexing). Must be greater than start_sec (cross-field constraint enforced by the indexer, not by this schema)."
+    },
+    "era": {
+      "$ref": "#/$defs/era"
+    },
+    "activity": {
+      "$ref": "#/$defs/activity"
+    },
+    "content_type": {
+      "$ref": "#/$defs/content_type"
+    },
+    "overlays": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "hud",
+          "nameplates",
+          "burned_text",
+          "talking_head",
+          "letterbox",
+          "none"
+        ]
+      },
+      "description": "OBSERVED. Overlays burned into the frame, which no edit can remove. Tag ['none'] (or []) for a frame with nothing burned in. 'hud', 'nameplates', 'burned_text' and 'talking_head' are DISQUALIFYING: they make `clean` false. 'letterbox' is a warning only — bars can be cropped. See vocab/cleanliness.yaml."
+    },
+    "clean": {
+      "type": "boolean",
+      "description": "DERIVED gate, and the project's primary filter: true iff `overlays` contains none of {hud, nameplates, burned_text, talking_head}, i.e. the shot can be cut into the story as-is. An ABSENT or untagged `overlays` derives clean=false — cleanliness must be positively established, because a false positive puts a HUD in the finished cut. label_source should be 'heuristic'."
+    },
+    "footage_tier": {
+      "enum": [
+        "cinematic",
+        "gameplay",
+        "mixed"
+      ],
+      "description": "DERIVED cutting tier from content_type: {cinematic,cutscene}->'cinematic', gameplay->'gameplay', otherwise 'mixed'. Gameplay is kept in the index but ranked beneath cinematics, so a story defaults to the cinematic look and falls back to gameplay for coverage. label_source should be 'heuristic'."
+    },
+    "destination": {
+      "$ref": "#/$defs/destination"
+    },
+    "subclass_version": {
+      "$ref": "#/$defs/subclass_version"
+    },
+    "class": {
+      "enum": [
+        "titan",
+        "hunter",
+        "warlock",
+        "unknown"
+      ],
+      "description": "Guardian class of the subject. 'unknown' when no class can be told (e.g. back-only wide shots of a fireteam)."
+    },
+    "element": {
+      "enum": [
+        "arc",
+        "solar",
+        "void",
+        "stasis",
+        "strand",
+        "prismatic",
+        "unknown"
+      ],
+      "description": "Light/Darkness element visibly expressed (ability FX, weapon FX, subclass color language)."
+    },
+    "faction": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "cabal",
+          "fallen_eliksni",
+          "hive",
+          "vex",
+          "taken",
+          "scorn",
+          "witness_forces",
+          "unknown"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Enemy faction(s) visible in the shot (multi). Empty array when no enemy faction appears; ['unknown'] only when indeterminate."
+    },
+    "shot_scale": {
+      "enum": [
+        "ELS",
+        "LS",
+        "MLS",
+        "MS",
+        "MCU",
+        "CU",
+        "ECU",
+        "INSERT",
+        "UNKNOWN"
+      ],
+      "description": "Shot scale: ELS/LS/MLS/MS/MCU/CU/ECU, INSERT for object insert shots, UNKNOWN when indeterminate."
+    },
+    "composition": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "establishing",
+          "single",
+          "two_shot",
+          "group",
+          "crowd",
+          "OTS",
+          "POV",
+          "cutaway"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Compositional type(s) of the shot (multi)."
+    },
+    "camera_angle": {
+      "enum": [
+        "eye_level",
+        "high",
+        "low",
+        "dutch",
+        "overhead",
+        "ground_level",
+        "UNKNOWN"
+      ],
+      "description": "Dominant camera angle (single)."
+    },
+    "camera_movement": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "static",
+          "pan",
+          "tilt",
+          "push_in",
+          "pull_out",
+          "track",
+          "handheld_shaky",
+          "orbit",
+          "crane",
+          "UNKNOWN"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Camera movement(s) present (multi). 'handheld_shaky' matters because it excludes traversal_hero."
+    },
+    "pacing": {
+      "enum": [
+        "slow",
+        "medium",
+        "fast",
+        "UNKNOWN"
+      ],
+      "description": "Editing/motion pace of the segment (single)."
+    },
+    "lighting": {
+      "enum": [
+        "bright",
+        "dim",
+        "high_contrast",
+        "silhouette",
+        "UNKNOWN"
+      ],
+      "description": "Dominant lighting character (single)."
+    },
+    "substitutability": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5,
+      "description": "How comfortably this shot's subject reads as 'could be anyone'. 0 = a specific named character, unmistakable; 5 = fully anonymous/interchangeable. INDEPENDENT of shot_scale: a CU on a featureless helmet can still score 4-5. DEMOTED to a tie-breaker between otherwise-equal clean ensemble shots — it is NOT a usability gate, since a face-clear lead is fully usable at 0."
+    },
+    "identity_visibility": {
+      "enum": [
+        "face_clear",
+        "partial_face",
+        "face_obscured",
+        "back_only",
+        "silhouette",
+        "none"
+      ],
+      "description": "How much of the subject's identity-revealing surface is visible. 'face_obscured' includes full helmets; 'none' = no person in frame."
+    },
+    "character_identifiability": {
+      "enum": [
+        "explicit",
+        "inferred",
+        "implied_by_costume",
+        "unidentifiable"
+      ],
+      "description": "Whether the specific character can be named: explicit = unmistakably a named character; inferred = deducible from context; implied_by_costume = class/armor readable but person unknown; unidentifiable = anonymous."
+    },
+    "helmet_simplicity": {
+      "enum": [
+        "simple",
+        "ornate",
+        "unknown"
+      ],
+      "description": "Visual complexity of the helmet/head silhouette; 'simple' favors substitutability with a stand-in performer."
+    },
+    "face_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of visible (uncovered) faces in frame."
+    },
+    "subject_facing_camera": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Whether the primary subject faces the camera. null when not applicable (e.g. no person in frame)."
+    },
+    "register": {
+      "type": "integer",
+      "minimum": -2,
+      "maximum": 2,
+      "description": "Mythic register: -2 grounded/gritty ... 0 neutral ... +2 fully mythic/legendary."
+    },
+    "mood": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "reverent",
+          "triumphant",
+          "lonely",
+          "ominous",
+          "serene",
+          "tense"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Emotional tone(s) of the segment (multi)."
+    },
+    "subject_salience": {
+      "enum": [
+        "guardian_hero",
+        "environment_establishing",
+        "enemy_threat",
+        "object_artifact",
+        "crowd_group",
+        "ambient"
+      ],
+      "description": "What the shot is ABOUT (single, REQUIRED): the Guardian as hero figure; the environment/destination; an enemy threat; an object or artifact; a crowd/group; or ambient texture."
+    },
+    "action": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "idle",
+          "combat",
+          "ability_cast",
+          "traversal",
+          "emote",
+          "dialogue",
+          "ritual",
+          "vehicle",
+          "unknown"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Action(s) taking place (multi). 'traversal' = running/jumping/parkour/sparrow-free movement through space."
+    },
+    "traversal_hero": {
+      "type": "boolean",
+      "description": "DERIVED boolean: true iff action includes 'traversal' AND shot_scale in {ELS,LS,MLS,MS} AND camera_movement does not include 'handheld_shaky'. Marks the wide, mythic 'Guardian in motion' beats that carry a sequence. label_source should be 'heuristic'."
+    },
+    "casting": {
+      "$ref": "#/$defs/casting"
+    },
+    "character": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "kind"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Free-text entity name, e.g. 'Zavala', 'The Traveler', 'Eris Morn'."
+          },
+          "kind": {
+            "enum": [
+              "guardian_npc",
+              "vanguard",
+              "enemy_boss",
+              "other"
+            ],
+            "description": "Entity category. Free-text names mean the vocabulary is open-ended; kind only buckets the entity."
+          }
+        }
+      },
+      "description": "Named entities appearing in the segment. Empty array when no specific named entity is present (anonymous Guardians are NOT characters; they are the substitutable subject)."
+    },
+    "caption": {
+      "type": "string",
+      "description": "Free-text natural-language description of the segment. This is the embedding-indexed field that carries the long tail beyond the controlled axes."
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Parallel provenance map keyed by tagged field name. Convention: every tagged field present on this record SHOULD have a matching entry; keys must be one of the taggable field names below.",
+      "propertyNames": {
+        "enum": [
+          "era",
+          "activity",
+          "content_type",
+          "overlays",
+          "footage_tier",
+          "clean",
+          "destination",
+          "subclass_version",
+          "class",
+          "element",
+          "faction",
+          "shot_scale",
+          "composition",
+          "camera_angle",
+          "camera_movement",
+          "pacing",
+          "lighting",
+          "substitutability",
+          "identity_visibility",
+          "character_identifiability",
+          "helmet_simplicity",
+          "face_count",
+          "subject_facing_camera",
+          "register",
+          "mood",
+          "subject_salience",
+          "action",
+          "traversal_hero",
+          "character",
+          "casting",
+          "caption"
+        ]
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/provenanceEntry"
+      }
+    }
+  },
+  "$defs": {
+    "casting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "character",
+        "person",
+        "usable",
+        "constraints_failed",
+        "slots"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "lead",
+            "ensemble",
+            "none"
+          ],
+          "description": "Which casting tier this shot belongs to. 'lead' = a named Destiny character from vocab/casting.yaml `leads` is on screen and is played by a fixed person. 'ensemble' = anonymous Guardian slot(s) fillable from the month's Project Bluefin contributor pool. 'none' = nobody to cast (environment, enemy, artifact)."
+        },
+        "character": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical `leads` key matched, e.g. 'elsie_bray' (aka spellings such as 'exo_stranger' normalize to it). null unless role is 'lead'."
+        },
+        "person": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Id of the real person cast. Set for role 'lead' when that character has been cast (null for a lead that is written but not yet cast). ALWAYS null for 'ensemble' at index time: ensemble people are assigned per calendar month by tools/ensemble.py so the pool can rotate without retagging segments."
+        },
+        "usable": {
+          "type": "boolean",
+          "description": "DERIVED. Whether the shot can actually be used for `person`. True for unconstrained leads and for ensemble. For a CONSTRAINED binding (jeefy -> Saladin, which requires far + helmeted framing because the person does not resemble the character) it is false when the shot violates the constraints, and the unmet keys are listed in `constraints_failed`. An unusable shot gets no lead boost and is excluded from that character's retrieval."
+        },
+        "constraints_failed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "DERIVED. Constraint keys the shot fails for a constrained lead binding, e.g. ['require_far','require_helmet'] for a tight, face-clear Saladin. Empty when usable, or when the binding has no constraints."
+        },
+        "slots": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many contributor credit tiles this shot can carry. 0 for 'lead' and 'none'. For 'ensemble': 6 for a crowd composition, 3 for a group/crowd_group, else 1."
+        }
+      },
+      "description": "DERIVED casting decision. Rule, applied in order: (1) if any name in `character` matches a `leads` key or its aka list -> role='lead', character=that canonical key, person=the binding's person (may be null if uncast), slots=0. Most lead bindings carry no resemblance constraints and are usable at any shot scale, because the project names roles rather than compositing faces; a CONSTRAINED binding (jeefy -> Saladin: far + helmeted only) is evaluated here, setting usable=false and listing the unmet keys in constraints_failed. (2) elif subject_salience in {guardian_hero, crowd_group} -> role='ensemble', character=null, person=null, usable=true, slots per the crowd/group/solo rule. (3) else -> role='none', character=null, person=null, usable=false, slots=0. SHOULD carry a provenance entry with label_source 'heuristic'."
+    },
+    "provenanceEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "label_source",
+        "confidence"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "inherited",
+            "observed"
+          ],
+          "description": "inherited = copied from the parent video record's video-scoped defaults; observed = tagged from this segment's own frames/audio."
+        },
+        "label_source": {
+          "enum": [
+            "manual",
+            "heuristic",
+            "model"
+          ],
+          "description": "Who/what produced the label: a human (manual), a deterministic rule (heuristic), or an ML model (model)."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence in this label, 0 (guess) to 1 (certain)."
+        }
+      }
+    },
+    "era": {
+      "enum": [
+        "d1_base",
+        "the_dark_below",
+        "house_of_wolves",
+        "the_taken_king",
+        "rise_of_iron",
+        "d2_base",
+        "curse_of_osiris",
+        "warmind",
+        "forsaken",
+        "shadowkeep",
+        "beyond_light",
+        "witch_queen",
+        "lightfall",
+        "the_final_shape",
+        "unknown"
+      ],
+      "description": "Destiny release era. Usually inherited from the video record."
+    },
+    "activity": {
+      "enum": [
+        "cinematic",
+        "patrol",
+        "strike",
+        "raid",
+        "crucible_pvp",
+        "gambit",
+        "dungeon",
+        "story_mission",
+        "unknown"
+      ],
+      "description": "Activity type depicted. Usually inherited from the video record; may be observed per-segment when a video mixes activities."
+    },
+    "content_type": {
+      "enum": [
+        "cinematic",
+        "gameplay",
+        "cutscene",
+        "trailer",
+        "UNKNOWN"
+      ],
+      "description": "Nature of the footage in THIS segment. Often inherited from the video; override when a trailer video contains gameplay or cinematic shots."
+    },
+    "destination": {
+      "enum": [
+        "edz",
+        "cosmodrome",
+        "moon",
+        "dreaming_city",
+        "europa",
+        "nessus",
+        "the_traveler",
+        "io",
+        "mars",
+        "tangled_shore",
+        "savathun_throne_world",
+        "neptune_neomuna",
+        "the_pale_heart",
+        "orbit_space",
+        "unknown"
+      ],
+      "description": "Controlled vocabulary of in-fiction Destiny locations. Use 'unknown' when unclear or not in the controlled list."
+    },
+    "subclass_version": {
+      "enum": [
+        "arc_3",
+        "solar_3",
+        "void_3",
+        "stasis",
+        "strand",
+        "prismatic",
+        "unknown"
+      ],
+      "description": "Subclass generation (e.g. arc_3 = Arc 3.0 rework). INHERITED from era via heuristic, NEVER observed from frames: a shot cannot tell a 3.0 subclass from an earlier one."
+    }
+  }
+}
