@@ -59,6 +59,8 @@ enforces exactly that:
    for the person.
 3. Docs: the cast table in `README.md` and the bindings table in
    `docs/taxonomy.md`.
+4. `python3 tools/rederive.py` — the checked-in segments still carry the old
+   casting until it is run. Renaming a person is five places, not four.
 
 `constraints` (`require_helmet`, `require_far`) exist only where the project
 wants the figure to read as the character rather than as the person — currently
@@ -68,6 +70,36 @@ retrieval.
 
 Not every binding is a Guardian: `sagira` is a Ghost, so framing and helmet
 questions do not apply and her nameplate carries no subclass line.
+
+### Re-casting the index after a vocab edit
+
+`casting` is a pure function of the tagger's `character` list plus this vocab,
+so a vocab edit re-casts the whole index **without re-tagging** — but the
+checked-in segments still carry the old value until something recomputes them.
+The only writer used to be `tools/annotate.py index`, which needs the source
+video, and `media/` is gitignored. So a rename left every segment stale with no
+runnable remedy.
+
+`tools/rederive.py` is that remedy. It recomputes every derived field from the
+fields the record already carries — no video, no keyframes, no model:
+
+```bash
+python3 tools/rederive.py --check    # report drift, change nothing, exit 1
+python3 tools/rederive.py            # rewrite the drifted segments
+```
+
+It reports each change, so a vocab edit's blast radius is visible before it is
+committed:
+
+```text
+seg_yt_..._0027-0029.json
+    casting.person: 'karena_angel' -> 'karena_angell'
+```
+
+This is not a licence to edit a derived field by hand. It is the opposite: the
+one supported way to make the files agree with the vocab again, which is why it
+refuses to touch a tagger field and preserves each file's existing JSON layout
+so the diff shows the change and nothing else.
 
 ### Ensemble
 

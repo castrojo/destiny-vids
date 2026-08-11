@@ -956,3 +956,43 @@ def test_the_sign_off_card_plays_even_when_everyone_is_credited():
     assert "body" not in card          # nobody left to list
     assert card["at"] > entries[0]["at"]  # ...and it is the last beat
     plate.load_manifest_entries(entries)
+# --- a lead's plate carries only what was authored ---------------------------
+#
+# A real person's subclass is deck data, never a lore call about the character
+# they play. Karena's binding is the case where the owner supplied the class
+# (Warlock) but no subclass, so the row is short a word -- and shipping it short
+# is correct, because the alternative is an agent choosing a subclass for a real
+# person. These pin the shape so nobody "completes" it later.
+
+def test_the_mara_sov_plate_is_exactly_what_was_authored():
+    from tools.derive import load_leads
+    spec = load_leads()["mara_sov"]["plate"]
+    assert spec["class"] == "Warlock", (
+        "the owner supplied the class only; a subclass must come from the owner, "
+        "never from an agent picking a plausible one"
+    )
+    assert spec["name"] == "Karena Angell"
+    assert spec["title"] == "Archon of the Consensus"
+    assert spec["variant"] == "leader"
+
+
+def test_the_mara_sov_plate_renders():
+    from tools.derive import load_leads
+    img = plate.render_plate(load_leads()["mara_sov"]["plate"])
+    assert img.width > 0 and img.height > 0
+
+
+def test_a_lead_plate_renders_without_a_class_row():
+    """The standing fallback when no class is authored at all."""
+    spec = {"label": "ARCHITECT // GENERAL", "name": "Karena Angell",
+            "title": "Archon of the Consensus", "variant": "leader"}
+    without = plate.render_plate(spec)
+    with_class = plate.render_plate(dict(spec, **{"class": "Voidwalker Warlock"}))
+    assert without.height < with_class.height
+
+
+def test_a_classless_lead_still_takes_its_variant_chrome():
+    """Dropping a row must not drop the gold treatment with it."""
+    spec = {"label": "ARCHITECT // GENERAL", "name": "Karena Angell",
+            "title": "Archon of the Consensus", "variant": "leader"}
+    assert plate._variant_for(spec) == plate.VARIANTS["leader"]

@@ -143,9 +143,40 @@ leads:
         Kat from now on, but she remains the bubble in the original Wolves.
       aka: [saint, saint14]
     mara_sov:
-      person: karena_angel
-      display_name: Karena Angel
+      person: karena_angell
+      display_name: Karena Angell
       aka: [queen_mara_sov]
+      # OWNER-SUPPLIED plate copy. Karena has NO entry in the reference deck
+      # (~/Videos/nameplates.json), so there is no authored Guardian identity to
+      # reproduce, and this file must never invent one -- see the `ensemble.titles`
+      # comment and the Osiris/Sagira bindings, both of which were corrected back
+      # to deck data for exactly this reason.
+      #
+      # The exception that applies here is the owner authoring copy directly,
+      # which is allowed where an agent inventing it is not. Every field below
+      # was supplied by the owner verbatim; they are recorded as authored, not
+      # derived from anything about the character.
+      #
+      # `class` is INCOMPLETE and deliberately so. The owner gave the class --
+      # Warlock -- and referred to a subclass without naming it. Every other
+      # class row in the deck is "<Subclass> <Class>" (Voidwalker Warlock,
+      # Harbinger Titan), so this row is missing its first word. The subclass is
+      # authored nowhere: not the deck, not projectbluefin/website's
+      # wolves-gallery-featured.ts or wolves-lore-records.ts. Picking one would
+      # put a Destiny subclass on a real person on the owner's authority without
+      # the owner having said it, which is the single thing this file must never
+      # do -- so the row carries only what was actually supplied.
+      #
+      # TODO(owner): supply the subclass and make this "<Subclass> Warlock".
+      #
+      # `variant: leader` is the gold treatment from WolvesIntroOverlay.vue
+      # (.wolves-guardian-plate-leader), owner-directed for this binding.
+      plate:
+        label: ARCHITECT // GENERAL
+        class: Warlock
+        name: Karena Angell
+        title: Archon of the Consensus
+        variant: leader
     petra_venj:
       person: lenka
       display_name: Lenka

@@ -45,7 +45,7 @@ first-party footage.
 | Osiris | mrbobbytables | |
 | Sagira | Lindsay Gendreau | Osiris's Ghost; cast on presence, no framing constraint |
 | Saint-14 | Kat | remains the bubble in the original Wolves |
-| Mara Sov | Karena Angel | |
+| Mara Sov | Karena Angell | |
 | Petra Venj | Lenka | |
 | Variks | Nate Waddington | |
 | The Speaker | Jonathan Bryce | |
