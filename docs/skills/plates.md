@@ -46,7 +46,8 @@ A Guardian nameplate carries **exactly**:
 | `title` | `Reconciler of the Plane` |
 | `trustee` | `true` — the burnished-silver chrome |
 
-The title card is the deck's only other shape: `title`, `subtitle`, `body[]`.
+The deck's other shapes are the title card (`title`, `subtitle`, `body[]`) and
+the **chat card** (`speaker`, `text`) — see "Showing a conversation" below.
 
 That is the whole vocabulary, taken from the reference deck
 (`~/Videos/nameplates.json`). **Do not add a line the deck has no field for.**
@@ -99,6 +100,43 @@ smartblur = enable='between(t,10,3*60)'
 ```
 
 `source: /websites/ffmpeg_documentation` (timeline editing)
+
+## Showing a conversation
+
+The chat card (`kind: chat`) puts a line of dialogue on screen under the name
+of the person cast in that role. It exists because the alternative — typing the
+conversation into a manifest — is exactly the invented copy the rest of this
+skill forbids. Both of its fields are recovered, never authored here:
+
+- `speaker` comes from `vocab/casting.yaml`, preferring the character's `plate:`
+  name, so a line and that character's reveal credit the person identically.
+- `text` comes from `dialogue/<video_id>.json`, which carries the source
+  timecodes, the recovery method, and per-line `evidence` for who is speaking.
+  Fix a wrong line **there**, not in a render.
+
+It deliberately carries no `class` row and no character line: who plays whom is
+established once by the Guardian reveal.
+
+```bash
+# 1. reveals first -- naming the cast right is the job the index exists for
+python3 tools/plate.py plan cut.json --only leads --hold 4 --out leads.json
+# 2. dialogue fits around them (anchored: each line where its footage landed)
+python3 tools/dialogue.py cut.json --video-id <id> --around leads.json \
+    --out chat.json
+# 3. the ensemble takes what is left, then merge and burn
+python3 tools/plate.py plan cut.json --roster roster.json --only ensemble \
+    --around fixed.json --out ens.json
+python3 tools/plate.py merge leads.json chat.json ens.json --out plates.json
+```
+
+`--mode script` is the alternative: it replays the exchange in spoken order
+instead of anchoring each line to its own footage. Anchored is right for an
+uncut source, where the picture and the conversation share a clock. Script mode
+is for a **re-ordered cut**, where anchoring scatters the lines out of sequence
+and the exchange stops reading as a conversation.
+
+Dropped lines are always reported with a reason — a line whose footage is not
+in the cut, or that a reveal already covers, is never lost silently.
 
 ## Styling provenance
 

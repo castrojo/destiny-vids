@@ -1,0 +1,226 @@
+{
+  "video_id": "yt_curse_of_osiris_opening_cinematic",
+  "usage_class": "third_party_copyrighted",
+  "source_rights_note": "Dialogue written and owned by Bungie, Inc. Recovered here as timed metadata so on-screen copy is never invented. Bungie's fan-content policy permits non-commercial fan creations; this file stores text and timecodes, not audio.",
+  "text_source": {
+    "method": "youtube_auto_captions",
+    "url": "https://www.youtube.com/watch?v=3nRzli5m8B8",
+    "fetched": "2026-08-11",
+    "note": "ASR, not an authored script. Rolling caption windows were de-duplicated into whole lines; `raw` keeps the caption text a line was assembled from. Correct `text` here rather than in a render."
+  },
+  "speaker_source": {
+    "method": "vocative_alternation",
+    "note": "Two speakers only. Lines that name the other party ('Focus, Sagira.', 'Well, Osiris...', 'Sagira, I can see your light.', \"Don't you even Osiris!\") pin the turn; the lines between them alternate from those anchors. `evidence` records which applies, and `uncertain` marks a turn the anchors do not settle."
+  },
+  "cues": [
+    {
+      "id": "d01",
+      "start_sec": 35.96,
+      "end_sec": 41.99,
+      "character": "sagira",
+      "evidence": "alternation",
+      "text": "Ominous rocks, killer robots, people in mortal danger. Seriously, aren't you tired of this?"
+    },
+    {
+      "id": "d02",
+      "start_sec": 42.0,
+      "end_sec": 45.55,
+      "character": "osiris",
+      "evidence": "alternation",
+      "text": "Fatigue is a distraction from our purpose."
+    },
+    {
+      "id": "d03",
+      "start_sec": 45.56,
+      "end_sec": 47.51,
+      "character": "osiris",
+      "evidence": "alternation",
+      "text": "As are complaints."
+    },
+    {
+      "id": "d04",
+      "start_sec": 47.52,
+      "end_sec": 50.55,
+      "character": "sagira",
+      "evidence": "alternation",
+      "text": "Oh, I haven't begun to complain yet."
+    },
+    {
+      "id": "d05",
+      "start_sec": 50.56,
+      "end_sec": 52.51,
+      "character": "sagira",
+      "evidence": "uncertain",
+      "text": "Ouch."
+    },
+    {
+      "id": "d06",
+      "start_sec": 52.52,
+      "end_sec": 53.99,
+      "character": "sagira",
+      "evidence": "alternation",
+      "text": "Now I'm complaining."
+    },
+    {
+      "id": "d07",
+      "start_sec": 54.0,
+      "end_sec": 60.47,
+      "character": "osiris",
+      "evidence": "vocative",
+      "text": "Focus, Sagira."
+    },
+    {
+      "id": "d08",
+      "start_sec": 60.48,
+      "end_sec": 67.71,
+      "character": "sagira",
+      "evidence": "alternation",
+      "text": "Reach for the sky, big guy."
+    },
+    {
+      "id": "d09",
+      "start_sec": 69.52,
+      "end_sec": 72.43,
+      "character": "sagira",
+      "evidence": "alternation",
+      "text": "Need help? Again?"
+    },
+    {
+      "id": "d10",
+      "start_sec": 72.44,
+      "end_sec": 80.87,
+      "character": "osiris",
+      "evidence": "alternation",
+      "text": "I've got it, thank you."
+    },
+    {
+      "id": "d11",
+      "start_sec": 80.88,
+      "end_sec": 87.83,
+      "character": "sagira",
+      "evidence": "vocative",
+      "text": "Well, Osiris, what did you see?",
+      "raw": "Well, | Osiris, | what what did you see?"
+    },
+    {
+      "id": "d12",
+      "start_sec": 87.84,
+      "end_sec": 90.83,
+      "character": "osiris",
+      "evidence": "uncertain",
+      "text": "Slow down."
+    },
+    {
+      "id": "d13",
+      "start_sec": 90.84,
+      "end_sec": 92.23,
+      "character": "osiris",
+      "evidence": "uncertain",
+      "text": "Wait."
+    },
+    {
+      "id": "d14",
+      "start_sec": 92.24,
+      "end_sec": 94.95,
+      "character": "osiris",
+      "evidence": "uncertain",
+      "text": "I thought I\u2014"
+    },
+    {
+      "id": "d15",
+      "start_sec": 94.96,
+      "end_sec": 98.19,
+      "character": "sagira",
+      "evidence": "uncertain",
+      "text": "Oh, sh\u2014"
+    },
+    {
+      "id": "d16",
+      "start_sec": 98.2,
+      "end_sec": 99.39,
+      "character": "sagira",
+      "evidence": "uncertain",
+      "text": "GO!"
+    },
+    {
+      "id": "d17",
+      "start_sec": 99.4,
+      "end_sec": 103.95,
+      "character": "sagira",
+      "evidence": "alternation",
+      "text": "TO YOUR LEFT. 2 o'clock, MEDIUM RANGE."
+    },
+    {
+      "id": "d18",
+      "start_sec": 103.96,
+      "end_sec": 114.47,
+      "character": "sagira",
+      "evidence": "alternation",
+      "text": "YOU'RE WELCOME."
+    },
+    {
+      "id": "d19",
+      "start_sec": 114.48,
+      "end_sec": 121.43,
+      "character": "sagira",
+      "evidence": "alternation",
+      "text": "You know, I can't help but notice that even with all of reality to explore, you keep picking the places where they shoot at us."
+    },
+    {
+      "id": "d20",
+      "start_sec": 121.44,
+      "end_sec": 128.91,
+      "character": "osiris",
+      "evidence": "alternation",
+      "text": "We can't stay. If the Vex succeed, it's the end of everything."
+    },
+    {
+      "id": "d21",
+      "start_sec": 128.92,
+      "end_sec": 133.95,
+      "character": "osiris",
+      "evidence": "vocative",
+      "text": "Sagira, I can see your light."
+    },
+    {
+      "id": "d22",
+      "start_sec": 133.96,
+      "end_sec": 134.63,
+      "character": "osiris",
+      "evidence": "alternation",
+      "text": "You have to go."
+    },
+    {
+      "id": "d23",
+      "start_sec": 134.64,
+      "end_sec": 137.59,
+      "character": "sagira",
+      "evidence": "alternation",
+      "text": "Nope, not leaving you. Without me, there's no coming back."
+    },
+    {
+      "id": "d24",
+      "start_sec": 137.6,
+      "end_sec": 142.27,
+      "character": "osiris",
+      "evidence": "alternation",
+      "text": "If I don't stop the Vex, there won't be anything to come back to. I'm doing this for the both of us."
+    },
+    {
+      "id": "d25",
+      "start_sec": 142.28,
+      "end_sec": 146.0,
+      "character": "sagira",
+      "evidence": "vocative",
+      "text": "Don't you even Osiris!"
+    }
+  ],
+  "dropped": [
+    {
+      "start_sec": 67.72,
+      "end_sec": 69.51,
+      "raw": "ARGH, ALAF SEL.",
+      "reason": "ASR noise over combat, not a recoverable line. Dropped rather than guessed."
+    }
+  ]
+}

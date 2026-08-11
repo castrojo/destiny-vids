@@ -75,6 +75,38 @@ moves the start. A detector-derived beat can be a fine *beat* and a terrible
 Pass the same value to `tools/plate.py plan`, or every plate after the first
 trimmed shot lands late.
 
+## Not every piece is a cut
+
+Sometimes the source already tells the story and the job is to credit the cast
+and clean the frame, not to re-edit. `tools/uncut.py` emits a cut list that is
+simply every segment of one video in source order, so all the planners run
+unchanged — and because nothing is re-ordered or capped, the finished file and
+the source share a clock.
+
+```bash
+python3 tools/uncut.py <video_id> --out cut.json
+python3 tools/redact.py --video media/<video_id>.mp4 --video-id <video_id> \
+    --audio media/<bed>.mp3 --audio-gain 0.9 --out base.mp4
+```
+
+`redact.py` paints out the burned-in publisher copy an upload carries — the
+ratings card at the head, the logo lockup and legal line at the tail — from
+boxes authored in `redactions/<video_id>.json` against source pixels. On a cut
+those frames are simply `burned_text` and get dropped; uncut, there is nothing
+to drop them *for*, so they are covered instead. A redaction only ever removes:
+it never paints anything the frame did not already have to say.
+
+Two things follow, and both bite:
+
+- **The index must still be honest.** A shot that dissolves into the logo card
+  is `burned_text` and therefore not `clean`, even though the first fifteen
+  seconds of it are beautiful. Tag it, and let the redaction — not a fib in the
+  index — be what makes it usable here.
+- **Scoring replaces the audio.** `--audio` maps the bed instead of the source
+  and passes `-shortest`, so the dialogue is gone. If the conversation still
+  needs to be legible, show it: `tools/dialogue.py` (see
+  [`plates.md`](plates.md)).
+
 ## Common Rationalizations
 
 | Rationalization | Reality |

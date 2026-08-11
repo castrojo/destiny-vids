@@ -269,3 +269,41 @@ def test_title_card_renders_its_body_lines():
     card = plate.render_plate(TITLE_CARD)
     fewer = plate.render_plate(dict(TITLE_CARD, body=["castrojo"]))
     assert card.height > fewer.height
+
+
+CHAT = {
+    "id": "d01", "at": 3.0, "dur": 4.0, "position": "center", "kind": "chat",
+    "speaker": "Lindsay Gendreau",
+    "text": "Ominous rocks, killer robots, people in mortal danger.",
+}
+
+
+def test_chat_card_renders_the_speaker_and_the_line():
+    img = plate.render_plate(CHAT)
+    assert img.mode == "RGBA"
+    assert img.getpixel((0, 0))[3] == 0          # chamfered corner
+    assert img.getpixel((img.width // 2, img.height // 2))[3] > 0
+
+
+def test_chat_copy_wraps_instead_of_running_off_the_card():
+    """Long recovered dialogue must wrap to the CSS cap, not widen forever."""
+    long_line = dict(CHAT, text=CHAT["text"] * 4)
+    wide = plate.render_plate(long_line)
+    assert wide.width <= plate.MAX_INNER_W + 2 * plate.PAD_X + 1
+    assert wide.height > plate.render_plate(CHAT).height
+
+
+def test_wrapping_never_breaks_a_word():
+    """Hyphenating recovered dialogue would put characters nobody said on screen."""
+    font = plate._font("regular", plate.FS_CLASS)
+    lines = plate._wrap("supercalifragilistic and some more words here", font, 120)
+    assert "supercalifragilistic" in lines
+    assert all("-" not in line for line in lines)
+
+
+def test_a_chat_card_carries_no_guardian_rows():
+    """It names the person and the line; who plays whom is the reveal's job."""
+    card = plate.render_plate(CHAT)
+    with_ignored_rows = plate.render_plate(
+        dict(CHAT, label="TRUSTEE // GUARDIAN", **{"class": "Dawnblade Warlock"}))
+    assert card.size == with_ignored_rows.size

@@ -1,0 +1,31 @@
+{
+  "video_id": "yt_curse_of_osiris_opening_cinematic",
+  "note": "Burned-in publisher copy on an otherwise usable frame. Boxes are in source pixels at 1920x1080 and windows are source seconds, so a redaction survives any later re-encode of the same source. Only non-diegetic text is covered: the Vex glyphs in the ruins are in-fiction and stay.",
+  "redactions": [
+    {
+      "id": "pegi_card",
+      "start_sec": 0.0,
+      "end_sec": 3.4,
+      "reason": "PEGI 16 age-rating card on black",
+      "boxes": "full"
+    },
+    {
+      "id": "logo_card_title",
+      "start_sec": 163.6,
+      "end_sec": 173.194,
+      "reason": "DESTINY 2 / EXPANSION I / CURSE OF OSIRIS lockup",
+      "boxes": [
+        {"x": 360, "y": 296, "w": 1200, "h": 232}
+      ]
+    },
+    {
+      "id": "logo_card_legal",
+      "start_sec": 163.6,
+      "end_sec": 173.194,
+      "reason": "Bungie and Activision logos plus the copyright line",
+      "boxes": [
+        {"x": 0, "y": 892, "w": 1920, "h": 140}
+      ]
+    }
+  ]
+}

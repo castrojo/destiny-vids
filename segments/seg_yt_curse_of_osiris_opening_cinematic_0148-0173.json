@@ -22,7 +22,9 @@
   "identity_visibility": "none",
   "character_identifiability": "unidentifiable",
   "substitutability": 0,
-  "overlays": [],
+  "overlays": [
+    "burned_text"
+  ],
   "subject_salience": "environment_establishing",
   "action": [],
   "mood": [
@@ -30,9 +32,9 @@
   ],
   "register": 1,
   "character": [],
-  "caption": "A long, calm view of the triangular Vex gateway atop sunlit ruined steps, golden light flooding the frame around ancient stone columns.",
+  "caption": "A long, calm view of the triangular Vex gateway atop sunlit ruined steps, golden light flooding the frame around ancient stone columns. The shot dissolves into the burned-in DESTINY 2 / CURSE OF OSIRIS logo card with publisher logos and legal copy.",
   "faction": [],
-  "clean": true,
+  "clean": false,
   "footage_tier": "cinematic",
   "traversal_hero": false,
   "casting": {
@@ -111,8 +113,8 @@
     },
     "overlays": {
       "source": "observed",
-      "label_source": "model",
-      "confidence": 0.95
+      "label_source": "human",
+      "confidence": 1.0
     },
     "subject_salience": {
       "source": "observed",

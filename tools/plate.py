@@ -106,6 +106,10 @@ PAD_BOTTOM = 1.5 * REM
 CHAMFER = 16             # clip-path: polygon(16px ...)
 CREST = 2.5 * REM        # .wolves-guardian-plate-crest
 
+# The CSS caps the plate at 44rem and lets the browser wrap. Only the chat card
+# carries copy long enough to need it, so it is the only shape that wraps.
+MAX_INNER_W = 44 * REM
+
 # Row placement: bottom 10%, left/right 5% (.wolves-guardian-plate-row).
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
@@ -146,6 +150,27 @@ def _draw_tracked(draw, xy, text, font, fill, tracking_em):
     for ch in text:
         draw.text((x, y), ch, font=font, fill=fill)
         x += draw.textlength(ch, font=font) + extra
+
+
+def _wrap(text, font, max_width):
+    """Greedy word wrap to ``max_width``, mirroring the CSS 44rem cap.
+
+    A word longer than the line box is left over-long rather than broken: the
+    copy is recovered dialogue, and hyphenating it would put characters on
+    screen that nobody said.
+    """
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    lines, current = [], ""
+    for word in (text or "").split():
+        trial = f"{current} {word}".strip()
+        if current and probe.textlength(trial, font=font) > max_width:
+            lines.append(current)
+            current = word
+        else:
+            current = trial
+    if current:
+        lines.append(current)
+    return lines
 
 
 def _gradient_text(size, text, font, top, bottom):
@@ -221,13 +246,16 @@ def _variant_for(spec):
 def render_plate(spec):
     """One plate spec -> a tight RGBA image (no frame padding).
 
-    Two card shapes, both from ~/Videos/nameplates.json: the Guardian plate
-    (`label` / `class` / `name` / `title`) and the title card (`title` /
-    `subtitle` / `body`).
+    Three card shapes. Two come straight from ~/Videos/nameplates.json: the
+    Guardian plate (`label` / `class` / `name` / `title`) and the title card
+    (`title` / `subtitle` / `body`). The third is the chat card (`speaker` /
+    `text`), added to the data model deliberately so a cut can show a recovered
+    conversation without a plate line anybody had to invent.
     """
     variant = _variant_for(spec)
     ghost = spec.get("kind") == "ghost"
     card = spec.get("kind") == "title"
+    chat = spec.get("kind") == "chat"
     scale = 0.82 if ghost else 1.0
 
     f_label = _font("regular", FS_LABEL * scale)
@@ -243,6 +271,13 @@ def render_plate(spec):
         name = spec.get("title") or ""
         title = spec.get("subtitle") or ""
         body = list(spec.get("body") or [])
+    elif chat:
+        # The chat card names the PERSON speaking and shows what they said.
+        # It deliberately carries no character row: who plays whom is
+        # established by the Guardian reveal, not restated on every line.
+        label = (spec.get("speaker") or "").upper()
+        klass, name, title = "", "", ""
+        body = _wrap(spec.get("text") or "", f_class, MAX_INNER_W)
     else:
         label = (spec.get("label") or "").upper()
         klass = "" if ghost else (spec.get("class") or "").upper()
@@ -342,6 +377,9 @@ MIN_ANCHOR = 1.5
 LEAD_IN = 0.4     # let the cut land before the plate arrives
 TAIL_OUT = 0.25   # ...and clear before the next one
 DEFAULT_HOLD = 5.0
+# The roster card is a credit, not an end board: on a long final shot the
+# remaining room can be half a minute, which reads as a stuck frame.
+MAX_ROSTER_HOLD = 10.0
 
 
 def cut_timeline(shots, max_shot_sec=None):
@@ -378,7 +416,31 @@ def _window(start, duration, hold=DEFAULT_HOLD, room=None):
     return round(start + LEAD_IN, 3), round(min(hold, usable), 3)
 
 
-def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None):
+def _first_free_window(start, duration, hold, total, busy, cursor=None):
+    """First readable window inside a shot that nothing else has taken.
+
+    Walks forward from the shot's head: if dialogue or an earlier plate holds
+    it, the next candidate starts as soon as the *blocking* window clears --
+    not a whole plate-length later, which used to step straight over the gap it
+    was looking for. Leads, ensemble slots and re-homed contributors all share
+    this, so "the head of the shot is busy" never means "not credited at all".
+    """
+    cursor = start if cursor is None else cursor
+    while True:
+        candidate = _window(cursor, duration - (cursor - start), hold,
+                            room=total - cursor)
+        if not candidate:
+            return None
+        at, dur = candidate
+        blockers = [b_end for b_start, b_end in busy
+                    if at < b_end and at + dur > b_start]
+        if not blockers:
+            return candidate
+        cursor = max(blockers) + TAIL_OUT
+
+
+def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
+         busy=None, only="all"):
     """Cut list -> plate manifest.
 
     Leads are plated on their first appearance long enough to read, using the
@@ -386,17 +448,26 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     the deterministic assignment in tools/ensemble.py; anyone whose assigned
     shot is too short to hold a plate is credited over the final shot instead,
     so the month's contributors are never silently dropped.
+
+    ``busy`` seeds the occupied windows with something already fixed on the
+    timeline. ``only`` (``leads`` / ``ensemble`` / ``all``) runs one tier at a
+    time, which is what lets a scored cut be planned in priority order: the
+    lead reveals are placed first because they are the credit the whole index
+    exists to get right, the dialogue is fitted around them, and the ensemble
+    then takes what is left.
     """
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     entries, plated = [], set()
-    busy = []  # occupied windows, so nothing ever double-books the screen
+    busy = list(busy or [])  # occupied windows, so nothing double-books the screen
 
     def free(start, duration):
         end = start + duration
         return all(end <= b_start or start >= b_end for b_start, b_end in busy)
 
     for start, duration, shot in timeline:
+        if only == "ensemble":
+            break
         casting = shot.get("casting") or {}
         character = casting.get("character")
         if casting.get("role") != "lead" or not character or character in plated:
@@ -406,8 +477,11 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         copy = (leads.get(character) or {}).get("plate")
         if not copy:
             continue
-        window = _window(start, duration, hold, room=total - start)
-        if not window or not free(*window):
+        # Walk forward through the shot: if dialogue (or an earlier plate) holds
+        # its head, the reveal waits for the next opening inside its own anchor
+        # rather than being lost for the whole cut.
+        window = _first_free_window(start, duration, hold, total, busy)
+        if not window:
             continue
         at, dur = window
         entries.append({"id": character, "at": at, "dur": dur, "position": "left",
@@ -417,7 +491,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         if log:
             log(f"  {character:<10} {at:6.2f}s +{dur:.1f}s  {copy.get('name')}")
 
-    if not roster:
+    if not roster or only == "leads":
         return sorted(entries, key=lambda e: e["at"])
 
     from tools.ensemble import assign
@@ -429,14 +503,20 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
 
     credited, pending = set(), []
     for start, duration, shot in timeline:
+        # A shot with several ensemble slots credits several people, one after
+        # another rather than all at its head: the plate rides across the cut,
+        # so a six-Guardian firefight can name six contributors instead of
+        # burning five of them onto the roster card for want of a start time.
+        cursor = start
         for item in by_segment.get(shot.get("segment_id"), []):
             if item["login"] in credited:
                 continue
-            window = _window(start, duration, hold, room=total - start)
-            if not window or not free(*window):
+            window = _first_free_window(start, duration, hold, total, busy, cursor)
+            if not window:
                 pending.append(item)
                 continue
             at, dur = window
+            cursor = at + dur + TAIL_OUT
             entries.append({
                 "id": f"ensemble_{item['login']}", "at": at, "dur": dur,
                 "position": "right", "label": "CONTRIBUTOR // GUARDIAN",
@@ -448,16 +528,50 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             if log:
                 log(f"  {'ensemble':<10} {at:6.2f}s +{dur:.1f}s  {item['display_name']}")
 
+    # Second pass: anyone their own shot could not hold is re-homed onto another
+    # ensemble shot that still has room. An ensemble credit is not a claim about
+    # a particular body in a particular frame the way a lead binding is -- the
+    # slot formula says the crowd is fillable, and vocab/casting.yaml assigns it
+    # programmatically -- so "one of the anonymous Guardians in this film" stays
+    # true wherever the plate lands. It is still a real credit, and a named
+    # contributor reads better than a line on a roster card.
+    pending = [item for item in pending if item["login"] not in credited]
+    still_pending = []
+    for item in pending:
+        placed = False
+        for start, duration, shot in timeline:
+            if (shot.get("casting") or {}).get("role") != "ensemble":
+                continue
+            window = _first_free_window(start, duration, hold, total, busy)
+            if not window:
+                continue
+            at, dur = window
+            entries.append({
+                "id": f"ensemble_{item['login']}", "at": at, "dur": dur,
+                "position": "right", "label": "CONTRIBUTOR // GUARDIAN",
+                "name": item["display_name"],
+                "title": f"Project Bluefin, {result['month']}",
+            })
+            busy.append((at, at + dur))
+            credited.add(item["login"])
+            placed = True
+            if log:
+                log(f"  {'ensemble':<10} {at:6.2f}s +{dur:.1f}s  "
+                    f"{item['display_name']} (re-homed)")
+            break
+        if not placed:
+            still_pending.append(item)
+
     # Whoever the body of the cut could not hold is credited together on one
     # roster plate over the tail, in rotation order. The month's contributors
     # are the ensemble; dropping them silently would be the one unacceptable
     # outcome.
-    pending = [item for item in pending if item["login"] not in credited]
+    pending = [item for item in still_pending if item["login"] not in credited]
     if pending and timeline:
         tail_start, tail_dur, _ = timeline[-1]
         cursor = max([tail_start + LEAD_IN] + [b_end + TAIL_OUT for b_start, b_end in busy
                                                if b_end > tail_start])
-        remaining = tail_start + tail_dur - TAIL_OUT - cursor
+        remaining = min(tail_start + tail_dur - TAIL_OUT - cursor, MAX_ROSTER_HOLD)
         seen, names = set(), []
         for item in pending:
             if item["login"] not in seen:
@@ -589,9 +703,31 @@ def main(argv=None):
     p.add_argument("--max-shot-sec", type=float, default=None,
                    help="the same hold cap render.py was given, so timings line up")
     p.add_argument("--hold", type=float, default=DEFAULT_HOLD)
+    p.add_argument("--around", default=None,
+                   help="a manifest of already-fixed windows (e.g. dialogue) that "
+                        "the plates must not collide with")
+    p.add_argument("--only", choices=("all", "leads", "ensemble"), default="all",
+                   help="plan one tier at a time, so a scored cut can be planned "
+                        "in priority order: leads, then dialogue, then ensemble")
     p.add_argument("--out", required=True)
 
+    m = sub.add_parser("merge", help="combine planned manifests into one, validated")
+    m.add_argument("manifests", nargs="+")
+    m.add_argument("--out", required=True)
+
     args = parser.parse_args(argv)
+
+    if args.command == "merge":
+        entries = []
+        for path in args.manifests:
+            entries.extend(load_manifest(path))
+        entries.sort(key=lambda e: float(e["at"]))
+        load_manifest_entries(entries)  # rejects overlaps across the whole deck
+        with Path(args.out).open("w", encoding="utf-8") as fh:
+            json.dump(entries, fh, indent=2)
+            fh.write("\n")
+        print(f"wrote {args.out} ({len(entries)} plate(s))")
+        return 0
 
     if args.command == "plan":
         from tools.derive import load_leads
@@ -601,8 +737,13 @@ def main(argv=None):
         if args.roster:
             with Path(args.roster).open(encoding="utf-8") as fh:
                 roster = json.load(fh)
+        busy = []
+        if args.around:
+            busy = [(float(e["at"]), float(e["at"]) + float(e["dur"]))
+                    for e in load_manifest(args.around)]
         entries = plan(load_shots(args.shotlist), load_leads(), roster,
-                       max_shot_sec=args.max_shot_sec, hold=args.hold, log=print)
+                       max_shot_sec=args.max_shot_sec, hold=args.hold, log=print,
+                       busy=busy, only=args.only)
         load_manifest_entries(entries)  # same validation the burn path applies
         with Path(args.out).open("w", encoding="utf-8") as fh:
             json.dump(entries, fh, indent=2)
