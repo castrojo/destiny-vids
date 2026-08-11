@@ -26,8 +26,12 @@ whose only job is naming them.
   `ublue-os` or a filtered subset of it (Aurora and Bazzite are repos inside one
   org, so an org walk credits both communities as one).
 - Owner authors the three lead bindings, which are claims about real people:
-  - `john_17` → `KyleGospo`, with `constraints: {require_helmet: true}` — the
-    character never removes the helmet, so a face-clear shot is not him;
+  - `john_17` → `KyleGospo`, with **no** blanket `require_helmet`: #11's own
+    opening shot has the helmet under his arm, and he pulls it on later. The
+    `saladin` precedent constrains a character who is never helmeted; this one is
+    helmeted for most of the campaign but not all of it, so the helmet state
+    belongs on the beat (`helmet_simplicity` / `identity_visibility` filters in
+    the outline), not on the binding;
   - `sgt_johnson` → `bketelsen`;
   - the second veteran on the heavy weapon → `GloriousEggroll`; #11 gives no
     canon name, so the binding is keyed on the description, like

@@ -23,14 +23,22 @@ of either answer unchanged.
 
 **Scope:**
 - Owner states which reading #11 means.
-- If generation: open a follow-up for the provenance class — `usage_class` gains
-  a value, `source_rights_note` describes the generator's terms, and the
-  shot-detection pass runs over generated clips rather than published ones.
+- If generation: open a follow-up for the provenance class. It is more than one
+  enum value — `schema/video.schema.json` **requires** `youtube_url` and
+  describes `title` as the publisher's title, so generated sources need either a
+  separate source schema or those two fields relaxed; `usage_class` gains a
+  value; `source_rights_note` describes the generator's terms; the generation
+  step has to be barred from baking a HUD into the clip (a generated HUD derives
+  `clean = false` exactly like a shipped one, and would make its own output
+  uncuttable); and generating recognizable likenesses of the real people in #11
+  needs a stated consent basis before any render.
 - If indexing: H-07 proceeds as written.
 
 **Acceptance:**
 - [ ] The reading is recorded in `docs/plans/halo/design.md` §3 as decided, not open.
 - [ ] H-07's scope is updated to match.
+- [ ] If generation: the source-record shape and the likeness/consent basis are
+      written down before the first clip is produced.
 
 **Depends on:** —
 

@@ -37,7 +37,9 @@ policy permits it is simply a false statement in the data.
 - [ ] A test asserts the note matches the record's universe.
 - [ ] `AGENTS.md` states both policies and where the GCUR attribution appears.
 
-**Depends on:** H-00 (which framework applies at all), H-05 (`universe` exists)
+**Depends on:** H-00 (which framework applies at all). The `AGENTS.md` and
+policy-text half needs nothing else and can land first; only the per-universe
+`RIGHTS_NOTE` selection waits on H-05 for the `universe` field to exist.
 
 **Automatable:** partly — the plumbing is mechanical; the exact policy text must
 be copied from the live page, and the publishing decision is the owner's.

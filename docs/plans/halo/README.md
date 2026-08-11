@@ -18,7 +18,7 @@ design, the research it rests on, and one issue-ready file per unit of work.
 
 Each file in [`issues/`](issues) is a complete issue body. File them in the
 order below, title them with the file's `#` heading, and replace the plan ids
-(`H-00`…`H-13`) in the **Depends on** lines with the real issue numbers as they
+(`H-00`…`H-15`) in the **Depends on** lines with the real issue numbers as they
 are created. #11 becomes the epic that tracks them.
 
 ## The map
@@ -50,25 +50,36 @@ Cross-references use plan ids, not GitHub numbers, until the issues exist.
 |---|---|---|---|
 | H-09 | [A campaign/episode format: movements that alternate dialogue and combat](issues/09-campaign-episode-format.md) | H-05 | yes |
 | H-10 | [Scored assembly: fill a combat movement to one track, and lay per-movement audio](issues/10-scored-assembly-and-audio-plan.md) | H-02, H-09 | yes |
-| H-11 | [The Halo CE-era HUD layer](issues/11-hud-layer.md) | H-04, H-09 | partly |
+| H-11 | [The Halo CE-era HUD layer](issues/11-hud-layer.md) | H-04, H-05, H-09 | partly |
 | H-12 | [Re-run the same campaign template with a different cast](issues/12-reusable-campaign-template.md) | H-08, H-09, H-11 | yes |
+| H-14 | [Replace the intro slides with org logos](issues/14-org-logo-intro-slides.md) | H-04, H-09 | partly |
+| H-15 | [Deliver the campaign: assemble the Open Gaming Collective cut end to end](issues/15-deliver-the-campaign.md) | H-07, H-10, H-11, H-12, H-14 | partly |
 
 ### Meta
 
 | Id | Issue | Depends on | Automatable |
 |---|---|---|---|
-| H-13 | [Skills and docs for the campaign and HUD stages](issues/13-skills-and-docs.md) | H-09, H-10, H-11 | yes |
+| H-13 | [Skills and docs for the campaign and HUD stages](issues/13-skills-and-docs.md) | H-09, H-10, H-11, H-14 | yes |
+
+H-14 and H-15 are numbered after H-13 because they were added once the brief's
+last line and the missing delivery step were noticed; the order to work them in
+is the graph below, not the ids.
 
 ## Dependency order, as a line
 
 ```
 H-00 ─┬─> H-05 ─┬─> H-06
-      │         ├─> H-07  (also H-01, H-03)
-      │         └─> H-09 ─┬─> H-10  (also H-02)
-      │                   ├─> H-11  (also H-04)
-      │                   └─> H-13
-H-04 ─┴─> H-08 ─────────────> H-12
+      │         ├─> H-07  (also H-01, H-03) ──────────────┐
+      │         └─> H-09 ─┬─> H-10  (also H-02) ──────────┤
+      │                   ├─> H-11  (also H-04, H-05) ────┤
+      │                   ├─> H-14  (also H-04) ──────────┤
+      │                   └─> H-13                        ├─> H-15
+H-04 ─┴─> H-08 ─────────────> H-12 ────────────────────────┘
 ```
+
+H-03 sits in "decide first" because the rights framework has to be settled before
+any Halo record is written; only the *per-universe* `RIGHTS_NOTE` half of it
+waits on H-05.
 
 ## The three rules still outrank this plan
 
@@ -80,7 +91,7 @@ Everything here is subordinate to [`AGENTS.md`](../../../AGENTS.md):
    changes that.
 2. **The fiction bends to the footage.** A campaign beat with no clean match is
    rewritten, not filled from unclean coverage. The Halo arc in
-   [`design.md`](design.md#11-proposed-episode-map-draft) is a draft that the
+   [`design.md`](design.md#12-proposed-episode-map-draft) is a draft that the
    footage gets to veto.
 3. **Casting names real people.** Every handle in #11 is a person. A wrong
    `character` tag, or an invented plate line, credits them for something they

@@ -13,7 +13,17 @@ varies from what does not.
 
 **Scope:**
 - A cast file: lead bindings (character → person → display copy) plus the org
-  list H-08 rosters from. It is the only file a new run edits.
+  list H-08 rosters from. It is the only file a new run edits. The universe pack
+  (H-05) keeps the *roles* — character ids, aliases, constraints — because Halo
+  has one Sgt. Johnson no matter who plays him; the cast file binds a role to a
+  person for one run.
+- **Decide where casting resolves, and ship one answer.** `casting.person` is
+  derived and *stored on every segment* today (`tools/derive.py`), and search and
+  plates read the stored value — so swapping a cast file does not recast an
+  already-assembled corpus. Either re-run `derive.py` per campaign (legal: it is
+  the only writer, so nothing is hand-edited) or resolve casting at assembly time
+  from the run's cast file and stop storing `person` on the segment. Both is a
+  bug waiting to happen: two sources of truth for who is credited.
 - `tools/campaign.py --template … --cast …` as the whole re-run interface.
 - **Determinism.** `ensemble.py`'s guarantee extends up: the same (template,
   cast, roster month, corpus) must produce byte-identical cut lists and
@@ -25,6 +35,8 @@ varies from what does not.
 **Acceptance:**
 - [ ] Two cast files over one template produce two campaigns differing only in
       who is credited.
+- [ ] Swapping the cast file changes every credit, with no stale `person` left
+      over from a previous run.
 - [ ] Running the same inputs twice produces identical output files.
 - [ ] Nothing about a cast is hardcoded in `tools/campaign.py`.
 

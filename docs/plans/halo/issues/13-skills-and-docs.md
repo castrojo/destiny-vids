@@ -12,8 +12,11 @@ nothing about movements, and improvises.
   set, the era decisions, and the "our overlay never launders unclean source
   footage" rule. Category `editing`; depends on `editing`, `casting`.
 - Update `docs/skills/casting.md` and `docs/skills/indexing.md` for universes:
-  which vocab pack applies, and that a lead binding lives under
-  `vocab/universes/<universe>/`.
+  which vocab pack applies, that a lead binding lives under
+  `vocab/universes/<universe>/`, and where a *run's* cast file binds people to
+  those roles (H-12).
+- Update `docs/skills/plates.md` for the org logo deck (H-14): a third-party mark
+  is not authored copy, and it is referenced rather than vendored.
 - Route both from `docs/SKILL.md`, then regenerate the catalog:
   `python3 scripts/generate_skill_index.py --write`.
 - Update the `README.md` layout table for the new tools and directories.
@@ -25,6 +28,6 @@ nothing about movements, and improvises.
 - [ ] Each new skill follows the front-matter contract and the 200-line soft
       budget in `docs/SKILL.md`.
 
-**Depends on:** H-09, H-10, H-11
+**Depends on:** H-09, H-10, H-11, H-14
 
 **Automatable:** yes.

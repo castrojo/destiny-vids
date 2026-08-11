@@ -55,3 +55,33 @@ def test_plan_ids_match_the_filenames_and_are_unique():
 def test_no_dead_relative_links(path):
     for target in re.findall(r"\]\((?!https?:)([^)#]+?\.md)(?:#[^)]*)?\)", path.read_text()):
         assert (path.parent / target).exists(), f"{path.name} -> {target}"
+
+
+def _slugify(heading):
+    """GitHub's heading anchor rule: lowercase, drop punctuation, spaces to '-'."""
+    text = heading.lstrip("#").strip().lower()
+    text = re.sub(r"[^\w\s-]", "", text.replace("_", ""))
+    return text.replace(" ", "-")
+
+
+def _anchors(path):
+    return {_slugify(line) for line in path.read_text().splitlines()
+            if re.match(r"#{1,6}\s", line)}
+
+
+@pytest.mark.parametrize("path", PLAN_DOCS, ids=lambda p: p.name)
+def test_no_dead_section_anchors(path):
+    """A renumbered section silently breaks every link that pointed at it."""
+    for target, anchor in re.findall(r"\]\((?!https?:)([^)#]*?(?:\.md)?)#([^)]+)\)", path.read_text()):
+        doc = (path.parent / target) if target else path
+        if not doc.exists():
+            continue  # dead file links are the other test's job
+        assert anchor in _anchors(doc), f"{path.name} -> {target}#{anchor}"
+
+
+@pytest.mark.parametrize("path", PLAN_DOCS, ids=lambda p: p.name)
+def test_every_referenced_plan_id_exists(path):
+    """A `Depends on: H-14` pointing at nothing is a plan that cannot be worked."""
+    known = {p.name.split("-", 1)[0] for p in ISSUES}
+    for number in re.findall(r"\bH-(\d\d)\b", path.read_text()):
+        assert number in known, f"{path.name} references H-{number}, which has no issue file"

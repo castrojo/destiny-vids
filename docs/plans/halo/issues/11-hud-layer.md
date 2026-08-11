@@ -7,8 +7,9 @@ trooper is introduced, resolving in the final beat of the closing episode into
 the Bazzite download call-to-action.
 
 `plate.py` already solved most of this: transparent PNGs at frame size, one
-ffmpeg pass building an `overlay` chain, `enable='between(t,…)'` windows, and a
-refusal to put two cards on screen at once (`tools/plate.py:527–569`).
+ffmpeg pass building an `overlay` chain (`plate.burn`, `tools/plate.py:527–569`),
+`enable='between(t,…)'` windows, and a refusal to put two cards on screen at once
+(`plate.load_manifest_entries`, `tools/plate.py:492–513`).
 
 **Scope:**
 - `tools/hud.py plan | render | burn`, reusing `plate.py`'s PNG + overlay-chain
@@ -46,17 +47,24 @@ and are wrong for this brief.
 - **It never invents copy.** Callout fields are a closed set in the universe
   pack, like the nameplate deck, and the closing CTA — wording and URL — is
   authored, not composed at render time (`docs/skills/plates.md`).
-- **It never shares the screen with a plate.** With two overlay tools, one
-  scheduler owns the timeline, or two names land on screen at once.
+- **It never puts two names on screen at once.** The chrome is continuous, so it
+  *does* share the screen with plates — a card over the visor frame is the
+  intended look, and forbidding that would forbid every plate. What is mutually
+  exclusive is the name-bearing layer: a trooper callout, the CTA and a plate are
+  three ways of captioning the same frame. `plate.load_manifest_entries` only
+  compares plate windows and knows nothing about HUD manifests, so one scheduler
+  has to own the name-bearing timeline across both tools.
 
 **Acceptance:**
 - [ ] Chrome rides a whole episode; callouts appear only in their windows.
 - [ ] A callout carrying a field outside the closed set fails a test, mirroring
       `tests/test_plate.py::test_no_plate_field_is_invented_beyond_the_reference_deck`.
-- [ ] Overlapping callout/plate windows are refused.
+- [ ] Overlapping *name-bearing* windows are refused across both tools; chrome
+      under a plate is allowed.
 - [ ] Colour and font decisions are recorded in the universe pack, not in code.
 
-**Depends on:** H-04 (who is named), H-09 (episodes exist)
+**Depends on:** H-04 (who is named), H-05 (the pack that stores the colour, font
+and callout-field decisions), H-09 (episodes exist)
 
 **Automatable:** partly — the compositing is mechanical; the colour, font and CTA
 copy decisions are the owner's.

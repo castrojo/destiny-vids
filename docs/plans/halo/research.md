@@ -98,7 +98,7 @@ blue-cyan. Both instructions cannot hold; the owner picks.
 ## 4. Halo: Combat Evolved campaign arc
 
 Ten missions, in order — the spine the episode map in
-[`design.md`](design.md#11-proposed-episode-map-draft) groups into six episodes.
+[`design.md`](design.md#12-proposed-episode-map-draft) groups into six episodes.
 Source: [Halopedia — Halo: Combat Evolved](https://www.halopedia.org/Halo:_Combat_Evolved).
 
 | # | Mission | Beat |
@@ -185,3 +185,4 @@ repo over a hardcoded Bluefin list (`tools/ensemble.py:41–47`). For orgs:
 | Authoritative hex values for the CE HUD palette | no published spec found; screenshots are the only reference | H-11 |
 | The contents of the Wolves catalogue | owner-supplied, not in this repo | H-02 |
 | Which video #11 means by "the video provided" | no link in the issue body | H-01 |
+| Brand-guideline / permission terms for each org's logo | each project publishes its own, and none were reachable to confirm | H-14 |
