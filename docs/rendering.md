@@ -24,7 +24,7 @@ the whole render stage while looking like a bad input file.
 ## The answer: the ffmpeg container
 
 Bluefin already runs a long-lived ffmpeg container for the GNOME thumbnailer
-service:
+service, managed by the `bluefin-thumbnailer.service` quadlet:
 
 ```console
 $ podman ps --format "{{.Names}} {{.Image}}"
@@ -43,9 +43,51 @@ ffmpeg version 8.1
 Using it costs nothing: no layered packages, no `rpm-ostree` mutation of the
 base image, no Homebrew build. It is already running.
 
+## Host setup: make the container *be* `ffmpeg`
+
+Rather than teaching every tool to find a working ffmpeg, put one on `PATH`.
+`~/.local/bin/ffmpeg` is a shim that runs the container image, with
+`~/.local/bin/ffprobe` symlinked to it (it dispatches on `$0`):
+
+```bash
+ffmpeg -version          # => ffmpeg version 8.1  (container)
+FFMPEG_NO_CONTAINER=1 ffmpeg -version   # => 7.1.3 host ffmpeg-free (escape hatch)
+```
+
+Configured in `~/.config/ffmpeg-container.conf`, pinned to the digest the
+thumbnailer service already runs so it never triggers a pull.
+
+### Why an ephemeral `podman run`, not `podman exec`
+
+The shim runs the *image* rather than `exec`ing into the running container:
+
+1. **That container belongs to the thumbnailer service.** Borrowing it for long
+   encodes contends with desktop thumbnailing.
+2. **It only bind-mounts `$HOME`.** `/tmp` and anything else is invisible inside
+   it. An ephemeral run controls its own mounts, so `/tmp` works.
+
+Overhead is ~156ms vs ~79ms for `exec` — irrelevant next to an encode.
+
+The shim mounts `$HOME` and `/tmp`, adds `$PWD` explicitly when it falls outside
+both, sets `-w "$PWD"` so relative paths resolve, allocates a TTY **only** when
+stdin and stdout are both terminals (a TTY corrupts binary data on a pipe),
+passes `/dev/dri` through for VAAPI, and keeps networking enabled so
+`ffmpeg -i https://…` still works.
+
+Verified behavior: relative paths, `/tmp` paths, paths outside `$HOME`, H.264 +
+AAC encode, output files owned by the user (not root), exit-code propagation,
+binary pipe integrity, and network inputs.
+
+## Why `render.py` still resolves ffmpeg itself
+
+The shim fixes *this* host. `tools/render.py` keeps its own resolution order so
+the repo works on machines without it — and because being explicit about which
+ffmpeg ran is worth more than the indirection costs.
+
 ### Why the paths just work
 
-The container is started with the user's home bind-mounted **at the same path**:
+The thumbnailer container is started with the user's home bind-mounted **at the
+same path**:
 
 ```
 /var/home/jorge -> /var/home/jorge
@@ -65,6 +107,9 @@ ignored:
    mounted. Clip intermediates and the concat list file are written to a
    temporary directory created *beside the output file*, not in the system
    temp dir.
+
+(The `~/.local/bin` shim avoids both by using `podman run -w "$PWD"` with its
+own mounts. `render.py` uses `podman exec`, so it must handle them.)
 
 ### The container is shared
 
@@ -124,3 +169,36 @@ yt-dlp -S "vcodec:h264,res:1080" --merge-output-format mp4 \
 
 Sanity check: a two-minute Bungie trailer should detect on the order of ~70
 shots. If it reports 1, the codec is wrong, not the detector.
+
+## Seeking: why `-ss` goes after `-i`
+
+`render.py` uses **output seeking** (`-ss` after `-i`), which decodes from the
+start of the file and discards. It is ~2.6x slower than input-side `-ss` on a
+two-minute source.
+
+The common justification for this — "input seeking snaps to a keyframe" — is
+**stale**. Per the FFmpeg documentation, input seeking moves to the closest
+point before the requested position and then *decodes and discards the
+intervening segment to ensure accuracy*. Both are accurate.
+
+The real reason is specific to this pipeline: input seeking **rebases output
+timestamps to zero**, which shifts the phase of the 29.97 → 30 fps conversion
+every clip goes through, changing which source frames get duplicated. Measured
+on the same in-point, the two methods produce visibly different frames:
+
+```console
+$ ffmpeg -i src.mp4 -ss 69.336 -t 0.968 ...   # 2.486s, framemd5 b8507036...
+$ ffmpeg -ss 69.336 -i src.mp4 -t 0.968 ...   # 0.964s, framemd5 2e7dbbdb...
+```
+
+Same frame count, different frames. Accuracy wins; the cut list's in-points are
+the entire point of the index.
+
+If a future change drops the fps normalization (e.g. all clips from one
+source at native rate), input seeking becomes safe and is worth the 2.6x.
+
+## Sources
+
+Technical claims about `-ss` semantics and the concat demuxer's
+identical-stream-properties requirement were verified against current FFmpeg
+documentation via Context7: `/websites/ffmpeg_documentation`.

@@ -174,8 +174,10 @@ python3 tools/render.py cut.json --audio track.mp3   # lay a music bed
 
 Every clip is re-encoded rather than stream-copied: a stream copy snaps the
 in-point to the nearest keyframe, which throws away the exact boundary shot
-detection worked to find. A shot whose source file is absent is **reported and
-skipped**, never silently dropped.
+detection worked to find. Re-encoding to one common size/rate/pixel format is
+also what lets the concat demuxer join the clips at all — it requires identical
+stream properties across inputs. A shot whose source file is absent is
+**reported and skipped**, never silently dropped.
 
 **Which ffmpeg?** On Bluefin, the already-running `bluefin-thumbnailer`
 container — the host's `ffmpeg-free` has no H.264 decoder and fails only once

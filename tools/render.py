@@ -121,9 +121,18 @@ def load_shots(path):
 def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
     """Cut one clip and normalize it to the common intermediate format.
 
-    ``-ss`` is placed after ``-i`` so the seek is decode-accurate: the fast
-    input-side seek lands on a keyframe, which is exactly the drift this
-    pipeline exists to avoid.
+    ``-ss`` goes *after* ``-i`` (output seeking): ffmpeg decodes from the start
+    and discards, so the in-point is exact on the source timeline.
+
+    Input-side ``-ss`` is ~2.6x faster and is also accurate in modern ffmpeg
+    (it seeks to the closest point before the target, then decodes and discards
+    — it does not simply snap to a keyframe). It is still wrong *here*, for a
+    subtler reason: it rebases output timestamps to zero, which shifts the phase
+    of the 29.97 -> 30 fps conversion below and changes which source frames are
+    duplicated. Measured on the same in-point, the two produce different frames.
+
+    Normalizing every clip to one size/rate/pixel format is what lets the concat
+    demuxer join them: it requires identical stream properties across inputs.
     """
     vf = (
         f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease,"
