@@ -87,8 +87,8 @@ credit and nothing else.
 
 The exception to "copy lives in `vocab/casting.yaml`" is the owner writing a
 plate into an issue's `brief` block (`plates[]` in
-[`schema/brief.schema.json`](../../schema/brief.schema.json)) — issue #1 plates
-Paris Pittman, who has no binding. That is legitimate: the owner is the one
+[`schema/brief.schema.json`](../../schema/brief.schema.json)) — which may name
+somebody who has no binding at all. That is legitimate: the owner is the one
 source that may introduce a *new* claim about a real person, and the brief is
 where they speak. `plan` reads it:
 
