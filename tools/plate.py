@@ -481,6 +481,15 @@ DEFAULT_HOLD = 5.0
 # The roster card is a credit, not an end board: on a long final shot the
 # remaining room can be half a minute, which reads as a stuck frame.
 MAX_ROSTER_HOLD = 10.0
+# A reveal reads better on the character's hero move than on the static insert
+# they happen to appear in first -- Osiris's name arriving as he climbs the
+# stairwell, not while the camera sits on his mask. `traversal_hero` is already
+# derived (wide, stable, in motion), so the index says which shot that is.
+#
+# Bounded, though: a lead the audience has been watching for this long is not
+# being revealed any more, they are being belatedly captioned. Past it, the
+# reveal goes back to the first appearance that can hold it.
+MAX_REVEAL_DEFERRAL = 30.0
 
 
 def cut_timeline(shots, max_shot_sec=None):
@@ -562,6 +571,9 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     reveals are placed first because they are the credit the whole index exists
     to get right, the dialogue is fitted around them, and the ensemble then
     takes what is left.
+
+    A reveal also prefers the character's first ``traversal_hero`` beat over
+    their literal first appearance -- see ``MAX_REVEAL_DEFERRAL``.
     """
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
@@ -573,7 +585,21 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         end = start + duration
         return all(end <= b_start or start >= b_end for b_start, b_end in busy)
 
-    def place_leads(avoid):
+    def first_appearance():
+        """Timeline start of each character's first plateable shot."""
+        first = {}
+        for start, duration, shot in timeline:
+            casting = shot.get("casting") or {}
+            character = casting.get("character")
+            if (casting.get("role") == "lead" and character
+                    and casting.get("usable", True)
+                    and character not in first):
+                first[character] = start
+        return first
+
+    debut = first_appearance()
+
+    def place_leads(avoid, hero_only=False):
         for start, duration, shot in timeline:
             casting = shot.get("casting") or {}
             character = casting.get("character")
@@ -581,6 +607,14 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 continue
             if not casting.get("usable", True):
                 continue  # a shot failing its binding's constraints is no reveal
+            if hero_only:
+                # Hold the reveal for the character's hero move -- but only if
+                # it lands close enough to their debut to still read as an
+                # introduction rather than a late caption.
+                if not shot.get("traversal_hero"):
+                    continue
+                if start - debut.get(character, start) > MAX_REVEAL_DEFERRAL:
+                    continue
             copy = (leads.get(character) or {}).get("plate")
             if not copy:
                 continue
@@ -596,16 +630,21 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             busy.append((at, at + dur))
             plated.add(character)
             if log:
-                note = " (clear of dialogue)" if avoid is not busy else ""
+                notes = "".join([
+                    " (on the hero move)" if hero_only else "",
+                    " (clear of dialogue)" if avoid is not busy else "",
+                ])
                 log(f"  {character:<10} {at:6.2f}s +{dur:.1f}s  "
-                    f"{copy.get('name')}{note}")
+                    f"{copy.get('name')}{notes}")
 
     if only != "ensemble":
-        # Preferred: a reveal that does not land on top of a line of dialogue.
-        if soft_busy:
-            place_leads(busy + soft_busy)
-        # Fallback: a reveal that costs a line still beats no reveal at all.
-        place_leads(busy)
+        # Preference order, most wanted first. A reveal that yields until it
+        # disappears is worse than one that costs a line of dialogue, so every
+        # preference is tried across the whole timeline before its fallback.
+        for hero_only in (True, False):
+            if soft_busy:
+                place_leads(busy + soft_busy, hero_only=hero_only)
+            place_leads(busy, hero_only=hero_only)
 
     if not roster or only == "leads":
         return sorted(entries, key=lambda e: e["at"])

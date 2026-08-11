@@ -427,3 +427,73 @@ def test_the_plate_corners_are_antialiased_and_only_two_are_cut():
     diagonal = [img.getpixel((i, plate.CHAMFER - i))[3]
                 for i in range(1, plate.CHAMFER)]
     assert any(0 < a < 255 for a in diagonal), "chamfer edge is aliased"
+
+
+# --- reveals wait for the hero move -----------------------------------------
+
+def _lead_shot(segment_id, start, end, character="osiris", traversal_hero=False):
+    return {"segment_id": segment_id, "start_sec": start, "end_sec": end,
+            "traversal_hero": traversal_hero,
+            "casting": {"role": "lead", "character": character, "usable": True,
+                        "slots": 0}}
+
+
+REVEAL_LEADS = {"osiris": {"plate": {"label": "TRUSTEE // GUARDIAN",
+                                     "name": "Bob Killen"}}}
+
+
+def test_a_reveal_waits_for_the_characters_hero_move():
+    """Osiris is named as he climbs the stairwell, not on the static insert.
+
+    The index already says which shot that is: `traversal_hero` is a derived
+    "wide, stable, in motion" beat. The reveal prefers it over the character's
+    literal first appearance.
+    """
+    shots = [_lead_shot("insert", 0.0, 8.0),
+             _lead_shot("stairs", 8.0, 12.0, traversal_hero=True)]
+    entries = plate.plan(shots, REVEAL_LEADS, only="leads")
+    assert len(entries) == 1
+    assert entries[0]["at"] == pytest.approx(8.0 + plate.LEAD_IN)
+
+
+def test_a_reveal_falls_back_when_there_is_no_hero_move():
+    """Sagira is a Ghost and never traverses; she is still revealed."""
+    shots = [_lead_shot("insert", 0.0, 8.0), _lead_shot("more", 8.0, 12.0)]
+    entries = plate.plan(shots, REVEAL_LEADS, only="leads")
+    assert len(entries) == 1
+    assert entries[0]["at"] == pytest.approx(plate.LEAD_IN)
+
+
+def test_a_reveal_is_not_deferred_past_the_point_of_being_an_introduction():
+    """Waiting too long stops being a reveal and becomes a late caption.
+
+    The deferral is measured on the finished cut, not on source timecodes --
+    cut_timeline lays shots end to end, so what matters is how long the viewer
+    has actually been looking at an unnamed lead.
+    """
+    long_insert = plate.MAX_REVEAL_DEFERRAL + 10.0
+    shots = [_lead_shot("insert", 0.0, long_insert),
+             _lead_shot("stairs", long_insert, long_insert + 6.0,
+                        traversal_hero=True)]
+    entries = plate.plan(shots, REVEAL_LEADS, only="leads")
+    assert entries[0]["at"] == pytest.approx(plate.LEAD_IN)
+
+
+def test_the_hero_move_still_has_to_be_long_enough_to_read():
+    """A two-second hero beat is not worth losing the reveal over."""
+    shots = [_lead_shot("insert", 0.0, 8.0),
+             _lead_shot("blink", 8.0, 8.3, traversal_hero=True)]
+    entries = plate.plan(shots, REVEAL_LEADS, only="leads")
+    assert entries[0]["at"] == pytest.approx(plate.LEAD_IN)
+
+
+def test_each_lead_is_still_plated_exactly_once():
+    shots = [_lead_shot("a", 0.0, 8.0),
+             _lead_shot("b", 8.0, 14.0, traversal_hero=True),
+             _lead_shot("c", 14.0, 20.0, traversal_hero=True),
+             _lead_shot("d", 20.0, 26.0, character="sagira")]
+    entries = plate.plan(shots, {**REVEAL_LEADS,
+                                 "sagira": {"plate": {"name": "Lindsay Gendreau"}}},
+                         only="leads")
+    assert sorted(e["id"] for e in entries) == ["osiris", "sagira"]
+    plate.load_manifest_entries(sorted(entries, key=lambda e: e["at"]))

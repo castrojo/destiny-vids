@@ -80,7 +80,14 @@ credit and nothing else.
 
 Scheduling rules, all of which exist because a plate is a claim about a person:
 
-- Each lead is plated **once**, on the first appearance long enough to read.
+- Each lead is plated **once**, on the first shot long enough to read.
+- A reveal **waits for the character's hero move**. `traversal_hero` is already
+  derived — wide, stable, in motion — so the index says which shot that is, and
+  the reveal prefers it over the static insert the character happens to appear
+  in first. Osiris is named as he climbs the stairwell, not while the camera
+  sits on his mask. Bounded by `MAX_REVEAL_DEFERRAL`: a lead the audience has
+  watched unnamed for that long is not being revealed any more, just belatedly
+  captioned, so past it the reveal drops back to the first appearance.
 - Never on a shot with `usable = false`: that shot is already excluded from the
   character's retrieval, so it is not a reveal.
 - A plate is **anchored** to a shot but not confined to it — a lower third rides
