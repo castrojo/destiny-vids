@@ -45,7 +45,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -57,11 +57,20 @@ FRAME_W, FRAME_H = 1920, 1080
 # at 1080p, which is what these plates are composited over.
 REM = 16.0
 
-# --- palette (WolvesIntroOverlay.vue) ---------------------------------------
+# --- palette (WolvesIntroOverlay.vue, as baked by wolves-*/render/reveal.html) -
 INK = (8, 12, 20, 209)          # background: rgb(8 12 20 / 82%)
 CREST_FILL = (8, 12, 20, 242)   # .wolves-guardian-plate-crest-inner
 TEXT = (245, 245, 245, 255)     # .wolves-guardian-plate-name color
-NAME_BOTTOM = (160, 174, 192, 255)   # name gradient tail (#a0aec0)
+# .name's gradient has a MIDDLE stop: #fff 0%, #e2e8f0 60%, #a0aec0 100%.
+NAME_MID = (226, 232, 240, 255)      # #e2e8f0 at 60%
+NAME_BOTTOM = (160, 174, 192, 255)   # #a0aec0
+
+# text-shadow: 0 2px 10px rgb(0 0 0 / 80%) -- a CSS blur radius of 10px is
+# roughly a Gaussian sigma of 5. Without it the type sits flat on a translucent
+# plate that has footage showing through it.
+SHADOW = (0, 0, 0, 204)
+SHADOW_OFFSET = (0, 2)
+SHADOW_BLUR = 5
 
 # Default (blue) chrome vs the burnished-silver trustee treatment.
 VARIANTS = {
@@ -69,8 +78,8 @@ VARIANTS = {
         "border": (147, 197, 253, 115),   # rgb(147 197 253 / 45%)
         "accent": (147, 197, 253, 255),   # #93c5fd
         "label": (147, 197, 253, 255),
-        "klass": (191, 219, 254, 255),    # #bfdbfe
-        "title": (148, 163, 184, 255),    # #94a3b8
+        "klass": (203, 213, 245, 255),    # #cbd5f5 (reveal.html .class)
+        "title": (147, 197, 253, 255),    # #93c5fd (reveal.html .title)
         "glow": (147, 197, 253, 140),
     },
     "trustee": {
@@ -85,11 +94,10 @@ VARIANTS = {
         "border": (250, 204, 21, 140),    # rgb(250 204 21 / 55%)
         "accent": (250, 204, 21, 255),    # #facc15
         "label": (250, 204, 21, 255),
-        # The leader block overrides the label and the title but NOT
-        # .wolves-guardian-plate-class, so the subclass row stays the default
-        # blue even on the gold plate. Christoph Blecker's "Broodweaver Warlock"
-        # renders exactly this way in the wolves trailer.
-        "klass": (191, 219, 254, 255),    # #bfdbfe
+        # The leader block overrides the label and the title but NOT the class
+        # row, so the subclass keeps the default colour on the gold plate.
+        # Christoph Blecker's "Broodweaver Warlock" renders exactly this way.
+        "klass": (203, 213, 245, 255),    # #cbd5f5, as default
         "title": (253, 230, 138, 255),    # #fde68a
         "glow": (250, 204, 21, 140),
     },
@@ -103,11 +111,13 @@ FS_TITLE = 1.9 * REM     # .wolves-guardian-plate-title
 
 LS_LABEL = 0.35          # letter-spacing: 0.35em
 LS_CLASS = 0.05
+LS_TITLE = 0.08          # reveal.html .title; the site leaves the title untracked
 
 PAD_X = 2.0 * REM        # padding: 1.75rem 2rem 1.5rem
 PAD_TOP = 1.75 * REM
 PAD_BOTTOM = 1.5 * REM
 CHAMFER = 16             # clip-path: polygon(16px ...)
+CORNER_RADIUS = 12       # border-radius: 0.75rem, on the two corners not cut
 CREST = 2.5 * REM        # .wolves-guardian-plate-crest
 
 # The CSS caps the plate at 44rem and lets the browser wrap. Only the chat card
@@ -118,15 +128,26 @@ MAX_INNER_W = 44 * REM
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
 
+# The CSS stack is `ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace`
+# (wolves-*/render/reveal.html, and --wc-font-mono on the site). Neither Apple's
+# SF Mono nor Cascadia Mono ships on a Fedora atomic host, so the browser that
+# baked the reference plates fell through to the fontconfig generic -- which is
+# DejaVu Sans Mono. Match that resolution order exactly.
+#
+# Adwaita Mono is deliberately NOT first: it is the desktop's mono and it is
+# installed here, so preferring it silently rendered every plate in a typeface
+# that appears nowhere in the stack, and none of the other videos.
 FONT_CANDIDATES = {
     "regular": [
-        "/usr/share/fonts/Adwaita/AdwaitaMono-Regular.ttf",
+        "/usr/share/fonts/dejavu-sans-mono-fonts/DejaVuSansMono.ttf",
         "/usr/share/fonts/dejavu/DejaVuSansMono.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
         "/usr/share/fonts/liberation-fonts/LiberationMono-Regular.ttf",
     ],
     "bold": [
-        "/usr/share/fonts/Adwaita/AdwaitaMono-Bold.ttf",
+        "/usr/share/fonts/dejavu-sans-mono-fonts/DejaVuSansMono-Bold.ttf",
         "/usr/share/fonts/dejavu/DejaVuSansMono-Bold.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf",
         "/usr/share/fonts/liberation-fonts/LiberationMono-Bold.ttf",
     ],
 }
@@ -177,29 +198,80 @@ def _wrap(text, font, max_width):
     return lines
 
 
-def _gradient_text(size, text, font, top, bottom):
-    """The name's white -> slate vertical gradient (background-clip: text)."""
+def _gradient_text(size, text, font, stops):
+    """The name's vertical gradient (background-clip: text).
+
+    ``stops`` is ``[(offset, rgba), ...]`` with offsets in 0..1, mirroring the
+    CSS: `#fff 0%, #e2e8f0 60%, #a0aec0 100%`. The middle stop matters -- a
+    straight white->slate ramp washes the centre of the name out.
+    """
     layer = Image.new("RGBA", size, (0, 0, 0, 0))
     mask = Image.new("L", size, 0)
     ImageDraw.Draw(mask).text((0, 0), text, font=font, fill=255)
     grad = Image.new("RGBA", size)
     for y in range(size[1]):
         t = y / max(1, size[1] - 1)
+        lower = max(i for i, (offset, _) in enumerate(stops) if offset <= t) \
+            if any(offset <= t for offset, _ in stops) else 0
+        upper = min(lower + 1, len(stops) - 1)
+        (o0, c0), (o1, c1) = stops[lower], stops[upper]
+        k = 0.0 if o1 == o0 else (t - o0) / (o1 - o0)
         grad.paste(
-            tuple(int(top[i] + (bottom[i] - top[i]) * t) for i in range(4)),
+            tuple(int(c0[i] + (c1[i] - c0[i]) * k) for i in range(4)),
             (0, y, size[0], y + 1),
         )
     layer.paste(grad, (0, 0), mask)
     return layer
 
 
-def _chamfered(size, fill, border, radius=CHAMFER):
-    """The plate box: clipped top-left and bottom-right corners, 1px rule."""
+def _with_text_shadow(layer):
+    """`text-shadow: 0 2px 10px rgb(0 0 0 / 80%)` under a text layer.
+
+    The plate is translucent, so footage shows through it; without the shadow
+    the type has no separation from whatever is moving behind the card.
+    """
+    shadow = Image.new("RGBA", layer.size, (0, 0, 0, 0))
+    shadow.paste(SHADOW, (0, 0), layer.split()[3])
+    shadow = shadow.filter(ImageFilter.GaussianBlur(SHADOW_BLUR))
+    out = Image.new("RGBA", layer.size, (0, 0, 0, 0))
+    out.alpha_composite(shadow, SHADOW_OFFSET)
+    out.alpha_composite(layer)
+    return out
+
+
+def _chamfered(size, fill, border, radius=CHAMFER, corner=CORNER_RADIUS):
+    """The plate box: two chamfered corners, two rounded, one hairline rule.
+
+    The CSS applies `border-radius` *and* a `clip-path`, so the polygon wins on
+    the top-left and bottom-right (diagonal cuts) while the other two corners
+    keep their radius. Built from a supersampled mask because Pillow will not
+    antialias a polygon edge, and a hard-aliased diagonal is exactly the sort of
+    thing that reads as "not the same card" next to a browser-rendered plate.
+    """
     w, h = size
-    points = [(radius, 0), (w - 1, 0), (w - 1, h - 1 - radius),
-              (w - 1 - radius, h - 1), (0, h - 1), (0, radius)]
+    scale = 4
+    big = (w * scale, h * scale)
+    r, c = radius * scale, corner * scale
+
+    mask = Image.new("L", big, 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, big[0] - 1, big[1] - 1],
+                                           radius=c, fill=255)
+    # Cut the two chamfers back out of the rounded box.
+    cut = ImageDraw.Draw(mask)
+    cut.polygon([(0, 0), (r, 0), (0, r)], fill=0)
+    cut.polygon([(big[0] - 1, big[1] - 1 - r), (big[0] - 1, big[1] - 1),
+                 (big[0] - 1 - r, big[1] - 1)], fill=0)
+    mask = mask.resize(size, Image.LANCZOS)
+
     img = Image.new("RGBA", size, (0, 0, 0, 0))
-    ImageDraw.Draw(img).polygon(points, fill=fill, outline=border)
+    img.paste(fill, (0, 0, w, h), mask)
+
+    # The 1px rule is the mask minus its own inset, so it follows every corner.
+    inner = mask.filter(ImageFilter.MinFilter(3))
+    edge = ImageChops.subtract(mask, inner)
+    rule = Image.new("RGBA", size, (0, 0, 0, 0))
+    rule.paste(border, (0, 0, w, h), edge)
+    img.alpha_composite(rule)
     return img
 
 
@@ -290,7 +362,11 @@ def render_plate(spec):
         body = _wrap(spec.get("text") or "", f_class, MAX_INNER_W)
     else:
         label = (spec.get("label") or "").upper()
-        klass = "" if ghost else (spec.get("class") or "").upper()
+        # NOT uppercased. The site stylesheet puts `text-transform: uppercase`
+        # on .wolves-guardian-plate-class, but the baked reveal that the other
+        # videos actually use does not -- "Behemoth Titan", not "BEHEMOTH
+        # TITAN". The videos are the thing being matched.
+        klass = "" if ghost else (spec.get("class") or "")
         name = spec.get("name") or ""
         title = spec.get("title") or ""
         body = []
@@ -299,7 +375,7 @@ def render_plate(spec):
         _tracked_width(probe, label, f_label, LS_LABEL),
         _tracked_width(probe, klass, f_class, LS_CLASS),
         probe.textlength(name, font=f_name),
-        probe.textlength(title, font=f_title),
+        _tracked_width(probe, title, f_title, LS_TITLE),
         *(probe.textlength(line, font=f_class) for line in body),
         CREST * scale * 3,  # the header never collapses below crest + two rules
     ]
@@ -316,7 +392,11 @@ def render_plate(spec):
     box_h = int(round(PAD_TOP * scale + crest_h + gap + text_h + PAD_BOTTOM * scale))
 
     img = _chamfered((box_w, box_h), INK, variant["border"])
-    draw = ImageDraw.Draw(img)
+
+    # Text goes on its own layer so one text-shadow can sit under all of it,
+    # matching CSS (the shadow applies to type, not to the crest or the rules).
+    text_layer = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_layer)
 
     # Header: rule, crest, rule.
     y = PAD_TOP * scale
@@ -345,13 +425,16 @@ def render_plate(spec):
     if name:
         w = int(math.ceil(draw.textlength(name, font=f_name)))
         layer = _gradient_text((w + 4, int(f_name.size * 1.4)), name, f_name,
-                               (255, 255, 255, 255), NAME_BOTTOM)
-        img.alpha_composite(layer, (int(cx - w / 2), int(y)))
+                               [(0.0, (255, 255, 255, 255)),
+                                (0.6, NAME_MID),
+                                (1.0, NAME_BOTTOM)])
+        text_layer.alpha_composite(layer, (int(cx - w / 2), int(y)))
         y += f_name.size * 1.25 + gap
 
     if title:
-        w = draw.textlength(title, font=f_title)
-        draw.text((cx - w / 2, y), title, font=f_title, fill=variant["title"])
+        w = _tracked_width(draw, title, f_title, LS_TITLE)
+        _draw_tracked(draw, (cx - w / 2, y), title, f_title, variant["title"],
+                      LS_TITLE)
         y += f_title.size * 1.25 + gap
 
     # The title card's body copy: one authored line per row.
@@ -360,6 +443,7 @@ def render_plate(spec):
         draw.text((cx - w / 2, y), line, font=f_class, fill=variant["klass"])
         y += f_class.size * 1.25 + gap
 
+    img.alpha_composite(_with_text_shadow(text_layer))
     return img
 
 

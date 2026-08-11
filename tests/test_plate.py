@@ -374,3 +374,56 @@ def test_the_gold_plate_actually_renders_gold_pixels():
     gold = plate.render_plate(dict(GUARDIAN, variant="leader"))
     assert silver.size == gold.size, "chrome must not change the layout"
     assert silver.tobytes() != gold.tobytes()
+
+
+def test_the_font_stack_resolves_the_way_the_browser_did():
+    """`ui-monospace, SFMono-Regular, Cascadia Mono, monospace` on this host.
+
+    Neither Apple's SF Mono nor Cascadia Mono ships on Fedora atomic, so the
+    headless browser that baked the reference plates
+    (~/Videos/wolves-*/render/reveal.html) fell through to the fontconfig
+    generic: DejaVu Sans Mono. Preferring the desktop's Adwaita Mono instead
+    rendered every plate in a typeface that is in neither the stack nor any of
+    the other videos, which is what "the fonts don't look right" was.
+    """
+    preferred = plate.FONT_CANDIDATES["regular"][0]
+    assert "DejaVuSansMono" in preferred
+    assert not any("Adwaita" in path
+                   for paths in plate.FONT_CANDIDATES.values()
+                   for path in paths)
+    for weight in ("regular", "bold"):
+        assert plate._font(weight, 20) is not None
+
+
+def test_the_subclass_row_keeps_its_authored_case():
+    """The baked reveal reads "Behemoth Titan", not "BEHEMOTH TITAN".
+
+    The site stylesheet uppercases .wolves-guardian-plate-class; the reveal the
+    other videos actually use does not. The videos are what is being matched.
+    """
+    mixed = plate.render_plate(dict(GUARDIAN, **{"class": "Dawnblade Warlock"}))
+    upper = plate.render_plate(dict(GUARDIAN, **{"class": "DAWNBLADE WARLOCK"}))
+    assert mixed.tobytes() != upper.tobytes(), "the class row was uppercased"
+
+
+def test_the_default_title_is_the_blue_the_reference_bakes():
+    """reveal.html's .title is #93c5fd and tracked, not untracked slate."""
+    assert plate.VARIANTS["default"]["title"] == (147, 197, 253, 255)
+    assert plate.VARIANTS["default"]["klass"] == (203, 213, 245, 255)
+    assert plate.LS_TITLE == 0.08
+
+
+def test_the_plate_corners_are_antialiased_and_only_two_are_cut():
+    """clip-path cuts top-left and bottom-right; border-radius rounds the rest."""
+    img = plate.render_plate(GUARDIAN)
+    w, h = img.size
+    assert img.getpixel((0, 0))[3] == 0            # chamfered
+    assert img.getpixel((w - 1, h - 1))[3] == 0    # chamfered
+    # The rounded corners are cut back too, just far less than the chamfers.
+    assert img.getpixel((w - 1, 0))[3] == 0
+    assert img.getpixel((2, h - 2))[3] < 255
+    # ...and a chamfer is a soft edge, not a staircase: the diagonal has
+    # partially-transparent pixels along it.
+    diagonal = [img.getpixel((i, plate.CHAMFER - i))[3]
+                for i in range(1, plate.CHAMFER)]
+    assert any(0 < a < 255 for a in diagonal), "chamfer edge is aliased"
