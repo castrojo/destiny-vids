@@ -150,3 +150,58 @@ def test_csv_has_a_row_per_shot(segments):
     story = build_story(beats(*OUTLINE), segments)
     rows = to_csv(story).strip().splitlines()
     assert len(rows) == len(OUTLINE) + 1  # + header
+
+
+# --- holds are clamped to the vetted material -------------------------------
+#
+# An outline-supplied duration is a legitimate authoring control, but an
+# unclamped one cuts straight through the `clean` gate: render.py cuts
+# `-ss start_sec -t duration`, so a hold longer than the segment keeps decoding
+# into the NEXT shot -- footage no beat selected and no tagger vetted.
+
+def _shot(**over):
+    seg = {"segment_id": "s1", "video_id": "v", "start_sec": 10.0, "end_sec": 14.0,
+           "start_tc": "00:00:10:00", "end_tc": "00:00:14:00", "clean": True,
+           "footage_tier": "cinematic", "caption": "a lone figure on a bridge"}
+    seg.update(over)
+    return seg
+
+
+def test_hold_is_clamped_to_the_shot_it_was_vetted_on():
+    seg = _shot()
+    story = build_story([{"beat": seg["caption"], "duration": 900.0}], [seg])
+    assert story["shots"][0]["duration"] == 4.0
+
+
+def test_clamped_hold_is_reported_not_swallowed():
+    seg = _shot()
+    story = build_story([{"beat": seg["caption"], "duration": 900.0}], [seg])
+    assert len(story["overruns"]) == 1
+    over = story["overruns"][0]
+    assert over["requested"] == 900.0
+    assert over["clamped_to"] == 4.0
+    assert over["segment_id"] == "s1"
+
+
+def test_a_hold_inside_the_shot_is_left_alone():
+    seg = _shot()
+    story = build_story([{"beat": seg["caption"], "duration": 2.0}], [seg])
+    assert story["shots"][0]["duration"] == 2.0
+    assert story["overruns"] == []
+
+
+def test_no_hold_falls_back_to_the_full_shot():
+    seg = _shot()
+    story = build_story([{"beat": seg["caption"], "duration": None}], [seg])
+    assert story["shots"][0]["duration"] == 4.0
+    assert story["overruns"] == []
+
+
+def test_a_clamped_hold_never_runs_past_the_out_point(segments):
+    """The property that matters: no shot may be cut beyond its own end_sec."""
+    outline = [{"beat": line, "duration": 600.0} for line in OUTLINE]
+    story = build_story(outline, segments)
+    for shot in story["shots"]:
+        source = shot["end_sec"] - shot["start_sec"]
+        assert shot["duration"] <= source + 1e-9, shot["segment_id"]
+        assert shot["start_sec"] + shot["duration"] <= shot["end_sec"] + 1e-9

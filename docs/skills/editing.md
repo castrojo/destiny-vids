@@ -75,6 +75,27 @@ moves the start. A detector-derived beat can be a fine *beat* and a terrible
 Pass the same value to `tools/plate.py plan`, or every plate after the first
 trimmed shot lands late.
 
+### A hold cannot exceed the shot it was vetted on
+
+A beat may carry its own `duration` (in a JSON outline), which is a legitimate
+way to author a hold. It is capped at the segment's own length, and the cap is
+reported:
+
+```text
+CLAMPED HOLDS — the outline asked to hold past the shot's out-point:
+   3. yt_demo_0007  600s -> 4.2s
+```
+
+The cap is not tidiness. `render.py` cuts `-ss start_sec -t duration`, so a hold
+longer than the segment keeps decoding **into the next shot** — footage no beat
+selected and no tagger ever vetted, which may carry a HUD or a burned-in title
+and may not be `clean` at all. The emitted `end_sec` still reports the segment's
+real out-point, so nothing downstream reveals the overrun. That is the `clean`
+gate defeated by arithmetic rather than by a bad tag.
+
+Want a longer hold? Use a longer shot. The gate is per-shot because cleanliness
+was established per-shot.
+
 ## Not every piece is a cut
 
 Sometimes the source already tells the story and the job is to credit the cast
@@ -113,6 +134,7 @@ Two things follow, and both bite:
 |---|---|
 | "No clean shot matches, so I'll allow unclean footage." | The gate exists to keep a HUD out of the finished cut. Rewrite the beat instead. |
 | "I'll hand-edit the timings in `cut.json`." | It is a derived artifact and the next run discards your edit. Change the outline or the cap. |
+| "I'll set a long `duration` on the beat to hold the shot." | A hold is clamped to the segment. Past its out-point you are cutting the *next* shot, which nothing vetted. |
 | "The beat matched something close enough." | A mismatch cascades into every later beat that wanted that shot. Fix it at the source. |
 | "Stream copy is faster and looks the same." | It snaps the in-point to a keyframe, discarding the boundary the detector pass exists to find. |
 
