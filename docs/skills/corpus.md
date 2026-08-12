@@ -99,5 +99,7 @@ python3 tools/corpus.py --check
 ```
 
 Worked example, including how one cut's unresolved beats were recorded rather
-than guessed: [`docs/cuts/01-dance.md`](../cuts/01-dance.md). The axes
+than guessed: [`docs/cuts/01-dance.md`](../cuts/01-dance.md). For a corpus
+written *before* the outline, so the beats could be shaped around the gaps it
+reported, see [`docs/cuts/02-zavala.md`](../cuts/02-zavala.md). The axes
 themselves are documented in `docs/taxonomy.md`.
