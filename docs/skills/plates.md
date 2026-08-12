@@ -1,7 +1,7 @@
 ---
 name: plates
 version: "1.0"
-last_updated: "2026-08-11"
+last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
 entry_point: docs/skills/plates.md
@@ -88,6 +88,20 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   card over the tail. Dropping a month's contributors silently is the one
   unacceptable outcome.
 
+`plan` writes `{"plates": [...], "unresolved": [...]}`. A lead who made the cut
+but got no plate lands in `unresolved` rather than disappearing, with the reason
+and whether a tool can fix it:
+
+| `reason` | Means | `automatable` |
+|---|---|---|
+| `uncast` | `leads.<character>.person` is null — nobody to credit | `false` — an owner casting decision |
+| `no_plate_copy` | The binding has no `plate:` block, and copy is never invented | `false` — owner-authored copy |
+| `no_window` | No appearance was long enough, or free, to hold a plate | `true` — re-plan, or give them a longer anchor |
+
+Nothing blocks: the manifest is written either way, and `render`/`burn` read the
+`plates` list and ignore the punch-list. Someone being cast but plate-only is a
+legitimate resting state — see [`casting.md`](casting.md).
+
 `burn` composites every plate in one ffmpeg pass — an `overlay` chain gated by
 `enable='between(t,in,out)'` — and stream-copies audio, so titling never costs
 the soundtrack a second generation. `enable` is FFmpeg's timeline-editing
@@ -121,11 +135,14 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 | "I'll hardcode the copy just for this render." | Then the credit and the casting drift apart the first time a role is recast. Copy lives in `vocab/casting.yaml`. |
 | "The plate is short, it can share the screen." | Two plates at once is unreadable; both `plan` and `burn` refuse it. |
 | "The shot is only two seconds, so nobody can be plated there." | The plate rides across the cut. Only the *anchor* must be long enough to register. |
+| "No copy for this lead? Write them something." | Then the plate says what nobody wrote. Leave them in `unresolved` until the owner writes it. |
 
 ## Red Flags
 
 - Inventing a plate line, a role, or a pronoun row.
 - Hardcoding copy in the manifest instead of `vocab/casting.yaml`.
+- Shipping a cut with a non-empty `unresolved` list without reading it: someone
+  who was on screen went uncredited.
 - Planning with a different `--max-shot-sec` than the render used — every plate
   after the first trimmed shot lands late.
 - A subclass line on a Ghost.

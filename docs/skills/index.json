@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-11",
+  "generated_at": "2026-08-12",
   "schema_version": "1.0",
   "skills": [
     {
@@ -18,7 +18,7 @@
       ],
       "description": "Covers lead bindings, ensemble slots, and how casting is derived rather than tagged. Use when adding or changing a cast member, crediting contributors, or debugging a casting role that did not derive.",
       "version": "1.0",
-      "last_updated": "2026-08-11",
+      "last_updated": "2026-08-12",
       "doc_type": "reference"
     },
     {
@@ -75,7 +75,7 @@
       ],
       "description": "Plans, renders, and burns Project Bluefin Guardian nameplates onto a cut. Use when crediting cast or contributors on screen, or changing plate copy, timing, or chrome.",
       "version": "1.0",
-      "last_updated": "2026-08-11",
+      "last_updated": "2026-08-12",
       "doc_type": "procedure"
     }
   ]
