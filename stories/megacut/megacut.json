@@ -1,0 +1,71 @@
+{
+  "_what": "Seven Days to the Wolves — director's cut megacut. The running order is the owner's, given this session; the shape of it comes from buildDirectorsCutVideoSequence() in ~/src/website/src/data/wolves-intro-sequence.ts, where the Destiny hero video sits after the prologue and before wolves.",
+  "_audio": "Segments 2-4 carry their deliverable's own 48 kHz 5.1 audio, unprocessed. The hero segment and all four cards are silent by owner decision — Bungie's audio was never fetched. A bed under them is a licensing decision.",
+  "_sources": {
+    "hero": "renders/megacut-01-hero.mp4 — YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), video-only, six Guardian plates burned. usage_class: third_party_copyrighted.",
+    "kat": "~/Videos/UPLOAD/01-wolves-kat-cosgrove-sentinel-titan.mp4 — owner-approved deliverable, reused as-is.",
+    "natali": "~/Videos/UPLOAD/02-wolves-natali-vlatko-behemoth-titan.mp4 — owner-approved deliverable, reused as-is.",
+    "europa": "~/Videos/UPLOAD/zz-wolves-europa-directors-cut.mp4 — owner-approved deliverable, reused as-is."
+  },
+
+  "output": "renders/07-seven-days-to-the-wolves-directors-cut-megacut.mp4",
+  "width": 1920,
+  "height": 1080,
+  "fps": "60000/1001",
+  "sample_rate": 48000,
+  "layout": "5.1",
+  "crf": 16,
+  "preset": "slow",
+  "audio_bitrate": "640k",
+
+  "items": [
+    {
+      "kind": "card",
+      "image": "renders/plates-megacut-cards/plate_card0.png",
+      "dur": 5.0,
+      "label": "PROJECT BLUEFIN / seven days to the wolves"
+    },
+    {
+      "kind": "clip",
+      "path": "renders/megacut-01-hero.mp4",
+      "audio": "silent",
+      "label": "Destiny hero video — Into the Light, six Guardians plated"
+    },
+    {
+      "kind": "card",
+      "image": "renders/plates-megacut-cards/plate_card1.png",
+      "dur": 5.0,
+      "label": "Kat Cosgrove / Sentinel Titan"
+    },
+    {
+      "kind": "clip",
+      "path": "/var/home/jorge/Videos/UPLOAD/01-wolves-kat-cosgrove-sentinel-titan.mp4",
+      "audio": "source",
+      "label": "Kat Cosgrove — Guardian intro"
+    },
+    {
+      "kind": "card",
+      "image": "renders/plates-megacut-cards/plate_card2.png",
+      "dur": 5.0,
+      "label": "Natali Vlatko / Behemoth Titan"
+    },
+    {
+      "kind": "clip",
+      "path": "/var/home/jorge/Videos/UPLOAD/02-wolves-natali-vlatko-behemoth-titan.mp4",
+      "audio": "source",
+      "label": "Natali Vlatko — Guardian arrival"
+    },
+    {
+      "kind": "card",
+      "image": "renders/plates-megacut-cards/plate_card3.png",
+      "dur": 5.0,
+      "label": "Europa / Director's Cut"
+    },
+    {
+      "kind": "clip",
+      "path": "/var/home/jorge/Videos/UPLOAD/zz-wolves-europa-directors-cut.mp4",
+      "audio": "source",
+      "label": "Europa Director's Cut — Laura Santamaria"
+    }
+  ]
+}

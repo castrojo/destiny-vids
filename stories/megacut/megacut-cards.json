@@ -1,0 +1,50 @@
+{
+  "_source": "Chapter card copy is REPRODUCED, never authored. `kind: \"title\"` is the reference deck's other card shape (title / subtitle / body), authored in ~/Videos/nameplates.json as `np_title` and implemented in tools/plate.py. Its field set is closed: do not add a row the deck has no field for.",
+  "_provenance": {
+    "card 0": "'PROJECT BLUEFIN' / 'seven days to the wolves' — the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94).",
+    "card 1": "'Kat Cosgrove' / 'Sentinel Titan' — ~/src/website/public/wolves/characters/characters.json, slug `kat`.",
+    "card 2": "'Natali Vlatko' / 'Behemoth Titan' — characters.json, slug `natali`.",
+    "card 3": "'Europa' / \"Director's Cut\" — ~/Videos/UPLOAD/README.md and ~/Videos/wolves-review.m3u."
+  },
+  "_omitted": "Cortney Nickerson has no authored Guardian identity and is unresolved, so she gets no card and no plate. A card whose words nobody has written is omitted and recorded, never guessed.",
+  "_audio": "Every card is silent. Putting a bed under them is a licensing decision, the owner's alone.",
+  "plates": [
+    {
+      "id": "card0",
+      "kind": "title",
+      "at": 0.0,
+      "dur": 5.0,
+      "position": "center",
+      "title": "PROJECT BLUEFIN",
+      "subtitle": "seven days to the wolves"
+    },
+    {
+      "id": "card1",
+      "kind": "title",
+      "at": 116.566667,
+      "dur": 5.0,
+      "position": "center",
+      "title": "Kat Cosgrove",
+      "subtitle": "Sentinel Titan"
+    },
+    {
+      "id": "card2",
+      "kind": "title",
+      "at": 155.566667,
+      "dur": 5.0,
+      "position": "center",
+      "title": "Natali Vlatko",
+      "subtitle": "Behemoth Titan"
+    },
+    {
+      "id": "card3",
+      "kind": "title",
+      "at": 185.825234,
+      "dur": 5.0,
+      "position": "center",
+      "title": "Europa",
+      "subtitle": "Director's Cut"
+    }
+  ],
+  "_timeline": "Each card's `at` is its true position in the finished programme, so this manifest doubles as the running-order record. card0 0.000-5.000 | hero 5.000-116.567 | card1 116.567-121.567 | kat 121.567-155.567 | card2 155.567-160.567 | natali 160.567-185.825 | card3 185.825-190.825 | europa 190.825-301.025. Total 301.025s."
+}
