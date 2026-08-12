@@ -55,15 +55,37 @@ def test_card_needs_a_positive_duration(tmp_path):
 
 
 def test_every_item_contributes_one_video_and_one_audio_leg(tmp_path):
-    """concat needs both streams from every segment; a missing leg is the
-    classic way an assembly desynchronises partway through."""
+    """Every segment must carry both streams; a missing leg is the classic way
+    an assembly desynchronises partway through. The join reads the segments in
+    order, so a segment with no audio would silently shift everything after
+    it."""
     _, plan = _plan(tmp_path, [
         {"kind": "card", "image": "c.png", "dur": 5.0},
         {"kind": "clip", "path": "a.mp4", "audio": "silent", "dur": 10.0},
         {"kind": "clip", "path": "b.mp4", "audio": "source", "dur": 3.0},
     ])
-    graph = megacut.build_filtergraph(plan)
-    assert "[v0][a0][v1][a1][v2][a2]concat=n=3:v=1:a=1[vout][aout]" in graph
+    for item in plan["items"]:
+        graph = megacut.build_filtergraph(plan, [item])
+        assert "[v0]null[vout]" in graph
+        assert "[a0]anull[aout]" in graph
+
+
+def test_a_segment_is_never_a_concatenation_of_one(tmp_path):
+    """`concat=n=1` reads as a harmless no-op and is not one: on one act it
+    re-timed 307.967s of frames into 299.48s of timestamps, the encoder dropped
+    the frames that collided, and the programme came out 8.5s short with every
+    later act starting early. The join is the concat DEMUXER, not a filter."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    assert "concat" not in megacut.build_filtergraph(plan, plan["items"])
+
+    _, two = _plan(tmp_path, [
+        {"kind": "card", "image": "c.png", "dur": 5.0},
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    with pytest.raises(ValueError):
+        megacut.build_filtergraph(two)
 
 
 def test_silent_clip_gets_generated_silence_of_matching_length(tmp_path):
@@ -99,7 +121,7 @@ def test_everything_lands_on_one_frame_rate(tmp_path):
         {"kind": "card", "image": "c.png", "dur": 5.0},
         {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
     ])
-    graph = megacut.build_filtergraph(plan)
+    graph = "".join(megacut.build_filtergraph(plan, [i]) for i in plan["items"])
     assert graph.count("fps=60000/1001") == 2
 
 

@@ -4,7 +4,7 @@ The whole show as **one continuous video**, assembled from the finished cuts and
 announced by act slides in the Wolves cinematic's own chrome.
 
 **Status: v0.5 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.5.mp4`,
-**1236.892 s (20:36.9)**, seven of the eight acts. The owner asked for "one
+**1236.971 s (20:37.0)** against a planned 1236.892, seven of the eight acts. The owner asked for "one
 supercut with everything that we have", and .5 is their name for it.
 
 It is **not the feature**. Act VIII, the credits, is not designed (#51), so the
@@ -46,7 +46,10 @@ after act I by 312.967 s, which is the worked example of why.
 | **VII** | 1126.692 | 1236.892 | **Europa Director's Cut** | `Prod/07-…` |
 | **VIII** | — | — | Credits — **not designed** (#51) | — |
 
-**1236.892s — 20:36.9**, output to `~/Videos/Wolves/megacut/`. Every act plays
+**1236.892s planned, 1236.971s built — 20:37.0**, output to
+`~/Videos/Wolves/megacut/`. The 79 ms is act II's audio leg outrunning its
+video leg by 31 ms plus per-segment rounding; it does not accumulate, and every
+act slide lands within a second of its mark. Every act plays
 from `~/Videos/Wolves/Prod/`, which holds the **highest-quality master** of
 each — FLAC audio, picture never re-encoded. Assembly re-encodes once and edits
 nothing.
