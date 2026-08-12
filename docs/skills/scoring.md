@@ -1,6 +1,6 @@
 ---
 name: scoring
-version: "1.1"
+version: "1.2"
 last_updated: "2026-08-12"
 id: scoring
 one_line_purpose: Measure a music bed, cut sections out of it, and cut to its bars.
@@ -10,10 +10,10 @@ mcp_compliance_level: partial
 optimization_status: draft
 status: active
 dependencies: [editing]
-tags: [music, bed, tempo, downbeat, excision, anchor, ffmpeg, true-peak, section-detection]
+tags: [music, bed, tempo, downbeat, excision, anchor, ffmpeg, true-peak, section-detection, two-clocks, bed-pause, diegetic-insert]
 description: >-
-  Covers bed records, bar-snapped excisions, the cached grid, named anchors, finding a section boundary by measurement, and a master over 0 dBTP.
-  Use when scoring a cut or supporting a second recording.
+  Covers bed records, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a master over 0 dBTP.
+  Use when scoring a cut, pausing the song for a moment of source audio, or supporting a second recording.
 metadata:
   type: procedure
   context7-sources:
@@ -31,12 +31,13 @@ metadata:
 - Finding where a section (a gallop, a solo, a break) actually starts
 - Supporting more than one recording of the same song
 - A delivered file whose true peak is above 0 dBTP
+- The song must pause, duck, or start late over picture already running
 
 ## When NOT to Use
 
 - Sourcing the best copy of a track, or any mixing/mastering question →
   the `audio-quality-tenet` and `scoring-cuts-with-replacement-music` skills
-- Assembling the picture → [`editing.md`](editing.md)
+- Assembling the picture, marking material for removal → [`editing.md`](editing.md)
 
 ## Core Process
 
@@ -266,6 +267,65 @@ Prefer a copy already in the project over a fresh download. The Nightwish bed
 existed at 24-bit in `~/Videos/wolves-natali/sources/`; a re-fetch produced
 16-bit for the same YouTube id.
 
+## Two clocks: when the bed does not run end to end
+
+`render.py --audio` lays one file over a finished cut, which is right whenever
+the song plays from first frame to last. Two things it cannot express, and both
+are the same mechanic:
+
+- a **pre-roll** — the film opens on its own source audio and the song enters
+  later, over picture that is already running;
+- a **pause** — the song stops, a moment plays in its own audio, and the song
+  resumes *from where it stopped*.
+
+`tools/audiomix.py` handles both by giving the cut two clocks:
+
+> **`wall` is position in the film; `bed` is position in the song. A shot
+> marked `audio: "source"` advances wall and not bed.**
+
+Everything follows from that — including the fact that a musical with a pause
+in it is **longer than its own song**, which is why every anchor in an authored
+builder must be asserted against *bed* time, never wall time.
+
+```bash
+python3 tools/audiomix.py stories/<name>.json --video renders/<name>-picture.mp4 \
+    --bed media/<bed>.wav --bed-offset 20.166 --bed-gain-db -3.5 \
+    --out renders/<name>.mp4
+```
+
+The bed is cut into as many pieces as there are gaps, each delayed to its wall
+position, and the source audio is muted wherever the bed plays. **Nothing is
+mixed on top of anything**: at every instant exactly one of the two is audible.
+That is what "pause the song" means, and it is not what ducking would do — a
+dense, heavily-limited master has to come down so far to sit under dialogue or
+an action hit that it is a stop with mud on top.
+
+**Choose the pause point by measuring the bed, not by taste.** Scan for
+full-band drops and put the seam in one: *7 Days to the Wolves* has exactly one
+interior silence in 424 s (278.64 → 279.64 s, ending 23 ms before a downbeat),
+and a stop placed there costs the music nothing because the artist already
+stopped. Where no natural gap exists, snap the seam to a downbeat so the resume
+lands on a bar.
+
+Verify it landed, rather than trusting the filtergraph: correlate the delivered
+audio against the bed at a known offset. A bed region should return `+1.000`,
+and a paused region should return roughly `0.000`.
+
+## A diegetic insert has to be allowed to end
+
+When the bed pauses for a moment of source audio, the out-point belongs to
+**that moment's own phrase**, not to the shot or to a round number. Cut back to
+the song while the insert is still in the air and it reads as a dropout rather
+than a decision — the moment starts and does not finish.
+
+Find the out-point by measuring the insert's envelope and taking its resolution
+(its quietest point after the last swell), the same way the bed's own gaps are
+found. A pause under ~3 s rarely reads as deliberate at all.
+
+If a note says the moment is *in the right place* but wrong somehow, change the
+**length**, not the position. Those are separate faults and the in-point is
+usually the part that was already right.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -280,6 +340,11 @@ existed at 24-bit in `~/Videos/wolves-natali/sources/`; a re-fetch produced
 | "I measured the peak on the bed, so the delivery is fine." | Measure the delivered file. The encode adds intersample peaks the WAV did not have. |
 
 ## Red Flags
+
+- An anchor asserted against wall time in a cut whose bed pauses. Bed time is
+  the only clock the music knows.
+- A source-audio insert cut to a round number rather than to its own phrase.
+- Ducking a dense master under dialogue or an action hit instead of pausing it.
 
 - A tempo exactly double the one you can tap
 - An excision whose `removed_bars` is not a whole number

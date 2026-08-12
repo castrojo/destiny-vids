@@ -152,16 +152,11 @@ sun sat still.
 
 ### Two clocks
 
-`wall` is position in the film; `bed` is position in the song. **A shot marked
-`audio: "source"` advances wall and not bed.** Every anchor in the builder is
-asserted against bed time, because a musical with a pause in it is longer than
-its own song — 427.6 s of film for 424.0 s of music.
-
-`tools/audiomix.py` cuts the bed into pieces, delays each to its wall position,
-and mutes the source wherever the bed plays. At every instant exactly one of the
-two is audible: that is what "pause the song" means, and it is why this is not a
-duck. A −6.8 LUFS master has to come down ~18 dB to sit under an action hit,
-which is a stop with mud on top.
+The mechanic and when to reach for it are in
+[`docs/skills/scoring.md`](../skills/scoring.md#two-clocks-when-the-bed-does-not-run-end-to-end).
+What is specific to this cut: the song plays from the first frame, the only
+`audio: "source"` shot is the pause, and the film is therefore **427.6 s for
+424.0 s of music**. Every anchor in the builder is asserted against bed time.
 
 Verified by correlating the delivered audio against the bed:
 
@@ -169,26 +164,21 @@ Verified by correlating the delivered audio against the bed:
 |---|---|---|---|
 | 100 s | 100 s | **+1.000** | the song is exactly where it should be |
 | 323 s | — | ~**0.000** | inside the pause, the song is genuinely absent |
-| 350 s | 348.2 s | **+1.000** | it resumes from where it stopped |
+| 350 s | 346.35 s | **+1.000** | it resumes from where it stopped |
 
-The third row is the one that matters: after the pause the film runs 3.65 s
-ahead of the song, and the song picks up at exactly the sample it stopped on.
+### The pause's length, measured
 
-### A diegetic insert has to be allowed to end
-
-The pause was first cut at 1.8 s, and the moment *started and did not finish* —
-the song came back while the trailer's phrase was still in the air, so the pause
-read as a dropout rather than a decision. The out-point is now the phrase's own
-resolution, measured on the trailer's envelope:
+The rule — [a diegetic insert has to be allowed to
+end](../skills/scoring.md#a-diegetic-insert-has-to-be-allowed-to-end) — came out
+of this cut. The pause was first taken at 1.8 s and the moment *started and did
+not finish*. The in-point never moved; only the out-point was wrong. From the
+trailer's envelope:
 
 ```
 28.2  build begins        29.63  peak (-9.5 dB)
 30.36 release             32.56  second swell
 33.00 the phrase lands in its quietest point (-31.9 dB)   <- out
 ```
-
-The in-point did not move: **where** the pause falls was already right, and only
-its length was wrong. `test_the_pause_is_long_enough_to_be_a_decision` pins it.
 
 ### Guardians together
 

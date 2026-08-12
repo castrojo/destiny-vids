@@ -1,6 +1,6 @@
 ---
 name: editing
-version: "1.4"
+version: "1.5"
 last_updated: "2026-08-12"
 id: editing
 one_line_purpose: Turn a plain-language outline into a rendered cut.
@@ -10,7 +10,7 @@ mcp_compliance_level: partial
 optimization_status: draft
 status: active
 dependencies: [indexing]
-tags: [story, cut-list, render, ffmpeg, outline, still, artwork-card, window-extract, timing-pass, marker-card, two-clocks, bed-pause]
+tags: [story, cut-list, render, ffmpeg, outline, still, artwork-card, window-extract, timing-pass, marker-card, two-clocks, bed-pause, excision, diegetic-insert]
 description: >-
   Covers outlines, shot matching, artwork cards, timing passes with marker cards, and a bed that pauses.
   Use when writing an outline, marking material for removal before editing, or scoring a cut whose song does not run end to end.
@@ -262,49 +262,62 @@ changed.
 the film's own artwork goes; marking them early is what lets the artwork be
 made to a known duration instead of being squeezed in afterwards.
 
-### Two clocks: when the bed does not run end to end
+### When the bed does not run end to end
 
-`render.py --audio` lays one file over a finished cut, which is right whenever
-the song plays from first frame to last. Two things it cannot express, and both
-are the same mechanic:
+A cut whose song pauses, or starts late, has **two clocks** — `wall` (position
+in the film) and `bed` (position in the song) — and a shot marked
+`audio: "source"` advances wall and not bed. The mechanic, the tool
+(`tools/audiomix.py`), how to choose a pause point by measurement, and why a
+diegetic insert has to be allowed to end all live in
+[`scoring.md`](scoring.md#two-clocks-when-the-bed-does-not-run-end-to-end).
 
-- a **pre-roll** — the film opens on its own source audio and the song enters
-  later, over picture that is already running;
-- a **pause** — the song stops, a moment plays in its own audio, and the song
-  resumes *from where it stopped*.
+The one rule that belongs here: **anchors in an authored builder are asserted
+against bed time, never wall time.** A musical with a pause in it is longer than
+its own song.
 
-`tools/audiomix.py` handles both by giving the cut two clocks:
+### Filling a span is how banned material gets into a cut
 
-> **`wall` is position in the film; `bed` is position in the song. A shot
-> marked `audio: "source"` advances wall and not bed.**
+**The most dangerous edit in this repo is a span that has to be filled.** Both
+of the worst defects in the Wolves cut came from the same reflex — a run needed
+N seconds, the chosen material held fewer, so the code reached for whatever was
+adjacent:
 
-Everything follows from that — including the fact that a musical with a pause
-in it is **longer than its own song**, which is why every anchor in an authored
-builder must be asserted against *bed* time, never wall time.
+| Symptom | What the fill actually did |
+|---|---|
+| 25 shots replayed | replayed the pool in reverse once it ran out |
+| a Savathûn montage in a no-Savathûn film | started the run 17.8 s early, reaching back past the Neomuna boundary into the Throne World |
 
-```bash
-python3 tools/audiomix.py stories/<name>.json --video renders/<name>-picture.mp4 \
-    --bed media/<bed>.wav --bed-offset 20.166 --bed-gain-db -3.5 \
-    --out renders/<name>.mp4
+Nobody chose either. **A fill does not know what it is picking up**, so every
+editorial rule — no repeats, no Savathûn, no Witness body, no enemy subjects —
+is silently suspended at exactly the moment the code is under pressure.
+
+So: when a span comes up short, **the shortfall is an editorial question, not an
+arithmetic one.** Take the extra material from a *named* source, from the front,
+and assert the boundary that must not be crossed:
+
+```python
+assert min(s["start_sec"] for s in run) >= BOUNDARY   # not a comment. a test.
 ```
 
-The bed is cut into as many pieces as there are gaps, each delayed to its wall
-position, and the source audio is muted wherever the bed plays. **Nothing is
-mixed on top of anything**: at every instant exactly one of the two is audible.
-That is what "pause the song" means, and it is not what ducking would do — a
-dense, heavily-limited master has to come down so far to sit under dialogue or
-an action hit that it is a stop with mud on top.
+The Wolves fix pulled 17.8 s from an official trailer rather than reaching
+backwards — which also improved the cut's provenance, because a deliberate
+choice can be made for more than one reason and a fill cannot.
 
-**Choose the pause point by measuring the bed, not by taste.** Scan for
-full-band drops and put the seam in one: *7 Days to the Wolves* has exactly one
-interior silence in 424 s (278.64 → 279.64 s, ending 23 ms before a downbeat),
-and a stop placed there costs the music nothing because the artist already
-stopped. Where no natural gap exists, snap the seam to a downbeat so the resume
-lands on a bar.
+### Excisions: derive the in-point, never write it down
 
-Verify it landed, rather than trusting the filtergraph: correlate the delivered
-audio against the bed at a known offset. A bed region should return `+1.000`,
-and a paused region should return roughly `0.000`.
+Cutting a dull span out of the middle of an act does not change what the act
+owes the music. Write the excisions as data and **derive** the in-point from
+them:
+
+```python
+CAPTURE_IN = CAPTURE_OUT - ACT_LEN - sum(o - i for i, o, _ in EXCISIONS)
+```
+
+Now dropping another span is a one-line change: the run simply starts earlier,
+the act still fills its span, and no anchor moves. Hard-code the in-point
+instead and every excision becomes a manual re-solve of the whole act — which is
+the arithmetic that produces a short act, and a short act slides every later
+anchor.
 
 ### An authored shotlist, and the invariant it must hold
 
@@ -399,6 +412,8 @@ Two things follow, and both bite:
 | "I'll hand-edit the timings in `cut.json`." | It is a derived artifact and the next run discards your edit. Change the outline or the cap. |
 | "The act came out a bit short, the render will pad it." | It will not. A cut is a concatenation with no absolute timeline, so a short act slides every later shot earlier and every musical anchor with it. |
 | "I'll skip the window extract, it's just one flag." | Output seeking decodes from the file start. A clip at 24:00 in a 30-minute source costs ~40s of decode, every time. |
+| "The act is short, I'll loop the pool / start the run earlier to fill it." | That is not filling, it is choosing footage blind. It is how 25 shots got replayed and how a Savathûn montage entered a no-Savathûn film. Name the extra source and assert the boundary. |
+| "The pause is in the right place but feels wrong, so I'll move it." | Position and length are separate faults. Measure the insert's phrase and fix the out-point first. |
 | "I'll just cut the bits we don't want, then judge the timing." | You have thrown away the thing you were going to judge. Black them out in place at their exact duration first — a timing pass keeps every later anchor where it will actually land. |
 | "Duck the song under the action beat, it's simpler than pausing." | A −6.8 LUFS master has to drop ~18 dB to sit under anything, which is a stop with mud on top. Pause it, and put the seam in a gap the artist already left. |
 | "The card is just black with text, I'll drop it." | Dropping it shortens the film and loses the rhythm the trailer had. Replace it with artwork; the slot is the point. |
@@ -428,6 +443,10 @@ Two things follow, and both bite:
 - A marker card that has grown chrome, a name, or a role. It is a slate, not a
   plate.
 - Cutting dozens of clips out of a long source without extracting the window.
+- **Any code path that extends a run to make a span add up.** Ask what it picked
+  up. This is the single failure that has breached the most editorial rules here.
+- A hard-coded in-point in an act that has excisions. Derive it, or the next
+  excision silently shortens the act.
 
 ## Verification
 
@@ -437,6 +456,21 @@ python3 -m pytest -q tests/test_story.py tests/test_render.py
 # the rendered cut is what the cut list said it would be
 ffprobe -v error -show_entries format=duration -of csv=p=0 renders/<name>.mp4
 ```
+
+For a scored cut, prove the audio landed rather than trusting the filtergraph —
+correlate the delivered file against the bed at a known offset:
+
+- a bed region returns **+1.000**
+- a paused region returns roughly **0.000**
+- after a pause, the offset is `bed_offset + total paused so far`
+
+Checklist before calling a cut done:
+
+- [ ] every act's measured length equals the span it was written for
+- [ ] no shot appears twice
+- [ ] no run begins before a boundary an editorial rule depends on
+- [ ] every marked span is exactly as long as the material it stands in for
+- [ ] anchors asserted against bed time, not wall time
 
 ## Delivery
 
