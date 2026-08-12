@@ -4,7 +4,8 @@ The whole show as **one continuous video**, assembled from the finished cuts and
 announced by act slides in the Wolves cinematic's own chrome.
 
 **Status: v0.5 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.5.mp4`,
-**1236.971 s (20:37.0)** against a planned 1236.892, seven of the eight acts. The owner asked for "one
+**20:21.9** planned, seven of the eight acts on six slides — acts IV and V
+share one. The last *built* file is 20:37.0 and predates that merge. The owner asked for "one
 supercut with everything that we have", and .5 is their name for it.
 
 It is **not the feature**. Act VIII, the credits, is not designed (#51), so the
@@ -36,17 +37,16 @@ after act I by 312.967 s, which is the worked example of why.
 | **II** | 121.567 | 429.534 | **Endless Forms Most Beautiful** — the live-action trailers, one song end to end | `Prod/02-…` |
 | — | 429.534 | 434.534 | Slide **III** — `Bob Killen` / *Voidwalker Warlock* | rendered |
 | **III** | 434.534 | 594.734 | **mrbobbytables** — August 2026 contributors | `Prod/03-…` |
-| — | 594.734 | 609.734 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
+| — | 594.734 | 609.734 | Slide **IV–V** — the terminal block, both titles, held 15s | rendered |
 | **IV** | 609.734 | 643.734 | **Kat Cosgrove** — Guardian intro | `Prod/04-…` |
-| — | 643.734 | 658.734 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
-| **V** | 658.734 | 683.992 | **Natali Vlatko** — Guardian arrival | `Prod/05-…` |
-| — | 683.992 | 688.992 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
-| **VI** | 688.992 | 1121.692 | **Seven Days to the Wolves** — the musical (timing pass) | `Prod/06-…` |
-| — | 1121.692 | 1126.692 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
-| **VII** | 1126.692 | 1236.892 | **Europa Director's Cut** | `Prod/07-…` |
+| **V** | 643.734 | 668.992 | **Natali Vlatko** — Guardian arrival, straight off act IV | `Prod/05-…` |
+| — | 668.992 | 673.992 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
+| **VI** | 673.992 | 1106.692 | **Seven Days to the Wolves** — the musical (timing pass) | `Prod/06-…` |
+| — | 1106.692 | 1111.692 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
+| **VII** | 1111.692 | 1221.892 | **Europa Director's Cut** | `Prod/07-…` |
 | **VIII** | — | — | Credits — **not designed** (#51) | — |
 
-**1236.892s planned, 1236.971s built — 20:37.0**, output to
+**1221.892s planned — 20:21.9**, output to
 `~/Videos/Wolves/megacut/`. The 79 ms is act II's audio leg outrunning its
 video leg by 31 ms plus per-segment rounding; it does not accumulate, and every
 act slide lands within a second of its mark. Every act plays

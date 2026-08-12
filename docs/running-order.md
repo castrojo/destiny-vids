@@ -19,8 +19,8 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the comic card | delivered |
 | **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers | delivered, in the programme |
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
-| **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change |
-| **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered |
+| **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
+| **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
 | **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **timing pass**, provenance open — #55 |
 | **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; its master clips — #82 |
 | **VIII** | Credits | — | **not designed** — #51 |
@@ -35,6 +35,12 @@ permanently, whatever gets built later.
 delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
 and its own place on the clock. Seven of the eight acts now play, which is what
 **v0.5** is.
+
+**Acts IV and V share one slide.** The owner's call: their films run 34 s and
+25 s, and two slides held 15 s each announced 59 s of picture. The slide carries
+**both** authored titles at equal weight and both acts keep their numerals and
+their films — it merges the announcement, not the acts. It is one chapter marker
+because a chapter starts on its slide, and there is now one slide.
 
 **One person, one act.** `mrbobbytables` appears once, at III. An earlier pass
 had him twice — as an empty act and as another act's film under his character's
@@ -54,14 +60,14 @@ python3 tools/megacut.py stories/megacut/megacut.json --chapters
 0:00  I. Project Bluefin
 1:56  II. Endless Forms Most Beautiful
 7:09  III. Bob Killen
-9:54  IV. Bias for Action
-10:43 V. Wrong Place, Wrong Time, Right Attitude
-11:23 VI. 7 Days to the Wolves
-18:41 VII. Europa
+9:54  IV–V. Bias for Action / Wrong Place, Wrong Time, Right Attitude
+11:08 VI. 7 Days to the Wolves
+18:26 VII. Europa
 ```
 
-That is **v0.5**, 20:36.9. Every stamp after act I moved when act II was wired
-in — which is exactly why they are derived and never typed.
+**20:21.9**, six markers for seven acts. Every stamp after act I moved when act
+II was wired in, and everything after act III moved again when acts IV and V
+were given one slide — which is exactly why they are derived and never typed.
 
 A chapter starts on its **act slide**, not on the film behind it: the slide is
 how the audience is told which act this is. The list regenerates from the plan's

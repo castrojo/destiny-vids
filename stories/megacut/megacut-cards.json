@@ -61,12 +61,12 @@
       "subtitle": "Voidwalker Warlock"
     },
     {
-      "id": "act4",
+      "id": "act4-5",
       "kind": "act",
       "at": 594.734,
       "dur": 15.0,
-      "act": "IV",
-      "title": "Bias for Action",
+      "act": "IV–V",
+      "label": "Acts IV and V",
       "body": [
         "The Knightly Order of Kubernetes sends a lone titan on a secret mission",
         "Destination: Europa",
@@ -74,30 +74,16 @@
         "TAB Authorization: [ DENIED ]",
         "CNCF Authorization: [ UNAUTHORIZED ]"
       ],
-      "chapters": [],
-      "note": "OWNER-AUTHORED, verbatim, this session -- title and all five terminal lines. Held 15s, three times every other card, because the owner asked for it: 'Hold that slide for a long time it's a transition inbetween videos.' It carries no eyebrow and no subtitle: the owner wrote a title and a terminal block, so a title and a terminal block is what it shows. CHAPTERS: deliberately none. This act runs 34s/25s as one continuous scene; a contents list for it would be longer than the thing it indexes."
-    },
-    {
-      "id": "act5",
-      "kind": "act",
-      "at": 643.734,
-      "dur": 15.0,
-      "act": "V",
-      "title": "Wrong Place, Wrong Time, Right Attitude",
-      "body": [
-        "The Knightly Order of Kubernetes sends a lone titan on a secret mission",
-        "Destination: Europa",
-        "TOC Authorization: [ DENIED ]",
-        "TAB Authorization: [ DENIED ]",
-        "CNCF Authorization: [ UNAUTHORIZED ]"
+      "chapters": [
+        "IV   Bias for Action — Kat Cosgrove",
+        "V    Wrong Place, Wrong Time, Right Attitude — Natali Vlatko"
       ],
-      "chapters": [],
-      "note": "OWNER-AUTHORED, verbatim: the title, and the instruction that this slide carries the SAME terminal block as act IV -- 'make the slide with the unauthorized etc be the same for Natali and change the title to \"Wrong Place, Wrong Time, Right Attitude\"'. So the five lines are act IV's, copied unchanged, including 'Destination: Europa': they are the same authorisation readout, not a per-act rewrite, and rewriting one line of it would be authoring copy nobody wrote. Like act IV it carries no eyebrow and no subtitle -- Natali's authored identity is on her own reveal card inside the cut. HELD 15s, matching act IV: identical copy, and the owner's reason for that hold ('it's a transition inbetween videos') applies to this one too. See `unresolved` -- the hold is the one thing here that was inferred rather than said. CHAPTERS: deliberately none. This act runs 34s/25s as one continuous scene; a contents list for it would be longer than the thing it indexes."
+      "note": "ONE slide for two acts, owner instruction: 'give kat/nat one slide since those videos are short'. Their films run 34.0s and 25.3s; two 15s slides announced 59.3s of picture, which is what that note is about. It saves 15s of the programme. Both acts KEEP their numerals and their films -- this merges the announcement, not the acts. The two authored titles are carried at EQUAL weight in the contents list rather than one being promoted to the big title row and the other demoted to the subtitle row: they are two act titles the owner wrote for two acts, not a title and its subtitle, and the owner's own instruction for act V was that its slide be act IV's with the title changed -- a matched pair. A variant with 'Bias for Action' big and the other as a subtitle renders fine and is a one-line change if the owner prefers it. The terminal block is act IV's five lines, unchanged and still shared, which is why the two slides collapsed cleanly: they differed only in title."
     },
     {
       "id": "act6",
       "kind": "act",
-      "at": 683.992,
+      "at": 668.992,
       "dur": 5.0,
       "act": "VI",
       "label": "Act VI",
@@ -115,7 +101,7 @@
     {
       "id": "act7",
       "kind": "act",
-      "at": 1121.692,
+      "at": 1106.692,
       "dur": 5.0,
       "act": "VII",
       "label": "Act VII",
@@ -155,7 +141,13 @@
       "detail": "The owner asked for act V to carry act IV's terminal block and a new title, and said nothing about its length. It is held 15s like act IV, because the copy is identical and five lines plus a nine-word title do not read in five seconds. That is an inference about pacing, not an instruction -- recorded so it can be cut back without archaeology.",
       "automatable": "no",
       "blocked_on": "the owner's eye on the assembled programme."
+    },
+    {
+      "what": "which title leads the merged act IV-V slide",
+      "detail": "The merged slide carries both authored titles at equal weight in its contents list. If the owner wants the slide to LEAD with one of them -- big title row, the other as the subtitle -- that is a two-field change on the `act4-5` entry (`title` and `subtitle`) and it was deliberately not chosen here, because picking which act's title is the headline is an editorial call about two people's acts.",
+      "automatable": "no",
+      "blocked_on": "the owner, if they want a hierarchy rather than a pair."
     }
   ],
-  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | intro 5.000-116.567 | act2 116.567-121.567 | endlessformsmostbeautiful 121.567-429.534 | act3 429.534-434.534 | mrbobbytables 434.534-594.734 | act4 594.734-609.734 | kat 609.734-643.734 | act5 643.734-658.734 | nat 658.734-683.992 | act6 683.992-688.992 | 7daystothewolves 688.992-1121.692 | act7 1121.692-1126.692 | europa 1126.692-1236.892. Total 1236.892s (20:36.9). Recomputed 2026-08-12 when act II was wired in; every stamp after act I moved, which is why nothing here is typed by hand -- re-derive with `python3 tools/megacut.py stories/megacut/megacut.json --chapters`."
+  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | intro 5.000-116.567 | act2 116.567-121.567 | endlessformsmostbeautiful 121.567-429.534 | act3 429.534-434.534 | mrbobbytables 434.534-594.734 | act4-5 594.734-609.734 | kat 609.734-643.734 | nat 643.734-668.992 | act6 668.992-673.992 | 7daystothewolves 673.992-1106.692 | act7 1106.692-1111.692 | europa 1111.692-1221.892. Total 1221.892s (20:21.9). Recomputed 2026-08-12 when acts IV and V were given ONE slide; the programme lost 15s and every stamp after act III moved. Nothing here is typed by hand -- re-derive with `python3 tools/megacut.py stories/megacut/megacut.json --chapters`."
 }

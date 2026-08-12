@@ -61,7 +61,11 @@ def test_the_act_slides_are_numbered_in_the_owners_canonical_order():
     -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII)."""
     cards = _load("megacut-cards.json")
     numerals = [p["act"] for p in cards["plates"]]
-    assert numerals == ["I", "II", "III", "IV", "V", "VI", "VII"]
+    # Acts IV and V share ONE slide -- the owner's call, because their films run
+    # 34s and 25s and two 15s slides announced 59s of picture. The numerals are
+    # still both there and still in order: this merged the announcement, not the
+    # acts, and nothing renumbered around it.
+    assert numerals == ["I", "II", "III", "IV\u2013V", "VI", "VII"]
     # VIII is absent because it has no film, and it must stay recorded, or the
     # numbering silently closes up over it. Act II was in the same state until
     # its film was built; a slide is added when the act plays, never before.

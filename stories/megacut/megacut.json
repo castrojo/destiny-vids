@@ -74,23 +74,16 @@
     },
     {
       "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act4.png",
+      "image": "renders/plates-megacut-cards/plate_act4-5.png",
       "dur": 15.0,
-      "label": "IV — BIAS FOR ACTION (held long, by owner request)",
-      "chapter": "IV. Bias for Action"
+      "label": "IV–V — Kat Cosgrove and Natali Vlatko, announced together (held long, by owner request)",
+      "chapter": "IV–V. Bias for Action / Wrong Place, Wrong Time, Right Attitude"
     },
     {
       "kind": "clip",
       "path": "/var/home/jorge/Videos/Wolves/Prod/04-kat.mp4",
       "audio": "source",
       "label": "Act IV — Kat Cosgrove: Guardian intro"
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act5.png",
-      "dur": 15.0,
-      "label": "V — WRONG PLACE, WRONG TIME, RIGHT ATTITUDE (held long, matching act IV)",
-      "chapter": "V. Wrong Place, Wrong Time, Right Attitude"
     },
     {
       "kind": "clip",
