@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Act slide</title>
+<style>
+  /*
+   * The act slide: the Wolves cinematic's own handoff card, the one that reads
+   *
+   *     // Deploy CNCF Projects Team, scramble all Guardians.
+   *
+   * between songs. Nothing here is designed. Every rule below is COPIED from
+   * `projectbluefin/website`:
+   *
+   *   src/components/wolves/cinematic/CinematicTransition.vue  (the card)
+   *   src/style/wolves-cinematic.scss                          (the tokens)
+   *
+   * -- the same way ~/Videos/wolves-{kat,natali}/render/reveal.html and
+   * nimbatus-review/render/endcard.html copy the plate CSS rather than
+   * re-implementing it. Read those files before changing a value here; the
+   * site is authoritative and this is a reproduction of it.
+   *
+   * Two deliberate differences, both the owner's, both additive:
+   *
+   *   - a HUGE Roman numeral naming the act ("Give them Huge Roman numbers in
+   *     the intro slides");
+   *   - a `chapters` list under the title ("each will have chapters").
+   *
+   * Rendered at 1920x1080 with a transparent background, so a card is either
+   * flattened onto black as a programme item (tools/megacut.py) or composited
+   * over footage (tools/plate.py burn). Copy arrives in the query string; a
+   * row nobody authored is left out of the URL and does not render.
+   */
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  /* --- src/style/wolves-cinematic.scss ------------------------------------ */
+  :root {
+    --wc-gold: #60a5fa;
+    --wc-white: #e9e9e5;
+    --wc-grey: #8b8f96;
+    --wc-line: rgb(96 165 250 / 28%);
+    --wc-font-display: 'Inter', 'Arial Narrow', sans-serif;
+    --wc-font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace;
+  }
+
+  /* .wc-transition-overlay */
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--wc-font-display);
+    background: radial-gradient(
+      ellipse 78% 68% at 50% 50%,
+      rgb(6 7 10 / 88%) 0%,
+      rgb(6 7 10 / 74%) 52%,
+      rgb(6 7 10 / 34%) 100%
+    );
+  }
+
+  /* .wc-transition-frame */
+  .frame {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    width: min(64rem, 90vw);
+    padding: 2.4rem;
+    border-left: 2px solid var(--wc-gold);
+    text-shadow: 0 0.1rem 0.6rem rgb(0 0 0 / 85%);
+  }
+
+  /* The act numeral. Sized off .wc-transition-title's own clamp() so it stays
+     in the card's type system: the title tops out at 4.6rem, and the numeral
+     is the display size above it. */
+  .numeral {
+    margin: 0;
+    font-size: clamp(6rem, 12vw, 11rem);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    color: var(--wc-white);
+  }
+
+  /* .wc-transition-terminal */
+  .terminal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-family: var(--wc-font-mono);
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    color: #7fd4d4;
+  }
+  .terminal-line { display: block; }
+
+  /* .wc-hairline */
+  .hairline { height: 1px; background: var(--wc-line); }
+
+  /* .wc-label */
+  .label {
+    font-family: var(--wc-font-mono);
+    font-size: 1.1rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--wc-gold);
+  }
+
+  /* .wc-transition-title */
+  .title {
+    margin: 0;
+    font-size: clamp(2.8rem, 5vw, 4.6rem);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--wc-white);
+    line-height: 1.1;
+  }
+
+  /* .wc-transition-artist */
+  .artist {
+    margin: 0;
+    font-family: var(--wc-font-mono);
+    font-size: 1.5rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--wc-grey);
+  }
+
+  /* The chapters list. Set in the terminal face at the artist's colour: it is
+     a contents list, not a second title. */
+  .chapters {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--wc-font-mono);
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    color: var(--wc-grey);
+  }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <p class="numeral hidden" id="numeral"></p>
+    <div class="terminal hidden" id="terminal"></div>
+    <div class="hairline hidden" id="hairline"></div>
+    <span class="label hidden" id="label"></span>
+    <h2 class="title hidden" id="title"></h2>
+    <p class="artist hidden" id="artist"></p>
+    <ul class="chapters hidden" id="chapters"></ul>
+  </div>
+<script>
+  const params = new URLSearchParams(window.location.search)
+
+  function fill(id, value) {
+    const el = document.getElementById(id)
+    if (!value) { return false }
+    el.textContent = value
+    el.classList.remove('hidden')
+    return true
+  }
+
+  function fillList(id, values, tag) {
+    const el = document.getElementById(id)
+    if (!values.length) { return false }
+    for (const value of values) {
+      const row = document.createElement(tag)
+      row.className = id === 'terminal' ? 'terminal-line' : 'chapter'
+      row.textContent = value
+      el.appendChild(row)
+    }
+    el.classList.remove('hidden')
+    return true
+  }
+
+  fill('numeral', params.get('act'))
+  const terminal = fillList('terminal', params.getAll('body'), 'span')
+  const label = fill('label', params.get('label'))
+  const title = fill('title', params.get('title'))
+  const artist = fill('artist', params.get('subtitle'))
+  const chapters = fillList('chapters', params.getAll('chapters'), 'li')
+  // The site draws the hairline between the terminal block and the titles; with
+  // nothing on one side of it, a rule is chrome for its own sake.
+  if (terminal && (label || title || artist || chapters)) {
+    document.getElementById('hairline').classList.remove('hidden')
+  }
+
+  document.fonts.ready.then(() => { window.__renderReady = true })
+</script>
+</body>
+</html>
