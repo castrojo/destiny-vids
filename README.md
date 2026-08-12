@@ -252,10 +252,11 @@ not dropped — they land on the tail roster card.
 Cadence alone only thins the intro; what actually spreads the names is the
 **outline**, because a contributor can only be plated where an ensemble shot
 plays. To move a credit, move the beat: `stories/osiris-sagira.txt` deals its
-Guardian beats out across the story (the courtyard pillars, the Guardian atop
-the Vex spire, the fall through crossing beams) instead of running them off at
-the top. Check the result before rendering — `plan` prints every plate it
-placed, in order:
+five Guardian beats out across the story — the crouch-run, the Guardian
+suspended in void light, the courtyard pillars, the Vex spire, the fall through
+crossing beams — so each one can carry a contributor plate instead of four of
+them going by in the first twelve seconds. Check the result before rendering;
+`plan` prints every plate it placed, in order:
 
 ```bash
 python3 tools/story.py stories/osiris-sagira.txt --dir segments --format json --out cut.json
