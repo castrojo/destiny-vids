@@ -137,9 +137,24 @@ already been learned the hard way and must not be re-learned:
 - The bed's gain is **derived from its measured true peak**, never hardcoded and
   never normalised. `tools/redact.py`'s `gain_for_headroom` exists because a
   hardcoded `0.9` shipped a **+0.5 dBTP** clipping master.
-- The contributors piece is **stereo AAC on purpose** (its bed is a lossy MP3
-  source); the Guardian intros are 5.1 from lossless sources. Do not "fix" one
-  into the other.
+- **That alone is not enough: check the DELIVERED peak, not the bed's.** A lossy
+  encoder reconstructs inter-sample peaks above the samples it is given, so a
+  mix measuring −1.1 dBTP came back from AAC at **+0.3 dBTP** — clipping, from a
+  chain correct at every earlier step. How much it overshoots depends on the
+  material (0.2 dB on one bed, 1.5 dB on another). `redact.py` now measures the
+  output and re-runs at a corrected **static** gain until it has headroom;
+  corrections only go down and stop at the first safe result, because the
+  overshoot is not monotonic in the gain. A FLAC build of the same cut lands on
+  target in one pass, which is how you know it is the encoder.
+- The contributors piece is **stereo AAC on purpose**; the Guardian intros are
+  5.1. Do not "fix" one into the other. Its bed was re-sourced off the best
+  Opus rung in 2026-08 (it had been a transcoded MP3), so the "lossy MP3 bed"
+  note in older docs is stale.
+- `ACODEC=flac` builds a **lossless master** alongside the deliverable, so a
+  later fold-down starts from the bed rather than from a lossy file. The
+  default stays `aac`, and the defaults must keep rebuilding the shipped file.
+  The standard and the checker live in `~/Videos/AUDIO.md` and
+  `~/Videos/audio-check.sh`.
 - Prove it, don't assert it: `framemd5` proves an audio change touched no
   frames, an audio-stream MD5 proves a picture change touched no audio,
   `-xerror` proves the file is not truncated, `volumedetect` proves it is not
