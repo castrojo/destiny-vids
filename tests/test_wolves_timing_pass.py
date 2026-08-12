@@ -31,14 +31,14 @@ def test_bed_is_consumed_exactly(cut):
 
 
 def test_film_is_longer_than_its_song(cut):
-    """A musical with a pre-roll and a pause is longer than the record it uses.
+    """A musical with a pause in it is longer than the record it uses.
 
     This is the whole point of the two clocks; if these are ever equal, someone
     has quietly gone back to asserting against wall time.
     """
     regions = plan_regions(cut["shots"], cut["bed_offset_sec"])
     wall = sum(s["duration"] for s in cut["shots"])
-    assert wall > total_bed(regions) + 20
+    assert wall > total_bed(regions) + 1.0
 
 
 def test_anchors_land_on_bed_time(cut):
@@ -102,6 +102,13 @@ def test_every_run_is_a_forward_run(cut):
             shot["duration"], abs=0.002)
 
 
+def test_the_song_plays_from_the_first_frame(cut):
+    """No pre-roll: the film opens on the song, under the title card."""
+    assert cut["bed_offset_sec"] == 0.0
+    assert cut["shots"][0]["audio"] == "bed"
+    assert cut["shots"][0].get("still"), "the film opens on the title card"
+
+
 def test_act_one_stops_at_the_end_of_the_cinematic(cut):
     """The capture ends at source 3:23; past it lie the fade and another trailer."""
     act1 = [s for s in cut["shots"] if s.get("video_id") == "wolves_act1"]
@@ -115,8 +122,8 @@ def test_the_pause_consumes_no_bed_time(cut):
     assert paused, "the cut has no source-audio moment"
     regions = plan_regions(cut["shots"], cut["bed_offset_sec"])
     src = [r for r in regions if r["kind"] == "source"]
-    assert len(src) == 2, "expected a pre-roll and one pause"
-    assert "bed_start" not in src[0] and "bed_start" not in src[1]
+    assert len(src) == 1, "the pause is the cut's only source-audio moment"
+    assert "bed_start" not in src[0]
 
 
 def test_bed_resumes_where_it_stopped(cut):
@@ -129,13 +136,13 @@ def test_bed_resumes_where_it_stopped(cut):
 
 def test_plan_rejects_a_disagreeing_offset(cut):
     with pytest.raises(ValueError):
-        plan_regions(cut["shots"], bed_offset=0.0)
+        plan_regions(cut["shots"], bed_offset=99.0)
 
 
 def test_filter_delays_each_bed_piece_to_its_wall_position(cut):
     regions = plan_regions(cut["shots"], cut["bed_offset_sec"])
     graph = build_filter(regions, bed_gain_db=-3.5)
-    assert "adelay=20166|20166" in graph
+    assert "adelay=0|0" in graph
     assert "volume=-3.5dB" in graph
     # The source is muted under the bed, never mixed with it.
     assert "volume=0:enable=" in graph
@@ -173,3 +180,32 @@ def test_plate_slots_are_flagged_for_the_nameplate_pass(cut):
     assert len(slots) >= 3, "Guardians-together runs should be flagged"
     for shot in slots:
         assert shot["duration"] >= 5.0, "a plate needs time to be read"
+
+
+def test_act_two_never_reaches_back_into_savathuns_throne_world(cut):
+    """Neomuna starts at extract 45.55; before it is Witch Queen material.
+
+    An earlier build filled Act II by starting the run 16 s early, which pulled
+    in Savathun's Throne World and the WITCH QUEEN branded cards -- a standing
+    no-Savathun violation produced purely by needing to fill time. The shortfall
+    is covered by the official Lightfall trailer instead, so the compilation run
+    may never begin before the boundary.
+    """
+    from scripts.build_wolves import COMP, NEOMUNA_IN
+
+    comp = [s for s in cut["shots"] if s.get("video_id") == COMP]
+    assert comp, "Act II lost its source"
+    assert min(s["start_sec"] for s in comp) >= NEOMUNA_IN - 0.001
+
+
+def test_the_gallop_cuts_to_neon(cut):
+    """The gallop is a picture change, not just a beat: it lands on Neomuna."""
+    bed = 0.0
+    for shot in cut["shots"]:
+        if shot["audio"] == "source":
+            continue
+        if abs(bed - cut["anchors"]["act2_gallop_in"]) < 0.02:
+            assert "neon" in shot["beat"].lower()
+            return
+        bed += shot["duration"]
+    raise AssertionError("no shot starts on the gallop")

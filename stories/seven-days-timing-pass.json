@@ -2,7 +2,7 @@
  "title": "Seven Days to the Wolves",
  "kind": "timing_pass",
  "bed": "bed_seven_days_to_the_wolves",
- "bed_offset_sec": 20.166,
+ "bed_offset_sec": 0.0,
  "bed_gain_db": -3.5,
  "anchors": {
   "act2_gallop_in": 182.834,
@@ -19,40 +19,63 @@
    "segment_id": "card_000",
    "still": "/var/home/jorge/src/destiny-vids/renders/markers/title-project-bluefin-seven-days-to-the-wolves-e9f32c80.png",
    "duration": 10.0,
-   "beat": "TITLE CARD (over the source's Destiny logo, 0:00-0:10)",
-   "audio": "source"
-  },
-  {
-   "segment_id": "wolves_act1_0010_000",
-   "video_id": "wolves_act1",
-   "start_sec": 10.0,
-   "end_sec": 20.166,
-   "duration": 10.166,
-   "start_tc": "0:10.0",
-   "end_tc": "0:20.2",
-   "beat": "PRE-ROLL: the cinematic in its own audio; the song enters at the end",
-   "audio": "source"
-  },
-  {
-   "segment_id": "wolves_act1_0020_166",
-   "video_id": "wolves_act1",
-   "start_sec": 20.166,
-   "end_sec": 203.0,
-   "duration": 182.834,
-   "start_tc": "0:20.2",
-   "end_tc": "3:23.0",
-   "beat": "I. intro capture, continuous to source 3:23.0",
+   "beat": "TITLE CARD (the film's own logo; the source's is never shown)",
    "audio": "bed"
   },
   {
-   "segment_id": "wolves_act2_0029_344",
+   "segment_id": "wolves_act1_0030_166",
+   "video_id": "wolves_act1",
+   "start_sec": 30.166,
+   "end_sec": 203.0,
+   "duration": 172.834,
+   "start_tc": "0:30.2",
+   "end_tc": "3:23.0",
+   "beat": "I. intro capture, continuous from source 0:30.2 to 3:23.0",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "yt_destiny_2_lightfall_launch_trailer_0044_910",
+   "video_id": "yt_destiny_2_lightfall_launch_trailer",
+   "start_sec": 44.91,
+   "end_sec": 48.21,
+   "duration": 3.3,
+   "start_tc": "0:44.9",
+   "end_tc": "0:48.2",
+   "beat": "II. the gallop cuts to neon -- Neomuna's neon skyline, establishing",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "yt_destiny_2_lightfall_launch_trailer_0052_050",
+   "video_id": "yt_destiny_2_lightfall_launch_trailer",
+   "start_sec": 52.05,
+   "end_sec": 53.45,
+   "duration": 1.4,
+   "start_tc": "0:52.0",
+   "end_tc": "0:53.5",
+   "beat": "II. a Guardian in a rain-slick Neomuna alley",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "yt_destiny_2_lightfall_launch_trailer_0072_940",
+   "video_id": "yt_destiny_2_lightfall_launch_trailer",
+   "start_sec": 72.94,
+   "end_sec": 85.996,
+   "duration": 13.056,
+   "start_tc": "1:12.9",
+   "end_tc": "1:26.0",
+   "beat": "II. into the Strand: Guardians over the neon city",
+   "audio": "bed",
+   "plate_slot": true
+  },
+  {
+   "segment_id": "wolves_act2_0047_100",
    "video_id": "wolves_act2",
-   "start_sec": 29.344,
+   "start_sec": 47.1,
    "end_sec": 105.9,
-   "duration": 76.556,
-   "start_tc": "0:29.3",
+   "duration": 58.8,
+   "start_tc": "0:47.1",
    "end_tc": "1:45.9",
-   "beat": "II. Neomuna, unbroken from source 23:29.3 -- three Guardians advancing, straight through to the crash",
+   "beat": "II. Neomuna, unbroken from source 23:47.1 straight through to the crash",
    "audio": "bed",
    "plate_slot": true
   },
@@ -68,14 +91,14 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_005",
+   "segment_id": "card_007",
    "still": "/var/home/jorge/src/destiny-vids/renders/markers/comic-placeholder-4-33-4-37-enemy-cu-9cd1d516.png",
    "duration": 3.51,
    "beat": "III. COMIC PLACEHOLDER over the enemy close-up",
    "audio": "bed"
   },
   {
-   "segment_id": "card_006",
+   "segment_id": "card_008",
    "still": "/var/home/jorge/Pictures/Artwork/wolves.jpg",
    "duration": 2.661,
    "beat": "III. ARTWORK held through the HOWL and the 278.64-279.66s silence; picture returns on the slam",
@@ -105,7 +128,7 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_009",
+   "segment_id": "card_011",
    "still": "/var/home/jorge/src/destiny-vids/renders/markers/comic-placeholder-7-raids-card-39d605b4.png",
    "duration": 1.9,
    "beat": "III. COMIC PLACEHOLDER over the 7 RAIDS card",
@@ -123,7 +146,7 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_011",
+   "segment_id": "card_013",
    "still": "/var/home/jorge/src/destiny-vids/renders/markers/comic-placeholder-endless-buildcrafting--718d0698.png",
    "duration": 2.0,
    "beat": "III. COMIC PLACEHOLDER over the ENDLESS BUILDCRAFTING card",
@@ -141,7 +164,7 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_013",
+   "segment_id": "card_015",
    "still": "/var/home/jorge/src/destiny-vids/renders/markers/comic-placeholder-countless-legends-card-063a771f.png",
    "duration": 2.0,
    "beat": "III. COMIC PLACEHOLDER over the COUNTLESS LEGENDS card",
@@ -194,7 +217,7 @@
    "plate_slot": true
   },
   {
-   "segment_id": "card_018",
+   "segment_id": "card_020",
    "still": "/var/home/jorge/Pictures/Artwork/wolves.jpg",
    "duration": 12.293,
    "beat": "ARTWORK (outro, over the fade)",
