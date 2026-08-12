@@ -222,6 +222,14 @@ leads:
       # Destiny name is UNCONFIRMED — the binding is keyed on the description so
       # the casting is not blocked on identifying her. Rename this key (and add
       # the old id to `aka`) once the character is pinned down.
+      #
+      # NO `plate:` ON PURPOSE. Paris has owner-written nameplate copy, but it is
+      # a Guardian plate for Paris, not copy for an Iron Lord — and what a
+      # character says on screen is authored, never derived or adapted. So she is
+      # cast but plate-only, and tools/plate.py reports her under `unresolved`
+      # (`no_plate_copy`) every time she makes a cut, rather than dropping the
+      # credit. Writing copy in here is the owner's call, and the only thing that
+      # closes it.
       person: paris_pittman
       display_name: Paris Pittman
       aka: [red_haired_iron_lord, dying_iron_lord]

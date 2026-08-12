@@ -217,6 +217,8 @@ LEADS = {
                          "kind": "ghost"}},
     "zavala": {"person": "kelsey_hightower", "display_name": "Kelsey Hightower",
                "aka": [], "constraints": {}, "plate": None},
+    "ikora_rey": {"person": None, "display_name": None, "aka": [],
+                  "constraints": {}, "plate": None},
 }
 
 
@@ -245,6 +247,45 @@ def test_plan_plates_each_lead_once_on_first_appearance():
 def test_plan_skips_a_lead_with_no_plate_copy():
     """A binding without `plate:` in the vocab simply gets no plate."""
     assert plate.plan([_shot("s1", 0, 8, "lead", "zavala")], LEADS) == []
+
+
+def test_plan_reports_an_unplated_lead_instead_of_dropping_them():
+    """A credit that vanishes without a word is how a real person goes uncredited.
+
+    Neither reason is fixable by a tool: writing plate copy and casting a person
+    are both owner decisions, so the punch-list asks rather than guesses.
+    """
+    shots = [_shot("s1", 0, 8, "lead", "zavala"),
+             _shot("s2", 8, 16, "lead", "ikora_rey")]
+    unresolved = []
+    assert plate.plan(shots, LEADS, unresolved=unresolved) == []
+
+    by_id = {u["id"]: u for u in unresolved}
+    assert by_id["zavala"]["reason"] == "no_plate_copy"
+    assert by_id["zavala"]["display_name"] == "Kelsey Hightower"
+    assert by_id["ikora_rey"]["reason"] == "uncast"
+    assert by_id["ikora_rey"]["person"] is None
+    for entry in unresolved:
+        assert entry["automatable"] is False
+        assert entry["blocked_on"]
+
+
+def test_plan_reports_a_lead_the_cut_never_gave_a_window():
+    """Unlike the copy-shaped reasons, this one a re-plan can actually fix."""
+    shots = [_shot("s1", 0, 0.5, "lead", "sagira"), _shot("s2", 0.5, 20.0)]
+    unresolved = []
+    assert plate.plan(shots, LEADS, unresolved=unresolved) == []
+    assert [(u["id"], u["reason"]) for u in unresolved] == [("sagira", "no_window")]
+    assert unresolved[0]["automatable"] is True
+
+
+def test_plan_does_not_report_a_lead_a_later_shot_carried():
+    """A first appearance too short to plate is not a miss if a later one holds."""
+    shots = [_shot("s1", 0, 0.5, "lead", "osiris"), _shot("s2", 0.5, 20, "lead", "osiris")]
+    unresolved = []
+    entries = plate.plan(shots, LEADS, unresolved=unresolved)
+    assert [e["id"] for e in entries] == ["osiris"]
+    assert unresolved == []
 
 
 def test_plan_skips_a_shot_that_fails_its_binding_constraints():
@@ -628,6 +669,77 @@ def test_placeholder_copy_comes_from_the_vocab_not_the_tool():
             if k not in {"id", "at", "dur", "position"}} == copy
 
 
+def test_plan_reports_contributors_the_tail_could_not_hold():
+    """An empty `unresolved` must mean nobody was missed: when the tail has no
+    room even for the roster card, every name the cut drops goes on the
+    punch-list -- a log line nobody reads is still a silent drop."""
+    shots = [
+        _shot("s1", 0, 2, "ensemble", None, slots=2),
+        _shot("s2", 2, 4, "ensemble", None, slots=2),  # no room for the roster card
+    ]
+    unresolved, logs = [], []
+    entries = plate.plan(shots, LEADS, ROSTER, log=logs.append,
+                         unresolved=unresolved)
+
+    plated = {e["name"] for e in entries}
+    # s1's two slots ride the cut as one staggered group row; nothing after
+    # them fits -- not the other contributors, not even the roster card.
+    assert len(entries) == 2
+    assert {e.get("position") for e in entries} == {"group"}
+    assert {u["display_name"] for u in unresolved} == {
+        c["display_name"] for c in ROSTER["contributors"]} - plated
+    for entry in unresolved:
+        assert entry["reason"] == "no_window"
+        assert entry["automatable"] is True
+    # the human-readable line stays -- the log and the punch-list both tell it
+    assert any("UNCREDITED (no room in the cut)" in line for line in logs)
+
+
+def test_plan_reports_each_lead_reason():
+    """The reason table a reader of `unresolved` relies on: uncast and missing
+    copy are owner decisions; a missing window is not."""
+    shots = [
+        _shot("s1", 0, 0.5, "lead", "sagira"),       # never a window
+        _shot("s2", 0.5, 8.5, "lead", "zavala"),      # binding has no plate copy
+        _shot("s3", 8.5, 16.5, "lead", "ikora_rey"),  # nobody cast
+        _shot("s4", 16.5, 30),
+    ]
+    unresolved = []
+    assert plate.plan(shots, LEADS, unresolved=unresolved) == []
+
+    by_id = {u["id"]: u for u in unresolved}
+    assert by_id["ikora_rey"]["reason"] == "uncast"
+    assert by_id["zavala"]["reason"] == "no_plate_copy"
+    assert by_id["sagira"]["reason"] == "no_window"
+    for entry in unresolved:
+        assert entry["reason"] in plate.UNPLATED
+        vocab_entry = plate.UNPLATED[entry["reason"]]
+        assert entry["detail"] == vocab_entry["detail"]
+        assert entry["automatable"] == vocab_entry["automatable"]
+
+
+def test_plan_cli_reports_the_whole_punch_list(tmp_path, capsys):
+    """The count the CLI prints is the list it writes: a reader who sees
+    '0 unresolved' must be able to trust that nobody went uncredited."""
+    shotlist = tmp_path / "shots.json"
+    shotlist.write_text(json.dumps({"shots": [
+        _shot("s1", 0, 2, "ensemble", None, slots=2),
+        _shot("s2", 2, 4, "ensemble", None, slots=2),
+    ]}))
+    roster = tmp_path / "roster.json"
+    roster.write_text(json.dumps(ROSTER))
+    out = tmp_path / "plates.json"
+
+    assert plate.main(["plan", str(shotlist), "--roster", str(roster),
+                       "--out", str(out)]) == 0
+
+    written = json.loads(out.read_text())
+    assert len(written["unresolved"]) == len(ROSTER["contributors"]) - len(written["plates"])
+    summary = capsys.readouterr().out.strip().splitlines()[-1]
+    assert f"{len(written['plates'])} plate(s)" in summary
+    assert f"{len(written['unresolved'])} unresolved" in summary
+
+
 def test_no_plate_field_is_invented_beyond_the_reference_deck():
     """The reference (~/Videos/nameplates.json) has exactly these text fields.
 
@@ -896,8 +1008,9 @@ def _lead_shot(segment_id, start, end, character="osiris", traversal_hero=False)
                         "slots": 0}}
 
 
-REVEAL_LEADS = {"osiris": {"plate": {"label": "TRUSTEE // GUARDIAN",
-                                     "name": "Bob Killen"}}}
+REVEAL_LEADS = {"osiris": {"person": "mrbobbytables",  # an uncast lead is
+                           "plate": {"label": "TRUSTEE // GUARDIAN",
+                                     "name": "Bob Killen"}}}  # reported, never plated
 
 
 def test_a_reveal_waits_for_the_characters_hero_move():
@@ -951,7 +1064,8 @@ def test_each_lead_is_still_plated_exactly_once():
              _lead_shot("c", 14.0, 20.0, traversal_hero=True),
              _lead_shot("d", 20.0, 26.0, character="sagira")]
     entries = plate.plan(shots, {**REVEAL_LEADS,
-                                 "sagira": {"plate": {"name": "Lindsay Gendreau"}}},
+                                 "sagira": {"person": "lindsay_gendreau",
+                                            "plate": {"name": "Lindsay Gendreau"}}},
                          only="leads")
     assert sorted(e["id"] for e in entries) == ["osiris", "sagira"]
     plate.load_manifest_entries(sorted(entries, key=lambda e: e["at"]))

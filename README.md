@@ -284,6 +284,13 @@ anyone whose shot is too short to hold a plate is credited together on a roster
 title card over the tail, because dropping a month's contributors silently is
 the one unacceptable outcome.
 
+The same goes for a lead the cut could not credit. `plan` writes
+`{"plates": [...], "unresolved": [...]}`, and a lead with no `plate:` copy, or no
+binding at all, is listed in `unresolved` with the reason instead of quietly
+falling out. Nothing blocks — writing copy and casting a person are both owner
+decisions, so the punch-list asks rather than guesses, and a person can stay
+plate-only for as long as that is the right answer.
+
 Plates are anchored to a shot but not confined to it — a lower third routinely
 rides across a cut, and Destiny cinematics are full of two-second shots that
 could otherwise never carry a reveal. Two plates are never visible at once;

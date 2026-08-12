@@ -1,6 +1,6 @@
 ---
 name: plates
-version: "1.1"
+version: "1.2"
 last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
@@ -273,6 +273,20 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   note turned into copy would put the owner's words on whichever real
   contributor landed there. A moment outside the cut is reported, not moved.
 
+`plan` writes `{"plates": [...], "unresolved": [...]}`. A lead who made the cut
+but got no plate lands in `unresolved` rather than disappearing — and so does
+an ensemble contributor even the tail roster card had no room for:
+
+| `reason` | Means | `automatable` |
+|---|---|---|
+| `uncast` | `leads.<character>.person` is null — nobody to credit | `false` — an owner casting decision |
+| `no_plate_copy` | The binding has no `plate:` block, and copy is never invented | `false` — owner-authored copy |
+| `no_window` | No appearance was long enough, or free, to hold a plate | `true` — re-plan, or give them a longer anchor |
+
+Nothing blocks: the manifest is written either way, and `render`/`burn` read the
+`plates` list and ignore the punch-list. Someone being cast but plate-only is a
+legitimate resting state — see [`casting.md`](casting.md).
+
 ### Before a roster exists
 
 ```bash
@@ -294,13 +308,8 @@ squeezed in where it cannot be finished is worse than one less plate.
 `enable='between(t,in,out)'` — and stream-copies audio, so titling never costs
 the soundtrack a second generation. `enable` is FFmpeg's timeline-editing
 option: the expression is evaluated per frame, and the filter passes the frame
-through untouched when it is false.
-
-```text
-smartblur = enable='between(t,10,3*60)'
-```
-
-`source: /websites/ffmpeg_documentation` (timeline editing)
+through untouched when it is false (`source: /websites/ffmpeg_documentation`,
+timeline editing).
 
 ## Showing a conversation
 
@@ -434,6 +443,7 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 | "The plate is short, it can share the screen." | Two plates at once is unreadable; both `plan` and `burn` refuse it. The only exception is a group row, whose members are built to be seen together. |
 | "The shot is only two seconds, so nobody can be plated there." | The plate rides across the cut. Only the *anchor* must be long enough to register. |
 | "I'll put a plausible name on the placeholder so it looks finished." | A plate names a real person. `TBD` is the honest answer until a roster exists. |
+| "No copy for this lead? Write them something." | Then the plate says what nobody wrote. Leave them in `unresolved` until the owner writes it. |
 
 ## Red Flags
 
@@ -445,6 +455,10 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 - Letting a brief override a binding's `plate:` block silently. The vocab
   wins; if the brief is right, the fix is a vocab edit, not a per-video
   override.
+- Shipping a cut with a non-empty `unresolved` list without reading it: someone
+  who was on screen went uncredited. The list is the whole punch-list — an
+  empty `unresolved` really does mean nobody was missed, so anything it does
+  not report is a bug in `plan`, not a gap to work around.
 - Planning with a different `--max-shot-sec` than the render used — every plate
   after the first trimmed shot lands late.
 - A subclass line on a Ghost.

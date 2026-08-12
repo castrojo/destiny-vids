@@ -31,6 +31,12 @@ Before a month's roster exists, ``plan --placeholders N`` plates ensemble shots
 with the uncast blueberry copy from ``vocab/casting.yaml``. It names nobody: a
 placeholder is for timing and review, and a real contributor replaces it.
 
+``plan`` writes ``{"plates": [...], "unresolved": [...]}``: the manifest the
+other two subcommands read, plus a punch-list of everyone the cut could not
+credit -- a lead, or a contributor even the tail roster card had no room for --
+and why. It never blocks on one -- an uncast character and a binding with no
+plate copy are owner decisions -- but it never swallows one either.
+
 Styling is ported from ``projectbluefin/website``
 ``src/components/wolves/WolvesIntroOverlay.vue`` -- ``.wolves-guardian-plate``
 and friends. The CSS is the source of truth; the constants below name the rule
@@ -846,6 +852,31 @@ def _brief_ensemble_beats(brief, timeline, log):
         out.append((t, note, shot))
     return sorted(out)
 
+# Why a lead who made the cut carries no plate. A credit that disappears without
+# a word is how a real person goes uncredited, so an unplated lead is REPORTED,
+# never dropped -- and reporting is all it does, because the two copy-shaped
+# reasons are owner decisions that no derivation can make.
+UNPLATED = {
+    "uncast": {
+        "reason": "uncast",
+        "detail": "no person is bound to this character in vocab/casting.yaml",
+        "automatable": False,
+        "blocked_on": "an owner casting decision (leads.<character>.person)",
+    },
+    "no_plate_copy": {
+        "reason": "no_plate_copy",
+        "detail": "the binding carries no `plate:` copy, and plate copy is never invented",
+        "automatable": False,
+        "blocked_on": "owner-authored plate copy (leads.<character>.plate)",
+    },
+    "no_window": {
+        "reason": "no_window",
+        "detail": "no appearance in the cut was long enough, or free, to hold a plate",
+        "automatable": True,
+        "blocked_on": None,
+    },
+}
+
 
 def cut_timeline(shots, max_shot_sec=None):
     """Cut list -> [(start_on_timeline, duration, shot)] on the rendered cut.
@@ -1017,7 +1048,7 @@ def _ensemble_group_rows(items, start, duration, hold, total, busy, copy):
 
 def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
          busy=None, only="all", soft_busy=None, brief=None,
-         placeholders=0, placeholder_copy=None):
+         placeholders=0, placeholder_copy=None, unresolved=None):
     """Cut list -> plate manifest.
 
     Leads are plated on their first appearance long enough to read, using the
@@ -1066,6 +1097,17 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     copy from vocab/casting.yaml instead — for a cut being timed and reviewed
     before a roster exists. It is mutually exclusive with ``roster``: once real
     contributors are known, they are who the plate is for.
+
+    Anyone the cut could not credit gets the same treatment: pass a list as
+    ``unresolved`` and it is appended a punch-list entry saying who went
+    unplated and why (see ``UNPLATED``) -- a lead, and also a contributor whom
+    even the tail roster card had no room for. Nothing blocks -- an uncast
+    character and a binding with no plate copy are both owner decisions, so the
+    manifest is written either way and the punch-list is what asks for the
+    decision. An empty ``unresolved`` therefore means exactly what it says:
+    nobody on screen went uncredited. A shot that fails its binding's
+    constraints is not an appearance at all: it is already excluded from that
+    character's retrieval, so it is not a reveal.
     """
     if roster and placeholders:
         raise ValueError("pass a roster or placeholders, not both: a cut with a "
@@ -1084,6 +1126,8 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             brief, timeline, total, hold, leads, busy, log)
         entries.extend(brief_entries)
         plated |= brief_plated
+
+    unplated = {}  # character -> UNPLATED key, in first-appearance order
 
     def free(start, duration):
         end = start + duration
@@ -1119,18 +1163,28 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                     continue
                 if start - debut.get(character, start) > MAX_REVEAL_DEFERRAL:
                     continue
-            copy = (leads.get(character) or {}).get("plate")
+            # The reportable reasons, in order: nobody cast, no copy to plate,
+            # no window to plate it in. The first two are owner decisions; the
+            # third a re-plan can fix. The hero filter above is none of these --
+            # it defers to a later pass, it does not report.
+            binding = leads.get(character) or {}
+            if not binding.get("person"):
+                unplated[character] = "uncast"
+                continue
+            copy = binding.get("plate")
             provenance = "casting"
             if not copy:
                 copy = brief_reveal_copy.get(character)
                 provenance = "brief" if copy else provenance
             if not copy:
+                unplated[character] = "no_plate_copy"
                 continue
             # Walk forward through the shot: if dialogue (or an earlier plate)
             # holds its head, the reveal waits for the next opening inside its
             # own anchor rather than being lost for the whole cut.
             window = _first_free_window(start, duration, hold, total, avoid)
             if not window:
+                unplated.setdefault(character, "no_window")
                 continue
             at, dur = window
             entries.append({"id": character, "at": at, "dur": dur,
@@ -1138,6 +1192,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                             **copy})
             busy.append((at, at + dur))
             plated.add(character)
+            unplated.pop(character, None)  # a later appearance carried it after all
             if log:
                 notes = "".join([
                     " (on the hero move)" if hero_only else "",
@@ -1154,6 +1209,22 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             if soft_busy:
                 place_leads(busy + soft_busy, hero_only=hero_only)
             place_leads(busy, hero_only=hero_only)
+
+    # Every lead the passes above could not plate is REPORTED, never dropped:
+    # a credit that disappears without a word is how a real person goes
+    # uncredited. (Under --only ensemble the leads pass never ran, so this
+    # list is empty and the loop says nothing.)
+    for character, why in unplated.items():
+        binding = leads.get(character) or {}
+        if unresolved is not None:
+            unresolved.append({
+                "id": character,
+                "person": binding.get("person"),
+                "display_name": binding.get("display_name"),
+                **UNPLATED[why],
+            })
+        if log:
+            log(f"  UNPLATED   {character:<10} {why}: {UNPLATED[why]['detail']}")
 
     if not roster or only == "leads":
         # These paths never run the ensemble pass, so a brief's pinned
@@ -1306,6 +1377,12 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     # programmatically -- so "one of the anonymous Guardians in this film" stays
     # true wherever the plate lands. It is still a real credit, and a named
     # contributor reads better than a line on a roster card.
+    #
+    # Whoever the body of the cut still could not hold is credited together on
+    # one roster plate over the tail, in rotation order. The month's
+    # contributors are the ensemble; dropping them silently would be the one
+    # unacceptable outcome -- so when even the tail has no room, every name the
+    # cut could not credit goes on the punch-list, not just into a log line.
     pending = [item for item in pending if item["login"] not in credited]
     still_pending = []
     for item in pending:
@@ -1354,14 +1431,17 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         from tools.derive import load_ensemble_titles
         titled = load_ensemble_titles()
 
-        def card_names(extra_credited=()):
-            seen, names = set(), []
+        def card_waiting(extra_credited=()):
+            seen, waiting = set(), []
             for item in pending:
                 if (item["login"] not in seen and item["login"] not in credited
                         and item["login"] not in extra_credited):
                     seen.add(item["login"])
-                    names.append(item["display_name"])
-            return names
+                    waiting.append(item)
+            return waiting
+
+        def card_names(extra_credited=()):
+            return [item["display_name"] for item in card_waiting(extra_credited)]
 
         def tail_room(at_cursor):
             return min(tail_start + tail_dur - TAIL_OUT - at_cursor,
@@ -1386,7 +1466,8 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 log(f"  {'ensemble':<10} {at:6.2f}s +{dur:.1f}s  "
                     f"{item['display_name']} (authored plate)")
         remaining = tail_room(cursor)
-        names = card_names()
+        waiting = card_waiting()
+        names = [item["display_name"] for item in waiting]
         if remaining >= MIN_HOLD:
             card = {
                 "id": "ensemble_roster", "at": round(cursor, 3),
@@ -1401,8 +1482,19 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             if log:
                 log(f"  {'sign-off':<10} {cursor:6.2f}s +{remaining:.1f}s  "
                     f"{', '.join(names) if names else '(everyone credited in the cut)'}")
-        elif names and log:
-            log(f"  UNCREDITED (no room in the cut): {', '.join(names)}")
+        elif names:
+            # Even the tail had no room: every name the cut could not credit
+            # goes on the punch-list, not just into a log line nobody reads.
+            if unresolved is not None:
+                for item in waiting:
+                    unresolved.append({
+                        "id": f"ensemble_{item['login']}",
+                        "person": item["login"],
+                        "display_name": item["display_name"],
+                        **UNPLATED["no_window"],
+                    })
+            if log:
+                log(f"  UNCREDITED (no room in the cut): {', '.join(names)}")
         elif log:
             log("  NO SIGN-OFF: the tail has no room for the card")
 
@@ -1638,15 +1730,17 @@ def main(argv=None):
             except BriefError as exc:
                 print(f"error: {exc}", file=sys.stderr)
                 return 2
+        unresolved = []
         entries = plan(load_shots(args.shotlist), load_leads(), roster,
                        max_shot_sec=args.max_shot_sec, hold=args.hold, log=print,
                        busy=busy, only=args.only, soft_busy=soft, brief=brief,
-                       placeholders=args.placeholders)
+                       placeholders=args.placeholders, unresolved=unresolved)
         load_manifest_entries(entries)  # same validation the burn path applies
         with Path(args.out).open("w", encoding="utf-8") as fh:
-            json.dump(entries, fh, indent=2)
+            json.dump({"plates": entries, "unresolved": unresolved}, fh, indent=2)
             fh.write("\n")
-        print(f"wrote {args.out} ({len(entries)} plate(s))")
+        print(f"wrote {args.out} ({len(entries)} plate(s), "
+              f"{len(unresolved)} unresolved)")
         return 0
 
     entries = load_manifest(args.manifest)

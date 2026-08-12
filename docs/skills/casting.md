@@ -1,7 +1,7 @@
 ---
 name: casting
 version: "1.0"
-last_updated: "2026-08-11"
+last_updated: "2026-08-12"
 id: casting
 one_line_purpose: Bind a Destiny character to a person and credit the monthly ensemble.
 entry_point: docs/skills/casting.md
@@ -101,6 +101,30 @@ one supported way to make the files agree with the vocab again, which is why it
 refuses to touch a tagger field and preserves each file's existing JSON layout
 so the diff shows the change and nothing else.
 
+### Plate-only people
+
+A person can carry owner-written nameplate copy and still have no binding here,
+and that is a **terminal state, not a gap**. A `leads` binding is for someone who
+*recurs*: it fixes their credit across every cut for the life of the project. A
+one-video credit belongs in the copy the owner wrote for that video, and adding a
+binding for it would claim a permanence nobody asked for.
+
+Nothing in this repo can tell the two apart, so nothing in this repo tries —
+`automatable: no`, blocked on an owner decision. The open ones (see
+castrojo/destiny-vids#1 for the copy itself; do not transcribe it, it has one
+home):
+
+| Person | State | Blocked on |
+|---|---|---|
+| Paris Pittman | Cast, as `iron_lord_red_haired` — but the binding has no `plate:`, and the copy the owner wrote is a Guardian plate for Paris, not copy for an Iron Lord. | Authoring plate copy for the character, or deciding she stays plate-only. |
+| Jeffrey Sica | Not cast, not in the index. Plate-only. | Whether he is recurring cast (add a binding) or a one-video credit (nothing to do). |
+
+Neither blocks anything. A cast-but-unplated lead like Paris still makes the cut:
+`tools/plate.py plan` writes the manifest and lists her under `unresolved` with
+the reason, so the credit is never dropped in silence — see
+[`plates.md`](plates.md). Someone with no binding at all is not in the index's
+casting, and the brief that carries their copy is their punch-list.
+
 ### Ensemble
 
 ```bash
@@ -153,6 +177,7 @@ belongs on the lead binding and nowhere else.
 | "I'll tag `casting` directly, it's faster." | It is derived. A hand-set value is overwritten and hides the vocab bug that made you reach for it. |
 | "The search phrase can come later." | A binding nobody can query does not exist, and the suite fails on it. |
 | "Re-rolling the roster is fine, it's only credits." | Assignment is deterministic on purpose: a re-render must not re-credit a different person. |
+| "They have plate copy, so bind them — it's only a credit." | A binding says they recur, for the life of the project. Whether it's that or a one-video credit is the owner's call; the punch-list asks. |
 
 ## Red Flags
 
@@ -163,6 +188,8 @@ belongs on the lead binding and nowhere else.
   from the shots around it.
 - Adding a binding without a search phrase (the suite fails), or leaving a
   phrase behind after removing one (the suite fails the other way too).
+- Casting someone because they turned up in a brief with plate copy. Copy is a
+  credit for one video; a binding is a claim that they recur.
 - Treating `substitutability` as a usability gate. It was demoted: it only
   tie-breaks between otherwise-equal ensemble shots.
 
