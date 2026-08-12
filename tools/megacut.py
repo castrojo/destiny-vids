@@ -64,16 +64,25 @@ def ffmpeg_bin():
     On an atomic Fedora/Bluefin host the ``ffmpeg`` on PATH is ``ffmpeg-free``,
     which has no H.264 decoder and fails only once decoding starts -- which
     reads like a corrupt input file. Prefer the linuxbrew build, then the local
-    container shim, and fall back to PATH only if neither exists.
+    container shim, and fall back to PATH.
+
+    This never raises when no ffmpeg exists: *building* a command is pure
+    string work, and the offline test suite has to be able to do it on a
+    machine with no ffmpeg at all. A missing binary surfaces when the command
+    is actually run, which is the only place it matters.
     """
     for candidate in ("/home/linuxbrew/.linuxbrew/bin/ffmpeg",
                       str(Path.home() / ".local/bin/ffmpeg")):
         if Path(candidate).exists():
             return candidate
-    found = shutil.which("ffmpeg")
-    if not found:
-        raise SystemExit("no ffmpeg found")
-    return found
+    return shutil.which("ffmpeg") or "ffmpeg"
+
+
+def ffprobe_bin():
+    """The ffprobe beside the chosen ffmpeg."""
+    ffmpeg = ffmpeg_bin()
+    head, sep, tail = ffmpeg.rpartition("ffmpeg")
+    return f"{head}ffprobe{tail}" if sep else "ffprobe"
 
 
 def load_plan(path):
@@ -182,7 +191,7 @@ def build_filtergraph(plan):
 
 def probe_duration(path):
     out = subprocess.run(
-        [ffmpeg_bin().replace("ffmpeg", "ffprobe"), "-v", "error",
+        [ffprobe_bin(), "-v", "error",
          "-show_entries", "format=duration", "-of", "csv=p=0", path],
         capture_output=True, text=True, check=True,
     )

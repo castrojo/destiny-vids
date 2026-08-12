@@ -120,3 +120,22 @@ def test_expected_duration_sums_the_parts(tmp_path):
         {"kind": "card", "image": "d.png", "dur": 5.0},
     ])
     assert megacut.expected_duration(plan) == pytest.approx(121.5)
+
+
+def test_a_command_can_be_built_with_no_ffmpeg_installed(tmp_path, monkeypatch):
+    """The suite is offline and must run on a machine with no ffmpeg at all.
+    Building a command is pure string work, so binary resolution must never
+    raise here -- a missing binary surfaces when the command is *run*."""
+    monkeypatch.setattr(megacut.shutil, "which", lambda _: None)
+    monkeypatch.setattr(megacut.Path, "exists", lambda self: True
+                        if self.suffix in (".png", ".mp4") else False)
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    cmd = megacut.build_command(plan, "out.mp4")
+    assert cmd[0] == "ffmpeg"
+
+
+def test_ffprobe_is_resolved_beside_the_chosen_ffmpeg(monkeypatch):
+    monkeypatch.setattr(megacut, "ffmpeg_bin", lambda: "/opt/ffmpeg/bin/ffmpeg")
+    assert megacut.ffprobe_bin() == "/opt/ffmpeg/bin/ffprobe"
