@@ -202,7 +202,7 @@ From the corpus (`gaps`), the ensemble subject has **no clean coverage** of:
 
 | Gap | Consequence here |
 |---|---|
-| `action: emote` | The dance itself cannot be shown. The one emote shot in the index is unclean. |
+| `action: emote` | The dance itself cannot be shown. No Guardian emote shot is indexed at all; the index's only `emote` shot is an Eliksni busker, and it is unclean. |
 | `action: vehicle` | No sparrow/ship beat is writable. |
 | `shot_scale: CU` / `ECU` / `INSERT` | No close-up on a blueberry — no hands, no faceplate detail, no cutaway inserts. This is why the cut reads wide throughout. |
 
