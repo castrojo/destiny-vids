@@ -1,7 +1,7 @@
 ---
 name: plates
-version: "1.0"
-last_updated: "2026-08-11"
+version: "1.1"
+last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
 entry_point: docs/skills/plates.md
@@ -273,6 +273,23 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   note turned into copy would put the owner's words on whichever real
   contributor landed there. A moment outside the cut is reported, not moved.
 
+### Before a roster exists
+
+```bash
+python3 tools/plate.py plan cut.json --placeholders 4 --max-shot-sec 9 \
+    --out plates.json
+```
+
+`--placeholders N` plates the first N ensemble shots that can hold a plate with
+`ensemble.placeholder_plate` from `vocab/casting.yaml` — `CONTRIBUTOR //
+GUARDIAN`, name `TBD`, default blue chrome. It names nobody on purpose: a
+placeholder is for timing and review of a cut whose cast is not decided.
+
+It is mutually exclusive with `--roster` and raises if both are passed. Once
+real contributors are known, they are who the plate is for — swap the flag, do
+not edit the copy. If fewer than N fit, you get the ones that read; a plate
+squeezed in where it cannot be finished is worse than one less plate.
+
 `burn` composites every plate in one ffmpeg pass — an `overlay` chain gated by
 `enable='between(t,in,out)'` — and stream-copies audio, so titling never costs
 the soundtrack a second generation. `enable` is FFmpeg's timeline-editing
@@ -416,6 +433,7 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 | "The brief's copy contradicts the binding, but the owner wrote it today." | Recency is not authority: the vocab is the reviewed record, the issue body is editable. The vocab wins; edit it if the brief is right. |
 | "The plate is short, it can share the screen." | Two plates at once is unreadable; both `plan` and `burn` refuse it. The only exception is a group row, whose members are built to be seen together. |
 | "The shot is only two seconds, so nobody can be plated there." | The plate rides across the cut. Only the *anchor* must be long enough to register. |
+| "I'll put a plausible name on the placeholder so it looks finished." | A plate names a real person. `TBD` is the honest answer until a roster exists. |
 
 ## Red Flags
 
@@ -438,6 +456,8 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
   unknown seal is a blueberry; a known one is a paraphrase.
 - A plate positioned against the frame on a letterboxed source, so it sits on
   the black bar instead of the picture.
+- A placeholder plate carrying anything but the vocab's uncast copy, or shipping
+  alongside a real roster.
 
 ## Verification
 

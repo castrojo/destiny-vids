@@ -320,6 +320,18 @@ ensemble:
       composition contains crowd                    -> 6;
       composition contains group, or subject_salience == crowd_group -> 3;
       otherwise                                     -> 1.
+  placeholder_plate:
+    # On-screen copy for an ensemble slot that is NOT YET CAST — the blueberry
+    # plate. It exists so a cut can be assembled, timed and reviewed before a
+    # month's roster is known, WITHOUT putting a real person's name on a shot
+    # they were never assigned. It names nobody on purpose: `name: TBD` is a
+    # visible placeholder, not a credit. Replace it by re-planning with a real
+    # roster (`tools/ensemble.py roster`) before anything is published.
+    # Same four-field deck vocabulary as a lead `plate:` — nothing invented —
+    # and the default blue chrome, which is the blueberry treatment.
+    label: CONTRIBUTOR // GUARDIAN
+    name: TBD
+    title: Project Bluefin
 
 derived_fields:
   casting:

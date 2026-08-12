@@ -567,6 +567,66 @@ def test_a_pool_smaller_than_the_slot_count_names_nobody_twice():
     assert credits == ["ensemble_hanthor"]
     plate.load_manifest_entries(entries)
 
+PLACEHOLDER = {"label": "CONTRIBUTOR // GUARDIAN", "name": "TBD",
+               "title": "Project Bluefin"}
+
+
+def _placeholder_shots():
+    return [
+        _shot("s1", 0, 8, "ensemble", None, slots=3),
+        _shot("s2", 8, 16, "ensemble", None, slots=2),
+        _shot("s3", 16, 24, "lead", "osiris"),
+        _shot("s4", 24, 40, "ensemble", None, slots=4),
+    ]
+
+
+def _placeholders_of(entries):
+    return [e for e in entries if e["id"].startswith("ensemble_placeholder_")]
+
+
+def test_placeholders_plate_ensemble_shots_with_the_uncast_copy():
+    entries = _placeholders_of(plate.plan(_placeholder_shots(), LEADS, placeholders=2,
+                                          placeholder_copy=PLACEHOLDER))
+    assert len(entries) == 2
+    assert [e["id"] for e in entries] == ["ensemble_placeholder_01",
+                                          "ensemble_placeholder_02"]
+    assert all(e["name"] == "TBD" for e in entries)
+
+
+def test_placeholders_never_land_on_a_shot_with_no_ensemble_in_it():
+    shots = [_shot("s1", 0, 20, "lead", "osiris"), _shot("s2", 20, 40)]
+    assert _placeholders_of(plate.plan(shots, LEADS, placeholders=3)) == []
+
+
+def test_placeholders_degrade_when_the_cut_has_no_room_for_them_all():
+    """Asking for more plates than fit is not an error; you get what reads."""
+    entries = plate.plan(_placeholder_shots(), LEADS, placeholders=99,
+                         placeholder_copy=PLACEHOLDER)
+    assert 0 < len(_placeholders_of(entries)) < 99
+    plate.load_manifest_entries(entries)  # raises if any two overlap
+
+
+def test_placeholders_do_not_double_book_a_lead_plate():
+    entries = plate.plan(_placeholder_shots(), LEADS, placeholders=99,
+                         placeholder_copy=PLACEHOLDER)
+    plate.load_manifest_entries(entries)
+    assert any(e["id"] == "osiris" for e in entries)
+
+
+def test_a_roster_and_placeholders_are_mutually_exclusive():
+    """Once real contributors are known, they are who the plate is for."""
+    with pytest.raises(ValueError):
+        plate.plan(_placeholder_shots(), LEADS, ROSTER, placeholders=2)
+
+
+def test_placeholder_copy_comes_from_the_vocab_not_the_tool():
+    from tools.derive import load_placeholder_plate
+
+    copy = load_placeholder_plate()
+    entry = _placeholders_of(plate.plan(_placeholder_shots(), LEADS, placeholders=1))[0]
+    assert {k: v for k, v in entry.items()
+            if k not in {"id", "at", "dur", "position"}} == copy
+
 
 def test_no_plate_field_is_invented_beyond_the_reference_deck():
     """The reference (~/Videos/nameplates.json) has exactly these text fields.
@@ -587,6 +647,7 @@ def test_no_plate_field_is_invented_beyond_the_reference_deck():
         if not copy:
             continue
         assert set(copy) <= allowed, (character, set(copy) - allowed)
+    assert set(casting["ensemble"]["placeholder_plate"]) <= allowed
 
     # The ensemble credit is the same closed set, plus the two eyebrow variants
     # that pick between a maintainer and a contributor, and `roster_title` --
