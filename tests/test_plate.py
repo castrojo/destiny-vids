@@ -1672,3 +1672,101 @@ def test_a_pin_on_a_shot_with_no_ensemble_role_is_reported_not_anchored():
     assert not any(e["at"] == pytest.approx(10.0) for e in entries)
     assert any("no ensemble role" in line and "not moved" in line
                for line in lines)
+
+
+# --- the status nameplate: the site's top-of-frame HUD ----------------------
+
+def _status(**kw):
+    base = {"id": "hud", "at": 0.0, "dur": 5.0, "kind": "status",
+            "position": "status", "detail": "Legends Sought",
+            "label": "Follow the path, we've got your back"}
+    base.update(kw)
+    return base
+
+
+def test_status_card_carries_only_its_two_authored_lines():
+    """A fourth card shape, added deliberately -- and still closed. It renders
+    from `detail` and `label` and nothing else."""
+    img = plate.render_plate(_status())
+    assert img.width > 0 and img.height > 0
+    # Wider copy makes a wider card: the box sizes to its longest line.
+    narrow = plate.render_plate(_status(label="#nova4ever"))
+    assert narrow.width < img.width
+
+
+def test_status_accent_is_blue_not_gold():
+    """`--wc-gold` is the token's NAME; it resolves to #60a5fa, a blue.
+    Reproducing the name instead of the value renders this card gold."""
+    assert plate.STATUS_ACCENT[:3] == (96, 165, 250)
+
+
+def test_status_card_sits_top_left_not_in_the_lower_third():
+    placed = plate.place(plate.render_plate(_status()), "status")
+    box = placed.getbbox()
+    assert box is not None
+    left, top = box[0], box[1]
+    assert top < plate.FRAME_H * 0.25, "status card is not at the top"
+    assert left < plate.FRAME_W * 0.25, "status card is not at the left"
+
+
+def test_glitch_splits_the_type_and_tears_the_card():
+    """The CSS applies the split as a *text*-shadow, so the panel keeps clean
+    edges; the clip-path tear cuts a band out of the whole card."""
+    plain = plate.render_plate(_status(label="#nova4ever"))
+    glitched = plate.render_plate(_status(label="#nova4ever", glitch=True))
+    assert glitched.size == plain.size
+
+    band = range(int(plain.height * 0.44), int(plain.height * 0.56))
+    assert any(plain.getpixel((x, y))[3] for x in range(plain.width) for y in band)
+    assert not any(glitched.getpixel((x, y))[3]
+                   for x in range(glitched.width) for y in band), "no tear"
+
+    def red_fringe(img):
+        return sum(1 for r, g, b, a in img.getdata()
+                   if a > 40 and r > g + 40 and r > b + 40)
+    # The plain card has NO warm pixels at all -- its palette is blue accent on
+    # near-black -- so any red is the split's own signature, not a threshold
+    # this test happened to pick.
+    assert red_fringe(plain) == 0
+    assert red_fringe(glitched) > 100
+
+
+def test_a_status_card_may_share_the_screen_with_a_guardian_plate():
+    """Different rows. On the site the HUD is persistent chrome that Guardian
+    plates appear underneath, so they are never in contention."""
+    entries = [
+        _status(id="hud", at=0.0, dur=100.0),
+        {"id": "bob", "at": 3.0, "dur": 9.5, "position": "left",
+         "label": "TRUSTEE // GUARDIAN", "class": "Voidwalker Warlock",
+         "name": "Bob Killen", "title": "Reconciler of the Plane"},
+    ]
+    plate.load_manifest_entries(entries)  # must not raise
+
+
+def test_two_status_cards_at_once_are_still_an_error():
+    entries = [_status(id="a", at=0.0, dur=10.0),
+               _status(id="b", at=5.0, dur=10.0)]
+    with pytest.raises(ValueError, match="visible at the same time"):
+        plate.load_manifest_entries(entries)
+
+
+def test_touching_windows_are_adjacent_not_overlapping():
+    """58.6 + 0.45 == 59.050000000000004 in floating point, against a next cue
+    authored at 59.05. Without a tolerance a back-to-back pair trips the
+    overlap check by 4e-15 of a second."""
+    entries = [_status(id="a", at=58.6, dur=0.45),
+               _status(id="b", at=59.05, dur=5.0)]
+    plate.load_manifest_entries(entries)  # must not raise
+
+
+def test_raised_lifts_a_plate_out_of_the_lower_third():
+    """`.wolves-guardian-plate-raised { bottom: auto; top: 28% }` -- an
+    authored value, not a judgement call."""
+    spec = {"id": "natali", "at": 0.0, "dur": 5.0, "position": "right",
+            "label": "MAINTAINER // GUARDIAN", "class": "Behemoth Titan",
+            "name": "Natali Vlatko", "title": "Shipwright of Kubernetes"}
+    card = plate.render_plate(spec)
+    normal = plate.place(card, "right").getbbox()[1]
+    raised = plate.place(card, "right", raised=True).getbbox()[1]
+    assert raised < normal
+    assert raised == pytest.approx(plate.FRAME_H * plate.RAISED_TOP, abs=2)

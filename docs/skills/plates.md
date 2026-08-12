@@ -1,6 +1,6 @@
 ---
 name: plates
-version: "1.3"
+version: "1.4"
 last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
@@ -68,8 +68,21 @@ Rust Foundation herald, per #8). A variant is colour only.
 
 The deck's `gp_*` entries add three **placement** fields, which are deck data,
 not new copy: `position: "group"` with an absolute `x` (measured against the
-picture, never the raw frame), a `scale` factor that shrinks the card, and a
-`group` key marking which row a card belongs to.
+picture, never the raw frame), a `scale` that shrinks the card, and a `group`
+key marking which row a card belongs to. Two more come from the intro overlay:
+`raised` (`top: 28%`, for a Guardian towering over the lower third) and
+`position: "status"`.
+
+## The status nameplate is a fourth card, added deliberately
+
+The site's **top-of-frame HUD** (`Nameplate.vue`) is not the reveal plate: it is
+persistent chrome the intro overlay re-labels per cue, carrying **exactly two**
+authored lines — `detail` and `label` — plus one chrome flag, `glitch`. It is a
+**different row** from the lower third, so the one-plate-at-a-time check exempts
+it against a Guardian plate; two status cards at once are still an error. Its
+copy comes from the per-cue overrides *and* the segment default, so reproducing
+only the cues renders a card that flickers where the site holds one
+continuously. See [`references/status-nameplate.md`](references/status-nameplate.md).
 
 ## Where the copy is authored
 
@@ -414,11 +427,10 @@ it is always safe.
 
 ## Styling provenance
 
-The plate treatment is ported from the website's
-`WolvesIntroOverlay.vue`, and where the site and the baked video reveals
-disagree, **the videos win**. The constant-by-constant record — the four
-known divergences, the font trap (`fc-match monospace`), and the gradient,
-shadow and chamfer details — lives in
+The plate treatment is ported from the website's `WolvesIntroOverlay.vue`, and
+where the site and the baked video reveals disagree, **the videos win**. The
+constant-by-constant record — the four known divergences, the font trap
+(`fc-match monospace`), and the gradient, shadow and chamfer details — lives in
 [`references/plate-styling.md`](references/plate-styling.md).
 
 ## Common Rationalizations

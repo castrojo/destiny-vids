@@ -106,20 +106,51 @@ Two behaviours are carried over from the sequence file so nobody "fixes" them:
   opposite `position` values and a shared `group` key — `tools/plate.py` treats
   a group row as one row, which is exactly what the live overlay renders.
 
-## What is not reproduced
+## What is reproduced, and the one thing that is not
 
-Three live-overlay behaviours have no equivalent in `tools/plate.py`. Each is
-**omitted and recorded**, never approximated:
+The three live-overlay behaviours this cut originally shipped without are now
+**built** (2026-08-12), so the hero segment is generated end to end here rather
+than approximated:
 
-1. **The top status nameplate** (`statusOnly`), including the closing *"Follow
-   the path, we've got your back"* / `Legends Sought` card at source
-   106.5–118.8. It is a different chrome from a lower third.
+1. **The top status nameplate** — the site's persistent top-of-frame HUD
+   (`Nameplate.vue`), which the intro overlay re-labels per cue. It runs the
+   whole segment on the authored default from `INTRO_DISPLAY['wolves-intro']`
+   (*Meet your Fireteam* / *a project to bring their stories to life*), and is
+   overridden by the closing **Legends Sought** / *"Follow the path, we've got
+   your back"* card at source 106.5 onward — 7 seconds of authored copy that
+   used to be missing entirely.
 2. **The three `#nova4ever` glitch bursts** (source 52, 60.6, 68.1 — 0.45s
-   each), an RGB-split distortion easter egg.
-3. **`raised`** on Natali's plate — a vertical offset, i.e. a visual judgement.
+   each): the red/cyan `text-shadow` split and the clip-path tear from
+   `@keyframes wc-nameplate-glitch`. The split is applied to the **type**, not
+   the panel, because that is what a text-shadow does.
+3. **`raised` on Natali's plate** — this turned out **not** to be a visual
+   judgement at all: `.wolves-guardian-plate-raised` is an authored rule
+   (`bottom: auto; top: 28%`). Reproducing it lifts her card beside the
+   Behemoth Guardian and staggers it against Christoph's in the lower third,
+   which is how the site composes that shared shot.
 
-They need new rendering code. It must **not** go into `tools/plate.py` while
-that file is owned by the Wolves timing-pass work.
+**The one thing still not drawn is the rotating dinosaur avatar badge** on the
+status nameplate. It is animated brand artwork rather than copy, on a
+20-second cycle that no still can represent honestly, and a frozen stand-in
+would put a picture on the card that nobody authored. Omitted and recorded.
+
+## Deprecations
+
+**The fan-archive hero source is deprecated.** `BV3BZKbpBns` ("Into the Light
+(Without Dialogue)", *Destiny Music Archive*) is what the website embeds and
+what the `watchUrl`s in `characters.json` point at. This cut uses Bungie's own
+`BKm0TPqeOjY` instead, and nothing here should go back to the fan copy: the
+official upload removes the provenance question outright, and the only reason
+the fan copy was ever preferred — that Bungie's carries an Ikora voice-over —
+is moot now the audio is dropped.
+
+Anything reusing the old source must re-verify its own anchors. The two uploads
+are **not** interchangeable: `maxDuration: 118.8` is correct for the fan copy
+and wrong for Bungie's, whose content ends at 113.55 (see above).
+
+**The plate-only hero is superseded.** A hero segment carrying the six Guardian
+plates but no status row is an incomplete reproduction, not a lighter variant.
+Rebuild with the full manifest.
 
 ## Punch-list — owner decisions, not bugs
 
@@ -128,6 +159,7 @@ that file is owned by the Wolves timing-pass work.
   her overlay string **and** `characters.json` both say *"Shipwright of
   Kubernetes"*. The two agreeing sources are used. Choosing between two things
   the owner authored, on a real colleague's card, is not automatable.
+- **The status nameplate's dinosaur avatar badge** is not drawn (see above).
 - **A music bed** under the hero segment and the four cards. They are silent; a
   bed is a licensing decision.
 - **Chapter card placement.** The cards use the deck's own geometry, so they sit

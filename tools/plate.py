@@ -141,6 +141,38 @@ CHAMFER = 16             # clip-path: polygon(16px ...)
 CORNER_RADIUS = 12       # border-radius: 0.75rem, on the two corners not cut
 CREST = 2.5 * REM        # .wolves-guardian-plate-crest
 
+# --- status nameplate (the site's own top-of-frame chrome) -------------------
+# A DIFFERENT card from the reveal plate: the Wolves app's persistent HUD
+# nameplate (src/components/wolves/cinematic/Nameplate.vue, on the tokens in
+# src/style/wolves-cinematic.scss), which the intro overlay re-labels per cue.
+# It carries two authored lines -- a small `detail` eyebrow over a large
+# `label` -- and nothing else, so it is added to the data model deliberately
+# rather than bent out of the Guardian plate's field set.
+#
+# Note `--wc-gold` is the token's NAME, not its value: it resolves to #60a5fa,
+# a blue. Reproducing the name instead of the value would have made this card
+# gold and wrong.
+STATUS_PANEL = (14, 16, 20, 224)     # --wc-panel: rgb(14 16 20 / 88%)
+STATUS_LINE = (96, 165, 250, 71)     # --wc-line: rgb(96 165 250 / 28%)
+STATUS_ACCENT = (96, 165, 250, 255)  # --wc-gold: #60a5fa
+STATUS_WHITE = (233, 233, 229, 255)  # --wc-white: #e9e9e5
+
+FS_STATUS_DETAIL = 1.1 * REM   # .wc-label
+FS_STATUS_LABEL = 2.2 * REM    # .wc-nameplate-label
+LS_STATUS_DETAIL = 0.32        # letter-spacing: 0.32em
+LS_STATUS_LABEL = 0.06
+
+STATUS_PAD_TOP = 1.2 * REM     # padding: 1.2rem 2.4rem 1.2rem 1.6rem
+STATUS_PAD_RIGHT = 2.4 * REM
+STATUS_PAD_LEFT = 1.6 * REM
+STATUS_RULE = 2                # border-left: 2px solid var(--wc-gold)
+STATUS_CHAMFER = int(0.9 * REM)  # .wc-plate clip-path: 0.9rem
+STATUS_GAP = 0.35 * REM
+# .wc-intro-nameplate { position: fixed; top: 3rem; left: 3rem }
+STATUS_INSET = 3.0 * REM
+# .wolves-guardian-plate-raised { bottom: auto; top: 28% }
+RAISED_TOP = 0.28
+
 # --- chat card (wolves-*/render/plate.html -- the baked dialogue pill) -------
 # The other videos' talking card is neither the reveal plate nor the site's
 # .wc-nameplate: it is the one-line pill plate.html bakes -- [crest] SPEAKER |
@@ -464,6 +496,105 @@ def _variant_for(spec):
     return VARIANTS["trustee" if spec.get("trustee") else "default"]
 
 
+def _render_status(spec, glitch=False):
+    """The site's top-of-frame HUD nameplate: a `detail` eyebrow over a `label`.
+
+    Reproduces `.wc-nameplate` (Nameplate.vue) on the `.wc-plate` surface: a
+    chamfered translucent panel with a 2px accent rule down its left edge.
+
+    The component's rotating dinosaur avatar badge is deliberately NOT drawn.
+    It is animated brand artwork rather than copy, it cycles on a 20s timer
+    that no still can represent honestly, and inventing a frozen stand-in for
+    it would put a picture on the card that the deck never authored. Recorded
+    as a gap instead -- see docs/cuts/08-directors-cut-megacut.md.
+    """
+    detail = (spec.get("detail") or "").upper()   # text-transform: uppercase
+    label = (spec.get("label") or "").upper()
+
+    f_detail = _font("regular", FS_STATUS_DETAIL)
+    f_label = _font("bold", FS_STATUS_LABEL)
+
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    inner = max(
+        _tracked_width(probe, detail, f_detail, LS_STATUS_DETAIL),
+        _tracked_width(probe, label, f_label, LS_STATUS_LABEL),
+    )
+    box_w = int(round(inner + STATUS_PAD_LEFT + STATUS_PAD_RIGHT + STATUS_RULE))
+    rows = [t for t in (detail, label) if t]
+    text_h = sum(f.size * 1.25 for t, f in ((detail, f_detail), (label, f_label)) if t)
+    text_h += STATUS_GAP * (len(rows) - 1) if len(rows) > 1 else 0
+    box_h = int(round(STATUS_PAD_TOP * 2 + text_h))
+
+    img = _chamfered((box_w, box_h), STATUS_PANEL, STATUS_LINE,
+                     radius=STATUS_CHAMFER, corner=0)
+    # border-left: the accent rule runs the full height of the plate.
+    ImageDraw.Draw(img).rectangle(
+        [0, 0, STATUS_RULE - 1, box_h - 1], fill=STATUS_ACCENT)
+
+    text_layer = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_layer)
+    x = STATUS_RULE + STATUS_PAD_LEFT
+    y = STATUS_PAD_TOP
+    if detail:
+        _draw_tracked(draw, (x, y), detail, f_detail, STATUS_ACCENT,
+                      LS_STATUS_DETAIL)
+        y += f_detail.size * 1.25 + STATUS_GAP
+    if label:
+        _draw_tracked(draw, (x, y), label, f_label, STATUS_WHITE,
+                      LS_STATUS_LABEL)
+
+    if glitch:
+        text_layer = _rgb_split(text_layer)
+    img.alpha_composite(_with_text_shadow(text_layer))
+    if glitch:
+        img = _tear(img)
+    return img
+
+
+def _rgb_split(text):
+    """The glitch's red/cyan `text-shadow` split.
+
+    In the CSS this is a *text-shadow*, so it applies to the type and not to
+    the panel behind it -- splitting the whole card instead fringes the plate's
+    edges and leaves the words looking untouched.
+
+        text-shadow: 2px 0 0 rgb(255 0 64 / 75%), -2px 0 0 rgb(0 220 255 / 75%)
+    """
+    out = Image.new("RGBA", text.size, (0, 0, 0, 0))
+    alpha = text.getchannel("A").point(lambda a: int(a * 0.75))
+    for colour, dx in (((255, 0, 64), 2), ((0, 220, 255), -2)):
+        layer = Image.new("RGBA", text.size, (*colour, 0))
+        layer.putalpha(alpha)
+        shifted = Image.new("RGBA", text.size, (0, 0, 0, 0))
+        # alpha_composite takes no negative offset, so each copy is pasted onto
+        # its own full-size canvas at the shift and then composited.
+        shifted.paste(layer, (dx, 0))
+        out.alpha_composite(shifted)
+    out.alpha_composite(text)
+    return out
+
+
+def _tear(img):
+    """The glitch's clip-path tear: the band from 42% to 58% is cut away.
+
+        clip-path: polygon(0 0, 100% 0, 100% 42%, 0 42%, 0 58%, 100% 58%, ...)
+    """
+    out = img.copy()
+    ImageDraw.Draw(out).rectangle(
+        [0, int(img.height * 0.42), img.width, int(img.height * 0.58)],
+        fill=(0, 0, 0, 0))
+    return out
+
+
+def _glitch(img):
+    """Kept for callers that hold a finished card: split then tear.
+
+    Prefer ``_render_status(spec, glitch=True)``, which splits the TEXT layer
+    the way the CSS does. This whole-card form fringes the panel edges too.
+    """
+    return _tear(_rgb_split(img))
+
+
 def render_plate(spec):
     """One plate spec -> a tight RGBA image (no frame padding).
 
@@ -477,6 +608,8 @@ def render_plate(spec):
     """
     if spec.get("kind") == "chat":
         return _render_chat(spec)
+    if spec.get("kind") == "status":
+        return _render_status(spec, glitch=bool(spec.get("glitch")))
     variant = _variant_for(spec)
     ghost = spec.get("kind") == "ghost"
     card = spec.get("kind") == "title"
@@ -582,7 +715,7 @@ def render_plate(spec):
     return img
 
 
-def place(plate, position="left", picture=None, x=None, scale=1.0):
+def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False):
     """Composite a plate onto a full 1920x1080 transparent frame.
 
     ``picture`` is the real image area ``(x, y, w, h)`` inside the frame. The
@@ -603,6 +736,17 @@ def place(plate, position="left", picture=None, x=None, scale=1.0):
                              Image.LANCZOS)
     px, py, pw, ph = picture or (0, 0, FRAME_W, FRAME_H)
     y = py + int(ph * (1 - MARGIN_BOTTOM)) - plate.height
+    if raised:
+        # .wolves-guardian-plate-raised { bottom: auto; top: 28% } -- for a
+        # Guardian who towers above the frame's lower third.
+        y = py + int(ph * RAISED_TOP)
+    if position == "status":
+        # .wc-intro-nameplate { top: 3rem; left: 3rem }. Measured against the
+        # PICTURE, like every other placement here, so it cannot land on a
+        # letterbox bar.
+        frame.alpha_composite(plate, (px + int(STATUS_INSET),
+                                      py + int(STATUS_INSET)))
+        return frame
     if position == "group":
         if x is None:
             raise ValueError("a group plate needs an absolute x")
@@ -1630,21 +1774,36 @@ def load_manifest_entries(entries):
             raise ValueError(f"plate {e['id']!r} has non-positive dur")
         start = float(e["at"])
         windows.append((start, start + float(e["dur"]), e["id"],
-                        e.get("group")))
+                        e.get("group"), e.get("kind")))
 
     # One plate at a time (authoring-interview-chat-plates): overlapping visible
-    # windows are a bug, not a style choice. One narrow exception: members of
-    # the same group row share a `group` key and are one row by construction --
-    # the reference deck's roll call is *meant* to be visible together. A group
-    # member overlapping anything outside its own row is still an error, so the
-    # check is pairwise rather than the old adjacent-pair scan (an exempt pair
-    # must not shield a later collider behind it).
+    # windows are a bug, not a style choice. Two narrow exceptions:
+    #
+    #   * members of the same group row share a `group` key and are one row by
+    #     construction -- the reference deck's roll call is *meant* to be
+    #     visible together;
+    #   * the status nameplate is the site's top-of-frame HUD, a different row
+    #     from the lower third entirely. On the site it is persistent chrome
+    #     that Guardian plates appear *underneath*, so a status card and a
+    #     lower third are never in contention for the same space. Two status
+    #     cards still are, and are still an error.
+    #
+    # A group member overlapping anything outside its own row is still an
+    # error, so the check is pairwise rather than the old adjacent-pair scan
+    # (an exempt pair must not shield a later collider behind it).
     ordered = sorted(windows)
-    for i, (a_start, a_end, a_id, a_group) in enumerate(ordered):
-        for b_start, b_end, b_id, b_group in ordered[i + 1:]:
-            if b_start >= a_end:
+    # Windows that merely TOUCH are adjacent, not overlapping. Without a
+    # tolerance, a back-to-back pair whose boundary is computed in floating
+    # point (58.6 + 0.45 == 59.050000000000004, against a next cue at 59.05)
+    # trips the check by 4e-15 of a second.
+    EPS = 1e-6
+    for i, (a_start, a_end, a_id, a_group, a_kind) in enumerate(ordered):
+        for b_start, b_end, b_id, b_group, b_kind in ordered[i + 1:]:
+            if b_start >= a_end - EPS:
                 break
             if a_group and a_group == b_group:
+                continue
+            if (a_kind == "status") != (b_kind == "status"):
                 continue
             raise ValueError(
                 f"plates {a_id!r} and {b_id!r} are visible at the same time "
@@ -1660,7 +1819,8 @@ def render_all(entries, out_dir, picture=None):
     for e in entries:
         dest = out_dir / f"plate_{e['id']}.png"
         place(render_plate(e), e.get("position", "left"), picture,
-              x=e.get("x"), scale=float(e.get("scale", 1.0))).save(dest)
+              x=e.get("x"), scale=float(e.get("scale", 1.0)),
+              raised=bool(e.get("raised"))).save(dest)
         written.append(dest)
     return written
 
