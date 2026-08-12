@@ -13,9 +13,22 @@ The repo stores **metadata and timestamps, never footage**.
 
 ## Where the work lives
 
-**GitHub issues are the backlog.** There is no TODO file, no notes doc, and no
-planning markdown in the repo — those go stale and mislead the next agent.
-Session state stays in the agent's session folder.
+**GitHub issues are the backlog.** Session state stays in the agent's session
+folder. The one exception is `docs/plans/<name>/`: a planning tree may be
+committed when a design is too large for one issue body — a design, the
+research it rests on, and one issue-ready file per unit of work. Its lifecycle:
+
+- **Created** only against an open issue the owner asked for.
+- **A plan decides nothing.** It may *identify* an owner-held decision —
+  rights, casting, provenance — but no plan text is authority to act on one.
+  The filed issues are.
+- **CI may assert only that a plan is navigable while it exists** — links
+  resolve, its map matches its files. CI must never require a plan to *exist*,
+  so deleting a tree is always green.
+- **Deleted** when its contents are filed as issues, which is the tree's own
+  stated destination — tree, its test file, and its README row removed in one
+  commit. A plan that survives its filing is the stale planning doc this
+  contract exists to prevent.
 
 An issue carries the owner's prose *and* a fenced `brief` block that makes it
 executable. How to file work, pick it up, and normalize prose into a brief is
