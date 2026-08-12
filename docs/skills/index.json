@@ -55,7 +55,7 @@
         "outline"
       ],
       "description": "Covers outline authoring, shot matching, hold caps, and rendering a cut list to video. Use when writing a story outline, debugging a beat that matched the wrong shot, or rendering a cut.",
-      "version": "1.1",
+      "version": "1.2",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },

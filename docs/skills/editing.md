@@ -1,6 +1,6 @@
 ---
 name: editing
-version: "1.1"
+version: "1.2"
 last_updated: "2026-08-12"
 id: editing
 one_line_purpose: Turn a plain-language outline into a rendered cut.
@@ -64,6 +64,18 @@ in outline order. Two consequences to write around:
 
 Phrasing a beat close to the target caption is legitimate: captions are the
 index's search surface, and the outline is written against what exists.
+
+**Beat order is also credit placement.** A contributor can only be plated
+where an ensemble shot plays, so where the credits land is decided by the
+outline, not by the scheduler. Every ensemble anchor in a Destiny cinematic
+sits in its opening firefight, so an outline that runs its Guardian beats off
+at the top credits the whole month in the first twelve seconds and then goes
+silent. Move the beat and the credit moves with it: `stories/osiris-sagira.txt`
+deals its Guardian beats out across the story, and on the same roster that
+reorder alone turned three contributors crammed into the first 1.2 seconds
+(three more with no window at all) into all seven credited across a minute.
+Spreading is measured, not guessed: `tools/plate.py plan` prints every plate
+it placed, in order, so check the credit times before rendering.
 
 ### One cinematic, skipped forward
 
@@ -168,6 +180,7 @@ Two things follow, and both bite:
 | Rationalization | Reality |
 |---|---|
 | "No clean shot matches, so I'll allow unclean footage." | The gate exists to keep a HUD out of the finished cut. Rewrite the beat instead. |
+| "The credits pile up in the intro, so I'll add a scheduler gap between contributor plates." | Measured on the Osiris cut, a cadence gate *costs* credits — it suppresses the group rows and the re-home pass. All the ensemble shots sitting in the intro is an outline problem: move the Guardian beat, and the credit moves with it. |
 | "I'll hand-edit the timings in `cut.json`." | It is a derived artifact and the next run discards your edit. Change the outline or the cap. |
 | "I'll set a long `duration` on the beat to hold the shot." | A hold is clamped to the segment. Past its out-point you are cutting the *next* shot, which nothing vetted. |
 | "The beat matched something close enough." | A mismatch cascades into every later beat that wanted that shot. Fix it at the source. |
