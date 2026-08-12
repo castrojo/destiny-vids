@@ -4,11 +4,55 @@
 plus the tools that turn a plain-language outline into a rendered, credited cut.
 The repo stores **metadata and timestamps, never footage**.
 
+## What this repo produces: features and hero videos
+
+Two kinds of video, built by the same tools, governed by different rules. Most
+of this repo's historical confusion is one being cut as if it were the other —
+read [`docs/catalog.md`](docs/catalog.md) before building either.
+
+**The feature** is the main story: **Seven Days to the Wolves**, released as
+**one whole unit** at KubeCon NA — Wolves → Europa → **credits** (not designed
+yet) → the Nati teaser. Those four are the running order *inside one file*, not
+four videos to sequence in a playlist. The Nati teaser is part of the feature
+and is **not** a hero video; appearing in the feature does not make that
+appearance somebody's hero video.
+
+**A hero video is one person, one video, every source** — every clean shot of a
+bound character in the whole index, summed into one cut. Karena is Mara Sov, so
+hers is *every* instance of Mara Sov in the indexed cinematics — Season of the
+Lost and the Final Shape trailer today, plus whatever is indexed tomorrow. Kat,
+mrbobbytables, Cayde/castrojo and the rest of the cast each get one, and they
+are **promotional material for the feature**, released weekly in the run-up.
+
+**The schedule is real and dated**: teaser at T−7 weeks (21 Sep 2026), six
+weekly hero videos, feature at KubeCon NA (9 Nov 2026) —
+[`docs/release.md`](docs/release.md). The binding constraint is **indexing, not
+editing**: of the cast, only Osiris/mrbobbytables (82.1s) and Zavala/Kelsey
+(19.0s) have enough footage today. Kat has **zero** indexed shots and
+Cayde/castrojo has **1.2 seconds**.
+
+This is why segments carry a `video_id` *and* a character binding: so retrieval
+can gather that character from everywhere at once. Both tools already work this
+way — `tools/corpus.py <character>` reports the cross-source pool (`across 2
+video(s)`), and `tools/story.py` spans the whole index **by default**.
+
+**Spanning is the default; pinning is the exception.** `--from-video` +
+`--forward-only` builds a chronological cut inside one trailer, correct only
+when the cut retells *that trailer's* story. Reaching for it out of habit is a
+recorded failure: three consecutive Destiny chapters came out of the same 1:53
+trailer while four fully-indexed trailers had no outline at all, and two of
+those cuts shared 68% of their footage and plated the same person (issue #49).
+
+**Before pinning a source, ask what the cut is about. If it is about a person,
+do not pin** — see [`docs/cuts/hero-montage.md`](docs/cuts/hero-montage.md).
+
 ## Read order
 
 1. This file — repo rules, commands, and boundaries.
 2. [`docs/SKILL.md`](docs/SKILL.md) — find the skill for your task and load it.
-3. The design docs the skill points at (`docs/taxonomy.md`, `docs/pipeline.md`,
+3. [`docs/catalog.md`](docs/catalog.md) — which of the two video kinds you are
+   building. Getting this wrong wastes the whole cut.
+4. The design docs the skill points at (`docs/taxonomy.md`, `docs/pipeline.md`,
    `docs/agent-retrieval.md`, `docs/rendering.md`).
 
 ## Where the work lives
