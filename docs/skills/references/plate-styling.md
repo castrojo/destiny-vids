@@ -42,3 +42,26 @@ footage moves behind it), and the box applies `border-radius` *and* a
 
 The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 `tools/plate.py` is the live implementation.
+
+## Checking a binding for drift
+
+`vocab/casting.yaml` reproduces the website's authored identities, so the two
+can silently diverge. This reads both and says which bindings no longer match
+(read-only; it never writes to `~/src/website`):
+
+```bash
+python3 - <<'PY'
+import json
+from tools.derive import load_leads
+authored = {c["name"]: c for c in json.load(open(
+    "/var/home/jorge/src/website/public/wolves/characters/characters.json"
+))["characters"]}
+for key, b in load_leads().items():
+    p = b.get("plate") or {}
+    src = authored.get(p.get("name"))
+    if src:
+        rows = ("label", "class", "name", "title")
+        same = all(p.get(r) == src.get(r) for r in rows)
+        print(f"{key:12} {'ok' if same else 'DRIFTED'}")
+PY
+```

@@ -8,3 +8,6 @@ keyframes/
 renders/
 *.mp4
 *.edl
+
+# playwright for cards/render-cards.mjs is not vendored; link a checkout that has it
+node_modules

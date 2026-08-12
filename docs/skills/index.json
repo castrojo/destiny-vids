@@ -110,7 +110,7 @@
     {
       "id": "megacut",
       "name": "megacut",
-      "one_line_purpose": "Join finished cuts into one programme with deck-format chapter cards.",
+      "one_line_purpose": "Join finished cuts into one programme, with act slides between them.",
       "entry_point": "docs/skills/megacut.md",
       "category": "editing",
       "status": "active",
@@ -141,7 +141,7 @@
         "ffmpeg"
       ],
       "description": "Plans, renders, and burns Project Bluefin Guardian nameplates onto a cut. Use when crediting cast or contributors on screen, or changing plate copy, timing, or chrome.",
-      "version": "1.4",
+      "version": "1.5",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },

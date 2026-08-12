@@ -199,6 +199,12 @@ CHAT_RULE_H = 23         # .rule { height: 46px }
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
 
+# The full-frame cards -- the cinematic act slide and the intro's comic title
+# card. They are the site's own components, reproduced by `cards/render-cards.mjs`
+# in a real browser rather than ported into Pillow, so this module only ever
+# BURNS them: `render` skips them and `render_plate` refuses one outright.
+CARD_KINDS = ("act", "comic")
+
 # --- group rows (the reference deck's roll call, ~/Videos/nameplates.json) ---
 # The deck's gp_* entries are one row of credits, doubly staggered: spatially,
 # each card carries an absolute `x` measured against the picture; temporally,
@@ -605,7 +611,20 @@ def render_plate(spec):
     conversation without a plate line anybody had to invent. The chat card is
     a different component -- the plate.html dialogue pill -- so it dispatches
     to `_render_chat` instead of sharing the reveal's centered stack.
+
+    The FULL-FRAME cards (`act`, `comic`) are not rendered here at all. They are
+    the site's own components, and they are reproduced the way every other
+    Wolves card is -- the real CSS in a browser (`cards/render-cards.mjs`),
+    never a second implementation in Pillow. Rendering one here would silently
+    produce an empty Guardian plate, so it is refused instead.
     """
+    if spec.get("kind") in CARD_KINDS:
+        raise ValueError(
+            f"plate {spec.get('id')!r} is a {spec['kind']} card: render it with "
+            "`node cards/render-cards.mjs --manifest <manifest> --out-dir <dir>`, "
+            "which uses the website's own CSS. tools/plate.py burns them, it "
+            "does not draw them."
+        )
     if spec.get("kind") == "chat":
         return _render_chat(spec)
     if spec.get("kind") == "status":
@@ -1813,15 +1832,30 @@ def load_manifest_entries(entries):
 
 
 def render_all(entries, out_dir, picture=None):
+    """Render every plate in a manifest -- except the full-frame cards.
+
+    A manifest may mix the two: the megacut's hero segment carries six Guardian
+    plates and the comic title card. The cards come from `cards/render-cards.mjs`
+    and land in the same directory under the same `plate_<id>.png` name, so
+    both renderers fill one plates-dir and `burn` reads it without caring which
+    tool drew which file. Skipped cards are returned so a caller can report
+    them rather than assume they were drawn.
+    """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    written = []
+    written, skipped = [], []
     for e in entries:
+        if e.get("kind") in CARD_KINDS:
+            skipped.append(e["id"])
+            continue
         dest = out_dir / f"plate_{e['id']}.png"
         place(render_plate(e), e.get("position", "left"), picture,
               x=e.get("x"), scale=float(e.get("scale", 1.0)),
               raised=bool(e.get("raised"))).save(dest)
         written.append(dest)
+    if skipped:
+        print(f"skipped {len(skipped)} full-frame card(s) -- render them with "
+              f"cards/render-cards.mjs: {', '.join(skipped)}")
     return written
 
 

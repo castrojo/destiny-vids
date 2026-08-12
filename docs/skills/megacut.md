@@ -3,7 +3,7 @@ name: megacut
 version: "1.2"
 last_updated: "2026-08-12"
 id: megacut
-one_line_purpose: Join finished cuts into one programme with deck-format chapter cards.
+one_line_purpose: Join finished cuts into one programme, with act slides between them.
 entry_point: docs/skills/megacut.md
 category: editing
 mcp_compliance_level: partial
@@ -51,16 +51,49 @@ every other render in this repo.
 ## Core Process
 
 ```bash
-# 1. Chapter cards: the deck's title card, one PNG each
-python3 tools/plate.py render --manifest renders/<name>-cards.json \
+# 1a. Chapter cards, deck format (title / subtitle / body): a Python plate
+python3 tools/plate.py render --manifest stories/<name>/<name>-cards.json \
+    --out-dir renders/plates-<name>-cards
+
+# 1b. Full-frame cards (`kind: act`, `kind: comic`): the SITE'S OWN CSS in a
+#     real browser. Do not port one into Pillow -- see "Cards are reproduced".
+ln -sfn ~/src/website/node_modules node_modules      # playwright is not vendored
+node cards/render-cards.mjs --manifest stories/<name>/<name>-cards.json \
     --out-dir renders/plates-<name>-cards
 
 # 2. Check the graph before paying for the encode
-python3 tools/megacut.py renders/<name>.json --dry-run
+python3 tools/megacut.py stories/<name>/<name>.json --dry-run
 
 # 3. Assemble
-python3 tools/megacut.py renders/<name>.json
+python3 tools/megacut.py stories/<name>/<name>.json
 ```
+
+Both renderers write `plate_<id>.png` into the same directory and each skips
+what the other owns, so a manifest may mix them — the Wolves hero segment
+carries six Guardian plates *and* the comic title card, and `burn` reads one
+plates-dir without caring which tool drew which file.
+
+## Cards are reproduced, not designed
+
+A card that exists on the website is **rendered from the website's own rules**.
+`cards/act.html` and `cards/comic.html` copy the CSS out of
+`CinematicTransition.vue` and `WolvesIntroOverlay.vue`, and
+`cards/render-cards.mjs` screenshots them with playwright — the same pattern
+`~/Videos/wolves-{kat,natali}/render/plate.html` and
+`nimbatus-review/render/endcard.html` have always used.
+
+Re-implementing one in Pillow gets you a second, drifting version of chrome
+that already exists; `tools/plate.py` refuses a card kind outright and names
+the driver instead. The Python renderer is for the *deck's* shapes — the
+Guardian plate, the small title card, the chat pill, the status HUD.
+
+Two rules survive the move to a browser:
+
+- **Copy still arrives in the manifest.** A row nobody authored is left out of
+  the URL and does not render. The card templates default nothing.
+- **A CSS comment containing `*/` truncates the stylesheet**, and the card then
+  renders as unstyled black text on white — which is exactly what a path like
+  `wolves-*/render/reveal.html` does inside a comment. A test pins it.
 
 The plan is an ordered list of two kinds of item:
 
@@ -68,7 +101,7 @@ The plan is an ordered list of two kinds of item:
 {
   "output": "renders/<name>.mp4",
   "items": [
-    {"kind": "card", "image": "renders/plates-x/plate_card0.png", "dur": 5.0},
+    {"kind": "card", "image": "renders/plates-x/plate_act1.png", "dur": 5.0},
     {"kind": "clip", "path": "renders/segment.mp4", "audio": "silent"},
     {"kind": "clip", "path": "/abs/path/deliverable.mp4", "audio": "source"}
   ]
@@ -134,9 +167,13 @@ Segments genuinely disagree, so *some* re-encode is unavoidable:
   seconds — one here had a marketing end card the other did not.
 - **Never hand-edit the assembled file.** Fix the plan or the upstream cut and
   re-run.
-- **Chapter card copy is reproduced, never authored.** Cards use the deck's
-  closed `title` / `subtitle` / `body` shape. A card whose words nobody has
+- **Chapter card copy is reproduced, never authored.** The deck's card is the
+  closed `title` / `subtitle` / `body` shape; the act slide adds only the
+  owner's `act` numeral and `chapters` list. A card whose words nobody has
   written is omitted and recorded — see [`plates.md`](plates.md).
+- **A card that exists on the site is not re-implemented.** Render it from the
+  site's CSS with `cards/render-cards.mjs`; a Pillow port of chrome that
+  already ships is a second version to keep in step.
 - **A music bed under a silent segment is a licensing decision.** Leave it
   silent and record it; never pick a track to fill the gap.
 

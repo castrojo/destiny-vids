@@ -1,6 +1,6 @@
 ---
 name: plates
-version: "1.4"
+version: "1.5"
 last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
@@ -433,6 +433,12 @@ constant-by-constant record — the four known divergences, the font trap
 (`fc-match monospace`), and the gradient, shadow and chamfer details — lives in
 [`references/plate-styling.md`](references/plate-styling.md).
 
+The port covers the *deck's* shapes only. The two **full-frame** cards — the act
+slide and the intro's comic title card — are still live on the site, so they are
+rendered from its own CSS by `cards/render-cards.mjs` rather than ported;
+`tools/plate.py` refuses one and names the driver. See
+[`references/full-frame-cards.md`](references/full-frame-cards.md).
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -465,6 +471,9 @@ constant-by-constant record — the four known divergences, the font trap
 - A plate rendered in Adwaita Mono (or anything but DejaVu Sans Mono) — it is
   not in the font stack and matches none of the other videos.
 - Styling taken from the live site where the baked reveal disagrees.
+- A full-frame card re-implemented in Python instead of rendered from the
+  site's CSS — that is a second copy of chrome that already exists, and the two
+  drift the first time the site changes.
 - Falling back to `Bluefin Blueberry` for one of the seven people whose
   Guardian identity **is** authored (see "Where the copy is authored"). An
   unknown seal is a blueberry; a known one is a paraphrase.
@@ -479,21 +488,8 @@ constant-by-constant record — the four known divergences, the font trap
 python3 -m pytest -q tests/test_plate.py     # includes the closed-vocabulary test
 python3 -m pytest -q tests/test_derive.py    # pins every authored plate verbatim
 
-# diff a binding against the file that authored it (read-only)
-python3 - <<'PY'
-import json
-from tools.derive import load_leads
-authored = {c["name"]: c for c in json.load(open(
-    "/var/home/jorge/src/website/public/wolves/characters/characters.json"
-))["characters"]}
-for key, b in load_leads().items():
-    p = b.get("plate") or {}
-    src = authored.get(p.get("name"))
-    if src:
-        rows = ("label", "class", "name", "title")
-        same = all(p.get(r) == src.get(r) for r in rows)
-        print(f"{key:12} {'ok' if same else 'DRIFTED'}")
-PY
+# diff every binding against the file that authored it (read-only) --
+# the snippet lives in references/plate-styling.md, "Checking a binding for drift"
 
 # eyeball a plate inside its window
 ffmpeg -ss <at+1> -i renders/cut-plated.mp4 -frames:v 1 /var/tmp/plate.jpg

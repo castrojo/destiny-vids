@@ -12,7 +12,7 @@ Generated: 2026-08-12 · schema 1.0 · 9 skills
 | [editing](editing.md) | editing | active | Turn a plain-language outline into a rendered cut. |
 | [indexing](indexing.md) | indexing | active | Index a source video into schema-valid, searchable segments. |
 | [issues](issues.md) | meta | active | File work, pick it up, and know when to stop and ask. |
-| [megacut](megacut.md) | editing | active | Join finished cuts into one programme with deck-format chapter cards. |
+| [megacut](megacut.md) | editing | active | Join finished cuts into one programme, with act slides between them. |
 | [plates](plates.md) | editing | active | Put Guardian nameplates and title cards on a rendered cut. |
 | [production](production.md) | editing | active | Run the issue-to-render loop, repeatedly and in parallel. |
 | [scoring](scoring.md) | editing | active | Measure a music bed, cut sections out of it, and cut to its bars. |
