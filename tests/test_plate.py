@@ -51,10 +51,14 @@ def test_ghost_plate_has_no_class_line():
 
 
 def test_placement_respects_the_row_margins():
-    """bottom 10%, left/right 5% (.wolves-guardian-plate-row)."""
+    """bottom 10%, left/right 5% (.wolves-guardian-plate-row).
+
+    The bottom margin is the site's, i.e. what a full-frame 16:9 cut gets;
+    letterboxed footage is placed against the bar instead (below).
+    """
     p = plate.render_plate(GUARDIAN)
-    left = plate.place(p, "left")
-    right = plate.place(p, "right")
+    left = plate.place(p, "left", aspect=None)
+    right = plate.place(p, "right", aspect=None)
     assert left.size == (plate.FRAME_W, plate.FRAME_H)
 
     def bbox_of(frame):
@@ -66,6 +70,38 @@ def test_placement_respects_the_row_margins():
     assert rx1 == pytest.approx(plate.FRAME_W * (1 - plate.MARGIN_X), abs=2)
     assert ly1 == pytest.approx(plate.FRAME_H * (1 - plate.MARGIN_BOTTOM), abs=2)
     assert lx0 < rx0  # left-anchored really is further left
+
+
+def test_letterbox_bar_is_zero_for_full_frame_footage():
+    """16:9 (or wider) content is padded into nothing, so there is no bar."""
+    assert plate.letterbox_bar(16 / 9) == 0.0
+    assert plate.letterbox_bar(None) == 0.0
+    # 2.39:1 in a 1920x1080 frame: ~138px of bar, picture edge at ~942.
+    assert plate.letterbox_bar(2.39) == pytest.approx(138.3, abs=0.5)
+
+
+@pytest.mark.parametrize("spec", [GUARDIAN, GHOST, TITLE_CARD])
+def test_plate_text_sits_below_the_letterbox(spec):
+    """The card is anchored to the bar, not to the frame.
+
+    The site's 10% row margin is measured against a full-bleed player; over
+    2.39:1 footage it lands the row under the name straddling the picture edge,
+    half on the image and half on the bar. Placement is measured from the
+    letterbox so those rows read on black.
+    """
+    p = plate.render_plate(spec)
+    frame = plate.place(p, spec.get("position", "left"))
+    _, _, _, bottom = frame.getchannel("A").getbbox()
+
+    bar = plate.letterbox_bar()
+    picture_edge = plate.FRAME_H - bar
+    assert bottom > picture_edge          # seated on the bar...
+    assert bottom <= plate.FRAME_H        # ...and never off the frame
+
+    # ...far enough onto it that the plate's last row — the deck's `title` /
+    # `subtitle` line — clears the picture entirely.
+    last_row = plate.PAD_BOTTOM + max(plate.FS_TITLE, plate.FS_CLASS) * 1.25
+    assert bottom - picture_edge >= last_row
 
 
 def test_overlapping_plates_are_rejected(tmp_path):
@@ -242,6 +278,71 @@ def test_plan_output_never_double_books_the_screen():
     entries = plate.plan(shots, LEADS, ROSTER)
     assert len(entries) > 2
     plate.load_manifest_entries(entries)  # raises if any two overlap
+
+
+def _credits(entries):
+    """The contributor plates, in order — not the tail roster card."""
+    return [e for e in entries
+            if e["id"].startswith("ensemble_") and e.get("kind") != "title"]
+
+
+def test_contributor_plates_are_spread_across_the_cut():
+    """A month's credits stacked back to back read as a crawl, not casting.
+
+    The ensemble anchors in a Destiny cinematic cluster in its opening
+    firefight, so first-come placement puts every contributor in the intro.
+    """
+    shots = [_shot(f"s{i}", i * 3.0, i * 3.0 + 3.0, "ensemble", None, slots=1)
+             for i in range(10)]
+    entries = plate.plan(shots, LEADS, ROSTER)
+    credits = _credits(entries)
+    assert len(credits) > 1
+    for earlier, later in zip(credits, credits[1:]):
+        assert later["at"] - (earlier["at"] + earlier["dur"]) >= plate.MIN_SPACING
+
+
+def test_spacing_holds_contributors_back_rather_than_dropping_them():
+    """Whoever the cadence skips is still credited on the tail roster card."""
+    shots = [_shot(f"s{i}", i * 3.0, i * 3.0 + 3.0, "ensemble", None, slots=1)
+             for i in range(10)]
+    spread = plate.plan(shots, LEADS, ROSTER)
+    stacked = plate.plan(shots, LEADS, ROSTER, spacing=0)
+    assert len(_credits(spread)) < len(_credits(stacked))  # the rule bites...
+
+    named = {e.get("name") for e in spread} | {
+        line for e in spread for line in e.get("body", [])}
+    for contributor in ROSTER["contributors"]:  # ...and nobody is dropped for it
+        assert contributor["display_name"] in named, contributor
+
+
+def test_a_contributor_plate_shortens_rather_than_yields_to_a_later_lead():
+    """A collision is not a lost credit: the plate leaves before the lead arrives."""
+    shots = [
+        _shot("s1", 0, 3, "ensemble", None, slots=1),
+        _shot("s2", 3, 12, "lead", "osiris"),
+        _shot("s3", 12, 30),
+    ]
+    entries = plate.plan(shots, LEADS, ROSTER)
+    credit = _credits(entries)[0]
+    osiris = next(e for e in entries if e["id"] == "osiris")
+    assert credit["at"] == pytest.approx(plate.LEAD_IN)          # still on its anchor
+    assert credit["dur"] < plate.DEFAULT_HOLD                    # ...but cut short
+    assert credit["at"] + credit["dur"] <= osiris["at"]
+
+
+def test_a_contributor_plate_waits_out_an_earlier_lead():
+    """When the screen is already taken, the credit arrives once it clears."""
+    shots = [
+        _shot("s1", 0, 3, "lead", "osiris"),   # plate rides across the cut
+        _shot("s2", 3, 12, "ensemble", None, slots=1),
+        _shot("s3", 12, 30),
+    ]
+    entries = plate.plan(shots, LEADS, ROSTER)
+    osiris = next(e for e in entries if e["id"] == "osiris")
+    credit = _credits(entries)[0]
+    assert credit["at"] >= osiris["at"] + osiris["dur"]
+    assert credit["at"] < 12                  # and while its anchor is still up
+    assert credit["dur"] == pytest.approx(plate.DEFAULT_HOLD)
 
 
 def test_no_plate_field_is_invented_beyond_the_reference_deck():

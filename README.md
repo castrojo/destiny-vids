@@ -236,7 +236,40 @@ the one unacceptable outcome.
 Plates are anchored to a shot but not confined to it — a lower third routinely
 rides across a cut, and Destiny cinematics are full of two-second shots that
 could otherwise never carry a reveal. Two plates are never visible at once;
-`plan` and `burn` both refuse a manifest where the windows overlap.
+`plan` and `burn` both refuse a manifest where the windows overlap. A collision
+does not cost a credit if it does not have to: a plate will arrive once the one
+ahead of it clears, or leave before the next one is due, as long as it still
+lands while its own anchor is on screen.
+
+### Spread the credits
+
+Contributor plates are held at least `--spacing` seconds apart (default 8s).
+Without the cadence they stack: every ensemble anchor in a Destiny cinematic
+sits in its opening firefight, so first-come placement credits the whole month
+in the first twelve seconds and then goes silent. Whoever the cadence skips is
+not dropped — they land on the tail roster card.
+
+Cadence alone only thins the intro; what actually spreads the names is the
+**outline**, because a contributor can only be plated where an ensemble shot
+plays. To move a credit, move the beat: `stories/osiris-sagira.txt` deals its
+Guardian beats out across the story (the courtyard pillars, the Guardian atop
+the Vex spire, the fall through crossing beams) instead of running them off at
+the top. Check the result before rendering — `plan` prints every plate it
+placed, in order:
+
+```bash
+python3 tools/story.py stories/osiris-sagira.txt --dir segments --format json --out cut.json
+python3 tools/plate.py plan cut.json --roster roster.json --max-shot-sec 9 --out plates.json
+```
+
+### Sit below the letterbox
+
+`render.py` normalizes every shot to 1920×1080 and pads 2.39:1 source to fit, so
+a cut carries ~138px black bars. `plan`/`burn` place the card against the bottom
+bar (`--aspect`, default `2.39`), which keeps the lower rows — name, title,
+class — reading on black instead of straddling the picture edge. Pass
+`--aspect 0` for footage that fills the frame; the card falls back to a 10%
+bottom margin.
 
 Pass `plan` the **same** `--max-shot-sec` the render used, so plate timings land
 on the finished file rather than on the source timeline.

@@ -34,6 +34,11 @@ each value came from so the two can be diffed by eye. Entrance animation is
 deliberately NOT reproduced: a still plate that cuts in cleanly reads better at
 this length than a 0.6s CSS transform ported by hand, and it keeps the burn a
 single ffmpeg overlay rather than an image sequence.
+
+Placement is the one deliberate departure. The site overlays a full-bleed 16:9
+player; these plates ride over 2.39:1 cinematic footage padded into a 16:9
+frame, so the card is anchored to the LETTERBOX and its text rows read below
+the picture edge, on the bar, instead of being cut in half by it.
 """
 
 from __future__ import annotations
@@ -109,6 +114,17 @@ CREST = 2.5 * REM        # .wolves-guardian-plate-crest
 # Row placement: bottom 10%, left/right 5% (.wolves-guardian-plate-row).
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
+
+# The site's overlay rides over a full-bleed 16:9 player. A Destiny cinematic is
+# 2.39:1 inside that frame, so render.py pads a black bar top and bottom and the
+# site's 10% row margin lands the plate's lower rows — the `title`/`subtitle`
+# line the deck puts under the name — straddling the picture edge, half on the
+# image and half on the bar. Placement is therefore measured from the letterbox:
+# the card sits ON the bottom bar, with its last row below the picture edge.
+LETTERBOX_AR = 2.39
+# ...clear of the frame edge by a quarter of a bar, so the card reads as seated
+# in the letterbox rather than falling out of it.
+BAR_MARGIN = 0.25
 
 FONT_CANDIDATES = {
     "regular": [
@@ -318,10 +334,33 @@ def render_plate(spec):
     return img
 
 
-def place(plate, position="left"):
-    """Composite a plate onto a full 1920x1080 transparent frame."""
+def letterbox_bar(aspect=LETTERBOX_AR, frame_w=FRAME_W, frame_h=FRAME_H):
+    """Height of ONE black bar when ``aspect`` content is padded into the frame.
+
+    render.py normalizes every clip with ``scale=...:force_original_aspect_ratio
+    =decrease`` + ``pad``, so 2.39:1 footage lands in the 16:9 frame with a
+    ~138px bar top and bottom and a picture edge at y ~= 942. Content at or
+    wider than the frame gets no bars, and neither does ``aspect=None``.
+    """
+    if not aspect or aspect <= frame_w / frame_h:
+        return 0.0
+    return (frame_h - frame_w / aspect) / 2
+
+
+def place(plate, position="left", aspect=LETTERBOX_AR):
+    """Composite a plate onto a full 1920x1080 transparent frame.
+
+    The card is bottom-anchored to the LETTERBOX rather than to the frame: its
+    lower rows sit inside the bottom bar, below the picture edge, instead of
+    being cut in half by it. ``aspect=None`` restores the site's 10% row margin
+    for a full-frame 16:9 cut.
+    """
     frame = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
-    y = int(FRAME_H * (1 - MARGIN_BOTTOM)) - plate.height
+    bar = letterbox_bar(aspect)
+    if bar:
+        y = int(round(FRAME_H - bar * BAR_MARGIN)) - plate.height
+    else:
+        y = int(FRAME_H * (1 - MARGIN_BOTTOM)) - plate.height
     if position == "right":
         x = int(FRAME_W * (1 - MARGIN_X)) - plate.width
     elif position == "center":
@@ -342,6 +381,15 @@ MIN_ANCHOR = 1.5
 LEAD_IN = 0.4     # let the cut land before the plate arrives
 TAIL_OUT = 0.25   # ...and clear before the next one
 DEFAULT_HOLD = 5.0
+# Contributor plates are spread across the cut rather than filled from the
+# front. The ensemble anchors in a Destiny cinematic cluster in its opening
+# firefight — every anonymous-Guardian shot in the Osiris cut lands inside its
+# first 12 seconds — so first-come placement credits the whole month in the
+# intro and then runs silent, which reads as a credits crawl rather than
+# casting. A contributor plate waits until the timeline has moved MIN_SPACING
+# past the end of the previous one; whoever the body of the cut cannot hold at
+# that cadence is still credited on the tail roster card.
+MIN_SPACING = 8.0
 
 
 def cut_timeline(shots, max_shot_sec=None):
@@ -378,23 +426,57 @@ def _window(start, duration, hold=DEFAULT_HOLD, room=None):
     return round(start + LEAD_IN, 3), round(min(hold, usable), 3)
 
 
-def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None):
+def _schedule(start, duration, busy, total, hold=DEFAULT_HOLD, earliest=None):
+    """Fit a plate onto one anchor in the room the schedule leaves it.
+
+    A collision is not automatically a lost credit: the plate can arrive after
+    the plate ahead of it clears, or leave before the next one is due. What it
+    may never do is share the screen, hold too briefly to read, or arrive so
+    late that the anchor it belongs to has already cut away.
+
+    ``earliest`` is the credit cadence — the point before which the next
+    contributor plate would stack onto the last one.
+    """
+    window = _window(start, duration, hold, room=total - start)
+    if not window:
+        return None
+    at, dur = window
+    if earliest is not None:
+        at = round(max(at, earliest), 3)
+    for b_start, b_end in sorted(busy):
+        if b_end <= at or b_start >= at + dur:
+            continue
+        if b_start <= at:
+            at = round(b_end + TAIL_OUT, 3)   # arrive once that plate clears
+        else:
+            dur = round(b_start - TAIL_OUT - at, 3)   # ...or leave before it
+    # A shifted plate has to arrive while its anchor is still up, with enough of
+    # the shot left to tie the name to it. An unshifted plate keeps the original
+    # contract: the anchor was already long enough to register.
+    latest = max(start + LEAD_IN, start + duration - MIN_ANCHOR)
+    if at > latest:
+        return None
+    dur = round(min(dur, total - TAIL_OUT - at), 3)
+    if dur < MIN_HOLD:
+        return None
+    return at, dur
+
+
+def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
+         spacing=MIN_SPACING):
     """Cut list -> plate manifest.
 
     Leads are plated on their first appearance long enough to read, using the
     `plate:` copy in vocab/casting.yaml. Ensemble contributors are plated from
-    the deterministic assignment in tools/ensemble.py; anyone whose assigned
-    shot is too short to hold a plate is credited over the final shot instead,
-    so the month's contributors are never silently dropped.
+    the deterministic assignment in tools/ensemble.py, spread across the cut at
+    a cadence of ``spacing`` seconds between plates; anyone whose assigned shot
+    is too short — or too close to the last credit — is credited over the final
+    shot instead, so the month's contributors are never silently dropped.
     """
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     entries, plated = [], set()
     busy = []  # occupied windows, so nothing ever double-books the screen
-
-    def free(start, duration):
-        end = start + duration
-        return all(end <= b_start or start >= b_end for b_start, b_end in busy)
 
     for start, duration, shot in timeline:
         casting = shot.get("casting") or {}
@@ -406,8 +488,8 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         copy = (leads.get(character) or {}).get("plate")
         if not copy:
             continue
-        window = _window(start, duration, hold, room=total - start)
-        if not window or not free(*window):
+        window = _schedule(start, duration, busy, total, hold)
+        if not window:
             continue
         at, dur = window
         entries.append({"id": character, "at": at, "dur": dur, "position": "left",
@@ -428,12 +510,16 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         by_segment.setdefault(item["segment_id"], []).append(item)
 
     credited, pending = set(), []
+    # Where the previous contributor plate cleared the screen, so the next one
+    # waits for the cut to move on instead of stacking behind it.
+    last_credit_end = None
     for start, duration, shot in timeline:
         for item in by_segment.get(shot.get("segment_id"), []):
             if item["login"] in credited:
                 continue
-            window = _window(start, duration, hold, room=total - start)
-            if not window or not free(*window):
+            earliest = None if last_credit_end is None else last_credit_end + spacing
+            window = _schedule(start, duration, busy, total, hold, earliest)
+            if not window:
                 pending.append(item)
                 continue
             at, dur = window
@@ -444,6 +530,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 "title": f"Project Bluefin, {result['month']}",
             })
             busy.append((at, at + dur))
+            last_credit_end = at + dur
             credited.add(item["login"])
             if log:
                 log(f"  {'ensemble':<10} {at:6.2f}s +{dur:.1f}s  {item['display_name']}")
@@ -513,13 +600,13 @@ def load_manifest_entries(entries):
     return entries
 
 
-def render_all(entries, out_dir):
+def render_all(entries, out_dir, aspect=LETTERBOX_AR):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
     for e in entries:
         dest = out_dir / f"plate_{e['id']}.png"
-        place(render_plate(e), e.get("position", "left")).save(dest)
+        place(render_plate(e), e.get("position", "left"), aspect).save(dest)
         written.append(dest)
     return written
 
@@ -576,12 +663,18 @@ def main(argv=None):
     r = sub.add_parser("render", help="manifest -> transparent PNG per plate")
     r.add_argument("--manifest", required=True)
     r.add_argument("--out-dir", default=str(REPO_ROOT / "renders" / "plates"))
+    r.add_argument("--aspect", type=float, default=LETTERBOX_AR,
+                   help="aspect ratio of the footage inside the 16:9 frame, so "
+                        "plates sit below the letterbox (0 for a full-frame cut)")
 
     b = sub.add_parser("burn", help="composite rendered plates onto a cut")
     b.add_argument("--video", required=True)
     b.add_argument("--manifest", required=True)
     b.add_argument("--plates-dir", default=str(REPO_ROOT / "renders" / "plates"))
     b.add_argument("--out", required=True)
+    b.add_argument("--aspect", type=float, default=LETTERBOX_AR,
+                   help="aspect ratio of the footage inside the 16:9 frame, so "
+                        "plates sit below the letterbox (0 for a full-frame cut)")
 
     p = sub.add_parser("plan", help="cut list (+ roster) -> timed plate manifest")
     p.add_argument("shotlist", help="JSON shot list from tools/story.py --format json")
@@ -589,6 +682,9 @@ def main(argv=None):
     p.add_argument("--max-shot-sec", type=float, default=None,
                    help="the same hold cap render.py was given, so timings line up")
     p.add_argument("--hold", type=float, default=DEFAULT_HOLD)
+    p.add_argument("--spacing", type=float, default=MIN_SPACING,
+                   help="seconds of cut between contributor plates, so the "
+                        "month's credits are spread instead of stacked")
     p.add_argument("--out", required=True)
 
     args = parser.parse_args(argv)
@@ -602,7 +698,8 @@ def main(argv=None):
             with Path(args.roster).open(encoding="utf-8") as fh:
                 roster = json.load(fh)
         entries = plan(load_shots(args.shotlist), load_leads(), roster,
-                       max_shot_sec=args.max_shot_sec, hold=args.hold, log=print)
+                       max_shot_sec=args.max_shot_sec, hold=args.hold, log=print,
+                       spacing=args.spacing)
         load_manifest_entries(entries)  # same validation the burn path applies
         with Path(args.out).open("w", encoding="utf-8") as fh:
             json.dump(entries, fh, indent=2)
@@ -613,12 +710,12 @@ def main(argv=None):
     entries = load_manifest(args.manifest)
 
     if args.command == "render":
-        written = render_all(entries, args.out_dir)
+        written = render_all(entries, args.out_dir, args.aspect)
         for path in written:
             print(f"wrote {path}")
         return 0
 
-    render_all(entries, args.plates_dir)
+    render_all(entries, args.plates_dir, args.aspect)
     out = burn(args.video, entries, args.plates_dir, args.out)
     print(f"wrote {out}")
     return 0

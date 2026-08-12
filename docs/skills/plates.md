@@ -1,7 +1,7 @@
 ---
 name: plates
 version: "1.0"
-last_updated: "2026-08-11"
+last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
 entry_point: docs/skills/plates.md
@@ -83,10 +83,32 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   otherwise never carry a reveal. The anchor must still be long enough to
   register (`MIN_ANCHOR`).
 - **Two plates are never visible at once.** `plan` and `burn` both refuse an
-  overlapping manifest.
-- Contributors whose shot is too short are credited together on a roster title
-  card over the tail. Dropping a month's contributors silently is the one
-  unacceptable outcome.
+  overlapping manifest. A collision is resolved before it is conceded: the plate
+  arrives once the one ahead of it clears, or leaves before the next is due, as
+  long as it still lands while its own anchor is on screen.
+- Contributor plates are held `MIN_SPACING` apart (`--spacing`, default 8s).
+  Every ensemble anchor in a Destiny cinematic sits in its opening firefight, so
+  first-come placement credits the whole month in the first twelve seconds and
+  then goes silent. **The cadence only thins the intro — spreading the credits
+  is an outline job**, because a contributor can only be plated where an
+  ensemble shot plays. Deal the Guardian beats out across the story.
+- Contributors whose shot is too short — or whom the cadence skips — are
+  credited together on a roster title card over the tail. Dropping a month's
+  contributors silently is the one unacceptable outcome.
+
+## Sit below the letterbox
+
+`render.py` pads 2.39:1 source into a 1920×1080 frame, so a cut carries ~138px
+black bars. The card is placed against the bottom bar (`--aspect`, default
+`2.39`) rather than on the website's 10% margin, which keeps its lower rows —
+name, title, class — reading on black instead of straddling the picture edge
+where the bar cuts them in half. `--aspect 0` restores the full-frame margin for
+footage that fills the frame.
+
+This is the only deliberate departure from the website CSS, and it exists
+because the website plays plates over full-frame video and we do not.
+
+## Burning
 
 `burn` composites every plate in one ffmpeg pass — an `overlay` chain gated by
 `enable='between(t,in,out)'` — and stream-copies audio, so titling never costs
@@ -121,6 +143,8 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 | "I'll hardcode the copy just for this render." | Then the credit and the casting drift apart the first time a role is recast. Copy lives in `vocab/casting.yaml`. |
 | "The plate is short, it can share the screen." | Two plates at once is unreadable; both `plan` and `burn` refuse it. |
 | "The shot is only two seconds, so nobody can be plated there." | The plate rides across the cut. Only the *anchor* must be long enough to register. |
+| "All the ensemble shots are in the intro, so that's where the credits go." | Then the month reads as a crawl and the rest of the cut is uncredited. Move the beats, not the names. |
+| "The card looks fine on the reference still." | The reference is full-frame; the render is letterboxed. Check the plate against the picture edge, not the frame edge. |
 
 ## Red Flags
 
@@ -128,12 +152,18 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 - Hardcoding copy in the manifest instead of `vocab/casting.yaml`.
 - Planning with a different `--max-shot-sec` than the render used — every plate
   after the first trimmed shot lands late.
+- Every contributor plate inside the first fifteen seconds.
+- A plate whose lower rows cross the letterbox line (~y=942 for 2.39:1 in 1080p).
 - A subclass line on a Ghost.
 
 ## Verification
 
 ```bash
 python3 -m pytest -q tests/test_plate.py     # includes the closed-vocabulary test
+
+# read the cadence: every plate `plan` placed, in order
+python3 tools/plate.py plan cut.json --roster roster.json --max-shot-sec 9 \
+    --out plates.json
 
 # eyeball a plate inside its window
 ffmpeg -ss <at+1> -i renders/cut-plated.mp4 -frames:v 1 /tmp/plate.jpg
