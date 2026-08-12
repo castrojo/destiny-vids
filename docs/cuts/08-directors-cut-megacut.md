@@ -59,18 +59,44 @@ provenance question.
 third_party_copyrighted`, Bungie fan-content policy, non-commercial, no footage
 committed.
 
-**Owner decision, this session: use Bungie's own upload and drop its audio.**
+**Owner decision: use Bungie's own upload.** Its audio was dropped at first and
+then **restored** (2026-08-12) — dropping it took the *score* with it, and the
+segment played silent. The fan copy's "(Without Dialogue)" label means exactly
+that: it still carries the music. Bungie's own audio is now used, so the score
+is official too; Ikora's voice-over comes with it, because it is part of the
+cinematic as Bungie published it.
 The website defaults instead to `BV3BZKbpBns` ("Into the Light (Without
 Dialogue)", *Destiny Music Archive* — a fan archive), and offers Bungie's as an
-"Ikora voice over" toggle. Taking Bungie's silent resolves three things at once:
+"Ikora voice over" toggle. Using Bungie's gives an **official** upload for both
+picture and score, so the fan-archive provenance question does not arise, and
+AV1 was available for the picture (format 399).
 
-- **provenance** — an official upload, so the fan-archive question does not arise;
-- **the voice-over** — the only reason to prefer the fan copy was that Bungie's
-  carries dialogue, and dropping the audio removes the objection entirely;
-- **codecs** — AV1 was available and used (format 399).
+> **The trap, and it was walked into.** "Drop the audio, we don't use it" was
+> read as *mute the segment*, and the segment then played with **no score** —
+> because the fan copy's *"(Without Dialogue)"* never meant silent, it meant
+> *music without the voice-over*. Muting to avoid the voice-over throws away the
+> music with it. If dialogue-free music is ever wanted again, that is a
+> different edit, not a mute.
 
 Accepted cost, recorded: Bungie's is **1080p30** where the fan copy was 1080p60,
 so the hero is the only 30fps source in the programme.
+
+### The audio, and how it is sourced
+
+From the same upload's best audio rung: **Opus 127k at native 48 kHz**
+(format 251) — deliberately **not** the `-drc` rung beside it, which applies
+dynamic range compression the audio tenet forbids. Trimmed to the same
+`2.0 -> 113.55` window as the picture and placed **bit-exact in FL/FR** with
+`pan` (never `-ac`, which would quietly rescale it), the other four channels
+silent — the same shape as every other master in `~/Videos`.
+
+The decoded audio is a half-frame shorter than the picture, so it is padded with
+`apad` and the **picture decides the length** — the pattern `~/Videos/PREMIERE.md`
+records. Cutting to the shorter stream instead drops a frame and, inside a
+concat, drifts everything after it. Kept **lossless (FLAC)** through the
+intermediate, so the only lossy step is the final assembly encode.
+
+**Only the four title cards are silent.**
 
 ### The anchors were re-verified, and they moved
 
@@ -117,33 +143,33 @@ Two behaviours are carried over from the sequence file so nobody "fixes" them:
   opposite `position` values and a shared `group` key — `tools/plate.py` treats
   a group row as one row, which is exactly what the live overlay renders.
 
-## What is reproduced, and the one thing that is not
+## On screen: the six nameplates, and nothing else
 
-The three live-overlay behaviours this cut originally shipped without are now
-**built** (2026-08-12), so the hero segment is generated end to end here rather
-than approximated:
+**Owner decision, 2026-08-12: "just the name plaquards."** The cut carries the
+six Guardian nameplates and no other chrome. The site's persistent top-of-frame
+HUD is deliberately **not** burned in — that removes the default *"Meet your
+Fireteam"* / *"a project to bring their stories to life"* card, the three
+`#nova4ever` glitch bursts, and the closing *"Legends Sought"* card.
 
-1. **The top status nameplate** — the site's persistent top-of-frame HUD
-   (`Nameplate.vue`), which the intro overlay re-labels per cue. It runs the
-   whole segment on the authored default from `INTRO_DISPLAY['wolves-intro']`
-   (*Meet your Fireteam* / *a project to bring their stories to life*), and is
-   overridden by the closing **Legends Sought** / *"Follow the path, we've got
-   your back"* card at source 106.5 onward — 7 seconds of authored copy that
-   used to be missing entirely.
-2. **The three `#nova4ever` glitch bursts** (source 52, 60.6, 68.1 — 0.45s
-   each): the red/cyan `text-shadow` split and the clip-path tear from
-   `@keyframes wc-nameplate-glitch`. The split is applied to the **type**, not
-   the panel, because that is what a text-shadow does.
-3. **`raised` on Natali's plate** — this turned out **not** to be a visual
-   judgement at all: `.wolves-guardian-plate-raised` is an authored rule
-   (`bottom: auto; top: 28%`). Reproducing it lifts her card beside the
-   Behemoth Guardian and staggers it against Christoph's in the lower third,
-   which is how the site composes that shared shot.
+**The capability is built and kept, not deleted.** `tools/plate.py` renders
+`kind: "status"` — the HUD's two authored lines, the glitch's red/cyan
+`text-shadow` split (applied to the *type*, not the panel, because that is what
+a text-shadow does) and its clip-path tear — and all of it is tested. Putting
+any of it back is a manifest edit, not new code. The rows are removed from
+`stories/megacut/megacut-hero-plates.json`, which records why.
 
-**The one thing still not drawn is the rotating dinosaur avatar badge** on the
-status nameplate. It is animated brand artwork rather than copy, on a
-20-second cycle that no still can represent honestly, and a frozen stand-in
-would put a picture on the card that nobody authored. Omitted and recorded.
+One thing about the HUD is worth keeping written down, because it is invisible
+until it is wrong: it is **persistent** chrome, not a per-cue pop-in. Its copy
+comes from the per-cue overrides in `wolves-intro-sequence.ts` *and* the segment
+default in `INTRO_DISPLAY`. Wiring only the cues renders a card that flickers
+where the site holds one continuously. And its rotating dinosaur avatar badge is
+never drawn: animated brand artwork on a 20-second cycle, not copy.
+
+**`raised` survives on Natali's plate**, and it turned out **not** to be a
+visual judgement at all: `.wolves-guardian-plate-raised` is an authored rule
+(`bottom: auto; top: 28%`). Reproducing it lifts her card beside the Behemoth
+Guardian and staggers it against Christoph's in the lower third, which is how
+the site composes that shared shot.
 
 ## Deprecations
 
@@ -171,8 +197,8 @@ Rebuild with the full manifest.
   Kubernetes"*. The two agreeing sources are used. Choosing between two things
   the owner authored, on a real colleague's card, is not automatable.
 - **The status nameplate's dinosaur avatar badge** is not drawn (see above).
-- **A music bed** under the hero segment and the four cards. They are silent; a
-  bed is a licensing decision.
+- **A music bed** under the four title cards. They are silent; a bed is a
+  licensing decision. The hero segment now carries Bungie's own score.
 - **Chapter card placement.** The cards use the deck's own geometry, so they sit
   as a lower third on an otherwise black frame. Centring them would look more
   deliberate, but moving authored chrome is a visual judgement.
@@ -200,7 +226,8 @@ Not asserted — measured.
 
   | Segment | Master | Source |
   |---|---|---|
-  | card0 + hero | −91.0 dB (digital silence) | silent by design |
+  | card0 | −91.0 dB (digital silence) | silent by design |
+  | hero | −4.6 dB | Bungie's score, no gain applied |
   | card1 | −91.0 dB | silent by design |
   | Kat | −1.1 dB | −1.1 dBTP |
   | card2 | −91.0 dB | silent by design |
@@ -219,9 +246,9 @@ under `renders/` and `media/` is a regenerated artifact.
 
 ```bash
 cd ~/src/destiny-vids
+FFPROFILE=firefox:~/.var/app/org.mozilla.firefox/config/mozilla/firefox/mha2aykb.default-release
 
-yt-dlp --cookies-from-browser \
-  firefox:~/.var/app/org.mozilla.firefox/config/mozilla/firefox/mha2aykb.default-release \
+yt-dlp --cookies-from-browser "$FFPROFILE" \
   -f "bv*[height=1080][vcodec^=av01]/bv*[height=1080][vcodec^=vp9]/bv*[height=1080]" \
   -o media/yt_into_the_light_cinematic.%\(ext\)s \
   https://www.youtube.com/watch?v=BKm0TPqeOjY
@@ -234,7 +261,19 @@ python3 tools/plate.py render --manifest stories/megacut/megacut-hero-plates.jso
     --out-dir renders/plates-megacut-hero
 python3 tools/plate.py burn --video renders/megacut-01-hero-raw.mp4 \
     --manifest stories/megacut/megacut-hero-plates.json \
-    --plates-dir renders/plates-megacut-hero --out renders/megacut-01-hero.mp4
+    --plates-dir renders/plates-megacut-hero --out renders/megacut-01-hero-mute.mp4
+
+# the score: best audio rung, NOT the -drc one (it compresses dynamics)
+yt-dlp --cookies-from-browser "$FFPROFILE" -f 251 \
+  -o media/yt_into_the_light_cinematic-audio.%\(ext\)s \
+  https://www.youtube.com/watch?v=BKm0TPqeOjY
+
+# same window as the picture; stereo bit-exact in FL/FR; picture decides length
+ffmpeg -i renders/megacut-01-hero-mute.mp4 \
+  -i media/yt_into_the_light_cinematic-audio.webm -map 0:v:0 -map 1:a:0 \
+  -c:v copy -c:a flac -shortest \
+  -af "atrim=start=2.0:end=113.55,asetpts=N/SR/TB,aresample=48000,pan=5.1|FL=FL|FR=FR,apad" \
+  renders/megacut-01-hero.mkv
 
 python3 tools/plate.py render --manifest stories/megacut/megacut-cards.json \
     --out-dir renders/plates-megacut-cards
