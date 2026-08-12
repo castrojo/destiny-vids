@@ -3,7 +3,6 @@
   "_timeline": "Windows come from wolves-intro-sequence.ts, which records them as frame-verified against the real embed. They are keyed to the SOURCE absolute timeline; every `at` below is that value minus the verified startOffset of 2.0s, so it lands on the trimmed segment.",
   "_source_video": "BKm0TPqeOjY - 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (111.55s). Video-only: audio was never fetched (owner decision, this session).",
   "_windows_verified": "All six windows were frame-checked against THIS file, not assumed: t=8 purple void vortex (Bob), t=20 Ward of Dawn bubble with a Titan inside (Kat), t=44 arc lightning duel (Kaslin), t=73 solar winged Guardian (Laura), t=87 green Strand tendrils (Christoph), t=92 green Strand Guardian left + icy-blue crystal Guardian right (Christoph + Natali). The timeline maps 1:1 with the fan copy the windows were originally measured on; the ~5.4s length difference is entirely in the tail.",
-
   "plates": [
     {
       "id": "bob",
@@ -74,10 +73,85 @@
       "name": "Natali Vlatko",
       "title": "Shipwright of Kubernetes",
       "group": "christoph-natali",
-      "note": "source window 89.5 - 96. Shares the `group` row with Christoph: the two ARE meant to be visible together (that is why they carry opposite `position` values), which is exactly the exemption tools/plate.py's overlap check reserves for a group row. TITLE DISCREPANCY, owner decision: a comment in wolves-intro-sequence.ts says her title line is 'Punch first, document later.' per explicit user request, while her own overlay string AND characters.json both say 'Shipwright of Kubernetes'. The two agreeing authored sources are used here; picking between two authored strings on a real colleague's card is not automatable. The live overlay also gives her plate a `raised` vertical offset, which tools/plate.py has no equivalent for -- see unresolved below."
+      "note": "source window 89.5 - 96. Shares the `group` row with Christoph: the two ARE meant to be visible together (that is why they carry opposite `position` values), which is exactly the exemption tools/plate.py's overlap check reserves for a group row. TITLE DISCREPANCY, owner decision: a comment in wolves-intro-sequence.ts says her title line is 'Punch first, document later.' per explicit user request, while her own overlay string AND characters.json both say 'Shipwright of Kubernetes'. The two agreeing authored sources are used here; picking between two authored strings on a real colleague's card is not automatable. The live overlay also gives her plate a `raised` vertical offset, which tools/plate.py has no equivalent for -- see unresolved below.",
+      "raised": true
+    },
+    {
+      "id": "hud_default_0",
+      "kind": "status",
+      "at": 0.0,
+      "dur": 50.0,
+      "position": "status",
+      "detail": "Meet your Fireteam",
+      "label": "a project to bring their stories to life"
+    },
+    {
+      "id": "hud_nova_1",
+      "kind": "status",
+      "at": 50.0,
+      "dur": 0.45,
+      "position": "status",
+      "detail": "Meet your Fireteam",
+      "label": "#nova4ever",
+      "glitch": true
+    },
+    {
+      "id": "hud_default_1",
+      "kind": "status",
+      "at": 50.45,
+      "dur": 8.15,
+      "position": "status",
+      "detail": "Meet your Fireteam",
+      "label": "a project to bring their stories to life"
+    },
+    {
+      "id": "hud_nova_2",
+      "kind": "status",
+      "at": 58.6,
+      "dur": 0.45,
+      "position": "status",
+      "detail": "Meet your Fireteam",
+      "label": "#nova4ever",
+      "glitch": true
+    },
+    {
+      "id": "hud_default_2",
+      "kind": "status",
+      "at": 59.05,
+      "dur": 7.05,
+      "position": "status",
+      "detail": "Meet your Fireteam",
+      "label": "a project to bring their stories to life"
+    },
+    {
+      "id": "hud_nova_3",
+      "kind": "status",
+      "at": 66.1,
+      "dur": 0.45,
+      "position": "status",
+      "detail": "Meet your Fireteam",
+      "label": "#nova4ever",
+      "glitch": true
+    },
+    {
+      "id": "hud_default_3",
+      "kind": "status",
+      "at": 66.55,
+      "dur": 37.95,
+      "position": "status",
+      "detail": "Meet your Fireteam",
+      "label": "a project to bring their stories to life"
+    },
+    {
+      "id": "hud_closing",
+      "kind": "status",
+      "at": 104.5,
+      "dur": 7.066667,
+      "position": "status",
+      "detail": "Legends Sought",
+      "label": "Follow the path, we've got your back"
     }
   ],
-
   "unresolved": [
     {
       "what": "top status nameplate (`statusOnly`)",
@@ -109,5 +183,6 @@
       "automatable": "no",
       "blocked_on": "owner's licensing call."
     }
-  ]
+  ],
+  "_status_row": "The site's top-of-frame HUD nameplate, reproduced. It is PERSISTENT chrome on the website, not a pop-in, so it runs the whole segment: the authored default from INTRO_DISPLAY['wolves-intro'] in ~/src/website/src/WolvesApp.vue ('Meet your Fireteam' / 'a project to bring their stories to life'), overridden by the three #nova4ever glitch bursts and by the closing 'Legends Sought' card. Every window is a sequence-file cue time minus the verified 2.0s startOffset."
 }
