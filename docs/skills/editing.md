@@ -99,8 +99,10 @@ python3 tools/story.py stories/01-dance.txt --dir segments \
 The beat order *is* the timeline; the skips are the gaps between chosen shots.
 This is deliberately not a sequencer — there is no cut-graph, no editing DSL,
 and no layer that lets cut order disagree with source order. Write the beats in
-source-time order and reorder by moving lines. Worked example:
-[`docs/cuts/01-dance.md`](../cuts/01-dance.md).
+source-time order and reorder by moving lines. Worked examples:
+[`docs/cuts/01-dance.md`](../cuts/01-dance.md) (ensemble) and
+[`docs/cuts/03-zavala.md`](../cuts/03-zavala.md) (a lead, where the beats had to
+bend to eight clean shots).
 
 Under `--forward-only` a mismatch cascades harder than usual: a wrong early
 pick can strand every later beat behind the playhead. Fix the earliest wrong

@@ -1,0 +1,65 @@
+# 03-zavala — the Zavala cut. Sequence position 03 (see docs/cuts/03-zavala.md).
+#
+# ONE CINEMATIC, SKIPPED FORWARD. Every beat below is cut from
+# yt_destiny_2_the_final_shape_launch_trailer and sits at or after the previous
+# one on that cinematic's own timeline, so the cut only ever skips forward:
+#
+#   python3 tools/story.py stories/03-zavala.txt --dir segments \
+#       --from-video yt_destiny_2_the_final_shape_launch_trailer --forward-only
+#
+# The beat order IS the timeline. There is no sequencer and no second
+# cinematic; the five movements below are the skip-forward points, and each one
+# names the source timecode it resumes at.
+#
+# A HERO CUT FOR ZAVALA. The camera serves him: every movement is built to
+# arrive on one of his six clean shots, and the last of them — the ghost of a
+# smile at 1:25 — is the one the whole cut is walking toward. The antagonist
+# gets one beat, wide and brief, face never given. There is no per-enemy
+# framing anywhere in here, by design.
+#
+# THE FICTION BENT TO THE FOOTAGE. Zavala has eight clean shots in the whole
+# index and six of them are in this cinematic; the other two are in the
+# Lightfall launch trailer, which is a different source and therefore a
+# different cut. Nothing here was widened to unclean footage and no shot was
+# invented. What the outline could not reach — including the owner's 1:50
+# reveal point — is recorded in docs/cuts/03-zavala.md and corpus/zavala.json.
+
+# --- MOVEMENT 1 — WHAT IT COSTS (skip to 0:14) ------------------------------
+# Opens on the threat implied, never shown, and on the price already paid.
+two distant lights burn through heavy red fog
+a dim shell lies open and still on a floor in raking amber light
+
+# --- MOVEMENT 2 — THE COMMANDER (skip to 0:32) ------------------------------
+low shot of armored titan boots planted on grey lunar rock, mountains beyond
+zavala kneels on a windswept ridge, shield on his back, staring off
+a single silhouetted guardian dwarfed by the vast sphere of the traveler in cloud
+the curve of a world seen from orbit, its surface veined with fire
+
+# --- MOVEMENT 3 — THE ROOM HE COMMANDS (skip to 0:39) -----------------------
+# The people the order is given to, then the man who has to give it: the
+# cockpit push-in is the longest clean Zavala shot in the index.
+over-the-shoulder on two helmeted guardians in a dim briefing space, teal light
+a helmeted guardian sits amid crew in a dim hold, framed between two foreground figures
+a ring of guardians resting on crates and rock in low red light
+zavala lit cold blue in a cockpit, jaw set, looking out past camera
+
+# --- MOVEMENT 4 — THE LINE HOLDS (skip to 0:55) -----------------------------
+a lone guardian silhouetted at the center of an enormous violet detonation
+a guardian stands on a ridge in pale cloud, facing a distant black pyramid
+two guardians advance shoulder to shoulder with rifles raised, drenched in red light
+a scorched red helmet lies abandoned against dark stonework
+discarded rifles lie scattered in wet grass
+zavala in profile, helmeted against washed sky, visor catching the light
+a lone cloaked figure walks out across an enormous grey-green plain under storm cloud
+guardians move up through red-lit ruins in loose formation, dust in the air
+zavala framed against a burning orange horizon, shield over his shoulder, eyes forward
+
+# --- MOVEMENT 5 — THE GHOST OF A SMILE (skip to 1:14) -----------------------
+# The funeral, then the antagonist wide and brief, then the payoff. The cut
+# ends on the long walk so the reveal has room to be read.
+two hands reach toward each other across a dark room, one gloved and red, one bare
+a helmeted guardian stands over a shrouded body laid out on cloth, blue and still
+zavala stands full-height against grey cloud, shield rigged on his back
+a winged silhouette stands centered in a vast ring of white light
+tight profile of zavala in blue light, a smile breaking through
+a single red-armored guardian walks alone through violet fog, tiny against the dark

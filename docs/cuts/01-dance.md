@@ -175,7 +175,8 @@ python3 tools/plate.py burn --video renders/01-dance-youtube.mp4 \
 ```
 
 **Sequence order lives in the filename prefix.** `01-` is the upload position;
-the next cut is `stories/02-<name>.txt` → `renders/02-<name>-*.mp4`. Sorting the
+`02-cayde-6-the-return` and `03-zavala` follow it, and the next cut is
+`stories/04-<name>.txt` → `renders/04-<name>-*.mp4`. Sorting the
 directory sorts the playlist. There is no manifest and no ordering table to keep
 in sync — the prefix is the whole convention, and it survives files being
 copied out of the repo, which a manifest would not. This story-prefix sequence

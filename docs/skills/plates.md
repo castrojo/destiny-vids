@@ -1,6 +1,6 @@
 ---
 name: plates
-version: "1.2"
+version: "1.3"
 last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
@@ -128,6 +128,14 @@ Recorded, not resolved. Each one is somebody's call, not an agent's:
   `nameplates.json` has no such field and `tools/plate.py` does not implement
   one. That is a missing *feature*, not a missing string: do not approximate it
   with an invented row.
+- **Kelsey Hightower has no deck entry** — but his plate is authored anyway.
+  The owner wrote all four rows (`ARCHITECT // GUARDIAN`, Dawnblade Warlock,
+  Kelsey Hightower, *Evangelist of the Open Sky*) into issue #8, so the issue —
+  not the deck — is the authorisation, and the rows are reproduced verbatim on
+  Zavala's binding. #33 added gold chrome (`variant: leader`) **on top of** that
+  copy, not instead of it. Anything beyond those four rows is still not ours to
+  write: a lead's `class: titan` tags describe *Zavala*, and printing one on
+  the card would make it a claim about Kelsey, which only the owner may make.
 - **Four of the seven have no binding here** — Kaslin, Christoph, Natali and
   Andy (see #26); Bob, Laura and Kat are bound and their copy is reproduced
   above. Adding a binding is a casting decision ([`casting.md`](casting.md));
@@ -204,6 +212,17 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   sits on his mask. Bounded by `MAX_REVEAL_DEFERRAL`: a lead the audience has
   watched unnamed for that long is not being revealed any more, just belatedly
   captioned, so past it the reveal drops back to the first appearance.
+- **A floor on the reveal is the owner's to set, not the tool's to fake.**
+  `--reveal-after MM:SS` holds every derived lead reveal until that point on the
+  *finished cut's* clock ("don't name him until 1:50"), and suppresses the
+  `MAX_REVEAL_DEFERRAL` bound while it applies — the deferral cap exists to stop
+  the tool dawdling, not to overrule an explicit ask. It is distinct from a
+  brief's `at`, which pins **one** credit to a moment in *source* time. The
+  floor only ever moves a reveal onto a later shot the character is genuinely
+  in; if no appearance lies at or after it, the reveal degrades to the
+  character's **latest** appearance and the shortfall is reported as
+  `reveal_floor_missed` (`automatable: false`). Missing a timing request is
+  recoverable; naming a real person over a shot they are not in is not.
 - Never on a shot with `usable = false`: that shot is already excluded from the
   character's retrieval, so it is not a reveal.
 - A plate is **anchored** to a shot but not confined to it — a lower third rides
@@ -395,43 +414,12 @@ it is always safe.
 
 ## Styling provenance
 
-Ported from `projectbluefin/website`
-`src/components/wolves/WolvesIntroOverlay.vue` (`.wolves-guardian-plate` and
-friends): near-black translucent fill, chamfered corners, thin blue-white rules,
-hex crest with chevron, uppercase letter-spaced eyebrow. The CSS is the source
-of truth; `tools/plate.py` names the rule each constant came from so the two can
-be diffed by eye. The entrance animation is deliberately not reproduced — a
-still plate keeps the burn one ffmpeg pass instead of an image sequence.
-
-**Where the site and the videos disagree, the videos win.** The plates in the
-other cuts were baked by a headless browser from
-`~/Videos/wolves-{kat,natali}/render/reveal.html`, which is a deliberate literal
-2× of `.wolves-guardian-plate` — and it diverges from the live site in ways that
-are immediately visible side by side:
-
-| | Site CSS | Baked reveal (**use this**) |
-|---|---|---|
-| Class row case | `text-transform: uppercase` | authored case — "Behemoth Titan" |
-| Class colour | `#bfdbfe` | `#cbd5f5` |
-| Title colour | `#94a3b8` slate | `#93c5fd` blue |
-| Title tracking | none | `0.08em` |
-
-The **font** is the one that reads as broken from across the room. The stack is
-`ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace`; neither Apple's
-SF Mono nor Cascadia Mono ships on a Fedora atomic host, so the browser fell
-through to the fontconfig generic — **DejaVu Sans Mono**. Adwaita Mono is the
-desktop's monospace and *is* installed, so preferring it silently rendered every
-plate in a typeface that appears in neither the stack nor any other video.
-Check with `fc-match monospace` before assuming.
-
-Also carried from the baked reveal: the name's gradient has a **middle stop**
-(`#fff 0%, #e2e8f0 60%, #a0aec0 100%`), the type has a `text-shadow`
-(`0 2px 10px rgb(0 0 0 / 80%)` — it matters, the plate is translucent and
-footage moves behind it), and the box applies `border-radius` *and* a
-`clip-path`, so two corners are chamfered and the other two are rounded.
-
-The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
-`tools/plate.py` is the live implementation.
+The plate treatment is ported from the website's
+`WolvesIntroOverlay.vue`, and where the site and the baked video reveals
+disagree, **the videos win**. The constant-by-constant record — the four
+known divergences, the font trap (`fc-match monospace`), and the gradient,
+shadow and chamfer details — lives in
+[`references/plate-styling.md`](references/plate-styling.md).
 
 ## Common Rationalizations
 

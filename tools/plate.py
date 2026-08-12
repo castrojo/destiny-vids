@@ -888,6 +888,19 @@ UNPLATED = {
     },
 }
 
+# Not an unplated reason: the person IS credited. What could not be honoured is
+# the moment, and only the owner can choose between the earlier reveal, a
+# longer cut, and footage nobody has indexed yet.
+REVEAL_FLOOR_MISSED = {
+    "reason": "reveal_floor_missed",
+    "detail": ("the cut holds no appearance of this character at or after the "
+               "requested reveal point, so the reveal was placed on their "
+               "latest appearance instead -- never on a shot they are not in"),
+    "automatable": False,
+    "blocked_on": ("an owner decision: accept the earlier reveal, or index "
+                   "footage of them past the requested point"),
+}
+
 
 def cut_timeline(shots, max_shot_sec=None):
     """Cut list -> [(start_on_timeline, duration, shot)] on the rendered cut.
@@ -1059,7 +1072,8 @@ def _ensemble_group_rows(items, start, duration, hold, total, busy, copy):
 
 def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
          busy=None, only="all", soft_busy=None, brief=None,
-         placeholders=0, placeholder_copy=None, unresolved=None):
+         placeholders=0, placeholder_copy=None, unresolved=None,
+         reveal_after=None):
     """Cut list -> plate manifest.
 
     Leads are plated on their first appearance long enough to read, using the
@@ -1103,6 +1117,17 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
 
     A reveal also prefers the character's first ``traversal_hero`` beat over
     their literal first appearance -- see ``MAX_REVEAL_DEFERRAL``.
+
+    ``reveal_after`` is a floor on the CUT's clock -- "do not reveal him until
+    1:50" -- and it outranks that preference: no lead reveal is placed before
+    it. It is deliberately not a brief ``plates[].at``, which pins ONE credit
+    to one moment in SOURCE time; this holds EVERY derived lead reveal until a
+    point on the finished video, which is the clock an owner watching the cut
+    is reading off. Brief plates are owner-authored fixed points and are not
+    moved by it. When no appearance of a character lies at or after the floor,
+    the reveal degrades to their latest appearance and the shortfall is
+    reported (``REVEAL_FLOOR_MISSED``) -- the floor never buys itself a plate
+    on a shot the character is not in.
 
     ``placeholders`` plates that many ensemble shots with the UNCAST blueberry
     copy from vocab/casting.yaml instead — for a cut being timed and reviewed
@@ -1158,8 +1183,8 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
 
     debut = first_appearance()
 
-    def place_leads(avoid, hero_only=False):
-        for start, duration, shot in timeline:
+    def place_leads(avoid, hero_only=False, floor=None, latest=False):
+        for start, duration, shot in (reversed(timeline) if latest else timeline):
             casting = shot.get("casting") or {}
             character = casting.get("character")
             if casting.get("role") != "lead" or not character or character in plated:
@@ -1169,10 +1194,12 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             if hero_only:
                 # Hold the reveal for the character's hero move -- but only if
                 # it lands close enough to their debut to still read as an
-                # introduction rather than a late caption.
+                # introduction rather than a late caption. An owner-set floor
+                # has already overridden that judgement, so it does not apply.
                 if not shot.get("traversal_hero"):
                     continue
-                if start - debut.get(character, start) > MAX_REVEAL_DEFERRAL:
+                if (floor is None
+                        and start - debut.get(character, start) > MAX_REVEAL_DEFERRAL):
                     continue
             # The reportable reasons, in order: nobody cast, no copy to plate,
             # no window to plate it in. The first two are owner decisions; the
@@ -1192,8 +1219,13 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 continue
             # Walk forward through the shot: if dialogue (or an earlier plate)
             # holds its head, the reveal waits for the next opening inside its
-            # own anchor rather than being lost for the whole cut.
-            window = _first_free_window(start, duration, hold, total, avoid)
+            # own anchor rather than being lost for the whole cut. A floor
+            # starts that walk at the owner's moment instead of the shot's
+            # head, so the plate lands at or after it while still anchored to
+            # a shot the character is actually in.
+            cursor = None if floor is None else max(start, floor)
+            window = _first_free_window(start, duration, hold, total, avoid,
+                                        cursor=cursor)
             if not window:
                 unplated.setdefault(character, "no_window")
                 continue
@@ -1208,6 +1240,8 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 notes = "".join([
                     " (on the hero move)" if hero_only else "",
                     " (clear of dialogue)" if avoid is not busy else "",
+                    " (held for the reveal point)" if floor is not None else "",
+                    " (latest appearance)" if latest else "",
                 ])
                 log(f"  {character:<10} {at:6.2f}s +{dur:.1f}s  "
                     f"{copy.get('name')}{notes}")
@@ -1218,8 +1252,38 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         # preference is tried across the whole timeline before its fallback.
         for hero_only in (True, False):
             if soft_busy:
-                place_leads(busy + soft_busy, hero_only=hero_only)
-            place_leads(busy, hero_only=hero_only)
+                place_leads(busy + soft_busy, hero_only=hero_only,
+                            floor=reveal_after)
+            place_leads(busy, hero_only=hero_only, floor=reveal_after)
+
+    if reveal_after is not None and only != "ensemble":
+        # The floor is a request about the CUT, and the footage may simply not
+        # reach it. Held back rather than credited is how a real person goes
+        # uncredited, so the reveal degrades to their LATEST appearance -- the
+        # closest the footage comes to the moment asked for -- and the
+        # shortfall is reported. What is never done is honouring the floor by
+        # plating them over a shot they are not in: that is a false claim
+        # about a real person, and no timing request outranks it.
+        held = set(unplated)
+        if soft_busy:
+            place_leads(busy + soft_busy, latest=True)
+        place_leads(busy, latest=True)
+        for character in [c for c in held if c not in unplated]:
+            at = next(e["at"] for e in entries if e.get("id") == character)
+            binding = leads.get(character) or {}
+            if unresolved is not None:
+                unresolved.append({
+                    "id": character,
+                    "person": binding.get("person"),
+                    "display_name": binding.get("display_name"),
+                    "requested_reveal_after": round(reveal_after, 3),
+                    "revealed_at": at,
+                    **REVEAL_FLOOR_MISSED,
+                })
+            if log:
+                log(f"  REVEAL     {character:<10} the cut has no appearance at "
+                    f"or after {reveal_after:.2f}s; revealed at {at:.2f}s "
+                    f"instead -- reported, not moved onto another shot")
 
     # Every lead the passes above could not plate is REPORTED, never dropped:
     # a credit that disappears without a word is how a real person goes
@@ -1690,6 +1754,11 @@ def main(argv=None):
                         "are planned first as fixed, owner-timed credits (see "
                         "docs/skills/plates.md). Lead-tier: with --only ensemble "
                         "they are expected via --around, like dialogue")
+    p.add_argument("--reveal-after", default=None, metavar="MM:SS",
+                   help="hold every derived lead reveal until this point on the "
+                        "FINISHED cut (mm:ss, HH:MM:SS or seconds). A character "
+                        "the cut never shows again after it is revealed on their "
+                        "latest appearance instead, and reported")
     p.add_argument("--out", required=True)
 
     m = sub.add_parser("merge", help="combine planned manifests into one, validated")
@@ -1742,10 +1811,21 @@ def main(argv=None):
                 print(f"error: {exc}", file=sys.stderr)
                 return 2
         unresolved = []
+        reveal_after = None
+        if args.reveal_after is not None:
+            try:
+                reveal_after = (_tc_seconds(args.reveal_after)
+                                if ":" in args.reveal_after
+                                else float(args.reveal_after))
+            except ValueError:
+                print(f"error: --reveal-after wants mm:ss or seconds, got "
+                      f"{args.reveal_after!r}", file=sys.stderr)
+                return 2
         entries = plan(load_shots(args.shotlist), load_leads(), roster,
                        max_shot_sec=args.max_shot_sec, hold=args.hold, log=print,
                        busy=busy, only=args.only, soft_busy=soft, brief=brief,
-                       placeholders=args.placeholders, unresolved=unresolved)
+                       placeholders=args.placeholders, unresolved=unresolved,
+                       reveal_after=reveal_after)
         load_manifest_entries(entries)  # same validation the burn path applies
         with Path(args.out).open("w", encoding="utf-8") as fh:
             json.dump({"plates": entries, "unresolved": unresolved}, fh, indent=2)
