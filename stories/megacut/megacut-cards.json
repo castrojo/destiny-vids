@@ -5,7 +5,6 @@
   "_chapters": "Every act is to carry chapters. None have been authored yet, so every `chapters` list is empty: the field renders nothing until somebody writes the words. An empty list is the recorded gap, not a placeholder to fill in.",
   "_gaps": "Acts II and VIII have NO FOOTAGE and therefore no card in the built programme: a slide announcing an act that does not play is worse than a recorded gap. They keep their numerals in `unresolved` so the numbering cannot drift when they are built.",
   "_audio": "Every card is silent. Putting a bed under one is a licensing decision, the owner's alone.",
-
   "plates": [
     {
       "id": "act1",
@@ -52,18 +51,23 @@
       "id": "act5",
       "kind": "act",
       "at": 330.767,
-      "dur": 5.0,
+      "dur": 15.0,
       "act": "V",
-      "label": "Act V",
-      "title": "Natali Vlatko",
-      "subtitle": "Behemoth Titan",
+      "title": "Wrong Place, Wrong Time, Right Attitude",
+      "body": [
+        "The Knightly Order of Kubernetes sends a lone titan on a secret mission",
+        "Destination: Europa",
+        "TOC Authorization: [ DENIED ]",
+        "TAB Authorization: [ DENIED ]",
+        "CNCF Authorization: [ UNAUTHORIZED ]"
+      ],
       "chapters": [],
-      "note": "characters.json, slug `natali`. Her title line is left off the card entirely, which sidesteps rather than settles the two-authored-strings disagreement recorded in megacut-hero-plates.json."
+      "note": "OWNER-AUTHORED, verbatim: the title, and the instruction that this slide carries the SAME terminal block as act IV -- 'make the slide with the unauthorized etc be the same for Natali and change the title to \"Wrong Place, Wrong Time, Right Attitude\"'. So the five lines are act IV's, copied unchanged, including 'Destination: Europa': they are the same authorisation readout, not a per-act rewrite, and rewriting one line of it would be authoring copy nobody wrote. Like act IV it carries no eyebrow and no subtitle -- Natali's authored identity is on her own reveal card inside the cut. HELD 15s, matching act IV: identical copy, and the owner's reason for that hold ('it's a transition inbetween videos') applies to this one too. See `unresolved` -- the hold is the one thing here that was inferred rather than said."
     },
     {
       "id": "act6",
       "kind": "act",
-      "at": 361.026,
+      "at": 371.026,
       "dur": 5.0,
       "act": "VI",
       "label": "Act VI",
@@ -75,7 +79,7 @@
     {
       "id": "act7",
       "kind": "act",
-      "at": 793.726,
+      "at": 803.726,
       "dur": 5.0,
       "act": "VII",
       "label": "Act VII",
@@ -85,7 +89,6 @@
       "note": "~/Videos/UPLOAD/README.md and ~/Videos/wolves-review.m3u. The cut itself credits Laura Santamaria; whether this session's 'laura santamaria is orlin' recast reaches it is an open owner question, recorded in megacut-hero-plates.json."
     }
   ],
-
   "unresolved": [
     {
       "what": "act II -- Endless Forms Most Beautiful (instrumental)",
@@ -110,8 +113,13 @@
       "detail": "Acts III and V are named after people, so their cards carry the Guardian identity authored for that person rather than an act title nobody has written. If the acts get titles, the cards take them.",
       "automatable": "no",
       "blocked_on": "the owner authoring act titles."
+    },
+    {
+      "what": "act V's hold",
+      "detail": "The owner asked for act V to carry act IV's terminal block and a new title, and said nothing about its length. It is held 15s like act IV, because the copy is identical and five lines plus a nine-word title do not read in five seconds. That is an inference about pacing, not an instruction -- recorded so it can be cut back without archaeology.",
+      "automatable": "no",
+      "blocked_on": "the owner's eye on the assembled programme."
     }
   ],
-
-  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | hero 5.000-116.567 | act3 116.567-121.567 | mrbobbytables 121.567-281.767 | act4 281.767-296.767 | kat 296.767-330.767 | act5 330.767-335.767 | natali 335.767-361.026 | act6 361.026-366.026 | seven days 366.026-793.726 | act7 793.726-798.726 | europa 798.726-908.926. Total 908.926s (15:09)."
+  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | hero 5.000-116.567 | act3 116.567-121.567 | mrbobbytables 121.567-281.767 | act4 281.767-296.767 | kat 296.767-330.767 | act5 330.767-345.767 | natali 345.767-371.026 | act6 371.026-376.026 | seven days 376.026-803.726 | act7 803.726-808.726 | europa 808.726-918.926. Total 918.926s (15:19)."
 }

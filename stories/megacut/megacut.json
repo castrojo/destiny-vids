@@ -20,7 +20,6 @@
     "sevendays": "~/Videos/UPLOAD/07-seven-days-to-the-wolves.mp4 — the musical, staged for review and explicitly NOT owner-approved (a timing pass with four black COMIC PLACEHOLDER cards). Its provenance is unresolved: three of five sections use a fan compilation, issue #55. Staging is not publishing; this programme stays in renders/.",
     "europa": "~/Videos/UPLOAD/zz-wolves-europa-directors-cut.mp4 — owner-approved deliverable, reused as-is."
   },
-
   "output": "renders/07-seven-days-to-the-wolves-directors-cut-megacut.mp4",
   "width": 1920,
   "height": 1080,
@@ -30,7 +29,6 @@
   "crf": 16,
   "preset": "slow",
   "audio_bitrate": "640k",
-
   "items": [
     {
       "kind": "card",
@@ -71,8 +69,8 @@
     {
       "kind": "card",
       "image": "renders/plates-megacut-cards/plate_act5.png",
-      "dur": 5.0,
-      "label": "V — Natali Vlatko / Behemoth Titan"
+      "dur": 15.0,
+      "label": "V — WRONG PLACE, WRONG TIME, RIGHT ATTITUDE (held long, matching act IV)"
     },
     {
       "kind": "clip",
