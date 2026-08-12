@@ -109,9 +109,14 @@ A render in `renders/` is not a deliverable. The delivery workspace is
 
 | Step | Where |
 |---|---|
-| Stage the approved file | `~/Videos/UPLOAD/`, numbered in playlist order |
+| Stage the approved file | `~/Videos/UPLOAD/`, named so it **sorts** into playlist order |
 | Record what it is | `~/Videos/UPLOAD/README.md` + the cut's `STORYBOARD.md` |
 | Publish | `python3 ~/Videos/yt-refresh.py` — one unlisted playlist |
+
+`UPLOAD/` is ordered by lexical filename, so the prefix is the running order.
+Europa is pinned last with a `zz-` prefix by the owner's decision — do not
+renumber it, and do not assume the numbers are gapless (they are not: Europa
+vacated `03`). Positions are not filenames; refer to cuts by name.
 
 Three rules there that this repo has to respect:
 
