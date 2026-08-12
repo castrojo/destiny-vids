@@ -1,0 +1,160 @@
+{
+  "character": "cayde_6",
+  "aka": [
+    "cayde",
+    "cayde6"
+  ],
+  "cast": {
+    "person": "castrojo",
+    "display_name": "castrojo",
+    "has_plate_copy": true
+  },
+  "generated_by": "tools/corpus.py",
+  "source_dir": "segments",
+  "coverage": {
+    "videos": [
+      {
+        "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+        "title": "Destiny 2: The Final Shape | Launch Trailer",
+        "shots": 1,
+        "clean_shots": 1,
+        "seconds": 1.201
+      }
+    ],
+    "shots": 1,
+    "clean_shots": 1,
+    "seconds": 1.201
+  },
+  "shots": [
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0067-0068",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:07",
+      "end_tc": "1:08",
+      "start_sec": 67.133733,
+      "end_sec": 68.334933,
+      "clean": true,
+      "overlays": [],
+      "footage_tier": "cinematic",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "push_in"
+      ],
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_clear",
+      "character_identifiability": "explicit",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "casting": {
+        "role": "lead",
+        "character": "cayde_6",
+        "person": "castrojo",
+        "usable": true,
+        "constraints_failed": [],
+        "slots": 0
+      },
+      "caption": "Cayde-6 under a hood, blue Exo faceplate and burning eyes emerging from shadow. The return shot.",
+      "seconds": 1.201
+    }
+  ],
+  "unresolved": [
+    {
+      "id": "sources_unindexed",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "The three sources the issue edits against are not in the index: youtu.be/ZJLAJVmggt0, youtu.be/0MDrj33Aqqw, youtu.be/rQ4i0AT8c-M. Every per-timecode instruction in the issue (cut 0:44, resume 0:54, plates at 1:07 and 1:08, cut before the words at 1:34, intro at 1:52) addresses those timelines, so none of them can be resolved against segments/ today. Ingest and tag them with tools/ingest.py + the tagger, then rerun `tools/corpus.py build cayde_6`.",
+      "status": "unresolved",
+      "automatable": false,
+      "blocked_on": "footage: shot detection and tagging need the video files, which this repo never stores"
+    },
+    {
+      "id": "cayde_has_one_shot",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "The whole index holds a single Cayde-6 shot (1.201s, TFS launch trailer 1:07-1:08). The cut therefore casts him as the reveal and gives the surrounding beats to the footage that exists, rather than inventing Cayde coverage. More Cayde beats need more indexed Cayde footage.",
+      "status": "unresolved",
+      "automatable": false,
+      "blocked_on": "footage: no other indexed source contains him"
+    },
+    {
+      "id": "cayde_plate_anchor",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "His plate copy is authored in vocab/casting.yaml, but `tools/plate.py plan` reports UNPLATED cayde_6: the 1.201s anchor is under MIN_ANCHOR (1.5s), so the cut cannot hold his name long enough to read. Do not lower MIN_ANCHOR to force it; the plate lands by itself once a longer Cayde shot is indexed.",
+      "status": "unresolved",
+      "automatable": false,
+      "blocked_on": "footage: needs a Cayde shot of at least 1.5s"
+    },
+    {
+      "id": "druckman_binding",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "CONDUIT // GUARDIAN / Katherine Druckman / Stormcaller Warlock / Voice of the Open Frontier names no Destiny character, so there is nothing to bind it to in vocab/casting.yaml. The issue points at a shot in an unindexed video ('1:52 intro ... do the character on the left').",
+      "status": "unresolved",
+      "automatable": false,
+      "blocked_on": "human: identifying who is on screen is a visual judgement about a real person's credit"
+    },
+    {
+      "id": "gospodnetich_binding",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "MAINTAINER // TRAINEE / Kyle Gospodnetich / Gunslinger Hunter likewise names no character, and the issue asks to 'check the bazzite.gg spelling' of the name. Both the binding and the spelling are unresolved.",
+      "status": "unresolved",
+      "automatable": false,
+      "blocked_on": "human: naming a real person on screen, and confirming how he spells his name"
+    },
+    {
+      "id": "class_line_spelling",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "The issue writes 'Harbringer Hunter' for both Jorge Castro and Lori Lorusso. It is stored verbatim in vocab/casting.yaml, because on-screen copy is quoted, never corrected. If it was meant to be 'Harbinger', an author has to say so.",
+      "status": "todo",
+      "automatable": false,
+      "blocked_on": "human: on-screen copy about real people is theirs to approve"
+    },
+    {
+      "id": "rust_chrome_signoff",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "'Make it rusted out ... but make it look cool' is realised as `variant: rust` in tools/plate.py (oxidised iron chrome, unchanged geometry and fields). Whether it reads as cool is not a property this repo can test.",
+      "status": "todo",
+      "automatable": false,
+      "blocked_on": "human: visual judgement"
+    },
+    {
+      "id": "bluefin_maintainer_titans",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "'Make the two titans in the crowd 2 Bluefin Maintainers' and the follow-on plates at 0:54, 1:07 and 1:08 are crowd credits. The machinery exists (group shots derive casting.slots; tools/ensemble.py + `plate.py plan --roster` credit them as CONTRIBUTOR // GUARDIAN), but the shots referenced live in an unindexed video and no maintainer list was supplied.",
+      "status": "unresolved",
+      "automatable": false,
+      "blocked_on": "input: a roster of which maintainers to credit, plus the footage from sources_unindexed"
+    },
+    {
+      "id": "conversation_placards",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "'Put plaques up for the conversation' and 'add discussion placards as placeholders for future updates' supply no copy, and nameplate fields are a closed set (docs/skills/plates.md). Nothing is invented to fill them.",
+      "status": "unresolved",
+      "automatable": false,
+      "blocked_on": "input: the placard copy has to be written by a human"
+    },
+    {
+      "id": "dialogue_swap",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "Changing \"How's your sister\" to \"It's not too late Kyle\" rewrites spoken/on-screen copy in an unindexed video. The original line can only be recovered from the footage, and the replacement is a subtitle-or-audio edit this pipeline does not perform.",
+      "status": "unresolved",
+      "automatable": false,
+      "blocked_on": "footage: the line is not in the index; and the pipeline cuts picture, it does not author dialogue"
+    },
+    {
+      "id": "lenka_recast",
+      "ref": "castrojo/destiny-vids#8",
+      "need": "Recasting Petra Venj to Lori Lorusso displaces Lenka, who is no longer credited anywhere. The issue does not say where she goes.",
+      "status": "unresolved",
+      "automatable": false,
+      "blocked_on": "human: casting decision about a real person"
+    }
+  ]
+}

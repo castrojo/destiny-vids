@@ -50,6 +50,14 @@ def test_ghost_plate_has_no_class_line():
     assert ghost.height < with_class.height
 
 
+def test_rust_variant_changes_only_the_chrome():
+    """The Rust Foundation herald's plate is oxidised, not a different card."""
+    rust = plate.render_plate(dict(GUARDIAN, variant="rust", trustee=False))
+    default = plate.render_plate(dict(GUARDIAN, trustee=False))
+    assert rust.size == default.size          # same geometry, same copy
+    assert rust.tobytes() != default.tobytes()  # different chrome
+
+
 def test_placement_respects_the_row_margins():
     """bottom 10%, left/right 5% (.wolves-guardian-plate-row)."""
     p = plate.render_plate(GUARDIAN)
@@ -200,6 +208,31 @@ def test_plan_lets_a_plate_ride_across_a_cut():
 def test_plan_rejects_an_anchor_too_short_to_register():
     shots = [_shot("s1", 0, 0.5, "lead", "sagira"), _shot("s2", 0.5, 20.0)]
     assert plate.plan(shots, LEADS) == []
+
+
+def test_plan_reports_a_lead_it_could_not_credit():
+    """An uncredited hero is said out loud, never silently dropped."""
+    shots = [_shot("s1", 0, 0.5, "lead", "sagira"), _shot("s2", 0.5, 20.0)]
+    lines = []
+    assert plate.plan(shots, LEADS, log=lines.append) == []
+    assert any("UNPLATED sagira" in line for line in lines)
+
+
+def test_plan_stays_quiet_about_a_lead_with_no_copy_to_show():
+    """No `plate:` in the vocab is a deliberate omission, not a failure."""
+    lines = []
+    plate.plan([_shot("s1", 0, 8, "lead", "zavala")], LEADS, log=lines.append)
+    assert not any("UNPLATED" in line for line in lines)
+
+
+def test_plan_does_not_report_a_lead_it_credits_later():
+    """A short first appearance is not a gap if a later shot carries the plate."""
+    shots = [_shot("s1", 0, 0.5, "lead", "sagira"), _shot("s2", 0.5, 20.0,
+                                                           "lead", "sagira")]
+    lines = []
+    entries = plate.plan(shots, LEADS, log=lines.append)
+    assert [e["id"] for e in entries] == ["sagira"]
+    assert not any("UNPLATED" in line for line in lines)
 
 
 def test_plan_respects_the_render_hold_cap():

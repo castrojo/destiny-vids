@@ -216,7 +216,7 @@ def test_concealed_visibilities_satisfy_require_helmet(visibility):
     ("Osiris", "mrbobbytables"),
     ("Saint-14", "kat"),
     ("Mara Sov", "karena_angel"),
-    ("Petra Venj", "lenka"),
+    ("Petra Venj", "lori_lorusso"),
     ("Variks", "nate_waddington"),
     ("The Speaker", "jonathan_bryce"),
     ("Amanda Holliday", "ashley_willis"),

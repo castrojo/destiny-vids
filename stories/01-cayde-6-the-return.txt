@@ -1,0 +1,55 @@
+# 01 — Cayde-6: The Return          (production notes: 01-cayde-6-the-return.md)
+#
+# ONE CINEMATIC, PLAYED FORWARD. Every beat below comes from
+# yt_destiny_2_the_final_shape_launch_trailer and starts at or after the
+# previous beat's out point, so the cut only ever skips forward:
+#
+#   python3 tools/story.py stories/01-cayde-6-the-return.txt --dir segments \
+#       --forward-only --video yt_destiny_2_the_final_shape_launch_trailer
+#
+# The skipped stretches are reported by --forward-only; they are not authored
+# here. To move a skip, move a beat. To feature a different hero, swap the beat
+# that names them — the notes have the procedure.
+#
+# HERO CUT: the heroes get the entrances, the silhouettes and the payoffs; the
+# antagonist stays wide and brief (one beat, held at distance).
+
+# --- cold open: the aftermath ------------------------------------------------
+two distant lights burning through heavy red fog
+a dim shell lying open and still on a floor in raking amber light
+
+# --- the vanguard holds ------------------------------------------------------
+a commander kneeling on a windswept ridge, shield on his back
+a single silhouetted figure dwarfed by a vast pale sphere in cloud
+
+# --- the crew ----------------------------------------------------------------
+a helmeted guardian sitting amid crew in a dim hold, framed between two foreground figures
+a ring of guardians resting on crates and rock in low red light
+a hooded helm with a green visor, still against teal haze
+a commander lit cold blue in a cockpit, jaw set, looking out past camera
+
+# --- the fight starts --------------------------------------------------------
+a lone guardian silhouetted at the center of an enormous violet detonation
+two guardians advancing shoulder to shoulder, drenched in red light
+discarded rifles scattered in wet grass
+a detonation blooming straight into camera, orange filaments tearing outward
+
+# --- the return --------------------------------------------------------------
+Cayde-6 under a hood, blue faceplate and burning eyes emerging from shadow
+a lone cloaked figure walking out across an enormous grey-green plain
+guardians moving up through red-lit ruins in loose formation, dust in the air
+a commander framed against a burning orange horizon, eyes forward
+
+# --- what they are up against (wide, brief, never examined; the enum-like word
+#     "witness" would parse as a faction filter, so the beat describes the
+#     picture instead — see docs/skills/editing.md) --------------------------
+a winged silhouette standing centered in a vast ring of white light, held at distance
+a tight profile of the commander in blue light, a smile breaking through
+
+# --- payoff ------------------------------------------------------------------
+a guardian swinging a blade mid-charge as allies close in
+overhead wide on a guardian at the center of a detonation, blue lightning branching across the ground
+a guardian driving a blade forward through a wall of fire, face lit gold
+a hooded figure raising a crackling weapon overhead against a night sky
+a guardian hurling a torrent of blue-white energy across a dark field, hands trailing light
+a warlock drawing violet and white prismatic light up into both hands

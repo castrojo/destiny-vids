@@ -89,6 +89,17 @@ VARIANTS = {
         "title": (253, 230, 138, 255),    # #fde68a
         "glow": (250, 204, 21, 140),
     },
+    # Oxidised iron, for the Rust Foundation herald. Same geometry and the same
+    # closed field set as every other plate — only the chrome changes, so this
+    # stays a variant rather than a second kind of card.
+    "rust": {
+        "border": (180, 83, 9, 140),      # rgb(180 83 9 / 55%) — #b45309
+        "accent": (194, 91, 32, 255),     # #c25b20, oxide edge
+        "label": (251, 146, 60, 255),     # #fb923c
+        "klass": (253, 186, 116, 255),    # #fdba74
+        "title": (168, 121, 92, 255),     # #a8795c, weathered iron
+        "glow": (194, 91, 32, 140),
+    },
 }
 
 # --- type ramp (clamp() upper bounds, i.e. the desktop sizes) ---------------
@@ -385,11 +396,14 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     `plate:` copy in vocab/casting.yaml. Ensemble contributors are plated from
     the deterministic assignment in tools/ensemble.py; anyone whose assigned
     shot is too short to hold a plate is credited over the final shot instead,
-    so the month's contributors are never silently dropped.
+    so the month's contributors are never silently dropped. A lead who has copy
+    but no shot that can carry it is reported through `log` for the same
+    reason: an uncredited hero is a cut to rewrite, not a detail to swallow.
     """
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     entries, plated = [], set()
+    unplated = {}  # lead -> why the cut could not carry their name
     busy = []  # occupied windows, so nothing ever double-books the screen
 
     def free(start, duration):
@@ -401,21 +415,36 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         character = casting.get("character")
         if casting.get("role") != "lead" or not character or character in plated:
             continue
-        if not casting.get("usable", True):
-            continue  # a shot that fails its binding's constraints is not a reveal
         copy = (leads.get(character) or {}).get("plate")
         if not copy:
+            continue  # a binding with no plate copy simply gets no plate
+        if not casting.get("usable", True):
+            # a shot that fails its binding's constraints is not a reveal
+            unplated.setdefault(character, "every shot fails the binding's constraints")
             continue
         window = _window(start, duration, hold, room=total - start)
         if not window or not free(*window):
+            unplated.setdefault(
+                character,
+                f"no anchor long enough (best so far {duration:.2f}s, "
+                f"needs {MIN_ANCHOR:.2f}s)")
             continue
         at, dur = window
         entries.append({"id": character, "at": at, "dur": dur, "position": "left",
                         **copy})
         busy.append((at, at + dur))
         plated.add(character)
+        unplated.pop(character, None)
         if log:
             log(f"  {character:<10} {at:6.2f}s +{dur:.1f}s  {copy.get('name')}")
+
+    # A lead who is in the cut, has plate copy, and still ends up with no plate
+    # is exactly the silent drop this pipeline refuses everywhere else: the
+    # unmatched beat, the missing source file, the uncredited contributor. Say
+    # it out loud so the cut can be rewritten instead of shipping anonymous.
+    for character, reason in unplated.items():
+        if log:
+            log(f"  UNPLATED {character}: {reason}")
 
     if not roster:
         return sorted(entries, key=lambda e: e["at"])

@@ -68,10 +68,26 @@ leads:
       person: kelsey_hightower
       display_name: Kelsey Hightower
       aka: [commander_zavala]
+      # Plate copy as authored in castrojo/destiny-vids#8. The subclass line
+      # names the ROLE the project casts, the same way Osiris's does, so it is
+      # not read back off the Titan on screen.
+      plate:
+        label: ARCHITECT // GUARDIAN
+        class: Dawnblade Warlock
+        name: Kelsey Hightower
+        title: Evangelist of the Open Sky
     cayde_6:
       person: castrojo
       display_name: castrojo
       aka: [cayde, cayde6]
+      # Plate copy as authored in castrojo/destiny-vids#8, verbatim — including
+      # the `class` spelling. On-screen copy is quoted, never corrected here;
+      # corpus/cayde_6.json carries the open question about it.
+      plate:
+        label: MAINTAINER // GUARDIAN
+        class: Harbringer Hunter
+        name: Jorge Castro
+        title: Upender of Antipatterns | Narrator
     saladin:
       # CONSTRAINED binding. jeefy plays the Iron Lord, but does not resemble
       # Saladin, so the shot has to do the work: FAR and HELMETED only, where the
@@ -124,9 +140,21 @@ leads:
       display_name: Karena Angel
       aka: [queen_mara_sov]
     petra_venj:
-      person: lenka
-      display_name: Lenka
+      # RECAST in castrojo/destiny-vids#8: the role passes from lenka to Lori
+      # Lorusso. Recorded here rather than anywhere else because this file is
+      # the one place a binding lives — the pinned cast test, the query phrases
+      # and the plate copy all follow it.
+      person: lori_lorusso
+      display_name: Lori Lorusso
       aka: [petra]
+      # `variant: rust` is a chrome flag, not a new copy field: oxidised iron
+      # instead of the blue chrome, for the Rust Foundation.
+      plate:
+        label: HERALD // GUARDIAN
+        class: Harbringer Hunter
+        name: Lori Lorusso
+        title: Pathfinder of the Iron Weave
+        variant: rust
     variks:
       person: nate_waddington
       display_name: Nate Waddington

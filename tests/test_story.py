@@ -88,6 +88,66 @@ def test_crowd_beat_picks_the_biggest_ensemble(segments):
     assert story["shots"][0]["casting"]["slots"] == 6
 
 
+# --- one cinematic, played forward ------------------------------------------
+
+def test_video_pins_the_cut_to_one_source(segments):
+    story = build_story(beats(*OUTLINE), segments,
+                        video_id="yt_final_shape_launch_trailer")
+    assert story["shots"], "expected the pinned video to cover some beats"
+    assert {shot["video_id"] for shot in story["shots"]} == {"yt_final_shape_launch_trailer"}
+
+
+def test_forward_only_locks_the_cut_to_one_cinematic(segments):
+    """The first matched beat chooses the cinematic; the rest follow it."""
+    story = build_story(beats("close up on a lone titan helmet",
+                              "wide establishing shot of the Traveler"), segments,
+                        forward_only=True)
+    assert story["video_id"] == "yt_beyond_light_story_trailer"
+    assert {shot["video_id"] for shot in story["shots"]} == {"yt_beyond_light_story_trailer"}
+
+
+def test_forward_only_never_doubles_back(segments):
+    story = build_story(beats(*OUTLINE), segments, forward_only=True)
+    starts = [shot["start_sec"] for shot in story["shots"]]
+    assert starts == sorted(starts)
+    for previous, following in zip(story["shots"], story["shots"][1:]):
+        assert following["start_sec"] >= previous["start_sec"] + previous["duration"]
+
+
+def test_forward_only_reports_a_beat_it_cannot_reach(segments):
+    """A beat whose only shot is behind the playhead is a miss, not a rewind."""
+    forward = build_story(beats("close up on a lone titan helmet",
+                                "Elsie Bray hero shot"), segments, forward_only=True)
+    assert [m["beat"] for m in forward["misses"]] == ["Elsie Bray hero shot"]
+    free = build_story(beats("close up on a lone titan helmet",
+                             "Elsie Bray hero shot"), segments)
+    assert free["misses"] == []
+
+
+def test_skips_cover_the_stretches_the_cut_passes_over(segments):
+    story = build_story(beats("close up on a lone titan helmet"), segments,
+                        forward_only=True)
+    assert len(story["skips"]) == 1             # head only: the cut ends on the
+    head = story["skips"][0]                    # last indexed shot of that video
+    assert head["after_shot"] == 0
+    assert head["from_sec"] == 0.0 and head["to_sec"] == 72
+    assert head["seconds"] == 72
+    assert head["segments_skipped"] == 1        # the Elsie hero shot at 62-68s
+
+
+def test_tail_skip_is_reported_when_the_cut_stops_early(segments):
+    story = build_story(beats("Elsie Bray hero shot"), segments, forward_only=True)
+    tail = story["skips"][-1]
+    assert tail["after_shot"] == 1              # named by the shot it follows
+    assert tail["from_sec"] == 68 and tail["to_sec"] == 78
+    assert tail["segments_skipped"] == 1        # the titan helmet close-up
+
+
+def test_no_skips_reported_without_forward_only(segments):
+    story = build_story(beats(*OUTLINE), segments)
+    assert "skips" not in story and "video_id" not in story
+
+
 # --- outline parsing --------------------------------------------------------
 
 def test_read_text_outline(tmp_path):
