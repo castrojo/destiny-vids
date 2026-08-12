@@ -1,6 +1,6 @@
 ---
 name: editing
-version: "1.3"
+version: "1.4"
 last_updated: "2026-08-12"
 id: editing
 one_line_purpose: Turn a plain-language outline into a rendered cut.
@@ -10,10 +10,10 @@ mcp_compliance_level: partial
 optimization_status: draft
 status: active
 dependencies: [indexing]
-tags: [story, cut-list, render, ffmpeg, outline, still, artwork-card, window-extract]
+tags: [story, cut-list, render, ffmpeg, outline, still, artwork-card, window-extract, timing-pass, marker-card, two-clocks, bed-pause]
 description: >-
-  Covers outlines, shot matching, hold caps, artwork cards, and rendering a cut list.
-  Use when writing an outline, debugging a wrong shot match, cutting from a long source, or replacing mechanic cards with artwork.
+  Covers outlines, shot matching, artwork cards, timing passes with marker cards, and a bed that pauses.
+  Use when writing an outline, marking material for removal before editing, or scoring a cut whose song does not run end to end.
 metadata:
   type: procedure
   context7-sources:
@@ -220,6 +220,92 @@ detector artifact.
 **This does not weaken the `clean` gate.** The card record never cuts the
 source's burned-in frames at all — it puts artwork in the hole they leave.
 
+### Mark, don't cut: the timing pass
+
+Before an edit is worth making, its timing has to be judged — and you cannot
+judge timing against a cut that has already thrown the material away. A
+**timing pass** is the intermediate render that answers this:
+
+> Anything destined for removal or replacement **stays in the timeline at its
+> exact duration**, blacked out by a marker card saying what will happen there.
+
+Because a card and the footage it replaces are the same number of seconds,
+**timing is preserved by construction**: every later anchor lands exactly where
+it will land in the finished cut, so the pass can be played against the music
+and reviewed before a frame is actually removed.
+
+```bash
+python3 tools/marker.py "COMIC PLACEHOLDER" --sub "4:33-4:37  enemy CU"
+```
+
+Two kinds, and the sub-line always says *which* material is standing behind the
+card:
+
+| Card | Means |
+|---|---|
+| `COMIC PLACEHOLDER` | **an artwork slot** — artwork will be dropped in here later |
+| `REMOVE — <reason>` | this is coming out; it is here so the timing still reads |
+
+`tools/marker.py` renders these deliberately plain — full-frame black, one
+tracked line, no chrome. A marker must never be mistakable for a finished
+nameplate. They are **production markers, not credits**: a marker carries no
+claim about any person, so none of the nameplate vocabulary rules in
+[`plates.md`](plates.md) apply to it, and none of its shapes are reused either.
+
+This is what replaces jump-cutting around unwanted material. A long enemy
+close-up, a publisher's mechanic card, a repeated shot: black it out in place
+and keep going. The reviewer sees a continuous cut with its holes labelled,
+which is a far better artifact than a shorter cut whose rhythm has silently
+changed.
+
+**Leaving artwork slots is the point, not a workaround.** The slots are where
+the film's own artwork goes; marking them early is what lets the artwork be
+made to a known duration instead of being squeezed in afterwards.
+
+### Two clocks: when the bed does not run end to end
+
+`render.py --audio` lays one file over a finished cut, which is right whenever
+the song plays from first frame to last. Two things it cannot express, and both
+are the same mechanic:
+
+- a **pre-roll** — the film opens on its own source audio and the song enters
+  later, over picture that is already running;
+- a **pause** — the song stops, a moment plays in its own audio, and the song
+  resumes *from where it stopped*.
+
+`tools/audiomix.py` handles both by giving the cut two clocks:
+
+> **`wall` is position in the film; `bed` is position in the song. A shot
+> marked `audio: "source"` advances wall and not bed.**
+
+Everything follows from that — including the fact that a musical with a pause
+in it is **longer than its own song**, which is why every anchor in an authored
+builder must be asserted against *bed* time, never wall time.
+
+```bash
+python3 tools/audiomix.py stories/<name>.json --video renders/<name>-picture.mp4 \
+    --bed media/<bed>.wav --bed-offset 20.166 --bed-gain-db -3.5 \
+    --out renders/<name>.mp4
+```
+
+The bed is cut into as many pieces as there are gaps, each delayed to its wall
+position, and the source audio is muted wherever the bed plays. **Nothing is
+mixed on top of anything**: at every instant exactly one of the two is audible.
+That is what "pause the song" means, and it is not what ducking would do — a
+dense, heavily-limited master has to come down so far to sit under dialogue or
+an action hit that it is a stop with mud on top.
+
+**Choose the pause point by measuring the bed, not by taste.** Scan for
+full-band drops and put the seam in one: *7 Days to the Wolves* has exactly one
+interior silence in 424 s (278.64 → 279.64 s, ending 23 ms before a downbeat),
+and a stop placed there costs the music nothing because the artist already
+stopped. Where no natural gap exists, snap the seam to a downbeat so the resume
+lands on a bar.
+
+Verify it landed, rather than trusting the filtergraph: correlate the delivered
+audio against the bed at a known offset. A bed region should return `+1.000`,
+and a paused region should return roughly `0.000`.
+
 ### An authored shotlist, and the invariant it must hold
 
 A cut list that `story.py` produced is derived, and hand-editing it is a Red Flag
@@ -313,6 +399,8 @@ Two things follow, and both bite:
 | "I'll hand-edit the timings in `cut.json`." | It is a derived artifact and the next run discards your edit. Change the outline or the cap. |
 | "The act came out a bit short, the render will pad it." | It will not. A cut is a concatenation with no absolute timeline, so a short act slides every later shot earlier and every musical anchor with it. |
 | "I'll skip the window extract, it's just one flag." | Output seeking decodes from the file start. A clip at 24:00 in a 30-minute source costs ~40s of decode, every time. |
+| "I'll just cut the bits we don't want, then judge the timing." | You have thrown away the thing you were going to judge. Black them out in place at their exact duration first — a timing pass keeps every later anchor where it will actually land. |
+| "Duck the song under the action beat, it's simpler than pausing." | A −6.8 LUFS master has to drop ~18 dB to sit under anything, which is a stop with mud on top. Pause it, and put the seam in a gap the artist already left. |
 | "The card is just black with text, I'll drop it." | Dropping it shortens the film and loses the rhythm the trailer had. Replace it with artwork; the slot is the point. |
 | "I'll set a long `duration` on the beat to hold the shot." | A hold is clamped to the segment. Past its out-point you are cutting the *next* shot, which nothing vetted. |
 | "The beat matched something close enough." | A mismatch cascades into every later beat that wanted that shot. Fix it at the source. |
@@ -335,6 +423,10 @@ Two things follow, and both bite:
 - An act whose measured length does not match the span it was written for.
 - Selecting a shot from its midpoint keyframe alone, without scrubbing its edges.
 - A still whose audio disposition differs from the cut clips around it.
+- An anchor asserted against wall time in a cut whose bed pauses. Bed time is
+  the only clock the music knows.
+- A marker card that has grown chrome, a name, or a role. It is a slate, not a
+  plate.
 - Cutting dozens of clips out of a long source without extracting the window.
 
 ## Verification

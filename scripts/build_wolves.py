@@ -1,320 +1,346 @@
 #!/usr/bin/env python3
-"""Build the authored shotlist for *Seven Days to the Wolves*.
+"""Build the authored shotlist for *Seven Days to the Wolves* -- timing pass.
 
-This is NOT ``tools/story.py``. There is no matcher and no index lookup for the
-two new sources: their shots were picked by eye from contact sheets, because
-tagging exists to feed the matcher and nothing here uses it.
+This is NOT ``tools/story.py``. There is no matcher and no index lookup: the
+shots are picked by eye from contact sheets, because tagging exists to feed the
+matcher and nothing here uses it.
 
-Three acts, hinged on two measured moments in the bed:
+WHAT CHANGED FROM THE FIRST CUT, AND WHY
+----------------------------------------
+The first cut was 289 shots in 424 s, 25 of them replayed, a third of Act I
+from Curse of Osiris, and the middle reshuffled out of source order. This one
+inverts the method.
 
-    Act I    0.000 -> 182.834   the existing index
-    Act II   182.834 -> 259.390 the compilation, from source 23:47
-    Act III  259.390 -> 423.993 the crash, the swing, then the montage
+**Mark, don't cut.** Nothing is removed. A span destined for removal or for
+artwork stays in the timeline at its exact duration, blacked out by a marker
+card (``tools/marker.py``). Timing is therefore preserved by construction and
+can be judged against the music before a frame is actually taken out. See
+``docs/skills/editing.md``.
 
-The window crash (compilation source 24:46) is the FIRST shot of Act III, so it
-lands on the flute entry. That is the one frame-accurate obligation in the cut.
+**Continuity over selection.** Every act is ONE unbroken source run, in source
+order. Act II and Act III-A are literally contiguous -- the window crash is not
+a cut at all, it simply happens, which is the strongest possible way to land it
+on the flute entry.
 
-Editorial rules enforced here rather than remembered:
-  * no Savathun, ever
-  * the Witness only as eyes or smoke, never its body
-  * no major-enemy subject shots, no long drawn-out enemy holds
-  * every mechanic card becomes the wolves artwork, in every instance
+**Two clocks.** ``wall`` is position in the film, ``bed`` is position in the
+song. A shot marked ``audio: "source"`` advances wall and not bed, so the film
+is longer than its own song. Every anchor is asserted against BED time; see
+``tools/audiomix.py``.
+
+MEASURED, NOT GUESSED
+---------------------
+* **The gallop, 182.834 s** and **the flute entry, 259.390 s** -- the two act
+  hinges, from the first cut's spectral analysis, snapped to the bar grid.
+* **The one break in the song: 278.64 -> 279.64 s.** A scan of the whole bed
+  for full-band drops finds exactly one interior gap: a full second of silence
+  ending 23 ms before the downbeat at 279.661. That is the "HOWL", and it is
+  where the artwork holds -- over the silence, cutting back to picture on the
+  slam.
+* **The crash impact peaks at extract 105.9 s**, half a second after the shot
+  starts at 105.4. The run is placed so the IMPACT lands on the flute entry and
+  the shot starts a beat early -- "4:19 backed up a tad", as a number.
+* **The intro capture is 193 s for a 182.834 s act.** Rather than trim the
+  capture, the bed ENTERS LATE, at wall 20.166 s. The film opens on the
+  cinematic's own audio and the song arrives over it; the gallop still lands
+  exactly at the end of the capture. Nothing is cut to make the music fit.
+
+EDITORIAL RULES ENFORCED HERE RATHER THAN REMEMBERED
+----------------------------------------------------
+  * no Curse of Osiris anywhere -- this is the finale
+  * no shot used twice, asserted
+  * no Savathun; the Witness only as eyes or smoke, never its body
+  * a long enemy hold becomes a COMIC PLACEHOLDER card, never a jump cut
 """
 import json
-import glob
+import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO))
+
+from tools.marker import marker_path, title_card_path  # noqa: E402
+
 BED = json.loads((REPO / "music/bed_seven_days_to_the_wolves.json").read_text())
 GRID = BED["grid"]
-BEAT = GRID["beat_interval_sec"]
-BEATS = GRID["beats"]
+BAR = GRID["bar_sec"]
+FIRST_BEAT = GRID["first_beat_sec"]
+END = BED["duration_sec"]                       # 423.993
 
+# --- the two act hinges, measured in the first cut ---------------------------
 ACT2_IN = 182.834          # the gallop
-ACT3_IN = 259.390          # the flute entry — the crash lands here
-END = 423.993
+ACT3_IN = 259.390          # the flute entry -- the crash impact lands here
+
+# --- the song's one interior silence ----------------------------------------
+HOWL_GAP_IN = 278.64       # the band stops
+HOWL_SLAM = 279.661        # ...and returns, on this downbeat
+ARTWORK_IN = 277.00        # the artwork is up before the shout, over the CU
+ENEMY_CU_IN = 273.490      # the enemy close-up the artwork will replace
+
+# --- the pause: the song stops, a moment plays in its own audio --------------
+PAUSE_AT = 322.200         # a downbeat (FIRST_BEAT + 102 bars)
+PAUSE_IN = 29.35           # Collection Trailer: the clean hero shot at 0:29
+PAUSE_DUR = 1.8            # ...and out before the first-person gameplay at 0:31
+
+# Mechanic cards inside the Collection Trailer montage, recovered from the
+# frames in the first cut. Each is publisher copy this film does not want, so
+# each becomes an artwork slot -- marked at its exact duration, never cut.
+TRAILER_CARDS = [
+    (63.3, 65.2, "7 RAIDS card"),
+    (71.0, 73.0, "ENDLESS BUILDCRAFTING card"),
+    (87.4, 89.4, "COUNTLESS LEGENDS card"),
+]
 
 ART = str(Path.home() / "Pictures/Artwork/wolves.jpg")
-COMP = "wolves_act2"       # compilation extract, source offset +1380s
-TRAILER = "wolves_act3"    # Collection Trailer extract, 0:00-1:32
 
-# --- the two new sources, picked by eye -------------------------------------
-# (shot#, in, out) from /tmp/sheets/*/shots.json, rejects already removed.
+# --- sources -----------------------------------------------------------------
+# Window extracts, so every seek lands in a short file: render.py seeks with
+# -ss AFTER -i for frame accuracy, which decodes from zero (docs/rendering.md).
+ACT1 = "wolves_act1"       # compilation 0:00-3:30      -- the Destiny 1 opening
+COMP = "wolves_act2"       # compilation 23:00-26:30    -- Neomuna, the crash
+TRAILER = "wolves_act3"    # Collection Trailer 0:00-1:32
+FINALE = "wolves_act4"     # compilation 26:30-30:23    -- the Pale Heart finale
 
-# Act II: Neomuna. Source 23:47 is extract 47.1s.
-ACT2_SHOTS = [
-    (18, 47.1, 51.1), (19, 51.1, 54.0), (20, 54.0, 58.3), (21, 58.3, 59.2),
-    (22, 59.2, 59.8), (23, 59.8, 60.9), (25, 63.1, 63.8), (26, 63.8, 65.0),
-    (27, 65.0, 66.4), (28, 66.4, 67.4), (29, 67.4, 68.0), (30, 68.0, 69.4),
-    (31, 69.4, 70.2), (32, 70.2, 71.7), (33, 71.7, 73.1), (34, 73.1, 74.9),
-    (36, 76.8, 79.1), (37, 79.1, 80.2), (38, 80.2, 81.3), (39, 81.3, 83.3),
-    (40, 83.3, 86.2), (41, 86.2, 88.2), (42, 88.2, 90.2), (44, 91.4, 92.2),
-    (45, 92.2, 95.1), (46, 95.1, 99.8), (47, 99.8, 101.6),
-]
-# rejected: 24/35 (Cabal + Tormentor subject), 43 (smoke faces), 48/49 (Calus)
+TITLE_IN = 10.000          # the source's Destiny logo occupies 0:00-0:10
+CAPTURE_OUT = 203.000      # the first cinematic ends here (verified by frame)
+# The card REPLACES the logo, so the usable capture is 0:10 -> 3:23 = 193 s for
+# a 182.834 s act. The surplus is not trimmed: it becomes the pre-roll, and the
+# song enters over it. Nothing is cut to make the music fit.
+CAPTURE_LEN = CAPTURE_OUT - TITLE_IN
+BED_ENTERS = CAPTURE_LEN - ACT2_IN            # 10.166 -- the pre-roll's length
 
-# Act III part A: the crash, then the strand descent. #50 IS the crash.
-ACT3_COMP_A = [
-    (50, 105.4, 107.4), (51, 107.4, 110.1), (52, 110.1, 111.1),
-    (53, 111.1, 111.6), (54, 111.6, 113.1), (55, 113.1, 115.5),
-    (56, 115.5, 116.5), (57, 116.5, 117.6), (58, 117.6, 119.8),
-    (59, 119.8, 123.3), (61, 123.8, 125.3), (62, 125.3, 129.1),
-    (63, 129.1, 133.0),
-]
-# Act III part C: the Final Shape climax — Guardians outnumbered in the Pale Heart.
-ACT3_COMP_C = [
-    (72, 152.8, 155.6), (74, 157.5, 159.5), (75, 159.5, 161.2),
-    (76, 161.2, 163.2), (79, 171.0, 173.0), (80, 173.0, 175.0),
-    (81, 175.0, 176.9), (82, 176.9, 179.6), (83, 179.6, 181.2),
-    (86, 185.2, 187.0), (88, 195.7, 197.7), (89, 197.7, 198.8),
-    (91, 199.3, 201.0), (92, 201.0, 202.8), (93, 202.8, 203.9),
-    (94, 203.9, 204.9), (96, 205.8, 206.9), (98, 207.9, 210.0),
-]
-# rejected: 84/85/87/90/95/97 (pyramid/Witness body, debris holds), 71 (10s wasteland)
+CRASH_IMPACT = 105.900     # extract clock; measured from the audio transient
 
-# Act III part B: the Collection Trailer montage, after the branded stretch ends.
-ACT3_TRAILER = [
-    (51, 55.0, 55.5), (52, 55.5, 56.0), (53, 56.0, 56.5), (54, 56.5, 57.0),
-    (55, 57.0, 57.4), (56, 57.4, 58.4), (57, 58.4, 58.9), (58, 58.9, 59.3),
-    (59, 59.3, 59.8), (60, 59.8, 60.9), (61, 60.9, 63.3),
-    (65, 66.3, 67.4), (66, 67.4, 68.2), (67, 68.2, 68.8), (68, 68.8, 69.8),
-    (69, 69.8, 70.3), (70, 70.3, 71.0),
-    (72, 73.0, 74.2), (74, 74.6, 75.6), (75, 75.6, 76.5), (76, 76.5, 77.7),
-    (77, 77.7, 78.5), (78, 78.5, 79.5), (79, 79.5, 80.1), (80, 80.1, 80.7),
-    (81, 80.7, 81.2), (84, 82.4, 83.2), (85, 83.2, 84.2), (86, 84.2, 84.9),
-    (87, 84.9, 86.5), (88, 86.5, 87.0), (89, 87.0, 87.4),
-    (91, 89.4, 90.5), (92, 90.5, 91.4), (93, 91.4, 92.0),
-]
-# rejected: 62/71/90 are cards (below); 63/64 boss ogres; 73/82/83 enemy subjects
-
-# Every black card that explains a mechanic. Recovered from the frames, not
-# invented — each is replaced by the artwork, in every instance.
-CARDS = [
-    ("5 EXPANSIONS", 18.1, 19.9), ("4 CONTENT PACKS", 37.6, 39.6),
-    ("10 DUNGEONS", 53.1, 55.0), ("7 RAIDS", 63.3, 65.2),
-    ("ENDLESS BUILDCRAFTING", 71.0, 73.0), ("COUNTLESS LEGENDS", 87.4, 89.4),
-]
-
-# --- Act I: the existing index ----------------------------------------------
-ENEMY_SUBJECT = (
-    "ogre", "minotaur", "tormentor", "calus", "savathun", "witness", "wizard",
-    "knight", "thrall", "goblin", "hydra", "acolyte", "shank", "captain",
-    "cabal", "psion", "harpy", "servitor", "colossus", "centurion", "legionary",
-)
-BANNED = ("savathun", "witness")
+BANNED_SOURCES = ("yt_curse_of_osiris_opening_cinematic",)
 
 
-def load_index():
-    # Only sources whose media is actually present: a shot render.py cannot
-    # resolve is silently skipped, which shortens the cut and slides every
-    # later anchor off the beat. media/ is gitignored, so this varies by host.
-    have = {p.stem for p in (REPO / "media").glob("*") if p.is_file()}
-    segs = []
-    for f in glob.glob(str(REPO / "segments/*.json")):
-        d = json.loads(Path(f).read_text())
-        segs.extend(d if isinstance(d, list) else [d])
-    out = []
-    for s in segs:
-        if not s.get("clean"):
-            continue
-        if s["video_id"] not in have:
-            continue
-        cap = (s.get("caption") or "").lower()
-        chars = " ".join(
-            (c.get("name", "") if isinstance(c, dict) else str(c)).lower()
-            for c in (s.get("character") or [])
-        )
-        # Never Savathun; never the Witness (its only clean shots here are body).
-        if any(b in cap[:60] for b in BANNED) or any(b in chars for b in BANNED):
-            continue
-        # The enemy must not be the subject of the frame.
-        if any(w in cap[:46] for w in ENEMY_SUBJECT):
-            continue
-        out.append(s)
-    return out
+def tc(seconds):
+    return f"{int(seconds) // 60}:{seconds % 60:04.1f}"
 
 
-def heroic(s):
-    sc = 0
-    comp = s.get("composition") or []
-    if s.get("camera_angle") == "low":
-        sc += 3
-    if "group" in comp or "crowd" in comp:
-        sc += 3
-    if "establishing" in comp:
-        sc += 1
-    if s.get("subject_salience") == "hero":
-        sc += 2
-    sc += min(s.get("register", 0), 3)
-    if s.get("action"):
-        sc += 1
-    if s.get("faction"):
-        sc += 1          # Guardians with hostiles in frame = outnumbered
-    return sc
+class Timeline:
+    """Two clocks and a shot list.
 
+    ``bed`` only advances for shots the song plays under. That single rule is
+    what lets the film contain a pause without any anchor moving.
+    """
 
-def snap(t):
-    """Nearest beat — every cut lands on the grid."""
-    return min(BEATS, key=lambda b: abs(b - t))
+    def __init__(self):
+        self.shots = []
+        self.wall = 0.0
+        self.bed = 0.0
 
-
-def fill(span_start, span_end, pool, max_hold, min_hold, video_id, offset=0.0,
-         cards=None, beat_step=1):
-    """Lay shots across a span, snapping every cut to the beat grid."""
-    shots = []
-    t = span_start
-    i = 0
-    cards = list(cards or [])
-    while t < span_end - 0.05 and (i < len(pool) or cards):
-        # A card interrupts wherever its source moment falls in the montage.
-        use_card = cards and i and i % max(1, len(pool) // (len(cards) + 1)) == 0
-        if use_card:
-            name, cs, ce = cards.pop(0)
-            dur = min(ce - cs, span_end - t)
-            dur = max(dur, BEAT * 2)
-            shots.append({
-                "segment_id": f"card_{len(shots):03d}",
-                "still": ART, "duration": round(min(dur, span_end - t), 3),
-                "beat": f"ARTWORK (was: {name})",
-            })
-            t += shots[-1]["duration"]
-            continue
-        n, a, b = pool[i]
-        i += 1
-        avail = b - a
-        want = min(max_hold, avail)
-        # Snap the out-point to the grid so the cut lands with the music.
-        end = snap(t + want)
-        dur = end - t
-        if dur < min_hold:
-            dur = min(min_hold, avail)
-        if dur > avail:
-            dur = avail
-        if t + dur > span_end:
-            dur = span_end - t
-        if dur < 0.25:
-            break
-        shots.append({
-            "segment_id": f"{video_id}_{n:03d}",
+    def run(self, video_id, src_in, dur, beat, audio="bed", plate_slot=False):
+        """A continuous piece of one source, in source order."""
+        shot = {
+            "segment_id": f"{video_id}_{src_in:08.3f}".replace(".", "_"),
             "video_id": video_id,
-            "start_sec": round(a, 3), "end_sec": round(b, 3),
+            "start_sec": round(src_in, 3),
+            "end_sec": round(src_in + dur, 3),
             "duration": round(dur, 3),
-            "start_tc": f"{int(a)//60}:{a%60:04.1f}",
-            "end_tc": f"{int(b)//60}:{b%60:04.1f}",
-            "beat": f"{video_id} #{n} (source {int((a+offset)//60)}:{(a+offset)%60:04.1f})",
-        })
-        t += dur
-    return shots, t
+            "start_tc": tc(src_in),
+            "end_tc": tc(src_in + dur),
+            "beat": beat,
+            "audio": audio,
+        }
+        if plate_slot:
+            # Where a nameplate can land: Guardians together, held long enough
+            # to read. Recorded here so the plates pass has a list to work from
+            # rather than re-deriving it by eye.
+            shot["plate_slot"] = True
+        self._push(shot, dur, audio)
+        return shot
+
+    def card(self, still, dur, beat, audio="bed"):
+        shot = {
+            "segment_id": f"card_{len(self.shots):03d}",
+            "still": str(still),
+            "duration": round(dur, 3),
+            "beat": beat,
+            "audio": audio,
+        }
+        self._push(shot, dur, audio)
+        return shot
+
+    def _push(self, shot, dur, audio):
+        if dur <= 0:
+            raise AssertionError(f"non-positive duration for {shot['beat']!r}")
+        self.shots.append(shot)
+        self.wall += dur
+        if audio != "source":
+            self.bed += dur
+
+    def at_bed(self, target, what):
+        if abs(self.bed - target) > 0.02:
+            raise AssertionError(
+                f"{what}: bed clock is {self.bed:.3f}s but the anchor is "
+                f"{target:.3f}s. The cut is a concatenation, so a short act "
+                "slides every later anchor off the music.")
+
+
+def build():
+    t = Timeline()
+
+    # ---- the title card: the source's own logo, blacked out ----------------
+    # Not an overlay. The card IS the picture for ten seconds, so the Destiny
+    # logo is not dimmed, it is simply not in the film.
+    t.card(title_card_path(
+        "Project Bluefin", "Seven Days to the Wolves",
+        ["Destiny footage used under Bungie's fan-content policy"]),
+        TITLE_IN, "TITLE CARD (over the source's Destiny logo, 0:00-0:10)",
+        audio="source")
+
+    # ---- pre-roll: picture running, song not yet in ------------------------
+    t.run(ACT1, TITLE_IN, BED_ENTERS,
+          "PRE-ROLL: the cinematic in its own audio; the song enters at the end",
+          audio="source")
+
+    # ---- Act I: the intro capture, unedited --------------------------------
+    t.run(ACT1, TITLE_IN + BED_ENTERS, ACT2_IN,
+          f"I. intro capture, continuous to source "
+          f"{int(CAPTURE_OUT)//60}:{CAPTURE_OUT % 60:04.1f}")
+    t.at_bed(ACT2_IN, "Act I")
+    assert abs(t.shots[-1]["end_sec"] - CAPTURE_OUT) < 0.01, (
+        f"Act I ends at source {t.shots[-1]['end_sec']:.3f}s but the first "
+        f"cinematic ends at {CAPTURE_OUT:.3f}s -- the capture would run into "
+        "the fade and the next trailer.")
+
+    # ---- Act II: the gallop. One unbroken run that ends ON the crash -------
+    act2_len = ACT3_IN - ACT2_IN
+    act2_in = CRASH_IMPACT - act2_len
+    t.run(COMP, act2_in, act2_len,
+          f"II. Neomuna, unbroken from source "
+          f"{int(act2_in + 1380)//60}:{(act2_in + 1380) % 60:04.1f} -- three "
+          "Guardians advancing, straight through to the crash",
+          plate_slot=True)
+    t.at_bed(ACT3_IN, "Act II")
+
+    # ---- Act III-A: contiguous with Act II. The crash is not a cut. --------
+    def src_at(bed_time):
+        """Where this run is in the source, for a given position in the song."""
+        return CRASH_IMPACT + (bed_time - ACT3_IN)
+
+    t.run(COMP, src_at(ACT3_IN), ENEMY_CU_IN - ACT3_IN,
+          "III. the crash (impact on the flute entry), then the strand descent")
+
+    # The enemy close-up. Marked, not cut: the span stays, blacked out, so the
+    # timing is unchanged and the artwork has a measured slot to land in.
+    t.card(marker_path("COMIC PLACEHOLDER", "4:33-4:37  enemy CU"),
+           ARTWORK_IN - ENEMY_CU_IN,
+           "III. COMIC PLACEHOLDER over the enemy close-up")
+
+    # The artwork, up before the shout and held through the song's one silence.
+    t.card(ART, HOWL_SLAM - ARTWORK_IN,
+           f"III. ARTWORK held through the HOWL and the {HOWL_GAP_IN:.2f}-"
+           f"{HOWL_SLAM:.2f}s silence; picture returns on the slam")
+
+    # ...and the picture returns on the downbeat, onto three Guardians.
+    a3a_out = 287.000
+    t.run(COMP, src_at(HOWL_SLAM), a3a_out - HOWL_SLAM,
+          "III. the band slams back in on three Guardians, held",
+          plate_slot=True)
+    t.at_bed(a3a_out, "Act III-A")
+
+    # ---- Act III-B: the Collection Trailer montage, in source order --------
+    # Continuous from 0:55, with each mechanic card blacked out where it falls.
+    # The montage's length is fixed by the anchors, so the marks cost nothing:
+    # a card and the footage it replaces are the same number of seconds.
+    montage_in = 55.0
+    montage_len = PAUSE_AT - a3a_out
+    pos = montage_in
+    for card_in, card_out, what in TRAILER_CARDS:
+        t.run(TRAILER, pos, card_in - pos,
+              f"III. the Collection Trailer montage, unbroken from "
+              f"{int(pos)//60}:{pos % 60:04.1f}")
+        t.card(marker_path("COMIC PLACEHOLDER", what),
+               card_out - card_in,
+               f"III. COMIC PLACEHOLDER over the {what}")
+        pos = card_out
+    t.run(TRAILER, pos, montage_in + montage_len - pos,
+          "III. the montage runs out to the pause")
+    t.at_bed(PAUSE_AT, "Act III-B")
+
+    # ---- the pause: the song stops; the moment plays in its own audio ------
+    # UNPLATED, deliberately. The owner names this shot as Cortney Nickerson's,
+    # and she has no authored Guardian identity in ~/Videos/nameplates.json,
+    # the website's characters.json, or vocab/casting.yaml. A missing name is
+    # omitted and recorded; it is never invented (AGENTS.md). See the punch
+    # list in docs/cuts/07-seven-days-to-the-wolves.md.
+    t.run(TRAILER, PAUSE_IN, PAUSE_DUR,
+          "III. SONG PAUSES -- hero montage in its own audio, then resumes. "
+          "Casting requested: Cortney Nickerson. UNPLATED: no authored "
+          "identity exists, so no plate is invented.",
+          audio="source")
+    t.at_bed(PAUSE_AT, "the pause consumed no bed time")
+
+    # ---- Act III-C: the Pale Heart -----------------------------------------
+    pale_out = 361.200
+    t.run(COMP, 171.0, pale_out - PAUSE_AT,
+          "III. the Pale Heart, unbroken from source 25:51 -- Guardians "
+          "gathering on the plains", plate_slot=True)
+    t.at_bed(pale_out, "Act III-C")
+
+    # ---- Act III-D: the finale ---------------------------------------------
+    # Out at source 26:30 + 50.5, a beat before the branded THE FINAL SHAPE
+    # cards start at 51 s: the film ends on the Guardians, not on a logo.
+    finale_out = pale_out + 50.5
+    t.run(FINALE, 0.0, finale_out - pale_out,
+          "III. the finale, unbroken from source 26:30 -- the Guardians "
+          "assembled", plate_slot=True)
+    t.at_bed(finale_out, "Act III-D")
+
+    # ---- the outro, over the fade ------------------------------------------
+    # The song fades from 6:57 and is silent by 7:04. Holding the artwork there
+    # beats truncating the fade -- a short picture would cut it off.
+    t.card(ART, END - finale_out, "ARTWORK (outro, over the fade)")
+    t.at_bed(END, "the whole cut")
+
+    return t
+
+
+def audit(shots):
+    """The rules that were prose in the first cut, as assertions."""
+    seen = set()
+    for s in shots:
+        if "video_id" not in s:
+            continue
+        assert s["video_id"] not in BANNED_SOURCES, (
+            f"{s['video_id']} is excluded from this cut")
+        key = (s["video_id"], s["start_sec"])
+        assert key not in seen, f"shot reused: {key}"
+        seen.add(key)
 
 
 def main():
-    shots = []
-
-    # ---- Act I ------------------------------------------------------------
-    idx = load_index()
-    idx.sort(key=lambda s: -heroic(s))
-    # Open wide and quiet, end loud: establishing shots first, action last.
-    picked = sorted(idx, key=lambda s: (
-        0 if "establishing" in (s.get("composition") or []) else 1,
-        -(s.get("register") or 0) if s.get("action") else 0,
-    ))
-    used = set()
-    t = 0.0
-    for s in picked:
-        if t >= ACT2_IN - 0.05:
-            break
-        avail = s["end_sec"] - s["start_sec"]
-        want = min(3.2, avail)
-        dur = snap(t + want) - t
-        if dur < 0.8:
-            dur = min(1.2, avail)
-        dur = min(dur, avail, ACT2_IN - t)
-        if dur < 0.3:
-            continue
-        used.add(s["segment_id"])
-        shots.append({
-            "segment_id": s["segment_id"], "video_id": s["video_id"],
-            "start_sec": s["start_sec"], "end_sec": s["end_sec"],
-            "duration": round(dur, 3),
-            "start_tc": s["start_tc"], "end_tc": s["end_tc"],
-            "beat": f"I. {s['caption'][:70]}",
-        })
-        t += dur
-    act1_end = t
-    assert abs(act1_end - ACT2_IN) < 0.15, (
-        f"Act I is {act1_end:.2f}s but the gallop is at {ACT2_IN:.2f}s. "
-        "The cut is a concatenation, so a short act slides every later anchor.")
-
-    # ---- Act II: the gallop ----------------------------------------------
-    a2, t = fill(ACT2_IN, ACT3_IN, ACT2_SHOTS, max_hold=3.0, min_hold=0.8,
-                 video_id=COMP, offset=1380.0)
-    shots += a2
-    # Anything left before the crash is covered by holding the last Neomuna beats.
-    while t < ACT3_IN - 0.05:
-        extra, t2 = fill(t, ACT3_IN, ACT2_SHOTS[::-1], 2.4, 0.8, COMP, 1380.0)
-        if not extra:
-            break
-        shots += extra
-        t = t2
-    assert abs(t - ACT3_IN) < 0.15, (
-        f"Act II ends at {t:.2f}s but the flute entry is at {ACT3_IN:.2f}s. "
-        "The window crash must land on the beat change.")
-
-    # ---- Act III: the crash lands exactly here ---------------------------
-    for pool, mx, mn, vid, off, cards in (
-        (ACT3_COMP_A, 2.6, 0.6, COMP, 1380.0, None),
-        (ACT3_TRAILER, 1.6, 0.45, TRAILER, 0.0, CARDS),
-        (ACT3_COMP_C, 2.0, 0.6, COMP, 1380.0, None),
-    ):
-        part, t = fill(t, END, pool, mx, mn, vid, off, cards=cards)
-        shots += part
-
-    # Still short? The index closes it out rather than the cut ending early.
-    tail = [s for s in idx if s["segment_id"] not in used]
-    ti = 0
-    while t < END - 0.05 and ti < len(tail):
-        s = tail[ti]
-        ti += 1
-        avail = s["end_sec"] - s["start_sec"]
-        dur = min(snap(t + min(1.8, avail)) - t, avail, END - t)
-        if dur < 0.4:
-            continue
-        shots.append({
-            "segment_id": s["segment_id"], "video_id": s["video_id"],
-            "start_sec": s["start_sec"], "end_sec": s["end_sec"],
-            "duration": round(dur, 3),
-            "start_tc": s["start_tc"], "end_tc": s["end_tc"],
-            "beat": f"III. {s['caption'][:60]}",
-        })
-        t += dur
-
-    # The song fades to silence over its last bars. Rather than truncate the
-    # bed (concat passes -shortest, so a short picture would cut the fade off),
-    # hold the artwork over it: the outro card the cut was always going to want.
-    if t < END - 0.05:
-        shots.append({
-            "segment_id": "card_outro",
-            "still": ART, "duration": round(END - t, 3),
-            "beat": "ARTWORK (outro, over the fade)",
-        })
-        t = END
+    t = build()
+    audit(t.shots)
 
     out = {
         "title": "Seven Days to the Wolves",
+        "kind": "timing_pass",
         "bed": "bed_seven_days_to_the_wolves",
-        "anchors": {"act2_gallop_in": ACT2_IN, "act3_flute_change": ACT3_IN},
-        "note": "AUTHORED shotlist, not a story.py output. Hand-picked from "
-                "contact sheets; the two new sources are not in segments/.",
-        "shots": shots,
+        "bed_offset_sec": round(TITLE_IN + BED_ENTERS, 3),
+        "bed_gain_db": -3.5,
+        "anchors": {
+            "act2_gallop_in": ACT2_IN,
+            "act3_flute_change": ACT3_IN,
+            "howl_silence": [HOWL_GAP_IN, HOWL_SLAM],
+            "pause_at_bed": PAUSE_AT,
+        },
+        "note": "AUTHORED shotlist, not a story.py output. A TIMING PASS: "
+                "spans destined for removal or artwork are blacked out with "
+                "marker cards at their exact duration, so nothing is cut yet. "
+                "Shots marked audio=source do not advance the bed clock.",
+        "shots": t.shots,
     }
-    dest = REPO / "stories/seven-days-prototype.json"
+    dest = REPO / "stories/seven-days-timing-pass.json"
     dest.write_text(json.dumps(out, indent=1))
-    total = sum(s["duration"] for s in shots)
-    print(f"{len(shots)} shots, {total:.1f}s (bed {END:.1f}s)")
-    print(f"  Act I   {act1_end:6.1f}s")
-    print(f"  Act II  {ACT3_IN - ACT2_IN:6.1f}s")
-    print(f"  Act III {total - ACT3_IN:6.1f}s")
-    print(f"  cards placed: {sum(1 for s in shots if s.get('still'))}/{len(CARDS)}")
+
+    print(f"{len(t.shots)} shots")
+    print(f"  film   {t.wall:7.3f}s  ({int(t.wall)//60}:{t.wall % 60:04.1f})")
+    print(f"  bed    {t.bed:7.3f}s  (song is {END:.3f}s)")
+    print(f"  bed enters at wall {TITLE_IN + BED_ENTERS:.3f}s")
+    print(f"  plate slots: {sum(1 for s in t.shots if s.get('plate_slot'))}")
+    print(f"  cards:       {sum(1 for s in t.shots if s.get('still'))}")
     print(f"-> {dest}")
 
 
