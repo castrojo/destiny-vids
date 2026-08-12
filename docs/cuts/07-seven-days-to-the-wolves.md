@@ -232,7 +232,7 @@ decided.
 
 ## Punch list
 
-- [ ] **Owner: is the Antesion compilation acceptable provenance?** [issue #60].
+- [ ] **Owner: is the Antesion compilation acceptable provenance?** [issue #55].
       Blocking
       delivery. If not, Acts I and II and the finale need re-sourcing from
       official uploads. Escalated: three of five sections now depend on it.
@@ -261,4 +261,4 @@ decided.
 
 [issue #51]: https://github.com/castrojo/destiny-vids/issues/51
 [issue #59]: https://github.com/castrojo/destiny-vids/issues/59
-[issue #60]: https://github.com/castrojo/destiny-vids/issues/60
+[issue #55]: https://github.com/castrojo/destiny-vids/issues/55
