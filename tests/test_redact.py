@@ -183,3 +183,80 @@ def test_true_peak_is_read_from_the_last_ebur128_summary(monkeypatch):
                   "  True peak:\n    Peak:        0.5 dBFS\n")
     monkeypatch.setattr(redact.subprocess, "run", lambda *a, **k: Proc())
     assert redact.measure_true_peak("x.mp3", ffmpeg=["ffmpeg"]) == 0.5
+
+
+def test_flac_deliverable_gets_no_bitrate():
+    """A bitrate is meaningless for a lossless codec, so it is not passed.
+
+    ``flac`` exists so a later re-encode -- a stereo fold-down for streaming, a
+    different container -- starts from the bed rather than from a lossy file.
+    """
+    assert redact.audio_encode_opts("aac") == ["-c:a", "aac", "-b:a", "192k"]
+    assert redact.audio_encode_opts("flac") == ["-c:a", "flac"]
+
+
+def test_the_default_deliverable_codec_is_unchanged():
+    """Adding the lossless option must not move the shipped default."""
+    cmd = redact.build_command(["ffmpeg"], "in.mp4", [], "out.mp4",
+                               audio="bed.wav", audio_gain=0.8)
+    assert "-c:a" in cmd and cmd[cmd.index("-c:a") + 1] == "aac"
+    assert "192k" in cmd
+
+
+def test_a_lossless_deliverable_is_requested_by_codec():
+    cmd = redact.build_command(["ffmpeg"], "in.mp4", [], "out.mp4",
+                               audio="bed.wav", audio_gain=0.8,
+                               audio_codec="flac")
+    assert cmd[cmd.index("-c:a") + 1] == "flac"
+    assert "192k" not in cmd
+
+
+def test_delivered_peak_is_corrected_when_the_encoder_overshoots(monkeypatch, tmp_path):
+    """The bed landing on target is not the same as the FILE landing on target.
+
+    A lossy encoder reconstructs inter-sample peaks above the samples it was
+    given, so a -1.1 dBTP mix came back from AAC at +0.3 dBTP -- clipping, from
+    a chain correct at every earlier step. The correction is another static
+    gain, and it only ever goes down.
+    """
+    peaks = iter([0.3, -1.4])
+    monkeypatch.setattr(redact, "measure_true_peak", lambda *a, **k: next(peaks))
+    gains = []
+
+    def fake_run(cmd, **kwargs):
+        if "volume=" in " ".join(cmd):
+            gains.append(float(
+                [c for c in cmd if c.startswith("volume=")][0].split("=")[1]))
+
+        class P:
+            returncode = 0
+            stderr = ""
+        return P()
+
+    monkeypatch.setattr(redact.subprocess, "run", fake_run)
+    redact.apply("in.mp4", [], str(tmp_path / "out.mp4"), audio="bed.wav",
+                 audio_gain=0.8, ffmpeg=["ffmpeg"], target_dbtp=-1.1)
+    # One corrective pass, quieter than the first: 0.3 dBTP is 1.4 dB over.
+    assert len(gains) == 2
+    assert gains[1] < gains[0]
+    assert gains[1] == pytest.approx(0.8 * 10 ** (-1.4 / 20), rel=1e-6)
+
+
+def test_a_delivered_file_with_headroom_is_not_re_encoded(monkeypatch, tmp_path):
+    """Corrections stop at the first safe result -- the overshoot is not
+    monotonic in the gain, so chasing a narrow window oscillates."""
+    monkeypatch.setattr(redact, "measure_true_peak", lambda *a, **k: -2.4)
+    calls = []
+
+    def fake_run(cmd, **kwargs):
+        calls.append(cmd)
+
+        class P:
+            returncode = 0
+            stderr = ""
+        return P()
+
+    monkeypatch.setattr(redact.subprocess, "run", fake_run)
+    redact.apply("in.mp4", [], str(tmp_path / "out.mp4"), audio="bed.wav",
+                 audio_gain=0.8, ffmpeg=["ffmpeg"], target_dbtp=-1.1)
+    assert len(calls) == 1

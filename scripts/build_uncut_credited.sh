@@ -19,6 +19,14 @@ VIDEO_ID="${1:?usage: $0 <video_id> <roster.json> [music.mp3]}"
 ROSTER="${2:?usage: $0 <video_id> <roster.json> [music.mp3]}"
 MUSIC="${3:-}"
 
+# ACODEC=flac builds a LOSSLESS master alongside the normal deliverable, so a
+# later re-encode (a stereo fold-down for streaming, a different container)
+# starts from the bed rather than from a lossy file. Output is suffixed so it
+# never overwrites the shipped render.
+ACODEC="${ACODEC:-aac}"
+SUFFIX=""
+[ "$ACODEC" = "aac" ] || SUFFIX="-hq"
+
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
@@ -34,7 +42,7 @@ OUT_DIR="renders"
 PLATES_DIR="$OUT_DIR/plates-$VIDEO_ID"
 BASE="$WORK/base.mp4"
 MANIFEST="$OUT_DIR/$VIDEO_ID-plates.json"
-FINAL="$OUT_DIR/$VIDEO_ID-credited.mp4"
+FINAL="$OUT_DIR/$VIDEO_ID-credited${SUFFIX}.mp4"
 
 mkdir -p "$OUT_DIR"
 
@@ -62,10 +70,10 @@ python3 tools/plate.py merge "$WORK/leads.json" "$WORK/chat.json" \
 echo "==> redact burned-in copy${MUSIC:+ and score}"
 if [ -n "$MUSIC" ]; then
     python3 tools/redact.py --video "media/$VIDEO_ID.mp4" --video-id "$VIDEO_ID" \
-        --audio "$MUSIC" --out "$BASE"
+        --audio "$MUSIC" --audio-codec "$ACODEC" --out "$BASE"
 else
     python3 tools/redact.py --video "media/$VIDEO_ID.mp4" --video-id "$VIDEO_ID" \
-        --out "$BASE"
+        --audio-codec "$ACODEC" --out "$BASE"
 fi
 
 echo "==> burn the deck"

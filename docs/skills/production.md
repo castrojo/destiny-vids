@@ -109,9 +109,14 @@ A render in `renders/` is not a deliverable. The delivery workspace is
 
 | Step | Where |
 |---|---|
-| Stage the approved file | `~/Videos/UPLOAD/`, numbered in playlist order |
+| Stage the approved file | `~/Videos/UPLOAD/`, named so it **sorts** into playlist order |
 | Record what it is | `~/Videos/UPLOAD/README.md` + the cut's `STORYBOARD.md` |
 | Publish | `python3 ~/Videos/yt-refresh.py` — one unlisted playlist |
+
+`UPLOAD/` is ordered by lexical filename, so the prefix is the running order.
+Europa is pinned last with a `zz-` prefix by the owner's decision — do not
+renumber it, and do not assume the numbers are gapless (they are not: Europa
+vacated `03`). Positions are not filenames; refer to cuts by name.
 
 Three rules there that this repo has to respect:
 
@@ -137,9 +142,28 @@ already been learned the hard way and must not be re-learned:
 - The bed's gain is **derived from its measured true peak**, never hardcoded and
   never normalised. `tools/redact.py`'s `gain_for_headroom` exists because a
   hardcoded `0.9` shipped a **+0.5 dBTP** clipping master.
-- The contributors piece is **stereo AAC on purpose** (its bed is a lossy MP3
-  source); the Guardian intros are 5.1 from lossless sources. Do not "fix" one
-  into the other.
+- **That alone is not enough: check the DELIVERED peak, not the bed's.** A lossy
+  encoder reconstructs inter-sample peaks above the samples it is given, so a
+  mix measuring −1.1 dBTP came back from AAC at **+0.3 dBTP** — clipping, from a
+  chain correct at every earlier step. How much it overshoots depends on the
+  material (0.2 dB on one bed, 1.5 dB on another). `redact.py` now measures the
+  output and re-runs at a corrected **static** gain until it has headroom;
+  corrections only go down and stop at the first safe result, because the
+  overshoot is not monotonic in the gain. A FLAC build of the same cut lands on
+  target in one pass, which is how you know it is the encoder.
+- The contributors piece is **stereo AAC on purpose**; the Guardian intros are
+  5.1. Do not "fix" one into the other.
+- **Source a bed by codec, not by bitrate.** Sorting candidate downloads on raw
+  bitrate picks a 44.1 kHz AAC rung over a 48 kHz Opus one whenever the AAC
+  number is bigger, and that rung is brickwalled around 15 kHz and forces a
+  needless resample. Fetch with `~/Videos/audio-source.sh`, which pins
+  `-S "acodec:opus,asr,abr"` and records provenance. A 44.1 kHz bed is the
+  fingerprint of having got this wrong.
+- `ACODEC=flac` builds a **lossless master** alongside the deliverable, so a
+  later fold-down starts from the bed rather than from a lossy file. The
+  default stays `aac`, and the defaults must keep rebuilding the shipped file.
+  The standard and the checker live in `~/Videos/AUDIO.md` and
+  `~/Videos/audio-check.sh`.
 - Prove it, don't assert it: `framemd5` proves an audio change touched no
   frames, an audio-stream MD5 proves a picture change touched no audio,
   `-xerror` proves the file is not truncated, `volumedetect` proves it is not
@@ -260,6 +284,12 @@ grind them.
   in its `README.md` saying which master it came from.
 - Any write to `~/src/website`. It is read-only from here — several agents run
   worktrees against it — and it is where the authored plate copy lives.
+- Trusting a bed's measured true peak as the *delivered* peak. The encoder adds
+  inter-sample overshoot; measure the output file.
+- Renumbering the `zz-` prefixed cut in `~/Videos/UPLOAD/`, or "closing the gap"
+  in the numbering. The prefix is the sort key and the gap is deliberate.
+- A music bed at 44.1 kHz, or one with nothing above 16 kHz. Both mean the
+  fetch took the wrong rung.
 
 ## Verification
 
@@ -267,6 +297,7 @@ grind them.
 python3 tools/gaps.py
 python3 -m pytest -q                  # includes committed-index integrity
 python3 scripts/generate_skill_index.py --check
+~/Videos/audio-check.sh --all         # before staging anything for delivery
 ```
 
 `tests/test_index_integrity.py` validates every committed segment, video and

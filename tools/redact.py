@@ -158,6 +158,15 @@ def drawbox_filters(redactions):
 # 0 dBFS clips on playback. ~1 dB of headroom is the usual delivery allowance.
 DEFAULT_TARGET_DBTP = -1.1
 
+# How far above the target a delivered file may land and still be accepted.
+# The delivered cuts in ~/Videos/UPLOAD sit at -0.9..-1.1 dBTP, so this keeps
+# the accepted band flush with what has actually shipped while staying clear
+# of full scale.
+PEAK_ACCEPT_MARGIN_DB = 0.6
+
+# Below this far under target, say so: safe, but quieter than the other cuts.
+QUIET_WARN_DB = 1.0
+
 
 def measure_true_peak(path, ffmpeg=None):
     """True peak of ``path`` in dBFS, via ffmpeg's ebur128 (ITU-R BS.1770).
@@ -194,8 +203,21 @@ def gain_for_headroom(path, target_dbtp=DEFAULT_TARGET_DBTP, ffmpeg=None):
     return 10 ** ((target_dbtp - peak) / 20.0), peak
 
 
+def audio_encode_opts(codec):
+    """Encoder options for the deliverable's audio.
+
+    ``flac`` builds a lossless master, so that a re-encode later (a fold-down
+    for streaming, a different container) starts from the bed rather than from
+    a lossy deliverable. A bitrate is meaningless for a lossless codec, so it
+    is omitted rather than passed and ignored.
+    """
+    if codec == "aac":
+        return ["-c:a", "aac", "-b:a", "192k"]
+    return ["-c:a", codec]
+
+
 def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
-                  trim=None):
+                  trim=None, audio_codec="aac"):
     """One pass: paint out the boxes, trim to the kept range, swap or keep audio.
 
     The music bed replaces the source audio rather than mixing with it, so a
@@ -230,13 +252,13 @@ def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
         if audio_gain is not None:
             cmd += ["-af", f"volume={audio_gain}"]
         cmd += ["-map", "0:v:0", "-map", "1:a:0", "-shortest",
-                "-c:a", "aac", "-b:a", "192k"]
+                *audio_encode_opts(audio_codec)]
     elif trim:
         spec = f"atrim=start={trim[0]:.3f}"
         if trim[1] is not None:
             spec += f":end={trim[1]:.3f}"
         cmd += ["-af", spec + ",asetpts=PTS-STARTPTS",
-                "-map", "0:v:0", "-map", "0:a?", "-c:a", "aac", "-b:a", "192k"]
+                "-map", "0:v:0", "-map", "0:a?", *audio_encode_opts(audio_codec)]
     else:
         cmd += ["-map", "0:v:0", "-map", "0:a?", "-c:a", "copy"]
     cmd += [str(out_path)]
@@ -244,7 +266,8 @@ def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
 
 
 def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
-          video_end=None):
+          video_end=None, target_dbtp=None, audio_codec="aac",
+          _attempts_left=5):
     if ffmpeg is None:
         from tools.render import find_ffmpeg
 
@@ -260,11 +283,73 @@ def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
     cmd = build_command(ffmpeg, Path(video).resolve(), drawbox_filters(redactions),
                         Path(out_path).resolve(),
                         Path(audio).resolve() if audio else None, audio_gain,
-                        trim=trim)
+                        trim=trim, audio_codec=audio_codec)
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
         raise RuntimeError(f"redaction pass failed:\n{tail}")
+
+    # Verify the DELIVERED peak, not just the bed's.
+    #
+    # gain_for_headroom lands the *bed* on target, but the deliverable is AAC,
+    # and a lossy encoder reconstructs inter-sample peaks above the samples it
+    # was given. How much depends on the material: this cut's MP3 bed overshot
+    # by 0.2 dB while the higher-bandwidth Opus-sourced bed overshot by 1.5 dB
+    # and landed a -1.1 dBTP mix at +0.3 dBTP -- clipping, from a chain that
+    # measured correct at every earlier step. Deriving the gain from the source
+    # fixed the old hardcoded-gain bug; it does not cover this one.
+    #
+    # Verify the DELIVERED peak, not just the bed's.
+    #
+    # gain_for_headroom lands the *bed* on target, but the deliverable is AAC,
+    # and a lossy encoder reconstructs inter-sample peaks above the samples it
+    # was given. How much depends on the material: this cut's MP3 bed overshot
+    # by 0.2 dB while the higher-bandwidth Opus-sourced bed overshot by 1.5 dB
+    # and landed a -1.1 dBTP mix at +0.3 dBTP -- clipping, from a chain that
+    # measured correct at every earlier step. Deriving the gain from the source
+    # fixed the old hardcoded-gain bug; it does not cover this one.
+    #
+    # Each correction is another STATIC gain, never a limiter: the pass is
+    # re-run at a different scale, so the artist's dynamics are untouched.
+    #
+    # Corrections only ever go DOWN, and stop at the first safe result. The
+    # overshoot is not monotonic in the gain -- it is set by whichever transient
+    # the encoder reconstructs highest, and that moves discontinuously as the
+    # level changes quantization decisions (measured here: gain 0.658 delivered
+    # -2.5 dBTP while 0.675 delivered -0.8). Chasing a narrow window on that
+    # curve oscillates and costs a full pass per attempt, so this takes the
+    # first result with real headroom instead.
+    if audio and audio_gain and target_dbtp is not None:
+        ceiling = target_dbtp + PEAK_ACCEPT_MARGIN_DB
+        gain = audio_gain
+        for attempt in range(_attempts_left):
+            delivered = measure_true_peak(out_path, ffmpeg)
+            if delivered <= ceiling:
+                print(f"  delivered true peak {delivered:+.1f} dBTP")
+                if delivered < target_dbtp - QUIET_WARN_DB:
+                    print(f"  note: {target_dbtp - delivered:.1f} dB below the "
+                          f"{target_dbtp:+.1f} dBTP target -- the encoder left "
+                          f"more headroom than asked for, which is safe but "
+                          f"quieter than the other cuts")
+                break
+            if attempt == _attempts_left - 1:
+                print(f"  WARNING: delivered true peak {delivered:+.1f} dBTP "
+                      f"still above {ceiling:+.1f} after {_attempts_left} "
+                      f"attempts -- verify before shipping")
+                break
+            gain *= 10 ** (-(delivered - target_dbtp) / 20.0)
+            print(f"  delivered true peak {delivered:+.1f} dBTP -- the encoder "
+                  f"added {delivered - target_dbtp:.1f} dB over the bed's "
+                  f"target; re-running at static gain {gain:.3f}")
+            cmd = build_command(ffmpeg, Path(video).resolve(),
+                                drawbox_filters(redactions),
+                                Path(out_path).resolve(),
+                                Path(audio).resolve(), gain, trim=trim,
+                                audio_codec=audio_codec)
+            proc = subprocess.run(cmd, capture_output=True, text=True)
+            if proc.returncode != 0:
+                tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
+                raise RuntimeError(f"redaction pass failed:\n{tail}")
     return out_path
 
 
@@ -282,6 +367,9 @@ def main(argv=None):
     ap.add_argument("--target-dbtp", type=float, default=DEFAULT_TARGET_DBTP,
                     help="deliverable headroom in dBTP when --audio-gain is not "
                          f"given (default {DEFAULT_TARGET_DBTP})")
+    ap.add_argument("--audio-codec", default="aac",
+                    help="deliverable audio codec; 'flac' builds a lossless "
+                         "master (default aac)")
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
 
@@ -300,7 +388,9 @@ def main(argv=None):
         print(f"music bed: true peak {peak:+.1f} dBTP -> gain {gain:.3f} "
               f"(target {args.target_dbtp:+.1f} dBTP)")
     apply(args.video, data["redactions"], args.out,
-          audio=args.audio, audio_gain=gain, video_end=video_end)
+          audio=args.audio, audio_gain=gain, video_end=video_end,
+          audio_codec=args.audio_codec,
+          target_dbtp=args.target_dbtp if args.audio_gain is None else None)
     print(f"wrote {args.out}")
     return 0
 
