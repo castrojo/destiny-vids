@@ -77,19 +77,43 @@ def test_characters_normalize_to_canonical_casting_keys():
     assert brief["characters"] == ["saint_14", "elsie_bray"]
 
 
-def test_an_unknown_character_is_refused_not_guessed():
-    with pytest.raises(BriefError, match="unknown character"):
-        parse_brief(MINIMAL + "characters: [paris_pittman]\n")
+def test_an_unknown_character_is_reported_not_fatal():
+    # Blocking a whole request over one unrecognised word is how a pipeline
+    # stops being used. The names that DO resolve still run.
+    brief = parse_brief(MINIMAL + "characters: [saint_14, paris_pittman]\n")
+    assert brief["characters"] == ["saint_14"]
+    assert brief["unresolved"] == [{"field": "characters", "name": "paris_pittman"}]
 
 
-def test_unknown_character_error_lists_the_valid_keys():
-    with pytest.raises(BriefError, match="cayde_6"):
-        parse_brief(MINIMAL + "characters: [nobody_at_all]\n")
+def test_an_unknown_character_is_still_never_guessed():
+    # Degrading is not the same as inventing: nothing may map an unknown name
+    # onto the nearest key, because that casts a real person on the owner's
+    # behalf.
+    brief = parse_brief(MINIMAL + "characters: [osiris_the_second]\n")
+    assert brief["characters"] == []
+    assert brief["unresolved"][0]["name"] == "osiris_the_second"
 
 
-def test_a_plate_character_is_validated_the_same_way():
-    with pytest.raises(BriefError, match="unknown character"):
-        parse_brief(MINIMAL + "plates:\n  - character: not_a_lead\n")
+def test_a_resolvable_brief_records_nothing_unresolved():
+    brief = parse_brief(MINIMAL + "characters: [cayde]\n")
+    assert brief["characters"] == ["cayde_6"]
+    assert "unresolved" not in brief
+
+
+def test_a_plate_keeps_owner_copy_when_the_character_is_uncast():
+    # The copy is the one thing only the owner can supply -- dropping it
+    # because the vocab has not caught up loses the irreplaceable half.
+    brief = parse_brief(
+        MINIMAL
+        + "plates:\n  - character: Paris Pittman\n    copy:\n      name: Paris Pittman\n"
+    )
+    plate = brief["plates"][0]
+    assert "character" not in plate
+    assert plate["copy"]["name"] == "Paris Pittman"
+    assert brief["unresolved"] == [{"field": "plates", "name": "Paris Pittman"}]
+
+
+def test_a_known_plate_character_still_normalizes():
     brief = parse_brief(MINIMAL + "plates:\n  - character: cayde\n    at: '0:14'\n")
     assert brief["plates"][0]["character"] == "cayde_6"
 

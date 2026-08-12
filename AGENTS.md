@@ -55,6 +55,38 @@ Run both before every commit.
    for a shot they are not in. Tag a character only when they are visibly in
    frame; omit rather than guess.
 
+## Degrade, never block
+
+**A missing string is not a failure. It is a punch-list item.**
+
+Nothing here may halt because a word has not been written yet. A nameplate
+whose subclass nobody has authored renders without the subclass row. A brief
+naming somebody not yet in `vocab/casting.yaml` runs on the names that do
+resolve and records the rest in `unresolved`. A beat with no matching shot is
+reported and the cut is still made. **Ship the degraded output and record what
+is missing** — a video that exists can be fixed; a video blocked on one word
+never gets made, and a pipeline that refuses contributions stops being used.
+
+This does **not** loosen rule 3, and the distinction is the whole point:
+
+| | |
+|---|---|
+| **Missing** a word | Omit it, ship, record it. Always. |
+| **Inventing** a word | Forbidden. Always. |
+
+Guessing which person the owner meant, or writing a subclass nobody authored,
+is not iteration — it puts words on a real colleague under the owner's name,
+and no amount of velocity justifies it. The two failure modes look similar and
+are opposites: one leaves a gap, the other fills it with fiction.
+
+The only things that genuinely stop work are a **rights** decision and a
+**clean** violation — the two that cannot be undone after publishing.
+Everything else degrades and carries on.
+
+Record the gap where the next person will trip over it: `unresolved` in a
+parsed brief, a `TODO(owner)` beside the binding, and a GitHub issue when it
+needs somebody to decide.
+
 ## Boundaries
 
 - **Never commit footage.** `media/`, `keyframes/`, `renders/` and `*.mp4` are

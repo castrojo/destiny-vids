@@ -131,17 +131,35 @@ updates rather than duplicating.
 
 ## What is not an agent's call
 
-Three classes of work in this repo cannot be automated. Not "are not yet" —
-cannot be. An agent that reaches one, names it, and stops has **succeeded**.
+Two things genuinely stop work, because neither can be undone after publishing:
+a **rights** decision, and a **`clean`** violation. Everything else degrades and
+carries on — see "Degrade, never block" in [`AGENTS.md`](../../AGENTS.md).
 
-| Class | Why | Worked example |
+A missing string is never a reason to halt. A brief naming somebody uncast runs
+on the names that resolve and records the rest in `unresolved`; a plate whose
+subclass nobody authored renders without that row. Ship it, record the gap,
+move on.
+
+What stays forbidden is *inventing* the missing string. These look alike and
+are opposites:
+
+| | |
+|---|---|
+| **Missing** a word | Omit, ship, record. |
+| **Inventing** a word | Never. It puts words on a real colleague. |
+
+So: name a character only where they are visibly in frame, never write plate
+copy nobody authored, and leave rights calls to the owner. Then keep going.
+
+| Class | Why it is the owner's | Worked example |
 |---|---|---|
-| A visual judgement about a frame | "Nobody has looked at this" is not evidence the frame is clean. | 61 unreviewed beats keeping a video out of every cut |
-| A claim about a real person | Casting, plate copy, a subclass, a pronoun. Inventing one puts words on a colleague under the owner's authority. | Karena's missing subclass word |
-| A licensing decision | Rights are the owner's to accept. | CC BY-NC-ND photographs blocking a Ken Burns push |
+| A visual judgement about a frame | "Nobody has looked at this" is not evidence the frame is clean. | unreviewed beats keeping a video out of every cut |
+| A claim about a real person | Casting, plate copy, a subclass, a pronoun. | a subclass word nobody has authored |
+| A licensing decision | Rights are the owner's to accept. | ND-licensed photographs blocking a treatment |
 
-Say `automatable: no`, put the exact missing decision in `blocked_on`, and
-stop. Never guess past one to keep a queue moving.
+Use `automatable: no` for work that genuinely cannot proceed, put the exact
+missing decision in `blocked_on`, and file it. Do not use it for a gap you
+could have shipped around.
 
 ## Finding the unfinished
 
@@ -162,6 +180,8 @@ amounts of trust.
 
 | Rationalization | Reality |
 |---|---|
+| "A word is missing, so I have to stop." | No. Omit the row, ship the cut, record the gap. Only rights and `clean` stop work. |
+| "I'll fill in the missing subclass, it's obvious." | That is inventing, not iterating. It puts words on a real colleague. |
 | "The prose is clear enough, I'll just start." | Two agents reading the same prose build two different cuts. Normalize, confirm, then work. |
 | "I'll add a `character/paris` label." | Characters live in the brief, in the index's own vocabulary. A label set is a second vocabulary that drifts. |
 | "The owner obviously means Paris is a Titan." | That is a claim about a real person. `automatable: no`. |

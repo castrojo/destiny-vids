@@ -37,12 +37,14 @@ guess would otherwise be made.
 
 Three rules this module exists to enforce:
 
-* **An unknown character is an error, never a normalization.** ``characters``
-  and ``plates[].character`` are the same vocabulary the index uses, so they
-  are checked against ``vocab/casting.yaml``. A name that is not a lead key or
-  one of its ``aka`` spellings stops the parse and lists what is valid. Casting
-  a real person is an owner decision (docs/skills/casting.md); an agent that
-  quietly maps "Paris" onto the nearest key has made that decision for them.
+* **An unknown character is reported, not fatal.** ``characters`` and
+  ``plates[].character`` use the same vocabulary as the index, checked against
+  ``vocab/casting.yaml``. A name that is not a lead key or one of its ``aka``
+  spellings is dropped from the brief and listed in ``unresolved``, so the rest
+  of the request still runs. What is never done is quietly mapping "Paris" onto
+  the nearest key: casting a real person is an owner decision
+  (docs/skills/casting.md). Omit, report, continue -- never invent, never halt.
+  Pass ``--strict`` to make it fatal where that is genuinely wanted.
 
 * **A derived field in a brief is an error.** ``clean``, ``footage_tier``,
   ``traversal_hero`` and ``casting`` are computed by ``tools/derive.py`` at
@@ -189,22 +191,19 @@ def _validate_schema(data):
 
 
 def _resolve_character(name, alias_index, leads):
-    """A brief's character name -> its canonical vocab/casting.yaml key.
+    """A brief's character name -> its canonical key, or None if unknown.
 
-    Raises rather than guessing. An unrecognized name is far more often a
-    person the project has not cast yet than a typo, and inventing the binding
-    is the one thing casting must never do.
+    Returns None rather than raising. An unrecognized name is far more often
+    somebody the project has not cast yet than a typo, and stopping the whole
+    request over one word is how a pipeline stops being used: the cut that
+    could have been made from the other four names never gets made. The caller
+    records it in ``unresolved`` and carries on.
+
+    What is still refused is a GUESS. Mapping "Paris" onto the nearest key
+    would cast a real person on the owner's behalf, and no amount of velocity
+    justifies that. Omit, report, continue.
     """
-    key = alias_index.get(snake_case(name))
-    if key is None:
-        known = ", ".join(sorted(leads))
-        raise BriefError(
-            f"unknown character {name!r}. `characters` uses the lead keys in "
-            f"vocab/casting.yaml, which are the same ids the segment index "
-            f"tags. Add the binding there first (an owner decision -- see "
-            f"docs/skills/casting.md), or use one of: {known}"
-        )
-    return key
+    return alias_index.get(snake_case(name))
 
 
 def parse_brief(text, casting_path=None):
@@ -232,15 +231,36 @@ def parse_brief(text, casting_path=None):
     leads = load_leads(casting_path)
     alias_index = lead_alias_index(leads)
 
+    # Names that do not resolve are collected rather than thrown. The brief
+    # still runs on what it CAN resolve, and `unresolved` is the punch list of
+    # what to fix afterwards -- casting somebody, or correcting a spelling.
+    unresolved = []
+
     if "characters" in data:
-        data["characters"] = [
-            _resolve_character(name, alias_index, leads) for name in data["characters"]
-        ]
+        resolved = []
+        for name in data["characters"]:
+            key = _resolve_character(name, alias_index, leads)
+            if key is None:
+                unresolved.append({"field": "characters", "name": name})
+            elif key not in resolved:
+                resolved.append(key)
+        data["characters"] = resolved
+
     for plate in data.get("plates") or []:
-        if plate.get("character"):
-            plate["character"] = _resolve_character(
-                plate["character"], alias_index, leads
-            )
+        if not plate.get("character"):
+            continue
+        key = _resolve_character(plate["character"], alias_index, leads)
+        if key is None:
+            # The plate keeps its copy: an owner-authored plate names somebody
+            # real whether or not the vocab knows them yet, and dropping the
+            # copy would lose the one thing only the owner can supply.
+            unresolved.append({"field": "plates", "name": plate["character"]})
+            plate.pop("character")
+        else:
+            plate["character"] = key
+
+    if unresolved:
+        data["unresolved"] = unresolved
 
     if data["automatable"] in ("no", "partly") and not data.get("blocked_on"):
         raise BriefError(
