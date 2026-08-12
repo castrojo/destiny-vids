@@ -28,18 +28,27 @@ fewer, longer gaps — never a thinner video.
    rebuild cannot fix.
 2. **The hero videos** — one person, one video, every source. Promotional
    material ([`catalog.md`](catalog.md), [`cuts/hero-montage.md`](cuts/hero-montage.md)).
-3. **The feature** — *Seven Days to the Wolves*, a musical: one song, three
-   acts, one file. A prototype is staged
+3. **The feature** — *Seven Days to the Wolves*, **eight acts in one file**.
+   [`running-order.md`](running-order.md) is the source of truth for what they
+   are; act VI is the musical, and an editorial pass of it exists
    ([`cuts/07-seven-days-to-the-wolves.md`](cuts/07-seven-days-to-the-wolves.md)).
+   The programme is assembled by `tools/megacut.py` and is **not yet rendered**,
+   by owner instruction.
 
 ## What blocks this, measured
 
-### The feature exists as a prototype, not an approved cut
+### The feature is assembled on paper, and two of its eight acts have no film
 
-The picture is made and delivered. What is not settled is **provenance**: Act II
-and the climax draw on a fan compilation of Bungie trailers rather than official
+Five acts are delivered into `~/Videos/Wolves/Prod/`. **Act I is built but not
+rendered**, act II has no music decision ([issue #74]), and act VIII — the
+credits — is not designed ([issue #51]). The programme itself has not been
+built.
+
+What is also not settled is **provenance**: inside act VI, its second movement
+and its climax draw on a fan compilation of Bungie trailers rather than official
 uploads, and the fan-content policy covers Bungie's footage, not a re-uploader's
-compilation. That is an owner decision and it gates release, not iteration.
+compilation. That is an owner decision and it gates release, not iteration
+([issue #55]).
 
 The bed is also an official-but-lossy YouTube upload rather than the lossless
 master. Replacing it re-times the cut, so it wants doing before the edit is
@@ -47,16 +56,16 @@ locked, not after.
 
 ### The credits sequence does not exist
 
-A musical still has to credit its cast, and the prototype carries **no plates at
-all**. This is design work, not a render setting, and it is on the critical path
-to T−0. Tracked in [issue #51].
+The show still has to credit its cast, and act VI carries **no plates at all**.
+Act VIII is the slot for it and the slot is empty. This is design work, not a
+render setting, and it is on the critical path to T−0. Tracked in [issue #51].
 
-### Two finished cuts are unplaced
+### Two finished cuts are no longer unplaced
 
-The feature used to be four parts. Now that it is one song end to end, the
-Europa director's cut and the Nati teaser have no slot inside it. Both are
-finished and owner-approved; where they go is an open decision, most likely
-promotional release alongside the hero videos. See [`catalog.md`](catalog.md).
+The feature used to be four parts, then a single song, which left the Europa
+director's cut and the Nati teaser with no slot. **The canonical eight acts
+placed both** — Nati is act V, Europa is act VII. Neither is a loose end any
+more; see [`running-order.md`](running-order.md) and [issue #56].
 
 ### Most of the cast has no footage to make a hero video from
 
@@ -123,6 +132,9 @@ Ship six hero videos or ship two. **Never ship a thin one to hold a date.**
 - **Rights on any new music** for the credits or the teaser.
 
 [issue #7]: https://github.com/castrojo/destiny-vids/issues/7
+[issue #55]: https://github.com/castrojo/destiny-vids/issues/55
+[issue #56]: https://github.com/castrojo/destiny-vids/issues/56
+[issue #74]: https://github.com/castrojo/destiny-vids/issues/74
 [issue #50]: https://github.com/castrojo/destiny-vids/issues/50
 [issue #51]: https://github.com/castrojo/destiny-vids/issues/51
 [issue #49]: https://github.com/castrojo/destiny-vids/issues/49

@@ -101,7 +101,8 @@ def test_every_act_slide_carries_an_audience_facing_chapter_title():
 
 def test_the_programme_is_delivered_from_the_wolves_workspace():
     """Prod holds the highest-quality master of each act; the movie goes to
-    megacut/. Reading UPLOAD/ instead would ship the older AAC staging copies."""
+    megacut/. Reading anywhere else would ship a lossy copy of the same cut --
+    which is what the retired UPLOAD/ staging folder held."""
     plan = _load("megacut.json")
     assert plan["output"].startswith("/var/home/jorge/Videos/Wolves/megacut/")
     for item in plan["items"]:

@@ -10,14 +10,14 @@
     "VII": "europa — the Europa director's cut.",
     "VIII": "credits — NOT DESIGNED. Issue #51."
   },
-  "_audio": "Every act carries its own audio, unprocessed: no normaliser, no limiter, no EQ. The programme is 48 kHz STEREO because that is what the masters are -- every -hq master in Prod is stereo FLAC. The older UPLOAD copies were AAC 5.1, but that 5.1 was the same two channels plus a derived LFE (FC/BL/BR digital silence), added by each cut's own run script. Upmixing here to recreate it would be assembly inventing a soundfield, which the audio tenet forbids; if 5.1 delivery is wanted, it belongs in the per-cut scripts that already do it. Only the six act slides are silent; a bed under them is a licensing decision.",
+  "_audio": "Every act carries its own audio, unprocessed: no normaliser, no limiter, no EQ. The programme is 48 kHz STEREO because that is what the masters are -- every -hq master in Prod is stereo FLAC. The older, now-retired UPLOAD copies were AAC 5.1, but that 5.1 was the same two channels plus a derived LFE (FC/BL/BR digital silence), added by each cut's own run script. Upmixing here to recreate it would be assembly inventing a soundfield, which the audio tenet forbids; if 5.1 delivery is wanted, it belongs in the per-cut scripts that already do it. Only the six act slides are silent; a bed under them is a licensing decision.",
   "_sources": {
-    "_where": "Every act plays from ~/Videos/Wolves/Prod, which holds the HIGHEST-QUALITY master of each: FLAC audio and the un-re-encoded picture. They are hardlinks to the per-project masters, so Prod costs no extra disk and cannot drift from what its project built. ~/Videos/UPLOAD holds the older AAC 5.1 staging copies and is NOT what this reads.",
-    "hero": "renders/megacut-01-hero.mkv — YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), Bungie's score, six Guardian plates and the comic title card burned. usage_class: third_party_copyrighted. NOT YET BUILT, and not yet in Prod.",
+    "_where": "Every act plays from ~/Videos/Wolves/Prod, which holds the HIGHEST-QUALITY master of each: FLAC audio and the un-re-encoded picture. They are hardlinks to the per-project masters, so Prod costs no extra disk and cannot drift from what its project built. The retired ~/Videos/UPLOAD staging folder held lossy copies of the same cuts and is NOT what this reads; its removal is issue #81.",
+    "hero": "~/Videos/Wolves/Prod/01-intro.mp4 (hardlink to renders/megacut-01-hero.mp4) — YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), Bungie's score, six Guardian plates and the comic title card burned. usage_class: third_party_copyrighted. BUILT 2026-08-12: raw trim (x264 crf 14) + tools/plate.py burn (crf 18), audio decoded from the plain 251 Opus rung to FLAC -- NOT 251-drc, which is dynamic-range compressed and forbidden by the audio standard. Delivered as act I.",
     "mrbobbytables": "Wolves/Prod/03-mrbobbytables.mp4 -> destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4. PARTIALLY COMPLETE by the owner's description; placed as-is, because assembly never re-cuts what it is handed.",
     "kat": "Wolves/Prod/04-kat.mp4 -> ~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4. NOTE: the owner's dialogue change (Kat/Ian split, and 'Remember kids, cardio!') is staged in that project and NOT yet rendered, so this master still carries the old dialogue. Rebuild it there before assembling.",
     "natali": "Wolves/Prod/05-nat.mp4 -> ~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4.",
-    "wolves": "Wolves/Prod/06-7daystothewolves.mp4 -> ~/Videos/UPLOAD/07-seven-days-to-the-wolves.mp4. THE ONE ACT WITH NO LOSSLESS MASTER: it is AAC, so Prod holds the best that exists rather than the best possible. Issue #58.",
+    "wolves": "Wolves/Prod/06-7daystothewolves.mp4 -> ~/Videos/wolves-musical/wolves-7days-master.mp4. THE ONE ACT WITH NO LOSSLESS MASTER: it is AAC (stereo, 48 kHz, ~323 kb/s), so Prod holds the best that exists rather than the best possible. Issue #58. It was re-homed out of the retired UPLOAD/ staging folder by moving the inode, so the hardlink never broke.",
     "europa": "Wolves/Prod/07-europa.mp4 -> ~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4."
   },
   "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves.mp4",
@@ -39,7 +39,7 @@
     },
     {
       "kind": "clip",
-      "path": "renders/megacut-01-hero.mkv",
+      "path": "/var/home/jorge/Videos/Wolves/Prod/01-intro.mp4",
       "audio": "source",
       "label": "Act I — Into the Light: six Guardians plated, the comic card, Bungie's score",
       "dur": 111.567,

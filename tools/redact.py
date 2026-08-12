@@ -159,7 +159,7 @@ def drawbox_filters(redactions):
 DEFAULT_TARGET_DBTP = -1.1
 
 # How far above the target a delivered file may land and still be accepted.
-# The delivered cuts in ~/Videos/UPLOAD sit at -0.9..-1.1 dBTP, so this keeps
+# The delivered acts in ~/Videos/Wolves/Prod sit at -0.9..-1.2 dBTP, so this keeps
 # the accepted band flush with what has actually shipped while staying clear
 # of full scale.
 PEAK_ACCEPT_MARGIN_DB = 0.6

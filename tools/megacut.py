@@ -35,7 +35,7 @@ The segments genuinely disagree, so a re-encode is unavoidable:
 
 Audio is re-encoded once to AAC. That is one generation of lossy-to-lossy loss
 on segments whose deliverables are already AAC; it is recorded rather than
-hidden, and the lossless-master path (see ``~/Videos/AUDIO.md``) is the upgrade
+hidden, and the lossless-master path (see ``docs/skills/references/audio-standard.md``) is the upgrade
 if a delivered master is ever wanted.
 """
 
@@ -271,7 +271,7 @@ def build_command(plan, out_path):
         # The three -color_* flags above describe the *frames*, and x264 only
         # copies the matrix from them -- primaries and transfer come out
         # `unknown`, which is a silent mismatch against every other deliverable
-        # in ~/Videos/UPLOAD. Writing the VUI directly is the only way all three
+        # in ~/Videos/Wolves/Prod. Writing the VUI directly is the only way all three
         # actually land in the bitstream. Verified by ffprobe, not assumed.
         "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709",
         "-movflags", "+faststart",
