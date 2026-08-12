@@ -221,6 +221,59 @@ def test_cayde_cut_gives_cayde_the_reveal(indexed):
             assert shot["segment"]["shot_scale"] in {"ELS", "LS", "MLS"}
 
 
+# The Zavala cut (docs/cuts/03-zavala.md) comes out of the same cinematic, and
+# is the one-cinematic mechanic pointed at a single lead instead of the
+# ensemble.
+
+def _zavala_story(indexed):
+    _, _, outline = read_outline(str(REPO_ROOT / "stories" / "03-zavala.txt"))
+    return outline, build_story(outline, indexed, from_video=DANCE_CINEMATIC,
+                                forward_only=True)
+
+
+def test_zavala_cut_assembles_from_one_cinematic_skipped_forward(indexed):
+    outline, story = _zavala_story(indexed)
+    assert story["misses"] == []
+    assert len(story["shots"]) == len(outline)
+    assert {s["video_id"] for s in story["shots"]} == {DANCE_CINEMATIC}
+    assert all(shot["segment"]["clean"] for shot in story["shots"])
+    playhead = 0.0
+    for shot in story["shots"]:
+        assert shot["start_sec"] >= playhead
+        playhead = shot["end_sec"]
+
+
+def test_zavala_cut_is_a_hero_cut(indexed):
+    """Heroes carry it; the antagonist is coverage, held wide and brief."""
+    _, story = _zavala_story(indexed)
+    salience = [shot["segment"]["subject_salience"] for shot in story["shots"]]
+    assert salience.count("enemy_threat") <= 1
+    for shot in story["shots"]:
+        if shot["segment"]["subject_salience"] == "enemy_threat":
+            assert shot["segment"]["shot_scale"] in {"ELS", "LS", "MLS"}
+
+
+def test_zavala_cut_uses_every_clean_zavala_shot_this_cinematic_has(indexed):
+    """The subject of a hero cut has 19 seconds of footage in the whole index.
+
+    Six of his eight clean shots are in this cinematic, and the outline is
+    written to spend all six -- which is also why the cut cannot be lengthened
+    toward a later reveal by finding more of him (see docs/cuts/03-zavala.md).
+    """
+    _, story = _zavala_story(indexed)
+    available = {seg["segment_id"] for seg in indexed
+                 if seg["video_id"] == DANCE_CINEMATIC and seg.get("clean")
+                 and (seg.get("casting") or {}).get("character") == "zavala"}
+    used = [shot for shot in story["shots"]
+            if (shot["segment"].get("casting") or {}).get("character") == "zavala"]
+    assert {shot["segment_id"] for shot in used} == available
+
+    # ...and the last of them is the payoff, so the reveal lands as late as the
+    # footage allows rather than on his first appearance.
+    last = max(story["shots"].index(shot) for shot in used)
+    assert last >= len(story["shots"]) - 2
+
+
 # --- outline parsing --------------------------------------------------------
 
 def test_read_text_outline(tmp_path):

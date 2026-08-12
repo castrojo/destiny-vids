@@ -40,7 +40,10 @@ leads:
       cut's plates. Keys mirror the reference deck (~/Videos/nameplates.json):
       `label` (the uppercase eyebrow), `class`, `name`, `title` and `trustee`
       (the burnished-silver treatment), plus `kind` (`ghost` drops the class
-      line, since a Ghost has no subclass). Derivation never reads it — a
+      line, since a Ghost has no subclass) and `variant` (`leader` is the gold
+      treatment, and it outranks `trustee`). Every key is OPTIONAL: a row the
+      reference deck does not authorise is omitted, never invented, so a plate
+      carrying only `name` is a valid plate. Derivation never reads it — a
       binding without one simply gets no plate.
     constraints:  >
       OPTIONAL per-binding usability constraints, for a person who does not
@@ -80,14 +83,19 @@ leads:
       person: kelsey_hightower
       display_name: Kelsey Hightower
       aka: [commander_zavala]
-      # Plate copy as authored in castrojo/destiny-vids#8. The subclass line
-      # names the ROLE the project casts, the same way Osiris's does, so it is
-      # not read back off the Titan on screen.
+      # Plate copy as authored in castrojo/destiny-vids#8 -- the issue IS the
+      # authorisation; Kelsey has no entry in the reference deck
+      # (~/Videos/nameplates.json). The subclass line names the ROLE the
+      # project casts, the same way Osiris's does, so it is not read back off
+      # the Titan on screen. GOLD chrome, on the owner's instruction (#33):
+      # `variant: leader` is the same complete treatment Osiris carries
+      # below -- the wolves overlay's `.wolves-guardian-plate-leader`.
       plate:
         label: ARCHITECT // GUARDIAN
         class: Dawnblade Warlock
         name: Kelsey Hightower
         title: Evangelist of the Open Sky
+        variant: leader
     cayde_6:
       person: castrojo
       display_name: castrojo

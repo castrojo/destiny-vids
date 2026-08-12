@@ -40,7 +40,7 @@ first-party footage.
 |---|---|---|
 | Elsie Bray | Laura Santamaria | authored plate |
 | Anna Bray | Joanna Lee | |
-| Zavala | Kelsey Hightower | authored plate (#8) |
+| Zavala | Kelsey Hightower | authored plate (#8), gold chrome (#33) |
 | Cayde-6 | castrojo | authored plate |
 | Osiris | mrbobbytables | |
 | Sagira | Lindsay Gendreau | Osiris's Ghost; cast on presence, no framing constraint |
@@ -300,6 +300,13 @@ could otherwise never carry a reveal. Two plates are never visible at once;
 Pass `plan` the **same** `--max-shot-sec` the render used, so plate timings land
 on the finished file rather than on the source timeline.
 
+`--reveal-after MM:SS` holds every lead reveal until a point on the *finished
+cut's* clock, for when the ask is "don't name him until 1:50". It only ever
+moves a reveal to a later shot the character is actually in; if no appearance
+lies that late, the reveal degrades to their **latest** appearance and the
+shortfall lands in `unresolved`. Missing a timing request is recoverable, and
+crediting a real person over a shot they are not in is not.
+
 Before a month's roster exists, `--placeholders N` plates that many ensemble
 shots with the uncast copy in `vocab/casting.yaml`
 (`ensemble.placeholder_plate`: `CONTRIBUTOR // GUARDIAN`, name `TBD`) so a cut
@@ -310,8 +317,8 @@ for.
 ## Ship a cut
 
 A finished cut goes to two places from **one** cut list: the website player
-(source audio) and a YouTube upload (a music bed via `render.py --audio`). They
-differ by audio and filename, never by a second edit.
+(source audio) and a YouTube upload (a music bed via `render.py --audio`, where
+the cut wants one). They differ by audio and filename, never by a second edit.
 
 Upload order is the numeric filename prefix: `stories/01-dance.txt` →
 `renders/01-dance-web.mp4` and `renders/01-dance-youtube.mp4`. Sorting the
@@ -322,6 +329,8 @@ skip points, unresolved beats, and whatever a human still has to decide.
 | Cut | Doc |
 |---|---|
 | 01 — Dance | [`docs/cuts/01-dance.md`](docs/cuts/01-dance.md) |
+| 02 — Cayde-6: The Return | [`stories/02-cayde-6-the-return.md`](stories/02-cayde-6-the-return.md) |
+| 03 — Zavala | [`docs/cuts/03-zavala.md`](docs/cuts/03-zavala.md) |
 
 ## Editorial direction
 
