@@ -279,6 +279,61 @@ leads:
     savathun:    { person: null, display_name: null, aka: [savathun_witch_queen] }
     the_witness: { person: null, display_name: null, aka: [witness] }
 
+  # --- REQUESTED, NOT YET BOUND ----------------------------------------------
+  # The exact mirror of "written, not yet cast" above: there the CHARACTER is
+  # known and the person is not; here the PERSON is known and the character is
+  # not. A request lands as a name and a description of a figure on screen ("the
+  # woman", "the main character"), and turning that into a Destiny character is a
+  # visual judgment on the footage — so it is parked here instead of guessed.
+  #
+  # Derivation NEVER reads this block. A pending entry casts nobody, plates
+  # nothing, and needs no search phrase; it is a queue, not a binding. Promote an
+  # entry by moving it into `values` under its character key, adding its search
+  # phrases to tools/search.py, and deleting it from here.
+  pending_fields:
+    github:        The requester's identifier for the person. Verifiable; a real name may not be.
+    display_name:  How they are credited, when the request said. null when nobody has said yet.
+    described_as:  The requester's words for the figure on screen, quoted. Never paraphrased into a character name.
+    requested_in:  Where the request came from.
+    source_video:  The footage the request is about. Not necessarily indexed yet.
+    automatable:   Whether an agent can settle this alone. `no` for anything that names a real person.
+    blocked_on:    What has to happen first, in one sentence.
+  pending:
+    wrkode:
+      # "Add william rizzo and team" — the issue title names him, the body points
+      # the "main character" at this account. Which Destiny character that is is
+      # not recoverable from the index: the source video has no video record, no
+      # segments, and no keyframes here.
+      github: wrkode
+      display_name: William Rizzo
+      described_as: Main character
+      requested_in: https://github.com/castrojo/destiny-vids/issues/14
+      source_video: https://www.youtube.com/watch?v=dOdPT9fLKEA
+      automatable: no
+      blocked_on: >
+        The source video is not ingested, so no indexed shot shows this figure.
+        Ingest and index it, then name the character from the footage.
+    abangser:
+      github: abangser
+      display_name: null   # not given in the request; a plate must not invent one
+      described_as: Woman
+      requested_in: https://github.com/castrojo/destiny-vids/issues/14
+      source_video: https://www.youtube.com/watch?v=dOdPT9fLKEA
+      automatable: no
+      blocked_on: >
+        The source video is not ingested, so no indexed shot shows this figure.
+        Ingest and index it, then name the character from the footage.
+    robertsirc:
+      github: robertsirc
+      display_name: null   # not given in the request; a plate must not invent one
+      described_as: other guy
+      requested_in: https://github.com/castrojo/destiny-vids/issues/14
+      source_video: https://www.youtube.com/watch?v=dOdPT9fLKEA
+      automatable: no
+      blocked_on: >
+        The source video is not ingested, so no indexed shot shows this figure.
+        Ingest and index it, then name the character from the footage.
+
 ensemble:
   description: >
     The anonymous-Guardian crowd, cast from Project Bluefin contributors. The
