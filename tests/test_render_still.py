@@ -94,3 +94,34 @@ def test_render_reports_a_missing_still_instead_of_crashing(tmp_path):
     with pytest.raises(RuntimeError, match="nothing to render"):
         render.render(shots, str(tmp_path), tmp_path / "out.mp4", verbose=False,
                       ffmpeg=["ffmpeg-not-invoked"])
+
+
+def test_a_millisecond_rounded_shot_does_not_report_as_clamped(capsys):
+    """The CLAMPED warning must name a REAL overrun, and nothing else.
+
+    A shotlist rounds its endpoints to milliseconds, so `end - start`
+    reconstructs the duration with a few femtoseconds of float error:
+    85.996 - 72.94 is 13.055999999999997, not 13.056. Compared exactly, every
+    shot "overruns" and every shot warns -- which is what the Wolves feature
+    did, 33 times per render. A warning that fires on everything is a warning
+    nobody reads, and this one exists to flag a `clean`-gate violation: a hold
+    that decodes past the out-point into footage no tagger ever vetted.
+    """
+    from tools.render import resolve_duration
+
+    shot = {"segment_id": "s", "start_sec": 72.94, "end_sec": 85.996,
+            "duration": 13.056}
+    assert shot["end_sec"] - shot["start_sec"] < shot["duration"]  # the trap
+    assert resolve_duration(shot) == 13.056
+    assert "CLAMPED" not in capsys.readouterr().err
+
+
+def test_a_real_overrun_still_clamps_and_says_so(capsys):
+    """The tolerance is a microsecond -- far under a frame at any frame rate --
+    so a hold that genuinely runs past the vetted out-point is unaffected."""
+    from tools.render import resolve_duration
+
+    shot = {"segment_id": "greedy", "start_sec": 10.0, "end_sec": 14.2,
+            "duration": 600.0}
+    assert resolve_duration(shot) == pytest.approx(4.2)
+    assert "CLAMPED" in capsys.readouterr().err

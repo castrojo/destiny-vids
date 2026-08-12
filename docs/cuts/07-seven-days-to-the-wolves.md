@@ -1,6 +1,9 @@
 # Seven Days to the Wolves — the musical (editorial pass)
 
-**Status:** editorial pass, for review. **Not delivered** — see Rights.
+**Status:** editorial pass, **staged for review** in `~/Videos/UPLOAD/` as
+`07-seven-days-to-the-wolves.mp4`. Staged is not published — it is deliberately
+not in `yt-refresh.py`'s manifest, because that means choosing a title and a
+description, which is the owner's call.
 **Runtime:** 432.7 s (7:12.7) for a 424.0 s song. The 8.66 s difference is the pause.
 **Rendered:** `renders/07-wolves-timing-pass.mp4` — 1920x1080 H.264, 30 fps,
 AAC 48 kHz, −1.2 dBTP, −10.0 LUFS integrated.
@@ -443,6 +446,21 @@ leaking into a region that was supposed to be a pause.
 
 ## Reproducing
 
+**One command, once the sources are in `media/`:**
+
+```bash
+./scripts/rebuild-wolves.sh
+```
+
+That is the loop — notes, edit `scripts/build_wolves.py`, rebuild, watch. It
+rebuilds the shotlist, the summit plates, the picture and the audio, copies a
+review file to `~/Videos/destiny-cuts-review/`, and **refuses to hand over a
+file** with either of the two faults that have actually shipped here: a silent
+insert, or a true peak over the −1.0 dBTP gate. Both are invisible to "did it
+render".
+
+The steps it runs, for when a source has to be fetched first:
+
 ```bash
 cd ~/src/destiny-vids
 FF=/home/linuxbrew/.linuxbrew/bin/ffmpeg   # the system ffmpeg has no H.264 decoder
@@ -501,11 +519,15 @@ as a non-commercial fan-work music bed.
 
 **The compilation provenance question is unchanged.** Act I, Act II and the
 finale all come from Antesion's re-upload. The fan-content policy covers
-Bungie's footage; it does not make a third party's compilation ours to use. An
-editorial pass is an internal review artifact, so this pass proceeds —
-**delivery does not**. Nothing here goes to `~/Videos/UPLOAD/` until that is
-decided. The Gameplay Trailer added in this pass moves 22.6 s of the film onto
-an official Bungie upload, so the exposure is slightly smaller than it was.
+Bungie's footage; it does not make a third party's compilation ours to use. The
+Gameplay Trailer added in this pass moves 22.6 s of the film onto an official
+Bungie upload, so the exposure is slightly smaller than it was.
+
+**That question gates publishing, not staging**, and the two are different
+things here by design: `~/Videos/UPLOAD/` is a staging area whose own README
+says so, and nothing is published until a file is added to `yt-refresh.py`'s
+manifest — which needs a title and a description, i.e. the owner. So the cut is
+staged for review at the owner's instruction, and [issue #55] stays open.
 
 **The CNCF photographs are `CC BY-NC-ND 4.0`**, verified on the Flickr metadata
 for the group photos (account `143247548@N03`, album *Maintainer Summit North
@@ -531,8 +553,8 @@ of it.
 ## Punch list
 
 - [ ] **Owner: is the Antesion compilation acceptable provenance?** [issue #55].
-      Blocking delivery. If not, Acts I and II and the finale need re-sourcing
-      from official uploads.
+      Gates **publishing**, not staging. If not, Acts I and II and the finale
+      need re-sourcing from official uploads.
 - [ ] **Credits sequence** — [issue #51]. Now carries two obligations, not one:
       the cast credits *and* the CNCF attribution the photo licence requires.
 - [ ] **Owner: Cortney Nickerson's Guardian identity** — [issue #59]. The pause

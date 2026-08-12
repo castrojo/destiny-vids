@@ -255,7 +255,14 @@ def resolve_duration(shot):
         return float(shot.get("duration") or 2.0)
     duration = shot.get("duration") or (shot["end_sec"] - shot["start_sec"])
     vetted = shot["end_sec"] - shot["start_sec"]
-    if duration > vetted:
+    # Both endpoints are rounded to milliseconds when the shotlist is written,
+    # so `end - start` reconstructs the duration with a few femtoseconds of
+    # float error -- 85.996 - 72.94 is 13.055999999999997, not 13.056. Compared
+    # exactly, that "overruns" and every single shot warns, which destroys the
+    # signal: this message exists to name a REAL clean-gate violation, and one
+    # that fires on all 33 shots is one nobody reads. A microsecond is far below
+    # a frame at any frame rate, so anything inside it is noise, not an overrun.
+    if duration > vetted + 1e-6:
         print(f"  CLAMPED: shot {shot['segment_id']} asked for {duration:g}s, "
               f"shot holds {vetted:g}s", file=sys.stderr)
         duration = vetted
