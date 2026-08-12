@@ -121,16 +121,17 @@ Recorded, not resolved. Each one is somebody's call, not an agent's:
 - **Jeffrey Sica's title.** The deck says *Forgemaster of the Seven*; issue #1's
   owner-authored brief copy says *Forgemaster of Kubernetes*. A brief is the
   owner speaking, so `plan` will use it — but the two records disagree and one
-  of them wants editing. See #17.
+  of them wants editing. See #27 (and #17 for whether he is cast at all).
 - **A portrait row.** `reveal.html` takes a `pfp` (a real photograph; it hides
   the hex crest when one is set) and the Kat and Natali cuts both ship one.
   `nameplates.json` has no such field and `tools/plate.py` does not implement
   one. That is a missing *feature*, not a missing string: do not approximate it
   with an invented row.
-- **Five of the seven are not bound here.** Kat and Laura are cast as leads with
-  no `plate:` block; Kaslin, Christoph, Natali and Andy have no binding at all.
-  Adding a binding is a casting decision ([`casting.md`](casting.md)); copying
-  authored copy onto an existing binding is reproduction and is allowed.
+- **Four of the seven have no binding here** — Kaslin, Christoph, Natali and
+  Andy (see #26); Bob, Laura and Kat are bound and their copy is reproduced
+  above. Adding a binding is a casting decision
+  ([`casting.md`](casting.md)); copying authored copy onto an existing binding
+  is reproduction and is allowed.
 
 ## Core Process
 
