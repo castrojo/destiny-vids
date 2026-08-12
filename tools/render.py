@@ -145,6 +145,37 @@ def load_shots(path):
     return data["shots"] if isinstance(data, dict) else data
 
 
+def still_clip(ffmpeg, image, duration, out_path, keep_audio=True):
+    """Render a still image as a clip in the common intermediate format.
+
+    An artwork card takes the slot a dropped shot left behind, so it has to be
+    indistinguishable from a cut clip to the concat demuxer: same size, rate and
+    pixel format, and the *same* audio disposition. Giving a still a silent
+    track when the other clips are video-only (which is what ``--audio`` does)
+    would make it the only input with a stream the others lack, and the join
+    fails.
+    """
+    vf = (
+        f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease,"
+        f"pad={TARGET_W}:{TARGET_H}:(ow-iw)/2:(oh-ih)/2,"
+        f"fps={TARGET_FPS},format=yuv420p"
+    )
+    cmd = list(ffmpeg) + ["-v", "error", "-y", "-loop", "1", "-t", f"{duration:.3f}",
+                          "-i", str(image)]
+    if keep_audio:
+        cmd += ["-f", "lavfi", "-t", f"{duration:.3f}",
+                "-i", "anullsrc=r=48000:cl=stereo",
+                # Explicit maps: with two inputs, implicit selection drops the
+                # silent track and the still stops matching the cut clips.
+                "-map", "0:v:0", "-map", "1:a:0",
+                "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2"]
+    else:
+        cmd += ["-map", "0:v:0", "-an"]
+    cmd += ["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-crf", "18",
+            "-pix_fmt", "yuv420p", str(out_path)]
+    subprocess.run(cmd, check=True)
+
+
 def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
     """Cut one clip and normalize it to the common intermediate format.
 
@@ -217,7 +248,11 @@ def resolve_duration(shot):
     tagger vetted: the ``clean``-gate violation the story-side clamp exists to
     prevent. Clamp it here too, and warn naming the shot rather than silently
     truncating.
+
+    A still has no out-point to overrun, so its authored duration stands.
     """
+    if shot.get("still"):
+        return float(shot.get("duration") or 2.0)
     duration = shot.get("duration") or (shot["end_sec"] - shot["start_sec"])
     vetted = shot["end_sec"] - shot["start_sec"]
     if duration > vetted:
@@ -244,6 +279,9 @@ def cap_holds(shots, max_shot_sec, log=None):
     out = []
     for shot in shots:
         duration = resolve_duration(shot)
+        if shot.get("still"):
+            out.append(shot)
+            continue
         if duration > max_shot_sec:
             if log:
                 log(f"  trimmed {shot['segment_id']} {duration:.1f}s -> {max_shot_sec:.1f}s")
@@ -266,12 +304,23 @@ def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=
     # ffmpeg can see them through the same bind mount as the source media.
     with tempfile.TemporaryDirectory(dir=out_path.parent, prefix=".render-") as tmp:
         for n, shot in enumerate(shots, 1):
+            duration = resolve_duration(shot)
+            clip = Path(tmp) / f"clip_{n:03d}.mp4"
+            if shot.get("still"):
+                image = Path(shot["still"]).expanduser().resolve()
+                if not image.exists():
+                    missing.append(shot)
+                    continue
+                if verbose:
+                    print(f"  [{n:>2}] STILL ({duration:.2f}s)  "
+                          f"{shot.get('beat', image.name)}")
+                still_clip(ffmpeg, image, duration, clip, keep_audio)
+                rendered.append(clip)
+                continue
             src = resolve_media(shot["video_id"], media_dir)
             if src is None:
                 missing.append(shot)
                 continue
-            duration = resolve_duration(shot)
-            clip = Path(tmp) / f"clip_{n:03d}.mp4"
             if verbose:
                 print(f"  [{n:>2}] {shot['start_tc']}–{shot['end_tc']} "
                       f"({duration:.2f}s)  {shot.get('beat', shot['segment_id'])}")
@@ -305,10 +354,11 @@ def main(argv=None):
     rendered, missing = render(shots, args.media, args.out,
                                keep_audio=not args.mute and not args.audio,
                                audio_bed=args.audio, ffmpeg=ffmpeg)
-    total = sum(s.get("duration") or (s["end_sec"] - s["start_sec"]) for s in shots)
+    total = sum(resolve_duration(s) for s in shots)
     print(f"OK: {len(rendered)} clip(s), ~{total:.1f}s -> {args.out}")
     for shot in missing:
-        print(f"  MISSING SOURCE: {shot['video_id']} (shot {shot['segment_id']} skipped)",
+        src = shot.get("still") or shot.get("video_id")
+        print(f"  MISSING SOURCE: {src} (shot {shot.get('segment_id','?')} skipped)",
               file=sys.stderr)
     return 0
 
