@@ -17,9 +17,16 @@ from tools import render
 
 def _ffmpeg():
     try:
-        return render.find_ffmpeg(prefer_container=False)
+        ffmpeg = render.find_ffmpeg(prefer_container=False)
     except RuntimeError:
         pytest.skip("no ffmpeg available")
+    # Resolving a command is not the same as being able to run it: CI has no
+    # ffmpeg at all, and DESTINY_FFMPEG can name a path that does not exist.
+    try:
+        subprocess.run(list(ffmpeg) + ["-version"], capture_output=True, check=True)
+    except (OSError, subprocess.CalledProcessError):
+        pytest.skip("ffmpeg is not runnable here")
+    return ffmpeg
 
 
 def _streams(ffmpeg, path):
@@ -77,6 +84,13 @@ def test_still_shot_survives_the_hold_clamp():
 
 
 def test_render_reports_a_missing_still_instead_of_crashing(tmp_path):
+    """A missing artwork file is reported like any missing source.
+
+    ``ffmpeg`` is passed explicitly so this stays in the offline suite: no clip
+    ever resolves, so the binary is never invoked, and resolving one would
+    otherwise fail on a runner that has none.
+    """
     shots = [{"still": str(tmp_path / "nope.jpg"), "duration": 1.0, "segment_id": "card_1"}]
     with pytest.raises(RuntimeError, match="nothing to render"):
-        render.render(shots, str(tmp_path), tmp_path / "out.mp4", verbose=False)
+        render.render(shots, str(tmp_path), tmp_path / "out.mp4", verbose=False,
+                      ffmpeg=["ffmpeg-not-invoked"])
