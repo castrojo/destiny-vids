@@ -1,7 +1,7 @@
 ---
 name: editing
 version: "1.0"
-last_updated: "2026-08-11"
+last_updated: "2026-08-12"
 id: editing
 one_line_purpose: Turn a plain-language outline into a rendered cut.
 entry_point: docs/skills/editing.md
@@ -65,6 +65,30 @@ in outline order. Two consequences to write around:
 Phrasing a beat close to the target caption is legitimate: captions are the
 index's search surface, and the outline is written against what exists.
 
+### One cinematic, played forward
+
+`--video <video_id>` pins the pool to a single source; `--forward-only` keeps
+the playhead monotonic, so each beat matches a shot at or after the previous
+beat's out point and the cut only ever skips forward through one cinematic.
+
+```bash
+python3 tools/story.py stories/01-cayde-6-the-return.txt --dir segments \
+    --forward-only --video yt_destiny_2_the_final_shape_launch_trailer
+```
+
+The skipped stretches are **derived**, not authored: `story.py` computes them
+from the beats that matched and reports them under `SKIPPED FORWARD` (`skips[]`
+in `--format json`). To move a skip, move a beat.
+
+Beats must then be written in **source order** — one that describes footage
+earlier than the previous out point cannot be reached and is reported as a miss.
+Without `--video`, the first matched beat locks the cinematic.
+
+This is the intended shape for a single-source cut. Do not build a timeline,
+cut-graph or sequencer to stitch several cinematics: pin a different `--video`
+and write a second outline. Worked example:
+[`../../stories/01-cayde-6-the-return.md`](../../stories/01-cayde-6-the-return.md).
+
 ### Holds
 
 `--max-shot-sec` trims any shot held longer than the cap, **from its tail**. The
@@ -75,6 +99,15 @@ moves the start. A detector-derived beat can be a fine *beat* and a terrible
 Pass the same value to `tools/plate.py plan`, or every plate after the first
 trimmed shot lands late.
 
+### Delivery
+
+One plated master serves both destinations — the site plays the file and
+YouTube uploads the same file, so there is no second encoding path to keep in
+sync. Numbered outlines (`stories/01-…`) carry their number through to the
+render artifacts, and that prefix *is* the upload order: sorting `stories/` or
+`renders/` by name gives the running order. Full recipe:
+[`../../stories/01-cayde-6-the-return.md`](../../stories/01-cayde-6-the-return.md).
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -82,6 +115,7 @@ trimmed shot lands late.
 | "No clean shot matches, so I'll allow unclean footage." | The gate exists to keep a HUD out of the finished cut. Rewrite the beat instead. |
 | "I'll hand-edit the timings in `cut.json`." | It is a derived artifact and the next run discards your edit. Change the outline or the cap. |
 | "The beat matched something close enough." | A mismatch cascades into every later beat that wanted that shot. Fix it at the source. |
+| "I'll compose a few cinematics into one timeline." | One cinematic plus forward skips covers the single-source case. A timeline layer is a second copy of the cut to keep in sync. |
 | "Stream copy is faster and looks the same." | It snaps the in-point to a keyframe, discarding the boundary the detector pass exists to find. |
 
 ## Red Flags

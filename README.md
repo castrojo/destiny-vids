@@ -77,7 +77,8 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `schema/segment.schema.json` | JSON Schema (Draft 2020-12) for one indexed segment/beat. |
 | `schema/video.schema.json` | JSON Schema for a source-video record (video-scoped inherited defaults). |
 | `examples/` | Fully-annotated example records that validate against the schemas. |
-| `tools/story.py` | **Outline → ordered cut list.** Text/JSON/EDL/CSV. |
+| `tools/story.py` | **Outline → ordered cut list.** Text/JSON/EDL/CSV. `--video` + `--forward-only` walk one cinematic front to back. |
+| `tools/corpus.py` | **Index → per-character shot catalog**, with the gaps the footage cannot cover recorded rather than guessed. |
 | `tools/render.py` | **Cut list → rendered video.** ffmpeg cut + concat against local source media. |
 | `tools/ensemble.py` | Monthly Bluefin contributor roster → Guardian credit tiles. |
 | `tools/search.py` | NL query → enum filters + caption match + editorial ranking. |
@@ -86,7 +87,8 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `tools/derive.py` | Pure derivation of `clean`, `footage_tier`, `traversal_hero` and `casting`. |
 | `tools/plate.py` | **Cut list → Guardian nameplates.** Plans timed plates from the casting vocab + contributor roster, renders them as transparent PNGs, and burns them into a cut. |
 | `tools/ffmpeg-container-shim.sh` | Host setup, not a pipeline stage: installs a containerized `ffmpeg`/`ffprobe` on `PATH` so the whole machine has H.264. See `docs/rendering.md`. |
-| `stories/` | Worked outlines. |
+| `stories/` | Worked outlines, numbered in upload order, each with production notes beside it. |
+| `corpus/` | Per-character shot catalogs (derived) plus the recorded gaps (authored). |
 | `videos/` | Ingested video-level records (6 real Bungie videos, metadata-only). |
 | `tags/` | Tagger output per video, keyed by beat index — replayed by `annotate.JsonTagger`. |
 | `segments/` | Assembled, schema-valid segment records for real footage — 69 shots from the TFS launch trailer and 50 from the Curse of Osiris opening cinematic. |
@@ -167,6 +169,49 @@ rather than cutting a HUD into the sequence.
 `--format json` emits a shot list you can feed straight to `tools/ensemble.py`
 or `tools/render.py`.
 
+### One cinematic, played forward
+
+`--video` pins the cut to one source and `--forward-only` keeps the playhead
+monotonic, so the cut walks a single cinematic front to back and only ever
+skips forward. The skipped stretches are derived from the beats that matched —
+move a beat to move a skip — and reported alongside the cut:
+
+```bash
+python3 tools/story.py stories/01-cayde-6-the-return.txt --dir segments \
+    --forward-only --video yt_destiny_2_the_final_shape_launch_trailer
+```
+
+```text
+SKIPPED FORWARD — stretches of the cinematic this cut passes over:
+           head: 0:00–0:14 (14.248s, 7 segment(s))
+   after shot 2: 0:23–0:33 (9.943s, 5 segment(s))
+```
+
+That is deliberately all the machinery there is: no timeline object, no
+cut-graph, no sequencer. A second source means a second outline.
+[`stories/01-cayde-6-the-return.md`](stories/01-cayde-6-the-return.md) is the
+worked example, including how the same plated master serves both the site and
+YouTube and why the `01-` prefix is the upload order.
+
+## What footage do we have of X?
+
+The index is organised by video; `tools/corpus.py` pivots it into a per-character
+catalog under `corpus/`, so a story starts from a list instead of a re-read of
+every segment.
+
+```bash
+python3 tools/corpus.py build cayde_6     # writes corpus/cayde_6.json
+python3 tools/corpus.py check             # fails if any committed corpus is stale
+```
+
+`shots` and `coverage` are **derived** and regenerate from the index. The
+`unresolved` array is **authored** and survives every rebuild: a beat the
+footage cannot cover, a source that was never indexed, a call that needs a
+human. Each gap has to say whether it is `automatable` and, if not, what it is
+`blocked_on` — a gap that does not name its blocker is rejected. Destiny's
+footage is finite, so the corpus accumulates one character at a time. Details:
+[`docs/skills/corpus.md`](docs/skills/corpus.md).
+
 ## Render the cut
 
 The index stores timestamps, not footage, so rendering needs the source video
@@ -231,7 +276,9 @@ excluded from the character's retrieval, so it is not a reveal). Ensemble
 contributors come from the deterministic assignment in `tools/ensemble.py`;
 anyone whose shot is too short to hold a plate is credited together on a roster
 title card over the tail, because dropping a month's contributors silently is
-the one unacceptable outcome.
+the one unacceptable outcome. A lead with copy and no shot long enough to carry
+it is reported as `UNPLATED <character>`, for the same reason — an uncredited
+hero is a cut to rewrite, not a detail to swallow.
 
 Plates are anchored to a shot but not confined to it — a lower third routinely
 rides across a cut, and Destiny cinematics are full of two-second shots that
@@ -346,6 +393,8 @@ common editorial abbreviations.
 ```bash
 pip install jsonschema pyyaml pytest
 python3 -m pytest -q
+python3 tools/corpus.py check                     # per-character catalogs are current
+python3 scripts/generate_skill_index.py --check   # skill catalog is current
 ```
 
 Optional extras, only for the frame-touching stages: `scenedetect` and

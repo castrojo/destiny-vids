@@ -1,7 +1,7 @@
 ---
 name: plates
 version: "1.0"
-last_updated: "2026-08-11"
+last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
 entry_point: docs/skills/plates.md
@@ -56,8 +56,9 @@ test pins the vocabulary so it cannot drift by accident. If a plate genuinely
 needs to say something new, add the field to the data model deliberately.
 
 Local additions to the deck's shape are limited to chrome flags: `kind: ghost`
-(drops the class line, because a Ghost has no subclass) and `variant` (for the
-`leader` gold treatment).
+(drops the class line, because a Ghost has no subclass) and `variant` (the
+`leader` gold treatment, and `rust` — oxidised iron, for the Rust Foundation
+herald). A variant changes colour only: same geometry, same closed field set.
 
 ## Core Process
 
@@ -87,6 +88,10 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
 - Contributors whose shot is too short are credited together on a roster title
   card over the tail. Dropping a month's contributors silently is the one
   unacceptable outcome.
+- A lead who has copy but no shot that can carry it is reported as
+  `UNPLATED <character>: <reason>`, for the same reason. Rewrite the cut or
+  index a longer shot — do not lower `MIN_ANCHOR` to force a plate onto footage
+  too brief to read.
 
 `burn` composites every plate in one ffmpeg pass — an `overlay` chain gated by
 `enable='between(t,in,out)'` — and stream-copies audio, so titling never costs
@@ -129,6 +134,8 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 - Planning with a different `--max-shot-sec` than the render used — every plate
   after the first trimmed shot lands late.
 - A subclass line on a Ghost.
+- `UNPLATED` in `plan`'s output, ignored. The hero of the cut is going out
+  uncredited.
 
 ## Verification
 
