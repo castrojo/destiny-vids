@@ -266,8 +266,8 @@ def test_no_binding_invents_plate_copy():
     vocab/casting.yaml must never do -- add it to AUTHORED_PLATES with its
     source only after checking the source.
 
-    Two bindings are deliberate exceptions, each carrying its own comment in
-    the vocab, and they are opposite kinds of exception:
+    Three bindings are deliberate exceptions, each carrying its own comment in
+    the vocab, and they are different kinds of exception:
 
     - `sagira` is a documented *fallback*: nobody has authored a seal for
       Lindsay, so her title is the project's standing answer for an unknown
@@ -277,8 +277,23 @@ def test_no_binding_invents_plate_copy():
       allowed where an agent inventing one is not; its class row is
       deliberately a word short pending #5, and tests/test_plate.py pins the
       exact shape so nobody "completes" it.
+    - `zavala` carries no copy at all: his only text row is `name`, which is
+      the binding's own `display_name`, and the rest of the card is chrome
+      (#33 asked for the gold treatment). Kelsey Hightower has no entry in the
+      reference deck, so the eyebrow, subclass and seal rows are omitted
+      rather than written here -- an omitted row needs no authorisation, and
+      that is what makes a chrome-only plate safe to ship.
     """
-    with_plates = {k for k, v in LEADS.items() if v.get("plate")}
+    chrome = {"variant", "kind", "trustee"}
+    with_plates = set()
+    for character, binding in LEADS.items():
+        rows = {k: v for k, v in (binding.get("plate") or {}).items()
+                if k not in chrome}
+        if not rows:
+            continue
+        if set(rows) == {"name"} and rows["name"] == binding.get("display_name"):
+            continue  # the binding's own display_name is not new copy
+        with_plates.add(character)
     assert with_plates - {"sagira", "mara_sov"} == set(AUTHORED_PLATES)
 
 

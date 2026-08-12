@@ -40,7 +40,10 @@ leads:
       cut's plates. Keys mirror the reference deck (~/Videos/nameplates.json):
       `label` (the uppercase eyebrow), `class`, `name`, `title` and `trustee`
       (the burnished-silver treatment), plus `kind` (`ghost` drops the class
-      line, since a Ghost has no subclass). Derivation never reads it — a
+      line, since a Ghost has no subclass) and `variant` (`leader` is the gold
+      treatment, and it outranks `trustee`). Every key is OPTIONAL: a row the
+      reference deck does not authorise is omitted, never invented, so a plate
+      carrying only `name` is a valid plate. Derivation never reads it — a
       binding without one simply gets no plate.
     constraints:  >
       OPTIONAL per-binding usability constraints, for a person who does not
@@ -80,6 +83,20 @@ leads:
       person: kelsey_hightower
       display_name: Kelsey Hightower
       aka: [commander_zavala]
+      # GOLD, on the owner's instruction (#33): `variant: leader` is the same
+      # complete treatment Osiris carries below -- the wolves overlay's
+      # `.wolves-guardian-plate-leader`. Nothing else on the card is authored.
+      # Kelsey has no entry in the reference deck (~/Videos/nameplates.json),
+      # so the eyebrow, the subclass row and the seal are OMITTED rather than
+      # guessed; `name` is his own `display_name`, authored directly above.
+      # A subclass borrowed from Zavala's `class: titan` tags would be a lore
+      # call about the character wearing a real person's credit, which is the
+      # fault the Osiris note below exists to forbid.
+      # TODO(owner): `label`, `class` and `title` for Kelsey Hightower, from
+      # the deck. Until then the plate ships three rows short, by design.
+      plate:
+        name: Kelsey Hightower
+        variant: leader
     cayde_6:
       person: castrojo
       display_name: castrojo

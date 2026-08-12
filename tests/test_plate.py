@@ -740,6 +740,89 @@ def test_plan_cli_reports_the_whole_punch_list(tmp_path, capsys):
     assert f"{len(written['unresolved'])} unresolved" in summary
 
 
+# --- holding a reveal (#33: "do not reveal until 1:50") ---------------------
+#
+# The floor is a request about the FINISHED cut's clock -- the clock the owner
+# is reading off while watching it -- and it outranks the derived preference
+# for a first appearance. What it must never do is buy itself the moment by
+# plating somebody over a shot they are not in.
+
+GOLD_LEADS = dict(LEADS, zavala=dict(
+    LEADS["zavala"], plate={"name": "Kelsey Hightower", "variant": "leader"}))
+
+
+def test_a_reveal_floor_holds_the_plate_until_the_moment_asked_for():
+    shots = [_shot("s1", 0, 10, "lead", "zavala"),
+             _shot("s2", 10, 20),
+             _shot("s3", 20, 30, "lead", "zavala")]
+    entries = plate.plan(shots, GOLD_LEADS, reveal_after=18)
+    assert [e["id"] for e in entries] == ["zavala"]
+    assert entries[0]["at"] == pytest.approx(20 + plate.LEAD_IN)
+    assert entries[0]["variant"] == "leader"
+
+
+def test_a_reveal_floor_inside_a_shot_starts_the_plate_at_the_floor():
+    """The anchor may straddle the moment; the plate still lands at or after it."""
+    shots = [_shot("s1", 0, 30, "lead", "zavala")]
+    entries = plate.plan(shots, GOLD_LEADS, reveal_after=12)
+    assert entries[0]["at"] == pytest.approx(12 + plate.LEAD_IN)
+
+
+def test_a_reveal_the_footage_cannot_reach_degrades_to_the_latest_appearance():
+    """Held back rather than credited is how a real person goes uncredited.
+
+    So the reveal falls back to the closest the footage comes to the moment
+    asked for -- their LAST appearance, not their first -- and the shortfall is
+    reported for an owner decision.
+    """
+    shots = [_shot("s1", 0, 10, "lead", "zavala"),
+             _shot("s2", 10, 20, "lead", "zavala"),
+             _shot("s3", 20, 40)]
+    unresolved = []
+    entries = plate.plan(shots, GOLD_LEADS, reveal_after=110,
+                         unresolved=unresolved)
+    assert entries[0]["at"] == pytest.approx(10 + plate.LEAD_IN)
+
+    assert [u["reason"] for u in unresolved] == ["reveal_floor_missed"]
+    report = unresolved[0]
+    assert report["id"] == "zavala"
+    assert report["display_name"] == "Kelsey Hightower"
+    assert report["requested_reveal_after"] == 110
+    assert report["revealed_at"] == entries[0]["at"]
+    assert report["automatable"] is False and report["blocked_on"]
+
+
+def test_a_reveal_floor_never_moves_a_credit_onto_another_shot():
+    """The one thing the floor may not buy: a name over somebody else's shot."""
+    shots = [_shot("s1", 0, 10, "lead", "zavala"),
+             _shot("s2", 10, 30, "lead", "osiris")]
+    entries = plate.plan(shots, GOLD_LEADS, reveal_after=110)
+    by_id = {e["id"]: e for e in entries}
+    assert by_id["zavala"]["at"] < 10, "zavala is only in the first shot"
+    assert by_id["osiris"]["at"] >= 10
+
+
+def test_a_reveal_floor_does_not_report_a_character_it_could_honour():
+    shots = [_shot("s1", 0, 10, "lead", "zavala"),
+             _shot("s2", 10, 30, "lead", "zavala")]
+    unresolved = []
+    plate.plan(shots, GOLD_LEADS, reveal_after=12, unresolved=unresolved)
+    assert unresolved == []
+
+
+def test_reveal_after_accepts_a_timecode_on_the_cli(tmp_path):
+    shotlist = tmp_path / "shots.json"
+    shotlist.write_text(json.dumps({"shots": [
+        _shot("s1", 0, 10, "lead", "osiris"),
+        _shot("s2", 10, 30, "lead", "osiris"),
+    ]}))
+    out = tmp_path / "plates.json"
+    assert plate.main(["plan", str(shotlist), "--reveal-after", "0:12",
+                       "--out", str(out)]) == 0
+    written = json.loads(out.read_text())
+    assert written["plates"][0]["at"] == pytest.approx(12 + plate.LEAD_IN)
+
+
 def test_no_plate_field_is_invented_beyond_the_reference_deck():
     """The reference (~/Videos/nameplates.json) has exactly these text fields.
 
@@ -1355,6 +1438,36 @@ def test_a_classless_lead_still_takes_its_variant_chrome():
     spec = {"label": "ARCHITECT // GENERAL", "name": "Karena Angell",
             "title": "Archon of the Consensus", "variant": "leader"}
     assert plate._variant_for(spec) == plate.VARIANTS["leader"]
+
+
+# Kelsey Hightower has no entry in the reference deck, so #33's "make his
+# nameplate golden" is answerable in full -- the chrome is local, it makes no
+# claim about anybody -- while the eyebrow, subclass and seal rows are not
+# answerable at all. The card therefore ships three rows short rather than a
+# word invented, and these pin that shape so nobody "completes" it either.
+
+def test_the_zavala_plate_is_gold_and_carries_no_authored_copy():
+    from tools.derive import load_leads
+    binding = load_leads()["zavala"]
+    spec = binding["plate"]
+    assert spec["variant"] == "leader"
+    assert plate._variant_for(spec) is plate.VARIANTS["leader"]
+    assert spec["name"] == binding["display_name"], (
+        "the only text row is the binding's own display_name -- a plate that "
+        "repeats what is already authored invents nothing")
+    assert set(spec) == {"name", "variant"}, (
+        "no deck entry authorises an eyebrow, a subclass or a seal for Kelsey "
+        "Hightower; an omitted row is correct, an invented one never is")
+
+
+def test_the_zavala_plate_renders_gold_from_a_name_alone():
+    from tools.derive import load_leads
+    spec = load_leads()["zavala"]["plate"]
+    gold = plate.render_plate(spec)
+    assert gold.width > 0 and gold.height > 0
+    blue = plate.render_plate({k: v for k, v in spec.items() if k != "variant"})
+    assert gold.size == blue.size, "chrome must not change the layout"
+    assert gold.tobytes() != blue.tobytes()
 
 
 # --- ensemble direction from a brief (the issue #18 bridge) ------------------
