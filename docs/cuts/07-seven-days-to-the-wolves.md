@@ -1,7 +1,7 @@
 # Seven Days to the Wolves — the musical (timing pass)
 
 **Status:** timing pass, for review. **Not delivered** — see Rights.
-**Runtime:** 446.0 s (7:26) for a 424.0 s song. The difference is deliberate.
+**Runtime:** 425.8 s (7:06) for a 424.0 s song. The 1.8 s difference is the pause.
 **Rendered:** `renders/07-wolves-timing-pass.mp4` — 1920x1080 H.264, 30 fps,
 AAC 48 kHz, −1.2 dBTP, −10.0 LUFS integrated.
 
@@ -47,6 +47,9 @@ Three window extracts keep every seek in a short file — `render.py` seeks afte
 | `wolves_act2` | 23:00 – 26:30 | Neomuna, the crash, the Pale Heart |
 | `wolves_act4` | 26:30 – 30:23 | the finale, the Guardians assembled |
 
+Act II's opening 17.8 s comes from `yt_destiny_2_lightfall_launch_trailer` — an
+**official Bungie upload**, already indexed here. See "The gallop cuts to neon".
+
 **Curse of Osiris is excluded from the whole feature.** It is a finale; the
 builder asserts on it rather than trusting anyone to remember.
 
@@ -54,19 +57,23 @@ builder asserts on it rather than trusting anyone to remember.
 
 | # | Film | Bed | Source | What |
 |---|---|---|---|---|
-| 1 | 0:00 – 0:10 | *not started* | title card | Project Bluefin, over the blacked-out Destiny logo |
-| 2 | 0:10 – 0:20.2 | *not started* | `act1` 0:10 | pre-roll: the cinematic in its own audio |
-| 3 | 0:20.2 – 3:23 | 0 – 182.8 | `act1` 0:20.2 – 3:23 | **Act I**, the intro capture, unedited |
-| 4 | 3:23 – 4:39.6 | 182.8 – 259.4 | `act2` 0:29.3 – 1:45.9 | **Act II**, Neomuna, unbroken to the crash |
-| 5 | 4:39.6 – 4:53.7 | 259.4 – 273.5 | `act2` 1:45.9 | **Act III**, the crash, the strand descent |
-| 6 | 4:53.7 – 4:57.2 | 273.5 – 277.0 | card | `COMIC PLACEHOLDER` over the enemy CU |
-| 7 | 4:57.2 – 4:59.8 | 277.0 – 279.7 | artwork | held through the HOWL and the silence |
-| 8 | 4:59.8 – 5:07.2 | 279.7 – 287.0 | `act2` 2:06.2 | the band slams back in, on three Guardians |
-| 9 | 5:07.2 – 5:42.4 | 287.0 – 322.2 | `act3` 0:55 – 1:30.2 | the Collection Trailer montage, three cards marked |
-| 10 | 5:42.4 – 5:44.2 | *paused* | `act3` 0:29.4 | **the song stops**; hero montage in its own audio |
-| 11 | 5:44.2 – 6:23.2 | 322.2 – 361.2 | `act2` 2:51 – 3:30 | the Pale Heart, Guardians gathering |
-| 12 | 6:23.2 – 7:13.7 | 361.2 – 411.7 | `act4` 0:00 – 0:50.5 | the finale, the Guardians assembled |
-| 13 | 7:13.7 – 7:26.0 | 411.7 – 424.0 | artwork | the outro, over the fade |
+| 1 | 0:00 – 0:10 | 0 – 10 | title card | Project Bluefin, over the song's quiet opening |
+| 2 | 0:10 – 3:02.8 | 10 – 182.8 | `act1` 0:30.2 – 3:23 | **Act I**, the intro capture |
+| 3 | 3:02.8 – 3:20.6 | 182.8 – 200.6 | Lightfall trailer | **Act II** opens: the gallop cuts to neon |
+| 4 | 3:20.6 – 4:19.4 | 200.6 – 259.4 | `act2` 0:47.1 – 1:45.9 | Neomuna, unbroken into the crash |
+| 5 | 4:19.4 – 4:33.5 | 259.4 – 273.5 | `act2` 1:45.9 | **Act III**, the crash, the strand descent |
+| 6 | 4:33.5 – 4:37.0 | 273.5 – 277.0 | card | `COMIC PLACEHOLDER` over the enemy CU |
+| 7 | 4:37.0 – 4:39.7 | 277.0 – 279.7 | artwork | held through the HOWL and the silence |
+| 8 | 4:39.7 – 4:47.0 | 279.7 – 287.0 | `act2` 2:06.2 | the band slams back in, on three Guardians |
+| 9 | 4:47.0 – 5:22.2 | 287.0 – 322.2 | `act3` 0:55 – 1:30.2 | the Collection Trailer montage, three cards marked |
+| 10 | 5:22.2 – 5:24.0 | *paused* | `act3` 0:29.4 | **the song stops**; hero montage in its own audio |
+| 11 | 5:24.0 – 6:03.0 | 322.2 – 361.2 | `act2` 2:51 – 3:30 | the Pale Heart, Guardians gathering |
+| 12 | 6:03.0 – 6:53.5 | 361.2 – 411.7 | `act4` 0:00 – 0:50.5 | the finale, the Guardians assembled |
+| 13 | 6:53.5 – 7:05.8 | 411.7 – 424.0 | artwork | the outro, over the fade |
+
+**The song plays from the first frame**, under the title card — the record's own
+opening is quiet pickups, which is what a title card wants. The only source
+audio in the film is the 1.8 s pause.
 
 ## Everything below is measured
 
@@ -103,21 +110,37 @@ so the impact landed half a second late. The Act II run is now placed so
 **extract 105.9 lands on 259.390** — the shot starts a beat early and the impact
 lands on the beat change.
 
-### The intro overrun, solved by not cutting anything
+### The gallop cuts to neon, and Savathûn stays out
 
-The capture is source 0:10 → 3:23, which is **193 s for a 182.834 s act**.
-Rather than trim the capture, **the bed enters late, at 20.166 s**. The film
-opens on the cinematic's own audio, the song arrives over picture that is
-already running, and the gallop still lands exactly at the end of the capture.
+The compilation reaches Neomuna at extract **47.1** — verified by frame. Before
+it lie Savathûn's Throne World and the `THE WITCH QUEEN` branded cards, which
+the standing no-Savathûn rule keeps out of this film.
 
-That is only expressible because the cut has two clocks.
+That leaves only **58.8 s** of Neomuna before the crash, against a 76.556 s
+gallop-to-flute span. An earlier build closed that gap by starting the run 17.8 s
+early — which is exactly how the Witch Queen montage got in: not by anyone
+choosing it, but by needing to fill time. `test_act_two_never_reaches_back_into_savathuns_throne_world`
+now makes that impossible.
+
+The gap is filled from the front instead, by the **official Lightfall launch
+trailer**: the neon skyline establishing (0:44.9), a Guardian in a rain-slick
+alley (0:52.0), then the Strand sequence (1:12.9 →). So the gallop lands on a
+picture change — a hard cut to neon — and hands over to the compilation exactly
+at the Neomuna boundary. It is also better provenance for 17.8 s of the film.
+
+### The intro trim
+
+The capture is source 0:10 → 3:23, which is **193 s**, and the intro has only
+182.834 s to spend once the song plays from frame one. The 20.166 s comes off
+the **head** — source 0:10 → 0:30 is a slow, dark orrery — because the capture's
+ending (the ship rising, the fade) is the payoff into Act II.
 
 ### Two clocks
 
 `wall` is position in the film; `bed` is position in the song. **A shot marked
 `audio: "source"` advances wall and not bed.** Every anchor in the builder is
 asserted against bed time, because a musical with a pause in it is longer than
-its own song — 446.0 s of film for 424.0 s of music.
+its own song — 425.8 s of film for 424.0 s of music.
 
 `tools/audiomix.py` cuts the bed into pieces, delays each to its wall position,
 and mutes the source wherever the bed plays. At every instant exactly one of the
@@ -129,12 +152,12 @@ Verified by correlating the delivered audio against the bed:
 
 | Film position | Bed position | Correlation | |
 |---|---|---|---|
-| 100 s | 79.834 s | **+1.000** | the song is exactly where it should be |
-| 343 s | — | **−0.024** | inside the pause, the song is genuinely absent |
-| 350 s | 328.034 s | **+1.000** | it resumes from where it stopped |
+| 100 s | 100 s | **+1.000** | the song is exactly where it should be |
+| 323 s | — | ~**0.000** | inside the pause, the song is genuinely absent |
+| 350 s | 348.2 s | **+1.000** | it resumes from where it stopped |
 
-The third row is the one that matters: after the pause the film-to-bed offset is
-20.166 + 1.8 s, and the song picks up at exactly the sample it stopped on.
+The third row is the one that matters: after the pause the film runs 1.8 s ahead
+of the song, and the song picks up at exactly the sample it stopped on.
 
 ### Guardians together
 
@@ -149,8 +172,11 @@ whole assembled crowd.
 
 - **No Curse of Osiris**, anywhere — asserted.
 - **No shot used twice** — asserted. The first cut replayed 25.
-- **No Savathûn. The Witness: eyes or smoke, never its body.** The Pale Heart
-  run starts at source 25:51, after the pyramid and monolith material.
+- **No Savathûn. The Witness: eyes or smoke, never its body.** Act II starts at
+  the Neomuna boundary (source 23:47.1), after the Throne World and its branded
+  cards; the Pale Heart run starts at source 25:51, after the pyramid and
+  monolith material. Both are asserted, because both were breached by a run
+  reaching backwards to fill time rather than by anyone choosing the footage.
 - **A long enemy hold becomes a card, never a jump cut.**
 - **Publisher mechanic cards become artwork slots.** Three fall inside the
   Collection Trailer montage — `7 RAIDS` (63.3–65.2), `ENDLESS BUILDCRAFTING`
@@ -205,6 +231,9 @@ decided.
       Swapping it will re-time the cut: codec rungs differ in leading padding
       (~36 ms measured previously here), so cross-correlate and prove lag 0.
 - [ ] Instrumental (`SE_c6nqy-y0`) and orchestral toggles not built.
+- [ ] **A burned-in ESRB `TEEN` badge** sits bottom-right over the first ~4.4 s
+      of the Neomuna run (extract 47.1 – 51.5). It is publisher copy, so it is a
+      `redactions/` job for the finished cut, not a re-cut.
 - [ ] Neither compilation extract is in `segments/`. Tagging exists to feed
       `story.py`'s matcher and nothing here uses it — index them only if these
       sources are wanted in search.

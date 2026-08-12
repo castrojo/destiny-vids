@@ -96,19 +96,34 @@ ART = str(Path.home() / "Pictures/Artwork/wolves.jpg")
 # Window extracts, so every seek lands in a short file: render.py seeks with
 # -ss AFTER -i for frame accuracy, which decodes from zero (docs/rendering.md).
 ACT1 = "wolves_act1"       # compilation 0:00-3:30      -- the Destiny 1 opening
+LIGHTFALL = "yt_destiny_2_lightfall_launch_trailer"   # OFFICIAL Bungie upload
 COMP = "wolves_act2"       # compilation 23:00-26:30    -- Neomuna, the crash
 TRAILER = "wolves_act3"    # Collection Trailer 0:00-1:32
 FINALE = "wolves_act4"     # compilation 26:30-30:23    -- the Pale Heart finale
 
-TITLE_IN = 10.000          # the source's Destiny logo occupies 0:00-0:10
+TITLE_CARD_LEN = 10.000    # the card opens the film; the song plays under it
 CAPTURE_OUT = 203.000      # the first cinematic ends here (verified by frame)
-# The card REPLACES the logo, so the usable capture is 0:10 -> 3:23 = 193 s for
-# a 182.834 s act. The surplus is not trimmed: it becomes the pre-roll, and the
-# song enters over it. Nothing is cut to make the music fit.
-CAPTURE_LEN = CAPTURE_OUT - TITLE_IN
-BED_ENTERS = CAPTURE_LEN - ACT2_IN            # 10.166 -- the pre-roll's length
+# The song plays from the first frame, so the intro has exactly ACT2_IN seconds
+# to spend and the capture is trimmed to fit: card + capture = the gallop.
+# The trim comes off the HEAD -- source 0:10-0:30 is a slow, dark orrery, and
+# the capture's ending (the ship rising, the fade) is the payoff into Act II.
+CAPTURE_IN = CAPTURE_OUT - (ACT2_IN - TITLE_CARD_LEN)   # 30.166
 
 CRASH_IMPACT = 105.900     # extract clock; measured from the audio transient
+NEOMUNA_IN = 47.100        # extract clock: where Neomuna starts, verified by frame.
+# Before it lie Savathun's Throne World and the WITCH QUEEN branded cards, which
+# the standing no-Savathun rule keeps out of this film. There are only 60.35 s of
+# Neomuna before the crash, and the gallop-to-flute span is 76.556 s, so the
+# gallop cuts to neon from the OFFICIAL Lightfall trailer and hands over to the
+# compilation exactly at the Neomuna boundary.
+# Runs are taken from the indexed segment boundaries so none starts mid-shot;
+# the last one is stretched to fill, and stops before the trailer's OUR/END
+# title cards at 87.05.
+LIGHTFALL_LEAD = [
+    (44.91, 48.21, "Neomuna's neon skyline, establishing"),
+    (52.05, 53.45, "a Guardian in a rain-slick Neomuna alley"),
+    (72.94, None, "into the Strand: Guardians over the neon city"),
+]
 
 BANNED_SOURCES = ("yt_curse_of_osiris_opening_cinematic",)
 
@@ -186,17 +201,13 @@ def build():
     t.card(title_card_path(
         "Project Bluefin", "Seven Days to the Wolves",
         ["Destiny footage used under Bungie's fan-content policy"]),
-        TITLE_IN, "TITLE CARD (over the source's Destiny logo, 0:00-0:10)",
-        audio="source")
+        TITLE_CARD_LEN,
+        "TITLE CARD (the film's own logo; the source's is never shown)")
 
-    # ---- pre-roll: picture running, song not yet in ------------------------
-    t.run(ACT1, TITLE_IN, BED_ENTERS,
-          "PRE-ROLL: the cinematic in its own audio; the song enters at the end",
-          audio="source")
-
-    # ---- Act I: the intro capture, unedited --------------------------------
-    t.run(ACT1, TITLE_IN + BED_ENTERS, ACT2_IN,
-          f"I. intro capture, continuous to source "
+    # ---- Act I: the intro capture ------------------------------------------
+    t.run(ACT1, CAPTURE_IN, ACT2_IN - TITLE_CARD_LEN,
+          f"I. intro capture, continuous from source "
+          f"{int(CAPTURE_IN)//60}:{CAPTURE_IN % 60:04.1f} to "
           f"{int(CAPTURE_OUT)//60}:{CAPTURE_OUT % 60:04.1f}")
     t.at_bed(ACT2_IN, "Act I")
     assert abs(t.shots[-1]["end_sec"] - CAPTURE_OUT) < 0.01, (
@@ -204,13 +215,24 @@ def build():
         f"cinematic ends at {CAPTURE_OUT:.3f}s -- the capture would run into "
         "the fade and the next trailer.")
 
-    # ---- Act II: the gallop. One unbroken run that ends ON the crash -------
-    act2_len = ACT3_IN - ACT2_IN
-    act2_in = CRASH_IMPACT - act2_len
-    t.run(COMP, act2_in, act2_len,
+    # ---- Act II: the gallop cuts to neon ----------------------------------
+    # The compilation only holds 60.35 s of Neomuna before the crash, so the
+    # first 16.2 s comes from the official Lightfall trailer -- which is both
+    # the right picture for the gallop and better provenance than the fan
+    # compilation.
+    comp_len = CRASH_IMPACT - NEOMUNA_IN
+    lead_len = (ACT3_IN - ACT2_IN) - comp_len
+    fixed = sum(o - i for i, o, _ in LIGHTFALL_LEAD if o is not None)
+    for n, (src_in, src_out, what) in enumerate(LIGHTFALL_LEAD):
+        dur = (src_out - src_in) if src_out is not None else lead_len - fixed
+        prefix = "the gallop cuts to neon -- " if n == 0 else ""
+        t.run(LIGHTFALL, src_in, dur, f"II. {prefix}{what}",
+              plate_slot=(src_out is None))
+
+    t.run(COMP, NEOMUNA_IN, comp_len,
           f"II. Neomuna, unbroken from source "
-          f"{int(act2_in + 1380)//60}:{(act2_in + 1380) % 60:04.1f} -- three "
-          "Guardians advancing, straight through to the crash",
+          f"{int(NEOMUNA_IN + 1380)//60}:{(NEOMUNA_IN + 1380) % 60:04.1f} "
+          "straight through to the crash",
           plate_slot=True)
     t.at_bed(ACT3_IN, "Act II")
 
@@ -318,7 +340,7 @@ def main():
         "title": "Seven Days to the Wolves",
         "kind": "timing_pass",
         "bed": "bed_seven_days_to_the_wolves",
-        "bed_offset_sec": round(TITLE_IN + BED_ENTERS, 3),
+        "bed_offset_sec": 0.0,
         "bed_gain_db": -3.5,
         "anchors": {
             "act2_gallop_in": ACT2_IN,
@@ -338,7 +360,7 @@ def main():
     print(f"{len(t.shots)} shots")
     print(f"  film   {t.wall:7.3f}s  ({int(t.wall)//60}:{t.wall % 60:04.1f})")
     print(f"  bed    {t.bed:7.3f}s  (song is {END:.3f}s)")
-    print(f"  bed enters at wall {TITLE_IN + BED_ENTERS:.3f}s")
+    print(f"  the song plays from the first frame")
     print(f"  plate slots: {sum(1 for s in t.shots if s.get('plate_slot'))}")
     print(f"  cards:       {sum(1 for s in t.shots if s.get('still'))}")
     print(f"-> {dest}")
