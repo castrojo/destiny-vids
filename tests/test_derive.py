@@ -280,9 +280,9 @@ def test_no_binding_invents_plate_copy():
       one, exactly as an ensemble slot's is. Not an authored identity.
     - `mara_sov` is copy the *owner* wrote directly, for somebody who has no
       entry in the reference deck at all. The owner authoring a credit is
-      allowed where an agent inventing one is not; its class row is
-      deliberately a word short pending #5, and tests/test_plate.py pins the
-      exact shape so nobody "completes" it.
+      allowed where an agent inventing one is not. Re-authored for act II with
+      the subclass (#5) now supplied; the old copy survives verbatim in the
+      binding's `note:`, and tests/test_plate.py pins both halves.
     """
     with_plates = {k for k, v in LEADS.items() if v.get("plate")}
     assert with_plates - {"sagira", "mara_sov"} == set(AUTHORED_PLATES)
