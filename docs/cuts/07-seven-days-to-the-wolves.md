@@ -539,10 +539,11 @@ of it.
       is cast to her by the owner and she has no authored identity in
       `~/Videos/nameplates.json`, the website's `characters.json`, or
       `vocab/casting.yaml`. **The shot is rendered unplated.**
-- [ ] **Owner: `github.com/inffy`'s Guardian identity.** Same shape as Cortney's,
-      recorded in `leads.pending`. The run is rendered unplated.
-- [ ] **Kaslin Fields' GitHub login**, so her authored identity can be recorded
-      in `ensemble.titles` — which is keyed by login — rather than nowhere.
+- [ ] **Owner: `github.com/inffy`'s Guardian identity** — [issue #72]. Same
+      shape as Cortney's, recorded in `leads.pending`. The run renders unplated.
+- [ ] **Kaslin Fields' GitHub login** — [issue #72]. Her identity *is* authored;
+      the gap is that `ensemble.titles` is keyed by login and nobody has
+      supplied hers, so there is nowhere correct to record it.
 - [ ] Nameplates are not burned yet. The `plate_slot` runs are flagged in the
       shotlist for that pass.
 - [ ] The bed is an official YouTube upload — lossy, and not the highest-quality
@@ -567,3 +568,4 @@ of it.
 [issue #51]: https://github.com/castrojo/destiny-vids/issues/51
 [issue #59]: https://github.com/castrojo/destiny-vids/issues/59
 [issue #55]: https://github.com/castrojo/destiny-vids/issues/55
+[issue #72]: https://github.com/castrojo/destiny-vids/issues/72
