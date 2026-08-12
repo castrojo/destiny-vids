@@ -1,7 +1,7 @@
 ---
 name: production
-version: "1.0"
-last_updated: "2026-08-11"
+version: "1.1"
+last_updated: "2026-08-12"
 id: production
 one_line_purpose: Run the issue-to-render loop, repeatedly and in parallel.
 entry_point: docs/skills/production.md
@@ -104,23 +104,31 @@ A video that refuses here does not need the gate relaxed. It needs cutting.
 ## Delivering a finished cut
 
 A render in `renders/` is not a deliverable. The delivery workspace is
-**`~/Videos`** — not a git repo, and the owner's, not this repo's. Read
-`~/Videos/README.md` first; the short version:
+**`~/Videos/Wolves/`** — the owner's, not this repo's, and output only: every
+file in it is a regenerated artifact.
 
-| Step | Where |
+| Folder | What goes in it |
 |---|---|
-| Stage the approved file | `~/Videos/UPLOAD/`, named so it **sorts** into playlist order |
-| Record what it is | `~/Videos/UPLOAD/README.md` + the cut's `STORYBOARD.md` |
+| `Prod/` | The show at the **highest quality that exists** — one file per act, `NN-<act>.mp4`, FLAC audio, picture never re-encoded |
+| `10mb/` | Social copies under a byte cap (`tools/social.py`), built from `Prod/` |
+| `megacut/` | The final movie, and nothing else (`tools/megacut.py`) |
 | Publish | `python3 ~/Videos/yt-refresh.py` — one unlisted playlist |
 
-`UPLOAD/` is ordered by lexical filename, so the prefix is the running order.
-Europa is pinned last with a `zz-` prefix by the owner's decision — do not
-renumber it, and do not assume the numbers are gapless (they are not: Europa
-vacated `03`). Positions are not filenames; refer to cuts by name.
+**The order is [`docs/running-order.md`](../running-order.md)'s, not the
+filenames'.** `NN-` is the act number, which is fixed: acts II and VIII have no
+film, so the numbering has gaps and closing them would renumber the show.
+
+**`Prod/` is hardlinks** to each project's master, so it costs no disk and
+cannot drift from what built it. Re-link with `ln -f`; `cp` over an existing
+entry breaks the link silently and leaves a copy that goes stale.
+
+`~/Videos/UPLOAD/` is the older staging folder — a different order, AAC copies —
+and is being retired. See
+[`docs/handoff/2026-08-12-consolidate-the-project.md`](../handoff/2026-08-12-consolidate-the-project.md).
 
 Three rules there that this repo has to respect:
 
-- **A regenerated file is not hand-edited.** `UPLOAD/README.md` names
+- **A regenerated file is not hand-edited.** The delivery notes name
   `renders/<video_id>-credited.mp4` as the master for the contributors piece and
   says so explicitly: it is rebuilt from checked-in data by
   `scripts/build_uncut_credited.sh`, so **a new month is a new render, not a new
@@ -272,6 +280,27 @@ grind them.
 | "I'll re-run detection, it's cheap." | Beat index is positional. New detection invalidates the tag file. |
 | "I'll bump `vocab/casting.yaml` while I'm here." | It names real people and every video reads it. Its own PR. |
 | "The render failed, I'll hand-fix the segment." | Derived fields are recomputed. Fix the tag or the vocab. |
+
+## A social copy is a delivery stage
+
+```bash
+python3 tools/social.py ~/Videos/Wolves/Prod/<act>.mp4 \
+    --out ~/Videos/Wolves/10mb/<act>.mp4 --audio-bitrate 256
+```
+
+Social platforms cap an upload by **bytes**, so `tools/social.py` solves for the
+video bitrate from the duration and the audio budget and spends exactly that in
+a two-pass encode — the file lands under the cap by arithmetic, not by re-rolling
+a CRF until one happens to fit. `--dry-run` prints the budget first.
+
+Two rules, and the second is the one that gets broken:
+
+- **Encode from `Prod/`, never from another social copy.** A copy of a copy is
+  two lossy generations for no reason.
+- **Re-encoding is allowed; processing is not.** No normaliser, no limiter, no
+  EQ — the peak of a social copy must match its master's, and a test asserts the
+  tool contains no filter that would change it. A starved music bed is the
+  artifact people actually hear on a phone, so spend bitrate on audio first.
 
 ## Red Flags
 

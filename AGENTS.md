@@ -54,10 +54,13 @@ do not pin** — see [`docs/cuts/hero-montage.md`](docs/cuts/hero-montage.md).
 ## Read order
 
 1. This file — repo rules, commands, and boundaries.
-2. [`docs/SKILL.md`](docs/SKILL.md) — find the skill for your task and load it.
-3. [`docs/catalog.md`](docs/catalog.md) — which of the two video kinds you are
+2. [`docs/running-order.md`](docs/running-order.md) — **what the show is**: the
+   canonical eight acts, their chapters, and where the files live. It outranks
+   every other description of the order, in this repo or outside it.
+3. [`docs/SKILL.md`](docs/SKILL.md) — find the skill for your task and load it.
+4. [`docs/catalog.md`](docs/catalog.md) — which of the two video kinds you are
    building. Getting this wrong wastes the whole cut.
-4. The design docs the skill points at (`docs/taxonomy.md`, `docs/pipeline.md`,
+5. The design docs the skill points at (`docs/taxonomy.md`, `docs/pipeline.md`,
    `docs/agent-retrieval.md`, `docs/rendering.md`).
 
 ## Where the work lives
@@ -91,17 +94,38 @@ get published both live outside it.
 
 | Path | What it is | Write? |
 |---|---|---|
-| `~/src/destiny-vids` | The index and the tools. | **yes** |
-| `~/Videos` | The owner's delivery workspace: the reference deck, the finished cuts, `UPLOAD/` and the publish script. Read its `README.md`. | only where its own docs say so |
-| `~/src/website` | Where the authored Guardian identities live (`public/wolves/characters/characters.json`) and where the plate CSS is ported from. | **never** — several agents run worktrees against it |
+| `~/src/destiny-vids` | The index, the tools, **and the policy**. | **yes** |
+| `~/Videos` | The owner's delivery workspace: the reference deck, the per-cut projects, and `Wolves/`, where the show is delivered. | only where this repo or its own docs say so |
+| `~/src/website` | Where the authored Guardian identities live (`public/wolves/characters/characters.json`) and where the card CSS is ported from. | **never** — several agents run worktrees against it |
 
-Nothing in either of those is editable from here, and both are *authoritative*
-over this repo where they overlap: plate copy is
-[reproduced](docs/skills/plates.md#where-the-copy-is-authored), not authored,
-and a delivered file is
-[regenerated](docs/skills/production.md#delivering-a-finished-cut), not
+**This repo is the source of truth for the project**: what the show is, what
+order it plays in, what the standards are, and how anything is built. Start at
+[`docs/running-order.md`](docs/running-order.md). `~/Videos` is where files are
+*delivered*, not where policy is decided — a rule that only exists in a note in
+that folder is a rule this repo will contradict sooner or later.
+
+Two narrow things outside this repo remain *authoritative over it*, and both are
+**copy, not policy**: the authored Guardian identities, which are
+[reproduced](docs/skills/plates.md#where-the-copy-is-authored) rather than
+written, and the reference deck's field set. A delivered file is likewise
+[regenerated](docs/skills/production.md#delivering-a-finished-cut), never
 hand-edited. `~/Videos` is a Syncthing folder, so a directory can vanish
 mid-session; check `~/.local/share/Trash` before rebuilding anything.
+
+### Where the show is delivered
+
+`~/Videos/Wolves/` — three folders, one job each, all of them regenerated
+artifacts:
+
+| Folder | What goes in it |
+|---|---|
+| `Prod/` | The whole show at the **highest quality that exists** — one file per act, FLAC audio, picture never re-encoded. |
+| `10mb/` | Social copies under a byte cap (`tools/social.py`), built from `Prod/` and never from each other. |
+| `megacut/` | The final movie, and nothing else. |
+
+`~/Videos/UPLOAD/` is the **older** staging folder (AAC copies, a different
+running order). It is superseded and is being retired — see
+[`docs/handoff/2026-08-12-consolidate-the-project.md`](docs/handoff/2026-08-12-consolidate-the-project.md).
 
 **Three classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, and a licensing decision. An agent that

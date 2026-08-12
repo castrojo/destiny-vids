@@ -163,8 +163,8 @@
         "resume"
       ],
       "description": "The whole loop from an issue to a rendered cut, what resumes, where it stops on purpose, and how several agents make videos at once without colliding. Use when producing videos in volume rather than debugging one stage.",
-      "version": "1.0",
-      "last_updated": "2026-08-11",
+      "version": "1.1",
+      "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },
     {

@@ -56,16 +56,57 @@ def test_render_all_skips_cards_instead_of_drawing_them(tmp_path):
 
 
 def test_the_act_slides_are_numbered_in_the_owners_canonical_order():
-    """intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat ->
-    osiris -> 7daystothewolves -> europa -> end credits, numbered I..IX."""
+    """The canonical order, from docs/running-order.md: intro (I) ->
+    endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V)
+    -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII)."""
     cards = _load("megacut-cards.json")
     numerals = [p["act"] for p in cards["plates"]]
-    assert numerals == ["I", "IV", "V", "VI", "VII", "VIII"]
-    # II, III and IX are absent because they have no film; they must stay
+    assert numerals == ["I", "III", "IV", "V", "VI", "VII"]
+    # II and VIII are absent because they have no film; they must stay
     # recorded, or the numbering silently closes up over them.
     unresolved = " ".join(u["what"] for u in cards["unresolved"])
-    for missing in ("act II", "act III", "act IX"):
+    for missing in ("act II", "act VIII"):
         assert missing in unresolved, missing
+
+
+def test_one_person_is_never_two_acts():
+    """mrbobbytables was once an empty act AND another act's film, under his
+    character's name. One subject, one act."""
+    cards = _load("megacut-cards.json")
+    subjects = [c.get("title") for c in cards["plates"]]
+    assert len(subjects) == len(set(subjects))
+
+
+def test_the_running_order_doc_is_the_source_of_truth_and_agrees_with_the_plan():
+    doc = open(os.path.join(REPO, "docs", "running-order.md"), encoding="utf-8").read()
+    assert "source of truth" in doc
+    # Every act slide's chapter title must appear in the doc, or the two
+    # descriptions of the show have drifted.
+    import re
+    plan = _load("megacut.json")
+    for item in plan["items"]:
+        if item["kind"] == "card":
+            title = item["chapter"].split(". ", 1)[1]
+            assert title in doc, title
+
+
+def test_every_act_slide_carries_an_audience_facing_chapter_title():
+    """`label` is a build note; `chapter` is what the viewer reads."""
+    plan = _load("megacut.json")
+    for item in plan["items"]:
+        if item["kind"] == "card":
+            assert item.get("chapter"), item.get("label")
+            assert "held long" not in item["chapter"]
+
+
+def test_the_programme_is_delivered_from_the_wolves_workspace():
+    """Prod holds the highest-quality master of each act; the movie goes to
+    megacut/. Reading UPLOAD/ instead would ship the older AAC staging copies."""
+    plan = _load("megacut.json")
+    assert plan["output"].startswith("/var/home/jorge/Videos/Wolves/megacut/")
+    for item in plan["items"]:
+        if item["kind"] == "clip" and item["path"].startswith("/"):
+            assert "/Videos/Wolves/Prod/" in item["path"], item["path"]
 
 
 def test_act_slides_run_in_time_order_and_carry_a_chapters_field():

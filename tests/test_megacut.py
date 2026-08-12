@@ -194,3 +194,51 @@ def test_validation_and_encoding_resolve_the_same_file(tmp_path, monkeypatch):
     resolved = megacut.resolve("renders/a.mp4")
     assert resolved == str(tmp_path / "repo" / "renders" / "a.mp4")
     assert Path(resolved).read_bytes() == b"repo"
+
+
+def test_chapters_start_on_the_act_slide_and_the_first_is_zero():
+    """A marker landing after the slide drops the viewer into a card they have
+    already read; YouTube ignores a list whose first mark is not 0:00."""
+    plan = {"items": [
+        {"kind": "card", "image": "a.png", "dur": 5.0, "chapter": "I. One"},
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 100.0},
+        {"kind": "card", "image": "b.png", "dur": 15.0, "chapter": "II. Two"},
+        {"kind": "clip", "path": "b.mp4", "audio": "source", "dur": 30.0},
+    ]}
+    marks = megacut.chapters(plan)
+    assert marks == [(0.0, "I. One"), (105.0, "II. Two")]
+    assert megacut.format_chapters(marks) == "0:00 I. One\n1:45 II. Two"
+
+
+def test_chapters_fall_back_to_the_label_visibly():
+    plan = {"items": [{"kind": "card", "image": "a.png", "dur": 5.0,
+                       "label": "I — a build note"}]}
+    assert megacut.chapters(plan) == [(0.0, "I — a build note")]
+
+
+def test_chapters_pass_the_hour_mark():
+    plan = {"items": [
+        {"kind": "card", "image": "a.png", "dur": 1.0, "chapter": "I"},
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3700.0},
+        {"kind": "card", "image": "b.png", "dur": 1.0, "chapter": "II"},
+    ]}
+    assert megacut.format_chapters(megacut.chapters(plan)) == "0:00 I\n1:01:41 II"
+
+
+def test_a_plan_may_be_read_for_its_order_before_its_footage_exists(tmp_path):
+    """The running order is a decision; footage is not a precondition for
+    recording it. But an item with no file must carry its own `dur`."""
+    plan = {"items": [
+        {"kind": "card", "image": "nope.png", "dur": 5.0, "chapter": "I"},
+        {"kind": "clip", "path": "nope.mp4", "audio": "source", "dur": 10.0},
+    ]}
+    path = tmp_path / "plan.json"
+    path.write_text(json.dumps(plan))
+    assert megacut.load_plan(path, require_sources=False)["items"]
+    with pytest.raises(ValueError):
+        megacut.load_plan(path)
+
+    plan["items"][1].pop("dur")
+    path.write_text(json.dumps(plan))
+    with pytest.raises(ValueError, match="unknowable"):
+        megacut.load_plan(path, require_sources=False)
