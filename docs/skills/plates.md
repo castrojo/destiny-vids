@@ -83,6 +83,53 @@ python3 tools/plate.py burn --video renders/cut.mp4 --manifest plates.json \
 that binds a character to a person — so recasting a role changes the on-screen
 credit and nothing else.
 
+## Plates from a brief
+
+The exception to "copy lives in `vocab/casting.yaml`" is the owner writing a
+plate into an issue's `brief` block (`plates[]` in
+[`schema/brief.schema.json`](../../schema/brief.schema.json)) — which may name
+somebody who has no binding at all. That is legitimate: the owner is the one
+source that may introduce a *new* claim about a real person, and the brief is
+where they speak. `plan` reads it:
+
+```bash
+python3 tools/plate.py plan cut.json --brief 1 --out plates.json   # or a YAML file
+```
+
+Brief plates are planned **first**, as fixed credits, and everything derived
+routes around them. They live inside `plan` — not in a post-hoc `merge` — for
+two reasons: a brief's `at` is in *source* time ("drop her nameplate right
+after she removes her helmet, 0:14") and only the shot list can map that onto
+the cut's clock, and a brief plate naming a `character` **is** that
+character's one plate — planned anywhere else it would double-plate the
+reveal or die on `merge`'s overlap check.
+
+Three rules keep the exception narrow:
+
+- **The field set is still closed.** A `copy` key the deck has no field for is
+  refused, from a brief same as anywhere else.
+- **The vocab wins a conflict.** If the character's binding already has a
+  `plate:` block, that copy is used and the brief's is reported as deferred.
+  The vocab is the durable record, changed by reviewed PR; a brief is one
+  video's request in an editable issue body. Letting a brief override it would
+  let two videos disagree about a real person's credit — the drift the vocab
+  exists to prevent. A brief that disagrees is a signal the record needs an
+  edit, so the conflict is logged, never adjudicated silently. (The owner's
+  *timing* is still honoured — timing is a per-video decision; copy is a
+  durable claim.)
+- **The owner's `at` is honoured, not re-derived.** The moment is mapped from
+  source time onto the cut, exactly — no `LEAD_IN`, because the owner pointed
+  at a moment inside the footage, not a shot head. A moment that is not in the
+  cut is **reported, not moved**; a plate that names a `character` falls back
+  to the derived reveal rather than vanishing, and one that carries only copy
+  is reported and skipped. Without an `at`, a plate goes through the normal
+  reveal scheduling (hero move and all) with the brief's copy.
+
+Every planned entry carries `copy_source` — `"brief"` or `"casting"` — so a
+reader of the manifest can tell an owner-authored plate from a vocab-derived
+one without knowing the convention. Brief plates are lead-tier: with
+`--only ensemble` they arrive via `--around`, the same way dialogue does.
+
 Scheduling rules, all of which exist because a plate is a claim about a person:
 
 - Each lead is plated **once**, on the first shot long enough to read.
@@ -293,14 +340,21 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 | Rationalization | Reality |
 |---|---|
 | "One extra line makes the plate clearer." | It makes the plate say something nobody wrote. The deck's fields are the contract. |
-| "I'll hardcode the copy just for this render." | Then the credit and the casting drift apart the first time a role is recast. Copy lives in `vocab/casting.yaml`. |
+| "I'll hardcode the copy just for this render." | Then the credit and the casting drift apart the first time a role is recast. Copy lives in `vocab/casting.yaml` — or, for someone the vocab does not bind yet, in the issue's brief, which `plan` marks `copy_source: brief`. |
+| "The brief's copy contradicts the binding, but the owner wrote it today." | Recency is not authority: the vocab is the reviewed record, the issue body is editable. The vocab wins; edit it if the brief is right. |
 | "The plate is short, it can share the screen." | Two plates at once is unreadable; both `plan` and `burn` refuse it. The only exception is a group row, whose members are built to be seen together. |
 | "The shot is only two seconds, so nobody can be plated there." | The plate rides across the cut. Only the *anchor* must be long enough to register. |
 
 ## Red Flags
 
-- Inventing a plate line, a role, or a pronoun row.
+- Inventing a plate line, a role, or a pronoun row — from a brief same as
+  anywhere else: `plan` refuses a `copy` field outside the deck's set.
 - Hardcoding copy in the manifest instead of `vocab/casting.yaml`.
+- A plate manifest that hides where its copy came from — every planned entry
+  carries `copy_source`, and a brief plate without it is a hand-edit.
+- Letting a brief override a binding's `plate:` block silently. The vocab
+  wins; if the brief is right, the fix is a vocab edit, not a per-video
+  override.
 - Planning with a different `--max-shot-sec` than the render used — every plate
   after the first trimmed shot lands late.
 - A subclass line on a Ghost.

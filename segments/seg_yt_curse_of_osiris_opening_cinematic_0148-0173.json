@@ -113,7 +113,7 @@
     },
     "overlays": {
       "source": "observed",
-      "label_source": "human",
+      "label_source": "manual",
       "confidence": 1.0
     },
     "subject_salience": {

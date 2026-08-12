@@ -1,0 +1,175 @@
+{
+  "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0074-0075",
+  "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+  "start_sec": 74.2,
+  "end_sec": 75.166667,
+  "start_tc": "1:14",
+  "end_tc": "1:15",
+  "era": "beyond_light",
+  "activity": "unknown",
+  "content_type": "cinematic",
+  "action": [],
+  "camera_movement": [
+    "static"
+  ],
+  "caption": "'THE DARKNESS' title card over swirling fire and energy.",
+  "character": [],
+  "character_identifiability": "unidentifiable",
+  "class": "unknown",
+  "composition": [
+    "cutaway"
+  ],
+  "element": "unknown",
+  "faction": [],
+  "identity_visibility": "none",
+  "lighting": "dim",
+  "mood": [
+    "ominous"
+  ],
+  "overlays": [
+    "burned_text"
+  ],
+  "pacing": "fast",
+  "register": 0,
+  "shot_scale": "INSERT",
+  "subject_salience": "ambient",
+  "substitutability": 0,
+  "clean": false,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.97
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

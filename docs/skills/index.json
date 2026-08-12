@@ -60,6 +60,25 @@
       "doc_type": "procedure"
     },
     {
+      "id": "issues",
+      "name": "issues",
+      "one_line_purpose": "File work, pick it up, and know when to stop and ask.",
+      "entry_point": "docs/skills/issues.md",
+      "category": "meta",
+      "status": "active",
+      "tags": [
+        "issues",
+        "brief",
+        "backlog",
+        "automatable",
+        "gaps"
+      ],
+      "description": "GitHub issues are the backlog, and a fenced `brief` block is the executable part of one. Use when filing work, picking work up, normalizing a prose request, or deciding whether something is an agent's call at all.",
+      "version": "1.0",
+      "last_updated": "2026-08-11",
+      "doc_type": "procedure"
+    },
+    {
       "id": "plates",
       "name": "plates",
       "one_line_purpose": "Put Guardian nameplates and title cards on a rendered cut.",
@@ -74,6 +93,25 @@
         "ffmpeg"
       ],
       "description": "Plans, renders, and burns Project Bluefin Guardian nameplates onto a cut. Use when crediting cast or contributors on screen, or changing plate copy, timing, or chrome.",
+      "version": "1.0",
+      "last_updated": "2026-08-11",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "production",
+      "name": "production",
+      "one_line_purpose": "Run the issue-to-render loop, repeatedly and in parallel.",
+      "entry_point": "docs/skills/production.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "pipeline",
+        "batch",
+        "parallel",
+        "make-video",
+        "resume"
+      ],
+      "description": "The whole loop from an issue to a rendered cut, what resumes, where it stops on purpose, and how several agents make videos at once without colliding. Use when producing videos in volume rather than debugging one stage.",
       "version": "1.0",
       "last_updated": "2026-08-11",
       "doc_type": "procedure"

@@ -76,6 +76,7 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `vocab/` | Controlled vocabularies (YAML) — the **single source of truth** for every enum. `cleanliness.yaml` (overlays → `clean`, `footage_tier`) and `casting.yaml` (the lead cast map + ensemble policy) carry the two decisions above. |
 | `schema/segment.schema.json` | JSON Schema (Draft 2020-12) for one indexed segment/beat. |
 | `schema/video.schema.json` | JSON Schema for a source-video record (video-scoped inherited defaults). |
+| `schema/brief.schema.json` | JSON Schema for the `brief` block in a GitHub issue — the machine-readable half of a request for a video. |
 | `examples/` | Fully-annotated example records that validate against the schemas. |
 | `tools/story.py` | **Outline → ordered cut list.** Text/JSON/EDL/CSV. |
 | `tools/render.py` | **Cut list → rendered video.** ffmpeg cut + concat against local source media. |
@@ -84,8 +85,11 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `tools/ingest.py` | Video-level ingestion: Bungie YouTube title (oEmbed, no API key) → inherited defaults → `video.schema.json` record. |
 | `tools/annotate.py` | Annotator pipeline: shot detection → keyframes → pluggable tagger → schema-valid records. |
 | `tools/derive.py` | Pure derivation of `clean`, `footage_tier`, `traversal_hero` and `casting`. |
+| `tools/brief.py` | **Issue → executable brief.** Parses the fenced `brief` block in an issue body, or proposes one from prose for the owner to confirm. |
+| `tools/gaps.py` | What in the index is unfinished — unindexed videos, unreviewed beats, uncast leads — optionally filed as fingerprinted issues. |
 | `tools/plate.py` | **Cut list → Guardian nameplates.** Plans timed plates from the casting vocab + contributor roster, renders them as transparent PNGs, and burns them into a cut. |
 | `tools/ffmpeg-container-shim.sh` | Host setup, not a pipeline stage: installs a containerized `ffmpeg`/`ffprobe` on `PATH` so the whole machine has H.264. See `docs/rendering.md`. |
+| `scripts/make_video.sh` | The whole loop, issue → rendered cut, resuming at whatever stage is unfinished and stopping at tagging. |
 | `stories/` | Worked outlines. |
 | `videos/` | Ingested video-level records (6 real Bungie videos, metadata-only). |
 | `tags/` | Tagger output per video, keyed by beat index — replayed by `annotate.JsonTagger`. |
@@ -302,9 +306,9 @@ human reads. The second replays the resulting tags into schema-valid segments:
 yt-dlp -S "vcodec:h264,res:1080" -o "media/<video_id>.%(ext)s" <url>
 python3 tools/ingest.py <url> --id <video_id>
 
-# pass 1 — detect + keyframes (also writes keyframes/<dir>/beats.json)
+# pass 1 — detect + keyframes (also writes keyframes/<video_id>/beats.json)
 python3 tools/annotate.py index --video media/<video_id>.mp4 \
-    --video-record videos/<video_id>.json --keyframes-dir keyframes/<dir>
+    --video-record videos/<video_id>.json
 
 # ...tag every keyframe into tags/<video_id>.json...
 
@@ -312,6 +316,18 @@ python3 tools/annotate.py index --video media/<video_id>.mp4 \
 python3 tools/annotate.py index --video media/<video_id>.mp4 \
     --video-record videos/<video_id>.json --tags tags/<video_id>.json
 ```
+
+Stills land in `keyframes/<video_id>/`, derived from the record rather than
+chosen at the command line, so two videos cannot collide on the same `000.jpg`.
+
+Or run the whole loop from the issue that asked for the video:
+
+```bash
+scripts/make_video.sh 3          # resumes at whatever stage is unfinished
+```
+
+It skips any stage whose output already exists and **stops at tagging**, which
+is the stage that needs somebody to look at frames.
 
 Both passes run the **same detector settings**, so beat indices line up; a tag
 file is only ever valid against the shot list its own detection pass produced.
@@ -354,4 +370,37 @@ when the container isn't available). The test suite passes without them.
 
 The suite validates every example against the schema, re-derives every derived
 field and asserts it matches what is stored, and pins the cast list — so a silent
-change would re-credit a real person.
+change would re-credit a real person. It also validates every **committed**
+segment, video and tag file (`tests/test_index_integrity.py`), because the index
+is data and data drifts: a hand-corrected `label_source: "human"` — one word, not
+in the enum — sat in the index until a rebuild died on it.
+
+## Work is filed as issues
+
+The backlog is GitHub issues. An issue carries the owner's prose *and* a fenced
+`brief` block — the same request in YAML, matching `schema/brief.schema.json`,
+using the same character ids as the index:
+
+````markdown
+```brief
+sources:
+  - url: https://www.youtube.com/watch?v=0B9v8VoZrMU
+characters: [saint_14]
+automatable: partly
+blocked_on: the source is not indexed yet
+```
+````
+
+Writing that block is not the owner's job — an agent proposes it and the owner
+confirms it:
+
+```bash
+python3 tools/brief.py normalize 3   # prose -> a proposed block
+python3 tools/brief.py check         # validate every open issue
+python3 tools/gaps.py                # what in the index is unfinished
+```
+
+`automatable` is required, because three classes of work here can never be
+automated: a visual judgement about a frame, a claim about a real person, and a
+licensing decision. An agent that names one and stops has succeeded. See
+`docs/skills/issues.md`.

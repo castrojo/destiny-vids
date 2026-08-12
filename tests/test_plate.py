@@ -956,3 +956,186 @@ def test_the_sign_off_card_plays_even_when_everyone_is_credited():
     assert "body" not in card          # nobody left to list
     assert card["at"] > entries[0]["at"]  # ...and it is the last beat
     plate.load_manifest_entries(entries)
+
+
+# --- plates from a brief (the issue #1 bridge) -------------------------------
+#
+# A brief's plates[] are the owner speaking: copy they authored, at a moment
+# they chose. The fixture below is issue #1's actual copy -- Paris Pittman is
+# not a binding in vocab/casting.yaml, and a brief is the one place such a new
+# claim about a real person may enter.
+
+PARIS = {
+    "label": "TRUSTEE // GUARDIAN", "name": "Paris Pittman",
+    "class": "Harbringer Titan", "title": "Kolossus of Kubernetes",
+    "trustee": True,
+}
+
+
+def _brief(*plates):
+    return {"automatable": "partly", "plates": list(plates)}
+
+
+def test_owner_authored_copy_reaches_a_planned_plate():
+    """Paris Pittman has no binding; the brief's copy is the whole credit."""
+    shots = [_shot("s1", 0, 30, "lead", "osiris")]
+    brief = _brief({"at": "0:14", "copy": dict(PARIS)})
+    entries = plate.plan(shots, LEADS, brief=brief)
+    paris = next(e for e in entries if e["id"] == "paris_pittman")
+    assert paris["label"] == "TRUSTEE // GUARDIAN"
+    assert paris["name"] == "Paris Pittman"
+    assert paris["class"] == "Harbringer Titan"
+    assert paris["title"] == "Kolossus of Kubernetes"
+    assert paris["trustee"] is True
+    plate.load_manifest_entries(entries)
+
+
+def test_a_copy_field_outside_the_closed_set_is_refused():
+    """The deck has no pronoun row; accommodating one would invent copy."""
+    shots = [_shot("s1", 0, 30, "lead", "osiris")]
+    brief = _brief({"at": "0:14",
+                    "copy": {**PARIS, "pronouns": "she/her"}})
+    with pytest.raises(ValueError, match="closed set"):
+        plate.plan(shots, LEADS, brief=brief)
+
+
+def test_the_vocab_wins_a_conflict_and_says_so():
+    """A brief that disagrees with a binding's `plate:` block loses to it.
+
+    The vocab is the project's durable record of claims about real people --
+    changed by reviewed PR -- while a brief is one video's request in an
+    editable issue body. The conflict is reported, never adjudicated silently.
+    """
+    shots = [_shot("s1", 0, 30, "lead", "osiris")]
+    brief = _brief({"character": "osiris", "at": "0:14",
+                    "copy": {**PARIS, "name": "Not Bob Killen"}})
+    lines = []
+    entries = plate.plan(shots, LEADS, brief=brief, log=lines.append)
+    osiris = next(e for e in entries if e["id"] == "osiris")
+    assert osiris["name"] == "Bob Killen"          # the binding's copy
+    assert osiris["copy_source"] == "casting"
+    assert any("vocab" in line and "wins" in line for line in lines)
+
+
+def test_the_owners_at_is_honoured_not_re_derived():
+    """'Drop her nameplate right after she removes her helmet, 0:14.'
+
+    The `at` is SOURCE time; the plate lands at that moment on the cut's
+    clock, exactly -- no LEAD_IN, because the owner pointed at a moment inside
+    the footage, not at a shot head.
+    """
+    shots = [_shot("s1", 10, 40, "lead", "osiris")]  # cut starts at source 10s
+    brief = _brief({"at": "0:14", "copy": dict(PARIS)})
+    entries = plate.plan(shots, LEADS, brief=brief)
+    paris = next(e for e in entries if e["id"] == "paris_pittman")
+    # source 14s is 4s into the shot, which opens the cut -> timeline 4.0
+    assert paris["at"] == pytest.approx(4.0)
+    assert paris["dur"] == pytest.approx(plate.DEFAULT_HOLD)
+
+
+def test_an_owner_moment_that_is_not_in_the_cut_is_reported_not_moved():
+    shots = [_shot("s1", 0, 30, "lead", "osiris")]
+    brief = _brief({"at": "9:59", "copy": dict(PARIS)})
+    lines = []
+    entries = plate.plan(shots, LEADS, brief=brief, log=lines.append)
+    assert not any(e["id"] == "paris_pittman" for e in entries)
+    assert any("not in this cut" in line for line in lines)
+
+
+def test_a_character_plate_whose_moment_is_cut_falls_back_to_the_reveal():
+    """The owner's timing failed, not the credit: with a `character` named,
+    the derived reveal still plates them rather than vanishing."""
+    shots = [_shot("s1", 0, 30, "lead", "osiris")]
+    brief = _brief({"character": "osiris", "at": "9:59"})
+    lines = []
+    entries = plate.plan(shots, LEADS, brief=brief, log=lines.append)
+    osiris = next(e for e in entries if e["id"] == "osiris")
+    assert osiris["at"] == pytest.approx(plate.LEAD_IN)  # the derived reveal
+    assert any("not in this cut" in line for line in lines)
+
+
+def test_a_brief_plate_for_a_binding_without_copy_uses_the_briefs():
+    """zavala's binding has no `plate:` block, so the brief's copy is the one
+    source that may introduce the claim -- marked as the owner's, not the
+    vocab's."""
+    shots = [_shot("s1", 0, 30, "lead", "zavala")]
+    brief = _brief({"character": "zavala",
+                    "copy": {"label": "MAINTAINER // GUARDIAN",
+                             "name": "Jeffrey Sica",
+                             "class": "Stormbreaker Titan",
+                             "title": "Forgemaster of Kubernetes"}})
+    entries = plate.plan(shots, LEADS, brief=brief)
+    zavala = next(e for e in entries if e["id"] == "zavala")
+    assert zavala["name"] == "Jeffrey Sica"
+    assert zavala["copy_source"] == "brief"
+    assert zavala["at"] == pytest.approx(plate.LEAD_IN)  # no at -> the reveal
+
+
+def test_brief_plates_pin_the_timeline_and_reveals_route_around_them():
+    """The owner's fixed window is taken first; the derived reveal waits for
+    the next free opening rather than double-booking the screen."""
+    shots = [_shot("s1", 0, 30, "lead", "osiris")]
+    brief = _brief({"at": "0:01", "copy": dict(PARIS)})  # busy 1.0..6.0
+    entries = plate.plan(shots, LEADS, brief=brief)
+    paris = next(e for e in entries if e["id"] == "paris_pittman")
+    osiris = next(e for e in entries if e["id"] == "osiris")
+    assert paris["at"] == pytest.approx(1.0)
+    assert osiris["at"] >= paris["at"] + paris["dur"]
+    plate.load_manifest_entries(entries)  # raises if any two overlap
+
+
+def test_every_planned_plate_says_where_its_copy_came_from():
+    """Provenance is uniform: a reader never has to know the convention that
+    an unmarked plate is the vocab's."""
+    shots = [
+        _shot("s1", 0, 30, "lead", "osiris"),
+        _shot("s2", 30, 40, "ensemble", None, slots=1),
+    ]
+    brief = _brief({"at": "0:14", "copy": dict(PARIS)})
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief)
+    assert entries
+    for e in entries:
+        assert e["copy_source"] in ("brief", "casting"), e["id"]
+    assert next(e for e in entries
+                if e["id"] == "paris_pittman")["copy_source"] == "brief"
+    assert next(e for e in entries
+                if e["id"] == "osiris")["copy_source"] == "casting"
+
+
+def test_a_plate_asking_for_a_character_who_is_not_in_the_cut_is_reported():
+    shots = [_shot("s1", 0, 30, "lead", "osiris")]
+    brief = _brief({"character": "sagira"})
+    lines = []
+    entries = plate.plan(shots, LEADS, brief=brief, log=lines.append)
+    assert not any(e["id"] == "sagira" for e in entries)
+    assert any("not in this cut" in line for line in lines)
+
+
+def test_the_issue_1_brief_end_to_end_through_the_parser():
+    """The real shape of issue #1's copy, parsed as a brief and planned.
+
+    Written as the confirmed block would read; the parse path (not a hand-
+    built dict) is what proves the bridge meets the brief as filed.
+    """
+    from tools.brief import parse_brief
+
+    brief = parse_brief(
+        "automatable: partly\n"
+        "blocked_on: Paris Pittman and Jeffrey Sica are not cast in "
+        "vocab/casting.yaml yet.\n"
+        "plates:\n"
+        "  - at: '0:14'\n"
+        "    copy:\n"
+        "      label: TRUSTEE // GUARDIAN\n"
+        "      name: Paris Pittman\n"
+        "      class: Harbringer Titan\n"
+        "      title: Kolossus of Kubernetes\n"
+        "      trustee: true\n"
+    )
+    shots = [_shot("s1", 0, 30, "lead", "osiris")]
+    entries = plate.plan(shots, LEADS, brief=brief)
+    paris = next(e for e in entries if e["id"] == "paris_pittman")
+    assert paris["at"] == pytest.approx(14.0)
+    assert paris["name"] == "Paris Pittman"
+    assert paris["title"] == "Kolossus of Kubernetes"
+    assert paris["copy_source"] == "brief"

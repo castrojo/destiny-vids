@@ -619,6 +619,181 @@ MAX_ROSTER_HOLD = 10.0
 # reveal goes back to the first appearance that can hold it.
 MAX_REVEAL_DEFERRAL = 30.0
 
+# The fields schema/brief.schema.json allows in a brief plate's `copy` -- the
+# reference deck's closed on-screen vocabulary, the same set a lead binding's
+# `plate:` block carries. brief.py's schema validation is optional (it no-ops
+# without jsonschema installed), so the planner defends the set itself: a
+# field outside it is an invented row on a card that names a real person, and
+# that is an error, never something to accommodate.
+BRIEF_COPY_FIELDS = {"label", "class", "name", "title", "trustee", "kind",
+                     "variant"}
+
+
+def _tc_seconds(tc):
+    """``mm:ss`` or ``HH:MM:SS`` -> seconds (the shape the brief schema pins)."""
+    parts = [int(p) for p in str(tc).split(":")]
+    if len(parts) == 2:
+        return parts[0] * 60 + parts[1]
+    return parts[0] * 3600 + parts[1] * 60 + parts[2]
+
+
+def _source_moment_on_timeline(timeline, at_sec, video_id=None):
+    """A source-time moment -> (its time on the rendered cut, the shot), or
+    (None, None) when the moment is not in the cut.
+
+    A brief's `at` is in SOURCE time ("drop her nameplate right after she
+    removes her helmet, 0:14"); the plate has to land on the CUT's clock, so
+    the moment is mapped through the shot that carries it. A moment no
+    selected shot covers -- or one the render's hold cap trimmed away --
+    returns None, and the caller reports rather than relocates it: the owner
+    pointed at a moment, and quietly moving their credit to a moment they did
+    not choose is the same failure as inventing the copy.
+    """
+    for start, duration, shot in timeline:
+        if video_id and shot.get("video_id") != video_id:
+            continue
+        s0, s1 = shot.get("start_sec"), shot.get("end_sec")
+        if s0 is None or s1 is None or not (s0 <= at_sec < s1):
+            continue
+        if at_sec - s0 > duration:  # trimmed by the render's max_shot_sec cap
+            continue
+        return round(start + (at_sec - s0), 3), shot
+    return None, None
+
+
+def _plan_brief_plates(brief, timeline, total, hold, leads, busy, log):
+    """A brief's `plates[]` -> fixed manifest entries, before anything derived.
+
+    Returns ``(entries, plated_characters, reveal_copy)``: the fixed plates,
+    the characters they already credit (so the reveal pass does not plate them
+    again), and copy to hand the reveal pass for a character whose binding has
+    no `plate:` block of its own.
+
+    The owner authored these, so they pin the timeline: each entry with an
+    `at` takes its window first and everything derived routes around it. Three
+    rules keep that safe:
+
+    * **Copy is closed.** A field outside BRIEF_COPY_FIELDS is refused.
+    * **The vocab wins a conflict.** When the character's binding in
+      vocab/casting.yaml already has a `plate:` block, that copy is used and
+      the brief's copy is reported as deferred -- the vocab is the project's
+      durable record of claims about real people, changed by reviewed PR,
+      while a brief is one video's request in an editable issue body. Letting
+      a brief override it would let two videos disagree about a person's
+      credit, which is the drift the vocab exists to prevent. A brief that
+      disagrees with the record is a signal the record needs an edit, so the
+      conflict is logged rather than adjudicated silently.
+    * **The owner's `at` is honoured, not re-derived.** The moment is mapped
+      from source time onto the cut; when it is not in the cut (or lands on a
+      shot the character's constraints exclude) that is reported, and a plate
+      naming a character falls back to the derived reveal rather than
+      vanishing.
+
+    Every entry carries `copy_source` -- "brief" or "casting" -- so a reader
+    of the manifest can tell owner-authored copy from the vocab's.
+    """
+    entries, plated, reveal_copy = [], set(), {}
+
+    def note(msg):
+        if log:
+            log(msg)
+
+    requested = {}  # character -> placed fixed?
+    for index, req in enumerate(brief.get("plates") or [], start=1):
+        copy = dict(req.get("copy") or {})
+        extra = sorted(set(copy) - BRIEF_COPY_FIELDS)
+        if extra:
+            raise ValueError(
+                f"brief plate #{index} has copy field(s) outside the "
+                f"reference deck's closed set: {', '.join(extra)}. The deck "
+                "has no row for them, and inventing one puts unauthored text "
+                "on a card that names a real person -- see "
+                "docs/skills/plates.md."
+            )
+        character = req.get("character")
+        if not character and not copy:
+            note(f"  brief plate #{index}: no character and no copy -- "
+                 f"direction, not a plate ({(req.get('note') or '').strip()}); "
+                 "nothing to plan")
+            continue
+
+        binding = (leads.get(character) or {}) if character else {}
+        binding_copy = binding.get("plate")
+        if binding_copy:
+            if copy and copy != binding_copy:
+                note(f"  {character:<10} brief copy differs from the binding's "
+                     "plate: block -- the vocab's copy wins (it is the durable "
+                     "record; edit vocab/casting.yaml if the brief is right)")
+            use, provenance = binding_copy, "casting"
+        else:
+            use, provenance = copy, "brief"
+        if character:
+            requested.setdefault(character, False)
+
+        at_tc = req.get("at")
+        placed = False
+        if at_tc and use:
+            t, shot = _source_moment_on_timeline(timeline, _tc_seconds(at_tc),
+                                                 req.get("video_id"))
+            if (t is not None and character
+                    and (shot.get("casting") or {}).get("character") == character
+                    and not (shot.get("casting") or {}).get("usable", True)):
+                note(f"  {character:<10} the owner's moment {at_tc} lands on a "
+                     "shot the binding's constraints exclude -- not a reveal; "
+                     "falling back to the derived one")
+                t = None
+            if t is None:
+                note(f"  {character or copy.get('name', index):<10} the owner's "
+                     f"moment {at_tc} is not in this cut -- reported, not moved")
+            else:
+                dur = round(min(hold, total - t), 3)
+                if dur < MIN_HOLD:
+                    note(f"  {character or copy.get('name', index):<10} the "
+                         f"owner's moment {at_tc} leaves {dur:.1f}s -- less "
+                         "than a readable hold; honouring it anyway, it is "
+                         "their call")
+                if character:
+                    plate_id = character
+                    if plate_id in plated:
+                        plate_id = f"{character}_2"  # "again here" -- the owner
+                else:                                # may repeat a plate
+                    from tools.derive import snake_case
+                    plate_id = snake_case(copy.get("name") or "") or f"brief_{index}"
+                    while plate_id in plated:
+                        plate_id += "_2"
+                entries.append({"id": plate_id, "at": t, "dur": dur,
+                                "position": "left", "copy_source": provenance,
+                                **use})
+                busy.append((t, t + dur))
+                plated.add(plate_id)
+                if character:
+                    requested[character] = True
+                placed = True
+                if log:
+                    whose = ("owner-authored" if provenance == "brief"
+                             else "the binding's")
+                    log(f"  {plate_id:<10} {t:6.2f}s +{dur:.1f}s  "
+                        f"{use.get('name')} (brief plate, {whose} copy, at "
+                        f"the owner's moment {at_tc})")
+        if placed:
+            continue
+        if character and not binding_copy and copy:
+            reveal_copy[character] = copy  # the reveal pass plates them with it
+
+    # A character the owner asked to plate who never (usably) appears is
+    # reported, never dropped: the brief asked for them by name. A character
+    # whose fixed placement failed above is NOT reported again here -- their
+    # reveal falls back to the derived path, which is about to run.
+    in_cut = {(s.get("casting") or {}).get("character")
+              for _, _, s in timeline
+              if (s.get("casting") or {}).get("role") == "lead"
+              and (s.get("casting") or {}).get("usable", True)}
+    for character, was_placed in requested.items():
+        if not was_placed and character not in in_cut:
+            note(f"  {character:<10} the brief asks to plate them, but they "
+                 "are not in this cut -- reported, not dropped")
+    return entries, plated, reveal_copy
+
 
 def cut_timeline(shots, max_shot_sec=None):
     """Cut list -> [(start_on_timeline, duration, shot)] on the rendered cut.
@@ -694,10 +869,10 @@ def _ensemble_entry(item, at, dur, copy):
     authored = load_ensemble_titles().get(item["login"])
     if authored:
         return {"id": f"ensemble_{item['login']}", "at": at, "dur": dur,
-                "position": "right", **authored}
+                "position": "right", "copy_source": "casting", **authored}
     entry = {
         "id": f"ensemble_{item['login']}", "at": at, "dur": dur,
-        "position": "right",
+        "position": "right", "copy_source": "casting",
         "label": ensemble_label(copy, item.get("org_member")),
         "name": item["display_name"],
     }
@@ -789,7 +964,7 @@ def _ensemble_group_rows(items, start, duration, hold, total, busy, copy):
 
 
 def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
-         busy=None, only="all", soft_busy=None):
+         busy=None, only="all", soft_busy=None, brief=None):
     """Cut list -> plate manifest.
 
     Leads are plated on their first appearance long enough to read, using the
@@ -797,6 +972,21 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     the deterministic assignment in tools/ensemble.py; anyone whose assigned
     shot is too short to hold a plate is credited over the final shot instead,
     so the month's contributors are never silently dropped.
+
+    ``brief`` is a parsed brief (tools/brief.py) whose ``plates[]`` are
+    planned FIRST, as fixed owner-authored credits -- see
+    ``_plan_brief_plates`` for the precedence and timing rules. They are part
+    of THIS pass, not a post-hoc `merge` step, for two reasons: a brief's
+    `at` is in source time and only the shot list here can map it onto the
+    cut's clock, and a brief plate that names a character IS that character's
+    one plate -- planned anywhere else it would double-plate the reveal or die
+    on merge's overlap check. Brief plates are lead-tier: with
+    ``only="ensemble"`` they are expected to arrive via ``busy`` (the
+    ``--around`` manifest), the same way dialogue does.
+
+    Every entry carries ``copy_source`` -- "brief" for owner-authored copy,
+    "casting" for vocab/casting.yaml -- so the manifest says where each claim
+    about a real person came from.
 
     ``busy`` seeds the occupied windows with something already fixed on the
     timeline. ``soft_busy`` is a *preference*: windows a plate should avoid if
@@ -819,6 +1009,15 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     entries, plated = [], set()
     busy = list(busy or [])  # occupied windows, so nothing double-books the screen
     soft_busy = list(soft_busy or [])
+
+    # The brief's owner-authored plates take their windows first; everything
+    # derived routes around them.
+    brief_reveal_copy = {}
+    if brief and only != "ensemble":
+        brief_entries, brief_plated, brief_reveal_copy = _plan_brief_plates(
+            brief, timeline, total, hold, leads, busy, log)
+        entries.extend(brief_entries)
+        plated |= brief_plated
 
     def free(start, duration):
         end = start + duration
@@ -855,6 +1054,10 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 if start - debut.get(character, start) > MAX_REVEAL_DEFERRAL:
                     continue
             copy = (leads.get(character) or {}).get("plate")
+            provenance = "casting"
+            if not copy:
+                copy = brief_reveal_copy.get(character)
+                provenance = "brief" if copy else provenance
             if not copy:
                 continue
             # Walk forward through the shot: if dialogue (or an earlier plate)
@@ -865,7 +1068,8 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 continue
             at, dur = window
             entries.append({"id": character, "at": at, "dur": dur,
-                            "position": "left", **copy})
+                            "position": "left", "copy_source": provenance,
+                            **copy})
             busy.append((at, at + dur))
             plated.add(character)
             if log:
@@ -1031,6 +1235,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             card = {
                 "id": "ensemble_roster", "at": round(cursor, 3),
                 "dur": round(remaining, 3), "position": "right", "kind": "title",
+                "copy_source": "casting",
                 "title": ensemble_copy["roster_title"],
                 "subtitle": f"Project Bluefin contributors, {result['month']}",
             }
@@ -1182,6 +1387,11 @@ def main(argv=None):
     p.add_argument("--only", choices=("all", "leads", "ensemble"), default="all",
                    help="plan one tier at a time, so a scored cut can be planned "
                         "in priority order: leads, then dialogue, then ensemble")
+    p.add_argument("--brief", default=None,
+                   help="issue number or brief YAML file: the brief's plates[] "
+                        "are planned first as fixed, owner-timed credits (see "
+                        "docs/skills/plates.md). Lead-tier: with --only ensemble "
+                        "they are expected via --around, like dialogue")
     p.add_argument("--out", required=True)
 
     m = sub.add_parser("merge", help="combine planned manifests into one, validated")
@@ -1218,9 +1428,24 @@ def main(argv=None):
         if args.prefer_clear_of:
             soft = [(float(e["at"]), float(e["at"]) + float(e["dur"]))
                     for e in load_manifest(args.prefer_clear_of)]
+        brief = None
+        if args.brief:
+            from tools.brief import (BriefError, fetch_issue, has_block,
+                                     parse_brief, parse_issue_body)
+            try:
+                if args.brief.isdigit():
+                    brief = parse_issue_body(
+                        fetch_issue(int(args.brief)).get("body"))
+                else:
+                    text = Path(args.brief).read_text(encoding="utf-8")
+                    brief = (parse_issue_body(text) if has_block(text)
+                             else parse_brief(text))
+            except BriefError as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 2
         entries = plan(load_shots(args.shotlist), load_leads(), roster,
                        max_shot_sec=args.max_shot_sec, hold=args.hold, log=print,
-                       busy=busy, only=args.only, soft_busy=soft)
+                       busy=busy, only=args.only, soft_busy=soft, brief=brief)
         load_manifest_entries(entries)  # same validation the burn path applies
         with Path(args.out).open("w", encoding="utf-8") as fh:
             json.dump(entries, fh, indent=2)
