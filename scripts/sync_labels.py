@@ -1,11 +1,28 @@
 #!/usr/bin/env python3
-"""Sync the four labels the issue pipeline runs on.
+"""Sync the labels the issue pipeline runs on.
 
 Work in this repo moves on GitHub issues, and an agent picking one up reads
 its state from the label alone, so the set is deliberately tiny. Characters
 are NOT labels and never will be: casting lives in the `brief` block in the
 issue body, keyed by the leads in vocab/casting.yaml — a character/* label
 would be a second, diverging source of truth about a real person.
+
+Beyond the four state labels there are three triage axes, and each earns its
+place by answering a question the state labels cannot:
+
+  area/*      which stage of the pipeline the work lands in, so an agent can
+              pick up the work it is equipped for. These mirror the skills in
+              docs/skills/, not an invented taxonomy.
+  size/*      the cost of the work, so a backlog can be read at a glance
+              instead of re-estimated by every reader. Thresholds are in the
+              descriptions and are agent-hours, not calendar time.
+  priority/*  the running order. Ordering lives on the issue rather than in a
+              planning file, for the same reason the backlog does: a file
+              goes stale and misleads the next agent.
+
+An area is a routing hint, never a claim about a person or a frame, so
+mislabelling one costs a re-read and nothing worse. That is the test a new
+axis has to pass before it is added here.
 
 Three classes of work here are permanently not automatable (visual judgement
 on a frame, a claim about a real person, a licensing decision), so
@@ -53,6 +70,77 @@ LABELS = [
         "description": "Needs human judgement; will never be automated. "
                        "Stopping here is a first-class outcome.",
     },
+
+    # --- area: which stage of the pipeline, mirroring docs/skills/ ---------
+    {
+        "name": "area/indexing",
+        "color": "1d76db",
+        "description": "Ingest, shot detection, keyframes, tagging.",
+    },
+    {
+        "name": "area/cut",
+        "color": "1d76db",
+        "description": "Producing one video: outline, cut list, render.",
+    },
+    {
+        "name": "area/casting",
+        "color": "1d76db",
+        "description": "Lead bindings and the ensemble in vocab/casting.yaml.",
+    },
+    {
+        "name": "area/plates",
+        "color": "1d76db",
+        "description": "On-screen copy: nameplates, title cards, chat cards.",
+    },
+    {
+        "name": "area/rights",
+        "color": "1d76db",
+        "description": "Licensing, attribution, and what may be published.",
+    },
+    {
+        "name": "area/tooling",
+        "color": "1d76db",
+        "description": "The pipeline itself: tools, schema, vocab, docs.",
+    },
+
+    # --- size: agent-hours, so a backlog reads without re-estimating ------
+    {
+        "name": "size/S",
+        "color": "c2e0c6",
+        "description": "Under 2 agent-hours.",
+    },
+    {
+        "name": "size/M",
+        "color": "c2e0c6",
+        "description": "2 to 8 agent-hours.",
+    },
+    {
+        "name": "size/L",
+        "color": "c2e0c6",
+        "description": "8 to 24 agent-hours.",
+    },
+    {
+        "name": "size/XL",
+        "color": "c2e0c6",
+        "description": "Over 24 agent-hours; split it before starting.",
+    },
+
+    # --- priority: the running order, kept on the issue not in a file -----
+    {
+        "name": "priority/now",
+        "color": "d93f0b",
+        "description": "Work the top of the queue. Start here.",
+    },
+    {
+        "name": "priority/next",
+        "color": "e99695",
+        "description": "Queued behind the current work.",
+    },
+    {
+        "name": "priority/later",
+        "color": "f9d0c4",
+        "description": "Real work, not yet scheduled.",
+    },
 ]
 
 
@@ -88,7 +176,7 @@ def repo_labels():
 def drift(desired, actual):
     """Owned-label drift: labels that are missing, or whose color or
     description differs. Labels this script does not own are ignored — it
-    manages four, not the whole namespace.
+    manages its own set, not the whole namespace.
 
     gh reports colors without '#', and case varies between the API and this
     file, so colors compare case-insensitively.
@@ -114,7 +202,7 @@ def drift(desired, actual):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(
-        description="Sync the repo's four owned labels.")
+        description="Sync the repo's owned labels.")
     group = ap.add_mutually_exclusive_group(required=True)
     group.add_argument("--check", action="store_true",
                        help="report drift against the live repo (exit 1 on "

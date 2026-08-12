@@ -20,9 +20,24 @@ def _json_of(labels):
     return json.dumps(labels)
 
 
-def test_the_owned_set_is_exactly_these_four_labels():
+def test_the_owned_set_is_the_four_states_plus_the_triage_axes():
     assert [label["name"] for label in sync_labels.LABELS] == [
-        "triage", "agent-ready", "blocked", "automatable/no"]
+        "triage", "agent-ready", "blocked", "automatable/no",
+        "area/indexing", "area/cut", "area/casting", "area/plates",
+        "area/rights", "area/tooling",
+        "size/S", "size/M", "size/L", "size/XL",
+        "priority/now", "priority/next", "priority/later"]
+
+
+def test_every_area_names_a_pipeline_stage_not_a_person():
+    """An area is a routing hint. A label that named a person or a character
+    would be a second source of truth about a real person, which the brief
+    block and vocab/casting.yaml already own."""
+    areas = [label["name"].split("/", 1)[1]
+             for label in sync_labels.LABELS
+             if label["name"].startswith("area/")]
+    assert areas == ["indexing", "cut", "casting", "plates", "rights",
+                     "tooling"]
 
 
 def test_every_label_has_a_hex_color_and_a_description():

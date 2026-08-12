@@ -93,7 +93,7 @@ somebody meant, and it is not executable until they say it is right.
 
 ## Labels
 
-Four, and they are deliberately few:
+Four say what **state** the work is in, and they are deliberately few:
 
 | Label | Meaning |
 |---|---|
@@ -101,6 +101,19 @@ Four, and they are deliberately few:
 | `agent-ready` | Enough detail that an agent can start. |
 | `blocked` | Waiting on an owner decision. |
 | `automatable/no` | Needs human judgement, permanently. |
+
+Three more axes say how the backlog is **read**, and exist so ordering lives on
+the issue rather than in a planning file that goes stale:
+
+| Axis | Values | What it answers |
+|---|---|---|
+| `area/*` | `indexing`, `cut`, `casting`, `plates`, `rights`, `tooling` | Which stage of the pipeline — so an agent picks up work it is equipped for. Mirrors the skills in this directory. |
+| `size/*` | `S` (<2h), `M` (2–8h), `L` (8–24h), `XL` (>24h) | Agent-hours, so nobody re-estimates a backlog they are only scanning. An `XL` wants splitting before it is started. |
+| `priority/*` | `now`, `next`, `later` | The running order. |
+
+An area or a size is a routing hint, so getting one wrong costs a re-read.
+That is the bar a new axis has to clear before it is added — a label that
+made a claim about a person or a frame would not clear it.
 
 `python3 scripts/sync_labels.py --check` reports drift; `--write` fixes it.
 
