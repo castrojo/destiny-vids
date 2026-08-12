@@ -57,14 +57,15 @@ def test_render_all_skips_cards_instead_of_drawing_them(tmp_path):
 
 def test_the_act_slides_are_numbered_in_the_owners_canonical_order():
     """intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat ->
-    7daystothewolves -> europa -> end credits, numbered I..VIII."""
+    osiris -> 7daystothewolves -> europa -> end credits, numbered I..IX."""
     cards = _load("megacut-cards.json")
     numerals = [p["act"] for p in cards["plates"]]
-    assert numerals == ["I", "III", "IV", "V", "VI", "VII"]
-    # II and VIII are absent because they are not built; they must stay
+    assert numerals == ["I", "IV", "V", "VI", "VII", "VIII"]
+    # II, III and IX are absent because they have no film; they must stay
     # recorded, or the numbering silently closes up over them.
     unresolved = " ".join(u["what"] for u in cards["unresolved"])
-    assert "act II" in unresolved and "act VIII" in unresolved
+    for missing in ("act II", "act III", "act IX"):
+        assert missing in unresolved, missing
 
 
 def test_act_slides_run_in_time_order_and_carry_a_chapters_field():

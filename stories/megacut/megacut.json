@@ -1,20 +1,20 @@
 {
-  "_what": "Seven Days to the Wolves — the whole programme, assembled from its acts. The running order is the owner's canonical one, given verbatim this session: intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat -> 7daystothewolves -> europa -> end credits. Each act is announced by its own slide, carrying a huge Roman numeral (stories/megacut/megacut-cards.json).",
+  "_what": "Seven Days to the Wolves — the whole programme, assembled from its acts. The running order is the owner's canonical one: intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat -> 7daystothewolves -> europa -> end credits, amended by 'add osiris before europa and after nat'. Each act is announced by its own slide, carrying a huge Roman numeral (stories/megacut/megacut-cards.json).",
   "_acts": {
     "I": "intro — the Destiny hero video (Into the Light), six Guardians plated, with the comic title card and the Amber Graner quote covering source 24.5 - 38.",
-    "II": "endlessdaysmostbeautiful — NOT BUILT. Owner: 'it's endless forms most beautiful, instrumental'. No footage, no outline, no card: an act that does not play gets no slide.",
-    "III": "mrbobbytables — the August 2026 contributors piece, Curse of Osiris. See `_act_iii` below: which file plays this act is an OWNER decision, not something assembly settles.",
+    "II": "endlessdaysmostbeautiful — NOT BUILT. Owner: 'it's endless forms most beautiful, instrumental'. No footage, no outline, no card: an act that does not play gets no slide. Issue #74.",
+    "III": "mrbobbytables — NO FILM. The Curse of Osiris contributors piece used to stand in here; the owner has given that film its own act (VI) and said of this one 'I will deal with it later'. Issue #25.",
     "IV": "kat — Kat Cosgrove's Guardian intro, behind the owner-authored BIAS FOR ACTION slide.",
-    "V": "nat — Natali Vlatko's Guardian arrival.",
-    "VI": "7daystothewolves — the musical. STAGED, not approved: `07-` is a timing pass and its provenance is unresolved (issue #55).",
-    "VII": "europa — the Europa director's cut.",
-    "VIII": "end credits — NOT DESIGNED. Issue #51."
+    "V": "nat — Natali Vlatko's Guardian arrival, behind the same authorisation slide retitled WRONG PLACE, WRONG TIME, RIGHT ATTITUDE.",
+    "VI": "osiris — the mrbobbytables film: the August 2026 contributors piece cut from the Curse of Osiris opening cinematic. The owner calls it PARTIALLY COMPLETE, so it is placed as-is and will be replaced by its finished version.",
+    "VII": "7daystothewolves — the musical. STAGED, not approved: `07-` is a timing pass and its provenance is unresolved (issue #55).",
+    "VIII": "europa — the Europa director's cut.",
+    "IX": "end credits — NOT DESIGNED. Issue #51."
   },
-  "_act_iii": "The owner's order names act III `mrbobbytables`. There is no hero video for that account: the closest thing this repo has delivered is the August 2026 contributors piece, cut from the Curse of Osiris opening cinematic, where Osiris is the character bound to mrbobbytables. It is used, and it is FLAGGED — the piece credits a month of contributors, not one person, so whether it is really act III is the owner's call. See docs/cuts/08-directors-cut-megacut.md.",
   "_audio": "Every segment carries its own 48 kHz 5.1 audio, unprocessed. The hero segment carries Bungie's own score, sourced from BKm0TPqeOjY's best audio rung (format 251, Opus 127k at native 48 kHz -- NOT the `-drc` rung, which applies dynamic range compression the audio tenet forbids), trimmed to the same 2.0 -> 113.55 window as the picture, placed bit-exact in FL/FR with `pan` (never `-ac`), and padded with `apad` so the PICTURE decides the segment length. Only the six act slides are silent; a bed under them is a licensing decision.",
   "_sources": {
     "hero": "renders/megacut-01-hero.mkv — YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), Bungie's score, six Guardian plates and the comic title card burned. usage_class: third_party_copyrighted.",
-    "mrbobbytables": "~/Videos/UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4 — owner-approved deliverable, reused as-is.",
+    "osiris": "~/Videos/UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4 — the mrbobbytables film, PARTIALLY COMPLETE by the owner's own description. Placed as-is; finishing it is upstream work, and assembly never re-cuts what it is handed.",
     "kat": "~/Videos/UPLOAD/01-wolves-kat-cosgrove-sentinel-titan.mp4 — owner-approved deliverable, reused as-is. NOTE: the owner's dialogue change of this session (Kat/Ian split, and 'Remember kids, cardio!') is staged in ~/Videos/wolves-kat/ and NOT yet rendered, so this file is still the old dialogue. Rebuild it there before assembling.",
     "natali": "~/Videos/UPLOAD/02-wolves-natali-vlatko-behemoth-titan.mp4 — owner-approved deliverable, reused as-is.",
     "sevendays": "~/Videos/UPLOAD/07-seven-days-to-the-wolves.mp4 — the musical, staged for review and explicitly NOT owner-approved (a timing pass with four black COMIC PLACEHOLDER cards). Its provenance is unresolved: three of five sections use a fan compilation, issue #55. Staging is not publishing; this programme stays in renders/.",
@@ -44,18 +44,6 @@
     },
     {
       "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act3.png",
-      "dur": 5.0,
-      "label": "III — Bob Killen / Voidwalker Warlock"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4",
-      "audio": "source",
-      "label": "Act III — mrbobbytables: August 2026 contributors, Curse of Osiris"
-    },
-    {
-      "kind": "card",
       "image": "renders/plates-megacut-cards/plate_act4.png",
       "dur": 15.0,
       "label": "IV — BIAS FOR ACTION (held long, by owner request)"
@@ -82,25 +70,37 @@
       "kind": "card",
       "image": "renders/plates-megacut-cards/plate_act6.png",
       "dur": 5.0,
-      "label": "VI — 7 Days to the Wolves / Nightwish"
+      "label": "VI — Osiris"
     },
     {
       "kind": "clip",
-      "path": "/var/home/jorge/Videos/UPLOAD/07-seven-days-to-the-wolves.mp4",
+      "path": "/var/home/jorge/Videos/UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4",
       "audio": "source",
-      "label": "Act VI — Seven Days to the Wolves: the musical (TIMING PASS, provenance open)"
+      "label": "Act VI — Osiris: the mrbobbytables film, August 2026 contributors (partially complete)"
     },
     {
       "kind": "card",
       "image": "renders/plates-megacut-cards/plate_act7.png",
       "dur": 5.0,
-      "label": "VII — Europa / Director's Cut"
+      "label": "VII — 7 Days to the Wolves / Nightwish"
+    },
+    {
+      "kind": "clip",
+      "path": "/var/home/jorge/Videos/UPLOAD/07-seven-days-to-the-wolves.mp4",
+      "audio": "source",
+      "label": "Act VII — Seven Days to the Wolves: the musical (TIMING PASS, provenance open)"
+    },
+    {
+      "kind": "card",
+      "image": "renders/plates-megacut-cards/plate_act8.png",
+      "dur": 5.0,
+      "label": "VIII — Europa / Director's Cut"
     },
     {
       "kind": "clip",
       "path": "/var/home/jorge/Videos/UPLOAD/zz-wolves-europa-directors-cut.mp4",
       "audio": "source",
-      "label": "Act VII — Europa Director's Cut"
+      "label": "Act VIII — Europa Director's Cut"
     }
   ]
 }

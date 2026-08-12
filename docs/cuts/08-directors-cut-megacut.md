@@ -16,8 +16,12 @@ Given by the owner, verbatim:
 > intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat ->
 > 7daystothewolves -> europa -> end credits
 
-Those are the **acts of the whole musical**, numbered I–VIII in that order, and
-each act slide carries its numeral, huge. Every act is to carry **chapters**;
+then amended:
+
+> add osiris before europa and after nat
+
+Osiris sits **between nat and the musical**, so the acts of the whole musical
+are **I–IX**, and each act slide carries its numeral, huge. Every act is to carry **chapters**;
 none have been authored yet, so every `chapters` list is empty and the field
 renders nothing.
 
@@ -25,27 +29,34 @@ renders nothing.
 |---|---|---|---|---|
 | — | 0.000 | 5.000 | Slide **I** — `PROJECT BLUEFIN` / *seven days to the wolves* | rendered |
 | **I** | 5.000 | 116.567 | **Into the Light** — six Guardians plated, the comic card, Bungie's score | `BKm0TPqeOjY` |
-| **II** | — | — | **Endless Forms Most Beautiful (instrumental)** — **NOT BUILT** | — |
-| — | 116.567 | 121.567 | Slide **III** — `Bob Killen` / *Voidwalker Warlock* | rendered |
-| **III** | 121.567 | 281.767 | **mrbobbytables** — August 2026 contributors, Curse of Osiris | `UPLOAD/04-…` |
-| — | 281.767 | 296.767 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
-| **IV** | 296.767 | 330.767 | **Kat Cosgrove** — Guardian intro | `UPLOAD/01-…` |
-| — | 330.767 | 345.767 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
-| **V** | 345.767 | 371.026 | **Natali Vlatko** — Guardian arrival | `UPLOAD/02-…` |
-| — | 371.026 | 376.026 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
-| **VI** | 376.026 | 803.726 | **Seven Days to the Wolves** — the musical (timing pass) | `UPLOAD/07-…` |
-| — | 803.726 | 808.726 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
-| **VII** | 808.726 | 918.926 | **Europa Director's Cut** | `UPLOAD/zz-…` |
-| **VIII** | — | — | **End credits** — **NOT DESIGNED** (#51) | — |
+| **II** | — | — | **Endless Forms Most Beautiful (instrumental)** — **NOT BUILT** (#74) | — |
+| **III** | — | — | **mrbobbytables** — **NO FILM**, owner will deal with it later (#25) | — |
+| — | 116.567 | 131.567 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
+| **IV** | 131.567 | 165.567 | **Kat Cosgrove** — Guardian intro | `UPLOAD/01-…` |
+| — | 165.567 | 180.567 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
+| **V** | 180.567 | 205.826 | **Natali Vlatko** — Guardian arrival | `UPLOAD/02-…` |
+| — | 205.826 | 210.826 | Slide **VI** — `Osiris` | rendered |
+| **VI** | 210.826 | 371.026 | **Osiris** — the mrbobbytables film, August 2026 contributors | `UPLOAD/04-…` |
+| — | 371.026 | 376.026 | Slide **VII** — `7 Days to the Wolves` / *Nightwish* | rendered |
+| **VII** | 376.026 | 803.726 | **Seven Days to the Wolves** — the musical (timing pass) | `UPLOAD/07-…` |
+| — | 803.726 | 808.726 | Slide **VIII** — `Europa` / *Director's Cut* | rendered |
+| **VIII** | 808.726 | 918.926 | **Europa Director's Cut** | `UPLOAD/zz-…` |
+| **IX** | — | — | **End credits** — **NOT DESIGNED** (#51) | — |
 
-**918.926s — 15:19.** The five delivered cuts are owner-approved deliverables
-**reused as-is**; this repo cannot rebuild them (they are `~/Videos` projects
-with their own `render/run-*.sh`). Assembly re-encodes them once and edits
-nothing.
+**918.926s — 15:19.** The five delivered cuts are reused **as-is**: four are
+owner-approved, and act VI is the partially complete one. This repo cannot
+rebuild any of them — they are `~/Videos` projects with their own
+`render/run-*.sh`. Assembly re-encodes them once and edits nothing.
 
-**Acts II and VIII have no card.** A slide announcing an act that does not play
-is worse than a recorded gap, so they keep their numerals in the manifest's
+**Acts II, III and IX have no card.** A slide announcing an act that does not
+play is worse than a recorded gap, so they keep their numerals in the manifest's
 `unresolved` list and nothing else. The numbering does not close up over them.
+
+**Act III changed hands.** The Curse of Osiris contributors piece used to stand
+in for `mrbobbytables`; the owner has given that film its own act — *"add osiris
+before europa and after nat"*, *"the mrbobbytables one, it is partially
+complete"* — and said of act III itself, *"I will deal with it later."* So it is
+an empty slot with a numeral, not a slide.
 
 ## The act slide is the cinematic's own card
 
@@ -161,12 +172,14 @@ plaquards" — which also drops the `#nova4ever` glitch bursts and the closing
   authored identity. Both open.
 - **Act II has no film and no named track.** "It's endless forms most
   beautiful, instrumental" names the *record*, not which instrumental.
-- **Act VIII has no design** — #51.
-- **Act III's file is a stand-in.** The owner's order says `mrbobbytables`;
-  what exists is the August 2026 contributors piece, cut from the Curse of
-  Osiris cinematic where Osiris is the character bound to that account. It
-  credits a month of contributors, not one person. Owner's call.
-- **Act VI is a timing pass, not an approved cut**, and its provenance is
+- **Act IX has no design** — #51.
+- **Act III is empty and the owner owns it** — *"I will deal with it later."*
+  His hero video is #25; the cast-wide footage shortfall is #50.
+- **Act VI is partially complete, by the owner's own description**, and it is
+  placed as-is: assembly joins finished things and never re-cuts one. Finishing
+  it happens upstream. The film also has no authored title (#41), which is why
+  its slide says only `Osiris`.
+- **Act VII is a timing pass, not an approved cut**, and its provenance is
   open (#55). Staging is not publishing; this programme stays in `renders/`.
 - **Kat's cut is about to change under this plan.** The dialogue split and
   "Remember kids, cardio!" are staged in `~/Videos/wolves-kat/` and not
