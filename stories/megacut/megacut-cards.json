@@ -1,9 +1,9 @@
 {
   "_what": "The act slides for Seven Days to the Wolves. One card per act of the programme, in the owner's canonical order, each carrying its Roman numeral. `kind: \"act\"` is the cinematic handoff slide from the website (CinematicTransition.vue), rendered full-frame by tools/fullframe.py.",
-  "_order": "The canonical order is the owner's, given verbatim this session: intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat -> 7daystothewolves -> europa -> end credits. Numbered I..VIII in that order, and the numbering is the point: 'add these as the canonical acts of the entire musical - Give them Huge Roman numbers in the intro slides, each will have chapters.'",
+  "_order": "The canonical order is the owner's. Given first as 'intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat -> 7daystothewolves -> europa -> end credits', then amended: 'add osiris before europa and after nat', placed between nat and the musical. So the acts are I intro, II endlessdaysmostbeautiful, III mrbobbytables, IV kat, V nat, VI osiris, VII 7daystothewolves, VIII europa, IX end credits. The numbering is the point: 'add these as the canonical acts of the entire musical - Give them Huge Roman numbers in the intro slides, each will have chapters.'",
   "_copy": "Chapter card copy is REPRODUCED, never authored. Where an act has no authored title, the row is omitted rather than filled -- see `unresolved`. The only strings the owner wrote for this pass are act II's title and the whole of act IV's terminal block, both quoted back verbatim.",
   "_chapters": "Every act is to carry chapters. None have been authored yet, so every `chapters` list is empty: the field renders nothing until somebody writes the words. An empty list is the recorded gap, not a placeholder to fill in.",
-  "_gaps": "Acts II and VIII have NO FOOTAGE and therefore no card in the built programme: a slide announcing an act that does not play is worse than a recorded gap. They keep their numerals in `unresolved` so the numbering cannot drift when they are built.",
+  "_gaps": "Acts II, III and IX have no film in this programme and therefore no card: a slide announcing an act that does not play is worse than a recorded gap. They keep their numerals in `unresolved` so the numbering cannot drift when they are built. III is the one that CHANGED: the Curse of Osiris contributors piece used to stand in for it, and the owner has now given that film its own act (VI), saying of act III 'I will deal with it later'.",
   "_audio": "Every card is silent. Putting a bed under one is a licensing decision, the owner's alone.",
   "plates": [
     {
@@ -19,21 +19,9 @@
       "note": "Copy is the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94). This card was `card0` before the acts were numbered."
     },
     {
-      "id": "act3",
-      "kind": "act",
-      "at": 116.567,
-      "dur": 5.0,
-      "act": "III",
-      "label": "Act III",
-      "title": "Bob Killen",
-      "subtitle": "Voidwalker Warlock",
-      "chapters": [],
-      "note": "The owner's order names this act `mrbobbytables`. The authored Guardian identity for that account is Bob Killen / Voidwalker Warlock / 'Reconciler of the Plane' (characters.json, slug `bob`; ~/Videos/nameplates.json np_bob), reproduced here. WHICH FILE plays under it is recorded in megacut.json and is not settled by this card."
-    },
-    {
       "id": "act4",
       "kind": "act",
-      "at": 281.767,
+      "at": 116.567,
       "dur": 15.0,
       "act": "IV",
       "title": "Bias for Action",
@@ -50,7 +38,7 @@
     {
       "id": "act5",
       "kind": "act",
-      "at": 330.767,
+      "at": 165.567,
       "dur": 15.0,
       "act": "V",
       "title": "Wrong Place, Wrong Time, Right Attitude",
@@ -67,22 +55,33 @@
     {
       "id": "act6",
       "kind": "act",
-      "at": 371.026,
+      "at": 205.826,
       "dur": 5.0,
       "act": "VI",
       "label": "Act VI",
+      "title": "Osiris",
+      "chapters": [],
+      "note": "The owner placed this act by name -- 'add osiris before europa and after nat' -- and named its film: the mrbobbytables one, ~/Videos/UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4, which they describe as PARTIALLY COMPLETE. The card carries the act's name and nothing else: the film itself has no authored title (issue #41), and Bob Killen's Guardian identity belongs to his plate inside the cut, not to an act slide. A subtitle would have to be written, so there is none."
+    },
+    {
+      "id": "act7",
+      "kind": "act",
+      "at": 371.026,
+      "dur": 5.0,
+      "act": "VII",
+      "label": "Act VII",
       "title": "7 Days to the Wolves",
       "subtitle": "Nightwish",
       "chapters": [],
       "note": "Title and artist reproduced from the cinematic's own segment record, ~/src/website/src/config/wolves-cinematic.ts (id `seven-days-to-the-wolves`) -- the same two rows the transition slide this card is ported from renders."
     },
     {
-      "id": "act7",
+      "id": "act8",
       "kind": "act",
       "at": 803.726,
       "dur": 5.0,
-      "act": "VII",
-      "label": "Act VII",
+      "act": "VIII",
+      "label": "Act VIII",
       "title": "Europa",
       "subtitle": "Director's Cut",
       "chapters": [],
@@ -97,7 +96,7 @@
       "blocked_on": "the act being built, and the track being named -- a music choice is a licensing decision."
     },
     {
-      "what": "act VIII -- end credits",
+      "what": "act IX -- end credits",
       "detail": "Last in the canonical order. The credits sequence for Seven Days to the Wolves has never been designed, which is issue #51. Nothing here designs it.",
       "automatable": "no",
       "blocked_on": "issue #51."
@@ -109,17 +108,23 @@
       "blocked_on": "the owner authoring chapter names."
     },
     {
-      "what": "act titles for acts III and V",
-      "detail": "Acts III and V are named after people, so their cards carry the Guardian identity authored for that person rather than an act title nobody has written. If the acts get titles, the cards take them.",
+      "what": "an act title for act VI",
+      "detail": "Act VI is named after its character, so its card carries 'Osiris' and no subtitle. The film under it -- the August 2026 contributors piece -- has no authored title either, which is issue #41. If either gets written, the card takes it.",
       "automatable": "no",
-      "blocked_on": "the owner authoring act titles."
+      "blocked_on": "the owner authoring an act title, or issue #41."
     },
     {
       "what": "act V's hold",
       "detail": "The owner asked for act V to carry act IV's terminal block and a new title, and said nothing about its length. It is held 15s like act IV, because the copy is identical and five lines plus a nine-word title do not read in five seconds. That is an inference about pacing, not an instruction -- recorded so it can be cut back without archaeology.",
       "automatable": "no",
       "blocked_on": "the owner's eye on the assembled programme."
+    },
+    {
+      "what": "act III -- mrbobbytables",
+      "detail": "It had no hero video of its own, and the Curse of Osiris contributors piece was standing in for it. That film is now act VI by owner instruction, so act III has nothing to play and gets no card. The owner's words: 'I will deal with it later.' His hero video is issue #25; the footage shortfall across the cast is #50.",
+      "automatable": "no",
+      "blocked_on": "the owner deciding what act III is."
     }
   ],
-  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | hero 5.000-116.567 | act3 116.567-121.567 | mrbobbytables 121.567-281.767 | act4 281.767-296.767 | kat 296.767-330.767 | act5 330.767-345.767 | natali 345.767-371.026 | act6 371.026-376.026 | seven days 376.026-803.726 | act7 803.726-808.726 | europa 808.726-918.926. Total 918.926s (15:19)."
+  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | hero 5.000-116.567 | act4 116.567-131.567 | kat 131.567-165.567 | act5 165.567-180.567 | natali 180.567-205.826 | act6 205.826-210.826 | osiris 210.826-371.026 | act7 371.026-376.026 | seven days 376.026-803.726 | act8 803.726-808.726 | europa 808.726-918.926. Total 918.926s (15:19)."
 }
