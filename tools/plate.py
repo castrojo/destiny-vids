@@ -21,6 +21,10 @@ improvised text:
 
 The four text fields plus ``trustee`` are exactly the vocabulary of the
 reference deck (``~/Videos/nameplates.json``); nothing is invented on top of it.
+The owner-authored chrome rides as flags, never copy: ``variant`` (``leader``
+gold, ``rust`` iron, ``bazzite`` purple), ``avatar`` (a PFP composited into
+the crest, degrading to the drawn crest when the file is not there), and
+``wreath`` (the struck laurel around it). See docs/skills/plates.md.
 
 ``kind: "ghost"`` drops the class line (a Ghost is not a Guardian, so a subclass
 would be nonsense on it) and shrinks the plate. ``kind: "title"`` is the deck's
@@ -122,7 +126,28 @@ VARIANTS = {
         "title": (168, 121, 92, 255),     # #a8795c, weathered iron
         "glow": (194, 91, 32, 140),
     },
+    # Bazzite purple, for the three end-fight plates. The brand colours are
+    # VERIFIED from the official logo (ublue-os/bazzite,
+    # repo_content/Bazzite.svg): the logomark's gradient runs cobalt #0047AB
+    # -> blue-violet #8A2BE2, and the wordmark sets its type in #5835ce. The
+    # wordmark purple is too dark to set type in on the translucent plate, so
+    # the text rows take Tailwind violet tints -- the palette family the rest
+    # of the site's ramp is built from. The brief is a HUM, not a glow: the
+    # type stays legible, and the card says nothing about why they are special.
+    "bazzite": {
+        "border": (138, 43, 226, 140),    # rgb(138 43 226 / 55%) — #8A2BE2
+        "accent": (138, 43, 226, 255),    # #8A2BE2, logomark gradient end stop
+        "label": (196, 181, 253, 255),    # #c4b5fd (Tailwind violet-300)
+        "klass": (221, 214, 254, 255),    # #ddd6fe (Tailwind violet-200)
+        "title": (167, 139, 250, 255),    # #a78bfa (Tailwind violet-400)
+        "glow": (88, 53, 206, 140),       # #5835ce, the wordmark purple
+    },
 }
+
+# The Bazzite logomark's gradient stops (ublue-os/bazzite repo_content/Bazzite.svg,
+# paint0_linear: cobalt -> blue-violet across the tile's diagonal).
+BAZZITE_COBALT = (0, 71, 171)      # #0047AB, gradient start (top-left)
+BAZZITE_VIOLET = (138, 43, 226)    # #8A2BE2, gradient end (bottom-right)
 
 # --- type ramp (clamp() upper bounds, i.e. the desktop sizes) ---------------
 FS_LABEL = 1.8 * REM     # .wolves-guardian-plate-label
@@ -140,6 +165,17 @@ PAD_BOTTOM = 1.5 * REM
 CHAMFER = 16             # clip-path: polygon(16px ...)
 CORNER_RADIUS = 12       # border-radius: 0.75rem, on the two corners not cut
 CREST = 2.5 * REM        # .wolves-guardian-plate-crest
+
+# --- owner-authored chrome: the laurel wreath -------------------------------
+# `wreath: true` strikes a laurel around the crest in the plate's own accent
+# metal -- the ring a game draws around a max-level portrait. Exactly two
+# people in the show carry it, and that scarcity is the point; the renderer
+# never adds one by itself. The canvas is wider than the crest so the leaves
+# clear the hex, and the header rules shorten around it (the card's box and
+# every row of type stay exactly where they were).
+WREATH_SPAN = 1.5        # the laurel's canvas, as a multiple of the crest
+WREATH_LEAVES = 7        # per branch -- restraint is the brief
+WREATH_GAP = 35          # degrees left open at the bottom, where a laurel ties
 
 # --- status nameplate (the site's own top-of-frame chrome) -------------------
 # A DIFFERENT card from the reveal plate: the Wolves app's persistent HUD
@@ -346,22 +382,275 @@ def _chamfered(size, fill, border, radius=CHAMFER, corner=CORNER_RADIUS):
     return img
 
 
-def _crest(size, accent, glow):
-    """The hex crest with its chevron (inline SVG in the Vue component)."""
+def _load_avatar(path, size):
+    """A PFP file -> a ``size``-px square RGBA crop, or None.
+
+    GitHub avatars are the source (e.g. avatars.githubusercontent.com/u/<id>),
+    fetched and cached AHEAD of time -- this renderer never touches the
+    network, so ``avatar`` is always a local path (relative paths resolve
+    against the repo root). The crop is CSS `object-fit: cover`: scaled to
+    fill, centre-cropped.
+
+    A missing or unreadable file is a punch-list item, never a crash
+    (degrade, never block): the caller falls back to the drawn crest.
+    """
+    if not path:
+        return None
+    p = Path(path)
+    if not p.is_absolute():
+        p = REPO_ROOT / p
+    try:
+        img = Image.open(p).convert("RGBA")
+        if not img.width or not img.height:
+            raise ValueError("empty image")
+        scale = max(size / img.width, size / img.height)
+        img = img.resize((max(1, round(img.width * scale)),
+                          max(1, round(img.height * scale))), Image.LANCZOS)
+        x = (img.width - size) // 2
+        y = (img.height - size) // 2
+        return img.crop((x, y, x + size, y + size))
+    except (OSError, ValueError):
+        print(f"plate: avatar {path!r} is missing or unreadable -- "
+              "the drawn crest stands in (punch-list item)", file=sys.stderr)
+        return None
+
+
+# The crest's own geometry (inline SVG in the Vue component), in its box.
+CREST_OUTER = [(50, 5), (85, 20), (95, 55), (50, 95), (5, 55), (15, 20)]
+CREST_INNER = [(50, 12), (78, 25), (87, 52), (50, 85), (13, 52), (22, 25)]
+CREST_CHEVRON = [(35, 45), (50, 60), (65, 45)]
+
+
+def _cubic(p0, p1, p2, p3, steps=24):
+    """Flatten a cubic Bezier to polygon points (excluding ``p0``)."""
+    out = []
+    for i in range(1, steps + 1):
+        t = i / steps
+        mt = 1 - t
+        out.append((
+            mt ** 3 * p0[0] + 3 * mt ** 2 * t * p1[0]
+            + 3 * mt * t ** 2 * p2[0] + t ** 3 * p3[0],
+            mt ** 3 * p0[1] + 3 * mt ** 2 * t * p1[1]
+            + 3 * mt * t ** 2 * p2[1] + t ** 3 * p3[1],
+        ))
+    return out
+
+
+def _bazzite_tile(s, accent, photo):
+    """The Bazzite logomark, ``s`` px square, supersampled: the gradient tile
+    with its D-pad glyph, or ``photo`` masked to the tile's silhouette.
+
+    Traced from the official logo (ublue-os/bazzite repo_content/Bazzite.svg).
+    The tile (path1) lives in a 408x408 box at (100,100) of the viewBox: a
+    circle of radius 204 centred on (304,304) with the top-left squared off
+    into an 81.6px rounded corner. The glyph is a controller D-pad -- two
+    fully-rounded bars (path3, white at 70%) with four button ticks around it
+    (paths 4-7) -- over the "b" stem and bowl (path2, white at 50%).
+
+    With a ``photo`` the tile keeps only its silhouette and hairline: the PFP
+    masked into it IS the logo's shape, and the glyph is never drawn over a
+    face.
+    """
+    def m(pt):  # svg coords -> pixels: the mark's 408x408 box maps onto s
+        return ((pt[0] - 100) / 408 * s, (pt[1] - 100) / 408 * s)
+
+    outline = [(100, 181.6)]
+    outline += _cubic((100, 181.6), (100, 136.534), (136.534, 100), (181.6, 100))
+    outline.append((304, 100))
+    outline += _cubic((304, 100), (416.666, 100), (508, 191.334), (508, 304))
+    outline += _cubic((508, 304), (508, 416.666), (395.334, 508), (304, 508))
+    outline += _cubic((304, 508), (191.334, 508), (100, 416.666), (100, 304))
+    poly = [m(p) for p in outline]
+
+    mask = Image.new("L", (s, s), 0)
+    ImageDraw.Draw(mask).polygon(poly, fill=255)
+
+    img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    if photo is not None:
+        img.paste(photo, (0, 0), mask)
+    else:
+        # paint0_linear: userSpaceOnUse from (100,100) to (508,508) -- the
+        # tile's diagonal, so t is the mean of the two axes.
+        grad = Image.new("RGBA", (s, s))
+        px = grad.load()
+        for yy in range(s):
+            for xx in range(s):
+                t = ((xx + yy) / 2) / s
+                px[xx, yy] = tuple(
+                    int(BAZZITE_COBALT[i] + (BAZZITE_VIOLET[i] - BAZZITE_COBALT[i]) * t)
+                    for i in range(3)) + (255,)
+        img.paste(grad, (0, 0), mask)
+
+        d = ImageDraw.Draw(img)
+        # path2, the "b": an outer shape with the bowl punched back out of it
+        # (the SVG's fill-rule="evenodd").
+        stem = [(204.448, 100), (256.672, 100), (256.672, 204.448),
+                (366.167, 204.448)]
+        stem += _cubic((366.167, 204.448), (412.051, 204.448),
+                       (449.248, 241.645), (449.248, 287.529))
+        stem += _cubic((449.248, 287.529), (449.248, 376.844),
+                       (376.844, 449.248), (287.529, 449.248))
+        stem += _cubic((287.529, 449.248), (241.645, 449.248),
+                       (204.448, 412.051), (204.448, 366.167))
+        stem += [(204.448, 256.672), (100, 256.672), (100, 204.448),
+                 (204.448, 204.448)]
+        bowl = [(256.672, 256.672), (256.672, 366.167)]
+        bowl += _cubic((256.672, 366.167), (256.672, 383.209),
+                       (270.487, 397.024), (287.529, 397.024))
+        bowl += _cubic((287.529, 397.024), (348.001, 397.024),
+                       (397.024, 348.001), (397.024, 287.529))
+        bowl += _cubic((397.024, 287.529), (397.024, 270.487),
+                       (383.209, 256.672), (366.167, 256.672))
+        b_mask = Image.new("L", (s, s), 0)
+        b_draw = ImageDraw.Draw(b_mask)
+        b_draw.polygon([m(p) for p in stem], fill=128)   # white at ~50%
+        b_draw.polygon([m(p) for p in bowl], fill=0)     # the even-odd punch
+        img.paste(Image.new("RGBA", (s, s), (255, 255, 255, 255)), (0, 0),
+                  b_mask)
+
+        # path3, the D-pad: two fully-rounded bars crossing at (230.56, 230.56),
+        # white at 70%.
+        cross = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+        c_draw = ImageDraw.Draw(cross)
+        arm_r = 26.112
+        c_draw.rounded_rectangle(
+            [m((204.448, 124.48)), m((256.672, 336.64))],
+            radius=arm_r / 408 * s, fill=(255, 255, 255, 179))
+        c_draw.rounded_rectangle(
+            [m((124.48, 204.448)), m((336.64, 256.672))],
+            radius=arm_r / 408 * s, fill=(255, 255, 255, 179))
+        img.alpha_composite(cross)
+        # paths 4-7: the four button ticks around the pad, full white.
+        for tri in (
+            [(312.82, 230.56), (298.444, 243.19), (290.944, 238.86),
+             (290.944, 222.26), (298.444, 217.93)],
+            [(230.56, 312.82), (217.93, 298.444), (222.26, 290.944),
+             (238.86, 290.944), (243.19, 298.444)],
+            [(230.56, 148.3), (243.19, 162.676), (238.86, 170.176),
+             (222.26, 170.176), (217.93, 162.676)],
+            [(148.3, 230.56), (162.676, 217.93), (170.176, 222.26),
+             (170.176, 238.86), (162.676, 243.19)],
+        ):
+            d.polygon([m(p) for p in tri], fill=(255, 255, 255, 255))
+
+    # The silhouette's hairline, in the plate's accent -- the same job the
+    # hex crest's own rule does, so the crest slot keeps its geometry.
+    ImageDraw.Draw(img).polygon(poly, outline=accent, width=max(1, s // 100))
+    return img
+
+
+def _crest(size, accent, glow, avatar=None, mark=None):
+    """The hex crest with its chevron (inline SVG in the Vue component).
+
+    ``avatar`` is the path to a PFP image: the photo is cover-fit and masked
+    to the crest's inner hex, with the hex rules kept drawn over it so the
+    card's geometry is unchanged. A missing or unreadable file degrades to
+    the drawn crest -- a punch-list item, never a crash.
+
+    ``mark="bazzite"`` replaces the hex with the Bazzite logomark (see
+    ``_bazzite_tile``); an avatar there masks to the tile's silhouette.
+    """
     scale = 4  # supersampled, then downscaled: Pillow has no antialiased strokes
     s = int(size * scale)
+    if mark == "bazzite":
+        return _bazzite_tile(s, accent, _load_avatar(avatar, s)).resize(
+            (int(size), int(size)), Image.LANCZOS)
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
     def pts(coords):
         return [(x / 100 * s, y / 100 * s) for x, y in coords]
 
-    d.polygon(pts([(50, 5), (85, 20), (95, 55), (50, 95), (5, 55), (15, 20)]),
-              outline=accent, width=int(2 * scale))
-    d.polygon(pts([(50, 12), (78, 25), (87, 52), (50, 85), (13, 52), (22, 25)]),
-              fill=CREST_FILL, outline=TEXT, width=int(1 * scale))
-    d.line(pts([(35, 45), (50, 60), (65, 45)]), fill=accent,
-           width=int(4 * scale), joint="curve")
+    photo = _load_avatar(avatar, s)
+    if photo is not None:
+        # The portrait takes the inner hex; both rules stay drawn over it.
+        mask = Image.new("L", (s, s), 0)
+        ImageDraw.Draw(mask).polygon(pts(CREST_INNER), fill=255)
+        img.paste(photo, (0, 0), mask)
+        d.polygon(pts(CREST_OUTER), outline=accent, width=int(2 * scale))
+        d.polygon(pts(CREST_INNER), outline=TEXT, width=int(1 * scale))
+    else:
+        d.polygon(pts(CREST_OUTER), outline=accent, width=int(2 * scale))
+        d.polygon(pts(CREST_INNER), fill=CREST_FILL, outline=TEXT,
+                  width=int(1 * scale))
+        d.line(pts(CREST_CHEVRON), fill=accent, width=int(4 * scale),
+               joint="curve")
+    return img.resize((int(size), int(size)), Image.LANCZOS)
+
+
+def _leaf(cx, cy, r, theta, lean, length, half_w):
+    """One laurel leaf: a pointed oval grown from the stem ring at ``theta``.
+
+    The axis tilts ``lean`` radians off the tangent toward outward, the way a
+    laurel's leaves angle toward the branch tip. Returns (outline, tip_base)
+    polygons in pixels -- the leaf and the midrib line that strikes it.
+    """
+    base = (cx + r * math.cos(theta), cy + r * math.sin(theta))
+    tangent = (-math.sin(theta), math.cos(theta))
+    outward = (math.cos(theta), math.sin(theta))
+    axis = (tangent[0] * math.cos(lean) + outward[0] * math.sin(lean),
+            tangent[1] * math.cos(lean) + outward[1] * math.sin(lean))
+    perp = (-axis[1], axis[0])
+    steps = 10
+    fwd, back = [], []
+    for i in range(steps + 1):
+        t = i / steps
+        w = half_w * math.sin(math.pi * t) ** 0.8
+        px = base[0] + axis[0] * length * t
+        py = base[1] + axis[1] * length * t
+        fwd.append((px + perp[0] * w, py + perp[1] * w))
+        back.append((px - perp[0] * w, py - perp[1] * w))
+    rib = [(base[0] + axis[0] * length * 0.15, base[1] + axis[1] * length * 0.15),
+           (base[0] + axis[0] * length * 0.85, base[1] + axis[1] * length * 0.85)]
+    return fwd + back[::-1], rib
+
+
+def _wreath(size, accent):
+    """A struck laurel around the crest, in the plate's own accent metal.
+
+    Owner-briefed chrome for the show's two maxed-out characters: the ring a
+    game draws around a max-level portrait. "Struck" means ONE metal, like a
+    medallion -- no glow, no bloom, no second light source, nothing fighting
+    the type. Two branches rise from an open bottom and stop short of the
+    top. Scarcity and restraint are the brief: if it reads as gaudy, it is
+    overdone.
+    """
+    scale = 4  # supersampled like the crest, for antialiased leaf edges
+    s = int(size * scale)
+    img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    cx = cy = s / 2
+    r_stem = s * 0.335
+    r_leaf = s * 0.365
+    leaf_len = s * 0.19
+    leaf_w = s * 0.034
+    metal = (accent[0], accent[1], accent[2], 232)
+    # The struck relief: the SAME metal darkened, an engraved shadow -- not a
+    # second light source.
+    shade = tuple(int(c * 0.55) for c in accent[:3]) + (232,)
+
+    # Two branches, open at the bottom where a laurel ties, just short of
+    # meeting at the top. Angles are screen degrees: 0 is right, 90 is down.
+    gap = math.radians(WREATH_GAP)
+    top = math.radians(12)
+    branches = [
+        (math.pi / 2 + gap, math.pi * 1.5 - top),   # left, rising
+        (-math.pi / 2 + top, math.pi / 2 - gap),    # right, rising (theta falls)
+    ]
+    for start, end in branches:
+        d.arc([cx - r_stem, cy - r_stem, cx + r_stem, cy + r_stem],
+              math.degrees(min(start, end)), math.degrees(max(start, end)),
+              fill=shade, width=max(1, int(1.1 * scale)))
+        step = (end - start) / (WREATH_LEAVES - 1)
+        for i in range(WREATH_LEAVES):
+            theta = start + i * step
+            # Leaves grow toward the middle of the branch, as a laurel's do.
+            grow = 0.8 + 0.4 * math.sin(math.pi * i / (WREATH_LEAVES - 1))
+            lean = math.radians(28) * (1 if step > 0 else -1)
+            outline, rib = _leaf(cx, cy, r_leaf, theta, lean,
+                                 leaf_len * grow, leaf_w * grow)
+            d.polygon(outline, fill=metal)
+            d.line(rib, fill=shade, width=max(1, int(0.7 * scale)))
     return img.resize((int(size), int(size)), Image.LANCZOS)
 
 
@@ -452,10 +741,22 @@ def _render_chat(spec):
     img = _pill((box_w, box_h), INK, chrome["border"])
     mid = box_h / 2
 
-    # The avatar slot holds a pfp in the videos; with no pfp in the field set,
-    # the crest is plate.html's own fallback.
-    img.alpha_composite(_crest(CHAT_AVATAR, chrome["accent"], chrome["glow"]),
-                        (CHAT_PAD_L, int(mid - CHAT_AVATAR / 2)))
+    # The avatar slot holds a pfp in the videos (.avatar/.pfp: an 84px
+    # circle); with no pfp, the crest is plate.html's own fallback. A pfp
+    # that will not load falls back the same way -- degrade, never block.
+    photo = _load_avatar(spec.get("avatar"), CHAT_AVATAR * 4)
+    if photo is not None:
+        s = CHAT_AVATAR * 4
+        mask = Image.new("L", (s, s), 0)
+        ImageDraw.Draw(mask).ellipse([0, 0, s - 1, s - 1], fill=255)
+        badge = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+        badge.paste(photo, (0, 0), mask)
+        img.alpha_composite(
+            badge.resize((CHAT_AVATAR, CHAT_AVATAR), Image.LANCZOS),
+            (CHAT_PAD_L, int(mid - CHAT_AVATAR / 2)))
+    else:
+        img.alpha_composite(_crest(CHAT_AVATAR, chrome["accent"], chrome["glow"]),
+                            (CHAT_PAD_L, int(mid - CHAT_AVATAR / 2)))
 
     # Text goes on its own layer so one text-shadow sits under all of it
     # (plate.html: text-shadow: 0 4px 20px at 2x == 0 2px 10px here). The rule
@@ -633,6 +934,11 @@ def render_plate(spec):
     ghost = spec.get("kind") == "ghost"
     card = spec.get("kind") == "title"
     scale = 0.82 if ghost else 1.0
+    # Chrome, not copy: a PFP in the crest, the laurel around it, and the
+    # bazzite logomark. None of it adds a row the deck has no field for.
+    avatar = spec.get("avatar")
+    wreath = bool(spec.get("wreath"))
+    mark = "bazzite" if spec.get("variant") == "bazzite" else None
 
     f_label = _font("regular", FS_LABEL * scale)
     f_class = _font("regular", FS_CLASS * scale)
@@ -685,18 +991,26 @@ def render_plate(spec):
     text_layer = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(text_layer)
 
-    # Header: rule, crest, rule.
+    # Header: rule, crest, rule. A wreath's canvas is wider than the crest,
+    # so the rules shorten around it -- the box and every row stay put.
     y = PAD_TOP * scale
     cx = box_w / 2
-    rule_w = (inner - crest_h - 2 * gap) / 2
+    crest_w = crest_h * (WREATH_SPAN if wreath else 1)
+    rule_w = (inner - crest_w - 2 * gap) / 2
     rule_y = int(y + crest_h / 2 - 1)
     if rule_w > 8:
         img.alpha_composite(_horizon(rule_w, 2, variant["accent"]),
                             (int(PAD_X * scale), rule_y))
         img.alpha_composite(_horizon(rule_w, 2, variant["accent"], to_left=True),
                             (int(box_w - PAD_X * scale - rule_w), rule_y))
-    img.alpha_composite(_crest(crest_h, variant["accent"], variant["glow"]),
-                        (int(cx - crest_h / 2), int(y)))
+    img.alpha_composite(
+        _crest(crest_h, variant["accent"], variant["glow"], avatar=avatar,
+               mark=mark),
+        (int(cx - crest_h / 2), int(y)))
+    if wreath:
+        laurel = _wreath(crest_w, variant["accent"])
+        img.alpha_composite(laurel, (int(cx - laurel.width / 2),
+                                     int(y + crest_h / 2 - laurel.height / 2)))
     y += crest_h + gap
 
     for text, font, colour, tracking in (

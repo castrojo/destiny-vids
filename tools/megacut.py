@@ -181,12 +181,23 @@ def build_inputs(plan, items=None):
 
 
 def build_filtergraph(plan, items=None):
-    """A filter_complex that normalises the given items and concatenates them.
+    """A filter_complex that normalises one item into ``[vout]``/``[aout]``.
 
-    ``items`` defaults to the whole plan. Passing a single item is how a
-    segment is built: the chains are identical, so a segment is normalised
-    exactly as it would have been inside the all-at-once graph, and
-    ``concat=n=1`` keeps one code path rather than two that can drift.
+    ``items`` is a one-item list; the parameter is a list so the chains stay
+    indexed exactly as they were when this built the whole programme at once.
+
+    **There is no ``concat`` filter here, and that is load-bearing.** A segment
+    holds one item, so ``concat=n=1`` looked like a harmless no-op that kept a
+    single code path. It is not harmless: on one of the acts it re-timed the
+    output, squeezing 307.967 s of frames into 299.48 s of timestamps, and the
+    encoder then dropped the ~506 frames whose timestamps collided. The frame
+    count going in and coming out matched, so nothing errored -- the programme
+    was simply 8.5 s short, and every act after it started early.
+
+    Measured on that file: the same chains WITHOUT concat give 307.99 s, with
+    concat give 299.48 s. Other acts pass through concat unharmed, so this is a
+    property of one source rather than of the filter in general -- which is
+    exactly why the fix is to not ask for a concatenation of one thing.
     """
     fps = plan.get("fps", DEFAULT_FPS)
     w = int(plan.get("width", DEFAULT_WIDTH))
@@ -254,7 +265,14 @@ def build_filtergraph(plan, items=None):
                 )
         labels += [f"[{v}][{a}]"]
 
-    chains.append(f"{''.join(labels)}concat=n={len(items)}:v=1:a=1[vout][aout]")
+    if len(items) != 1:
+        raise ValueError(
+            "build_filtergraph normalises exactly one item; the programme is "
+            "joined by the concat DEMUXER, in build_concat_command")
+    # `null`/`anull` rename the labels and do nothing else. Naming the outputs
+    # keeps build_segment_command's -map arguments independent of the chain.
+    chains.append(f"[v0]null[vout]")
+    chains.append(f"[a0]anull[aout]")
     return ";".join(chains)
 
 
@@ -284,6 +302,22 @@ def probe_duration(path, stream=None):
     return float(out.stdout.strip())
 
 
+def segment_video_chain(plan, item):
+    """The normalising video chain for a clip, as a plain -vf string."""
+    fps = plan.get("fps", DEFAULT_FPS)
+    w = int(plan.get("width", DEFAULT_WIDTH))
+    h = int(plan.get("height", DEFAULT_HEIGHT))
+    chain = (f"scale={w}:{h}:flags=lanczos,setsar=1,"
+             f"fps={fps},format=yuv420p")
+    if item["audio"] == "silent":
+        # Both legs pinned to ONE duration so they are equal by construction.
+        dur = item.get("dur")
+        if dur is None:
+            dur = probe_duration(resolve(item["path"]), stream="v:0")
+        chain += f",trim=duration={dur}"
+    return chain + ",setpts=PTS-STARTPTS"
+
+
 def build_segment_command(plan, index, seg_path):
     """Encode one item to its own normalised segment.
 
@@ -298,31 +332,66 @@ def build_segment_command(plan, index, seg_path):
     "Invalid data found when processing input". Measured, not guessed. PCM has
     no extradata to mismatch.
 
+    **A clip is filtered with -vf/-af, not -filter_complex, and that is
+    load-bearing.** On one act -- 30 fps, timescale 1/15360 -- the identical
+    chain run through ``-filter_complex`` came out 299.48 s instead of
+    307.967 s, with ``drop=505`` frames: the filtered timestamps were rescaled
+    and the colliding frames were discarded. The same chain as ``-vf`` gives
+    307.99 s. The programme was 8.5 s short and every act after that one
+    started early, while ffmpeg exited 0 and reported the full frame count
+    going in. Cards keep the graph form because they need lavfi sources, and
+    they are stills whose durations are authored rather than carried.
+
     Matroska, not MP4, because a segment is a temporary the concat demuxer
     reads back -- it never needs a faststart-able moov.
     """
     crf = str(plan.get("crf", 16))
     preset = plan.get("preset", "slow")
+    rate = str(plan.get("sample_rate", DEFAULT_SAMPLE_RATE))
+    layout = plan.get("layout", DEFAULT_LAYOUT)
     item = plan["items"][index]
-    return [
-        ffmpeg_bin(), "-nostdin", "-hide_banner",
-        *build_inputs(plan, [item]),
-        "-filter_complex", build_filtergraph(plan, [item]),
-        "-map", "[vout]", "-map", "[aout]",
+
+    common = [
         "-c:v", "libx264", "-preset", preset, "-crf", crf,
         "-pix_fmt", "yuv420p",
         "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
         # The three -color_* flags above describe the *frames*, and x264 only
         # copies the matrix from them -- primaries and transfer come out
         # `unknown`, which is a silent mismatch against every other deliverable
-        # in ~/Videos/Wolves/Prod. Writing the VUI directly is the only way all three
-        # actually land in the bitstream. Verified by ffprobe, not assumed.
-        # It has to be written HERE, on the segment: the join copies the
-        # bitstream, so whatever the VUI says at this point is what ships.
+        # in ~/Videos/Wolves/Prod. Writing the VUI directly is the only way all
+        # three actually land in the bitstream. It has to be written HERE, on
+        # the segment: the join copies the bitstream, so whatever the VUI says
+        # at this point is what ships. Verified by ffprobe, not assumed.
         "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709",
-        "-c:a", "pcm_s24le", "-ar", str(plan.get("sample_rate", DEFAULT_SAMPLE_RATE)),
+        "-c:a", "pcm_s24le", "-ar", rate,
         str(seg_path), "-y",
     ]
+
+    if item["kind"] == "card":
+        return [
+            ffmpeg_bin(), "-nostdin", "-hide_banner",
+            *build_inputs(plan, [item]),
+            "-filter_complex", build_filtergraph(plan, [item]),
+            "-map", "[vout]", "-map", "[aout]",
+            *common,
+        ]
+
+    args = [ffmpeg_bin(), "-nostdin", "-hide_banner", "-i", resolve(item["path"])]
+    if item["audio"] == "silent":
+        dur = item.get("dur")
+        if dur is None:
+            dur = probe_duration(resolve(item["path"]), stream="v:0")
+        args += ["-f", "lavfi", "-i",
+                 f"anullsrc=channel_layout={layout}:sample_rate={rate}:d={dur}"]
+        maps = ["-map", "0:v:0", "-map", "1:a:0", "-t", str(dur)]
+        af = []
+    else:
+        maps = ["-map", "0:v:0", "-map", "0:a:0"]
+        # aresample only where the rate differs; aformat pins the layout so the
+        # join sees one shape. No gain is applied anywhere.
+        af = ["-af", f"aresample={rate},"
+                     f"aformat=sample_fmts=fltp:channel_layouts={layout}"]
+    return [*args, "-vf", segment_video_chain(plan, item), *af, *maps, *common]
 
 
 def build_concat_command(plan, list_path, out_path):

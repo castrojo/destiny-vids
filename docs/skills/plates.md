@@ -1,6 +1,6 @@
 ---
 name: plates
-version: "1.5"
+version: "1.7"
 last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
@@ -64,7 +64,10 @@ precedence over `trustee`**, mirroring the CSS selector
 `.wolves-guardian-plate-trustee:not(.wolves-guardian-plate-leader)`, so a
 binding may carry both flags and plate gold; the leader block does not restyle
 the class row, which stays the default blue — and `rust`, oxidised iron for the
-Rust Foundation herald, per #8). A variant is colour only.
+Rust Foundation herald, per #8 — and `bazzite`, Bazzite purple for the end
+fight). A variant is colour only. Owner-authored imagery chrome — `avatar`,
+`wreath`, bracketed names like `[ REDACTED ]` — is likewise not copy:
+[`references/plate-chrome.md`](references/plate-chrome.md).
 
 The deck's `gp_*` entries add three **placement** fields, which are deck data,
 not new copy: `position: "group"` with an absolute `x` (measured against the
@@ -136,11 +139,8 @@ Recorded, not resolved. Each one is somebody's call, not an agent's:
   owner-authored brief copy says *Forgemaster of Kubernetes*. A brief is the
   owner speaking, so `plan` will use it — but the two records disagree and one
   of them wants editing. See #27 (and #17 for whether he is cast at all).
-- **A portrait row.** `reveal.html` takes a `pfp` (a real photograph; it hides
-  the hex crest when one is set) and the Kat and Natali cuts both ship one.
-  `nameplates.json` has no such field and `tools/plate.py` does not implement
-  one. That is a missing *feature*, not a missing string: do not approximate it
-  with an invented row.
+- **A portrait row.** `reveal.html`'s `pfp` is implemented as the `avatar`
+  chrome flag — see [`references/plate-chrome.md`](references/plate-chrome.md).
 - **Kelsey Hightower has no deck entry** — but his plate is authored anyway.
   The owner wrote all four rows (`ARCHITECT // GUARDIAN`, Dawnblade Warlock,
   Kelsey Hightower, *Evangelist of the Open Sky*) into issue #8, so the issue —
@@ -380,6 +380,10 @@ heading and are restored verbatim; a line the owner rewrites is marked
 owner supplying copy is allowed — an *agent* inventing it is not, and keeping
 both versions is what tells the two apart. A test asserts the checked-in
 `DIALOGUE.md` still matches the record, so the pair cannot drift.
+
+A record can also hold a line **never recovered at all** (act II's owner-
+written closer): the top-level methods and the cue's `text_source`/`evidence`
+are `owner_supplied` with no `recovered_text`, and it still enters via `apply`.
 
 It deliberately carries no `class` row and no character line: who plays whom is
 established once by the Guardian reveal.
