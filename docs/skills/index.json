@@ -60,10 +60,12 @@
         "timing-pass",
         "marker-card",
         "two-clocks",
-        "bed-pause"
+        "bed-pause",
+        "excision",
+        "diegetic-insert"
       ],
       "description": "Covers outlines, shot matching, artwork cards, timing passes with marker cards, and a bed that pauses. Use when writing an outline, marking material for removal before editing, or scoring a cut whose song does not run end to end.",
-      "version": "1.4",
+      "version": "1.5",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },
@@ -178,10 +180,13 @@
         "anchor",
         "ffmpeg",
         "true-peak",
-        "section-detection"
+        "section-detection",
+        "two-clocks",
+        "bed-pause",
+        "diegetic-insert"
       ],
-      "description": "Covers bed records, bar-snapped excisions, the cached grid, named anchors, finding a section boundary by measurement, and a master over 0 dBTP. Use when scoring a cut or supporting a second recording.",
-      "version": "1.1",
+      "description": "Covers bed records, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a master over 0 dBTP. Use when scoring a cut, pausing the song for a moment of source audio, or supporting a second recording.",
+      "version": "1.2",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     }
