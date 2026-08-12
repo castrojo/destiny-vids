@@ -152,9 +152,13 @@ already been learned the hard way and must not be re-learned:
   overshoot is not monotonic in the gain. A FLAC build of the same cut lands on
   target in one pass, which is how you know it is the encoder.
 - The contributors piece is **stereo AAC on purpose**; the Guardian intros are
-  5.1. Do not "fix" one into the other. Its bed was re-sourced off the best
-  Opus rung in 2026-08 (it had been a transcoded MP3), so the "lossy MP3 bed"
-  note in older docs is stale.
+  5.1. Do not "fix" one into the other.
+- **Source a bed by codec, not by bitrate.** Sorting candidate downloads on raw
+  bitrate picks a 44.1 kHz AAC rung over a 48 kHz Opus one whenever the AAC
+  number is bigger, and that rung is brickwalled around 15 kHz and forces a
+  needless resample. Fetch with `~/Videos/audio-source.sh`, which pins
+  `-S "acodec:opus,asr,abr"` and records provenance. A 44.1 kHz bed is the
+  fingerprint of having got this wrong.
 - `ACODEC=flac` builds a **lossless master** alongside the deliverable, so a
   later fold-down starts from the bed rather than from a lossy file. The
   default stays `aac`, and the defaults must keep rebuilding the shipped file.
@@ -280,6 +284,12 @@ grind them.
   in its `README.md` saying which master it came from.
 - Any write to `~/src/website`. It is read-only from here — several agents run
   worktrees against it — and it is where the authored plate copy lives.
+- Trusting a bed's measured true peak as the *delivered* peak. The encoder adds
+  inter-sample overshoot; measure the output file.
+- Renumbering the `zz-` prefixed cut in `~/Videos/UPLOAD/`, or "closing the gap"
+  in the numbering. The prefix is the sort key and the gap is deliberate.
+- A music bed at 44.1 kHz, or one with nothing above 16 kHz. Both mean the
+  fetch took the wrong rung.
 
 ## Verification
 
@@ -287,6 +297,7 @@ grind them.
 python3 tools/gaps.py
 python3 -m pytest -q                  # includes committed-index integrity
 python3 scripts/generate_skill_index.py --check
+~/Videos/audio-check.sh --all         # before staging anything for delivery
 ```
 
 `tests/test_index_integrity.py` validates every committed segment, video and
