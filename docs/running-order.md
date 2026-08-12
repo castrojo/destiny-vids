@@ -17,7 +17,7 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | Act | Chapter | The film | State |
 |---|---|---|---|
 | **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the comic card | delivered |
-| **II** | *Endless Forms Most Beautiful* | — | **no film** — #74 |
+| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers | delivered, **not wired into the megacut** — #74 |
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered |
@@ -25,11 +25,17 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; its master clips — #82 |
 | **VIII** | Credits | — | **not designed** — #51 |
 
-**The numbering is fixed.** Acts II and VIII have no film, so they get no slide
-and no chapter marker — a card announcing an act that does not play, or a marker
-that jumps to the next act's footage, is a lie about what the audience is
-watching. They keep their numerals so nothing renumbers around them: III is
-`mrbobbytables` permanently, whatever gets built later.
+**The numbering is fixed.** Act VIII has no film, so it gets no slide and no
+chapter marker — a card announcing an act that does not play, or a marker that
+jumps to the next act's footage, is a lie about what the audience is watching.
+It keeps its numeral so nothing renumbers around it: III is `mrbobbytables`
+permanently, whatever gets built later.
+
+**Act II now has a film** ([`docs/cuts/02-endless-forms-most-beautiful.md`](cuts/02-endless-forms-most-beautiful.md)),
+delivered to `Prod/`. It is **not yet in the programme**: its slide and its clip
+are a change to `stories/megacut/`, which was held open by another agent when
+the act was built, so wiring it in is filed rather than done. Until that lands,
+the assembled megacut still runs I, III, IV, V, VI, VII.
 
 **One person, one act.** `mrbobbytables` appears once, at III. An earlier pass
 had him twice — as an empty act and as another act's film under his character's
@@ -96,7 +102,9 @@ Recorded, not hidden:
 - **Act VII's master clips** at +0.3 dBTP — issue #82. The AAC deliverable of
   the same cut measured −1.0 and passed for weeks; nothing had ever measured the
   FLAC master. It needs a re-render of Europa's own build, not a fix here.
-- **Acts II and VIII do not exist.** Issues #74 and #51.
+- **Act VIII does not exist.** Issue #51.
+- **Act II exists but is not in the programme.** Issue #74. It is delivered to
+  `Prod/`; its slide and clip are still to be added to `stories/megacut/`.
 
 Delivered on 2026-08-12, so the two encode gaps this file used to list are
 closed:

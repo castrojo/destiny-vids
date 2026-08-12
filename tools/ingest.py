@@ -58,6 +58,17 @@ DESTINATION_RULES = [
 ]
 
 
+def match_kw(keyword, hay):
+    """Whole-word keyword match.
+
+    A bare ``in`` test is wrong for the short entries in these tables: ``io``
+    matched the middle of "Act**io**n Trailers" and tagged a compilation of
+    Earth and Moon footage as ``destination: io``. Word boundaries make a
+    two-letter destination as safe as a ten-letter one.
+    """
+    return re.search(r"\b%s\b" % re.escape(keyword), hay) is not None
+
+
 def infer_video_defaults(title, description="", playlist=""):
     """Rule-based inference of video-scoped defaults from text metadata.
 
@@ -67,7 +78,7 @@ def infer_video_defaults(title, description="", playlist=""):
     hay = " ".join([title or "", description or "", playlist or ""]).lower()
     out = {}
 
-    era = next((v for kw, v in ERA_RULES if kw in hay), "unknown")
+    era = next((v for kw, v in ERA_RULES if match_kw(kw, hay)), "unknown")
     out["era"] = {"value": era, "confidence": 0.9 if era != "unknown" else 0.2}
 
     # content_type + activity
@@ -94,7 +105,7 @@ def infer_video_defaults(title, description="", playlist=""):
     elif "crucible" in hay or "pvp" in hay:
         out["activity"] = {"value": "crucible_pvp", "confidence": 0.7}
 
-    dest = next((v for kw, v in DESTINATION_RULES if kw in hay), None)
+    dest = next((v for kw, v in DESTINATION_RULES if match_kw(kw, hay)), None)
     if dest:
         out["destination"] = {"value": dest, "confidence": 0.7}
     return out
@@ -132,14 +143,14 @@ def fetch_title(watch_url, timeout=10):
 
 
 def build_video_record(video_id, watch_url, title, description="", playlist="",
-                       youtube_tags=None):
+                       youtube_tags=None, rights_note=None):
     defaults = infer_video_defaults(title, description, playlist)
     rec = {
         "video_id": video_id,
         "youtube_url": watch_url,
         "title": title,
         "usage_class": "third_party_copyrighted",
-        "source_rights_note": RIGHTS_NOTE,
+        "source_rights_note": rights_note or RIGHTS_NOTE,
     }
     if description:
         rec["description"] = description
@@ -178,6 +189,10 @@ def main(argv=None):
     ap.add_argument("--description", default="")
     ap.add_argument("--playlist", default="")
     ap.add_argument("--out", default=VIDEOS_DIR, help="output directory")
+    ap.add_argument("--rights-note", default=None,
+                    help="override source_rights_note; use when the upload is "
+                         "NOT the publisher's own (a fan compilation), so the "
+                         "weaker provenance is recorded rather than assumed")
     args = ap.parse_args(argv)
 
     watch_url, yid = ("", "")
@@ -191,7 +206,8 @@ def main(argv=None):
 
     video_id = args.id or f"yt_{slug(title)[:60]}"
     rec = build_video_record(video_id, watch_url or f"https://youtu.be/{yid or 'unknown'}",
-                             title, args.description, args.playlist)
+                             title, args.description, args.playlist,
+                             rights_note=args.rights_note)
     errs = validate_video(rec)
     if errs:
         print("VALIDATION ERRORS:", errs, file=sys.stderr)
