@@ -56,10 +56,14 @@
         "outline",
         "still",
         "artwork-card",
-        "window-extract"
+        "window-extract",
+        "timing-pass",
+        "marker-card",
+        "two-clocks",
+        "bed-pause"
       ],
-      "description": "Covers outlines, shot matching, hold caps, artwork cards, and rendering a cut list. Use when writing an outline, debugging a wrong shot match, cutting from a long source, or replacing mechanic cards with artwork.",
-      "version": "1.3",
+      "description": "Covers outlines, shot matching, artwork cards, timing passes with marker cards, and a bed that pauses. Use when writing an outline, marking material for removal before editing, or scoring a cut whose song does not run end to end.",
+      "version": "1.4",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },

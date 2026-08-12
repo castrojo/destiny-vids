@@ -25,8 +25,11 @@ It is a **musical**: one song end to end, in three acts, cut to Nightwish's
 *7 Days to the Wolves*. The song is the structure — the acts hinge on measured
 moments in the bed (the gallop, the flute entry), not on chapter boundaries.
 
-A prototype exists and is staged for review:
+A **timing pass** is rendered and staged for review:
 [`cuts/07-seven-days-to-the-wolves.md`](cuts/07-seven-days-to-the-wolves.md).
+It is deliberately not a finished cut — spans destined for removal or artwork
+are blacked out with marker cards at their exact duration, so the timing can be
+judged against the music before anything is actually removed.
 
 ### What this replaced, and what is now unplaced
 
@@ -47,7 +50,9 @@ longer have a slot inside the feature file. The likely answer is promotional
 release alongside the hero videos, but that is a decision, not a default.
 
 **The credits sequence is still undesigned** — [issue #51]. A musical still has
-to credit its cast, and the prototype carries no plates at all.
+to credit its cast, and the timing pass carries no plates yet — though the
+Guardians-together runs it is built around are flagged `plate_slot` for that
+pass.
 
 ## Hero videos: one person, one video, every source
 
@@ -96,7 +101,7 @@ Staged in `~/Videos/UPLOAD/` today, classified under this taxonomy:
 | `04-bluefin-contributors-…-curse-of-osiris` | neither — a monthly contributors reel |
 | `05-destiny-prologue-the-dance` | neither — single-cinematic story cut |
 | `06-destiny-cayde-6-the-return` | **mis-shaped**: named for a person, cut from one trailer |
-| `07-seven-days-to-the-wolves` | **the feature** — prototype, not yet approved |
+| `07-seven-days-to-the-wolves` | **the feature** — timing pass, not yet approved; delivery blocked on provenance ([issue #60]) |
 
 `07-` is the feature and stands alone: it is one song end to end, so nothing is
 assembled around it. The two unplaced files above are finished work waiting on a
@@ -113,4 +118,5 @@ cinematic, uncut and re-credited each month. It is neither part of the feature
 nor a hero video, and it is regenerated per roster rather than authored.
 
 [issue #49]: https://github.com/castrojo/destiny-vids/issues/49
+[issue #60]: https://github.com/castrojo/destiny-vids/issues/60
 [issue #51]: https://github.com/castrojo/destiny-vids/issues/51

@@ -1,124 +1,174 @@
-# Seven Days to the Wolves — the musical (prototype)
+# Seven Days to the Wolves — the musical (timing pass)
 
-**Status:** prototype. Built to be iterated on, not defended.
-**Runtime:** 423.7 s (the song is 424.0 s).
-**Delivered:** `~/Videos/UPLOAD/07-seven-days-to-the-wolves.mp4` — 297 MB,
-1920x1080 H.264 High, yuv420p, 30 fps, AAC 48 kHz, −2.7 dBTP. Decodes clean
-end to end.
+**Status:** timing pass, for review. **Not delivered** — see Rights.
+**Runtime:** 446.0 s (7:26) for a 424.0 s song. The difference is deliberate.
+**Rendered:** `renders/07-wolves-timing-pass.mp4` — 1920x1080 H.264, 30 fps,
+AAC 48 kHz, −1.2 dBTP, −10.0 LUFS integrated.
 
 The project's first musical: one song, three acts. This is the flagship the
 hero videos and the teaser are marketing toward.
+
+## What this pass is
+
+The first cut was 289 shots in 424 s, 25 of them replayed, a third of Act I
+from Curse of Osiris, and the middle reshuffled out of source order. It was a
+good first cut and the wrong method. This one inverts it.
+
+> **Mark, don't cut.** Anything destined for removal or replacement stays in
+> the timeline at its exact duration, blacked out by a marker card saying what
+> will happen there.
+
+Because a card and the footage it replaces are the same number of seconds,
+**timing is preserved by construction**. Every anchor lands where it will land
+in the finished cut, so this can be played against the music and reviewed
+before a frame is actually removed. The convention is written up in
+[`docs/skills/editing.md`](../skills/editing.md).
+
+**13 source runs, not 289 shots.** Every act is one unbroken run in source
+order. Act II and Act III-A are literally contiguous: the window crash is not a
+cut at all — it simply happens, which is the strongest possible way to land it
+on the flute entry.
 
 ## Sources
 
 | Role | Source | Notes |
 |---|---|---|
 | Bed | Nightwish, *7 Days to the Wolves* — [`LASru9j0oIc`](https://www.youtube.com/watch?v=LASru9j0oIc) | Album version (*Dark Passion Play*), official Nightwish channel. 424.0 s |
-| Act II + III | *All Cinematic Trailers (Destiny)* — [`oRoHW97OZcs`](https://www.youtube.com/watch?v=oRoHW97OZcs) | **A fan compilation by Antesion**, 30:23. Not an official Bungie upload — see Rights |
+| Acts I, II, III | *All Cinematic Trailers (Destiny)* — [`oRoHW97OZcs`](https://www.youtube.com/watch?v=oRoHW97OZcs) | **A fan compilation by Antesion**, 30:23. Not an official Bungie upload — see Rights |
 | Act III | *Destiny 2: The Collection Trailer* — [`qI-fxJM8rSM`](https://www.youtube.com/watch?v=qI-fxJM8rSM) | Official Destiny 2 channel |
-| Act I | The existing index | 351 clean segments across 7 indexed sources |
 | Artwork | `~/Pictures/Artwork/wolves.jpg` | The *Seven Days to the Wolves* poster |
 
-## The two anchors, measured not guessed
+Three window extracts keep every seek in a short file — `render.py` seeks after
+`-i` for frame accuracy, which decodes from zero (`docs/rendering.md`):
 
-The bed's structure was measured rather than taken from a tracklist:
+| Extract | Compilation span | Carries |
+|---|---|---|
+| `wolves_act1` | 0:00 – 3:30 | the Destiny 1 opening cinematic |
+| `wolves_act2` | 23:00 – 26:30 | Neomuna, the crash, the Pale Heart |
+| `wolves_act4` | 26:30 – 30:23 | the finale, the Guardians assembled |
 
-- **The gallop — 182.834 s.** The spectral centroid collapses from ~2500 Hz to
-  **768 Hz** between 3:04 and 3:18, with spectral flatness at 0.0005: a
-  palm-muted low riff and nothing else. Act II starts here.
-- **The flute entry — 259.390 s.** The sharpest post-gallop break: percussion
-  drops out at 4:18 and the 700–2500 Hz band takes the lead from 4:20 on.
+**Curse of Osiris is excluded from the whole feature.** It is a finale; the
+builder asserts on it rather than trusting anyone to remember.
 
-Both snapped to the nearest downbeat of the cached grid (76 bpm, bar 3.158 s).
+## Structure
 
-**The window crash lands on the flute entry.** Compilation source `24:45.4`
-is shot 164 of the cut, at **259.385 s** — 5 ms from the anchor. It is the
-first shot of Act III, so the beat change and the glass break together.
+| # | Film | Bed | Source | What |
+|---|---|---|---|---|
+| 1 | 0:00 – 0:10 | *not started* | title card | Project Bluefin, over the blacked-out Destiny logo |
+| 2 | 0:10 – 0:20.2 | *not started* | `act1` 0:10 | pre-roll: the cinematic in its own audio |
+| 3 | 0:20.2 – 3:23 | 0 – 182.8 | `act1` 0:20.2 – 3:23 | **Act I**, the intro capture, unedited |
+| 4 | 3:23 – 4:39.6 | 182.8 – 259.4 | `act2` 0:29.3 – 1:45.9 | **Act II**, Neomuna, unbroken to the crash |
+| 5 | 4:39.6 – 4:53.7 | 259.4 – 273.5 | `act2` 1:45.9 | **Act III**, the crash, the strand descent |
+| 6 | 4:53.7 – 4:57.2 | 273.5 – 277.0 | card | `COMIC PLACEHOLDER` over the enemy CU |
+| 7 | 4:57.2 – 4:59.8 | 277.0 – 279.7 | artwork | held through the HOWL and the silence |
+| 8 | 4:59.8 – 5:07.2 | 279.7 – 287.0 | `act2` 2:06.2 | the band slams back in, on three Guardians |
+| 9 | 5:07.2 – 5:42.4 | 287.0 – 322.2 | `act3` 0:55 – 1:30.2 | the Collection Trailer montage, three cards marked |
+| 10 | 5:42.4 – 5:44.2 | *paused* | `act3` 0:29.4 | **the song stops**; hero montage in its own audio |
+| 11 | 5:44.2 – 6:23.2 | 322.2 – 361.2 | `act2` 2:51 – 3:30 | the Pale Heart, Guardians gathering |
+| 12 | 6:23.2 – 7:13.7 | 361.2 – 411.7 | `act4` 0:00 – 0:50.5 | the finale, the Guardians assembled |
+| 13 | 7:13.7 – 7:26.0 | 411.7 – 424.0 | artwork | the outro, over the fade |
 
-## Act structure
+## Everything below is measured
 
-| Act | Span | Source | Feel |
+### The two act hinges
+
+Unchanged from the first cut, and still the only frame-accurate obligations:
+the **gallop at 182.834 s** (the spectral centroid collapses to 768 Hz) and the
+**flute entry at 259.390 s**, both snapped to the bar grid (76 bpm, bar 3.158 s).
+
+### The song's one silence — and where the artwork goes
+
+Scanning the whole bed for full-band drops finds **exactly one interior gap**:
+
+```
+gap_start  gap_end   len   next_downbeat  offset
+   278.64   279.64  1.00        279.661   +0.023
+```
+
+A full second of silence, ending 23 ms before a downbeat. That is the "HOWL",
+and it is the only place in 424 seconds where the band stops. The artwork comes
+up at 277.0 — over the enemy close-up, before the shout — holds through the
+silence, and **the picture returns on the slam**, onto three Guardians running
+at camera. Nothing about that beat was chosen by taste.
+
+The scan's only other hits are the intro's quiet pickups (1.6–6.3 s) and the
+outro fade (416.8 s → end), which is why the artwork closes the film there
+rather than the picture being truncated.
+
+### "4:19 needs to be backed up a tad", as a number
+
+The crash *shot* starts at extract 105.4; its audio impact ramps from 105.05 and
+**peaks at 105.9**. The first cut put the shot's first frame on the flute entry,
+so the impact landed half a second late. The Act II run is now placed so
+**extract 105.9 lands on 259.390** — the shot starts a beat early and the impact
+lands on the beat change.
+
+### The intro overrun, solved by not cutting anything
+
+The capture is source 0:10 → 3:23, which is **193 s for a 182.834 s act**.
+Rather than trim the capture, **the bed enters late, at 20.166 s**. The film
+opens on the cinematic's own audio, the song arrives over picture that is
+already running, and the gallop still lands exactly at the end of the capture.
+
+That is only expressible because the cut has two clocks.
+
+### Two clocks
+
+`wall` is position in the film; `bed` is position in the song. **A shot marked
+`audio: "source"` advances wall and not bed.** Every anchor in the builder is
+asserted against bed time, because a musical with a pause in it is longer than
+its own song — 446.0 s of film for 424.0 s of music.
+
+`tools/audiomix.py` cuts the bed into pieces, delays each to its wall position,
+and mutes the source wherever the bed plays. At every instant exactly one of the
+two is audible: that is what "pause the song" means, and it is why this is not a
+duck. A −6.8 LUFS master has to come down ~18 dB to sit under an action hit,
+which is a stop with mud on top.
+
+Verified by correlating the delivered audio against the bed:
+
+| Film position | Bed position | Correlation | |
 |---|---|---|---|
-| I | 0 → 182.8 s | the existing index | wide, quiet, building |
-| II | 182.8 → 259.4 s | compilation from source 23:47 (Neomuna) | the gallop |
-| III | 259.4 → 424.0 s | the crash, the strand descent, the Collection Trailer montage, the Pale Heart climax | frantic |
+| 100 s | 79.834 s | **+1.000** | the song is exactly where it should be |
+| 343 s | — | **−0.024** | inside the pause, the song is genuinely absent |
+| 350 s | 328.034 s | **+1.000** | it resumes from where it stopped |
 
-Each act fills its span **exactly**. The cut is a concatenation with no absolute
-timeline, so an act that comes up short slides every later anchor — the builder
-asserts on it rather than letting the crash drift off the beat.
+The third row is the one that matters: after the pause the film-to-bed offset is
+20.166 + 1.8 s, and the song picks up at exactly the sample it stopped on.
 
-## The mechanic cards
+### Guardians together
 
-Every black card that explains a game mechanic is replaced by the artwork, in
-every instance. Recovered from the frames, not invented:
-
-| Card | Source span (trailer) |
-|---|---|
-| 5 EXPANSIONS | 18.1 – 19.9 s |
-| 4 CONTENT PACKS | 37.6 – 39.6 s |
-| 10 DUNGEONS | 53.1 – 55.0 s |
-| 7 RAIDS | 63.3 – 65.2 s |
-| ENDLESS BUILDCRAFTING | 71.0 – 73.0 s |
-| COUNTLESS LEGENDS | 87.4 – 89.4 s |
-
-A seventh artwork card closes the film over the song's fade to silence. The
-bed fades from 6:48 and is effectively silent by 7:00; holding the poster there
-beats truncating the fade, which is what a short picture would have done
-(`concat` passes `-shortest`).
+The selection signal is **Guardians in frame together**, and four runs are
+flagged `plate_slot` in the shotlist for the nameplate pass rather than being
+re-found by eye later: Act II opens on three Guardians advancing abreast
+(source 23:29), the slam after the silence lands on three running at camera,
+the Pale Heart run has them gathering on the plains, and the finale is the
+whole assembled crowd.
 
 ## Editorial rules, enforced in the builder
 
-- **No Savathûn.** Filtered by caption and by character tag.
-- **The Witness: eyes or smoke, never its body.** Now a standing rule in
-  `vocab/casting.yaml` with an allow-list that defaults to empty, asserted by
-  `tests/test_witness_depiction.py`. The trailer's Witness silhouette (shot 12)
-  and the compilation's pyramid/body shots are out.
-- **No major-enemy subjects.** A shot whose first clause names an Ogre,
-  Minotaur, Tormentor, Calus, etc. is dropped — that is the "long drawn-out
-  enemy shot" the direction cuts. Rejected by hand from the compilation:
-  #24/#35 (Cabal, Tormentor), #48/#49 (Calus); from the trailer: #63/#64
-  (boss ogres), #73/#82/#83 (enemy subjects).
-- **Guardians outnumbered and looking amazing** is the selection signal: low
-  camera angle (the vocab annotates it "heroic framing"), group/crowd
-  composition, hero salience, and hostiles present in frame.
-- Every cut lands on the beat grid. Act III holds are capped at 1.6 s.
-
-## How it was built, and what was deliberately skipped
-
-Neither new source is in `segments/`. **Tagging exists to feed `story.py`'s
-matcher; these shots were picked by eye from contact sheets, so no tags were
-needed.** Detection pass 1 alone gave 99 shots (compilation window) and 94
-(trailer), each with a midpoint keyframe.
-
-Four subsystems were considered and cut, each with an "add when":
-
-| Skipped | Instead | Add when |
-|---|---|---|
-| `bed.py anchor` subcommand | two constants in the builder | a second bed variant ships |
-| `cards/<video_id>.json` + schema | a six-row list in the builder | the card list outgrows one screen |
-| `depiction` enforcement in `story.py`/`corpus.py` | the rule in vocab + a test; selection is by hand | a tool starts auto-selecting Witness shots |
-| indexing either source into `segments/` | detection pass 1 only | these sources are wanted in search |
-
-**The window extract is what made the render feasible.** `render.py` seeks with
-`-ss` after `-i` for frame accuracy, so an Act II clip at source 24:00 would
-decode 24 minutes first — ~40 s per clip at the ~35x realtime measured here,
-times 83 compilation clips. Re-encoding the 23:00–26:30 window to its own file
-first makes every seek land in a 3.5-minute file. Timecodes rebase by
-**1380 s**; the builder records the source timecode in each shot's label.
+- **No Curse of Osiris**, anywhere — asserted.
+- **No shot used twice** — asserted. The first cut replayed 25.
+- **No Savathûn. The Witness: eyes or smoke, never its body.** The Pale Heart
+  run starts at source 25:51, after the pyramid and monolith material.
+- **A long enemy hold becomes a card, never a jump cut.**
+- **Publisher mechanic cards become artwork slots.** Three fall inside the
+  Collection Trailer montage — `7 RAIDS` (63.3–65.2), `ENDLESS BUILDCRAFTING`
+  (71.0–73.0), `COUNTLESS LEGENDS` (87.4–89.4) — each blacked out at its exact
+  duration. Recovered from frames in the first cut, not invented.
+- **The film ends on the Guardians, not a logo.** The finale run stops at
+  source 26:30 + 50.5, a beat before the branded `THE FINAL SHAPE` cards.
 
 ## Audio
 
-The 2007 master is loud: **−6.8 LUFS integrated, LRA 3.3**. Decoded, its true
-peak measured **+2.1 dBFS** — intersample peaks above full scale.
+The 2007 master is loud: −6.8 LUFS integrated, and decoded its true peak
+measures +2.1 dBFS. The fix is a **static −3.5 dB gain** applied once, at the
+final mux — not `loudnorm`, not a limiter: a static gain changes no dynamics at
+all, and the LRA is the artist's, not ours.
 
-The fix was a **static −3.5 dB gain**, applied once at the final mux. Not
-`loudnorm`, not a limiter: a static gain is the one correction that changes no
-dynamics at all, and the LRA is the artist's, not ours. Delivered true peak is
-**−2.7 dBTP**, integrated −10.0 LUFS.
-
-The audio is encoded exactly once, from the 24-bit WAV at the final mux
-(AAC 320k, 48 kHz native — no resample). The gain pass stream-copies the video,
-so the picture is encoded once too.
+Delivered: **−1.2 dBTP**, −10.0 LUFS integrated, LRA 4.1. The true peak is
+tighter than the first cut's −2.7 dBTP because the source-audio regions bring
+their own peaks; it is still under 0 dBTP, which is the gate.
 
 ## Rights
 
@@ -126,23 +176,39 @@ Bungie footage under Bungie's fan-content policy: non-commercial, metadata and
 timecodes only, no footage committed. The bed is a Nuclear Blast recording used
 as a non-commercial fan-work music bed.
 
-**The compilation is a third party's re-upload.** The fan-content policy covers
-Bungie's footage; it does not make Antesion's compilation ours to use. That is
-an owner decision, recorded here rather than assumed.
+**The compilation provenance question is now larger, not smaller.** Act I, Act
+II and the finale all come from Antesion's re-upload. The fan-content policy
+covers Bungie's footage; it does not make a third party's compilation ours to
+use. A timing pass is an internal review artifact, so this pass proceeds —
+**delivery does not**. Nothing here goes to `~/Videos/UPLOAD/` until that is
+decided.
 
 ## Punch list
 
-- [ ] **Owner: is the Antesion compilation acceptable provenance?** If not, Act
-      II and the Pale Heart climax need re-sourcing from official uploads.
-- [ ] The bed is an official YouTube upload — lossy, and **not** "the highest
-      quality upstream version". The purchasable lossless *Dark Passion Play*
-      master is the real answer. Swapping it will re-time the cut: codec rungs
-      differ in leading padding (~36 ms measured previously in this project),
-      so cross-correlate and prove lag 0 before shipping.
+- [ ] **Owner: is the Antesion compilation acceptable provenance?** [issue #60].
+      Blocking
+      delivery. If not, Acts I and II and the finale need re-sourcing from
+      official uploads. Escalated: three of five sections now depend on it.
+- [ ] **Owner: Cortney Nickerson's Guardian identity** — [issue #59]. The hero shot at the
+      pause (Collection Trailer 0:29.4) is cast to her by the owner, and she
+      has no authored identity in `~/Videos/nameplates.json`, the website's
+      `characters.json`, or `vocab/casting.yaml`. **The shot is rendered
+      unplated**: a missing name is omitted and recorded, never invented
+      (`AGENTS.md`). Author the identity where identities are authored and the
+      plate follows.
+- [ ] Nameplates are not burned yet. Four `plate_slot` runs are flagged in the
+      shotlist for that pass; the credits sequence is still [issue #51].
+- [ ] The four `COMIC PLACEHOLDER` slots need their artwork: one enemy CU
+      (3.5 s) and three publisher cards (1.9–2.0 s each).
+- [ ] The bed is an official YouTube upload — lossy, and not the highest-quality
+      upstream version. The purchasable lossless *Dark Passion Play* master is.
+      Swapping it will re-time the cut: codec rungs differ in leading padding
+      (~36 ms measured previously here), so cross-correlate and prove lag 0.
 - [ ] Instrumental (`SE_c6nqy-y0`) and orchestral toggles not built.
-- [ ] Act I is machine-ordered by a heroic score, not directed. It is the
-      weakest act and the obvious first thing to re-cut by hand.
-- [ ] No nameplates or credits; the credits sequence is still [issue #51].
-- [ ] `docs/catalog.md` still describes the feature as four parts. If this cut
-      replaces that structure, the Europa director's cut and the Nati teaser
-      need somewhere to go.
+- [ ] Neither compilation extract is in `segments/`. Tagging exists to feed
+      `story.py`'s matcher and nothing here uses it — index them only if these
+      sources are wanted in search.
+
+[issue #51]: https://github.com/castrojo/destiny-vids/issues/51
+[issue #59]: https://github.com/castrojo/destiny-vids/issues/59
+[issue #60]: https://github.com/castrojo/destiny-vids/issues/60

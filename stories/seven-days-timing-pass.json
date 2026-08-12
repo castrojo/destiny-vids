@@ -1,0 +1,204 @@
+{
+ "title": "Seven Days to the Wolves",
+ "kind": "timing_pass",
+ "bed": "bed_seven_days_to_the_wolves",
+ "bed_offset_sec": 20.166,
+ "bed_gain_db": -3.5,
+ "anchors": {
+  "act2_gallop_in": 182.834,
+  "act3_flute_change": 259.39,
+  "howl_silence": [
+   278.64,
+   279.661
+  ],
+  "pause_at_bed": 322.2
+ },
+ "note": "AUTHORED shotlist, not a story.py output. A TIMING PASS: spans destined for removal or artwork are blacked out with marker cards at their exact duration, so nothing is cut yet. Shots marked audio=source do not advance the bed clock.",
+ "shots": [
+  {
+   "segment_id": "card_000",
+   "still": "/var/home/jorge/src/destiny-vids/renders/markers/title-project-bluefin-seven-days-to-the-wolves-e9f32c80.png",
+   "duration": 10.0,
+   "beat": "TITLE CARD (over the source's Destiny logo, 0:00-0:10)",
+   "audio": "source"
+  },
+  {
+   "segment_id": "wolves_act1_0010_000",
+   "video_id": "wolves_act1",
+   "start_sec": 10.0,
+   "end_sec": 20.166,
+   "duration": 10.166,
+   "start_tc": "0:10.0",
+   "end_tc": "0:20.2",
+   "beat": "PRE-ROLL: the cinematic in its own audio; the song enters at the end",
+   "audio": "source"
+  },
+  {
+   "segment_id": "wolves_act1_0020_166",
+   "video_id": "wolves_act1",
+   "start_sec": 20.166,
+   "end_sec": 203.0,
+   "duration": 182.834,
+   "start_tc": "0:20.2",
+   "end_tc": "3:23.0",
+   "beat": "I. intro capture, continuous to source 3:23.0",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "wolves_act2_0029_344",
+   "video_id": "wolves_act2",
+   "start_sec": 29.344,
+   "end_sec": 105.9,
+   "duration": 76.556,
+   "start_tc": "0:29.3",
+   "end_tc": "1:45.9",
+   "beat": "II. Neomuna, unbroken from source 23:29.3 -- three Guardians advancing, straight through to the crash",
+   "audio": "bed",
+   "plate_slot": true
+  },
+  {
+   "segment_id": "wolves_act2_0105_900",
+   "video_id": "wolves_act2",
+   "start_sec": 105.9,
+   "end_sec": 120.0,
+   "duration": 14.1,
+   "start_tc": "1:45.9",
+   "end_tc": "2:00.0",
+   "beat": "III. the crash (impact on the flute entry), then the strand descent",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "card_005",
+   "still": "/var/home/jorge/src/destiny-vids/renders/markers/comic-placeholder-4-33-4-37-enemy-cu-9cd1d516.png",
+   "duration": 3.51,
+   "beat": "III. COMIC PLACEHOLDER over the enemy close-up",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "card_006",
+   "still": "/var/home/jorge/Pictures/Artwork/wolves.jpg",
+   "duration": 2.661,
+   "beat": "III. ARTWORK held through the HOWL and the 278.64-279.66s silence; picture returns on the slam",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "wolves_act2_0126_171",
+   "video_id": "wolves_act2",
+   "start_sec": 126.171,
+   "end_sec": 133.51,
+   "duration": 7.339,
+   "start_tc": "2:06.2",
+   "end_tc": "2:13.5",
+   "beat": "III. the band slams back in on three Guardians, held",
+   "audio": "bed",
+   "plate_slot": true
+  },
+  {
+   "segment_id": "wolves_act3_0055_000",
+   "video_id": "wolves_act3",
+   "start_sec": 55.0,
+   "end_sec": 63.3,
+   "duration": 8.3,
+   "start_tc": "0:55.0",
+   "end_tc": "1:03.3",
+   "beat": "III. the Collection Trailer montage, unbroken from 0:55.0",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "card_009",
+   "still": "/var/home/jorge/src/destiny-vids/renders/markers/comic-placeholder-7-raids-card-39d605b4.png",
+   "duration": 1.9,
+   "beat": "III. COMIC PLACEHOLDER over the 7 RAIDS card",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "wolves_act3_0065_200",
+   "video_id": "wolves_act3",
+   "start_sec": 65.2,
+   "end_sec": 71.0,
+   "duration": 5.8,
+   "start_tc": "1:05.2",
+   "end_tc": "1:11.0",
+   "beat": "III. the Collection Trailer montage, unbroken from 1:05.2",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "card_011",
+   "still": "/var/home/jorge/src/destiny-vids/renders/markers/comic-placeholder-endless-buildcrafting--718d0698.png",
+   "duration": 2.0,
+   "beat": "III. COMIC PLACEHOLDER over the ENDLESS BUILDCRAFTING card",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "wolves_act3_0073_000",
+   "video_id": "wolves_act3",
+   "start_sec": 73.0,
+   "end_sec": 87.4,
+   "duration": 14.4,
+   "start_tc": "1:13.0",
+   "end_tc": "1:27.4",
+   "beat": "III. the Collection Trailer montage, unbroken from 1:13.0",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "card_013",
+   "still": "/var/home/jorge/src/destiny-vids/renders/markers/comic-placeholder-countless-legends-card-063a771f.png",
+   "duration": 2.0,
+   "beat": "III. COMIC PLACEHOLDER over the COUNTLESS LEGENDS card",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "wolves_act3_0089_400",
+   "video_id": "wolves_act3",
+   "start_sec": 89.4,
+   "end_sec": 90.2,
+   "duration": 0.8,
+   "start_tc": "1:29.4",
+   "end_tc": "1:30.2",
+   "beat": "III. the montage runs out to the pause",
+   "audio": "bed"
+  },
+  {
+   "segment_id": "wolves_act3_0029_350",
+   "video_id": "wolves_act3",
+   "start_sec": 29.35,
+   "end_sec": 31.15,
+   "duration": 1.8,
+   "start_tc": "0:29.4",
+   "end_tc": "0:31.2",
+   "beat": "III. SONG PAUSES -- hero montage in its own audio, then resumes. Casting requested: Cortney Nickerson. UNPLATED: no authored identity exists, so no plate is invented.",
+   "audio": "source"
+  },
+  {
+   "segment_id": "wolves_act2_0171_000",
+   "video_id": "wolves_act2",
+   "start_sec": 171.0,
+   "end_sec": 210.0,
+   "duration": 39.0,
+   "start_tc": "2:51.0",
+   "end_tc": "3:30.0",
+   "beat": "III. the Pale Heart, unbroken from source 25:51 -- Guardians gathering on the plains",
+   "audio": "bed",
+   "plate_slot": true
+  },
+  {
+   "segment_id": "wolves_act4_0000_000",
+   "video_id": "wolves_act4",
+   "start_sec": 0.0,
+   "end_sec": 50.5,
+   "duration": 50.5,
+   "start_tc": "0:00.0",
+   "end_tc": "0:50.5",
+   "beat": "III. the finale, unbroken from source 26:30 -- the Guardians assembled",
+   "audio": "bed",
+   "plate_slot": true
+  },
+  {
+   "segment_id": "card_018",
+   "still": "/var/home/jorge/Pictures/Artwork/wolves.jpg",
+   "duration": 12.293,
+   "beat": "ARTWORK (outro, over the fade)",
+   "audio": "bed"
+  }
+ ]
+}
