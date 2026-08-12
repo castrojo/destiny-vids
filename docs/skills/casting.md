@@ -1,6 +1,6 @@
 ---
 name: casting
-version: "1.0"
+version: "1.1"
 last_updated: "2026-08-12"
 id: casting
 one_line_purpose: Bind a Destiny character to a person and credit the monthly ensemble.
@@ -10,11 +10,10 @@ mcp_compliance_level: partial
 optimization_status: draft
 status: active
 dependencies: [indexing]
-tags: [casting, vocab, ensemble, leads, contributors]
+tags: [casting, vocab, ensemble, leads, contributors, depiction]
 description: >-
-  Covers lead bindings, ensemble slots, and how casting is derived rather than
-  tagged. Use when adding or changing a cast member, crediting contributors, or
-  debugging a casting role that did not derive.
+  Covers lead bindings, ensemble slots, depiction rules, and derived casting.
+  Use when adding a cast member, crediting contributors, recording a rule for how a character may be shown, or debugging a casting role.
 metadata:
   type: reference
 ---
@@ -197,6 +196,44 @@ An authored identity also does not travel between tiers on its own: a person
 cast as a **lead** is excluded from the ensemble pool entirely, so their copy
 belongs on the lead binding and nowhere else.
 
+## A binding can carry a depiction rule
+
+Casting says *who* a figure is. A **depiction rule** says how a character may be
+shown at all, and it applies whether or not anybody is cast as them.
+
+The Witness is the standing example:
+
+```yaml
+the_witness:
+  person: null
+  aka: [witness]
+  depiction:
+    rule: eyes_or_smoke_only
+    approved: []
+```
+
+> Eyes or smoke, never the body.
+
+Three properties make it work, and all three are deliberate:
+
+- **The default is exclusion.** An empty `approved` means *no* shots of that
+  character are usable, exactly like an untagged `overlays` deriving
+  `clean = false`. Permission is positively established or it does not exist.
+- **It is not derived.** `clean`, `footage_tier`, `traversal_hero` and `casting`
+  are the four derived fields and this is not a fifth. "Is that a body or a
+  wisp?" is a visual judgement about a frame, which
+  [`AGENTS.md`](../../AGENTS.md) lists among the things that can never be
+  automated. A human adds a `segment_id` to `approved` after looking at it.
+- **A rule is not an editorial choice.** "Cut Savathûn from this video" belongs
+  in the outline for that video. "The Witness is never shown bodily" belongs
+  here, because it holds for every cut the project ever makes. Putting the
+  first one here would quietly ban a character from the whole index; putting the
+  second in an outline loses it the moment somebody writes a new one.
+
+The mechanism is generic — any binding may carry `depiction` — while the rules
+themselves are specific and few. Add one only when the owner states it as a rule
+about the character, not as a note about one cut.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -208,6 +245,8 @@ belongs on the lead binding and nowhere else.
 | "Re-rolling the roster is fine, it's only credits." | Assignment is deterministic on purpose: a re-render must not re-credit a different person. |
 | "They have plate copy, so bind them — it's only a credit." | A binding says they recur, for the life of the project. Whether it's that or a one-video credit is the owner's call; the punch-list asks. |
 | "I can't see the video, but the description narrows it to one character." | Then park it in `leads.pending`. A binding is a claim about a real person; a queue entry is not. |
+| "The owner only said it about this one video, so it's an outline note." | Ask which object it is about. "Cut her from this cut" is editorial; "never show its body" is a rule about the character and belongs on the binding. |
+| "The allow-list is empty, so the rule isn't doing anything yet." | Empty means *exclude everything*, which is the rule at full strength. It is doing all of its work. |
 
 ## Red Flags
 
@@ -222,6 +261,10 @@ belongs on the lead binding and nowhere else.
   credit for one video; a binding is a claim that they recur.
 - Treating `substitutability` as a usability gate. It was demoted: it only
   tie-breaks between otherwise-equal ensemble shots.
+- Widening a `depiction.rule` to a new value, or adding keys to the block, to
+  let a shot through. The rule is the gate; the allow-list is the exception.
+- Approving a Witness shot from a caption or a midpoint keyframe rather than
+  looking at the frames.
 
 ## Verification
 

@@ -1,7 +1,7 @@
 ---
 name: scoring
-version: "1.0"
-last_updated: "2026-08-11"
+version: "1.1"
+last_updated: "2026-08-12"
 id: scoring
 one_line_purpose: Measure a music bed, cut sections out of it, and cut to its bars.
 entry_point: docs/skills/scoring.md
@@ -10,12 +10,10 @@ mcp_compliance_level: partial
 optimization_status: draft
 status: active
 dependencies: [editing]
-tags: [music, bed, tempo, downbeat, excision, anchor, ffmpeg]
+tags: [music, bed, tempo, downbeat, excision, anchor, ffmpeg, true-peak, section-detection]
 description: >-
-  Covers bed records, bar-snapped excisions, the cached beat grid, and mapping a
-  timecode between the source and edited timelines. Use when scoring a cut to a
-  chosen track, removing a section from a bed, or landing a shot on a musical
-  moment.
+  Covers bed records, bar-snapped excisions, the cached grid, named anchors, finding a section boundary by measurement, and a master over 0 dBTP.
+  Use when scoring a cut or supporting a second recording.
 metadata:
   type: procedure
   context7-sources:
@@ -30,6 +28,9 @@ metadata:
 - Replacing a cut's audio with a chosen track
 - Cutting a section out of that track
 - Landing a specific shot at a specific moment in the music
+- Finding where a section (a gallop, a solo, a break) actually starts
+- Supporting more than one recording of the same song
+- A delivered file whose true peak is above 0 dBTP
 
 ## When NOT to Use
 
@@ -113,6 +114,94 @@ The wider lesson is why the tempo is *not* trusted for the bar length here:
 `bar_sec` is derived from the median tracked beat interval instead, so the
 reported tempo and the grid can never disagree.
 
+## Finding a section boundary: measure it, don't take it from a tracklist
+
+"When the gallop starts" and "when the flute comes in" are directions, not
+timecodes, and a tracklist will not give you them. Measure the bed's own
+structure in short windows and read the shape:
+
+```python
+rms  = librosa.feature.rms(y=y, hop_length=512)[0]
+cent = librosa.feature.spectral_centroid(y=y, sr=sr, hop_length=512)[0]
+flat = librosa.feature.spectral_flatness(y=y, hop_length=512)[0]
+H, P = librosa.effects.hpss(y)      # harmonic vs percussive
+```
+
+What each one tells you, with the readings that identified them on the Nightwish
+bed:
+
+| Signal | What it means |
+|---|---|
+| **Centroid collapses** (2500 Hz → **768 Hz**) with **flatness ~0.0005** | a palm-muted low riff and nothing else — a gallop |
+| **Percussive RMS drops out** for a window, then everything re-enters | a break, and the strongest "the beat changes again" candidate |
+| **Mid band (700–2500 Hz) takes over** from the low band | a melodic lead instrument — whistle, pipe, flute |
+| RMS rises and stays up | a new section, but a weak boundary on its own |
+
+Split harmonic from percussive before reading the bands, or a cymbal wash reads
+as a flute. A boundary you cannot see in *two* of these is probably not one.
+
+Then snap the answer to a downbeat — never anchor to the literal timecode.
+
+## Named anchors beat literal timecodes
+
+A cut scored to a bed should refer to **musical events by name**, not to seconds:
+
+```json
+"anchors": { "act2_gallop_in": 182.834, "act3_flute_change": 259.390 }
+```
+
+Two things get easier, and both are otherwise expensive:
+
+- **A second recording of the same song is a different timeline.** An
+  instrumental or orchestral version is not the album take with parts muted:
+  the arrangement, the length and the position of every section differ. A cut
+  anchored to `3:04` is correct on exactly one recording; a cut anchored to
+  `act2_gallop_in` is correct on all of them, once each record maps the name.
+- **Re-sourcing the bed becomes a re-anchor, not a re-cut.** Codec rungs decode
+  with different leading padding, so a better source silently moves every
+  literal timecode (see below).
+
+Placing an anchor is a listening judgement. Snap it and record it; never let a
+detector guess where the gallop starts.
+
+## Record what you measured about the source
+
+A bed record holds provenance and measurements, so the audio checks belong in it
+rather than in someone's memory:
+
+```json
+"source_format": "opus 48kHz stereo (yt-dlp format 774), decoded once to pcm_s24le",
+"spectral_cutoff_hz": 19000,
+"spectral_note": "real content to ~19 kHz, Opus lowpass above 20.5 kHz; not a low-rate re-encode"
+```
+
+Measure the cutoff before cutting anything to the bed. A ruler-flat brickwall
+well below ~20 kHz means the upload was made from a lossy file, and decoding it
+to 24-bit does not undo that. Writing the number down is what stops the next
+person re-measuring — or worse, not measuring.
+
+**Say so when the source is not the best available.** An official artist upload
+is still lossy and is not "the highest-quality upstream version". That is fine
+for a prototype and must be recorded as a known gap, not quietly shipped.
+
+## A loud master can exceed 0 dBTP, and the fix is a static gain
+
+Modern and loudness-war-era masters routinely decode above full scale. Measured
+on a 2007 metal master: **+2.1 dBFS true peak, −6.8 LUFS integrated, LRA 3.3**.
+
+The correction is a **static gain at the mux** — nothing else:
+
+```bash
+ffmpeg -i cut.mp4 -i bed.wav -map 0:v:0 -map 1:a:0 -c:v copy \
+    -af "volume=-3.5dB" -c:a aac -b:a 320k -ar 48000 -shortest out.mp4
+```
+
+`-c:v copy` matters: the picture is not re-encoded, so the gain pass costs one
+audio encode and no generation loss on video. A static gain scales every sample
+identically, so the LRA and every dynamic relationship the artist chose are
+untouched — which is exactly what `loudnorm`, a compressor or a limiter would
+change. Re-measure the **delivered** file afterwards, not the intermediate.
+
 ## Excisions are snapped to bar lines
 
 `excise` moves both endpoints to the nearest downbeat before recording them:
@@ -185,6 +274,10 @@ existed at 24-bit in `~/Videos/wolves-natali/sources/`; a re-fetch produced
 | "I'll just cut the 13 seconds the owner asked for." | Mid-bar, that stumbles *and* re-phases the grid. Snap to bars; 12.098s is what four bars actually measure. |
 | "I'll re-run the analysis at render time, it's the same audio." | Beat tracking is a heuristic. A different answer silently moves every cut. |
 | "3:48 is 3:48." | Not once a section is gone. Edited 3:48 is source 4:00.098 here. |
+| "The tracklist says the bridge is at 4:20." | A tracklist is not a measurement. Read the centroid, the flatness and the percussive RMS, and confirm the boundary in two of them. |
+| "The instrumental is the album take with the vocals muted." | It is a different arrangement with a different length. Anchor by name and map each recording separately. |
+| "True peak is over, I'll run loudnorm." | That rewrites the artist's dynamics. A static gain at the mux fixes the peak and changes nothing else. |
+| "I measured the peak on the bed, so the delivery is fine." | Measure the delivered file. The encode adds intersample peaks the WAV did not have. |
 
 ## Red Flags
 
@@ -193,6 +286,9 @@ existed at 24-bit in `~/Videos/wolves-natali/sources/`; a re-fetch produced
 - A rendered bed whose bit depth or sample rate differs from the source
 - Anchoring to a literal timecode on a bar-aligned cut
 - Re-analysing a bed that already has a cached grid
+- A bed record with no measured spectral cutoff
+- A section boundary taken from a tracklist rather than measured
+- `loudnorm`, a compressor or a limiter anywhere near a finished master
 
 ## Verification
 

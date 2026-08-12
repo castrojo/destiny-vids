@@ -11,11 +11,16 @@ of this repo's historical confusion is one being cut as if it were the other —
 read [`docs/catalog.md`](docs/catalog.md) before building either.
 
 **The feature** is the main story: **Seven Days to the Wolves**, released as
-**one whole unit** at KubeCon NA — Wolves → Europa → **credits** (not designed
-yet) → the Nati teaser. Those four are the running order *inside one file*, not
-four videos to sequence in a playlist. The Nati teaser is part of the feature
-and is **not** a hero video; appearing in the feature does not make that
-appearance somebody's hero video.
+**one whole unit** at KubeCon NA. It is a **musical** — one song end to end, in
+three acts, cut to Nightwish's *7 Days to the Wolves*, with the acts hinged on
+measured moments in the bed rather than on chapter boundaries. A prototype is
+staged ([`docs/cuts/07-seven-days-to-the-wolves.md`](docs/cuts/07-seven-days-to-the-wolves.md));
+what it still needs is a **credits sequence** and a **provenance decision**.
+
+It used to be four parts in a running order, and it is not any more — so the
+Europa director's cut and the Nati teaser are now **unplaced**, and where they
+go is an open decision. Appearing in the feature never made an appearance
+somebody's hero video, and it still does not.
 
 **A hero video is one person, one video, every source** — every clean shot of a
 bound character in the whole index, summed into one cut. Karena is Mara Sov, so
