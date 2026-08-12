@@ -3,11 +3,17 @@
 The whole show as **one continuous video**, assembled from the finished cuts and
 announced by act slides in the Wolves cinematic's own chrome.
 
-**Status: planned and staged, NOT rendered.** The act slides and the comic title
-card are rendered and reviewable in `renders/`; the programme itself is not
-built, by owner instruction ("fix it in the video don't render it"). Nothing
-is delivered for the feature beyond act VI's own file — provenance is an
-unresolved owner decision (#55) and this cut does not change it.
+**Status: v0.5 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.5.mp4`,
+**1236.892 s (20:36.9)**, seven of the eight acts. The owner asked for "one
+supercut with everything that we have", and .5 is their name for it.
+
+It is **not the feature**. Act VIII, the credits, is not designed (#51), so the
+programme ends on Europa and credits nobody. Act VI is a timing pass whose
+provenance is an open owner decision (#55); act II's picture comes from a fan
+compilation carrying the same question; act III is partially complete by the
+owner's own description; act VII's master clips at +0.3 dBTP (#82). None of that
+is fixable by re-assembling — assembly joins finished things and never re-cuts
+one.
 
 ## What the current build contains
 
@@ -19,27 +25,28 @@ the running order is right and this file is stale.
 
 The timings are **derived, never typed**: re-run
 `python3 tools/megacut.py stories/megacut/megacut.json --chapters` after every
-assembly rather than editing this table. They will shift the moment act I is
-rendered or act IV is rebuilt.
+assembly rather than editing this table. Wiring act II in moved every stamp
+after act I by 312.967 s, which is the worked example of why.
 
 | Act | From | To | What | Source |
 |---|---|---|---|---|
 | — | 0.000 | 5.000 | Slide **I** — `PROJECT BLUEFIN` / *seven days to the wolves* | rendered |
-| **I** | 5.000 | 116.567 | **Into the Light** — six Guardians plated, the comic card, Bungie's score | `BKm0TPqeOjY` |
-| **II** | — | — | *Endless Forms Most Beautiful* — **no film** (#74) | — |
-| — | 116.567 | 121.567 | Slide **III** — `Bob Killen` / *Voidwalker Warlock* | rendered |
-| **III** | 121.567 | 281.767 | **mrbobbytables** — August 2026 contributors | `Prod/03-…` |
-| — | 281.767 | 296.767 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
-| **IV** | 296.767 | 330.767 | **Kat Cosgrove** — Guardian intro | `Prod/04-…` |
-| — | 330.767 | 345.767 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
-| **V** | 345.767 | 371.026 | **Natali Vlatko** — Guardian arrival | `Prod/05-…` |
-| — | 371.026 | 376.026 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
-| **VI** | 376.026 | 803.726 | **Seven Days to the Wolves** — the musical (timing pass) | `Prod/06-…` |
-| — | 803.726 | 808.726 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
-| **VII** | 808.726 | 918.926 | **Europa Director's Cut** | `Prod/07-…` |
+| **I** | 5.000 | 116.567 | **Into the Light** — six Guardians plated, the comic card, Bungie's score | `Prod/01-…` |
+| — | 116.567 | 121.567 | Slide **II** — `ENDLESS FORMS MOST BEAUTIFUL` / *Nightwish* | rendered |
+| **II** | 121.567 | 429.534 | **Endless Forms Most Beautiful** — the live-action trailers, one song end to end | `Prod/02-…` |
+| — | 429.534 | 434.534 | Slide **III** — `Bob Killen` / *Voidwalker Warlock* | rendered |
+| **III** | 434.534 | 594.734 | **mrbobbytables** — August 2026 contributors | `Prod/03-…` |
+| — | 594.734 | 609.734 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
+| **IV** | 609.734 | 643.734 | **Kat Cosgrove** — Guardian intro | `Prod/04-…` |
+| — | 643.734 | 658.734 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
+| **V** | 658.734 | 683.992 | **Natali Vlatko** — Guardian arrival | `Prod/05-…` |
+| — | 683.992 | 688.992 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
+| **VI** | 688.992 | 1121.692 | **Seven Days to the Wolves** — the musical (timing pass) | `Prod/06-…` |
+| — | 1121.692 | 1126.692 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
+| **VII** | 1126.692 | 1236.892 | **Europa Director's Cut** | `Prod/07-…` |
 | **VIII** | — | — | Credits — **not designed** (#51) | — |
 
-**918.926s — 15:18.9**, output to `~/Videos/Wolves/megacut/`. Every act plays
+**1236.892s — 20:36.9**, output to `~/Videos/Wolves/megacut/`. Every act plays
 from `~/Videos/Wolves/Prod/`, which holds the **highest-quality master** of
 each — FLAC audio, picture never re-encoded. Assembly re-encodes once and edits
 nothing.

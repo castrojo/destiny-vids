@@ -3,7 +3,7 @@
   "_order": "THE CANONICAL ORDER, codified by the owner on 2026-08-12 and settled: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). Eight acts, each announced by a slide carrying a huge Roman numeral. This list is the show's chapter list: see docs/running-order.md, which is the source of truth, and `tools/megacut.py --chapters`, which derives the timestamped markers from the built programme rather than from a hand-typed table.",
   "_copy": "Chapter card copy is REPRODUCED, never authored. Where an act has no authored title, the row is omitted rather than filled -- see `unresolved`. The only strings the owner wrote for this pass are act II's title and the whole of act IV's terminal block, both quoted back verbatim.",
   "_chapters": "Every act is to carry chapters. None have been authored yet, so every `chapters` list is empty: the field renders nothing until somebody writes the words. An empty list is the recorded gap, not a placeholder to fill in.",
-  "_gaps": "Acts II and VIII have no film and therefore no card: a slide announcing an act that does not play is worse than a recorded gap. They keep their numerals in `unresolved` so the numbering cannot drift when they are built.",
+  "_gaps": "Act VIII has no film and therefore no card: a slide announcing an act that does not play is worse than a recorded gap. It keeps its numeral in `unresolved` so the numbering cannot drift when it is built. Act II had the same gap until 2026-08-12, when it was built (docs/cuts/02-endless-forms-most-beautiful.md) and this card was added.",
   "_audio": "Every card is silent. Putting a bed under one is a licensing decision, the owner's alone.",
   "plates": [
     {
@@ -19,9 +19,21 @@
       "note": "Copy is the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94). This card was `card0` before the acts were numbered."
     },
     {
-      "id": "act3",
+      "id": "act2",
       "kind": "act",
       "at": 116.567,
+      "dur": 5.0,
+      "act": "II",
+      "label": "Act II",
+      "title": "Endless Forms Most Beautiful",
+      "subtitle": "Nightwish",
+      "chapters": [],
+      "note": "The owner named this act and its music in one instruction -- 'it's endless forms most beautiful, instrumental' -- and docs/running-order.md carries the title. The artist is reproduced from the bed's own provenance (music/bed_endless_forms_most_beautiful.json, the official Nightwish channel), matching act VI's card, which is a title and an artist for the same reason. The film is docs/cuts/02-endless-forms-most-beautiful.md. The word 'instrumental' is deliberately NOT on the slide: it describes which recording was used, not what the act is called, and nobody authored it as a subtitle."
+    },
+    {
+      "id": "act3",
+      "kind": "act",
+      "at": 429.534,
       "dur": 5.0,
       "act": "III",
       "label": "Act III",
@@ -33,7 +45,7 @@
     {
       "id": "act4",
       "kind": "act",
-      "at": 281.767,
+      "at": 594.734,
       "dur": 15.0,
       "act": "IV",
       "title": "Bias for Action",
@@ -50,7 +62,7 @@
     {
       "id": "act5",
       "kind": "act",
-      "at": 330.767,
+      "at": 643.734,
       "dur": 15.0,
       "act": "V",
       "title": "Wrong Place, Wrong Time, Right Attitude",
@@ -67,7 +79,7 @@
     {
       "id": "act6",
       "kind": "act",
-      "at": 371.026,
+      "at": 683.992,
       "dur": 5.0,
       "act": "VI",
       "label": "Act VI",
@@ -79,7 +91,7 @@
     {
       "id": "act7",
       "kind": "act",
-      "at": 803.726,
+      "at": 1121.692,
       "dur": 5.0,
       "act": "VII",
       "label": "Act VII",
@@ -90,12 +102,6 @@
     }
   ],
   "unresolved": [
-    {
-      "what": "act II -- Endless Forms Most Beautiful (instrumental)",
-      "detail": "The owner placed it second in the canonical order and named its music: 'it's endless forms most beautiful, instrumental'. No cut exists, no outline exists, and the album is a Nightwish record rather than a single track, so which instrumental it is has not been narrowed. No card is rendered for an act that does not play.",
-      "automatable": "no",
-      "blocked_on": "the act being built, and the track being named -- a music choice is a licensing decision."
-    },
     {
       "what": "act VIII -- end credits",
       "detail": "Last in the canonical order. The credits sequence for Seven Days to the Wolves has never been designed, which is issue #51. Nothing here designs it.",
@@ -121,5 +127,5 @@
       "blocked_on": "the owner's eye on the assembled programme."
     }
   ],
-  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | hero 5.000-116.567 | act3 116.567-121.567 | mrbobbytables 121.567-281.767 | act4 281.767-296.767 | kat 296.767-330.767 | act5 330.767-345.767 | natali 345.767-371.026 | act6 371.026-376.026 | wolves 376.026-803.726 | act7 803.726-808.726 | europa 808.726-918.926. Total 918.926s (15:18.9)."
+  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | intro 5.000-116.567 | act2 116.567-121.567 | endlessformsmostbeautiful 121.567-429.534 | act3 429.534-434.534 | mrbobbytables 434.534-594.734 | act4 594.734-609.734 | kat 609.734-643.734 | act5 643.734-658.734 | nat 658.734-683.992 | act6 683.992-688.992 | 7daystothewolves 688.992-1121.692 | act7 1121.692-1126.692 | europa 1126.692-1236.892. Total 1236.892s (20:36.9). Recomputed 2026-08-12 when act II was wired in; every stamp after act I moved, which is why nothing here is typed by hand -- re-derive with `python3 tools/megacut.py stories/megacut/megacut.json --chapters`."
 }

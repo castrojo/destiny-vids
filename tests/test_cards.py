@@ -61,12 +61,14 @@ def test_the_act_slides_are_numbered_in_the_owners_canonical_order():
     -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII)."""
     cards = _load("megacut-cards.json")
     numerals = [p["act"] for p in cards["plates"]]
-    assert numerals == ["I", "III", "IV", "V", "VI", "VII"]
-    # II and VIII are absent because they have no film; they must stay
-    # recorded, or the numbering silently closes up over them.
+    assert numerals == ["I", "II", "III", "IV", "V", "VI", "VII"]
+    # VIII is absent because it has no film, and it must stay recorded, or the
+    # numbering silently closes up over it. Act II was in the same state until
+    # its film was built; a slide is added when the act plays, never before.
     unresolved = " ".join(u["what"] for u in cards["unresolved"])
-    for missing in ("act II", "act VIII"):
-        assert missing in unresolved, missing
+    assert "act VIII" in unresolved
+    assert "act II --" not in unresolved, (
+        "act II has a film now; a gap that outlives its cause is a stale note")
 
 
 def test_one_person_is_never_two_acts():

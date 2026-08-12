@@ -17,7 +17,7 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | Act | Chapter | The film | State |
 |---|---|---|---|
 | **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the comic card | delivered |
-| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers | delivered, **not wired into the megacut** — #74 |
+| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers | delivered, in the programme |
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered |
@@ -31,11 +31,10 @@ jumps to the next act's footage, is a lie about what the audience is watching.
 It keeps its numeral so nothing renumbers around it: III is `mrbobbytables`
 permanently, whatever gets built later.
 
-**Act II now has a film** ([`docs/cuts/02-endless-forms-most-beautiful.md`](cuts/02-endless-forms-most-beautiful.md)),
-delivered to `Prod/`. It is **not yet in the programme**: its slide and its clip
-are a change to `stories/megacut/`, which was held open by another agent when
-the act was built, so wiring it in is filed rather than done. Until that lands,
-the assembled megacut still runs I, III, IV, V, VI, VII.
+**Act II has a film** ([`docs/cuts/02-endless-forms-most-beautiful.md`](cuts/02-endless-forms-most-beautiful.md)),
+delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
+and its own place on the clock. Seven of the eight acts now play, which is what
+**v0.5** is.
 
 **One person, one act.** `mrbobbytables` appears once, at III. An earlier pass
 had him twice — as an empty act and as another act's film under his character's
@@ -53,12 +52,16 @@ python3 tools/megacut.py stories/megacut/megacut.json --chapters
 
 ```text
 0:00  I. Project Bluefin
-1:56  III. Bob Killen
-4:41  IV. Bias for Action
-5:30  V. Wrong Place, Wrong Time, Right Attitude
-6:11  VI. 7 Days to the Wolves
-13:28 VII. Europa
+1:56  II. Endless Forms Most Beautiful
+7:09  III. Bob Killen
+9:54  IV. Bias for Action
+10:43 V. Wrong Place, Wrong Time, Right Attitude
+11:23 VI. 7 Days to the Wolves
+18:41 VII. Europa
 ```
+
+That is **v0.5**, 20:36.9. Every stamp after act I moved when act II was wired
+in — which is exactly why they are derived and never typed.
 
 A chapter starts on its **act slide**, not on the film behind it: the slide is
 how the audience is told which act this is. The list regenerates from the plan's
@@ -102,9 +105,11 @@ Recorded, not hidden:
 - **Act VII's master clips** at +0.3 dBTP — issue #82. The AAC deliverable of
   the same cut measured −1.0 and passed for weeks; nothing had ever measured the
   FLAC master. It needs a re-render of Europa's own build, not a fix here.
-- **Act VIII does not exist.** Issue #51.
-- **Act II exists but is not in the programme.** Issue #74. It is delivered to
-  `Prod/`; its slide and clip are still to be added to `stories/megacut/`.
+- **Act VIII does not exist.** Issue #51. The programme therefore ends on
+  Europa and **credits nobody**, which is the single biggest reason v0.5 is not
+  the feature.
+- **Act II's picture is a fan compilation**, not an official Bungie upload —
+  the same provenance question act VI carries (#55). See its cut doc.
 
 Delivered on 2026-08-12, so the two encode gaps this file used to list are
 closed:

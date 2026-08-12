@@ -105,13 +105,37 @@ def test_everything_lands_on_one_frame_rate(tmp_path):
 
 def test_colour_is_written_into_the_x264_vui(tmp_path):
     """-color_primaries describes the frames; x264 copies only the matrix from
-    them and leaves primaries/transfer `unknown`. Both must be set."""
+    them and leaves primaries/transfer `unknown`. Both must be set.
+
+    On the SEGMENT, which is the stage that encodes: the join copies the
+    bitstream, so a VUI written any later would never reach it."""
     path, plan = _plan(tmp_path, [
         {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
     ])
-    cmd = megacut.build_command(plan, "out.mp4")
+    cmd = megacut.build_segment_command(plan, 0, "seg000.mkv")
     assert "-color_primaries" in cmd
     assert "colorprim=bt709:transfer=bt709:colormatrix=bt709" in cmd
+    assert "copy" not in cmd, "the segment encodes; only the join copies"
+
+
+def test_the_join_copies_the_picture_and_encodes_the_sound_once(tmp_path):
+    """The reason segmenting costs no quality. Video is encoded at the segment
+    and copied here, so there is one video generation. Audio rides the segments
+    as lossless 24-bit PCM and is encoded to AAC once, ACROSS the joins --
+    encoding AAC per segment would give every cut its own encoder delay and
+    padding. PCM rather than FLAC because the concat demuxer binds the first
+    file's extradata to the whole stream, and FLAC keeps its STREAMINFO
+    there."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    seg = megacut.build_segment_command(plan, 0, "seg000.mkv")
+    assert seg[seg.index("-c:a") + 1] == "pcm_s24le"
+
+    join = megacut.build_concat_command(plan, "segments.txt", "out.mp4")
+    assert join[join.index("-c:v") + 1] == "copy"
+    assert join[join.index("-c:a") + 1] == "aac"
+    assert "-safe" in join and join[join.index("-safe") + 1] == "0"
 
 
 def test_expected_duration_sums_the_parts(tmp_path):
@@ -135,7 +159,8 @@ def test_a_command_can_be_built_with_no_ffmpeg_installed(tmp_path, monkeypatch):
     _, plan = _plan(tmp_path, [
         {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
     ])
-    assert megacut.build_command(plan, "out.mp4")[0] == "ffmpeg"
+    assert megacut.build_segment_command(plan, 0, "seg000.mkv")[0] == "ffmpeg"
+    assert megacut.build_concat_command(plan, "l.txt", "out.mp4")[0] == "ffmpeg"
 
 
 def test_ffprobe_is_resolved_beside_the_chosen_ffmpeg(monkeypatch):
