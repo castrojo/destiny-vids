@@ -153,3 +153,29 @@ no footage, and keep output non-commercial.
   H.264, and it fails only once decoding starts. See `docs/rendering.md`.
 - When a session surfaces a durable pattern, update the matching
   `docs/skills/*.md` in the same change and regenerate the catalog.
+
+## The merge queue
+
+`main` is protected: changes land through a pull request, and merging goes
+through GitHub's **merge queue** rather than a button. The queue re-runs CI on
+each PR *rebased onto the queue's head*, so two changes that pass separately but
+break together are caught before they land — which is the normal failure mode
+here, where several agents edit `tools/plate.py`, `vocab/casting.yaml` and the
+generated indexes at once.
+
+`.github/workflows/ci.yml` is the gate, and it runs on `merge_group` as well as
+on pull requests. It is the offline suite plus the three derived-artifact
+checks:
+
+```bash
+python3 -m pytest -q
+python3 scripts/generate_skill_index.py --check   # skill catalog
+python3 tools/corpus.py --check                   # per-character corpora
+python3 tools/rederive.py --check                 # no hand-edited derived field
+```
+
+Run all four before pushing; a queue rejection costs everybody behind you a
+re-run. If one of the last three fails, **regenerate — never hand-resolve**:
+`generate_skill_index.py --write`, `corpus.py --write`. A conflict in
+`docs/skills/index.json`, `docs/skills/index.md` or `corpus/*.json` is always
+resolved by re-running the tool, because those files are outputs.
