@@ -141,3 +141,39 @@ def test_cap_holds_without_a_cap_is_a_passthrough():
 def test_cap_holds_derives_duration_when_absent():
     shots = [{"segment_id": "a", "start_sec": 2.0, "end_sec": 22.0}]
     assert render.cap_holds(shots, 5.0)[0]["end_sec"] == 7.0
+
+
+def test_resolve_duration_clamps_a_hold_past_the_out_point(capsys):
+    """build_story clamps a hold at the cut, but a shotlist it never produced
+    (hand-edited, or from a future producer) can still arrive holding past
+    ``end_sec`` — the same clean-gate hole. The render is the last gate."""
+    shot = {"segment_id": "seg_a", "start_sec": 10.0, "end_sec": 14.2,
+            "duration": 600.0}
+    assert render.resolve_duration(shot) == pytest.approx(4.2)
+    err = capsys.readouterr().err
+    assert "CLAMPED" in err
+    assert "seg_a" in err
+
+
+def test_resolve_duration_within_the_span_is_quiet(capsys):
+    shot = {"segment_id": "seg_a", "start_sec": 10.0, "end_sec": 14.2,
+            "duration": 3.0}
+    assert render.resolve_duration(shot) == 3.0
+    assert capsys.readouterr().err == ""
+
+
+def test_resolve_duration_derives_the_span_when_duration_is_absent(capsys):
+    shot = {"segment_id": "seg_a", "start_sec": 10.0, "end_sec": 14.2}
+    assert render.resolve_duration(shot) == pytest.approx(4.2)
+    assert capsys.readouterr().err == ""
+
+
+def test_cap_holds_keeps_the_clamp_so_the_render_does_not_warn_twice(capsys):
+    """cap_holds and render both resolve the duration; the clamp must be
+    written back or the same shot is warned about once per pass."""
+    shots = [{"segment_id": "a", "start_sec": 0.0, "end_sec": 4.0, "duration": 30.0}]
+    capped = render.cap_holds(shots, 8.0)
+    assert capped[0]["duration"] == 4.0
+    assert capped[0]["end_sec"] == 4.0        # the clamp is to the vetted span
+    assert render.resolve_duration(capped[0]) == 4.0
+    assert capsys.readouterr().err.count("CLAMPED") == 1

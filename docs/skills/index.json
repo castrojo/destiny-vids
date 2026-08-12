@@ -18,8 +18,27 @@
       ],
       "description": "Covers lead bindings, ensemble slots, and how casting is derived rather than tagged. Use when adding or changing a cast member, crediting contributors, or debugging a casting role that did not derive.",
       "version": "1.0",
-      "last_updated": "2026-08-11",
+      "last_updated": "2026-08-12",
       "doc_type": "reference"
+    },
+    {
+      "id": "corpus",
+      "name": "corpus",
+      "one_line_purpose": "Catalog every indexed shot of one character, and the coverage they lack.",
+      "entry_point": "docs/skills/corpus.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "corpus",
+        "character",
+        "coverage",
+        "gaps",
+        "unresolved"
+      ],
+      "description": "Builds a per-character catalog of indexed shots plus the vocabulary values that have no clean coverage. Use before writing an outline for a character, or when extending the index to the next character or story.",
+      "version": "1.0",
+      "last_updated": "2026-08-12",
+      "doc_type": "procedure"
     },
     {
       "id": "editing",
@@ -36,8 +55,8 @@
         "outline"
       ],
       "description": "Covers outline authoring, shot matching, hold caps, and rendering a cut list to video. Use when writing a story outline, debugging a beat that matched the wrong shot, or rendering a cut.",
-      "version": "1.0",
-      "last_updated": "2026-08-11",
+      "version": "1.1",
+      "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },
     {
@@ -60,6 +79,25 @@
       "doc_type": "procedure"
     },
     {
+      "id": "issues",
+      "name": "issues",
+      "one_line_purpose": "File work, pick it up, and know when to stop and ask.",
+      "entry_point": "docs/skills/issues.md",
+      "category": "meta",
+      "status": "active",
+      "tags": [
+        "issues",
+        "brief",
+        "backlog",
+        "automatable",
+        "gaps"
+      ],
+      "description": "GitHub issues are the backlog, and a fenced `brief` block is the executable part of one. Use when filing work, picking work up, normalizing a prose request, or deciding whether something is an agent's call at all.",
+      "version": "1.0",
+      "last_updated": "2026-08-11",
+      "doc_type": "procedure"
+    },
+    {
       "id": "plates",
       "name": "plates",
       "one_line_purpose": "Put Guardian nameplates and title cards on a rendered cut.",
@@ -74,6 +112,46 @@
         "ffmpeg"
       ],
       "description": "Plans, renders, and burns Project Bluefin Guardian nameplates onto a cut. Use when crediting cast or contributors on screen, or changing plate copy, timing, or chrome.",
+      "version": "1.2",
+      "last_updated": "2026-08-12",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "production",
+      "name": "production",
+      "one_line_purpose": "Run the issue-to-render loop, repeatedly and in parallel.",
+      "entry_point": "docs/skills/production.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "pipeline",
+        "batch",
+        "parallel",
+        "make-video",
+        "resume"
+      ],
+      "description": "The whole loop from an issue to a rendered cut, what resumes, where it stops on purpose, and how several agents make videos at once without colliding. Use when producing videos in volume rather than debugging one stage.",
+      "version": "1.0",
+      "last_updated": "2026-08-11",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "scoring",
+      "name": "scoring",
+      "one_line_purpose": "Measure a music bed, cut sections out of it, and cut to its bars.",
+      "entry_point": "docs/skills/scoring.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "music",
+        "bed",
+        "tempo",
+        "downbeat",
+        "excision",
+        "anchor",
+        "ffmpeg"
+      ],
+      "description": "Covers bed records, bar-snapped excisions, the cached beat grid, and mapping a timecode between the source and edited timelines. Use when scoring a cut to a chosen track, removing a section from a bed, or landing a shot on a musical moment.",
       "version": "1.0",
       "last_updated": "2026-08-11",
       "doc_type": "procedure"

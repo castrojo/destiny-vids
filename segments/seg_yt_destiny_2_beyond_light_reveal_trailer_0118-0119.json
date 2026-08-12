@@ -1,0 +1,175 @@
+{
+  "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0118-0119",
+  "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+  "start_sec": 118.875,
+  "end_sec": 119.958333,
+  "start_tc": "1:59",
+  "end_tc": "2:00",
+  "era": "beyond_light",
+  "activity": "cinematic",
+  "content_type": "cinematic",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [],
+  "shot_scale": "MS",
+  "composition": [
+    "group"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "pacing": "medium",
+  "lighting": "dim",
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "implied_by_costume",
+  "substitutability": 3,
+  "overlays": [],
+  "subject_salience": "crowd_group",
+  "action": [
+    "idle"
+  ],
+  "mood": [
+    "tense"
+  ],
+  "register": 1,
+  "character": [],
+  "caption": "Three armored figures stand together on the ice, weapons slung, facing outward in different directions.",
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 3
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.6
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.7
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.95
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.78
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.68
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.68
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.88
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

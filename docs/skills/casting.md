@@ -1,7 +1,7 @@
 ---
 name: casting
 version: "1.0"
-last_updated: "2026-08-11"
+last_updated: "2026-08-12"
 id: casting
 one_line_purpose: Bind a Destiny character to a person and credit the monthly ensemble.
 entry_point: docs/skills/casting.md
@@ -59,6 +59,8 @@ enforces exactly that:
    for the person.
 3. Docs: the cast table in `README.md` and the bindings table in
    `docs/taxonomy.md`.
+4. `python3 tools/rederive.py` — the checked-in segments still carry the old
+   casting until it is run. Renaming a person is five places, not four.
 
 `constraints` (`require_helmet`, `require_far`) exist only where the project
 wants the figure to read as the character rather than as the person — currently
@@ -68,6 +70,60 @@ retrieval.
 
 Not every binding is a Guardian: `sagira` is a Ghost, so framing and helmet
 questions do not apply and her nameplate carries no subclass line.
+
+### Re-casting the index after a vocab edit
+
+`casting` is a pure function of the tagger's `character` list plus this vocab,
+so a vocab edit re-casts the whole index **without re-tagging** — but the
+checked-in segments still carry the old value until something recomputes them.
+The only writer used to be `tools/annotate.py index`, which needs the source
+video, and `media/` is gitignored. So a rename left every segment stale with no
+runnable remedy.
+
+`tools/rederive.py` is that remedy. It recomputes every derived field from the
+fields the record already carries — no video, no keyframes, no model:
+
+```bash
+python3 tools/rederive.py --check    # report drift, change nothing, exit 1
+python3 tools/rederive.py            # rewrite the drifted segments
+```
+
+It reports each change, so a vocab edit's blast radius is visible before it is
+committed:
+
+```text
+seg_yt_..._0027-0029.json
+    casting.person: 'karena_angel' -> 'karena_angell'
+```
+
+This is not a licence to edit a derived field by hand. It is the opposite: the
+one supported way to make the files agree with the vocab again, which is why it
+refuses to touch a tagger field and preserves each file's existing JSON layout
+so the diff shows the change and nothing else.
+
+### Plate-only people
+
+A person can carry owner-written nameplate copy and still have no binding here,
+and that is a **terminal state, not a gap**. A `leads` binding is for someone who
+*recurs*: it fixes their credit across every cut for the life of the project. A
+one-video credit belongs in the copy the owner wrote for that video, and adding a
+binding for it would claim a permanence nobody asked for.
+
+Nothing in this repo can tell the two apart, so nothing in this repo tries —
+`automatable: no`, blocked on an owner decision. The open ones (see
+castrojo/destiny-vids#1 for the copy itself; do not transcribe it, it has one
+home):
+
+| Person | State | Blocked on |
+|---|---|---|
+| Paris Pittman | Cast, as `iron_lord_red_haired` — but the binding has no `plate:`, and the copy the owner wrote is a Guardian plate for Paris, not copy for an Iron Lord. | Authoring plate copy for the character, or deciding she stays plate-only. |
+| Jeffrey Sica | Not cast, not in the index. Plate-only. | Whether he is recurring cast (add a binding) or a one-video credit (nothing to do). |
+
+Neither blocks anything. A cast-but-unplated lead like Paris still makes the cut:
+`tools/plate.py plan` writes the manifest and lists her under `unresolved` with
+the reason, so the credit is never dropped in silence — see
+[`plates.md`](plates.md). Someone with no binding at all is not in the index's
+casting, and the brief that carries their copy is their punch-list.
 
 ### Ensemble
 
@@ -84,14 +140,44 @@ re-render must not re-credit a different person.
 Slots are a pure function of the tags, never hand-set: `crowd` → 6, `group` or
 `crowd_group` salience → 3, otherwise 1.
 
+On-screen credit copy lives beside the casting decision in `vocab/casting.yaml`:
+the generic ensemble copy under `ensemble.plate`, and — under `ensemble.titles`,
+keyed by GitHub login — the Guardian identity of any contributor whose plate is
+genuinely authored in the reference deck (castrojo's is `np_jorge`). Most
+contributors have no entry: an unknown seal is `Bluefin Blueberry`, never an
+invented title. [`plates.md`](plates.md) covers how the two are scheduled.
+
+### Authored identities are reproduced, not written
+
+Ten people have a Guardian identity somebody actually authored, in files this
+repo does not own — `~/Videos/nameplates.json` and, for seven of them,
+`~/src/website public/wolves/characters/characters.json`. The roster and the
+precedence between those sources are in
+[`plates.md`](plates.md#where-the-copy-is-authored). Two consequences here:
+
+- **Copying an authored identity onto an existing binding is reproduction**, and
+  is allowed without asking — verbatim, with the source cited in a comment, as
+  `elsie_bray` (Laura Santamaria) and `saint_14` (Kat Cosgrove) do.
+- **Binding a new person is still a casting decision**, and stays the owner's.
+  An authored plate says who somebody *is*; it does not say which Destiny
+  character they play. Kaslin Fields, Christoph Blecker, Natali Vlatko and
+  Doctor Andy Anderson have authored identities and no binding here, and that
+  is a question for an issue, not an edit.
+
+An authored identity also does not travel between tiers on its own: a person
+cast as a **lead** is excluded from the ensemble pool entirely, so their copy
+belongs on the lead binding and nowhere else.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
 |---|---|
 | "It's probably them — same armor, two shots earlier." | A wrong tag credits a real person for a shot they are not in. Omit rather than guess. |
+| "Their Guardian identity is authored, so they're basically cast." | Two different claims. Reproduce the identity; leave the binding to the owner. |
 | "I'll tag `casting` directly, it's faster." | It is derived. A hand-set value is overwritten and hides the vocab bug that made you reach for it. |
 | "The search phrase can come later." | A binding nobody can query does not exist, and the suite fails on it. |
 | "Re-rolling the roster is fine, it's only credits." | Assignment is deterministic on purpose: a re-render must not re-credit a different person. |
+| "They have plate copy, so bind them — it's only a credit." | A binding says they recur, for the life of the project. Whether it's that or a one-video credit is the owner's call; the punch-list asks. |
 
 ## Red Flags
 
@@ -102,6 +188,8 @@ Slots are a pure function of the tags, never hand-set: `crowd` → 6, `group` or
   from the shots around it.
 - Adding a binding without a search phrase (the suite fails), or leaving a
   phrase behind after removing one (the suite fails the other way too).
+- Casting someone because they turned up in a brief with plate copy. Copy is a
+  credit for one video; a binding is a claim that they recur.
 - Treating `substitutability` as a usability gate. It was demoted: it only
   tie-breaks between otherwise-equal ensemble shots.
 

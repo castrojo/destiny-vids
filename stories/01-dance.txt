@@ -1,0 +1,51 @@
+# 01-dance — the Dance cut. Sequence position 01 (see docs/cuts/01-dance.md).
+#
+# ONE CINEMATIC, SKIPPED FORWARD. Every beat below is cut from
+# yt_destiny_2_the_final_shape_launch_trailer and sits at or after the previous
+# one on that cinematic's own timeline, so the cut only ever skips forward:
+#
+#   python3 tools/story.py stories/01-dance.txt --dir segments \
+#       --from-video yt_destiny_2_the_final_shape_launch_trailer --forward-only
+#
+# The beat order IS the timeline. There is no sequencer and no second
+# cinematic; the four movements below are the skip-forward points, and each
+# one names the source timecode it resumes at.
+#
+# THE FICTION BENT TO THE FOOTAGE. The index holds no dance-emote footage —
+# `action: emote` appears on exactly one shot in the whole index and it is
+# unclean. So the dance is staged, not depicted: one Guardian alone, then the
+# floor fills, then the light goes up. Nothing here claims anyone is dancing.
+# The unresolved beats that would have needed real dance footage are recorded
+# in docs/cuts/01-dance.md and in corpus/ensemble.json, not guessed at.
+
+# --- MOVEMENT 1 — ALONE (skip to 0:32) --------------------------------------
+# One Guardian, by themselves. The sound-effect hit the brief asks for lands
+# here; its exact frame is unresolved (see docs/cuts/01-dance.md).
+low shot of armored titan boots planted on grey lunar rock, mountains beyond
+a single silhouetted guardian dwarfed by the vast sphere of the traveler in cloud
+
+# --- MOVEMENT 2 — THEY GATHER (skip to 0:39) --------------------------------
+over-the-shoulder on two helmeted guardians in a dim briefing space, teal light
+a helmeted guardian sits amid crew in a dim hold, framed between two foreground figures
+a ring of guardians resting on crates and rock in low red light
+a hunter in a hooded helm with a green visor stands still against teal haze
+
+# --- MOVEMENT 3 — THE FLOOR MOVES (skip to 0:55) ----------------------------
+a lone guardian silhouetted at the center of an enormous violet detonation
+a cloaked guardian looks down over the lit city at dusk
+two guardians advance shoulder to shoulder with rifles raised, drenched in red light
+a lone cloaked figure walks out across an enormous grey-green plain under storm cloud
+guardians move up through red-lit ruins in loose formation, dust in the air
+
+# --- MOVEMENT 4 — THE DROP (skip to 1:23) -----------------------------------
+# The antagonist beat is wide, brief, and never close-up, per the standing
+# editorial direction; everything after it belongs to the heroes.
+a winged silhouette stands centered in a vast ring of white light
+a single red-armored guardian walks alone through violet fog, tiny against the dark
+a guardian swings a blade mid-charge as allies close in
+guardians charge through smoke, motion-blurred, weapons up
+overhead on a guardian at the center of an arc detonation, blue lightning branching
+a hooded hunter raises a crackling arc weapon overhead against a night sky
+a guardian hurls a torrent of blue-white energy across a dark field
+a hooded guardian turns through drifting embers, orange firelight raking the helmet
+a warlock draws violet and white prismatic light up into both hands

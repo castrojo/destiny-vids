@@ -1,7 +1,7 @@
 ---
 name: editing
-version: "1.0"
-last_updated: "2026-08-11"
+version: "1.1"
+last_updated: "2026-08-12"
 id: editing
 one_line_purpose: Turn a plain-language outline into a rendered cut.
 entry_point: docs/skills/editing.md
@@ -65,6 +65,35 @@ in outline order. Two consequences to write around:
 Phrasing a beat close to the target caption is legitimate: captions are the
 index's search surface, and the outline is written against what exists.
 
+### One cinematic, skipped forward
+
+A cut that lives inside a single source cinematic gets two flags instead of an
+edit timeline:
+
+```bash
+python3 tools/story.py stories/01-dance.txt --dir segments \
+    --from-video yt_destiny_2_the_final_shape_launch_trailer --forward-only
+```
+
+- `--from-video` restricts the pool to one source, so nothing drifts in from
+  another cinematic.
+- `--forward-only` holds a playhead on the source timeline: each beat may only
+  take a shot at or after the previous shot's out-point. The jump is reported
+  per shot as `skip_sec` (`[skip +Xs]` in text output). It requires
+  `--from-video` — a playhead is seconds on ONE cinematic's timeline, and the
+  tool refuses the flag alone rather than compare seconds across unrelated
+  sources.
+
+The beat order *is* the timeline; the skips are the gaps between chosen shots.
+This is deliberately not a sequencer — there is no cut-graph, no editing DSL,
+and no layer that lets cut order disagree with source order. Write the beats in
+source-time order and reorder by moving lines. Worked example:
+[`docs/cuts/01-dance.md`](../cuts/01-dance.md).
+
+Under `--forward-only` a mismatch cascades harder than usual: a wrong early
+pick can strand every later beat behind the playhead. Fix the earliest wrong
+beat, not the stranded one.
+
 ### Holds
 
 `--max-shot-sec` trims any shot held longer than the cap, **from its tail**. The
@@ -75,14 +104,75 @@ moves the start. A detector-derived beat can be a fine *beat* and a terrible
 Pass the same value to `tools/plate.py plan`, or every plate after the first
 trimmed shot lands late.
 
+### A hold cannot exceed the shot it was vetted on
+
+A beat may carry its own `duration` (in a JSON outline), which is a legitimate
+way to author a hold. It is capped at the segment's own length, and the cap is
+reported:
+
+```text
+CLAMPED HOLDS — the outline asked to hold past the shot's out-point:
+   3. yt_demo_0007  600s -> 4.2s
+```
+
+The cap is not tidiness. `render.py` cuts `-ss start_sec -t duration`, so a hold
+longer than the segment keeps decoding **into the next shot** — footage no beat
+selected and no tagger ever vetted, which may carry a HUD or a burned-in title
+and may not be `clean` at all. The emitted `end_sec` still reports the segment's
+real out-point, so nothing downstream reveals the overrun. That is the `clean`
+gate defeated by arithmetic rather than by a bad tag.
+
+Want a longer hold? Use a longer shot. The gate is per-shot because cleanliness
+was established per-shot.
+
+`render.py` applies the same clamp to every shot it cuts, not only to shotlists
+`story.py` built: a hand-edited `cut.json` can carry a `duration` past
+`end_sec`, and that is the identical hole. The render warns the same way —
+`CLAMPED: shot <segment_id> asked for Xs, shot holds Ys` on stderr — and cuts
+only the vetted span.
+
+## Not every piece is a cut
+
+Sometimes the source already tells the story and the job is to credit the cast
+and clean the frame, not to re-edit. `tools/uncut.py` emits a cut list that is
+simply every segment of one video in source order, so all the planners run
+unchanged — and because nothing is re-ordered or capped, the finished file and
+the source share a clock.
+
+```bash
+python3 tools/uncut.py <video_id> --out cut.json
+python3 tools/redact.py --video media/<video_id>.mp4 --video-id <video_id> \
+    --audio media/<bed>.mp3 --audio-gain 0.9 --out base.mp4
+```
+
+`redact.py` paints out the burned-in publisher copy an upload carries — the
+ratings card at the head, the logo lockup and legal line at the tail — from
+boxes authored in `redactions/<video_id>.json` against source pixels. On a cut
+those frames are simply `burned_text` and get dropped; uncut, there is nothing
+to drop them *for*, so they are covered instead. A redaction only ever removes:
+it never paints anything the frame did not already have to say.
+
+Two things follow, and both bite:
+
+- **The index must still be honest.** A shot that dissolves into the logo card
+  is `burned_text` and therefore not `clean`, even though the first fifteen
+  seconds of it are beautiful. Tag it, and let the redaction — not a fib in the
+  index — be what makes it usable here.
+- **Scoring replaces the audio.** `--audio` maps the bed instead of the source
+  and passes `-shortest`, so the dialogue is gone. If the conversation still
+  needs to be legible, show it: `tools/dialogue.py` (see
+  [`plates.md`](plates.md)).
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
 |---|---|
 | "No clean shot matches, so I'll allow unclean footage." | The gate exists to keep a HUD out of the finished cut. Rewrite the beat instead. |
 | "I'll hand-edit the timings in `cut.json`." | It is a derived artifact and the next run discards your edit. Change the outline or the cap. |
+| "I'll set a long `duration` on the beat to hold the shot." | A hold is clamped to the segment. Past its out-point you are cutting the *next* shot, which nothing vetted. |
 | "The beat matched something close enough." | A mismatch cascades into every later beat that wanted that shot. Fix it at the source. |
 | "Stream copy is faster and looks the same." | It snaps the in-point to a keyframe, discarding the boundary the detector pass exists to find. |
+| "I'll build a timeline layer so I can order shots freely." | One cinematic plus `--forward-only` is the shape. A sequencer buys freedom to hide continuity errors. |
 
 ## Red Flags
 
@@ -90,6 +180,8 @@ trimmed shot lands late.
   Coverage widening is a deliberate editorial choice, not a matcher fix.
 - Hand-editing `cut.json` to change timings. Change the outline, the tags, or
   the cap — the cut list is a derived artifact.
+- Adding a second cinematic, a track model, or a cut-graph to make a beat fit.
+  Back out and simplify: beat order is the timeline.
 - Stream-copying clips "to make the render faster". A stream copy snaps the
   in-point to the nearest keyframe and throws away the boundary the whole
   detector pass exists to find.
@@ -105,5 +197,19 @@ python3 -m pytest -q tests/test_story.py tests/test_render.py
 ffprobe -v error -show_entries format=duration -of csv=p=0 renders/<name>.mp4
 ```
 
+## Delivery
+
+A cut ships to two places from **one** cut list: the website player (source
+audio) and a YouTube upload (a music bed, `render.py --audio`). They differ by
+audio and filename, never by a second edit.
+
+Upload order lives in a numeric filename prefix — `stories/01-dance.txt` →
+`renders/01-dance-web.mp4`, `renders/01-dance-youtube.mp4`. Sorting the
+directory sorts the playlist; there is no ordering manifest to keep in sync.
+
+Each shipped cut gets a doc in `docs/cuts/` recording its source cinematic, its
+skip points, its unresolved beats, and anything a human still has to decide.
+
 Ranking weights and query mapping: `docs/agent-retrieval.md`. Encoder choices,
-seeking, and the ffmpeg resolution order: `docs/rendering.md`.
+seeking, and the ffmpeg resolution order: `docs/rendering.md`. What a character
+does and does not have on film: [`corpus.md`](corpus.md).

@@ -22,11 +22,13 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -112,6 +114,31 @@ def resolve_media(video_id, media_dir):
     return None
 
 
+def detect_picture(video, ffmpeg=None, probe_at=40.0, probe_len=5.0):
+    """Find the real picture area inside a letterboxed frame.
+
+    Bungie's cinematics are 2.39:1 delivered in a 16:9 file, so ~140px of the
+    top and bottom of every frame is baked-in black. Anything positioned
+    against the *frame* -- a nameplate on a 10% bottom margin -- ends up
+    hanging off the picture and onto the bar, which reads as a mistake.
+
+    Returns ``(x, y, w, h)``, falling back to the full frame when ffmpeg's
+    cropdetect finds nothing (an un-letterboxed source, or no decoder).
+    """
+    ffmpeg = ffmpeg or find_ffmpeg()
+    cmd = [*ffmpeg, "-nostdin", "-hide_banner",
+           "-ss", str(probe_at), "-t", str(probe_len), "-i", str(Path(video).resolve()),
+           "-vf", "cropdetect=24:2:0", "-f", "null", "-"]
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    found = re.findall(r"crop=(\d+):(\d+):(\d+):(\d+)", proc.stderr)
+    if not found:
+        return None
+    # The steadiest reading across the probe window, not the last one.
+    best = Counter(found).most_common(1)[0][0]
+    w, h, x, y = (int(v) for v in best)
+    return x, y, w, h
+
+
 def load_shots(path):
     with Path(path).open(encoding="utf-8") as fh:
         data = json.load(fh)
@@ -180,6 +207,26 @@ def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None):
         list_path.unlink(missing_ok=True)
 
 
+def resolve_duration(shot):
+    """A shot's hold in seconds, clamped to the span that was vetted.
+
+    story.py clamps a beat's hold at the cut; this is the same clamp at the
+    render, for a shotlist build_story never produced — hand-edited, or from a
+    future producer. A hold longer than ``end_sec - start_sec`` makes
+    ``-ss start_sec -t duration`` decode past the out-point into footage no
+    tagger vetted: the ``clean``-gate violation the story-side clamp exists to
+    prevent. Clamp it here too, and warn naming the shot rather than silently
+    truncating.
+    """
+    duration = shot.get("duration") or (shot["end_sec"] - shot["start_sec"])
+    vetted = shot["end_sec"] - shot["start_sec"]
+    if duration > vetted:
+        print(f"  CLAMPED: shot {shot['segment_id']} asked for {duration:g}s, "
+              f"shot holds {vetted:g}s", file=sys.stderr)
+        duration = vetted
+    return duration
+
+
 def cap_holds(shots, max_shot_sec, log=None):
     """Trim any shot held longer than ``max_shot_sec``, from its tail.
 
@@ -187,17 +234,23 @@ def cap_holds(shots, max_shot_sec, log=None):
     cinematic ends on a 25-second static gateway shot, which is a fine *beat*
     and a terrible final *cut*. The in-point is what the index worked to find,
     so the trim always comes off the end and never moves the start.
+
+    The hold is first clamped to the shot's own vetted span (see
+    ``resolve_duration``), and the clamp is written back so the render does
+    not resolve — and warn about — the same overrun a second time.
     """
     if not max_shot_sec:
         return list(shots)
     out = []
     for shot in shots:
-        duration = shot.get("duration") or (shot["end_sec"] - shot["start_sec"])
+        duration = resolve_duration(shot)
         if duration > max_shot_sec:
             if log:
                 log(f"  trimmed {shot['segment_id']} {duration:.1f}s -> {max_shot_sec:.1f}s")
             shot = dict(shot, duration=float(max_shot_sec),
                         end_sec=shot["start_sec"] + float(max_shot_sec))
+        elif shot.get("duration") and shot["duration"] != duration:
+            shot = dict(shot, duration=duration)
         out.append(shot)
     return out
 
@@ -217,7 +270,7 @@ def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=
             if src is None:
                 missing.append(shot)
                 continue
-            duration = shot.get("duration") or (shot["end_sec"] - shot["start_sec"])
+            duration = resolve_duration(shot)
             clip = Path(tmp) / f"clip_{n:03d}.mp4"
             if verbose:
                 print(f"  [{n:>2}] {shot['start_tc']}–{shot['end_tc']} "

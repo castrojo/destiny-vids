@@ -1,0 +1,175 @@
+{
+  "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0025-0026",
+  "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+  "start_sec": 25.166667,
+  "end_sec": 26.266667,
+  "start_tc": "0:25",
+  "end_tc": "0:26",
+  "era": "beyond_light",
+  "activity": "unknown",
+  "content_type": "cinematic",
+  "action": [
+    "traversal"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "caption": "Three Guardians advance in silhouette down a warmly lit interior hall.",
+  "character": [],
+  "character_identifiability": "unidentifiable",
+  "class": "unknown",
+  "composition": [
+    "group"
+  ],
+  "element": "unknown",
+  "faction": [],
+  "identity_visibility": "silhouette",
+  "lighting": "silhouette",
+  "mood": [
+    "tense"
+  ],
+  "overlays": [],
+  "pacing": "medium",
+  "register": 0,
+  "shot_scale": "MLS",
+  "subject_salience": "crowd_group",
+  "substitutability": 5,
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": true,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 3
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.8
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

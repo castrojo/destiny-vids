@@ -58,6 +58,18 @@ leads:
       person: laura_santamaria
       display_name: Laura Santamaria
       aka: [elsie_gray, the_exo_stranger, exo_stranger]
+      # Laura's Guardian identity is AUTHORED, not written here: every field is
+      # verbatim from ~/src/website public/wolves/characters/characters.json
+      # (slug `laura`), the same roster that authors Bob's plate below. It is
+      # reproduced rather than referenced because a credit that knows an
+      # authored identity must not fall back to the generic copy -- and it is
+      # copied verbatim rather than paraphrased, because paraphrasing a real
+      # person's credit is the same fault as inventing one.
+      plate:
+        label: MAINTAINER // GUARDIAN
+        class: Gunslinger Hunter
+        name: Laura Santamaria
+        title: The Order of Seven
     anna_bray:
       # Elsie's sister — the Bray line is the project's through-thread, so both
       # sisters are cast.
@@ -72,6 +84,18 @@ leads:
       person: castrojo
       display_name: castrojo
       aka: [cayde, cayde6]
+      # castrojo's Guardian identity is authored in the reference deck
+      # (~/Videos/nameplates.json, np_jorge), so it lives on his LEAD binding
+      # and is reproduced verbatim. Because he is cast as a lead, he is also
+      # excluded from the anonymous-Guardian ensemble pool: a person cannot be
+      # a named character and a nameless blueberry in the same project. He is
+      # therefore credited only in cuts where Cayde-6 is actually on screen.
+      plate:
+        label: TRUSTEE // GUARDIAN
+        class: Harbinger Titan
+        name: Jorge Castro
+        title: "Upender of Antipatterns | The First Disciple"
+        trustee: true
     saladin:
       # CONSTRAINED binding. jeefy plays the Iron Lord, but does not resemble
       # Saladin, so the shot has to do the work: FAR and HELMETED only, where the
@@ -90,14 +114,22 @@ leads:
       aka: []
       # On-screen nameplate copy (tools/plate.py), in the same four-field form
       # as the reference deck: label / class / name / title, plus `trustee`.
-      # The subclass is lore-true to Osiris rather than to the performer's usual
-      # Bluefin plate: he is a solar Warlock, and the plate names the ROLE.
+      # Every field is Bob Killen's OWN plate from the deck (np_bob) -- a real
+      # person's subclass is deck data, never a lore call about the character
+      # they happen to play.
+      #
+      # `variant: leader` is the complete gold treatment from
+      # WolvesIntroOverlay.vue (.wolves-guardian-plate-leader) -- the one the
+      # wolves video reserves for Christoph Blecker. It takes precedence over
+      # `trustee` in the CSS and in _variant_for(), so both flags are kept: Bob
+      # is a trustee, and he is plated as the leader.
       plate:
         label: TRUSTEE // GUARDIAN
-        class: Dawnblade Warlock
+        class: Voidwalker Warlock
         name: Bob Killen
         title: Reconciler of the Plane
         trustee: true
+        variant: leader
     sagira:
       # Osiris's Ghost. A Ghost is not a Guardian, so nothing about framing or
       # helmets applies -- she is cast on presence in frame alone.
@@ -107,7 +139,10 @@ leads:
       plate:
         label: EMOTIONAL SUPPORT // GHOST
         name: Lindsay Gendreau
-        title: Master of the Labyrinths
+        # Nobody has authored a seal for Lindsay, so the title is the project's
+        # standing answer for an unknown one (the owner's rule), the same as an
+        # ensemble slot's.
+        title: Bluefin Blueberry
         kind: ghost
     saint_14:
       person: kat
@@ -119,10 +154,53 @@ leads:
       note: >
         Kat from now on, but she remains the bubble in the original Wolves.
       aka: [saint, saint14]
+      # AUTHORED identity, reproduced verbatim -- and authored twice over, which
+      # is why it is safe to reproduce without asking: characters.json (slug
+      # `kat`) and src/data/wolves-intro-sequence.ts in ~/src/website agree
+      # field for field, and the shipped cut
+      # ~/Videos/UPLOAD/01-wolves-kat-cosgrove-sentinel-titan.mp4 renders it.
+      # `display_name` above stays "Kat" (how the index refers to her); the
+      # plate carries her full authored name, as the deck does everywhere.
+      plate:
+        label: MAINTAINER // GUARDIAN
+        class: Sentinel Titan
+        name: Kat Cosgrove
+        title: Defender Queen of the Lost
     mara_sov:
-      person: karena_angel
-      display_name: Karena Angel
+      person: karena_angell
+      display_name: Karena Angell
       aka: [queen_mara_sov]
+      # OWNER-SUPPLIED plate copy. Karena has NO entry in the reference deck
+      # (~/Videos/nameplates.json), so there is no authored Guardian identity to
+      # reproduce, and this file must never invent one -- see the `ensemble.titles`
+      # comment and the Osiris/Sagira bindings, both of which were corrected back
+      # to deck data for exactly this reason.
+      #
+      # The exception that applies here is the owner authoring copy directly,
+      # which is allowed where an agent inventing it is not. Every field below
+      # was supplied by the owner verbatim; they are recorded as authored, not
+      # derived from anything about the character.
+      #
+      # `class` is INCOMPLETE and deliberately so. The owner gave the class --
+      # Warlock -- and referred to a subclass without naming it. Every other
+      # class row in the deck is "<Subclass> <Class>" (Voidwalker Warlock,
+      # Harbinger Titan), so this row is missing its first word. The subclass is
+      # authored nowhere: not the deck, not projectbluefin/website's
+      # wolves-gallery-featured.ts or wolves-lore-records.ts. Picking one would
+      # put a Destiny subclass on a real person on the owner's authority without
+      # the owner having said it, which is the single thing this file must never
+      # do -- so the row carries only what was actually supplied.
+      #
+      # TODO(owner): supply the subclass and make this "<Subclass> Warlock".
+      #
+      # `variant: leader` is the gold treatment from WolvesIntroOverlay.vue
+      # (.wolves-guardian-plate-leader), owner-directed for this binding.
+      plate:
+        label: ARCHITECT // GENERAL
+        class: Warlock
+        name: Karena Angell
+        title: Archon of the Consensus
+        variant: leader
     petra_venj:
       person: lenka
       display_name: Lenka
@@ -144,6 +222,14 @@ leads:
       # Destiny name is UNCONFIRMED — the binding is keyed on the description so
       # the casting is not blocked on identifying her. Rename this key (and add
       # the old id to `aka`) once the character is pinned down.
+      #
+      # NO `plate:` ON PURPOSE. Paris has owner-written nameplate copy, but it is
+      # a Guardian plate for Paris, not copy for an Iron Lord — and what a
+      # character says on screen is authored, never derived or adapted. So she is
+      # cast but plate-only, and tools/plate.py reports her under `unresolved`
+      # (`no_plate_copy`) every time she makes a cut, rather than dropping the
+      # credit. Writing copy in here is the owner's call, and the only thing that
+      # closes it.
       person: paris_pittman
       display_name: Paris Pittman
       aka: [red_haired_iron_lord, dying_iron_lord]
@@ -167,6 +253,61 @@ ensemble:
     pool is rebuilt per calendar month by tools/ensemble.py from repository
     contribution history, then deterministically assigned to the ensemble slots
     across a shot list, producing one credit TILE per contributor.
+  plate:
+    description: >
+      On-screen nameplate copy for an ensemble credit, read by tools/plate.py.
+      Same closed field set as a lead's `plate:` block. The eyebrow depends on
+      whether the person is a member of the GitHub org: a maintainer is not a
+      passing contributor and the credit should not say they are.
+
+      `label_unknown` exists because org membership is a lookup that can fail
+      (no network, no token, insufficient scope). Failing to read it is NOT
+      evidence that someone is not a maintainer, so it gets the neutral
+      GUARDIAN eyebrow rather than silently demoting the whole cast.
+    label: CONTRIBUTOR // GUARDIAN        # not in the org
+    label_member: MAINTAINER // GUARDIAN  # in the org
+    label_unknown: GUARDIAN               # membership could not be read
+    # A Destiny "title" is a seal, and we do not know anyone's. "Blueberry" is
+    # the in-game name for an unnamed Guardian you get randomly grouped with,
+    # which is exactly what an ensemble slot is.
+    title: Bluefin Blueberry
+    # The headline of the roster card that closes the cut (the title card's
+    # `title` field). Owner-supplied copy; the card's `subtitle` carries the
+    # month context and is assembled by tools/plate.py from the roster key.
+    roster_title: Thanks for working on Bluefin!
+  # AUTHORED Guardian identities for individual contributors, keyed by GitHub
+  # login. Most contributors are anonymous Guardians: nobody knows their seal,
+  # so they get the generic plate copy above. A few people's Guardian identity
+  # is genuinely authored in the reference deck (~/Videos/nameplates.json), and
+  # a credit that knows it must reproduce it verbatim, never a paraphrase and
+  # never the generic fallback. tools/plate.py prefers an entry here over the
+  # generic copy wherever the person lands, including over the tail sign-off
+  # card, which never flattens an authored identity into a name line while the
+  # cut still has room for the real plate.
+  #
+  # A person CAST AS A LEAD does not belong here: their identity lives on the
+  # lead binding, and they are excluded from the ensemble pool entirely. That
+  # is why castrojo is not in this map -- he is Cayde-6, so his plate is on the
+  # `cayde_6` binding above and he is credited only where Cayde is on screen.
+  #
+  # Add a login ONLY with copy that exists in the deck: inventing a title, a
+  # class, or a pronoun for a real person is the one thing this file must
+  # never do.
+  titles:
+    description: >
+      Authored Guardian identities for individual contributors, keyed by GitHub
+      login (see the comment above). Values are full plate copies in the
+      reference deck's closed field set; tools/derive.py loads them with
+      load_ensemble_titles() and tools/plate.py prefers them over the generic
+      ensemble copy. Derivation never reads this block. Empty is normal: it
+      only ever holds people whose identity is genuinely authored AND who are
+      not cast as a lead.
+  org:
+    description: >
+      GitHub organisation whose members are credited as maintainers. Recorded
+      per roster by tools/ensemble.py as `org_member` on each contributor:
+      true, false, or null when the lookup failed.
+    value: projectbluefin
   pool:
     source: Project Bluefin repositories, contributions within a calendar month.
     rotation: monthly
@@ -187,6 +328,18 @@ ensemble:
       composition contains crowd                    -> 6;
       composition contains group, or subject_salience == crowd_group -> 3;
       otherwise                                     -> 1.
+  placeholder_plate:
+    # On-screen copy for an ensemble slot that is NOT YET CAST — the blueberry
+    # plate. It exists so a cut can be assembled, timed and reviewed before a
+    # month's roster is known, WITHOUT putting a real person's name on a shot
+    # they were never assigned. It names nobody on purpose: `name: TBD` is a
+    # visible placeholder, not a credit. Replace it by re-planning with a real
+    # roster (`tools/ensemble.py roster`) before anything is published.
+    # Same four-field deck vocabulary as a lead `plate:` — nothing invented —
+    # and the default blue chrome, which is the blueberry treatment.
+    label: CONTRIBUTOR // GUARDIAN
+    name: TBD
+    title: Project Bluefin
 
 derived_fields:
   casting:

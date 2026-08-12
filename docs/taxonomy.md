@@ -190,7 +190,7 @@ tiers, and the difference between them is the whole model:
 | `osiris` | `mrbobbytables` | — | — |
 | `sagira` | `lindsay_gendreau` (Lindsay Gendreau) | `sagira_ghost` | — |
 | `saint_14` | `kat` (Kat) | `saint`, `saint14` | — |
-| `mara_sov` | `karena_angel` (Karena Angel) | `queen_mara_sov` | — |
+| `mara_sov` | `karena_angell` (Karena Angell) | `queen_mara_sov` | — |
 | `petra_venj` | `lenka` (Lenka) | `petra` | — |
 | `variks` | `nate_waddington` (Nate Waddington) | `variks_the_loyal` | — |
 | `the_speaker` | `jonathan_bryce` (Jonathan Bryce) | `speaker` | — |
@@ -215,6 +215,15 @@ in the same four-field form as the reference deck (`label`, `class`, `name`,
 character→person binding is what stops the credit and the casting from drifting
 apart — recast a role and the plate follows, with no other edit. Derivation
 never reads it; `tools/plate.py` does.
+
+Five bindings carry one today; four of them — `cayde_6`, `osiris`, `elsie_bray`
+and `saint_14` — are **reproduced verbatim** from a file this repo does not own
+(`~/Videos/nameplates.json`, or the website's
+`public/wolves/characters/characters.json`). None of it was written here. The
+fifth, `sagira`, carries the documented unknown-seal fallback (`title: Bluefin
+Blueberry`), not an authored identity. Which source wins, who else has an
+authored identity, and where two sources disagree is
+[`docs/skills/plates.md`](skills/plates.md#where-the-copy-is-authored).
 
 Querying either half of a binding retrieves the same footage — "Zavala" and
 "Kelsey" are the same lead, so both resolve to it. Alongside these, `leads`

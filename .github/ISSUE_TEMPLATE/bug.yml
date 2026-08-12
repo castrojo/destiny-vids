@@ -1,0 +1,57 @@
+name: Bug / debt report
+description: Something is wrong, in the fixed shape agent-filed issues use
+title: ""
+labels: [triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the shape agents file bugs in (see #5, #6, #7). The
+        load-bearing section is **why it is not just fixed**: if an agent
+        could fix it, it would have.
+
+        Three classes of work in this repo are permanently **not
+        automatable**: visual judgement on a frame, a claim about a real
+        person, and a licensing decision. For those, "not automatable,
+        stopping" is a first-class successful outcome — the bug report *is*
+        the deliverable.
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: What is wrong, stated plainly.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it is not just fixed
+      description: What stops the fix from being applied right now — missing owner data, a rule in AGENTS.md, a rights question.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: The command or steps that show it.
+      render: bash
+    validations:
+      required: false
+  - type: textarea
+    id: fix
+    attributes:
+      label: Fix
+      description: The fix if one is known, or the options with their trade-offs if it is an owner's call.
+    validations:
+      required: false
+  - type: dropdown
+    id: automatable
+    attributes:
+      label: Automatable
+      description: "No means human judgement — a frame, a real person, or a license. That is a stopping point, not a failure."
+      options:
+        - "yes"
+        - "no"
+        - "partly"
+    validations:
+      required: true

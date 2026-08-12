@@ -20,6 +20,7 @@ Usage:
     python3 tools/story.py outline.txt --dir examples --format edl --out cut.edl
     python3 tools/story.py outline.txt --format json --out shotlist.json
     python3 tools/story.py outline.txt --allow-gameplay
+    python3 tools/story.py outline.txt --from-video <video_id> --forward-only
 """
 from __future__ import annotations
 
@@ -68,11 +69,14 @@ def _beat(entry):
     return {"beat": entry.get("beat", "").strip(), "duration": entry.get("duration")}
 
 
-def pick_shot(beat, candidates, used_ids):
+def pick_shot(beat, candidates, used_ids, after_sec=None):
     """Best-scoring unused candidate for one beat, or None.
 
     Reuse is blocked because a story that cuts the same shot twice reads as
     padding; the caller reports the miss so the beat can be rewritten.
+
+    ``after_sec`` is the forward-only floor: a candidate that starts before it
+    would run the source cinematic backwards, so it is not a candidate.
     """
     parsed = parse_query(beat)
     survivors, active, dropped = relaxed_filter(candidates, parsed["filters"])
@@ -80,6 +84,8 @@ def pick_shot(beat, candidates, used_ids):
     scored = []
     for seg in survivors:
         if seg.get("segment_id") in used_ids:
+            continue
+        if after_sec is not None and (seg.get("start_sec") or 0) < after_sec:
             continue
         # A blocked constrained lead does not read as the character, so it can
         # never carry a beat — even one that never named that character.
@@ -97,26 +103,79 @@ def pick_shot(beat, candidates, used_ids):
             "relaxed": [f for f, _ in dropped], "filters": {k: sorted(v) for k, v in active.items()}}
 
 
-def build_story(outline_beats, segments, allow_gameplay=False):
-    """Walk the beats in order, casting each to a distinct clean shot."""
+def clamp_duration(requested, source_duration):
+    """Clamp an outline-supplied hold to what the shot actually contains.
+
+    Returns ``(duration, overrun_or_None)``.
+
+    A beat may carry its own ``duration``, which is a legitimate authoring
+    control. Left unclamped it is also a hole straight through the ``clean``
+    gate: ``render.py`` cuts ``-ss start_sec -t duration``, so a hold longer
+    than the segment keeps decoding **into the next scene** — footage no beat
+    selected, which may carry a HUD or burned-in text and may not be ``clean``
+    at all. Nothing downstream notices, because the emitted ``end_sec`` still
+    reports the segment's real out-point.
+
+    Cleanliness has to be positively established per shot, so a hold is capped
+    at the material that was actually vetted. The overrun is returned rather
+    than swallowed: silently shortening a beat the author asked to hold is its
+    own surprise, and an anchored cut needs to know its timeline moved.
+    """
+    if not requested:
+        return source_duration, None
+    if source_duration and requested > source_duration:
+        return source_duration, requested
+    return requested, None
+
+
+
+def build_story(outline_beats, segments, allow_gameplay=False, from_video=None,
+                forward_only=False):
+    """Walk the beats in order, casting each to a distinct clean shot.
+
+    ``from_video`` narrows the pool to one source cinematic and ``forward_only``
+    makes the cut advance along that cinematic's own timeline — each beat may
+    only take a shot at or after the end of the last one, so the story skips
+    forward and never doubles back. Together they are the whole "one cinematic,
+    skipped forward" shape: no timeline object, no sequencer, just the pool and
+    a floor that moves.
+
+    ``forward_only`` without ``from_video`` is refused: the playhead is seconds
+    on ONE cinematic's timeline, and compared across different sources it would
+    silently exclude shots and report a skip measured between unrelated
+    timelines.
+    """
+    if forward_only and not from_video:
+        raise ValueError("forward_only needs from_video: a forward-only "
+                         "playhead only has meaning on one cinematic's "
+                         "timeline")
+
     # THE gate: only clean footage is eligible. Gameplay is opt-in coverage.
     pool = [s for s in segments if s.get("clean")]
     if not allow_gameplay:
         pool = [s for s in pool if s.get("footage_tier") != "gameplay"]
+    if from_video:
+        pool = [s for s in pool if s.get("video_id") == from_video]
 
     shots = []
     misses = []
+    overruns = []
     used = set()
+    playhead = 0.0 if forward_only else None
     for index, item in enumerate(outline_beats, start=1):
-        pick = pick_shot(item["beat"], pool, used)
+        pick = pick_shot(item["beat"], pool, used, after_sec=playhead)
         if pick is None:
             misses.append({"index": index, "beat": item["beat"]})
             continue
         seg = pick["segment"]
         used.add(seg.get("segment_id"))
         source_duration = (seg.get("end_sec", 0) or 0) - (seg.get("start_sec", 0) or 0)
-        duration = item["duration"] or source_duration
-        shots.append({
+        duration, over = clamp_duration(item["duration"], source_duration)
+        if over is not None:
+            overruns.append({"index": index, "beat": item["beat"],
+                             "segment_id": seg.get("segment_id"),
+                             "requested": over, "clamped_to": duration})
+        shot = {
             "index": index,
             "beat": item["beat"],
             "segment_id": seg.get("segment_id"),
@@ -132,8 +191,13 @@ def build_story(outline_beats, segments, allow_gameplay=False):
             "score": round(pick["score"], 3),
             "why": pick["reasons"],
             "segment": seg,
-        })
-    return {"shots": shots, "misses": misses,
+        }
+        if playhead is not None:
+            # How far the cinematic was skipped forward to reach this beat.
+            shot["skip_sec"] = round((seg.get("start_sec") or 0) - playhead, 3)
+            playhead = seg.get("end_sec") or 0
+        shots.append(shot)
+    return {"shots": shots, "misses": misses, "overruns": overruns,
             "pool_size": len(pool), "index_size": len(segments)}
 
 
@@ -188,8 +252,11 @@ def to_text(story, title):
         who = casting.get("character") or (
             f"ensemble x{casting.get('slots')}" if casting.get("role") == "ensemble" else "—")
         lines.append(f"{shot['index']:>3}. {shot['beat']}")
+        skip = ""
+        if shot.get("skip_sec") is not None:
+            skip = f"  [skip +{shot['skip_sec']:g}s]"
         lines.append(f"     {shot['video_id']}  {shot['start_tc']}–{shot['end_tc']}  "
-                     f"({shot['duration']:g}s, {shot['footage_tier']}, {who})")
+                     f"({shot['duration']:g}s, {shot['footage_tier']}, {who}){skip}")
         lines.append(f"     {shot['segment_id']}  [{shot['score']:+.2f}] "
                      f"{', '.join(shot['why'])}")
         cap = (shot.get("caption") or "").strip()
@@ -200,6 +267,15 @@ def to_text(story, title):
         lines.append("UNMATCHED BEATS — no clean shot covers these; rewrite them:")
         for miss in story["misses"]:
             lines.append(f"  {miss['index']:>3}. {miss['beat']}")
+    if story.get("overruns"):
+        lines.append("")
+        lines.append("CLAMPED HOLDS — the outline asked to hold past the shot's "
+                     "out-point:")
+        for over in story["overruns"]:
+            lines.append(f"  {over['index']:>3}. {over['segment_id']}  "
+                         f"{over['requested']:g}s -> {over['clamped_to']:g}s")
+        lines.append("  Holding past the out-point would cut unvetted footage "
+                     "from the next shot.")
     return "\n".join(lines)
 
 
@@ -212,14 +288,24 @@ def main(argv=None):
     ap.add_argument("--out", help="write output here instead of stdout")
     ap.add_argument("--allow-gameplay", action="store_true",
                     help="let gameplay-tier shots into the pool as coverage")
+    ap.add_argument("--from-video", metavar="VIDEO_ID",
+                    help="cut from ONE source cinematic only")
+    ap.add_argument("--forward-only", action="store_true",
+                    help="each beat must sit at or after the last one on the "
+                         "source timeline — the cut skips forward, never back "
+                         "(requires --from-video)")
     args = ap.parse_args(argv)
+    if args.forward_only and not args.from_video:
+        ap.error("--forward-only skips forward within ONE source cinematic; "
+                 "pass --from-video VIDEO_ID with it")
 
     title, fps, beats = read_outline(args.outline)
     segments = load_segments(args.dir)
     if not segments:
         print(f"No segment records found in {args.dir}", file=sys.stderr)
         return 1
-    story = build_story(beats, segments, allow_gameplay=args.allow_gameplay)
+    story = build_story(beats, segments, allow_gameplay=args.allow_gameplay,
+                        from_video=args.from_video, forward_only=args.forward_only)
 
     if args.format == "json":
         payload = dict(story)
@@ -239,6 +325,10 @@ def main(argv=None):
               f"{len(story['misses'])} unmatched beat(s))")
     else:
         print(text)
+    for over in story.get("overruns", []):
+        print(f"  CLAMPED: beat {over['index']} ({over['segment_id']}) asked for "
+              f"{over['requested']:g}s, shot holds {over['clamped_to']:g}s",
+              file=sys.stderr)
     return 0
 
 

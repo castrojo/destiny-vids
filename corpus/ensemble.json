@@ -1,0 +1,4947 @@
+{
+  "subject": "ensemble",
+  "generated_by": "tools/corpus.py",
+  "counts": {
+    "shots": 117,
+    "clean": 116,
+    "blocked": 1,
+    "videos": 7,
+    "clean_seconds": 194.185
+  },
+  "videos": [
+    "yt_curse_of_osiris_opening_cinematic",
+    "yt_d2_season_of_the_lost_cutscenes",
+    "yt_destiny_2_beyond_light_gameplay_trailer",
+    "yt_destiny_2_beyond_light_reveal_trailer",
+    "yt_destiny_2_lightfall_launch_trailer",
+    "yt_destiny_2_the_final_shape_launch_trailer",
+    "yt_destiny_2_the_witch_queen_gameplay_trailer"
+  ],
+  "coverage": {
+    "action": {
+      "combat": 46,
+      "traversal": 30,
+      "ability_cast": 27,
+      "idle": 26,
+      "vehicle": 4,
+      "ritual": 3,
+      "dialogue": 2
+    },
+    "shot_scale": {
+      "MS": 51,
+      "LS": 23,
+      "MCU": 17,
+      "MLS": 11,
+      "ELS": 8,
+      "ECU": 5,
+      "CU": 1
+    },
+    "composition": {
+      "single": 50,
+      "group": 31,
+      "two_shot": 22,
+      "establishing": 11,
+      "POV": 5,
+      "OTS": 4,
+      "crowd": 2
+    },
+    "subject_salience": {
+      "guardian_hero": 93,
+      "crowd_group": 23
+    }
+  },
+  "gaps": [
+    {
+      "axis": "action",
+      "value": "emote",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "shot_scale",
+      "value": "INSERT",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    }
+  ],
+  "shots": [
+    {
+      "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0003-0010",
+      "video_id": "yt_curse_of_osiris_opening_cinematic",
+      "start_tc": "0:03",
+      "end_tc": "0:10",
+      "start_sec": 3.366667,
+      "end_sec": 10.3,
+      "duration": 6.933,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three helmeted Guardians move in a low crouch-run through a dim, teal-lit Vex ruin corridor, weapons raised and ready.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0010-0012",
+      "video_id": "yt_curse_of_osiris_opening_cinematic",
+      "start_tc": "0:10",
+      "end_tc": "0:13",
+      "start_sec": 10.3,
+      "end_sec": 12.566667,
+      "duration": 2.267,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "An armored Guardian's back fills the foreground while two more Guardians aim their weapons down a rubble-strewn stairwell in the ruins beyond.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "OTS",
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0013-0014",
+      "video_id": "yt_curse_of_osiris_opening_cinematic",
+      "start_tc": "0:14",
+      "end_tc": "0:15",
+      "start_sec": 13.5,
+      "end_sec": 14.533333,
+      "duration": 1.033,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two Guardians push forward side by side through the ruins, one in heavy plate armor aiming a rifle, the other in a flowing cloak raised behind cover.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0024-0026",
+      "video_id": "yt_curse_of_osiris_opening_cinematic",
+      "start_tc": "0:25",
+      "end_tc": "0:27",
+      "start_sec": 24.966667,
+      "end_sec": 26.566667,
+      "duration": 1.6,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A hooded Guardian leaps into the air with void energy blazing around a raised fist as a Vex Minotaur aims its weapon in response.",
+      "class": "hunter",
+      "element": "void",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "combat"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 1,
+      "faction": [
+        "vex"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0026-0028",
+      "video_id": "yt_curse_of_osiris_opening_cinematic",
+      "start_tc": "0:27",
+      "end_tc": "0:29",
+      "start_sec": 26.566667,
+      "end_sec": 28.566667,
+      "duration": 2.0,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 6
+      },
+      "caption": "A sprawling firefight spans a shattered Vex courtyard as Guardians perched on broken pillars trade beam fire with a crowd of machines below while an arc blast tears through the center.",
+      "class": "unknown",
+      "element": "arc",
+      "shot_scale": "LS",
+      "composition": [
+        "establishing",
+        "crowd"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "crowd_group",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": [
+        "vex"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0028-0033",
+      "video_id": "yt_curse_of_osiris_opening_cinematic",
+      "start_tc": "0:29",
+      "end_tc": "0:34",
+      "start_sec": 28.566667,
+      "end_sec": 33.633333,
+      "duration": 5.067,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 6
+      },
+      "caption": "A chaotic firefight fills the frame: a Vex Minotaur anchors a crowd of machines on the left while Guardians leap, fall, and fire through crossing beams of light on the right.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "crowd"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "crowd_group",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": [
+        "vex"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0047-0052",
+      "video_id": "yt_curse_of_osiris_opening_cinematic",
+      "start_tc": "0:47",
+      "end_tc": "0:52",
+      "start_sec": 47.4,
+      "end_sec": 52.166667,
+      "duration": 4.767,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A hooded Guardian braces atop a jagged black Vex spire and fires a rifle through drifting embers, a bright muzzle flash cutting across crossing pink hard-light beams.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "push_in"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": [
+        "vex"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_d2_season_of_the_lost_cutscenes_0016-0017",
+      "video_id": "yt_d2_season_of_the_lost_cutscenes",
+      "start_tc": "0:16",
+      "end_tc": "0:18",
+      "start_sec": 16.333333,
+      "end_sec": 17.766667,
+      "duration": 1.433,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A dark-haired Awoken pilot screams in a cockpit harness, amber eyes wide, red-lit machinery close behind his head.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "CU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "face_clear",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0015-0016",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:15",
+      "end_tc": "0:16",
+      "start_sec": 15.433333,
+      "end_sec": 16.3,
+      "duration": 0.867,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A cloaked Guardian looks out from a ledge over a vast ruined facility shrouded in teal fog.",
+      "class": "hunter",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "single",
+        "establishing"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "ominous"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0016-0017",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:16",
+      "end_tc": "0:18",
+      "start_sec": 16.3,
+      "end_sec": 17.6,
+      "duration": 1.3,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Two armored figures walk a raised catwalk inside a blue-lit industrial facility.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "crowd_group",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "ominous"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0019-0020",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:20",
+      "end_tc": "0:21",
+      "start_sec": 19.633333,
+      "end_sec": 20.666667,
+      "duration": 1.033,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two Guardians walk in silhouette down a corridor toward a bright exit.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "reverent"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0023-0024",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:23",
+      "end_tc": "0:24",
+      "start_sec": 23.133333,
+      "end_sec": 24.0,
+      "duration": 0.867,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A small group of Guardians gathers near a vehicle deep inside an icy cave.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group",
+        "establishing"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "silhouette",
+      "subject_salience": "crowd_group",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "lonely"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0025-0026",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:25",
+      "end_tc": "0:26",
+      "start_sec": 25.166667,
+      "end_sec": 26.266667,
+      "duration": 1.1,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three Guardians advance in silhouette down a warmly lit interior hall.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "crowd_group",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0026-0027",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:26",
+      "end_tc": "0:27",
+      "start_sec": 26.266667,
+      "end_sec": 27.466667,
+      "duration": 1.2,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A fireteam of three Guardians advances with weapons drawn across icy terrain.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "silhouette",
+      "subject_salience": "crowd_group",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0028-0029",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:28",
+      "end_tc": "0:30",
+      "start_sec": 28.466667,
+      "end_sec": 29.566667,
+      "duration": 1.1,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A lone Guardian stands centered in a grand, symmetrical hall bathed in red light, weapon in hand.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single",
+        "establishing"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "reverent"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0031-0032",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:32",
+      "end_tc": "0:33",
+      "start_sec": 31.833333,
+      "end_sec": 32.833333,
+      "duration": 1.0,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two Guardians leap through a narrow icy chasm opening toward bright light beyond.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0034-0036",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:35",
+      "end_tc": "0:37",
+      "start_sec": 34.866667,
+      "end_sec": 36.833333,
+      "duration": 1.967,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A robed figure stands alone on a ridge, facing a distant brilliant light.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "silhouette",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "reverent"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0036-0037",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:37",
+      "end_tc": "0:38",
+      "start_sec": 36.833333,
+      "end_sec": 37.666667,
+      "duration": 0.833,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian stands within a glowing orange energy dome as particles radiate outward.",
+      "class": "titan",
+      "element": "solar",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "bright",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0037-0039",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:38",
+      "end_tc": "0:39",
+      "start_sec": 37.666667,
+      "end_sec": 39.266667,
+      "duration": 1.6,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Extreme close-up on a Guardian's armored shoulder and helmet, lit red with sparks drifting past.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "ECU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0039-0040",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:39",
+      "end_tc": "0:41",
+      "start_sec": 39.266667,
+      "end_sec": 40.633333,
+      "duration": 1.367,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Extreme close-up of a Titan firing a weapon directly at camera, muzzle flash blooming bright.",
+      "class": "titan",
+      "element": "unknown",
+      "shot_scale": "ECU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0040-0041",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:41",
+      "end_tc": "0:41",
+      "start_sec": 40.633333,
+      "end_sec": 41.433333,
+      "duration": 0.8,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A bright energy beam weapon fires down a futuristic corridor between two distant silhouetted combatants.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0041-0042",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:41",
+      "end_tc": "0:42",
+      "start_sec": 41.433333,
+      "end_sec": 42.033333,
+      "duration": 0.6,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian runs and leaps across a red-lit metal scaffold.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0042-0043",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:42",
+      "end_tc": "0:43",
+      "start_sec": 42.033333,
+      "end_sec": 43.233333,
+      "duration": 1.2,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two Guardians stand in silhouette against a bright starburst of light.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "reverent"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0045-0046",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:46",
+      "end_tc": "0:46",
+      "start_sec": 45.9,
+      "end_sec": 46.5,
+      "duration": 0.6,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Extreme close-up of a Guardian in gold armor firing a shotgun, muzzle flash and snow bursting outward.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "ECU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0047-0048",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:48",
+      "end_tc": "0:48",
+      "start_sec": 47.533333,
+      "end_sec": 48.233333,
+      "duration": 0.7,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Extreme close-up on a Guardian's boots walking across reflective pink-lit ground.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "ECU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "none",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0048-0049",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:48",
+      "end_tc": "0:49",
+      "start_sec": 48.233333,
+      "end_sec": 49.2,
+      "duration": 0.967,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian runs in silhouette across an icy ridge beneath a huge distant planet.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "single",
+        "establishing"
+      ],
+      "camera_movement": [
+        "pan"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "lonely"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0049-0049",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:49",
+      "end_tc": "0:50",
+      "start_sec": 49.2,
+      "end_sec": 49.966667,
+      "duration": 0.767,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian clashes with a dark enemy amid a burst of blue Stasis crystals.",
+      "class": "unknown",
+      "element": "stasis",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat",
+        "ability_cast"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0049-0051",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:50",
+      "end_tc": "0:52",
+      "start_sec": 49.966667,
+      "end_sec": 51.533333,
+      "duration": 1.567,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two Guardians sprint through a facility corridor firing red energy weapons at unseen enemies.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat",
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0051-0052",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "0:52",
+      "end_tc": "0:52",
+      "start_sec": 51.533333,
+      "end_sec": 52.166667,
+      "duration": 0.633,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two armored Guardians crouch together in cover against a blue-lit technological backdrop.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0060-0061",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "1:00",
+      "end_tc": "1:01",
+      "start_sec": 60.1,
+      "end_sec": 61.466667,
+      "duration": 1.367,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "An armored figure stands amid falling ice shards in a blue-lit scene.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0063-0063",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "1:03",
+      "end_tc": "1:04",
+      "start_sec": 63.266667,
+      "end_sec": 63.9,
+      "duration": 0.633,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A hooded figure raises a crackling ice-blue Stasis blade toward the camera in dramatic red light.",
+      "class": "unknown",
+      "element": "stasis",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0067-0067",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "1:07",
+      "end_tc": "1:08",
+      "start_sec": 67.166667,
+      "end_sec": 67.7,
+      "duration": 0.533,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two combatants clash in a burst of crackling blue-white energy.",
+      "class": "unknown",
+      "element": "arc",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat",
+        "ability_cast"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0069-0069",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "1:09",
+      "end_tc": "1:10",
+      "start_sec": 69.3,
+      "end_sec": 69.9,
+      "duration": 0.6,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian raises a weapon amid a bright explosion as another figure looks on nearby.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "bright",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0069-0070",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "1:10",
+      "end_tc": "1:11",
+      "start_sec": 69.9,
+      "end_sec": 70.9,
+      "duration": 1.0,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A silhouetted Guardian stands amid drifting embers beside a bright orb of light.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "ominous"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0075-0076",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "1:16",
+      "end_tc": "1:17",
+      "start_sec": 75.733333,
+      "end_sec": 76.833333,
+      "duration": 1.1,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Several silhouetted combatants clash amid a burst of icy blue light.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0083-0090",
+      "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+      "start_tc": "1:24",
+      "end_tc": "1:31",
+      "start_sec": 83.833333,
+      "end_sec": 90.933333,
+      "duration": 7.1,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A robed figure stands with their back to camera inside a round, blue-lit chamber.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "reverent"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0016-0018",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "0:16",
+      "end_tc": "0:19",
+      "start_sec": 16.166667,
+      "end_sec": 18.791667,
+      "duration": 2.625,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A hooded figure in a fur-trimmed coat and breathing mask holds up a lit torch inside a dim, cluttered structure.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "partial_face",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "lonely",
+        "ominous"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0034-0037",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "0:34",
+      "end_tc": "0:38",
+      "start_sec": 34.166667,
+      "end_sec": 37.625,
+      "duration": 3.458,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Seen from behind, a lone figure stands in the snow watching a large wreck burn nearby.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "high_contrast",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "lonely",
+        "ominous"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0037-0044",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "0:38",
+      "end_tc": "0:45",
+      "start_sec": 37.625,
+      "end_sec": 44.958333,
+      "duration": 7.333,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A hooded figure in a fur-trimmed coat and breathing mask raises a lit torch, an 'S'-marked pendant hanging at his chest.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "partial_face",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "lonely",
+        "ominous"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0055-0056",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "0:55",
+      "end_tc": "0:56",
+      "start_sec": 55.083333,
+      "end_sec": 56.291667,
+      "duration": 1.208,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Seen from behind, a cloaked figure walks away across the ice toward a bright sun with Jupiter overhead.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "silhouette",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "lonely",
+        "serene"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0062-0065",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:03",
+      "end_tc": "1:05",
+      "start_sec": 62.958333,
+      "end_sec": 65.166667,
+      "duration": 2.208,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A helmeted rider leans low over a sparrow racing across the icy ground, motion-blurred with speed.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "vehicle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0073-0075",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:14",
+      "end_tc": "1:15",
+      "start_sec": 73.75,
+      "end_sec": 75.208333,
+      "duration": 1.458,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two riders race sparrows side by side through a narrow, fog-filled ice canyon.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "vehicle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0079-0080",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:19",
+      "end_tc": "1:21",
+      "start_sec": 79.333333,
+      "end_sec": 80.75,
+      "duration": 1.417,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "The same hooded, masked figure adjusts his hood in a doorway lit by warm interior lights and a red wall panel.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "partial_face",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "lonely"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0091-0094",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:31",
+      "end_tc": "1:34",
+      "start_sec": 91.375,
+      "end_sec": 94.458333,
+      "duration": 3.083,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A hooded rider with glowing white eyes leans into a sparrow racing through an ice canyon marked with red streaks.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "vehicle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0094-0095",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:34",
+      "end_tc": "1:35",
+      "start_sec": 94.458333,
+      "end_sec": 95.375,
+      "duration": 0.917,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Framed through a spacecraft's open cargo doors, a figure leaps down onto the snow below.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "POV",
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0096-0097",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:36",
+      "end_tc": "1:38",
+      "start_sec": 96.208333,
+      "end_sec": 97.666667,
+      "duration": 1.458,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "The hooded, masked figure stands before a parked dropship, looking directly ahead through blowing snow.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "partial_face",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "lonely",
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0098-0100",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:39",
+      "end_tc": "1:40",
+      "start_sec": 98.708333,
+      "end_sec": 100.208333,
+      "duration": 1.5,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A motion-blurred close-up of the hooded, masked figure raising a gloved hand toward his face.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "ECU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "partial_face",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0104-0107",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:45",
+      "end_tc": "1:47",
+      "start_sec": 104.625,
+      "end_sec": 107.125,
+      "duration": 2.5,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A cloaked, helmeted figure strides across the ice with a small light hovering alongside, twin moons overhead.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "lonely",
+        "serene"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0109-0112",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:50",
+      "end_tc": "1:52",
+      "start_sec": 109.666667,
+      "end_sec": 112.458333,
+      "duration": 2.792,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three tiny figures stand apart on a wide, sunlit expanse of rippled snow and sand.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "ELS",
+      "composition": [
+        "establishing",
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "bright",
+      "identity_visibility": "none",
+      "subject_salience": "crowd_group",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "lonely"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0118-0119",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "1:59",
+      "end_tc": "2:00",
+      "start_sec": 118.875,
+      "end_sec": 119.958333,
+      "duration": 1.083,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three armored figures stand together on the ice, weapons slung, facing outward in different directions.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "crowd_group",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0119-0121",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "2:00",
+      "end_tc": "2:01",
+      "start_sec": 119.958333,
+      "end_sec": 121.375,
+      "duration": 1.417,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three cloaked figures stand close together as a small winged companion drone hovers beside them.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "crowd_group",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0121-0125",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "2:01",
+      "end_tc": "2:06",
+      "start_sec": 121.375,
+      "end_sec": 125.5,
+      "duration": 4.125,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three armored figures stand together on the ice, one carrying a large weapon across their back.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "crowd_group",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_beyond_light_reveal_trailer_0125-0128",
+      "video_id": "yt_destiny_2_beyond_light_reveal_trailer",
+      "start_tc": "2:06",
+      "end_tc": "2:08",
+      "start_sec": 125.5,
+      "end_sec": 128.041667,
+      "duration": 2.542,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three small figures walk together across a fogbound icefield toward a massive dark pyramid on the horizon.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "ELS",
+      "composition": [
+        "establishing",
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "silhouette",
+      "subject_salience": "crowd_group",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "ominous",
+        "reverent"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0024-0025",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "0:24",
+      "end_tc": "0:26",
+      "start_sec": 24.491133,
+      "end_sec": 25.592233,
+      "duration": 1.101,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A row of armored Guardians and allies stand together on an elevated walkway inside a high-tech interior.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "partial_face",
+      "subject_salience": "crowd_group",
+      "action": [
+        "dialogue"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0037-0037",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "0:37",
+      "end_tc": "0:38",
+      "start_sec": 37.203833,
+      "end_sec": 37.9379,
+      "duration": 0.734,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Seen from behind a pilot's seat, a ship banks past a fiery orbital debris trail toward a distant world.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "OTS"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "vehicle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0047-0048",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "0:47",
+      "end_tc": "0:48",
+      "start_sec": 47.113733,
+      "end_sec": 48.214833,
+      "duration": 1.101,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian leaps through the air in silhouette, a dark ribbon-like effect trailing overhead against purple light.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal",
+        "ability_cast"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0052-0053",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "0:52",
+      "end_tc": "0:53",
+      "start_sec": 52.052,
+      "end_sec": 53.4534,
+      "duration": 1.401,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A Guardian crouches with a weapon beside fallen enemies in a rain-slick Neomuna alley.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat",
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": [
+        "unknown"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0056-0056",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "0:56",
+      "end_tc": "0:57",
+      "start_sec": 56.322933,
+      "end_sec": 56.990267,
+      "duration": 0.667,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two silhouetted figures clash in combat, one wielding a staff and the other a large curved blade, against the glowing Neomuna skyline.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0056-0058",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "0:57",
+      "end_tc": "0:58",
+      "start_sec": 56.990267,
+      "end_sec": 58.1581,
+      "duration": 1.168,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Seen from above, a robed figure leaps through the air over fallen chrome-armored bodies.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "pan"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat",
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": [
+        "unknown"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0058-0058",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "0:58",
+      "end_tc": "0:59",
+      "start_sec": 58.1581,
+      "end_sec": 58.892167,
+      "duration": 0.734,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A caped, helmeted Guardian is engulfed in a bright solar explosion mid-battle.",
+      "class": "unknown",
+      "element": "solar",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0067-0068",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:08",
+      "end_tc": "1:09",
+      "start_sec": 67.8678,
+      "end_sec": 68.535133,
+      "duration": 0.667,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two matching robed figures perform a symmetrical fire-lighting ritual facing each other in a dim hall.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ritual"
+      ],
+      "mood": [
+        "reverent"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0072-0074",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:13",
+      "end_tc": "1:14",
+      "start_sec": 72.939533,
+      "end_sec": 74.2742,
+      "duration": 1.335,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A squad of hooded Guardians walk in silhouette toward camera, backlit by the glowing Neomuna skyline.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "crowd_group",
+      "action": [
+        "traversal",
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0074-0077",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:14",
+      "end_tc": "1:17",
+      "start_sec": 74.2742,
+      "end_sec": 77.110367,
+      "duration": 2.836,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian crackling with violet void energy battles a large gold mechanical Vex construct.",
+      "class": "unknown",
+      "element": "void",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat",
+        "ability_cast"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": [
+        "vex"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0077-0078",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:17",
+      "end_tc": "1:18",
+      "start_sec": 77.110367,
+      "end_sec": 78.1781,
+      "duration": 1.068,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian's armor erupts with void energy beside a towering gold Vex construct.",
+      "class": "unknown",
+      "element": "void",
+      "shot_scale": "MCU",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat",
+        "ability_cast"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": [
+        "vex"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0079-0080",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:20",
+      "end_tc": "1:21",
+      "start_sec": 79.813067,
+      "end_sec": 80.8808,
+      "duration": 1.068,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "An overexposed shot of a Guardian mid-air wreathed in bright energy above a neon-lit city.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "bright",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0080-0083",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:21",
+      "end_tc": "1:24",
+      "start_sec": 80.8808,
+      "end_sec": 83.516767,
+      "duration": 2.636,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian wrapped in bright green Strand energy flies with arms outstretched against a fiery orange backdrop.",
+      "class": "unknown",
+      "element": "strand",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "bright",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "traversal"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0083-0084",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:24",
+      "end_tc": "1:24",
+      "start_sec": 83.516767,
+      "end_sec": 84.2842,
+      "duration": 0.767,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Guardians wreathed in green Strand energy clash with gold-armored Vex constructs in a chaotic battle.",
+      "class": "unknown",
+      "element": "strand",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": [
+        "vex"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0084-0085",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:24",
+      "end_tc": "1:25",
+      "start_sec": 84.2842,
+      "end_sec": 85.218467,
+      "duration": 0.934,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Two green, Strand-wreathed Guardians charge into battle against gold-armored Vex constructs and a shielded Vex unit in a neon-lit street.",
+      "class": "unknown",
+      "element": "strand",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat",
+        "ability_cast"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": [
+        "vex"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0085-0086",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:25",
+      "end_tc": "1:26",
+      "start_sec": 85.218467,
+      "end_sec": 86.252833,
+      "duration": 1.034,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian is thrown backward in a burst of green energy as a robed figure looks on at the frame's edge.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0088-0089",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:28",
+      "end_tc": "1:29",
+      "start_sec": 88.221467,
+      "end_sec": 89.456033,
+      "duration": 1.235,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian in teal armor aims a weapon as another Guardian's silhouette is visible at the frame's edge.",
+      "class": "titan",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_lightfall_launch_trailer_0090-0091",
+      "video_id": "yt_destiny_2_lightfall_launch_trailer",
+      "start_tc": "1:30",
+      "end_tc": "1:32",
+      "start_sec": 90.423667,
+      "end_sec": 91.825067,
+      "duration": 1.401,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A group of armored figures descend stairs together, the whole scene bathed in red light.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "crowd_group",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0001-0003",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "0:02",
+      "end_tc": "0:03",
+      "start_sec": 1.968633,
+      "end_sec": 3.370033,
+      "duration": 1.401,
+      "clean": false,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Tracking shot down a crowded Last City market street, a Guardian walking away from camera through civilians. Warm, lived-in. Burned-in 'Not Actual Gameplay' disclaimer.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "crowd_group",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "serene"
+      ],
+      "register": 1,
+      "faction": [],
+      "blocked_by": [
+        "burned_text"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0031-0033",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "0:32",
+      "end_tc": "0:33",
+      "start_sec": 31.798433,
+      "end_sec": 33.033,
+      "duration": 1.235,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Low shot of armored Titan boots planted on grey lunar rock, mountains beyond. Anonymous, monumental.",
+      "class": "titan",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "none",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "lonely"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0038-0039",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "0:39",
+      "end_tc": "0:40",
+      "start_sec": 38.805433,
+      "end_sec": 39.572867,
+      "duration": 0.767,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Over-the-shoulder on two helmeted Guardians in a dim briefing space, teal light.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "OTS"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "dialogue"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0041-0044",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "0:42",
+      "end_tc": "0:44",
+      "start_sec": 41.875167,
+      "end_sec": 44.077367,
+      "duration": 2.202,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A helmeted Guardian sits amid crew in a dim hold, framed between two foreground figures.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "crowd_group",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0044-0045",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "0:44",
+      "end_tc": "0:45",
+      "start_sec": 44.077367,
+      "end_sec": 45.378667,
+      "duration": 1.301,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A ring of Guardians resting on crates and rock in low red light — the quiet before.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "crowd_group",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "lonely"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0045-0046",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "0:45",
+      "end_tc": "0:46",
+      "start_sec": 45.378667,
+      "end_sec": 46.479767,
+      "duration": 1.101,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Hunter in a hooded helm with a green visor stands still against teal haze. Fully anonymous, fully iconic.",
+      "class": "hunter",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0054-0055",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "0:55",
+      "end_tc": "0:56",
+      "start_sec": 54.587867,
+      "end_sec": 55.588867,
+      "duration": 1.001,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A lone Guardian silhouetted at the center of an enormous violet detonation, debris hanging in the shockwave.",
+      "class": "unknown",
+      "element": "prismatic",
+      "shot_scale": "ELS",
+      "composition": [
+        "establishing"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0056-0057",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "0:57",
+      "end_tc": "0:57",
+      "start_sec": 56.5565,
+      "end_sec": 57.490767,
+      "duration": 0.934,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian stands on a ridge in pale cloud, facing a distant black pyramid. Small figure, huge sky.",
+      "class": "titan",
+      "element": "unknown",
+      "shot_scale": "ELS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "bright",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0058-0059",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "0:59",
+      "end_tc": "1:00",
+      "start_sec": 58.7587,
+      "end_sec": 59.6596,
+      "duration": 0.901,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two Guardians advance shoulder to shoulder with rifles raised, drenched in red light.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0069-0070",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:09",
+      "end_tc": "1:10",
+      "start_sec": 69.335933,
+      "end_sec": 70.303567,
+      "duration": 0.968,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A lone cloaked figure walks out across an enormous grey-green plain under storm cloud. Pure scale.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "ELS",
+      "composition": [
+        "establishing"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "lonely"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0070-0071",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:10",
+      "end_tc": "1:12",
+      "start_sec": 70.303567,
+      "end_sec": 71.9719,
+      "duration": 1.668,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Guardians move up through red-lit ruins in loose formation, dust in the air.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "crowd_group",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0078-0080",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:18",
+      "end_tc": "1:21",
+      "start_sec": 78.144733,
+      "end_sec": 80.8808,
+      "duration": 2.736,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A helmeted Guardian stands over a shrouded body laid out on pale cloth. Blue, still, funerary.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ritual"
+      ],
+      "mood": [
+        "lonely"
+      ],
+      "register": -1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0087-0097",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:27",
+      "end_tc": "1:37",
+      "start_sec": 87.253833,
+      "end_sec": 97.330567,
+      "duration": 10.077,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A single red-armored Guardian walks alone through violet fog, tiny against the dark.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "ELS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "lonely"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0097-0098",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:37",
+      "end_tc": "1:38",
+      "start_sec": 97.330567,
+      "end_sec": 98.098,
+      "duration": 0.767,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A helmeted Guardian pushes into blinding white light, lens flares streaking across frame.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "bright",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0101-0102",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:41",
+      "end_tc": "1:42",
+      "start_sec": 101.0009,
+      "end_sec": 102.368933,
+      "duration": 1.368,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A Guardian swings a blade mid-charge as allies close in, violet and fire light colliding.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_clear",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0111-0112",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:52",
+      "end_tc": "1:52",
+      "start_sec": 111.644867,
+      "end_sec": 112.345567,
+      "duration": 0.701,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Guardians charge through smoke, motion-blurred, weapons up.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "crowd_group",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0112-0113",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:52",
+      "end_tc": "1:54",
+      "start_sec": 112.345567,
+      "end_sec": 113.7136,
+      "duration": 1.368,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Overhead wide: a Guardian at the center of an arc detonation, blue lightning branching across the ground.",
+      "class": "unknown",
+      "element": "arc",
+      "shot_scale": "ELS",
+      "composition": [
+        "establishing"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0116-0117",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:57",
+      "end_tc": "1:58",
+      "start_sec": 116.783333,
+      "end_sec": 117.784333,
+      "duration": 1.001,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian drives a blade forward through a wall of fire, face lit gold by the blast.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_clear",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0118-0120",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:59",
+      "end_tc": "2:01",
+      "start_sec": 118.551767,
+      "end_sec": 120.687233,
+      "duration": 2.135,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A hooded Hunter raises a crackling arc weapon overhead against a night sky. Anonymous and heroic.",
+      "class": "hunter",
+      "element": "arc",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "push_in"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0121-0124",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "2:02",
+      "end_tc": "2:05",
+      "start_sec": 121.888433,
+      "end_sec": 124.8247,
+      "duration": 2.936,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian hurls a torrent of blue-white energy across a dark field, hands trailing light.",
+      "class": "unknown",
+      "element": "arc",
+      "shot_scale": "LS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0124-0126",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "2:05",
+      "end_tc": "2:06",
+      "start_sec": 124.8247,
+      "end_sec": 126.359567,
+      "duration": 1.535,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A hooded Guardian turns through drifting embers, orange firelight raking the helmet.",
+      "class": "hunter",
+      "element": "solar",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0126-0131",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "2:06",
+      "end_tc": "2:11",
+      "start_sec": 126.359567,
+      "end_sec": 131.264467,
+      "duration": 4.905,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Warlock draws violet and white prismatic light up into both hands, face lit from below.",
+      "class": "warlock",
+      "element": "prismatic",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "track"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_clear",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0019-0020",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:20",
+      "end_tc": "0:21",
+      "start_sec": 19.6,
+      "end_sec": 20.866667,
+      "duration": 1.267,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Hunter with a teeth-patterned helmet aims a long rifle across a misty swamp as a second Guardian wades through the water beyond.",
+      "class": "hunter",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "bright",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0020-0023",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:21",
+      "end_tc": "0:23",
+      "start_sec": 20.866667,
+      "end_sec": 23.066667,
+      "duration": 2.2,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three Guardians spread across a misty swamp aim their weapons outward past clusters of red Hive flora.",
+      "class": "hunter",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "bright",
+      "identity_visibility": "back_only",
+      "subject_salience": "crowd_group",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0023-0024",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:23",
+      "end_tc": "0:24",
+      "start_sec": 23.066667,
+      "end_sec": 24.033333,
+      "duration": 0.967,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian raises both hands as a bright light gathers between their palms, a hazy cityscape glowing behind them.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "reverent"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0025-0026",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:25",
+      "end_tc": "0:26",
+      "start_sec": 25.233333,
+      "end_sec": 26.133333,
+      "duration": 0.9,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A cloaked figure carrying a glowing curved sword advances down a symmetrical, ice-blue corridor.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MLS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "ominous"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0026-0027",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:26",
+      "end_tc": "0:27",
+      "start_sec": 26.133333,
+      "end_sec": 27.066667,
+      "duration": 0.933,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A lone silhouette walks toward a bright archway deep within a rocky, teal-lit tunnel.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "ELS",
+      "composition": [
+        "establishing"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "lonely",
+        "reverent"
+      ],
+      "register": 2,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0027-0028",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:27",
+      "end_tc": "0:28",
+      "start_sec": 27.066667,
+      "end_sec": 28.3,
+      "duration": 1.233,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A first-person view of a weapon-in-hand advancing down a dark, green-lit passage toward a carved wall.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "POV"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "none",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "ominous"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0030-0031",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:30",
+      "end_tc": "0:32",
+      "start_sec": 30.5,
+      "end_sec": 31.633333,
+      "duration": 1.133,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A first-person view down a weapon toward a green-lit altar as two silhouetted figures stand before it in a grand hall.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "POV"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ritual"
+      ],
+      "mood": [
+        "reverent",
+        "ominous"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0031-0032",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:32",
+      "end_tc": "0:33",
+      "start_sec": 31.633333,
+      "end_sec": 32.7,
+      "duration": 1.067,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three silhouetted Guardians race down a spired, magenta-lit corridor, one wielding a drawn sword.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "crowd_group",
+      "action": [
+        "combat",
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0032-0033",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:33",
+      "end_tc": "0:34",
+      "start_sec": 32.7,
+      "end_sec": 33.733333,
+      "duration": 1.033,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Two Guardians aim their weapons up a grand ice-blue staircase toward an unseen threat.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "back_only",
+      "subject_salience": "crowd_group",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense",
+        "reverent"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0039-0040",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:39",
+      "end_tc": "0:41",
+      "start_sec": 39.4,
+      "end_sec": 40.533333,
+      "duration": 1.133,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three masked Hunters stand together in a warmly lit, ornate hall, the center Guardian holding a rifle raised.",
+      "class": "hunter",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "bright",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0040-0041",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:41",
+      "end_tc": "0:42",
+      "start_sec": 40.533333,
+      "end_sec": 41.633333,
+      "duration": 1.1,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Motion-blurred legs of several running and leaping figures cross a narrow bridge above a misty green chasm.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "crowd_group",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0051-0052",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:51",
+      "end_tc": "0:52",
+      "start_sec": 51.3,
+      "end_sec": 52.333333,
+      "duration": 1.033,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A Guardian leaps sword-first through a blinding burst of energy as a caped figure and a crystalline creature clash beside them.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "combat"
+      ],
+      "mood": [
+        "tense",
+        "triumphant"
+      ],
+      "register": 1,
+      "faction": [
+        "hive"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0055-0056",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:55",
+      "end_tc": "0:57",
+      "start_sec": 55.166667,
+      "end_sec": 56.666667,
+      "duration": 1.5,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A robed Guardian is wreathed in searing red-orange light as bright tracer fire streaks past overhead.",
+      "class": "warlock",
+      "element": "solar",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "combat"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0056-0057",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:57",
+      "end_tc": "0:58",
+      "start_sec": 56.666667,
+      "end_sec": 57.833333,
+      "duration": 1.167,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A weapon blurs past in the foreground as a glowing Guardian and a spiked Hive creature clash beyond.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "OTS"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "none",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": [
+        "hive"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0058-0059",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "0:59",
+      "end_tc": "0:59",
+      "start_sec": 58.7,
+      "end_sec": 59.333333,
+      "duration": 0.633,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian silhouette leaps sword-raised through a blinding wash of orange solar light.",
+      "class": "unknown",
+      "element": "solar",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "combat"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0059-0060",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "1:00",
+      "end_tc": "1:01",
+      "start_sec": 59.9,
+      "end_sec": 60.6,
+      "duration": 0.7,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Hunter braces and aims an ornate weapon through drifting smoke as a burning Hive enemy collapses nearby.",
+      "class": "hunter",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "high_contrast",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": [
+        "hive"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0060-0062",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "1:01",
+      "end_tc": "1:03",
+      "start_sec": 60.6,
+      "end_sec": 62.733333,
+      "duration": 2.133,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Guardian is engulfed in crackling blue-white arc energy against a bright open sky.",
+      "class": "unknown",
+      "element": "arc",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0062-0063",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "1:03",
+      "end_tc": "1:04",
+      "start_sec": 62.733333,
+      "end_sec": 63.633333,
+      "duration": 0.9,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A caped figure bursts through a wall of magenta energy, blade raised, as another combatant closes in beside them.",
+      "class": "unknown",
+      "element": "void",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "combat"
+      ],
+      "mood": [
+        "triumphant",
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0063-0065",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "1:04",
+      "end_tc": "1:05",
+      "start_sec": 63.633333,
+      "end_sec": 65.1,
+      "duration": 1.467,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "A caped figure surges through a bright magenta blast, sword drawn, amid a shower of crystalline debris.",
+      "class": "unknown",
+      "element": "void",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "combat"
+      ],
+      "mood": [
+        "triumphant",
+        "tense"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0069-0071",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "1:10",
+      "end_tc": "1:11",
+      "start_sec": 69.933333,
+      "end_sec": 71.333333,
+      "duration": 1.4,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three Hunters take up firing positions in an ornate hall lined with red Hive flora.",
+      "class": "hunter",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "bright",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "crowd_group",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": 0,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0073-0074",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "1:13",
+      "end_tc": "1:15",
+      "start_sec": 73.366667,
+      "end_sec": 74.9,
+      "duration": 1.533,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A first-person view down a rifle as a horde of Hive Thrall charges across a grand hall.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "POV"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "bright",
+      "identity_visibility": "none",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": [
+        "hive"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0074-0076",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "1:15",
+      "end_tc": "1:16",
+      "start_sec": 74.9,
+      "end_sec": 76.466667,
+      "duration": 1.567,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A first-person view down a shotgun as several Hive creatures collapse across the hall floor.",
+      "class": "unknown",
+      "element": "unknown",
+      "shot_scale": "MS",
+      "composition": [
+        "POV"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "bright",
+      "identity_visibility": "none",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat"
+      ],
+      "mood": [
+        "tense"
+      ],
+      "register": -1,
+      "faction": [
+        "hive"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0077-0079",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "1:18",
+      "end_tc": "1:19",
+      "start_sec": 77.966667,
+      "end_sec": 79.133333,
+      "duration": 1.167,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A Hunter leaps through a burst of violet energy, a trail of fire streaming from their cloak below.",
+      "class": "hunter",
+      "element": "void",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "handheld_shaky"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "ability_cast",
+        "traversal"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 1,
+      "faction": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_the_witch_queen_gameplay_trailer_0079-0081",
+      "video_id": "yt_destiny_2_the_witch_queen_gameplay_trailer",
+      "start_tc": "1:19",
+      "end_tc": "1:21",
+      "start_sec": 79.133333,
+      "end_sec": 81.033333,
+      "duration": 1.9,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A cloaked Guardian swings a blazing blade downward before a grand archway as a burning enemy falls nearby.",
+      "class": "unknown",
+      "element": "solar",
+      "shot_scale": "MS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "fast",
+      "lighting": "high_contrast",
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "combat",
+        "ability_cast"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 1,
+      "faction": [
+        "hive"
+      ]
+    }
+  ]
+}

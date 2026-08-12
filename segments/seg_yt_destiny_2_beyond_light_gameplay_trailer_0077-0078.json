@@ -1,0 +1,177 @@
+{
+  "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0077-0078",
+  "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+  "start_sec": 77.9,
+  "end_sec": 78.633333,
+  "start_tc": "1:18",
+  "end_tc": "1:19",
+  "era": "beyond_light",
+  "activity": "unknown",
+  "content_type": "gameplay",
+  "action": [
+    "combat"
+  ],
+  "camera_movement": [
+    "static"
+  ],
+  "caption": "First-person point-of-view aiming a Stasis-themed weapon at a large ice-crusted enemy ahead; no HUD elements are visible in the frame.",
+  "character": [],
+  "character_identifiability": "unidentifiable",
+  "class": "unknown",
+  "composition": [
+    "POV"
+  ],
+  "element": "stasis",
+  "faction": [
+    "unknown"
+  ],
+  "identity_visibility": "none",
+  "lighting": "dim",
+  "mood": [
+    "tense"
+  ],
+  "overlays": [],
+  "pacing": "medium",
+  "register": 1,
+  "shot_scale": "MCU",
+  "subject_salience": "enemy_threat",
+  "substitutability": 0,
+  "clean": true,
+  "footage_tier": "gameplay",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.55
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.4
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.3
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.85
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

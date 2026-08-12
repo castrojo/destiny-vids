@@ -1,0 +1,176 @@
+{
+  "segment_id": "seg_yt_destiny_2_beyond_light_gameplay_trailer_0049-0049",
+  "video_id": "yt_destiny_2_beyond_light_gameplay_trailer",
+  "start_sec": 49.2,
+  "end_sec": 49.966667,
+  "start_tc": "0:49",
+  "end_tc": "0:50",
+  "era": "beyond_light",
+  "activity": "unknown",
+  "content_type": "cinematic",
+  "action": [
+    "combat",
+    "ability_cast"
+  ],
+  "camera_movement": [
+    "handheld_shaky"
+  ],
+  "caption": "A Guardian clashes with a dark enemy amid a burst of blue Stasis crystals.",
+  "character": [],
+  "character_identifiability": "unidentifiable",
+  "class": "unknown",
+  "composition": [
+    "two_shot"
+  ],
+  "element": "stasis",
+  "faction": [],
+  "identity_visibility": "silhouette",
+  "lighting": "high_contrast",
+  "mood": [
+    "tense"
+  ],
+  "overlays": [],
+  "pacing": "fast",
+  "register": 1,
+  "shot_scale": "MS",
+  "subject_salience": "guardian_hero",
+  "substitutability": 5,
+  "clean": true,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 1
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.45
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.5
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "model",
+      "confidence": 0.75
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}
