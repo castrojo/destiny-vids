@@ -96,8 +96,8 @@ and redaction is frame-level, so on Curse of Osiris the last beat is clean
 footage that dissolves into a logo card, and the 163.6s cut removes exactly the
 card. Trusting *every* straddle would be too generous — a head cut made for a
 ratings card would silently grandfather an unrelated HUD beat that happens to
-overlap it. `acknowledges` makes the trust explicit, per beat, in a file
-CODEOWNERS puts in front of the owner.
+overlap it. `acknowledges` makes the trust explicit, per beat, in a file you
+edit by hand.
 
 A video that refuses here does not need the gate relaxed. It needs cutting.
 

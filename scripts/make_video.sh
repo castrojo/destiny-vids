@@ -322,7 +322,7 @@ for s in mine:
 # would be too generous -- a head cut made for a ratings card would silently
 # grandfather an unrelated HUD beat that happens to overlap it. So the trust
 # is explicit: the redaction record names the segments it accounts for, in a
-# file the owner reviews (CODEOWNERS).
+# file you edit by hand.
 acknowledged = set()
 for item in redactions:
     acknowledged.update(item.get("acknowledges") or [])

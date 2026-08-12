@@ -95,22 +95,18 @@ somebody meant, and it is not executable until they say it is right.
 
 Four, and they are deliberately few:
 
-| Label | Meaning | Applied by |
-|---|---|---|
-| `triage` | Filed. Nobody has looked at it. | the issue form, automatically |
-| `agent-ready` | Enough detail that an agent can start. | **the owner, and only the owner** |
-| `blocked` | Waiting on an owner decision. | whoever discovers the blocker |
-| `automatable/no` | Needs human judgement, permanently. | whoever establishes it |
+| Label | Meaning |
+|---|---|
+| `triage` | Filed. Nobody has looked at it. |
+| `agent-ready` | Enough detail that an agent can start. |
+| `blocked` | Waiting on an owner decision. |
+| `automatable/no` | Needs human judgement, permanently. |
 
 `python3 scripts/sync_labels.py --check` reports drift; `--write` fixes it.
 
-**`agent-ready` is the confirmation.** A brief block lives in an issue body,
-which anyone with write access can edit — so "the owner confirmed this brief"
-cannot be read from the block itself. The label can: GitHub records who applied
-it. That is why an agent must not apply `agent-ready` to its own proposal, and
-why the labels are worth having at all when the brief already carries
-`automatable`. The brief says what the work needs; the label says a person
-agreed to it.
+`agent-ready` is how the owner says a brief is confirmed — the block itself
+cannot say so, because an issue body is editable. Don't put it on your own
+proposal.
 
 **Characters are not labels.** They live in the brief block, keyed by the lead
 ids in `vocab/casting.yaml`, because that is the same vocabulary the segment
