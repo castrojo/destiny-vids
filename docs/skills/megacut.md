@@ -1,6 +1,6 @@
 ---
 name: megacut
-version: "1.1"
+version: "1.2"
 last_updated: "2026-08-12"
 id: megacut
 one_line_purpose: Join finished cuts into one programme with deck-format chapter cards.
@@ -117,6 +117,18 @@ Segments genuinely disagree, so *some* re-encode is unavoidable:
 - **A card is a transparent PNG.** Flatten it onto real black with `overlay`;
   do not rely on `format=yuv420p` to drop the alpha, because the colour under a
   fully transparent pixel is undefined and can fringe.
+- **"Drop the audio" is not the same as "mute it".** A source labelled *without
+  dialogue* still carries the **score**; muting a segment to lose a voice-over
+  throws the music away with it, and the result reads as a broken cut rather
+  than an edit. If dialogue-free music is wanted, that is a different source or
+  a different edit — never silence.
+- **Source audio by rung, not by convenience.** Prefer the native-rate stream,
+  and never take a `-drc` variant: it applies dynamic range compression, which
+  the audio tenet forbids. Place stereo into 5.1 with `pan`, never `-ac`, which
+  quietly rescales a finished mix.
+- **When a segment's audio is a fraction short of its picture, pad it** with
+  `apad` and let the picture decide the length. Cutting to the shorter stream
+  drops a frame and, in a concat, drifts everything after it.
 - **Never assume an anchor measured on a different upload.** In/out points are
   frame-verified per file. Two uploads of the "same" cinematic can differ by
   seconds — one here had a marketing end card the other did not.
