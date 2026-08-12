@@ -1,0 +1,87 @@
+{
+  "segment_id": "seg_yt_destiny_2_official_launch_trailer_0115-0116",
+  "video_id": "yt_destiny_2_official_launch_trailer",
+  "start_sec": 115.381933,
+  "end_sec": 116.249467,
+  "start_tc": "1:55",
+  "end_tc": "1:56",
+  "era": "d2_base",
+  "activity": "cinematic",
+  "content_type": "trailer",
+  "caption": "A sparrow skims low over water and forest with laser fire - verified full-size at 121.3: single rider, combat-adjacent.",
+  "action": [
+    "vehicle"
+  ],
+  "composition": [
+    "single"
+  ],
+  "subject_salience": "ambient",
+  "clean": false,
+  "footage_tier": "mixed",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

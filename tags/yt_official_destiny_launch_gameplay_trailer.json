@@ -1,0 +1,2904 @@
+{
+ "0": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/000.jpg",
+   "start_sec": 0.0,
+   "end_sec": 10.3103,
+   "start_tc": "0:00",
+   "end_tc": "0:10"
+  },
+  "caption": "'MASTERFUL GAME-MAKING' - The Escapist accolade card over a rubble cityscape.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "1": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/001.jpg",
+   "start_sec": 10.3103,
+   "end_sec": 12.379033,
+   "start_tc": "0:10",
+   "end_tc": "0:12"
+  },
+  "caption": "'ACTIVISION AND BUNGIE HAVE A MASSIVE NEW HIT' - Variety accolade card on black.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "2": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/002.jpg",
+   "start_sec": 12.379033,
+   "end_sec": 16.583233,
+   "start_tc": "0:12",
+   "end_tc": "0:17"
+  },
+  "caption": "Accolade text dissolving over a red Mars-dunes vista with the Traveler low on the horizon.",
+  "overlays": [
+   "burned_text"
+  ],
+  "shot_scale": "ELS",
+  "subject_salience": "environment_establishing",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  }
+ },
+ "3": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/003.jpg",
+   "start_sec": 16.583233,
+   "end_sec": 24.8248,
+   "start_tc": "0:17",
+   "end_tc": "0:25"
+  },
+  "caption": "DISSOLVE SANDWICH: three Guardians walk away across a stone plaza toward a distant obelisk, pink sky, broken planet overhead; accolade-card dissolves bracket the beat. Verified text-free window 20.3-22.7 (probed full-size).",
+  "overlays": [
+   "burned_text"
+  ],
+  "shot_scale": "LS",
+  "composition": [
+   "group"
+  ],
+  "camera_movement": [
+   "static"
+  ],
+  "action": [
+   "traversal"
+  ],
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "lighting": "bright",
+  "mood": [
+   "serene",
+   "reverent"
+  ],
+  "pacing": "slow",
+  "substitutability": 5,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "4": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/004.jpg",
+   "start_sec": 24.8248,
+   "end_sec": 27.193833,
+   "start_tc": "0:25",
+   "end_tc": "0:27"
+  },
+  "caption": "'A MORE AMBITIOUS GAME THAN ANYTHING THAT HAS COME BEFORE IT' - Forbes accolade card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "5": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/005.jpg",
+   "start_sec": 27.193833,
+   "end_sec": 27.961267,
+   "start_tc": "0:27",
+   "end_tc": "0:28"
+  },
+  "caption": "The Traveler hanging over the last city at golden dusk; static ELS vista. Verified clean full-size at 27.6s.",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "ELS",
+  "camera_movement": [
+   "static"
+  ],
+  "subject_salience": "environment_establishing",
+  "lighting": "bright",
+  "mood": [
+   "serene"
+  ],
+  "pacing": "slow",
+  "substitutability": 3,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "camera_movement": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "6": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/006.jpg",
+   "start_sec": 27.961267,
+   "end_sec": 29.763067,
+   "start_tc": "0:28",
+   "end_tc": "0:30"
+  },
+  "caption": "Wider Traveler-over-valley vista at sunset; a small ship crosses low. Verified clean full-size at 29.0s.",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "ELS",
+  "subject_salience": "environment_establishing",
+  "lighting": "bright",
+  "mood": [
+   "serene"
+  ],
+  "pacing": "slow",
+  "substitutability": 3,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "7": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/007.jpg",
+   "start_sec": 29.763067,
+   "end_sec": 33.400033,
+   "start_tc": "0:30",
+   "end_tc": "0:33"
+  },
+  "caption": "Activision logo card on black.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "8": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/008.jpg",
+   "start_sec": 33.400033,
+   "end_sec": 34.467767,
+   "start_tc": "0:33",
+   "end_tc": "0:34"
+  },
+  "caption": "A lone Guardian runs toward a crashed ship's glowing engine across dusty industrial ground. Verified clean full-size at 33.8/34.2. Lone figure - marginal for the anonymous-group brief.",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "LS",
+  "composition": [
+   "single"
+  ],
+  "action": [
+   "traversal"
+  ],
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "pacing": "medium",
+  "substitutability": 2,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "9": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/009.jpg",
+   "start_sec": 34.467767,
+   "end_sec": 35.2352,
+   "start_tc": "0:34",
+   "end_tc": "0:35"
+  },
+  "caption": "Blue-armored Titan close-up, helmeted.",
+  "shot_scale": "MCU",
+  "composition": [
+   "single"
+  ],
+  "identity_visibility": "face_obscured",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  }
+ },
+ "10": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/010.jpg",
+   "start_sec": 35.2352,
+   "end_sec": 37.103733,
+   "start_tc": "0:35",
+   "end_tc": "0:37"
+  },
+  "caption": "Dark industrial scene, ship and small figures in green-tinged light.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.6
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.6
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.6
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "11": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/011.jpg",
+   "start_sec": 37.103733,
+   "end_sec": 40.173467,
+   "start_tc": "0:37",
+   "end_tc": "0:40"
+  },
+  "caption": "Three Guardians walk away through the foggy green Hellmouth approach; a Fallen Dreg enters frame at ~39.8. Verified clean traversal window 37.5-39.6 (probed full-size).",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "LS",
+  "composition": [
+   "group"
+  ],
+  "action": [
+   "traversal"
+  ],
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "faction": [
+   "fallen_eliksni"
+  ],
+  "lighting": "dim",
+  "mood": [
+   "ominous"
+  ],
+  "pacing": "slow",
+  "substitutability": 4,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "12": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/012.jpg",
+   "start_sec": 40.173467,
+   "end_sec": 41.307933,
+   "start_tc": "0:40",
+   "end_tc": "0:41"
+  },
+  "caption": "A Guardian walks past resting figures in a dim blue-lit interior.",
+  "action": [
+   "traversal"
+  ],
+  "lighting": "dim",
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "13": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/013.jpg",
+   "start_sec": 41.307933,
+   "end_sec": 43.376667,
+   "start_tc": "0:41",
+   "end_tc": "0:43"
+  },
+  "caption": "Fireteam of three stands on a rocky ledge silhouetted against a bright sky, one raises an arm. Verified full-size window 41.31-43.38.",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "LS",
+  "composition": [
+   "group"
+  ],
+  "lighting": "silhouette",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "mood": [
+   "triumphant"
+  ],
+  "substitutability": 4,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  }
+ },
+ "14": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/014.jpg",
+   "start_sec": 43.376667,
+   "end_sec": 45.812433,
+   "start_tc": "0:43",
+   "end_tc": "0:46"
+  },
+  "caption": "Guardians fight around a Vex gate amid purple energy.",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "vex"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "15": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/015.jpg",
+   "start_sec": 45.812433,
+   "end_sec": 46.679967,
+   "start_tc": "0:46",
+   "end_tc": "0:47"
+  },
+  "caption": "Fallen Vandal close-up.",
+  "faction": [
+   "fallen_eliksni"
+  ],
+  "subject_salience": "enemy_threat",
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  }
+ },
+ "16": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/016.jpg",
+   "start_sec": 46.679967,
+   "end_sec": 48.048,
+   "start_tc": "0:47",
+   "end_tc": "0:48"
+  },
+  "caption": "A Cabal Centurion charges against an orange sunset - verified full-size at 46.9/47.4: an ENEMY, not a Guardian group (earlier tile-level read corrected).",
+  "faction": [
+   "cabal"
+  ],
+  "subject_salience": "enemy_threat",
+  "shot_scale": "MS",
+  "lighting": "silhouette",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "17": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/017.jpg",
+   "start_sec": 48.048,
+   "end_sec": 48.982267,
+   "start_tc": "0:48",
+   "end_tc": "0:49"
+  },
+  "caption": "A glowing green portal ring fills the frame.",
+  "subject_salience": "object_artifact",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  }
+ },
+ "18": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/018.jpg",
+   "start_sec": 48.982267,
+   "end_sec": 50.2502,
+   "start_tc": "0:49",
+   "end_tc": "0:50"
+  },
+  "caption": "A Fallen ketch flies past Earth in orbit - space vista.",
+  "shot_scale": "ELS",
+  "subject_salience": "environment_establishing",
+  "faction": [
+   "fallen_eliksni"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  }
+ },
+ "19": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/019.jpg",
+   "start_sec": 50.2502,
+   "end_sec": 51.017633,
+   "start_tc": "0:50",
+   "end_tc": "0:51"
+  },
+  "caption": "An Exo Guardian tumbles through orbital debris with Earth below; lone figure, ~0.7s.",
+  "composition": [
+   "single"
+  ],
+  "action": [
+   "traversal"
+  ],
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "20": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/020.jpg",
+   "start_sec": 51.017633,
+   "end_sec": 52.786067,
+   "start_tc": "0:51",
+   "end_tc": "0:53"
+  },
+  "caption": "A sparrow races across a moonscape; verified usable window only ~0.6s before the cut.",
+  "action": [
+   "vehicle"
+  ],
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "21": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/021.jpg",
+   "start_sec": 52.786067,
+   "end_sec": 53.3533,
+   "start_tc": "0:53",
+   "end_tc": "0:53"
+  },
+  "caption": "An armored Guardian stands atop a snow-dusted structure.",
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "22": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/022.jpg",
+   "start_sec": 53.3533,
+   "end_sec": 55.789067,
+   "start_tc": "0:53",
+   "end_tc": "0:56"
+  },
+  "caption": "Snowy ridge with a huge Vex ring gate - ruins vista.",
+  "subject_salience": "environment_establishing",
+  "faction": [
+   "vex"
+  ],
+  "shot_scale": "ELS",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  }
+ },
+ "23": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/023.jpg",
+   "start_sec": 55.789067,
+   "end_sec": 56.8568,
+   "start_tc": "0:56",
+   "end_tc": "0:57"
+  },
+  "caption": "Snow scene with ruined structures.",
+  "subject_salience": "environment_establishing",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  }
+ },
+ "24": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/024.jpg",
+   "start_sec": 56.8568,
+   "end_sec": 57.791067,
+   "start_tc": "0:57",
+   "end_tc": "0:58"
+  },
+  "caption": "Two figures at the ring gate, one carrying a blue glow.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "25": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/025.jpg",
+   "start_sec": 57.791067,
+   "end_sec": 58.8588,
+   "start_tc": "0:58",
+   "end_tc": "0:59"
+  },
+  "caption": "A Guardian runs as a Vex goblin fires a laser - combat.",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "vex"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "26": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/026.jpg",
+   "start_sec": 58.8588,
+   "end_sec": 59.8598,
+   "start_tc": "0:59",
+   "end_tc": "1:00"
+  },
+  "caption": "Guardians fighting at the Vex gate, purple energy (verified full-size at 59.5).",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "vex"
+  ],
+  "composition": [
+   "group"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "27": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/027.jpg",
+   "start_sec": 59.8598,
+   "end_sec": 60.894167,
+   "start_tc": "1:00",
+   "end_tc": "1:01"
+  },
+  "caption": "Black frame.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "28": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/028.jpg",
+   "start_sec": 60.894167,
+   "end_sec": 61.795067,
+   "start_tc": "1:01",
+   "end_tc": "1:02"
+  },
+  "caption": "A golden-armored Titan poses with a heavy weapon above a city - verified full-size at 61.5: lone hero pose, out per the anonymous brief.",
+  "composition": [
+   "single"
+  ],
+  "shot_scale": "MCU",
+  "subject_salience": "guardian_hero",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "29": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/029.jpg",
+   "start_sec": 61.795067,
+   "end_sec": 63.063,
+   "start_tc": "1:02",
+   "end_tc": "1:03"
+  },
+  "caption": "A Guardian bursts into golden radiance (self-resurrection) - verified full-size at 62.2/62.7.",
+  "composition": [
+   "single"
+  ],
+  "action": [
+   "ability_cast"
+  ],
+  "element": "solar",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "30": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/030.jpg",
+   "start_sec": 63.063,
+   "end_sec": 64.097367,
+   "start_tc": "1:03",
+   "end_tc": "1:04"
+  },
+  "caption": "Golden-armored Guardian hero pose.",
+  "composition": [
+   "single"
+  ],
+  "subject_salience": "guardian_hero",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  }
+ },
+ "31": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/031.jpg",
+   "start_sec": 64.097367,
+   "end_sec": 68.8688,
+   "start_tc": "1:04",
+   "end_tc": "1:09"
+  },
+  "caption": "A red-armored Cabal squares off against a Guardian.",
+  "faction": [
+   "cabal"
+  ],
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "32": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/032.jpg",
+   "start_sec": 68.8688,
+   "end_sec": 69.8698,
+   "start_tc": "1:09",
+   "end_tc": "1:10"
+  },
+  "caption": "Mars canyon vista with a ship flyover; verified clean window 68.87-69.87.",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "ELS",
+  "subject_salience": "environment_establishing",
+  "mood": [
+   "serene"
+  ],
+  "substitutability": 3,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "33": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/033.jpg",
+   "start_sec": 69.8698,
+   "end_sec": 70.937533,
+   "start_tc": "1:10",
+   "end_tc": "1:11"
+  },
+  "caption": "Hive swamp with a seeder ship overhead.",
+  "faction": [
+   "hive"
+  ],
+  "subject_salience": "environment_establishing",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  }
+ },
+ "34": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/034.jpg",
+   "start_sec": 70.937533,
+   "end_sec": 71.905167,
+   "start_tc": "1:11",
+   "end_tc": "1:12"
+  },
+  "caption": "A Fallen ketch hangs over cliffs.",
+  "faction": [
+   "fallen_eliksni"
+  ],
+  "subject_salience": "environment_establishing",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  }
+ },
+ "35": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/035.jpg",
+   "start_sec": 71.905167,
+   "end_sec": 72.8728,
+   "start_tc": "1:12",
+   "end_tc": "1:13"
+  },
+  "caption": "A squad drops from a ship - verified clean window 75.4-76.4.",
+  "overlays": [
+   "none"
+  ],
+  "composition": [
+   "group"
+  ],
+  "action": [
+   "traversal"
+  ],
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 3,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "36": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/036.jpg",
+   "start_sec": 72.8728,
+   "end_sec": 73.6736,
+   "start_tc": "1:13",
+   "end_tc": "1:14"
+  },
+  "caption": "A Fallen ketch.",
+  "faction": [
+   "fallen_eliksni"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "37": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/037.jpg",
+   "start_sec": 73.6736,
+   "end_sec": 76.1761,
+   "start_tc": "1:14",
+   "end_tc": "1:16"
+  },
+  "caption": "Black frame.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "38": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/038.jpg",
+   "start_sec": 76.1761,
+   "end_sec": 76.9769,
+   "start_tc": "1:16",
+   "end_tc": "1:17"
+  },
+  "caption": "First-person gameplay: weapon in frame over fallen enemies in green ruins.",
+  "content_type": "gameplay",
+  "composition": [
+   "POV"
+  ],
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "39": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/039.jpg",
+   "start_sec": 76.9769,
+   "end_sec": 78.344933,
+   "start_tc": "1:17",
+   "end_tc": "1:18"
+  },
+  "caption": "First-person gameplay in green ruins.",
+  "content_type": "gameplay",
+  "composition": [
+   "POV"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "40": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/040.jpg",
+   "start_sec": 78.344933,
+   "end_sec": 80.547133,
+   "start_tc": "1:18",
+   "end_tc": "1:21"
+  },
+  "caption": "First-person gameplay continues.",
+  "content_type": "gameplay",
+  "composition": [
+   "POV"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "41": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/041.jpg",
+   "start_sec": 80.547133,
+   "end_sec": 82.215467,
+   "start_tc": "1:21",
+   "end_tc": "1:22"
+  },
+  "caption": "Arc ability bloom in combat.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "arc",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "42": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/042.jpg",
+   "start_sec": 82.215467,
+   "end_sec": 82.8828,
+   "start_tc": "1:22",
+   "end_tc": "1:23"
+  },
+  "caption": "Mars Cabal base vista under a red sky.",
+  "subject_salience": "environment_establishing",
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  }
+ },
+ "43": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/043.jpg",
+   "start_sec": 82.8828,
+   "end_sec": 83.8838,
+   "start_tc": "1:23",
+   "end_tc": "1:24"
+  },
+  "caption": "Explosion around a Cabal Walker.",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "44": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/044.jpg",
+   "start_sec": 83.8838,
+   "end_sec": 84.5845,
+   "start_tc": "1:24",
+   "end_tc": "1:25"
+  },
+  "caption": "First-person purple-lit jump.",
+  "composition": [
+   "POV"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "45": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/045.jpg",
+   "start_sec": 84.5845,
+   "end_sec": 85.6856,
+   "start_tc": "1:25",
+   "end_tc": "1:26"
+  },
+  "caption": "Void super blooms in combat.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "void",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "46": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/046.jpg",
+   "start_sec": 85.6856,
+   "end_sec": 86.820067,
+   "start_tc": "1:26",
+   "end_tc": "1:27"
+  },
+  "caption": "Cabal base under a red sky.",
+  "faction": [
+   "cabal"
+  ],
+  "subject_salience": "environment_establishing",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  }
+ },
+ "47": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/047.jpg",
+   "start_sec": 86.820067,
+   "end_sec": 88.655233,
+   "start_tc": "1:27",
+   "end_tc": "1:29"
+  },
+  "caption": "Sunset dunes with a distant city on the horizon.",
+  "subject_salience": "environment_establishing",
+  "shot_scale": "ELS",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  }
+ },
+ "48": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/048.jpg",
+   "start_sec": 88.655233,
+   "end_sec": 89.722967,
+   "start_tc": "1:29",
+   "end_tc": "1:30"
+  },
+  "caption": "First-person gun in frame over dead enemies in green ruins - verified full-size 76.4-77.2 (earlier tile-level read of a walking fireteam corrected).",
+  "content_type": "gameplay",
+  "composition": [
+   "POV"
+  ],
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "49": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/049.jpg",
+   "start_sec": 89.722967,
+   "end_sec": 90.557133,
+   "start_tc": "1:30",
+   "end_tc": "1:31"
+  },
+  "caption": "Golden gun first-person flash.",
+  "composition": [
+   "POV"
+  ],
+  "action": [
+   "ability_cast"
+  ],
+  "element": "solar",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "50": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/050.jpg",
+   "start_sec": 90.557133,
+   "end_sec": 91.157733,
+   "start_tc": "1:31",
+   "end_tc": "1:31"
+  },
+  "caption": "Cabal firefight at medium range.",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "51": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/051.jpg",
+   "start_sec": 91.157733,
+   "end_sec": 92.3923,
+   "start_tc": "1:31",
+   "end_tc": "1:32"
+  },
+  "caption": "Walker battle.",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "52": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/052.jpg",
+   "start_sec": 92.3923,
+   "end_sec": 93.326567,
+   "start_tc": "1:32",
+   "end_tc": "1:33"
+  },
+  "caption": "Fallen in jungle terrain.",
+  "faction": [
+   "fallen_eliksni"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "53": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/053.jpg",
+   "start_sec": 93.326567,
+   "end_sec": 95.6956,
+   "start_tc": "1:33",
+   "end_tc": "1:36"
+  },
+  "caption": "FOUR-IMAGE DISSOLVE BEAT (93.33-95.70): Traveler+trio silhouette, then figures before a ketch, then a planet. Only the 93.5-94.5 window - three Guardians silhouetted walking toward the Traveler - verified clean; the beat is shredded by dissolves.",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "LS",
+  "lighting": "silhouette",
+  "composition": [
+   "group"
+  ],
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "action": [
+   "traversal"
+  ],
+  "substitutability": 3,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  }
+ },
+ "54": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/054.jpg",
+   "start_sec": 95.6956,
+   "end_sec": 96.329567,
+   "start_tc": "1:36",
+   "end_tc": "1:36"
+  },
+  "caption": "Ability explosion.",
+  "action": [
+   "ability_cast"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "55": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/055.jpg",
+   "start_sec": 96.329567,
+   "end_sec": 97.330567,
+   "start_tc": "1:36",
+   "end_tc": "1:37"
+  },
+  "caption": "Dropship over a vista; no figures in frame.",
+  "subject_salience": "environment_establishing",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  }
+ },
+ "56": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/056.jpg",
+   "start_sec": 97.330567,
+   "end_sec": 98.364933,
+   "start_tc": "1:37",
+   "end_tc": "1:38"
+  },
+  "caption": "Two Guardians silhouetted against a glaring tower-sun - verified clean window 97.33-98.36.",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "LS",
+  "lighting": "silhouette",
+  "composition": [
+   "two_shot"
+  ],
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "substitutability": 4,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "57": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/057.jpg",
+   "start_sec": 98.364933,
+   "end_sec": 102.268833,
+   "start_tc": "1:38",
+   "end_tc": "1:42"
+  },
+  "caption": "Titan with a machine gun, interior.",
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "58": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/058.jpg",
+   "start_sec": 102.268833,
+   "end_sec": 104.737967,
+   "start_tc": "1:42",
+   "end_tc": "1:45"
+  },
+  "caption": "Black frame.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "59": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/059.jpg",
+   "start_sec": 104.737967,
+   "end_sec": 105.972533,
+   "start_tc": "1:45",
+   "end_tc": "1:46"
+  },
+  "caption": "'STUNNING' - Destructoid accolade card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "60": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/060.jpg",
+   "start_sec": 105.972533,
+   "end_sec": 107.140367,
+   "start_tc": "1:46",
+   "end_tc": "1:47"
+  },
+  "caption": "Titan and Hunter silhouetted on Mars dunes, one raises a sword - verified clean window 105.97-107.14.",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "LS",
+  "lighting": "silhouette",
+  "composition": [
+   "two_shot"
+  ],
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "mood": [
+   "triumphant"
+  ],
+  "substitutability": 4,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "61": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/061.jpg",
+   "start_sec": 107.140367,
+   "end_sec": 108.341567,
+   "start_tc": "1:47",
+   "end_tc": "1:48"
+  },
+  "caption": "'MORE THAN A GAME' - USA Today accolade card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "62": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/062.jpg",
+   "start_sec": 108.341567,
+   "end_sec": 109.442667,
+   "start_tc": "1:48",
+   "end_tc": "1:49"
+  },
+  "caption": "A planet and station in space.",
+  "subject_salience": "environment_establishing",
+  "shot_scale": "ELS",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  }
+ },
+ "63": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/063.jpg",
+   "start_sec": 109.442667,
+   "end_sec": 110.6105,
+   "start_tc": "1:49",
+   "end_tc": "1:51"
+  },
+  "caption": "'OVER 180 AWARDS AND NOMINATIONS' card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "64": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/064.jpg",
+   "start_sec": 110.6105,
+   "end_sec": 112.846067,
+   "start_tc": "1:51",
+   "end_tc": "1:53"
+  },
+  "caption": "Guardians packed inside a drop pod, mixed POV.",
+  "composition": [
+   "POV"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "65": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/065.jpg",
+   "start_sec": 112.846067,
+   "end_sec": 113.5134,
+   "start_tc": "1:53",
+   "end_tc": "1:54"
+  },
+  "caption": "An arc-jump past a glass building.",
+  "action": [
+   "traversal"
+  ],
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "66": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/066.jpg",
+   "start_sec": 113.5134,
+   "end_sec": 116.9168,
+   "start_tc": "1:54",
+   "end_tc": "1:57"
+  },
+  "caption": "Black frame.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "67": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/067.jpg",
+   "start_sec": 116.9168,
+   "end_sec": 122.5224,
+   "start_tc": "1:57",
+   "end_tc": "2:03"
+  },
+  "caption": "The Tower in the clouds, ELS vista; verified clean window 116.9-120.6 before the title-card dissolve.",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "ELS",
+  "subject_salience": "environment_establishing",
+  "mood": [
+   "serene",
+   "reverent"
+  ],
+  "pacing": "slow",
+  "substitutability": 3,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "mood": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "pacing": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "68": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/068.jpg",
+   "start_sec": 122.5224,
+   "end_sec": 133.166367,
+   "start_tc": "2:03",
+   "end_tc": "2:13"
+  },
+  "caption": "DESTINY title card, 09.09.14.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "69": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_official_destiny_launch_gameplay_trailer/069.jpg",
+   "start_sec": 133.166367,
+   "end_sec": 149.11563333333334,
+   "start_tc": "2:13",
+   "end_tc": "2:29"
+  },
+  "caption": "DESTINY pre-order 'EARLY ACCESS' end card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ }
+}

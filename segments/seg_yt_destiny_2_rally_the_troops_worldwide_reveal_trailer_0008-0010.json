@@ -1,0 +1,79 @@
+{
+  "segment_id": "seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0008-0010",
+  "video_id": "yt_destiny_2_rally_the_troops_worldwide_reveal_trailer",
+  "start_sec": 8.966667,
+  "end_sec": 10.6,
+  "start_tc": "0:09",
+  "end_tc": "0:11",
+  "era": "unknown",
+  "activity": "cinematic",
+  "content_type": "trailer",
+  "caption": "Guardians huddled on rubble.",
+  "composition": [
+    "group"
+  ],
+  "subject_salience": "ambient",
+  "clean": false,
+  "footage_tier": "mixed",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.2
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.75
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.75
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.75
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

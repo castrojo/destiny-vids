@@ -1,0 +1,145 @@
+{
+  "segment_id": "seg_yt_destiny_year_one_0358-0358",
+  "video_id": "yt_destiny_year_one",
+  "start_sec": 358.1,
+  "end_sec": 358.666667,
+  "start_tc": "5:58",
+  "end_tc": "5:59",
+  "era": "unknown",
+  "activity": "cinematic",
+  "content_type": "UNKNOWN",
+  "caption": "Reviewed by contact-sheet triage only (delegated): this community-retrospective ViDoc mixes gameplay HUD, streamer overlays, webcams, interviews, text cards and beta-build watermarks with cinematic material; this beat is not in the act-II traversal pull and was not verified at frame level. Overlays deliberately untagged so clean derives false.",
+  "class": "unknown",
+  "element": "unknown",
+  "faction": [],
+  "shot_scale": "UNKNOWN",
+  "pacing": "UNKNOWN",
+  "lighting": "UNKNOWN",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 0,
+  "subject_salience": "ambient",
+  "action": [
+    "unknown"
+  ],
+  "mood": [],
+  "register": 0,
+  "character": [],
+  "clean": false,
+  "footage_tier": "mixed",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.2
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.5
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "class": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "element": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.4
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

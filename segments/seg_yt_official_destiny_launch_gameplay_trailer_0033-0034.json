@@ -1,0 +1,125 @@
+{
+  "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0033-0034",
+  "video_id": "yt_official_destiny_launch_gameplay_trailer",
+  "start_sec": 33.400033,
+  "end_sec": 34.467767,
+  "start_tc": "0:33",
+  "end_tc": "0:34",
+  "era": "d1_base",
+  "activity": "unknown",
+  "content_type": "gameplay",
+  "caption": "A lone Guardian runs toward a crashed ship's glowing engine across dusty industrial ground. Verified clean full-size at 33.8/34.2. Lone figure - marginal for the anonymous-group brief.",
+  "overlays": [
+    "none"
+  ],
+  "shot_scale": "LS",
+  "composition": [
+    "single"
+  ],
+  "action": [
+    "traversal"
+  ],
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "pacing": "medium",
+  "substitutability": 2,
+  "clean": true,
+  "footage_tier": "gameplay",
+  "traversal_hero": true,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 1
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.95
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

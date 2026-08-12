@@ -1,0 +1,27 @@
+{
+  "video_id": "yt_official_destiny_launch_gameplay_trailer",
+  "youtube_url": "https://www.youtube.com/watch?v=jv7vqCmt6wY",
+  "title": "Official Destiny - Launch Gameplay Trailer",
+  "usage_class": "third_party_copyrighted",
+  "source_rights_note": "Bungie, Inc. copyrighted footage. Bungie's fan-content policy permits non-commercial fan creations, including fan music videos, using Bungie assets. This index stores only metadata and timestamps, not the footage.",
+  "era": "d1_base",
+  "content_type": "gameplay",
+  "activity": "unknown",
+  "provenance": {
+    "era": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "activity": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    }
+  }
+}

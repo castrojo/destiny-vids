@@ -1,0 +1,96 @@
+{
+  "segment_id": "seg_yt_destiny_2_official_launch_trailer_0132-0134",
+  "video_id": "yt_destiny_2_official_launch_trailer",
+  "start_sec": 132.398933,
+  "end_sec": 134.0339,
+  "start_tc": "2:12",
+  "end_tc": "2:14",
+  "era": "d2_base",
+  "activity": "cinematic",
+  "content_type": "trailer",
+  "caption": "The Vanguard around a war table in a dark hangar - verified full-size at 132.5/133.2: Zavala, Ikora, Cayde among others, static interior.",
+  "character": [
+    {
+      "name": "zavala",
+      "kind": "vanguard"
+    },
+    {
+      "name": "ikora_rey",
+      "kind": "vanguard"
+    },
+    {
+      "name": "cayde_6",
+      "kind": "vanguard"
+    }
+  ],
+  "lighting": "dim",
+  "subject_salience": "ambient",
+  "clean": false,
+  "footage_tier": "mixed",
+  "traversal_hero": false,
+  "casting": {
+    "role": "lead",
+    "character": "zavala",
+    "person": "kelsey_hightower",
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.85
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

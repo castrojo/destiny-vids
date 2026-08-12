@@ -1,0 +1,79 @@
+{
+  "segment_id": "seg_yt_destiny_year_one_0139-0142",
+  "video_id": "yt_destiny_year_one",
+  "start_sec": 139.166667,
+  "end_sec": 142.8,
+  "start_tc": "2:19",
+  "end_tc": "2:23",
+  "era": "unknown",
+  "activity": "cinematic",
+  "content_type": "trailer",
+  "caption": "Tower-balcony sunset group - REJECTED: verified full-size 'BUNGIE VIDOC / DESTINY WORK IN PROGRESS' watermark burned in.",
+  "overlays": [
+    "burned_text"
+  ],
+  "subject_salience": "ambient",
+  "clean": false,
+  "footage_tier": "mixed",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.2
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.5
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.5
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.98
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.98
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.98
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

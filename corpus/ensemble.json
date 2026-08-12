@@ -2,11 +2,11 @@
   "subject": "ensemble",
   "generated_by": "tools/corpus.py",
   "counts": {
-    "shots": 117,
-    "clean": 116,
-    "blocked": 1,
-    "videos": 7,
-    "clean_seconds": 194.185
+    "shots": 137,
+    "clean": 124,
+    "blocked": 13,
+    "videos": 11,
+    "clean_seconds": 208.229
   },
   "videos": [
     "yt_curse_of_osiris_opening_cinematic",
@@ -14,13 +14,17 @@
     "yt_destiny_2_beyond_light_gameplay_trailer",
     "yt_destiny_2_beyond_light_reveal_trailer",
     "yt_destiny_2_lightfall_launch_trailer",
+    "yt_destiny_2_official_launch_trailer",
+    "yt_destiny_2_rally_the_troops_worldwide_reveal_trailer",
     "yt_destiny_2_the_final_shape_launch_trailer",
-    "yt_destiny_2_the_witch_queen_gameplay_trailer"
+    "yt_destiny_2_the_witch_queen_gameplay_trailer",
+    "yt_destiny_year_one",
+    "yt_official_destiny_launch_gameplay_trailer"
   ],
   "coverage": {
     "action": {
       "combat": 46,
-      "traversal": 30,
+      "traversal": 34,
       "ability_cast": 27,
       "idle": 26,
       "vehicle": 4,
@@ -29,7 +33,7 @@
     },
     "shot_scale": {
       "MS": 51,
-      "LS": 23,
+      "LS": 31,
       "MCU": 17,
       "MLS": 11,
       "ELS": 8,
@@ -37,17 +41,17 @@
       "CU": 1
     },
     "composition": {
-      "single": 50,
-      "group": 31,
-      "two_shot": 22,
+      "single": 52,
+      "group": 34,
+      "two_shot": 24,
       "establishing": 11,
       "POV": 5,
       "OTS": 4,
-      "crowd": 2
+      "crowd": 3
     },
     "subject_salience": {
-      "guardian_hero": 93,
-      "crowd_group": 23
+      "guardian_hero": 100,
+      "crowd_group": 24
     }
   },
   "gaps": [
@@ -3029,6 +3033,247 @@
       "faction": []
     },
     {
+      "segment_id": "seg_yt_destiny_2_official_launch_trailer_0050-0052",
+      "video_id": "yt_destiny_2_official_launch_trailer",
+      "start_tc": "0:50",
+      "end_tc": "0:52",
+      "start_sec": 50.417033,
+      "end_sec": 52.218833,
+      "duration": 1.802,
+      "clean": false,
+      "footage_tier": "mixed",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three Guardians hero pose.",
+      "class": null,
+      "element": null,
+      "shot_scale": null,
+      "composition": [
+        "group"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "guardian_hero",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_official_launch_trailer_0053-0054",
+      "video_id": "yt_destiny_2_official_launch_trailer",
+      "start_tc": "0:53",
+      "end_tc": "0:54",
+      "start_sec": 53.420033,
+      "end_sec": 54.320933,
+      "duration": 0.901,
+      "clean": false,
+      "footage_tier": "mixed",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Civilians run through a station.",
+      "class": null,
+      "element": null,
+      "shot_scale": null,
+      "composition": null,
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "crowd_group",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_official_launch_trailer_0054-0055",
+      "video_id": "yt_destiny_2_official_launch_trailer",
+      "start_tc": "0:54",
+      "end_tc": "0:55",
+      "start_sec": 54.320933,
+      "end_sec": 55.3553,
+      "duration": 1.034,
+      "clean": false,
+      "footage_tier": "mixed",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Hooded figures walk through a refugee camp.",
+      "class": null,
+      "element": null,
+      "shot_scale": null,
+      "composition": null,
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "crowd_group",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0010-0012",
+      "video_id": "yt_destiny_2_rally_the_troops_worldwide_reveal_trailer",
+      "start_tc": "0:11",
+      "end_tc": "0:13",
+      "start_sec": 10.6,
+      "end_sec": 12.733333,
+      "duration": 2.133,
+      "clean": true,
+      "footage_tier": "mixed",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 6
+      },
+      "caption": "A crowd of Guardians silhouetted on a rubble ridge in backlit haze; standing and gesturing rather than walking - marginal for the traversal brief (window 10.6-12.7).",
+      "class": null,
+      "element": null,
+      "shot_scale": "LS",
+      "composition": [
+        "crowd"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "crowd_group",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0051-0052",
+      "video_id": "yt_destiny_2_rally_the_troops_worldwide_reveal_trailer",
+      "start_tc": "0:51",
+      "end_tc": "0:53",
+      "start_sec": 51.3,
+      "end_sec": 52.966667,
+      "duration": 1.667,
+      "clean": false,
+      "footage_tier": "mixed",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Crowd silhouettes.",
+      "class": null,
+      "element": null,
+      "shot_scale": null,
+      "composition": null,
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "crowd_group",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0053-0062",
+      "video_id": "yt_destiny_2_rally_the_troops_worldwide_reveal_trailer",
+      "start_tc": "0:54",
+      "end_tc": "1:02",
+      "start_sec": 53.966667,
+      "end_sec": 62.233333,
+      "duration": 8.267,
+      "clean": false,
+      "footage_tier": "mixed",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "CIVILIANS huddling in golden fog - verified full-size: not Guardians, excluded from the traversal pool (near-miss).",
+      "class": null,
+      "element": null,
+      "shot_scale": null,
+      "composition": null,
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "crowd_group",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0078-0079",
+      "video_id": "yt_destiny_2_rally_the_troops_worldwide_reveal_trailer",
+      "start_tc": "1:18",
+      "end_tc": "1:20",
+      "start_sec": 78.133333,
+      "end_sec": 79.566667,
+      "duration": 1.433,
+      "clean": false,
+      "footage_tier": "mixed",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "The crowd, one fist raised.",
+      "class": null,
+      "element": null,
+      "shot_scale": null,
+      "composition": null,
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "crowd_group",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
       "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0001-0003",
       "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
       "start_tc": "0:02",
@@ -4942,6 +5187,492 @@
       "faction": [
         "hive"
       ]
+    },
+    {
+      "segment_id": "seg_yt_destiny_year_one_0175-0179",
+      "video_id": "yt_destiny_year_one",
+      "start_tc": "2:56",
+      "end_tc": "2:59",
+      "start_sec": 175.733333,
+      "end_sec": 179.4,
+      "duration": 3.667,
+      "clean": false,
+      "footage_tier": "mixed",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Four named hero characters posed in a lineup (tile-level; identities not individually confirmed, so no character tags).",
+      "class": null,
+      "element": null,
+      "shot_scale": null,
+      "composition": [
+        "group"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "guardian_hero",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_destiny_year_one_1674-1675",
+      "video_id": "yt_destiny_year_one",
+      "start_tc": "27:54",
+      "end_tc": "27:56",
+      "start_sec": 1674.4,
+      "end_sec": 1675.533333,
+      "duration": 1.133,
+      "clean": true,
+      "footage_tier": "mixed",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A lone Guardian mid-leap over a wrecked tank in a misty green wasteland, letterboxed cinematic - verified clean 1674.4-1675.53. Lone figure: marginal-in as an energy insert.",
+      "class": null,
+      "element": null,
+      "shot_scale": "LS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": null,
+      "register": null,
+      "faction": null
+    },
+    {
+      "segment_id": "seg_yt_destiny_year_one_1691-1692",
+      "video_id": "yt_destiny_year_one",
+      "start_tc": "28:12",
+      "end_tc": "28:13",
+      "start_sec": 1691.566667,
+      "end_sec": 1692.6,
+      "duration": 1.033,
+      "clean": false,
+      "footage_tier": "mixed",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A lone Guardian in a static hero pose - out per the anonymous-group brief.",
+      "class": null,
+      "element": null,
+      "shot_scale": null,
+      "composition": [
+        "single"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "guardian_hero",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0016-0024",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "0:17",
+      "end_tc": "0:25",
+      "start_sec": 16.583233,
+      "end_sec": 24.8248,
+      "duration": 8.242,
+      "clean": false,
+      "footage_tier": "gameplay",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "DISSOLVE SANDWICH: three Guardians walk away across a stone plaza toward a distant obelisk, pink sky, broken planet overhead; accolade-card dissolves bracket the beat. Verified text-free window 20.3-22.7 (probed full-size).",
+      "class": null,
+      "element": null,
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": [
+        "static"
+      ],
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "bright",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "serene",
+        "reverent"
+      ],
+      "register": null,
+      "faction": null,
+      "blocked_by": [
+        "burned_text"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0033-0034",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "0:33",
+      "end_tc": "0:34",
+      "start_sec": 33.400033,
+      "end_sec": 34.467767,
+      "duration": 1.068,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A lone Guardian runs toward a crashed ship's glowing engine across dusty industrial ground. Verified clean full-size at 33.8/34.2. Lone figure - marginal for the anonymous-group brief.",
+      "class": null,
+      "element": null,
+      "shot_scale": "LS",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": null,
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": null,
+      "register": null,
+      "faction": null
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0034-0035",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "0:34",
+      "end_tc": "0:35",
+      "start_sec": 34.467767,
+      "end_sec": 35.2352,
+      "duration": 0.767,
+      "clean": false,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Blue-armored Titan close-up, helmeted.",
+      "class": null,
+      "element": null,
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": "face_obscured",
+      "subject_salience": "guardian_hero",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0037-0040",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "0:37",
+      "end_tc": "0:40",
+      "start_sec": 37.103733,
+      "end_sec": 40.173467,
+      "duration": 3.07,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Three Guardians walk away through the foggy green Hellmouth approach; a Fallen Dreg enters frame at ~39.8. Verified clean traversal window 37.5-39.6 (probed full-size).",
+      "class": null,
+      "element": null,
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": "slow",
+      "lighting": "dim",
+      "identity_visibility": "back_only",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": [
+        "ominous"
+      ],
+      "register": null,
+      "faction": [
+        "fallen_eliksni"
+      ]
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0041-0043",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "0:41",
+      "end_tc": "0:43",
+      "start_sec": 41.307933,
+      "end_sec": 43.376667,
+      "duration": 2.069,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "Fireteam of three stands on a rocky ledge silhouetted against a bright sky, one raises an arm. Verified full-size window 41.31-43.38.",
+      "class": null,
+      "element": null,
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": null,
+      "mood": [
+        "triumphant"
+      ],
+      "register": null,
+      "faction": null
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0060-0061",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "1:01",
+      "end_tc": "1:02",
+      "start_sec": 60.894167,
+      "end_sec": 61.795067,
+      "duration": 0.901,
+      "clean": false,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "A golden-armored Titan poses with a heavy weapon above a city - verified full-size at 61.5: lone hero pose, out per the anonymous brief.",
+      "class": null,
+      "element": null,
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "guardian_hero",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0063-0064",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "1:03",
+      "end_tc": "1:04",
+      "start_sec": 63.063,
+      "end_sec": 64.097367,
+      "duration": 1.034,
+      "clean": false,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Golden-armored Guardian hero pose.",
+      "class": null,
+      "element": null,
+      "shot_scale": null,
+      "composition": [
+        "single"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": null,
+      "identity_visibility": null,
+      "subject_salience": "guardian_hero",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null,
+      "blocked_by": []
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0093-0095",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "1:33",
+      "end_tc": "1:36",
+      "start_sec": 93.326567,
+      "end_sec": 95.6956,
+      "duration": 2.369,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": true,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 3
+      },
+      "caption": "FOUR-IMAGE DISSOLVE BEAT (93.33-95.70): Traveler+trio silhouette, then figures before a ketch, then a planet. Only the 93.5-94.5 window - three Guardians silhouetted walking toward the Traveler - verified clean; the beat is shredded by dissolves.",
+      "class": null,
+      "element": null,
+      "shot_scale": "LS",
+      "composition": [
+        "group"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "traversal"
+      ],
+      "mood": null,
+      "register": null,
+      "faction": null
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0097-0098",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "1:37",
+      "end_tc": "1:38",
+      "start_sec": 97.330567,
+      "end_sec": 98.364933,
+      "duration": 1.034,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Two Guardians silhouetted against a glaring tower-sun - verified clean window 97.33-98.36.",
+      "class": null,
+      "element": null,
+      "shot_scale": "LS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": null,
+      "mood": null,
+      "register": null,
+      "faction": null
+    },
+    {
+      "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0105-0107",
+      "video_id": "yt_official_destiny_launch_gameplay_trailer",
+      "start_tc": "1:46",
+      "end_tc": "1:47",
+      "start_sec": 105.972533,
+      "end_sec": 107.140367,
+      "duration": 1.168,
+      "clean": true,
+      "footage_tier": "gameplay",
+      "traversal_hero": false,
+      "casting": {
+        "role": "ensemble",
+        "character": null,
+        "usable": true,
+        "slots": 1
+      },
+      "caption": "Titan and Hunter silhouetted on Mars dunes, one raises a sword - verified clean window 105.97-107.14.",
+      "class": null,
+      "element": null,
+      "shot_scale": "LS",
+      "composition": [
+        "two_shot"
+      ],
+      "camera_movement": null,
+      "camera_angle": null,
+      "pacing": null,
+      "lighting": "silhouette",
+      "identity_visibility": "silhouette",
+      "subject_salience": "guardian_hero",
+      "action": null,
+      "mood": [
+        "triumphant"
+      ],
+      "register": null,
+      "faction": null
     }
   ]
 }

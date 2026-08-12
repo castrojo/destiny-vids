@@ -1,0 +1,79 @@
+{
+  "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0063-0064",
+  "video_id": "yt_official_destiny_launch_gameplay_trailer",
+  "start_sec": 63.063,
+  "end_sec": 64.097367,
+  "start_tc": "1:03",
+  "end_tc": "1:04",
+  "era": "d1_base",
+  "activity": "unknown",
+  "content_type": "gameplay",
+  "caption": "Golden-armored Guardian hero pose.",
+  "composition": [
+    "single"
+  ],
+  "subject_salience": "guardian_hero",
+  "clean": false,
+  "footage_tier": "gameplay",
+  "traversal_hero": false,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 1
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.7
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.7
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.7
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

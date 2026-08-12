@@ -1,0 +1,90 @@
+{
+  "segment_id": "seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0015-0017",
+  "video_id": "yt_destiny_2_rally_the_troops_worldwide_reveal_trailer",
+  "start_sec": 15.866667,
+  "end_sec": 17.233333,
+  "start_tc": "0:16",
+  "end_tc": "0:17",
+  "era": "unknown",
+  "activity": "cinematic",
+  "content_type": "trailer",
+  "caption": "Zavala walks through the crowd (verified recognizable in an earlier full-size probe).",
+  "character": [
+    {
+      "name": "zavala",
+      "kind": "vanguard"
+    }
+  ],
+  "action": [
+    "traversal"
+  ],
+  "subject_salience": "ambient",
+  "clean": false,
+  "footage_tier": "mixed",
+  "traversal_hero": false,
+  "casting": {
+    "role": "lead",
+    "character": "zavala",
+    "person": "kelsey_hightower",
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.2
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

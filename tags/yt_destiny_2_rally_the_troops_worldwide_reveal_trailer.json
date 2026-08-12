@@ -1,0 +1,1507 @@
+{
+ "0": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/000.jpg",
+   "start_sec": 0.0,
+   "end_sec": 6.466667,
+   "start_tc": "0:00",
+   "end_tc": "0:06"
+  },
+  "caption": "ESRB 'RP' bug over the burning City vista with the Traveler.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "1": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/001.jpg",
+   "start_sec": 6.466667,
+   "end_sec": 8.966667,
+   "start_tc": "0:06",
+   "end_tc": "0:09"
+  },
+  "caption": "Zavala chest-up addressing the crowd.",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "2": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/002.jpg",
+   "start_sec": 8.966667,
+   "end_sec": 10.6,
+   "start_tc": "0:09",
+   "end_tc": "0:11"
+  },
+  "caption": "Guardians huddled on rubble.",
+  "composition": [
+   "group"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "3": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/003.jpg",
+   "start_sec": 10.6,
+   "end_sec": 12.733333,
+   "start_tc": "0:11",
+   "end_tc": "0:13"
+  },
+  "caption": "A crowd of Guardians silhouetted on a rubble ridge in backlit haze; standing and gesturing rather than walking - marginal for the traversal brief (window 10.6-12.7).",
+  "overlays": [
+   "none"
+  ],
+  "shot_scale": "LS",
+  "lighting": "silhouette",
+  "composition": [
+   "crowd"
+  ],
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "crowd_group",
+  "substitutability": 2,
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character_identifiability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "substitutability": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  }
+ },
+ "4": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/004.jpg",
+   "start_sec": 12.733333,
+   "end_sec": 14.133333,
+   "start_tc": "0:13",
+   "end_tc": "0:14"
+  },
+  "caption": "Two unarmored men in conversation.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "5": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/005.jpg",
+   "start_sec": 14.133333,
+   "end_sec": 15.866667,
+   "start_tc": "0:14",
+   "end_tc": "0:16"
+  },
+  "caption": "Cayde-6 gesturing to the crowd.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "6": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/006.jpg",
+   "start_sec": 15.866667,
+   "end_sec": 17.233333,
+   "start_tc": "0:16",
+   "end_tc": "0:17"
+  },
+  "caption": "Zavala walks through the crowd (verified recognizable in an earlier full-size probe).",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "action": [
+   "traversal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "7": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/007.jpg",
+   "start_sec": 17.233333,
+   "end_sec": 19.1,
+   "start_tc": "0:17",
+   "end_tc": "0:19"
+  },
+  "caption": "Guardians with a heavy weapon amid fires.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "8": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/008.jpg",
+   "start_sec": 19.1,
+   "end_sec": 19.9,
+   "start_tc": "0:19",
+   "end_tc": "0:20"
+  },
+  "caption": "Titan helmet close-up.",
+  "shot_scale": "CU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "9": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/009.jpg",
+   "start_sec": 19.9,
+   "end_sec": 20.6,
+   "start_tc": "0:20",
+   "end_tc": "0:21"
+  },
+  "caption": "A hulking armored figure with red lights among civilians.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "10": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/010.jpg",
+   "start_sec": 20.6,
+   "end_sec": 21.166667,
+   "start_tc": "0:21",
+   "end_tc": "0:21"
+  },
+  "caption": "The brawl continues.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "11": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/011.jpg",
+   "start_sec": 21.166667,
+   "end_sec": 22.133333,
+   "start_tc": "0:21",
+   "end_tc": "0:22"
+  },
+  "caption": "Brawl amid fire.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "12": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/012.jpg",
+   "start_sec": 22.133333,
+   "end_sec": 23.033333,
+   "start_tc": "0:22",
+   "end_tc": "0:23"
+  },
+  "caption": "A Guardian in dark tones.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.65
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.65
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "13": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/013.jpg",
+   "start_sec": 23.033333,
+   "end_sec": 23.633333,
+   "start_tc": "0:23",
+   "end_tc": "0:24"
+  },
+  "caption": "Arc ability against a Titan - blue lightning.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "arc",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "14": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/014.jpg",
+   "start_sec": 23.633333,
+   "end_sec": 24.566667,
+   "start_tc": "0:24",
+   "end_tc": "0:25"
+  },
+  "caption": "Cayde-6 with his gun raised.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "15": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/015.jpg",
+   "start_sec": 24.566667,
+   "end_sec": 25.266667,
+   "start_tc": "0:25",
+   "end_tc": "0:25"
+  },
+  "caption": "Three Guardians posed on a ledge against an orange sky with ships - hero lineup, not traversal.",
+  "composition": [
+   "group"
+  ],
+  "lighting": "silhouette",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "16": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/016.jpg",
+   "start_sec": 25.266667,
+   "end_sec": 26.3,
+   "start_tc": "0:25",
+   "end_tc": "0:26"
+  },
+  "caption": "A hulking armored figure.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.65
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.65
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "17": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/017.jpg",
+   "start_sec": 26.3,
+   "end_sec": 26.866667,
+   "start_tc": "0:26",
+   "end_tc": "0:27"
+  },
+  "caption": "Guardians firing.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "18": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/018.jpg",
+   "start_sec": 26.866667,
+   "end_sec": 28.066667,
+   "start_tc": "0:27",
+   "end_tc": "0:28"
+  },
+  "caption": "Cayde-6 gunplay.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "19": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/019.jpg",
+   "start_sec": 28.066667,
+   "end_sec": 30.8,
+   "start_tc": "0:28",
+   "end_tc": "0:31"
+  },
+  "caption": "Zavala close-up.",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "20": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/020.jpg",
+   "start_sec": 30.8,
+   "end_sec": 33.3,
+   "start_tc": "0:31",
+   "end_tc": "0:33"
+  },
+  "caption": "Guardians fighting amid debris.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "21": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/021.jpg",
+   "start_sec": 33.3,
+   "end_sec": 37.766667,
+   "start_tc": "0:33",
+   "end_tc": "0:38"
+  },
+  "caption": "Cayde-6 reaches toward a red figure.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "22": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/022.jpg",
+   "start_sec": 37.766667,
+   "end_sec": 39.433333,
+   "start_tc": "0:38",
+   "end_tc": "0:39"
+  },
+  "caption": "Cayde-6 in silhouette.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "lighting": "silhouette",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "23": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/023.jpg",
+   "start_sec": 39.433333,
+   "end_sec": 41.433333,
+   "start_tc": "0:39",
+   "end_tc": "0:41"
+  },
+  "caption": "Green-lit interior explosion.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "24": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/024.jpg",
+   "start_sec": 41.433333,
+   "end_sec": 42.966667,
+   "start_tc": "0:41",
+   "end_tc": "0:43"
+  },
+  "caption": "Cayde-6 with Ikora in frame.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   },
+   {
+    "name": "ikora_rey",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "25": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/025.jpg",
+   "start_sec": 42.966667,
+   "end_sec": 44.2,
+   "start_tc": "0:43",
+   "end_tc": "0:44"
+  },
+  "caption": "Cayde-6 among the crowd.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "26": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/026.jpg",
+   "start_sec": 44.2,
+   "end_sec": 47.933333,
+   "start_tc": "0:44",
+   "end_tc": "0:48"
+  },
+  "caption": "A Cabal ship crashing.",
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "27": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/027.jpg",
+   "start_sec": 47.933333,
+   "end_sec": 49.766667,
+   "start_tc": "0:48",
+   "end_tc": "0:50"
+  },
+  "caption": "Cayde-6 and the crowd.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "28": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/028.jpg",
+   "start_sec": 49.766667,
+   "end_sec": 51.3,
+   "start_tc": "0:50",
+   "end_tc": "0:51"
+  },
+  "caption": "Cayde-6 close-up.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "29": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/029.jpg",
+   "start_sec": 51.3,
+   "end_sec": 52.966667,
+   "start_tc": "0:51",
+   "end_tc": "0:53"
+  },
+  "caption": "Crowd silhouettes.",
+  "subject_salience": "crowd_group",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  }
+ },
+ "30": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/030.jpg",
+   "start_sec": 52.966667,
+   "end_sec": 53.966667,
+   "start_tc": "0:53",
+   "end_tc": "0:54"
+  },
+  "caption": "Zavala close-up.",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "31": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/031.jpg",
+   "start_sec": 53.966667,
+   "end_sec": 62.233333,
+   "start_tc": "0:54",
+   "end_tc": "1:02"
+  },
+  "caption": "CIVILIANS huddling in golden fog - verified full-size: not Guardians, excluded from the traversal pool (near-miss).",
+  "subject_salience": "crowd_group",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  }
+ },
+ "32": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/032.jpg",
+   "start_sec": 62.233333,
+   "end_sec": 63.4,
+   "start_tc": "1:02",
+   "end_tc": "1:03"
+  },
+  "caption": "A red-masked figure among unarmored men.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "33": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/033.jpg",
+   "start_sec": 63.4,
+   "end_sec": 69.2,
+   "start_tc": "1:03",
+   "end_tc": "1:09"
+  },
+  "caption": "A brawl in the fog.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "34": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/034.jpg",
+   "start_sec": 69.2,
+   "end_sec": 73.7,
+   "start_tc": "1:09",
+   "end_tc": "1:14"
+  },
+  "caption": "Cayde-6 close-up.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "35": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/035.jpg",
+   "start_sec": 73.7,
+   "end_sec": 75.5,
+   "start_tc": "1:14",
+   "end_tc": "1:16"
+  },
+  "caption": "Zavala addressing the crowd.",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "36": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/036.jpg",
+   "start_sec": 75.5,
+   "end_sec": 78.133333,
+   "start_tc": "1:16",
+   "end_tc": "1:18"
+  },
+  "caption": "Zavala addressing the crowd (verified recognizable in an earlier full-size probe).",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "37": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/037.jpg",
+   "start_sec": 78.133333,
+   "end_sec": 79.566667,
+   "start_tc": "1:18",
+   "end_tc": "1:20"
+  },
+  "caption": "The crowd, one fist raised.",
+  "subject_salience": "crowd_group",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  }
+ },
+ "38": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/038.jpg",
+   "start_sec": 79.566667,
+   "end_sec": 81.633333,
+   "start_tc": "1:20",
+   "end_tc": "1:22"
+  },
+  "caption": "The crowd with a recognizable red-caped Zavala (verified in an earlier full-size probe).",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "subject_salience": "crowd_group",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  }
+ },
+ "39": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/039.jpg",
+   "start_sec": 81.633333,
+   "end_sec": 83.9,
+   "start_tc": "1:22",
+   "end_tc": "1:24"
+  },
+  "caption": "Ikora with a rifle beside Cayde-6.",
+  "character": [
+   {
+    "name": "ikora_rey",
+    "kind": "vanguard"
+   },
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "40": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/040.jpg",
+   "start_sec": 83.9,
+   "end_sec": 86.933333,
+   "start_tc": "1:24",
+   "end_tc": "1:27"
+  },
+  "caption": "Cayde-6 close-up.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "41": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/041.jpg",
+   "start_sec": 86.933333,
+   "end_sec": 91.766667,
+   "start_tc": "1:27",
+   "end_tc": "1:32"
+  },
+  "caption": "The crowd cheers around Cayde-6.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "subject_salience": "crowd_group",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  }
+ },
+ "42": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/042.jpg",
+   "start_sec": 91.766667,
+   "end_sec": 96.9,
+   "start_tc": "1:32",
+   "end_tc": "1:37"
+  },
+  "caption": "'NEW LEGENDS WILL RISE' text over a crowd silhouette.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "43": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/043.jpg",
+   "start_sec": 96.9,
+   "end_sec": 101.333333,
+   "start_tc": "1:37",
+   "end_tc": "1:41"
+  },
+  "caption": "DESTINY 2 'SEPTEMBER 6' title card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "44": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_rally_the_troops_worldwide_reveal_trailer/044.jpg",
+   "start_sec": 101.333333,
+   "end_sec": 116.26666666666667,
+   "start_tc": "1:41",
+   "end_tc": "1:56"
+  },
+  "caption": "DESTINY 2 pre-order beta early-access end card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ }
+}

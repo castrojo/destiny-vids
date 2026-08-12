@@ -1,0 +1,88 @@
+{
+  "segment_id": "seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0049-0051",
+  "video_id": "yt_destiny_2_rally_the_troops_worldwide_reveal_trailer",
+  "start_sec": 49.766667,
+  "end_sec": 51.3,
+  "start_tc": "0:50",
+  "end_tc": "0:51",
+  "era": "unknown",
+  "activity": "cinematic",
+  "content_type": "trailer",
+  "caption": "Cayde-6 close-up.",
+  "character": [
+    {
+      "name": "cayde_6",
+      "kind": "vanguard"
+    }
+  ],
+  "shot_scale": "MCU",
+  "subject_salience": "ambient",
+  "clean": false,
+  "footage_tier": "mixed",
+  "traversal_hero": false,
+  "casting": {
+    "role": "lead",
+    "character": "cayde_6",
+    "person": "castrojo",
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.2
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

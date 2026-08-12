@@ -1,0 +1,95 @@
+{
+  "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0058-0059",
+  "video_id": "yt_official_destiny_launch_gameplay_trailer",
+  "start_sec": 58.8588,
+  "end_sec": 59.8598,
+  "start_tc": "0:59",
+  "end_tc": "1:00",
+  "era": "d1_base",
+  "activity": "unknown",
+  "content_type": "gameplay",
+  "caption": "Guardians fighting at the Vex gate, purple energy (verified full-size at 59.5).",
+  "action": [
+    "combat"
+  ],
+  "faction": [
+    "vex"
+  ],
+  "composition": [
+    "group"
+  ],
+  "subject_salience": "ambient",
+  "clean": false,
+  "footage_tier": "gameplay",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "faction": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

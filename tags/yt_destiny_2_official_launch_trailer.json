@@ -1,0 +1,3031 @@
+{
+ "0": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/000.jpg",
+   "start_sec": 0.0,
+   "end_sec": 2.969633,
+   "start_tc": "0:00",
+   "end_tc": "0:03"
+  },
+  "caption": "ESRB rating bug over a dark red-lit Cabal scene.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "1": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/001.jpg",
+   "start_sec": 2.969633,
+   "end_sec": 5.472133,
+   "start_tc": "0:03",
+   "end_tc": "0:05"
+  },
+  "caption": "Ghaul walks, ESRB bug in corner.",
+  "overlays": [
+   "burned_text"
+  ],
+  "character": [
+   {
+    "name": "ghaul",
+    "kind": "enemy_boss"
+   }
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "2": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/002.jpg",
+   "start_sec": 5.472133,
+   "end_sec": 7.4074,
+   "start_tc": "0:05",
+   "end_tc": "0:07"
+  },
+  "caption": "Cabal soldiers deploy from a ship.",
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "3": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/003.jpg",
+   "start_sec": 7.4074,
+   "end_sec": 8.9089,
+   "start_tc": "0:07",
+   "end_tc": "0:09"
+  },
+  "caption": "Figures leap near Cabal troops.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "4": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/004.jpg",
+   "start_sec": 8.9089,
+   "end_sec": 11.011,
+   "start_tc": "0:09",
+   "end_tc": "0:11"
+  },
+  "caption": "Belly of a Cabal ship, red lights.",
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "5": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/005.jpg",
+   "start_sec": 11.011,
+   "end_sec": 13.013,
+   "start_tc": "0:11",
+   "end_tc": "0:13"
+  },
+  "caption": "Ghaul close-up.",
+  "character": [
+   {
+    "name": "ghaul",
+    "kind": "enemy_boss"
+   }
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "6": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/006.jpg",
+   "start_sec": 13.013,
+   "end_sec": 15.382033,
+   "start_tc": "0:13",
+   "end_tc": "0:15"
+  },
+  "caption": "White-armored Ghaul among civilians.",
+  "character": [
+   {
+    "name": "ghaul",
+    "kind": "enemy_boss"
+   }
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "7": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/007.jpg",
+   "start_sec": 15.382033,
+   "end_sec": 22.655967,
+   "start_tc": "0:15",
+   "end_tc": "0:23"
+  },
+  "caption": "Activision logo card on black.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "8": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/008.jpg",
+   "start_sec": 22.655967,
+   "end_sec": 32.665967,
+   "start_tc": "0:23",
+   "end_tc": "0:33"
+  },
+  "caption": "The burning City at dusk, dark sphere overhead.",
+  "subject_salience": "environment_establishing",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  }
+ },
+ "9": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/009.jpg",
+   "start_sec": 32.665967,
+   "end_sec": 35.668967,
+   "start_tc": "0:33",
+   "end_tc": "0:36"
+  },
+  "caption": "Zavala close-up.",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "10": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/010.jpg",
+   "start_sec": 35.668967,
+   "end_sec": 37.2372,
+   "start_tc": "0:36",
+   "end_tc": "0:37"
+  },
+  "caption": "Two Guardians before a massive Cabal structure, green sky.",
+  "composition": [
+   "group"
+  ],
+  "shot_scale": "LS",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "11": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/011.jpg",
+   "start_sec": 37.2372,
+   "end_sec": 39.6396,
+   "start_tc": "0:37",
+   "end_tc": "0:40"
+  },
+  "caption": "Zavala close-up.",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "12": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/012.jpg",
+   "start_sec": 39.6396,
+   "end_sec": 40.2402,
+   "start_tc": "0:40",
+   "end_tc": "0:40"
+  },
+  "caption": "Near-black frame.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "13": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/013.jpg",
+   "start_sec": 40.2402,
+   "end_sec": 43.009633,
+   "start_tc": "0:40",
+   "end_tc": "0:43"
+  },
+  "caption": "Cabal fleet over the burning City - vista.",
+  "subject_salience": "environment_establishing",
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  }
+ },
+ "14": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/014.jpg",
+   "start_sec": 43.009633,
+   "end_sec": 44.477767,
+   "start_tc": "0:43",
+   "end_tc": "0:44"
+  },
+  "caption": "Silhouettes atop rubble, night city.",
+  "lighting": "silhouette",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "15": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/015.jpg",
+   "start_sec": 44.477767,
+   "end_sec": 46.079367,
+   "start_tc": "0:44",
+   "end_tc": "0:46"
+  },
+  "caption": "Two figures run through a green-lit corridor toward a bright light - interior.",
+  "action": [
+   "traversal"
+  ],
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "16": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/016.jpg",
+   "start_sec": 46.079367,
+   "end_sec": 48.081367,
+   "start_tc": "0:46",
+   "end_tc": "0:48"
+  },
+  "caption": "Guardians with weapons in a burning plaza, red sky.",
+  "composition": [
+   "group"
+  ],
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "17": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/017.jpg",
+   "start_sec": 48.081367,
+   "end_sec": 49.215833,
+   "start_tc": "0:48",
+   "end_tc": "0:49"
+  },
+  "caption": "Same plaza fight, closer.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "18": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/018.jpg",
+   "start_sec": 49.215833,
+   "end_sec": 50.417033,
+   "start_tc": "0:49",
+   "end_tc": "0:50"
+  },
+  "caption": "Three Guardians from behind in golden light.",
+  "composition": [
+   "group"
+  ],
+  "identity_visibility": "back_only",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "identity_visibility": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "19": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/019.jpg",
+   "start_sec": 50.417033,
+   "end_sec": 52.218833,
+   "start_tc": "0:50",
+   "end_tc": "0:52"
+  },
+  "caption": "Three Guardians hero pose.",
+  "composition": [
+   "group"
+  ],
+  "subject_salience": "guardian_hero",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  }
+ },
+ "20": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/020.jpg",
+   "start_sec": 52.218833,
+   "end_sec": 53.420033,
+   "start_tc": "0:52",
+   "end_tc": "0:53"
+  },
+  "caption": "Dark rubble.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "21": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/021.jpg",
+   "start_sec": 53.420033,
+   "end_sec": 54.320933,
+   "start_tc": "0:53",
+   "end_tc": "0:54"
+  },
+  "caption": "Civilians run through a station.",
+  "subject_salience": "crowd_group",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  }
+ },
+ "22": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/022.jpg",
+   "start_sec": 54.320933,
+   "end_sec": 55.3553,
+   "start_tc": "0:54",
+   "end_tc": "0:55"
+  },
+  "caption": "Hooded figures walk through a refugee camp.",
+  "subject_salience": "crowd_group",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  }
+ },
+ "23": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/023.jpg",
+   "start_sec": 55.3553,
+   "end_sec": 57.123733,
+   "start_tc": "0:55",
+   "end_tc": "0:57"
+  },
+  "caption": "A robed figure with a staff.",
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "24": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/024.jpg",
+   "start_sec": 57.123733,
+   "end_sec": 57.924533,
+   "start_tc": "0:57",
+   "end_tc": "0:58"
+  },
+  "caption": "Black frame.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "25": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/025.jpg",
+   "start_sec": 57.924533,
+   "end_sec": 59.9599,
+   "start_tc": "0:58",
+   "end_tc": "1:00"
+  },
+  "caption": "A hooded Hunter with a light.",
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "26": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/026.jpg",
+   "start_sec": 59.9599,
+   "end_sec": 60.7607,
+   "start_tc": "1:00",
+   "end_tc": "1:01"
+  },
+  "caption": "Zavala and Ikora in conversation.",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   },
+   {
+    "name": "ikora_rey",
+    "kind": "vanguard"
+   }
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "27": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/027.jpg",
+   "start_sec": 60.7607,
+   "end_sec": 61.928533,
+   "start_tc": "1:01",
+   "end_tc": "1:02"
+  },
+  "caption": "Dark battlefield, scattered fires.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "28": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/028.jpg",
+   "start_sec": 61.928533,
+   "end_sec": 63.3633,
+   "start_tc": "1:02",
+   "end_tc": "1:03"
+  },
+  "caption": "A group of Guardians walks through darkness.",
+  "composition": [
+   "group"
+  ],
+  "action": [
+   "traversal"
+  ],
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "29": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/029.jpg",
+   "start_sec": 63.3633,
+   "end_sec": 64.197467,
+   "start_tc": "1:03",
+   "end_tc": "1:04"
+  },
+  "caption": "Guardian grapples with a Cabal soldier.",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "30": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/030.jpg",
+   "start_sec": 64.197467,
+   "end_sec": 64.798067,
+   "start_tc": "1:04",
+   "end_tc": "1:05"
+  },
+  "caption": "Cabal brawl.",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "31": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/031.jpg",
+   "start_sec": 64.798067,
+   "end_sec": 65.398667,
+   "start_tc": "1:05",
+   "end_tc": "1:05"
+  },
+  "caption": "Guardian with a gun raised.",
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "32": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/032.jpg",
+   "start_sec": 65.398667,
+   "end_sec": 67.100367,
+   "start_tc": "1:05",
+   "end_tc": "1:07"
+  },
+  "caption": "Cabal soldier with a gun.",
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "33": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/033.jpg",
+   "start_sec": 67.100367,
+   "end_sec": 67.6676,
+   "start_tc": "1:07",
+   "end_tc": "1:08"
+  },
+  "caption": "Dark fight scene.",
+  "action": [
+   "combat"
+  ],
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "34": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/034.jpg",
+   "start_sec": 67.6676,
+   "end_sec": 69.903167,
+   "start_tc": "1:08",
+   "end_tc": "1:10"
+  },
+  "caption": "Void energy trail (super).",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "void",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "35": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/035.jpg",
+   "start_sec": 69.903167,
+   "end_sec": 70.637233,
+   "start_tc": "1:10",
+   "end_tc": "1:11"
+  },
+  "caption": "A Hunter wreathed in green glow.",
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "36": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/036.jpg",
+   "start_sec": 70.637233,
+   "end_sec": 71.704967,
+   "start_tc": "1:11",
+   "end_tc": "1:12"
+  },
+  "caption": "A Hunter draws a void bow.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "void",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "37": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/037.jpg",
+   "start_sec": 71.704967,
+   "end_sec": 72.639233,
+   "start_tc": "1:12",
+   "end_tc": "1:13"
+  },
+  "caption": "Ikora close-up.",
+  "character": [
+   {
+    "name": "ikora_rey",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "38": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/038.jpg",
+   "start_sec": 72.639233,
+   "end_sec": 73.6736,
+   "start_tc": "1:13",
+   "end_tc": "1:14"
+  },
+  "caption": "Cayde-6 close-up.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "39": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/039.jpg",
+   "start_sec": 73.6736,
+   "end_sec": 74.707967,
+   "start_tc": "1:14",
+   "end_tc": "1:15"
+  },
+  "caption": "Black frame.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "40": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/040.jpg",
+   "start_sec": 74.707967,
+   "end_sec": 75.542133,
+   "start_tc": "1:15",
+   "end_tc": "1:16"
+  },
+  "caption": "Sunlit battlefield with a dropship.",
+  "subject_salience": "environment_establishing",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  }
+ },
+ "41": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/041.jpg",
+   "start_sec": 75.542133,
+   "end_sec": 78.511767,
+   "start_tc": "1:16",
+   "end_tc": "1:19"
+  },
+  "caption": "Arc energy circle.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "arc",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "42": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/042.jpg",
+   "start_sec": 78.511767,
+   "end_sec": 79.079,
+   "start_tc": "1:19",
+   "end_tc": "1:19"
+  },
+  "caption": "Sparrow chase with an explosion.",
+  "action": [
+   "vehicle"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "43": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/043.jpg",
+   "start_sec": 79.079,
+   "end_sec": 80.213467,
+   "start_tc": "1:19",
+   "end_tc": "1:20"
+  },
+  "caption": "Red circular structure interior.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "44": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/044.jpg",
+   "start_sec": 80.213467,
+   "end_sec": 81.214467,
+   "start_tc": "1:20",
+   "end_tc": "1:21"
+  },
+  "caption": "Two Guardians leap silhouetted against an explosion.",
+  "composition": [
+   "two_shot"
+  ],
+  "lighting": "silhouette",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "45": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/045.jpg",
+   "start_sec": 81.214467,
+   "end_sec": 82.115367,
+   "start_tc": "1:21",
+   "end_tc": "1:22"
+  },
+  "caption": "Void super with purple wings.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "void",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "46": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/046.jpg",
+   "start_sec": 82.115367,
+   "end_sec": 84.250833,
+   "start_tc": "1:22",
+   "end_tc": "1:24"
+  },
+  "caption": "Guardians behind void shields.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "void",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "47": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/047.jpg",
+   "start_sec": 84.250833,
+   "end_sec": 85.5855,
+   "start_tc": "1:24",
+   "end_tc": "1:26"
+  },
+  "caption": "Golden gun firing.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "solar",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "48": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/048.jpg",
+   "start_sec": 85.5855,
+   "end_sec": 86.7867,
+   "start_tc": "1:26",
+   "end_tc": "1:27"
+  },
+  "caption": "Dark frame.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "49": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/049.jpg",
+   "start_sec": 86.7867,
+   "end_sec": 87.821067,
+   "start_tc": "1:27",
+   "end_tc": "1:28"
+  },
+  "caption": "Red Cabal vehicle firing.",
+  "faction": [
+   "cabal"
+  ],
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "50": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/050.jpg",
+   "start_sec": 87.821067,
+   "end_sec": 91.858433,
+   "start_tc": "1:28",
+   "end_tc": "1:32"
+  },
+  "caption": "Guardian spinning an arc staff.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "arc",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.8
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "51": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/051.jpg",
+   "start_sec": 91.858433,
+   "end_sec": 92.625867,
+   "start_tc": "1:32",
+   "end_tc": "1:33"
+  },
+  "caption": "Guardians tumble through the air.",
+  "action": [
+   "traversal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "52": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/052.jpg",
+   "start_sec": 92.625867,
+   "end_sec": 93.526767,
+   "start_tc": "1:33",
+   "end_tc": "1:34"
+  },
+  "caption": "Platform amid fire.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "53": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/053.jpg",
+   "start_sec": 93.526767,
+   "end_sec": 95.762333,
+   "start_tc": "1:34",
+   "end_tc": "1:36"
+  },
+  "caption": "Golden-armored Cabal close-up.",
+  "faction": [
+   "cabal"
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "54": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/054.jpg",
+   "start_sec": 95.762333,
+   "end_sec": 100.1,
+   "start_tc": "1:36",
+   "end_tc": "1:40"
+  },
+  "caption": "Guardian with a purple-lit weapon.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "55": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/055.jpg",
+   "start_sec": 100.1,
+   "end_sec": 100.967533,
+   "start_tc": "1:40",
+   "end_tc": "1:41"
+  },
+  "caption": "Guardians fighting on a blue-lit platform.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "56": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/056.jpg",
+   "start_sec": 100.967533,
+   "end_sec": 101.534767,
+   "start_tc": "1:41",
+   "end_tc": "1:42"
+  },
+  "caption": "Guardian versus a red-lit Cabal.",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "57": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/057.jpg",
+   "start_sec": 101.534767,
+   "end_sec": 103.770333,
+   "start_tc": "1:42",
+   "end_tc": "1:44"
+  },
+  "caption": "A vehicle with purple thrusters on a road.",
+  "action": [
+   "vehicle"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "58": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/058.jpg",
+   "start_sec": 103.770333,
+   "end_sec": 104.537767,
+   "start_tc": "1:44",
+   "end_tc": "1:45"
+  },
+  "caption": "Blue energy cannon discharge.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "59": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/059.jpg",
+   "start_sec": 104.537767,
+   "end_sec": 105.171733,
+   "start_tc": "1:45",
+   "end_tc": "1:45"
+  },
+  "caption": "A Guardian runs through grass under red beams - verified full-size at 119.6/120.4 this is dockside COMBAT, not traversal.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "60": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/060.jpg",
+   "start_sec": 105.171733,
+   "end_sec": 105.972533,
+   "start_tc": "1:45",
+   "end_tc": "1:46"
+  },
+  "caption": "Nessus gameplay combat, green sky.",
+  "action": [
+   "combat"
+  ],
+  "content_type": "gameplay",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "content_type": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "61": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/061.jpg",
+   "start_sec": 105.972533,
+   "end_sec": 106.7066,
+   "start_tc": "1:46",
+   "end_tc": "1:47"
+  },
+  "caption": "Vehicle amid green fog.",
+  "action": [
+   "vehicle"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "62": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/062.jpg",
+   "start_sec": 106.7066,
+   "end_sec": 108.341567,
+   "start_tc": "1:47",
+   "end_tc": "1:48"
+  },
+  "caption": "Gun firing at a structure.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "63": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/063.jpg",
+   "start_sec": 108.341567,
+   "end_sec": 108.975533,
+   "start_tc": "1:48",
+   "end_tc": "1:49"
+  },
+  "caption": "An Exo Guardian slides along a pipe.",
+  "action": [
+   "traversal"
+  ],
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "64": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/064.jpg",
+   "start_sec": 108.975533,
+   "end_sec": 110.076633,
+   "start_tc": "1:49",
+   "end_tc": "1:50"
+  },
+  "caption": "Arc grenade bloom.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "arc",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "65": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/065.jpg",
+   "start_sec": 110.076633,
+   "end_sec": 110.677233,
+   "start_tc": "1:50",
+   "end_tc": "1:51"
+  },
+  "caption": "Cabal and Guardian fight in blue ruins.",
+  "action": [
+   "combat"
+  ],
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "66": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/066.jpg",
+   "start_sec": 110.677233,
+   "end_sec": 111.277833,
+   "start_tc": "1:51",
+   "end_tc": "1:51"
+  },
+  "caption": "Spark explosion around figures.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "67": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/067.jpg",
+   "start_sec": 111.277833,
+   "end_sec": 112.745967,
+   "start_tc": "1:51",
+   "end_tc": "1:53"
+  },
+  "caption": "Guardians fall amid debris.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "68": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/068.jpg",
+   "start_sec": 112.745967,
+   "end_sec": 114.147367,
+   "start_tc": "1:53",
+   "end_tc": "1:54"
+  },
+  "caption": "Golden-armored Guardian with a minigun.",
+  "composition": [
+   "single"
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "69": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/069.jpg",
+   "start_sec": 114.147367,
+   "end_sec": 114.781333,
+   "start_tc": "1:54",
+   "end_tc": "1:55"
+  },
+  "caption": "Void explosions.",
+  "action": [
+   "ability_cast"
+  ],
+  "element": "void",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "element": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "70": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/070.jpg",
+   "start_sec": 114.781333,
+   "end_sec": 115.381933,
+   "start_tc": "1:55",
+   "end_tc": "1:55"
+  },
+  "caption": "Guardians fighting in a flooded ruined dock - verified full-size at 119.6/120.4.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "71": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/071.jpg",
+   "start_sec": 115.381933,
+   "end_sec": 116.249467,
+   "start_tc": "1:55",
+   "end_tc": "1:56"
+  },
+  "caption": "A sparrow skims low over water and forest with laser fire - verified full-size at 121.3: single rider, combat-adjacent.",
+  "action": [
+   "vehicle"
+  ],
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "72": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/072.jpg",
+   "start_sec": 116.249467,
+   "end_sec": 117.3172,
+   "start_tc": "1:56",
+   "end_tc": "1:57"
+  },
+  "caption": "'NEW' text card (verified full-size at 122.0).",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "73": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/073.jpg",
+   "start_sec": 117.3172,
+   "end_sec": 118.118,
+   "start_tc": "1:57",
+   "end_tc": "1:58"
+  },
+  "caption": "Guardians with energy on a shore.",
+  "action": [
+   "combat"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "action": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "74": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/074.jpg",
+   "start_sec": 118.118,
+   "end_sec": 119.252467,
+   "start_tc": "1:58",
+   "end_tc": "1:59"
+  },
+  "caption": "Two white-armored Guardians raise light.",
+  "composition": [
+   "two_shot"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "75": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/075.jpg",
+   "start_sec": 119.252467,
+   "end_sec": 120.987533,
+   "start_tc": "1:59",
+   "end_tc": "2:01"
+  },
+  "caption": "Beat in the NEW/LEGENDS/WILL/RISE title-card run.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "76": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/076.jpg",
+   "start_sec": 120.987533,
+   "end_sec": 121.8217,
+   "start_tc": "2:01",
+   "end_tc": "2:02"
+  },
+  "caption": "Beat in the NEW/LEGENDS/WILL/RISE title-card run.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "77": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/077.jpg",
+   "start_sec": 121.8217,
+   "end_sec": 122.388933,
+   "start_tc": "2:02",
+   "end_tc": "2:02"
+  },
+  "caption": "'NEW' title card in smoke.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "78": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/078.jpg",
+   "start_sec": 122.388933,
+   "end_sec": 123.256467,
+   "start_tc": "2:02",
+   "end_tc": "2:03"
+  },
+  "caption": "A golden-lit figure raises a fist before a crowd.",
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.75
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "79": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/079.jpg",
+   "start_sec": 123.256467,
+   "end_sec": 124.090633,
+   "start_tc": "2:03",
+   "end_tc": "2:04"
+  },
+  "caption": "'LEGENDS' title card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "80": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/080.jpg",
+   "start_sec": 124.090633,
+   "end_sec": 124.7246,
+   "start_tc": "2:04",
+   "end_tc": "2:05"
+  },
+  "caption": "A Hunter with a knife.",
+  "composition": [
+   "single"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "composition": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "81": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/081.jpg",
+   "start_sec": 124.7246,
+   "end_sec": 125.6255,
+   "start_tc": "2:05",
+   "end_tc": "2:06"
+  },
+  "caption": "'WILL' title card (verified full-size at 125.0).",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.95
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "82": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/082.jpg",
+   "start_sec": 125.6255,
+   "end_sec": 126.2261,
+   "start_tc": "2:06",
+   "end_tc": "2:06"
+  },
+  "caption": "Cabal ships exploding in orbit (verified full-size at 125.9).",
+  "faction": [
+   "cabal"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "faction": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "83": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/083.jpg",
+   "start_sec": 126.2261,
+   "end_sec": 127.293833,
+   "start_tc": "2:06",
+   "end_tc": "2:07"
+  },
+  "caption": "'RISE' title card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "84": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/084.jpg",
+   "start_sec": 127.293833,
+   "end_sec": 129.129,
+   "start_tc": "2:07",
+   "end_tc": "2:09"
+  },
+  "caption": "Purple-lit Guardians.",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.7
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "85": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/085.jpg",
+   "start_sec": 129.129,
+   "end_sec": 130.463667,
+   "start_tc": "2:09",
+   "end_tc": "2:10"
+  },
+  "caption": "Black frame.",
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "86": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/086.jpg",
+   "start_sec": 130.463667,
+   "end_sec": 132.398933,
+   "start_tc": "2:10",
+   "end_tc": "2:12"
+  },
+  "caption": "Cayde-6 close-up.",
+  "character": [
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "shot_scale": "MCU",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "shot_scale": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.9
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "87": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/087.jpg",
+   "start_sec": 132.398933,
+   "end_sec": 134.0339,
+   "start_tc": "2:12",
+   "end_tc": "2:14"
+  },
+  "caption": "The Vanguard around a war table in a dark hangar - verified full-size at 132.5/133.2: Zavala, Ikora, Cayde among others, static interior.",
+  "character": [
+   {
+    "name": "zavala",
+    "kind": "vanguard"
+   },
+   {
+    "name": "ikora_rey",
+    "kind": "vanguard"
+   },
+   {
+    "name": "cayde_6",
+    "kind": "vanguard"
+   }
+  ],
+  "lighting": "dim",
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "character": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "lighting": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.85
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "88": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/088.jpg",
+   "start_sec": 134.0339,
+   "end_sec": 138.138,
+   "start_tc": "2:14",
+   "end_tc": "2:18"
+  },
+  "caption": "DESTINY 2 logo card (verified full-size at 134.5).",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "89": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/089.jpg",
+   "start_sec": 138.138,
+   "end_sec": 141.975167,
+   "start_tc": "2:18",
+   "end_tc": "2:22"
+  },
+  "caption": "DESTINY 2 'SEPTEMBER 6' title card (verified full-size at 136.0/137.5).",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ },
+ "90": {
+  "_worksheet": {
+   "keyframe": "keyframes/yt_destiny_2_official_launch_trailer/090.jpg",
+   "start_sec": 141.975167,
+   "end_sec": 156.99016666666665,
+   "start_tc": "2:22",
+   "end_tc": "2:37"
+  },
+  "caption": "DESTINY 2 pre-order 'COLDHEART' end card.",
+  "overlays": [
+   "burned_text"
+  ],
+  "provenance": {
+   "caption": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "overlays": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   },
+   "subject_salience": {
+    "source": "observed",
+    "label_source": "manual",
+    "confidence": 0.98
+   }
+  },
+  "subject_salience": "ambient"
+ }
+}
