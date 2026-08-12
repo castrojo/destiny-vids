@@ -40,13 +40,13 @@ first-party footage.
 |---|---|---|
 | Elsie Bray | Laura Santamaria | authored plate |
 | Anna Bray | Joanna Lee | |
-| Zavala | Kelsey Hightower | |
-| Cayde-6 | castrojo | |
+| Zavala | Kelsey Hightower | authored plate (#8) |
+| Cayde-6 | castrojo | authored plate |
 | Osiris | mrbobbytables | |
 | Sagira | Lindsay Gendreau | Osiris's Ghost; cast on presence, no framing constraint |
 | Saint-14 | Kat | remains the bubble in the original Wolves; authored plate |
 | Mara Sov | Karena Angell | subclass unauthored (#5) |
-| Petra Venj | Lenka | |
+| Petra Venj | Lori Lorusso | recast in #8; rusted plate chrome |
 | Variks | Nate Waddington | |
 | The Speaker | Jonathan Bryce | |
 | Amanda Holliday | Ashley Willis | |

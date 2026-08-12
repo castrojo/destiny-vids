@@ -80,6 +80,14 @@ leads:
       person: kelsey_hightower
       display_name: Kelsey Hightower
       aka: [commander_zavala]
+      # Plate copy as authored in castrojo/destiny-vids#8. The subclass line
+      # names the ROLE the project casts, the same way Osiris's does, so it is
+      # not read back off the Titan on screen.
+      plate:
+        label: ARCHITECT // GUARDIAN
+        class: Dawnblade Warlock
+        name: Kelsey Hightower
+        title: Evangelist of the Open Sky
     cayde_6:
       person: castrojo
       display_name: castrojo
@@ -202,9 +210,33 @@ leads:
         title: Archon of the Consensus
         variant: leader
     petra_venj:
-      person: lenka
-      display_name: Lenka
+      # RECAST in castrojo/destiny-vids#8: the role passes from lenka to Lori
+      # Lorusso. Recorded here rather than anywhere else because this file is
+      # the one place a binding lives — the pinned cast test, the query phrases
+      # and the plate copy all follow it.
+      #
+      # The recast DISPLACES lenka, who is no longer credited anywhere; the
+      # issue does not say where she goes. That is a casting decision about a
+      # real person — blocked_on: human — and it stays recorded (see
+      # stories/02-cayde-6-the-return.md), not resolved by an agent.
+      person: lori_lorusso
+      display_name: Lori Lorusso
       aka: [petra]
+      # Plate copy as authored in castrojo/destiny-vids#8, verbatim — including
+      # the `class` spelling ("Harbringer"). Lori has no entry in the reference
+      # deck, so the issue is the only authored source; on-screen copy is
+      # quoted, never corrected here.
+      # TODO(owner): if "Harbringer" was meant to be "Harbinger", say so.
+      #
+      # `variant: rust` is a chrome flag, not a new copy field: oxidised iron
+      # instead of the blue chrome, for the Rust Foundation herald ("make it
+      # rusted out ... but make it look cool").
+      plate:
+        label: HERALD // GUARDIAN
+        class: Harbringer Hunter
+        name: Lori Lorusso
+        title: Pathfinder of the Iron Weave
+        variant: rust
     variks:
       person: nate_waddington
       display_name: Nate Waddington

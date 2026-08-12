@@ -191,7 +191,7 @@ tiers, and the difference between them is the whole model:
 | `sagira` | `lindsay_gendreau` (Lindsay Gendreau) | `sagira_ghost` | — |
 | `saint_14` | `kat` (Kat) | `saint`, `saint14` | — |
 | `mara_sov` | `karena_angell` (Karena Angell) | `queen_mara_sov` | — |
-| `petra_venj` | `lenka` (Lenka) | `petra` | — |
+| `petra_venj` | `lori_lorusso` (Lori Lorusso) | `petra` | — |
 | `variks` | `nate_waddington` (Nate Waddington) | `variks_the_loyal` | — |
 | `the_speaker` | `jonathan_bryce` (Jonathan Bryce) | `speaker` | — |
 | `amanda_holliday` | `ashley_willis` (Ashley Willis) | `amanda`, `holliday` | — |

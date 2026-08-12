@@ -58,12 +58,13 @@ test pins the vocabulary so it cannot drift by accident. If a plate genuinely
 needs to say something new, add the field to the data model deliberately.
 
 Local additions to the deck's shape are limited to chrome flags: `kind: ghost`
-(drops the class line, because a Ghost has no subclass) and `variant` (for the
-`leader` gold treatment — the wolves trailer reserves it for Christoph Blecker,
-and it **takes precedence over `trustee`**, mirroring the CSS selector
+(drops the class line, because a Ghost has no subclass) and `variant` (`leader`
+gold — the wolves trailer reserves it for Christoph Blecker — and it **takes
+precedence over `trustee`**, mirroring the CSS selector
 `.wolves-guardian-plate-trustee:not(.wolves-guardian-plate-leader)`, so a
-binding may carry both flags and plate gold. The leader block deliberately does
-not restyle the class row, which stays the default blue).
+binding may carry both flags and plate gold; the leader block does not restyle
+the class row, which stays the default blue — and `rust`, oxidised iron for the
+Rust Foundation herald, per #8). A variant is colour only.
 
 The deck's `gp_*` entries add three **placement** fields, which are deck data,
 not new copy: `position: "group"` with an absolute `x` (measured against the
@@ -129,9 +130,8 @@ Recorded, not resolved. Each one is somebody's call, not an agent's:
   with an invented row.
 - **Four of the seven have no binding here** — Kaslin, Christoph, Natali and
   Andy (see #26); Bob, Laura and Kat are bound and their copy is reproduced
-  above. Adding a binding is a casting decision
-  ([`casting.md`](casting.md)); copying authored copy onto an existing binding
-  is reproduction and is allowed.
+  above. Adding a binding is a casting decision ([`casting.md`](casting.md));
+  copying authored copy onto an existing binding is reproduction and is allowed.
 
 ## Core Process
 

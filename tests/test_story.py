@@ -190,6 +190,37 @@ def test_dance_cut_is_a_hero_cut(indexed):
             assert shot["segment"]["shot_scale"] in {"ELS", "LS", "MLS"}
 
 
+def test_cayde_cut_assembles_from_one_cinematic_skipped_forward(indexed):
+    """The shipped Cayde-6 cut (stories/02-cayde-6-the-return.md) must stay
+    reproducible: every beat lands, all of it out of the same one cinematic,
+    and the playhead never runs backwards."""
+    _, _, outline = read_outline(str(REPO_ROOT / "stories" / "02-cayde-6-the-return.txt"))
+    story = build_story(outline, indexed, from_video=DANCE_CINEMATIC, forward_only=True)
+    assert story["misses"] == []
+    assert len(story["shots"]) == len(outline)
+    assert {s["video_id"] for s in story["shots"]} == {DANCE_CINEMATIC}
+    assert all(shot["segment"]["clean"] for shot in story["shots"])
+    playhead = 0.0
+    for shot in story["shots"]:
+        assert shot["start_sec"] >= playhead
+        playhead = shot["end_sec"]
+
+
+def test_cayde_cut_gives_cayde_the_reveal(indexed):
+    """Cayde has exactly one indexed shot, and the cut casts it as the reveal:
+    his beat lands on it, and the antagonist stays wide and brief."""
+    _, _, outline = read_outline(str(REPO_ROOT / "stories" / "02-cayde-6-the-return.txt"))
+    story = build_story(outline, indexed, from_video=DANCE_CINEMATIC, forward_only=True)
+    cayde = [s for s in story["shots"]
+             if (s.get("casting") or {}).get("character") == "cayde_6"]
+    assert len(cayde) == 1
+    salience = [shot["segment"]["subject_salience"] for shot in story["shots"]]
+    assert salience.count("enemy_threat") <= 1
+    for shot in story["shots"]:
+        if shot["segment"]["subject_salience"] == "enemy_threat":
+            assert shot["segment"]["shot_scale"] in {"ELS", "LS", "MLS"}
+
+
 # --- outline parsing --------------------------------------------------------
 
 def test_read_text_outline(tmp_path):
