@@ -19,32 +19,35 @@ Release schedule for both: [`docs/release.md`](release.md).
 ## The feature: *Seven Days to the Wolves*
 
 **One video, one unit.** Not a series and not separately-published parts — it is
-released as a single piece at KubeCon NA, and it runs:
+released as a single piece at KubeCon NA.
 
-| Order | Part | Status |
+It is a **musical**: one song end to end, in three acts, cut to Nightwish's
+*7 Days to the Wolves*. The song is the structure — the acts hinge on measured
+moments in the bed (the gallop, the flute entry), not on chapter boundaries.
+
+A prototype exists and is staged for review:
+[`cuts/07-seven-days-to-the-wolves.md`](cuts/07-seven-days-to-the-wolves.md).
+
+### What this replaced, and what is now unplaced
+
+The feature was previously specified as four parts in a running order — the
+Wolves video, the Europa director's cut, credits, then the Nati teaser. The
+musical supersedes that structure.
+
+Two finished pieces are therefore **unplaced**, and where they go is an open
+owner decision rather than a settled fact:
+
+| Piece | Was | Now |
 |---|---|---|
-| 1 | The Wolves video | exists |
-| 2 | The Europa video | exists as the director's cut |
-| 3 | **Credits** | **not designed yet — open work** |
-| 4 | The Nati teaser | exists; plays after the credits |
+| `zz-wolves-europa-directors-cut` | feature part 2 | unplaced |
+| `02-wolves-natali-vlatko-behemoth-titan` (the Nati teaser) | feature part 4 | unplaced |
 
-**Treat all four as one unit from here on.** They are not four videos to be
-ordered in a playlist; they are the running order *inside* one file. Anything
-that reasons about them separately — a playlist position, a per-part checksum
-row, a "which chapter goes first" decision — is reasoning about the wrong
-object.
+Neither is discarded. Both are finished, owner-approved work; they simply no
+longer have a slot inside the feature file. The likely answer is promotional
+release alongside the hero videos, but that is a decision, not a default.
 
-**The credits sequence is the one undesigned part**, and it sits between the
-main story and the Nati teaser. It is a real design task, not a render setting —
-[issue #51].
-
-**The Nati teaser is not a hero video.** It is part of the feature, playing after
-the credits. Appearing in the feature does not make a person's appearance their
-hero video, and a hero video is never "their bit of the feature". The same
-person can have both, and they are cut by different rules.
-
-The comm-line design that assembles the feature from one authored file is
-[`docs/plans/wolves/design.md`](plans/wolves/design.md) (issue #9).
+**The credits sequence is still undesigned** — [issue #51]. A musical still has
+to credit its cast, and the prototype carries no plates at all.
 
 ## Hero videos: one person, one video, every source
 
@@ -56,6 +59,10 @@ plus whatever is indexed next.
 These are **promotional material for the feature**, released weekly in the
 run-up to KubeCon: Kat, mrbobbytables, Cayde/castrojo, and every other cast
 member gets one.
+
+**A hero video is never someone's bit of another video.** Appearing in the
+feature — or in any other cut — does not make that appearance their hero video.
+The same person can have both, and the two are cut by different rules.
 
 Two rules follow directly, and both are load-bearing:
 
@@ -84,15 +91,16 @@ Staged in `~/Videos/UPLOAD/` today, classified under this taxonomy:
 | File | Kind |
 |---|---|
 | `01-wolves-kat-cosgrove-sentinel-titan` | hero video (promo) |
-| `02-wolves-natali-vlatko-behemoth-titan` | **feature part 4** — the Nati teaser |
-| `zz-wolves-europa-directors-cut` | **feature part 2** |
+| `02-wolves-natali-vlatko-behemoth-titan` | the Nati teaser — **unplaced** since the feature became a musical |
+| `zz-wolves-europa-directors-cut` | **unplaced**, same reason |
 | `04-bluefin-contributors-…-curse-of-osiris` | neither — a monthly contributors reel |
 | `05-destiny-prologue-the-dance` | neither — single-cinematic story cut |
 | `06-destiny-cayde-6-the-return` | **mis-shaped**: named for a person, cut from one trailer |
+| `07-seven-days-to-the-wolves` | **the feature** — prototype, not yet approved |
 
-Because the feature is one unit, the parts that belong to it **stop being
-independent uploads** once it is assembled. The staged files above are inputs to
-that assembly, not the release.
+`07-` is the feature and stands alone: it is one song end to end, so nothing is
+assembled around it. The two unplaced files above are finished work waiting on a
+decision, not inputs to it.
 
 `06-` is the worked example of the error this doc exists to prevent. It carries
 Cayde's name but is a single-cinematic cut, and the unstaged `03-zavala` built

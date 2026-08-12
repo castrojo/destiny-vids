@@ -67,8 +67,7 @@ FFMPEG_NO_CONTAINER=1 ffmpeg -version   # => the host binary (escape hatch)
 
 Pin `FFMPEG_CONTAINER_IMAGE` to the digest the thumbnailer service already runs
 and the shim never triggers a pull. If that image is gone (a prune, a tag move),
-it falls back to whatever image the running container actually uses rather than
-failing.
+it falls back to whatever image the running container actually uses rather thanfailing.
 
 The escape hatch does not assume a specific host ffmpeg: `FFMPEG_NO_CONTAINER=1`
 tries `/usr/bin/<tool>` first and then `/home/linuxbrew/.linuxbrew/bin/<tool>`,
@@ -236,6 +235,18 @@ the entire point of the index.
 If a future change drops the fps normalization (e.g. all clips from one
 source at native rate), input seeking becomes safe and is worth the 2.6x.
 
+### The consequence: cut long sources through a window extract
+
+Output seeking is cheap on a two-minute trailer and brutal on a long one,
+because the cost scales with the **in-point**, not the clip length. Measured
+here at roughly 35x realtime, a clip at 24:00 in a 30-minute compilation costs
+about 40 seconds of decode before it writes a frame — for a one-second clip, and
+again for every other clip in that act.
+
+So extract the span you need to its own file first and cut from that. The
+procedure and the timecode-rebasing it forces are in
+[`skills/editing.md`](skills/editing.md).
+
 ## Burning plates onto a cut
 
 `tools/plate.py` is a separate stage from `render.py`, deliberately: cutting and
@@ -252,6 +263,64 @@ Two consequences worth stating:
 2. **The plates are rendered at 1920×1080**, the same size `render.py`
    normalizes every clip to, so the overlay needs no scaling and the chrome
    stays pixel-exact.
+
+## The shim only sees `$HOME`
+
+The shim bind-mounts the home directory, so **a path outside `$HOME` does not
+exist as far as the container is concerned**, and the error says so in the most
+misleading way available:
+
+```console
+$ ffprobe /var/tmp/x.mp4
+/var/tmp/x.mp4: No such file or directory
+```
+
+The file is right there. Python's `Path.exists()` returns `True`. Only the
+containerized process cannot see it.
+
+This bites tests hardest, because **pytest's `tmp_path` lives under `/var/tmp`**.
+A check that writes a clip to `tmp_path` and then probes it with `ffprobe` from
+`PATH` fails with a missing-file error that has nothing to do with the code under
+test. Two ways out, and the second is usually better:
+
+- Keep the fixture under `$HOME`.
+- Probe with the **same** command the code resolved, via `find_ffmpeg()`, rather
+  than with bare `ffprobe`. `imageio-ffmpeg`'s bundled binary is a real local
+  process and sees the whole filesystem. `ffmpeg -i <file>` and a regex over its
+  stderr replaces `ffprobe -show_entries` for stream questions.
+
+The same rule applies at render time, which is why `render.py` keeps its
+intermediates beside the output rather than in `/tmp`.
+
+## Tests that touch ffmpeg must skip without it
+
+The suite is offline and must pass on a runner with **no ffmpeg at all** — CI
+has none. So any check that encodes must skip, not fail:
+
+```python
+def _ffmpeg():
+    try:
+        ffmpeg = render.find_ffmpeg(prefer_container=False)
+    except RuntimeError:
+        pytest.skip("no ffmpeg available")
+    # Resolving a command is not the same as being able to run it.
+    try:
+        subprocess.run(list(ffmpeg) + ["-version"], capture_output=True, check=True)
+    except (OSError, subprocess.CalledProcessError):
+        pytest.skip("ffmpeg is not runnable here")
+    return ffmpeg
+```
+
+Both halves matter. `find_ffmpeg` raises only when it can find *nothing*; with
+`DESTINY_FFMPEG` set to a path that does not exist it returns happily and the
+failure surfaces later as a `FileNotFoundError` from `subprocess`.
+
+And a check that never actually encodes should not resolve ffmpeg at all — pass
+a stub command in. Resolution is the part that raises:
+
+```python
+render.render(shots, media, out, ffmpeg=["ffmpeg-not-invoked"])
+```
 
 ## Sources
 

@@ -28,17 +28,35 @@ fewer, longer gaps — never a thinner video.
    rebuild cannot fix.
 2. **The hero videos** — one person, one video, every source. Promotional
    material ([`catalog.md`](catalog.md), [`cuts/hero-montage.md`](cuts/hero-montage.md)).
-3. **The feature** — *Seven Days to the Wolves*, one unit: Wolves → Europa →
-   **credits** → Nati teaser.
+3. **The feature** — *Seven Days to the Wolves*, a musical: one song, three
+   acts, one file. A prototype is staged
+   ([`cuts/07-seven-days-to-the-wolves.md`](cuts/07-seven-days-to-the-wolves.md)).
 
 ## What blocks this, measured
 
+### The feature exists as a prototype, not an approved cut
+
+The picture is made and delivered. What is not settled is **provenance**: Act II
+and the climax draw on a fan compilation of Bungie trailers rather than official
+uploads, and the fan-content policy covers Bungie's footage, not a re-uploader's
+compilation. That is an owner decision and it gates release, not iteration.
+
+The bed is also an official-but-lossy YouTube upload rather than the lossless
+master. Replacing it re-times the cut, so it wants doing before the edit is
+locked, not after.
+
 ### The credits sequence does not exist
 
-It is part 3 of the feature, between the main story and the Nati teaser, and it
-has **not been designed**. It is the only part of the feature with no artifact
-behind it. This is design work, not a render setting, and it is on the critical
-path to T−0. Tracked in [issue #51].
+A musical still has to credit its cast, and the prototype carries **no plates at
+all**. This is design work, not a render setting, and it is on the critical path
+to T−0. Tracked in [issue #51].
+
+### Two finished cuts are unplaced
+
+The feature used to be four parts. Now that it is one song end to end, the
+Europa director's cut and the Nati teaser have no slot inside it. Both are
+finished and owner-approved; where they go is an open decision, most likely
+promotional release alongside the hero videos. See [`catalog.md`](catalog.md).
 
 ### Most of the cast has no footage to make a hero video from
 

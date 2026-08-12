@@ -1,6 +1,6 @@
 ---
 name: editing
-version: "1.2"
+version: "1.3"
 last_updated: "2026-08-12"
 id: editing
 one_line_purpose: Turn a plain-language outline into a rendered cut.
@@ -10,13 +10,14 @@ mcp_compliance_level: partial
 optimization_status: draft
 status: active
 dependencies: [indexing]
-tags: [story, cut-list, render, ffmpeg, outline]
+tags: [story, cut-list, render, ffmpeg, outline, still, artwork-card, window-extract]
 description: >-
-  Covers outline authoring, shot matching, hold caps, and rendering a cut list
-  to video. Use when writing a story outline, debugging a beat that matched the
-  wrong shot, or rendering a cut.
+  Covers outlines, shot matching, hold caps, artwork cards, and rendering a cut list.
+  Use when writing an outline, debugging a wrong shot match, cutting from a long source, or replacing mechanic cards with artwork.
 metadata:
   type: procedure
+  context7-sources:
+    - /websites/ffmpeg_documentation
 ---
 
 # Editing a cut
@@ -175,8 +176,104 @@ was established per-shot.
 `CLAMPED: shot <segment_id> asked for Xs, shot holds Ys` on stderr — and cuts
 only the vetted span.
 
-## Not every piece is a cut
+### Cutting from a long source: extract the window first
 
+`render.py` seeks with `-ss` **after** `-i` on purpose (see below), so every clip
+decodes from the file's start and discards. On a 30-minute compilation a clip at
+24:00 decodes twenty-four minutes before it writes a frame — measured at roughly
+35x realtime here, so about 40 seconds per clip, times however many clips the act
+needs.
+
+**Re-encode the span you need to its own file first**, and cut from that:
+
+```bash
+ffmpeg -ss 1380 -i media/<long>.mp4 -t 210 -c:v libx264 -preset veryfast -crf 16 \
+    -c:a aac -b:a 192k media/<window>.mp4
+```
+
+Every later seek then lands inside a short file. `annotate.py` has no window or
+offset option either, so this is also what keeps detection cheap.
+
+The cost is bookkeeping: **timecodes rebase by the extract's start**. Record the
+offset next to the shot, so a source timecode the owner gave you ("the crash at
+24:46") stays checkable against the extract's own clock.
+
+### Artwork cards: a shot that is a still
+
+A shot carrying `"still": "<path>"` instead of `"video_id"` renders the image for
+its authored duration through the same normalization chain as a cut clip. It is
+how a dropped card keeps its slot — a trailer's black "8 DUNGEONS" plate is
+`burned_text` and therefore already excluded, and dropping it silently shortens
+the film; replacing it with artwork keeps the rhythm the trailer had.
+
+**A still must match the cut clips' audio disposition exactly.** With `--audio`,
+`render.py` sets `keep_audio=False` and every clip is video-only; a still that
+carried a silent track would then be the only input with a stream the others
+lack. The concat demuxer requires that all inputs "share identical stream
+properties such as codecs and time bases"
+(`source: /websites/ffmpeg_documentation`), so the join simply fails.
+
+A still has no out-point, so `resolve_duration` leaves its hold alone and
+`--max-shot-sec` does not trim it: a card's length is a musical decision, not a
+detector artifact.
+
+**This does not weaken the `clean` gate.** The card record never cuts the
+source's burned-in frames at all — it puts artwork in the hole they leave.
+
+### An authored shotlist, and the invariant it must hold
+
+A cut list that `story.py` produced is derived, and hand-editing it is a Red Flag
+below. A shotlist **authored from the start** is a different object: no matcher
+ran, so there is nothing to be out of date with. Name it so the two are never
+confused (`stories/<name>-prototype.json`, not `cut.json`) and say so in the
+file.
+
+This is the legitimate path when shots are chosen by eye — see the next section.
+It comes with one invariant that is easy to miss:
+
+> **A cut is a concatenation. It has no absolute timeline.**
+
+So an act that comes up short does not leave a gap; it slides every later shot
+earlier, and any shot that was supposed to land on a musical moment lands
+somewhere else. Assert that each act fills its span rather than discovering it in
+the render:
+
+```python
+assert abs(act_end - ANCHOR) < 0.15, "a short act slides every later anchor"
+```
+
+The same arithmetic makes an *unresolvable* shot dangerous. `render.py` skips a
+shot whose source is missing and reports it on stderr — but the film is then
+shorter than the shotlist says. `media/` is gitignored and varies per host, so
+**filter the pool to sources that actually exist** before building.
+
+### Picking shots by eye, without tagging
+
+Tagging exists to feed `story.py`'s matcher. **If a human picks the shots, no
+tags are needed** — and for a new source that is the difference between a cut
+today and a tagging pass first.
+
+Detection pass 1 alone gives what eyeball selection needs:
+
+```bash
+python3 tools/annotate.py index --video media/<window>.mp4 \
+    --video-record videos/<id>.json          # no --tags: boundaries + keyframes
+```
+
+Then contact-sheet the keyframes (5x4 grids, each tile labelled with the shot
+index and its in/out) and read them. Two hundred shots fit on ten sheets.
+
+Two rules make this honest rather than a shortcut around the gate:
+
+- **A midpoint keyframe does not prove the interval is clean.** Keyframes come
+  from the middle of a beat by design; a shot whose middle is clean can still
+  open or close on a logo card or a HUD frame. Scrub the edges of anything you
+  select.
+- **It buys a cut, not an index.** Nothing lands in `segments/`, so the shots are
+  not searchable and no later cut can find them. That is the trade; make it
+  deliberately.
+
+## Not every piece is a cut
 Sometimes the source already tells the story and the job is to credit the cast
 and clean the frame, not to re-edit. `tools/uncut.py` emits a cut list that is
 simply every segment of one video in source order, so all the planners run
@@ -214,6 +311,9 @@ Two things follow, and both bite:
 | "No clean shot matches, so I'll allow unclean footage." | The gate exists to keep a HUD out of the finished cut. Rewrite the beat instead. |
 | "The credits pile up in the intro, so I'll add a scheduler gap between contributor plates." | Measured on the Osiris cut, a cadence gate *costs* credits — it suppresses the group rows and the re-home pass. All the ensemble shots sitting in the intro is an outline problem: move the Guardian beat, and the credit moves with it. |
 | "I'll hand-edit the timings in `cut.json`." | It is a derived artifact and the next run discards your edit. Change the outline or the cap. |
+| "The act came out a bit short, the render will pad it." | It will not. A cut is a concatenation with no absolute timeline, so a short act slides every later shot earlier and every musical anchor with it. |
+| "I'll skip the window extract, it's just one flag." | Output seeking decodes from the file start. A clip at 24:00 in a 30-minute source costs ~40s of decode, every time. |
+| "The card is just black with text, I'll drop it." | Dropping it shortens the film and loses the rhythm the trailer had. Replace it with artwork; the slot is the point. |
 | "I'll set a long `duration` on the beat to hold the shot." | A hold is clamped to the segment. Past its out-point you are cutting the *next* shot, which nothing vetted. |
 | "The beat matched something close enough." | A mismatch cascades into every later beat that wanted that shot. Fix it at the source. |
 | "Stream copy is faster and looks the same." | It snaps the in-point to a keyframe, discarding the boundary the detector pass exists to find. |
@@ -232,6 +332,10 @@ Two things follow, and both bite:
   detector pass exists to find.
 - A shot silently missing from the output. `render.py` reports missing sources;
   read its stderr rather than trusting the duration.
+- An act whose measured length does not match the span it was written for.
+- Selecting a shot from its midpoint keyframe alone, without scrubbing its edges.
+- A still whose audio disposition differs from the cut clips around it.
+- Cutting dozens of clips out of a long source without extracting the window.
 
 ## Verification
 
