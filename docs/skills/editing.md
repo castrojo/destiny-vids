@@ -1,7 +1,7 @@
 ---
 name: editing
-version: "1.0"
-last_updated: "2026-08-11"
+version: "1.1"
+last_updated: "2026-08-12"
 id: editing
 one_line_purpose: Turn a plain-language outline into a rendered cut.
 entry_point: docs/skills/editing.md
@@ -65,6 +65,32 @@ in outline order. Two consequences to write around:
 Phrasing a beat close to the target caption is legitimate: captions are the
 index's search surface, and the outline is written against what exists.
 
+### One cinematic, skipped forward
+
+A cut that lives inside a single source cinematic gets two flags instead of an
+edit timeline:
+
+```bash
+python3 tools/story.py stories/01-dance.txt --dir segments \
+    --from-video yt_destiny_2_the_final_shape_launch_trailer --forward-only
+```
+
+- `--from-video` restricts the pool to one source, so nothing drifts in from
+  another cinematic.
+- `--forward-only` holds a playhead on the source timeline: each beat may only
+  take a shot at or after the previous shot's out-point. The jump is reported
+  per shot as `skip_sec` (`[skip +Xs]` in text output).
+
+The beat order *is* the timeline; the skips are the gaps between chosen shots.
+This is deliberately not a sequencer — there is no cut-graph, no editing DSL,
+and no layer that lets cut order disagree with source order. Write the beats in
+source-time order and reorder by moving lines. Worked example:
+[`docs/cuts/01-dance.md`](../cuts/01-dance.md).
+
+Under `--forward-only` a mismatch cascades harder than usual: a wrong early
+pick can strand every later beat behind the playhead. Fix the earliest wrong
+beat, not the stranded one.
+
 ### Holds
 
 `--max-shot-sec` trims any shot held longer than the cap, **from its tail**. The
@@ -83,6 +109,7 @@ trimmed shot lands late.
 | "I'll hand-edit the timings in `cut.json`." | It is a derived artifact and the next run discards your edit. Change the outline or the cap. |
 | "The beat matched something close enough." | A mismatch cascades into every later beat that wanted that shot. Fix it at the source. |
 | "Stream copy is faster and looks the same." | It snaps the in-point to a keyframe, discarding the boundary the detector pass exists to find. |
+| "I'll build a timeline layer so I can order shots freely." | One cinematic plus `--forward-only` is the shape. A sequencer buys freedom to hide continuity errors. |
 
 ## Red Flags
 
@@ -90,6 +117,8 @@ trimmed shot lands late.
   Coverage widening is a deliberate editorial choice, not a matcher fix.
 - Hand-editing `cut.json` to change timings. Change the outline, the tags, or
   the cap — the cut list is a derived artifact.
+- Adding a second cinematic, a track model, or a cut-graph to make a beat fit.
+  Back out and simplify: beat order is the timeline.
 - Stream-copying clips "to make the render faster". A stream copy snaps the
   in-point to the nearest keyframe and throws away the boundary the whole
   detector pass exists to find.
@@ -105,5 +134,19 @@ python3 -m pytest -q tests/test_story.py tests/test_render.py
 ffprobe -v error -show_entries format=duration -of csv=p=0 renders/<name>.mp4
 ```
 
+## Delivery
+
+A cut ships to two places from **one** cut list: the website player (source
+audio) and a YouTube upload (a music bed, `render.py --audio`). They differ by
+audio and filename, never by a second edit.
+
+Upload order lives in a numeric filename prefix — `stories/01-dance.txt` →
+`renders/01-dance-web.mp4`, `renders/01-dance-youtube.mp4`. Sorting the
+directory sorts the playlist; there is no ordering manifest to keep in sync.
+
+Each shipped cut gets a doc in `docs/cuts/` recording its source cinematic, its
+skip points, its unresolved beats, and anything a human still has to decide.
+
 Ranking weights and query mapping: `docs/agent-retrieval.md`. Encoder choices,
-seeking, and the ffmpeg resolution order: `docs/rendering.md`.
+seeking, and the ffmpeg resolution order: `docs/rendering.md`. What a character
+does and does not have on film: [`corpus.md`](corpus.md).

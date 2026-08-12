@@ -27,6 +27,10 @@ would be nonsense on it) and shrinks the plate. ``kind: "title"`` is the deck's
 other card -- ``title`` / ``subtitle`` / ``body`` -- used here to credit the
 month's ensemble.
 
+Before a month's roster exists, ``plan --placeholders N`` plates ensemble shots
+with the uncast blueberry copy from ``vocab/casting.yaml``. It names nobody: a
+placeholder is for timing and review, and a real contributor replaces it.
+
 Styling is ported from ``projectbluefin/website``
 ``src/components/wolves/WolvesIntroOverlay.vue`` -- ``.wolves-guardian-plate``
 and friends. The CSS is the source of truth; the constants below name the rule
@@ -378,7 +382,8 @@ def _window(start, duration, hold=DEFAULT_HOLD, room=None):
     return round(start + LEAD_IN, 3), round(min(hold, usable), 3)
 
 
-def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None):
+def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
+         placeholders=0, placeholder_copy=None):
     """Cut list -> plate manifest.
 
     Leads are plated on their first appearance long enough to read, using the
@@ -386,7 +391,15 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     the deterministic assignment in tools/ensemble.py; anyone whose assigned
     shot is too short to hold a plate is credited over the final shot instead,
     so the month's contributors are never silently dropped.
+
+    ``placeholders`` plates that many ensemble shots with the UNCAST blueberry
+    copy from vocab/casting.yaml instead — for a cut being timed and reviewed
+    before a roster exists. It is mutually exclusive with ``roster``: once real
+    contributors are known, they are who the plate is for.
     """
+    if roster and placeholders:
+        raise ValueError("pass a roster or placeholders, not both: a cut with a "
+                         "roster credits real contributors, not placeholders")
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     entries, plated = [], set()
@@ -418,6 +431,9 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             log(f"  {character:<10} {at:6.2f}s +{dur:.1f}s  {copy.get('name')}")
 
     if not roster:
+        if placeholders:
+            entries.extend(_placeholder_entries(
+                timeline, total, placeholders, placeholder_copy, hold, free, busy, log))
         return sorted(entries, key=lambda e: e["at"])
 
     from tools.ensemble import assign
@@ -479,6 +495,41 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             log(f"  UNCREDITED (no room in the cut): {', '.join(names)}")
 
     return sorted(entries, key=lambda e: e["at"])
+
+
+def _placeholder_entries(timeline, total, wanted, copy, hold, free, busy, log=None):
+    """Blueberry plates: the first ``wanted`` ensemble shots that can hold one.
+
+    A placeholder credits nobody, so there is no assignment to be deterministic
+    about — it just proves the plate lands, reads, and clears before the next
+    one, on a cut whose cast is not decided yet.
+    """
+    if not copy:
+        from tools.derive import load_placeholder_plate
+
+        copy = load_placeholder_plate()
+    if not copy:
+        raise ValueError("no ensemble.placeholder_plate copy in vocab/casting.yaml")
+
+    entries = []
+    for start, duration, shot in timeline:
+        if len(entries) >= wanted:
+            break
+        if (shot.get("casting") or {}).get("role") != "ensemble":
+            continue
+        window = _window(start, duration, hold, room=total - start)
+        if not window or not free(*window):
+            continue
+        at, dur = window
+        entries.append({"id": f"ensemble_placeholder_{len(entries) + 1:02d}",
+                        "at": at, "dur": dur, "position": "right", **copy})
+        busy.append((at, at + dur))
+        if log:
+            log(f"  {'placeholder':<10} {at:6.2f}s +{dur:.1f}s  {copy.get('name')}")
+    if log and len(entries) < wanted:
+        log(f"  only {len(entries)}/{wanted} placeholder(s) fit — the rest of the "
+            f"ensemble shots are too short or already busy")
+    return entries
 
 
 def load_manifest(path):
@@ -585,7 +636,11 @@ def main(argv=None):
 
     p = sub.add_parser("plan", help="cut list (+ roster) -> timed plate manifest")
     p.add_argument("shotlist", help="JSON shot list from tools/story.py --format json")
-    p.add_argument("--roster", default=None, help="roster.json from tools/ensemble.py")
+    who = p.add_mutually_exclusive_group()
+    who.add_argument("--roster", default=None, help="roster.json from tools/ensemble.py")
+    who.add_argument("--placeholders", type=int, default=0, metavar="N",
+                     help="plate N ensemble shots with the uncast blueberry copy "
+                          "from vocab/casting.yaml, for a cut with no roster yet")
     p.add_argument("--max-shot-sec", type=float, default=None,
                    help="the same hold cap render.py was given, so timings line up")
     p.add_argument("--hold", type=float, default=DEFAULT_HOLD)
@@ -602,7 +657,8 @@ def main(argv=None):
             with Path(args.roster).open(encoding="utf-8") as fh:
                 roster = json.load(fh)
         entries = plan(load_shots(args.shotlist), load_leads(), roster,
-                       max_shot_sec=args.max_shot_sec, hold=args.hold, log=print)
+                       max_shot_sec=args.max_shot_sec, hold=args.hold, log=print,
+                       placeholders=args.placeholders)
         load_manifest_entries(entries)  # same validation the burn path applies
         with Path(args.out).open("w", encoding="utf-8") as fh:
             json.dump(entries, fh, indent=2)

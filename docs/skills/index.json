@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-11",
+  "generated_at": "2026-08-12",
   "schema_version": "1.0",
   "skills": [
     {
@@ -22,6 +22,25 @@
       "doc_type": "reference"
     },
     {
+      "id": "corpus",
+      "name": "corpus",
+      "one_line_purpose": "Catalog every indexed shot of one character, and the coverage they lack.",
+      "entry_point": "docs/skills/corpus.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "corpus",
+        "character",
+        "coverage",
+        "gaps",
+        "unresolved"
+      ],
+      "description": "Builds a per-character catalog of indexed shots plus the vocabulary values that have no clean coverage. Use before writing an outline for a character, or when extending the index to the next character or story.",
+      "version": "1.0",
+      "last_updated": "2026-08-12",
+      "doc_type": "procedure"
+    },
+    {
       "id": "editing",
       "name": "editing",
       "one_line_purpose": "Turn a plain-language outline into a rendered cut.",
@@ -36,8 +55,8 @@
         "outline"
       ],
       "description": "Covers outline authoring, shot matching, hold caps, and rendering a cut list to video. Use when writing a story outline, debugging a beat that matched the wrong shot, or rendering a cut.",
-      "version": "1.0",
-      "last_updated": "2026-08-11",
+      "version": "1.1",
+      "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },
     {
@@ -74,8 +93,8 @@
         "ffmpeg"
       ],
       "description": "Plans, renders, and burns Project Bluefin Guardian nameplates onto a cut. Use when crediting cast or contributors on screen, or changing plate copy, timing, or chrome.",
-      "version": "1.0",
-      "last_updated": "2026-08-11",
+      "version": "1.1",
+      "last_updated": "2026-08-12",
       "doc_type": "procedure"
     }
   ]

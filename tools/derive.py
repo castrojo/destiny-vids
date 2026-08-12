@@ -86,6 +86,21 @@ def load_leads(path=None):
     }
 
 
+def load_placeholder_plate(path=None):
+    """Load the UNCAST-ensemble nameplate copy from vocab/casting.yaml.
+
+    The blueberry plate: what an ensemble slot says on screen before a month's
+    roster exists. It lives in the vocab for the same reason lead plate copy
+    does — so nobody hardcodes on-screen text into a manifest — and it credits
+    nobody, because an uncast slot has no person to credit yet.
+    """
+    path = Path(path) if path else DEFAULT_CASTING_PATH
+    with path.open(encoding="utf-8") as fh:
+        data = yaml.safe_load(fh)
+    copy = ((data or {}).get("ensemble") or {}).get("placeholder_plate") or {}
+    return dict(copy)
+
+
 def lead_alias_index(leads):
     """Flatten a lead map into ``{alias_or_canonical_id: canonical_id}``."""
     index = {}
