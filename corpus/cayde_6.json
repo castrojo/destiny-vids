@@ -1,0 +1,171 @@
+{
+  "subject": "cayde_6",
+  "generated_by": "tools/corpus.py",
+  "counts": {
+    "shots": 1,
+    "clean": 1,
+    "blocked": 0,
+    "videos": 1,
+    "clean_seconds": 1.201
+  },
+  "videos": [
+    "yt_destiny_2_the_final_shape_launch_trailer"
+  ],
+  "coverage": {
+    "action": {
+      "idle": 1
+    },
+    "shot_scale": {
+      "MCU": 1
+    },
+    "composition": {
+      "single": 1
+    },
+    "subject_salience": {
+      "guardian_hero": 1
+    }
+  },
+  "gaps": [
+    {
+      "axis": "action",
+      "value": "combat",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "action",
+      "value": "ability_cast",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "action",
+      "value": "traversal",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "action",
+      "value": "emote",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "action",
+      "value": "dialogue",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "action",
+      "value": "ritual",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "action",
+      "value": "vehicle",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "shot_scale",
+      "value": "ELS",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "shot_scale",
+      "value": "LS",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "shot_scale",
+      "value": "MLS",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "shot_scale",
+      "value": "MS",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "shot_scale",
+      "value": "CU",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "shot_scale",
+      "value": "ECU",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    },
+    {
+      "axis": "shot_scale",
+      "value": "INSERT",
+      "status": "unresolved",
+      "note": "no clean shot of this subject carries this value; no shot carries it at all",
+      "blocked_candidates": []
+    }
+  ],
+  "shots": [
+    {
+      "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0067-0068",
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "start_tc": "1:07",
+      "end_tc": "1:08",
+      "start_sec": 67.133733,
+      "end_sec": 68.334933,
+      "duration": 1.201,
+      "clean": true,
+      "footage_tier": "cinematic",
+      "traversal_hero": false,
+      "casting": {
+        "role": "lead",
+        "character": "cayde_6",
+        "usable": true,
+        "slots": 0
+      },
+      "caption": "Cayde-6 under a hood, blue Exo faceplate and burning eyes emerging from shadow. The return shot.",
+      "class": "hunter",
+      "element": "unknown",
+      "shot_scale": "MCU",
+      "composition": [
+        "single"
+      ],
+      "camera_movement": [
+        "push_in"
+      ],
+      "camera_angle": null,
+      "pacing": "medium",
+      "lighting": "dim",
+      "identity_visibility": "face_clear",
+      "subject_salience": "guardian_hero",
+      "action": [
+        "idle"
+      ],
+      "mood": [
+        "triumphant"
+      ],
+      "register": 2,
+      "faction": []
+    }
+  ]
+}

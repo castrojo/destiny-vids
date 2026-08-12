@@ -111,6 +111,17 @@ VARIANTS = {
         "title": (253, 230, 138, 255),    # #fde68a
         "glow": (250, 204, 21, 140),
     },
+    # Oxidised iron, for the Rust Foundation herald. Same geometry and the same
+    # closed field set as every other plate — only the chrome changes, so this
+    # stays a variant rather than a second kind of card.
+    "rust": {
+        "border": (180, 83, 9, 140),      # rgb(180 83 9 / 55%) — #b45309
+        "accent": (194, 91, 32, 255),     # #c25b20, oxide edge
+        "label": (251, 146, 60, 255),     # #fb923c
+        "klass": (253, 186, 116, 255),    # #fdba74
+        "title": (168, 121, 92, 255),     # #a8795c, weathered iron
+        "glow": (194, 91, 32, 140),
+    },
 }
 
 # --- type ramp (clamp() upper bounds, i.e. the desktop sizes) ---------------

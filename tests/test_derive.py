@@ -216,7 +216,7 @@ def test_concealed_visibilities_satisfy_require_helmet(visibility):
     ("Osiris", "mrbobbytables"),
     ("Saint-14", "kat"),
     ("Mara Sov", "karena_angell"),
-    ("Petra Venj", "lenka"),
+    ("Petra Venj", "lori_lorusso"),
     ("Variks", "nate_waddington"),
     ("The Speaker", "jonathan_bryce"),
     ("Amanda Holliday", "ashley_willis"),
@@ -249,6 +249,12 @@ AUTHORED_PLATES = {
     # characters.json slug `kat`, corroborated by wolves-intro-sequence.ts
     "saint_14": ("MAINTAINER // GUARDIAN", "Sentinel Titan", "Kat Cosgrove",
                  "Defender Queen of the Lost"),
+    # issue #8, owner-authored (Kelsey has no deck entry)
+    "zavala": ("ARCHITECT // GUARDIAN", "Dawnblade Warlock",
+               "Kelsey Hightower", "Evangelist of the Open Sky"),
+    # issue #8, owner-authored (Lori has no deck entry)
+    "petra_venj": ("HERALD // GUARDIAN", "Harbringer Hunter",
+                   "Lori Lorusso", "Pathfinder of the Iron Weave"),
 }
 
 

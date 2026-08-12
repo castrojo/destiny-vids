@@ -51,6 +51,14 @@ def test_ghost_plate_has_no_class_line():
     assert ghost.height < with_class.height
 
 
+def test_rust_variant_changes_only_the_chrome():
+    """The Rust Foundation herald's plate is oxidised, not a different card."""
+    rust = plate.render_plate(dict(GUARDIAN, variant="rust", trustee=False))
+    default = plate.render_plate(dict(GUARDIAN, trustee=False))
+    assert rust.size == default.size            # same geometry, same copy
+    assert rust.tobytes() != default.tobytes()  # different chrome
+
+
 def test_placement_respects_the_row_margins():
     """bottom 10%, left/right 5% (.wolves-guardian-plate-row)."""
     p = plate.render_plate(GUARDIAN)
@@ -462,8 +470,13 @@ def test_no_invented_title_survives_in_the_vocab():
     assert values["osiris"]["plate"]["class"] == "Voidwalker Warlock"
     assert values["sagira"]["plate"]["title"] == "Bluefin Blueberry"
     raw = path.read_text()
-    for invented in ("Master of the Labyrinths", "Dawnblade Warlock"):
-        assert invented not in raw
+    assert "Master of the Labyrinths" not in raw
+    # "Dawnblade Warlock" was once invented for Bob and is banned from every
+    # binding — EXCEPT zavala's, where the owner authored it for Kelsey
+    # Hightower verbatim in #8. Pin exactly that one occurrence.
+    dawnblade = [k for k, v in values.items()
+                 if (v.get("plate") or {}).get("class") == "Dawnblade Warlock"]
+    assert dawnblade == ["zavala"]
 
 
 def test_plan_output_never_double_books_the_screen():
