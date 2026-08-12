@@ -121,7 +121,7 @@ PHRASES = {
     "kat": [("casting.person", {"kat"})],
     "mara sov": [("casting.character", {"mara_sov"})],
     "mara": [("casting.character", {"mara_sov"})],
-    "karena": [("casting.person", {"karena_angel"})],
+    "karena": [("casting.person", {"karena_angell"})],
     "petra venj": [("casting.character", {"petra_venj"})],
     "petra": [("casting.character", {"petra_venj"})],
     "lenka": [("casting.person", {"lenka"})],

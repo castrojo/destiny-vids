@@ -156,6 +156,18 @@ def detect_beats(video_path, fps_or_duration, window_sec=DEFAULT_WINDOW_SEC,
     """
     if HAVE_SCENEDETECT and open_video is not None and video_path and Path(video_path).exists():
         return _scenedetect_beats(video_path, min_shot_sec)
+    if video_path and Path(video_path).exists() and not HAVE_SCENEDETECT:
+        # Falling back on a REAL video is worth saying out loud. The fixed-window
+        # pass returns uniform slices that look like a plausible shot list and are
+        # not one, so the failure is invisible in the output and only shows up
+        # much later as cuts that land mid-shot.
+        print(
+            f"WARNING: scenedetect is not installed, so {Path(video_path).name} "
+            f"is being sliced into fixed {window_sec:g}s windows instead of real "
+            f"shots.\n         Install it before indexing: "
+            f"pip install scenedetect opencv-python-headless",
+            file=sys.stderr,
+        )
     return _fixed_window_beats(_coerce_duration_sec(fps_or_duration), window_sec)
 
 

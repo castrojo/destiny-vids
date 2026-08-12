@@ -97,6 +97,31 @@ def pick_shot(beat, candidates, used_ids):
             "relaxed": [f for f, _ in dropped], "filters": {k: sorted(v) for k, v in active.items()}}
 
 
+def clamp_duration(requested, source_duration):
+    """Clamp an outline-supplied hold to what the shot actually contains.
+
+    Returns ``(duration, overrun_or_None)``.
+
+    A beat may carry its own ``duration``, which is a legitimate authoring
+    control. Left unclamped it is also a hole straight through the ``clean``
+    gate: ``render.py`` cuts ``-ss start_sec -t duration``, so a hold longer
+    than the segment keeps decoding **into the next scene** — footage no beat
+    selected, which may carry a HUD or burned-in text and may not be ``clean``
+    at all. Nothing downstream notices, because the emitted ``end_sec`` still
+    reports the segment's real out-point.
+
+    Cleanliness has to be positively established per shot, so a hold is capped
+    at the material that was actually vetted. The overrun is returned rather
+    than swallowed: silently shortening a beat the author asked to hold is its
+    own surprise, and an anchored cut needs to know its timeline moved.
+    """
+    if not requested:
+        return source_duration, None
+    if source_duration and requested > source_duration:
+        return source_duration, requested
+    return requested, None
+
+
 def build_story(outline_beats, segments, allow_gameplay=False):
     """Walk the beats in order, casting each to a distinct clean shot."""
     # THE gate: only clean footage is eligible. Gameplay is opt-in coverage.
@@ -106,6 +131,7 @@ def build_story(outline_beats, segments, allow_gameplay=False):
 
     shots = []
     misses = []
+    overruns = []
     used = set()
     for index, item in enumerate(outline_beats, start=1):
         pick = pick_shot(item["beat"], pool, used)
@@ -115,7 +141,11 @@ def build_story(outline_beats, segments, allow_gameplay=False):
         seg = pick["segment"]
         used.add(seg.get("segment_id"))
         source_duration = (seg.get("end_sec", 0) or 0) - (seg.get("start_sec", 0) or 0)
-        duration = item["duration"] or source_duration
+        duration, over = clamp_duration(item["duration"], source_duration)
+        if over is not None:
+            overruns.append({"index": index, "beat": item["beat"],
+                             "segment_id": seg.get("segment_id"),
+                             "requested": over, "clamped_to": duration})
         shots.append({
             "index": index,
             "beat": item["beat"],
@@ -133,7 +163,7 @@ def build_story(outline_beats, segments, allow_gameplay=False):
             "why": pick["reasons"],
             "segment": seg,
         })
-    return {"shots": shots, "misses": misses,
+    return {"shots": shots, "misses": misses, "overruns": overruns,
             "pool_size": len(pool), "index_size": len(segments)}
 
 
@@ -200,6 +230,15 @@ def to_text(story, title):
         lines.append("UNMATCHED BEATS — no clean shot covers these; rewrite them:")
         for miss in story["misses"]:
             lines.append(f"  {miss['index']:>3}. {miss['beat']}")
+    if story.get("overruns"):
+        lines.append("")
+        lines.append("CLAMPED HOLDS — the outline asked to hold past the shot's "
+                     "out-point:")
+        for over in story["overruns"]:
+            lines.append(f"  {over['index']:>3}. {over['segment_id']}  "
+                         f"{over['requested']:g}s -> {over['clamped_to']:g}s")
+        lines.append("  Holding past the out-point would cut unvetted footage "
+                     "from the next shot.")
     return "\n".join(lines)
 
 
@@ -239,6 +278,10 @@ def main(argv=None):
               f"{len(story['misses'])} unmatched beat(s))")
     else:
         print(text)
+    for over in story.get("overruns", []):
+        print(f"  CLAMPED: beat {over['index']} ({over['segment_id']}) asked for "
+              f"{over['requested']:g}s, shot holds {over['clamped_to']:g}s",
+              file=sys.stderr)
     return 0
 
 

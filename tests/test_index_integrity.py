@@ -81,14 +81,37 @@ def test_tag_file_uses_only_real_label_sources(path):
 
 
 @pytest.mark.parametrize("path", TAG_PATHS, ids=lambda p: Path(p).stem)
-def test_every_tagged_beat_states_its_overlays(path):
+def test_a_beat_with_no_overlays_stays_out_of_every_cut(path):
     # `clean` is the primary gate and derives false when overlays is untagged.
-    # A tag file that skips it does not leave a small hole -- it marks its whole
-    # output uncuttable, silently.
-    missing = [beat for beat, tags in _load(path).items() if "overlays" not in tags]
-    assert not missing, (
-        f"beats with no `overlays`: {missing}. An untagged beat derives "
-        "clean = false and leaves every cut; use [] for a clean frame."
+    # A long archive is reviewed incrementally, so a beat with no `overlays` is
+    # legitimate -- it means "nobody has looked at this frame yet". What is
+    # never legitimate is such a beat reaching a cut: the gate only works if the
+    # missing tag actually derives clean = false. Assert the consequence, not
+    # the absence, or an inherited "clean" puts a HUD in a finished cut.
+    tags = _load(path)
+    video_id = Path(path).stem
+    segments = sorted(
+        (json.loads(Path(p).read_text()) for p in SEGMENT_PATHS),
+        key=lambda s: s["start_sec"],
+    )
+    segments = [s for s in segments if s["video_id"] == video_id]
+    if not segments:
+        pytest.skip(f"{video_id} has no assembled segments")
+
+    beats = [tags[k] for k in sorted(tags, key=int)]
+    assert len(beats) == len(segments), (
+        f"{video_id}: {len(beats)} tagged beats but {len(segments)} segments -- "
+        "the two passes disagree, so no per-beat claim below can be trusted"
+    )
+
+    leaked = [
+        seg["segment_id"]
+        for beat, seg in zip(beats, segments)
+        if "overlays" not in beat and seg.get("clean")
+    ]
+    assert not leaked, (
+        f"segments derived clean from an unreviewed beat: {leaked}. "
+        "An untagged beat must derive clean = false and leave every cut."
     )
 
 

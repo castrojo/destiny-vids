@@ -115,6 +115,27 @@
       "version": "1.0",
       "last_updated": "2026-08-11",
       "doc_type": "procedure"
+    },
+    {
+      "id": "scoring",
+      "name": "scoring",
+      "one_line_purpose": "Measure a music bed, cut sections out of it, and cut to its bars.",
+      "entry_point": "docs/skills/scoring.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "music",
+        "bed",
+        "tempo",
+        "downbeat",
+        "excision",
+        "anchor",
+        "ffmpeg"
+      ],
+      "description": "Covers bed records, bar-snapped excisions, the cached beat grid, and mapping a timecode between the source and edited timelines. Use when scoring a cut to a chosen track, removing a section from a bed, or landing a shot on a musical moment.",
+      "version": "1.0",
+      "last_updated": "2026-08-11",
+      "doc_type": "procedure"
     }
   ]
 }

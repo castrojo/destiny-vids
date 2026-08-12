@@ -86,6 +86,18 @@ material a tagger reads wrong.
   worksheet leaves it `null` — never `[]` — because an inherited "clean" is
   how a HUD gets into a finished cut. `tools/worksheet.py check` is the
   done-ness signal; `make_video.sh` gates stage 5 on it.
+- **Every beat must be tagged, and an unreviewed beat is tagged honestly.**
+  `annotate.py` refuses a gap outright (`no tags for beat N`), so a partial pass
+  cannot silently index half a video. When a long source is being reviewed
+  incrementally, give the unreviewed beats a record with **no `overlays`**: they
+  derive `clean = false` and stay out of every cut until somebody looks at them.
+  That is the gate working, not a shortcut around it — "I have not seen this
+  frame" is not evidence that the frame is clean. Reviewing is additive and
+  needs no re-detection, so the beat indices stay valid.
+- **Only `TAGGER_FIELDS` may appear in a tag.** A bookkeeping field like
+  `review_status` is rejected by `assemble_segment`, and the video record's
+  schema is closed too. Reasoning about *why* a beat was tagged a certain way
+  belongs in the commit message, not in the data.
 - **Do not tag the source's own letterbox.** Bungie cinematics are 2.39:1 inside
   a 16:9 frame; tagging `letterbox` would reject the entire video.
 - **Never return a derived field.** `clean`, `footage_tier`, `traversal_hero`
@@ -114,6 +126,15 @@ Expect a few rejects per video: ratings, title and date cards carry
 - **Exactly 1 beat for a cut-heavy video.** The codec is wrong, not the
   detector: OpenCV cannot decode AV1 and silently returns one scene. Re-fetch
   with `-S "vcodec:h264"` (`docs/rendering.md`).
+- **Every "shot" the same length.** `scenedetect` is not installed and detection
+  fell back to fixed 3-second windows. The result *looks* like a plausible shot
+  list and is not one, so the damage only shows up later as cuts that land
+  mid-shot. `detect_beats` now warns on stderr, but check the install first:
+
+  ```bash
+  python3 -c "import scenedetect, cv2; print(scenedetect.__version__)"
+  python3 -m pip install --user scenedetect opencv-python-headless
+  ```
 - **A flood of sub-second beats.** Destiny super activations, explosions and
   muzzle flash read as cuts to a frame-difference detector. `--min-shot-sec`
   (default 0.5) merges them; raise it rather than hand-deleting segments.
