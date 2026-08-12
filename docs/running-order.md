@@ -68,9 +68,22 @@ how the audience is told which act this is. The list regenerates from the plan's
 own clock, so it cannot drift when a cut's length changes — re-run it after
 every assembly and paste the output into the upload description.
 
-Each act may also carry **sub-chapters** (`chapters[]` on its slide, rendered
-under the title). Nobody has written any, so every list is empty; the field is
-there and the renderer draws it the moment somebody fills it in.
+Each act may also carry **sub-chapters** — a contents list rendered under the
+title. **They all live in one place:** `chapters[]` on that act's entry in
+[`stories/megacut/megacut-cards.json`](../stories/megacut/megacut-cards.json).
+Edit the array, re-render the cards, rebuild. A line nobody authored is omitted
+rather than defaulted, so deleting one removes it from the slide.
+
+Five acts carry a **drafted** list (I, II, III, VI, VII). Every line is either
+read off the built film or reproduced from that act's own cut record, and each
+card's `note` cites which — **none of it is the owner's copy yet**. Acts IV and
+V carry none on purpose: 34 s and 25 s, one continuous scene each, so a contents
+list would be longer than the thing it indexes.
+
+```bash
+node cards/render-cards.mjs --manifest stories/megacut/megacut-cards.json \
+    --out-dir renders/plates-megacut-cards
+```
 
 ## Where the files live
 

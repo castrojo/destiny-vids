@@ -15,8 +15,16 @@
       "label": "Act I",
       "title": "Project Bluefin",
       "subtitle": "seven days to the wolves",
-      "chapters": [],
-      "note": "Copy is the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94). This card was `card0` before the acts were numbered."
+      "chapters": [
+        "0:03  Cortney Nickerson",
+        "0:12  Kat Cosgrove",
+        "0:22  “You don’t need permission” — Amber Graner",
+        "0:38  Kaslin Fields",
+        "1:08  Orlin",
+        "1:23  Christoph Blecker",
+        "1:27  Natali Vlatko"
+      ],
+      "note": "Copy is the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94). This card was `card0` before the acts were numbered. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): One line per plate the act actually burns, in order, read off the built file -- stories/megacut/megacut-hero-plates.json for the windows, the frames for confirmation. The two name-only lines are name-only ON THE PLATE too: Cortney Nickerson (#59) and Orlin (#73) have no authored Guardian identity, and this list must not give them one."
     },
     {
       "id": "act2",
@@ -27,8 +35,14 @@
       "label": "Act II",
       "title": "Endless Forms Most Beautiful",
       "subtitle": "Nightwish",
-      "chapters": [],
-      "note": "The owner named this act and its music in one instruction -- 'it's endless forms most beautiful, instrumental' -- and docs/running-order.md carries the title. The artist is reproduced from the bed's own provenance (music/bed_endless_forms_most_beautiful.json, the official Nightwish channel), matching act VI's card, which is a title and an artist for the same reason. The film is docs/cuts/02-endless-forms-most-beautiful.md. The word 'instrumental' is deliberately NOT on the slide: it describes which recording was used, not what the act is called, and nobody authored it as a subtitle."
+      "chapters": [
+        "0:00  The moon, cold open",
+        "0:06  The moon battle",
+        "0:36  The red dunes",
+        "2:28  The jungle patrol",
+        "3:32  The temple"
+      ],
+      "note": "The owner named this act and its music in one instruction -- 'it's endless forms most beautiful, instrumental' -- and docs/running-order.md carries the title. The artist is reproduced from the bed's own provenance (music/bed_endless_forms_most_beautiful.json, the official Nightwish channel), matching act VI's card, which is a title and an artist for the same reason. The film is docs/cuts/02-endless-forms-most-beautiful.md. The word 'instrumental' is deliberately NOT on the slide: it describes which recording was used, not what the act is called, and nobody authored it as a subtitle. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): The first two are docs/cuts/02-endless-forms-most-beautiful.md's own words for its first two kept runs. The last three are the remaining kept runs, named from what is visibly in frame at each -- the doc records where their boundaries are, not what they show."
     },
     {
       "id": "act3",
@@ -38,8 +52,12 @@
       "act": "III",
       "label": "Act III",
       "title": "Bob Killen",
-      "chapters": [],
-      "note": "This act is `mrbobbytables` -- the film delivered as ~/Videos/Wolves/Prod/03-mrbobbytables.mp4 (was UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4). The owner named it and placed it: 'rename this \"mrbobbytables\" ... and then put it in slot three'. The card reproduces his authored Guardian identity -- characters.json slug `bob`, ~/Videos/nameplates.json np_bob -- rather than an act title nobody wrote. His seal, 'Reconciler of the Plane', stays on the plate inside the cut, matching acts V and VII, which give a name and a class and no title.",
+      "chapters": [
+        "0:00  The Vex assault",
+        "2:00  Osiris — “the end of everything”",
+        "2:32  Thanks for working on Bluefin"
+      ],
+      "note": "This act is `mrbobbytables` -- the film delivered as ~/Videos/Wolves/Prod/03-mrbobbytables.mp4 (was UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4). The owner named it and placed it: 'rename this \"mrbobbytables\" ... and then put it in slot three'. The card reproduces his authored Guardian identity -- characters.json slug `bob`, ~/Videos/nameplates.json np_bob -- rather than an act title nobody wrote. His seal, 'Reconciler of the Plane', stays on the plate inside the cut, matching acts V and VII, which give a name and a class and no title. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): Read off the built file: the Vex assault, Osiris's line (already burned in as recovered dialogue), and the contributors card the cut ends on.",
       "subtitle": "Voidwalker Warlock"
     },
     {
@@ -57,7 +75,7 @@
         "CNCF Authorization: [ UNAUTHORIZED ]"
       ],
       "chapters": [],
-      "note": "OWNER-AUTHORED, verbatim, this session -- title and all five terminal lines. Held 15s, three times every other card, because the owner asked for it: 'Hold that slide for a long time it's a transition inbetween videos.' It carries no eyebrow and no subtitle: the owner wrote a title and a terminal block, so a title and a terminal block is what it shows."
+      "note": "OWNER-AUTHORED, verbatim, this session -- title and all five terminal lines. Held 15s, three times every other card, because the owner asked for it: 'Hold that slide for a long time it's a transition inbetween videos.' It carries no eyebrow and no subtitle: the owner wrote a title and a terminal block, so a title and a terminal block is what it shows. CHAPTERS: deliberately none. This act runs 34s/25s as one continuous scene; a contents list for it would be longer than the thing it indexes."
     },
     {
       "id": "act5",
@@ -74,7 +92,7 @@
         "CNCF Authorization: [ UNAUTHORIZED ]"
       ],
       "chapters": [],
-      "note": "OWNER-AUTHORED, verbatim: the title, and the instruction that this slide carries the SAME terminal block as act IV -- 'make the slide with the unauthorized etc be the same for Natali and change the title to \"Wrong Place, Wrong Time, Right Attitude\"'. So the five lines are act IV's, copied unchanged, including 'Destination: Europa': they are the same authorisation readout, not a per-act rewrite, and rewriting one line of it would be authoring copy nobody wrote. Like act IV it carries no eyebrow and no subtitle -- Natali's authored identity is on her own reveal card inside the cut. HELD 15s, matching act IV: identical copy, and the owner's reason for that hold ('it's a transition inbetween videos') applies to this one too. See `unresolved` -- the hold is the one thing here that was inferred rather than said."
+      "note": "OWNER-AUTHORED, verbatim: the title, and the instruction that this slide carries the SAME terminal block as act IV -- 'make the slide with the unauthorized etc be the same for Natali and change the title to \"Wrong Place, Wrong Time, Right Attitude\"'. So the five lines are act IV's, copied unchanged, including 'Destination: Europa': they are the same authorisation readout, not a per-act rewrite, and rewriting one line of it would be authoring copy nobody wrote. Like act IV it carries no eyebrow and no subtitle -- Natali's authored identity is on her own reveal card inside the cut. HELD 15s, matching act IV: identical copy, and the owner's reason for that hold ('it's a transition inbetween videos') applies to this one too. See `unresolved` -- the hold is the one thing here that was inferred rather than said. CHAPTERS: deliberately none. This act runs 34s/25s as one continuous scene; a contents list for it would be longer than the thing it indexes."
     },
     {
       "id": "act6",
@@ -85,8 +103,14 @@
       "label": "Act VI",
       "title": "7 Days to the Wolves",
       "subtitle": "Nightwish",
-      "chapters": [],
-      "note": "Title and artist reproduced from the cinematic's own segment record, ~/src/website/src/config/wolves-cinematic.ts (id `seven-days-to-the-wolves`) -- the same two rows the transition slide this card is ported from renders."
+      "chapters": [
+        "0:00  The orrery approach, and the capture",
+        "3:02  The gallop cuts to neon",
+        "4:19  The crash, and the strand descent",
+        "5:22  The song stops",
+        "6:09  The finale, the Guardians assembled"
+      ],
+      "note": "Title and artist reproduced from the cinematic's own segment record, ~/src/website/src/config/wolves-cinematic.ts (id `seven-days-to-the-wolves`) -- the same two rows the transition slide this card is ported from renders. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): docs/cuts/07-seven-days-to-the-wolves.md's Structure table, in its own words. Its internal 'Act I/II/III' labels are deliberately NOT reproduced -- inside act VI of an eight-act programme they would name the wrong thing."
     },
     {
       "id": "act7",
@@ -97,8 +121,14 @@
       "label": "Act VII",
       "title": "Europa",
       "subtitle": "Director's Cut",
-      "chapters": [],
-      "note": "~/Videos/Wolves/Prod/README.md and ~/Videos/wolves-review.m3u. The cut itself credits Laura Santamaria; whether this session's 'laura santamaria is orlin' recast reaches it is an open owner question, recorded in megacut-hero-plates.json."
+      "chapters": [
+        "0:00  Europa",
+        "0:57  The speeder",
+        "1:24  The Exo Stranger — Laura Santamaria",
+        "1:28  Coming to KubeCon NA",
+        "1:37  Seven Days to the Wolves"
+      ],
+      "note": "~/Videos/Wolves/Prod/README.md and ~/Videos/wolves-review.m3u. The cut itself credits Laura Santamaria; whether this session's 'laura santamaria is orlin' recast reaches it is an open owner question, recorded in megacut-hero-plates.json. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): ~/Videos/wolves-directors-cut/STORYBOARD.md's segment map, confirmed against the frames."
     }
   ],
   "unresolved": [
@@ -109,10 +139,10 @@
       "blocked_on": "issue #51."
     },
     {
-      "what": "chapters, for every act",
-      "detail": "The owner's instruction is that each act 'will have chapters'. The renderer takes them (`chapters`, one authored line per row, drawn under the title) and every list is empty because nobody has written them yet.",
+      "what": "chapters -- drafted, not authored",
+      "detail": "The owner's instruction is that each act 'will have chapters'. Five acts now carry a drafted list (I, II, III, VI, VII); each line is read off the built film or reproduced from that act's own cut record, and every one is cited in its card's `note`. They are a CONTENTS list, not a second title. Acts IV and V carry none on purpose -- 34s and 25s, one scene each. None of this copy is the owner's yet: it is a first pass to edit, and all of it lives in one place, `plates[].chapters` in this file. A line removed here disappears from the slide; the renderer omits what nobody authored.",
       "automatable": "no",
-      "blocked_on": "the owner authoring chapter names."
+      "blocked_on": "the owner rewriting the drafted lines, or striking them."
     },
     {
       "what": "an act title for act III",
