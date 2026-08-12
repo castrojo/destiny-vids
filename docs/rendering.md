@@ -171,6 +171,27 @@ Off Bluefin, or with no container running, `pip install imageio-ffmpeg` supplies
 a full static ffmpeg (H.264 + AAC) with no system packages. It is what
 `--no-container` selects here.
 
+## The other answer on this host: Homebrew
+
+`~/Videos/README.md` and `~/Videos/OVERLAYS.md` tell agents to use
+`/home/linuxbrew/.linuxbrew/bin/ffmpeg`. That is not a contradiction and neither
+document is stale — the two workspaces solved the same problem differently, and
+the Homebrew build is what the cuts already shipped there were made with.
+
+Measured on this host, all three at once:
+
+| Binary | Version | H.264 | `drawtext` |
+|---|---|---|---|
+| `/usr/bin/ffmpeg` (`ffmpeg-free`) | 7.1.3 | **no** | — |
+| `/home/linuxbrew/.linuxbrew/bin/ffmpeg` | 8.1.2 | yes | **no** |
+| the container (and `~/.local/bin/ffmpeg`) | 8.1 | yes | yes |
+
+So: either non-free build renders this repo's cuts, and the missing `drawtext`
+is precisely why `~/Videos` renders its cards in PIL and a headless browser
+rather than in a filter chain — which is also what `tools/plate.py` does. Use
+whichever the workspace you are in documents; what must never happen is falling
+through to `/usr/bin/ffmpeg`, which fails only once decoding starts.
+
 ## Related trap: OpenCV cannot decode AV1
 
 Shot detection has the mirror-image problem. `yt-dlp` prefers AV1 from YouTube,

@@ -38,14 +38,14 @@ first-party footage.
 
 | Character | Cast as | |
 |---|---|---|
-| Elsie Bray | Laura Santamaria | |
+| Elsie Bray | Laura Santamaria | authored plate |
 | Anna Bray | Joanna Lee | |
 | Zavala | Kelsey Hightower | |
 | Cayde-6 | castrojo | |
 | Osiris | mrbobbytables | |
 | Sagira | Lindsay Gendreau | Osiris's Ghost; cast on presence, no framing constraint |
-| Saint-14 | Kat | remains the bubble in the original Wolves |
-| Mara Sov | Karena Angell | |
+| Saint-14 | Kat | remains the bubble in the original Wolves; authored plate |
+| Mara Sov | Karena Angell | subclass unauthored (#5) |
 | Petra Venj | Lenka | |
 | Variks | Nate Waddington | |
 | The Speaker | Jonathan Bryce | |
@@ -229,6 +229,12 @@ copy is the reference deck's vocabulary and nothing more: `label`, `class`,
 card for the ensemble roster. Do not invent fields; a plate that says something
 the deck has no slot for is a plate that says something nobody wrote.
 
+Copy that somebody *has* authored is reproduced verbatim rather than written
+here — ten people have a Guardian identity in the deck or in the website's
+`public/wolves/characters/characters.json`, and the roster, the precedence
+between those sources and the known divergences are in
+[`docs/skills/plates.md`](docs/skills/plates.md#where-the-copy-is-authored).
+
 Each lead is plated **once**, on the first appearance long enough to read, and
 never on a shot that failed its binding's constraints (that shot is already
 excluded from the character's retrieval, so it is not a reveal). Ensemble
@@ -404,3 +410,17 @@ python3 tools/gaps.py                # what in the index is unfinished
 automated: a visual judgement about a frame, a claim about a real person, and a
 licensing decision. An agent that names one and stops has succeeded. See
 `docs/skills/issues.md`.
+
+## Where a finished cut goes
+
+A file in `renders/` is not a deliverable. The owner's delivery workspace is
+`~/Videos` (read its `README.md`): approved cuts are staged into
+`~/Videos/UPLOAD/` in playlist order and published by `~/Videos/yt-refresh.py`
+into **one unlisted playlist**, because YouTube cannot replace a video file — a
+re-upload always gets a new ID, so only a playlist link is stable.
+
+The credited contributors cut is **regenerated, never hand-edited**: a new month
+is a new render from checked-in data (`scripts/build_uncut_credited.sh`), not a
+new edit. Titles, descriptions and audio treatment for a delivered file follow
+that workspace's rules, not this one's — see
+[`docs/skills/production.md`](docs/skills/production.md#delivering-a-finished-cut).

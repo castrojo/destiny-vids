@@ -1180,3 +1180,192 @@ def test_a_classless_lead_still_takes_its_variant_chrome():
     spec = {"label": "ARCHITECT // GENERAL", "name": "Karena Angell",
             "title": "Archon of the Consensus", "variant": "leader"}
     assert plate._variant_for(spec) == plate.VARIANTS["leader"]
+
+
+# --- ensemble direction from a brief (the issue #18 bridge) ------------------
+#
+# "4:03 put a bluefin maintainer in here" is the owner pinning ONE ensemble
+# slot to ONE moment. The rotation still decides who fills it -- the note is
+# direction, and a note that became copy would put words on whichever real
+# contributor landed there.
+
+
+def _ensemble_brief(*beats):
+    return {"automatable": "partly", "beats": list(beats)}
+
+
+def test_the_owners_ensemble_moment_is_credited_at_that_moment():
+    shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
+    brief = _ensemble_brief({"at": "0:10", "note": "put a bluefin maintainer "
+                                                   "in here", "ensemble": True})
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief)
+    fixed = next(e for e in entries
+                 if e["id"].startswith("ensemble_") and e["at"] == pytest.approx(10.0))
+    assert fixed["copy_source"] == "casting"
+    assert "bluefin maintainer" not in json.dumps(fixed)  # the note is not copy
+    plate.load_manifest_entries(entries)
+
+
+def test_the_rotation_routes_around_the_owners_fixed_ensemble_moment():
+    """The fixed point takes its window first; nothing double-books it, and
+    nobody is credited twice."""
+    shots = [_shot("s1", 0, 30, "ensemble", None, slots=2),
+             _shot("s2", 30, 60, "ensemble", None, slots=2)]
+    brief = _ensemble_brief({"at": "0:02", "note": "a maintainer here",
+                             "ensemble": True})
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief)
+    assert any(e["at"] == pytest.approx(2.0) for e in entries)
+    ids = [e["id"] for e in entries if e["id"].startswith("ensemble_")
+           and e["id"] != "ensemble_roster"]
+    assert len(ids) == len(set(ids))
+    plate.load_manifest_entries(entries)
+
+
+def test_the_ensemble_moment_is_honoured_when_only_the_ensemble_is_planned():
+    """`--only ensemble` runs after the leads; the owner's ensemble direction
+    belongs to that pass, so it must survive it."""
+    shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
+    brief = _ensemble_brief({"at": "0:10", "note": "a maintainer here",
+                             "ensemble": True})
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief, only="ensemble")
+    assert any(e["at"] == pytest.approx(10.0) for e in entries)
+
+
+def test_an_ensemble_moment_outside_the_cut_is_reported_not_moved():
+    shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
+    brief = _ensemble_brief({"at": "9:59", "note": "a maintainer here",
+                             "ensemble": True})
+    lines = []
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief, log=lines.append)
+    assert any("not in this cut" in line for line in lines)
+    assert entries  # the rest of the cut is still planned
+
+
+def test_a_beat_without_a_timecode_cannot_be_pinned_and_says_so():
+    shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
+    brief = _ensemble_brief({"note": "a maintainer somewhere", "ensemble": True})
+    lines = []
+    plate.plan(shots, LEADS, ROSTER, brief=brief, log=lines.append)
+    assert any("no `at`" in line for line in lines)
+
+
+def test_an_ordinary_beat_is_still_only_direction():
+    """A beat without `ensemble: true` plans nothing -- the field is how the
+    owner says "this one is a request", so inferring it would execute prose."""
+    shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
+    plain = plate.plan(shots, LEADS, ROSTER,
+                       brief=_ensemble_brief({"at": "0:10", "note": "awesome"}))
+    none = plate.plan(shots, LEADS, ROSTER)
+    assert [e["at"] for e in plain] == [e["at"] for e in none]
+
+
+def test_two_pinned_moments_do_not_double_book_the_screen():
+    """Two pins 2s apart: the second moment lands inside the first pin's
+    window. The owner's moment is never moved, so the colliding pin is
+    reported and skipped -- not overlapped, and not allowed to sink the plan."""
+    shots = [_shot("s1", 0, 30, "ensemble", None, slots=2),
+             _shot("s2", 30, 60, "ensemble", None, slots=2)]
+    brief = _ensemble_brief({"at": "0:02", "note": "first", "ensemble": True},
+                            {"at": "0:04", "note": "second", "ensemble": True})
+    lines = []
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief, log=lines.append)
+    plate.load_manifest_entries(entries)  # raises if any two overlap
+    assert any(e["at"] == pytest.approx(2.0) for e in entries)
+    assert not any(e["at"] == pytest.approx(4.0) for e in entries)
+    assert any("already covered" in line and "second" in line
+               for line in lines)
+
+
+def test_a_pin_inside_a_leads_reveal_window_is_reported_not_double_booked():
+    """The reveal rides across the cut (0.4s-5.4s); a pin at 0:04 lands on an
+    ensemble shot but inside that window. The pin cannot move, so it is
+    reported and skipped and the plan still validates."""
+    shots = [_shot("s1", 0, 2, "lead", "osiris"),
+             _shot("s2", 2, 30, "ensemble", None, slots=1)]
+    brief = _ensemble_brief({"at": "0:04", "note": "a maintainer here",
+                             "ensemble": True})
+    lines = []
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief, log=lines.append)
+    plate.load_manifest_entries(entries)
+    assert any(e["id"] == "osiris" for e in entries)
+    assert not any(e["at"] == pytest.approx(4.0) for e in entries)
+    assert any("already covered" in line for line in lines)
+
+
+def test_a_pin_routes_around_dialogue_windows_from_around():
+    """`--around` seeds `busy` with fixed windows (e.g. dialogue). A pin whose
+    hold would run into one is shortened to end where it begins; one left with
+    less than a readable hold is reported and skipped instead."""
+    shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
+    brief = _ensemble_brief({"at": "0:10", "note": "a maintainer here",
+                             "ensemble": True})
+    # dialogue at 13.0-16.0: the 5s hold trims to 3.0s and the moment stands
+    lines = []
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief,
+                         busy=[(13.0, 16.0)], log=lines.append)
+    plate.load_manifest_entries(entries)
+    pinned = next(e for e in entries if e["at"] == pytest.approx(10.0))
+    assert pinned["dur"] == pytest.approx(3.0)
+    assert any("shortened to 3.0s" in line for line in lines)
+    # dialogue at 12.0-15.0: 2.0s is left -- not readable, so reported
+    lines = []
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief,
+                         busy=[(12.0, 15.0)], log=lines.append)
+    plate.load_manifest_entries(entries)
+    assert not any(e["at"] == pytest.approx(10.0) for e in entries)
+    assert any("only 2.0s before the next plate" in line for line in lines)
+
+
+def test_a_pin_on_the_trim_boundary_has_no_hold_left_to_emit():
+    """_source_moment_on_timeline accepts at_sec - s0 == duration, so a pin on
+    the hold cap's edge maps to the cut's final instant, where dur rounds to
+    0. That entry would fail validation; it is reported and skipped instead."""
+    shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
+    brief = _ensemble_brief({"at": "0:09", "note": "edge", "ensemble": True})
+    lines = []
+    entries = plate.plan(shots, LEADS, ROSTER, max_shot_sec=9,
+                         brief=brief, log=lines.append)
+    plate.load_manifest_entries(entries)
+    assert not any(e["at"] == pytest.approx(9.0) for e in entries)
+    assert any("no readable hold" in line and "edge" in line
+               for line in lines)
+
+
+def test_pinned_beats_are_reported_when_no_ensemble_pass_will_run():
+    """No roster, or --only leads: the ensemble pass never runs, so the
+    brief's pinned beats produce no entry -- but they must still say why,
+    not vanish silently."""
+    shots = [_shot("s1", 0, 30, "lead", "osiris"),
+             _shot("s2", 30, 60, "ensemble", None, slots=1)]
+    brief = _ensemble_brief({"at": "0:40", "note": "a maintainer here",
+                             "ensemble": True})
+    lines = []
+    entries = plate.plan(shots, LEADS, None, brief=brief, log=lines.append)
+    plate.load_manifest_entries(entries)
+    assert any(e["id"] == "osiris" for e in entries)
+    assert not any(e["id"].startswith("ensemble_") for e in entries)
+    assert any("no roster was given" in line and "not honoured" in line
+               for line in lines)
+
+    lines = []
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief, only="leads",
+                         log=lines.append)
+    plate.load_manifest_entries(entries)
+    assert any("--only leads" in line and "not honoured" in line
+               for line in lines)
+
+
+def test_a_pin_on_a_shot_with_no_ensemble_role_is_reported_not_anchored():
+    """An ensemble credit may only anchor where the round-robin and the
+    re-home pass could place one -- a shot with `casting.role == "ensemble"`.
+    A pin on a lead shot is reported and skipped, never relocated."""
+    shots = [_shot("s1", 0, 30, "lead", "osiris"),
+             _shot("s2", 30, 60, "ensemble", None, slots=1)]
+    brief = _ensemble_brief({"at": "0:10", "note": "a maintainer here",
+                             "ensemble": True})
+    lines = []
+    entries = plate.plan(shots, LEADS, ROSTER, brief=brief, log=lines.append)
+    plate.load_manifest_entries(entries)
+    assert not any(e["at"] == pytest.approx(10.0) for e in entries)
+    assert any("no ensemble role" in line and "not moved" in line
+               for line in lines)

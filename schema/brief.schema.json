@@ -242,6 +242,10 @@
           "type": "string",
           "minLength": 1,
           "description": "The direction itself, in the owner's words."
+        },
+        "ensemble": {
+          "type": "boolean",
+          "description": "This beat asks for an ENSEMBLE credit at `at` -- 'put a bluefin maintainer in here'. It requests a slot, never a person: who fills it comes from the month's rotation in tools/ensemble.py, and the note stays direction rather than becoming plate copy. Requires `at`; a beat that sets it must not name anybody, because naming who appears in a frame is a casting decision, not a brief's."
         }
       }
     },

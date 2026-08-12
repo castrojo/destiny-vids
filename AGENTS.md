@@ -22,6 +22,25 @@ executable. How to file work, pick it up, and normalize prose into a brief is
 [`docs/skills/issues.md`](docs/skills/issues.md); the field reference is
 [`schema/brief.schema.json`](schema/brief.schema.json).
 
+## Three workspaces, one of them writable
+
+This repo is not self-contained: the words that go on screen and the files that
+get published both live outside it.
+
+| Path | What it is | Write? |
+|---|---|---|
+| `~/src/destiny-vids` | The index and the tools. | **yes** |
+| `~/Videos` | The owner's delivery workspace: the reference deck, the finished cuts, `UPLOAD/` and the publish script. Read its `README.md`. | only where its own docs say so |
+| `~/src/website` | Where the authored Guardian identities live (`public/wolves/characters/characters.json`) and where the plate CSS is ported from. | **never** — several agents run worktrees against it |
+
+Nothing in either of those is editable from here, and both are *authoritative*
+over this repo where they overlap: plate copy is
+[reproduced](docs/skills/plates.md#where-the-copy-is-authored), not authored,
+and a delivered file is
+[regenerated](docs/skills/production.md#delivering-a-finished-cut), not
+hand-edited. `~/Videos` is a Syncthing folder, so a directory can vanish
+mid-session; check `~/.local/share/Trash` before rebuilding anything.
+
 **Three classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, and a licensing decision. An agent that
 reaches one, records `automatable: no` with the missing decision in
@@ -98,7 +117,10 @@ needs somebody to decide.
   means editing `vocab/*.yaml` *and* `schema/segment.schema.json`; tests assert
   the two agree, and that every cast binding is queryable.
 - **Never invent on-screen copy.** Nameplate fields are a closed set — see
-  [`docs/skills/plates.md`](docs/skills/plates.md). Dialogue shown on screen is
+  [`docs/skills/plates.md`](docs/skills/plates.md). A Guardian identity somebody
+  *has* authored (ten people, in `~/Videos/nameplates.json` and the website's
+  `characters.json`) is reproduced verbatim; the generic fallback for an
+  authored identity is as wrong as an invented one. Dialogue shown on screen is
   *recovered*, not written: it lives in `dialogue/<video_id>/dialogue.json` with
   its source timecodes and per-line evidence for who is speaking, beside the
   `DIALOGUE.md` the owner edits (`tools/dialogue_md.py` round-trips the two, and

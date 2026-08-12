@@ -714,7 +714,8 @@ def _plan_brief_plates(brief, timeline, total, hold, leads, busy, log):
         if not character and not copy:
             note(f"  brief plate #{index}: no character and no copy -- "
                  f"direction, not a plate ({(req.get('note') or '').strip()}); "
-                 "nothing to plan")
+                 "nothing to plan. An ensemble credit at a moment is a beat "
+                 "with `ensemble: true`, not a plate.")
             continue
 
         binding = (leads.get(character) or {}) if character else {}
@@ -793,6 +794,53 @@ def _plan_brief_plates(brief, timeline, total, hold, leads, busy, log):
             note(f"  {character:<10} the brief asks to plate them, but they "
                  "are not in this cut -- reported, not dropped")
     return entries, plated, reveal_copy
+
+
+def _brief_ensemble_beats(brief, timeline, log):
+    """A brief's ensemble direction -> fixed moments on the cut.
+
+    ``beats[].ensemble`` is the owner asking for a contributor credit at a
+    particular moment -- "4:03 put a bluefin maintainer in here". It requests a
+    SLOT, not a person: who fills it is the month's rotation in
+    tools/ensemble.py, and the note stays direction rather than becoming plate
+    copy. That is the whole reason this is safe to execute -- an ensemble
+    credit says "one of the anonymous Guardians in this film", which is true
+    wherever it lands, while naming who is in a frame would be a casting
+    decision the brief does not get to make.
+
+    Returns ``[(timeline_seconds, note, shot)]`` for the moments that can take
+    a pin, earliest first. A moment outside the cut is reported and dropped,
+    the same way a lead plate's is: the direction is about a frame this cut
+    does not contain. So is a moment inside a shot with no ensemble role: the
+    round-robin and the re-home pass both require ``casting.role ==
+    "ensemble"``, and a pin may not anchor a credit anywhere they could not.
+    """
+    out = []
+    for index, beat in enumerate(brief.get("beats") or [], start=1):
+        if not beat.get("ensemble"):
+            continue
+        note = (beat.get("note") or "").strip()
+        at_tc = beat.get("at")
+        if not at_tc:
+            if log:
+                log(f"  brief beat #{index}: asks for an ensemble credit but "
+                    f"carries no `at` -- nothing to pin it to ({note})")
+            continue
+        t, shot = _source_moment_on_timeline(timeline, _tc_seconds(at_tc),
+                                             beat.get("video_id"))
+        if t is None:
+            if log:
+                log(f"  {'ensemble':<10} the owner's moment {at_tc} is not in "
+                    f"this cut -- reported, not moved ({note})")
+            continue
+        if (shot.get("casting") or {}).get("role") != "ensemble":
+            if log:
+                log(f"  {'ensemble':<10} the owner's moment {at_tc} lands on "
+                    "a shot with no ensemble role -- an ensemble credit "
+                    f"cannot anchor there; reported, not moved ({note})")
+            continue
+        out.append((t, note, shot))
+    return sorted(out)
 
 
 def cut_timeline(shots, max_shot_sec=None):
@@ -984,6 +1032,11 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     ``only="ensemble"`` they are expected to arrive via ``busy`` (the
     ``--around`` manifest), the same way dialogue does.
 
+    A brief's ``beats[].ensemble`` direction is the ensemble-tier equivalent --
+    "put a bluefin maintainer in here" -- and is planned in the ensemble pass,
+    so it is honoured under ``only="ensemble"`` too. See
+    ``_brief_ensemble_beats``.
+
     Every entry carries ``copy_source`` -- "brief" for owner-authored copy,
     "casting" for vocab/casting.yaml -- so the manifest says where each claim
     about a real person came from.
@@ -1090,6 +1143,16 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             place_leads(busy, hero_only=hero_only)
 
     if not roster or only == "leads":
+        # These paths never run the ensemble pass, so a brief's pinned
+        # ensemble beats cannot be honoured here. That is reported, never
+        # silently dropped: the direction was the owner's.
+        if brief and log:
+            pins = [b for b in (brief.get("beats") or []) if b.get("ensemble")]
+            if pins:
+                why = ("no roster was given" if not roster
+                       else "--only leads plans no ensemble tier")
+                log(f"  {'ensemble':<10} the brief pins {len(pins)} ensemble "
+                    f"moment(s), but {why} -- reported, not honoured")
         return sorted(entries, key=lambda e: e["at"])
 
     from tools.derive import load_ensemble_plate
@@ -1102,6 +1165,81 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         by_segment.setdefault(item["segment_id"], []).append(item)
 
     credited, pending = set(), []
+
+    # The owner's ensemble direction is a FIXED POINT: "put a bluefin
+    # maintainer in here" pins one slot to one moment, and the rotation below
+    # routes around it exactly as it routes around a lead reveal or a line of
+    # dialogue. It is honoured before the round-robin runs, because a moment
+    # the owner chose outranks a moment the assignment happened to produce --
+    # and because taking its window first is what makes the rest route around
+    # it at all.
+    #
+    # WHO fills the slot still comes from the rotation, never from the note.
+    # The note is direction ("a bluefin maintainer"), and turning it into copy
+    # would put words on whichever real contributor landed there.
+    #
+    # Fixed does not mean above the one-plate-at-a-time rule: the pin takes
+    # only windows nothing earlier claimed (brief plates, lead reveals,
+    # --around dialogue, earlier pins). It is shortened to fit ahead of the
+    # next plate when it can be, and reported and skipped when it cannot --
+    # it is never MOVED, because the owner pointed at a frame.
+    if brief:
+        rotation = list({item["login"]: item
+                         for item in result["assignments"]}.values())
+        for t, note, _ in _brief_ensemble_beats(brief, timeline, log):
+            item = next((i for i in rotation if i["login"] not in credited), None)
+            if item is None:
+                if log:
+                    log(f"  {'ensemble':<10} the owner asks for a credit at "
+                        f"{t:.2f}s, but every contributor in the rotation is "
+                        f"already credited -- reported, not duplicated ({note})")
+                continue
+            dur = round(min(hold, total - t), 3)
+            if dur < MIN_HOLD:
+                # A pin on the trim boundary maps to the cut's final instant
+                # (dur == 0), and one near it to an unreadable flash. Neither
+                # may be emitted -- validation rejects a non-positive dur, and
+                # a plate below MIN_HOLD cannot be read.
+                if log:
+                    log(f"  {'ensemble':<10} the owner's moment {t:.2f}s "
+                        f"leaves {dur:.1f}s on the cut -- no readable hold "
+                        f"remains; reported, not emitted ({note})")
+                continue
+            # The moment is a fixed point, but the screen may already be
+            # booked: an earlier pin, a brief plate, a lead reveal, or
+            # dialogue via --around. The pin never MOVES -- the owner pointed
+            # at this frame -- so a moment already covered is reported and
+            # skipped, and a partly free window is shortened to end where the
+            # next plate begins (when what remains can still be read).
+            overlapping = sorted(
+                (b_start, b_end) for b_start, b_end in busy
+                if t < b_end and b_start < t + dur)
+            if overlapping and overlapping[0][0] <= t:
+                if log:
+                    log(f"  {'ensemble':<10} the owner's moment {t:.2f}s is "
+                        "already covered by another plate -- reported, not "
+                        f"moved ({note})")
+                continue
+            if overlapping:
+                trimmed = round(overlapping[0][0] - t, 3)
+                if trimmed < MIN_HOLD:
+                    if log:
+                        log(f"  {'ensemble':<10} the owner's moment {t:.2f}s "
+                            f"has only {trimmed:.1f}s before the next plate "
+                            f"-- reported, not moved ({note})")
+                    continue
+                if log:
+                    log(f"  {'ensemble':<10} the owner's moment {t:.2f}s "
+                        f"holds {dur:.1f}s, shortened to {trimmed:.1f}s ahead "
+                        f"of the next plate ({note})")
+                dur = trimmed
+            entries.append(_ensemble_entry(item, t, dur, ensemble_copy))
+            busy.append((t, t + dur))
+            credited.add(item["login"])
+            if log:
+                log(f"  {'ensemble':<10} {t:6.2f}s +{dur:.1f}s  "
+                    f"{item['display_name']} (the owner's moment: {note})")
+
     for start, duration, shot in timeline:
         items = [item for item in by_segment.get(shot.get("segment_id"), [])
                  if item["login"] not in credited]
