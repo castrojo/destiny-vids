@@ -49,8 +49,6 @@ import json
 import sys
 from pathlib import Path
 
-import numpy as np
-from PIL import Image
 
 REPO = Path(__file__).resolve().parents[1]
 SRC_DIR = REPO / "media" / "summit"
@@ -62,32 +60,18 @@ MANIFEST = REPO / "stories" / "summit-photos.json"
 
 W, H = 1920, 1080
 
-# The six slots the cut has to fill, longest first, paired with a photograph.
-#
-# Chosen for MAXIMUM DISTINCTNESS, not just for headcount, and that is a
-# correction: the first assignment took the three biggest crowds -- 002, 003
-# and 004 -- which turned out to be three frames of the SAME overhead group
-# photo, seconds apart. On screen they read as one image shown three times. The
-# owner had already called this out on the source set ("keep summit 11 and not
-# the dupe"), so the rule is now enforced below rather than remembered.
-#
-# 002 is the overhead wide of the entire summit and takes the longest hold; the
-# other five are ground-level crowds from the same minute, so the six still
-# read as one set. Pairwise correlation within this selection peaks at 0.27,
-# against 0.42-0.57 among the three overheads.
-ASSIGNMENT = {
-    "enemy_cu": "group-002",        # 3.510s -- the whole summit, from above
-    "act1_black_1": "group-008",    # 3.016s
-    "act1_black_3": "group-011",    # 2.078s
-    "buildcrafting": "group-010",   # 1.967s
-    "raids": "group-012",           # 1.966s
-    "act1_black_2": "group-005",    # 1.374s
-}
+# Which photograph fills which slot, and the duplicate limit, are AUTHORED
+# INPUTS -- they are editorial choices, not code -- so they live in the
+# committed manifest beside the licence and the URLs. Reading them from there
+# also lets the offline test suite check the slots against build_wolves.py
+# WITHOUT importing this module, which needs numpy and Pillow that CI does not
+# install: the frame-touching extras are optional here by design (AGENTS.md).
+_META = json.loads(MANIFEST.read_text())
+ASSIGNMENT = _META["assignment"]
 
 # Above this, two plates are the same picture as far as an audience is
-# concerned. Measured on 32x32 normalised luma; the rejected overhead trio sat
-# at 0.42-0.57 and everything kept is at or below 0.27.
-DUPLICATE_CORRELATION = 0.35
+# concerned. Measured on 32x32 normalised luma.
+DUPLICATE_CORRELATION = _META["duplicate_correlation_limit"]
 
 # Grade applied to all six, so they sit in one film rather than six.
 # Deliberately gentle: these are photographs of colleagues, not a look.
@@ -103,6 +87,8 @@ def detail_map(img):
     carpet and ceiling are not. Cheap, deterministic, and good enough to keep
     a crop off the empty half of a wide group shot.
     """
+    import numpy as np
+
     g = np.asarray(img.convert("L"), dtype=float)
     # 2-D box variance via separable running sums.
     k = 17
@@ -121,6 +107,8 @@ def detail_map(img):
 
 def best_crop(img):
     """The 16:9 window holding the most detail, at the largest possible size."""
+    import numpy as np
+
     w, h = img.size
     if w / h >= W / H:                      # source is wider: crop left/right
         cw, ch = int(round(h * W / H)), h
@@ -140,6 +128,8 @@ def best_crop(img):
 
 def grade(arr):
     """One common treatment, in float, rounded exactly once by the caller."""
+    import numpy as np
+
     x = arr / 255.0
     x = np.power(x, 1.0 / GAMMA)
     lum = (x * [0.2126, 0.7152, 0.0722]).sum(axis=2, keepdims=True)
@@ -154,6 +144,9 @@ def grade(arr):
 
 
 def build(stem, dest):
+    import numpy as np
+    from PIL import Image
+
     src = SRC_DIR / f"{stem}.jpg"
     if not src.exists():
         return None
@@ -168,6 +161,9 @@ def build(stem, dest):
 
 def signature(path):
     """A 32x32 normalised-luma fingerprint, for telling near-duplicates apart."""
+    import numpy as np
+    from PIL import Image
+
     a = np.asarray(Image.open(path).convert("L").resize((32, 32)), dtype=float)
     return ((a - a.mean()) / (a.std() + 1e-9)).ravel()
 
@@ -178,6 +174,8 @@ def assert_distinct(stems):
     Three frames of one group photo, seconds apart, are three different files
     and one image. Catching that needs a measurement, not a filename check.
     """
+    import numpy as np
+
     sigs = {s: signature(SRC_DIR / f"{s}.jpg") for s in stems
             if (SRC_DIR / f"{s}.jpg").exists()}
     worst = []

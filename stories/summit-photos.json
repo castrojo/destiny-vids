@@ -105,5 +105,15 @@
    "url": "https://live.staticflickr.com/65535/54927620483_bccef149c8_k.jpg",
    "file": "media/summit/group-012.jpg"
   }
- ]
+ ],
+ "assignment_note": "Which photograph fills which slot in the cut. Chosen for MAXIMUM DISTINCTNESS as well as headcount: the first selection took the three biggest crowds (002, 003, 004) and they turned out to be three frames of the same overhead photo seconds apart -- on screen, one image shown three times. 002 is the overhead wide of the whole summit and takes the longest hold; the rest are ground-level crowds from the same minute, so the six still read as one set. Pairwise correlation peaks at 0.27 against the 0.42-0.57 of the rejected trio. Owner-rejected on the wider set: summit-11 (one person), summit-03 (its near-duplicate), summit-15 (blurred audience).",
+ "duplicate_correlation_limit": 0.35,
+ "assignment": {
+  "enemy_cu": "group-002",
+  "act1_black_1": "group-008",
+  "act1_black_3": "group-011",
+  "buildcrafting": "group-010",
+  "raids": "group-012",
+  "act1_black_2": "group-005"
+ }
 }

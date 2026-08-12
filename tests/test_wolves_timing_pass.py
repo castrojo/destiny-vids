@@ -397,7 +397,12 @@ def test_no_two_summit_slots_show_the_same_picture():
     times. A filename check cannot catch that, so the plate builder measures
     it, and this pins that the measurement is actually wired up and that the
     shipped selection passes it.
+
+    Needs the frame-touching extras and the photographs, so it skips where
+    neither is present -- the suite is offline by design (`AGENTS.md`).
     """
+    pytest.importorskip("numpy")
+    pytest.importorskip("PIL")
     from scripts.build_summit_plates import (
         ASSIGNMENT, DUPLICATE_CORRELATION, SRC_DIR, assert_distinct, signature)
 
@@ -414,16 +419,25 @@ def test_no_two_summit_slots_show_the_same_picture():
 
 
 def test_every_summit_slot_the_builder_asks_for_has_a_plate():
-    """The cut's slots and the plate builder's slots are the same set.
+    """The cut's slots and the plate manifest's slots are the same set.
 
     They are declared in two files, so they can drift: a slot renamed in
     build_wolves.py would silently fall back to a marker card, which is a black
     frame with production text on it.
+
+    Read from the committed manifest rather than from the plate builder, so
+    this runs on a bare CI box: the assignment is an authored input, and the
+    builder needs numpy and Pillow that the offline suite does not install.
     """
-    from scripts.build_summit_plates import ASSIGNMENT
     from scripts.build_wolves import ACT1_EDITS, TRAILER_CARDS
 
+    meta = json.loads((REPO / "stories" / "summit-photos.json").read_text())
     wanted = {kind for _, _, kind, _ in ACT1_EDITS if kind != "cut"}
     wanted |= {slot for _, _, _, slot in TRAILER_CARDS}
     wanted.add("enemy_cu")
-    assert wanted == set(ASSIGNMENT)
+    assert wanted == set(meta["assignment"])
+
+    # Every slot names a photograph the manifest actually knows how to fetch.
+    known = {p["file"].rsplit("/", 1)[-1].removesuffix(".jpg")
+             for p in meta["photos"]}
+    assert set(meta["assignment"].values()) <= known
