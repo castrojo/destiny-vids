@@ -1,6 +1,6 @@
 ---
 name: scoring
-version: "1.2"
+version: "1.3"
 last_updated: "2026-08-12"
 id: scoring
 one_line_purpose: Measure a music bed, cut sections out of it, and cut to its bars.
@@ -10,7 +10,7 @@ mcp_compliance_level: partial
 optimization_status: draft
 status: active
 dependencies: [editing]
-tags: [music, bed, tempo, downbeat, excision, anchor, ffmpeg, true-peak, section-detection, two-clocks, bed-pause, diegetic-insert]
+tags: [music, bed, tempo, downbeat, excision, anchor, ffmpeg, true-peak, section-detection, two-clocks, bed-pause, diegetic-insert, insert-headroom, source-gain]
 description: >-
   Covers bed records, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a master over 0 dBTP.
   Use when scoring a cut, pausing the song for a moment of source audio, or supporting a second recording.
@@ -325,6 +325,48 @@ found. A pause under ~3 s rarely reads as deliberate at all.
 If a note says the moment is *in the right place* but wrong somehow, change the
 **length**, not the position. Those are separate faults and the in-point is
 usually the part that was already right.
+
+### ...and it brings its own peaks
+
+An insert is somebody else's mix. Its peaks are not yours to have planned for,
+and they are measured on a region far too short to move the film's integrated
+loudness — so a cut whose bed sits comfortably under the headroom gate can be
+pushed over it by one explosion, and the *whole-file* number is the only place
+you will see it.
+
+Measured on an 8.7 s insert in a 432 s film:
+
+```text
+whole file          -1.6 -> -0.4 dBTP   over the -1.0 gate
+  bed region        -3.2 dBTP           fine, and unchanged
+  insert region     -0.4 dBTP           the culprit, 8.7s of 432
+```
+
+**Measure per region, not just per file.** The fix is the same static gain the
+bed already gets, applied to the insert regions only — `tools/audiomix.py
+--source-gain-db`, the mirror of `--bed-gain-db`. Pulling the *whole* film down
+would work too and is worse: it quietly re-levels music whose gain was already
+decided and documented.
+
+Do not reach for a limiter here. The insert's dynamics are the reason it is in
+the film.
+
+### And check the insert is actually audible
+
+A source-audio region is the one part of a cut where a silent input fails
+**silently**: the bed is muted there by design, so a missing audio track sounds
+exactly like a working pause until somebody plays it. It happened here —
+`yt-dlp -f 401` is video-only, so the insert rendered as digital silence and
+every anchor, duration and sync check still passed.
+
+```python
+# the pause must be LOUD, not just present
+rms = 20*log10(rms(pcm(out, pause_in, pause_len)))   # -240 dB is the bug
+```
+
+Assert a floor on the region's RMS, and assert its correlation against the bed
+is ~0. The first catches a silent insert; the second catches the bed leaking
+into a region that was supposed to be a pause. Neither is implied by the other.
 
 ## Common Rationalizations
 

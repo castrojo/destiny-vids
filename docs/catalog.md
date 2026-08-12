@@ -25,11 +25,12 @@ It is a **musical**: one song end to end, in three acts, cut to Nightwish's
 *7 Days to the Wolves*. The song is the structure — the acts hinge on measured
 moments in the bed (the gallop, the flute entry), not on chapter boundaries.
 
-A **timing pass** is rendered and staged for review:
+An **editorial pass** is rendered and staged for review:
 [`cuts/07-seven-days-to-the-wolves.md`](cuts/07-seven-days-to-the-wolves.md).
-It is deliberately not a finished cut — spans destined for removal or artwork
-are blacked out with marker cards at their exact duration, so the timing can be
-judged against the music before anything is actually removed.
+The timing pass before it blacked out every doomed span at its exact duration
+so the timing could be judged against the music; the owner's notes on that pass
+have now been carried out, and every marker card is filled with picture. It is
+still not a finished cut — it carries no nameplates and no credits sequence.
 
 ### What this replaced, and what is now unplaced
 
@@ -50,7 +51,7 @@ longer have a slot inside the feature file. The likely answer is promotional
 release alongside the hero videos, but that is a decision, not a default.
 
 **The credits sequence is still undesigned** — [issue #51]. A musical still has
-to credit its cast, and the timing pass carries no plates yet — though the
+to credit its cast, and the editorial pass carries no plates yet — though the
 Guardians-together runs it is built around are flagged `plate_slot` for that
 pass.
 
@@ -101,7 +102,7 @@ Staged in `~/Videos/UPLOAD/` today, classified under this taxonomy:
 | `04-bluefin-contributors-…-curse-of-osiris` | neither — a monthly contributors reel |
 | `05-destiny-prologue-the-dance` | neither — single-cinematic story cut |
 | `06-destiny-cayde-6-the-return` | **mis-shaped**: named for a person, cut from one trailer |
-| `07-seven-days-to-the-wolves` | **the feature** — timing pass, not yet approved; delivery blocked on provenance ([issue #55]) |
+| `07-seven-days-to-the-wolves` | **the feature** — editorial pass, not yet approved; delivery blocked on provenance ([issue #55]) |
 
 `07-` is the feature and stands alone: it is one song end to end, so nothing is
 assembled around it. The two unplaced files above are finished work waiting on a

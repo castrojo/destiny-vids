@@ -204,3 +204,44 @@ def test_the_real_grid_stays_in_phase_across_the_real_splice():
     gaps = [b - a for a, b in zip(bars, bars[1:])]
     median = sorted(gaps)[len(gaps) // 2]
     assert max(abs(g - median) for g in gaps) < 0.12, "a splice re-phased the grid"
+
+
+# --- a diegetic insert's own peaks -------------------------------------------
+
+def test_source_gain_attenuates_only_the_insert_regions():
+    """An insert is somebody else's mix, and it brings its own peaks.
+
+    Measured on this cut: the bed region sat at -3.2 dBTP and the whole file at
+    -0.4, over the -1.0 headroom gate -- 8.7 s of insert in 432 s of film. The
+    fix is the same static gain the bed already gets, applied to the insert
+    only. Pulling the whole film down would also work and is worse: it quietly
+    re-levels music whose gain was already decided and documented.
+    """
+    from tools.audiomix import build_filter
+
+    regions = [
+        {"kind": "bed", "wall_start": 0.0, "wall_end": 10.0,
+         "bed_start": 0.0, "bed_end": 10.0},
+        {"kind": "source", "wall_start": 10.0, "wall_end": 12.0},
+        {"kind": "bed", "wall_start": 12.0, "wall_end": 20.0,
+         "bed_start": 10.0, "bed_end": 18.0},
+    ]
+    graph = build_filter(regions, bed_gain_db=-3.5, source_gain_db=-1.5)
+
+    assert "volume=-1.5dB" in graph, "the insert is not attenuated"
+    assert graph.count("volume=-1.5dB") == 1, "applied once, not per region"
+    # It rides on the source input, never on a bed piece.
+    source_chain = next(p for p in graph.split(";") if p.startswith("[0:a]"))
+    assert "volume=-1.5dB" in source_chain
+    for piece in graph.split(";"):
+        if piece.startswith("[1:a]"):
+            assert "volume=-3.5dB" in piece and "-1.5dB" not in piece
+
+
+def test_source_gain_defaults_to_no_change():
+    """Silence is not a level decision. A cut that never asked for one gets
+    its source audio exactly as rendered."""
+    from tools.audiomix import build_filter
+
+    regions = [{"kind": "source", "wall_start": 0.0, "wall_end": 5.0}]
+    assert "volume=" not in build_filter(regions).replace("volume=0:", "")

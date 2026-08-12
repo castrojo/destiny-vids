@@ -27,6 +27,13 @@ LEADS = load_leads()
 # request cannot be dropped in a vocab edit without this file going red.
 REQUESTED = ["wrkode", "abangser", "robertsirc"]
 
+# Everybody in the queue, in file order. #14 is not the only source of pending
+# cast any more: the editorial pass on Seven Days to the Wolves added `inffy`,
+# whom the owner cast onto the Hunter run in the Final Shape Gameplay Trailer
+# and for whom no Guardian identity is authored anywhere. Pinned separately
+# from REQUESTED so the #14 assertions below stay about #14.
+PENDING_LOGINS = ["inffy"] + REQUESTED
+
 # The video the request is about. Ingesting it is a licensing decision about a
 # possibly-non-Bungie source, which is the owner's call — so the index must
 # NOT contain it until the owner says so.
@@ -56,7 +63,18 @@ def _seg(**overrides):
 
 def test_requested_people_are_recorded():
     """A request that is not written down is a request that gets dropped."""
-    assert list(PENDING) == REQUESTED
+    assert list(PENDING) == PENDING_LOGINS
+
+
+@pytest.mark.parametrize("person", PENDING_LOGINS)
+def test_every_pending_entry_is_recorded_as_blocked(person):
+    """Whatever put someone in the queue, the queue's shape is the same: the
+    requester's own words, and a reason an agent may not settle it alone."""
+    entry = PENDING[person]
+    assert entry["github"] == person
+    assert entry["automatable"] is False
+    assert entry["blocked_on"].strip()
+    assert entry["described_as"], "the requester's own words, never a character name"
 
 
 @pytest.mark.parametrize("person", REQUESTED)
@@ -64,15 +82,25 @@ def test_requested_cast_is_recorded_as_blocked(person):
     """Recorded as BLOCKED, in the requester's own words — a binding written
     down instead would credit someone for a shot nobody has seen."""
     entry = PENDING[person]
-    assert entry["github"] == person
-    assert entry["automatable"] is False
-    assert entry["blocked_on"].strip()
-    assert entry["described_as"], "the requester's own words, never a character name"
     assert entry["requested_in"] == (
         "https://github.com/castrojo/destiny-vids/issues/14")
 
 
-@pytest.mark.parametrize("person", REQUESTED)
+def test_inffy_is_pending_because_no_identity_is_authored():
+    """The owner cast the Hunter run onto this account, OVERRIDING their own
+    proxy filename, which said "Laura". Both halves matter: the override is
+    recorded so nobody credits Laura Santamaria for a shot the owner moved off
+    her, and the entry stays *pending* because no Guardian identity is authored
+    for inffy in the reference deck or the website's characters.json — so no
+    plate copy may be written here."""
+    entry = PENDING["inffy"]
+    assert entry["display_name"] is None, "nobody has authored one"
+    assert not PLATE_FIELDS & set(entry)
+    assert "UchfadQhX7w" in entry["source_video"]
+    assert "inffy" not in LEADS
+
+
+@pytest.mark.parametrize("person", PENDING_LOGINS)
 def test_a_pending_entry_is_not_a_binding(person):
     """`leads.pending` is a queue. Until an entry is promoted into
     `leads.values` it must cast nobody: no character, no plate, no retrieval."""
@@ -115,6 +143,7 @@ def test_pending_entries_are_not_search_phrases():
                 for facet, values in phrase if facet in cast_facets
                 for v in values}
     assert not (set(REQUESTED) & targeted)
+    assert "inffy" not in targeted
     assert "william_rizzo" not in targeted
 
 

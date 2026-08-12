@@ -79,11 +79,19 @@ def total_wall(regions):
     return regions[-1]["wall_end"] if regions else 0.0
 
 
-def build_filter(regions, bed_gain_db=0.0):
+def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0):
     """The filtergraph: bed pieces delayed into place, source muted under them.
 
     Input 0 is the rendered picture (carrying its own source audio); input 1 is
     the bed.
+
+    ``source_gain_db`` is the mirror of ``bed_gain_db`` and exists for the same
+    reason. A diegetic insert brings its OWN peaks, and they are nobody's
+    mastering decision -- so a cut whose bed is comfortably under the headroom
+    gate can still be pushed over it by one loud explosion. Attenuating the
+    source region is a static gain applied once, exactly like the bed's: it
+    changes no dynamics, and it is preferable to a limiter, to `loudnorm`, or
+    to pulling the whole film down and quietly re-levelling the music.
     """
     parts = []
     labels = []
@@ -103,7 +111,10 @@ def build_filter(regions, bed_gain_db=0.0):
     mute = "+".join(
         f"between(t,{r['wall_start']:.6f},{r['wall_end']:.6f})"
         for r in regions if r["kind"] == "bed")
-    src = "[0:a]volume=0:enable='" + (mute or "0") + "'[src]"
+    src = "[0:a]"
+    if source_gain_db:
+        src += f"volume={source_gain_db}dB,"
+    src += "volume=0:enable='" + (mute or "0") + "'[src]"
     parts.append(src)
 
     inputs = "".join(f"[{l}]" for l in labels) + "[src]"
@@ -112,7 +123,8 @@ def build_filter(regions, bed_gain_db=0.0):
     return ";".join(parts)
 
 
-def mux(video, bed, regions, out, bed_gain_db=0.0, ffmpeg=None, bitrate="320k"):
+def mux(video, bed, regions, out, bed_gain_db=0.0, ffmpeg=None, bitrate="320k",
+        source_gain_db=0.0):
     """Mux the composed audio onto ``video``, stream-copying the picture."""
     if ffmpeg is None:
         from tools.render import find_ffmpeg
@@ -120,7 +132,7 @@ def mux(video, bed, regions, out, bed_gain_db=0.0, ffmpeg=None, bitrate="320k"):
         ffmpeg = find_ffmpeg()
     cmd = list(ffmpeg) + [
         "-v", "error", "-y", "-i", str(video), "-i", str(bed),
-        "-filter_complex", build_filter(regions, bed_gain_db),
+        "-filter_complex", build_filter(regions, bed_gain_db, source_gain_db),
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", bitrate, "-ar", "48000",
         str(out),
@@ -140,6 +152,9 @@ def main(argv=None):
     ap.add_argument("--out", required=True)
     ap.add_argument("--bed-offset", type=float, default=0.0)
     ap.add_argument("--bed-gain-db", type=float, default=0.0)
+    ap.add_argument("--source-gain-db", type=float, default=0.0,
+                    help="static gain on the diegetic-insert regions, "
+                         "so their own peaks cannot breach the headroom gate")
     args = ap.parse_args(argv)
 
     doc = json.loads(Path(args.shotlist).read_text())
@@ -151,7 +166,8 @@ def main(argv=None):
                  if r["kind"] == "bed" else "")
         print(f"  {r['kind']:6s} wall {span}{extra}")
     print(f"  bed used {total_bed(regions):.3f}s over {total_wall(regions):.3f}s of film")
-    mux(args.video, args.bed, regions, args.out, args.bed_gain_db)
+    mux(args.video, args.bed, regions, args.out, args.bed_gain_db,
+        source_gain_db=args.source_gain_db)
     print(f"wrote {args.out}")
     return 0
 
