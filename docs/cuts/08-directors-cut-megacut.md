@@ -3,14 +3,25 @@
 The finished Wolves cuts assembled into **one continuous programme**, with the
 reference deck's title cards between them.
 
-**Status: built, verified, not delivered.** It lives in `renders/` only. Nothing
-goes to `~/Videos/UPLOAD/` for the Wolves feature — provenance there is an
-unresolved owner decision, and this cut does not change that.
+**Status: built, verified, and delivered.** Staged 2026-08-12 at the owner's
+request as `~/Videos/UPLOAD/08-seven-days-to-the-wolves-directors-cut.mp4`
+(md5 `1dfa3a0209ab8b89e4cf1fe2a568900b`, in that folder's `CHECKSUMS.md5`).
 
 ```
 renders/07-seven-days-to-the-wolves-directors-cut-megacut.mp4
-301.05s · 1920x1080 · H.264 High · yuv420p · BT.709 SDR · 59.94 fps · 48 kHz 5.1 · 225 MB
+301.05s · 1920x1080 · H.264 High · yuv420p · BT.709 SDR · 59.94 fps · 48 kHz 5.1 · 224 MB
 ```
+
+The staged copy is **regenerated, not edited**: fix the plan or an upstream cut
+and re-run `tools/megacut.py`, then re-stage. It is deliberately **not** in
+`yt-refresh.py`'s `VIDEOS` list, so it publishes nothing until the owner adds
+it — the same treatment `04-` gets, and for the same reason: its title,
+description, and one real ordering question are the owner's call.
+
+> **It overlaps three cuts already staged.** `08-` contains Kat, Natali and
+> Europa, which are also standalone files (`01-`, `02-`, `zz-`), so a playlist
+> in `ls` order shows all three twice. Ship the programme *or* the singles, not
+> both. Recorded in `~/Videos/UPLOAD/README.md`.
 
 ## Where the running order comes from
 
@@ -169,6 +180,9 @@ Rebuild with the full manifest.
   No peak moved (below), but the lossless-master path in `~/Videos/AUDIO.md` is
   the upgrade if a delivered master is ever wanted.
 - **Cortney Nickerson stays unplated and uncarded** — unresolved identity.
+- **Playlist placement.** `08-` duplicates `01-`, `02-` and `zz-` (above). Ship
+  the programme or the singles, and add `08-` to `yt-refresh.py`'s `VIDEOS` with
+  a title and description when that is decided.
 
 ## Verification
 
