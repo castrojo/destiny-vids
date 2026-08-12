@@ -101,7 +101,7 @@ Staged in `~/Videos/UPLOAD/` today, classified under this taxonomy:
 | `04-bluefin-contributors-…-curse-of-osiris` | neither — a monthly contributors reel |
 | `05-destiny-prologue-the-dance` | neither — single-cinematic story cut |
 | `06-destiny-cayde-6-the-return` | **mis-shaped**: named for a person, cut from one trailer |
-| `07-seven-days-to-the-wolves` | **the feature** — timing pass, not yet approved; delivery blocked on provenance ([issue #60]) |
+| `07-seven-days-to-the-wolves` | **the feature** — timing pass, not yet approved; delivery blocked on provenance ([issue #55]) |
 
 `07-` is the feature and stands alone: it is one song end to end, so nothing is
 assembled around it. The two unplaced files above are finished work waiting on a
@@ -118,5 +118,5 @@ cinematic, uncut and re-credited each month. It is neither part of the feature
 nor a hero video, and it is regenerated per roster rather than authored.
 
 [issue #49]: https://github.com/castrojo/destiny-vids/issues/49
-[issue #60]: https://github.com/castrojo/destiny-vids/issues/60
+[issue #55]: https://github.com/castrojo/destiny-vids/issues/55
 [issue #51]: https://github.com/castrojo/destiny-vids/issues/51
