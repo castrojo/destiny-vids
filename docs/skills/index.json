@@ -106,6 +106,25 @@
       "doc_type": "procedure"
     },
     {
+      "id": "megacut",
+      "name": "megacut",
+      "one_line_purpose": "Join finished cuts into one programme with deck-format chapter cards.",
+      "entry_point": "docs/skills/megacut.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "assembly",
+        "concat",
+        "chapter-cards",
+        "ffmpeg",
+        "programme"
+      ],
+      "description": "Assembles already-finished cuts and owner-approved deliverables into one continuous programme, separated by the reference deck's title cards, in a single ffmpeg pass. Use when several cuts must play as one video.",
+      "version": "1.0",
+      "last_updated": "2026-08-12",
+      "doc_type": "procedure"
+    },
+    {
       "id": "plates",
       "name": "plates",
       "one_line_purpose": "Put Guardian nameplates and title cards on a rendered cut.",
