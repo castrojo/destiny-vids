@@ -91,11 +91,33 @@ genuinely authored in the reference deck (castrojo's is `np_jorge`). Most
 contributors have no entry: an unknown seal is `Bluefin Blueberry`, never an
 invented title. [`plates.md`](plates.md) covers how the two are scheduled.
 
+### Authored identities are reproduced, not written
+
+Ten people have a Guardian identity somebody actually authored, in files this
+repo does not own — `~/Videos/nameplates.json` and, for seven of them,
+`~/src/website public/wolves/characters/characters.json`. The roster and the
+precedence between those sources are in
+[`plates.md`](plates.md#where-the-copy-is-authored). Two consequences here:
+
+- **Copying an authored identity onto an existing binding is reproduction**, and
+  is allowed without asking — verbatim, with the source cited in a comment, as
+  `elsie_bray` (Laura Santamaria) and `saint_14` (Kat Cosgrove) do.
+- **Binding a new person is still a casting decision**, and stays the owner's.
+  An authored plate says who somebody *is*; it does not say which Destiny
+  character they play. Kaslin Fields, Christoph Blecker, Natali Vlatko and
+  Doctor Andy Anderson have authored identities and no binding here, and that
+  is a question for an issue, not an edit.
+
+An authored identity also does not travel between tiers on its own: a person
+cast as a **lead** is excluded from the ensemble pool entirely, so their copy
+belongs on the lead binding and nowhere else.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
 |---|---|
 | "It's probably them — same armor, two shots earlier." | A wrong tag credits a real person for a shot they are not in. Omit rather than guess. |
+| "Their Guardian identity is authored, so they're basically cast." | Two different claims. Reproduce the identity; leave the binding to the owner. |
 | "I'll tag `casting` directly, it's faster." | It is derived. A hand-set value is overwritten and hides the vocab bug that made you reach for it. |
 | "The search phrase can come later." | A binding nobody can query does not exist, and the suite fails on it. |
 | "Re-rolling the roster is fine, it's only credits." | Assignment is deterministic on purpose: a re-render must not re-credit a different person. |

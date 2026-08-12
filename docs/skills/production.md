@@ -101,6 +101,55 @@ edit by hand.
 
 A video that refuses here does not need the gate relaxed. It needs cutting.
 
+## Delivering a finished cut
+
+A render in `renders/` is not a deliverable. The delivery workspace is
+**`~/Videos`** — not a git repo, and the owner's, not this repo's. Read
+`~/Videos/README.md` first; the short version:
+
+| Step | Where |
+|---|---|
+| Stage the approved file | `~/Videos/UPLOAD/`, numbered in playlist order |
+| Record what it is | `~/Videos/UPLOAD/README.md` + the cut's `STORYBOARD.md` |
+| Publish | `python3 ~/Videos/yt-refresh.py` — one unlisted playlist |
+
+Three rules there that this repo has to respect:
+
+- **A regenerated file is not hand-edited.** `UPLOAD/README.md` names
+  `renders/<video_id>-credited.mp4` as the master for the contributors piece and
+  says so explicitly: it is rebuilt from checked-in data by
+  `scripts/build_uncut_credited.sh`, so **a new month is a new render, not a new
+  edit**. Fix the tag, the vocab or the redaction and re-run.
+- **Share the playlist, never a video URL.** YouTube cannot replace a video
+  file — a re-upload always gets a new ID — so a playlist link is the only
+  stable handle. `yt-refresh.py` hashes each file and uploads only what changed.
+  An upload costs ~1600 of the default 10,000 daily quota units (about six a
+  day); `403 quotaExceeded` means wait for the midnight Pacific reset.
+- **Titling is the owner's call.** The contributors piece is staged but
+  deliberately not in `yt-refresh.py`'s manifest, because adding it means
+  choosing its title and description. That is the same class of stop as a
+  casting decision: stage it, say so, stop.
+
+Delivery is also where the audio rules bite, and they are not this repo's:
+load **`audio-quality-tenet`** before touching a deliverable's audio. What has
+already been learned the hard way and must not be re-learned:
+
+- The bed's gain is **derived from its measured true peak**, never hardcoded and
+  never normalised. `tools/redact.py`'s `gain_for_headroom` exists because a
+  hardcoded `0.9` shipped a **+0.5 dBTP** clipping master.
+- The contributors piece is **stereo AAC on purpose** (its bed is a lossy MP3
+  source); the Guardian intros are 5.1 from lossless sources. Do not "fix" one
+  into the other.
+- Prove it, don't assert it: `framemd5` proves an audio change touched no
+  frames, an audio-stream MD5 proves a picture change touched no audio,
+  `-xerror` proves the file is not truncated, `volumedetect` proves it is not
+  clipping.
+
+**Hazard: `~/Videos` is a Syncthing folder.** A remote deletion can remove a
+directory while you are working in it — it has already destroyed a live
+`render/` mid-session. It is a move to Trash, so check
+`~/.local/share/Trash/info` before rebuilding anything.
+
 ## Where it stops, and why that is the design
 
 **Stage 5 stops and asks a person to look at frames.** That is not a missing
@@ -193,6 +242,8 @@ grind them.
 | Rationalization | Reality |
 |---|---|
 | "I'll tag the obvious ones and leave the rest." | An untagged beat derives `clean = false`. Half a tag file marks half the video uncuttable. |
+| "The delivered file needs one small fix, I'll edit it in place." | It is regenerated from checked-in data. A hand-edit is lost on the next month's render and nobody can tell it happened. |
+| "I'll upload it and share the video link." | YouTube cannot replace a file. Share the playlist; `yt-refresh.py` swaps the contents. |
 | "The gameplay trailer has almost nothing clean, the tagging must be wrong." | Gameplay trailers have HUD in the footage. That is what the tier is for. |
 | "I'll re-run detection, it's cheap." | Beat index is positional. New detection invalidates the tag file. |
 | "I'll bump `vocab/casting.yaml` while I'm here." | It names real people and every video reads it. Its own PR. |
@@ -205,6 +256,10 @@ grind them.
 - A video whose segments are 0 clean → `overlays` was skipped wholesale.
 - Two agents on one `video_id`.
 - Anything under `media/`, `keyframes/` or `renders/` appearing in `git status`.
+- A hand-edited file in `~/Videos/UPLOAD/`, or one staged there without a line
+  in its `README.md` saying which master it came from.
+- Any write to `~/src/website`. It is read-only from here — several agents run
+  worktrees against it — and it is where the authored plate copy lives.
 
 ## Verification
 

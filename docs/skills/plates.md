@@ -50,7 +50,8 @@ The deck's other shapes are the title card (`title`, `subtitle`, `body[]`) and
 the **chat card** (`speaker`, `text`) — see "Showing a conversation" below.
 
 That is the whole vocabulary, taken from the reference deck
-(`~/Videos/nameplates.json`). **Do not add a line the deck has no field for.**
+(`~/Videos/nameplates.json` — see "Where the copy is authored" below).
+**Do not add a line the deck has no field for.**
 An invented row — an `AS <CHARACTER>` casting line, a role, a pronoun — puts
 unauthored text on a card whose entire purpose is naming real people, and a
 test pins the vocabulary so it cannot drift by accident. If a plate genuinely
@@ -68,6 +69,68 @@ The deck's `gp_*` entries add three **placement** fields, which are deck data,
 not new copy: `position: "group"` with an absolute `x` (measured against the
 picture, never the raw frame), a `scale` factor that shrinks the card, and a
 `group` key marking which row a card belongs to.
+
+## Where the copy is authored
+
+"The deck" is shorthand for **four** files outside this repo, and knowing which
+one to read is the difference between reproducing a credit and inventing one.
+None of them is editable from here — this repo *reproduces* them:
+
+| Source | What it is authoritative for |
+|---|---|
+| `~/Videos/nameplates.json` | The **field set**, the chrome flags, and the KubeCon interview's own plate timings. The worked example of every shape. |
+| `~/src/website/public/wolves/characters/characters.json` | The **authored Guardian identities** — `label`, `class`, `name`, `title` per person. The broadest roster: seven people. |
+| `~/src/website` `src/data/wolves-intro-sequence.ts` | The same identities as they appear in the Wolves intro, and the second corroboration when one disagrees. |
+| `~/Videos/wolves-{kat,natali}/render/reveal.html` | The **baked** treatment the finished cuts actually shipped. Where it disagrees with the live site CSS, it wins — see "Styling provenance". |
+
+**Never touch `~/src/website`.** Several agents run worktrees against it; read
+it, quote it, and cite the file you read.
+
+The seven authored identities, verbatim:
+
+| Person | Label | Class | Title |
+|---|---|---|---|
+| Bob Killen | `TRUSTEE // GUARDIAN` | Voidwalker Warlock | Reconciler of the Plane |
+| Kat Cosgrove | `MAINTAINER // GUARDIAN` | Sentinel Titan | Defender Queen of the Lost |
+| Kaslin Fields | `MAINTAINER // GUARDIAN` | Stormcaller Warlock | Rage of the Paradox |
+| Laura Santamaria | `MAINTAINER // GUARDIAN` | Gunslinger Hunter | The Order of Seven |
+| Christoph Blecker | `TRUSTEE // GUARDIAN` | Broodweaver Warlock | First Among Equals — The North Star |
+| Natali Vlatko | `MAINTAINER // GUARDIAN` | Behemoth Titan | Shipwright of Kubernetes |
+| Doctor Andy Anderson | `MAINTAINER // GUARDIAN` | Shadebinder Warlock | Foundry of the Forbidden |
+
+Plus, from `nameplates.json` only: **Jorge Castro** (Harbinger Titan, *Upender
+of Antipatterns | The First Disciple*), **Jeffrey Sica** (Stormbreaker Titan,
+*Forgemaster of the Seven*) and **Amber Graner** (Striker Titan, *The Iron
+Standard*).
+
+Two things follow, and they are the reason this section exists:
+
+- **An identity that is authored must be reproduced, never paraphrased and
+  never replaced by the generic fallback.** A person with an entry above is not
+  a Bluefin Blueberry, wherever their credit lands.
+- **An identity that is not authored is not yours to write.** `np_amber`'s own
+  note records the correct shape of that gap: the deck carried
+  `Subclass [ REDACTED ]` until the *owner* supplied Amber's class. That is
+  exactly the state issue #5 is in for Karena Angell's subclass — the row ships
+  short until the owner has the word.
+
+### Known divergences
+
+Recorded, not resolved. Each one is somebody's call, not an agent's:
+
+- **Jeffrey Sica's title.** The deck says *Forgemaster of the Seven*; issue #1's
+  owner-authored brief copy says *Forgemaster of Kubernetes*. A brief is the
+  owner speaking, so `plan` will use it — but the two records disagree and one
+  of them wants editing. See #17.
+- **A portrait row.** `reveal.html` takes a `pfp` (a real photograph; it hides
+  the hex crest when one is set) and the Kat and Natali cuts both ship one.
+  `nameplates.json` has no such field and `tools/plate.py` does not implement
+  one. That is a missing *feature*, not a missing string: do not approximate it
+  with an invented row.
+- **Five of the seven are not bound here.** Kat and Laura are cast as leads with
+  no `plate:` block; Kaslin, Christoph, Natali and Andy have no binding at all.
+  Adding a binding is a casting decision ([`casting.md`](casting.md)); copying
+  authored copy onto an existing binding is reproduction and is allowed.
 
 ## Core Process
 
@@ -369,6 +432,9 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 - A plate rendered in Adwaita Mono (or anything but DejaVu Sans Mono) — it is
   not in the font stack and matches none of the other videos.
 - Styling taken from the live site where the baked reveal disagrees.
+- Falling back to `Bluefin Blueberry` for one of the seven people whose
+  Guardian identity **is** authored (see "Where the copy is authored"). An
+  unknown seal is a blueberry; a known one is a paraphrase.
 - A plate positioned against the frame on a letterboxed source, so it sits on
   the black bar instead of the picture.
 
@@ -376,6 +442,23 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 
 ```bash
 python3 -m pytest -q tests/test_plate.py     # includes the closed-vocabulary test
+python3 -m pytest -q tests/test_derive.py    # pins every authored plate verbatim
+
+# diff a binding against the file that authored it (read-only)
+python3 - <<'PY'
+import json
+from tools.derive import load_leads
+authored = {c["name"]: c for c in json.load(open(
+    "/var/home/jorge/src/website/public/wolves/characters/characters.json"
+))["characters"]}
+for key, b in load_leads().items():
+    p = b.get("plate") or {}
+    src = authored.get(p.get("name"))
+    if src:
+        rows = ("label", "class", "name", "title")
+        same = all(p.get(r) == src.get(r) for r in rows)
+        print(f"{key:12} {'ok' if same else 'DRIFTED'}")
+PY
 
 # eyeball a plate inside its window
 ffmpeg -ss <at+1> -i renders/cut-plated.mp4 -frames:v 1 /tmp/plate.jpg

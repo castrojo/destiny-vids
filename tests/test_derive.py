@@ -229,6 +229,52 @@ def test_cast_bindings(character, person):
     assert compute_casting(seg, LEADS)["person"] == person
 
 
+# Every plate block on a binding is REPRODUCED from a file this repo does not
+# own -- ~/Videos/nameplates.json, or ~/src/website's
+# public/wolves/characters/characters.json (see
+# docs/skills/plates.md#where-the-copy-is-authored). Neither is available to an
+# offline suite, so the authored values are pinned here instead: a change to a
+# real person's credit then has to be a deliberate edit in two places, and can
+# be diffed against the source by hand.
+AUTHORED_PLATES = {
+    # nameplates.json np_jorge
+    "cayde_6": ("TRUSTEE // GUARDIAN", "Harbinger Titan", "Jorge Castro",
+                "Upender of Antipatterns | The First Disciple"),
+    # nameplates.json np_bob, and characters.json slug `bob`
+    "osiris": ("TRUSTEE // GUARDIAN", "Voidwalker Warlock", "Bob Killen",
+               "Reconciler of the Plane"),
+    # characters.json slug `laura`
+    "elsie_bray": ("MAINTAINER // GUARDIAN", "Gunslinger Hunter",
+                   "Laura Santamaria", "The Order of Seven"),
+    # characters.json slug `kat`, corroborated by wolves-intro-sequence.ts
+    "saint_14": ("MAINTAINER // GUARDIAN", "Sentinel Titan", "Kat Cosgrove",
+                 "Defender Queen of the Lost"),
+}
+
+
+@pytest.mark.parametrize("character,authored", sorted(AUTHORED_PLATES.items()))
+def test_authored_plate_copy_is_reproduced_verbatim(character, authored):
+    """A paraphrase of an authored identity is as wrong as an invented one."""
+    plate = LEADS[character]["plate"]
+    assert (plate["label"], plate["class"], plate["name"],
+            plate["title"]) == authored
+
+
+def test_no_binding_invents_plate_copy():
+    """Any plate block on a binding must be somebody's authored identity. A new
+    one appearing here is copy written in this repo, which is the one thing
+    vocab/casting.yaml must never do -- add it to AUTHORED_PLATES with its
+    source only after checking the source.
+
+    `sagira` is the deliberate exception and carries its own comment in the
+    vocab: nobody has authored a seal for Lindsay, so her title is the
+    project's standing answer for an unknown one, exactly as an ensemble
+    slot's is. That is a documented fallback, not an authored identity.
+    """
+    with_plates = {k for k, v in LEADS.items() if v.get("plate")}
+    assert with_plates - {"sagira"} == set(AUTHORED_PLATES)
+
+
 def test_lead_written_but_uncast_has_null_person():
     """An uncast lead still identifies the character; the tile just has no name."""
     seg = _seg(character=[{"name": "Ikora Rey", "kind": "guardian_npc"}])

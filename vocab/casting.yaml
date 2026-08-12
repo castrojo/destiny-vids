@@ -58,6 +58,18 @@ leads:
       person: laura_santamaria
       display_name: Laura Santamaria
       aka: [elsie_gray, the_exo_stranger, exo_stranger]
+      # Laura's Guardian identity is AUTHORED, not written here: every field is
+      # verbatim from ~/src/website public/wolves/characters/characters.json
+      # (slug `laura`), the same roster that authors Bob's plate below. It is
+      # reproduced rather than referenced because a credit that knows an
+      # authored identity must not fall back to the generic copy -- and it is
+      # copied verbatim rather than paraphrased, because paraphrasing a real
+      # person's credit is the same fault as inventing one.
+      plate:
+        label: MAINTAINER // GUARDIAN
+        class: Gunslinger Hunter
+        name: Laura Santamaria
+        title: The Order of Seven
     anna_bray:
       # Elsie's sister — the Bray line is the project's through-thread, so both
       # sisters are cast.
@@ -142,6 +154,18 @@ leads:
       note: >
         Kat from now on, but she remains the bubble in the original Wolves.
       aka: [saint, saint14]
+      # AUTHORED identity, reproduced verbatim -- and authored twice over, which
+      # is why it is safe to reproduce without asking: characters.json (slug
+      # `kat`) and src/data/wolves-intro-sequence.ts in ~/src/website agree
+      # field for field, and the shipped cut
+      # ~/Videos/UPLOAD/01-wolves-kat-cosgrove-sentinel-titan.mp4 renders it.
+      # `display_name` above stays "Kat" (how the index refers to her); the
+      # plate carries her full authored name, as the deck does everywhere.
+      plate:
+        label: MAINTAINER // GUARDIAN
+        class: Sentinel Titan
+        name: Kat Cosgrove
+        title: Defender Queen of the Lost
     mara_sov:
       person: karena_angel
       display_name: Karena Angel

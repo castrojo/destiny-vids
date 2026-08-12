@@ -216,6 +216,13 @@ character→person binding is what stops the credit and the casting from driftin
 apart — recast a role and the plate follows, with no other edit. Derivation
 never reads it; `tools/plate.py` does.
 
+Four bindings carry one today — `cayde_6`, `osiris`, `elsie_bray` and
+`saint_14` — and every field of all four is **reproduced verbatim** from a file
+this repo does not own (`~/Videos/nameplates.json`, or the website's
+`public/wolves/characters/characters.json`). None of it was written here. Which
+source wins, who else has an authored identity, and where two sources disagree
+is [`docs/skills/plates.md`](skills/plates.md#where-the-copy-is-authored).
+
 Querying either half of a binding retrieves the same footage — "Zavala" and
 "Kelsey" are the same lead, so both resolve to it. Alongside these, `leads`
 also carries a set of **written-but-not-yet-cast** roles with `person: null`:
