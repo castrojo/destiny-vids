@@ -59,9 +59,10 @@
       "dur": 5.0,
       "act": "VI",
       "label": "Act VI",
-      "title": "Osiris",
+      "title": "Bob Killen",
       "chapters": [],
-      "note": "The owner placed this act by name -- 'add osiris before europa and after nat' -- and named its film: the mrbobbytables one, ~/Videos/UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4, which they describe as PARTIALLY COMPLETE. The card carries the act's name and nothing else: the film itself has no authored title (issue #41), and Bob Killen's Guardian identity belongs to his plate inside the cut, not to an act slide. A subtitle would have to be written, so there is none."
+      "note": "This act is `mrbobbytables`, the film staged as ~/Videos/UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4, and the owner pinned it here: 'there is no \"osiris\" movie anymore it's the mrbobbytables one in 04 in uploads and it's in slot VI'. It briefly carried the act title 'Osiris' -- that was the CHARACTER's name on an act named after a PERSON, and it also left mrbobbytables appearing twice in the running order. The card now reproduces his authored Guardian identity: characters.json slug `bob`, and ~/Videos/nameplates.json np_bob. The title row (*Reconciler of the Plane*) is left off, matching acts V and VIII, which give a name and a class and keep the seal for the plate inside the cut.",
+      "subtitle": "Voidwalker Warlock"
     },
     {
       "id": "act7",
@@ -109,7 +110,7 @@
     },
     {
       "what": "an act title for act VI",
-      "detail": "Act VI is named after its character, so its card carries 'Osiris' and no subtitle. The film under it -- the August 2026 contributors piece -- has no authored title either, which is issue #41. If either gets written, the card takes it.",
+      "detail": "Act VI is named after a person, so its card carries his authored Guardian identity rather than an act title nobody has written. The film under it has no authored title either, which is issue #41. If either gets written, the card takes it.",
       "automatable": "no",
       "blocked_on": "the owner authoring an act title, or issue #41."
     },
@@ -120,8 +121,8 @@
       "blocked_on": "the owner's eye on the assembled programme."
     },
     {
-      "what": "act III -- mrbobbytables",
-      "detail": "It had no hero video of its own, and the Curse of Osiris contributors piece was standing in for it. That film is now act VI by owner instruction, so act III has nothing to play and gets no card. The owner's words: 'I will deal with it later.' His hero video is issue #25; the footage shortfall across the cast is #50.",
+      "what": "act III -- unnamed",
+      "detail": "Slot III is empty and has no subject. The owner's first running order put `mrbobbytables` third; his film is now act VI by explicit instruction ('it's in slot VI'), so naming III after him as well would put one person in the programme twice -- which is exactly what the owner caught. The slot keeps its numeral and nothing else, because VI is pinned and renumbering around III would move it.",
       "automatable": "no",
       "blocked_on": "the owner deciding what act III is."
     }

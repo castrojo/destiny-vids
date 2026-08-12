@@ -16,12 +16,14 @@ Given by the owner, verbatim:
 > intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat ->
 > 7daystothewolves -> europa -> end credits
 
-then amended:
+then amended twice: *"add osiris before europa and after nat"*, and then
 
-> add osiris before europa and after nat
+> there is no "osiris" movie anymore it's the mrbobbytables one in 04 in
+> uploads and it's in slot VI
 
-Osiris sits **between nat and the musical**, so the acts of the whole musical
-are **I–IX**, and each act slide carries its numeral, huge. Every act is to carry **chapters**;
+So **mrbobbytables plays once, as act VI**, between nat and the musical — the
+correction was that he had been named twice, as an empty act III *and* as act
+VI's film. The acts run **I–IX**, and each slide carries its numeral, huge. Every act is to carry **chapters**;
 none have been authored yet, so every `chapters` list is empty and the field
 renders nothing.
 
@@ -30,13 +32,13 @@ renders nothing.
 | — | 0.000 | 5.000 | Slide **I** — `PROJECT BLUEFIN` / *seven days to the wolves* | rendered |
 | **I** | 5.000 | 116.567 | **Into the Light** — six Guardians plated, the comic card, Bungie's score | `BKm0TPqeOjY` |
 | **II** | — | — | **Endless Forms Most Beautiful (instrumental)** — **NOT BUILT** (#74) | — |
-| **III** | — | — | **mrbobbytables** — **NO FILM**, owner will deal with it later (#25) | — |
+| **III** | — | — | **unnamed** — an open slot, no subject and no film | — |
 | — | 116.567 | 131.567 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
 | **IV** | 131.567 | 165.567 | **Kat Cosgrove** — Guardian intro | `UPLOAD/01-…` |
 | — | 165.567 | 180.567 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
 | **V** | 180.567 | 205.826 | **Natali Vlatko** — Guardian arrival | `UPLOAD/02-…` |
-| — | 205.826 | 210.826 | Slide **VI** — `Osiris` | rendered |
-| **VI** | 210.826 | 371.026 | **Osiris** — the mrbobbytables film, August 2026 contributors | `UPLOAD/04-…` |
+| — | 205.826 | 210.826 | Slide **VI** — `Bob Killen` / *Voidwalker Warlock* | rendered |
+| **VI** | 210.826 | 371.026 | **mrbobbytables** — August 2026 contributors, Curse of Osiris | `UPLOAD/04-…` |
 | — | 371.026 | 376.026 | Slide **VII** — `7 Days to the Wolves` / *Nightwish* | rendered |
 | **VII** | 376.026 | 803.726 | **Seven Days to the Wolves** — the musical (timing pass) | `UPLOAD/07-…` |
 | — | 803.726 | 808.726 | Slide **VIII** — `Europa` / *Director's Cut* | rendered |
@@ -52,11 +54,11 @@ rebuild any of them — they are `~/Videos` projects with their own
 play is worse than a recorded gap, so they keep their numerals in the manifest's
 `unresolved` list and nothing else. The numbering does not close up over them.
 
-**Act III changed hands.** The Curse of Osiris contributors piece used to stand
-in for `mrbobbytables`; the owner has given that film its own act — *"add osiris
-before europa and after nat"*, *"the mrbobbytables one, it is partially
-complete"* — and said of act III itself, *"I will deal with it later."* So it is
-an empty slot with a numeral, not a slide.
+**Act III is an open slot with no subject.** The owner's first running order
+put `mrbobbytables` third; his film is act VI by explicit instruction, so
+naming III after him as well would put one person in the programme twice —
+which is exactly what he caught. III keeps its numeral and nothing else,
+because **VI is pinned** and renumbering around III would move it.
 
 ## The act slide is the cinematic's own card
 
@@ -173,12 +175,15 @@ plaquards" — which also drops the `#nova4ever` glitch bursts and the closing
 - **Act II has no film and no named track.** "It's endless forms most
   beautiful, instrumental" names the *record*, not which instrumental.
 - **Act IX has no design** — #51.
-- **Act III is empty and the owner owns it** — *"I will deal with it later."*
-  His hero video is #25; the cast-wide footage shortfall is #50.
+- **Act III has no subject.** An open numbered slot, the owner's to fill.
 - **Act VI is partially complete, by the owner's own description**, and it is
   placed as-is: assembly joins finished things and never re-cuts one. Finishing
-  it happens upstream. The film also has no authored title (#41), which is why
-  its slide says only `Osiris`.
+  it happens upstream. Its slide carries Bob Killen's **authored** Guardian
+  identity rather than an act title, because the film has none (#41) and one
+  would have to be written. **This does not contradict the intro recast**: the
+  owner replaced him on *one plate in act I*, and `vocab/casting.yaml` still
+  binds Osiris to mrbobbytables with Bob's plate, which is what act VI's film
+  credits.
 - **Act VII is a timing pass, not an approved cut**, and its provenance is
   open (#55). Staging is not publishing; this programme stays in `renders/`.
 - **Kat's cut is about to change under this plan.** The dialogue split and
