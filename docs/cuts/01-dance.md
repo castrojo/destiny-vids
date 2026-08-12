@@ -178,7 +178,9 @@ python3 tools/plate.py burn --video renders/01-dance-youtube.mp4 \
 the next cut is `stories/02-<name>.txt` → `renders/02-<name>-*.mp4`. Sorting the
 directory sorts the playlist. There is no manifest and no ordering table to keep
 in sync — the prefix is the whole convention, and it survives files being
-copied out of the repo, which a manifest would not.
+copied out of the repo, which a manifest would not. This story-prefix sequence
+is the repo's own; it is separate from the Wolves upload numbering in
+`~/Videos/UPLOAD/`, which the delivery workspace owns.
 
 `renders/`, `media/` and `*.mp4` are gitignored. The index references footage by
 `video_id` and timecode and ships none of it; both outputs are non-commercial

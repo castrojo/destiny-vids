@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from tools.search import load_segments
-from tools.story import build_story, read_outline, tc, to_csv, to_edl
+from tools.story import build_story, main, read_outline, tc, to_csv, to_edl
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = str(REPO_ROOT / "examples")
@@ -105,14 +105,44 @@ def test_from_video_reports_beats_the_cinematic_cannot_cover(segments):
 
 
 def test_forward_only_never_runs_the_cinematic_backwards(segments):
-    story = build_story(beats(*(["guardians"] * 4)), segments, forward_only=True)
+    story = build_story(beats(*(["guardians"] * 4)), segments,
+                        from_video="yt_final_shape_launch_trailer",
+                        forward_only=True)
     starts = [s["start_sec"] for s in story["shots"]]
     ends = [s["end_sec"] for s in story["shots"]]
     assert all(start >= prev_end for start, prev_end in zip(starts[1:], ends[:-1]))
 
 
+def test_forward_only_stays_inside_one_cinematic(segments):
+    """The playhead is seconds on ONE timeline: a forward-only cut can never
+    mix sources, or one cinematic's out-point would silently exclude another
+    cinematic's shots."""
+    story = build_story(beats(*(["guardians"] * 4)), segments,
+                        from_video="yt_final_shape_launch_trailer",
+                        forward_only=True)
+    assert {s["video_id"] for s in story["shots"]} == {"yt_final_shape_launch_trailer"}
+
+
+def test_forward_only_without_from_video_is_refused(segments):
+    """A playhead with no single timeline would compare seconds across
+    unrelated cinematics — refuse, never produce the misleading cut."""
+    with pytest.raises(ValueError, match="from_video"):
+        build_story(beats("guardians"), segments, forward_only=True)
+
+
+def test_forward_only_flag_alone_is_a_cli_error(tmp_path, capsys):
+    outline = tmp_path / "o.txt"
+    outline.write_text("guardians\n")
+    with pytest.raises(SystemExit) as exc:
+        main([str(outline), "--forward-only"])
+    assert exc.value.code == 2
+    assert "--from-video" in capsys.readouterr().err
+
+
 def test_forward_only_records_how_far_the_cut_skipped(segments):
-    story = build_story(beats(*(["guardians"] * 2)), segments, forward_only=True)
+    story = build_story(beats(*(["guardians"] * 2)), segments,
+                        from_video="yt_final_shape_launch_trailer",
+                        forward_only=True)
     assert all(shot["skip_sec"] >= 0 for shot in story["shots"])
 
 

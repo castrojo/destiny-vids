@@ -79,7 +79,10 @@ python3 tools/story.py stories/01-dance.txt --dir segments \
   another cinematic.
 - `--forward-only` holds a playhead on the source timeline: each beat may only
   take a shot at or after the previous shot's out-point. The jump is reported
-  per shot as `skip_sec` (`[skip +Xs]` in text output).
+  per shot as `skip_sec` (`[skip +Xs]` in text output). It requires
+  `--from-video` — a playhead is seconds on ONE cinematic's timeline, and the
+  tool refuses the flag alone rather than compare seconds across unrelated
+  sources.
 
 The beat order *is* the timeline; the skips are the gaps between chosen shots.
 This is deliberately not a sequencer — there is no cut-graph, no editing DSL,

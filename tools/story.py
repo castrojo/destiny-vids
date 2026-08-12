@@ -113,7 +113,17 @@ def build_story(outline_beats, segments, allow_gameplay=False, from_video=None,
     forward and never doubles back. Together they are the whole "one cinematic,
     skipped forward" shape: no timeline object, no sequencer, just the pool and
     a floor that moves.
+
+    ``forward_only`` without ``from_video`` is refused: the playhead is seconds
+    on ONE cinematic's timeline, and compared across different sources it would
+    silently exclude shots and report a skip measured between unrelated
+    timelines.
     """
+    if forward_only and not from_video:
+        raise ValueError("forward_only needs from_video: a forward-only "
+                         "playhead only has meaning on one cinematic's "
+                         "timeline")
+
     # THE gate: only clean footage is eligible. Gameplay is opt-in coverage.
     pool = [s for s in segments if s.get("clean")]
     if not allow_gameplay:
@@ -242,8 +252,12 @@ def main(argv=None):
                     help="cut from ONE source cinematic only")
     ap.add_argument("--forward-only", action="store_true",
                     help="each beat must sit at or after the last one on the "
-                         "source timeline — the cut skips forward, never back")
+                         "source timeline — the cut skips forward, never back "
+                         "(requires --from-video)")
     args = ap.parse_args(argv)
+    if args.forward_only and not args.from_video:
+        ap.error("--forward-only skips forward within ONE source cinematic; "
+                 "pass --from-video VIDEO_ID with it")
 
     title, fps, beats = read_outline(args.outline)
     segments = load_segments(args.dir)
