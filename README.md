@@ -554,10 +554,16 @@ licensing decision. An agent that names one and stops has succeeded. See
 ## Where a finished cut goes
 
 A file in `renders/` is not a deliverable. The owner's delivery workspace is
-`~/Videos` (read its `README.md`): approved cuts are staged into
-`~/Videos/UPLOAD/` in playlist order and published by `~/Videos/yt-refresh.py`
-into **one unlisted playlist**, because YouTube cannot replace a video file — a
-re-upload always gets a new ID, so only a playlist link is stable.
+`~/Videos` (read its `README.md`), and the show is delivered into
+`~/Videos/Wolves/`: `Prod/` holds one file per act at the highest quality that
+exists, `10mb/` holds social copies built from it, and `megacut/` holds the
+assembled programme. `Prod/` is **hardlinks** to each project's master, so it
+costs no disk and cannot drift from what built it — `ln -f`, never `cp`.
+
+Publishing is `~/Videos/yt-refresh.py` into **one unlisted playlist**, because
+YouTube cannot replace a video file — a re-upload always gets a new ID, so only
+a playlist link is stable. It resolves each cut by its **act number** out of
+`Prod/`, and that number comes from [`docs/running-order.md`](docs/running-order.md).
 
 The credited contributors cut is **regenerated, never hand-edited**: a new month
 is a new render from checked-in data (`scripts/build_uncut_credited.sh`), not a

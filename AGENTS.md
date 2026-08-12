@@ -11,16 +11,24 @@ of this repo's historical confusion is one being cut as if it were the other —
 read [`docs/catalog.md`](docs/catalog.md) before building either.
 
 **The feature** is the main story: **Seven Days to the Wolves**, released as
-**one whole unit** at KubeCon NA. It is a **musical** — one song end to end, in
-three acts, cut to Nightwish's *7 Days to the Wolves*, with the acts hinged on
-measured moments in the bed rather than on chapter boundaries. A prototype is
-staged ([`docs/cuts/07-seven-days-to-the-wolves.md`](docs/cuts/07-seven-days-to-the-wolves.md));
-what it still needs is a **credits sequence** and a **provenance decision**.
+**one whole unit** at KubeCon NA. It is **eight acts**, and
+[`docs/running-order.md`](docs/running-order.md) is the source of truth for what
+they are and what order they play in — read it before building anything for the
+feature. Act VI is the **musical**, one song end to end cut to Nightwish's
+*7 Days to the Wolves*, and an editorial pass of it exists
+([`docs/cuts/07-seven-days-to-the-wolves.md`](docs/cuts/07-seven-days-to-the-wolves.md)).
+It is the longest act and the centre of the show; it is not the whole show.
 
-It used to be four parts in a running order, and it is not any more — so the
-Europa director's cut and the Nati teaser are now **unplaced**, and where they
-go is an open decision. Appearing in the feature never made an appearance
-somebody's hero video, and it still does not.
+It used to be four parts, then a single song, and the eight acts settled it: the
+Europa director's cut is **act VII** and the Nati teaser is **act V**, so
+neither is unplaced any more. Appearing in the feature never made an appearance
+somebody's hero video, and it still does not — act IV is Kat's act *and* her
+hero video is a separate, separately-released thing.
+
+**Two acts have no film, and their numerals are load-bearing.** Act II needs a
+music decision (#74) and act VIII, the credits, is not designed (#51). Do not
+renumber to close the gaps: III is `mrbobbytables` permanently. The programme
+also still needs a **provenance decision** (#55).
 
 **A hero video is one person, one video, every source** — every clean shot of a
 bound character in the whole index, summed into one cut. Karena is Mara Sov, so
@@ -123,9 +131,10 @@ artifacts:
 | `10mb/` | Social copies under a byte cap (`tools/social.py`), built from `Prod/` and never from each other. |
 | `megacut/` | The final movie, and nothing else. |
 
-`~/Videos/UPLOAD/` is the **older** staging folder (AAC copies, a different
-running order). It is superseded and is being retired — see
-[`docs/handoff/2026-08-12-consolidate-the-project.md`](docs/handoff/2026-08-12-consolidate-the-project.md).
+`~/Videos/UPLOAD/` was the **older** staging folder (AAC copies, a different
+running order). It is superseded, and nothing depends on it any more; its
+removal is [issue #81](https://github.com/castrojo/destiny-vids/issues/81).
+**Nothing is staged there.**
 
 **Three classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, and a licensing decision. An agent that

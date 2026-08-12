@@ -21,39 +21,49 @@ Release schedule for both: [`docs/release.md`](release.md).
 **One video, one unit.** Not a series and not separately-published parts — it is
 released as a single piece at KubeCon NA.
 
-It is a **musical**: one song end to end, in three acts, cut to Nightwish's
-*7 Days to the Wolves*. The song is the structure — the acts hinge on measured
-moments in the bed (the gallop, the flute entry), not on chapter boundaries.
+It is **eight acts**, and [`running-order.md`](running-order.md) is the source of
+truth for what they are and what order they play in. Read it before building
+anything for the feature; if this file and that one disagree, that one is right.
 
-An **editorial pass** is rendered and staged for review:
+The acts are announced by slides carrying a huge Roman numeral, and act VI is
+the **musical** — one song end to end, cut to Nightwish's *7 Days to the
+Wolves*, with its internal structure hinged on measured moments in the bed (the
+gallop, the flute entry) rather than on chapter boundaries. The musical is the
+longest act and the centre of the show; it is not the whole show.
+
+An **editorial pass** of act VI is rendered:
 [`cuts/07-seven-days-to-the-wolves.md`](cuts/07-seven-days-to-the-wolves.md).
 The timing pass before it blacked out every doomed span at its exact duration
 so the timing could be judged against the music; the owner's notes on that pass
 have now been carried out, and every marker card is filled with picture. It is
-still not a finished cut — it carries no nameplates and no credits sequence.
+still not a finished cut — it carries no nameplates.
 
-### What this replaced, and what is now unplaced
+The programme itself is assembled by `tools/megacut.py` from
+`~/Videos/Wolves/Prod/` and is **not yet rendered**, by owner instruction ("fix
+it in the video don't render it"). The build record is
+[`cuts/08-directors-cut-megacut.md`](cuts/08-directors-cut-megacut.md).
+
+### What this replaced, and what is now placed
 
 The feature was previously specified as four parts in a running order — the
-Wolves video, the Europa director's cut, credits, then the Nati teaser. The
-musical supersedes that structure.
+Wolves video, the Europa director's cut, credits, then the Nati teaser. Then it
+was specified as a musical, which left two finished pieces with nowhere to go.
 
-Two finished pieces are therefore **unplaced**, and where they go is an open
-owner decision rather than a settled fact:
+**The eight acts settled it.** Both are placed, and neither is a loose end any
+more:
 
 | Piece | Was | Now |
 |---|---|---|
-| `zz-wolves-europa-directors-cut` | feature part 2 | unplaced |
-| `02-wolves-natali-vlatko-behemoth-titan` (the Nati teaser) | feature part 4 | unplaced |
+| The Europa director's cut | feature part 2, then unplaced | **act VII** |
+| The Nati teaser | feature part 4, then unplaced | **act V** |
 
-Neither is discarded. Both are finished, owner-approved work; they simply no
-longer have a slot inside the feature file. The likely answer is promotional
-release alongside the hero videos, but that is a decision, not a default.
+Appearing in the feature never made an appearance somebody's hero video, and it
+still does not: act IV is Kat's act *and* Kat's hero video is a separate,
+separately-released thing.
 
-**The credits sequence is still undesigned** — [issue #51]. A musical still has
-to credit its cast, and the editorial pass carries no plates yet — though the
-Guardians-together runs it is built around are flagged `plate_slot` for that
-pass.
+**Two acts have no film.** Act II (*Endless Forms Most Beautiful*) needs a music
+decision — [issue #74] — and act VIII, the credits sequence, is **not designed**
+— [issue #51]. Their numerals are held so nothing renumbers around them.
 
 ## Hero videos: one person, one video, every source
 
@@ -92,25 +102,32 @@ promotion. See [`docs/release.md`](release.md).
 
 ## Which is which, for the cuts that already exist
 
-Staged in `~/Videos/UPLOAD/` today, classified under this taxonomy:
+Delivered in `~/Videos/Wolves/Prod/` today, classified under this taxonomy.
+`NN` is the **act number** from [`running-order.md`](running-order.md):
 
 | File | Kind |
 |---|---|
-| `01-wolves-kat-cosgrove-sentinel-titan` | hero video (promo) |
-| `02-wolves-natali-vlatko-behemoth-titan` | the Nati teaser — **unplaced** since the feature became a musical |
-| `zz-wolves-europa-directors-cut` | **unplaced**, same reason |
-| `04-bluefin-contributors-…-curse-of-osiris` | neither — a monthly contributors reel |
-| `05-destiny-prologue-the-dance` | neither — single-cinematic story cut |
-| `06-destiny-cayde-6-the-return` | **mis-shaped**: named for a person, cut from one trailer |
-| `07-seven-days-to-the-wolves` | **the feature** — editorial pass, not yet approved; delivery blocked on provenance ([issue #55]) |
+| `03-mrbobbytables` | **act III** of the feature — a monthly contributors reel, partially complete |
+| `04-kat` | **act IV** of the feature; also Kat's hero video (promo) |
+| `05-nat` | **act V** of the feature — the Nati teaser, no longer unplaced |
+| `06-7daystothewolves` | **act VI** — the musical. Editorial pass, not approved; delivery blocked on provenance ([issue #55]) |
+| `07-europa` | **act VII** — the Europa director's cut, no longer unplaced |
 
-`07-` is the feature and stands alone: it is one song end to end, so nothing is
-assembled around it. The two unplaced files above are finished work waiting on a
-decision, not inputs to it.
+Not acts, and not in the feature — build outputs under `renders/`:
 
-`06-` is the worked example of the error this doc exists to prevent. It carries
-Cayde's name but is a single-cinematic cut, and the unstaged `03-zavala` built
-from the same trailer duplicates 68% of it. **A Cayde/castrojo hero video is
+| File | Kind |
+|---|---|
+| `01-dance-plated` | neither — single-cinematic story cut |
+| `02-cayde-6-the-return` | **mis-shaped**: named for a person, cut from one trailer ([issue #49]) |
+
+Two things the older `~/Videos/UPLOAD/` staging folder made easy to get wrong,
+and which the act numbering now prevents: a cut appearing twice under two
+different numbers, and a lexical filename prefix being mistaken for an ordering
+decision. That folder is retired ([issue #81]).
+
+`02-cayde-6-the-return` is the worked example of the error this doc exists to
+prevent. It carries Cayde's name but is a single-cinematic cut, and `03-zavala`
+built from the same trailer duplicates 68% of it. **A Cayde/castrojo hero video is
 every Cayde shot in the index**, which is a different video that has not been
 made yet — and today the index holds 1.2 seconds of him.
 
@@ -119,5 +136,7 @@ cinematic, uncut and re-credited each month. It is neither part of the feature
 nor a hero video, and it is regenerated per roster rather than authored.
 
 [issue #49]: https://github.com/castrojo/destiny-vids/issues/49
-[issue #55]: https://github.com/castrojo/destiny-vids/issues/55
 [issue #51]: https://github.com/castrojo/destiny-vids/issues/51
+[issue #55]: https://github.com/castrojo/destiny-vids/issues/55
+[issue #74]: https://github.com/castrojo/destiny-vids/issues/74
+[issue #81]: https://github.com/castrojo/destiny-vids/issues/81

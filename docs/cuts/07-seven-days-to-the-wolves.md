@@ -1,9 +1,11 @@
 # Seven Days to the Wolves — the musical (editorial pass)
 
-**Status:** editorial pass, **staged for review** in `~/Videos/UPLOAD/` as
-`07-seven-days-to-the-wolves.mp4`. Staged is not published — it is deliberately
-not in `yt-refresh.py`'s manifest, because that means choosing a title and a
-description, which is the owner's call.
+**Status:** editorial pass, delivered for review as **act VI** of the running
+order — `~/Videos/Wolves/Prod/06-7daystothewolves.mp4`, hardlinked from
+`~/Videos/wolves-musical/`. Delivered is not published: it is deliberately not
+in `yt-refresh.py`'s manifest, because that means choosing a title and a
+description, which is the owner's call. It is also **the one act with no
+lossless master** (#58).
 **Runtime:** 432.7 s (7:12.7) for a 424.0 s song. The 8.66 s difference is the pause.
 **Rendered:** `renders/07-wolves-timing-pass.mp4` — 1920x1080 H.264, 30 fps,
 AAC 48 kHz, −1.2 dBTP, −10.0 LUFS integrated.
@@ -208,8 +210,9 @@ audio is the trailer's own, **unaltered**. Measured over the span it is
 broadband rather than tonal — spectral flatness **0.45** in the run-up and
 **0.47** across the explosion — i.e. gunfire and detonation, not a melodic bed.
 Nothing was separated, ducked or enhanced to make that true; the audio tenet in
-`~/Videos/AUDIO.md` is to ship the best source unaltered, and source separation
-is exactly the kind of "enhancement" it rules out.
+[`docs/skills/references/audio-standard.md`](../skills/references/audio-standard.md)
+is to ship the best source unaltered, and source separation is exactly the kind
+of "enhancement" it rules out.
 
 ### The Ghost sequence, and why its hole had to be filled
 
@@ -523,11 +526,11 @@ Bungie's footage; it does not make a third party's compilation ours to use. The
 Gameplay Trailer added in this pass moves 22.6 s of the film onto an official
 Bungie upload, so the exposure is slightly smaller than it was.
 
-**That question gates publishing, not staging**, and the two are different
-things here by design: `~/Videos/UPLOAD/` is a staging area whose own README
-says so, and nothing is published until a file is added to `yt-refresh.py`'s
-manifest — which needs a title and a description, i.e. the owner. So the cut is
-staged for review at the owner's instruction, and [issue #55] stays open.
+**That question gates publishing, not delivery**, and the two are different
+things here by design: `~/Videos/Wolves/Prod/` holds what the show is made of,
+and nothing is published until a file is added to `yt-refresh.py`'s manifest —
+which needs a title and a description, i.e. the owner. So the cut is delivered
+for review at the owner's instruction, and [issue #55] stays open.
 
 **The CNCF photographs are `CC BY-NC-ND 4.0`**, verified on the Flickr metadata
 for the group photos (account `143247548@N03`, album *Maintainer Summit North

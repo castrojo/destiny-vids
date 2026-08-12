@@ -16,13 +16,13 @@ Settled by the owner on 2026-08-12 and **canonical**:
 
 | Act | Chapter | The film | State |
 |---|---|---|---|
-| **I** | Project Bluefin | Into the Light, six Guardians plated, the comic card | built in-repo, **not yet rendered** |
+| **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the comic card | delivered |
 | **II** | *Endless Forms Most Beautiful* | — | **no film** — #74 |
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
-| **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered; a dialogue change is staged, unrendered |
+| **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered |
 | **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **timing pass**, provenance open — #55 |
-| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered |
+| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; its master clips — #82 |
 | **VIII** | Credits | — | **not designed** — #51 |
 
 **The numbering is fixed.** Acts II and VIII have no film, so they get no slide
@@ -89,11 +89,26 @@ python3 tools/social.py ~/Videos/Wolves/Prod/05-nat.mp4 \
 
 Recorded, not hidden:
 
-- **Act I** is not rendered. It is built here (`renders/megacut-01-hero.mkv`)
-  and belongs in `Prod/01-intro.mp4` once it is.
 - **Act VI has no lossless master** — the musical is AAC, so `Prod` holds the
-  best that exists rather than the best possible. Issue #58.
-- **Act IV's master predates the owner's dialogue change** (the Kat/Ian split
-  and "Remember kids, cardio!"), which is staged in `~/Videos/wolves-kat/` and
-  unrendered.
-- **Acts II and VIII do not exist.**
+  best that exists rather than the best possible. Issue #58. Its master lives in
+  `~/Videos/wolves-musical/`, re-homed out of the retired `UPLOAD/` staging
+  folder (issue #81) by moving the inode, so the hardlink never broke.
+- **Act VII's master clips** at +0.3 dBTP — issue #82. The AAC deliverable of
+  the same cut measured −1.0 and passed for weeks; nothing had ever measured the
+  FLAC master. It needs a re-render of Europa's own build, not a fix here.
+- **Acts II and VIII do not exist.** Issues #74 and #51.
+
+Delivered on 2026-08-12, so the two encode gaps this file used to list are
+closed:
+
+- **Act I** is rendered and delivered as `Prod/01-intro.mp4` — the frame-verified
+  2.0 → 113.55 trim of `BKm0TPqeOjY`, six Guardian plates and the comic title
+  card burned, Bungie's own score decoded from the **plain 251 Opus rung** to
+  FLAC. Not `251-drc`: that rung is dynamic-range compressed, and taking it
+  would have been the pipeline applying processing it forbids.
+- **Act IV carries the owner's dialogue change** — the Kat/Ian split and
+  "Remember kids, cardio!" are rendered and on screen, verified frame by frame.
+  Rebuilt in `~/Videos/wolves-kat/` with `node render/render-plates.mjs`, then
+  `./render/run-kat.sh` and the `SURROUND=0 ACODEC=flac OUT=…-hq.mp4` variant.
+  The `Prod` hardlink survived the rebuild, because the script writes its master
+  in place rather than replacing the file.

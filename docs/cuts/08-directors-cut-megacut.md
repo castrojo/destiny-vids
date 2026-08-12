@@ -6,14 +6,21 @@ announced by act slides in the Wolves cinematic's own chrome.
 **Status: planned and staged, NOT rendered.** The act slides and the comic title
 card are rendered and reviewable in `renders/`; the programme itself is not
 built, by owner instruction ("fix it in the video don't render it"). Nothing
-goes to `~/Videos/UPLOAD/` for the feature — provenance there is an unresolved
-owner decision (#55) and this cut does not change it.
+is delivered for the feature beyond act VI's own file — provenance is an
+unresolved owner decision (#55) and this cut does not change it.
 
-## The canonical order
+## What the current build contains
 
-**[`docs/running-order.md`](../running-order.md) owns it.** This file is the
-*build record* — how the current assembly was made and what it is missing. If
-the two disagree about the order, the running order is right.
+**This is a build record, not the running order.**
+[`docs/running-order.md`](../running-order.md) owns the order; the table below
+is the *timeline of the assembly as it stands* — what is in it, where each item
+lands on the clock, and what is missing. If the two disagree about the order,
+the running order is right and this file is stale.
+
+The timings are **derived, never typed**: re-run
+`python3 tools/megacut.py stories/megacut/megacut.json --chapters` after every
+assembly rather than editing this table. They will shift the moment act I is
+rendered or act IV is rebuilt.
 
 | Act | From | To | What | Source |
 |---|---|---|---|---|
@@ -38,7 +45,7 @@ each — FLAC audio, picture never re-encoded. Assembly re-encodes once and edit
 nothing.
 
 **The programme is stereo**, because every master is stereo FLAC. The older
-`UPLOAD/` copies were AAC 5.1, but that 5.1 was the same two channels plus an
+retired `UPLOAD/` copies were AAC 5.1, but that 5.1 was the same two channels plus an
 LFE derived by each cut's own script; upmixing here to recreate it would be
 assembly inventing a soundfield, which the audio tenet forbids.
 
@@ -170,8 +177,8 @@ plaquards" — which also drops the `#nova4ever` glitch bursts and the closing
   open (#55). Staging is not publishing; this programme stays in `renders/`.
 - **Kat's cut is about to change under this plan.** The dialogue split and
   "Remember kids, cardio!" are staged in `~/Videos/wolves-kat/` and not
-  rendered, so `UPLOAD/01-…` is still the old dialogue. Rebuild it there
-  before assembling, or the programme ships the superseded lines.
+  rendered, so `Prod/04-kat.mp4` is still the old dialogue. Rebuild it there
+  and re-link, or the programme ships the superseded lines.
 - **Chapters for every act.** The renderer takes them; nobody has written them.
 - **A music bed under the six slides.** They are silent; a bed is a licensing
   decision.

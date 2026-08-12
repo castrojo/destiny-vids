@@ -122,9 +122,29 @@ film, so the numbering has gaps and closing them would renumber the show.
 cannot drift from what built it. Re-link with `ln -f`; `cp` over an existing
 entry breaks the link silently and leaves a copy that goes stale.
 
-`~/Videos/UPLOAD/` is the older staging folder — a different order, AAC copies —
-and is being retired. See
-[`docs/handoff/2026-08-12-consolidate-the-project.md`](../handoff/2026-08-12-consolidate-the-project.md).
+`~/Videos/UPLOAD/` was the older staging folder — a different order, AAC copies.
+It has been superseded and emptied of everything load-bearing; its removal is
+[issue #81]. **Nothing is staged there any more.** If you find a doc or a script
+that still writes to it, that doc or script is the bug.
+
+### The per-project contract
+
+Each act is built by its own project directory under `~/Videos/<project>/`, and
+`Prod/` hardlinks to what that project produced. Read these **before** touching
+a cut — they exist so nobody re-derives the analysis:
+
+1. `STORYBOARD.md` — the scene, the source and in/out points, every decision and
+   why, and which file is the shipped deliverable.
+2. `render/run-<name>.sh` — the build, and the primary technical record: overlay
+   cue times, geometry, colour, audio treatment. **Its defaults always rebuild
+   the shipped file.** If they don't, that is a bug, not a variant.
+3. `render/` — plates, avatars, music beds, and the scripts that made them.
+4. `sources/` — downloaded originals. Large; never re-download needlessly.
+
+A variant is an **environment override**, never an edit:
+`MUSIC=… SFX=… OUT=… ./render/run-natali.sh`. That is what keeps "the default
+rebuilds what shipped" true, and it is how the `-hq` lossless masters are built
+alongside the deliverables (`SURROUND=0 ACODEC=flac OUT=…`).
 
 Three rules there that this repo has to respect:
 
@@ -136,12 +156,18 @@ Three rules there that this repo has to respect:
 - **Share the playlist, never a video URL.** YouTube cannot replace a video
   file — a re-upload always gets a new ID — so a playlist link is the only
   stable handle. `yt-refresh.py` hashes each file and uploads only what changed.
-  An upload costs ~1600 of the default 10,000 daily quota units (about six a
-  day); `403 quotaExceeded` means wait for the midnight Pacific reset.
-- **Titling is the owner's call.** The contributors piece is staged but
+  It resolves each cut by its **act number** out of `Prod/`, so the order it
+  publishes is the running order. An upload costs ~1600 of the default 10,000
+  daily quota units (about six a day); `403 quotaExceeded` means wait for the
+  midnight Pacific reset.
+- **Titling is the owner's call.** The contributors piece is delivered but
   deliberately not in `yt-refresh.py`'s manifest, because adding it means
-  choosing its title and description. That is the same class of stop as a
-  casting decision: stage it, say so, stop.
+  choosing its title and description ([issue #41]). That is the same class of
+  stop as a casting decision: deliver it, say so, stop.
+
+[issue #41]: https://github.com/castrojo/destiny-vids/issues/41
+[issue #82]: https://github.com/castrojo/destiny-vids/issues/82
+[issue #81]: https://github.com/castrojo/destiny-vids/issues/81
 
 Delivery is also where the audio rules bite, and they are not this repo's:
 load **`audio-quality-tenet`** before touching a deliverable's audio. What has
@@ -167,11 +193,25 @@ already been learned the hard way and must not be re-learned:
   needless resample. Fetch with `~/Videos/audio-source.sh`, which pins
   `-S "acodec:opus,asr,abr"` and records provenance. A 44.1 kHz bed is the
   fingerprint of having got this wrong.
+- **Never take a `-drc` rung.** YouTube offers `251-drc` beside `251`: same
+  codec, same bitrate, **dynamic range compressed**. A bare `-f ba -S acodec:opus`
+  can select it, and taking it means the pipeline shipped compression it
+  forbids — the artist's dynamics lost before the first edit, invisibly, because
+  every other check passes. Ask for the rung by number (`-f 251`) when the
+  ladder offers both, and confirm what was chosen in yt-dlp's own output.
+- **Gate the file you actually ship.** Act VII's lossy deliverable measured
+  −1.0 dBTP and passed for weeks while its FLAC master clipped at **+0.3**
+  ([issue #82]) — the gain correction had been applied to one and never the
+  other, and nothing measured the master because the standing report scanned the
+  wrong folder. A check that runs over yesterday's staging directory is not a
+  gate.
 - `ACODEC=flac` builds a **lossless master** alongside the deliverable, so a
   later fold-down starts from the bed rather than from a lossy file. The
   default stays `aac`, and the defaults must keep rebuilding the shipped file.
-  The standard and the checker live in `~/Videos/AUDIO.md` and
-  `~/Videos/audio-check.sh`.
+  The standard is
+  [`references/audio-standard.md`](references/audio-standard.md) — thresholds,
+  the delivery band, the sourcing rule, and the two failures that have actually
+  shipped. The checker that enforces it is `~/Videos/audio-check.sh`.
 - Prove it, don't assert it: `framemd5` proves an audio change touched no
   frames, an audio-stream MD5 proves a picture change touched no audio,
   `-xerror` proves the file is not truncated, `volumedetect` proves it is not
@@ -309,16 +349,19 @@ Two rules, and the second is the one that gets broken:
 - A video whose segments are 0 clean → `overlays` was skipped wholesale.
 - Two agents on one `video_id`.
 - Anything under `media/`, `keyframes/` or `renders/` appearing in `git status`.
-- A hand-edited file in `~/Videos/UPLOAD/`, or one staged there without a line
-  in its `README.md` saying which master it came from.
+- A file hand-edited in `~/Videos/Wolves/Prod/`, or a `cp` over one of its
+  entries. Every entry is a hardlink to a project's master; `cp` breaks the link
+  silently and leaves a copy that goes stale. Re-link with `ln -f`.
 - Any write to `~/src/website`. It is read-only from here — several agents run
   worktrees against it — and it is where the authored plate copy lives.
 - Trusting a bed's measured true peak as the *delivered* peak. The encoder adds
   inter-sample overshoot; measure the output file.
-- Renumbering the `zz-` prefixed cut in `~/Videos/UPLOAD/`, or "closing the gap"
-  in the numbering. The prefix is the sort key and the gap is deliberate.
+- Renumbering an act, or "closing the gap" in `Prod/`'s numbering. `NN-` is the
+  act number from [`docs/running-order.md`](../running-order.md): acts II and
+  VIII have no film, and their numerals are load-bearing so nothing renumbers
+  around them. III is `mrbobbytables` permanently.
 - A music bed at 44.1 kHz, or one with nothing above 16 kHz. Both mean the
-  fetch took the wrong rung.
+  fetch took the wrong rung. So does a format id ending in `-drc`.
 
 ## Verification
 
@@ -326,7 +369,7 @@ Two rules, and the second is the one that gets broken:
 python3 tools/gaps.py
 python3 -m pytest -q                  # includes committed-index integrity
 python3 scripts/generate_skill_index.py --check
-~/Videos/audio-check.sh --all         # before staging anything for delivery
+~/Videos/audio-check.sh --all         # gates every act in Wolves/Prod
 ```
 
 `tests/test_index_integrity.py` validates every committed segment, video and

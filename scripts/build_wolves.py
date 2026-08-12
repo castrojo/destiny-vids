@@ -442,7 +442,7 @@ def build():
     # span it is broadband, not tonal -- spectral flatness 0.45 in the run-up
     # and 0.47 across the explosion -- i.e. gunfire and detonation rather than a
     # melodic bed, which is what "the sfx pristine version, no music" asks for.
-    # Nothing is separated or enhanced to make that true (~/Videos/AUDIO.md).
+    # Nothing is separated or enhanced to make that true (docs/skills/references/audio-standard.md).
     t.run(GAMEPLAY, PAUSE_IN, PAUSE_DUR,
           "III. SONG PAUSES -- the explosion, then the transcendence portrait, "
           "held to the cut, in its own audio. Casting requested: Cortney "
