@@ -285,7 +285,24 @@ leads:
     shaxx:       { person: null, display_name: null, aka: [lord_shaxx] }
     ghost:       { person: null, display_name: null, aka: [little_light] }
     savathun:    { person: null, display_name: null, aka: [savathun_witch_queen] }
-    the_witness: { person: null, display_name: null, aka: [witness] }
+    # DEPICTION RULE — eyes or smoke, never the body. This is a standing rule
+    # for the character, not one cut's editorial choice: the Witness reads as a
+    # presence, and showing its body makes it a monster instead. A shot of the
+    # Witness is excluded from every cut unless a human has looked at the frame
+    # and judged it eyes-or-smoke. Default is exclusion, exactly like `clean`:
+    # the permission has to be positively established. Enforced at selection,
+    # not derived — "is this a body or a wisp?" is a visual judgement, which
+    # AGENTS.md lists among the things that can never be automated.
+    the_witness:
+      person: null
+      display_name: null
+      aka: [witness]
+      depiction:
+        rule: eyes_or_smoke_only
+        note: >
+          Never the body, never a full figure. Eyes, or smoke/vapour only.
+          Add a segment_id to `approved` only after looking at the frame.
+        approved: []
 
   # --- REQUESTED, NOT YET BOUND ----------------------------------------------
   # The exact mirror of "written, not yet cast" above: there the CHARACTER is
