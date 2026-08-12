@@ -290,3 +290,48 @@ def test_only_yes_and_no_are_forgiven_their_yaml_type():
         parse_brief("automatable: on\n")
     with pytest.raises(BriefError, match="schema"):
         parse_brief("automatable: true\n")
+
+
+# --- ensemble direction in a beat (issue #18) --------------------------------
+
+def test_a_proposal_marks_ensemble_direction_as_a_request():
+    """"put a bluefin maintainer in here" is a request for a SLOT, so the
+    proposal flags it -- for the owner to confirm, as with everything else."""
+    proposal = propose_brief("Paris/Jeefy", "4:03 put a bluefin maintainer in here")
+    beat = proposal["beats"][0]
+    assert beat["at"] == "4:03"
+    assert beat["ensemble"] is True
+    assert beat["note"] == "4:03 put a bluefin maintainer in here"
+
+
+def test_a_nameplate_eyebrow_is_not_read_as_an_ensemble_request():
+    """The deck's own eyebrow says MAINTAINER; matching that word alone would
+    turn somebody's authored credit into an anonymous slot."""
+    proposal = propose_brief("x", "0:35 MAINTAINER // GUARDIAN Jeffrey Sica")
+    assert "ensemble" not in proposal["beats"][0]
+
+
+def test_an_ensemble_beat_survives_the_parser():
+    brief = parse_brief(
+        "automatable: partly\n"
+        "blocked_on: the source is not indexed yet\n"
+        "beats:\n"
+        "  - at: '4:03'\n"
+        "    note: put a bluefin maintainer in here\n"
+        "    ensemble: true\n"
+    )
+    assert brief["beats"][0]["ensemble"] is True
+
+
+def test_an_ensemble_beat_may_not_carry_an_unknown_field():
+    """The beat asks for a slot; a field naming who fills it would be a casting
+    decision smuggled into a brief."""
+    with pytest.raises(BriefError, match="schema"):
+        parse_brief(
+            "automatable: yes\n"
+            "beats:\n"
+            "  - at: '4:03'\n"
+            "    note: a maintainer here\n"
+            "    ensemble: true\n"
+            "    person: castrojo\n"
+        )

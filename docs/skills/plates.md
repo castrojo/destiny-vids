@@ -200,6 +200,14 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   on the roster card gets first claim on the tail window, so the card never
   flattens an authored identity into a name line while the cut has room for
   the real plate. Add a login only with copy that exists in the deck.
+- **The owner can pin a slot to a moment.** A brief beat with `ensemble: true`
+  and an `at` — issue #1's "4:03 put a bluefin maintainer in here" — is a
+  *fixed point*: `plan` takes that window before the rotation runs, and the
+  round-robin routes around it the way it routes around a lead reveal. It
+  requests a **slot, never a person**: who fills it is still the month's
+  rotation, and the note stays direction rather than becoming copy, because a
+  note turned into copy would put the owner's words on whichever real
+  contributor landed there. A moment outside the cut is reported, not moved.
 
 `burn` composites every plate in one ffmpeg pass — an `overlay` chain gated by
 `enable='between(t,in,out)'` — and stream-copies audio, so titling never costs

@@ -714,7 +714,8 @@ def _plan_brief_plates(brief, timeline, total, hold, leads, busy, log):
         if not character and not copy:
             note(f"  brief plate #{index}: no character and no copy -- "
                  f"direction, not a plate ({(req.get('note') or '').strip()}); "
-                 "nothing to plan")
+                 "nothing to plan. An ensemble credit at a moment is a beat "
+                 "with `ensemble: true`, not a plate.")
             continue
 
         binding = (leads.get(character) or {}) if character else {}
@@ -793,6 +794,45 @@ def _plan_brief_plates(brief, timeline, total, hold, leads, busy, log):
             note(f"  {character:<10} the brief asks to plate them, but they "
                  "are not in this cut -- reported, not dropped")
     return entries, plated, reveal_copy
+
+
+def _brief_ensemble_beats(brief, timeline, log):
+    """A brief's ensemble direction -> fixed moments on the cut.
+
+    ``beats[].ensemble`` is the owner asking for a contributor credit at a
+    particular moment -- "4:03 put a bluefin maintainer in here". It requests a
+    SLOT, not a person: who fills it is the month's rotation in
+    tools/ensemble.py, and the note stays direction rather than becoming plate
+    copy. That is the whole reason this is safe to execute -- an ensemble
+    credit says "one of the anonymous Guardians in this film", which is true
+    wherever it lands, while naming who is in a frame would be a casting
+    decision the brief does not get to make.
+
+    Returns ``[(timeline_seconds, note)]`` for the moments that are in the cut,
+    earliest first. A moment outside the cut is reported and dropped, the same
+    way a lead plate's is: the direction is about a frame this cut does not
+    contain.
+    """
+    out = []
+    for index, beat in enumerate(brief.get("beats") or [], start=1):
+        if not beat.get("ensemble"):
+            continue
+        note = (beat.get("note") or "").strip()
+        at_tc = beat.get("at")
+        if not at_tc:
+            if log:
+                log(f"  brief beat #{index}: asks for an ensemble credit but "
+                    f"carries no `at` -- nothing to pin it to ({note})")
+            continue
+        t, _ = _source_moment_on_timeline(timeline, _tc_seconds(at_tc),
+                                          beat.get("video_id"))
+        if t is None:
+            if log:
+                log(f"  {'ensemble':<10} the owner's moment {at_tc} is not in "
+                    f"this cut -- reported, not moved ({note})")
+            continue
+        out.append((t, note))
+    return sorted(out)
 
 
 def cut_timeline(shots, max_shot_sec=None):
@@ -984,6 +1024,11 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     ``only="ensemble"`` they are expected to arrive via ``busy`` (the
     ``--around`` manifest), the same way dialogue does.
 
+    A brief's ``beats[].ensemble`` direction is the ensemble-tier equivalent --
+    "put a bluefin maintainer in here" -- and is planned in the ensemble pass,
+    so it is honoured under ``only="ensemble"`` too. See
+    ``_brief_ensemble_beats``.
+
     Every entry carries ``copy_source`` -- "brief" for owner-authored copy,
     "casting" for vocab/casting.yaml -- so the manifest says where each claim
     about a real person came from.
@@ -1102,6 +1147,42 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         by_segment.setdefault(item["segment_id"], []).append(item)
 
     credited, pending = set(), []
+
+    # The owner's ensemble direction is a FIXED POINT: "put a bluefin
+    # maintainer in here" pins one slot to one moment, and the rotation below
+    # routes around it exactly as it routes around a lead reveal or a line of
+    # dialogue. It is honoured before the round-robin runs, because a moment
+    # the owner chose outranks a moment the assignment happened to produce --
+    # and because taking its window first is what makes the rest route around
+    # it at all.
+    #
+    # WHO fills the slot still comes from the rotation, never from the note.
+    # The note is direction ("a bluefin maintainer"), and turning it into copy
+    # would put words on whichever real contributor landed there.
+    if brief:
+        rotation = list({item["login"]: item
+                         for item in result["assignments"]}.values())
+        for t, note in _brief_ensemble_beats(brief, timeline, log):
+            item = next((i for i in rotation if i["login"] not in credited), None)
+            if item is None:
+                if log:
+                    log(f"  {'ensemble':<10} the owner asks for a credit at "
+                        f"{t:.2f}s, but every contributor in the rotation is "
+                        f"already credited -- reported, not duplicated ({note})")
+                continue
+            dur = round(min(hold, total - t), 3)
+            if dur < MIN_HOLD:
+                if log:
+                    log(f"  {'ensemble':<10} the owner's moment leaves "
+                        f"{dur:.1f}s at {t:.2f}s -- less than a readable hold; "
+                        "honouring it anyway, it is their call")
+            entries.append(_ensemble_entry(item, t, dur, ensemble_copy))
+            busy.append((t, t + dur))
+            credited.add(item["login"])
+            if log:
+                log(f"  {'ensemble':<10} {t:6.2f}s +{dur:.1f}s  "
+                    f"{item['display_name']} (the owner's moment: {note})")
+
     for start, duration, shot in timeline:
         items = [item for item in by_segment.get(shot.get("segment_id"), [])
                  if item["login"] not in credited]

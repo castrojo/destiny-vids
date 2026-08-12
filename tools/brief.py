@@ -377,6 +377,23 @@ def _split_media_urls(body):
     return sources, music
 
 
+ENSEMBLE_WORD_RE = re.compile(r"\b(maintainers?|contributors?|blueberr(?:y|ies))\b",
+                              re.I)
+ENSEMBLE_ASK_RE = re.compile(r"\b(put|add|insert|drop|place|here)\b", re.I)
+
+
+def _asks_for_an_ensemble_slot(line):
+    """Does a timecoded line ask for a contributor credit at that moment?
+
+    Two words are needed, not one: the crowd word ("maintainer") says which
+    tier is wanted, and the ask ("put ... in here") says it is a request rather
+    than plate copy that happens to contain the word -- a nameplate's eyebrow
+    reads ``MAINTAINER // GUARDIAN``, and matching that alone would turn
+    somebody's authored credit into an anonymous slot.
+    """
+    return bool(ENSEMBLE_WORD_RE.search(line) and ENSEMBLE_ASK_RE.search(line))
+
+
 def propose_brief(title, body, casting_path=None):
     """Read an issue's prose and propose a brief, conservatively.
 
@@ -412,7 +429,14 @@ def propose_brief(title, body, casting_path=None):
             continue
         match = TIMECODE_RE.search(stripped)
         if match and not stripped.startswith("http"):
-            beats.append({"at": match.group(1), "note": stripped})
+            beat = {"at": match.group(1), "note": stripped}
+            if _asks_for_an_ensemble_slot(stripped):
+                # "4:03 put a bluefin maintainer in here" -- a request for a
+                # SLOT, which the rotation fills. Proposed, never assumed: like
+                # everything else here it is a reading of the prose, and the
+                # owner confirms it before anything runs.
+                beat["ensemble"] = True
+            beats.append(beat)
     if beats:
         proposal["beats"] = beats
 
