@@ -58,18 +58,31 @@ BED_ID = "bed_endless_forms_most_beautiful"
 # --- the cut ---------------------------------------------------------------
 # (in, out, why this boundary is here). Source timecodes, seconds.
 RUNS = [
-    # The moon, part one: the cold open, up to the cut into the reading.
-    (0.000, 6.467, "moon cold open; out on the cut to the man reading"),
+    # The moon, part one: the cold open, out at the DISSOLVE into the man
+    # reading -- not at the hard cut 2.45 s later. See REMOVED, first entry.
+    (0.000, 4.017, "moon cold open; out on the last frame before the dissolve"),
     # The moon, continuous: back from the framing narration to the HALO slate.
     (22.033, 52.233, "moon battle, unbroken; out on the cut back to the reading"),
     # Become Legend and Evil's Most Wanted, minus the DESTINY card.
     (62.633, 174.433, "in off the HALO slate; out on the cut to the DESTINY card"),
     (180.533, 244.833, "in off the black after the card; out before BECOME LEGEND"),
-    # The tail. The owner's 4:50 lands mid-shot; 289.467 is the boundary before it.
-    (289.467, 376.134, "owner's 4:50, snapped back to the shot boundary; to end"),
+    # The tail, split in two by the mech removal below.
+    (289.467, 344.000, "owner's 4:50, snapped back to the shot boundary; out before the mech"),
+    (345.767, 362.200, "in off the mech; out on the cut to the DESTINY logo card"),
 ]
 
 REMOVED = [
+    # THE OWNER'S ":12 - :14 human pic snuck in remove it".
+    #
+    # This one is why the file says MEASURED, NOT GUESSED. The moon does not
+    # CUT to the man reading, it DISSOLVES into him, and a dissolve is invisible
+    # to ContentDetector -- which is exactly how 2.45 s of live-action framing
+    # narration survived a pass whose whole purpose was removing it. The
+    # boundary below was found by stepping frames at 1/30 s and looking: the
+    # last clean helmet frame is 4.017, and the man's face is bleeding through
+    # by 4.05. Cutting at the hard cut (6.467) keeps the dissolve; cutting mid
+    # dissolve keeps a ghost of him. So the out point is the last clean frame.
+    (4.017, 6.467, "the dissolve into the man reading -- the owner's ':12-:14 human pic'"),
     (6.467, 22.033, "live action: the man reading to his son, and the book"),
     (52.233, 54.267, "live action: the reading, reprised"),
     (54.267, 62.633, "title card: from the creators of Halo"),
@@ -77,6 +90,21 @@ REMOVED = [
     (179.167, 180.533, "black, measured by blackdetect"),
     (244.833, 246.100, "burned-in end title: BECOME LEGEND"),
     (246.100, 289.467, "the dance section -- cut separately as its own video"),
+    # THE OWNER: "we might want to cut the big enemy with the flashing gun in
+    # that scene so we can highlight the heroes instead, do that this is a
+    # pivotal [beat] ... unless you think it's awesome already."
+    #
+    # Removed WHOLE rather than trimmed. It is a discrete 1.767 s shot between
+    # two hard cuts, opening on the white blowout of the gun and resolving to
+    # the machine posed at camera. Trimming it to half its length would make it
+    # a flash-frame -- worse than either keeping or cutting it -- and removing
+    # it needs no mid-shot trim and leaves no artifact. One line to restore.
+    (344.000, 345.767, "the Cabal war machine and its flashing gun -- the heroes take the screen"),
+    # THE PUBLISHER END CARDS. Every other title card in this act was removed,
+    # including one named above as "burned-in end title: BECOME LEGEND"; these
+    # survived only because run 5 used to run to the end of the source. The act
+    # was closing on an advert. Owner: "cut to black, end on the heroes".
+    (362.200, 376.134, "DESTINY / DESTINY 2 logo slates, Bungie/Activision copyright, 'AVAILABLE ON PC OCTOBER 24'"),
 ]
 
 # The owner's rounded marks, kept beside the measured ones so the difference
@@ -85,17 +113,37 @@ OWNER_MARKS = {"skip_from": 246.0, "resume_at": 290.0}
 
 # What happens to the gap between picture and song.
 #
-# The owner asked to see the numbers first and was unavailable when they came
-# in, so this is a decision made under `AGENTS.md`'s degrade rule, and it is
-# the reversible one: **the song starts first**. Nothing is truncated, nothing
-# is frozen, and no removed material is quietly restored -- the picture simply
-# joins a song already playing, which is what the other three options all cost
-# something to avoid. In the megacut the act slide covers that lead-in; played
-# alone the act opens on black with the music under it.
+# THIS IS NO LONGER A FREE CHOICE. It used to be: the picture was 8.564 s short
+# of the song, `music_first` put the whole gap at the head as black, and the
+# only question was taste. Two owner decisions changed that.
 #
-# Changing this to any other policy changes no run above.
-TAIL_POLICY = "music_first"
-BED_LEAD_SEC = None  # derived below: exactly the gap
+# 1. THE SYNC. The song breaks down at 258.0 and the full band re-enters at
+#    269.700 -- an exact downbeat on the bed's own grid (beat index 683,
+#    downbeat_phase 3, bar 1.578957 s). On screen at that moment is a Sentinel
+#    Titan raising a Void shield, and in the delivered film it arrived roughly a
+#    third of a second LATE. The owner approved moving picture to fix it.
+#
+#    So the head lead-in is now DERIVED FROM THE MUSIC: it is whatever value
+#    puts SYNC_ANCHOR_SRC on SYNC_ANCHOR_FILM, and it is asserted below. Type a
+#    number here and the shield drifts off the beat the next time a run moves.
+#
+# 2. THE END CARDS. Cutting 13.934 s of advert off the tail freed time that
+#    cannot go to the head -- the head is now spoken for by the sync, and
+#    lengthening it would slide every frame against the song. So the freed time
+#    goes to the TAIL: black under the song's outro, after the act ends on the
+#    cathedral. Owner: "cut to black, end on the heroes".
+#
+# The invariant that matters: HEAD + PICTURE + TAIL == SONG, with head and tail
+# both derived and neither typed.
+TAIL_POLICY = "sync_anchored"
+
+# The frame the music is cut to, and the moment it must land on.
+# Source 338.200 is the Sentinel's shield at full extension (verified by eye).
+SYNC_ANCHOR_SRC = 338.200
+SYNC_ANCHOR_FILM = 269.700
+
+BED_LEAD_SEC = None  # derived below, from the anchor
+BED_TAIL_SEC = None  # derived below, from the remainder
 
 
 def load_json(path):
@@ -131,30 +179,53 @@ def build():
         last = b
     assert last <= src_sec + 0.01, f"run runs past the source ({last} > {src_sec})"
 
-    # 2. Runs and removals together account for every frame of the source that
-    #    precedes the final out point. A frame that is neither kept nor named
-    #    as removed is a frame nobody decided about.
+    # 2. Runs and removals together account for EVERY FRAME OF THE SOURCE. A
+    #    frame that is neither kept nor named as removed is a frame nobody
+    #    decided about. This is now the whole source, not just the part before
+    #    the last out point: the publisher end cards are a decision too, and
+    #    naming them is what stops them drifting back in.
     spans = sorted([(a, b) for a, b, _ in RUNS] + [(a, b) for a, b, _ in REMOVED])
     cursor = 0.0
     for a, b in spans:
         assert abs(a - cursor) < 0.001, (
             f"gap or overlap at {fmt(cursor)}: next span starts {fmt(a)}")
         cursor = b
-    assert abs(cursor - RUNS[-1][1]) < 0.001
+    assert abs(cursor - src_sec) < 0.05, (
+        f"spans end at {fmt(cursor)} but the source is {fmt(src_sec)}")
 
     # 3. The owner's rounded marks and the measured boundaries agree to within
     #    a shot. Drifting further than that means the cut moved, not the round.
-    assert abs(OWNER_MARKS["resume_at"] - RUNS[-1][0]) < 2.0
-    assert abs(OWNER_MARKS["skip_from"] - REMOVED[-1][0]) < 2.0
+    assert abs(OWNER_MARKS["resume_at"] - RUNS[4][0]) < 2.0
+    assert abs(OWNER_MARKS["skip_from"] - REMOVED[7][0]) < 2.0
 
     picture = sum(b - a for a, b, _ in RUNS)
-    gap = bed_sec - picture
 
-    # The lead-in IS the gap, by construction. Asserting it rather than typing
-    # a number is what keeps the song whole if a run boundary ever moves.
-    lead = gap if TAIL_POLICY == "music_first" else 0.0
-    assert lead >= 0, "picture is longer than the song; TAIL_POLICY cannot absorb it"
-    assert abs((lead + picture) - bed_sec) < 0.001
+    # --- the head, derived from the music --------------------------------
+    # Where does SYNC_ANCHOR_SRC sit in the picture, measuring only kept time?
+    anchor_picture_offset = None
+    elapsed = 0.0
+    for a, b, _ in RUNS:
+        if a <= SYNC_ANCHOR_SRC < b:
+            anchor_picture_offset = elapsed + (SYNC_ANCHOR_SRC - a)
+            break
+        elapsed += b - a
+    assert anchor_picture_offset is not None, (
+        f"sync anchor {SYNC_ANCHOR_SRC} is not inside any kept run -- it was "
+        "cut. Move the anchor to a frame that still plays, or restore the run.")
+
+    # The lead-in IS whatever puts the anchor on the beat. Asserting it rather
+    # than typing it is what keeps the shield on the downbeat if a run moves.
+    lead = SYNC_ANCHOR_FILM - anchor_picture_offset
+    assert lead >= 0, (
+        f"the anchor needs a lead of {lead:.3f}s -- there is more picture "
+        "before the beat than the song has room for")
+
+    tail = bed_sec - lead - picture
+    assert tail >= -0.001, (
+        f"picture overruns the song by {-tail:.3f}s; something must be cut")
+    assert abs((lead + picture + tail) - bed_sec) < 0.001
+
+    gap = bed_sec - picture
 
     return {
         "act": "II",
@@ -166,8 +237,11 @@ def build():
         "picture_sec": round(picture, 3),
         "gap_sec": round(gap, 3),
         "tail_policy": TAIL_POLICY,
+        "sync_anchor_src": SYNC_ANCHOR_SRC,
+        "sync_anchor_film": SYNC_ANCHOR_FILM,
         "bed_lead_sec": round(lead, 3),
-        "film_sec": round(lead + picture, 3),
+        "bed_tail_sec": round(tail, 3),
+        "film_sec": round(lead + picture + tail, 3),
         "runs": [{"in": a, "out": b, "sec": round(b - a, 3), "why": w}
                  for a, b, w in RUNS],
         "removed": [{"in": a, "out": b, "sec": round(b - a, 3), "why": w}
@@ -206,7 +280,10 @@ def main(argv=None):
         print("\n  TAIL_POLICY is unset -- owner decides how the gap is closed.")
     else:
         print(f"\n  tail policy: {plan['tail_policy']}")
+        print(f"  sync anchor: source {plan['sync_anchor_src']}s lands on "
+              f"film {fmt(plan['sync_anchor_film'])} (the downbeat)")
         print(f"  bed leads the picture by {plan['bed_lead_sec']:.3f}s")
+        print(f"  black tail under the outro  {plan['bed_tail_sec']:.3f}s")
         print(f"  film {plan['film_sec']}s ({fmt(plan['film_sec'])})")
     return 0
 
