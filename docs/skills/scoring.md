@@ -138,6 +138,13 @@ Tracked downbeats jitter, so four real bars measure 4.07 median bars, and
 reporting that would suggest a fractional excision where the cut is exactly four
 bars of music.
 
+An excision that **overlaps one already recorded is refused**, naming the
+excision it collides with — including an exact re-run of the same `excise`. The
+rendered bed would survive an overlap (the filter coalesces spans), but
+`edited_duration` and the timeline mapping sum `removed_sec` blindly, so a
+double-counted span desyncs every anchor from the audio with no error anywhere.
+Two excisions that merely touch at a bar line share no audio and are fine.
+
 ## Mapping between the two timelines
 
 Once a section is gone there are two clocks, and confusing them silently moves

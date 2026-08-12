@@ -199,6 +199,28 @@ def plan_excision(grid, start, end):
     }
 
 
+def guard_no_overlap(record, exc):
+    """Refuse an excision whose snapped span overlaps one already recorded.
+
+    ``build_filter`` coalesces overlapping spans, so the *rendered* bed would
+    still be right — but ``edited_duration`` / ``to_edited`` / ``to_source``
+    sum ``removed_sec`` blindly, so a double-counted overlap desyncs every
+    anchor from the audio with no error anywhere. The comparison runs on the
+    snapped interval (``plan_excision`` has already snapped it), so an exact
+    re-run of the same excise is an overlap too. Spans that merely touch at a
+    bar line share no audio and are fine.
+    """
+    for existing in record.get("excisions", []):
+        if exc["start_sec"] < existing["end_sec"] and \
+                existing["start_sec"] < exc["end_sec"]:
+            raise ValueError(
+                f"excision {fmt_tc(exc['start_sec'])}-{fmt_tc(exc['end_sec'])} "
+                f"overlaps existing excision {fmt_tc(existing['start_sec'])}-"
+                f"{fmt_tc(existing['end_sec'])} "
+                f"(bars {existing['start_bar']}-{existing['end_bar']})"
+            )
+
+
 def edited_duration(record):
     """Source duration minus everything excised."""
     removed = sum(e["removed_sec"] for e in record.get("excisions", []))
@@ -385,6 +407,7 @@ def main(argv=None):
     if args.cmd == "excise":
         start, end = parse_tc(args.start), parse_tc(args.end)
         exc = plan_excision(record["grid"], start, end)
+        guard_no_overlap(record, exc)
         record.setdefault("excisions", []).append(exc)
         record["excisions"].sort(key=lambda x: x["start_sec"])
         save_record(record, args.record)

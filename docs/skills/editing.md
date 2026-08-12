@@ -96,6 +96,12 @@ gate defeated by arithmetic rather than by a bad tag.
 Want a longer hold? Use a longer shot. The gate is per-shot because cleanliness
 was established per-shot.
 
+`render.py` applies the same clamp to every shot it cuts, not only to shotlists
+`story.py` built: a hand-edited `cut.json` can carry a `duration` past
+`end_sec`, and that is the identical hole. The render warns the same way —
+`CLAMPED: shot <segment_id> asked for Xs, shot holds Ys` on stderr — and cuts
+only the vetted span.
+
 ## Not every piece is a cut
 
 Sometimes the source already tells the story and the job is to credit the cast

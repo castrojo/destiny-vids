@@ -11,8 +11,8 @@ import pytest
 
 from tools.bed import (
     build_filter, downbeats, edited_downbeats, edited_duration, fmt_tc,
-    load_record, nearest_edited_downbeat, parse_tc, plan_excision,
-    snap_to_downbeat, to_edited, to_source,
+    guard_no_overlap, load_record, nearest_edited_downbeat, parse_tc,
+    plan_excision, snap_to_downbeat, to_edited, to_source,
 )
 
 REPO_ROOT = __import__("pathlib").Path(__file__).resolve().parents[1]
@@ -88,6 +88,28 @@ def test_a_collapsed_excision_is_refused():
     g = grid(bar=2.0, n_bars=20)
     with pytest.raises(ValueError, match="collapses"):
         plan_excision(g, 4.1, 4.2)
+
+
+def test_an_overlapping_excision_is_refused():
+    """build_filter coalesces the overlap, but removed_sec is summed blindly:
+    a double-counted span desyncs every anchor from the audio, silently."""
+    rec = record([plan_excision(grid(), 20.0, 30.0)])
+    with pytest.raises(ValueError, match="overlaps existing excision 0:20.000"):
+        guard_no_overlap(rec, plan_excision(grid(), 25.0, 35.0))
+
+
+def test_a_duplicate_excision_is_refused():
+    """Re-running the same excise must not count the span twice."""
+    rec = record([plan_excision(grid(), 20.0, 30.0)])
+    with pytest.raises(ValueError, match="overlaps"):
+        guard_no_overlap(rec, plan_excision(grid(), 20.0, 30.0))
+
+
+def test_excisions_touching_at_a_bar_line_do_not_overlap():
+    """Adjacent excisions share a boundary bar line but no audio; both count."""
+    rec = record([plan_excision(grid(), 20.0, 30.0)])
+    guard_no_overlap(rec, plan_excision(grid(), 30.0, 40.0))
+    guard_no_overlap(rec, plan_excision(grid(), 10.0, 20.0))
 
 
 # --- timeline mapping -------------------------------------------------------
