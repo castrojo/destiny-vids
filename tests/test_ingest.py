@@ -46,9 +46,32 @@ def test_unknown_era_low_confidence():
     assert info["era"]["confidence"] < 0.5
 
 
+def test_keyword_match_is_whole_word():
+    """``io`` must not match the middle of "Action Trailers".
+
+    A bare substring test tagged a compilation of Earth and Moon footage as
+    ``destination: io``, which is a wrong claim about what the footage shows.
+    """
+    info = ingest.infer_video_defaults("Destiny - All Live Action Trailers")
+    assert "destination" not in info
+    # the real destinations still resolve
+    assert ingest.infer_video_defaults(
+                "Destiny 2 | Io Gameplay")["destination"]["value"] == "io"
+
+
+def test_rights_note_override_records_weak_provenance():
+    """A fan compilation is not the publisher's own upload, and says so."""
+    note = "Fan compilation, not an official upload."
+    rec = ingest.build_video_record(
+                "yt_test", "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "Destiny - All Live Action Trailers", rights_note=note)
+    assert rec["source_rights_note"] == note
+    assert ingest.validate_video(rec) == []
+
+
 def test_parse_video_id_forms():
     for src in ["dQw4w9WgXcQ",
-                "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
                 "https://youtu.be/dQw4w9WgXcQ"]:
         url, yid = ingest.parse_video_id(src)
         assert yid == "dQw4w9WgXcQ"
