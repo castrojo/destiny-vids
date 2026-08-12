@@ -14,6 +14,7 @@ load only that skill, then act.
 | I need to... | Load |
 |---|---|
 | Index a new video: detect beats, extract keyframes, tag, assemble segments | [`indexing.md`](skills/indexing.md) |
+| Find what footage exists for a character, or record a gap | [`corpus.md`](skills/corpus.md) |
 | Cast a character, add a lead binding, or credit the monthly ensemble | [`casting.md`](skills/casting.md) |
 | Write an outline, assemble a cut list, or render it to video | [`editing.md`](skills/editing.md) |
 | Put a name on screen — Guardian nameplates and title cards | [`plates.md`](skills/plates.md) |

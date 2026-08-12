@@ -69,6 +69,29 @@ retrieval.
 Not every binding is a Guardian: `sagira` is a Ghost, so framing and helmet
 questions do not apply and her nameplate carries no subclass line.
 
+### When the character is not known yet
+
+A request often arrives the other way round: here is a person, and here is a
+figure on screen — "the woman", "the main character". That is a **visual
+judgment**, and it is not available at all when the source video is not indexed.
+Park it in `leads.pending` rather than guessing:
+
+```yaml
+  pending:
+    <github-handle>:
+      github: <github-handle>
+      described_as: Woman        # the requester's words, never a character name
+      automatable: no
+      blocked_on: >
+        The source video is not ingested, so no indexed shot shows this figure.
+```
+
+Derivation never reads `pending`, so the entry casts nobody and needs no search
+phrase; `tools/corpus.py` carries it into `corpus/`'s `unresolved` list so the
+request cannot be lost. Promoting one is an ordinary binding: move it under its
+character key in `values` and run the three-step checklist above. Full rules and
+the other gap kinds: [`corpus.md`](corpus.md).
+
 ### Ensemble
 
 ```bash
@@ -92,6 +115,7 @@ Slots are a pure function of the tags, never hand-set: `crowd` → 6, `group` or
 | "I'll tag `casting` directly, it's faster." | It is derived. A hand-set value is overwritten and hides the vocab bug that made you reach for it. |
 | "The search phrase can come later." | A binding nobody can query does not exist, and the suite fails on it. |
 | "Re-rolling the roster is fine, it's only credits." | Assignment is deterministic on purpose: a re-render must not re-credit a different person. |
+| "I can't see the video, but the description narrows it to one character." | Then park it in `leads.pending`. A binding is a claim about a real person; a queue entry is not. |
 
 ## Red Flags
 

@@ -75,6 +75,47 @@ moves the start. A detector-derived beat can be a fine *beat* and a terrible
 Pass the same value to `tools/plate.py plan`, or every plate after the first
 trimmed shot lands late.
 
+### One cinematic, skipped forward
+
+A cut is a single source cinematic advanced by **skipping forward** through it.
+The skip points are the in/out timecodes on each row of the cut list, taken
+straight from the segment records; `render.py` re-encodes each span and
+concatenates them. The 16-beat Osiris cut is one video, sixteen jumps.
+
+There is deliberately no timeline object, no sequencer, and no cut graph. The
+outline is the only ordering state, so the edit operations are text edits:
+
+- **Reorder a beat** — move its line in the outline and re-run.
+- **Swap a hero beat** — rewrite that line; a shorter or worse-matching beat
+  affects the shots later beats can reach, so re-read the printed reasoning.
+- **Feature a different hero** — name the character (or the person cast as them)
+  in the beat: `search.py` maps both onto a `casting.character` filter, so
+  "osiris vaults over broken stonework" is a filtered query, not just prose.
+
+If a cut seems to want a second cinematic spliced in, write a second cut list
+and a second render. Stitching them is an editorial decision that belongs in an
+outline, not a new layer of machinery.
+
+### Output targets
+
+The same cut list feeds both deliveries, so they cannot drift apart:
+
+| Target | Produced by | Artifact |
+|---|---|---|
+| Site embed | `render.py` | `renders/NN-<slug>.mp4` |
+| YouTube upload | `plate.py plan` → `plate.py burn` over that render | `renders/NN-<slug>-plated.mp4` |
+
+The site already owns the plate design — `plate.py` is a port of its
+`WolvesIntroOverlay.vue` — so an embed there can draw the plates itself from the
+same `plates.json`. YouTube cannot overlay anything, which is why the burn
+exists. Both start from `renders/NN-<slug>.mp4`; nothing is re-cut between them,
+and `plan` must be given the render's `--max-shot-sec` either way.
+
+`NN` is the video's position in the published sequence, zero-padded, so an
+upload queue sorts correctly by filename. `renders/` is gitignored: what the
+repo keeps is the outline and the segments the cut list is derived from, which
+is enough to rebuild either artifact byte-for-byte.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -83,6 +124,7 @@ trimmed shot lands late.
 | "I'll hand-edit the timings in `cut.json`." | It is a derived artifact and the next run discards your edit. Change the outline or the cap. |
 | "The beat matched something close enough." | A mismatch cascades into every later beat that wanted that shot. Fix it at the source. |
 | "Stream copy is faster and looks the same." | It snaps the in-point to a keyframe, discarding the boundary the detector pass exists to find. |
+| "This needs a timeline to stitch several cinematics." | The cut list *is* the timeline. One cinematic skipped forward, or a second outline and a second render. |
 
 ## Red Flags
 

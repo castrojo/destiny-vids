@@ -1,0 +1,1949 @@
+{
+  "generated_at": "2026-08-12",
+  "schema_version": "1.0",
+  "segment_dir": "segments",
+  "totals": {
+    "segments": 119,
+    "clean": 109,
+    "characters": 9,
+    "bound": 6,
+    "videos": 2
+  },
+  "videos": [
+    {
+      "video_id": "yt_curse_of_osiris_opening_cinematic",
+      "shots": 50,
+      "clean": 49,
+      "unclean": 1,
+      "character_shots": 25,
+      "ensemble_shots": 7,
+      "ensemble_slots": 21
+    },
+    {
+      "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+      "shots": 69,
+      "clean": 60,
+      "unclean": 9,
+      "character_shots": 13,
+      "ensemble_shots": 21,
+      "ensemble_slots": 31
+    }
+  ],
+  "characters": [
+    {
+      "character": "cayde_6",
+      "names_in_index": [
+        "Cayde-6"
+      ],
+      "bound": true,
+      "person": "castrojo",
+      "display_name": "castrojo",
+      "has_plate": false,
+      "constraints": {},
+      "videos": [
+        "yt_destiny_2_the_final_shape_launch_trailer"
+      ],
+      "totals": {
+        "shots": 1,
+        "clean": 1,
+        "unclean": 0,
+        "cinematic": 1,
+        "gameplay": 0,
+        "usable": 1,
+        "clean_seconds": 1.2
+      },
+      "shots": [
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0067-0068",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "1:07",
+          "end_tc": "1:08",
+          "start_sec": 67.133733,
+          "end_sec": 68.334933,
+          "duration": 1.201,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "push_in"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "triumphant"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Cayde-6 under a hood, blue Exo faceplate and burning eyes emerging from shadow. The return shot."
+        }
+      ]
+    },
+    {
+      "character": "elsie_bray",
+      "names_in_index": [
+        "Elsie Bray"
+      ],
+      "bound": true,
+      "person": "laura_santamaria",
+      "display_name": "Laura Santamaria",
+      "has_plate": false,
+      "constraints": {},
+      "videos": [
+        "yt_destiny_2_the_final_shape_launch_trailer"
+      ],
+      "totals": {
+        "shots": 1,
+        "clean": 1,
+        "unclean": 0,
+        "cinematic": 1,
+        "gameplay": 0,
+        "usable": 1,
+        "clean_seconds": 1.17
+      },
+      "shots": [
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0030-0031",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "0:31",
+          "end_tc": "0:32",
+          "start_sec": 30.6306,
+          "end_sec": 31.798433,
+          "duration": 1.168,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "ECU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "push_in"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense"
+          ],
+          "action": [
+            "dialogue"
+          ],
+          "overlays": [],
+          "caption": "Extreme close-up on a white Exo faceplate, dark eyes catching red light. Still and resolute."
+        }
+      ]
+    },
+    {
+      "character": "ikora_rey",
+      "names_in_index": [
+        "Ikora Rey"
+      ],
+      "bound": true,
+      "person": null,
+      "display_name": null,
+      "has_plate": false,
+      "constraints": {},
+      "videos": [
+        "yt_destiny_2_the_final_shape_launch_trailer"
+      ],
+      "totals": {
+        "shots": 1,
+        "clean": 1,
+        "unclean": 0,
+        "cinematic": 1,
+        "gameplay": 0,
+        "usable": 1,
+        "clean_seconds": 2.3
+      },
+      "shots": [
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0039-0041",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "0:40",
+          "end_tc": "0:42",
+          "start_sec": 39.572867,
+          "end_sec": 41.875167,
+          "duration": 2.302,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense"
+          ],
+          "action": [
+            "dialogue"
+          ],
+          "overlays": [],
+          "caption": "Ikora Rey braces a hand against a comrade, lit teal and gold, urgent mid-conversation."
+        }
+      ]
+    },
+    {
+      "character": "mara_sov",
+      "names_in_index": [
+        "Mara Sov"
+      ],
+      "bound": true,
+      "person": "karena_angel",
+      "display_name": "Karena Angel",
+      "has_plate": false,
+      "constraints": {},
+      "videos": [
+        "yt_destiny_2_the_final_shape_launch_trailer"
+      ],
+      "totals": {
+        "shots": 2,
+        "clean": 2,
+        "unclean": 0,
+        "cinematic": 2,
+        "gameplay": 0,
+        "usable": 2,
+        "clean_seconds": 3.27
+      },
+      "shots": [
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0027-0029",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "0:27",
+          "end_tc": "0:30",
+          "start_sec": 27.027,
+          "end_sec": 29.662967,
+          "duration": 2.636,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense"
+          ],
+          "action": [
+            "dialogue"
+          ],
+          "overlays": [],
+          "caption": "Mara Sov in fur mantle and gold sigil, hand raised mid-sentence, teal rim light. Commanding, wary."
+        },
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0113-0114",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "1:54",
+          "end_tc": "1:54",
+          "start_sec": 113.7136,
+          "end_sec": 114.347567,
+          "duration": 0.634,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MS",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Mara Sov levels a hand cannon into the dark, pale hair and scaled mantle catching low light."
+        }
+      ]
+    },
+    {
+      "character": "osiris",
+      "names_in_index": [
+        "Osiris"
+      ],
+      "bound": true,
+      "person": "mrbobbytables",
+      "display_name": "mrbobbytables",
+      "has_plate": true,
+      "constraints": {},
+      "videos": [
+        "yt_curse_of_osiris_opening_cinematic"
+      ],
+      "totals": {
+        "shots": 22,
+        "clean": 22,
+        "unclean": 0,
+        "cinematic": 22,
+        "gameplay": 0,
+        "usable": 22,
+        "clean_seconds": 76.83
+      },
+      "shots": [
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0033-0041",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "0:34",
+          "end_tc": "0:42",
+          "start_sec": 33.633333,
+          "end_sec": 41.766667,
+          "duration": 8.133,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "ECU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Extreme close-up on Osiris's masked face beneath an ornate gold headdress, one eye catching cold light, as Sagira's spiked golden Ghost shell hovers beside him with its eye glowing."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0041-0044",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "0:42",
+          "end_tc": "0:45",
+          "start_sec": 41.766667,
+          "end_sec": 44.8,
+          "duration": 3.033,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "LS",
+          "composition": [
+            "single",
+            "establishing"
+          ],
+          "camera_movement": [
+            "track"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "ominous",
+            "lonely"
+          ],
+          "action": [
+            "traversal"
+          ],
+          "overlays": [],
+          "caption": "A lone robed figure climbs a frost-dusted stairwell deep in Vex ruins, seen from behind and dwarfed by the architecture, silhouetted against a glowing triangular portal of light at the top of the stairs."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0052-0055",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "0:52",
+          "end_tc": "0:55",
+          "start_sec": 52.166667,
+          "end_sec": 55.033333,
+          "duration": 2.867,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "LS",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense",
+            "ominous"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Osiris stands his ground as a towering Vex war-frame's armored claw reaches toward him from the shadows, a web of red laser trip-beams crackling between them in the ruined corridor."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0062-0072",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:02",
+          "end_tc": "1:13",
+          "start_sec": 62.3,
+          "end_sec": 72.666667,
+          "duration": 10.367,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent",
+            "ominous"
+          ],
+          "action": [
+            "ritual"
+          ],
+          "overlays": [],
+          "caption": "Osiris reaches into a floating cluster of glowing cyan Vex glyphs, his gold headdress and cloth mask lit by their light as he studies the ancient script with both hands."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0072-0076",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:13",
+          "end_tc": "1:17",
+          "start_sec": 72.666667,
+          "end_sec": 76.566667,
+          "duration": 3.9,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MLS",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense",
+            "ominous"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Osiris faces down a towering Vex war-frame as its weapon arm charges a beam, Sagira's small gold Ghost shell hovering loyally at his side in the hazy blue gloom."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0076-0079",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:17",
+          "end_tc": "1:20",
+          "start_sec": 76.566667,
+          "end_sec": 79.833333,
+          "duration": 3.267,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "push_in"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "reverent",
+            "tense"
+          ],
+          "action": [
+            "dialogue"
+          ],
+          "overlays": [],
+          "caption": "A tight, face-clear close-up on Osiris beneath his ornate gold headdress and cloth mask, his eyes hard with focus as red hard-light beams streak past in the dark behind him."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0079-0083",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:20",
+          "end_tc": "1:24",
+          "start_sec": 79.833333,
+          "end_sec": 83.8,
+          "duration": 3.967,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "LS",
+          "composition": [
+            "single",
+            "establishing"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent",
+            "ominous"
+          ],
+          "action": [
+            "traversal"
+          ],
+          "overlays": [],
+          "caption": "Osiris and Sagira approach a massive glowing triangular Vex gateway together, seen small and distant beyond an out-of-focus alien weapon looming in the foreground."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0089-0091",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:29",
+          "end_tc": "1:32",
+          "start_sec": 89.4,
+          "end_sec": 91.533333,
+          "duration": 2.133,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MLS",
+          "composition": [
+            "group"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "ominous",
+            "tense"
+          ],
+          "action": [
+            "traversal"
+          ],
+          "overlays": [],
+          "caption": "Osiris and Sagira move deeper into a dim, green-lit Vex ruin as a Goblin perches on wreckage nearby and a distant Guardian trades fire in the haze beyond."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0097-0105",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:37",
+          "end_tc": "1:45",
+          "start_sec": 97.366667,
+          "end_sec": 105.0,
+          "duration": 7.633,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "tense",
+            "triumphant"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Osiris aims his rifle in profile beneath a wind-blown feather headdress as Sagira's spiked gold shell hovers beside him, two Vex machines watching from the ruined rock walls behind."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0105-0106",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:45",
+          "end_tc": "1:46",
+          "start_sec": 105.0,
+          "end_sec": 106.033333,
+          "duration": 1.033,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MS",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "triumphant",
+            "tense"
+          ],
+          "action": [
+            "ability_cast",
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Extreme overhead angle on Osiris swinging a blazing solar sword down onto a Vex machine, sparks and firelight erupting around the blow as another Vex stands on the rocks nearby."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0108-0109",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:48",
+          "end_tc": "1:49",
+          "start_sec": 108.433333,
+          "end_sec": 109.333333,
+          "duration": 0.9,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "OTS"
+          ],
+          "camera_movement": [
+            "push_in"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "triumphant",
+            "tense"
+          ],
+          "action": [
+            "ability_cast",
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Osiris dives through the air wreathed in solar flame and burning wings, closing on a Vex Minotaur whose reflective visor fills the foreground."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0109-0110",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:49",
+          "end_tc": "1:50",
+          "start_sec": 109.333333,
+          "end_sec": 110.333333,
+          "duration": 1.0,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "INSERT",
+          "composition": [
+            "cutaway"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "triumphant"
+          ],
+          "action": [
+            "ability_cast"
+          ],
+          "overlays": [],
+          "caption": "Insert of Osiris's ornate gold gauntlet gripping a glowing blade hilt, cyan energy lines lit along the vambrace against the dark Vex ruin and firelight behind."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0110-0115",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:50",
+          "end_tc": "1:56",
+          "start_sec": 110.333333,
+          "end_sec": 115.5,
+          "duration": 5.167,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "LS",
+          "composition": [
+            "OTS",
+            "crowd"
+          ],
+          "camera_movement": [
+            "track"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "tense",
+            "triumphant"
+          ],
+          "action": [
+            "traversal",
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Seen from behind, Osiris vaults over broken stonework toward a spread of Vex machines across a ravine, weapon raised as red beams and a fiery blast light the canyon."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0115-0120",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:56",
+          "end_tc": "2:00",
+          "start_sec": 115.5,
+          "end_sec": 120.166667,
+          "duration": 4.667,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "tense",
+            "reverent"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Close profile on Osiris beneath his wind-blown feather headdress, one eye glinting as he levels his rifle, Sagira's spiked gold shell glowing teal at his side."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0120-0124",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:00",
+          "end_tc": "2:05",
+          "start_sec": 120.166667,
+          "end_sec": 124.833333,
+          "duration": 4.667,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "reverent",
+            "triumphant"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Face-clear close-up on Osiris's weathered eyes above his gold chevron mask, framed by his ornate beaked headdress, Sagira's spiked shell resting quietly beside his head."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0124-0126",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:05",
+          "end_tc": "2:06",
+          "start_sec": 124.833333,
+          "end_sec": 126.2,
+          "duration": 1.367,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "LS",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "reverent",
+            "tense"
+          ],
+          "action": [
+            "ability_cast"
+          ],
+          "overlays": [],
+          "caption": "Wide shot of Osiris kneeling amid Vex wreckage, one hand raised and glowing as Sagira hovers beside him, a defeated Vex machine slumped nearby and a laser beam still cutting through the dark."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0126-0127",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:06",
+          "end_tc": "2:07",
+          "start_sec": 126.2,
+          "end_sec": 127.233333,
+          "duration": 1.033,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "reverent",
+            "triumphant"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Tight face-clear close-up on Osiris's masked eyes beneath his beaked golden headdress, Sagira's spiked shell glowing bright teal right beside his head."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0129-0130",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:09",
+          "end_tc": "2:11",
+          "start_sec": 129.133333,
+          "end_sec": 130.733333,
+          "duration": 1.6,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Osiris turns in profile beneath his gold beaked headdress and patterned face wrap as Sagira, his spiked golden Ghost, hovers at his shoulder among Mercury's ruins."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0132-0133",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:12",
+          "end_tc": "2:13",
+          "start_sec": 132.2,
+          "end_sec": 133.266667,
+          "duration": 1.067,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Close-up on Osiris's masked profile, eyes steady beneath his beaked gold headdress, as Sagira's spiked shell drifts at his shoulder."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0134-0137",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:15",
+          "end_tc": "2:17",
+          "start_sec": 134.7,
+          "end_sec": 137.466667,
+          "duration": 2.767,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Tight close-up on Osiris's eyes above his patterned face wrap, Sagira's golden spiked shell filling the frame just beside him."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0137-0140",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:17",
+          "end_tc": "2:21",
+          "start_sec": 137.466667,
+          "end_sec": 140.666667,
+          "duration": 3.2,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "ECU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent",
+            "tense"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Extreme close-up on Osiris's eyes and brow, feathers of his headdress filling the frame as he turns his masked face toward something offscreen."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0140-0143",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:21",
+          "end_tc": "2:24",
+          "start_sec": 140.666667,
+          "end_sec": 143.733333,
+          "duration": 3.067,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MS",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense",
+            "ominous"
+          ],
+          "action": [
+            "ritual"
+          ],
+          "overlays": [],
+          "caption": "Osiris, in profile, holds a small glowing Vex artifact out in his palm as machine sentries advance through the ruins behind him."
+        }
+      ]
+    },
+    {
+      "character": "sagira",
+      "names_in_index": [
+        "Sagira"
+      ],
+      "bound": true,
+      "person": "lindsay_gendreau",
+      "display_name": "Lindsay Gendreau",
+      "has_plate": true,
+      "constraints": {},
+      "videos": [
+        "yt_curse_of_osiris_opening_cinematic"
+      ],
+      "totals": {
+        "shots": 15,
+        "clean": 15,
+        "unclean": 0,
+        "cinematic": 15,
+        "gameplay": 0,
+        "usable": 15,
+        "clean_seconds": 53.03
+      },
+      "shots": [
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0033-0041",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "0:34",
+          "end_tc": "0:42",
+          "start_sec": 33.633333,
+          "end_sec": 41.766667,
+          "duration": 8.133,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "ECU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Extreme close-up on Osiris's masked face beneath an ornate gold headdress, one eye catching cold light, as Sagira's spiked golden Ghost shell hovers beside him with its eye glowing."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0055-0060",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "0:55",
+          "end_tc": "1:01",
+          "start_sec": 55.033333,
+          "end_sec": 60.566667,
+          "duration": 5.533,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "enemy_threat",
+          "register": -1,
+          "mood": [
+            "ominous",
+            "tense"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Close-up on a Vex war-frame's multi-barreled cannon arm firing a hard-light beam, purple radiolaria motes drifting past as Sagira's small gold Ghost shell darts through the line of fire in the background."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0060-0062",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:01",
+          "end_tc": "1:02",
+          "start_sec": 60.566667,
+          "end_sec": 62.3,
+          "duration": 1.733,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "ECU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "enemy_threat",
+          "register": -1,
+          "mood": [
+            "ominous",
+            "tense"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Extreme close-up on a Vex war-frame's massive weapon arm swinging into frame, while Sagira's small gold Ghost shell drifts through drifting debris and a crossing beam of light below."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0072-0076",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:13",
+          "end_tc": "1:17",
+          "start_sec": 72.666667,
+          "end_sec": 76.566667,
+          "duration": 3.9,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MLS",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense",
+            "ominous"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Osiris faces down a towering Vex war-frame as its weapon arm charges a beam, Sagira's small gold Ghost shell hovering loyally at his side in the hazy blue gloom."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0079-0083",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:20",
+          "end_tc": "1:24",
+          "start_sec": 79.833333,
+          "end_sec": 83.8,
+          "duration": 3.967,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "LS",
+          "composition": [
+            "single",
+            "establishing"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent",
+            "ominous"
+          ],
+          "action": [
+            "traversal"
+          ],
+          "overlays": [],
+          "caption": "Osiris and Sagira approach a massive glowing triangular Vex gateway together, seen small and distant beyond an out-of-focus alien weapon looming in the foreground."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0083-0086",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:24",
+          "end_tc": "1:27",
+          "start_sec": 83.8,
+          "end_sec": 86.633333,
+          "duration": 2.833,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "ECU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 0,
+          "mood": [
+            "lonely",
+            "ominous"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Sagira's spiked gold Ghost shell hangs alone in near-total darkness, her bright teal eye the only light in the frame."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0089-0091",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:29",
+          "end_tc": "1:32",
+          "start_sec": 89.4,
+          "end_sec": 91.533333,
+          "duration": 2.133,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MLS",
+          "composition": [
+            "group"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "ominous",
+            "tense"
+          ],
+          "action": [
+            "traversal"
+          ],
+          "overlays": [],
+          "caption": "Osiris and Sagira move deeper into a dim, green-lit Vex ruin as a Goblin perches on wreckage nearby and a distant Guardian trades fire in the haze beyond."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0097-0105",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:37",
+          "end_tc": "1:45",
+          "start_sec": 97.366667,
+          "end_sec": 105.0,
+          "duration": 7.633,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "tense",
+            "triumphant"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Osiris aims his rifle in profile beneath a wind-blown feather headdress as Sagira's spiked gold shell hovers beside him, two Vex machines watching from the ruined rock walls behind."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0115-0120",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "1:56",
+          "end_tc": "2:00",
+          "start_sec": 115.5,
+          "end_sec": 120.166667,
+          "duration": 4.667,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "tense",
+            "reverent"
+          ],
+          "action": [
+            "combat"
+          ],
+          "overlays": [],
+          "caption": "Close profile on Osiris beneath his wind-blown feather headdress, one eye glinting as he levels his rifle, Sagira's spiked gold shell glowing teal at his side."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0120-0124",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:00",
+          "end_tc": "2:05",
+          "start_sec": 120.166667,
+          "end_sec": 124.833333,
+          "duration": 4.667,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "reverent",
+            "triumphant"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Face-clear close-up on Osiris's weathered eyes above his gold chevron mask, framed by his ornate beaked headdress, Sagira's spiked shell resting quietly beside his head."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0124-0126",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:05",
+          "end_tc": "2:06",
+          "start_sec": 124.833333,
+          "end_sec": 126.2,
+          "duration": 1.367,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "LS",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "reverent",
+            "tense"
+          ],
+          "action": [
+            "ability_cast"
+          ],
+          "overlays": [],
+          "caption": "Wide shot of Osiris kneeling amid Vex wreckage, one hand raised and glowing as Sagira hovers beside him, a defeated Vex machine slumped nearby and a laser beam still cutting through the dark."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0126-0127",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:06",
+          "end_tc": "2:07",
+          "start_sec": 126.2,
+          "end_sec": 127.233333,
+          "duration": 1.033,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "reverent",
+            "triumphant"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Tight face-clear close-up on Osiris's masked eyes beneath his beaked golden headdress, Sagira's spiked shell glowing bright teal right beside his head."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0129-0130",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:09",
+          "end_tc": "2:11",
+          "start_sec": 129.133333,
+          "end_sec": 130.733333,
+          "duration": 1.6,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Osiris turns in profile beneath his gold beaked headdress and patterned face wrap as Sagira, his spiked golden Ghost, hovers at his shoulder among Mercury's ruins."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0132-0133",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:12",
+          "end_tc": "2:13",
+          "start_sec": 132.2,
+          "end_sec": 133.266667,
+          "duration": 1.067,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Close-up on Osiris's masked profile, eyes steady beneath his beaked gold headdress, as Sagira's spiked shell drifts at his shoulder."
+        },
+        {
+          "segment_id": "seg_yt_curse_of_osiris_opening_cinematic_0134-0137",
+          "video_id": "yt_curse_of_osiris_opening_cinematic",
+          "start_tc": "2:15",
+          "end_tc": "2:17",
+          "start_sec": 134.7,
+          "end_sec": 137.466667,
+          "duration": 2.767,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "two_shot"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Tight close-up on Osiris's eyes above his patterned face wrap, Sagira's golden spiked shell filling the frame just beside him."
+        }
+      ]
+    },
+    {
+      "character": "the_traveler",
+      "names_in_index": [
+        "The Traveler"
+      ],
+      "bound": false,
+      "person": null,
+      "display_name": null,
+      "has_plate": false,
+      "constraints": {},
+      "videos": [
+        "yt_destiny_2_the_final_shape_launch_trailer"
+      ],
+      "totals": {
+        "shots": 1,
+        "clean": 1,
+        "unclean": 0,
+        "cinematic": 1,
+        "gameplay": 0,
+        "usable": 1,
+        "clean_seconds": 2.6
+      },
+      "shots": [
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0034-0036",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "0:34",
+          "end_tc": "0:37",
+          "start_sec": 34.267567,
+          "end_sec": 36.870167,
+          "duration": 2.603,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "ELS",
+          "composition": [
+            "establishing"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "environment_establishing",
+          "register": 2,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "A single silhouetted Guardian dwarfed by the vast pale sphere of the Traveler in cloud."
+        }
+      ]
+    },
+    {
+      "character": "the_witness",
+      "names_in_index": [
+        "The Witness"
+      ],
+      "bound": true,
+      "person": null,
+      "display_name": null,
+      "has_plate": false,
+      "constraints": {},
+      "videos": [
+        "yt_destiny_2_the_final_shape_launch_trailer"
+      ],
+      "totals": {
+        "shots": 1,
+        "clean": 1,
+        "unclean": 0,
+        "cinematic": 1,
+        "gameplay": 0,
+        "usable": 1,
+        "clean_seconds": 2.3
+      },
+      "shots": [
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0082-0085",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "1:23",
+          "end_tc": "1:25",
+          "start_sec": 82.9829,
+          "end_sec": 85.2852,
+          "duration": 2.302,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "LS",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "enemy_threat",
+          "register": -2,
+          "mood": [
+            "ominous"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "A winged silhouette stands centered in a vast ring of white light. Held at distance; face never given."
+        }
+      ]
+    },
+    {
+      "character": "zavala",
+      "names_in_index": [
+        "Zavala"
+      ],
+      "bound": true,
+      "person": "kelsey_hightower",
+      "display_name": "Kelsey Hightower",
+      "has_plate": false,
+      "constraints": {},
+      "videos": [
+        "yt_destiny_2_the_final_shape_launch_trailer"
+      ],
+      "totals": {
+        "shots": 6,
+        "clean": 6,
+        "unclean": 0,
+        "cinematic": 6,
+        "gameplay": 0,
+        "usable": 6,
+        "clean_seconds": 15.62
+      },
+      "shots": [
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0033-0034",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "0:33",
+          "end_tc": "0:34",
+          "start_sec": 33.033,
+          "end_sec": 34.267567,
+          "duration": 1.235,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MS",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "lonely"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Zavala kneels on a windswept ridge, shield on his back, staring off. Weary command."
+        },
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0046-0054",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "0:46",
+          "end_tc": "0:55",
+          "start_sec": 46.479767,
+          "end_sec": 54.587867,
+          "duration": 8.108,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "push_in"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Zavala lit cold blue in a cockpit, jaw set, looking out past camera."
+        },
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0068-0069",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "1:08",
+          "end_tc": "1:09",
+          "start_sec": 68.334933,
+          "end_sec": 69.335933,
+          "duration": 1.001,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Profile of a helmeted Titan against pale sky, visor catching the light."
+        },
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0071-0073",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "1:12",
+          "end_tc": "1:13",
+          "start_sec": 71.9719,
+          "end_sec": 73.1731,
+          "duration": 1.201,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MCU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "tense"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Zavala framed against a burning orange horizon, shield over his shoulder, eyes forward."
+        },
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0080-0082",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "1:21",
+          "end_tc": "1:23",
+          "start_sec": 80.8808,
+          "end_sec": 82.9829,
+          "duration": 2.102,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "MS",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 1,
+          "mood": [
+            "reverent"
+          ],
+          "action": [
+            "idle"
+          ],
+          "overlays": [],
+          "caption": "Zavala stands full-height against grey cloud, shield rigged on his back."
+        },
+        {
+          "segment_id": "seg_yt_destiny_2_the_final_shape_launch_trailer_0085-0087",
+          "video_id": "yt_destiny_2_the_final_shape_launch_trailer",
+          "start_tc": "1:25",
+          "end_tc": "1:27",
+          "start_sec": 85.2852,
+          "end_sec": 87.253833,
+          "duration": 1.969,
+          "clean": true,
+          "footage_tier": "cinematic",
+          "usable": true,
+          "constraints_failed": [],
+          "shot_scale": "CU",
+          "composition": [
+            "single"
+          ],
+          "camera_movement": [
+            "static"
+          ],
+          "subject_salience": "guardian_hero",
+          "register": 2,
+          "mood": [
+            "triumphant"
+          ],
+          "action": [
+            "dialogue"
+          ],
+          "overlays": [],
+          "caption": "Tight profile of Zavala in blue light, the ghost of a smile breaking through."
+        }
+      ]
+    }
+  ],
+  "unresolved": [
+    {
+      "kind": "uncast_lead",
+      "id": "ikora_rey",
+      "detail": "1 clean shot(s) indexed, no person bound",
+      "automatable": false,
+      "blocked_on": "a casting decision; binding a role names a real person"
+    },
+    {
+      "kind": "unbound_character",
+      "id": "the_traveler",
+      "detail": "tagged in 1 shot(s) but absent from vocab/casting.yaml `leads.values`",
+      "automatable": false,
+      "blocked_on": "whether this name is a castable role at all"
+    },
+    {
+      "kind": "uncast_lead",
+      "id": "the_witness",
+      "detail": "1 clean shot(s) indexed, no person bound",
+      "automatable": false,
+      "blocked_on": "a casting decision; binding a role names a real person"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "anna_bray",
+      "detail": "bound to joanna_lee, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "saladin",
+      "detail": "bound to jeefy, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "saint_14",
+      "detail": "bound to kat, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "petra_venj",
+      "detail": "bound to lenka, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "variks",
+      "detail": "bound to nate_waddington, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "the_speaker",
+      "detail": "bound to jonathan_bryce, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "amanda_holliday",
+      "detail": "bound to ashley_willis, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "iron_lord_red_haired",
+      "detail": "bound to paris_pittman, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "the_drifter",
+      "detail": "written but not cast, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "crow",
+      "detail": "written but not cast, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "caiatl",
+      "detail": "written but not cast, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "eris_morn",
+      "detail": "written but not cast, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "shaxx",
+      "detail": "written but not cast, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "ghost",
+      "detail": "written but not cast, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "unindexed_lead",
+      "id": "savathun",
+      "detail": "written but not cast, zero shots in the index",
+      "automatable": true,
+      "blocked_on": "media for a video that features them, and an indexing pass"
+    },
+    {
+      "kind": "pending_binding",
+      "id": "wrkode",
+      "detail": "Main character",
+      "automatable": false,
+      "blocked_on": "The source video is not ingested, so no indexed shot shows this figure. Ingest and index it, then name the character from the footage.",
+      "requested_in": "https://github.com/castrojo/destiny-vids/issues/14",
+      "source_video": "https://www.youtube.com/watch?v=dOdPT9fLKEA"
+    },
+    {
+      "kind": "pending_binding",
+      "id": "abangser",
+      "detail": "Woman",
+      "automatable": false,
+      "blocked_on": "The source video is not ingested, so no indexed shot shows this figure. Ingest and index it, then name the character from the footage.",
+      "requested_in": "https://github.com/castrojo/destiny-vids/issues/14",
+      "source_video": "https://www.youtube.com/watch?v=dOdPT9fLKEA"
+    },
+    {
+      "kind": "pending_binding",
+      "id": "robertsirc",
+      "detail": "other guy",
+      "automatable": false,
+      "blocked_on": "The source video is not ingested, so no indexed shot shows this figure. Ingest and index it, then name the character from the footage.",
+      "requested_in": "https://github.com/castrojo/destiny-vids/issues/14",
+      "source_video": "https://www.youtube.com/watch?v=dOdPT9fLKEA"
+    }
+  ]
+}

@@ -64,6 +64,13 @@ Written but not yet cast (retrieval still identifies them; the tile just has no
 name on it): Ikora Rey, the Drifter, Crow, Caiatl, Eris Morn, Shaxx, Ghost,
 Savathûn, the Witness. Add or change a binding in `vocab/casting.yaml`.
 
+**Requested, not yet bound** — a request that arrives as a person plus a
+description of a figure on screen ("the woman", "the main character") cannot be
+turned into a binding without seeing the footage. Those wait in
+`vocab/casting.yaml` under `leads.pending`, quoting the requester's own words,
+and surface in the corpus below as `pending_binding` gaps. They cast nobody and
+plate nothing until someone confirms the character.
+
 **Ensemble** — anonymous Guardians. A shot exposes `slots` (6 for a crowd, 3 for a
 group, else 1), and `tools/ensemble.py` fills them from a month's contributors.
 `casting.person` is always `null` for ensemble in a segment record: people are
@@ -84,13 +91,15 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `tools/ingest.py` | Video-level ingestion: Bungie YouTube title (oEmbed, no API key) → inherited defaults → `video.schema.json` record. |
 | `tools/annotate.py` | Annotator pipeline: shot detection → keyframes → pluggable tagger → schema-valid records. |
 | `tools/derive.py` | Pure derivation of `clean`, `footage_tier`, `traversal_hero` and `casting`. |
+| `tools/corpus.py` | **Segments → per-character corpus.** Coverage per cast member plus the `unresolved` gap list. |
 | `tools/plate.py` | **Cut list → Guardian nameplates.** Plans timed plates from the casting vocab + contributor roster, renders them as transparent PNGs, and burns them into a cut. |
 | `tools/ffmpeg-container-shim.sh` | Host setup, not a pipeline stage: installs a containerized `ffmpeg`/`ffprobe` on `PATH` so the whole machine has H.264. See `docs/rendering.md`. |
 | `stories/` | Worked outlines. |
 | `videos/` | Ingested video-level records (6 real Bungie videos, metadata-only). |
 | `tags/` | Tagger output per video, keyed by beat index — replayed by `annotate.JsonTagger`. |
 | `segments/` | Assembled, schema-valid segment records for real footage — 69 shots from the TFS launch trailer and 50 from the Curse of Osiris opening cinematic. |
-| `tests/` | `pytest` suite across search, derivation, story assembly, ensemble casting, ingestion, the stub pipeline, and ffmpeg resolution. |
+| `corpus/` | **Generated.** `characters.json` + `README.md`: what footage exists per character, and what is missing. Rebuild with `tools/corpus.py --write`. |
+| `tests/` | `pytest` suite across search, derivation, story assembly, ensemble casting, ingestion, the corpus, the stub pipeline, and ffmpeg resolution. |
 | `docs/` | `SKILL.md` (agent skill router) and `skills/`, plus the design docs: `taxonomy.md` (axis reference), `pipeline.md` (segmentation + cost tiers), `agent-retrieval.md` (query mapping), `rendering.md` (which ffmpeg, and why). |
 | `AGENTS.md` | Agent operating contract: commands, boundaries, and the three rules that outrank convenience. |
 
@@ -167,6 +176,14 @@ rather than cutting a HUD into the sequence.
 `--format json` emits a shot list you can feed straight to `tools/ensemble.py`
 or `tools/render.py`.
 
+**One cinematic, skipped forward.** A cut is a single source video advanced by
+skipping between indexed beats — the cut list's in/out timecodes *are* the skip
+points, and the outline is the only ordering state. There is no timeline object,
+no sequencer, no cut graph: reordering a beat is moving a line, and featuring a
+different hero is naming them in one (`search.py` maps a character name, or the
+person cast as them, onto a `casting.character` filter). The worked Osiris cut
+is sixteen beats and sixteen jumps through one cinematic.
+
 ## Render the cut
 
 The index stores timestamps, not footage, so rendering needs the source video
@@ -240,6 +257,15 @@ could otherwise never carry a reveal. Two plates are never visible at once;
 
 Pass `plan` the **same** `--max-shot-sec` the render used, so plate timings land
 on the finished file rather than on the source timeline.
+
+**Two deliveries, one cut.** `renders/NN-<slug>.mp4` is the cut itself — what the
+site embeds, drawing the plates live from `plates.json` in the same treatment
+`plate.py` was ported from. `renders/NN-<slug>-plated.mp4` is that exact file
+with the plates burned in, for platforms that cannot overlay anything, i.e.
+YouTube. Nothing is re-cut between them. `NN` is the video's position in the
+published sequence, zero-padded, so an upload queue sorts by filename;
+`renders/` is gitignored, so what the repo keeps is the outline and the segments
+that regenerate both.
 
 ## Editorial direction
 
@@ -321,6 +347,31 @@ flashes and explosions provoke out of a frame-difference detector.
 `overlays` is a **required** tagger field — an untagged `overlays` derives
 `clean = false`, so a tagger that skips it silently marks its whole output
 unusable.
+
+## The character corpus
+
+`segments/` answers *what is this shot?*. `corpus/` answers *what do we have of
+this character, how much of it can I cut, and what is missing?*
+
+```bash
+python3 tools/corpus.py --character osiris   # coverage for one character
+python3 tools/corpus.py --write              # rebuild after indexing or recasting
+python3 tools/corpus.py --check              # what the suite runs
+```
+
+Both files in `corpus/` are generated; hand-editing them is the same mistake as
+hand-editing `clean`. The corpus re-derives `clean` and `footage_tier` through
+`tools/derive.py` rather than reading them off the record, and evaluates
+`usable` per character, so a two-hander files under both people in it.
+
+The amount of Destiny footage is fixed, so the index is a long walk taken one
+story at a time — index a video, bind any new character, re-run `--write`. The
+`unresolved` list is the other half of the file and the more useful one: it
+names every gap as `uncast_lead` (footage exists, nobody bound),
+`unindexed_lead` (cast, no footage), `unbound_character` (tagged in footage, not
+in the cast map), or `pending_binding` (a person requested, character unknown),
+each with `automatable` and a `blocked_on` reason. Gaps are recorded, never
+guessed at. See [`docs/skills/corpus.md`](docs/skills/corpus.md).
 
 ## Cost posture
 
