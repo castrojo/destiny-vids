@@ -122,7 +122,7 @@
         "programme"
       ],
       "description": "Assembles already-finished cuts and owner-approved deliverables into one continuous programme, separated by the reference deck's title cards, in a single ffmpeg pass. Use when several cuts must play as one video.",
-      "version": "1.0",
+      "version": "1.1",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },

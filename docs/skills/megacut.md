@@ -1,6 +1,6 @@
 ---
 name: megacut
-version: "1.0"
+version: "1.1"
 last_updated: "2026-08-12"
 id: megacut
 one_line_purpose: Join finished cuts into one programme with deck-format chapter cards.
@@ -144,3 +144,27 @@ ffmpeg -ss <seg> -t <len> -i out.mp4 -map a:0 -af volumedetect -f null /dev/null
 - **Silent stretches read at the noise floor** (about −91 dB for AAC digital
   silence), not merely "quiet".
 - Extract frames either side of every join **and look at them**.
+
+## Delivering a programme
+
+A programme is delivered like any other cut — see
+[`production.md`](production.md) — with one extra question that only
+compilations raise.
+
+```bash
+cd ~/Videos && ./audio-check.sh <master>     # the workspace's own gate, first
+cp <master> ~/Videos/UPLOAD/<NN>-<name>.mp4
+cd ~/Videos/UPLOAD
+ffmpeg -v error -xerror -i <NN>-<name>.mp4 -f null -   # verify the STAGED copy
+md5sum <NN>-<name>.mp4 >> CHECKSUMS.md5 && md5sum -c CHECKSUMS.md5
+```
+
+Then update `UPLOAD/README.md`: the table, the true-peak list, and the master
+that regenerates it. A staged file with no row is a file nobody can trace.
+
+**Ask what the programme duplicates.** Its segments are usually already staged
+as standalone cuts, and `UPLOAD/` sorts lexically into playlist order — so
+shipping both shows the same footage twice. That is an ordering decision and it
+belongs to the owner, so **stage the file but leave it out of `yt-refresh.py`'s
+`VIDEOS` list** until they choose. Staging publishes nothing; the `VIDEOS` list
+does.
