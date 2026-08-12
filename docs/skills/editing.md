@@ -1,6 +1,6 @@
 ---
 name: editing
-version: "1.5"
+version: "1.6"
 last_updated: "2026-08-12"
 id: editing
 one_line_purpose: Turn a plain-language outline into a rendered cut.
@@ -10,7 +10,7 @@ mcp_compliance_level: partial
 optimization_status: draft
 status: active
 dependencies: [indexing]
-tags: [story, cut-list, render, ffmpeg, outline, still, artwork-card, window-extract, timing-pass, marker-card, two-clocks, bed-pause, excision, diegetic-insert]
+tags: [story, cut-list, render, ffmpeg, outline, still, artwork-card, window-extract, timing-pass, marker-card, two-clocks, bed-pause, excision, diegetic-insert, proxy-clip, editorial-pass, shot-boundary-measurement]
 description: >-
   Covers outlines, shot matching, artwork cards, timing passes with marker cards, and a bed that pauses.
   Use when writing an outline, marking material for removal before editing, or scoring a cut whose song does not run end to end.
@@ -261,6 +261,11 @@ changed.
 **Leaving artwork slots is the point, not a workaround.** The slots are where
 the film's own artwork goes; marking them early is what lets the artwork be
 made to a known duration instead of being squeezed in afterwards.
+
+Carrying those notes out — what a "replace" costs versus a "cut", where the
+seconds come from, verifying a reviewer's proxy clip, and measuring a boundary
+the shot detector got wrong — is
+[`references/timing-pass-notes.md`](references/timing-pass-notes.md).
 
 ### When the bed does not run end to end
 

@@ -324,6 +324,34 @@ leads:
     automatable:   Whether an agent can settle this alone. `no` for anything that names a real person.
     blocked_on:    What has to happen first, in one sentence.
   pending:
+    inffy:
+      # The owner cast the Hunter run in the Final Shape Gameplay Trailer
+      # (source 90.791-95.225) onto this account, EXPLICITLY OVERRIDING their
+      # own file name for the clip, which said "Laura":
+      #
+      #   "the warlock should be kaslin fields and the hunter was laura
+      #    santamaria but make it github.com/inffy"
+      #
+      # The override is recorded because the proxy file
+      # ~/Videos/wolves-directors-cut/UchfadQhX7w_Laura_91-97.mp4 still carries
+      # the old name, and a wrong credit is not recoverable by a revert.
+      #
+      # No Guardian identity is authored for inffy anywhere: not
+      # ~/Videos/nameplates.json, not the website's characters.json. The name
+      # appears only as a callsign in the website's wolves-track-zero-manifest,
+      # which is not a plate. So the run is rendered UNPLATED and no copy is
+      # written here -- a missing name is omitted and recorded, never invented.
+      github: inffy
+      display_name: null   # nobody has authored one; a plate must not invent it
+      described_as: the hunter
+      requested_in: owner instruction, editorial pass on Seven Days to the Wolves
+      source_video: https://www.youtube.com/watch?v=UchfadQhX7w
+      automatable: no
+      blocked_on: >
+        No authored Guardian identity exists for this account. Author one where
+        identities are authored -- ~/src/website public/wolves/characters/characters.json
+        or ~/Videos/nameplates.json -- and the binding can move into `values`
+        with its plate reproduced verbatim.
     wrkode:
       # "Add william rizzo and team" — the issue title names him, the body points
       # the "main character" at this account. Which Destiny character that is is

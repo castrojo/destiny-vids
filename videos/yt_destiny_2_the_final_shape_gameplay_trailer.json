@@ -1,0 +1,27 @@
+{
+  "video_id": "yt_destiny_2_the_final_shape_gameplay_trailer",
+  "youtube_url": "https://www.youtube.com/watch?v=UchfadQhX7w",
+  "title": "Destiny 2: The Final Shape | Gameplay Trailer",
+  "usage_class": "third_party_copyrighted",
+  "source_rights_note": "Bungie, Inc. copyrighted footage. Bungie's fan-content policy permits non-commercial fan creations, including fan music videos, using Bungie assets. This index stores only metadata and timestamps, not the footage.",
+  "era": "the_final_shape",
+  "content_type": "gameplay",
+  "activity": "unknown",
+  "provenance": {
+    "era": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "activity": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    }
+  }
+}

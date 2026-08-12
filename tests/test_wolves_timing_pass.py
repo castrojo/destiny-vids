@@ -225,23 +225,219 @@ def test_the_pause_is_long_enough_to_be_a_decision(cut):
         "too short to read as a decision -- see the trailer's envelope")
 
 
-def test_act_one_excisions_are_bought_back_off_the_head(cut):
+def test_act_one_edits_are_bought_back_off_the_head(cut):
     """Dropping a span from the intro must not move the gallop.
 
-    The capture's in-point is derived from the excision list, so a span cut out
-    of the middle is paid for by starting earlier. If these ever stop summing,
+    The capture's in-point is derived from the edit list, so a span cut out of
+    the middle is paid for by starting earlier. If these ever stop summing,
     Act I comes up short and every later anchor slides.
+
+    A *replaced* span -- a black screen standing in for a summit photograph --
+    is deliberately NOT paid for, because the photograph is exactly as long as
+    the black it replaces. That distinction is the whole reason Act I's picture
+    runs and its still cards are counted separately here.
     """
-    from scripts.build_wolves import ACT1_EXCISIONS, ACT2_IN, TITLE_CARD_LEN
+    from scripts.build_wolves import ACT1_EDITS, ACT2_IN, TITLE_CARD_LEN
 
     act1 = [s for s in cut["shots"] if s.get("video_id") == "wolves_act1"]
-    assert len(act1) == len(ACT1_EXCISIONS) + 1, "one run per kept span"
-    assert sum(s["duration"] for s in act1) == pytest.approx(
-        ACT2_IN - TITLE_CARD_LEN, abs=0.01)
+    stills = [s for s in cut["shots"]
+              if s.get("still") and s["beat"].startswith("I. SUMMIT")]
+    replaced = [e for e in ACT1_EDITS if e[2] != "cut"]
 
-    # The excised spans are genuinely absent from the film.
-    for cut_in, cut_out, _ in ACT1_EXCISIONS:
+    assert len(stills) == len(replaced), "one summit plate per replaced span"
+    # Picture and plates together still fill exactly the act.
+    assert sum(s["duration"] for s in act1 + stills) == pytest.approx(
+        ACT2_IN - TITLE_CARD_LEN, abs=0.01)
+    # Each plate is exactly as long as the span it stands in for, so it is free.
+    for still, (cut_in, cut_out, _, _) in zip(stills, replaced):
+        assert still["duration"] == pytest.approx(cut_out - cut_in, abs=0.001)
+
+    # Every edited span -- cut or replaced -- is genuinely absent from picture.
+    for cut_in, cut_out, _, _ in ACT1_EDITS:
         for shot in act1:
             assert not (shot["start_sec"] < cut_out - 0.01
                         and shot["end_sec"] > cut_in + 0.01), \
-                f"an Act I run overlaps the excised {cut_in}-{cut_out}"
+                f"an Act I run overlaps the edited {cut_in}-{cut_out}"
+
+
+# --- the editorial pass -----------------------------------------------------
+# The timing pass marked what it was going to remove; this pass removes it. The
+# tests below pin the removals themselves, because each one was an owner note
+# that a later "tidy-up" could quietly undo.
+
+def test_the_publisher_slide_the_owner_cut_never_comes_back(cut):
+    """"cut out the renegades slide."
+
+    The COUNTLESS LEGENDS slide is REMOVED, not marked -- and removing it could
+    not simply shorten the montage, or the pause would slide off its downbeat.
+    The montage starts earlier instead and stops before the slide. So the guard
+    is not "is there a card" but "does any run reach the slide's timecode".
+    """
+    from scripts.build_wolves import COUNTLESS_LEGENDS_IN
+
+    for shot in cut["shots"]:
+        if shot.get("video_id") != "wolves_act3":
+            continue
+        assert shot["start_sec"] < COUNTLESS_LEGENDS_IN, shot["beat"]
+        assert shot["end_sec"] <= COUNTLESS_LEGENDS_IN + 0.01, (
+            f"the montage runs to {shot['end_sec']:.3f}s and would put the "
+            "COUNTLESS LEGENDS slide back on screen")
+
+
+def test_no_comic_placeholder_survives(cut):
+    """Every marker slot is filled with picture.
+
+    A COMIC PLACEHOLDER left in a delivered cut is a black frame with production
+    text on it. The timing pass had four; this pass has none.
+    """
+    for shot in cut["shots"]:
+        assert "COMIC PLACEHOLDER" not in shot["beat"], shot["beat"]
+
+
+def test_the_ghost_sequence_is_gone_and_its_hole_is_filled(cut):
+    """"cut 5:44 extended ghost sequence, cut this to 5:56 and keep the rest."
+
+    `wolves_act2` ends at 210.015 s, so the Pale Heart run cannot simply grow a
+    tail to cover the removal: the footage does not exist. The 13.943 s is
+    filled from the Gameplay Trailer instead, and Act III-C still has to land
+    exactly on its anchor -- which the bed assertions already check. Here we
+    check the hole itself.
+    """
+    from scripts.build_wolves import GHOST_IN, GHOST_OUT, GHOST_FILL, GAMEPLAY
+
+    for shot in cut["shots"]:
+        if shot.get("video_id") != "wolves_act2":
+            continue
+        assert not (shot["start_sec"] < GHOST_OUT - 0.01
+                    and shot["end_sec"] > GHOST_IN + 0.01), \
+            f"a Pale Heart run overlaps the excised Ghost sequence: {shot['beat']}"
+
+    fill = [s for s in cut["shots"]
+            if s.get("video_id") == GAMEPLAY and s.get("audio") != "source"]
+    assert len(fill) == len(GHOST_FILL)
+    assert sum(s["duration"] for s in fill) == pytest.approx(
+        GHOST_OUT - GHOST_IN, abs=0.01), \
+        "the fill must be exactly as long as the hole, or Act III-C slides"
+
+
+def test_the_pause_is_the_shot_the_owner_named(cut):
+    """The explosion, the transcendence portrait, held to the cut.
+
+    Measured by frame-differencing the trailer at 1/30 s: the explosion's cut
+    is at 51.835 (frame delta 170 against a background under 30) and the cut
+    out of the portrait is at 53.470 (delta 89). The pause must contain both,
+    and must end ON that cut rather than running into the next shot.
+    """
+    from scripts.build_wolves import GAMEPLAY
+
+    paused = [s for s in cut["shots"] if s["audio"] == "source"]
+    assert len(paused) == 1
+    shot = paused[0]
+    assert shot["video_id"] == GAMEPLAY, (
+        "the pause is the Gameplay Trailer, not the Collection Trailer -- the "
+        "owner's reference clip frame-matches it at 45.0-54.009")
+    assert shot["start_sec"] < 51.835, "the explosion must be inside the pause"
+    assert shot["end_sec"] == pytest.approx(53.470, abs=0.001), (
+        "the pause must end on the measured cut after the portrait")
+
+
+def test_the_summit_photographs_are_never_captioned(cut):
+    """These are photographs of real colleagues.
+
+    They carry no on-screen name and make no claim about anyone, which is what
+    keeps them inside the casting rules. Attribution for them is the credits
+    sequence's job (issue #51), not a burned-in line here.
+
+    The guard is on the ASSET, not on the beat text: a beat is production
+    metadata that never reaches the screen, whereas the still is literally the
+    picture. A summit slot must therefore be a photograph straight out of
+    `scripts/build_summit_plates.py` -- never a `tools/marker.py` slate, which
+    renders text, and never anything from `tools/plate.py`, which renders a
+    nameplate about a person.
+    """
+    from tools.marker import DEFAULT_DIR as MARKER_DIR
+
+    slots = [s for s in cut["shots"]
+             if s["beat"].startswith(("I. SUMMIT", "III. SUMMIT"))]
+    assert slots, "the summit slots vanished"
+    for shot in slots:
+        still = Path(shot["still"])
+        assert still.suffix == ".jpg", still
+        assert still.parent.name == "summit-plates", still
+        assert MARKER_DIR not in still.parents, "a marker renders text"
+        assert "plate" not in shot and "name" not in shot
+
+
+def test_the_hunter_run_credits_nobody_on_screen(cut):
+    """The owner overrode their own filename: the Hunter is github.com/inffy,
+    not Laura Santamaria, and inffy has no authored Guardian identity.
+
+    So the run is rendered UNPLATED and the binding lives in `leads.pending`.
+    A plate appearing here would be copy this repo wrote about a real person.
+    """
+    import yaml
+
+    casting = yaml.safe_load(
+        (REPO / "vocab" / "casting.yaml").read_text(encoding="utf-8"))
+    pending = (casting.get("leads") or {}).get("pending") or {}
+    assert "inffy" in pending
+    assert pending["inffy"]["display_name"] is None
+
+    hunter = [s for s in cut["shots"] if "inffy" in s["beat"]]
+    assert len(hunter) == 1
+    assert not hunter[0].get("plate_slot"), (
+        "an unplatable person must not be flagged for the nameplate pass")
+
+
+def test_no_two_summit_slots_show_the_same_picture():
+    """Three frames of one group photo are three files and one image.
+
+    The first assignment took the three biggest crowds and they turned out to
+    be the same overhead shot seconds apart -- on screen, one image shown three
+    times. A filename check cannot catch that, so the plate builder measures
+    it, and this pins that the measurement is actually wired up and that the
+    shipped selection passes it.
+
+    Needs the frame-touching extras and the photographs, so it skips where
+    neither is present -- the suite is offline by design (`AGENTS.md`).
+    """
+    pytest.importorskip("numpy")
+    pytest.importorskip("PIL")
+    from scripts.build_summit_plates import (
+        ASSIGNMENT, DUPLICATE_CORRELATION, SRC_DIR, assert_distinct, signature)
+
+    present = [s for s in ASSIGNMENT.values() if (SRC_DIR / f"{s}.jpg").exists()]
+    if len(present) < 2:
+        pytest.skip("summit photographs are not fetched (media/ is gitignored)")
+
+    peak = assert_distinct(present)          # raises SystemExit on a duplicate
+    assert peak <= DUPLICATE_CORRELATION
+
+    # ...and the guard genuinely fires: a photograph against itself is a 1.0.
+    sig = signature(SRC_DIR / f"{present[0]}.jpg")
+    assert float(sig @ sig / len(sig)) > DUPLICATE_CORRELATION
+
+
+def test_every_summit_slot_the_builder_asks_for_has_a_plate():
+    """The cut's slots and the plate manifest's slots are the same set.
+
+    They are declared in two files, so they can drift: a slot renamed in
+    build_wolves.py would silently fall back to a marker card, which is a black
+    frame with production text on it.
+
+    Read from the committed manifest rather than from the plate builder, so
+    this runs on a bare CI box: the assignment is an authored input, and the
+    builder needs numpy and Pillow that the offline suite does not install.
+    """
+    from scripts.build_wolves import ACT1_EDITS, TRAILER_CARDS
+
+    meta = json.loads((REPO / "stories" / "summit-photos.json").read_text())
+    wanted = {kind for _, _, kind, _ in ACT1_EDITS if kind != "cut"}
+    wanted |= {slot for _, _, _, slot in TRAILER_CARDS}
+    wanted.add("enemy_cu")
+    assert wanted == set(meta["assignment"])
+
+    # Every slot names a photograph the manifest actually knows how to fetch.
+    known = {p["file"].rsplit("/", 1)[-1].removesuffix(".jpg")
+             for p in meta["photos"]}
+    assert set(meta["assignment"].values()) <= known

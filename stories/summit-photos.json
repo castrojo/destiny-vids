@@ -1,0 +1,119 @@
+{
+ "album": "Maintainer Summit North America 2025",
+ "album_url": "https://www.flickr.com/photos/143247548@N03/albums/72177720330210424/",
+ "creator": "Cloud Native Computing Foundation",
+ "flickr_nsid": "143247548@N03",
+ "license": "CC BY-NC-ND 4.0",
+ "license_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+ "crop_authorisation": "NoDerivatives forbids distributing a crop, and every plate is a crop (3:2 sources into a 16:9 film). OWNER DECISION, verbatim: \"crop it I have authority I work for the cncf\". Recorded as the owner's, not an agent's -- see AGENTS.md, 'a licensing decision'.",
+ "attribution": "Required by the licence and NOT burned onto the slides: it belongs to the credits sequence, issue #51. Until that exists this is an outstanding obligation, tracked on the cut's punch list.",
+ "note": "Largest rendition only: sizes at _h and above carry their OWN secret, so a _b URL cannot be edited into a _k URL. Each `url` below was resolved from the photo's own sizes page.",
+ "photos": [
+  {
+   "frame": "001",
+   "id": "54927727830",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_001",
+   "page": "https://www.flickr.com/photos/143247548@N03/54927727830/",
+   "url": "https://live.staticflickr.com/65535/54927727830_8ceeb435e0_k.jpg",
+   "file": "media/summit/group-001.jpg"
+  },
+  {
+   "frame": "002",
+   "id": "54927620503",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_002",
+   "page": "https://www.flickr.com/photos/143247548@N03/54927620503/",
+   "url": "https://live.staticflickr.com/65535/54927620503_bdcd9f55bf_k.jpg",
+   "file": "media/summit/group-002.jpg"
+  },
+  {
+   "frame": "003",
+   "id": "54927669184",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_003",
+   "page": "https://www.flickr.com/photos/143247548@N03/54927669184/",
+   "url": "https://live.staticflickr.com/65535/54927669184_bd08620ef3_k.jpg",
+   "file": "media/summit/group-003.jpg"
+  },
+  {
+   "frame": "004",
+   "id": "54927620358",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_004",
+   "page": "https://www.flickr.com/photos/143247548@N03/54927620358/",
+   "url": "https://live.staticflickr.com/65535/54927620358_e95c5d3916_k.jpg",
+   "file": "media/summit/group-004.jpg"
+  },
+  {
+   "frame": "005",
+   "id": "54927727895",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_005",
+   "page": "https://www.flickr.com/photos/143247548@N03/54927727895/",
+   "url": "https://live.staticflickr.com/65535/54927727895_ae0f43a216_k.jpg",
+   "file": "media/summit/group-005.jpg"
+  },
+  {
+   "frame": "006",
+   "id": "54926555222",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_006",
+   "page": "https://www.flickr.com/photos/143247548@N03/54926555222/",
+   "url": "https://live.staticflickr.com/65535/54926555222_cdad9ac177_k.jpg",
+   "file": "media/summit/group-006.jpg"
+  },
+  {
+   "frame": "007",
+   "id": "54926555127",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_007",
+   "page": "https://www.flickr.com/photos/143247548@N03/54926555127/",
+   "url": "https://live.staticflickr.com/65535/54926555127_97d2f27d16_k.jpg",
+   "file": "media/summit/group-007.jpg"
+  },
+  {
+   "frame": "008",
+   "id": "54927669159",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_008",
+   "page": "https://www.flickr.com/photos/143247548@N03/54927669159/",
+   "url": "https://live.staticflickr.com/65535/54927669159_d389e66c51_k.jpg",
+   "file": "media/summit/group-008.jpg"
+  },
+  {
+   "frame": "009",
+   "id": "54926555137",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_009",
+   "page": "https://www.flickr.com/photos/143247548@N03/54926555137/",
+   "url": "https://live.staticflickr.com/65535/54926555137_2df970d650_k.jpg",
+   "file": "media/summit/group-009.jpg"
+  },
+  {
+   "frame": "010",
+   "id": "54927727820",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_010",
+   "page": "https://www.flickr.com/photos/143247548@N03/54927727820/",
+   "url": "https://live.staticflickr.com/65535/54927727820_644f4019f8_k.jpg",
+   "file": "media/summit/group-010.jpg"
+  },
+  {
+   "frame": "011",
+   "id": "54926555242",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_011",
+   "page": "https://www.flickr.com/photos/143247548@N03/54926555242/",
+   "url": "https://live.staticflickr.com/65535/54926555242_43c7e3884e_k.jpg",
+   "file": "media/summit/group-011.jpg"
+  },
+  {
+   "frame": "012",
+   "id": "54927620483",
+   "title": "KC+CNC_NA_251109_MaintainerSummitGroupPhoto_ML-MN_012",
+   "page": "https://www.flickr.com/photos/143247548@N03/54927620483/",
+   "url": "https://live.staticflickr.com/65535/54927620483_bccef149c8_k.jpg",
+   "file": "media/summit/group-012.jpg"
+  }
+ ],
+ "assignment_note": "Which photograph fills which slot in the cut. Chosen for MAXIMUM DISTINCTNESS as well as headcount: the first selection took the three biggest crowds (002, 003, 004) and they turned out to be three frames of the same overhead photo seconds apart -- on screen, one image shown three times. 002 is the overhead wide of the whole summit and takes the longest hold; the rest are ground-level crowds from the same minute, so the six still read as one set. Pairwise correlation peaks at 0.27 against the 0.42-0.57 of the rejected trio. Owner-rejected on the wider set: summit-11 (one person), summit-03 (its near-duplicate), summit-15 (blurred audience).",
+ "duplicate_correlation_limit": 0.35,
+ "assignment": {
+  "enemy_cu": "group-002",
+  "act1_black_1": "group-008",
+  "act1_black_3": "group-011",
+  "buildcrafting": "group-010",
+  "raids": "group-012",
+  "act1_black_2": "group-005"
+ }
+}

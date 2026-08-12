@@ -1,7 +1,7 @@
-# Seven Days to the Wolves — the musical (timing pass)
+# Seven Days to the Wolves — the musical (editorial pass)
 
-**Status:** timing pass, for review. **Not delivered** — see Rights.
-**Runtime:** 427.6 s (7:08) for a 424.0 s song. The 3.65 s difference is the pause.
+**Status:** editorial pass, for review. **Not delivered** — see Rights.
+**Runtime:** 432.7 s (7:12.7) for a 424.0 s song. The 8.66 s difference is the pause.
 **Rendered:** `renders/07-wolves-timing-pass.mp4` — 1920x1080 H.264, 30 fps,
 AAC 48 kHz, −1.2 dBTP, −10.0 LUFS integrated.
 
@@ -10,19 +10,30 @@ hero videos and the teaser are marketing toward.
 
 ## What this pass is
 
-The first cut was 289 shots in 424 s, 25 of them replayed, a third of Act I
-from Curse of Osiris, and the middle reshuffled out of source order. It was a
-good first cut and the wrong method. This one inverts it.
+The pass before this one was a **timing pass**: nothing was removed, and every
+span destined for removal stayed in the timeline at its exact duration behind a
+marker card, so the cut could be played against the music and judged before a
+frame was actually taken out. That worked, the owner reviewed it, and this pass
+carries out the notes.
 
-> **Mark, don't cut.** Anything destined for removal or replacement stays in
-> the timeline at its exact duration, blacked out by a marker card saying what
-> will happen there.
+> **Mark, don't cut — until the notes come back.** The convention is written up
+> in [`docs/skills/editing.md`](../skills/editing.md).
 
-Because a card and the footage it replaces are the same number of seconds,
-**timing is preserved by construction**. Every anchor lands where it will land
-in the finished cut, so this can be played against the music and reviewed
-before a frame is actually removed. The convention is written up in
-[`docs/skills/editing.md`](../skills/editing.md).
+What survives from the timing pass is its arithmetic, and it is the reason the
+notes could be applied without re-timing anything: **a card and the footage it
+replaces are the same number of seconds.** So replacing a black screen with a
+photograph moves no anchor at all, and only the genuine removals cost anything.
+
+Three timing invariants govern every edit, and all three are assertions in
+`scripts/build_wolves.py` rather than prose here:
+
+1. **Bed anchors never move** — the gallop, the flute entry, the HOWL, the pause.
+2. **Act I removals are bought back off the head**, automatically, by the
+   derived `CAPTURE_IN`. Cut more out of the intro and the capture starts
+   earlier; the gallop does not move.
+3. **A removal inside Act III must be filled.** That act's length is pinned
+   between two anchors *and* `wolves_act2` ends at 210.015 s, so the Pale Heart
+   run cannot grow a tail to cover a removal — the footage does not exist.
 
 **13 source runs, not 289 shots.** Every act is one unbroken run in source
 order. Act II and Act III-A are literally contiguous: the window crash is not a
@@ -36,7 +47,32 @@ on the flute entry.
 | Bed | Nightwish, *7 Days to the Wolves* — [`LASru9j0oIc`](https://www.youtube.com/watch?v=LASru9j0oIc) | Album version (*Dark Passion Play*), official Nightwish channel. 424.0 s |
 | Acts I, II, III | *All Cinematic Trailers (Destiny)* — [`oRoHW97OZcs`](https://www.youtube.com/watch?v=oRoHW97OZcs) | **A fan compilation by Antesion**, 30:23. Not an official Bungie upload — see Rights |
 | Act III | *Destiny 2: The Collection Trailer* — [`qI-fxJM8rSM`](https://www.youtube.com/watch?v=qI-fxJM8rSM) | Official Destiny 2 channel |
+| Act III | *Destiny 2: The Final Shape \| **Gameplay** Trailer* — [`UchfadQhX7w`](https://www.youtube.com/watch?v=UchfadQhX7w) | **Official Destiny 2 channel.** 123 s, 2024-04-09. New in this pass |
+| Stills | Contributor Summit group photographs | CNCF, CC BY-NC-ND 4.0 — see Rights |
 | Artwork | `~/Pictures/Artwork/wolves.jpg` | The *Seven Days to the Wolves* poster |
+
+### The Gameplay Trailer is not the Launch Trailer
+
+This bit cost a wrong turn, so it is written down. The owner supplied three
+640x360 proxy clips named `UchfadQhX7w_Kat_77-82`, `_Kaslin_83-87` and
+`_Laura_91-97`, and this repo already indexes a file called
+`yt_destiny_2_the_final_shape_launch_trailer`. They are **different videos**:
+
+| Title | ID |
+|---|---|
+| Teaser Trailer | `gGa8K-yQr8k` |
+| Reveal Trailer | `Ehl6aWUiA4Y` |
+| **Gameplay Trailer** — the proxies' source | **`UchfadQhX7w`** |
+| Launch Trailer — indexed here already | `6Gm5mbwrqSA` |
+
+Frame-matching all three proxies against the indexed 1080p launch trailer found
+**no match at any offset**: best mean-abs-pixel-difference 45.3 / 60.6 / 59.0 at
+160x90, with runners-up within 0.5 of the best — noise, not a match. Fetched
+fresh as **4K AV1 (format 401)** and scaled to 1080p; the proxies then match the
+new master to the frame (diff 3.7 / 4.2 against runners-up above 20).
+
+It is an **official Bungie upload**, so it is better provenance than the fan
+compilation the rest of the film rests on.
 
 Three window extracts keep every seek in a short file — `render.py` seeks after
 `-i` for frame accuracy, which decodes from zero (`docs/rendering.md`):
@@ -58,31 +94,202 @@ builder asserts on it rather than trusting anyone to remember.
 | # | Film | Bed | Source | What |
 |---|---|---|---|---|
 | 1 | 0:00 – 0:10 | 0 – 10 | title card | Project Bluefin, over the song's quiet opening |
-| 2 | 0:10 – 0:47 | 10 – 47 | `act1` 0:21.2 – 0:58.2 | **Act I**, the intro capture |
-| 2b | 0:47 – 3:02.8 | 47 – 182.8 | `act1` 1:07.2 – 3:23 | ...continuing past the excised sun |
-| 3 | 3:02.8 – 3:20.6 | 182.8 – 200.6 | Lightfall trailer | **Act II** opens: the gallop cuts to neon |
-| 4 | 3:20.6 – 4:19.4 | 200.6 – 259.4 | `act2` 0:47.1 – 1:45.9 | Neomuna, unbroken into the crash |
-| 5 | 4:19.4 – 4:33.5 | 259.4 – 273.5 | `act2` 1:45.9 | **Act III**, the crash, the strand descent |
-| 6 | 4:33.5 – 4:37.0 | 273.5 – 277.0 | card | `COMIC PLACEHOLDER` over the enemy CU |
-| 7 | 4:37.0 – 4:39.7 | 277.0 – 279.7 | artwork | held through the HOWL and the silence |
-| 8 | 4:39.7 – 4:47.0 | 279.7 – 287.0 | `act2` 2:06.2 | the band slams back in, on three Guardians |
-| 9 | 4:47.0 – 5:22.2 | 287.0 – 322.2 | `act3` 0:55 – 1:30.2 | the Collection Trailer montage, three cards marked |
-| 10 | 5:22.2 – 5:25.9 | *paused* | `act3` 0:29.4 – 0:33.0 | **the song stops**; hero montage in its own audio |
-| 11 | 5:25.9 – 6:04.9 | 322.2 – 361.2 | `act2` 2:51 – 3:30 | the Pale Heart, Guardians gathering |
-| 12 | 6:04.9 – 6:55.4 | 361.2 – 411.7 | `act4` 0:00 – 0:50.5 | the finale, the Guardians assembled |
-| 13 | 6:55.4 – 7:07.6 | 411.7 – 424.0 | artwork | the outro, over the fade |
+| 2 | 0:10 – 1:30.8 | 10 – 90.8 | `act1` 0:10.1 – 1:40.9 | **Act I**, the orrery approach and the capture |
+| 3 | 1:30.8 – 1:33.8 | 90.8 – 93.8 | **summit** | over the black the owner asked to lose |
+| 4 | 1:33.8 – 2:04.1 | 93.8 – 124.1 | `act1` 1:43.9 – 2:04.2 | ...continuing, the Ghost-alone shot gone |
+| 5 | 2:04.1 – 2:05.4 | 124.1 – 125.4 | **summit** | over a second black |
+| 6 | 2:05.4 – 2:44.9 | 125.4 – 164.9 | `act1` 2:16.8 – 2:49.7 | the court scene and the 2:24 sequence gone |
+| 7 | 2:44.9 – 2:47.0 | 164.9 – 167.0 | **summit** | over a third black |
+| 8 | 2:47.0 – 3:02.8 | 167.0 – 182.8 | `act1` 3:07.2 – 3:23 | the ship rising, into the gallop |
+| 9 | 3:02.8 – 3:20.6 | 182.8 – 200.6 | Lightfall trailer | **Act II** opens: the gallop cuts to neon |
+| 10 | 3:20.6 – 4:19.4 | 200.6 – 259.4 | `act2` 0:47.1 – 1:45.9 | Neomuna, unbroken into the crash |
+| 11 | 4:19.4 – 4:33.5 | 259.4 – 273.5 | `act2` 1:45.9 | **Act III**, the crash, the strand descent |
+| 12 | 4:33.5 – 4:37.0 | 273.5 – 277.0 | **summit** | the whole summit, over the enemy CU |
+| 13 | 4:37.0 – 4:39.7 | 277.0 – 279.7 | artwork | held through the HOWL and the silence |
+| 14 | 4:39.7 – 4:47.0 | 279.7 – 287.0 | `act2` 2:06.2 | the band slams back in, on three Guardians |
+| 15 | 4:47.0 – 5:22.2 | 287.0 – 322.2 | `act3` 0:51.8 – 1:27.0 | the Collection Trailer montage, two slots filled |
+| 16 | 5:22.2 – 5:30.9 | *paused* | `gameplay` 0:44.8 – 0:53.5 | **the song stops**; the explosion and the portrait |
+| 17 | 5:30.9 – 5:46.9 | 322.2 – 338.2 | `act2` 2:51 – 3:07 | the Pale Heart, Guardians gathering |
+| 18 | 5:46.9 – 6:00.8 | 338.2 – 352.1 | `gameplay` 1:17.6 – 1:35.2 | three action runs, where the Ghost sequence was |
+| 19 | 6:00.8 – 6:09.9 | 352.1 – 361.2 | `act2` 3:21 – 3:30 | back on the plains |
+| 20 | 6:09.9 – 7:00.4 | 361.2 – 411.7 | `act4` 0:00 – 0:50.5 | the finale, the Guardians assembled |
+| 21 | 7:00.4 – 7:12.7 | 411.7 – 424.0 | artwork | the outro, over the fade |
 
 **The song plays from the first frame**, under the title card — the record's own
 opening is quiet pickups, which is what a title card wants. The only source
-audio in the film is the 3.65 s pause.
+audio in the film is the 8.66 s pause.
+
+## The owner's notes, and what each one measured
+
+Every note is a *film* timecode. Each was confirmed by extracting the frame it
+names, then snapped to a measured shot boundary — the black spans from
+`blackdetect`, the picture from `ContentDetector`. Nothing below was rounded to
+a convenient number.
+
+| Note | What was on screen | What was done |
+|---|---|---|
+| "1:21 just flash the enemy and then move on and remove the black" | the enemy CU at `act1` 99.3–100.1, a dark tail, then 3.0 s of black | the CU is kept as the flash it already is; the dark tail (0.771 s) is **cut**; the black becomes a **summit photograph** |
+| "1:41 skip the ghost by itself and cut to the shot of them together" | Ghost alone at 122.9–124.2, the two together from 124.2 | the Ghost-alone shot is **cut** (1.240 s) |
+| "speeder bike scene is awesome" | — | untouched |
+| "02:20 court scene skip" | the throne room, 160.0–162.4 | **cut** (2.379 s) |
+| "02:24 skip this whole sequence until 2:30" | ships over canyon → caged Vex mind → Ghost over a map | **cut** 163.3–169.7 (6.435 s), out on the ship lifting off |
+| "2:45" | 2.1 s of black | **summit photograph** |
+| "cut out the renegades slide" | the `COUNTLESS LEGENDS` publisher slide | **removed outright** — see below |
+| "we want this explosion to be cortney's segment" | the wrong shot entirely | recut from the Gameplay Trailer — see below |
+| "5:26 … keep this in its entirety" | the three Guardians on the plains | untouched, and it now follows Cortney directly |
+| "cut 5:44 extended ghost sequence … to 5:56" | the Ghost alone, 13.9 s of it | **cut**, and the hole filled — see below |
+| "Replace all black screen/placeholders" | 4 marker cards, 3 black spans | six photographs, one slide removed |
+
+One black span the owner did not name — `act1` 135.4–136.8, at film 1:55 — is
+also replaced, because "replace **all** black screen" is the instruction. Two
+much shorter blacks (0.37 s and 0.54 s) are **left alone**: they are transitions
+inside the cinematic, and a third of a second of photograph is a subliminal
+flash, not a picture. The threshold used is 1.0 s, and it is written down here
+rather than left for somebody to rediscover.
+
+The excisions total 20.094 s, so the capture now starts at `act1` **10.072**
+instead of 21.166 — which is where the documented capture begins. The 11 s
+bought back at the head is the **Mars → Earth orrery approach**, checked by
+frame, and it builds where the old head started cold.
 
 ## Everything below is measured
 
+### The renegades slide could not simply be deleted
+
+The `COUNTLESS LEGENDS` slide sits at `act3` 87.4–89.4, immediately before the
+pause. Deleting its 2.0 s would have pulled the pause 2.0 s earlier and **off
+its downbeat** — the one anchor in this section.
+
+So the montage **starts earlier instead**: in-point 55.0 → **51.767** (a detected
+boundary), running to 86.967, which stops 0.433 s short of the slide. Bed time
+is unchanged, every anchor holds, and the slide never appears. The final run's
+tail is the only thing trimmed, which is the house rule — an in-point is what
+the detector worked to find, so a trim never moves the start.
+
+`test_the_publisher_slide_the_owner_cut_never_comes_back` asserts on the
+*timecode*, not on the absence of a card, because "no card" would still pass if
+a run grew into the slide.
+
+### The pause: the explosion, the portrait, and the cut
+
+The owner's note — *"we want this explosion to be cortney's segment. Capture the
+length of the shot, including the portrait of her in transcendence glowing mode,
+hold the scene until the cut"* — came with a reference clip,
+`~/Videos/wolves-directors-cut/cortney.mp4` (9.009 s, 640x360, with music).
+
+**The timing pass had the wrong footage.** It paused on the Collection Trailer
+at 0:29.4. The reference clip frame-matches the **Gameplay Trailer** at
+**45.0 – 54.009** — mean abs pixel difference 3.2–4.1 at 160x90 against
+runners-up of 22–33, at four probes across the clip. It is not in the
+Collection Trailer at all.
+
+The shot's own boundaries were then measured by differencing consecutive frames
+at 1/30 s:
+
+```
+51.835   frame delta 170.2   the explosion's white bloom begins
+53.003   ...decaying into the transcendence portrait
+53.470   frame delta  89.1   the cut out of the portrait
+```
+
+against a background of under 30. The pause runs **44.811 → 53.470** (8.659 s):
+in-point at the enclosing shot boundary so the moment builds rather than
+starting mid-air, out-point exactly on the measured cut. The reference is
+9.009 s; this is 8.659 s.
+
+It is `audio: "source"`, so it **costs no bed time** — extending it from 3.65 s
+only makes the film longer, and no anchor moved.
+
+On *"recreate it with the sfx pristine version you have, no music"*: the source
+audio is the trailer's own, **unaltered**. Measured over the span it is
+broadband rather than tonal — spectral flatness **0.45** in the run-up and
+**0.47** across the explosion — i.e. gunfire and detonation, not a melodic bed.
+Nothing was separated, ducked or enhanced to make that true; the audio tenet in
+`~/Videos/AUDIO.md` is to ship the best source unaltered, and source separation
+is exactly the kind of "enhancement" it rules out.
+
+### The Ghost sequence, and why its hole had to be filled
+
+`wolves_act2` 187.022 → 200.965 is the Ghost alone, flying through fog and
+machinery — 13.943 s, verified by frame at both ends, with the Guardians
+returning to the plains on the cut at 200.965.
+
+The Pale Heart run **cannot** simply grow a tail to cover the removal:
+`wolves_act2` is 210.015 s long and the run already ends at 210.0. There is no
+more footage. Act III-C's length is pinned between two bed anchors, so 13.943 s
+of picture had to come from somewhere.
+
+It comes from the three runs the owner supplied as proxies, recut from the
+1080p master at detected boundaries:
+
+| Source | Duration | What |
+|---|---|---|
+| `gameplay` 77.578 – 82.516 | 4.938 | a Titan holds the line behind a Ward of Dawn |
+| `gameplay` 82.516 – 87.087 | 4.571 | a Warlock through the Dread, weapons up |
+| `gameplay` 90.791 – 95.225 | 4.434 | a Hunter vaults into the light, and three walk in together |
+
+= **13.943 s**, exactly. Only the last is trimmed, and only at its tail. They
+play **under the bed**: the pause is the film's one section with its own audio.
+
+### Casting on those three runs — and an override
+
+The owner named the people, and **overrode their own filenames doing it**:
+
+> "the warlock should be kaslin fields and the hunter was laura santamaria but
+> make it github.com/inffy"
+
+| Shot | Proxy filename said | Cast as | Identity |
+|---|---|---|---|
+| Titan | Kat | **Kat Cosgrove** | authored; already bound in `vocab/casting.yaml` |
+| Warlock | Kaslin | **Kaslin Fields** | authored in the website's `characters.json` (slug `kaslin`) |
+| Hunter | **Laura** | **`github.com/inffy`** | **none authored anywhere** |
+
+The override is recorded because the proxy file
+`UchfadQhX7w_Laura_91-97.mp4` still carries the old name, and **a wrong credit
+is not recoverable by a revert**.
+
+**None of the three is plated**, so none of this reaches the screen in this
+pass: the runs play under the bed as action, and credit belongs to the credits
+sequence ([issue #51]). `inffy` is recorded in `leads.pending` with
+`automatable: no` — no Guardian identity is authored for that account in the
+reference deck or the website's `characters.json`, and a missing name is
+omitted and recorded, never invented.
+
+Kaslin is deliberately **not** added to `vocab/casting.yaml`. Her identity is
+authored, but `leads` is keyed by *Destiny character* and there is no Destiny
+character here — she is a Warlock in gameplay footage. The right home is
+`ensemble.titles`, which is keyed by **GitHub login**, and nobody has supplied
+hers. Inventing either key would have been the fault this file exists to
+prevent, so the casting is recorded in the shotlist and here instead.
+
+### The summit photographs
+
+Six Contributor Summit group photographs replace the four `COMIC PLACEHOLDER`
+cards and the three Act I black spans, built by
+[`scripts/build_summit_plates.py`](../../scripts/build_summit_plates.py).
+
+They are **picture, not slates**, which is why that script sits beside
+`tools/marker.py` rather than inside it: a marker must never be mistakable for
+finished picture, and the reverse holds too.
+
+The crop is **computed, not centred.** The website's own sequence file already
+records the problem next to its `backgroundMotion: 'kenburns'` flag — these are
+wide group shots with empty plant and floor padding, and a centred crop frames
+the padding instead of the people. So the 16:9 window is chosen by measuring
+local variance (faces, lanyards and badges are high-frequency; foliage, carpet
+and ceiling are not) and keeping the densest band. All six then get one common
+grade, so they read as a set rather than as six unrelated stills.
+
+Selection favoured the most people in frame, per the owner: the three overhead
+wides of the whole summit take the three longest slots. Owner-confirmed
+rejections: `summit-11` (one person holding a shirt), `summit-03` (its
+near-duplicate) and `summit-15` (a blurred audience).
+
 ### The two act hinges
 
-Unchanged from the first cut, and still the only frame-accurate obligations:
-the **gallop at 182.834 s** (the spectral centroid collapses to 768 Hz) and the
-**flute entry at 259.390 s**, both snapped to the bar grid (76 bpm, bar 3.158 s).
+Unchanged, and still the only frame-accurate obligations: the **gallop at
+182.834 s** (the spectral centroid collapses to 768 Hz) and the **flute entry at
+259.390 s**, both snapped to the bar grid (76 bpm, bar 3.158 s).
 
 ### The song's one silence — and where the artwork goes
 
@@ -131,63 +338,55 @@ at the Neomuna boundary. It is also better provenance for 17.8 s of the film.
 
 ### The intro trim, and why the in-point is derived
 
-The capture is source 0:10 → 3:23, which is **193 s**, and the intro has only
-182.834 s to spend once the song plays from frame one.
-
-One span is dropped from inside it — **source 0:58 → 1:07**, a static distant
-sun followed by several seconds of black, which stops the intro dead. The rest
-of the difference comes off the **head**, because the capture's ending (the ship
-rising, the fade) is the payoff into Act II.
+The capture is source 0:10 → 3:23, and the intro has only 182.834 s to spend
+once the song plays from frame one. Everything the owner cut out of the middle
+is bought back off the **head**, because the capture's ending (the ship rising,
+the fade) is the payoff into Act II.
 
 **The in-point is therefore derived, not written down:**
 
 ```python
-CAPTURE_IN = CAPTURE_OUT - (ACT2_IN - TITLE_CARD_LEN) - sum(excisions)
+CAPTURE_IN = CAPTURE_OUT - (ACT2_IN - TITLE_CARD_LEN) - sum(cuts)
 ```
 
 Cut another span out of the intro and the capture simply starts earlier — the
-gallop does not move, and no anchor after it does either. Buying the sun back
-restored the Mars → Earth orrery approach at the head, which builds where the
-sun sat still.
+gallop does not move, and no anchor after it does either.
+
+`sum(cuts)` counts only the spans marked `"cut"`. A span **replaced** by a
+photograph costs nothing, because the photograph is exactly as long as the black
+it stands in for. That distinction is the whole reason the black spans could be
+dealt with without re-timing Act I, and
+`test_act_one_edits_are_bought_back_off_the_head` pins both halves of it.
+
+One boundary moved for its own reason: the static-sun excision now ends at
+**67.435** rather than 67.166, because that is where `blackdetect` says the
+black actually ends. The old value leaked 0.27 s of black into the cut.
 
 ### Two clocks
 
 The mechanic and when to reach for it are in
 [`docs/skills/scoring.md`](../skills/scoring.md#two-clocks-when-the-bed-does-not-run-end-to-end).
 What is specific to this cut: the song plays from the first frame, the only
-`audio: "source"` shot is the pause, and the film is therefore **427.6 s for
+`audio: "source"` shot is the pause, and the film is therefore **432.7 s for
 424.0 s of music**. Every anchor in the builder is asserted against bed time.
-
-Verified by correlating the delivered audio against the bed:
-
-| Film position | Bed position | Correlation | |
-|---|---|---|---|
-| 100 s | 100 s | **+1.000** | the song is exactly where it should be |
-| 323 s | — | ~**0.000** | inside the pause, the song is genuinely absent |
-| 350 s | 346.35 s | **+1.000** | it resumes from where it stopped |
 
 ### The pause's length, measured
 
 The rule — [a diegetic insert has to be allowed to
 end](../skills/scoring.md#a-diegetic-insert-has-to-be-allowed-to-end) — came out
 of this cut. The pause was first taken at 1.8 s and the moment *started and did
-not finish*. The in-point never moved; only the out-point was wrong. From the
-trailer's envelope:
-
-```
-28.2  build begins        29.63  peak (-9.5 dB)
-30.36 release             32.56  second swell
-33.00 the phrase lands in its quietest point (-31.9 dB)   <- out
-```
+not finish*; the timing pass took it to 3.65 s. This pass takes it to the shot
+the owner actually meant, 8.659 s, with the out-point on a measured cut rather
+than on an audio envelope.
 
 ### Guardians together
 
-The selection signal is **Guardians in frame together**, and four runs are
-flagged `plate_slot` in the shotlist for the nameplate pass rather than being
+The selection signal is **Guardians in frame together**, and the runs flagged
+`plate_slot` in the shotlist are there for the nameplate pass rather than being
 re-found by eye later: Act II opens on three Guardians advancing abreast
 (source 23:29), the slam after the silence lands on three running at camera,
-the Pale Heart run has them gathering on the plains, and the finale is the
-whole assembled crowd.
+both halves of the Pale Heart run have them gathering on the plains, and the
+finale is the whole assembled crowd.
 
 ## Editorial rules, enforced in the builder
 
@@ -198,11 +397,8 @@ whole assembled crowd.
   cards; the Pale Heart run starts at source 25:51, after the pyramid and
   monolith material. Both are asserted, because both were breached by a run
   reaching backwards to fill time rather than by anyone choosing the footage.
-- **A long enemy hold becomes a card, never a jump cut.**
-- **Publisher mechanic cards become artwork slots.** Three fall inside the
-  Collection Trailer montage — `7 RAIDS` (63.3–65.2), `ENDLESS BUILDCRAFTING`
-  (71.0–73.0), `COUNTLESS LEGENDS` (87.4–89.4) — each blacked out at its exact
-  duration. Recovered from frames in the first cut, not invented.
+- **No publisher slide survives** — each is removed, or replaced by picture, and
+  the montage is asserted never to reach the removed one's timecode.
 - **The film ends on the Guardians, not a logo.** The finale run stops at
   source 26:30 + 50.5, a beat before the branded `THE FINAL SHAPE` cards.
 
@@ -213,9 +409,89 @@ measures +2.1 dBFS. The fix is a **static −3.5 dB gain** applied once, at the
 final mux — not `loudnorm`, not a limiter: a static gain changes no dynamics at
 all, and the LRA is the artist's, not ours.
 
-Delivered: **−1.2 dBTP**, −10.0 LUFS integrated, LRA 4.1. The true peak is
-tighter than the first cut's −2.7 dBTP because the source-audio regions bring
-their own peaks; it is still under 0 dBTP, which is the gate.
+**The pause needed the same treatment, for its own reason.** An insert is
+somebody else's mix and it brings peaks nobody here planned for, over a region
+far too short to move the film's integrated loudness. Measured:
+
+| Region | True peak |
+|---|---|
+| whole file, before | **−0.4 dBTP** — over the −1.0 gate |
+| a bed region | −3.2 dBTP — fine, and unchanged |
+| the 8.7 s pause | **−0.4 dBTP** — the culprit |
+
+So the pause gets a static **−1.5 dB** of its own
+(`tools/audiomix.py --source-gain-db`, added in this pass as the mirror of
+`--bed-gain-db`). Pulling the whole film down would have worked too and is
+worse: it would quietly re-level music whose gain was already decided and
+documented above.
+
+Delivered: **−1.6 dBTP**, −10.1 LUFS integrated, LRA 4.0.
+
+### The pause was silent, and everything else still passed
+
+Worth recording, because it nearly shipped. The Gameplay Trailer was fetched
+with `yt-dlp -f 401`, which is **video-only**, so the one region of the film
+that plays its own audio rendered as **digital silence** — and every duration,
+every anchor and every bed-sync check passed anyway, because the bed is muted
+there by design. A silent insert sounds exactly like a working pause until
+somebody plays it.
+
+The verification now asserts a floor on the region's RMS as well as its
+correlation against the bed. The two catch opposite faults and neither implies
+the other: the floor catches a silent insert, the correlation catches the bed
+leaking into a region that was supposed to be a pause.
+
+## Reproducing
+
+```bash
+cd ~/src/destiny-vids
+FF=/home/linuxbrew/.linuxbrew/bin/ffmpeg   # the system ffmpeg has no H.264 decoder
+
+# 1. the new source: official Bungie upload, 4K AV1, video AND audio
+yt-dlp -f 401 -o media/_gp4k.%(ext)s https://www.youtube.com/watch?v=UchfadQhX7w
+yt-dlp -f 251 -o media/_gpaudio.%(ext)s https://www.youtube.com/watch?v=UchfadQhX7w
+$FF -i media/_gp4k.mp4 -i media/_gpaudio.webm -map 0:v:0 -map 1:a:0 \
+    -vf "scale=1920:1080:flags=lanczos,setsar=1" \
+    -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -c:a aac -b:a 320k \
+    media/yt_destiny_2_the_final_shape_gameplay_trailer.mp4
+python3 tools/ingest.py https://www.youtube.com/watch?v=UchfadQhX7w
+python3 tools/annotate.py index \
+    --video media/yt_destiny_2_the_final_shape_gameplay_trailer.mp4 \
+    --video-record videos/yt_destiny_2_the_final_shape_gameplay_trailer.json
+
+# 2. the summit plates (URLs and licence: stories/summit-photos.json)
+python3 scripts/build_summit_plates.py --fetch
+
+# 3. the shotlist, the picture, the audio
+python3 scripts/build_wolves.py
+DESTINY_FFMPEG=$FF python3 tools/render.py stories/seven-days-timing-pass.json \
+    --media media --out renders/07-wolves-picture.mp4
+DESTINY_FFMPEG=$FF python3 tools/audiomix.py stories/seven-days-timing-pass.json \
+    --video renders/07-wolves-picture.mp4 \
+    --bed media/bed_seven_days_to_the_wolves.wav \
+    --bed-gain-db -3.5 --source-gain-db -1.5 \
+    --out renders/07-wolves-timing-pass.mp4
+```
+
+**Fetching the audio separately is not optional.** Format 401 is video-only,
+and a silent insert is invisible to every other check — see Audio.
+
+## Verification
+
+Not asserted — measured, on the delivered file.
+
+| Claim | Evidence |
+|---|---|
+| Not truncated | full `-xerror` decode passes; 12 977 frames, 432.733 s |
+| The song is where it should be | cross-correlation against the bed: lag **0.00 ms**, r = 0.9998–0.9999 at film 100/250/300 |
+| The song resumes where it stopped | lag **1.00 ms** (8 samples at 8 kHz), r = 0.9997–0.9999 at film 340/400 |
+| The pause is a genuine pause | correlation against the bed **−0.10** across the region |
+| The pause is not silent | region RMS **−18.5 dB**, peak −1.9 dB — the trailer's own SFX |
+| Headroom | **−1.6 dBTP**, −10.1 LUFS, LRA 4.0 |
+| Anchors hold | every `at_bed()` assertion in the builder, plus `tests/test_wolves_timing_pass.py` (28 tests) |
+| No slide, no placeholder | asserted on timecode and on beat text, not on the absence of a card |
+| No two summit slots repeat | peak pairwise correlation **0.27**, limit 0.35 |
+| Joins | a frame extracted at every new cut and inside every summit slot |
 
 ## Rights
 
@@ -223,30 +499,53 @@ Bungie footage under Bungie's fan-content policy: non-commercial, metadata and
 timecodes only, no footage committed. The bed is a Nuclear Blast recording used
 as a non-commercial fan-work music bed.
 
-**The compilation provenance question is now larger, not smaller.** Act I, Act
-II and the finale all come from Antesion's re-upload. The fan-content policy
-covers Bungie's footage; it does not make a third party's compilation ours to
-use. A timing pass is an internal review artifact, so this pass proceeds —
+**The compilation provenance question is unchanged.** Act I, Act II and the
+finale all come from Antesion's re-upload. The fan-content policy covers
+Bungie's footage; it does not make a third party's compilation ours to use. An
+editorial pass is an internal review artifact, so this pass proceeds —
 **delivery does not**. Nothing here goes to `~/Videos/UPLOAD/` until that is
-decided.
+decided. The Gameplay Trailer added in this pass moves 22.6 s of the film onto
+an official Bungie upload, so the exposure is slightly smaller than it was.
+
+**The CNCF photographs are `CC BY-NC-ND 4.0`**, verified on the Flickr metadata
+for the group photos (account `143247548@N03`, album *Maintainer Summit North
+America 2025*). Non-commercial reuse is fine. **NoDerivatives forbids
+distributing a crop**, and every plate here is a crop: the sources are 3:2 and
+the film is 16:9.
+
+> **Owner decision, recorded verbatim:** *"crop it I have authority I work for
+> the cncf"*
+
+That is the licensing decision `AGENTS.md` reserves for the owner, and it has
+been made **by the owner**, not inferred by an agent. It is recorded here and in
+the header of `scripts/build_summit_plates.py` so nobody re-litigates it and
+nobody mistakes it for an agent's judgement.
+
+Attribution is required by the licence and is **not** burned onto the slides —
+it belongs to the credits sequence ([issue #51]), together with the cast
+credits. Until that sequence exists, this is an outstanding obligation, and it
+is on the punch list rather than assumed done. The photographs show identifiable
+attendees, so publicity and privacy interests survive the licence independently
+of it.
 
 ## Punch list
 
 - [ ] **Owner: is the Antesion compilation acceptable provenance?** [issue #55].
-      Blocking
-      delivery. If not, Acts I and II and the finale need re-sourcing from
-      official uploads. Escalated: three of five sections now depend on it.
-- [ ] **Owner: Cortney Nickerson's Guardian identity** — [issue #59]. The hero shot at the
-      pause (Collection Trailer 0:29.4) is cast to her by the owner, and she
-      has no authored identity in `~/Videos/nameplates.json`, the website's
-      `characters.json`, or `vocab/casting.yaml`. **The shot is rendered
-      unplated**: a missing name is omitted and recorded, never invented
-      (`AGENTS.md`). Author the identity where identities are authored and the
-      plate follows.
-- [ ] Nameplates are not burned yet. Four `plate_slot` runs are flagged in the
-      shotlist for that pass; the credits sequence is still [issue #51].
-- [ ] The four `COMIC PLACEHOLDER` slots need their artwork: one enemy CU
-      (3.5 s) and three publisher cards (1.9–2.0 s each).
+      Blocking delivery. If not, Acts I and II and the finale need re-sourcing
+      from official uploads.
+- [ ] **Credits sequence** — [issue #51]. Now carries two obligations, not one:
+      the cast credits *and* the CNCF attribution the photo licence requires.
+- [ ] **Owner: Cortney Nickerson's Guardian identity** — [issue #59]. The pause
+      is cast to her by the owner and she has no authored identity in
+      `~/Videos/nameplates.json`, the website's `characters.json`, or
+      `vocab/casting.yaml`. **The shot is rendered unplated.**
+- [ ] **Owner: `github.com/inffy`'s Guardian identity** — [issue #72]. Same
+      shape as Cortney's, recorded in `leads.pending`. The run renders unplated.
+- [ ] **Kaslin Fields' GitHub login** — [issue #72]. Her identity *is* authored;
+      the gap is that `ensemble.titles` is keyed by login and nobody has
+      supplied hers, so there is nowhere correct to record it.
+- [ ] Nameplates are not burned yet. The `plate_slot` runs are flagged in the
+      shotlist for that pass.
 - [ ] The bed is an official YouTube upload — lossy, and not the highest-quality
       upstream version. The purchasable lossless *Dark Passion Play* master is.
       Swapping it will re-time the cut: codec rungs differ in leading padding
@@ -255,6 +554,13 @@ decided.
 - [ ] **A burned-in ESRB `TEEN` badge** sits bottom-right over the first ~4.4 s
       of the Neomuna run (extract 47.1 – 51.5). It is publisher copy, so it is a
       `redactions/` job for the finished cut, not a re-cut.
+- [ ] **The Gameplay Trailer's segments are not tagged.** Its video record and
+      75 detected shot boundaries are in, so the source is ingested and
+      reproducible, but no `tags/` file exists — and without one, `overlays` is
+      untagged and every segment would derive `clean = false`. That is the
+      correct default, not a bug: it keeps unvetted footage out of `story.py`'s
+      pool until somebody has actually looked at each shot. The runs used in
+      this cut were picked by eye and do not go through the matcher.
 - [ ] Neither compilation extract is in `segments/`. Tagging exists to feed
       `story.py`'s matcher and nothing here uses it — index them only if these
       sources are wanted in search.
@@ -262,3 +568,4 @@ decided.
 [issue #51]: https://github.com/castrojo/destiny-vids/issues/51
 [issue #59]: https://github.com/castrojo/destiny-vids/issues/59
 [issue #55]: https://github.com/castrojo/destiny-vids/issues/55
+[issue #72]: https://github.com/castrojo/destiny-vids/issues/72

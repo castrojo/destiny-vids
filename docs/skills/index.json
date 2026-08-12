@@ -62,10 +62,13 @@
         "two-clocks",
         "bed-pause",
         "excision",
-        "diegetic-insert"
+        "diegetic-insert",
+        "proxy-clip",
+        "editorial-pass",
+        "shot-boundary-measurement"
       ],
       "description": "Covers outlines, shot matching, artwork cards, timing passes with marker cards, and a bed that pauses. Use when writing an outline, marking material for removal before editing, or scoring a cut whose song does not run end to end.",
-      "version": "1.5",
+      "version": "1.6",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },
@@ -183,10 +186,12 @@
         "section-detection",
         "two-clocks",
         "bed-pause",
-        "diegetic-insert"
+        "diegetic-insert",
+        "insert-headroom",
+        "source-gain"
       ],
       "description": "Covers bed records, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a master over 0 dBTP. Use when scoring a cut, pausing the song for a moment of source audio, or supporting a second recording.",
-      "version": "1.2",
+      "version": "1.3",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     }
