@@ -125,6 +125,35 @@ the reason, so the credit is never dropped in silence — see
 [`plates.md`](plates.md). Someone with no binding at all is not in the index's
 casting, and the brief that carries their copy is their punch-list.
 
+### When the character is not known yet
+
+A request often arrives the other way round: here is a person, and here is a
+figure on screen — "the woman", "the main character". Turning that into a
+Destiny character is a **visual judgment** on the footage, and it is not
+available at all when the source video is not indexed. Park it in
+`leads.pending` rather than guessing:
+
+```yaml
+  pending:
+    <github-handle>:
+      github: <github-handle>
+      described_as: Woman        # the requester's words, never a character name
+      automatable: no
+      blocked_on: >
+        The source video is not ingested, so no indexed shot shows this figure.
+```
+
+Derivation never reads `pending` (`load_leads` reads only `leads.values`), so a
+pending entry casts nobody, plates nothing and needs no search phrase — it is a
+queue, not a binding. It surfaces in exactly two places, per the contract's
+"record the gap where the next person will trip over it": the vocab file itself,
+beside the bindings, and the requester's GitHub issue, which stays open as the
+punch-list (the live example is castrojo/destiny-vids#14, three logins and an
+un-ingested video). `tests/test_casting_pending.py` pins the queue so it cannot
+be silently dropped. Promoting an entry is an ordinary binding: move it under
+its character key in `values`, add the search phrases, and run the checklist
+above.
+
 ### Ensemble
 
 ```bash
@@ -178,6 +207,7 @@ belongs on the lead binding and nowhere else.
 | "The search phrase can come later." | A binding nobody can query does not exist, and the suite fails on it. |
 | "Re-rolling the roster is fine, it's only credits." | Assignment is deterministic on purpose: a re-render must not re-credit a different person. |
 | "They have plate copy, so bind them — it's only a credit." | A binding says they recur, for the life of the project. Whether it's that or a one-video credit is the owner's call; the punch-list asks. |
+| "I can't see the video, but the description narrows it to one character." | Then park it in `leads.pending`. A binding is a claim about a real person; a queue entry is not. |
 
 ## Red Flags
 
