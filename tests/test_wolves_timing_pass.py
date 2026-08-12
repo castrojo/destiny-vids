@@ -209,3 +209,39 @@ def test_the_gallop_cuts_to_neon(cut):
             return
         bed += shot["duration"]
     raise AssertionError("no shot starts on the gallop")
+
+
+def test_the_pause_is_long_enough_to_be_a_decision(cut):
+    """A diegetic insert must be allowed to END.
+
+    The first attempt paused for 1.8 s, which cut the trailer's phrase off
+    mid-air: the moment started and did not finish, so the pause read as a
+    dropout rather than a deliberate beat. The out-point is now the phrase's
+    own resolution (its quietest point), not the end of the hero shot.
+    """
+    paused = [s for s in cut["shots"] if s["audio"] == "source"]
+    assert len(paused) == 1
+    assert paused[0]["duration"] >= 3.0, (
+        "too short to read as a decision -- see the trailer's envelope")
+
+
+def test_act_one_excisions_are_bought_back_off_the_head(cut):
+    """Dropping a span from the intro must not move the gallop.
+
+    The capture's in-point is derived from the excision list, so a span cut out
+    of the middle is paid for by starting earlier. If these ever stop summing,
+    Act I comes up short and every later anchor slides.
+    """
+    from scripts.build_wolves import ACT1_EXCISIONS, ACT2_IN, TITLE_CARD_LEN
+
+    act1 = [s for s in cut["shots"] if s.get("video_id") == "wolves_act1"]
+    assert len(act1) == len(ACT1_EXCISIONS) + 1, "one run per kept span"
+    assert sum(s["duration"] for s in act1) == pytest.approx(
+        ACT2_IN - TITLE_CARD_LEN, abs=0.01)
+
+    # The excised spans are genuinely absent from the film.
+    for cut_in, cut_out, _ in ACT1_EXCISIONS:
+        for shot in act1:
+            assert not (shot["start_sec"] < cut_out - 0.01
+                        and shot["end_sec"] > cut_in + 0.01), \
+                f"an Act I run overlaps the excised {cut_in}-{cut_out}"

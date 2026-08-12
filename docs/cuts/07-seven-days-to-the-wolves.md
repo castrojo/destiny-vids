@@ -1,7 +1,7 @@
 # Seven Days to the Wolves — the musical (timing pass)
 
 **Status:** timing pass, for review. **Not delivered** — see Rights.
-**Runtime:** 425.8 s (7:06) for a 424.0 s song. The 1.8 s difference is the pause.
+**Runtime:** 427.6 s (7:08) for a 424.0 s song. The 3.65 s difference is the pause.
 **Rendered:** `renders/07-wolves-timing-pass.mp4` — 1920x1080 H.264, 30 fps,
 AAC 48 kHz, −1.2 dBTP, −10.0 LUFS integrated.
 
@@ -58,7 +58,8 @@ builder asserts on it rather than trusting anyone to remember.
 | # | Film | Bed | Source | What |
 |---|---|---|---|---|
 | 1 | 0:00 – 0:10 | 0 – 10 | title card | Project Bluefin, over the song's quiet opening |
-| 2 | 0:10 – 3:02.8 | 10 – 182.8 | `act1` 0:30.2 – 3:23 | **Act I**, the intro capture |
+| 2 | 0:10 – 0:47 | 10 – 47 | `act1` 0:21.2 – 0:58.2 | **Act I**, the intro capture |
+| 2b | 0:47 – 3:02.8 | 47 – 182.8 | `act1` 1:07.2 – 3:23 | ...continuing past the excised sun |
 | 3 | 3:02.8 – 3:20.6 | 182.8 – 200.6 | Lightfall trailer | **Act II** opens: the gallop cuts to neon |
 | 4 | 3:20.6 – 4:19.4 | 200.6 – 259.4 | `act2` 0:47.1 – 1:45.9 | Neomuna, unbroken into the crash |
 | 5 | 4:19.4 – 4:33.5 | 259.4 – 273.5 | `act2` 1:45.9 | **Act III**, the crash, the strand descent |
@@ -66,14 +67,14 @@ builder asserts on it rather than trusting anyone to remember.
 | 7 | 4:37.0 – 4:39.7 | 277.0 – 279.7 | artwork | held through the HOWL and the silence |
 | 8 | 4:39.7 – 4:47.0 | 279.7 – 287.0 | `act2` 2:06.2 | the band slams back in, on three Guardians |
 | 9 | 4:47.0 – 5:22.2 | 287.0 – 322.2 | `act3` 0:55 – 1:30.2 | the Collection Trailer montage, three cards marked |
-| 10 | 5:22.2 – 5:24.0 | *paused* | `act3` 0:29.4 | **the song stops**; hero montage in its own audio |
-| 11 | 5:24.0 – 6:03.0 | 322.2 – 361.2 | `act2` 2:51 – 3:30 | the Pale Heart, Guardians gathering |
-| 12 | 6:03.0 – 6:53.5 | 361.2 – 411.7 | `act4` 0:00 – 0:50.5 | the finale, the Guardians assembled |
-| 13 | 6:53.5 – 7:05.8 | 411.7 – 424.0 | artwork | the outro, over the fade |
+| 10 | 5:22.2 – 5:25.9 | *paused* | `act3` 0:29.4 – 0:33.0 | **the song stops**; hero montage in its own audio |
+| 11 | 5:25.9 – 6:04.9 | 322.2 – 361.2 | `act2` 2:51 – 3:30 | the Pale Heart, Guardians gathering |
+| 12 | 6:04.9 – 6:55.4 | 361.2 – 411.7 | `act4` 0:00 – 0:50.5 | the finale, the Guardians assembled |
+| 13 | 6:55.4 – 7:07.6 | 411.7 – 424.0 | artwork | the outro, over the fade |
 
 **The song plays from the first frame**, under the title card — the record's own
 opening is quiet pickups, which is what a title card wants. The only source
-audio in the film is the 1.8 s pause.
+audio in the film is the 3.65 s pause.
 
 ## Everything below is measured
 
@@ -128,19 +129,33 @@ alley (0:52.0), then the Strand sequence (1:12.9 →). So the gallop lands on a
 picture change — a hard cut to neon — and hands over to the compilation exactly
 at the Neomuna boundary. It is also better provenance for 17.8 s of the film.
 
-### The intro trim
+### The intro trim, and why the in-point is derived
 
 The capture is source 0:10 → 3:23, which is **193 s**, and the intro has only
-182.834 s to spend once the song plays from frame one. The 20.166 s comes off
-the **head** — source 0:10 → 0:30 is a slow, dark orrery — because the capture's
-ending (the ship rising, the fade) is the payoff into Act II.
+182.834 s to spend once the song plays from frame one.
+
+One span is dropped from inside it — **source 0:58 → 1:07**, a static distant
+sun followed by several seconds of black, which stops the intro dead. The rest
+of the difference comes off the **head**, because the capture's ending (the ship
+rising, the fade) is the payoff into Act II.
+
+**The in-point is therefore derived, not written down:**
+
+```python
+CAPTURE_IN = CAPTURE_OUT - (ACT2_IN - TITLE_CARD_LEN) - sum(excisions)
+```
+
+Cut another span out of the intro and the capture simply starts earlier — the
+gallop does not move, and no anchor after it does either. Buying the sun back
+restored the Mars → Earth orrery approach at the head, which builds where the
+sun sat still.
 
 ### Two clocks
 
 `wall` is position in the film; `bed` is position in the song. **A shot marked
 `audio: "source"` advances wall and not bed.** Every anchor in the builder is
 asserted against bed time, because a musical with a pause in it is longer than
-its own song — 425.8 s of film for 424.0 s of music.
+its own song — 427.6 s of film for 424.0 s of music.
 
 `tools/audiomix.py` cuts the bed into pieces, delays each to its wall position,
 and mutes the source wherever the bed plays. At every instant exactly one of the
@@ -156,8 +171,24 @@ Verified by correlating the delivered audio against the bed:
 | 323 s | — | ~**0.000** | inside the pause, the song is genuinely absent |
 | 350 s | 348.2 s | **+1.000** | it resumes from where it stopped |
 
-The third row is the one that matters: after the pause the film runs 1.8 s ahead
-of the song, and the song picks up at exactly the sample it stopped on.
+The third row is the one that matters: after the pause the film runs 3.65 s
+ahead of the song, and the song picks up at exactly the sample it stopped on.
+
+### A diegetic insert has to be allowed to end
+
+The pause was first cut at 1.8 s, and the moment *started and did not finish* —
+the song came back while the trailer's phrase was still in the air, so the pause
+read as a dropout rather than a decision. The out-point is now the phrase's own
+resolution, measured on the trailer's envelope:
+
+```
+28.2  build begins        29.63  peak (-9.5 dB)
+30.36 release             32.56  second swell
+33.00 the phrase lands in its quietest point (-31.9 dB)   <- out
+```
+
+The in-point did not move: **where** the pause falls was already right, and only
+its length was wrong. `test_the_pause_is_long_enough_to_be_a_decision` pins it.
 
 ### Guardians together
 

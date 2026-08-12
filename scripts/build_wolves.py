@@ -79,7 +79,14 @@ ENEMY_CU_IN = 273.490      # the enemy close-up the artwork will replace
 # --- the pause: the song stops, a moment plays in its own audio --------------
 PAUSE_AT = 322.200         # a downbeat (FIRST_BEAT + 102 bars)
 PAUSE_IN = 29.35           # Collection Trailer: the clean hero shot at 0:29
-PAUSE_DUR = 1.8            # ...and out before the first-person gameplay at 0:31
+# Out at the trailer's own phrase resolution, not at the end of the hero shot.
+# Measured on the trailer's envelope: the phrase builds from 28.2, peaks at
+# 29.63, releases by 30.36, swells again to 32.56 and lands in its quietest
+# point at 33.0 (-31.9 dB). Cutting back to the song before that is what made
+# the moment "start and not finish" -- a diegetic insert has to be allowed to
+# END, or the pause reads as a dropout rather than a decision.
+PAUSE_OUT = 33.00
+PAUSE_DUR = PAUSE_OUT - PAUSE_IN
 
 # Mechanic cards inside the Collection Trailer montage, recovered from the
 # frames in the first cut. Each is publisher copy this film does not want, so
@@ -103,11 +110,17 @@ FINALE = "wolves_act4"     # compilation 26:30-30:23    -- the Pale Heart finale
 
 TITLE_CARD_LEN = 10.000    # the card opens the film; the song plays under it
 CAPTURE_OUT = 203.000      # the first cinematic ends here (verified by frame)
+# Spans dropped from inside the capture. Source 0:58-1:07 is a static distant
+# sun and then several seconds of black -- it stops the intro dead.
+ACT1_EXCISIONS = [(58.166, 67.166, "the static sun, and the black after it")]
+
 # The song plays from the first frame, so the intro has exactly ACT2_IN seconds
 # to spend and the capture is trimmed to fit: card + capture = the gallop.
-# The trim comes off the HEAD -- source 0:10-0:30 is a slow, dark orrery, and
-# the capture's ending (the ship rising, the fade) is the payoff into Act II.
-CAPTURE_IN = CAPTURE_OUT - (ACT2_IN - TITLE_CARD_LEN)   # 30.166
+# Whatever is excised above is bought back off the HEAD, which is why the
+# in-point is derived rather than written down: drop another span and the
+# capture simply starts earlier, and the gallop does not move.
+CAPTURE_IN = (CAPTURE_OUT - (ACT2_IN - TITLE_CARD_LEN)
+              - sum(o - i for i, o, _ in ACT1_EXCISIONS))
 
 CRASH_IMPACT = 105.900     # extract clock; measured from the audio transient
 NEOMUNA_IN = 47.100        # extract clock: where Neomuna starts, verified by frame.
@@ -205,10 +218,14 @@ def build():
         "TITLE CARD (the film's own logo; the source's is never shown)")
 
     # ---- Act I: the intro capture ------------------------------------------
-    t.run(ACT1, CAPTURE_IN, ACT2_IN - TITLE_CARD_LEN,
-          f"I. intro capture, continuous from source "
-          f"{int(CAPTURE_IN)//60}:{CAPTURE_IN % 60:04.1f} to "
-          f"{int(CAPTURE_OUT)//60}:{CAPTURE_OUT % 60:04.1f}")
+    pos = CAPTURE_IN
+    for cut_in, cut_out, what in ACT1_EXCISIONS:
+        t.run(ACT1, pos, cut_in - pos,
+              f"I. intro capture from source {tc(pos)}")
+        pos = cut_out
+    t.run(ACT1, pos, CAPTURE_OUT - pos,
+          f"I. intro capture from source {tc(pos)} to {tc(CAPTURE_OUT)}"
+          + (f" (skipping {ACT1_EXCISIONS[-1][2]})" if ACT1_EXCISIONS else ""))
     t.at_bed(ACT2_IN, "Act I")
     assert abs(t.shots[-1]["end_sec"] - CAPTURE_OUT) < 0.01, (
         f"Act I ends at source {t.shots[-1]['end_sec']:.3f}s but the first "
