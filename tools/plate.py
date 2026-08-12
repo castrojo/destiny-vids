@@ -27,6 +27,11 @@ would be nonsense on it) and shrinks the plate. ``kind: "title"`` is the deck's
 other card -- ``title`` / ``subtitle`` / ``body`` -- used here to credit the
 month's ensemble.
 
+``plan`` writes ``{"plates": [...], "unresolved": [...]}``: the manifest the
+other two subcommands read, plus a punch-list of leads the cut could not credit
+and why. It never blocks on one -- an uncast character and a binding with no
+plate copy are owner decisions -- but it never swallows one either.
+
 Styling is ported from ``projectbluefin/website``
 ``src/components/wolves/WolvesIntroOverlay.vue`` -- ``.wolves-guardian-plate``
 and friends. The CSS is the source of truth; the constants below name the rule
@@ -343,6 +348,31 @@ LEAD_IN = 0.4     # let the cut land before the plate arrives
 TAIL_OUT = 0.25   # ...and clear before the next one
 DEFAULT_HOLD = 5.0
 
+# Why a lead who made the cut carries no plate. A credit that disappears without
+# a word is how a real person goes uncredited, so an unplated lead is REPORTED,
+# never dropped -- and reporting is all it does, because the two copy-shaped
+# reasons are owner decisions that no derivation can make.
+UNPLATED = {
+    "uncast": {
+        "reason": "uncast",
+        "detail": "no person is bound to this character in vocab/casting.yaml",
+        "automatable": False,
+        "blocked_on": "an owner casting decision (leads.<character>.person)",
+    },
+    "no_plate_copy": {
+        "reason": "no_plate_copy",
+        "detail": "the binding carries no `plate:` copy, and plate copy is never invented",
+        "automatable": False,
+        "blocked_on": "owner-authored plate copy (leads.<character>.plate)",
+    },
+    "no_window": {
+        "reason": "no_window",
+        "detail": "no appearance in the cut was long enough, or free, to hold a plate",
+        "automatable": True,
+        "blocked_on": None,
+    },
+}
+
 
 def cut_timeline(shots, max_shot_sec=None):
     """Cut list -> [(start_on_timeline, duration, shot)] on the rendered cut.
@@ -378,7 +408,8 @@ def _window(start, duration, hold=DEFAULT_HOLD, room=None):
     return round(start + LEAD_IN, 3), round(min(hold, usable), 3)
 
 
-def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None):
+def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=None,
+         unresolved=None):
     """Cut list -> plate manifest.
 
     Leads are plated on their first appearance long enough to read, using the
@@ -386,10 +417,19 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     the deterministic assignment in tools/ensemble.py; anyone whose assigned
     shot is too short to hold a plate is credited over the final shot instead,
     so the month's contributors are never silently dropped.
+
+    A lead the cut could not credit gets the same treatment: pass a list as
+    ``unresolved`` and it is appended a punch-list entry saying which lead went
+    unplated and why (see ``UNPLATED``). Nothing blocks -- an uncast character
+    and a binding with no plate copy are both owner decisions, so the manifest
+    is written either way and the punch-list is what asks for the decision. A
+    shot that fails its binding's constraints is not an appearance at all: it is
+    already excluded from that character's retrieval, so it is not a reveal.
     """
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     entries, plated = [], set()
+    unplated = {}  # character -> UNPLATED key, in first-appearance order
     busy = []  # occupied windows, so nothing ever double-books the screen
 
     def free(start, duration):
@@ -403,19 +443,38 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             continue
         if not casting.get("usable", True):
             continue  # a shot that fails its binding's constraints is not a reveal
-        copy = (leads.get(character) or {}).get("plate")
+        binding = leads.get(character) or {}
+        if not binding.get("person"):
+            unplated[character] = "uncast"
+            continue
+        copy = binding.get("plate")
         if not copy:
+            unplated[character] = "no_plate_copy"
             continue
         window = _window(start, duration, hold, room=total - start)
         if not window or not free(*window):
+            unplated.setdefault(character, "no_window")
             continue
         at, dur = window
         entries.append({"id": character, "at": at, "dur": dur, "position": "left",
                         **copy})
         busy.append((at, at + dur))
         plated.add(character)
+        unplated.pop(character, None)  # a later appearance carried it after all
         if log:
             log(f"  {character:<10} {at:6.2f}s +{dur:.1f}s  {copy.get('name')}")
+
+    for character, why in unplated.items():
+        binding = leads.get(character) or {}
+        if unresolved is not None:
+            unresolved.append({
+                "id": character,
+                "person": binding.get("person"),
+                "display_name": binding.get("display_name"),
+                **UNPLATED[why],
+            })
+        if log:
+            log(f"  UNPLATED   {character:<10} {why}: {UNPLATED[why]['detail']}")
 
     if not roster:
         return sorted(entries, key=lambda e: e["at"])
@@ -601,13 +660,16 @@ def main(argv=None):
         if args.roster:
             with Path(args.roster).open(encoding="utf-8") as fh:
                 roster = json.load(fh)
+        unresolved = []
         entries = plan(load_shots(args.shotlist), load_leads(), roster,
-                       max_shot_sec=args.max_shot_sec, hold=args.hold, log=print)
+                       max_shot_sec=args.max_shot_sec, hold=args.hold, log=print,
+                       unresolved=unresolved)
         load_manifest_entries(entries)  # same validation the burn path applies
         with Path(args.out).open("w", encoding="utf-8") as fh:
-            json.dump(entries, fh, indent=2)
+            json.dump({"plates": entries, "unresolved": unresolved}, fh, indent=2)
             fh.write("\n")
-        print(f"wrote {args.out} ({len(entries)} plate(s))")
+        print(f"wrote {args.out} ({len(entries)} plate(s), "
+              f"{len(unresolved)} unresolved)")
         return 0
 
     entries = load_manifest(args.manifest)

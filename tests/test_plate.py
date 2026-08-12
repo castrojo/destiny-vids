@@ -152,6 +152,8 @@ LEADS = {
                          "kind": "ghost"}},
     "zavala": {"person": "kelsey_hightower", "display_name": "Kelsey Hightower",
                "aka": [], "constraints": {}, "plate": None},
+    "ikora_rey": {"person": None, "display_name": None, "aka": [],
+                  "constraints": {}, "plate": None},
 }
 
 
@@ -180,6 +182,45 @@ def test_plan_plates_each_lead_once_on_first_appearance():
 def test_plan_skips_a_lead_with_no_plate_copy():
     """A binding without `plate:` in the vocab simply gets no plate."""
     assert plate.plan([_shot("s1", 0, 8, "lead", "zavala")], LEADS) == []
+
+
+def test_plan_reports_an_unplated_lead_instead_of_dropping_them():
+    """A credit that vanishes without a word is how a real person goes uncredited.
+
+    Neither reason is fixable by a tool: writing plate copy and casting a person
+    are both owner decisions, so the punch-list asks rather than guesses.
+    """
+    shots = [_shot("s1", 0, 8, "lead", "zavala"),
+             _shot("s2", 8, 16, "lead", "ikora_rey")]
+    unresolved = []
+    assert plate.plan(shots, LEADS, unresolved=unresolved) == []
+
+    by_id = {u["id"]: u for u in unresolved}
+    assert by_id["zavala"]["reason"] == "no_plate_copy"
+    assert by_id["zavala"]["display_name"] == "Kelsey Hightower"
+    assert by_id["ikora_rey"]["reason"] == "uncast"
+    assert by_id["ikora_rey"]["person"] is None
+    for entry in unresolved:
+        assert entry["automatable"] is False
+        assert entry["blocked_on"]
+
+
+def test_plan_reports_a_lead_the_cut_never_gave_a_window():
+    """Unlike the copy-shaped reasons, this one a re-plan can actually fix."""
+    shots = [_shot("s1", 0, 0.5, "lead", "sagira"), _shot("s2", 0.5, 20.0)]
+    unresolved = []
+    assert plate.plan(shots, LEADS, unresolved=unresolved) == []
+    assert [(u["id"], u["reason"]) for u in unresolved] == [("sagira", "no_window")]
+    assert unresolved[0]["automatable"] is True
+
+
+def test_plan_does_not_report_a_lead_a_later_shot_carried():
+    """A first appearance too short to plate is not a miss if a later one holds."""
+    shots = [_shot("s1", 0, 0.5, "lead", "osiris"), _shot("s2", 0.5, 20, "lead", "osiris")]
+    unresolved = []
+    entries = plate.plan(shots, LEADS, unresolved=unresolved)
+    assert [e["id"] for e in entries] == ["osiris"]
+    assert unresolved == []
 
 
 def test_plan_skips_a_shot_that_fails_its_binding_constraints():
