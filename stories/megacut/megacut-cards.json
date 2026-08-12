@@ -1,9 +1,9 @@
 {
   "_what": "The act slides for Seven Days to the Wolves. One card per act of the programme, in the owner's canonical order, each carrying its Roman numeral. `kind: \"act\"` is the cinematic handoff slide from the website (CinematicTransition.vue), rendered full-frame by tools/fullframe.py.",
-  "_order": "The canonical order is the owner's. Given first as 'intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat -> 7daystothewolves -> europa -> end credits', then amended: 'add osiris before europa and after nat', placed between nat and the musical. So the acts are I intro, II endlessdaysmostbeautiful, III mrbobbytables, IV kat, V nat, VI osiris, VII 7daystothewolves, VIII europa, IX end credits. The numbering is the point: 'add these as the canonical acts of the entire musical - Give them Huge Roman numbers in the intro slides, each will have chapters.'",
+  "_order": "THE CANONICAL ORDER, codified by the owner on 2026-08-12 and settled: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). Eight acts, each announced by a slide carrying a huge Roman numeral. This list is the show's chapter list: see docs/running-order.md, which is the source of truth, and `tools/megacut.py --chapters`, which derives the timestamped markers from the built programme rather than from a hand-typed table.",
   "_copy": "Chapter card copy is REPRODUCED, never authored. Where an act has no authored title, the row is omitted rather than filled -- see `unresolved`. The only strings the owner wrote for this pass are act II's title and the whole of act IV's terminal block, both quoted back verbatim.",
   "_chapters": "Every act is to carry chapters. None have been authored yet, so every `chapters` list is empty: the field renders nothing until somebody writes the words. An empty list is the recorded gap, not a placeholder to fill in.",
-  "_gaps": "Acts II, III and IX have no film in this programme and therefore no card: a slide announcing an act that does not play is worse than a recorded gap. They keep their numerals in `unresolved` so the numbering cannot drift when they are built. III is the one that CHANGED: the Curse of Osiris contributors piece used to stand in for it, and the owner has now given that film its own act (VI), saying of act III 'I will deal with it later'.",
+  "_gaps": "Acts II and VIII have no film and therefore no card: a slide announcing an act that does not play is worse than a recorded gap. They keep their numerals in `unresolved` so the numbering cannot drift when they are built.",
   "_audio": "Every card is silent. Putting a bed under one is a licensing decision, the owner's alone.",
   "plates": [
     {
@@ -19,9 +19,21 @@
       "note": "Copy is the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94). This card was `card0` before the acts were numbered."
     },
     {
-      "id": "act4",
+      "id": "act3",
       "kind": "act",
       "at": 116.567,
+      "dur": 5.0,
+      "act": "III",
+      "label": "Act III",
+      "title": "Bob Killen",
+      "chapters": [],
+      "note": "This act is `mrbobbytables` -- the film delivered as ~/Videos/Wolves/Prod/03-mrbobbytables.mp4 (was UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4). The owner named it and placed it: 'rename this \"mrbobbytables\" ... and then put it in slot three'. The card reproduces his authored Guardian identity -- characters.json slug `bob`, ~/Videos/nameplates.json np_bob -- rather than an act title nobody wrote. His seal, 'Reconciler of the Plane', stays on the plate inside the cut, matching acts V and VII, which give a name and a class and no title.",
+      "subtitle": "Voidwalker Warlock"
+    },
+    {
+      "id": "act4",
+      "kind": "act",
+      "at": 281.767,
       "dur": 15.0,
       "act": "IV",
       "title": "Bias for Action",
@@ -38,7 +50,7 @@
     {
       "id": "act5",
       "kind": "act",
-      "at": 165.567,
+      "at": 330.767,
       "dur": 15.0,
       "act": "V",
       "title": "Wrong Place, Wrong Time, Right Attitude",
@@ -55,34 +67,22 @@
     {
       "id": "act6",
       "kind": "act",
-      "at": 205.826,
+      "at": 371.026,
       "dur": 5.0,
       "act": "VI",
       "label": "Act VI",
-      "title": "Bob Killen",
-      "chapters": [],
-      "note": "This act is `mrbobbytables`, the film staged as ~/Videos/UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4, and the owner pinned it here: 'there is no \"osiris\" movie anymore it's the mrbobbytables one in 04 in uploads and it's in slot VI'. It briefly carried the act title 'Osiris' -- that was the CHARACTER's name on an act named after a PERSON, and it also left mrbobbytables appearing twice in the running order. The card now reproduces his authored Guardian identity: characters.json slug `bob`, and ~/Videos/nameplates.json np_bob. The title row (*Reconciler of the Plane*) is left off, matching acts V and VIII, which give a name and a class and keep the seal for the plate inside the cut.",
-      "subtitle": "Voidwalker Warlock"
-    },
-    {
-      "id": "act7",
-      "kind": "act",
-      "at": 371.026,
-      "dur": 5.0,
-      "act": "VII",
-      "label": "Act VII",
       "title": "7 Days to the Wolves",
       "subtitle": "Nightwish",
       "chapters": [],
       "note": "Title and artist reproduced from the cinematic's own segment record, ~/src/website/src/config/wolves-cinematic.ts (id `seven-days-to-the-wolves`) -- the same two rows the transition slide this card is ported from renders."
     },
     {
-      "id": "act8",
+      "id": "act7",
       "kind": "act",
       "at": 803.726,
       "dur": 5.0,
-      "act": "VIII",
-      "label": "Act VIII",
+      "act": "VII",
+      "label": "Act VII",
       "title": "Europa",
       "subtitle": "Director's Cut",
       "chapters": [],
@@ -97,7 +97,7 @@
       "blocked_on": "the act being built, and the track being named -- a music choice is a licensing decision."
     },
     {
-      "what": "act IX -- end credits",
+      "what": "act VIII -- end credits",
       "detail": "Last in the canonical order. The credits sequence for Seven Days to the Wolves has never been designed, which is issue #51. Nothing here designs it.",
       "automatable": "no",
       "blocked_on": "issue #51."
@@ -109,8 +109,8 @@
       "blocked_on": "the owner authoring chapter names."
     },
     {
-      "what": "an act title for act VI",
-      "detail": "Act VI is named after a person, so its card carries his authored Guardian identity rather than an act title nobody has written. The film under it has no authored title either, which is issue #41. If either gets written, the card takes it.",
+      "what": "an act title for act III",
+      "detail": "Act III is named after a person, so its card carries his authored Guardian identity rather than an act title nobody has written. The film under it has no authored title either, which is issue #41.",
       "automatable": "no",
       "blocked_on": "the owner authoring an act title, or issue #41."
     },
@@ -119,13 +119,7 @@
       "detail": "The owner asked for act V to carry act IV's terminal block and a new title, and said nothing about its length. It is held 15s like act IV, because the copy is identical and five lines plus a nine-word title do not read in five seconds. That is an inference about pacing, not an instruction -- recorded so it can be cut back without archaeology.",
       "automatable": "no",
       "blocked_on": "the owner's eye on the assembled programme."
-    },
-    {
-      "what": "act III -- unnamed",
-      "detail": "Slot III is empty and has no subject. The owner's first running order put `mrbobbytables` third; his film is now act VI by explicit instruction ('it's in slot VI'), so naming III after him as well would put one person in the programme twice -- which is exactly what the owner caught. The slot keeps its numeral and nothing else, because VI is pinned and renumbering around III would move it.",
-      "automatable": "no",
-      "blocked_on": "the owner deciding what act III is."
     }
   ],
-  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | hero 5.000-116.567 | act4 116.567-131.567 | kat 131.567-165.567 | act5 165.567-180.567 | natali 180.567-205.826 | act6 205.826-210.826 | osiris 210.826-371.026 | act7 371.026-376.026 | seven days 376.026-803.726 | act8 803.726-808.726 | europa 808.726-918.926. Total 918.926s (15:19)."
+  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | hero 5.000-116.567 | act3 116.567-121.567 | mrbobbytables 121.567-281.767 | act4 281.767-296.767 | kat 296.767-330.767 | act5 330.767-345.767 | natali 345.767-371.026 | act6 371.026-376.026 | wolves 376.026-803.726 | act7 803.726-808.726 | europa 808.726-918.926. Total 918.926s (15:18.9)."
 }

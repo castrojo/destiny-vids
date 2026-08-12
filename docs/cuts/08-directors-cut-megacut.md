@@ -11,54 +11,36 @@ owner decision (#55) and this cut does not change it.
 
 ## The canonical order
 
-Given by the owner, verbatim:
-
-> intro -> endlessdaysmostbeautiful -> mrbobbytables -> kat -> nat ->
-> 7daystothewolves -> europa -> end credits
-
-then amended twice: *"add osiris before europa and after nat"*, and then
-
-> there is no "osiris" movie anymore it's the mrbobbytables one in 04 in
-> uploads and it's in slot VI
-
-So **mrbobbytables plays once, as act VI**, between nat and the musical — the
-correction was that he had been named twice, as an empty act III *and* as act
-VI's film. The acts run **I–IX**, and each slide carries its numeral, huge. Every act is to carry **chapters**;
-none have been authored yet, so every `chapters` list is empty and the field
-renders nothing.
+**[`docs/running-order.md`](../running-order.md) owns it.** This file is the
+*build record* — how the current assembly was made and what it is missing. If
+the two disagree about the order, the running order is right.
 
 | Act | From | To | What | Source |
 |---|---|---|---|---|
 | — | 0.000 | 5.000 | Slide **I** — `PROJECT BLUEFIN` / *seven days to the wolves* | rendered |
 | **I** | 5.000 | 116.567 | **Into the Light** — six Guardians plated, the comic card, Bungie's score | `BKm0TPqeOjY` |
-| **II** | — | — | **Endless Forms Most Beautiful (instrumental)** — **NOT BUILT** (#74) | — |
-| **III** | — | — | **unnamed** — an open slot, no subject and no film | — |
-| — | 116.567 | 131.567 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
-| **IV** | 131.567 | 165.567 | **Kat Cosgrove** — Guardian intro | `UPLOAD/01-…` |
-| — | 165.567 | 180.567 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
-| **V** | 180.567 | 205.826 | **Natali Vlatko** — Guardian arrival | `UPLOAD/02-…` |
-| — | 205.826 | 210.826 | Slide **VI** — `Bob Killen` / *Voidwalker Warlock* | rendered |
-| **VI** | 210.826 | 371.026 | **mrbobbytables** — August 2026 contributors, Curse of Osiris | `UPLOAD/04-…` |
-| — | 371.026 | 376.026 | Slide **VII** — `7 Days to the Wolves` / *Nightwish* | rendered |
-| **VII** | 376.026 | 803.726 | **Seven Days to the Wolves** — the musical (timing pass) | `UPLOAD/07-…` |
-| — | 803.726 | 808.726 | Slide **VIII** — `Europa` / *Director's Cut* | rendered |
-| **VIII** | 808.726 | 918.926 | **Europa Director's Cut** | `UPLOAD/zz-…` |
-| **IX** | — | — | **End credits** — **NOT DESIGNED** (#51) | — |
+| **II** | — | — | *Endless Forms Most Beautiful* — **no film** (#74) | — |
+| — | 116.567 | 121.567 | Slide **III** — `Bob Killen` / *Voidwalker Warlock* | rendered |
+| **III** | 121.567 | 281.767 | **mrbobbytables** — August 2026 contributors | `Prod/03-…` |
+| — | 281.767 | 296.767 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
+| **IV** | 296.767 | 330.767 | **Kat Cosgrove** — Guardian intro | `Prod/04-…` |
+| — | 330.767 | 345.767 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
+| **V** | 345.767 | 371.026 | **Natali Vlatko** — Guardian arrival | `Prod/05-…` |
+| — | 371.026 | 376.026 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
+| **VI** | 376.026 | 803.726 | **Seven Days to the Wolves** — the musical (timing pass) | `Prod/06-…` |
+| — | 803.726 | 808.726 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
+| **VII** | 808.726 | 918.926 | **Europa Director's Cut** | `Prod/07-…` |
+| **VIII** | — | — | Credits — **not designed** (#51) | — |
 
-**918.926s — 15:19.** The five delivered cuts are reused **as-is**: four are
-owner-approved, and act VI is the partially complete one. This repo cannot
-rebuild any of them — they are `~/Videos` projects with their own
-`render/run-*.sh`. Assembly re-encodes them once and edits nothing.
+**918.926s — 15:18.9**, output to `~/Videos/Wolves/megacut/`. Every act plays
+from `~/Videos/Wolves/Prod/`, which holds the **highest-quality master** of
+each — FLAC audio, picture never re-encoded. Assembly re-encodes once and edits
+nothing.
 
-**Acts II, III and IX have no card.** A slide announcing an act that does not
-play is worse than a recorded gap, so they keep their numerals in the manifest's
-`unresolved` list and nothing else. The numbering does not close up over them.
-
-**Act III is an open slot with no subject.** The owner's first running order
-put `mrbobbytables` third; his film is act VI by explicit instruction, so
-naming III after him as well would put one person in the programme twice —
-which is exactly what he caught. III keeps its numeral and nothing else,
-because **VI is pinned** and renumbering around III would move it.
+**The programme is stereo**, because every master is stereo FLAC. The older
+`UPLOAD/` copies were AAC 5.1, but that 5.1 was the same two channels plus an
+LFE derived by each cut's own script; upmixing here to recreate it would be
+assembly inventing a soundfield, which the audio tenet forbids.
 
 ## The act slide is the cinematic's own card
 

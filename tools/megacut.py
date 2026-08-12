@@ -90,7 +90,13 @@ def ffprobe_bin():
     return f"{head}ffprobe{tail}" if sep else "ffprobe"
 
 
-def load_plan(path):
+def load_plan(path, require_sources=True):
+    """Validate a plan. ``require_sources`` off reads a plan whose files are
+    not built yet -- which is what ``--chapters`` needs, since the running order
+    is a decision and the footage is not a precondition for recording it. Every
+    other check still runs, and an item with no file must then carry its own
+    ``dur`` or the arithmetic has nothing to work from.
+    """
     plan = json.loads(Path(path).read_text())
     items = plan.get("items")
     if not items:
@@ -103,7 +109,13 @@ def load_plan(path):
         if not src:
             raise ValueError(f"item {i}: missing {'image' if kind == 'card' else 'path'}")
         if not resolve(src):
-            raise ValueError(f"item {i}: source does not exist: {src}")
+            if require_sources:
+                raise ValueError(f"item {i}: source does not exist: {src}")
+            if kind == "clip" and item.get("dur") is None:
+                raise ValueError(
+                    f"item {i}: {src} does not exist and the item has no `dur`, "
+                    f"so its length is unknowable"
+                )
         if kind == "card" and float(item.get("dur", 0)) <= 0:
             raise ValueError(f"item {i}: card needs a positive dur")
         if kind == "clip" and item.get("audio") not in ("source", "silent"):
@@ -284,15 +296,65 @@ def expected_duration(plan):
     return total
 
 
+def chapters(plan):
+    """The programme's chapter markers, derived from the plan's own clock.
+
+    A chapter starts where its ACT SLIDE starts, not where the film behind it
+    does: the slide is how the audience is told which act this is, so a marker
+    landing after it would drop them into a card they have already read. The
+    The title is the card's `chapter` -- an authored audience-facing string,
+    NOT the item's `label`, which is a build note ("held long, by owner
+    request"). It lives on the item so the running order and its markers cannot
+    disagree; a card without one falls back to `label` and reads oddly, which is
+    the visible failure that gets it filled in.
+
+    Yielded as (seconds, title), so a caller can format them for YouTube, an
+    ffmpeg metadata file, or a review note without this knowing about any of
+    them.
+    """
+    out, t = [], 0.0
+    for item in plan["items"]:
+        if item["kind"] == "card":
+            out.append((t, item.get("chapter") or item.get("label") or "Chapter"))
+            t += float(item["dur"])
+            continue
+        dur = item.get("dur")
+        if dur is None:
+            dur = probe_duration(resolve(item["path"]), stream="v:0")
+        t += float(dur)
+    return out
+
+
+def format_chapters(marks):
+    """YouTube's chapter format: `H:MM:SS Title`, one per line.
+
+    The first marker must be at zero or YouTube ignores the whole list, which
+    holds here by construction -- the programme opens on act I's slide.
+    """
+    lines = []
+    for seconds, title in marks:
+        h, rem = divmod(int(seconds), 3600)
+        m, s = divmod(rem, 60)
+        stamp = f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+        lines.append(f"{stamp} {title}")
+    return "\n".join(lines)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("plan", help="JSON assembly plan")
     ap.add_argument("--out", help="output file (overrides the plan's `output`)")
     ap.add_argument("--dry-run", action="store_true",
                     help="print the command and the expected duration, encode nothing")
+    ap.add_argument("--chapters", action="store_true",
+                    help="print the chapter markers and exit, encoding nothing")
     args = ap.parse_args(argv)
 
-    plan = load_plan(args.plan)
+    plan = load_plan(args.plan, require_sources=not args.chapters)
+    if args.chapters:
+        print(format_chapters(chapters(plan)))
+        return 0
+
     out_path = args.out or plan.get("output")
     if not out_path:
         raise SystemExit("no output: pass --out or set `output` in the plan")
