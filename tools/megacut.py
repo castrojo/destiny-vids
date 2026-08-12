@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ordered cuts and chapter cards -> one continuous programme, in a single pass.
+"""Ordered cuts and chapter cards -> one continuous programme.
 
 This is the assembly stage: it takes finished deliverables that already exist
 and joins them into one file, with the reference deck's title cards between
@@ -9,12 +9,33 @@ cards are PNGs rendered by ``tools/plate.py render``.
 
     python3 tools/megacut.py renders/megacut.json --out renders/megacut.mp4
 
-Why one ffmpeg pass
--------------------
-The obvious implementation normalises each segment to a temporary file and then
-concatenates the temporaries. That re-encodes every frame twice. This builds a
-single ``filter_complex`` instead, so a source frame is decoded once and encoded
-once -- one generation of loss, not two.
+Segment, then concatenate -- and still one generation
+-----------------------------------------------------
+This used to be **one** ``filter_complex`` over every input at once, on the
+reasoning that normalising each segment to a temporary file and concatenating
+the temporaries would re-encode every frame twice.
+
+That reasoning was right about quality and wrong about whether it runs. On the
+real programme -- fourteen inputs, half an hour of 1080p -- ffmpeg buffers the
+inputs ``concat`` is not consuming yet, climbs to ~2 GB resident, and then
+**deadlocks**: every thread in ``futex_do_wait``, 0% CPU, no output growth.
+Measured twice, at two presets, stalling at the same point on the timeline. A
+fourteen-input graph over *short* inputs completes fine, so the shape is not
+the problem; the duration behind it is.
+
+So each item is normalised to its own segment first, and the segments are then
+joined with the **concat demuxer**. The generation count is unchanged, which is
+the part worth protecting:
+
+* **Video is encoded once.** Segments are encoded at the plan's own ``crf`` and
+  ``preset``, and the join then uses ``-c:v copy``. Nothing is re-encoded, so
+  this costs no quality against the single-pass form -- it only costs disk,
+  briefly, in a temporary directory.
+* **Audio is encoded once.** Segments carry **FLAC**, which is lossless, so the
+  single AAC encode happens at the join, across the whole programme rather than
+  per segment. Encoding AAC per segment and copying would have been the real
+  quality regression: every join would carry its own encoder delay and padding,
+  which is audible as a tick.
 
 What "normalise" means here, and why each choice
 ------------------------------------------------
@@ -46,6 +67,7 @@ import json
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -145,11 +167,11 @@ def resolve(src, required=True):
     return "" if required else str(REPO_ROOT / src)
 
 
-def build_inputs(plan):
+def build_inputs(plan, items=None):
     """ffmpeg input arguments, in item order."""
     args = []
     fps = plan.get("fps", DEFAULT_FPS)
-    for item in plan["items"]:
+    for item in (plan["items"] if items is None else items):
         if item["kind"] == "card":
             args += ["-loop", "1", "-framerate", fps,
                      "-t", str(item["dur"]), "-i", resolve(item["image"])]
@@ -158,16 +180,23 @@ def build_inputs(plan):
     return args
 
 
-def build_filtergraph(plan):
-    """One filter_complex that normalises every segment and concatenates once."""
+def build_filtergraph(plan, items=None):
+    """A filter_complex that normalises the given items and concatenates them.
+
+    ``items`` defaults to the whole plan. Passing a single item is how a
+    segment is built: the chains are identical, so a segment is normalised
+    exactly as it would have been inside the all-at-once graph, and
+    ``concat=n=1`` keeps one code path rather than two that can drift.
+    """
     fps = plan.get("fps", DEFAULT_FPS)
     w = int(plan.get("width", DEFAULT_WIDTH))
     h = int(plan.get("height", DEFAULT_HEIGHT))
     rate = int(plan.get("sample_rate", DEFAULT_SAMPLE_RATE))
     layout = plan.get("layout", DEFAULT_LAYOUT)
 
+    items = plan["items"] if items is None else items
     chains, labels = [], []
-    for i, item in enumerate(plan["items"]):
+    for i, item in enumerate(items):
         v, a = f"v{i}", f"a{i}"
         if item["kind"] == "card":
             dur = float(item["dur"])
@@ -225,8 +254,7 @@ def build_filtergraph(plan):
                 )
         labels += [f"[{v}][{a}]"]
 
-    n = len(plan["items"])
-    chains.append(f"{''.join(labels)}concat=n={n}:v=1:a=1[vout][aout]")
+    chains.append(f"{''.join(labels)}concat=n={len(items)}:v=1:a=1[vout][aout]")
     return ";".join(chains)
 
 
@@ -256,14 +284,30 @@ def probe_duration(path, stream=None):
     return float(out.stdout.strip())
 
 
-def build_command(plan, out_path):
+def build_segment_command(plan, index, seg_path):
+    """Encode one item to its own normalised segment.
+
+    This is where the picture is encoded, at the plan's own quality, so the
+    join can copy it. Audio is **24-bit PCM**: lossless, so carrying it here
+    costs nothing but disk, and it keeps the single AAC encode at the join,
+    where it spans the whole programme instead of restarting at every cut.
+
+    PCM rather than FLAC, and that is not a preference. FLAC carries its
+    STREAMINFO in the stream's extradata; the concat demuxer binds the first
+    file's extradata to the joined stream, so every later segment decodes as
+    "Invalid data found when processing input". Measured, not guessed. PCM has
+    no extradata to mismatch.
+
+    Matroska, not MP4, because a segment is a temporary the concat demuxer
+    reads back -- it never needs a faststart-able moov.
+    """
     crf = str(plan.get("crf", 16))
     preset = plan.get("preset", "slow")
-    abitrate = plan.get("audio_bitrate", "640k")
+    item = plan["items"][index]
     return [
         ffmpeg_bin(), "-nostdin", "-hide_banner",
-        *build_inputs(plan),
-        "-filter_complex", build_filtergraph(plan),
+        *build_inputs(plan, [item]),
+        "-filter_complex", build_filtergraph(plan, [item]),
         "-map", "[vout]", "-map", "[aout]",
         "-c:v", "libx264", "-preset", preset, "-crf", crf,
         "-pix_fmt", "yuv420p",
@@ -273,11 +317,64 @@ def build_command(plan, out_path):
         # `unknown`, which is a silent mismatch against every other deliverable
         # in ~/Videos/Wolves/Prod. Writing the VUI directly is the only way all three
         # actually land in the bitstream. Verified by ffprobe, not assumed.
+        # It has to be written HERE, on the segment: the join copies the
+        # bitstream, so whatever the VUI says at this point is what ships.
         "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709",
+        "-c:a", "pcm_s24le", "-ar", str(plan.get("sample_rate", DEFAULT_SAMPLE_RATE)),
+        str(seg_path), "-y",
+    ]
+
+
+def build_concat_command(plan, list_path, out_path):
+    """Join the segments: copy the picture, encode the sound once.
+
+    ``-safe 0`` because the list holds absolute paths. The video is copied, so
+    every segment must share codec parameters -- they do, by construction:
+    ``build_segment_command`` encodes them all from the same plan.
+    """
+    abitrate = plan.get("audio_bitrate", "640k")
+    return [
+        ffmpeg_bin(), "-nostdin", "-hide_banner",
+        "-f", "concat", "-safe", "0", "-i", str(list_path),
+        "-map", "0:v:0", "-map", "0:a:0",
+        "-c:v", "copy",
+        "-c:a", "aac", "-b:a", abitrate,
+        "-ar", str(plan.get("sample_rate", DEFAULT_SAMPLE_RATE)),
         "-movflags", "+faststart",
-        "-c:a", "aac", "-b:a", abitrate, "-ar", str(plan.get("sample_rate", DEFAULT_SAMPLE_RATE)),
         str(out_path), "-y",
     ]
+
+
+def assemble(plan, out_path, workdir=None, log=None):
+    """Build every segment, then join them. Returns the output path.
+
+    The segments land in a temporary directory that is removed afterwards --
+    they are pure intermediates, and keeping them would invite somebody to
+    hand-edit one, which is the failure this repo's regenerated-artifact rule
+    exists to prevent.
+    """
+    log = log or (lambda msg: print(msg, file=sys.stderr))
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    ctx = (tempfile.TemporaryDirectory(prefix="megacut-", dir=workdir)
+           if workdir is None else None)
+    tmp = Path(ctx.name) if ctx else Path(workdir)
+    try:
+        segments = []
+        for i, item in enumerate(plan["items"]):
+            seg = tmp / f"seg{i:03d}.mkv"
+            log(f"  segment {i + 1}/{len(plan['items'])}: {item.get('label', item['kind'])}")
+            subprocess.run(build_segment_command(plan, i, seg), check=True)
+            segments.append(seg)
+        list_path = tmp / "segments.txt"
+        list_path.write_text(
+            "".join(f"file '{s}'\n" for s in segments), encoding="utf-8")
+        log(f"  joining {len(segments)} segments")
+        subprocess.run(build_concat_command(plan, list_path, out_path), check=True)
+    finally:
+        if ctx:
+            ctx.cleanup()
+    return out_path
 
 
 def expected_duration(plan):
@@ -348,6 +445,9 @@ def main(argv=None):
                     help="print the command and the expected duration, encode nothing")
     ap.add_argument("--chapters", action="store_true",
                     help="print the chapter markers and exit, encoding nothing")
+    ap.add_argument("--workdir",
+                    help="keep the intermediate segments here instead of a "
+                         "temporary directory (they are large; for debugging a join)")
     args = ap.parse_args(argv)
 
     plan = load_plan(args.plan, require_sources=not args.chapters)
@@ -359,15 +459,16 @@ def main(argv=None):
     if not out_path:
         raise SystemExit("no output: pass --out or set `output` in the plan")
 
-    cmd = build_command(plan, out_path)
     if args.dry_run:
-        print(" ".join(cmd))
+        for i, item in enumerate(plan["items"]):
+            print(" ".join(build_segment_command(plan, i, f"seg{i:03d}.mkv")))
+        print(" ".join(build_concat_command(plan, "segments.txt", out_path)))
         print(f"# expected duration: {expected_duration(plan):.3f}s "
               f"across {len(plan['items'])} items")
         return 0
 
     print(f"assembling {len(plan['items'])} items -> {out_path}", file=sys.stderr)
-    subprocess.run(cmd, check=True)
+    assemble(plan, out_path, workdir=args.workdir)
     print(f"wrote {out_path}")
     return 0
 
