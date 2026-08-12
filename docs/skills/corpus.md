@@ -49,6 +49,28 @@ is in a shot: a lead key from `vocab/casting.yaml` (`osiris`, `zavala`, ...) or
 Each corpus holds the subject's shots (tags, timecodes, `clean`, `caption`),
 coverage counts per axis, and `gaps`.
 
+### A corpus spans every source, and that is the mission
+
+**`corpus.py` pools a character across the whole index, not one cinematic**, and
+the header says so explicitly:
+
+```text
+CORPUS: mara_sov
+6/6 clean shot(s), 11.304s across 2 video(s)
+```
+
+That cross-source pool **is the shot list for that character's hero video** —
+one person, one video, every instance of them in the collection
+([`docs/cuts/hero-montage.md`](../cuts/hero-montage.md)). Read the corpus first
+and the outline writes itself: one beat per shot, and `tools/story.py` with no
+`--from-video` spans exactly the same pool.
+
+So a corpus is also **the coverage ledger for a finished hero video**. Because a
+montage is defined as "all of them", the corpus is what says whether the video
+is complete as of the current index — and when a new cinematic is indexed, the
+corpus grows and the hero video becomes re-cuttable. Hero videos are not final;
+they are complete *as of an index*.
+
 ### Gaps are the point
 
 A gap is a `vocab/` enum value the subject has **no clean coverage of**. That is

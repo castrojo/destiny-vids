@@ -77,10 +77,37 @@ reorder alone turned three contributors crammed into the first 1.2 seconds
 Spreading is measured, not guessed: `tools/plate.py plan` prints every plate
 it placed, in order, so check the credit times before rendering.
 
-### One cinematic, skipped forward
+### Two cut shapes, and spanning is the default
 
-A cut that lives inside a single source cinematic gets two flags instead of an
-edit timeline:
+**A cut spans every source unless you tell it not to.** That is the shape of a
+**hero video** — one person, one video, every clean shot of that bound character
+in the whole index. Karena's Mara Sov video is her Season of the Lost shots
+*and* her Final Shape shots, summed. Hero videos are promotional material for
+the feature, *Seven Days to the Wolves*; the two kinds and their rules are
+[`docs/catalog.md`](../catalog.md).
+
+```bash
+# hero video: the whole index is the pool. No flags. This is the default.
+python3 tools/story.py stories/mara-sov.txt --dir segments
+```
+
+Start from the corpus, which already spans sources — `python3 tools/corpus.py
+mara_sov --dir segments` reports `6/6 clean shot(s), 11.304s across 2 video(s)`.
+That list *is* the hero video's shot list. Full walkthrough:
+[`docs/cuts/hero-montage.md`](../cuts/hero-montage.md).
+
+**Reaching for `--from-video` by habit is a known failure.** Three consecutive
+Destiny chapters were all cut from `yt_destiny_2_the_final_shape_launch_trailer`
+while four fully-indexed trailers had no outline written against them; two of
+those cuts shared 35.9s — 68% of one's runtime — and plated the same person
+([issue #49]). Before pinning a source, ask whether the cut is retelling *that
+trailer's* story. If it is about a person, it is not.
+
+### One cinematic, skipped forward (the special case)
+
+A cut that deliberately lives inside a single source cinematic — because it is
+retelling that cinematic's own story in its own order — gets two flags instead
+of an edit timeline:
 
 ```bash
 python3 tools/story.py stories/01-dance.txt --dir segments \
@@ -106,7 +133,10 @@ bend to eight clean shots).
 
 Under `--forward-only` a mismatch cascades harder than usual: a wrong early
 pick can strand every later beat behind the playhead. Fix the earliest wrong
-beat, not the stranded one.
+beat, not the stranded one. (A hero video has no playhead, so nothing is ever
+stranded there — only distinctness cascades.)
+
+[issue #49]: https://github.com/castrojo/destiny-vids/issues/49
 
 ### Holds
 

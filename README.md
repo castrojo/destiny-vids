@@ -11,6 +11,49 @@ ingestion at scale, storage, and search infra live elsewhere.
 **Working on this repo as an agent?** Start with [`AGENTS.md`](AGENTS.md), then
 [`docs/SKILL.md`](docs/SKILL.md) to load the one skill your task needs.
 
+## What this repo produces: features and hero videos
+
+Two kinds of video come out of this repo, built by the same tools and governed
+by different rules. Full taxonomy: [`docs/catalog.md`](docs/catalog.md).
+
+**The feature — *Seven Days to the Wolves*.** The main story, released as **one
+whole unit** at KubeCon NA: Wolves → Europa → **credits** (not designed yet) →
+the Nati teaser. Those four are the running order *inside one file*, not four
+videos to sequence in a playlist. The Nati teaser is part of the feature and is
+**not** a hero video: being in the feature does not make that appearance
+somebody's hero video.
+
+**Hero videos — one person, one video, every source.** Every clean shot of a
+bound character in the entire index, summed into one cut. Karena is Mara Sov, so
+*her* video is every instance of Mara Sov in the collection — the Season of the
+Lost cutscenes and the Final Shape launch trailer today, and whatever gets
+indexed next. Kat, mrbobbytables, Cayde/castrojo and the rest of the cast each
+get one, and they are **promotional material for the feature**.
+
+**The release schedule** ([`docs/release.md`](docs/release.md)): the teaser —
+the Destiny section of the *original* Wolves video, with its calls to action —
+ships **21 Sep 2026**, seven weeks out; six weekly hero videos follow; the
+feature lands at **KubeCon NA, 9 Nov 2026**. The binding constraint is
+**indexing, not editing** — only two cast members currently have enough footage
+for a hero video.
+
+Hero videos are what the index is *for*. A shot-level index whose cuts never
+leave a single source is just a trailer re-edit; the reason segments carry a
+`video_id` **and** a character binding is so retrieval can gather that character
+from everywhere at once. `tools/corpus.py <character>` already reports exactly
+that pool — Mara Sov's is 6 clean shots, 11.3s, **across 2 videos** — and
+`tools/story.py` spans sources by default: omit `--from-video` and the whole
+index is the pool.
+
+**The single-cinematic cut is the special case, not the rule.** `--from-video`
+plus `--forward-only` builds a chronological cut inside one trailer, which is
+right when a cut retells that trailer's own story. It is wrong for a hero video,
+and using it by habit is how three consecutive Destiny chapters ended up cut
+from the same 1:53 trailer, two of them sharing 68% of their footage
+([issue #49]). See [`docs/cuts/hero-montage.md`](docs/cuts/hero-montage.md).
+
+[issue #49]: https://github.com/castrojo/destiny-vids/issues/49
+
 ## The governing idea
 
 **The fiction bends to the footage.** You do not hunt for shots that fit a
