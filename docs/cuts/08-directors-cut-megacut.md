@@ -30,15 +30,15 @@ renders nothing.
 | **III** | 121.567 | 281.767 | **mrbobbytables** — August 2026 contributors, Curse of Osiris | `UPLOAD/04-…` |
 | — | 281.767 | 296.767 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
 | **IV** | 296.767 | 330.767 | **Kat Cosgrove** — Guardian intro | `UPLOAD/01-…` |
-| — | 330.767 | 335.767 | Slide **V** — `Natali Vlatko` / *Behemoth Titan* | rendered |
-| **V** | 335.767 | 361.026 | **Natali Vlatko** — Guardian arrival | `UPLOAD/02-…` |
-| — | 361.026 | 366.026 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
-| **VI** | 366.026 | 793.726 | **Seven Days to the Wolves** — the musical (timing pass) | `UPLOAD/07-…` |
-| — | 793.726 | 798.726 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
-| **VII** | 798.726 | 908.926 | **Europa Director's Cut** | `UPLOAD/zz-…` |
+| — | 330.767 | 345.767 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
+| **V** | 345.767 | 371.026 | **Natali Vlatko** — Guardian arrival | `UPLOAD/02-…` |
+| — | 371.026 | 376.026 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
+| **VI** | 376.026 | 803.726 | **Seven Days to the Wolves** — the musical (timing pass) | `UPLOAD/07-…` |
+| — | 803.726 | 808.726 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
+| **VII** | 808.726 | 918.926 | **Europa Director's Cut** | `UPLOAD/zz-…` |
 | **VIII** | — | — | **End credits** — **NOT DESIGNED** (#51) | — |
 
-**908.926s — 15:09.** The five delivered cuts are owner-approved deliverables
+**918.926s — 15:19.** The five delivered cuts are owner-approved deliverables
 **reused as-is**; this repo cannot rebuild them (they are `~/Videos` projects
 with their own `render/run-*.sh`). Assembly re-encodes them once and edits
 nothing.
@@ -73,8 +73,19 @@ CNCF Authorization: [ UNAUTHORIZED ]
 BIAS FOR ACTION
 ```
 
-— and it is **held 15 seconds**, three times any other slide: "Hold that slide
-for a long time it's a transition inbetween videos."
+— and it is **held 15 seconds**: "Hold that slide for a long time it's a
+transition inbetween videos."
+
+**Act V carries the same terminal block.** "Make the slide with the unauthorized
+etc be the same for Natali and change the title to *Wrong Place, Wrong Time,
+Right Attitude*." So the five authorisation lines are act IV's, copied
+unchanged — *Destination: Europa* included: it is the same readout, and
+rewriting a line of it per act would be authoring copy nobody wrote. Like act
+IV it drops the eyebrow and the subtitle, because Natali's authored identity is
+on her own reveal card inside the cut. Its 15s hold is the one thing here that
+was **inferred** rather than said — identical copy, and five lines plus a
+nine-word title do not read in five seconds — and it is recorded in the
+manifest's `unresolved` so it can be cut back without archaeology.
 
 ## Act I: the hero segment
 
@@ -214,7 +225,7 @@ ffprobe -select_streams v:0 -show_entries stream=color_primaries,color_transfer,
 ffmpeg -ss <seg> -t <len> -i out.mp4 -map a:0 -af volumedetect -f null /dev/null
 ```
 
-- Duration equals the sum of the parts (908.926s expected).
+- Duration equals the sum of the parts (918.926s expected).
 - **Per segment**, the peak matches its source — a re-encode must not lift one.
 - **Colour**: `bt709` primaries, transfer **and** matrix. `-color_primaries`
   describes the *frames*; x264 copies only the matrix from them, so the VUI is
