@@ -156,16 +156,20 @@ no footage, and keep output non-commercial.
 
 ## The merge queue
 
-`main` is protected: changes land through a pull request, and merging goes
-through GitHub's **merge queue** rather than a button. The queue re-runs CI on
-each PR *rebased onto the queue's head*, so two changes that pass separately but
-break together are caught before they land — which is the normal failure mode
-here, where several agents edit `tools/plate.py`, `vocab/casting.yaml` and the
-generated indexes at once.
+`main` is protected by a ruleset: nothing is pushed to it directly, every change
+lands through a pull request, and a PR cannot merge until **`test` is green on
+the PR rebased onto the current `main`** ("require branches to be up to date").
+That last clause is the queue: it serialises landings, so two changes that pass
+separately but break together are caught before they land rather than after.
+It is the normal failure mode here — several agents edit `tools/plate.py`,
+`vocab/casting.yaml` and the generated indexes at once.
 
-`.github/workflows/ci.yml` is the gate, and it runs on `merge_group` as well as
-on pull requests. It is the offline suite plus the three derived-artifact
-checks:
+Turn on **auto-merge** and walk away; the PR merges itself when the check is
+green, and its branch is deleted.
+
+`.github/workflows/ci.yml` is the gate. It is the offline suite plus the three
+derived-artifact checks, and it runs on `merge_group` too, so nothing has to
+change if this repo ever moves to an organization:
 
 ```bash
 python3 -m pytest -q
@@ -174,8 +178,15 @@ python3 tools/corpus.py --check                   # per-character corpora
 python3 tools/rederive.py --check                 # no hand-edited derived field
 ```
 
-Run all four before pushing; a queue rejection costs everybody behind you a
-re-run. If one of the last three fails, **regenerate — never hand-resolve**:
-`generate_skill_index.py --write`, `corpus.py --write`. A conflict in
-`docs/skills/index.json`, `docs/skills/index.md` or `corpus/*.json` is always
-resolved by re-running the tool, because those files are outputs.
+Run all four before pushing. If one of the last three fails, **regenerate —
+never hand-resolve**: `generate_skill_index.py --write`, `corpus.py --write`. A
+conflict in `docs/skills/index.json`, `docs/skills/index.md` or `corpus/*.json`
+is always settled by re-running the tool, because those files are outputs.
+
+**What is missing, so nobody re-derives it:** GitHub's *native* merge queue —
+which batches several PRs into one speculative build instead of serialising
+them one at a time — needs an organization-owned repository, and this one is
+owned by a personal account. The API refuses the `merge_queue` rule with
+`Invalid rules: 'Merge queue'`, on both REST and GraphQL. The up-to-date branch
+requirement above is the same guarantee at lower throughput. See the tracking
+issue #35.
