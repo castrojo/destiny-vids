@@ -57,6 +57,12 @@ DEFAULT_HEIGHT = 1080
 DEFAULT_SAMPLE_RATE = 48000
 DEFAULT_LAYOUT = "5.1"
 
+# Named so a test can point them somewhere that does not exist. The system
+# ffmpeg on an atomic Fedora/Bluefin host is `ffmpeg-free`, which has no H.264
+# decoder, so these are preferred over PATH.
+LINUXBREW_FFMPEG = "/home/linuxbrew/.linuxbrew/bin/ffmpeg"
+SHIM_FFMPEG = str(Path.home() / ".local/bin/ffmpeg")
+
 
 def ffmpeg_bin():
     """The ffmpeg that can actually decode H.264.
@@ -71,8 +77,7 @@ def ffmpeg_bin():
     machine with no ffmpeg at all. A missing binary surfaces when the command
     is actually run, which is the only place it matters.
     """
-    for candidate in ("/home/linuxbrew/.linuxbrew/bin/ffmpeg",
-                      str(Path.home() / ".local/bin/ffmpeg")):
+    for candidate in (LINUXBREW_FFMPEG, SHIM_FFMPEG):
         if Path(candidate).exists():
             return candidate
     return shutil.which("ffmpeg") or "ffmpeg"
@@ -97,7 +102,7 @@ def load_plan(path):
         src = item.get("image") if kind == "card" else item.get("path")
         if not src:
             raise ValueError(f"item {i}: missing {'image' if kind == 'card' else 'path'}")
-        if not (REPO_ROOT / src).exists() and not Path(src).exists():
+        if not resolve(src):
             raise ValueError(f"item {i}: source does not exist: {src}")
         if kind == "card" and float(item.get("dur", 0)) <= 0:
             raise ValueError(f"item {i}: card needs a positive dur")
@@ -106,12 +111,26 @@ def load_plan(path):
                 f"item {i}: clip audio must be 'source' or 'silent' -- state it "
                 f"explicitly, so a segment is never silently dropped to silence"
             )
+        if kind == "clip" and "dur" in item and float(item["dur"]) <= 0:
+            raise ValueError(f"item {i}: clip dur, when given, must be positive")
     return plan
 
 
-def resolve(src):
+def resolve(src, required=True):
+    """The one path resolver: absolute wins, then repo-root, then cwd.
+
+    Validation and encoding MUST agree on this. When the two disagreed, a
+    relative path could be validated against the repo copy and then encoded
+    from a different file of the same name in the working directory -- the file
+    that was checked would not be the file that shipped.
+    """
     p = Path(src)
-    return str(p if p.is_absolute() or p.exists() else REPO_ROOT / src)
+    if p.is_absolute():
+        return str(p) if not required or p.exists() else ""
+    for candidate in (REPO_ROOT / src, Path.cwd() / src):
+        if candidate.exists():
+            return str(candidate)
+    return "" if required else str(REPO_ROOT / src)
 
 
 def build_inputs(plan):
@@ -159,22 +178,32 @@ def build_filtergraph(plan):
                 f"asetpts=PTS-STARTPTS[{a}]"
             )
         else:
-            chains.append(
-                f"[{i}:v]scale={w}:{h}:flags=lanczos,setsar=1,"
-                f"fps={fps},format=yuv420p,setpts=PTS-STARTPTS[{v}]"
-            )
             if item["audio"] == "silent":
-                # Length is taken from the clip itself, not guessed: a silence
-                # source that is a frame short desynchronises everything after
-                # it in the concat.
+                # Both legs are pinned to ONE duration so they are equal by
+                # construction. Previously the silence was set to a probed or
+                # authored scalar while the video leg ran its own natural
+                # length: if the two disagreed, `concat` advanced each stream's
+                # timeline independently and every segment after this one
+                # drifted out of sync. Trimming the video to its own probed
+                # duration is a no-op; trimming it to an authored `dur` is the
+                # author's stated intent. Either way they cannot diverge.
                 dur = item.get("dur")
                 if dur is None:
-                    dur = probe_duration(resolve(item["path"]))
+                    dur = probe_duration(resolve(item["path"]), stream="v:0")
+                chains.append(
+                    f"[{i}:v]scale={w}:{h}:flags=lanczos,setsar=1,"
+                    f"fps={fps},format=yuv420p,trim=duration={dur},"
+                    f"setpts=PTS-STARTPTS[{v}]"
+                )
                 chains.append(
                     f"anullsrc=channel_layout={layout}:sample_rate={rate}:d={dur},"
                     f"asetpts=PTS-STARTPTS[{a}]"
                 )
             else:
+                chains.append(
+                    f"[{i}:v]scale={w}:{h}:flags=lanczos,setsar=1,"
+                    f"fps={fps},format=yuv420p,setpts=PTS-STARTPTS[{v}]"
+                )
                 # aresample only where the rate differs; aformat pins the layout
                 # so concat sees one shape. No gain is applied anywhere.
                 chains.append(
@@ -189,9 +218,26 @@ def build_filtergraph(plan):
     return ";".join(chains)
 
 
-def probe_duration(path):
+def probe_duration(path, stream=None):
+    """Duration in seconds.
+
+    ``stream="v:0"`` asks the video stream rather than the container. The two
+    can disagree -- a container's ``format=duration`` covers its longest
+    stream, so on a file whose audio outruns its picture it is the wrong number
+    to cut silence against. Falls back to the container when a stream reports
+    no duration of its own, which some muxers do.
+    """
+    probe = ffprobe_bin()
+    if stream:
+        out = subprocess.run(
+            [probe, "-v", "error", "-select_streams", stream,
+             "-show_entries", "stream=duration", "-of", "csv=p=0", path],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        if out and out.upper() != "N/A":
+            return float(out)
     out = subprocess.run(
-        [ffprobe_bin(), "-v", "error",
+        [probe, "-v", "error",
          "-show_entries", "format=duration", "-of", "csv=p=0", path],
         capture_output=True, text=True, check=True,
     )
@@ -228,7 +274,13 @@ def expected_duration(plan):
         if item["kind"] == "card":
             total += float(item["dur"])
         else:
-            total += float(item.get("dur") or probe_duration(resolve(item["path"])))
+            # `is None`, not `or`: a 0 would fall through to a probe and report
+            # a length the graph does not build. build_filtergraph tests the
+            # same way, and the two must not disagree about what "no dur" is.
+            dur = item.get("dur")
+            if dur is None:
+                dur = probe_duration(resolve(item["path"]), stream="v:0")
+            total += float(dur)
     return total
 
 

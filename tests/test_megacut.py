@@ -6,6 +6,7 @@ re-encoding or mis-tagging something. They run offline and touch no footage.
 """
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -127,15 +128,69 @@ def test_a_command_can_be_built_with_no_ffmpeg_installed(tmp_path, monkeypatch):
     Building a command is pure string work, so binary resolution must never
     raise here -- a missing binary surfaces when the command is *run*."""
     monkeypatch.setattr(megacut.shutil, "which", lambda _: None)
-    monkeypatch.setattr(megacut.Path, "exists", lambda self: True
-                        if self.suffix in (".png", ".mp4") else False)
+    monkeypatch.setattr(megacut, "LINUXBREW_FFMPEG", "/nonexistent/ffmpeg")
+    monkeypatch.setattr(megacut, "SHIM_FFMPEG", "/nonexistent/shim/ffmpeg")
+    assert megacut.ffmpeg_bin() == "ffmpeg"
+
     _, plan = _plan(tmp_path, [
         {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
     ])
-    cmd = megacut.build_command(plan, "out.mp4")
-    assert cmd[0] == "ffmpeg"
+    assert megacut.build_command(plan, "out.mp4")[0] == "ffmpeg"
 
 
 def test_ffprobe_is_resolved_beside_the_chosen_ffmpeg(monkeypatch):
     monkeypatch.setattr(megacut, "ffmpeg_bin", lambda: "/opt/ffmpeg/bin/ffmpeg")
     assert megacut.ffprobe_bin() == "/opt/ffmpeg/bin/ffprobe"
+
+
+def test_ffprobe_survives_ffmpeg_in_a_parent_directory(monkeypatch):
+    """rpartition, not str.replace: a path like /opt/ffmpeg/bin/ffmpeg has the
+    word twice, and replacing both yields a binary that does not exist."""
+    monkeypatch.setattr(megacut, "ffmpeg_bin", lambda: "/ffmpeg/build/ffmpeg")
+    assert megacut.ffprobe_bin() == "/ffmpeg/build/ffprobe"
+
+
+def test_silent_clip_pins_both_legs_to_one_duration(tmp_path):
+    """The legs must be equal BY CONSTRUCTION. If the silence and the picture
+    disagree, concat advances each stream independently and everything after
+    this segment drifts out of sync."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "silent", "dur": 111.5},
+    ])
+    graph = megacut.build_filtergraph(plan)
+    assert "trim=duration=111.5" in graph, "video leg is not pinned"
+    assert "anullsrc=channel_layout=5.1:sample_rate=48000:d=111.5" in graph
+
+
+def test_source_clip_video_is_not_trimmed(tmp_path):
+    """Only silent clips are pinned; a clip with real audio keeps its own
+    length, and trimming it would silently drop the tail."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    assert "trim=duration=" not in megacut.build_filtergraph(plan)
+
+
+def test_clip_dur_must_be_positive_when_given(tmp_path):
+    path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "silent", "dur": 0},
+    ])
+    with pytest.raises(ValueError, match="must be positive"):
+        megacut.load_plan(path)
+
+
+def test_validation_and_encoding_resolve_the_same_file(tmp_path, monkeypatch):
+    """load_plan used to check repo-root first while resolve() preferred the
+    cwd, so a relative path could be validated against one file and encoded
+    from a different file of the same name."""
+    monkeypatch.setattr(megacut, "REPO_ROOT", tmp_path / "repo")
+    (tmp_path / "repo" / "renders").mkdir(parents=True)
+    (tmp_path / "repo" / "renders" / "a.mp4").write_bytes(b"repo")
+    cwd = tmp_path / "elsewhere" / "renders"
+    cwd.mkdir(parents=True)
+    (cwd / "a.mp4").write_bytes(b"cwd")
+    monkeypatch.chdir(tmp_path / "elsewhere")
+
+    resolved = megacut.resolve("renders/a.mp4")
+    assert resolved == str(tmp_path / "repo" / "renders" / "a.mp4")
+    assert Path(resolved).read_bytes() == b"repo"

@@ -98,6 +98,16 @@ Segments genuinely disagree, so *some* re-encode is unavoidable:
 
 ## Red Flags
 
+- **A silent segment's two legs must be equal by construction.** Generating
+  silence from a probed or authored duration while the picture runs its own
+  natural length is a latent desync: `concat` advances each stream's timeline
+  per segment, so a mismatch drifts **every segment after it**. Pin both to one
+  number. Probe the **video stream**, not the container — `format=duration`
+  covers the longest stream, which is the wrong number on a file whose audio
+  outruns its picture.
+- **Validation and encoding must resolve a path the same way.** If the checker
+  prefers the repo root and the encoder prefers the working directory, the file
+  that was validated is not necessarily the file that ships.
 - **`-color_primaries` alone does not tag the file.** Those flags describe the
   *frames*; x264 copies the matrix from them and leaves primaries and transfer
   `unknown`. The file then silently disagrees with every other deliverable.
