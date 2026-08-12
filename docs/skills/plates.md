@@ -85,12 +85,14 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
 - **Two plates are never visible at once.** `plan` and `burn` both refuse an
   overlapping manifest.
 - Contributors whose shot is too short are credited together on a roster title
-  card over the tail. Dropping a month's contributors silently is the one
-  unacceptable outcome.
+  card over the tail; a tail too short even for that card lands every one of
+  them in `unresolved` instead. Dropping a month's contributors silently is the
+  one unacceptable outcome.
 
 `plan` writes `{"plates": [...], "unresolved": [...]}`. A lead who made the cut
 but got no plate lands in `unresolved` rather than disappearing, with the reason
-and whether a tool can fix it:
+and whether a tool can fix it — and so does an ensemble contributor whom even
+the tail roster card had no room for:
 
 | `reason` | Means | `automatable` |
 |---|---|---|
@@ -142,7 +144,9 @@ The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
 - Inventing a plate line, a role, or a pronoun row.
 - Hardcoding copy in the manifest instead of `vocab/casting.yaml`.
 - Shipping a cut with a non-empty `unresolved` list without reading it: someone
-  who was on screen went uncredited.
+  who was on screen went uncredited. The list is the whole punch-list — an
+  empty `unresolved` really does mean nobody was missed, so anything it does
+  not report is a bug in `plan`, not a gap to work around.
 - Planning with a different `--max-shot-sec` than the render used — every plate
   after the first trimmed shot lands late.
 - A subclass line on a Ghost.

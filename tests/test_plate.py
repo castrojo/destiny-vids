@@ -285,6 +285,74 @@ def test_plan_output_never_double_books_the_screen():
     plate.load_manifest_entries(entries)  # raises if any two overlap
 
 
+def test_plan_reports_contributors_the_tail_could_not_hold():
+    """An empty `unresolved` must mean nobody was missed: when the tail has no
+    room even for the roster card, every name the cut drops goes on the
+    punch-list -- a log line nobody reads is still a silent drop."""
+    shots = [
+        _shot("s1", 0, 2, "ensemble", None, slots=2),
+        _shot("s2", 2, 4, "ensemble", None, slots=2),  # no room for the roster card
+    ]
+    unresolved, logs = [], []
+    entries = plate.plan(shots, LEADS, ROSTER, log=logs.append,
+                         unresolved=unresolved)
+
+    plated = {e["name"] for e in entries}
+    assert len(entries) == 1  # the first slot of s1 is all that fits
+    assert {u["display_name"] for u in unresolved} == {
+        c["display_name"] for c in ROSTER["contributors"]} - plated
+    for entry in unresolved:
+        assert entry["reason"] == "no_window"
+        assert entry["automatable"] is True
+    # the human-readable line stays -- the log and the punch-list both tell it
+    assert any("UNCREDITED (no room in the cut)" in line for line in logs)
+
+
+def test_plan_reports_each_lead_reason():
+    """The reason table a reader of `unresolved` relies on: uncast and missing
+    copy are owner decisions; a missing window is not."""
+    shots = [
+        _shot("s1", 0, 0.5, "lead", "sagira"),       # never a window
+        _shot("s2", 0.5, 8.5, "lead", "zavala"),      # binding has no plate copy
+        _shot("s3", 8.5, 16.5, "lead", "ikora_rey"),  # nobody cast
+        _shot("s4", 16.5, 30),
+    ]
+    unresolved = []
+    assert plate.plan(shots, LEADS, unresolved=unresolved) == []
+
+    by_id = {u["id"]: u for u in unresolved}
+    assert by_id["ikora_rey"]["reason"] == "uncast"
+    assert by_id["zavala"]["reason"] == "no_plate_copy"
+    assert by_id["sagira"]["reason"] == "no_window"
+    for entry in unresolved:
+        assert entry["reason"] in plate.UNPLATED
+        vocab_entry = plate.UNPLATED[entry["reason"]]
+        assert entry["detail"] == vocab_entry["detail"]
+        assert entry["automatable"] == vocab_entry["automatable"]
+
+
+def test_plan_cli_reports_the_whole_punch_list(tmp_path, capsys):
+    """The count the CLI prints is the list it writes: a reader who sees
+    '0 unresolved' must be able to trust that nobody went uncredited."""
+    shotlist = tmp_path / "shots.json"
+    shotlist.write_text(json.dumps({"shots": [
+        _shot("s1", 0, 2, "ensemble", None, slots=2),
+        _shot("s2", 2, 4, "ensemble", None, slots=2),
+    ]}))
+    roster = tmp_path / "roster.json"
+    roster.write_text(json.dumps(ROSTER))
+    out = tmp_path / "plates.json"
+
+    assert plate.main(["plan", str(shotlist), "--roster", str(roster),
+                       "--out", str(out)]) == 0
+
+    written = json.loads(out.read_text())
+    assert len(written["unresolved"]) == len(ROSTER["contributors"]) - len(written["plates"])
+    summary = capsys.readouterr().out.strip().splitlines()[-1]
+    assert f"{len(written['plates'])} plate(s)" in summary
+    assert f"{len(written['unresolved'])} unresolved" in summary
+
+
 def test_no_plate_field_is_invented_beyond_the_reference_deck():
     """The reference (~/Videos/nameplates.json) has exactly these text fields.
 

@@ -28,7 +28,8 @@ other card -- ``title`` / ``subtitle`` / ``body`` -- used here to credit the
 month's ensemble.
 
 ``plan`` writes ``{"plates": [...], "unresolved": [...]}``: the manifest the
-other two subcommands read, plus a punch-list of leads the cut could not credit
+other two subcommands read, plus a punch-list of everyone the cut could not
+credit -- a lead, or a contributor even the tail roster card had no room for --
 and why. It never blocks on one -- an uncast character and a binding with no
 plate copy are owner decisions -- but it never swallows one either.
 
@@ -418,13 +419,16 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     shot is too short to hold a plate is credited over the final shot instead,
     so the month's contributors are never silently dropped.
 
-    A lead the cut could not credit gets the same treatment: pass a list as
-    ``unresolved`` and it is appended a punch-list entry saying which lead went
-    unplated and why (see ``UNPLATED``). Nothing blocks -- an uncast character
-    and a binding with no plate copy are both owner decisions, so the manifest
-    is written either way and the punch-list is what asks for the decision. A
-    shot that fails its binding's constraints is not an appearance at all: it is
-    already excluded from that character's retrieval, so it is not a reveal.
+    Anyone the cut could not credit gets the same treatment: pass a list as
+    ``unresolved`` and it is appended a punch-list entry saying who went
+    unplated and why (see ``UNPLATED``) -- a lead, and also a contributor whom
+    even the tail roster card had no room for. Nothing blocks -- an uncast
+    character and a binding with no plate copy are both owner decisions, so the
+    manifest is written either way and the punch-list is what asks for the
+    decision. An empty ``unresolved`` therefore means exactly what it says:
+    nobody on screen went uncredited. A shot that fails its binding's
+    constraints is not an appearance at all: it is already excluded from that
+    character's retrieval, so it is not a reveal.
     """
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
@@ -510,18 +514,20 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
     # Whoever the body of the cut could not hold is credited together on one
     # roster plate over the tail, in rotation order. The month's contributors
     # are the ensemble; dropping them silently would be the one unacceptable
-    # outcome.
+    # outcome -- so when even the tail has no room, every name the cut could
+    # not credit goes on the punch-list, not just into a log line.
     pending = [item for item in pending if item["login"] not in credited]
     if pending and timeline:
         tail_start, tail_dur, _ = timeline[-1]
         cursor = max([tail_start + LEAD_IN] + [b_end + TAIL_OUT for b_start, b_end in busy
                                                if b_end > tail_start])
         remaining = tail_start + tail_dur - TAIL_OUT - cursor
-        seen, names = set(), []
+        seen, waiting = set(), []
         for item in pending:
             if item["login"] not in seen:
                 seen.add(item["login"])
-                names.append(item["display_name"])
+                waiting.append(item)
+        names = [item["display_name"] for item in waiting]
         if remaining >= MIN_HOLD:
             entries.append({
                 "id": "ensemble_roster", "at": round(cursor, 3),
@@ -534,8 +540,17 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             if log:
                 log(f"  {'roster':<10} {cursor:6.2f}s +{remaining:.1f}s  "
                     f"{', '.join(names)}")
-        elif log:
-            log(f"  UNCREDITED (no room in the cut): {', '.join(names)}")
+        else:
+            if unresolved is not None:
+                for item in waiting:
+                    unresolved.append({
+                        "id": f"ensemble_{item['login']}",
+                        "person": item["login"],
+                        "display_name": item["display_name"],
+                        **UNPLATED["no_window"],
+                    })
+            if log:
+                log(f"  UNCREDITED (no room in the cut): {', '.join(names)}")
 
     return sorted(entries, key=lambda e: e["at"])
 
