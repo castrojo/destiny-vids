@@ -247,6 +247,19 @@ So extract the span you need to its own file first and cut from that. The
 procedure and the timecode-rebasing it forces are in
 [`skills/editing/SKILL.md`](skills/editing/SKILL.md).
 
+## The delivered peak is trimmed, not assumed
+
+A cut re-encodes audio with AAC at the concat pass, and a lossy encoder
+reconstructs inter-sample peaks above the samples it was given — so the
+finished file can sit above the delivery band even when nothing downstream
+touched the level. `render.py` therefore measures the **delivered** file with
+`tools/peaks.py` and re-runs the concat (only the concat, never the clip cuts)
+at a corrected **static gain** until it lands at or below −0.9 dBTP, the top
+of the band `~/Videos/audio-check.sh` enforces. Never a limiter, never a
+normaliser. A file that is still hot after five passes ships with a WARNING
+rather than failing — degrade, never block. `--target-dbtp` moves the target;
+a muted render has no audio and skips the check.
+
 ## Burning plates onto a cut
 
 `tools/plate.py` is a separate stage from `render.py`, deliberately: cutting and

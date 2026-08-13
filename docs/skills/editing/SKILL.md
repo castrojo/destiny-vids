@@ -153,6 +153,11 @@ python3 -m pytest -q tests/test_story.py tests/test_render.py
 ffprobe -v error -show_entries format=duration -of csv=p=0 renders/<name>.mp4
 ```
 
+The render prints the **delivered true peak** of the finished file and re-runs
+the concat at a corrected static gain if it is above −0.9 dBTP
+(`tools/peaks.py`, issue #44). Read that line before shipping; a WARNING there
+means the file is still hot after five corrections.
+
 For a scored cut, prove the audio landed rather than trusting the filtergraph —
 correlate the delivered file against the bed at a known offset:
 

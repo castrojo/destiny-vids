@@ -177,3 +177,100 @@ def test_cap_holds_keeps_the_clamp_so_the_render_does_not_warn_twice(capsys):
     assert capped[0]["end_sec"] == 4.0        # the clamp is to the vetted span
     assert render.resolve_duration(capped[0]) == 4.0
     assert capsys.readouterr().err.count("CLAMPED") == 1
+
+
+# --- delivered true-peak trim (issue #44) ------------------------------------
+
+def _one_shot_render(monkeypatch, tmp_path, delivered_peaks, **render_kwargs):
+    """Run render() with every encode and every measurement faked.
+
+    Returns the list of ``audio_gain`` values concat() was called with, in
+    order -- None for the first (ungained) pass, a float for a correction.
+    """
+    media = tmp_path / "media"
+    media.mkdir()
+    (media / "yt_x.mp4").write_bytes(b"")
+    shots = [{"segment_id": "a", "video_id": "yt_x", "start_sec": 1.0,
+              "end_sec": 3.0, "start_tc": "0:01", "end_tc": "0:03"}]
+    monkeypatch.setattr(render, "cut_clip", lambda *a, **k: None)
+    readings = iter(delivered_peaks)
+    monkeypatch.setattr(render.peaks, "measure_true_peak",
+                        lambda *a, **k: next(readings))
+    gains = []
+
+    def fake_concat(ffmpeg, clips, out_path, audio_bed=None, workdir=None,
+                    audio_gain=None):
+        gains.append(audio_gain)
+
+    monkeypatch.setattr(render, "concat", fake_concat)
+    render.render(shots, media, tmp_path / "out.mp4",
+                  ffmpeg=["ffmpeg-not-invoked"], verbose=False, **render_kwargs)
+    return gains
+
+
+def test_a_cut_above_the_band_is_re_concatenated_at_a_static_gain(monkeypatch, tmp_path):
+    """Issue #44: a cut measured -0.7 dBTP is 0.4 dB over the -1.1 target, so
+    the concat is re-run with a STATIC volume gain -- never a limiter, never a
+    normaliser -- and only the concat, not the clip cuts."""
+    gains = _one_shot_render(monkeypatch, tmp_path, [-0.7, -1.0])
+    assert gains[0] is None, "the first pass carries no gain filter"
+    assert len(gains) == 2, "one corrective concat, then in band"
+    assert gains[1] == pytest.approx(10 ** (-0.4 / 20), rel=1e-6)
+    assert gains[1] < 1.0, "corrections only ever go down"
+
+
+def test_a_cut_inside_the_band_is_not_re_concatenated(monkeypatch, tmp_path):
+    gains = _one_shot_render(monkeypatch, tmp_path, [-1.0])
+    assert gains == [None]
+
+
+def test_the_peak_check_also_covers_a_music_bed(monkeypatch, tmp_path):
+    """--audio replaces the source audio at the concat; the delivered file is
+    still measured and corrected there."""
+    bed = tmp_path / "bed.wav"
+    bed.write_bytes(b"")
+    gains = _one_shot_render(monkeypatch, tmp_path, [-0.4, -1.2], audio_bed=bed)
+    assert len(gains) == 2 and gains[1] < 1.0
+
+
+def test_a_muted_render_is_never_measured(monkeypatch, tmp_path):
+    """No audio stream means nothing to measure -- the loop must not run."""
+    monkeypatch.setattr(render.peaks, "measure_true_peak",
+                        lambda *a, **k: pytest.fail("measured a muted file"))
+    gains = _one_shot_render(monkeypatch, tmp_path, [], keep_audio=False)
+    assert gains == [None]
+
+
+def test_concat_applies_the_correction_as_a_static_volume_filter(monkeypatch, tmp_path):
+    """The corrective pass is a plain volume= scale, not a dynamics filter."""
+    seen = []
+
+    def fake_run(cmd, check=False):
+        seen.append(cmd)
+        return None
+
+    monkeypatch.setattr(render.subprocess, "run", fake_run)
+    render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
+                  workdir=tmp_path, audio_gain=0.95)
+    cmd = seen[0]
+    assert cmd[cmd.index("-af") + 1] == "volume=0.95"
+    joined = " ".join(cmd)
+    assert "loudnorm" not in joined and "acompressor" not in joined \
+        and "alimiter" not in joined
+
+
+def test_concat_with_a_bed_gains_the_bed(monkeypatch, tmp_path):
+    seen = []
+
+    def fake_run(cmd, check=False):
+        seen.append(cmd)
+        return None
+
+    monkeypatch.setattr(render.subprocess, "run", fake_run)
+    render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
+                  audio_bed=tmp_path / "bed.wav", workdir=tmp_path,
+                  audio_gain=0.95)
+    cmd = seen[0]
+    assert "volume=0.95" in cmd[cmd.index("-af") + 1]
+    assert cmd[cmd.index("-map") + 1] == "0:v:0"
+    assert "1:a:0" in cmd
