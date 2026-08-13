@@ -10,7 +10,7 @@ Generated: 2026-08-13 · schema 1.0 · 11 skills
 | [casting](casting/SKILL.md) | indexing | active | Bind a Destiny character to a person and credit the monthly ensemble. |
 | [corpus](corpus.md) | editing | active | Catalog every indexed shot of one character, and the coverage they lack. |
 | [editing](editing/SKILL.md) | editing | active | Turn a plain-language outline into a rendered cut. |
-| [farm](farm.md) | editing | active | Offload a long encode to the ghost k3s cluster and verify what comes back. |
+| [farm](farm.md) | editing | active | Offload a long encode to the idle k3s cluster and verify what comes back. |
 | [indexing](indexing.md) | indexing | active | Index a source video into schema-valid, searchable segments. |
 | [intake](intake.md) | meta | active | Turn the owner's dictated notes into filed issues before anything acts on them. |
 | [issues](issues/SKILL.md) | meta | active | File work, pick it up, and know when to stop and ask. |
