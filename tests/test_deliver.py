@@ -1,0 +1,290 @@
+"""tools/deliver.py — the delivery graph: master -> Prod/ -> megacut/ -> 10mb/.
+
+Offline: fixtures are tiny text "videos" under tmp_path; nothing encodes, and
+the ffprobe duration check skips itself on a file that is not a real video.
+"""
+import json
+import os
+import sys
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from tools import deliver  # noqa: E402
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+# --- the committed inputs ---------------------------------------------------
+
+
+def test_the_act_list_comes_from_the_real_running_order():
+    """The tool must never carry its own act list: it parses the source of
+    truth. If the table stops parsing, that is the failure to fix, not the
+    parser."""
+    acts = deliver.parse_running_order(REPO_ROOT / "docs" / "running-order.md")
+    assert [a.numeral for a in acts] == ["I", "II", "III", "IV", "V", "VI",
+                                         "VII", "VIII"]
+    assert acts[5].prod_file == "06-7daystothewolves.mp4"
+    # Act VIII has no film (issue #51); its numeral is load-bearing.
+    assert acts[-1].numeral == "VIII"
+    assert acts[-1].prod_file is None
+
+
+def test_the_delivery_map_covers_every_filmed_act_and_no_phantom_acts():
+    """delivery.json is intent, not a second act list: it may not invent acts
+    the running order does not have, and every act WITH a film must declare
+    its master -- otherwise publish has nothing to link and the graph has a
+    silent hole."""
+    acts = deliver.parse_running_order(REPO_ROOT / "docs" / "running-order.md")
+    masters, social = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    numerals = {a.numeral for a in acts}
+    assert set(masters) <= numerals, "the map names an act the order does not"
+    assert set(social.get("absent", {})) <= numerals
+    for act in acts:
+        if act.prod_file:
+            assert act.numeral in masters, f"act {act.numeral} has a film " \
+                                           f"but no declared master"
+
+
+# --- fixture ----------------------------------------------------------------
+
+RUNNING_ORDER = """# The running order
+
+| Act | Chapter | The film | State |
+|---|---|---|---|
+| **I** | Intro | `Prod/01-intro.mp4` — the opener | delivered |
+| **II** | Song | `Prod/02-song.mp4` — the song | delivered |
+| **III** | Credits | — | **not designed** — #51 |
+"""
+
+README = """# Prod
+
+Hand-written prose the tool must preserve.
+
+{table}
+
+Trailing prose.
+"""
+
+
+@pytest.fixture
+def ws(tmp_path):
+    """A minimal but complete workspace: two filmed acts with linked masters,
+    checksums, a megacut, one social copy, and a no-film act."""
+    root = tmp_path
+    masters = root / "masters"
+    masters.mkdir()
+    wolves = root / "wolves"
+    (wolves / "Prod").mkdir(parents=True)
+    (wolves / "10mb").mkdir()
+    (wolves / "megacut").mkdir()
+
+    (root / "running-order.md").write_text(RUNNING_ORDER)
+    (root / "delivery.json").write_text(json.dumps({
+        "masters": {
+            "I": {"path": str(masters / "intro-master.mp4"), "note": ""},
+            "II": {"path": str(masters / "song-master.mp4"), "note": "v2"},
+        },
+        "social": {"audio_bitrate": 256,
+                   "absent": {"II": "too long for the cap"}},
+    }))
+    (root / "plan.json").write_text(json.dumps({
+        "items": [{"kind": "card", "image": "x.png", "dur": 5.0}],
+        "output": str(wolves / "megacut" / "show-v1.mp4"),
+    }))
+
+    (masters / "intro-master.mp4").write_bytes(b"intro-content")
+    (masters / "song-master.mp4").write_bytes(b"song-content")
+    os.link(masters / "intro-master.mp4", wolves / "Prod" / "01-intro.mp4")
+    os.link(masters / "song-master.mp4", wolves / "Prod" / "02-song.mp4")
+    (wolves / "10mb" / "01-intro.mp4").write_bytes(b"social-copy")
+    (wolves / "megacut" / "show-v1.mp4").write_bytes(b"megacut")
+    future = 2_000_000_000  # mtimes lie under Syncthing; fixtures pin them
+    os.utime(wolves / "10mb" / "01-intro.mp4", (future, future))
+    os.utime(wolves / "megacut" / "show-v1.mp4", (future, future))
+    acts = deliver.parse_running_order(root / "running-order.md")
+    masters, _social = deliver.load_delivery(root / "delivery.json")
+    table = deliver.expected_table(acts, masters)
+    (wolves / "Prod" / "README.md").write_text(README.format(table=table))
+    sums = "\n".join(f"{deliver.md5(f)}  {f.name}"
+                     for f in sorted((wolves / "Prod").glob("*.mp4")))
+    (wolves / "Prod" / deliver.CHECKSUMS).write_text(sums + "\n")
+    return root
+
+
+def run(root, *argv):
+    return deliver.main([
+        *argv,
+        "--wolves-root", str(root / "wolves"),
+        "--running-order", str(root / "running-order.md"),
+        "--delivery", str(root / "delivery.json"),
+        "--plan", str(root / "plan.json"),
+    ])
+
+
+def gather(root):
+    acts = deliver.parse_running_order(root / "running-order.md")
+    masters, social = deliver.load_delivery(root / "delivery.json")
+    return deliver.gather(acts, masters, social, root / "wolves",
+                          root / "plan.json", twin_roots=[])
+
+
+def findings(reports, numeral):
+    return {f.node: f for r in reports if r.act.numeral == numeral
+            for f in r.findings}
+
+
+# --- the chain, healthy and broken ------------------------------------------
+
+
+def test_an_up_to_date_chain_passes_check(ws):
+    assert run(ws, "status", "--check") == 0
+    reports = gather(ws)
+    assert findings(reports, "I")["link"].state == deliver.OK
+    assert findings(reports, "III")["film"].state == deliver.NO_FILM
+    # A recorded absence is reported but never fails the gate.
+    assert findings(reports, "II")["social"].state == deliver.ABSENT_BY_DESIGN
+
+
+def test_a_master_rewritten_as_a_new_inode_detaches_the_link(ws):
+    """The peaks.py trim flow: the master is os.replace'd by a corrected file,
+    so Prod keeps the old inode. publish is the re-link step peaks defers to.
+    """
+    master = ws / "masters" / "intro-master.mp4"
+    (ws / "masters" / "intro-new.mp4").write_bytes(b"intro-corrected")
+    os.replace(ws / "masters" / "intro-new.mp4", master)
+    assert run(ws, "status", "--check") == 1
+    assert findings(gather(ws), "I")["link"].state == deliver.STALE
+    assert run(ws, "publish") == 0
+    assert deliver.same_file(ws / "wolves" / "Prod" / "01-intro.mp4", master)
+    assert run(ws, "status", "--check") == 0
+
+
+def test_an_older_master_never_reverts_newer_prod_content(ws):
+    """Act II on 2026-08-13: the build lived in a worktree, the declared
+    master was a revision behind. Re-linking would silently revert the show.
+    """
+    master = ws / "masters" / "song-master.mp4"
+    prod = ws / "wolves" / "Prod" / "02-song.mp4"
+    (ws / "masters" / "song-old.mp4").write_bytes(b"song-older-revision")
+    os.replace(ws / "masters" / "song-old.mp4", master)
+    past = 1_000_000_000
+    os.utime(master, (past, past))
+    os.utime(prod, (past + 1, past + 1))
+    f = findings(gather(ws), "II")["link"]
+    assert f.state == deliver.CONFLICT
+    assert "revert" in f.detail
+    assert run(ws, "publish") == 0
+    assert prod.read_bytes() == b"song-content", "publish must not downgrade"
+
+
+def test_a_stale_checksum_is_detected_and_regenerated(ws):
+    prod = ws / "wolves" / "Prod" / "01-intro.mp4"
+    prod.unlink()
+    (ws / "wolves" / "Prod" / "01-intro.mp4").write_bytes(b"intro-new")
+    os.link(ws / "masters" / "intro-master.mp4", ws / "x")
+    os.remove(ws / "x")
+    # Prod content changed under a checksum file written before the change.
+    f = findings(gather(ws), "I")["checksum"]
+    assert f.state == deliver.STALE
+    assert run(ws, "status", "--check") == 1
+    run(ws, "publish")
+    assert findings(gather(ws), "I")["checksum"].state == deliver.OK
+
+
+def test_a_missing_social_copy_is_built_but_an_exempt_one_never_is(ws, capsys):
+    (ws / "wolves" / "10mb" / "01-intro.mp4").unlink()
+    # Give act II a copy requirement by removing its exemption, then missing.
+    delivery = json.loads((ws / "delivery.json").read_text())
+    del delivery["social"]["absent"]["II"]
+    (ws / "delivery.json").write_text(json.dumps(delivery))
+    assert findings(gather(ws), "I")["social"].state == deliver.MISSING
+    assert findings(gather(ws), "II")["social"].state == deliver.MISSING
+    capsys.readouterr()
+    assert run(ws, "build", "--dry-run") == 0
+    out = capsys.readouterr().out
+    assert "social.py" in out and "01-intro.mp4" in out and "02-song.mp4" in out
+    # Nothing was actually built.
+    assert not (ws / "wolves" / "10mb" / "01-intro.mp4").exists()
+
+
+def test_a_missing_megacut_is_a_build_action(ws, capsys):
+    (ws / "wolves" / "megacut" / "show-v1.mp4").unlink()
+    assert findings(gather(ws), "")["megacut"].state == deliver.MISSING
+    capsys.readouterr()
+    assert run(ws, "build", "--dry-run") == 0
+    assert "megacut.py" in capsys.readouterr().out
+
+
+def test_the_megacut_is_refused_while_a_link_conflicts(ws, capsys):
+    """Baking a reverted act into a fresh megacut is the failure the whole
+    graph exists to prevent; the megacut waits for the link to resolve."""
+    (ws / "wolves" / "megacut" / "show-v1.mp4").unlink()
+    master = ws / "masters" / "song-master.mp4"
+    (ws / "masters" / "song-old.mp4").write_bytes(b"song-older-revision")
+    os.replace(ws / "masters" / "song-old.mp4", master)
+    past = 1_000_000_000
+    os.utime(master, (past, past))
+    os.utime(ws / "wolves" / "Prod" / "02-song.mp4", (past + 1, past + 1))
+    capsys.readouterr()
+    assert run(ws, "build", "--dry-run") == 0
+    out = capsys.readouterr().out
+    assert "REFUSED" in out and "megacut.py" not in out
+
+
+def test_the_readme_table_is_regenerated_and_the_prose_survives(ws):
+    # Drift the table by hand -- the historical failure, act VI naming v2
+    # while the link pointed at v3.
+    readme = ws / "wolves" / "Prod" / "README.md"
+    text = readme.read_text()
+    readme.write_text(text.replace("song-master.mp4` — v2",
+                                   "a-hand-maintained-lie.mp4`"))
+    assert findings(gather(ws), "")["readme"].state == deliver.STALE
+    run(ws, "publish")
+    text = (ws / "wolves" / "Prod" / "README.md").read_text()
+    assert "Hand-written prose the tool must preserve." in text
+    assert "Trailing prose." in text
+    assert "a hand-maintained lie" not in text
+    assert "song-master.mp4` — v2" in text
+    assert "Act III has no film" in text
+    assert findings(gather(ws), "")["readme"].state == deliver.OK
+
+
+def test_a_checksum_line_for_a_file_that_is_not_an_act_is_stale(ws):
+    with (ws / "wolves" / "Prod" / deliver.CHECKSUMS).open("a") as fh:
+        fh.write(f"{'0' * 32}  09-phantom.mp4\n")
+    assert findings(gather(ws), "")["checksum"].state == deliver.STALE
+
+
+def test_an_absent_workspace_is_a_report_not_a_crash(tmp_path, capsys):
+    """CI runners have no ~/Videos; the suite must stay green there."""
+    rc = deliver.main(["status", "--wolves-root", str(tmp_path / "nope")])
+    assert rc == 0
+    assert "absent" in capsys.readouterr().out
+    # ...but a GATE fails closed: a check that cannot see its workspace
+    # proves nothing.
+    assert deliver.main(["status", "--check",
+                         "--wolves-root", str(tmp_path / "nope")]) == 1
+
+
+# --- the real workspace, as a report ----------------------------------------
+
+
+@pytest.mark.skipif(not deliver.DEFAULT_WOLVES.exists(),
+                    reason="no ~/Videos/Wolves on this machine")
+def test_the_real_workspace_reports_without_failing(capsys):
+    """status is wired into the suite as a REPORT, never a gate: a stale
+    deliverable is a punch-list item, and the owner's ~/Videos being mid-edit
+    must not fail the tests. --check is the gate, and nothing here uses it.
+    """
+    rc = deliver.main(["status"])
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert "delivery status" in out
+    # The eight acts of the running order all appear, VIII included.
+    for numeral in ("I", "II", "III", "IV", "V", "VI", "VII", "VIII"):
+        assert f"\n{numeral:<4}" in out
