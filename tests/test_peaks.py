@@ -115,3 +115,122 @@ def test_the_render_ceiling_is_the_top_of_the_delivered_band():
     assert ceiling == pytest.approx(-0.9)
     assert ceiling - -0.9 < 1e-9       # -0.9 dBTP (in band) passes
     assert -0.7 > ceiling              # -0.7 dBTP (issue #44) is corrected
+
+
+# ---------------------------------------------------------------------------
+# trim_master_peak: the lossless master gets the same delivered-peak loop as
+# the deliverable (issue #82 -- Europa's FLAC shipped at +0.3 dBTP while its
+# AAC copy was gated to -1.0). ffmpeg is faked throughout: the suite is
+# offline, and what is under test is the file choreography and the gain math.
+# ---------------------------------------------------------------------------
+
+def _fake_measure(monkeypatch, seq):
+    """Successive true-peak readings; the last one repeats once exhausted."""
+    seq = list(seq)
+
+    def fake(*a, **k):
+        return seq.pop(0) if len(seq) > 1 else seq[0]
+
+    monkeypatch.setattr(peaks, "measure_true_peak", fake)
+
+
+def _fake_ffmpeg(monkeypatch, calls):
+    """Pretend to encode: record the argv and 'write' the output file."""
+    def fake_run(cmd, **kwargs):
+        calls.append(cmd)
+        if "-i" in cmd:
+            peaks.Path(cmd[-1]).write_bytes(b"re-encoded")
+        class Proc:
+            returncode = 0
+        return Proc()
+
+    monkeypatch.setattr(peaks.subprocess, "run", fake_run)
+
+
+def test_a_master_already_in_band_is_left_byte_identical(tmp_path, monkeypatch):
+    """No correction, no re-encode -- and the inode survives, so a Prod/
+    hardlink to the master is not silently detached."""
+    master = tmp_path / "master-hq.mp4"
+    master.write_bytes(b"original")
+    ino = master.stat().st_ino
+    _fake_measure(monkeypatch, [-1.0])
+    _fake_ffmpeg(monkeypatch, calls := [])
+    gain = peaks.trim_master_peak(master, ffmpeg=["ffmpeg"])
+    assert gain == 1.0
+    assert calls == []
+    assert master.read_bytes() == b"original"
+    assert master.stat().st_ino == ino
+    assert not (tmp_path / "master-hq.mp4.pretrim").exists()
+
+
+def test_a_hot_master_is_trimmed_by_one_derived_static_gain(tmp_path, monkeypatch):
+    """+0.3 dBTP down to the -1.1 target is -1.4 dB, applied ONCE: a lossless
+    codec adds no overshoot of its own."""
+    master = tmp_path / "master-hq.mp4"
+    master.write_bytes(b"original")
+    _fake_measure(monkeypatch, [0.3, -1.1])
+    _fake_ffmpeg(monkeypatch, calls := [])
+    gain = peaks.trim_master_peak(master, ffmpeg=["ffmpeg"])
+    assert gain == pytest.approx(10 ** (-1.4 / 20), rel=1e-6)
+    assert len(calls) == 1
+    assert master.read_bytes() == b"re-encoded"
+    assert not (tmp_path / "master-hq.mp4.pretrim").exists()
+
+
+def test_the_correction_copies_the_picture_and_scales_only_audio(tmp_path, monkeypatch):
+    master = tmp_path / "master-hq.mp4"
+    master.write_bytes(b"original")
+    _fake_measure(monkeypatch, [0.3, -1.1])
+    _fake_ffmpeg(monkeypatch, calls := [])
+    peaks.trim_master_peak(master, ffmpeg=["ffmpeg"])
+    (cmd,) = calls
+    assert cmd[cmd.index("-c:v") + 1] == "copy"          # never re-encode video
+    assert "libx264" not in cmd
+    assert cmd[cmd.index("-af") + 1].startswith("volume=")
+    assert cmd[cmd.index("-c:a") + 1] == "flac"
+    # ... and it reads the preserved original, not the half-corrected output.
+    assert cmd[cmd.index("-i") + 1].endswith(".pretrim")
+
+
+def test_corrections_are_cumulative_from_the_original(tmp_path, monkeypatch):
+    """rerun()'s gain is cumulative from unity, so every attempt must decode
+    the ORIGINAL -- re-reading the previous attempt would apply the gain twice."""
+    master = tmp_path / "master-hq.mp4"
+    master.write_bytes(b"original")
+    _fake_measure(monkeypatch, [0.3, 0.1, -1.0])
+    _fake_ffmpeg(monkeypatch, calls := [])
+    gain = peaks.trim_master_peak(master, ffmpeg=["ffmpeg"])
+    first, second = calls
+    g1 = 10 ** (-1.4 / 20)
+    assert gain == pytest.approx(g1 * 10 ** (-1.2 / 20), rel=1e-6)
+    for cmd in (first, second):
+        assert cmd[cmd.index("-i") + 1].endswith(".pretrim")
+
+
+def test_a_master_that_stays_hot_keeps_its_original(tmp_path, monkeypatch, capsys):
+    """Degrade, never block: the corrected-best file ships with a WARNING, and
+    the pristine master is not destroyed to keep the queue moving."""
+    master = tmp_path / "master-hq.mp4"
+    master.write_bytes(b"original")
+    _fake_measure(monkeypatch, [0.3])
+    _fake_ffmpeg(monkeypatch, calls := [])
+    peaks.trim_master_peak(master, ffmpeg=["ffmpeg"], attempts=3)
+    out = capsys.readouterr().out
+    assert "WARNING" in out
+    assert (tmp_path / "master-hq.mp4.pretrim").read_bytes() == b"original"
+
+
+def test_trim_cli_plumbs_target_and_ffmpeg(tmp_path, monkeypatch, capsys):
+    master = tmp_path / "master-hq.mp4"
+    master.write_bytes(b"original")
+    _fake_measure(monkeypatch, [-1.0])
+    _fake_ffmpeg(monkeypatch, calls := [])
+    peaks.main(["trim", str(master), "--target-dbtp", "-1.1",
+                "--ffmpeg", "podman exec bluefin-thumbnailer ffmpeg"])
+    assert "delivered true peak -1.0 dBTP" in capsys.readouterr().out
+
+
+def test_measure_cli_prints_the_peak(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(peaks, "measure_true_peak", lambda *a, **k: 0.3)
+    peaks.main(["measure", "x.mp4", "--ffmpeg", "ffmpeg"])
+    assert capsys.readouterr().out.strip() == "+0.30"

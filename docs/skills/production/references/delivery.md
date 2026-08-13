@@ -120,7 +120,12 @@ already been learned the hard way and must not be re-learned:
   ([issue #82]) — the gain correction had been applied to one and never the
   other, and nothing measured the master because the standing report scanned the
   wrong folder. A check that runs over yesterday's staging directory is not a
-  gate.
+  gate. The master gate now exists: `python3 tools/peaks.py trim <master>`
+  runs the same measured delivered-peak loop on a finished lossless file —
+  one derived static gain on the audio, video stream copied untouched — and a
+  master build should end with it. Note it detaches hardlinks by design (the
+  corrected file is a new inode, never an in-place rewrite), so re-link
+  `Prod/` afterwards with `ln -f`.
 - `ACODEC=flac` builds a **lossless master** alongside the deliverable, so a
   later fold-down starts from the bed rather than from a lossy file. The
   default stays `aac`, and the defaults must keep rebuilding the shipped file.

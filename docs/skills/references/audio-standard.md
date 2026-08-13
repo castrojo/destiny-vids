@@ -38,20 +38,26 @@ that convention is gone.
 | IV | Kat | dArtagnan *Holding out for a Hero* `egLoz_DPQ8E`, **Opus rung 251** @48 k | FLAC stereo | −0.9 dBTP | `wolves-kat/wolves-kat-reveal-hq.mp4` |
 | V | Natali | Nightwish *Shudder Before the Beautiful* `oTTITV4H9fo`, **Opus 251** @48 k | FLAC stereo | −1.0 dBTP | `wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4` |
 | VI | The musical | Nightwish *7 Days to the Wolves* | AAC stereo 323 k | −1.6 dBTP | **none — issue #58** |
-| VII | Europa | *Beauty Of The Beast* `X3WrCzLIIvk`, **Opus** @48 k | FLAC stereo | **+0.3 dBTP — clipping, issue #82** | `wolves-directors-cut/…-beauty-of-the-beast-hq.mp4` |
+| VII | Europa | *Beauty Of The Beast* `X3WrCzLIIvk`, **Opus** @48 k | FLAC stereo | −1.1 dBTP (was **+0.3 — clipping**, issue #82) | `wolves-directors-cut/…-beauty-of-the-beast-hq.mp4` |
 
-Measured on the files in `Wolves/Prod/` on 2026-08-12, not recalled. Every cut
+Measured on the files in `Wolves/Prod/` on 2026-08-13, not recalled. Every cut
 **except the musical** has a lossless master behind it; each master's audio is
 **bit-exact with its source bed**, verified by comparing decoded stream MD5s
 rather than asserted. Act VI is the exception and is recorded as one:
 `Prod/06-7daystothewolves.mp4` holds the best copy that exists rather than the
 best possible.
 
-**Act VII's FLAC master clips**, and that is worth reading twice: the *AAC 5.1
-deliverable* of the same cut measured −1.0 dBTP and passed for weeks. The gain
-correction described below was applied to the lossy deliverable and never to the
-master, and nothing measured the master until `--all` was pointed at `Prod/`.
-**Check the file you are actually shipping.**
+**Act VII's FLAC master clipped**, and that is worth reading twice: the *AAC
+5.1 deliverable* of the same cut measured −1.0 dBTP and passed for weeks. The
+gain correction described below was applied to the lossy deliverable and never
+to the master, and nothing measured the master until `--all` was pointed at
+`Prod/`. **Check the file you are actually shipping.** The fix (issue #82) was
+a derived static gain of 0.851 applied to the master by its own build —
+`run-final-hq.sh` now ends with `tools/peaks.py trim`, which measures the
+master and re-muxes it at the corrected gain, video stream copied untouched.
+LRA stayed 11.3 LU and integrated moved −8.3 → −9.7 LUFS: exactly −1.4 dB
+everywhere, which is what a static gain looks like. The video stream MD5 is
+unchanged.
 
 ## The honest caveat: "lossless" here is relative
 

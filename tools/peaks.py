@@ -17,9 +17,17 @@ live here are ``docs/skills/references/audio-standard.md``'s:
   -2.5 dBTP while 0.675 delivered -0.8) and chasing a narrow window on that
   curve oscillates at a full encode per attempt.
 """
+import argparse
+import os
 import re
+import shlex
 import subprocess
+import sys
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 # Headroom for the deliverable, in dBTP. Intersample peaks exceed sample peaks,
 # and a lossy decoder can overshoot further still, so a deliverable that sits at
@@ -118,3 +126,111 @@ def correct_delivered_peak(out_path, gain, target_dbtp, rerun, ffmpeg=None,
             f"re-running at static gain {gain:.3f}")
         rerun(gain)
     return gain
+
+
+def trim_master_peak(path, target_dbtp=DEFAULT_TARGET_DBTP, ffmpeg=None,
+                     attempts=5, log=print, margin_db=DELIVERED_BAND_MARGIN_DB):
+    """Gate a LOSSLESS master to the delivered band, with a static gain only.
+
+    The master was the systemic hole in issue #82: the deliverable got the
+    measured delivered-peak loop and the master never did, so Europa's FLAC
+    shipped at +0.3 dBTP while the AAC copy of the same cut sat at -1.0. This
+    is that same loop (``correct_delivered_peak``, same ceiling a fresh render
+    is held to) applied to the file that is actually shipped from
+    ``~/Videos/Wolves/Prod/`` -- which today is the master.
+
+    The correction is a remux, not a re-encode: the video stream is COPIED
+    untouched (the picture is never re-encoded) and the audio is decoded,
+    scaled by one derived static gain and re-encoded to FLAC. A lossless codec
+    adds no inter-sample overshoot of its own, so the correction lands on
+    target in one pass -- the loop re-measures to prove it. Never a limiter,
+    never a normaliser, never EQ.
+
+    The original is held aside as ``<name>.pretrim`` for the duration of the
+    loop because ``rerun``'s gain is cumulative from unity, and each attempt
+    is encoded to a new file and ``os.replace``d over the output -- never
+    opened for writing in place, so a hardlinked twin (``Prod/`` links every
+    master) is detached rather than silently rewritten: re-linking the
+    corrected master is a separate, deliberate step. A master already inside
+    the band is left byte-identical (same inode; hardlinks intact). The
+    ``.pretrim`` is removed once the result is in band, and KEPT -- with a
+    WARNING -- when the attempt budget runs out hot: the pristine master is
+    not destroyed to keep a queue moving.
+    """
+    path = Path(path)
+    if ffmpeg is None:
+        from tools.render import find_ffmpeg
+
+        ffmpeg = find_ffmpeg()
+    orig = path.with_name(path.name + ".pretrim")
+    if orig.exists():
+        log(f"  resuming from untouched original {orig.name} "
+            f"(a previous trim was interrupted)")
+    else:
+        os.replace(path, orig)
+    # Seed the output with a hardlink to the original: the loop's first
+    # measurement then reads the pristine audio, at zero copy cost. Each
+    # rerun writes a NEW inode and renames it over the output -- ffmpeg -y
+    # would O_TRUNC an existing output, and with a hardlinked seed that would
+    # rewrite the very original the cumulative gain is measured against.
+    if path.exists():
+        path.unlink()
+    os.link(orig, path)
+
+    def rerun(gain):
+        # Keep the suffix: ffmpeg picks the muxer from the extension, and a
+        # bare ".trimtmp" is "Unable to choose an output format".
+        tmp = path.with_name(path.stem + ".trimtmp" + path.suffix)
+        cmd = [*ffmpeg, "-v", "error", "-nostdin", "-y", "-i", str(orig),
+               "-map", "0:v", "-c:v", "copy",
+               "-map", "0:a", "-af", f"volume={gain}", "-c:a", "flac",
+               "-movflags", "+faststart", str(tmp)]
+        subprocess.run(cmd, check=True)
+        os.replace(tmp, path)
+
+    gain = correct_delivered_peak(path, 1.0, target_dbtp, rerun, ffmpeg=ffmpeg,
+                                  attempts=attempts, log=log,
+                                  margin_db=margin_db)
+    if gain == 1.0:
+        # Inside the band: the seed link is the original, byte for byte.
+        orig.unlink()
+        return gain
+    # The loop does not report whether its last measurement passed, and
+    # whether the pristine original may be deleted depends on exactly that.
+    if measure_true_peak(path, ffmpeg) > target_dbtp + margin_db:
+        log(f"  WARNING: master still above the band after correction -- "
+            f"the untouched original is kept at {orig}")
+    else:
+        orig.unlink()
+    return gain
+
+
+def main(argv=None):
+    """CLI so a build script (e.g. ~/Videos/<project>/render/run-*.sh) can
+    measure and gate a master without re-implementing the maths."""
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    sub = ap.add_subparsers(dest="command", required=True)
+    for name, helptext in (("measure", "print the file's true peak in dBTP"),
+                           ("trim", "gate a lossless master to the delivered "
+                                    "band with a derived static gain")):
+        p = sub.add_parser(name, help=helptext)
+        p.add_argument("file")
+        p.add_argument("--ffmpeg", default=None,
+                       help="ffmpeg command, shell-split (default: the "
+                            "resolution order in tools/render.py)")
+    sub.choices["trim"].add_argument(
+        "--target-dbtp", type=float, default=DEFAULT_TARGET_DBTP,
+        help=f"delivered true-peak target (default {DEFAULT_TARGET_DBTP}); "
+             f"accepted up to {DEFAULT_TARGET_DBTP + DELIVERED_BAND_MARGIN_DB} "
+             "-- the top of the band ~/Videos/audio-check.sh enforces")
+    args = ap.parse_args(argv)
+    ffmpeg = shlex.split(args.ffmpeg) if args.ffmpeg else None
+    if args.command == "measure":
+        print(f"{measure_true_peak(args.file, ffmpeg):+.2f}")
+    else:
+        trim_master_peak(args.file, target_dbtp=args.target_dbtp,
+                         ffmpeg=ffmpeg)
+
+
+if __name__ == "__main__":
+    main()
