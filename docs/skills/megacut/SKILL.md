@@ -65,7 +65,9 @@ node cards/render-cards.mjs --manifest stories/<name>/<name>-cards.json \
 # 2. Check the graph before paying for the encode
 python3 tools/megacut.py stories/<name>/<name>.json --dry-run
 
-# 3. Assemble
+# 3. Assemble. Clips whose sources match the delivery spec (tools/conform.py)
+#    are stream-copied, not re-encoded; the first run conforms what is new and
+#    caches it, so re-runs cost seconds. --jobs N parallelises what encodes.
 python3 tools/megacut.py stories/<name>/<name>.json
 
 # 4. Measure the joins on the BUILT file (issue #105)
@@ -103,7 +105,13 @@ This skill is the contract. The procedure lives in `references/`:
   `unknown`. The file then silently disagrees with every other deliverable.
   Pass `-x264-params colorprim=…:transfer=…:colormatrix=…` as well, and
   **verify with `ffprobe`** — this was caught only by probing the output against
-  a known-good deliverable.
+  a known-good deliverable. The shared spelling lives in
+  `tools/conform.py:video_encode_args`; use it rather than re-typing the flags.
+- **Don't re-encode an act that already conforms.** `tools/conform.py` owns
+  the delivery spec and a content-hash cache; `assemble()` conforms each clip
+  source once and then stream-copies its picture. A new act built by
+  `tools/render.py` is born conformant. `--check` a file before paying for an
+  encode.
 - **A card is a transparent PNG.** Flatten it onto real black with `overlay`;
   do not rely on `format=yuv420p` to drop the alpha, because the colour under a
   fully transparent pixel is undefined and can fringe.

@@ -88,6 +88,36 @@ Segments genuinely disagree, so *some* re-encode is unavoidable:
 | Silence | **Generated**, length probed | Every segment must carry both streams. A silence source one frame short desynchronises everything after it. |
 | Colour | BT.709, written into the VUI | See the trap below. |
 
+## The conform cache: normalise once, then copy
+
+Normalising on *every* assembly cost ~24 minutes of x264 for a ~20-minute
+programme even when nothing had changed — measured. The fix splits the work
+into a cached one-time conform and a per-assembly remux:
+
+- **`tools/conform.py` owns the delivery spec** (60000/1001, 1920x1080,
+  yuv420p, BT.709 in the VUI, H.264 High@**4.2** — 1080p59.94 does not fit in
+  4.1 — closed GOP) and a content-hash cache. `assemble()` conforms every
+  clip's source *before* building segments; an unchanged act is a cache hit
+  and costs a stat. Re-delivered acts are caught because the key is the
+  file's **content** hash, not its path.
+- **A conformant clip's segment is `-c:v copy`.** No `-vf` at all — the
+  source already carries the spec, so filtering it would only spend a
+  generation. The audio leg is identical to the encode path's: decoded,
+  resampled only where needed, layout pinned, the plan's fades applied, PCM
+  s24le out. Never FLAC in a segment.
+- **Cards still encode** — they are generated — but to the same spec, so a
+  card's bitstream joins a copied act's. `verify_segment` and
+  `verify_programme` run on both paths: a remux that re-times is exactly the
+  failure they exist for, so the copy path is not allowed to skip them.
+- **`--jobs N`** builds segments (and first-run conforms) in parallel with a
+  ProcessPoolExecutor; the default is `min(cpu_count() // 6, items)`. x264
+  saturates early, so workers at a few threads each beat one worker at every
+  core. The concat list is written in plan order from an indexed list, never
+  in completion order — order is the programme.
+- A plan targeting another rate or frame size takes the original encode path
+  unchanged; `--no-copy` forces it for debugging. `python3 tools/conform.py
+  <file> --check` reports conformance without doing work.
+
 ## Fades at the joins (issue #105)
 
 Measured on v0.6 with `tools/transitions.py`: every act join was the same
