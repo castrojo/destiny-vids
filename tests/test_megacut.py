@@ -6,6 +6,7 @@ re-encoding or mis-tagging something. They run offline and touch no footage.
 """
 
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -547,3 +548,97 @@ def test_fade_chain_is_empty_without_declared_fades():
 def test_fade_chain_formats_both_ends():
     chain = megacut.fade_chain({"fade_in": 1.5, "fade_out": 2.0}, 100.0)
     assert chain == ",afade=t=in:st=0:d=1.500,afade=t=out:st=98.000:d=2.000"
+
+# --- the #88 guard: a silent re-time must stop the build -------------------
+#
+# Issue #88: one act's segment came out of the filtergraph with 307.967 s of
+# frames re-timed into 299.48 s of timestamps, the encoder dropped the 505
+# frames that collided, ffmpeg exited 0, and the programme shipped 8.5 s short
+# with every later act starting early. Nothing in any log said so. These tests
+# fake the ffmpeg layer and pin the two checks that turn that failure loud.
+
+
+def _run_fake_ffmpeg(monkeypatch):
+    """Pretend every ffmpeg command succeeds and writes its output file."""
+    def fake_run(cmd, **kw):
+        Path(cmd[-2]).touch()  # the output path sits just before "-y"
+        return subprocess.CompletedProcess(cmd, 0)
+    monkeypatch.setattr(megacut.subprocess, "run", fake_run)
+
+
+def test_a_retimed_segment_fails_the_build(tmp_path, monkeypatch):
+    """The #88 regression test: a segment whose picture is 8.5 s short of its
+    source is a re-time, not rounding, and the build must STOP and say so --
+    the v0.5 programme shipped exactly this because nothing checked."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "act2.mp4", "audio": "source"},
+    ])
+    _run_fake_ffmpeg(monkeypatch)
+    # The source probes at its true length; the segment's video comes out at
+    # the re-timed length the issue measured.
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda path, stream=None: 307.967)
+    monkeypatch.setattr(megacut, "probe_video_extent", lambda path: 299.48)
+    with pytest.raises(RuntimeError, match=r"re-time.*#88"):
+        megacut.assemble(plan, tmp_path / "out.mp4")
+
+
+def test_a_healthy_build_passes_verification(tmp_path, monkeypatch):
+    """The same checks pass a healthy build: segment lengths track their
+    sources and the programme is the sum of its parts, within rounding."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "card", "image": "c.png", "dur": 5.0},
+        {"kind": "clip", "path": "a.mp4", "audio": "source"},
+        {"kind": "clip", "path": "b.mp4", "audio": "silent", "dur": 10.0},
+    ])
+    _run_fake_ffmpeg(monkeypatch)
+    out_path = tmp_path / "out.mp4"
+
+    def fake_probe(path, stream=None):
+        # The joined programme is the sum of its parts plus the measured
+        # +0.112 s of non-accumulating join rounding; every source is 307.967.
+        return 5.0 + 307.967 + 10.0 + 0.112 if Path(path) == out_path else 307.967
+    monkeypatch.setattr(megacut, "probe_duration", fake_probe)
+    # Healthy extents: within a frame or two of each source.
+    monkeypatch.setattr(megacut, "probe_video_extent",
+                        lambda path: 307.94 if "seg001" in str(path)
+                        else (10.0 if "seg002" in str(path) else 5.0))
+    out = megacut.assemble(plan, out_path)
+    assert Path(out).exists()
+
+
+def test_a_programme_that_comes_out_short_fails(tmp_path, monkeypatch):
+    """The per-segment check passes and the JOIN still loses time -- the
+    final check is the backstop for join-level drift, and it must fail the
+    build rather than ship a short programme."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 100.0},
+        {"kind": "clip", "path": "b.mp4", "audio": "source", "dur": 100.0},
+    ])
+    _run_fake_ffmpeg(monkeypatch)
+    monkeypatch.setattr(megacut, "probe_video_extent", lambda path: 100.0)
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda path, stream=None: 191.4)  # the join lost 8.6 s
+    with pytest.raises(RuntimeError, match=r"plan sums to"):
+        megacut.assemble(plan, tmp_path / "out.mp4")
+
+
+def test_probe_video_extent_reads_frames_not_the_container(tmp_path, monkeypatch):
+    """The extent is the video stream's own last-frame end -- the one number
+    that saw #88, since the segment's audio leg stayed whole while its picture
+    was re-timed. B-frame reordering puts the largest pts before the last
+    packet in mux order, so the max is taken, not the tail line."""
+    packets = "307.891000,0.016683\n307.941000,0.016683\n307.908000,0.016683\n"
+    monkeypatch.setattr(megacut.subprocess, "run", lambda *a, **kw:
+                        subprocess.CompletedProcess(a[0], 0, stdout=packets))
+    extent = megacut.probe_video_extent(tmp_path / "seg000.mkv")
+    assert extent == pytest.approx(307.941 + 0.016683)
+
+
+def test_probe_video_extent_refuses_an_empty_answer(tmp_path, monkeypatch):
+    """A segment with no readable video packets is not 'zero seconds of
+    picture', it is a broken probe -- refuse rather than pass."""
+    monkeypatch.setattr(megacut.subprocess, "run", lambda *a, **kw:
+                        subprocess.CompletedProcess(a[0], 0, stdout=""))
+    with pytest.raises(RuntimeError, match="no video packets"):
+        megacut.probe_video_extent(tmp_path / "seg000.mkv")

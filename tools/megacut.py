@@ -31,11 +31,14 @@ the part worth protecting:
   ``preset``, and the join then uses ``-c:v copy``. Nothing is re-encoded, so
   this costs no quality against the single-pass form -- it only costs disk,
   briefly, in a temporary directory.
-* **Audio is encoded once.** Segments carry **FLAC**, which is lossless, so the
-  single AAC encode happens at the join, across the whole programme rather than
-  per segment. Encoding AAC per segment and copying would have been the real
-  quality regression: every join would carry its own encoder delay and padding,
-  which is audible as a tick.
+* **Audio is encoded once.** Segments carry **24-bit PCM**, which is lossless,
+  so the single AAC encode happens at the join, across the whole programme
+  rather than per segment. Encoding AAC per segment and copying would have
+  been the real quality regression: every join would carry its own encoder
+  delay and padding, which is audible as a tick. PCM rather than FLAC because
+  FLAC's STREAMINFO lives in the stream's extradata and the concat demuxer
+  binds the first file's extradata to the whole joined stream -- every later
+  segment then fails to decode.
 
 What "normalise" means here, and why each choice
 ------------------------------------------------
@@ -347,6 +350,105 @@ def probe_duration(path, stream=None):
     return float(out.stdout.strip())
 
 
+def probe_video_extent(path):
+    """The video stream's own timeline length: last frame's pts + duration.
+
+    A container's ``format=duration`` covers the LONGEST stream, and Matroska
+    carries no per-stream duration header at all -- so neither number sees
+    what #88 actually did. There the segment's audio leg stayed whole while
+    its picture was re-timed 8.5 s short, and only a video-only measurement
+    catches that. Packets are read, not decoded (about a second for a
+    five-minute segment), and the max is taken because B-frame reordering
+    means the last packet in mux order is not necessarily the last in
+    presentation order.
+    """
+    out = subprocess.run(
+        [ffprobe_bin(), "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "packet=pts_time,duration_time", "-of", "csv=p=0",
+         str(path)],
+        capture_output=True, text=True, check=True,
+    )
+    extent = 0.0
+    for line in out.stdout.splitlines():
+        parts = line.strip().split(",")
+        if len(parts) < 2:
+            continue
+        try:
+            pts, dur = float(parts[0]), float(parts[1])
+        except ValueError:
+            continue
+        extent = max(extent, pts + dur)
+    if extent <= 0.0:
+        raise RuntimeError(f"no video packets read from {path}")
+    return extent
+
+
+# How far a built segment may drift from its source before it is a re-time,
+# not rounding. The fps conversion lands within a frame or two of the source
+# length (~0.03 s at 59.94); #88's failure was 8.487 s. 0.25 s sits ~8x above
+# the noise and ~34x below the failure.
+SEGMENT_DURATION_TOLERANCE_SEC = 0.25
+
+# The join adds its own small rounding per segment (measured: +0.112 s over a
+# 14-item programme). The base absorbs the one-off muxing/encoder delay; the
+# per-item term keeps a long programme from false-positiving on accumulated
+# rounding while still failing any real re-time (#88 was -8.487 s on one act).
+PROGRAMME_DURATION_TOLERANCE_BASE_SEC = 0.5
+PROGRAMME_DURATION_TOLERANCE_PER_ITEM_SEC = 0.1
+
+
+def verify_segment(plan, index, seg_path):
+    """Fail the build if one segment's PICTURE is not its source's length.
+
+    This is the check issue #88 proved necessary: the filtergraph re-timed one
+    act's video 8.5 s short, ffmpeg exited 0, the frame count going IN was
+    right, and the programme only read as wrong when its act slides stopped
+    landing on their marks. Comparing each segment's video extent against the
+    item's own length turns that silent re-time into a loud stop that names
+    the act.
+
+    The expectation is on the item's own clock -- for a clip, its film time
+    (the delivered file's video stream); for a card, the authored slide
+    duration. The segment is that same clock re-encoded, so the two must agree
+    within rounding.
+    """
+    item = plan["items"][index]
+    expected_sec = _item_dur_programme_clock(item)
+    built_sec = probe_video_extent(seg_path)
+    if abs(built_sec - expected_sec) > SEGMENT_DURATION_TOLERANCE_SEC:
+        label = item.get("label", item.get("path") or item.get("image"))
+        raise RuntimeError(
+            f"segment {index} ({label}) is {built_sec:.3f}s of picture but "
+            f"its source is {expected_sec:.3f}s -- {built_sec - expected_sec:+.3f}s "
+            f"is a re-time, not rounding (#88). The programme is NOT written; "
+            f"fix the segment's chain rather than shipping the shortfall.")
+    return built_sec
+
+
+def verify_programme(plan, out_path):
+    """Fail the build if the joined programme is not the sum of its parts.
+
+    The per-segment check catches a re-timed item; this one catches everything
+    the join itself can lose -- a segment whose legs disagreed, a concat-time
+    timestamp jump. Measured on a healthy build: +0.112 s over 14 items, and
+    the point of the tolerance is that per-segment rounding does not
+    accumulate into a false stop.
+
+    Both numbers are on the PROGRAMME clock: the expected side is the plan's
+    own arithmetic, the built side is the delivered file's container duration.
+    """
+    expected_sec = expected_duration(plan)
+    built_sec = probe_duration(out_path)
+    tolerance = (PROGRAMME_DURATION_TOLERANCE_BASE_SEC
+                 + PROGRAMME_DURATION_TOLERANCE_PER_ITEM_SEC * len(plan["items"]))
+    if abs(built_sec - expected_sec) > tolerance:
+        raise RuntimeError(
+            f"programme is {built_sec:.3f}s but the plan sums to "
+            f"{expected_sec:.3f}s -- {built_sec - expected_sec:+.3f}s exceeds "
+            f"the {tolerance:.3f}s join tolerance (#88). Do not ship it.")
+    return built_sec
+
+
 def segment_video_chain(plan, item):
     """The normalising video chain for a clip, as a plain -vf string."""
     fps = plan.get("fps", DEFAULT_FPS)
@@ -492,6 +594,11 @@ def build_concat_command(plan, list_path, out_path):
 def assemble(plan, out_path, workdir=None, log=None):
     """Build every segment, then join them. Returns the output path.
 
+    Every segment is verified against its source's length as it is built, and
+    the joined programme against the plan's sum, so a silent re-time stops the
+    build instead of shipping (#88: one act came out of the filtergraph 8.5 s
+    short, ffmpeg exited 0, and the file played fine).
+
     The segments land in a temporary directory that is removed afterwards --
     they are pure intermediates, and keeping them would invite somebody to
     hand-edit one, which is the failure this repo's regenerated-artifact rule
@@ -509,12 +616,14 @@ def assemble(plan, out_path, workdir=None, log=None):
             seg = tmp / f"seg{i:03d}.mkv"
             log(f"  segment {i + 1}/{len(plan['items'])}: {item.get('label', item['kind'])}")
             subprocess.run(build_segment_command(plan, i, seg), check=True)
+            verify_segment(plan, i, seg)
             segments.append(seg)
         list_path = tmp / "segments.txt"
         list_path.write_text(
             "".join(f"file '{s}'\n" for s in segments), encoding="utf-8")
         log(f"  joining {len(segments)} segments")
         subprocess.run(build_concat_command(plan, list_path, out_path), check=True)
+        verify_programme(plan, out_path)
     finally:
         if ctx:
             ctx.cleanup()

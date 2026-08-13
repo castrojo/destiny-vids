@@ -153,7 +153,10 @@ ffmpeg -ss <seg> -t <len> -i out.mp4 -map a:0 -af volumedetect -f null /dev/null
 
 - **Duration equals the sum of the parts.** Not approximately: an 8.5 s
   shortfall on a 20-minute programme is one act silently truncated, and the
-  file plays fine.
+  file plays fine. **`assemble()` enforces this itself** — each segment's
+  video extent against its source, and the programme against the plan's sum —
+  so a re-time fails the build instead of shipping (#88). The manual checks
+  below are for what a duration cannot see.
 - **Every act slide lands where the plan says.** Cheap and decisive: extract a
   frame per second (`-vf fps=1,scale=64:36`), compare each against the rendered
   `plate_act*.png`, and print where each slide actually starts. A slide that is
