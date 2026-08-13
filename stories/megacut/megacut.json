@@ -100,9 +100,10 @@
     },
     {
       "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/06-7daystothewolves.mp4",
+      "path": "/var/home/jorge/Videos/Wolves/Prod/06-7daystothewolves-plated.mp4",
       "audio": "source",
-      "label": "Act VI — Seven Days to the Wolves: the musical (TIMING PASS, provenance open)"
+      "label": "Act VI — Seven Days to the Wolves: the musical (TIMING PASS, provenance open), with the Cayde-6 tail plates burned in",
+      "_plates": "The -plated file is 06-7daystothewolves.mp4 with stories/06-wolves-cayde-plates.json burned onto it (tools/plate.py burn --fit-picture). The un-plated master is KEPT beside it deliberately: burning is not idempotent, so a re-burn always starts from the clean file and never stacks a second card on top of the first. Audio is stream-copied, so the act's duration is unchanged (432.7330) and no chapter after it moves."
     },
     {
       "kind": "card",

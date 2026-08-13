@@ -447,6 +447,81 @@ correlation against the bed. The two catch opposite faults and neither implies
 the other: the floor catches a silent insert, the correlation catches the bed
 leaking into a region that was supposed to be a pause.
 
+## The tail plates — the Cayde-6 reveal
+
+**Added 2026-08-13**, from the owner's brief. Act II plates Jorge Castro as
+`[ REDACTED ]` with the note *"act II only — he is revealed later in the
+programme"*. **This is that reveal**, and it is why the programme withholds his
+name for sixteen minutes: it pays off on Cayde-6 walking alone out of the fog
+at the end of this act, and three gold credits follow him.
+
+The manifest is [`stories/06-wolves-cayde-plates.json`](../../stories/06-wolves-cayde-plates.json).
+
+### The clock, settled on a frame
+
+The brief's marks were **megacut** time. Act VI film = megacut − 673.992, which
+`tools/megacut.py --locate 17:37` confirms independently (`VI @ 6:23.041`).
+Nothing here is a film timecode anybody typed, and **every window was then
+looked at** before a name was attached to it — the rule that caught both real
+defects of the previous session, neither of which was visible in a manifest.
+
+| Owner mark | Film | What is actually on that frame | Card |
+|---|---|---|---|
+| 17:37 | 382.7 | Cayde-6 alone in the fog, then the hooded close-up | **Jorge Castro**, basic blue |
+| 17:37 | 386.3 | the Guardians walking up between the fire pillars | the narration, as the deck's title card |
+| 17:45 | 391.008 | the Guardians assembled around the fire | **Kelsey Hightower**, gold |
+| 17:49 | 395.008 | the group standing, sunset behind | **Brian Ketelsen**, gold |
+| 17:51 | 397.008 | the front rank walking into camera | **Angie Jones**, gold |
+
+Gold is `variant: leader` — the wolves overlay's `.wolves-guardian-plate-leader`,
+which recolours the label and the title and deliberately leaves the class row
+blue. The reveal carries no variant at all, which is the owner's *"basic blue,
+like the blueberries"*.
+
+### Why the reveal comes before the narration
+
+Both are lower-third cards, so they cannot share a window — the one-card-at-a-
+time check is there precisely to stop two credits stacking. The brief gives
+both at 17:37, so they are sequenced inside that beat, name first, because the
+name is the payoff the act has been saving. Swapping them is one edit to `at`.
+
+### What the owner still has to settle
+
+Recorded in the manifest's `unresolved`, and none of it is an agent's call:
+
+- **`Harbringer Hunter`** is reproduced from the brief verbatim. The reference
+  deck spells the same word *Harbinger* on the same person. One character, on
+  his own credit — so it ships as he wrote it rather than silently corrected.
+- **Two bindings now disagree with `vocab/casting.yaml`.** The committed
+  `cayde_6` plate is `TRUSTEE // GUARDIAN` / Harbinger Titan / *"Upender of
+  Antipatterns | The First Disciple"* / silver; `zavala` is `ARCHITECT //
+  GUARDIAN` / Dawnblade Warlock. The brief overrides both **for this cut only**
+  — `casting.yaml` is not edited here, because which record is right is the
+  owner's call, not a side effect of a render.
+- **Brian Ketelsen and Angie Jones are not in `casting.yaml` at all.** Their
+  copy exists only in the brief. A binding needs a GitHub login, and a login is
+  not something to guess about a real person.
+- **Kelsey and Brian carry the same title**, *Evangelist of the Open Sky*,
+  exactly as written. Reproduced, not de-duplicated.
+
+### Burning it
+
+```bash
+python3 tools/plate.py render --manifest stories/06-wolves-cayde-plates.json \
+    --out-dir renders/plates-act6 \
+    --fit-video ~/Videos/Wolves/Prod/06-7daystothewolves.mp4
+python3 tools/plate.py burn --video ~/Videos/Wolves/Prod/06-7daystothewolves.mp4 \
+    --manifest stories/06-wolves-cayde-plates.json \
+    --plates-dir renders/plates-act6 \
+    --out ~/Videos/Wolves/Prod/06-7daystothewolves-plated.mp4 --fit-picture
+```
+
+**The un-plated master is kept beside the plated file on purpose.** Burning is
+not idempotent, so a re-burn always starts from the clean act and never stacks
+a second card on the first. Audio is stream-copied, so the act's duration is
+unchanged (432.7330) and **no chapter after it moves** — the megacut manifest
+points at the `-plated` file and its timings are otherwise untouched.
+
 ## Reproducing
 
 **One command, once the sources are in `media/`:**
@@ -569,8 +644,9 @@ of it.
 - [ ] **Kaslin Fields' GitHub login** — [issue #72]. Her identity *is* authored;
       the gap is that `ensemble.titles` is keyed by login and nobody has
       supplied hers, so there is nowhere correct to record it.
-- [ ] Nameplates are not burned yet. The `plate_slot` runs are flagged in the
-      shotlist for that pass.
+- [x] Nameplates are burned on the **tail** — the Cayde-6 reveal and three gold
+      credits, see "The tail plates" above. The `plate_slot` runs through the
+      rest of the act are still unplated.
 - [ ] The bed is an official YouTube upload — lossy, and not the highest-quality
       upstream version. The purchasable lossless *Dark Passion Play* master is.
       Swapping it will re-time the cut: codec rungs differ in leading padding
