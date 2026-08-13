@@ -506,6 +506,50 @@ def format_chapters(marks):
     return "\n".join(lines)
 
 
+def parse_stamp(text):
+    """Read a review note's timecode: `12:43`, `1:02:11`, `763`, `12:43.5`."""
+    parts = str(text).strip().split(":")
+    if len(parts) > 3 or not all(parts):
+        raise ValueError(f"not a timecode: {text!r}")
+    seconds = 0.0
+    for part in parts:
+        seconds = seconds * 60 + float(part)
+    return seconds
+
+
+def locate(plan, seconds):
+    """Which act is playing at `seconds`, and how far into it.
+
+    The whole point of a review loop is that a note is taken against the
+    PROGRAMME clock -- "12:43 looks wrong" -- while a fix is made against an
+    ACT: its own project, its own file, its own timeline. Doing that arithmetic
+    by hand, per note, off a chapter list is where a round of notes silently
+    gets applied to the wrong act.
+
+    Returns (title, offset_into_that_item, path_or_None). A card is an act
+    slide, so a note landing on one is a note about the slide, not the film.
+
+    The title is the act's, not the item's: a clip carries a `label` that is a
+    build note ("held long, by owner request"), so an act's film is reported
+    under the chapter its own SLIDE announced. That is what the audience --
+    and therefore the note -- calls it.
+    """
+    t = 0.0
+    act = None
+    for item in plan["items"]:
+        dur = item.get("dur")
+        if dur is None:
+            dur = probe_duration(resolve(item["path"]), stream="v:0")
+        dur = float(dur)
+        if item["kind"] == "card":
+            act = item.get("chapter") or item.get("label")
+        if seconds < t + dur or item is plan["items"][-1]:
+            title = act or item.get("label") or item.get("path") or "?"
+            return title, round(seconds - t, 3), item.get("path")
+        t += dur
+    raise ValueError("empty plan")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("plan", help="JSON assembly plan")
@@ -514,14 +558,28 @@ def main(argv=None):
                     help="print the command and the expected duration, encode nothing")
     ap.add_argument("--chapters", action="store_true",
                     help="print the chapter markers and exit, encoding nothing")
+    ap.add_argument("--locate", metavar="TC", nargs="+",
+                    help="turn review-note timecodes on the PROGRAMME clock "
+                         "(12:43, 1:02:11, 763) into the act that is playing "
+                         "and the offset inside its own file; encodes nothing")
     ap.add_argument("--workdir",
                     help="keep the intermediate segments here instead of a "
                          "temporary directory (they are large; for debugging a join)")
     args = ap.parse_args(argv)
 
-    plan = load_plan(args.plan, require_sources=not args.chapters)
+    plan = load_plan(args.plan, require_sources=not (args.chapters or args.locate))
     if args.chapters:
         print(format_chapters(chapters(plan)))
+        return 0
+
+    if args.locate:
+        for stamp in args.locate:
+            seconds = parse_stamp(stamp)
+            title, offset, path = locate(plan, seconds)
+            m, s = divmod(offset, 60)
+            where = f"{int(m)}:{s:06.3f}"
+            print(f"{stamp:>9}  ->  {title}  @ {where}"
+                  + (f"  [{path}]" if path else "  [act slide]"))
         return 0
 
     out_path = args.out or plan.get("output")
