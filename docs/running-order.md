@@ -17,7 +17,7 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | Act | Chapter | The film | State |
 |---|---|---|---|
 | **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the comic card | delivered |
-| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers | delivered and **credited**, in the programme |
+| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers, and *The Long Walk* inside them | delivered and **credited**, in the programme |
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
@@ -35,10 +35,17 @@ permanently, whatever gets built later.
 delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
 and its own place on the clock. Seven of the eight acts now play, which is what
 **v0.5** is. It is also the first feature act to carry **nameplates** — thirteen
-of them, generated rather than placed by hand.
+of them, generated rather than placed by hand — now fifteen, plus a chapter
+card, twelve dialogue pills, a patch-queue HUD and a villain's bar, all of it
+still generated.
+
+**Act I carries the GUARDIAN BOND companion cards**, ported from the live
+overlay: Karl beside Kat, Alamo beside Natali, Katerina beside Kaslin, and Bob
+Killen's unnamed Torosaurus beside Cortney, which she inherits by the owner's
+explicit decision rather than by the recast.
 
 **Act II emits two sub-chapters that nothing consumes yet.** `TOC` at 0:54.234
-and `Rizzo` at 2:41.367, in the act's own film time
+and `The Long Walk` at 2:27.801, in the act's own film time
 (`python3 scripts/build_efmb_plates.py --chapters`). `chapters()` below derives
 markers from act **slides** only, so an act's internal marks have nowhere to go
 — [#92](https://github.com/castrojo/destiny-vids/issues/92). They are anchored

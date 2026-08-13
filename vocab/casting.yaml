@@ -544,9 +544,70 @@ ensemble:
       #
       # Basic blue chrome, exactly as authored: no variant, no trustee, no
       # wreath. No subclass is authored; the class row is omitted.
+      #
+      # NOT PLATED IN ACT II ANY MORE. His shot (source 185.233) is inside
+      # "The Long Walk", and the owner's instruction for that chapter is "No
+      # other guardians". The copy stays here because it is authored and he
+      # is owed a credit wherever the show next has room for one -- deleting
+      # a written identity because one chapter dropped it is how a credit
+      # gets lost for good.
       label: MAINTAINER // GUARDIAN
       name: William Rizzo
       title: Hammer of Kairos
+
+    # --- ACT II, "THE LONG WALK" ---------------------------------------------
+    # The owner's chapter inside act II: three people walking, and nobody else.
+    # All three are NAME-ONLY plus chrome, and that is the authored state, not
+    # an unfinished one: he gave each of them an AFFILIATION and no title, so
+    # the affiliation rides as chrome the way Kyle's Bazzite purple does and
+    # NO title row is written for anybody. The label is reproduced from Kyle's
+    # own entry above, because the owner's instruction was that they are his
+    # peers.
+    # TODO(owner): author a title (and any class) for each of the three, and
+    # settle whether GloriousEggroll is credited by handle or as Thomas Crider.
+    GloriousEggroll:
+      # github.com/GloriousEggroll. Owner: "Glorious Eggroll the main guy
+      # walking with a nobara linux logo, same as Kyles in other parts of the
+      # video. We want Eggroll to be a peer of kyle".
+      #
+      # NAME ROW IS THE HANDLE, as the owner wrote it in his own dialogue
+      # block ("[ GloriousEggroll ] There's nothing glorious about this job").
+      # GitHub records his name as Thomas Crider; which of the two goes on the
+      # card is HIS call, not an agent's, so the string he used is reproduced
+      # and the question is recorded rather than resolved.
+      label: BLUEBERRY // MAINTAINER
+      name: GloriousEggroll
+      variant: nobara
+      avatar: https://avatars.githubusercontent.com/u/11287837?v=4
+    HikariKnight:
+      # github.com/HikariKnight. Owner: "Hikari, another peer, but he's also
+      # bazzite affiliated like kyle" and "just generate the info from github".
+      # GitHub's `name` field for the account IS "HikariKnight" -- no separate
+      # real name is published there, so the handle is not a stand-in for one.
+      # His bio ("Currently helping out with @ublue-os & Bazzite") is what the
+      # bazzite chrome reproduces; it is not quoted on the card.
+      label: BLUEBERRY // MAINTAINER
+      name: HikariKnight
+      variant: bazzite
+      avatar: https://avatars.githubusercontent.com/u/2557889?v=4
+    A1RM4X:
+      # youtube.com/@A1RM4X. Owner: "a linux youtuber named A1RMAX - his
+      # affiliation should be his youtube channel and brand it appropriately".
+      #
+      # THE ONLY NON-GITHUB IDENTITY IN THIS FILE. He is keyed by the channel
+      # handle because that is the durable identifier he has here; there is no
+      # login to key him on and inventing one would be a claim about him.
+      # The owner wrote "A1RMAX"; the channel is @A1RM4X, which is what the
+      # card carries -- his own spelling of his own name outranks a
+      # transcription of it, and both are recorded here.
+      #
+      # The avatar is the channel's own picture, not a logo: a creator's brand
+      # IS their face here, and putting YouTube's mark on his crest would name
+      # the platform louder than the person. The red is the platform.
+      label: "@A1RM4X // YOUTUBE"
+      name: A1RM4X
+      variant: youtube
+      avatar: https://yt3.googleusercontent.com/ytc/AIdro_kCixIw5CtOKMcqo_p8ZSDwYXoGQZ2TB5NzA7Lag-n_ByM=s900-c-k-c0x00ffffff-no-rj
 
   # --- NAMED, COPY NOT YET AUTHORED ------------------------------------------
   # The owner named these two for act II but authored no plate copy. Recorded

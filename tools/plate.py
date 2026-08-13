@@ -157,12 +157,53 @@ VARIANTS = {
         "title": (167, 139, 250, 255),    # #a78bfa (Tailwind violet-400)
         "glow": (88, 53, 206, 140),       # #5835ce, the wordmark purple
     },
+    # Nobara indigo, for GloriousEggroll -- the peer of Kyle's bazzite purple,
+    # and for the same reason: the affiliation is CHROME, and the card says
+    # nothing about it in words. The colours are VERIFIED from the official
+    # icon at https://nobaraproject.org/img/nobara-icon.png, sampled rather
+    # than recalled: #3E3FC5 is the dominant fill (and the brand's own
+    # "Governor Bay"), and the mark's gradient runs #2431A5 -> #664FF8 across
+    # it. As with bazzite, the wordmark indigo is too dark to set type in on a
+    # translucent plate, so the text rows take the same family's tints.
+    "nobara": {
+        "border": (62, 63, 197, 140),     # rgb(62 63 197 / 55%) — #3E3FC5
+        "accent": (62, 63, 197, 255),     # #3E3FC5, the icon's dominant fill
+        "label": (165, 180, 252, 255),    # #a5b4fc (Tailwind indigo-300)
+        "klass": (199, 210, 254, 255),    # #c7d2fe (Tailwind indigo-200)
+        "title": (129, 140, 248, 255),    # #818cf8 (Tailwind indigo-400)
+        "glow": (102, 79, 248, 140),      # #664FF8, the gradient's light end
+    },
+    # YouTube red, for a creator whose affiliation IS their channel. Same
+    # rule: the platform is chrome, and #FF0000 is YouTube's own logo red,
+    # which is too hot to set small type in -- the rows take red tints.
+    "youtube": {
+        "border": (255, 0, 0, 140),       # rgb(255 0 0 / 55%) — #FF0000
+        "accent": (255, 0, 0, 255),       # #FF0000, the YouTube logo red
+        "label": (252, 165, 165, 255),    # #fca5a5 (Tailwind red-300)
+        "klass": (254, 202, 202, 255),    # #fecaca (Tailwind red-200)
+        "title": (248, 113, 113, 255),    # #f87171 (Tailwind red-400)
+        "glow": (255, 0, 0, 140),
+    },
 }
 
 # The Bazzite logomark's gradient stops (ublue-os/bazzite repo_content/Bazzite.svg,
 # paint0_linear: cobalt -> blue-violet across the tile's diagonal).
 BAZZITE_COBALT = (0, 71, 171)      # #0047AB, gradient start (top-left)
 BAZZITE_VIOLET = (138, 43, 226)    # #8A2BE2, gradient end (bottom-right)
+
+# Which chrome variants put a brand mark in the crest instead of the hex.
+# `bazzite` is drawn from traced SVG geometry; the rest are cached raster
+# artwork, downloaded by scripts/fetch_brand_marks.py into gitignored
+# renders/. A missing file degrades to the drawn crest, never a crash.
+#
+# `youtube` is deliberately NOT here: a creator's own channel avatar is their
+# brand, so A1RM4X's crest carries HIS picture and the red is the platform.
+# Putting YouTube's own logo on somebody's credit would name the platform
+# louder than the person.
+BRAND_MARKS = {
+    "bazzite": "bazzite",
+    "nobara": "renders/marks/nobara.png",
+}
 
 # --- type ramp (clamp() upper bounds, i.e. the desktop sizes) ---------------
 FS_LABEL = 1.8 * REM     # .wolves-guardian-plate-label
@@ -246,7 +287,87 @@ CHAT_FS_TEXT_MIN = 19    # ...MIN_FONT 38px -- the shrink-to-fit floor
 CHAT_RULE_W = 2          # .rule { width: 3px } -- 1.5px at 1x, rounded up
 CHAT_RULE_H = 23         # .rule { height: 46px }
 
-# Row placement: bottom 10%, left/right 5% (.wolves-guardian-plate-row).
+# --- companion plate (the site's GUARDIAN BOND card) ------------------------
+# A DIFFERENT card again: `.wolves-companion-plate` in WolvesIntroOverlay.vue,
+# the bonded dinosaur split out beside the Guardian's own lower third. It is
+# the row's other half -- the site anchors it `right: 5%; bottom: 10%` while
+# the name plate holds the left -- so a companion shares its Guardian's `group`
+# rather than contending with it for the lower third.
+#
+# Its three rows are the site's, reproduced: the fixed `GUARDIAN BOND` label
+# (chrome, not a per-person line), the dinosaur's authored name, and the
+# species' scientific name. Where no character sheet names the bonded animal
+# the name row is OMITTED, exactly as `v-if` does it on the site -- an unnamed
+# bond is a real state, and inventing a name for somebody's companion is the
+# same class of mistake as inventing their subclass.
+COMPANION_LABEL = "GUARDIAN BOND"
+COMPANION_W = 24.0 * REM          # width: clamp(17rem, 14rem + 5vw, 24rem)
+COMPANION_PAD_TOP = 4.2 * REM     # padding: 4.2rem 1.6rem 1.4rem
+COMPANION_PAD_X = 1.6 * REM
+COMPANION_PAD_BOTTOM = 1.4 * REM
+COMPANION_ART_DROP = 3.4 * REM    # .art { margin-bottom: -3.4rem } -- the
+                                  # artwork breaks out of the chamfered box
+FS_COMPANION_LABEL = 1.5 * REM    # .wolves-companion-plate-label
+FS_COMPANION_NAME = 2.8 * REM     # .wolves-companion-plate-name
+FS_COMPANION_SPECIES = 1.6 * REM  # .wolves-companion-plate-species
+LS_COMPANION_LABEL = 0.35         # letter-spacing: 0.35em
+LS_COMPANION_SPECIES = 0.05
+COMPANION_LABEL_COLOUR = (147, 197, 253, 255)   # #93c5fd
+COMPANION_SPECIES_COLOUR = (148, 163, 184, 255)  # #94a3b8
+# "Size each visible silhouette, not each source canvas" -- the per-species
+# corrections the site carries, reproduced rather than re-judged. A species
+# with no entry renders at the base width, which is what the base rule does.
+COMPANION_ART_WIDTH = {
+    "bob-torosaurus": 1.08,
+    "karl": 1.18,
+    "kentrosaurus": 1.04,
+    "alamosaurus": 1.242,
+}
+COMPANION_ART_BASE = 1.08         # .wolves-companion-plate-art { width: 108% }
+
+# --- the miniboss badge (Destiny's own boss-bar treatment) ------------------
+# `kind: "miniboss"` -- the card a Destiny raid or strike puts at the TOP of
+# the screen when a named enemy arrives: a rank icon, the name in large
+# tracked caps, its title beneath, and the health bar under both.
+#
+# Destiny's own tiers are colour-coded: an orange/yellow bar is a Major (what
+# players call a miniboss) and an Ultra gets the big bar with a skull. The
+# owner asked for a RED badge, so the red is his and the LAYOUT is the game's.
+# It carries the deck's own `name` and `title` and adds no new row.
+MINIBOSS_RED = (220, 38, 38, 255)         # #dc2626, the owner's red badge
+MINIBOSS_RED_DIM = (127, 29, 29, 255)     # #7f1d1d, the bar's unfilled track
+MINIBOSS_PANEL = (10, 6, 8, 196)
+FS_MINIBOSS_NAME = 2.6 * REM
+FS_MINIBOSS_TITLE = 1.35 * REM
+LS_MINIBOSS_NAME = 0.14                   # the game sets the name wide
+LS_MINIBOSS_TITLE = 0.24
+MINIBOSS_PAD_X = 2.2 * REM
+MINIBOSS_PAD_Y = 1.0 * REM
+MINIBOSS_BAR_H = 7                        # the health bar under the type
+MINIBOSS_ICON = 2.2 * REM                 # the rank diamond on the left
+MINIBOSS_TOP = 0.08                       # the game puts the bar near the top
+
+# --- the achievement toast (the Xbox gag) -----------------------------------
+# `kind: "achievement"` -- the unlock notification, top-centre, in the official
+# Xbox brand green #107C10. Three rows: the fixed ACHIEVEMENT UNLOCKED eyebrow,
+# the achievement's `name`, and its gamerscore.
+#
+# EVERY STRING ON THIS CARD IS A JOKE ABOUT UPSTREAMING PATCHES, which makes it
+# authored copy like any other. The builder holds a PROPOSED list and does not
+# emit it until the owner approves the words -- see build_efmb_plates.py.
+XBOX_GREEN = (16, 124, 16, 255)           # #107C10
+ACHIEVEMENT_PANEL = (18, 22, 18, 224)
+FS_ACHIEVEMENT_EYEBROW = 1.0 * REM
+FS_ACHIEVEMENT_NAME = 1.7 * REM
+FS_ACHIEVEMENT_SCORE = 1.2 * REM
+LS_ACHIEVEMENT_EYEBROW = 0.3
+ACHIEVEMENT_PAD_X = 1.4 * REM
+ACHIEVEMENT_PAD_Y = 0.9 * REM
+ACHIEVEMENT_ORB = 3.0 * REM               # the green sphere on the left
+ACHIEVEMENT_TOP = 0.06
+ACHIEVEMENT_EYEBROW = "ACHIEVEMENT UNLOCKED"
+
+
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
 
@@ -255,6 +376,12 @@ MARGIN_BOTTOM = 0.10
 # in a real browser rather than ported into Pillow, so this module only ever
 # BURNS them: `render` skips them and `render_plate` refuses one outright.
 CARD_KINDS = ("act", "comic")
+
+# The card kinds that own a row of their own rather than the lower third: the
+# site's top-left HUD, Destiny's boss bar at the top of frame, and the console
+# toast under it. Each may share the screen with a lower third and with a
+# different chrome row; two of the SAME kind at once are still an error.
+CHROME_ROWS = ("status", "miniboss", "achievement")
 
 # --- group rows (the reference deck's roll call, ~/Videos/nameplates.json) ---
 # The deck's gp_* entries are one row of credits, doubly staggered: spatially,
@@ -292,6 +419,18 @@ FONT_CANDIDATES = {
         "/usr/share/fonts/dejavu/DejaVuSansMono-Bold.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf",
         "/usr/share/fonts/liberation-fonts/LiberationMono-Bold.ttf",
+    ],
+    # `font-style: italic` on .wolves-companion-plate-species -- the only
+    # italic row anywhere in the deck. The same family's oblique, and the
+    # regular faces as the last resort: a scientific name set upright is a
+    # missing slant, not a wrong word.
+    "italic": [
+        "/usr/share/fonts/dejavu-sans-mono-fonts/DejaVuSansMono-Oblique.ttf",
+        "/usr/share/fonts/dejavu/DejaVuSansMono-Oblique.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Oblique.ttf",
+        "/usr/share/fonts/liberation-fonts/LiberationMono-Italic.ttf",
+        "/usr/share/fonts/dejavu-sans-mono-fonts/DejaVuSansMono.ttf",
+        "/usr/share/fonts/dejavu/DejaVuSansMono.ttf",
     ],
 }
 
@@ -395,6 +534,12 @@ def _chamfered(size, fill, border, radius=CHAMFER, corner=CORNER_RADIUS):
     rule.paste(border, (0, 0, w, h), edge)
     img.alpha_composite(rule)
     return img
+
+
+def _resolve(path):
+    """A manifest image path -> an absolute Path (relative to the repo root)."""
+    p = Path(path)
+    return p if p.is_absolute() else REPO_ROOT / p
 
 
 def _load_avatar(path, size):
@@ -554,6 +699,44 @@ def _bazzite_tile(s, accent, photo):
     return img
 
 
+def _mark_tile(s, path, photo):
+    """Official brand artwork as the crest, ``s`` px square.
+
+    The generic form of ``_bazzite_tile``: where Bazzite's logomark is traced
+    from its SVG's path geometry, a brand whose only published asset is a
+    raster is REPRODUCED from that raster instead of being redrawn by hand --
+    a hand-drawn approximation of somebody's logo is an invented mark.
+
+    The artwork's own alpha is the silhouette, so a ``photo`` masks into the
+    logo's shape exactly as it does on the Bazzite tile, and the glyph is
+    never drawn over a face. A missing file degrades to ``None`` and the
+    caller falls back to the drawn hex crest.
+    """
+    try:
+        art = Image.open(_resolve(path)).convert("RGBA")
+    except (OSError, ValueError):
+        print(f"plate: brand mark {path!r} is missing or unreadable -- "
+              "the drawn crest stands in (punch-list item)", file=sys.stderr)
+        return None
+    # Crop to the artwork's own ink first. A published icon carries whatever
+    # transparent padding its author gave it, and scaling the padded canvas
+    # into the crest renders the mark visibly smaller than the traced Bazzite
+    # tile beside it -- the same logo at two sizes reads as two ranks.
+    box = art.getbbox()
+    if box:
+        art = art.crop(box)
+    side = max(art.size)
+    square = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    square.alpha_composite(art, ((side - art.width) // 2,
+                                 (side - art.height) // 2))
+    art = square.resize((s, s), Image.LANCZOS)
+    if photo is None:
+        return art
+    img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    img.paste(photo, (0, 0), art.getchannel("A"))
+    return img
+
+
 def _crest(size, accent, glow, avatar=None, mark=None):
     """The hex crest with its chevron (inline SVG in the Vue component).
 
@@ -563,13 +746,19 @@ def _crest(size, accent, glow, avatar=None, mark=None):
     the drawn crest -- a punch-list item, never a crash.
 
     ``mark="bazzite"`` replaces the hex with the Bazzite logomark (see
-    ``_bazzite_tile``); an avatar there masks to the tile's silhouette.
+    ``_bazzite_tile``); an avatar there masks to the tile's silhouette. Any
+    other ``mark`` is a path to cached brand artwork and behaves the same way
+    (``_mark_tile``).
     """
     scale = 4  # supersampled, then downscaled: Pillow has no antialiased strokes
     s = int(size * scale)
     if mark == "bazzite":
         return _bazzite_tile(s, accent, _load_avatar(avatar, s)).resize(
             (int(size), int(size)), Image.LANCZOS)
+    if mark:
+        tile = _mark_tile(s, mark, _load_avatar(avatar, s))
+        if tile is not None:
+            return tile.resize((int(size), int(size)), Image.LANCZOS)
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
@@ -873,6 +1062,225 @@ def _render_status(spec, glitch=False):
     return img
 
 
+def _render_companion(spec):
+    """The site's GUARDIAN BOND card: species artwork over a three-row plate.
+
+    Ported from `.wolves-companion-plate` and friends (WolvesIntroOverlay.vue).
+    The artwork is the hero: it rides above the card and overflows the
+    chamfered box (the site puts the clip-path on the card, never the wrapper),
+    so this composites onto a canvas taller and wider than the card itself.
+
+    `name` is omitted when no character sheet names the bonded dinosaur -- the
+    site's own `v-if`. `art` is a local image path, cached ahead of time the
+    way avatars are; a missing file degrades to the card alone with a stderr
+    note, because a bond that renders without its picture still credits the
+    bond, and a crash credits nobody.
+    """
+    label = COMPANION_LABEL
+    name = spec.get("name") or ""
+    species = spec.get("species") or ""
+
+    f_label = _font("regular", FS_COMPANION_LABEL)
+    f_name = _font("bold", FS_COMPANION_NAME)
+    f_species = _font("italic", FS_COMPANION_SPECIES)
+
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    inner = max(
+        _tracked_width(probe, label, f_label, LS_COMPANION_LABEL),
+        probe.textlength(name, font=f_name),
+        _tracked_width(probe, species, f_species, LS_COMPANION_SPECIES),
+    )
+    # The site fixes the card's width and lets the browser wrap; nothing here
+    # wraps, so the card grows past its clamp rather than clipping a name.
+    card_w = int(round(max(COMPANION_W, inner + 2 * COMPANION_PAD_X)))
+
+    gap = 0.3 * REM   # .name { margin-top: 0.3rem }, .species { 0.35rem }
+    rows = [(label, f_label), (name, f_name), (species, f_species)]
+    text_h = sum(f.size * 1.25 for text, f in rows if text)
+    text_h += gap * (max(1, len([1 for text, _ in rows if text])) - 1)
+    card_h = int(round(COMPANION_PAD_TOP + text_h + COMPANION_PAD_BOTTOM))
+
+    art = None
+    art_path = spec.get("art")
+    if art_path:
+        try:
+            art = Image.open(_resolve(art_path)).convert("RGBA")
+        except (OSError, ValueError) as exc:
+            print(f"companion {spec.get('id')!r}: no artwork at {art_path} "
+                  f"({exc}); rendering the card alone", file=sys.stderr)
+
+    art_w = art_h = 0
+    if art is not None:
+        ratio = COMPANION_ART_WIDTH.get(spec.get("species_id"),
+                                        COMPANION_ART_BASE)
+        art_w = int(round(card_w * ratio))
+        art_h = max(1, int(round(art.height * art_w / art.width)))
+        # `art_max_h` caps how far the artwork rises, for the one place where
+        # a full-height animal would climb into another card. It is a FRAME
+        # JUDGEMENT and never a default: the site's art is the hero and this
+        # shrinks it, so an entry that sets it has to say why in its note.
+        cap = spec.get("art_max_h")
+        if cap and art_h > int(cap):
+            art_w = max(1, int(round(art_w * int(cap) / art_h)))
+            art_h = int(cap)
+        art = art.resize((art_w, art_h), Image.LANCZOS)
+
+    # The art overflows the card on both sides and rises above it, less the
+    # negative bottom margin that tucks it behind the card's top padding.
+    overhang = max(0, (art_w - card_w) // 2)
+    rise = max(0, art_h - int(round(COMPANION_ART_DROP))) if art is not None else 0
+    img = Image.new("RGBA", (card_w + 2 * overhang, card_h + rise), (0, 0, 0, 0))
+
+    card = _chamfered((card_w, card_h), INK, VARIANTS["default"]["border"],
+                      radius=CHAMFER, corner=CORNER_RADIUS)
+    img.alpha_composite(card, (overhang, rise))
+    if art is not None:
+        img.alpha_composite(art, ((img.width - art_w) // 2, 0))
+
+    text_layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_layer)
+    cx = img.width / 2
+    y = rise + COMPANION_PAD_TOP
+    if label:
+        w = _tracked_width(draw, label, f_label, LS_COMPANION_LABEL)
+        _draw_tracked(draw, (cx - w / 2, y), label, f_label,
+                      COMPANION_LABEL_COLOUR, LS_COMPANION_LABEL)
+        y += f_label.size * 1.25 + gap
+    if name:
+        w = int(math.ceil(draw.textlength(name, font=f_name)))
+        layer = _gradient_text((w + 4, int(f_name.size * 1.4)), name, f_name,
+                               [(0.0, (255, 255, 255, 255)),
+                                (0.6, NAME_MID),
+                                (1.0, NAME_BOTTOM)])
+        text_layer.alpha_composite(layer, (int(cx - w / 2), int(y)))
+        y += f_name.size * 1.25 + gap
+    if species:
+        w = _tracked_width(draw, species, f_species, LS_COMPANION_SPECIES)
+        _draw_tracked(draw, (cx - w / 2, y), species, f_species,
+                      COMPANION_SPECIES_COLOUR, LS_COMPANION_SPECIES)
+
+    img.alpha_composite(_with_text_shadow(text_layer))
+    return img
+
+
+def _render_miniboss(spec):
+    """Destiny's boss bar, as a card: rank diamond, NAME, title, health bar.
+
+    The layout is the game's -- the thing it puts at the top of frame when a
+    named enemy arrives -- and the red is the owner's ("Name Plate for the
+    Villan in Red Badge"). Destiny's own Majors run orange-yellow and its
+    Ultras get the skull, so this is not a reproduction of a specific bar; it
+    is that treatment in his colour, and the rows are still the deck's closed
+    set: `name` and `title`, nothing invented.
+
+    It names a VILLAIN, not a person. That is why it is the one card here that
+    may carry copy nobody's identity had to be authored for.
+    """
+    name = (spec.get("name") or "").upper()
+    title = (spec.get("title") or "").upper()
+
+    f_name = _font("bold", FS_MINIBOSS_NAME)
+    f_title = _font("regular", FS_MINIBOSS_TITLE)
+
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    inner = max(_tracked_width(probe, name, f_name, LS_MINIBOSS_NAME),
+                _tracked_width(probe, title, f_title, LS_MINIBOSS_TITLE))
+    gap = 0.3 * REM
+    text_h = f_name.size * 1.25 + (f_title.size * 1.25 + gap if title else 0)
+    box_w = int(round(inner + 2 * MINIBOSS_PAD_X + MINIBOSS_ICON + gap))
+    box_h = int(round(2 * MINIBOSS_PAD_Y + text_h + gap + MINIBOSS_BAR_H))
+
+    img = _chamfered((box_w, box_h), MINIBOSS_PANEL, MINIBOSS_RED,
+                     radius=CHAMFER, corner=0)
+    d = ImageDraw.Draw(img)
+
+    # The rank diamond: the game marks a named enemy before it names it.
+    cy = MINIBOSS_PAD_Y + text_h / 2
+    r = MINIBOSS_ICON / 2
+    cxi = MINIBOSS_PAD_X + r
+    d.polygon([(cxi, cy - r), (cxi + r, cy), (cxi, cy + r), (cxi - r, cy)],
+              fill=MINIBOSS_RED)
+    d.polygon([(cxi, cy - r * 0.5), (cxi + r * 0.5, cy),
+               (cxi, cy + r * 0.5), (cxi - r * 0.5, cy)], fill=MINIBOSS_PANEL)
+
+    text_layer = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_layer)
+    x = MINIBOSS_PAD_X + MINIBOSS_ICON + gap
+    y = MINIBOSS_PAD_Y
+    _draw_tracked(draw, (x, y), name, f_name, TEXT, LS_MINIBOSS_NAME)
+    y += f_name.size * 1.25 + gap
+    if title:
+        _draw_tracked(draw, (x, y), title, f_title, MINIBOSS_RED,
+                      LS_MINIBOSS_TITLE)
+    img.alpha_composite(_with_text_shadow(text_layer))
+
+    # The health bar, full: the enemy has just arrived and has taken nothing.
+    bar_y = box_h - MINIBOSS_PAD_Y / 2 - MINIBOSS_BAR_H
+    d.rectangle([MINIBOSS_PAD_X, bar_y, box_w - MINIBOSS_PAD_X,
+                 bar_y + MINIBOSS_BAR_H - 1], fill=MINIBOSS_RED_DIM)
+    d.rectangle([MINIBOSS_PAD_X, bar_y, box_w - MINIBOSS_PAD_X,
+                 bar_y + MINIBOSS_BAR_H - 1], fill=MINIBOSS_RED)
+    return img
+
+
+def _render_achievement(spec):
+    """The Xbox achievement toast: green orb, ACHIEVEMENT UNLOCKED, name, score.
+
+    Owner's gag, one per dramatic explosion: "make this look like a real
+    person unlocking a bunch of achievements". #107C10 is Xbox's own brand
+    green. The eyebrow is fixed chrome; `name` and `score` are authored copy
+    and the builder will not emit one the owner has not approved.
+    """
+    eyebrow = ACHIEVEMENT_EYEBROW
+    name = spec.get("name") or ""
+    score = spec.get("score") or ""
+
+    f_eyebrow = _font("regular", FS_ACHIEVEMENT_EYEBROW)
+    f_name = _font("bold", FS_ACHIEVEMENT_NAME)
+    f_score = _font("regular", FS_ACHIEVEMENT_SCORE)
+
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    gap = 0.75 * REM
+    text_w = max(_tracked_width(probe, eyebrow, f_eyebrow,
+                                LS_ACHIEVEMENT_EYEBROW),
+                 probe.textlength(name, font=f_name))
+    score_w = probe.textlength(score, font=f_score) + gap if score else 0
+    box_w = int(round(ACHIEVEMENT_PAD_X * 2 + ACHIEVEMENT_ORB + gap
+                      + text_w + score_w))
+    text_h = f_eyebrow.size * 1.25 + f_name.size * 1.25
+    box_h = int(round(ACHIEVEMENT_PAD_Y * 2 + max(text_h, ACHIEVEMENT_ORB)))
+
+    img = _chamfered((box_w, box_h), ACHIEVEMENT_PANEL, XBOX_GREEN,
+                     radius=CORNER_RADIUS, corner=CORNER_RADIUS)
+    d = ImageDraw.Draw(img)
+
+    # The orb: the green sphere the console pops with its own tick inside it.
+    ox = ACHIEVEMENT_PAD_X
+    oy = (box_h - ACHIEVEMENT_ORB) / 2
+    d.ellipse([ox, oy, ox + ACHIEVEMENT_ORB, oy + ACHIEVEMENT_ORB],
+              fill=XBOX_GREEN)
+    cx, cy = ox + ACHIEVEMENT_ORB / 2, oy + ACHIEVEMENT_ORB / 2
+    q = ACHIEVEMENT_ORB * 0.22
+    d.line([(cx - q, cy), (cx - q * 0.2, cy + q * 0.8), (cx + q, cy - q * 0.8)],
+           fill=(255, 255, 255, 255), width=max(2, int(ACHIEVEMENT_ORB * 0.09)),
+           joint="curve")
+
+    text_layer = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_layer)
+    x = ox + ACHIEVEMENT_ORB + gap
+    y = (box_h - text_h) / 2
+    _draw_tracked(draw, (x, y), eyebrow, f_eyebrow, XBOX_GREEN,
+                  LS_ACHIEVEMENT_EYEBROW)
+    y += f_eyebrow.size * 1.25
+    draw.text((x, y), name, font=f_name, fill=TEXT)
+    if score:
+        sw = draw.textlength(score, font=f_score)
+        draw.text((box_w - ACHIEVEMENT_PAD_X - sw, (box_h - f_score.size) / 2),
+                  score, font=f_score, fill=XBOX_GREEN)
+    img.alpha_composite(_with_text_shadow(text_layer))
+    return img
+
+
 def _rgb_split(text):
     """The glitch's red/cyan `text-shadow` split.
 
@@ -926,7 +1334,9 @@ def render_plate(spec):
     `text`), added to the data model deliberately so a cut can show a recovered
     conversation without a plate line anybody had to invent. The chat card is
     a different component -- the plate.html dialogue pill -- so it dispatches
-    to `_render_chat` instead of sharing the reveal's centered stack.
+    to `_render_chat` instead of sharing the reveal's centered stack. So are
+    the site's own two: the top-of-frame `status` HUD, and the `companion`
+    card that names a Guardian's bonded dinosaur beside their lower third.
 
     The FULL-FRAME cards (`act`, `comic`) are not rendered here at all. They are
     the site's own components, and they are reproduced the way every other
@@ -943,6 +1353,12 @@ def render_plate(spec):
         )
     if spec.get("kind") == "chat":
         return _render_chat(spec)
+    if spec.get("kind") == "companion":
+        return _render_companion(spec)
+    if spec.get("kind") == "miniboss":
+        return _render_miniboss(spec)
+    if spec.get("kind") == "achievement":
+        return _render_achievement(spec)
     if spec.get("kind") == "status":
         return _render_status(spec, glitch=bool(spec.get("glitch")))
     variant = _variant_for(spec)
@@ -953,7 +1369,11 @@ def render_plate(spec):
     # bazzite logomark. None of it adds a row the deck has no field for.
     avatar = spec.get("avatar")
     wreath = bool(spec.get("wreath"))
-    mark = "bazzite" if spec.get("variant") == "bazzite" else None
+    # The crest's mark follows the chrome: Bazzite's is traced from its SVG,
+    # and a brand published only as a raster is reproduced from the cached
+    # artwork (scripts/fetch_brand_marks.py). A variant with no mark keeps
+    # the drawn hex crest, which is the default everywhere else.
+    mark = BRAND_MARKS.get(spec.get("variant"))
 
     f_label = _font("regular", FS_LABEL * scale)
     f_class = _font("regular", FS_CLASS * scale)
@@ -1094,6 +1514,27 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
         # letterbox bar.
         frame.alpha_composite(plate, (px + int(STATUS_INSET),
                                       py + int(STATUS_INSET)))
+        return frame
+    if position == "status-bottom":
+        # The same HUD card, at the bottom. Owner instruction for act II's
+        # patch queue: "have a status thing in the bottom". It goes bottom
+        # RIGHT because the dialogue pills hold the bottom left, and a status
+        # card is already exempt from the one-plate-at-a-time rule -- that
+        # exemption assumes the two are not in the same corner.
+        frame.alpha_composite(
+            plate, (px + pw - int(STATUS_INSET) - plate.width,
+                    py + ph - int(STATUS_INSET) - plate.height))
+        return frame
+    if position == "boss":
+        # Destiny puts a named enemy's bar at the top of frame, centred.
+        frame.alpha_composite(plate, (px + (pw - plate.width) // 2,
+                                      py + int(ph * MINIBOSS_TOP)))
+        return frame
+    if position == "toast":
+        # The console's own notification slot: top centre, clear of the lower
+        # third and of the bottom-right HUD.
+        frame.alpha_composite(plate, (px + (pw - plate.width) // 2,
+                                      py + int(ph * ACHIEVEMENT_TOP)))
         return frame
     if position == "group":
         if x is None:
@@ -2122,10 +2563,10 @@ def load_manifest_entries(entries):
             raise ValueError(f"plate {e['id']!r} has non-positive dur")
         start = float(e["at"])
         windows.append((start, start + float(e["dur"]), e["id"],
-                        e.get("group"), e.get("kind")))
+                        e.get("group"), e.get("kind"), e.get("bond_of")))
 
     # One plate at a time (authoring-interview-chat-plates): overlapping visible
-    # windows are a bug, not a style choice. Two narrow exceptions:
+    # windows are a bug, not a style choice. Three narrow exceptions:
     #
     #   * members of the same group row share a `group` key and are one row by
     #     construction -- the reference deck's roll call is *meant* to be
@@ -2134,7 +2575,18 @@ def load_manifest_entries(entries):
     #     from the lower third entirely. On the site it is persistent chrome
     #     that Guardian plates appear *underneath*, so a status card and a
     #     lower third are never in contention for the same space. Two status
-    #     cards still are, and are still an error.
+    #     cards still are, and are still an error. The same holds for the two
+    #     other cards that own a row of their own -- the `miniboss` bar at the
+    #     top of frame and the `achievement` toast under it (`CHROME_ROWS`):
+    #     each may share the screen with a lower third and with a DIFFERENT
+    #     chrome row, and never with a second card of its own kind.
+    #   * a `companion` card naming the Guardian it is bonded to, via
+    #     `bond_of: "<that plate's id>"`. The site renders the pair as one row
+    #     -- the name plate holding the left, the GUARDIAN BOND card anchored
+    #     bottom-right -- so they are the same exemption as a group, but
+    #     NAMED: the companion has to say whose bond it is, which means it can
+    #     never quietly overlap somebody else's plate the way a shared group
+    #     string could.
     #
     # A group member overlapping anything outside its own row is still an
     # error, so the check is pairwise rather than the old adjacent-pair scan
@@ -2145,13 +2597,22 @@ def load_manifest_entries(entries):
     # point (58.6 + 0.45 == 59.050000000000004, against a next cue at 59.05)
     # trips the check by 4e-15 of a second.
     EPS = 1e-6
-    for i, (a_start, a_end, a_id, a_group, a_kind) in enumerate(ordered):
-        for b_start, b_end, b_id, b_group, b_kind in ordered[i + 1:]:
+    for i, (a_start, a_end, a_id, a_group, a_kind, a_bond) in enumerate(ordered):
+        for b_start, b_end, b_id, b_group, b_kind, b_bond in ordered[i + 1:]:
             if b_start >= a_end - EPS:
                 break
             if a_group and a_group == b_group:
                 continue
-            if (a_kind == "status") != (b_kind == "status"):
+            if (a_kind in CHROME_ROWS) != (b_kind in CHROME_ROWS):
+                continue
+            # Two chrome cards may share the screen only when they do not
+            # share a row. The status HUD sits alone at the bottom; the boss
+            # bar and the console toast BOTH live at the top of frame, so
+            # they are held to the one-at-a-time rule against each other.
+            if a_kind in CHROME_ROWS and b_kind in CHROME_ROWS \
+                    and "status" in (a_kind, b_kind) and a_kind != b_kind:
+                continue
+            if a_bond == b_id or b_bond == a_id:
                 continue
             raise ValueError(
                 f"plates {a_id!r} and {b_id!r} are visible at the same time "

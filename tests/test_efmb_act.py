@@ -371,3 +371,107 @@ def test_the_owner_s_asides_are_pfp_chats_and_carry_no_rank():
     assert [p["kind"] for p in chats] == ["chat", "chat"]
     assert all(p["speaker"] == "Jorge Castro" for p in chats)
     assert not any(p.get("variant") or p.get("trustee") for p in chats)
+
+
+# --- "The Long Walk" (owner brief, this round) -----------------------------
+
+def walk_plates():
+    return {p["id"]: p for p in committed()["plates"]
+            if p["id"].startswith("walk_")}
+
+
+def test_the_owner_s_two_timed_lines_land_on_his_marks():
+    """He gave these off the MEGACUT (act II film + 2:01.567), so both were
+    converted to source before anything was scheduled. If the chain of cues
+    before them ever pushes one late, this is what catches it."""
+    walk = walk_plates()
+    assert walk["walk_ge_stream"]["at"] == pytest.approx(
+        build_efmb.film_for_source(build_efmb_plates.WALK_MARK_STREAM), abs=1e-3)
+    assert walk["walk_ge_glorious"]["at"] == pytest.approx(
+        build_efmb.film_for_source(build_efmb_plates.WALK_MARK_UPSTREAM),
+        abs=1e-3)
+
+
+def test_the_villain_arrives_with_the_villain():
+    """The bar is on the shot the winged figure walks out of, not on the
+    owner's 5:35 -- his mark is 0.9s before the cut, and a card that names
+    what is on screen has to be on the frame it names."""
+    walk = walk_plates()
+    bar = walk["walk_villain"]
+    assert bar["kind"] == "miniboss"
+    assert bar["seen_at_src"] == build_efmb_plates.WALK_VILLAIN
+    assert bar["name"] == "KERNEL REGRESSION"
+    assert bar["title"] == "Enslaver of Maintainers | Ruiner of User Experience"
+
+
+def test_nobody_else_is_credited_inside_the_walk():
+    """Owner: 'No other guardians'. Rizzo, HuntedRaven7, hanthor and Ahmed
+    Adan all held shots in this window and all four came out."""
+    walk_in = build_efmb.film_for_source(build_efmb_plates.WALK_IN)
+    walk_out = build_efmb.film_for_source(build_efmb_plates.WALK_OUT)
+    for p in committed()["plates"]:
+        if p["id"].startswith("walk_"):
+            continue
+        assert not (walk_in <= p["at"] < walk_out), (
+            f"{p['id']} is still credited inside The Long Walk")
+
+
+def test_the_patch_queue_holds_from_the_enemies_until_the_villain():
+    """A queue that blinks once is a caption. It is the site's own HUD card,
+    at the bottom because the owner said bottom."""
+    walk = walk_plates()
+    hud = walk["walk_patch_queue"]
+    assert hud["kind"] == "status" and hud["position"] == "status-bottom"
+    assert hud["detail"] == "UPSTREAM PATCH QUEUE"
+    assert hud["at"] == pytest.approx(
+        build_efmb.film_for_source(build_efmb_plates.WALK_ENEMIES), abs=1e-3)
+    assert hud["at"] + hud["dur"] == pytest.approx(walk["walk_villain"]["at"],
+                                                   abs=1e-3)
+
+
+def test_the_achievement_gag_is_built_but_not_scheduled_until_it_is_approved():
+    """The owner asked to approve the strings before anything is burned. Only
+    'Mailing List Bullshit' is his; the rest are proposed, and a proposal that
+    quietly rendered would be an invented line on screen."""
+    assert build_efmb_plates.WALK_ACHIEVEMENTS_APPROVED is False
+    assert not [p for p in committed()["plates"]
+                if p.get("kind") == "achievement"]
+    gaps = " ".join(committed()["unresolved"])
+    assert "Mailing List Bullshit" in gaps
+    owner_lines = [g for g in build_efmb_plates.WALK_ACHIEVEMENTS
+                   if g["copy"] == "owner_supplied"]
+    assert [g["name"] for g in owner_lines] == ["Mailing List Bullshit"]
+
+
+def test_the_walk_never_rides_over_the_hard_cut_at_the_end_of_run_four():
+    walk = walk_plates()
+    end = max(p["at"] + p["dur"] for p in walk.values())
+    assert end <= build_efmb.film_for_source(build_efmb_plates.WALK_OUT) + 1e-6
+
+
+def test_the_chapter_replaces_rizzo_rather_than_pointing_at_a_gone_credit():
+    chapters = {c["title"]: c for c in committed()["chapters"]}
+    assert "Rizzo" not in chapters, "a marker points at a credit that is gone"
+    assert chapters["The Long Walk"]["src"] == build_efmb_plates.WALK_IN
+
+
+def test_every_walk_line_is_reproduced_verbatim():
+    """Including the swearing, and the owner's own 'A1RMAX' inside his line
+    while the CARD carries the channel's @A1RM4X."""
+    walk = walk_plates()
+    assert walk["walk_ge_stream"]["text"] == "Alright A1RMAX turn the stream on"
+    assert walk["walk_ge_soundcard"]["text"] == (
+        "You picked the shittiest sound card to impress them with")
+    assert walk["walk_ge_lesson"]["text"] == "Here comes the lesson kids"
+    assert walk["walk_A1RM4X"]["name"] == "A1RM4X"
+
+
+def test_every_dialogue_pill_in_the_walk_carries_its_speaker_s_pfp():
+    """The pill has an avatar slot and its fallback is the drawn crest --
+    which is what every chat here silently rendered before, because the
+    builder handed the avatar resolver an empty dict."""
+    for pid, p in walk_plates().items():
+        if p.get("kind") != "chat":
+            continue
+        assert p.get("avatar"), f"{pid} lost its pfp badge"
+        assert not str(p["avatar"]).startswith("http")
