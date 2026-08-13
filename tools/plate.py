@@ -564,16 +564,18 @@ def _load_avatar(path, size):
 
     GitHub avatars are the source (e.g. avatars.githubusercontent.com/u/<id>),
     fetched and cached AHEAD of time -- this renderer never touches the
-    network, so ``avatar`` is always a local path (relative paths resolve
-    against the repo root). The crop is CSS `object-fit: cover`: scaled to
-    fill, centre-cropped.
+    network, so ``avatar`` is always a local path. A ``~``-rooted path is
+    expanded, matching the delivery map's own rule that a path outside the
+    repo is ``~``-rooted or absolute and never relative to a worktree;
+    relative paths resolve against the repo root. The crop is CSS
+    `object-fit: cover`: scaled to fill, centre-cropped.
 
     A missing or unreadable file is a punch-list item, never a crash
     (degrade, never block): the caller falls back to the drawn crest.
     """
     if not path:
         return None
-    p = Path(path)
+    p = Path(path).expanduser()
     if not p.is_absolute():
         p = REPO_ROOT / p
     try:
@@ -2870,6 +2872,28 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None):
     return out_path
 
 
+def parse_picture(text):
+    """``"X,Y,W,H"`` -> the picture rect ``place`` measures its margins against.
+
+    The measured alternative to probing footage. ``detect_picture`` reads the
+    letterbox off the video, which needs the film to be on this machine and
+    silently returns ``None`` when its probe lands past the end of a short cut
+    -- so a 34 s act gets no rect at all and its plates seat against the raw
+    frame. An act that has already measured its own matte records the rect in
+    its manifest and passes it here, which is both reproducible and offline.
+    """
+    parts = [p.strip() for p in str(text).split(",")]
+    if len(parts) != 4:
+        raise ValueError(f"--picture wants X,Y,W,H -- got {text!r}")
+    try:
+        x, y, w, h = (int(p) for p in parts)
+    except ValueError:
+        raise ValueError(f"--picture wants four integers -- got {text!r}") from None
+    if w <= 0 or h <= 0:
+        raise ValueError(f"--picture needs a positive width and height -- got {text!r}")
+    return x, y, w, h
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Render and burn Guardian nameplates.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -2880,6 +2904,13 @@ def main(argv=None):
     r.add_argument("--fit-video", default=None,
                    help="keep plates on the picture of this letterboxed video "
                         "instead of the raw 16:9 frame")
+    r.add_argument("--picture", default=None, metavar="X,Y,W,H",
+                   help="the picture area, given rather than probed. Use when "
+                        "the letterbox was MEASURED and recorded in the "
+                        "manifest: the rect is then committed with the act "
+                        "instead of being re-derived from footage this repo "
+                        "does not carry, and rendering needs no video at all. "
+                        "Wins over --fit-video when both are given")
 
     b = sub.add_parser("burn", help="composite rendered plates onto a cut")
     b.add_argument("--video", required=True)
@@ -3003,13 +3034,22 @@ def main(argv=None):
 
     if args.command == "render":
         picture = None
-        if args.fit_video:
+        if args.picture:
+            picture = parse_picture(args.picture)
+            print(f"picture area: {picture[2]}x{picture[3]} at "
+                  f"+{picture[0]}+{picture[1]} (given, not probed)")
+        elif args.fit_video:
             from tools.render import detect_picture
 
             picture = detect_picture(args.fit_video)
             if picture:
                 print(f"picture area: {picture[2]}x{picture[3]} at "
                       f"+{picture[0]}+{picture[1]}")
+            else:
+                print("picture area: cropdetect found nothing -- plates are "
+                      "placed against the RAW FRAME. On a letterboxed cut "
+                      "that seats them wrong; pass --picture with the "
+                      "measured rect instead", file=sys.stderr)
         written = render_all(entries, args.out_dir, picture)
         for path in written:
             print(f"wrote {path}")
