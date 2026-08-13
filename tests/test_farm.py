@@ -39,11 +39,14 @@ def test_boundaries_cover_the_file_exactly_on_the_frame_grid():
     assert len(spans) == 4
     assert spans[0][0] == 0.0
     # No gaps, no overlaps.
-    for (ss, dur), (next_ss, _) in zip(spans, spans[1:]):
+    for (ss, dur, _), (next_ss, _, _) in zip(spans, spans[1:]):
         assert abs(ss + dur - next_ss) < 1e-9
     assert abs(spans[-1][0] + spans[-1][1] - 111.6) < 1e-9
-    # Every boundary is an exact multiple of the frame period.
-    for ss, dur in spans:
+    # Every boundary is an exact multiple of the frame period, and the frame
+    # counts are integers summing to the whole file.
+    assert sum(n for _, _, n in spans) == 3348
+    for ss, dur, n in spans:
+        assert isinstance(n, int)
         for t in (ss, dur):
             frames = t * 30
             assert abs(frames - round(frames)) < 1e-6
@@ -56,7 +59,22 @@ def test_boundaries_clamp_to_the_frame_count():
 
 def test_a_vfr_source_falls_back_to_time_slices():
     spans = farm.chunk_boundaries(facts(vfr=True), 3)
-    assert [round(d, 3) for _, d in spans] == [37.2, 37.2, 37.2]
+    assert [round(d, 3) for _, d, n in spans] == [37.2, 37.2, 37.2]
+    assert all(n is None for _, _, n in spans)
+
+
+def test_cfr_chunks_encode_an_exact_integer_frame_count():
+    """issue-#88-class bug, measured on act VI: a float -t truncates into the
+    stream timebase and drops the seam frame (13297 vs 13301)."""
+    plan = farm.build_plan(facts=facts(), out_name="o.mp4", segments=4,
+                           video_args=[], audio_args=[], threads=6,
+                           work_dir="/w", src_arg="/w/in/s.mp4")
+    counts = []
+    for c in plan["chunks"]:
+        argv = c["argv"]
+        assert "-t" not in argv, "CFR chunks must not use a float duration"
+        counts.append(int(argv[argv.index("-frames:v") + 1]))
+    assert sum(counts) == 3348
 
 
 # --------------------------------------------------------------------------
@@ -128,40 +146,46 @@ def test_pod_script_is_valid_bash_and_waits_for_both_markers(tmp_path):
 # the manifest
 
 
-def test_the_workflow_is_a_plain_workflow_pinned_to_ghost():
+def test_the_workflow_is_a_plain_workflow_pinned_to_exo0():
     wf = farm.build_workflow("farm-x-ab12", "echo hi",
                              namespace="argo", image=farm.DEFAULT_IMAGE,
-                             cpu="12", limit_cpu="24", memory="24Gi",
-                             node="ghost", service_account="argo", keep=False)
+                             cpu="2", limit_cpu="24", memory="4Gi",
+                             limit_memory="16Gi", node="exo-0",
+                             service_account="argo", keep=False)
     assert wf["kind"] == "Workflow"  # a WorkflowTemplate would be GitOps'd
     spec = wf["spec"]
     assert spec["serviceAccountName"] == "argo"
     tpl = spec["templates"][0]
-    assert tpl["nodeSelector"] == {"kubernetes.io/hostname": "ghost"}
+    # exo-0 has ~24 free cores; ghost only ~14.
+    assert tpl["nodeSelector"] == {"kubernetes.io/hostname": "exo-0"}
     res = tpl["container"]["resources"]
-    assert res["requests"] == {"cpu": "12", "memory": "24Gi"}
-    # The request fits ghost's allocatable remainder; the limit lets the
-    # encode burst into an idle cluster.
-    assert res["limits"]["cpu"] == "24"
+    # House style: a low request always schedules, the high limit is the real
+    # budget on an idle node (the cluster runs at 156-263% limit overcommit).
+    assert res["requests"] == {"cpu": "2", "memory": "4Gi"}
+    assert res["limits"] == {"cpu": "24", "memory": "16Gi"}
     assert tpl["container"]["command"][:2] == ["/bin/bash", "-c"]
     assert spec["volumes"][0]["persistentVolumeClaim"]["claimName"] == "farm-x-ab12"
     # No artifacts section anywhere: the cluster has no artifact repository.
     assert "artifacts" not in json.dumps(wf)
+    assert "amd.com/gpu" not in json.dumps(wf)  # CPU-only: faster AND better
     assert spec["ttlStrategy"]["secondsAfterSuccess"] == 3600
 
 
 def test_keep_omits_the_ttl_backstop():
     wf = farm.build_workflow("farm-x-ab12", "s", namespace="argo", image="i",
                              cpu="1", limit_cpu="1", memory="1Gi",
-                             node="ghost", service_account="argo", keep=True)
+                             limit_memory="2Gi",
+                             node="exo-0", service_account="argo", keep=True)
     assert "ttlStrategy" not in wf["spec"]
 
 
 def test_the_default_image_is_pullable_through_the_zot_allowlist():
     """ghcr.io/jrottenberg/ffmpeg is NOT reachable on this cluster: the zot
     mirror syncs tags only (lab ADR 0007), ghcr has no jrottenberg tag past
-    6.0, and jrottenberg/* is not in the sync allowlist. linuxserver/* is."""
-    assert farm.DEFAULT_IMAGE == "docker.io/linuxserver/ffmpeg:8.1.2-cli-ls76"
+    6.0, and jrottenberg/* is not in the sync allowlist. lscr.io is
+    allowlisted wholesale, and linuxserver/ffmpeg is the same full non-free
+    build — verified pulling on the cluster."""
+    assert farm.DEFAULT_IMAGE == "lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76"
     assert "@sha256:" not in farm.DEFAULT_IMAGE  # digests 404 through zot
 
 

@@ -36,25 +36,29 @@ ReadWriteOnce). The pod mounts one PVC, waits for a ready-marker, encodes,
 waits for a fetched-marker, and exits; the tool orchestrates those markers
 and streams ``kubectl logs`` so a 20-minute encode is not a silent wait.
 
-THE IMAGE is ``docker.io/linuxserver/ffmpeg`` (8.1.2), a full non-free build
-(libx264/libx265/libfdk_aac, CPU only — AMD VAAPI quality is not delivery
-grade). The researched default, ``ghcr.io/jrottenberg/ffmpeg``, cannot be
-pulled by this cluster: pulls go through the zot registry mirror whose
+THE IMAGE is ``lscr.io/linuxserver/ffmpeg`` (8.1.2), a full non-free build
+(libx264/libx265/libfdk_aac — and Mesa's VAAPI drivers, unused here: on 24
+cores libx264 measured FASTER than h264_vaapi on identical input, 15.7x vs
+13.7x realtime, at better quality; CPU-only is both the quality and the
+speed choice). The researched default, ``ghcr.io/jrottenberg/ffmpeg``, cannot
+be pulled by this cluster: pulls go through the zot registry mirror whose
 on-demand sync only fires on *tag* references (lab ADR 0007), ghcr's
 jrottenberg repo no longer publishes any tag past 6.0, and the sync allowlist
 covers neither ``jrottenberg/*`` on ghcr nor on docker.io. Widening that
-allowlist is a ``lab/`` change and out of scope here; ``linuxserver/*`` is
-already allowlisted and is the same class of full build.
+allowlist is a ``lab/`` change and out of scope here; ``lscr.io`` is
+allowlisted wholesale and linuxserver/ffmpeg is the same class of full build.
 
 DEGRADE, NEVER BLOCK: if the cluster is unreachable the tool says so once and
 runs the same segmented encode locally with ``tools.render.find_ffmpeg``.
 ``--local`` forces that path; ``--keep`` leaves the Workflow and PVC for
 debugging; ``--dry-run`` prints the plan and manifest and does nothing.
 
-Resource shape: ghost has ~31.7 allocatable CPU of which ~15 was already
-*requested* when this was written, so the pod requests 12 CPU / 24 Gi (it must
-fit the allocatable remainder, not the node's size) and may burst to
-``--limit-cpu`` (default 24) when the cluster is as idle as it usually is.
+RESOURCE SHAPE follows the house rule: requests gate SCHEDULING, limits gate
+BURST, and the cluster runs at 156–263% limit overcommit. exo-0 has ~24 free
+cores (ghost only ~14), so the pod requests a schedulable 2 CPU / 4 Gi and
+may burst to ``--limit-cpu`` 24 / ``--limit-memory`` 16 Gi — requesting 24
+gets you Pending; requesting 2 with a limit of 24 measures 24 cores (nproc)
+inside the pod.
 """
 
 from __future__ import annotations
@@ -82,13 +86,14 @@ if str(REPO_ROOT) not in sys.path:
 from tools.render import find_ffmpeg, find_ffprobe  # noqa: E402
 
 # See the module docstring for why this is linuxserver and not jrottenberg.
-DEFAULT_IMAGE = "docker.io/linuxserver/ffmpeg:8.1.2-cli-ls76"
+DEFAULT_IMAGE = "lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76"
 DEFAULT_NAMESPACE = "argo"
 DEFAULT_SERVICE_ACCOUNT = "argo"
-DEFAULT_NODE = "ghost"
-DEFAULT_CPU = "12"
-DEFAULT_LIMIT_CPU = "24"
-DEFAULT_MEMORY = "24Gi"
+DEFAULT_NODE = "exo-0"          # ~24 free cores vs ghost's ~14
+DEFAULT_CPU = "2"               # request: low, so it always schedules
+DEFAULT_LIMIT_CPU = "24"        # limit: the burst ceiling on idle exo-0
+DEFAULT_MEMORY = "4Gi"          # request
+DEFAULT_LIMIT_MEMORY = "16Gi"   # limit
 DEFAULT_THREADS = 6
 DEFAULT_TIMEOUT = 7200          # matches the controller's activeDeadlineSeconds
 WORK_DIR = "/work"
@@ -170,24 +175,28 @@ def _is_vfr(video):
 
 
 def chunk_boundaries(facts, segments):
-    """[(start_s, dur_s)] on the frame grid, covering the whole file exactly.
+    """[(start_s, dur_s, n_frames)] on the frame grid, covering the file
+    exactly. ``n_frames`` is None for a VFR source (no frame grid exists).
 
-    Frame-grid boundaries are what make the seam safe: with accurate seeking
-    (``-ss`` before ``-i`` decodes-and-discards to the exact frame) a boundary
-    that lands exactly on a frame time is owned by exactly one chunk — the
-    earlier chunk's ``-t`` excludes it, the later chunk's ``-ss`` includes it.
-    A VFR source has no frame grid, so it falls back to equal time slices and
-    leans on verification to catch a bad seam.
+    Frame-grid boundaries are what make the seam safe, but only if the chunk
+    length is expressed in FRAMES: a float ``-t`` duration is converted to the
+    stream's int64 timebase and truncates, which drops the boundary frame
+    whenever the float lands a hair low (measured: act VI lost exactly one
+    frame per seam, 13297 vs 13301). ``-ss`` for the start (accurate seek is
+    exact at nanosecond formatting) plus ``-frames:v N`` for the length is
+    integer-exact. VFR sources fall back to ``-t`` time slices and lean on
+    verification to catch a bad seam.
     """
     segments = max(1, segments)
     duration, fps = facts["duration"], facts["fps"]
     if facts["vfr"] or fps <= 0:
         step = duration / segments
-        return [(i * step, step) for i in range(segments)]
+        return [(i * step, step, None) for i in range(segments)]
     frames = facts["frame_count"] or round(duration * float(fps))
     segments = max(1, min(segments, frames))
     bounds = [round(i * frames / segments) for i in range(segments + 1)]
-    return [(float(Fraction(b0) / fps), float(Fraction(b1 - b0) / fps))
+    return [(float(Fraction(b0) / fps), float(Fraction(b1 - b0) / fps),
+             b1 - b0)
             for b0, b1 in zip(bounds, bounds[1:])]
 
 
@@ -212,15 +221,21 @@ def build_plan(*, facts, out_name, segments, video_args, audio_args, threads,
     """
     spans = chunk_boundaries(facts, segments)
     chunks = []
-    for i, (ss, dur) in enumerate(spans):
+    for i, (ss, dur, nframes) in enumerate(spans):
         argv = [*ffmpeg, "-nostdin", "-hide_banner", "-loglevel", "warning",
                 # Input-side seek: frame-accurate in ffmpeg >= 5 (it decodes
                 # and discards), and rebases timestamps to zero, which is
                 # exactly what a chunk needs. The rendering.md objection to
                 # input seeking is about frame PHASE across a 29.97->30
                 # conversion; this tool never changes frame rate.
-                "-ss", f"{ss:.6f}", "-t", f"{dur:.6f}", "-i", src_arg,
-                *video_args, "-an",
+                "-ss", f"{ss:.9f}", "-i", src_arg]
+        if nframes is not None:
+            # Integer frame count: exact. A float -t truncates into the
+            # stream timebase and eats the seam frame (see chunk_boundaries).
+            argv += ["-frames:v", str(nframes)]
+        else:
+            argv += ["-t", f"{dur:.6f}"]
+        argv += [*video_args, "-an",
                 # After the recipe so the farm's threading wins even when the
                 # recipe carries its own -threads (documented, not a bug).
                 "-threads", str(threads),
@@ -355,7 +370,7 @@ def build_pvc(name, *, namespace, storage):
 
 
 def build_workflow(name, script, *, namespace, image, cpu, limit_cpu, memory,
-                   node, service_account, keep):
+                   limit_memory, node, service_account, keep):
     """A plain Workflow — never a WorkflowTemplate, which would have to be
     GitOps'd from lab/ and ArgoCD would fight it."""
     spec = {
@@ -372,11 +387,11 @@ def build_workflow(name, script, *, namespace, image, cpu, limit_cpu, memory,
                 # The image's entrypoint is ffmpeg itself; command replaces it.
                 "command": ["/bin/bash", "-c", script],
                 "resources": {
-                    # Requests must fit ghost's allocatable REMAINDER (~15 CPU
-                    # already requested by the lab when written); limits let
-                    # the encode burst into the cluster's real idleness.
+                    # House style (156–263% limit overcommit): a LOW request
+                    # always schedules; the HIGH limit is the real budget on
+                    # an idle node.
                     "requests": {"cpu": cpu, "memory": memory},
-                    "limits": {"cpu": limit_cpu, "memory": memory},
+                    "limits": {"cpu": limit_cpu, "memory": limit_memory},
                 },
                 "volumeMounts": [{"name": "work", "mountPath": WORK_DIR}],
             },
@@ -530,12 +545,14 @@ def _tail_log(kc, pod):
 
 
 def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
-                   memory, node, service_account, storage, keep, timeout):
+                   memory, limit_memory, node, service_account, storage, keep,
+                   timeout):
     deadline = time.monotonic() + timeout
     kc.apply_json(build_pvc(name, namespace=kc.namespace, storage=storage))
     kc.apply_json(build_workflow(name, script, namespace=kc.namespace,
                                  image=image, cpu=cpu, limit_cpu=limit_cpu,
-                                 memory=memory, node=node,
+                                 memory=memory, limit_memory=limit_memory,
+                                 node=node,
                                  service_account=service_account, keep=keep))
     print(f"farm: workflow {name} submitted (node {node}, "
           f"{len(plan['chunks'])} chunks x up to {limit_cpu} cpu)")
@@ -740,11 +757,15 @@ def main(argv=None):
                     help="ffmpeg -threads per chunk (default 6; x264 scales "
                          "poorly past ~8)")
     ap.add_argument("--cpu", default=DEFAULT_CPU,
-                    help="pod CPU request (default 12 — must fit ghost's "
-                         "allocatable remainder)")
+                    help="pod CPU request — kept LOW so the pod always "
+                         "schedules (default 2); the limit is the real budget")
     ap.add_argument("--limit-cpu", default=DEFAULT_LIMIT_CPU,
-                    help="pod CPU limit / burst ceiling (default 24)")
-    ap.add_argument("--memory", default=DEFAULT_MEMORY)
+                    help="pod CPU limit / burst ceiling (default 24 = exo-0's "
+                         "free cores)")
+    ap.add_argument("--memory", default=DEFAULT_MEMORY,
+                    help="pod memory request (default 4Gi)")
+    ap.add_argument("--limit-memory", default=DEFAULT_LIMIT_MEMORY,
+                    help="pod memory limit (default 16Gi)")
     ap.add_argument("--storage", default=None,
                     help="PVC size (default: 3x the source, min 1Gi)")
     ap.add_argument("--image", default=DEFAULT_IMAGE)
@@ -836,7 +857,8 @@ def main(argv=None):
             print(json.dumps(build_workflow(
                 farm_name(src.name), script, namespace=args.namespace,
                 image=args.image, cpu=args.cpu, limit_cpu=args.limit_cpu,
-                memory=args.memory, node=args.node,
+                memory=args.memory, limit_memory=args.limit_memory,
+                node=args.node,
                 service_account=DEFAULT_SERVICE_ACCOUNT,
                 keep=args.keep), indent=2))
         return 0
@@ -851,7 +873,7 @@ def main(argv=None):
             run_on_cluster(plan, name=name, src=src, out=out, script=script,
                            kc=kc, image=args.image, cpu=args.cpu,
                            limit_cpu=args.limit_cpu, memory=args.memory,
-                           node=args.node,
+                           limit_memory=args.limit_memory, node=args.node,
                            service_account=DEFAULT_SERVICE_ACCOUNT,
                            storage=args.storage or storage_for(src.stat().st_size),
                            keep=args.keep, timeout=args.timeout)
@@ -868,8 +890,11 @@ def main(argv=None):
     print(f"farm: encoded in {elapsed:.0f}s "
           f"({'cluster' if use_cluster else 'local'})")
 
-    problems = verify_output(out, reference, ffprobe=ffprobe,
-                             strict_streams=args.reference is not None)
+    try:
+        problems = verify_output(out, reference, ffprobe=ffprobe,
+                                 strict_streams=args.reference is not None)
+    except FarmError as exc:
+        raise SystemExit(f"farm: {exc}")
     if problems:
         for p in problems:
             print(f"farm: VERIFY FAIL: {p}")
