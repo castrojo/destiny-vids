@@ -111,12 +111,23 @@ def test_duplicate_ids_and_backwards_timecodes_are_refused():
         dialogue_md.parse(text, LEADS)
 
 
-def test_a_line_left_empty_is_refused():
-    """A blank line would burn an empty card; that is a mistake, not an edit."""
+def test_a_line_left_empty_is_kept_as_a_placeholder():
+    """REVERSED, on the owner's instruction: *"instead of blocking when I
+    don't have prose use lorem ipsum so we have placeholders for everything at
+    least"*.
+
+    This test used to assert the opposite -- that a blank line was refused,
+    because "a blank line would burn an empty card; that is a mistake, not an
+    edit". The reasoning was half right: an empty card IS a mistake. The
+    conclusion was wrong, because refusing the file cost every OTHER edit in
+    it, and an owner who does not have the words yet had nowhere to put the
+    beat. The empty card is now solved by rendering lorem instead
+    (`tools/placeholder.py`), so refusing the file buys nothing.
+    """
     text = dialogue_md.export(DATA, LEADS).replace(
         "Fatigue is a distraction.", "")
-    with pytest.raises(ValueError, match="no text"):
-        dialogue_md.parse(text, LEADS)
+    cues = dialogue_md.parse(text, LEADS)
+    assert next(c for c in cues if c["id"] == "d02")["text_source"] == "placeholder"
 
 
 def test_a_wrapped_paragraph_rejoins_into_one_line():
@@ -151,3 +162,57 @@ def test_the_checked_in_markdown_matches_the_checked_in_record():
         "DIALOGUE.md is stale -- run "
         f"`python3 tools/dialogue_md.py export {video_id}`"
     )
+
+
+# --- a line the owner has not written yet -----------------------------------
+
+
+def test_a_blank_line_no_longer_fails_the_whole_file():
+    """One unwritten line used to cost every other edit in the file.
+
+    `parse` raised on a cue with no text, so an owner blocking out a beat --
+    or simply not having the words yet -- lost the entire round of edits.
+    That is the block the lorem-placeholder rule exists to remove.
+    """
+    md = dialogue_md.export(DATA, LEADS).replace("Fatigue is a distraction.", "")
+    cues = dialogue_md.parse(md, LEADS)
+    blank = next(c for c in cues if c["id"] == "d02")
+    assert blank["text"] == ""
+    assert blank["text_source"] == "placeholder"
+    # and the edit that WAS made survives
+    assert next(c for c in cues if c["id"] == "d01")["text"] == \
+        "Aren't you tired of this?"
+
+
+def test_clearing_a_line_keeps_what_was_recovered():
+    """Handing a slot back is not the same as rewording it to nothing."""
+    md = dialogue_md.export(DATA, LEADS).replace("Fatigue is a distraction.", "")
+    updated, changes = dialogue_md.merge(DATA, dialogue_md.parse(md, LEADS))
+    cue = next(c for c in updated["cues"] if c["id"] == "d02")
+    assert cue["text"] == ""
+    assert cue["text_source"] == "placeholder"
+    assert cue["recovered_text"] == "Fatigue is a distraction."
+    assert any("placeholder" in c for c in changes)
+
+
+def test_a_new_blank_cue_is_a_slot_not_an_owner_supplied_line():
+    """`owner_supplied` would claim they wrote something. They did not."""
+    cues = [{"id": "d03", "start_sec": 20.0, "end_sec": 22.0,
+             "character": "osiris", "text": ""}]
+    updated, _ = dialogue_md.merge(DATA, cues)
+    added = next(c for c in updated["cues"] if c["id"] == "d03")
+    assert added["text_source"] == "placeholder"
+
+
+def test_the_placeholder_cue_renders_credited_to_nobody():
+    """End to end: a blank line in DIALOGUE.md never puts lorem on Osiris."""
+    from tools.placeholder import fill
+
+    md = dialogue_md.export(DATA, LEADS).replace("Fatigue is a distraction.", "")
+    cue = next(c for c in dialogue_md.parse(md, LEADS) if c["id"] == "d02")
+    plate_spec = fill({"id": cue["id"], "kind": "chat",
+                       "speaker": cue["character"],
+                       "text_source": cue["text_source"]})
+    assert plate_spec["speaker"] == "TBD"
+    assert plate_spec["speaker_pending"] == "osiris"
+    assert plate_spec["text"]

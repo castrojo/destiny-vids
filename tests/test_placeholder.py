@@ -200,3 +200,24 @@ def test_a_named_badge_is_listed_but_never_overwritten():
     listed = [f for f in placeholder.scan()
               if f["id"] == "placeholder_dylan_taylor"]
     assert listed and listed[0]["kind"] == "named-badge"
+
+
+# --- the dialogue record's own placeholder ----------------------------------
+
+
+def test_a_cue_the_owner_left_blank_is_a_placeholder():
+    """`dialogue_md.apply` marks it rather than failing the whole file."""
+    assert placeholder.needs_prose({"id": "c1", "text_source": "placeholder"})
+
+
+def test_a_blank_cue_still_loses_its_speaker_at_render_time():
+    """The record keeps the character and its evidence; the PLATE does not.
+
+    This is why the lorem is not baked into `dialogue.json`: the swap has to
+    happen once, here, or a recovered character would appear to say it.
+    """
+    out = placeholder.fill({"id": "c1", "kind": "chat", "speaker": "osiris",
+                            "text_source": "placeholder"})
+    assert out["speaker"] == "TBD"
+    assert out["speaker_pending"] == "osiris"
+    assert out["text"]

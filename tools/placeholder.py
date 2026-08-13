@@ -108,6 +108,12 @@ def needs_prose(spec):
     deliberately partial, and overwriting a real name with lorem would be the
     exact failure this module exists to prevent.
     """
+    if spec.get("text_source") == "placeholder":
+        # The dialogue record's own way of saying it: `dialogue_md.apply`
+        # marks a cue the owner left blank rather than failing the file. The
+        # words are deliberately NOT baked in there, so that the speaker swap
+        # below happens once, here, at render time.
+        return True
     return spec.get("kind") == "chat" and not (spec.get("text") or "").strip()
 
 

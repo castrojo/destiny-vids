@@ -52,6 +52,9 @@ python3 tools/dialogue_md.py apply  <video_id>            # DIALOGUE.md -> recor
 
 Editing the Markdown never loses provenance. Timecodes and evidence ride in the
 heading and are restored verbatim; a line the owner rewrites is marked
+`text_source: placeholder` marks a cue whose words do not exist yet -- a
+blank line in `DIALOGUE.md` is kept as a slot rather than failing the file, and
+renders as lorem credited to `TBD`. An owner rewrite instead records
 `text_source: owner_supplied` and keeps the recovered wording in
 `recovered_text`; a deleted section moves to `dropped` with a reason. The
 owner supplying copy is allowed — an *agent* inventing it is not, and keeping
