@@ -4,6 +4,7 @@
   "act": "IV",
   "title": "Kat Cosgrove",
   "source_id": "det0BbS_9GU",
+  "source_file": "det0BbS_9GU.mkv",
   "_source": "Fan GMV 'I Need a Hero - Destiny 2: Lightfall' (det0BbS_9GU, channel Kahiyao), VP9 1920x1080p60 bt709, format 303. Staged at ~/Videos/wolves-kat/sources/. Third-party copyrighted, same provenance question acts II and VI carry (#55). Footage is never committed.",
   "film_sec": 34.0,
   "trim": {
@@ -152,7 +153,9 @@
     "pix_fmt": "yuv420p",
     "colorspace": "bt709",
     "fps": 60,
-    "_fps_note": "Native 60fps preserved -- no fps filter."
+    "_fps_note": "Native 60fps preserved -- no fps filter.",
+    "loop_framerate": 60,
+    "_loop_framerate_note": "run-kat.sh passed `-framerate 60` on every still input. Act V did not, and its master was built that way, so whether to pass it is recorded per act rather than assumed."
   },
   "unresolved": [
     "The three radio voices krook, jeefy and mrbobbytables spoke ONLY placeholder copy and were dropped; their avatars remain on disk in ~/Videos/wolves-kat/render/ so the previous cut stays reproducible, but they are not in this record.",
