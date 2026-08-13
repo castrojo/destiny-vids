@@ -25,10 +25,11 @@ neither is unplaced any more. Appearing in the feature never made an appearance
 somebody's hero video, and it still does not — act IV is Kat's act *and* her
 hero video is a separate, separately-released thing.
 
-**Two acts have no film, and their numerals are load-bearing.** Act II needs a
-music decision (#74) and act VIII, the credits, is not designed (#51). Do not
-renumber to close the gaps: III is `mrbobbytables` permanently. The programme
-also still needs a **provenance decision** (#55).
+**One act has no film, and the numerals are load-bearing.** Act VIII, the
+credits, is **not designed** (#51); act II was the other gap and is now
+delivered and credited. Do not renumber to close the gap: III is
+`mrbobbytables` permanently. The programme also still needs a **provenance
+decision** (#55).
 
 **A hero video is one person, one video, every source** — every clean shot of a
 bound character in the whole index, summed into one cut. Karena is Mara Sov, so

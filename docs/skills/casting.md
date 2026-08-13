@@ -1,6 +1,6 @@
 ---
 name: casting
-version: "1.1"
+version: "1.2"
 last_updated: "2026-08-12"
 id: casting
 one_line_purpose: Bind a Destiny character to a person and credit the monthly ensemble.
@@ -167,6 +167,39 @@ re-render must not re-credit a different person.
 
 Slots are a pure function of the tags, never hand-set: `crowd` → 6, `group` or
 `crowd_group` salience → 3, otherwise 1.
+
+### When the owner says who is where, round-robin cannot help
+
+Rotation answers *"who fills the anonymous slots"*. It cannot answer **"which
+body is this named person"** — and when the owner says so, that is the only
+question that matters:
+
+> "0:55 left to right, Joseph Sandoval, Ricardo from CERN, Karena Angel"
+
+`vocab/casting.yaml` holds the **copy** and `tools/ensemble.py` holds the
+**rotation**; neither holds a binding from a person to a shot. Do not make
+rotation approximate one — it would put a real person's name on whichever body
+the seed happened to land on, which is rule 3 broken by machinery rather than by
+guessing.
+
+**Positional casting is authored, once, in a per-cut builder** that emits a
+plate manifest. `scripts/build_efmb_plates.py` is the worked example: the
+person→shot bindings are the only hand-written thing in it, the copy is read
+verbatim from this file, and every window is derived. Three rules it earns:
+
+- **Bind to SOURCE timecodes, never film time.** Every mark an owner gives is a
+  film timecode, and the film moves under it — act II's head lead went
+  8.564 → 10.650 s, so every one of his marks shifted by 0.364 to 2.131 s.
+  Source time is a position in a file that has not changed.
+- **A missing copy key must raise**, never fall back to the generic blueberry
+  plate: the fallback silently overwrites an identity the owner authored.
+- **Never credit one person twice with two different faces.** Exclude leads
+  (they are credited where their character is) *and* anyone already carrying a
+  named placeholder badge, or the roster hands them a second, generic plate.
+
+Anyone the owner **named** but wrote no plate for gets a **named placeholder**:
+their name, the neutral eyebrow, and no invented rows. That is the "missing, so
+omit and record" case, and it is the opposite of composing the words to fill it.
 
 On-screen credit copy lives beside the casting decision in `vocab/casting.yaml`:
 the generic ensemble copy under `ensemble.plate`, and — under `ensemble.titles`,

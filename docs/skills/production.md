@@ -1,6 +1,6 @@
 ---
 name: production
-version: "1.1"
+version: "1.2"
 last_updated: "2026-08-12"
 id: production
 one_line_purpose: Run the issue-to-render loop, repeatedly and in parallel.
@@ -115,12 +115,24 @@ file in it is a regenerated artifact.
 | Publish | `python3 ~/Videos/yt-refresh.py` — one unlisted playlist |
 
 **The order is [`docs/running-order.md`](../running-order.md)'s, not the
-filenames'.** `NN-` is the act number, which is fixed: acts II and VIII have no
-film, so the numbering has gaps and closing them would renumber the show.
+filenames'.** `NN-` is the act number, which is fixed: act VIII has no film, so
+the numbering has a gap and closing it would renumber the show.
 
 **`Prod/` is hardlinks** to each project's master, so it costs no disk and
 cannot drift from what built it. Re-link with `ln -f`; `cp` over an existing
 entry breaks the link silently and leaves a copy that goes stale.
+
+**Refresh only your own line in `CHECKSUMS.md5`.** Rewriting the whole file
+asserts that every act in it is correct, and you only built one. A failing line
+for somebody else's act is a report, not a chore — act I's line was stale for
+exactly this reason and was deliberately left alone.
+
+**Verify a titled deliverable by looking at a frame.** A cut that gained
+nameplates is not verified by its duration, its checksum or ffmpeg's exit code:
+`tools/plate.py burn` has twice written a correct-length, correctly-measured
+file with **no plates on it at all**
+([`docs/rendering.md`](../rendering.md#burning-plates-onto-a-cut)). Pull frames
+inside two or three plate windows and look before you deliver.
 
 `~/Videos/UPLOAD/` was the older staging folder — a different order, AAC copies.
 It has been superseded and emptied of everything load-bearing; its removal is
@@ -357,9 +369,9 @@ Two rules, and the second is the one that gets broken:
 - Trusting a bed's measured true peak as the *delivered* peak. The encoder adds
   inter-sample overshoot; measure the output file.
 - Renumbering an act, or "closing the gap" in `Prod/`'s numbering. `NN-` is the
-  act number from [`docs/running-order.md`](../running-order.md): acts II and
-  VIII have no film, and their numerals are load-bearing so nothing renumbers
-  around them. III is `mrbobbytables` permanently.
+  act number from [`docs/running-order.md`](../running-order.md): act VIII has
+  no film, and its numeral is load-bearing so nothing renumbers around it. III
+  is `mrbobbytables` permanently.
 - A music bed at 44.1 kHz, or one with nothing above 16 kHz. Both mean the
   fetch took the wrong rung. So does a format id ending in `-drc`.
 
