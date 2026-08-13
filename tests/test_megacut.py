@@ -272,6 +272,104 @@ def test_chapters_pass_the_hour_mark():
     assert megacut.format_chapters(megacut.chapters(plan)) == "0:00 I\n1:01:41 II"
 
 
+# --- sub-chapters: an act's own internal marks (issue #92) ------------------
+#
+# TWO CLOCKS, and naming them is the whole point (issue #109 burned two
+# sessions on exactly this):
+#   * the act manifest's `at` is ACT FILM time -- where the mark lands inside
+#     that act's own delivered file;
+#   * chapters() counts in PROGRAMME time -- the running total of item
+#     durations.
+# A sub-chapter therefore lands at clip_start_programme + at_film. The
+# manifest's `src` is SOURCE time -- the anchor back into the original
+# footage -- and assembly never reads it.
+
+
+def _sub_chapter_plan(tmp_path, marks):
+    """A programme plan plus the ACT'S OWN manifest holding its marks. The
+    plan carries only a pointer, so the act keeps its own timecodes."""
+    manifest = tmp_path / "act2.json"
+    manifest.write_text(json.dumps({"chapters": marks}))
+    plan = {"items": [
+        {"kind": "card", "image": "a.png", "dur": 5.0, "chapter": "I. One"},
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 100.0},
+        {"kind": "card", "image": "b.png", "dur": 5.0, "chapter": "II. Two"},
+        {"kind": "clip", "path": "b.mp4", "audio": "source", "dur": 200.0,
+         "sub_chapters": str(manifest)},
+    ]}
+    return plan
+
+
+def test_default_chapter_list_is_byte_identical_without_opt_in(tmp_path):
+    """The published one-entry-per-act list must not silently change
+    granularity: sub-chapters are emitted only when explicitly asked for."""
+    plan = _sub_chapter_plan(tmp_path, [
+        {"at": 54.234, "title": "TOC", "src": 72.0},
+        {"at": 147.801, "title": "The Long Walk", "src": 165.567},
+    ])
+    default = megacut.chapters(plan)
+    assert default == [(0.0, "I. One"), (105.0, "II. Two")]
+    # An explicit False is the same call, not a different default.
+    assert megacut.chapters(plan, include_sub_chapters=False) == default
+    assert megacut.format_chapters(default) == "0:00 I. One\n1:45 II. Two"
+
+
+def test_opt_in_emits_sub_chapters_at_programme_time(tmp_path):
+    """`at` is ACT FILM time; chapters() counts PROGRAMME time. Act II's clip
+    starts at 105.0 (card) + 5.0 (slide) = 110.0 on the programme clock, so a
+    mark at film 54.234 lands at programme 164.234."""
+    plan = _sub_chapter_plan(tmp_path, [
+        {"at": 54.234, "title": "TOC", "src": 72.0},
+        {"at": 147.801, "title": "The Long Walk", "src": 165.567},
+    ])
+    marks = megacut.chapters(plan, include_sub_chapters=True)
+    assert marks == [
+        (0.0, "I. One"),
+        (105.0, "II. Two"),
+        (164.234, "TOC"),
+        (257.801, "The Long Walk"),
+    ]
+    assert megacut.format_chapters(marks) == (
+        "0:00 I. One\n1:45 II. Two\n2:44 TOC\n4:17 The Long Walk")
+
+
+def test_an_act_with_no_sub_chapters_is_a_no_op(tmp_path):
+    """An act that never emitted marks -- or whose pointer names a manifest
+    with an empty `chapters` -- leaves the list exactly as it was."""
+    plan = _sub_chapter_plan(tmp_path, [])
+    assert megacut.chapters(plan, include_sub_chapters=True) == [
+        (0.0, "I. One"), (105.0, "II. Two")]
+    plan["items"][3].pop("sub_chapters")
+    assert megacut.chapters(plan, include_sub_chapters=True) == [
+        (0.0, "I. One"), (105.0, "II. Two")]
+
+
+def test_a_sub_chapter_mark_without_a_film_time_is_an_error(tmp_path):
+    """`at` is the whole value -- a mark that names only a source timecode
+    would be placed on the wrong clock, silently."""
+    plan = _sub_chapter_plan(tmp_path, [{"title": "TOC", "src": 72.0}])
+    with pytest.raises(ValueError, match="act film time"):
+        megacut.chapters(plan, include_sub_chapters=True)
+
+
+def test_sub_chapters_belong_on_the_clip_not_the_card(tmp_path):
+    path, _ = _plan(tmp_path, [
+        {"kind": "card", "image": "c.png", "dur": 5.0,
+         "sub_chapters": "stories/02-endless-forms-plates.json"},
+    ])
+    with pytest.raises(ValueError, match="CLIP"):
+        megacut.load_plan(path)
+
+
+def test_sub_chapters_is_a_pointer_not_the_marks(tmp_path):
+    path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0,
+         "sub_chapters": [{"at": 1.0, "title": "TOC"}]},
+    ])
+    with pytest.raises(ValueError, match="pointer"):
+        megacut.load_plan(path)
+
+
 def test_a_plan_may_be_read_for_its_order_before_its_footage_exists(tmp_path):
     """The running order is a decision; footage is not a precondition for
     recording it. But an item with no file must carry its own `dur`."""

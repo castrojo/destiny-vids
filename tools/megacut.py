@@ -147,6 +147,16 @@ def load_plan(path, require_sources=True):
             )
         if kind == "clip" and "dur" in item and float(item["dur"]) <= 0:
             raise ValueError(f"item {i}: clip dur, when given, must be positive")
+        if kind == "card" and "sub_chapters" in item:
+            raise ValueError(
+                f"item {i}: sub_chapters belong on the act's CLIP -- a card is "
+                f"the slide, and the marks index the film behind it")
+        if kind == "clip" and "sub_chapters" in item and not isinstance(
+                item["sub_chapters"], str):
+            raise ValueError(
+                f"item {i}: sub_chapters is a pointer at the act's own manifest "
+                f"(a path string), not the marks themselves -- the marks live "
+                f"with the act so two people's edits never collide in the plan")
     return plan
 
 
@@ -462,7 +472,52 @@ def expected_duration(plan):
     return total
 
 
-def chapters(plan):
+def _item_dur_programme_clock(item):
+    """One item's length on the PROGRAMME (megacut) clock.
+
+    `is None`, not `or`: a 0 would fall through to a probe and report a length
+    the graph does not build. expected_duration and build_filtergraph test the
+    same way, and the three must not disagree about what "no dur" is.
+    """
+    dur = item.get("dur")
+    if dur is None:
+        dur = probe_duration(resolve(item["path"]), stream="v:0")
+    return float(dur)
+
+
+def load_sub_chapters(pointer):
+    """An act's own sub-chapter marks, read from ITS manifest, not the plan.
+
+    Two clocks live here, and mixing them is the recorded failure (issue
+    #109):
+
+    * ``at``  -- ACT FILM time: where the mark lands inside that act's own
+      delivered file. This is the clock ``chapters()`` counts in per item, so
+      a mark's programme time is ``clip_start_programme + at``.
+    * ``src`` -- SOURCE time: the timecode in the act's original footage the
+      mark is anchored to, so the mark and the credit it belongs to cannot
+      drift apart when the act is re-cut. Assembly never reads it; it exists
+      so the mark can be re-derived, not placed.
+
+    The pointer keeps the marks in the act's own file (their source of truth)
+    and out of the programme plan: an act writing its timecodes into
+    ``megacut.json`` is how two people's edits collide (issue #92).
+    """
+    path = Path(pointer)
+    if not path.is_absolute():
+        path = REPO_ROOT / path
+    manifest = json.loads(path.read_text())
+    marks = []
+    for i, mark in enumerate(manifest.get("chapters", [])):
+        at = mark.get("at")
+        if at is None:
+            raise ValueError(
+                f"{pointer}: chapter {i} has no `at` (act film time)")
+        marks.append((float(at), mark.get("title") or "Chapter"))
+    return marks
+
+
+def chapters(plan, include_sub_chapters=False):
     """The programme's chapter markers, derived from the plan's own clock.
 
     A chapter starts where its ACT SLIDE starts, not where the film behind it
@@ -474,20 +529,30 @@ def chapters(plan):
     disagree; a card without one falls back to `label` and reads oddly, which is
     the visible failure that gets it filled in.
 
+    ``include_sub_chapters`` is OFF by default, so the published one-entry-per-
+    act list is unchanged unless it is asked for. When on, a clip item may
+    carry ``sub_chapters`` -- a pointer at the ACT'S OWN manifest -- and each
+    of its marks is emitted at ``clip_start_programme + at``, where ``at`` is
+    ACT FILM time (the same clock this function counts per item). TODO(owner):
+    whether these belong in the YouTube chapter list at all, or only in an
+    ffmpeg metadata track -- eight acts plus internal marks may be more
+    granular than a scrub bar wants. Issue #92.
+
     Yielded as (seconds, title), so a caller can format them for YouTube, an
     ffmpeg metadata file, or a review note without this knowing about any of
     them.
     """
-    out, t = [], 0.0
+    out, t_programme = [], 0.0
     for item in plan["items"]:
         if item["kind"] == "card":
-            out.append((t, item.get("chapter") or item.get("label") or "Chapter"))
-            t += float(item["dur"])
+            out.append(
+                (t_programme, item.get("chapter") or item.get("label") or "Chapter"))
+            t_programme += float(item["dur"])
             continue
-        dur = item.get("dur")
-        if dur is None:
-            dur = probe_duration(resolve(item["path"]), stream="v:0")
-        t += float(dur)
+        if include_sub_chapters and item.get("sub_chapters"):
+            for at_film, title in load_sub_chapters(item["sub_chapters"]):
+                out.append((t_programme + at_film, title))
+        t_programme += _item_dur_programme_clock(item)
     return out
 
 
@@ -558,6 +623,11 @@ def main(argv=None):
                     help="print the command and the expected duration, encode nothing")
     ap.add_argument("--chapters", action="store_true",
                     help="print the chapter markers and exit, encoding nothing")
+    ap.add_argument("--sub-chapters", action="store_true",
+                    help="with --chapters: also emit each act's own internal "
+                         "marks (opt-in; default keeps one marker per act). "
+                         "TODO(owner): whether these belong in the YouTube "
+                         "chapter list or only in ffmpeg metadata -- issue #92")
     ap.add_argument("--locate", metavar="TC", nargs="+",
                     help="turn review-note timecodes on the PROGRAMME clock "
                          "(12:43, 1:02:11, 763) into the act that is playing "
@@ -569,7 +639,7 @@ def main(argv=None):
 
     plan = load_plan(args.plan, require_sources=not (args.chapters or args.locate))
     if args.chapters:
-        print(format_chapters(chapters(plan)))
+        print(format_chapters(chapters(plan, include_sub_chapters=args.sub_chapters)))
         return 0
 
     if args.locate:

@@ -57,7 +57,9 @@
       "kind": "clip",
       "path": "/var/home/jorge/Videos/Wolves/Prod/02-endlessformsmostbeautiful.mp4",
       "audio": "source",
-      "label": "Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end"
+      "label": "Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end",
+      "sub_chapters": "stories/02-endless-forms-plates.json",
+      "_sub_chapters_note": "A POINTER at act II's own manifest, which is the source of the marks -- the plan opts in, it does not hold the timecodes, so an act's edit and the programme's edit never collide (issue #92). Consumed only with --sub-chapters; the default chapter list is unchanged. TODO(owner): YouTube chapter list vs ffmpeg-only metadata track."
     },
     {
       "kind": "card",
