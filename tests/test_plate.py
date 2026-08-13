@@ -2,6 +2,7 @@
 import json
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -2159,3 +2160,68 @@ def test_a_missing_brand_mark_degrades_to_the_drawn_crest():
     img = plate.render_plate({"id": "x", "name": "Nobody", "variant": "nobara",
                               "mark": "renders/marks/nope.png"})
     assert img.width > 0 and img.height > 0
+
+
+# --- A hand-authored manifest must not silently contradict the vocab --------
+#
+# `plan` already enforces "the vocab wins a conflict". A manifest written by
+# hand skips `plan`, and nothing was checking it -- which is how act VI's tail
+# shipped two cards disagreeing with their bindings (#111).
+
+_BOUND_LEADS = {
+    "cayde_6": {"plate": {"label": "TRUSTEE // GUARDIAN", "class": "Harbinger Titan",
+                          "name": "Jorge Castro",
+                          "title": "Upender of Antipatterns | The First Disciple"}},
+}
+
+
+def test_manifest_copy_that_contradicts_a_binding_is_refused():
+    from tools.plate import check_copy_against_bindings
+    entries = [{"id": "reveal", "at": 1.0, "dur": 2.0, "name": "Jorge Castro",
+                "label": "MAINTAINER // GUARDIAN", "class": "Harbringer Hunter",
+                "title": "Upender of Antipatterns"}]
+    with pytest.raises(ValueError) as exc:
+        check_copy_against_bindings(entries, leads=_BOUND_LEADS)
+    assert "vocab wins" in str(exc.value)
+    assert "cayde_6" in str(exc.value)
+
+
+def test_an_explicit_copy_override_records_the_decision_and_passes():
+    """The escape hatch must name who decided, so it cannot be added by accident."""
+    from tools.plate import check_copy_against_bindings
+    entries = [{"id": "reveal", "at": 1.0, "dur": 2.0, "name": "Jorge Castro",
+                "label": "MAINTAINER // GUARDIAN", "class": "Harbringer Hunter",
+                "title": "Upender of Antipatterns",
+                "copy_override": {"reason": "owner brief 2026-08-13",
+                                  "decided_by": "https://github.com/castrojo/destiny-vids/issues/111"}}]
+    assert check_copy_against_bindings(entries, leads=_BOUND_LEADS) == entries
+
+
+def test_a_copy_override_without_a_decider_is_not_enough():
+    from tools.plate import check_copy_against_bindings
+    entries = [{"id": "reveal", "at": 1.0, "dur": 2.0, "name": "Jorge Castro",
+                "label": "MAINTAINER // GUARDIAN", "class": "Harbringer Hunter",
+                "title": "Upender of Antipatterns",
+                "copy_override": {"reason": "felt right"}}]
+    with pytest.raises(ValueError):
+        check_copy_against_bindings(entries, leads=_BOUND_LEADS)
+
+
+def test_matching_copy_needs_no_override():
+    from tools.plate import check_copy_against_bindings
+    entries = [{"id": "reveal", "at": 1.0, "dur": 2.0, "name": "Jorge Castro",
+                "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Titan",
+                "title": "Upender of Antipatterns | The First Disciple"}]
+    assert check_copy_against_bindings(entries, leads=_BOUND_LEADS) == entries
+
+
+def test_the_shipped_act_vi_manifest_declares_its_overrides():
+    """The real manifest must stay loadable -- and stay honest about #111."""
+    import json
+    from tools.plate import check_copy_against_bindings
+    root = Path(__file__).resolve().parents[1]
+    d = json.loads((root / "stories" / "06-wolves-cayde-plates.json").read_text())
+    check_copy_against_bindings(d["plates"])
+    overridden = {p["id"] for p in d["plates"] if p.get("copy_override")}
+    assert overridden == {"cayde_reveal_castrojo", "gold_kelsey_hightower"}
+    assert any("#111" in u for u in d["unresolved"])

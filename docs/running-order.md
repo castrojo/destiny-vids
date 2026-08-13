@@ -21,7 +21,7 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
-| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **timing pass**, provenance open — #55 |
+| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **timing pass**, provenance open — #55; its tail now plates the Cayde-6 reveal and three gold credits |
 | **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; its master clips — #82 |
 | **VIII** | Credits | — | **not designed** — #51 |
 
@@ -34,7 +34,7 @@ permanently, whatever gets built later.
 **Act II has a film** ([`docs/cuts/02-endless-forms-most-beautiful.md`](cuts/02-endless-forms-most-beautiful.md)),
 delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
 and its own place on the clock. Seven of the eight acts now play, which is what
-**v0.5** is. It is also the first feature act to carry **nameplates** — thirteen
+**v0.5** was; the current build is **v0.6**. It is also the first feature act to carry **nameplates** — thirteen
 of them, generated rather than placed by hand — now fifteen, plus a chapter
 card, twelve dialogue pills, a patch-queue HUD and a villain's bar, all of it
 still generated.
@@ -146,8 +146,10 @@ Recorded, not hidden:
   the same cut measured −1.0 and passed for weeks; nothing had ever measured the
   FLAC master. It needs a re-render of Europa's own build, not a fix here.
 - **Act VIII does not exist.** Issue #51. The programme therefore ends on
-  Europa and **credits nobody**, which is the single biggest reason v0.5 is not
-  the feature.
+  Europa with **no credit roll**, which is the single biggest reason v0.6 is not
+  the feature. The only names in the show are act VI's tail — the Cayde-6
+  reveal (Jorge Castro) and three gold credits behind it — and a reveal inside
+  an act is not a credits sequence.
 - **Act II's picture is a fan compilation**, not an official Bungie upload —
   the same provenance question act VI carries (#55). See its cut doc.
 
