@@ -107,25 +107,17 @@ Not every field deserves the same spend. Buckets:
 |---|---|---|
 | **Tier 0 — free / deterministic** | No model. OpenCV/OCR/audio libs. | Shot boundaries, timecodes, HUD/OCR text (kill feed, location banners), audio/music/silence markers, dominant color, brightness, `face_count` — plus four assembly-time derivations that run after tagging, on every segment, regardless of which tagger produced it: `clean`, `footage_tier`, `traversal_hero`, `casting` (see below) |
 | **Tier 1 — flash-tier model + cheap heuristics** | One flash vision call per keyframe/beat; classical CV where it's good enough | `class`, `element`, `faction`, `shot_scale` (coarse), `camera_movement` (coarse — optical-flow heuristics separate static/pan/tilt/push/handheld before the model ever sees it), `pacing`, `salience`, `action`, `identity_visibility`, `substitutability`, `overlays` (cheap and highly automatable — see below), `caption`, `mood`, `register` |
-| **Tier 2 — heavy model or human** | Expensive per-shot; spend only on queue-selected shots | `helmet_simplicity`, fine-grained character identity (which named NPC), dolly-vs-zoom disambiguation, `subclass_version` confirmation (e.g. pre- vs post-rework Solar visuals), final hero-shot sign-off |
+| **Tier 2 — heavy model or human** | Expensive per-shot; spend only on queue-selected shots | fine-grained character identity (which named NPC), dolly-vs-zoom disambiguation, `subclass_version` confirmation (e.g. pre- vs post-rework Solar visuals), final hero-shot sign-off |
 
 ### `overlays` is a required tagger field, not an optional one
 
 `clean` derives `false` on an untagged shot (`docs/taxonomy.md`, Axis A), so a tagger that silently skips `overlays` doesn't leave a small gap — it marks its **entire output unusable**: every segment it touches fails the primary gate by default. Every `Tagger` implementation must set it, no exceptions.
 
-The good news is it's cheap. HUD reticles, nameplates, kill feeds, and burned-in title/date cards are near-textbook OCR/template-matching problems — nothing like the fine-grained discrimination `helmet_simplicity` needs (below) — so `overlays` sits comfortably in Tier 1. For `content_type: gameplay` sources it's arguably **Tier 0**: the inherited `content_type` already all but implies a HUD is in frame, so the tagger is mostly confirming a strong prior rather than discovering something from scratch.
+The good news is it's cheap. HUD reticles, nameplates, kill feeds, and burned-in title/date cards are near-textbook OCR/template-matching problems, so `overlays` sits comfortably in Tier 1. For `content_type: gameplay` sources it's arguably **Tier 0**: the inherited `content_type` already all but implies a HUD is in frame, so the tagger is mostly confirming a strong prior rather than discovering something from scratch.
 
 ### The four Tier 0 derivations run after tagging, not instead of it
 
 `clean`, `footage_tier`, `traversal_hero`, and `casting` are pure functions of fields a tagger already produced. `tools/derive.py` computes all four once, deterministically, at assembly time — no vision pass, no separate heuristic budget, just set arithmetic and a lookup against `vocab/casting.yaml`'s `leads` map. A `Tagger` implementation is never allowed to set them directly; the assembler computes them itself from whatever the tagger returned, so every derivation reruns correctly from the stored tags alone — including after a `vocab/casting.yaml` edit (a new lead binding, a newly-cast role) with no re-tagging of a single frame.
-
-### Honest verdict on `helmet_simplicity`
-
-**It is not reliably flash-affordable per frame.** Telling "plain smooth helmet" from "helmet with antlers/wires/glow" at gameplay-trailer resolution, at distance, in motion, is exactly the kind of fine-grained visual discrimination flash models flub — and it still matters for us (a simple-helmet Guardian reads as more comfortably substitutable; a distinctive one reads as more specific). Cheapest path in order:
-
-1. **Infer from armor-set metadata / title+description** — armor-focused videos ("Armor Showcase", eververse/season-pass trailers) name the sets; that text resolves helmet_simplicity at video scope for free.
-2. **Else a heavier visual pass** (Tier 2) on queue-selected shots only.
-3. **Default: `unknown`.** Do not force this field into the flash budget; a confidently-wrong `simple` is worse than an honest `unknown` because it silently poisons the substitutability tie-break.
 
 ### Named-character identity is usually inherited, not seen
 

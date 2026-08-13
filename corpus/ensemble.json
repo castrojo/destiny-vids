@@ -98,7 +98,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -140,7 +139,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -181,7 +179,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -222,7 +219,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -267,7 +263,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -310,7 +305,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -353,7 +347,6 @@
       "camera_movement": [
         "push_in"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -396,7 +389,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "face_clear",
@@ -438,7 +430,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -479,7 +470,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -520,7 +510,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -562,7 +551,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "silhouette",
@@ -603,7 +591,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -644,7 +631,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "silhouette",
@@ -686,7 +672,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -727,7 +712,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -768,7 +752,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "silhouette",
       "identity_visibility": "back_only",
@@ -809,7 +792,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "bright",
       "identity_visibility": "silhouette",
@@ -850,7 +832,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -891,7 +872,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -932,7 +912,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -973,7 +952,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -1014,7 +992,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -1055,7 +1032,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -1096,7 +1072,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "none",
@@ -1138,7 +1113,6 @@
       "camera_movement": [
         "pan"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "silhouette",
@@ -1179,7 +1153,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -1221,7 +1194,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -1263,7 +1235,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "silhouette",
@@ -1304,7 +1275,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "silhouette",
@@ -1345,7 +1315,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -1386,7 +1355,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -1428,7 +1396,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "bright",
       "identity_visibility": "silhouette",
@@ -1469,7 +1436,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -1510,7 +1476,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -1551,7 +1516,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -1592,7 +1556,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "partial_face",
@@ -1634,7 +1597,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "high_contrast",
       "identity_visibility": "back_only",
@@ -1676,7 +1638,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "partial_face",
@@ -1718,7 +1679,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "silhouette",
       "identity_visibility": "back_only",
@@ -1760,7 +1720,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -1801,7 +1760,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -1842,7 +1800,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "partial_face",
@@ -1883,7 +1840,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -1925,7 +1881,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -1966,7 +1921,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "partial_face",
@@ -2008,7 +1962,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "partial_face",
@@ -2049,7 +2002,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -2092,7 +2044,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "bright",
       "identity_visibility": "none",
@@ -2133,7 +2084,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -2174,7 +2124,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -2215,7 +2164,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -2257,7 +2205,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "silhouette",
@@ -2299,7 +2246,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "partial_face",
@@ -2340,7 +2286,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -2381,7 +2326,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "silhouette",
@@ -2423,7 +2367,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -2467,7 +2410,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -2508,7 +2450,6 @@
       "camera_movement": [
         "pan"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "silhouette",
@@ -2552,7 +2493,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -2594,7 +2534,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -2635,7 +2574,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -2677,7 +2615,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -2721,7 +2658,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -2765,7 +2701,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "bright",
       "identity_visibility": "silhouette",
@@ -2807,7 +2742,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "bright",
       "identity_visibility": "silhouette",
@@ -2849,7 +2783,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -2892,7 +2825,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -2936,7 +2868,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -2977,7 +2908,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -3018,7 +2948,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -3057,7 +2986,6 @@
         "group"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -3091,7 +3019,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -3125,7 +3052,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -3161,7 +3087,6 @@
         "crowd"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -3194,7 +3119,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -3228,7 +3152,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -3262,7 +3185,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -3300,7 +3222,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -3344,7 +3265,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "none",
@@ -3385,7 +3305,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -3426,7 +3345,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -3467,7 +3385,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -3508,7 +3425,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -3549,7 +3465,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -3590,7 +3505,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "bright",
       "identity_visibility": "back_only",
@@ -3631,7 +3545,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -3672,7 +3585,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -3713,7 +3625,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -3754,7 +3665,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -3795,7 +3705,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -3836,7 +3745,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "bright",
       "identity_visibility": "face_obscured",
@@ -3877,7 +3785,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_clear",
@@ -3918,7 +3825,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -3959,7 +3865,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -4000,7 +3905,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_clear",
@@ -4041,7 +3945,6 @@
       "camera_movement": [
         "push_in"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_obscured",
@@ -4082,7 +3985,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -4123,7 +4025,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -4164,7 +4065,6 @@
       "camera_movement": [
         "track"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "face_clear",
@@ -4205,7 +4105,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "bright",
       "identity_visibility": "back_only",
@@ -4246,7 +4145,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "bright",
       "identity_visibility": "back_only",
@@ -4287,7 +4185,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -4328,7 +4225,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -4369,7 +4265,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -4411,7 +4306,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "none",
@@ -4452,7 +4346,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -4494,7 +4387,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -4536,7 +4428,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "back_only",
@@ -4578,7 +4469,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "bright",
       "identity_visibility": "face_obscured",
@@ -4619,7 +4509,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -4660,7 +4549,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -4705,7 +4593,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -4747,7 +4634,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "none",
@@ -4790,7 +4676,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -4832,7 +4717,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "high_contrast",
       "identity_visibility": "back_only",
@@ -4875,7 +4759,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -4916,7 +4799,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -4959,7 +4841,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "silhouette",
@@ -5002,7 +4883,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "bright",
       "identity_visibility": "face_obscured",
@@ -5043,7 +4923,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "bright",
       "identity_visibility": "none",
@@ -5086,7 +4965,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "bright",
       "identity_visibility": "none",
@@ -5129,7 +5007,6 @@
       "camera_movement": [
         "handheld_shaky"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -5171,7 +5048,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "fast",
       "lighting": "high_contrast",
       "identity_visibility": "face_obscured",
@@ -5213,7 +5089,6 @@
         "group"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -5249,7 +5124,6 @@
         "single"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": "back_only",
@@ -5286,7 +5160,6 @@
         "single"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -5324,7 +5197,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "bright",
       "identity_visibility": "back_only",
@@ -5367,7 +5239,6 @@
         "single"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": null,
       "identity_visibility": "back_only",
@@ -5404,7 +5275,6 @@
         "single"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": "face_obscured",
@@ -5440,7 +5310,6 @@
         "group"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "back_only",
@@ -5481,7 +5350,6 @@
         "group"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -5518,7 +5386,6 @@
         "single"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -5554,7 +5421,6 @@
         "single"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -5590,7 +5456,6 @@
         "group"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -5627,7 +5492,6 @@
         "two_shot"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": "silhouette",
       "identity_visibility": "silhouette",
@@ -5662,7 +5526,6 @@
         "two_shot"
       ],
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": "silhouette",
       "identity_visibility": "silhouette",

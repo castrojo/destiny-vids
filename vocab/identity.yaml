@@ -40,16 +40,6 @@ character_identifiability:
     implied_by_costume:  Not a specific person, but costume implies a role/class.
     unidentifiable:      No identity cues at all.
 
-helmet_simplicity:
-  # Reliably determinable ONLY from armor-set metadata or a heavier dedicated
-  # visual pass; per-frame observation is unreliable. DEFAULT to 'unknown'.
-  description: Ornateness of helmet silhouette. Default 'unknown'.
-  default: unknown
-  values:
-    simple:  Plain, generic helmet silhouette.
-    ornate:  Distinctive/exotic silhouette (horns, crests, unique profiles).
-    unknown: Not assessed; the safe default.
-
 # Evidence fields recorded alongside the enums above. These are raw observations
 # that feed the derived labels, not enums themselves.
 evidence_fields:

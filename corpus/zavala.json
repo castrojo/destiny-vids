@@ -144,7 +144,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_clear",
@@ -185,7 +184,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "face_clear",
@@ -222,7 +220,6 @@
       "shot_scale": "MCU",
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -256,7 +253,6 @@
       "shot_scale": "MCU",
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -290,7 +286,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -324,7 +319,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": "dim",
       "identity_visibility": null,
@@ -358,7 +352,6 @@
       "shot_scale": "MCU",
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -392,7 +385,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -428,7 +420,6 @@
       "shot_scale": "MCU",
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -462,7 +453,6 @@
       "shot_scale": "MCU",
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -496,7 +486,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -530,7 +519,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -564,7 +552,6 @@
       "shot_scale": null,
       "composition": null,
       "camera_movement": null,
-      "camera_angle": null,
       "pacing": null,
       "lighting": null,
       "identity_visibility": null,
@@ -602,7 +589,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "face_clear",
@@ -643,7 +629,6 @@
       "camera_movement": [
         "push_in"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "face_clear",
@@ -684,7 +669,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "bright",
       "identity_visibility": "partial_face",
@@ -725,7 +709,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "medium",
       "lighting": "dim",
       "identity_visibility": "face_clear",
@@ -766,7 +749,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "bright",
       "identity_visibility": "face_clear",
@@ -807,7 +789,6 @@
       "camera_movement": [
         "static"
       ],
-      "camera_angle": null,
       "pacing": "slow",
       "lighting": "dim",
       "identity_visibility": "face_clear",
