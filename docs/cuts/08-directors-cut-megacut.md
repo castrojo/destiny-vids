@@ -15,7 +15,7 @@ supercut with everything that we have", and .5 was their name for it.
 It is **not the feature**. Act VIII, the credits, is not designed (#51), so the
 programme ends on Europa — though it no longer credits *nobody*: act VI's tail
 now names Jorge Castro, Kelsey Hightower, Brian Ketelsen and Angie Jones. Act
-VI is a timing pass whose
+VI is an editorial pass whose
 provenance is an open owner decision (#55); act II's picture comes from a fan
 compilation carrying the same question; act III is partially complete by the
 owner's own description; act VII's master clips at +0.3 dBTP (#82). None of that
@@ -47,7 +47,7 @@ after act I by 312.967 s, which is the worked example of why.
 | **IV** | 609.734 | 643.734 | **Kat Cosgrove** — Guardian intro | `Prod/04-…` |
 | **V** | 643.734 | 668.992 | **Natali Vlatko** — Guardian arrival, straight off act IV | `Prod/05-…` |
 | — | 668.992 | 673.992 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
-| **VI** | 673.992 | 1106.692 | **Seven Days to the Wolves** — the musical (timing pass) | `Prod/06-…` |
+| **VI** | 673.992 | 1106.692 | **Seven Days to the Wolves** — the musical (editorial pass) | `Prod/06-…` |
 | — | 1106.692 | 1111.692 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
 | **VII** | 1111.692 | 1221.892 | **Europa Director's Cut** | `Prod/07-…` |
 | **VIII** | — | — | Credits — **not designed** (#51) | — |
@@ -94,7 +94,10 @@ BIAS FOR ACTION
 — and it is **held 15 seconds**: "Hold that slide for a long time it's a
 transition inbetween videos."
 
-**Act V carries the same terminal block.** "Make the slide with the unauthorized
+**Act V's own slide is superseded** — acts IV and V now share one slide (the
+owner's call; see [`../running-order.md`](../running-order.md)), so the
+paragraph below records the earlier separate-slide decision, kept because its
+copy rules still hold. "Make the slide with the unauthorized
 etc be the same for Natali and change the title to *Wrong Place, Wrong Time,
 Right Attitude*." So the five authorisation lines are act IV's, copied
 unchanged — *Destination: Europa* included: it is the same readout, and
@@ -264,23 +267,27 @@ plaquards" — which also drops the `#nova4ever` glitch bursts and the closing
   instrumental; the track is now recorded as Nightwish's *Endless Forms Most
   Beautiful (Instrumental)*, [`6-9667CV1zQ`](https://www.youtube.com/watch?v=6-9667CV1zQ)
   from the official channel, and the act is delivered and credited (#74).
-- **Act IX has no design** — #51.
-- **Act III has no subject.** An open numbered slot, the owner's to fill.
-- **Act VI is partially complete, by the owner's own description**, and it is
+- **Act VIII (the credits) has no film** — #51 tracks the design; the owner's
+  design brief is now in that issue's body.
+- **Act III is partially complete, by the owner's own description**, and it is
   placed as-is: assembly joins finished things and never re-cuts one. Finishing
-  it happens upstream. Its slide carries Bob Killen's **authored** Guardian
-  identity rather than an act title, because the film has none (#41) and one
-  would have to be written. **This does not contradict the intro recast**: the
-  owner replaced him on *one plate in act I*, and `vocab/casting.yaml` still
-  binds Osiris to mrbobbytables with Bob's plate, which is what act VI's film
-  credits.
-- **Act VII is a timing pass, not an approved cut**, and its provenance is
-  open (#55). Staging is not publishing; this programme stays in `renders/`.
-- **Kat's cut is about to change under this plan.** The dialogue split and
-  "Remember kids, cardio!" are staged in `~/Videos/wolves-kat/` and not
-  rendered, so `Prod/04-kat.mp4` is still the old dialogue. Rebuild it there
-  and re-link, or the programme ships the superseded lines.
-- **Chapters for every act.** The renderer takes them; nobody has written them.
+  it happens upstream, in the contributors project. Its slide carries Bob
+  Killen's **authored** Guardian identity rather than an act title, because
+  the film has none (#41) and one would have to be written. **This does not
+  contradict the intro recast**: the owner replaced him on *one plate in act
+  I*, and `vocab/casting.yaml` still binds Osiris to mrbobbytables with Bob's
+  plate, which is what act III's film credits.
+- **Act VI is an editorial pass, not an approved cut**, and its provenance is
+  open (#55). Delivered is not published.
+- **Act VII plays the pre-terse-pass film.** Its twelve terse-pass plates are
+  rebuilt but its film is not (#102), so the Europa in this build still
+  carries the old Foreman lines; its master also clips at +0.3 dBTP (#82).
+  Rebuild it in `~/Videos/wolves-directors-cut/` and re-link.
+- ~~**Kat's cut is about to change under this plan.**~~ **Done 2026-08-12**:
+  the dialogue split and "Remember kids, cardio!" are rendered into
+  `Prod/04-kat.mp4` (rebuilt 16:52; the hardlink survived).
+- **Chapters for every act.** Five acts carry a drafted list; none of it is
+  the owner's copy yet (see [`../running-order.md`](../running-order.md)).
 - **A music bed under the six slides.** They are silent; a bed is a licensing
   decision.
 - **The QR is inverted** — light modules on near-black — because
@@ -333,7 +340,9 @@ ffprobe -select_streams v:0 -show_entries stream=color_primaries,color_transfer,
 ffmpeg -ss <seg> -t <len> -i out.mp4 -map a:0 -af volumedetect -f null /dev/null
 ```
 
-- Duration equals the sum of the parts (918.926s expected).
+- Duration equals the sum of the parts — derive it from the plan
+  (`python3 tools/megacut.py stories/megacut/megacut.json --dry-run` prints the
+  expected total; 1221.859s for v0.6) rather than trusting a number typed here.
 - **Per segment**, the peak matches its source — a re-encode must not lift one.
 - **Colour**: `bt709` primaries, transfer **and** matrix. `-color_primaries`
   describes the *frames*; x264 copies only the matrix from them, so the VUI is

@@ -32,8 +32,8 @@ fewer, longer gaps — never a thinner video.
    [`running-order.md`](running-order.md) is the source of truth for what they
    are; act VI is the musical, and an editorial pass of it exists
    ([`cuts/07-seven-days-to-the-wolves.md`](cuts/07-seven-days-to-the-wolves.md)).
-   The programme is assembled by `tools/megacut.py` and is **not yet rendered**,
-   by owner instruction.
+   The programme is assembled by `tools/megacut.py`; **v0.6 is rendered**, and
+   it is still not the feature (no act VIII).
 
 ## What blocks this, measured
 
@@ -42,8 +42,9 @@ fewer, longer gaps — never a thinner video.
 **Seven acts are delivered** into `~/Videos/Wolves/Prod/`, which is what the
 megacut's **v0.5** is. Act VIII — the credits — is **not designed**
 ([issue #51]). Act II's music decision ([issue #74]) is settled: it is
-delivered, credited, and in the programme. The programme itself is assembled by
-`tools/megacut.py` but **not yet rendered**, by owner instruction.
+delivered, credited, and in the programme. The programme itself is assembled
+by `tools/megacut.py`, and **v0.6 is rendered** — still not the feature, for
+the reasons above.
 
 What is also not settled is **provenance**: inside act VI, its second movement
 and its climax draw on a fan compilation of Bungie trailers rather than official
@@ -57,9 +58,11 @@ locked, not after.
 
 ### The credits sequence does not exist
 
-The show still has to credit its cast, and act VI carries **no plates at all**.
-Act VIII is the slot for it and the slot is empty. This is design work, not a
-render setting, and it is on the critical path to T−0. Tracked in [issue #51].
+The show still has to credit its cast. Act VI's tail now plates the Cayde-6
+reveal and three gold credits, but a reveal inside an act is not a credits
+sequence: there is **no standalone credit roll**. Act VIII is the slot for it
+and the slot is empty. This is design work, not a render setting, and it is on
+the critical path to T−0. Tracked in [issue #51].
 
 ### Two finished cuts are no longer unplaced
 

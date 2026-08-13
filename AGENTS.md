@@ -128,7 +128,7 @@ artifacts:
 
 | Folder | What goes in it |
 |---|---|
-| `Prod/` | The whole show at the **highest quality that exists** — one file per act, FLAC audio, picture never re-encoded. |
+| `Prod/` | The whole show at the **highest quality that exists** — one file per act, FLAC audio where a lossless master exists, picture never re-encoded. |
 | `10mb/` | Social copies under a byte cap (`tools/social.py`), built from `Prod/` and never from each other. |
 | `megacut/` | The final movie, and nothing else. |
 

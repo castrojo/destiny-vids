@@ -21,8 +21,8 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
-| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **timing pass**, provenance open — #55; its tail now plates the Cayde-6 reveal and three gold credits |
-| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; its master clips — #82 |
+| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; its tail now plates the Cayde-6 reveal and three gold credits |
+| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; plays the pre-terse-pass film — #102; its master clips — #82 |
 | **VIII** | Credits | — | **not designed** — #51 |
 
 **The numbering is fixed.** Act VIII has no film, so it gets no slide and no
@@ -118,7 +118,7 @@ node cards/render-cards.mjs --manifest stories/megacut/megacut-cards.json \
 
 | Folder | What goes in it |
 |---|---|
-| `Prod/` | **The show, at the highest quality that exists.** One file per act, named `NN-<act>.mp4`. FLAC audio, no re-encoded picture. Hardlinks to each project's own master, so Prod costs no disk and cannot drift from what built it. |
+| `Prod/` | **The show, at the highest quality that exists.** One file per act, named `NN-<act>.mp4`. FLAC audio where a lossless master exists (act VI is AAC pending #58), no re-encoded picture. Hardlinks to each project's own master, so Prod costs no disk and cannot drift from what built it. |
 | `10mb/` | Social copies, capped by bytes. Built by `tools/social.py` from `Prod/`, **never** from another social copy. |
 | `megacut/` | The final movie, and nothing else. Assembled by `tools/megacut.py`. |
 
