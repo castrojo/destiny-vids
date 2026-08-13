@@ -29,7 +29,7 @@ metadata:
 
 ## When NOT to Use
 
-- Assembling a cut from an existing index → [`editing.md`](editing.md)
+- Assembling a cut from an existing index → [`editing.md`](editing/SKILL.md)
 - Deciding *who* a shot depicts → [`casting.md`](casting.md)
 
 ## Core Process

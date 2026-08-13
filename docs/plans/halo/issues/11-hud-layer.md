@@ -46,7 +46,7 @@ and are wrong for this brief.
   own definition. Keep the pre-HUD render.
 - **It never invents copy.** Callout fields are a closed set in the universe
   pack, like the nameplate deck, and the closing CTA — wording and URL — is
-  authored, not composed at render time (`docs/skills/plates.md`).
+  authored, not composed at render time (`docs/skills/plates/SKILL.md`).
 - **It never puts two names on screen at once.** The chrome is continuous, so it
   *does* share the screen with plates — a card over the visor frame is the
   intended look, and forbidding that would forbid every plate. What is mutually

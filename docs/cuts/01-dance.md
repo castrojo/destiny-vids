@@ -107,7 +107,7 @@ output or the `skip_sec` field in the JSON cut list.
    shots means it landed.
 4. Avoid enum-like words unless you mean them as filters — `titan`, `arc`,
    `vex` and friends become hard filters, not prose. See
-   [`docs/skills/editing.md`](../skills/editing.md).
+   [`docs/skills/editing/SKILL.md`](../skills/editing/SKILL.md).
 
 Moving a beat *earlier* than the shot it wants is the one move that silently
 fails: under `--forward-only` its shot is already behind the playhead, so it

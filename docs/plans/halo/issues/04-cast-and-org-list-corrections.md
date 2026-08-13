@@ -37,7 +37,7 @@ whose only job is naming them.
     canon name, so the binding is keyed on the description, like
     `iron_lord_red_haired`.
 - Owner supplies each person's on-screen display form. Handles are identifiers,
-  not copy, and `docs/skills/plates.md` forbids inventing what a card says.
+  not copy, and `docs/skills/plates/SKILL.md` forbids inventing what a card says.
 - Confirm "John 17" is the intended spelling (canon is John-117). It is carried
   verbatim either way; this asks once rather than correcting silently.
 

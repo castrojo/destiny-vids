@@ -15,7 +15,7 @@ nothing about movements, and improvises.
   which vocab pack applies, that a lead binding lives under
   `vocab/universes/<universe>/`, and where a *run's* cast file binds people to
   those roles (H-12).
-- Update `docs/skills/plates.md` for the org logo deck (H-14): a third-party mark
+- Update `docs/skills/plates/SKILL.md` for the org logo deck (H-14): a third-party mark
   is not authored copy, and it is referenced rather than vendored.
 - Route both from `docs/SKILL.md`, then regenerate the catalog:
   `python3 scripts/generate_skill_index.py --write`.

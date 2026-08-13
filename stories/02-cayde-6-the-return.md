@@ -72,7 +72,7 @@ Edit the outline and re-run. Two forward-only-specific consequences:
   cinematic's timeline, and the tool refuses the flag alone rather than compare
   seconds across unrelated sources.
 
-Everything in [`docs/skills/editing.md`](../docs/skills/editing.md) still
+Everything in [`docs/skills/editing/SKILL.md`](../docs/skills/editing/SKILL.md) still
 applies — especially that domain words are parsed as *filters*. Beat 17 ("a
 winged silhouette ... held at distance") is written the long way around for
 exactly this reason: the word "witness" would have added a `faction` filter.
@@ -133,7 +133,7 @@ punch-list the next session works from.
 | Katherine Druckman, `CONDUIT // GUARDIAN` | **Unresolved.** The copy names no Destiny character, so there is nothing to bind in `vocab/casting.yaml`, and the issue points at a shot in an unindexed video ("1:52 intro ... do the character on the left"). `blocked_on: human` — identifying who is on screen is a visual judgement about a real person's credit. |
 | Kyle Gospodnetich, `MAINTAINER // TRAINEE` | **Unresolved.** Likewise names no character, and the issue asks to "check the bazzite.gg spelling" of the name. `blocked_on: human` — naming a real person on screen, and confirming how he spells his name. |
 | "How's your sister" → "It's not too late Kyle" | **Unresolved.** Rewrites spoken/on-screen copy in an unindexed video; the original line can only be recovered from the footage, and the pipeline cuts picture — it does not author dialogue. `blocked_on: footage`. |
-| Discussion placards | **Unresolved.** "Put plaques up for the conversation" supplies no copy, and nameplate fields are a closed set (`docs/skills/plates.md`). Nothing is invented to fill them. `blocked_on: input` — the placard copy has to be written by a human. |
+| Discussion placards | **Unresolved.** "Put plaques up for the conversation" supplies no copy, and nameplate fields are a closed set (`docs/skills/plates/SKILL.md`). Nothing is invented to fill them. `blocked_on: input` — the placard copy has to be written by a human. |
 | Two titans in the crowd as Bluefin maintainers | **Unresolved.** The machinery exists (group shots derive `casting.slots`; `tools/ensemble.py` + `plate.py plan --roster` credit them), but the shots live in an unindexed video and no maintainer list was supplied. `blocked_on: input` — a roster, plus the footage above. |
 | **Lenka, displaced by the Petra recast** | **Unresolved.** The recast in #8 moves Petra Venj to Lori Lorusso and does not say where Lenka goes; she is no longer credited anywhere. `automatable: no` — `blocked_on: human`: a casting decision about a real person. Recorded here and beside the `petra_venj` binding; an agent does not resolve it. |
 

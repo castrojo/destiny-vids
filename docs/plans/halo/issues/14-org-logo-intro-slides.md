@@ -32,7 +32,7 @@ separate permission, per org.
   plate scheduling rules (one card at a time, held long enough to read).
 - Marks are used **as given**: no recolouring into HUD green, no compositing into
   the visor frame, no invented tagline. On-screen copy stays the closed authored
-  set `docs/skills/plates.md` requires.
+  set `docs/skills/plates/SKILL.md` requires.
 - A missing or unverifiable logo is **missing, not a failure**: the episode
   ships with that org's slide omitted and the gap recorded in the run's miss
   report, per "Degrade, never block" in `AGENTS.md`. What stays forbidden is

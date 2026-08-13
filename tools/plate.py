@@ -24,7 +24,7 @@ reference deck (``~/Videos/nameplates.json``); nothing is invented on top of it.
 The owner-authored chrome rides as flags, never copy: ``variant`` (``leader``
 gold, ``rust`` iron, ``bazzite`` purple), ``avatar`` (a PFP composited into
 the crest, degrading to the drawn crest when the file is not there), and
-``wreath`` (the struck laurel around it). See docs/skills/plates.md.
+``wreath`` (the struck laurel around it). See docs/skills/plates/SKILL.md.
 
 ``kind: "ghost"`` drops the class line (a Ghost is not a Guardian, so a subclass
 would be nonsense on it) and shrinks the plate. ``kind: "title"`` is the deck's
@@ -273,7 +273,7 @@ RAISED_TOP = 0.28
 # from. Where plate.html and the site disagree (pill vs chamfered box, one
 # line vs stacked rows, gradient message vs solid uppercase label) the baked
 # reference wins: it is what the videos were actually rendered from
-# (docs/skills/plates.md: where the site and the videos disagree, the videos win).
+# (docs/skills/plates/SKILL.md: where the site and the videos disagree, the videos win).
 CHAT_AVATAR = 42         # .avatar/.pfp: 84px circle; the crest is the no-pfp fallback
 CHAT_GAP = 13            # .plate { gap: 26px }
 CHAT_PAD_L = 12          # .plate { padding: 20px 44px 20px 24px }
@@ -1662,7 +1662,7 @@ def _plan_brief_plates(brief, timeline, total, hold, leads, busy, log):
                 f"reference deck's closed set: {', '.join(extra)}. The deck "
                 "has no row for them, and inventing one puts unauthored text "
                 "on a card that names a real person -- see "
-                "docs/skills/plates.md."
+                "docs/skills/plates/SKILL.md."
             )
         character = req.get("character")
         if not character and not copy:
@@ -2791,7 +2791,7 @@ def main(argv=None):
     p.add_argument("--brief", default=None,
                    help="issue number or brief YAML file: the brief's plates[] "
                         "are planned first as fixed, owner-timed credits (see "
-                        "docs/skills/plates.md). Lead-tier: with --only ensemble "
+                        "docs/skills/plates/SKILL.md). Lead-tier: with --only ensemble "
                         "they are expected via --around, like dialogue")
     p.add_argument("--reveal-after", default=None, metavar="MM:SS",
                    help="hold every derived lead reveal until this point on the "

@@ -74,8 +74,8 @@ The pool is every clean segment in the index. Shots from different cinematics
 sit next to each other, and `story.py` reports the `video_id` per shot so the
 cut list stays honest about where each frame came from.
 
-**Step 4 — render and plate as usual** ([`editing.md`](../skills/editing.md),
-[`plates.md`](../skills/plates.md)). Nothing downstream changes: `render.py`
+**Step 4 — render and plate as usual** ([`editing.md`](../skills/editing/SKILL.md),
+[`plates.md`](../skills/plates/SKILL.md)). Nothing downstream changes: `render.py`
 already resolves each shot's own `video_id` against `media/`, so a cross-source
 cut list needs no special handling.
 

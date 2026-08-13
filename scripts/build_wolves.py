@@ -241,7 +241,7 @@ PALE_OUT = 210.000         # `wolves_act2` is 210.015 s long: there is no more
 # own trims (77-82, 83-87, 91-97) are the owner's, not shot edges, so each is
 # snapped to a detected boundary. Only the last is trimmed, and only at its
 # TAIL: an in-point is what the detector worked to find, so a trim never moves
-# the start (docs/skills/editing.md, "Holds").
+# the start (docs/skills/editing/SKILL.md, "Holds").
 #
 # CASTING, on the owner's instruction, which OVERRODE their own filenames:
 # the Titan is Kat Cosgrove, the Warlock is Kaslin Fields, and the Hunter --

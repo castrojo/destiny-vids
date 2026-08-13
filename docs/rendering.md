@@ -245,7 +245,7 @@ again for every other clip in that act.
 
 So extract the span you need to its own file first and cut from that. The
 procedure and the timecode-rebasing it forces are in
-[`skills/editing.md`](skills/editing.md).
+[`skills/editing/SKILL.md`](skills/editing/SKILL.md).
 
 ## Burning plates onto a cut
 

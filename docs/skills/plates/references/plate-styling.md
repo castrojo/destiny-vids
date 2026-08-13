@@ -1,6 +1,6 @@
 # Plate styling provenance
 
-Reference for [`docs/skills/plates.md`](../plates.md). Split out of it to
+Reference for [`../SKILL.md`](../SKILL.md). Split out of it to
 keep the skill inside its size budget; this is the constant-by-constant
 record of where the plate's look came from, needed when changing chrome or
 porting the treatment, not when planning a cut.

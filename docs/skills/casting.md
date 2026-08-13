@@ -31,7 +31,7 @@ getting it wrong is crediting someone for a shot they are not in.
 
 ## When NOT to Use
 
-- Rendering the credit on screen → [`plates.md`](plates.md)
+- Rendering the credit on screen → [`plates.md`](plates/SKILL.md)
 - Tagging what is visible in a frame → [`indexing.md`](indexing.md)
 
 ## Core Process
@@ -121,7 +121,7 @@ home):
 Neither blocks anything. A cast-but-unplated lead like Paris still makes the cut:
 `tools/plate.py plan` writes the manifest and lists her under `unresolved` with
 the reason, so the credit is never dropped in silence — see
-[`plates.md`](plates.md). Someone with no binding at all is not in the index's
+[`plates.md`](plates/SKILL.md). Someone with no binding at all is not in the index's
 casting, and the brief that carries their copy is their punch-list.
 
 ### When the character is not known yet
@@ -206,7 +206,7 @@ the generic ensemble copy under `ensemble.plate`, and — under `ensemble.titles
 keyed by GitHub login — the Guardian identity of any contributor whose plate is
 genuinely authored in the reference deck (castrojo's is `np_jorge`). Most
 contributors have no entry: an unknown seal is `Bluefin Blueberry`, never an
-invented title. [`plates.md`](plates.md) covers how the two are scheduled.
+invented title. [`plates.md`](plates/SKILL.md) covers how the two are scheduled.
 
 ### Authored identities are reproduced, not written
 
@@ -214,7 +214,7 @@ Ten people have a Guardian identity somebody actually authored, in files this
 repo does not own — `~/Videos/nameplates.json` and, for seven of them,
 `~/src/website public/wolves/characters/characters.json`. The roster and the
 precedence between those sources are in
-[`plates.md`](plates.md#where-the-copy-is-authored). Two consequences here:
+[`plates.md`](plates/SKILL.md#where-the-copy-is-authored). Two consequences here:
 
 - **Copying an authored identity onto an existing binding is reproduction**, and
   is allowed without asking — verbatim, with the source cited in a comment, as

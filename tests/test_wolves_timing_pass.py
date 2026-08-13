@@ -152,7 +152,7 @@ def test_filter_delays_each_bed_piece_to_its_wall_position(cut):
 def test_marker_cards_carry_no_nameplate_vocabulary(cut):
     """A marker is a slate. It must never grow a name, a role, or a class.
 
-    Nameplate copy is a closed set naming real people (docs/skills/plates.md);
+    Nameplate copy is a closed set naming real people (docs/skills/plates/SKILL.md);
     a production marker is not a credit and may not borrow that vocabulary.
     """
     from tools.marker import render_marker

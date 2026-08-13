@@ -68,7 +68,7 @@ speaking, and the **one** place a new claim about a real person may enter the
 system — a brief can name somebody who has no binding in `vocab/casting.yaml`
 yet. `tools/plate.py plan --brief` turns them into fixed, owner-timed credits;
 the rules (closed field set, the vocab wins a conflict, provenance on every
-plate) are in [`plates.md`](plates.md).
+plate) are in [`plates.md`](plates/SKILL.md).
 
 ```bash
 python3 tools/brief.py normalize 3   # prose -> a PROPOSED block, printed

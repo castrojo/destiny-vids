@@ -1,6 +1,6 @@
 # Full-frame cards: the act slide and the comic title card
 
-Reference for [`docs/skills/plates.md`](../plates.md). Split out of it to keep
+Reference for [`../SKILL.md`](../SKILL.md). Split out of it to keep
 the skill inside its size budget; this is the detail needed when rendering or
 changing a card that covers the whole frame, not when planning a cut.
 

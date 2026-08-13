@@ -151,7 +151,7 @@
     "plate": {
       "type": "object",
       "additionalProperties": false,
-      "description": "One nameplate. Either it names a `character` whose copy already lives on a binding in vocab/casting.yaml, or it carries owner-authored `copy`. The field set of `copy` is CLOSED and mirrors the reference deck (docs/skills/plates.md): inventing a row the deck has no field for is the thing this schema exists to prevent.",
+      "description": "One nameplate. Either it names a `character` whose copy already lives on a binding in vocab/casting.yaml, or it carries owner-authored `copy`. The field set of `copy` is CLOSED and mirrors the reference deck (docs/skills/plates/SKILL.md): inventing a row the deck has no field for is the thing this schema exists to prevent.",
       "properties": {
         "at": {
           "$ref": "#/$defs/timecode",

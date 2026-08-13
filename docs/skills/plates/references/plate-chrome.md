@@ -1,6 +1,6 @@
 # Owner-authored plate chrome
 
-The detail behind [`../plates.md`](../plates.md)'s "Owner-authored chrome"
+The detail behind [`../plates.md`](../SKILL.md)'s "Owner-authored chrome"
 section: four additions the owner briefed directly. All four are **chrome and
 imagery, not copy** — none adds a row of text the reference deck has no field
 for, so the closed field set is untouched. They ride in a manifest entry — or

@@ -5,7 +5,7 @@ A timing pass does not remove the material it is going to remove. It **blacks
 it out in place**, at exactly its original duration, with a card saying what is
 going to happen there. The picture stays legible against the music, so the cut
 can be judged before a single frame is actually taken out -- see
-``docs/skills/editing.md``, "Mark, don't cut".
+``docs/skills/editing/SKILL.md``, "Mark, don't cut".
 
 Two kinds, and the distinction is the whole point:
 

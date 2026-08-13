@@ -1,6 +1,6 @@
 # The status nameplate
 
-Reference for [`docs/skills/plates.md`](../plates.md). Split out of it to keep
+Reference for [`../SKILL.md`](../SKILL.md). Split out of it to keep
 the skill inside its size budget; this is the detail needed when changing the
 HUD card's chrome, not when planning a cut.
 
