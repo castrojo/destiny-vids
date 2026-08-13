@@ -15,7 +15,6 @@
  },
  "note": "AUTHORED shotlist, not a story.py output. A TIMING PASS: spans destined for removal or artwork are blacked out with marker cards at their exact duration, so nothing is cut yet. Only audio=bed shots advance the bed clock; the interruption (issue #104) is silent/hold/source beats that are all free to the song.",
  "unresolved": [
-  "HOLD MUSIC, TODO(owner): interruption beats B and C (9.0 s of wall time) carry audio='hold' -- the elevator-music slot. No cleared hold-music asset exists on this machine and picking a track is a licensing decision (rights stop work; they cannot be un-done after publishing), so the slot ships SILENT and recorded rather than filled with an unlicensed track. When a track is cleared: give both shots audio_from={video_id, start_sec} in that source's own clock -- tools/audiomix.py already wires hold regions, though an audio-only container will need an extension added to tools/render.py's MEDIA_EXTS.",
   "CNCF MARK, TODO(owner): the interruption slide reproduces only the owner-authored LINE ('The CNCF Ambassadors would like a moment.'); the CNCF logo/mark is not used because the rights to it have not been cleared. Text only until the owner says otherwise.",
   "WREATH, TODO(owner): Cortney Nickerson's plate on interruption card C reproduces her authored act-I identity verbatim with no wreath; whether the interruption treatment should add one is the owner's call (#104).",
   "CLIP RANGE: the clip plays source 43.000 -> 53.470 -- option B of the owner's own correction on #104 (the issue text's 43.0 -> 51.0 would cut the transcendence portrait they previously insisted on). Verified on frames in renders/verify-104/. One-line revert to option A: CLIP_IN = 44.811.",
@@ -279,15 +278,23 @@
    "segment_id": "card_026",
    "still": "renders/interruption/b-ambassadors.png",
    "duration": 4.0,
-   "beat": "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' (owner-authored, verbatim; hold-music slot, silent until a track is cleared -- issue #104)",
-   "audio": "hold"
+   "beat": "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' (owner-authored, verbatim; hold music: Local Forecast - Slower, CC BY 4.0, credited in ATTRIBUTIONS.md)",
+   "audio": "hold",
+   "audio_from": {
+    "video_id": "bed_local_forecast_slower",
+    "start_sec": 6.5
+   }
   },
   {
    "segment_id": "card_027",
    "still": "renders/interruption/c-cortney.png",
    "duration": 4.0,
-   "beat": "III. INTERRUPTION C -- Introducing Cortney Nickerson, her authored #90 identity verbatim with the class row omitted, as in act I (hold-music slot)",
-   "audio": "hold"
+   "beat": "III. INTERRUPTION C -- Introducing Cortney Nickerson, her authored #90 identity verbatim with the class row omitted, as in act I (hold music continues)",
+   "audio": "hold",
+   "audio_from": {
+    "video_id": "bed_local_forecast_slower",
+    "start_sec": 6.5
+   }
   },
   {
    "segment_id": "yt_destiny_2_the_final_shape_gameplay_trailer_0043_000",

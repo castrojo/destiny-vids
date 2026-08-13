@@ -10,10 +10,10 @@ mcp_compliance_level: partial
 optimization_status: draft
 status: active
 dependencies: [editing]
-tags: [music, bed, tempo, downbeat, excision, anchor, ffmpeg, true-peak, section-detection, two-clocks, bed-pause, diegetic-insert, insert-headroom, source-gain]
+tags: [music, bed, rights, attribution, insert-track, tempo, downbeat, excision, anchor, ffmpeg, true-peak, section-detection, two-clocks, bed-pause, diegetic-insert, insert-headroom, source-gain]
 description: >-
-  Covers bed records, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a master over 0 dBTP.
-  Use when scoring a cut, pausing the song for a moment of source audio, or supporting a second recording.
+  Covers bed records and their rights buckets, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a second track over that pause.
+  Use when scoring a cut, pausing the song, or clearing and crediting a track.
 metadata:
   type: procedure
   context7-sources:
@@ -60,7 +60,31 @@ python3 tools/bed.py map music/<bed_id>.json --at 3:48 --edited
 A bed gets a record in `music/<bed_id>.json`, which is to a track what
 `videos/<video_id>.json` is to a source video: provenance plus measurements,
 **never the media**. Same rights posture — `usage_class` and
-`source_rights_note` on every record.
+`source_rights_note` on every record, validated against
+[`schema/bed.schema.json`](../../../schema/bed.schema.json) and
+`vocab/provenance.yaml`.
+
+`usage_class` says which bucket the track is in, and **both buckets are
+usable**:
+
+| Value | What it means |
+|---|---|
+| `third_party_copyrighted` | Somebody else's recording, used as a non-commercial fan-work bed. |
+| `cc_by_4_0` | **Cleared.** Commercial use, sync and redistribution permitted; attribution is the only condition, and `--attribution` is then required — the credit is reproduced verbatim in [`ATTRIBUTIONS.md`](../../../ATTRIBUTIONS.md), which the suite checks. |
+
+```bash
+python3 tools/bed.py measure media/<bed>.wav --id <bed_id> \
+    --usage-class cc_by_4_0 --attribution "$(cat credit.txt)" ...
+```
+
+## A second track, while the song is paused
+
+`audio: "insert"` plays a different track over a span — hold music under a
+title card, say. It advances **wall and not bed**, exactly like `audio:
+"source"`, so an interruption costs the song nothing and no anchor after it
+moves. The shot names its own `insert_bed`, and optionally `insert_start` and
+`insert_gain_db`. See `tools/audiomix.py` and act VI's Ambassadors beat in
+`scripts/build_wolves.py`.
 
 ## Where the detail lives
 
@@ -84,6 +108,9 @@ This skill is the contract. The procedure lives in `references/`:
 | "The instrumental is the album take with the vocals muted." | It is a different arrangement with a different length. Anchor by name and map each recording separately. |
 | "True peak is over, I'll run loudnorm." | That rewrites the artist's dynamics. A static gain at the mux fixes the peak and changes nothing else. |
 | "I measured the peak on the bed, so the delivery is fine." | Measure the delivered file. The encode adds intersample peaks the WAV did not have. |
+| "The track needs a licence decision, so the cut is blocked." | Only if it is **uncleared**. Choosing between tracks that are already CC BY is taste, not rights — pick one, record the obligation, ship. See `AGENTS.md`, "A rights *decision* blocks. A rights *choice* does not." |
+| "It's CC BY and the credits act doesn't exist yet, so I can't use it." | Attribution has to land *somewhere*, not somewhere specific. `ATTRIBUTIONS.md` satisfies it today; the on-screen home is #51's job. |
+| "CC licensed means I can use it freely." | Not CC0. The condition is the licence — a record claiming `cc_by_4_0` without its verbatim credit claims a permission it does not have, and the suite fails it. |
 
 ## Red Flags
 

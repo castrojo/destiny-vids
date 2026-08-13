@@ -198,6 +198,35 @@ The only things that genuinely stop work are a **rights** decision and a
 **clean** violation — the two that cannot be undone after publishing.
 Everything else degrades and carries on.
 
+### A rights *decision* blocks. A rights *choice* does not.
+
+The rule above has one reading that has already cost a day, so it is written
+out here rather than left to judgement. **"It involves a licence" is not the
+test.** The test is whether anybody still has to grant something.
+
+| Situation | Blocked? |
+|---|---|
+| The asset is not cleared, and clearing it needs somebody's permission. | **Yes.** Stop, record `blocked_on`, file the issue. |
+| Several assets are *already* cleared and one must be picked. | **No.** That is taste. Pick one, record the obligation, ship. |
+| A cleared asset carries a condition — attribution, a disclaimer. | **No.** Satisfy the condition. |
+| The condition has no home yet (no credits sequence, no description). | **No.** Attribution has to land *somewhere*, not somewhere specific. `ATTRIBUTIONS.md` is that somewhere, and a `TODO(owner)` records the rest. |
+
+The worked example is act VI's hold music (#104). Four CC BY 4.0 tracks were
+found, verified, and written up — commercial use, sync and redistribution all
+permitted, attribution the only condition — and then the work stopped to ask
+which one. Nothing was blocked: a seventeen-second gag waited a day on a
+question of taste wearing a licence's clothes.
+
+Two structural fixes came out of it, and they are the reason this is a rule
+rather than a note. `usage_class` had exactly **one** value, so the index could
+say an asset was *somebody else's* and had no way to say it was *cleared* — and
+an agent with nowhere to record "cleared" records "blocked". Bed records had no
+schema at all, so nothing ever checked. Both are fixed; if a third asset class
+appears with the same shape, fix it the same way rather than working around it.
+
+**Recording that something is cleared is as important as recording that it is
+not.** A rights bucket that only has one value is not a rights bucket.
+
 Record the gap where the next person will trip over it: `unresolved` in a
 parsed brief, a `TODO(owner)` beside the binding, and a GitHub issue when it
 needs somebody to decide.

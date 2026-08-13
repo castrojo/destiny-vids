@@ -1,137 +1,137 @@
 {
-  "_what": "Seven Days to the Wolves — the whole programme, assembled from its acts. THE RUNNING ORDER IS CANONICAL and settled by the owner on 2026-08-12: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). docs/running-order.md is the source of truth for it; this file executes it.",
-  "_acts": {
-    "I": "intro — the Into the Light opener, six Guardians plated, with the title cover (wolves.jpg) covering source 24.5 - 38.",
-    "II": "endlessformsmostbeautiful — delivered and credited, in the programme. Five unbroken runs of the live-action trailers scored to Nightwish's Endless Forms Most Beautiful (instrumental); The Long Walk inside them. See docs/cuts/02-endless-forms-most-beautiful.md. Its picture is a fan compilation (same provenance question as act VI, #55).",
-    "III": "mrbobbytables — the August 2026 contributors piece, cut from the Curse of Osiris opening cinematic. Owner-named and owner-placed. He calls it PARTIALLY COMPLETE, so it is placed as-is and will be replaced by its finished version.",
-    "IV": "kat — Kat Cosgrove's Guardian intro, behind the owner-authored BIAS FOR ACTION slide.",
-    "V": "nat — Natali Vlatko's Guardian arrival, behind the same authorisation slide retitled WRONG PLACE, WRONG TIME, RIGHT ATTITUDE.",
-    "VI": "7daystothewolves — the musical. Editorial pass, delivered for review, not approved: provenance is unresolved (issue #55). Its tail plates the Cayde-6 reveal and three gold credits.",
-    "VII": "europa — the Europa director's cut.",
-    "VIII": "credits — NOT DESIGNED. Issue #51."
+ "_what": "Seven Days to the Wolves \u2014 the whole programme, assembled from its acts. THE RUNNING ORDER IS CANONICAL and settled by the owner on 2026-08-12: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). docs/running-order.md is the source of truth for it; this file executes it.",
+ "_acts": {
+  "I": "intro \u2014 the Into the Light opener, six Guardians plated, with the title cover (wolves.jpg) covering source 24.5 - 38.",
+  "II": "endlessformsmostbeautiful \u2014 delivered and credited, in the programme. Five unbroken runs of the live-action trailers scored to Nightwish's Endless Forms Most Beautiful (instrumental); The Long Walk inside them. See docs/cuts/02-endless-forms-most-beautiful.md. Its picture is a fan compilation (same provenance question as act VI, #55).",
+  "III": "mrbobbytables \u2014 the August 2026 contributors piece, cut from the Curse of Osiris opening cinematic. Owner-named and owner-placed. He calls it PARTIALLY COMPLETE, so it is placed as-is and will be replaced by its finished version.",
+  "IV": "kat \u2014 Kat Cosgrove's Guardian intro, behind the owner-authored BIAS FOR ACTION slide.",
+  "V": "nat \u2014 Natali Vlatko's Guardian arrival, behind the same authorisation slide retitled WRONG PLACE, WRONG TIME, RIGHT ATTITUDE.",
+  "VI": "7daystothewolves \u2014 the musical. Editorial pass, delivered for review, not approved: provenance is unresolved (issue #55). Its tail plates the Cayde-6 reveal and three gold credits.",
+  "VII": "europa \u2014 the Europa director's cut.",
+  "VIII": "credits \u2014 NOT DESIGNED. Issue #51."
+ },
+ "_audio": "Every act carries its own audio, unprocessed: no normaliser, no limiter, no EQ. The programme is 48 kHz STEREO because that is what the masters are -- every -hq master in Prod is stereo FLAC. The older, now-retired UPLOAD copies were AAC 5.1, but that 5.1 was the same two channels plus a derived LFE (FC/BL/BR digital silence), added by each cut's own run script. Upmixing here to recreate it would be assembly inventing a soundfield, which the audio tenet forbids; if 5.1 delivery is wanted, it belongs in the per-cut scripts that already do it. Only the six act slides are silent; a bed under them is a licensing decision.",
+ "_transitions": "Issue #105, measured on v0.6 with tools/transitions.py (all times programme clock): every act entered DRY out of the slides' digital silence (4-14 s of -inf per join), the worst being act VII at -15.3 dB one second after the slide, and acts I and III ended HOT against the silence (-24.4 and -14.8 dB in their last second). The treatment below is explicit afade shapes, stated here so they are reproducible: fade_in 2.0 s on every act that starts behind a slide, fade_out 2.0 s on the acts whose tails do not already fade (I, III, V) and 3.0 s on act VII so the programme lands rather than stops. Acts II and VI fade themselves out (measured -96.7 / -90.3 dB in their last seconds) and carry no fade_out; the IV->V join is direct and continuous (-15.2 -> -11.9 dB) and carries no fade on either side. All fade times are ACT FILM time -- the clip's own clock -- so a re-order never moves them. LEFT TO THE OWNER (automatable: no): (1) whether the slides carry a bed or room tone -- a licensing decision, per the megacut skill; (2) levelling the act ENTRIES, which still differ by ~20 dB (act III at -29.5 vs act VII at -15.3) -- static gain per act is a mix decision; (3) how long the slides' silence should be -- the 15 s IV-V slide is deliberate pacing.",
+ "_sources": {
+  "_where": "Every act plays from ~/Videos/Wolves/Prod, which holds the HIGHEST-QUALITY master of each: FLAC audio and the un-re-encoded picture. They are hardlinks to the per-project masters, so Prod costs no extra disk and cannot drift from what its project built. The retired ~/Videos/UPLOAD staging folder held lossy copies of the same cuts and is NOT what this reads; its removal is issue #81. Act VII's master was re-rendered 2026-08-13 under the new master gate (tools/peaks.py trim, #130) and now measures -1.1 dBTP, inside the -0.9..-1.1 band -- the +0.3 dBTP clip of #82 is fixed in the delivered file; the issue stays open for its owner to close.",
+  "hero": "~/Videos/Wolves/Prod/01-intro.mp4 (hardlink to renders/megacut-01-hero.mp4) \u2014 YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), Bungie's score, six Guardian plates and the comic title card burned. usage_class: third_party_copyrighted. BUILT 2026-08-12: raw trim (x264 crf 14) + tools/plate.py burn (crf 18), audio decoded from the plain 251 Opus rung to FLAC -- NOT 251-drc, which is dynamic-range compressed and forbidden by the audio standard. Delivered as act I.",
+  "mrbobbytables": "Wolves/Prod/03-mrbobbytables.mp4 -> destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4. PARTIALLY COMPLETE by the owner's description; placed as-is, because assembly never re-cuts what it is handed.",
+  "kat": "Wolves/Prod/04-kat.mp4 -> ~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4. Carries the owner's dialogue change (the Kat/Ian telnet split and 'Remember kids, cardio!'), rebuilt 2026-08-12 16:52; the Prod hardlink survived the rebuild because the script writes its master in place.",
+  "natali": "Wolves/Prod/05-nat.mp4 -> ~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4.",
+  "wolves": "Wolves/Prod/06-7daystothewolves.mp4 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4, PROMOTED 2026-08-13 (the clean pre-plate v2 is wolves-7days-master-v2.mp4; the v1 pair is kept beside them). v2 is the #104 interruption build: the song pauses at bed 322.200, the Ambassadors interrupt, and the film runs 443.5 s, +10.811 s over v1, so every stamp after act VI moves. Bed unchanged at 423.993 s; the hold-music slot is deliberately SILENT pending the owner's licensing call (#104). THE ONE ACT WITH NO LOSSLESS MASTER: it is AAC (stereo, 48 kHz, ~323 kb/s), so Prod holds the best that exists rather than the best possible. Issue #58.",
+  "europa": "Wolves/Prod/07-europa.mp4 -> ~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4.",
+  "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md."
+ },
+ "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.9.mp4",
+ "width": 1920,
+ "height": 1080,
+ "fps": "60000/1001",
+ "sample_rate": 48000,
+ "layout": "stereo",
+ "crf": 16,
+ "preset": "slow",
+ "audio_bitrate": "640k",
+ "items": [
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act1.png",
+   "dur": 5.0,
+   "label": "I \u2014 PROJECT BLUEFIN / seven days to the wolves",
+   "chapter": "I. Project Bluefin"
   },
-  "_audio": "Every act carries its own audio, unprocessed: no normaliser, no limiter, no EQ. The programme is 48 kHz STEREO because that is what the masters are -- every -hq master in Prod is stereo FLAC. The older, now-retired UPLOAD copies were AAC 5.1, but that 5.1 was the same two channels plus a derived LFE (FC/BL/BR digital silence), added by each cut's own run script. Upmixing here to recreate it would be assembly inventing a soundfield, which the audio tenet forbids; if 5.1 delivery is wanted, it belongs in the per-cut scripts that already do it. Only the six act slides are silent; a bed under them is a licensing decision.",
-  "_transitions": "Issue #105, measured on v0.6 with tools/transitions.py (all times programme clock): every act entered DRY out of the slides' digital silence (4-14 s of -inf per join), the worst being act VII at -15.3 dB one second after the slide, and acts I and III ended HOT against the silence (-24.4 and -14.8 dB in their last second). The treatment below is explicit afade shapes, stated here so they are reproducible: fade_in 2.0 s on every act that starts behind a slide, fade_out 2.0 s on the acts whose tails do not already fade (I, III, V) and 3.0 s on act VII so the programme lands rather than stops. Acts II and VI fade themselves out (measured -96.7 / -90.3 dB in their last seconds) and carry no fade_out; the IV->V join is direct and continuous (-15.2 -> -11.9 dB) and carries no fade on either side. All fade times are ACT FILM time -- the clip's own clock -- so a re-order never moves them. LEFT TO THE OWNER (automatable: no): (1) whether the slides carry a bed or room tone -- a licensing decision, per the megacut skill; (2) levelling the act ENTRIES, which still differ by ~20 dB (act III at -29.5 vs act VII at -15.3) -- static gain per act is a mix decision; (3) how long the slides' silence should be -- the 15 s IV-V slide is deliberate pacing.",
-  "_sources": {
-    "_where": "Every act plays from ~/Videos/Wolves/Prod, which holds the HIGHEST-QUALITY master of each: FLAC audio and the un-re-encoded picture. They are hardlinks to the per-project masters, so Prod costs no extra disk and cannot drift from what its project built. The retired ~/Videos/UPLOAD staging folder held lossy copies of the same cuts and is NOT what this reads; its removal is issue #81. Act VII's master was re-rendered 2026-08-13 under the new master gate (tools/peaks.py trim, #130) and now measures -1.1 dBTP, inside the -0.9..-1.1 band -- the +0.3 dBTP clip of #82 is fixed in the delivered file; the issue stays open for its owner to close.",
-    "hero": "~/Videos/Wolves/Prod/01-intro.mp4 (hardlink to renders/megacut-01-hero.mp4) — YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), Bungie's score, six Guardian plates and the comic title card burned. usage_class: third_party_copyrighted. BUILT 2026-08-12: raw trim (x264 crf 14) + tools/plate.py burn (crf 18), audio decoded from the plain 251 Opus rung to FLAC -- NOT 251-drc, which is dynamic-range compressed and forbidden by the audio standard. Delivered as act I.",
-    "mrbobbytables": "Wolves/Prod/03-mrbobbytables.mp4 -> destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4. PARTIALLY COMPLETE by the owner's description; placed as-is, because assembly never re-cuts what it is handed.",
-    "kat": "Wolves/Prod/04-kat.mp4 -> ~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4. Carries the owner's dialogue change (the Kat/Ian telnet split and 'Remember kids, cardio!'), rebuilt 2026-08-12 16:52; the Prod hardlink survived the rebuild because the script writes its master in place.",
-    "natali": "Wolves/Prod/05-nat.mp4 -> ~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4.",
-    "wolves": "Wolves/Prod/06-7daystothewolves.mp4 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4, PROMOTED 2026-08-13 (the clean pre-plate v2 is wolves-7days-master-v2.mp4; the v1 pair is kept beside them). v2 is the #104 interruption build: the song pauses at bed 322.200, the Ambassadors interrupt, and the film runs 443.5 s, +10.811 s over v1, so every stamp after act VI moves. Bed unchanged at 423.993 s; the hold-music slot is deliberately SILENT pending the owner's licensing call (#104). THE ONE ACT WITH NO LOSSLESS MASTER: it is AAC (stereo, 48 kHz, ~323 kb/s), so Prod holds the best that exists rather than the best possible. Issue #58.",
-    "europa": "Wolves/Prod/07-europa.mp4 -> ~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4.",
-    "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md."
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/01-intro.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "fade_out": 2.0,
+   "label": "Act I \u2014 Into the Light: six Guardians plated, the comic card, Bungie's score",
+   "dur": 111.567,
+   "_dur_note": "The frame-verified trim, 2.0 -> 113.55 of BKm0TPqeOjY. Recorded here so the running order and its chapter markers can be read before the segment is built."
   },
-  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.8.mp4",
-  "width": 1920,
-  "height": 1080,
-  "fps": "60000/1001",
-  "sample_rate": 48000,
-  "layout": "stereo",
-  "crf": 16,
-  "preset": "slow",
-  "audio_bitrate": "640k",
-  "items": [
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act1.png",
-      "dur": 5.0,
-      "label": "I — PROJECT BLUEFIN / seven days to the wolves",
-      "chapter": "I. Project Bluefin"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/01-intro.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "fade_out": 2.0,
-      "label": "Act I — Into the Light: six Guardians plated, the comic card, Bungie's score",
-      "dur": 111.567,
-      "_dur_note": "The frame-verified trim, 2.0 -> 113.55 of BKm0TPqeOjY. Recorded here so the running order and its chapter markers can be read before the segment is built."
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act2.png",
-      "dur": 5.0,
-      "label": "II — Endless Forms Most Beautiful / Nightwish",
-      "chapter": "II. Endless Forms Most Beautiful"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/02-endlessformsmostbeautiful.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "label": "Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end",
-      "sub_chapters": "stories/02-endless-forms-plates.json",
-      "_sub_chapters_note": "A POINTER at act II's own manifest, which is the source of the marks -- the plan opts in, it does not hold the timecodes, so an act's edit and the programme's edit never collide (issue #92). Consumed only with --sub-chapters; the default chapter list is unchanged. TODO(owner): YouTube chapter list vs ffmpeg-only metadata track."
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act3.png",
-      "dur": 5.0,
-      "label": "III — Bob Killen / Voidwalker Warlock",
-      "chapter": "III. Bob Killen"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/03-mrbobbytables.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "fade_out": 2.0,
-      "label": "Act III — mrbobbytables: August 2026 contributors (partially complete)"
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act4-5.png",
-      "dur": 15.0,
-      "label": "IV–V — Bias for Action / The Kat and the Nat (held long, by owner request)",
-      "chapter": "IV–V. Bias for Action"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/04-kat.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "label": "Act IV — Kat Cosgrove: Guardian intro"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/05-nat.mp4",
-      "audio": "source",
-      "fade_out": 2.0,
-      "label": "Act V — Natali Vlatko: Guardian arrival"
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act6.png",
-      "dur": 5.0,
-      "label": "VI — 7 Days to the Wolves / Nightwish",
-      "chapter": "VI. 7 Days to the Wolves"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/06-7daystothewolves.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "label": "Act VI — Seven Days to the Wolves: the musical (editorial pass, provenance open), with the Cayde-6 tail plates burned in",
-      "_plates": "Act VI carries stories/06-wolves-cayde-plates.json burned in (tools/plate.py burn --fit-picture). Prod holds ONE file per act, hardlinked to its project master, so Prod/06 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4. The UN-PLATED v2 master is kept beside it as wolves-7days-master-v2.mp4, because burning is not idempotent: a re-burn starts from the clean file and never stacks a second card on the first. v2 re-burned the tail plates at +10.811 s film time (the manifest's _shifted records it) and the act runs 443.5 s, so slide VII and act VII move +10.811 s of programme time."
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act7.png",
-      "dur": 5.0,
-      "label": "VII — Europa / Director's Cut",
-      "chapter": "VII. Europa"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/07-europa.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "fade_out": 3.0,
-      "label": "Act VII — Europa Director's Cut"
-    }
-  ],
-  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no film, so it has no marker -- a chapter that jumps to the next act's footage would be a lie about what plays.",
-  "_version": "v0.8 -- v0.7 with TWO act changes, sequenced so neither raced the other: (1) act II rebuilt for #98 (PR #136): the TOC exchange (laid out around The Long Walk), the endgame timed cues, the closing quotes over the black outro, and the letterbox callout. Act II's own duration is UNCHANGED (307.998 s -- the picture was re-plated, never re-cut), so no chapter before act VI moves. (2) act VI promoted to its #104 interruption build (PR #135's v2, delivered alongside v1 and promoted here): the Ambassadors interruption adds +10.811 s (432.7 -> 443.5 s film), so slide VII and act VII move +10.811 s; the hold-music slot is deliberately silent pending the owner's licensing call (#104). Planned total 1232.659 s (20:32.7). v0.7 was v0.6 plus the act-join treatment of #105: explicit afade shapes per act (see _transitions), applied at the segment encode, no gain anywhere. v0.6 was v0.5 plus act VI's tail plates (the Cayde-6 reveal and three gold credits). v0.5 was the owner's name for the build before them: everything that exists, assembled, and explicitly NOT the feature. Seven of the eight acts play. What makes it a .5 rather than a 1.0: act VIII (the credits) is not designed (#51), so the programme ends on Europa, and the only names in it are act VI's tail; act VI is an editorial pass whose provenance is an open owner decision (#55); act II's picture comes from a fan compilation with the same question (#74's film); and act III is partially complete by the owner's own description. None of those is fixed by re-assembling -- assembly joins finished things and never re-cuts one."
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act2.png",
+   "dur": 5.0,
+   "label": "II \u2014 Endless Forms Most Beautiful / Nightwish",
+   "chapter": "II. Endless Forms Most Beautiful"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/02-endlessformsmostbeautiful.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "label": "Act II \u2014 Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end",
+   "sub_chapters": "stories/02-endless-forms-plates.json",
+   "_sub_chapters_note": "A POINTER at act II's own manifest, which is the source of the marks -- the plan opts in, it does not hold the timecodes, so an act's edit and the programme's edit never collide (issue #92). Consumed only with --sub-chapters; the default chapter list is unchanged. TODO(owner): YouTube chapter list vs ffmpeg-only metadata track."
+  },
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act3.png",
+   "dur": 5.0,
+   "label": "III \u2014 Bob Killen / Voidwalker Warlock",
+   "chapter": "III. Bob Killen"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/03-mrbobbytables.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "fade_out": 2.0,
+   "label": "Act III \u2014 mrbobbytables: August 2026 contributors (partially complete)"
+  },
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act4-5.png",
+   "dur": 15.0,
+   "label": "IV\u2013V \u2014 Bias for Action / The Kat and the Nat (held long, by owner request)",
+   "chapter": "IV\u2013V. Bias for Action"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/04-kat.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "label": "Act IV \u2014 Kat Cosgrove: Guardian intro"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/05-nat.mp4",
+   "audio": "source",
+   "fade_out": 2.0,
+   "label": "Act V \u2014 Natali Vlatko: Guardian arrival"
+  },
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act6.png",
+   "dur": 5.0,
+   "label": "VI \u2014 7 Days to the Wolves / Nightwish",
+   "chapter": "VI. 7 Days to the Wolves"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/06-7daystothewolves.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "label": "Act VI \u2014 Seven Days to the Wolves: the musical (editorial pass, provenance open), with the Cayde-6 tail plates burned in",
+   "_plates": "Act VI carries stories/06-wolves-cayde-plates.json burned in (tools/plate.py burn --fit-picture). Prod holds ONE file per act, hardlinked to its project master, so Prod/06 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4. The UN-PLATED v2 master is kept beside it as wolves-7days-master-v2.mp4, because burning is not idempotent: a re-burn starts from the clean file and never stacks a second card on the first. v2 re-burned the tail plates at +10.811 s film time (the manifest's _shifted records it) and the act runs 443.5 s, so slide VII and act VII move +10.811 s of programme time."
+  },
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act7.png",
+   "dur": 5.0,
+   "label": "VII \u2014 Europa / Director's Cut",
+   "chapter": "VII. Europa"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/07-europa.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "fade_out": 3.0,
+   "label": "Act VII \u2014 Europa Director's Cut"
+  }
+ ],
+ "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no film, so it has no marker -- a chapter that jumps to the next act's footage would be a lie about what plays.",
+ "_version": "v0.9 -- act VI's Ambassadors interruption now plays its hold music. Local Forecast - Slower, CC BY 4.0 (Kevin MacLeod / Incompetech); credit in ATTRIBUTIONS.md. The slot shipped silent in v0.8 because a cleared track was mistaken for a rights block."
 }
