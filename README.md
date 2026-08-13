@@ -167,9 +167,9 @@ ambiguity-and-cost sink. See `docs/pipeline.md`.
 |---|---|
 | **A. Cleanliness** | `overlays` → derived `clean`, `footage_tier` |
 | **B. Domain semantics** | `class`, `element`, `faction`, `destination`, `character`, `era`, `activity`, `subclass_version` |
-| **C. Cinematography** | `shot_scale`, `composition`, `camera_angle`, `camera_movement`, `pacing`, `content_type`, `lighting` |
+| **C. Cinematography** | `shot_scale`, `composition`, `camera_movement`, `pacing`, `content_type`, `lighting` |
 | **D. Casting** | derived `casting` (`role`, `character`, `person`, `usable`, `constraints_failed`, `slots`) |
-| **E. Identity** | `substitutability` (0–5), `identity_visibility`, `character_identifiability`, `helmet_simplicity`, `face_count`, `subject_facing_camera` |
+| **E. Identity** | `substitutability` (0–5), `identity_visibility`, `character_identifiability`, `face_count`, `subject_facing_camera` |
 | **F. Register / mood** | `register` (−2..+2), `mood` |
 | **G. Salience** | `subject_salience` (required) |
 | **H. Action** | `action` (incl. first-class `traversal`), derived `traversal_hero` |
@@ -490,9 +490,7 @@ unusable.
 The schema is designed to be populated by a **flash-tier model** at scale.
 `docs/pipeline.md` buckets every field into Tier 0 (free/deterministic), Tier 1
 (flash-tier / cheap heuristic), and Tier 2 (heavy model or human). All four
-derived fields are Tier 0 pure functions. Notably, `helmet_simplicity` is **not**
-reliably flash-affordable per frame — cheapest path is inferring it from armor-set
-metadata or the video title, else it defaults to `unknown`.
+derived fields are Tier 0 pure functions.
 
 ## Prior art borrowed
 

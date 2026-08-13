@@ -66,7 +66,7 @@ NOT_COVERAGE = frozenset({"unknown", "UNKNOWN"})
 # Tagged fields carried into the corpus, so an outline can be written from the
 # corpus alone without reopening every segment record.
 CARRIED = ["class", "element", "shot_scale", "composition", "camera_movement",
-           "camera_angle", "pacing", "lighting", "identity_visibility",
+           "pacing", "lighting", "identity_visibility",
            "subject_salience", "action", "mood", "register", "faction"]
 
 

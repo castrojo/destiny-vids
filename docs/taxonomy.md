@@ -93,7 +93,6 @@ Separate axes, never one overloaded `shot_type`.
   cutaway`. `crowd` sits above `group` — a mass of subjects too many to count
   individually — and it's the largest ensemble slot in the casting model below
   (Axis D): a `crowd` shot seats up to 6 contributor tiles versus 3 for `group`.
-- `camera_angle`: `eye_level, high, low, dutch, overhead, ground_level, UNKNOWN`.
 - `camera_movement` (multi): `static, pan, tilt, push_in, pull_out, track,
   handheld_shaky, orbit, crane, UNKNOWN`. **Deliberately coarse** — dolly vs zoom vs
   track are not cheaply distinguishable, so they're collapsed. `handheld_shaky`
@@ -131,9 +130,6 @@ so anonymity stopped being a scarce resource. What's left:
 - `identity_visibility`: `face_clear, partial_face, face_obscured, back_only,
   silhouette, none`.
 - `character_identifiability`: `explicit, inferred, implied_by_costume, unidentifiable`.
-- `helmet_simplicity`: `simple, ornate, unknown`. Aesthetic preference for clean over
-  ornate helmets. **Feasibility caveat:** not reliably flash-affordable per frame —
-  infer from armor-set metadata or title/description if possible, else `unknown`.
 - `face_count` (int) and `subject_facing_camera` (bool|null) — evidence.
 
 **Independent of shot scale.** A `CU` on a *face-obscured helmet* is

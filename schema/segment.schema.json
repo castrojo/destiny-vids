@@ -154,18 +154,6 @@
       "uniqueItems": true,
       "description": "Compositional type(s) of the shot (multi)."
     },
-    "camera_angle": {
-      "enum": [
-        "eye_level",
-        "high",
-        "low",
-        "dutch",
-        "overhead",
-        "ground_level",
-        "UNKNOWN"
-      ],
-      "description": "Dominant camera angle (single)."
-    },
     "camera_movement": {
       "type": "array",
       "items": {
@@ -229,14 +217,6 @@
         "unidentifiable"
       ],
       "description": "Whether the specific character can be named: explicit = unmistakably a named character; inferred = deducible from context; implied_by_costume = class/armor readable but person unknown; unidentifiable = anonymous."
-    },
-    "helmet_simplicity": {
-      "enum": [
-        "simple",
-        "ornate",
-        "unknown"
-      ],
-      "description": "Visual complexity of the helmet/head silhouette; 'simple' favors substitutability with a stand-in performer."
     },
     "face_count": {
       "type": "integer",
@@ -357,14 +337,12 @@
           "faction",
           "shot_scale",
           "composition",
-          "camera_angle",
           "camera_movement",
           "pacing",
           "lighting",
           "substitutability",
           "identity_visibility",
           "character_identifiability",
-          "helmet_simplicity",
           "face_count",
           "subject_facing_camera",
           "register",

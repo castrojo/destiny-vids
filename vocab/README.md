@@ -63,4 +63,4 @@ shot level, and were produced `manual`ly, by a `heuristic`, or by a `model`.
   computed once at assembly time from already-tagged fields — never hand-tagged,
   never settable by a tagger.
 - **Deliberately coarse where observation is unreliable**: camera movement
-  collapses dolly/zoom/track; `helmet_simplicity` defaults to `unknown`.
+  collapses dolly/zoom/track.

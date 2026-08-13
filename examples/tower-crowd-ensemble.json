@@ -21,7 +21,6 @@
     "crowd",
     "establishing"
   ],
-  "camera_angle": "high",
   "camera_movement": [
     "crane"
   ],
@@ -30,7 +29,6 @@
   "substitutability": 5,
   "identity_visibility": "face_obscured",
   "character_identifiability": "unidentifiable",
-  "helmet_simplicity": "unknown",
   "face_count": 0,
   "subject_facing_camera": false,
   "register": 2,
@@ -104,11 +102,6 @@
       "label_source": "manual",
       "confidence": 0.9
     },
-    "camera_angle": {
-      "source": "observed",
-      "label_source": "manual",
-      "confidence": 0.9
-    },
     "camera_movement": {
       "source": "observed",
       "label_source": "manual",
@@ -138,11 +131,6 @@
       "source": "observed",
       "label_source": "manual",
       "confidence": 0.95
-    },
-    "helmet_simplicity": {
-      "source": "observed",
-      "label_source": "manual",
-      "confidence": 0.4
     },
     "face_count": {
       "source": "observed",

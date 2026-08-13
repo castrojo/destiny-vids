@@ -29,17 +29,6 @@ composition:
     POV:          First-person point of view (includes FPS gameplay).
     cutaway:      Brief insert away from main action.
 
-camera_angle:
-  description: Vertical/oblique camera angle relative to subject.
-  values:
-    eye_level:    Camera at subject eye height.
-    high:         Looking down on subject.
-    low:          Looking up at subject (heroic framing).
-    dutch:        Tilted horizon.
-    overhead:     Directly above (bird's-eye / top-down).
-    ground_level: Camera at ground/floor height.
-    UNKNOWN:      Angle not determinable.
-
 camera_movement:
   # MULTI-VALUED and deliberately COARSE: dolly vs zoom vs tracking are NOT
   # cheaply distinguishable from single clips, so they are collapsed into

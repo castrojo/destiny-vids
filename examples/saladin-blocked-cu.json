@@ -20,7 +20,6 @@
   "composition": [
     "single"
   ],
-  "camera_angle": "eye_level",
   "camera_movement": [
     "push_in"
   ],
@@ -29,7 +28,6 @@
   "substitutability": 2,
   "identity_visibility": "face_obscured",
   "character_identifiability": "explicit",
-  "helmet_simplicity": "ornate",
   "face_count": 0,
   "subject_facing_camera": true,
   "register": 1,
@@ -109,11 +107,6 @@
       "label_source": "heuristic",
       "confidence": 0.85
     },
-    "camera_angle": {
-      "source": "observed",
-      "label_source": "heuristic",
-      "confidence": 0.85
-    },
     "camera_movement": {
       "source": "observed",
       "label_source": "heuristic",
@@ -140,11 +133,6 @@
       "confidence": 0.85
     },
     "character_identifiability": {
-      "source": "observed",
-      "label_source": "heuristic",
-      "confidence": 0.85
-    },
-    "helmet_simplicity": {
       "source": "observed",
       "label_source": "heuristic",
       "confidence": 0.85
