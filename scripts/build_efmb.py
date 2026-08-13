@@ -146,6 +146,68 @@ BED_LEAD_SEC = None  # derived below, from the anchor
 BED_TAIL_SEC = None  # derived below, from the remainder
 
 
+# --- the mapping between source time and film time -------------------------
+# Every mark the owner ever gave for this act was given in FILM time, and the
+# film has moved under all of them: the head lead went 8.564 -> 10.650, run 1's
+# out point moved 6.467 -> 4.017, and the mech and the end cards are gone. A
+# film timecode from an earlier pass therefore points at the wrong frame, and
+# quietly so.
+#
+# SOURCE TIME IS THE INVARIANT. It is a position in a file that has not
+# changed, so a mark recorded against it survives every re-cut that does not
+# remove the frame itself. The two functions below are the only sanctioned way
+# to move between the two clocks; nothing downstream may type a film timecode.
+#
+# The pair is exact, not approximate: film_for_source(source_for_film(t)) == t
+# for any film t inside the picture, and the test suite says so.
+
+class NotInPicture(ValueError):
+    """A source moment that no kept run plays, or a film moment in head/tail."""
+
+
+def picture_offset_for_source(src_sec, runs=None):
+    """Where ``src_sec`` sits in the picture, counting only KEPT time."""
+    elapsed = 0.0
+    for a, b, _ in (RUNS if runs is None else runs):
+        if a <= src_sec < b:
+            return elapsed + (src_sec - a)
+        elapsed += b - a
+    raise NotInPicture(
+        f"source {src_sec:.3f}s is not inside any kept run -- it was cut. "
+        "Nothing may be bound to a frame that does not play.")
+
+
+def film_for_source(src_sec, lead=None, runs=None):
+    """Source seconds -> film seconds. Raises if the frame was cut."""
+    if lead is None:
+        lead = derive_lead(runs)
+    return lead + picture_offset_for_source(src_sec, runs)
+
+
+def source_for_film(film_sec, lead=None, runs=None):
+    """Film seconds -> source seconds. Raises in the head or the tail."""
+    if lead is None:
+        lead = derive_lead(runs)
+    offset = film_sec - lead
+    if offset < 0:
+        raise NotInPicture(
+            f"film {film_sec:.3f}s is in the {lead:.3f}s head -- black, no picture")
+    elapsed = 0.0
+    for a, b, _ in (RUNS if runs is None else runs):
+        span = b - a
+        if offset < elapsed + span:
+            return a + (offset - elapsed)
+        elapsed += span
+    raise NotInPicture(
+        f"film {film_sec:.3f}s is past the last frame of picture "
+        f"({lead + elapsed:.3f}s) -- it is in the tail")
+
+
+def derive_lead(runs=None):
+    """The head lead-in, derived from the sync anchor. Never typed."""
+    return SYNC_ANCHOR_FILM - picture_offset_for_source(SYNC_ANCHOR_SRC, runs)
+
+
 def load_json(path):
     with open(path) as fh:
         return json.load(fh)
@@ -202,19 +264,11 @@ def build():
 
     # --- the head, derived from the music --------------------------------
     # Where does SYNC_ANCHOR_SRC sit in the picture, measuring only kept time?
-    anchor_picture_offset = None
-    elapsed = 0.0
-    for a, b, _ in RUNS:
-        if a <= SYNC_ANCHOR_SRC < b:
-            anchor_picture_offset = elapsed + (SYNC_ANCHOR_SRC - a)
-            break
-        elapsed += b - a
-    assert anchor_picture_offset is not None, (
-        f"sync anchor {SYNC_ANCHOR_SRC} is not inside any kept run -- it was "
-        "cut. Move the anchor to a frame that still plays, or restore the run.")
-
-    # The lead-in IS whatever puts the anchor on the beat. Asserting it rather
-    # than typing it is what keeps the shield on the downbeat if a run moves.
+    # The lead-in IS whatever puts the anchor on the beat. Deriving it rather
+    # than typing it is what keeps the shield on the downbeat if a run moves,
+    # and picture_offset_for_source raises if the anchor has been cut rather
+    # than silently syncing to a frame that no longer plays.
+    anchor_picture_offset = picture_offset_for_source(SYNC_ANCHOR_SRC)
     lead = SYNC_ANCHOR_FILM - anchor_picture_offset
     assert lead >= 0, (
         f"the anchor needs a lead of {lead:.3f}s -- there is more picture "

@@ -1,0 +1,474 @@
+#!/usr/bin/env python3
+"""Build act II's plate manifest -- who is on screen, and when.
+
+    python3 scripts/build_efmb_plates.py            # print the manifest
+    python3 scripts/build_efmb_plates.py --write    # write it
+    python3 scripts/build_efmb_plates.py --check    # CI: committed == generated
+
+WHY THIS SCRIPT EXISTS
+----------------------
+``vocab/casting.yaml`` holds the **copy** -- the words on the card -- and
+``tools/ensemble.py`` assigns anonymous slots by deterministic round-robin.
+Neither can do what act II needs, which is **positional casting**: the owner
+named specific people in specific places in the frame.
+
+    "0:55 left to right, Joseph Sandoval, Ricardo from CERN, Karena Angel"
+
+Round-robin cannot express that, and it must not try -- it would put a real
+person's name on whichever body the rotation happened to land on. So the
+binding of person to shot is authored here, once, and everything else is
+derived.
+
+THE TWO CLOCKS, AND WHY EVERY WINDOW BELOW IS IN SOURCE TIME
+------------------------------------------------------------
+Every mark the owner gave for this act was a FILM timecode, and the film has
+moved under all of them: the head lead went 8.564 -> 10.650, run 1's out point
+moved 6.467 -> 4.017, and the mech and the publisher end cards are gone. His
+``0:55`` now points 0.364 s away from what he meant, and his ``4:50`` by 2.131.
+
+So the windows below are **source** timecodes -- positions in a file that has
+not changed -- and film time is computed by ``build_efmb.film_for_source``.
+Nothing here types a film timecode, and a binding whose frame gets cut raises
+rather than silently sliding onto whatever now occupies that second.
+
+MEASURED, NOT GUESSED
+---------------------
+Every window is a shot boundary from ``ContentDetector(threshold=27)`` over the
+source, and every one was then **looked at** before a name was attached to it.
+That second step is not ceremony. Detection reported the trio as a single
+18.77 s shot, because the sequence is built from dissolves and a dissolve is
+invisible to a content detector -- the same blind spot that let 2.45 s of
+live-action framing narration survive the pass whose whole purpose was removing
+it. Detection proposes; the eye disposes.
+
+WHAT IS DELIBERATELY NOT HERE
+-----------------------------
+- **No invented copy.** Every word comes from ``vocab/casting.yaml`` verbatim.
+  A person the owner named but authored no plate for (``ensemble.placeholders``)
+  renders as a *named placeholder*, never as a credit with a title nobody wrote.
+- **No plate on the burned-in title.** Source 356.500 -> 358.200 carries
+  Bungie's "NEW LEGENDS WILL RISE" across the middle of frame. Nothing is
+  placed there.
+- **No pointer at a body.** A row of names is spread evenly across the frame in
+  the order the owner gave, never positioned to single out a figure -- the rule
+  ``tools/plate.py`` already applies to ensemble rows, for the same reason.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+import build_efmb  # noqa: E402
+
+MANIFEST = REPO_ROOT / "stories" / "02-endless-forms-plates.json"
+ROSTER = REPO_ROOT / "renders" / "roster-2026-08.json"
+
+# --- the authored bindings -------------------------------------------------
+# (source_in, source_out) is the SHOT, measured. `hold` is how long the plate
+# stays up; it may ride past the shot's out point, which is normal for a lower
+# third and is what lets a 1.6 s shot carry a 2.2 s credit.
+
+# The trio. One continuous dissolve sequence, 69.533 -> 88.300 by detection,
+# but the three Guardians only read as three separate figures between ~71.5 and
+# ~75.0: after that the camera pushes in and the hooded Hunter fills the frame
+# alone. So the row goes up inside that window and is gone before the push-in.
+#
+# The ORDER is the owner's, left to right. The x positions are an even spread
+# computed by tools/plate.py, NOT a pointer at each body -- naming the order he
+# gave is honouring the instruction; drawing an arrow at a specific Guardian
+# would claim more than anyone verified.
+TRIO_IN, TRIO_OUT = 72.000, 75.000
+# `position` is the frame third each card sits in, in the owner's order. Three
+# cards at full size would collide across 1920 px, so the row is scaled down --
+# the same lever the reference deck's roll call pulls.
+TRIO_SCALE = 0.62
+TRIO = [
+    ("joseph_sandoval", "left"),
+    ("rochaporto", "center"),
+    ("mara_sov", "right"),
+]
+
+# One person, one shot. Each verified by eye at the frame named in `seen`.
+SOLO = [
+    {
+        "key": "wrkode",
+        "src": (185.233, 188.067),
+        "seen": 185.502,
+        "why": "the lone Hunter walking the Dreadnaught, Ghost at his shoulder",
+    },
+    {
+        "key": "KyleGospo",
+        "src": (335.267, 339.767),
+        "seen": 338.200,
+        # HIS NAME ARRIVES ON THE SLAM. 338.200 is the sync anchor -- the
+        # Sentinel's shield at full extension -- pinned to film 269.700, the
+        # downbeat the full band re-enters on after the breakdown. Deriving the
+        # plate's `at` from the same anchor means the card and the shield and
+        # the drum land together, and stay together if a run ever moves.
+        "at_src": build_efmb.SYNC_ANCHOR_SRC,
+        "why": "the Sentinel raising the Void shield, on the re-entry downbeat",
+    },
+    {
+        "key": "p5",
+        "src": (342.433, 344.000),
+        "seen": 343.500,
+        "why": "the hooded, caped Hunter, blade raised, magenta arc blooming",
+    },
+    {
+        "key": "EyeCantCU",
+        "src": (353.533, 355.167),
+        "seen": 354.600,
+        "why": "the Warlock, arms spread, going off in a wreath of solar fire",
+    },
+]
+
+# The people the owner NAMED for act II but authored no plate copy for
+# (`ensemble.placeholders`). They are credited as named placeholders: the name
+# he gave, and the neutral eyebrow -- no title, no class, no seal, because
+# nobody wrote one. This is the "missing, so omit and record" case, and it is
+# the opposite of inventing the words to fill the row.
+PLACEHOLDERS = [
+    {"key": "dylan_taylor", "src": (147.633, 150.533), "seen": 148.500,
+     "why": "the Titan walking out of the dark"},
+    {"key": "ahmedadan", "src": (171.800, 174.433), "seen": 172.500,
+     "why": "the armoured Guardian with the Ghost"},
+]
+
+# The blueberries -- the month's contributors, in the anonymous slots. Copy is
+# resolved by tools/plate.py's own ensemble path, so a contributor whose
+# identity IS authored gets it verbatim and everyone else gets the generic
+# blueberry plate with the eyebrow their org membership earns. Leads are
+# excluded: castrojo is Cayde-6 and is credited only where Cayde is on screen.
+BLUEBERRY_SHOTS = [
+    {"src": (90.767, 96.500), "seen": 92.500,
+     "why": "the hooded Hunter and his Ghost, close"},
+    {"src": (195.267, 198.967), "seen": 196.500,
+     "why": "two Guardians climbing the stair into the light"},
+    {"src": (233.500, 238.200), "seen": 235.000,
+     "why": "the Guardian reaching out over the neon city"},
+]
+BLUEBERRY_EXCLUDE = {"castrojo"}  # a lead; see the comment above
+
+# Cayde signs off. Source 358.200 -> 360.500 is 2.30 s against a 2.2 s minimum
+# hold, so it fits by a tenth of a second -- DO NOT SHORTEN IT. It is the
+# second-to-last shot: he says it, and then three figures walk into the
+# cathedral light.
+#
+# The line is the OWNER'S, not Bungie's. Bungie's Cayde never said it, so it
+# lives in dialogue/ as owner-authored and is reproduced here; it must never
+# read as recovered source dialogue.
+#
+# THE SPEAKER IS REDACTED, AND ONLY IN THIS ACT. The `cayde_6` binding names
+# Jorge Castro, and that name is correct everywhere else in the programme --
+# he is revealed as Cayde later, so acts I and III-VII are untouched. Here the
+# joke depends on the audience not being told yet, so the pill reads
+# `[ REDACTED ]`. The bracketed form is the owner's own treatment, the same one
+# he authored for `[ p5 ]` and `[ EyeCantCU ]`; it is a redaction of a name
+# this repo already knows, never an invented one.
+CAYDE = {
+    "src": (358.200, 360.500),
+    "seen": 359.000,
+    "why": "the hero pose under the caged Traveler, neon city behind",
+    "redacted_speaker": "[ REDACTED ]",
+    "reveals": "cayde_6",
+}
+
+LEAD_IN = 0.4      # let the cut land before the plate arrives
+MIN_HOLD = 2.2     # below this a plate cannot be read
+SOLO_HOLD = 3.2
+TRIO_HOLD = 2.6
+
+# Spans no plate may be visible over, in SOURCE time.
+#
+# Bungie burns "NEW LEGENDS WILL RISE" across the middle of the frame here. The
+# act removes every other title card in the source -- including one named in
+# build_efmb.REMOVED as "burned-in end title: BECOME LEGEND" -- but this one is
+# welded to picture the act keeps, the end fight, so it cannot be cut without
+# losing the fight. Laying our own credit over the publisher's is the one thing
+# that would make it look deliberate, so the plates clear it instead.
+NO_PLATE_SRC = [
+    (356.500, 358.200, "Bungie's burned-in 'NEW LEGENDS WILL RISE'"),
+]
+
+
+def clamp_hold(at, hold, film_of):
+    """Shorten a plate so it never runs into a no-plate zone.
+
+    Returns None if the shortened plate would be too brief to read -- better no
+    credit than an unreadable one, and the caller reports it rather than
+    quietly dropping somebody.
+    """
+    end = at + hold
+    for src_in, _src_out, _why in NO_PLATE_SRC:
+        zone_start = film_of(src_in)
+        if at < zone_start < end:
+            hold = round(zone_start - at, 3)
+    return hold if hold >= MIN_HOLD else None
+
+
+def load_casting():
+    import yaml
+    with open(REPO_ROOT / "vocab" / "casting.yaml") as fh:
+        return yaml.safe_load(fh)
+
+
+def _titles(casting):
+    return {k: v for k, v in casting["ensemble"]["titles"].items()
+            if k != "description"}
+
+
+def authored_copy(key, casting):
+    """The plate copy for ``key``, verbatim from vocab/casting.yaml.
+
+    Two places hold authored copy and they are not interchangeable: a LEAD's
+    plate lives on its binding (Karena is cast as Mara Sov), and an individual
+    contributor's lives under ``ensemble.titles``. Reproducing, never
+    composing, is the whole rule -- so this raises rather than falling back to
+    generic copy if a key is missing, because a silent fallback would put the
+    blueberry plate on somebody whose identity the owner actually wrote.
+    """
+    titles = _titles(casting)
+    if key in titles:
+        return dict(titles[key])
+    binding = casting.get("leads", {}).get("values", {}).get(key)
+    if binding and binding.get("plate"):
+        return dict(binding["plate"])
+    raise KeyError(
+        f"no authored plate copy for {key!r} in vocab/casting.yaml -- copy is "
+        "reproduced, never composed, so this is a gap for the owner to fill "
+        "rather than something to work around")
+
+
+def placeholder_copy(key, casting):
+    """A named placeholder badge: the owner's name, and nothing invented.
+
+    ``ensemble.placeholders`` is a queue, not copy -- these are people he named
+    with no plate authored. They are still credited, because a missing word is
+    omitted and recorded rather than allowed to block, but every row nobody
+    wrote is simply absent.
+    """
+    entry = casting["ensemble"]["placeholders"][key]
+    generic = casting["ensemble"]["plate"]
+    return {
+        "label": generic.get("label_unknown", "GUARDIAN"),
+        "name": entry["name"],
+        "placeholder": True,
+    }
+
+
+def roster_items(casting):
+    """The month's contributors, minus anyone already credited elsewhere.
+
+    Two exclusions, and both are about not crediting one person twice with two
+    different faces. A LEAD is credited where their character is on screen
+    (castrojo is Cayde-6). A PLACEHOLDER is someone the owner named for this
+    act, so they already have a badge of their own -- letting the roster hand
+    them a second, generic blueberry plate would put the same person on two
+    different Guardians in the same five minutes.
+    """
+    with open(ROSTER) as fh:
+        roster = json.load(fh)
+    named = {p["key"] for p in PLACEHOLDERS}
+    skip = BLUEBERRY_EXCLUDE | named
+    return [c for c in roster["contributors"] if c["login"] not in skip]
+
+
+def blueberry_entry(item, at, dur, casting):
+    """One contributor's credit, resolved the same way tools/plate.py does."""
+    authored = _titles(casting).get(item["login"])
+    if authored:
+        return {"copy_source": "casting", **dict(authored)}
+    copy = casting["ensemble"]["plate"]
+    member = item.get("org_member")
+    label = (copy["label_member"] if member
+             else copy["label"] if member is False
+             else copy["label_unknown"])
+    entry = {"copy_source": "casting", "label": label,
+             "name": item["display_name"]}
+    if copy.get("title"):
+        entry["title"] = copy["title"]
+    return entry
+
+
+def _at(shot_in, film_of):
+    """When the plate arrives: after the cut has landed."""
+    return round(film_of(shot_in) + LEAD_IN, 3)
+
+
+def build():
+    casting = load_casting()
+    plan = build_efmb.build()
+    lead = build_efmb.derive_lead()
+
+    def film_of(src):
+        return build_efmb.film_for_source(src, lead)
+
+    plates = []
+
+    # --- the trio, as one row ---------------------------------------------
+    # Three sequential lower thirds would need 3 x (2.2 + 0.25) = 7.35 s and the
+    # trio only reads as a trio for 3.0 s, so they go up together as a row --
+    # which is also how the reference deck does a roll call.
+    trio_at = _at(TRIO_IN, film_of)
+    trio_dur = round(min(TRIO_HOLD, film_of(TRIO_OUT) - trio_at), 3)
+    assert trio_dur >= MIN_HOLD, (
+        f"the trio row can only hold {trio_dur:.3f}s, below the {MIN_HOLD}s a "
+        "plate needs to be read")
+    for order, (key, where) in enumerate(TRIO):
+        plates.append({
+            "id": f"trio_{key}",
+            "at": trio_at,
+            "dur": trio_dur,
+            "position": where,
+            "scale": TRIO_SCALE,
+            "group": "trio_row",
+            "order": order,
+            "copy_source": "casting",
+            "seen_at_src": TRIO_IN,
+            **authored_copy(key, casting),
+        })
+
+    # --- one person, one shot ---------------------------------------------
+    for b in SOLO:
+        src_in, src_out = b["src"]
+        at = (round(film_of(b["at_src"]), 3) if b.get("at_src")
+              else _at(src_in, film_of))
+        hold = clamp_hold(at, SOLO_HOLD, film_of)
+        assert hold, (
+            f"{b['key']}'s plate at {at:.3f}s cannot clear a no-plate zone and "
+            "still be readable -- move the anchor to another shot")
+        plates.append({
+            "id": f"solo_{b['key']}",
+            "at": at,
+            "dur": hold,
+            "position": "left",
+            "copy_source": "casting",
+            "shot_src": [src_in, src_out],
+            "seen_at_src": b["seen"],
+            "why": b["why"],
+            **authored_copy(b["key"], casting),
+        })
+
+    # --- named placeholders -----------------------------------------------
+    for b in PLACEHOLDERS:
+        src_in, src_out = b["src"]
+        plates.append({
+            "id": f"placeholder_{b['key']}",
+            "at": _at(src_in, film_of),
+            "dur": SOLO_HOLD,
+            "position": "right",
+            "copy_source": "casting",
+            "shot_src": [src_in, src_out],
+            "seen_at_src": b["seen"],
+            "why": b["why"],
+            **placeholder_copy(b["key"], casting),
+        })
+
+    # --- the blueberries ---------------------------------------------------
+    # Deterministic: the roster is walked in its own order against the shot
+    # list in timeline order, so a re-render never reshuffles who played whom.
+    items = roster_items(casting)
+    for i, shot in enumerate(BLUEBERRY_SHOTS):
+        if i >= len(items):
+            break
+        src_in, src_out = shot["src"]
+        item = items[i]
+        plates.append({
+            "id": f"blueberry_{item['login']}",
+            "at": _at(src_in, film_of),
+            "dur": SOLO_HOLD,
+            "position": "right",
+            "shot_src": [src_in, src_out],
+            "seen_at_src": shot["seen"],
+            "why": shot["why"],
+            **blueberry_entry(item, None, None, casting),
+        })
+
+    # --- Cayde's sign-off --------------------------------------------------
+    src_in, src_out = CAYDE["src"]
+    room = round(film_of(src_out) - film_of(src_in), 3)
+    assert room >= MIN_HOLD, (
+        f"Cayde's shot is {room:.3f}s, under the {MIN_HOLD}s the card needs")
+    # The card takes the whole shot up to the minimum hold and no more: at
+    # 2.30 s of room against a 2.2 s hold there is no lead-in to spend, and
+    # riding past the cut would put his line over the cathedral ending.
+    real_name = authored_copy(CAYDE["reveals"], casting)["name"]
+    plates.append({
+        "id": "cayde_signoff",
+        "kind": "chat",
+        "at": round(film_of(src_in), 3),
+        "dur": MIN_HOLD,
+        "copy_source": "dialogue",
+        "shot_src": [src_in, src_out],
+        "seen_at_src": CAYDE["seen"],
+        "why": CAYDE["why"],
+        "speaker": CAYDE["redacted_speaker"],
+        "redacts": real_name,
+        "redaction_scope": "act II only -- he is revealed later in the programme",
+        "text": "I'm so proud of you kids!",
+        "text_source": "owner_supplied",
+    })
+
+    plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))
+
+    return {
+        "_what": (
+            "Act II's plate manifest. GENERATED by "
+            "scripts/build_efmb_plates.py -- never hand-edited. Windows are "
+            "derived from scripts/build_efmb.py (source time -> film time) and "
+            "every word of copy is reproduced verbatim from vocab/casting.yaml."
+        ),
+        "_film_sec": plan["film_sec"],
+        "_bed_lead_sec": plan["bed_lead_sec"],
+        "act": "II",
+        "title": plan["title"],
+        "source_id": plan["source_id"],
+        "plates": plates,
+    }
+
+
+def render_text(manifest):
+    return json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--write", action="store_true", help="write the manifest")
+    ap.add_argument("--check", action="store_true",
+                    help="fail if the committed manifest is out of date")
+    args = ap.parse_args(argv)
+
+    manifest = build()
+    text = render_text(manifest)
+
+    if args.check:
+        if not MANIFEST.exists():
+            print(f"{MANIFEST} is missing -- run --write", file=sys.stderr)
+            return 1
+        if MANIFEST.read_text() != text:
+            print(f"{MANIFEST} is out of date -- regenerate with --write, "
+                  "never hand-resolve", file=sys.stderr)
+            return 1
+        print(f"{MANIFEST.name} is up to date ({len(manifest['plates'])} plates)")
+        return 0
+
+    if args.write:
+        MANIFEST.write_text(text)
+        print(f"wrote {MANIFEST} ({len(manifest['plates'])} plates)")
+        return 0
+
+    for p in manifest["plates"]:
+        end = p["at"] + p["dur"]
+        who = p.get("name") or p.get("speaker", "?")
+        print(f"  {p['at']:7.3f} -> {end:7.3f}  {p['id']:28s}  {who}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
