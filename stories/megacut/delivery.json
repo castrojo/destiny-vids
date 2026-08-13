@@ -41,15 +41,21 @@
    "sources": [
     "stories/04-kat-plates.json",
     "scripts/build_kat.py",
+    "scripts/actbuild.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "c9c6fb55fc9b5d2fb5cc253255ed1a7d5616b330797f86754f1cd68e0eced790"
+   "source_digest": "747160e2380ae9514b43cd50e8681bee0247c129bf28556bea6d9cf80fedc0d7"
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
-   "note": "",
-   "sources": [],
-   "sources_note": "NOT REPO-DRIVEN -- cut in ~/Videos/wolves-natali, no committed inputs at all. Act IV was the same and is no longer (see its note): stories/04-kat-plates.json + scripts/build_kat.py give it a home, and act V wants the same shape. Until it has one, the Nat half of the dictated Kat/Nat round (#118) still has nowhere to land. See #152."
+   "note": "REPO-DRIVEN AS OF #152's act V pass, the same shape act IV got first. The words, the windows and the measured build parameters are committed in stories/05-natali-plates.json and scripts/build_natali.py rebuilds the film from them -- verified against this master: the AUDIO IS BIT-IDENTICAL (same stream MD5) and 676 of 1514 frames are bit-identical, every differing frame falling inside a dialogue-plate window because the pills are re-rendered by tools/plate.py rather than screenshotted from plate.html (worst frame 0.9873). The reveal card and the closing fade are untouched. The nameplate is NOT repo-rendered; see the manifest's `_not_repo_rendered`.",
+   "sources": [
+    "stories/05-natali-plates.json",
+    "scripts/build_natali.py",
+    "scripts/actbuild.py",
+    "vocab/casting.yaml"
+   ],
+   "source_digest": "8db550dc2d92a22fae129e3250ddd3d7460215268e52d0e99c8a82c63a2cc8ee"
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v3.mp4",
@@ -72,7 +78,7 @@
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4",
    "note": "master corrected to -1.1 dBTP by static trim (#82 delivered, pending owner close)",
    "sources": [],
-   "sources_note": "NOT REPO-DRIVEN -- cut in ~/Videos/wolves-directors-cut, no committed inputs at all. The last of the three; act IV now has a builder and act V is next. See #152."
+   "sources_note": "NOT REPO-DRIVEN -- cut in ~/Videos/wolves-directors-cut, no committed inputs at all. The last of the three: acts IV and V now have committed records and a shared builder (scripts/actbuild.py), and act VII wants the same shape. See #152."
   }
  },
  "social": {
