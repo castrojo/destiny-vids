@@ -71,7 +71,18 @@ Two deliberate behaviours, both learned the hard way on 2026-08-13:
   because re-linking it would silently revert the show. (Act II: the #98
   build's only twin lived in `dv-wt/feat-98-act2-overlay`, a worktree whose
   merge deletes it, while the main checkout's `renders/efmb-plated.mp4` was a
-  revision behind.)
+  revision behind. Repaired under #150 by promoting the worktree build onto
+  the durable master; the tool then re-attached the link.)
+- **Location is a hazard, not just freshness.** A master or twin whose only
+  resolution lives inside a git worktree is reported **`ephemeral`** — a
+  distinct state from `conflict`, because the remedy differs: conflict means
+  "decide which content wins", ephemeral means "promote the master to a
+  durable path" (the main checkout's `renders/`, or the act's `~/Videos`
+  project). Detection reads git, not the path string: a `.git` *file* marks a
+  linked worktree, a `.git` *directory* the main checkout. Mtime ordering is
+  irrelevant — a worktree-resident master that is *newer* is still one
+  `git worktree remove` from gone, and `publish` refuses to link from a
+  worktree path at all.
 - **`publish` is the re-link `tools/peaks.py trim` defers to.** `peaks.py`
   corrects a master by `os.replace`ing it with a new inode *on purpose*, so a
   corrected master never silently rewrites its twin — and every such
