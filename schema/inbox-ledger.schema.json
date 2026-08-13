@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destiny-vids.local/schema/inbox-ledger.schema.json",
+  "title": "WhispInboxLedger",
+  "type": "object",
+  "description": "The receipt book for the owner's dictated Whisp notes (see tools/inbox.py and docs/skills/intake.md): one entry per note, recording a content hash, the note's mtime, and what became of the note. Written only by tools/inbox.py — never hand-edited. PRIVACY: the ledger commits a hash, an mtime and a status, never the note's text. `excerpt` is reserved for a short identifying excerpt and stays null until the owner signs off (issue #121, `blocked_on`); do not populate it speculatively.",
+  "additionalProperties": false,
+  "required": ["version", "notes"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Ledger format version."
+    },
+    "notes": {
+      "type": "object",
+      "description": "Note id (the Whisp filename stem) -> receipt.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sha256", "mtime", "status", "excerpt"],
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "SHA-256 of the note content the status was recorded against. A note whose current hash differs was edited after its receipt and is surfaced again by --check."
+          },
+          "mtime": {
+            "type": "string",
+            "description": "The note file's mtime (UTC, ISO 8601) when the entry was written."
+          },
+          "status": {
+            "type": ["string", "null"],
+            "pattern": "^(filed #[0-9]+|landed|superseded|ignored|out-of-scope)$",
+            "description": "null = dictated but never received (the failure this ledger exists to make visible). 'filed #N' = the note became GitHub issue N. 'landed' = the ordered work is in the repo or delivered. 'superseded' = replaced by a later note or cut. 'ignored' = read and deliberately not acted on. 'out-of-scope' = not destiny-vids work."
+          },
+          "excerpt": {
+            "type": ["string", "null"],
+            "description": "Reserved for a short identifying excerpt, pending the owner sign-off recorded in issue #121's blocked_on. Always null until then."
+          }
+        }
+      }
+    }
+  }
+}

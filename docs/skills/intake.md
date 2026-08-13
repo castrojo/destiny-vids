@@ -49,8 +49,11 @@ or dialogue.
 At the **start** of a session that touches owner requests, and at the **end**
 of every session:
 
-1. List notes newer than the last session you know about
-   (`ls -t .../notes/*.md | head`).
+1. `python3 tools/inbox.py --check` — every note it lists has no receipt.
+   `--write` adds newly-dictated notes to the ledger; `--set <id> <status>`
+   records one (`filed #N`, `landed`, `superseded`, `ignored`,
+   `out-of-scope`). To see what is new without the ledger,
+   `ls -t .../notes/*.md | head`.
 2. For each in-scope note, find its issue: search distinctive strings with
    `gh search issues --repo castrojo/destiny-vids "<phrase>"`.
 3. A note with no issue gets one, now — prose quoted verbatim (the owner's
@@ -103,8 +106,13 @@ behind main). The lifecycle:
 ## Verification
 
 ```bash
+python3 tools/inbox.py --check   # every dictated note has a status
 # any in-scope note strings missing from repo and issues?
 grep -o '<distinctive phrase>' -r . --include='*.md' --include='*.json'
 gh search issues --repo castrojo/destiny-vids "<distinctive phrase>"
 git worktree list   # nothing stale
 ```
+
+`--check` is a session ritual, not a CI gate: it fails whenever the owner
+dictates something new, which is exactly what it is for, and exactly why it
+must not gate unrelated PRs.
