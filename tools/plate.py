@@ -2173,6 +2173,24 @@ def render_all(entries, out_dir, picture=None):
     return written
 
 
+def _probe_duration(path, ffmpeg=None):
+    """Seconds of ``path``, for bounding the looped plate inputs.
+
+    Uses the ffprobe beside whichever ffmpeg was resolved, so a containerized
+    toolchain probes the same file it is about to read.
+    """
+    probe = ["ffprobe"]
+    if ffmpeg and ffmpeg[-1].endswith("ffmpeg"):
+        probe = [*ffmpeg[:-1], "ffprobe"]
+    out = subprocess.run(
+        [*probe, "-v", "error", "-show_entries", "format=duration",
+         "-of", "csv=p=0", str(path)], capture_output=True, text=True)
+    try:
+        return float(out.stdout.strip())
+    except ValueError:
+        raise RuntimeError(f"could not read the duration of {path}: {out.stderr}")
+
+
 def burn(video, entries, plates_dir, out_path, ffmpeg=None):
     """Composite every plate onto ``video`` in one ffmpeg pass.
 
@@ -2187,9 +2205,29 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None):
     out_path = Path(out_path).resolve()
     plates_dir = Path(plates_dir).resolve()
 
+    # HOW LONG THE PLATES HAVE TO EXIST FOR.
+    #
+    # A PNG is a ONE-FRAME input. Fed to overlay as-is it reaches EOF almost
+    # immediately, and while `eof_action=repeat` holds the last frame for a
+    # while, it does not hold it for five minutes: a plate gated to t=5 draws
+    # and the identical plate gated to t=269 does not, on the same file, with
+    # the same filtergraph. That is how act II came out fully credited on paper
+    # and completely unplated on screen.
+    #
+    # So each image input is LOOPED for the length of the video. `-loop 1`
+    # alone is an infinite input and the encode never terminates; bounding it
+    # with `-t` makes it finite, so the frame is available at every timestamp
+    # the enable expression might name and the muxer still stops.
+    #
+    # `-framerate 1` is the cheap part: the looped stream is the SAME still
+    # frame at every timestamp, so decoding it 30 times a second buys nothing.
+    # One frame a second cut this burn from ten minutes back to about one.
+    duration = _probe_duration(video, ffmpeg)
+
     cmd = [*ffmpeg, "-nostdin", "-y", "-i", str(video)]
     for e in entries:
-        cmd += ["-i", str(plates_dir / f"plate_{e['id']}.png")]
+        cmd += ["-loop", "1", "-framerate", "1", "-t", f"{duration:.3f}",
+                "-i", str(plates_dir / f"plate_{e['id']}.png")]
 
     steps, last = [], "0:v"
     for i, e in enumerate(entries, start=1):
@@ -2218,6 +2256,11 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None):
     cmd += [
         "-filter_complex", ";".join(steps),
         "-map", f"[{last}]", "-map", "0:a?",
+        # The looped plate inputs are the same length as the picture, so the
+        # muxer has no unambiguous shortest stream to stop at and the output
+        # runs long -- act II came out 318.767 s against a 307.998 s cut.
+        # Naming the length is deterministic where `-shortest` is not.
+        "-t", f"{duration:.3f}",
         "-c:v", "libx264", "-preset", "medium", "-crf", "18",
         "-pix_fmt", "yuv420p", "-c:a", "copy",
         str(out_path),

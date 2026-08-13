@@ -194,6 +194,8 @@ def test_the_burn_filter_carries_no_shell_quotes():
     seen = {}
 
     def fake_run(cmd, **kwargs):
+        if any("ffprobe" in str(part) for part in cmd):
+            return subprocess.CompletedProcess(cmd, 0, "307.998\n", "")
         seen["cmd"] = cmd
         return subprocess.CompletedProcess(cmd, 0, "", "")
 
@@ -209,6 +211,42 @@ def test_the_burn_filter_carries_no_shell_quotes():
     assert "'" not in graph, f"shell quotes in an argv filtergraph: {graph}"
     assert "enable=between(t\\," in graph, (
         f"unquoted commas are argument separators to the filter parser: {graph}")
+
+
+def test_every_plate_input_is_looped_for_the_length_of_the_picture():
+    """REGRESSION, and it shipped: a plate gated late in a long cut never drew.
+
+    A PNG is a ONE-FRAME input. Fed to overlay as-is it EOFs immediately, and
+    `eof_action=repeat` does not hold the frame for five minutes: the identical
+    plate gated to t=5 draws and gated to t=269 does not, same file, same
+    graph. Act II came out fully credited on paper and completely unplated on
+    screen, twice, before anyone looked at the frame instead of the manifest.
+    """
+    import tools.plate as plate
+
+    seen = {}
+
+    def fake_run(cmd, **kwargs):
+        if any("ffprobe" in str(part) for part in cmd):
+            return subprocess.CompletedProcess(cmd, 0, "307.998\n", "")
+        seen["cmd"] = cmd
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    real_run = plate.subprocess.run
+    plate.subprocess.run = fake_run
+    try:
+        plate.burn("in.mp4", [{"id": "x", "at": 269.0, "dur": 2.5}],
+                   "plates", "out.mp4", ffmpeg=["ffmpeg"])
+    finally:
+        plate.subprocess.run = real_run
+
+    cmd = [str(part) for part in seen["cmd"]]
+    assert "-loop" in cmd, "the plate input is a single frame that EOFs at once"
+    # ...and bounded, or the input is infinite and the encode never terminates.
+    assert cmd.count("-t") >= 2, (
+        "each looped input needs -t, and the output needs one too: with every "
+        "input the same length there is no unambiguous shortest stream, and "
+        "act II came out 318.767 s against a 307.998 s cut")
 
 
 def test_the_render_chain_never_uses_filter_complex():

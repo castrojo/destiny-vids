@@ -336,6 +336,12 @@ def test_burn_builds_one_enable_gated_overlay_per_plate(tmp_path):
     captured = {}
 
     def fake_run(cmd, **kwargs):
+        if any("ffprobe" in str(part) for part in cmd):
+            class P:
+                returncode = 0
+                stdout = "20.0\n"
+                stderr = ""
+            return P()
         captured["cmd"] = cmd
 
         class R:

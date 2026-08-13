@@ -89,22 +89,6 @@
       "placeholder": true
     },
     {
-      "id": "placeholder_ahmedadan",
-      "at": 154.434,
-      "dur": 3.2,
-      "position": "right",
-      "copy_source": "casting",
-      "shot_src": [
-        171.8,
-        174.433
-      ],
-      "seen_at_src": 172.5,
-      "why": "the armoured Guardian with the Ghost",
-      "label": "GUARDIAN",
-      "name": "Ahmed Adan",
-      "placeholder": true
-    },
-    {
       "id": "solo_wrkode",
       "at": 161.767,
       "dur": 3.2,
@@ -151,6 +135,22 @@
       "label": "MAINTAINER // GUARDIAN",
       "name": "hanthor",
       "title": "Bluefin Blueberry"
+    },
+    {
+      "id": "placeholder_ahmedadan",
+      "at": 217.701,
+      "dur": 3.2,
+      "position": "right",
+      "copy_source": "casting",
+      "shot_src": [
+        241.167,
+        244.833
+      ],
+      "seen_at_src": 242.5,
+      "why": "three Guardians, supers lit, before the throne",
+      "label": "GUARDIAN",
+      "name": "Ahmed Adan",
+      "placeholder": true
     },
     {
       "id": "solo_KyleGospo",

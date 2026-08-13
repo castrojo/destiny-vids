@@ -150,8 +150,12 @@ SOLO = [
 PLACEHOLDERS = [
     {"key": "dylan_taylor", "src": (147.633, 150.533), "seen": 148.500,
      "why": "the Titan walking out of the dark"},
-    {"key": "ahmedadan", "src": (171.800, 174.433), "seen": 172.500,
-     "why": "the armoured Guardian with the Ghost"},
+    # RE-ANCHORED. He was on 171.800 -> 174.433, which ends under Bungie's
+    # burned-in "BECOME LEGEND" -- the plate went up and the publisher's title
+    # came up with it. Found by looking at the burned film rather than at the
+    # manifest, which is the only place it was ever going to show.
+    {"key": "ahmedadan", "src": (241.167, 244.833), "seen": 242.500,
+     "why": "three Guardians, supers lit, before the throne"},
 ]
 
 # The blueberries -- the month's contributors, in the anonymous slots. Copy is
@@ -207,8 +211,17 @@ TRIO_HOLD = 2.6
 # losing the fight. Laying our own credit over the publisher's is the one thing
 # that would make it look deliberate, so the plates clear it instead.
 NO_PLATE_SRC = [
+    # Bungie burns "BECOME LEGEND" over the cave at the end of run 2, fading in
+    # around 172.5 and holding to the cut. The act removes a DIFFERENT instance
+    # of this same title (build_efmb.REMOVED names 244.833 -> 246.100); this one
+    # is inside picture the act keeps.
+    (172.500, 174.433, "Bungie's burned-in 'BECOME LEGEND'"),
     (356.500, 358.200, "Bungie's burned-in 'NEW LEGENDS WILL RISE'"),
 ]
+
+
+def _zones(film_of):
+    return [(film_of(a), film_of(b - 0.001), why) for a, b, why in NO_PLATE_SRC]
 
 
 def clamp_hold(at, hold, film_of):
@@ -218,11 +231,13 @@ def clamp_hold(at, hold, film_of):
     credit than an unreadable one, and the caller reports it rather than
     quietly dropping somebody.
     """
-    end = at + hold
-    for src_in, _src_out, _why in NO_PLATE_SRC:
-        zone_start = film_of(src_in)
-        if at < zone_start < end:
-            hold = round(zone_start - at, 3)
+    for start, end, why in _zones(film_of):
+        if start <= at <= end:
+            raise ValueError(
+                f"a plate at {at:.3f}s starts inside {why} -- re-anchor it to "
+                "another shot rather than trimming it")
+        if at < start < at + hold:
+            hold = round(start - at, 3)
     return hold if hold >= MIN_HOLD else None
 
 
@@ -419,13 +434,18 @@ def build():
     # --- named placeholders -----------------------------------------------
     for b in PLACEHOLDERS:
         src_in, src_out = b["src"]
+        at = _at(src_in, film_of)
+        hold = clamp_hold(at, SOLO_HOLD, film_of)
+        assert hold, (
+            f"{b['key']}'s badge at {at:.3f}s cannot clear a no-plate zone and "
+            "still be readable -- move the anchor to another shot")
         plates.append({
             "id": f"placeholder_{b['key']}",
-            "at": _at(src_in, film_of),
-            "dur": SOLO_HOLD,
+            "at": at,
+            "dur": hold,
             "position": "right",
             "copy_source": "casting",
-            "shot_src": [src_in, src_out],
+            "shot_src": list(b["src"]),
             "seen_at_src": b["seen"],
             "why": b["why"],
             **placeholder_copy(b["key"], casting),
