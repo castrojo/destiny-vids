@@ -37,7 +37,7 @@ after act I by 312.967 s, which is the worked example of why.
 | **II** | 121.567 | 429.534 | **Endless Forms Most Beautiful** — the live-action trailers, one song end to end | `Prod/02-…` |
 | — | 429.534 | 434.534 | Slide **III** — `Bob Killen` / *Voidwalker Warlock* | rendered |
 | **III** | 434.534 | 594.734 | **mrbobbytables** — August 2026 contributors | `Prod/03-…` |
-| — | 594.734 | 609.734 | Slide **IV–V** — the terminal block, both titles, held 15s | rendered |
+| — | 594.734 | 609.734 | Slide **IV–V** — `BIAS FOR ACTION` / *The Kat and the Nat*, held 15s | rendered |
 | **IV** | 609.734 | 643.734 | **Kat Cosgrove** — Guardian intro | `Prod/04-…` |
 | **V** | 643.734 | 668.992 | **Natali Vlatko** — Guardian arrival, straight off act IV | `Prod/05-…` |
 | — | 668.992 | 673.992 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |

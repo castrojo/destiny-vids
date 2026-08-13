@@ -37,10 +37,16 @@ and its own place on the clock. Seven of the eight acts now play, which is what
 **v0.5** is.
 
 **Acts IV and V share one slide.** The owner's call: their films run 34 s and
-25 s, and two slides held 15 s each announced 59 s of picture. The slide carries
-**both** authored titles at equal weight and both acts keep their numerals and
-their films — it merges the announcement, not the acts. It is one chapter marker
-because a chapter starts on its slide, and there is now one slide.
+25 s, and two slides held 15 s each announced 59 s of picture. Both acts keep
+their numerals and their films — it merges the announcement, not the acts — and
+it is one chapter marker, because a chapter starts on its slide and there is now
+one slide.
+
+The slide's copy is **owner-authored**: *Bias for Action*, subtitled *The Kat
+and the Nat*, over act IV's terminal block. Act V's own title, *Wrong Place,
+Wrong Time, Right Attitude*, stays its name here but **no longer appears on
+screen** — recorded in the manifest's `unresolved`, because losing a title
+somebody wrote should be deliberate.
 
 **One person, one act.** `mrbobbytables` appears once, at III. An earlier pass
 had him twice — as an empty act and as another act's film under his character's
@@ -60,7 +66,7 @@ python3 tools/megacut.py stories/megacut/megacut.json --chapters
 0:00  I. Project Bluefin
 1:56  II. Endless Forms Most Beautiful
 7:09  III. Bob Killen
-9:54  IV–V. Bias for Action / Wrong Place, Wrong Time, Right Attitude
+9:54  IV–V. Bias for Action
 11:08 VI. 7 Days to the Wolves
 18:26 VII. Europa
 ```

@@ -66,7 +66,6 @@
       "at": 594.734,
       "dur": 15.0,
       "act": "IV–V",
-      "label": "Acts IV and V",
       "body": [
         "The Knightly Order of Kubernetes sends a lone titan on a secret mission",
         "Destination: Europa",
@@ -74,11 +73,13 @@
         "TAB Authorization: [ DENIED ]",
         "CNCF Authorization: [ UNAUTHORIZED ]"
       ],
+      "title": "Bias for Action",
+      "subtitle": "The Kat and the Nat",
       "chapters": [
-        "IV   Bias for Action — Kat Cosgrove",
-        "V    Wrong Place, Wrong Time, Right Attitude — Natali Vlatko"
+        "With the CNCF Locked in \"Oh no what do we do?\" mode, two Kubernetes contributors make their own fates.",
+        "Backed by community concensus. No one took notes last meeting so no one knows where to go."
       ],
-      "note": "ONE slide for two acts, owner instruction: 'give kat/nat one slide since those videos are short'. Their films run 34.0s and 25.3s; two 15s slides announced 59.3s of picture, which is what that note is about. It saves 15s of the programme. Both acts KEEP their numerals and their films -- this merges the announcement, not the acts. The two authored titles are carried at EQUAL weight in the contents list rather than one being promoted to the big title row and the other demoted to the subtitle row: they are two act titles the owner wrote for two acts, not a title and its subtitle, and the owner's own instruction for act V was that its slide be act IV's with the title changed -- a matched pair. A variant with 'Bias for Action' big and the other as a subtitle renders fine and is a one-line change if the owner prefers it. The terminal block is act IV's five lines, unchanged and still shared, which is why the two slides collapsed cleanly: they differed only in title."
+      "note": "ONE slide for two acts, owner instruction: 'give kat/nat one slide since those videos are short'. Their films run 34.0s and 25.3s; two 15s slides announced 59.3s of picture, which is what that note is about. It saves 15s of the programme. Both acts KEEP their numerals and their films -- this merges the announcement, not the acts. ALL OF THE COPY BELOW IS OWNER-AUTHORED, verbatim, and it settled the open question of which title leads: 'retitle this chapter \"BIAS FOR ACTION\" with the subtitle \"The Kat and the Nat\"', plus two logline rows. Reproduced as written, including the capital L in 'Locked' and the spelling 'concensus' -- authored copy is reproduced, never silently corrected, and both are flagged in `unresolved` so the owner can decide rather than discover. Act V's authored title, 'Wrong Place, Wrong Time, Right Attitude', is therefore NO LONGER ON SCREEN anywhere -- it is still act V's name in docs/running-order.md, and whether it should survive on the slide is the owner's to say. The terminal block is act IV's five lines, unchanged and still shared, which is why the two slides collapsed cleanly: they differed only in title."
     },
     {
       "id": "act6",
@@ -143,10 +144,16 @@
       "blocked_on": "the owner's eye on the assembled programme."
     },
     {
-      "what": "which title leads the merged act IV-V slide",
-      "detail": "The merged slide carries both authored titles at equal weight in its contents list. If the owner wants the slide to LEAD with one of them -- big title row, the other as the subtitle -- that is a two-field change on the `act4-5` entry (`title` and `subtitle`) and it was deliberately not chosen here, because picking which act's title is the headline is an editorial call about two people's acts.",
+      "what": "act V's title no longer appears on screen",
+      "detail": "The merged slide is titled 'Bias for Action' with the subtitle 'The Kat and the Nat', both owner-authored. 'Wrong Place, Wrong Time, Right Attitude' -- act V's own authored title -- is not printed anywhere in the programme as a result. It remains act V's name in docs/running-order.md and in this manifest's history. Recorded because losing a title the owner wrote is the kind of thing that should be deliberate, and this one may well be.",
       "automatable": "no",
-      "blocked_on": "the owner, if they want a hierarchy rather than a pair."
+      "blocked_on": "the owner, if they want act V's title back on the slide."
+    },
+    {
+      "what": "two spellings on the act IV-V slide, reproduced as the owner wrote them",
+      "detail": "'With the CNCF Locked in ...' carries a mid-sentence capital L, and 'Backed by community concensus' spells consensus with a c. Both are on screen exactly as authored, because this repo reproduces owner copy and does not silently correct it -- a typo fixed without asking is still somebody else's words changed. Say the word and both are a one-line edit in this file.",
+      "automatable": "no",
+      "blocked_on": "the owner confirming or correcting the two spellings."
     }
   ],
   "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | intro 5.000-116.567 | act2 116.567-121.567 | endlessformsmostbeautiful 121.567-429.534 | act3 429.534-434.534 | mrbobbytables 434.534-594.734 | act4-5 594.734-609.734 | kat 609.734-643.734 | nat 643.734-668.992 | act6 668.992-673.992 | 7daystothewolves 673.992-1106.692 | act7 1106.692-1111.692 | europa 1111.692-1221.892. Total 1221.892s (20:21.9). Recomputed 2026-08-12 when acts IV and V were given ONE slide; the programme lost 15s and every stamp after act III moved. Nothing here is typed by hand -- re-derive with `python3 tools/megacut.py stories/megacut/megacut.json --chapters`."
