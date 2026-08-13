@@ -157,6 +157,49 @@ extras only matter for the frame-touching stages: `scenedetect` +
 
 Run both before every commit.
 
+## "A video now" means a video now
+
+**This is rule zero. It outranks everything below it, including quality.**
+
+When the owner asks for a video, the next artifact you produce is a video file
+they can open. Not a plan for one, not a refactor that will make the next one
+better, not an issue explaining why it is hard. **Render something, put it
+where they can watch it, tell them the path — then do the other work.**
+
+The failure this exists to stop is real and it has happened repeatedly here: an
+agent is asked for a quick cut, notices something structurally wrong on the way
+there, fixes the structural thing properly — schema, vocab, tests, docs — and
+surfaces hours later with excellent engineering and **no video**. Every
+individual step was defensible. The whole was a failure, because the owner
+asked for one thing and did not get it.
+
+**The ordering rule, not the doing rule.** Nothing here says ship slop. It says
+the render happens *first* and the improvement happens *after*, in that order,
+even when the improvement is what makes the render good. If the fix genuinely
+must precede the render, say so in one line and give an ETA — do not silently
+spend the afternoon on it.
+
+| Signal | What it means |
+|---|---|
+| "I want a video" / "ship it" / "publish" | Stop. Render. Deliver a path. Then continue. |
+| "quick" / "for iteration" | A rough cut beats a correct cut that does not exist. |
+| An owner asking twice | You already got this wrong once. Deliver before your next tool call. |
+
+**Answer the question that was asked.** "When can I have my video" is answered
+with a **time**, and whether you are still working, in the first line. Not with
+context, not with what you learned, not with an apology. If you do not know the
+time, measure it — an encode's rate is one `stat` a few seconds apart — and
+then answer.
+
+**Never bury the deliverable.** Say the path and the runtime first. Findings,
+corrections and caveats go after, and they go short. Four paragraphs of
+reasoning in front of a file path reads as an excuse whether or not it is one.
+
+**A found problem is an issue, not a detour.** Filing it takes a minute and
+keeps the queue honest; fixing it mid-errand spends the owner's time on
+something they did not ask for. Rule 3 below still binds — never publish a
+wrong credit — but "this cut could be better" is never a reason to withhold it.
+
 ## The three rules that outrank convenience
 
 1. **`clean` is the primary gate, and it must be positively established.** An
