@@ -3,7 +3,7 @@ name: farm
 version: "1.0"
 last_updated: "2026-08-13"
 id: farm
-one_line_purpose: Offload a long encode to the ghost k3s cluster and verify what comes back.
+one_line_purpose: Offload a long encode to the idle k3s cluster and verify what comes back.
 entry_point: docs/skills/farm.md
 category: editing
 mcp_compliance_level: partial
@@ -12,8 +12,8 @@ status: active
 dependencies: []
 tags: [encode, farm, cluster, argo, ffmpeg, rendering]
 description: >-
-  Runs one encode on the ghost cluster instead of the laptop: frame-grid
-  segments in parallel in one Argo pod, stream-copy join, ffprobe
+  Runs one encode on the k3s cluster (exo-0) instead of the laptop:
+  frame-grid segments in parallel in one Argo pod, stream-copy join, ffprobe
   verification, local fallback when the cluster is unreachable.
 metadata:
   type: procedure
@@ -59,7 +59,7 @@ and geometry too), `--keep` (leave the Workflow + PVC for debugging),
 ## How it works (and why)
 
 One input file → N **frame-grid segments** → N parallel ffmpeg processes in
-one pod on `ghost` → `concat -c copy` join. Audio is *not* segmented: chunks
+one pod on `exo-0` → `concat -c copy` join. Audio is *not* segmented: chunks
 are video-only, one continuous audio pass runs beside them, and the join muxes
 the two — per-chunk audio copies left AAC priming seams and non-monotonic DTS
 warnings. This is the megacut's own join trick applied to a single file; the
@@ -73,20 +73,22 @@ of 0 is not evidence (issue #88).
 
 ## Red flags
 
-- **The image is `docker.io/linuxserver/ffmpeg:8.1.2-cli-ls76`, not
+- **The image is `lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76`, not
   `ghcr.io/jrottenberg/ffmpeg`.** The jrottenberg image cannot be pulled on
   this cluster: the zot mirror syncs on *tag* references only (lab ADR 0007,
   so a digest pin 404s), ghcr's jrottenberg repo has no tags past 6.0, and
   `jrottenberg/*` is not in the sync allowlist. Widening the allowlist is a
-  `lab/` change, which the farm must not make.
-- **CPU-only.** No VAAPI for delivery encodes; AMD H.264 VAAPI quality is not
-  delivery grade.
-- **Requests fit the allocatable remainder, not the node.** ghost has ~15 of
-  31.7 CPU already requested by lab workloads, so the pod requests 12 and
-  bursts to `--limit-cpu` 24 when the cluster is idle. A request near the
-  node's size would never schedule; `pod_blocker` fails fast with the
-  scheduler's message if that changes.
-- **Namespace `argo`, service account `argo`, node `ghost`, plain `Workflow`
+  `lab/` change, which the farm must not make. `lscr.io` is allowlisted
+  wholesale and the linuxserver build is the same full non-free build.
+- **CPU-only, and not just for quality.** On 24 cores, libx264 slow beat
+  h264_vaapi on identical input (15.7x vs 13.7x realtime) — and AMD VAAPI
+  quality is not delivery grade anyway. Never request `amd.com/gpu`.
+- **Request low, limit high — that is the house style.** The cluster runs at
+  156–263% limit overcommit. Requesting 24 CPU gets you Pending; requesting 2
+  with a limit of 24 measures 24 cores (`nproc`) inside the pod. The pod runs
+  on `exo-0` (~24 free cores, vs ghost's ~14); `pod_blocker` fails fast with
+  the scheduler's message if the request ever stops fitting.
+- **Namespace `argo`, service account `argo`, node `exo-0`, plain `Workflow`
   objects.** Never a WorkflowTemplate (those are GitOps'd from `lab/` and
   ArgoCD reverts manual edits), never SSH to a node.
 - **Cleanup is automatic** (Workflow + PVC deleted); `--keep` opts out. A

@@ -75,7 +75,7 @@
     {
       "id": "farm",
       "name": "farm",
-      "one_line_purpose": "Offload a long encode to the ghost k3s cluster and verify what comes back.",
+      "one_line_purpose": "Offload a long encode to the idle k3s cluster and verify what comes back.",
       "entry_point": "docs/skills/farm.md",
       "category": "editing",
       "status": "active",
@@ -87,7 +87,7 @@
         "ffmpeg",
         "rendering"
       ],
-      "description": "Runs one encode on the ghost cluster instead of the laptop: frame-grid segments in parallel in one Argo pod, stream-copy join, ffprobe verification, local fallback when the cluster is unreachable.",
+      "description": "Runs one encode on the k3s cluster (exo-0) instead of the laptop: frame-grid segments in parallel in one Argo pod, stream-copy join, ffprobe verification, local fallback when the cluster is unreachable.",
       "version": "1.0",
       "last_updated": "2026-08-13",
       "doc_type": "procedure"
