@@ -115,6 +115,21 @@ VARIANTS = {
         "title": (253, 230, 138, 255),    # #fde68a
         "glow": (250, 204, 21, 140),
     },
+    # Bronze, the third rank. `leader` is already the gold and `trustee` the
+    # silver, so a medal set only needed its lowest step -- owner instruction:
+    # "Rank them with bronze, silver, and gold, make them lower thirds with the
+    # heraldric style". #cd7f32 is the classical bronze, deliberately more
+    # golden than `rust`'s oxide (#c25b20) so the two do not read as the same
+    # metal: rust is a Foundation's herald, bronze is a rank.
+    "bronze": {
+        "border": (205, 127, 50, 140),    # rgb(205 127 50 / 55%) — #cd7f32
+        "accent": (205, 127, 50, 255),    # #cd7f32
+        "label": (231, 178, 124, 255),    # #e7b27c, struck bronze highlight
+        # As `leader`, the rank never recolours the class row.
+        "klass": (203, 213, 245, 255),    # #cbd5f5, as default
+        "title": (222, 164, 110, 255),    # #dea46e
+        "glow": (205, 127, 50, 140),
+    },
     # Oxidised iron, for the Rust Foundation herald. Same geometry and the same
     # closed field set as every other plate — only the chrome changes, so this
     # stays a variant rather than a second kind of card.

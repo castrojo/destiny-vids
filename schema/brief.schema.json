@@ -213,10 +213,11 @@
         "variant": {
           "enum": [
             "leader",
+            "bronze",
             "rust",
             "bazzite"
           ],
-          "description": "Chrome variants, colour only. `leader` is the gold treatment and takes precedence over `trustee`, mirroring the CSS; `rust` is oxidised iron (the Rust Foundation herald, #8); `bazzite` is purple chrome with the Bazzite logo. The same set is valid on a `plate:` block in vocab/casting.yaml."
+          "description": "Chrome variants, colour only. `leader` is the gold treatment and takes precedence over `trustee`, mirroring the CSS; `bronze` is the third rank below gold (`leader`) and silver (`trustee`), and is deliberately more golden than `rust` so the two do not read as the same metal; `rust` is oxidised iron (the Rust Foundation herald, #8); `bazzite` is purple chrome with the Bazzite logo. The same set is valid on a `plate:` block in vocab/casting.yaml."
         }
       }
     },
