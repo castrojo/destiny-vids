@@ -24,18 +24,20 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SEGMENT_PATHS = sorted(glob.glob(str(REPO_ROOT / "segments" / "*.json")))
 VIDEO_PATHS = sorted(glob.glob(str(REPO_ROOT / "videos" / "*.json")))
 TAG_PATHS = sorted(glob.glob(str(REPO_ROOT / "tags" / "*.json")))
+BED_PATHS = sorted(glob.glob(str(REPO_ROOT / "music" / "*.json")))
 
-LABEL_SOURCES = set(
-    (
-        yaml.safe_load((REPO_ROOT / "vocab" / "provenance.yaml").read_text())
-        or {}
-    )["label_source"]["values"]
+PROVENANCE = (
+    yaml.safe_load((REPO_ROOT / "vocab" / "provenance.yaml").read_text()) or {}
 )
+
+LABEL_SOURCES = set(PROVENANCE["label_source"]["values"])
 """Read from vocab/, which is the single source of truth for every enum.
 
 Hardcoding the three values here would create a second copy that drifts from
 the first -- the exact failure this file exists to catch.
 """
+
+USAGE_CLASSES = set(PROVENANCE["usage_class"]["values"])
 
 
 def _validator(name):
@@ -64,6 +66,51 @@ def test_committed_video_matches_the_schema(path):
     assert not errors, "\n".join(
         f"{'/'.join(str(p) for p in e.path)}: {e.message}" for e in errors
     )
+
+
+@pytest.mark.parametrize("path", BED_PATHS, ids=lambda p: Path(p).stem)
+def test_committed_bed_matches_the_schema(path):
+    # Bed records had no schema until 2026-08-13, so `tools/bed.py measure`
+    # accepted any string as --usage-class and nothing ever re-read it. That is
+    # how a rights bucket stops meaning anything.
+    errors = sorted(_validator("bed.schema.json").iter_errors(_load(path)),
+                    key=lambda e: list(e.path))
+    assert not errors, "\n".join(
+        f"{'/'.join(str(p) for p in e.path)}: {e.message}" for e in errors
+    )
+
+
+@pytest.mark.parametrize("path", BED_PATHS, ids=lambda p: Path(p).stem)
+def test_bed_usage_class_is_in_the_vocabulary(path):
+    # The schema's enum and vocab/provenance.yaml are two copies of one list.
+    # This asserts they agree, the way the segment axes already do.
+    record = _load(path)
+    assert record["usage_class"] in USAGE_CLASSES, (
+        f"{record['usage_class']!r} is not in vocab/provenance.yaml: "
+        f"{sorted(USAGE_CLASSES)}"
+    )
+
+
+@pytest.mark.parametrize("path", BED_PATHS, ids=lambda p: Path(p).stem)
+def test_an_attributed_bed_carries_its_credit_verbatim(path):
+    # CC BY is not CC0. The licence is conditional on a credit, so a record
+    # that claims the licence without carrying the credit claims a permission
+    # it does not have -- and the credit must also be reproduced where a viewer
+    # can see it, which is ATTRIBUTIONS.md.
+    record = _load(path)
+    if record["usage_class"] != "cc_by_4_0":
+        return
+    credit = record.get("attribution")
+    assert credit, (
+        f"{Path(path).stem} is CC BY 4.0 but carries no `attribution` string. "
+        "Attribution is the whole condition of the licence."
+    )
+    attributions = (REPO_ROOT / "ATTRIBUTIONS.md").read_text(encoding="utf-8")
+    for line in (ln.strip() for ln in credit.splitlines() if ln.strip()):
+        assert line in attributions, (
+            f"ATTRIBUTIONS.md is missing a required credit line for "
+            f"{Path(path).stem}: {line!r}"
+        )
 
 
 @pytest.mark.parametrize("path", TAG_PATHS, ids=lambda p: Path(p).stem)

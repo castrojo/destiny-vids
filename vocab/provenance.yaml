@@ -25,8 +25,20 @@ confidence:
   range: [0.0, 1.0]
 
 usage_class:
-  description: Copyright/usage classification of the underlying footage.
+  description: >
+    Copyright/usage classification of the underlying asset — footage, or a
+    music bed. This axis exists so an asset can say it is CLEARED, not only
+    that it is somebody else's. Until 2026-08-13 it held exactly one value, so
+    the index had no way to record a track whose licence already permits the
+    use, and a cleared asset kept being written up as a rights block.
   values:
     third_party_copyrighted: >
       Bungie-owned footage indexed for non-infringing reference/retrieval;
       timestamps are returned, not the footage itself.
+    cc_by_4_0: >
+      Creative Commons Attribution 4.0. Commercial use, sync and
+      redistribution are all permitted; attribution is the only condition and
+      is NOT optional. A record carrying this value must have its required
+      credit string reproduced verbatim in ATTRIBUTIONS.md. Not CC0, and not
+      a reason to stop: choosing among assets that already carry this value is
+      taste, not a licensing decision.

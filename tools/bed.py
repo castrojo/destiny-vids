@@ -60,6 +60,20 @@ MUSIC_DIR = REPO_ROOT / "music"
 DEFAULT_BEATS_PER_BAR = 4
 
 
+def usage_classes():
+    """The legal rights buckets, read from vocab/ rather than hardcoded here.
+
+    ``vocab/`` is the single source of truth for every enum (``AGENTS.md``), and
+    a bed record used to be the one place that opted out: ``--usage-class`` was
+    free text, so a typo -- or a value nobody had defined -- was written to disk
+    and never re-read.
+    """
+    import yaml
+
+    doc = yaml.safe_load((REPO_ROOT / "vocab" / "provenance.yaml").read_text())
+    return sorted((doc or {})["usage_class"]["values"])
+
+
 # --- timecodes --------------------------------------------------------------
 
 def parse_tc(value):
@@ -643,6 +657,11 @@ def main(argv=None):
     m.add_argument("--title", default="")
     m.add_argument("--artist", default="")
     m.add_argument("--usage-class", default="third_party_copyrighted")
+    m.add_argument("--attribution",
+                   help="the credit string the licence requires, verbatim. "
+                        "Required for an attribution licence such as "
+                        "cc_by_4_0, and it must also appear in "
+                        "ATTRIBUTIONS.md.")
     m.add_argument("--rights-note", default="")
     m.add_argument("--beats-per-bar", type=int, default=DEFAULT_BEATS_PER_BAR)
     m.add_argument("--beat-multiple", type=int, default=1,
@@ -673,6 +692,14 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     if args.cmd == "measure":
+        allowed = usage_classes()
+        if args.usage_class not in allowed:
+            ap.error(f"--usage-class {args.usage_class!r} is not in "
+                     f"vocab/provenance.yaml: {allowed}")
+        if args.usage_class == "cc_by_4_0" and not args.attribution:
+            ap.error("cc_by_4_0 requires --attribution: the licence permits "
+                     "the use only on condition of the credit, so a record "
+                     "without one claims a permission it does not have.")
         media = Path(args.media)
         grid = analyze_grid(media, beats_per_bar=args.beats_per_bar,
                             beat_multiple=args.beat_multiple,
@@ -689,6 +716,8 @@ def main(argv=None):
             "grid": grid,
             "excisions": [],
         }
+        if args.attribution:
+            record["attribution"] = args.attribution
         out = Path(args.out)
         dest = out / f"{args.id}.json" if out.is_dir() or not out.suffix else out
         save_record(record, dest)

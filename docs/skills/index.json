@@ -199,6 +199,9 @@
       "tags": [
         "music",
         "bed",
+        "rights",
+        "attribution",
+        "insert-track",
         "tempo",
         "downbeat",
         "excision",
@@ -212,7 +215,7 @@
         "insert-headroom",
         "source-gain"
       ],
-      "description": "Covers bed records, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a master over 0 dBTP. Use when scoring a cut, pausing the song for a moment of source audio, or supporting a second recording.",
+      "description": "Covers bed records and their rights buckets, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a second track over that pause. Use when scoring a cut, pausing the song, or clearing and crediting a track.",
       "version": "2.0",
       "last_updated": "2026-08-13",
       "doc_type": "procedure"

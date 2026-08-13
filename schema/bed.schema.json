@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/castrojo/destiny-vids/schema/bed.schema.json",
+  "title": "Music bed record",
+  "description": "A record in music/<bed_id>.json. To a track what videos/<video_id>.json is to a source video: provenance plus measurements, never the media. Until 2026-08-13 bed records had no schema at all, so tools/bed.py's free-text --usage-class was never checked against vocab/provenance.yaml -- the same class of drift tests/test_index_integrity.py exists to catch for segments and videos.",
+  "type": "object",
+  "required": [
+    "bed_id",
+    "media_filename",
+    "title",
+    "artist",
+    "usage_class",
+    "source_rights_note",
+    "duration_sec",
+    "grid"
+  ],
+  "properties": {
+    "bed_id": {
+      "type": "string",
+      "pattern": "^bed_[a-z0-9_]+$",
+      "description": "Stable identifier, referenced by a shotlist's `bed` field."
+    },
+    "media_filename": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The file in media/, which is gitignored. The record travels; the audio never does."
+    },
+    "source_url": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artist": {
+      "type": "string",
+      "minLength": 1
+    },
+    "usage_class": {
+      "enum": ["third_party_copyrighted", "cc_by_4_0"],
+      "description": "Rights bucket, and it must agree with vocab/provenance.yaml -- tests assert the two match. `cc_by_4_0` means the licence already permits this use and attribution is the only condition; it is a record that the asset is CLEARED, which is the thing this index previously could not say."
+    },
+    "source_rights_note": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable rights note. For cc_by_4_0 it must say where the mandatory credit is reproduced."
+    },
+    "attribution": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The credit string the licence requires, reproduced verbatim. Required for cc_by_4_0. This is reproduced copy, not authored copy: the licensor specifies the wording, so it is never paraphrased, reformatted or shortened."
+    },
+    "duration_sec": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "grid": {
+      "type": "object",
+      "required": ["tempo_bpm", "beats_per_bar", "bar_sec", "beats"],
+      "properties": {
+        "detected_tempo_bpm": {"type": "number"},
+        "beat_multiple": {"type": "integer", "minimum": 1},
+        "beat_interval_sec": {"type": "number"},
+        "tempo_bpm": {"type": "number", "exclusiveMinimum": 0},
+        "beats_per_bar": {"type": "integer", "minimum": 1},
+        "bar_sec": {"type": "number", "exclusiveMinimum": 0},
+        "downbeat_phase": {"type": "integer", "minimum": 0},
+        "downbeat_strength": {"type": "array", "items": {"type": "number"}},
+        "first_beat_sec": {"type": "number"},
+        "beats": {"type": "array", "items": {"type": "number"}, "minItems": 1}
+      }
+    },
+    "excisions": {
+      "type": "array",
+      "description": "Bar-snapped sections removed from the track, in source time.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "start_sec": {"type": "number"},
+          "end_sec": {"type": "number"},
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "anchors": {
+      "type": "object",
+      "description": "Named moments in the track, preferred over literal timecodes in a builder."
+    },
+    "source_format": {
+      "type": "string",
+      "description": "The delivery rung the audio came from, when it matters -- see the audio-quality-tenet skill."
+    },
+    "spectral_cutoff_hz": {"type": "number"},
+    "spectral_note": {"type": "string"},
+    "notes": {"type": "string"}
+  }
+}

@@ -135,6 +135,15 @@ SILENCE_LEN = 1.000        # A: the held beat of realization -- black, silent
 SLIDE_LEN = 4.000          # B: "The CNCF Ambassadors would like a moment."
 PLATE_LEN = 4.000          # C: "Introducing ..." -> Cortney Nickerson's plate
 
+# The hold music for B and C. CC BY 4.0 (Kevin MacLeod / Incompetech): the
+# licence permits commercial use, sync and redistribution, and attribution is
+# its only condition -- carried verbatim in ATTRIBUTIONS.md and in
+# music/bed_local_forecast_slower.json, which the suite checks agree.
+# HOLD_MUSIC_IN is a SOURCE clock: past the intro flourish, into the steady
+# lounge. The music is cut off dead by the explosion, which is the joke.
+HOLD_MUSIC_ID = "bed_local_forecast_slower"
+HOLD_MUSIC_IN = 6.500
+
 # D, the clip itself, SOURCE clock in the gameplay trailer. Issue #104 as
 # written said 43.0 -> 51.0; the owner's own comment on the issue corrects
 # it -- 51.0 is mid-combat and 53.470 is the cut, so the literal range would
@@ -370,7 +379,7 @@ class Timeline:
         self._push(shot, dur, audio)
         return shot
 
-    def card(self, still, dur, beat, audio="bed"):
+    def card(self, still, dur, beat, audio="bed", audio_from=None):
         shot = {
             "segment_id": f"card_{len(self.shots):03d}",
             "still": str(still),
@@ -378,6 +387,8 @@ class Timeline:
             "beat": beat,
             "audio": audio,
         }
+        if audio_from is not None:
+            shot["audio_from"] = audio_from
         self._push(shot, dur, audio)
         return shot
 
@@ -522,14 +533,24 @@ def build():
            "anything appears (issue #104)", audio="silent")
     # B -- the Ambassadors' slide. Copy owner-authored in #104 and reproduced
     # VERBATIM; the CNCF mark itself is rights-blocked, so the slide is text
-    # only. `audio="hold"` is the hold-music slot: silent until the owner
-    # clears a track (licensing -- one of the two things that stop work), and
-    # recorded in `unresolved` in the shotlist with a TODO(owner).
+    # only. `audio="hold"` is the hold-music slot, and it now CARRIES A TRACK:
+    # Local Forecast - Slower, CC BY 4.0 (Kevin MacLeod / Incompetech).
+    # Commercial use, sync and redistribution are all permitted; attribution is
+    # the only condition and is reproduced verbatim in ATTRIBUTIONS.md and in
+    # music/bed_local_forecast_slower.json.
+    #
+    # The slot was left silent "until a track is cleared". Four cleared tracks
+    # had already been found and verified on #104 -- picking between assets
+    # that are ALREADY cleared is taste, not a licensing decision, and it never
+    # blocked anything. See AGENTS.md, "A rights DECISION blocks. A rights
+    # CHOICE does not."
     t.card(interruption("b-ambassadors", "INTERRUPTION B", "slide missing"),
            SLIDE_LEN,
            "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' "
-           "(owner-authored, verbatim; hold-music slot, silent until a track "
-           "is cleared -- issue #104)", audio="hold")
+           "(owner-authored, verbatim; hold music: Local Forecast - Slower, "
+           "CC BY 4.0, credited in ATTRIBUTIONS.md)", audio="hold",
+           audio_from={"video_id": HOLD_MUSIC_ID,
+                       "start_sec": HOLD_MUSIC_IN})
     # C -- introducing Cortney Nickerson. Her Guardian identity is OWNER-
     # AUTHORED (issue #90, already on screen in act I) and reproduced
     # verbatim, 'Weilder' and all; the class row stays OMITTED, exactly as in
@@ -539,7 +560,9 @@ def build():
            PLATE_LEN,
            "III. INTERRUPTION C -- Introducing Cortney Nickerson, her "
            "authored #90 identity verbatim with the class row omitted, as in "
-           "act I (hold-music slot)", audio="hold")
+           "act I (hold music continues)", audio="hold",
+           audio_from={"video_id": HOLD_MUSIC_ID,
+                       "start_sec": HOLD_MUSIC_IN})
     # D -- the clip, with its OWN effects and score: the polite hold music is
     # smashed out by the explosion. That is the joke, and it is why #95's
     # with-music mix is no longer a defect. SOURCE clock 43.000 -> 53.470 --
@@ -620,16 +643,6 @@ def main():
                 "interruption (issue #104) is silent/hold/source beats that "
                 "are all free to the song.",
         "unresolved": [
-            "HOLD MUSIC, TODO(owner): interruption beats B and C (9.0 s of "
-            "wall time) carry audio='hold' -- the elevator-music slot. No "
-            "cleared hold-music asset exists on this machine and picking a "
-            "track is a licensing decision (rights stop work; they cannot be "
-            "un-done after publishing), so the slot ships SILENT and "
-            "recorded rather than filled with an unlicensed track. When a "
-            "track is cleared: give both shots audio_from={video_id, "
-            "start_sec} in that source's own clock -- tools/audiomix.py "
-            "already wires hold regions, though an audio-only container "
-            "will need an extension added to tools/render.py's MEDIA_EXTS.",
             "CNCF MARK, TODO(owner): the interruption slide reproduces only "
             "the owner-authored LINE ('The CNCF Ambassadors would like a "
             "moment.'); the CNCF logo/mark is not used because the rights to "

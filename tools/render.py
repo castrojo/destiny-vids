@@ -37,7 +37,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from tools import peaks  # noqa: E402
 
-MEDIA_EXTS = (".mp4", ".mkv", ".webm", ".mov")
+MEDIA_EXTS = (".mp4", ".mkv", ".webm", ".mov", ".wav", ".flac", ".m4a")
 
 # Common intermediate format. Every clip is normalized to this so the concat
 # demuxer can join them without re-muxing mismatched streams.

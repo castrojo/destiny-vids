@@ -198,7 +198,8 @@ def test_plan_rejects_a_disagreeing_offset(cut):
 
 def test_filter_delays_each_bed_piece_to_its_wall_position(cut):
     regions = plan_regions(cut["shots"], cut["bed_offset_sec"])
-    graph = build_filter(regions, bed_gain_db=-3.5)
+    graph = build_filter(regions, bed_gain_db=-3.5,
+                         audio_inputs={"bed_local_forecast_slower": 2})
     assert "adelay=0|0" in graph
     assert "volume=-3.5dB" in graph
     # The source is muted under the bed, never mixed with it.
@@ -371,20 +372,39 @@ def test_cortney_is_introduced_with_her_authored_copy(cut):
     assert "Cortney Nickerson" in beats[3]["beat"]
 
 
-def test_the_hold_music_slot_is_empty_and_recorded(cut):
-    """No cleared hold-music asset exists, and music is a licensing decision
-    -- so the slot ships silent, and the gap is recorded where the next
-    person trips over it (degrade, never block; never guess past a rights
-    decision)."""
+def test_the_hold_music_is_cleared_and_credited(cut):
+    """The slot carries a track, and the track carries its licence.
+
+    This test used to assert the opposite -- that the slot ships EMPTY, because
+    "music is a licensing decision". It is not, when the track is already
+    cleared. Four CC BY 4.0 tracks had been found and verified before the slot
+    was built silent; choosing between assets that are already cleared is
+    taste, and it stalled the beat for a day. See AGENTS.md, "A rights
+    DECISION blocks. A rights CHOICE does not."
+
+    What still binds is the licence's CONDITION, which is checkable and is
+    checked here: CC BY is not CC0.
+    """
+    import json as _json
+
     hold = [s for s in cut["shots"] if s["audio"] == "hold"]
     assert hold, "the hold-music slot vanished -- B and C should carry it"
+    names = set()
     for shot in hold:
-        assert not shot.get("audio_from"), (
-            "an unlicensed track is not recoverable by a revert; the slot "
-            "stays empty until the owner clears one")
-    assert any("HOLD MUSIC" in u and "TODO(owner)" in u
-               for u in cut["unresolved"]), (
-        "the empty slot must be recorded in unresolved with a TODO(owner)")
+        assert shot.get("audio_from"), (
+            "the slot is empty again -- a cleared track exists, so silence "
+            "here is a regression, not caution")
+        names.add(shot["audio_from"]["video_id"])
+    assert len(names) == 1, "one track, one licence to satisfy"
+
+    record = _json.loads(
+        (REPO / "music" / f"{names.pop()}.json").read_text())
+    assert record["usage_class"] == "cc_by_4_0"
+    assert record["attribution"], "CC BY without a credit is not CC BY"
+    attributions = (REPO / "ATTRIBUTIONS.md").read_text()
+    for line in (l.strip() for l in record["attribution"].splitlines()
+                 if l.strip()):
+        assert line in attributions, f"credit line missing: {line!r}"
 
 
 def test_plate_slots_are_flagged_for_the_nameplate_pass(cut):
