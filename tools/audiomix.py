@@ -17,6 +17,21 @@ advances wall and **not** bed. Everything else follows from that -- including
 the fact that a musical with a pause in it is longer than its own song, which
 is why every anchor in the builder is asserted against bed time.
 
+Two more non-bed dispositions exist for the interruption (issue #104), and
+they are different promises, not synonyms:
+
+  * ``silent`` -- a deliberate silence, forever. The picture's own audio is
+    muted and nothing replaces it (the held beat before the slide appears).
+  * ``hold`` -- the hold-music slot. Silent TODAY, because no cleared track
+    exists on this machine and music is a licensing decision, which is one of
+    the two things that stop work here. When the owner picks one it is wired
+    in with ``audio_from``, exactly like a source swap. The kind exists so
+    that the slot is a recorded, greppable place rather than a silence
+    nobody can tell apart from the deliberate one beside it.
+
+A shot carrying any other ``audio`` value is an error, not a bed shot: a typo
+must fail loudly, because the bed-clock arithmetic is load-bearing.
+
     plan = plan_regions(shots, bed_offset=20.166)
     mux(video, bed_wav, plan, out="cut.mp4", bed_gain_db=-3.5)
 
@@ -33,6 +48,11 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+#: Non-bed dispositions (see the module docstring). ``source`` may carry
+#: ``audio_from``; ``hold`` is the slot that will, once a track is cleared;
+#: ``silent`` never does.
+NON_BED_KINDS = ("source", "silent", "hold")
+
 
 def plan_regions(shots, bed_offset=0.0):
     """Walk a cut list and return its alternating source/bed regions.
@@ -41,25 +61,35 @@ def plan_regions(shots, bed_offset=0.0):
     shots before it must be marked ``audio: "source"`` and are what plays
     instead. Regions are merged, so a run of twenty bed shots is one region.
 
-    A source shot may carry ``audio_from`` -- ``{"video_id", "start_sec"}``,
+    A non-bed shot may carry ``audio_from`` -- ``{"video_id", "start_sec"}``,
     the start in THAT source's own clock -- when what is heard is not the
-    picture's own audio (issue #95: the pause's picture is the gameplay
-    trailer, but its mix carries the score, so the SFX-only audio comes from
-    another upload of the same moment). Source regions merge only when their
-    ``audio_from`` agrees; a bed shot carrying one is an error, because it
-    would never be heard.
+    picture's own audio. That is how a cleared hold-music track will reach
+    the ``hold`` regions (issue #104; the slot is silent until the owner
+    picks one). Regions merge only when kind AND ``audio_from`` agree; a
+    ``bed`` or ``silent`` shot carrying one is an error, because it would
+    never be heard there.
     """
     regions = []
     wall = 0.0
     bed = 0.0
     for shot in shots:
         dur = float(shot["duration"])
-        kind = "source" if shot.get("audio") == "source" else "bed"
-        audio_from = shot.get("audio_from")
-        if audio_from is not None and kind != "source":
+        audio = shot.get("audio") or "bed"
+        if audio == "bed":
+            kind = "bed"
+        elif audio in NON_BED_KINDS:
+            kind = audio
+        else:
             raise ValueError(
-                f"{shot.get('beat', '?')!r}: audio_from on a bed shot would "
-                "never be heard -- the bed plays there")
+                f"{shot.get('beat', '?')!r}: unknown audio disposition "
+                f"{audio!r} -- expected one of 'bed', {', '.join(NON_BED_KINDS)}. "
+                "An unrecognised value must not silently become bed time: the "
+                "bed clock is load-bearing.")
+        audio_from = shot.get("audio_from")
+        if audio_from is not None and kind not in ("source", "hold"):
+            raise ValueError(
+                f"{shot.get('beat', '?')!r}: audio_from on a {kind!r} shot "
+                "would never be heard -- nothing plays there")
         if (regions and regions[-1]["kind"] == kind
                 and regions[-1].get("audio_from") == audio_from):
             regions[-1]["wall_end"] += dur
@@ -70,7 +100,7 @@ def plan_regions(shots, bed_offset=0.0):
             if kind == "bed":
                 r["bed_start"] = bed
                 r["bed_end"] = bed + dur
-            elif audio_from is not None:
+            if audio_from is not None:
                 r["audio_from"] = audio_from
             regions.append(r)
         wall += dur
@@ -115,7 +145,9 @@ def resolve_audio_inputs(regions, media_dir=None):
         if path is None:
             raise ValueError(
                 f"{vid!r}: audio_from names a source that is not in "
-                f"{media_dir} -- fetch it first (issue #95 records how)")
+                f"{media_dir} -- fetch it first. NOTE: resolve_media knows "
+                "only video containers; an audio-only hold-music track "
+                "(issue #104) will need an extension added there too.")
         paths[vid] = path
     return paths
 
@@ -153,11 +185,13 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0,
         parts.append(chain)
         labels.append(lab)
 
-    # Source regions whose audio is another file's: the picture is muted there
-    # too, and the named source plays instead -- trimmed in ITS OWN clock
-    # (audio_from.start_sec) and delayed to the region's wall position.
+    # Non-bed regions whose audio is another file's: the picture is muted
+    # there too, and the named source plays instead -- trimmed in ITS OWN
+    # clock (audio_from.start_sec) and delayed to the region's wall position.
+    # This is also how a cleared hold-music track will play under the
+    # interruption's `hold` regions (issue #104).
     for j, r in enumerate(x for x in regions
-                          if x["kind"] == "source" and x.get("audio_from")):
+                          if x["kind"] != "bed" and x.get("audio_from")):
         lab = f"s{j}"
         start = float(r["audio_from"]["start_sec"])
         dur = r["wall_end"] - r["wall_start"]
@@ -171,8 +205,12 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0,
         parts.append(chain)
         labels.append(lab)
 
+    # The picture's own track is audible ONLY in a source region playing its
+    # own audio. Bed regions mute it; silent and hold regions mute it too --
+    # a deliberate silence is only silence if the picture is muted there, and
+    # the hold slot is silent until it carries an audio_from of its own.
     muted = [r for r in regions
-             if r["kind"] == "bed" or r.get("audio_from")]
+             if r["kind"] != "source" or r.get("audio_from")]
     mute = "+".join(
         f"between(t,{r['wall_start']:.6f},{r['wall_end']:.6f})" for r in muted)
     src = "[0:a]"

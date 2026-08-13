@@ -2,14 +2,15 @@
   "_what": "Act VI's tail plates -- the Cayde-6 reveal and the three gold credits that follow it. AUTHORED, not derived: every window below is an owner mark from the 2026-08-13 brief, converted from megacut time to act VI FILM time and then CONFIRMED ON AN EXTRACTED FRAME before a name was attached to it. Copy is reproduced verbatim from that brief.",
   "_clock": "The brief's marks are MEGACUT time. Act VI film = megacut - 673.992 (tools/megacut.py --locate agrees: 17:37 -> VI @ 6:23.041). Nothing here is a film timecode the owner typed, and nothing here was converted twice.",
   "_why_here": "Act II plates Jorge Castro as `[ REDACTED ]` with the note 'act II only -- he is revealed later in the programme'. This is that reveal: the programme withholds his name for sixteen minutes and pays it off on Cayde-6 walking out of the fog.",
-  "_film_sec": 432.733,
+  "_film_sec": 443.463,
+  "_shifted": "2026-08-13, issue #104: every `at` below moved +10.811 s ACT-FILM time. The interruption (19.470 s: 1.0 silent + 4.0 slide + 4.0 plate + the clip at 10.470) replaced the 8.659 s pause at bed 322.200, and every window here is after it, so the shots these plates are anchored to play 10.811 s later in the film. The windows themselves are unchanged; the frames they were verified against are the same frames, at the new offsets. Bed time is untouched -- the pause consumes no bed time.",
   "act": "VI",
   "title": "7 Days to the Wolves",
   "source_id": "prod_06_7daystothewolves",
   "plates": [
     {
       "id": "cayde_reveal_castrojo",
-      "at": 382.7,
+      "at": 393.511,
       "dur": 3.4,
       "position": "left",
       "copy_source": "brief",
@@ -32,7 +33,7 @@
     {
       "id": "cayde_narration",
       "kind": "title",
-      "at": 386.3,
+      "at": 397.111,
       "dur": 4.5,
       "copy_source": "brief",
       "shot_film": [
@@ -53,7 +54,7 @@
     },
     {
       "id": "gold_kelsey_hightower",
-      "at": 391.008,
+      "at": 401.819,
       "dur": 3.6,
       "position": "left",
       "copy_source": "brief",
@@ -76,7 +77,7 @@
     },
     {
       "id": "gold_brian_ketelsen",
-      "at": 395.008,
+      "at": 405.819,
       "dur": 1.8,
       "position": "left",
       "copy_source": "brief",
@@ -94,7 +95,7 @@
     },
     {
       "id": "gold_angie_jones",
-      "at": 397.008,
+      "at": 407.819,
       "dur": 1.85,
       "position": "left",
       "copy_source": "brief",
