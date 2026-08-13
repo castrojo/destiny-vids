@@ -538,7 +538,8 @@
    412.432834,
    413.222313,
    414.011791
-  ]
+  ],
+  "downbeat_phase_evidence": "audited under #89: corroborated at 0. Three section events measured from the audio in the act VI pass -- the gallop at 182.834s, the flute entry at 259.390s and the HOWL slam at 279.661s -- each land on a residue-0 beat within 0.2ms, and the strength vector reads as a backbeat under phase 0 (positions 1+3 average 3.66 against 3.41 for 0+2)."
  },
  "excisions": [],
  "source_format": "opus 48kHz stereo (yt-dlp format 774), decoded once to pcm_s24le at native rate",

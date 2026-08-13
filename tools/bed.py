@@ -15,6 +15,16 @@ reproducible and keeps the whole suite offline -- `librosa` is an optional
 dependency, needed only to *create* a record, exactly as `scenedetect` is needed
 only to index a video.
 
+**The downbeat phase is evidence-backed, never an argmax.** Onset strength
+answers "what is loudest"; the bar line is "where the bar begins", and in any
+backbeat-driven genre the snare on 2 and 4 out-accents the kick -- a bare
+argmax over onset strength parks the bar line on the snare (issue #89). So
+`measure` corroborates the phase against the song's own re-entries (a composer
+puts the band back in on beat 1), plus any `--anchor` the owner asserts by
+ear. When neither can decide, the phase is recorded as `null` with the
+candidates and the reason -- a missing value is a punch-list item; an invented
+one puts every bar-snapped cut a beat off.
+
 **Excisions are snapped to downbeats, and that is what keeps the grid whole.**
 Cutting an arbitrary 13 seconds lands mid-bar: the music stumbles, and every
 downbeat after the splice sits at a new phase, so a single (tempo, offset) pair
@@ -33,10 +43,14 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import array
 import json
+import math
+import operator
 import os
 import subprocess
 import sys
+import wave
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -85,7 +99,7 @@ def probe_duration(path, ffmpeg=None):
 
 
 def analyze_grid(path, beats_per_bar=DEFAULT_BEATS_PER_BAR, sr=22050,
-                 beat_multiple=1):
+                 beat_multiple=1, anchors=()):
     """Detect tempo, beats and the downbeat phase. Requires ``librosa``.
 
     Returns the grid dict that gets cached in the record.
@@ -101,8 +115,12 @@ def analyze_grid(path, beats_per_bar=DEFAULT_BEATS_PER_BAR, sr=22050,
     amount of cleverness beats listening once. Both the raw detection and the
     chosen level are recorded so a later reader can tell what happened.
 
-    The downbeat phase is the offset whose beats carry the most onset strength:
-    a bar line is where the music pushes.
+    The downbeat phase is NOT the argmax over onset strength: that answers
+    "what is loudest", and in backbeat-driven music the loudest beats are the
+    snares on 2 and 4, not beat 1 (issue #89). The phase is resolved by
+    ``resolve_downbeat_phase`` against the song's measured re-entries plus any
+    operator ``anchors``, and the record keeps both the evidence string and the
+    measured events, so a later reader can see what the value rests on.
     """
     try:
         import librosa
@@ -130,10 +148,16 @@ def analyze_grid(path, beats_per_bar=DEFAULT_BEATS_PER_BAR, sr=22050,
     onset_at_beat = onset[np.clip(beat_frames, 0, len(onset) - 1)]
     strength = [float(onset_at_beat[phase::beats_per_bar].mean())
                 for phase in range(beats_per_bar)]
-    phase = int(np.argmax(strength))
+
+    reentries = measure_reentries(rms_envelope_db(y, sr), HOP_SEC)
+    evidence = sorted(float(a) for a in anchors) + \
+        [r["measured_sec"] for r in reentries]
+    beat_list = [round(float(t), 6) for t in beat_times]
+    phase, phase_evidence = resolve_downbeat_phase(
+        strength, beats_per_bar, beats=beat_list, evidence_sec=evidence)
 
     interval = float(np.median(np.diff(beat_times)))
-    return {
+    grid = {
         "detected_tempo_bpm": round(float(np.atleast_1d(tempo)[0]), 3),
         "beat_multiple": beat_multiple,
         "beat_interval_sec": round(interval, 6),
@@ -141,16 +165,26 @@ def analyze_grid(path, beats_per_bar=DEFAULT_BEATS_PER_BAR, sr=22050,
         "beats_per_bar": beats_per_bar,
         "bar_sec": round(interval * beats_per_bar, 6),
         "downbeat_phase": phase,
+        "downbeat_phase_evidence": phase_evidence,
         "downbeat_strength": [round(s, 4) for s in strength],
+        "measured_reentries": reentries,
         "first_beat_sec": round(float(beat_times[0]), 6),
-        "beats": [round(float(t), 6) for t in beat_times],
+        "beats": beat_list,
     }
+    if anchors:
+        grid["phase_anchors_sec"] = [round(float(a), 6) for a in anchors]
+    return grid
 
 
 def downbeats(grid):
     """The bar lines, in source-timeline seconds."""
+    phase = grid.get("downbeat_phase")
+    if phase is None:
+        raise ValueError(
+            "this grid's downbeat phase is unresolved -- "
+            + grid.get("downbeat_phase_evidence", "no evidence recorded"))
     beats = grid["beats"]
-    return [beats[i] for i in range(grid["downbeat_phase"], len(beats),
+    return [beats[i] for i in range(phase, len(beats),
                                     grid["beats_per_bar"])]
 
 
@@ -158,6 +192,263 @@ def snap_to_downbeat(grid, seconds):
     """Nearest bar line to ``seconds``."""
     bars = downbeats(grid)
     return min(bars, key=lambda b: abs(b - seconds))
+
+
+# --- musical events: the evidence a downbeat phase rests on ------------------
+#
+# A beat grid says where beats fall; it does not say where anything HAPPENS.
+# The events that say where the bar begins are drops (the energy falls and
+# stays down) and re-entries (it returns): a composer puts the band back in on
+# beat 1, so measured re-entry times are what corroborate a downbeat phase.
+# The envelope is plain RMS at HOP_SEC resolution, smoothed over SMOOTH_SEC so
+# a quiet bar inside a loud section is not mistaken for a breakdown, and
+# thresholded against the song's own median level. Stdlib only, so the test
+# suite stays offline and dependency-free; scripts/efmb_beats.py reuses these
+# same functions rather than keeping a second copy.
+#
+# Each constant is a measured trade-off, not a guess; the comments say what
+# breaks if you move it.
+HOP_SEC = 0.02        # envelope resolution; finer than this buys nothing at 152 bpm
+SMOOTH_SEC = 1.5      # shorter smooths let one quiet bar fragment the breakdown
+DROP_DB = 2.5         # how far below the song's median level counts as "down"
+MIN_DOWN_SEC = 4.0    # a drop that comes back inside one bar is a breath, not a drop
+RECOVER_DB = 1.5      # re-entry gate: level must stay within this of baseline for 2 s
+SUSTAIN_SEC = 2.0     # ... for this long -- a riser swell fails this, the slam passes
+ONSET_CONFIRM_SEC = 0.25  # a hit confirming a bar line lands within a quarter
+                      # second of it; wider windows catch the pick-up instead
+REENTRY_WINDOW_SEC = 12.0  # a re-entry this far after the drop is a new section
+PHASE_TOLERANCE_SEC = 0.08  # the owner's rule: 0.08 s off the bar line is a win
+BACKBEAT_SIGNATURE_MIN = 0.05  # parity-class imbalance below this is no signature
+
+
+def load_envelope_db(path, hop=HOP_SEC):
+    """RMS energy of the WAV in dB re its own peak, one value per ``hop`` seconds.
+
+    Both channels, summed in the energy domain. Pure stdlib: ``wave`` for the
+    container, ``array`` for the samples, ``map(operator.mul, ...)`` because a
+    genexpr over 15M samples is the difference between 4 seconds and 30.
+    """
+    with wave.open(str(path), "rb") as w:
+        rate = w.getframerate()
+        channels = w.getnchannels()
+        width = w.getsampwidth()
+        raw = w.readframes(w.getnframes())
+    if width != 2:
+        raise RuntimeError(f"{path} is {width * 8}-bit; the detector expects 16-bit PCM")
+    a = array.array("h")
+    a.frombytes(raw)
+    del raw
+    win = int(rate * hop)
+    step = win * channels
+    n = (len(a) // step) * step  # whole windows only; the tail is < 20 ms of fade
+    env = []
+    for i in range(0, n, step):
+        ss = 0
+        for c in range(channels):
+            ch = a[i + c:i + step:channels]
+            ss += sum(map(operator.mul, ch, ch))
+        env.append(math.sqrt(ss / (channels * win)))
+    peak = max(env)
+    return [20 * math.log10(e / peak) if e > 0 else -120.0 for e in env], hop
+
+
+def rms_envelope_db(y, sr, hop=HOP_SEC):
+    """The same envelope ``load_envelope_db`` reads off a WAV, from mono float
+    samples librosa has already decoded. numpy is imported locally: it is an
+    optional dependency, present exactly when the caller is measuring audio.
+    """
+    import numpy as np  # optional dependency, as with analyze_grid
+    win = int(sr * hop)
+    n = (len(y) // win) * win
+    if n == 0:
+        return []
+    rms = np.sqrt((y[:n].reshape(-1, win) ** 2).mean(axis=1))
+    peak = float(rms.max())
+    if peak <= 0:
+        return [-120.0] * len(rms)
+    return [20 * math.log10(max(float(e) / peak, 1e-6)) for e in rms]
+
+
+def smooth(xs, width_sec, hop):
+    """Centered boxcar. Centered, not trailing: a trailing window delays every
+    edge by half its width and the drop/re-entry times would all drift late."""
+    k = max(1, int(width_sec / hop))
+    half = k // 2
+    out = []
+    for i in range(len(xs)):
+        lo = max(0, i - half)
+        hi = min(len(xs), i + half + 1)
+        out.append(sum(xs[lo:hi]) / (hi - lo))
+    return out
+
+
+def baseline_of(level):
+    """The song's typical loudness: median of the smoothed level. Median, not
+    mean, because a 12 s breakdown should not lower the bar it is measured
+    against."""
+    s = sorted(level)
+    return s[len(s) // 2]
+
+
+def find_drops(level, hop, baseline, drop_db=DROP_DB, min_down_sec=MIN_DOWN_SEC):
+    """Regions where the level falls ``drop_db`` below baseline and stays there.
+
+    ``drop_sec`` is not the threshold crossing: the fall takes about a second,
+    so the crossing sits mid-slide wherever the threshold happens to catch it.
+    The musically meaningful moment is when the loud state was last present --
+    the last window at or above the midpoint between the pre-drop level and the
+    region floor. That lands within half a second of the by-ear time on this
+    song; a bare threshold crossing lands wherever you tune it.
+    """
+    threshold = baseline - drop_db
+    min_run = int(min_down_sec / hop)
+    drops = []
+    i = 0
+    while i < len(level):
+        if level[i] >= threshold:
+            i += 1
+            continue
+        j = i
+        while j < len(level) and level[j] < threshold:
+            j += 1
+        if j - i >= min_run:
+            start, end = i * hop, (j - 1) * hop
+            floor = min(level[i:j])
+            pre_lo = max(0, i - int(6.0 / hop))
+            pre = level[pre_lo:i - int(0.5 / hop)] if i > int(0.5 / hop) else []
+            if pre:
+                pre_level = sorted(pre)[len(pre) // 2]
+                mid = (pre_level + floor) / 2
+                k = i - 1
+                while k > 0 and level[k] < mid:
+                    k -= 1
+                drop_sec = k * hop
+            else:
+                drop_sec = start  # the song opens quiet: an intro, not a drop
+            drops.append({
+                "drop_sec": round(drop_sec, 3),
+                "down_from_sec": round(start, 3),
+                "down_until_sec": round(end, 3),
+                "floor_db": round(floor, 2),
+                "depth_db": round(baseline - floor, 2),
+                "kind": ("intro" if start < hop * 2 else
+                         "outro" if j >= len(level) - int(1.0 / hop) else
+                         "drop"),
+            })
+        i = j
+    return drops
+
+
+def measure_reentries(env_db, hop):
+    """When the band comes back after each drop, measured from the audio
+    BEFORE any grid is consulted -- the evidence a downbeat phase is scored
+    against.
+
+    A re-entry is the strongest 60 ms level step after a drop whose following
+    SUSTAIN_SEC seconds stay within RECOVER_DB of the baseline. The sustain
+    gate is what rejects a riser: a swell spikes and falls back, failing the
+    gate; the full-band slam stays up, passing it. The step search is
+    phase-free on purpose -- consulting a candidate grid here would make the
+    corroboration circular.
+    """
+    level = smooth(env_db, SMOOTH_SEC, hop)
+    baseline = baseline_of(level)
+    gate = baseline - RECOVER_DB
+    sustain = int(SUSTAIN_SEC / hop)
+    out = []
+    for drop in find_drops(level, hop, baseline):
+        if drop["kind"] == "outro":
+            continue
+        # The centered smoother reports the region end up to half a window
+        # late, so a re-entry that slams instantly sits BEFORE down_until.
+        lo = max(3, int((drop["down_until_sec"] - SMOOTH_SEC / 2) / hop))
+        hi = min(len(env_db), int((drop["down_until_sec"] +
+                                   REENTRY_WINDOW_SEC) / hop))
+        best, best_k = 0.0, None
+        for k in range(lo, hi):
+            if k + sustain > len(level):
+                break
+            step = env_db[k] - env_db[k - 3]
+            if step > best and min(level[k:k + sustain]) >= gate:
+                best, best_k = step, k
+        if best_k is not None:
+            out.append({"measured_sec": round(best_k * hop, 3),
+                        "onset_db": round(best, 2),
+                        "after_drop_sec": drop["drop_sec"]})
+    return out
+
+
+def resolve_downbeat_phase(strength, beats_per_bar, beats=(), evidence_sec=(),
+                           tolerance_sec=PHASE_TOLERANCE_SEC):
+    """Which beat of the bar is beat 1, and what that answer rests on.
+
+    Returns ``(phase, evidence)``. ``phase`` is ``None`` when the evidence
+    cannot decide: a missing phase is a punch-list item, an invented one puts
+    every bar-snapped cut a beat off -- missing, never invented.
+
+    Onset strength answers "what is loudest"; the bar line is "where the bar
+    begins". In backbeat-driven music the snare on 2 and 4 out-accents the
+    kick, so the strength vector alone can only narrow the phase to one parity
+    pair ({1,3}-indexed beats 1&3 or 2&4) -- it cannot order beat 1 against
+    beat 3, and it cannot distinguish "loud downbeat" from "loud snare"
+    without a genre assumption. Measured events decide: a composer puts the
+    band back in on beat 1, so the phase whose bar lines the measured
+    re-entries and owner anchors land on is the bar line.
+
+    With no events at all, a clear backbeat signature narrows the answer to
+    the quieter parity pair and reports it as unresolved; without even a
+    signature the loudest-beat phase is kept, labelled as what it is.
+    """
+    n = len(strength)
+    loudest = max(range(n), key=lambda i: strength[i]) if n else 0
+    if beats_per_bar != 4 or n != beats_per_bar:
+        return loudest, (f"no backbeat model for a {beats_per_bar}-beat bar; "
+                         f"kept the loudest-beat phase {loudest} "
+                         "(onset-strength argmax)")
+
+    even = (strength[0] + strength[2]) / 2   # beat-1-and-3 class under phase 0
+    odd = (strength[1] + strength[3]) / 2
+    quiet_pair = (0, 2) if odd >= even else (1, 3)
+
+    if evidence_sec:
+        if not beats:
+            raise ValueError("evidence_sec needs the beat grid to score against")
+        scores = {}
+        for p in range(beats_per_bar):
+            bars = beats[p::beats_per_bar]
+            errs = [min(abs(t - b) for b in bars) for t in evidence_sec]
+            scores[p] = sum(errs) / len(errs)
+        best = min(scores, key=scores.get)
+        runner_up = min(s for p, s in scores.items() if p != best)
+        if scores[best] <= tolerance_sec:
+            consistency = ("consistent with the backbeat signature"
+                           if best in quiet_pair else
+                           "NOTE: lands in the accented class -- the "
+                           "snare-louder reading does not hold for this track")
+            return best, (
+                f"{len(evidence_sec)} measured re-entries/anchors land a mean "
+                f"{scores[best]:.3f}s from phase-{best} bar lines (next best "
+                f"phase scores {runner_up:.3f}s); {consistency}")
+        return None, (
+            f"no phase puts the {len(evidence_sec)} measured events on bar "
+            f"lines (best is phase {best} at a mean {scores[best]:.3f}s, over "
+            f"the {tolerance_sec}s gate) -- the grid itself may have drifted "
+            "from the music; phase left unset rather than guessed")
+
+    scale = (even + odd) / 2
+    if scale <= 0 or abs(even - odd) / scale < BACKBEAT_SIGNATURE_MIN:
+        return loudest, (f"no backbeat signature in the onset strengths "
+                         f"(even beats {even:.2f}, odd {odd:.2f}); kept the "
+                         f"loudest-beat phase {loudest} -- corroborate against "
+                         "a measured re-entry before cutting to the bar")
+    louder = "odd" if odd > even else "even"
+    a, b = quiet_pair
+    return None, (
+        f"backbeat signature: {louder} positions out-accent "
+        f"({max(even, odd):.2f} vs {min(even, odd):.2f}) -- the snare is "
+        f"louder than the kick, so the bar line is beat {a + 1} or {b + 1} "
+        "and onset strength cannot say which. Left unset rather than guessed; "
+        "re-measure with --anchor, or let the measured re-entries decide")
 
 
 # --- excisions --------------------------------------------------------------
@@ -357,6 +648,10 @@ def main(argv=None):
     m.add_argument("--beat-multiple", type=int, default=1,
                    help="keep every Nth detected beat; 2 undoes a double-time "
                         "lock, which beat trackers do routinely")
+    m.add_argument("--anchor", action="append", type=parse_tc, default=[],
+                   metavar="SEC", help="a moment asserted by ear to be beat 1 "
+                        "of a bar (repeatable); scored alongside the measured "
+                        "re-entries to fix the downbeat phase")
     m.add_argument("--out", default=str(MUSIC_DIR))
 
     e = sub.add_parser("excise", help="snap and record a section to remove")
@@ -380,7 +675,8 @@ def main(argv=None):
     if args.cmd == "measure":
         media = Path(args.media)
         grid = analyze_grid(media, beats_per_bar=args.beats_per_bar,
-                            beat_multiple=args.beat_multiple)
+                            beat_multiple=args.beat_multiple,
+                            anchors=args.anchor)
         record = {
             "bed_id": args.id,
             "media_filename": media.name,
@@ -398,8 +694,13 @@ def main(argv=None):
         save_record(record, dest)
         print(f"wrote {dest}")
         print(f"  duration {record['duration_sec']:.3f}s ({fmt_tc(record['duration_sec'])})")
-        print(f"  tempo {grid['tempo_bpm']} bpm, bar {grid['bar_sec']:.4f}s, "
-              f"{len(downbeats(grid))} bars")
+        print(f"  tempo {grid['tempo_bpm']} bpm, bar {grid['bar_sec']:.4f}s")
+        if grid["downbeat_phase"] is None:
+            print(f"  downbeat phase UNRESOLVED: {grid['downbeat_phase_evidence']}")
+        else:
+            print(f"  downbeat phase {grid['downbeat_phase']} "
+                  f"({len(downbeats(grid))} bars)")
+            print(f"  evidence: {grid['downbeat_phase_evidence']}")
         return 0
 
     record = load_record(args.record)

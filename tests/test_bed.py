@@ -245,3 +245,100 @@ def test_source_gain_defaults_to_no_change():
 
     regions = [{"kind": "source", "wall_start": 0.0, "wall_end": 5.0}]
     assert "volume=" not in build_filter(regions).replace("volume=0:", "")
+
+
+# --- the downbeat phase is evidence-backed, never an argmax (issue #89) ------
+
+from tools.bed import (  # noqa: E402
+    measure_reentries, resolve_downbeat_phase, smooth, baseline_of, find_drops,
+)
+
+EFMB_BED = REPO_ROOT / "music" / "bed_endless_forms_most_beautiful.json"
+
+
+def test_the_issue89_vector_yields_phase_0():
+    """The exact bug: argmax over this strength vector answers 3, the snare.
+
+    The vector, the beat grid and the five re-entry times are all recorded --
+    the strengths in the committed bed record, the re-entries in issue #89
+    (measured from the WAV, each within 51 ms of a phase-0 bar line). Fed the
+    same evidence, the resolver must land on 0.
+    """
+    grid = json.loads(EFMB_BED.read_text())["grid"]
+    assert grid["downbeat_strength"] == [3.1266, 3.61, 3.2519, 3.8094]
+    reentries = [25.031, 62.415, 138.786, 246.340, 269.700]
+    phase, evidence = resolve_downbeat_phase(
+        grid["downbeat_strength"], grid["beats_per_bar"],
+        beats=grid["beats"], evidence_sec=reentries)
+    assert phase == 0
+    assert "consistent with the backbeat signature" in evidence
+
+
+def test_argmax_would_have_picked_the_snare():
+    """The regression being guarded against, stated plainly."""
+    strength = [3.1266, 3.61, 3.2519, 3.8094]
+    assert max(range(4), key=lambda i: strength[i]) == 3  # the bug
+    beats = [round(0.4 * i, 6) for i in range(200)]
+    reentries = [16.0, 32.0]  # beats 40 and 80: phase-0 bar lines exactly
+    phase, _ = resolve_downbeat_phase(strength, 4, beats=beats,
+                                      evidence_sec=reentries)
+    assert phase == 0
+
+
+def test_a_backbeat_signature_without_events_is_left_unresolved():
+    """Missing, never invented: strength alone cannot order beat 1 vs beat 3."""
+    strength = [1.0, 2.0, 1.0, 2.2]   # the backbeat pattern, no events
+    phase, evidence = resolve_downbeat_phase(strength, 4)
+    assert phase is None
+    assert "beat 1 or 3" in evidence and "unset" in evidence
+
+
+def test_no_backbeat_signature_keeps_the_loudest_beat_and_says_so():
+    strength = [1.0, 1.02, 0.98, 1.0]  # flat: nothing to read
+    phase, evidence = resolve_downbeat_phase(strength, 4)
+    assert phase == 1
+    assert "no backbeat signature" in evidence
+
+
+def test_a_downbeat_accented_track_keeps_its_argmax_when_events_agree():
+    # Four-on-the-floor: beat 1 IS the loudest, and the events confirm it.
+    strength = [4.0, 3.0, 3.2, 3.0]
+    beats = [round(0.5 * i, 6) for i in range(200)]
+    phase, evidence = resolve_downbeat_phase(strength, 4, beats=beats,
+                                             evidence_sec=[10.0, 20.0])
+    assert phase == 0
+
+
+def test_events_that_land_on_no_phase_are_grid_drift_not_a_winner():
+    strength = [3.1266, 3.61, 3.2519, 3.8094]
+    beats = [round(0.4 * i, 6) for i in range(200)]
+    phase, evidence = resolve_downbeat_phase(strength, 4, beats=beats,
+                                             evidence_sec=[20.13, 40.13])
+    assert phase is None
+    assert "drifted" in evidence
+
+
+def test_non_four_four_has_no_backbeat_model():
+    phase, evidence = resolve_downbeat_phase([2.0, 1.0, 1.5], 3)
+    assert phase == 0 and "no backbeat model" in evidence
+
+
+def test_measure_reentries_finds_the_slam_not_the_riser():
+    """The synthetic-envelope contract the producer's evidence rests on."""
+    hop = 0.02
+    db = []
+    for k in range(int(120.0 / hop)):
+        t = k * hop
+        if t < 51.0:
+            db.append(0.0)
+        elif t < 59.9:
+            db.append(-8.0)
+        elif t < 60.9:
+            db.append(-8.0 + 8.0 * (t - 59.9))  # the riser ramp
+        else:
+            db.append(0.0)
+    for k in range(int(60.86 / hop), int(60.90 / hop)):
+        db[k] = 3.0                              # the slam's transient
+    events = measure_reentries(db, hop)
+    assert len(events) == 1
+    assert events[0]["measured_sec"] == pytest.approx(60.88, abs=0.05)

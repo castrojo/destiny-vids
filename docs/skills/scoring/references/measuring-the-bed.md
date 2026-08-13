@@ -34,6 +34,35 @@ in the record:
 A tempo outside roughly 60–160 bpm, or one exactly double what you tapped, is
 the tell.
 
+### The downbeat phase is evidence-backed, never an argmax
+
+Onset strength answers *"what is loudest"*; the bar line is *"where the bar
+begins"*, and in any backbeat-driven genre those are different questions: the
+snare on 2 and 4 out-accents the kick, so a bare argmax parks the bar line on
+the snare. That is exactly what shipped in the act II bed
+(`downbeat_phase: 3`, strength `[3.13, 3.61, 3.25, 3.81]` — positions 2 and 4
+out-accent 1 and 3), and it read the shipped sync anchor as 0.372 s off a beat
+it was in fact exactly on ([#89](https://github.com/castrojo/destiny-vids/issues/89)).
+
+`measure` now resolves the phase with `resolve_downbeat_phase`: the strength
+vector's parity classes narrow the answer to a pair (the loud pair is the
+snares, the bar line is in the quiet pair), and **measured events decide** —
+the song's own re-entries, measured phase-free from the energy envelope (a
+composer puts the band back in on beat 1), plus any `--anchor SEC` the
+operator asserts by ear. The record keeps the audit trail:
+
+```json
+"downbeat_phase": 0,
+"downbeat_phase_evidence": "5 measured re-entries/anchors land a mean 0.042s from phase-0 bar lines ...",
+"measured_reentries": [{"measured_sec": 24.98, "onset_db": 9.1, ...}, ...]
+```
+
+When no event lands near any phase, or the strength signature is ambiguous,
+the phase is recorded as `null` with the candidates and the reason — a missing
+phase is a punch-list item, an invented one puts every bar-snapped cut a beat
+off. `excise` and `map` refuse a `null` phase loudly; the fix is evidence, not
+a guess: measure a re-entry, or get the owner to tap one bar line.
+
 ### `beat_track` returns tempo as an array, and the official example is stale
 
 librosa's own tutorial still prints the tempo like a scalar:
