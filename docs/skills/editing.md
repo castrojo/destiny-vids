@@ -1,6 +1,6 @@
 ---
 name: editing
-version: "1.6"
+version: "1.7"
 last_updated: "2026-08-12"
 id: editing
 one_line_purpose: Turn a plain-language outline into a rendered cut.
@@ -403,6 +403,11 @@ Two things follow, and both bite:
   is `burned_text` and therefore not `clean`, even though the first fifteen
   seconds of it are beautiful. Tag it, and let the redaction — not a fib in the
   index — be what makes it usable here.
+- **A hand-cut act never went through the clean gate at all.** When runs are
+  authored as timecodes on an unindexed source, no tagger ever set `overlays`
+  on them: **scan the finished picture for burned-in titles yourself** before
+  plating it. Act II kept two, one of them unrecorded, and a credit was placed
+  squarely on it.
 - **Scoring replaces the audio.** `--audio` maps the bed instead of the source
   and passes `-shortest`, so the dialogue is gone. If the conversation still
   needs to be legible, show it: `tools/dialogue.py` (see

@@ -37,12 +37,13 @@ fewer, longer gaps — never a thinner video.
 
 ## What blocks this, measured
 
-### The feature is assembled on paper, and two of its eight acts have no film
+### The feature is assembled on paper, and one of its eight acts has no film
 
-Five acts are delivered into `~/Videos/Wolves/Prod/`. **Act I is built but not
-rendered**, act II has no music decision ([issue #74]), and act VIII — the
-credits — is not designed ([issue #51]). The programme itself has not been
-built.
+**Seven acts are delivered** into `~/Videos/Wolves/Prod/`, which is what the
+megacut's **v0.5** is. Act VIII — the credits — is **not designed**
+([issue #51]). Act II's music decision ([issue #74]) is settled: it is
+delivered, credited, and in the programme. The programme itself is assembled by
+`tools/megacut.py` but **not yet rendered**, by owner instruction.
 
 What is also not settled is **provenance**: inside act VI, its second movement
 and its climax draw on a fan compilation of Bungie trailers rather than official

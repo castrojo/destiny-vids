@@ -61,9 +61,10 @@ Appearing in the feature never made an appearance somebody's hero video, and it
 still does not: act IV is Kat's act *and* Kat's hero video is a separate,
 separately-released thing.
 
-**Two acts have no film.** Act II (*Endless Forms Most Beautiful*) needs a music
-decision — [issue #74] — and act VIII, the credits sequence, is **not designed**
-— [issue #51]. Their numerals are held so nothing renumbers around them.
+**One act has no film.** Act VIII, the credits sequence, is **not designed** —
+[issue #51]. Act II was the other gap: its music decision ([issue #74]) is
+settled and it is delivered and credited. The numerals are held so nothing
+renumbers around act VIII.
 
 ## Hero videos: one person, one video, every source
 

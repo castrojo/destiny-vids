@@ -18,7 +18,7 @@
         "depiction"
       ],
       "description": "Covers lead bindings, ensemble slots, depiction rules, and derived casting. Use when adding a cast member, crediting contributors, recording a rule for how a character may be shown, or debugging a casting role.",
-      "version": "1.1",
+      "version": "1.2",
       "last_updated": "2026-08-12",
       "doc_type": "reference"
     },
@@ -68,7 +68,7 @@
         "shot-boundary-measurement"
       ],
       "description": "Covers outlines, shot matching, artwork cards, timing passes with marker cards, and a bed that pauses. Use when writing an outline, marking material for removal before editing, or scoring a cut whose song does not run end to end.",
-      "version": "1.6",
+      "version": "1.7",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },
@@ -163,7 +163,7 @@
         "resume"
       ],
       "description": "The whole loop from an issue to a rendered cut, what resumes, where it stops on purpose, and how several agents make videos at once without colliding. Use when producing videos in volume rather than debugging one stage.",
-      "version": "1.1",
+      "version": "1.2",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },

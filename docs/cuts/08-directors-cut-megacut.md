@@ -211,8 +211,11 @@ plaquards" — which also drops the `#nova4ever` glitch bursts and the closing
   with intro notes, so it is applied to the intro plate **and nowhere else**;
   the Europa director's cut still credits Laura Santamaria. No surname, no
   authored identity. Both open.
-- **Act II has no film and no named track.** "It's endless forms most
-  beautiful, instrumental" names the *record*, not which instrumental.
+- ~~**Act II has no film and no named track.**~~ **Settled.** "It's endless
+  forms most beautiful, instrumental" named the *record*, not which
+  instrumental; the track is now recorded as Nightwish's *Endless Forms Most
+  Beautiful (Instrumental)*, [`6-9667CV1zQ`](https://www.youtube.com/watch?v=6-9667CV1zQ)
+  from the official channel, and the act is delivered and credited (#74).
 - **Act IX has no design** — #51.
 - **Act III has no subject.** An open numbered slot, the owner's to fill.
 - **Act VI is partially complete, by the owner's own description**, and it is
