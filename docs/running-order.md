@@ -21,8 +21,8 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
-| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; its tail now plates the Cayde-6 reveal and three gold credits |
-| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; plays the pre-terse-pass film — #102; its master clips — #82 |
+| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; now the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits |
+| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; plays the pre-terse-pass film — #102; master corrected to −1.1 dBTP — #82 |
 | **VIII** | Credits | — | **not designed** — #51 |
 
 **The numbering is fixed.** Act VIII has no film, so it gets no slide and no
@@ -34,7 +34,7 @@ permanently, whatever gets built later.
 **Act II has a film** ([`docs/cuts/02-endless-forms-most-beautiful.md`](cuts/02-endless-forms-most-beautiful.md)),
 delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
 and its own place on the clock. Seven of the eight acts now play, which is what
-**v0.5** was; the current build is **v0.6**. It is also the first feature act to carry **nameplates** — thirteen
+**v0.5** was; the current build is **v0.8** (act II's #98 overlay pass and act VI's #104 interruption). It is also the first feature act to carry **nameplates** — thirteen
 of them, generated rather than placed by hand — now eighteen, plus a chapter
 card, twenty-six dialogue pills, a patch-queue HUD, a villain's bar and the
 letterbox callout, all of it still generated.
@@ -89,12 +89,13 @@ python3 tools/megacut.py stories/megacut/megacut.json --chapters
 7:09  III. Bob Killen
 9:54  IV–V. Bias for Action
 11:08 VI. 7 Days to the Wolves
-18:26 VII. Europa
+18:37 VII. Europa
 ```
 
-**20:21.9**, six markers for seven acts. Every stamp after act I moved when act
-II was wired in, and everything after act III moved again when acts IV and V
-were given one slide — which is exactly why they are derived and never typed.
+**20:32.7**, six markers for seven acts. Every stamp after act I moved when act
+II was wired in, everything after act III moved again when acts IV and V were
+given one slide, and slide VII moved +10.811 s when act VI became the #104
+interruption build — which is exactly why they are derived and never typed.
 
 A chapter starts on its **act slide**, not on the film behind it: the slide is
 how the audience is told which act this is. The list regenerates from the plan's
@@ -148,14 +149,16 @@ Recorded, not hidden:
   best that exists rather than the best possible. Issue #58. Its master lives in
   `~/Videos/wolves-musical/`, re-homed out of the retired `UPLOAD/` staging
   folder (issue #81) by moving the inode, so the hardlink never broke.
-- **Act VII's master clips** at +0.3 dBTP — issue #82. The AAC deliverable of
-  the same cut measured −1.0 and passed for weeks; nothing had ever measured the
-  FLAC master. It needs a re-render of Europa's own build, not a fix here.
+- ~~**Act VII's master clips** at +0.3 dBTP — issue #82.~~ **Fixed 2026-08-13**:
+  Europa's own build was re-rendered under the new master gate
+  (`tools/peaks.py trim`, PR #130) and the delivered master now measures
+  **−1.1 dBTP**, inside the −0.9…−1.1 band. The issue stays open for its owner
+  to close.
 - **Act VIII does not exist.** Issue #51. The programme therefore ends on
-  Europa with **no credit roll**, which is the single biggest reason v0.6 is not
-  the feature. The only names in the show are act VI's tail — the Cayde-6
-  reveal (Jorge Castro) and three gold credits behind it — and a reveal inside
-  an act is not a credits sequence.
+  Europa with **no credit roll**, which is the single biggest reason the
+  current build is not the feature. The only names in the show are act VI's
+  tail — the Cayde-6 reveal (Jorge Castro) and three gold credits behind it —
+  and a reveal inside an act is not a credits sequence.
 - **Act II's picture is a fan compilation**, not an official Bungie upload —
   the same provenance question act VI carries (#55). See its cut doc.
 
