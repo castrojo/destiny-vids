@@ -217,7 +217,7 @@ of the card and `tools/plate.py` has no z-order for.
 
 ### The Guardian plates, and two recasts
 
-| Programme | Verified on screen | Plate |
+| Act film | Verified on screen | Plate |
 |---|---|---|
 | 3.0 – 12.5 | purple void vortex | **Cortney Nickerson** (was Bob Killen) |
 | 12.5 – 22.5 | Ward of Dawn bubble, Titan inside | Kat Cosgrove — Sentinel Titan |
