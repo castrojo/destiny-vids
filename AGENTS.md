@@ -247,12 +247,37 @@ reported and the cut is still made. **Ship the degraded output and record what
 is missing** — a video that exists can be fixed; a video blocked on one word
 never gets made, and a pipeline that refuses contributions stops being used.
 
+**Prose gets a placeholder, not a gap.** A dialogue line nobody has written
+renders as **lorem ipsum** rather than as an empty pill or no pill at all
+(`tools/placeholder.py`), so every slot in the show exists early enough to be
+watched: the timing, the letterbox seat, the read length and the gaps between
+plates are all reviewable before a single word is final. A slot that renders
+nothing is a slot nobody notices is missing.
+
 This does **not** loosen rule 3, and the distinction is the whole point:
 
 | | |
 |---|---|
-| **Missing** a word | Omit it, ship, record it. Always. |
+| **Missing** a word | Fill it with a **placeholder**, ship, record it. Always. |
 | **Inventing** a word | Forbidden. Always. |
+
+A placeholder is the opposite of an invention, not a soft version of one: it is
+Latin, so nobody can mistake it for English somebody approved, and **it credits
+nobody**. Placeholder prose carries the vocab's own uncast speaker (`TBD`) and
+the drawn crest, never a real login and never a real person's avatar. The
+person a line is *destined* for is kept in `speaker_pending`, recorded rather
+than rendered.
+
+That last rule is written in scar tissue. Act IV's first pass put lorem ipsum
+lines on `krook`, `jeefy` and `mrbobbytables`; all three were dropped from the
+film once real copy arrived, because they had only ever "spoken" words nobody
+wrote. **Lorem under a real name is still putting words in a colleague's
+mouth.** Lorem under `TBD` is an empty chair with the right dimensions.
+
+Find them all again with `python3 tools/placeholder.py list` — "a placeholder
+for everything" is only worth having if one command says what is still
+unwritten. `--check` exits non-zero for anyone gating a *final* cut; CI does
+not run it, because CI must stay green while copy is still being written.
 
 Guessing which person the owner meant, or writing a subclass nobody authored,
 is not iteration — it puts words on a real colleague under the owner's name,
@@ -313,7 +338,10 @@ needs somebody to decide.
   [`docs/skills/plates/SKILL.md`](docs/skills/plates/SKILL.md). A Guardian identity somebody
   *has* authored (ten people, in `~/Videos/nameplates.json` and the website's
   `characters.json`) is reproduced verbatim; the generic fallback for an
-  authored identity is as wrong as an invented one. Dialogue shown on screen is
+  authored identity is as wrong as an invented one. Copy that has not been
+  written yet is a **placeholder**, which is not an exception to this: lorem
+  ipsum credited to `TBD` invents nothing, because it claims nothing. Dialogue
+  shown on screen is
   *recovered*, not written: it lives in `dialogue/<video_id>/dialogue.json` with
   its source timecodes and per-line evidence for who is speaking, beside the
   `DIALOGUE.md` the owner edits (`tools/dialogue_md.py` round-trips the two, and

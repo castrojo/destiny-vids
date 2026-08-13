@@ -50,6 +50,20 @@ The deck's other shapes are the title card (`title`, `subtitle`, `body[]`) and
 the **chat card** (`speaker`, `text`) —
 [`references/conversation-cards.md`](references/conversation-cards.md).
 
+## Prose that is not written yet is lorem, never a gap
+
+A chat pill with no `text` does **not** block and no longer renders empty:
+`tools/placeholder.py` fills it with deterministic lorem ipsum, so timing,
+seat and read length are reviewable while the copy is still being written.
+`python3 tools/placeholder.py list` is the punch list.
+
+**A placeholder credits nobody** — the vocab's uncast speaker (`TBD`) and the
+drawn crest, never a real login or somebody's avatar; the intended speaker is
+kept in `speaker_pending`. Lorem under a real name is still putting words in a
+colleague's mouth, and act IV lost three people to exactly that. Details and
+the named-badge distinction:
+[`references/conversation-cards.md`](references/conversation-cards.md).
+
 That is the whole vocabulary, taken from the reference deck
 (`~/Videos/nameplates.json` —
 [`references/copy-authoring.md`](references/copy-authoring.md)).
