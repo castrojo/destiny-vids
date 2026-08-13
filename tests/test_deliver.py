@@ -288,3 +288,118 @@ def test_the_real_workspace_reports_without_failing(capsys):
     # The eight acts of the running order all appear, VIII included.
     for numeral in ("I", "II", "III", "IV", "V", "VI", "VII", "VIII"):
         assert f"\n{numeral:<4}" in out
+
+
+# --- the rung before the master: inputs -> master ---------------------------
+
+
+def test_a_digest_is_content_not_mtime(tmp_path, monkeypatch):
+    """These inputs come out of git, where every mtime is checkout time.
+
+    An mtime-based check calls every act stale on a fresh clone; a content
+    hash survives a clone, a rebase and a Syncthing round trip.
+    """
+    monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
+    f = tmp_path / "a.json"
+    f.write_text("one")
+    first = deliver.source_digest(["a.json"])
+    os.utime(f, (0, 0))
+    assert deliver.source_digest(["a.json"]) == first, "mtime must not count"
+    f.write_text("two")
+    assert deliver.source_digest(["a.json"]) != first, "content must count"
+
+
+def test_a_directory_input_hashes_every_file_under_it(tmp_path, monkeypatch):
+    # A dialogue record is a directory; a new line in it must register.
+    monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
+    d = tmp_path / "dialogue" / "vid"
+    d.mkdir(parents=True)
+    (d / "dialogue.json").write_text("{}")
+    before = deliver.source_digest(["dialogue/vid"])
+    (d / "DIALOGUE.md").write_text("[Kat] Fine I'll fix your shit too")
+    assert deliver.source_digest(["dialogue/vid"]) != before
+
+
+def test_a_renamed_input_is_drift_not_a_crash(tmp_path, monkeypatch):
+    monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
+    assert deliver.source_digest(["gone.json"])  # absent hashes, never raises
+
+
+def _report(master):
+    act = deliver.Act("VI", "7 Days to the Wolves", "06.mp4")
+    r = deliver.ActReport(act)
+    deliver.check_sources(act, master, r)
+    return r.findings[0]
+
+
+def test_inputs_that_moved_since_the_render_are_stale(tmp_path, monkeypatch):
+    monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
+    (tmp_path / "shotlist.json").write_text("v1")
+    master = {"path": "~/m.mp4", "sources": ["shotlist.json"],
+              "source_digest": deliver.source_digest(["shotlist.json"])}
+    assert _report(master).state == deliver.OK
+    (tmp_path / "shotlist.json").write_text("v2")
+    f = _report(master)
+    assert f.state == deliver.STALE
+    assert "rebuild the act" in f.detail
+
+
+def test_an_act_with_no_committed_inputs_says_so(tmp_path, monkeypatch):
+    """Acts IV and V are cut outside the repo, so there is nothing to watch.
+
+    That is a finding, not a configuration: it is precisely why the Kat/Nat
+    dialogue round (#118) had nowhere to land.
+    """
+    monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
+    f = _report({"path": "~/m.mp4", "sources": [], "sources_note": "NOT REPO-DRIVEN"})
+    assert f.state == deliver.ABSENT_BY_DESIGN
+    assert "NOT REPO-DRIVEN" in f.detail
+
+
+def test_undeclared_inputs_are_never_mistaken_for_fresh(tmp_path, monkeypatch):
+    monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
+    assert _report({"path": "~/m.mp4"}).state == deliver.UNDECLARED
+
+
+def test_declared_but_unrecorded_is_undeclared_not_ok(tmp_path, monkeypatch):
+    # A digest nobody stamped proves nothing; publish is what stamps it.
+    monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
+    (tmp_path / "s.json").write_text("x")
+    assert _report({"path": "~/m.mp4",
+                    "sources": ["s.json"]}).state == deliver.UNDECLARED
+
+
+def test_every_declared_source_actually_exists():
+    """A path typo would silently hash as 'absent' and then look stable."""
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    for numeral, master in masters.items():
+        for rel in master.get("sources") or []:
+            assert (REPO_ROOT / rel).exists(), \
+                f"act {numeral} declares a source that does not exist: {rel}"
+
+
+def test_an_act_with_no_committed_inputs_carries_its_reason():
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    for numeral, master in masters.items():
+        if master.get("sources") == []:
+            assert master.get("sources_note"), \
+                f"act {numeral} declares no inputs and does not say why"
+
+
+def test_the_recorded_digest_matches_what_is_committed():
+    """The gate CI runs. If this fails, an act's inputs moved and nobody
+    re-rendered it -- rebuild the act and `deliver.py publish`."""
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    stale = []
+    for numeral, master in masters.items():
+        sources = master.get("sources")
+        if not sources or not master.get("source_digest"):
+            continue
+        if deliver.source_digest(sources) != master["source_digest"]:
+            stale.append(numeral)
+    assert not stale, (
+        f"act(s) {', '.join(stale)}: committed inputs no longer match the "
+        f"delivered master. Rebuild, then `python3 tools/deliver.py publish`.")

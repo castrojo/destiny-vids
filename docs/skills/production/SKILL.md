@@ -154,6 +154,38 @@ An encode's ETA is measurable, so measure it rather than guessing — two `stat`
 calls a few seconds apart on the growing output give the rate. **A question
 about timing gets a time.**
 
+## Keeping the delivery fresh
+
+**A scene changing and the film not changing is the failure mode**, and it is
+invisible: the file is still there, still plays, and is a round of notes
+behind. `tools/deliver.py` is the graph that notices —
+`inputs -> master -> Prod/ -> megacut/ -> 10mb/`.
+
+```bash
+python3 tools/deliver.py status              # what is stale and why
+python3 tools/deliver.py build               # rebuild exactly what is stale
+python3 tools/deliver.py build --watch 60    # keep it fresh while you work
+python3 tools/deliver.py publish             # after ANY act rebuild
+```
+
+**`publish` after every act rebuild.** It re-links `Prod/`, regenerates the
+checksums and README table, *and* stamps the act's input digest — which is what
+makes the next edit show up as drift. Skip it and the act reports stale
+forever.
+
+Transcoding is cheap and the megacut is what gets reviewed, so it should never
+be more than one edit behind. `--watch` polls rather than using inotify on
+purpose: an edit can arrive from a rebase, another agent's worktree, or another
+machine, and none of those raise a local file event.
+
+**An act with `sources: []` is not configured — it is a finding.** It means the
+act is cut outside the repo, so there is nothing to edit here and nothing to
+watch. Acts IV, V and VII are in that state, which is exactly why the Kat/Nat
+dialogue round ([#118]) had nowhere to land. Giving those acts a builder is the
+fix, not adding a source list that lies.
+
+[#118]: https://github.com/castrojo/destiny-vids/issues/118
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -162,6 +194,8 @@ about timing gets a time.**
 | "It's not worth shipping until X is done." | A cut that exists can be watched, judged and corrected. A cut that does not exist teaches nobody anything. |
 | "I found something important on the way, so the detour was justified." | File it as an issue in one minute. A found problem is never a licence to spend the owner's afternoon. |
 | "I'll explain what I learned, then give them the file." | Path and runtime first. Explanation after, and short. |
+| "I rebuilt the act, the delivery is fine." | Not until `deliver.py publish`. Until then `Prod/` may still link the old master and the megacut still contains it. |
+| "The megacut is only one act behind, I'll roll it in next time." | Transcoding is cheap. `deliver.py build` rebuilds only what is stale; there is no next time to save for. |
 | "I'll tag the obvious ones and leave the rest." | An untagged beat derives `clean = false`. Half a tag file marks half the video uncuttable. |
 | "The delivered file needs one small fix, I'll edit it in place." | It is regenerated from checked-in data. A hand-edit is lost on the next month's render and nobody can tell it happened. |
 | "I'll upload it and share the video link." | YouTube cannot replace a file. Share the playlist; `yt-refresh.py` swaps the contents. |
