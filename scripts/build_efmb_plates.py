@@ -532,6 +532,14 @@ BEDAZZLE = {"speaker": "cncf marketing", "text": "Let's bedazzle this thing!"}
 # the brief's own scene starts (2:19, the montage's hand-off) and holds to
 # the last frame. It never shares the lower third's row -- it lives on the
 # bottom letterbox bar, below the picture.
+#
+# ONE DUCK, AND IT IS MEASURED, NOT AESTHETIC. The walk's patch-queue HUD is
+# bottom-right and its card dips 90px onto the bar (y 922-1030 in the shipped
+# geometry); no position on the bar clears it while it holds. So the callout
+# ducks exactly the HUD's window -- 28.4 s in a 169 s hold -- rather than
+# shrink to ticker height for the whole song to fix half a minute. The
+# alternative is the owner's to call (#98, Questions); recorded in
+# `unresolved`.
 LETTERBOX_BANNER = (
     "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST")
 
@@ -1284,17 +1292,23 @@ def build():
         "the preamble lands the last cue on the final second")
 
     # The letterbox callout: up where the brief's scene starts, down on the
-    # last frame -- "keep it up for the whole song".
-    toc.append({
-        "id": "letterbox_banner",
-        "kind": "banner",
-        "at": MONTAGE_OUT,
-        "dur": round(film_sec - MONTAGE_OUT, 3),
-        "position": "letterbox",
-        "copy_source": "owner_supplied",
-        "text": LETTERBOX_BANNER,
-        "text_source": "owner_supplied",
-    })
+    # last frame -- "keep it up for the whole song". Two windows: it ducks the
+    # patch-queue HUD, the one card that already owns a piece of the bar. The
+    # HUD holds from the enemies' reveal until the villain lands (see the
+    # walk's own schedule above), so those are the duck's edges.
+    for i, (b_start, b_end) in enumerate((
+            (MONTAGE_OUT, round(film_of(WALK_ENEMIES), 3)),
+            (villain_at, film_sec))):
+        toc.append({
+            "id": f"letterbox_banner_{i + 1}",
+            "kind": "banner",
+            "at": round(b_start, 3),
+            "dur": round(b_end - b_start, 3),
+            "position": "letterbox",
+            "copy_source": "owner_supplied",
+            "text": LETTERBOX_BANNER,
+            "text_source": "owner_supplied",
+        })
 
     plates.extend(toc)
     plates.extend(timed)
@@ -1384,9 +1398,11 @@ def build():
             "burned. An accent-colour emphasis would be chrome nobody "
             "authored",
             "the letterbox callout runs 2:19 -> the last frame, where the "
-            "brief's scene starts; 'the whole song' could also mean from "
-            "0:00 or from the pill that first asks it (1:43.5). TODO(owner): "
-            "say if it should come up earlier",
+            "brief's scene starts, ducking only the patch-queue HUD's 28.4 s "
+            "(its card already occupies the bar's bottom-right; measured, not "
+            "aesthetic). 'The whole song' could also mean from 0:00, from the "
+            "pill that first asks it (1:43.5), or with NO duck -- that costs "
+            "shrinking it to ticker height for the whole film. TODO(owner)",
             "the TOC payoff REPRISES the montage's emeritus card verbatim -- "
             "a callback, not a second credit; the double-credit guard was "
             "taught that a verbatim reprise is not two faces",

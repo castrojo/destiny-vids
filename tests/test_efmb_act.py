@@ -425,11 +425,18 @@ def test_the_villain_arrives_with_the_villain():
 
 def test_nobody_else_is_credited_inside_the_walk():
     """Owner: 'No other guardians'. Rizzo, HuntedRaven7, hanthor and Ahmed
-    Adan all held shots in this window and all four came out."""
+    Adan all held shots in this window and all four came out.
+
+    The letterbox banner is exempt: it names nobody (a hashtag, a collective,
+    a second hashtag), and its second window starts where the patch-queue HUD
+    ends -- the duck is measured off the walk's own schedule.
+    """
     walk_in = build_efmb.film_for_source(build_efmb_plates.WALK_IN)
     walk_out = build_efmb.film_for_source(build_efmb_plates.WALK_OUT)
     for p in committed()["plates"]:
         if p["id"].startswith("walk_"):
+            continue
+        if p.get("kind") == "banner":
             continue
         assert not (walk_in <= p["at"] < walk_out), (
             f"{p['id']} is still credited inside The Long Walk")
@@ -599,15 +606,23 @@ def test_the_closing_quotes_end_on_the_final_second():
 def test_the_letterbox_callout_holds_for_the_rest_of_the_song():
     """"Keep it up for the whole song": up where the brief's scene starts
     (2:19, the montage's hand-off), down on the last frame, on the bottom bar
-    where it shares no card's row."""
-    banner = toc_plates()["letterbox_banner"]
-    assert banner["kind"] == "banner"
-    assert banner["position"] == "letterbox"
-    assert banner["at"] == build_efmb_plates.MONTAGE_OUT
-    assert banner["at"] + banner["dur"] == pytest.approx(
+    where it shares no card's row. It ducks exactly one thing -- the walk's
+    patch-queue HUD, whose card already occupies the bar's bottom-right."""
+    toc = toc_plates()
+    banners = [toc["letterbox_banner_1"], toc["letterbox_banner_2"]]
+    assert all(b["kind"] == "banner" and b["position"] == "letterbox"
+               for b in banners)
+    assert all(b["text"] == build_efmb_plates.LETTERBOX_BANNER
+               for b in banners)
+    assert "Support Open Gaming Collective" in banners[0]["text"]
+    # Up at the scene's start, down on the final frame...
+    assert banners[0]["at"] == build_efmb_plates.MONTAGE_OUT
+    assert banners[1]["at"] + banners[1]["dur"] == pytest.approx(
         committed()["_film_sec"], abs=1e-3)
-    assert banner["text"] == build_efmb_plates.LETTERBOX_BANNER
-    assert "Support Open Gaming Collective" in banner["text"]
+    # ...and the duck is exactly the HUD's window, to the millisecond.
+    hud = next(p for p in committed()["plates"] if p["id"] == "walk_patch_queue")
+    assert banners[0]["at"] + banners[0]["dur"] == pytest.approx(hud["at"])
+    assert banners[1]["at"] == pytest.approx(hud["at"] + hud["dur"])
 
 
 def test_the_placeholder_speakers_are_recorded_never_guessed():

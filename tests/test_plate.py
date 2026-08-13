@@ -2261,6 +2261,21 @@ def test_the_banner_sits_below_the_picture_on_the_bar():
         f"{picture[1] + picture[3]}")
 
 
+def test_the_banner_survives_a_full_frame_picture_rect():
+    """Act II mixes aspect ratios: the opening is 16:9 full-frame, so
+    detection can return a rect that IS the frame. The banner must then sit
+    just off the bottom edge -- never off-screen, which is how a full-frame
+    rect once rendered it into the void below the canvas."""
+    img = plate.render_plate(dict(BANNER))
+    frame = plate.place(img, "letterbox", (0, 0, plate.FRAME_W, plate.FRAME_H))
+    alpha = frame.split()[3]
+    rows = alpha.load()
+    ys = [y for y in range(plate.FRAME_H)
+          if any(rows[x, y] for x in range(0, plate.FRAME_W, 17))]
+    assert ys, "the banner rendered off the frame entirely"
+    assert max(ys) < plate.FRAME_H
+
+
 def test_a_banner_shares_the_screen_but_never_with_a_second_banner():
     """A chrome row of its own: it coexists with a lower third and with the
     other chrome rows, but two banners at once is still an error."""

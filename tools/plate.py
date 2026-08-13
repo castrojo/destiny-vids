@@ -1579,11 +1579,16 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
         # The banner's strip is the bottom BAR of a letterboxed frame: below
         # the picture entirely, so it can hold for a whole film and never
         # share the lower third's row (issue #98: "a huge callout along the
-        # bottom of the letterbox ... keep it up for the whole song"). On a
-        # full-frame source there is no bar and it sits at the bottom edge.
+        # bottom of the letterbox ... keep it up for the whole song"). When
+        # the picture rect IS the frame -- detection probed an un-letterboxed
+        # stretch, or the source mixes aspect ratios (act II's opening is
+        # full-frame, the rest is not) -- it sits just off the bottom edge.
         bar_top = py + ph
         x = (FRAME_W - plate.width) // 2
-        y = bar_top + max(0, (FRAME_H - bar_top - plate.height) // 2)
+        if FRAME_H - bar_top >= plate.height:
+            y = bar_top + (FRAME_H - bar_top - plate.height) // 2
+        else:
+            y = FRAME_H - plate.height - int(0.02 * FRAME_H)
         frame.alpha_composite(plate, (x, y))
         return frame
     if position == "boss":

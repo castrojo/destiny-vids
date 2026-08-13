@@ -165,10 +165,10 @@
       "placeholder": true
     },
     {
-      "id": "letterbox_banner",
+      "id": "letterbox_banner_1",
       "kind": "banner",
       "at": 139.0,
-      "dur": 168.998,
+      "dur": 47.334,
       "position": "letterbox",
       "copy_source": "owner_supplied",
       "text": "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST",
@@ -378,6 +378,16 @@
       "at": 189.483,
       "dur": 3.2,
       "position": "left"
+    },
+    {
+      "id": "letterbox_banner_2",
+      "kind": "banner",
+      "at": 214.734,
+      "dur": 93.264,
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text": "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST",
+      "text_source": "owner_supplied"
     },
     {
       "id": "walk_villain",
@@ -647,7 +657,7 @@
     "Karena's jump carries no card ('the beat is the jump'): it is 1.5s of clear screen between Joseph's DO line and Ricardo's answer. No shot was verified as HER jump and picking one would be casting by inference -- TODO(owner): the frame",
     "the closing five quotes play over the black outro (picture ends 4:51.933): the brief's own schedule put them 4:51 -> 5:07 and its preamble lands the last cue on the final second. The tail is black by the owner's standing decision",
     "Joseph's 'DO' and siosm's 'powering up' carry authored emphasis; the pill's message row is set bold throughout (the site's own style), so both ARE bold on screen but not differentiated. siosm's asterisks are emphasis markup and are stripped, not burned. An accent-colour emphasis would be chrome nobody authored",
-    "the letterbox callout runs 2:19 -> the last frame, where the brief's scene starts; 'the whole song' could also mean from 0:00 or from the pill that first asks it (1:43.5). TODO(owner): say if it should come up earlier",
+    "the letterbox callout runs 2:19 -> the last frame, where the brief's scene starts, ducking only the patch-queue HUD's 28.4 s (its card already occupies the bar's bottom-right; measured, not aesthetic). 'The whole song' could also mean from 0:00, from the pill that first asks it (1:43.5), or with NO duck -- that costs shrinking it to ticker height for the whole film. TODO(owner)",
     "the TOC payoff REPRISES the montage's emeritus card verbatim -- a callback, not a second credit; the double-credit guard was taught that a verbatim reprise is not two faces"
   ]
 }

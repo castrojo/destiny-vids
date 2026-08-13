@@ -316,7 +316,10 @@ five closing quotes spread evenly from there so the **last one ends on the
 film's final frame**. The letterbox callout — `#FIGHTFORCONTRIBUTORS -
 Support Open Gaming Collective - #UPSTREAMFIRST` — holds from 2:19 to the
 last frame on the bottom bar (`kind: banner`, `position: letterbox`), below
-the picture, sharing no card's row. **Not built:** the 4:01 speech bubble on
+the picture, sharing no card's row; it ducks exactly the patch-queue HUD's
+28.4 s, whose card already occupies the bar's bottom-right (measured, not
+aesthetic — the alternative is ticker height for the whole film, and that is
+the owner's call). **Not built:** the 4:01 speech bubble on
 Cayde — his card is at 4:47.9, so a bubble anchored on him cannot be at 4:01;
 which moves is the owner's call.
 
