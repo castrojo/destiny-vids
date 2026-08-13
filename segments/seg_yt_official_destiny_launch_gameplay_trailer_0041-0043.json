@@ -1,0 +1,125 @@
+{
+  "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0041-0043",
+  "video_id": "yt_official_destiny_launch_gameplay_trailer",
+  "start_sec": 41.307933,
+  "end_sec": 43.376667,
+  "start_tc": "0:41",
+  "end_tc": "0:43",
+  "era": "d1_base",
+  "activity": "unknown",
+  "content_type": "gameplay",
+  "caption": "Fireteam of three stands on a rocky ledge silhouetted against a bright sky, one raises an arm. Verified full-size window 41.31-43.38.",
+  "overlays": [
+    "none"
+  ],
+  "shot_scale": "LS",
+  "composition": [
+    "group"
+  ],
+  "lighting": "silhouette",
+  "identity_visibility": "silhouette",
+  "character_identifiability": "unidentifiable",
+  "subject_salience": "guardian_hero",
+  "mood": [
+    "triumphant"
+  ],
+  "substitutability": 4,
+  "clean": true,
+  "footage_tier": "gameplay",
+  "traversal_hero": false,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 3
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.85
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

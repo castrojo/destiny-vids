@@ -55,15 +55,37 @@ def test_card_needs_a_positive_duration(tmp_path):
 
 
 def test_every_item_contributes_one_video_and_one_audio_leg(tmp_path):
-    """concat needs both streams from every segment; a missing leg is the
-    classic way an assembly desynchronises partway through."""
+    """Every segment must carry both streams; a missing leg is the classic way
+    an assembly desynchronises partway through. The join reads the segments in
+    order, so a segment with no audio would silently shift everything after
+    it."""
     _, plan = _plan(tmp_path, [
         {"kind": "card", "image": "c.png", "dur": 5.0},
         {"kind": "clip", "path": "a.mp4", "audio": "silent", "dur": 10.0},
         {"kind": "clip", "path": "b.mp4", "audio": "source", "dur": 3.0},
     ])
-    graph = megacut.build_filtergraph(plan)
-    assert "[v0][a0][v1][a1][v2][a2]concat=n=3:v=1:a=1[vout][aout]" in graph
+    for item in plan["items"]:
+        graph = megacut.build_filtergraph(plan, [item])
+        assert "[v0]null[vout]" in graph
+        assert "[a0]anull[aout]" in graph
+
+
+def test_a_segment_is_never_a_concatenation_of_one(tmp_path):
+    """`concat=n=1` reads as a harmless no-op and is not one: on one act it
+    re-timed 307.967s of frames into 299.48s of timestamps, the encoder dropped
+    the frames that collided, and the programme came out 8.5s short with every
+    later act starting early. The join is the concat DEMUXER, not a filter."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    assert "concat" not in megacut.build_filtergraph(plan, plan["items"])
+
+    _, two = _plan(tmp_path, [
+        {"kind": "card", "image": "c.png", "dur": 5.0},
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    with pytest.raises(ValueError):
+        megacut.build_filtergraph(two)
 
 
 def test_silent_clip_gets_generated_silence_of_matching_length(tmp_path):
@@ -99,19 +121,43 @@ def test_everything_lands_on_one_frame_rate(tmp_path):
         {"kind": "card", "image": "c.png", "dur": 5.0},
         {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
     ])
-    graph = megacut.build_filtergraph(plan)
+    graph = "".join(megacut.build_filtergraph(plan, [i]) for i in plan["items"])
     assert graph.count("fps=60000/1001") == 2
 
 
 def test_colour_is_written_into_the_x264_vui(tmp_path):
     """-color_primaries describes the frames; x264 copies only the matrix from
-    them and leaves primaries/transfer `unknown`. Both must be set."""
+    them and leaves primaries/transfer `unknown`. Both must be set.
+
+    On the SEGMENT, which is the stage that encodes: the join copies the
+    bitstream, so a VUI written any later would never reach it."""
     path, plan = _plan(tmp_path, [
         {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
     ])
-    cmd = megacut.build_command(plan, "out.mp4")
+    cmd = megacut.build_segment_command(plan, 0, "seg000.mkv")
     assert "-color_primaries" in cmd
     assert "colorprim=bt709:transfer=bt709:colormatrix=bt709" in cmd
+    assert "copy" not in cmd, "the segment encodes; only the join copies"
+
+
+def test_the_join_copies_the_picture_and_encodes_the_sound_once(tmp_path):
+    """The reason segmenting costs no quality. Video is encoded at the segment
+    and copied here, so there is one video generation. Audio rides the segments
+    as lossless 24-bit PCM and is encoded to AAC once, ACROSS the joins --
+    encoding AAC per segment would give every cut its own encoder delay and
+    padding. PCM rather than FLAC because the concat demuxer binds the first
+    file's extradata to the whole stream, and FLAC keeps its STREAMINFO
+    there."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    seg = megacut.build_segment_command(plan, 0, "seg000.mkv")
+    assert seg[seg.index("-c:a") + 1] == "pcm_s24le"
+
+    join = megacut.build_concat_command(plan, "segments.txt", "out.mp4")
+    assert join[join.index("-c:v") + 1] == "copy"
+    assert join[join.index("-c:a") + 1] == "aac"
+    assert "-safe" in join and join[join.index("-safe") + 1] == "0"
 
 
 def test_expected_duration_sums_the_parts(tmp_path):
@@ -135,7 +181,8 @@ def test_a_command_can_be_built_with_no_ffmpeg_installed(tmp_path, monkeypatch):
     _, plan = _plan(tmp_path, [
         {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
     ])
-    assert megacut.build_command(plan, "out.mp4")[0] == "ffmpeg"
+    assert megacut.build_segment_command(plan, 0, "seg000.mkv")[0] == "ffmpeg"
+    assert megacut.build_concat_command(plan, "l.txt", "out.mp4")[0] == "ffmpeg"
 
 
 def test_ffprobe_is_resolved_beside_the_chosen_ffmpeg(monkeypatch):

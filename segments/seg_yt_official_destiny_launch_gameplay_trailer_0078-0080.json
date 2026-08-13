@@ -1,0 +1,79 @@
+{
+  "segment_id": "seg_yt_official_destiny_launch_gameplay_trailer_0078-0080",
+  "video_id": "yt_official_destiny_launch_gameplay_trailer",
+  "start_sec": 78.344933,
+  "end_sec": 80.547133,
+  "start_tc": "1:18",
+  "end_tc": "1:21",
+  "era": "d1_base",
+  "activity": "unknown",
+  "content_type": "gameplay",
+  "caption": "First-person gameplay continues.",
+  "composition": [
+    "POV"
+  ],
+  "subject_salience": "ambient",
+  "clean": false,
+  "footage_tier": "gameplay",
+  "traversal_hero": false,
+  "casting": {
+    "role": "none",
+    "character": null,
+    "person": null,
+    "usable": false,
+    "constraints_failed": [],
+    "slots": 0
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "heuristic",
+      "confidence": 0.4
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.8
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.8
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.8
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.8
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

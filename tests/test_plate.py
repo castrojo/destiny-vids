@@ -59,6 +59,156 @@ def test_rust_variant_changes_only_the_chrome():
     assert rust.tobytes() != default.tobytes()  # different chrome
 
 
+# --- owner-authored chrome: portraits, the laurel, bazzite purple -----------
+# None of these adds a row of text; they are imagery and colour, the same
+# class of local addition as `variant` and `kind: ghost`.
+
+@pytest.fixture
+def avatar_png(tmp_path):
+    """A local PFP file, as cached ahead of time from a GitHub avatar."""
+    from PIL import Image
+
+    path = tmp_path / "pfp.png"
+    Image.new("RGBA", (96, 96), (200, 30, 30, 255)).save(path)
+    return path
+
+
+def test_an_avatar_is_masked_into_the_crest(avatar_png):
+    """`avatar` is a PFP path: the photo sits in the crest's inner hex with
+    the hex rules kept over it, and the plate's geometry does not move."""
+    with_photo = plate.render_plate(dict(GUARDIAN, avatar=str(avatar_png)))
+    drawn = plate.render_plate(GUARDIAN)
+    assert with_photo.size == drawn.size
+    # the crest's heart is the photo's red, not the drawn crest's dark fill
+    cx = with_photo.width // 2
+    crest_mid = int(plate.PAD_TOP + plate.CREST / 2)
+    r, g, b, a = with_photo.getpixel((cx, crest_mid))
+    assert a == 255 and r > 150 and g < 80
+    assert drawn.getpixel((cx, crest_mid)) != (r, g, b, a)
+
+
+def test_a_missing_avatar_degrades_to_the_drawn_crest():
+    """Degrade, never block: a PFP that is not there is a punch-list item,
+    and the drawn crest stands in -- the render is exactly the fallback."""
+    spec = dict(GUARDIAN, avatar="avatars/nobody-cached-this.png")
+    assert plate.render_plate(spec).tobytes() == plate.render_plate(GUARDIAN).tobytes()
+
+
+def test_an_unreadable_avatar_also_degrades(tmp_path):
+    """A file that is not an image is the same punch-list item, not a crash."""
+    bad = tmp_path / "pfp.png"
+    bad.write_text("not an image")
+    assert plate.render_plate(dict(GUARDIAN, avatar=str(bad))).tobytes() == \
+        plate.render_plate(GUARDIAN).tobytes()
+
+
+def test_an_avatar_url_degrades_too_the_renderer_is_offline():
+    """The vocab may record the avatar's SOURCE URL; the renderer never
+    fetches. Until a cache step turns it into a local path, the drawn crest
+    stands in -- reported on stderr, never a crash."""
+    spec = dict(GUARDIAN, avatar="https://avatars.githubusercontent.com/u/52753?v=4")
+    assert plate.render_plate(spec).tobytes() == plate.render_plate(GUARDIAN).tobytes()
+
+
+def test_the_wreath_rings_the_crest_without_moving_the_layout():
+    """Owner-briefed for exactly two people: a laurel around the crest, struck
+    in the plate's own accent metal. It must not grow the card, and it must
+    stay thin -- coverage in the ring is a medallion's, not a glow's."""
+    import math
+
+    plain = plate.render_plate(GUARDIAN)
+    wreathed = plate.render_plate(dict(GUARDIAN, wreath=True))
+    assert wreathed.size == plain.size
+    assert wreathed.tobytes() != plain.tobytes()
+
+    cx = wreathed.width // 2
+    cy = int(plate.PAD_TOP + plate.CREST / 2)
+
+    def metal_hits(img, r0=22, r1=33):
+        """Bright-metal pixels in the ring band around the crest."""
+        return sum(1 for yy in range(cy - r1, cy + r1 + 1)
+                   for xx in range(cx - r1, cx + r1 + 1)
+                   if r0 <= math.hypot(xx - cx, yy - cy) <= r1
+                   and min(*img.getpixel((xx, yy))[:3]) > 120)
+
+    leaves, bare = metal_hits(wreathed), metal_hits(plain)
+    assert leaves > bare + 150, "the laurel is there"
+    ring_area = sum(1 for yy in range(cy - 33, cy + 34)
+                    for xx in range(cx - 33, cx + 34)
+                    if 22 <= math.hypot(xx - cx, yy - cy) <= 33)
+    assert leaves / ring_area < 0.45, "a struck laurel, not a solid ring"
+
+
+def test_the_wreath_frames_the_avatar(avatar_png):
+    """The brief was 'a nicer wreath around her pfp': both compose, and the
+    photo still fills the crest under the laurel."""
+    img = plate.render_plate(dict(GUARDIAN, avatar=str(avatar_png), wreath=True))
+    cx = img.width // 2
+    cy = int(plate.PAD_TOP + plate.CREST / 2)
+    r, g, b, a = img.getpixel((cx, cy))
+    assert a == 255 and r > 150 and g < 80
+
+
+def test_the_bazzite_variant_is_purple_chrome_not_a_new_card():
+    """Same geometry and the same closed field set as every other plate --
+    only the chrome changes, exactly like rust and leader. The purples are
+    verified from the official logo (ublue-os/bazzite
+    repo_content/Bazzite.svg): gradient #0047AB -> #8A2BE2, wordmark #5835ce."""
+    bazzite = plate.render_plate(dict(GUARDIAN, variant="bazzite", trustee=False))
+    default = plate.render_plate(dict(GUARDIAN, trustee=False))
+    assert bazzite.size == default.size
+    assert bazzite.tobytes() != default.tobytes()
+    variant = plate._variant_for(dict(GUARDIAN, variant="bazzite"))
+    assert variant is plate.VARIANTS["bazzite"]
+    assert variant["accent"] == (138, 43, 226, 255)   # #8A2BE2
+    assert variant["glow"][:3] == (88, 53, 206)       # #5835ce
+
+
+def test_the_bazzite_crest_carries_the_logomark():
+    """The tile replaces the hex for this variant: the cobalt->violet
+    gradient with the white D-pad at its heart."""
+    img = plate.render_plate(dict(GUARDIAN, variant="bazzite", trustee=False))
+    x0 = img.width // 2 - plate.CREST / 2
+
+    def crest_px(u, v):
+        """Sample the crest; (u, v) are fractions across its box."""
+        return img.getpixel((int(x0 + u * plate.CREST),
+                             int(plate.PAD_TOP + v * plate.CREST)))
+
+    # the D-pad cross centre (SVG 230.56,230.56 in the mark's 100..508 box)
+    cross = crest_px((230.56 - 100) / 408, (230.56 - 100) / 408)
+    assert cross[2] > 200 and cross[0] > 160  # the white glyph over gradient
+    # top-left of the tile is the cobalt end of the gradient
+    corner = crest_px(0.147, 0.147)
+    assert corner[2] > corner[0] + 80
+
+
+def test_a_bazzite_avatar_takes_the_tiles_silhouette(avatar_png):
+    """'Use the bazzite logo and his PFP': with a photo set, the tile keeps
+    its silhouette and hairline and the glyph is not drawn over a face."""
+    img = plate.render_plate(dict(GUARDIAN, variant="bazzite", trustee=False,
+                                  avatar=str(avatar_png)))
+    x0 = img.width // 2 - plate.CREST / 2
+    centre = img.getpixel((int(x0 + (230.56 - 100) / 408 * plate.CREST),
+                           int(plate.PAD_TOP + (230.56 - 100) / 408 * plate.CREST)))
+    r, g, b, a = centre
+    assert a == 255 and r > 150 and g < 80  # the photo, not the glyph
+
+
+def test_a_bracketed_name_typesets_wide_and_whole():
+    """`[ REDACTED ]` is wider than a typical name; the box grows to fit the
+    bracketed form and nothing clips. [ p5 ] and [ EyeCantCU ] render too."""
+    probe_name = {"label": "", "class": "", "title": ""}  # let the name set the width
+    redacted = plate.render_plate(dict(GUARDIAN, **probe_name,
+                                       name="[ REDACTED ]"))
+    bob = plate.render_plate(dict(GUARDIAN, **probe_name))
+    assert redacted.width > bob.width         # the wider name gets a wider card
+    assert redacted.height == bob.height      # ...but it is still one name row
+    for name in ("[ p5 ]", "[ EyeCantCU ]"):
+        img = plate.render_plate(dict(GUARDIAN, **probe_name, name=name))
+        assert img.width > 0 and img.height == bob.height
+
+
 def test_placement_respects_the_row_margins():
     """bottom 10%, left/right 5% (.wolves-guardian-plate-row)."""
     p = plate.render_plate(GUARDIAN)
@@ -186,6 +336,12 @@ def test_burn_builds_one_enable_gated_overlay_per_plate(tmp_path):
     captured = {}
 
     def fake_run(cmd, **kwargs):
+        if any("ffprobe" in str(part) for part in cmd):
+            class P:
+                returncode = 0
+                stdout = "20.0\n"
+                stderr = ""
+            return P()
         captured["cmd"] = cmd
 
         class R:
@@ -204,8 +360,15 @@ def test_burn_builds_one_enable_gated_overlay_per_plate(tmp_path):
 
     chain = captured["cmd"][captured["cmd"].index("-filter_complex") + 1]
     assert chain.count("overlay=") == 2
-    assert "between(t,1.000,6.000)" in chain
-    assert "between(t,8.000,12.000)" in chain
+    # ESCAPED COMMAS, NO SHELL QUOTES. This assertion used to read
+    # `between(t,1.000,6.000)`, which is the documented command-line spelling
+    # and is wrong here: the command is an argv list that never sees a shell,
+    # so ffmpeg got the quotes literally, failed to parse the expression,
+    # disabled every overlay and exited 0 — burning a video with no plates on
+    # it. The test agreed with the bug, so nothing caught it.
+    assert "between(t\\,1.000\\,6.000)" in chain
+    assert "between(t\\,8.000\\,12.000)" in chain
+    assert "'" not in chain, "shell quotes cannot survive an argv filtergraph"
     # audio is carried through, not re-encoded
     assert "-c:a" in captured["cmd"] and "copy" in captured["cmd"]
 
@@ -847,6 +1010,10 @@ def test_no_plate_field_is_invented_beyond_the_reference_deck():
 
     allowed = {"label", "class", "name", "title", "trustee",  # guardian plate
                "kind", "variant",                             # local chrome flags
+               # owner-authored imagery, not copy: a PFP path for the crest,
+               # and the struck laurel around it
+               "avatar", "wreath",
+               "avatar", "wreath",                            # portrait chrome (act II)
                "title", "subtitle", "body"}                   # title card
     casting = yaml.safe_load(
         (Path(__file__).resolve().parents[1] / "vocab" / "casting.yaml").read_text())
@@ -973,6 +1140,21 @@ def test_a_chat_card_carries_no_guardian_rows():
     with_ignored_rows = plate.render_plate(
         dict(CHAT, label="TRUSTEE // GUARDIAN", **{"class": "Dawnblade Warlock"}))
     assert card.size == with_ignored_rows.size
+
+
+def test_a_chat_card_carries_the_pfp_in_its_badge_slot(avatar_png):
+    """plate.html's .avatar/.pfp is an 84px circle; the crest is the no-pfp
+    fallback. The slot was always reserved, so the layout does not move."""
+    with_photo = plate.render_plate(dict(CHAT, avatar=str(avatar_png)))
+    pill = plate.render_plate(CHAT)
+    assert with_photo.size == pill.size
+    # the badge's heart is the photo's red, masked to the circle...
+    badge_cx = plate.CHAT_PAD_L + plate.CHAT_AVATAR // 2
+    r, g, b, a = with_photo.getpixel((badge_cx, with_photo.height // 2))
+    assert a == 255 and r > 150 and g < 80
+    # ...and the slot's corner is pill fill, not photo: the mask is a circle
+    corner = with_photo.getpixel((plate.CHAT_PAD_L + 3, 10))
+    assert corner[:3] == plate.INK[:3]
 
 
 def test_plates_sit_on_the_picture_not_on_the_letterbox_bar():
@@ -1414,21 +1596,41 @@ def test_the_issue_1_brief_end_to_end_through_the_parser():
 # --- a lead's plate carries only what was authored ---------------------------
 #
 # A real person's subclass is deck data, never a lore call about the character
-# they play. Karena's binding is the case where the owner supplied the class
-# (Warlock) but no subclass, so the row is short a word -- and shipping it short
-# is correct, because the alternative is an agent choosing a subclass for a real
-# person. These pin the shape so nobody "completes" it later.
+# they play. Karena's binding was the case where the owner had supplied the
+# class (Warlock) but no subclass; for act II the owner re-authored the whole
+# plate and supplied the subclass (Stasis), answering issue #5. These pin the
+# new copy verbatim -- and pin that the old copy survives in the binding's
+# `note:`, so the change is visible rather than silent.
 
 def test_the_mara_sov_plate_is_exactly_what_was_authored():
     from tools.derive import load_leads
     spec = load_leads()["mara_sov"]["plate"]
-    assert spec["class"] == "Warlock", (
-        "the owner supplied the class only; a subclass must come from the owner, "
-        "never from an agent picking a plausible one"
+    assert (spec["label"], spec["class"], spec["name"], spec["title"]) == (
+        "ARCHON // CONTRIBUTOR", "Stasis Warlock",
+        "Karena Angell", "Architect of the Consensus"), (
+        "owner-authored for act II, the subclass (#5) now supplied; a "
+        "paraphrase is as wrong as an invention"
     )
-    assert spec["name"] == "Karena Angell"
-    assert spec["title"] == "Archon of the Consensus"
-    assert spec["variant"] == "leader"
+    assert spec["variant"] == "leader"   # gold, carried over -- never withdrawn
+    assert spec["wreath"] is True        # "the most senior warrior in the series"
+    assert "avatar" not in spec, (
+        "no GitHub login is on record for Karena, so the wreath has no "
+        "portrait to ring yet -- a recorded gap, never a guessed login")
+
+
+def test_the_mara_sov_reauthorship_keeps_the_old_copy_visible():
+    """The old plate is owner-authored copy about a real person, so replacing
+    it is recorded: the binding's `note:` keeps the previous copy verbatim and
+    names the issue the re-authorship answers."""
+    import yaml
+    from pathlib import Path
+
+    casting = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "vocab" / "casting.yaml").read_text())
+    note = casting["leads"]["values"]["mara_sov"]["note"]
+    assert "#5" in note
+    assert "ARCHITECT // GENERAL" in note     # the old label, verbatim
+    assert "Archon of the Consensus" in note  # the old title, verbatim
 
 
 def test_the_mara_sov_plate_renders():
@@ -1438,9 +1640,11 @@ def test_the_mara_sov_plate_renders():
 
 
 def test_a_lead_plate_renders_without_a_class_row():
-    """The standing fallback when no class is authored at all."""
-    spec = {"label": "ARCHITECT // GENERAL", "name": "Karena Angell",
-            "title": "Archon of the Consensus", "variant": "leader"}
+    """The standing fallback when no class is authored at all. Synthetic copy:
+    Karena's binding carried this shape until the owner authored Stasis (#5),
+    and Joseph Sandoval's act II plate ships without a class row today."""
+    spec = {"label": "PRACTITIONER // GUARDIAN", "name": "A Guardian",
+            "title": "Bearer of the Unwritten Row", "variant": "leader"}
     without = plate.render_plate(spec)
     with_class = plate.render_plate(dict(spec, **{"class": "Voidwalker Warlock"}))
     assert without.height < with_class.height
@@ -1448,8 +1652,8 @@ def test_a_lead_plate_renders_without_a_class_row():
 
 def test_a_classless_lead_still_takes_its_variant_chrome():
     """Dropping a row must not drop the gold treatment with it."""
-    spec = {"label": "ARCHITECT // GENERAL", "name": "Karena Angell",
-            "title": "Archon of the Consensus", "variant": "leader"}
+    spec = {"label": "PRACTITIONER // GUARDIAN", "name": "A Guardian",
+            "title": "Bearer of the Unwritten Row", "variant": "leader"}
     assert plate._variant_for(spec) == plate.VARIANTS["leader"]
 
 

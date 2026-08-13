@@ -60,6 +60,42 @@ picture for its window exactly as the site does:
 | `art` | one comic hero shot (`wolves-comic-hero-shots.ts`) |
 | `qr` / `qr_dialogue` / `qr_domain` | the MakeMeAComic panel |
 | `quote` / `quote_by` / `quote_note` | the pull quote and its attribution |
+| `wallpaper` | an image behind the card, in place of its opaque black |
+| `wallpaper_dir` / `wallpaper_match` | roll a random one per render, from a directory, optionally filtered by regex |
+| `captions[]` | caption boxes in the frame's margins |
+
+A card whose only content is `art` — no QR panel, no quote — is not a hero shot
+beside a column: it **is** the frame, and takes the full height. Without that
+it renders at about a third of frame.
+
+### Caption boxes, and when a plate cannot be one
+
+A Guardian plate is **561px** wide. Square art on a 16:9 frame leaves **420px**
+of margin either side, so an identity beside a square cover cannot be a plate
+without covering the art. `captions[]` carries the same authored strings in
+chrome that fits:
+
+```json
+{"side": "left", "label": "BLUEBERRY // HUMAN",
+ "lines": ["Rafael Castro", "Blueberry Hunter", "Happy 10th Birthday!"]}
+```
+
+`side` picks the margin, `label` draws the mono eyebrow, and `lines[]` draws
+the rows — the first as the headline, the rest as supporting detail. Absent
+keys draw nothing, as everywhere else. The chrome is the deck's own, reproduced
+not designed: white stock, the 16px chamfer and the `#60a5fa` hairline
+`tools/plate.py` draws, plus a left accent rule, and **no tilt**.
+
+This is a chrome change, never a copy change. Moving an identity off a plate
+and into a caption must carry every authored string across verbatim; a row that
+does not fit is a row the owner has to shorten, not one the renderer drops.
+
+### A random wallpaper is only usable if the roll is recorded
+
+`wallpaper_dir` picks a file at random per render. A render nobody wrote down
+cannot be rebuilt, so the driver records its choice in `wallpapers.json` beside
+the PNG, and `--wallpaper-seed <seed>` replays it — the pick is hashed from
+`seed:card_id`, so it does not depend on directory order.
 
 ## Traps, each of which has already bitten
 
@@ -83,3 +119,7 @@ picture for its window exactly as the site does:
   0.35s; the burn cuts between stills on the same slot arithmetic
   `getComicHeroShotIndex()` uses, and the difference is recorded rather than
   faked.
+- **`clip-path` opens a stacking context**, so a hairline drawn as a
+  `z-index: -1` pseudo-element paints *over* the element's own background
+  instead of behind it — a white box renders solid blue. The caption boxes nest
+  a white panel 2px inside a blue parent instead.

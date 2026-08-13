@@ -35,7 +35,99 @@
 
   :root {
     --wc-font-weyland-mono: 'Share Tech Mono', ui-monospace, monospace;
+    /* Same two stacks act.html declares, so a caption on the cover renders in
+       the same face as the act slides rather than a third typeface. */
+    --wc-font-display: 'Inter', 'Arial Narrow', sans-serif;
+    --wc-font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace;
+    --wc-accent: #60a5fa;
   }
+
+  /* The Bluefin wallpaper behind the card. The site's title card is opaque
+     black; act I's TITLE COVER puts a wallpaper there instead, at the owner's
+     request, because the cover art is square and a 16:9 frame leaves margins
+     either side of it. It sits under everything and is never drawn over the
+     art. */
+  .wallpaper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+  /* With a wallpaper behind it, the card's own black would hide it. */
+  body.has-wallpaper { background: transparent; }
+  /* A cover with no QR panel and no quote is not a hero shot beside a column:
+     it IS the frame, so it takes the full height rather than the site's
+     hero-shot box. Without this it renders at about a third of frame. */
+  body.cover-only { padding: 0; }
+  body.cover-only .layout { transform: none; width: 100%; height: 100%; }
+  body.cover-only .main { width: 100%; height: 100%; display: flex;
+    align-items: center; justify-content: center; }
+  body.cover-only .art-frame { width: auto; height: 100%; position: relative;
+    z-index: 1; }
+  body.cover-only .art { height: 100%; width: auto; }
+
+  /* CAPTION BOXES -- the cover's margins.
+   *
+   * The cover art is square, so at 1920x1080 it fills the middle 1080px and
+   * leaves 420px of wallpaper either side. A Guardian nameplate is 561px wide
+   * (tools/plate.py), so the owner's authored cover identities CANNOT be
+   * plates here without covering the ink -- which the owner ruled out. They
+   * are carried as caption boxes in those margins instead: same authored
+   * strings, chrome that fits the space.
+   *
+   * The chrome is the show's own, reproduced not invented: white stock, the
+   * 16px top-left/bottom-right chamfer and the #60a5fa hairline that
+   * tools/plate.py draws (CHAMFER, the accent token), plus a left accent rule.
+   * No tilt, by owner instruction.
+   */
+  .captions {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center;
+    pointer-events: none;
+  }
+  .caption-column {
+    display: flex; flex-direction: column; gap: 18px;
+    width: 392px; padding: 0 14px;
+  }
+  .caption-column.right { align-items: flex-end; }
+  /* The blue shape is the OUTER element and the white panel is nested 2px
+     inside it, so the hairline reads as a stroke. Drawing it as a negative
+     z-index pseudo-element does not work: clip-path opens a stacking context,
+     so the layer paints over the white rather than behind it. */
+  .caption {
+    width: 100%;
+    background: var(--wc-accent);
+    padding: 2px;
+    clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px),
+                       calc(100% - 18px) 100%, 0 100%, 0 18px);
+    text-align: left;
+  }
+  .caption-inner {
+    background: #fff;
+    padding: 24px 22px 24px 23px;
+    border-left: 3px solid var(--wc-accent);
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px),
+                       calc(100% - 16px) 100%, 0 100%, 0 16px);
+  }
+  .caption-label {
+    display: block;
+    font-family: var(--wc-font-mono);
+    font-size: 17px; font-weight: 700;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    color: #2563eb;
+    margin-bottom: 10px;
+  }
+  .caption-line {
+    display: block;
+    font-family: var(--wc-font-display);
+    font-weight: 700; font-size: 34px; line-height: 1.16;
+    color: #0b0e14;
+  }
+  .caption-line + .caption-line { margin-top: 4px; }
+  /* Rows after the first are supporting detail, not the headline. */
+  .caption-line.secondary { font-size: 27px; font-weight: 600; color: #313a4a; }
 
   /* .wolves-intro-overlay-title-card */
   body {
@@ -195,6 +287,7 @@
 </style>
 </head>
 <body>
+  <img class="wallpaper hidden" id="wallpaper" alt="" />
   <div class="layout">
     <div class="main">
       <div class="art-frame hidden" id="art-frame">
@@ -216,6 +309,10 @@
       <span id="quote-note"></span>
     </div>
   </blockquote>
+  <div class="captions hidden" id="captions">
+    <div class="caption-column left" id="captions-left"></div>
+    <div class="caption-column right" id="captions-right"></div>
+  </div>
 <script>
   const params = new URLSearchParams(window.location.search)
 
@@ -269,6 +366,17 @@
     img.style.top = `${(box.height - contentH * scale) / 2 - minY * scale}px`
   }
 
+  const wallpaperSrc = params.get('wallpaper')
+  if (wallpaperSrc) {
+    const el = document.getElementById('wallpaper')
+    pending.push(loadImage(el, wallpaperSrc).then((ok) => {
+      if (ok) {
+        el.classList.remove('hidden')
+        document.body.classList.add('has-wallpaper')
+      }
+    }))
+  }
+
   const artSrc = params.get('art')
   if (artSrc) {
     const img = document.getElementById('art')
@@ -304,6 +412,52 @@
   }
   fill('quote-by', params.get('quote_by'))
   fill('quote-note', params.get('quote_note'))
+
+  // A card whose only content is the art takes the whole frame rather than the
+  // site's hero-shot box, which sizes itself to sit beside the QR column.
+  if (artSrc && !qrSrc && !params.get('quote')) {
+    document.body.classList.add('cover-only')
+  }
+
+  // Caption boxes arrive as one JSON param rather than a flat key per row,
+  // because each box is a variable-length stack of authored lines and there
+  // may be several per side. Shape:
+  //   [{ "side": "left", "label": "...", "lines": ["...", "..."] }]
+  // Every string is authored copy reproduced verbatim; a key that is absent is
+  // a row the card leaves out, never one it defaults.
+  const captionsRaw = params.get('captions')
+  if (captionsRaw) {
+    const columns = {
+      left: document.getElementById('captions-left'),
+      right: document.getElementById('captions-right'),
+    }
+    let rendered = 0
+    for (const caption of JSON.parse(captionsRaw)) {
+      const column = columns[caption.side === 'right' ? 'right' : 'left']
+      const box = document.createElement('div')
+      box.className = 'caption'
+      const inner = document.createElement('div')
+      inner.className = 'caption-inner'
+      box.appendChild(inner)
+      if (caption.label) {
+        const label = document.createElement('span')
+        label.className = 'caption-label'
+        label.textContent = caption.label
+        inner.appendChild(label)
+      }
+      const lines = caption.lines ?? []
+      lines.forEach((text, index) => {
+        const line = document.createElement('span')
+        line.className = index === 0 ? 'caption-line' : 'caption-line secondary'
+        line.textContent = text
+        inner.appendChild(line)
+      })
+      if (!caption.label && lines.length === 0) { continue }
+      column.appendChild(box)
+      rendered++
+    }
+    if (rendered > 0) { document.getElementById('captions').classList.remove('hidden') }
+  }
 
   Promise.all([document.fonts.ready, ...pending]).then(() => {
     window.__renderReady = true

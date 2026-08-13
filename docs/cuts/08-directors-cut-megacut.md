@@ -3,11 +3,18 @@
 The whole show as **one continuous video**, assembled from the finished cuts and
 announced by act slides in the Wolves cinematic's own chrome.
 
-**Status: planned and staged, NOT rendered.** The act slides and the comic title
-card are rendered and reviewable in `renders/`; the programme itself is not
-built, by owner instruction ("fix it in the video don't render it"). Nothing
-is delivered for the feature beyond act VI's own file — provenance is an
-unresolved owner decision (#55) and this cut does not change it.
+**Status: v0.5 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.5.mp4`,
+**20:21.9** planned, seven of the eight acts on six slides — acts IV and V
+share one. The last *built* file is 20:37.0 and predates that merge. The owner asked for "one
+supercut with everything that we have", and .5 is their name for it.
+
+It is **not the feature**. Act VIII, the credits, is not designed (#51), so the
+programme ends on Europa and credits nobody. Act VI is a timing pass whose
+provenance is an open owner decision (#55); act II's picture comes from a fan
+compilation carrying the same question; act III is partially complete by the
+owner's own description; act VII's master clips at +0.3 dBTP (#82). None of that
+is fixable by re-assembling — assembly joins finished things and never re-cuts
+one.
 
 ## What the current build contains
 
@@ -19,27 +26,30 @@ the running order is right and this file is stale.
 
 The timings are **derived, never typed**: re-run
 `python3 tools/megacut.py stories/megacut/megacut.json --chapters` after every
-assembly rather than editing this table. They will shift the moment act I is
-rendered or act IV is rebuilt.
+assembly rather than editing this table. Wiring act II in moved every stamp
+after act I by 312.967 s, which is the worked example of why.
 
 | Act | From | To | What | Source |
 |---|---|---|---|---|
 | — | 0.000 | 5.000 | Slide **I** — `PROJECT BLUEFIN` / *seven days to the wolves* | rendered |
-| **I** | 5.000 | 116.567 | **Into the Light** — six Guardians plated, the comic card, Bungie's score | `BKm0TPqeOjY` |
-| **II** | — | — | *Endless Forms Most Beautiful* — **no film** (#74) | — |
-| — | 116.567 | 121.567 | Slide **III** — `Bob Killen` / *Voidwalker Warlock* | rendered |
-| **III** | 121.567 | 281.767 | **mrbobbytables** — August 2026 contributors | `Prod/03-…` |
-| — | 281.767 | 296.767 | Slide **IV** — `BIAS FOR ACTION`, held 15s | rendered |
-| **IV** | 296.767 | 330.767 | **Kat Cosgrove** — Guardian intro | `Prod/04-…` |
-| — | 330.767 | 345.767 | Slide **V** — `WRONG PLACE, WRONG TIME, RIGHT ATTITUDE`, held 15s | rendered |
-| **V** | 345.767 | 371.026 | **Natali Vlatko** — Guardian arrival | `Prod/05-…` |
-| — | 371.026 | 376.026 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
-| **VI** | 376.026 | 803.726 | **Seven Days to the Wolves** — the musical (timing pass) | `Prod/06-…` |
-| — | 803.726 | 808.726 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
-| **VII** | 808.726 | 918.926 | **Europa Director's Cut** | `Prod/07-…` |
+| **I** | 5.000 | 116.567 | **Into the Light** — six Guardians plated, the title cover, Bungie's score | `Prod/01-…` |
+| — | 116.567 | 121.567 | Slide **II** — `ENDLESS FORMS MOST BEAUTIFUL` / *Nightwish* | rendered |
+| **II** | 121.567 | 429.534 | **Endless Forms Most Beautiful** — the live-action trailers, one song end to end | `Prod/02-…` |
+| — | 429.534 | 434.534 | Slide **III** — `Bob Killen` / *Voidwalker Warlock* | rendered |
+| **III** | 434.534 | 594.734 | **mrbobbytables** — August 2026 contributors | `Prod/03-…` |
+| — | 594.734 | 609.734 | Slide **IV–V** — `BIAS FOR ACTION` / *The Kat and the Nat*, held 15s | rendered |
+| **IV** | 609.734 | 643.734 | **Kat Cosgrove** — Guardian intro | `Prod/04-…` |
+| **V** | 643.734 | 668.992 | **Natali Vlatko** — Guardian arrival, straight off act IV | `Prod/05-…` |
+| — | 668.992 | 673.992 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
+| **VI** | 673.992 | 1106.692 | **Seven Days to the Wolves** — the musical (timing pass) | `Prod/06-…` |
+| — | 1106.692 | 1111.692 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
+| **VII** | 1111.692 | 1221.892 | **Europa Director's Cut** | `Prod/07-…` |
 | **VIII** | — | — | Credits — **not designed** (#51) | — |
 
-**918.926s — 15:18.9**, output to `~/Videos/Wolves/megacut/`. Every act plays
+**1221.892s planned — 20:21.9**, output to
+`~/Videos/Wolves/megacut/`. The 79 ms is act II's audio leg outrunning its
+video leg by 31 ms plus per-segment rounding; it does not accumulate, and every
+act slide lands within a second of its mark. Every act plays
 from `~/Videos/Wolves/Prod/`, which holds the **highest-quality master** of
 each — FLAC audio, picture never re-encoded. Assembly re-encodes once and edits
 nothing.
@@ -99,26 +109,54 @@ transfer). Bungie's own score rides with it, from that upload's best audio rung.
 `usage_class: third_party_copyrighted`, Bungie fan-content policy,
 non-commercial, no footage committed.
 
-### The comic title card, and the Amber Graner quote
+### The title cover
 
-Owner instruction: *"we need the 'comic book' slide with amber graner's quote
-covering the same area."*
+Owner instruction, this round: *"replace the dino/QR sequence with wolves.jpg,
+the same comic at the end of europa"* — and the owner's own name for it, *"call
+this the title cover"*.
 
-The site's full-screen comic title card is reproduced by `cards/comic.html`,
-which copies `.wolves-intro-overlay-title-card` and friends out of
-`WolvesIntroOverlay.vue` — the opaque black card, the cycling comic hero shot,
-the MakeMeAComic QR panel, and the quote:
+It takes the whole window the 23-shot comic/QR cycle held, and it is the same
+asset the Europa director's cut ends on
+(`~/Videos/wolves-directors-cut/STORYBOARD.md`, *Scene: Comic cover*).
+
+**What the identities are, and why they are not plates.** The art is square
+(9075×9075) and the frame is 16:9, so the cover fills the middle 1080px and
+leaves **420px of margin** either side. A Guardian plate is **561px** wide
+(`tools/plate.py`), so the owner's three authored cover identities could not be
+plates without covering the ink — which the owner ruled out: *"can't have the
+nameplates cover the art."* They are carried as **caption boxes on the card
+itself**, in `captions[]`. Every authored string is reproduced verbatim; only
+the chrome changed, to the box the owner picked: *"no tilt, use the same tech
+outline on the box but keep them white."*
+
+That chrome is the show's own, reproduced not designed — white stock, the 16px
+top-left/bottom-right chamfer and the `#60a5fa` hairline `tools/plate.py`
+draws, plus a left accent rule. The hairline is a nested panel, **not** a
+`z-index: -1` pseudo-element: `clip-path` opens a stacking context, so that
+layer paints *over* the white instead of behind it.
+
+**The margins show a random Bluefin wallpaper**, by owner request (*"have it be
+a random one every time"*). A roll nobody wrote down cannot be rebuilt, so
+`cards/render-cards.mjs` records which file it picked in `wallpapers.json`
+beside the PNG, and `--wallpaper-seed` replays it.
+
+### What the title cover replaced
+
+The site's full-screen comic title card is still reproduced by
+`cards/comic.html`, which copies `.wolves-intro-overlay-title-card` and friends
+out of `WolvesIntroOverlay.vue`. Two owner-authored pieces left with the cycle
+and are **recorded, not re-authored** — the MakeMeAComic QR panel, and:
 
 > "You don't need permission to contribute to your own destiny."
 > — **Amber Graner**, Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]
 
-It **covers** the cinematic for its window, exactly as the site does. The site
-cues it at source 24–38; here it runs **source 24.5 – 38 (segment 22.5 – 36.0)**
-so it cannot overlap Kat's plate, which the live overlay draws *on top* of the
-card and `tools/plate.py` has no z-order for. The 23 authored hero shots share
-the window evenly — the same slot arithmetic `getComicHeroShotIndex()` uses —
-burned as 23 back-to-back stills. The 0.35s cross-fade between them is the one
-thing a still cannot carry, and it is recorded rather than faked.
+Whether they return elsewhere is an owner decision, logged in the manifest's
+`unresolved` and in issue #90.
+
+The card **covers** the cinematic for its window, exactly as the site does. The
+site cues it at source 24–38; here it runs **source 24.5 – 38 (segment 22.5 –
+36.0)** so it cannot overlap Kat's plate, which the live overlay draws *on top*
+of the card and `tools/plate.py` has no z-order for.
 
 ### The Guardian plates, and two recasts
 
@@ -134,12 +172,19 @@ thing a still cannot carry, and it is recorded rather than faked.
 **The recasts changed who is credited, never which shot**, so the frame-verified
 windows are untouched and nothing needs re-checking against the picture.
 
-Both new names are rendered as a **name and nothing else**. Neither has an
-authored Guardian identity in any of the places identities live
-(`~/Videos/nameplates.json`, the website's `characters.json`,
-`vocab/casting.yaml`), and the previous occupant's label, subclass and title are
-**his and hers** — inheriting them would put Bob Killen's *Reconciler of the
-Plane* on Cortney's card. A missing row is omitted; it is never guessed.
+**Cortney's identity was authored** this round (issue #90) and is reproduced
+verbatim, including the owner's spelling of *Weilder*. One row is still absent:
+the owner wrote *"whatever the Void subclass is"*, and Void subclasses are
+class-specific — Voidwalker (Warlock), Sentinel (Titan), Nightstalker (Hunter)
+— so the subclass row needs her class before it can be written. It is omitted,
+not guessed.
+
+**Orlin is rendered as a name and nothing else.** No authored Guardian identity
+exists in any of the places identities live (`~/Videos/nameplates.json`, the
+website's `characters.json`, `vocab/casting.yaml`), and the previous occupant's
+label, subclass and title are **hers** — inheriting them would put Laura
+Santamaria's rows on Orlin's card. A missing row is omitted; it is never
+guessed.
 
 Two behaviours are carried over from the sequence file so nobody "fixes" them:
 
@@ -155,8 +200,13 @@ plaquards" — which also drops the `#nova4ever` glitch bursts and the closing
 
 ## Punch-list — owner decisions, not bugs
 
-- **Cortney Nickerson's Guardian identity** — issue #59. Until it is authored,
-  her plate is a name.
+- **Cortney Nickerson's Void subclass** — issues #90 and #59. Her label, name
+  and title are authored; the subclass row needs her class.
+- **Four strings on the title cover** — issue #90: `speciesname`, which
+  ANTIRRHOPUS is *proposed* for; whether Lakshmi's name goes on her own caption
+  or stays only in the framing line; the *Weilder*/*Wielder* spellings, both
+  reproduced as written; and whether the QR panel and the Amber Graner quote
+  return elsewhere.
 - **Who "Orlin" is.** The instruction was *"laura santamaria is orlin"*, given
   with intro notes, so it is applied to the intro plate **and nowhere else**;
   the Europa director's cut still credits Laura Santamaria. No surname, no
@@ -238,4 +288,6 @@ ffmpeg -ss <seg> -t <len> -i out.mp4 -map a:0 -af volumedetect -f null /dev/null
   describes the *frames*; x264 copies only the matrix from them, so the VUI is
   written with `-x264-params` and probed afterwards.
 - Extract frames either side of every join, inside all six plate windows, and
-  at the head and tail of the comic card — **and look at them**.
+  at the head and tail of the title cover — **and look at them**. On the
+  cover, check that no caption box touches the ink: that is the whole point
+  of the margins, and it is a visual judgement no assertion replaces.

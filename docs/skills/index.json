@@ -144,7 +144,7 @@
         "ffmpeg"
       ],
       "description": "Plans, renders, and burns Project Bluefin Guardian nameplates onto a cut. Use when crediting cast or contributors on screen, or changing plate copy, timing, or chrome.",
-      "version": "1.5",
+      "version": "1.8",
       "last_updated": "2026-08-12",
       "doc_type": "procedure"
     },

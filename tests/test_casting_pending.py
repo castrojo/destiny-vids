@@ -1,11 +1,16 @@
 """`leads.pending` — a cast request that names a PERSON but no character.
 
 Casting names real people, and a wrong credit is not recoverable by a revert.
-A request like castrojo/destiny-vids#14 (three GitHub logins, the requester's
+A request like castrojo/destiny-vids#14 (GitHub logins, the requester's
 words for the figures on screen, a video that is not ingested) is therefore
 RECORDED, never guessed: parked under `leads.pending`, which derivation never
 reads. These tests pin the queue so the gap cannot be silently dropped — and
 pin that a pending entry casts nobody, plates nothing and retrieves nothing.
+
+wrkode was part of the #14 queue until the owner authored his plate for
+act II: he is promoted to `ensemble.titles` (pinned in
+tests/test_act2_casting.py), which partially closes #14. abangser and
+robertsirc remain here.
 """
 
 import json
@@ -23,9 +28,11 @@ CASTING = yaml.safe_load(
 PENDING = (CASTING.get("leads") or {}).get("pending") or {}
 LEADS = load_leads()
 
-# The three people castrojo/destiny-vids#14 asked for. Pinned by login so the
+# The people castrojo/destiny-vids#14 asked for who are STILL waiting: wrkode
+# left the queue when the owner authored his plate for act II (he is in
+# `ensemble.titles` now), and these two remain. Pinned by login so the
 # request cannot be dropped in a vocab edit without this file going red.
-REQUESTED = ["wrkode", "abangser", "robertsirc"]
+REQUESTED = ["abangser", "robertsirc"]
 
 # Everybody in the queue, in file order. #14 is not the only source of pending
 # cast any more: the editorial pass on Seven Days to the Wolves added `inffy`,
@@ -117,14 +124,10 @@ def test_a_pending_entry_is_not_a_binding(person):
 
 @pytest.mark.parametrize("person", REQUESTED)
 def test_display_name_is_never_invented(person):
-    """`display_name` is null unless the request itself named the person.
-    wrkode's comes from the issue title ("Add william rizzo and team") — the
-    requester's own words; the other two were not named, so nothing is made up."""
-    entry = PENDING[person]
-    if person == "wrkode":
-        assert entry["display_name"] == "William Rizzo"
-    else:
-        assert entry["display_name"] is None
+    """`display_name` is null unless the request itself named the person. The
+    #14 body names nobody (its title named William Rizzo, whose plate the
+    owner has since authored — see `ensemble.titles`), so nothing is made up."""
+    assert PENDING[person]["display_name"] is None
 
 
 def test_load_leads_never_returns_a_pending_entry():

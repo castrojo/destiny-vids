@@ -35,9 +35,12 @@ const COPY = ['act', 'label', 'title', 'subtitle', 'quote', 'quote_by', 'quote_n
   'qr_dialogue', 'qr_domain']
 const LISTS = ['body', 'chapters']
 const ASSETS = ['art', 'qr']
+// Structured copy: one JSON param, because a caption box is a variable-length
+// stack of authored lines and a card may carry several.
+const JSON_COPY = ['captions']
 
 function parseArgs(argv) {
-  const args = { manifest: null, outDir: null, only: null }
+  const args = { manifest: null, outDir: null, only: null, wallpaperSeed: null }
   for (let i = 0; i < argv.length; i++) {
     const [key, inline] = argv[i].startsWith('--') ? argv[i].slice(2).split('=', 2) : []
     if (!key) { continue }
@@ -45,12 +48,43 @@ function parseArgs(argv) {
     if (key === 'manifest') { args.manifest = value }
     else if (key === 'out-dir') { args.outDir = value }
     else if (key === 'only') { args.only = value.split(',') }
+    else if (key === 'wallpaper-seed') { args.wallpaperSeed = value }
     else { throw new Error(`unknown option --${key}`) }
   }
   if (!args.manifest || !args.outDir) {
     throw new Error('usage: render-cards.mjs --manifest <plates.json> --out-dir <dir>')
   }
   return args
+}
+
+// A card may ask for a RANDOM Bluefin wallpaper behind it rather than naming
+// one, at the owner's request ("have it be a random one every time"). A random
+// render is not reproducible unless the roll is written down, so the choice is
+// recorded in <out-dir>/wallpapers.json and can be replayed with
+// --wallpaper-seed. Chosen by hash, so the same seed always yields the same
+// wallpaper regardless of how the directory is ordered on disk.
+function hashString(text) {
+  let hash = 2166136261
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i)
+    hash = Math.imul(hash, 16777619) >>> 0
+  }
+  return hash
+}
+
+function chooseWallpaper(dir, cardId, seed, match) {
+  const pattern = match ? new RegExp(match) : null
+  const candidates = fs.readdirSync(dir)
+    .filter(name => /\.(webp|png|jpe?g)$/i.test(name))
+    .filter(name => !pattern || pattern.test(name))
+    .sort()
+  if (candidates.length === 0) {
+    throw new Error(`${cardId}: wallpaper_dir has no matching images: ${dir}`)
+  }
+  const index = seed === null
+    ? Math.floor(Math.random() * candidates.length)
+    : hashString(`${seed}:${cardId}`) % candidates.length
+  return path.join(dir, candidates[index])
 }
 
 const args = parseArgs(process.argv.slice(2))
@@ -79,10 +113,15 @@ const page = await browser.newPage({
   deviceScaleFactor: 1,
 })
 
+const wallpaperLog = {}
+
 for (const card of cards) {
   const params = new URLSearchParams()
   for (const key of COPY) {
     if (card[key]) { params.set(key, String(card[key])) }
+  }
+  for (const key of JSON_COPY) {
+    if (card[key]) { params.set(key, JSON.stringify(card[key])) }
   }
   for (const key of LISTS) {
     for (const value of card[key] ?? []) { params.append(key, String(value)) }
@@ -94,6 +133,15 @@ for (const card of cards) {
       throw new Error(`${card.id}: ${key} does not exist: ${asset}`)
     }
     params.set(key, `file://${asset}`)
+  }
+  if (card.wallpaper_dir) {
+    const dir = path.resolve(repoRoot, card.wallpaper_dir)
+    if (!fs.existsSync(dir)) {
+      throw new Error(`${card.id}: wallpaper_dir does not exist: ${dir}`)
+    }
+    const chosen = chooseWallpaper(dir, card.id, args.wallpaperSeed, card.wallpaper_match)
+    params.set('wallpaper', `file://${chosen}`)
+    wallpaperLog[card.id] = chosen
   }
 
   await page.goto(`file://${path.join(here, TEMPLATES[card.kind])}?${params}`)
@@ -107,4 +155,10 @@ for (const card of cards) {
 }
 
 await browser.close()
+if (Object.keys(wallpaperLog).length > 0) {
+  const logPath = path.join(outDir, 'wallpapers.json')
+  const existing = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath, 'utf8')) : {}
+  fs.writeFileSync(logPath, `${JSON.stringify({ ...existing, ...wallpaperLog }, null, 2)}\n`)
+  console.info(`recorded ${Object.keys(wallpaperLog).length} wallpaper choice(s) in ${path.relative(repoRoot, logPath)}`)
+}
 console.info(`${cards.length} card(s); ${skipped} non-card plate(s) left to tools/plate.py`)

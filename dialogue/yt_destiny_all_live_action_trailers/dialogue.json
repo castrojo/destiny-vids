@@ -1,0 +1,25 @@
+{
+  "video_id": "yt_destiny_all_live_action_trailers",
+  "usage_class": "third_party_copyrighted",
+  "source_rights_note": "Bungie, Inc. copyrighted footage, used under Bungie's fan-content policy, which permits non-commercial fan creations. The upload is a fan compilation (see the video record); this file stores text and timecodes, not audio. No Bungie dialogue is reproduced here: the act plays the picture under an instrumental, and the only line on screen is the owner's own, marked owner_supplied so it is never mistaken for recovered Bungie copy.",
+  "text_source": {
+    "method": "owner_supplied",
+    "note": "Nothing was recovered from this source: act II runs the picture under Nightwish's instrumental, so there is no caption track to recover and no `recovered_text` to keep. The one line in this record was written by the owner for Cayde-6's hero pose (source 5:58.24 -> 6:00.54; act-II film 290.1 -> 292.4, the second-to-last shot). It lives here rather than in a render manifest so the provenance record still carries every word on screen, and `text_source: owner_supplied` on the cue is what separates it from recovered dialogue."
+  },
+  "speaker_source": {
+    "method": "owner_supplied",
+    "note": "The owner named the speaker when they wrote the line: Cayde-6, bound to castrojo in vocab/casting.yaml. The chat card resolves the credited person from that binding at plan time (the character's `plate:` name preferred), so whatever name the binding carries is what the card shows -- the act-II '[ REDACTED ]' gag lives in vocab/casting.yaml, not here."
+  },
+  "cues": [
+    {
+      "id": "d01",
+      "start_sec": 358.24,
+      "end_sec": 360.54,
+      "character": "cayde_6",
+      "evidence": "owner_supplied",
+      "text": "I'm so proud of you kids!",
+      "text_source": "owner_supplied"
+    }
+  ],
+  "dropped": []
+}

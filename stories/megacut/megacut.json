@@ -18,9 +18,10 @@
     "kat": "Wolves/Prod/04-kat.mp4 -> ~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4. NOTE: the owner's dialogue change (Kat/Ian split, and 'Remember kids, cardio!') is staged in that project and NOT yet rendered, so this master still carries the old dialogue. Rebuild it there before assembling.",
     "natali": "Wolves/Prod/05-nat.mp4 -> ~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4.",
     "wolves": "Wolves/Prod/06-7daystothewolves.mp4 -> ~/Videos/wolves-musical/wolves-7days-master.mp4. THE ONE ACT WITH NO LOSSLESS MASTER: it is AAC (stereo, 48 kHz, ~323 kb/s), so Prod holds the best that exists rather than the best possible. Issue #58. It was re-homed out of the retired UPLOAD/ staging folder by moving the inode, so the hardlink never broke.",
-    "europa": "Wolves/Prod/07-europa.mp4 -> ~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4."
+    "europa": "Wolves/Prod/07-europa.mp4 -> ~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4.",
+    "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-hq.mp4. Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md."
   },
-  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves.mp4",
+  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.5.mp4",
   "width": 1920,
   "height": 1080,
   "fps": "60000/1001",
@@ -47,6 +48,19 @@
     },
     {
       "kind": "card",
+      "image": "renders/plates-megacut-cards/plate_act2.png",
+      "dur": 5.0,
+      "label": "II — Endless Forms Most Beautiful / Nightwish",
+      "chapter": "II. Endless Forms Most Beautiful"
+    },
+    {
+      "kind": "clip",
+      "path": "/var/home/jorge/Videos/Wolves/Prod/02-endlessformsmostbeautiful.mp4",
+      "audio": "source",
+      "label": "Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end"
+    },
+    {
+      "kind": "card",
       "image": "renders/plates-megacut-cards/plate_act3.png",
       "dur": 5.0,
       "label": "III — Bob Killen / Voidwalker Warlock",
@@ -60,23 +74,16 @@
     },
     {
       "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act4.png",
+      "image": "renders/plates-megacut-cards/plate_act4-5.png",
       "dur": 15.0,
-      "label": "IV — BIAS FOR ACTION (held long, by owner request)",
-      "chapter": "IV. Bias for Action"
+      "label": "IV–V — Bias for Action / The Kat and the Nat (held long, by owner request)",
+      "chapter": "IV–V. Bias for Action"
     },
     {
       "kind": "clip",
       "path": "/var/home/jorge/Videos/Wolves/Prod/04-kat.mp4",
       "audio": "source",
       "label": "Act IV — Kat Cosgrove: Guardian intro"
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act5.png",
-      "dur": 15.0,
-      "label": "V — WRONG PLACE, WRONG TIME, RIGHT ATTITUDE (held long, matching act IV)",
-      "chapter": "V. Wrong Place, Wrong Time, Right Attitude"
     },
     {
       "kind": "clip",
@@ -111,5 +118,6 @@
       "label": "Act VII — Europa Director's Cut"
     }
   ],
-  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Acts II and VIII have no film, so they have no marker -- a chapter that jumps to the next act's footage would be a lie about what plays."
+  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Acts II and VIII have no film, so they have no marker -- a chapter that jumps to the next act's footage would be a lie about what plays.",
+  "_version": "v0.5 -- the owner's name for this build: everything that exists, assembled, and explicitly NOT the feature. Seven of the eight acts play. What makes it a .5 rather than a 1.0: act VIII (the credits) is not designed (#51), so the programme ends on Europa and credits nobody; act VI is a timing pass whose provenance is an open owner decision (#55); act II's picture comes from a fan compilation with the same question (#74's film); act III is partially complete by the owner's own description; and act VII's master clips at +0.3 dBTP (#82). None of those is fixed by re-assembling -- assembly joins finished things and never re-cuts one."
 }

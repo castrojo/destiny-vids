@@ -9,8 +9,10 @@
       "at": 3.0,
       "dur": 9.5,
       "position": "left",
+      "label": "AMBASSADOR // GUARDIAN",
       "name": "Cortney Nickerson",
-      "note": "RECAST, owner instruction (editorial pass, this session): \"bob killen is replaced with cortney nickerson in the intro\". The window is Bob's, unchanged (source 5 - 14.5, shortened from the frame-accurate 17.5 so Kat's plate replaces it cleanly -- explicit owner request, 2026-07-18; do NOT 'fix' this back to 17.5). NAME ONLY: Cortney has no authored Guardian identity anywhere identities are authored (~/Videos/nameplates.json, the website's characters.json, vocab/casting.yaml), so the label, subclass and title rows Bob's plate carried are OMITTED rather than inherited -- his copy is his. The chrome falls back to the default blue: `trustee` is a claim about a role nobody has authored for her. See issue #59."
+      "title": "Weilder of the Arcane",
+      "note": "OWNER-AUTHORED this round, verbatim, including the spelling 'Weilder' -- authored copy is reproduced, never silently corrected (issue #90). Window unchanged: it is Bob's, source 5 - 14.5, shortened from the frame-accurate 17.5 by explicit owner request (2026-07-18); do NOT 'fix' it back. The SUBCLASS ROW IS OMITTED, not forgotten: the owner wrote 'whatever the Void subclass is', and Void subclasses are class-specific -- Voidwalker (Warlock), Sentinel (Titan), Nightstalker (Hunter) -- so it needs her class first. A missing row is left out; a guessed one would put a word about a real person on screen under the owner's name. Issue #90, and this largely answers #59."
     },
     {
       "id": "kat",
@@ -50,7 +52,7 @@
       "label": "TRUSTEE // GUARDIAN",
       "class": "Broodweaver Warlock",
       "name": "Christoph Blecker",
-      "title": "First Among Equals — The North Star",
+      "title": "First Among Equals \u2014 The North Star",
       "trustee": true,
       "variant": "leader",
       "group": "christoph-natali",
@@ -70,334 +72,60 @@
       "raised": true
     },
     {
-      "id": "comic-00-youre-holding-it-wrong-post1",
+      "id": "title-cover",
       "kind": "comic",
       "at": 22.5,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/Youre_Holding_It_Wrong_Post1.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-01-chonky-achillibator-pose1-post",
-      "kind": "comic",
-      "at": 23.086957,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/chonky-achillibator-pose1-post.webp",
-      "art_label": "Achillobator giganticus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-02-bluefin",
-      "kind": "comic",
-      "at": 23.673913,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/bluefin.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-03-chonky-dakosaurus-bluefinskin",
-      "kind": "comic",
-      "at": 24.26087,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/chonky-dakosaurus-bluefinskin.webp",
-      "art_label": "Dakosaurus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-04-jorge-custom-chonks-kentrosaurus-post1",
-      "kind": "comic",
-      "at": 24.847826,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/Jorge_CustomChonks_Kentrosaurus_Post1.webp",
-      "art_label": "Kentrosaurus aethiopicus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-05-chonky-dromaeosaurus-bluefin",
-      "kind": "comic",
-      "at": 25.434783,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/chonky-dromaeosaurus-bluefin.webp",
-      "art_label": "Dromaeosaurus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-06-dolly",
-      "kind": "comic",
-      "at": 26.021739,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/dolly.webp",
-      "art_label": "Dimetrodon limbatus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-07-custom-chonk-jorge-concavenator-post1",
-      "kind": "comic",
-      "at": 26.608696,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/CustomChonk_Jorge_Concavenator_Post1.webp",
-      "art_label": "Concavenator corcovatus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-08-chonky-utahraptor-bluefinskin",
-      "kind": "comic",
-      "at": 27.195652,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/chonky-utahraptor-bluefinskin.webp",
-      "art_label": "Utahraptor ostrommaysi",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-09-chonky-achillibator-pose2-post",
-      "kind": "comic",
-      "at": 27.782609,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/chonky-achillibator-pose2-post.webp",
-      "art_label": "Achillobator giganticus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-10-deinonychus-antirrhopus-and-achillobator-giganticus",
-      "kind": "comic",
-      "at": 28.369565,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/Deinonychus_antirrhopus_and_Achillobator_giganticus.webp",
-      "art_label": "Deinonychus antirrhopus and Achillobator giganticus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-11-achillobator",
-      "kind": "comic",
-      "at": 28.956522,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/achillobator.webp",
-      "art_label": "Achillobator giganticus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-12-angry",
-      "kind": "comic",
-      "at": 29.543478,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/angry.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-13-dakota",
-      "kind": "comic",
-      "at": 30.130435,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/dakota.webp",
-      "art_label": "Dakotaraptor steini",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-14-karl",
-      "kind": "comic",
-      "at": 30.717391,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/karl.webp",
-      "art_label": "Amargasaurus cazaui",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-15-intrigued",
-      "kind": "comic",
-      "at": 31.304348,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/intrigued.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-16-leaping",
-      "kind": "comic",
-      "at": 31.891304,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/leaping.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-17-nest",
-      "kind": "comic",
-      "at": 32.478261,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/nest.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-18-pride",
-      "kind": "comic",
-      "at": 33.065217,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/pride.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-19-roaring",
-      "kind": "comic",
-      "at": 33.652174,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/roaring.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-20-utah",
-      "kind": "comic",
-      "at": 34.23913,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/utah.webp",
-      "art_label": "Utahraptor ostrommaysi",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-21-jorge-custom-chonks-pivotraptor-post1",
-      "kind": "comic",
-      "at": 34.826087,
-      "dur": 0.586956,
-      "art": "/var/home/jorge/src/website/public/characters/Jorge_CustomChonks_PivotRaptor_Post1.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
-    },
-    {
-      "id": "comic-22-youre-holding-it-wrong2-post2",
-      "kind": "comic",
-      "at": 35.413043,
-      "dur": 0.586957,
-      "art": "/var/home/jorge/src/website/public/characters/Youre_Holding_It_Wrong2_Post2.webp",
-      "art_label": "Deinonychus antirrhopus",
-      "qr": "/var/home/jorge/src/website/src/assets/svg/qr-makemeacomic.svg",
-      "qr_dialogue": "Level Up a Maintainer",
-      "qr_domain": "makemeacomic.com",
-      "quote": "\"You don't need permission to contribute to your own destiny.\"",
-      "quote_by": "— Amber Graner",
-      "quote_note": "Maintainer Guardian // The Iron Standard - Subclass [ REDACTED ]"
+      "dur": 13.5,
+      "art": "/var/home/jorge/Downloads/wolves.jpg",
+      "note": "THE TITLE COVER -- the owner's name for it. Owner instruction: 'replace the dino/QR sequence with wolves.jpg, the same comic at the end of europa'. It takes the whole window the 23-shot comic/QR cycle held (22.5 - 36.0), and it is the SAME asset the Europa director's cut ends on (~/Videos/wolves-directors-cut/STORYBOARD.md, 'Scene: Comic cover'). What left with the cycle: the MakeMeAComic QR panel and the Amber Graner quote, both owner-authored -- flagged in issue #90 so dropping them is a decision rather than a side effect.\n\nWHY THE COVER IDENTITIES ARE CAPTIONS AND NOT PLATES: the art is square (9075x9075) and the frame is 16:9, so it fills the middle 1080px and leaves 420px of margin either side. A Guardian plate is 561px wide (tools/plate.py), so the owner's three authored cover identities could not be plates without covering the ink -- which the owner ruled out ('can't have the nameplates cover the art'). Every authored string is carried verbatim in the caption boxes below; only the chrome changed, to the white/chamfered/blue-hairline box the owner picked ('no tilt, use the same tech outline on the box but keep them white'). The two framing lines are owner-authored too.\n\nThe margins show a RANDOM Bluefin wallpaper per render, by owner request; cards/render-cards.mjs records which one it rolled in wallpapers.json beside the PNG, so a frame stays reproducible.\n\nStill open, all in issue #90: 'Wielder of the Kube' is the owner's spelling here and 'Weilder of the Arcane' is theirs on Cortney's plate -- both reproduced, neither corrected. The owner wrote 'DEINONYCHUS // speciesname'; ANTIRRHOPUS is PROPOSED from the art_label 'Deinonychus antirrhopus' the deleted comic entries carried, not decided. The trailing space in 'Really Hungry ' is authored and kept. The second Blueberry caption has NO NAME ROW: the owner wrote a class and a title for 'little girl behind him' and withheld her name in the plate request, then wrote 'Introducing Rafael and Lakshmi' as the framing line. Naming the child on her own caption is a claim the owner has not made in that place, so the row stays out.",
+      "wallpaper_dir": "/var/home/jorge/src/website/public/img/wallpapers",
+      "wallpaper_match": "^bluefin-",
+      "captions": [
+        {
+          "side": "left",
+          "lines": [
+            "Introducing Rafael and Lakshmi"
+          ]
+        },
+        {
+          "side": "left",
+          "label": "BLUEBERRY // HUMAN",
+          "lines": [
+            "Rafael Castro",
+            "Blueberry Hunter",
+            "Happy 10th Birthday!"
+          ]
+        },
+        {
+          "side": "left",
+          "lines": [
+            "Blueberry Warlock",
+            "Wielder of the Kube"
+          ]
+        },
+        {
+          "side": "right",
+          "lines": [
+            "Have you met Bluefin?"
+          ]
+        },
+        {
+          "side": "right",
+          "label": "DEINONYCHUS // ANTIRRHOPUS",
+          "lines": [
+            "BLUEFIN",
+            "Really Hungry "
+          ]
+        }
+      ]
     }
   ],
   "unresolved": [
     {
-      "what": "Cortney Nickerson's Guardian identity",
-      "detail": "The owner recast the intro's first plate onto her. No label, subclass or title is authored for her in ~/Videos/nameplates.json, the website's characters.json or vocab/casting.yaml, so the plate renders her name alone. Bob Killen's rows are NOT inherited.",
+      "what": "Cortney Nickerson's Void subclass",
+      "detail": "The owner authored her label, name and title this round (issue #90), so the plate no longer renders her name alone and Bob Killen's rows are still NOT inherited. One row is still missing: the owner wrote 'whatever the Void subclass is', and Void subclasses are class-specific -- Voidwalker (Warlock), Sentinel (Titan), Nightstalker (Hunter) -- so the row needs her class before it can be written. It is omitted, not guessed.",
       "automatable": "no",
-      "blocked_on": "an authored Guardian identity -- issue #59."
+      "blocked_on": "the owner naming her class -- issues #90 and #59."
     },
     {
       "what": "who 'Orlin' is, and how far the recast reaches",
@@ -434,8 +162,26 @@
       "detail": "The site cross-fades between hero shots (0.35s), places each shot by an authored contentFrame before its alpha bounds are measured, and renders the QR through `filter: invert(1)`. The burn cuts between stills instead of cross-fading, centres each shot by its alpha bounds (what centerComicHeroShot() settles on anyway), and reproduces the inverted code as published -- an inverted QR is what the site shows, so it is copied rather than corrected.",
       "automatable": "no",
       "blocked_on": "an owner's eye on the rendered card; nothing here blocks the cut."
+    },
+    {
+      "what": "the second Blueberry caption's name row",
+      "detail": "The owner authored a class ('Blueberry Warlock') and a title ('Wielder of the Kube') for 'little girl behind him' on the title cover, and withheld a name there. The framing caption they wrote is 'Introducing Rafael and Lakshmi', which names her in the frame but not on her own box. Writing it onto the caption is a claim about a child the owner has not made in that place, so the row stays out until they say so.",
+      "automatable": "no",
+      "blocked_on": "the owner confirming the name goes on the box -- issue #90."
+    },
+    {
+      "what": "the dinosaur's species, written as `speciesname`",
+      "detail": "The owner wrote 'DEINONYCHUS // speciesname'. ANTIRRHOPUS is PROPOSED from the art_label 'Deinonychus antirrhopus' that the deleted comic entries carried in this same manifest -- a repo string, not an owner's. One word.",
+      "automatable": "no",
+      "blocked_on": "the owner confirming the word -- issue #90."
+    },
+    {
+      "what": "the MakeMeAComic QR panel and the Amber Graner quote",
+      "detail": "Both were owner-authored and both left with the 23-shot comic/QR cycle the title cover replaced. Nothing here re-authors them; they are recorded so dropping them stays a decision rather than a side effect.",
+      "automatable": "no",
+      "blocked_on": "the owner deciding whether they return elsewhere -- issue #90."
     }
   ],
   "_hud_removed": "The site's top-of-frame HUD nameplate is deliberately NOT burned in (owner decision, 2026-08-12: 'remove \"a project to bring their stories to life\", just the name plaquards'). That drops the persistent default card, the three #nova4ever glitch bursts and the closing 'Legends Sought' card -- every status row -- leaving only the six Guardian nameplates. tools/plate.py still renders `kind: \"status\"` and is tested, so restoring any of them is a manifest edit, not new code.",
-  "_comic": "The comic title card, reproduced from `.wolves-intro-overlay-title-card` in WolvesIntroOverlay.vue: an opaque full-frame card that COVERS the cinematic for its window, cycling the authored hero shots of wolves-comic-hero-shots.ts over the MakeMeAComic QR panel and the Amber Graner quote. The site cues it at source 24 - 38; here it starts at source 24.5 (segment 22.5) so it cannot overlap Kat's plate, which the live overlay draws ON TOP of the card and tools/plate.py has no z-order for. 23 shots share the window evenly, the same slot arithmetic getComicHeroShotIndex() uses. Owner instruction, this session: \"we need the 'comic book' slide with amber graner's quote covering the same area\"."
+  "_comic": "Replaced 2026-08-12 by the TITLE COVER (`title-cover`). It previously held 23 full-frame comic cards cycling the site's hero shots over the MakeMeAComic QR panel and the Amber Graner quote, reproduced from `.wolves-intro-overlay-title-card` in WolvesIntroOverlay.vue. That cycle, its QR and its quote are gone from act I; the window (22.5 - 36.0) and its reason for starting at 22.5 rather than the site's 24 -- so it cannot overlap Kat's plate -- are unchanged."
 }
