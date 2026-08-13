@@ -260,6 +260,12 @@ normaliser. A file that is still hot after five passes ships with a WARNING
 rather than failing — degrade, never block. `--target-dbtp` moves the target;
 a muted render has no audio and skips the check.
 
+A file that was built *outside* `render.py` gets the same gate afterwards:
+`python3 tools/peaks.py trim <file>` measures the delivered file and re-muxes
+it at a corrected static gain, video stream copied untouched. That is how a
+lossless FLAC master is held to the same standard as the AAC deliverable —
+the gap that let act VII ship at +0.3 dBTP (issue #82).
+
 ## Burning plates onto a cut
 
 `tools/plate.py` is a separate stage from `render.py`, deliberately: cutting and
