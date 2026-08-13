@@ -19,7 +19,10 @@ this pass actually removes it, and fills every slot with picture:
   * the COUNTLESS LEGENDS publisher slide is removed outright rather than marked;
   * three action runs from the official Final Shape *Gameplay* Trailer fill the
     hole left by excising the Pale Heart's long Ghost sequence;
-  * the pause is recut from that same trailer, to the shot the owner named.
+  * the pause is recut from that same trailer, to the shot the owner named --
+    and then REMAINED as the interruption (issue #104, superseding #95): the
+    song pauses at bed 322.200, the CNCF Ambassadors interrupt the film, and
+    the clip is presented to the audience with its own effects and score.
 
 WHAT CHANGED FROM THE FIRST CUT, AND WHY
 ----------------------------------------
@@ -40,8 +43,9 @@ a cut at all, it simply happens, which is the strongest possible way to land it
 on the flute entry.
 
 **Two clocks.** ``wall`` is position in the film, ``bed`` is position in the
-song. A shot marked ``audio: "source"`` advances wall and not bed, so the film
-is longer than its own song. Every anchor is asserted against BED time; see
+song. Any shot not marked ``audio: "bed"`` -- the clip, the held silence, the
+hold-music slot -- advances wall and not bed, so the film is longer than its
+own song. Every anchor is asserted against BED time; see
 ``tools/audiomix.py``.
 
 THREE TIMING INVARIANTS, WHICH THE ASSERTIONS BELOW ENFORCE
@@ -70,7 +74,9 @@ MEASURED, NOT GUESSED
 * **The pause is the shot the owner named.** Frame-differencing the trailer at
   1/30 s finds the explosion's cut at **51.835** (frame delta 170 against a
   background of <30) and the cut out of the transcendence portrait at
-  **53.470** (delta 89). Nothing there was chosen by eye.
+  **53.470** (delta 89). Nothing there was chosen by eye. The interruption's
+  in-point (**43.000**) is the owner's own correction on issue #104, verified
+  here frame by frame (see the constants block).
 
 EDITORIAL RULES ENFORCED HERE RATHER THAN REMEMBERED
 ----------------------------------------------------
@@ -104,24 +110,44 @@ HOWL_SLAM = 279.661        # ...and returns, on this downbeat
 ARTWORK_IN = 277.00        # the artwork is up before the shout, over the CU
 ENEMY_CU_IN = 273.490      # the enemy close-up the artwork will replace
 
-# --- the pause: the song stops, a moment plays in its own audio --------------
-# The owner named this shot: "we want this explosion to be cortney's segment.
-# Capture the length of the shot, including the portrait of her in
-# transcendence glowing mode, hold the scene until the cut."
+# --- the interruption: the song is paused and the clip is PRESENTED ----------
+# Issue #104 is the owner's solution to #95, and it dissolves that problem
+# rather than solving it: stop trying to hide that it is a clip. The song
+# pauses, the CNCF Ambassadors interrupt the film, and the clip is PLAYED TO
+# THE AUDIENCE with its own effects and score. The music stops being a defect
+# and becomes the point -- which retires #95's search for an SFX-only mix
+# (the moment is not in the named source, yNBMDXdp69g, at all; PR #132).
 #
-# It is NOT in the Collection Trailer, which is where the timing pass looked
-# for it. The owner's reference clip (~/Videos/wolves-directors-cut/cortney.mp4,
-# 9.009 s, 640x360, with music) frame-matches the official Final Shape GAMEPLAY
-# trailer at 45.0 -> 54.009: mean abs pixel diff 3.2-4.1 at 160x90 against a
-# runner-up of 22-33, i.e. exact, at four probes across the clip.
+# "Since this is an interruption we have unlimited time." True mechanically as
+# well as dramatically: the bed does not advance across the pause (asserted
+# below), so every second here is FREE -- it costs the song nothing.
 #
-# In-point is the enclosing shot boundary at 44.811, so the moment builds
-# rather than starting mid-air. Out-point is the measured cut after the
-# transcendence portrait. The reference is 9.009 s and this is 8.659 s.
-PAUSE_AT = 322.200         # a downbeat (FIRST_BEAT + 102 bars)
-PAUSE_IN = 44.811          # Gameplay Trailer: the shot the run-up sits in
-PAUSE_OUT = 53.470         # the cut out of the transcendence portrait
-PAUSE_DUR = PAUSE_OUT - PAUSE_IN
+# FOUR CLOCKS, and every constant names its own (issue #109):
+#   PAUSE_AT               BED clock -- where the song stops, and resumes
+#   SILENCE/SLIDE/PLATE_LEN, CLIP_LEN   ACT-FILM clock -- screen time
+#   CLIP_IN / CLIP_OUT     SOURCE clock -- a span in the gameplay trailer file
+PAUSE_AT = 322.200         # a downbeat (FIRST_BEAT + 102 bars) -- BED clock
+
+# The sequence (issue #104). No static element holds longer than 4.0 s and
+# each is a new development -- mark, then name, then the clip. That is craft
+# guidance from the issue, not measurement; do not dress it up as precise.
+SILENCE_LEN = 1.000        # A: the held beat of realization -- black, silent
+SLIDE_LEN = 4.000          # B: "The CNCF Ambassadors would like a moment."
+PLATE_LEN = 4.000          # C: "Introducing ..." -> Cortney Nickerson's plate
+
+# D, the clip itself, SOURCE clock in the gameplay trailer. Issue #104 as
+# written said 43.0 -> 51.0; the owner's own comment on the issue corrects
+# it -- 51.0 is mid-combat and 53.470 is the cut, so the literal range would
+# DROP the transcendence portrait the owner previously insisted on. The
+# comment offers 43.000 -> 53.470 as "very likely what was meant" (option B),
+# and it is adopted here after frame verification in this worktree
+# (renders/verify-104/): combat with supers at 43.0, the white bloom at 52.0,
+# the portrait at 53.0, and the next shot (Guardians running) at 53.6.
+# 44.811 -> 53.470 (the as-shipped pause, option A) is the one-line fallback
+# if the owner disagrees. 10.470 s instead of the issue's 8.0 s -- free.
+CLIP_IN = 43.000         # SOURCE clock: the run-up the moment builds from
+CLIP_OUT = 53.470        # SOURCE clock: the cut out of the portrait
+CLIP_LEN = CLIP_OUT - CLIP_IN
 
 # Publisher mechanic cards inside the Collection Trailer montage. Two are
 # replaced by a Contributor Summit photograph at their exact duration, so the
@@ -141,6 +167,23 @@ ART = str(Path.home() / "Pictures/Artwork/wolves.jpg")
 # See that script's header and docs/cuts/07-seven-days-to-the-wolves.md.
 SUMMIT_DIR = REPO / "renders" / "summit-plates"
 
+# The interruption's slides, built by scripts/build_interruption_cards.py from
+# stories/06-wolves-interruption-cards.json. The copy is owner-authored and
+# reproduced verbatim; the CNCF mark is NOT on the slide (rights, #104).
+INTERRUPTION_DIR = REPO / "renders" / "interruption"
+
+
+def _rel(path):
+    """A repo-internal path, relative -- the committed shotlist is an output
+    and must be regenerable from any worktree, so it may not carry this
+    checkout's absolute path in it. Paths outside the repo (the artwork in
+    ~/Pictures) stay absolute."""
+    path = Path(path)
+    try:
+        return str(path.relative_to(REPO))
+    except ValueError:
+        return str(path)
+
 
 def summit(slot, fallback_text, fallback_sub):
     """A summit photograph, or the marker card it replaces if it is missing.
@@ -150,10 +193,24 @@ def summit(slot, fallback_text, fallback_sub):
     """
     plate = SUMMIT_DIR / f"{slot}.jpg"
     if plate.exists():
-        return str(plate)
+        return _rel(plate)
     print(f"  MISSING PLATE {slot}: falling back to the marker card",
           file=sys.stderr)
-    return marker_path(fallback_text, fallback_sub)
+    return _rel(marker_path(fallback_text, fallback_sub))
+
+
+def interruption(slot, fallback_text, fallback_sub):
+    """An interruption slide, or a marker card if the cards pass has not run.
+
+    Same degrade-never-block rule as the summit photographs: a missing slide
+    is reported and the cut still builds, with the slot marked in place.
+    """
+    card = INTERRUPTION_DIR / f"{slot}.png"
+    if card.exists():
+        return _rel(card)
+    print(f"  MISSING INTERRUPTION CARD {slot}: falling back to a marker",
+          file=sys.stderr)
+    return _rel(marker_path(fallback_text, fallback_sub))
 
 
 # --- sources -----------------------------------------------------------------
@@ -264,6 +321,12 @@ def tc(seconds):
     return f"{int(seconds) // 60}:{seconds % 60:04.1f}"
 
 
+# The audio dispositions a shot may carry (tools/audiomix.py owns the mix
+# semantics). The bed advances ONLY under "bed" -- the source clip, the held
+# silence and the hold-music slot all cost the song nothing (issue #104).
+AUDIO_KINDS = ("bed", "source", "silent", "hold")
+
+
 class Timeline:
     """Two clocks and a shot list.
 
@@ -282,7 +345,8 @@ class Timeline:
 
         ``audio_from`` names a DIFFERENT source for what is heard: a dict of
         ``video_id`` and ``start_sec``, the latter in that source's own clock.
-        Only meaningful with ``audio="source"`` -- under the bed it would never
+        Only meaningful on a non-bed shot that plays something (``source``,
+        or ``hold`` once a track is cleared) -- anywhere else it would never
         be heard, and tools/audiomix.py rejects it there.
         """
         shot = {
@@ -320,9 +384,14 @@ class Timeline:
     def _push(self, shot, dur, audio):
         if dur <= 0:
             raise AssertionError(f"non-positive duration for {shot['beat']!r}")
+        if audio not in AUDIO_KINDS:
+            raise AssertionError(
+                f"unknown audio disposition {audio!r} for {shot['beat']!r} -- "
+                f"expected one of {AUDIO_KINDS}; a typo must not quietly "
+                "become bed time")
         self.shots.append(shot)
         self.wall += dur
-        if audio != "source":
+        if audio == "bed":
             self.bed += dur
 
     def at_bed(self, target, what):
@@ -339,9 +408,9 @@ def build():
     # ---- the title card: the source's own logo, blacked out ----------------
     # Not an overlay. The card IS the picture for ten seconds, so the Destiny
     # logo is not dimmed, it is simply not in the film.
-    t.card(title_card_path(
+    t.card(_rel(title_card_path(
         "Project Bluefin", "Seven Days to the Wolves",
-        ["Destiny footage used under Bungie's fan-content policy"]),
+        ["Destiny footage used under Bungie's fan-content policy"])),
         TITLE_CARD_LEN,
         "TITLE CARD (the film's own logo; the source's is never shown)")
 
@@ -440,40 +509,49 @@ def build():
         "slide the owner asked to cut would be back on screen.")
     t.at_bed(PAUSE_AT, "Act III-B")
 
-    # ---- the pause: the song stops; the moment plays in its own audio ------
-    # UNPLATED, deliberately. The owner names this shot as Cortney Nickerson's,
-    # and she has no authored Guardian identity in ~/Videos/nameplates.json,
-    # the website's characters.json, or vocab/casting.yaml. A missing name is
-    # omitted and recorded; it is never invented (AGENTS.md). See the punch
-    # list in docs/cuts/07-seven-days-to-the-wolves.md.
+    # ---- the interruption: the song is paused and the clip is PRESENTED ----
+    # Issue #104, which supersedes #95: the clip is not hidden, it is played
+    # to the audience. Four beats, all free -- the bed clock does not advance
+    # across any of them (asserted below), so this costs the song nothing.
     #
-    # SFX ONLY, NO MUSIC -- asked for twice (issue #95), and NOT YET TRUE.
-    # The trailer's own audio on this span IS the with-music mix: it measures
-    # corr 0.875 against the owner's "here it is with music" clip
-    # (~/Videos/wolves-directors-cut/cortney.mp4). The owner-named SFX source,
-    # yNBMDXdp69g (DESTINY 2: THE FINAL SHAPE All Cutscenes), was fetched and
-    # searched frame by frame across all 8280 s: the moment is NOT IN IT.
-    # It is first-person gameplay (the seventh-column super), which a
-    # cutscenes compilation does not carry -- best frame correlation anywhere
-    # in the movie is 0.30 against a 0.998 control on the trailer.
-    #
-    # TODO(owner): name a source that CONTAINS this gameplay moment with an
-    # SFX-only mix. When one exists: fetch it (never a -drc rung), verify it
-    # is music-free, and give this shot
-    #     audio_from={"video_id": ..., "start_sec": ...}
-    # with start_sec in THAT source's own clock -- tools/audiomix.py already
-    # implements the swap, and tests/test_wolves_timing_pass.py pins the
-    # shape. Until then the insert degrades to the trailer's (with-music)
-    # audio, and the gap lives here and in issue #95 -- recorded, never
-    # silently worked around.
-    t.run(GAMEPLAY, PAUSE_IN, PAUSE_DUR,
-          "III. SONG PAUSES -- the explosion, then the transcendence portrait, "
-          "held to the cut. KNOWN GAP (issue #95): owner wants SFX-only audio; "
-          "the named source does not contain the moment, so this still plays "
-          "the trailer's mix. Casting requested: Cortney Nickerson. UNPLATED: "
-          "no authored identity exists, so none is invented.",
+    # A -- 1.0 s of black and true silence: the realization, before anything
+    # appears. `audio="silent"` is a promise this beat stays silent forever.
+    t.card(interruption("a-silence", "INTERMISSION", "the song stops"),
+           SILENCE_LEN,
+           "III. INTERRUPTION A -- the song stops; a held beat of black before "
+           "anything appears (issue #104)", audio="silent")
+    # B -- the Ambassadors' slide. Copy owner-authored in #104 and reproduced
+    # VERBATIM; the CNCF mark itself is rights-blocked, so the slide is text
+    # only. `audio="hold"` is the hold-music slot: silent until the owner
+    # clears a track (licensing -- one of the two things that stop work), and
+    # recorded in `unresolved` in the shotlist with a TODO(owner).
+    t.card(interruption("b-ambassadors", "INTERRUPTION B", "slide missing"),
+           SLIDE_LEN,
+           "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' "
+           "(owner-authored, verbatim; hold-music slot, silent until a track "
+           "is cleared -- issue #104)", audio="hold")
+    # C -- introducing Cortney Nickerson. Her Guardian identity is OWNER-
+    # AUTHORED (issue #90, already on screen in act I) and reproduced
+    # verbatim, 'Weilder' and all; the class row stays OMITTED, exactly as in
+    # act I, because her class was never named and a hint is not an
+    # authorisation (#59/#90). The wreath question is the owner's (#104).
+    t.card(interruption("c-cortney", "INTERRUPTION C", "nameplate missing"),
+           PLATE_LEN,
+           "III. INTERRUPTION C -- Introducing Cortney Nickerson, her "
+           "authored #90 identity verbatim with the class row omitted, as in "
+           "act I (hold-music slot)", audio="hold")
+    # D -- the clip, with its OWN effects and score: the polite hold music is
+    # smashed out by the explosion. That is the joke, and it is why #95's
+    # with-music mix is no longer a defect. SOURCE clock 43.000 -> 53.470 --
+    # option B of the owner's correction on #104; see the constants above.
+    t.run(GAMEPLAY, CLIP_IN, CLIP_LEN,
+          "III. INTERRUPTION D -- the clip plays to the audience with its own "
+          "effects and score (issue #104; supersedes #95, whose SFX-only mix "
+          "does not exist): the explosion, then the transcendence portrait, "
+          "held to the cut at source 53.470. Cortney Nickerson's moment, "
+          "introduced on the card before it.",
           audio="source")
-    t.at_bed(PAUSE_AT, "the pause consumed no bed time")
+    t.at_bed(PAUSE_AT, "the interruption consumed no bed time")
 
     # ---- Act III-C: the Pale Heart, around the excised Ghost sequence ------
     pale_out = 361.200
@@ -538,7 +616,39 @@ def main():
         "note": "AUTHORED shotlist, not a story.py output. A TIMING PASS: "
                 "spans destined for removal or artwork are blacked out with "
                 "marker cards at their exact duration, so nothing is cut yet. "
-                "Shots marked audio=source do not advance the bed clock.",
+                "Only audio=bed shots advance the bed clock; the "
+                "interruption (issue #104) is silent/hold/source beats that "
+                "are all free to the song.",
+        "unresolved": [
+            "HOLD MUSIC, TODO(owner): interruption beats B and C (9.0 s of "
+            "wall time) carry audio='hold' -- the elevator-music slot. No "
+            "cleared hold-music asset exists on this machine and picking a "
+            "track is a licensing decision (rights stop work; they cannot be "
+            "un-done after publishing), so the slot ships SILENT and "
+            "recorded rather than filled with an unlicensed track. When a "
+            "track is cleared: give both shots audio_from={video_id, "
+            "start_sec} in that source's own clock -- tools/audiomix.py "
+            "already wires hold regions, though an audio-only container "
+            "will need an extension added to tools/render.py's MEDIA_EXTS.",
+            "CNCF MARK, TODO(owner): the interruption slide reproduces only "
+            "the owner-authored LINE ('The CNCF Ambassadors would like a "
+            "moment.'); the CNCF logo/mark is not used because the rights to "
+            "it have not been cleared. Text only until the owner says "
+            "otherwise.",
+            "WREATH, TODO(owner): Cortney Nickerson's plate on interruption "
+            "card C reproduces her authored act-I identity verbatim with no "
+            "wreath; whether the interruption treatment should add one is "
+            "the owner's call (#104).",
+            "CLIP RANGE: the clip plays source 43.000 -> 53.470 -- option B "
+            "of the owner's own correction on #104 (the issue text's "
+            "43.0 -> 51.0 would cut the transcendence portrait they "
+            "previously insisted on). Verified on frames in "
+            "renders/verify-104/. One-line revert to option A: CLIP_IN = "
+            "44.811.",
+            "CORTNEY'S CLASS: still unrecorded -- the plate omits the class "
+            "row exactly as her authored act-I plate does; a hint is not an "
+            "authorisation (#59/#90 remain open).",
+        ],
         "shots": t.shots,
     }
     dest = REPO / "stories/seven-days-timing-pass.json"

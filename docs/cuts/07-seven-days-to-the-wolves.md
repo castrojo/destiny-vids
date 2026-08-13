@@ -6,9 +6,16 @@ order — `~/Videos/Wolves/Prod/06-7daystothewolves.mp4`, hardlinked from
 in `yt-refresh.py`'s manifest, because that means choosing a title and a
 description, which is the owner's call. It is also **the one act with no
 lossless master** (#58).
-**Runtime:** 432.7 s (7:12.7) for a 424.0 s song. The 8.66 s difference is the pause.
+**Runtime:** 443.5 s (7:23.5) for a 424.0 s song. The 19.47 s difference is the
+interruption ([issue #104](https://github.com/castrojo/destiny-vids/issues/104)) —
+the bed is paused across all of it, so it costs the song nothing.
 **Rendered:** `renders/07-wolves-timing-pass.mp4` — 1920x1080 H.264, 30 fps,
-AAC 48 kHz, −1.2 dBTP, −10.0 LUFS integrated.
+AAC 48 kHz, −2.8 dBTP, −10.1 LUFS integrated (interruption build, 2026-08-13;
+the previous delivered build measured −1.6 dBTP, −10.1 LUFS). Delivered
+**alongside** v1 as `~/Videos/wolves-musical/wolves-7days-master-v2.mp4` and
+`-plated-master-v2.mp4` — v1 and the `Prod/` link are untouched; promoting v2
+and reassembling the programme (v0.8) is a deliberate follow-up, coordinated
+with the act II rebuild.
 
 The project's first musical: one song, three acts. This is the flagship the
 hero videos and the teaser are marketing toward.
@@ -113,16 +120,17 @@ builder asserts on it rather than trusting anyone to remember.
 | 13 | 4:37.0 – 4:39.7 | 277.0 – 279.7 | artwork | held through the HOWL and the silence |
 | 14 | 4:39.7 – 4:47.0 | 279.7 – 287.0 | `act2` 2:06.2 | the band slams back in, on three Guardians |
 | 15 | 4:47.0 – 5:22.2 | 287.0 – 322.2 | `act3` 0:51.8 – 1:27.0 | the Collection Trailer montage, two slots filled |
-| 16 | 5:22.2 – 5:30.9 | *paused* | `gameplay` 0:44.8 – 0:53.5 | **the song stops**; the explosion and the portrait |
-| 17 | 5:30.9 – 5:46.9 | 322.2 – 338.2 | `act2` 2:51 – 3:07 | the Pale Heart, Guardians gathering |
-| 18 | 5:46.9 – 6:00.8 | 338.2 – 352.1 | `gameplay` 1:17.6 – 1:35.2 | three action runs, where the Ghost sequence was |
-| 19 | 6:00.8 – 6:09.9 | 352.1 – 361.2 | `act2` 3:21 – 3:30 | back on the plains |
-| 20 | 6:09.9 – 7:00.4 | 361.2 – 411.7 | `act4` 0:00 – 0:50.5 | the finale, the Guardians assembled |
-| 21 | 7:00.4 – 7:12.7 | 411.7 – 424.0 | artwork | the outro, over the fade |
+| 16 | 5:22.2 – 5:41.7 | *paused* | cards + `gameplay` 0:43.0 – 0:53.5 | **the interruption** (#104): the song stops, the Ambassadors interrupt, the clip is presented |
+| 17 | 5:41.7 – 5:57.7 | 322.2 – 338.2 | `act2` 2:51 – 3:07 | the Pale Heart, Guardians gathering |
+| 18 | 5:57.7 – 6:11.6 | 338.2 – 352.1 | `gameplay` 1:17.6 – 1:35.2 | three action runs, where the Ghost sequence was |
+| 19 | 6:11.6 – 6:20.7 | 352.1 – 361.2 | `act2` 3:21 – 3:30 | back on the plains |
+| 20 | 6:20.7 – 7:11.2 | 361.2 – 411.7 | `act4` 0:00 – 0:50.5 | the finale, the Guardians assembled |
+| 21 | 7:11.2 – 7:23.5 | 411.7 – 424.0 | artwork | the outro, over the fade |
 
 **The song plays from the first frame**, under the title card — the record's own
 opening is quiet pickups, which is what a title card wants. The only source
-audio in the film is the 8.66 s pause.
+audio in the film is the interruption's 10.47 s clip, which plays its own
+effects and score by design (#104).
 
 ## The owner's notes, and what each one measured
 
@@ -175,7 +183,7 @@ the detector worked to find, so a trim never moves the start.
 *timecode*, not on the absence of a card, because "no card" would still pass if
 a run grew into the slide.
 
-### The pause: the explosion, the portrait, and the cut
+### The interruption: the song is paused and the clip is *presented*
 
 The owner's note — *"we want this explosion to be cortney's segment. Capture the
 length of the shot, including the portrait of her in transcendence glowing mode,
@@ -197,29 +205,81 @@ at 1/30 s:
 53.470   frame delta  89.1   the cut out of the portrait
 ```
 
-against a background of under 30. The pause runs **44.811 → 53.470** (8.659 s):
-in-point at the enclosing shot boundary so the moment builds rather than
-starting mid-air, out-point exactly on the measured cut. The reference is
-9.009 s; this is 8.659 s.
+against a background of under 30.
 
-It is `audio: "source"`, so it **costs no bed time** — extending it from 3.65 s
-only makes the film longer, and no anchor moved.
+**Then issue #104 reframed the whole beat.** #95 wanted the clip's audio
+SFX-only, and that search closed as *blocked* (below). The owner's solution
+dissolves the problem rather than solving it: **stop hiding that it is a clip
+— frame it as a presentation.** The song is paused, the CNCF Ambassadors
+interrupt the film, and the clip is *played to the audience* with its own
+effects and score. The with-music mix stops being a defect and becomes the
+point; the polite hold music is smashed out by the explosion, and that is the
+joke.
 
-On *"recreate it with the sfx pristine version you have, no music"* — **the
-delivered insert does not do that, and an earlier paragraph here claimed it
-did.** That claim argued from a spectral-flatness measurement (0.45 run-up,
+> *"Since this is an interruption we have unlimited time."* True mechanically
+> as well as dramatically: the bed does not advance across the pause
+> (`t.at_bed(PAUSE_AT, ...)` in `scripts/build_wolves.py`), so every second of
+> the sequence is free — it costs the song nothing.
+
+The sequence, built from `stories/06-wolves-interruption-cards.json` and the
+constants in `scripts/build_wolves.py` — **every timecode names its clock**:
+`322.200` is BED time, the clip's in/out are SOURCE time, the durations are
+ACT-FILM time:
+
+| # | Dur (film) | What | Audio |
+|---|---|---|---|
+| A | 1.0 s | the song stops; a held beat of black before anything appears | `silent` |
+| B | 4.0 s | *"The CNCF Ambassadors would like a moment."* (owner-authored, verbatim; **text only** — the CNCF mark is rights-blocked) | `hold` slot |
+| C | 4.0 s | *"Introducing ..."* → **Cortney Nickerson's nameplate**, her authored act-I identity verbatim — `AMBASSADOR // GUARDIAN` / *Weilder of the Arcane*, class row omitted exactly as there (#90) | `hold` slot |
+| D | 10.470 s | the clip: **source 43.000 → 53.470**, its own effects and score | `source` |
+| E | — | unpause; the song resumes at bed 322.200 | the song |
+
+19.47 s of screen time, all free. The **hold-music slot ships silent**: no
+cleared elevator-music asset exists on this machine, and picking a track is a
+licensing decision — one of the two things that genuinely stop work, because
+it cannot be un-done after publishing. The slot is recorded in the shotlist's
+`unresolved` with a `TODO(owner)`, and `tools/audiomix.py` already knows the
+`hold` kind: when the owner clears a track, both shots get an `audio_from`
+and nothing else changes. Silence in that slot is a punch-list item; an
+unlicensed track is not recoverable by a revert.
+
+The lengths are the issue's craft guidance, not measurement: an ordinary
+pre-punchline beat is 0.5–1 s, hold music wants 3–4 s, and past 5–6 s a
+static element with no new development is dead air — so no static element
+holds past 4.0 s and each is a new development (mark → name → explosion).
+
+**The in-point is the owner's own correction, verified on frames.** Issue #104
+as written said 43.0 → 51.0, but the owner's follow-up comment on the issue
+retracts it: 51.0 is mid-combat, 53.470 *is* the cut, and the literal range
+would drop the transcendence portrait they had previously insisted on. The
+comment names **43.000 → 53.470** as "very likely what was meant" (option B;
+the as-shipped 44.811 → 53.470 is option A). Option B is what is built here,
+after extracting frames across the window in this worktree
+(`renders/verify-104/`): combat with supers from 43.0, the white bloom at
+52.0, the portrait at 53.0, and the *next* shot — Guardians running — at 53.6.
+If the owner prefers A, it is a one-line change (`CLIP_IN = 44.811`) and a
+rebuild.
+
+The clip is `audio: "source"`, so it **costs no bed time**, and neither do the
+silent and hold beats — extending the pause from 8.659 s to 19.470 s only
+makes the film longer; no anchor moved.
+
+What follows is the history that closed #95, kept because the measurements
+stand. On *"recreate it with the sfx pristine version you have, no music"* —
+**the delivered insert never did that, and an earlier paragraph here claimed
+it did.** That claim argued from a spectral-flatness measurement (0.45 run-up,
 0.47 across the explosion) that the trailer's own audio was "broadband, not
-tonal". It is deleted: a flatness average across a loud explosion can mask a
+tonal". It stays deleted: a flatness average across a loud explosion can mask a
 bed, and a measurement is not a licence to ignore the source the owner handed
 over. Measured properly ([issue
 #95](https://github.com/castrojo/destiny-vids/issues/95)), the trailer's audio
 on this span **is** the with-music mix — correlation **0.875** against the
 owner's own *"here it is with music"* clip at matching loudness.
 
-**The fix is a source, not a process** — nothing is separated, ducked or
+**The fix was a source, not a process** — nothing is separated, ducked or
 enhanced; the audio tenet in
 [`docs/skills/references/audio-standard.md`](../skills/references/audio-standard.md)
-rules that out, so the SFX-only audio must come from another upload of the
+rules that out, so the SFX-only audio had to come from another upload of the
 same moment. The owner named *DESTINY 2: THE FINAL SHAPE All Cutscenes*
 ([`yNBMDXdp69g`](https://www.youtube.com/watch?v=yNBMDXdp69g), 2:18:00). It
 was fetched (plain 251 Opus — never a `-drc` rung) and searched end to end:
@@ -232,14 +292,11 @@ was fetched (plain 251 Opus — never a `-drc` rung) and searched end to end:
 
 **The moment is not in that video.** It is first-person *gameplay* — the
 seventh-column super cast — and a cutscenes compilation does not carry
-gameplay. So the insert still plays the trailer's (with-music) audio, and the
-gap is recorded here and in `scripts/build_wolves.py` next to the shot rather
-than worked around: **what is needed is a source that contains this gameplay
-moment with an SFX-only mix** — the picture span is gameplay trailer
-44.811 → 53.470 (gameplay-trailer clock), i.e. act film 5:22.2 – 5:30.9.
-`tools/audiomix.py` already implements the swap (`audio_from` on the shot, the
-span named in the *audio* source's clock); when the owner names a source that
-contains the moment, the fix is one line in the builder and a rebuild.
+gameplay. That is what closed #95 as blocked (PR #132), and what #104 then
+reframed: no SFX-only mix exists, so the clip stops apologising for its score
+and is *presented* with it. The `audio_from` mechanism in
+`tools/audiomix.py` survives — it is how the hold-music slot will play once
+the owner clears a track.
 
 ### The Ghost sequence, and why its hole had to be filled
 
@@ -262,7 +319,8 @@ It comes from the three runs the owner supplied as proxies, recut from the
 | `gameplay` 90.791 – 95.225 | 4.434 | a Hunter vaults into the light, and three walk in together |
 
 = **13.943 s**, exactly. Only the last is trimmed, and only at its tail. They
-play **under the bed**: the pause is the film's one section with its own audio.
+play **under the bed**: the interruption's clip is the film's one section with
+its own audio.
 
 ### Casting on those three runs — and an override
 
@@ -399,18 +457,23 @@ black actually ends. The old value leaked 0.27 s of black into the cut.
 
 The mechanic and when to reach for it are in
 [`docs/skills/scoring.md`](../skills/scoring/references/two-clocks-and-levels.md).
-What is specific to this cut: the song plays from the first frame, the only
-`audio: "source"` shot is the pause, and the film is therefore **432.7 s for
-424.0 s of music**. Every anchor in the builder is asserted against bed time.
+What is specific to this cut: the song plays from the first frame, and the
+only shots that cost no bed time are the interruption's — the only
+`audio: "source"` shot is the clip, and beats A–C are `silent` / `hold`. The
+film is therefore **443.5 s for 424.0 s of music**. Every anchor in the
+builder is asserted against bed time.
 
 ### The pause's length, measured
 
 The rule — [a diegetic insert has to be allowed to
 end](../skills/scoring/references/two-clocks-and-levels.md#a-diegetic-insert-has-to-be-allowed-to-end) — came out
 of this cut. The pause was first taken at 1.8 s and the moment *started and did
-not finish*; the timing pass took it to 3.65 s. This pass takes it to the shot
-the owner actually meant, 8.659 s, with the out-point on a measured cut rather
-than on an audio envelope.
+not finish*; the timing pass took it to 3.65 s; the editorial pass took it to
+the shot the owner actually meant, 8.659 s, with the out-point on a measured
+cut rather than on an audio envelope. The interruption (#104) takes the beat
+to 19.470 s of film: the same shot, now 43.000 → 53.470 on the source clock,
+*plus* the three presentation beats in front of it — all of it free to the
+bed.
 
 ### Guardians together
 
@@ -442,23 +505,26 @@ measures +2.1 dBFS. The fix is a **static −3.5 dB gain** applied once, at the
 final mux — not `loudnorm`, not a limiter: a static gain changes no dynamics at
 all, and the LRA is the artist's, not ours.
 
-**The pause needed the same treatment, for its own reason.** An insert is
+**The clip needs the same treatment, for its own reason.** An insert is
 somebody else's mix and it brings peaks nobody here planned for, over a region
-far too short to move the film's integrated loudness. Measured:
+far too short to move the film's integrated loudness. Measured (on the
+8.659 s pause; the interruption's clip is the same material, 1.8 s longer):
 
 | Region | True peak |
 |---|---|
 | whole file, before | **−0.4 dBTP** — over the −1.0 gate |
 | a bed region | −3.2 dBTP — fine, and unchanged |
-| the 8.7 s pause | **−0.4 dBTP** — the culprit |
+| the pause region | **−0.4 dBTP** — the culprit |
 
-So the pause gets a static **−1.5 dB** of its own
+So the clip gets a static **−1.5 dB** of its own
 (`tools/audiomix.py --source-gain-db`, added in this pass as the mirror of
 `--bed-gain-db`). Pulling the whole film down would have worked too and is
 worse: it would quietly re-level music whose gain was already decided and
-documented above.
+documented above. The silent and hold beats carry no audio at all, so they
+cannot peak.
 
-Delivered: **−1.6 dBTP**, −10.1 LUFS integrated, LRA 4.0.
+Delivered (previous build): **−1.6 dBTP**, −10.1 LUFS integrated, LRA 4.0. The
+interruption rebuild's own numbers are in the verification table below.
 
 ### The pause was silent, and everything else still passed
 
@@ -473,6 +539,11 @@ The verification now asserts a floor on the region's RMS as well as its
 correlation against the bed. The two catch opposite faults and neither implies
 the other: the floor catches a silent insert, the correlation catches the bed
 leaking into a region that was supposed to be a pause.
+
+The interruption (#104) adds the **inverse** fault, and the gate covers it too
+(`scripts/rebuild-wolves.sh` measures both directions from the shotlist's own
+wall clock): a `silent` beat — or the `hold` slot while no track is cleared —
+that is *audible* means the bed is leaking into the pause.
 
 ## The tail plates — the Cayde-6 reveal
 
@@ -499,6 +570,12 @@ defects of the previous session, neither of which was visible in a manifest.
 | 17:45 | 391.008 | the Guardians assembled around the fire | **Kelsey Hightower**, gold |
 | 17:49 | 395.008 | the group standing, sunset behind | **Brian Ketelsen**, gold |
 | 17:51 | 397.008 | the front rank walking into camera | **Angie Jones**, gold |
+
+**Shifted +10.811 s for the interruption build (#104).** Every window is after
+the pause, and the pause grew by exactly 10.811 s of film (bed untouched), so
+the same frames now play at 393.511 / 397.111 / 401.819 / 405.819 / 407.819.
+The manifest records the shift in `_shifted`; the marks and the verified
+frames above are unchanged.
 
 Gold is `variant: leader` — the wolves overlay's `.wolves-guardian-plate-leader`,
 which recolours the label and the title and deliberately leaves the class row
@@ -542,20 +619,30 @@ Recorded in the manifest's `unresolved`, and none of it is an agent's call:
 ```bash
 python3 tools/plate.py render --manifest stories/06-wolves-cayde-plates.json \
     --out-dir renders/plates-act6 \
-    --fit-video ~/Videos/Wolves/Prod/06-7daystothewolves.mp4
-python3 tools/plate.py burn --video ~/Videos/Wolves/Prod/06-7daystothewolves.mp4 \
+    --fit-video renders/07-wolves-timing-pass.mp4
+python3 tools/plate.py burn --video renders/07-wolves-timing-pass.mp4 \
     --manifest stories/06-wolves-cayde-plates.json \
     --plates-dir renders/plates-act6 \
-    --out ~/Videos/Wolves/Prod/06-7daystothewolves-plated.mp4 --fit-picture
+    --out renders/07-wolves-plated.mp4 --fit-picture
 ```
 
-`Prod/` holds **one file per act**, hardlinked to its project master, so the
-plated act is `Prod/06-7daystothewolves.mp4` →
-`~/Videos/wolves-musical/wolves-7days-plated-master.mp4`. **The un-plated
-master is kept beside it** as `wolves-7days-master.mp4`, because burning is not
-idempotent: a re-burn starts from the clean act and never stacks a second card
-on the first. Audio is stream-copied, so the act's duration is unchanged
-(432.7330) and **no chapter after it moves**.
+(the v1 burn fitted against `~/Videos/Wolves/Prod/06-7daystothewolves.mp4`;
+the #104 build fits against the fresh render, and the result is *then*
+delivered alongside — never burned over a delivered file in place.)
+
+`Prod/` holds **one file per act**, hardlinked to its project master. The
+interruption build (2026-08-13, #104) is delivered **alongside** the v1
+masters as `~/Videos/wolves-musical/wolves-7days-master-v2.mp4` and
+`wolves-7days-plated-master-v2.mp4`; `Prod/06` still links to v1. Promoting is
+one deliberate step — `ln -f wolves-7days-plated-master-v2.mp4
+~/Videos/Wolves/Prod/06-7daystothewolves.mp4` — and because the act is now
+443.5 s, **the programme (v0.7) then needs reassembly**: every chapter after
+act VI moves +10.811 s. That reassembly is *not* done in this change, so it
+cannot race the act II rebuild happening in parallel; it is the recorded
+follow-up. **The un-plated master is kept beside the plated one**, because
+burning is not idempotent: a re-burn starts from the clean act and never
+stacks a second card on the first. Audio is stream-copied at the burn, so the
+burn itself moves nothing.
 
 ## Reproducing
 
@@ -593,6 +680,9 @@ python3 tools/annotate.py index \
 # 2. the summit plates (URLs and licence: stories/summit-photos.json)
 python3 scripts/build_summit_plates.py --fetch
 
+# 2b. the interruption slides (copy: stories/06-wolves-interruption-cards.json)
+python3 scripts/build_interruption_cards.py
+
 # 3. the shotlist, the picture, the audio
 python3 scripts/build_wolves.py
 DESTINY_FFMPEG=$FF python3 tools/render.py stories/seven-days-timing-pass.json \
@@ -612,18 +702,28 @@ and a silent insert is invisible to every other check — see Audio.
 
 Not asserted — measured, on the delivered file.
 
+Measured on the **interruption build** (2026-08-13; film clock, 443.533 s
+container):
+
 | Claim | Evidence |
 |---|---|
-| Not truncated | full `-xerror` decode passes; 12 977 frames, 432.733 s |
+| Not truncated | full `-xerror` decode passes; 13 301 frames, 443.533 s |
 | The song is where it should be | cross-correlation against the bed: lag **0.00 ms**, r = 0.9998–0.9999 at film 100/250/300 |
-| The song resumes where it stopped | lag **1.00 ms** (8 samples at 8 kHz), r = 0.9997–0.9999 at film 340/400 |
-| The pause is a genuine pause | correlation against the bed **−0.10** across the region |
-| The pause is not silent | region RMS **−18.5 dB**, peak −1.9 dB — the trailer's own audio, **which carries the score**: the SFX-only source the owner named does not contain the moment ([issue #95](https://github.com/castrojo/destiny-vids/issues/95)) |
-| Headroom | **−1.6 dBTP**, −10.1 LUFS, LRA 4.0 |
-| Anchors hold | every `at_bed()` assertion in the builder, plus `tests/test_wolves_timing_pass.py` (28 tests) |
+| The song resumes where it stopped | film 350/400/440 = bed 330.530/380.530/420.530 (film − 19.470): lag **0.00 ms**, r = 0.9998–0.9999 |
+| The interruption is a genuine pause | correlation against the bed **−0.02** across the region |
+| The clip is not silent | region RMS **−18.8 dB** (film 331.2–341.67) — the trailer's own audio, effects and score, **by design** ([#104](https://github.com/castrojo/destiny-vids/issues/104)) |
+| The held beats ARE silent | beat A RMS **−89.3 dB**; beats B and C RMS **−240 dB** (digital silence) — the hold-music slot ships empty, recorded in `unresolved` |
+| Headroom | **−2.8 dBTP**, −10.1 LUFS integrated |
+| The frames are the design | extracted and eyeballed: 322.6 black; 325.2 the Ambassadors slide; 329.2 "Introducing ..." + Cortney's plate; 340.2 the white bloom; 341.2 the transcendence portrait; 342.5 the Pale Heart resumed |
+| The reveal still lands | plates re-burned at +10.811 s; the Cayde frame at film 394.5 carries the reveal card |
+| Anchors hold | every `at_bed()` assertion in the builder, plus `tests/test_wolves_timing_pass.py` |
 | No slide, no placeholder | asserted on timecode and on beat text, not on the absence of a card |
 | No two summit slots repeat | peak pairwise correlation **0.27**, limit 0.35 |
 | Joins | a frame extracted at every new cut and inside every summit slot |
+
+The previous build's measurements (432.733 s, 12 977 frames, resume lag
+1.00 ms, pause RMS −18.5 dB, −1.6 dBTP) stood on the 8.659 s pause and are
+superseded by the table above.
 
 ## Rights
 
@@ -671,10 +771,26 @@ of it.
       need re-sourcing from official uploads.
 - [ ] **Credits sequence** — [issue #51]. Now carries two obligations, not one:
       the cast credits *and* the CNCF attribution the photo licence requires.
-- [ ] **Owner: Cortney Nickerson's Guardian identity** — [issue #59]. The pause
-      is cast to her by the owner and she has no authored identity in
-      `~/Videos/nameplates.json`, the website's `characters.json`, or
-      `vocab/casting.yaml`. **The shot is rendered unplated.**
+- [ ] **Owner: Cortney Nickerson's class** — [issue #59] / [#90]. She is
+      **plated now**: interruption card C introduces her with the identity the
+      owner authored for act I (#90), verbatim — `AMBASSADOR // GUARDIAN` /
+      *Weilder of the Arcane*. The class row stays **omitted**, exactly as in
+      act I: her class was never named and a hint is not an authorisation.
+- [ ] **Owner: the hold music** — [#104]. Interruption beats B and C carry the
+      `hold` audio slot, which ships **silent**: no cleared elevator-music
+      asset exists on this machine and picking a track is a licensing
+      decision. Recorded in the shotlist's `unresolved` with a `TODO(owner)`;
+      when a track is cleared, both shots get an `audio_from` and the mix
+      wiring already knows what to do with it.
+- [ ] **Owner: the CNCF mark on the interruption slide** — [#104]. The slide
+      is the owner-authored line as text only; using the logo is a rights
+      decision, not made.
+- [ ] **Owner: a wreath for the interruption plate?** — [#104]. Card C
+      reproduces the act-I treatment exactly, which has none.
+- [ ] **Owner: confirm the clip's in-point** — [#104]. Built as option B of
+      the owner's own correction (source 43.000 → 53.470); the issue text's
+      43.0 → 51.0 would drop the portrait. One-line revert to option A:
+      `CLIP_IN = 44.811` in `scripts/build_wolves.py`.
 - [ ] **Owner: `github.com/inffy`'s Guardian identity** — [issue #72]. Same
       shape as Cortney's, recorded in `leads.pending`. The run renders unplated.
 - [ ] **Kaslin Fields' GitHub login** — [issue #72]. Her identity *is* authored;

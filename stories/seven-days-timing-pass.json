@@ -13,11 +13,18 @@
   ],
   "pause_at_bed": 322.2
  },
- "note": "AUTHORED shotlist, not a story.py output. A TIMING PASS: spans destined for removal or artwork are blacked out with marker cards at their exact duration, so nothing is cut yet. Shots marked audio=source do not advance the bed clock.",
+ "note": "AUTHORED shotlist, not a story.py output. A TIMING PASS: spans destined for removal or artwork are blacked out with marker cards at their exact duration, so nothing is cut yet. Only audio=bed shots advance the bed clock; the interruption (issue #104) is silent/hold/source beats that are all free to the song.",
+ "unresolved": [
+  "HOLD MUSIC, TODO(owner): interruption beats B and C (9.0 s of wall time) carry audio='hold' -- the elevator-music slot. No cleared hold-music asset exists on this machine and picking a track is a licensing decision (rights stop work; they cannot be un-done after publishing), so the slot ships SILENT and recorded rather than filled with an unlicensed track. When a track is cleared: give both shots audio_from={video_id, start_sec} in that source's own clock -- tools/audiomix.py already wires hold regions, though an audio-only container will need an extension added to tools/render.py's MEDIA_EXTS.",
+  "CNCF MARK, TODO(owner): the interruption slide reproduces only the owner-authored LINE ('The CNCF Ambassadors would like a moment.'); the CNCF logo/mark is not used because the rights to it have not been cleared. Text only until the owner says otherwise.",
+  "WREATH, TODO(owner): Cortney Nickerson's plate on interruption card C reproduces her authored act-I identity verbatim with no wreath; whether the interruption treatment should add one is the owner's call (#104).",
+  "CLIP RANGE: the clip plays source 43.000 -> 53.470 -- option B of the owner's own correction on #104 (the issue text's 43.0 -> 51.0 would cut the transcendence portrait they previously insisted on). Verified on frames in renders/verify-104/. One-line revert to option A: CLIP_IN = 44.811.",
+  "CORTNEY'S CLASS: still unrecorded -- the plate omits the class row exactly as her authored act-I plate does; a hint is not an authorisation (#59/#90 remain open)."
+ ],
  "shots": [
   {
    "segment_id": "card_000",
-   "still": "/var/home/jorge/src/destiny-vids/renders/markers/title-project-bluefin-seven-days-to-the-wolves-e9f32c80.png",
+   "still": "renders/markers/title-project-bluefin-seven-days-to-the-wolves-e9f32c80.png",
    "duration": 10.0,
    "beat": "TITLE CARD (the film's own logo; the source's is never shown)",
    "audio": "bed"
@@ -46,7 +53,7 @@
   },
   {
    "segment_id": "card_003",
-   "still": "/var/home/jorge/src/destiny-vids/renders/summit-plates/act1_black_1.jpg",
+   "still": "renders/summit-plates/act1_black_1.jpg",
    "duration": 3.016,
    "beat": "I. SUMMIT -- film 1:21 -- the black; the owner asked for it gone, and it becomes the summit instead",
    "audio": "bed"
@@ -75,7 +82,7 @@
   },
   {
    "segment_id": "card_006",
-   "still": "/var/home/jorge/src/destiny-vids/renders/summit-plates/act1_black_2.jpg",
+   "still": "renders/summit-plates/act1_black_2.jpg",
    "duration": 1.374,
    "beat": "I. SUMMIT -- film 1:55 -- black",
    "audio": "bed"
@@ -115,7 +122,7 @@
   },
   {
    "segment_id": "card_010",
-   "still": "/var/home/jorge/src/destiny-vids/renders/summit-plates/act1_black_3.jpg",
+   "still": "renders/summit-plates/act1_black_3.jpg",
    "duration": 2.078,
    "beat": "I. SUMMIT -- film 2:45 -- black",
    "audio": "bed"
@@ -190,7 +197,7 @@
   },
   {
    "segment_id": "card_017",
-   "still": "/var/home/jorge/src/destiny-vids/renders/summit-plates/enemy_cu.jpg",
+   "still": "renders/summit-plates/enemy_cu.jpg",
    "duration": 3.51,
    "beat": "III. SUMMIT -- the whole Contributor Summit, over the enemy CU",
    "audio": "bed"
@@ -227,7 +234,7 @@
   },
   {
    "segment_id": "card_021",
-   "still": "/var/home/jorge/src/destiny-vids/renders/summit-plates/raids.jpg",
+   "still": "renders/summit-plates/raids.jpg",
    "duration": 1.966,
    "beat": "III. SUMMIT -- over the 7 RAIDS card",
    "audio": "bed"
@@ -245,7 +252,7 @@
   },
   {
    "segment_id": "card_023",
-   "still": "/var/home/jorge/src/destiny-vids/renders/summit-plates/buildcrafting.jpg",
+   "still": "renders/summit-plates/buildcrafting.jpg",
    "duration": 1.967,
    "beat": "III. SUMMIT -- over the ENDLESS BUILDCRAFTING card",
    "audio": "bed"
@@ -262,14 +269,35 @@
    "audio": "bed"
   },
   {
-   "segment_id": "yt_destiny_2_the_final_shape_gameplay_trailer_0044_811",
+   "segment_id": "card_025",
+   "still": "renders/interruption/a-silence.png",
+   "duration": 1.0,
+   "beat": "III. INTERRUPTION A -- the song stops; a held beat of black before anything appears (issue #104)",
+   "audio": "silent"
+  },
+  {
+   "segment_id": "card_026",
+   "still": "renders/interruption/b-ambassadors.png",
+   "duration": 4.0,
+   "beat": "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' (owner-authored, verbatim; hold-music slot, silent until a track is cleared -- issue #104)",
+   "audio": "hold"
+  },
+  {
+   "segment_id": "card_027",
+   "still": "renders/interruption/c-cortney.png",
+   "duration": 4.0,
+   "beat": "III. INTERRUPTION C -- Introducing Cortney Nickerson, her authored #90 identity verbatim with the class row omitted, as in act I (hold-music slot)",
+   "audio": "hold"
+  },
+  {
+   "segment_id": "yt_destiny_2_the_final_shape_gameplay_trailer_0043_000",
    "video_id": "yt_destiny_2_the_final_shape_gameplay_trailer",
-   "start_sec": 44.811,
+   "start_sec": 43.0,
    "end_sec": 53.47,
-   "duration": 8.659,
-   "start_tc": "0:44.8",
+   "duration": 10.47,
+   "start_tc": "0:43.0",
    "end_tc": "0:53.5",
-   "beat": "III. SONG PAUSES -- the explosion, then the transcendence portrait, held to the cut. KNOWN GAP (issue #95): owner wants SFX-only audio; the named source does not contain the moment, so this still plays the trailer's mix. Casting requested: Cortney Nickerson. UNPLATED: no authored identity exists, so none is invented.",
+   "beat": "III. INTERRUPTION D -- the clip plays to the audience with its own effects and score (issue #104; supersedes #95, whose SFX-only mix does not exist): the explosion, then the transcendence portrait, held to the cut at source 53.470. Cortney Nickerson's moment, introduced on the card before it.",
    "audio": "source"
   },
   {
@@ -342,7 +370,7 @@
    "plate_slot": true
   },
   {
-   "segment_id": "card_032",
+   "segment_id": "card_035",
    "still": "/var/home/jorge/Pictures/Artwork/wolves.jpg",
    "duration": 12.293,
    "beat": "ARTWORK (outro, over the fade)",

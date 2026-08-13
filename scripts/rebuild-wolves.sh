@@ -33,6 +33,9 @@ echo "==> shotlist"
 echo "==> summit plates"
 "$PY" scripts/build_summit_plates.py --fetch
 
+echo "==> interruption cards"
+"$PY" scripts/build_interruption_cards.py
+
 echo "==> picture"
 DESTINY_FFMPEG="$FF" "$PY" tools/render.py "$SHOTLIST" \
     --media media --out "$PICTURE" | tail -2
@@ -55,25 +58,45 @@ shots = json.load(open(shotlist))["shots"]
 # Where does the film play its own audio? That region is the one place a
 # missing audio track is INAUDIBLE as a bug: the bed is muted there by design,
 # so a silent insert sounds exactly like a working pause.
-wall, inserts = 0.0, []
+#
+# The interruption (#104) adds the inverse fault: a `silent` beat -- or the
+# `hold` slot while no track is cleared -- that is AUDIBLE is the bed leaking
+# into the pause. Both directions are measured here, from the shotlist's own
+# wall clock.
+wall, inserts, silences = 0.0, [], []
 for s in shots:
-    if s.get("audio") == "source":
+    audio = s.get("audio", "bed")
+    if audio == "source":
         inserts.append((wall, s["duration"]))
+    elif audio in ("silent", "hold") and not s.get("audio_from"):
+        silences.append((wall, s["duration"], audio))
     wall += s["duration"]
 
-fail = []
-for start, dur in inserts:
+
+def measure(start, dur):
     raw = subprocess.run(
         [FF, "-v", "error", "-ss", str(start), "-i", out, "-t", str(dur),
          "-ac", "1", "-ar", "8000", "-f", "s16le", "-"],
         capture_output=True).stdout
     a = array.array("h", raw[: len(raw) // 2 * 2])
     rms = math.sqrt(sum(float(x) * x for x in a) / max(len(a), 1))
-    db = 20 * math.log10(rms / 32768 + 1e-12)
-    print(f"    insert @{start:7.2f}s  {dur:5.2f}s  rms {db:6.1f} dB")
+    return 20 * math.log10(rms / 32768 + 1e-12)
+
+
+fail = []
+for start, dur in inserts:
+    db = measure(start, dur)
+    print(f"    insert  @{start:7.2f}s  {dur:5.2f}s  rms {db:6.1f} dB")
     if db < -60:
         fail.append(f"the insert at {start:.2f}s is SILENT ({db:.1f} dB). "
                     "yt-dlp DASH formats are video-only -- fetch audio too.")
+
+for start, dur, audio in silences:
+    db = measure(start, dur)
+    print(f"    {audio:6s} @{start:7.2f}s  {dur:5.2f}s  rms {db:6.1f} dB")
+    if db >= -60:
+        fail.append(f"the {audio} beat at {start:.2f}s is AUDIBLE "
+                    f"({db:.1f} dB) -- the bed is leaking into the pause.")
 
 peak = None
 for line in subprocess.run(
