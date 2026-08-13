@@ -155,18 +155,62 @@ def test_the_comic_card_covers_one_unbroken_window_beside_the_guardian_plates():
 
 
 def test_a_recast_plate_carries_a_name_and_no_inherited_rows():
-    """Cortney and Orlin have no authored identity: name only, never Bob's or
-    Laura's label, subclass and title."""
+    """Orlin has no authored identity: name only, never Laura's label, subclass
+    and title. Cortney's identity WAS authored (issue #90), so hers is checked
+    the other way -- every row present, and the one row nobody wrote absent."""
     entries = plate.load_manifest(os.path.join(MEGACUT, "megacut-hero-plates.json"))
-    recast = {e["id"]: e for e in entries if e["id"] in ("cortney", "orlin")}
-    assert set(recast) == {"cortney", "orlin"}
-    for entry in recast.values():
-        assert entry["name"]
-        for row in ("label", "class", "title", "trustee"):
-            assert row not in entry, f"{entry['id']} inherited {row}"
+    orlin = next(e for e in entries if e["id"] == "orlin")
+    assert orlin["name"]
+    for row in ("label", "class", "title", "trustee"):
+        assert row not in orlin, f"orlin inherited {row}"
+
+    cortney = next(e for e in entries if e["id"] == "cortney")
+    assert cortney["name"] == "Cortney Nickerson"
+    # 'whatever the Void subclass is' is not a subclass: Void is Voidwalker,
+    # Sentinel or Nightstalker depending on her class, which nobody has said.
+    assert "class" not in cortney, "a subclass nobody authored was guessed"
+
     manifest = _load("megacut-hero-plates.json")
     gaps = " ".join(u["what"] for u in manifest["unresolved"])
     assert "Cortney Nickerson" in gaps and "Orlin" in gaps
+
+
+def test_the_cover_identities_are_captions_because_a_plate_would_cover_the_art():
+    """The owner ruled out nameplates over the cover art. The art is square, so
+    a 16:9 frame leaves 420px either side and a 561px Guardian plate cannot fit
+    -- the authored identities are carried as caption boxes on the card itself.
+    A `cover-*` plate reappearing means somebody has put one back over the ink.
+    """
+    entries = plate.load_manifest(os.path.join(MEGACUT, "megacut-hero-plates.json"))
+    assert not [e for e in entries if e["id"].startswith("cover-")]
+
+    cover = next(e for e in entries if e.get("kind") == "comic")
+    captions = cover["captions"]
+    assert {c["side"] for c in captions} == {"left", "right"}
+    # Every authored string the owner wrote for the cover, still on the card.
+    text = json.dumps(captions)
+    for authored in ("Introducing Rafael and Lakshmi", "Have you met Bluefin?",
+                     "BLUEBERRY // HUMAN", "Rafael Castro", "Blueberry Hunter",
+                     "Happy 10th Birthday!", "Blueberry Warlock",
+                     "Wielder of the Kube", "BLUEFIN", "Really Hungry "):
+        assert authored in text, authored
+    # The child's name is not on her own box: see `unresolved`.
+    warlock = next(c for c in captions if "Blueberry Warlock" in c.get("lines", []))
+    assert "Lakshmi" not in json.dumps(warlock)
+
+
+def test_the_cover_wallpaper_roll_is_recorded_so_a_frame_is_reproducible():
+    """A random wallpaper per render is the owner's instruction. A random
+    render nobody wrote down cannot be rebuilt, so the driver records the roll
+    and can replay it."""
+    cover = next(e for e in _load("megacut-hero-plates.json")["plates"]
+                 if e.get("kind") == "comic")
+    assert cover["wallpaper_dir"]
+    # The directory holds aurora wallpapers too; the owner asked for Bluefin.
+    assert re.search(r"bluefin", cover["wallpaper_match"], re.I)
+    driver = open(os.path.join(CARDS, "render-cards.mjs"), encoding="utf-8").read()
+    assert "wallpapers.json" in driver
+    assert "--wallpaper-seed" in driver or "wallpaper-seed" in driver
 
 
 def test_the_card_templates_copy_the_sites_own_rules():
