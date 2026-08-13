@@ -63,7 +63,7 @@ time ([#98](https://github.com/castrojo/destiny-vids/issues/98)).
 | III. Bob Killen | 7:09 | `Prod/03-mrbobbytables.mp4` |
 | IV–V. Bias for Action | 9:54 | `Prod/04-kat.mp4`, `Prod/05-nat.mp4` |
 | VI. 7 Days to the Wolves | 11:08 | `Prod/06-7daystothewolves.mp4` |
-| VII. Europa | 18:26 | `Prod/07-europa.mp4` |
+| VII. Europa | 18:37 | `Prod/07-europa.mp4` |
 
 Regenerate this with `--chapters`; never hand-edit it, and never trust a copy
 of it that has been pasted somewhere else.
@@ -99,11 +99,15 @@ watch.
 
 Known and tracked, so nobody re-measures them:
 
-- The programme currently peaks at **+0.2 dBTP**, inherited from act VII's
-  master at **+0.3 dBTP** — acts I–VI all measure between −4.6 and −0.9. It is
-  one act's file, not the show ([#82](https://github.com/castrojo/destiny-vids/issues/82)).
-- The −1.0 dBTP band is enforced in `tools/redact.py` only. `tools/render.py`
-  and `tools/social.py` encode audio blind
+- ~~The programme peaks at **+0.2 dBTP**, inherited from act VII's master.~~
+  **Fixed 2026-08-13**: act VII's master was re-rendered under
+  `tools/peaks.py trim` (PR #130) and measures **−1.1 dBTP**; every act is now
+  in the −4.6…−0.9 band and v0.8's programme peak is −0.9
+  ([#82](https://github.com/castrojo/destiny-vids/issues/82) stays open for its
+  owner to close).
+- The delivered-peak trim is enforced by `tools/redact.py`, `tools/render.py`
+  and the master gate `tools/peaks.py trim`; `tools/social.py` still encodes
+  audio blind and relies on its master's peak
   ([#44](https://github.com/castrojo/destiny-vids/issues/44)).
 
 ## Taking notes so they survive the watch

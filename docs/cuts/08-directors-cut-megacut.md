@@ -3,15 +3,20 @@
 The whole show as **one continuous video**, assembled from the finished cuts and
 announced by act slides in the Wolves cinematic's own chrome.
 
-**Status: v0.7 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.7.mp4`,
-**20:21.9** planned, seven of the eight acts on six slides — acts IV and V
-share one. v0.7 is v0.6 with the **act-join treatment** of
-[#105](https://github.com/castrojo/destiny-vids/issues/105): every act used to
-enter dry out of the slides' digital silence (4–14 s of `-inf` per join, then
-an entry as hot as −15 dB a second later), and acts I and III ended hot
-against it. The plan now carries explicit `fade_in`/`fade_out` shapes per act
-(act-film clock, `afade` at the segment encode, no gain anywhere); durations
-are unchanged, so **no chapter moved**, and v0.6 is kept beside it. Earlier:
+**Status: v0.8 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.8.mp4`,
+**20:32.7** planned, seven of the eight acts on six slides — acts IV and V
+share one. v0.8 carries two act changes over v0.7: **act II's overlay pass**
+([#98](https://github.com/castrojo/destiny-vids/issues/98) — the TOC exchange,
+the endgame timed cues, the closing quotes, the letterbox callout; duration
+byte-identical, so no chapter moved there) and **act VI's promotion to the #104
+interruption build** (v2, 443.5 s — the 17 s Ambassadors interruption over the
+unchanged bed; the Cayde-6 tail plates moved +10.811 s with it), which moved
+act VII's chapter to **18:37**. It also inherits act VII's corrected master
+(−1.1 dBTP, #82) from `Prod/`, so the programme peak is now −0.9. v0.7 added
+the **act-join treatment** of
+[#105](https://github.com/castrojo/destiny-vids/issues/105): explicit
+`fade_in`/`fade_out` shapes per act (act-film clock, `afade` at the segment
+encode, no gain anywhere). Earlier:
 v0.6 added **act VI's tail plates** (the Cayde-6 reveal that finally names
 Jorge Castro, and three gold credits behind it — see
 [`07-seven-days-to-the-wolves.md`](07-seven-days-to-the-wolves.md), "The tail
@@ -24,7 +29,7 @@ now names Jorge Castro, Kelsey Hightower, Brian Ketelsen and Angie Jones. Act
 VI is an editorial pass whose
 provenance is an open owner decision (#55); act II's picture comes from a fan
 compilation carrying the same question; act III is partially complete by the
-owner's own description; act VII's master clips at +0.3 dBTP (#82). None of that
+owner's own description. None of that
 is fixable by re-assembling — assembly joins finished things and never re-cuts
 one.
 
@@ -53,15 +58,15 @@ after act I by 312.967 s, which is the worked example of why.
 | **IV** | 609.734 | 643.734 | **Kat Cosgrove** — Guardian intro | `Prod/04-…` |
 | **V** | 643.734 | 668.992 | **Natali Vlatko** — Guardian arrival, straight off act IV | `Prod/05-…` |
 | — | 668.992 | 673.992 | Slide **VI** — `7 Days to the Wolves` / *Nightwish* | rendered |
-| **VI** | 673.992 | 1106.692 | **Seven Days to the Wolves** — the musical (editorial pass) | `Prod/06-…` |
-| — | 1106.692 | 1111.692 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
-| **VII** | 1111.692 | 1221.892 | **Europa Director's Cut** | `Prod/07-…` |
+| **VI** | 673.992 | 1117.492 | **Seven Days to the Wolves** — the musical (editorial pass), #104 interruption build | `Prod/06-…` |
+| — | 1117.492 | 1122.492 | Slide **VII** — `Europa` / *Director's Cut* | rendered |
+| **VII** | 1122.492 | 1232.692 | **Europa Director's Cut** | `Prod/07-…` |
 | **VIII** | — | — | Credits — **not designed** (#51) | — |
 
-**1221.892s planned — 20:21.9**, output to
-`~/Videos/Wolves/megacut/`. The 79 ms is act II's audio leg outrunning its
-video leg by 31 ms plus per-segment rounding; it does not accumulate, and every
-act slide lands within a second of its mark. Every act plays
+**1232.692s planned — 20:32.7**, output to
+`~/Videos/Wolves/megacut/`. The 33 ms against the tool's sum (1232.659) is
+act II's audio leg outrunning its video leg plus per-segment rounding; it does
+not accumulate, and every act slide lands within a second of its mark. Every act plays
 from `~/Videos/Wolves/Prod/`, which holds the **highest-quality master** of
 each — FLAC audio, picture never re-encoded. Assembly re-encodes once and edits
 nothing.
@@ -287,8 +292,8 @@ plaquards" — which also drops the `#nova4ever` glitch bursts and the closing
   open (#55). Delivered is not published.
 - **Act VII plays the pre-terse-pass film.** Its twelve terse-pass plates are
   rebuilt but its film is not (#102), so the Europa in this build still
-  carries the old Foreman lines; its master also clips at +0.3 dBTP (#82).
-  Rebuild it in `~/Videos/wolves-directors-cut/` and re-link.
+  carries the old Foreman lines. Its master's +0.3 dBTP clip (#82) is **fixed**:
+  re-rendered under the master gate on 2026-08-13, now −1.1 dBTP.
 - ~~**Kat's cut is about to change under this plan.**~~ **Done 2026-08-12**:
   the dialogue split and "Remember kids, cardio!" are rendered into
   `Prod/04-kat.mp4` (rebuilt 16:52; the hardlink survived).
@@ -348,7 +353,8 @@ ffmpeg -ss <seg> -t <len> -i out.mp4 -map a:0 -af volumedetect -f null /dev/null
 
 - Duration equals the sum of the parts — derive it from the plan
   (`python3 tools/megacut.py stories/megacut/megacut.json --dry-run` prints the
-  expected total; 1221.859s for v0.6 and v0.7 — fades do not move the clock) rather than trusting a number typed here.
+  expected total; 1232.659s for v0.8 — 1221.859s for v0.6 and v0.7, plus
+  act VI v2's net +10.800s) rather than trusting a number typed here.
 - **Per segment**, the peak matches its source — a re-encode must not lift one.
 - **Colour**: `bt709` primaries, transfer **and** matrix. `-color_primaries`
   describes the *frames*; x264 copies only the matrix from them, so the VUI is
