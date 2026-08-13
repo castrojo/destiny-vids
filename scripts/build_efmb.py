@@ -52,6 +52,8 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 SOURCE_ID = "yt_destiny_all_live_action_trailers"
 BED_ID = "bed_endless_forms_most_beautiful"
 
@@ -226,6 +228,163 @@ def fmt(seconds):
     return f"{int(m)}:{s:06.3f}"
 
 
+# --- rendering -------------------------------------------------------------
+# Until now this file described a cut nobody could rebuild. The delivered
+# master was assembled by hand, which is why it went stale the moment the cut
+# changed and why issue #88 had no upstream to fix. The recipe lives here now.
+
+TARGET_W, TARGET_H, TARGET_FPS = 1920, 1080, 30
+
+# THE BED DECODES ABOVE FULL SCALE. The first mux measured +0.2 dBFS true peak.
+# The fix is the one docs/skills/references/audio-standard.md prescribes: a
+# STATIC GAIN at the mux, applied once, with the picture stream-copied. Not
+# loudnorm and not a limiter -- those change the dynamic relationships the
+# artist chose. Corrections only ever go down.
+MUX_GAIN_DB = -1.2
+
+# ISSUE #88, AND WHY EVERY CHAIN BELOW IS `-vf`.
+#
+# The identical normalising chain gives two different answers depending on how
+# it is spelled. As `-vf` the act runs 307.99 s; wrapped in `-filter_complex`
+# the same frames come out 299.48 s, about 2.8% fast, and ffmpeg discards 505
+# frames whose rescaled timestamps collide -- exiting 0 while doing it. So:
+# `-vf` only here, black is a real encoded clip joined by the concat DEMUXER
+# rather than a filtergraph, and nothing in this path builds a filter_complex.
+NORMALISE_VF = (
+    f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease,"
+    f"pad={TARGET_W}:{TARGET_H}:(ow-iw)/2:(oh-ih)/2,"
+    f"fps={TARGET_FPS},format=yuv420p"
+)
+X264 = ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
+        "-pix_fmt", "yuv420p"]
+
+
+def _run(cmd):
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        tail = "\n".join(proc.stderr.strip().splitlines()[-12:])
+        raise RuntimeError(f"ffmpeg failed:\n  {' '.join(map(str, cmd))}\n{tail}")
+
+
+def _cut_run(ffmpeg, src, start, duration, out_path):
+    """One kept run, normalised, silent.
+
+    ``-ss`` goes AFTER ``-i``: ffmpeg decodes from zero and discards, so the
+    in-point is exact on the source timeline. Input-side seeking rebases output
+    timestamps to zero, which shifts the phase of the frame-rate conversion and
+    changes which frames get duplicated -- measurably different picture from
+    the same in-point, and this act is cut to a beat.
+    """
+    _run(list(ffmpeg) + [
+        "-nostdin", "-v", "error", "-y", "-i", str(src),
+        "-ss", f"{start:.3f}", "-t", f"{duration:.3f}",
+        "-vf", NORMALISE_VF, *X264, "-an", str(out_path)])
+
+
+def _black(ffmpeg, duration, out_path):
+    """A real encoded black clip, so the concat demuxer can join it.
+
+    The head and the tail are black under the song, and they are PICTURE: made
+    here as clips rather than as a filtergraph pad, because a filtergraph is
+    exactly what #88 says re-times this act.
+    """
+    _run(list(ffmpeg) + [
+        "-nostdin", "-v", "error", "-y",
+        "-f", "lavfi", "-i",
+        f"color=c=black:s={TARGET_W}x{TARGET_H}:r={TARGET_FPS}:d={duration:.3f}",
+        "-t", f"{duration:.3f}", *X264, "-an", str(out_path)])
+
+
+def _concat(ffmpeg, parts, out_path, workdir):
+    """Join the normalised parts with the concat DEMUXER.
+
+    The list file is written into ``workdir`` rather than /tmp: a containerized
+    ffmpeg only sees the bind-mounted home, so a /tmp path would resolve inside
+    the container's own namespace and the join would fail on a missing file.
+    """
+    list_path = Path(workdir) / "efmb_concat.txt"
+    list_path.write_text(
+        "".join(f"file '{Path(p).resolve()}'\n" for p in parts), encoding="utf-8")
+    try:
+        _run(list(ffmpeg) + [
+            "-nostdin", "-v", "error", "-y", "-f", "concat", "-safe", "0",
+            "-i", str(list_path), "-c", "copy", str(out_path)])
+    finally:
+        list_path.unlink(missing_ok=True)
+
+
+def render(out_path=None, work_dir=None, verbose=True):
+    """Build the act: cut the runs, black the head and tail, lay the song under.
+
+    Returns the path to the master. Picture is encoded once and the mux
+    stream-copies it, so the audio pass costs the picture nothing.
+    """
+    from tools.render import find_ffmpeg
+
+    plan = build()
+    ffmpeg = find_ffmpeg()
+    source = REPO_ROOT / "media" / f"{SOURCE_ID}.mp4"
+    bed = REPO_ROOT / "media" / f"{BED_ID}.wav"
+    for path, what in ((source, "picture source"), (bed, "music bed")):
+        if not path.exists():
+            raise SystemExit(
+                f"missing {what}: {path}\nMedia is fetched, never committed -- "
+                "see docs/cuts/02-endless-forms-most-beautiful.md.")
+
+    renders = REPO_ROOT / "renders"
+    renders.mkdir(exist_ok=True)
+    work = Path(work_dir or renders / "efmb-parts")
+    work.mkdir(parents=True, exist_ok=True)
+    out_path = Path(out_path or renders / "efmb-hq.mp4")
+
+    parts = []
+    head = work / "head_black.mp4"
+    if verbose:
+        print(f"  head   {plan['bed_lead_sec']:.3f}s black")
+    _black(ffmpeg, plan["bed_lead_sec"], head)
+    parts.append(head)
+
+    for i, r in enumerate(plan["runs"]):
+        part = work / f"run_{i:02d}.mp4"
+        if verbose:
+            print(f"  run {i}  {fmt(r['in'])} -> {fmt(r['out'])}  {r['sec']:7.3f}s")
+        _cut_run(ffmpeg, source, r["in"], r["sec"], part)
+        parts.append(part)
+
+    if plan["bed_tail_sec"] > 0.001:
+        tail = work / "tail_black.mp4"
+        if verbose:
+            print(f"  tail   {plan['bed_tail_sec']:.3f}s black")
+        _black(ffmpeg, plan["bed_tail_sec"], tail)
+        parts.append(tail)
+
+    silent = renders / "efmb-film-silent.mp4"
+    if verbose:
+        print(f"  joining {len(parts)} parts -> {silent.name}")
+    _concat(ffmpeg, parts, silent, work)
+
+    if verbose:
+        print(f"  mux: bed at {MUX_GAIN_DB} dB static gain, FLAC, picture copied")
+    _run(list(ffmpeg) + [
+        "-nostdin", "-v", "error", "-y",
+        "-i", str(silent), "-i", str(bed),
+        "-map", "0:v:0", "-map", "1:a:0",
+        "-c:v", "copy",
+        "-af", f"volume={MUX_GAIN_DB}dB",
+        "-c:a", "flac", "-ar", "48000", "-ac", "2",
+        "-shortest", str(out_path)])
+
+    got = probe_duration(out_path)
+    want = plan["film_sec"]
+    if abs(got - want) > 0.25:
+        raise RuntimeError(
+            f"{out_path.name} is {got:.3f}s but the plan says {want:.3f}s. "
+            "If the gap is ~2.8% the chain grew a -filter_complex -- see #88.")
+    if verbose:
+        print(f"  {out_path}  {got:.3f}s (plan {want:.3f}s)")
+    return out_path
+
+
 def build():
     bed = load_json(REPO_ROOT / "music" / f"{BED_ID}.json")
     bed_sec = float(bed["duration_sec"])
@@ -306,6 +465,12 @@ def build():
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     plan = build()
+
+    if "--render" in argv:
+        i = argv.index("--render")
+        out = argv[i + 1] if len(argv) > i + 1 and not argv[i + 1].startswith("-") else None
+        render(out_path=out)
+        return 0
 
     if "--json" in argv:
         out = argv[argv.index("--json") + 1] if len(argv) > argv.index("--json") + 1 else None
