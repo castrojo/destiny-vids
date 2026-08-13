@@ -234,14 +234,25 @@ ACT-FILM time:
 | D | 10.470 s | the clip: **source 43.000 → 53.470**, its own effects and score | `source` |
 | E | — | unpause; the song resumes at bed 322.200 | the song |
 
-19.47 s of screen time, all free. The **hold-music slot ships silent**: no
-cleared elevator-music asset exists on this machine, and picking a track is a
-licensing decision — one of the two things that genuinely stop work, because
-it cannot be un-done after publishing. The slot is recorded in the shotlist's
-`unresolved` with a `TODO(owner)`, and `tools/audiomix.py` already knows the
-`hold` kind: when the owner clears a track, both shots get an `audio_from`
-and nothing else changes. Silence in that slot is a punch-list item; an
-unlicensed track is not recoverable by a revert.
+19.47 s of screen time, all free. The **hold-music slot plays**: *Local
+Forecast – Slower* (Kevin MacLeod / Incompetech), **CC BY 4.0** — commercial
+use, sync and redistribution all permitted, attribution the only condition,
+reproduced verbatim in [`ATTRIBUTIONS.md`](../../ATTRIBUTIONS.md) and in
+`music/bed_local_forecast_slower.json`. Both shots carry an `audio_from` and
+nothing else changed; `tools/audiomix.py` already knew the `hold` kind.
+
+The slot **shipped silent in v0.8**, recorded as blocked because "picking a
+track is a licensing decision". It was not. Four cleared CC BY tracks had
+already been found and verified on #104 — **choosing between assets that are
+already cleared is taste, not rights**, and treating it as a block held the
+beat for a day. See `AGENTS.md`, "A rights *decision* blocks. A rights *choice*
+does not."
+
+Two structural reasons it read as a block, both now fixed: `usage_class` had
+exactly one value, so the index could say an asset was somebody else's and had
+no way to say it was **cleared**; and bed records had no schema, so
+`tools/bed.py`'s free-text `--usage-class` was never checked. An agent with
+nowhere to record "cleared" records "blocked".
 
 The lengths are the issue's craft guidance, not measurement: an ordinary
 pre-punchline beat is 0.5–1 s, hold music wants 3–4 s, and past 5–6 s a
@@ -295,8 +306,8 @@ seventh-column super cast — and a cutscenes compilation does not carry
 gameplay. That is what closed #95 as blocked (PR #132), and what #104 then
 reframed: no SFX-only mix exists, so the clip stops apologising for its score
 and is *presented* with it. The `audio_from` mechanism in
-`tools/audiomix.py` survives — it is how the hold-music slot will play once
-the owner clears a track.
+`tools/audiomix.py` survives — it is what carries the hold music under
+interruption beats B and C.
 
 ### The Ghost sequence, and why its hole had to be filled
 
@@ -712,7 +723,8 @@ container):
 | The song resumes where it stopped | film 350/400/440 = bed 330.530/380.530/420.530 (film − 19.470): lag **0.00 ms**, r = 0.9998–0.9999 |
 | The interruption is a genuine pause | correlation against the bed **−0.02** across the region |
 | The clip is not silent | region RMS **−18.8 dB** (film 331.2–341.67) — the trailer's own audio, effects and score, **by design** ([#104](https://github.com/castrojo/destiny-vids/issues/104)) |
-| The held beats ARE silent | beat A RMS **−89.3 dB**; beats B and C RMS **−240 dB** (digital silence) — the hold-music slot ships empty, recorded in `unresolved` |
+| The held beat A IS silent | beat A RMS **−240 dB** (true digital silence), measured on the region's interior — a window starting on the cut catches the previous music's tail and reads ≈ −39 dB |
+| The hold music plays | beats B and C RMS **−13.6** and **−16.7 dB**, measured in the delivered movie — *Local Forecast – Slower*, CC BY 4.0. They read **−240 dB** in v0.8, when the slot shipped empty |
 | Headroom | **−2.8 dBTP**, −10.1 LUFS integrated |
 | The frames are the design | extracted and eyeballed: 322.6 black; 325.2 the Ambassadors slide; 329.2 "Introducing ..." + Cortney's plate; 340.2 the white bloom; 341.2 the transcendence portrait; 342.5 the Pale Heart resumed |
 | The reveal still lands | plates re-burned at +10.811 s; the Cayde frame at film 394.5 carries the reveal card |
@@ -776,12 +788,13 @@ of it.
       owner authored for act I (#90), verbatim — `AMBASSADOR // GUARDIAN` /
       *Weilder of the Arcane*. The class row stays **omitted**, exactly as in
       act I: her class was never named and a hint is not an authorisation.
-- [ ] **Owner: the hold music** — [#104]. Interruption beats B and C carry the
-      `hold` audio slot, which ships **silent**: no cleared elevator-music
-      asset exists on this machine and picking a track is a licensing
-      decision. Recorded in the shotlist's `unresolved` with a `TODO(owner)`;
-      when a track is cleared, both shots get an `audio_from` and the mix
-      wiring already knows what to do with it.
+- [x] **The hold music** — [#104]. Interruption beats B and C play *Local
+      Forecast – Slower* (Kevin MacLeod / Incompetech), **CC BY 4.0**, credited
+      verbatim in [`ATTRIBUTIONS.md`](../../ATTRIBUTIONS.md). It shipped silent
+      in v0.8 on the mistaken view that choosing between already-cleared tracks
+      was a licensing decision. **Owner may still swap the track** — the other
+      three candidates on #104 are equally cleared, and it is a one-line change
+      to `HOLD_MUSIC_ID`; the credit follows the track.
 - [ ] **Owner: the CNCF mark on the interruption slide** — [#104]. The slide
       is the owner-authored line as text only; using the logo is a rights
       decision, not made.

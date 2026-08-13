@@ -3,9 +3,19 @@
 The whole show as **one continuous video**, assembled from the finished cuts and
 announced by act slides in the Wolves cinematic's own chrome.
 
-**Status: v0.8 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.8.mp4`,
-**20:32.7** planned, seven of the eight acts on six slides — acts IV and V
-share one. v0.8 carries two act changes over v0.7: **act II's overlay pass**
+**Status: v0.9 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.9.mp4`,
+**20:32.765** measured on the delivered file, seven of the eight acts on six
+slides — acts IV and V share one. v0.9's one change over v0.8: **act VI's
+Ambassadors interruption now plays its hold music** — *Local Forecast –
+Slower*, CC BY 4.0, credited in [`ATTRIBUTIONS.md`](../../ATTRIBUTIONS.md).
+The slot shipped **silent** in v0.8, recorded as blocked on a licensing
+decision it never was: four cleared tracks had already been found, and
+choosing between them is taste. Act VI's duration is unchanged (443.533 s),
+so **no chapter moved** and every other act was copied rather than
+re-encoded. The interruption sits at **16:35.3–16:52.3** on the programme
+clock. Measured on the delivered v0.9: true peak **−0.9 dBTP**, integrated
+**−10.7 LUFS**, full `-xerror` decode passes. v0.8 carried two act changes
+over v0.7: **act II's overlay pass**
 ([#98](https://github.com/castrojo/destiny-vids/issues/98) — the TOC exchange,
 the endgame timed cues, the closing quotes, the letterbox callout; duration
 byte-identical, so no chapter moved there) and **act VI's promotion to the #104
@@ -353,8 +363,10 @@ ffmpeg -ss <seg> -t <len> -i out.mp4 -map a:0 -af volumedetect -f null /dev/null
 
 - Duration equals the sum of the parts — derive it from the plan
   (`python3 tools/megacut.py stories/megacut/megacut.json --dry-run` prints the
-  expected total; 1232.659s for v0.8 — 1221.859s for v0.6 and v0.7, plus
-  act VI v2's net +10.800s) rather than trusting a number typed here.
+  expected total; 1232.659s planned for v0.8 and v0.9, against 1232.765s
+  measured on the delivered v0.9 — 1221.859s for v0.6 and v0.7, plus act VI
+  v2's net +10.800s. v0.9 changed act VI's AUDIO only, so the plan total is
+  unchanged) rather than trusting a number typed here.
 - **Per segment**, the peak matches its source — a re-encode must not lift one.
 - **Colour**: `bt709` primaries, transfer **and** matrix. `-color_primaries`
   describes the *frames*; x264 copies only the matrix from them, so the VUI is

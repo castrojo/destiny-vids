@@ -34,7 +34,7 @@ permanently, whatever gets built later.
 **Act II has a film** ([`docs/cuts/02-endless-forms-most-beautiful.md`](cuts/02-endless-forms-most-beautiful.md)),
 delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
 and its own place on the clock. Seven of the eight acts now play, which is what
-**v0.5** was; the current build is **v0.8** (act II's #98 overlay pass and act VI's #104 interruption). It is also the first feature act to carry **nameplates** — thirteen
+**v0.5** was; the current build is **v0.9** (act II's #98 overlay pass, and act VI's #104 interruption now playing its CC BY hold music — the slot shipped silent in v0.8). Act VI's duration is unchanged, so no chapter moved. It is also the first feature act to carry **nameplates** — thirteen
 of them, generated rather than placed by hand — now eighteen, plus a chapter
 card, twenty-six dialogue pills, a patch-queue HUD, a villain's bar and the
 letterbox callout, all of it still generated.
