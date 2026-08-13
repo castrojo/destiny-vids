@@ -69,19 +69,58 @@ Audio is re-encoded once to AAC. That is one generation of lossy-to-lossy loss
 on segments whose deliverables are already AAC; it is recorded rather than
 hidden, and the lossless-master path (see ``docs/skills/references/audio-standard.md``) is the upgrade
 if a delivered master is ever wanted.
+
+The stream-copy path, and what it costs to earn it
+--------------------------------------------------
+The normalising re-encode exists because delivered acts disagree (30/1, 60/1
+and 60000/1001 in one programme). But once an act HAS been normalised,
+re-normalising it on every assembly is pure waste: measured here, the full
+programme costs ~24 minutes of sequential x264 for ~20 minutes of picture.
+So the encode moved out of the loop:
+
+* ``tools/conform.py`` owns the delivery spec (60000/1001, 1080p, yuv420p,
+  BT.709 VUI, H.264 High@4.2, closed GOP) and a cache keyed by
+  (source content hash + spec version). ``assemble()`` ensures every clip's
+  source is conformant BEFORE building segments; an unchanged act is a cache
+  hit and costs a stat.
+* A clip whose source conforms builds its segment with **``-c:v copy``** --
+  the picture is remuxed, never re-encoded -- while the audio is decoded,
+  filtered (``aresample``/``aformat``/the plan's explicit ``afade``) and
+  written as PCM s24le exactly as before. The lossless-audio chain is
+  unchanged: FLAC never goes in a segment (the extradata trap above), and no
+  gain ever touches the sound.
+* Cards still encode -- they are generated from PNGs -- but they encode to
+  the same spec, so their bitstream joins the copied ones. A card on other
+  settings would force the whole programme back onto the slow path.
+* ``--jobs N`` builds segments (and first-run conforms) in parallel with a
+  ProcessPoolExecutor. x264 scales sublinearly past ~8 threads, so several
+  workers at fewer threads each beat one worker at all of them; the default
+  is ``min(cpu_count() // 6, items)``. The concat list is written from the
+  plan's index order, never from completion order -- order is the programme.
+
+A plan that does not target the delivery spec (another fps or frame size)
+takes the original per-segment encode path unchanged. ``verify_segment`` and
+``verify_programme`` run on BOTH paths -- the copy path is exactly where a
+silent re-time would hide, so that is where the checks must not come off.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools import conform  # noqa: E402  (the delivery spec + conform cache)
 
 # 59.94, as a rational so ffmpeg never rounds it to 60.
 DEFAULT_FPS = "60000/1001"
@@ -486,7 +525,29 @@ def fade_chain(item, dur):
     return "," + ",".join(filters) if filters else ""
 
 
-def build_segment_command(plan, index, seg_path):
+def clip_audio_chain(item, rate, layout, dur):
+    """The audio filter string for a source-audio clip: resample if needed,
+    pin the layout for the join, then the plan's explicit fades. No gain,
+    anywhere. Shared by the encode and the stream-copy segment commands so
+    the two paths treat a clip's sound identically -- ``dur`` is the clip's
+    length on the ACT FILM clock (authored, else probed by the caller).
+    """
+    return (f"aresample={rate},"
+            f"aformat=sample_fmts=fltp:channel_layouts={layout}"
+            f"{fade_chain(item, float(dur) if dur is not None else 0.0)}")
+
+
+def _clip_dur_for_audio(item):
+    """How long the clip is, for fade placement: authored, else probed from
+    the video stream (the container can report a longer audio stream, and a
+    fade placed against that starts early)."""
+    dur = item.get("dur")
+    if dur is None and float(item.get("fade_out", 0)):
+        dur = probe_duration(resolve(item["path"]), stream="v:0")
+    return dur
+
+
+def build_segment_command(plan, index, seg_path, threads=None):
     """Encode one item to its own normalised segment.
 
     This is where the picture is encoded, at the plan's own quality, so the
@@ -520,17 +581,15 @@ def build_segment_command(plan, index, seg_path):
     item = plan["items"][index]
 
     common = [
-        "-c:v", "libx264", "-preset", preset, "-crf", crf,
-        "-pix_fmt", "yuv420p",
-        "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
-        # The three -color_* flags above describe the *frames*, and x264 only
-        # copies the matrix from them -- primaries and transfer come out
-        # `unknown`, which is a silent mismatch against every other deliverable
-        # in ~/Videos/Wolves/Prod. Writing the VUI directly is the only way all
-        # three actually land in the bitstream. It has to be written HERE, on
-        # the segment: the join copies the bitstream, so whatever the VUI says
-        # at this point is what ships. Verified by ffprobe, not assumed.
-        "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709",
+        *conform.video_encode_args(crf=crf, preset=preset, threads=threads),
+        # The colour note that used to live here: the three -color_* flags
+        # describe the *frames*, and x264 only copies the matrix from them --
+        # primaries and transfer come out `unknown`, which is a silent
+        # mismatch against every other deliverable in ~/Videos/Wolves/Prod.
+        # Writing the VUI directly (inside video_encode_args) is the only way
+        # all three actually land in the bitstream. It has to be written
+        # HERE, on the segment: the join copies the bitstream, so whatever
+        # the VUI says at this point is what ships. Verified by ffprobe.
         "-c:a", "pcm_s24le", "-ar", rate,
         str(seg_path), "-y",
     ]
@@ -555,20 +614,52 @@ def build_segment_command(plan, index, seg_path):
         af = []
     else:
         maps = ["-map", "0:v:0", "-map", "0:a:0"]
-        # A fade-out is placed against the clip's END, so it needs the clip's
-        # length on the act film clock -- authored, else probed from the video
-        # stream (the container can report a longer audio stream, and cutting
-        # a fade against that would start it early).
-        dur = item.get("dur")
-        if dur is None and float(item.get("fade_out", 0)):
-            dur = probe_duration(resolve(item["path"]), stream="v:0")
         # aresample only where the rate differs; aformat pins the layout so the
         # join sees one shape. No gain is applied anywhere; the only treatment
         # is an explicit fade the plan asked for (issue #105).
-        af = ["-af", f"aresample={rate},"
-                     f"aformat=sample_fmts=fltp:channel_layouts={layout}"
-                     f"{fade_chain(item, float(dur) if dur is not None else 0.0)}"]
+        af = ["-af", clip_audio_chain(item, rate, layout,
+                                      _clip_dur_for_audio(item))]
     return [*args, "-vf", segment_video_chain(plan, item), *af, *maps, *common]
+
+
+def build_segment_copy_command(plan, index, seg_path, src_path):
+    """Remux a CONFORMANT clip into its segment: copy the picture, decode the
+    sound to PCM. There is no ``-vf`` anywhere -- ``src_path`` already matches
+    the delivery spec (that is what ``tools/conform.py``'s cache guarantees),
+    so filtering it would only spend a video generation.
+
+    The audio leg is identical to the encode path's: decoded, resampled only
+    where the rate differs, layout pinned, the plan's explicit fades applied,
+    written as PCM s24le. Still never FLAC in a segment -- the concat demuxer
+    binds the first file's extradata to the whole joined stream, and FLAC's
+    STREAMINFO lives there. The picture copy changes none of that.
+
+    ``src_path`` is the conformed file, and it is what gets probed too: the
+    conform is timeline-preserving, so its lengths are the source's, and
+    probing the file actually being remuxed keeps the check honest.
+    """
+    rate = str(plan.get("sample_rate", DEFAULT_SAMPLE_RATE))
+    layout = plan.get("layout", DEFAULT_LAYOUT)
+    item = plan["items"][index]
+
+    args = [ffmpeg_bin(), "-nostdin", "-hide_banner", "-i", str(src_path)]
+    if item["audio"] == "silent":
+        dur = item.get("dur")
+        if dur is None:
+            dur = probe_duration(str(src_path), stream="v:0")
+        args += ["-f", "lavfi", "-i",
+                 f"anullsrc=channel_layout={layout}:sample_rate={rate}:d={dur}"]
+        maps = ["-map", "0:v:0", "-map", "1:a:0", "-t", str(dur)]
+        af = []
+    else:
+        maps = ["-map", "0:v:0", "-map", "0:a:0"]
+        dur = item.get("dur")
+        if dur is None and float(item.get("fade_out", 0)):
+            dur = probe_duration(str(src_path), stream="v:0")
+        af = ["-af", clip_audio_chain(item, rate, layout, dur)]
+    return [*args, *af, *maps,
+            "-c:v", "copy", "-c:a", "pcm_s24le", "-ar", rate,
+            str(seg_path), "-y"]
 
 
 def build_concat_command(plan, list_path, out_path):
@@ -591,33 +682,120 @@ def build_concat_command(plan, list_path, out_path):
     ]
 
 
-def assemble(plan, out_path, workdir=None, log=None):
+def default_jobs(n_items):
+    """How many segments to build at once. x264's own threading saturates
+    early (~8 threads), so workers at a few threads each beat one worker at
+    every core: 4 x 6 finishes before 1 x 32."""
+    return max(1, min((os.cpu_count() or 1) // 6, n_items))
+
+
+def _copy_path_ok(plan, allow_copy=True):
+    """Only a plan targeting the delivery spec can stream-copy: its segments
+    must BE spec files, or the conform cache would hand back 59.94/1080p
+    sources to a plan building something else. A plan at another rate or
+    frame size still works -- it encodes, as it always has."""
+    if not allow_copy:
+        return False
+    return (str(plan.get("fps", DEFAULT_FPS)) == conform.DELIVERY.fps
+            and int(plan.get("width", DEFAULT_WIDTH)) == conform.DELIVERY.width
+            and int(plan.get("height", DEFAULT_HEIGHT)) == conform.DELIVERY.height)
+
+
+def _conform_one(job):
+    """Picklable worker: conform one clip source, report what it cost."""
+    index, src, cache_dir, ffmpeg, threads = job
+    path, status = conform.ensure(src, out_dir=cache_dir, ffmpeg=ffmpeg,
+                                  threads=threads, log=lambda _m: None)
+    return index, str(path), status
+
+
+def _segment_worker(job):
+    """Picklable worker: build one segment, then verify it against its item.
+
+    The verify rides inside the worker so a parallel build still fails the
+    moment a segment re-times (#88), not after the other workers finish.
+    """
+    argv, plan, index, seg = job
+    subprocess.run(argv, check=True)
+    verify_segment(plan, index, seg)
+    return index
+
+
+def assemble(plan, out_path, workdir=None, log=None, jobs=None,
+             conform_cache=None, allow_copy=True):
     """Build every segment, then join them. Returns the output path.
 
     Every segment is verified against its source's length as it is built, and
     the joined programme against the plan's sum, so a silent re-time stops the
     build instead of shipping (#88: one act came out of the filtergraph 8.5 s
-    short, ffmpeg exited 0, and the file played fine).
+    short, ffmpeg exited 0, and the file played fine). This holds on the
+    stream-copy path too -- a remux that re-times is exactly the failure
+    those checks exist for, so they do not come off when the encode does.
 
     The segments land in a temporary directory that is removed afterwards --
     they are pure intermediates, and keeping them would invite somebody to
     hand-edit one, which is the failure this repo's regenerated-artifact rule
     exists to prevent.
+
+    Order is the programme: the concat list is written from a list indexed by
+    plan position, filled in as workers finish -- never in completion order.
     """
     log = log or (lambda msg: print(msg, file=sys.stderr))
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    n_items = len(plan["items"])
+    jobs = max(1, min(jobs, n_items)) if jobs else default_jobs(n_items)
+    threads = max(1, (os.cpu_count() or 1) // jobs) if jobs > 1 else None
+    copy_ok = _copy_path_ok(plan, allow_copy)
     ctx = (tempfile.TemporaryDirectory(prefix="megacut-", dir=workdir)
            if workdir is None else None)
     tmp = Path(ctx.name) if ctx else Path(workdir)
     try:
-        segments = []
+        # Phase 1: every clip's source made conformant, cached, so its
+        # segment can copy the picture. Unchanged sources are cache hits;
+        # only a newly delivered act pays the encode, and only once.
+        sources = {}
+        if copy_ok:
+            clip_jobs = [(i, resolve(item["path"]))
+                         for i, item in enumerate(plan["items"])
+                         if item["kind"] == "clip"]
+            if clip_jobs:
+                work = [(i, src, conform_cache, [ffmpeg_bin()], threads)
+                        for i, src in clip_jobs]
+                if jobs > 1 and len(work) > 1:
+                    with ProcessPoolExecutor(max_workers=jobs) as pool:
+                        results = list(pool.map(_conform_one, work))
+                else:
+                    results = [_conform_one(w) for w in work]
+                for i, path, status in results:
+                    if status != "conforms":
+                        log(f"  conform [{status}]: "
+                            f"{plan['items'][i].get('label', path)}")
+                    sources[i] = path
+
+        # Phase 2: the segments. Cards always encode (they are generated);
+        # clips copy their picture when the plan targets the delivery spec.
+        segments = [None] * n_items
+        work = []
         for i, item in enumerate(plan["items"]):
             seg = tmp / f"seg{i:03d}.mkv"
-            log(f"  segment {i + 1}/{len(plan['items'])}: {item.get('label', item['kind'])}")
-            subprocess.run(build_segment_command(plan, i, seg), check=True)
-            verify_segment(plan, i, seg)
-            segments.append(seg)
+            segments[i] = seg
+            if item["kind"] == "clip" and copy_ok:
+                argv = build_segment_copy_command(plan, i, seg, sources[i])
+                mode = "copy"
+            else:
+                argv = build_segment_command(plan, i, seg, threads=threads)
+                mode = "encode"
+            log(f"  segment {i + 1}/{n_items} [{mode}]: "
+                f"{item.get('label', item['kind'])}")
+            work.append((argv, plan, i, seg))
+        if jobs > 1 and len(work) > 1:
+            with ProcessPoolExecutor(max_workers=jobs) as pool:
+                list(pool.map(_segment_worker, work))
+        else:
+            for w in work:
+                _segment_worker(w)
+
         list_path = tmp / "segments.txt"
         list_path.write_text(
             "".join(f"file '{s}'\n" for s in segments), encoding="utf-8")
@@ -809,6 +987,17 @@ def main(argv=None):
     ap.add_argument("--workdir",
                     help="keep the intermediate segments here instead of a "
                          "temporary directory (they are large; for debugging a join)")
+    ap.add_argument("--jobs", type=int, default=None,
+                    help="build this many segments in parallel "
+                         "(default min(cpu//6, items)); x264 saturates early, "
+                         "so workers x few threads beats one worker x all cores")
+    ap.add_argument("--conform-cache",
+                    help="where conformed clip sources are cached "
+                         "(default: $DESTINY_CONFORM_CACHE or "
+                         "~/.cache/destiny-vids/conform)")
+    ap.add_argument("--no-copy", action="store_true",
+                    help="encode every segment even when sources conform to "
+                         "the delivery spec (debugging; the slow path)")
     args = ap.parse_args(argv)
 
     plan = load_plan(args.plan, require_sources=not (args.chapters or args.locate))
@@ -831,15 +1020,24 @@ def main(argv=None):
         raise SystemExit("no output: pass --out or set `output` in the plan")
 
     if args.dry_run:
+        copy_ok = _copy_path_ok(plan, allow_copy=not args.no_copy)
         for i, item in enumerate(plan["items"]):
-            print(" ".join(build_segment_command(plan, i, f"seg{i:03d}.mkv")))
+            if item["kind"] == "clip" and copy_ok:
+                print(f"# [{i}] COPY (via conform cache): "
+                      f"{item.get('label', item['path'])}")
+                print(" ".join(build_segment_copy_command(
+                    plan, i, f"seg{i:03d}.mkv", resolve(item["path"]))))
+            else:
+                print(f"# [{i}] ENCODE: {item.get('label', item['kind'])}")
+                print(" ".join(build_segment_command(plan, i, f"seg{i:03d}.mkv")))
         print(" ".join(build_concat_command(plan, "segments.txt", out_path)))
         print(f"# expected duration: {expected_duration(plan):.3f}s "
               f"across {len(plan['items'])} items")
         return 0
 
     print(f"assembling {len(plan['items'])} items -> {out_path}", file=sys.stderr)
-    assemble(plan, out_path, workdir=args.workdir)
+    assemble(plan, out_path, workdir=args.workdir, jobs=args.jobs,
+             conform_cache=args.conform_cache, allow_copy=not args.no_copy)
     print(f"wrote {out_path}")
     return 0
 
