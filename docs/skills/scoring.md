@@ -37,7 +37,7 @@ metadata:
 
 - Sourcing the best copy of a track, or any mixing/mastering question →
   the `audio-quality-tenet` and `scoring-cuts-with-replacement-music` skills
-- Assembling the picture, marking material for removal → [`editing.md`](editing.md)
+- Assembling the picture, marking material for removal → [`editing.md`](editing/SKILL.md)
 
 ## Core Process
 

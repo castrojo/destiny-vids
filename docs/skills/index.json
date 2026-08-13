@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-12",
+  "generated_at": "2026-08-13",
   "schema_version": "1.0",
   "skills": [
     {
@@ -45,7 +45,7 @@
       "id": "editing",
       "name": "editing",
       "one_line_purpose": "Turn a plain-language outline into a rendered cut.",
-      "entry_point": "docs/skills/editing.md",
+      "entry_point": "docs/skills/editing/SKILL.md",
       "category": "editing",
       "status": "active",
       "tags": [
@@ -68,8 +68,8 @@
         "shot-boundary-measurement"
       ],
       "description": "Covers outlines, shot matching, artwork cards, timing passes with marker cards, and a bed that pauses. Use when writing an outline, marking material for removal before editing, or scoring a cut whose song does not run end to end.",
-      "version": "1.7",
-      "last_updated": "2026-08-12",
+      "version": "2.0",
+      "last_updated": "2026-08-13",
       "doc_type": "procedure"
     },
     {
@@ -133,7 +133,7 @@
       "id": "plates",
       "name": "plates",
       "one_line_purpose": "Put Guardian nameplates and title cards on a rendered cut.",
-      "entry_point": "docs/skills/plates.md",
+      "entry_point": "docs/skills/plates/SKILL.md",
       "category": "editing",
       "status": "active",
       "tags": [
@@ -144,8 +144,8 @@
         "ffmpeg"
       ],
       "description": "Plans, renders, and burns Project Bluefin Guardian nameplates onto a cut. Use when crediting cast or contributors on screen, or changing plate copy, timing, or chrome.",
-      "version": "1.8",
-      "last_updated": "2026-08-12",
+      "version": "2.0",
+      "last_updated": "2026-08-13",
       "doc_type": "procedure"
     },
     {

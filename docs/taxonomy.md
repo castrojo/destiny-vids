@@ -223,7 +223,7 @@ and `saint_14` — are **reproduced verbatim** from a file this repo does not ow
 fifth, `sagira`, carries the documented unknown-seal fallback (`title: Bluefin
 Blueberry`), not an authored identity. Which source wins, who else has an
 authored identity, and where two sources disagree is
-[`docs/skills/plates.md`](skills/plates.md#where-the-copy-is-authored).
+[`docs/skills/plates/SKILL.md`](skills/plates/SKILL.md#where-the-copy-is-authored).
 
 Querying either half of a binding retrieves the same footage — "Zavala" and
 "Kelsey" are the same lead, so both resolve to it. Alongside these, `leads`

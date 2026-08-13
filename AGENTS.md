@@ -115,7 +115,7 @@ that folder is a rule this repo will contradict sooner or later.
 
 Two narrow things outside this repo remain *authoritative over it*, and both are
 **copy, not policy**: the authored Guardian identities, which are
-[reproduced](docs/skills/plates.md#where-the-copy-is-authored) rather than
+[reproduced](docs/skills/plates/SKILL.md#where-the-copy-is-authored) rather than
 written, and the reference deck's field set. A delivered file is likewise
 [regenerated](docs/skills/production.md#delivering-a-finished-cut), never
 hand-edited. `~/Videos` is a Syncthing folder, so a directory can vanish
@@ -213,7 +213,7 @@ needs somebody to decide.
   means editing `vocab/*.yaml` *and* `schema/segment.schema.json`; tests assert
   the two agree, and that every cast binding is queryable.
 - **Never invent on-screen copy.** Nameplate fields are a closed set — see
-  [`docs/skills/plates.md`](docs/skills/plates.md). A Guardian identity somebody
+  [`docs/skills/plates/SKILL.md`](docs/skills/plates/SKILL.md). A Guardian identity somebody
   *has* authored (ten people, in `~/Videos/nameplates.json` and the website's
   `characters.json`) is reproduced verbatim; the generic fallback for an
   authored identity is as wrong as an invented one. Dialogue shown on screen is
@@ -247,8 +247,11 @@ no footage, and keep output non-commercial.
   corrected there.
 - On an atomic Fedora/Bluefin host the default `ffmpeg` is `ffmpeg-free`: no
   H.264, and it fails only once decoding starts. See `docs/rendering.md`.
-- When a session surfaces a durable pattern, update the matching
-  `docs/skills/*.md` in the same change and regenerate the catalog.
+- When a session surfaces a durable pattern, update the matching skill in the
+  same change and regenerate the catalog. Skills are 200 lines soft / 500 hard
+  and **migrate on sight**: one that outgrows a flat file becomes
+  `docs/skills/<name>/SKILL.md` + `references/`, in that same change. See
+  [`docs/SKILL.md`](docs/SKILL.md), "Writing a skill here".
 
 ## The merge queue
 

@@ -110,7 +110,7 @@ the `skip_sec` field in the JSON cut list.
    bonus, so his beats match his shots rather than shots that merely look like
    them.
 
-**Enum-like words are filters, not prose** ([`editing.md`](../skills/editing.md)),
+**Enum-like words are filters, not prose** ([`editing.md`](../skills/editing/SKILL.md)),
 and this outline paid for that lesson three times. `ghost` filters on
 `casting.character`, `fighting` on `action: combat`, and `pale` on
 `destination: the_pale_heart` — each one silently emptied the candidate pool

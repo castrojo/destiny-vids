@@ -1,6 +1,6 @@
 # The cards that are not lower thirds
 
-The detail behind [`../plates.md`](../plates.md)'s "Cards that are not lower
+The detail behind [`../plates.md`](../SKILL.md)'s "Cards that are not lower
 thirds". Four `kind`s that do not live in the reveal plate's row -- three of
 them chrome the lower third can share the screen with, and one that is the
 lower third's other half.

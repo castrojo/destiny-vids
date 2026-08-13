@@ -3,7 +3,7 @@
 **Parent:** #9 · **Depends on:** B, C, D, E · **Blocks:** G
 **Design:** [`docs/plans/wolves/design.md` §6](../design.md)
 
-The plate's field set is closed on purpose, and `docs/skills/plates.md` says the
+The plate's field set is closed on purpose, and `docs/skills/plates/SKILL.md` says the
 only legal way to say something new is to **add the field to the data model
 deliberately**. This epic is that deliberate addition, done once: an avatar, an
 org band, a generated title, and a ribbon rack — then the vocabulary closes
@@ -28,14 +28,14 @@ and `tests/test_plate.py`'s closed-vocabulary test passes against the new set.
 
 Add exactly four fields to the plate spec: `avatar` (a path in `avatars/`),
 `affiliation` (an org id), `ribbons` (the rack data), and keep `title` as it is.
-Update `docs/skills/plates.md`'s field table, and update the
+Update `docs/skills/plates/SKILL.md`'s field table, and update the
 `test_no_plate_field_is_invented_beyond_the_reference_deck` allow-list in the
 same commit.
 
 **Acceptance**
 
 - [ ] The allow-list grows by exactly these fields and no others.
-- [ ] `docs/skills/plates.md` documents each new field with an example, and says
+- [ ] `docs/skills/plates/SKILL.md` documents each new field with an example, and says
       where its value comes from (never from a manifest by hand).
 - [ ] The rationale is recorded: this is the deliberate extension the skill
       allows for, not a drift.

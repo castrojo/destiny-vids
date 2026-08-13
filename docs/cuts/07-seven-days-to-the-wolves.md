@@ -22,7 +22,7 @@ frame was actually taken out. That worked, the owner reviewed it, and this pass
 carries out the notes.
 
 > **Mark, don't cut — until the notes come back.** The convention is written up
-> in [`docs/skills/editing.md`](../skills/editing.md).
+> in [`docs/skills/editing/SKILL.md`](../skills/editing/SKILL.md).
 
 What survives from the timing pass is its arithmetic, and it is the reason the
 notes could be applied without re-timing anything: **a card and the footage it

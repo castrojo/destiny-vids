@@ -30,8 +30,8 @@ metadata:
 ## When NOT to Use
 
 - Debugging one stage — go to that stage's skill
-  ([`indexing.md`](indexing.md), [`editing.md`](editing.md),
-  [`plates.md`](plates.md))
+  ([`indexing.md`](indexing.md), [`editing.md`](editing/SKILL.md),
+  [`plates.md`](plates/SKILL.md))
 - Filing or triaging the work itself → [`issues.md`](issues.md)
 
 ## The loop

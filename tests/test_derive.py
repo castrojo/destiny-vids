@@ -232,7 +232,7 @@ def test_cast_bindings(character, person):
 # Every plate block on a binding is REPRODUCED from a file this repo does not
 # own -- ~/Videos/nameplates.json, or ~/src/website's
 # public/wolves/characters/characters.json (see
-# docs/skills/plates.md#where-the-copy-is-authored). Neither is available to an
+# docs/skills/plates/SKILL.md#where-the-copy-is-authored). Neither is available to an
 # offline suite, so the authored values are pinned here instead: a change to a
 # real person's credit then has to be a deliberate edit in two places, and can
 # be diffed against the source by hand.

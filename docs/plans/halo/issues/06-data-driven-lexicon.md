@@ -8,7 +8,7 @@ comment and a test. A second universe doubles the file and puts "vex" and
 "covenant" in the same namespace, so a Halo beat can pick up a Destiny filter.
 
 **Why it matters beyond tidiness:** `tools/story.py` parses every beat through
-this lexicon, and `docs/skills/editing.md` already warns that domain words in a
+this lexicon, and `docs/skills/editing/SKILL.md` already warns that domain words in a
 beat become hard filters rather than prose. With two universes sharing one
 lexicon, that failure mode gets a second source and no error message.
 

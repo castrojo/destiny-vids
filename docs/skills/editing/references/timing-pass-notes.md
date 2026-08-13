@@ -1,12 +1,12 @@
 # Carrying out notes on a timing pass
 
-Reference for [`docs/skills/editing.md`](../editing.md). Split out of it to
+Reference for [`../SKILL.md`](../SKILL.md). Split out of it to
 keep the skill inside its size budget; this is the mechanics of turning a
 reviewed timing pass into a real cut — needed when the notes come back, not
 when planning one.
 
 The worked example throughout is
-[`docs/cuts/07-seven-days-to-the-wolves.md`](../../cuts/07-seven-days-to-the-wolves.md).
+[`docs/cuts/07-seven-days-to-the-wolves.md`](../../../cuts/07-seven-days-to-the-wolves.md).
 
 ## What each note actually costs
 

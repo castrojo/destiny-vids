@@ -323,7 +323,7 @@ Copy that somebody *has* authored is reproduced verbatim rather than written
 here — ten people have a Guardian identity in the deck or in the website's
 `public/wolves/characters/characters.json`, and the roster, the precedence
 between those sources and the known divergences are in
-[`docs/skills/plates.md`](docs/skills/plates.md#where-the-copy-is-authored).
+[`docs/skills/plates/SKILL.md`](docs/skills/plates/SKILL.md#where-the-copy-is-authored).
 
 Each lead is plated **once**, on the first appearance long enough to read, and
 never on a shot that failed its binding's constraints (that shot is already
@@ -395,7 +395,7 @@ than in an outline:
   [`docs/skills/casting.md`](docs/skills/casting.md).
 - **A mechanic card is replaced, not dropped.** A trailer's black "8 DUNGEONS"
   plate is `burned_text` and already excluded; putting artwork in its slot keeps
-  the rhythm the trailer had — see [`docs/skills/editing.md`](docs/skills/editing.md).
+  the rhythm the trailer had — see [`docs/skills/editing/SKILL.md`](docs/skills/editing/SKILL.md).
 
 ## Cast the ensemble
 

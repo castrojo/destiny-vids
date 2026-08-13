@@ -36,7 +36,7 @@ to the output so a failed run is debuggable.
 - [ ] `--dry-run` does everything except touch a frame, and prints the report —
       so it works on a machine with no `media/`.
 - [ ] Plate planning is handed the same hold cap the render used (the trap
-      `docs/skills/editing.md` and `plates.md` both already warn about).
+      `docs/skills/editing/SKILL.md` and `plates.md` both already warn about).
 - [ ] Missing source media is reported and skipped, as `render.py` does today.
 - [ ] Every roster contributor gets a plate, or is named in the report's
       `uncredited contributors` counter. Rotation is by login order — no ranking

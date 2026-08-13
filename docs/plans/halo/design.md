@@ -151,7 +151,7 @@ Three things that are not details:
 - **Handles are not display copy.** #11 writes `kylegospo`; GitHub's canonical
   login is `KyleGospo`, and neither is necessarily how the person wants to be
   named on screen. On-screen copy is a closed set authored by the owner
-  (`docs/skills/plates.md`), so the callout deck gets its strings from the cast
+  (`docs/skills/plates/SKILL.md`), so the callout deck gets its strings from the cast
   file, not from a handle string manipulated at render time. Same for "John 17",
   which is the brief's spelling and is carried verbatim rather than corrected.
 

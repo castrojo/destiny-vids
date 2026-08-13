@@ -421,7 +421,7 @@ Stated so nobody builds it by accident:
   case belongs in a vocabulary file, not in a render invocation.
 - **No on-screen copy nobody authored.** The nameplate's field set is closed;
   §3–5 extend it *deliberately, once*, with a test pinning the new set, exactly
-  as `docs/skills/plates.md` requires.
+  as `docs/skills/plates/SKILL.md` requires.
 - **No database, no service, no web UI.** Files in git, one command.
 
 ## The rules that outrank convenience, extended

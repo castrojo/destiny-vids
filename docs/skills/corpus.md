@@ -29,7 +29,7 @@ metadata:
 
 ## When NOT to Use
 
-- Matching a specific beat to a shot → [`editing.md`](editing.md)
+- Matching a specific beat to a shot → [`editing.md`](editing/SKILL.md)
 - Binding a character to a person → [`casting.md`](casting.md)
 - Tagging new footage → [`indexing.md`](indexing.md)
 

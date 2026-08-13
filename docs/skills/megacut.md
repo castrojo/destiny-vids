@@ -33,8 +33,8 @@ metadata:
 
 ## When NOT to Use
 
-- Building a cut from indexed shots → [`editing.md`](editing.md)
-- Putting names on people → [`plates.md`](plates.md)
+- Building a cut from indexed shots → [`editing.md`](editing/SKILL.md)
+- Putting names on people → [`plates.md`](plates/SKILL.md)
 - Fitting a cut to music → [`scoring.md`](scoring.md)
 - Delivering a finished file → [`production.md`](production.md)
 
@@ -211,7 +211,7 @@ Segments genuinely disagree, so *some* re-encode is unavoidable:
 - **Chapter card copy is reproduced, never authored.** The deck's card is the
   closed `title` / `subtitle` / `body` shape; the act slide adds only the
   owner's `act` numeral and `chapters` list. A card whose words nobody has
-  written is omitted and recorded — see [`plates.md`](plates.md).
+  written is omitted and recorded — see [`plates.md`](plates/SKILL.md).
 - **A card that exists on the site is not re-implemented.** Render it from the
   site's CSS with `cards/render-cards.mjs`; a Pillow port of chrome that
   already ships is a second version to keep in step.

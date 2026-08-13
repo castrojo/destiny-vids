@@ -18,9 +18,9 @@ load only that skill, then act.
 | Index a new video: detect beats, extract keyframes, tag, assemble segments | [`indexing.md`](skills/indexing.md) |
 | Cast a character, add a lead binding, or credit the monthly ensemble | [`casting.md`](skills/casting.md) |
 | Find out what footage a character actually has — and what they lack | [`corpus.md`](skills/corpus.md) |
-| Write an outline, assemble a cut list, mark material for removal, or render it | [`editing.md`](skills/editing.md) |
+| Write an outline, assemble a cut list, mark material for removal, or render it | [`editing.md`](skills/editing/SKILL.md) |
 | Score a cut to a music bed, pause the song mid-cut, or land a shot on a beat | [`scoring.md`](skills/scoring.md) |
-| Put a name on screen — Guardian nameplates and title cards | [`plates.md`](skills/plates.md) |
+| Put a name on screen — Guardian nameplates and title cards | [`plates.md`](skills/plates/SKILL.md) |
 | Join several finished cuts into one programme with chapter cards | [`megacut.md`](skills/megacut.md) |
 | Get a working ffmpeg on an atomic host | [`../docs/rendering.md`](rendering.md) |
 
@@ -46,14 +46,29 @@ than restating them:
 
 Follow `projectbluefin/common`'s
 [`docs/skills/write-a-skill.md`](https://github.com/projectbluefin/common/blob/main/docs/skills/write-a-skill.md):
-same front matter, same 200-line soft budget, same "link to canonical sources
+same front matter, same size budget, same "link to canonical sources
 instead of duplicating them" rule. The one local difference is `category`, whose
 enum here is `indexing | editing | meta` (see `skills/index.schema.json`) —
 this repo builds videos, not container images.
+
+**The size budget is 200 lines soft, 500 hard, and it is *migrate on sight*.**
+A skill that outgrows one file becomes `skills/<name>/SKILL.md` plus
+`skills/<name>/references/*.md` — **in the same change that touched it**, with
+no exemptions and no deferral list. `SKILL.md` keeps the front matter, the
+triggers, the core workflow, the red flags, and a table pointing at each
+reference; the detail moves out. `plates` and `editing` are the worked
+examples, both migrated from 500-line flat files on 2026-08-13.
+
+Two tests hold the line: `test_skill_size_budget` measures every flat skill,
+every `*/SKILL.md` **and** every reference file, and
+`test_migrated_skill_points_at_its_references` fails a migrated skill that
+orphans one of its own references. `tests/test_doc_links.py` proves every
+relative link in the docs tree still resolves — the check that a split is an
+improvement rather than a pile of dead ends.
 
 After adding or editing a skill:
 
 ```bash
 python3 scripts/generate_skill_index.py --write
-python3 -m pytest -q tests/test_skill_catalog.py
+python3 -m pytest -q tests/test_skill_catalog.py tests/test_doc_links.py
 ```
