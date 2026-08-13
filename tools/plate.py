@@ -927,7 +927,16 @@ def _render_chat(spec):
     use, not the Guardian reveal's centered stack. The reveal names the person
     once; every line after that rides in this. Both fields are recovered copy:
     `speaker` from vocab/casting.yaml, `text` from dialogue/<id>/dialogue.json.
+
+    A pill with NO text is not skipped and no longer renders empty: it is
+    filled with lorem ipsum and credited to nobody, so the cut can be watched
+    and timed before its words exist (``tools/placeholder.py``). The speaker is
+    replaced along with the text -- a placeholder line under a real login is
+    how act IV once had three colleagues "saying" lorem.
     """
+    from tools.placeholder import fill
+
+    spec = fill(spec)
     chrome = VARIANTS["default"]  # plate.html bakes only the blue chrome
     # .eyebrow { text-transform: uppercase } -- the speaker is chrome.
     speaker = (spec.get("speaker") or "").upper()

@@ -86,3 +86,32 @@ and the exchange stops reading as a conversation.
 Dropped lines are always reported with a reason — a line whose footage is not
 in the cut, or that a reveal already covers, is never lost silently.
 
+---
+
+## Unwritten prose: lorem ipsum, credited to nobody
+
+A chat pill with no `text` does **not** block, and no longer renders an empty
+pill. `tools/placeholder.py` fills it with deterministic lorem ipsum so the cut
+is watchable before its words exist — timing, letterbox seat, read length and
+the gaps between plates are all reviewable while the copy is still being
+written.
+
+```bash
+python3 tools/placeholder.py list        # every punch-list item in the show
+python3 tools/placeholder.py list --check   # non-zero if any remain (final cuts)
+```
+
+**A placeholder credits nobody.** It carries the vocab's uncast speaker (`TBD`)
+and the drawn crest — never a real login, never somebody's avatar. Whoever the
+line is destined for is kept in `speaker_pending`: recorded, not rendered.
+
+This is written in scar tissue. Act IV's first pass put lorem on `krook`,
+`jeefy` and `mrbobbytables`, and all three were dropped from the film once real
+copy arrived, because they had only ever "spoken" words nobody wrote. **Lorem
+under a real name is still putting words in a colleague's mouth.**
+
+Do not confuse it with act II's **named placeholder badge**
+(`placeholder_dylan_taylor`): a real person, credited by name, with every
+unauthored row omitted. Its copy is not missing but deliberately partial, so
+`list` reports it and `fill` never touches it. `needs_prose` is the narrow
+question, `is_placeholder` the union.
