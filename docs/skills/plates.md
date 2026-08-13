@@ -1,6 +1,6 @@
 ---
 name: plates
-version: "1.7"
+version: "1.8"
 last_updated: "2026-08-12"
 id: plates
 one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
@@ -337,11 +337,10 @@ not edit the copy. If fewer than N fit, you get the ones that read; a plate
 squeezed in where it cannot be finished is worse than one less plate.
 
 `burn` composites every plate in one ffmpeg pass — an `overlay` chain gated by
-`enable='between(t,in,out)'` — and stream-copies audio, so titling never costs
-the soundtrack a second generation. `enable` is FFmpeg's timeline-editing
-option: the expression is evaluated per frame, and the filter passes the frame
-through untouched when it is false (`source: /websites/ffmpeg_documentation`,
-timeline editing).
+an `enable=between(t,in,out)` expression, evaluated per frame — and
+stream-copies audio, so titling never costs the soundtrack a second generation.
+Two spellings of it have shipped a video with **no plates on it**, exiting 0 at
+the right length — [`docs/rendering.md`](../rendering.md#burning-plates-onto-a-cut).
 
 ## Showing a conversation
 
@@ -465,6 +464,7 @@ rendered from its own CSS by `cards/render-cards.mjs` rather than ported;
 - Letting a brief override a binding's `plate:` block silently. The vocab
   wins; if the brief is right, the fix is a vocab edit, not a per-video
   override.
+- Calling a burn done because ffmpeg exited 0. Check a frame, not the manifest.
 - Shipping a cut with a non-empty `unresolved` list without reading it: someone
   who was on screen went uncredited. The list is the whole punch-list — an
   empty `unresolved` really does mean nobody was missed, so anything it does

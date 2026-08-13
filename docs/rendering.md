@@ -252,8 +252,9 @@ procedure and the timecode-rebasing it forces are in
 `tools/plate.py` is a separate stage from `render.py`, deliberately: cutting and
 titling are different concerns, and keeping them apart means a re-title does not
 re-cut. It composites every plate in **one** ffmpeg pass — an `overlay` chain
-where each plate is gated by `enable='between(t,in,out)'` — and stream-copies
-the audio, so titling never costs the soundtrack a second generation.
+where each plate is gated by an `enable=between(t,in,out)` expression — and
+stream-copies the audio, so titling never costs the soundtrack a second
+generation.
 
 Two consequences worth stating:
 
@@ -263,6 +264,30 @@ Two consequences worth stating:
 2. **The plates are rendered at 1920×1080**, the same size `render.py`
    normalizes every clip to, so the overlay needs no scaling and the chrome
    stays pixel-exact.
+
+### Two ways this pass has silently produced an unplated video
+
+Both exited 0 and wrote a file of the right length. Neither is theoretical —
+act II shipped both, and they are now pinned by tests that inspect the argv.
+
+**Shell quotes in an argv list.** `enable='between(t,1,2)'` is the spelling the
+ffmpeg docs use, and it is correct *on a command line*, where the shell strips
+the quotes. `burn()` builds an argv list and never sees a shell, so ffmpeg got
+the quote characters as part of the expression, failed to parse it, and
+disabled every overlay. Unquoted, the commas must be escaped instead
+(`between(t\,1\,2)`) or the filtergraph parser reads them as argument
+separators.
+
+**A one-frame PNG does not survive a long timeline.** Fed to `overlay` as-is a
+still image reaches EOF immediately, and `eof_action=repeat` does not hold that
+frame for five minutes: a plate gated to `t=5` draws and the identical plate
+gated to `t=269` does not, same file, same graph. Each image input therefore
+needs `-loop 1` — bounded with `-t`, because an unbounded loop is an infinite
+input and the encode never terminates, and with `-framerate 1`, because the
+looped stream is the same still frame at every timestamp and decoding it thirty
+times a second only costs time. The **output** needs its own `-t` as well: with
+every input the same length there is no unambiguous shortest stream, and the
+burn runs long.
 
 ## The shim only sees `$HOME`
 

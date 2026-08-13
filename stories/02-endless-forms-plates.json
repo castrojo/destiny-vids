@@ -5,6 +5,18 @@
   "act": "II",
   "title": "Endless Forms Most Beautiful",
   "source_id": "yt_destiny_all_live_action_trailers",
+  "chapters": [
+    {
+      "at": 54.234,
+      "title": "TOC",
+      "src": 72.0
+    },
+    {
+      "at": 161.367,
+      "title": "Rizzo",
+      "src": 185.233
+    }
+  ],
   "plates": [
     {
       "id": "trio_joseph_sandoval",

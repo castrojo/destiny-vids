@@ -33,7 +33,7 @@ that convention is gone.
 
 | Act | Cut | Bed source | In `Prod/` | True peak | Lossless master |
 |---|---|---|---|---|---|
-| II | Endless Forms Most Beautiful | Nightwish *Endless Forms Most Beautiful (Instrumental)* `6-9667CV1zQ`, **Opus 251** @48 k | FLAC stereo | −1.0 dBTP | `destiny-vids/renders/efmb-hq.mp4` |
+| II | Endless Forms Most Beautiful | Nightwish *Endless Forms Most Beautiful (Instrumental)* `6-9667CV1zQ`, **Opus 251** @48 k | FLAC stereo | −1.0 dBTP | `destiny-vids/renders/efmb-plated.mp4` |
 | III | Contributors | Rammstein *Deutschland (Instrumental)* `WqaiHivKlsE`, **Opus 251** @48 k | FLAC stereo | −1.2 dBTP | `destiny-vids/renders/…-credited-hq.mp4` |
 | IV | Kat | dArtagnan *Holding out for a Hero* `egLoz_DPQ8E`, **Opus rung 251** @48 k | FLAC stereo | −0.9 dBTP | `wolves-kat/wolves-kat-reveal-hq.mp4` |
 | V | Natali | Nightwish *Shudder Before the Beautiful* `oTTITV4H9fo`, **Opus 251** @48 k | FLAC stereo | −1.0 dBTP | `wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4` |

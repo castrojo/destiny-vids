@@ -199,6 +199,26 @@ CAYDE = {
 
 LEAD_IN = 0.4      # let the cut land before the plate arrives
 MIN_HOLD = 2.2     # below this a plate cannot be read
+
+# ACT II'S SUB-CHAPTERS.
+#
+# The act has two moments the owner wants findable from a scrub bar: the TOC
+# trio arriving out of the fog, and Rizzo's shot. They are anchored to the same
+# SOURCE timecodes the plates use, so a chapter and the credit it belongs to
+# can never drift apart.
+#
+# A chapter starts where the SHOT starts, not where the plate does -- the plate
+# is 0.4 s late on purpose, to let the cut land first, and a marker that drops
+# the audience 0.4 s into a shot has dropped them into the middle of it.
+#
+# These are emitted in FILM time and go no further. tools/megacut.py derives
+# the programme's chapters from act SLIDES only, and stories/megacut/megacut.json
+# belongs to whoever is assembling the programme -- an act does not get to
+# write into it. Consuming these is issue #92.
+CHAPTERS = [
+    (TRIO_IN, "TOC"),
+    (185.233, "Rizzo"),
+]
 SOLO_HOLD = 3.2
 TRIO_HOLD = 2.6
 
@@ -511,6 +531,10 @@ def build():
         "act": "II",
         "title": plan["title"],
         "source_id": plan["source_id"],
+        "chapters": [
+            {"at": round(film_of(src), 3), "title": title, "src": src}
+            for src, title in CHAPTERS
+        ],
         "plates": plates,
     }
 
@@ -526,10 +550,18 @@ def main(argv=None):
                     help="fail if the committed manifest is out of date")
     ap.add_argument("--fetch-avatars", action="store_true",
                     help="download the avatars the manifest names into renders/")
+    ap.add_argument("--chapters", action="store_true",
+                    help="print act II's sub-chapters in film time")
     args = ap.parse_args(argv)
 
     manifest = build()
     text = render_text(manifest)
+
+    if args.chapters:
+        for c in manifest["chapters"]:
+            m, s = divmod(c["at"], 60)
+            print(f"{int(m):d}:{s:06.3f}  {c['title']}")
+        return 0
 
     if args.fetch_avatars:
         fetch_avatars(manifest)
