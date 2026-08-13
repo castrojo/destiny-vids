@@ -132,10 +132,36 @@ with it.
 Both stops print the exact next command. Neither is a state to route around.
 
 
+## Deliver first, improve second
+
+**When the owner asks for a video, the next thing you produce is a video
+file.** See `AGENTS.md`, "A video now means a video now" — it is rule zero and
+it outranks everything in this skill.
+
+The loop below is a *production* loop, and its most common failure is not a bad
+render. It is **no render**: an agent asked for a quick cut finds a real
+structural problem on the way, fixes it properly, and surfaces hours later with
+good engineering and nothing to watch. Deliver the cut, file the problem, then
+fix it.
+
+```bash
+# Deliver something watchable in one command, even mid-round:
+./scripts/rebuild-wolves.sh          # act VI, end to end, with its own gates
+python3 tools/megacut.py stories/megacut/megacut.json   # the whole programme
+```
+
+An encode's ETA is measurable, so measure it rather than guessing — two `stat`
+calls a few seconds apart on the growing output give the rate. **A question
+about timing gets a time.**
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
 |---|---|
+| "I'll fix the underlying problem first, then the render will be right." | The owner asked for a video. Render, deliver the path, *then* fix. The ordering is the rule; the fix is still welcome after. |
+| "It's not worth shipping until X is done." | A cut that exists can be watched, judged and corrected. A cut that does not exist teaches nobody anything. |
+| "I found something important on the way, so the detour was justified." | File it as an issue in one minute. A found problem is never a licence to spend the owner's afternoon. |
+| "I'll explain what I learned, then give them the file." | Path and runtime first. Explanation after, and short. |
 | "I'll tag the obvious ones and leave the rest." | An untagged beat derives `clean = false`. Half a tag file marks half the video uncuttable. |
 | "The delivered file needs one small fix, I'll edit it in place." | It is regenerated from checked-in data. A hand-edit is lost on the next month's render and nobody can tell it happened. |
 | "I'll upload it and share the video link." | YouTube cannot replace a file. Share the playlist; `yt-refresh.py` swaps the contents. |
