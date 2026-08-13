@@ -16,7 +16,7 @@ Settled by the owner on 2026-08-12 and **canonical**:
 
 | Act | Chapter | The film | State |
 |---|---|---|---|
-| **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the comic card | delivered |
+| **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the title cover | delivered |
 | **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers, and *The Long Walk* inside them | delivered and **credited**, in the programme |
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
@@ -163,8 +163,8 @@ Delivered on 2026-08-12, so the two encode gaps this file used to list are
 closed:
 
 - **Act I** is rendered and delivered as `Prod/01-intro.mp4` — the frame-verified
-  2.0 → 113.55 trim of `BKm0TPqeOjY`, six Guardian plates and the comic title
-  card burned, Bungie's own score decoded from the **plain 251 Opus rung** to
+  2.0 → 113.55 trim of `BKm0TPqeOjY`, six Guardian plates and the title cover
+  burned, Bungie's own score decoded from the **plain 251 Opus rung** to
   FLAC. Not `251-drc`: that rung is dynamic-range compressed, and taking it
   would have been the pipeline applying processing it forbids.
 - **Act IV carries the owner's dialogue change** — the Kat/Ian split and

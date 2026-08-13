@@ -18,13 +18,13 @@
       "chapters": [
         "0:03  Cortney Nickerson",
         "0:12  Kat Cosgrove",
-        "0:22  “You don’t need permission” — Amber Graner",
+        "0:22  Title cover — Rafael Castro, Lakshmi, Bluefin",
         "0:38  Kaslin Fields",
         "1:08  Orlin",
         "1:23  Christoph Blecker",
         "1:27  Natali Vlatko"
       ],
-      "note": "Copy is the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94). This card was `card0` before the acts were numbered. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): One line per plate the act actually burns, in order, read off the built file -- stories/megacut/megacut-hero-plates.json for the windows, the frames for confirmation. The two name-only lines are name-only ON THE PLATE too: Cortney Nickerson (#59) and Orlin (#73) have no authored Guardian identity, and this list must not give them one."
+      "note": "Copy is the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94). This card was `card0` before the acts were numbered. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): One line per plate the act actually burns, in order, read off the built file -- stories/megacut/megacut-hero-plates.json for the windows, the frames for confirmation. Orlin's line is name-only because he is name-only ON THE PLATE too (#73: no authored Guardian identity, and this list must not give him one); Cortney Nickerson's is not -- issue #90 authored her label, name and title, with the subclass row withheld until the owner names her class (megacut-hero-plates.json, `unresolved`). The 0:22 line is the title cover that issue #90 put in place of the comic/QR cycle; the owner-authored Amber Graner quote it used to name is gone from the act by the same instruction, and the line names the three the cover's caption boxes credit -- Rafael Castro and Bluefin on their boxes, Lakshmi in the owner's framing line."
     },
     {
       "id": "act2",
