@@ -428,3 +428,122 @@ def test_locate_lands_a_note_past_the_end_on_the_last_act():
     title, offset, path = megacut.locate(_locate_plan(), 10_000.0)
     assert (title, path) == ("II. Two", "two.mp4")
     assert offset > 30.0
+
+
+# --- fades: the act-join treatment (issue #105) ------------------------------
+# Measured on v0.6: every act enters dry out of the slide's digital silence,
+# and several acts end hot against it. The treatment is an explicit fade the
+# plan states, applied at the segment encode -- never a gain, never a
+# normaliser. All fade times are ACT FILM time: they belong to the act, so
+# they cannot drift when the running order moves the act.
+
+def test_no_fade_declared_means_the_audio_chain_is_byte_identical(tmp_path):
+    """The untreated path must not change by one character: the tenet's
+    'passed through unprocessed' test pins it, and a plan with no fades is
+    every plan that existed before #105."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    af = megacut.build_segment_command(plan, 0, "seg000.mkv")
+    af_str = af[af.index("-af") + 1]
+    assert af_str == ("aresample=48000,"
+                      "aformat=sample_fmts=fltp:channel_layouts=5.1")
+    assert "afade" not in af_str
+
+
+def test_fade_in_is_applied_from_the_clips_own_start(tmp_path):
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source",
+         "dur": 100.0, "fade_in": 2.0},
+    ])
+    af = megacut.build_segment_command(plan, 0, "seg000.mkv")
+    af_str = af[af.index("-af") + 1]
+    assert "afade=t=in:st=0:d=2.000" in af_str
+    # the fade rides after the rate/layout normalisation, on the same stream
+    assert af_str.index("aformat") < af_str.index("afade")
+
+
+def test_fade_out_is_placed_against_the_clips_end(tmp_path):
+    """st is dur - fade_out on the ACT FILM clock: a fade that was authored
+    against the programme clock would move every time the running order did."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source",
+         "dur": 100.0, "fade_out": 2.5},
+    ])
+    af = megacut.build_segment_command(plan, 0, "seg000.mkv")
+    assert "afade=t=out:st=97.500:d=2.500" in af[af.index("-af") + 1]
+
+
+def test_fade_out_without_an_authored_dur_probes_the_video_stream(tmp_path, monkeypatch):
+    """The fade ends where the picture ends. The container's format duration
+    can be the audio stream outrunning the picture, which would start the
+    fade early -- so the probe asks the video stream, like the silent path."""
+    probed = {}
+    def fake_probe(path, stream=None):
+        probed["stream"] = stream
+        return 42.5
+    monkeypatch.setattr(megacut, "probe_duration", fake_probe)
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "fade_out": 2.0},
+    ])
+    af = megacut.build_segment_command(plan, 0, "seg000.mkv")
+    assert probed["stream"] == "v:0"
+    assert "afade=t=out:st=40.500:d=2.000" in af[af.index("-af") + 1]
+
+
+def test_no_fade_out_means_no_probe(tmp_path, monkeypatch):
+    """A clip that declares nothing must not suddenly require footage to
+    build a command -- --dry-run and the offline suite depend on that."""
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda *a, **k: pytest.fail("probed without a fade"))
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source"},
+    ])
+    megacut.build_segment_command(plan, 0, "seg000.mkv")
+
+
+def test_a_fade_is_seconds_and_not_negative(tmp_path):
+    for bad in (-1.0, "soon"):
+        path, _ = _plan(tmp_path, [
+            {"kind": "clip", "path": "a.mp4", "audio": "source",
+             "dur": 10.0, "fade_in": bad},
+        ])
+        with pytest.raises(ValueError, match="fade_in"):
+            megacut.load_plan(path)
+
+
+def test_a_card_cannot_carry_a_fade(tmp_path):
+    """A card is generated silence; fading silence is a no-op that reads as a
+    treatment. If a slide should carry sound, that is a licensing decision."""
+    path, _ = _plan(tmp_path, [
+        {"kind": "card", "image": "c.png", "dur": 5.0, "fade_in": 1.0},
+    ])
+    with pytest.raises(ValueError, match="belongs on a CLIP"):
+        megacut.load_plan(path)
+
+
+def test_a_silent_clip_cannot_carry_a_fade(tmp_path):
+    path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "silent",
+         "dur": 10.0, "fade_out": 1.0},
+    ])
+    with pytest.raises(ValueError, match="silent"):
+        megacut.load_plan(path)
+
+
+def test_fades_may_not_overlap_the_whole_clip(tmp_path):
+    path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source",
+         "dur": 3.0, "fade_in": 2.0, "fade_out": 2.0},
+    ])
+    with pytest.raises(ValueError, match="meets or exceeds"):
+        megacut.load_plan(path)
+
+
+def test_fade_chain_is_empty_without_declared_fades():
+    assert megacut.fade_chain({"audio": "source"}, 10.0) == ""
+
+
+def test_fade_chain_formats_both_ends():
+    chain = megacut.fade_chain({"fade_in": 1.5, "fade_out": 2.0}, 100.0)
+    assert chain == ",afade=t=in:st=0:d=1.500,afade=t=out:st=98.000:d=2.000"

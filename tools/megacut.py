@@ -47,9 +47,17 @@ The segments genuinely disagree, so a re-encode is unavoidable:
   60fps Guardian intros; choosing 60/1 would make the 59.94 cut drift against
   its own audio.
 * **Audio.** Everything is 48 kHz 5.1, and it is passed through **unprocessed**
-  -- no normaliser, no limiter, no EQ (the audio tenet). Silent segments get
-  generated 5.1 silence of exactly matching length rather than being left with
-  no stream, because ``concat`` needs every segment to carry both.
+  -- no normaliser, no limiter, no EQ (the audio tenet). The one exception is
+  an **explicit fade**: a clip may carry ``fade_in``/``fade_out`` (seconds, on
+  the ACT FILM clock -- the clip's own timeline, so a fade never moves when
+  the running order does), which the segment encode applies with ``afade``.
+  That is the act-join treatment from issue #105: an act enters dry out of the
+  slide's digital silence unless its head is faded, and several acts end hot
+  unless their tail is. A fade is a stated, reproducible shape in the plan --
+  not a limiter, not a normaliser, and never a *gain*: how loud one act is
+  against another is a mix decision and belongs to the owner. Silent segments
+  get generated 5.1 silence of exactly matching length rather than being left
+  with no stream, because ``concat`` needs every segment to carry both.
 * **Colour.** BT.709 SDR is tagged explicitly. Untagged 1080p is *assumed* to be
   BT.709 by most players, but "most" is not a guarantee, and a mis-tagged master
   is invisible until someone grades against it.
@@ -147,6 +155,33 @@ def load_plan(path, require_sources=True):
             )
         if kind == "clip" and "dur" in item and float(item["dur"]) <= 0:
             raise ValueError(f"item {i}: clip dur, when given, must be positive")
+        for fade in ("fade_in", "fade_out"):
+            if fade not in item:
+                continue
+            if kind != "clip":
+                raise ValueError(
+                    f"item {i}: {fade} belongs on a CLIP -- a card is "
+                    f"generated silence and there is nothing to fade")
+            try:
+                value = float(item[fade])
+            except (TypeError, ValueError):
+                raise ValueError(
+                    f"item {i}: {fade} must be seconds, got {item[fade]!r}")
+            if value < 0:
+                raise ValueError(f"item {i}: {fade} must be >= 0 seconds")
+            if item.get("audio") == "silent" and value:
+                raise ValueError(
+                    f"item {i}: {fade} on a silent clip fades generated "
+                    f"silence -- a no-op that reads as a treatment. Drop it; "
+                    f"if the slide should carry sound, that is a licensing "
+                    f"decision for the owner, not a fade")
+        if kind == "clip" and "dur" in item:
+            total = float(item.get("fade_in", 0)) + float(item.get("fade_out", 0))
+            if total >= float(item["dur"]):
+                raise ValueError(
+                    f"item {i}: fade_in + fade_out ({total}s) meets or exceeds "
+                    f"the clip's own duration ({item['dur']}s) -- the fades "
+                    f"would overlap on the ACT FILM clock")
         if kind == "card" and "sub_chapters" in item:
             raise ValueError(
                 f"item {i}: sub_chapters belong on the act's CLIP -- a card is "
@@ -328,6 +363,27 @@ def segment_video_chain(plan, item):
     return chain + ",setpts=PTS-STARTPTS"
 
 
+def fade_chain(item, dur):
+    """The ``afade`` filters a clip asks for, or "" -- ACT FILM clock.
+
+    ``fade_in`` starts at 0 of the clip's own timeline; ``fade_out`` ENDS at
+    the clip's end, so its start is ``dur - fade_out``. Both are seconds from
+    the plan, stated explicitly and reproducibly -- the act-join treatment of
+    issue #105. They are fades, never gains: an act's level against the others
+    is a mix decision and is not taken here. ``dur`` is the clip's length on
+    its own clock (authored, or probed by the caller); with no fades declared
+    the chain is empty and the audio path is byte-identical to before.
+    """
+    fade_in = float(item.get("fade_in", 0))
+    fade_out = float(item.get("fade_out", 0))
+    filters = []
+    if fade_in:
+        filters.append(f"afade=t=in:st=0:d={fade_in:.3f}")
+    if fade_out:
+        filters.append(f"afade=t=out:st={dur - fade_out:.3f}:d={fade_out:.3f}")
+    return "," + ",".join(filters) if filters else ""
+
+
 def build_segment_command(plan, index, seg_path):
     """Encode one item to its own normalised segment.
 
@@ -397,10 +453,19 @@ def build_segment_command(plan, index, seg_path):
         af = []
     else:
         maps = ["-map", "0:v:0", "-map", "0:a:0"]
+        # A fade-out is placed against the clip's END, so it needs the clip's
+        # length on the act film clock -- authored, else probed from the video
+        # stream (the container can report a longer audio stream, and cutting
+        # a fade against that would start it early).
+        dur = item.get("dur")
+        if dur is None and float(item.get("fade_out", 0)):
+            dur = probe_duration(resolve(item["path"]), stream="v:0")
         # aresample only where the rate differs; aformat pins the layout so the
-        # join sees one shape. No gain is applied anywhere.
+        # join sees one shape. No gain is applied anywhere; the only treatment
+        # is an explicit fade the plan asked for (issue #105).
         af = ["-af", f"aresample={rate},"
-                     f"aformat=sample_fmts=fltp:channel_layouts={layout}"]
+                     f"aformat=sample_fmts=fltp:channel_layouts={layout}"
+                     f"{fade_chain(item, float(dur) if dur is not None else 0.0)}"]
     return [*args, "-vf", segment_video_chain(plan, item), *af, *maps, *common]
 
 

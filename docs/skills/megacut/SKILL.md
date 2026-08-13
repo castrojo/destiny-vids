@@ -67,6 +67,9 @@ python3 tools/megacut.py stories/<name>/<name>.json --dry-run
 
 # 3. Assemble
 python3 tools/megacut.py stories/<name>/<name>.json
+
+# 4. Measure the joins on the BUILT file (issue #105)
+python3 tools/transitions.py stories/<name>/<name>.json --measure <built>.mp4
 ```
 
 Both renderers write `plate_<id>.png` into the same directory and each skips
@@ -130,6 +133,12 @@ This skill is the contract. The procedure lives in `references/`:
   already ships is a second version to keep in step.
 - **A music bed under a silent segment is a licensing decision.** Leave it
   silent and record it; never pick a track to fill the gap.
+- **An act enters dry out of a slide's silence unless its head is faded.**
+  The join applies no gain and no fade by itself; the treatment is
+  `fade_in`/`fade_out` (seconds, ACT FILM clock) on the plan's clip items,
+  applied by `afade` at the segment encode. Fades only — levelling one act
+  against another is a mix decision for the owner. Measure first and after
+  with `tools/transitions.py --measure` (issue #105).
 
 ## Verify, don't assert
 
