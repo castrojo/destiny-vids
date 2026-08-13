@@ -7,7 +7,7 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from tools import redact  # noqa: E402
+from tools import peaks, redact  # noqa: E402
 
 
 BOXED = {"id": "logo", "start_sec": 10.0, "end_sec": 20.0, "reason": "logo",
@@ -160,7 +160,7 @@ def test_gain_is_derived_from_the_beds_true_peak(monkeypatch):
     clips on lossy playback even though no sample is over. The fix is a gain,
     never a normaliser: loudnorm would rewrite the dynamics the artist chose.
     """
-    monkeypatch.setattr(redact, "measure_true_peak", lambda *a, **k: 1.5)
+    monkeypatch.setattr(peaks, "measure_true_peak", lambda *a, **k: 1.5)
     gain, peak = redact.gain_for_headroom("bed.mp3", target_dbtp=-1.1)
     assert peak == 1.5
     # 1.5 dBTP down to -1.1 dBTP is -2.6 dB.
@@ -171,7 +171,7 @@ def test_gain_is_derived_from_the_beds_true_peak(monkeypatch):
 
 def test_a_quiet_bed_is_never_pushed_up_to_the_target(monkeypatch):
     """The target is a ceiling, not a loudness mandate."""
-    monkeypatch.setattr(redact, "measure_true_peak", lambda *a, **k: -8.0)
+    monkeypatch.setattr(peaks, "measure_true_peak", lambda *a, **k: -8.0)
     gain, peak = redact.gain_for_headroom("bed.mp3", target_dbtp=-1.1)
     assert gain == 1.0 and peak == -8.0
 
@@ -181,7 +181,7 @@ def test_true_peak_is_read_from_the_last_ebur128_summary(monkeypatch):
     class Proc:
         stderr = ("Peak: -6.0 dBFS\n"
                   "  True peak:\n    Peak:        0.5 dBFS\n")
-    monkeypatch.setattr(redact.subprocess, "run", lambda *a, **k: Proc())
+    monkeypatch.setattr(peaks.subprocess, "run", lambda *a, **k: Proc())
     assert redact.measure_true_peak("x.mp3", ffmpeg=["ffmpeg"]) == 0.5
 
 
@@ -219,8 +219,8 @@ def test_delivered_peak_is_corrected_when_the_encoder_overshoots(monkeypatch, tm
     a chain correct at every earlier step. The correction is another static
     gain, and it only ever goes down.
     """
-    peaks = iter([0.3, -1.4])
-    monkeypatch.setattr(redact, "measure_true_peak", lambda *a, **k: next(peaks))
+    peaks_iter = iter([0.3, -1.4])
+    monkeypatch.setattr(peaks, "measure_true_peak", lambda *a, **k: next(peaks_iter))
     gains = []
 
     def fake_run(cmd, **kwargs):
@@ -245,7 +245,7 @@ def test_delivered_peak_is_corrected_when_the_encoder_overshoots(monkeypatch, tm
 def test_a_delivered_file_with_headroom_is_not_re_encoded(monkeypatch, tmp_path):
     """Corrections stop at the first safe result -- the overshoot is not
     monotonic in the gain, so chasing a narrow window oscillates."""
-    monkeypatch.setattr(redact, "measure_true_peak", lambda *a, **k: -2.4)
+    monkeypatch.setattr(peaks, "measure_true_peak", lambda *a, **k: -2.4)
     calls = []
 
     def fake_run(cmd, **kwargs):

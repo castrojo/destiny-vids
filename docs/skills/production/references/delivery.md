@@ -97,7 +97,10 @@ already been learned the hard way and must not be re-learned:
   output and re-runs at a corrected **static** gain until it has headroom;
   corrections only go down and stop at the first safe result, because the
   overshoot is not monotonic in the gain. A FLAC build of the same cut lands on
-  target in one pass, which is how you know it is the encoder.
+  target in one pass, which is how you know it is the encoder. That
+  measure-and-correct loop is `tools/peaks.py`, shared with `tools/render.py`:
+  every cut gets the same delivered-peak trim (issue #44), held to a ceiling of
+  −0.9 dBTP — the top of the band the checker above enforces.
 - The contributors piece is **stereo AAC on purpose**; the Guardian intros are
   5.1. Do not "fix" one into the other.
 - **Source a bed by codec, not by bitrate.** Sorting candidate downloads on raw

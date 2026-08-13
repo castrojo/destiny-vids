@@ -122,7 +122,8 @@ over.
 Nothing here compresses, limits, EQs or loudness-normalises. The artist's
 dynamics are the artist's. The only permitted correction is a **static scale**.
 
-`tools/redact.py::gain_for_headroom` derives the trim from the bed's measured
+`tools/peaks.py::gain_for_headroom` (re-exported by `tools/redact.py`) derives
+the trim from the bed's measured
 true peak. Source masters routinely run into full scale — Rammstein's measures
 **+0.7 dBTP**, and the old MP3 of it **+1.5** — so a bed that clips is normal
 and not a defect. `audio-check.sh` warns on it rather than failing, because the

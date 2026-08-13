@@ -32,6 +32,10 @@ from collections import Counter
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools import peaks  # noqa: E402
 
 MEDIA_EXTS = (".mp4", ".mkv", ".webm", ".mov")
 
@@ -213,12 +217,18 @@ def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
     subprocess.run(cmd, check=True)
 
 
-def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None):
+def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None,
+           audio_gain=None):
     """Join normalized clips with the concat demuxer.
 
     The list file is written into ``workdir`` rather than /tmp: a containerized
     ffmpeg only sees the bind-mounted home, so a /tmp path would resolve inside
     the container namespace and the join would fail on a missing file.
+
+    ``audio_gain`` is a STATIC volume scale applied at this final pass (never a
+    limiter, never a normaliser): it exists so tools/peaks.py's delivered-peak
+    correction can re-run just the concat instead of re-cutting every clip.
+    None means no filter, so an uncorrected render is bit-identical to before.
     """
     workdir = Path(workdir or Path(out_path).parent)
     list_path = workdir / "concat_list.txt"
@@ -229,8 +239,13 @@ def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None):
         cmd = list(ffmpeg) + ["-v", "error", "-y", "-f", "concat", "-safe", "0",
                               "-i", str(list_path)]
         if audio_bed:
-            cmd += ["-i", str(audio_bed), "-map", "0:v:0", "-map", "1:a:0", "-shortest",
-                    "-c:a", "aac", "-b:a", "192k"]
+            cmd += ["-i", str(audio_bed), "-map", "0:v:0", "-map", "1:a:0", "-shortest"]
+            if audio_gain is not None:
+                cmd += ["-af", f"volume={audio_gain}"]
+            cmd += ["-c:a", "aac", "-b:a", "192k"]
+        elif audio_gain is not None:
+            # Source audio from the clips; the implicit selection picks it up.
+            cmd += ["-af", f"volume={audio_gain}"]
         cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p"]
         cmd.append(str(out_path))
         subprocess.run(cmd, check=True)
@@ -301,7 +316,7 @@ def cap_holds(shots, max_shot_sec, log=None):
 
 
 def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=True,
-           ffmpeg=None):
+           ffmpeg=None, target_dbtp=peaks.DEFAULT_TARGET_DBTP, _peak_attempts=5):
     ffmpeg = ffmpeg or find_ffmpeg()
     out_path = Path(out_path).resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -336,6 +351,20 @@ def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=
         if not rendered:
             raise RuntimeError("nothing to render: no shot resolved to a source file")
         concat(ffmpeg, rendered, out_path, audio_bed, workdir=tmp)
+        # A cut must not ship above the delivered-peak band either: measure the
+        # FINISHED file and re-run the concat at a corrected static gain until
+        # it has real headroom (tools/peaks.py -- never a limiter, never a
+        # normaliser). Only the concat is re-run, not the clip cuts. A muted
+        # render has no audio to measure.
+        if target_dbtp is not None and (keep_audio or audio_bed):
+            def rerun(new_gain):
+                concat(ffmpeg, rendered, out_path, audio_bed, workdir=tmp,
+                       audio_gain=new_gain)
+
+            peaks.correct_delivered_peak(
+                out_path, 1.0, target_dbtp, rerun, ffmpeg=ffmpeg,
+                attempts=_peak_attempts,
+                margin_db=peaks.DELIVERED_BAND_MARGIN_DB)
     return rendered, missing
 
 
@@ -351,6 +380,10 @@ def main(argv=None):
                     help="skip the ffmpeg container and use a local binary")
     ap.add_argument("--max-shot-sec", type=float, default=None,
                     help="trim any shot held longer than this, from its tail")
+    ap.add_argument("--target-dbtp", type=float, default=peaks.DEFAULT_TARGET_DBTP,
+                    help="delivered true-peak target in dBTP; the finished file "
+                         "is measured and re-run at a corrected static gain "
+                         f"until it has headroom (default {peaks.DEFAULT_TARGET_DBTP})")
     args = ap.parse_args(argv)
 
     ffmpeg = find_ffmpeg(prefer_container=not args.no_container)
@@ -360,7 +393,8 @@ def main(argv=None):
     shots = cap_holds(shots, args.max_shot_sec, log=print)
     rendered, missing = render(shots, args.media, args.out,
                                keep_audio=not args.mute and not args.audio,
-                               audio_bed=args.audio, ffmpeg=ffmpeg)
+                               audio_bed=args.audio, ffmpeg=ffmpeg,
+                               target_dbtp=args.target_dbtp)
     total = sum(resolve_duration(s) for s in shots)
     print(f"OK: {len(rendered)} clip(s), ~{total:.1f}s -> {args.out}")
     for shot in missing:

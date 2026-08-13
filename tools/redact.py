@@ -21,7 +21,6 @@ list to the same range, so the two never disagree about where the picture is.
 """
 import argparse
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path
@@ -30,6 +29,12 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+# The headroom constants and the measure/correct machinery live in
+# tools/peaks.py, shared with tools/render.py; they are re-exported here so
+# long-standing references to redact.gain_for_headroom keep resolving.
+from tools.peaks import (DEFAULT_TARGET_DBTP, PEAK_ACCEPT_MARGIN_DB,  # noqa: E402, F401
+                         QUIET_WARN_DB, correct_delivered_peak,
+                         gain_for_headroom, measure_true_peak)
 from tools.search import load_segments  # noqa: E402
 
 REDACTIONS_DIR = REPO_ROOT / "redactions"
@@ -153,56 +158,6 @@ def drawbox_filters(redactions):
     return filters
 
 
-# Headroom for the music bed, in dBTP. Intersample peaks exceed sample peaks,
-# and a lossy decoder can overshoot further still, so a deliverable that sits at
-# 0 dBFS clips on playback. ~1 dB of headroom is the usual delivery allowance.
-DEFAULT_TARGET_DBTP = -1.1
-
-# How far above the target a delivered file may land and still be accepted.
-# The delivered acts in ~/Videos/Wolves/Prod sit at -0.9..-1.2 dBTP, so this keeps
-# the accepted band flush with what has actually shipped while staying clear
-# of full scale.
-PEAK_ACCEPT_MARGIN_DB = 0.6
-
-# Below this far under target, say so: safe, but quieter than the other cuts.
-QUIET_WARN_DB = 1.0
-
-
-def measure_true_peak(path, ffmpeg=None):
-    """True peak of ``path`` in dBFS, via ffmpeg's ebur128 (ITU-R BS.1770).
-
-    True peak, not sample peak: the question is whether the reconstructed
-    analogue waveform clips, and intersample peaks routinely exceed the highest
-    sample by a dB or more.
-    """
-    if ffmpeg is None:
-        from tools.render import find_ffmpeg
-
-        ffmpeg = find_ffmpeg()
-    proc = subprocess.run(
-        [*ffmpeg, "-nostdin", "-hide_banner", "-nostats", "-i", str(Path(path).resolve()),
-         "-af", "ebur128=peak=true", "-f", "null", "-"],
-        capture_output=True, text=True)
-    peaks = re.findall(r"Peak:\s*(-?\d+(?:\.\d+)?)\s*dBFS", proc.stderr)
-    if not peaks:
-        raise RuntimeError(f"could not measure true peak of {path}")
-    return float(peaks[-1])
-
-
-def gain_for_headroom(path, target_dbtp=DEFAULT_TARGET_DBTP, ffmpeg=None):
-    """Linear gain that lands ``path`` at ``target_dbtp``.
-
-    A STATIC gain, deliberately: the alternative is a normaliser, and
-    loudnorm/compression would rewrite the dynamics the artist chose. This only
-    ever scales; it never reshapes. A track already quieter than the target is
-    left alone (gain 1.0) rather than being pushed up to meet it.
-    """
-    peak = measure_true_peak(path, ffmpeg)
-    if peak <= target_dbtp:
-        return 1.0, peak
-    return 10 ** ((target_dbtp - peak) / 20.0), peak
-
-
 def audio_encode_opts(codec):
     """Encoder options for the deliverable's audio.
 
@@ -289,67 +244,23 @@ def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
         tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
         raise RuntimeError(f"redaction pass failed:\n{tail}")
 
-    # Verify the DELIVERED peak, not just the bed's.
-    #
-    # gain_for_headroom lands the *bed* on target, but the deliverable is AAC,
-    # and a lossy encoder reconstructs inter-sample peaks above the samples it
-    # was given. How much depends on the material: this cut's MP3 bed overshot
-    # by 0.2 dB while the higher-bandwidth Opus-sourced bed overshot by 1.5 dB
-    # and landed a -1.1 dBTP mix at +0.3 dBTP -- clipping, from a chain that
-    # measured correct at every earlier step. Deriving the gain from the source
-    # fixed the old hardcoded-gain bug; it does not cover this one.
-    #
-    # Verify the DELIVERED peak, not just the bed's.
-    #
-    # gain_for_headroom lands the *bed* on target, but the deliverable is AAC,
-    # and a lossy encoder reconstructs inter-sample peaks above the samples it
-    # was given. How much depends on the material: this cut's MP3 bed overshot
-    # by 0.2 dB while the higher-bandwidth Opus-sourced bed overshot by 1.5 dB
-    # and landed a -1.1 dBTP mix at +0.3 dBTP -- clipping, from a chain that
-    # measured correct at every earlier step. Deriving the gain from the source
-    # fixed the old hardcoded-gain bug; it does not cover this one.
-    #
-    # Each correction is another STATIC gain, never a limiter: the pass is
-    # re-run at a different scale, so the artist's dynamics are untouched.
-    #
-    # Corrections only ever go DOWN, and stop at the first safe result. The
-    # overshoot is not monotonic in the gain -- it is set by whichever transient
-    # the encoder reconstructs highest, and that moves discontinuously as the
-    # level changes quantization decisions (measured here: gain 0.658 delivered
-    # -2.5 dBTP while 0.675 delivered -0.8). Chasing a narrow window on that
-    # curve oscillates and costs a full pass per attempt, so this takes the
-    # first result with real headroom instead.
+    # Verify the DELIVERED peak, not just the bed's -- the measure-and-correct
+    # loop is shared with render.py and lives in tools/peaks.py. A hand-set
+    # --audio-gain opts out (main passes target_dbtp=None then).
     if audio and audio_gain and target_dbtp is not None:
-        ceiling = target_dbtp + PEAK_ACCEPT_MARGIN_DB
-        gain = audio_gain
-        for attempt in range(_attempts_left):
-            delivered = measure_true_peak(out_path, ffmpeg)
-            if delivered <= ceiling:
-                print(f"  delivered true peak {delivered:+.1f} dBTP")
-                if delivered < target_dbtp - QUIET_WARN_DB:
-                    print(f"  note: {target_dbtp - delivered:.1f} dB below the "
-                          f"{target_dbtp:+.1f} dBTP target -- the encoder left "
-                          f"more headroom than asked for, which is safe but "
-                          f"quieter than the other cuts")
-                break
-            if attempt == _attempts_left - 1:
-                print(f"  WARNING: delivered true peak {delivered:+.1f} dBTP "
-                      f"still above {ceiling:+.1f} after {_attempts_left} "
-                      f"attempts -- verify before shipping")
-                break
-            gain *= 10 ** (-(delivered - target_dbtp) / 20.0)
-            print(f"  delivered true peak {delivered:+.1f} dBTP -- the encoder "
-                  f"added {delivered - target_dbtp:.1f} dB over the bed's "
-                  f"target; re-running at static gain {gain:.3f}")
+        def rerun(new_gain):
             cmd = build_command(ffmpeg, Path(video).resolve(),
                                 drawbox_filters(redactions),
                                 Path(out_path).resolve(),
-                                Path(audio).resolve(), gain, trim=trim,
+                                Path(audio).resolve(), new_gain, trim=trim,
                                 audio_codec=audio_codec)
             proc = subprocess.run(cmd, capture_output=True, text=True)
             if proc.returncode != 0:
                 tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
                 raise RuntimeError(f"redaction pass failed:\n{tail}")
+
+        correct_delivered_peak(out_path, audio_gain, target_dbtp, rerun,
+                               ffmpeg=ffmpeg, attempts=_attempts_left)
     return out_path
 
 
