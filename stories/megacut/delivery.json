@@ -8,27 +8,62 @@
   },
   "II": {
    "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
-   "note": "#98's overlay pass; `renders/efmb-hq.mp4` is the pre-plate picture"
+   "note": "#98's overlay pass; `renders/efmb-hq.mp4` is the pre-plate picture",
+   "sources": [
+    "scripts/build_efmb.py",
+    "scripts/build_efmb_plates.py",
+    "scripts/efmb_beats.py",
+    "stories/02-endless-forms-plates.json",
+    "music/bed_endless_forms_most_beautiful.json",
+    "dialogue/yt_destiny_all_live_action_trailers",
+    "vocab/casting.yaml"
+   ],
+   "source_digest": "f4c0e62c369c5ef41b64d4114ba8e157fab6ee0ad963af77a8fdae04c929b86c"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
-   "note": ""
+   "note": "",
+   "sources": [
+    "scripts/build_uncut_credited.sh",
+    "dialogue/yt_curse_of_osiris_opening_cinematic",
+    "vocab/casting.yaml"
+   ],
+   "source_digest": "ba19cec8675c481a50d5657e7187fbe6a4bb2d78cfcdc4644bff77e173a9cecd"
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
-   "note": ""
+   "note": "",
+   "sources": [],
+   "sources_note": "NOT REPO-DRIVEN. This act was cut in ~/Videos/wolves-kat and has no committed inputs, so there is nothing here to edit and nothing for this tool to watch. That is exactly why the Kat/Nat dialogue round (#118) could not land: the words have no home in the repo. Giving act IV a builder is the fix."
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
-   "note": ""
+   "note": "",
+   "sources": [],
+   "sources_note": "NOT REPO-DRIVEN, same as act IV -- cut in ~/Videos/wolves-natali. See #118."
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v3.mp4",
-   "note": "the #104 interruption build with its **hold music now playing** (443.533 s): Local Forecast – Slower, CC BY 4.0, credited in the repo's `ATTRIBUTIONS.md`. The slot shipped silent in v2 because a cleared track was mistaken for a rights block. **AAC, the one act with no lossless master** (#58)"
+   "note": "the #104 interruption build with its **hold music now playing** (443.533 s): Local Forecast – Slower, CC BY 4.0, credited in the repo's `ATTRIBUTIONS.md`. The slot shipped silent in v2 because a cleared track was mistaken for a rights block. **AAC, the one act with no lossless master** (#58)",
+   "sources": [
+    "scripts/build_wolves.py",
+    "scripts/rebuild-wolves.sh",
+    "scripts/build_interruption_cards.py",
+    "scripts/build_summit_plates.py",
+    "stories/seven-days-timing-pass.json",
+    "stories/06-wolves-cayde-plates.json",
+    "stories/06-wolves-interruption-cards.json",
+    "music/bed_seven_days_to_the_wolves.json",
+    "music/bed_local_forecast_slower.json",
+    "vocab/casting.yaml"
+   ],
+   "source_digest": "4116ca06209d9d221eb67b81ecd61cf6b10ee952063532a5290d64716d4c8f8f"
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4",
-   "note": "master corrected to -1.1 dBTP by static trim (#82 delivered, pending owner close)"
+   "note": "master corrected to -1.1 dBTP by static trim (#82 delivered, pending owner close)",
+   "sources": [],
+   "sources_note": "NOT REPO-DRIVEN -- cut in ~/Videos/wolves-directors-cut."
   }
  },
  "social": {
@@ -39,5 +74,6 @@
    "III": "160.2 s leaves ~268 kbps of video budget -- mud. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
    "VI": "443.5 s: the 256k audio ALONE overruns the 10 MiB cap, so no copy can be encoded at all. Recorded in 10mb/README.md; a shorter excerpt is the owner's call."
   }
- }
+ },
+ "_sources": "`sources` is the rung BEFORE the master: the committed inputs an act is built from. tools/deliver.py hashes them and compares against `source_digest`, which `publish` stamps -- so editing a shotlist, a plate manifest, a dialogue record or vocab/casting.yaml marks that act's delivered film STALE instead of letting it silently predate its own inputs. Content hashed, never mtime: these come out of git, where every mtime is checkout time. An empty list means the act has no committed inputs AT ALL and its note must say so -- that is a finding, not a configuration. An act with no `sources` key is reported UNDECLARED so nobody mistakes silence for freshness."
 }

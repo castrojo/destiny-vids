@@ -51,3 +51,12 @@ jobs:
 
       - name: No derived field was hand-edited
         run: python3 tools/rederive.py --check
+
+      # The delivery graph's first rung: did an act's committed inputs change
+      # without anybody re-rendering the act? This needs no footage and no
+      # ~/Videos, so it is the one delivery check that CAN run here -- and it
+      # is the one that matters, because a delivered film silently predating
+      # its own records is invisible until somebody watches it. Acts IV and V
+      # sat a dialogue round behind for days exactly this way (#118).
+      - name: No act's inputs moved without a rebuild
+        run: python3 tools/deliver.py status --sources-only --check

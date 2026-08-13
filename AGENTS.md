@@ -137,6 +137,28 @@ running order). It is superseded, and nothing depends on it any more; its
 removal is [issue #81](https://github.com/castrojo/destiny-vids/issues/81).
 **Nothing is staged there.**
 
+**Nothing here is maintained by hand.** `tools/deliver.py` owns the graph —
+`inputs -> master -> Prod/ -> megacut/ -> 10mb/` — and every rung is checked
+rather than trusted:
+
+```bash
+python3 tools/deliver.py status            # what is stale and why
+python3 tools/deliver.py build             # rebuild exactly what is stale
+python3 tools/deliver.py build --watch 60  # keep the megacut one edit behind, never more
+python3 tools/deliver.py publish           # after ANY act rebuild
+```
+
+**Run `publish` after every act rebuild.** It re-links `Prod/`, regenerates the
+checksums and the README table, and stamps the act's **input digest** — the
+hash of the committed records that act is built from. That last part is what
+turns "somebody edited a dialogue record and nobody re-rendered" into a
+reported failure instead of a film that quietly plays a round of notes behind.
+CI gates it with `status --sources-only --check`, which needs no footage.
+
+An act whose delivery entry says `sources: []` has **no committed inputs at
+all** — it is cut outside the repo, so there is nothing here to edit and
+nothing to watch. That is a finding, not a setting.
+
 **Three classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, and a licensing decision. An agent that
 reaches one, records `automatable: no` with the missing decision in

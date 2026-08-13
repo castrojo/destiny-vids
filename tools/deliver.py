@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The delivery graph: master -> Prod/ -> megacut/ -> 10mb/.
+"""The delivery graph: inputs -> master -> Prod/ -> megacut/ -> 10mb/.
 
 `~/Videos/Wolves/` is the owner's delivery workspace, and for a long time its
 freshness was maintained by hand: `Prod/README.md` prescribed a manual
@@ -15,9 +15,31 @@ notices:
 
     python3 tools/deliver.py status            # what is stale and why
     python3 tools/deliver.py status --check    # the same, as a gate (exit 1)
+    python3 tools/deliver.py status --sources-only --check   # the CI gate
     python3 tools/deliver.py publish           # re-link Prod/, checksums, README
     python3 tools/deliver.py build --dry-run   # what a rebuild would run
     python3 tools/deliver.py build             # megacut + social copies, stale only
+    python3 tools/deliver.py build --watch 60  # keep it fresh, forever
+
+The rung before the master
+--------------------------
+The graph used to start at a **rendered file**, which cannot see the thing
+that goes stale first: somebody edits a shotlist, a dialogue record, a plate
+manifest or `vocab/casting.yaml`, and the delivered act silently predates its
+own inputs. Acts IV and V sat behind a dictated dialogue round for days that
+way (#118) and nothing noticed, because nothing was looking.
+
+So each act declares its committed `sources` in the delivery map, hashed into
+a `source_digest` that `publish` stamps. An edit to any of them reports the
+act as **stale** and names the inputs. Two honest non-answers exist and are
+distinguished on purpose: `sources: []` means the act has **no committed
+inputs at all** (cut outside the repo -- a finding, and it must carry a note
+saying so), while a missing `sources` key is **undeclared** and reported
+rather than assumed fresh.
+
+This rung reads only committed files, so `--sources-only` needs no footage and
+no `~/Videos` and runs on CI, where every other check here has to degrade to a
+report.
 
 What it trusts
 --------------
@@ -106,6 +128,7 @@ ABSENT_BY_DESIGN = "absent-by-design"
 STALE = "stale"
 MISSING = "missing"
 CONFLICT = "conflict"
+UNDECLARED = "undeclared"
 
 FAILING = {STALE, MISSING, CONFLICT}
 
@@ -222,6 +245,76 @@ def find_twins(path, roots=TWIN_ROOTS):
 
 
 # --- the per-node checks, in dependency order -------------------------------
+
+
+def source_digest(sources):
+    """A content hash over an act's committed inputs, in declared order.
+
+    Content, not mtime: these files come out of git, so on a fresh clone every
+    mtime is checkout time and every act would look stale at once. The digest
+    survives a clone, a rebase and a Syncthing round trip, and it is the same
+    reasoning the Prod link already uses.
+
+    A path that does not exist hashes as absent rather than raising -- a
+    renamed input should report as drift, not crash the report.
+    """
+    h = hashlib.sha256()
+    for rel in sources:
+        path = REPO_ROOT / rel
+        h.update(rel.encode())
+        if path.is_dir():
+            for child in sorted(p for p in path.rglob("*") if p.is_file()):
+                h.update(str(child.relative_to(REPO_ROOT)).encode())
+                h.update(child.read_bytes())
+        elif path.exists():
+            h.update(path.read_bytes())
+        else:
+            h.update(b"\0absent")
+    return h.hexdigest()
+
+
+def check_sources(act, master, report):
+    """The rung BEFORE the master: did an act's inputs change without a render?
+
+    `master -> Prod/ -> megacut/ -> 10mb/` starts at a rendered file, so it
+    cannot see the thing that actually goes stale first -- somebody edits a
+    shotlist, a dialogue record or a plate manifest, and the delivered act
+    silently predates its own inputs. That is not hypothetical: acts IV and V
+    were delivered on 11-12 August and the Kat/Nat dialogue round dictated on
+    the 13th (#118) never reached them, which nothing detected.
+
+    Unlike every other check here, this one needs **no footage and no
+    ~/Videos**, so it runs as a gate on CI.
+    """
+    if master is None:
+        return
+    sources = master.get("sources")
+    if sources is None:
+        report.add("sources", UNDECLARED,
+                   "no inputs declared -- nothing can tell whether this act's "
+                   "master is older than the records that produce it. Add "
+                   "`sources` to stories/megacut/delivery.json")
+        return
+    if not sources:
+        report.add("sources", ABSENT_BY_DESIGN,
+                   master.get("sources_note")
+                   or "no committed inputs: this act is not built from the "
+                      "repo yet")
+        return
+    digest = source_digest(sources)
+    recorded = master.get("source_digest")
+    if not recorded:
+        report.add("sources", UNDECLARED,
+                   f"inputs declared but never recorded -- run `deliver.py "
+                   f"publish` to record {digest[:12]}")
+        return
+    if digest != recorded:
+        report.add("sources", STALE,
+                   f"inputs changed since this master was recorded "
+                   f"({recorded[:12]} -> {digest[:12]}); rebuild the act, then "
+                   f"`publish`. Declared inputs: {', '.join(sources)}")
+        return
+    report.add("sources", OK, f"{len(sources)} input(s) match {digest[:12]}")
 
 
 def check_master(act, master, report):
@@ -454,7 +547,7 @@ def link_master(src, prod):
     os.replace(tmp, prod)
 
 
-def publish(acts, masters, wolves, log=print):
+def publish(acts, masters, wolves, delivery_path=None, log=print):
     """Make Prod/ match the delivery map, then regenerate what describes it.
 
     Only ever `ln -f` semantics -- never a copy. A conflicted act (declared
@@ -511,7 +604,35 @@ def publish(acts, masters, wolves, log=print):
             log(f"  README.md: no {TABLE_BEGIN} markers -- table NOT "
                 f"touched; add the markers around the table to hand it to "
                 f"the tool")
+    record_source_digests(acts, masters, delivery_path, log=log)
     return 0
+
+
+def record_source_digests(acts, masters, delivery_path, log=print):
+    """Stamp each act's current input digest into the delivery map.
+
+    This is what closes the loop: `publish` is the step that says "what is in
+    Prod NOW is built from these inputs", so a later edit to any of them shows
+    up as drift instead of going unnoticed. Recording it anywhere else would
+    let an act be declared fresh without anything being delivered.
+    """
+    if delivery_path is None:
+        return
+    doc = json.loads(Path(delivery_path).read_text(encoding="utf-8"))
+    changed = []
+    for act in acts:
+        master = doc.get("masters", {}).get(act.numeral)
+        if not master or not master.get("sources"):
+            continue
+        digest = source_digest(master["sources"])
+        if master.get("source_digest") != digest:
+            master["source_digest"] = digest
+            changed.append(f"{act.numeral} -> {digest[:12]}")
+    if changed:
+        Path(delivery_path).write_text(
+            json.dumps(doc, indent=1, ensure_ascii=False) + "\n",
+            encoding="utf-8")
+        log(f"  delivery.json: recorded input digests for {', '.join(changed)}")
 
 
 # --- build ------------------------------------------------------------------
@@ -528,6 +649,21 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
     for r in reports:
         if not r.act.prod_file:
             continue
+        src_f = next((f for f in r.findings if f.node == "sources"), None)
+        if src_f and src_f.state == STALE:
+            cmd = (masters.get(r.act.numeral) or {}).get("rebuild")
+            if cmd:
+                argv = shlex.split(cmd) if isinstance(cmd, str) else list(cmd)
+                actions.append((-1, f"rebuild {r.act.numeral}", argv,
+                                shlex.join(argv)))
+            else:
+                # Degrade, never block: an act whose inputs moved but which has
+                # no one-command rebuild is REPORTED, not silently skipped and
+                # not faked with a guessed command. A wrong rebuild here
+                # re-burns nameplates about real people.
+                log(f"act {r.act.numeral}: inputs changed but no `rebuild` "
+                    f"command is declared in delivery.json -- rebuild it by "
+                    f"hand, then `deliver.py publish`")
         link = next((f for f in r.findings if f.node == "link"), None)
         if link and link.state in FAILING:
             if link.state == CONFLICT:
@@ -593,6 +729,7 @@ def gather(acts, masters, social, wolves, plan_path, twin_roots=TWIN_ROOTS):
                   "nothing renumbers around it")
             continue
         master_path = check_master(r.act, masters.get(r.act.numeral), r)
+        check_sources(r.act, masters.get(r.act.numeral), r)
         check_link(r.act, master_path, wolves, r, twin_roots=twin_roots)
     programme = ActReport(Act("", "the programme", None))
     check_checksums(wolves, reports, programme)
@@ -605,7 +742,7 @@ def gather(acts, masters, social, wolves, plan_path, twin_roots=TWIN_ROOTS):
 
 def print_report(reports, wolves, log=print):
     log(f"delivery status -- {wolves}")
-    log("graph: master -> Prod/ -> megacut/ -> 10mb/  "
+    log("graph: inputs -> master -> Prod/ -> megacut/ -> 10mb/  "
         "(acts and order: docs/running-order.md)")
     programme = reports[-1]
     for r in reports[:-1]:
@@ -628,6 +765,46 @@ def print_report(reports, wolves, log=print):
 # --- entry ------------------------------------------------------------------
 
 
+def watch(acts, masters, social, wolves, plan_path, interval, dry_run,
+          log=print, once=False):
+    """Keep the delivery fresh: re-gather, rebuild what is stale, repeat.
+
+    The owner's standard is that the megacut is never more than one edit
+    behind, because transcoding is cheap and a stale programme is what gets
+    reviewed and mis-trusted. This is the loop that enforces it.
+
+    It is deliberately a poll, not an inotify watch: the inputs live in git and
+    the outputs live in a Syncthing folder, so an edit can arrive from a
+    rebase, another agent's worktree, or another machine -- none of which
+    generate a local file event. A poll notices all three for the cost of a
+    few hashes.
+
+    Ctrl-C is a clean exit, not a traceback: this is meant to be left running.
+    """
+    import time
+
+    log(f"watching {wolves} every {interval:g}s -- Ctrl-C to stop")
+    rounds = 0
+    try:
+        while True:
+            rounds += 1
+            reports = gather(acts, masters, social, wolves, plan_path)
+            failing = sum(1 for r in reports for f in r.findings
+                          if f.state in FAILING)
+            if failing:
+                log(f"[{rounds}] {failing} stale finding(s); rebuilding")
+                build(acts, masters, social, wolves, plan_path, reports,
+                      reports[-1], dry_run, log=log)
+            else:
+                log(f"[{rounds}] fresh")
+            if once:
+                return 0
+            time.sleep(interval)
+    except KeyboardInterrupt:
+        log("\nstopped")
+        return 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("command", choices=("status", "publish", "build"))
@@ -639,11 +816,37 @@ def main(argv=None):
     ap.add_argument("--running-order", type=Path, default=DEFAULT_RUNNING_ORDER)
     ap.add_argument("--delivery", type=Path, default=DEFAULT_DELIVERY)
     ap.add_argument("--plan", type=Path, default=DEFAULT_PLAN)
+    ap.add_argument("--sources-only", action="store_true",
+                    help="status: check ONLY the inputs->master rung, which "
+                         "needs no footage and no ~/Videos, so it runs on CI")
+    ap.add_argument("--watch", type=float, metavar="SECONDS",
+                    help="build: keep rebuilding whatever goes stale, every "
+                         "SECONDS. Transcoding is cheap; a stale megacut is "
+                         "not")
     args = ap.parse_args(argv)
 
     wolves = args.wolves_root
     acts = parse_running_order(args.running_order)
     masters, social = load_delivery(args.delivery)
+
+    if args.sources_only:
+        # The one check that works with no workspace at all: it reads only
+        # committed files. This is the gate that would have caught acts IV/V
+        # drifting away from a dialogue round nobody rendered (#118).
+        stale = 0
+        for act in acts:
+            if act.prod_file is None:
+                continue
+            report = ActReport(act)
+            check_sources(act, masters.get(act.numeral), report)
+            for f in report.findings:
+                print(f"{act.numeral:4s} {f.node:9s} {f.state:16s} {f.detail}")
+                if f.state == STALE:
+                    stale += 1
+        print(f"\n{stale} act(s) whose inputs moved without a rebuild")
+        # UNDECLARED is a warning, never a gate failure: an act nobody has
+        # taught the tool about must not block every unrelated PR.
+        return 1 if (stale and args.check) else 0
 
     if not wolves.exists():
         # A CI runner has no ~/Videos. The suite must stay green there, and
@@ -659,7 +862,10 @@ def main(argv=None):
         rc = print_report(reports, wolves)
         return rc if args.check else 0
     if args.command == "publish":
-        return publish(acts, masters, wolves)
+        return publish(acts, masters, wolves, args.delivery)
+    if args.watch:
+        return watch(acts, masters, social, wolves, args.plan, args.watch,
+                     args.dry_run)
     reports = gather(acts, masters, social, wolves, args.plan)
     return build(acts, masters, social, wolves, args.plan, reports,
                  reports[-1], args.dry_run)
