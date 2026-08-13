@@ -55,7 +55,31 @@ Segments genuinely disagree, so *some* re-encode is unavoidable:
 | Property | Rule | Why |
 |---|---|---|
 | Frame rate | **60000/1001** | Real sources here run 30/1, 60/1 and 60000/1001. 30 would throw away the 60fps material; 60/1 makes 59.94 material drift against its own audio. |
-| Audio | 48 kHz 5.1, **unprocessed** | The audio tenet: no normaliser, no limiter, no EQ. |
+| Audio | 48 kHz 5.1, **unprocessed** | The audio tenet: no normaliser, no limiter, no EQ. The one exception is an explicit fade the plan states (below). |
 | Silence | **Generated**, length probed | Every segment must carry both streams. A silence source one frame short desynchronises everything after it. |
 | Colour | BT.709, written into the VUI | See the trap below. |
+
+## Fades at the joins (issue #105)
+
+Measured on v0.6 with `tools/transitions.py`: every act join was the same
+shape — the outgoing act faded (or cut) to digital silence, the slide held
+4–14 s of absolute `-inf`, and the next act entered dry, up to −15 dB one
+second after the slide. The fix lives in the plan, not in a hand-render:
+
+- A clip item may carry `fade_in` / `fade_out` in **seconds on the ACT FILM
+  clock** — `fade_in` starts at the clip's own 0, `fade_out` ends at the
+  clip's own end, so a fade can never drift when the running order moves.
+- The segment encode appends `afade` after `aresample`/`aformat`. With no
+  fades declared the chain is byte-identical to before (a test pins this).
+- A `fade_out` needs the clip's length, so it probes the **video** stream
+  when no `dur` is authored — the container duration can be the audio stream
+  outrunning the picture, and a fade placed against that starts early.
+- Cards and silent clips cannot carry fades: fading generated silence is a
+  no-op that reads as a treatment, so the plan validator refuses it. A slide
+  that should carry sound is a licensing decision (a bed), not a fade.
+
+`tools/transitions.py <plan> --measure <built.mp4>` is the before/after
+check: per-second RMS around every join, the silence-run length, and each
+act's exit and entry level — all on the **programme clock**, with the tool
+saying so in its header.
 

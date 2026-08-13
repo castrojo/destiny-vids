@@ -3,13 +3,19 @@
 The whole show as **one continuous video**, assembled from the finished cuts and
 announced by act slides in the Wolves cinematic's own chrome.
 
-**Status: v0.6 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.6.mp4`,
+**Status: v0.7 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.7.mp4`,
 **20:21.9** planned, seven of the eight acts on six slides — acts IV and V
-share one. v0.6 is v0.5 with **act VI's tail plates** burned in: the Cayde-6
-reveal that finally names Jorge Castro, and three gold credits behind it (see
+share one. v0.7 is v0.6 with the **act-join treatment** of
+[#105](https://github.com/castrojo/destiny-vids/issues/105): every act used to
+enter dry out of the slides' digital silence (4–14 s of `-inf` per join, then
+an entry as hot as −15 dB a second later), and acts I and III ended hot
+against it. The plan now carries explicit `fade_in`/`fade_out` shapes per act
+(act-film clock, `afade` at the segment encode, no gain anywhere); durations
+are unchanged, so **no chapter moved**, and v0.6 is kept beside it. Earlier:
+v0.6 added **act VI's tail plates** (the Cayde-6 reveal that finally names
+Jorge Castro, and three gold credits behind it — see
 [`07-seven-days-to-the-wolves.md`](07-seven-days-to-the-wolves.md), "The tail
-plates"). Act VI's duration is unchanged, so **no chapter moved**, and v0.5 is
-kept beside it for comparison. The owner asked for "one
+plates"). The owner asked for "one
 supercut with everything that we have", and .5 was their name for it.
 
 It is **not the feature**. Act VIII, the credits, is not designed (#51), so the
@@ -342,7 +348,7 @@ ffmpeg -ss <seg> -t <len> -i out.mp4 -map a:0 -af volumedetect -f null /dev/null
 
 - Duration equals the sum of the parts — derive it from the plan
   (`python3 tools/megacut.py stories/megacut/megacut.json --dry-run` prints the
-  expected total; 1221.859s for v0.6) rather than trusting a number typed here.
+  expected total; 1221.859s for v0.6 and v0.7 — fades do not move the clock) rather than trusting a number typed here.
 - **Per segment**, the peak matches its source — a re-encode must not lift one.
 - **Colour**: `bt709` primaries, transfer **and** matrix. `-color_primaries`
   describes the *frames*; x264 copies only the matrix from them, so the VUI is
