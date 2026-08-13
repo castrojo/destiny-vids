@@ -354,8 +354,15 @@ def test_burn_builds_one_enable_gated_overlay_per_plate(tmp_path):
 
     chain = captured["cmd"][captured["cmd"].index("-filter_complex") + 1]
     assert chain.count("overlay=") == 2
-    assert "between(t,1.000,6.000)" in chain
-    assert "between(t,8.000,12.000)" in chain
+    # ESCAPED COMMAS, NO SHELL QUOTES. This assertion used to read
+    # `between(t,1.000,6.000)`, which is the documented command-line spelling
+    # and is wrong here: the command is an argv list that never sees a shell,
+    # so ffmpeg got the quotes literally, failed to parse the expression,
+    # disabled every overlay and exited 0 — burning a video with no plates on
+    # it. The test agreed with the bug, so nothing caught it.
+    assert "between(t\\,1.000\\,6.000)" in chain
+    assert "between(t\\,8.000\\,12.000)" in chain
+    assert "'" not in chain, "shell quotes cannot survive an argv filtergraph"
     # audio is carried through, not re-encoded
     assert "-c:a" in captured["cmd"] and "copy" in captured["cmd"]
 
