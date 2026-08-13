@@ -18,8 +18,14 @@ along in the heading and are restored verbatim -- and a line the owner changes
 is recorded as changed rather than silently overwriting the recovered text:
 
     "text":           what goes on screen
-    "text_source":    "recovered" (default) or "owner_supplied"
-    "recovered_text": the original, kept whenever the owner replaced it
+    "text_source":    "recovered" (default), "owner_supplied", or
+                      "placeholder" -- a beat blocked out before its words
+                      exist. A blank line is NOT an error: it used to fail the
+                      whole file, so one unwritten line cost every other edit
+                      in it. It is kept, marked, and rendered as lorem
+                      credited to nobody (`tools/placeholder.py`).
+    "recovered_text": the original, kept whenever the owner replaced it --
+                      including when they cleared the line back to a slot
 
 That last field is the point. The repo's rule is that on-screen copy is never
 *invented by an agent*; the owner supplying their own line is allowed, and the
@@ -183,6 +189,7 @@ def parse(text, leads):
     flush()
 
     seen = set()
+    placeholders = []
     for cue in cues:
         if cue["id"] in seen:
             raise ValueError(f"duplicate cue id {cue['id']!r}")
@@ -190,7 +197,21 @@ def parse(text, leads):
         if cue["end_sec"] <= cue["start_sec"]:
             raise ValueError(f"cue {cue['id']!r} ends before it starts")
         if not cue["text"]:
-            raise ValueError(f"cue {cue['id']!r} has no text")
+            # A line the owner has not written yet is NOT an error, and used
+            # to fail the whole file -- so one blank line cost every other
+            # edit in it. It becomes a placeholder: the timecodes and the
+            # speaker evidence are kept, the words are left empty, and
+            # `text_source` says so. The lorem is NOT baked in here on
+            # purpose. `tools/placeholder.py` fills it at render time, which
+            # is also where it swaps the speaker for `TBD` -- bake the words
+            # in and the plate would render lorem under this cue's real
+            # character, which is the one thing a placeholder may never do.
+            cue["text_source"] = "placeholder"
+            placeholders.append(cue["id"])
+    if placeholders:
+        print(f"dialogue: {len(placeholders)} cue(s) with no words yet -- "
+              f"kept as placeholders: {', '.join(placeholders)}",
+              file=sys.stderr)
     return cues
 
 
@@ -207,6 +228,10 @@ def merge(data, edited):
     for cue in edited:
         previous = original.get(cue["id"])
         if previous is None:
+            # A brand-new cue with no words is the owner blocking out a beat
+            # before writing it -- a slot, not a line. `owner_supplied` would
+            # claim they wrote something; `placeholder` says they have not.
+            blank = not cue["text"]
             cues.append({
                 "id": cue["id"],
                 "start_sec": round(cue["start_sec"], 2),
@@ -214,18 +239,27 @@ def merge(data, edited):
                 "character": cue["character"],
                 "evidence": "owner_supplied",
                 "text": cue["text"],
-                "text_source": "owner_supplied",
+                "text_source": "placeholder" if blank else "owner_supplied",
             })
-            changes.append(f"  + {cue['id']} added: {cue['text'][:56]}")
+            changes.append(
+                f"  + {cue['id']} added: "
+                f"{'(placeholder -- no words yet)' if blank else cue['text'][:56]}")
             continue
 
         merged = dict(previous)
         recovered = previous.get("recovered_text", previous.get("text", ""))
         if cue["text"] != previous.get("text"):
             merged["text"] = cue["text"]
-            merged["text_source"] = "owner_supplied"
+            # Emptying a line is not rewording it to nothing: it is handing the
+            # slot back as unwritten. The recovered text is still kept beside
+            # it, so clearing a line never destroys what was recovered.
+            merged["text_source"] = ("placeholder" if not cue["text"]
+                                     else "owner_supplied")
             merged["recovered_text"] = recovered
-            changes.append(f"  ~ {cue['id']} reworded: {cue['text'][:56]}")
+            changes.append(
+                f"  ~ {cue['id']} "
+                + ("cleared to a placeholder" if not cue["text"]
+                   else f"reworded: {cue['text'][:56]}"))
         if cue["character"] != previous.get("character"):
             merged["character"] = cue["character"]
             merged["evidence"] = "owner_supplied"
