@@ -19,14 +19,70 @@ file in it is a regenerated artifact.
 filenames'.** `NN-` is the act number, which is fixed: act VIII has no film, so
 the numbering has a gap and closing it would renumber the show.
 
-**`Prod/` is hardlinks** to each project's master, so it costs no disk and
-cannot drift from what built it. Re-link with `ln -f`; `cp` over an existing
-entry breaks the link silently and leaves a copy that goes stale.
+**`Prod/` is hardlinks** to each project's master, so it costs no disk. The
+link itself cannot drift — but everything downstream of it can and has:
+checksums go stale under a re-link, the megacut keeps playing yesterday's
+acts, social copies go missing, and the README keeps naming last week's
+master. That is what `tools/deliver.py` is for.
 
 **Refresh only your own line in `CHECKSUMS.md5`.** Rewriting the whole file
 asserts that every act in it is correct, and you only built one. A failing line
 for somebody else's act is a report, not a chore — act I's line was stale for
-exactly this reason and was deliberately left alone.
+exactly this reason and was deliberately left alone. The exception is
+`deliver.py publish`: it recomputes every line before it rewrites the file,
+so the assertion it writes is the one it checked.
+
+## The delivery graph: `tools/deliver.py`
+
+The chain is `master -> Prod/NN-act.mp4 -> megacut/<version>.mp4 ->
+10mb/NN-act.mp4`, and drift anywhere along it is the owner's "my copies are
+many revisions late" complaint. The graph is now a tool:
+
+```bash
+python3 tools/deliver.py status            # what is stale and why, in dependency order
+python3 tools/deliver.py status --check    # the same, as a gate (exit 1 on any staleness)
+python3 tools/deliver.py publish           # re-link Prod/, regen CHECKSUMS.md5 + the README table
+python3 tools/deliver.py build --dry-run   # what a rebuild would run
+python3 tools/deliver.py build             # rebuild the stale: megacut, then social copies
+```
+
+The **acts and their order come from `docs/running-order.md`**, parsed from
+its table — deliver.py carries no act list of its own, and act VIII's missing
+film is reported as by-design, never as an error. The **declared masters**
+(and the acts that deliberately have no social copy) live in
+[`stories/megacut/delivery.json`](../../../../stories/megacut/delivery.json),
+keyed by act numeral. That file is intent; `publish` is the only thing that
+makes `Prod/` match it, and it never uses `cp`.
+
+Staleness is content-based where it can be, because `~/Videos` is a Syncthing
+folder and mtimes lie: the hardlink layer is checked by **inode identity**
+against the declared master, `CHECKSUMS.md5` by recomputation, and the
+README's master table is **generated** between `<!-- deliver:table -->`
+markers so a hand-edit that disagrees with the map is detected as drift. The
+megacut is a re-encode, so mtime against Prod is the signal there, plus a
+duration check against the plan's own arithmetic when ffprobe is available —
+which is also what catches a build still being written.
+
+Two deliberate behaviours, both learned the hard way on 2026-08-13:
+
+- **`publish` never downgrades.** When a Prod entry and its declared master
+  disagree in content, only the newer side may win. A declared master that is
+  *older* than what Prod carries is a conflict — reported, not re-linked —
+  because re-linking it would silently revert the show. (Act II: the #98
+  build's only twin lived in `dv-wt/feat-98-act2-overlay`, a worktree whose
+  merge deletes it, while the main checkout's `renders/efmb-plated.mp4` was a
+  revision behind.)
+- **`publish` is the re-link `tools/peaks.py trim` defers to.** `peaks.py`
+  corrects a master by `os.replace`ing it with a new inode *on purpose*, so a
+  corrected master never silently rewrites its twin — and every such
+  correction leaves the Prod link detached until `deliver.py publish`
+  re-attaches it. Master gate, then publish: that is the whole loop.
+
+`status` without `--check` always exits 0 once it has printed: a stale
+deliverable is a punch-list item, not a build failure, and the suite runs it
+against the real workspace as a report (`tests/test_deliver.py`) that stays
+green while the owner is mid-edit — and on machines with no `~/Videos` at
+all.
 
 **Verify a titled deliverable by looking at a frame.** A cut that gained
 nameplates is not verified by its duration, its checksum or ffmpeg's exit code:
@@ -124,8 +180,9 @@ already been learned the hard way and must not be re-learned:
   runs the same measured delivered-peak loop on a finished lossless file —
   one derived static gain on the audio, video stream copied untouched — and a
   master build should end with it. Note it detaches hardlinks by design (the
-  corrected file is a new inode, never an in-place rewrite), so re-link
-  `Prod/` afterwards with `ln -f`.
+  corrected file is a new inode, never an in-place rewrite), so the master
+  gate is always followed by `python3 tools/deliver.py publish` to re-link
+  `Prod/` — that re-link is the step `peaks.py` deliberately does not do.
 - `ACODEC=flac` builds a **lossless master** alongside the deliverable, so a
   later fold-down starts from the bed rather than from a lossy file. The
   default stays `aac`, and the defaults must keep rebuilding the shipped file.
