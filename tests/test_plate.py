@@ -2002,3 +2002,160 @@ def test_a_bronze_card_renders_and_differs_from_silver_and_gold():
     # Same geometry, different metal: chrome only, as every variant here.
     assert len({img.size for img in ranks.values()}) == 1
     assert len({img.tobytes() for img in ranks.values()}) == 3
+
+
+# --- the companion card (the site's GUARDIAN BOND, ported) -------------------
+
+def _companion(**kw):
+    spec = {"id": "karl", "kind": "companion", "at": 12.5, "dur": 10.0,
+            "position": "right", "bond_of": "kat", "name": "Karl",
+            "species": "Amargasaurus cazaui", "species_id": "karl"}
+    spec.update(kw)
+    return spec
+
+
+def test_companion_card_carries_the_sites_three_rows():
+    """A fifth card shape, and closed like the rest: the fixed GUARDIAN BOND
+    label, the dinosaur's authored name, and the species' scientific name."""
+    img = plate.render_plate(_companion(art=None))
+    assert img.width > 0 and img.height > 0
+    assert plate.COMPANION_LABEL == "GUARDIAN BOND"
+
+
+def test_an_unnamed_bond_omits_the_name_row_instead_of_inventing_one():
+    """Bob Killen's bond record carries no `dinosaurName`, and the site's own
+    `v-if` drops the row. A name nobody authored is never composed for it."""
+    named = plate.render_plate(_companion(art=None))
+    unnamed = plate.render_plate(_companion(id="torosaurus", name=None,
+                                            species="Torosaurus latus",
+                                            species_id="bob-torosaurus",
+                                            art=None))
+    assert unnamed.height < named.height, "the name row was not dropped"
+
+
+def test_missing_artwork_degrades_to_the_card_rather_than_crashing():
+    """Degrade, never block: a bond that renders without its picture still
+    credits the bond."""
+    img = plate.render_plate(_companion(art="renders/companions/nope.webp"))
+    assert img.width > 0 and img.height > 0
+
+
+def test_a_companion_may_share_the_row_with_the_guardian_it_names():
+    entries = [
+        {"id": "kat", "at": 12.5, "dur": 10.0, "position": "left",
+         "label": "MAINTAINER // GUARDIAN", "class": "Sentinel Titan",
+         "name": "Kat Cosgrove", "title": "Defender Queen of the Lost"},
+        _companion(art=None),
+    ]
+    plate.load_manifest_entries(entries)  # must not raise
+
+
+def test_a_companion_may_not_overlap_somebody_elses_plate():
+    """The exemption is NAMED -- `bond_of` -- precisely so it cannot spread."""
+    entries = [
+        {"id": "kaslin", "at": 12.5, "dur": 10.0, "position": "left",
+         "label": "MAINTAINER // GUARDIAN", "name": "Kaslin Fields"},
+        _companion(art=None),
+    ]
+    with pytest.raises(ValueError, match="visible at the same time"):
+        plate.load_manifest_entries(entries)
+
+
+def test_the_species_row_is_italic_because_the_site_sets_it_that_way():
+    """`font-style: italic` on .wolves-companion-plate-species -- the only
+    italic row in the deck."""
+    assert plate._font("italic", 16).path != plate._font("regular", 16).path
+
+
+def test_alamos_artwork_clears_natalis_raised_plate():
+    """A capped picture, because a covered credit is worse than a small
+    dinosaur. Verified on the burned frame at t=90 first, then pinned here."""
+    import json
+    manifest = json.load(open(
+        os.path.join(os.path.dirname(__file__), "..", "stories", "megacut",
+                     "megacut-hero-plates.json"), encoding="utf-8"))
+    plates = {p["id"]: p for p in manifest["plates"]}
+    natali, alamo = plates["natali"], plates["natali-alamo"]
+    nb = plate.place(plate.render_plate(natali), natali["position"],
+                     raised=bool(natali.get("raised"))).getbbox()
+    ab = plate.place(plate.render_plate(alamo), alamo["position"]).getbbox()
+    assert ab[1] > nb[3], "Alamo's artwork is back over Natali's name"
+
+
+# --- the walk's two new cards ------------------------------------------------
+
+def test_the_miniboss_bar_carries_only_name_and_title():
+    """Destiny's boss-bar treatment in the owner's red. It names a VILLAIN,
+    which is the only reason it may carry copy no identity was authored for --
+    and it still adds no row the deck has no field for."""
+    img = plate.render_plate({
+        "id": "kr", "kind": "miniboss", "name": "KERNEL REGRESSION",
+        "title": "Enslaver of Maintainers | Ruiner of User Experience"})
+    assert img.width > 0 and img.height > 0
+    # It is red, not Destiny's own Major orange: the owner asked for a red badge.
+    assert plate.MINIBOSS_RED[:3] == (220, 38, 38)
+    reds = sum(1 for r, g, b, a in img.convert("RGBA").getdata()
+               if a > 40 and r > 150 and g < 90 and b < 90)
+    assert reds > 500, "the bar and its rule are not drawn"
+
+
+def test_the_boss_bar_sits_at_the_top_of_frame():
+    placed = plate.place(plate.render_plate({
+        "id": "kr", "kind": "miniboss", "name": "KERNEL REGRESSION"}), "boss")
+    box = placed.getbbox()
+    assert box[1] < plate.FRAME_H * 0.25, "a boss bar is not a lower third"
+
+
+def test_the_achievement_toast_is_xbox_green_and_sits_clear_of_the_lower_third():
+    img = plate.render_plate({"id": "a", "kind": "achievement",
+                              "name": "Mailing List Bullshit", "score": "100 G"})
+    assert plate.XBOX_GREEN[:3] == (16, 124, 16)   # #107C10, the brand green
+    assert img.width > 0
+    placed = plate.place(img, "toast")
+    box = placed.getbbox()
+    assert box[1] < plate.FRAME_H * 0.25
+    assert box[3] < plate.FRAME_H * 0.5
+
+
+def test_the_boss_bar_and_the_toast_share_a_row_so_never_share_a_moment():
+    """Both live at the top of frame. The status HUD is exempt against them
+    because it is at the bottom; these two are not exempt against each other."""
+    entries = [
+        {"id": "toast", "kind": "achievement", "at": 10.0, "dur": 3.0,
+         "name": "Sent It Upstream"},
+        {"id": "boss", "kind": "miniboss", "at": 11.0, "dur": 3.0,
+         "name": "KERNEL REGRESSION"},
+    ]
+    with pytest.raises(ValueError, match="visible at the same time"):
+        plate.load_manifest_entries(entries)
+
+
+def test_the_bottom_status_card_clears_the_dialogue_pill():
+    """Owner instruction for the patch queue: 'a status thing in the bottom'.
+    The chat pills hold the bottom left, so it goes bottom right -- the status
+    exemption assumes the two are not in the same corner."""
+    hud = plate.place(plate.render_plate(
+        {"id": "q", "kind": "status", "detail": "UPSTREAM PATCH QUEUE",
+         "label": "KERNEL 6.11-RC"}), "status-bottom").getbbox()
+    pill = plate.place(plate.render_plate(
+        {"id": "c", "kind": "chat", "speaker": "GloriousEggroll",
+         "text": "There's nothing glorious about this job"}), "left").getbbox()
+    assert hud[3] > plate.FRAME_H * 0.5, "the queue is not at the bottom"
+    assert hud[0] > pill[2], "the queue overlaps the dialogue pill"
+
+
+def test_nobara_chrome_is_sampled_from_the_official_icon():
+    """#3E3FC5 is the icon's dominant fill and the brand's own Governor Bay.
+    Recalling a colour for somebody's project is the same class of mistake as
+    recalling a word for somebody's plate."""
+    assert plate.VARIANTS["nobara"]["accent"][:3] == (62, 63, 197)
+    assert plate.VARIANTS["nobara"]["accent"] != plate.VARIANTS["bazzite"]["accent"]
+    assert plate.BRAND_MARKS["nobara"].endswith("nobara.png")
+    # A creator's own avatar is their brand: no platform mark is put on it.
+    assert "youtube" not in plate.BRAND_MARKS
+
+
+def test_a_missing_brand_mark_degrades_to_the_drawn_crest():
+    img = plate.render_plate({"id": "x", "name": "Nobody", "variant": "nobara",
+                              "mark": "renders/marks/nope.png"})
+    assert img.width > 0 and img.height > 0

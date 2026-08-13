@@ -15,6 +15,18 @@
       "note": "OWNER-AUTHORED this round, verbatim, including the spelling 'Weilder' -- authored copy is reproduced, never silently corrected (issue #90). Window unchanged: it is Bob's, source 5 - 14.5, shortened from the frame-accurate 17.5 by explicit owner request (2026-07-18); do NOT 'fix' it back. The SUBCLASS ROW IS OMITTED, not forgotten: the owner wrote 'whatever the Void subclass is', and Void subclasses are class-specific -- Voidwalker (Warlock), Sentinel (Titan), Nightstalker (Hunter) -- so it needs her class first. A missing row is left out; a guessed one would put a word about a real person on screen under the owner's name. Issue #90, and this largely answers #59."
     },
     {
+      "id": "cortney-bond",
+      "kind": "companion",
+      "at": 3.0,
+      "dur": 9.5,
+      "position": "right",
+      "species": "Torosaurus latus",
+      "species_id": "bob-torosaurus",
+      "art": "renders/companions/bob-torosaurus.webp",
+      "note": "OWNER DECISION this round: Cortney inherits the Torosaurus. The bond record is Bob Killen's (wolves-guardian-dinosaur-bonds.ts, `{guardianName: 'Bob Killen', dinosaurSpeciesId: 'bob-torosaurus'}`), and a bond does NOT follow a recast by itself -- the owner was asked and said it does here. NO NAME ROW: that record carries no `dinosaurName`, so no character sheet names this animal, and the site omits the row too. Shares Cortney's window and her `group`, which is what the site's row is: her plate on the left, the bond on the right.",
+      "bond_of": "cortney"
+    },
+    {
       "id": "kat",
       "at": 12.5,
       "dur": 10.0,
@@ -26,50 +38,17 @@
       "note": "source window 14.5 - 24.5. Deliberately cued AHEAD of the frame-verified footage cut at 17.5 (explicit owner request, 2026-07-18)."
     },
     {
-      "id": "kaslin",
-      "at": 38.0,
-      "dur": 8.0,
-      "position": "left",
-      "label": "MAINTAINER // GUARDIAN",
-      "class": "Stormcaller Warlock",
-      "name": "Kaslin Fields",
-      "title": "Rage of the Paradox",
-      "note": "source window 40 - 48, beginning on her visible electric reveal."
-    },
-    {
-      "id": "orlin",
-      "at": 68.5,
-      "dur": 6.5,
-      "position": "left",
-      "name": "Orlin",
-      "note": "RECAST, owner instruction (editorial pass, this session): \"laura santamaria is orlin\". Source window 70.5 - 77, unchanged. NAME ONLY, and the string is the owner's own, verbatim: no Guardian identity is authored for Orlin in nameplates.json, characters.json or vocab/casting.yaml, and no surname was given -- so Laura's label, subclass and title are OMITTED rather than inherited. Two things stay open and are recorded rather than guessed: which person 'orlin' names, and whether the recast reaches the Europa director's cut, which still credits Laura Santamaria. Neither is automatable."
-    },
-    {
-      "id": "christoph",
-      "at": 83.0,
+      "id": "kat-karl",
+      "kind": "companion",
+      "at": 12.5,
       "dur": 10.0,
-      "position": "left",
-      "label": "TRUSTEE // GUARDIAN",
-      "class": "Broodweaver Warlock",
-      "name": "Christoph Blecker",
-      "title": "First Among Equals \u2014 The North Star",
-      "trustee": true,
-      "variant": "leader",
-      "group": "christoph-natali",
-      "note": "source window 85 - 95. Shares the shot with Natali from ~89.5; the two carry opposite `position` values so they render side by side instead of stacking. Leader gold outranks trustee silver, matching the CSS precedence. His plate ends a second before hers so the two do not linger together after his shot has settled."
-    },
-    {
-      "id": "natali",
-      "at": 87.5,
-      "dur": 6.5,
       "position": "right",
-      "label": "MAINTAINER // GUARDIAN",
-      "class": "Behemoth Titan",
-      "name": "Natali Vlatko",
-      "title": "Shipwright of Kubernetes",
-      "group": "christoph-natali",
-      "note": "source window 89.5 - 96. Shares the `group` row with Christoph: the two ARE meant to be visible together (that is why they carry opposite `position` values), which is exactly the exemption tools/plate.py's overlap check reserves for a group row. TITLE DISCREPANCY, owner decision: a comment in wolves-intro-sequence.ts says her title line is 'Punch first, document later.' per explicit user request, while her own overlay string AND characters.json both say 'Shipwright of Kubernetes'. The two agreeing authored sources are used here; picking between two authored strings on a real colleague's card is not automatable. The live overlay also gives her plate a `raised` vertical offset, which tools/plate.py has no equivalent for -- see unresolved below.",
-      "raised": true
+      "name": "Karl",
+      "species": "Amargasaurus cazaui",
+      "species_id": "karl",
+      "art": "renders/companions/karl.webp",
+      "note": "Kat Cosgrove's documented bond. Name and species reproduced from wolves-guardian-dinosaur-bonds.ts + wolves-dinosaur-species.ts; nothing here is composed.",
+      "bond_of": "kat"
     },
     {
       "id": "title-cover",
@@ -118,6 +97,80 @@
           ]
         }
       ]
+    },
+    {
+      "id": "kaslin",
+      "at": 38.0,
+      "dur": 8.0,
+      "position": "left",
+      "label": "MAINTAINER // GUARDIAN",
+      "class": "Stormcaller Warlock",
+      "name": "Kaslin Fields",
+      "title": "Rage of the Paradox",
+      "note": "source window 40 - 48, beginning on her visible electric reveal."
+    },
+    {
+      "id": "kaslin-katerina",
+      "kind": "companion",
+      "at": 38.0,
+      "dur": 8.0,
+      "position": "right",
+      "name": "Katerina",
+      "species": "Kentrosaurus aethiopicus",
+      "species_id": "kentrosaurus",
+      "art": "renders/companions/kentrosaurus.webp",
+      "note": "Kaslin Fields' documented bond. The species' artwork on the site is `./characters/header/katharina.webp` -- the file name differs from the dinosaur's authored name, and the ARTWORK PATH is what was reproduced, not the file name.",
+      "bond_of": "kaslin"
+    },
+    {
+      "id": "orlin",
+      "at": 68.5,
+      "dur": 6.5,
+      "position": "left",
+      "name": "Orlin",
+      "note": "RECAST, owner instruction (editorial pass, this session): \"laura santamaria is orlin\". Source window 70.5 - 77, unchanged. NAME ONLY, and the string is the owner's own, verbatim: no Guardian identity is authored for Orlin in nameplates.json, characters.json or vocab/casting.yaml, and no surname was given -- so Laura's label, subclass and title are OMITTED rather than inherited. Two things stay open and are recorded rather than guessed: which person 'orlin' names, and whether the recast reaches the Europa director's cut, which still credits Laura Santamaria. Neither is automatable."
+    },
+    {
+      "id": "christoph",
+      "at": 83.0,
+      "dur": 10.0,
+      "position": "left",
+      "label": "TRUSTEE // GUARDIAN",
+      "class": "Broodweaver Warlock",
+      "name": "Christoph Blecker",
+      "title": "First Among Equals — The North Star",
+      "trustee": true,
+      "variant": "leader",
+      "group": "christoph-natali",
+      "note": "source window 85 - 95. Shares the shot with Natali from ~89.5; the two carry opposite `position` values so they render side by side instead of stacking. Leader gold outranks trustee silver, matching the CSS precedence. His plate ends a second before hers so the two do not linger together after his shot has settled."
+    },
+    {
+      "id": "natali",
+      "at": 87.5,
+      "dur": 6.5,
+      "position": "right",
+      "label": "MAINTAINER // GUARDIAN",
+      "class": "Behemoth Titan",
+      "name": "Natali Vlatko",
+      "title": "Shipwright of Kubernetes",
+      "group": "christoph-natali",
+      "note": "source window 89.5 - 96. Shares the `group` row with Christoph: the two ARE meant to be visible together (that is why they carry opposite `position` values), which is exactly the exemption tools/plate.py's overlap check reserves for a group row. TITLE DISCREPANCY, owner decision: a comment in wolves-intro-sequence.ts says her title line is 'Punch first, document later.' per explicit user request, while her own overlay string AND characters.json both say 'Shipwright of Kubernetes'. The two agreeing authored sources are used here; picking between two authored strings on a real colleague's card is not automatable. The live overlay also gives her plate a `raised` vertical offset, which tools/plate.py has no equivalent for -- see unresolved below.",
+      "raised": true
+    },
+    {
+      "id": "natali-alamo",
+      "kind": "companion",
+      "at": 87.5,
+      "dur": 6.5,
+      "position": "right",
+      "name": "Alamo",
+      "species": "Alamosaurus sanjuanensis",
+      "species_id": "alamosaurus",
+      "art": "renders/companions/alamosaurus.webp",
+      "note": "Natali Vlatko's documented bond. Takes the christoph-natali group rather than a new one: three cards are visible together in this shot and that row is exactly what the group exemption is for. Natali's own plate is `raised` (top 28%) and the bond sits at the row's bottom right, so they do not stack -- the same separation the site gets from `position: fixed; right: 5%; bottom: 10%`. ART CAPPED at 200px, and this is a FRAME JUDGEMENT, not a proportion: at full height Alamo's artwork rose to y=379 and covered 'Natali Vlatko' and 'Shipwright of Kubernetes' on her raised plate -- verified on the burned frame at t=90, not in the manifest. Capped, the card's top sits at 640 against her plate's bottom at 611. The site has no such cap because nothing there is 1920x1080 with a raised plate above the bond; here a legible credit outranks the artwork's scale.",
+      "bond_of": "natali",
+      "group": "christoph-natali",
+      "art_max_h": 200
     }
   ],
   "unresolved": [
@@ -183,5 +236,6 @@
     }
   ],
   "_hud_removed": "The site's top-of-frame HUD nameplate is deliberately NOT burned in (owner decision, 2026-08-12: 'remove \"a project to bring their stories to life\", just the name plaquards'). That drops the persistent default card, the three #nova4ever glitch bursts and the closing 'Legends Sought' card -- every status row -- leaving only the six Guardian nameplates. tools/plate.py still renders `kind: \"status\"` and is tested, so restoring any of them is a manifest edit, not new code.",
-  "_comic": "Replaced 2026-08-12 by the TITLE COVER (`title-cover`). It previously held 23 full-frame comic cards cycling the site's hero shots over the MakeMeAComic QR panel and the Amber Graner quote, reproduced from `.wolves-intro-overlay-title-card` in WolvesIntroOverlay.vue. That cycle, its QR and its quote are gone from act I; the window (22.5 - 36.0) and its reason for starting at 22.5 rather than the site's 24 -- so it cannot overlap Kat's plate -- are unchanged."
+  "_comic": "Replaced 2026-08-12 by the TITLE COVER (`title-cover`). It previously held 23 full-frame comic cards cycling the site's hero shots over the MakeMeAComic QR panel and the Amber Graner quote, reproduced from `.wolves-intro-overlay-title-card` in WolvesIntroOverlay.vue. That cycle, its QR and its quote are gone from act I; the window (22.5 - 36.0) and its reason for starting at 22.5 rather than the site's 24 -- so it cannot overlap Kat's plate -- are unchanged.",
+  "_companions": "The GUARDIAN BOND cards, ported from the live overlay this round (owner: 'Intro missing dinosaur companions from port. Alamo, karl, etc.'). Every bond is READ from ~/src/website/src/data/wolves-guardian-dinosaur-bonds.ts and its species from wolves-dinosaur-species.ts -- four bonds exist and all four are here. Orlin gets none: the bond list keys on the guardian NAME, it has no entry for Orlin, and Laura Santamaria has none either, so there is nothing to inherit even if the owner wanted it. Artwork is cached by scripts/fetch_companion_art.py into renders/ (gitignored) -- the renderer never reaches outside the repo and never touches the network."
 }

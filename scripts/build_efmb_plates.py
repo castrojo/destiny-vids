@@ -120,13 +120,11 @@ TRIO = [
 ]
 
 # One person, one shot. Each verified by eye at the frame named in `seen`.
+# REMOVED, owner instruction for "The Long Walk": William Rizzo's credit sat
+# at source 185.233 -- inside the new chapter, whose whole brief is "No other
+# guardians". His authored copy stays in vocab/casting.yaml; only the
+# SCHEDULING is gone, so nothing about his identity was lost with it.
 SOLO = [
-    {
-        "key": "wrkode",
-        "src": (185.233, 188.067),
-        "seen": 185.502,
-        "why": "the lone Hunter walking the Dreadnaught, Ghost at his shoulder",
-    },
     {
         "key": "KyleGospo",
         "src": (335.267, 339.767),
@@ -161,12 +159,15 @@ SOLO = [
 PLACEHOLDERS = [
     {"key": "dylan_taylor", "src": (147.633, 150.533), "seen": 148.500,
      "why": "the Titan walking out of the dark"},
-    # RE-ANCHORED. He was on 171.800 -> 174.433, which ends under Bungie's
-    # burned-in "BECOME LEGEND" -- the plate went up and the publisher's title
-    # came up with it. Found by looking at the burned film rather than at the
-    # manifest, which is the only place it was ever going to show.
-    {"key": "ahmedadan", "src": (241.167, 244.833), "seen": 242.500,
-     "why": "three Guardians, supers lit, before the throne"},
+    # AHMED ADAN'S BADGE IS REMOVED, owner instruction: "get rid of the
+    # hanthor plate, ahmed, etc. here". It sat at source 241.167 (film
+    # 3:37.3), at the end of "The Long Walk" and directly after the villain
+    # arrives. He was ALREADY re-anchored once, off 171.800 where the plate
+    # came up under Bungie's burned-in "BECOME LEGEND"; this time the chapter
+    # itself is what displaces him.
+    #
+    # He stays in ensemble.placeholders, which is the queue that owes him a
+    # plate -- nothing about his standing changed, only where act II had room.
 ]
 
 # The blueberries -- the month's contributors, in the anonymous slots. Copy is
@@ -174,13 +175,14 @@ PLACEHOLDERS = [
 # identity IS authored gets it verbatim and everyone else gets the generic
 # blueberry plate with the eyebrow their org membership earns. Leads are
 # excluded: castrojo is Cayde-6 and is credited only where Cayde is on screen.
+# TWO SHOTS REMOVED, same instruction. 195.267 (HuntedRaven7, film 2:51.4)
+# and 233.500 (hanthor, film 3:29.6) are both inside "The Long Walk". The
+# roster is walked in order against this list, so dropping two shots does not
+# reshuffle who played whom -- it shortens the list, and the two contributors
+# it reached are reported in `unresolved` rather than silently dropped.
 BLUEBERRY_SHOTS = [
     {"src": (90.767, 96.500), "seen": 92.500,
      "why": "the hooded Hunter and his Ghost, close"},
-    {"src": (195.267, 198.967), "seen": 196.500,
-     "why": "two Guardians climbing the stair into the light"},
-    {"src": (233.500, 238.200), "seen": 235.000,
-     "why": "the Guardian reaching out over the neon city"},
 ]
 BLUEBERRY_EXCLUDE = {"castrojo"}  # a lead; see the comment above
 
@@ -287,6 +289,153 @@ RANK_CHROME = {
     "gold": {"variant": "leader"},
 }
 
+# --- "THE LONG WALK" (owner brief, this round) -----------------------------
+#
+# A chapter inside act II, in the jungle: GloriousEggroll walking with Nobara
+# chrome, HikariKnight and A1RM4X as his peers, and NOBODY ELSE -- "No other
+# guardians", which is why Rizzo, HuntedRaven7, hanthor and Ahmed Adan came
+# out of the lists above.
+#
+# TWO CLOCKS AGAIN, AND THEY ARE NOT THE ONES ISSUE #98 USED. The owner gave
+# this round's marks off the MEGACUT (`tools/megacut.py --locate`), where act
+# II's film sits at +2:01.567; issue #98's marks were act II FILM time. The
+# conversion was not assumed, it was proved on the frame: at megacut 5:35 the
+# extracted frame still carries hanthor's plate, and act II's own 4:59 is
+# black tail, so the standalone reading is impossible.
+#
+#   megacut 4:30 -> film 148.433 -> source 166.199   the walk
+#   megacut 4:59 -> film 177.433 -> source 201.299   "turn the stream on"
+#   megacut 5:08 -> film 186.433 -> source 210.299   the green-eyed enemies
+#   megacut 5:28 -> film 206.433 -> source 230.299   he turns around
+#   megacut 5:35 -> film 213.433 -> source 237.299   the villain
+#
+# Every anchor below is therefore a SOURCE timecode, like every other window
+# in this file, and each one was snapped to a measured shot boundary and then
+# looked at on a contact sheet.
+WALK_IN = 165.567          # two Guardians walking, green forest -- the chapter
+WALK_ENEMIES = 210.200     # the helmet close-up, teal eyes lit behind it
+WALK_VILLAIN = 238.200     # the winged figure: "Say hello to ..."
+WALK_OUT = 244.832         # run 4's last frame; nothing here may cross it
+
+# The owner's own marks, where a cue is timed to one rather than to a shot.
+WALK_MARK_STREAM = 201.299     # "4:59 Alright A1RMAX turn the stream on"
+WALK_MARK_UPSTREAM = 210.299   # "5:08 he says ..."
+
+# THE CHAPTER CARD. `kind: "title"` is the deck's own title card, so this adds
+# no renderer: `title` over `subtitle`, and no third row.
+#
+# Both strings are the owner's, verbatim and from the same brief: he wrote the
+# chapter in as "Glorious Eggroll and the new kids ..." and then named it --
+# 'Make this one "The Long Walk"'. The name is the title and the line he wrote
+# it in as is the subtitle; the ellipsis is his.
+# TODO(owner): if the subtitle is not wanted, delete it -- it is reproduced,
+# not required.
+WALK_CARD = {
+    "title": "The Long Walk",
+    "subtitle": "Glorious Eggroll and the new kids ...",
+}
+
+# THE SCENE, IN ORDER. One lane, one card at a time: a plate arrives, then the
+# lines that follow it, then the next plate.
+#
+# `src` anchors a cue to a measured shot boundary; `at_src` pins one to a mark
+# the OWNER gave (see the conversion table above). A cue with neither simply
+# follows the previous one -- the whole list is chained, so a boundary that
+# moves slides the scene rather than reordering it.
+#
+# Copy for a `plate` comes from vocab/casting.yaml like every other credit
+# here. Every `line` is the owner's, verbatim, including the swearing and his
+# own spelling of "A1RMAX" inside his line -- his transcription of a name
+# stays as he typed it, while the CARD carries the channel's own @A1RM4X.
+WALK_SEQUENCE = [
+    {"cue": "plate", "key": "GloriousEggroll", "src": 180.533, "hold": 4.0,
+     "why": "he takes the frame after the title, walking"},
+    {"cue": "line", "id": "walk_ge_1", "speaker": "GloriousEggroll",
+     "text": "Watch how I do it", "hold": 2.6},
+    {"cue": "line", "id": "walk_ge_2", "speaker": "GloriousEggroll",
+     "text": "Half the trick is looking good", "hold": 2.6},
+    {"cue": "line", "id": "walk_ge_3", "speaker": "GloriousEggroll",
+     "text": "This Nobara Horse Armor Proton Edition will slay", "hold": 3.4},
+    {"cue": "plate", "key": "HikariKnight", "src": 193.800, "hold": 2.8,
+     "why": "the peer beside him -- Kyle's chrome, Kyle's label"},
+    # 195.267 is the shot HuntedRaven7's credit used to hold. It is free now,
+    # and putting A1RM4X there is what lets the next line land ON the owner's
+    # 4:59 instead of 1.3 s late behind a plate.
+    {"cue": "plate", "key": "A1RM4X", "src": 195.267, "hold": 3.0,
+     "why": "up before the line that talks to him"},
+    {"cue": "line", "id": "walk_ge_stream", "speaker": "GloriousEggroll",
+     "text": "Alright A1RMAX turn the stream on", "hold": 2.6,
+     "at_src": WALK_MARK_STREAM},
+    {"cue": "line", "id": "walk_a1rm4x", "speaker": "A1RM4X",
+     "text": "When can we see Shuah and Greg?", "hold": 2.6},
+    {"cue": "line", "id": "walk_ge_soundcard", "speaker": "GloriousEggroll",
+     "text": "You picked the shittiest sound card to impress them with",
+     "hold": 2.7},
+    {"cue": "line", "id": "walk_ge_glorious", "speaker": "GloriousEggroll",
+     "text": "There's nothing glorious about this job", "hold": 2.8,
+     "at_src": WALK_MARK_UPSTREAM},
+    {"cue": "line", "id": "walk_ge_upstream", "speaker": "GloriousEggroll",
+     "text": "If we don't upstream these they keep coming back", "hold": 3.2},
+]
+
+# The line after the villain lands, which is why it is not in the list above.
+# 2.2 s is the readable minimum and it is exactly what run 4 has left after
+# the villain's bar clears: his line is the last thing in the chapter and the
+# cut behind it is hard, so the card ends with the run rather than riding over
+# it. DO NOT LENGTHEN IT without shortening the bar first.
+WALK_LESSON = {"id": "walk_ge_lesson", "speaker": "GloriousEggroll",
+               "text": "Here comes the lesson kids", "hold": 2.2}
+
+# THE PATCH QUEUE. Owner: "When he sees the green eyed monsters have a status
+# thing in the bottom say: UPSTREAM PATCH QUEUE". It is the site's own HUD
+# card (`kind: "status"`), at the bottom because he said bottom, and it holds
+# from the enemies' reveal until the villain arrives -- a queue that blinks
+# once is a caption, a queue that stays up is a HUD.
+WALK_HUD = {"detail": "UPSTREAM PATCH QUEUE", "label": "KERNEL 6.11-RC"}
+
+# THE VILLAIN. `kind: "miniboss"` -- Destiny's boss-bar treatment, in the red
+# the owner asked for. Both rows are his, verbatim.
+#
+# It names NOBODY: a kernel regression is not a person, which is the only
+# reason this card may carry copy no identity was authored for.
+WALK_VILLAIN_CARD = {
+    "name": "KERNEL REGRESSION",
+    "title": "Enslaver of Maintainers | Ruiner of User Experience",
+}
+# The bar and the line after it have to share what run 4 has left after the
+# villain arrives: 2.97 s of his own shot plus the tail of the run. 3.5 s
+# leaves the closing line its readable minimum, and the build asserts it
+# rather than trusting this number.
+WALK_VILLAIN_HOLD = 3.5
+
+# THE ACHIEVEMENT GAG -- PROPOSED, NOT APPROVED, SO NOT EMITTED.
+#
+# Owner: "for every dramatic explosion in this segment add a Bazzite
+# Achievement Unlocked gag designed after the XBox ... Give them jokes about
+# upstreaming patches. The most dramatic should be 'Mailing List Bullshit'."
+# He then chose, explicitly, to approve the strings before anything is burned.
+#
+# So the renderer exists (tools/plate.py `kind: "achievement"`), the explosions
+# are measured, and the copy below is a PROPOSAL: only "Mailing List Bullshit"
+# is his. `WALK_ACHIEVEMENTS_APPROVED` is the gate, and until he flips it the
+# whole list is reported in `unresolved` and no card is scheduled.
+#
+# The four `src` values are measured explosion cuts inside the chapter,
+# verified on the contact sheet. "Mailing List Bullshit" is on 213.200, the
+# biggest blast in the segment, per his "the most dramatic should be".
+WALK_ACHIEVEMENTS_APPROVED = False
+WALK_ACHIEVEMENTS = [
+    {"src": 213.200, "name": "Mailing List Bullshit", "score": "100 G",
+     "copy": "owner_supplied"},
+    {"src": 217.033, "name": "Sent It Upstream", "score": "10 G",
+     "copy": "proposed"},
+    {"src": 223.967, "name": "Maintainer Said NAK", "score": "25 G",
+     "copy": "proposed"},
+    {"src": 228.300, "name": "Carried Out of Tree Since 2019", "score": "50 G",
+     "copy": "proposed"},
+]
+WALK_ACHIEVEMENT_HOLD = 3.0
+
 LEAD_IN = 0.4      # let the cut land before the plate arrives
 MIN_HOLD = 2.2     # below this a plate cannot be read
 
@@ -307,7 +456,10 @@ MIN_HOLD = 2.2     # below this a plate cannot be read
 # write into it. Consuming these is issue #92.
 CHAPTERS = [
     (TRIO_IN, "TOC"),
-    (185.233, "Rizzo"),
+    # "Rizzo" is gone with his plate: a chapter that drops the audience on a
+    # credit that is no longer there is a marker pointing at nothing. The
+    # chapter it is replaced by starts where the walk starts.
+    (WALK_IN, "The Long Walk"),
 ]
 # HOW LONG A CREDIT STAYS UP.
 #
@@ -474,6 +626,27 @@ def localise_avatar(key, copy):
     copy["avatar"] = str(AVATAR_DIR / f"{key}.png")
     copy["avatar_url"] = url
     return copy
+
+
+def chat_avatar(key, casting):
+    """The pfp for a chat pill's badge, or nothing at all.
+
+    The pill has an avatar slot (`tools/plate.py` CHAT_AVATAR) and its
+    documented fallback is the drawn crest. `localise_avatar` only rewrites an
+    avatar that is already in the copy, so handing it an empty dict -- which
+    is what this file used to do for every chat -- silently produced a pill
+    with no picture on it, every time. The avatar comes from the SAME authored
+    entry as the plate copy, so a speaker with no recorded avatar (Karena, and
+    anyone the owner has not given one) still gets the crest, by omission
+    rather than by accident.
+    """
+    try:
+        copy = authored_copy(key, casting)
+    except KeyError:
+        return {}
+    if not copy.get("avatar"):
+        return {}
+    return localise_avatar(key, {"avatar": copy["avatar"]})
 
 
 def fetch_avatars(manifest, verbose=True):
@@ -685,7 +858,7 @@ def build():
             "speaker": speaker,
             "text": text,
             "text_source": "owner_supplied",
-            **localise_avatar(login, {}),
+            **chat_avatar(login, casting),
         })
         cue_at += MONTAGE_STEP
 
@@ -711,6 +884,142 @@ def build():
     assert last_out <= MONTAGE_OUT, (
         f"the montage cues run to {last_out:.3f}s, past the {MONTAGE_OUT}s "
         "lead-in banner they are supposed to hand off to")
+
+    # --- "The Long Walk" (owner brief, this round) -------------------------
+    # One lane, in order: the chapter card, then a plate or a line at a time,
+    # each landing on its shot and never before the previous card has cleared.
+    # Nothing here types a film timecode -- `at` is either a shot boundary
+    # converted from source, or the previous cue's out plus the gap.
+    walk_unresolved = []
+    walk = []
+    cursor = [0.0]
+
+    def walk_cue(entry, src=None, at_src=None, hold=None):
+        """Schedule one cue in the walk's single lower-third lane."""
+        want = round(film_of(at_src), 3) if at_src else (
+            _at(src, film_of) if src else 0.0)
+        at = round(max(want, cursor[0]), 3)
+        room = clamp_hold(at, hold, film_of)
+        if room is None:
+            walk_unresolved.append(
+                f"{entry['id']}: no readable hold at {at:.3f}s once the "
+                "no-plate zone is cleared -- the cue is not scheduled")
+            return None
+        entry = {**entry, "at": at, "dur": room, "position": "left"}
+        cursor[0] = round(at + room + PLATE_GAP, 3)
+        walk.append(entry)
+        return entry
+
+    walk_cue({
+        "id": "walk_chapter",
+        "kind": "title",
+        "copy_source": "owner_supplied",
+        "seen_at_src": WALK_IN,
+        "why": "the chapter card, on the walk it names",
+        **WALK_CARD,
+    }, src=WALK_IN, hold=5.0)
+
+    for spec in WALK_SEQUENCE:
+        if spec["cue"] == "plate":
+            walk_cue({
+                "id": f"walk_{spec['key']}",
+                "copy_source": "casting",
+                "seen_at_src": spec["src"],
+                "why": spec["why"],
+                **localise_avatar(spec["key"],
+                                  authored_copy(spec["key"], casting)),
+            }, src=spec["src"], hold=spec["hold"])
+        else:
+            walk_cue({
+                "id": spec["id"],
+                "kind": "chat",
+                "copy_source": "owner_supplied",
+                "speaker": spec["speaker"],
+                "text": spec["text"],
+                "text_source": "owner_supplied",
+                **chat_avatar(spec["speaker"], casting),
+            }, at_src=spec.get("at_src"), hold=spec["hold"])
+
+    # The villain, then the line that answers him.
+    villain_at = _at(WALK_VILLAIN, film_of)
+    walk.append({
+        "id": "walk_villain",
+        "kind": "miniboss",
+        "at": villain_at,
+        "dur": WALK_VILLAIN_HOLD,
+        "position": "boss",
+        "copy_source": "owner_supplied",
+        "seen_at_src": WALK_VILLAIN,
+        "why": "the winged figure arrives: 'Say hello to ...'",
+        **WALK_VILLAIN_CARD,
+    })
+    cursor[0] = max(cursor[0], round(villain_at + WALK_VILLAIN_HOLD
+                                     + PLATE_GAP, 3))
+    # The last card in the chapter ends WITH run 4, never over it: the cut
+    # behind it is hard and lands in a different sequence entirely. So its
+    # hold is what the run has left, floored at the readable minimum -- a
+    # typed number here would ride over the join the next time a boundary
+    # moves.
+    lesson_room = round(film_of(WALK_OUT) - cursor[0], 3)
+    assert lesson_room >= MIN_HOLD, (
+        f"only {lesson_room:.3f}s left in run 4 for "
+        f"{WALK_LESSON['text']!r}, under the {MIN_HOLD}s minimum -- shorten "
+        "the villain's bar")
+    walk_cue({
+        "id": WALK_LESSON["id"],
+        "kind": "chat",
+        "copy_source": "owner_supplied",
+        "speaker": WALK_LESSON["speaker"],
+        "text": WALK_LESSON["text"],
+        "text_source": "owner_supplied",
+        **chat_avatar(WALK_LESSON["speaker"], casting),
+    }, hold=min(WALK_LESSON["hold"], lesson_room))
+
+    # The patch queue: up on the enemies, down when the villain lands.
+    hud_at = round(film_of(WALK_ENEMIES), 3)
+    walk.append({
+        "id": "walk_patch_queue",
+        "kind": "status",
+        "at": hud_at,
+        "dur": round(villain_at - hud_at, 3),
+        "position": "status-bottom",
+        "copy_source": "owner_supplied",
+        "seen_at_src": WALK_ENEMIES,
+        "why": "the green-eyed enemies are on screen from here",
+        **WALK_HUD,
+    })
+
+    if WALK_ACHIEVEMENTS_APPROVED:
+        for i, gag in enumerate(WALK_ACHIEVEMENTS):
+            walk.append({
+                "id": f"walk_achievement_{i + 1}",
+                "kind": "achievement",
+                "at": _at(gag["src"], film_of),
+                "dur": WALK_ACHIEVEMENT_HOLD,
+                "position": "toast",
+                "copy_source": gag["copy"],
+                "seen_at_src": gag["src"],
+                "why": "a dramatic explosion",
+                "name": gag["name"],
+                "score": gag["score"],
+            })
+    else:
+        proposed = "; ".join(
+            f"{g['name']} ({g['score']}, {g['copy']})"
+            for g in WALK_ACHIEVEMENTS)
+        walk_unresolved.append(
+            "the Bazzite/Xbox achievement gag is BUILT BUT NOT SCHEDULED: the "
+            "owner asked to approve the strings before anything is burned. "
+            f"Proposed, one per measured explosion -- {proposed}. Only "
+            "'Mailing List Bullshit' is his. Flip "
+            "WALK_ACHIEVEMENTS_APPROVED in scripts/build_efmb_plates.py once "
+            "he has said yes.")
+
+    walk_end = max(p["at"] + p["dur"] for p in walk)
+    assert walk_end <= film_of(WALK_OUT) + 1e-6, (
+        f"the walk runs to {walk_end:.3f}s, past run 4's out point at "
+        f"{film_of(WALK_OUT):.3f}s -- a card would ride over the hard cut")
+    plates.extend(walk)
 
     plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))
 
@@ -739,7 +1048,26 @@ def build():
         "plates": plates,
         # What the brief authored but this manifest could not place. Recorded
         # so it is visible rather than buried: degrade, never block.
-        "unresolved": montage_unresolved + [
+        "unresolved": montage_unresolved + walk_unresolved + [
+            "the two contributors who held the shots 'The Long Walk' took "
+            "(HuntedRaven7 at source 195.267 and hanthor at 233.500) are no "
+            "longer credited in act II. The owner's instruction for the "
+            "chapter is 'No other guardians'; they are owed a credit "
+            "elsewhere and nobody has decided where",
+            "William Rizzo and Ahmed Adan lose their act II badges to the "
+            "same instruction. Rizzo's authored copy stays in "
+            "vocab/casting.yaml and Ahmed stays in ensemble.placeholders, so "
+            "only the scheduling went",
+            "GloriousEggroll's name row is the handle he was written in as; "
+            "GitHub records him as Thomas Crider. Which goes on the card is "
+            "the owner's call",
+            "no title row is authored for GloriousEggroll, HikariKnight or "
+            "A1RM4X -- their affiliation rides as chrome and the row is "
+            "omitted rather than composed",
+            "the montage's two Jorge Castro chat pills still have no pfp: "
+            "`castrojo` is a lead, his identity lives on the `cayde_6` "
+            "binding, and no avatar is recorded on it. The drawn crest "
+            "stands in",
             "the 2:19 lead-in banner (owner: \"setting up this scene it's "
             "important\") has no authored copy, so nothing is emitted for it",
             "the CNCF logo the brief marks as [CNCF LOGO] on each announcement "

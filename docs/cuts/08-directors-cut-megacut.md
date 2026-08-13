@@ -109,6 +109,48 @@ transfer). Bungie's own score rides with it, from that upload's best audio rung.
 `usage_class: third_party_copyrighted`, Bungie fan-content policy,
 non-commercial, no footage committed.
 
+### The GUARDIAN BOND companion cards
+
+Owner instruction, this round: *"Intro missing dinosaur companions from port.
+Alamo, karl, etc."* The live overlay renders a `GUARDIAN BOND` card beside a
+Guardian's own lower third; `tools/plate.py` had no such card, so the burned
+act I showed none. It has one now (`kind: "companion"`), ported from
+`.wolves-companion-plate` and its CSS.
+
+**All four documented bonds are here**, read from the site's own
+`wolves-guardian-dinosaur-bonds.ts` and `wolves-dinosaur-species.ts` — nothing
+was composed:
+
+| Beside | Bond | Species |
+|---|---|---|
+| Cortney Nickerson | *(unnamed)* | *Torosaurus latus* |
+| Kat Cosgrove | **Karl** | *Amargasaurus cazaui* |
+| Kaslin Fields | **Katerina** | *Kentrosaurus aethiopicus* |
+| Natali Vlatko | **Alamo** | *Alamosaurus sanjuanensis* |
+
+Three things this needed a decision or a judgement for:
+
+- **The Torosaurus is Bob Killen's bond**, and a bond does **not** follow a
+  recast on its own. Cortney inherits it because the owner said so, explicitly,
+  and that is recorded on the plate. Its card carries **no name row**, because
+  no character sheet names that animal — the site's own `v-if` drops it too.
+- **Alamo's artwork is capped at 200px**, and that is a frame judgement rather
+  than a proportion: at full height it rose to y=379 and covered "Natali
+  Vlatko" and "Shipwright of Kubernetes" on her raised plate. Found on the
+  burned frame at t=90, which is the only place it could have been found. A
+  test now pins the clearance.
+- **`bond_of` is what lets the pair share the screen**, instead of a shared
+  `group` string. The exemption is named on purpose: a group key could quietly
+  cover somebody else's plate too.
+
+Artwork is cached by `scripts/fetch_companion_art.py` into gitignored
+`renders/`; the renderer never reaches outside the repo and never touches the
+network, and a missing file degrades to the card alone.
+
+**Orlin gets none.** The bond list keys on the Guardian's name, has no entry
+for Orlin, and has none for Laura Santamaria either — so there is nothing to
+inherit even if the owner wanted it.
+
 ### The title cover
 
 Owner instruction, this round: *"replace the dino/QR sequence with wolves.jpg,

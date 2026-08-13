@@ -65,7 +65,9 @@ precedence over `trustee`**, mirroring the CSS selector
 binding may carry both flags and plate gold; the leader block does not restyle
 the class row, which stays the default blue — and `rust`, oxidised iron for the
 Rust Foundation herald, per #8 — and `bazzite`, Bazzite purple for the end
-fight). A variant is colour only. Owner-authored imagery chrome — `avatar`,
+fight; `nobara`, indigo sampled from the Nobara Project's own icon; and
+`youtube`, brand red for a creator whose affiliation is their channel). A
+variant is colour only. Owner-authored imagery chrome — `avatar`,
 `wreath`, bracketed names like `[ REDACTED ]` — is likewise not copy:
 [`references/plate-chrome.md`](references/plate-chrome.md).
 
@@ -75,17 +77,6 @@ picture, never the raw frame), a `scale` that shrinks the card, and a `group`
 key marking which row a card belongs to. Two more come from the intro overlay:
 `raised` (`top: 28%`, for a Guardian towering over the lower third) and
 `position: "status"`.
-
-## The status nameplate is a fourth card, added deliberately
-
-The site's **top-of-frame HUD** (`Nameplate.vue`) is not the reveal plate: it is
-persistent chrome the intro overlay re-labels per cue, carrying **exactly two**
-authored lines — `detail` and `label` — plus one chrome flag, `glitch`. It is a
-**different row** from the lower third, so the one-plate-at-a-time check exempts
-it against a Guardian plate; two status cards at once are still an error. Its
-copy comes from the per-cue overrides *and* the segment default, so reproducing
-only the cues renders a card that flickers where the site holds one
-continuously. See [`references/status-nameplate.md`](references/status-nameplate.md).
 
 ## Where the copy is authored
 
@@ -341,6 +332,15 @@ an `enable=between(t,in,out)` expression, evaluated per frame — and
 stream-copies audio, so titling never costs the soundtrack a second generation.
 Two spellings of it have shipped a video with **no plates on it**, exiting 0 at
 the right length — [`docs/rendering.md`](../rendering.md#burning-plates-onto-a-cut).
+
+## Cards that are not lower thirds
+
+Four `kind`s sit outside the reveal plate's row: the site's `status` HUD,
+Destiny's `miniboss` bar, the Xbox `achievement` toast and the `companion`
+GUARDIAN BOND card — [`references/other-cards.md`](references/other-cards.md),
+[`references/status-nameplate.md`](references/status-nameplate.md). The
+`miniboss` bar is the only card here that may carry copy nobody's identity was
+authored for, because **it names a villain, not a person**.
 
 ## Showing a conversation
 

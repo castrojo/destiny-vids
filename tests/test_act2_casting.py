@@ -140,3 +140,54 @@ def test_every_act2_plate_renders(key):
     plate = pytest.importorskip("tools.plate")
     img = plate.render_plate(dict(TITLES[key]))
     assert img.width > 0 and img.height > 0
+
+
+# --- "The Long Walk" (owner brief, this round) -------------------------------
+
+WALK = ["GloriousEggroll", "HikariKnight", "A1RM4X"]
+
+
+def test_the_walks_three_are_name_and_chrome_with_no_invented_title():
+    """The owner gave each of them an AFFILIATION and no title. The
+    affiliation rides as chrome the way Kyle's Bazzite purple does, and the
+    title row is OMITTED -- a card with a row missing is the authored state."""
+    for key in WALK:
+        assert key in TITLES, key
+        assert "title" not in TITLES[key], f"{key} was given a title nobody wrote"
+        assert "class" not in TITLES[key], f"{key} was given a subclass"
+
+
+def test_the_two_peers_carry_kyles_own_label():
+    """Owner: "We want Eggroll to be a peer of kyle" and "Hikari, another peer
+    ... bazzite affiliated like kyle". The label is reproduced from Kyle's
+    entry rather than composed, and only the chrome differs."""
+    for key in ("GloriousEggroll", "HikariKnight"):
+        assert TITLES[key]["label"] == TITLES["KyleGospo"]["label"]
+    assert TITLES["GloriousEggroll"]["variant"] == "nobara"
+    assert TITLES["HikariKnight"]["variant"] == TITLES["KyleGospo"]["variant"]
+
+
+def test_gloriouseggroll_is_credited_by_the_handle_the_owner_wrote():
+    """GitHub records him as Thomas Crider. The owner wrote him into his own
+    dialogue as GloriousEggroll, so that is what the card says and which of
+    the two he wants is recorded as his call, not settled by an agent."""
+    assert TITLES["GloriousEggroll"]["name"] == "GloriousEggroll"
+    assert "Thomas Crider" in RAW, "the alternative stays recorded"
+
+
+def test_a1rm4x_is_the_one_identity_here_that_is_not_a_github_login():
+    """His affiliation IS his channel. The avatar is the channel's own
+    picture, never YouTube's logo: a creator's brand is the person."""
+    spec = TITLES["A1RM4X"]
+    assert spec["label"] == "@A1RM4X // YOUTUBE"
+    assert spec["variant"] == "youtube"
+    assert spec["avatar"].startswith("https://yt3.googleusercontent.com/")
+    # The owner typed "A1RMAX"; the channel is @A1RM4X. Both are recorded.
+    assert "A1RMAX" in RAW
+
+
+@pytest.mark.parametrize("key", WALK)
+def test_every_walk_plate_renders(key):
+    plate = pytest.importorskip("tools.plate")
+    img = plate.render_plate(dict(TITLES[key]))
+    assert img.width > 0 and img.height > 0
