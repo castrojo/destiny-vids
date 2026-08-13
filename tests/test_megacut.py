@@ -289,3 +289,44 @@ def test_a_plan_may_be_read_for_its_order_before_its_footage_exists(tmp_path):
     path.write_text(json.dumps(plan))
     with pytest.raises(ValueError, match="unknowable"):
         megacut.load_plan(path, require_sources=False)
+
+
+# --- --locate: a review note's timecode -> the act that has to change --------
+
+def test_parse_stamp_reads_the_shapes_a_review_note_uses():
+    assert megacut.parse_stamp("763") == 763.0
+    assert megacut.parse_stamp("12:43") == 763.0
+    assert megacut.parse_stamp("1:02:11") == 3731.0
+    assert megacut.parse_stamp("12:43.5") == 763.5
+    for bad in ("", "1:2:3:4", "12:", ":30"):
+        with pytest.raises(ValueError):
+            megacut.parse_stamp(bad)
+
+
+def _locate_plan():
+    return {"items": [
+        {"kind": "card", "image": "a.png", "dur": 5.0, "chapter": "I. One"},
+        {"kind": "clip", "path": "one.mp4", "audio": "source", "dur": 100.0},
+        {"kind": "card", "image": "b.png", "dur": 15.0, "chapter": "II. Two"},
+        {"kind": "clip", "path": "two.mp4", "audio": "source", "dur": 30.0},
+    ]}
+
+
+def test_locate_maps_a_programme_timecode_onto_the_act_and_its_own_clock():
+    """The note is taken against the programme; the fix is made against one
+    act's file. Doing that arithmetic by hand is how a round of notes gets
+    applied to the wrong act."""
+    plan = _locate_plan()
+    assert megacut.locate(plan, 0.0) == ("I. One", 0.0, None)
+    assert megacut.locate(plan, 30.0) == ("I. One", 25.0, "one.mp4")
+    # 105.0 is the first frame of act II's slide, not the last of act I.
+    assert megacut.locate(plan, 105.0) == ("II. Two", 0.0, None)
+    assert megacut.locate(plan, 130.0) == ("II. Two", 10.0, "two.mp4")
+
+
+def test_locate_lands_a_note_past_the_end_on_the_last_act():
+    """A note taken off a scrub bar can sit a frame past the last item; it is
+    still a note about the closing act, not an error to raise at the owner."""
+    title, offset, path = megacut.locate(_locate_plan(), 10_000.0)
+    assert (title, path) == ("II. Two", "two.mp4")
+    assert offset > 30.0
