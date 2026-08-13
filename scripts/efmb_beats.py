@@ -39,158 +39,44 @@ The known ground truth this detector must reproduce: the song breaks down at
 detector that misses the one event the whole act is built on is wrong, and
 the test suite says so.
 
-THE RE-ENTRY IS A DOWNBEAT, AND THE GRID'S PHASE IS ONE BEAT OFF
-----------------------------------------------------------------
-The stored ``downbeat_phase: 3`` is librosa's global argmax over onset
-strength -- a guess, and the file's own ``downbeat_strength`` vector shows
-why it guessed wrong: positions 1 and 3 measure 3.61 and 3.81 against 3.13
-and 3.25 for 0 and 2. That is a backbeat -- the snares on 2 and 4 out-accent
-the kicks on 1 and 3, which is what metal does -- and argmax picked one of
-the strong positions, landing the "bar line" on beat 4. The owner set the
-film's one hard anchor BY EAR at the re-entry slam, 269.700, and under the
-stored phase that moment is not a downbeat at all (the stored phase puts the
-bar line at 269.328, one beat early). The anchor is the measurement made by
-a human at the one moment that matters; the strength vector agrees with the
-human once the snare positions are read as snares. So this script reports
-downbeats at the anchor-verified phase and says so, loudly, every time it
-runs. Fixing the committed grid is a separate decision -- this script only
-reports.
+THE RE-ENTRY IS A DOWNBEAT, AND THE GRID NOW SAYS SO
+----------------------------------------------------
+This bed once carried ``downbeat_phase: 3`` -- librosa's global argmax over
+onset strength, which answers "what is loudest", not "where the bar begins".
+The file's own ``downbeat_strength`` vector showed the backbeat (positions 1
+and 3 at 3.61 and 3.81 against 3.13 and 3.25 for 0 and 2: the snares on 2 and
+4 out-accent the kicks, which is what metal does), and argmax had parked the
+bar line on beat 4. Issue #89 fixed the record and the producer: the phase is
+now corroborated against measured re-entries -- this song's five, every one
+within 51 ms of a phase-0 bar line -- and the owner's by-ear anchor at
+269.700, and ``tools/bed.py`` never trusts a bare argmax any more. What
+remains here is the guard: ``verify_downbeat_phase`` checks the shipped
+anchor against the stored phase every run, so a future grid drift is reported
+rather than inherited.
 """
 from __future__ import annotations
 
-import array
 import json
-import math
-import operator
 import sys
-import wave
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(REPO_ROOT))
 
 import build_efmb  # noqa: E402 -- the authority on the cut; never re-typed here
+# The envelope/drop/re-entry detector lives with the bed producer now; it is
+# the same machinery that corroborates a new bed's downbeat phase.
+from tools.bed import (  # noqa: E402
+    ONSET_CONFIRM_SEC, RECOVER_DB, SMOOTH_SEC, SUSTAIN_SEC, baseline_of,
+    find_drops, load_envelope_db, smooth,
+)
 
 BED_PATH = REPO_ROOT / "music" / f"{build_efmb.BED_ID}.json"
 WAV_PATH = REPO_ROOT / "media" / f"{build_efmb.BED_ID}.wav"
 
-# --- detector constants -----------------------------------------------------
-# Each is a measured trade-off, not a guess; the comments say what breaks if
-# you move it.
-HOP_SEC = 0.02        # envelope resolution; finer than this buys nothing at 152 bpm
-SMOOTH_SEC = 1.5      # shorter smooths let one quiet bar fragment the breakdown
-DROP_DB = 2.5         # how far below the song's median level counts as "down"
-MIN_DOWN_SEC = 4.0    # a drop that comes back inside one bar is a breath, not a drop
-RECOVER_DB = 1.5      # re-entry gate: level must stay within this of baseline for 2 s
-SUSTAIN_SEC = 2.0     # ... for this long -- a riser swell fails this, the slam passes
-ONSET_CONFIRM_SEC = 0.25  # a hit confirming a bar line lands within a quarter
-                      # second of it; wider windows catch the pick-up instead
 
-
-# --- the envelope ------------------------------------------------------------
-
-def load_envelope_db(path, hop=HOP_SEC):
-    """RMS energy of the WAV in dB re its own peak, one value per ``hop`` seconds.
-
-    Both channels, summed in the energy domain. Pure stdlib: ``wave`` for the
-    container, ``array`` for the samples, ``map(operator.mul, ...)`` because a
-    genexpr over 15M samples is the difference between 4 seconds and 30.
-    """
-    with wave.open(str(path), "rb") as w:
-        rate = w.getframerate()
-        channels = w.getnchannels()
-        width = w.getsampwidth()
-        raw = w.readframes(w.getnframes())
-    if width != 2:
-        raise RuntimeError(f"{path} is {width * 8}-bit; the detector expects 16-bit PCM")
-    a = array.array("h")
-    a.frombytes(raw)
-    del raw
-    win = int(rate * hop)
-    step = win * channels
-    n = (len(a) // step) * step  # whole windows only; the tail is < 20 ms of fade
-    env = []
-    for i in range(0, n, step):
-        ss = 0
-        for c in range(channels):
-            ch = a[i + c:i + step:channels]
-            ss += sum(map(operator.mul, ch, ch))
-        env.append(math.sqrt(ss / (channels * win)))
-    peak = max(env)
-    return [20 * math.log10(e / peak) if e > 0 else -120.0 for e in env], hop
-
-
-def smooth(xs, width_sec, hop):
-    """Centered boxcar. Centered, not trailing: a trailing window delays every
-    edge by half its width and the drop/re-entry times would all drift late."""
-    k = max(1, int(width_sec / hop))
-    half = k // 2
-    out = []
-    for i in range(len(xs)):
-        lo = max(0, i - half)
-        hi = min(len(xs), i + half + 1)
-        out.append(sum(xs[lo:hi]) / (hi - lo))
-    return out
-
-
-def baseline_of(level):
-    """The song's typical loudness: median of the smoothed level. Median, not
-    mean, because a 12 s breakdown should not lower the bar it is measured
-    against."""
-    s = sorted(level)
-    return s[len(s) // 2]
-
-
-# --- drops and re-entries ----------------------------------------------------
-
-def find_drops(level, hop, baseline, drop_db=DROP_DB, min_down_sec=MIN_DOWN_SEC):
-    """Regions where the level falls ``drop_db`` below baseline and stays there.
-
-    ``drop_sec`` is not the threshold crossing: the fall takes about a second,
-    so the crossing sits mid-slide wherever the threshold happens to catch it.
-    The musically meaningful moment is when the loud state was last present --
-    the last window at or above the midpoint between the pre-drop level and the
-    region floor. That lands within half a second of the by-ear time on this
-    song; a bare threshold crossing lands wherever you tune it.
-    """
-    threshold = baseline - drop_db
-    min_run = int(min_down_sec / hop)
-    drops = []
-    i = 0
-    while i < len(level):
-        if level[i] >= threshold:
-            i += 1
-            continue
-        j = i
-        while j < len(level) and level[j] < threshold:
-            j += 1
-        if j - i >= min_run:
-            start, end = i * hop, (j - 1) * hop
-            floor = min(level[i:j])
-            pre_lo = max(0, i - int(6.0 / hop))
-            pre = level[pre_lo:i - int(0.5 / hop)] if i > int(0.5 / hop) else []
-            if pre:
-                pre_level = sorted(pre)[len(pre) // 2]
-                mid = (pre_level + floor) / 2
-                k = i - 1
-                while k > 0 and level[k] < mid:
-                    k -= 1
-                drop_sec = k * hop
-            else:
-                drop_sec = start  # the song opens quiet: an intro, not a drop
-            drops.append({
-                "drop_sec": round(drop_sec, 3),
-                "down_from_sec": round(start, 3),
-                "down_until_sec": round(end, 3),
-                "floor_db": round(floor, 2),
-                "depth_db": round(baseline - floor, 2),
-                "kind": ("intro" if start < hop * 2 else
-                         "outro" if j >= len(level) - int(1.0 / hop) else
-                         "drop"),
-            })
-        i = j
-    return drops
-
+# --- the re-entry against a candidate set of bar lines -----------------------
 
 def find_reentry(level, hop, raw_db, downbeats, drop, baseline,
                  recover_db=RECOVER_DB, sustain_sec=SUSTAIN_SEC):
@@ -205,6 +91,11 @@ def find_reentry(level, hop, raw_db, downbeats, drop, baseline,
     that downbeat is the measured hit. Wider than that and the window swallows
     the pick-up hit on the beat before, and the re-entry is reported one beat
     early -- which is precisely the mistake this function exists to avoid.
+
+    Unlike ``tools.bed.measure_reentries`` -- which measures re-entries
+    phase-free so a grid can be scored against them -- this report version
+    tests candidate bar lines, because its job is to say which downbeat each
+    re-entry IS.
     """
     if drop["kind"] == "outro":
         return None
@@ -238,6 +129,7 @@ def find_reentry(level, hop, raw_db, downbeats, drop, baseline,
     return None
 
 
+
 # --- the grid ----------------------------------------------------------------
 
 def nearest(times, t):
@@ -248,15 +140,14 @@ def nearest(times, t):
 
 
 def verify_downbeat_phase(grid, anchor_film):
-    """Which beats are bar lines: the stored phase, checked against the anchor.
+    """The stored phase, guarded against the shipped anchor.
 
-    The stored phase is librosa's argmax over onset strength. The anchor is the
-    owner's by-ear fix at the one moment the film cannot get wrong. When they
-    disagree, the tie-break is in the file itself: under the true phase, the
-    backbeat positions (2 and 4) must out-accent 1 and 3 -- if argmax landed on
-    a snare, the phase is one beat early. Returns (phase, note); the note is
-    printed every run, because a phase the file and the film disagree about is
-    a fact nobody should have to re-derive.
+    The anchor is the owner's by-ear fix at the one moment the film cannot get
+    wrong. Since #89 the committed phase is itself evidence-backed, so this is
+    a guard, not a workaround: if the anchor stops landing on a stored
+    downbeat, something has drifted -- the grid or the record -- and the note
+    says so rather than re-phasing behind anyone's back. Returns
+    ``(phase, note)``; the note is printed every run.
     """
     beats = grid["beats"]
     bpb = grid["beats_per_bar"]
@@ -270,25 +161,10 @@ def verify_downbeat_phase(grid, anchor_film):
                         "beat -- the grid itself has drifted, phase not checked")
     if idx % bpb == stored:
         return stored, "stored phase and the shipped anchor agree"
-    candidate = idx % bpb
-    strength = grid.get("downbeat_strength", [])
-    if len(strength) == bpb:
-        snares = ((candidate + 1) % bpb, (candidate + bpb - 1) % bpb)
-        kicks = (candidate, (candidate + 2) % bpb)
-        snare_mean = sum(strength[s] for s in snares) / len(snares)
-        kick_mean = sum(strength[k] for k in kicks) / len(kicks)
-        if snare_mean > kick_mean:
-            return candidate, (
-                f"stored downbeat_phase {stored} puts the bar line one beat "
-                f"EARLY of the music: the file's own strength vector has the "
-                f"backbeat positions out-accenting 1 and 3 ({snare_mean:.2f} vs "
-                f"{kick_mean:.2f}), and the shipped anchor at {anchor_film}s -- "
-                f"set by ear at the re-entry -- is an exact beat. Downbeats "
-                f"reported at anchor-verified phase {candidate}; the committed "
-                "grid's phase is a separate fix, this script only reports.")
-    return stored, (f"WARNING: anchor lands on beat residue {candidate}, not the "
-                    f"stored phase {stored}, and the strength vector does not "
-                    "support re-phasing; reporting the stored phase")
+    return stored, (f"WARNING: anchor lands on beat residue {idx % bpb}, not "
+                    f"the stored phase {stored}; reporting the stored phase. "
+                    "The phase is fixed in the bed record (issue #89) -- if "
+                    "this fires, re-derive the record, do not patch around it")
 
 
 def downbeat_times(grid, phase):

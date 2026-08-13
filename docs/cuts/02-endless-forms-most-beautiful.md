@@ -131,9 +131,12 @@ The song **breaks down hard at 258.0 s** and stays down to 268.0 (−12 dBFS
 falling to −20). It builds for two seconds, and the **full band re-enters at
 269.700 s**.
 
-269.700 is an exact **downbeat** on the bed's own grid — beat index 683,
-`downbeat_phase 3`, bar 1.578957 s — read from
-`music/bed_endless_forms_most_beautiful.json`, not estimated.
+269.700 is an exact **downbeat** on the bed's own grid — beat index 692,
+`downbeat_phase 0`, bar 1.578957 s — read from
+`music/bed_endless_forms_most_beautiful.json`, not estimated. (The record once
+carried phase 3, an onset-strength argmax that had parked the bar line on the
+snare; #89 corrected it. The anchor never depended on it: it was measured from
+the audio by ear.)
 
 On screen at that moment: a **Sentinel Titan raising the Void shield**. In the
 delivered film the shield reached full extension at roughly 270.06 — about a
@@ -366,10 +369,11 @@ timecodes; it ships no audio and no footage.
   this repo, so her wreath rings the drawn crest; Ricardo's subclass is
   unauthored, so his class row reads bare `Hunter`; Joseph and Dylan have no
   logins. Every one of them is a word only the owner can write.
-- **The bed's `downbeat_phase` is one beat off** —
-  [#89](https://github.com/castrojo/destiny-vids/issues/89). It does not affect
+- **The bed's `downbeat_phase` was one beat off and is now corrected** —
+  [#89](https://github.com/castrojo/destiny-vids/issues/89). It never affected
   this act: the anchor at 269.700 was measured from the audio by ear, not read
-  from the stored phase.
+  from the stored phase. Under the corrected phase 0 the anchor is beat index
+  692, an exact downbeat.
 - **Sub-chapters are emitted and unconsumed** —
   [#92](https://github.com/castrojo/destiny-vids/issues/92).
 - **No lossless provenance.** As with every bed in this show, the source is a

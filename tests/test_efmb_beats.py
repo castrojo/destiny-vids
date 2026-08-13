@@ -101,27 +101,28 @@ def test_without_the_wav_the_grid_analysis_still_ships():
 
 # --- the phase check -----------------------------------------------------------
 
-def test_phase_repaired_when_argmax_lands_on_the_backbeat():
-    # stored phase 3, but the anchor is an exact beat at residue 0 and the
-    # strength vector has 2 and 4 out-accenting 1 and 3 -- the backbeat tie.
-    grid = synth_grid(phase=3, strength=[1.0, 2.0, 1.0, 2.2])
-    phase, note = efmb_beats.verify_downbeat_phase(grid, anchor_film=40.0)
-    assert phase == 0
-    assert "one beat" in note
-
-
-def test_phase_kept_when_anchor_and_grid_agree():
+def test_phase_is_the_stored_phase_when_anchor_and_grid_agree():
+    # Since #89 the stored phase is itself evidence-backed; the check is a
+    # guard, and agreement is the quiet case.
     grid = synth_grid(phase=3, strength=[1.0, 2.0, 1.0, 2.2])
     phase, note = efmb_beats.verify_downbeat_phase(grid, anchor_film=41.5)
     assert phase == 3 and "agree" in note
 
 
-def test_phase_kept_with_warning_when_strength_does_not_support_repair():
-    # anchor off the stored phase, but 1 and 3 already out-accent 2 and 4:
-    # re-phasing would put the bar line on a weaker beat. Trust the file.
-    grid = synth_grid(phase=3, strength=[2.0, 1.0, 2.0, 1.0])
+def test_anchor_off_the_stored_phase_warns_and_still_reports_stored():
+    # The guard's job is to say so, loudly -- never to re-phase behind the
+    # record's back. The stored phase is reported either way.
+    grid = synth_grid(phase=3, strength=[1.0, 2.0, 1.0, 2.2])
     phase, note = efmb_beats.verify_downbeat_phase(grid, anchor_film=40.0)
-    assert phase == 3 and "WARNING" in note
+    assert phase == 3
+    assert "WARNING" in note and "residue 0" in note
+
+
+def test_anchor_off_every_beat_is_grid_drift_not_a_phase_question():
+    grid = synth_grid(phase=3, strength=[1.0, 2.0, 1.0, 2.2])
+    phase, note = efmb_beats.verify_downbeat_phase(grid, anchor_film=40.25)
+    assert phase == 3
+    assert "WARNING" in note and "drifted" in note
 
 
 # --- the detector, synthetic ---------------------------------------------------

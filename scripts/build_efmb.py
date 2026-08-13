@@ -120,8 +120,9 @@ OWNER_MARKS = {"skip_from": 246.0, "resume_at": 290.0}
 # only question was taste. Two owner decisions changed that.
 #
 # 1. THE SYNC. The song breaks down at 258.0 and the full band re-enters at
-#    269.700 -- an exact downbeat on the bed's own grid (beat index 683,
-#    downbeat_phase 3, bar 1.578957 s). On screen at that moment is a Sentinel
+#    269.700 -- an exact downbeat on the bed's own grid (beat index 692,
+#    downbeat_phase 0, bar 1.578957 s; the record carried the argmax-wrong
+#    phase 3 until #89 corrected it). On screen at that moment is a Sentinel
 #    Titan raising a Void shield, and in the delivered film it arrived roughly a
 #    third of a second LATE. The owner approved moving picture to fix it.
 #

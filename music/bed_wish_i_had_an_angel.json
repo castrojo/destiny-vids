@@ -342,7 +342,8 @@
       238.910113,
       239.653152,
       240.39619
-    ]
+    ],
+    "downbeat_phase_evidence": "audited under #89: UNCORROBORATED argmax, left in place rather than guessed. The strength vector has the accented parity class at positions 1+3 (4.60 against 4.09 for 0+2), which under the backbeat reading makes the stored 1 suspect; but re-entries measured from the source WAV land half a beat off the stored grid on BOTH beat parities in different sections (the band entry at 13.600s, +7.8dB, sits between stored beats; the breakdown slam at 193.6s, +13.0dB, is on a residue-0 beat), so the tracked grid does not hold one offset through the song and no phase is measurable against it. Needs the owner's ear, or a re-tracked grid, before this bed is cut to the bar."
   },
   "excisions": [
     {
