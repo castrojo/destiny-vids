@@ -116,12 +116,18 @@ def test_no_plate_is_laid_over_bungies_burned_in_title():
     The act removes every other title card in the source. This one is welded to
     picture the act keeps, so the plates clear it instead -- laying our credit
     over the publisher's is the one thing that would look deliberate.
+
+    The zone guards the PICTURE. The letterbox banner lives on the bottom bar,
+    below the picture entirely, so it never touches the burned-in title and is
+    exempt by position -- this is a time-overlap check and cannot see that.
     """
     lead = build_efmb.derive_lead()
     for src_in, src_out, _why in build_efmb_plates.NO_PLATE_SRC:
         zone = (build_efmb.film_for_source(src_in, lead),
                 build_efmb.film_for_source(src_out - 0.001, lead))
         for plate in committed()["plates"]:
+            if plate.get("position") == "letterbox":
+                continue
             start, end = plate["at"], plate["at"] + plate["dur"]
             assert not (start < zone[1] and end > zone[0]), (
                 f"{plate['id']} overlaps the burned-in title at {zone}")
@@ -152,9 +158,22 @@ def test_cayde_is_redacted_in_this_act_and_only_by_covering_a_known_name():
 
 
 def test_nobody_is_credited_twice_with_two_different_faces():
+    """One name, two different cards, is the bug this guards. A card repeated
+    VERBATIM -- the TOC payoff reprising the montage's emeritus announcement
+    row for row, as a callback -- is the same face twice, which is allowed.
+    """
     plates = committed()["plates"]
-    names = [p["name"] for p in plates if p.get("name")]
-    assert len(names) == len(set(names)), f"duplicate credit: {names}"
+    by_name = {}
+    for p in plates:
+        if p.get("name"):
+            by_name.setdefault(p["name"], []).append(p)
+    for name, cards in by_name.items():
+        copies = {(c.get("label"), c.get("class"), c.get("title"))
+                  for c in cards}
+        assert len(copies) == 1, (
+            f"{name!r} is credited {len(cards)} times with DIFFERENT copy: "
+            f"{copies} -- a reprise reproduces the card verbatim; anything "
+            "else is two faces for one person")
 
 
 def test_every_plate_can_be_read():
@@ -475,3 +494,132 @@ def test_every_dialogue_pill_in_the_walk_carries_its_speaker_s_pfp():
             continue
         assert p.get("avatar"), f"{pid} lost its pfp badge"
         assert not str(p["avatar"]).startswith("http")
+
+
+# --- the TOC exchange and the endgame (owner brief, issue #98 §3-§4) ----------
+
+def toc_plates():
+    return {p["id"]: p for p in committed()["plates"]
+            if p["id"].startswith(("toc_", "timed_", "quote_", "letterbox_"))}
+
+
+def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
+    """Owner: the exchange belongs in the greenery; the greenery is where The
+    Long Walk lives. So the questions go up in the pre-walk window and the
+    answer lands after the walk's own last card has cleared."""
+    lead = build_efmb.derive_lead()
+    walk_in = build_efmb.film_for_source(build_efmb_plates.WALK_IN, lead)
+    walk_out = build_efmb.film_for_source(build_efmb_plates.WALK_OUT, lead)
+    toc = toc_plates()
+    pre = [toc[k] for k in ("toc_karena", "toc_joseph_worth", "toc_ricardo")]
+    for p in pre:
+        assert build_efmb_plates.MONTAGE_OUT <= p["at"]
+        assert p["at"] + p["dur"] <= walk_in + 1e-6
+    post = [toc[k] for k in ("toc_joseph_faith", "toc_ricardo_desktop",
+                             "toc_joseph_lol", "toc_announce_emeritus",
+                             "toc_announce_ambassadors")]
+    for p in post:
+        assert p["at"] >= walk_out
+
+
+def test_josephs_five_oh_seven_is_retimed_off_the_black_tail():
+    """"[JOSEPH] at 5:07" is inside the 16.065 s black tail -- the exchange
+    plays over picture that exists, per the owner's own ruling."""
+    card = toc_plates()["toc_joseph_faith"]
+    assert card["text"] == "Dunno, how much faith DO we have in the CNCF?"
+    picture_end = build_efmb.film_for_source(362.2 - 1e-6)   # the last frame
+    assert card["at"] + card["dur"] < picture_end
+
+
+def test_karena_s_jump_carries_no_card():
+    """"Karena says nothing and jumps. No card on her here; the beat is the
+    jump." The beat is clear screen between the DO line and Ricardo's answer.
+    """
+    toc = toc_plates()
+    gap = (toc["toc_ricardo_desktop"]["at"]
+           - (toc["toc_joseph_faith"]["at"] + toc["toc_joseph_faith"]["dur"]))
+    assert gap == pytest.approx(build_efmb_plates.JUMP_BEAT, abs=1e-3)
+    assert not any("jump" in p for p in toc), "the jump is a beat, not a card"
+
+
+def test_the_emeritus_payoff_is_a_verbatim_reprise():
+    """A callback, not a second credit: same rows, same gold, word for word."""
+    plates = committed()["plates"]
+    by_id = {p["id"]: p for p in plates}
+    for row in ("label", "name", "title", "variant"):
+        assert by_id["toc_announce_emeritus"].get(row) \
+            == by_id["announce_emeritus"].get(row)
+
+
+def test_the_toc_copy_is_reproduced_verbatim():
+    toc = toc_plates()
+    assert toc["toc_karena"]["text"] == (
+        "One hundred thousand bootc volunteers, ready to power up")
+    assert toc["toc_ricardo"]["text"] == (
+        "You really think they can save open source?")
+    assert toc["toc_ricardo_desktop"]["text"] == "Cloud native desktop? ..."
+    assert toc["toc_joseph_lol"]["text"] == "LOL"
+    assert toc["toc_announce_ambassadors"]["title"] == (
+        "Have you met our Ambassadors?")
+    # The brief's own speaker tags, not a casting.yaml lookup.
+    assert toc["toc_karena"]["speaker"] == "Karena"
+    # Emphasis markers are markup, not words: stripped, and recorded.
+    assert "**" not in toc["quote_siosm"]["text"]
+    assert any("powering up" in u for u in committed()["unresolved"])
+
+
+def test_the_timed_cues_land_on_the_owners_marks():
+    """All ACT II FILM time, anchored to source so a cut that moves raises."""
+    toc = toc_plates()
+    assert toc["timed_krook"]["at"] == pytest.approx(250.0, abs=1e-3)
+    assert toc["timed_natewaddington"]["at"] == pytest.approx(260.0, abs=1e-3)
+    assert toc["timed_jorge"]["at"] == pytest.approx(291.0, abs=1e-3)
+    assert toc["timed_natewaddington"]["name"] == "[ Natewaddington ]"
+    assert toc["timed_krook"]["text"] == (
+        "Generational talent detected, call in the best")
+    # The 4:01 Cayde speech bubble is the owner's call, and stays unscheduled.
+    assert not any(p.get("at") == 241.0 for p in committed()["plates"])
+    assert any("4:01" in u for u in committed()["unresolved"])
+
+
+def test_the_closing_quotes_end_on_the_final_second():
+    """The brief's preamble lands the last cue on the final second; its own
+    proposal spread them 4:51 -> 5:07, over the black outro."""
+    toc = toc_plates()
+    quotes = [toc[f"quote_{s}"] for s in
+              ("cgwalters", "siosm", "jberkus", "preethi", "castrojo")]
+    starts = [q["at"] for q in quotes]
+    steps = {round(b - a, 3) for a, b in zip(starts, starts[1:])}
+    assert len(steps) == 1, f"not evenly spread: {steps}"
+    last = quotes[-1]
+    assert last["at"] + last["dur"] == pytest.approx(
+        committed()["_film_sec"], abs=0.01)
+
+
+def test_the_letterbox_callout_holds_for_the_rest_of_the_song():
+    """"Keep it up for the whole song": up where the brief's scene starts
+    (2:19, the montage's hand-off), down on the last frame, on the bottom bar
+    where it shares no card's row."""
+    banner = toc_plates()["letterbox_banner"]
+    assert banner["kind"] == "banner"
+    assert banner["position"] == "letterbox"
+    assert banner["at"] == build_efmb_plates.MONTAGE_OUT
+    assert banner["at"] + banner["dur"] == pytest.approx(
+        committed()["_film_sec"], abs=1e-3)
+    assert banner["text"] == build_efmb_plates.LETTERBOX_BANNER
+    assert "Support Open Gaming Collective" in banner["text"]
+
+
+def test_the_placeholder_speakers_are_recorded_never_guessed():
+    """Nine names in the brief are in no vocab: they render as name-only
+    placeholder badges with the drawn crest, and the punch-list names them."""
+    gaps = " ".join(committed()["unresolved"])
+    for name in ("krook", "Natewaddington", "cgwalters", "siosm", "jberkus",
+                 "preethi"):
+        assert name in gaps, f"{name} must stay on the punch-list"
+    toc = toc_plates()
+    for pid in ("timed_krook", "timed_bedazzle", "quote_cgwalters",
+                "quote_siosm", "quote_jberkus", "quote_preethi"):
+        assert "avatar" not in toc[pid], (
+            f"{pid} carries an avatar nobody recorded -- the crest is the "
+            "honest placeholder")

@@ -35,9 +35,9 @@ permanently, whatever gets built later.
 delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
 and its own place on the clock. Seven of the eight acts now play, which is what
 **v0.5** was; the current build is **v0.6**. It is also the first feature act to carry **nameplates** — thirteen
-of them, generated rather than placed by hand — now fifteen, plus a chapter
-card, twelve dialogue pills, a patch-queue HUD and a villain's bar, all of it
-still generated.
+of them, generated rather than placed by hand — now eighteen, plus a chapter
+card, twenty-six dialogue pills, a patch-queue HUD, a villain's bar and the
+letterbox callout, all of it still generated.
 
 **Act I carries the GUARDIAN BOND companion cards**, ported from the live
 overlay: Karl beside Kat, Alamo beside Natali, Katerina beside Kaslin, and Bob

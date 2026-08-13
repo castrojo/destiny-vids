@@ -436,6 +436,124 @@ WALK_ACHIEVEMENTS = [
 ]
 WALK_ACHIEVEMENT_HOLD = 3.0
 
+# --- THE TOC EXCHANGE AND THE ENDGAME (owner brief, issue #98 §3-§4) --------
+#
+# §3's exchange is the trio talking about the CNCF; §4 is the endgame's timed
+# cues. ALL COPY IS OWNER-AUTHORED AND VERBATIM, bracket spacing, casing and
+# the asterisk emphasis markers included (the markers are emphasis, not words:
+# the chat pill's message row is set in bold throughout, so `DO` and
+# `powering up` ARE bold on screen -- preserved, not differentiated).
+#
+# THE CLOCK TRAP, AGAIN (#109): the brief's marks are ACT II FILM time, and
+# one of them -- "JOSEPH at 5:07" -- lands in the 16.065 s of black tail
+# (picture ends at 4:51.933). The owner has since ruled where the exchange
+# plays: "this should be in the endless beautiful section, it's the only
+# section with greenery in it". The greenery is the jungle, and the jungle is
+# where The Long Walk already lives, so the exchange is laid out AROUND the
+# walk, never on top of it:
+#
+#   * the three QUESTIONS go up in the pre-walk window (2:19 -> the walk's
+#     first frame) -- with the trio itself on screen at 2:24;
+#   * the ANSWER lands after the walk, in the run-5 window its credits leave
+#     clear (220.967 -> Kyle's downbeat at 269.700), chained ahead of the two
+#     owner-marked §4 cues at 4:10 and 4:20.
+#
+# KARENA'S JUMP CARRIES NO CARD. "Karena says nothing and jumps. No card on
+# her here; the beat is the jump." So the beat is clear screen: JUMP_BEAT
+# seconds between Joseph's DO line and Ricardo's answer. No shot here was
+# verified as HER jump and picking one would be casting by inference -- the
+# frame is the owner's eye, recorded in `unresolved`.
+JUMP_BEAT = 1.5
+
+# The speakers are the brief's own tags ([KARENA] / [JOSEPH] / [RICARDO]),
+# not a casting.yaml lookup -- the same rule the montage applied to "Jorge
+# Castro". The `key` rides along ONLY to find the pfp; a speaker with no
+# recorded avatar (Karena, Joseph) gets the drawn crest, by omission rather
+# than by accident.
+TOC_PRE = [
+    {"id": "toc_karena", "key": "mara_sov", "speaker": "Karena",
+     "text": "One hundred thousand bootc volunteers, ready to power up",
+     "hold": 3.2},
+    {"id": "toc_joseph_worth", "key": "joseph_sandoval", "speaker": "Joseph",
+     "text": "Is it worth it?", "hold": 2.2},
+    {"id": "toc_ricardo", "key": "rochaporto", "speaker": "Ricardo",
+     "text": "You really think they can save open source?",
+     "hold": None},  # whatever is left before the walk's first frame
+]
+TOC_POST = [
+    {"id": "toc_joseph_faith", "key": "joseph_sandoval", "speaker": "Joseph",
+     "text": "Dunno, how much faith DO we have in the CNCF?", "hold": 3.0},
+    {"id": "toc_ricardo_desktop", "key": "rochaporto", "speaker": "Ricardo",
+     "text": "Cloud native desktop? ...", "hold": 2.6, "lead": JUMP_BEAT},
+    {"id": "toc_joseph_lol", "key": "joseph_sandoval", "speaker": "Joseph",
+     "text": "LOL", "hold": 2.2},
+]
+
+# The payoff pair from §3's announcement block. The first REPRISES the
+# montage's emeritus card verbatim -- a callback, so the copy is identical,
+# row for row, rank included. The second is the pivot it sets up; the brief's
+# block gives it no addressee row, so the card carries none.
+TOC_ANNOUNCEMENTS = [
+    {"id": "toc_announce_emeritus", "rank": "gold",
+     "name": "[ EMERITUS CONTRIBUTORS ]",
+     "title": "It's totally NOT like this. We promise."},
+    {"id": "toc_announce_ambassadors", "rank": None,
+     "name": None,
+     "title": "Have you met our Ambassadors?"},
+]
+
+# §4's owner-marked cues, pinned to his second. Like every window in this file
+# the anchor is carried in SOURCE time (`src_of` below), so a cut that moves
+# raises rather than slides.
+#
+# NOT HERE: the 4:01 cue -- "[pfp] Jorge Castro: They are not ready for Shua
+# Khan and Greg KH", drawn as a speech bubble ON Cayde. Cayde's [ REDACTED ]
+# card is at 287.933 (4:47.9), so a bubble anchored on him cannot also be at
+# 4:01. Which moves is the owner's call (#98, Questions) -- recorded in
+# `unresolved`, scheduled nowhere.
+TIMED_KROOK = 250.0          # 4:10
+TIMED_NATEWADDINGTON = 260.0  # 4:20
+TIMED_JORGE = 291.0          # 4:51 -- inside the cathedral shot, which ends
+                             # 291.933; the pill rides the black tail
+TIMED_JORGE_HOLD = 2.8
+
+# "New Announcement Placard" -- the montage's heraldic shape, not a chat pill.
+# The brief gives the placard no rank, so it carries no rank's chrome.
+NATEWADDINGTON_PLACARD = {
+    "name": "[ Natewaddington ]",
+    "title": "Time for your first real contribution kids",
+}
+
+# The untimed §4 cue, in the order the brief lists it: after krook, before
+# the placard.
+BEDAZZLE = {"speaker": "cncf marketing", "text": "Let's bedazzle this thing!"}
+
+# The letterbox callout. "Keep it up for the whole song": it comes up where
+# the brief's own scene starts (2:19, the montage's hand-off) and holds to
+# the last frame. It never shares the lower third's row -- it lives on the
+# bottom letterbox bar, below the picture.
+LETTERBOX_BANNER = (
+    "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST")
+
+# The closing montage: five quotes the brief leaves untimed. Its own proposal
+# is 4:51 -> 5:07, and the preamble lands the last cue on the final second --
+# so they are spread evenly from the gaslighting pill's out to the film's last
+# frame, over the black outro the owner is keeping "for future flexibility".
+#
+# siosm's line carries authored emphasis (`**powering up**` in the brief). The
+# asterisks are emphasis markup, not words -- burning them would put
+# punctuation on screen nobody meant to say -- so they are stripped here and
+# recorded in `unresolved`: the pill's message row is set in bold throughout
+# (the site's own style), so the emphasis survives but is not differentiated.
+CLOSING_QUOTES = [
+    ("cgwalters", "Use open source responsibly!"),
+    ("siosm", "I can feel Fedora powering up!"),
+    ("jberkus", "I knew they could do it!"),
+    ("preethi", "Great, more paperwork"),
+    ("castrojo", "Just another day on the CNCF Projects team"),
+]
+QUOTE_HOLD = 2.2
+
 LEAD_IN = 0.4      # let the cut land before the plate arrives
 MIN_HOLD = 2.2     # below this a plate cannot be read
 
@@ -1021,6 +1139,166 @@ def build():
         f"{film_of(WALK_OUT):.3f}s -- a card would ride over the hard cut")
     plates.extend(walk)
 
+    # --- the TOC exchange (owner brief #98, section 3) ---------------------
+    # One screen, one card: the exchange shares the lower third with
+    # everything else, so it is scheduled on ONE cursor even where the card's
+    # lane changes -- load_manifest_entries is position-blind, and two cards
+    # in different thirds of the frame still read as two cards at once.
+    toc = []
+
+    def src_of(film_sec):
+        """An owner mark is given in FILM time; anchor it in SOURCE time."""
+        return build_efmb.source_for_film(film_sec, lead)
+
+    def toc_chat(spec, at, hold):
+        entry = {
+            "id": spec["id"],
+            "kind": "chat",
+            "at": round(at, 3),
+            "dur": round(hold, 3),
+            "position": "left",
+            "copy_source": "owner_supplied",
+            "speaker": spec["speaker"],
+            "text": spec["text"],
+            "text_source": "owner_supplied",
+            **chat_avatar(spec["key"], casting),
+        }
+        return entry
+
+    # The questions, in the pre-walk window. The scene starts at 2:19 -- the
+    # lead-in banner that was to open it has no copy yet (#98, Questions), so
+    # the first line takes its slot.
+    cursor = MONTAGE_OUT
+    for spec in TOC_PRE:
+        hold = spec["hold"]
+        if hold is None:
+            hold = round(film_of(WALK_IN) - PLATE_GAP - cursor, 3)
+        assert hold >= MIN_HOLD, (
+            f"{spec['id']} gets only {hold:.3f}s before The Long Walk's first "
+            f"frame, under the {MIN_HOLD}s a card needs -- the pre-walk "
+            "window is full")
+        toc.append(toc_chat(spec, cursor, hold))
+        cursor = round(cursor + hold + PLATE_GAP, 3)
+
+    # The answer, after the walk's last card has cleared. `lead` is the TOTAL
+    # clear screen before the card -- the jump beat is measured in clear air,
+    # not in clear air plus a gap nobody asked for.
+    cursor = round(film_of(WALK_OUT) + PLATE_GAP, 3)
+    for spec in TOC_POST:
+        at = round(cursor - PLATE_GAP + spec.get("lead", PLATE_GAP), 3)
+        toc.append(toc_chat(spec, at, spec["hold"]))
+        cursor = round(at + spec["hold"] + PLATE_GAP, 3)
+    for spec in TOC_ANNOUNCEMENTS:
+        entry = {
+            "id": spec["id"],
+            "at": round(cursor, 3),
+            "dur": SOLO_HOLD,
+            "position": "center",
+            "copy_source": "owner_supplied",
+            "label": ANNOUNCER,
+            "title": spec["title"],
+        }
+        if spec["name"]:
+            entry["name"] = spec["name"]
+        if spec["rank"]:
+            entry.update(RANK_CHROME[spec["rank"]])
+        toc.append(entry)
+        cursor = round(cursor + SOLO_HOLD + PLATE_GAP, 3)
+
+    # --- the timed cues (owner brief #98, section 4) -----------------------
+    # krook and the placard are pinned to the owner's marks (4:10, 4:20); the
+    # bedazzle line is untimed and takes the gap between them in the order he
+    # listed them. All three are over run 5's end fight.
+    krook_at = round(film_of(src_of(TIMED_KROOK)), 3)
+    assert krook_at >= cursor, (
+        f"krook's 4:10 mark lands at {krook_at:.3f}s but the TOC exchange "
+        f"runs to {cursor:.3f}s -- one of them has to move")
+    timed = [{
+        "id": "timed_krook",
+        "kind": "chat",
+        "at": krook_at,
+        "dur": 3.0,
+        "position": "left",
+        "copy_source": "owner_supplied",
+        "seen_at_src": round(src_of(TIMED_KROOK), 3),
+        "speaker": "krook",
+        "text": "Generational talent detected, call in the best",
+        "text_source": "owner_supplied",
+    }, {
+        "id": "timed_bedazzle",
+        "kind": "chat",
+        "at": round(krook_at + 3.0 + PLATE_GAP, 3),
+        "dur": 2.6,
+        "position": "left",
+        "copy_source": "owner_supplied",
+        "speaker": BEDAZZLE["speaker"],
+        "text": BEDAZZLE["text"],
+        "text_source": "owner_supplied",
+    }, {
+        "id": "timed_natewaddington",
+        "at": round(film_of(src_of(TIMED_NATEWADDINGTON)), 3),
+        "dur": SOLO_HOLD,
+        "position": "center",
+        "copy_source": "owner_supplied",
+        "seen_at_src": round(src_of(TIMED_NATEWADDINGTON), 3),
+        "label": ANNOUNCER,
+        **NATEWADDINGTON_PLACARD,
+    }]
+
+    # The gaslighting pill and the closing quotes: his 4:51, then an even
+    # spread whose last card ENDS on the film's final frame, over the black
+    # outro. None of them are casting lookups -- the speakers are the brief's
+    # own handles, and every one without a recorded login renders the drawn
+    # crest (recorded in `unresolved`).
+    jorge_at = round(film_of(src_of(TIMED_JORGE)), 3)
+    timed.append({
+        "id": "timed_jorge",
+        "kind": "chat",
+        "at": jorge_at,
+        "dur": TIMED_JORGE_HOLD,
+        "copy_source": "owner_supplied",
+        "seen_at_src": round(src_of(TIMED_JORGE), 3),
+        "speaker": "jorge",
+        "text": "Well shut my gaslighting mouth ....",
+        "text_source": "owner_supplied",
+        **chat_avatar("castrojo", casting),
+    })
+    film_sec = plan["film_sec"]
+    quotes_start = round(jorge_at + TIMED_JORGE_HOLD + PLATE_GAP, 3)
+    quote_step = round(
+        (film_sec - QUOTE_HOLD - quotes_start) / (len(CLOSING_QUOTES) - 1), 3)
+    for i, (speaker, text) in enumerate(CLOSING_QUOTES):
+        timed.append({
+            "id": f"quote_{speaker}",
+            "kind": "chat",
+            "at": round(quotes_start + i * quote_step, 3),
+            "dur": QUOTE_HOLD,
+            "copy_source": "owner_supplied",
+            "speaker": speaker,
+            "text": text,
+            "text_source": "owner_supplied",
+            **chat_avatar(speaker, casting),
+        })
+    last_quote = timed[-1]
+    assert abs(last_quote["at"] + last_quote["dur"] - film_sec) < 0.01, (
+        "the preamble lands the last cue on the final second")
+
+    # The letterbox callout: up where the brief's scene starts, down on the
+    # last frame -- "keep it up for the whole song".
+    toc.append({
+        "id": "letterbox_banner",
+        "kind": "banner",
+        "at": MONTAGE_OUT,
+        "dur": round(film_sec - MONTAGE_OUT, 3),
+        "position": "letterbox",
+        "copy_source": "owner_supplied",
+        "text": LETTERBOX_BANNER,
+        "text_source": "owner_supplied",
+    })
+
+    plates.extend(toc)
+    plates.extend(timed)
+
     plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))
 
     for cur, nxt, room in space_plates(plates):
@@ -1064,16 +1342,54 @@ def build():
             "no title row is authored for GloriousEggroll, HikariKnight or "
             "A1RM4X -- their affiliation rides as chrome and the row is "
             "omitted rather than composed",
-            "the montage's two Jorge Castro chat pills still have no pfp: "
-            "`castrojo` is a lead, his identity lives on the `cayde_6` "
-            "binding, and no avatar is recorded on it. The drawn crest "
-            "stands in",
+            "the owner's own chat pills still have no pfp: `castrojo` is a "
+            "lead, his identity lives on the `cayde_6` binding, and no avatar "
+            "is recorded on it. The drawn crest stands in on the montage's "
+            "two pills, the 4:51 gaslighting pill, and his closing quote",
             "the 2:19 lead-in banner (owner: \"setting up this scene it's "
-            "important\") has no authored copy, so nothing is emitted for it",
+            "important\") has no authored copy, so nothing is emitted for it "
+            "-- the TOC exchange's first line takes its slot",
             "the CNCF logo the brief marks as [CNCF LOGO] on each announcement "
             "has no asset in this repo; the cards render without it",
             "AN4-CH3CK-12 is not in vocab/casting.yaml -- it is reproduced as "
             "the announcer's label, and casts nobody",
+            "the 4:01 cue ('They are not ready for Shua Khan and Greg KH', "
+            "a speech bubble ON Cayde) is NOT scheduled: Cayde's "
+            "[ REDACTED ] card is at 287.933 (4:47.9), so a bubble anchored "
+            "on him cannot also be at 4:01. TODO(owner): which moves -- the "
+            "bubble to ~4:48, or the anchor (#98, Questions)",
+            "krook, Natewaddington, cgwalters, siosm, jberkus and preethi are "
+            "not in vocab/casting.yaml -- their pills and the placard render "
+            "as placeholder badges with the drawn crest, and their GitHub "
+            "logins are the owner's to confirm before any avatar is fetched "
+            "(a login is not guessed). 'cncf marketing' as a speaker and the "
+            "Open Gaming Collective callout are reproduced as written; "
+            "neither casts anybody",
+            "the brief names the same person three ways -- 'Jorge Castro' in "
+            "the montage, 'jorge' at 4:51, 'castrojo' in the closing quotes. "
+            "All three are reproduced verbatim; the pill's own chrome "
+            "uppercases the speaker row",
+            "Karena's jump carries no card ('the beat is the jump'): it is "
+            f"{JUMP_BEAT}s of clear screen between Joseph's DO line and "
+            "Ricardo's answer. No shot was verified as HER jump and picking "
+            "one would be casting by inference -- TODO(owner): the frame",
+            "the closing five quotes play over the black outro (picture ends "
+            "4:51.933): the brief's own schedule put them 4:51 -> 5:07 and "
+            "its preamble lands the last cue on the final second. The tail "
+            "is black by the owner's standing decision",
+            "Joseph's 'DO' and siosm's 'powering up' carry authored emphasis; "
+            "the pill's message row is set bold throughout (the site's own "
+            "style), so both ARE bold on screen but not differentiated. "
+            "siosm's asterisks are emphasis markup and are stripped, not "
+            "burned. An accent-colour emphasis would be chrome nobody "
+            "authored",
+            "the letterbox callout runs 2:19 -> the last frame, where the "
+            "brief's scene starts; 'the whole song' could also mean from "
+            "0:00 or from the pill that first asks it (1:43.5). TODO(owner): "
+            "say if it should come up earlier",
+            "the TOC payoff REPRISES the montage's emeritus card verbatim -- "
+            "a callback, not a second credit; the double-credit guard was "
+            "taught that a verbatim reprise is not two faces",
         ],
     }
 

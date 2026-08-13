@@ -265,6 +265,18 @@ STATUS_INSET = 3.0 * REM
 # .wolves-guardian-plate-raised { bottom: auto; top: 28% }
 RAISED_TOP = 0.28
 
+# --- letterbox banner (owner brief, issue #98) -------------------------------
+# "a huge callout along the bottom of the letterbox ... Keep it up for the
+# whole song". One tracked line on the bottom bar of a letterboxed frame --
+# cinema-subtitle territory, BELOW the picture, so it can hold for a whole
+# film without ever sharing the lower third's row. There is no deck component
+# for it; it is chrome, not copy: the words are owner-authored and the shape
+# is one line of the deck's own tracked type.
+BANNER_FS_MAX = 2.6 * REM    # "huge" -- bounded by the bar's ~140px
+BANNER_FS_MIN = 1.2 * REM    # below this it is not a callout; render whole anyway
+BANNER_LS = 0.18             # letter-spacing, em
+BANNER_MAX_W = 0.94          # of the frame's width
+
 # --- chat card (wolves-*/render/plate.html -- the baked dialogue pill) -------
 # The other videos' talking card is neither the reveal plate nor the site's
 # .wc-nameplate: it is the one-line pill plate.html bakes -- [crest] SPEAKER |
@@ -378,10 +390,11 @@ MARGIN_BOTTOM = 0.10
 CARD_KINDS = ("act", "comic")
 
 # The card kinds that own a row of their own rather than the lower third: the
-# site's top-left HUD, Destiny's boss bar at the top of frame, and the console
-# toast under it. Each may share the screen with a lower third and with a
-# different chrome row; two of the SAME kind at once are still an error.
-CHROME_ROWS = ("status", "miniboss", "achievement")
+# site's top-left HUD, Destiny's boss bar at the top of frame, the console
+# toast under it, and the letterbox banner on the bottom bar of a letterboxed
+# frame. Each may share the screen with a lower third and with a different
+# chrome row; two of the SAME kind at once are still an error.
+CHROME_ROWS = ("status", "miniboss", "achievement", "banner")
 
 # --- group rows (the reference deck's roll call, ~/Videos/nameplates.json) ---
 # The deck's gp_* entries are one row of credits, doubly staggered: spatially,
@@ -459,7 +472,7 @@ def _draw_tracked(draw, xy, text, font, fill, tracking_em):
         x += draw.textlength(ch, font=font) + extra
 
 
-def _gradient_text(size, text, font, stops):
+def _gradient_text(size, text, font, stops, tracking_em=0.0):
     """The name's vertical gradient (background-clip: text).
 
     ``stops`` is ``[(offset, rgba), ...]`` with offsets in 0..1, mirroring the
@@ -468,7 +481,11 @@ def _gradient_text(size, text, font, stops):
     """
     layer = Image.new("RGBA", size, (0, 0, 0, 0))
     mask = Image.new("L", size, 0)
-    ImageDraw.Draw(mask).text((0, 0), text, font=font, fill=255)
+    if tracking_em:
+        _draw_tracked(ImageDraw.Draw(mask), (0, 0), text, font, 255,
+                      tracking_em)
+    else:
+        ImageDraw.Draw(mask).text((0, 0), text, font=font, fill=255)
     grad = Image.new("RGBA", size)
     for y in range(size[1]):
         t = y / max(1, size[1] - 1)
@@ -1062,6 +1079,37 @@ def _render_status(spec, glitch=False):
     return img
 
 
+def _render_banner(spec):
+    """The letterbox callout: one tracked line, sized to the frame's width.
+
+    NOT uppercased, for the same reason the chat pill's message is not: the
+    string is owner-authored copy (`copy_source: owner_supplied`) and shouting
+    the mixed-case part ("Support Open Gaming Collective") would put an
+    emphasis on it nobody wrote. Shrink-to-fit like the chat pill: one wide
+    line, never a wrap, and at the floor it renders whole rather than clip.
+    """
+    text = spec.get("text") or ""
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    max_w = FRAME_W * BANNER_MAX_W
+
+    size = BANNER_FS_MAX
+    f_text = _font("bold", int(size))
+    while (int(size) > int(BANNER_FS_MIN)
+           and _tracked_width(probe, text, f_text, BANNER_LS) > max_w):
+        size -= 1
+        f_text = _font("bold", int(size))
+
+    w = int(math.ceil(_tracked_width(probe, text, f_text, BANNER_LS))) + 4
+    a, d = f_text.getmetrics()
+    img = Image.new("RGBA", (w, int((a + d) * 1.3)), (0, 0, 0, 0))
+    layer = _gradient_text((w, int(f_text.size * 1.4)), text, f_text,
+                           [(0.0, (255, 255, 255, 255)),
+                            (0.6, NAME_MID), (1.0, NAME_BOTTOM)],
+                           tracking_em=BANNER_LS)
+    img.alpha_composite(_with_text_shadow(layer), (0, 0))
+    return img
+
+
 def _render_companion(spec):
     """The site's GUARDIAN BOND card: species artwork over a three-row plate.
 
@@ -1361,6 +1409,8 @@ def render_plate(spec):
         return _render_achievement(spec)
     if spec.get("kind") == "status":
         return _render_status(spec, glitch=bool(spec.get("glitch")))
+    if spec.get("kind") == "banner":
+        return _render_banner(spec)
     variant = _variant_for(spec)
     ghost = spec.get("kind") == "ghost"
     card = spec.get("kind") == "title"
@@ -1524,6 +1574,17 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
         frame.alpha_composite(
             plate, (px + pw - int(STATUS_INSET) - plate.width,
                     py + ph - int(STATUS_INSET) - plate.height))
+        return frame
+    if position == "letterbox":
+        # The banner's strip is the bottom BAR of a letterboxed frame: below
+        # the picture entirely, so it can hold for a whole film and never
+        # share the lower third's row (issue #98: "a huge callout along the
+        # bottom of the letterbox ... keep it up for the whole song"). On a
+        # full-frame source there is no bar and it sits at the bottom edge.
+        bar_top = py + ph
+        x = (FRAME_W - plate.width) // 2
+        y = bar_top + max(0, (FRAME_H - bar_top - plate.height) // 2)
+        frame.alpha_composite(plate, (x, y))
         return frame
     if position == "boss":
         # Destiny puts a named enemy's bar at the top of frame, centred.
@@ -2660,9 +2721,12 @@ def load_manifest_entries(entries):
             # Two chrome cards may share the screen only when they do not
             # share a row. The status HUD sits alone at the bottom; the boss
             # bar and the console toast BOTH live at the top of frame, so
-            # they are held to the one-at-a-time rule against each other.
+            # they are held to the one-at-a-time rule against each other. The
+            # letterbox banner is below the picture entirely, on the bar, so
+            # it shares a row with nothing -- only a second banner collides.
             if a_kind in CHROME_ROWS and b_kind in CHROME_ROWS \
-                    and "status" in (a_kind, b_kind) and a_kind != b_kind:
+                    and a_kind != b_kind \
+                    and {"status", "banner"}.intersection((a_kind, b_kind)):
                 continue
             if a_bond == b_id or b_bond == a_id:
                 continue
