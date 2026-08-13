@@ -230,8 +230,32 @@ CHAPTERS = [
     (TRIO_IN, "TOC"),
     (185.233, "Rizzo"),
 ]
-SOLO_HOLD = 3.2
-TRIO_HOLD = 2.6
+# HOW LONG A CREDIT STAYS UP.
+#
+# Owner instruction, from the first alpha watch: "at a bare minimum keep the
+# nameplates up longer it's worth it this is a hero video we want people's
+# moments to shine". These held 3.2 s and 2.6 s for the alpha; that was long
+# enough to READ a name and too short for it to land.
+#
+# The ceiling is not the shot. A lower third may ride past its shot's out point
+# -- that is normal, and it is what lets a 1.6 s shot carry a credit -- so the
+# real ceiling is the NEXT plate in the same frame position, enforced by
+# `space_plates` rather than by hand-checking pairs.
+SOLO_HOLD = 4.5
+TRIO_HOLD = 4.0
+
+# The gap between two credits in the same position. Below this the outgoing
+# card and the incoming one read as one flicker rather than two people.
+PLATE_GAP = 0.25
+
+# The trio arrives one card at a time, 0.8 s apart, and the row clears
+# together. Owner instruction, same note: "stagger intros so that each
+# character has a shot to shine". Sequential lower thirds -- one card up, out,
+# then the next -- would need 3 x (2.2 + 0.25) = 7.35 s and the trio only reads
+# as three separate figures for 3.0 s, so the row still assembles inside the
+# window it is true for; what is staggered is the ENTRANCE, which is the beat
+# that gives each name its own moment.
+TRIO_STAGGER = 0.8
 
 # Spans no plate may be visible over, in SOURCE time.
 #
@@ -403,6 +427,40 @@ def fetch_avatars(manifest, verbose=True):
     return got, failed
 
 
+def space_plates(plates):
+    """Stop a credit running into the next one in the same frame position.
+
+    Holds are set by how long a name wants to be readable; whether that fits is
+    a property of the TIMELINE, not of the plate. Two cards in the same
+    position with no gap between them read as one flicker, so each plate is
+    shortened to clear ``PLATE_GAP`` before its successor.
+
+    A plate is never shortened below ``MIN_HOLD`` -- if it does not fit, it
+    keeps its readable minimum and is returned in the report, because a
+    silently unreadable credit is worse than a visible scheduling problem.
+
+    Positions are independent: the trio's left/center/right cards sit in
+    different thirds of the frame and cannot collide with each other.
+    """
+    tight = []
+    by_position = {}
+    for p in plates:
+        by_position.setdefault(p.get("position"), []).append(p)
+
+    for lane in by_position.values():
+        lane.sort(key=lambda p: p["at"])
+        for cur, nxt in zip(lane, lane[1:]):
+            room = round(nxt["at"] - cur["at"] - PLATE_GAP, 3)
+            if cur["dur"] <= room:
+                continue
+            if room < MIN_HOLD:
+                tight.append((cur, nxt, room))
+                cur["dur"] = MIN_HOLD
+            else:
+                cur["dur"] = room
+    return tight
+
+
 def _at(shot_in, film_of):
     """When the plate arrives: after the cut has landed."""
     return round(film_of(shot_in) + LEAD_IN, 3)
@@ -419,19 +477,25 @@ def build():
     plates = []
 
     # --- the trio, as one row ---------------------------------------------
-    # Three sequential lower thirds would need 3 x (2.2 + 0.25) = 7.35 s and the
-    # trio only reads as a trio for 3.0 s, so they go up together as a row --
-    # which is also how the reference deck does a roll call.
+    # The row assembles one card at a time and clears together: each Guardian
+    # gets an entrance of their own (TRIO_STAGGER), and once up the three read
+    # as the roll call they are. Owner instruction -- see TRIO_STAGGER.
+    #
+    # The row rides past TRIO_OUT, where the camera pushes in on the hooded
+    # Hunter. That is deliberate and it is the owner's call: holding the names
+    # only while all three figures are separate is what made them flash by.
     trio_at = _at(TRIO_IN, film_of)
-    trio_dur = round(min(TRIO_HOLD, film_of(TRIO_OUT) - trio_at), 3)
-    assert trio_dur >= MIN_HOLD, (
-        f"the trio row can only hold {trio_dur:.3f}s, below the {MIN_HOLD}s a "
-        "plate needs to be read")
+    trio_out = round(trio_at + (len(TRIO) - 1) * TRIO_STAGGER + TRIO_HOLD, 3)
     for order, (key, where) in enumerate(TRIO):
+        at = round(trio_at + order * TRIO_STAGGER, 3)
+        dur = round(trio_out - at, 3)
+        assert dur >= MIN_HOLD, (
+            f"the trio's {key} card can only hold {dur:.3f}s, below the "
+            f"{MIN_HOLD}s a plate needs to be read")
         plates.append({
             "id": f"trio_{key}",
-            "at": trio_at,
-            "dur": trio_dur,
+            "at": at,
+            "dur": dur,
             "position": where,
             "scale": TRIO_SCALE,
             "group": "trio_row",
@@ -529,6 +593,11 @@ def build():
     })
 
     plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))
+
+    for cur, nxt, room in space_plates(plates):
+        print(f"plate {cur['id']} has only {room:.3f}s before {nxt['id']} and "
+              f"keeps the {MIN_HOLD}s minimum -- the two overlap on screen",
+              file=sys.stderr)
 
     return {
         "_what": (

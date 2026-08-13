@@ -21,7 +21,7 @@
     {
       "id": "trio_joseph_sandoval",
       "at": 54.634,
-      "dur": 2.6,
+      "dur": 5.6,
       "position": "left",
       "scale": 0.62,
       "group": "trio_row",
@@ -35,8 +35,8 @@
     },
     {
       "id": "trio_rochaporto",
-      "at": 54.634,
-      "dur": 2.6,
+      "at": 55.434,
+      "dur": 4.8,
       "position": "center",
       "scale": 0.62,
       "group": "trio_row",
@@ -53,8 +53,8 @@
     },
     {
       "id": "trio_mara_sov",
-      "at": 54.634,
-      "dur": 2.6,
+      "at": 56.234,
+      "dur": 4.0,
       "position": "right",
       "scale": 0.62,
       "group": "trio_row",
@@ -71,7 +71,7 @@
     {
       "id": "blueberry_Giklab",
       "at": 73.401,
-      "dur": 3.2,
+      "dur": 4.5,
       "position": "right",
       "shot_src": [
         90.767,
@@ -87,7 +87,7 @@
     {
       "id": "placeholder_dylan_taylor",
       "at": 130.267,
-      "dur": 3.2,
+      "dur": 4.5,
       "position": "right",
       "copy_source": "casting",
       "shot_src": [
@@ -103,7 +103,7 @@
     {
       "id": "solo_wrkode",
       "at": 161.767,
-      "dur": 3.2,
+      "dur": 4.5,
       "position": "left",
       "copy_source": "casting",
       "shot_src": [
@@ -119,7 +119,7 @@
     {
       "id": "blueberry_HuntedRaven7",
       "at": 171.801,
-      "dur": 3.2,
+      "dur": 4.5,
       "position": "right",
       "shot_src": [
         195.267,
@@ -135,7 +135,7 @@
     {
       "id": "blueberry_hanthor",
       "at": 210.034,
-      "dur": 3.2,
+      "dur": 4.5,
       "position": "right",
       "shot_src": [
         233.5,
@@ -151,7 +151,7 @@
     {
       "id": "placeholder_ahmedadan",
       "at": 217.701,
-      "dur": 3.2,
+      "dur": 4.5,
       "position": "right",
       "copy_source": "casting",
       "shot_src": [
@@ -167,7 +167,7 @@
     {
       "id": "solo_KyleGospo",
       "at": 269.7,
-      "dur": 3.2,
+      "dur": 4.383,
       "position": "left",
       "copy_source": "casting",
       "shot_src": [
@@ -186,7 +186,7 @@
     {
       "id": "solo_p5",
       "at": 274.333,
-      "dur": 3.2,
+      "dur": 4.5,
       "position": "left",
       "copy_source": "casting",
       "shot_src": [
