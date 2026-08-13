@@ -105,6 +105,35 @@ def find_ffmpeg(prefer_container=True):
     return [found]
 
 
+def find_ffprobe(prefer_container=True):
+    """``find_ffmpeg``'s sibling: same resolution order, for ffprobe.
+
+    The one divergence is ``imageio-ffmpeg``: that wheel ships a bare ffmpeg
+    with no ffprobe beside it, so it cannot satisfy this lookup and is
+    skipped. ``DESTINY_FFPROBE`` wins outright when set.
+    """
+    override = os.environ.get("DESTINY_FFPROBE")
+    if override:
+        return shlex.split(override)
+
+    if prefer_container and shutil.which("podman"):
+        name = os.environ.get("DESTINY_FFMPEG_CONTAINER", DEFAULT_CONTAINER)
+        if _container_running(name):
+            return ["podman", "exec", name, "ffprobe"]
+        image = os.environ.get("DESTINY_FFMPEG_IMAGE")
+        if image:
+            home = str(Path.home())
+            return ["podman", "run", "--rm", "-v", f"{home}:{home}",
+                    "-w", os.getcwd(), "--entrypoint", "ffprobe", image]
+
+    found = shutil.which("ffprobe")
+    if not found:
+        raise RuntimeError(
+            "no ffprobe found: start the ffmpeg container or set DESTINY_FFPROBE"
+        )
+    return [found]
+
+
 def resolve_media(video_id, media_dir):
     """Find the source file for a video_id, as an absolute path.
 
