@@ -1,12 +1,12 @@
 {
   "_what": "Seven Days to the Wolves — the whole programme, assembled from its acts. THE RUNNING ORDER IS CANONICAL and settled by the owner on 2026-08-12: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). docs/running-order.md is the source of truth for it; this file executes it.",
   "_acts": {
-    "I": "intro — the Destiny hero video (Into the Light), six Guardians plated, with the comic title card and the Amber Graner quote covering source 24.5 - 38.",
-    "II": "endlessformsmostbeautiful — NOT BUILT. 'It's endless forms most beautiful, instrumental' names the record, not a track. No footage, no outline, no card. Issue #74.",
+    "I": "intro — the Into the Light opener, six Guardians plated, with the title cover (wolves.jpg) covering source 24.5 - 38.",
+    "II": "endlessformsmostbeautiful — delivered and credited, in the programme. Five unbroken runs of the live-action trailers scored to Nightwish's Endless Forms Most Beautiful (instrumental); The Long Walk inside them. See docs/cuts/02-endless-forms-most-beautiful.md. Its picture is a fan compilation (same provenance question as act VI, #55).",
     "III": "mrbobbytables — the August 2026 contributors piece, cut from the Curse of Osiris opening cinematic. Owner-named and owner-placed. He calls it PARTIALLY COMPLETE, so it is placed as-is and will be replaced by its finished version.",
     "IV": "kat — Kat Cosgrove's Guardian intro, behind the owner-authored BIAS FOR ACTION slide.",
     "V": "nat — Natali Vlatko's Guardian arrival, behind the same authorisation slide retitled WRONG PLACE, WRONG TIME, RIGHT ATTITUDE.",
-    "VI": "7daystothewolves — the musical. STAGED, not approved: a timing pass whose provenance is unresolved (issue #55).",
+    "VI": "7daystothewolves — the musical. Editorial pass, delivered for review, not approved: provenance is unresolved (issue #55). Its tail plates the Cayde-6 reveal and three gold credits.",
     "VII": "europa — the Europa director's cut.",
     "VIII": "credits — NOT DESIGNED. Issue #51."
   },
@@ -15,11 +15,11 @@
     "_where": "Every act plays from ~/Videos/Wolves/Prod, which holds the HIGHEST-QUALITY master of each: FLAC audio and the un-re-encoded picture. They are hardlinks to the per-project masters, so Prod costs no extra disk and cannot drift from what its project built. The retired ~/Videos/UPLOAD staging folder held lossy copies of the same cuts and is NOT what this reads; its removal is issue #81.",
     "hero": "~/Videos/Wolves/Prod/01-intro.mp4 (hardlink to renders/megacut-01-hero.mp4) — YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), Bungie's score, six Guardian plates and the comic title card burned. usage_class: third_party_copyrighted. BUILT 2026-08-12: raw trim (x264 crf 14) + tools/plate.py burn (crf 18), audio decoded from the plain 251 Opus rung to FLAC -- NOT 251-drc, which is dynamic-range compressed and forbidden by the audio standard. Delivered as act I.",
     "mrbobbytables": "Wolves/Prod/03-mrbobbytables.mp4 -> destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4. PARTIALLY COMPLETE by the owner's description; placed as-is, because assembly never re-cuts what it is handed.",
-    "kat": "Wolves/Prod/04-kat.mp4 -> ~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4. NOTE: the owner's dialogue change (Kat/Ian split, and 'Remember kids, cardio!') is staged in that project and NOT yet rendered, so this master still carries the old dialogue. Rebuild it there before assembling.",
+    "kat": "Wolves/Prod/04-kat.mp4 -> ~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4. Carries the owner's dialogue change (the Kat/Ian telnet split and 'Remember kids, cardio!'), rebuilt 2026-08-12 16:52; the Prod hardlink survived the rebuild because the script writes its master in place.",
     "natali": "Wolves/Prod/05-nat.mp4 -> ~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4.",
     "wolves": "Wolves/Prod/06-7daystothewolves.mp4 -> ~/Videos/wolves-musical/wolves-7days-plated-master.mp4 (the clean pre-plate master is wolves-7days-master.mp4 in the same folder). THE ONE ACT WITH NO LOSSLESS MASTER: it is AAC (stereo, 48 kHz, ~323 kb/s), so Prod holds the best that exists rather than the best possible. Issue #58. It was re-homed out of the retired UPLOAD/ staging folder by moving the inode, so the hardlink never broke.",
     "europa": "Wolves/Prod/07-europa.mp4 -> ~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4.",
-    "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-hq.mp4. Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md."
+    "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md."
   },
   "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.6.mp4",
   "width": 1920,
@@ -102,7 +102,7 @@
       "kind": "clip",
       "path": "/var/home/jorge/Videos/Wolves/Prod/06-7daystothewolves.mp4",
       "audio": "source",
-      "label": "Act VI — Seven Days to the Wolves: the musical (TIMING PASS, provenance open), with the Cayde-6 tail plates burned in",
+      "label": "Act VI — Seven Days to the Wolves: the musical (editorial pass, provenance open), with the Cayde-6 tail plates burned in",
       "_plates": "Act VI carries stories/06-wolves-cayde-plates.json burned in (tools/plate.py burn --fit-picture). Prod holds ONE file per act, hardlinked to its project master, so Prod/06 -> ~/Videos/wolves-musical/wolves-7days-plated-master.mp4. The UN-PLATED master is kept beside it as wolves-7days-master.mp4, because burning is not idempotent: a re-burn starts from the clean file and never stacks a second card on the first. Audio is stream-copied, so the act's duration is unchanged (432.7330) and no chapter after it moves."
     },
     {
@@ -119,6 +119,6 @@
       "label": "Act VII — Europa Director's Cut"
     }
   ],
-  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Acts II and VIII have no film, so they have no marker -- a chapter that jumps to the next act's footage would be a lie about what plays.",
-  "_version": "v0.6 -- v0.5 plus act VI's tail plates (the Cayde-6 reveal and three gold credits); the act's duration is unchanged, so no chapter moved. v0.5 was the owner's name for the build before them: everything that exists, assembled, and explicitly NOT the feature. Seven of the eight acts play. What makes it a .5 rather than a 1.0: act VIII (the credits) is not designed (#51), so the programme ends on Europa, and the only names in it are act VI's tail; act VI is a timing pass whose provenance is an open owner decision (#55); act II's picture comes from a fan compilation with the same question (#74's film); act III is partially complete by the owner's own description; and act VII's master clips at +0.3 dBTP (#82). None of those is fixed by re-assembling -- assembly joins finished things and never re-cuts one."
+  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no film, so it has no marker -- a chapter that jumps to the next act's footage would be a lie about what plays.",
+  "_version": "v0.6 -- v0.5 plus act VI's tail plates (the Cayde-6 reveal and three gold credits); the act's duration is unchanged, so no chapter moved. v0.5 was the owner's name for the build before them: everything that exists, assembled, and explicitly NOT the feature. Seven of the eight acts play. What makes it a .5 rather than a 1.0: act VIII (the credits) is not designed (#51), so the programme ends on Europa, and the only names in it are act VI's tail; act VI is an editorial pass whose provenance is an open owner decision (#55); act II's picture comes from a fan compilation with the same question (#74's film); act III is partially complete by the owner's own description; and act VII's master clips at +0.3 dBTP (#82). None of those is fixed by re-assembling -- assembly joins finished things and never re-cuts one."
 }

@@ -39,8 +39,9 @@ have now been carried out, and every marker card is filled with picture. It is
 still not a finished cut — it carries no nameplates.
 
 The programme itself is assembled by `tools/megacut.py` from
-`~/Videos/Wolves/Prod/` and is **not yet rendered**, by owner instruction ("fix
-it in the video don't render it"). The build record is
+`~/Videos/Wolves/Prod/` and **v0.6 is rendered** —
+`~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.6.mp4` — though it is
+still not the feature. The build record is
 [`cuts/08-directors-cut-megacut.md`](cuts/08-directors-cut-megacut.md).
 
 ### What this replaced, and what is now placed
@@ -109,9 +110,9 @@ Delivered in `~/Videos/Wolves/Prod/` today, classified under this taxonomy.
 | File | Kind |
 |---|---|
 | `03-mrbobbytables` | **act III** of the feature — a monthly contributors reel, partially complete |
-| `04-kat` | **act IV** of the feature; also Kat's hero video (promo) |
+| `04-kat` | **act IV** of the feature; Kat's hero video is a separate, separately-released promo |
 | `05-nat` | **act V** of the feature — the Nati teaser, no longer unplaced |
-| `06-7daystothewolves` | **act VI** — the musical. Editorial pass, not approved; delivery blocked on provenance ([issue #55]) |
+| `06-7daystothewolves` | **act VI** — the musical. Editorial pass, not approved; publication blocked on provenance ([issue #55]) |
 | `07-europa` | **act VII** — the Europa director's cut, no longer unplaced |
 
 Not acts, and not in the feature — build outputs under `renders/`:
@@ -133,8 +134,9 @@ every Cayde shot in the index**, which is a different video that has not been
 made yet — and today the index holds 1.2 seconds of him.
 
 The monthly contributors reel is a third thing — the whole Curse of Osiris
-cinematic, uncut and re-credited each month. It is neither part of the feature
-nor a hero video, and it is regenerated per roster rather than authored.
+cinematic, uncut and re-credited each month. It is not a hero video, and it is
+regenerated per roster rather than authored; its August 2026 edition is
+currently placed as **act III** of the feature, by the owner.
 
 [issue #49]: https://github.com/castrojo/destiny-vids/issues/49
 [issue #51]: https://github.com/castrojo/destiny-vids/issues/51
