@@ -2196,8 +2196,20 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None):
         start = float(e["at"])
         end = start + float(e["dur"])
         label = f"v{i}"
+        # NO SHELL QUOTES HERE, AND THE COMMAS ARE ESCAPED.
+        #
+        # `enable='between(t,269.7,272.9)'` is the form the ffmpeg docs show,
+        # and it is correct -- on a COMMAND LINE, where the shell strips the
+        # quotes. This command is built as an argv list and never sees a shell,
+        # so ffmpeg received the quote characters as part of the expression,
+        # failed to parse it, disabled the overlay, and exited 0. The result
+        # was a video that looked finished and carried no plates at all.
+        #
+        # Unquoted, the commas must be escaped instead, or the filtergraph
+        # parser reads them as argument separators.
         steps.append(
-            f"[{last}][{i}:v]overlay=0:0:enable='between(t,{start:.3f},{end:.3f})'[{label}]"
+            f"[{last}][{i}:v]overlay=0:0:"
+            f"enable=between(t\\,{start:.3f}\\,{end:.3f})[{label}]"
         )
         last = label
     if not steps:

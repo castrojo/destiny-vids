@@ -36,7 +36,8 @@
       "name": "Ricardo Rocha",
       "title": "Cloud Native Atom Smasher",
       "wreath": true,
-      "avatar": "https://avatars.githubusercontent.com/u/52753?v=4"
+      "avatar": "renders/avatars/rochaporto.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
     },
     {
       "id": "trio_mara_sov",
@@ -167,7 +168,8 @@
       "name": "Kyle Gospodnetich",
       "title": "The First Knife",
       "variant": "bazzite",
-      "avatar": "https://avatars.githubusercontent.com/u/10704358?v=4"
+      "avatar": "renders/avatars/KyleGospo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10704358?v=4"
     },
     {
       "id": "solo_p5",
@@ -185,7 +187,8 @@
       "name": "[ p5 ]",
       "title": "Herald of the Hummingbird",
       "variant": "bazzite",
-      "avatar": "https://avatars.githubusercontent.com/u/46304672?v=4"
+      "avatar": "renders/avatars/p5.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/46304672?v=4"
     },
     {
       "id": "solo_EyeCantCU",
@@ -203,7 +206,8 @@
       "name": "[ EyeCantCU ]",
       "title": "Seer of the Truth",
       "variant": "bazzite",
-      "avatar": "https://avatars.githubusercontent.com/u/18015150?v=4"
+      "avatar": "renders/avatars/EyeCantCU.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18015150?v=4"
     },
     {
       "id": "cayde_signoff",

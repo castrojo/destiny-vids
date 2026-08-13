@@ -69,6 +69,20 @@ import build_efmb  # noqa: E402
 MANIFEST = REPO_ROOT / "stories" / "02-endless-forms-plates.json"
 ROSTER = REPO_ROOT / "renders" / "roster-2026-08.json"
 
+# WHERE AVATARS LIVE, AND WHY THE MANIFEST NEVER CARRIES A URL.
+#
+# vocab/casting.yaml records each person's avatar as a GitHub URL, because that
+# is the durable identifier. tools/plate.py needs a LOCAL FILE -- the renderer
+# never touches the network -- so a URL handed to it silently falls back to the
+# drawn crest with a punch-list warning, which is how every wreathed plate in
+# this act was quietly rendering without its portrait.
+#
+# So the manifest carries the cache path and keeps the URL beside it as
+# provenance. The picture is a fetched artifact, so it lives in gitignored
+# renders/ like every other one; missing it degrades to the crest rather than
+# blocking, and `--fetch-avatars` fills it in.
+AVATAR_DIR = Path("renders") / "avatars"
+
 # --- the authored bindings -------------------------------------------------
 # (source_in, source_out) is the SHOT, measured. `hold` is how long the plate
 # stays up; it may ride past the shot's out point, which is normal for a lower
@@ -296,6 +310,53 @@ def blueberry_entry(item, at, dur, casting):
     return entry
 
 
+def localise_avatar(key, copy):
+    """Point a plate's ``avatar`` at the local cache, keeping the URL as source.
+
+    Returns the copy unchanged when there is no avatar -- Karena has none,
+    because no GitHub login for her is on record anywhere in this repo and a
+    login is not an agent's to guess (issue #87). A wreath with no portrait to
+    ring is a recorded gap, not a reason to invent one.
+    """
+    url = copy.get("avatar")
+    if not url or not str(url).startswith("http"):
+        return copy
+    copy = dict(copy)
+    copy["avatar"] = str(AVATAR_DIR / f"{key}.png")
+    copy["avatar_url"] = url
+    return copy
+
+
+def fetch_avatars(manifest, verbose=True):
+    """Download every avatar the manifest names. Degrade, never block."""
+    import urllib.request
+
+    dest_dir = REPO_ROOT / AVATAR_DIR
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    got, failed = 0, []
+    for plate in manifest["plates"]:
+        url = plate.get("avatar_url")
+        if not url:
+            continue
+        dest = REPO_ROOT / plate["avatar"]
+        try:
+            req = urllib.request.Request(
+                url, headers={"User-Agent": "destiny-vids"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                dest.write_bytes(resp.read())
+            got += 1
+            if verbose:
+                print(f"  {plate['id']}: {dest.relative_to(REPO_ROOT)}")
+        except Exception as exc:                      # noqa: BLE001
+            failed.append((plate["id"], exc))
+    for pid, exc in failed:
+        print(f"  {pid}: avatar fetch failed ({exc}) -- the drawn crest "
+              "stands in (punch-list item)", file=sys.stderr)
+    if verbose:
+        print(f"fetched {got} avatar(s), {len(failed)} failed")
+    return got, failed
+
+
 def _at(shot_in, film_of):
     """When the plate arrives: after the cut has landed."""
     return round(film_of(shot_in) + LEAD_IN, 3)
@@ -331,7 +392,7 @@ def build():
             "order": order,
             "copy_source": "casting",
             "seen_at_src": TRIO_IN,
-            **authored_copy(key, casting),
+            **localise_avatar(key, authored_copy(key, casting)),
         })
 
     # --- one person, one shot ---------------------------------------------
@@ -352,7 +413,7 @@ def build():
             "shot_src": [src_in, src_out],
             "seen_at_src": b["seen"],
             "why": b["why"],
-            **authored_copy(b["key"], casting),
+            **localise_avatar(b["key"], authored_copy(b["key"], casting)),
         })
 
     # --- named placeholders -----------------------------------------------
@@ -387,7 +448,8 @@ def build():
             "shot_src": [src_in, src_out],
             "seen_at_src": shot["seen"],
             "why": shot["why"],
-            **blueberry_entry(item, None, None, casting),
+            **localise_avatar(item["login"],
+                              blueberry_entry(item, None, None, casting)),
         })
 
     # --- Cayde's sign-off --------------------------------------------------
@@ -442,10 +504,16 @@ def main(argv=None):
     ap.add_argument("--write", action="store_true", help="write the manifest")
     ap.add_argument("--check", action="store_true",
                     help="fail if the committed manifest is out of date")
+    ap.add_argument("--fetch-avatars", action="store_true",
+                    help="download the avatars the manifest names into renders/")
     args = ap.parse_args(argv)
 
     manifest = build()
     text = render_text(manifest)
+
+    if args.fetch_avatars:
+        fetch_avatars(manifest)
+        return 0
 
     if args.check:
         if not MANIFEST.exists():

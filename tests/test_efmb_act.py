@@ -1,0 +1,234 @@
+"""Act II -- *Endless Forms Most Beautiful*: the cut, the clocks, the plates.
+
+Offline and dependency-free, like the rest of the suite: no ffmpeg, no media,
+no network. What is pinned here is the arithmetic and the wiring, not pixels.
+"""
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+import build_efmb  # noqa: E402
+import build_efmb_plates  # noqa: E402
+
+
+# --- the two clocks --------------------------------------------------------
+
+def test_source_and_film_time_round_trip():
+    """The two clocks are exact inverses, not approximations.
+
+    Everything downstream binds a person to a SOURCE timecode and lets film
+    time be computed, because the film moves and the source does not. That is
+    only safe if the conversion is lossless in both directions.
+    """
+    lead = build_efmb.derive_lead()
+    for src in (0.0, 3.9, 30.0, 100.0, 244.0, 338.2, 360.4):
+        film = build_efmb.film_for_source(src, lead)
+        assert build_efmb.source_for_film(film, lead) == pytest.approx(src, abs=1e-6)
+
+
+def test_a_splice_is_one_film_instant_and_two_source_instants():
+    """At a cut the round trip is ambiguous, and that is the cut existing.
+
+    Source 4.017 is the last frame of the cold open and 22.033 is the first
+    frame of the moon battle; the removal between them is what makes the act
+    one continuous scene. Both land on the same film second, so converting
+    back yields the earlier one. Pinned so nobody 'fixes' the asymmetry and
+    quietly shifts every binding after a splice by one shot.
+    """
+    lead = build_efmb.derive_lead()
+    assert (build_efmb.film_for_source(4.017 - 1e-9, lead)
+            == pytest.approx(build_efmb.film_for_source(22.033, lead), abs=1e-6))
+    joined = build_efmb.film_for_source(22.033, lead)
+    assert build_efmb.source_for_film(joined, lead) == pytest.approx(4.017, abs=1e-6)
+
+
+def test_a_cut_frame_raises_instead_of_sliding_onto_its_neighbour():
+    """Binding a name to a frame that no longer plays must be loud.
+
+    The dance section is removed. Silently returning the film time of whatever
+    now occupies that second is how a credit ends up on the wrong Guardian.
+    """
+    with pytest.raises(build_efmb.NotInPicture):
+        build_efmb.film_for_source(260.0)          # inside the dance section
+    with pytest.raises(build_efmb.NotInPicture):
+        build_efmb.film_for_source(370.0)          # the publisher end cards
+
+
+def test_the_head_is_derived_from_the_music_and_never_typed():
+    """The lead-in is whatever puts the shield on the downbeat."""
+    plan = build_efmb.build()
+    assert build_efmb.BED_LEAD_SEC is None, "the head must not be a typed constant"
+    anchor_film = build_efmb.film_for_source(build_efmb.SYNC_ANCHOR_SRC)
+    assert anchor_film == pytest.approx(build_efmb.SYNC_ANCHOR_FILM, abs=1e-6)
+    assert (plan["bed_lead_sec"] + plan["picture_sec"] + plan["bed_tail_sec"]
+            == pytest.approx(plan["bed_duration_sec"], abs=0.001))
+
+
+# --- the plate manifest ----------------------------------------------------
+
+def committed():
+    with open(REPO_ROOT / "stories" / "02-endless-forms-plates.json") as fh:
+        return json.load(fh)
+
+
+def test_the_committed_manifest_matches_its_generator():
+    """It is an OUTPUT. A conflict in it is settled by re-running the tool."""
+    assert committed() == build_efmb_plates.build()
+
+
+def test_every_plate_sits_on_a_frame_that_still_plays():
+    for plate in committed()["plates"]:
+        src = plate.get("seen_at_src")
+        if src is None:
+            continue
+        build_efmb.film_for_source(src)      # raises if that frame was cut
+
+
+def test_no_plate_is_laid_over_bungies_burned_in_title():
+    """Source 356.500 -> 358.200 burns "NEW LEGENDS WILL RISE" across frame.
+
+    The act removes every other title card in the source. This one is welded to
+    picture the act keeps, so the plates clear it instead -- laying our credit
+    over the publisher's is the one thing that would look deliberate.
+    """
+    lead = build_efmb.derive_lead()
+    for src_in, src_out, _why in build_efmb_plates.NO_PLATE_SRC:
+        zone = (build_efmb.film_for_source(src_in, lead),
+                build_efmb.film_for_source(src_out - 0.001, lead))
+        for plate in committed()["plates"]:
+            start, end = plate["at"], plate["at"] + plate["dur"]
+            assert not (start < zone[1] and end > zone[0]), (
+                f"{plate['id']} overlaps the burned-in title at {zone}")
+
+
+def test_the_authored_handles_are_never_replaced_with_real_names():
+    """`[ p5 ]` and `[ EyeCantCU ]` are copy the owner authored, not gaps."""
+    names = {p.get("name") for p in committed()["plates"]}
+    assert "[ p5 ]" in names and "[ EyeCantCU ]" in names
+    for banned in ("Robert Sturla", "RJ Trujillo"):
+        assert banned not in names
+
+
+def test_cayde_is_redacted_in_this_act_and_only_by_covering_a_known_name():
+    """The joke needs the audience not to be told yet.
+
+    A redaction only ever HIDES something this repo already knows -- the plate
+    it covers is recorded beside it -- and it is scoped to act II, because he
+    is revealed later in the programme.
+    """
+    card = next(p for p in committed()["plates"] if p["id"] == "cayde_signoff")
+    assert card["speaker"] == "[ REDACTED ]"
+    assert card["redacts"] == "Jorge Castro"
+    assert "act II only" in card["redaction_scope"]
+    assert card["text_source"] == "owner_supplied", (
+        "Bungie's Cayde never said this -- it must never read as recovered "
+        "source dialogue")
+
+
+def test_nobody_is_credited_twice_with_two_different_faces():
+    plates = committed()["plates"]
+    names = [p["name"] for p in plates if p.get("name")]
+    assert len(names) == len(set(names)), f"duplicate credit: {names}"
+
+
+def test_every_plate_can_be_read():
+    for plate in committed()["plates"]:
+        assert plate["dur"] >= build_efmb_plates.MIN_HOLD, (
+            f"{plate['id']} holds {plate['dur']}s -- too brief to read")
+
+
+def test_the_manifest_obeys_one_plate_at_a_time():
+    from tools.plate import load_manifest_entries
+    load_manifest_entries(committed()["plates"])
+
+
+def test_copy_is_reproduced_rather_than_composed():
+    """A missing key must raise, never fall back to the generic plate.
+
+    Falling back would quietly overwrite an identity the owner authored with
+    the anonymous blueberry copy, which is the one thing casting must not do.
+    """
+    casting = build_efmb_plates.load_casting()
+    with pytest.raises(KeyError):
+        build_efmb_plates.authored_copy("nobody_has_authored_this", casting)
+
+
+def test_a_placeholder_carries_a_name_and_no_invented_rows():
+    """Named, but nothing written for them yet: omit the rows, keep the name."""
+    casting = build_efmb_plates.load_casting()
+    copy = build_efmb_plates.placeholder_copy("dylan_taylor", casting)
+    assert copy["name"] == "Dylan Taylor"
+    assert "title" not in copy and "class" not in copy
+
+
+def test_the_manifest_never_hands_the_renderer_a_url():
+    """tools/plate.py never touches the network, so an avatar URL renders as
+    the drawn crest with a warning -- which is how every wreathed plate in this
+    act was quietly shipping without its portrait."""
+    for plate in committed()["plates"]:
+        avatar = plate.get("avatar")
+        if avatar:
+            assert not str(avatar).startswith("http"), plate["id"]
+
+
+# --- the two ffmpeg spellings that have cost this act a rebuild ------------
+
+def test_the_burn_filter_carries_no_shell_quotes():
+    """REGRESSION, and it shipped: plates that silently did not burn.
+
+    `enable='between(t,1,2)'` is the documented form -- on a command line,
+    where the SHELL strips the quotes. tools/plate.py builds an argv list that
+    never sees a shell, so ffmpeg got the quote characters as part of the
+    expression, failed to parse it, disabled every overlay and exited 0. The
+    output looked finished and carried no plates at all.
+    """
+    import tools.plate as plate
+
+    seen = {}
+
+    def fake_run(cmd, **kwargs):
+        seen["cmd"] = cmd
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    real_run = plate.subprocess.run
+    plate.subprocess.run = fake_run
+    try:
+        plate.burn("in.mp4", [{"id": "x", "at": 1.0, "dur": 2.0}],
+                   "plates", "out.mp4", ffmpeg=["ffmpeg"])
+    finally:
+        plate.subprocess.run = real_run
+
+    graph = seen["cmd"][seen["cmd"].index("-filter_complex") + 1]
+    assert "'" not in graph, f"shell quotes in an argv filtergraph: {graph}"
+    assert "enable=between(t\\," in graph, (
+        f"unquoted commas are argument separators to the filter parser: {graph}")
+
+
+def test_the_render_chain_never_uses_filter_complex():
+    """ISSUE #88: the same chain, spelled two ways, gives two lengths.
+
+    As `-vf` the act runs 307.99 s. Wrapped in `-filter_complex` the same
+    frames come out 299.48 s -- 2.8% fast, 505 frames discarded where the
+    rescaled timestamps collide, and ffmpeg exits 0 while doing it.
+    """
+    source = (REPO_ROOT / "scripts" / "build_efmb.py").read_text()
+    render_section = source[source.index("def render("):]
+    assert '"-filter_complex"' not in render_section, (
+        "the render chain passes -filter_complex to ffmpeg")
+    assert "filter_complex" not in build_efmb.NORMALISE_VF
+
+
+def test_the_bed_is_corrected_with_static_gain_and_never_a_normaliser():
+    """The bed decodes above full scale; the fix only ever goes DOWN."""
+    assert build_efmb.MUX_GAIN_DB < 0
+    source = (REPO_ROOT / "scripts" / "build_efmb.py").read_text()
+    render_section = source[source.index("def render("):]
+    for banned in ("loudnorm", "alimiter", "acompressor"):
+        assert banned not in render_section
