@@ -11,7 +11,7 @@ nothing about movements, and improvises.
 - `docs/skills/hud.md` — planning and burning the HUD layer, the closed callout
   set, the era decisions, and the "our overlay never launders unclean source
   footage" rule. Category `editing`; depends on `editing`, `casting`.
-- Update `docs/skills/casting.md` and `docs/skills/indexing.md` for universes:
+- Update `docs/skills/casting/SKILL.md` and `docs/skills/indexing.md` for universes:
   which vocab pack applies, that a lead binding lives under
   `vocab/universes/<universe>/`, and where a *run's* cast file binds people to
   those roles (H-12).

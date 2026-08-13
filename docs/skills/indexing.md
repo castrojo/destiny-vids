@@ -30,7 +30,7 @@ metadata:
 ## When NOT to Use
 
 - Assembling a cut from an existing index → [`editing.md`](editing/SKILL.md)
-- Deciding *who* a shot depicts → [`casting.md`](casting.md)
+- Deciding *who* a shot depicts → [`casting.md`](casting/SKILL.md)
 
 ## Core Process
 
@@ -104,7 +104,7 @@ material a tagger reads wrong.
   and `casting` are computed at assembly; `assemble_segment` raises on anything
   outside `TAGGER_FIELDS`.
 - **Name a character only when visible in that frame** — see
-  [`casting.md`](casting.md).
+  [`casting.md`](casting/SKILL.md).
 - Batch a long video across parallel taggers, but hand every batch the same enum
   list and the same reference entry, or the tags will not be comparable.
 

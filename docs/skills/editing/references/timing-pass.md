@@ -58,7 +58,7 @@ in the film) and `bed` (position in the song) — and a shot marked
 `audio: "source"` advances wall and not bed. The mechanic, the tool
 (`tools/audiomix.py`), how to choose a pause point by measurement, and why a
 diegetic insert has to be allowed to end all live in
-[`scoring.md`](../../scoring.md#two-clocks-when-the-bed-does-not-run-end-to-end).
+[`scoring.md`](../../scoring/references/two-clocks-and-levels.md).
 
 The one rule that belongs here: **anchors in an authored builder are asserted
 against bed time, never wall time.** A musical with a pause in it is longer than

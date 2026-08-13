@@ -6,7 +6,7 @@
       "id": "casting",
       "name": "casting",
       "one_line_purpose": "Bind a Destiny character to a person and credit the monthly ensemble.",
-      "entry_point": "docs/skills/casting.md",
+      "entry_point": "docs/skills/casting/SKILL.md",
       "category": "indexing",
       "status": "active",
       "tags": [
@@ -18,8 +18,8 @@
         "depiction"
       ],
       "description": "Covers lead bindings, ensemble slots, depiction rules, and derived casting. Use when adding a cast member, crediting contributors, recording a rule for how a character may be shown, or debugging a casting role.",
-      "version": "1.2",
-      "last_updated": "2026-08-12",
+      "version": "2.0",
+      "last_updated": "2026-08-13",
       "doc_type": "reference"
     },
     {
@@ -92,10 +92,32 @@
       "doc_type": "procedure"
     },
     {
+      "id": "intake",
+      "name": "intake",
+      "one_line_purpose": "Turn the owner's dictated notes into filed issues before anything acts on them.",
+      "entry_point": "docs/skills/intake.md",
+      "category": "meta",
+      "status": "active",
+      "tags": [
+        "whisp",
+        "dictation",
+        "notes",
+        "inbox",
+        "intake",
+        "worktree",
+        "two-clocks",
+        "session-end"
+      ],
+      "description": "The owner dictates work orders into Whisp; a note is not submitted until it is a GitHub issue. Use when starting a session, when the owner says work was submitted but never landed, or when picking up dictated briefs.",
+      "version": "1.0",
+      "last_updated": "2026-08-13",
+      "doc_type": "procedure"
+    },
+    {
       "id": "issues",
       "name": "issues",
       "one_line_purpose": "File work, pick it up, and know when to stop and ask.",
-      "entry_point": "docs/skills/issues.md",
+      "entry_point": "docs/skills/issues/SKILL.md",
       "category": "meta",
       "status": "active",
       "tags": [
@@ -106,15 +128,15 @@
         "gaps"
       ],
       "description": "GitHub issues are the backlog, and a fenced `brief` block is the executable part of one. Use when filing work, picking work up, normalizing a prose request, or deciding whether something is an agent's call at all.",
-      "version": "1.0",
-      "last_updated": "2026-08-11",
+      "version": "2.0",
+      "last_updated": "2026-08-13",
       "doc_type": "procedure"
     },
     {
       "id": "megacut",
       "name": "megacut",
       "one_line_purpose": "Join finished cuts into one programme, with act slides between them.",
-      "entry_point": "docs/skills/megacut.md",
+      "entry_point": "docs/skills/megacut/SKILL.md",
       "category": "editing",
       "status": "active",
       "tags": [
@@ -125,8 +147,8 @@
         "programme"
       ],
       "description": "Assembles already-finished cuts and owner-approved deliverables into one continuous programme, separated by the reference deck's title cards, in a single ffmpeg pass. Use when several cuts must play as one video.",
-      "version": "1.2",
-      "last_updated": "2026-08-12",
+      "version": "2.0",
+      "last_updated": "2026-08-13",
       "doc_type": "procedure"
     },
     {
@@ -152,7 +174,7 @@
       "id": "production",
       "name": "production",
       "one_line_purpose": "Run the issue-to-render loop, repeatedly and in parallel.",
-      "entry_point": "docs/skills/production.md",
+      "entry_point": "docs/skills/production/SKILL.md",
       "category": "editing",
       "status": "active",
       "tags": [
@@ -163,15 +185,15 @@
         "resume"
       ],
       "description": "The whole loop from an issue to a rendered cut, what resumes, where it stops on purpose, and how several agents make videos at once without colliding. Use when producing videos in volume rather than debugging one stage.",
-      "version": "1.2",
-      "last_updated": "2026-08-12",
+      "version": "2.0",
+      "last_updated": "2026-08-13",
       "doc_type": "procedure"
     },
     {
       "id": "scoring",
       "name": "scoring",
       "one_line_purpose": "Measure a music bed, cut sections out of it, and cut to its bars.",
-      "entry_point": "docs/skills/scoring.md",
+      "entry_point": "docs/skills/scoring/SKILL.md",
       "category": "editing",
       "status": "active",
       "tags": [
@@ -191,8 +213,8 @@
         "source-gain"
       ],
       "description": "Covers bed records, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a master over 0 dBTP. Use when scoring a cut, pausing the song for a moment of source audio, or supporting a second recording.",
-      "version": "1.3",
-      "last_updated": "2026-08-12",
+      "version": "2.0",
+      "last_updated": "2026-08-13",
       "doc_type": "procedure"
     }
   ]

@@ -32,7 +32,7 @@ metadata:
 ## When NOT to Use
 
 - Narration captions → the `authoring-video-closed-captions` skill
-- Deciding *who* is cast → [`casting.md`](../casting.md)
+- Deciding *who* is cast → [`casting.md`](../casting/SKILL.md)
 
 ## The field set is closed
 

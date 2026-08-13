@@ -67,6 +67,6 @@ Recorded, not resolved. Each one is somebody's call, not an agent's:
   the card would make it a claim about Kelsey, which only the owner may make.
 - **Four of the seven have no binding here** — Kaslin, Christoph, Natali and
   Andy (see #26); Bob, Laura and Kat are bound and their copy is reproduced
-  above. Adding a binding is a casting decision ([`casting.md`](../../casting.md));
+  above. Adding a binding is a casting decision ([`casting.md`](../../casting/SKILL.md));
   copying authored copy onto an existing binding is reproduction and is allowed.
 

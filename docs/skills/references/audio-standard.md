@@ -1,6 +1,6 @@
 # Audio standard for the Wolves cuts
 
-Reference for [`docs/skills/production.md`](../production.md). **This is the
+Reference for [`docs/skills/production.md`](../production/SKILL.md). **This is the
 standard every delivered file in this project is held to** — the thresholds, the
 sourcing rule, and the two failures that have actually shipped from here.
 

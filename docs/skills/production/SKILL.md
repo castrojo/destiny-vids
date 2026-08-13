@@ -1,0 +1,181 @@
+---
+name: production
+version: "2.0"
+last_updated: "2026-08-13"
+id: production
+one_line_purpose: Run the issue-to-render loop, repeatedly and in parallel.
+entry_point: docs/skills/production/SKILL.md
+category: editing
+mcp_compliance_level: partial
+optimization_status: draft
+status: active
+dependencies: [issues, indexing, editing, casting, plates]
+tags: [pipeline, batch, parallel, make-video, resume]
+description: >-
+  The whole loop from an issue to a rendered cut, what resumes, where it stops
+  on purpose, and how several agents make videos at once without colliding.
+  Use when producing videos in volume rather than debugging one stage.
+metadata:
+  type: procedure
+---
+
+# Making videos in volume
+
+## When to Use
+
+- Taking an issue all the way to a rendered file
+- Working several videos at once, or alongside other agents
+- Deciding what to do first when the index is thin
+
+## When NOT to Use
+
+- Debugging one stage — go to that stage's skill
+  ([`indexing.md`](../indexing.md), [`editing.md`](../editing/SKILL.md),
+  [`plates.md`](../plates/SKILL.md))
+- Filing or triaging the work itself → [`issues.md`](../issues/SKILL.md)
+
+## The loop
+
+```bash
+python3 tools/gaps.py                        # what is unfinished
+scripts/make_video.sh 3                       # issue -> as far as it can go
+scripts/make_video.sh --video-id yt_foo       # or drive it by video
+```
+
+`make_video.sh` runs the stages in order and **skips any whose output already
+exists**, so re-running it after a tagging pass resumes at assembly rather than
+re-fetching 200 MB:
+
+| # | Stage | Skipped when |
+|---|---|---|
+| 1 | read the issue's brief | — |
+| 2 | ingest a video record | `videos/<id>.json` exists |
+| 3 | fetch the media (H.264) | `media/<id>.mp4` exists |
+| 4 | detect beats + keyframes | `keyframes/<id>/beats.json` exists |
+| 5 | **tag** | `tags/<id>.json` exists *and* `worksheet.py check` passes |
+| 6 | assemble segments | never — it is cheap and idempotent |
+| 7 | finish: a **cut**, or the **uncut** credited build | nothing asked for |
+
+## Two ways to finish
+
+Which one applies is a property of the footage, not a preference:
+
+```bash
+scripts/make_video.sh 3 --outline stories/yt_foo.txt   # CUT
+scripts/make_video.sh 3 renders/roster.json            # UNCUT, credited
+```
+
+- **Cut** — `tools/story.py` picks clean shots out of the index and orders them
+  to an outline. It draws **only** from the clean pool, so a trailer full of
+  HUD and title cards is fine: the unusable material is never chosen. This is
+  the path for almost every trailer.
+- **Uncut** — the whole video, credited end to end. Right for a cinematic that
+  already tells its story. `tools/uncut.py` does not filter on `clean`, by
+  design, which is why stage 7 checks before it builds.
+
+`make_video.sh` picks up `stories/<video_id>.txt` automatically if it exists.
+Writing the outline is editorial work; the script does not invent one.
+
+## The gate at stage 7
+
+`build_uncut_credited.sh` renders the **whole** video and credits it. That is
+right for a cinematic — the source already tells the story, and
+`redactions/<video_id>.json` trims publisher copy off the head and tail. It is
+exactly wrong for a trailer whose unclean beats are scattered HUD and title
+cards, because rendering the whole thing puts every one of them on screen.
+
+So `make_video.sh` checks before it builds, and **fails closed**:
+
+- An unclean beat that survives redaction **whole** → refuse, and point at the
+  cut path.
+- An unclean beat a redaction boundary **cuts through** → refuse *unless* that
+  redaction record names the segment in `acknowledges`.
+
+That second case is the one the index cannot resolve alone: tags are beat-level
+and redaction is frame-level, so on Curse of Osiris the last beat is clean
+footage that dissolves into a logo card, and the 163.6s cut removes exactly the
+card. Trusting *every* straddle would be too generous — a head cut made for a
+ratings card would silently grandfather an unrelated HUD beat that happens to
+overlap it. `acknowledges` makes the trust explicit, per beat, in a file you
+edit by hand.
+
+A video that refuses here does not need the gate relaxed. It needs cutting.
+
+## Where the detail lives
+
+This skill is the contract. The procedure lives in `references/`:
+
+| Reference | What is in it |
+|---|---|
+| [`delivery.md`](references/delivery.md) | The `~/Videos/Wolves/` workspace, the per-project contract, hardlinks and checksums, publishing via the playlist, the audio rules that bite at delivery, and the Syncthing hazard. |
+| [`parallel-and-tagging.md`](references/parallel-and-tagging.md) | Stale tags and `verify_tags_match_detection`, running several videos at once, batch tagging from generated worksheets, and what to work on first. |
+| [`social-copies.md`](references/social-copies.md) | Byte-capped social encodes with `tools/social.py`: encode from `Prod/`, re-encode but never process. |
+
+## Where it stops, and why that is the design
+
+**Stage 5 stops and asks a person to look at frames.** That is not a missing
+feature. `clean` is the gate the whole repo rests on, it must be positively
+established, and "nobody has looked at this frame" is not evidence the frame is
+clean. A script that guessed here would eventually put a HUD in a finished cut.
+What the stop hands over is a generated worksheet; what lets the script
+continue is `tools/worksheet.py check` passing, not the file merely existing.
+
+**A brief with `automatable: no` stops at stage 1**, prints what it is waiting
+on, and exits 0 — stopping is the correct result, not a failure. A brief with
+`automatable: partly` runs the mechanical half and stops before the credited
+build: indexing is mechanical, putting names on screen is not.
+
+`--video-id` skips the brief entirely. That is a debugging path for a video you
+already understand, not the way to run an issue — it bypasses `automatable`
+with it.
+
+Both stops print the exact next command. Neither is a state to route around.
+
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I'll tag the obvious ones and leave the rest." | An untagged beat derives `clean = false`. Half a tag file marks half the video uncuttable. |
+| "The delivered file needs one small fix, I'll edit it in place." | It is regenerated from checked-in data. A hand-edit is lost on the next month's render and nobody can tell it happened. |
+| "I'll upload it and share the video link." | YouTube cannot replace a file. Share the playlist; `yt-refresh.py` swaps the contents. |
+| "The gameplay trailer has almost nothing clean, the tagging must be wrong." | Gameplay trailers have HUD in the footage. That is what the tier is for. |
+| "I'll re-run detection, it's cheap." | Beat index is positional. New detection invalidates the tag file. |
+| "I'll bump `vocab/casting.yaml` while I'm here." | It names real people and every video reads it. Its own PR. |
+| "The render failed, I'll hand-fix the segment." | Derived fields are recomputed. Fix the tag or the vocab. |
+
+
+## Red Flags
+
+- Exactly 1 beat for a cut-heavy video → the source is AV1, not H.264
+  (`docs/rendering.md`). `make_video.sh` warns on the codec before this bites.
+- A video whose segments are 0 clean → `overlays` was skipped wholesale.
+- Two agents on one `video_id`.
+- Anything under `media/`, `keyframes/` or `renders/` appearing in `git status`.
+- A file hand-edited in `~/Videos/Wolves/Prod/`, or a `cp` over one of its
+  entries. Every entry is a hardlink to a project's master; `cp` breaks the link
+  silently and leaves a copy that goes stale. Re-link with `ln -f`.
+- Any write to `~/src/website`. It is read-only from here — several agents run
+  worktrees against it — and it is where the authored plate copy lives.
+- Trusting a bed's measured true peak as the *delivered* peak. The encoder adds
+  inter-sample overshoot; measure the output file.
+- Renumbering an act, or "closing the gap" in `Prod/`'s numbering. `NN-` is the
+  act number from [`docs/running-order.md`](../../running-order.md): act VIII has
+  no film, and its numeral is load-bearing so nothing renumbers around it. III
+  is `mrbobbytables` permanently.
+- A music bed at 44.1 kHz, or one with nothing above 16 kHz. Both mean the
+  fetch took the wrong rung. So does a format id ending in `-drc`.
+
+## Verification
+
+```bash
+python3 tools/gaps.py
+python3 -m pytest -q                  # includes committed-index integrity
+python3 scripts/generate_skill_index.py --check
+~/Videos/audio-check.sh --all         # gates every act in Wolves/Prod
+```
+
+`tests/test_index_integrity.py` validates every committed segment, video and
+tag file against its schema. It exists because a hand-corrected
+`label_source: "human"` — one word, not in the enum — sat in the index until a
+rebuild failed on it.
