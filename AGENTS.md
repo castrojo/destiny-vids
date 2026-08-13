@@ -282,8 +282,11 @@ needs somebody to decide.
   and `casting` are computed by `tools/derive.py` at assembly time. A tagger
   that returns one is an error, by design.
 - **`vocab/` is the single source of truth for every enum.** Adding a value
-  means editing `vocab/*.yaml` *and* `schema/segment.schema.json`; tests assert
-  the two agree, and that every cast binding is queryable.
+  means editing `vocab/*.yaml` *and* the schema that mirrors it
+  (`schema/segment.schema.json`, `schema/video.schema.json`,
+  `schema/bed.schema.json`); tests assert they agree, and that every cast
+  binding is queryable. A record type with **no** schema is the same bug one
+  step earlier — that is how a bed's `usage_class` stayed unchecked free text.
 - **Never invent on-screen copy.** Nameplate fields are a closed set — see
   [`docs/skills/plates/SKILL.md`](docs/skills/plates/SKILL.md). A Guardian identity somebody
   *has* authored (ten people, in `~/Videos/nameplates.json` and the website's
@@ -307,6 +310,15 @@ Bungie footage is third-party copyrighted and used under Bungie's fan-content
 policy, which permits non-commercial fan creations. Every video record carries
 `usage_class` and `source_rights_note`. Keep it that way: index metadata, ship
 no footage, and keep output non-commercial.
+
+**Not everything here is somebody else's.** `usage_class` also has `cc_by_4_0`,
+for an asset whose licence already permits this use — the act VI hold music is
+the first. That bucket exists so the index can record that something is
+**cleared**, which it previously could not say at all. Its condition is not
+optional: a record claiming it carries its required credit verbatim in
+[`ATTRIBUTIONS.md`](ATTRIBUTIONS.md), and `tests/test_index_integrity.py`
+fails if a line goes missing. Adding a value means editing `vocab/`, the
+schemas, *and* the credit file — never just one.
 
 ## Agent fast path
 
