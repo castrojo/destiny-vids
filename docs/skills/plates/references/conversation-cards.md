@@ -6,12 +6,19 @@ and the chat card that puts recovered dialogue on screen.
 
 ## Cards that are not lower thirds
 
-Four `kind`s sit outside the reveal plate's row: the site's `status` HUD,
-Destiny's `miniboss` bar, the Xbox `achievement` toast and the `companion`
-GUARDIAN BOND card — [`references/other-cards.md`](other-cards.md),
+Five `kind`s sit outside the reveal plate's row: the site's `status` HUD,
+Destiny's `miniboss` bar, the Xbox `achievement` toast, the `companion`
+GUARDIAN BOND card and the `banner` letterbox callout —
+[`references/other-cards.md`](other-cards.md),
 [`references/status-nameplate.md`](status-nameplate.md). The
 `miniboss` bar is the only card here that may carry copy nobody's identity was
 authored for, because **it names a villain, not a person**.
+
+The `banner` is the persistent strip, not a credit: one tracked line on the
+bottom bar of a letterboxed frame (`position: "letterbox"`), below the
+picture entirely, so it can hold for a whole film without sharing the lower
+third's row. Its `text` is owner-authored copy, reproduced verbatim and never
+uppercased — the same rule the chat pill's message follows.
 
 ## Showing a conversation
 

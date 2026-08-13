@@ -165,6 +165,51 @@
       "placeholder": true
     },
     {
+      "id": "letterbox_banner_1",
+      "kind": "banner",
+      "at": 139.0,
+      "dur": 47.334,
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text": "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "toc_karena",
+      "kind": "chat",
+      "at": 139.0,
+      "dur": 3.2,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "Karena",
+      "text": "One hundred thousand bootc volunteers, ready to power up",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "toc_joseph_worth",
+      "kind": "chat",
+      "at": 142.45,
+      "dur": 2.2,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "Joseph",
+      "text": "Is it worth it?",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "toc_ricardo",
+      "kind": "chat",
+      "at": 144.9,
+      "dur": 2.651,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "Ricardo",
+      "text": "You really think they can save open source?",
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/rochaporto.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+    },
+    {
       "id": "walk_chapter",
       "kind": "title",
       "copy_source": "owner_supplied",
@@ -335,6 +380,16 @@
       "position": "left"
     },
     {
+      "id": "letterbox_banner_2",
+      "kind": "banner",
+      "at": 214.734,
+      "dur": 93.264,
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text": "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST",
+      "text_source": "owner_supplied"
+    },
+    {
       "id": "walk_villain",
       "kind": "miniboss",
       "at": 214.734,
@@ -358,6 +413,95 @@
       "at": 218.484,
       "dur": 2.2,
       "position": "left"
+    },
+    {
+      "id": "toc_joseph_faith",
+      "kind": "chat",
+      "at": 221.216,
+      "dur": 3.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "Joseph",
+      "text": "Dunno, how much faith DO we have in the CNCF?",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "toc_ricardo_desktop",
+      "kind": "chat",
+      "at": 225.716,
+      "dur": 2.6,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "Ricardo",
+      "text": "Cloud native desktop? ...",
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/rochaporto.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+    },
+    {
+      "id": "toc_joseph_lol",
+      "kind": "chat",
+      "at": 228.566,
+      "dur": 2.2,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "Joseph",
+      "text": "LOL",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "toc_announce_emeritus",
+      "at": 231.016,
+      "dur": 4.5,
+      "position": "center",
+      "copy_source": "owner_supplied",
+      "label": "AN4-CH3CK-12",
+      "title": "It's totally NOT like this. We promise.",
+      "name": "[ EMERITUS CONTRIBUTORS ]",
+      "variant": "leader"
+    },
+    {
+      "id": "toc_announce_ambassadors",
+      "at": 235.766,
+      "dur": 4.5,
+      "position": "center",
+      "copy_source": "owner_supplied",
+      "label": "AN4-CH3CK-12",
+      "title": "Have you met our Ambassadors?"
+    },
+    {
+      "id": "timed_krook",
+      "kind": "chat",
+      "at": 250.0,
+      "dur": 3.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "seen_at_src": 318.5,
+      "speaker": "krook",
+      "text": "Generational talent detected, call in the best",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "timed_bedazzle",
+      "kind": "chat",
+      "at": 253.25,
+      "dur": 2.6,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "cncf marketing",
+      "text": "Let's bedazzle this thing!",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "timed_natewaddington",
+      "at": 260.0,
+      "dur": 4.5,
+      "position": "center",
+      "copy_source": "owner_supplied",
+      "seen_at_src": 328.5,
+      "label": "AN4-CH3CK-12",
+      "name": "[ Natewaddington ]",
+      "title": "Time for your first real contribution kids"
     },
     {
       "id": "solo_KyleGospo",
@@ -433,6 +577,67 @@
       "redaction_scope": "act II only -- he is revealed later in the programme",
       "text": "I'm so proud of you kids!",
       "text_source": "owner_supplied"
+    },
+    {
+      "id": "timed_jorge",
+      "kind": "chat",
+      "at": 291.0,
+      "dur": 2.8,
+      "copy_source": "owner_supplied",
+      "seen_at_src": 361.267,
+      "speaker": "jorge",
+      "text": "Well shut my gaslighting mouth ....",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "quote_cgwalters",
+      "kind": "chat",
+      "at": 294.05,
+      "dur": 2.2,
+      "copy_source": "owner_supplied",
+      "speaker": "cgwalters",
+      "text": "Use open source responsibly!",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "quote_siosm",
+      "kind": "chat",
+      "at": 296.987,
+      "dur": 2.2,
+      "copy_source": "owner_supplied",
+      "speaker": "siosm",
+      "text": "I can feel Fedora powering up!",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "quote_jberkus",
+      "kind": "chat",
+      "at": 299.924,
+      "dur": 2.2,
+      "copy_source": "owner_supplied",
+      "speaker": "jberkus",
+      "text": "I knew they could do it!",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "quote_preethi",
+      "kind": "chat",
+      "at": 302.861,
+      "dur": 2.2,
+      "copy_source": "owner_supplied",
+      "speaker": "preethi",
+      "text": "Great, more paperwork",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "quote_castrojo",
+      "kind": "chat",
+      "at": 305.798,
+      "dur": 2.2,
+      "copy_source": "owner_supplied",
+      "speaker": "castrojo",
+      "text": "Just another day on the CNCF Projects team",
+      "text_source": "owner_supplied"
     }
   ],
   "unresolved": [
@@ -442,9 +647,17 @@
     "William Rizzo and Ahmed Adan lose their act II badges to the same instruction. Rizzo's authored copy stays in vocab/casting.yaml and Ahmed stays in ensemble.placeholders, so only the scheduling went",
     "GloriousEggroll's name row is the handle he was written in as; GitHub records him as Thomas Crider. Which goes on the card is the owner's call",
     "no title row is authored for GloriousEggroll, HikariKnight or A1RM4X -- their affiliation rides as chrome and the row is omitted rather than composed",
-    "the montage's two Jorge Castro chat pills still have no pfp: `castrojo` is a lead, his identity lives on the `cayde_6` binding, and no avatar is recorded on it. The drawn crest stands in",
-    "the 2:19 lead-in banner (owner: \"setting up this scene it's important\") has no authored copy, so nothing is emitted for it",
+    "the owner's own chat pills still have no pfp: `castrojo` is a lead, his identity lives on the `cayde_6` binding, and no avatar is recorded on it. The drawn crest stands in on the montage's two pills, the 4:51 gaslighting pill, and his closing quote",
+    "the 2:19 lead-in banner (owner: \"setting up this scene it's important\") has no authored copy, so nothing is emitted for it -- the TOC exchange's first line takes its slot",
     "the CNCF logo the brief marks as [CNCF LOGO] on each announcement has no asset in this repo; the cards render without it",
-    "AN4-CH3CK-12 is not in vocab/casting.yaml -- it is reproduced as the announcer's label, and casts nobody"
+    "AN4-CH3CK-12 is not in vocab/casting.yaml -- it is reproduced as the announcer's label, and casts nobody",
+    "the 4:01 cue ('They are not ready for Shua Khan and Greg KH', a speech bubble ON Cayde) is NOT scheduled: Cayde's [ REDACTED ] card is at 287.933 (4:47.9), so a bubble anchored on him cannot also be at 4:01. TODO(owner): which moves -- the bubble to ~4:48, or the anchor (#98, Questions)",
+    "krook, Natewaddington, cgwalters, siosm, jberkus and preethi are not in vocab/casting.yaml -- their pills and the placard render as placeholder badges with the drawn crest, and their GitHub logins are the owner's to confirm before any avatar is fetched (a login is not guessed). 'cncf marketing' as a speaker and the Open Gaming Collective callout are reproduced as written; neither casts anybody",
+    "the brief names the same person three ways -- 'Jorge Castro' in the montage, 'jorge' at 4:51, 'castrojo' in the closing quotes. All three are reproduced verbatim; the pill's own chrome uppercases the speaker row",
+    "Karena's jump carries no card ('the beat is the jump'): it is 1.5s of clear screen between Joseph's DO line and Ricardo's answer. No shot was verified as HER jump and picking one would be casting by inference -- TODO(owner): the frame",
+    "the closing five quotes play over the black outro (picture ends 4:51.933): the brief's own schedule put them 4:51 -> 5:07 and its preamble lands the last cue on the final second. The tail is black by the owner's standing decision",
+    "Joseph's 'DO' and siosm's 'powering up' carry authored emphasis; the pill's message row is set bold throughout (the site's own style), so both ARE bold on screen but not differentiated. siosm's asterisks are emphasis markup and are stripped, not burned. An accent-colour emphasis would be chrome nobody authored",
+    "the letterbox callout runs 2:19 -> the last frame, where the brief's scene starts, ducking only the patch-queue HUD's 28.4 s (its card already occupies the bar's bottom-right; measured, not aesthetic). 'The whole song' could also mean from 0:00, from the pill that first asks it (1:43.5), or with NO duck -- that costs shrinking it to ticker height for the whole film. TODO(owner)",
+    "the TOC payoff REPRISES the montage's emeritus card verbatim -- a callback, not a second credit; the double-credit guard was taught that a verbatim reprise is not two faces"
   ]
 }

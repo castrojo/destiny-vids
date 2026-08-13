@@ -2225,3 +2225,70 @@ def test_the_shipped_act_vi_manifest_declares_its_overrides():
     overridden = {p["id"] for p in d["plates"] if p.get("copy_override")}
     assert overridden == {"cayde_reveal_castrojo", "gold_kelsey_hightower"}
     assert any("#111" in u for u in d["unresolved"])
+
+
+# --- the letterbox banner (owner brief, issue #98) ---------------------------
+
+BANNER = {
+    "id": "callout", "at": 139.0, "dur": 169.0, "kind": "banner",
+    "position": "letterbox",
+    "text": "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST",
+}
+
+
+def test_the_banner_renders_one_tracked_line_that_fits_the_frame():
+    img = plate.render_plate(dict(BANNER))
+    assert img.width <= plate.FRAME_W * plate.BANNER_MAX_W + 4
+    assert img.height > 0
+    # ...and it drew something, not an empty canvas.
+    alpha = img.split()[3]
+    assert alpha.getextrema()[1] > 0, "the banner rendered no visible pixels"
+
+
+def test_the_banner_sits_below_the_picture_on_the_bar():
+    """Its strip is the bottom letterbox bar: it must start at or below the
+    picture's bottom edge, so it never shares the lower third's row."""
+    img = plate.render_plate(dict(BANNER))
+    picture = (0, 140, 1920, 800)      # a 2.39:1 letterbox inside 16:9
+    frame = plate.place(img, "letterbox", picture)
+    # Find the banner's top edge: the first row with an opaque pixel.
+    alpha = frame.split()[3]
+    rows = alpha.load()
+    top = next(y for y in range(plate.FRAME_H)
+               if any(rows[x, y] for x in range(0, plate.FRAME_W, 17)))
+    assert top >= picture[1] + picture[3], (
+        f"banner starts at y={top}, above the picture's bottom at "
+        f"{picture[1] + picture[3]}")
+
+
+def test_the_banner_survives_a_full_frame_picture_rect():
+    """Act II mixes aspect ratios: the opening is 16:9 full-frame, so
+    detection can return a rect that IS the frame. The banner must then sit
+    just off the bottom edge -- never off-screen, which is how a full-frame
+    rect once rendered it into the void below the canvas."""
+    img = plate.render_plate(dict(BANNER))
+    frame = plate.place(img, "letterbox", (0, 0, plate.FRAME_W, plate.FRAME_H))
+    alpha = frame.split()[3]
+    rows = alpha.load()
+    ys = [y for y in range(plate.FRAME_H)
+          if any(rows[x, y] for x in range(0, plate.FRAME_W, 17))]
+    assert ys, "the banner rendered off the frame entirely"
+    assert max(ys) < plate.FRAME_H
+
+
+def test_a_banner_shares_the_screen_but_never_with_a_second_banner():
+    """A chrome row of its own: it coexists with a lower third and with the
+    other chrome rows, but two banners at once is still an error."""
+    plate.load_manifest_entries([
+        dict(BANNER),
+        dict(GUARDIAN, id="lower-third"),
+        {"id": "hud", "at": 150.0, "dur": 10.0, "kind": "status",
+         "position": "status-bottom", "detail": "D", "label": "L"},
+        {"id": "boss", "at": 160.0, "dur": 3.0, "kind": "miniboss",
+         "position": "boss", "name": "N", "title": "T"},
+    ])
+    with pytest.raises(ValueError, match="same time"):
+        plate.load_manifest_entries([
+            dict(BANNER),
+            dict(BANNER, id="callout2"),
+        ])
