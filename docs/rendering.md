@@ -4,6 +4,23 @@
 stage most likely to fail on a Bluefin/Fedora atomic host — for a reason that is
 easy to misdiagnose. This documents which ffmpeg to use and why.
 
+## The delivery spec: render output is born conformant
+
+Everything `render.py` emits now conforms to the one delivery spec defined in
+`tools/conform.py` (`DELIVERY`): **60000/1001** (59.94 — the owner-approved
+delivery rate), 1920×1080, yuv420p, BT.709 primaries/transfer/matrix written
+into the x264 VUI, H.264 High@4.2, closed GOP. The flags come from
+`conform.video_encode_args()` — one place, so the render stage, the conform
+stage and the megacut's cards can never drift apart.
+
+Why it matters: a conformant act needs **no normalising at assembly time**.
+`tools/megacut.py` probes each clip's source, conforms it once through a
+content-hash cache, and then builds the segment with `-c:v copy` — the
+per-assembly re-encode of the whole programme (~17¾ minutes, measured) drops
+to seconds when the acts are unchanged. The full story, including why cards
+must encode to the same spec, is in
+[`skills/megacut/references/assembly-graph.md`](skills/megacut/references/assembly-graph.md).
+
 ## The problem: `ffmpeg-free` has no H.264
 
 Fedora, and therefore Bluefin, ships **`ffmpeg-free`**: a build with patent-
@@ -220,9 +237,11 @@ point before the requested position and then *decodes and discards the
 intervening segment to ensure accuracy*. Both are accurate.
 
 The real reason is specific to this pipeline: input seeking **rebases output
-timestamps to zero**, which shifts the phase of the 29.97 → 30 fps conversion
-every clip goes through, changing which source frames get duplicated. Measured
-on the same in-point, the two methods produce visibly different frames:
+timestamps to zero**, which shifts the phase of the fps conversion every clip
+goes through (29.97 → 30 when this was measured; the delivery rate is now
+60000/1001 — the phase argument is unchanged), changing which source frames
+get duplicated. Measured on the same in-point, the two methods produce
+visibly different frames:
 
 ```console
 $ ffmpeg -i src.mp4 -ss 69.336 -t 0.968 ...   # 2.486s, framemd5 b8507036...

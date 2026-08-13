@@ -564,6 +564,11 @@ def _run_fake_ffmpeg(monkeypatch):
         Path(cmd[-2]).touch()  # the output path sits just before "-y"
         return subprocess.CompletedProcess(cmd, 0)
     monkeypatch.setattr(megacut.subprocess, "run", fake_run)
+    # The conform phase is tools/conform.py's own tested concern; here every
+    # clip source counts as already conformant so assemble() can be driven
+    # end to end with no ffmpeg at all.
+    monkeypatch.setattr(megacut.conform, "ensure",
+                        lambda src, **kw: (Path(src), "conforms"))
 
 
 def test_a_retimed_segment_fails_the_build(tmp_path, monkeypatch):
@@ -642,3 +647,161 @@ def test_probe_video_extent_refuses_an_empty_answer(tmp_path, monkeypatch):
                         subprocess.CompletedProcess(a[0], 0, stdout=""))
     with pytest.raises(RuntimeError, match="no video packets"):
         megacut.probe_video_extent(tmp_path / "seg000.mkv")
+
+
+# --- the stream-copy path (the conform cache in the assembly loop) ----------
+#
+# When every clip in the plan already matches the delivery spec
+# (tools/conform.py), a segment's picture is REMUXED, not re-encoded -- the
+# ~24 minutes of x264 the whole programme used to cost. The checks that
+# caught #88 stay on in both paths.
+
+def test_a_conforming_clip_copies_its_picture(tmp_path):
+    """The copy segment has NO -vf and no encoder: the source was already
+    normalised to the delivery spec, so filtering would only spend a
+    generation. Audio is still decoded to PCM s24le with the plan's fades --
+    the lossless-segment rule (never FLAC in a concat segment) is unchanged."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0,
+         "fade_in": 2.0},
+    ])
+    cmd = megacut.build_segment_copy_command(plan, 0, "seg000.mkv",
+                                             "/cache/conformed.mp4")
+    assert cmd[cmd.index("-c:v") + 1] == "copy"
+    assert cmd[cmd.index("-c:a") + 1] == "pcm_s24le"
+    assert "-vf" not in cmd and "libx264" not in cmd
+    assert "-filter_complex" not in cmd
+    af = cmd[cmd.index("-af") + 1]
+    assert af.startswith("aresample=48000,aformat=")
+    assert "afade=t=in:st=0:d=2.000" in af
+    for banned in ("volume=", "loudnorm", "dynaudnorm", "alimiter"):
+        assert banned not in af
+
+
+def test_a_conforming_silent_clip_copies_picture_and_generates_silence(tmp_path):
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "silent", "dur": 10.0},
+    ])
+    cmd = megacut.build_segment_copy_command(plan, 0, "seg000.mkv",
+                                             "/cache/conformed.mp4")
+    assert cmd[cmd.index("-c:v") + 1] == "copy"
+    assert "anullsrc=channel_layout=5.1:sample_rate=48000:d=10.0" in cmd
+    assert "-t" in cmd and cmd[cmd.index("-t") + 1] == "10.0"
+
+
+def test_the_copy_path_is_chosen_only_when_the_plan_targets_the_spec(tmp_path):
+    """A plan at another rate or frame size still encodes every segment: its
+    segments must not be spec files, and a conform cache would hand back
+    59.94/1080p sources to a plan building something else."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    assert megacut._copy_path_ok(plan)
+
+    _, legacy = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ], fps="30")
+    assert not megacut._copy_path_ok(legacy)
+    assert not megacut._copy_path_ok(plan, allow_copy=False)
+
+
+def test_cards_still_encode_on_the_copy_path(tmp_path):
+    """A card is generated from a PNG -- there is nothing to copy. It encodes
+    to the SAME spec, or one card would force the whole programme back onto
+    the slow path."""
+    _, plan = _plan(tmp_path, [{"kind": "card", "image": "c.png", "dur": 5.0}])
+    cmd = megacut.build_segment_command(plan, 0, "seg000.mkv")
+    assert "libx264" in cmd
+    assert cmd[cmd.index("-profile:v") + 1] == "high"
+    assert cmd[cmd.index("-level:v") + 1] == "4.2"
+    assert "+cgop" in cmd
+    assert "colorprim=bt709:transfer=bt709:colormatrix=bt709" in cmd
+
+
+def test_assemble_copies_every_clip_when_all_sources_conform(tmp_path, monkeypatch):
+    """End to end, with ffmpeg faked: conformable clips take the copy command,
+    the card encodes, and the join is still the concat demuxer."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "card", "image": "c.png", "dur": 5.0},
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+        {"kind": "clip", "path": "b.mp4", "audio": "silent", "dur": 10.0},
+    ])
+    _run_fake_ffmpeg(monkeypatch)
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda path, stream=None:
+                        18.1 if str(path).endswith("out.mp4") else 3.0)
+    monkeypatch.setattr(megacut, "probe_video_extent",
+                        lambda path: 5.0 if "seg000" in str(path)
+                        else (3.0 if "seg001" in str(path) else 10.0))
+    commands = []
+
+    def spy_worker(job):
+        argv, _plan_, index, seg = job
+        commands.append(argv)
+        Path(seg).touch()
+        return index
+    monkeypatch.setattr(megacut, "_segment_worker", spy_worker)
+
+    megacut.assemble(plan, tmp_path / "out.mp4", jobs=1)
+    assert "libx264" in commands[0], "the card encodes"
+    assert commands[1][commands[1].index("-c:v") + 1] == "copy"
+    assert commands[2][commands[2].index("-c:v") + 1] == "copy"
+    assert all("-vf" not in c for c in commands[1:])
+
+
+def test_assemble_encodes_clips_when_the_plan_is_off_spec(tmp_path, monkeypatch):
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ], fps="30")
+    _run_fake_ffmpeg(monkeypatch)
+    monkeypatch.setattr(megacut, "probe_duration", lambda path, stream=None: 3.0)
+    monkeypatch.setattr(megacut, "probe_video_extent", lambda path: 3.0)
+    conform_calls = []
+    monkeypatch.setattr(megacut.conform, "ensure",
+                        lambda *a, **kw: conform_calls.append(a) or (a[0], "x"))
+    megacut.assemble(plan, tmp_path / "out.mp4", jobs=1)
+    assert conform_calls == [], "an off-spec plan never touches the cache"
+
+
+def _touch_segment_worker(job):
+    """Module-level so ProcessPoolExecutor can pickle it: build nothing, just
+    'write' the segment so the assemble flow completes."""
+    _argv, _plan, _index, seg = job
+    Path(seg).touch()
+    return _index
+
+
+def test_parallel_builds_cannot_reorder_the_programme(tmp_path, monkeypatch):
+    """Order is the programme. The concat list is indexed by plan position
+    and written after all workers finish, so completion order can never
+    shuffle it."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": f"{c}.mp4", "audio": "source", "dur": 3.0}
+        for c in "abcd"
+    ])
+    _run_fake_ffmpeg(monkeypatch)
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda path, stream=None:
+                        12.1 if str(path).endswith("out.mp4") else 3.0)
+    monkeypatch.setattr(megacut, "probe_video_extent", lambda path: 3.0)
+    monkeypatch.setattr(megacut, "_segment_worker", _touch_segment_worker)
+
+    written = {}
+
+    def fake_write(self, text, **kw):
+        written[str(self)] = text
+    monkeypatch.setattr(Path, "write_text", fake_write)
+
+    megacut.assemble(plan, tmp_path / "out.mp4", jobs=4)
+    list_text = next(v for k, v in written.items() if k.endswith("segments.txt"))
+    lines = [l for l in list_text.splitlines() if l]
+    assert [Path(l.split("'")[1]).name for l in lines] == \
+        [f"seg{i:03d}.mkv" for i in range(4)]
+
+
+def test_default_jobs_scales_with_cores_and_items(monkeypatch):
+    monkeypatch.setattr(megacut.os, "cpu_count", lambda: 32)
+    assert megacut.default_jobs(13) == 5
+    assert megacut.default_jobs(2) == 2, "never more workers than items"
+    monkeypatch.setattr(megacut.os, "cpu_count", lambda: 4)
+    assert megacut.default_jobs(13) == 1, "a small machine stays serial"

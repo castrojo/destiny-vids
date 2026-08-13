@@ -35,13 +35,17 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from tools import peaks  # noqa: E402
+from tools import conform, peaks  # noqa: E402
 
 MEDIA_EXTS = (".mp4", ".mkv", ".webm", ".mov", ".wav", ".flac", ".m4a")
 
 # Common intermediate format. Every clip is normalized to this so the concat
-# demuxer can join them without re-muxing mismatched streams.
-TARGET_W, TARGET_H, TARGET_FPS = 1920, 1080, 30
+# demuxer can join them without re-muxing mismatched streams. The frame rate
+# is the delivery spec's (tools/conform.py): a cut rendered from now on comes
+# out already conformant, so megacut's assembly can copy its picture instead
+# of re-encoding it.
+TARGET_W, TARGET_H = conform.DELIVERY.width, conform.DELIVERY.height
+TARGET_FPS = conform.DELIVERY.fps
 
 # Bluefin runs a long-lived ffmpeg container with $HOME bind-mounted at the same
 # path, so host paths resolve unchanged inside it (see docs/rendering.md).
@@ -204,8 +208,8 @@ def still_clip(ffmpeg, image, duration, out_path, keep_audio=True):
                 "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2"]
     else:
         cmd += ["-map", "0:v:0", "-an"]
-    cmd += ["-vf", vf, "-c:v", "libx264", "-preset", "medium", "-crf", "18",
-            "-pix_fmt", "yuv420p", str(out_path)]
+    cmd += ["-vf", vf,
+            *conform.video_encode_args(crf=18, preset="medium"), str(out_path)]
     subprocess.run(cmd, check=True)
 
 
@@ -219,8 +223,9 @@ def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
     (it seeks to the closest point before the target, then decodes and discards
     — it does not simply snap to a keyframe). It is still wrong *here*, for a
     subtler reason: it rebases output timestamps to zero, which shifts the phase
-    of the 29.97 -> 30 fps conversion below and changes which source frames are
-    duplicated. Measured on the same in-point, the two produce different frames.
+    of the 29.97 -> 60000/1001 fps conversion below and changes which source
+    frames are duplicated. Measured on the same in-point, the two produce
+    different frames.
 
     Normalizing every clip to one size/rate/pixel format is what lets the concat
     demuxer join them: it requires identical stream properties across inputs.
@@ -235,8 +240,7 @@ def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
         "-i", str(src),
         "-ss", f"{start_sec:.3f}", "-t", f"{duration:.3f}",
         "-vf", vf,
-        "-c:v", "libx264", "-preset", "medium", "-crf", "18",
-        "-pix_fmt", "yuv420p",
+        *conform.video_encode_args(crf=18, preset="medium"),
     ]
     if keep_audio:
         cmd += ["-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2"]
@@ -275,7 +279,7 @@ def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None,
         elif audio_gain is not None:
             # Source audio from the clips; the implicit selection picks it up.
             cmd += ["-af", f"volume={audio_gain}"]
-        cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p"]
+        cmd += conform.video_encode_args(crf=18, preset="medium")
         cmd.append(str(out_path))
         subprocess.run(cmd, check=True)
     finally:
