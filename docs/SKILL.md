@@ -23,6 +23,7 @@ load only that skill, then act.
 | Score a cut to a music bed, pause the song mid-cut, or land a shot on a beat | [`scoring.md`](skills/scoring/SKILL.md) |
 | Put a name on screen — Guardian nameplates and title cards | [`plates.md`](skills/plates/SKILL.md) |
 | Join several finished cuts into one programme with chapter cards | [`megacut.md`](skills/megacut/SKILL.md) |
+| Run a long encode on the ghost cluster instead of the laptop | [`farm.md`](skills/farm.md) |
 | Get a working ffmpeg on an atomic host | [`../docs/rendering.md`](rendering.md) |
 
 The machine-readable catalog is [`skills/index.json`](skills/index.json), with a

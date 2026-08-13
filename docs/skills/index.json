@@ -73,6 +73,26 @@
       "doc_type": "procedure"
     },
     {
+      "id": "farm",
+      "name": "farm",
+      "one_line_purpose": "Offload a long encode to the ghost k3s cluster and verify what comes back.",
+      "entry_point": "docs/skills/farm.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "encode",
+        "farm",
+        "cluster",
+        "argo",
+        "ffmpeg",
+        "rendering"
+      ],
+      "description": "Runs one encode on the ghost cluster instead of the laptop: frame-grid segments in parallel in one Argo pod, stream-copy join, ffprobe verification, local fallback when the cluster is unreachable.",
+      "version": "1.0",
+      "last_updated": "2026-08-13",
+      "doc_type": "procedure"
+    },
+    {
       "id": "indexing",
       "name": "indexing",
       "one_line_purpose": "Index a source video into schema-valid, searchable segments.",
