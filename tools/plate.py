@@ -2544,6 +2544,58 @@ def _placeholder_entries(timeline, total, wanted, copy, hold, free, busy, log=No
     return entries
 
 
+def check_copy_against_bindings(entries, leads=None):
+    """A hand-authored manifest must not silently contradict `vocab/casting.yaml`.
+
+    `plan` already enforces this: when a brief's copy differs from a character's
+    binding, the **vocab wins**, because it is the reviewed durable record and an
+    issue body is editable. `plates/SKILL.md` lists "the owner wrote it today" as
+    a rationalization, not an exception.
+
+    A manifest written by hand skips `plan` entirely, so nothing was checking it
+    — which is exactly how act VI's tail shipped two cards that disagree with
+    their bindings (issue #111). This closes that path: a card whose `name`
+    matches an authored identity must either reproduce that identity's copy or
+    carry an explicit `copy_override` recording who decided otherwise.
+
+    The override is deliberately noisy. It cannot be added by accident, it names
+    the deciding issue, and it makes the divergence greppable instead of
+    invisible.
+    """
+    if leads is None:
+        from tools.derive import load_leads
+        leads = load_leads()
+
+    by_name = {}
+    for character, binding in (leads or {}).items():
+        copy = (binding or {}).get("plate") or {}
+        if copy.get("name"):
+            by_name.setdefault(copy["name"], (character, copy))
+
+    problems = []
+    for e in entries:
+        name = e.get("name")
+        if not name or name not in by_name:
+            continue
+        character, bound = by_name[name]
+        differs = [f for f in ("label", "class", "title")
+                   if f in e and e[f] != bound.get(f)]
+        if not differs:
+            continue
+        override = e.get("copy_override")
+        if not (isinstance(override, dict) and override.get("decided_by")):
+            problems.append(
+                f"plate {e['id']!r} credits {name!r} with copy that differs from "
+                f"the `{character}` binding in vocab/casting.yaml ({', '.join(differs)}). "
+                "The vocab wins a conflict. Either fix the manifest, edit the "
+                "binding, or record the decision with a `copy_override` carrying "
+                "a `decided_by` issue URL."
+            )
+    if problems:
+        raise ValueError("\n".join(problems))
+    return entries
+
+
 def load_manifest(path):
     with Path(path).open(encoding="utf-8") as fh:
         entries = json.load(fh)
@@ -2874,6 +2926,11 @@ def main(argv=None):
         return 0
 
     entries = load_manifest(args.manifest)
+    # `render` and `burn` are where a HAND-AUTHORED manifest enters the
+    # pipeline without ever passing through `plan`, which is the only other
+    # place the vocab-wins rule is enforced. Checked here rather than inside
+    # load_manifest so the loader stays a parsing helper.
+    check_copy_against_bindings(entries)
 
     if args.command == "render":
         picture = None

@@ -117,6 +117,7 @@ This skill is the contract. The procedure lives in `references/`:
 | "One extra line makes the plate clearer." | It makes the plate say something nobody wrote. The deck's fields are the contract. |
 | "I'll hardcode the copy just for this render." | Then the credit and the casting drift apart the first time a role is recast. Copy lives in `vocab/casting.yaml` — or, for someone the vocab does not bind yet, in the issue's brief, which `plan` marks `copy_source: brief`. |
 | "The brief's copy contradicts the binding, but the owner wrote it today." | Recency is not authority: the vocab is the reviewed record, the issue body is editable. The vocab wins; edit it if the brief is right. |
+| "I'll hand-author the manifest, so `plan`'s rules don't apply." | They still apply — `plan` was just the only thing enforcing them. `render` and `burn` now run `check_copy_against_bindings`, and a card contradicting its binding is refused unless it carries a `copy_override` naming the deciding issue. |
 | "The plate is short, it can share the screen." | Two plates at once is unreadable; both `plan` and `burn` refuse it. The only exception is a group row, whose members are built to be seen together. |
 | "The shot is only two seconds, so nobody can be plated there." | The plate rides across the cut. Only the *anchor* must be long enough to register. |
 | "I'll put a plausible name on the placeholder so it looks finished." | A plate names a real person. `TBD` is the honest answer until a roster exists. |
@@ -153,6 +154,25 @@ This skill is the contract. The procedure lives in `references/`:
   the black bar instead of the picture.
 - A placeholder plate carrying anything but the vocab's uncast copy, or shipping
   alongside a real roster.
+
+## When a card must diverge from its binding
+
+Only with an explicit, greppable record. `render` and `burn` call
+`check_copy_against_bindings`, which refuses any card whose `name` matches an
+authored identity but whose `label`/`class`/`title` do not — unless it carries:
+
+```json
+"copy_override": {
+  "reason": "owner brief 2026-08-13 contradicts the committed binding",
+  "binding": "cayde_6",
+  "decided_by": "https://github.com/castrojo/destiny-vids/issues/111"
+}
+```
+
+`decided_by` is required, so the escape hatch cannot be taken by accident and
+always names who is settling it. An override is a **recorded violation with an
+owner on the hook**, not a second way to be right — act VI's tail is the worked
+example, and its two cards exist to be resolved, not copied.
 
 ## Verification
 

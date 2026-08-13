@@ -492,12 +492,18 @@ Recorded in the manifest's `unresolved`, and none of it is an agent's call:
 - **`Harbringer Hunter`** is reproduced from the brief verbatim. The reference
   deck spells the same word *Harbinger* on the same person. One character, on
   his own credit — so it ships as he wrote it rather than silently corrected.
-- **Two bindings now disagree with `vocab/casting.yaml`.** The committed
-  `cayde_6` plate is `TRUSTEE // GUARDIAN` / Harbinger Titan / *"Upender of
-  Antipatterns | The First Disciple"* / silver; `zavala` is `ARCHITECT //
-  GUARDIAN` / Dawnblade Warlock. The brief overrides both **for this cut only**
-  — `casting.yaml` is not edited here, because which record is right is the
-  owner's call, not a side effect of a render.
+- **Two cards knowingly break the vocab-wins rule**, and that is a violation,
+  not a design. [`plates/SKILL.md`](../skills/plates/SKILL.md) lists *"the
+  brief's copy contradicts the binding, but the owner wrote it today"* as a
+  **rationalization**: the vocab is the reviewed record, an issue body is
+  editable, so **the vocab wins** — and `tools/plate.py plan` enforces exactly
+  that. This manifest was hand-authored, so it never passed through `plan`.
+  The committed `cayde_6` plate is `TRUSTEE // GUARDIAN` / Harbinger Titan /
+  *"Upender of Antipatterns | The First Disciple"* / silver; `zavala` is
+  `ARCHITECT // GUARDIAN` / Dawnblade Warlock. Both cards now carry an explicit
+  `copy_override` naming #111 as the decider, and `render`/`burn` refuse the
+  manifest without one. Resolution is #111: edit the bindings, or re-burn the
+  two cards from them.
 - **Brian Ketelsen and Angie Jones are not in `casting.yaml` at all.** Their
   copy exists only in the brief. A binding needs a GitHub login, and a login is
   not something to guess about a real person.
@@ -516,11 +522,13 @@ python3 tools/plate.py burn --video ~/Videos/Wolves/Prod/06-7daystothewolves.mp4
     --out ~/Videos/Wolves/Prod/06-7daystothewolves-plated.mp4 --fit-picture
 ```
 
-**The un-plated master is kept beside the plated file on purpose.** Burning is
-not idempotent, so a re-burn always starts from the clean act and never stacks
-a second card on the first. Audio is stream-copied, so the act's duration is
-unchanged (432.7330) and **no chapter after it moves** — the megacut manifest
-points at the `-plated` file and its timings are otherwise untouched.
+`Prod/` holds **one file per act**, hardlinked to its project master, so the
+plated act is `Prod/06-7daystothewolves.mp4` →
+`~/Videos/wolves-musical/wolves-7days-plated-master.mp4`. **The un-plated
+master is kept beside it** as `wolves-7days-master.mp4`, because burning is not
+idempotent: a re-burn starts from the clean act and never stacks a second card
+on the first. Audio is stream-copied, so the act's duration is unchanged
+(432.7330) and **no chapter after it moves**.
 
 ## Reproducing
 
