@@ -126,11 +126,13 @@ def run(root, *argv):
     ])
 
 
-def gather(root):
+def gather(root, twin_roots=[]):
+    """Hermetic gather: twin search defaults OFF ([]), so a test never walks
+    the real ~/Videos. Tests about twins pass the fixture root explicitly."""
     acts = deliver.parse_running_order(root / "running-order.md")
     masters, social = deliver.load_delivery(root / "delivery.json")
     return deliver.gather(acts, masters, social, root / "wolves",
-                          root / "plan.json", twin_roots=[])
+                          root / "plan.json", twin_roots=twin_roots)
 
 
 def findings(reports, numeral):
@@ -258,6 +260,122 @@ def test_a_checksum_line_for_a_file_that_is_not_an_act_is_stale(ws):
     with (ws / "wolves" / "Prod" / deliver.CHECKSUMS).open("a") as fh:
         fh.write(f"{'0' * 32}  09-phantom.mp4\n")
     assert findings(gather(ws), "")["checksum"].state == deliver.STALE
+
+
+# --- the worktree hazard (#150): location, not mtime -------------------------
+
+
+def make_worktree(ws, name="wt-feature"):
+    """A directory that IS a linked git worktree: `.git` as a FILE, which is
+    how git marks every checkout `git worktree add` makes (and `git worktree
+    remove` deletes)."""
+    wt = ws / "dv-wt" / name
+    (wt / "renders").mkdir(parents=True)
+    (wt / ".git").write_text(f"gitdir: {ws}/main/.git/worktrees/{name}\n")
+    return wt
+
+
+def test_worktree_detection_reads_git_not_the_path_string(tmp_path):
+    """`dv-wt/` is our naming convention; the hazard is being a worktree. A
+    `.git` file marks one, a `.git` directory marks the main checkout, and
+    neither means 'not a checkout at all' (~/Videos)."""
+    wt = make_worktree(tmp_path)
+    main = tmp_path / "main"
+    (main / ".git").mkdir(parents=True)
+    elsewhere = tmp_path / "Videos"
+    elsewhere.mkdir()
+    assert deliver.is_worktree_path(wt / "renders" / "x.mp4")
+    assert not deliver.is_worktree_path(main / "renders" / "x.mp4")
+    assert not deliver.is_worktree_path(elsewhere / "x.mp4")
+
+
+def test_a_worktree_master_is_ephemeral_even_intact_and_newer(ws):
+    """The case that slipped through before: the declared master LIVES in a
+    worktree, the link is intact, the mtime is newer -- every signal said ok
+    while `git worktree remove` stood ready to delete the master. Location is
+    the hazard, so this is ephemeral, never ok."""
+    wt = make_worktree(ws)
+    master = wt / "renders" / "song-master.mp4"
+    master.write_bytes(b"song-content")
+    prod = ws / "wolves" / "Prod" / "02-song.mp4"
+    prod.unlink()
+    os.link(master, prod)
+    future = 2_000_000_000
+    os.utime(master, (future, future))  # newer than Prod: mtime says "fine"
+    delivery = json.loads((ws / "delivery.json").read_text())
+    delivery["masters"]["II"]["path"] = str(master)
+    (ws / "delivery.json").write_text(json.dumps(delivery))
+    report = findings(gather(ws), "II")
+    assert report["master"].state == deliver.EPHEMERAL
+    assert report["link"].state == deliver.EPHEMERAL
+    assert run(ws, "status", "--check") == 1
+
+
+def test_a_twin_that_lives_only_in_a_worktree_is_ephemeral_not_conflict(ws):
+    """Act II on 2026-08-13: the durable master was a revision behind and the
+    build's only twin sat in dv-wt/feat-98-act2-overlay. It was caught as a
+    conflict only because the mtimes happened to point that way; the real
+    condition is that the delivered content has no durable home."""
+    wt = make_worktree(ws, name="feat-98-act2-overlay")
+    prod = ws / "wolves" / "Prod" / "02-song.mp4"
+    # The durable master becomes an OLDER, different file...
+    master = ws / "masters" / "song-master.mp4"
+    (ws / "masters" / "song-old.mp4").write_bytes(b"song-older-revision")
+    os.replace(ws / "masters" / "song-old.mp4", master)
+    past = 1_000_000_000
+    os.utime(master, (past, past))
+    os.utime(prod, (past + 1, past + 1))
+    # ...and Prod's content resolves only inside the worktree.
+    os.link(prod, wt / "renders" / "efmb-plated.mp4")
+    f = findings(gather(ws, twin_roots=[ws]), "II")["link"]
+    assert f.state == deliver.EPHEMERAL
+    assert "durable" in f.detail and "worktree" in f.detail
+
+
+def test_a_newer_durable_master_supersedes_a_worktree_twin(ws):
+    """When the durable master is NEWER, re-linking resolves the hazard by
+    superseding the worktree content -- that is the ordinary stale path, not
+    ephemeral: nothing worth keeping evaporates with the worktree."""
+    wt = make_worktree(ws)
+    prod = ws / "wolves" / "Prod" / "02-song.mp4"
+    master = ws / "masters" / "song-master.mp4"
+    (ws / "masters" / "song-new.mp4").write_bytes(b"song-v2-from-the-project")
+    os.replace(ws / "masters" / "song-new.mp4", master)
+    os.link(prod, wt / "renders" / "song-twin.mp4")
+    f = findings(gather(ws, twin_roots=[ws]), "II")["link"]
+    assert f.state == deliver.STALE
+    assert "BEHIND" in f.detail
+
+
+def test_publish_never_links_from_a_worktree(ws, capsys):
+    """The refusal that makes the state structural: publish cannot 'fix' a
+    link by attaching Prod to a path that evaporates."""
+    wt = make_worktree(ws)
+    master = wt / "renders" / "song-master.mp4"
+    master.write_bytes(b"song-content")
+    delivery = json.loads((ws / "delivery.json").read_text())
+    delivery["masters"]["II"]["path"] = str(master)
+    (ws / "delivery.json").write_text(json.dumps(delivery))
+    prod = ws / "wolves" / "Prod" / "02-song.mp4"
+    prod.unlink()
+    capsys.readouterr()
+    assert run(ws, "publish") == 0
+    assert not prod.exists(), "publish linked from a worktree"
+    assert "EPHEMERAL" in capsys.readouterr().out
+
+
+def test_the_megacut_is_refused_while_a_link_is_ephemeral(ws, capsys):
+    (ws / "wolves" / "megacut" / "show-v1.mp4").unlink()
+    wt = make_worktree(ws)
+    master = wt / "renders" / "song-master.mp4"
+    master.write_bytes(b"song-content")
+    delivery = json.loads((ws / "delivery.json").read_text())
+    delivery["masters"]["II"]["path"] = str(master)
+    (ws / "delivery.json").write_text(json.dumps(delivery))
+    capsys.readouterr()
+    assert run(ws, "build", "--dry-run") == 0
+    out = capsys.readouterr().out
+    assert "REFUSED" in out and "megacut.py" not in out
 
 
 def test_an_absent_workspace_is_a_report_not_a_crash(tmp_path, capsys):

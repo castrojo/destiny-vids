@@ -58,7 +58,10 @@ folder and mtimes lie, so:
   definition -- `tools/peaks.py trim` detaches on purpose via `os.replace`,
   and this tool is the re-link step its docstring defers to), and by
   **content hash** when the inodes disagree, so a re-link never downgrades
-  what Prod carries.
+  what Prod carries. **Location** is checked too: a master or twin whose
+  only resolution lives inside a git worktree is `ephemeral` -- one
+  `git worktree remove` from gone -- regardless of which mtime is newer,
+  because the hazard is where the file lives, not when it was written.
 * `CHECKSUMS.md5` is verified by recomputing every line.
 * The `Prod/README.md` master table is **generated** (between
   `<!-- deliver:table -->` markers) from the running order plus the delivery
@@ -121,16 +124,20 @@ DURATION_TOLERANCE_S = 2.0
 SOCIAL_CAP_BYTES = 10 * 1024 * 1024
 
 # States. ABSENT_BY_DESIGN and NO_FILM are recorded decisions, not failures;
-# everything in FAILING fails --check.
+# everything in FAILING fails --check. EPHEMERAL is distinct from CONFLICT on
+# purpose: conflict means "decide which content wins", ephemeral means "this
+# content's only home is a git worktree that `git worktree remove` deletes --
+# promote the master to a durable path".
 OK = "ok"
 NO_FILM = "no-film"
 ABSENT_BY_DESIGN = "absent-by-design"
 STALE = "stale"
 MISSING = "missing"
 CONFLICT = "conflict"
+EPHEMERAL = "ephemeral"
 UNDECLARED = "undeclared"
 
-FAILING = {STALE, MISSING, CONFLICT}
+FAILING = {STALE, MISSING, CONFLICT, EPHEMERAL}
 
 # One act row in docs/running-order.md's table:
 #   | **I** | Project Bluefin | `Prod/01-intro.mp4` — ... | delivered |
@@ -211,6 +218,26 @@ def same_file(a, b):
     except OSError:
         return False
     return (sa.st_dev, sa.st_ino) == (sb.st_dev, sb.st_ino)
+
+
+def is_worktree_path(path):
+    """True when `path` lives inside a LINKED git worktree -- a checkout whose
+    root holds a `.git` FILE (`gitdir: ...`) rather than the main checkout's
+    `.git` DIRECTORY. `git worktree remove` deletes the whole tree, so a
+    master or twin that resolves only there is one command away from gone,
+    and no amount of freshness saves it.
+
+    Not string-matching on `dv-wt/`: the convention is how OUR worktrees are
+    named, but the hazard is being a worktree, wherever it sits.
+    """
+    p = Path(path).resolve()
+    for ancestor in (p, *p.parents):
+        git = ancestor / ".git"
+        if git.is_file():
+            return True
+        if git.is_dir():
+            return False
+    return False
 
 
 def find_twins(path, roots=TWIN_ROOTS):
@@ -326,12 +353,20 @@ def check_master(act, master, report):
     if not path.exists():
         report.add("master", MISSING, f"declared master does not exist: {path}")
         return None
+    if is_worktree_path(path):
+        report.add("master", EPHEMERAL,
+                   f"the declared master lives in a git worktree: {path} -- "
+                   f"`git worktree remove` deletes it. Promote it to a "
+                   f"durable path (the main checkout's renders/, or the "
+                   f"act's ~/Videos project) and update delivery.json")
+        return path
     report.add("master", OK, str(path))
     return path
 
 
 def check_link(act, master_path, wolves, report, twin_roots=TWIN_ROOTS):
-    """Inode first; content decides which side a mismatch must move."""
+    """Inode first; content decides which side a mismatch must move; LOCATION
+    decides whether the content survives a worktree cleanup at all."""
     prod = wolves / "Prod" / act.prod_file
     if not prod.exists():
         report.add("link", MISSING, f"{prod.name} is not in Prod/")
@@ -339,6 +374,16 @@ def check_link(act, master_path, wolves, report, twin_roots=TWIN_ROOTS):
     if master_path is None:
         report.add("link", OK, f"{prod.name} present; cannot verify it "
                                f"against a master (see the master line)")
+        return
+    if is_worktree_path(master_path):
+        # Whatever the inodes say, linking Prod to a worktree is the hazard
+        # itself: the link looks intact right up until `git worktree remove`.
+        # (check_master has already named the path; this is the link's view.)
+        report.add("link", EPHEMERAL,
+                   "the declared master is a worktree checkout, so this link "
+                   "is one `git worktree remove` from dangling. publish will "
+                   "not link from a worktree -- promote the master to a "
+                   "durable path first")
         return
     if same_file(prod, master_path):
         n = os.stat(prod).st_nlink
@@ -359,6 +404,20 @@ def check_link(act, master_path, wolves, report, twin_roots=TWIN_ROOTS):
                    "publish re-links it)")
         return
     twins = find_twins(prod, roots=twin_roots)
+    if twins and all(is_worktree_path(t) for t in twins
+                     ) and master_mt <= prod_mt:
+        # Every non-Prod resolution of this inode is a worktree checkout, and
+        # the durable master does not supersede the content. Mtime direction
+        # is incidental here -- the hazard is LOCATION: when the branch is
+        # finished, `git worktree remove` makes the delivered act
+        # un-reproducible even though nothing about it looks stale today.
+        report.add("link", EPHEMERAL,
+                   f"Prod's content resolves only inside worktree "
+                   f"checkout(s) ({twins[0]}); the durable master "
+                   f"{master_path} does not carry it. Promote the build onto "
+                   f"the master (or fix delivery.json), then publish -- "
+                   f"before the worktree is removed")
+        return
     where = (f"; Prod's content actually twins with {twins[0]}" if twins
              else "; no twin found -- Prod's content exists nowhere else")
     if master_mt > prod_mt:
@@ -568,6 +627,14 @@ def publish(acts, masters, wolves, delivery_path=None, log=print):
         if not src.exists():
             log(f"  {act.prod_file}: master missing ({src}); left as-is")
             continue
+        if is_worktree_path(src):
+            # Attaching Prod to a worktree path is the hazard itself (#150):
+            # the link reads as intact until `git worktree remove` runs.
+            # The remedy is promotion to a durable path, never this link.
+            log(f"  {act.prod_file}: EPHEMERAL -- declared master lives in a "
+                f"git worktree ({src}); NOT linked. Promote it to a durable "
+                f"path first")
+            continue
         if prod.exists():
             if same_file(prod, src):
                 continue  # already the master's inode
@@ -666,7 +733,10 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                     f"hand, then `deliver.py publish`")
         link = next((f for f in r.findings if f.node == "link"), None)
         if link and link.state in FAILING:
-            if link.state == CONFLICT:
+            if link.state in (CONFLICT, EPHEMERAL):
+                # Both block downstream the same way; the remedies differ
+                # (decide the content vs promote the master to a durable
+                # path), and status names which.
                 conflicted.add(r.act.numeral)
             else:
                 actions.append((0, f"link {r.act.numeral}", None,
@@ -685,7 +755,7 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
     if mega and mega.state in FAILING:
         if conflicted:
             log(f"megacut: REFUSED -- act(s) {', '.join(sorted(conflicted))} "
-                f"have conflicted links; rebuilding would bake in the wrong "
+                f"have unresolved links; rebuilding would bake in the wrong "
                 f"content")
         else:
             argv = [sys.executable, str(REPO_ROOT / "tools" / "megacut.py"),
@@ -711,9 +781,9 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
     if not actions:
         log("  nothing stale")
     if conflicted:
-        log(f"  unresolved conflict(s): act(s) {', '.join(sorted(conflicted))} "
-            f"-- see status; no tool action exists until the master or the "
-            f"delivery map is brought up to date")
+        log(f"  unresolved link(s): act(s) {', '.join(sorted(conflicted))} "
+            f"-- see status; no tool action exists until the conflict is "
+            f"decided or the master is promoted to a durable path")
     return 0
 
 
