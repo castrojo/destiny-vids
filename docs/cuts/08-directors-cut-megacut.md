@@ -3,13 +3,19 @@
 The whole show as **one continuous video**, assembled from the finished cuts and
 announced by act slides in the Wolves cinematic's own chrome.
 
-**Status: v0.5 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.5.mp4`,
+**Status: v0.6 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.6.mp4`,
 **20:21.9** planned, seven of the eight acts on six slides — acts IV and V
-share one. The last *built* file is 20:37.0 and predates that merge. The owner asked for "one
-supercut with everything that we have", and .5 is their name for it.
+share one. v0.6 is v0.5 with **act VI's tail plates** burned in: the Cayde-6
+reveal that finally names Jorge Castro, and three gold credits behind it (see
+[`07-seven-days-to-the-wolves.md`](07-seven-days-to-the-wolves.md), "The tail
+plates"). Act VI's duration is unchanged, so **no chapter moved**, and v0.5 is
+kept beside it for comparison. The owner asked for "one
+supercut with everything that we have", and .5 was their name for it.
 
 It is **not the feature**. Act VIII, the credits, is not designed (#51), so the
-programme ends on Europa and credits nobody. Act VI is a timing pass whose
+programme ends on Europa — though it no longer credits *nobody*: act VI's tail
+now names Jorge Castro, Kelsey Hightower, Brian Ketelsen and Angie Jones. Act
+VI is a timing pass whose
 provenance is an open owner decision (#55); act II's picture comes from a fan
 compilation carrying the same question; act III is partially complete by the
 owner's own description; act VII's master clips at +0.3 dBTP (#82). None of that
