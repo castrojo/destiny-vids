@@ -1,6 +1,6 @@
 ---
 name: production
-version: "2.0"
+version: "2.1"
 last_updated: "2026-08-13"
 id: production
 one_line_purpose: Run the issue-to-render loop, repeatedly and in parallel.
@@ -107,7 +107,7 @@ This skill is the contract. The procedure lives in `references/`:
 
 | Reference | What is in it |
 |---|---|
-| [`delivery.md`](references/delivery.md) | The `~/Videos/Wolves/` workspace, the per-project contract, hardlinks and checksums, publishing via the playlist, the audio rules that bite at delivery, and the Syncthing hazard. |
+| [`delivery.md`](references/delivery.md) | The `~/Videos/Wolves/` workspace, the delivery graph (`tools/deliver.py` status/publish/build), the per-project contract, hardlinks and checksums, publishing via the playlist, the audio rules that bite at delivery, and the Syncthing hazard. |
 | [`parallel-and-tagging.md`](references/parallel-and-tagging.md) | Stale tags and `verify_tags_match_detection`, running several videos at once, batch tagging from generated worksheets, and what to work on first. |
 | [`social-copies.md`](references/social-copies.md) | Byte-capped social encodes with `tools/social.py`: encode from `Prod/`, re-encode but never process. |
 
@@ -181,6 +181,10 @@ about timing gets a time.**
 - A file hand-edited in `~/Videos/Wolves/Prod/`, or a `cp` over one of its
   entries. Every entry is a hardlink to a project's master; `cp` breaks the link
   silently and leaves a copy that goes stale. Re-link with `ln -f`.
+- Shipping a master and walking away. The link is not the delivery: the
+  checksums, the megacut, the social copies and the README all sit downstream
+  of it. `python3 tools/deliver.py status` shows the whole chain; `publish`
+  re-links and regenerates, `build` re-encodes what is stale.
 - Any write to `~/src/website`. It is read-only from here — several agents run
   worktrees against it — and it is where the authored plate copy lives.
 - Trusting a bed's measured true peak as the *delivered* peak. The encoder adds
@@ -198,6 +202,7 @@ about timing gets a time.**
 python3 tools/gaps.py
 python3 -m pytest -q                  # includes committed-index integrity
 python3 scripts/generate_skill_index.py --check
+python3 tools/deliver.py status       # the delivery chain, as a report (never a gate here)
 ~/Videos/audio-check.sh --all         # gates every act in Wolves/Prod
 ```
 
