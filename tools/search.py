@@ -97,6 +97,10 @@ PHRASES = {
     "elsie": [("casting.character", {"elsie_bray"})],
     "laura": [("casting.person", {"laura_santamaria"})],
     "santamaria": [("casting.person", {"laura_santamaria"})],
+    # Nimbatus is the same person's PRE-REVEAL credit (issue #103): her own
+    # binding, deliberately NOT an elsie_bray aka — folding the two together
+    # would route a pre-act-VII cut to the plate that prints her real name.
+    "nimbatus": [("casting.character", {"nimbatus"})],
     "anna bray": [("casting.character", {"anna_bray"})],
     "ana bray": [("casting.character", {"anna_bray"})],
     "joanna": [("casting.person", {"joanna_lee"})],

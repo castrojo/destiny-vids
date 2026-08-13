@@ -84,7 +84,8 @@ first-party footage.
 
 | Character | Cast as | |
 |---|---|---|
-| Elsie Bray | Laura Santamaria | authored plate |
+| Elsie Bray | Laura Santamaria | authored plate — **act VII copy only**; earlier acts credit her as Nimbatus (#103) |
+| Nimbatus | Laura Santamaria | name-only binding (#103): pre-reveal credit, login `nimbinatus`, no plate copy authored |
 | Anna Bray | Joanna Lee | |
 | Zavala | Kelsey Hightower | authored plate (#8), gold chrome (#33) |
 | Cayde-6 | castrojo | authored plate |
