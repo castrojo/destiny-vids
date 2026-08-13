@@ -412,6 +412,13 @@ inspect the **argv**, not the video.
    filtergraph the same frames come out 299.48 s — 2.8% fast, 505 frames
    discarded where the rescaled timestamps collide. So `--render` uses `-vf`
    only, and black is a real encoded clip joined by the concat **demuxer**.
+   The root cause was hunted and died with the hand-assembled master it was
+   found on: the scripted rebuild this script produces does **not** reproduce
+   the re-time under any of the issue's spellings, and the suspected
+   `1/15360` timescale pairing is exonerated (the healthy rebuild carries it
+   too). The lasting fix is the guard: the megacut assembly now **fails the
+   build** when any segment's picture disagrees with its source's length, so
+   the next silent re-time cannot ship.
 2. **A one-frame PNG does not survive five minutes of timeline.** Fed to
    `overlay` as-is it EOFs at once, and `eof_action=repeat` does not hold it:
    a plate gated to t=5 draws and the identical plate gated to t=269 does not.
