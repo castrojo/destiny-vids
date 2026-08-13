@@ -83,6 +83,25 @@ def test_the_committed_manifest_matches_its_generator():
     assert committed() == build_efmb_plates.build()
 
 
+def test_the_manifest_builds_from_committed_inputs_only():
+    """Everything the generator reads must be in the repository.
+
+    The roster decides which REAL PEOPLE this act credits, so it is an input to
+    the cut, not a scratch artifact. It first lived in gitignored renders/,
+    where tools/ensemble.py writes it, and CI failed on the file simply not
+    being there -- a manifest generated from a file nobody else has cannot be
+    checked, reproduced, or reviewed.
+    """
+    for path in (build_efmb_plates.ROSTER,
+                 REPO_ROOT / "vocab" / "casting.yaml",
+                 REPO_ROOT / "music" / "bed_endless_forms_most_beautiful.json"):
+        assert path.exists(), f"{path} is missing"
+        ignored = subprocess.run(["git", "check-ignore", str(path)],
+                                 cwd=REPO_ROOT, capture_output=True, text=True)
+        assert ignored.returncode != 0, (
+            f"{path} is gitignored -- the generator cannot depend on it")
+
+
 def test_every_plate_sits_on_a_frame_that_still_plays():
     for plate in committed()["plates"]:
         src = plate.get("seen_at_src")
