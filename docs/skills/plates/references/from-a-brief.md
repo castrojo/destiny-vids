@@ -152,7 +152,7 @@ an ensemble contributor even the tail roster card had no room for:
 
 Nothing blocks: the manifest is written either way, and `render`/`burn` read the
 `plates` list and ignore the punch-list. Someone being cast but plate-only is a
-legitimate resting state — see [`casting.md`](../../casting.md).
+legitimate resting state — see [`casting.md`](../../casting/SKILL.md).
 
 ### Before a roster exists
 

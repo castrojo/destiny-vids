@@ -93,7 +93,7 @@ research it rests on, and one issue-ready file per unit of work. Its lifecycle:
 
 An issue carries the owner's prose *and* a fenced `brief` block that makes it
 executable. How to file work, pick it up, and normalize prose into a brief is
-[`docs/skills/issues.md`](docs/skills/issues.md); the field reference is
+[`docs/skills/issues.md`](docs/skills/issues/SKILL.md); the field reference is
 [`schema/brief.schema.json`](schema/brief.schema.json).
 
 ## Three workspaces, one of them writable
@@ -117,7 +117,7 @@ Two narrow things outside this repo remain *authoritative over it*, and both are
 **copy, not policy**: the authored Guardian identities, which are
 [reproduced](docs/skills/plates/SKILL.md#where-the-copy-is-authored) rather than
 written, and the reference deck's field set. A delivered file is likewise
-[regenerated](docs/skills/production.md#delivering-a-finished-cut), never
+[regenerated](docs/skills/production/references/delivery.md), never
 hand-edited. `~/Videos` is a Syncthing folder, so a directory can vanish
 mid-session; check `~/.local/share/Trash` before rebuilding anything.
 

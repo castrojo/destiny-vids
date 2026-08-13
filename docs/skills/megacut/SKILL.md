@@ -1,10 +1,10 @@
 ---
 name: megacut
-version: "1.2"
-last_updated: "2026-08-12"
+version: "2.0"
+last_updated: "2026-08-13"
 id: megacut
 one_line_purpose: Join finished cuts into one programme, with act slides between them.
-entry_point: docs/skills/megacut.md
+entry_point: docs/skills/megacut/SKILL.md
 category: editing
 mcp_compliance_level: partial
 optimization_status: draft
@@ -29,14 +29,14 @@ metadata:
 - A compilation needs chapter cards between its parts
 - Reproducing a running order that is authored somewhere else (the website's
   intro sequence, a playlist) — though **this show's order is authored here**,
-  in [`docs/running-order.md`](../running-order.md)
+  in [`docs/running-order.md`](../../running-order.md)
 
 ## When NOT to Use
 
-- Building a cut from indexed shots → [`editing.md`](editing/SKILL.md)
-- Putting names on people → [`plates.md`](plates/SKILL.md)
-- Fitting a cut to music → [`scoring.md`](scoring.md)
-- Delivering a finished file → [`production.md`](production.md)
+- Building a cut from indexed shots → [`editing.md`](../editing/SKILL.md)
+- Putting names on people → [`plates.md`](../plates/SKILL.md)
+- Fitting a cut to music → [`scoring.md`](../scoring/SKILL.md)
+- Delivering a finished file → [`production.md`](../production/SKILL.md)
 
 ## Assembly is not editing
 
@@ -74,101 +74,14 @@ what the other owns, so a manifest may mix them — the Wolves hero segment
 carries six Guardian plates *and* the comic title card, and `burn` reads one
 plates-dir without caring which tool drew which file.
 
-## Cards are reproduced, not designed
+## Where the detail lives
 
-A card that exists on the website is **rendered from the website's own rules**.
-`cards/act.html` and `cards/comic.html` copy the CSS out of
-`CinematicTransition.vue` and `WolvesIntroOverlay.vue`, and
-`cards/render-cards.mjs` screenshots them with playwright — the same pattern
-`~/Videos/wolves-{kat,natali}/render/plate.html` and
-`nimbatus-review/render/endcard.html` have always used.
+This skill is the contract. The procedure lives in `references/`:
 
-Re-implementing one in Pillow gets you a second, drifting version of chrome
-that already exists; `tools/plate.py` refuses a card kind outright and names
-the driver instead. The Python renderer is for the *deck's* shapes — the
-Guardian plate, the small title card, the chat pill, the status HUD.
-
-Two rules survive the move to a browser:
-
-- **Copy still arrives in the manifest.** A row nobody authored is left out of
-  the URL and does not render. The card templates default nothing.
-- **A CSS comment containing `*/` truncates the stylesheet**, and the card then
-  renders as unstyled black text on white — which is exactly what a path like
-  `wolves-*/render/reveal.html` does inside a comment. A test pins it.
-
-The plan is an ordered list of two kinds of item:
-
-```json
-{
-  "output": "renders/<name>.mp4",
-  "items": [
-    {"kind": "card", "image": "renders/plates-x/plate_act1.png", "dur": 5.0},
-    {"kind": "clip", "path": "renders/segment.mp4", "audio": "silent"},
-    {"kind": "clip", "path": "/abs/path/deliverable.mp4", "audio": "source"}
-  ]
-}
-```
-
-`audio` has no default **on purpose**. A clip that silently defaulted to
-silence would ship a mute segment that looks fine in every log, so the tool
-refuses a clip that does not say which it is.
-
-## Segments, then a join — and still one generation
-
-`tools/megacut.py` normalises each item to its own temporary segment and joins
-them with the **concat demuxer**. It used to build one `filter_complex` over
-every input at once, to avoid encoding each frame twice.
-
-**That does not run on a real programme.** Fourteen inputs and half an hour of
-1080p: ffmpeg buffers the inputs `concat` is not consuming yet, climbs to ~2 GB
-resident, then **deadlocks** — every thread in `futex_do_wait`, 0% CPU, no
-output growth. Measured twice, at two presets, stalling at the same point.
-A fourteen-input graph over *short* inputs completes fine, so it is the
-duration behind the inputs, not the shape of the graph.
-
-The generation count is unchanged, which is the part worth protecting:
-
-- **Video is encoded once.** Segments carry the plan's own `crf`/`preset`; the
-  join is `-c:v copy`. It costs disk, briefly, not quality.
-- **Audio is encoded once.** Segments carry lossless **24-bit PCM**, so the one
-  AAC encode happens at the join, across the whole programme. Encoding AAC per
-  segment and copying would give every cut its own encoder delay and padding —
-  a tick at every join.
-- **PCM, not FLAC**, in the segments. FLAC keeps its STREAMINFO in the stream's
-  extradata, and the concat demuxer binds the first file's extradata to the
-  whole joined stream: every later segment then fails to decode with
-  `Invalid data found when processing input`.
-
-### A clip is filtered with `-vf`, never `-filter_complex`
-
-This one cost a whole rebuild and is invisible in every log. On one act — 30
-fps, container timescale 1/15360 — the *identical* chain gave:
-
-| Form | Result |
+| Reference | What is in it |
 |---|---|
-| `-vf "scale…,fps…,setpts…"` | **307.99 s** ✅ |
-| `-filter_complex "[0:v]scale…,fps…,setpts…[v]"` | **299.48 s**, `drop=505` ❌ |
-
-The filtered timestamps were rescaled and the frames that collided were
-discarded. ffmpeg exited **0** and reported the full frame count going *in*.
-The programme came out 8.5 s short and **every act after that one started
-early**, which is how it was caught: the act slides no longer landed where the
-plan said. Cards keep the graph form, because they need `lavfi` sources and are
-stills whose durations are authored rather than carried.
-
-`concat=n=1` on a single-item segment is not a harmless no-op either — it
-re-times the same file the same way. The join is a demuxer, not a filter.
-
-## What has to be normalised, and why
-
-Segments genuinely disagree, so *some* re-encode is unavoidable:
-
-| Property | Rule | Why |
-|---|---|---|
-| Frame rate | **60000/1001** | Real sources here run 30/1, 60/1 and 60000/1001. 30 would throw away the 60fps material; 60/1 makes 59.94 material drift against its own audio. |
-| Audio | 48 kHz 5.1, **unprocessed** | The audio tenet: no normaliser, no limiter, no EQ. |
-| Silence | **Generated**, length probed | Every segment must carry both streams. A silence source one frame short desynchronises everything after it. |
-| Colour | BT.709, written into the VUI | See the trap below. |
+| [`cards.md`](references/cards.md) | Full-frame cards are rendered from the site's own CSS in a real browser, the plan's two item kinds, and why `audio` has no default. |
+| [`assembly-graph.md`](references/assembly-graph.md) | Segments-then-join (and the `filter_complex` deadlock it replaced), the `-vf` vs `-filter_complex` re-timing trap, and what has to be normalised. |
 
 ## Red Flags
 
@@ -211,7 +124,7 @@ Segments genuinely disagree, so *some* re-encode is unavoidable:
 - **Chapter card copy is reproduced, never authored.** The deck's card is the
   closed `title` / `subtitle` / `body` shape; the act slide adds only the
   owner's `act` numeral and `chapters` list. A card whose words nobody has
-  written is omitted and recorded — see [`plates.md`](plates/SKILL.md).
+  written is omitted and recorded — see [`plates.md`](../plates/SKILL.md).
 - **A card that exists on the site is not re-implemented.** Render it from the
   site's CSS with `cards/render-cards.mjs`; a Pillow port of chrome that
   already ships is a second version to keep in step.
@@ -244,7 +157,7 @@ ffmpeg -ss <seg> -t <len> -i out.mp4 -map a:0 -af volumedetect -f null /dev/null
 ## Delivering a programme
 
 A programme is delivered like any other cut — see
-[`production.md`](production.md) — with one extra question that only
+[`production.md`](../production/SKILL.md) — with one extra question that only
 compilations raise.
 
 ```bash
@@ -258,7 +171,7 @@ md5sum *.mp4 > CHECKSUMS.md5 && md5sum -c CHECKSUMS.md5
 `ln -f`, **never `cp`** — `Prod/` is hardlinks to each project's master, so it
 costs no disk and cannot drift. A `cp` over an existing entry breaks the link
 silently and leaves a copy that goes stale. `NN` is the **act number** from
-[`docs/running-order.md`](../running-order.md), not a sort key.
+[`docs/running-order.md`](../../running-order.md), not a sort key.
 
 Then update `Wolves/Prod/README.md`: the act, and the master it links to. A
 delivered file with no row is a file nobody can trace.

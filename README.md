@@ -392,7 +392,7 @@ than in an outline:
 
 - **The Witness is shown as eyes or smoke, never its body.** A `depiction` rule
   on the binding, defaulting to exclusion — see
-  [`docs/skills/casting.md`](docs/skills/casting.md).
+  [`docs/skills/casting.md`](docs/skills/casting/SKILL.md).
 - **A mechanic card is replaced, not dropped.** A trailer's black "8 DUNGEONS"
   plate is `burned_text` and already excluded; putting artwork in its slot keeps
   the rhythm the trailer had — see [`docs/skills/editing/SKILL.md`](docs/skills/editing/SKILL.md).
@@ -549,7 +549,7 @@ python3 tools/gaps.py                # what in the index is unfinished
 `automatable` is required, because three classes of work here can never be
 automated: a visual judgement about a frame, a claim about a real person, and a
 licensing decision. An agent that names one and stops has succeeded. See
-`docs/skills/issues.md`.
+`docs/skills/issues/SKILL.md`.
 
 ## Where a finished cut goes
 
@@ -569,4 +569,4 @@ The credited contributors cut is **regenerated, never hand-edited**: a new month
 is a new render from checked-in data (`scripts/build_uncut_credited.sh`), not a
 new edit. Titles, descriptions and audio treatment for a delivered file follow
 that workspace's rules, not this one's — see
-[`docs/skills/production.md`](docs/skills/production.md#delivering-a-finished-cut).
+[`docs/skills/production.md`](docs/skills/production/references/delivery.md).

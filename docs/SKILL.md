@@ -13,15 +13,16 @@ load only that skill, then act.
 
 | I need to... | Load |
 |---|---|
-| File work, pick up an issue, or normalize a request into a brief | [`issues.md`](skills/issues.md) |
-| Take an issue all the way to a rendered cut, or make videos in volume | [`production.md`](skills/production.md) |
+| Turn the owner's dictated Whisp notes into filed issues, or find out why a submitted request never landed | [`intake.md`](skills/intake.md) |
+| File work, pick up an issue, or normalize a request into a brief | [`issues.md`](skills/issues/SKILL.md) |
+| Take an issue all the way to a rendered cut, or make videos in volume | [`production.md`](skills/production/SKILL.md) |
 | Index a new video: detect beats, extract keyframes, tag, assemble segments | [`indexing.md`](skills/indexing.md) |
-| Cast a character, add a lead binding, or credit the monthly ensemble | [`casting.md`](skills/casting.md) |
+| Cast a character, add a lead binding, or credit the monthly ensemble | [`casting.md`](skills/casting/SKILL.md) |
 | Find out what footage a character actually has — and what they lack | [`corpus.md`](skills/corpus.md) |
 | Write an outline, assemble a cut list, mark material for removal, or render it | [`editing.md`](skills/editing/SKILL.md) |
-| Score a cut to a music bed, pause the song mid-cut, or land a shot on a beat | [`scoring.md`](skills/scoring.md) |
+| Score a cut to a music bed, pause the song mid-cut, or land a shot on a beat | [`scoring.md`](skills/scoring/SKILL.md) |
 | Put a name on screen — Guardian nameplates and title cards | [`plates.md`](skills/plates/SKILL.md) |
-| Join several finished cuts into one programme with chapter cards | [`megacut.md`](skills/megacut.md) |
+| Join several finished cuts into one programme with chapter cards | [`megacut.md`](skills/megacut/SKILL.md) |
 | Get a working ffmpeg on an atomic host | [`../docs/rendering.md`](rendering.md) |
 
 The machine-readable catalog is [`skills/index.json`](skills/index.json), with a

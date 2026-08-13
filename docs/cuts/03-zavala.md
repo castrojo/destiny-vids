@@ -297,7 +297,7 @@ calls, not missing code:
 Issue #33 is prose, and prose is not executable. This is the block
 [`tools/brief.py`](../../tools/brief.py) would propose for it — **a proposal**,
 not a confirmation: it goes in the issue only if the owner says it reads right,
-which is the point of the division ([`issues.md`](../skills/issues.md)).
+which is the point of the division ([`issues.md`](../skills/issues/SKILL.md)).
 
 ````markdown
 ```brief

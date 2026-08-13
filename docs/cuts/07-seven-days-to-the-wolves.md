@@ -371,7 +371,7 @@ black actually ends. The old value leaked 0.27 s of black into the cut.
 ### Two clocks
 
 The mechanic and when to reach for it are in
-[`docs/skills/scoring.md`](../skills/scoring.md#two-clocks-when-the-bed-does-not-run-end-to-end).
+[`docs/skills/scoring.md`](../skills/scoring/references/two-clocks-and-levels.md).
 What is specific to this cut: the song plays from the first frame, the only
 `audio: "source"` shot is the pause, and the film is therefore **432.7 s for
 424.0 s of music**. Every anchor in the builder is asserted against bed time.
@@ -379,7 +379,7 @@ What is specific to this cut: the song plays from the first frame, the only
 ### The pause's length, measured
 
 The rule — [a diegetic insert has to be allowed to
-end](../skills/scoring.md#a-diegetic-insert-has-to-be-allowed-to-end) — came out
+end](../skills/scoring/references/two-clocks-and-levels.md#a-diegetic-insert-has-to-be-allowed-to-end) — came out
 of this cut. The pause was first taken at 1.8 s and the moment *started and did
 not finish*; the timing pass took it to 3.65 s. This pass takes it to the shot
 the owner actually meant, 8.659 s, with the out-point on a measured cut rather
