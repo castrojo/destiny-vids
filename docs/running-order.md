@@ -44,12 +44,18 @@ overlay: Karl beside Kat, Alamo beside Natali, Katerina beside Kaslin, and Bob
 Killen's unnamed Torosaurus beside Cortney, which she inherits by the owner's
 explicit decision rather than by the recast.
 
-**Act II emits two sub-chapters that nothing consumes yet.** `TOC` at 0:54.234
+**Act II emits two sub-chapters, consumed only on opt-in.** `TOC` at 0:54.234
 and `The Long Walk` at 2:27.801, in the act's own film time
 (`python3 scripts/build_efmb_plates.py --chapters`). `chapters()` below derives
-markers from act **slides** only, so an act's internal marks have nowhere to go
-— [#92](https://github.com/castrojo/destiny-vids/issues/92). They are anchored
+markers from act **slides** only, so an act's internal marks stay out of the
+published list unless asked for: the act's clip in the programme plan carries a
+`sub_chapters` **pointer** at its own manifest (the source of the marks), and
+`--sub-chapters` emits them at slide-relative programme time. The default
+chapter list is unchanged —
+[#92](https://github.com/castrojo/destiny-vids/issues/92). They are anchored
 to source timecodes, so they cannot drift from the credits they belong to.
+**TODO(owner):** whether sub-chapters belong in the YouTube chapter list at
+all, or only in an ffmpeg metadata track.
 
 **Acts IV and V share one slide.** The owner's call: their films run 34 s and
 25 s, and two slides held 15 s each announced 59 s of picture. Both acts keep
