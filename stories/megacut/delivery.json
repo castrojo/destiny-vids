@@ -4,7 +4,12 @@
  "masters": {
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
-   "note": ""
+   "note": "the six Guardian plates and the comic title card burned over BKm0TPqeOjY, trimmed 2.0 -> 113.55. NO COMMITTED BUILDER: this act was assembled ad-hoc (raw x264 crf 14 trim, then a `tools/plate.py` burn at crf 18) rather than by a script under `scripts/`, so its `sources` cover the copy that goes on screen but not the assembly that places it. Re-rendering act I from the repo is therefore not reproducible today -- that gap is its own finding, not a reason to leave the act undeclared",
+   "sources": [
+    "stories/megacut/megacut-hero-plates.json",
+    "vocab/casting.yaml"
+   ],
+   "source_digest": "bc62bd90c79a60f4ac788fb9a3e2ae9f13e4e6ebb4a18a6e86317111f2f85158"
   },
   "II": {
    "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
