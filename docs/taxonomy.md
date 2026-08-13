@@ -183,6 +183,7 @@ tiers, and the difference between them is the whole model:
 | Character | Person | aka | Constraints |
 |---|---|---|---|
 | `elsie_bray` | `laura_santamaria` (Laura Santamaria) | `elsie_gray`, `the_exo_stranger`, `exo_stranger` | — |
+| `nimbatus` | `laura_santamaria` (Nimbatus) | — | redaction: real name withheld until act VII (#103) |
 | `anna_bray` | `joanna_lee` (Joanna Lee) | `ana_bray` | — |
 | `zavala` | `kelsey_hightower` (Kelsey Hightower) | `commander_zavala` | — |
 | `cayde_6` | `castrojo` (castrojo) | `cayde`, `cayde6` | — |
@@ -205,7 +206,15 @@ derivation input; the field is free text and `compute_casting` never reads it.
 `iron_lord_red_haired` is the red-haired Iron Lord who dies in the *Rise of
 Iron* intro — her canonical Destiny name is unconfirmed, so the key is
 descriptive on purpose and should be renamed (with the old id kept in `aka`)
-once she's identified. `sagira` is the one binding that is **not a Guardian** —
+once she's identified. `nimbatus` is the same *person* as `elsie_bray`
+(Laura Santamaria) under a **redaction** (#103): the programme reveals her real
+name on act VII's Guardian card, so every earlier act credits her as NIMBATUS.
+The binding carries her verified login (`nimbinatus` — *not* the unrelated
+`nimbatus` account) and deliberately **no `plate` block**: her authored identity
+lives on `elsie_bray`, its name row is the redacted string itself, and no
+Nimbatus plate copy has been authored — so a plate pass over a pre-reveal
+appearance reports `no_plate_copy` instead of printing her real name. `sagira`
+is the one binding that is **not a Guardian** —
 she is Osiris's Ghost, so no framing or helmet question applies and she is cast
 on presence in frame alone; her nameplate accordingly carries no subclass line.
 

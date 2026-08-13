@@ -209,6 +209,7 @@ def test_concealed_visibilities_satisfy_require_helmet(visibility):
 
 @pytest.mark.parametrize("character,person", [
     ("Elsie Bray", "laura_santamaria"),
+    ("Nimbatus", "laura_santamaria"),
     ("Anna Bray", "joanna_lee"),
     ("Zavala", "kelsey_hightower"),
     ("Cayde-6", "castrojo"),

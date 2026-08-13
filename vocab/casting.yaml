@@ -35,6 +35,23 @@ leads:
     display_name: How the person is credited on their tile.
     aka:          Alternate spellings/ids for the SAME character, normalized to this key.
     note:         OPTIONAL free-text standing direction for the binding. Documentation only — derivation never reads it.
+    github:       >
+      OPTIONAL. The person's verified GitHub login, recorded so avatar tooling
+      resolves the person and never a same-named stranger's account (the
+      `nimbatus`/`nimbinatus` trap — see that binding). A login is verifiable;
+      a real name may not be. Documentation only — derivation never reads it.
+    redacts:      >
+      OPTIONAL. The real name the programme must NOT print while the redaction
+      holds, mirroring the card-level fields (see `cayde_signoff` in
+      scripts/build_efmb_plates.py). The enforcement is structural: a binding
+      whose on-screen credit is a redaction carries NO `plate:` block, so
+      tools/plate.py has no real-name copy to print and reports the character
+      under `unresolved` (no_plate_copy) instead. Documentation + tests only —
+      derivation never reads it.
+    redaction_scope: >
+      OPTIONAL with `redacts`. Where the redaction holds and where the reveal
+      is, in the card field's own phrasing ("act II only -- he is revealed
+      later in the programme").
     plate:        >
       OPTIONAL on-screen nameplate copy, read by tools/plate.py when it plans a
       cut's plates. Keys mirror the reference deck (~/Videos/nameplates.json):
@@ -72,11 +89,53 @@ leads:
       # authored identity must not fall back to the generic copy -- and it is
       # copied verbatim rather than paraphrased, because paraphrasing a real
       # person's credit is the same fault as inventing one.
+      #
+      # NAME-UNTIL-EUROPA: this plate's name row is act VII copy only. Every
+      # act before VII credits her as NIMBATUS — see the `nimbatus` binding
+      # below, which is the same person under the redaction (issue #103).
       plate:
         label: MAINTAINER // GUARDIAN
         class: Gunslinger Hunter
         name: Laura Santamaria
         title: The Order of Seven
+    nimbatus:
+      # NIMBATUS IS LAURA SANTAMARIA — "they are the same person we don't
+      # reveal her real name until europa" (owner, first alpha watch; issue
+      # #103). Act VII's Guardian card (82.525-90.000) is the reveal; every act
+      # before it calls her NIMBATUS. The binding is what stops an earlier act
+      # crediting her by her real name BY DEFAULT: the pre-reveal name resolves
+      # here, and this entry carries NO `plate:` block, so tools/plate.py has
+      # no copy to print and reports her under `unresolved` (no_plate_copy)
+      # every time she makes a cut -- the iron_lord_red_haired posture, and the
+      # same shape cayde_signoff carries in act II ("[ REDACTED ]" /
+      # redacts / redaction_scope).
+      #
+      # THE LOGIN IS `nimbinatus`, NOT `nimbatus` — two different GitHub
+      # accounts, and the wrong one matches the character name. github.com/
+      # nimbinatus is Laura Santamaria (Red Hat, u/1538692); github.com/
+      # nimbatus is an unrelated empty account (u/20426015). Avatar tooling
+      # resolves from the `github` login, so binding her by the character
+      # string would fetch a stranger's avatar onto her credit. Her pfp at
+      # ~/src/website public/wolves/characters/nimbatus.webp is
+      # owner-confirmed; only the login was the trap.
+      #
+      # NO `plate:` ON PURPOSE. Her AUTHORED Guardian identity (characters.json
+      # slug `laura`) already lives on the elsie_bray binding above — and its
+      # name row IS the redacted string, so it cannot be reproduced here. A
+      # Guardian identity for NIMBATUS (label / class / title under that name)
+      # has been authored by NOBODY: not the reference deck, not the website,
+      # not an issue. TODO(owner): author it where identities are authored
+      # (~/Videos/nameplates.json or the website's characters.json); tracked by
+      # issue #103. Until then every plate pass over a nimbatus shot reports
+      # the gap rather than filling it.
+      person: laura_santamaria
+      display_name: Nimbatus
+      aka: []
+      github: nimbinatus
+      redacts: Laura Santamaria
+      redaction_scope: >
+        every act before VII -- she is revealed on act VII's Guardian card
+        (82.525-90.000); the programme calls her NIMBATUS until Europa
     anna_bray:
       # Elsie's sister — the Bray line is the project's through-thread, so both
       # sisters are cast.
