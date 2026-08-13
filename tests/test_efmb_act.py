@@ -289,3 +289,85 @@ def test_the_bed_is_corrected_with_static_gain_and_never_a_normaliser():
     render_section = source[source.index("def render("):]
     for banned in ("loudnorm", "alimiter", "acompressor"):
         assert banned not in render_section
+
+
+# --- the montage announcements (owner brief, issue #98) ---------------------
+
+def _montage(manifest):
+    return [p for p in manifest["plates"]
+            if p["id"].startswith(("montage_chat_", "announce_"))]
+
+
+def test_the_montage_cues_are_evenly_spaced_across_the_owner_s_window():
+    """"spaced out over this montage until the 02:19 - try to space them out
+    evenly". Even means even: one step, no drift."""
+    cues = _montage(build_efmb_plates.build())
+    assert len(cues) == 6
+    starts = [p["at"] for p in cues]
+    assert starts[0] == build_efmb_plates.MONTAGE_IN
+    steps = {round(b - a, 3) for a, b in zip(starts, starts[1:])}
+    assert steps == {build_efmb_plates.MONTAGE_STEP}
+
+
+def test_the_last_announcement_hands_off_before_the_lead_in_banner():
+    """The cues exist to fill 1:38 -> 2:19 and then get out of the way; one
+    running past 2:19 would be on top of the scene it is introducing."""
+    cues = _montage(build_efmb_plates.build())
+    assert cues[-1]["at"] + cues[-1]["dur"] <= build_efmb_plates.MONTAGE_OUT
+
+
+def test_the_montage_never_stacks_a_cue_on_the_badge_already_in_that_window():
+    """Dylan Taylor's badge sits at 130.267 inside the montage. An announcement
+    trimmed to the 2.2s minimum by the collision guard is not what "evenly"
+    means, so the schedule has to clear it on its own."""
+    manifest = build_efmb_plates.build()
+    dylan = next(p for p in manifest["plates"]
+                 if p["id"] == "placeholder_dylan_taylor")
+    last = _montage(manifest)[-1]
+    assert last["at"] + last["dur"] <= dylan["at"]
+    assert last["dur"] == build_efmb_plates.SOLO_HOLD  # never trimmed
+
+
+def test_the_ranks_escalate_bronze_silver_gold():
+    """The escalation is the joke: bronze greets the newcomer, silver flatters
+    the incumbent, gold is kept for the ones who left and for the payoff."""
+    ranked = [p for p in build_efmb_plates.build()["plates"]
+              if p["id"].startswith("announce_")]
+    chrome = [(p["id"], p.get("variant"), p.get("trustee")) for p in ranked]
+    assert chrome == [
+        ("announce_new", "bronze", None),
+        ("announce_current", None, True),      # `trustee` IS the silver
+        ("announce_emeritus", "leader", None),
+        ("announce_all", "leader", None),
+    ]
+
+
+def test_the_announcement_copy_is_reproduced_bracket_spacing_and_all():
+    """The owner wrote `[ NEW CONTRIBUTORS ]` with spaces and `[ALL
+    CONTRIBUTORS]` without. Authored copy is reproduced, never tidied."""
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert by_id["announce_new"]["name"] == "TO [ NEW CONTRIBUTORS ]"
+    assert by_id["announce_all"]["name"] == "[ALL CONTRIBUTORS]"
+    assert by_id["announce_emeritus"]["name"] == "[ EMERITUS CONTRIBUTORS ]"
+    # ... and the typo in the owner's own aside stands until they change it.
+    assert (by_id["montage_chat_2"]["text"]
+            == "Ready to the #FIGHTFORCONTRIBUTORS?")
+    assert all(p["label"] == "AN4-CH3CK-12"
+               for p in build_efmb_plates.build()["plates"]
+               if p["id"].startswith("announce_"))
+
+
+def test_copy_the_card_has_no_row_for_is_recorded_not_dropped():
+    """A fourth authored line on a three-row card is a punch-list item, not a
+    licence to cram it into the class row."""
+    unresolved = build_efmb_plates.build()["unresolved"]
+    assert any("Look how good you look!" in u for u in unresolved)
+    assert any("lead-in banner" in u for u in unresolved)
+
+
+def test_the_owner_s_asides_are_pfp_chats_and_carry_no_rank():
+    chats = [p for p in build_efmb_plates.build()["plates"]
+             if p["id"].startswith("montage_chat_")]
+    assert [p["kind"] for p in chats] == ["chat", "chat"]
+    assert all(p["speaker"] == "Jorge Castro" for p in chats)
+    assert not any(p.get("variant") or p.get("trustee") for p in chats)

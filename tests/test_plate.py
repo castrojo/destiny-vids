@@ -1974,3 +1974,31 @@ def test_raised_lifts_a_plate_out_of_the_lower_third():
     raised = plate.place(card, "right", raised=True).getbbox()[1]
     assert raised < normal
     assert raised == pytest.approx(plate.FRAME_H * plate.RAISED_TOP, abs=2)
+
+
+def test_bronze_is_the_third_rank_and_is_not_rust():
+    """Owner: "Rank them with bronze, silver, and gold". `leader` was already
+    the gold and `trustee` the silver, so only the lowest step was missing.
+
+    Bronze must not read as `rust`: that variant is the Rust Foundation's
+    herald, and a rank borrowing a Foundation's metal says something about the
+    person wearing it that nobody authored."""
+    bronze = plate.VARIANTS["bronze"]
+    assert bronze["accent"] == (205, 127, 50, 255)          # #cd7f32
+    assert bronze["accent"] != plate.VARIANTS["rust"]["accent"]
+    # As `leader`, a rank never recolours the class row.
+    assert bronze["klass"] == plate.VARIANTS["default"]["klass"]
+
+
+def test_a_bronze_card_renders_and_differs_from_silver_and_gold():
+    spec = {"label": "AN4-CH3CK-12", "name": "TO [ NEW CONTRIBUTORS ]",
+            "title": "It's totally like this. We promise."}
+    ranks = {
+        "bronze": plate.render_plate({**spec, "variant": "bronze"}),
+        "silver": plate.render_plate({**spec, "trustee": True}),
+        "gold": plate.render_plate({**spec, "variant": "leader"}),
+    }
+    assert all(img.size[0] > 0 for img in ranks.values())
+    # Same geometry, different metal: chrome only, as every variant here.
+    assert len({img.size for img in ranks.values()}) == 1
+    assert len({img.tobytes() for img in ranks.values()}) == 3

@@ -208,6 +208,85 @@ CAYDE = {
     "reveals": "cayde_6",
 }
 
+# --- THE MONTAGE ANNOUNCEMENTS (owner brief, issue #98) --------------------
+#
+# "Right after the smash at 1:38 ... Make an overlay with announcements spaced
+# out over this montage until the 02:19 - try to space them out evenly. Rank
+# them with bronze, silver, and gold, make them lower thirds with the
+# heraldric style."
+#
+# ALL COPY BELOW IS OWNER-AUTHORED AND VERBATIM, including the bracket spacing
+# (`[ NEW CONTRIBUTORS ]` but `[ALL CONTRIBUTORS]`) and `Ready to the
+# #FIGHTFORCONTRIBUTORS?`. Authored copy is reproduced, never corrected.
+#
+# THE RANKS ESCALATE, and that is the joke: bronze greets the newcomer, silver
+# flatters the incumbent, gold is kept for the people who already left and for
+# the payoff line that agrees with all of them.
+MONTAGE_IN, MONTAGE_OUT = 98.0, 139.0     # 1:38 -> 2:19, in film time
+
+# The window is not empty: the Dylan Taylor badge already sits at 130.267.
+# Six cues at MONTAGE_STEP land the last one clear of it rather than stacking
+# a second card on top -- `space_plates` would catch the collision, but an
+# announcement silently trimmed to 2.2s is not what "spaced out evenly" means.
+MONTAGE_STEP = 5.5
+
+ANNOUNCER = "AN4-CH3CK-12"
+
+# `kind: chat` -- the pfp-badge pill the other videos use, not heraldry. The
+# owner's two lines are asides to camera, so they carry no rank.
+#
+# The SPEAKER string is the owner's own, from the brief ("[pfp] Jorge Castro:
+# Enjoying the metal?"), not a casting.yaml lookup: nobody has authored plate
+# copy for `castrojo`, and a chat pill needs a name to put on the pill. The
+# login is carried only to find the pfp, which degrades to the drawn crest.
+MONTAGE_CHATS = [
+    ("castrojo", "Jorge Castro", "Enjoying the metal?"),
+    ("castrojo", "Jorge Castro", "Ready to the #FIGHTFORCONTRIBUTORS?"),
+]
+
+# The heraldic lower thirds. `name` is who is being addressed, `title` is what
+# is said to them -- the closed field set, no row invented.
+MONTAGE_ANNOUNCEMENTS = [
+    {
+        "id": "announce_new",
+        "rank": "bronze",
+        "name": "TO [ NEW CONTRIBUTORS ]",
+        "title": "It's totally like this. We promise.",
+    },
+    {
+        "id": "announce_current",
+        "rank": "silver",
+        "name": "TO [ CURRENT CONTRIBUTORS ]",
+        "title": "Look how good you look, it totally is like this!",
+    },
+    {
+        "id": "announce_emeritus",
+        "rank": "gold",
+        "name": "[ EMERITUS CONTRIBUTORS ]",
+        "title": "It's totally NOT like this. We promise.",
+        # The owner's block for this one carries a SECOND line -- "Look how
+        # good you look!" -- and the card has three rows, all spoken for. It
+        # is recorded in `unresolved` rather than dropped or crammed into the
+        # class row, which is a subclass and would be nonsense here.
+        "orphan_copy": "Look how good you look!",
+    },
+    {
+        "id": "announce_all",
+        "rank": "gold",
+        "name": "[ALL CONTRIBUTORS]",
+        "title": "You are not wrong",
+    },
+]
+
+# `trustee: true` IS the silver treatment (tools/plate.py `_variant_for`), so
+# the middle rank is a flag rather than a `variant` -- same as every silver
+# plate in the show.
+RANK_CHROME = {
+    "bronze": {"variant": "bronze"},
+    "silver": {"trustee": True},
+    "gold": {"variant": "leader"},
+}
+
 LEAD_IN = 0.4      # let the cut land before the plate arrives
 MIN_HOLD = 2.2     # below this a plate cannot be read
 
@@ -592,6 +671,47 @@ def build():
         "text_source": "owner_supplied",
     })
 
+    # --- the montage announcements (owner brief #98) -----------------------
+    # Two asides to camera, then the ranks, evenly spaced across the montage.
+    montage_unresolved = []
+    cue_at = MONTAGE_IN
+    for i, (login, speaker, text) in enumerate(MONTAGE_CHATS):
+        plates.append({
+            "id": f"montage_chat_{i + 1}",
+            "kind": "chat",
+            "at": round(cue_at, 3),
+            "dur": SOLO_HOLD,
+            "copy_source": "owner_supplied",
+            "speaker": speaker,
+            "text": text,
+            "text_source": "owner_supplied",
+            **localise_avatar(login, {}),
+        })
+        cue_at += MONTAGE_STEP
+
+    for spec in MONTAGE_ANNOUNCEMENTS:
+        plates.append({
+            "id": spec["id"],
+            "at": round(cue_at, 3),
+            "dur": SOLO_HOLD,
+            "position": "center",
+            "copy_source": "owner_supplied",
+            "label": ANNOUNCER,
+            "name": spec["name"],
+            "title": spec["title"],
+            **RANK_CHROME[spec["rank"]],
+        })
+        if spec.get("orphan_copy"):
+            montage_unresolved.append(
+                f"{spec['id']}: authored line {spec['orphan_copy']!r} has no "
+                "row on a three-row card -- owner to place or cut it")
+        cue_at += MONTAGE_STEP
+
+    last_out = cue_at - MONTAGE_STEP + SOLO_HOLD
+    assert last_out <= MONTAGE_OUT, (
+        f"the montage cues run to {last_out:.3f}s, past the {MONTAGE_OUT}s "
+        "lead-in banner they are supposed to hand off to")
+
     plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))
 
     for cur, nxt, room in space_plates(plates):
@@ -604,7 +724,8 @@ def build():
             "Act II's plate manifest. GENERATED by "
             "scripts/build_efmb_plates.py -- never hand-edited. Windows are "
             "derived from scripts/build_efmb.py (source time -> film time) and "
-            "every word of copy is reproduced verbatim from vocab/casting.yaml."
+            "every word of copy is reproduced verbatim from vocab/casting.yaml "
+            "or, for the montage cues, from the owner's brief in issue #98."
         ),
         "_film_sec": plan["film_sec"],
         "_bed_lead_sec": plan["bed_lead_sec"],
@@ -616,6 +737,16 @@ def build():
             for src, title in CHAPTERS
         ],
         "plates": plates,
+        # What the brief authored but this manifest could not place. Recorded
+        # so it is visible rather than buried: degrade, never block.
+        "unresolved": montage_unresolved + [
+            "the 2:19 lead-in banner (owner: \"setting up this scene it's "
+            "important\") has no authored copy, so nothing is emitted for it",
+            "the CNCF logo the brief marks as [CNCF LOGO] on each announcement "
+            "has no asset in this repo; the cards render without it",
+            "AN4-CH3CK-12 is not in vocab/casting.yaml -- it is reproduced as "
+            "the announcer's label, and casts nobody",
+        ],
     }
 
 
