@@ -276,8 +276,15 @@ class Timeline:
         self.wall = 0.0
         self.bed = 0.0
 
-    def run(self, video_id, src_in, dur, beat, audio="bed", plate_slot=False):
-        """A continuous piece of one source, in source order."""
+    def run(self, video_id, src_in, dur, beat, audio="bed", plate_slot=False,
+            audio_from=None):
+        """A continuous piece of one source, in source order.
+
+        ``audio_from`` names a DIFFERENT source for what is heard: a dict of
+        ``video_id`` and ``start_sec``, the latter in that source's own clock.
+        Only meaningful with ``audio="source"`` -- under the bed it would never
+        be heard, and tools/audiomix.py rejects it there.
+        """
         shot = {
             "segment_id": f"{video_id}_{src_in:08.3f}".replace(".", "_"),
             "video_id": video_id,
@@ -289,6 +296,8 @@ class Timeline:
             "beat": beat,
             "audio": audio,
         }
+        if audio_from is not None:
+            shot["audio_from"] = audio_from
         if plate_slot:
             # Where a nameplate can land: Guardians together, held long enough
             # to read. Recorded here so the plates pass has a list to work from
@@ -438,15 +447,31 @@ def build():
     # omitted and recorded; it is never invented (AGENTS.md). See the punch
     # list in docs/cuts/07-seven-days-to-the-wolves.md.
     #
-    # The source audio here is the trailer's own, unaltered. Measured over this
-    # span it is broadband, not tonal -- spectral flatness 0.45 in the run-up
-    # and 0.47 across the explosion -- i.e. gunfire and detonation rather than a
-    # melodic bed, which is what "the sfx pristine version, no music" asks for.
-    # Nothing is separated or enhanced to make that true (docs/skills/references/audio-standard.md).
+    # SFX ONLY, NO MUSIC -- asked for twice (issue #95), and NOT YET TRUE.
+    # The trailer's own audio on this span IS the with-music mix: it measures
+    # corr 0.875 against the owner's "here it is with music" clip
+    # (~/Videos/wolves-directors-cut/cortney.mp4). The owner-named SFX source,
+    # yNBMDXdp69g (DESTINY 2: THE FINAL SHAPE All Cutscenes), was fetched and
+    # searched frame by frame across all 8280 s: the moment is NOT IN IT.
+    # It is first-person gameplay (the seventh-column super), which a
+    # cutscenes compilation does not carry -- best frame correlation anywhere
+    # in the movie is 0.30 against a 0.998 control on the trailer.
+    #
+    # TODO(owner): name a source that CONTAINS this gameplay moment with an
+    # SFX-only mix. When one exists: fetch it (never a -drc rung), verify it
+    # is music-free, and give this shot
+    #     audio_from={"video_id": ..., "start_sec": ...}
+    # with start_sec in THAT source's own clock -- tools/audiomix.py already
+    # implements the swap, and tests/test_wolves_timing_pass.py pins the
+    # shape. Until then the insert degrades to the trailer's (with-music)
+    # audio, and the gap lives here and in issue #95 -- recorded, never
+    # silently worked around.
     t.run(GAMEPLAY, PAUSE_IN, PAUSE_DUR,
           "III. SONG PAUSES -- the explosion, then the transcendence portrait, "
-          "held to the cut, in its own audio. Casting requested: Cortney "
-          "Nickerson. UNPLATED: no authored identity exists, so none is invented.",
+          "held to the cut. KNOWN GAP (issue #95): owner wants SFX-only audio; "
+          "the named source does not contain the moment, so this still plays "
+          "the trailer's mix. Casting requested: Cortney Nickerson. UNPLATED: "
+          "no authored identity exists, so none is invented.",
           audio="source")
     t.at_bed(PAUSE_AT, "the pause consumed no bed time")
 

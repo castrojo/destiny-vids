@@ -149,6 +149,75 @@ def test_filter_delays_each_bed_piece_to_its_wall_position(cut):
     assert "normalize=0" in graph
 
 
+def test_the_pause_records_the_sfx_gap(cut):
+    """Issue #95: the insert must play SFX only, no music -- and today cannot.
+
+    The trailer's own mix carries the score (corr 0.875 against the owner's
+    "here it is with music" clip), and the owner-named SFX source does not
+    contain the moment at all. Two states are legal for this shot:
+
+      * GAP (today): no ``audio_from``, and the beat text says so, citing #95
+        -- the failure mode being prevented is a silent return to claiming
+        the trailer's mix is "broadband, not tonal".
+      * FIXED: ``audio_from`` names a DIFFERENT video whose span -- in that
+        source's own clock, never the trailer's -- was verified music-free.
+    """
+    paused = [s for s in cut["shots"] if s["audio"] == "source"]
+    assert len(paused) == 1
+    shot = paused[0]
+    audio_from = shot.get("audio_from")
+    if audio_from is None:
+        assert "#95" in shot["beat"], (
+            "the gap must be recorded where the next person trips over it")
+    else:
+        assert audio_from["video_id"] != shot["video_id"], (
+            "audio_from pointing at the trailer is the with-music mix again")
+        assert audio_from["start_sec"] >= 0, (
+            "a timecode in the audio source's own clock")
+
+
+def test_audio_from_reaches_the_filtergraph_in_its_own_clock():
+    """The named source is trimmed in ITS clock and delayed to the wall.
+
+    The insert's span (wall 322.200 -> 330.859 here) is stand-in data; what
+    is pinned is the wiring: a separate input, an atrim in the source's
+    clock, the picture's own audio muted across exactly the same window.
+    """
+    from tools.audiomix import resolve_audio_inputs
+
+    shots = [
+        {"duration": 322.2, "audio": "bed"},
+        {"duration": 8.659, "audio": "source",
+         "audio_from": {"video_id": "some_other_source", "start_sec": 1234.5}},
+        {"duration": 101.793, "audio": "bed"},
+    ]
+    regions = plan_regions(shots, bed_offset=0.0)
+    src = [r for r in regions if r["kind"] == "source"]
+    assert len(src) == 1
+    region = src[0]
+    assert region["audio_from"] == {"video_id": "some_other_source",
+                                    "start_sec": 1234.5}
+
+    graph = build_filter(regions, source_gain_db=-1.5,
+                         audio_inputs={"some_other_source": 2})
+    assert "[2:a]atrim=start=1234.500000:end=1243.159000" in graph
+    assert "adelay=322200|322200" in graph
+    assert "volume=-1.5dB" in graph
+    # ...and the picture's own audio is muted across exactly the insert
+    assert "between(t,322.200000,330.859000)" in graph
+
+    with pytest.raises(ValueError, match="not in"):
+        resolve_audio_inputs(regions, media_dir="/nonexistent")
+
+
+def test_audio_from_on_a_bed_shot_is_an_error():
+    """Under the bed it would never be heard -- fail loudly, don't drop it."""
+    shots = [{"duration": 1.0, "audio": "bed",
+              "audio_from": {"video_id": "x", "start_sec": 0.0}}]
+    with pytest.raises(ValueError, match="never be heard"):
+        plan_regions(shots, bed_offset=0.0)
+
+
 def test_marker_cards_carry_no_nameplate_vocabulary(cut):
     """A marker is a slate. It must never grow a name, a role, or a class.
 

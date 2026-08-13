@@ -205,14 +205,41 @@ starting mid-air, out-point exactly on the measured cut. The reference is
 It is `audio: "source"`, so it **costs no bed time** — extending it from 3.65 s
 only makes the film longer, and no anchor moved.
 
-On *"recreate it with the sfx pristine version you have, no music"*: the source
-audio is the trailer's own, **unaltered**. Measured over the span it is
-broadband rather than tonal — spectral flatness **0.45** in the run-up and
-**0.47** across the explosion — i.e. gunfire and detonation, not a melodic bed.
-Nothing was separated, ducked or enhanced to make that true; the audio tenet in
+On *"recreate it with the sfx pristine version you have, no music"* — **the
+delivered insert does not do that, and an earlier paragraph here claimed it
+did.** That claim argued from a spectral-flatness measurement (0.45 run-up,
+0.47 across the explosion) that the trailer's own audio was "broadband, not
+tonal". It is deleted: a flatness average across a loud explosion can mask a
+bed, and a measurement is not a licence to ignore the source the owner handed
+over. Measured properly ([issue
+#95](https://github.com/castrojo/destiny-vids/issues/95)), the trailer's audio
+on this span **is** the with-music mix — correlation **0.875** against the
+owner's own *"here it is with music"* clip at matching loudness.
+
+**The fix is a source, not a process** — nothing is separated, ducked or
+enhanced; the audio tenet in
 [`docs/skills/references/audio-standard.md`](../skills/references/audio-standard.md)
-is to ship the best source unaltered, and source separation is exactly the kind
-of "enhancement" it rules out.
+rules that out, so the SFX-only audio must come from another upload of the
+same moment. The owner named *DESTINY 2: THE FINAL SHAPE All Cutscenes*
+([`yNBMDXdp69g`](https://www.youtube.com/watch?v=yNBMDXdp69g), 2:18:00). It
+was fetched (plain 251 Opus — never a `-drc` rung) and searched end to end:
+
+| Method | Result |
+|---|---|
+| Whole-movie visual scan, mean abs pixel diff, 9-frame windows | best **59.5** — noise; the control finds the beat in the gameplay trailer at **4.8** |
+| Whole-movie visual scan, normalised cross-correlation | best **0.30** — noise; the trailer control scores **0.998** |
+| Audio cross-correlation of the insert against the movie | no peak above **0.12** anywhere |
+
+**The moment is not in that video.** It is first-person *gameplay* — the
+seventh-column super cast — and a cutscenes compilation does not carry
+gameplay. So the insert still plays the trailer's (with-music) audio, and the
+gap is recorded here and in `scripts/build_wolves.py` next to the shot rather
+than worked around: **what is needed is a source that contains this gameplay
+moment with an SFX-only mix** — the picture span is gameplay trailer
+44.811 → 53.470 (gameplay-trailer clock), i.e. act film 5:22.2 – 5:30.9.
+`tools/audiomix.py` already implements the swap (`audio_from` on the shot, the
+span named in the *audio* source's clock); when the owner names a source that
+contains the moment, the fix is one line in the builder and a rebuild.
 
 ### The Ghost sequence, and why its hole had to be filled
 
@@ -574,6 +601,7 @@ DESTINY_FFMPEG=$FF python3 tools/audiomix.py stories/seven-days-timing-pass.json
     --video renders/07-wolves-picture.mp4 \
     --bed media/bed_seven_days_to_the_wolves.wav \
     --bed-gain-db -3.5 --source-gain-db -1.5 \
+    --media media \
     --out renders/07-wolves-timing-pass.mp4
 ```
 
@@ -590,7 +618,7 @@ Not asserted — measured, on the delivered file.
 | The song is where it should be | cross-correlation against the bed: lag **0.00 ms**, r = 0.9998–0.9999 at film 100/250/300 |
 | The song resumes where it stopped | lag **1.00 ms** (8 samples at 8 kHz), r = 0.9997–0.9999 at film 340/400 |
 | The pause is a genuine pause | correlation against the bed **−0.10** across the region |
-| The pause is not silent | region RMS **−18.5 dB**, peak −1.9 dB — the trailer's own SFX |
+| The pause is not silent | region RMS **−18.5 dB**, peak −1.9 dB — the trailer's own audio, **which carries the score**: the SFX-only source the owner named does not contain the moment ([issue #95](https://github.com/castrojo/destiny-vids/issues/95)) |
 | Headroom | **−1.6 dBTP**, −10.1 LUFS, LRA 4.0 |
 | Anchors hold | every `at_bed()` assertion in the builder, plus `tests/test_wolves_timing_pass.py` (28 tests) |
 | No slide, no placeholder | asserted on timecode and on beat text, not on the absence of a card |

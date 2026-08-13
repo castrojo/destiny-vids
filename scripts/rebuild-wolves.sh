@@ -41,6 +41,7 @@ echo "==> audio"
 DESTINY_FFMPEG="$FF" "$PY" tools/audiomix.py "$SHOTLIST" \
     --video "$PICTURE" --bed media/bed_seven_days_to_the_wolves.wav \
     --bed-gain-db "$BED_GAIN" --source-gain-db "$SOURCE_GAIN" \
+    --media media \
     --out "$OUT" | tail -2
 
 echo "==> checks"

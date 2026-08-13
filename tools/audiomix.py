@@ -40,6 +40,14 @@ def plan_regions(shots, bed_offset=0.0):
     ``bed_offset`` is the wall time at which the song is first heard; the
     shots before it must be marked ``audio: "source"`` and are what plays
     instead. Regions are merged, so a run of twenty bed shots is one region.
+
+    A source shot may carry ``audio_from`` -- ``{"video_id", "start_sec"}``,
+    the start in THAT source's own clock -- when what is heard is not the
+    picture's own audio (issue #95: the pause's picture is the gameplay
+    trailer, but its mix carries the score, so the SFX-only audio comes from
+    another upload of the same moment). Source regions merge only when their
+    ``audio_from`` agrees; a bed shot carrying one is an error, because it
+    would never be heard.
     """
     regions = []
     wall = 0.0
@@ -47,7 +55,13 @@ def plan_regions(shots, bed_offset=0.0):
     for shot in shots:
         dur = float(shot["duration"])
         kind = "source" if shot.get("audio") == "source" else "bed"
-        if regions and regions[-1]["kind"] == kind:
+        audio_from = shot.get("audio_from")
+        if audio_from is not None and kind != "source":
+            raise ValueError(
+                f"{shot.get('beat', '?')!r}: audio_from on a bed shot would "
+                "never be heard -- the bed plays there")
+        if (regions and regions[-1]["kind"] == kind
+                and regions[-1].get("audio_from") == audio_from):
             regions[-1]["wall_end"] += dur
             if kind == "bed":
                 regions[-1]["bed_end"] += dur
@@ -56,6 +70,8 @@ def plan_regions(shots, bed_offset=0.0):
             if kind == "bed":
                 r["bed_start"] = bed
                 r["bed_end"] = bed + dur
+            elif audio_from is not None:
+                r["audio_from"] = audio_from
             regions.append(r)
         wall += dur
         if kind == "bed":
@@ -79,11 +95,39 @@ def total_wall(regions):
     return regions[-1]["wall_end"] if regions else 0.0
 
 
-def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0):
+def resolve_audio_inputs(regions, media_dir=None):
+    """Map each ``audio_from`` video_id to its media file, as extra inputs.
+
+    Returns ``{video_id: path}`` in first-use order; input 0 is the picture
+    and input 1 the bed, so the filter numbers them from 2 in dict order.
+    """
+    from tools.render import resolve_media
+
+    paths = {}
+    for r in regions:
+        af = r.get("audio_from")
+        if not af:
+            continue
+        vid = af["video_id"]
+        if vid in paths:
+            continue
+        path = resolve_media(vid, media_dir) if media_dir else None
+        if path is None:
+            raise ValueError(
+                f"{vid!r}: audio_from names a source that is not in "
+                f"{media_dir} -- fetch it first (issue #95 records how)")
+        paths[vid] = path
+    return paths
+
+
+def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0,
+                 audio_inputs=None):
     """The filtergraph: bed pieces delayed into place, source muted under them.
 
     Input 0 is the rendered picture (carrying its own source audio); input 1 is
-    the bed.
+    the bed; ``audio_inputs`` maps a video_id to its input number (2 and up)
+    for source regions whose audio comes from a different file than the
+    picture.
 
     ``source_gain_db`` is the mirror of ``bed_gain_db`` and exists for the same
     reason. A diegetic insert brings its OWN peaks, and they are nobody's
@@ -93,6 +137,7 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0):
     changes no dynamics, and it is preferable to a limiter, to `loudnorm`, or
     to pulling the whole film down and quietly re-levelling the music.
     """
+    audio_inputs = audio_inputs or {}
     parts = []
     labels = []
     for i, r in enumerate(x for x in regions if x["kind"] == "bed"):
@@ -108,9 +153,28 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0):
         parts.append(chain)
         labels.append(lab)
 
+    # Source regions whose audio is another file's: the picture is muted there
+    # too, and the named source plays instead -- trimmed in ITS OWN clock
+    # (audio_from.start_sec) and delayed to the region's wall position.
+    for j, r in enumerate(x for x in regions
+                          if x["kind"] == "source" and x.get("audio_from")):
+        lab = f"s{j}"
+        start = float(r["audio_from"]["start_sec"])
+        dur = r["wall_end"] - r["wall_start"]
+        idx = audio_inputs[r["audio_from"]["video_id"]]
+        delay = int(round(r["wall_start"] * 1000))
+        chain = (f"[{idx}:a]atrim=start={start:.6f}:end={start + dur:.6f},"
+                 f"asetpts=PTS-STARTPTS")
+        if source_gain_db:
+            chain += f",volume={source_gain_db}dB"
+        chain += f",adelay={delay}|{delay}[{lab}]"
+        parts.append(chain)
+        labels.append(lab)
+
+    muted = [r for r in regions
+             if r["kind"] == "bed" or r.get("audio_from")]
     mute = "+".join(
-        f"between(t,{r['wall_start']:.6f},{r['wall_end']:.6f})"
-        for r in regions if r["kind"] == "bed")
+        f"between(t,{r['wall_start']:.6f},{r['wall_end']:.6f})" for r in muted)
     src = "[0:a]"
     if source_gain_db:
         src += f"volume={source_gain_db}dB,"
@@ -124,15 +188,21 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0):
 
 
 def mux(video, bed, regions, out, bed_gain_db=0.0, ffmpeg=None, bitrate="320k",
-        source_gain_db=0.0):
+        source_gain_db=0.0, media_dir=None):
     """Mux the composed audio onto ``video``, stream-copying the picture."""
     if ffmpeg is None:
         from tools.render import find_ffmpeg
 
         ffmpeg = find_ffmpeg()
-    cmd = list(ffmpeg) + [
-        "-v", "error", "-y", "-i", str(video), "-i", str(bed),
-        "-filter_complex", build_filter(regions, bed_gain_db, source_gain_db),
+    audio_paths = resolve_audio_inputs(regions, media_dir)
+    # Input 0 is the picture, 1 the bed, then the audio_from files in
+    # first-use order -- the same order build_filter numbers them.
+    audio_inputs = {vid: i + 2 for i, vid in enumerate(audio_paths)}
+    cmd = list(ffmpeg) + ["-v", "error", "-y", "-i", str(video), "-i", str(bed)]
+    cmd += [arg for path in audio_paths.values() for arg in ("-i", str(path))]
+    cmd += [
+        "-filter_complex",
+        build_filter(regions, bed_gain_db, source_gain_db, audio_inputs),
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy", "-c:a", "aac", "-b:a", bitrate, "-ar", "48000",
         str(out),
@@ -155,6 +225,9 @@ def main(argv=None):
     ap.add_argument("--source-gain-db", type=float, default=0.0,
                     help="static gain on the diegetic-insert regions, "
                          "so their own peaks cannot breach the headroom gate")
+    ap.add_argument("--media", default=None,
+                    help="media directory, needed when a source region "
+                         "carries audio_from (its video_id resolves there)")
     args = ap.parse_args(argv)
 
     doc = json.loads(Path(args.shotlist).read_text())
@@ -167,7 +240,7 @@ def main(argv=None):
         print(f"  {r['kind']:6s} wall {span}{extra}")
     print(f"  bed used {total_bed(regions):.3f}s over {total_wall(regions):.3f}s of film")
     mux(args.video, args.bed, regions, args.out, args.bed_gain_db,
-        source_gain_db=args.source_gain_db)
+        source_gain_db=args.source_gain_db, media_dir=args.media)
     print(f"wrote {args.out}")
     return 0
 
