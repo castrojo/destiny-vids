@@ -780,10 +780,22 @@ def watch(acts, masters, social, wolves, plan_path, interval, dry_run,
     few hashes.
 
     Ctrl-C is a clean exit, not a traceback: this is meant to be left running.
+
+    Output is flushed every round. A watcher is normally run with its output
+    redirected to a log, where Python's block buffering would otherwise hold
+    several KB back -- so the log reads as empty for hours and the loop looks
+    dead while it is working.
     """
     import time
 
-    log(f"watching {wolves} every {interval:g}s -- Ctrl-C to stop")
+    def emit(msg=""):
+        log(msg)
+        try:
+            sys.stdout.flush()
+        except (ValueError, OSError):
+            pass
+
+    emit(f"watching {wolves} every {interval:g}s -- Ctrl-C to stop")
     rounds = 0
     try:
         while True:
@@ -792,16 +804,16 @@ def watch(acts, masters, social, wolves, plan_path, interval, dry_run,
             failing = sum(1 for r in reports for f in r.findings
                           if f.state in FAILING)
             if failing:
-                log(f"[{rounds}] {failing} stale finding(s); rebuilding")
+                emit(f"[{rounds}] {failing} stale finding(s); rebuilding")
                 build(acts, masters, social, wolves, plan_path, reports,
-                      reports[-1], dry_run, log=log)
+                      reports[-1], dry_run, log=emit)
             else:
-                log(f"[{rounds}] fresh")
+                emit(f"[{rounds}] fresh")
             if once:
                 return 0
             time.sleep(interval)
     except KeyboardInterrupt:
-        log("\nstopped")
+        emit("\nstopped")
         return 0
 
 

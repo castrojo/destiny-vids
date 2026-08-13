@@ -403,3 +403,16 @@ def test_the_recorded_digest_matches_what_is_committed():
     assert not stale, (
         f"act(s) {', '.join(stale)}: committed inputs no longer match the "
         f"delivered master. Rebuild, then `python3 tools/deliver.py publish`.")
+
+
+def test_the_watcher_flushes_so_its_log_is_readable_while_it_runs(
+        ws, monkeypatch, capsys):
+    """A watcher is run with its output redirected. Python block-buffers there,
+    so an unflushed loop reads as an empty log for hours and looks dead."""
+    flushed = []
+    monkeypatch.setattr(sys.stdout, "flush", lambda: flushed.append(1))
+    acts = deliver.parse_running_order(ws / "running-order.md")
+    masters, social = deliver.load_delivery(ws / "delivery.json")
+    deliver.watch(acts, masters, social, ws / "wolves", ws / "plan.json",
+                  interval=0.01, dry_run=True, once=True)
+    assert flushed, "the watch loop never flushed stdout"
