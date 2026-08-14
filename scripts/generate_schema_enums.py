@@ -19,9 +19,14 @@ and corpus/*.json: fix a drift by re-running this, never by hand-editing either
 copy. Adding an enum value is then one edit -- the vocab -- instead of two that
 have to be remembered together.
 
-Only the mapped `enum` lists are rewritten. Everything else in the schema
-(descriptions, types, required, $defs structure) is hand-authored and is left
-exactly as it is, byte for byte.
+Only the mapped `enum` lists have their CONTENT rewritten. Everything else in
+the schema -- descriptions, types, required, $defs structure -- is hand-authored
+and is preserved semantically, not byte for byte: `write()` reserialises the
+whole document with `json.dumps(indent=2)`, so a hand-authored compact form like
+`{"type": "number"}` on one line will be expanded on the next run. The committed
+schemas are already in that canonical form, so a clean tree is a true no-op
+(tests/test_schema_enums.py asserts it) -- but write compact JSON here and it
+will not survive. `--check` compares only the enum lists, so it will not warn.
 
     python3 scripts/generate_schema_enums.py --check   # CI: exit 1 on drift
     python3 scripts/generate_schema_enums.py --write   # regenerate in place
