@@ -62,6 +62,29 @@ What changed:
 - **`blueberry_Giklab` is gone** — the SHOT came out, so the roster is not
   reshuffled behind him and nobody else moved into the slot.
 
+### The Arc Hunter before Kyle is kolunmi
+
+Owner, 2026-08-14: *"the arc hunter before kylegospo is
+https://github.com/kolunmi/ - add a nameplate."*
+
+The shot bounds are **measured**, not eyeballed: a scene-change pass over
+source 320–342 puts cuts at **333.400** and **335.267**, and 335.267 is
+exactly where Kyle's shot already began — the two lists agreeing
+independently. 1.867 s of picture, the Guardian loosing a bright Arc bow. His
+plate lands at film **265.300** and clears Kyle's card at 269.700, which is
+the act's sync anchor and did not move.
+
+**The class row is the owner's own word.** He named the subclass when he named
+the shot — *the arc hunter* — and the frame agrees, so `Arc Hunter` is
+authored copy rather than a subclass read off a colour.
+
+**Everything else is deliberately absent.** The account carries no display
+name and no bio, so the name row is the login as its owner writes it,
+unbracketed — brackets are this repo's placeholder marker, and p5 and
+EyeCantCU wear them because the *owner* chose that treatment for them. No
+label and no title ship, and both are recorded as `TODO(owner)` in
+`vocab/casting.yaml`.
+
 ### Natewaddington is out of the climax
 
 Owner: *"get rid of the nate wassington in the endless climax in endless."*
@@ -330,6 +353,7 @@ tool, never by hand.
 | 2:37.067 | **GloriousEggroll** | He takes the frame, walking — Nobara chrome |
 | 2:53.717 | **A1RM4X** | Up before the line that talks to him |
 | 3:34.734 | **KERNEL REGRESSION** | The villain, on the winged figure — not a person |
+| 4:25.300 | **kolunmi** | The Arc Hunter loosing a bow — one cut before Kyle |
 | 4:29.700 | **Kyle Gospodnetich** | The Sentinel raising the Void shield — **on the downbeat** |
 | 4:34.333 | **`[ p5 ]`** | The hooded Hunter, blade raised, magenta arc blooming |
 | 4:43.666 | **`[ EyeCantCU ]`** | The Warlock, arms spread, going off in solar fire |

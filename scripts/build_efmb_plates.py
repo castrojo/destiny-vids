@@ -251,6 +251,19 @@ CHOICE_LEAD = 0.2          # air between riaan's pill and the menu
 # SCHEDULING is gone, so nothing about his identity was lost with it.
 SOLO = [
     {
+        # THE ARC HUNTER BEFORE KYLE. Owner, 2026-08-14: "the arc hunter
+        # before kylegospo is https://github.com/kolunmi/ - add a nameplate."
+        #
+        # The shot bounds are MEASURED, not eyeballed: a scene-change pass
+        # over source 320-342 puts cuts at 333.400 and 335.267, and 335.267 is
+        # exactly where Kyle's shot already started -- the two lists agreeing
+        # independently. 1.867 s of picture, the Guardian loosing an Arc bow.
+        "key": "kolunmi",
+        "src": (333.400, 335.267),
+        "seen": 334.300,
+        "why": "the Arc Hunter loosing a bow, one cut before Kyle's Sentinel",
+    },
+    {
         "key": "KyleGospo",
         "src": (335.267, 339.767),
         "seen": 338.200,
