@@ -31,6 +31,7 @@ the delivery session's job, deliberately NOT done here (run-final-hq.sh's
 from __future__ import annotations
 
 import argparse
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -309,7 +310,8 @@ def main(argv=None):
     # band, video stream-copied. Runs on the 110.2 s master BEFORE the cover
     # is cut, so the delivered film's picture is copied from the gated master.
     subprocess.run([sys.executable, str(REPO_ROOT / "tools" / "peaks.py"),
-                    "trim", str(master), "--ffmpeg", ff[0]], check=True)
+                    "trim", str(master), "--ffmpeg", shlex.join(ff)],
+                   check=True)
     print(f"build_europa: nocover -> {delivered}")
     subprocess.run(derive, check=True)
     return 0

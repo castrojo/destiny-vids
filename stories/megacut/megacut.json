@@ -1,204 +1,213 @@
 {
-  "_what": "Seven Days to the Wolves — the whole programme, assembled from its acts. THE RUNNING ORDER IS CANONICAL and settled by the owner on 2026-08-12: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). docs/running-order.md is the source of truth for it; this file executes it.",
-  "_acts": {
-    "0": "PROLOGUE -- the main title sequence, and THE ONE ENTRY WITH NO NUMERAL. The eight act numerals are load-bearing (AGENTS.md: 'III is mrbobbytables permanently'), so a cold open in front of act I is numbered outside them rather than by renumbering everything behind it. Like act VIII it carries NO SLIDE AND NO CHAPTER MARKER: chapters() derives markers from slides, and a card announcing the main title sequence would step on the main title sequence. Picture is Nightwish's official 'Perfume Of The Timeless' music video -- see the rights note in music/bed_perfume_of_the_timeless.json, and stories/megacut/delivery.json for why it has no social copy.",
-    "I": "intro — the Into the Light opener, six Guardians plated, with the title cover (wolves.jpg) covering source 24.5 - 38.",
-    "II": "endlessformsmostbeautiful — delivered and credited, in the programme. Five unbroken runs of the live-action trailers scored to Nightwish's Endless Forms Most Beautiful (instrumental); The Long Walk inside them. See docs/cuts/02-endless-forms-most-beautiful.md. Its picture is a fan compilation (same provenance question as act VI, #55).",
-    "III": "mrbobbytables — the August 2026 contributors piece, cut from the Curse of Osiris opening cinematic. Owner-named and owner-placed. He calls it PARTIALLY COMPLETE, so it is placed as-is and will be replaced by its finished version.",
-    "IV": "kat — Kat Cosgrove's Guardian intro, behind the owner-authored BIAS FOR ACTION slide.",
-    "V": "nat — Natali Vlatko's Guardian arrival, behind the same authorisation slide retitled WRONG PLACE, WRONG TIME, RIGHT ATTITUDE.",
-    "VI": "7daystothewolves — the musical. Editorial pass, delivered for review, not approved: provenance is unresolved (issue #55). Its tail plates the Cayde-6 reveal and three gold credits.",
-    "VII": "europa — the Europa director's cut.",
-    "VIII": "credits — the cast, 454 contributors across four projects, the comic-cover reveal at :22 and the Project Bluefin wordmark. The act that makes this the feature rather than seven eighths of it (#51)."
+ "_what": "Seven Days to the Wolves — the whole programme, assembled from its acts. THE RUNNING ORDER IS CANONICAL and settled by the owner on 2026-08-12: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). docs/running-order.md is the source of truth for it; this file executes it.",
+ "_acts": {
+  "0": "PROLOGUE -- the main title sequence, and THE ONE ENTRY WITH NO NUMERAL. The eight act numerals are load-bearing (AGENTS.md: 'III is mrbobbytables permanently'), so a cold open in front of act I is numbered outside them rather than by renumbering everything behind it. Like act VIII it carries NO SLIDE AND NO CHAPTER MARKER: chapters() derives markers from slides, and a card announcing the main title sequence would step on the main title sequence. Picture is Nightwish's official 'Perfume Of The Timeless' music video -- see the rights note in music/bed_perfume_of_the_timeless.json, and stories/megacut/delivery.json for why it has no social copy.",
+  "I": "intro — the Into the Light opener, six Guardians plated, with the title cover (wolves.jpg) covering source 24.5 - 38.",
+  "II": "endlessformsmostbeautiful — delivered and credited, in the programme. Five unbroken runs of the live-action trailers scored to Nightwish's Endless Forms Most Beautiful (instrumental); The Long Walk inside them. See docs/cuts/02-endless-forms-most-beautiful.md. Its picture is a fan compilation (same provenance question as act VI, #55).",
+  "III": "mrbobbytables — the August 2026 contributors piece, cut from the Curse of Osiris opening cinematic. Owner-named and owner-placed. He calls it PARTIALLY COMPLETE, so it is placed as-is and will be replaced by its finished version.",
+  "IV": "kat — Kat Cosgrove's Guardian intro, behind the owner-authored BIAS FOR ACTION slide.",
+  "V": "nat — Natali Vlatko's Guardian arrival, behind the same authorisation slide retitled WRONG PLACE, WRONG TIME, RIGHT ATTITUDE.",
+  "VI": "7daystothewolves — the musical. Editorial pass, delivered for review, not approved: provenance is unresolved (issue #55). Its tail plates the Cayde-6 reveal and three gold credits.",
+  "VII": "europa — the Europa director's cut.",
+  "VIII": "credits — the cast, 454 contributors across four projects, the comic-cover reveal at :22 and the Project Bluefin wordmark. The act that makes this the feature rather than seven eighths of it (#51)."
+ },
+ "_audio": "Every act carries its own audio, unprocessed: no normaliser, no limiter, no EQ. The programme is 48 kHz STEREO because that is what the masters are -- every -hq master in Prod is stereo FLAC. The older, now-retired UPLOAD copies were AAC 5.1, but that 5.1 was the same two channels plus a derived LFE (FC/BL/BR digital silence), added by each cut's own run script. Upmixing here to recreate it would be assembly inventing a soundfield, which the audio tenet forbids; if 5.1 delivery is wanted, it belongs in the per-cut scripts that already do it. Only the six act slides are silent; a bed under them is a licensing decision.",
+ "_transitions": "Issue #105, measured on v0.6 with tools/transitions.py (all times programme clock): every act entered DRY out of the slides' digital silence (4-14 s of -inf per join), the worst being act VII at -15.3 dB one second after the slide, and acts I and III ended HOT against the silence (-24.4 and -14.8 dB in their last second). The treatment below is explicit afade shapes, stated here so they are reproducible: fade_in 2.0 s on every act that starts behind a slide, fade_out 2.0 s on the acts whose tails do not already fade (I, III, V) and 3.0 s on act VII so the programme lands rather than stops. Acts II and VI fade themselves out (measured -96.7 / -90.3 dB in their last seconds) and carry no fade_out; the IV->V join is direct and continuous (-15.2 -> -11.9 dB) and carries no fade on either side. All fade times are ACT FILM time -- the clip's own clock -- so a re-order never moves them. LEFT TO THE OWNER (automatable: no): (1) whether the slides carry a bed or room tone -- a licensing decision, per the megacut skill; (2) levelling the act ENTRIES, which still differ by ~20 dB (act III at -29.5 vs act VII at -15.3) -- static gain per act is a mix decision; (3) how long the slides' silence should be. THE 15 s IV-V SLIDE IS GONE (v2.2): with the Perfume thread running through the show, a 15 s frozen card in silence after movement 3's static skull shot was about twenty seconds in which nothing moved. It holds 5.0 s now, like every other slide, and movement 3's fade_out is 1.0 s rather than 2.0 so the music carries closer to the card. PROLOGUE JOIN, measured 2026-08-14 on the built act rather than assumed: the prologue's own tail runs -28.3 -> -34.8 -> -58.7 dB RMS across its last three seconds (the song fading under the bridge from 93.000), and act I opens at digital silence (-127 dB) climbing through -30 to -18 dB. So the join needs NO fade on either side and carries none: the prologue fades itself out, exactly as acts II and VI do, and act I's own quiet opening picks it up. A fade_out here would double the taper on a fade the act already performs. ONE EDITORIAL FINDING, LEFT TO THE OWNER (automatable: no): the bridge exists because the owner asked for the wallpaper to 'replace the black part', and act I's 5 s silent slide immediately after it puts a black part back. It reads as a continuous darkening today -- night fades to black and the slide rises out of the same darkness, which is how a title sequence normally hands to act one -- but if the intent was for the wallpaper to hand STRAIGHT into a film, the fix is to drop or restyle act I's slide, and a slide is the one thing this show gives every act. Not changed unilaterally.",
+ "_sources": {
+  "_where": "Every act plays from ~/Videos/Wolves/Prod, which holds the HIGHEST-QUALITY master of each: FLAC audio and the un-re-encoded picture. They are hardlinks to the per-project masters, so Prod costs no extra disk and cannot drift from what its project built. The retired ~/Videos/UPLOAD staging folder held lossy copies of the same cuts and is NOT what this reads; its removal is issue #81. Act VII's master was re-rendered 2026-08-13 under the new master gate (tools/peaks.py trim, #130) and now measures -1.1 dBTP, inside the -0.9..-1.1 band -- the +0.3 dBTP clip of #82 is fixed in the delivered file; the issue stays open for its owner to close.",
+  "hero": "~/Videos/Wolves/Prod/01-intro.mp4 (hardlink to renders/megacut-01-hero.mp4) — YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), Bungie's score, six Guardian plates and the comic title card burned. usage_class: third_party_copyrighted. BUILT 2026-08-12: raw trim (x264 crf 14) + tools/plate.py burn (crf 18), audio decoded from the plain 251 Opus rung to FLAC -- NOT 251-drc, which is dynamic-range compressed and forbidden by the audio standard. Delivered as act I.",
+  "mrbobbytables": "Wolves/Prod/03-mrbobbytables.mp4 -> destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4. PARTIALLY COMPLETE by the owner's description; placed as-is, because assembly never re-cuts what it is handed.",
+  "kat": "Wolves/Prod/04-kat.mp4 -> ~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4. Carries the owner's dialogue change (the Kat/Ian telnet split and 'Remember kids, cardio!'), rebuilt 2026-08-12 16:52; the Prod hardlink survived the rebuild because the script writes its master in place.",
+  "natali": "Wolves/Prod/05-nat.mp4 -> ~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4.",
+  "wolves": "Wolves/Prod/06-7daystothewolves.mp4 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4, PROMOTED 2026-08-13 (the clean pre-plate v2 is wolves-7days-master-v2.mp4; the v1 pair is kept beside them). v2 is the #104 interruption build: the song pauses at bed 322.200, the Ambassadors interrupt, and the film runs 443.5 s, +10.811 s over v1, so every stamp after act VI moves. Bed unchanged at 423.993 s; the hold-music slot is deliberately SILENT pending the owner's licensing call (#104). THE ONE ACT WITH NO LOSSLESS MASTER: it is AAC (stereo, 48 kHz, ~323 kb/s), so Prod holds the best that exists rather than the best possible. Issue #58.",
+  "europa": "Wolves/Prod/07-europa.mp4 -> ~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4.",
+  "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md.",
+  "prologue": "Wolves/Prod/00-prologue.mp4 -> destiny-vids/renders/00-prologue.mp4, built by scripts/build_prologue.py from stories/00-prologue-plates.json and cards/maintitle.html. Born conformant (1920x1080, 60000/1001, bt709 on all three fields, FLAC 48 kHz stereo) so the join stream-copies its picture. Audio decoded from the plain 251 Opus rung, NOT 251-drc, per the audio standard -- the same lossy-source posture act I records."
+ },
+ "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.3.mp4",
+ "width": 1920,
+ "height": 1080,
+ "fps": "60000/1001",
+ "sample_rate": 48000,
+ "layout": "stereo",
+ "crf": 16,
+ "preset": "slow",
+ "audio_bitrate": "640k",
+ "items": [
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/00-prologue.mp4",
+   "audio": "source",
+   "label": "Prologue — main title: 'Perfume Of The Timeless' 0 - 91.2, the title at 0:11, then the March day->night bridge",
+   "dur": 99.2,
+   "_dur_note": "91.200 of picture + an 8.000 bridge. The out point is the source's own luma MINIMUM (YAVG 30.0 at 91.2, against 46.9 at 88.8 and climbing again by 91.4), which is one frame off the owner's stated 1:31. NO fade_in: it opens on its own darkness, which is the first frame of the show. NO fade_out either -- like acts II and VI it fades ITSELF out, across the bridge, and a second fade on top would double the taper."
   },
-  "_audio": "Every act carries its own audio, unprocessed: no normaliser, no limiter, no EQ. The programme is 48 kHz STEREO because that is what the masters are -- every -hq master in Prod is stereo FLAC. The older, now-retired UPLOAD copies were AAC 5.1, but that 5.1 was the same two channels plus a derived LFE (FC/BL/BR digital silence), added by each cut's own run script. Upmixing here to recreate it would be assembly inventing a soundfield, which the audio tenet forbids; if 5.1 delivery is wanted, it belongs in the per-cut scripts that already do it. Only the six act slides are silent; a bed under them is a licensing decision.",
-  "_transitions": "Issue #105, measured on v0.6 with tools/transitions.py (all times programme clock): every act entered DRY out of the slides' digital silence (4-14 s of -inf per join), the worst being act VII at -15.3 dB one second after the slide, and acts I and III ended HOT against the silence (-24.4 and -14.8 dB in their last second). The treatment below is explicit afade shapes, stated here so they are reproducible: fade_in 2.0 s on every act that starts behind a slide, fade_out 2.0 s on the acts whose tails do not already fade (I, III, V) and 3.0 s on act VII so the programme lands rather than stops. Acts II and VI fade themselves out (measured -96.7 / -90.3 dB in their last seconds) and carry no fade_out; the IV->V join is direct and continuous (-15.2 -> -11.9 dB) and carries no fade on either side. All fade times are ACT FILM time -- the clip's own clock -- so a re-order never moves them. LEFT TO THE OWNER (automatable: no): (1) whether the slides carry a bed or room tone -- a licensing decision, per the megacut skill; (2) levelling the act ENTRIES, which still differ by ~20 dB (act III at -29.5 vs act VII at -15.3) -- static gain per act is a mix decision; (3) how long the slides' silence should be. THE 15 s IV-V SLIDE IS GONE (v2.2): with the Perfume thread running through the show, a 15 s frozen card in silence after movement 3's static skull shot was about twenty seconds in which nothing moved. It holds 5.0 s now, like every other slide, and movement 3's fade_out is 1.0 s rather than 2.0 so the music carries closer to the card. PROLOGUE JOIN, measured 2026-08-14 on the built act rather than assumed: the prologue's own tail runs -28.3 -> -34.8 -> -58.7 dB RMS across its last three seconds (the song fading under the bridge from 93.000), and act I opens at digital silence (-127 dB) climbing through -30 to -18 dB. So the join needs NO fade on either side and carries none: the prologue fades itself out, exactly as acts II and VI do, and act I's own quiet opening picks it up. A fade_out here would double the taper on a fade the act already performs. ONE EDITORIAL FINDING, LEFT TO THE OWNER (automatable: no): the bridge exists because the owner asked for the wallpaper to 'replace the black part', and act I's 5 s silent slide immediately after it puts a black part back. It reads as a continuous darkening today -- night fades to black and the slide rises out of the same darkness, which is how a title sequence normally hands to act one -- but if the intent was for the wallpaper to hand STRAIGHT into a film, the fix is to drop or restyle act I's slide, and a slide is the one thing this show gives every act. Not changed unilaterally.",
-  "_sources": {
-    "_where": "Every act plays from ~/Videos/Wolves/Prod, which holds the HIGHEST-QUALITY master of each: FLAC audio and the un-re-encoded picture. They are hardlinks to the per-project masters, so Prod costs no extra disk and cannot drift from what its project built. The retired ~/Videos/UPLOAD staging folder held lossy copies of the same cuts and is NOT what this reads; its removal is issue #81. Act VII's master was re-rendered 2026-08-13 under the new master gate (tools/peaks.py trim, #130) and now measures -1.1 dBTP, inside the -0.9..-1.1 band -- the +0.3 dBTP clip of #82 is fixed in the delivered file; the issue stays open for its owner to close.",
-    "hero": "~/Videos/Wolves/Prod/01-intro.mp4 (hardlink to renders/megacut-01-hero.mp4) — YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), Bungie's score, six Guardian plates and the comic title card burned. usage_class: third_party_copyrighted. BUILT 2026-08-12: raw trim (x264 crf 14) + tools/plate.py burn (crf 18), audio decoded from the plain 251 Opus rung to FLAC -- NOT 251-drc, which is dynamic-range compressed and forbidden by the audio standard. Delivered as act I.",
-    "mrbobbytables": "Wolves/Prod/03-mrbobbytables.mp4 -> destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4. PARTIALLY COMPLETE by the owner's description; placed as-is, because assembly never re-cuts what it is handed.",
-    "kat": "Wolves/Prod/04-kat.mp4 -> ~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4. Carries the owner's dialogue change (the Kat/Ian telnet split and 'Remember kids, cardio!'), rebuilt 2026-08-12 16:52; the Prod hardlink survived the rebuild because the script writes its master in place.",
-    "natali": "Wolves/Prod/05-nat.mp4 -> ~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4.",
-    "wolves": "Wolves/Prod/06-7daystothewolves.mp4 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4, PROMOTED 2026-08-13 (the clean pre-plate v2 is wolves-7days-master-v2.mp4; the v1 pair is kept beside them). v2 is the #104 interruption build: the song pauses at bed 322.200, the Ambassadors interrupt, and the film runs 443.5 s, +10.811 s over v1, so every stamp after act VI moves. Bed unchanged at 423.993 s; the hold-music slot is deliberately SILENT pending the owner's licensing call (#104). THE ONE ACT WITH NO LOSSLESS MASTER: it is AAC (stereo, 48 kHz, ~323 kb/s), so Prod holds the best that exists rather than the best possible. Issue #58.",
-    "europa": "Wolves/Prod/07-europa.mp4 -> ~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4.",
-    "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md.",
-    "prologue": "Wolves/Prod/00-prologue.mp4 -> destiny-vids/renders/00-prologue.mp4, built by scripts/build_prologue.py from stories/00-prologue-plates.json and cards/maintitle.html. Born conformant (1920x1080, 60000/1001, bt709 on all three fields, FLAC 48 kHz stereo) so the join stream-copies its picture. Audio decoded from the plain 251 Opus rung, NOT 251-drc, per the audio standard -- the same lossy-source posture act I records."
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act1.png",
+   "dur": 5.0,
+   "label": "I — PROJECT BLUEFIN / seven days to the wolves",
+   "chapter": "I. Project Bluefin"
   },
-  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.3.mp4",
-  "width": 1920,
-  "height": 1080,
-  "fps": "60000/1001",
-  "sample_rate": 48000,
-  "layout": "stereo",
-  "crf": 16,
-  "preset": "slow",
-  "audio_bitrate": "640k",
-  "items": [
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/00-prologue.mp4",
-      "audio": "source",
-      "label": "Prologue — main title: 'Perfume Of The Timeless' 0 - 91.2, the title at 0:11, then the March day->night bridge",
-      "dur": 99.2,
-      "_dur_note": "91.200 of picture + an 8.000 bridge. The out point is the source's own luma MINIMUM (YAVG 30.0 at 91.2, against 46.9 at 88.8 and climbing again by 91.4), which is one frame off the owner's stated 1:31. NO fade_in: it opens on its own darkness, which is the first frame of the show. NO fade_out either -- like acts II and VI it fades ITSELF out, across the bridge, and a second fade on top would double the taper."
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act1.png",
-      "dur": 5.0,
-      "label": "I — PROJECT BLUEFIN / seven days to the wolves",
-      "chapter": "I. Project Bluefin"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/01-intro.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "fade_out": 2.0,
-      "gain_db": 3.5,
-      "_gain": "Owner-approved 2026-08-14 (#164): act I measured -19.4 LUFS integrated where the other six acts cluster -9.7..-11.3, so the show opened ~9 dB quiet and jumped at the I->II join. Its true peak is -4.6 dBTP (re-measured on the delivered master before choosing this number), so +3.5 dB is the MOST a plain gain can add while staying inside the house -0.9..-1.1 dBTP band -- the audio tenet forbids a limiter, so the remaining ~5.6 LU needs a re-master of the act and is recorded on #164. The number is peak-constrained arithmetic, not taste.",
-      "label": "Act I — Into the Light: six Guardians plated, the comic card, Bungie's score",
-      "dur": 111.567,
-      "_dur_note": "The frame-verified trim, 2.0 -> 113.55 of BKm0TPqeOjY. Recorded here so the running order and its chapter markers can be read before the segment is built."
-    },
-    {
-      "kind": "clip",
-      "path": "renders/perfume-2.mp4",
-      "audio": "source",
-      "fade_in": 6.2,
-      "fade_out": 2.0,
-      "label": "Perfume, movement 2 — source 93.000 -> 159.400, after the Destiny intro",
-      "_thread": "THE PERFUME THREAD, movement 2 of 5. No numeral, no slide, no chapter marker -- see stories/00-perfume-thread.json. The 6.2 s fade_in is not a default: it is the exact length of the fade the PROLOGUE went out on (afade st=93.0 d=6.2), replayed upside down, so the song dips across act I and swells back rather than restarting. It also resumes mid-shot -- there is no cut in the source between 91.200 and 108.960 -- so the picture continues the very frame the prologue left."
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act2.png",
-      "dur": 5.0,
-      "label": "II — Endless Forms Most Beautiful / Nightwish",
-      "chapter": "II. Endless Forms Most Beautiful"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/02-endlessformsmostbeautiful.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "label": "Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end",
-      "sub_chapters": "stories/02-endless-forms-plates.json",
-      "_sub_chapters_note": "A POINTER at act II's own manifest, which is the source of the marks -- the plan opts in, it does not hold the timecodes, so an act's edit and the programme's edit never collide (issue #92). Consumed only with --sub-chapters; the default chapter list is unchanged. TODO(owner): YouTube chapter list vs ffmpeg-only metadata track."
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act3.png",
-      "dur": 5.0,
-      "label": "III — Bob Killen / Voidwalker Warlock",
-      "chapter": "III. Bob Killen"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/03-mrbobbytables.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "fade_out": 0.0,
-      "label": "Act III — mrbobbytables: August 2026 contributors (partially complete)",
-      "_hard_out": "NO fade_out, owner 2026-08-14: '12:43 can be a perfect transition with the music make this one awesome'. Act III ends on the Vex gate BLOOMING TO WHITE, and movement 3 opens above the clouds and falls at exactly 12:43. A 2.0 s fade out into a 2.0 s fade in put a four-second hole in the sound under the one frame doing the most work. A white flash is the classic cover for a hard music edit: the picture blinds you and the next song is simply there."
-    },
-    {
-      "kind": "clip",
-      "path": "renders/perfume-3.mp4",
-      "audio": "source",
-      "fade_in": 0.0,
-      "fade_out": 1.0,
-      "label": "Perfume, movement 3 — source 159.400 -> 328.080, after mrbobbytables",
-      "_thread": "Movement 3 of 5, and the longest at 2:48.7 -- longer than acts IV, V and VII. That is what the owner's spans specify and it plays as a full movement of the song, but it is the one placement where an interlude outweighs the acts around it. Flagged in stories/00-perfume-thread.json for the owner, built as instructed."
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act4-5.png",
-      "dur": 5.0,
-      "label": "IV–V — Bias for Action / The Kat and the Nat",
-      "_shortened": "15.0 -> 5.0 on the owner's 2026-08-14 note: '15:31 entire transition is too weird and long, make it all fit.' The 15 s was deliberate pacing when two acts were given one slide, and it stopped reading that way once the Perfume thread ran through the show. What was actually there: movement 3 ends on a DARK, STATIC shot of animal skulls in a hall, the song fades out over 2.0 s, and then a frozen text card holds for 15 s IN SILENCE before Kat's ships arrive -- roughly twenty seconds in which neither the picture nor the sound moves. Five seconds is what every other slide in the programme holds, so this is the exception being retired rather than a new number being invented.",
-      "chapter": "IV–V. Bias for Action"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/04-kat.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "label": "Act IV — Kat Cosgrove: Guardian intro"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/05-nat.mp4",
-      "audio": "source",
-      "fade_out": 2.0,
-      "label": "Act V — Natali Vlatko: Guardian arrival"
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act6.png",
-      "dur": 5.0,
-      "label": "VI — 7 Days to the Wolves / Nightwish",
-      "chapter": "VI. 7 Days to the Wolves"
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/06-7daystothewolves.mp4",
-      "audio": "source",
-      "fade_in": 2.0,
-      "trim_to": 431.267,
-      "label": "Act VI — Seven Days to the Wolves: the musical, CUT AT THE COMIC (431.267) so the song hands straight to the next one",
-      "_trim": "Owner 2026-08-14: 'when the song ends we want to go right into the next song, cut out the comic and fade so it goes right from wolves to this song.' Both things they asked to remove start on the SAME measured frame: 431.267 is act VI's last shot change, the comic cover ('SEVEN DAYS TO THE WOLVES / THE FIGHT FOR FREEDOM BEGINS!') comes up on it and holds 12.2 s to the end, and the song's fade-out begins on it too -- full level right up to 431.267 (-12.6 dB), then -13.9, -16.2, -26.3, -46.4 and silence by 441. So one cut removes the comic AND the fade, and the act now ends on the song's last full bar. The owner said 23:55; the measured frame is 23:59.5, and it is the frame their description names.",
-      "_keeps_every_credit": "The tail plates end at act-film 409.669 (Cayde-6 reveal 393.511, the narration, then Kelsey Hightower, Brian Ketelsen and Angie Jones). The cut is 21.6 s after the last of them, so NOTHING that credits a real person is lost -- checked before cutting, because a dropped credit is not recoverable by a revert.",
-      "_cover_now_happens_once": "The comic cover was already act VIII's reveal (#178 took it off the end of act VII for exactly this reason). Removing it here means the programme plays it once, where it lands.",
-      "_plates": "Act VI carries stories/06-wolves-cayde-plates.json burned in (tools/plate.py burn --fit-picture). Prod holds ONE file per act, hardlinked to its project master, so Prod/06 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4. The UN-PLATED v2 master is kept beside it as wolves-7days-master-v2.mp4, because burning is not idempotent: a re-burn starts from the clean file and never stacks a second card on the first. v2 re-burned the tail plates at +10.811 s film time (the manifest's _shifted records it) and the act runs 443.5 s, so slide VII and act VII move +10.811 s of programme time. THE ACT'S OWN FILE IS NOT RE-RENDERED by the trim above -- the programme ends it early, so act VI in Prod/ is untouched."
-    },
-    {
-      "kind": "clip",
-      "path": "renders/perfume-4.mp4",
-      "audio": "source",
-      "fade_in": 0.0,
-      "fade_out": 0.0,
-      "label": "Perfume, movement 4 — source 328.080 -> 389.800, wolves straight in, straight out to Europa",
-      "_hard_both_ends": "NO fades, both owner calls. In: 'go right into the next song' -- act VI now ends on a full-level bar, so Perfume starts on the next frame at full level and the two songs meet like a needle drop. Out: '25:13 don't fade this it's awesome make it a quick cut to europa get rid of the title slide.'",
-      "_thread": "Movement 4 of 5."
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/07-europa.mp4",
-      "audio": "source",
-      "fade_in": 0.0,
-      "fade_out": 0.0,
-      "trim_to": 96.73,
-      "label": "Act VII — Europa Director's Cut (no slide: a quick cut off movement 4; ends on the eclipse, hard)",
-      "_no_slide": "Owner 2026-08-14: 'get rid of the title slide.' Act VII is now the SECOND act with no slide, after act VIII -- and like act VIII that also costs it its CHAPTER MARKER, because chapters() derives markers from slides. That is a real consequence of the instruction, recorded rather than worked around: the published list is six entries now, not seven. fade_in is 0.0 so nothing eases in front of the cut.",
-      "_eclipse_cut": "Owner 2026-08-14 (alpha QA): 'the eclipse/planets shot at the end of europa - that is janky it could be the best transition in the show if done right' -- more dramatic to 'cut right into the next song'. MEASURED: the tail holds flat at mean luma 36-37 through 96.73, then the film's own baked fade falls 96.8 -> 97.13 (30 -> 18) to black at 97.266. The act's own score is already low here (-39 dB mean over its last 0.8 s), so the v2.2 treatment -- a 1.5 s plan fade INTO that baked fade, then a dark held limb -- was a fade into a fade into dark: the jank the owner named. v2.3 trims at 96.73, the last full-brightness eclipse frame region, with NO audio fade: the residual score is quiet enough that the cut cannot pop, and movement 5 enters at full level on the next frame (max 0 dB in its first 3 s). Music meets music, so the join is hard, per docs/skills/megacut/references/joins.md.",
-      "_tail_read_before_trimming": "Act VII has no committed plate manifest yet (#152; being authored tonight). Checked VISUALLY instead, frame by frame: the Cayde/Laura credit plates sit around 88 s and are untouched; the burned 'Coming to KubeCon + Cloud Native Con NA' card is on screen from ~91 s and remains readable for ~5.7 s up to the cut. Nothing after 96.73 is anything but the baked fade to black -- no credit, no copy, nothing lost.",
-      "_alternative_b": "The match cut: also start movement 5 at the meteor-strike shot (source 393.560, a measured shot change) so the eclipse cuts straight into the strike, and extend movement 4 to 393.560 to keep the song gapless -- which nudges the 25:13 cut the owner has called awesome. Both joins were rendered as excerpts for the owner (renders/review/europa-join-A-needledrop.mp4 / europa-join-B-matchcut.mp4, cut at 16.7 s in each); v2.3 ships A as the safe default until the owner picks. #192."
-    },
-    {
-      "kind": "clip",
-      "path": "renders/perfume-5.mp4",
-      "audio": "source",
-      "fade_in": 0.0,
-      "fade_out": 1.5,
-      "trim_to": 109.5,
-      "_trim": "Owner 2026-08-14 (alpha QA): '28:20 has extra fade out that can be cut, including the music video director text, transition when the camera is in the ship make the song fade out but not too much then punch them with the credits at the end.' MEASURED: 28:20 programme time is movement 5's own tail. The in-ship shot (camera inside the sunken wreck, light through the hull) dissolves out from ~109.5; the source's burned credits ('(c) A LOVELY BUNCH OF COCONUTS 2024 / DIRECTED BY VILLE LIPIAINEN') fade in from 111.0 and are readable by 111.5, then near-black, then a held interior to EOF at 117.221 -- there is no shot boundary >=0.15 after film 100, it is one long dissolve, so the point is chosen on the frames: 109.5 is the last moment the camera still reads as IN the ship, with zero text risk. trim_to 109.5 cuts all of it; the 1.5 s fade_out lands against the AUTHORED end (st 108.0), which is 'fade out but not too much' from a -20 dB mean bed; act VIII's fade_in stays 0.0 so the drum smash punches on the next frame. Cuts 7.7 s of programme.",
-      "_no_fade_in": "Owner 2026-08-14: '27:03 transition needs a dramatic analysis, very close.' Measured what is actually there: Europa ends on the Europa/Jupiter vista behind the KubeCon card and fades to black over its last half second; movement 5 then opens on a DARK EARTH LIMB (Y~24) that holds 3.504 s before the sun bursts over the curve (Y jumps to 93), then an ice plume at 4.505, and at 6.506 -- programme 27:02.3, the frame the owner marked -- the cut to the body sinking through deep blue water. Vertical motion was measured on both sides and there is NO pan: the join is dark-to-dark, not a tilt. So the problem was never the frame, it was that a 2.0 s fade IN under an already near-black 3.5 s shot, coming off a 3.0 s fade OUT, made about four seconds of nothing exactly where the film wants to hold its breath. Dropping the fade puts the song in at full level on the cut, so the dark limb becomes a held breath with music under it and the sunrise lands as the payoff. v2.3 goes further on the other side of the join: act VII now ends on the eclipse at full brightness (its trim note has the numbers), so the held-breath limb follows a hard picture cut rather than a fade.",
-      "_still_open": "The B alternative -- movement 5 opening on the meteor strike at source 393.560, movement 4 extended to keep the song gapless -- is rendered as an excerpt beside the A default (renders/review/). Owner picks off the excerpts: #192.",
-      "label": "Perfume, movement 5 — source 389.800 -> 507.021 (EOF), Europa into the credits, CUT IN THE SHIP (109.5) so the credits smash lands off a live frame",
-      "_thread": "Movement 5 of 5, and the end of the song. The owner asked to 'match the transition panning up from laura after europa'. MEASURED, AND THE PREMISE DID NOT SURVIVE: there is no pan on either side. Europa's tail is the Europa/Jupiter vista behind the KubeCon card, fading to black, and movement 5 opens on a static dark Earth limb -- vertical displacement is 0 px across both, by row-profile correlation. What the join actually is, and what it is good at, is dark-to-dark: one world in space goes out, another comes up, and 3.5 s later the sun breaks over it. Act VII is never shortened to make anything FIT (#178) -- the v2.3 trim on it is not a fit, it is the owner's own eclipse note.",
-      "_moves_the_ambush": "RESOLVED by the owner's 28:20 note (was TODO(owner)/#191): the ambush now lands off the in-ship shot at mid-energy -- a 1.5 s fade from a -20 dB bed, not the source's long decay into burned credits and near-black. The picture is still deliberately left un-faded in the RENDER (these movements are rendered clean for the dinosaur pass); the trim and fade live here in the plan where they can be read, tested and reverted."
-    },
-    {
-      "kind": "clip",
-      "path": "/var/home/jorge/Videos/Wolves/Prod/08-credits.mp4",
-      "audio": "source",
-      "fade_in": 0.0,
-      "fade_out": 3.0,
-      "label": "Act VIII — Credits",
-      "_what": "NO ACT SLIDE, by owner instruction: 'no credits slide, go right to the metal ... it should surprise the viewer.' Every other act is announced by a card; this one is not. Europa fades to black on its own tail and the drum smash lands on the next frame. The missing slide also removes act VIII's CHAPTER MARKER -- chapters() derives them from slides -- and that is the point rather than a side effect: a 'VIII. Credits' entry on the scrub bar would spoil the same surprise the cut is built to land. fade_in is 0.0 so nothing eases in front of the smash."
-    }
-  ],
-  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no slide, so it has no marker -- that is the ambush working as designed. AS OF v2.1 ACT VII HAS NONE EITHER: the owner asked for its title slide to go so movement 4 could hard-cut into Europa, and the marker went with the slide. Six published entries, not eight. If Europa should keep a scrub-bar entry without a card in front of it, chapters() would need to read a `chapter` off the CLIP -- a change nobody has asked for yet.",
-  "_version": "v2.3 -- THE ALPHA QA PASS, owner notes of 2026-08-14: (1) act VII now ends ON the eclipse -- trim_to 96.73 at full brightness, no audio fade, hard into movement 5's music (the owner: 'cut right into the next song ... it could be the best transition in the show'; the B match-cut alternative is rendered beside it in renders/review/, #192); (2) the 28:20 dead tail is gone -- movement 5 trims at 109.5 while the camera is still in the ship, cutting the source's burned director credits and 7.7 s of fade-to-nothing, with a 1.5 s song fade and the credits smash punching the next frame (#191 resolved); (3) act I carries gain_db 3.5, the most its -4.60 dBTP true peak allows without a limiter -- it was 9.1 LU below the quietest other act (#164), and the remaining ~5.6 LU needs a re-master, recorded there. 36:16.2 -> 36:07.9. Same pass, other files: act VII re-rendered with the terse-pass dialogue (#102) and act IV gains the Linux desktop exchange (#118)."
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/01-intro.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "fade_out": 2.0,
+   "gain_db": 3.5,
+   "_gain": "Owner-approved 2026-08-14 (#164): act I measured -19.4 LUFS integrated where the other six acts cluster -9.7..-11.3, so the show opened ~9 dB quiet and jumped at the I->II join. Its true peak is -4.6 dBTP (re-measured on the delivered master before choosing this number), so +3.5 dB is the MOST a plain gain can add while staying inside the house -0.9..-1.1 dBTP band -- the audio tenet forbids a limiter, so the remaining ~5.6 LU needs a re-master of the act and is recorded on #164. The number is peak-constrained arithmetic, not taste.",
+   "label": "Act I — Into the Light: six Guardians plated, the comic card, Bungie's score",
+   "dur": 111.567,
+   "_dur_note": "The frame-verified trim, 2.0 -> 113.55 of BKm0TPqeOjY. Recorded here so the running order and its chapter markers can be read before the segment is built."
+  },
+  {
+   "kind": "clip",
+   "path": "renders/perfume-2.mp4",
+   "audio": "source",
+   "fade_in": 6.2,
+   "fade_out": 2.0,
+   "label": "Perfume, movement 2 — source 93.000 -> 159.400, after the Destiny intro",
+   "_thread": "THE PERFUME THREAD, movement 2 of 5. No numeral, no slide, no chapter marker -- see stories/00-perfume-thread.json. The 6.2 s fade_in is not a default: it is the exact length of the fade the PROLOGUE went out on (afade st=93.0 d=6.2), replayed upside down, so the song dips across act I and swells back rather than restarting. It also resumes mid-shot -- there is no cut in the source between 91.200 and 108.960 -- so the picture continues the very frame the prologue left."
+  },
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act2.png",
+   "dur": 5.0,
+   "label": "II — Endless Forms Most Beautiful / Nightwish",
+   "chapter": "II. Endless Forms Most Beautiful"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/02-endlessformsmostbeautiful.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "label": "Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end",
+   "sub_chapters": "stories/02-endless-forms-plates.json",
+   "_sub_chapters_note": "A POINTER at act II's own manifest, which is the source of the marks -- the plan opts in, it does not hold the timecodes, so an act's edit and the programme's edit never collide (issue #92). Consumed only with --sub-chapters; the default chapter list is unchanged. TODO(owner): YouTube chapter list vs ffmpeg-only metadata track."
+  },
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act3.png",
+   "dur": 5.0,
+   "label": "III — Bob Killen / Voidwalker Warlock",
+   "chapter": "III. Bob Killen"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/03-mrbobbytables.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "fade_out": 0.0,
+   "label": "Act III — mrbobbytables: August 2026 contributors (partially complete)",
+   "_hard_out": "NO fade_out, owner 2026-08-14: '12:43 can be a perfect transition with the music make this one awesome'. Act III ends on the Vex gate BLOOMING TO WHITE, and movement 3 opens above the clouds and falls at exactly 12:43. A 2.0 s fade out into a 2.0 s fade in put a four-second hole in the sound under the one frame doing the most work. A white flash is the classic cover for a hard music edit: the picture blinds you and the next song is simply there."
+  },
+  {
+   "kind": "clip",
+   "path": "renders/perfume-3.mp4",
+   "audio": "source",
+   "fade_in": 0.0,
+   "fade_out": 1.0,
+   "label": "Perfume, movement 3 — source 159.400 -> 328.080, after mrbobbytables",
+   "_thread": "Movement 3 of 5, and the longest at 2:48.7 -- longer than acts IV, V and VII. That is what the owner's spans specify and it plays as a full movement of the song, but it is the one placement where an interlude outweighs the acts around it. Flagged in stories/00-perfume-thread.json for the owner, built as instructed."
+  },
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act4-5.png",
+   "dur": 5.0,
+   "label": "IV–V — Bias for Action / The Kat and the Nat",
+   "_shortened": "15.0 -> 5.0 on the owner's 2026-08-14 note: '15:31 entire transition is too weird and long, make it all fit.' The 15 s was deliberate pacing when two acts were given one slide, and it stopped reading that way once the Perfume thread ran through the show. What was actually there: movement 3 ends on a DARK, STATIC shot of animal skulls in a hall, the song fades out over 2.0 s, and then a frozen text card holds for 15 s IN SILENCE before Kat's ships arrive -- roughly twenty seconds in which neither the picture nor the sound moves. Five seconds is what every other slide in the programme holds, so this is the exception being retired rather than a new number being invented.",
+   "chapter": "IV–V. Bias for Action"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/04-kat.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "label": "Act IV — Kat Cosgrove: Guardian intro"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/05-nat.mp4",
+   "audio": "source",
+   "fade_out": 2.0,
+   "label": "Act V — Natali Vlatko: Guardian arrival"
+  },
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_scream.png",
+   "dur": 5.0,
+   "label": "Interstitial — ON THE LINUX DESKTOP / NO ONE CAN HEAR YOU SCREAM",
+   "_what": "Owner 2026-08-14, verbatim: 'let the nat scene keep fading to black then put up a title card \"On the Linux Desktop\" \"No one can hear you scream\" - in a terryfing overlay.' Act V keeps its own 2.0 s fade to black (unchanged, the item above), and this comes up out of that black. Copy is the owner's, reproduced from stories/megacut/scream-card.json; the treatment is the Alien one-sheet homage the line invokes, rendered by scripts/build_scream_card.py. It holds 5.0 s, the house card length.",
+   "_no_chapter": "NO chapter key, deliberately: a scrub-bar entry would spoil the gag. The act VI slide follows as before, so this makes two cards back-to-back (10 s); accepted knowingly on the owner's instruction rather than re-derived as a hold bug.",
+   "interstitial": true
+  },
+  {
+   "kind": "card",
+   "image": "renders/plates-megacut-cards/plate_act6.png",
+   "dur": 5.0,
+   "label": "VI — 7 Days to the Wolves / Nightwish",
+   "chapter": "VI. 7 Days to the Wolves"
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/06-7daystothewolves.mp4",
+   "audio": "source",
+   "fade_in": 2.0,
+   "trim_to": 431.267,
+   "label": "Act VI — Seven Days to the Wolves: the musical, CUT AT THE COMIC (431.267) so the song hands straight to the next one",
+   "_trim": "Owner 2026-08-14: 'when the song ends we want to go right into the next song, cut out the comic and fade so it goes right from wolves to this song.' Both things they asked to remove start on the SAME measured frame: 431.267 is act VI's last shot change, the comic cover ('SEVEN DAYS TO THE WOLVES / THE FIGHT FOR FREEDOM BEGINS!') comes up on it and holds 12.2 s to the end, and the song's fade-out begins on it too -- full level right up to 431.267 (-12.6 dB), then -13.9, -16.2, -26.3, -46.4 and silence by 441. So one cut removes the comic AND the fade, and the act now ends on the song's last full bar. The owner said 23:55; the measured frame is 23:59.5, and it is the frame their description names.",
+   "_keeps_every_credit": "The tail plates end at act-film 409.669 (Cayde-6 reveal 393.511, the narration, then Kelsey Hightower, Brian Ketelsen and Angie Jones). The cut is 21.6 s after the last of them, so NOTHING that credits a real person is lost -- checked before cutting, because a dropped credit is not recoverable by a revert.",
+   "_cover_now_happens_once": "The comic cover was already act VIII's reveal (#178 took it off the end of act VII for exactly this reason). Removing it here means the programme plays it once, where it lands.",
+   "_plates": "Act VI carries stories/06-wolves-cayde-plates.json burned in (tools/plate.py burn --fit-picture). Prod holds ONE file per act, hardlinked to its project master, so Prod/06 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4. The UN-PLATED v2 master is kept beside it as wolves-7days-master-v2.mp4, because burning is not idempotent: a re-burn starts from the clean file and never stacks a second card on the first. v2 re-burned the tail plates at +10.811 s film time (the manifest's _shifted records it) and the act runs 443.5 s, so slide VII and act VII move +10.811 s of programme time. THE ACT'S OWN FILE IS NOT RE-RENDERED by the trim above -- the programme ends it early, so act VI in Prod/ is untouched."
+  },
+  {
+   "kind": "clip",
+   "path": "renders/perfume-4.mp4",
+   "audio": "source",
+   "fade_in": 0.0,
+   "fade_out": 0.0,
+   "label": "Perfume, movement 4 — source 328.080 -> 389.800, wolves straight in, straight out to Europa",
+   "_hard_both_ends": "NO fades, both owner calls. In: 'go right into the next song' -- act VI now ends on a full-level bar, so Perfume starts on the next frame at full level and the two songs meet like a needle drop. Out: '25:13 don't fade this it's awesome make it a quick cut to europa get rid of the title slide.'",
+   "_thread": "Movement 4 of 5."
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/07-europa.mp4",
+   "audio": "source",
+   "fade_in": 0.0,
+   "fade_out": 0.0,
+   "trim_to": 96.73,
+   "label": "Act VII — Europa Director's Cut (no slide: a quick cut off movement 4; ends on the eclipse, hard)",
+   "_no_slide": "Owner 2026-08-14: 'get rid of the title slide.' Act VII is now the SECOND act with no slide, after act VIII -- and like act VIII that also costs it its CHAPTER MARKER, because chapters() derives markers from slides. That is a real consequence of the instruction, recorded rather than worked around: the published list is six entries now, not seven. fade_in is 0.0 so nothing eases in front of the cut.",
+   "_eclipse_cut": "Owner 2026-08-14 (alpha QA): 'the eclipse/planets shot at the end of europa - that is janky it could be the best transition in the show if done right' -- more dramatic to 'cut right into the next song'. MEASURED: the tail holds flat at mean luma 36-37 through 96.73, then the film's own baked fade falls 96.8 -> 97.13 (30 -> 18) to black at 97.266. The act's own score is already low here (-39 dB mean over its last 0.8 s), so the v2.2 treatment -- a 1.5 s plan fade INTO that baked fade, then a dark held limb -- was a fade into a fade into dark: the jank the owner named. v2.3 trims at 96.73, the last full-brightness eclipse frame region, with NO audio fade: the residual score is quiet enough that the cut cannot pop, and movement 5 enters at full level on the next frame (max 0 dB in its first 3 s). Music meets music, so the join is hard, per docs/skills/megacut/references/joins.md.",
+   "_tail_read_before_trimming": "Act VII has no committed plate manifest yet (#152; being authored tonight). Checked VISUALLY instead, frame by frame: the Cayde/Laura credit plates sit around 88 s and are untouched; the burned 'Coming to KubeCon + Cloud Native Con NA' card is on screen from ~91 s and remains readable for ~5.7 s up to the cut. Nothing after 96.73 is anything but the baked fade to black -- no credit, no copy, nothing lost.",
+   "_alternative_b": "The match cut: also start movement 5 at the meteor-strike shot (source 393.560, a measured shot change) so the eclipse cuts straight into the strike, and extend movement 4 to 393.560 to keep the song gapless -- which nudges the 25:13 cut the owner has called awesome. Both joins were rendered as excerpts for the owner (renders/review/europa-join-A-needledrop.mp4 / europa-join-B-matchcut.mp4, cut at 16.7 s in each); v2.3 ships A as the safe default until the owner picks. #192."
+  },
+  {
+   "kind": "clip",
+   "path": "renders/perfume-5.mp4",
+   "audio": "source",
+   "fade_in": 0.0,
+   "fade_out": 1.5,
+   "trim_to": 109.5,
+   "_trim": "Owner 2026-08-14 (alpha QA): '28:20 has extra fade out that can be cut, including the music video director text, transition when the camera is in the ship make the song fade out but not too much then punch them with the credits at the end.' MEASURED: 28:20 programme time is movement 5's own tail. The in-ship shot (camera inside the sunken wreck, light through the hull) dissolves out from ~109.5; the source's burned credits ('(c) A LOVELY BUNCH OF COCONUTS 2024 / DIRECTED BY VILLE LIPIAINEN') fade in from 111.0 and are readable by 111.5, then near-black, then a held interior to EOF at 117.221 -- there is no shot boundary >=0.15 after film 100, it is one long dissolve, so the point is chosen on the frames: 109.5 is the last moment the camera still reads as IN the ship, with zero text risk. trim_to 109.5 cuts all of it; the 1.5 s fade_out lands against the AUTHORED end (st 108.0), which is 'fade out but not too much' from a -20 dB mean bed; act VIII's fade_in stays 0.0 so the drum smash punches on the next frame. Cuts 7.7 s of programme.",
+   "_no_fade_in": "Owner 2026-08-14: '27:03 transition needs a dramatic analysis, very close.' Measured what is actually there: Europa ends on the Europa/Jupiter vista behind the KubeCon card and fades to black over its last half second; movement 5 then opens on a DARK EARTH LIMB (Y~24) that holds 3.504 s before the sun bursts over the curve (Y jumps to 93), then an ice plume at 4.505, and at 6.506 -- programme 27:02.3, the frame the owner marked -- the cut to the body sinking through deep blue water. Vertical motion was measured on both sides and there is NO pan: the join is dark-to-dark, not a tilt. So the problem was never the frame, it was that a 2.0 s fade IN under an already near-black 3.5 s shot, coming off a 3.0 s fade OUT, made about four seconds of nothing exactly where the film wants to hold its breath. Dropping the fade puts the song in at full level on the cut, so the dark limb becomes a held breath with music under it and the sunrise lands as the payoff. v2.3 goes further on the other side of the join: act VII now ends on the eclipse at full brightness (its trim note has the numbers), so the held-breath limb follows a hard picture cut rather than a fade.",
+   "_still_open": "The B alternative -- movement 5 opening on the meteor strike at source 393.560, movement 4 extended to keep the song gapless -- is rendered as an excerpt beside the A default (renders/review/). Owner picks off the excerpts: #192.",
+   "label": "Perfume, movement 5 — source 389.800 -> 507.021 (EOF), Europa into the credits, CUT IN THE SHIP (109.5) so the credits smash lands off a live frame",
+   "_thread": "Movement 5 of 5, and the end of the song. The owner asked to 'match the transition panning up from laura after europa'. MEASURED, AND THE PREMISE DID NOT SURVIVE: there is no pan on either side. Europa's tail is the Europa/Jupiter vista behind the KubeCon card, fading to black, and movement 5 opens on a static dark Earth limb -- vertical displacement is 0 px across both, by row-profile correlation. What the join actually is, and what it is good at, is dark-to-dark: one world in space goes out, another comes up, and 3.5 s later the sun breaks over it. Act VII is never shortened to make anything FIT (#178) -- the v2.3 trim on it is not a fit, it is the owner's own eclipse note.",
+   "_moves_the_ambush": "RESOLVED by the owner's 28:20 note (was TODO(owner)/#191): the ambush now lands off the in-ship shot at mid-energy -- a 1.5 s fade from a -20 dB bed, not the source's long decay into burned credits and near-black. The picture is still deliberately left un-faded in the RENDER (these movements are rendered clean for the dinosaur pass); the trim and fade live here in the plan where they can be read, tested and reverted."
+  },
+  {
+   "kind": "clip",
+   "path": "/var/home/jorge/Videos/Wolves/Prod/08-credits.mp4",
+   "audio": "source",
+   "fade_in": 0.0,
+   "fade_out": 3.0,
+   "label": "Act VIII — Credits",
+   "_what": "NO ACT SLIDE, by owner instruction: 'no credits slide, go right to the metal ... it should surprise the viewer.' Every other act is announced by a card; this one is not. Europa fades to black on its own tail and the drum smash lands on the next frame. The missing slide also removes act VIII's CHAPTER MARKER -- chapters() derives them from slides -- and that is the point rather than a side effect: a 'VIII. Credits' entry on the scrub bar would spoil the same surprise the cut is built to land. fade_in is 0.0 so nothing eases in front of the smash."
+  }
+ ],
+ "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no slide, so it has no marker -- that is the ambush working as designed. AS OF v2.1 ACT VII HAS NONE EITHER: the owner asked for its title slide to go so movement 4 could hard-cut into Europa, and the marker went with the slide. Six published entries, not eight. If Europa should keep a scrub-bar entry without a card in front of it, chapters() would need to read a `chapter` off the CLIP -- a change nobody has asked for yet.",
+ "_version": "v2.3 -- THE ALPHA QA PASS, owner notes of 2026-08-14: (1) act VII now ends ON the eclipse -- trim_to 96.73 at full brightness, no audio fade, hard into movement 5's music (the owner: 'cut right into the next song ... it could be the best transition in the show'; the B match-cut alternative is rendered beside it in renders/review/, #192); (2) the 28:20 dead tail is gone -- movement 5 trims at 109.5 while the camera is still in the ship, cutting the source's burned director credits and 7.7 s of fade-to-nothing, with a 1.5 s song fade and the credits smash punching the next frame (#191 resolved); (3) act I carries gain_db 3.5, the most its -4.60 dBTP true peak allows without a limiter -- it was 9.1 LU below the quietest other act (#164), and the remaining ~5.6 LU needs a re-master, recorded there. 36:16.2 -> 36:07.9. Same pass, other files: act VII re-rendered with the terse-pass dialogue (#102) and act IV gains the Linux desktop exchange (#118). SAME EVENING, the owner's dialogue round: act IV plays the #118 conversation plus the sound bet and the upstreaming exchange (its yell uncast, TBD), act V plays the #118 Nat section ending on the docs.bazzite.gg button, and the ON THE LINUX DESKTOP / NO ONE CAN HEAR YOU SCREAM interstitial card (scripts/build_scream_card.py) comes up out of act V's own fade -- 36:07.9 -> 36:12.9."
 }

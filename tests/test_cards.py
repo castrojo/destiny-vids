@@ -60,7 +60,8 @@ def test_the_act_slides_are_numbered_in_the_owners_canonical_order():
     endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V)
     -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII)."""
     cards = _load("megacut-cards.json")
-    numerals = [p["act"] for p in cards["plates"]]
+    numerals = [p["act"] for p in cards["plates"]
+                if p.get("kind") != "interstitial"]
     # Acts IV and V share ONE slide -- the owner's call, because their films run
     # 34s and 25s and two 15s slides announced 59s of picture. The numerals are
     # still both there and still in order: this merged the announcement, not the
@@ -89,20 +90,34 @@ def test_the_running_order_doc_is_the_source_of_truth_and_agrees_with_the_plan()
     doc = open(os.path.join(REPO, "docs", "running-order.md"), encoding="utf-8").read()
     assert "source of truth" in doc
     # Every act slide's chapter title must appear in the doc, or the two
-    # descriptions of the show have drifted.
+    # descriptions of the show have drifted. A declared interstitial announces
+    # nothing, so it has no chapter title -- but its copy must still be in the
+    # doc, or the doc no longer describes what plays.
     import re
     plan = _load("megacut.json")
     for item in plan["items"]:
         if item["kind"] == "card":
+            if item.get("interstitial"):
+                assert "No one can hear you scream" in doc
+                continue
             title = item["chapter"].split(". ", 1)[1]
             assert title in doc, title
 
 
 def test_every_act_slide_carries_an_audience_facing_chapter_title():
-    """`label` is a build note; `chapter` is what the viewer reads."""
+    """`label` is a build note; `chapter` is what the viewer reads.
+
+    A card declared `interstitial` is the sanctioned exception both ways: it
+    is a beat inside the programme, not an announcement, so it must NOT carry
+    a chapter -- a scrub-bar entry would spoil it (the act VIII ambush rule,
+    applied to a gag).
+    """
     plan = _load("megacut.json")
     for item in plan["items"]:
         if item["kind"] == "card":
+            if item.get("interstitial"):
+                assert not item.get("chapter"), item.get("label")
+                continue
             assert item.get("chapter"), item.get("label")
             assert "held long" not in item["chapter"]
 
@@ -119,7 +134,8 @@ def test_the_programme_is_delivered_from_the_wolves_workspace():
 
 
 def test_act_slides_run_in_time_order_and_carry_a_chapters_field():
-    cards = _load("megacut-cards.json")["plates"]
+    cards = [p for p in _load("megacut-cards.json")["plates"]
+             if p.get("kind") != "interstitial"]
     ats = [p["at"] for p in cards]
     assert ats == sorted(ats)
     for card in cards:
