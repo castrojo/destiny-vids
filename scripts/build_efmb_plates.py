@@ -447,7 +447,15 @@ RANK_CHROME = {
 # Every anchor below is therefore a SOURCE timecode, like every other window
 # in this file, and each one was snapped to a measured shot boundary and then
 # looked at on a contact sheet.
-WALK_IN = 165.567          # two Guardians walking, green forest -- the chapter
+# 163.799 is the walking shot's FIRST frame, measured (film 146.033). It used
+# to be 165.567, which is 0.032 s before that shot's LAST frame -- off by a
+# whole shot -- so the chapter card came up 0.4 s after the walk had already
+# cut away and rode five seconds straight onto KARENA'S JUMP, captioning her
+# dive into the sinkhole "Glorious Eggroll and the new kids ...". The owner
+# caught it in the programme: "there's an erroneous long walk in the part with
+# karena". The shot boundaries either side are measured, not eyeballed:
+# 146.033 -> 147.833 is the walk, and 148.533 is the frame she jumps on.
+WALK_IN = 163.799          # two Guardians walking, green forest -- the chapter
 WALK_ENEMIES = 210.200     # the helmet close-up, teal eyes lit behind it
 WALK_VILLAIN = 238.200     # the winged figure: "Say hello to ..."
 WALK_OUT = 244.832         # run 4's last frame; nothing here may cross it
@@ -465,6 +473,13 @@ WALK_MARK_UPSTREAM = 210.299   # "5:08 he says ..."
 # it in as is the subtitle; the ellipsis is his.
 # TODO(owner): if the subtitle is not wanted, delete it -- it is reproduced,
 # not required.
+# The chapter card gets a SHORTER lead than everything else. Its shot is only
+# 1.8 s long and Karena's jump is the next frame after it, so the ordinary
+# 0.4 s of "let the cut land first" is 0.2 s the card cannot spare: at 0.4 it
+# clears the jump zone with 2.1 s, under the readable minimum, and would be
+# dropped entirely.
+WALK_CARD_LEAD = 0.2
+
 WALK_CARD = {
     "title": "The Long Walk",
     "subtitle": "Glorious Eggroll and the new kids ...",
@@ -613,8 +628,21 @@ TOC_PRE = [
      "text": "Is it worth it?", "hold": 2.2},
     {"id": "toc_ricardo", "key": "rochaporto", "speaker": "Ricardo",
      "text": "You really think they can save open source?",
-     "hold": None},  # whatever is left before the walk's first frame
+     "hold": 2.4},
 ]
+# THE EXCHANGE IS CHAINED BACKWARD FROM THE WALK, not forward from 2:19.
+#
+# It used to start at MONTAGE_OUT and give the last line "whatever is left"
+# before the walk's first frame. That worked only while the walk was
+# mis-anchored a shot late; correcting WALK_IN to the walking shot's real
+# first frame (146.033) left 7.033 s for three cards that need 7.100, and
+# Ricardo's question would have been squeezed under the readable minimum.
+#
+# Chaining backward keeps every authored hold and moves the whole exchange
+# 1.07 s earlier instead -- into clear air, since Dylan Taylor's badge is out
+# at 134.767. The scene it belongs to is the walk, so the walk is what it is
+# pinned to.
+TOC_PRE_TAIL_GAP = 0.2   # air between the last question and the chapter card
 TOC_POST = [
     {"id": "toc_joseph_faith", "key": "joseph_sandoval", "speaker": "Joseph",
      "text": "Dunno, how much faith DO we have in the CNCF?", "hold": 3.0},
@@ -758,6 +786,16 @@ TRIO_STAGGER = 0.8
 # losing the fight. Laying our own credit over the publisher's is the one thing
 # that would make it look deliberate, so the plates clear it instead.
 NO_PLATE_SRC = [
+    # KARENA'S JUMP. The brief has always said "Karena says nothing and jumps.
+    # No card on her here; the beat is the jump" -- but that was a rule about
+    # what to SCHEDULE, and the thing that broke it was a card scheduled
+    # somewhere else RIDING onto her. A zone is the mechanism that already
+    # exists for exactly that, and it protects the beat from every future cue
+    # rather than from the one that happened to hit it.
+    #
+    # 166.299 -> 167.766 is her shot, measured (film 148.533 -> 150.000).
+    (166.299, 167.766, "Karena's jump -- the beat is the jump, and no card "
+                       "belongs on it"),
     # Bungie burns "BECOME LEGEND" over the cave at the end of run 2, fading in
     # around 172.5 and holding to the cut. The act removes a DIFFERENT instance
     # of this same title (build_efmb.REMOVED names 244.833 -> 246.100); this one
@@ -1253,10 +1291,10 @@ def build():
     walk = []
     cursor = [0.0]
 
-    def walk_cue(entry, src=None, at_src=None, hold=None):
+    def walk_cue(entry, src=None, at_src=None, hold=None, lead=LEAD_IN):
         """Schedule one cue in the walk's single lower-third lane."""
         want = round(film_of(at_src), 3) if at_src else (
-            _at(src, film_of) if src else 0.0)
+            round(film_of(src) + lead, 3) if src else 0.0)
         at = round(max(want, cursor[0]), 3)
         room = clamp_hold(at, hold, film_of)
         if room is None:
@@ -1276,7 +1314,7 @@ def build():
         "seen_at_src": WALK_IN,
         "why": "the chapter card, on the walk it names",
         **WALK_CARD,
-    }, src=WALK_IN, hold=5.0)
+    }, src=WALK_IN, hold=5.0, lead=WALK_CARD_LEAD)
 
     for spec in WALK_SEQUENCE:
         if spec["cue"] == "plate":
@@ -1409,15 +1447,17 @@ def build():
     # The questions, in the pre-walk window. The scene starts at 2:19 -- the
     # lead-in banner that was to open it has no copy yet (#98, Questions), so
     # the first line takes its slot.
-    cursor = MONTAGE_OUT
+    span = (sum(spec["hold"] for spec in TOC_PRE)
+            + PLATE_GAP * (len(TOC_PRE) - 1) + TOC_PRE_TAIL_GAP)
+    cursor = round(film_of(WALK_IN) - span, 3)
+    assert cursor >= 134.767, (
+        f"the pre-walk exchange would start at {cursor:.3f}s, on top of Dylan "
+        "Taylor's badge -- a hold has to come down")
     for spec in TOC_PRE:
         hold = spec["hold"]
-        if hold is None:
-            hold = round(film_of(WALK_IN) - PLATE_GAP - cursor, 3)
         assert hold >= MIN_HOLD, (
-            f"{spec['id']} gets only {hold:.3f}s before The Long Walk's first "
-            f"frame, under the {MIN_HOLD}s a card needs -- the pre-walk "
-            "window is full")
+            f"{spec['id']} holds {hold:.3f}s, under the {MIN_HOLD}s a card "
+            "needs to be read")
         toc.append(toc_chat(spec, cursor, hold))
         cursor = round(cursor + hold + PLATE_GAP, 3)
 

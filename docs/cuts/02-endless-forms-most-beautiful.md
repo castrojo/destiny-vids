@@ -62,6 +62,36 @@ What changed:
 - **`blueberry_Giklab` is gone** — the SHOT came out, so the roster is not
   reshuffled behind him and nobody else moved into the slot.
 
+### The Long Walk card was on Karena's jump
+
+Owner, on the programme: *"there's an erroneous long walk in the part with
+karena."*
+
+`WALK_IN` was **source 165.567** — 0.032 s before the walking shot's **last**
+frame, a whole shot late. So the chapter card came up 0.4 s *after* the walk had
+already cut away, and held five seconds over Karena diving into the sinkhole,
+captioning her jump *"Glorious Eggroll and the new kids …"*.
+
+The boundaries are measured, not eyeballed: the walk is film **146.033 →
+147.833**, and **148.533** is the frame she jumps on.
+
+- `WALK_IN` is the walking shot's real first frame now (source **163.799**).
+- **Karena's jump is a `NO_PLATE_SRC` zone** (source 166.299 → 167.766). The
+  brief always said *"No card on her here; the beat is the jump"* — but that was
+  a rule about what to *schedule*, and what broke it was a card scheduled
+  somewhere else **riding onto** her. A zone is the mechanism that already
+  exists for exactly that, and it protects the beat from every future cue rather
+  than from the one that happened to hit it.
+- The chapter card takes a **shorter lead** (0.2 s, `WALK_CARD_LEAD`). Its shot
+  is 1.8 s long and the jump is the next frame after it; at the usual 0.4 s it
+  cleared the zone with 2.1 s, under `MIN_HOLD`, and would have been dropped
+  altogether.
+- **The pre-walk exchange is chained backward from the walk** rather than
+  forward from 2:19. The corrected anchor left 7.033 s for three cards that need
+  7.100, so the block moves 1.07 s earlier — into clear air, Dylan Taylor's badge
+  being out at 134.767 — instead of squeezing Ricardo's question under the
+  readable minimum.
+
 ### The choice screen
 
 The biggest new thing, and it arrived in five instructions:

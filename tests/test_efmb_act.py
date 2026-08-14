@@ -129,8 +129,13 @@ def test_no_plate_is_laid_over_bungies_burned_in_title():
             if plate.get("position") == "letterbox":
                 continue
             start, end = plate["at"], plate["at"] + plate["dur"]
-            assert not (start < zone[1] and end > zone[0]), (
-                f"{plate['id']} overlaps the burned-in title at {zone}")
+            # Touching is not overlapping. The chapter card is clamped to end
+            # ON the first frame of Karena's jump, and 146.233 + 2.300 lands
+            # 6e-14 past 148.533 in binary floating point -- the same
+            # tolerance `space_plates` already carries, for the same reason.
+            EPS = 1e-6
+            assert not (start < zone[1] - EPS and end > zone[0] + EPS), (
+                f"{plate['id']} overlaps the no-plate zone at {zone}")
 
 
 def test_the_authored_handles_are_never_replaced_with_real_names():
@@ -532,9 +537,17 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
     walk_out = build_efmb.film_for_source(build_efmb_plates.WALK_OUT, lead)
     toc = toc_plates()
     pre = [toc[k] for k in ("toc_karena", "toc_joseph_worth", "toc_ricardo")]
+    # CHAINED BACKWARD FROM THE WALK, not forward from 2:19. Correcting
+    # WALK_IN to the walking shot's real first frame left 7.033 s for three
+    # cards that need 7.100, so the exchange moves earlier as a block rather
+    # than squeezing Ricardo's question under the readable minimum. The floor
+    # is Dylan Taylor's badge, which is out at 134.767.
+    dylan = next(p for p in committed()["plates"]
+                 if p["id"] == "placeholder_dylan_taylor")
     for p in pre:
-        assert build_efmb_plates.MONTAGE_OUT <= p["at"]
+        assert p["at"] >= dylan["at"] + dylan["dur"]
         assert p["at"] + p["dur"] <= walk_in + 1e-6
+        assert p["dur"] >= build_efmb_plates.MIN_HOLD
     post = [toc[k] for k in ("toc_joseph_faith", "toc_ricardo_desktop",
                              "toc_joseph_lol")]
     for p in post:
@@ -818,3 +831,32 @@ def test_nothing_on_the_menu_is_selected():
     # Two cursor footprints' worth of pixels, and no more: anything else is a
     # box that reacted to being approached.
     assert changed <= 2 * cursor.width * cursor.height
+
+
+
+def test_no_card_rides_onto_karenas_jump():
+    """"there's an erroneous long walk in the part with karena".
+
+    The chapter card was anchored to source 165.567 -- 0.032 s before the
+    walking shot's LAST frame, a whole shot late -- so it came up after the
+    walk had cut away and held five seconds over Karena diving into the
+    sinkhole, captioned "Glorious Eggroll and the new kids ...".
+
+    The fix is not a nudge: her jump is a NO-PLATE ZONE now, so the guarantee
+    is against every future cue rather than against the one that happened to
+    hit it.
+    """
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    lead = build_efmb.derive_lead()
+    jump = next(z for z in build_efmb_plates.NO_PLATE_SRC if "Karena" in z[2])
+    jump_in = build_efmb.film_for_source(jump[0], lead)
+
+    card = by_id["walk_chapter"]
+    assert card["at"] + card["dur"] <= jump_in + 1e-6, \
+        "the chapter card is on Karena's jump again"
+    # ... and it is on the walk it names, which is only 1.8 s long.
+    walk_in = build_efmb.film_for_source(build_efmb_plates.WALK_IN, lead)
+    assert card["at"] >= walk_in
+    assert card["at"] - walk_in == pytest.approx(
+        build_efmb_plates.WALK_CARD_LEAD, abs=1e-3)
+    assert card["dur"] >= build_efmb_plates.MIN_HOLD
