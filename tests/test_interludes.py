@@ -216,8 +216,9 @@ def test_act_seven_therefore_has_no_chapter_marker(plan):
     the hard cut too, and this test is where they find that out.
     """
     chapters = [i.get("chapter") for i in plan["items"] if i.get("chapter")]
-    assert not any("VII." in c for c in chapters)
-    assert len(chapters) == 5
+    assert not any(c.startswith("II.") for c in chapters)
+    assert not any(c.startswith("VII.") for c in chapters)
+    assert len(chapters) == 4
 
 
 def test_the_two_dramatic_joins_carry_no_audio_dip(plan):

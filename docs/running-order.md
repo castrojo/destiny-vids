@@ -21,7 +21,7 @@ untouched: the prologue takes **no numeral** and nothing is renumbered.
 |---|---|---|---|
 | **0** | *(no chapter — it is the main title)* | `Prod/00-prologue.mp4` — black, the lockup fading up on it, the picture exploding in at 0:12.2, then the March day→night bridge | delivered, **prototype**; shipping form is an embed |
 | **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the title cover | delivered |
-| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers, and *The Long Walk* inside them | delivered and **credited**, in the programme |
+| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers, and *The Long Walk* inside them | delivered and **credited**, in the programme; **no slide or chapter marker** — movement 2 crescendos directly into it (owner 2026-08-14) |
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide**; plays the #118 Nat section, the docs.bazzite.gg button on its own fade; **followed by the interstitial card** — *On the Linux Desktop / No one can hear you scream* — up out of that fade (owner 2026-08-14; no chapter marker, deliberately; `scripts/build_scream_card.py`) |
@@ -267,7 +267,6 @@ python3 tools/megacut.py stories/megacut/megacut.json --chapters
 
 ```text
 0:00  I. Project Bluefin
-1:56  II. Endless Forms Most Beautiful
 7:09  III. Bob Killen
 9:54  IV–V. Bias for Action
 11:08 VI. 7 Days to the Wolves

@@ -29,6 +29,8 @@
   {
    "id": "act2",
    "kind": "act",
+   "retired": true,
+   "retired_note": "RETIRED 2026-08-14 on the owner's instruction: 'the 4:40 fade and title slide need to be removed, crescendo the music into the next segment in one smooth transition.' The programme now moves directly from Perfume movement 2 into act II. The authored title and chapters remain below so restoring the slide never means rewriting them; removing it also removes act II's slide-derived chapter marker.",
    "at": 116.567,
    "dur": 5.0,
    "act": "II",

@@ -61,7 +61,10 @@ The segments genuinely disagree, so a re-encode is unavoidable:
   mix decision and belongs to the owner; when the owner takes it, the plan
   records it as an explicit per-clip ``gain_db`` (a plain static gain, applied
   before the fades -- the first was act I, 9.1 LU under the show, #164), and
-  no gain is ever applied that the plan does not state. Silent segments
+  no gain is ever applied that the plan does not state. ``crescendo_out`` plus
+  ``crescendo_db`` may return an attenuated clip to unity over its final
+  seconds; validation refuses a pair that would boost above the source level.
+  Silent segments
   get generated 5.1 silence of exactly matching length rather than being left
   with no stream, because ``concat`` needs every segment to carry both.
 * **Colour.** BT.709 SDR is tagged explicitly. Untagged 1080p is *assumed* to be
@@ -239,6 +242,28 @@ def load_plan(path, require_sources=True):
                     f"silence -- a no-op that reads as a treatment. Drop it; "
                     f"if the slide should carry sound, that is a licensing "
                     f"decision for the owner, not a fade")
+        crescendo_keys = ("crescendo_out", "crescendo_db")
+        if any(key in item for key in crescendo_keys):
+            if not all(key in item for key in crescendo_keys):
+                raise ValueError(
+                    f"item {i}: crescendo_out and crescendo_db must be stated "
+                    "together")
+            if kind != "clip" or item.get("audio") != "source":
+                raise ValueError(
+                    f"item {i}: a crescendo belongs on a source-audio CLIP")
+            try:
+                crescendo_out = float(item["crescendo_out"])
+                crescendo_db = float(item["crescendo_db"])
+            except (TypeError, ValueError):
+                raise ValueError(
+                    f"item {i}: crescendo_out and crescendo_db must be numbers")
+            if crescendo_out <= 0 or crescendo_db <= 0:
+                raise ValueError(
+                    f"item {i}: crescendo_out and crescendo_db must be positive")
+            if float(item.get("gain_db", 0)) + crescendo_db > 1e-9:
+                raise ValueError(
+                    f"item {i}: gain_db + crescendo_db would boost above the "
+                    "source level")
         if kind == "clip" and ("dur" in item or "trim_to" in item):
             total = float(item.get("fade_in", 0)) + float(item.get("fade_out", 0))
             length = float(item.get("trim_to", item.get("dur", 0)))
@@ -247,6 +272,9 @@ def load_plan(path, require_sources=True):
                     f"item {i}: fade_in + fade_out ({total}s) meets or exceeds "
                     f"the clip's own duration ({length}s) -- the fades "
                     f"would overlap on the ACT FILM clock")
+            if float(item.get("crescendo_out", 0)) >= length:
+                raise ValueError(
+                    f"item {i}: crescendo_out must be shorter than the clip")
         if kind == "card" and "sub_chapters" in item:
             raise ValueError(
                 f"item {i}: sub_chapters belong on the act's CLIP -- a card is "
@@ -535,7 +563,7 @@ def segment_video_chain(plan, item):
 
 
 def fade_chain(item, dur):
-    """The ``volume``/``afade`` filters a clip asks for, or "" -- ACT FILM clock.
+    """The explicit gain/fade filters a clip asks for, or "" -- ACT FILM clock.
 
     ``fade_in`` starts at 0 of the clip's own timeline; ``fade_out`` ENDS at
     the clip's end, so its start is ``dur - fade_out``. Both are seconds from
@@ -547,12 +575,17 @@ def fade_chain(item, dur):
     show and approved for correction, #164); a tool or agent never picks the
     number, and it is a plain gain, never a limiter or normaliser. ``dur`` is
     the clip's length on its own clock (authored, or probed by the caller);
-    with nothing declared the chain is empty and the audio path is
-    byte-identical to before.
+    ``crescendo_out`` and ``crescendo_db`` add a linear-in-dB rise over the
+    clip's final seconds. They are paired with an initial negative ``gain_db``;
+    plan validation refuses any combination whose final gain exceeds unity.
+    With nothing declared the chain is empty and the audio path is byte-identical
+    to before.
     """
     gain_db = float(item.get("gain_db", 0))
     fade_in = float(item.get("fade_in", 0))
     fade_out = float(item.get("fade_out", 0))
+    crescendo_out = float(item.get("crescendo_out", 0))
+    crescendo_db = float(item.get("crescendo_db", 0))
     filters = []
     if gain_db:
         filters.append(f"volume={gain_db:+.1f}dB")
@@ -560,6 +593,12 @@ def fade_chain(item, dur):
         filters.append(f"afade=t=in:st=0:d={fade_in:.3f}")
     if fade_out:
         filters.append(f"afade=t=out:st={dur - fade_out:.3f}:d={fade_out:.3f}")
+    if crescendo_out:
+        start = dur - crescendo_out
+        filters.append(
+            "volume='if(lt(t,"
+            f"{start:.3f}),1,pow(10,({crescendo_db:.3f}*"
+            f"(t-{start:.3f})/{crescendo_out:.3f})/20))':eval=frame")
     return "," + ",".join(filters) if filters else ""
 
 
@@ -649,7 +688,9 @@ def build_segment_command(plan, index, seg_path, threads=None):
         dur = item.get("trim_to")
         if dur is None:
             dur = item.get("dur")
-            if dur is None and float(item.get("fade_out", 0)):
+            if dur is None and (
+                    float(item.get("fade_out", 0))
+                    or float(item.get("crescendo_out", 0))):
                 dur = probe_duration(resolve(item["path"]), stream="v:0")
         else:
             # A trimmed clip is cut on BOTH streams by the same number, so the
@@ -695,7 +736,9 @@ def build_segment_copy_command(plan, index, seg_path, src_path):
     else:
         maps = ["-map", "0:v:0", "-map", "0:a:0"]
         dur = item.get("dur")
-        if dur is None and float(item.get("fade_out", 0)):
+        if dur is None and (
+                float(item.get("fade_out", 0))
+                or float(item.get("crescendo_out", 0))):
             dur = probe_duration(str(src_path), stream="v:0")
         af = ["-af", clip_audio_chain(item, rate, layout, dur)]
     return [*args, *af, *maps,
@@ -711,11 +754,14 @@ def build_concat_command(plan, list_path, out_path):
     ``build_segment_command`` encodes them all from the same plan.
     """
     abitrate = plan.get("audio_bitrate", "640k")
+    master_gain = float(plan.get("master_gain_db", 0))
+    audio_filter = ["-af", f"volume={master_gain:+.1f}dB"] if master_gain else []
     return [
         ffmpeg_bin(), "-nostdin", "-hide_banner",
         "-f", "concat", "-safe", "0", "-i", str(list_path),
         "-map", "0:v:0", "-map", "0:a:0",
         "-c:v", "copy",
+        *audio_filter,
         "-c:a", "aac", "-b:a", abitrate,
         "-ar", str(plan.get("sample_rate", DEFAULT_SAMPLE_RATE)),
         "-movflags", "+faststart",

@@ -256,9 +256,10 @@ def load_envelope_db(path, hop=HOP_SEC):
         channels = w.getnchannels()
         width = w.getsampwidth()
         raw = w.readframes(w.getnframes())
-    if width != 2:
-        raise RuntimeError(f"{path} is {width * 8}-bit; the detector expects 16-bit PCM")
-    a = array.array("h")
+    if width not in (2, 4):
+        raise RuntimeError(
+            f"{path} is {width * 8}-bit; the detector expects 16- or 32-bit PCM")
+    a = array.array("h" if width == 2 else "i")
     a.frombytes(raw)
     del raw
     win = int(rate * hop)

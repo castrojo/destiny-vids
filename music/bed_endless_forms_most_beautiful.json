@@ -811,5 +811,8 @@
       269.66
     ]
   },
-  "excisions": []
+  "excisions": [],
+  "source_format": "YouTube format 251 -- Opus, 48 kHz stereo, 126 kb/s. Decoded once at the native 48 kHz with a -1.6 dB static gain into pcm_s32le, so the source's above-full-scale peaks are retained without clipping and the build can analyze the WAV offline. The former pcm_s16le intermediate clipped 10 samples in Kyle's 258-282 s climax. Preserving those peaks raised the decoded deliverable from -1.0 to -0.6 dBTP at the old correction, so the static gain moved down another 0.4 dB rather than adding a limiter.",
+  "spectral_cutoff_hz": 20000,
+  "spectral_note": "Measured 2026-08-14 over Kyle's 258-282 s climax. Cymbal energy remains through 18-20 kHz, then falls sharply above ~20 kHz (18-20 kHz band 58.9 dB vs 20-24 kHz 35.4 dB in the same FFT scale), consistent with the 126 kb/s Opus delivery rung. The source, decoded float bed, FLAC act master and plated master correlate at 0.99999999 after the intended -1.2 dB gain, so the audible cymbal texture is already in the YouTube source rather than introduced by rendering or plating. No local lossless release master was found."
 }

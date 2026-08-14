@@ -236,12 +236,10 @@ def fmt(seconds):
 
 TARGET_W, TARGET_H, TARGET_FPS = 1920, 1080, 30
 
-# THE BED DECODES ABOVE FULL SCALE. The first mux measured +0.2 dBFS true peak.
-# The fix is the one docs/skills/references/audio-standard.md prescribes: a
-# STATIC GAIN at the mux, applied once, with the picture stream-copied. Not
-# loudnorm and not a limiter -- those change the dynamic relationships the
-# artist chose. Corrections only ever go down.
-MUX_GAIN_DB = -1.2
+# THE BED'S SOURCE DECODES ABOVE FULL SCALE. Its fetched intermediate applies
+# a -1.6 dB static gain before integer PCM encoding, so those peaks are retained
+# rather than clipped. The mux therefore applies no second gain.
+MUX_GAIN_DB = 0.0
 
 # ISSUE #88, AND WHY EVERY CHAIN BELOW IS `-vf`.
 #
@@ -252,7 +250,8 @@ MUX_GAIN_DB = -1.2
 # `-vf` only here, black is a real encoded clip joined by the concat DEMUXER
 # rather than a filtergraph, and nothing in this path builds a filter_complex.
 NORMALISE_VF = (
-    f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease,"
+    f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease:"
+    "flags=lanczos,"
     f"pad={TARGET_W}:{TARGET_H}:(ow-iw)/2:(oh-ih)/2,"
     f"fps={TARGET_FPS},format=yuv420p"
 )
@@ -365,13 +364,12 @@ def render(out_path=None, work_dir=None, verbose=True):
     _concat(ffmpeg, parts, silent, work)
 
     if verbose:
-        print(f"  mux: bed at {MUX_GAIN_DB} dB static gain, FLAC, picture copied")
+        print("  mux: pre-gained PCM bed, FLAC, picture copied")
     _run(list(ffmpeg) + [
         "-nostdin", "-v", "error", "-y",
         "-i", str(silent), "-i", str(bed),
         "-map", "0:v:0", "-map", "1:a:0",
         "-c:v", "copy",
-        "-af", f"volume={MUX_GAIN_DB}dB",
         "-c:a", "flac", "-ar", "48000", "-ac", "2",
         "-shortest", str(out_path)])
 
