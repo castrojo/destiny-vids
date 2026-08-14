@@ -26,7 +26,7 @@ untouched: the prologue takes **no numeral** and nothing is renumbered.
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
 | **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits; **the programme plays 431.267 of it** (v2.1) — the comic and the fade cut off the end, the file untouched |
-| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; **no slide, no chapter marker** (v2.1) — a quick cut off movement 4; **1:37.266**, the comic cover cut so act VIII owns the reveal — #178; plays the pre-terse-pass film — #102; master corrected to −1.1 dBTP — #82 |
+| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; **no slide, no chapter marker** (v2.1) — a quick cut off movement 4; **the programme plays 96.73 of its 1:37.266** (v2.3) — it ends ON the eclipse at full brightness, hard into movement 5 (the owner's alpha-QA note; A/B excerpts in `renders/review/`, #192); the comic cover cut so act VIII owns the reveal — #178; terse-pass re-render in flight — #102; master corrected to −1.1 dBTP — #82 |
 | **VIII** | Credits | `Prod/08-credits.mp4` — the **call to action**, the comic-cover reveal, then the cast and 723 contributors across **eight** projects | delivered, **in the programme**; **7:50.453**, two bed passes (instrumental loop, then the album version with vocals); **no slide, no chapter marker** — it is meant to surprise — #51 |
 
 ## The prologue, and why it has no numeral
@@ -92,7 +92,7 @@ acts live inside it.
 | **2** | 93.000 → 159.400 | 1:06.400 | after act I |
 | **3** | 159.400 → 328.080 | 2:48.685 | after act III |
 | **4** | 328.080 → 389.800 | 1:01.728 | after act VI, before Europa |
-| **5** | 389.800 → 507.021 (EOF) | 1:57.200 | after Europa, into the credits |
+| **5** | 389.800 → 507.021 (EOF) | 1:57.200 — **the programme plays 109.5 of it** (v2.3) | after Europa, into the credits |
 
 Movements 2–5 add **6:54.0**. They take **no numerals, no slides and no chapter
 markers** — the same reasoning that keeps the prologue outside the eight, and
@@ -104,11 +104,14 @@ no fades, no overlays. The owner: *"we will be editing them in the future with
 dino artwork"*, and a dinosaur pass wants unfaded picture. `Prod/` keeps meaning
 "a finished act"; join treatment lives in `megacut.json` in act-film time.
 
-**Two joins are the owner's to approve.** Movement 5 opens on the measured cut
-at 389.800 to catch Europa's hand-down off Elsie Bray, and where exactly the
-two camera moves meet is a judgement about frames. It also **moves the act VIII
-ambush**: the drum smash now lands off the end of a different song, on a held
-shot rather than on black.
+**The two open joins were settled by the owner's alpha QA (2026-08-14).**
+Europa now ends on the eclipse at full brightness (act VII `trim_to 96.73`,
+no fade) and cuts hard into movement 5's music — the A/B excerpt pair for the
+final frame choice is in `renders/review/` (#192). The **act VIII ambush**
+was re-seated by the owner's 28:20 note: movement 5 trims at 109.5, while the
+camera is still inside the sunken ship — the source's burned director credits
+and its long fade to nothing are cut, the song fades 1.5 s ("not too much"),
+and the drum smash punches the next frame (#191).
 
 The measured cut points, the two-answer in point and the rest are in
 [`docs/cuts/00-perfume-thread.md`](cuts/00-perfume-thread.md).
