@@ -1,162 +1,170 @@
 {
-  "_what": "The act slides for Seven Days to the Wolves. One card per act of the programme, in the owner's canonical order, each carrying its Roman numeral. `kind: \"act\"` is the cinematic handoff slide from the website (CinematicTransition.vue), rendered full-frame from its own CSS by cards/render-cards.mjs (cards/act.html).",
-  "_order": "THE CANONICAL ORDER, codified by the owner on 2026-08-12 and settled: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). Eight acts, each announced by a slide carrying a huge Roman numeral. This list is the show's chapter list: see docs/running-order.md, which is the source of truth, and `tools/megacut.py --chapters`, which derives the timestamped markers from the built programme rather than from a hand-typed table.",
-  "_copy": "Chapter card copy is REPRODUCED, never authored. Where an act has no authored title, the row is omitted rather than filled -- see `unresolved`. The only strings the owner wrote for this pass are act II's title and the whole of act IV's terminal block, both quoted back verbatim.",
-  "_chapters": "Every act is to carry chapters, and every `chapters` list below is populated. Five acts -- I, II, III, VI and VII -- carry agent-drafted lists read off the built films, each line cited in its card's `note`; none of those words are the owner's yet, and the rewrite-or-strike decision is recorded in `unresolved`. The merged IV-V slide carries the owner's two authored loglines in the same field, verbatim. A line nobody authored is still omitted, never invented.",
-  "_gaps": "Act VIII has no film and therefore no card: a slide announcing an act that does not play is worse than a recorded gap. It keeps its numeral in `unresolved` so the numbering cannot drift when it is built. Act II had the same gap until 2026-08-12, when it was built (docs/cuts/02-endless-forms-most-beautiful.md) and this card was added.",
-  "_audio": "Every card is silent. Putting a bed under one is a licensing decision, the owner's alone.",
-  "plates": [
-    {
-      "id": "act1",
-      "kind": "act",
-      "at": 0.0,
-      "dur": 5.0,
-      "act": "I",
-      "label": "Act I",
-      "title": "Project Bluefin",
-      "subtitle": "seven days to the wolves",
-      "chapters": [
-        "0:03  Cortney Nickerson",
-        "0:12  Kat Cosgrove",
-        "0:22  Title cover — Rafael Castro, Lakshmi, Bluefin",
-        "0:38  Kaslin Fields",
-        "1:08  Orlin",
-        "1:23  Christoph Blecker",
-        "1:27  Natali Vlatko"
-      ],
-      "note": "Copy is the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94). This card was `card0` before the acts were numbered. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): One line per plate the act actually burns, in order, read off the built file -- stories/megacut/megacut-hero-plates.json for the windows, the frames for confirmation. Orlin's line is name-only because he is name-only ON THE PLATE too (#73: no authored Guardian identity, and this list must not give him one); Cortney Nickerson's is not -- issue #90 authored her label, name and title, with the subclass row withheld until the owner names her class (megacut-hero-plates.json, `unresolved`). The 0:22 line is the title cover that issue #90 put in place of the comic/QR cycle; the owner-authored Amber Graner quote it used to name is gone from the act by the same instruction, and the line names the three the cover's caption boxes credit -- Rafael Castro and Bluefin on their boxes, Lakshmi in the owner's framing line."
-    },
-    {
-      "id": "act2",
-      "kind": "act",
-      "at": 116.567,
-      "dur": 5.0,
-      "act": "II",
-      "label": "Act II",
-      "title": "Endless Forms Most Beautiful",
-      "subtitle": "Nightwish",
-      "chapters": [
-        "0:00  The moon, cold open",
-        "0:06  The moon battle",
-        "0:36  The red dunes",
-        "2:28  The jungle patrol",
-        "3:32  The temple"
-      ],
-      "note": "The owner named this act and its music in one instruction -- 'it's endless forms most beautiful, instrumental' -- and docs/running-order.md carries the title. The artist is reproduced from the bed's own provenance (music/bed_endless_forms_most_beautiful.json, the official Nightwish channel), matching act VI's card, which is a title and an artist for the same reason. The film is docs/cuts/02-endless-forms-most-beautiful.md. The word 'instrumental' is deliberately NOT on the slide: it describes which recording was used, not what the act is called, and nobody authored it as a subtitle. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): The first two are docs/cuts/02-endless-forms-most-beautiful.md's own words for its first two kept runs. The last three are the remaining kept runs, named from what is visibly in frame at each -- the doc records where their boundaries are, not what they show."
-    },
-    {
-      "id": "act3",
-      "kind": "act",
-      "at": 429.534,
-      "dur": 5.0,
-      "act": "III",
-      "label": "Act III",
-      "title": "Bob Killen",
-      "chapters": [
-        "0:00  The Vex assault",
-        "2:00  Osiris — “the end of everything”",
-        "2:32  Thanks for working on Bluefin"
-      ],
-      "note": "This act is `mrbobbytables` -- the film delivered as ~/Videos/Wolves/Prod/03-mrbobbytables.mp4 (was UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4). The owner named it and placed it: 'rename this \"mrbobbytables\" ... and then put it in slot three'. The card reproduces his authored Guardian identity -- characters.json slug `bob`, ~/Videos/nameplates.json np_bob -- rather than an act title nobody wrote. His seal, 'Reconciler of the Plane', stays on the plate inside the cut, matching acts V and VII, which give a name and a class and no title. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): Read off the built file: the Vex assault, Osiris's line (already burned in as recovered dialogue), and the contributors card the cut ends on.",
-      "subtitle": "Voidwalker Warlock"
-    },
-    {
-      "id": "act4-5",
-      "kind": "act",
-      "at": 594.734,
-      "dur": 5.0,
-      "act": "IV–V",
-      "body": [
-        "The Knightly Order of Kubernetes sends a lone titan on a secret mission",
-        "Destination: Europa",
-        "TOC Authorization: [ DENIED ]",
-        "TAB Authorization: [ DENIED ]",
-        "CNCF Authorization: [ UNAUTHORIZED ]"
-      ],
-      "title": "Bias for Action",
-      "subtitle": "The Kat and the Nat",
-      "chapters": [
-        "With the CNCF Locked in \"Oh no what do we do?\" mode, two Kubernetes contributors make their own fates.",
-        "But not enough volunteers showed up to take notes, leading to some surprises ..."
-      ],
-      "note": "ONE slide for two acts, owner instruction: 'give kat/nat one slide since those videos are short'. Their films run 34.0s and 25.3s; two 15s slides announced 59.3s of picture, which is what that note is about. It saves 15s of the programme. HELD 5.0 s AS OF v2.2, not 15.0: the long hold was deliberate pacing for a slide announcing two acts, and the Perfume thread changed what sits either side of it -- movement 3 ends on a dark, static shot of animal skulls and this card then froze for 15 s in silence before Kat's ships. Owner, 2026-08-14: '15:31 entire transition is too weird and long, make it all fit.' The copy is unchanged; only the hold is. Both acts KEEP their numerals and their films -- this merges the announcement, not the acts. ALL OF THE COPY BELOW IS OWNER-AUTHORED, verbatim, and it settled the open question of which title leads: 'retitle this chapter \"BIAS FOR ACTION\" with the subtitle \"The Kat and the Nat\"', plus two logline rows. The second was revised twice by the owner and now reads as a continuation of the first -- 'But not enough volunteers showed up to take notes, leading to some surprises ...'. The two earlier wordings both opened 'Backed by community concensus.'; that sentence is no longer on screen. Reproduced as written, including the capital L in 'Locked' and the spelling 'concensus' -- authored copy is reproduced, never silently corrected, and both are flagged in `unresolved` so the owner can decide rather than discover. Act V's authored title, 'Wrong Place, Wrong Time, Right Attitude', is therefore NO LONGER ON SCREEN anywhere -- it is still act V's name in docs/running-order.md, and whether it should survive on the slide is the owner's to say. The terminal block is act IV's five lines, unchanged and still shared, which is why the two slides collapsed cleanly: they differed only in title."
-    },
-    {
-      "id": "act6",
-      "kind": "act",
-      "at": 668.992,
-      "dur": 5.0,
-      "act": "VI",
-      "label": "Act VI",
-      "title": "7 Days to the Wolves",
-      "subtitle": "Nightwish",
-      "chapters": [
-        "0:00  The orrery approach, and the capture",
-        "3:02  The gallop cuts to neon",
-        "4:19  The crash, and the strand descent",
-        "5:22  The song stops",
-        "6:09  The finale, the Guardians assembled"
-      ],
-      "note": "Title and artist reproduced from the cinematic's own segment record, ~/src/website/src/config/wolves-cinematic.ts (id `seven-days-to-the-wolves`) -- the same two rows the transition slide this card is ported from renders. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): docs/cuts/07-seven-days-to-the-wolves.md's Structure table, in its own words. Its internal 'Act I/II/III' labels are deliberately NOT reproduced -- inside act VI of an eight-act programme they would name the wrong thing."
-    },
-    {
-      "id": "act7",
-      "kind": "act",
-      "retired": true,
-      "retired_note": "RETIRED 2026-08-14 (v2.1) on the owner's instruction: '25:13 don't fade this it's awesome make it a quick cut to europa get rid of the title slide.' The programme no longer plays this card, so act VII has no chapter marker either -- chapters() derives them from slides. The copy below is KEPT rather than deleted: it is authored, it is correct, and restoring the slide should never mean rewriting it. Act VII is the second act with no slide, after act VIII.",
-      "at": 1106.692,
-      "dur": 5.0,
-      "act": "VII",
-      "label": "Act VII",
-      "title": "Europa",
-      "subtitle": "Director's Cut",
-      "chapters": [
-        "0:00  Europa",
-        "0:57  The speeder",
-        "1:24  The Exo Stranger — Laura Santamaria",
-        "1:28  Coming to KubeCon NA",
-        "1:37  Seven Days to the Wolves"
-      ],
-      "note": "~/Videos/Wolves/Prod/README.md and ~/Videos/wolves-review.m3u. The cut itself credits Laura Santamaria; whether this session's 'laura santamaria is orlin' recast reaches it is an open owner question, recorded in megacut-hero-plates.json. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): ~/Videos/wolves-directors-cut/STORYBOARD.md's segment map, confirmed against the frames."
-    }
-  ],
-  "unresolved": [
-    {
-      "what": "act VIII -- no slide, on purpose",
-      "detail": "Act VIII is BUILT and in the programme (#51): the credits, Prod/08-credits.mp4. It is the one act with no slide here, by owner instruction -- 'no credits slide, go right to the metal ... it should surprise the viewer.' Europa fades to black on its own tail and the drum smash lands on the next frame. A slide was built and then removed rather than left in this manifest unused, because this file is what the programme renders. The missing slide also drops act VIII's chapter marker, which chapters() derives from slides -- deliberate, since a 'VIII. Credits' entry on the scrub bar spoils the same surprise.",
-      "automatable": "no",
-      "blocked_on": "nothing -- recorded so the absence is not 'fixed' by a future pass."
-    },
-    {
-      "what": "chapters -- drafted, not authored",
-      "detail": "The owner's instruction is that each act 'will have chapters'. Five acts now carry a drafted list (I, II, III, VI, VII); each line is read off the built film or reproduced from that act's own cut record, and every one is cited in its card's `note`. They are a CONTENTS list, not a second title. Acts IV and V carry none on purpose -- 34s and 25s, one scene each. None of this copy is the owner's yet: it is a first pass to edit, and all of it lives in one place, `plates[].chapters` in this file. A line removed here disappears from the slide; the renderer omits what nobody authored.",
-      "automatable": "no",
-      "blocked_on": "the owner rewriting the drafted lines, or striking them."
-    },
-    {
-      "what": "an act title for act III",
-      "detail": "Act III is named after a person, so its card carries his authored Guardian identity rather than an act title nobody has written. The film under it has no authored title either, which is issue #41.",
-      "automatable": "no",
-      "blocked_on": "the owner authoring an act title, or issue #41."
-    },
-    {
-      "what": "act V's hold",
-      "detail": "The owner asked for act V to carry act IV's terminal block and a new title, and said nothing about its length. It is held 15s like act IV, because the copy is identical and five lines plus a nine-word title do not read in five seconds. That is an inference about pacing, not an instruction -- recorded so it can be cut back without archaeology.",
-      "automatable": "no",
-      "blocked_on": "the owner's eye on the assembled programme."
-    },
-    {
-      "what": "act V's title no longer appears on screen",
-      "detail": "The merged slide is titled 'Bias for Action' with the subtitle 'The Kat and the Nat', both owner-authored. 'Wrong Place, Wrong Time, Right Attitude' -- act V's own authored title -- is not printed anywhere in the programme as a result. It remains act V's name in docs/running-order.md and in this manifest's history. Recorded because losing a title the owner wrote is the kind of thing that should be deliberate, and this one may well be.",
-      "automatable": "no",
-      "blocked_on": "the owner, if they want act V's title back on the slide."
-    },
-    {
-      "what": "one spelling on the act IV-V slide, reproduced as the owner wrote it",
-      "detail": "'With the CNCF Locked in ...' carries a mid-sentence capital L, and it is on screen exactly as authored, because this repo reproduces owner copy and does not silently correct it -- a typo fixed without asking is still somebody else's words changed. One line in this file if the owner wants it. (The earlier 'concensus' spelling left with the logline that carried it.) The revised second row ends with an ellipsis and no full stop, also as written; the owner's message ended it with a stray closing quote mark, which was read as an artifact of their quoting rather than copy and is one character to add back if it was not.",
-      "automatable": "no",
-      "blocked_on": "the owner confirming or correcting the two spellings."
-    }
-  ],
-  "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | intro 5.000-116.567 | act2 116.567-121.567 | endlessformsmostbeautiful 121.567-429.534 | act3 429.534-434.534 | mrbobbytables 434.534-594.734 | act4-5 594.734-609.734 | kat 609.734-643.734 | nat 643.734-668.992 | act6 668.992-673.992 | 7daystothewolves 673.992-1106.692 | act7 1106.692-1111.692 | europa 1111.692-1221.892. Total 1221.892s (20:21.9). Recomputed 2026-08-12 when acts IV and V were given ONE slide; the programme lost 15s and every stamp after act III moved. Nothing here is typed by hand -- re-derive with `python3 tools/megacut.py stories/megacut/megacut.json --chapters`."
+ "_what": "The act slides for Seven Days to the Wolves. One card per act of the programme, in the owner's canonical order, each carrying its Roman numeral. `kind: \"act\"` is the cinematic handoff slide from the website (CinematicTransition.vue), rendered full-frame from its own CSS by cards/render-cards.mjs (cards/act.html).",
+ "_order": "THE CANONICAL ORDER, codified by the owner on 2026-08-12 and settled: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). Eight acts, each announced by a slide carrying a huge Roman numeral. This list is the show's chapter list: see docs/running-order.md, which is the source of truth, and `tools/megacut.py --chapters`, which derives the timestamped markers from the built programme rather than from a hand-typed table.",
+ "_copy": "Chapter card copy is REPRODUCED, never authored. Where an act has no authored title, the row is omitted rather than filled -- see `unresolved`. The only strings the owner wrote for this pass are act II's title and the whole of act IV's terminal block, both quoted back verbatim.",
+ "_chapters": "Every act is to carry chapters, and every `chapters` list below is populated. Five acts -- I, II, III, VI and VII -- carry agent-drafted lists read off the built films, each line cited in its card's `note`; none of those words are the owner's yet, and the rewrite-or-strike decision is recorded in `unresolved`. The merged IV-V slide carries the owner's two authored loglines in the same field, verbatim. A line nobody authored is still omitted, never invented.",
+ "_gaps": "Act VIII has no film and therefore no card: a slide announcing an act that does not play is worse than a recorded gap. It keeps its numeral in `unresolved` so the numbering cannot drift when it is built. Act II had the same gap until 2026-08-12, when it was built (docs/cuts/02-endless-forms-most-beautiful.md) and this card was added.",
+ "_audio": "Every card is silent. Putting a bed under one is a licensing decision, the owner's alone.",
+ "plates": [
+  {
+   "id": "act1",
+   "kind": "act",
+   "at": 0.0,
+   "dur": 5.0,
+   "act": "I",
+   "label": "Act I",
+   "title": "Project Bluefin",
+   "subtitle": "seven days to the wolves",
+   "chapters": [
+    "0:03  Cortney Nickerson",
+    "0:12  Kat Cosgrove",
+    "0:22  Title cover — Rafael Castro, Lakshmi, Bluefin",
+    "0:38  Kaslin Fields",
+    "1:08  Orlin",
+    "1:23  Christoph Blecker",
+    "1:27  Natali Vlatko"
+   ],
+   "note": "Copy is the prologue's final overlay in ~/src/website/src/data/wolves-intro-sequence.ts (source window 78.5 - 94). This card was `card0` before the acts were numbered. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): One line per plate the act actually burns, in order, read off the built file -- stories/megacut/megacut-hero-plates.json for the windows, the frames for confirmation. Orlin's line is name-only because he is name-only ON THE PLATE too (#73: no authored Guardian identity, and this list must not give him one); Cortney Nickerson's is not -- issue #90 authored her label, name and title, with the subclass row withheld until the owner names her class (megacut-hero-plates.json, `unresolved`). The 0:22 line is the title cover that issue #90 put in place of the comic/QR cycle; the owner-authored Amber Graner quote it used to name is gone from the act by the same instruction, and the line names the three the cover's caption boxes credit -- Rafael Castro and Bluefin on their boxes, Lakshmi in the owner's framing line."
+  },
+  {
+   "id": "act2",
+   "kind": "act",
+   "at": 116.567,
+   "dur": 5.0,
+   "act": "II",
+   "label": "Act II",
+   "title": "Endless Forms Most Beautiful",
+   "subtitle": "Nightwish",
+   "chapters": [
+    "0:00  The moon, cold open",
+    "0:06  The moon battle",
+    "0:36  The red dunes",
+    "2:28  The jungle patrol",
+    "3:32  The temple"
+   ],
+   "note": "The owner named this act and its music in one instruction -- 'it's endless forms most beautiful, instrumental' -- and docs/running-order.md carries the title. The artist is reproduced from the bed's own provenance (music/bed_endless_forms_most_beautiful.json, the official Nightwish channel), matching act VI's card, which is a title and an artist for the same reason. The film is docs/cuts/02-endless-forms-most-beautiful.md. The word 'instrumental' is deliberately NOT on the slide: it describes which recording was used, not what the act is called, and nobody authored it as a subtitle. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): The first two are docs/cuts/02-endless-forms-most-beautiful.md's own words for its first two kept runs. The last three are the remaining kept runs, named from what is visibly in frame at each -- the doc records where their boundaries are, not what they show."
+  },
+  {
+   "id": "act3",
+   "kind": "act",
+   "at": 429.534,
+   "dur": 5.0,
+   "act": "III",
+   "label": "Act III",
+   "title": "Bob Killen",
+   "chapters": [
+    "0:00  The Vex assault",
+    "2:00  Osiris — “the end of everything”",
+    "2:32  Thanks for working on Bluefin"
+   ],
+   "note": "This act is `mrbobbytables` -- the film delivered as ~/Videos/Wolves/Prod/03-mrbobbytables.mp4 (was UPLOAD/04-bluefin-contributors-2026-08-curse-of-osiris.mp4). The owner named it and placed it: 'rename this \"mrbobbytables\" ... and then put it in slot three'. The card reproduces his authored Guardian identity -- characters.json slug `bob`, ~/Videos/nameplates.json np_bob -- rather than an act title nobody wrote. His seal, 'Reconciler of the Plane', stays on the plate inside the cut, matching acts V and VII, which give a name and a class and no title. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): Read off the built file: the Vex assault, Osiris's line (already burned in as recovered dialogue), and the contributors card the cut ends on.",
+   "subtitle": "Voidwalker Warlock"
+  },
+  {
+   "id": "act4-5",
+   "kind": "act",
+   "at": 594.734,
+   "dur": 5.0,
+   "act": "IV–V",
+   "body": [
+    "The Knightly Order of Kubernetes sends a lone titan on a secret mission",
+    "Destination: Europa",
+    "TOC Authorization: [ DENIED ]",
+    "TAB Authorization: [ DENIED ]",
+    "CNCF Authorization: [ UNAUTHORIZED ]"
+   ],
+   "title": "Bias for Action",
+   "subtitle": "The Kat and the Nat",
+   "chapters": [
+    "With the CNCF Locked in \"Oh no what do we do?\" mode, two Kubernetes contributors make their own fates.",
+    "But not enough volunteers showed up to take notes, leading to some surprises ..."
+   ],
+   "note": "ONE slide for two acts, owner instruction: 'give kat/nat one slide since those videos are short'. Their films run 34.0s and 25.3s; two 15s slides announced 59.3s of picture, which is what that note is about. It saves 15s of the programme. HELD 5.0 s AS OF v2.2, not 15.0: the long hold was deliberate pacing for a slide announcing two acts, and the Perfume thread changed what sits either side of it -- movement 3 ends on a dark, static shot of animal skulls and this card then froze for 15 s in silence before Kat's ships. Owner, 2026-08-14: '15:31 entire transition is too weird and long, make it all fit.' The copy is unchanged; only the hold is. Both acts KEEP their numerals and their films -- this merges the announcement, not the acts. ALL OF THE COPY BELOW IS OWNER-AUTHORED, verbatim, and it settled the open question of which title leads: 'retitle this chapter \"BIAS FOR ACTION\" with the subtitle \"The Kat and the Nat\"', plus two logline rows. The second was revised twice by the owner and now reads as a continuation of the first -- 'But not enough volunteers showed up to take notes, leading to some surprises ...'. The two earlier wordings both opened 'Backed by community concensus.'; that sentence is no longer on screen. Reproduced as written, including the capital L in 'Locked' and the spelling 'concensus' -- authored copy is reproduced, never silently corrected, and both are flagged in `unresolved` so the owner can decide rather than discover. Act V's authored title, 'Wrong Place, Wrong Time, Right Attitude', is therefore NO LONGER ON SCREEN anywhere -- it is still act V's name in docs/running-order.md, and whether it should survive on the slide is the owner's to say. The terminal block is act IV's five lines, unchanged and still shared, which is why the two slides collapsed cleanly: they differed only in title."
+  },
+  {
+   "id": "act6",
+   "kind": "act",
+   "at": 668.992,
+   "dur": 5.0,
+   "act": "VI",
+   "label": "Act VI",
+   "title": "7 Days to the Wolves",
+   "subtitle": "Nightwish",
+   "chapters": [
+    "0:00  The orrery approach, and the capture",
+    "3:02  The gallop cuts to neon",
+    "4:19  The crash, and the strand descent",
+    "5:22  The song stops",
+    "6:09  The finale, the Guardians assembled"
+   ],
+   "note": "Title and artist reproduced from the cinematic's own segment record, ~/src/website/src/config/wolves-cinematic.ts (id `seven-days-to-the-wolves`) -- the same two rows the transition slide this card is ported from renders. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): docs/cuts/07-seven-days-to-the-wolves.md's Structure table, in its own words. Its internal 'Act I/II/III' labels are deliberately NOT reproduced -- inside act VI of an eight-act programme they would name the wrong thing."
+  },
+  {
+   "id": "act7",
+   "kind": "act",
+   "retired": true,
+   "retired_note": "RETIRED 2026-08-14 (v2.1) on the owner's instruction: '25:13 don't fade this it's awesome make it a quick cut to europa get rid of the title slide.' The programme no longer plays this card, so act VII has no chapter marker either -- chapters() derives them from slides. The copy below is KEPT rather than deleted: it is authored, it is correct, and restoring the slide should never mean rewriting it. Act VII is the second act with no slide, after act VIII.",
+   "at": 1106.692,
+   "dur": 5.0,
+   "act": "VII",
+   "label": "Act VII",
+   "title": "Europa",
+   "subtitle": "Director's Cut",
+   "chapters": [
+    "0:00  Europa",
+    "0:57  The speeder",
+    "1:24  The Exo Stranger — Laura Santamaria",
+    "1:28  Coming to KubeCon NA",
+    "1:37  Seven Days to the Wolves"
+   ],
+   "note": "~/Videos/Wolves/Prod/README.md and ~/Videos/wolves-review.m3u. The cut itself credits Laura Santamaria; whether this session's 'laura santamaria is orlin' recast reaches it is an open owner question, recorded in megacut-hero-plates.json. CHAPTERS (agent-drafted 2026-08-12, the owner's to rewrite): ~/Videos/wolves-directors-cut/STORYBOARD.md's segment map, confirmed against the frames."
+  },
+  {
+   "id": "scream",
+   "kind": "interstitial",
+   "dur": 5.0,
+   "kicker": "On the Linux Desktop",
+   "line": "No one can hear you scream",
+   "note": "Owner 2026-08-14, verbatim: 'let the nat scene keep fading to black then put up a title card \"On the Linux Desktop\" \"No one can hear you scream\" - in a terryfing overlay.' Not an act slide: it announces nothing, carries no chapter (a scrub-bar entry would spoil it), and comes up out of act V's own fade. Rendered by scripts/build_scream_card.py (the Alien one-sheet homage the line invokes -- spaced cold capitals, display chrome only; this entry keeps the owner's casing). Both card renderers skip kind 'interstitial': it is owned by its builder."
+  }
+ ],
+ "unresolved": [
+  {
+   "what": "act VIII -- no slide, on purpose",
+   "detail": "Act VIII is BUILT and in the programme (#51): the credits, Prod/08-credits.mp4. It is the one act with no slide here, by owner instruction -- 'no credits slide, go right to the metal ... it should surprise the viewer.' Europa fades to black on its own tail and the drum smash lands on the next frame. A slide was built and then removed rather than left in this manifest unused, because this file is what the programme renders. The missing slide also drops act VIII's chapter marker, which chapters() derives from slides -- deliberate, since a 'VIII. Credits' entry on the scrub bar spoils the same surprise.",
+   "automatable": "no",
+   "blocked_on": "nothing -- recorded so the absence is not 'fixed' by a future pass."
+  },
+  {
+   "what": "chapters -- drafted, not authored",
+   "detail": "The owner's instruction is that each act 'will have chapters'. Five acts now carry a drafted list (I, II, III, VI, VII); each line is read off the built film or reproduced from that act's own cut record, and every one is cited in its card's `note`. They are a CONTENTS list, not a second title. Acts IV and V carry none on purpose -- 34s and 25s, one scene each. None of this copy is the owner's yet: it is a first pass to edit, and all of it lives in one place, `plates[].chapters` in this file. A line removed here disappears from the slide; the renderer omits what nobody authored.",
+   "automatable": "no",
+   "blocked_on": "the owner rewriting the drafted lines, or striking them."
+  },
+  {
+   "what": "an act title for act III",
+   "detail": "Act III is named after a person, so its card carries his authored Guardian identity rather than an act title nobody has written. The film under it has no authored title either, which is issue #41.",
+   "automatable": "no",
+   "blocked_on": "the owner authoring an act title, or issue #41."
+  },
+  {
+   "what": "act V's hold",
+   "detail": "The owner asked for act V to carry act IV's terminal block and a new title, and said nothing about its length. It is held 15s like act IV, because the copy is identical and five lines plus a nine-word title do not read in five seconds. That is an inference about pacing, not an instruction -- recorded so it can be cut back without archaeology.",
+   "automatable": "no",
+   "blocked_on": "the owner's eye on the assembled programme."
+  },
+  {
+   "what": "act V's title no longer appears on screen",
+   "detail": "The merged slide is titled 'Bias for Action' with the subtitle 'The Kat and the Nat', both owner-authored. 'Wrong Place, Wrong Time, Right Attitude' -- act V's own authored title -- is not printed anywhere in the programme as a result. It remains act V's name in docs/running-order.md and in this manifest's history. Recorded because losing a title the owner wrote is the kind of thing that should be deliberate, and this one may well be.",
+   "automatable": "no",
+   "blocked_on": "the owner, if they want act V's title back on the slide."
+  },
+  {
+   "what": "one spelling on the act IV-V slide, reproduced as the owner wrote it",
+   "detail": "'With the CNCF Locked in ...' carries a mid-sentence capital L, and it is on screen exactly as authored, because this repo reproduces owner copy and does not silently correct it -- a typo fixed without asking is still somebody else's words changed. One line in this file if the owner wants it. (The earlier 'concensus' spelling left with the logline that carried it.) The revised second row ends with an ellipsis and no full stop, also as written; the owner's message ended it with a stray closing quote mark, which was read as an artifact of their quoting rather than copy and is one character to add back if it was not.",
+   "automatable": "no",
+   "blocked_on": "the owner confirming or correcting the two spellings."
+  }
+ ],
+ "_timeline": "Each `at` is the card's true position in the assembled programme, so this manifest doubles as the running-order record. act1 0.000-5.000 | intro 5.000-116.567 | act2 116.567-121.567 | endlessformsmostbeautiful 121.567-429.534 | act3 429.534-434.534 | mrbobbytables 434.534-594.734 | act4-5 594.734-609.734 | kat 609.734-643.734 | nat 643.734-668.992 | act6 668.992-673.992 | 7daystothewolves 673.992-1106.692 | act7 1106.692-1111.692 | europa 1111.692-1221.892. Total 1221.892s (20:21.9). Recomputed 2026-08-12 when acts IV and V were given ONE slide; the programme lost 15s and every stamp after act III moved. Nothing here is typed by hand -- re-derive with `python3 tools/megacut.py stories/megacut/megacut.json --chapters`."
 }

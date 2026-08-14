@@ -1621,6 +1621,12 @@ def render_plate(spec):
             "which uses the website's own CSS. tools/plate.py burns them, it "
             "does not draw them."
         )
+    if spec.get("kind") == "interstitial":
+        raise ValueError(
+            f"plate {spec.get('id')!r} is an interstitial card: render it with "
+            "its own builder (scripts/build_scream_card.py). tools/plate.py "
+            "neither draws nor burns it."
+        )
     if spec.get("kind") == "chat":
         return _render_chat(spec)
     if spec.get("kind") == "companion":
@@ -2988,6 +2994,11 @@ def render_all(entries, out_dir, picture=None):
     written, skipped = [], []
     for e in entries:
         if e.get("kind") in CARD_KINDS:
+            skipped.append(e["id"])
+            continue
+        if e.get("kind") == "interstitial":
+            # Owned by its own builder (scripts/build_scream_card.py); neither
+            # full-frame renderer draws it, exactly like the site's cards.
             skipped.append(e["id"])
             continue
         dest = out_dir / f"plate_{e['id']}.png"
