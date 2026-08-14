@@ -52,13 +52,21 @@ def test_every_dialogue_plate_is_a_chat_pill_in_the_letterbox(any_act):
 
 
 def test_the_words_are_the_owners(doc):
-    """The copy is a RECORD of what shipped, reproduced, never re-authored."""
+    """The copy is a RECORD of what shipped, reproduced, never re-authored.
+
+    The last three are #118's Linux-desktop exchange, dictated 2026-08-13 and
+    confirmed in scope (and in nothing else's scope) on 2026-08-14 -- owner
+    copy, verbatim, landed 2026-08-14.
+    """
     assert [(c["speaker"], c["text"]) for c in doc["plates"]] == [
         ("kat", "Open telnet port?"),
         ("ian", "Look it up baby!"),
         ("tabbysable", "How come no one's shooting at you?"),
         ("cailyn-codes", "Security by hyperspace?"),
         ("kat", "Remember kids, cardio!"),
+        ("kat", "I miss ONE email now I gotta use a Linux desktop?"),
+        ("kat", "I miss ingress-nginx sometimes"),
+        ("kat", "Fine I'll fix your shit too"),
     ]
 
 
@@ -138,6 +146,25 @@ def test_every_cue_becomes_one_input_in_order(any_act):
     assert offsets == [f"{float(c['at']):g}" for c in actbuild._cues(any_act)]
     # source + the pills + the reveal + the bed
     assert cmd.count("-i") == len(any_act["plates"]) + 3
+
+
+def test_avatar_paths_resolve_in_both_recorded_shapes():
+    """Act IV's record carries ~-rooted paths; act V's carries bare names.
+
+    Joining a ~-rooted value onto the project made `render/~/Videos/...` and
+    every pill silently fell back to the drawn crest -- a regression against
+    the delivered master, whose pills carry the cast's photographs.
+    """
+    rooted = actbuild._resolve_avatar("/proj", "~/Videos/wolves-kat/render/kat.jpg")
+    assert rooted == str(Path("~/Videos/wolves-kat/render/kat.jpg").expanduser())
+    bare = actbuild._resolve_avatar("/proj", "kat.jpg")
+    assert bare == "/proj/render/kat.jpg"
+    # and the committed act IV record really does carry the rooted shape
+    doc = actbuild.load_act("IV")[0]
+    resolved = actbuild._project_manifest(doc, "/proj")
+    resolved = json.loads(resolved.read_text(encoding="utf-8"))
+    assert all(not p["avatar"].startswith("/proj")
+               for p in resolved["plates"] if p.get("avatar"))
 
 
 def test_the_reveal_is_taken_from_the_project_not_rendered(any_act):
@@ -222,7 +249,8 @@ def test_only_the_act_that_fades_to_black_gets_a_final_fade():
     assert "fade_out" not in kat["trim"]
     # the last overlay writes [vout] directly -- nothing follows it
     assert kgraph.endswith("[apre]anull[aout]")
-    assert "[t6]" not in kgraph
+    next_label = f"[t{len(kat['plates']) + 1}]"
+    assert next_label not in kgraph
 
 
 def test_the_loop_framerate_is_per_act_not_assumed():

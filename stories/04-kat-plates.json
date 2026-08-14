@@ -98,6 +98,48 @@
       "fade_out_at": 28.15,
       "fade_out": 0.25,
       "_note": "Kat answers the other three, so her line is deliberately last. The window is pinned by a MEASURED crescendo, not a guess: the bed is a compressed-flat master (~-14 dB throughout) so gross RMS barely moves, but the >2 kHz band climbs from -6.26 dB at 27.0 to a peak -3.13 dB at 29.0-29.25 while broadband RMS lifts off a -15.3 dB trough to the bed's loudest point at 29.0. The crescendo arrives at ~28.0-28.5; the plate is fully gone at 28.40. DOCUMENTED COMPROMISE: the owner asked for this line 'while climbing stairs', and there is NO STAIRCASE anywhere in 0-34s -- verified by frame inspection across all twelve shots, not assumed. It is anchored to the closest available match, the prone hull climb at 23.05-29.17."
+    },
+    {
+      "id": "p5-kat",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "kat",
+      "text": "I miss ONE email now I gotta use a Linux desktop?",
+      "avatar": "~/Videos/wolves-kat/render/kat.jpg",
+      "at": 17.0,
+      "dur": 2.4,
+      "fade_in": 0.6,
+      "fade_out_at": 19.15,
+      "fade_out": 0.25,
+      "_note": "#118's Linux-desktop exchange, line 1 of 3, owner copy VERBATIM (confirmed in scope 2026-08-14 as 'the linux desktop stuff'). The owner's note puts this and the next line right after the nameplate reveal, but the reveal holds to 11.0 and p1-kat opens at 12.2 -- the gap (1.2s) cannot hold a 45-char line at the house read length, and every later gap before the p4-kat exchange is 0.7s except one. This is that one: the only window after the reveal that fits a house-length pill without overlapping an existing line, 16.90-20.20 between Ian's answer and tabbysable. It sits over the tail of the 15.82-19.85 rapid-cut cluster (rides the measured cuts at 17.75 and 18.65) -- the plate-free-cluster rule broken DELIBERATELY on the owner's instruction, same as p1b-ian, and recorded here rather than quietly re-timed. Clears 0.22s BEFORE the measured cut at 19.62, mirroring p1-kat's 0.23s clearance before 14.833."
+    },
+    {
+      "id": "p6-kat",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "kat",
+      "text": "I miss ingress-nginx sometimes",
+      "avatar": "~/Videos/wolves-kat/render/kat.jpg",
+      "at": 28.7,
+      "dur": 2.0,
+      "fade_in": 0.6,
+      "fade_out_at": 30.45,
+      "fade_out": 0.25,
+      "_note": "#118's Linux-desktop exchange, line 2 of 3, owner copy VERBATIM. The note orders it right after p5, but the 16.90-20.20 window holds only one house-length pill, and the two mid gaps (22.6-23.3, 25.3-26.0) are 0.7s each, so the exchange resumes in the first free window after the p4-kat crescendo line. DOCUMENTED COMPROMISE: this reads as a later-third line rather than an immediately-after-the-reveal one, because the note's sequence cannot fit the dialogue the act already plays; the note's ORDER (p5 before p6 before p7) is kept exactly. dur 2.0 is the house short-read (matching 'Security by hyperspace?'); the 0.3s gap after p4-kat's fade matches the house tightest gap (p1-kat -> p1b-ian)."
+    },
+    {
+      "id": "p7-kat",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "kat",
+      "text": "Fine I'll fix your shit too",
+      "avatar": "~/Videos/wolves-kat/render/kat.jpg",
+      "at": 31.0,
+      "dur": 2.0,
+      "fade_in": 0.6,
+      "fade_out_at": 32.75,
+      "fade_out": 0.25,
+      "_note": "#118's Linux-desktop exchange, line 3 of 3, owner copy VERBATIM. The note marks it 10:27 -- MEGACUT time on the v0.6 clock (acts IV-V sat 10:10-11:08 there); on the current plan the clock has moved and 10:27 lands in act III, so per the owner's 2026-08-14 confirmation it places in the act film's LATER THIRD instead: this is the last free window, hard after p6. Clears 0.1s BEFORE the final measured cut at 33.1, leaving the closing shot (33.1-34.0) and the bed's 33.5 fade plate-free, so the act still lands clean. Kat gets the exchange's punchline over the film's final breath, which is where the 10:27 mark always read."
     }
   ],
   "cut_list": [
@@ -114,7 +156,7 @@
     29.17,
     33.1
   ],
-  "_cut_list_note": "scene>0.2 within 0-34s. The 15.82-19.85 rapid-cut cluster was kept plate-free until the owner pinned Ian's answer into its first second; see p1b-ian.",
+  "_cut_list_note": "scene>0.2 within 0-34s. The 15.82-19.85 rapid-cut cluster was kept plate-free until the owner pinned two lines into it: Ian's answer into its first second (see p1b-ian) and the first #118 line over its tail (see p5-kat).",
   "bed": {
     "file": "music-kat-neutral.wav",
     "track": "dArtagnan - Holding out for a Hero",
