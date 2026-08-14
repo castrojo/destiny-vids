@@ -100,23 +100,109 @@ padded, not scaled, so the prologue plays in bars; the bridge is full-frame
 16:9, and act I after it is too. Leaving somebody else's picture and entering
 the film is visible in the shape of the frame.
 
-## The scrim, which the first build did not have
+## The sparks, and why the fix is level and not a limiter
+
+The owner on the first cut:
+
+> the sparks in the beginning of the video is jarring audio for the audience,
+> tone them down the best you can
+
+Two separate things were wrong.
+
+### The master was above full scale
+
+It measured **+0.4 dBTP**. Every other act in this show passes
+`tools/peaks.py`, which lands a master in the **−0.9…−1.1 dBTP** band by static
+gain; this build never ran it. That is the same systemic miss as issue #82 —
+the deliverable gets checked and the master does not — and it is fixed by the
+same tool. The master is **−1.1 dBTP** now.
+
+### The sparks stood 13–18 dB above the bed
+
+| | |
+|---|---|
+| Sustained level, first 13 s | −13 … −18 dB RMS |
+| Spark transients | repeatedly **~0 dBFS** |
+| Source master, decoded | peaks to **+1.9 dBFS** — already clipped |
+
+The source is Nightwish's own loud master. Nothing here un-clips it.
+
+**No compressor, no limiter, no normaliser.** The audio tenet forbids dynamics
+processing on finished music, and it is the wrong tool anyway: squashing these
+transients would dull the crackle into mush. The sanctioned lever is **level**.
+
+So `scripts/build_prologue.py` rides the level across the opening, as an
+evaluated `volume` expression — automation, not a filter that reshapes
+dynamics:
+
+```
+gain(t) = −12 · (1 − (t/12.28)²)  dB,  and 0 dB from 12.28 onward
+```
+
+**The shape is the cut's.** The picture is a dark void until the 12.28 shot
+change, so the ride reaches unity exactly there: the sparks are held down
+precisely where they live, and full level arrives on the film's biggest visual
+event instead of on a black screen. Nothing after 12.28 is touched.
+
+Measured on the delivered file, against the same points before:
+
+| Moment | Before | After | |
+|---|---|---|---|
+| 0.864 s | −0.08 dBFS | **−13.5** | 13.4 dB down |
+| 9.504 s | −0.000001 dBFS | **−5.8** | 5.8 dB down |
+| True peak | +0.4 dBTP | **−1.1 dBTP** | in band |
+
+Every transient is still there. None of them arrives at full scale.
+
+**Source quality, recorded rather than assumed** (the tenet's rule 2, missed
+when the bed record was created): band energy above a swept 6-pole highpass
+runs −55.4 dB at 14 kHz to −78.9 dB at 20.5 kHz — a **smooth roll-off with no
+brickwall**, consistent with a healthy 48 kHz Opus rung. The numbers are in
+`music/bed_perfume_of_the_timeless.json`.
+
+### One process note worth keeping
+
+The first attempt at the gate produced a master **250 frames short**, with FLAC
+decode errors — because a render had been stopped and a second render started
+against the same output path before the first one's ffmpeg had actually gone.
+Two encoders on one file. The fix was to rebuild and **verify the master's
+frame count and clean decode before trimming**, which is now the order things
+are done in: build → verify → gate → verify → publish.
+
+## The lockup: a blue B, and no box
+
+Two owner corrections, both applied.
+
+> don't forget the blue b … the words are fine just color in the b
+
+The eyebrow stays as **type** — the real wordmark was the alternative and was
+declined — and only the **B** of BLUEFIN is coloured. The value is not chosen:
+`#4285f4` is the published fill of the fin ligature in Project Bluefin's own
+mark (`scripts/fetch_wordmark.py` recolours that mark's black type for dark
+backgrounds and leaves exactly this blue untouched), so the one coloured letter
+carries the same value the one coloured element of the real mark does. The
+manifest names the *word* (`accent: "BLUEFIN"`) rather than a character offset,
+so editing the copy cannot silently move the colour onto a different letter.
+
+> remove the black transclucent box around the words
+
+Gone. The scrim below was the right diagnosis and the wrong object: a panel
+behind titles over moving picture reads as a box, because it is one. The
+legibility problem it solved is real, so it moved onto the **glyphs** — a tight
+near-opaque core that gives each letterform its own edge, plus two wider soft
+falloffs. Same protection, travelling with the letters, with no edge of its
+own. Verified against the 12.28 starburst and the pale haze at 16 s, which are
+the two frames that defeated the plain site shadow.
+
+## The scrim that used to be here
 
 The first pass put the lockup over bare picture, reasoning that the frame at
 0:11 is near-black. It is — for 1.3 seconds. After 12.28 the source goes to a
 white starburst and then a pale haze, and in the built file the eyebrow and the
-credit pair were **unreadable** across most of the title's own window.
+credit pair were **unreadable** across most of the title's own window. That is
+why some protection is not optional; only its *form* changed, per the owner's
+note above.
 
-So the card carries `cards/act.html`'s radial scrim, at a strength chosen for
-type over moving picture rather than over a slide — the act card sits at 88%
-black because nothing is behind it, and 88% here would throw the shot away. The
-credit rows also moved off `--wc-grey` (#8b8f96, right on a black slide,
-invisible here) onto **#cbd5e1**, which is not a new value: it is the site's own
-secondary text colour, from `.wolves-intro-overlay-text-slim-line2`.
-
-**The scrim lives on the card, not in the filtergraph**, so it fades up and
-down with the text it protects and can never outlive the title and sit on bare
-footage.
 
 ## The copy is reproduced, and one treatment is swapped
 
@@ -189,10 +275,9 @@ rights shape, and it carries a **real** measured grid — 129.199 bpm, 507.008 s
 - **Where it sits.** The request said *"transition to endless forms"*; the
   placement chosen was *in front of act I*. It plays `PROLOGUE → I → II` today.
   Moving it is one reordered item in `megacut.json`.
-- **The wordmark.** `PROJECT BLUEFIN` is set as type, because that is what the
-  site's own cue carries. Act VIII uses the real mark
-  (`scripts/fetch_wordmark.py`); swapping it in here is an owner call about the
-  lockup, not a correctness fix.
+- ~~The wordmark.~~ **Settled**: the owner asked for the words to stay as type
+  with only the B coloured. `scripts/fetch_wordmark.py` remains the route if it
+  is ever revisited.
 - **Michroma**, the site's display face for this overlay, is not installed on
   this host, so the card resolves the act slides' stack (`Inter`,
   `Arial Narrow` → DejaVu Sans) exactly as `cards/act.html` does. That keeps

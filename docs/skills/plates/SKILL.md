@@ -154,10 +154,13 @@ This skill is the contract. The procedure lives in `references/`:
   moment it is not. Measure the luma across the card's own window
   (`signalstats` → `YAVG`) instead of judging it on the frame you cued to: the
   prologue's main title was cued over a near-black void and the source cut to a
-  white starburst 1.3 s later, inside the same card. The fix is `act.html`'s
-  radial scrim at a strength chosen for picture, not the slide's 88% black —
-  and it belongs **on the card**, not in the filtergraph, so it fades with the
-  type it protects and can never outlive it and sit on bare footage.
+  white starburst 1.3 s later, inside the same card.
+- **Protecting that type with a panel behind it.** A scrim is the right
+  diagnosis and the wrong object — over moving picture it reads as a box,
+  because it is one, and the owner will say so. Put the protection on the
+  **glyphs**: a tight near-opaque core plus wider soft falloffs travels with
+  the letterforms and has no edge of its own. `act.html`'s radial wash is for
+  a slide, where nothing is behind it.
 - **A looped still overlaid on a finite picture, without a bound.**
   `loop=loop=-1` is an INFINITE stream, and `overlay`'s framesync keeps
   producing output after the *main* input ends, repeating its last frame.
