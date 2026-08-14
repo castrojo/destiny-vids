@@ -150,3 +150,84 @@ def test_the_source_is_never_committed(thread):
     source = REPO_ROOT / thread["source"]
     assert source.parent.name == "media", (
         "footage lives in gitignored media/; the manifest carries timecodes")
+
+
+# --- the owner's join pass, 2026-08-14 (v2.1) -------------------------------
+#
+# Four notes taken while watching v2.0. They are asserted here rather than
+# left in the plan alone because three of them are ZEROES -- a fade that is
+# absent looks identical to a fade nobody thought about, and the next person
+# to "tidy up" the plan would put them back.
+
+ACT_VI = "06-7daystothewolves"
+COMIC_CUT = 431.267   # act VI's last shot change: comic cover AND fade start
+
+
+def _item(plan, needle):
+    return next(i for i in plan["items"]
+                if needle in (i.get("path") or i.get("image", "")))
+
+
+def test_act_six_is_cut_at_the_comic(plan):
+    """One frame removes the comic cover and the song's fade-out together.
+
+    Measured: 431.267 is act VI's last shot change. The cover comes up on it
+    and holds 12.2 s to the end, and the audio is at full level right up to
+    it (-12.6 dB) and decaying immediately after. The owner asked for both to
+    go, and both go with one cut.
+    """
+    assert _item(plan, ACT_VI)["trim_to"] == COMIC_CUT
+
+
+def test_the_trim_keeps_every_tail_credit(plan):
+    """A dropped credit is not recoverable by a revert.
+
+    Act VI's tail plates -- the Cayde-6 reveal and the three gold credits --
+    all end well before the cut. This reads the plate manifest rather than
+    trusting a number copied into a comment.
+    """
+    plates = json.loads(
+        (REPO_ROOT / "stories" / "06-wolves-cayde-plates.json").read_text())
+    last = max(p["at"] + p.get("dur", 0) for p in plates["plates"])
+    assert last < COMIC_CUT, (
+        f"the trim at {COMIC_CUT} would cut a credit ending at {last}")
+
+
+def test_the_wolves_join_is_hard_on_both_sides(plan):
+    """'go right into the next song' -- no fade either side of the join."""
+    assert _item(plan, ACT_VI).get("fade_out", 0) == 0
+    assert _item(plan, "perfume-4")["fade_in"] == 0
+
+
+def test_europa_has_no_slide_and_takes_a_quick_cut(plan):
+    """'make it a quick cut to europa get rid of the title slide.'"""
+    images = [i.get("image", "") for i in plan["items"]]
+    assert not any("plate_act7" in img for img in images), (
+        "act VII's title slide is meant to be gone")
+    assert _item(plan, "perfume-4")["fade_out"] == 0
+    assert _item(plan, "07-europa")["fade_in"] == 0
+
+
+def test_act_seven_therefore_has_no_chapter_marker(plan):
+    """The cost of the instruction, asserted so it cannot be re-added quietly.
+
+    chapters() derives markers from slides. No slide means no marker, exactly
+    as for act VIII. If somebody restores a VII card they must decide about
+    the hard cut too, and this test is where they find that out.
+    """
+    chapters = [i.get("chapter") for i in plan["items"] if i.get("chapter")]
+    assert not any("VII." in c for c in chapters)
+    assert len(chapters) == 5
+
+
+def test_the_two_dramatic_joins_carry_no_audio_dip(plan):
+    """Where the picture does the work, the sound must not duck under it.
+
+    12:43 -- act III blooms to white and movement 3 falls out of the sky.
+    27:03 -- Europa fades to black and movement 5 opens on a dark Earth limb
+    that holds 3.5 s before the sunrise. Both had a fade-out meeting a
+    fade-in, which is a hole in the sound at the exact moment the cut lands.
+    """
+    assert _item(plan, "03-mrbobbytables")["fade_out"] == 0
+    assert _item(plan, "perfume-3")["fade_in"] == 0
+    assert _item(plan, "perfume-5")["fade_in"] == 0
