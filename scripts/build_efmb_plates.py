@@ -427,9 +427,10 @@ RANK_CHROME = {
 # --- "THE LONG WALK" (owner brief, this round) -----------------------------
 #
 # A chapter inside act II, in the jungle: GloriousEggroll walking with Nobara
-# chrome, HikariKnight and A1RM4X as his peers, and NOBODY ELSE -- "No other
-# guardians", which is why Rizzo, HuntedRaven7, hanthor and Ahmed Adan came
-# out of the lists above.
+# chrome, A1RM4X as his peer, and NOBODY ELSE -- "No other guardians", which is
+# why Rizzo, HuntedRaven7, hanthor and Ahmed Adan came out of the lists above.
+# HikariKnight was the third name here and the owner has since cut him too
+# ("remove hikari from the eggroll scene"), so the walk is two Guardians.
 #
 # TWO CLOCKS AGAIN, AND THEY ARE NOT THE ONES ISSUE #98 USED. The owner gave
 # this round's marks off the MEGACUT (`tools/megacut.py --locate`), where act
@@ -506,8 +507,12 @@ WALK_SEQUENCE = [
      "text": "Half the trick is looking good", "hold": 2.6},
     {"cue": "line", "id": "walk_ge_3", "speaker": "GloriousEggroll",
      "text": "This Nobara Horse Armor Proton Edition will slay", "hold": 3.4},
-    {"cue": "plate", "key": "HikariKnight", "src": 193.800, "hold": 2.8,
-     "why": "the peer beside him -- Kyle's chrome, Kyle's label"},
+    # HIKARIKNIGHT IS OUT, owner instruction: "remove hikari from the eggroll
+    # scene". His plate sat at 193.800 (film 170.667). Only the SCHEDULING is
+    # gone -- his authored copy stays in vocab/casting.yaml and he keeps every
+    # other claim on the show, exactly as Rizzo and Ahmed Adan did when this
+    # chapter took their shots. A1RM4X is pinned to his own anchor below, so
+    # nothing slides up into the hole.
     # 195.267 is the shot HuntedRaven7's credit used to hold. It is free now,
     # and putting A1RM4X there is what lets the next line land ON the owner's
     # 4:59 instead of 1.3 s late behind a plate.
@@ -1643,9 +1648,14 @@ def build():
             "GloriousEggroll's name row is the handle he was written in as; "
             "GitHub records him as Thomas Crider. Which goes on the card is "
             "the owner's call",
-            "no title row is authored for GloriousEggroll, HikariKnight or "
-            "A1RM4X -- their affiliation rides as chrome and the row is "
-            "omitted rather than composed",
+            "no title row is authored for GloriousEggroll or A1RM4X -- their "
+            "affiliation rides as chrome and the row is omitted rather than "
+            "composed",
+            "HikariKnight is no longer credited in act II, owner: 'remove "
+            "hikari from the eggroll scene'. His plate sat at source 193.800 "
+            "(film 2:50.667). His authored copy stays in vocab/casting.yaml "
+            "and only the scheduling went -- he is owed a credit elsewhere "
+            "and nobody has decided where",
             "the owner's own chat pills still have no pfp: `castrojo` is a "
             "lead, his identity lives on the `cayde_6` binding, and no avatar "
             "is recorded on it. The drawn crest stands in on the montage's "

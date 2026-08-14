@@ -62,6 +62,18 @@ What changed:
 - **`blueberry_Giklab` is gone** — the SHOT came out, so the roster is not
   reshuffled behind him and nobody else moved into the slot.
 
+### HikariKnight is out of the walk
+
+Owner: *"remove hikari from the eggroll scene."* His plate sat at source
+193.800 (film **2:50.667**), between GloriousEggroll's Nobara line and A1RM4X.
+
+Only the **scheduling** went. His authored copy stays in `vocab/casting.yaml`,
+exactly as Rizzo's and Ahmed Adan's did when this chapter took their shots, and
+he is owed a credit elsewhere — recorded in `unresolved`. A1RM4X is pinned to
+his own source anchor, so nothing slid up into the hole and
+`walk_ge_stream` still lands on the owner's 4:59 mark to the frame. The walk is
+two Guardians now.
+
 ### The Long Walk card was on Karena's jump
 
 Owner, on the programme: *"there's an erroneous long walk in the part with
@@ -304,7 +316,6 @@ tool, never by hand.
 | 2:10.267 | Dylan Taylor *(placeholder)* | The Titan walking out of the dark |
 | 2:27.801 | *"The Long Walk"* | The chapter card, on the walk it names |
 | 2:37.067 | **GloriousEggroll** | He takes the frame, walking — Nobara chrome |
-| 2:50.667 | **HikariKnight** | The peer beside him — Kyle's chrome, Kyle's label |
 | 2:53.717 | **A1RM4X** | Up before the line that talks to him |
 | 3:34.734 | **KERNEL REGRESSION** | The villain, on the winged figure — not a person |
 | 4:29.700 | **Kyle Gospodnetich** | The Sentinel raising the Void shield — **on the downbeat** |
@@ -328,8 +339,8 @@ The two placeholders are people the owner **named** with no plate written yet
 
 ### "The Long Walk" — the chapter inside the act
 
-Owner brief, this round: a chapter in the jungle with GloriousEggroll walking,
-HikariKnight and A1RM4X as his peers, his dialogue, an `UPSTREAM PATCH QUEUE`
+Owner brief: a chapter in the jungle with GloriousEggroll walking,
+A1RM4X as his peer, his dialogue, an `UPSTREAM PATCH QUEUE`
 HUD when the green-eyed enemies arrive, and a **KERNEL REGRESSION** miniboss
 bar when the villain does. **"No other guardians"** — so four credits came out
 of this window: **William Rizzo** (2:41.767), **HuntedRaven7** (2:51.801),
