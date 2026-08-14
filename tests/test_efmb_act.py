@@ -860,3 +860,30 @@ def test_no_card_rides_onto_karenas_jump():
     assert card["at"] - walk_in == pytest.approx(
         build_efmb_plates.WALK_CARD_LEAD, abs=1e-3)
     assert card["dur"] >= build_efmb_plates.MIN_HOLD
+
+
+
+def test_hikariknight_is_out_of_the_eggroll_scene():
+    """Owner: "remove hikari from the eggroll scene."
+
+    Only the SCHEDULING goes -- his authored copy stays in the vocab, the way
+    Rizzo's and Ahmed Adan's did when this chapter took their shots -- and
+    nothing slides up into the hole, because every other cue in the walk is
+    pinned to its own source anchor.
+    """
+    manifest = build_efmb_plates.build()
+    ids = {p["id"] for p in manifest["plates"]}
+    assert "walk_HikariKnight" not in ids
+    assert not any("hikari" in i.lower() for i in ids)
+    assert any("hikari" in u.lower() for u in manifest["unresolved"]), \
+        "a dropped credit is recorded, never silently gone"
+
+    casting = build_efmb_plates.load_casting()
+    build_efmb_plates.authored_copy("HikariKnight", casting)  # raises if gone
+
+    # The line the owner timed to 4:59 still lands on his second.
+    by_id = {p["id"]: p for p in manifest["plates"]}
+    lead = build_efmb.derive_lead()
+    assert by_id["walk_ge_stream"]["at"] == pytest.approx(
+        build_efmb.film_for_source(build_efmb_plates.WALK_MARK_STREAM, lead),
+        abs=1e-3)

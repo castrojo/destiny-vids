@@ -806,20 +806,6 @@
       "position": "left"
     },
     {
-      "id": "walk_HikariKnight",
-      "copy_source": "casting",
-      "seen_at_src": 193.8,
-      "why": "the peer beside him -- Kyle's chrome, Kyle's label",
-      "label": "BLUEBERRY // MAINTAINER",
-      "name": "HikariKnight",
-      "variant": "bazzite",
-      "avatar": "renders/avatars/HikariKnight.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4",
-      "at": 170.667,
-      "dur": 2.8,
-      "position": "left"
-    },
-    {
       "id": "walk_A1RM4X",
       "copy_source": "casting",
       "seen_at_src": 195.267,
@@ -829,7 +815,7 @@
       "variant": "youtube",
       "avatar": "renders/avatars/A1RM4X.png",
       "avatar_url": "https://yt3.googleusercontent.com/ytc/AIdro_kCixIw5CtOKMcqo_p8ZSDwYXoGQZ2TB5NzA7Lag-n_ByM=s900-c-k-c0x00ffffff-no-rj",
-      "at": 173.717,
+      "at": 171.801,
       "dur": 3.0,
       "position": "left"
     },
@@ -1162,7 +1148,8 @@
     "the two contributors who held the shots 'The Long Walk' took (HuntedRaven7 at source 195.267 and hanthor at 233.500) are no longer credited in act II. The owner's instruction for the chapter is 'No other guardians'; they are owed a credit elsewhere and nobody has decided where",
     "William Rizzo and Ahmed Adan lose their act II badges to the same instruction. Rizzo's authored copy stays in vocab/casting.yaml and Ahmed stays in ensemble.placeholders, so only the scheduling went",
     "GloriousEggroll's name row is the handle he was written in as; GitHub records him as Thomas Crider. Which goes on the card is the owner's call",
-    "no title row is authored for GloriousEggroll, HikariKnight or A1RM4X -- their affiliation rides as chrome and the row is omitted rather than composed",
+    "no title row is authored for GloriousEggroll or A1RM4X -- their affiliation rides as chrome and the row is omitted rather than composed",
+    "HikariKnight is no longer credited in act II, owner: 'remove hikari from the eggroll scene'. His plate sat at source 193.800 (film 2:50.667). His authored copy stays in vocab/casting.yaml and only the scheduling went -- he is owed a credit elsewhere and nobody has decided where",
     "the owner's own chat pills still have no pfp: `castrojo` is a lead, his identity lives on the `cayde_6` binding, and no avatar is recorded on it. The drawn crest stands in on the montage's two pills, the 4:51 gaslighting pill, and his closing quote",
     "the 2:19 lead-in banner (owner: \"setting up this scene it's important\") has no authored copy, so nothing is emitted for it -- the TOC exchange's first line takes its slot",
     "the CNCF logo the brief marks as [CNCF LOGO] on each announcement has no asset in this repo; the cards render without it",
