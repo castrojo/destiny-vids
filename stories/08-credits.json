@@ -65,8 +65,10 @@
   ],
   "names_per_wall": 48,
   "wordmark": {
-    "_what": "Owner: 'then finish with a final stylized bluefin wordmark in large: Bluefin'. Its B is set in the film's blue like every other B in the sequence.",
+    "_what": "The REAL Project Bluefin wordmark, not the word typeset in the deck's font. Cached by scripts/fetch_wordmark.py from ublue-os/universal-blue-org content/ocis/bluefin.svg -- NOT ublue-os/artwork, which is wallpapers only and carries no wordmark in any branch or release. Reversed for this background by recolouring the black type to white; the fin's own #4285f4 is left exactly as published and no geometry is touched.",
     "text": "Bluefin",
+    "sub": "an ublue project",
+    "source": "ublue-os/universal-blue-org:content/ocis/bluefin.svg",
     "dur_sec": 10.0
   },
   "unresolved": [
@@ -557,12 +559,14 @@
     {
       "person": "Laura Santamaria",
       "character": "Elsie Bray",
-      "character_id": "elsie_bray"
+      "character_id": "elsie_bray",
+      "card": "laura"
     },
     {
       "person": "Laura Santamaria",
       "character": "Nimbatus",
-      "character_id": "nimbatus"
+      "character_id": "nimbatus",
+      "card": "laura"
     },
     {
       "person": "Joanna Lee",
@@ -587,7 +591,8 @@
     {
       "person": "Bob Killen",
       "character": "Osiris",
-      "character_id": "osiris"
+      "character_id": "osiris",
+      "card": "bob"
     },
     {
       "person": "Lindsay Gendreau",
@@ -597,7 +602,8 @@
     {
       "person": "Kat Cosgrove",
       "character": "Saint-14",
-      "character_id": "saint_14"
+      "character_id": "saint_14",
+      "card": "kat"
     },
     {
       "person": "Karena Angell",
@@ -629,5 +635,11 @@
       "character": "Iron Lord Red Haired",
       "character_id": "iron_lord_red_haired"
     }
-  ]
+  ],
+  "cast_hold_sec": 4.0,
+  "cast_logins": {
+    "_what": "VERIFIED GitHub logins for cast members who have no authored Guardian card. Hand-maintained: --refresh-contributors will not overwrite it. This lives here rather than in vocab/casting.yaml's `github:` field -- which is its proper home -- because casting.yaml is a committed input to all six delivered acts, so editing it marks every one of them stale (#167). Move these across when that freeze lifts. Each was checked by matching the ACCOUNT'S OWN name against the credited name; a login that only matches a character name is the nimbatus/nimbinatus trap and is never used. github.com/kat is named just 'Kat' and is NOT confirmed to be Kat Cosgrove -- she is credited from her authored card instead, which is better.",
+    "Jorge Castro": "castrojo",
+    "Jeefy": "jeefy"
+  }
 }

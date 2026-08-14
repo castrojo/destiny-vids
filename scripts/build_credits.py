@@ -134,7 +134,7 @@ def character_name(character_id):
     return " ".join(out)
 
 
-def cast_in_order():
+def cast_in_order(verified_logins=None):
     """The cast, as the film credits them: person, and who they played.
 
     Read from vocab/casting.yaml, never composed. A lead with no bound person
@@ -154,17 +154,51 @@ def cast_in_order():
         if name and entry.get("person"):
             real.setdefault(entry["person"], name)
 
+    cards = authored_cards()
+    verified = dict(verified_logins or {})
     out = []
     for character_id, entry in leads.items():
         person = entry.get("person")
         if not person:
             continue
-        out.append({
-            "person": real.get(person) or entry.get("display_name") or person,
+        credited = real.get(person) or entry.get("display_name") or person
+        member = {
+            "person": credited,
             "character": character_name(character_id),
             "character_id": character_id,
-        })
+        }
+        # A face, in strict order of what can be proved. An authored Guardian
+        # card is the owner's own identity for that person; a `github:` login
+        # in the vocab is verified. Neither is guessed, and there is no third
+        # fallback -- a placard with no face is correct, a placard with the
+        # wrong face is not recoverable.
+        if credited in cards:
+            member["card"] = cards[credited]
+        if entry.get("github"):
+            member["login"] = entry["github"]
+        elif credited in verified:
+            member["login"] = verified[credited]
+        out.append(member)
     return out
+
+
+AUTHORED_CARDS = Path.home() / "src/website/public/wolves/characters/characters.json"
+
+
+def authored_cards():
+    """``{person name: card slug}`` from the website's authored identities.
+
+    READ ONLY, and deliberately tolerant of the file being absent: several
+    agents run worktrees against that checkout, and a credits build must not
+    depend on another repo being present. Missing simply means no cast art.
+    """
+    try:
+        data = json.loads(AUTHORED_CARDS.read_text())
+    except (OSError, ValueError):
+        return {}
+    rows = data.get("characters", []) if isinstance(data, dict) else data
+    return {r["name"]: r["slug"] for r in rows
+            if isinstance(r, dict) and r.get("name") and r.get("slug")}
 
 
 def build_manifest(refresh):
@@ -175,7 +209,7 @@ def build_manifest(refresh):
     # that: a credit names a real person, so the owner gets the last word on
     # how they are named, not a derivation that silently changes under them.
     if refresh or "cast" not in manifest:
-        manifest["cast"] = cast_in_order()
+        manifest["cast"] = cast_in_order(manifest.get("cast_logins"))
     return manifest
 
 
@@ -225,12 +259,32 @@ def schedule(manifest):
                       "role": card["role"], "names": card["names"]})
         t += card["dur_sec"]
 
-    cast = manifest["cast"]
-    cast_window = reveal - t
-    per = cast_window / max(1, len(cast))
-    for person in cast:
-        items.append({"kind": "cast", "t": t, "dur": per,
-                      "person": person["person"], "character": person["character"]})
+    # The cast straddles the reveal. Everything cannot fit before it -- the
+    # cover is pinned to a musical transient, not to a card count -- and
+    # squeezing fifteen placards into the gap gave each one 2.15 s, which is
+    # not long enough to look at somebody's authored Guardian card. So the
+    # window before the reveal takes as many as it holds at a readable pace and
+    # the rest follow it. Order is preserved: this is a prefix/suffix split.
+    # The verified-login overlay is applied HERE, not baked into `cast` when it
+    # is generated: the cast list is only rewritten by --refresh-contributors,
+    # so a login added to the manifest afterwards would otherwise never reach a
+    # placard. Applying it every schedule keeps the two independent.
+    verified = {k: v for k, v in (manifest.get("cast_logins") or {}).items()
+                if not k.startswith("_")}
+    cast = [dict(c, login=c.get("login") or verified.get(c["person"]))
+            for c in manifest["cast"]]
+    target = manifest.get("cast_hold_sec", 4.0)
+    before = max(0, min(len(cast), int((reveal - t) // target)))
+    head, tail = cast[:before], cast[before:]
+
+    def place(person, at, dur):
+        return {"kind": "cast", "t": at, "dur": dur,
+                "person": person["person"], "character": person["character"],
+                "card": person.get("card"), "login": person.get("login")}
+
+    per = (reveal - t) / max(1, len(head))
+    for person in head:
+        items.append(place(person, t, per))
         t += per
 
     hold = manifest["reveal"]["hold_sec"]
@@ -238,10 +292,14 @@ def schedule(manifest):
                   "image": manifest["reveal"]["image"]})
     t = reveal + hold
 
+    for person in tail:
+        items.append(place(person, t, target))
+        t += target
+
     wordmark = manifest["wordmark"]
     walls = []
     for section in manifest["contributors"]:
-        for page in C.paginate(section["names"], manifest["names_per_wall"]):
+        for page in C.paginate(section["names"], C.NAMES_PER_WALL):
             walls.append((section["section"], page))
     wall_window = total - t - wordmark["dur_sec"]
     per_wall = wall_window / max(1, len(walls))
@@ -257,7 +315,7 @@ def schedule(manifest):
         t += per_wall
 
     items.append({"kind": "wordmark", "t": t, "dur": total - t,
-                  "text": wordmark["text"]})
+                  "text": wordmark["text"], "sub": wordmark.get("sub")})
     return items, total
 
 
@@ -269,12 +327,13 @@ def render_cards(items, out_dir):
         if item["kind"] == "role":
             img = C.render_role_card(item["role"], item["names"])
         elif item["kind"] == "cast":
-            img = C.render_cast_placard(item["person"], item["character"])
+            img = C.render_cast_placard(item["person"], item["character"],
+                                        card=item.get("card"), login=item.get("login"))
         elif item["kind"] == "wall":
             img = C.render_name_wall(item["section"], item["names"],
                                      item["page"], item["pages"])
         elif item["kind"] == "wordmark":
-            img = C.render_wordmark(item["text"])
+            img = C.render_wordmark(item["text"], item.get("sub"))
         elif item["kind"] == "cover":
             img = None
         else:

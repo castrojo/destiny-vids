@@ -96,6 +96,11 @@ def load_leads(path=None):
             "person": entry.get("person"),
             "display_name": entry.get("display_name"),
             "aka": list(entry.get("aka") or []),
+            # Documented in vocab/casting.yaml as the person's VERIFIED GitHub
+            # login, recorded "so avatar tooling resolves the person and never
+            # a same-named stranger's account". Carried through so the credits
+            # can use it; derivation still never reads it.
+            "github": entry.get("github"),
             "constraints": dict(entry.get("constraints") or {}),
             "plate": dict(entry.get("plate") or {}) or None,
         }
