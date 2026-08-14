@@ -22,12 +22,13 @@
     "crossfade_sec": 0.25
   },
   "reveal": {
-    "_what": "THE REAL REVEAL. Owner: 'when the crescendo for the next riff is, the crescendo of this song, drop the comic book cover'. There is no crescendo inside span A -- it is one sustained final chorus with uniform ~+7 dB onsets. The song's crescendo is its OPENING riff, which is what the loop exists to reach: a MEASURED +10.53 dB onset at 9.080 s in span B, lifting the smoothed level from -12 dB to -6 dB. Given as segment+source_sec, not as a credits-clock number, so it stays pinned to the transient if the bed is ever re-cut -- and so the crossfade's overlap is accounted for rather than forgotten.",
+    "_what": "THE REAL REVEAL, and the owner named its time: ':22 is when I want the comic book shot, put the cast after'. 22.080 rather than a flat 22.000 because a measured +5.01 dB onset sits there -- 0.080 s, under three frames, so the cut lands on a hit instead of mid-bar. The earlier anchor (the song's opening crescendo, 9.080 s into span B) is kept below: it is why the loop exists, and it is what to fall back to if `at_sec` is ever removed.",
     "hold_sec": 14.0,
     "image": "~/Pictures/Artwork/wolves.jpg",
     "TODO(owner)": "The cover is to be REMOVED from the end of the Europa director's cut, per the owner: 'we are removing it from the end of europa, this is the real reveal.' This builder cannot do that -- act VII has no committed inputs at all and is cut in ~/Videos/wolves-directors-cut (#152). Act VII must be re-cut separately or the reveal plays twice.",
     "segment": 1,
-    "source_sec": 9.08
+    "source_sec": 9.08,
+    "at_sec": 22.08
   },
   "fixed_cards": [
     {
