@@ -16,6 +16,7 @@ deliberately NOT recomputed here.
 
 from __future__ import annotations
 
+import functools
 import re
 from pathlib import Path
 
@@ -23,6 +24,24 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CASTING_PATH = REPO_ROOT / "vocab" / "casting.yaml"
+
+
+@functools.lru_cache(maxsize=8)
+def _parse_casting(path, _mtime):
+    with Path(path).open(encoding="utf-8") as fh:
+        return yaml.safe_load(fh) or {}
+
+
+def _casting(path=None):
+    """vocab/casting.yaml, parsed once per (path, mtime).
+
+    Four loaders below read this same 793-line file, and a rederive walks 1321
+    segments, so the uncached form reparsed it thousands of times. Keyed on
+    mtime, not just path, so an edit mid-session is still picked up -- and the
+    result is shared, so every caller copies before it mutates.
+    """
+    p = Path(path) if path else DEFAULT_CASTING_PATH
+    return _parse_casting(str(p), p.stat().st_mtime_ns)
 
 # Overlays that cannot be edited out and so bar a shot from the story.
 # `letterbox` is deliberately absent: bars can be cropped.
@@ -70,9 +89,7 @@ def load_leads(path=None):
     Returns ``{character_id: {"person": str|None, "display_name": str|None,
     "aka": [...]}}``, preserving YAML order.
     """
-    path = Path(path) if path else DEFAULT_CASTING_PATH
-    with path.open(encoding="utf-8") as fh:
-        data = yaml.safe_load(fh)
+    data = _casting(path)
     values = ((data or {}).get("leads") or {}).get("values") or {}
     return {
         character_id: {
@@ -93,9 +110,7 @@ def load_ensemble_plate(path=None):
     text lives beside the casting decision, so changing how contributors are
     credited is a vocabulary edit, not a renderer edit.
     """
-    path = Path(path) if path else DEFAULT_CASTING_PATH
-    with path.open(encoding="utf-8") as fh:
-        data = yaml.safe_load(fh)
+    data = _casting(path)
     block = dict((((data or {}).get("ensemble") or {}).get("plate") or {}))
     block.pop("description", None)
     return block
@@ -111,9 +126,7 @@ def load_ensemble_titles(path=None):
     (``~/Videos/nameplates.json`` -- castrojo's is ``np_jorge``), in which case
     the credit must reproduce it verbatim.
     """
-    path = Path(path) if path else DEFAULT_CASTING_PATH
-    with path.open(encoding="utf-8") as fh:
-        data = yaml.safe_load(fh)
+    data = _casting(path)
     titles = dict((((data or {}).get("ensemble") or {}).get("titles") or {}))
     titles.pop("description", None)
     return titles
@@ -140,9 +153,7 @@ def load_placeholder_plate(path=None):
     does -- so nobody hardcodes on-screen text into a manifest -- and it credits
     nobody, because an uncast slot has no person to credit yet.
     """
-    path = Path(path) if path else DEFAULT_CASTING_PATH
-    with path.open(encoding="utf-8") as fh:
-        data = yaml.safe_load(fh)
+    data = _casting(path)
     copy = ((data or {}).get("ensemble") or {}).get("placeholder_plate") or {}
     return dict(copy)
 

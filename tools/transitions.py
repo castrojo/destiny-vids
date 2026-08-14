@@ -53,6 +53,7 @@ from __future__ import annotations
 import argparse
 import math
 import os
+import statistics
 import struct
 import subprocess
 import sys
@@ -96,7 +97,7 @@ def bucket_rms(pcm, channels, rate):
     out = []
     for start in range(0, n - per + 1, per):
         chunk = samples[start : start + per]
-        out.append(db(sum(s * s for s in chunk) / len(chunk)))
+        out.append(db(statistics.fmean(s * s for s in chunk)))
     return out
 
 

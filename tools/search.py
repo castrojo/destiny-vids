@@ -26,11 +26,11 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import glob
 import json
 import os
 import re
 import sys
+from pathlib import Path
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -189,11 +189,10 @@ NEVER_RELAX = {"class", "element", "faction", "casting.person", "casting.charact
 
 def load_segments(directory):
     segs = []
-    for path in sorted(glob.glob(os.path.join(directory, "*.json"))):
-        with open(path) as fh:
-            rec = json.load(fh)
+    for path in sorted(Path(directory).glob("*.json")):
+        rec = json.loads(path.read_text())
         if "segment_id" in rec:  # skip video-level records
-            rec["_path"] = os.path.basename(path)
+            rec["_path"] = path.name
             segs.append(rec)
     return segs
 

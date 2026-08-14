@@ -31,6 +31,7 @@ import argparse
 import json
 import os
 import sys
+from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -132,10 +133,7 @@ def _values(entry, axis):
 
 
 def coverage(shots, axis):
-    counts = {}
-    for shot in shots:
-        for value in _values(shot, axis):
-            counts[value] = counts.get(value, 0) + 1
+    counts = Counter(v for shot in shots for v in _values(shot, axis))
     return dict(sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])))
 
 

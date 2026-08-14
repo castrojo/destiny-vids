@@ -226,14 +226,11 @@ def conforms(path, ffprobe):
     return (not bad, bad)
 
 
-def content_hash(path, _chunk=1 << 20):
+def content_hash(path):
     """SHA-256 of the file's bytes. The cache key's other half -- a file that
     changed must not be served its predecessor's conform."""
-    h = hashlib.sha256()
     with Path(path).open("rb") as fh:
-        for chunk in iter(lambda: fh.read(_chunk), b""):
-            h.update(chunk)
-    return h.hexdigest()
+        return hashlib.file_digest(fh, "sha256").hexdigest()
 
 
 def cache_root():

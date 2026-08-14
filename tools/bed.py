@@ -48,6 +48,7 @@ import json
 import math
 import operator
 import os
+import statistics
 import subprocess
 import sys
 import wave
@@ -300,8 +301,7 @@ def baseline_of(level):
     """The song's typical loudness: median of the smoothed level. Median, not
     mean, because a 12 s breakdown should not lower the bar it is measured
     against."""
-    s = sorted(level)
-    return s[len(s) // 2]
+    return statistics.median(level)
 
 
 def find_drops(level, hop, baseline, drop_db=DROP_DB, min_down_sec=MIN_DOWN_SEC):
