@@ -95,18 +95,35 @@ def render_plates(doc, project, out_dir):
     return out_dir
 
 
+def _resolve_avatar(project, value):
+    """One manifest ``avatar`` -> the path the pill renderer should open.
+
+    Act IV's record carries ``~``-rooted paths (the project's own render
+    folder); act V's carries bare FILE NAMES. Joining the former onto the
+    project produced ``render/~/Videos/...`` and every pill silently fell
+    back to the drawn crest -- a regression against the delivered master,
+    whose pills carry the cast's photographs. So: an absolute or ``~``-rooted
+    value is already a path and passes through; only a bare name resolves
+    against ``<project>/render/``.
+    """
+    p = Path(value).expanduser()
+    if p.is_absolute():
+        return str(p)
+    return str(Path(project).expanduser() / "render" / value)
+
+
 def _project_manifest(doc, project):
     """The manifest with its avatar paths pointed at ``project``.
 
-    The committed manifest names avatars by FILE NAME, not by path: they are
-    people's photographs and this repo commits none of them. Resolving them
-    against the project folder here keeps the record portable and keeps the
-    missing-file case a punch-list item -- ``plate.py`` falls back to the drawn
-    crest and says which one it could not read.
+    Avatars are people's photographs and this repo commits none of them, so
+    the record names where they live rather than carrying them. Resolving
+    them here keeps the record portable and keeps the missing-file case a
+    punch-list item -- ``plate.py`` falls back to the drawn crest and says
+    which one it could not read.
     """
     out = dict(doc)
     out["plates"] = [
-        {**p, "avatar": str(Path(project).expanduser() / "render" / p["avatar"])}
+        {**p, "avatar": _resolve_avatar(project, p["avatar"])}
         if p.get("avatar") else dict(p)
         for p in doc["plates"]
     ]
