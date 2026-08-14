@@ -190,6 +190,50 @@ TEAM_BADGE = {
 TEAM_BADGE_HOLD = 3.5
 TEAM_BADGE_LEAD = 0.25
 
+# --- THE KERNEL TRUSTEES (owner note, dictated 2026-08-13 01:09; #119) -----
+#
+#   "5:43 [redacted] To graduate you must impress / 2 Badges platinum, above
+#    gold. greg-kh and shuah khan / TRUSTEE // KERNEL / Make them both
+#    warlocks / Keep them up even when cutting to the raw recruits, their
+#    names up while redacted is talking"
+#
+# Megacut marks again, from the 2026-08-12 ALPHA watch -- and act II's window
+# has not moved since (MEGACUT_OFFSET is the same on the ALPHA builds), so
+# 5:43 is film 221.433. Frame-verified: the note's 6:34 "famous titan shield
+# throw" is Kyle's Sentinel plate (film 269.700) and "6:44 is eyecantCU" is
+# his window (film 283.666) -- the note is THIS act, misfiled as act III.
+#
+# THE DICTATED ANCHOR IS OCCUPIED. Film 221.433 sits inside the #98 pill run
+# (218.484 -> 230.766), which did not exist on the cut he watched -- ALPHA2
+# held Ahmed Adan's badge there and nothing else. Two owner instructions,
+# one window. The badges land at the first frame the pills clear and hold
+# across the recruits, the scarred man's close-up (the 5:58 slot the note
+# parks for Troy -- nothing renders there until the owner writes him), and
+# Cayde's 6:01 shot, which is the "while redacted is talking" the note asks
+# for; they clear for Tulip's shot. The 9.6 s displacement from the dictated
+# anchor is recorded in `unresolved`, and which of the two instructions
+# yields is the owner's call, not made here.
+TRUSTEE_ROW_AT = 231.016      # Joseph's "LOL" pill ends 230.766 + PLATE_GAP
+TRUSTEE_ROW_OUT = 247.217     # Tulip's shot starts 247.467, less PLATE_GAP
+TRUSTEE_ROW = ["gregkh", "shuah_khan"]  # the pair, left to right
+
+# --- TULIP, THE SOLAR WARLOCK (same note) ----------------------------------
+#
+#   "6:11 Nameplate: Tulip Blossom, whatever solar warlock is
+#    https://github.com/tulilirockz/ 'Deliverer of DDI' / keep it up until
+#    6:20"
+#
+# 6:11 is film 249.433 -- MID-SHOT: her leap through the cathedral window
+# runs 247.467 -> 249.567 (measured, scdet over renders/efmb-hq.mp4, cuts at
+# 247.467 and 249.567), so the plate anchors to the SHOT's first frame and
+# is already up at the dictated second. "Keep it up until 6:20" (film
+# 258.433) is NOT honoured: the shot ends 249.567 and the #98 pills (krook
+# at 250.000, the bedazzle at 253.250) own everything through 255.850, so
+# the longest possible hold that still names her on her own shot is
+# 247.467 -> 249.750 -- 0.083 s over the readable minimum. Recorded in
+# `unresolved`; the pills are the owner's to move if she should hold longer.
+TULIP = {"key": "tulilirockz", "at": 247.467, "out": 249.750}
+
 # --- THE NEW DIALOGUE (owner brief, this round) ----------------------------
 #
 #   "03:12 chat bubble for Joseph: Here comes the slop
@@ -1134,6 +1178,38 @@ def build():
         "copy_source": "owner_supplied",
     })
 
+    # --- the kernel trustees, one platinum pair held across the cuts -------
+    for order, key in enumerate(TRUSTEE_ROW):
+        dur = round(TRUSTEE_ROW_OUT - TRUSTEE_ROW_AT, 3)
+        assert dur >= MIN_HOLD, (
+            f"the trustee badge for {key} holds {dur:.3f}s, under the "
+            f"{MIN_HOLD}s a plate needs to be read")
+        plates.append({
+            "id": f"trustee_{key}",
+            "at": TRUSTEE_ROW_AT,
+            "dur": dur,
+            "position": ("left", "right")[order],
+            "scale": TRIO_SCALE,
+            "group": "kernel_trustees_row",
+            "order": order,
+            "copy_source": "casting",
+            **localise_avatar(key, authored_copy(key, casting)),
+        })
+
+    # --- Tulip, on her own shot ---------------------------------------------
+    tulip_dur = round(TULIP["out"] - TULIP["at"], 3)
+    assert tulip_dur >= MIN_HOLD, (
+        f"Tulip's plate holds {tulip_dur:.3f}s, under the {MIN_HOLD}s a "
+        "plate needs to be read -- her shot is shorter than the note's hold")
+    plates.append({
+        "id": "solo_tulilirockz",
+        "at": TULIP["at"],
+        "dur": tulip_dur,
+        "position": "left",
+        "copy_source": "casting",
+        **localise_avatar("tulilirockz", authored_copy("tulilirockz", casting)),
+    })
+
     # --- one person, one shot ---------------------------------------------
     for b in SOLO:
         src_in, src_out = b["src"]
@@ -1687,6 +1763,32 @@ def build():
             "[ REDACTED ] card is at 287.933 (4:47.9), so a bubble anchored "
             "on him cannot also be at 4:01. TODO(owner): which moves -- the "
             "bubble to ~4:48, or the anchor (#98, Questions)",
+            "the #119 note's dictated badge anchor (megacut 5:43 = film "
+            "221.433) sits inside the #98 pill run (218.484 -> 230.766), "
+            "which did not exist on the ALPHA2 cut the owner was watching "
+            "-- the pills are the NEWER instruction. The kernel-trustee "
+            "badges land at 231.016 instead, the first clear frame, and "
+            "still hold across the recruits, the Troy slot and Cayde's 6:01 "
+            "shot as the note asks. TODO(owner): badges at 5:43 over the "
+            "pills, or the pills keep the window",
+            "the #119 note's 6:27 (film 265.433) names github.com/m2 for "
+            "the Arc Hunter -- the same shot #198 gave kolunmi the day "
+            "AFTER the note was dictated. One shot, two owner-given names: "
+            "kolunmi's plate stands (the newer instruction), and m2's "
+            "authored copy is in vocab/casting.yaml (he is owed a plate "
+            "wherever the owner points). TODO(owner): which name the Arc "
+            "Hunter keeps",
+            "Troy renders NOTHING: 'Nameplate - Troy (I'll fill in later) "
+            "Stormbreaker Titan' (megacut 5:58 = film 236.433) is an "
+            "explicit owner placeholder, so he is queued in "
+            "ensemble.placeholders and his slot sits empty inside the "
+            "trustee badges' hold. The class words are his; every other "
+            "row is his to write",
+            "Tulip's 'keep it up until 6:20' (film 258.433) is not "
+            "honoured: her window-leap shot ends 249.567 and the #98 pills "
+            "own 250.000 -> 255.850, so she holds 247.467 -> 249.750 -- up "
+            "at the dictated 6:11, gone with her shot. TODO(owner): move "
+            "the pills or accept the shot-length hold",
             "krook, cgwalters, siosm, jberkus and preethi are "
             "not in vocab/casting.yaml -- their pills render "
             "as placeholder badges with the drawn crest, and their GitHub "

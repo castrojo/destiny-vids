@@ -687,6 +687,69 @@ ensemble:
       variant: youtube
       avatar: https://yt3.googleusercontent.com/ytc/AIdro_kCixIw5CtOKMcqo_p8ZSDwYXoGQZ2TB5NzA7Lag-n_ByM=s900-c-k-c0x00ffffff-no-rj
 
+    # --- THE KERNEL TRUSTEES (owner note, dictated 2026-08-13 01:09; #119) ---
+    # The note was filed as act III ("mrbobbytables"), but every mark in it is
+    # on the 2026-08-12 ALPHA megacut's clock and lands inside ACT II (film =
+    # megacut - 121.567, the script's own MEGACUT_OFFSET): the "famous titan
+    # shield throw" at 6:34 is Kyle's Sentinel plate, and "6:44 is eyecantCU"
+    # sits inside his window. Frame-verified against both ALPHA builds, which
+    # are identical at every mark. The "2 Badges platinum, above gold" for the
+    # "to graduate you must impress" beat are these two: platinum is the
+    # trustee chrome (burnished silver, not the leader gold), and the label is
+    # TRUSTEE // KERNEL exactly as dictated. They are not Bluefin contributors
+    # -- the joke is that the KERNEL owns the graduation -- so they can never
+    # arrive through the roster; the owner authored every string below
+    # verbatim, which is the only way in.
+    gregkh:
+      # github.com/gregkh (verified u/14953; the account's own name field is
+      # "Greg Kroah-Hartman", and the note's "greg-kh" is this login). "Make
+      # them both warlocks" is the whole class instruction -- no element was
+      # dictated, so the class row is the bare class (the rochaporto shape)
+      # and no subclass word is invented. The two quoted epithets ride as one
+      # piped title, the deck's own two-seal form (Jorge's "Upender of
+      # Antipatterns | The First Disciple" in ~/Videos/nameplates.json).
+      label: TRUSTEE // KERNEL
+      class: Warlock
+      name: Greg Kroah-Hartman
+      title: The Hand of the Kernel | My Son is Even More Powerful
+      trustee: true
+      avatar: https://avatars.githubusercontent.com/u/14953?v=4
+    shuah_khan:
+      # KEYED BY NAME, not login (the joseph_sandoval shape): the note gives
+      # none, and a login is not an agent's to guess. TODO(owner): her GitHub
+      # login, so avatar tooling can resolve her and never a same-named
+      # stranger; she renders with the drawn crest until then.
+      label: TRUSTEE // KERNEL
+      class: Warlock
+      name: Shuah Khan
+      title: Gardener of Talent | Looking for Gamers
+      trustee: true
+    tulilirockz:
+      # github.com/tulilirockz (verified u/120808662) -- and the account's own
+      # GitHub display name IS "Tulip Blossom", so the name row is hers, not a
+      # transcription. "whatever solar warlock is" is the owner's class
+      # instruction: the element word is his (the kolunmi precedent) and no
+      # subclass name is invented. No label was dictated, so the eyebrow row
+      # is omitted rather than composed.
+      class: Solar Warlock
+      name: Tulip Blossom
+      title: Deliverer of DDI
+      avatar: https://avatars.githubusercontent.com/u/120808662?v=4
+    m2:
+      # github.com/m2 (verified u/231907). The account's display name is
+      # "mat"; which of the two goes on the card is his call (the
+      # GloriousEggroll question), so the name row is the login the owner
+      # wrote. TODO(owner): the name row -- and which name the Arc Hunter
+      # keeps. The note dictated this plate for megacut 6:27 (film 265.433),
+      # the shot #198 gave kolunmi the day AFTER the note was dictated;
+      # kolunmi's plate stands and the conflict is recorded in
+      # scripts/build_efmb_plates.py's `unresolved`.
+      label: MAINTAINER // GUARDIAN
+      class: Arc Hunter
+      name: m2
+      title: Fun, Travel, and Adventure
+      avatar: https://avatars.githubusercontent.com/u/231907?v=4
+
   # --- NAMED, COPY NOT YET AUTHORED ------------------------------------------
   # The owner named these two for act II but authored no plate copy. Recorded
   # OUTSIDE `titles` -- a queue in the same posture as `leads.pending`, which
@@ -706,6 +769,16 @@ ensemble:
     ahmedadan:
       name: Ahmed Adan
       github: ahmedadan   # org member per renders/roster-2026-08.json
+      missing: [label, class, title, chrome, avatar]
+    troy:
+      # "5:58 Nameplate - Troy (I'll fill in later) Stormbreaker Titan" --
+      # the owner named him and explicitly parked the copy (#119). The class
+      # words are his ("Stormbreaker Titan"), but this queue's shape is
+      # name/github/missing, so they live in this comment and nowhere else
+      # until he fills the rest. His slot: megacut 5:58 = film 236.433,
+      # inside the kernel-trustees badge hold -- it renders NOTHING today.
+      name: Troy
+      github: null   # no login is recorded for him; not an agent's to guess
       missing: [label, class, title, chrome, avatar]
   org:
     description: >
