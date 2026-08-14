@@ -147,7 +147,6 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `segments/` | Assembled, schema-valid segment records for real footage — 69 shots from the TFS launch trailer and 50 from the Curse of Osiris opening cinematic. |
 | `tests/` | `pytest` suite across search, derivation, story assembly, ensemble casting, ingestion, the stub pipeline, and ffmpeg resolution. |
 | `docs/` | `SKILL.md` (agent skill router) and `skills/`, plus the design docs: `taxonomy.md` (axis reference), `pipeline.md` (segmentation + cost tiers), `agent-retrieval.md` (query mapping), `rendering.md` (which ffmpeg, and why). `cuts/` documents each shipped cut. |
-| `docs/plans/` | Planning artifacts for work too large for one change: a design, the research behind it, and one issue-ready file per unit of work, under the lifecycle `AGENTS.md` defines. `wolves/` is the comm-line system ([#9](https://github.com/castrojo/destiny-vids/issues/9)); `halo/` is the Halo-universe campaign re-skin ([#11](https://github.com/castrojo/destiny-vids/issues/11)). |
 | `AGENTS.md` | Agent operating contract: commands, boundaries, and the three rules that outrank convenience. |
 
 ## The unit: a "beat"
