@@ -82,22 +82,19 @@ the project. Most bindings are unconstrained: the project *names a role*, it doe
 not composite a face, so framing is irrelevant and a face-clear close-up is still
 first-party footage.
 
+GUARDIANS ARE ALWAYS REFERED TO BY THEIR REAL NAME. IT IS THEIR GREAT RENOWN.
+The destiny names are there for convenience 
+
 | Character | Cast as | |
 |---|---|---|
 | Elsie Bray | Laura Santamaria | authored plate — **act VII copy only**; earlier acts credit her as Nimbatus (#103) |
 | Nimbatus | Laura Santamaria | name-only binding (#103): pre-reveal credit, login `nimbinatus`, no plate copy authored |
-| Anna Bray | Joanna Lee | |
 | Zavala | Kelsey Hightower | authored plate (#8), gold chrome (#33) |
-| Cayde-6 | castrojo | authored plate |
-| Osiris | mrbobbytables | |
-| Sagira | Lindsay Gendreau | Osiris's Ghost; cast on presence, no framing constraint |
-| Saint-14 | Kat | remains the bubble in the original Wolves; authored plate |
-| Mara Sov | Karena Angell | authored plate (Stasis Warlock — answers #5), wreath chrome |
-| Petra Venj | Lori Lorusso | recast in #8; rusted plate chrome |
-| Variks | Nate Waddington | |
-| The Speaker | Jonathan Bryce | |
-| Amanda Holliday | Ashley Willis | |
-| the red-haired Iron Lord (Rise of Iron intro) | Paris Pittman | canonical name unconfirmed |
+| [Redacted] Cayde-6 | castrojo | authored plate (this character is very famous so we only reveal jorge's name once)| 
+| Osiris | mrbobbytables | Only person who knows wtf is going on |
+| Sagira | Lindsay Gendreau | Sends bobs emails to contributors |
+| Saint-14 | Kat | remains the bubble in the original Wolves; authored plate - doesn't read maintainer email, gets shot down |
+| Mara Sov | Karena Angel | authored plate (Stasis Warlock — answers #5), wreath chrome |
 | **Lord Saladin** | **Jeefy** | **constrained: far + helmeted only** |
 
 Saladin is the one **constrained** binding: Jeefy plays the Iron Lord but does not
