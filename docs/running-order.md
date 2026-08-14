@@ -23,13 +23,17 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
 | **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; now the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits |
 | **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; plays the pre-terse-pass film — #102; master corrected to −1.1 dBTP — #82 |
-| **VIII** | Credits | — | **not designed** — #51 |
+| **VIII** | Credits | `renders/08-credits.mp4` — the cast, 454 contributors, and the comic-cover reveal | **built**, 3:48.43 — #51; not yet in the programme |
 
-**The numbering is fixed.** Act VIII has no film, so it gets no slide and no
-chapter marker — a card announcing an act that does not play, or a marker that
-jumps to the next act's footage, is a lie about what the audience is watching.
-It keeps its numeral so nothing renumbers around it: III is `mrbobbytables`
-permanently, whatever gets built later.
+**Act VIII now has a film.** Built 2026-08-13 from `stories/08-credits.json`
+by `scripts/build_credits.py`: the four fixed cards, fifteen cast placards, the
+comic-cover reveal on the song's measured crescendo, 454 contributors across
+four projects, and the wordmark. It is **not yet in the programme** — wiring it
+in is a megacut rebuild, and it wants a slide and a chapter marker at that
+point.
+
+**The numbering is fixed.** III is `mrbobbytables` permanently, whatever gets
+built later.
 
 **Act II has a film** ([`docs/cuts/02-endless-forms-most-beautiful.md`](cuts/02-endless-forms-most-beautiful.md)),
 delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
