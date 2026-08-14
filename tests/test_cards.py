@@ -256,3 +256,22 @@ def test_the_card_templates_copy_the_sites_own_rules():
     for name, source in (("act.html", act), ("comic.html", comic)):
         style = source.split("<style>", 1)[1].split("</style>", 1)[0]
         assert style.count("/*") == style.count("*/"), name
+
+
+def test_every_act_slide_holds_the_same_length():
+    """One house length for slides, so none of them reads as a stall.
+
+    The IV-V slide used to hold 15.0 s -- deliberate pacing while it was the
+    one card announcing two acts. Once the Perfume thread ran through the
+    show, what sat either side of it changed: movement 3 ends on a dark,
+    static shot and the card then froze in silence, so the transition was
+    about twenty seconds of nothing moving. Owner, 2026-08-14: "15:31 entire
+    transition is too weird and long, make it all fit."
+
+    Asserted as "all equal" rather than "== 5.0" because the house length is
+    a choice; having two different ones by accident is the bug.
+    """
+    plan = _load("megacut.json")
+    durs = {round(float(i["dur"]), 3)
+            for i in plan["items"] if i["kind"] == "card"}
+    assert len(durs) == 1, f"act slides hold different lengths: {sorted(durs)}"
