@@ -584,6 +584,25 @@ ensemble:
       title: Herald of the Hummingbird
       variant: bazzite
       avatar: https://avatars.githubusercontent.com/u/46304672?v=4
+    kolunmi:
+      # github.com/kolunmi (id 113054217). Owner, 2026-08-14: "the arc hunter
+      # before kylegospo is https://github.com/kolunmi/ - add a nameplate."
+      #
+      # THE CLASS ROW IS THE OWNER'S OWN WORD. He named the subclass when he
+      # named the shot -- "the arc hunter" -- and the frame agrees: at source
+      # 334.300 the Guardian is loosing a bright Arc bow, one cut before
+      # Kyle's Sentinel. That is a subclass somebody authored, not one derived
+      # off a colour.
+      #
+      # Everything else is deliberately absent. The account carries no display
+      # name and no bio, so the name row is the LOGIN as its owner writes it,
+      # unbracketed -- brackets are this repo's placeholder marker (p5 and
+      # EyeCantCU wear them because the OWNER chose that treatment for them,
+      # which is a different thing).
+      # TODO(owner): a label, a title, and whether he wants his real name.
+      class: Arc Hunter
+      name: kolunmi
+      avatar: https://avatars.githubusercontent.com/u/113054217?v=4
     EyeCantCU:
       # github.com/EyeCantCU. The name row is the bracketed HANDLE, exactly as
       # authored -- the owner chose the handle treatment to match p5. His real

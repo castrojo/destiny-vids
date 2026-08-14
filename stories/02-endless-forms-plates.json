@@ -990,6 +990,23 @@
       "text_source": "owner_supplied"
     },
     {
+      "id": "solo_kolunmi",
+      "at": 265.3,
+      "dur": 4.15,
+      "position": "left",
+      "copy_source": "casting",
+      "shot_src": [
+        333.4,
+        335.267
+      ],
+      "seen_at_src": 334.3,
+      "why": "the Arc Hunter loosing a bow, one cut before Kyle's Sentinel",
+      "class": "Arc Hunter",
+      "name": "kolunmi",
+      "avatar": "renders/avatars/kolunmi.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4"
+    },
+    {
       "id": "solo_KyleGospo",
       "at": 269.7,
       "dur": 4.383,

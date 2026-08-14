@@ -902,7 +902,35 @@ def test_natewaddington_is_out_of_the_climax():
     assert any("waddington" in u.lower() for u in manifest["unresolved"]), \
         "a dropped credit is recorded, never silently gone"
 
-    # Nothing moved into the slot he vacated, and nothing plays over the
-    # breakdown into the climax.
-    assert not any(256.0 <= p["at"] <= 269.0 for p in manifest["plates"]), \
-        "the run into the 269.700 downbeat plays clean"
+    # Nothing moved into the slot he vacated. (The window is not empty in
+    # general -- the owner later added kolunmi's nameplate at 265.3 -- so this
+    # asserts about HIS slot, not about the whole run into the climax.)
+    assert not any(258.0 <= p["at"] <= 262.0 for p in manifest["plates"]), \
+        "nothing slid up into the 4:20 hole"
+
+
+def test_the_arc_hunter_before_kyle_is_credited():
+    """Owner: "the arc hunter before kylegospo is github.com/kolunmi - add a
+    nameplate."
+
+    The shot bounds are measured (a scene-change pass puts cuts at 333.400
+    and 335.267, and 335.267 is where Kyle's shot already started), the class
+    row is the owner's own word for the shot, and NOTHING else is authored --
+    the account carries no display name and no bio, so no label and no title
+    ship rather than being composed.
+    """
+    manifest = build_efmb_plates.build()
+    by_id = {p["id"]: p for p in manifest["plates"]}
+    plate = by_id["solo_kolunmi"]
+    assert plate["shot_src"] == [333.400, 335.267]
+    assert plate["name"] == "kolunmi"
+    assert plate["class"] == "Arc Hunter"
+    assert "label" not in plate and "title" not in plate, \
+        "a row nobody authored is omitted, never composed"
+    assert plate["avatar"], "his own GitHub avatar, from the login the owner gave"
+
+    # He plays BEFORE Kyle, and neither card sits on the other.
+    kyle = by_id["solo_KyleGospo"]
+    assert plate["at"] + plate["dur"] <= kyle["at"] + 1e-6
+    # Kyle's own anchor is untouched -- it is the act's sync anchor.
+    assert kyle["at"] == pytest.approx(269.700, abs=1e-3)
