@@ -154,14 +154,25 @@ def test_the_bluefin_creators_open_the_credits(manifest):
     assert manifest["fixed_cards"][0]["names"] == ["Jacob Schnurr", "Andy Frazer"]
 
 
-def test_the_director_is_credited_immediately_before_the_audience(manifest):
+def test_the_introducing_card_closes_the_fixed_credits(manifest):
+    """The debut credit is the last card before the cover drops."""
     roles = [c["role"] for c in manifest["fixed_cards"]]
-    assert roles.index("Directed by") == roles.index("Contributions by") - 1
+    assert roles[-1] == "Introducing"
+    assert roles.index("Directed by") == len(roles) - 2
 
 
 def test_the_fixed_cards_are_in_the_owners_order(manifest):
     assert [c["role"] for c in manifest["fixed_cards"]] == [
-        "Bluefin Created by", "Music by", "Directed by", "Contributions by"]
+        "Bluefin Created by", "Music by", "Directed by", "Introducing"]
+
+
+def test_the_introduced_names_are_reproduced_not_corrected(manifest):
+    """A person's name is copy. The owner wrote these two and they are
+    rendered as written -- including a spelling this repo cannot verify, which
+    is flagged for confirmation rather than silently 'fixed' or guessed."""
+    card = next(c for c in manifest["fixed_cards"] if c["role"] == "Introducing")
+    assert card["names"] == ["Rafael Castro", "Laskshmi Mehta-Castro"]
+    assert "TODO(owner)" in card, "an unverified name must carry its flag"
 
 
 def test_the_band_is_spelled_as_the_bed_record_spells_it(manifest):
