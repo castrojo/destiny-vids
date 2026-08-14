@@ -40,6 +40,13 @@ that convention is gone.
 | VI | The musical | Nightwish *7 Days to the Wolves* | AAC stereo 323 k | −1.6 dBTP | **none — issue #58** |
 | VII | Europa | *Beauty Of The Beast* `X3WrCzLIIvk`, **Opus** @48 k | FLAC stereo | −1.1 dBTP (was **+0.3 — clipping**, issue #82) | `wolves-directors-cut/…-beauty-of-the-beast-hq.mp4` |
 
+**Measure after the final lossy encode.** v2.4's lossless programme segments
+were safe, but the joined AAC measured **+0.7 dBTP**. The fix is one derived
+static gain at the final mux, followed by another measurement of the decoded
+deliverable — never `loudnorm`, limiting, or compression. FFmpeg's `volume`
+filter accepts dB values, and `ebur128=peak=true` measures true peak.
+Source: `/websites/ffmpeg_ffmpeg-all`.
+
 Measured on the files in `Wolves/Prod/` on 2026-08-13, not recalled. Every cut
 **except the musical** has a lossless master behind it; each master's audio is
 **bit-exact with its source bed**, verified by comparing decoded stream MD5s
