@@ -166,13 +166,27 @@ def test_the_fixed_cards_are_in_the_owners_order(manifest):
         "Bluefin Created by", "Music by", "Directed by", "Introducing"]
 
 
-def test_the_introduced_names_are_reproduced_not_corrected(manifest):
-    """A person's name is copy. The owner wrote these two and they are
-    rendered as written -- including a spelling this repo cannot verify, which
-    is flagged for confirmation rather than silently 'fixed' or guessed."""
+def test_the_second_introduced_name_stays_redacted(manifest):
+    """The owner redacted it. `[ REDACTED ]` is AUTHORED COPY, not a
+    placeholder awaiting resolution -- the deck's own convention
+    (docs/skills/plates/references/plate-chrome.md) is explicit that it must
+    never be 'helpfully' substituted with a real name.
+
+    The redacted name is deliberately absent from this repo, which is what a
+    redaction is for.
+    """
     card = next(c for c in manifest["fixed_cards"] if c["role"] == "Introducing")
-    assert card["names"] == ["Rafael Castro", "Laskshmi Mehta-Castro"]
-    assert "TODO(owner)" in card, "an unverified name must carry its flag"
+    assert card["names"] == ["Rafael Castro", "[ REDACTED ]"]
+
+    blob = json.dumps(manifest).lower()
+    assert "mehta" not in blob and "lakshmi" not in blob and "laskshmi" not in blob, \
+        "the redacted name must not survive anywhere in the manifest"
+
+
+def test_the_redaction_uses_the_decks_own_form(manifest):
+    """Same string the plates carry, so act VIII matches acts I-VII."""
+    card = next(c for c in manifest["fixed_cards"] if c["role"] == "Introducing")
+    assert "[ REDACTED ]" in card["names"]
 
 
 def test_the_band_is_spelled_as_the_bed_record_spells_it(manifest):
