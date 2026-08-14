@@ -2,6 +2,17 @@
  "_what": "The delivery graph's declared intent: which master each act's Prod/ entry hardlinks, and which acts have no social copy ON PURPOSE. tools/deliver.py reads this beside docs/running-order.md (which stays the source of truth for the act list and its ORDER -- this file is keyed by act numeral and says nothing about order). A master path is `~`-rooted or absolute, never relative to a worktree: worktrees are ephemeral, and act II's link into dv-wt/feat-98-act2-overlay is the recorded hazard. When a project's build replaces its master as a NEW inode (tools/peaks.py trim does os.replace on purpose), the Prod link is detached and `deliver.py publish` re-links it -- that re-link is the step peaks.py deliberately does not do.",
  "_rules": "publish re-links only when the declared master is NEWER than what Prod carries, or when the content is identical (re-attaching is then free). A declared master that is OLDER than Prod's current content is a conflict -- reported, never force-linked: something built Prod's content and the master never received it (act II on 2026-08-13: the #98 build lived only in a worktree while the main checkout's renders/efmb-plated.mp4 was a revision behind; repaired under #150 by promoting the worktree build onto the durable master). A master path that resolves inside a git worktree is EPHEMERAL and publish refuses to link from it at any mtime -- promote it to a durable path first.",
  "masters": {
+  "0": {
+   "path": "~/src/destiny-vids/renders/00-prologue.mp4",
+   "note": "THE PROLOGUE -- the feature's main title sequence, and the one entry with NO NUMERAL. Built by scripts/build_prologue.py from the committed manifest, so unlike act I it is reproducible from this repo. Its picture is the first 91.2 s of Nightwish's official 'Perfume Of The Timeless' music video (oHCaZmIzr0o) plus an 8.0 s March-wallpaper bridge; see music/bed_perfume_of_the_timeless.json for what this film is permitted to do with it. PROTOTYPE OUTPUT: the shipping presentation EMBEDS the music video rather than re-hosting it (owner: \"it's an iframe using their video don't download it\"), so this rendered file is for cutting and review, not for publication.",
+   "sources": [
+    "stories/00-prologue-plates.json",
+    "scripts/build_prologue.py",
+    "cards/maintitle.html",
+    "music/bed_perfume_of_the_timeless.json"
+   ],
+   "source_digest": "344f281e4c4d6a8793b067ce4f9a96b859f222776a7a1f2d3835db429c8a1046"
+  },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
    "note": "the six Guardian plates and the comic title card burned over BKm0TPqeOjY, trimmed 2.0 -> 113.55. NO COMMITTED BUILDER: this act was assembled ad-hoc (raw x264 crf 14 trim, then a `tools/plate.py` burn at crf 18) rather than by a script under `scripts/`, so its `sources` cover the copy that goes on screen but not the assembly that places it. Re-rendering act I from the repo is therefore not reproducible today -- that gap is its own finding, not a reason to leave the act undeclared",
@@ -97,6 +108,7 @@
   "audio_bitrate": 256,
   "_bitrate_note": "10mb/README.md builds with --audio-bitrate 256: the cap is spent on audio first, because a starved music bed is the artifact people actually hear on a phone.",
   "absent": {
+   "0": "NOT a rights call to make casually: the prologue's picture is Nightwish's own music video, and a social copy is a REDISTRIBUTION of it. The owner's instruction for this act is that the shipping form embeds the video rather than re-hosting it, so a standalone clip is exactly the thing that must not be cut. No social copy, by design and on purpose.",
    "II": "308.0 s leaves ~16 kbps of video budget under the 10 MiB cap -- it would look like mud. Recorded in 10mb/README.md; the fix is a shorter excerpt, which is an editorial decision for the owner.",
    "III": "160.2 s leaves ~268 kbps of video budget -- mud. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
    "VI": "443.5 s: the 256k audio ALONE overruns the 10 MiB cap, so no copy can be encoded at all. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",

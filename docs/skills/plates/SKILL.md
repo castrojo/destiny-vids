@@ -148,6 +148,23 @@ This skill is the contract. The procedure lives in `references/`:
   wins; if the brief is right, the fix is a vocab edit, not a per-video
   override.
 - Calling a burn done because ffmpeg exited 0. Check a frame, not the manifest.
+- **Deck colours on a card that sits over MOVING PICTURE.** The deck's greys
+  (`--wc-grey` #8b8f96, and the secondary #cbd5e1) are chosen against a slide's
+  black. Over footage they hold for as long as the shot is dark and vanish the
+  moment it is not. Measure the luma across the card's own window
+  (`signalstats` → `YAVG`) instead of judging it on the frame you cued to: the
+  prologue's main title was cued over a near-black void and the source cut to a
+  white starburst 1.3 s later, inside the same card. The fix is `act.html`'s
+  radial scrim at a strength chosen for picture, not the slide's 88% black —
+  and it belongs **on the card**, not in the filtergraph, so it fades with the
+  type it protects and can never outlive it and sit on bare footage.
+- **A looped still overlaid on a finite picture, without a bound.**
+  `loop=loop=-1` is an INFINITE stream, and `overlay`'s framesync keeps
+  producing output after the *main* input ends, repeating its last frame.
+  The prologue's first build emitted the film and then eight seconds of frozen
+  final frame, the material after it never played, and ffmpeg exited 0. `trim`
+  the still to the picture's length and add `shortest=1`. It was caught by
+  pulling three frames and noticing they were identical — not by watching.
 - Shipping a cut with a non-empty `unresolved` list without reading it: someone
   who was on screen went uncredited. The list is the whole punch-list — an
   empty `unresolved` really does mean nobody was missed, so anything it does

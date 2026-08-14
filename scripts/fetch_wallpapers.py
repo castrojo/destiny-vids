@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
-"""Cache Project Bluefin's **dark-mode** monthly wallpapers as frames.
+"""Cache Project Bluefin's monthly wallpapers as frames.
 
 Owner instruction for act VIII: *"Use the dinosaur artwork here instead of
 black, use the dark mode wallpapers, make them go through the entire calendar
-order and keep switching."*
+order and keep switching."* That is the ``night`` half, and it is still the
+default.
+
+The ``day`` half was added for the **prologue's bridge**, where the owner asked
+for *"a 03-bluefin-day.jxl and fade to the dark version so that that replaces
+the black part"* — the handoff out of the main title sequence is a March
+wallpaper turning from day to night rather than a cut to black.
 
 The wallpapers ship with the desktop, in ``/usr/share/backgrounds/bluefin`` --
-``NN-bluefin-night.jxl``, one pair per month, and the ``-night`` half is the
-dark mode one. They are **JPEG XL at 6300x2700**, which is two problems for a
-render:
+``NN-bluefin-{day,night}.jxl``, one pair per month. They are **JPEG XL at
+6300x2700**, which is two problems for a render:
 
 * Pillow cannot open JPEG XL, and the containerized ffmpeg on this host has no
   ``jpegxl`` decoder either (``no decoder found for: jpegxl``). GdkPixbuf
@@ -36,16 +41,40 @@ OUT_DIR = REPO_ROOT / "renders" / "wallpapers"
 W, H = 1920, 1080
 
 
-def months():
-    """The calendar, in order, for every month whose night art is installed."""
+def months(variant="night"):
+    """The calendar, in order, for every month whose art is installed.
+
+    ``variant`` is ``night`` or ``day``. The night half is act VIII's; the day
+    half exists for the **prologue's bridge**, which puts March up and turns it
+    to dark rather than cutting to black.
+    """
     out = []
     for m in range(1, 13):
         for ext in ("jxl", "png", "jpg", "svg"):
-            path = SOURCE_DIR / f"{m:02d}-bluefin-night.{ext}"
+            path = SOURCE_DIR / f"{m:02d}-bluefin-{variant}.{ext}"
             if path.exists():
                 out.append((m, path))
                 break
     return out
+
+
+def cached(month, variant="night"):
+    """Path of one cached frame, decoding it on demand. None if not installed.
+
+    The night frames keep their bare ``NN.png`` names because act VIII's build
+    already reads them; the day half is suffixed. Renaming the night frames to
+    match the day ones would be tidier and would silently invalidate act VIII's
+    cache, so it is deliberately not done.
+    """
+    out = cached_name(month, variant)
+    if out.exists():
+        return out
+    for m, path in months(variant):
+        if m == month:
+            OUT_DIR.mkdir(parents=True, exist_ok=True)
+            crop_16x9(decode(path)).save(out)
+            return out
+    return None
 
 
 def decode(path):
@@ -82,25 +111,43 @@ def crop_16x9(img):
 
 
 def main(argv=None):
-    found = months()
-    if not found:
-        print(f"note: no Bluefin wallpapers under {SOURCE_DIR}; act VIII will "
-              f"fall back to the deck's flat ink.", file=sys.stderr)
-        return 0
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    for month, path in found:
-        out = OUT_DIR / f"{month:02d}.png"
-        if out.exists():
-            print(f"have {out.name}")
+    import argparse
+
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--variant", choices=("night", "day", "both"),
+                    default="night",
+                    help="which half of each month's pair to cache "
+                         "(default: night, act VIII's)")
+    args = ap.parse_args(argv)
+    wanted = ("night", "day") if args.variant == "both" else (args.variant,)
+
+    for variant in wanted:
+        found = months(variant)
+        if not found:
+            print(f"note: no Bluefin {variant} wallpapers under {SOURCE_DIR}; "
+                  f"the consumer falls back to the deck's flat ink.",
+                  file=sys.stderr)
             continue
-        crop_16x9(decode(path)).save(out)
-        print(f"wrote {out.name}  <- {path.name}")
-    missing = [m for m in range(1, 13) if not (OUT_DIR / f"{m:02d}.png").exists()]
-    if missing:
-        print(f"note: no dark-mode art installed for month(s) "
-              f"{', '.join(f'{m:02d}' for m in missing)}; the cycle skips them.",
-              file=sys.stderr)
+        OUT_DIR.mkdir(parents=True, exist_ok=True)
+        for month, path in found:
+            out = OUT_DIR / (f"{month:02d}.png" if variant == "night"
+                             else f"{month:02d}-{variant}.png")
+            if out.exists():
+                print(f"have {out.name}")
+                continue
+            crop_16x9(decode(path)).save(out)
+            print(f"wrote {out.name}  <- {path.name}")
+        missing = [m for m in range(1, 13) if not cached_name(m, variant).exists()]
+        if missing:
+            print(f"note: no {variant} art installed for month(s) "
+                  f"{', '.join(f'{m:02d}' for m in missing)}; "
+                  f"the cycle skips them.", file=sys.stderr)
     return 0
+
+
+def cached_name(month, variant="night"):
+    return OUT_DIR / (f"{month:02d}.png" if variant == "night"
+                      else f"{month:02d}-{variant}.png")
 
 
 if __name__ == "__main__":

@@ -25,9 +25,15 @@ def test_the_act_list_comes_from_the_real_running_order():
     truth. If the table stops parsing, that is the failure to fix, not the
     parser."""
     acts = deliver.parse_running_order(REPO_ROOT / "docs" / "running-order.md")
-    assert [a.numeral for a in acts] == ["I", "II", "III", "IV", "V", "VI",
+    assert [a.numeral for a in acts] == ["0", "I", "II", "III", "IV", "V", "VI",
                                          "VII", "VIII"]
-    assert acts[5].prod_file == "06-7daystothewolves.mp4"
+    # The PROLOGUE is "0" on purpose. It is a cold open in front of act I and it
+    # takes no numeral, because the eight act numerals are load-bearing: giving
+    # it "I" and shifting everything behind it would move every chapter marker,
+    # every Prod/NN-*.mp4 name and every key in delivery.json.
+    assert acts[0].numeral == "0"
+    assert acts[0].prod_file == "00-prologue.mp4"
+    assert acts[6].prod_file == "06-7daystothewolves.mp4"
     # Act VIII has no film (issue #51); its numeral is load-bearing.
     assert acts[-1].numeral == "VIII"
     # Act VIII HAS a film now (#51). It had none for most of the project's
