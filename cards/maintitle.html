@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Main title</title>
+<style>
+  /*
+   * The feature's MAIN TITLE, burned over the prologue at 0:11.
+   *
+   * Nothing here is designed from scratch. The lockup is the site's own
+   * two-line "slim" intro cue, copied from `projectbluefin/website`:
+   *
+   *   src/components/wolves/WolvesIntroOverlay.vue
+   *     .wolves-intro-overlay-text
+   *     .wolves-intro-overlay-text-slim
+   *     .wolves-intro-overlay-text-slim-line1
+   *     .wolves-intro-overlay-text-slim-line2
+   *   src/style/wolves-cinematic.scss                (the tokens)
+   *   cards/act.html                                 (the credit rows' face)
+   *
+   * THE COPY IS AUTHORED, NOT WRITTEN HERE. The two title lines are the exact
+   * string the site's prologue already carries, at
+   * `src/data/wolves-intro-sequence.ts` (the 78.5 - 94 cue):
+   *
+   *     'PROJECT BLUEFIN\nseven days to the wolves'
+   *
+   * -- reproduced verbatim, in the same order, the same way
+   * stories/megacut/megacut-cards.json reproduces it for act I's slide.
+   *
+   * ONE DELIBERATE DIFFERENCE, and it is the owner's:
+   *
+   *   "Seven Days to the Wolves is the title of the whole movie so it should
+   *    be featured, the project bluefin should be on top, subtle but present"
+   *
+   * The site gives line 1 (PROJECT BLUEFIN) the display size and line 2 the
+   * small one. Here the two TREATMENTS are swapped -- the film's title takes
+   * line1's size, weight and colour, and PROJECT BLUEFIN takes line2's --
+   * while the authored ORDER is untouched, so Bluefin still sits on top. No
+   * value is invented: both rules are the site's, applied to the other line.
+   * This is the same kind of recorded, additive owner departure that act.html
+   * carries for its huge Roman numerals.
+   *
+   * A SECOND ROW, THE CREDIT PAIR, is the owner's copy verbatim -- "Music by
+   * Nightwish", "Action by Bungie" -- set in the act slide's own `.artist`
+   * face so it reads as part of the deck rather than a third typeface. It is
+   * NOT uppercased: it is reproduced as written.
+   *
+   * Rendered at 1920x1080 with a TRANSPARENT background, because this card is
+   * composited over footage rather than flattened onto black. There is
+   * deliberately no scrim: the frame under it at 0:11 is already near-black
+   * (YAVG ~30-46), and darkening it further would only mute the picture.
+   *
+   * STAGED IN TWO PASSES. The owner asked for the title to settle before the
+   * credits arrive, so this template renders twice and the build hard-swaps
+   * one PNG for the other. BOTH cards carry the same `body`; `stage=title`
+   * only makes the credit rows invisible (`visibility`, not `display`), so the
+   * two PNGs are pixel-identical above the swap and the title cannot jump when
+   * the credits appear.
+   */
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  /* --- src/style/wolves-cinematic.scss ------------------------------------ */
+  :root {
+    --wc-gold: #60a5fa;
+    --wc-white: #e9e9e5;
+    --wc-grey: #8b8f96;
+    --wc-font-display: 'Inter', 'Arial Narrow', sans-serif;
+    --wc-font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--wc-font-display);
+    /* THE SCRIM, and why it is here at all.
+     *
+     * The first build had none, on the reasoning that the frame under the
+     * title at 0:11 is near-black. It is -- for 1.3 seconds. The source cuts
+     * at 12.28 to a white starburst and then to a pale haze, and the graded
+     * measurements of the built file are unambiguous: the picture behind this
+     * lockup runs from YAVG 30 to YAVG 150+ inside the title's own window. The
+     * eyebrow and the credit pair were unreadable for most of it.
+     *
+     * So this is `cards/act.html`'s scrim, which exists for exactly this
+     * reason, at a strength chosen for type over MOVING PICTURE rather than
+     * over a slide: the act card sits at 88% black in the centre because
+     * nothing is behind it, and 88% here would throw the shot away. It is
+     * elliptical and centred on the lockup, so it darkens only what it has to
+     * and is gone by the frame edges.
+     *
+     * It lives on the CARD rather than in the build's filtergraph on purpose:
+     * that way it fades up and down with the text it is protecting, and a
+     * scrim can never outlive the title and sit on bare footage. */
+    background: radial-gradient(
+      ellipse 58% 30% at 50% 47%,
+      rgb(4 6 10 / 74%) 0%,
+      rgb(4 6 10 / 58%) 38%,
+      rgb(4 6 10 / 26%) 70%,
+      rgb(4 6 10 / 0%) 100%
+    );
+  }
+
+  /* .wolves-intro-overlay-text, minus the absolute bottom-12% anchoring: a
+     main title is centred rather than lower-third. */
+  .lockup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    /* .wolves-intro-overlay-text-slim */
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-align: center;
+    /* .wolves-intro-overlay-text */
+    text-shadow: 0 2px 18px rgb(0 0 0 / 85%);
+    white-space: pre-line;
+  }
+
+  /* THE OWNER'S SWAP. `.eyebrow` carries the site's line2 rules and `.title`
+     carries its line1 rules; the site applies them the other way round. */
+
+  /* .wolves-intro-overlay-text-slim-line2 */
+  .eyebrow {
+    display: block;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0 0 1.4rem;
+  }
+
+  /* .wolves-intro-overlay-text-slim-line1
+     ONE fitting change to the site's clamp: its max is 5.6rem, chosen for
+     "PROJECT BLUEFIN". The owner's swap puts a 24-character title on this rule
+     instead, which at 5.6rem runs to 88% of frame width -- close enough to the
+     edges to read as cramped on a 16:9 delivery. 4.9rem leaves ~12% either
+     side. The tracking is the site's and is deliberately NOT reduced: letting
+     the size carry the fit keeps the letterform spacing the design specifies. */
+  .title {
+    display: block;
+    font-size: clamp(3.2rem, 5.8vw, 4.9rem);
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    margin: 0;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  /* cards/act.html `.hairline`, at the lockup's own width. */
+  .hairline {
+    width: 34%;
+    height: 1px;
+    margin: 2.2rem 0 0;
+    background: rgb(96 165 250 / 28%);
+  }
+
+  /* cards/act.html `.artist` -- the credit rows. The slot always occupies its
+     space so the staged pair does not shift the title.
+     COLOUR: act.html's `.artist` is --wc-grey (#8b8f96), which is right on a
+     black slide and vanished completely over this footage even with the scrim
+     in. Lifted to #cbd5e1 -- not a new value, it is the site's own secondary
+     text colour, the one `.wolves-intro-overlay-text-slim-line2` uses. */
+  .credits {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1.8rem 0 0;
+    font-family: var(--wc-font-mono);
+    font-size: 1.5rem;
+    letter-spacing: 0.24em;
+    color: #cbd5e1;
+    visibility: hidden;
+  }
+  .credits.shown { visibility: visible; }
+  .credit-line { display: block; }
+</style>
+</head>
+<body>
+  <div class="lockup">
+    <span class="eyebrow" id="eyebrow"></span>
+    <h1 class="title" id="title"></h1>
+    <div class="hairline"></div>
+    <div class="credits" id="credits"></div>
+  </div>
+<script>
+  const params = new URLSearchParams(window.location.search)
+
+  function fill(id, value) {
+    const el = document.getElementById(id)
+    if (!value) { el.style.display = 'none'; return false }
+    el.textContent = value
+    return true
+  }
+
+  // `label` is PROJECT BLUEFIN, `title` is the film's title, and `body`
+  // repeats for the credit pair -- the same keys every other card in this
+  // repo uses, so the manifest needs almost no new vocabulary.
+  fill('eyebrow', params.get('label'))
+  fill('title', params.get('title'))
+
+  // BOTH staged cards carry the same `body`, so the credit rows always occupy
+  // their space and the two PNGs are identical above them. `stage` decides
+  // only whether they are VISIBLE: `title` is the first beat, `credits` the
+  // second. Anything else shows them, so a single unstaged card still works.
+  const host = document.getElementById('credits')
+  for (const line of params.getAll('body')) {
+    const row = document.createElement('span')
+    row.className = 'credit-line'
+    row.textContent = line
+    host.appendChild(row)
+  }
+  if (params.get('stage') !== 'title') { host.classList.add('shown') }
+
+  document.fonts.ready.then(() => { window.__renderReady = true })
+</script>
+</body>
+</html>

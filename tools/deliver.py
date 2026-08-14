@@ -142,7 +142,10 @@ FAILING = {STALE, MISSING, CONFLICT, EPHEMERAL}
 # One act row in docs/running-order.md's table:
 #   | **I** | Project Bluefin | `Prod/01-intro.mp4` — ... | delivered |
 # Act VIII's film cell is a dash -- it has no film and keeps its numeral.
-ACT_ROW = re.compile(r"^\|\s*\*\*([IVXL]+)\*\*\s*\|([^|]*)\|([^|]*)\|")
+# `0` is the PROLOGUE, which deliberately has no numeral: the eight act
+# numerals are load-bearing (AGENTS.md), so a cold open in front of act I is
+# numbered outside them rather than by renumbering everything behind it.
+ACT_ROW = re.compile(r"^\|\s*\*\*(0|[IVXL]+)\*\*\s*\|([^|]*)\|([^|]*)\|")
 PROD_FILE = re.compile(r"`Prod/([0-9]{2}-[^`]+\.mp4)`")
 
 

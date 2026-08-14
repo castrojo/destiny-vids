@@ -7,15 +7,19 @@ in.** Everything else executes it: `stories/megacut/megacut.json` assembles it,
 If one of those disagrees with this file, this file is right and the other is a
 bug.
 
-## Seven Days to the Wolves, in eight acts
+## Seven Days to the Wolves, in eight acts — behind a prologue
 
 Settled by the owner on 2026-08-12 and **canonical**:
 
 > intro → endlessformsmostbeautiful → mrbobbytables → kat → nat →
 > 7daystothewolves → europa → credits
 
+On 2026-08-14 the owner added a **prologue in front of it**. That order is
+untouched: the prologue takes **no numeral** and nothing is renumbered.
+
 | Act | Chapter | The film | State |
 |---|---|---|---|
+| **0** | *(no chapter — it is the main title)* | `Prod/00-prologue.mp4` — Nightwish's *Perfume Of The Timeless*, the main title at 0:11, then the March day→night bridge | delivered, **prototype**; shipping form is an embed |
 | **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the title cover | delivered |
 | **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers, and *The Long Walk* inside them | delivered and **credited**, in the programme |
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
@@ -24,6 +28,53 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; now the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits |
 | **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; **1:37.266**, the comic cover cut so act VIII owns the reveal — #178; plays the pre-terse-pass film — #102; master corrected to −1.1 dBTP — #82 |
 | **VIII** | Credits | `Prod/08-credits.mp4` — the cast, 619 contributors across **six** projects, the comic-cover reveal and the wordmark | delivered, **in the programme**; **no slide, no chapter marker** — it is meant to surprise — #51 |
+
+## The prologue, and why it has no numeral
+
+Added 2026-08-14 on the owner's instruction: *"Make this video the intro in
+front of endless forms"*, pointing at Nightwish's official music video for
+**"Perfume Of The Timeless"** (`oHCaZmIzr0o`). Asked where it should sit, the
+owner placed it as a **new cold open in front of act I** — *Into the Light*
+stays exactly where it was.
+
+**It takes no numeral, and that is the whole design.** The eight numerals are
+load-bearing: `AGENTS.md` says III is `mrbobbytables` permanently, and
+renumbering to make room for a ninth act at the front would move every chapter
+marker, every `Prod/NN-*.mp4` filename and every key in
+`stories/megacut/delivery.json`. So it delivers as `00-prologue` and the
+canonical eight-act order above is unchanged.
+
+**It carries no slide and no chapter marker**, for the same reason act VIII
+carries none: `chapters()` derives markers from slides, and a card announcing
+the main title sequence would step on the main title sequence.
+
+| | |
+|---|---|
+| Runtime | **1:39.200** — 91.200 of picture, then an 8.000 bridge |
+| Title at | 11.000, staged: the lockup, then the credit pair at 15.400 |
+| Out point | **91.200**, the source's own luma minimum (the owner said 1:31) |
+| Master | `renders/00-prologue.mp4`, built by `scripts/build_prologue.py` |
+| Copy | `stories/00-prologue-plates.json`, reproduced from the website's own cue |
+| Rights | `music/bed_perfume_of_the_timeless.json` |
+
+The build, the three measured numbers and the dramatic reasoning are in
+[`docs/cuts/00-prologue.md`](cuts/00-prologue.md).
+
+**The rendered file is a prototype, and the distinction matters.** Asked about
+rights, the owner's answer was *"it's an iframe using their video don't
+download it"* — the shipping presentation **embeds** Nightwish's video rather
+than re-hosting it, and the web version is deliberately deferred (*"we are
+prototyping we'll do the web thing later"*). So `Prod/00-prologue.mp4` exists
+to cut and watch against, and the prologue is recorded in
+`stories/megacut/delivery.json` as having **no social copy by design** — a
+standalone clip is precisely the redistribution the embed avoids.
+
+**One thing the owner may still want moved.** The written request said *"stop
+at 1:31 and then transition to endless forms"*, while the placement chosen puts
+the prologue in front of act I — so it currently plays
+`PROLOGUE → I → II`, not `PROLOGUE → II`. The prologue was built
+self-contained, with the bridge as its own tail, so moving it is one reordered
+item in `stories/megacut/megacut.json` and a row here — not a re-render.
 
 **Act VIII has a film and the programme plays it.** Built from
 `stories/08-credits.json` by `scripts/build_credits.py`: four fixed cards,

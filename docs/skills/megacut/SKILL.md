@@ -39,7 +39,6 @@ metadata:
 - Delivering a finished file → [`production.md`](../production/SKILL.md)
 
 ## Assembly is not editing
-
 This stage **joins finished things**. It never re-cuts, re-times or re-grades
 one. Every item it is handed is either a rendered cut from this repo or an
 owner-approved deliverable, and if one of them is wrong the fix belongs
@@ -90,6 +89,12 @@ This skill is the contract. The procedure lives in `references/`:
 
 ## Red Flags
 
+- **An item that plays before act I does not get act I's numeral.** The eight
+  act numerals are load-bearing (`AGENTS.md`), so a cold open is numbered
+  *outside* them — the prologue is `0`, and nothing behind it moved. Renumbering
+  to make room at the front rewrites every chapter marker, every
+  `Prod/NN-*.mp4` name and every key in `delivery.json`. `deliver.py`'s
+  `ACT_ROW` accepts `0` for exactly this.
 - **A silent segment's two legs must be equal by construction.** Generating
   silence from a probed or authored duration while the picture runs its own
   natural length is a latent desync: `concat` advances each stream's timeline
