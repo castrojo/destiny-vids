@@ -237,21 +237,24 @@ def load_plan(path, require_sources=True):
     return plan
 
 
-def resolve(src, required=True):
+def resolve(src):
     """The one path resolver: absolute wins, then repo-root, then cwd.
 
     Validation and encoding MUST agree on this. When the two disagreed, a
     relative path could be validated against the repo copy and then encoded
     from a different file of the same name in the working directory -- the file
     that was checked would not be the file that shipped.
+
+    A path that resolves nowhere comes back empty, which is what makes
+    `if not resolve(src)` the missing-source check.
     """
     p = Path(src)
     if p.is_absolute():
-        return str(p) if not required or p.exists() else ""
+        return str(p) if p.exists() else ""
     for candidate in (REPO_ROOT / src, Path.cwd() / src):
         if candidate.exists():
             return str(candidate)
-    return "" if required else str(REPO_ROOT / src)
+    return ""
 
 
 def build_inputs(plan, items=None):
@@ -293,7 +296,7 @@ def build_filtergraph(plan, items=None):
     layout = plan.get("layout", DEFAULT_LAYOUT)
 
     items = plan["items"] if items is None else items
-    chains, labels = [], []
+    chains = []
     for i, item in enumerate(items):
         v, a = f"v{i}", f"a{i}"
         if item["kind"] == "card":
@@ -350,7 +353,6 @@ def build_filtergraph(plan, items=None):
                     f"aformat=sample_fmts=fltp:channel_layouts={layout},"
                     f"asetpts=PTS-STARTPTS[{a}]"
                 )
-        labels += [f"[{v}][{a}]"]
 
     if len(items) != 1:
         raise ValueError(
@@ -452,7 +454,7 @@ def verify_segment(plan, index, seg_path):
     within rounding.
     """
     item = plan["items"][index]
-    expected_sec = _item_dur_programme_clock(item)
+    expected_sec = item_duration(item)
     built_sec = probe_video_extent(seg_path)
     if abs(built_sec - expected_sec) > SEGMENT_DURATION_TOLERANCE_SEC:
         label = item.get("label", item.get("path") or item.get("image"))
@@ -537,16 +539,6 @@ def clip_audio_chain(item, rate, layout, dur):
             f"{fade_chain(item, float(dur) if dur is not None else 0.0)}")
 
 
-def _clip_dur_for_audio(item):
-    """How long the clip is, for fade placement: authored, else probed from
-    the video stream (the container can report a longer audio stream, and a
-    fade placed against that starts early)."""
-    dur = item.get("dur")
-    if dur is None and float(item.get("fade_out", 0)):
-        dur = probe_duration(resolve(item["path"]), stream="v:0")
-    return dur
-
-
 def build_segment_command(plan, index, seg_path, threads=None):
     """Encode one item to its own normalised segment.
 
@@ -614,11 +606,16 @@ def build_segment_command(plan, index, seg_path, threads=None):
         af = []
     else:
         maps = ["-map", "0:v:0", "-map", "0:a:0"]
+        # Authored duration, else probed from the video stream -- the container
+        # can report a longer audio stream, and a fade placed against that
+        # starts early. Only a fade needs the number, so only a fade pays the probe.
+        dur = item.get("dur")
+        if dur is None and float(item.get("fade_out", 0)):
+            dur = probe_duration(resolve(item["path"]), stream="v:0")
         # aresample only where the rate differs; aformat pins the layout so the
         # join sees one shape. No gain is applied anywhere; the only treatment
         # is an explicit fade the plan asked for (issue #105).
-        af = ["-af", clip_audio_chain(item, rate, layout,
-                                      _clip_dur_for_audio(item))]
+        af = ["-af", clip_audio_chain(item, rate, layout, dur)]
     return [*args, "-vf", segment_video_chain(plan, item), *af, *maps, *common]
 
 
@@ -721,7 +718,7 @@ def _segment_worker(job):
     return index
 
 
-def assemble(plan, out_path, workdir=None, log=None, jobs=None,
+def assemble(plan, out_path, log=None, jobs=None,
              conform_cache=None, allow_copy=True):
     """Build every segment, then join them. Returns the output path.
 
@@ -747,9 +744,8 @@ def assemble(plan, out_path, workdir=None, log=None, jobs=None,
     jobs = max(1, min(jobs, n_items)) if jobs else default_jobs(n_items)
     threads = max(1, (os.cpu_count() or 1) // jobs) if jobs > 1 else None
     copy_ok = _copy_path_ok(plan, allow_copy)
-    ctx = (tempfile.TemporaryDirectory(prefix="megacut-", dir=workdir)
-           if workdir is None else None)
-    tmp = Path(ctx.name) if ctx else Path(workdir)
+    ctx = tempfile.TemporaryDirectory(prefix="megacut-")
+    tmp = Path(ctx.name)
     try:
         # Phase 1: every clip's source made conformant, cached, so its
         # segment can copy the picture. Unchanged sources are cache hits;
@@ -803,28 +799,16 @@ def assemble(plan, out_path, workdir=None, log=None, jobs=None,
         subprocess.run(build_concat_command(plan, list_path, out_path), check=True)
         verify_programme(plan, out_path)
     finally:
-        if ctx:
-            ctx.cleanup()
+        ctx.cleanup()
     return out_path
 
 
 def expected_duration(plan):
-    total = 0.0
-    for item in plan["items"]:
-        if item["kind"] == "card":
-            total += float(item["dur"])
-        else:
-            # `is None`, not `or`: a 0 would fall through to a probe and report
-            # a length the graph does not build. build_filtergraph tests the
-            # same way, and the two must not disagree about what "no dur" is.
-            dur = item.get("dur")
-            if dur is None:
-                dur = probe_duration(resolve(item["path"]), stream="v:0")
-            total += float(dur)
-    return total
+    """The programme's length: every item on the programme clock, summed."""
+    return sum(item_duration(item) for item in plan["items"])
 
 
-def _item_dur_programme_clock(item):
+def item_duration(item):
     """One item's length on the PROGRAMME (megacut) clock.
 
     `is None`, not `or`: a 0 would fall through to a probe and report a length
@@ -904,7 +888,7 @@ def chapters(plan, include_sub_chapters=False):
         if include_sub_chapters and item.get("sub_chapters"):
             for at_film, title in load_sub_chapters(item["sub_chapters"]):
                 out.append((t_programme + at_film, title))
-        t_programme += _item_dur_programme_clock(item)
+        t_programme += item_duration(item)
     return out
 
 
@@ -984,9 +968,6 @@ def main(argv=None):
                     help="turn review-note timecodes on the PROGRAMME clock "
                          "(12:43, 1:02:11, 763) into the act that is playing "
                          "and the offset inside its own file; encodes nothing")
-    ap.add_argument("--workdir",
-                    help="keep the intermediate segments here instead of a "
-                         "temporary directory (they are large; for debugging a join)")
     ap.add_argument("--jobs", type=int, default=None,
                     help="build this many segments in parallel "
                          "(default min(cpu//6, items)); x264 saturates early, "
@@ -1036,7 +1017,7 @@ def main(argv=None):
         return 0
 
     print(f"assembling {len(plan['items'])} items -> {out_path}", file=sys.stderr)
-    assemble(plan, out_path, workdir=args.workdir, jobs=args.jobs,
+    assemble(plan, out_path, jobs=args.jobs,
              conform_cache=args.conform_cache, allow_copy=not args.no_copy)
     print(f"wrote {out_path}")
     return 0

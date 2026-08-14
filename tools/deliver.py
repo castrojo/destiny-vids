@@ -203,12 +203,9 @@ def resolve_master(path):
     return Path(path).expanduser()
 
 
-def md5(path, _chunk=1 << 20):
-    h = hashlib.md5()
+def md5(path):
     with open(path, "rb") as fh:
-        for block in iter(lambda: fh.read(_chunk), b""):
-            h.update(block)
-    return h.hexdigest()
+        return hashlib.file_digest(fh, "md5").hexdigest()
 
 
 def same_file(a, b):

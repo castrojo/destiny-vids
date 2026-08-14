@@ -600,8 +600,9 @@ CREST_INNER = [(50, 12), (78, 25), (87, 52), (50, 85), (13, 52), (22, 25)]
 CREST_CHEVRON = [(35, 45), (50, 60), (65, 45)]
 
 
-def _cubic(p0, p1, p2, p3, steps=24):
+def _cubic(p0, p1, p2, p3):
     """Flatten a cubic Bezier to polygon points (excluding ``p0``)."""
+    steps = 24
     out = []
     for i in range(1, steps + 1):
         t = i / steps
@@ -1373,15 +1374,6 @@ def _tear(img):
         [0, int(img.height * 0.42), img.width, int(img.height * 0.58)],
         fill=(0, 0, 0, 0))
     return out
-
-
-def _glitch(img):
-    """Kept for callers that hold a finished card: split then tear.
-
-    Prefer ``_render_status(spec, glitch=True)``, which splits the TEXT layer
-    the way the CSS does. This whole-card form fringes the panel edges too.
-    """
-    return _tear(_rgb_split(img))
 
 
 def render_plate(spec):

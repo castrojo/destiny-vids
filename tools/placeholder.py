@@ -203,14 +203,7 @@ def main(argv=None):
                         help="exit 1 if any placeholder remains -- for anyone "
                              "gating a final cut, NOT for CI, which must stay "
                              "green while copy is still being written")
-    shower = sub.add_parser("show", help="print one deterministic line")
-    shower.add_argument("--chars", type=int, default=DEFAULT_CHARS)
-    shower.add_argument("--seed", default="")
     args = ap.parse_args(argv)
-
-    if args.command == "show":
-        print(lorem(args.chars, args.seed))
-        return 0
 
     found = scan()
     for item in found:

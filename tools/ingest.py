@@ -25,6 +25,10 @@ import sys
 import urllib.parse
 import urllib.request
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from tools import derive  # noqa: E402
+
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VIDEOS_DIR = os.path.join(REPO_ROOT, "videos")
 
@@ -111,8 +115,10 @@ def infer_video_defaults(title, description="", playlist=""):
     return out
 
 
-def slug(text):
-    return re.sub(r"_+", "_", re.sub(r"[^a-z0-9]+", "_", text.lower())).strip("_")
+# One normaliser, not two: a video_id minted here and a character id derived
+# in tools/derive.py are compared as strings, so they must agree by
+# construction rather than by both being maintained.
+slug = derive.snake_case
 
 
 def parse_video_id(url_or_id):

@@ -121,7 +121,7 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | Path | What it is |
 |---|---|
 | `vocab/` | Controlled vocabularies (YAML) — the **single source of truth** for every enum. `cleanliness.yaml` (overlays → `clean`, `footage_tier`) and `casting.yaml` (the lead cast map + ensemble policy) carry the two decisions above. |
-| `schema/segment.schema.json` | JSON Schema (Draft 2020-12) for one indexed segment/beat. |
+| `schema/segment.schema.json` | JSON Schema (Draft 2020-12) for one indexed segment/beat. Its `enum` lists are **generated** from `vocab/` by `scripts/generate_schema_enums.py`; everything else is hand-authored. |
 | `schema/video.schema.json` | JSON Schema for a source-video record (video-scoped inherited defaults). |
 | `schema/brief.schema.json` | JSON Schema for the `brief` block in a GitHub issue — the machine-readable half of a request for a video. |
 | `examples/` | Fully-annotated example records that validate against the schemas. |
@@ -147,7 +147,6 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `segments/` | Assembled, schema-valid segment records for real footage — 69 shots from the TFS launch trailer and 50 from the Curse of Osiris opening cinematic. |
 | `tests/` | `pytest` suite across search, derivation, story assembly, ensemble casting, ingestion, the stub pipeline, and ffmpeg resolution. |
 | `docs/` | `SKILL.md` (agent skill router) and `skills/`, plus the design docs: `taxonomy.md` (axis reference), `pipeline.md` (segmentation + cost tiers), `agent-retrieval.md` (query mapping), `rendering.md` (which ffmpeg, and why). `cuts/` documents each shipped cut. |
-| `docs/plans/` | Planning artifacts for work too large for one change: a design, the research behind it, and one issue-ready file per unit of work, under the lifecycle `AGENTS.md` defines. `wolves/` is the comm-line system ([#9](https://github.com/castrojo/destiny-vids/issues/9)); `halo/` is the Halo-universe campaign re-skin ([#11](https://github.com/castrojo/destiny-vids/issues/11)). |
 | `AGENTS.md` | Agent operating contract: commands, boundaries, and the three rules that outrank convenience. |
 
 ## The unit: a "beat"

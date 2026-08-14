@@ -50,7 +50,19 @@ TARGET_FPS = conform.DELIVERY.fps
 # Bluefin runs a long-lived ffmpeg container with $HOME bind-mounted at the same
 # path, so host paths resolve unchanged inside it (see docs/rendering.md).
 DEFAULT_CONTAINER = "bluefin-thumbnailer"
-DEFAULT_IMAGE = "ghcr.io/jrottenberg/ffmpeg"
+
+# Where and how long detect_picture reads the source. Issue #161: a cut shorter
+# than PROBE_AT gets no reading at all, and silently falls back to the frame.
+PROBE_AT = 40.0
+PROBE_LEN = 5.0
+
+# The one intermediate shape. Every clip -- cut or still -- is normalised to it,
+# because the concat demuxer joins only inputs whose stream properties match.
+VIDEO_FILTER = (
+    f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease,"
+    f"pad={TARGET_W}:{TARGET_H}:(ow-iw)/2:(oh-ih)/2,"
+    f"fps={TARGET_FPS},format=yuv420p"
+)
 
 
 def _container_running(name):
@@ -151,7 +163,7 @@ def resolve_media(video_id, media_dir):
     return None
 
 
-def detect_picture(video, ffmpeg=None, probe_at=40.0, probe_len=5.0):
+def detect_picture(video):
     """Find the real picture area inside a letterboxed frame.
 
     Bungie's cinematics are 2.39:1 delivered in a 16:9 file, so ~140px of the
@@ -162,9 +174,9 @@ def detect_picture(video, ffmpeg=None, probe_at=40.0, probe_len=5.0):
     Returns ``(x, y, w, h)``, falling back to the full frame when ffmpeg's
     cropdetect finds nothing (an un-letterboxed source, or no decoder).
     """
-    ffmpeg = ffmpeg or find_ffmpeg()
+    ffmpeg = find_ffmpeg()
     cmd = [*ffmpeg, "-nostdin", "-hide_banner",
-           "-ss", str(probe_at), "-t", str(probe_len), "-i", str(Path(video).resolve()),
+           "-ss", str(PROBE_AT), "-t", str(PROBE_LEN), "-i", str(Path(video).resolve()),
            "-vf", "cropdetect=24:2:0", "-f", "null", "-"]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     found = re.findall(r"crop=(\d+):(\d+):(\d+):(\d+)", proc.stderr)
@@ -192,11 +204,6 @@ def still_clip(ffmpeg, image, duration, out_path, keep_audio=True):
     would make it the only input with a stream the others lack, and the join
     fails.
     """
-    vf = (
-        f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease,"
-        f"pad={TARGET_W}:{TARGET_H}:(ow-iw)/2:(oh-ih)/2,"
-        f"fps={TARGET_FPS},format=yuv420p"
-    )
     cmd = list(ffmpeg) + ["-v", "error", "-y", "-loop", "1", "-t", f"{duration:.3f}",
                           "-i", str(image)]
     if keep_audio:
@@ -208,7 +215,7 @@ def still_clip(ffmpeg, image, duration, out_path, keep_audio=True):
                 "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2"]
     else:
         cmd += ["-map", "0:v:0", "-an"]
-    cmd += ["-vf", vf,
+    cmd += ["-vf", VIDEO_FILTER,
             *conform.video_encode_args(crf=18, preset="medium"), str(out_path)]
     subprocess.run(cmd, check=True)
 
@@ -230,16 +237,11 @@ def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
     Normalizing every clip to one size/rate/pixel format is what lets the concat
     demuxer join them: it requires identical stream properties across inputs.
     """
-    vf = (
-        f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease,"
-        f"pad={TARGET_W}:{TARGET_H}:(ow-iw)/2:(oh-ih)/2,"
-        f"fps={TARGET_FPS},format=yuv420p"
-    )
     cmd = list(ffmpeg) + [
         "-v", "error", "-y",
         "-i", str(src),
         "-ss", f"{start_sec:.3f}", "-t", f"{duration:.3f}",
-        "-vf", vf,
+        "-vf", VIDEO_FILTER,
         *conform.video_encode_args(crf=18, preset="medium"),
     ]
     if keep_audio:
@@ -349,7 +351,7 @@ def cap_holds(shots, max_shot_sec, log=None):
 
 
 def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=True,
-           ffmpeg=None, target_dbtp=peaks.DEFAULT_TARGET_DBTP, _peak_attempts=5):
+           ffmpeg=None, target_dbtp=peaks.DEFAULT_TARGET_DBTP):
     ffmpeg = ffmpeg or find_ffmpeg()
     out_path = Path(out_path).resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -396,7 +398,7 @@ def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=
 
             peaks.correct_delivered_peak(
                 out_path, 1.0, target_dbtp, rerun, ffmpeg=ffmpeg,
-                attempts=_peak_attempts,
+                attempts=5,
                 margin_db=peaks.DELIVERED_BAND_MARGIN_DB)
     return rendered, missing
 
@@ -407,7 +409,6 @@ def main(argv=None):
     ap.add_argument("--media", default=str(REPO_ROOT / "media"),
                     help="directory of source video files named <video_id>.mp4")
     ap.add_argument("--out", default=str(REPO_ROOT / "renders" / "cut.mp4"))
-    ap.add_argument("--mute", action="store_true", help="drop source audio")
     ap.add_argument("--audio", help="lay this audio file over the finished cut")
     ap.add_argument("--no-container", action="store_true",
                     help="skip the ffmpeg container and use a local binary")
@@ -425,7 +426,7 @@ def main(argv=None):
     print(f"rendering {len(shots)} shot(s) -> {args.out}")
     shots = cap_holds(shots, args.max_shot_sec, log=print)
     rendered, missing = render(shots, args.media, args.out,
-                               keep_audio=not args.mute and not args.audio,
+                               keep_audio=not args.audio,
                                audio_bed=args.audio, ffmpeg=ffmpeg,
                                target_dbtp=args.target_dbtp)
     total = sum(resolve_duration(s) for s in shots)

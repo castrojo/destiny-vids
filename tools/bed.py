@@ -48,6 +48,7 @@ import json
 import math
 import operator
 import os
+import statistics
 import subprocess
 import sys
 import wave
@@ -102,14 +103,22 @@ def fmt_tc(seconds):
 
 # --- measurement ------------------------------------------------------------
 
+def _ffprobe(path, args, ffmpeg=None):
+    """One ffprobe read, returning its single CSV field.
+
+    The container's own numbers, deliberately: a bed is one audio file, so
+    there is no video stream to disagree with (which is the distinction
+    megacut.probe_duration exists to make, on files that have both).
+    """
+    exe = ffmpeg or "ffprobe"
+    return subprocess.run(
+        [exe, "-v", "error", *args, "-of", "csv=p=0", str(Path(path).resolve())],
+        capture_output=True, text=True, check=True).stdout.strip()
+
+
 def probe_duration(path, ffmpeg=None):
     """Exact duration in seconds, via ffprobe."""
-    exe = ffmpeg or "ffprobe"
-    out = subprocess.run(
-        [exe, "-v", "error", "-show_entries", "format=duration",
-         "-of", "csv=p=0", str(Path(path).resolve())],
-        capture_output=True, text=True, check=True).stdout
-    return float(out.strip())
+    return float(_ffprobe(path, ["-show_entries", "format=duration"], ffmpeg))
 
 
 def analyze_grid(path, beats_per_bar=DEFAULT_BEATS_PER_BAR, sr=22050,
@@ -300,8 +309,7 @@ def baseline_of(level):
     """The song's typical loudness: median of the smoothed level. Median, not
     mean, because a 12 s breakdown should not lower the bar it is measured
     against."""
-    s = sorted(level)
-    return s[len(s) // 2]
+    return statistics.median(level)
 
 
 def find_drops(level, hop, baseline, drop_db=DROP_DB, min_down_sec=MIN_DOWN_SEC):
@@ -602,13 +610,8 @@ def build_filter(record):
 
 def probe_codec(path, ffmpeg=None):
     """The source's PCM codec name, so a re-cut does not quietly downgrade it."""
-    exe = ffmpeg or "ffprobe"
-    out = subprocess.run(
-        [exe, "-v", "error", "-select_streams", "a:0",
-         "-show_entries", "stream=codec_name", "-of", "csv=p=0",
-         str(Path(path).resolve())],
-        capture_output=True, text=True, check=True).stdout.strip()
-    return out or "pcm_s16le"
+    args = ["-select_streams", "a:0", "-show_entries", "stream=codec_name"]
+    return _ffprobe(path, args, ffmpeg) or "pcm_s16le"
 
 
 def render_bed(record, media_dir, out_path, ffmpeg="ffmpeg"):

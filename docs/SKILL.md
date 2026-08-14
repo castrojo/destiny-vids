@@ -42,7 +42,6 @@ than restating them:
 | [`agent-retrieval.md`](agent-retrieval.md) | How a natural-language query maps to filters and ranking. |
 | [`rendering.md`](rendering.md) | Which ffmpeg, why, and the seeking/AV1 traps. |
 | [`../schema/brief.schema.json`](../schema/brief.schema.json) | Every field of an issue's `brief` block. |
-| [`plans/wolves/design.md`](plans/wolves/design.md) | **Planned, not built.** The comm-line system: `WOLVES.md`, identity, affiliation, tempo. |
 
 ## Writing a skill here
 

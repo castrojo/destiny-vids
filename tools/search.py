@@ -26,11 +26,11 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import glob
 import json
 import os
 import re
 import sys
+from pathlib import Path
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -177,7 +177,6 @@ STOPWORDS = {
 MULTI = {"class": CLASS, "element": ELEMENT, "faction": FACTION,
          "activity": ACTIVITY, "destination": DESTINATION, "action": ACTION}
 
-MULTI_VALUE_FIELDS = {"faction", "composition", "camera_movement", "mood", "action"}
 # Saliences the editorial line favours. `crowd_group` is here because the
 # anonymous crowd is now the ensemble cast, not background noise.
 PREFERRED_SALIENCE = {"guardian_hero", "crowd_group", "environment_establishing",
@@ -190,11 +189,10 @@ NEVER_RELAX = {"class", "element", "faction", "casting.person", "casting.charact
 
 def load_segments(directory):
     segs = []
-    for path in sorted(glob.glob(os.path.join(directory, "*.json"))):
-        with open(path) as fh:
-            rec = json.load(fh)
+    for path in sorted(Path(directory).glob("*.json")):
+        rec = json.loads(path.read_text())
         if "segment_id" in rec:  # skip video-level records
-            rec["_path"] = os.path.basename(path)
+            rec["_path"] = path.name
             segs.append(rec)
     return segs
 
@@ -204,11 +202,10 @@ def tokenize(text):
 
 
 def parse_query(query):
-    """Return {filters, caption_terms, notes}. filters: facet -> set(values)."""
+    """Return {filters, caption_terms}. filters: facet -> set(values)."""
     q = query.lower()
     filters = {}
     consumed_spans = []
-    notes = []
 
     def add(facet, values):
         filters.setdefault(facet, set()).update(values)
@@ -245,7 +242,7 @@ def parse_query(query):
         if t not in STOPWORDS and t not in consumed and t not in phrase_tokens
         and len(t) > 1
     ]
-    return {"filters": filters, "caption_terms": caption_terms, "notes": notes}
+    return {"filters": filters, "caption_terms": caption_terms}
 
 
 def get_field(seg, facet):
