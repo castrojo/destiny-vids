@@ -12,9 +12,9 @@
       "src": 72.0
     },
     {
-      "at": 147.801,
+      "at": 146.033,
       "title": "The Long Walk",
-      "src": 165.567
+      "src": 163.799
     }
   ],
   "plates": [
@@ -696,6 +696,17 @@
       "placeholder": true
     },
     {
+      "id": "toc_karena",
+      "kind": "chat",
+      "at": 137.533,
+      "dur": 3.2,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "Karena",
+      "text": "One hundred thousand bootc volunteers, ready to power up",
+      "text_source": "owner_supplied"
+    },
+    {
       "id": "letterbox_banner_1",
       "kind": "banner",
       "at": 139.0,
@@ -706,20 +717,9 @@
       "text_source": "owner_supplied"
     },
     {
-      "id": "toc_karena",
-      "kind": "chat",
-      "at": 139.0,
-      "dur": 3.2,
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "speaker": "Karena",
-      "text": "One hundred thousand bootc volunteers, ready to power up",
-      "text_source": "owner_supplied"
-    },
-    {
       "id": "toc_joseph_worth",
       "kind": "chat",
-      "at": 142.45,
+      "at": 140.983,
       "dur": 2.2,
       "position": "left",
       "copy_source": "owner_supplied",
@@ -730,8 +730,8 @@
     {
       "id": "toc_ricardo",
       "kind": "chat",
-      "at": 144.9,
-      "dur": 2.651,
+      "at": 143.433,
+      "dur": 2.4,
       "position": "left",
       "copy_source": "owner_supplied",
       "speaker": "Ricardo",
@@ -744,12 +744,12 @@
       "id": "walk_chapter",
       "kind": "title",
       "copy_source": "owner_supplied",
-      "seen_at_src": 165.567,
+      "seen_at_src": 163.799,
       "why": "the chapter card, on the walk it names",
       "title": "The Long Walk",
       "subtitle": "Glorious Eggroll and the new kids ...",
-      "at": 148.201,
-      "dur": 5.0,
+      "at": 146.233,
+      "dur": 2.3,
       "position": "left"
     },
     {
