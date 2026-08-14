@@ -57,12 +57,11 @@
       "dur_sec": 6.0
     },
     {
-      "_what": "Owner, 2026-08-13: 'replace contributions by with \"Introducing\" Rafael Castro | Laskshmi Mehta-Castro'. The classic debut credit, and it replaces the 'Contributions by YOU' card entirely rather than joining it. Names reproduced EXACTLY as the owner wrote them -- a person's name is copy, and this file does not correct one silently.",
-      "TODO(owner)": "CONFIRM THE SPELLING of 'Laskshmi Mehta-Castro'. It is reproduced as given, but 'Lakshmi' is the far more common spelling and the source was a typed one-line instruction, not an authored record. Nothing here can verify it, and a misspelt name in a credit is not recoverable by a revert -- so it is rendered as written and flagged rather than guessed either way.",
+      "_what": "Owner, 2026-08-13: replace the 'Contributions by YOU' card with an 'Introducing' credit, then redact the second name. Rendered as `[ REDACTED ]` -- the deck's own authored form, the same string the plates carry (docs/skills/plates/references/plate-chrome.md). It is AUTHORED COPY, not a placeholder: never substitute a real name for it, and never 'fix' it. The redacted name is deliberately recorded NOWHERE in this repo -- not in this note, not in the git history of this file's final state, not in a comment. That is what a redaction is for, and a test asserts the manifest does not contain it.",
       "role": "Introducing",
       "names": [
         "Rafael Castro",
-        "Laskshmi Mehta-Castro"
+        "[ REDACTED ]"
       ],
       "dur_sec": 6.0
     }
@@ -77,7 +76,6 @@
   },
   "unresolved": [
     "Act VII still ends on the comic cover -- see reveal.TODO(owner).",
-    "Spelling of 'Laskshmi Mehta-Castro' is unconfirmed -- see fixed_cards[].TODO(owner).",
     "'Contributions by YOU' was REMOVED to make room for the Introducing card. It was the beat that handed the film to the audience immediately before the contributor walls; those walls now arrive without an introduction. Restore it as a fifth card if that reads as a gap."
   ],
   "contributors": [
