@@ -85,12 +85,43 @@ MANIFEST = REPO_ROOT / "stories" / "08-credits.json"
 CARDS_DIR = REPO_ROOT / "renders" / "cards-08-credits"
 OUT = REPO_ROOT / "renders" / "08-credits.mp4"
 
+# How much longer than the film the last card is held, so `-t` -- not the
+# concat demuxer's arithmetic -- decides where the picture ends.
+CONCAT_TAIL_SEC = 20.0
+
+# THE UPSTREAM TIER COMES FIRST.
+#
+# Owner: *"Add Fedora CoreOS and bootc upstream groups to the credits and have
+# them top tier in the credits before bluefin - make theirs larger and more
+# distinguished."*
+#
+# Bluefin is an image built on other people's work, and these two are the work:
+# Fedora CoreOS is where the ostree-native model this whole thing rides on is
+# maintained, and bootc is the boot-from-container project the LTS line is
+# built with. They are credited BEFORE the projects that depend on them, on
+# their own larger grid (``tier: upstream``).
+#
+# `bootc-dev/bootc` is the project's OWN current home -- `containers/bootc`
+# redirects to it, and the API confirms the redirect rather than the name
+# being assumed.
 CONTRIB_REPOS = [
-    ("Project Bluefin", "ublue-os/bluefin"),
-    ("Aurora", "ublue-os/aurora"),
-    ("Bazzite", "ublue-os/bazzite"),
-    ("Universal Blue", "ublue-os/main"),
+    ("Fedora CoreOS", "coreos/fedora-coreos-config", "upstream"),
+    ("bootc", "bootc-dev/bootc", "upstream"),
+    ("Project Bluefin", "ublue-os/bluefin", None),
+    ("Aurora", "ublue-os/aurora", None),
+    ("Bazzite", "ublue-os/bazzite", None),
+    ("Universal Blue", "ublue-os/main", None),
 ]
+
+
+# MACHINE ACCOUNTS, NAMED RATHER THAN PATTERN-MATCHED.
+#
+# The API's `type == "User"` filter does not catch these: both are ordinary
+# user accounts that a project drives with a token. A credit roll names
+# people, so they come out -- but by an explicit list, because a login ending
+# in "bot" is not evidence about a human ("bobslept" is a person, and so is
+# anyone else a suffix rule would sweep up).
+BOT_LOGINS = {"coreosbot", "platform-engineering-bot"}
 
 
 def fetch_contributors():
@@ -101,21 +132,29 @@ def fetch_contributors():
     Blue. Bots are dropped by ``type == "User"``; a credit roll names people.
     """
     out, seen = [], set()
-    for label, repo in CONTRIB_REPOS:
+    for label, repo, tier in CONTRIB_REPOS:
         raw = subprocess.run(
             ["gh", "api", f"repos/{repo}/contributors?per_page=100&anon=0",
              "--paginate", "--jq", '.[] | select(.type=="User") | .login'],
             capture_output=True, text=True, check=True).stdout.split()
-        names = sorted({n for n in raw}, key=str.lower)
+        names = sorted({n for n in raw if n.lower() not in BOT_LOGINS},
+                       key=str.lower)
         # ONLY the last section is deduped. The owner asked for "all the
         # contributors to ever contribute to aurora" under Aurora and so on --
         # somebody who worked on both Bluefin and Aurora is credited under
         # both, because they did both. It is only Universal Blue that is
         # "deduped from above".
+        # The upstream sections are NEVER deduped against, in either
+        # direction: somebody who maintains bootc and also files Bluefin
+        # issues did both, and the upstream credit is the point of the tier.
         if repo == CONTRIB_REPOS[-1][1]:
             names = [n for n in names if n.lower() not in seen]
-        seen.update(n.lower() for n in names)
-        out.append({"section": label, "repo": repo, "names": names})
+        if tier is None:
+            seen.update(n.lower() for n in names)
+        section = {"section": label, "repo": repo, "names": names}
+        if tier:
+            section["tier"] = tier
+        out.append(section)
     return out
 
 
@@ -200,6 +239,47 @@ def authored_cards():
     rows = data.get("characters", []) if isinstance(data, dict) else data
     return {r["name"]: r["slug"] for r in rows
             if isinstance(r, dict) and r.get("name") and r.get("slug")}
+
+
+def fetch_avatars(manifest, verbose=True):
+    """Cache a face for every login the manifest names.
+
+    The renderer never touches the network (``tools/credits.avatar``), so a
+    contributor with no cached PFP silently degrades to a ring. Adding two
+    upstream sections added ~200 logins nobody had ever fetched, which would
+    have been two walls of empty rings and no error. Missing is still not
+    fatal -- this only fills the cache in.
+    """
+    import urllib.request
+
+    C.AVATAR_DIR.mkdir(parents=True, exist_ok=True)
+    logins = []
+    for section in manifest.get("contributors", []):
+        logins.extend(section["names"])
+    for value in (manifest.get("cast_logins") or {}).values():
+        if isinstance(value, str) and not value.startswith("_"):
+            logins.append(value)
+    for person in manifest.get("cast", []):
+        if person.get("login"):
+            logins.append(person["login"])
+
+    got = missed = 0
+    for login in dict.fromkeys(logins):
+        path = C.AVATAR_DIR / f"{login}.png"
+        if path.exists() and path.stat().st_size >= 512:
+            continue
+        url = f"https://github.com/{login}.png?size=256"
+        try:
+            with urllib.request.urlopen(url, timeout=20) as fh:
+                path.write_bytes(fh.read())
+            got += 1
+        except Exception as exc:  # noqa: BLE001 -- degrade, never block
+            missed += 1
+            if verbose:
+                print(f"note: no avatar for {login}: {exc}", file=sys.stderr)
+    if verbose:
+        print(f"avatars: {got} fetched, {missed} missing")
+    return got, missed
 
 
 def build_manifest(refresh):
@@ -293,6 +373,8 @@ def schedule(manifest):
     # people rather than interrupting them.
     verified = {k: v for k, v in (manifest.get("cast_logins") or {}).items()
                 if not k.startswith("_")}
+    photos = {k: v for k, v in (manifest.get("cast_photos") or {}).items()
+              if not k.startswith("_")}
     target = manifest.get("cast_hold_sec", 4.0)
     redacted = set(manifest.get("cast_redactions") or [])
     for person in manifest["cast"]:
@@ -302,31 +384,45 @@ def schedule(manifest):
             # otherwise the placard redacts a word and reveals the person.
             items.append({"kind": "cast", "t": t, "dur": target,
                           "person": C.REDACTED, "character": person["character"],
-                          "card": None, "login": None})
+                          "card": None, "login": None, "photo": None})
         else:
             items.append({"kind": "cast", "t": t, "dur": target,
                           "person": name, "character": person["character"],
                           "card": person.get("card"),
-                          "login": person.get("login") or verified.get(name)})
+                          "login": person.get("login") or verified.get(name),
+                          "photo": photos.get(name)})
         t += target
 
     wordmark = manifest["wordmark"]
+    # The upstream sections lead, whatever order they are stored in: the
+    # owner's instruction is about the SEQUENCE, so it is enforced here rather
+    # than left to how somebody happened to edit the manifest.
+    sections = sorted(manifest["contributors"],
+                      key=lambda s: 0 if s.get("tier") == "upstream" else 1)
     walls = []
-    for section in manifest["contributors"]:
-        for page in C.paginate(section["names"], C.NAMES_PER_WALL):
-            walls.append((section["section"], page))
+    for section in sections:
+        tier = section.get("tier")
+        per_page = C.UPSTREAM_PER_WALL if tier == "upstream" else C.NAMES_PER_WALL
+        for page in C.paginate(section["names"], per_page):
+            walls.append((section["section"], page, tier))
     wall_window = total - t - wordmark["dur_sec"]
-    per_wall = wall_window / max(1, len(walls))
+    # An upstream wall holds a third as many faces, so at one flat rate it
+    # would flick past three times as fast as the tier it is meant to
+    # outrank. It is weighted instead: the upstream roll is slower per wall,
+    # which is the other half of "more distinguished".
+    weights = [C.UPSTREAM_WALL_WEIGHT if tier else 1.0 for _, _, tier in walls]
+    unit = wall_window / max(1e-9, sum(weights) or 1.0)
     pages_by_section = {}
-    for name, _ in walls:
+    for name, _, _ in walls:
         pages_by_section[name] = pages_by_section.get(name, 0) + 1
     idx = {}
-    for name, page in walls:
+    for (name, page, tier), weight in zip(walls, weights):
         idx[name] = idx.get(name, 0) + 1
-        items.append({"kind": "wall", "t": t, "dur": per_wall, "section": name,
-                      "names": page, "page": idx[name],
+        dur = unit * weight
+        items.append({"kind": "wall", "t": t, "dur": dur, "section": name,
+                      "names": page, "page": idx[name], "tier": tier,
                       "pages": pages_by_section[name]})
-        t += per_wall
+        t += dur
 
     items.append({"kind": "wordmark", "t": t, "dur": total - t,
                   "text": wordmark["text"], "sub": wordmark.get("sub")})
@@ -334,20 +430,28 @@ def schedule(manifest):
 
 
 def render_cards(items, out_dir):
+    # Cleared, not overwritten: the card set changes shape between builds (a
+    # dropped placard, a new wall), and a stale `012-cover.png` sitting beside
+    # this build's `012-cast.png` is a frame nobody can account for.
+    if out_dir.exists():
+        for stale in out_dir.glob("*.png"):
+            stale.unlink()
     out_dir.mkdir(parents=True, exist_ok=True)
     paths = []
     for i, item in enumerate(items):
         path = out_dir / f"{i:03d}-{item['kind']}.png"
         if item["kind"] == "role":
-            img = C.render_role_card(item["role"], item["names"])
+            img = C.render_role_card(item["role"], item["names"], index=i)
         elif item["kind"] == "cast":
             img = C.render_cast_placard(item["person"], item["character"],
-                                        card=item.get("card"), login=item.get("login"))
+                                        card=item.get("card"), login=item.get("login"),
+                                        photo=item.get("photo"), index=i)
         elif item["kind"] == "wall":
             img = C.render_name_wall(item["section"], item["names"],
-                                     item["page"], item["pages"])
+                                     item["page"], item["pages"],
+                                     tier=item.get("tier"), index=i)
         elif item["kind"] == "wordmark":
-            img = C.render_wordmark(item["text"], item.get("sub"))
+            img = C.render_wordmark(item["text"], item.get("sub"), index=i)
         elif item["kind"] == "cover":
             img = None
         else:
@@ -358,7 +462,7 @@ def render_cards(items, out_dir):
     return paths
 
 
-def cover_frame(image_path, out_path):
+def cover_frame(image_path, out_path, index=0):
     """The comic cover, letterboxed into the frame on the deck's ink.
 
     The art is square (9075x9075) and the frame is 16:9, so it fills the height
@@ -371,7 +475,10 @@ def cover_frame(image_path, out_path):
     art = art.crop(((art.width - side) // 2, (art.height - side) // 2,
                     (art.width + side) // 2, (art.height + side) // 2))
     art = art.resize((C.H, C.H), Image.LANCZOS)
-    frame = Image.new("RGB", (C.W, C.H), C.BG[:3])
+    # The pillars are the month's wallpaper, not black -- the owner's *"use the
+    # dinosaur artwork here instead of black"*. The reveal is the one card
+    # where the margin is wide enough to see one.
+    frame = C.backdrop(index).convert("RGB")
     frame.paste(art, ((C.W - C.H) // 2, 0))
     frame.save(out_path)
     return out_path
@@ -406,6 +513,8 @@ def main(argv=None):
     ap.add_argument("--refresh-contributors", action="store_true",
                     help="re-snapshot the contributor lists and the cast, "
                          "overwriting any hand-edited copy in the manifest (network)")
+    ap.add_argument("--fetch-avatars", action="store_true",
+                    help="cache a PFP for every login the manifest names (network)")
     ap.add_argument("--plan", action="store_true", help="print the schedule, render nothing")
     ap.add_argument("--cards-only", action="store_true", help="render the PNGs and stop")
     ap.add_argument("--out", default=str(OUT))
@@ -417,6 +526,9 @@ def main(argv=None):
     if args.write_manifest:
         MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
         print(f"wrote {MANIFEST}")
+
+    if args.fetch_avatars:
+        fetch_avatars(manifest)
 
     items, total = schedule(manifest)
 
@@ -439,7 +551,8 @@ def main(argv=None):
 
     paths = render_cards(items, CARDS_DIR)
     cover_idx = next(i for i, it in enumerate(items) if it["kind"] == "cover")
-    cover_frame(Path(manifest["reveal"]["image"]).expanduser(), paths[cover_idx])
+    cover_frame(Path(manifest["reveal"]["image"]).expanduser(), paths[cover_idx],
+                index=cover_idx)
     print(f"rendered {len(paths)} card(s) -> {CARDS_DIR}")
     if args.cards_only:
         return 0
@@ -450,10 +563,23 @@ def main(argv=None):
         raise SystemExit(f"bed audio is missing: {media}\n"
                          f"fetch it from {manifest['bed']['source_url']}")
 
+    # THE TAIL IS DELIBERATELY LONGER THAN THE FILM.
+    #
+    # The concat demuxer does not deliver a still for exactly the `duration`
+    # it is given -- it lands short, and across 38 cards the shortfall came to
+    # **4.347 s**: act VIII muxed with 227.303 s of audio over 222.956 s of
+    # picture, and the megacut's own join check caught it (`programme is
+    # 1447.132s but the plan sums to 1442.681s`) rather than anybody seeing
+    # it. Four and a half seconds of the wordmark simply were not there.
+    #
+    # So the last card is held for a generous extra span and `-t` below cuts
+    # both streams to the same frame. Overshooting is free; undershooting is a
+    # film that ends before its music does.
     concat = CARDS_DIR / "concat.txt"
     lines = []
     for path, item in zip(paths, items):
         lines.append(f"file '{path}'\nduration {item['dur']:.4f}\n")
+    lines.append(f"file '{paths[-1]}'\nduration {CONCAT_TAIL_SEC:.4f}\n")
     lines.append(f"file '{paths[-1]}'\n")
     concat.write_text("".join(lines))
 
@@ -464,12 +590,22 @@ def main(argv=None):
            "-i", str(media),
            "-filter_complex", audio_filter(manifest["bed"], stream=1),
            "-map", "0:v:0", "-map", "[aout]",
-           # The DELIVERY frame rate, taken from the spec rather than typed:
-           # every card is a still, so the rate costs nothing visually, and
-           # matching it means the megacut joins act VIII by stream copy
-           # instead of conforming a 30 fps file at assembly time.
-           "-c:v", "libx264", "-crf", "16", "-preset", "medium",
-           "-pix_fmt", "yuv420p", "-r", conform.DELIVERY.fps,
+           # THE DELIVERY BITSTREAM, from the spec rather than typed: every
+           # card is a still, so the rate costs nothing visually, and matching
+           # the spec means the megacut joins act VIII by stream copy instead
+           # of conforming it at assembly time. `video_encode_args` is what
+           # writes the bt709 VUI -- hand-rolled x264 flags left all three
+           # colour fields unset and the file came back NONCONFORM.
+           *conform.video_encode_args(preset="medium"),
+           # `tpad` CLONES the last frame, and that is the only thing that
+           # actually made the picture reach the end of the music. The concat
+           # demuxer lands short of the durations it is given -- 4.347 s short
+           # over 38 cards -- and holding the last card longer in `concat.txt`
+           # does NOT fix it, because the shortfall is in the demuxer's output
+           # timeline rather than in the list. Padding after the demuxer does.
+           # `-t` below then cuts both streams on the same frame.
+           "-vf", (f"tpad=stop_mode=clone:stop_duration={CONCAT_TAIL_SEC:.0f},"
+                   f"fps={conform.DELIVERY.fps},setsar=1"),
            "-c:a", "flac",
            "-t", f"{total:.3f}",
            str(out_path)]

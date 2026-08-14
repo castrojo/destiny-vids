@@ -23,6 +23,85 @@ but it is no longer uncredited. Fifteen name plates credit the people the show i
 about; see [The cast](#the-cast) below. Its other on-screen copy is the act
 slide, which belongs to the megacut.
 
+## The 2026-08-14 pass
+
+The owner watched the **programme**, not the act, so every mark in this round is
+**megacut time** — act II's film sits at `+2:01.567`, and film = megacut −
+121.567. That conversion is proved rather than assumed: the same message names
+`blueberry_Giklab` at *"03:16"* and that plate was at film **73.400**, which is
+megacut 3:14.97. No other reading lands, and act II's own 3:16 is inside *The
+Long Walk*, whose brief is *"No other guardians"*.
+
+What changed:
+
+- **AN4-CH3CK-12 is out** — *"Remove all this anacheck stuff for now."* Three
+  blocks went with him: the four ranked montage cards, the two TOC payoff cards,
+  and the eyebrow on Natewaddington's placard. The placard's own rows stay. Every
+  string survives in git, which is what *"for now"* buys.
+- **Four OG Guardians, in bronze** — `dims` (*Comes in Peace*), Catherine
+  Paganini, `thockin` (*Does NOT Come in Peace*) and `jbeda` (*Out of
+  Retirement*), at film 13.4 / 18.4 / 26.4 / 36.4. Catherine's card carries **no
+  title row**: the owner named her and wrote no line, and the other three having
+  one is not a licence to compose hers.
+- **The trio is re-staggered to the owner's own seconds** — Joseph alone at
+  55.4, Ricardo joins at 57.4, Karena at 61.4, and the row clears together
+  4.0 s after the last arrival. *"keep them up for readability"* is why the hold
+  runs off the LAST card rather than the first.
+- **Karena is "Angel", one L** — the README's spelling and the owner's, applied
+  to this act's copy (`NAME_CORRECTIONS`). `vocab/casting.yaml` still says
+  "Angell" and is a committed input to six delivered acts (#167), so it is not
+  edited under a render; the gap is in `unresolved`.
+- **A team badge** — *CNCF Community Leadership / Looking for Open Source's
+  Brightest Future*, landing after the trio clears so it reads as a caption on
+  the three people who just arrived rather than as a fourth name.
+- **Four new lines** — Joseph's *"Here comes the slop"* (70.4), Karena's *"I love
+  this job"* (77.4), and Joseph's *"Master your skills"* / *"You got this"* at
+  97.4 and 99.9. He marked the last two **one second apart** and a pill needs
+  2.2 s to be read, so the second is chained rather than stacked. The order is
+  his; only the gap is the timeline's.
+- **`blueberry_Giklab` is gone** — the SHOT came out, so the roster is not
+  reshuffled behind him and nobody else moved into the slot.
+
+### The choice screen
+
+The biggest new thing, and it arrived in five instructions:
+
+> *"generate a graphic choice box for the team o Update your LFX Profile o Do it
+> the hard way"* → *"make them 2 separate boxes"* → *"make the text MUCH larger
+> like a video game choice screen"* → *"design it like a video game choice screen
+> and 'pause' here to let the player 'decide' then it cuts to the descent"* →
+> *"design it like the destiny legendary campaign screen — the fight one should
+> match 'legendary'"* → *"whip up a quick mouse pointer starting at the center
+> and then moving towards the fighting choice but have it cut so it's a teaser
+> quick cut"*
+
+So `tools/plate.py` gained a **`choice`** card and `place()` gained a **`full`**
+position. It is a full-frame pause menu over the picture: a scrim across the
+whole frame, two separate buttons at 3rem, and Destiny's amber **LEGENDARY**
+chrome on the second one — the fighting one — with a diamond marker instead of a
+ring. `LEGENDARY` is the only word added and it is the owner's own; Destiny's own
+card carries modifiers, a recommended power and a flavour line, and all three
+would be copy nobody wrote.
+
+**Nothing is highlighted.** No cursor state, no selected row, no confirm prompt:
+the joke is that neither option is a choice, and lighting one up would answer it.
+A test checks that on the pixels — between the first frame and the last, the only
+thing that may differ is the cursor.
+
+**The cursor is animated the only way a still-plate pipeline can animate**: 22
+frames at 15 fps, one plate each, one group, back to back. It leaves the centre
+of the screen heading for the legendary box and **never arrives** — it is cut off
+at 80% of the way, eased *in* rather than out, because a pointer that lands has
+chosen. `space_plates` skips anything flagged `animation`: `MIN_HOLD` exists so a
+NAME can be read, and applying it to a frame stretched a 1.5 s teaser into a 35 s
+stack of overlapping stills.
+
+**Two things it does not do**, both recorded in `unresolved`: the picture does
+not actually freeze (a real freeze has to be cut into the film, which moves every
+timecode after it), and *"then it cuts to the descent"* is an edit instruction,
+not a plate — the menu ends at 88.5 and whatever the film already cuts to is what
+plays.
+
 ## Sources
 
 | Role | Source | Notes |

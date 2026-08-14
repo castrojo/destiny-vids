@@ -178,6 +178,11 @@ def test_nobody_is_credited_twice_with_two_different_faces():
 
 def test_every_plate_can_be_read():
     for plate in committed()["plates"]:
+        # An ANIMATION frame is not a credit. The choice screen is a run of
+        # frames a fifteenth of a second each; MIN_HOLD exists so a NAME can
+        # be read, and holding a frame for 2.2 s is a still, not a cursor.
+        if plate.get("animation"):
+            continue
         assert plate["dur"] >= build_efmb_plates.MIN_HOLD, (
             f"{plate['id']} holds {plate['dur']}s -- too brief to read")
 
@@ -317,15 +322,46 @@ def _montage(manifest):
             if p["id"].startswith(("montage_chat_", "announce_"))]
 
 
-def test_the_montage_cues_are_evenly_spaced_across_the_owner_s_window():
-    """"spaced out over this montage until the 02:19 - try to space them out
-    evenly". Even means even: one step, no drift."""
+def test_the_montage_asides_keep_their_even_step():
+    """"try to space them out evenly". Even means even: one step, no drift.
+
+    The four RANKED cards are gone with AN4-CH3CK-12 (owner: "Remove all this
+    anacheck stuff for now"), so what is left is the owner's own two asides.
+    They no longer start at MONTAGE_IN because 1:38 is now where Joseph is
+    talking -- the montage takes what the new dialogue leaves.
+    """
     cues = _montage(build_efmb_plates.build())
-    assert len(cues) == 6
-    starts = [p["at"] for p in cues]
-    assert starts[0] == build_efmb_plates.MONTAGE_IN
-    steps = {round(b - a, 3) for a, b in zip(starts, starts[1:])}
+    assert len(cues) == 2
+    assert all(p["id"].startswith("montage_chat_") for p in cues)
+    assert cues[0]["at"] >= build_efmb_plates.MONTAGE_IN
+    steps = {round(b["at"] - a["at"], 3) for a, b in zip(cues, cues[1:])}
     assert steps == {build_efmb_plates.MONTAGE_STEP}
+
+
+def test_the_announcer_is_gone_entirely():
+    """Owner: "Remove all this anacheck stuff for now." All three of his
+    blocks -- the ranked montage cards, the TOC payoff pair, and the eyebrow
+    on Natewaddington's placard -- and nothing else."""
+    manifest = build_efmb_plates.build()
+    blob = json.dumps(manifest["plates"])
+    assert "AN4-CH3CK" not in blob
+    ids = {p["id"] for p in manifest["plates"]}
+    assert not {i for i in ids if i.startswith(("announce_", "toc_announce_"))}
+    # The placard itself STAYS -- only its eyebrow was his.
+    placard = next(p for p in manifest["plates"]
+                   if p["id"] == "timed_natewaddington")
+    assert placard["name"] == "[ Natewaddington ]"
+    assert "label" not in placard
+    assert any("anacheck" in u.lower() for u in manifest["unresolved"])
+
+
+def test_giklab_is_gone_and_nobody_moved_into_his_slot():
+    """Owner: "03:16 get rid of giklab". Megacut 3:16 is film 74.4, and the
+    only blueberry plate in the act was at 73.400. The SHOT came out, so the
+    roster is not reshuffled behind him."""
+    assert build_efmb_plates.BLUEBERRY_SHOTS == []
+    ids = {p["id"] for p in build_efmb_plates.build()["plates"]}
+    assert not {i for i in ids if i.startswith("blueberry_")}
 
 
 def test_the_last_announcement_hands_off_before_the_lead_in_banner():
@@ -335,7 +371,7 @@ def test_the_last_announcement_hands_off_before_the_lead_in_banner():
     assert cues[-1]["at"] + cues[-1]["dur"] <= build_efmb_plates.MONTAGE_OUT
 
 
-def test_the_montage_never_stacks_a_cue_on_the_badge_already_in_that_window():
+def _retired_the_montage_never_stacks_a_cue_on_the_badge():
     """Dylan Taylor's badge sits at 130.267 inside the montage. An announcement
     trimmed to the 2.2s minimum by the collision guard is not what "evenly"
     means, so the schedule has to clear it on its own."""
@@ -347,40 +383,17 @@ def test_the_montage_never_stacks_a_cue_on_the_badge_already_in_that_window():
     assert last["dur"] == build_efmb_plates.SOLO_HOLD  # never trimmed
 
 
-def test_the_ranks_escalate_bronze_silver_gold():
-    """The escalation is the joke: bronze greets the newcomer, silver flatters
-    the incumbent, gold is kept for the ones who left and for the payoff."""
-    ranked = [p for p in build_efmb_plates.build()["plates"]
-              if p["id"].startswith("announce_")]
-    chrome = [(p["id"], p.get("variant"), p.get("trustee")) for p in ranked]
-    assert chrome == [
-        ("announce_new", "bronze", None),
-        ("announce_current", None, True),      # `trustee` IS the silver
-        ("announce_emeritus", "leader", None),
-        ("announce_all", "leader", None),
-    ]
-
-
-def test_the_announcement_copy_is_reproduced_bracket_spacing_and_all():
-    """The owner wrote `[ NEW CONTRIBUTORS ]` with spaces and `[ALL
-    CONTRIBUTORS]` without. Authored copy is reproduced, never tidied."""
+def test_the_owners_own_typo_still_stands():
+    """Authored copy is reproduced, never tidied."""
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    assert by_id["announce_new"]["name"] == "TO [ NEW CONTRIBUTORS ]"
-    assert by_id["announce_all"]["name"] == "[ALL CONTRIBUTORS]"
-    assert by_id["announce_emeritus"]["name"] == "[ EMERITUS CONTRIBUTORS ]"
-    # ... and the typo in the owner's own aside stands until they change it.
     assert (by_id["montage_chat_2"]["text"]
             == "Ready to the #FIGHTFORCONTRIBUTORS?")
-    assert all(p["label"] == "AN4-CH3CK-12"
-               for p in build_efmb_plates.build()["plates"]
-               if p["id"].startswith("announce_"))
 
 
 def test_copy_the_card_has_no_row_for_is_recorded_not_dropped():
     """A fourth authored line on a three-row card is a punch-list item, not a
     licence to cram it into the class row."""
     unresolved = build_efmb_plates.build()["unresolved"]
-    assert any("Look how good you look!" in u for u in unresolved)
     assert any("lead-in banner" in u for u in unresolved)
 
 
@@ -523,8 +536,7 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
         assert build_efmb_plates.MONTAGE_OUT <= p["at"]
         assert p["at"] + p["dur"] <= walk_in + 1e-6
     post = [toc[k] for k in ("toc_joseph_faith", "toc_ricardo_desktop",
-                             "toc_joseph_lol", "toc_announce_emeritus",
-                             "toc_announce_ambassadors")]
+                             "toc_joseph_lol")]
     for p in post:
         assert p["at"] >= walk_out
 
@@ -549,15 +561,6 @@ def test_karena_s_jump_carries_no_card():
     assert not any("jump" in p for p in toc), "the jump is a beat, not a card"
 
 
-def test_the_emeritus_payoff_is_a_verbatim_reprise():
-    """A callback, not a second credit: same rows, same gold, word for word."""
-    plates = committed()["plates"]
-    by_id = {p["id"]: p for p in plates}
-    for row in ("label", "name", "title", "variant"):
-        assert by_id["toc_announce_emeritus"].get(row) \
-            == by_id["announce_emeritus"].get(row)
-
-
 def test_the_toc_copy_is_reproduced_verbatim():
     toc = toc_plates()
     assert toc["toc_karena"]["text"] == (
@@ -566,8 +569,6 @@ def test_the_toc_copy_is_reproduced_verbatim():
         "You really think they can save open source?")
     assert toc["toc_ricardo_desktop"]["text"] == "Cloud native desktop? ..."
     assert toc["toc_joseph_lol"]["text"] == "LOL"
-    assert toc["toc_announce_ambassadors"]["title"] == (
-        "Have you met our Ambassadors?")
     # The brief's own speaker tags, not a casting.yaml lookup.
     assert toc["toc_karena"]["speaker"] == "Karena"
     # Emphasis markers are markup, not words: stripped, and recorded.
@@ -638,3 +639,182 @@ def test_the_placeholder_speakers_are_recorded_never_guessed():
         assert "avatar" not in toc[pid], (
             f"{pid} carries an avatar nobody recorded -- the crest is the "
             "honest placeholder")
+
+
+# --- this round: the OG Guardians, the team badge, and the choice screen ---
+
+def test_the_owners_marks_are_megacut_time():
+    """He timed this round off the PROGRAMME, not off act II standalone.
+
+    The conversion is proved, not assumed: the same message names
+    `blueberry_Giklab` at "03:16" and that plate was at film 73.400, which is
+    megacut 3:14.97. No other reading lands, and act II's own 3:16 is inside
+    "The Long Walk", whose brief is "No other guardians".
+    """
+    assert build_efmb_plates.MEGACUT_OFFSET == 121.567
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    # 02:57 / 02:59 / 03:03 -> 55.433 / 57.433 / 61.433
+    assert by_id["trio_joseph_sandoval"]["at"] == pytest.approx(55.433, abs=1e-3)
+    assert by_id["trio_rochaporto"]["at"] == pytest.approx(57.433, abs=1e-3)
+    assert by_id["trio_mara_sov"]["at"] == pytest.approx(61.433, abs=1e-3)
+
+
+def test_the_trio_staggers_and_then_holds_together():
+    """"only show joseph sandoval, we're going to stagger these, keep them up
+    for readability" -- one name, then a pair, then the row, and the row
+    clears together a full TRIO_HOLD after the LAST arrival."""
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    cards = [by_id[f"trio_{k}"] for k, _, _ in build_efmb_plates.TRIO]
+    outs = {round(c["at"] + c["dur"], 3) for c in cards}
+    assert len(outs) == 1, "the row must clear together"
+    assert outs.pop() == pytest.approx(
+        max(c["at"] for c in cards) + build_efmb_plates.TRIO_HOLD, abs=1e-3)
+    assert cards[0]["dur"] > cards[-1]["dur"], "Joseph is up longest"
+
+
+def test_karena_is_angel_with_one_l():
+    """Owner, twice: the README's spelling and "(Angel, one L)". The vocab is
+    frozen (#167), so the correction is applied to this act's copy and
+    recorded rather than edited into a committed input."""
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert by_id["trio_mara_sov"]["name"] == "Karena Angel"
+    assert any("Angel" in u and "Angell" in u
+               for u in build_efmb_plates.build()["unresolved"])
+
+
+def test_the_og_guardians_are_bronze_and_on_the_owners_marks():
+    """"02:15 ... 02:20 ... 02:28 ... 02:38 ... These are OG Guardians make
+    them a proud bronze"."""
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    marks = {"og_dims": 13.433, "og_paganini": 18.433,
+             "og_thockin": 26.433, "og_jbeda": 36.433}
+    for pid, at in marks.items():
+        assert by_id[pid]["at"] == pytest.approx(at, abs=1e-3)
+        assert by_id[pid]["variant"] == "bronze"
+        assert by_id[pid]["label"] == build_efmb_plates.OG_LABEL
+
+
+def test_the_og_copy_is_the_owners_word_for_word():
+    """Including the capitalised NOT, which is the joke."""
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert by_id["og_dims"]["title"] == "Comes in Peace"
+    assert by_id["og_thockin"]["title"] == "Does NOT Come in Peace"
+    assert by_id["og_jbeda"]["title"] == "Out of Retirement"
+
+
+def test_catherine_paganinis_card_has_no_line_nobody_wrote():
+    """The owner named her and wrote no title. Omitted, and recorded -- the
+    other three OG cards having one is not a licence to compose hers."""
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert by_id["og_paganini"]["name"] == "Catherine Paganini"
+    assert "title" not in by_id["og_paganini"]
+    assert any("Paganini" in u for u in build_efmb_plates.build()["unresolved"])
+
+
+def test_the_team_badge_captions_the_trio_rather_than_competing_with_it():
+    """"Make a Team Badge: CNCF Community Leadership / Looking for Open
+    Source's Brightest Future" -- after the row clears, before Joseph's next
+    line."""
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    badge = by_id["team_cncf_leadership"]
+    assert badge["name"] == "CNCF Community Leadership"
+    assert badge["title"] == "Looking for Open Source's Brightest Future"
+    trio_out = max(by_id[f"trio_{k}"]["at"] + by_id[f"trio_{k}"]["dur"]
+                   for k, _, _ in build_efmb_plates.TRIO)
+    assert badge["at"] >= trio_out
+    assert badge["at"] + badge["dur"] <= by_id["chat_joseph_slop"]["at"]
+
+
+def test_the_new_dialogue_lands_on_the_owners_seconds():
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert by_id["chat_joseph_slop"]["at"] == pytest.approx(70.433, abs=1e-3)
+    assert by_id["chat_joseph_slop"]["text"] == "Here comes the slop"
+    assert by_id["chat_karena_job"]["at"] == pytest.approx(77.433, abs=1e-3)
+    assert by_id["chat_karena_job"]["text"] == "I love this job"
+    assert by_id["chat_riaan_choices"]["speaker"] == "riaankleinhans"
+    assert by_id["chat_riaan_choices"]["text"] == "Your choices are:"
+
+
+def test_josephs_last_two_lines_keep_their_order_when_the_clock_cannot():
+    """He marked them one second apart and a pill needs 2.2 s. The ORDER is
+    his and is kept; only the gap is the timeline's, and it is recorded."""
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    first, second = by_id["chat_joseph_master"], by_id["chat_joseph_gotthis"]
+    assert first["at"] == pytest.approx(97.433, abs=1e-3)
+    assert second["at"] >= first["at"] + first["dur"]
+    assert second["text"] == "You got this"
+    assert any("You got this" in u
+               for u in build_efmb_plates.build()["unresolved"])
+
+
+def _choice_frames():
+    return [p for p in build_efmb_plates.build()["plates"]
+            if p["id"].startswith("choice_lfx_")]
+
+
+def test_the_choice_screen_is_a_full_frame_pause_menu():
+    frames = _choice_frames()
+    assert frames, "the choice screen is not scheduled"
+    assert all(f["kind"] == "choice" for f in frames)
+    assert all(f["position"] == "full" for f in frames)
+    assert all(f["animation"] for f in frames)
+    assert all(f["group"] == "choice_lfx" for f in frames)
+
+
+def test_the_menu_comes_up_on_riaans_line_and_is_a_quick_cut():
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    riaan = by_id["chat_riaan_choices"]
+    frames = _choice_frames()
+    assert frames[0]["at"] >= riaan["at"] + riaan["dur"]
+    span = round(frames[-1]["at"] + frames[-1]["dur"] - frames[0]["at"], 3)
+    assert span == pytest.approx(build_efmb_plates.CHOICE_HOLD, abs=0.05)
+
+
+def test_the_frames_are_contiguous():
+    """A gap between two frames of a cursor is a flicker."""
+    frames = _choice_frames()
+    for a, b in zip(frames, frames[1:]):
+        assert b["at"] == pytest.approx(a["at"] + a["dur"], abs=2e-3)
+
+
+def test_the_fighting_option_is_the_legendary_one():
+    """"design it like the destiny legendary campaign screen -- the fight one
+    should match 'legendary'"."""
+    options = build_efmb_plates.CHOICE_OPTIONS
+    assert options[0] == "Update your LFX Profile"
+    assert options[1] == {"text": "Do it the hard way", "tier": "legendary"}
+    from tools import plate
+    assert plate.CHOICE_POINTER_TARGET == 1, \
+        "the cursor must head for the legendary option"
+
+
+def test_the_cursor_starts_in_the_centre_and_never_arrives():
+    """"starting at the center and then moving towards the fighting choice but
+    have it cut so it's a teaser quick cut". A pointer that lands has chosen,
+    and the joke is that nobody gets to."""
+    from tools import plate
+    frames = _choice_frames()
+    assert frames[0]["pointer"] == 0.0
+    assert frames[-1]["pointer"] == pytest.approx(plate.CHOICE_POINTER_CUT)
+    assert plate.CHOICE_POINTER_CUT < 1.0
+    progress = [f["pointer"] for f in frames]
+    assert progress == sorted(progress)
+
+
+def test_nothing_on_the_menu_is_selected():
+    """A highlight would answer the question, so the boxes never change.
+
+    Checked on the pixels rather than on the source: between the first frame
+    and the last, the ONLY thing that may differ is the cursor. A hover state
+    on the box the pointer is heading for would light up here.
+    """
+    from tools import plate
+    spec = {"kind": "choice", "label": "Your choices are:",
+            "options": build_efmb_plates.CHOICE_OPTIONS}
+    start = plate.render_plate({**spec, "pointer": 0.0})
+    end = plate.render_plate({**spec, "pointer": plate.CHOICE_POINTER_CUT})
+    cursor = plate._cursor()
+    changed = sum(1 for a, b in zip(start.getdata(), end.getdata()) if a != b)
+    # Two cursor footprints' worth of pixels, and no more: anything else is a
+    # box that reacted to being approached.
+    assert changed <= 2 * cursor.width * cursor.height

@@ -379,6 +379,74 @@ ACHIEVEMENT_ORB = 3.0 * REM               # the green sphere on the left
 ACHIEVEMENT_TOP = 0.06
 ACHIEVEMENT_EYEBROW = "ACHIEVEMENT UNLOCKED"
 
+# --- the choice box (owner brief, act II) -----------------------------------
+#
+# "[github.com/riaankleinhans] - Your choices are: then generate a graphic
+# choice box for the team o Update your LFX Profile o Do it the hard way"
+#
+# A dialogue-tree box: a prompt row, then one row per option behind the
+# owner's own `o` bullet, which is drawn as a ring rather than typeset as the
+# letter. NOTHING is selected -- no highlight, no cursor -- because the joke is
+# that the choice is not a choice, and lighting one up would answer it.
+#
+# Its fields are `label` and `options`, closed like every other card kind's:
+# a third row here would be an invented line in somebody's mouth.
+CHOICE_PANEL = (10, 14, 22, 232)
+# VIDEO-GAME SCALE, owner instruction: *"make the text MUCH larger like a video
+# game choice screen"*. A dialogue-tree option is not a lower third -- it is the
+# thing the player is being asked to press, so it is set at 3rem (48px at
+# 1080p), roughly double a Guardian plate's name, with the padding and the
+# bullet scaled with it so the box stays a button rather than a banner.
+FS_CHOICE_LABEL = 1.6 * REM
+FS_CHOICE_OPTION = 3.0 * REM
+LS_CHOICE_LABEL = 0.3
+CHOICE_PAD_X = 2.4 * REM
+CHOICE_PAD_Y = 1.5 * REM
+CHOICE_ROW_GAP = 1.0 * REM      # the prompt's air above the first box
+CHOICE_BOX_GAP = int(0.9 * REM)  # the clear air BETWEEN the two boxes
+CHOICE_BULLET = 1.1 * REM
+CHOICE_BULLET_GAP = 1.2 * REM
+CHOICE_RULE = 4
+CHOICE_MAX_W = 0.66              # the widest a button may get, as a fraction of frame
+CHOICE_SCRIM = (4, 7, 12, 178)   # the pause dim over the whole picture
+
+# THE LEGENDARY TIER.
+#
+# Owner: *"design it like the destiny legendary campaign screen -- the fight
+# one should match 'legendary'."* Destiny's campaign difficulty select puts the
+# two options side by side and gives the hard one AMBER chrome, a diamond in
+# place of the plain marker, and its name spelled out above it. So the fighting
+# option gets that treatment and the other keeps the deck's blue.
+#
+# LEGENDARY is the only word added, and it is the owner's own. No modifier
+# rows, no "recommended power", no flavour line -- Destiny's card carries all
+# three and every one of them would be copy nobody wrote.
+CHOICE_LEGENDARY_TAG = "LEGENDARY"
+CHOICE_LEGENDARY_ACCENT = (240, 191, 92, 255)   # the campaign card's amber
+CHOICE_LEGENDARY_LINE = (240, 191, 92, 80)
+CHOICE_LEGENDARY_PANEL = (26, 19, 7, 236)
+FS_CHOICE_TAG = 1.0 * REM
+LS_CHOICE_TAG = 0.34
+
+# THE CURSOR, AND WHY IT NEVER ARRIVES.
+#
+# Owner: *"whip up a quick mouse pointer starting at the center and then moving
+# towards the fighting choice but have it cut so it's a teaser quick cut."*
+#
+# So the pointer starts dead centre and travels toward the SECOND option -- the
+# fighting one, "Do it the hard way" -- and the film cuts while it is still in
+# transit. `CHOICE_POINTER_CUT` is how far along it gets: short of the button,
+# on purpose. A pointer that lands has made the choice, and the gag is that
+# nobody gets to.
+CHOICE_POINTER_TARGET = 1        # index into `options`: the fighting one
+CHOICE_POINTER_CUT = 0.80        # fraction of the way there when the cut lands
+CHOICE_POINTER_H = 4.2 * REM     # the arrow's height -- game-menu scale
+CHOICE_POINTER_FILL = (255, 255, 255, 255)
+CHOICE_POINTER_EDGE = (8, 12, 20, 235)
+# The site's own accent (`--wc-gold`, which resolves to #60a5fa and is blue).
+CHOICE_ACCENT = STATUS_ACCENT
+CHOICE_LINE = STATUS_LINE
+
 
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
@@ -1341,6 +1409,157 @@ def _render_achievement(spec):
     return img
 
 
+def _render_choice(spec):
+    """The **video-game choice screen**: the film stops and asks the player.
+
+    Owner: *"design it like a video game choice screen and 'pause' here to let
+    the player 'decide' then it cuts to the descent."*
+
+    So this is not a lower third at all -- it is a FULL-FRAME card, placed with
+    ``position: "full"``. A scrim goes over the whole picture, the way a pause
+    menu dims the game behind it, and the two options sit in the middle at
+    button scale. The picture is still moving underneath: a true freeze would
+    have to be cut into the film itself, which moves every timecode after it,
+    so it is recorded as a punch-list item rather than faked here.
+
+    NOTHING IS HIGHLIGHTED -- no cursor, no selected row, no confirm prompt --
+    because the joke is that neither option is a choice, and lighting one up
+    would answer it. The `o` the owner typed is drawn as a ring rather than
+    typeset as the letter: it is a marker, not a lowercase o.
+
+    `label` is the prompt and `options` are the boxes. Both are authored copy,
+    and the field set is closed like every other card kind's.
+    """
+    label = (spec.get("label") or "").upper()
+    # An option is either a string or ``{"text": ..., "tier": "legendary"}``.
+    options = []
+    for raw in spec.get("options") or []:
+        entry = {"text": str(raw)} if isinstance(raw, str) else dict(raw)
+        if str(entry.get("text", "")).strip():
+            options.append(entry)
+
+    f_label = _font("regular", FS_CHOICE_LABEL)
+    f_option = _font("bold", FS_CHOICE_OPTION)
+    f_tag = _font("regular", FS_CHOICE_TAG)
+
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    row_w = CHOICE_BULLET + CHOICE_BULLET_GAP
+    widest = max([probe.textlength(o["text"], font=f_option) for o in options]
+                 or [0])
+    # Every box is cut to the widest option, so the stack is a column of
+    # buttons rather than a ragged edge -- two separate boxes, owner's call.
+    box_w = int(round(CHOICE_RULE + CHOICE_PAD_X * 2 + row_w + widest))
+    box_w = min(box_w, int(FRAME_W * CHOICE_MAX_W))
+    box_h = int(round(CHOICE_PAD_Y * 2 + f_option.size * 1.25))
+    # The legendary card is taller: Destiny's puts the difficulty's NAME above
+    # its title, so the amber box carries a tag row the plain one does not.
+    tag_h = int(round(f_tag.size * 1.5))
+    heights = [box_h + (tag_h if o.get("tier") == "legendary" else 0)
+               for o in options]
+
+    label_h = int(round(f_label.size * 1.25 + CHOICE_ROW_GAP)) if label else 0
+    stack_h = (label_h + sum(heights)
+               + max(0, len(options) - 1) * CHOICE_BOX_GAP)
+
+    # The pause scrim: the whole frame goes down so the menu reads as chrome
+    # over a stopped game rather than as a caption on a moving shot.
+    frame = Image.new("RGBA", (FRAME_W, FRAME_H), CHOICE_SCRIM)
+
+    top = int((FRAME_H - stack_h) / 2)
+    left = int((FRAME_W - box_w) / 2)
+
+    if label:
+        layer = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+        lw = _tracked_width(probe, label, f_label, LS_CHOICE_LABEL)
+        _draw_tracked(ImageDraw.Draw(layer),
+                      ((FRAME_W - lw) / 2, top), label, f_label,
+                      CHOICE_ACCENT, LS_CHOICE_LABEL)
+        frame.alpha_composite(_with_text_shadow(layer))
+
+    y = top + label_h
+    centres = []
+    for option, height in zip(options, heights):
+        legendary = option.get("tier") == "legendary"
+        panel = CHOICE_LEGENDARY_PANEL if legendary else CHOICE_PANEL
+        line = CHOICE_LEGENDARY_LINE if legendary else CHOICE_LINE
+        accent = CHOICE_LEGENDARY_ACCENT if legendary else CHOICE_ACCENT
+
+        box = _chamfered((box_w, height), panel, line,
+                         radius=CORNER_RADIUS, corner=CORNER_RADIUS)
+        ImageDraw.Draw(box).rectangle(
+            [0, 0, CHOICE_RULE - 1, height - 1], fill=accent)
+        layer = Image.new("RGBA", (box_w, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(layer)
+        x = CHOICE_RULE + CHOICE_PAD_X
+        ty = CHOICE_PAD_Y
+        if legendary:
+            _draw_tracked(draw, (x + row_w, ty), CHOICE_LEGENDARY_TAG, f_tag,
+                          accent, LS_CHOICE_TAG)
+            ty += tag_h
+        # The marker: Destiny's legendary card uses a diamond, the plain one a
+        # simple ring.
+        cy = ty + f_option.size * 0.62
+        r = CHOICE_BULLET / 2
+        if legendary:
+            draw.polygon([(x + r, cy - r), (x + CHOICE_BULLET, cy),
+                          (x + r, cy + r), (x, cy)], outline=accent, width=3)
+        else:
+            draw.ellipse([x, cy - r, x + CHOICE_BULLET, cy + r],
+                         outline=accent, width=3)
+        draw.text((x + row_w, ty), option["text"], font=f_option, fill=TEXT)
+        box.alpha_composite(_with_text_shadow(layer))
+        frame.alpha_composite(box, (left, int(round(y))))
+        # Aimed at the MARKER, not at the words: a cursor sitting on the text
+        # reads as a typo, and the marker is what you would click.
+        centres.append((left + x + CHOICE_BULLET / 2, y + cy))
+        y += height + CHOICE_BOX_GAP
+
+    progress = spec.get("pointer")
+    if progress is not None and centres:
+        target = centres[min(CHOICE_POINTER_TARGET, len(centres) - 1)]
+        t = max(0.0, min(1.0, float(progress)))
+        # Ease-IN: the hand is still winding up. Ease-out would put the
+        # pointer almost on the button by the time the cut lands, which reads
+        # as having chosen. It has not chosen -- that is the whole gag.
+        k = t ** 1.5
+        px = FRAME_W / 2 + (target[0] - FRAME_W / 2) * k
+        py = FRAME_H / 2 + (target[1] - FRAME_H / 2) * k
+        frame.alpha_composite(_cursor(), (int(px), int(py)))
+    return frame
+
+
+_CURSOR = None
+
+
+def _cursor():
+    """The arrow pointer, drawn once and cached.
+
+    The classic seven-point cursor: tip at the origin, so a caller places it by
+    the point it is actually pointing with rather than by a bounding box. White
+    with a dark edge, at game-menu scale -- a 24px desktop cursor is invisible
+    at a distance on a 1080p film.
+    """
+    global _CURSOR
+    if _CURSOR is not None:
+        return _CURSOR
+    h = CHOICE_POINTER_H
+    # Proportions of the standard arrow, in units of its height.
+    pts = [(0.00, 0.00), (0.00, 0.74), (0.19, 0.57), (0.31, 0.86),
+           (0.45, 0.80), (0.33, 0.52), (0.55, 0.52)]
+    scale = 4  # drawn oversized and downsampled: Pillow does not antialias
+    poly = [(x * h * scale, y * h * scale) for x, y in pts]
+    big = Image.new("RGBA", (int(h * 0.6 * scale) + 8, int(h * scale) + 8),
+                    (0, 0, 0, 0))
+    ImageDraw.Draw(big).polygon(poly, fill=CHOICE_POINTER_FILL,
+                                outline=CHOICE_POINTER_EDGE)
+    ImageDraw.Draw(big).line(poly + [poly[0]], fill=CHOICE_POINTER_EDGE,
+                             width=3 * scale, joint="curve")
+    ImageDraw.Draw(big).polygon(poly, fill=CHOICE_POINTER_FILL)
+    _CURSOR = big.resize((big.width // scale, big.height // scale),
+                         Image.LANCZOS)
+    return _CURSOR
+
+
 def _rgb_split(text):
     """The glitch's red/cyan `text-shadow` split.
 
@@ -1414,6 +1633,8 @@ def render_plate(spec):
         return _render_status(spec, glitch=bool(spec.get("glitch")))
     if spec.get("kind") == "banner":
         return _render_banner(spec)
+    if spec.get("kind") == "choice":
+        return _render_choice(spec)
     variant = _variant_for(spec)
     ghost = spec.get("kind") == "ghost"
     card = spec.get("kind") == "title"
@@ -1561,6 +1782,13 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
         # .wolves-guardian-plate-raised { bottom: auto; top: 28% } -- for a
         # Guardian who towers above the frame's lower third.
         y = py + int(ph * RAISED_TOP)
+    if position == "full":
+        # A FULL-FRAME card: the pause menu draws its own scrim over the whole
+        # picture, so it is composited at the origin rather than measured into
+        # a row. It is the only position that ignores `picture` -- a menu that
+        # respects a letterbox is a menu with black bars through it.
+        frame.alpha_composite(plate, (0, 0))
+        return frame
     if position == "status":
         # .wc-intro-nameplate { top: 3rem; left: 3rem }. Measured against the
         # PICTURE, like every other placement here, so it cannot land on a
@@ -2791,6 +3019,42 @@ def _probe_duration(path, ffmpeg=None):
         raise RuntimeError(f"could not read the duration of {path}: {out.stderr}")
 
 
+def _burn_units(entries):
+    """One overlay unit per still, and one per ANIMATION GROUP.
+
+    An animation group is a contiguous run of plates carrying ``animation:
+    true`` and the same ``group``. They are ``plate_<group>_NN.png`` on disk,
+    which is an image2 sequence, so the whole run becomes a single input at
+    ``1 / step`` frames a second. Everything else is unchanged.
+    """
+    units, seen = [], set()
+    for e in entries:
+        group = e.get("group") if e.get("animation") else None
+        if not group:
+            units.append({"animation": False, "id": e["id"],
+                          "at": float(e["at"]), "dur": float(e["dur"])})
+            continue
+        if group in seen:
+            continue
+        seen.add(group)
+        frames = [x for x in entries
+                  if x.get("animation") and x.get("group") == group]
+        frames.sort(key=lambda x: float(x["at"]))
+        start = float(frames[0]["at"])
+        end = float(frames[-1]["at"]) + float(frames[-1]["dur"])
+        step = (end - start) / len(frames)
+        width = max(2, len(str(len(frames) - 1)))
+        units.append({
+            "animation": True,
+            "id": group,
+            "pattern": f"plate_{group}_%0{width}d.png",
+            "fps": 1.0 / step if step else 1.0,
+            "at": start,
+            "dur": end - start,
+        })
+    return units
+
+
 def burn(video, entries, plates_dir, out_path, ffmpeg=None):
     """Composite every plate onto ``video`` in one ffmpeg pass.
 
@@ -2824,16 +3088,46 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None):
     # One frame a second cut this burn from ten minutes back to about one.
     duration = _probe_duration(video, ffmpeg)
 
+    # AN ANIMATION IS ONE INPUT, NOT ONE INPUT PER FRAME.
+    #
+    # Act II's choice screen is 24 plates a sixteenth of a second apart. Fed
+    # to this graph as 24 more stills it took the burn from 52 inputs to 74,
+    # and ffmpeg died on `Failed initializing scaling graph (Resource
+    # temporarily unavailable)` -- one rgba->yuva420p scaler per input, and
+    # the box ran out. It did not fail fast either: it span for thirty
+    # minutes and wrote a zero-byte file.
+    #
+    # A contiguous run of frames is exactly what the image2 demuxer reads
+    # natively, so a whole animation costs ONE input at its own frame rate.
+    # `tpad` then holds transparent frames in front of it so the stream spans
+    # the timeline from t=0 -- overlay's framesync wants a secondary frame to
+    # pair with every primary one, and a stream that simply starts late is
+    # how a graph stalls.
+    units = _burn_units(entries)
+
     cmd = [*ffmpeg, "-nostdin", "-y", "-i", str(video)]
-    for e in entries:
-        cmd += ["-loop", "1", "-framerate", "1", "-t", f"{duration:.3f}",
-                "-i", str(plates_dir / f"plate_{e['id']}.png")]
+    for unit in units:
+        if unit["animation"]:
+            cmd += ["-framerate", f"{unit['fps']:.6f}", "-start_number", "0",
+                    "-i", str(plates_dir / unit["pattern"])]
+        else:
+            cmd += ["-loop", "1", "-framerate", "1", "-t", f"{duration:.3f}",
+                    "-i", str(plates_dir / f"plate_{unit['id']}.png")]
 
     steps, last = [], "0:v"
-    for i, e in enumerate(entries, start=1):
-        start = float(e["at"])
-        end = start + float(e["dur"])
+    for i, unit in enumerate(units, start=1):
+        start = unit["at"]
+        end = start + unit["dur"]
         label = f"v{i}"
+        if unit["animation"]:
+            steps.append(
+                f"[{i}:v]tpad=start_duration={start:.3f}:start_mode=add:"
+                f"color=black@0[a{i}]")
+            steps.append(
+                f"[{last}][a{i}]overlay=0:0:eof_action=pass:"
+                f"enable=between(t\\,{start:.3f}\\,{end:.3f})[{label}]")
+            last = label
+            continue
         # NO SHELL QUOTES HERE, AND THE COMMAS ARE ESCAPED.
         #
         # `enable='between(t,269.7,272.9)'` is the form the ffmpeg docs show,
