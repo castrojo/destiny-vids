@@ -81,7 +81,7 @@ def db(mean_square):
     return 10.0 * math.log10(mean_square)
 
 
-def bucket_rms(pcm, channels, rate, bucket=BUCKET):
+def bucket_rms(pcm, channels, rate):
     """Per-bucket RMS (dBFS) of interleaved f32le PCM.
 
     Pure arithmetic, so the tests exercise it with no ffmpeg and no footage.
@@ -92,7 +92,7 @@ def bucket_rms(pcm, channels, rate, bucket=BUCKET):
     """
     n = len(pcm) // 4
     samples = struct.unpack(f"<{n}f", pcm[: n * 4])
-    per = int(rate * bucket) * channels
+    per = int(rate * BUCKET) * channels
     out = []
     for start in range(0, n - per + 1, per):
         chunk = samples[start : start + per]
@@ -128,22 +128,6 @@ def decode(path, start, dur, ffmpeg=None):
     ).stdout
 
 
-def programme_durations(plan):
-    """Each item's length on the programme clock.
-
-    Cards carry an authored ``dur``; clips are probed unless they carry one.
-    Factored out so tests can feed durations without an ffprobe.
-    """
-    durations = []
-    for item in plan["items"]:
-        dur = item.get("dur")
-        if dur is None:
-            dur = megacut.probe_duration(megacut.resolve(item["path"]),
-                                         stream="v:0")
-        durations.append(float(dur))
-    return durations
-
-
 def find_joins(plan, durations=None):
     """The programme's joins, in order, all times on the PROGRAMME clock.
 
@@ -152,7 +136,8 @@ def find_joins(plan, durations=None):
     incoming labels, and the window of interest: for a slide, the card's
     [start, end); for a direct join, the boundary point as [t, t).
     """
-    durations = programme_durations(plan) if durations is None else durations
+    if durations is None:
+        durations = [megacut.item_duration(item) for item in plan["items"]]
     items = plan["items"]
     starts, t = [], 0.0
     for dur in durations:
@@ -199,15 +184,15 @@ def find_joins(plan, durations=None):
     return joins
 
 
-def silence_run(buckets, start_idx, end_idx, threshold=SILENCE_DB):
-    """Longest run of consecutive buckets <= threshold within [start, end).
+def silence_run(buckets, start_idx, end_idx):
+    """Longest run of consecutive buckets <= SILENCE_DB within [start, end).
 
     Indices are bucket offsets into ``buckets``. This is the number the issue
     quotes as "about 7 seconds of true digital silence".
     """
     best = run = 0
     for i in range(start_idx, min(end_idx, len(buckets))):
-        if buckets[i] == float("-inf") or buckets[i] <= threshold:
+        if buckets[i] == float("-inf") or buckets[i] <= SILENCE_DB:
             run += 1
             best = max(best, run)
         else:
@@ -215,7 +200,7 @@ def silence_run(buckets, start_idx, end_idx, threshold=SILENCE_DB):
     return best
 
 
-def measure_join(path, join, rate, channels, decode_fn=decode, pre=PRE, post=POST):
+def measure_join(path, join, rate, channels, decode_fn=decode):
     """One join's per-second RMS rows plus its summary, programme clock.
 
     The window runs from PRE seconds before the silent stretch (or boundary)
@@ -223,8 +208,8 @@ def measure_join(path, join, rate, channels, decode_fn=decode, pre=PRE, post=POS
     is programme second N -- the same alignment the issue's hand table used,
     so the numbers compare row for row.
     """
-    win_start = max(0, math.floor(join["silent_start"] - pre))
-    win_end = math.ceil(join["silent_end"] + post)
+    win_start = max(0, math.floor(join["silent_start"] - PRE))
+    win_end = math.ceil(join["silent_end"] + POST)
     pcm = decode_fn(path, win_start, win_end - win_start)
     buckets = bucket_rms(pcm, channels, rate)
     rows = [(win_start + i, level) for i, level in enumerate(buckets)]

@@ -47,7 +47,6 @@ import json
 import os
 import subprocess
 import sys
-import tempfile
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict, dataclass
 from pathlib import Path

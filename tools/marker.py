@@ -53,42 +53,41 @@ def slug(text):
     return f"{base or 'marker'}-{digest}"
 
 
-def render_marker(text, sub=None, size=(W, H)):
+def render_marker(text, sub=None):
     """A black frame with one centred line, and an optional smaller line under.
 
     Full-frame and fully opaque: this *replaces* the picture for its duration
     rather than overlaying it, which is what keeps the timing honest -- the
     marked span is exactly as long as the material it stands in for.
     """
-    width, height = size
-    img = Image.new("RGBA", size, (0, 0, 0, 255))
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 255))
     draw = ImageDraw.Draw(img)
 
-    f_text = _font("bold", FS_TEXT * (width / W))
+    f_text = _font("bold", FS_TEXT)
     label = text.upper()
     tw = _tracked_width(draw, label, f_text, TRACKING)
-    y = height / 2 - FS_TEXT
-    _draw_tracked(draw, ((width - tw) / 2, y), label, f_text, INK, TRACKING)
+    y = H / 2 - FS_TEXT
+    _draw_tracked(draw, ((W - tw) / 2, y), label, f_text, INK, TRACKING)
 
     rule_y = y + FS_TEXT * 1.7
-    draw.line([(width / 2 - tw / 2, rule_y), (width / 2 + tw / 2, rule_y)],
+    draw.line([(W / 2 - tw / 2, rule_y), (W / 2 + tw / 2, rule_y)],
               fill=RULE, width=2)
 
     if sub:
-        f_sub = _font("regular", FS_SUB * (width / W))
+        f_sub = _font("regular", FS_SUB)
         sw = _tracked_width(draw, sub, f_sub, 0.06)
-        _draw_tracked(draw, ((width - sw) / 2, rule_y + FS_SUB), sub, f_sub,
+        _draw_tracked(draw, ((W - sw) / 2, rule_y + FS_SUB), sub, f_sub,
                       SUB_INK, 0.06)
     return img
 
 
-def marker_path(text, sub=None, out_dir=None):
+def marker_path(text, sub=None):
     """Render ``text`` to a cached PNG and return its path.
 
     Cached on (text, sub) so a builder can ask for the same marker in a loop
     without re-rendering it, and so a rebuild is byte-identical.
     """
-    out_dir = Path(out_dir or DEFAULT_DIR)
+    out_dir = DEFAULT_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"{slug(text + '|' + (sub or ''))}.png"
     if not path.exists():
@@ -96,7 +95,7 @@ def marker_path(text, sub=None, out_dir=None):
     return path
 
 
-def title_card_path(title, subtitle=None, body=None, out_dir=None):
+def title_card_path(title, subtitle=None, body=None):
     """The opening title card, as a full-frame still the cut can concatenate.
 
     The card itself is ``tools/plate.py``'s existing ``kind: "title"`` shape --
@@ -107,7 +106,7 @@ def title_card_path(title, subtitle=None, body=None, out_dir=None):
     """
     from tools.plate import render_plate
 
-    out_dir = Path(out_dir or DEFAULT_DIR)
+    out_dir = DEFAULT_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     key = "|".join([title, subtitle or "", *(body or [])])
     path = out_dir / f"title-{slug(key)}.png"

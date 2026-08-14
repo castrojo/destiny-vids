@@ -177,7 +177,6 @@ STOPWORDS = {
 MULTI = {"class": CLASS, "element": ELEMENT, "faction": FACTION,
          "activity": ACTIVITY, "destination": DESTINATION, "action": ACTION}
 
-MULTI_VALUE_FIELDS = {"faction", "composition", "camera_movement", "mood", "action"}
 # Saliences the editorial line favours. `crowd_group` is here because the
 # anonymous crowd is now the ensemble cast, not background noise.
 PREFERRED_SALIENCE = {"guardian_hero", "crowd_group", "environment_establishing",
@@ -204,11 +203,10 @@ def tokenize(text):
 
 
 def parse_query(query):
-    """Return {filters, caption_terms, notes}. filters: facet -> set(values)."""
+    """Return {filters, caption_terms}. filters: facet -> set(values)."""
     q = query.lower()
     filters = {}
     consumed_spans = []
-    notes = []
 
     def add(facet, values):
         filters.setdefault(facet, set()).update(values)
@@ -245,7 +243,7 @@ def parse_query(query):
         if t not in STOPWORDS and t not in consumed and t not in phrase_tokens
         and len(t) > 1
     ]
-    return {"filters": filters, "caption_terms": caption_terms, "notes": notes}
+    return {"filters": filters, "caption_terms": caption_terms}
 
 
 def get_field(seg, facet):
