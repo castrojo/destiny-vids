@@ -1,0 +1,67 @@
+{
+  "_what": "THE PERFUME THREAD -- Nightwish's 'Perfume Of The Timeless' (oHCaZmIzr0o) played from the first frame of the show to the last frame before the credits, with the eight acts living inside it. Movement 1 is the PROLOGUE (scripts/build_prologue.py, source 0 -> 91.200 picture / 99.200 audio). Movements 2-5 are this file: the rest of the same video, IN SOURCE ORDER AND WITHOUT GAPS, seated between the acts. It is not four interstitials -- it is one song the acts interrupt.",
+
+  "_owner": "Owner instruction, 2026-08-14: 'Start at ~1:31 or wherever the last cut left off from (check another agent doing parallel work) - save the clip and cut it at ~2.39, then insert that after the destiny intro. 2-39-5:29 is the the next segment, insert after mrbobby. 5:29- start there and record that to 6:30, then insert that before europa. 6:30 match the transition panning up from laura after europa, then hold until the end of this, then roll credits.'",
+
+  "_no_numerals": "These take NO ACT NUMERAL and get NO SLIDE and NO CHAPTER MARKER. AGENTS.md makes the eight numerals load-bearing, and the prologue already set the precedent for unnumbered connective tissue in front of act I. A slide announcing an interlude would announce the one thing whose whole job is to be unannounced.",
+
+  "_not_in_prod": "They deliver to renders/ ONLY, not to ~/Videos/Wolves/Prod. Owner: 'also want the snippets in the render folder we will be editing them in the future with dino artwork.' They are work-in-progress elements, not finished acts: the megacut plan references renders/ directly, and no delivery.json key, Prod/ hardlink, README row or CHECKSUMS entry is created for them. When the dinosaur pass lands they can be promoted; until then Prod/ keeps meaning 'a finished act'.",
+
+  "_clean_renders": "Every movement is rendered CLEAN -- no fades, no overlays, no cards. Fades live in stories/megacut/megacut.json in act-film time, which is this repo's convention (see megacut.json `_transitions`), and it is also what makes these files editable: the dinosaur pass gets unfaded picture to work on rather than footage with a dip already burned into it.",
+
+  "_rights": "Third-party copyrighted: Nuclear Blast recording, Nightwish's own official music video. The full rights record is music/bed_perfume_of_the_timeless.json and videos/yt_nightwish_perfume_of_the_timeless.json, written for the prologue and unchanged by this file. PROTOTYPE OUTPUT, same as the prologue: the shipping presentation embeds the video rather than re-hosting it, so these renders are for cutting and review. NO SOCIAL COPIES ARE CUT FROM THEM -- a standalone clip is exactly the redistribution the owner's instruction rules out.",
+
+  "source": "media/yt_nightwish_perfume_of_the_timeless.mkv",
+  "source_video_id": "oHCaZmIzr0o",
+  "source_duration": 507.021,
+  "source_fps": 25,
+  "source_width": 1920,
+  "source_height": 804,
+
+  "_measured": "Every cut point below was read off the file in this session with `select='gt(scene,0.25)'`, not taken from the owner's round numbers. The measured grid near the requested points: ... 108.96 110.84 114.32 115.28 116.20 121.68 125.28 134.44 138.92 144.52 145.80 148.16 150.08 151.92 156.52 159.40 | 190.84 211.48 220.88 223.36 228.72 240.56 245.96 252.20 253.96 258.80 262.32 266.32 273.84 276.68 279.40 281.28 287.36 292.52 299.72 301.88 303.48 304.60 315.16 318.72 321.96 325.40 328.08 | 343.08 ... 380.88 381.32 387.16 387.20 387.32 387.44 387.56 387.68 387.92 388.04 388.16 388.60 389.56 389.80 | 393.56 394.44 396.32 406.00 409.36 427.44 430.64 439.20 453.88 467.52 (then one held shot to EOF).",
+
+  "movements": [
+    {
+      "id": "perfume-2",
+      "out_file": "renders/perfume-2.mp4",
+      "in": 93.000,
+      "out": 159.400,
+      "duration": 66.400,
+      "seat": "after act I (01-intro), before act II's slide",
+      "_in_point": "The owner said '~1:31 or wherever the last cut left off'. There are TWO answers and this is the reconciliation. The prologue's PICTURE leaves off at 91.200; its SONG leaves off at 99.200, having faded from 93.000. Resuming at 93.000 replays exactly the 6.2 s the prologue faded DOWN, under a 6.2 s fade UP (applied in the megacut plan), so the song dips out across act I and swells back instead of restarting -- one continuous performance with a hole in it rather than two plays of the same bar. Resuming at 99.200 was the alternative: gapless song, but 8 s of picture silently skipped.",
+      "_free_match": "There is NO shot boundary between 91.200 and 108.960 -- it is one continuous shot. So movement 2 resumes the very shot the prologue left, and the join is invisible by construction rather than by treatment. This is the reason 93.000 costs nothing on the picture side.",
+      "_out_point": "The owner said '~2:39' (159.0). 159.400 is a measured shot change 0.40 s later, so the movement ends ON a cut instead of 10 frames inside the outgoing shot."
+    },
+    {
+      "id": "perfume-3",
+      "out_file": "renders/perfume-3.mp4",
+      "in": 159.400,
+      "out": 328.080,
+      "duration": 168.680,
+      "seat": "after act III (03-mrbobbytables), before the shared IV/V slide",
+      "_in_point": "Continuous with movement 2's out point: the thread has no gaps.",
+      "_out_point": "The owner said '5:29' (329.0). 328.080 is a measured shot change 0.92 s earlier; 343.08 is the next one, 14 s later, so 328.080 is unambiguously the cut meant.",
+      "_longest": "At 2:48.7 this is longer than acts IV, V and VII. That is what the owner's spans specify and it plays as a full movement of the song, but it is the one placement where an interlude outweighs the acts around it. Flagged for the owner, built as instructed."
+    },
+    {
+      "id": "perfume-4",
+      "out_file": "renders/perfume-4.mp4",
+      "in": 328.080,
+      "out": 389.800,
+      "duration": 61.720,
+      "seat": "after act VI (06-7daystothewolves), before act VII's slide",
+      "_out_point": "The owner said '6:30' (390.0). 389.800 is a measured shot change 0.20 s earlier -- five frames at 25 fps, and the frame the owner was looking at."
+    },
+    {
+      "id": "perfume-5",
+      "out_file": "renders/perfume-5.mp4",
+      "in": 389.800,
+      "out": 507.021,
+      "duration": 117.221,
+      "seat": "after act VII (07-europa), before act VIII (credits)",
+      "_in_point": "The owner: 'match the transition panning up from laura after europa'. Laura Santamaria is Elsie Bray, act VII copy (vocab/casting.yaml, README:90). Act VII runs 97.266 s and its tail is flat at YAVG~37 from 89 s, then falls hard over its last half second (96.8 -> 97.27: 32.8 -> 24.8 -> 16.0) -- it fades down, it does not cut. Movement 5 opens on the measured cut at 389.800 and its upward camera move continues that fall. WHERE EXACTLY THE TWO MOVES MEET IS A CRAFT JUDGEMENT ABOUT FRAMES AND IS NOT AUTOMATABLE: the join is built at 389.800 and shown to the owner. Act VII's out point is settled (#178) and is never shortened to make this fit.",
+      "_out_point": "EOF. The owner: 'hold until the end of this, then roll credits.' The source's last shot change is 467.52 and it holds to 507.021.",
+      "_credits_join": "This moves the act VIII ambush. docs/running-order.md records that the credits carry no slide and no marker because 'Europa fades to black on its own tail and the drum smash lands on the next frame' -- the smash now lands off the end of a DIFFERENT song. The plan gives movement 5 a tail fade to black so the ambush still comes out of black rather than out of a held frame, but whether the two pieces of music collide is a listening judgement for the owner."
+    }
+  ]
+}
