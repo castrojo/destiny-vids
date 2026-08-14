@@ -74,6 +74,20 @@
    "_note": "#118 line 3, first after the reveal per the note's order. Takes the frame-verified 12.2 seat (one continuous push-in 6.03-12.60; clears 0.23s before the 14.833 cut) that the retired telnet opener held."
   },
   {
+   "id": "p3b-kat-soundbet",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "kat",
+   "text": "How much you want to bet their sound just doesn't work?",
+   "avatar": "~/Videos/wolves-kat/render/kat.jpg",
+   "at": 14.95,
+   "dur": 2.4,
+   "fade_in": 0.6,
+   "fade_out_at": 17.1,
+   "fade_out": 0.25,
+   "_note": "Owner 2026-08-14, verbatim: 'add a \"How much you want to bet their sound just doesn't work?\" after kat's linux desktop line.' No speaker was named; it continues Kat's own line and is seated as hers. The seat is the recorded exception the retired p1b-ian held: it arrives on the 14.833 shake cut, 0.35s after the Linux line clears, and clears at 17.35, 0.4s before the 17.75 cut."
+  },
+  {
    "id": "p4-kat-linux2",
    "kind": "chat",
    "position": "letterbox",
