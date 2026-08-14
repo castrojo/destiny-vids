@@ -34,7 +34,7 @@ const TEMPLATES = { act: 'act.html', comic: 'comic.html', maintitle: 'maintitle.
 // `stage` is not copy -- it is the main title's two-beat switch, and it is
 // listed here only because it travels the same query string.
 const COPY = ['act', 'label', 'title', 'subtitle', 'quote', 'quote_by', 'quote_note',
-  'qr_dialogue', 'qr_domain', 'stage']
+  'qr_dialogue', 'qr_domain', 'stage', 'accent']
 const LISTS = ['body', 'chapters']
 const ASSETS = ['art', 'qr']
 // Structured copy: one JSON param, because a caption box is a variable-length

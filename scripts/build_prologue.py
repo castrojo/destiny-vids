@@ -103,6 +103,31 @@ AUDIO_FADE_START = 93.000
 TOTAL = OUT_POINT + BRIDGE                             # 99.200
 AUDIO_FADE = TOTAL - AUDIO_FADE_START                  # 6.200
 
+# --- the opening level ride ---------------------------------------------------
+# The owner, on the first cut: "the sparks in the beginning of the video is
+# jarring audio for the audience, tone them down the best you can", and then
+# "just tone down the spark noise at the beginning of the song so my ears don't
+# explode".
+#
+# MEASURED, on the built act. Across the first 13 s the sustained level sits at
+# -13 to -18 dB RMS while the spark transients hit repeatedly at ~0 dBFS -- they
+# stand 13 to 18 dB above the bed they arrive on. And the source is clipped
+# before this build touches it: decoded samples reach +1.9 dBFS. That is
+# Nightwish's master, and nothing here un-clips it.
+#
+# NOT A LIMITER, AND NOT A COMPRESSOR. The audio tenet forbids dynamics
+# processing on finished music, because it rewrites the dynamics the artist
+# chose -- and it is the wrong tool anyway: squashing these transients would
+# dull the crackle into mush. The sanctioned lever is LEVEL. Every spark stays
+# exactly as mixed; it simply does not arrive at the listener at full scale.
+#
+# THE SHAPE IS THE CUT'S. The picture is a dark void until the 12.28 shot change,
+# so the ride reaches unity exactly there: the sparks are held down precisely
+# where they live, and full level lands on the film's biggest visual event
+# instead of on a black screen. Nothing after 12.28 is touched.
+RIDE_START_DB = -12.0
+RIDE_TO = 12.280
+
 FPS = conform.DELIVERY.fps
 W, H = conform.DELIVERY.width, conform.DELIVERY.height
 
@@ -195,7 +220,16 @@ def filtergraph():
 
     join = "[v2][bridge]concat=n=2:v=1:a=0[vout]"
 
-    audio = (f"[0:a]atrim=0:{TOTAL:.3f},asetpts=PTS-STARTPTS,"
+    # The ride, as an evaluated `volume` expression: level automation, which is
+    # a mix decision, rather than a dynamics filter, which would be a rewrite.
+    # gain(t) = RIDE_START_DB * (1 - (t/RIDE_TO)^2) dB -- it holds near the
+    # start value through the spark-dense early seconds and opens up late, then
+    # is exactly 0 dB from RIDE_TO onward.
+    ride = (f"volume=eval=frame:volume="
+            f"'if(lt(t,{RIDE_TO:.3f}),"
+            f"pow(10,({RIDE_START_DB:.1f}*(1-pow(t/{RIDE_TO:.3f},2)))/20),1)'")
+
+    audio = (f"[0:a]atrim=0:{TOTAL:.3f},asetpts=PTS-STARTPTS,{ride},"
              f"afade=t=out:st={AUDIO_FADE_START:.3f}:d={AUDIO_FADE:.3f},"
              f"aresample=48000[aout]")
 

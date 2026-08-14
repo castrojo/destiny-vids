@@ -207,6 +207,17 @@ fix, not adding a source list that lies.
 
 ## Red Flags
 
+- **A new act's master that never went through `tools/peaks.py`.** The
+  deliverable gets the true-peak loop and the master historically did not —
+  that is issue #82, and the prologue repeated it exactly: it shipped at
+  **+0.4 dBTP**, above full scale, because a fresh builder simply never called
+  the gate. Build → **verify** → `peaks.py trim` → **verify** → `publish`.
+- **Starting a render while the previous one may still be writing the same
+  path.** Stopping a shell does not guarantee its ffmpeg is gone; two encoders
+  on one output produced a master 250 frames short with a corrupt FLAC stream,
+  and nothing failed loudly. Check the frame count and a clean decode
+  (`ffmpeg -v error -i out -f null -`) before trusting any master, and always
+  before gating one.
 - Exactly 1 beat for a cut-heavy video → the source is AV1, not H.264
   (`docs/rendering.md`). `make_video.sh` warns on the codec before this bites.
 - A video whose segments are 0 clean → `overlays` was skipped wholesale.
