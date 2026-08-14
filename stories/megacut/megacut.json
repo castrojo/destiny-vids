@@ -24,7 +24,7 @@
     "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md.",
     "prologue": "Wolves/Prod/00-prologue.mp4 -> destiny-vids/renders/00-prologue.mp4, built by scripts/build_prologue.py from stories/00-prologue-plates.json and cards/maintitle.html. Born conformant (1920x1080, 60000/1001, bt709 on all three fields, FLAC 48 kHz stereo) so the join stream-copies its picture. Audio decoded from the plain 251 Opus rung, NOT 251-drc, per the audio standard -- the same lossy-source posture act I records."
   },
-  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v1.0.mp4",
+  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.0.mp4",
   "width": 1920,
   "height": 1080,
   "fps": "60000/1001",
@@ -189,5 +189,5 @@
     }
   ],
   "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no film, so it has no marker -- a chapter that jumps to the next act's footage would be a lie about what plays.",
-  "_version": "v1.0 -- the first build that is the WHOLE FEATURE: all eight acts play. v0.9 was seven of eight, with act VIII a held numeral and no film. This build adds act VIII (the credits, #51) with its own slide and chapter marker, and cuts the comic cover from the end of act VII (#178) so the reveal happens once, in act VIII, at :22. Act VII is 12.934 s shorter, so every chapter after it moved."
+  "_version": "v2.0 -- THE PERFUME THREAD. v1.0 was the first build that was the whole feature: all eight acts playing, act VIII (the credits, #51) added with its own slide, and the comic cover cut from the end of act VII (#178) so the reveal happens once, at :22. v2.0 changes the SHAPE of the programme rather than its contents: Nightwish's 'Perfume Of The Timeless' now plays from the first frame to the last frame before the credits, in source order and without gaps, and the eight acts live inside it. Five movements -- the prologue in front of act I, then 93.000->159.400 after act I, 159.400->328.080 after act III, 328.080->389.800 before Europa, and 389.800->EOF from Europa into the credits. None of them takes a numeral, a slide or a chapter marker, so the chapter list still has eight entries, but every timestamp after act I moved. Movements 2-5 add 414.0 s (6:54.0) on top of the prologue's 99.2, taking the feature from 24:07.1 to roughly 32:40. See docs/cuts/00-perfume-thread.md."
 }
