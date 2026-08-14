@@ -24,7 +24,7 @@
     "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md.",
     "prologue": "Wolves/Prod/00-prologue.mp4 -> destiny-vids/renders/00-prologue.mp4, built by scripts/build_prologue.py from stories/00-prologue-plates.json and cards/maintitle.html. Born conformant (1920x1080, 60000/1001, bt709 on all three fields, FLAC 48 kHz stereo) so the join stream-copies its picture. Audio decoded from the plain 251 Opus rung, NOT 251-drc, per the audio standard -- the same lossy-source posture act I records."
   },
-  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.0.mp4",
+  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.1.mp4",
   "width": 1920,
   "height": 1080,
   "fps": "60000/1001",
@@ -96,14 +96,15 @@
       "path": "/var/home/jorge/Videos/Wolves/Prod/03-mrbobbytables.mp4",
       "audio": "source",
       "fade_in": 2.0,
-      "fade_out": 2.0,
-      "label": "Act III — mrbobbytables: August 2026 contributors (partially complete)"
+      "fade_out": 0.0,
+      "label": "Act III — mrbobbytables: August 2026 contributors (partially complete)",
+      "_hard_out": "NO fade_out, owner 2026-08-14: '12:43 can be a perfect transition with the music make this one awesome'. Act III ends on the Vex gate BLOOMING TO WHITE, and movement 3 opens above the clouds and falls at exactly 12:43. A 2.0 s fade out into a 2.0 s fade in put a four-second hole in the sound under the one frame doing the most work. A white flash is the classic cover for a hard music edit: the picture blinds you and the next song is simply there."
     },
     {
       "kind": "clip",
       "path": "renders/perfume-3.mp4",
       "audio": "source",
-      "fade_in": 2.0,
+      "fade_in": 0.0,
       "fade_out": 2.0,
       "label": "Perfume, movement 3 — source 159.400 -> 328.080, after mrbobbytables",
       "_thread": "Movement 3 of 5, and the longest at 2:48.7 -- longer than acts IV, V and VII. That is what the owner's spans specify and it plays as a full movement of the song, but it is the one placement where an interlude outweighs the acts around it. Flagged in stories/00-perfume-thread.json for the owner, built as instructed."
@@ -141,41 +142,43 @@
       "path": "/var/home/jorge/Videos/Wolves/Prod/06-7daystothewolves.mp4",
       "audio": "source",
       "fade_in": 2.0,
-      "label": "Act VI — Seven Days to the Wolves: the musical (editorial pass, provenance open), with the Cayde-6 tail plates burned in",
-      "_plates": "Act VI carries stories/06-wolves-cayde-plates.json burned in (tools/plate.py burn --fit-picture). Prod holds ONE file per act, hardlinked to its project master, so Prod/06 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4. The UN-PLATED v2 master is kept beside it as wolves-7days-master-v2.mp4, because burning is not idempotent: a re-burn starts from the clean file and never stacks a second card on the first. v2 re-burned the tail plates at +10.811 s film time (the manifest's _shifted records it) and the act runs 443.5 s, so slide VII and act VII move +10.811 s of programme time."
+      "trim_to": 431.267,
+      "label": "Act VI — Seven Days to the Wolves: the musical, CUT AT THE COMIC (431.267) so the song hands straight to the next one",
+      "_trim": "Owner 2026-08-14: 'when the song ends we want to go right into the next song, cut out the comic and fade so it goes right from wolves to this song.' Both things they asked to remove start on the SAME measured frame: 431.267 is act VI's last shot change, the comic cover ('SEVEN DAYS TO THE WOLVES / THE FIGHT FOR FREEDOM BEGINS!') comes up on it and holds 12.2 s to the end, and the song's fade-out begins on it too -- full level right up to 431.267 (-12.6 dB), then -13.9, -16.2, -26.3, -46.4 and silence by 441. So one cut removes the comic AND the fade, and the act now ends on the song's last full bar. The owner said 23:55; the measured frame is 23:59.5, and it is the frame their description names.",
+      "_keeps_every_credit": "The tail plates end at act-film 409.669 (Cayde-6 reveal 393.511, the narration, then Kelsey Hightower, Brian Ketelsen and Angie Jones). The cut is 21.6 s after the last of them, so NOTHING that credits a real person is lost -- checked before cutting, because a dropped credit is not recoverable by a revert.",
+      "_cover_now_happens_once": "The comic cover was already act VIII's reveal (#178 took it off the end of act VII for exactly this reason). Removing it here means the programme plays it once, where it lands.",
+      "_plates": "Act VI carries stories/06-wolves-cayde-plates.json burned in (tools/plate.py burn --fit-picture). Prod holds ONE file per act, hardlinked to its project master, so Prod/06 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4. The UN-PLATED v2 master is kept beside it as wolves-7days-master-v2.mp4, because burning is not idempotent: a re-burn starts from the clean file and never stacks a second card on the first. v2 re-burned the tail plates at +10.811 s film time (the manifest's _shifted records it) and the act runs 443.5 s, so slide VII and act VII move +10.811 s of programme time. THE ACT'S OWN FILE IS NOT RE-RENDERED by the trim above -- the programme ends it early, so act VI in Prod/ is untouched."
     },
     {
       "kind": "clip",
       "path": "renders/perfume-4.mp4",
       "audio": "source",
-      "fade_in": 2.0,
-      "fade_out": 2.0,
-      "label": "Perfume, movement 4 — source 328.080 -> 389.800, before Europa",
-      "_thread": "Movement 4 of 5. It follows act VI, which fades itself out (measured -90.3 dB in its last second), so this is the one join in the thread where music meets silence meets music."
-    },
-    {
-      "kind": "card",
-      "image": "renders/plates-megacut-cards/plate_act7.png",
-      "dur": 5.0,
-      "label": "VII — Europa / Director's Cut",
-      "chapter": "VII. Europa"
+      "fade_in": 0.0,
+      "fade_out": 0.0,
+      "label": "Perfume, movement 4 — source 328.080 -> 389.800, wolves straight in, straight out to Europa",
+      "_hard_both_ends": "NO fades, both owner calls. In: 'go right into the next song' -- act VI now ends on a full-level bar, so Perfume starts on the next frame at full level and the two songs meet like a needle drop. Out: '25:13 don't fade this it's awesome make it a quick cut to europa get rid of the title slide.'",
+      "_thread": "Movement 4 of 5."
     },
     {
       "kind": "clip",
       "path": "/var/home/jorge/Videos/Wolves/Prod/07-europa.mp4",
       "audio": "source",
-      "fade_in": 2.0,
-      "fade_out": 3.0,
-      "label": "Act VII — Europa Director's Cut"
+      "fade_in": 0.0,
+      "fade_out": 1.5,
+      "label": "Act VII — Europa Director's Cut (no slide: a quick cut off movement 4)",
+      "_no_slide": "Owner 2026-08-14: 'get rid of the title slide.' Act VII is now the SECOND act with no slide, after act VIII -- and like act VIII that also costs it its CHAPTER MARKER, because chapters() derives markers from slides. That is a real consequence of the instruction, recorded rather than worked around: the published list is six entries now, not seven. fade_in is 0.0 so nothing eases in front of the cut.",
+      "_shorter_tail": "fade_out 3.0 -> 1.5. Europa's picture already fades to black over its own last half second, and movement 5 opens on a dark Earth limb that holds 3.5 s before the sun breaks. Three seconds of audio fade on top of that made roughly four seconds of nothing across the join."
     },
     {
       "kind": "clip",
       "path": "renders/perfume-5.mp4",
       "audio": "source",
-      "fade_in": 2.0,
+      "fade_in": 0.0,
       "fade_out": 1.5,
+      "_no_fade_in": "Owner 2026-08-14: '27:03 transition needs a dramatic analysis, very close.' Measured what is actually there: Europa ends on the Europa/Jupiter vista behind the KubeCon card and fades to black over its last half second; movement 5 then opens on a DARK EARTH LIMB (Y~24) that holds 3.504 s before the sun bursts over the curve (Y jumps to 93), then an ice plume at 4.505, and at 6.506 -- programme 27:02.3, the frame the owner marked -- the cut to the body sinking through deep blue water. Vertical motion was measured on both sides and there is NO pan: the join is dark-to-dark, not a tilt. So the problem was never the frame, it was that a 2.0 s fade IN under an already near-black 3.5 s shot, coming off a 3.0 s fade OUT, made about four seconds of nothing exactly where the film wants to hold its breath. Dropping the fade puts the song in at full level on the cut, so the dark limb becomes a held breath with music under it and the sunrise lands as the payoff.",
+      "_still_open": "If it still plays slack, the one-number alternative is to start movement 5 at the SUNRISE -- source 393.560 is a measured shot change -- so Europa's black cuts straight to the sun breaking. It is not taken here because it would open a 3.76 s hole in the song, and the thread being gapless is the whole idea. Closing that hole means extending movement 4 to 393.560, which changes the 25:13 cut the owner has already called awesome. Owner's call: #192.",
       "label": "Perfume, movement 5 — source 389.800 -> 507.021 (EOF), Europa into the credits",
-      "_thread": "Movement 5 of 5, and the end of the song. The owner: 'match the transition panning up from laura after europa, then hold until the end of this, then roll credits.' Laura Santamaria is Elsie Bray, act VII copy. Act VII's tail is flat at YAVG~37 from 89 s and falls hard over its last half second, so it hands down into this movement's upward move. WHERE EXACTLY THE TWO MOVES MEET IS A CRAFT JUDGEMENT ABOUT FRAMES: this build joins at the measured cut, 389.800, and the frame is for the owner to approve. Act VII is never shortened to make it fit (#178).",
+      "_thread": "Movement 5 of 5, and the end of the song. The owner asked to 'match the transition panning up from laura after europa'. MEASURED, AND THE PREMISE DID NOT SURVIVE: there is no pan on either side. Europa's tail is the Europa/Jupiter vista behind the KubeCon card, fading to black, and movement 5 opens on a static dark Earth limb -- vertical displacement is 0 px across both, by row-profile correlation. What the join actually is, and what it is good at, is dark-to-dark: one world in space goes out, another comes up, and 3.5 s later the sun breaks over it. Act VII is never shortened to make anything fit (#178).",
       "_moves_the_ambush": "This changes what act VIII comes out of. The credits carry no slide and no marker because 'Europa fades to black on its own tail and the drum smash lands on the next frame' -- the smash now lands off the end of a DIFFERENT song, and the source's last shot is HELD (luma ~32), not black. The 1.5 s fade_out lets the song land rather than be chopped; the picture is deliberately left un-faded, because these movements are rendered clean for the dinosaur pass and a burned dip would have to be un-baked later. TODO(owner): whether the two pieces of music collide, and whether the ambush wants black in front of it after all."
     },
     {
@@ -188,6 +191,6 @@
       "_what": "NO ACT SLIDE, by owner instruction: 'no credits slide, go right to the metal ... it should surprise the viewer.' Every other act is announced by a card; this one is not. Europa fades to black on its own tail and the drum smash lands on the next frame. The missing slide also removes act VIII's CHAPTER MARKER -- chapters() derives them from slides -- and that is the point rather than a side effect: a 'VIII. Credits' entry on the scrub bar would spoil the same surprise the cut is built to land. fade_in is 0.0 so nothing eases in front of the smash."
     }
   ],
-  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no film, so it has no marker -- a chapter that jumps to the next act's footage would be a lie about what plays.",
-  "_version": "v2.0 -- THE PERFUME THREAD. v1.0 was the first build that was the whole feature: all eight acts playing, act VIII (the credits, #51) added with its own slide, and the comic cover cut from the end of act VII (#178) so the reveal happens once, at :22. v2.0 changes the SHAPE of the programme rather than its contents: Nightwish's 'Perfume Of The Timeless' now plays from the first frame to the last frame before the credits, in source order and without gaps, and the eight acts live inside it. Five movements -- the prologue in front of act I, then 93.000->159.400 after act I, 159.400->328.080 after act III, 328.080->389.800 before Europa, and 389.800->EOF from Europa into the credits. None of them takes a numeral, a slide or a chapter marker, so the chapter list still has eight entries, but every timestamp after act I moved. Movements 2-5 add 414.0 s (6:54.0) on top of the prologue's 99.2, taking the feature from 24:07.1 to roughly 32:40. See docs/cuts/00-perfume-thread.md."
+  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no slide, so it has no marker -- that is the ambush working as designed. AS OF v2.1 ACT VII HAS NONE EITHER: the owner asked for its title slide to go so movement 4 could hard-cut into Europa, and the marker went with the slide. Six published entries, not eight. If Europa should keep a scrub-bar entry without a card in front of it, chapters() would need to read a `chapter` off the CLIP -- a change nobody has asked for yet.",
+  "_version": "v2.1 -- THE OWNER'S JOIN PASS on v2.0, four notes taken while watching. (1) Act VI is CUT AT 431.267, its last shot change: the comic cover and the song's fade-out both start on that frame, so one cut removes both and the act ends on a full bar -- every tail credit survives, the last of them 21.6 s earlier. (2) Act VI -> movement 4 and (3) movement 4 -> act VII are now HARD, and act VII's title slide is gone, which also costs act VII its chapter marker (chapters() derives them from slides), leaving six published entries. (4) The audio dips were pulled out of the two joins where the picture was already doing the work: act III's white-out into movement 3, and Europa's black into movement 5's dark Earth limb. Nothing was re-rendered -- act VI's file in Prod/ is untouched and the cut lives in this plan, which is what `trim_to` is for. 32:40.249 -> 32:23.016."
 }

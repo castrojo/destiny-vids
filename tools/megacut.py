@@ -197,6 +197,25 @@ def load_plan(path, require_sources=True):
             )
         if kind == "clip" and "dur" in item and float(item["dur"]) <= 0:
             raise ValueError(f"item {i}: clip dur, when given, must be positive")
+        if "trim_to" in item:
+            if kind != "clip":
+                raise ValueError(
+                    f"item {i}: trim_to belongs on a CLIP -- a card's length "
+                    f"is its authored `dur`, not a cut into a film")
+            try:
+                trim_to = float(item["trim_to"])
+            except (TypeError, ValueError):
+                raise ValueError(
+                    f"item {i}: trim_to must be seconds of ACT FILM time, "
+                    f"got {item['trim_to']!r}")
+            if trim_to <= 0:
+                raise ValueError(f"item {i}: trim_to must be positive")
+            if "dur" in item and abs(float(item["dur"]) - trim_to) > 1e-6:
+                raise ValueError(
+                    f"item {i}: dur ({item['dur']}s) and trim_to ({trim_to}s) "
+                    f"disagree about how long this clip plays. trim_to is the "
+                    f"one that cuts, so a differing dur is a stale number the "
+                    f"programme's arithmetic would believe -- state one")
         for fade in ("fade_in", "fade_out"):
             if fade not in item:
                 continue
@@ -217,12 +236,13 @@ def load_plan(path, require_sources=True):
                     f"silence -- a no-op that reads as a treatment. Drop it; "
                     f"if the slide should carry sound, that is a licensing "
                     f"decision for the owner, not a fade")
-        if kind == "clip" and "dur" in item:
+        if kind == "clip" and ("dur" in item or "trim_to" in item):
             total = float(item.get("fade_in", 0)) + float(item.get("fade_out", 0))
-            if total >= float(item["dur"]):
+            length = float(item.get("trim_to", item.get("dur", 0)))
+            if total >= length:
                 raise ValueError(
                     f"item {i}: fade_in + fade_out ({total}s) meets or exceeds "
-                    f"the clip's own duration ({item['dur']}s) -- the fades "
+                    f"the clip's own duration ({length}s) -- the fades "
                     f"would overlap on the ACT FILM clock")
         if kind == "card" and "sub_chapters" in item:
             raise ValueError(
@@ -497,7 +517,12 @@ def segment_video_chain(plan, item):
     h = int(plan.get("height", DEFAULT_HEIGHT))
     chain = (f"scale={w}:{h}:flags=lanczos,setsar=1,"
              f"fps={fps},format=yuv420p")
-    if item["audio"] == "silent":
+    if item.get("trim_to") is not None:
+        # An authored cut inside a delivered act: the act's own file is never
+        # re-rendered, so the programme ends it early instead. The trim is on
+        # the ACT FILM clock, like every other number the plan states.
+        chain += f",trim=duration={float(item['trim_to'])}"
+    elif item["audio"] == "silent":
         # Both legs pinned to ONE duration so they are equal by construction.
         dur = item.get("dur")
         if dur is None:
@@ -609,9 +634,16 @@ def build_segment_command(plan, index, seg_path, threads=None):
         # Authored duration, else probed from the video stream -- the container
         # can report a longer audio stream, and a fade placed against that
         # starts early. Only a fade needs the number, so only a fade pays the probe.
-        dur = item.get("dur")
-        if dur is None and float(item.get("fade_out", 0)):
-            dur = probe_duration(resolve(item["path"]), stream="v:0")
+        dur = item.get("trim_to")
+        if dur is None:
+            dur = item.get("dur")
+            if dur is None and float(item.get("fade_out", 0)):
+                dur = probe_duration(resolve(item["path"]), stream="v:0")
+        else:
+            # A trimmed clip is cut on BOTH streams by the same number, so the
+            # sound cannot outlive the picture -- and a fade_out lands against
+            # the authored end rather than against the file's.
+            maps += ["-t", str(float(dur))]
         # aresample only where the rate differs; aformat pins the layout so the
         # join sees one shape. No gain is applied anywhere; the only treatment
         # is an explicit fade the plan asked for (issue #105).
@@ -776,7 +808,7 @@ def assemble(plan, out_path, log=None, jobs=None,
         for i, item in enumerate(plan["items"]):
             seg = tmp / f"seg{i:03d}.mkv"
             segments[i] = seg
-            if item["kind"] == "clip" and copy_ok:
+            if item["kind"] == "clip" and copy_ok and item.get("trim_to") is None:
                 argv = build_segment_copy_command(plan, i, seg, sources[i])
                 mode = "copy"
             else:
@@ -814,7 +846,17 @@ def item_duration(item):
     `is None`, not `or`: a 0 would fall through to a probe and report a length
     the graph does not build. expected_duration and build_filtergraph test the
     same way, and the three must not disagree about what "no dur" is.
+
+    ``trim_to`` OUTRANKS both. It is the only key that shortens a clip whose
+    audio comes from the file -- `dur` never did, and that was the trap: an
+    authored `dur` shorter than the file changed the plan's arithmetic while
+    the segment still played to its own end, so the programme's clock and its
+    picture disagreed and only `verify_segment` caught it. A clip that
+    declares `trim_to` IS `trim_to` long, everywhere.
     """
+    trim_to = item.get("trim_to")
+    if trim_to is not None:
+        return float(trim_to)
     dur = item.get("dur")
     if dur is None:
         dur = probe_duration(resolve(item["path"]), stream="v:0")
@@ -1003,7 +1045,7 @@ def main(argv=None):
     if args.dry_run:
         copy_ok = _copy_path_ok(plan, allow_copy=not args.no_copy)
         for i, item in enumerate(plan["items"]):
-            if item["kind"] == "clip" and copy_ok:
+            if item["kind"] == "clip" and copy_ok and item.get("trim_to") is None:
                 print(f"# [{i}] COPY (via conform cache): "
                       f"{item.get('label', item['path'])}")
                 print(" ".join(build_segment_copy_command(

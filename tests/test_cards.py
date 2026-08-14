@@ -129,8 +129,18 @@ def test_act_slides_run_in_time_order_and_carry_a_chapters_field():
 
 
 def test_the_programme_plays_every_card_the_cards_manifest_authored():
+    """Every authored card plays, and every played card is authored.
+
+    A `retired` card is exempt from the first half and only the first half:
+    its copy is kept because it was authored and may come back, but nothing
+    may play a card the deck does not declare. The one retirement so far is
+    act VII's title slide, dropped on the owner's instruction so movement 4
+    could hard-cut into Europa (v2.1).
+    """
     plan = _load("megacut.json")
-    authored = {p["id"] for p in _load("megacut-cards.json")["plates"]}
+    plates = _load("megacut-cards.json")["plates"]
+    authored = {p["id"] for p in plates}
+    live = {p["id"] for p in plates if not p.get("retired")}
     played = set()
     for item in plan["items"]:
         if item["kind"] != "card":
@@ -138,7 +148,18 @@ def test_the_programme_plays_every_card_the_cards_manifest_authored():
         match = re.search(r"plate_(.+)\.png$", item["image"])
         assert match, item["image"]
         played.add(match.group(1))
-    assert played == authored
+    assert played <= authored, (
+        f"the programme plays undeclared card(s): {played - authored}")
+    assert played == live, (
+        f"authored-but-unplayed: {live - played}; played-but-not-live: "
+        f"{played - live}. A card that should not play needs `retired` with "
+        f"a reason, so the decision is recorded rather than inferred.")
+
+
+def test_every_retired_card_says_why_it_was_retired():
+    for card in _load("megacut-cards.json")["plates"]:
+        if card.get("retired"):
+            assert card.get("retired_note"), card["id"]
 
 
 def test_the_comic_card_covers_one_unbroken_window_beside_the_guardian_plates():
