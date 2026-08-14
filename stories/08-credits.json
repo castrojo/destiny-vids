@@ -57,12 +57,11 @@
       "dur_sec": 6.0
     },
     {
-      "_what": "Owner, 2026-08-13: 'replace contributions by with \"Introducing\" Rafael Castro | Laskshmi Mehta-Castro'. The classic debut credit, and it replaces the 'Contributions by YOU' card entirely rather than joining it. Names reproduced EXACTLY as the owner wrote them -- a person's name is copy, and this file does not correct one silently.",
-      "TODO(owner)": "CONFIRM THE SPELLING of 'Laskshmi Mehta-Castro'. It is reproduced as given, but 'Lakshmi' is the far more common spelling and the source was a typed one-line instruction, not an authored record. Nothing here can verify it, and a misspelt name in a credit is not recoverable by a revert -- so it is rendered as written and flagged rather than guessed either way.",
+      "_what": "Owner, 2026-08-13: replace the 'Contributions by YOU' card with an 'Introducing' credit, then redact the second name. Rendered as `[ REDACTED ]` -- the deck's own authored form, the same string the plates carry (docs/skills/plates/references/plate-chrome.md). It is AUTHORED COPY, not a placeholder: never substitute a real name for it, and never 'fix' it. The redacted name is deliberately recorded NOWHERE in this repo -- not in this note, not in the git history of this file's final state, not in a comment. That is what a redaction is for, and a test asserts the manifest does not contain it.",
       "role": "Introducing",
       "names": [
         "Rafael Castro",
-        "Laskshmi Mehta-Castro"
+        "[ REDACTED ]"
       ],
       "dur_sec": 6.0
     }
@@ -77,8 +76,9 @@
   },
   "unresolved": [
     "Act VII still ends on the comic cover -- see reveal.TODO(owner).",
-    "Spelling of 'Laskshmi Mehta-Castro' is unconfirmed -- see fixed_cards[].TODO(owner).",
-    "'Contributions by YOU' was REMOVED to make room for the Introducing card. It was the beat that handed the film to the audience immediately before the contributor walls; those walls now arrive without an introduction. Restore it as a fifth card if that reads as a gap."
+    "'Contributions by YOU' was REMOVED to make room for the Introducing card. It was the beat that handed the film to the audience immediately before the contributor walls; those walls now arrive without an introduction. Restore it as a fifth card if that reads as a gap.",
+    "The README's cast table lists 9 leads; vocab/casting.yaml binds 15, and the credits follow the vocab. The six not in the table (Joanna Lee, Lori Lorusso, Nate Waddington, Jonathan Bryce, Ashley Willis, Paris Pittman) are still credited. Dropping a real person's credit is not recoverable by a revert, and the README itself says bindings live in vocab/casting.yaml -- so the conservative reading stands until the owner says otherwise. If the trim WAS a recast, remove those bindings from the vocab and this follows automatically.",
+    "The README now spells Karena's surname 'Angel'; vocab/casting.yaml has 'Angell', which is what the credits print. The same edit also introduced 'REFERED', so a dropped letter is at least as likely as a correction -- and the vocab is the deliberate record."
   ],
   "contributors": [
     {
@@ -646,5 +646,9 @@
     "_what": "VERIFIED GitHub logins for cast members who have no authored Guardian card. Hand-maintained: --refresh-contributors will not overwrite it. This lives here rather than in vocab/casting.yaml's `github:` field -- which is its proper home -- because casting.yaml is a committed input to all six delivered acts, so editing it marks every one of them stale (#167). Move these across when that freeze lifts. Each was checked by matching the ACCOUNT'S OWN name against the credited name; a login that only matches a character name is the nimbatus/nimbinatus trap and is never used. github.com/kat is named just 'Kat' and is NOT confirmed to be Kat Cosgrove -- she is credited from her authored card instead, which is better.",
     "Jorge Castro": "castrojo",
     "Jeefy": "jeefy"
-  }
+  },
+  "cast_redactions": [
+    "cayde_6"
+  ],
+  "_cast_redactions_what": "Owner's README, 2026-08-13: '[Redacted] Cayde-6 ... this character is very famous so we only reveal jorge's name once.' His one reveal in act VIII is the 'Directed by' card, so the cast placard redacts. It is the PERSON'S NAME that is redacted, not the character -- that is the show's own established treatment, authored by the owner in act II: scripts/build_efmb_plates.py's CAYDE carries redacted_speaker '[ REDACTED ]' with redacts=<real name> and reveals='cayde_6'. The famous character is the known half; the person behind it is the secret. Redacting the name also drops the avatar and the authored card, because a placard that hides a word and shows the face has revealed him anyway."
 }
