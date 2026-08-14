@@ -202,6 +202,15 @@ their numerals and their films — it merges the announcement, not the acts — 
 it is one chapter marker, because a chapter starts on its slide and there is now
 one slide.
 
+**It holds 5 s, not 15 (v2.2).** The long hold was deliberate pacing while it
+was the one slide announcing two acts. The Perfume thread changed what sits
+either side of it: movement 3 ends on a **dark, static** shot of animal skulls,
+the song faded out over 2 s, and then the card froze for 15 s **in silence**
+before Kat's ships — about twenty seconds in which neither the picture nor the
+sound moved. The owner: *"15:31 entire transition is too weird and long, make it
+all fit."* It now holds what every other slide holds, and movement 3's fade-out
+is 1 s so the music carries closer to the card. The copy is untouched.
+
 The slide's copy is **owner-authored**: *Bias for Action*, subtitled *The Kat
 and the Nat*, over act IV's terminal block. Act V's own title, *Wrong Place,
 Wrong Time, Right Attitude*, stays its name here but **no longer appears on
