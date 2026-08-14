@@ -241,3 +241,76 @@ def test_the_cards_are_frame_sized():
     assert C.render_wordmark().size == (C.W, C.H) == (1920, 1080)
     assert C.render_role_card("Directed by", ["Jorge O. Castro"]).size == (C.W, C.H)
     assert C.render_cast_placard("Bob Killen", "Osiris").size == (C.W, C.H)
+
+
+# --- capitalization, faces, and the wordmark -------------------------------
+
+def test_nothing_on_screen_is_uppercased(manifest):
+    """Capitalization is copy. 'Bazzite' is the project's name; 'BAZZITE' is a
+    different word, and a GitHub login's case is chosen by its owner."""
+    source = (REPO_ROOT / "tools" / "credits.py").read_text()
+    assert ".upper()" not in source, \
+        "a card is forcing case; print names as they are written"
+
+
+def test_section_headings_keep_their_authored_case(manifest):
+    assert [s["section"] for s in manifest["contributors"]] == [
+        "Project Bluefin", "Aurora", "Bazzite", "Universal Blue"]
+
+
+def test_a_cast_face_is_never_guessed(manifest):
+    """Rule 3, and the vocab's own warning: github.com/nimbatus is NOT Laura
+    Santamaria. A placard shows a face only from an authored card or a
+    VERIFIED login -- never from a login inferred off a person's name."""
+    verified = {k for k in (manifest.get("cast_logins") or {}) if not k.startswith("_")}
+    for member in manifest["cast"]:
+        if member.get("login"):
+            assert member["login"] in {"nimbinatus"} or member["person"] in verified
+
+
+def test_kat_is_credited_from_her_authored_card_not_a_lookalike_login(manifest):
+    """github.com/kat is named only 'Kat' and is not confirmed to be Kat
+    Cosgrove -- the nimbatus trap exactly. She has an authored card instead."""
+    kat = next(c for c in manifest["cast"] if c["person"] == "Kat Cosgrove")
+    assert kat.get("card") == "kat"
+    assert kat.get("login") is None
+
+
+def test_the_authored_cards_are_used_where_they_exist(manifest):
+    cards = {c["person"]: c.get("card") for c in manifest["cast"]}
+    assert cards["Bob Killen"] == "bob"
+    assert cards["Laura Santamaria"] == "laura"
+
+
+def test_verified_logins_survive_a_contributor_refresh(manifest):
+    """cast_logins is hand-maintained; the schedule applies it every time, so
+    a login added after the cast was generated still reaches its placard."""
+    items, _ = B.schedule(manifest)
+    jorge = next(i for i in items if i.get("person") == "Jorge Castro")
+    assert jorge["login"] == "castrojo"
+
+
+def test_the_wordmark_is_the_real_mark_not_typeset(manifest):
+    """A brand mark set in the deck's mono is an invented mark."""
+    assert manifest["wordmark"]["source"].startswith("ublue-os/universal-blue-org")
+
+
+def test_the_wordmark_source_is_recorded_because_artwork_does_not_have_it(manifest):
+    """Recorded so nobody re-derives it: ublue-os/artwork is wallpapers only."""
+    assert "artwork" not in manifest["wordmark"]["source"]
+
+
+def test_every_cast_placard_gets_a_readable_hold(manifest):
+    """15 placards squeezed before the reveal gave each 2.15 s, which is not
+    long enough to look at somebody's Guardian card. They straddle it now."""
+    items, _ = B.schedule(manifest)
+    for item in items:
+        if item["kind"] == "cast":
+            assert item["dur"] >= 3.5
+
+
+def test_the_cast_order_survives_the_split(manifest):
+    """The cast is split around the reveal; it must stay a prefix/suffix cut."""
+    items, _ = B.schedule(manifest)
+    on_screen = [i["person"] for i in items if i["kind"] == "cast"]
+    assert on_screen == [c["person"] for c in manifest["cast"]]
