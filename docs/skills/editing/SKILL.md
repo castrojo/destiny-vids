@@ -117,6 +117,8 @@ Two things follow, and both bite:
 | "The beat matched something close enough." | A mismatch cascades into every later beat that wanted that shot. Fix it at the source. |
 | "Stream copy is faster and looks the same." | It snaps the in-point to a keyframe, discarding the boundary the detector pass exists to find. |
 | "I'll build a timeline layer so I can order shots freely." | One cinematic plus `--forward-only` is the shape. A sequencer buys freedom to hide continuity errors. |
+| "To hold black before the picture, I'll cut in a black clip and concat it." | A delayed `fade=t=in:st=X` already holds every earlier frame black. One filter, no seam, no second stream to keep in sync. |
+| "The detector says the cut is at X, so the event starts at X." | It says the frame is already *different* by X. A flare that blooms is under way before that — measure the luma's departure from its plateau and cut on that frame, or the reveal pops in half-lit. |
 
 ## Red Flags
 
@@ -131,6 +133,9 @@ Two things follow, and both bite:
   detector pass exists to find.
 - A shot silently missing from the output. `render.py` reports missing sources;
   read its stderr rather than trusting the duration.
+- A black hold built as its own clip when a filter already holds it, or a
+  reveal cut on a scene-detector boundary rather than on the frame the light
+  actually starts moving.
 - An act whose measured length does not match the span it was written for.
 - Selecting a shot from its midpoint keyframe alone, without scrubbing its edges.
 - A still whose audio disposition differs from the cut clips around it.

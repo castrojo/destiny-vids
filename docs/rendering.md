@@ -225,6 +225,29 @@ yt-dlp -S "vcodec:h264,res:1080" --merge-output-format mp4 \
 Sanity check: a two-minute Bungie trailer should detect on the order of ~70
 shots. If it reports 1, the codec is wrong, not the detector.
 
+## A delayed `fade=t=in` is a gate, not only a ramp
+
+`fade=t=in:st=X:d=D` holds **every frame before `X` fully black**, then ramps
+over `D`. It is easy to read the filter as "start ramping at X" and reach for a
+`color=black` clip plus a `concat` or an `overlay` to hold the black — one
+filter already does both.
+
+That is what opens the prologue: the picture is gated off until the source's
+own flare, and a two-frame `d` lets the burst bloom out of black rather than
+pop in half-lit.
+
+```console
+$ ffmpeg -f lavfi -i testsrc=size=320x180:rate=25:duration=3 \
+    -vf "fade=t=in:st=2:d=0.1" -y /tmp/fadetest.mp4
+# mean luma: 0.0 at 0.5s, 0.0 at 1.5s, 83.8 at 2.05s, 125.8 at 2.5s
+```
+
+**Measure the moment you are gating to, rather than taking a shot boundary.**
+Scene detection reports a cut once the frame is already *different*; a flare
+that blooms is visibly under way by then. The prologue's void sits on a flat
+plateau (45.9, 45.8, 46.0) and departs it at 54.3 — that departure is the
+frame to cut on, and it is 80 ms ahead of what the detector called.
+
 ## Seeking: why `-ss` goes after `-i`
 
 `render.py` uses **output seeking** (`-ss` after `-i`), which decodes from the
