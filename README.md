@@ -121,7 +121,7 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | Path | What it is |
 |---|---|
 | `vocab/` | Controlled vocabularies (YAML) — the **single source of truth** for every enum. `cleanliness.yaml` (overlays → `clean`, `footage_tier`) and `casting.yaml` (the lead cast map + ensemble policy) carry the two decisions above. |
-| `schema/segment.schema.json` | JSON Schema (Draft 2020-12) for one indexed segment/beat. |
+| `schema/segment.schema.json` | JSON Schema (Draft 2020-12) for one indexed segment/beat. Its `enum` lists are **generated** from `vocab/` by `scripts/generate_schema_enums.py`; everything else is hand-authored. |
 | `schema/video.schema.json` | JSON Schema for a source-video record (video-scoped inherited defaults). |
 | `schema/brief.schema.json` | JSON Schema for the `brief` block in a GitHub issue — the machine-readable half of a request for a video. |
 | `examples/` | Fully-annotated example records that validate against the schemas. |

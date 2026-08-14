@@ -52,6 +52,12 @@ jobs:
       - name: No derived field was hand-edited
         run: python3 tools/rederive.py --check
 
+      # A fourth: the schemas' enum lists, which are vocab/ copied into JSON.
+      # They were hand-maintained, and two had already drifted -- the segment
+      # schema rejected six subclass_version values the vocab declares valid.
+      - name: Every schema enum matches the vocabulary
+        run: python3 scripts/generate_schema_enums.py --check
+
       # The delivery graph's first rung: did an act's committed inputs change
       # without anybody re-rendering the act? This needs no footage and no
       # ~/Videos, so it is the one delivery check that CAN run here -- and it

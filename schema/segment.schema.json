@@ -498,7 +498,6 @@
         "dreaming_city",
         "europa",
         "nessus",
-        "the_traveler",
         "io",
         "mercury",
         "mars",
@@ -506,6 +505,7 @@
         "savathun_throne_world",
         "neptune_neomuna",
         "the_pale_heart",
+        "the_traveler",
         "orbit_space",
         "unknown"
       ],
@@ -513,9 +513,15 @@
     },
     "subclass_version": {
       "enum": [
+        "arc_1",
+        "arc_2",
         "arc_3",
-        "solar_3",
+        "void_1",
+        "void_2",
         "void_3",
+        "solar_1",
+        "solar_2",
+        "solar_3",
         "stasis",
         "strand",
         "prismatic",

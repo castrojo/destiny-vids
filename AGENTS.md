@@ -328,12 +328,17 @@ needs somebody to decide.
 - **Never hand-edit derived fields.** `clean`, `footage_tier`, `traversal_hero`
   and `casting` are computed by `tools/derive.py` at assembly time. A tagger
   that returns one is an error, by design.
-- **`vocab/` is the single source of truth for every enum.** Adding a value
-  means editing `vocab/*.yaml` *and* the schema that mirrors it
-  (`schema/segment.schema.json`, `schema/video.schema.json`,
-  `schema/bed.schema.json`); tests assert they agree, and that every cast
-  binding is queryable. A record type with **no** schema is the same bug one
-  step earlier — that is how a bed's `usage_class` stayed unchecked free text.
+- **`vocab/` is the single source of truth for every enum.** Adding a value is
+  **one** edit — the `vocab/*.yaml` file — and then
+  `python3 scripts/generate_schema_enums.py --write`, because the schemas'
+  enum lists (`schema/segment.schema.json`, `schema/video.schema.json`,
+  `schema/bed.schema.json`) are **generated** from the vocabulary, not
+  maintained beside it. Never hand-edit an enum in a schema: CI checks it, and
+  the two copies had already drifted while they were maintained by hand — the
+  segment schema rejected six `subclass_version` values the vocab declares
+  valid. Everything else in a schema is hand-authored. A record type with
+  **no** schema is the same bug one step earlier — that is how a bed's
+  `usage_class` stayed unchecked free text.
 - **Never invent on-screen copy.** Nameplate fields are a closed set — see
   [`docs/skills/plates/SKILL.md`](docs/skills/plates/SKILL.md). A Guardian identity somebody
   *has* authored (ten people, in `~/Videos/nameplates.json` and the website's
@@ -400,21 +405,23 @@ It is the normal failure mode here — several agents edit `tools/plate.py`,
 Turn on **auto-merge** and walk away; the PR merges itself when the check is
 green, and its branch is deleted.
 
-`.github/workflows/ci.yml` is the gate. It is the offline suite plus the three
+`.github/workflows/ci.yml` is the gate. It is the offline suite plus the four
 derived-artifact checks, and it runs on `merge_group` too, so nothing has to
 change if this repo ever moves to an organization:
 
 ```bash
 python3 -m pytest -q
-python3 scripts/generate_skill_index.py --check   # skill catalog
-python3 tools/corpus.py --check                   # per-character corpora
-python3 tools/rederive.py --check                 # no hand-edited derived field
+python3 scripts/generate_skill_index.py --check    # skill catalog
+python3 tools/corpus.py --check                    # per-character corpora
+python3 tools/rederive.py --check                  # no hand-edited derived field
+python3 scripts/generate_schema_enums.py --check   # schema enums match vocab/
 ```
 
-Run all four before pushing. If one of the last three fails, **regenerate —
-never hand-resolve**: `generate_skill_index.py --write`, `corpus.py --write`. A
-conflict in `docs/skills/index.json`, `docs/skills/index.md` or `corpus/*.json`
-is always settled by re-running the tool, because those files are outputs.
+Run all five before pushing. If one of the last four fails, **regenerate —
+never hand-resolve**: `generate_skill_index.py --write`, `corpus.py --write`,
+`generate_schema_enums.py --write`. A conflict in `docs/skills/index.json`,
+`docs/skills/index.md`, `corpus/*.json` or a schema's `enum` list is always
+settled by re-running the tool, because those are outputs.
 
 **What is missing, so nobody re-derives it:** GitHub's *native* merge queue —
 which batches several PRs into one speculative build instead of serialising

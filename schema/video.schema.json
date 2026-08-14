@@ -37,17 +37,27 @@
     },
     "youtube_tags": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Creator-supplied YouTube tags on the video."
     },
     "playlist": {
       "type": "string",
       "description": "Name of the Bungie YouTube playlist this video was sourced from, if any."
     },
-    "era": { "$ref": "#/$defs/era" },
-    "activity": { "$ref": "#/$defs/activity" },
-    "content_type": { "$ref": "#/$defs/content_type" },
-    "destination": { "$ref": "#/$defs/destination" },
+    "era": {
+      "$ref": "#/$defs/era"
+    },
+    "activity": {
+      "$ref": "#/$defs/activity"
+    },
+    "content_type": {
+      "$ref": "#/$defs/content_type"
+    },
+    "destination": {
+      "$ref": "#/$defs/destination"
+    },
     "usage_class": {
       "const": "third_party_copyrighted",
       "description": "Rights bucket for this asset. Always 'third_party_copyrighted': the footage is Bungie, Inc. copyrighted material."
@@ -61,23 +71,41 @@
       "type": "object",
       "description": "Parallel provenance map, keyed by tagged field name (era, activity, content_type, destination). Each value is a provenanceEntry. Convention: every tagged field present on this record SHOULD have a matching entry here.",
       "propertyNames": {
-        "enum": ["era", "activity", "content_type", "destination"]
+        "enum": [
+          "era",
+          "activity",
+          "content_type",
+          "destination"
+        ]
       },
-      "additionalProperties": { "$ref": "#/$defs/provenanceEntry" }
+      "additionalProperties": {
+        "$ref": "#/$defs/provenanceEntry"
+      }
     }
   },
   "$defs": {
     "provenanceEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["source", "label_source", "confidence"],
+      "required": [
+        "source",
+        "label_source",
+        "confidence"
+      ],
       "properties": {
         "source": {
-          "enum": ["inherited", "observed"],
+          "enum": [
+            "inherited",
+            "observed"
+          ],
           "description": "inherited = copied from a parent scope (segment inherits from video); observed = determined directly from this record's own metadata or frames."
         },
         "label_source": {
-          "enum": ["manual", "heuristic", "model"],
+          "enum": [
+            "manual",
+            "heuristic",
+            "model"
+          ],
           "description": "Who/what produced the label: a human (manual), a deterministic rule (heuristic), or an ML model (model)."
         },
         "confidence": {
@@ -123,7 +151,13 @@
       "description": "Activity type depicted. 'cinematic' covers pre-rendered or engine cinematics not tied to a playable activity. Default for all segments of this video."
     },
     "content_type": {
-      "enum": ["cinematic", "gameplay", "cutscene", "trailer", "UNKNOWN"],
+      "enum": [
+        "cinematic",
+        "gameplay",
+        "cutscene",
+        "trailer",
+        "UNKNOWN"
+      ],
       "description": "Nature of the footage itself. 'trailer' = edited promotional trailer; 'cinematic' = pre-rendered cinematic; 'cutscene' = in-engine story cutscene; 'gameplay' = captured play. Default for all segments; a segment MAY override (e.g. a gameplay shot inside a trailer video)."
     },
     "destination": {
@@ -134,13 +168,14 @@
         "dreaming_city",
         "europa",
         "nessus",
-        "the_traveler",
         "io",
+        "mercury",
         "mars",
         "tangled_shore",
         "savathun_throne_world",
         "neptune_neomuna",
         "the_pale_heart",
+        "the_traveler",
         "orbit_space",
         "unknown"
       ],
