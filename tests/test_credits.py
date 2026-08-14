@@ -107,15 +107,26 @@ def test_the_reveal_is_pinned_to_the_source_not_the_clock(manifest):
 
 # --- what is on screen -----------------------------------------------------
 
-def test_the_first_card_after_the_drums_is_directed_by(manifest):
-    """The owner's revised running order starts here."""
-    assert manifest["fixed_cards"][0]["role"] == "Directed by"
-    assert manifest["fixed_cards"][0]["names"] == ["Jorge O. Castro"]
+def test_the_bluefin_creators_open_the_credits(manifest):
+    """The owner gave up the opening slot: 'Put jorge castro before
+    contributions by you so the bluefin creators get credit.'
+
+    The first card after the drum smash is the strongest in the sequence, and
+    it goes to the people who created Bluefin. Do not 'fix' this back on the
+    assumption that the director leads.
+    """
+    assert manifest["fixed_cards"][0]["role"] == "Bluefin Created by"
+    assert manifest["fixed_cards"][0]["names"] == ["Jacob Schnurr", "Andy Frazer"]
+
+
+def test_the_director_is_credited_immediately_before_the_audience(manifest):
+    roles = [c["role"] for c in manifest["fixed_cards"]]
+    assert roles.index("Directed by") == roles.index("Contributions by") - 1
 
 
 def test_the_fixed_cards_are_in_the_owners_order(manifest):
     assert [c["role"] for c in manifest["fixed_cards"]] == [
-        "Directed by", "Bluefin Created by", "Music by", "Contributions by"]
+        "Bluefin Created by", "Music by", "Directed by", "Contributions by"]
 
 
 def test_the_band_is_spelled_as_the_bed_record_spells_it(manifest):
