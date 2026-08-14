@@ -286,11 +286,53 @@ is the bug.
 
 ---
 
+# The alpha QA pass (v2.3) — the eclipse, and 28:20
+
+Two owner notes, same review: *"the eclipse/planets shot at the end of europa -
+that is janky it could be the best transition in the show if done right"* — in
+some cases *"it might be more dramatic cut right into the next song"* — and
+*"28:20 has extra fade out that can be cut, including the music video director
+text, transition when the camera is in the ship make the song fade out but not
+too much then punch them with the credits at the end."*
+
+**The eclipse (Europa → movement 5).** Measured: act VII's tail holds flat at
+mean luma 36–37 through 96.73, then its own baked fade falls to black over the
+last half second; its score is already at −39 dB mean by then. The v2.2
+treatment — a 1.5 s plan fade into that baked fade, then movement 5's dark
+limb — was a fade into a fade into dark. v2.3 **trims act VII at 96.73** (the
+last full-brightness eclipse frame region, the burned KubeCon card still
+readable for ~5.7 s) with **no audio fade**: music meets music, the join is
+hard. Two candidate frames were rendered for the owner —
+`renders/review/europa-join-A-needledrop.mp4` (eclipse cuts, dark limb holds
+its breath, the sun breaks 3.5 s later) and
+`europa-join-B-matchcut.mp4` (movement 5 opens straight on the meteor strike
+at source 393.560; taking it means extending movement 4 to keep the song
+gapless, which nudges the 25:13 cut). The cut lands at 16.7 s in each. **A
+ships as the default until the owner picks** (#192).
+
+**28:20 (movement 5 → the credits).** 28:20 programme time is movement 5's own
+tail: the in-ship shot dissolves out from ~film 109.5, the source's burned
+credits (*"© A LOVELY BUNCH OF COCONUTS 2024 / DIRECTED BY VILLE LIPIÄINEN"*)
+fade in from 111.0, then near-black, then a held interior to EOF — one long
+dissolve with no shot boundary ≥0.15 after 100. v2.3 **trims movement 5 at
+109.5**, while the camera still reads as inside the ship: the director text
+and 7.7 s of fade-to-nothing are gone, the song fades **1.5 s** from a −20 dB
+bed ("not too much"), and act VIII's drum smash punches the next frame with
+`fade_in 0.0`. That **resolves #191**: the ambush lands off a live frame at
+mid-energy, not a long decay.
+
+Same pass: act I carries the plan's first owner-approved `gain_db` (+3.5 dB,
+the most its −4.6 dBTP peak allows without a limiter — #164).
+
+**36:16.2 → 36:07.9.**
+
+---
+
 # Where the thread stands
 
 | | |
 |---|---|
-| Delivered | `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.2.mp4`, **32:13.152** |
-| Movements | 5, gapless, source order, `renders/perfume-2..5.mp4` + the prologue |
+| Delivered | `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.3.mp4`, **36:07.9** |
+| Movements | 5, gapless in the source, `renders/perfume-2..5.mp4` + the prologue; the programme plays 109.5 of movement 5 (the 28:20 cut) |
 | Chapter marks | **five** — acts VII and VIII have no slide, so no marker |
-| Open for the owner | #190 (one builder), #191 (the act VIII entry), #192 (the movement 5 in-point, and movement 3's length) |
+| Open for the owner | #190 (one builder), #192 (A or B off the excerpts in `renders/review/`, and movement 3's length) |
