@@ -65,6 +65,8 @@ def test_the_words_are_the_owners(doc):
         ("mrbobbytables", "The gamers don't know you're here to help"),
         ("kat", "I miss ONE email now I gotta use a Linux desktop?"),
         ("kat", "How much you want to bet their sound just doesn't work?"),
+        ("TBD", "HEY! We know when you're not upstreaming!"),
+        ("kat", "I have better sh*t to do!"),
         ("kat", "I miss ingress-nginx sometimes"),
         ("kat", "Fine I'll fix your shit too"),
         ("kat", "Remember kids, cardio!"),
