@@ -2292,3 +2292,45 @@ def test_a_banner_shares_the_screen_but_never_with_a_second_banner():
             dict(BANNER),
             dict(BANNER, id="callout2"),
         ])
+
+
+# --- an animation is one input, not one input per frame --------------------
+
+def test_a_run_of_animation_frames_becomes_one_image_sequence_input():
+    """The regression that cost a thirty-minute zero-byte burn.
+
+    Act II's choice screen is 24 plates a sixteenth of a second apart. As 24
+    more stills the graph went from 52 inputs to 74 and ffmpeg died on
+    ``Failed initializing scaling graph (Resource temporarily unavailable)``
+    -- one rgba->yuva420p scaler per input, and the box ran out. It span for
+    half an hour first and wrote nothing.
+    """
+    from tools.plate import _burn_units
+
+    entries = [{"id": "a", "at": 1.0, "dur": 2.0}]
+    entries += [{"id": f"anim_{n:02d}", "at": 10.0 + n * 0.0625, "dur": 0.0625,
+                 "animation": True, "group": "anim"} for n in range(24)]
+    entries += [{"id": "b", "at": 30.0, "dur": 2.0}]
+
+    units = _burn_units(entries)
+    assert len(units) == 3, "the 24 frames must collapse to one input"
+    anim = units[1]
+    assert anim["animation"]
+    assert anim["pattern"] == "plate_anim_%02d.png"
+    assert anim["fps"] == pytest.approx(16.0, abs=0.01)
+    assert anim["at"] == pytest.approx(10.0)
+    assert anim["dur"] == pytest.approx(1.5)
+    # The stills either side are untouched.
+    assert [u["id"] for u in units] == ["a", "anim", "b"]
+    assert not units[0]["animation"] and not units[2]["animation"]
+
+
+def test_an_animation_group_is_padded_from_the_start_of_the_timeline():
+    """overlay's framesync wants a secondary frame for every primary one; a
+    stream that simply starts late is how the graph stalls. `tpad` holds
+    transparent frames in front of it."""
+    source = (Path(__file__).resolve().parents[1] / "tools" / "plate.py").read_text()
+    body = source.split("def burn(")[1].split("\ndef ")[0]
+    assert "tpad=start_duration=" in body
+    assert "start_mode=add" in body and "color=black@0" in body
+    assert "eof_action=pass" in body

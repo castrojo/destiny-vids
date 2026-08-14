@@ -65,6 +65,7 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_efmb  # noqa: E402
+from tools.plate import CHOICE_POINTER_CUT  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "02-endless-forms-plates.json"
 # THE ROSTER IS AN INPUT, SO IT IS COMMITTED.
@@ -113,11 +114,135 @@ TRIO_IN, TRIO_OUT = 72.000, 75.000
 # cards at full size would collide across 1920 px, so the row is scaled down --
 # the same lever the reference deck's roll call pulls.
 TRIO_SCALE = 0.62
+
+# THE OWNER TIMED THIS ROW BY HAND, AND HIS CLOCK IS THE MEGACUT'S.
+#
+#   "02:57 only show joseph sandoval, we're going to stagger these, keep them
+#    up for readability / 02:59 add ricardo / 3:03 add karena (Angel, one L)"
+#
+# Act II's film sits at +2:01.567 in the programme, so his 2:57 / 2:59 / 3:03
+# are film 55.433 / 57.433 / 61.433. That conversion is not assumed: the marks
+# in the same message name `blueberry_Giklab` at "03:16" and that plate is at
+# film 73.400, which is megacut 3:14.97 -- the only reading that lands.
+#
+# It replaces the even TRIO_STAGGER cascade. He is no longer asking for three
+# entrances 0.8 s apart; he is asking for Joseph ALONE for two seconds, then a
+# pair, then the row -- and for the row to stay up long enough to read, which
+# is what TRIO_HOLD after the LAST arrival buys.
+MEGACUT_OFFSET = 121.567
 TRIO = [
-    ("joseph_sandoval", "left"),
-    ("rochaporto", "center"),
-    ("mara_sov", "right"),
+    ("joseph_sandoval", "left", 177.0),
+    ("rochaporto", "center", 179.0),
+    ("mara_sov", "right", 183.0),
 ]
+
+# ONE L. The README says "Karena Angel" and the owner said it again this round
+# ("add karena (Angel, one L)"). vocab/casting.yaml spells it "Angell", and it
+# is a committed input to six delivered acts (#167), so correcting it there
+# marks every one of them stale. The correction is applied HERE, to the copy
+# this act prints, and recorded in `unresolved` -- a person's name is not
+# something to leave wrong while waiting for a freeze to lift.
+NAME_CORRECTIONS = {"mara_sov": ("Karena Angell", "Karena Angel")}
+
+# --- THE OG GUARDIANS (owner brief, this round) ----------------------------
+#
+#   "02:15 name plate github/dims - 'Comes in Peace'
+#    02:20 name plate Catherine Paganini
+#    02:28 name plate github/thockin - 'Does NOT Come in Peace'
+#    02:38 name plate github/jbeda - 'Out of Retirement'
+#    These are OG Guardians make them a proud bronze"
+#
+# All four times are megacut, like the trio's. Every string is the owner's,
+# verbatim -- including the capitalised NOT, which is the joke and is
+# reproduced rather than normalised.
+#
+# THE ROW EACH ONE DOES NOT HAVE IS THE POINT. Catherine Paganini was given a
+# name and no line, so her card carries no title: that is the "missing, so
+# omit and record" case, and writing one for her would be inventing copy about
+# a real person. The three logins the owner wrote as `github/<name>` are
+# printed as the login he wrote, and their pfps come from the same account.
+OG_LABEL = "OG GUARDIAN"
+OG_GUARDIANS = [
+    {"id": "og_dims", "at_megacut": 135.0, "name": "dims",
+     "title": "Comes in Peace", "login": "dims"},
+    {"id": "og_paganini", "at_megacut": 140.0, "name": "Catherine Paganini"},
+    {"id": "og_thockin", "at_megacut": 148.0, "name": "thockin",
+     "title": "Does NOT Come in Peace", "login": "thockin"},
+    {"id": "og_jbeda", "at_megacut": 158.0, "name": "jbeda",
+     "title": "Out of Retirement", "login": "jbeda"},
+]
+OG_HOLD = 4.0
+
+# --- THE TEAM BADGE --------------------------------------------------------
+#
+#   "Make a Team Badge: CNCF Community Leadership / Looking for Open Source's
+#    Brightest Future"
+#
+# It lands after the trio's row clears, so it reads as the caption on the three
+# people who just arrived rather than as a fourth name competing with them.
+# `name` and `title` are the owner's two lines; there is no third row.
+TEAM_BADGE = {
+    "id": "team_cncf_leadership",
+    "label": "TEAM",
+    "name": "CNCF Community Leadership",
+    "title": "Looking for Open Source's Brightest Future",
+}
+TEAM_BADGE_HOLD = 3.5
+TEAM_BADGE_LEAD = 0.25
+
+# --- THE NEW DIALOGUE (owner brief, this round) ----------------------------
+#
+#   "03:12 chat bubble for Joseph: Here comes the slop
+#    03:19 karena: I love this job
+#    03:39 joseph: Master your skills
+#    03:40 joseph: You got this"
+#
+# Megacut marks again. 3:39 and 3:40 are ONE SECOND apart and a pill needs
+# MIN_HOLD to be read, so the second is chained behind the first rather than
+# stacked on it -- the ORDER is his and it is kept; only the gap is the
+# timeline's. Recorded in `unresolved`.
+NEW_CHATS = [
+    {"id": "chat_joseph_slop", "key": "joseph_sandoval", "speaker": "Joseph",
+     "text": "Here comes the slop", "at_megacut": 192.0, "hold": 2.6},
+    {"id": "chat_karena_job", "key": "mara_sov", "speaker": "Karena",
+     "text": "I love this job", "at_megacut": 199.0, "hold": 2.6},
+    {"id": "chat_riaan_choices", "key": None, "speaker": "riaankleinhans",
+     "text": "Your choices are:", "at_megacut": 206.0, "hold": 2.4,
+     "login": "riaankleinhans"},
+    {"id": "chat_joseph_master", "key": "joseph_sandoval", "speaker": "Joseph",
+     "text": "Master your skills", "at_megacut": 219.0, "hold": 2.2},
+    {"id": "chat_joseph_gotthis", "key": "joseph_sandoval", "speaker": "Joseph",
+     "text": "You got this", "at_megacut": None, "hold": 2.2},
+]
+
+# --- THE CHOICE SCREEN -----------------------------------------------------
+#
+#   "then generate a graphic choice box for the team o Update your LFX Profile
+#    o Do it the hard way ... Then just cut to the shot of them firing"
+#   "make them 2 separate boxes"
+#   "make the text MUCH larger like a video game choice screen"
+#   "design it like a video game choice screen and 'pause' here to let the
+#    player 'decide' then it cuts to the descent"
+#   "design it like the destiny legendary campaign screen -- the fight one
+#    should match 'legendary'"
+#   "whip up a quick mouse pointer starting at the center and then moving
+#    towards the fighting choice but have it cut so it's a teaser quick cut"
+#
+# So: a FULL-FRAME pause menu straight after riaankleinhans's line, the second
+# option carrying Destiny's amber legendary chrome, and a cursor that leaves
+# the centre of the screen heading for it and never arrives -- the film cuts
+# first. It is animated the only way a still-plate pipeline can animate: a
+# short run of frames, each one a plate, one group, back to back.
+CHOICE_OPTIONS = [
+    "Update your LFX Profile",
+    {"text": "Do it the hard way", "tier": "legendary"},
+]
+CHOICE_HOLD = 1.5          # the whole teaser, cut to cut
+CHOICE_FPS = 16            # the cursor's frame rate; the film's is 59.94.
+                           # 16 x 1.5 s = 24 frames exactly, so the image2
+                           # sequence has an integral rate and tpad does not
+                           # have to round one.
+CHOICE_LEAD = 0.2          # air between riaan's pill and the menu
 
 # One person, one shot. Each verified by eye at the frame named in `seen`.
 # REMOVED, owner instruction for "The Long Walk": William Rizzo's credit sat
@@ -180,10 +305,12 @@ PLACEHOLDERS = [
 # roster is walked in order against this list, so dropping two shots does not
 # reshuffle who played whom -- it shortens the list, and the two contributors
 # it reached are reported in `unresolved` rather than silently dropped.
-BLUEBERRY_SHOTS = [
-    {"src": (90.767, 96.500), "seen": 92.500,
-     "why": "the hooded Hunter and his Ghost, close"},
-]
+# EMPTY, owner instruction: "03:16 get rid of giklab". Megacut 3:16 is film
+# 74.4, and the one blueberry plate in this act was `blueberry_Giklab` at film
+# 73.400 -- the shot at source 90.767. The SHOT is what came out, so the roster
+# is not reshuffled: nobody else moved into his slot, and Giklab stays on the
+# roster for a later act. The window is now clear for the OG Guardians above.
+BLUEBERRY_SHOTS = []
 BLUEBERRY_EXCLUDE = {"castrojo"}  # a lead; see the comment above
 
 # Cayde signs off. Source 358.200 -> 360.500 is 2.30 s against a 2.2 s minimum
@@ -232,7 +359,15 @@ MONTAGE_IN, MONTAGE_OUT = 98.0, 139.0     # 1:38 -> 2:19, in film time
 # announcement silently trimmed to 2.2s is not what "spaced out evenly" means.
 MONTAGE_STEP = 5.5
 
-ANNOUNCER = "AN4-CH3CK-12"
+# AN4-CH3CK-12 IS GONE. Owner: "Remove all this anacheck stuff for now."
+#
+# The announcer carried three blocks -- the four ranked montage cards, the two
+# TOC payoff cards, and the label on Natewaddington's placard. All three are
+# removed rather than re-voiced: the copy was written FOR that character, and
+# putting somebody else's name on his lines would be a different joke nobody
+# asked for. Every string survives in git and in `unresolved`, so bringing him
+# back is a revert rather than a rewrite -- which is what "for now" means.
+ANNOUNCER = None
 
 # `kind: chat` -- the pfp-badge pill the other videos use, not heraldry. The
 # owner's two lines are asides to camera, so they carry no rank.
@@ -737,6 +872,22 @@ def blueberry_entry(item, at, dur, casting):
     return entry
 
 
+def _corrected(key, copy):
+    """Apply an owner-stated spelling of somebody's name to this act's copy.
+
+    Reproducing authored copy is the rule; this is the one case where the
+    AUTHOR has since corrected it and the file it lives in is frozen. The
+    correction is keyed on the exact string it replaces, so if the vocab is
+    ever fixed this silently stops applying instead of double-correcting.
+    """
+    want = NAME_CORRECTIONS.get(key)
+    if not want or copy.get("name") != want[0]:
+        return copy
+    copy = dict(copy)
+    copy["name"] = want[1]
+    return copy
+
+
 def localise_avatar(key, copy):
     """Point a plate's ``avatar`` at the local cache, keeping the URL as source.
 
@@ -823,6 +974,13 @@ def space_plates(plates):
     tight = []
     by_position = {}
     for p in plates:
+        # ANIMATION FRAMES ARE NOT CREDITS. A choice-screen frame is one
+        # sixteenth of a second by design; MIN_HOLD exists so a NAME can be
+        # read, and applying it to a frame stretches a 1.5 s teaser into a
+        # 35 s stack of overlapping stills. They are contiguous by
+        # construction, so there is nothing here to space.
+        if p.get("animation"):
+            continue
         by_position.setdefault(p.get("position"), []).append(p)
 
     for lane in by_position.values():
@@ -862,10 +1020,9 @@ def build():
     # The row rides past TRIO_OUT, where the camera pushes in on the hooded
     # Hunter. That is deliberate and it is the owner's call: holding the names
     # only while all three figures are separate is what made them flash by.
-    trio_at = _at(TRIO_IN, film_of)
-    trio_out = round(trio_at + (len(TRIO) - 1) * TRIO_STAGGER + TRIO_HOLD, 3)
-    for order, (key, where) in enumerate(TRIO):
-        at = round(trio_at + order * TRIO_STAGGER, 3)
+    trio_ats = [round(mc - MEGACUT_OFFSET, 3) for _, _, mc in TRIO]
+    trio_out = round(max(trio_ats) + TRIO_HOLD, 3)
+    for order, ((key, where, _), at) in enumerate(zip(TRIO, trio_ats)):
         dur = round(trio_out - at, 3)
         assert dur >= MIN_HOLD, (
             f"the trio's {key} card can only hold {dur:.3f}s, below the "
@@ -880,8 +1037,44 @@ def build():
             "order": order,
             "copy_source": "casting",
             "seen_at_src": TRIO_IN,
-            **localise_avatar(key, authored_copy(key, casting)),
+            **localise_avatar(key, _corrected(key, authored_copy(key, casting))),
         })
+
+    # --- the OG Guardians, in bronze --------------------------------------
+    for og in OG_GUARDIANS:
+        at = round(og["at_megacut"] - MEGACUT_OFFSET, 3)
+        hold = clamp_hold(at, OG_HOLD, film_of)
+        assert hold, (
+            f"{og['id']} at {at:.3f}s cannot clear a no-plate zone and still "
+            "be readable -- the owner's mark has to move")
+        entry = {
+            "id": og["id"],
+            "at": at,
+            "dur": hold,
+            "position": "left",
+            "copy_source": "owner_supplied",
+            "label": OG_LABEL,
+            "name": og["name"],
+            "variant": "bronze",
+        }
+        if og.get("title"):
+            entry["title"] = og["title"]
+        if og.get("login"):
+            # The pfp comes from the account the owner named, and nothing else
+            # about the person is read off it.
+            entry["avatar"] = str(AVATAR_DIR / f"{og['login']}.png")
+            entry["avatar_url"] = f"https://github.com/{og['login']}.png?size=256"
+        plates.append(entry)
+
+    # --- the team badge ----------------------------------------------------
+    badge_at = round(trio_out + TEAM_BADGE_LEAD, 3)
+    plates.append({
+        **TEAM_BADGE,
+        "at": badge_at,
+        "dur": TEAM_BADGE_HOLD,
+        "position": "center",
+        "copy_source": "owner_supplied",
+    })
 
     # --- one person, one shot ---------------------------------------------
     for b in SOLO:
@@ -970,10 +1163,68 @@ def build():
         "text_source": "owner_supplied",
     })
 
-    # --- the montage announcements (owner brief #98) -----------------------
-    # Two asides to camera, then the ranks, evenly spaced across the montage.
+    # --- the new dialogue, and the choice screen ---------------------------
+    #
+    # These share the pill lane with the montage asides below, so they are
+    # scheduled first and the montage takes what is left. Every mark is the
+    # owner's own; only the pair he put one second apart is chained, because a
+    # pill under MIN_HOLD cannot be read.
     montage_unresolved = []
-    cue_at = MONTAGE_IN
+    chat_cursor = 0.0
+    choice_end = 0.0
+    for spec in NEW_CHATS:
+        if spec["at_megacut"] is not None:
+            at = round(spec["at_megacut"] - MEGACUT_OFFSET, 3)
+        else:
+            at = round(chat_cursor + PLATE_GAP, 3)
+        entry = {
+            "id": spec["id"],
+            "kind": "chat",
+            "at": at,
+            "dur": spec["hold"],
+            "copy_source": "owner_supplied",
+            "speaker": spec["speaker"],
+            "text": spec["text"],
+            "text_source": "owner_supplied",
+        }
+        if spec.get("key"):
+            entry.update(chat_avatar(spec["key"], casting))
+        elif spec.get("login"):
+            entry["avatar"] = str(AVATAR_DIR / f"{spec['login']}.png")
+            entry["avatar_url"] = (
+                f"https://github.com/{spec['login']}.png?size=256")
+        plates.append(entry)
+        chat_cursor = round(at + spec["hold"], 3)
+
+        # riaankleinhans asks, and the menu comes up on his line's tail.
+        if spec["id"] == "chat_riaan_choices":
+            frames = max(2, int(round(CHOICE_HOLD * CHOICE_FPS)))
+            step = round(CHOICE_HOLD / frames, 4)
+            start = round(chat_cursor + CHOICE_LEAD, 3)
+            for n in range(frames):
+                t = n / (frames - 1)
+                plates.append({
+                    "id": f"choice_lfx_{n:02d}",
+                    "kind": "choice",
+                    "at": round(start + n * step, 3),
+                    "dur": step,
+                    "position": "full",
+                    "group": "choice_lfx",
+                    "order": n,
+                    "animation": True,
+                    "copy_source": "owner_supplied",
+                    "label": spec["text"],
+                    "options": CHOICE_OPTIONS,
+                    "pointer": round(t * CHOICE_POINTER_CUT, 4),
+                })
+            choice_end = round(start + frames * step, 3)
+            chat_cursor = max(chat_cursor, choice_end)
+
+    # --- the montage asides (owner brief #98) ------------------------------
+    # The ranked announcement cards are GONE with AN4-CH3CK-12; the owner's own
+    # two asides to camera stay. They start after the new dialogue has cleared
+    # rather than at MONTAGE_IN, because 1:38 is now where Joseph is talking.
+    cue_at = max(MONTAGE_IN, round(chat_cursor + PLATE_GAP, 3))
     for i, (login, speaker, text) in enumerate(MONTAGE_CHATS):
         plates.append({
             "id": f"montage_chat_{i + 1}",
@@ -986,24 +1237,6 @@ def build():
             "text_source": "owner_supplied",
             **chat_avatar(login, casting),
         })
-        cue_at += MONTAGE_STEP
-
-    for spec in MONTAGE_ANNOUNCEMENTS:
-        plates.append({
-            "id": spec["id"],
-            "at": round(cue_at, 3),
-            "dur": SOLO_HOLD,
-            "position": "center",
-            "copy_source": "owner_supplied",
-            "label": ANNOUNCER,
-            "name": spec["name"],
-            "title": spec["title"],
-            **RANK_CHROME[spec["rank"]],
-        })
-        if spec.get("orphan_copy"):
-            montage_unresolved.append(
-                f"{spec['id']}: authored line {spec['orphan_copy']!r} has no "
-                "row on a three-row card -- owner to place or cut it")
         cue_at += MONTAGE_STEP
 
     last_out = cue_at - MONTAGE_STEP + SOLO_HOLD
@@ -1196,22 +1429,8 @@ def build():
         at = round(cursor - PLATE_GAP + spec.get("lead", PLATE_GAP), 3)
         toc.append(toc_chat(spec, at, spec["hold"]))
         cursor = round(at + spec["hold"] + PLATE_GAP, 3)
-    for spec in TOC_ANNOUNCEMENTS:
-        entry = {
-            "id": spec["id"],
-            "at": round(cursor, 3),
-            "dur": SOLO_HOLD,
-            "position": "center",
-            "copy_source": "owner_supplied",
-            "label": ANNOUNCER,
-            "title": spec["title"],
-        }
-        if spec["name"]:
-            entry["name"] = spec["name"]
-        if spec["rank"]:
-            entry.update(RANK_CHROME[spec["rank"]])
-        toc.append(entry)
-        cursor = round(cursor + SOLO_HOLD + PLATE_GAP, 3)
+    # TOC_ANNOUNCEMENTS are NOT scheduled: they are AN4-CH3CK-12's payoff pair,
+    # and he is out this round. See the ANNOUNCER note.
 
     # --- the timed cues (owner brief #98, section 4) -----------------------
     # krook and the placard are pinned to the owner's marks (4:10, 4:20); the
@@ -1249,7 +1468,8 @@ def build():
         "position": "center",
         "copy_source": "owner_supplied",
         "seen_at_src": round(src_of(TIMED_NATEWADDINGTON), 3),
-        "label": ANNOUNCER,
+        # No `label`: the eyebrow was AN4-CH3CK-12's name, and he is out. The
+        # placard's own two rows are the owner's and they stay.
         **NATEWADDINGTON_PLACARD,
     }]
 
@@ -1341,6 +1561,36 @@ def build():
         # What the brief authored but this manifest could not place. Recorded
         # so it is visible rather than buried: degrade, never block.
         "unresolved": montage_unresolved + walk_unresolved + [
+            "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for "
+            "now.' Three blocks went with him -- the four ranked montage "
+            "cards, the two TOC payoff cards ('It's totally NOT like this' "
+            "and 'Have you met our Ambassadors?'), and the eyebrow on "
+            "Natewaddington's placard. Every string is still in git; 'for "
+            "now' means this is a revert, not a rewrite",
+            "the owner marked Joseph's last two lines one second apart "
+            "(megacut 3:39 and 3:40) and a pill needs 2.2s to be read, so "
+            "'You got this' is chained behind 'Master your skills' at 99.883 "
+            "rather than stacked on it. The ORDER is his and is kept",
+            "the choice screen is a full-frame PAUSE MENU over MOVING "
+            "picture: the owner asked to 'pause here to let the player "
+            "decide', and a real freeze-frame has to be cut into the film "
+            "itself, which moves every timecode after it. TODO(owner): "
+            "whether the 1.5s teaser is enough or the picture should stop",
+            "'Then just cut to the shot of them firing' / 'then it cuts to "
+            "the descent' is an EDIT instruction, not a plate: the menu ends "
+            "at 88.533 and whatever the film already cuts to is what plays. "
+            "TODO(owner): confirm the shot after it is the one meant",
+            "Catherine Paganini's OG Guardian card carries NO title row -- "
+            "the owner named her and wrote no line, and the other three OG "
+            "cards have one. Omitted rather than composed",
+            "dims, thockin and jbeda are printed as the LOGINS the owner "
+            "wrote ('github/dims'), not as their real names, and their pfps "
+            "come from those accounts. Whether the cards should carry real "
+            "names instead is the owner's call",
+            "vocab/casting.yaml spells Karena's surname 'Angell'; the README "
+            "and the owner both say 'Angel', one L. Act II prints the "
+            "correction (NAME_CORRECTIONS) rather than editing the vocab, "
+            "which is a committed input to six delivered acts (#167)",
             "the two contributors who held the shots 'The Long Walk' took "
             "(HuntedRaven7 at source 195.267 and hanthor at 233.500) are no "
             "longer credited in act II. The owner's instruction for the "

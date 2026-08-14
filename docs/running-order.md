@@ -23,12 +23,51 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
 | **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; now the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits |
 | **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; **1:37.266**, the comic cover cut so act VIII owns the reveal — #178; plays the pre-terse-pass film — #102; master corrected to −1.1 dBTP — #82 |
-| **VIII** | Credits | `Prod/08-credits.mp4` — the cast, 454 contributors, the comic-cover reveal and the wordmark | delivered, **in the programme**; **no slide, no chapter marker** — it is meant to surprise — #51 |
+| **VIII** | Credits | `Prod/08-credits.mp4` — the cast, 619 contributors across **six** projects, the comic-cover reveal and the wordmark | delivered, **in the programme**; **no slide, no chapter marker** — it is meant to surprise — #51 |
 
 **Act VIII has a film and the programme plays it.** Built from
 `stories/08-credits.json` by `scripts/build_credits.py`: four fixed cards,
-fifteen cast placards, the comic-cover reveal at :22, 454 contributors across
-four projects, and the real Project Bluefin wordmark.
+**eight** cast placards, the comic-cover reveal at :22, **619** contributors
+across **six** projects, and the real Project Bluefin wordmark.
+
+**The 2026-08-14 pass rebuilt how act VIII looks and who it names.** It runs
+**3:47.303** now, not 3:48.430:
+
+- **It is set in Adwaita**, resolved in `tools/credits.py` alone. `plate.py`
+  still resolves DejaVu, because that reproduces the browser that baked the
+  reference plates and changing it would restyle acts I–VII.
+- **The frame is the desktop.** Every card sits on one of Project Bluefin's
+  monthly **dark-mode** wallpapers — the dinosaurs — advanced card by card in
+  calendar order and wrapping, graded blue rather than neutral (*"more blue
+  than gold"*). November has no night art installed on this host, so the cycle
+  is eleven months and says so. Cached by `scripts/fetch_wallpapers.py`, which
+  decodes JPEG XL through GdkPixbuf because neither Pillow nor this host's
+  ffmpeg can.
+- **Fedora CoreOS and bootc lead the walls**, on their own larger grid — six
+  across by three down against nine by four — under an `UPSTREAM` eyebrow, and
+  each of their walls holds longer than a Bluefin one. The order is enforced
+  in `schedule()`, so reordering the manifest cannot demote them.
+- **The cast is the README's table minus Cayde-6**, by owner instruction. The
+  six the vocab binds but the README does not list keep their bindings; only
+  act VIII's placards went. Karena is **"Angel"**, one L.
+- **The bed loops properly.** Span A used to end at 240.780, which is 0.7 s
+  *inside* the song's own fade-out — so the loop played an ending and then the
+  drums. It ends at 239.653152 now, the nearest tracked beat to the owner's :46.
+- **"an ublue project" is off the wordmark.**
+- **The picture is padded to outlast the music.** The concat demuxer lands
+  short of the durations it is handed — 4.347 s short over 38 cards — so act
+  VIII muxed 227.303 s of audio over 222.956 s of picture and four and a half
+  seconds of the wordmark were not there. `tpad` clones the last frame and
+  `-t` cuts both streams on one frame. **The megacut's own join check is what
+  caught it**, not anybody's eyes.
+
+**Still open on act VIII:** the principals' summit portraits. The owner asked
+for *"a good shot of them from the CNCF contributor summit flickr feed"*; the
+feed is twelve frames of one **group** photograph, so every crop box has to be
+drawn by somebody who can say which face is whose — a visual judgement AND a
+claim about a real person. The mechanism is built
+(`tools/credits.summit_portrait`), `cast_photos` is empty, and the placards
+degrade to the verified avatar until the owner fills it in.
 
 **It is the one act with no slide and no chapter marker**, by owner
 instruction — *"no credits slide, go right to the metal … it should surprise
@@ -47,7 +86,7 @@ built later.
 **Act II has a film** ([`docs/cuts/02-endless-forms-most-beautiful.md`](cuts/02-endless-forms-most-beautiful.md)),
 delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
 and its own place on the clock. Seven of the eight acts now play, which is what
-**v0.5** was; the current build is **v0.9** (act II's #98 overlay pass, and act VI's #104 interruption now playing its CC BY hold music — the slot shipped silent in v0.8). Act VI's duration is unchanged, so no chapter moved. It is also the first feature act to carry **nameplates** — thirteen
+**v0.5** was; the current build is **v1.0** — all eight acts, 24:07.1. Its last pass (2026-08-14) rebuilt act VIII's look and cast and gave act II the CNCF round: four OG Guardians in bronze, a re-staggered trio, a team badge, four new lines, a full-frame Destiny-style **choice screen** with a cursor that never lands, and AN4-CH3CK-12 removed. It is also the first feature act to carry **nameplates** — thirteen
 of them, generated rather than placed by hand — now eighteen, plus a chapter
 card, twenty-six dialogue pills, a patch-queue HUD, a villain's bar and the
 letterbox callout, all of it still generated.

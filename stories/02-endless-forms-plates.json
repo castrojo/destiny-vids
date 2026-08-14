@@ -19,9 +19,58 @@
   ],
   "plates": [
     {
+      "id": "og_dims",
+      "at": 13.433,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "OG GUARDIAN",
+      "name": "dims",
+      "variant": "bronze",
+      "title": "Comes in Peace",
+      "avatar": "renders/avatars/dims.png",
+      "avatar_url": "https://github.com/dims.png?size=256"
+    },
+    {
+      "id": "og_paganini",
+      "at": 18.433,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "OG GUARDIAN",
+      "name": "Catherine Paganini",
+      "variant": "bronze"
+    },
+    {
+      "id": "og_thockin",
+      "at": 26.433,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "OG GUARDIAN",
+      "name": "thockin",
+      "variant": "bronze",
+      "title": "Does NOT Come in Peace",
+      "avatar": "renders/avatars/thockin.png",
+      "avatar_url": "https://github.com/thockin.png?size=256"
+    },
+    {
+      "id": "og_jbeda",
+      "at": 36.433,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "OG GUARDIAN",
+      "name": "jbeda",
+      "variant": "bronze",
+      "title": "Out of Retirement",
+      "avatar": "renders/avatars/jbeda.png",
+      "avatar_url": "https://github.com/jbeda.png?size=256"
+    },
+    {
       "id": "trio_joseph_sandoval",
-      "at": 54.634,
-      "dur": 5.6,
+      "at": 55.433,
+      "dur": 10.0,
       "position": "left",
       "scale": 0.62,
       "group": "trio_row",
@@ -35,8 +84,8 @@
     },
     {
       "id": "trio_rochaporto",
-      "at": 55.434,
-      "dur": 4.8,
+      "at": 57.433,
+      "dur": 8.0,
       "position": "center",
       "scale": 0.62,
       "group": "trio_row",
@@ -53,7 +102,7 @@
     },
     {
       "id": "trio_mara_sov",
-      "at": 56.234,
+      "at": 61.433,
       "dur": 4.0,
       "position": "right",
       "scale": 0.62,
@@ -63,31 +112,557 @@
       "seen_at_src": 72.0,
       "label": "ARCHON // CONTRIBUTOR",
       "class": "Stasis Warlock",
-      "name": "Karena Angell",
+      "name": "Karena Angel",
       "title": "Architect of the Consensus",
       "variant": "leader",
       "wreath": true
     },
     {
-      "id": "blueberry_Giklab",
-      "at": 73.401,
-      "dur": 4.5,
-      "position": "right",
-      "shot_src": [
-        90.767,
-        96.5
+      "id": "team_cncf_leadership",
+      "label": "TEAM",
+      "name": "CNCF Community Leadership",
+      "title": "Looking for Open Source's Brightest Future",
+      "at": 65.683,
+      "dur": 3.5,
+      "position": "center",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "chat_joseph_slop",
+      "kind": "chat",
+      "at": 70.433,
+      "dur": 2.6,
+      "copy_source": "owner_supplied",
+      "speaker": "Joseph",
+      "text": "Here comes the slop",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "chat_karena_job",
+      "kind": "chat",
+      "at": 77.433,
+      "dur": 2.6,
+      "copy_source": "owner_supplied",
+      "speaker": "Karena",
+      "text": "I love this job",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "chat_riaan_choices",
+      "kind": "chat",
+      "at": 84.433,
+      "dur": 2.4,
+      "copy_source": "owner_supplied",
+      "speaker": "riaankleinhans",
+      "text": "Your choices are:",
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/riaankleinhans.png",
+      "avatar_url": "https://github.com/riaankleinhans.png?size=256"
+    },
+    {
+      "id": "choice_lfx_00",
+      "kind": "choice",
+      "at": 87.033,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 0,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
       ],
-      "seen_at_src": 92.5,
-      "why": "the hooded Hunter and his Ghost, close",
-      "copy_source": "casting",
-      "label": "CONTRIBUTOR // GUARDIAN",
-      "name": "Giklab",
-      "title": "Bluefin Blueberry"
+      "pointer": 0.0
+    },
+    {
+      "id": "choice_lfx_01",
+      "kind": "choice",
+      "at": 87.096,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 1,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.0348
+    },
+    {
+      "id": "choice_lfx_02",
+      "kind": "choice",
+      "at": 87.158,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 2,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.0696
+    },
+    {
+      "id": "choice_lfx_03",
+      "kind": "choice",
+      "at": 87.221,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 3,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.1043
+    },
+    {
+      "id": "choice_lfx_04",
+      "kind": "choice",
+      "at": 87.283,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 4,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.1391
+    },
+    {
+      "id": "choice_lfx_05",
+      "kind": "choice",
+      "at": 87.346,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 5,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.1739
+    },
+    {
+      "id": "choice_lfx_06",
+      "kind": "choice",
+      "at": 87.408,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 6,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.2087
+    },
+    {
+      "id": "choice_lfx_07",
+      "kind": "choice",
+      "at": 87.471,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 7,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.2435
+    },
+    {
+      "id": "choice_lfx_08",
+      "kind": "choice",
+      "at": 87.533,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 8,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.2783
+    },
+    {
+      "id": "choice_lfx_09",
+      "kind": "choice",
+      "at": 87.596,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 9,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.313
+    },
+    {
+      "id": "choice_lfx_10",
+      "kind": "choice",
+      "at": 87.658,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 10,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.3478
+    },
+    {
+      "id": "choice_lfx_11",
+      "kind": "choice",
+      "at": 87.721,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 11,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.3826
+    },
+    {
+      "id": "choice_lfx_12",
+      "kind": "choice",
+      "at": 87.783,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 12,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.4174
+    },
+    {
+      "id": "choice_lfx_13",
+      "kind": "choice",
+      "at": 87.846,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 13,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.4522
+    },
+    {
+      "id": "choice_lfx_14",
+      "kind": "choice",
+      "at": 87.908,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 14,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.487
+    },
+    {
+      "id": "choice_lfx_15",
+      "kind": "choice",
+      "at": 87.971,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 15,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.5217
+    },
+    {
+      "id": "choice_lfx_16",
+      "kind": "choice",
+      "at": 88.033,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 16,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.5565
+    },
+    {
+      "id": "choice_lfx_17",
+      "kind": "choice",
+      "at": 88.096,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 17,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.5913
+    },
+    {
+      "id": "choice_lfx_18",
+      "kind": "choice",
+      "at": 88.158,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 18,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.6261
+    },
+    {
+      "id": "choice_lfx_19",
+      "kind": "choice",
+      "at": 88.221,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 19,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.6609
+    },
+    {
+      "id": "choice_lfx_20",
+      "kind": "choice",
+      "at": 88.283,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 20,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.6957
+    },
+    {
+      "id": "choice_lfx_21",
+      "kind": "choice",
+      "at": 88.346,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 21,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.7304
+    },
+    {
+      "id": "choice_lfx_22",
+      "kind": "choice",
+      "at": 88.408,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 22,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.7652
+    },
+    {
+      "id": "choice_lfx_23",
+      "kind": "choice",
+      "at": 88.471,
+      "dur": 0.0625,
+      "position": "full",
+      "group": "choice_lfx",
+      "order": 23,
+      "animation": true,
+      "copy_source": "owner_supplied",
+      "label": "Your choices are:",
+      "options": [
+        "Update your LFX Profile",
+        {
+          "text": "Do it the hard way",
+          "tier": "legendary"
+        }
+      ],
+      "pointer": 0.8
+    },
+    {
+      "id": "chat_joseph_master",
+      "kind": "chat",
+      "at": 97.433,
+      "dur": 2.2,
+      "copy_source": "owner_supplied",
+      "speaker": "Joseph",
+      "text": "Master your skills",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "chat_joseph_gotthis",
+      "kind": "chat",
+      "at": 99.883,
+      "dur": 2.2,
+      "copy_source": "owner_supplied",
+      "speaker": "Joseph",
+      "text": "You got this",
+      "text_source": "owner_supplied"
     },
     {
       "id": "montage_chat_1",
       "kind": "chat",
-      "at": 98.0,
+      "at": 102.333,
       "dur": 4.5,
       "copy_source": "owner_supplied",
       "speaker": "Jorge Castro",
@@ -97,56 +672,12 @@
     {
       "id": "montage_chat_2",
       "kind": "chat",
-      "at": 103.5,
+      "at": 107.833,
       "dur": 4.5,
       "copy_source": "owner_supplied",
       "speaker": "Jorge Castro",
       "text": "Ready to the #FIGHTFORCONTRIBUTORS?",
       "text_source": "owner_supplied"
-    },
-    {
-      "id": "announce_new",
-      "at": 109.0,
-      "dur": 4.5,
-      "position": "center",
-      "copy_source": "owner_supplied",
-      "label": "AN4-CH3CK-12",
-      "name": "TO [ NEW CONTRIBUTORS ]",
-      "title": "It's totally like this. We promise.",
-      "variant": "bronze"
-    },
-    {
-      "id": "announce_current",
-      "at": 114.5,
-      "dur": 4.5,
-      "position": "center",
-      "copy_source": "owner_supplied",
-      "label": "AN4-CH3CK-12",
-      "name": "TO [ CURRENT CONTRIBUTORS ]",
-      "title": "Look how good you look, it totally is like this!",
-      "trustee": true
-    },
-    {
-      "id": "announce_emeritus",
-      "at": 120.0,
-      "dur": 4.5,
-      "position": "center",
-      "copy_source": "owner_supplied",
-      "label": "AN4-CH3CK-12",
-      "name": "[ EMERITUS CONTRIBUTORS ]",
-      "title": "It's totally NOT like this. We promise.",
-      "variant": "leader"
-    },
-    {
-      "id": "announce_all",
-      "at": 125.5,
-      "dur": 4.5,
-      "position": "center",
-      "copy_source": "owner_supplied",
-      "label": "AN4-CH3CK-12",
-      "name": "[ALL CONTRIBUTORS]",
-      "title": "You are not wrong",
-      "variant": "leader"
     },
     {
       "id": "placeholder_dylan_taylor",
@@ -450,26 +981,6 @@
       "text_source": "owner_supplied"
     },
     {
-      "id": "toc_announce_emeritus",
-      "at": 231.016,
-      "dur": 4.5,
-      "position": "center",
-      "copy_source": "owner_supplied",
-      "label": "AN4-CH3CK-12",
-      "title": "It's totally NOT like this. We promise.",
-      "name": "[ EMERITUS CONTRIBUTORS ]",
-      "variant": "leader"
-    },
-    {
-      "id": "toc_announce_ambassadors",
-      "at": 235.766,
-      "dur": 4.5,
-      "position": "center",
-      "copy_source": "owner_supplied",
-      "label": "AN4-CH3CK-12",
-      "title": "Have you met our Ambassadors?"
-    },
-    {
       "id": "timed_krook",
       "kind": "chat",
       "at": 250.0,
@@ -499,7 +1010,6 @@
       "position": "center",
       "copy_source": "owner_supplied",
       "seen_at_src": 328.5,
-      "label": "AN4-CH3CK-12",
       "name": "[ Natewaddington ]",
       "title": "Time for your first real contribution kids"
     },
@@ -641,8 +1151,14 @@
     }
   ],
   "unresolved": [
-    "announce_emeritus: authored line 'Look how good you look!' has no row on a three-row card -- owner to place or cut it",
     "the Bazzite/Xbox achievement gag is BUILT BUT NOT SCHEDULED: the owner asked to approve the strings before anything is burned. Proposed, one per measured explosion -- Mailing List Bullshit (100 G, owner_supplied); Sent It Upstream (10 G, proposed); Maintainer Said NAK (25 G, proposed); Carried Out of Tree Since 2019 (50 G, proposed). Only 'Mailing List Bullshit' is his. Flip WALK_ACHIEVEMENTS_APPROVED in scripts/build_efmb_plates.py once he has said yes.",
+    "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for now.' Three blocks went with him -- the four ranked montage cards, the two TOC payoff cards ('It's totally NOT like this' and 'Have you met our Ambassadors?'), and the eyebrow on Natewaddington's placard. Every string is still in git; 'for now' means this is a revert, not a rewrite",
+    "the owner marked Joseph's last two lines one second apart (megacut 3:39 and 3:40) and a pill needs 2.2s to be read, so 'You got this' is chained behind 'Master your skills' at 99.883 rather than stacked on it. The ORDER is his and is kept",
+    "the choice screen is a full-frame PAUSE MENU over MOVING picture: the owner asked to 'pause here to let the player decide', and a real freeze-frame has to be cut into the film itself, which moves every timecode after it. TODO(owner): whether the 1.5s teaser is enough or the picture should stop",
+    "'Then just cut to the shot of them firing' / 'then it cuts to the descent' is an EDIT instruction, not a plate: the menu ends at 88.533 and whatever the film already cuts to is what plays. TODO(owner): confirm the shot after it is the one meant",
+    "Catherine Paganini's OG Guardian card carries NO title row -- the owner named her and wrote no line, and the other three OG cards have one. Omitted rather than composed",
+    "dims, thockin and jbeda are printed as the LOGINS the owner wrote ('github/dims'), not as their real names, and their pfps come from those accounts. Whether the cards should carry real names instead is the owner's call",
+    "vocab/casting.yaml spells Karena's surname 'Angell'; the README and the owner both say 'Angel', one L. Act II prints the correction (NAME_CORRECTIONS) rather than editing the vocab, which is a committed input to six delivered acts (#167)",
     "the two contributors who held the shots 'The Long Walk' took (HuntedRaven7 at source 195.267 and hanthor at 233.500) are no longer credited in act II. The owner's instruction for the chapter is 'No other guardians'; they are owed a credit elsewhere and nobody has decided where",
     "William Rizzo and Ahmed Adan lose their act II badges to the same instruction. Rizzo's authored copy stays in vocab/casting.yaml and Ahmed stays in ensemble.placeholders, so only the scheduling went",
     "GloriousEggroll's name row is the handle he was written in as; GitHub records him as Thomas Crider. Which goes on the card is the owner's call",
