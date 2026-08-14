@@ -19,7 +19,7 @@ untouched: the prologue takes **no numeral** and nothing is renumbered.
 
 | Act | Chapter | The film | State |
 |---|---|---|---|
-| **0** | *(no chapter — it is the main title)* | `Prod/00-prologue.mp4` — Nightwish's *Perfume Of The Timeless*, the main title at 0:11, then the March day→night bridge | delivered, **prototype**; shipping form is an embed |
+| **0** | *(no chapter — it is the main title)* | `Prod/00-prologue.mp4` — black, the lockup fading up on it, the picture exploding in at 0:12.2, then the March day→night bridge | delivered, **prototype**; shipping form is an embed |
 | **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the title cover | delivered |
 | **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers, and *The Long Walk* inside them | delivered and **credited**, in the programme |
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
@@ -51,7 +51,8 @@ the main title sequence would step on the main title sequence.
 | | |
 |---|---|
 | Runtime | **1:39.200** — 91.200 of picture, then an 8.000 bridge |
-| Title at | 11.000, staged: the lockup, then the credit pair at 15.400 |
+| Title at | **2.000**, on black, staged: the lockup, then the credit pair at 15.400 |
+| Picture in | **12.200** — the measured first frame off the void's luma plateau; the burst blooms out of black behind the title |
 | Out point | **91.200**, the source's own luma minimum (the owner said 1:31) |
 | Master | `renders/00-prologue.mp4`, built by `scripts/build_prologue.py` |
 | Copy | `stories/00-prologue-plates.json`, reproduced from the website's own cue |

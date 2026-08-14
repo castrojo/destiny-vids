@@ -29,9 +29,10 @@ DESTINY_FFMPEG=$(which ffmpeg) python3 scripts/build_prologue.py
 
 | From | To | |
 |---|---|---|
-| 0.000 | 11.000 | The void. Pale filaments on near-black; no faces, no cuts. |
-| 11.000 | 12.400 | The lockup fades up over 1.4 s. |
-| 12.280 | — | **The source cuts.** The void gives way to a white starburst, then to the living world. The reveal happens *through* the title. |
+| 0.000 | 2.000 | **Pure black.** No picture at all — the source's void is gated off. |
+| 2.000 | 3.400 | The lockup fades up, alone, on black. |
+| 3.400 | 12.200 | The title holds on nothing. Only the song is playing. |
+| 12.200 | — | **The explosion.** The picture opens on the burst, blooming out of black *behind* the title. |
 | 15.400 | | Hard swap: the credit pair appears, nothing else moves. |
 | 21.200 | 22.600 | The title fades out, clear of the 24.880 cut. |
 | 91.200 | 99.200 | **The bridge.** March's Bluefin wallpaper, day turning to night. |
@@ -57,19 +58,36 @@ again by 91.400. So 1:31 is one frame off the bottom of a natural fade the
 source performs by itself. The out point moves the six frames to the actual
 minimum, and the cut lands on black the film was already going to give us.
 
-### The title is cued at 11.000 because of where the shots are
+### The opening is black, and the burst is measured at 12.200
+
+The owner, after the first pass: *"just show black at the beginning of the
+prologue but have the bluefin logo fade straight in … it should be all black
+in the beginning then 'explode' into the burst behind the logo."*
+
+So the title no longer waits for the picture — it fades up at **2.000** on
+nothing — and the picture waits for the title.
 
 ```bash
-ffmpeg -v error -i media/yt_nightwish_perfume_of_the_timeless.mkv -t 95 \
-  -vf "select='gt(scene,0.25)',metadata=print:file=-" -an -f null -
+ffmpeg -v error -ss 11.8 -t 1.0 -i media/yt_nightwish_perfume_of_the_timeless.mkv \
+  -vsync 0 -frame_pts 1 /tmp/burst/f_%04d.png     # then mean luma per frame
 ```
 
-Boundaries at **12.28–12.56**, 24.88, 36.32, 40.72, 44.36, 49.64, 75.64. The
-owner's 0:11 is 1.3 s ahead of the first one, which is the interesting part: the
-title is fully present on the empty dark *before* the world arrives, so the
-biggest visual event in the section happens behind a title that is already
-settled. Cueing later would have put the title up during the event and made
-them compete. It then holds through the bloom and clears well before 24.88.
+The void sits on a flat plateau — **45.9, 45.8, 46.0** across 12.08–12.16 —
+and then leaves it: **54.3** at 12.200, 62.5, 103.2, and blown out at **195.9**
+by 12.320. 12.200 is the first frame off the plateau, so cutting there lets the
+flare bloom *out of* black instead of popping in half-lit. The old shot-boundary
+reading (12.28–12.56) is the same event seen 80 ms later, once it is already
+bright.
+
+**One filter does the whole gate.** `fade=t=in:st=X` holds every frame before
+its start time fully black — it is not only a ramp — so the void is blacked out
+and the burst blooms with a single `fade=t=in:st=12.200:d=0.0334` (two frames).
+Verified on this host before it was relied on:
+
+```bash
+ffmpeg -f lavfi -i testsrc=size=320x180:rate=25:duration=3 \
+  -vf "fade=t=in:st=2:d=0.1" -y /tmp/fadetest.mp4     # luma is 0.0 at 0.5s and 1.5s
+```
 
 ### The bridge is 8.000, and 2.6 of it is the turn
 
