@@ -101,14 +101,14 @@ DELIVERY = DeliverySpec()
 _PROFILE_ALIASES = {"high": "high", "100": "high"}
 
 
-def video_filter_chain(spec=DELIVERY):
+def video_filter_chain():
     """The normalising -vf chain. Kept identical in shape to megacut's
     segment chain: scale, square pixels, rate, pixel format, zeroed PTS."""
-    return (f"scale={spec.width}:{spec.height}:flags=lanczos,setsar=1,"
-            f"fps={spec.fps},format={spec.pix_fmt},setpts=PTS-STARTPTS")
+    return (f"scale={DELIVERY.width}:{DELIVERY.height}:flags=lanczos,setsar=1,"
+            f"fps={DELIVERY.fps},format={DELIVERY.pix_fmt},setpts=PTS-STARTPTS")
 
 
-def video_encode_args(spec=DELIVERY, *, crf=None, preset=None, threads=None):
+def video_encode_args(*, crf=None, preset=None, threads=None):
     """The x264 argv that produces a spec-conformant bitstream.
 
     Shared by conform.py, render.py and megacut.py's card segments so every
@@ -120,21 +120,21 @@ def video_encode_args(spec=DELIVERY, *, crf=None, preset=None, threads=None):
     """
     args = [
         "-c:v", "libx264",
-        "-preset", str(preset or spec.preset),
-        "-crf", str(crf or spec.crf),
-        "-pix_fmt", spec.pix_fmt,
-        "-profile:v", spec.profile,
-        "-level:v", spec.level,
+        "-preset", str(preset or DELIVERY.preset),
+        "-crf", str(crf or DELIVERY.crf),
+        "-pix_fmt", DELIVERY.pix_fmt,
+        "-profile:v", DELIVERY.profile,
+        "-level:v", DELIVERY.level,
         # Closed GOP: a frame after a join must never reference one before
         # it. x264's default is already closed; state it so a config change
         # cannot silently open the joins.
         "-flags", "+cgop",
-        "-color_primaries", spec.color_primaries,
-        "-color_trc", spec.color_transfer,
-        "-colorspace", spec.colorspace,
-        "-x264-params", f"colorprim={spec.color_primaries}"
-                        f":transfer={spec.color_transfer}"
-                        f":colormatrix={spec.colorspace}",
+        "-color_primaries", DELIVERY.color_primaries,
+        "-color_trc", DELIVERY.color_transfer,
+        "-colorspace", DELIVERY.colorspace,
+        "-x264-params", f"colorprim={DELIVERY.color_primaries}"
+                        f":transfer={DELIVERY.color_transfer}"
+                        f":colormatrix={DELIVERY.colorspace}",
     ]
     if threads:
         args += ["-threads", str(threads)]
@@ -184,7 +184,7 @@ def _fps_close(reported, wanted):
     return abs(value - float(wnum) / float(wden or 1)) < 1e-3
 
 
-def mismatches(props, spec=DELIVERY):
+def mismatches(props):
     """The ways a probed stream disagrees with the spec, as strings.
 
     Pure: takes the probe dict, returns the punch list. Empty means the file
@@ -194,29 +194,29 @@ def mismatches(props, spec=DELIVERY):
     bad = []
     if props.get("codec_name") != "h264":
         bad.append(f"codec is {props.get('codec_name')}, not h264")
-    if int(props.get("width", 0)) != spec.width or \
-            int(props.get("height", 0)) != spec.height:
+    if int(props.get("width", 0)) != DELIVERY.width or \
+            int(props.get("height", 0)) != DELIVERY.height:
         bad.append(f"size is {props.get('width')}x{props.get('height')}, "
-                   f"not {spec.width}x{spec.height}")
-    if not _fps_close(props.get("avg_frame_rate"), spec.fps):
+                   f"not {DELIVERY.width}x{DELIVERY.height}")
+    if not _fps_close(props.get("avg_frame_rate"), DELIVERY.fps):
         bad.append(f"frame rate is {props.get('avg_frame_rate')}, "
-                   f"not {spec.fps}")
-    if props.get("pix_fmt") != spec.pix_fmt:
-        bad.append(f"pixel format is {props.get('pix_fmt')}, not {spec.pix_fmt}")
-    for field, wanted in (("color_primaries", spec.color_primaries),
-                          ("color_transfer", spec.color_transfer),
-                          ("color_space", spec.colorspace)):
+                   f"not {DELIVERY.fps}")
+    if props.get("pix_fmt") != DELIVERY.pix_fmt:
+        bad.append(f"pixel format is {props.get('pix_fmt')}, not {DELIVERY.pix_fmt}")
+    for field, wanted in (("color_primaries", DELIVERY.color_primaries),
+                          ("color_transfer", DELIVERY.color_transfer),
+                          ("color_space", DELIVERY.colorspace)):
         if props.get(field) != wanted:
             bad.append(f"{field} is {props.get(field)}, not {wanted}")
     profile = _PROFILE_ALIASES.get(str(props.get("profile")).lower())
-    if profile != spec.profile:
-        bad.append(f"profile is {props.get('profile')}, not {spec.profile}")
+    if profile != DELIVERY.profile:
+        bad.append(f"profile is {props.get('profile')}, not {DELIVERY.profile}")
     try:
         level = int(props.get("level", 0)) / 10
     except (TypeError, ValueError):
         level = 0.0
-    if abs(level - float(spec.level)) > 1e-9:
-        bad.append(f"level is {props.get('level')}, not {spec.level}")
+    if abs(level - float(DELIVERY.level)) > 1e-9:
+        bad.append(f"level is {props.get('level')}, not {DELIVERY.level}")
     return bad
 
 
@@ -244,7 +244,7 @@ def cache_root():
         / "destiny-vids" / "conform"
 
 
-def build_encode_command(src, dst, spec=DELIVERY, ffmpeg=None, threads=None):
+def build_encode_command(src, dst, ffmpeg=None, threads=None):
     """Re-encode the picture to the spec; carry the audio untouched.
 
     ``-map 0:a?`` + ``-c:a copy``: every audio stream rides through
@@ -257,15 +257,15 @@ def build_encode_command(src, dst, spec=DELIVERY, ffmpeg=None, threads=None):
         *ffmpeg, "-nostdin", "-hide_banner",
         "-i", str(src),
         "-map", "0:v:0", "-map", "0:a?",
-        "-vf", video_filter_chain(spec),
-        *video_encode_args(spec, threads=threads),
+        "-vf", video_filter_chain(),
+        *video_encode_args(threads=threads),
         "-c:a", "copy",
         "-movflags", "+faststart",
         str(dst), "-y",
     ]
 
 
-def ensure(source, out_dir=None, spec=DELIVERY, ffmpeg=None, threads=None,
+def ensure(source, out_dir=None, ffmpeg=None, threads=None,
            log=None, _probe=None):
     """A spec-conformant version of ``source``, doing as little as possible.
 
@@ -283,7 +283,7 @@ def ensure(source, out_dir=None, spec=DELIVERY, ffmpeg=None, threads=None,
     log = log or (lambda msg: print(msg, file=sys.stderr))
     src = Path(source)
     if _probe is not None:
-        bad = mismatches(_probe(src), spec)
+        bad = mismatches(_probe(src))
     else:
         _ok, bad = conforms(src, ffprobe_for(ffmpeg or _find_ffmpeg()))
     if not bad:
@@ -298,8 +298,7 @@ def ensure(source, out_dir=None, spec=DELIVERY, ffmpeg=None, threads=None,
         return entry, "cache-hit"
     tmp = entry_dir / f".{digest}.tmp-{os.getpid()}.mp4"
     tmp.unlink(missing_ok=True)
-    argv = build_encode_command(src, tmp, spec,
-                                ffmpeg or _find_ffmpeg(), threads)
+    argv = build_encode_command(src, tmp, ffmpeg or _find_ffmpeg(), threads)
     try:
         subprocess.run(argv, check=True)
         tmp.replace(entry)
@@ -309,7 +308,7 @@ def ensure(source, out_dir=None, spec=DELIVERY, ffmpeg=None, threads=None,
     entry.with_suffix(".json").write_text(json.dumps({
         "source": str(src),
         "sha256": digest,
-        "spec": asdict(spec),
+        "spec": asdict(DELIVERY),
         "spec_version": SPEC_VERSION,
     }, indent=1) + "\n", encoding="utf-8")
     return entry, "conformed"
