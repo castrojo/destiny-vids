@@ -161,6 +161,16 @@ def test_the_join_copies_the_picture_and_encodes_the_sound_once(tmp_path):
     assert "-safe" in join and join[join.index("-safe") + 1] == "0"
 
 
+def test_final_mux_applies_only_an_explicit_static_master_gain(tmp_path):
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    plan["master_gain_db"] = -1.7
+    cmd = megacut.build_concat_command(plan, "segments.txt", "out.mp4")
+    assert cmd[cmd.index("-af") + 1] == "volume=-1.7dB"
+    assert "loudnorm" not in cmd and "alimiter" not in cmd
+
+
 def test_expected_duration_sums_the_parts(tmp_path):
     _, plan = _plan(tmp_path, [
         {"kind": "card", "image": "c.png", "dur": 5.0},
@@ -565,6 +575,50 @@ def test_fade_chain_applies_owner_gain_before_fades():
 
 def test_fade_chain_zero_gain_is_absent():
     assert megacut.fade_chain({"gain_db": 0}, 10.0) == ""
+
+
+def test_crescendo_returns_attenuated_clip_to_unity():
+    item = {"gain_db": -4.0, "crescendo_out": 4.0, "crescendo_db": 4.0}
+    chain = megacut.fade_chain(item, 66.4)
+    assert chain == (
+        ",volume=-4.0dB,"
+        "volume='if(lt(t,62.400),1,pow(10,(4.000*"
+        "(t-62.400)/4.000)/20))':eval=frame")
+
+
+def test_crescendo_without_authored_dur_probes_video(tmp_path, monkeypatch):
+    probed = {}
+
+    def fake_probe(path, stream=None):
+        probed["stream"] = stream
+        return 42.5
+
+    monkeypatch.setattr(megacut, "probe_duration", fake_probe)
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source",
+         "gain_db": -4.0, "crescendo_out": 4.0, "crescendo_db": 4.0},
+    ])
+    af = megacut.build_segment_command(plan, 0, "seg000.mkv")
+    assert probed["stream"] == "v:0"
+    assert "if(lt(t,38.500)" in af[af.index("-af") + 1]
+
+
+def test_crescendo_may_not_boost_above_source(tmp_path):
+    path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 10.0,
+         "gain_db": -2.0, "crescendo_out": 4.0, "crescendo_db": 4.0},
+    ])
+    with pytest.raises(ValueError, match="boost above the source"):
+        megacut.load_plan(path)
+
+
+def test_crescendo_fields_are_a_pair(tmp_path):
+    path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 10.0,
+         "crescendo_out": 4.0},
+    ])
+    with pytest.raises(ValueError, match="must be stated together"):
+        megacut.load_plan(path)
 
 # --- the #88 guard: a silent re-time must stop the build -------------------
 #

@@ -24,7 +24,7 @@
   "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md.",
   "prologue": "Wolves/Prod/00-prologue.mp4 -> destiny-vids/renders/00-prologue.mp4, built by scripts/build_prologue.py from stories/00-prologue-plates.json and cards/maintitle.html. Born conformant (1920x1080, 60000/1001, bt709 on all three fields, FLAC 48 kHz stereo) so the join stream-copies its picture. Audio decoded from the plain 251 Opus rung, NOT 251-drc, per the audio standard -- the same lossy-source posture act I records."
  },
- "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.3.mp4",
+ "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.4.mp4",
  "width": 1920,
  "height": 1080,
  "fps": "60000/1001",
@@ -33,6 +33,8 @@
  "crf": 16,
  "preset": "slow",
  "audio_bitrate": "640k",
+ "master_gain_db": -1.7,
+ "_master_gain": "Measured on decoded v2.4 before shipping: the final AAC reached +0.7 dBTP. The final mux applies one transparent -1.7 dB static gain to land at the -1.0 dBTP house target. No normalizer, limiter, compression or EQ.",
  "items": [
   {
    "kind": "clip",
@@ -66,23 +68,19 @@
    "path": "renders/perfume-2.mp4",
    "audio": "source",
    "fade_in": 6.2,
-   "fade_out": 2.0,
+   "gain_db": -4.0,
+   "crescendo_out": 4.0,
+   "crescendo_db": 4.0,
    "label": "Perfume, movement 2 — source 93.000 -> 159.400, after the Destiny intro",
-   "_thread": "THE PERFUME THREAD, movement 2 of 5. No numeral, no slide, no chapter marker -- see stories/00-perfume-thread.json. The 6.2 s fade_in is not a default: it is the exact length of the fade the PROLOGUE went out on (afade st=93.0 d=6.2), replayed upside down, so the song dips across act I and swells back rather than restarting. It also resumes mid-shot -- there is no cut in the source between 91.200 and 108.960 -- so the picture continues the very frame the prologue left."
-  },
-  {
-   "kind": "card",
-   "image": "renders/plates-megacut-cards/plate_act2.png",
-   "dur": 5.0,
-   "label": "II — Endless Forms Most Beautiful / Nightwish",
-   "chapter": "II. Endless Forms Most Beautiful"
+   "_thread": "THE PERFUME THREAD, movement 2 of 5. No numeral, no slide, no chapter marker -- see stories/00-perfume-thread.json. The 6.2 s fade_in is not a default: it is the exact length of the fade the PROLOGUE went out on (afade st=93.0 d=6.2), replayed upside down, so the song dips across act I and swells back rather than restarting. It also resumes mid-shot -- there is no cut in the source between 91.200 and 108.960 -- so the picture continues the very frame the prologue left. At the other end, the old 2.0 s fade_out and act II's silent card are gone on the owner's 4:40 note. The whole movement is held 4 dB below source, then the final 4.0 s rises linearly in dB back to unity: a crescendo that never boosts above the source's existing peak, followed by a direct music-to-music cut."
   },
   {
    "kind": "clip",
    "path": "/var/home/jorge/Videos/Wolves/Prod/02-endlessformsmostbeautiful.mp4",
    "audio": "source",
-   "fade_in": 2.0,
+   "fade_in": 0.0,
    "label": "Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end",
+   "_no_slide": "Owner 2026-08-14: 'the 4:40 fade and title slide need to be removed, crescendo the music into the next segment in one smooth transition.' The act II card is retired, so this clip follows movement 2 directly and loses its slide-derived chapter marker. Its old 2.0 s fade_in is removed because music now meets music rather than silence.",
    "sub_chapters": "stories/02-endless-forms-plates.json",
    "_sub_chapters_note": "A POINTER at act II's own manifest, which is the source of the marks -- the plan opts in, it does not hold the timecodes, so an act's edit and the programme's edit never collide (issue #92). Consumed only with --sub-chapters; the default chapter list is unchanged. TODO(owner): YouTube chapter list vs ffmpeg-only metadata track."
   },
@@ -209,5 +207,5 @@
   }
  ],
  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no slide, so it has no marker -- that is the ambush working as designed. AS OF v2.1 ACT VII HAS NONE EITHER: the owner asked for its title slide to go so movement 4 could hard-cut into Europa, and the marker went with the slide. Six published entries, not eight. If Europa should keep a scrub-bar entry without a card in front of it, chapters() would need to read a `chapter` off the CLIP -- a change nobody has asked for yet.",
- "_version": "v2.3 -- THE ALPHA QA PASS, owner notes of 2026-08-14: (1) act VII now ends ON the eclipse -- trim_to 96.73 at full brightness, no audio fade, hard into movement 5's music (the owner: 'cut right into the next song ... it could be the best transition in the show'; the B match-cut alternative is rendered beside it in renders/review/, #192); (2) the 28:20 dead tail is gone -- movement 5 trims at 109.5 while the camera is still in the ship, cutting the source's burned director credits and 7.7 s of fade-to-nothing, with a 1.5 s song fade and the credits smash punching the next frame (#191 resolved); (3) act I carries gain_db 3.5, the most its -4.60 dBTP true peak allows without a limiter -- it was 9.1 LU below the quietest other act (#164), and the remaining ~5.6 LU needs a re-master, recorded there. 36:16.2 -> 36:07.9. Same pass, other files: act VII re-rendered with the terse-pass dialogue (#102) and act IV gains the Linux desktop exchange (#118). SAME EVENING, the owner's dialogue round: act IV plays the #118 conversation plus the sound bet and the upstreaming exchange (its yell uncast, TBD), act V plays the #118 Nat section ending on the docs.bazzite.gg button, and the ON THE LINUX DESKTOP / NO ONE CAN HEAR YOU SCREAM interstitial card (scripts/build_scream_card.py) comes up out of act V's own fade -- 36:07.9 -> 36:12.9."
+ "_version": "v2.4 -- picture-quality and 4:40 transition pass. Act II is rebuilt from the source upload's 2160p rung and downscaled with Lanczos; movement 2 no longer fades out, the act II slide is retired, act II no longer fades in, and the outgoing music rises from -4 dB to unity over its final four seconds before the direct cut. The removed slide shortens v2.3 by 5.0 s. All v2.3 alpha-QA changes remain."
 }

@@ -33,12 +33,19 @@ that convention is gone.
 
 | Act | Cut | Bed source | In `Prod/` | True peak | Lossless master |
 |---|---|---|---|---|---|
-| II | Endless Forms Most Beautiful | Nightwish *Endless Forms Most Beautiful (Instrumental)* `6-9667CV1zQ`, **Opus 251** @48 k | FLAC stereo | −1.0 dBTP | `destiny-vids/renders/efmb-plated.mp4` |
+| II | Endless Forms Most Beautiful | Nightwish *Endless Forms Most Beautiful (Instrumental)* `6-9667CV1zQ`, **Opus 251** @48 k, static −1.6 dB into 32-bit PCM | FLAC stereo | −1.0 dBTP / −11.7 LUFS | `destiny-vids/renders/efmb-plated.mp4` |
 | III | Contributors | Rammstein *Deutschland (Instrumental)* `WqaiHivKlsE`, **Opus 251** @48 k | FLAC stereo | −1.2 dBTP | `destiny-vids/renders/…-credited-hq.mp4` |
 | IV | Kat | dArtagnan *Holding out for a Hero* `egLoz_DPQ8E`, **Opus rung 251** @48 k | FLAC stereo | −0.9 dBTP | `wolves-kat/wolves-kat-reveal-hq.mp4` |
 | V | Natali | Nightwish *Shudder Before the Beautiful* `oTTITV4H9fo`, **Opus 251** @48 k | FLAC stereo | −1.0 dBTP | `wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4` |
 | VI | The musical | Nightwish *7 Days to the Wolves* | AAC stereo 323 k | −1.6 dBTP | **none — issue #58** |
 | VII | Europa | *Beauty Of The Beast* `X3WrCzLIIvk`, **Opus** @48 k | FLAC stereo | −1.1 dBTP (was **+0.3 — clipping**, issue #82) | `wolves-directors-cut/…-beauty-of-the-beast-hq.mp4` |
+
+**Measure after the final lossy encode.** v2.4's lossless programme segments
+were safe, but the joined AAC measured **+0.7 dBTP**. The fix is one derived
+static gain at the final mux, followed by another measurement of the decoded
+deliverable — never `loudnorm`, limiting, or compression. FFmpeg's `volume`
+filter accepts dB values, and `ebur128=peak=true` measures true peak.
+Source: `/websites/ffmpeg_ffmpeg-all`.
 
 Measured on the files in `Wolves/Prod/` on 2026-08-13, not recalled. Every cut
 **except the musical** has a lossless master behind it; each master's audio is

@@ -6,7 +6,7 @@ programme** as of the megacut's v0.5. Delivered is not published. Provenance on
 the source is **weak and recorded** (below).
 **Runtime:** 307.998 s (5:07.998) for a 307.998 s song — the film *is* the song.
 **Master:** `renders/efmb-plated.mp4` — 1920x1080 H.264, 30 fps, FLAC 48 kHz
-stereo, **−1.0 dBTP, −11.3 LUFS integrated, LRA 5.9**, measured on the
+stereo, **−1.0 dBTP, −11.7 LUFS integrated, LRA 5.9**, measured on the
 **delivered** file. `renders/efmb-hq.mp4` is the same cut before the plates.
 
 Origin: [issue #74](https://github.com/castrojo/destiny-vids/issues/74) — act II
@@ -183,8 +183,8 @@ plays.
 
 | Role | Source | Notes |
 |---|---|---|
-| Bed | Nightwish, *Endless Forms Most Beautiful (Instrumental)* — [`6-9667CV1zQ`](https://www.youtube.com/watch?v=6-9667CV1zQ) | Official Nightwish channel. 307.998 s. **Opus rung 251 @48 k**, the top rung the ladder offers |
-| Picture | *Destiny – All Live Action Trailers* — [`lL9i6wqwFD8`](https://www.youtube.com/watch?v=lL9i6wqwFD8) | **A fan compilation by Brutal Draconis**, 376.1 s. Not an official Bungie upload — see Rights |
+| Bed | Nightwish, *Endless Forms Most Beautiful (Instrumental)* — [`6-9667CV1zQ`](https://www.youtube.com/watch?v=6-9667CV1zQ) | Official Nightwish channel. 307.998 s. **Opus rung 251 @48 k / 126 kb/s**, the top rung the ladder offers. Decoded with a −1.6 dB static gain to 32-bit PCM; the earlier 16-bit intermediate clipped 10 samples in Kyle's climax. The cymbal texture is source-bound: the source and both act masters correlate at 0.99999999, with a measured ~20 kHz Opus cutoff. |
+| Picture | *Destiny – All Live Action Trailers* — [`lL9i6wqwFD8`](https://www.youtube.com/watch?v=lL9i6wqwFD8) | **A fan compilation by Brutal Draconis**, 376.1 s. Fetched at the upload's 2160p AV1 rung (format 401, 3,688 kb/s) and Lanczos-downscaled to the 1080p act timeline; the preferred 2160p VP9 rung repeatedly returned HTTP 403 mid-transfer. The former source was the 1080p AVC rung (format 137, 2,145 kb/s). Not an official Bungie upload — see Rights |
 
 The bed is a **different track from act V's**. Act V (Natali) uses *Shudder
 Before the Beautiful*, instrumental, from the same album; #74 flagged that
@@ -602,9 +602,10 @@ python3 tools/plate.py burn --video renders/efmb-hq.mp4 \
     --plates-dir renders/plates-efmb --out renders/efmb-plated.mp4 --fit-picture
 ```
 
-The media is fetched, never committed: the compilation as H.264 into
+The media is fetched, never committed: the compilation's 2160p AV1 rung into
 `media/yt_destiny_all_live_action_trailers.mp4`, and the bed as Opus 251
-decoded to `media/bed_endless_forms_most_beautiful.wav`.
+decoded at native 48 kHz, with the safety gain applied once, to 32-bit PCM in
+`media/bed_endless_forms_most_beautiful.wav`.
 
 ### Two ffmpeg spellings this act has been lost to
 

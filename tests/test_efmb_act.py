@@ -312,8 +312,8 @@ def test_the_render_chain_never_uses_filter_complex():
 
 
 def test_the_bed_is_corrected_with_static_gain_and_never_a_normaliser():
-    """The bed decodes above full scale; the fix only ever goes DOWN."""
-    assert build_efmb.MUX_GAIN_DB < 0
+    """The fetched PCM is already safely gained; the mux does not process it."""
+    assert build_efmb.MUX_GAIN_DB == 0
     source = (REPO_ROOT / "scripts" / "build_efmb.py").read_text()
     render_section = source[source.index("def render("):]
     for banned in ("loudnorm", "alimiter", "acompressor"):
