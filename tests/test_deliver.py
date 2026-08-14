@@ -30,7 +30,9 @@ def test_the_act_list_comes_from_the_real_running_order():
     assert acts[5].prod_file == "06-7daystothewolves.mp4"
     # Act VIII has no film (issue #51); its numeral is load-bearing.
     assert acts[-1].numeral == "VIII"
-    assert acts[-1].prod_file is None
+    # Act VIII HAS a film now (#51). It had none for most of the project's
+    # life, which is why this used to assert the opposite.
+    assert acts[-1].prod_file == "08-credits.mp4"
 
 
 def test_the_delivery_map_covers_every_filmed_act_and_no_phantom_acts():

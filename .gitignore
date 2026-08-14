@@ -11,3 +11,4 @@ renders/
 
 # playwright for cards/render-cards.mjs is not vendored; link a checkout that has it
 node_modules
+.shield_scan/
