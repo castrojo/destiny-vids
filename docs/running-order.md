@@ -27,7 +27,7 @@ untouched: the prologue takes **no numeral** and nothing is renumbered.
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
 | **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits; **the programme plays 431.267 of it** (v2.1) — the comic and the fade cut off the end, the file untouched |
 | **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; **no slide, no chapter marker** (v2.1) — a quick cut off movement 4; **1:37.266**, the comic cover cut so act VIII owns the reveal — #178; plays the pre-terse-pass film — #102; master corrected to −1.1 dBTP — #82 |
-| **VIII** | Credits | `Prod/08-credits.mp4` — the cast, 619 contributors across **six** projects, the comic-cover reveal and the wordmark | delivered, **in the programme**; **no slide, no chapter marker** — it is meant to surprise — #51 |
+| **VIII** | Credits | `Prod/08-credits.mp4` — the **call to action**, the comic-cover reveal, then the cast and 723 contributors across **eight** projects | delivered, **in the programme**; **7:50.453**, two bed passes (instrumental loop, then the album version with vocals); **no slide, no chapter marker** — it is meant to surprise — #51 |
 
 ## The prologue, and why it has no numeral
 
@@ -113,12 +113,39 @@ The measured cut points, the two-answer in point and the rest are in
 [`docs/cuts/00-perfume-thread.md`](cuts/00-perfume-thread.md).
 
 **Act VIII has a film and the programme plays it.** Built from
-`stories/08-credits.json` by `scripts/build_credits.py`: four fixed cards,
-**eight** cast placards, the comic-cover reveal at :22, **619** contributors
-across **six** projects, and the real Project Bluefin wordmark.
+`stories/08-credits.json` by `scripts/build_credits.py`. Its shape changed on
+2026-08-14 and the full design is
+[`docs/cuts/08-credits.md`](cuts/08-credits.md):
 
-**The 2026-08-14 pass rebuilt how act VIII looks and who it names.** It runs
-**3:47.303** now, not 3:48.430:
+> the **call to action** → the comic-cover reveal at **:22** → the credits
+
+**It runs 7:50.453 now**, not 3:47.303, because the bed is two passes: the
+instrumental loop plays in full, then the **album version, with vocals**
+(*"switch to the album version with vocals after the entire instrumental loops
+once"*). Everything below still holds; what is new on top of it:
+
+- **The credits moved behind the reveal.** *"Move the existing credits to after
+  the comic reveal, instead let's make this part leading up to it a call to
+  action."* The four cards in front of the cover are WE MAKE OUR OWN FATE,
+  BECOME LEGEND, a birthday card, and FIGHT — which is held longer than the
+  first two together. The reveal's own `at_sec` and `hold_sec` are untouched.
+- **The F's sear.** Blocky Adwaita Black, no italics, the F filled in the
+  film's blue with an additive bloom around it.
+- **The `Introducing` card is the birthday card**, and the redacted second
+  name went with the card that carried it.
+- **The upstream tier is four projects**: Fedora CoreOS, bootc, **GNOME OS**
+  (`gnome-build-meta` only) and **KDE Linux**, the last two fetched from
+  GitLab, by NAME and never by email. Universal Blue, Bazzite and Aurora now
+  play ahead of Bluefin.
+- **`#UPSTREAMFIRST`** heads the upstream walls, **`#linuxforever`** runs
+  along the bottom of every one, the ghost maintainer closes KDE Linux, and a
+  side bubble dissolves once across the tier.
+- **A brand mark is never taken off this host.** Bluefin rebrands
+  `/usr/share/pixmaps` — its `fedora_whitelogo_med.png` and
+  `gnome-boot-logo.png` are both the Bluefin wordmark, and the first build
+  credited Fedora CoreOS under one of them.
+
+**The 2026-08-14 pass rebuilt how act VIII looks and who it names.**
 
 - **It is set in Adwaita**, resolved in `tools/credits.py` alone. `plate.py`
   still resolves DejaVu, because that reproduces the browser that baked the
@@ -130,13 +157,16 @@ across **six** projects, and the real Project Bluefin wordmark.
   is eleven months and says so. Cached by `scripts/fetch_wallpapers.py`, which
   decodes JPEG XL through GdkPixbuf because neither Pillow nor this host's
   ffmpeg can.
-- **Fedora CoreOS and bootc lead the walls**, on their own larger grid — six
-  across by three down against nine by four — under an `UPSTREAM` eyebrow, and
-  each of their walls holds longer than a Bluefin one. The order is enforced
-  in `schedule()`, so reordering the manifest cannot demote them.
+- **The upstream tier leads the walls**, on its own larger grid — six across
+  by three down against nine by four — and each of its walls holds longer than
+  a Bluefin one. The order is enforced in `schedule()`, so reordering the
+  manifest cannot demote them.
 - **The cast is the README's table minus Cayde-6**, by owner instruction. The
   six the vocab binds but the README does not list keep their bindings; only
-  act VIII's placards went. Karena is **"Angel"**, one L.
+  act VIII's placards went. Karena is **"Angel"**, one L. It is **not**
+  re-derived by `--refresh-contributors` — that once threw the owner's casting
+  away in the middle of a contributor snapshot; `--refresh-cast` asks for it
+  by name.
 - **The bed loops properly.** Span A used to end at 240.780, which is 0.7 s
   *inside* the song's own fade-out — so the loop played an ending and then the
   drums. It ends at 239.653152 now, the nearest tracked beat to the owner's :46.

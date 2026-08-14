@@ -83,6 +83,18 @@ the class row, which stays the default blue — and `rust`, oxidised iron for th
 Rust Foundation herald, per #8 — and `bazzite`, Bazzite purple for the end
 fight; `nobara`, indigo sampled from the Nobara Project's own icon; and
 `youtube`, brand red for a creator whose affiliation is their channel). A
+
+**A brand mark comes from the project's own site, never off this host.**
+`scripts/fetch_brand_marks.py` caches them into gitignored `renders/marks/`,
+and `/usr/share/pixmaps` is a trap that looks like the publisher's own
+delivery: Bluefin **rebrands** it, so `fedora_whitelogo_med.png` and
+`gnome-boot-logo.png` on this machine are both the Project Bluefin wordmark.
+Act VIII's first pass credited "Fedora CoreOS" under a Bluefin logo because of
+it, and only a rendered frame showed it. Prefer the **icon** over the
+horizontal wordmark lockup too — a mark that spells the brand out cannot be
+set small, and the owner's note on the first pass was *"you overdid the logos
+those are tacky, smaller and symbolic."*
+
 variant is colour only. Owner-authored imagery chrome — `avatar`,
 `wreath`, bracketed names like `[ REDACTED ]` — is likewise not copy:
 [`references/plate-chrome.md`](references/plate-chrome.md).

@@ -89,29 +89,70 @@ OUT = REPO_ROOT / "renders" / "08-credits.mp4"
 # concat demuxer's arithmetic -- decides where the picture ends.
 CONCAT_TAIL_SEC = 20.0
 
-# THE UPSTREAM TIER COMES FIRST.
+# THE UPSTREAM TIER COMES FIRST, AND IT IS FOUR PROJECTS NOW.
 #
 # Owner: *"Add Fedora CoreOS and bootc upstream groups to the credits and have
 # them top tier in the credits before bluefin - make theirs larger and more
-# distinguished."*
+# distinguished."*, then on 2026-08-14: *"Add GNOME OS Upstream as the same
+# level as coreOS"*, *"Only have GNOME OS since it's such a large org"*, and
+# *"Put KDE Linux Upstream"*.
 #
-# Bluefin is an image built on other people's work, and these two are the work:
-# Fedora CoreOS is where the ostree-native model this whole thing rides on is
-# maintained, and bootc is the boot-from-container project the LTS line is
-# built with. They are credited BEFORE the projects that depend on them, on
-# their own larger grid (``tier: upstream``).
+# Bluefin is an image built on other people's work, and these four are the
+# work: Fedora CoreOS is where the ostree-native model this whole thing rides
+# on is maintained, bootc is the boot-from-container project the LTS line is
+# built with, and GNOME OS and KDE Linux are the two desktops doing the same
+# thing from the other end. They are credited BEFORE the projects that depend
+# on them, on their own larger grid (``tier: upstream``).
+#
+# GNOME OS is `gnome-build-meta` and NOTHING ELSE, on the owner's instruction:
+# GNOME the organisation is enormous and crediting all of it would drown the
+# tier. The project builds GNOME OS and that is what is being credited.
 #
 # `bootc-dev/bootc` is the project's OWN current home -- `containers/bootc`
 # redirects to it, and the API confirms the redirect rather than the name
 # being assumed.
+#
+# THE UBLUE ORDER IS THE OWNER'S: *"Put universal blue and aurora ahead of
+# bluefin"*, with Bazzite placed between them in session. Universal Blue is
+# still the deduped section (see `fetch_contributors`) -- that is bound to the
+# SECTION and not to its position, which is the bug moving it first would
+# otherwise have caused.
+GITHUB, GITLAB_GNOME, GITLAB_KDE = "github", "gitlab.gnome.org", "invent.kde.org"
+
 CONTRIB_REPOS = [
-    ("Fedora CoreOS", "coreos/fedora-coreos-config", "upstream"),
-    ("bootc", "bootc-dev/bootc", "upstream"),
-    ("Project Bluefin", "ublue-os/bluefin", None),
-    ("Aurora", "ublue-os/aurora", None),
-    ("Bazzite", "ublue-os/bazzite", None),
-    ("Universal Blue", "ublue-os/main", None),
+    ("Fedora CoreOS", GITHUB, "coreos/fedora-coreos-config", "upstream"),
+    ("bootc", GITHUB, "bootc-dev/bootc", "upstream"),
+    ("GNOME OS", GITLAB_GNOME, "GNOME/gnome-build-meta", "upstream"),
+    ("KDE Linux", GITLAB_KDE, "kde-linux/kde-linux", "upstream"),
+    ("Universal Blue", GITHUB, "ublue-os/main", None),
+    ("Bazzite", GITHUB, "ublue-os/bazzite", None),
+    ("Aurora", GITHUB, "ublue-os/aurora", None),
+    ("Project Bluefin", GITHUB, "ublue-os/bluefin", None),
 ]
+
+# The section whose list is "deduped from above". It is named, not inferred
+# from position: it used to be the LAST entry and the dedup was written as
+# "the last section", so moving Universal Blue to the front would have quietly
+# deduped Project Bluefin instead and taken every shared name off its wall.
+DEDUPED_SECTION = "Universal Blue"
+
+# KDE LINUX'S TWO NAMED MAINTAINERS, pinned. Owner: *"put at least aleixpol
+# and harald sitter"*. GitLab's contributor list is by commit author name and
+# spelling varies between a person's commits, so "at least" is enforced here
+# rather than hoped for. Both are reproduced as the project's own commits
+# spell them.
+KDE_PINNED = ["Aleix Pol", "Harald Sitter"]
+
+# THE GHOST MAINTAINER -- an easter egg, and the owner's own words:
+# *"then put a outline of a ghost maintainer 'The Next KyleGospo' and then put
+# a title under it 'Curse of Maintainership'"*. It is NOT a contributor row: it
+# carries no login, fetches no avatar, and is drawn as an empty outline. It
+# rides on the KDE Linux wall, the last upstream section, so the joke lands at
+# the end of the tier rather than in the middle of it.
+GHOST_MAINTAINER = {
+    "name": "The Next KyleGospo",
+    "title": "Curse of Maintainership",
+}
 
 
 # MACHINE ACCOUNTS, NAMED RATHER THAN PATTERN-MATCHED.
@@ -124,36 +165,109 @@ CONTRIB_REPOS = [
 BOT_LOGINS = {"coreosbot", "platform-engineering-bot"}
 
 
-def fetch_contributors():
-    """All-time human contributors per project, deduped in the owner's order.
+def fetch_github_contributors(repo):
+    """All-time human contributors for a GitHub repo, as logins."""
+    raw = subprocess.run(
+        ["gh", "api", f"repos/{repo}/contributors?per_page=100&anon=0",
+         "--paginate", "--jq", '.[] | select(.type=="User") | .login'],
+        capture_output=True, text=True, check=True).stdout.split()
+    return sorted({n for n in raw if n.lower() not in BOT_LOGINS}, key=str.lower)
 
-    The last section is explicitly *"deduped from above"*: somebody who already
-    appeared under Bluefin, Aurora or Bazzite is not repeated under Universal
-    Blue. Bots are dropped by ``type == "User"``; a credit roll names people.
+
+def fetch_gitlab_contributors(host, project):
+    """All-time contributors for a GitLab project, as NAMES.
+
+    GNOME OS and KDE Linux are not on GitHub, so ``gh`` cannot reach them and
+    there are no logins to reach for -- GitLab's contributor endpoint answers
+    with a commit author's **name and email**.
+
+    Only the NAME is taken. An email address is not copy, it is somebody's
+    contact detail, and a credit roll harvested into a committed manifest is
+    exactly the wrong place for a few hundred of them. A GitLab contributor
+    therefore has no cached PFP either, and their face degrades to the ring
+    the renderer already draws for an unverified login.
+
+    Degrades rather than blocks: a network failure returns nothing and the
+    section renders empty with a note, because act VIII must still build with
+    no network at all.
     """
-    out, seen = [], set()
-    for label, repo, tier in CONTRIB_REPOS:
-        raw = subprocess.run(
-            ["gh", "api", f"repos/{repo}/contributors?per_page=100&anon=0",
-             "--paginate", "--jq", '.[] | select(.type=="User") | .login'],
-            capture_output=True, text=True, check=True).stdout.split()
-        names = sorted({n for n in raw if n.lower() not in BOT_LOGINS},
-                       key=str.lower)
-        # ONLY the last section is deduped. The owner asked for "all the
-        # contributors to ever contribute to aurora" under Aurora and so on --
-        # somebody who worked on both Bluefin and Aurora is credited under
-        # both, because they did both. It is only Universal Blue that is
-        # "deduped from above".
-        # The upstream sections are NEVER deduped against, in either
-        # direction: somebody who maintains bootc and also files Bluefin
-        # issues did both, and the upstream credit is the point of the tier.
-        if repo == CONTRIB_REPOS[-1][1]:
-            names = [n for n in names if n.lower() not in seen]
-        if tier is None:
-            seen.update(n.lower() for n in names)
-        section = {"section": label, "repo": repo, "names": names}
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+
+    url = (f"https://{host}/api/v4/projects/{urllib.parse.quote(project, safe='')}"
+           f"/repository/contributors?per_page=100&order_by=commits&sort=desc")
+    names = []
+    try:
+        for page in range(1, 12):
+            req = urllib.request.Request(f"{url}&page={page}",
+                                         headers={"User-Agent": "destiny-vids"})
+            with urllib.request.urlopen(req, timeout=30) as fh:
+                rows = json.loads(fh.read())
+            if not rows:
+                break
+            for row in rows:
+                name = (row.get("name") or "").strip()
+                if name and name.lower() not in BOT_LOGINS:
+                    names.append(name)
+            if len(rows) < 100:
+                break
+    except Exception as exc:  # noqa: BLE001 -- degrade, never block
+        print(f"note: no contributors for {project} on {host}: {exc}",
+              file=sys.stderr)
+        return []
+    return sorted(dict.fromkeys(names), key=str.lower)
+
+
+def fetch_contributors():
+    """All-time contributors per project, in the owner's order.
+
+    One section is *"deduped from above"* -- Universal Blue -- and it is named
+    rather than positional: it now plays FIRST, and a rule that said "the last
+    section" would have deduped Project Bluefin instead.
+
+    Bots are dropped by ``type == "User"`` on GitHub and by name on GitLab; a
+    credit roll names people.
+    """
+    raw = {}
+    for label, host, repo, _tier in CONTRIB_REPOS:
+        if host == GITHUB:
+            raw[label] = fetch_github_contributors(repo)
+        else:
+            raw[label] = fetch_gitlab_contributors(host, repo)
+
+    # The owner's two named KDE maintainers are guaranteed to be on screen --
+    # "put AT LEAST aleixpol and harald sitter" -- and are not duplicated if
+    # the API already returned them under the same spelling.
+    kde = raw.get("KDE Linux", [])
+    have = {n.lower() for n in kde}
+    raw["KDE Linux"] = [n for n in KDE_PINNED if n.lower() not in have] + kde
+
+    # ONLY the deduped section is deduped, and only against the other sections
+    # that are not upstream. The owner asked for "all the contributors to ever
+    # contribute to aurora" under Aurora and so on -- somebody who worked on
+    # both Bluefin and Aurora is credited under both, because they did both.
+    # The upstream sections are NEVER deduped against, in either direction:
+    # somebody who maintains bootc and also files Bluefin issues did both, and
+    # the upstream credit is the point of the tier.
+    seen = {n.lower() for label, _h, _r, tier in CONTRIB_REPOS
+            if tier is None and label != DEDUPED_SECTION
+            for n in raw[label]}
+    raw[DEDUPED_SECTION] = [n for n in raw[DEDUPED_SECTION]
+                            if n.lower() not in seen]
+
+    out = []
+    for label, host, repo, tier in CONTRIB_REPOS:
+        section = {"section": label, "repo": repo, "names": raw[label]}
+        if host != GITHUB:
+            # Recorded on the section so the renderer knows these are names
+            # and not logins -- it is why they carry no faces.
+            section["host"] = host
+            section["names_are"] = "display names, not logins (GitLab)"
         if tier:
             section["tier"] = tier
+        if label == "KDE Linux":
+            section["ghost"] = dict(GHOST_MAINTAINER)
         out.append(section)
     return out
 
@@ -255,6 +369,12 @@ def fetch_avatars(manifest, verbose=True):
     C.AVATAR_DIR.mkdir(parents=True, exist_ok=True)
     logins = []
     for section in manifest.get("contributors", []):
+        # A GitLab section carries display NAMES, not logins. Asking
+        # github.com for "Harald Sitter.png" is not a missing avatar, it is a
+        # category error -- and it would fetch whatever account happened to
+        # answer, which is a face beside somebody else's name.
+        if section.get("host") and section["host"] != GITHUB:
+            continue
         logins.extend(section["names"])
     for value in (manifest.get("cast_logins") or {}).values():
         if isinstance(value, str) and not value.startswith("_"):
@@ -282,16 +402,46 @@ def fetch_avatars(manifest, verbose=True):
     return got, missed
 
 
-def build_manifest(refresh):
+def build_manifest(refresh, refresh_cast=False):
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
     if refresh or "contributors" not in manifest:
         manifest["contributors"] = fetch_contributors()
-    # The cast is written into the manifest ONCE and is editable copy after
-    # that: a credit names a real person, so the owner gets the last word on
-    # how they are named, not a derivation that silently changes under them.
-    if refresh or "cast" not in manifest:
+    # THE CAST IS NOT REFRESHED WITH THE CONTRIBUTORS, and that is deliberate.
+    #
+    # A credit names a real person, so the owner gets the last word on how
+    # they are named -- the committed list is 8 curated entries with "Karena
+    # Angel" spelled the way she and the README spell it and Cayde held out of
+    # the starring roles. Deriving it from the vocab returns 15 entries,
+    # "Karena Angell", and Cayde. Wiring that to --refresh-contributors meant
+    # a routine contributor snapshot silently threw the owner's casting away;
+    # it did exactly that on 2026-08-14 and the suite caught it.
+    #
+    # It regenerates only when it is MISSING, or when somebody asks for it by
+    # name with --refresh-cast.
+    if refresh_cast or "cast" not in manifest:
         manifest["cast"] = cast_in_order(manifest.get("cast_logins"))
     return manifest
+
+
+def bed_passes(bed):
+    """The bed's passes in play order: the instrumental loop, then the album.
+
+    The manifest keeps pass one at the top level (it was the whole bed before
+    the vocal version was added, and every measured number in it is unchanged)
+    and hangs the pass that follows off ``then``. One pass or five, everything
+    downstream walks this list rather than reaching for ``bed["segments"]``.
+    """
+    out = [bed]
+    nxt = bed.get("then")
+    while nxt:
+        out.append(nxt)
+        nxt = nxt.get("then")
+    return out
+
+
+def bed_spans(bed):
+    """Every span the bed plays, in order, flattened across its passes."""
+    return [span for p in bed_passes(bed) for span in p["segments"]]
 
 
 def bed_total(bed):
@@ -302,10 +452,14 @@ def bed_total(bed):
     moves earlier by the same amount, which is exactly the bug this function
     exists to stop: the reveal was hand-set to 56.440 and landed at 56.180,
     0.26 s late against a transient it is supposed to hit.
+
+    Every seam counts, including the hand-over from the instrumental loop into
+    the album version -- it is the same kind of join and it costs the same
+    overlap.
     """
-    spans = sum(s["end_sec"] - s["start_sec"] for s in bed["segments"])
-    seams = max(0, len(bed["segments"]) - 1)
-    return spans - seams * bed.get("crossfade_sec", 0.0)
+    spans = bed_spans(bed)
+    total = sum(s["end_sec"] - s["start_sec"] for s in spans)
+    return total - max(0, len(spans) - 1) * bed.get("crossfade_sec", 0.0)
 
 
 def reveal_at(bed, reveal):
@@ -324,8 +478,9 @@ def reveal_at(bed, reveal):
         return float(reveal["at_sec"])
     xf = bed.get("crossfade_sec", 0.0)
     n = reveal["segment"]
-    before = sum(s["end_sec"] - s["start_sec"] for s in bed["segments"][:n])
-    return before - n * xf + (reveal["source_sec"] - bed["segments"][n]["start_sec"])
+    spans = bed_spans(bed)
+    before = sum(s["end_sec"] - s["start_sec"] for s in spans[:n])
+    return before - n * xf + (reveal["source_sec"] - spans[n]["start_sec"])
 
 
 def schedule(manifest):
@@ -342,35 +497,45 @@ def schedule(manifest):
     items = []
     t = 0.0
 
-    # The fixed cards fill exactly the gap before the reveal. Their dur_sec are
-    # RELATIVE WEIGHTS, scaled to the anchor: the owner named a time for the
-    # cover, so the cards give way to it rather than the other way round.
-    cards = manifest["fixed_cards"]
-    weight = sum(c["dur_sec"] for c in cards) or 1.0
-    for card in cards:
+    # THE CALL TO ACTION FILLS EVERYTHING BEFORE THE REVEAL.
+    #
+    # Owner, 2026-08-14: *"Move the existing credits to after the comic reveal,
+    # instead let's make this part leading up to it a call to action."* The
+    # dur_sec are RELATIVE WEIGHTS scaled to the anchor -- the owner named a
+    # time for the cover, so the cards give way to it rather than the other way
+    # round, exactly as the fixed cards used to. FIGHT's weight is longer than
+    # the first two together, which is what "up longer than the first 2" buys
+    # it whatever the window is.
+    cta = manifest.get("cta_cards", [])
+    weight = sum(c["dur_sec"] for c in cta) or 1.0
+    for card in cta:
         dur = card["dur_sec"] / weight * reveal
-        items.append({"kind": "role", "t": t, "dur": dur,
-                      "role": card["role"], "names": card["names"]})
+        item = {"kind": card.get("kind", "cta"), "t": t, "dur": dur}
+        item.update({k: v for k, v in card.items()
+                     if k not in ("dur_sec", "kind") and not k.startswith("_")})
+        items.append(item)
         t += dur
     t = reveal
 
-    # The cast straddles the reveal. Everything cannot fit before it -- the
-    # cover is pinned to a musical transient, not to a card count -- and
-    # squeezing fifteen placards into the gap gave each one 2.15 s, which is
-    # not long enough to look at somebody's authored Guardian card. So the
-    # window before the reveal takes as many as it holds at a readable pace and
-    # the rest follow it. Order is preserved: this is a prefix/suffix split.
-    # The verified-login overlay is applied HERE, not baked into `cast` when it
-    # is generated: the cast list is only rewritten by --refresh-contributors,
-    # so a login added to the manifest afterwards would otherwise never reach a
-    # placard. Applying it every schedule keeps the two independent.
     hold = manifest["reveal"]["hold_sec"]
     items.append({"kind": "cover", "t": reveal, "dur": hold,
                   "image": manifest["reveal"]["image"]})
     t = reveal + hold
 
-    # The whole cast follows the cover, in order. The reveal introduces the
-    # people rather than interrupting them.
+    # THE CREDITS FOLLOW THE COVER. Their dur_sec are seconds, not weights:
+    # nothing is anchored between the reveal and the cast, so a card the owner
+    # gave six seconds gets six seconds.
+    for card in manifest["fixed_cards"]:
+        items.append({"kind": "role", "t": t, "dur": card["dur_sec"],
+                      "role": card["role"], "names": card["names"]})
+        t += card["dur_sec"]
+
+    # The whole cast follows them, in order. The reveal introduces the people
+    # rather than interrupting them.
+    # The verified-login overlay is applied HERE, not baked into `cast` when it
+    # is generated: the cast list is only rewritten by --refresh-contributors,
+    # so a login added to the manifest afterwards would otherwise never reach a
+    # placard. Applying it every schedule keeps the two independent.
     verified = {k: v for k, v in (manifest.get("cast_logins") or {}).items()
                 if not k.startswith("_")}
     photos = {k: v for k, v in (manifest.get("cast_photos") or {}).items()
@@ -403,25 +568,54 @@ def schedule(manifest):
     for section in sections:
         tier = section.get("tier")
         per_page = C.UPSTREAM_PER_WALL if tier == "upstream" else C.NAMES_PER_WALL
-        for page in C.paginate(section["names"], per_page):
-            walls.append((section["section"], page, tier))
+        pages = C.paginate(section["names"], per_page)
+        for n, page in enumerate(pages):
+            # The ghost maintainer rides the LAST page of its section, so it
+            # closes the section rather than interrupting it.
+            ghost = section.get("ghost") if n == len(pages) - 1 else None
+            walls.append((section["section"], page, tier, ghost))
     wall_window = total - t - wordmark["dur_sec"]
     # An upstream wall holds a third as many faces, so at one flat rate it
     # would flick past three times as fast as the tier it is meant to
     # outrank. It is weighted instead: the upstream roll is slower per wall,
     # which is the other half of "more distinguished".
-    weights = [C.UPSTREAM_WALL_WEIGHT if tier else 1.0 for _, _, tier in walls]
+    weights = [C.UPSTREAM_WALL_WEIGHT if tier else 1.0
+               for _, _, tier, _ in walls]
     unit = wall_window / max(1e-9, sum(weights) or 1.0)
     pages_by_section = {}
-    for name, _, _ in walls:
+    for name, _, _, _ in walls:
         pages_by_section[name] = pages_by_section.get(name, 0) + 1
+
+    # THE BUBBLE DISSOLVES ACROSS THE UPSTREAM RUN, ONCE.
+    #
+    # Owner: the side bubble reads "So many. Running out of metal." and *"have
+    # that fade to 'Deploying CNCF Metal3'"*. A still cannot fade by itself, so
+    # the dissolve is spread over the walls it rides: the gag sets up on the
+    # first upstream walls, crosses at the middle one, and has landed by the
+    # last. It plays once over the whole tier rather than once per wall, which
+    # would be the same joke eight times.
+    upstream_walls = [i for i, (_, _, tier, _) in enumerate(walls) if tier]
+    mix_by_wall = {}
+    if upstream_walls:
+        last = max(1, len(upstream_walls) - 1)
+        for n, i in enumerate(upstream_walls):
+            # 0 for the first third, 1 for the last third, and a genuine
+            # half-and-half card in between.
+            span = n / last
+            mix_by_wall[i] = 0.0 if span < 0.34 else (1.0 if span > 0.66 else 0.5)
+
     idx = {}
-    for (name, page, tier), weight in zip(walls, weights):
+    for i, ((name, page, tier, ghost), weight) in enumerate(zip(walls, weights)):
         idx[name] = idx.get(name, 0) + 1
         dur = unit * weight
-        items.append({"kind": "wall", "t": t, "dur": dur, "section": name,
-                      "names": page, "page": idx[name], "tier": tier,
-                      "pages": pages_by_section[name]})
+        item = {"kind": "wall", "t": t, "dur": dur, "section": name,
+                "names": page, "page": idx[name], "tier": tier,
+                "pages": pages_by_section[name]}
+        if ghost:
+            item["ghost"] = ghost
+        if i in mix_by_wall:
+            item["bubble_mix"] = mix_by_wall[i]
+        items.append(item)
         t += dur
 
     items.append({"kind": "wordmark", "t": t, "dur": total - t,
@@ -442,6 +636,12 @@ def render_cards(items, out_dir):
         path = out_dir / f"{i:03d}-{item['kind']}.png"
         if item["kind"] == "role":
             img = C.render_role_card(item["role"], item["names"], index=i)
+        elif item["kind"] == "cta":
+            img = C.render_cta_card(item["text"], item.get("scale", "large"),
+                                    index=i)
+        elif item["kind"] == "birthday":
+            img = C.render_birthday_card(item["eyebrow"], item["name"],
+                                         item["body"], index=i)
         elif item["kind"] == "cast":
             img = C.render_cast_placard(item["person"], item["character"],
                                         card=item.get("card"), login=item.get("login"),
@@ -449,7 +649,9 @@ def render_cards(items, out_dir):
         elif item["kind"] == "wall":
             img = C.render_name_wall(item["section"], item["names"],
                                      item["page"], item["pages"],
-                                     tier=item.get("tier"), index=i)
+                                     tier=item.get("tier"), index=i,
+                                     ghost=item.get("ghost"),
+                                     bubble_mix=item.get("bubble_mix"))
         elif item["kind"] == "wordmark":
             img = C.render_wordmark(item["text"], item.get("sub"), index=i)
         elif item["kind"] == "cover":
@@ -485,24 +687,34 @@ def cover_frame(image_path, out_path, index=0):
 
 
 def audio_filter(bed, stream=1):
-    """One ffmpeg filtergraph: the two spans, in order, joined.
+    """One ffmpeg filtergraph: every span of every pass, in order, joined.
 
-    ``stream`` is the INPUT index of the music. The cards are input 0 (the
-    concat demuxer), so the bed is input 1 -- getting this wrong is a
-    filtergraph that binds to nothing rather than a wrong sound.
+    ``stream`` is the INPUT index of the FIRST music file. The cards are input
+    0 (the concat demuxer), so the instrumental is input 1 and the album
+    version is input 2 -- getting this wrong is a filtergraph that binds to
+    nothing rather than a wrong sound.
 
-    A short equal-power crossfade at the loop seam, so the join from the song's
-    last bar into its own intro does not click. Nothing else is applied -- no
-    gain, no normaliser (the audio tenet).
+    A short equal-power crossfade at every seam, so neither the loop's join
+    into its own intro nor the hand-over from the instrumental into the vocal
+    version clicks. ``acrossfade`` takes two inputs at a time, so the spans are
+    folded left to right. Nothing else is applied -- no gain, no normaliser
+    (the audio tenet).
     """
     parts, labels = [], []
-    for n, span in enumerate(bed["segments"]):
-        parts.append(f"[{stream}:a]atrim=start={span['start_sec']:.6f}:"
-                     f"end={span['end_sec']:.6f},asetpts=PTS-STARTPTS[a{n}]")
-        labels.append(f"[a{n}]")
+    n = 0
+    for offset, cut in enumerate(bed_passes(bed)):
+        for span in cut["segments"]:
+            parts.append(f"[{stream + offset}:a]atrim=start={span['start_sec']:.6f}:"
+                         f"end={span['end_sec']:.6f},asetpts=PTS-STARTPTS[a{n}]")
+            labels.append(f"[a{n}]")
+            n += 1
     xf = bed.get("crossfade_sec", 0)
-    if xf and len(labels) == 2:
-        parts.append(f"{labels[0]}{labels[1]}acrossfade=d={xf}:c1=tri:c2=tri[aout]")
+    if xf and len(labels) > 1:
+        acc = labels[0]
+        for i, nxt in enumerate(labels[1:], start=1):
+            out = "[aout]" if i == len(labels) - 1 else f"[x{i}]"
+            parts.append(f"{acc}{nxt}acrossfade=d={xf}:c1=tri:c2=tri{out}")
+            acc = out
     else:
         parts.append(f"{''.join(labels)}concat=n={len(labels)}:v=0:a=1[aout]")
     return ";".join(parts)
@@ -513,6 +725,10 @@ def main(argv=None):
     ap.add_argument("--refresh-contributors", action="store_true",
                     help="re-snapshot the contributor lists and the cast, "
                          "overwriting any hand-edited copy in the manifest (network)")
+    ap.add_argument("--refresh-cast", action="store_true",
+                    help="re-derive the CAST from vocab/casting.yaml, "
+                         "overwriting the owner's curated names (rarely what "
+                         "you want -- see build_manifest)")
     ap.add_argument("--fetch-avatars", action="store_true",
                     help="cache a PFP for every login the manifest names (network)")
     ap.add_argument("--plan", action="store_true", help="print the schedule, render nothing")
@@ -522,7 +738,7 @@ def main(argv=None):
                     help="save the manifest back (use with --refresh-contributors)")
     args = ap.parse_args(argv)
 
-    manifest = build_manifest(args.refresh_contributors)
+    manifest = build_manifest(args.refresh_contributors, args.refresh_cast)
     if args.write_manifest:
         MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
         print(f"wrote {MANIFEST}")
@@ -543,6 +759,10 @@ def main(argv=None):
                 extra = f"  {item['role']}: {', '.join(item['names'])}"
             elif item["kind"] == "cover":
                 extra = "  *** THE REVEAL ***"
+            elif item["kind"] == "cta":
+                extra = f"  {item['text']}"
+            elif item["kind"] == "birthday":
+                extra = f"  {item['eyebrow']} -- {item['name']}"
             print(f"{fmt_tc(item['t']):>9}  {item['dur']:6.2f}s  {item['kind']:<9}{extra}")
         print(f"\ntotal {fmt_tc(total)} ({total:.3f}s), {len(items)} cards")
         names = sum(len(i['names']) for i in items if i['kind'] == 'wall')
@@ -558,10 +778,13 @@ def main(argv=None):
         return 0
 
     ffmpeg = find_ffmpeg()
-    media = REPO_ROOT / "media" / manifest["bed"]["media_filename"]
-    if not media.exists():
-        raise SystemExit(f"bed audio is missing: {media}\n"
-                         f"fetch it from {manifest['bed']['source_url']}")
+    medias = []
+    for cut in bed_passes(manifest["bed"]):
+        media = REPO_ROOT / "media" / cut["media_filename"]
+        if not media.exists():
+            raise SystemExit(f"bed audio is missing: {media}\n"
+                             f"fetch it from {cut['source_url']}")
+        medias.append(media)
 
     # THE TAIL IS DELIBERATELY LONGER THAN THE FILM.
     #
@@ -587,7 +810,7 @@ def main(argv=None):
     out_path.parent.mkdir(parents=True, exist_ok=True)
     cmd = [*ffmpeg, "-nostdin", "-hide_banner", "-v", "error", "-y",
            "-f", "concat", "-safe", "0", "-i", str(concat),
-           "-i", str(media),
+           *[arg for media in medias for arg in ("-i", str(media))],
            "-filter_complex", audio_filter(manifest["bed"], stream=1),
            "-map", "0:v:0", "-map", "[aout]",
            # THE DELIVERY BITSTREAM, from the spec rather than typed: every

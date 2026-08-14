@@ -62,6 +62,18 @@ What changed:
 - **`blueberry_Giklab` is gone** — the SHOT came out, so the roster is not
   reshuffled behind him and nobody else moved into the slot.
 
+### Natewaddington is out of the climax
+
+Owner: *"get rid of the nate wassington in the endless climax in endless."*
+His placard stood at film **260.000** (4:20), centre frame — the last card
+before the **269.700** downbeat the act climaxes on.
+
+Only the **scheduling** went, the same way HikariKnight's did. The placard's
+two rows are the owner's own copy and survive in git, the drop is recorded in
+`unresolved`, and nothing moved into the slot: krook and the bedazzle pill keep
+their anchors and Jorge stays pinned to 291.0. The run into the band's
+re-entry plays clean now.
+
 ### HikariKnight is out of the walk
 
 Owner: *"remove hikari from the eggroll scene."* His plate sat at source
@@ -430,7 +442,7 @@ double-credit guard allows an identical repeat) and pivots to *"Have you met
 our Ambassadors?"*.
 
 **§4, the endgame**: krook's pill at his 4:10, the untimed bedazzle line
-after it, the Natewaddington placard at his 4:20, the gaslighting pill at his
+after it, the gaslighting pill at his
 4:51 (over the cathedral shot's last 0.9 s, riding the black tail), and the
 five closing quotes spread evenly from there so the **last one ends on the
 film's final frame**. The letterbox callout — `#FIGHTFORCONTRIBUTORS -
