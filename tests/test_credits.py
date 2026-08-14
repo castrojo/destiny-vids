@@ -442,3 +442,41 @@ def test_the_director_card_is_still_jorges_one_reveal(manifest):
     named = [c for c in manifest["fixed_cards"]
              if any("Castro" in n for n in c["names"])]
     assert [c["role"] for c in named] == ["Directed by", "Introducing"]
+
+
+# --- the blue letters ------------------------------------------------------
+
+@pytest.mark.parametrize("text,expected", [
+    ("Bob Killen", "Bb"),        # already has blue; the F rule does not apply
+    ("Jacob Schnurr", "Bb"),
+    ("Project Bluefin", "Bb"),   # 'Bluefin' has an f, but its B wins
+    ("Jeefy", "Ff"),             # no B anywhere -> the f lights up
+    ("Rafael Castro", "Ff"),
+    ("cflewis", "Ff"),
+    ("Kat Cosgrove", "Ff"),      # neither letter present: nothing is lit
+])
+def test_a_name_with_a_b_does_not_also_get_its_fs(text, expected):
+    """The owner's rule: F is blue only for a name with no B in it, so
+    somebody who already has blue does not get more of it."""
+    assert C.blue_letters(text) == expected
+
+
+def test_the_rule_is_case_insensitive_both_ways():
+    assert C.blue_letters("BOB") == "Bb"
+    assert C.blue_letters("bob") == "Bb"
+    assert C.blue_letters("FRED") == "Ff"
+    assert C.blue_letters("fred") == "Ff"
+
+
+def test_a_name_with_no_b_paints_its_f_blue():
+    img = C.render_role_card("Introducing", ["ffff"])
+    colours = {p[:3] for p in img.convert("RGBA").getdata() if p[3] > 200}
+    assert C.ACCENT[:3] in colours
+
+
+def test_a_name_with_a_b_leaves_its_f_alone():
+    """'bf' must light the b and NOT the f -- the whole point of the rule."""
+    from PIL import ImageDraw
+    from tools.plate import _font
+    lit = C.blue_letters("bf")
+    assert "f" not in lit and "b" in lit
