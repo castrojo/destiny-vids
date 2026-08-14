@@ -77,6 +77,29 @@ python3 tools/bed.py measure media/<bed>.wav --id <bed_id> \
     --usage-class cc_by_4_0 --attribution "$(cat credit.txt)" ...
 ```
 
+## More than one recording of the same song, back to back
+
+A bed can play **N passes**, not one: an instrumental cut on loop, then the
+album version with vocals, is one bed with two passes and one clock. Keep the
+first pass exactly as measured and hang the next off it, so a re-cut of the
+tail cannot silently re-time the head.
+
+Three things that only bite when a second pass appears:
+
+- **Every seam costs the crossfade, not just the first.** `acrossfade`
+  *overlaps* its inputs, so N spans cost N−1 fades. Compute the total from the
+  spans and subtract every seam, or an anchor after the join lands early —
+  which is exactly how a reveal pinned to a transient ended up eight frames
+  late.
+- **A second recording is a second ffmpeg input.** Fold the spans left to
+  right with `acrossfade` and index each pass's own input; binding pass two to
+  input 1 plays pass one twice and exits 0.
+- **"After it loops once" means the loop is not shortened.** Play the first
+  pass whole and let the hand-over land where it lands.
+
+A pass played end to end never asks for a downbeat phase, so an
+`UNRESOLVED` phase on that record is not a blocker — record it and move.
+
 ## A second track, while the song is paused
 
 `audio: "insert"` plays a different track over a span — hold music under a
@@ -106,6 +129,7 @@ This skill is the contract. The procedure lives in `references/`:
 | "3:48 is 3:48." | Not once a section is gone. Edited 3:48 is source 4:00.098 here. |
 | "The tracklist says the bridge is at 4:20." | A tracklist is not a measurement. Read the centroid, the flatness and the percussive RMS, and confirm the boundary in two of them. |
 | "The instrumental is the album take with the vocals muted." | It is a different arrangement with a different length. Anchor by name and map each recording separately. |
+| "Two recordings back to back is one crossfade." | It is one *more* crossfade. Every seam overlaps, so N spans cost N−1 fades and everything after each join moves earlier by one. |
 | "True peak is over, I'll run loudnorm." | That rewrites the artist's dynamics. A static gain at the mux fixes the peak and changes nothing else. |
 | "I measured the peak on the bed, so the delivery is fine." | Measure the delivered file. The encode adds intersample peaks the WAV did not have. |
 | "The track needs a licence decision, so the cut is blocked." | Only if it is **uncleared**. Choosing between tracks that are already CC BY is taste, not rights — pick one, record the obligation, ship. See `AGENTS.md`, "A rights *decision* blocks. A rights *choice* does not." |
@@ -125,6 +149,8 @@ This skill is the contract. The procedure lives in `references/`:
 - Re-analysing a bed that already has a cached grid
 - A bed record with no measured spectral cutoff
 - A section boundary taken from a tracklist rather than measured
+- A bed's total computed as a plain sum of its spans when any seam is
+  crossfaded, or a second pass bound to the first pass's ffmpeg input
 - `loudnorm`, a compressor or a limiter anywhere near a finished master
 
 ## Verification

@@ -93,6 +93,23 @@ This skill is the contract. The procedure lives in `references/`:
 | "I can't see the video, but the description narrows it to one character." | Then park it in `leads.pending`. A binding is a claim about a real person; a queue entry is not. |
 | "The owner only said it about this one video, so it's an outline note." | Ask which object it is about. "Cut her from this cut" is editorial; "never show its body" is a rule about the character and belongs on the binding. |
 | "The allow-list is empty, so the rule isn't doing anything yet." | Empty means *exclude everything*, which is the rule at full strength. It is doing all of its work. |
+| "A refresh flag only re-fetches, so it is safe to run." | Check what else it rewrites. A snapshot command that also re-derives the CAST throws the owner's curated names away silently — the derivation is not the credit. |
+| "GitLab gives me a name and an email, so I have both." | Take the name. An email is somebody's contact detail, not copy, and a credit roll harvested into a committed manifest is the wrong place for hundreds of them. |
+| "I'll bracket the handle like the others in that run." | `[ name ]` is the placeholder marker here. Somebody wearing brackets wears them because the owner chose it; a new credit gets the login plain. |
+
+## Two ways a credit dies quietly
+
+**Derivation overwriting authored copy.** A credit list is authored once and is
+copy from then on: the owner decides how a real person is named. Any command
+that can rewrite it needs its own flag, and the default must be to leave it
+alone. Regenerating a cast because you asked for a *contributor* snapshot is
+data loss with a clean exit code.
+
+**Reaching for a name the platform did not verify.** A GitHub login resolves to
+an account somebody controls; a GitLab commit-author name does not resolve to
+anything, so it carries no face. Credit the name and let the portrait degrade
+to the ring — never fetch `github.com/<that name>.png`, which returns whichever
+stranger happens to hold the handle.
 
 ## Red Flags
 
@@ -105,6 +122,9 @@ This skill is the contract. The procedure lives in `references/`:
   phrase behind after removing one (the suite fails the other way too).
 - Casting someone because they turned up in a brief with plate copy. Copy is a
   credit for one video; a binding is a claim that they recur.
+- A snapshot or refresh command that rewrites authored credit copy as a side
+  effect, rather than behind its own flag.
+- A contributor's face fetched from a platform that never issued them a handle.
 - Treating `substitutability` as a usability gate. It was demoted: it only
   tie-breaks between otherwise-equal ensemble shots.
 - Widening a `depiction.rule` to a new value, or adding keys to the block, to
