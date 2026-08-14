@@ -151,18 +151,37 @@ def cast_card(slug):
         return None
 
 
-def _blue_bs(draw, xy, text, font, fill, tracking_em=0.0):
-    """Draw ``text``, setting every B in the film's blue.
+def blue_letters(text):
+    """Which characters of ``text`` are set in the film's blue.
 
-    Both cases: a wall of GitHub logins is mostly lower-case, and colouring
-    only the capitals would leave the effect invisible exactly where the names
-    are. Glyph by glyph because Pillow has no letter-spacing -- the same reason
+    The owner's rule, in two parts:
+
+    * every **B** is blue -- the original instruction;
+    * **F** is blue instead, but *only for a name with no B in it*, so
+      somebody who already has blue does not get more of it.
+
+    The unit is the whole credit as it appears on screen, which is why this
+    takes a string rather than a character: "Jeefy" has no B, so its f lights
+    up; "Bob Killen" has two B's already and its name stays as it is.
+
+    Both cases throughout. A wall of GitHub logins is mostly lower-case, and
+    matching only capitals would leave the effect invisible exactly where the
+    names are.
+    """
+    return "Bb" if ("B" in text or "b" in text) else "Ff"
+
+
+def _blue_bs(draw, xy, text, font, fill, tracking_em=0.0):
+    """Draw ``text`` with its blue letters picked out.
+
+    Glyph by glyph because Pillow has no letter-spacing -- the same reason
     ``plate.py`` hand-places its tracked type.
     """
+    lit = blue_letters(text)
     x, y = xy
     extra = tracking_em * font.size
     for ch in text:
-        draw.text((x, y), ch, font=font, fill=ACCENT if ch in "Bb" else fill)
+        draw.text((x, y), ch, font=font, fill=ACCENT if ch in lit else fill)
         x += draw.textlength(ch, font=font) + extra
 
 
