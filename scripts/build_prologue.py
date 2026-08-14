@@ -30,15 +30,22 @@ The three measured numbers
 None of these are the owner's timestamps taken on trust; each was read off the
 actual file, and the exact commands are in ``docs/cuts/00-prologue.md``.
 
+* **TITLE at 2.000, over black.** The owner: *"just show black at the beginning
+  of the prologue but have the bluefin logo fade straight in ... it should be
+  all black in the beginning then 'explode' into the burst behind the logo."*
+  So the picture is **gated to black** until the burst and the lockup fades up
+  from the top, alone, on nothing.
+* **BURST at 12.200.** The source's void sits on a flat luma plateau -- 45.9,
+  45.8, 46.0 across 12.08-12.16 -- and then departs it: 54.3 at 12.200, 62.5,
+  103.2, and blown out at 195.9 by 12.320. 12.200 is the first frame that
+  leaves the plateau, so cutting there lets the flare **bloom out of black**
+  instead of popping in half-lit. `fade=t=in:st=` holds every frame before its
+  start time fully black, which is the gate; verified on this host rather than
+  assumed.
 * **OUT at 91.200.** The owner said "stop at 1:31". The picture's mean luma
   falls from 46.9 at 88.8 s to a minimum of **30.0 at 91.2 s** and is climbing
   again by 91.4, so 1:31 sits one frame off a natural fade-to-black. The out
   point is moved to the actual minimum rather than the round number.
-* **TITLE at 11.000.** The source's own shot boundaries in this stretch are
-  12.28-12.56, 24.88, 36.32, 40.72, 44.36, 49.64 and 75.64. Cueing at 11.0
-  puts the title fully up over the empty dark **before** the void gives way to
-  the living world at 12.3, so the reveal happens through the title instead of
-  fighting it, and it clears long before the 24.88 cut.
 * **BRIDGE of 8.000.** The owner: *"put up a 03-bluefin-day.jxl and fade to the
   dark version so that that replaces the black part, make it seem like one
   movie"*. March's pair is the same drawing at two times of day -- pink sunset
@@ -84,7 +91,8 @@ OUT = REPO_ROOT / "renders" / "00-prologue.mp4"
 
 # --- the measured timeline, in source seconds --------------------------------
 OUT_POINT = 91.200          # the luma minimum; the owner's "1:31" is 91.0
-TITLE_IN = 11.000           # over the void, before the 12.28 shot change
+BURST = 12.200              # the explosion, MEASURED -- see below
+TITLE_IN = 2.000            # the logo fades in over black, from the top
 TITLE_FADE = 1.400
 STAGE_SWAP = 15.400         # hard cut A -> B: only the credit pair appears
 TITLE_OUT = 22.600          # clear of the 24.88 cut
@@ -182,9 +190,16 @@ def filtergraph():
     # 1920x804 scope, so it already carries the delivery width at native
     # pixels; 138 px of black top and bottom seats it in 16:9 without
     # resampling a single one of them.
+    #
+    # THE GATE. `fade=t=in:st=X` holds every frame before X fully black -- it
+    # is not only a ramp -- so one filter both blacks out the void and lets the
+    # burst bloom out of it. The duration is two frames: long enough not to be
+    # a hard-edged pop on the first bright pixel, short enough that this reads
+    # as an explosion rather than a dissolve.
     film = (f"[0:v]trim=0:{OUT_POINT:.3f},setpts=PTS-STARTPTS,"
             f"pad={W}:{H}:0:{(H - 804) // 2}:color=black,setsar=1,"
-            f"fps={FPS},format=rgba[film]")
+            f"fps={FPS},fade=t=in:st={BURST:.3f}:d={2 * 1001 / 60000:.4f},"
+            f"format=rgba[film]")
 
     # `enable=between(t\,a\,b)` with ESCAPED commas, not the quoted form the
     # docs show: tools/plate.py records a build that failed to parse the quoted
