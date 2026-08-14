@@ -253,3 +253,44 @@ the authored end, and a trimmed clip is **forced off the stream-copy path**
 because a copy cannot cut mid-GOP safely.
 
 **Programme: 32:40.249 → 32:23.016.**
+
+---
+
+# The fifth note (v2.2) — 15:31
+
+> *"entire transition is too weird and long, make it all fit."*
+
+What was there, in order: movement 3 ends on a **dark, static** shot of animal
+skulls in a hall; the song fades out over 2.0 s; the IV–V card holds **15.0 s
+in silence**; Kat's ships arrive. About **twenty seconds in which neither the
+picture nor the sound moved.**
+
+The 15 s was not an accident — it was deliberate pacing from when acts IV and V
+had their two slides collapsed into one, and a single card announcing 59 s of
+two acts was judged to deserve a longer hold.
+
+**What changed underneath it is this thread.** The card no longer follows an act
+that ends on movement; it follows a slow static shot, so the two stillnesses ran
+together.
+
+So the exception is retired rather than a new number invented: the slide holds
+**5.0 s**, what every other slide in the programme holds, and movement 3's
+`fade_out` goes 2.0 → 1.0 so the music carries closer to the card. The slide's
+owner-authored copy is untouched — only the hold is.
+
+The test asserts all act slides hold the **same** length rather than 5.0
+specifically: the house length is a choice, but having two of them by accident
+is the bug.
+
+**32:23.016 → 32:13.016.**
+
+---
+
+# Where the thread stands
+
+| | |
+|---|---|
+| Delivered | `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.2.mp4`, **32:13.152** |
+| Movements | 5, gapless, source order, `renders/perfume-2..5.mp4` + the prologue |
+| Chapter marks | **five** — acts VII and VIII have no slide, so no marker |
+| Open for the owner | #190 (one builder), #191 (the act VIII entry), #192 (the movement 5 in-point, and movement 3's length) |
