@@ -48,6 +48,12 @@ That boundary is what makes the tool safe to re-run: the programme is a
 **regenerated artifact**, so it is rebuilt rather than patched, exactly like
 every other render in this repo.
 
+**One sanctioned exception, and it proves the rule:** `trim_to` lets the
+programme end a delivered act early. It is not editing, because the act's own
+file is never touched — the cut lives in the plan, where it is read, tested
+and reverted like any other number. Anything more than "stop here" still
+belongs upstream.
+
 ## Core Process
 
 ```bash
@@ -86,6 +92,7 @@ This skill is the contract. The procedure lives in `references/`:
 |---|---|
 | [`cards.md`](references/cards.md) | Full-frame cards are rendered from the site's own CSS in a real browser, the plan's two item kinds, and why `audio` has no default. |
 | [`assembly-graph.md`](references/assembly-graph.md) | Segments-then-join (and the `filter_complex` deadlock it replaced), the `-vf` vs `-filter_complex` re-timing trap, and what has to be normalised. |
+| [`joins.md`](references/joins.md) | Where two finished things touch: the audio hole under a dramatic cut, `trim_to`, holds that go wrong without being edited, and measuring a brief's premise rather than its number. |
 
 ## Red Flags
 
@@ -152,6 +159,29 @@ This skill is the contract. The procedure lives in `references/`:
   applied by `afade` at the segment encode. Fades only — levelling one act
   against another is a mix decision for the owner. Measure first and after
   with `tools/transitions.py --measure` (issue #105).
+- **A fade is for a join into or out of SILENCE.** Where music meets music, or
+  where the picture is carrying the transition, a `fade_out` meeting a
+  `fade_in` is a four-second hole in the sound exactly where the cut lands.
+  Three of four owner notes on one build were this one bug. See
+  [`joins.md`](references/joins.md).
+- **Assembly may shorten an act only with `trim_to`, never with `dur`.** It
+  cuts picture and sound on one number of the act film clock and leaves the
+  act's own file untouched. A short `dur` changes the plan's arithmetic while
+  the segment still plays to its own end — the clock and the picture then
+  disagree. **Read the act's plate manifest before trimming its tail**: a
+  credit cut out is not recoverable by a revert.
+- **A hold is a relationship, not a property.** Re-ordering the programme can
+  make a slide's duration wrong without anybody editing it — a long card after
+  an act that now ends on a static shot is two stillnesses in a row. Prefer
+  retiring the exception to inventing a third number, and assert that holds
+  are equal to *each other*.
+- **Measure a brief's premise, not just its number.** "Match the pan" was
+  followed by a measurement showing 0 px of vertical motion on both sides.
+  Chasing the number would have moved a good cut to match a camera move that
+  does not exist.
+- **Removing a slide removes that act's chapter marker.** `chapters()` derives
+  markers from slides. If a card is dropped, keep its authored copy in the
+  deck under `retired` with a note, and record the lost marker as a decision.
 
 ## Verify, don't assert
 
