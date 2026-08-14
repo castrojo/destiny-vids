@@ -228,12 +228,19 @@ def bed_total(bed):
 
 
 def reveal_at(bed, reveal):
-    """Where a source timecode inside one span lands on the credits clock.
+    """Where the cover drops, on the CREDITS clock.
 
-    Given as ``segment`` + ``source_sec`` rather than a credits-clock number,
-    so it stays pinned to the musical event when the bed is re-cut. A measured
-    onset is the anchor; the arithmetic follows it.
+    Two ways to say it, and the difference matters:
+
+    * ``at_sec`` -- the owner naming a time in the finished cut ("**:22** is
+      when I want the comic book shot"). Taken literally, because it is a
+      statement about the film, not about the song.
+    * ``segment`` + ``source_sec`` -- pinned to a moment in the music, which
+      survives the bed being re-cut. The crossfade's overlap is subtracted
+      here; forgetting it once already put the cover eight frames late.
     """
+    if reveal.get("at_sec") is not None:
+        return float(reveal["at_sec"])
     xf = bed.get("crossfade_sec", 0.0)
     n = reveal["segment"]
     before = sum(s["end_sec"] - s["start_sec"] for s in bed["segments"][:n])
@@ -254,10 +261,17 @@ def schedule(manifest):
     items = []
     t = 0.0
 
-    for card in manifest["fixed_cards"]:
-        items.append({"kind": "role", "t": t, "dur": card["dur_sec"],
+    # The fixed cards fill exactly the gap before the reveal. Their dur_sec are
+    # RELATIVE WEIGHTS, scaled to the anchor: the owner named a time for the
+    # cover, so the cards give way to it rather than the other way round.
+    cards = manifest["fixed_cards"]
+    weight = sum(c["dur_sec"] for c in cards) or 1.0
+    for card in cards:
+        dur = card["dur_sec"] / weight * reveal
+        items.append({"kind": "role", "t": t, "dur": dur,
                       "role": card["role"], "names": card["names"]})
-        t += card["dur_sec"]
+        t += dur
+    t = reveal
 
     # The cast straddles the reveal. Everything cannot fit before it -- the
     # cover is pinned to a musical transient, not to a card count -- and
@@ -269,31 +283,21 @@ def schedule(manifest):
     # is generated: the cast list is only rewritten by --refresh-contributors,
     # so a login added to the manifest afterwards would otherwise never reach a
     # placard. Applying it every schedule keeps the two independent.
-    verified = {k: v for k, v in (manifest.get("cast_logins") or {}).items()
-                if not k.startswith("_")}
-    cast = [dict(c, login=c.get("login") or verified.get(c["person"]))
-            for c in manifest["cast"]]
-    target = manifest.get("cast_hold_sec", 4.0)
-    before = max(0, min(len(cast), int((reveal - t) // target)))
-    head, tail = cast[:before], cast[before:]
-
-    def place(person, at, dur):
-        return {"kind": "cast", "t": at, "dur": dur,
-                "person": person["person"], "character": person["character"],
-                "card": person.get("card"), "login": person.get("login")}
-
-    per = (reveal - t) / max(1, len(head))
-    for person in head:
-        items.append(place(person, t, per))
-        t += per
-
     hold = manifest["reveal"]["hold_sec"]
     items.append({"kind": "cover", "t": reveal, "dur": hold,
                   "image": manifest["reveal"]["image"]})
     t = reveal + hold
 
-    for person in tail:
-        items.append(place(person, t, target))
+    # The whole cast follows the cover, in order. The reveal introduces the
+    # people rather than interrupting them.
+    verified = {k: v for k, v in (manifest.get("cast_logins") or {}).items()
+                if not k.startswith("_")}
+    target = manifest.get("cast_hold_sec", 4.0)
+    for person in manifest["cast"]:
+        items.append({"kind": "cast", "t": t, "dur": target,
+                      "person": person["person"], "character": person["character"],
+                      "card": person.get("card"),
+                      "login": person.get("login") or verified.get(person["person"])})
         t += target
 
     wordmark = manifest["wordmark"]

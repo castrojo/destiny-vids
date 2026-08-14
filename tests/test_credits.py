@@ -79,14 +79,17 @@ def test_bed_total_is_a_plain_sum_without_a_crossfade():
 
 # --- the reveal ------------------------------------------------------------
 
-def test_the_reveal_lands_on_the_measured_crescendo(manifest):
-    """9.080 s into span B, which is a +10.53 dB onset in the source.
+def test_the_reveal_lands_where_the_owner_asked(manifest):
+    """':22 is when I want the comic book shot'.
 
-    The rendered file was measured back: the biggest onset in the window is at
-    56.180 s and the cover drops at 56.190 s -- 0.3 of a frame.
+    22.080 rather than a flat 22.000: a measured +5.01 dB onset sits there, so
+    the cut lands on a hit instead of mid-bar. Under three frames from the
+    time that was named, which is the point -- honour the instruction, then
+    land it on the music.
     """
     at = B.reveal_at(manifest["bed"], manifest["reveal"])
-    assert at == pytest.approx(56.19, abs=0.01)
+    assert at == pytest.approx(22.08, abs=0.001)
+    assert abs(at - 22.0) < 0.1, "the owner said :22; do not drift off it"
 
 
 def test_the_reveal_accounts_for_the_crossfade():
@@ -98,11 +101,43 @@ def test_the_reveal_accounts_for_the_crossfade():
     assert at == pytest.approx(50.0 - 0.25 + 9.0)
 
 
-def test_the_reveal_is_pinned_to_the_source_not_the_clock(manifest):
-    """Stored as segment+source_sec so a re-cut bed moves it automatically."""
-    assert "at_sec" not in manifest["reveal"]
+def test_the_musical_anchor_is_kept_as_the_fallback(manifest):
+    """``at_sec`` wins, but segment+source_sec stays recorded.
+
+    It is the reason the loop exists at all -- the song's opening crescendo --
+    and it is what the reveal falls back to if the explicit time is removed.
+    """
     assert manifest["reveal"]["segment"] == 1
     assert manifest["reveal"]["source_sec"] == 9.08
+    without = {k: v for k, v in manifest["reveal"].items() if k != "at_sec"}
+    assert B.reveal_at(manifest["bed"], without) == pytest.approx(56.19, abs=0.01)
+
+
+def test_an_explicit_time_is_taken_literally():
+    """A time named in the finished cut is a statement about the FILM, so no
+    crossfade arithmetic is applied to it."""
+    bed = {"segments": [{"start_sec": 100.0, "end_sec": 150.0},
+                        {"start_sec": 0.0, "end_sec": 60.0}], "crossfade_sec": 0.25}
+    assert B.reveal_at(bed, {"at_sec": 22.08, "segment": 1, "source_sec": 9.0}) == 22.08
+
+
+def test_the_whole_cast_follows_the_cover(manifest):
+    """'put the cast after' -- the reveal introduces the people."""
+    items, _ = B.schedule(manifest)
+    cover = next(i for i in items if i["kind"] == "cover")
+    for item in items:
+        if item["kind"] == "cast":
+            assert item["t"] >= cover["t"] + cover["dur"] - 0.001
+
+
+def test_the_fixed_cards_give_way_to_the_anchor(manifest):
+    """Their dur_sec are relative weights: the cards fit the owner's time,
+    not the other way round."""
+    items, _ = B.schedule(manifest)
+    roles = [i for i in items if i["kind"] == "role"]
+    assert roles[0]["t"] == 0
+    end = roles[-1]["t"] + roles[-1]["dur"]
+    assert end == pytest.approx(B.reveal_at(manifest["bed"], manifest["reveal"]), abs=0.001)
 
 
 # --- what is on screen -----------------------------------------------------
