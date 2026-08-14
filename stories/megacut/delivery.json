@@ -34,7 +34,7 @@
     "dialogue/yt_destiny_all_live_action_trailers",
     "vocab/casting.yaml"
    ],
-   "source_digest": "5340e1f767385fb04342490ad140e9e9dac0cda3225f94acf11fabfc1fa01371"
+   "source_digest": "45a93ad36faf73c1a830766e0761eae79c667a9f7389cba4526b123a0046f15f"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -93,15 +93,16 @@
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
-   "note": "3:48.430. Act VIII, the credits (#51). Encoded to the DELIVERY SPEC (59.94, high@4.2, bt709) so the megacut joins it by stream copy rather than conforming it at assembly time.",
+   "note": "7:50.453. Act VIII, the credits (#51), rebuilt 2026-08-14: a call to action before the comic reveal, the credits after it, a second bed pass with vocals, and four upstream projects. Encoded to the DELIVERY SPEC (59.94, high@4.2, bt709) so the megacut joins it by stream copy rather than conforming it at assembly time.",
    "sources": [
     "stories/08-credits.json",
     "scripts/build_credits.py",
     "tools/credits.py",
     "music/bed_wish_i_had_an_angel.json",
+    "music/bed_wish_i_had_an_angel_album.json",
     "vocab/casting.yaml"
    ],
-   "source_digest": "16fb32fbd7933fb6f65348e210512199949254004c90ade15196c2ff02b80de2"
+   "source_digest": "41e0680543af82bbc6f73fb029b77fc637e47a0ebfb46fe1d7625111017f5a57"
   }
  },
  "social": {

@@ -362,7 +362,8 @@ MONTAGE_STEP = 5.5
 # AN4-CH3CK-12 IS GONE. Owner: "Remove all this anacheck stuff for now."
 #
 # The announcer carried three blocks -- the four ranked montage cards, the two
-# TOC payoff cards, and the label on Natewaddington's placard. All three are
+# TOC payoff cards, and the label on Natewaddington's placard (the placard
+# itself is out too now, see TIMED_KROOK below). All three are
 # removed rather than re-voiced: the copy was written FOR that character, and
 # putting somebody else's name on his lines would be a different joke nobody
 # asked for. Every string survives in git and in `unresolved`, so bringing him
@@ -680,20 +681,21 @@ TOC_ANNOUNCEMENTS = [
 # 4:01. Which moves is the owner's call (#98, Questions) -- recorded in
 # `unresolved`, scheduled nowhere.
 TIMED_KROOK = 250.0          # 4:10
-TIMED_NATEWADDINGTON = 260.0  # 4:20
+# NATEWADDINGTON IS OUT, owner: "get rid of the nate wassington in the endless
+# climax in endless". His placard sat at film 260.000 (4:20) for SOLO_HOLD,
+# inside the run into the act's climax -- the song breaks down at 258.0 and the
+# band re-enters on the 269.700 downbeat, so his card was the last thing on
+# screen before the biggest musical event in the act.
+#
+# Only the SCHEDULING goes, exactly as it did for HikariKnight: the placard's
+# two rows were the owner's copy and they stay in git, the drop is recorded in
+# `unresolved`, and nothing slides up into the hole -- krook and the bedazzle
+# pill keep their own anchors and Jorge stays pinned to 291.0.
 TIMED_JORGE = 291.0          # 4:51 -- inside the cathedral shot, which ends
                              # 291.933; the pill rides the black tail
 TIMED_JORGE_HOLD = 2.8
 
-# "New Announcement Placard" -- the montage's heraldic shape, not a chat pill.
-# The brief gives the placard no rank, so it carries no rank's chrome.
-NATEWADDINGTON_PLACARD = {
-    "name": "[ Natewaddington ]",
-    "title": "Time for your first real contribution kids",
-}
-
-# The untimed §4 cue, in the order the brief lists it: after krook, before
-# the placard.
+# The untimed §4 cue, in the order the brief lists it: after krook.
 BEDAZZLE = {"speaker": "cncf marketing", "text": "Let's bedazzle this thing!"}
 
 # The letterbox callout. "Keep it up for the whole song": it comes up where
@@ -1506,17 +1508,11 @@ def build():
         "speaker": BEDAZZLE["speaker"],
         "text": BEDAZZLE["text"],
         "text_source": "owner_supplied",
-    }, {
-        "id": "timed_natewaddington",
-        "at": round(film_of(src_of(TIMED_NATEWADDINGTON)), 3),
-        "dur": SOLO_HOLD,
-        "position": "center",
-        "copy_source": "owner_supplied",
-        "seen_at_src": round(src_of(TIMED_NATEWADDINGTON), 3),
-        # No `label`: the eyebrow was AN4-CH3CK-12's name, and he is out. The
-        # placard's own two rows are the owner's and they stay.
-        **NATEWADDINGTON_PLACARD,
     }]
+    # NATEWADDINGTON'S PLACARD IS NOT HERE. Owner: "get rid of the nate
+    # wassington in the endless climax in endless." It stood at film 260.000
+    # for SOLO_HOLD, centre frame, the last card before the 269.700 downbeat.
+    # Nothing takes its slot -- the run into the climax plays clean now.
 
     # The gaslighting pill and the closing quotes: his 4:51, then an even
     # spread whose last card ENDS on the film's final frame, over the black
@@ -1612,6 +1608,12 @@ def build():
             "and 'Have you met our Ambassadors?'), and the eyebrow on "
             "Natewaddington's placard. Every string is still in git; 'for "
             "now' means this is a revert, not a rewrite",
+            "NATEWADDINGTON IS OUT, owner: 'get rid of the nate wassington "
+            "in the endless climax in endless'. His placard stood at film "
+            "260.000 (4:20) -- centre frame, the last card before the "
+            "269.700 downbeat the act climaxes on. Only the scheduling went: "
+            "his two authored rows are still in git, nothing moved into the "
+            "slot, and he is owed a credit somewhere nobody has decided yet",
             "the owner marked Joseph's last two lines one second apart "
             "(megacut 3:39 and 3:40) and a pill needs 2.2s to be read, so "
             "'You got this' is chained behind 'Master your skills' at 99.883 "
@@ -1672,8 +1674,8 @@ def build():
             "[ REDACTED ] card is at 287.933 (4:47.9), so a bubble anchored "
             "on him cannot also be at 4:01. TODO(owner): which moves -- the "
             "bubble to ~4:48, or the anchor (#98, Questions)",
-            "krook, Natewaddington, cgwalters, siosm, jberkus and preethi are "
-            "not in vocab/casting.yaml -- their pills and the placard render "
+            "krook, cgwalters, siosm, jberkus and preethi are "
+            "not in vocab/casting.yaml -- their pills render "
             "as placeholder badges with the drawn crest, and their GitHub "
             "logins are the owner's to confirm before any avatar is fetched "
             "(a login is not guessed). 'cncf marketing' as a speaker and the "

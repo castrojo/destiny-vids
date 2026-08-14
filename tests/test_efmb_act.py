@@ -352,11 +352,9 @@ def test_the_announcer_is_gone_entirely():
     assert "AN4-CH3CK" not in blob
     ids = {p["id"] for p in manifest["plates"]}
     assert not {i for i in ids if i.startswith(("announce_", "toc_announce_"))}
-    # The placard itself STAYS -- only its eyebrow was his.
-    placard = next(p for p in manifest["plates"]
-                   if p["id"] == "timed_natewaddington")
-    assert placard["name"] == "[ Natewaddington ]"
-    assert "label" not in placard
+    # The placard his eyebrow rode on is gone too now -- the owner cut it out
+    # of the climax in a later pass (test_natewaddington_is_out_of_the_climax).
+    assert "timed_natewaddington" not in ids
     assert any("anacheck" in u.lower() for u in manifest["unresolved"])
 
 
@@ -593,9 +591,7 @@ def test_the_timed_cues_land_on_the_owners_marks():
     """All ACT II FILM time, anchored to source so a cut that moves raises."""
     toc = toc_plates()
     assert toc["timed_krook"]["at"] == pytest.approx(250.0, abs=1e-3)
-    assert toc["timed_natewaddington"]["at"] == pytest.approx(260.0, abs=1e-3)
     assert toc["timed_jorge"]["at"] == pytest.approx(291.0, abs=1e-3)
-    assert toc["timed_natewaddington"]["name"] == "[ Natewaddington ]"
     assert toc["timed_krook"]["text"] == (
         "Generational talent detected, call in the best")
     # The 4:01 Cayde speech bubble is the owner's call, and stays unscheduled.
@@ -887,3 +883,26 @@ def test_hikariknight_is_out_of_the_eggroll_scene():
     assert by_id["walk_ge_stream"]["at"] == pytest.approx(
         build_efmb.film_for_source(build_efmb_plates.WALK_MARK_STREAM, lead),
         abs=1e-3)
+
+
+def test_natewaddington_is_out_of_the_climax():
+    """Owner: "get rid of the nate wassington in the endless climax in endless."
+
+    His placard stood at film 260.000 -- centre frame, the last card before
+    the 269.700 downbeat the act climaxes on. Only the SCHEDULING goes: the
+    copy survives in git, the drop is recorded, and nothing slides up into the
+    hole, because krook and Jorge are pinned to their own anchors.
+    """
+    manifest = build_efmb_plates.build()
+    ids = {p["id"] for p in manifest["plates"]}
+    assert "timed_natewaddington" not in ids
+    assert not any("waddington" in i.lower() for i in ids)
+    blob = json.dumps(manifest["plates"]).lower()
+    assert "waddington" not in blob, "no row of his copy reaches the frame"
+    assert any("waddington" in u.lower() for u in manifest["unresolved"]), \
+        "a dropped credit is recorded, never silently gone"
+
+    # Nothing moved into the slot he vacated, and nothing plays over the
+    # breakdown into the climax.
+    assert not any(256.0 <= p["at"] <= 269.0 for p in manifest["plates"]), \
+        "the run into the 269.700 downbeat plays clean"

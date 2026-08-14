@@ -90,7 +90,11 @@
           "exclusiveMinimum": 0
         },
         "downbeat_phase": {
-          "type": "integer",
+          "description": "The bar line's phase, or null when no phase is measurable against the tracked grid. tools/bed.py records null WITH its evidence rather than guessing an argmax (#89), and a record that carries null is honest rather than invalid -- the tools that need a phase refuse loudly, and a bed played whole (act VIII's album pass) never asks for one.",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 0
         },
         "downbeat_strength": {

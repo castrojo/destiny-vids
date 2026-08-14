@@ -72,7 +72,7 @@ import re
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 from tools.plate import _draw_tracked, _tracked_width
 
@@ -376,6 +376,160 @@ def render_role_card(role, names, index=0):
 REDACTED = "[ REDACTED ]"
 
 
+# --- the call to action ----------------------------------------------------
+#
+# Owner, 2026-08-14: *"noticeably larger font, more emphasis on the font -- no
+# italics, I want bold and blocky, make the filled in F's and blue sear with
+# heat for the big ones"*, and of FIGHT: *"HUGE BOLD FONT. BLUE F"*.
+#
+# Three sizes, so "noticeably larger" is a step somebody can see rather than a
+# nudge. The heights are capped against the frame below, so a long line sets
+# smaller instead of running off the sides -- WE MAKE OUR OWN FATE is twenty
+# characters and FIGHT is five.
+CTA_SCALE = {"medium": 150, "large": 250, "huge": 420}
+# Below this the sear is not drawn: a seared glyph on a small card is a smudge.
+CTA_SEAR_FROM = "large"
+
+# The heat, from the core out. White-hot at the centre of the stroke, through
+# the film's blue, into a cold halo that dies in the backdrop -- an F that is
+# GLOWING, not an F with a blue outline.
+SEAR_MID = (147, 197, 253, 255)      # ACCENT, the film's blue -- the fill
+SEAR_HALO = (37, 99, 235, 255)       # a deeper blue, the wide haze
+SEAR_FLARE = (196, 226, 255, 255)    # the tight flare right off the stroke
+
+
+def _sear(img, glyphs, font, blur=None):
+    """Burn a set of glyphs into ``img`` as if the metal were white-hot.
+
+    ``glyphs`` is ``[(x, y, ch), ...]`` already positioned by the caller, so
+    the sear lands exactly under the letters it belongs to rather than being
+    re-measured with different tracking.
+
+    The bloom is **additive**, which is what separates heat from a blue
+    outline: light from a glowing thing adds to what is behind it, so the
+    backdrop's dinosaurs are washed out around the letter instead of merely
+    being covered by it. Three radii stacked -- a wide deep-blue haze, a
+    tighter flare, and the filled letter over them. Kept RESTRAINED on the
+    owner's note ("tone down the sear"): the letter should look warm, not lit
+    from inside a furnace, and the backdrop's dinosaurs should still be
+    visible through the haze.
+    """
+    w, h = img.size
+    blur = blur or max(3, font.size * 0.035)
+
+    mask = Image.new("L", (w, h), 0)
+    md = ImageDraw.Draw(mask)
+    for x, y, ch in glyphs:
+        md.text((x, y), ch, font=font, fill=255)
+
+    glow = Image.new("RGB", (w, h), (0, 0, 0))
+    for radius, colour, gain in ((blur * 4.0, SEAR_HALO, 0.34),
+                                 (blur * 1.4, SEAR_MID, 0.36),
+                                 (blur * 0.5, SEAR_FLARE, 0.26)):
+        layer = Image.new("RGB", (w, h), colour[:3])
+        soft = mask.filter(ImageFilter.GaussianBlur(radius)).point(
+            lambda v, g=gain: int(v * g))
+        glow = ImageChops.add(glow, Image.composite(
+            layer, Image.new("RGB", (w, h), (0, 0, 0)), soft))
+
+    base = img.convert("RGB")
+    img.paste(Image.merge("RGBA", (*ImageChops.add(base, glow).split(),
+                                   Image.new("L", (w, h), 255))), (0, 0))
+
+    # THE LETTER IS FILLED BLUE. Owner, seeing the first pass: *"the F would
+    # look better filled in blue!"* -- so the glyph is solid in the film's own
+    # accent and the heat is entirely in the bloom around it. There is no
+    # white-hot core; a paler centre made it read as white type with a blue
+    # edge, which is the opposite of a blue letter under heat.
+    d = ImageDraw.Draw(img)
+    for x, y, ch in glyphs:
+        d.text((x, y), ch, font=font, fill=SEAR_MID)
+    return img
+
+
+def _cta_font(text, scale):
+    """The blocky face, at the biggest size the line fits in the frame.
+
+    Adwaita Sans **Black** upright -- no italics, per the instruction -- and
+    never a synthesised oblique. Long lines step down rather than overflowing:
+    the treatment is what makes a card read as huge, not a number that only
+    works for one string.
+    """
+    size = CTA_SCALE.get(scale, CTA_SCALE["large"])
+    probe = ImageDraw.Draw(Image.new("RGB", (8, 8)))
+    while size > 60:
+        font = _font("black", size)
+        if _tracked_width(probe, text, font, CTA_TRACKING) <= W - 160:
+            return font
+        size = int(size * 0.92)
+    return _font("black", size)
+
+
+CTA_TRACKING = 0.05
+
+
+def render_cta_card(text, scale="large", index=0):
+    """One line of the call to action, blocky and seared.
+
+    The F's are FILLED and glowing -- the owner's *"make the filled in F's and
+    blue sear with heat for the big ones"*. Every other letter is the deck's
+    pale type, so the heat has something to be hot against. On the smallest
+    tier the sear is skipped and the F simply takes the film's blue: a bloom
+    at 150px is a smudge.
+    """
+    img = backdrop(index)
+    d = ImageDraw.Draw(img)
+    font = _cta_font(text, scale)
+    seared = CTA_SCALE.get(scale, 0) >= CTA_SCALE[CTA_SEAR_FROM]
+
+    x = _centre(d, text, font, CTA_TRACKING)
+    y = H / 2 - font.size * 0.72
+    extra = CTA_TRACKING * font.size
+
+    hot, cold = [], []
+    lit = blue_letters(text)
+    for ch in text:
+        (hot if ch in "Ff" else cold).append((x, y, ch))
+        x += d.textlength(ch, font=font) + extra
+
+    if hot and seared:
+        _sear(img, hot, font)
+    else:
+        for gx, gy, ch in hot:
+            d.text((gx, gy), ch, font=font, fill=ACCENT)
+    for gx, gy, ch in cold:
+        # The B rule still applies to the letters that are not on fire, so
+        # BECOME LEGEND keeps its blue B.
+        d.text((gx, gy), ch, font=font, fill=ACCENT if ch in lit and ch not in "Ff" else TEXT)
+    return img
+
+
+def render_birthday_card(eyebrow, name, body, index=0):
+    """The one card in the call to action that is not a battle cry.
+
+    Set in the credit treatment -- the same shape as a role card -- because it
+    is a birthday card. Every string is the owner's, reproduced, and nothing is
+    added: no age row, no second name.
+    """
+    img = backdrop(index)
+    d = ImageDraw.Draw(img)
+
+    f_eye = _font("regular", 44)
+    f_name = _font("black", 128)
+    f_body = _font("regular", 38)
+
+    block = 78 + 150 + 96
+    y = (H - block) / 2
+    _draw_tracked(d, (_centre(d, eyebrow, f_eye, TRACKING), y), eyebrow, f_eye,
+                  ACCENT, TRACKING)
+    y += 92
+    _blue_bs(d, (_centre(d, name, f_name, 0.03), y), name, f_name, TEXT, 0.03)
+    y += 178
+    d.line([(W / 2 - 120, y - 26), (W / 2 + 120, y - 26)], fill=RULE, width=2)
+    _draw_tracked(d, (_centre(d, body, f_body, 0.04), y), body, f_body, DIM, 0.04)
+    return img
+
+
 def render_cast_placard(person, character, card=None, login=None, photo=None,
                         index=0):
     """One member of the cast.
@@ -451,18 +605,190 @@ NAMES_PER_WALL = GRID_COLS * GRID_ROWS
 # "Larger" is not a font size on the same grid -- a bigger name over the same
 # 116px face reads as a typo. It is a different grid: six across, three down,
 # so eighteen people get the room forty-eight had. "More distinguished" is the
-# eyebrow above the section name saying what they are, and a rule the full
-# width of the block rather than a 600px dash.
+# badge lockup above the section name, and a rule the full width of the block
+# rather than a 600px dash.
 UPSTREAM_COLS, UPSTREAM_ROWS = 6, 3
 UPSTREAM_PER_WALL = UPSTREAM_COLS * UPSTREAM_ROWS
-UPSTREAM_EYEBROW = "UPSTREAM"
+
+# THE EYEBROW IS A CALL TO ACTION NOW. Owner, 2026-08-14: *"Change Upstream to
+# #UPSTREAMFIRST call to action at the top."*
+UPSTREAM_EYEBROW = "#UPSTREAMFIRST"
+
+# AND EVERY TEAM WALL CARRIES ONE ALONG THE BOTTOM. Owner: *"When we're
+# shoting the team credits Let's add huge hashtags #linuxforever at the bottom
+# as a call to action."*
+WALL_HASHTAG = "#linuxforever"
+
 # How much longer an upstream wall holds than a Bluefin one. It carries 18
 # faces against 48, so at a flat rate it would flick past nearly three times
 # as fast as the tier it outranks.
 UPSTREAM_WALL_WEIGHT = 1.25
 
+# THE BADGES. Owner: *"make these badges be AWESOME. For the elite"*, and
+# *"let's snag the logos to these projects and make them look GOOD."* Each
+# value is a mark cached by scripts/fetch_brand_marks.py from the project's
+# OWN published artwork. A section with no mark -- bootc publishes none --
+# keeps the type-only heading, which is the degrade rather than a redrawn
+# approximation of somebody's logo.
+SECTION_MARKS = {
+    "Fedora CoreOS": "fedora",
+    "GNOME OS": "gnome",
+    "KDE Linux": "kde",
+}
+MARKS_DIR = RENDERS / "marks"
 
-def render_name_wall(section, names, page=1, pages=1, tier=None, index=0):
+
+def section_mark(section, height):
+    """The project's own logo at ``height`` px, or ``None``.
+
+    Capped by WIDTH as well: Fedora publishes a wide horizontal lockup and
+    KDE a square badge, and matching them on height alone made one badge twice
+    the width of the other.
+    """
+    name = SECTION_MARKS.get(section)
+    if not name:
+        return None
+    return _mark(name, height, max_width=120)
+
+
+def _badge(section, mark):
+    """The section's name with its project's symbol beside it.
+
+    RESTRAINED, on the owner's correction of the first pass: *"you overdid the
+    logos those are tacky, smaller and symbolic."* So there is no plate, no rim
+    and no glow -- a small symbol at cap height, a gap, and the name. The mark
+    is the project's icon rather than its horizontal wordmark, because a lockup
+    that spells the brand out cannot be small.
+    """
+    f_head = _font("bold", 68)
+    probe = ImageDraw.Draw(Image.new("RGB", (8, 8)))
+    text_w = _tracked_width(probe, section, f_head, 0.02)
+    gap = 22
+    mark_w = mark.width if mark is not None else 0
+    w = int(mark_w + (gap if mark is not None else 0) + text_w) + 4
+    h = 96
+
+    out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(out)
+    x = 0
+    if mark is not None:
+        out.alpha_composite(mark, (0, int((h - mark.height) / 2)))
+        x = mark.width + gap
+    _draw_tracked(d, (x, (h - f_head.size) / 2 - 10), section, f_head, TEXT, 0.02)
+    return out
+
+
+def _ghost(size):
+    """The outline of a maintainer who does not exist yet.
+
+    Owner: *"put a outline of a ghost maintainer 'The Next KyleGospo' and then
+    put a title under it 'Curse of Maintainership'"* -- an easter egg and a
+    call for a volunteer. It is drawn, not fetched: there is no such person, so
+    there is no face, and it must never be mistaken for a contributor row.
+    """
+    img = Image.new("RGBA", (size * 4, size * 4), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    s = size * 4
+    ink = (147, 197, 253, 150)
+    d.ellipse([3, 3, s - 4, s - 4], outline=ink, width=7)
+    # A head and shoulders inside the ring: the silhouette a missing avatar
+    # would have had.
+    d.ellipse([s * 0.34, s * 0.20, s * 0.66, s * 0.52], outline=ink, width=7)
+    d.arc([s * 0.20, s * 0.52, s * 0.80, s * 1.02], start=180, end=360,
+          fill=ink, width=7)
+    out = img.resize((size, size), Image.LANCZOS)
+    return out
+
+
+BUBBLE_LINES = ("So many. Running out of metal.", "Deploying CNCF Metal3")
+
+
+def _metal3_green():
+    """Metal3's own brand green, sampled from its published mark.
+
+    Not recalled and not eyedropped from a screenshot: the most common opaque
+    colour in the logo file this repo cached from the project's docs.
+    """
+    path = MARKS_DIR / "metal3.png"
+    if not path.exists():
+        return (0, 210, 160, 255)
+    img = Image.open(path).convert("RGBA").resize((64, 64), Image.LANCZOS)
+    counts = {}
+    for r, g, b, a in img.getdata():
+        if a > 200 and not (r > 230 and g > 230 and b > 230):
+            counts[(r, g, b)] = counts.get((r, g, b), 0) + 1
+    if not counts:
+        return (0, 210, 160, 255)
+    return (*max(counts, key=counts.get), 255)
+
+
+def _bubble(text, stylise_three=False, alpha=255):
+    """A side bubble: the gag that rides the upstream walls.
+
+    Owner: *"a side bubble for comedic effect: 'So many. Running out of
+    metal.' have that fade to 'Deploying CNCF Metal3' with the 3 being
+    stylized like the cncf."* The 3 is set in Metal3's own brand green beside
+    its cube, which is what makes it read as the project rather than as a
+    digit somebody coloured in.
+    """
+    f = _font("semibold", 29)
+    probe = ImageDraw.Draw(Image.new("RGB", (8, 8)))
+    mark = None
+    if stylise_three:
+        mark = _mark("metal3", 38)
+    text_w = probe.textlength(text, font=f)
+    pad = 28
+    w = int(text_w + pad * 2 + ((mark.width + 12) if mark is not None else 0))
+    h = 88
+
+    img = Image.new("RGBA", (w * 2, h * 2), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([0, 0, w * 2 - 1, h * 2 - 12], radius=52,
+                        fill=(12, 20, 38, 205), outline=(147, 197, 253, 150),
+                        width=5)
+    # The tail, so it reads as somebody speaking rather than as a caption.
+    d.polygon([(w * 0.30, h * 2 - 14), (w * 0.46, h * 2 - 14),
+               (w * 0.33, h * 2 - 1)], fill=(12, 20, 38, 205))
+    img = img.resize((w, h), Image.LANCZOS)
+
+    d = ImageDraw.Draw(img)
+    x = pad
+    y = (h - 24) / 2 - 18
+    if stylise_three:
+        head, tail = text[:-1], text[-1]
+        d.text((x, y), head, font=f, fill=TEXT)
+        x += probe.textlength(head, font=f)
+        d.text((x, y), tail, font=_font("black", 34), fill=_metal3_green())
+        if mark is not None:
+            img.alpha_composite(mark, (int(x + 28), int(y - 5)))
+    else:
+        d.text((x, y), text, font=f, fill=TEXT)
+
+    if alpha < 255:
+        img.putalpha(img.getchannel("A").point(lambda v: int(v * alpha / 255)))
+    return img
+
+
+def _mark(name, height, max_width=None):
+    path = MARKS_DIR / f"{name}.png"
+    if not path.exists():
+        return None
+    try:
+        mark = Image.open(path).convert("RGBA")
+    except OSError:
+        return None
+    box = mark.getbbox()
+    if box:
+        mark = mark.crop(box)
+    width = max(1, int(mark.width * height / mark.height))
+    if max_width and width > max_width:
+        height = max(1, int(height * max_width / width))
+        width = max_width
+    return mark.resize((width, height), Image.LANCZOS)
+
+
+def render_name_wall(section, names, page=1, pages=1, tier=None, index=0,
+                     ghost=None, bubble_mix=None):
     """A screenful of one project's contributors: their faces and their logins.
 
     Nine across, four down -- six by three for the upstream tier, which is the
@@ -470,6 +796,11 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0):
     writes it, and is truncated with an ellipsis rather than allowed to collide
     with its neighbour: a name running into the next one is worse than a
     shortened one.
+
+    ``ghost`` puts the outlined maintainer in the last cell. ``bubble_mix``
+    dissolves the side gag from its first line to its second: 0 is all of the
+    first, 1 is all of the second, and a wall in between carries both at half
+    strength, which is how a still-based film fades.
     """
     img = backdrop(index)
     d = ImageDraw.Draw(img)
@@ -481,13 +812,17 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0):
 
     head_y = 54
     if up:
-        f_eye = _font("regular", 26)
+        f_eye = _font("bold", 30)
         _draw_tracked(d, (_centre(d, UPSTREAM_EYEBROW, f_eye, TRACKING), head_y),
                       UPSTREAM_EYEBROW, f_eye, ACCENT, TRACKING)
-        head_y += 46
-    _blue_bs(d, (_centre(d, section, f_head, 0.02), head_y), section, f_head,
-             TEXT, 0.02)
-    rule_y = head_y + (96 if up else 76)
+        head_y += 52
+        badge = _badge(section, section_mark(section, 54))
+        img.alpha_composite(badge, (int((W - badge.width) / 2), int(head_y)))
+        rule_y = head_y + badge.height + 18
+    else:
+        _blue_bs(d, (_centre(d, section, f_head, 0.02), head_y), section, f_head,
+                 TEXT, 0.02)
+        rule_y = head_y + 76
     half = 460 if up else 300
     d.line([(W / 2 - half, rule_y), (W / 2 + half, rule_y)],
            fill=(147, 197, 253, 170) if up else RULE, width=3 if up else 2)
@@ -497,18 +832,34 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0):
         _draw_tracked(d, (_centre(d, tag, f_pg, TRACKING), rule_y + 16), tag,
                       f_pg, DIM, TRACKING)
 
-    size, row_h = (180, 262) if up else (116, 196)
+    size, row_h = (150, 216) if up else (116, 196)
     col_w = (W - (260 if up else 200)) / cols
-    rows = -(-len(names) // cols) if names else 0
+    cells = list(names) + ([ghost] if ghost else [])
+    rows = -(-len(cells) // cols) if cells else 0
     # The block is centred in what is LEFT under the heading, and the reserve
-    # at the bottom is the label's own line -- an upstream login sets at 30px
-    # and a bottom row laid out on face height alone loses its descenders.
-    top = rule_y + 46 + max(0, (H - rule_y - 46 - 60) - (rows * row_h)) / 2
+    # at the bottom is the HASHTAG's own band -- 150 px of it. The first pass
+    # reserved 60 and the call to action landed on top of the last row of
+    # faces, which is the sort of thing only a rendered frame tells you.
+    top = rule_y + 36 + max(0, (H - rule_y - 36 - 168) - (rows * row_h)) / 2
 
-    for i, login in enumerate(names):
+    for i, cell in enumerate(cells):
         c, r = i % cols, i // cols
         cx = (130 if up else 100) + c * col_w + col_w / 2
         y = top + r * row_h
+        if isinstance(cell, dict):
+            # THE GHOST. No avatar is fetched and none ever will be: there is
+            # nobody to fetch. Its two rows are the owner's copy.
+            img.alpha_composite(_ghost(size), (int(cx - size / 2), int(y)))
+            f_g = _font("semibold", 26 if up else 20)
+            f_t = _font("regular", 21 if up else 17)
+            label = cell["name"]
+            _draw_tracked(d, (cx - _tracked_width(d, label, f_g, 0.02) / 2,
+                              y + size + 14), label, f_g, ACCENT, 0.02)
+            title = cell["title"]
+            _draw_tracked(d, (cx - _tracked_width(d, title, f_t, 0.06) / 2,
+                              y + size + 48), title, f_t, DIM, 0.06)
+            continue
+        login = cell
         face = avatar(login, size)
         img.alpha_composite(face if face is not None else _empty_circle(size),
                             (int(cx - size / 2), int(y)))
@@ -519,6 +870,23 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0):
             label = label[:-1] + "\u2026"
         _blue_bs(d, (cx - d.textlength(label, font=f_name) / 2, y + size + 16),
                  label, f_name, TEXT)
+
+    # THE CALL TO ACTION ALONG THE BOTTOM, on every team wall.
+    f_tag = _font("black", 76)
+    tag_y = H - 118
+    _blue_bs(d, (_centre(d, WALL_HASHTAG, f_tag, 0.02), tag_y), WALL_HASHTAG,
+             f_tag, (147, 197, 253, 235), 0.02)
+
+    if bubble_mix is not None:
+        # BOTTOM RIGHT, beside the hashtag rather than over the badge. The
+        # first pass put it top-right, where it sat straight across the
+        # section's own name.
+        for line, weight, three in ((BUBBLE_LINES[0], 1.0 - bubble_mix, False),
+                                    (BUBBLE_LINES[1], bubble_mix, True)):
+            if weight <= 0.01:
+                continue
+            bub = _bubble(line, stylise_three=three, alpha=int(255 * weight))
+            img.alpha_composite(bub, (W - bub.width - 40, H - bub.height - 6))
     return img
 
 

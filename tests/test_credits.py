@@ -157,14 +157,67 @@ def test_the_whole_cast_follows_the_cover(manifest):
             assert item["t"] >= cover["t"] + cover["dur"] - 0.001
 
 
-def test_the_fixed_cards_give_way_to_the_anchor(manifest):
-    """Their dur_sec are relative weights: the cards fit the owner's time,
-    not the other way round."""
+def test_the_call_to_action_gives_way_to_the_anchor(manifest):
+    """The CTA cards' dur_sec are relative weights: they fit the owner's time,
+    not the other way round.
+
+    Owner, 2026-08-14: "Move the existing credits to after the comic reveal,
+    instead let's make this part leading up to it a call to action."
+    """
     items, _ = B.schedule(manifest)
+    cta = [i for i in items if i["kind"] in ("cta", "birthday")]
+    assert cta[0]["t"] == 0
+    end = cta[-1]["t"] + cta[-1]["dur"]
+    assert end == pytest.approx(B.reveal_at(manifest["bed"], manifest["reveal"]),
+                                abs=0.001)
+
+
+def test_the_call_to_action_is_the_owners_words_in_his_order(manifest):
+    cards = manifest["cta_cards"]
+    assert [c.get("text") or c["name"] for c in cards] == [
+        "WE MAKE OUR OWN FATE", "BECOME LEGEND", "RAFAEL CASTRO", "FIGHT"]
+    assert [c["kind"] for c in cards] == ["cta", "cta", "birthday", "cta"]
+    # "noticeably larger font" is a step somebody can see, in this order.
+    scales = [C.CTA_SCALE[c["scale"]] for c in cards if c["kind"] == "cta"]
+    assert scales == sorted(scales) and len(set(scales)) == 3
+
+
+def test_fight_is_up_longer_than_the_first_two(manifest):
+    """Owner: 'FIGHT <--- I want this one up longer than the first 2'."""
+    items, _ = B.schedule(manifest)
+    cta = [i for i in items if i["kind"] == "cta"]
+    fight = next(i for i in cta if i["text"] == "FIGHT")
+    first_two = [i for i in cta if i["text"] != "FIGHT"][:2]
+    assert fight["dur"] > sum(c["dur"] for c in first_two)
+
+
+def test_the_reveal_length_was_not_touched(manifest):
+    """Owner, in the same breath: '(do not touch the comic book reveal
+    length.)' -- so the cover's own hold is what it always was."""
+    assert manifest["reveal"]["hold_sec"] == 14.0
+    assert manifest["reveal"]["at_sec"] == 22.08
+
+
+def test_the_credits_follow_the_comic_reveal(manifest):
+    """Owner: 'Move the existing credits to after the comic reveal'."""
+    items, _ = B.schedule(manifest)
+    cover = next(i for i in items if i["kind"] == "cover")
     roles = [i for i in items if i["kind"] == "role"]
-    assert roles[0]["t"] == 0
-    end = roles[-1]["t"] + roles[-1]["dur"]
-    assert end == pytest.approx(B.reveal_at(manifest["bed"], manifest["reveal"]), abs=0.001)
+    assert roles, "the fixed credits still play"
+    assert all(r["t"] >= cover["t"] + cover["dur"] - 0.001 for r in roles)
+    # And their dur_sec are seconds now, not weights.
+    for item, card in zip(roles, manifest["fixed_cards"]):
+        assert item["dur"] == pytest.approx(card["dur_sec"], abs=1e-6)
+
+
+def test_the_birthday_card_is_the_owners_copy(manifest):
+    """The owner's own words, reproduced. Nothing added: no age row, and no
+    second name -- the redacted one went with the card that carried it."""
+    card = next(c for c in manifest["cta_cards"] if c["kind"] == "birthday")
+    assert card["eyebrow"] == "Happy Tenth Birthday"
+    assert card["name"] == "RAFAEL CASTRO"
+    assert card["body"] == '"We love you" - Mom and Dad'
+    assert "names" not in card
 
 
 # --- what is on screen -----------------------------------------------------
@@ -181,46 +234,48 @@ def test_the_bluefin_creators_open_the_credits(manifest):
     assert manifest["fixed_cards"][0]["names"] == ["Jacob Schnurr", "Andy Frazer"]
 
 
-def test_the_introducing_card_closes_the_fixed_credits(manifest):
-    """The debut credit is the last card before the cover drops."""
+def test_the_introducing_card_became_the_birthday_card(manifest):
+    """Owner, 2026-08-14: 'Change introducing Rafael to Happy Tenth Birthday'.
+
+    The card left the fixed credits entirely -- it is a call-to-action card
+    now -- and the fixed credits are the three that remain.
+    """
     roles = [c["role"] for c in manifest["fixed_cards"]]
-    assert roles[-1] == "Introducing"
-    assert roles.index("Directed by") == len(roles) - 2
+    assert "Introducing" not in roles
+    assert roles[-1] == "Directed by"
 
 
 def test_the_fixed_cards_are_in_the_owners_order(manifest):
     assert [c["role"] for c in manifest["fixed_cards"]] == [
-        "Bluefin Created by", "Music by", "Directed by", "Introducing"]
+        "Bluefin Created by", "Music by", "Directed by"]
 
 
 def test_the_second_introduced_name_stays_redacted(manifest):
-    """The owner redacted it. `[ REDACTED ]` is AUTHORED COPY, not a
-    placeholder awaiting resolution -- the deck's own convention
-    (docs/skills/plates/references/plate-chrome.md) is explicit that it must
-    never be 'helpfully' substituted with a real name.
-
-    The redacted name is deliberately absent from this repo, which is what a
+    """The owner redacted it, and then removed the card it rode on. Either
+    way the name is deliberately absent from this repo, which is what a
     redaction is for.
-    """
-    card = next(c for c in manifest["fixed_cards"] if c["role"] == "Introducing")
-    assert card["names"] == ["Rafael Castro", "[ REDACTED ]"]
 
-    # EVERYTHING THIS REPO WROTE, and nothing GitHub returned. The contributor
-    # walls are a frozen API snapshot of other people's LOGINS, and the
-    # Fedora CoreOS list contains `lakshmiravichandran1` -- a real, different
-    # person whose login happens to contain the string. Scanning it would
-    # assert that no contributor may share a substring with a redacted name,
-    # which is a rule about strangers' usernames, not about the redaction.
+    EVERYTHING THIS REPO WROTE is scanned, and nothing GitHub returned. The
+    contributor walls are a frozen API snapshot of other people's LOGINS, and
+    the Fedora CoreOS list contains `lakshmiravichandran1` -- a real,
+    different person whose login happens to contain the string. Scanning it
+    would assert that no contributor may share a substring with a redacted
+    name, which is a rule about strangers' usernames, not about the
+    redaction.
+    """
     authored = {k: v for k, v in manifest.items() if k != "contributors"}
     blob = json.dumps(authored).lower()
     assert "mehta" not in blob and "lakshmi" not in blob and "laskshmi" not in blob, \
         "the redacted name must not survive anywhere in the authored manifest"
 
 
-def test_the_redaction_uses_the_decks_own_form(manifest):
-    """Same string the plates carry, so act VIII matches acts I-VII."""
-    card = next(c for c in manifest["fixed_cards"] if c["role"] == "Introducing")
-    assert "[ REDACTED ]" in card["names"]
+def test_the_redaction_treatment_survives_the_card_that_used_it(manifest):
+    """`[ REDACTED ]` is AUTHORED COPY, not a placeholder awaiting resolution
+    (docs/skills/plates/references/plate-chrome.md). The Introducing card is
+    gone, but the cast redactions still use the deck's own form, so the
+    convention is still enforced somewhere."""
+    assert C.REDACTED == "[ REDACTED ]"
+    assert manifest["cast_redactions"]
 
 
 def test_the_band_is_spelled_as_the_bed_record_spells_it(manifest):
@@ -359,8 +414,8 @@ def test_nothing_on_screen_is_uppercased(manifest):
 
 def test_section_headings_keep_their_authored_case(manifest):
     assert [s["section"] for s in manifest["contributors"]] == [
-        "Fedora CoreOS", "bootc", "Project Bluefin", "Aurora", "Bazzite",
-        "Universal Blue"]
+        "Fedora CoreOS", "bootc", "GNOME OS", "KDE Linux",
+        "Universal Blue", "Bazzite", "Aurora", "Project Bluefin"]
 
 
 def test_the_upstream_projects_lead_and_are_marked_as_upstream(manifest):
@@ -371,7 +426,7 @@ def test_the_upstream_projects_lead_and_are_marked_as_upstream(manifest):
     """
     upstream = [s["section"] for s in manifest["contributors"]
                 if s.get("tier") == "upstream"]
-    assert upstream == ["Fedora CoreOS", "bootc"]
+    assert upstream == ["Fedora CoreOS", "bootc", "GNOME OS", "KDE Linux"]
 
     items, _ = B.schedule(manifest)
     walls = [i for i in items if i["kind"] == "wall"]
@@ -556,10 +611,14 @@ def test_the_renderer_refuses_a_face_beside_a_redacted_name():
 
 
 def test_the_director_card_is_still_jorges_one_reveal(manifest):
-    """The redaction only makes sense if he is named exactly once."""
+    """He is named exactly once in the credits.
+
+    The Introducing card used to name him a second time; it became the
+    birthday card, which names Rafael and credits nobody as a role.
+    """
     named = [c for c in manifest["fixed_cards"]
              if any("Castro" in n for n in c["names"])]
-    assert [c["role"] for c in named] == ["Directed by", "Introducing"]
+    assert [c["role"] for c in named] == ["Directed by"]
 
 
 # --- the blue letters ------------------------------------------------------
@@ -684,3 +743,189 @@ def test_the_picture_is_padded_so_it_outlasts_the_music():
     source = (REPO_ROOT / "scripts" / "build_credits.py").read_text()
     assert "tpad=stop_mode=clone:stop_duration=" in source
     assert B.CONCAT_TAIL_SEC > 0
+
+
+# --- the second pass of the bed --------------------------------------------
+
+def test_the_vocal_version_follows_the_whole_instrumental_loop(manifest):
+    """Owner: 'switch to the album version with vocals after the entire
+    instrumental loops once'.
+
+    'the ENTIRE instrumental' is load-bearing: the loop is not cut short to
+    make room for the vocal. Pass one keeps both of its measured spans.
+    """
+    passes = B.bed_passes(manifest["bed"])
+    assert len(passes) == 2
+    assert passes[0]["bed_id"] == "bed_wish_i_had_an_angel"
+    assert passes[1]["bed_id"] == "bed_wish_i_had_an_angel_album"
+    assert len(passes[0]["segments"]) == 2
+    assert passes[0]["segments"][0]["start_sec"] == 193.42
+    assert passes[1]["segments"][0]["start_sec"] == 0.0
+
+
+def test_the_album_pass_stops_before_the_file_runs_out(manifest):
+    """243.400 is measured -- the recording is at -54 dB by 243 -- so the film
+    ends on the song's own ending rather than on digital silence."""
+    album = B.bed_passes(manifest["bed"])[1]
+    record = json.loads((REPO_ROOT / "music" /
+                         "bed_wish_i_had_an_angel_album.json").read_text())
+    end = album["segments"][0]["end_sec"]
+    assert end < record["duration_sec"]
+    assert record["duration_sec"] - end < 1.0
+
+
+def test_every_span_of_both_passes_reaches_the_filtergraph(manifest):
+    """The album version is a SECOND ffmpeg input; binding it to input 1
+    would silently play the instrumental twice."""
+    graph = B.audio_filter(manifest["bed"], stream=1)
+    assert graph.count("atrim") == len(B.bed_spans(manifest["bed"]))
+    assert "[1:a]" in graph and "[2:a]" in graph
+    # Every seam is crossfaded, including the hand-over between passes.
+    assert graph.count("acrossfade") == len(B.bed_spans(manifest["bed"])) - 1
+    assert graph.endswith("[aout]")
+
+
+def test_the_bed_total_pays_for_every_seam(manifest):
+    """acrossfade OVERLAPS, so three spans cost two fades, not one."""
+    spans = B.bed_spans(manifest["bed"])
+    raw = sum(s["end_sec"] - s["start_sec"] for s in spans)
+    xf = manifest["bed"]["crossfade_sec"]
+    assert B.bed_total(manifest["bed"]) == pytest.approx(
+        raw - (len(spans) - 1) * xf, abs=1e-9)
+
+
+# --- the upstream tier, the badges and the call-outs ------------------------
+
+def test_gnome_os_is_the_project_not_the_whole_org(manifest):
+    """Owner: 'Only have GNOME OS since it's such a large org'."""
+    gnome = next(s for s in manifest["contributors"]
+                 if s["section"] == "GNOME OS")
+    assert gnome["repo"] == "GNOME/gnome-build-meta"
+    assert gnome["tier"] == "upstream"
+
+
+def test_the_gitlab_sections_carry_names_and_never_emails(manifest):
+    """GitLab answers with a commit author's name AND email. An email is
+    somebody's contact detail, not copy, and a credit roll harvested into a
+    committed manifest is the wrong place for a few hundred of them."""
+    for label in ("GNOME OS", "KDE Linux"):
+        section = next(s for s in manifest["contributors"]
+                       if s["section"] == label)
+        assert section["host"] in ("gitlab.gnome.org", "invent.kde.org")
+        assert not any("@" in n for n in section["names"])
+
+
+def test_the_gitlab_names_are_never_fetched_as_github_logins(manifest, tmp_path):
+    """github.com/'Harald Sitter'.png is not a missing avatar, it is a
+    category error -- and whatever answered would be a face beside somebody
+    else's name."""
+    seen = []
+
+    class Recorder:
+        def __init__(self, *a, **k):
+            seen.append(a[0] if a else k.get("url"))
+            raise OSError("no network in tests")
+
+    import urllib.request
+    orig = urllib.request.urlopen
+    urllib.request.urlopen = Recorder
+    orig_dir, C.AVATAR_DIR = C.AVATAR_DIR, tmp_path
+    try:
+        B.fetch_avatars(manifest, verbose=False)
+    finally:
+        urllib.request.urlopen = orig
+        C.AVATAR_DIR = orig_dir
+    gitlab_names = [n for s in manifest["contributors"]
+                    if s.get("host") for n in s["names"]]
+    assert gitlab_names, "the GitLab sections are populated"
+    # EXACT urls, not a substring scan: the GitLab name "Sam" is a substring
+    # of the GitHub login "SamD2021", and asserting on substrings would fail
+    # on a real, correctly-fetched face.
+    asked = {url.rsplit("/", 1)[-1].split(".png")[0] for url in seen if url}
+    assert not (asked & set(gitlab_names))
+
+
+def test_the_named_kde_maintainers_are_on_screen(manifest):
+    """Owner: 'put at least aleixpol and harald sitter'. GitLab spellings
+    vary between a person's own commits, so 'at least' is enforced."""
+    kde = next(s for s in manifest["contributors"]
+               if s["section"] == "KDE Linux")
+    lowered = [n.lower() for n in kde["names"]]
+    assert "aleix pol" in lowered
+    assert "harald sitter" in lowered
+
+
+def test_the_deduped_section_is_named_not_positional(manifest):
+    """Universal Blue is 'deduped from above' and now plays FIRST of the
+    ublue family. A rule that said 'the last section' would have deduped
+    Project Bluefin instead and taken every shared name off its wall."""
+    assert B.DEDUPED_SECTION == "Universal Blue"
+    by = {s["section"]: set(n.lower() for n in s["names"])
+          for s in manifest["contributors"]}
+    others = by["Project Bluefin"] | by["Aurora"] | by["Bazzite"]
+    assert not (by["Universal Blue"] & others)
+    # ...and the sections it was deduped against kept everybody.
+    assert by["Project Bluefin"] & by["Aurora"], \
+        "somebody who worked on both is credited under both"
+
+
+def test_the_ublue_family_plays_in_the_owners_order(manifest):
+    """Owner: 'Put universal blue and aurora ahead of bluefin'."""
+    order = [s["section"] for s in manifest["contributors"]
+             if not s.get("tier")]
+    assert order == ["Universal Blue", "Bazzite", "Aurora", "Project Bluefin"]
+
+
+def test_the_ghost_maintainer_is_not_a_contributor(manifest):
+    """An easter egg, and a call for a volunteer. There is no such person, so
+    there is no login, no avatar, and it is never counted as a credit."""
+    kde = next(s for s in manifest["contributors"]
+               if s["section"] == "KDE Linux")
+    assert kde["ghost"] == {"name": "The Next KyleGospo",
+                            "title": "Curse of Maintainership"}
+    assert "The Next KyleGospo" not in kde["names"]
+
+    items, _ = B.schedule(manifest)
+    walls = [i for i in items if i["kind"] == "wall"]
+    ghosted = [w for w in walls if w.get("ghost")]
+    assert len(ghosted) == 1, "the ghost appears once, on one wall"
+    assert ghosted[0]["section"] == "KDE Linux"
+    assert ghosted[0]["page"] == ghosted[0]["pages"], "it closes the section"
+
+
+def test_the_call_outs_reach_the_frame():
+    """#UPSTREAMFIRST at the top of an upstream wall, #linuxforever along the
+    bottom of every one."""
+    assert C.UPSTREAM_EYEBROW == "#UPSTREAMFIRST"
+    assert C.WALL_HASHTAG == "#linuxforever"
+    up = C.render_name_wall("bootc", ["cgwalters"], 1, 1, tier="upstream")
+    plain = C.render_name_wall("Aurora", ["castrojo"], 1, 1)
+    assert up.size == plain.size == (C.W, C.H)
+
+
+def test_the_metal3_bubble_dissolves_once_across_the_tier(manifest):
+    """Owner: 'have that fade to Deploying CNCF Metal3'. A still cannot fade
+    by itself, so the dissolve is spread over the walls it rides -- and it
+    plays ONCE over the tier, not once per wall."""
+    items, _ = B.schedule(manifest)
+    mixes = [i["bubble_mix"] for i in items
+             if i["kind"] == "wall" and "bubble_mix" in i]
+    assert mixes, "the gag rides the upstream walls"
+    assert mixes == sorted(mixes), "it never fades back"
+    assert mixes[0] == 0.0 and mixes[-1] == 1.0
+    assert 0.5 in mixes, "a genuine half-and-half card is the dissolve"
+    # It is on the upstream walls only.
+    for item in items:
+        if item["kind"] == "wall" and "bubble_mix" in item:
+            assert item.get("tier") == "upstream"
+
+
+def test_a_brand_mark_is_never_taken_off_this_host():
+    """Bluefin REBRANDS /usr/share/pixmaps: `fedora_whitelogo_med.png` and
+    `gnome-boot-logo.png` on this machine are both the Bluefin wordmark, and
+    the first build credited Fedora CoreOS under one of them."""
+    import fetch_brand_marks
+    assert not hasattr(fetch_brand_marks, "LOCAL_MARKS")
+    for url in fetch_brand_marks.MARKS.values():
+        assert url.startswith("https://")
+        assert "/usr/share" not in url
