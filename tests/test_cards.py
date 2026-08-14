@@ -66,9 +66,11 @@ def test_the_act_slides_are_numbered_in_the_owners_canonical_order():
     # still both there and still in order: this merged the announcement, not the
     # acts, and nothing renumbered around it.
     assert numerals == ["I", "II", "III", "IV\u2013V", "VI", "VII"]
-    # VIII is absent because it has no film, and it must stay recorded, or the
-    # numbering silently closes up over it. Act II was in the same state until
-    # its film was built; a slide is added when the act plays, never before.
+    # VIII is absent DESPITE having a film: the owner wants the credits to
+    # surprise ("no credits slide, go right to the metal"), so act VIII is the
+    # one act the programme does not announce. It must stay recorded either
+    # way, or the numbering silently closes up over it -- and so that a later
+    # pass does not "fix" the gap by adding the slide back.
     unresolved = " ".join(u["what"] for u in cards["unresolved"])
     assert "act VIII" in unresolved
     assert "act II --" not in unresolved, (

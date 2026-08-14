@@ -120,10 +120,10 @@
   ],
   "unresolved": [
     {
-      "what": "act VIII -- end credits",
-      "detail": "Last in the canonical order. The credits sequence for Seven Days to the Wolves has never been designed, which is issue #51. Nothing here designs it.",
+      "what": "act VIII -- no slide, on purpose",
+      "detail": "Act VIII is BUILT and in the programme (#51): the credits, Prod/08-credits.mp4. It is the one act with no slide here, by owner instruction -- 'no credits slide, go right to the metal ... it should surprise the viewer.' Europa fades to black on its own tail and the drum smash lands on the next frame. A slide was built and then removed rather than left in this manifest unused, because this file is what the programme renders. The missing slide also drops act VIII's chapter marker, which chapters() derives from slides -- deliberate, since a 'VIII. Credits' entry on the scrub bar spoils the same surprise.",
       "automatable": "no",
-      "blocked_on": "issue #51."
+      "blocked_on": "nothing -- recorded so the absence is not 'fixed' by a future pass."
     },
     {
       "what": "chapters -- drafted, not authored",

@@ -1,94 +1,107 @@
 {
- "_what": "The delivery graph's declared intent: which master each act's Prod/ entry hardlinks, and which acts have no social copy ON PURPOSE. tools/deliver.py reads this beside docs/running-order.md (which stays the source of truth for the act list and its ORDER -- this file is keyed by act numeral and says nothing about order). A master path is `~`-rooted or absolute, never relative to a worktree: worktrees are ephemeral, and act II's link into dv-wt/feat-98-act2-overlay is the recorded hazard. When a project's build replaces its master as a NEW inode (tools/peaks.py trim does os.replace on purpose), the Prod link is detached and `deliver.py publish` re-links it -- that re-link is the step peaks.py deliberately does not do.",
- "_rules": "publish re-links only when the declared master is NEWER than what Prod carries, or when the content is identical (re-attaching is then free). A declared master that is OLDER than Prod's current content is a conflict -- reported, never force-linked: something built Prod's content and the master never received it (act II on 2026-08-13: the #98 build lived only in a worktree while the main checkout's renders/efmb-plated.mp4 was a revision behind; repaired under #150 by promoting the worktree build onto the durable master). A master path that resolves inside a git worktree is EPHEMERAL and publish refuses to link from it at any mtime -- promote it to a durable path first.",
- "masters": {
-  "I": {
-   "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
-   "note": "the six Guardian plates and the comic title card burned over BKm0TPqeOjY, trimmed 2.0 -> 113.55. NO COMMITTED BUILDER: this act was assembled ad-hoc (raw x264 crf 14 trim, then a `tools/plate.py` burn at crf 18) rather than by a script under `scripts/`, so its `sources` cover the copy that goes on screen but not the assembly that places it. Re-rendering act I from the repo is therefore not reproducible today -- that gap is its own finding, not a reason to leave the act undeclared",
-   "sources": [
-    "stories/megacut/megacut-hero-plates.json",
-    "vocab/casting.yaml"
-   ],
-   "source_digest": "bc62bd90c79a60f4ac788fb9a3e2ae9f13e4e6ebb4a18a6e86317111f2f85158"
+  "_what": "The delivery graph's declared intent: which master each act's Prod/ entry hardlinks, and which acts have no social copy ON PURPOSE. tools/deliver.py reads this beside docs/running-order.md (which stays the source of truth for the act list and its ORDER -- this file is keyed by act numeral and says nothing about order). A master path is `~`-rooted or absolute, never relative to a worktree: worktrees are ephemeral, and act II's link into dv-wt/feat-98-act2-overlay is the recorded hazard. When a project's build replaces its master as a NEW inode (tools/peaks.py trim does os.replace on purpose), the Prod link is detached and `deliver.py publish` re-links it -- that re-link is the step peaks.py deliberately does not do.",
+  "_rules": "publish re-links only when the declared master is NEWER than what Prod carries, or when the content is identical (re-attaching is then free). A declared master that is OLDER than Prod's current content is a conflict -- reported, never force-linked: something built Prod's content and the master never received it (act II on 2026-08-13: the #98 build lived only in a worktree while the main checkout's renders/efmb-plated.mp4 was a revision behind; repaired under #150 by promoting the worktree build onto the durable master). A master path that resolves inside a git worktree is EPHEMERAL and publish refuses to link from it at any mtime -- promote it to a durable path first.",
+  "masters": {
+    "I": {
+      "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
+      "note": "the six Guardian plates and the comic title card burned over BKm0TPqeOjY, trimmed 2.0 -> 113.55. NO COMMITTED BUILDER: this act was assembled ad-hoc (raw x264 crf 14 trim, then a `tools/plate.py` burn at crf 18) rather than by a script under `scripts/`, so its `sources` cover the copy that goes on screen but not the assembly that places it. Re-rendering act I from the repo is therefore not reproducible today -- that gap is its own finding, not a reason to leave the act undeclared",
+      "sources": [
+        "stories/megacut/megacut-hero-plates.json",
+        "vocab/casting.yaml"
+      ],
+      "source_digest": "bc62bd90c79a60f4ac788fb9a3e2ae9f13e4e6ebb4a18a6e86317111f2f85158"
+    },
+    "II": {
+      "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
+      "note": "#98's overlay pass; `renders/efmb-hq.mp4` is the pre-plate picture",
+      "sources": [
+        "scripts/build_efmb.py",
+        "scripts/build_efmb_plates.py",
+        "scripts/efmb_beats.py",
+        "stories/02-endless-forms-plates.json",
+        "music/bed_endless_forms_most_beautiful.json",
+        "dialogue/yt_destiny_all_live_action_trailers",
+        "vocab/casting.yaml"
+      ],
+      "source_digest": "f4c0e62c369c5ef41b64d4114ba8e157fab6ee0ad963af77a8fdae04c929b86c"
+    },
+    "III": {
+      "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
+      "note": "",
+      "sources": [
+        "scripts/build_uncut_credited.sh",
+        "dialogue/yt_curse_of_osiris_opening_cinematic",
+        "vocab/casting.yaml"
+      ],
+      "source_digest": "ba19cec8675c481a50d5657e7187fbe6a4bb2d78cfcdc4644bff77e173a9cecd"
+    },
+    "IV": {
+      "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
+      "note": "REPO-DRIVEN AS OF #152's act IV pass. The words, the windows and the measured build parameters are committed in stories/04-kat-plates.json and scripts/build_kat.py rebuilds the film from them -- verified against this master: the AUDIO IS BIT-IDENTICAL (same stream MD5) and 1167 of 2040 frames are bit-identical, every differing frame falling inside a dialogue-plate window because the pills are re-rendered by tools/plate.py rather than screenshotted from plate.html (overall SSIM 0.9973, worst frame 0.9887). The nameplate card is NOT repo-rendered and is consumed from the project folder; see the manifest's `_not_repo_rendered`.",
+      "sources": [
+        "stories/04-kat-plates.json",
+        "scripts/build_kat.py",
+        "scripts/actbuild.py",
+        "vocab/casting.yaml"
+      ],
+      "source_digest": "747160e2380ae9514b43cd50e8681bee0247c129bf28556bea6d9cf80fedc0d7"
+    },
+    "V": {
+      "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
+      "note": "REPO-DRIVEN AS OF #152's act V pass, the same shape act IV got first. The words, the windows and the measured build parameters are committed in stories/05-natali-plates.json and scripts/build_natali.py rebuilds the film from them -- verified against this master: the AUDIO IS BIT-IDENTICAL (same stream MD5) and 676 of 1514 frames are bit-identical, every differing frame falling inside a dialogue-plate window because the pills are re-rendered by tools/plate.py rather than screenshotted from plate.html (worst frame 0.9873). The reveal card and the closing fade are untouched. The nameplate is NOT repo-rendered; see the manifest's `_not_repo_rendered`.",
+      "sources": [
+        "stories/05-natali-plates.json",
+        "scripts/build_natali.py",
+        "scripts/actbuild.py",
+        "vocab/casting.yaml"
+      ],
+      "source_digest": "8db550dc2d92a22fae129e3250ddd3d7460215268e52d0e99c8a82c63a2cc8ee"
+    },
+    "VI": {
+      "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v3.mp4",
+      "note": "the #104 interruption build with its **hold music now playing** (443.533 s): Local Forecast – Slower, CC BY 4.0, credited in the repo's `ATTRIBUTIONS.md`. The slot shipped silent in v2 because a cleared track was mistaken for a rights block. **AAC, the one act with no lossless master** (#58)",
+      "sources": [
+        "scripts/build_wolves.py",
+        "scripts/rebuild-wolves.sh",
+        "scripts/build_interruption_cards.py",
+        "scripts/build_summit_plates.py",
+        "stories/seven-days-timing-pass.json",
+        "stories/06-wolves-cayde-plates.json",
+        "stories/06-wolves-interruption-cards.json",
+        "music/bed_seven_days_to_the_wolves.json",
+        "music/bed_local_forecast_slower.json",
+        "vocab/casting.yaml"
+      ],
+      "source_digest": "4116ca06209d9d221eb67b81ecd61cf6b10ee952063532a5290d64716d4c8f8f"
+    },
+    "VII": {
+      "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
+      "note": "1:37.266. The comic cover (97.200-110.200) is CUT: it is act VIII's reveal now (#178), and playing it twice made the second one the weaker. The act ends on the fade-to-black it already had -- measured luminance runs 23.6 mean at 95.5 s to 0.00 at 97.2 -- with a 2.5 s audio fade landing the outro with the picture. Picture is STREAM-COPIED from the -1.1 dBTP master (#82); no generation added.",
+      "sources": [],
+      "sources_note": "NOT REPO-DRIVEN -- cut in ~/Videos/wolves-directors-cut, no committed inputs at all, so the no-cover master was made by trimming the delivered one rather than by re-running a builder. See #152."
+    },
+    "VIII": {
+      "path": "~/Videos/wolves-credits/08-credits-master.mp4",
+      "note": "3:48.430. Act VIII, the credits (#51). Encoded to the DELIVERY SPEC (59.94, high@4.2, bt709) so the megacut joins it by stream copy rather than conforming it at assembly time.",
+      "sources": [
+        "stories/08-credits.json",
+        "scripts/build_credits.py",
+        "tools/credits.py",
+        "music/bed_wish_i_had_an_angel.json",
+        "vocab/casting.yaml"
+      ],
+      "source_digest": "17527d2390265fef1b848dc7857a053ab0cef18f99d8ddc3821439a6ee34e907"
+    }
   },
-  "II": {
-   "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
-   "note": "#98's overlay pass; `renders/efmb-hq.mp4` is the pre-plate picture",
-   "sources": [
-    "scripts/build_efmb.py",
-    "scripts/build_efmb_plates.py",
-    "scripts/efmb_beats.py",
-    "stories/02-endless-forms-plates.json",
-    "music/bed_endless_forms_most_beautiful.json",
-    "dialogue/yt_destiny_all_live_action_trailers",
-    "vocab/casting.yaml"
-   ],
-   "source_digest": "f4c0e62c369c5ef41b64d4114ba8e157fab6ee0ad963af77a8fdae04c929b86c"
+  "social": {
+    "audio_bitrate": 256,
+    "_bitrate_note": "10mb/README.md builds with --audio-bitrate 256: the cap is spent on audio first, because a starved music bed is the artifact people actually hear on a phone.",
+    "absent": {
+      "II": "308.0 s leaves ~16 kbps of video budget under the 10 MiB cap -- it would look like mud. Recorded in 10mb/README.md; the fix is a shorter excerpt, which is an editorial decision for the owner.",
+      "III": "160.2 s leaves ~268 kbps of video budget -- mud. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
+      "VI": "443.5 s: the 256k audio ALONE overruns the 10 MiB cap, so no copy can be encoded at all. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
+      "VIII": "227.2 s: at the policy's 256k audio the sound alone is 7.3 MiB of the 10 MiB cap, leaving ~102 kbps of video -- and the encode came out 0.16 MiB OVER anyway. Act III was already judged mud at 268 kbps and this is a longer act, so the same call applies. Recorded rather than fixed by starving the bed, which is the one thing 10mb/README.md says not to do. A shorter excerpt is the owner's call, and act VIII takes one well: any single wall or the cover reveal stands alone."
+    }
   },
-  "III": {
-   "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
-   "note": "",
-   "sources": [
-    "scripts/build_uncut_credited.sh",
-    "dialogue/yt_curse_of_osiris_opening_cinematic",
-    "vocab/casting.yaml"
-   ],
-   "source_digest": "ba19cec8675c481a50d5657e7187fbe6a4bb2d78cfcdc4644bff77e173a9cecd"
-  },
-  "IV": {
-   "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
-   "note": "REPO-DRIVEN AS OF #152's act IV pass. The words, the windows and the measured build parameters are committed in stories/04-kat-plates.json and scripts/build_kat.py rebuilds the film from them -- verified against this master: the AUDIO IS BIT-IDENTICAL (same stream MD5) and 1167 of 2040 frames are bit-identical, every differing frame falling inside a dialogue-plate window because the pills are re-rendered by tools/plate.py rather than screenshotted from plate.html (overall SSIM 0.9973, worst frame 0.9887). The nameplate card is NOT repo-rendered and is consumed from the project folder; see the manifest's `_not_repo_rendered`.",
-   "sources": [
-    "stories/04-kat-plates.json",
-    "scripts/build_kat.py",
-    "scripts/actbuild.py",
-    "vocab/casting.yaml"
-   ],
-   "source_digest": "747160e2380ae9514b43cd50e8681bee0247c129bf28556bea6d9cf80fedc0d7"
-  },
-  "V": {
-   "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
-   "note": "REPO-DRIVEN AS OF #152's act V pass, the same shape act IV got first. The words, the windows and the measured build parameters are committed in stories/05-natali-plates.json and scripts/build_natali.py rebuilds the film from them -- verified against this master: the AUDIO IS BIT-IDENTICAL (same stream MD5) and 676 of 1514 frames are bit-identical, every differing frame falling inside a dialogue-plate window because the pills are re-rendered by tools/plate.py rather than screenshotted from plate.html (worst frame 0.9873). The reveal card and the closing fade are untouched. The nameplate is NOT repo-rendered; see the manifest's `_not_repo_rendered`.",
-   "sources": [
-    "stories/05-natali-plates.json",
-    "scripts/build_natali.py",
-    "scripts/actbuild.py",
-    "vocab/casting.yaml"
-   ],
-   "source_digest": "8db550dc2d92a22fae129e3250ddd3d7460215268e52d0e99c8a82c63a2cc8ee"
-  },
-  "VI": {
-   "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v3.mp4",
-   "note": "the #104 interruption build with its **hold music now playing** (443.533 s): Local Forecast – Slower, CC BY 4.0, credited in the repo's `ATTRIBUTIONS.md`. The slot shipped silent in v2 because a cleared track was mistaken for a rights block. **AAC, the one act with no lossless master** (#58)",
-   "sources": [
-    "scripts/build_wolves.py",
-    "scripts/rebuild-wolves.sh",
-    "scripts/build_interruption_cards.py",
-    "scripts/build_summit_plates.py",
-    "stories/seven-days-timing-pass.json",
-    "stories/06-wolves-cayde-plates.json",
-    "stories/06-wolves-interruption-cards.json",
-    "music/bed_seven_days_to_the_wolves.json",
-    "music/bed_local_forecast_slower.json",
-    "vocab/casting.yaml"
-   ],
-   "source_digest": "4116ca06209d9d221eb67b81ecd61cf6b10ee952063532a5290d64716d4c8f8f"
-  },
-  "VII": {
-   "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq.mp4",
-   "note": "master corrected to -1.1 dBTP by static trim (#82 delivered, pending owner close)",
-   "sources": [],
-   "sources_note": "NOT REPO-DRIVEN -- cut in ~/Videos/wolves-directors-cut, no committed inputs at all. The last of the three: acts IV and V now have committed records and a shared builder (scripts/actbuild.py), and act VII wants the same shape. See #152."
-  }
- },
- "social": {
-  "audio_bitrate": 256,
-  "_bitrate_note": "10mb/README.md builds with --audio-bitrate 256: the cap is spent on audio first, because a starved music bed is the artifact people actually hear on a phone.",
-  "absent": {
-   "II": "308.0 s leaves ~16 kbps of video budget under the 10 MiB cap -- it would look like mud. Recorded in 10mb/README.md; the fix is a shorter excerpt, which is an editorial decision for the owner.",
-   "III": "160.2 s leaves ~268 kbps of video budget -- mud. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
-   "VI": "443.5 s: the 256k audio ALONE overruns the 10 MiB cap, so no copy can be encoded at all. Recorded in 10mb/README.md; a shorter excerpt is the owner's call."
-  }
- },
- "_sources": "`sources` is the rung BEFORE the master: the committed inputs an act is built from. tools/deliver.py hashes them and compares against `source_digest`, which `publish` stamps -- so editing a shotlist, a plate manifest, a dialogue record or vocab/casting.yaml marks that act's delivered film STALE instead of letting it silently predate its own inputs. Content hashed, never mtime: these come out of git, where every mtime is checkout time. An empty list means the act has no committed inputs AT ALL and its note must say so -- that is a finding, not a configuration. An act with no `sources` key is reported UNDECLARED so nobody mistakes silence for freshness."
+  "_sources": "`sources` is the rung BEFORE the master: the committed inputs an act is built from. tools/deliver.py hashes them and compares against `source_digest`, which `publish` stamps -- so editing a shotlist, a plate manifest, a dialogue record or vocab/casting.yaml marks that act's delivered film STALE instead of letting it silently predate its own inputs. Content hashed, never mtime: these come out of git, where every mtime is checkout time. An empty list means the act has no committed inputs AT ALL and its note must say so -- that is a finding, not a configuration. An act with no `sources` key is reported UNDECLARED so nobody mistakes silence for freshness."
 }

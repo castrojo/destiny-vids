@@ -22,15 +22,24 @@ Settled by the owner on 2026-08-12 and **canonical**:
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide** |
 | **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; now the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits |
-| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; plays the pre-terse-pass film — #102; master corrected to −1.1 dBTP — #82 |
-| **VIII** | Credits | `renders/08-credits.mp4` — the cast, 454 contributors, and the comic-cover reveal | **built**, 3:48.43 — #51; not yet in the programme |
+| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; **1:37.266**, the comic cover cut so act VIII owns the reveal — #178; plays the pre-terse-pass film — #102; master corrected to −1.1 dBTP — #82 |
+| **VIII** | Credits | `Prod/08-credits.mp4` — the cast, 454 contributors, the comic-cover reveal and the wordmark | delivered, **in the programme**; **no slide, no chapter marker** — it is meant to surprise — #51 |
 
-**Act VIII now has a film.** Built 2026-08-13 from `stories/08-credits.json`
-by `scripts/build_credits.py`: the four fixed cards, fifteen cast placards, the
-comic-cover reveal on the song's measured crescendo, 454 contributors across
-four projects, and the wordmark. It is **not yet in the programme** — wiring it
-in is a megacut rebuild, and it wants a slide and a chapter marker at that
-point.
+**Act VIII has a film and the programme plays it.** Built from
+`stories/08-credits.json` by `scripts/build_credits.py`: four fixed cards,
+fifteen cast placards, the comic-cover reveal at :22, 454 contributors across
+four projects, and the real Project Bluefin wordmark.
+
+**It is the one act with no slide and no chapter marker**, by owner
+instruction — *"no credits slide, go right to the metal … it should surprise
+the viewer."* Europa fades to black on its own tail and the drum smash lands on
+the next frame. The missing marker is deliberate too: `chapters()` derives them
+from slides, so a *VIII. Credits* entry on the scrub bar would spoil the same
+surprise the cut is built to land. Every other act is still announced.
+
+**Act VII no longer ends on the comic cover.** The cover is act VIII's reveal
+now, so Europa ends on the fade-to-black it already had, 12.934 s earlier
+(#178). Every chapter mark after act VII moved by that amount.
 
 **The numbering is fixed.** III is `mrbobbytables` permanently, whatever gets
 built later.

@@ -76,6 +76,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from tools import conform  # noqa: E402
 from tools import credits as C  # noqa: E402
 from tools.bed import fmt_tc  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
@@ -463,8 +464,12 @@ def main(argv=None):
            "-i", str(media),
            "-filter_complex", audio_filter(manifest["bed"], stream=1),
            "-map", "0:v:0", "-map", "[aout]",
+           # The DELIVERY frame rate, taken from the spec rather than typed:
+           # every card is a still, so the rate costs nothing visually, and
+           # matching it means the megacut joins act VIII by stream copy
+           # instead of conforming a 30 fps file at assembly time.
            "-c:v", "libx264", "-crf", "16", "-preset", "medium",
-           "-pix_fmt", "yuv420p", "-r", "30",
+           "-pix_fmt", "yuv420p", "-r", conform.DELIVERY.fps,
            "-c:a", "flac",
            "-t", f"{total:.3f}",
            str(out_path)]
