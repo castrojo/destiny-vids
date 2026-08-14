@@ -54,20 +54,32 @@ def test_every_dialogue_plate_is_a_chat_pill_in_the_letterbox(any_act):
 def test_the_words_are_the_owners(doc):
     """The copy is a RECORD of what shipped, reproduced, never re-authored.
 
-    The last three are #118's Linux-desktop exchange, dictated 2026-08-13 and
-    confirmed in scope (and in nothing else's scope) on 2026-08-14 -- owner
-    copy, verbatim, landed 2026-08-14.
+    This is #118's dictated conversation (2026-08-13), landed in note order on
+    the owner's 2026-08-14 instruction -- 'the dialogue is wrong, needs the
+    linux desktop conversation' -- which retired the earlier telnet round
+    (kept verbatim under ``retired``). Cardio is the note's 10:33 beat and
+    keeps its delivered seat.
     """
     assert [(c["speaker"], c["text"]) for c in doc["plates"]] == [
+        ("kat", "Hey why are they shooting at me!"),
+        ("mrbobbytables", "The gamers don't know you're here to help"),
+        ("kat", "I miss ONE email now I gotta use a Linux desktop?"),
+        ("kat", "I miss ingress-nginx sometimes"),
+        ("kat", "Fine I'll fix your shit too"),
+        ("kat", "Remember kids, cardio!"),
+    ]
+
+
+def test_the_retired_round_keeps_its_words(doc):
+    """A retired plate keeps its authored copy -- restoring must never mean
+    rewriting (the megacut deck's own convention, applied to an act record)."""
+    assert [(c["speaker"], c["text"]) for c in doc["retired"]] == [
         ("kat", "Open telnet port?"),
         ("ian", "Look it up baby!"),
         ("tabbysable", "How come no one's shooting at you?"),
         ("cailyn-codes", "Security by hyperspace?"),
-        ("kat", "Remember kids, cardio!"),
-        ("kat", "I miss ONE email now I gotta use a Linux desktop?"),
-        ("kat", "I miss ingress-nginx sometimes"),
-        ("kat", "Fine I'll fix your shit too"),
     ]
+    assert all(c.get("retired_note") for c in doc["retired"])
 
 
 def test_no_two_plates_share_the_screen(any_act):
@@ -77,11 +89,18 @@ def test_no_two_plates_share_the_screen(any_act):
         assert start > end, f"{start} overlaps a plate still on screen at {end}"
 
 
-def test_every_plate_lands_after_the_hero_reveal(doc):
-    """The owner's rule for this act: nothing precedes the nameplate."""
+def test_the_conversation_breaks_on_the_reveal(doc):
+    """#118's note order: the setup pair plays BEFORE 'nameplate reveal', the
+    Linux exchange after it. (This replaced the act's earlier rule that
+    nothing precedes the nameplate -- the note itself puts two lines there.)
+    """
     reveal = doc["reveal"]
     reveal_end = reveal["at"] + reveal["dur"]
-    assert min(c["at"] for c in doc["plates"]) > reveal_end
+    setup, rest = doc["plates"][:2], doc["plates"][2:]
+    for cue in setup:
+        assert cue["at"] + cue["dur"] < reveal["at"], cue["id"]
+    for cue in rest:
+        assert cue["at"] > reveal_end, cue["id"]
 
 
 def test_fade_out_finishes_inside_the_window(any_act):
@@ -91,18 +110,18 @@ def test_fade_out_finishes_inside_the_window(any_act):
         assert cue["at"] + cue["fade_in"] <= cue["fade_out_at"], cue["id"]
 
 
-def test_ians_answer_lands_on_the_measured_cut(doc):
-    """The owner pinned the line to the cut where the camera starts shaking.
-
-    That cut was measured at 14.833 and is in the record's cut list. Kat's
-    question must clear BEFORE it and Ian's answer must start after, or the
-    exchange no longer breaks on the shake.
+def test_the_lines_clear_the_measured_cuts(doc):
+    """Plates sit inside their frame-verified seats: the setup pair clears
+    before the first cut at 6.03 (so the hero shot and the 7.0 reveal arrive
+    clean), and the first Linux line reuses the 12.2 push-in seat, clearing
+    before the 14.833 shake cut exactly as the seat's first tenant did.
     """
-    cut = 14.833
     assert 14.83 in doc["cut_list"]
-    kat, ian = doc["plates"][0], doc["plates"][1]
-    assert kat["at"] + kat["dur"] < cut
-    assert ian["at"] > cut
+    setup_last = doc["plates"][1]
+    assert setup_last["at"] + setup_last["dur"] < 6.03
+    linux1 = doc["plates"][2]
+    assert linux1["at"] == 12.2
+    assert linux1["at"] + linux1["dur"] < 14.833
 
 
 def test_the_delivered_variant_is_lossless_stereo(any_act):
