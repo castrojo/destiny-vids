@@ -341,10 +341,14 @@ def test_the_authored_cards_are_used_where_they_exist(manifest):
 
 def test_verified_logins_survive_a_contributor_refresh(manifest):
     """cast_logins is hand-maintained; the schedule applies it every time, so
-    a login added after the cast was generated still reaches its placard."""
+    a login added after the cast was generated still reaches its placard.
+
+    Checked on Jeefy rather than Jorge: Jorge's placard is redacted, which
+    correctly strips his login before it can reach the card.
+    """
     items, _ = B.schedule(manifest)
-    jorge = next(i for i in items if i.get("person") == "Jorge Castro")
-    assert jorge["login"] == "castrojo"
+    jeefy = next(i for i in items if i.get("person") == "Jeefy")
+    assert jeefy["login"] == "jeefy"
 
 
 def test_the_wordmark_is_the_real_mark_not_typeset(manifest):
@@ -366,8 +370,61 @@ def test_every_cast_placard_gets_a_readable_hold(manifest):
             assert item["dur"] >= 3.5
 
 
-def test_the_cast_order_survives_the_split(manifest):
-    """The cast is split around the reveal; it must stay a prefix/suffix cut."""
+def test_the_cast_plays_in_the_vocabularys_order(manifest):
+    """Ordered by the binding, not by whoever happens to have a face.
+
+    Compared on the CHARACTER, because a redacted placard deliberately no
+    longer carries its person's name.
+    """
     items, _ = B.schedule(manifest)
-    on_screen = [i["person"] for i in items if i["kind"] == "cast"]
-    assert on_screen == [c["person"] for c in manifest["cast"]]
+    on_screen = [i["character"] for i in items if i["kind"] == "cast"]
+    assert on_screen == [c["character"] for c in manifest["cast"]]
+
+
+def test_every_bound_lead_reaches_the_screen(manifest):
+    """The README's table lists 9; the vocab binds 15 and the credits follow
+    the vocab, because dropping a real person's credit is not recoverable.
+    Recorded in `unresolved` until the owner says otherwise."""
+    items, _ = B.schedule(manifest)
+    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 15
+
+
+# --- the Cayde redaction ---------------------------------------------------
+
+def test_caydes_placard_redacts_the_person_not_the_character(manifest):
+    """The owner's README: '[Redacted] Cayde-6 ... we only reveal jorge's name
+    once.' His one reveal in act VIII is the Directed by card.
+
+    Which half is redacted is not a coin toss: act II's authored treatment
+    (scripts/build_efmb_plates.py, CAYDE) carries redacted_speaker
+    '[ REDACTED ]' with redacts=<real name> and reveals='cayde_6'. The famous
+    character is the known half; the person behind it is the secret.
+    """
+    items, _ = B.schedule(manifest)
+    cayde = next(i for i in items
+                 if i["kind"] == "cast" and i["character"] == "Cayde-6")
+    assert cayde["person"] == "[ REDACTED ]"
+    assert cayde["character"] == "Cayde-6"
+
+
+def test_a_redacted_placard_shows_no_face(manifest):
+    """A card that hides the name and shows the avatar has revealed him."""
+    items, _ = B.schedule(manifest)
+    cayde = next(i for i in items
+                 if i["kind"] == "cast" and i["character"] == "Cayde-6")
+    assert cayde["login"] is None and cayde["card"] is None
+
+
+def test_the_renderer_refuses_a_face_beside_a_redacted_name():
+    """Belt and braces: even asked directly, the placard drops the art."""
+    with_face = C.render_cast_placard(C.REDACTED, "Cayde-6",
+                                      card="bob", login="castrojo")
+    without = C.render_cast_placard(C.REDACTED, "Cayde-6")
+    assert list(with_face.getdata()) == list(without.getdata())
+
+
+def test_the_director_card_is_still_jorges_one_reveal(manifest):
+    """The redaction only makes sense if he is named exactly once."""
+    named = [c for c in manifest["fixed_cards"]
+             if any("Castro" in n for n in c["names"])]
+    assert [c["role"] for c in named] == ["Directed by", "Introducing"]

@@ -293,11 +293,20 @@ def schedule(manifest):
     verified = {k: v for k, v in (manifest.get("cast_logins") or {}).items()
                 if not k.startswith("_")}
     target = manifest.get("cast_hold_sec", 4.0)
+    redacted = set(manifest.get("cast_redactions") or [])
     for person in manifest["cast"]:
-        items.append({"kind": "cast", "t": t, "dur": target,
-                      "person": person["person"], "character": person["character"],
-                      "card": person.get("card"),
-                      "login": person.get("login") or verified.get(person["person"])})
+        name = person["person"]
+        if person["character_id"] in redacted:
+            # The name goes, and with it the face and the authored card --
+            # otherwise the placard redacts a word and reveals the person.
+            items.append({"kind": "cast", "t": t, "dur": target,
+                          "person": C.REDACTED, "character": person["character"],
+                          "card": None, "login": None})
+        else:
+            items.append({"kind": "cast", "t": t, "dur": target,
+                          "person": name, "character": person["character"],
+                          "card": person.get("card"),
+                          "login": person.get("login") or verified.get(name)})
         t += target
 
     wordmark = manifest["wordmark"]

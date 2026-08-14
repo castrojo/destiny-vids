@@ -196,6 +196,9 @@ def render_role_card(role, names):
     return img
 
 
+REDACTED = "[ REDACTED ]"
+
+
 def render_cast_placard(person, character, card=None, login=None):
     """One member of the cast.
 
@@ -206,6 +209,14 @@ def render_cast_placard(person, character, card=None, login=None):
     """
     img = backdrop()
     d = ImageDraw.Draw(img)
+
+    # A redacted name suppresses the FACE and the authored card too. Printing
+    # "[ REDACTED ]" over somebody's avatar, or over a Guardian card that has
+    # their real name set into the art, is not a redaction -- it is a caption
+    # on a reveal.
+    if person == REDACTED:
+        card, login = None, None
+
     art = cast_card(card)
 
     if art is not None:
@@ -227,7 +238,7 @@ def render_cast_placard(person, character, card=None, login=None):
     top = (H - (size + 250)) / 2
     img.alpha_composite(face if face is not None else _empty_circle(size),
                         (int((W - size) / 2), int(top)))
-    if face is None:
+    if face is None and person != REDACTED:
         f_i = _font("bold", 110)
         initial = (person or "?")[0]
         _blue_bs(d, (_centre(d, initial, f_i), top + size / 2 - 78), initial, f_i, DIM)
