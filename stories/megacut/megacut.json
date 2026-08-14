@@ -24,7 +24,7 @@
     "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md.",
     "prologue": "Wolves/Prod/00-prologue.mp4 -> destiny-vids/renders/00-prologue.mp4, built by scripts/build_prologue.py from stories/00-prologue-plates.json and cards/maintitle.html. Born conformant (1920x1080, 60000/1001, bt709 on all three fields, FLAC 48 kHz stereo) so the join stream-copies its picture. Audio decoded from the plain 251 Opus rung, NOT 251-drc, per the audio standard -- the same lossy-source posture act I records."
   },
-  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v1.0.mp4",
+  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.0.mp4",
   "width": 1920,
   "height": 1080,
   "fps": "60000/1001",
@@ -60,6 +60,15 @@
       "_dur_note": "The frame-verified trim, 2.0 -> 113.55 of BKm0TPqeOjY. Recorded here so the running order and its chapter markers can be read before the segment is built."
     },
     {
+      "kind": "clip",
+      "path": "renders/perfume-2.mp4",
+      "audio": "source",
+      "fade_in": 6.2,
+      "fade_out": 2.0,
+      "label": "Perfume, movement 2 — source 93.000 -> 159.400, after the Destiny intro",
+      "_thread": "THE PERFUME THREAD, movement 2 of 5. No numeral, no slide, no chapter marker -- see stories/00-perfume-thread.json. The 6.2 s fade_in is not a default: it is the exact length of the fade the PROLOGUE went out on (afade st=93.0 d=6.2), replayed upside down, so the song dips across act I and swells back rather than restarting. It also resumes mid-shot -- there is no cut in the source between 91.200 and 108.960 -- so the picture continues the very frame the prologue left."
+    },
+    {
       "kind": "card",
       "image": "renders/plates-megacut-cards/plate_act2.png",
       "dur": 5.0,
@@ -89,6 +98,15 @@
       "fade_in": 2.0,
       "fade_out": 2.0,
       "label": "Act III — mrbobbytables: August 2026 contributors (partially complete)"
+    },
+    {
+      "kind": "clip",
+      "path": "renders/perfume-3.mp4",
+      "audio": "source",
+      "fade_in": 2.0,
+      "fade_out": 2.0,
+      "label": "Perfume, movement 3 — source 159.400 -> 328.080, after mrbobbytables",
+      "_thread": "Movement 3 of 5, and the longest at 2:48.7 -- longer than acts IV, V and VII. That is what the owner's spans specify and it plays as a full movement of the song, but it is the one placement where an interlude outweighs the acts around it. Flagged in stories/00-perfume-thread.json for the owner, built as instructed."
     },
     {
       "kind": "card",
@@ -127,6 +145,15 @@
       "_plates": "Act VI carries stories/06-wolves-cayde-plates.json burned in (tools/plate.py burn --fit-picture). Prod holds ONE file per act, hardlinked to its project master, so Prod/06 -> ~/Videos/wolves-musical/wolves-7days-plated-master-v2.mp4. The UN-PLATED v2 master is kept beside it as wolves-7days-master-v2.mp4, because burning is not idempotent: a re-burn starts from the clean file and never stacks a second card on the first. v2 re-burned the tail plates at +10.811 s film time (the manifest's _shifted records it) and the act runs 443.5 s, so slide VII and act VII move +10.811 s of programme time."
     },
     {
+      "kind": "clip",
+      "path": "renders/perfume-4.mp4",
+      "audio": "source",
+      "fade_in": 2.0,
+      "fade_out": 2.0,
+      "label": "Perfume, movement 4 — source 328.080 -> 389.800, before Europa",
+      "_thread": "Movement 4 of 5. It follows act VI, which fades itself out (measured -90.3 dB in its last second), so this is the one join in the thread where music meets silence meets music."
+    },
+    {
       "kind": "card",
       "image": "renders/plates-megacut-cards/plate_act7.png",
       "dur": 5.0,
@@ -143,6 +170,16 @@
     },
     {
       "kind": "clip",
+      "path": "renders/perfume-5.mp4",
+      "audio": "source",
+      "fade_in": 2.0,
+      "fade_out": 1.5,
+      "label": "Perfume, movement 5 — source 389.800 -> 507.021 (EOF), Europa into the credits",
+      "_thread": "Movement 5 of 5, and the end of the song. The owner: 'match the transition panning up from laura after europa, then hold until the end of this, then roll credits.' Laura Santamaria is Elsie Bray, act VII copy. Act VII's tail is flat at YAVG~37 from 89 s and falls hard over its last half second, so it hands down into this movement's upward move. WHERE EXACTLY THE TWO MOVES MEET IS A CRAFT JUDGEMENT ABOUT FRAMES: this build joins at the measured cut, 389.800, and the frame is for the owner to approve. Act VII is never shortened to make it fit (#178).",
+      "_moves_the_ambush": "This changes what act VIII comes out of. The credits carry no slide and no marker because 'Europa fades to black on its own tail and the drum smash lands on the next frame' -- the smash now lands off the end of a DIFFERENT song, and the source's last shot is HELD (luma ~32), not black. The 1.5 s fade_out lets the song land rather than be chopped; the picture is deliberately left un-faded, because these movements are rendered clean for the dinosaur pass and a burned dip would have to be un-baked later. TODO(owner): whether the two pieces of music collide, and whether the ambush wants black in front of it after all."
+    },
+    {
+      "kind": "clip",
       "path": "/var/home/jorge/Videos/Wolves/Prod/08-credits.mp4",
       "audio": "source",
       "fade_in": 0.0,
@@ -152,5 +189,5 @@
     }
   ],
   "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no film, so it has no marker -- a chapter that jumps to the next act's footage would be a lie about what plays.",
-  "_version": "v1.0 -- the first build that is the WHOLE FEATURE: all eight acts play. v0.9 was seven of eight, with act VIII a held numeral and no film. This build adds act VIII (the credits, #51) with its own slide and chapter marker, and cuts the comic cover from the end of act VII (#178) so the reveal happens once, in act VIII, at :22. Act VII is 12.934 s shorter, so every chapter after it moved."
+  "_version": "v2.0 -- THE PERFUME THREAD. v1.0 was the first build that was the whole feature: all eight acts playing, act VIII (the credits, #51) added with its own slide, and the comic cover cut from the end of act VII (#178) so the reveal happens once, at :22. v2.0 changes the SHAPE of the programme rather than its contents: Nightwish's 'Perfume Of The Timeless' now plays from the first frame to the last frame before the credits, in source order and without gaps, and the eight acts live inside it. Five movements -- the prologue in front of act I, then 93.000->159.400 after act I, 159.400->328.080 after act III, 328.080->389.800 before Europa, and 389.800->EOF from Europa into the credits. None of them takes a numeral, a slide or a chapter marker, so the chapter list still has eight entries, but every timestamp after act I moved. Movements 2-5 add 414.0 s (6:54.0) on top of the prologue's 99.2, taking the feature from 24:07.1 to roughly 32:40. See docs/cuts/00-perfume-thread.md."
 }

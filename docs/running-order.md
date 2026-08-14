@@ -76,6 +76,42 @@ the prologue in front of act I — so it currently plays
 self-contained, with the bridge as its own tail, so moving it is one reordered
 item in `stories/megacut/megacut.json` and a row here — not a re-render.
 
+## The Perfume thread — the prologue was the first movement of five
+
+Added 2026-08-14, later the same night, on the owner's instruction: take the
+**middle** of the same music video and seat it between the acts. So the
+prologue is no longer a cold open that ends — it is **movement 1 of five**, and
+"Perfume Of The Timeless" now plays from the first frame of the show to the
+last frame before the credits, **in source order and without gaps**. The eight
+acts live inside it.
+
+| Movement | Source in → out | Runtime | Seat |
+|---|---|---|---|
+| **1** — the prologue | 0 → 91.200 (+8 s bridge) | 1:39.200 | in front of act I |
+| **2** | 93.000 → 159.400 | 1:06.400 | after act I |
+| **3** | 159.400 → 328.080 | 2:48.685 | after act III |
+| **4** | 328.080 → 389.800 | 1:01.728 | after act VI, before Europa |
+| **5** | 389.800 → 507.021 (EOF) | 1:57.200 | after Europa, into the credits |
+
+Movements 2–5 add **6:54.0**. They take **no numerals, no slides and no chapter
+markers** — the same reasoning that keeps the prologue outside the eight, and
+the chapter list still has its eight entries, though **every timestamp after
+act I moved**.
+
+They deliver to **`renders/` only, not `Prod/`**, and are rendered **clean** —
+no fades, no overlays. The owner: *"we will be editing them in the future with
+dino artwork"*, and a dinosaur pass wants unfaded picture. `Prod/` keeps meaning
+"a finished act"; join treatment lives in `megacut.json` in act-film time.
+
+**Two joins are the owner's to approve.** Movement 5 opens on the measured cut
+at 389.800 to catch Europa's hand-down off Elsie Bray, and where exactly the
+two camera moves meet is a judgement about frames. It also **moves the act VIII
+ambush**: the drum smash now lands off the end of a different song, on a held
+shot rather than on black.
+
+The measured cut points, the two-answer in point and the rest are in
+[`docs/cuts/00-perfume-thread.md`](cuts/00-perfume-thread.md).
+
 **Act VIII has a film and the programme plays it.** Built from
 `stories/08-credits.json` by `scripts/build_credits.py`: four fixed cards,
 **eight** cast placards, the comic-cover reveal at :22, **619** contributors
