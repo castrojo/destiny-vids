@@ -58,6 +58,9 @@ ACTS = {
     "V": {"manifest": "stories/05-natali-plates.json",
           "project": "~/Videos/wolves-natali",
           "plates_dir": "renders/plates-05-natali"},
+    "VII": {"manifest": "stories/07-europa-plates.json",
+            "project": "~/Videos/wolves-directors-cut",
+            "plates_dir": "renders/plates-07-europa"},
 }
 
 

@@ -87,9 +87,14 @@
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
-   "note": "1:37.266. The comic cover (97.200-110.200) is CUT: it is act VIII's reveal now (#178), and playing it twice made the second one the weaker. The act ends on the fade-to-black it already had -- measured luminance runs 23.6 mean at 95.5 s to 0.00 at 97.2 -- with a 2.5 s audio fade landing the outro with the picture. Picture is STREAM-COPIED from the -1.1 dBTP master (#82); no generation added.",
-   "sources": [],
-   "sources_note": "NOT REPO-DRIVEN -- cut in ~/Videos/wolves-directors-cut, no committed inputs at all, so the no-cover master was made by trimming the delivered one rather than by re-running a builder. See #152."
+   "note": "1:37.266. The comic cover (97.200-110.200) is CUT: it is act VIII's reveal now (#178), and playing it twice made the second one the weaker. The act ends on the fade-to-black it already had -- measured luminance runs 23.6 mean at 95.5 s to 0.00 at 97.2 -- with a 2.5 s audio fade landing the outro with the picture. Picture is STREAM-COPIED from the -1.1 dBTP master (#82); no generation added. REPO-DRIVEN since the terse-pass re-render (#102, fixes #152 for act VII): plates are house pills rendered from the committed record by scripts/build_europa.py via scripts/actbuild.py.",
+   "sources": [
+    "stories/07-europa-plates.json",
+    "scripts/build_europa.py",
+    "scripts/actbuild.py",
+    "tools/plate.py"
+   ],
+   "source_digest": "ea005392d8cbfc0e798b32c9e34cdb602d8135a1751751e268e8d4e4ce163a6b"
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
