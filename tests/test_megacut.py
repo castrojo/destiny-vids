@@ -549,6 +549,23 @@ def test_fade_chain_formats_both_ends():
     chain = megacut.fade_chain({"fade_in": 1.5, "fade_out": 2.0}, 100.0)
     assert chain == ",afade=t=in:st=0:d=1.500,afade=t=out:st=98.000:d=2.000"
 
+
+# --- gain_db: the owner's mix decision, recorded in the plan (#164) --------
+#
+# A static per-act gain is a mix decision that belongs to the owner; gain_db
+# is the place their decision lands. It is applied BEFORE the fades so a fade
+# shapes the corrected level, and an item without one keeps a byte-identical
+# audio chain.
+
+
+def test_fade_chain_applies_owner_gain_before_fades():
+    chain = megacut.fade_chain({"gain_db": 3.5, "fade_in": 2.0}, 100.0)
+    assert chain == ",volume=+3.5dB,afade=t=in:st=0:d=2.000"
+
+
+def test_fade_chain_zero_gain_is_absent():
+    assert megacut.fade_chain({"gain_db": 0}, 10.0) == ""
+
 # --- the #88 guard: a silent re-time must stop the build -------------------
 #
 # Issue #88: one act's segment came out of the filtergraph with 307.967 s of

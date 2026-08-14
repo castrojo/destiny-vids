@@ -57,8 +57,11 @@ The segments genuinely disagree, so a re-encode is unavoidable:
   That is the act-join treatment from issue #105: an act enters dry out of the
   slide's digital silence unless its head is faded, and several acts end hot
   unless their tail is. A fade is a stated, reproducible shape in the plan --
-  not a limiter, not a normaliser, and never a *gain*: how loud one act is
-  against another is a mix decision and belongs to the owner. Silent segments
+  not a limiter, not a normaliser. How loud one act is against another is a
+  mix decision and belongs to the owner; when the owner takes it, the plan
+  records it as an explicit per-clip ``gain_db`` (a plain static gain, applied
+  before the fades -- the first was act I, 9.1 LU under the show, #164), and
+  no gain is ever applied that the plan does not state. Silent segments
   get generated 5.1 silence of exactly matching length rather than being left
   with no stream, because ``concat`` needs every segment to carry both.
 * **Colour.** BT.709 SDR is tagged explicitly. Untagged 1080p is *assumed* to be
@@ -532,19 +535,27 @@ def segment_video_chain(plan, item):
 
 
 def fade_chain(item, dur):
-    """The ``afade`` filters a clip asks for, or "" -- ACT FILM clock.
+    """The ``volume``/``afade`` filters a clip asks for, or "" -- ACT FILM clock.
 
     ``fade_in`` starts at 0 of the clip's own timeline; ``fade_out`` ENDS at
     the clip's end, so its start is ``dur - fade_out``. Both are seconds from
     the plan, stated explicitly and reproducibly -- the act-join treatment of
-    issue #105. They are fades, never gains: an act's level against the others
-    is a mix decision and is not taken here. ``dur`` is the clip's length on
-    its own clock (authored, or probed by the caller); with no fades declared
-    the chain is empty and the audio path is byte-identical to before.
+    issue #105. ``gain_db`` is a static per-act gain, applied BEFORE the
+    fades. An act's level against the others is a mix decision that belongs
+    to the owner -- so ``gain_db`` exists only as the place the OWNER'S OWN
+    decision is recorded in the plan (the first was act I, 9.1 LU under the
+    show and approved for correction, #164); a tool or agent never picks the
+    number, and it is a plain gain, never a limiter or normaliser. ``dur`` is
+    the clip's length on its own clock (authored, or probed by the caller);
+    with nothing declared the chain is empty and the audio path is
+    byte-identical to before.
     """
+    gain_db = float(item.get("gain_db", 0))
     fade_in = float(item.get("fade_in", 0))
     fade_out = float(item.get("fade_out", 0))
     filters = []
+    if gain_db:
+        filters.append(f"volume={gain_db:+.1f}dB")
     if fade_in:
         filters.append(f"afade=t=in:st=0:d={fade_in:.3f}")
     if fade_out:
@@ -554,10 +565,11 @@ def fade_chain(item, dur):
 
 def clip_audio_chain(item, rate, layout, dur):
     """The audio filter string for a source-audio clip: resample if needed,
-    pin the layout for the join, then the plan's explicit fades. No gain,
-    anywhere. Shared by the encode and the stream-copy segment commands so
-    the two paths treat a clip's sound identically -- ``dur`` is the clip's
-    length on the ACT FILM clock (authored, else probed by the caller).
+    pin the layout for the join, then the plan's explicit gain and fades. No
+    gain unless the plan's owner-authored ``gain_db`` declares one. Shared by
+    the encode and the stream-copy segment commands so the two paths treat a
+    clip's sound identically -- ``dur`` is the clip's length on the ACT FILM
+    clock (authored, else probed by the caller).
     """
     return (f"aresample={rate},"
             f"aformat=sample_fmts=fltp:channel_layouts={layout}"
