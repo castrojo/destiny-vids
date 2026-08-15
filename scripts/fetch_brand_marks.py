@@ -50,6 +50,20 @@ MARKS = {
     # ("Deploying CNCF Metal3").
     "metal3": "https://raw.githubusercontent.com/metal3-io/metal3-docs/"
               "main/images/metal3.svg",
+
+    # THE MAIN TITLE'S O. Owner, 2026-08-15: *"change the o in 'Wolves' to the
+    # kubernetes symbol - not the blue one though, just the white symbolic
+    # one"*. That is CNCF's own published white icon -- the helm alone, no
+    # wordmark, already `fill:#fff` in the source, so nothing here recolours
+    # anybody's mark. `cards/maintitle.html` swaps it in for the single O of
+    # WOLVES.
+    #
+    # RIGHTS: the Kubernetes mark is a Linux Foundation trademark distributed
+    # under CC BY 4.0 through cncf/artwork. That is a CLEARED asset, not a
+    # rights decision -- the licence's condition is attribution, which is
+    # satisfied verbatim in ATTRIBUTIONS.md.
+    "kubernetes": "https://raw.githubusercontent.com/cncf/artwork/main/"
+                  "projects/kubernetes/icon/white/kubernetes-icon-white.svg",
 }
 
 # NEVER TAKE A BRAND MARK OFF THIS HOST'S /usr/share/pixmaps.

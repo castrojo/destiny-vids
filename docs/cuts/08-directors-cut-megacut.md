@@ -16,6 +16,60 @@ Measured on the delivered files, not asserted: the master reads **−1.1 dBTP /
 −11.8 LUFS**, the distribution copy **−3.2 dBTP / −13.9 LUFS**, and
 `tools/deliver.py status` reports **0 stale**.
 
+## v2.9 — the 2026-08-15 review pass
+
+Ten owner notes, every one of them fixed **in the act that owns it** rather
+than in the assembly: *"make sure you're fixing the original video and do the
+entire supercut when you're done"*.
+
+| Note | Fixed in | What it was |
+|---|---|---|
+| the O in *Wolves* | `cards/maintitle.html` | CNCF's white Kubernetes helm, sized to the cap band |
+| every b and f blue | `tools/blueletters.py` | one rule, one home; **not** chat bubbles, **not** nameplates |
+| 1:32 fade, then black | `scripts/build_prologue.py` + the plan | a 1.2 s fade in front of **2.000 s of measured dead black** |
+| 4:19 the woman | `scripts/build_interludes.py` | dusk day→night, and a 6-frame roar |
+| 4:39 audio cut off | `megacut.json` | a crescendo peaking at −11.5 dB into an act entering at −21 |
+| 4:40 the plaques | `scripts/build_efmb_plates.py` | three cards printing a **login** where a name belongs |
+| 13:16 the band ghosts | `scripts/build_interludes.py` | three ghost shots, seven wallpapers |
+| 14:11 | `megacut.json` | a 3.0 s dip where a jump cut belongs |
+| the credits bed | `stories/08-credits.json` | the album pass restarted the song from its intro |
+| MAKE YOUR OWN FATE | `tools/credits.py` | the fitter, not the sizes — see below |
+
+**Three of these were measurement failures, not taste.** They are worth
+recording because each looked like a styling question and was not:
+
+- **1:32.** The bridge was doing what it was told. `signalstats` on the v2.8
+  programme showed the frame pinned at **YAVG 16.00 from 99.35 to 101.02** —
+  act I's own head, which holds flat black to 1.833 and starts climbing at
+  2.000. The fade was hurried *and* two seconds of nothing followed it. Both
+  ends were fixed: `BRIDGE_DOWN` 1.200 → 3.200, and act I's head skipped in the
+  programme. **The programme's length is unchanged** — the bridge gains exactly
+  what act I gives up.
+- **The call to action.** The sizes were never the problem. `_cta_font` shrank
+  a line until it fitted on **one row**, so an eighteen-character cry could
+  never be big: it came out near the `medium` size whatever the card asked for,
+  and FIGHT — five characters — was the only line that ever rendered at its
+  stated size, which is why it was the only one nobody complained about. Lines
+  **wrap** now and keep their size, balanced so a cry reads as a block rather
+  than a list.
+- **4:39.** Nothing was fading. Movement 2's crescendo returns Perfume to unity
+  and it simply *stopped* at its loudest, a ten dB cliff into act II's first
+  bar. The crescendo is the owner's own design and stays; what it was missing
+  is its release.
+
+**Artwork is high fidelity, and that was a correction.** The first interlude
+pass cropped every wallpaper to 16:9 and downscaled it to 1920×1080 at fetch
+time, then **stretched it to 1920×804** at render time to match the film's
+scope window. The owner: *"YOU ARE FUCKING UP THE IMAGES"*, and *"why are you
+using the 10xx versions use the high rez versions"*. Art is now cached at its
+published resolution — up to **7680×4320**, vectors rasterised at a 3840 long
+edge on their own aspect — and resampled **once**, fitted with
+`force_original_aspect_ratio=decrease` and letterboxed. Never stretched, never
+cropped.
+
+**Every replacement is duration-locked** to the shot it covers, measured with
+`select='gt(scene,…)'`, so no chapter marker downstream can move.
+
 **v2.6 is the slide cut and the audio pass, in that order.**
 
 The owner, 2026-08-14: *"we should remove the roman numeral chapter things —

@@ -43,3 +43,28 @@ and `source_rights_note`; the film's own title card states the position on
 screen. See [`AGENTS.md`](AGENTS.md), "Rights".
 
 [#51]: https://github.com/castrojo/destiny-vids/issues/51
+
+## Kubernetes
+
+The Kubernetes logo (the white helm) appears as the **O of WOLVES** in the
+feature's main title. It is a trademark of The Linux Foundation, distributed by
+the CNCF under **CC BY 4.0**:
+
+> The Kubernetes logo is a trademark of The Linux Foundation. Artwork from
+> [cncf/artwork](https://github.com/cncf/artwork), licensed under
+> [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+Cached by `scripts/fetch_brand_marks.py` from
+`projects/kubernetes/icon/white/kubernetes-icon-white.svg`. The mark is
+**reproduced unmodified** -- the published white icon is already `fill:#fff`,
+so nothing here recolours it; it is scaled and seated on the title's baseline
+and nothing else.
+
+## Project Bluefin artwork
+
+The extra wallpapers in the Perfume interludes -- `bluefin`, `prey`, `dusk`,
+`huntress`, `leaf-collector`, `eyes`, `lazy-days` -- and the angry raptor used
+for the jump scare are **Project Bluefin's own artwork**, from
+[ublue-os/artwork](https://github.com/ublue-os/artwork) and the project's
+website. This film is Project Bluefin's; the art is not a third party's.
+Cached by `scripts/fetch_artwork.py`.

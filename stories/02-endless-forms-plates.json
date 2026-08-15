@@ -25,7 +25,7 @@
       "position": "left",
       "copy_source": "owner_supplied",
       "label": "OG GUARDIAN",
-      "name": "dims",
+      "name": "Davanum Srinivas",
       "variant": "bronze",
       "title": "Comes in Peace",
       "avatar": "renders/avatars/dims.png",
@@ -39,7 +39,9 @@
       "copy_source": "owner_supplied",
       "label": "OG GUARDIAN",
       "name": "Catherine Paganini",
-      "variant": "bronze"
+      "variant": "bronze",
+      "avatar": "renders/avatars/CathPag.png",
+      "avatar_url": "https://github.com/CathPag.png?size=256"
     },
     {
       "id": "og_thockin",
@@ -48,7 +50,7 @@
       "position": "left",
       "copy_source": "owner_supplied",
       "label": "OG GUARDIAN",
-      "name": "thockin",
+      "name": "Tim Hockin",
       "variant": "bronze",
       "title": "Does NOT Come in Peace",
       "avatar": "renders/avatars/thockin.png",
@@ -61,7 +63,7 @@
       "position": "left",
       "copy_source": "owner_supplied",
       "label": "OG GUARDIAN",
-      "name": "jbeda",
+      "name": "Joe Beda",
       "variant": "bronze",
       "title": "Out of Retirement",
       "avatar": "renders/avatars/jbeda.png",
@@ -1175,6 +1177,7 @@
   ],
   "unresolved": [
     "the Bazzite/Xbox achievement gag is BUILT BUT NOT SCHEDULED: the owner asked to approve the strings before anything is burned. Proposed, one per measured explosion -- Mailing List Bullshit (100 G, owner_supplied); Sent It Upstream (10 G, proposed); Maintainer Said NAK (25 G, proposed); Carried Out of Tree Since 2019 (50 G, proposed). Only 'Mailing List Bullshit' is his. Flip WALK_ACHIEVEMENTS_APPROVED in scripts/build_efmb_plates.py once he has said yes.",
+    "og_paganini HAS NO `title` ROW. The owner filled the OG Guardian plaques on 2026-08-15 by pointing at GitHub, which gets every one of them a verified NAME and a pfp -- but a title is authored copy and no profile carries one. The other three have the owner's own lines ('Comes in Peace', 'Does NOT Come in Peace', 'Out of Retirement'); Catherine Paganini has none, so the row is OMITTED and her card degrades to name and pfp. A lorem placeholder is NOT available here: placeholder prose credits the vocab's uncast speaker, and this card names a real person -- AGENTS.md, 'Lorem under a real name is still putting words in a colleague's mouth.' One line from the owner closes it",
     "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for now.' Three blocks went with him -- the four ranked montage cards, the two TOC payoff cards ('It's totally NOT like this' and 'Have you met our Ambassadors?'), and the eyebrow on Natewaddington's placard. Every string is still in git; 'for now' means this is a revert, not a rewrite",
     "NATEWADDINGTON IS OUT, owner: 'get rid of the nate wassington in the endless climax in endless'. His placard stood at film 260.000 (4:20) -- centre frame, the last card before the 269.700 downbeat the act climaxes on. Only the scheduling went: his two authored rows are still in git, nothing moved into the slot, and he is owed a credit somewhere nobody has decided yet",
     "the owner marked Joseph's last two lines one second apart (megacut 3:39 and 3:40) and a pill needs 2.2s to be read, so 'You got this' is chained behind 'Master your skills' at 99.883 rather than stacked on it. The ORDER is his and is kept",

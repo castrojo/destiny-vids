@@ -21,13 +21,14 @@
     ],
     "crossfade_sec": 0.25,
     "then": {
-      "_what": "PASS TWO -- the album version, WITH VOCALS, played whole from its own top. It takes over the moment the instrumental loop has run once, which is what 'after the entire instrumental loops once' means: the loop is not cut short to make room. 243.400 is MEASURED, not the file end -- the recording holds full level to 242 (-6.7 dB), decays through 242-243 (-19.6 dB) and is at -54.4 dB by 243, so the film ends on the song's own ending with 0.479 s of digital silence left off the back. The record's downbeat phase is UNRESOLVED and nothing here needs it: this pass is played whole, never snapped to a bar.",
+      "_what": "PASS TWO -- the album version, WITH VOCALS. It takes over the moment the instrumental loop has run once, which is what 'after the entire instrumental loops once' means: the loop is not cut short to make room. IT NO LONGER RESTARTS THE SONG. Owner, 2026-08-15: 'the transition is weird you don't need to start the song from the beginning just make it all fit so it sounds like they play the instrumental version first and then go into the song.' It used to play from 0.0, so a hand-over that happened mid-song -- pass one goes out at instrumental 181.320, the top of the breakdown -- landed on this recording's QUIET INTRO. Mid-song to intro is the 'weird' the owner heard: the song audibly started over. The intro is now skipped and the album is entered on its full-band vocal entry instead, so the instrumental reads as the opener and the song proper arrives with the voice. WHY NOT A LITERAL CONTINUATION at album ~184.5, the breakdown pass one stopped at: it would replay the 'weird drum section with the moaning' the owner cut from the loop, and it would leave only 59 s of song -- the last minute rather than 'the song'. The record's downbeat phase is UNRESOLVED and nothing here needs it: the in point is a measured onset snapped to a tracked beat, never to a bar.",
       "bed_id": "bed_wish_i_had_an_angel_album",
       "media_filename": "bed_wish_i_had_an_angel_album.wav",
       "source_url": "https://www.youtube.com/watch?v=wEERFBI9eCg",
       "segments": [
         {
-          "start_sec": 0.0,
+          "_what": "MEASURED 2026-08-15. The album version is entered at 10.4722, NOT at 0.0. Its own intro runs 0 -> 10.8 at about -13 dB and the full band and the vocal arrive on a +6.11 dB step at 10.820 -- the sharpest onset anywhere in the first minute. 10.4722 is the album's own tracked beat 0.348 s ahead of that step, chosen so the 0.25 s crossfade is COMPLETE before the hit lands: starting on the onset itself would put the transient inside the fade and shave the arrival. 243.400 is unchanged and is also measured -- the recording holds full level to 242, decays through 242-243 and is at -54.4 dB by 243, so the film still ends on the song's own ending with the digital silence left off the back.",
+          "start_sec": 10.4722,
           "end_sec": 243.4
         }
       ]
@@ -45,17 +46,17 @@
   "_cta_cards_what": "The call to action, and everything that plays BEFORE the reveal. Owner, 2026-08-14. dur_sec are RELATIVE WEIGHTS scaled into the window the cover's own time leaves (reveal.at_sec), exactly as fixed_cards used to be: the owner named :22 for the cover and the cards give way to it. FIGHT's weight is longer than the first two together, which is the instruction; the reveal's own hold_sec is untouched.",
   "cta_cards": [
     {
-      "_what": "Card one of the call to action. Set in the blocky treatment, but the smallest of the three cries -- it is the premise, and BECOME LEGEND is the answer to it.",
+      "_what": "Card one of the call to action. THE OWNER'S WORDING, 2026-08-15: 'MAKE YOUR OWN FATE'. It read 'WE MAKE OUR OWN FATE' until then; the owner restated the line and their instruction is the copy, so the string was updated rather than queried -- a committed string records what was decided last time, it does not outrank what the owner says now. Stepped medium -> large in the same pass ('noticeably larger font, more emphasis on the font'), which also brings it above CTA_SEAR_FROM so its F sears.",
       "kind": "cta",
-      "text": "WE MAKE OUR OWN FATE",
-      "scale": "medium",
+      "text": "MAKE YOUR OWN FATE",
+      "scale": "large",
       "dur_sec": 4.0
     },
     {
-      "_what": "Owner: 'noticeably larger font, more emphasis on the font - no italics, I want bold and blocky, make the filled in F's and blue sear with heat for the big ones'. There is no F in this line; its B carries the film's blue under the existing rule.",
+      "_what": "Owner, re-issued 2026-08-15 against this line and the one above: 'noticeably larger font, more emphasis on the font - no italics, I want bold and blocky, make the filled in F's and blue sear with heat for the big ones'. Stepped large -> huge. There is no F in this line; its B carries the film's blue under the b/f rule, which is now every b AND every f rather than an either/or.",
       "kind": "cta",
       "text": "BECOME LEGEND",
-      "scale": "large",
+      "scale": "huge",
       "dur_sec": 4.5
     },
     {
@@ -67,10 +68,10 @@
       "dur_sec": 5.0
     },
     {
-      "_what": "Owner: 'FIGHT <--- I want this one up longer than the first 2 (do not touch the comic book reveal length.) HUGE BOLD FONT. BLUE F'. Its weight is longer than cards one and two put together, and it is the last thing on screen before the cover drops.",
+      "_what": "Owner: 'FIGHT <--- I want this one up longer than the first 2 (do not touch the comic book reveal length.) HUGE BOLD FONT. BLUE F'. Its weight is longer than cards one and two put together, and it is the last thing on screen before the cover drops. Moved huge -> colossal on 2026-08-15 so that promoting the two cries above it did not quietly demote FIGHT to joint-largest: it is the biggest thing in the act and has to stay that way.",
       "kind": "cta",
       "text": "FIGHT",
-      "scale": "huge",
+      "scale": "colossal",
       "dur_sec": 9.5
     }
   ],
