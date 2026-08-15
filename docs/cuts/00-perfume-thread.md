@@ -13,8 +13,8 @@ inside it. Five movements, in source order, with no gaps:
 |---|---|---|---|---|
 | **1** — the prologue | 0 → 91.200 (+8 s bridge) | 99.200 | cold open, in front of act I | `scripts/build_prologue.py` |
 | **2** | 93.000 → 159.400 | 66.400 | after act I | `scripts/build_interludes.py` |
-| **3** | 159.400 → 328.080 | 168.680 | after act III | " |
-| **4** | 328.080 → 389.800 | 61.720 | before act VII | " |
+| **3** | 159.400 → 274.240 | 114.840 | after act III | " |
+| **4** | 274.240 → 389.800 | 115.560 | before act VII | " |
 | **5** | 389.800 → 507.021 (EOF) | 117.221 | after act VII, into the credits | " |
 
 Movements 2–5 add **414.021 s** (6:54.0). With the prologue the programme goes
@@ -181,11 +181,41 @@ full bar and hands straight to Perfume. The owner said 23:55; the measured frame
 is 23:59.5, and it is the frame their description names.
 
 **Every credit survives.** Act VI's tail plates — the Cayde-6 reveal (Jorge
-Castro), the narration, then Kelsey Hightower, Brian Ketelsen and Angie Jones —
-all end by act-film **409.669**, 21.6 s before the cut. That was checked against
+Castro), then Kelsey Hightower, Brian Ketelsen and Angie Jones, and since
+2026-08-15 castrojo's six spoken lines — all end by act-film **429.980**,
+1.25 s before the cut. That was checked against
 `stories/06-wolves-cayde-plates.json` *before* cutting, and it is asserted in
 `tests/test_interludes.py`, because a dropped credit is not recoverable by a
-revert.
+revert. The margin used to be 21.6 s; the pills were seated into exactly that
+empty tail, so any further trim here is now a real risk rather than a rounding
+question.
+
+## 2026-08-15 — "the transition to the other song is also a hot mess"
+
+The owner's note on the v2.7 join, and it was a **measurement** problem, not a
+level one: `tools/transitions.py` had the two sides within 0.3 dB of each other
+(−16.9 → −17.2 dB) and no silence at all. Spectral flux on the delivered files
+found what was actually wrong, on both sides at once:
+
+- act VI's cut at **431.267** fell **24 ms inside a drum hit** at 431.243 — the
+  programme played a transient's attack and took the rest away, which is a
+  click, not an ending;
+- movement 4 opened with a **0.421 s stub** of the previous phrase before its
+  own first hit, so the new song did not land for nearly half a second after the
+  cut.
+
+Fixed on both sides, and neither side loses any song:
+
+| | before | after |
+|---|---|---|
+| act VI out (`megacut.json`) | 431.267 | **431.231** — the 59.94 fps frame ahead of the hit |
+| movement 3/4 boundary | 273.840 | **274.240** — the 25 fps frame ahead of movement 4's first hit; movement 3 keeps the 0.400 s |
+
+**Three joins were built and measured before choosing** —
+`renders/review/join-A.mp4` (as shipped), `join-B.mp4` (act VI trimmed only)
+and `join-C.mp4` (both sides). A and B both leave the new song's first hit
+**0.48 s after** the seam; C lands it **on** the seam at full flux. C shipped.
+The comic is still never seen: it comes up 36 ms after the cut.
 
 **The cover now happens once.** It was already act VIII's reveal — #178 took it
 off the end of act VII for exactly this reason.

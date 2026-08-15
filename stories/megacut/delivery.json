@@ -69,7 +69,7 @@
    "source_digest": "21a2e2bdd047187685927d4bdbae7d9864ba7da3a2fb74bd3137765eae0ec0c2"
   },
   "VI": {
-   "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v3.mp4",
+   "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v4.mp4",
    "note": "the #104 interruption build with its **hold music now playing** (443.533 s): Local Forecast – Slower, CC BY 4.0, credited in the repo's `ATTRIBUTIONS.md`. The slot shipped silent in v2 because a cleared track was mistaken for a rights block. **AAC, the one act with no lossless master** (#58)",
    "sources": [
     "scripts/build_wolves.py",
@@ -83,7 +83,7 @@
     "music/bed_local_forecast_slower.json",
     "vocab/casting.yaml"
    ],
-   "source_digest": "b63d7c741a7cdb651972fec77a1418b9d2123b61cfc7dfdbac4e8cdd1e51cd8b"
+   "source_digest": "d6b1ad8842f3e430bcee65583f4374b30cc03a2b783decdac0c120a3168ef646"
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",

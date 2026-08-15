@@ -2227,6 +2227,42 @@ def test_the_shipped_act_vi_manifest_declares_its_overrides():
     assert any("#111" in u for u in d["unresolved"])
 
 
+def test_the_act_vi_tail_speaks_in_pills_not_a_stacked_card():
+    """Owner 2026-08-15: 'individual senteces spaced out over the course of
+    the shot, one line per with castrojo talking'.
+
+    The failure this guards against is the old shape coming back: six lines
+    stacked on one title card, which is what a narration card is. Six pills
+    that overlap, or that land on top of the gold credits, would also read as
+    a regression -- one plate at a time is the rule the reveal exists under.
+    """
+    import json
+    root = Path(__file__).resolve().parents[1]
+    d = json.loads((root / "stories" / "06-wolves-cayde-plates.json").read_text())
+    plates = d["plates"]
+
+    assert not any(p.get("kind") == "title" for p in plates), (
+        "the narration went back to being one stacked card")
+
+    lines = [p for p in plates if p.get("kind") == "chat"]
+    assert len(lines) == 6
+    assert {p["speaker"] for p in lines} == {"castrojo"}, (
+        "the pills are his own lines; the reveal three cards earlier already "
+        "said his name, so they carry his handle")
+    assert lines[0]["text"].startswith("For five years"), "the owner's fix"
+    assert lines[-1]["text"] == "Lead the way, we will follow"
+
+    # One per bar of the song, and the bar is the bed's own (3.157914 s).
+    gaps = [round(b["at"] - a["at"], 3) for a, b in zip(lines, lines[1:])]
+    assert gaps == [3.158] * 5, gaps
+
+    # After every gold credit, and never two on screen at once.
+    credits_end = max(p["at"] + p["dur"] for p in plates if p.get("kind") != "chat")
+    assert lines[0]["at"] > credits_end
+    for a, b in zip(lines, lines[1:]):
+        assert a["at"] + a["dur"] <= b["at"], f"{a['id']} overlaps {b['id']}"
+
+
 # --- the letterbox banner (owner brief, issue #98) ---------------------------
 
 BANNER = {

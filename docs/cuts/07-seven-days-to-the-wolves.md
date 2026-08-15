@@ -577,10 +577,62 @@ defects of the previous session, neither of which was visible in a manifest.
 | Owner mark | Film | What is actually on that frame | Card |
 |---|---|---|---|
 | 17:37 | 382.7 | Cayde-6 alone in the fog, then the hooded close-up | **Jorge Castro**, basic blue |
-| 17:37 | 386.3 | the Guardians walking up between the fire pillars | the narration, as the deck's title card |
+| 17:37 | 386.3 | the Guardians walking up between the fire pillars | the narration — **retired 2026-08-15**, see below |
 | 17:45 | 391.008 | the Guardians assembled around the fire | **Kelsey Hightower**, gold |
 | 17:49 | 395.008 | the group standing, sunset behind | **Brian Ketelsen**, gold |
 | 17:51 | 397.008 | the front rank walking into camera | **Angie Jones**, gold |
+
+**"17:37" is the OLD programme clock, and it no longer resolves here.** It was
+megacut time on the pre-prologue running order. On the programme as it plays
+today the reveal is at **21:36**, and `tools/megacut.py --locate 17:37` lands
+in the middle of act VI instead. The act-film numbers below are the ones that
+mean anything; a review note quoting 17:37 is quoting the 2026-08-13 brief.
+
+### The narration is six pills now, not one card
+
+**Owner, 2026-08-15**, verbatim: *"As individual senteces spaced out over the
+course of the shot, one line per with castrojo talking."* The single
+`cayde_narration` title card — 4.5 s with all six lines stacked on it — is
+retired, and the same words are six `kind: chat` pills under his GitHub
+handle. Two lines changed with the same instruction: *"For fives years"* became
+**"For five years"** (the author correcting his own brief; `Harbringer` above
+has had no such word said about it, so it is still reproduced verbatim), and
+*"Lead the way, open source will follow"* became **"Lead the way, we will
+follow"**.
+
+**They do not sit where the card sat, and that is the whole design decision.**
+The reveal holds 393.511–396.911 and Kelsey's gold plate arrives at 401.819, so
+the narration's old slot is 4.7 s — six readable pills cannot live there, and
+one plate at a time is a hard rule. The tail from 409.669, where the last gold
+credit clears, is **one unbroken finale run** (`build_wolves.py` plays FINALE
+from 380.670 to 431.170) carrying nothing at all. The pills take it at **one
+line per bar** — 3.157914 s apart, the bed's own bar, from a measured onset at
+411.390 — holding 2.8 s each and clearing at 429.980.
+
+| # | Film | Line |
+|---|---|---|
+| 1 | 411.390 | For five years you've trusted us |
+| 2 | 414.548 | Mastered your tools |
+| 3 | 417.706 | Honed your craft |
+| 4 | 420.864 | Made Lifelong Friends |
+| 5 | 424.022 | And now it's up to you, guardian |
+| 6 | 427.180 | Lead the way, we will follow |
+
+They carry `position: letterbox` and seat in the bottom matte — act VI is
+`crop=1920:800:0:140`, so the pill's top edge lands at y=979 against a picture
+that ends at y=940, and none of them ever covers picture. The reveal and the
+three gold credits are untouched.
+
+**The handle, not the name.** The reveal three cards earlier says *Jorge
+Castro* in full; the pills say `castrojo`, with his own avatar, exactly as act
+IV's conversation does. Owner's instruction: *"you've already said my name use
+my github handle."*
+
+**This tightened the act's out point margin from 21.6 s to 1.25 s.** Anything
+that trims act VI further now has to be measured against 429.980, not against
+the last gold plate — `tests/test_interludes.py` asserts it from the manifest
+rather than from a number in a comment.
+
 
 **Shifted +10.811 s for the interruption build (#104).** Every window is after
 the pause, and the pause grew by exactly 10.811 s of film (bed untouched), so
@@ -595,10 +647,12 @@ like the blueberries"*.
 
 ### Why the reveal comes before the narration
 
-Both are lower-third cards, so they cannot share a window — the one-card-at-a-
-time check is there precisely to stop two credits stacking. The brief gives
-both at 17:37, so they are sequenced inside that beat, name first, because the
-name is the payoff the act has been saving. Swapping them is one edit to `at`.
+Both were lower-third cards, so they could not share a window — the
+one-card-at-a-time check is there precisely to stop two credits stacking. The
+brief gives both at 17:37, so they are sequenced inside that beat, name first,
+because the name is the payoff the act has been saving. The narration has since
+moved out of that beat entirely (it is the six pills above), so what this rule
+now settles is simply that the reveal owns 393.511 alone.
 
 ### What the owner still has to settle
 
@@ -626,6 +680,21 @@ Recorded in the manifest's `unresolved`, and none of it is an agent's call:
   exactly as written. Reproduced, not de-duplicated.
 
 ### Burning it
+
+```bash
+python3 tools/plate.py burn \
+    --video ~/Videos/wolves-musical/wolves-7days-master-v3.mp4 \
+    --manifest stories/06-wolves-cayde-plates.json \
+    --plates-dir renders/plates-act6-v4 \
+    --out ~/Videos/wolves-musical/wolves-7days-plated-master-v4.mp4 --fit-picture
+```
+
+**Always from the CLEAN master.** Burning is not idempotent: starting from the
+plated file stacks a second card on the first. `wolves-7days-master-v3.mp4` is
+the un-plated act; `-plated-master-v4.mp4` is the 2026-08-15 burn with the six
+pills, and it is what `Prod/06` hardlinks to.
+
+The earlier form of the same command, for the record:
 
 ```bash
 python3 tools/plate.py render --manifest stories/06-wolves-cayde-plates.json \

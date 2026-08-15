@@ -160,7 +160,7 @@ def test_the_source_is_never_committed(thread):
 # to "tidy up" the plan would put them back.
 
 ACT_VI = "06-7daystothewolves"
-COMIC_CUT = 431.267   # act VI's last shot change: comic cover AND fade start
+COMIC_CUT = 431.231   # 36 ms ahead of the 431.243 hit; the comic comes up at 431.267
 
 
 def _item(plan, needle):
@@ -175,6 +175,12 @@ def test_act_six_is_cut_at_the_comic(plan):
     and holds 12.2 s to the end, and the audio is at full level right up to
     it (-12.6 dB) and decaying immediately after. The owner asked for both to
     go, and both go with one cut.
+
+    The cut sits 36 ms EARLIER than that shot change, at 431.231, and the 36 ms
+    are the owner's 'hot mess' note (2026-08-15): there is a hit at 431.243, so
+    cutting on the shot change played the attack of a drum and took the rest
+    away. 431.231 is the frame boundary ahead of the transient. The comic is
+    still never seen -- it starts 36 ms after the cut.
     """
     assert _item(plan, ACT_VI)["trim_to"] == COMIC_CUT
 
@@ -182,9 +188,11 @@ def test_act_six_is_cut_at_the_comic(plan):
 def test_the_trim_keeps_every_tail_credit(plan):
     """A dropped credit is not recoverable by a revert.
 
-    Act VI's tail plates -- the Cayde-6 reveal and the three gold credits --
-    all end well before the cut. This reads the plate manifest rather than
-    trusting a number copied into a comment.
+    Act VI's tail plates -- the Cayde-6 reveal, the three gold credits, and
+    castrojo's six spoken lines -- all end before the cut. This reads the
+    plate manifest rather than trusting a number copied into a comment, and
+    the margin is now 1.25 s rather than 21.6 s: the six pills were seated
+    into the empty tail this cut used to have to spare.
     """
     plates = json.loads(
         (REPO_ROOT / "stories" / "06-wolves-cayde-plates.json").read_text())
