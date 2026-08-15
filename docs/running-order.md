@@ -49,7 +49,7 @@ plays standalone. Issue #206.
 | **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete**; **slide retired** (v2.5), marker on the act |
 | **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **the shared IV–V slide is retired** (v2.5) — it announced two acts, so its one marker stays one marker, on this act, carrying the card's authored title unchanged |
 | **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **the shared IV–V slide is retired** (v2.5); plays the #118 Nat section, the docs.bazzite.gg button on its own fade; **followed by the interstitial card** — *On the Linux Desktop / No one can hear you scream* — up out of that fade (owner 2026-08-14; no chapter marker, deliberately; `scripts/build_scream_card.py`) |
-| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits; **the programme plays 431.267 of it** (v2.1) — the comic and the fade cut off the end, the file untouched; **slide retired and the 10.000 s head plate skipped** (v2.5, `trim_from`) — the programme plays 421.267 of it, the act file untouched and its attribution intact standalone (#206) |
+| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits; **the programme plays 431.231 of it** — the comic and the fade cut off the end, the file untouched; **slide retired and the 10.000 s head plate skipped** (v2.5, `trim_from`) — the programme plays 421.231 of it, the act file untouched and its attribution intact standalone (#206); **v4, 2026-08-15**: the narration card is retired and castrojo speaks six lines as chat pills, one per bar from film 411.390, and the out point moved 36 ms off a drum hit so the join into Perfume is a needle drop rather than a chopped transient |
 | **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; **no slide, no chapter marker** (v2.1) — a quick cut off movement 4; **the programme plays 96.73 of its 1:37.266** (v2.3) — it ends ON the eclipse at full brightness, hard into movement 5 (the owner's alpha-QA note; A/B excerpts in `renders/review/`, #192); the comic cover cut so act VIII owns the reveal — #178; terse-pass re-render in flight — #102; master corrected to −1.1 dBTP — #82 |
 | **VIII** | Credits | `Prod/08-credits.mp4` — the **call to action**, the comic-cover reveal, then the cast and 723 contributors across **eight** projects | delivered, **in the programme**; **7:50.453**, two bed passes (instrumental loop, then the album version with vocals); **no slide, no chapter marker** — it is meant to surprise — #51; master corrected to −1.1 dBTP (was **+0.9 — clipping**), 2026-08-14 |
 
@@ -114,8 +114,8 @@ acts live inside it.
 |---|---|---|---|
 | **1** — the prologue | 0 → 91.200 (+8 s bridge) | 1:39.200 | in front of act I |
 | **2** | 93.000 → 159.400 | 1:06.400 | after act I |
-| **3** | 159.400 → 328.080 | 2:48.685 | after act III |
-| **4** | 328.080 → 389.800 | 1:01.728 | after act VI, before Europa |
+| **3** | 159.400 → 274.240 | 1:54.848 | after act III |
+| **4** | 274.240 → 389.800 | 1:55.565 | after act VI, before Europa |
 | **5** | 389.800 → 507.021 (EOF) | 1:57.200 — **the programme plays 109.5 of it** (v2.3) | after Europa, into the credits |
 
 Movements 2–5 add **6:54.0**. They take **no numerals, no slides and no chapter
