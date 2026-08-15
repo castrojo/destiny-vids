@@ -1,4 +1,4 @@
-# 01-dance — the Dance cut. Sequence position 01 (see docs/cuts/01-dance.md).
+# 01-dance — the Dance cut. Sequence position 01.
 #
 # ONE CINEMATIC, SKIPPED FORWARD. Every beat below is cut from
 # yt_destiny_2_the_final_shape_launch_trailer and sits at or after the previous
@@ -16,11 +16,11 @@
 # unclean. So the dance is staged, not depicted: one Guardian alone, then the
 # floor fills, then the light goes up. Nothing here claims anyone is dancing.
 # The unresolved beats that would have needed real dance footage are recorded
-# in docs/cuts/01-dance.md and in corpus/ensemble.json, not guessed at.
+# in corpus/ensemble.json, not guessed at.
 
 # --- MOVEMENT 1 — ALONE (skip to 0:32) --------------------------------------
 # One Guardian, by themselves. The sound-effect hit the brief asks for lands
-# here; its exact frame is unresolved (see docs/cuts/01-dance.md).
+# here; its exact frame is unresolved.
 low shot of armored titan boots planted on grey lunar rock, mountains beyond
 a single silhouetted guardian dwarfed by the vast sphere of the traveler in cloud
 

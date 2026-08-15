@@ -70,7 +70,7 @@ VIDEO_FILTER = (
     f"fps={TARGET_FPS},format=yuv420p"
 )
 
-# Issue #144. `docs/skills/references/audio-standard.md` states the rule in one
+# Issue #144. `docs/skills/audio/SKILL.md` states the rule in one
 # line -- "source the best version that exists, KEEP THE CHAIN LOSSLESS, ship it
 # unaltered" -- and this module used to encode AAC 192k at three places inside
 # that chain. The loss was invisible where it happened (the file plays fine) and

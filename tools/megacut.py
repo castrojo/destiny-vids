@@ -75,7 +75,7 @@ The segments genuinely disagree, so a re-encode is unavoidable:
 
 Audio is re-encoded once to AAC. That is one generation of lossy-to-lossy loss
 on segments whose deliverables are already AAC; it is recorded rather than
-hidden, and the lossless-master path (see ``docs/skills/references/audio-standard.md``) is the upgrade
+hidden, and the lossless-master path (see ``docs/skills/audio/SKILL.md``) is the upgrade
 if a delivered master is ever wanted.
 
 The stream-copy path, and what it costs to earn it

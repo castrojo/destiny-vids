@@ -173,7 +173,7 @@ ART = str(Path.home() / "Pictures/Artwork/wolves.jpg")
 
 # Contributor Summit group photographs, built by scripts/build_summit_plates.py.
 # CNCF, CC BY-NC-ND 4.0; cropped to 16:9 on the owner's explicit authority.
-# See that script's header and docs/cuts/07-seven-days-to-the-wolves.md.
+# See that script's header and ATTRIBUTIONS.md.
 SUMMIT_DIR = REPO / "renders" / "summit-plates"
 
 # The interruption's slides, built by scripts/build_interruption_cards.py from

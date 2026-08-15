@@ -131,6 +131,22 @@ Use `automatable: no` for work that genuinely cannot proceed, put the exact
 missing decision in `blocked_on`, and file it. Do not use it for a gap you
 could have shipped around.
 
+**Before you mark anything blocked, read the issue's own comments.** The most
+common defect in this backlog is not a wrong decision, it is an issue sitting
+`blocked` on a question the owner already answered in a comment months earlier
+— #73 waited on "who is Orlin" while the answer, a GitHub profile and "only in
+the intro", sat two comments up. An owner reply is an instruction to execute,
+not a note to file. Re-asking a question that has been answered is the same
+cost as inventing an answer: the work does not happen.
+
+**Do not cite a tool, test, or file you have not opened.** #222 and #223 were
+filed on the findings of `tools/quality.py`, recorded in `sources/unindexed.json`
+and guarded by `tests/test_quality.py` — none of which have ever existed here.
+Both issues had a real defect inside them, and both were unusable, because
+nothing they pointed at could be read. Check with `git log --all -- <path>`
+before you cite: a path with no history never existed, and one with history was
+deleted and needs repointing at whatever holds the fact now.
+
 
 ## Common Rationalizations
 
@@ -142,6 +158,8 @@ could have shipped around.
 | "I'll add a `character/paris` label." | Characters live in the brief, in the index's own vocabulary. A label set is a second vocabulary that drifts. |
 | "The owner obviously means Paris is a Titan." | That is a claim about a real person. `automatable: no`. |
 | "I'll mark it automatable so it isn't stuck." | Stopping is a result here. A wrong credit is not recoverable by a revert. |
+| "This is blocked on an owner decision." | Read the comments first. He has usually already answered, and the issue is waiting on you, not on him. |
+| "The audit tool reported…" | Open the tool. `git log --all -- <path>` it. Do not cite evidence you did not read. |
 | "I'll note the remaining work in NOTES.md." | It goes in an issue. Files like that go stale and mislead the next agent. |
 
 ## Red Flags

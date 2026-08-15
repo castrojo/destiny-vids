@@ -17,7 +17,7 @@ The corpus is DERIVED and regenerable: everything in it is copied or counted
 from ``segments/``, nothing is authored. Hand-editing a corpus file is the same
 mistake as hand-editing ``clean`` — rerun the tool instead. Editorial
 unknowns that are not derivable (a music cue, a licensing call) belong in the
-cut's own doc under ``docs/cuts/``, never here.
+cut's own outline under ``stories/``, never here.
 
 Usage:
     python3 tools/corpus.py ensemble --dir segments

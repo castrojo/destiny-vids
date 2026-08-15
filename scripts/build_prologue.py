@@ -28,7 +28,8 @@ reports what is missing rather than substituting anything.
 The three measured numbers
 --------------------------
 None of these are the owner's timestamps taken on trust; each was read off the
-actual file, and the exact commands are in ``docs/cuts/00-prologue.md``.
+actual file with ``ffprobe``, and the values they produced are the constants
+below and in ``stories/00-prologue-plates.json``.
 
 * **TITLE at 2.000, over black.** The owner: *"just show black at the beginning
   of the prologue but have the bluefin logo fade straight in ... it should be

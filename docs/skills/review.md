@@ -77,17 +77,19 @@ time ([#98](https://github.com/castrojo/destiny-vids/issues/98)).
 
 ## Step 2 — the act clocks, so you can predict the answer
 
-| Act | Starts | Its film |
-|---|---|---|
-| I. Project Bluefin | 0:00 | `Prod/01-intro.mp4` |
-| II. Endless Forms Most Beautiful | 1:56 | `Prod/02-endlessformsmostbeautiful.mp4` |
-| III. Bob Killen | 7:09 | `Prod/03-mrbobbytables.mp4` |
-| IV–V. Bias for Action | 9:54 | `Prod/04-kat.mp4`, `Prod/05-nat.mp4` |
-| VI. 7 Days to the Wolves | 11:08 | `Prod/06-7daystothewolves.mp4` |
-| VII. Europa | 18:37 | `Prod/07-europa.mp4` |
+Derive them, every time — do not read them from a table in a doc:
 
-Regenerate this with `--chapters`; never hand-edit it, and never trust a copy
-of it that has been pasted somewhere else.
+```bash
+python3 tools/megacut.py stories/megacut/megacut.json --chapters
+```
+
+Which act owns which file is [`../running-order.md`](../running-order.md); the
+measured trims are in `stories/megacut/megacut.json`.
+
+This table used to be printed here, and it went stale the day the prologue was
+placed in front of act I — it still opened act I at `0:00`, which is now 1:41
+wrong and disagreed with `running-order.md`. **Never paste a copy of a derived
+stamp into a doc**, here or anywhere else.
 
 ## Step 3 — rebuild only what changed
 
@@ -120,12 +122,9 @@ watch.
 
 Known and tracked, so nobody re-measures them:
 
-- ~~The programme peaks at **+0.2 dBTP**, inherited from act VII's master.~~
-  **Fixed 2026-08-13**: act VII's master was re-rendered under
-  `tools/peaks.py trim` (PR #130) and measures **−1.1 dBTP**; every act is now
-  in the −4.6…−0.9 band and v0.8's programme peak is −0.9
-  ([#82](https://github.com/castrojo/destiny-vids/issues/82) stays open for its
-  owner to close).
+- Every act is inside the −4.6…−0.9 dBTP band, and the programme peak is
+  −0.9. The gate that keeps it there is `tools/peaks.py trim`
+  ([#82](https://github.com/castrojo/destiny-vids/issues/82)).
 - The delivered-peak trim is enforced by `tools/redact.py`, `tools/render.py`
   and the master gate `tools/peaks.py trim`; `tools/social.py` still encodes
   audio blind and relies on its master's peak

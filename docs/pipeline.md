@@ -180,11 +180,3 @@ mount, the plate burn, and the matching AV1 hazard in shot detection (OpenCV
 cannot decode AV1 and silently reports the whole video as a single beat).
 
 ---
-
-## 6. Prior art
-
-- **Shot detection:** [PySceneDetect](https://www.scenedetect.com/) (content/HSV-threshold SBD), [TransNetV2](https://github.com/soCzech/TransNetV2) (neural SBD, strong on soft transitions), [AutoShot](https://github.com/flix/AutoShot) (SBD + shot-annotation pipeline precedent).
-- **Metadata standards:** [IPTC Video Metadata Hub](https://iptc.org/standards/video-metadata-hub/), [PBCore](https://pbcore.org/), [EBUCore](https://tech.ebu.ch/MetadataEbuCore), [MovieLabs Ontology for Media Creation (OMC)](https://mc.movielabs.com/) — our `source`/`confidence` stamping and inheritance-over-observation pattern follows their asset/derivative metadata models.
-- **Editorial tagging:** stock-footage practice (Getty/Pond5-style mood, concept, and shot-type keywording) is the model for `mood`, `salience`, and caption-first retrieval.
-- **Stand-in conventions:** film stand-in / photo-double / body-double practice — the performer substitutes for the principal when face/identity is hidden — is why `identity_visibility` and `substitutability` exist as fields at all: in Destiny the helmet does the doubling. The project no longer leans on this convention as its primary casting mechanism — most lead bindings carry no resemblance constraint at all (see `docs/taxonomy.md`'s casting section) — but it survives as more than inert vocabulary: it is the literal mechanism behind the project's one constrained binding (`saladin` → `jeefy`), whose `require_helmet` constraint is evaluated directly against `identity_visibility`.
-- **On vocabularies:** there is **no standards-body canonical enum for shot scale or camera movement**. We adopt the common editorial abbreviations (ELS/LS/MLS/MS/MCU/CU/ECU; static/pan/tilt/push/handheld…) rather than inventing new terms.
