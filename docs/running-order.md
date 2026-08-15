@@ -50,10 +50,10 @@ his character's name.
 
 **Not every act is announced.** The Roman-numeral slides were retired on the
 owner's instruction; the programme plays exactly one card, the scream
-interstitial between acts V and VI — *ON THE LINUX DESKTOP / No one can hear you
-scream* — which carries no numeral and no marker, because a scrub-bar entry
-would spoil the gag. Acts VII and VIII carry no marker deliberately either: act
-VIII's whole design is that it surprises the viewer.
+interstitial between acts V and VI — *ON THE LINUX DESKTOP /
+No one can hear you scream* — which carries no numeral and no marker, because a
+scrub-bar entry would spoil the gag. Acts VII and VIII carry no marker
+deliberately either: act VIII's whole design is that it surprises the viewer.
 
 ## The Perfume thread
 
