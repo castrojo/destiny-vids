@@ -12,7 +12,7 @@
   "VIII": "credits — the cast, 454 contributors across four projects, the comic-cover reveal at :22 and the Project Bluefin wordmark. The act that makes this the feature rather than seven eighths of it (#51)."
  },
  "_audio": "Every act carries its own audio, unprocessed: no normaliser, no limiter, no EQ. The programme is 48 kHz STEREO because that is what the masters are -- every -hq master in Prod is stereo FLAC. The older, now-retired UPLOAD copies were AAC 5.1, but that 5.1 was the same two channels plus a derived LFE (FC/BL/BR digital silence), added by each cut's own run script. Upmixing here to recreate it would be assembly inventing a soundfield, which the audio tenet forbids; if 5.1 delivery is wanted, it belongs in the per-cut scripts that already do it. Only the six act slides are silent; a bed under them is a licensing decision.",
- "_transitions": "Issue #105, measured on v0.6 with tools/transitions.py (all times programme clock): every act entered DRY out of the slides' digital silence (4-14 s of -inf per join), the worst being act VII at -15.3 dB one second after the slide, and acts I and III ended HOT against the silence (-24.4 and -14.8 dB in their last second). The treatment below is explicit afade shapes, stated here so they are reproducible: fade_in 2.0 s on every act that starts behind a slide, fade_out 2.0 s on the acts whose tails do not already fade (I, III, V) and 3.0 s on act VII so the programme lands rather than stops. Acts II and VI fade themselves out (measured -96.7 / -90.3 dB in their last seconds) and carry no fade_out; the IV->V join is direct and continuous (-15.2 -> -11.9 dB) and carries no fade on either side. All fade times are ACT FILM time -- the clip's own clock -- so a re-order never moves them. LEFT TO THE OWNER (automatable: no): (1) whether the slides carry a bed or room tone -- a licensing decision, per the megacut skill; (2) levelling the act ENTRIES, which still differ by ~20 dB (act III at -29.5 vs act VII at -15.3) -- static gain per act is a mix decision; (3) how long the slides' silence should be. THE 15 s IV-V SLIDE IS GONE (v2.2): with the Perfume thread running through the show, a 15 s frozen card in silence after movement 3's static skull shot was about twenty seconds in which nothing moved. It holds 5.0 s now, like every other slide, and movement 3's fade_out is 1.0 s rather than 2.0 so the music carries closer to the card. PROLOGUE JOIN, measured 2026-08-14 on the built act rather than assumed: the prologue's own tail runs -28.3 -> -34.8 -> -58.7 dB RMS across its last three seconds (the song fading under the bridge from 93.000), and act I opens at digital silence (-127 dB) climbing through -30 to -18 dB. So the join needs NO fade on either side and carries none: the prologue fades itself out, exactly as acts II and VI do, and act I's own quiet opening picks it up. A fade_out here would double the taper on a fade the act already performs. ONE EDITORIAL FINDING, LEFT TO THE OWNER (automatable: no): the bridge exists because the owner asked for the wallpaper to 'replace the black part', and act I's 5 s silent slide immediately after it puts a black part back. It reads as a continuous darkening today -- night fades to black and the slide rises out of the same darkness, which is how a title sequence normally hands to act one -- but if the intent was for the wallpaper to hand STRAIGHT into a film, the fix is to drop or restyle act I's slide, and a slide is the one thing this show gives every act. Not changed unilaterally.",
+ "_transitions": "Issue #105, measured on v0.6 with tools/transitions.py (all times programme clock): every act entered DRY out of the slides' digital silence (4-14 s of -inf per join), the worst being act VII at -15.3 dB one second after the slide, and acts I and III ended HOT against the silence (-24.4 and -14.8 dB in their last second). The treatment below is explicit afade shapes, stated here so they are reproducible: fade_in 2.0 s on every act that starts behind a slide, fade_out 2.0 s on the acts whose tails do not already fade (I, III, V) and 3.0 s on act VII so the programme lands rather than stops. Acts II and VI fade themselves out (measured -96.7 / -90.3 dB in their last seconds) and carry no fade_out; the IV->V join is direct and continuous (-15.2 -> -11.9 dB) and carries no fade on either side. All fade times are ACT FILM time -- the clip's own clock -- so a re-order never moves them. LEFT TO THE OWNER (automatable: no): (1) whether the slides carry a bed or room tone -- a licensing decision, per the megacut skill; (2) levelling the act ENTRIES, which still differ by ~20 dB (act III at -29.5 vs act VII at -15.3) -- static gain per act is a mix decision; (3) how long the slides' silence should be. THE 15 s IV-V SLIDE IS GONE (v2.2): with the Perfume thread running through the show, a 15 s frozen card in silence after movement 3's static skull shot was about twenty seconds in which nothing moved. It holds 5.0 s now, like every other slide, and movement 3's fade_out is 1.0 s rather than 2.0 so the music carries closer to the card. PROLOGUE JOIN, measured 2026-08-14 on the built act rather than assumed: the prologue's own tail runs -28.3 -> -34.8 -> -58.7 dB RMS across its last three seconds (the song fading under the bridge from 93.000), and act I opens at digital silence (-127 dB) climbing through -30 to -18 dB. So the join needs NO fade on either side and carries none: the prologue fades itself out, exactly as acts II and VI do, and act I's own quiet opening picks it up. A fade_out here would double the taper on a fade the act already performs. ONE EDITORIAL FINDING, LEFT TO THE OWNER (automatable: no): the bridge exists because the owner asked for the wallpaper to 'replace the black part', and act I's 5 s silent slide immediately after it puts a black part back. It reads as a continuous darkening today -- night fades to black and the slide rises out of the same darkness, which is how a title sequence normally hands to act one -- but if the intent was for the wallpaper to hand STRAIGHT into a film, the fix is to drop or restyle act I's slide, and a slide is the one thing this show gives every act. Not changed unilaterally. ---- v2.5, THE SLIDES REMOVED. Four joins lost the five seconds of digital silence their fades were shaped against, so each was re-judged rather than carried over. PROLOGUE -> ACT I: act I's fade_in goes 2.0 -> 0.0. The measurement already in this note says the prologue runs ITSELF down to -58.7 dB across its last three seconds and act I opens at digital silence climbing through -30 to -18 dB; the 2.0 was shaping the card between them, and two things that both fade themselves need nothing added. ACT II -> ACT III: act II still fades itself out (-96.7 dB in its last seconds) and act III keeps its 2.0 s fade_in, which is now the whole treatment rather than a treatment laid over a card. MOVEMENT 3 -> ACT IV: movement 3 keeps its 1.0 s fade_out and act IV its 2.0 s fade_in, so the join is a 3.0 s dip where it was a dip plus a silent card. SCREAM CARD -> ACT VI: act VI keeps its 2.0 s fade_in, and it now lands on the song's intro at -18.4 dB instead of on ten seconds of a frozen title -- two seconds later the song rises to -15.0 and then -12.3, so the card hands into a build rather than into a hold. THE TWO TRIMMED HEADS carry no new fade: act II enters at 10.666667 on the crescendo's own hard cut (fade_in 0.0, unchanged, and the point of the crescendo), and act VI's 2.0 s is measured above. EVERYTHING HERE IS PLAN-SIDE AND RE-MEASURABLE: run tools/transitions.py --measure on the built v2.5 rather than believing this paragraph.",
  "_sources": {
   "_where": "Every act plays from ~/Videos/Wolves/Prod, which holds the HIGHEST-QUALITY master of each: FLAC audio and the un-re-encoded picture. They are hardlinks to the per-project masters, so Prod costs no extra disk and cannot drift from what its project built. The retired ~/Videos/UPLOAD staging folder held lossy copies of the same cuts and is NOT what this reads; its removal is issue #81. Act VII's master was re-rendered 2026-08-13 under the new master gate (tools/peaks.py trim, #130) and now measures -1.1 dBTP, inside the -0.9..-1.1 band -- the +0.3 dBTP clip of #82 is fixed in the delivered file; the issue stays open for its owner to close.",
   "hero": "~/Videos/Wolves/Prod/01-intro.mp4 (hardlink to renders/megacut-01-hero.mp4) — YouTube BKm0TPqeOjY, 'Destiny 2: Into the Light Cinematic', official 'Destiny 2' channel. Trimmed 2.0 -> 113.55 (both frame-verified against this file), Bungie's score, six Guardian plates and the comic title card burned. usage_class: third_party_copyrighted. BUILT 2026-08-12: raw trim (x264 crf 14) + tools/plate.py burn (crf 18), audio decoded from the plain 251 Opus rung to FLAC -- NOT 251-drc, which is dynamic-range compressed and forbidden by the audio standard. Delivered as act I.",
@@ -24,7 +24,7 @@
   "efmb": "Wolves/Prod/02-endlessformsmostbeautiful.mp4 -> renders/efmb-plated.mp4 (the delivered, plated master; renders/efmb-hq.mp4 is the pre-plate picture). Five unbroken runs of Destiny's LIVE-ACTION trailers, scored to Nightwish's Endless Forms Most Beautiful (instrumental); the film is the song, 307.998s. FLAC master, -1.0 dBTP. Its picture comes from a FAN COMPILATION, not an official Bungie upload -- the same provenance question act VI carries (#55). See docs/cuts/02-endless-forms-most-beautiful.md.",
   "prologue": "Wolves/Prod/00-prologue.mp4 -> destiny-vids/renders/00-prologue.mp4, built by scripts/build_prologue.py from stories/00-prologue-plates.json and cards/maintitle.html. Born conformant (1920x1080, 60000/1001, bt709 on all three fields, FLAC 48 kHz stereo) so the join stream-copies its picture. Audio decoded from the plain 251 Opus rung, NOT 251-drc, per the audio standard -- the same lossy-source posture act I records."
  },
- "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.4.mp4",
+ "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.6.mp4",
  "width": 1920,
  "height": 1080,
  "fps": "60000/1001",
@@ -34,7 +34,9 @@
  "preset": "slow",
  "audio_bitrate": "640k",
  "master_gain_db": -1.7,
- "_master_gain": "Measured on decoded v2.4 before shipping: the final AAC reached +0.7 dBTP. The final mux applies one transparent -1.7 dB static gain to land at the -1.0 dBTP house target. No normalizer, limiter, compression or EQ.",
+ "_master_gain": "Measured on the DECODED deliverable, never asserted. v2.4's joined AAC reached +0.7 dBTP and -1.7 dB landed it on the -1.0 house target. v2.5 came back +0.3 dBTP with the same gain, and the cause was upstream rather than here: the standing sweep over Prod/ found TWO masters clipping -- 00-prologue at +0.4 dBTP and 08-credits at +0.9 -- the same hole issue #82 recorded, where a lossless master was never gated because only the lossy copy ever was. Both are corrected AT SOURCE by tools/peaks.py trim (derived static gains 0.841 and 0.794, picture stream copied, both re-measured at -1.1 dBTP), so the programme is not asked to carry two acts' headroom. The gain stays -1.7 and v2.6 re-measures it. No normalizer, limiter, compression or EQ, at any step.",
+ "distribution_gain_db": -2.1,
+ "_distribution_gain": "EXTRA headroom the AAC copy needs and the lossless master does not. Measured on v2.6's two outputs, built from the SAME PCM segments with the same -1.7 mix gain: the FLAC master read -1.1 dBTP and the AAC copy +1.0 -- inter-sample peaks the encoder reconstructs above the samples it was given. -2.1 dB was applied to the lossy leg only and the copy re-measured at -3.2 dBTP / -13.9 LUFS. THAT IS 2.1 dB LOWER THAN THE ARITHMETIC PREDICTS, AND IT IS KEPT: tools/peaks.py records that the overshoot is NOT monotonic in the gain (measured elsewhere in this project: gain 0.658 delivered -2.5 dBTP while 0.675 delivered -0.8), so chasing a narrow window costs a full ten-minute encode per attempt and can land further out than it started. The rule is stop at the first SAFE result. Nothing is lost by being conservative here: the quality reference is now the lossless .mkv master, which sits exactly on the house -1.1 dBTP band, and -13.9 LUFS integrated is within a tenth of YouTube's own -14 normalisation target, so the distribution copy is played back at the same loudness either way. Never a limiter, a normalizer, compression or EQ. Re-measure BOTH files after every rebuild.",
  "items": [
   {
    "kind": "clip",
@@ -45,17 +47,13 @@
    "_dur_note": "91.200 of picture + an 8.000 bridge. The out point is the source's own luma MINIMUM (YAVG 30.0 at 91.2, against 46.9 at 88.8 and climbing again by 91.4), which is one frame off the owner's stated 1:31. NO fade_in: it opens on its own darkness, which is the first frame of the show. NO fade_out either -- like acts II and VI it fades ITSELF out, across the bridge, and a second fade on top would double the taper."
   },
   {
-   "kind": "card",
-   "image": "renders/plates-megacut-cards/plate_act1.png",
-   "dur": 5.0,
-   "label": "I — PROJECT BLUEFIN / seven days to the wolves",
-   "chapter": "I. Project Bluefin"
-  },
-  {
    "kind": "clip",
    "path": "/var/home/jorge/Videos/Wolves/Prod/01-intro.mp4",
    "audio": "source",
-   "fade_in": 2.0,
+   "chapter": "I. Project Bluefin",
+   "_no_slide": "Owner 2026-08-14: 'we should remove the roman numeral chapter things - I'll design overlays later, let's just cut them where appropriate.' Card `act1` is retired (megacut-cards.json keeps its authored copy). The chapter string moved HERE, onto the act's own clip, so cutting a slide does not silently delete a marker -- it now starts where the act starts, which is the only place left that means anything.",
+   "fade_in": 0.0,
+   "_no_fade_in": "0.0, not the old 2.0: that fade was shaping the SLIDE'S five seconds of digital silence, and the slide is gone. Act I's own head is already digital silence climbing through -30 to -18 dB (measured on the built act, recorded in _transitions), and the prologue's tail runs itself down to -58.7 dB across its last three seconds. Two things that both fade themselves need nothing between them.",
    "fade_out": 2.0,
    "gain_db": 3.5,
    "_gain": "Owner-approved 2026-08-14 (#164): act I measured -19.4 LUFS integrated where the other six acts cluster -9.7..-11.3, so the show opened ~9 dB quiet and jumped at the I->II join. Its true peak is -4.6 dBTP (re-measured on the delivered master before choosing this number), so +3.5 dB is the MOST a plain gain can add while staying inside the house -0.9..-1.1 dBTP band -- the audio tenet forbids a limiter, so the remaining ~5.6 LU needs a re-master of the act and is recorded on #164. The number is peak-constrained arithmetic, not taste.",
@@ -79,22 +77,19 @@
    "path": "/var/home/jorge/Videos/Wolves/Prod/02-endlessformsmostbeautiful.mp4",
    "audio": "source",
    "fade_in": 0.0,
+   "trim_from": 10.666667,
+   "_trim_from": "Issue #206, and the other half of the owner's 2026-08-14 'tighten this up'. Act II opens on a 10.666667 s BLACK head -- measured with blackdetect on the delivered act (black_start:0, black_end:10.666667), not assumed -- with the song already playing under it at -17..-18 dB. Behind a retired slide that was 15.7 s in which nothing moved. The head is DERIVED in scripts/build_efmb.py from the music sync anchor (HEAD + PICTURE + TAIL == SONG), so it cannot be shortened act-side without re-syncing the whole act; the programme starts the act at its first picture frame instead. THE ACT'S OWN FILE IS UNTOUCHED. Movement 2's crescendo to unity now hands straight into act II's picture rather than into ten seconds of black.",
    "label": "Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end",
    "_no_slide": "Owner 2026-08-14: 'the 4:40 fade and title slide need to be removed, crescendo the music into the next segment in one smooth transition.' The act II card is retired, so this clip follows movement 2 directly and loses its slide-derived chapter marker. Its old 2.0 s fade_in is removed because music now meets music rather than silence.",
    "sub_chapters": "stories/02-endless-forms-plates.json",
    "_sub_chapters_note": "A POINTER at act II's own manifest, which is the source of the marks -- the plan opts in, it does not hold the timecodes, so an act's edit and the programme's edit never collide (issue #92). Consumed only with --sub-chapters; the default chapter list is unchanged. TODO(owner): YouTube chapter list vs ffmpeg-only metadata track."
   },
   {
-   "kind": "card",
-   "image": "renders/plates-megacut-cards/plate_act3.png",
-   "dur": 5.0,
-   "label": "III — Bob Killen / Voidwalker Warlock",
-   "chapter": "III. Bob Killen"
-  },
-  {
    "kind": "clip",
    "path": "/var/home/jorge/Videos/Wolves/Prod/03-mrbobbytables.mp4",
    "audio": "source",
+   "chapter": "III. Bob Killen",
+   "_no_slide": "Card `act3` retired on the owner's 2026-08-14 instruction; its chapter string moved here. Act II ends on black with its own fade to -96.7 dB, so act III's 2.0 s fade_in below is now what the join is made of rather than a treatment on top of five seconds of card silence.",
    "fade_in": 2.0,
    "fade_out": 0.0,
    "label": "Act III — mrbobbytables: August 2026 contributors (partially complete)",
@@ -110,17 +105,11 @@
    "_thread": "Movement 3 of 5, and the longest at 2:48.7 -- longer than acts IV, V and VII. That is what the owner's spans specify and it plays as a full movement of the song, but it is the one placement where an interlude outweighs the acts around it. Flagged in stories/00-perfume-thread.json for the owner, built as instructed."
   },
   {
-   "kind": "card",
-   "image": "renders/plates-megacut-cards/plate_act4-5.png",
-   "dur": 5.0,
-   "label": "IV–V — Bias for Action / The Kat and the Nat",
-   "_shortened": "15.0 -> 5.0 on the owner's 2026-08-14 note: '15:31 entire transition is too weird and long, make it all fit.' The 15 s was deliberate pacing when two acts were given one slide, and it stopped reading that way once the Perfume thread ran through the show. What was actually there: movement 3 ends on a DARK, STATIC shot of animal skulls in a hall, the song fades out over 2.0 s, and then a frozen text card holds for 15 s IN SILENCE before Kat's ships arrive -- roughly twenty seconds in which neither the picture nor the sound moves. Five seconds is what every other slide in the programme holds, so this is the exception being retired rather than a new number being invented.",
-   "chapter": "IV–V. Bias for Action"
-  },
-  {
    "kind": "clip",
    "path": "/var/home/jorge/Videos/Wolves/Prod/04-kat.mp4",
    "audio": "source",
+   "chapter": "IV–V. Bias for Action",
+   "_no_slide": "Card `act4-5` retired on the owner's 2026-08-14 instruction. It announced BOTH acts, so its one marker stays ONE marker, on act IV, carrying the card's authored title unchanged -- reproduced, not re-titled. Act V's own title is printed nowhere and is #91's open question, which this does not settle. Movement 3 now ends on its 1.0 s fade and act IV enters on its own 2.0 s, so the join is a 3.0 s dip where it used to be a dip plus five seconds of card.",
    "fade_in": 2.0,
    "label": "Act IV — Kat Cosgrove: Guardian intro"
   },
@@ -137,21 +126,18 @@
    "dur": 5.0,
    "label": "Interstitial — ON THE LINUX DESKTOP / NO ONE CAN HEAR YOU SCREAM",
    "_what": "Owner 2026-08-14, verbatim: 'let the nat scene keep fading to black then put up a title card \"On the Linux Desktop\" \"No one can hear you scream\" - in a terryfing overlay.' Act V keeps its own 2.0 s fade to black (unchanged, the item above), and this comes up out of that black. Copy is the owner's, reproduced from stories/megacut/scream-card.json; the treatment is the Alien one-sheet homage the line invokes, rendered by scripts/build_scream_card.py. It holds 5.0 s, the house card length.",
-   "_no_chapter": "NO chapter key, deliberately: a scrub-bar entry would spoil the gag. The act VI slide follows as before, so this makes two cards back-to-back (10 s); accepted knowingly on the owner's instruction rather than re-derived as a hold bug.",
+   "_no_chapter": "NO chapter key, deliberately: a scrub-bar entry would spoil the gag. It is now the ONLY card left in the programme -- the four Roman-numeral slides were cut on 2026-08-14 -- so the two-cards-back-to-back note that used to sit here is gone with act VI's slide.",
    "interstitial": true
-  },
-  {
-   "kind": "card",
-   "image": "renders/plates-megacut-cards/plate_act6.png",
-   "dur": 5.0,
-   "label": "VI — 7 Days to the Wolves / Nightwish",
-   "chapter": "VI. 7 Days to the Wolves"
   },
   {
    "kind": "clip",
    "path": "/var/home/jorge/Videos/Wolves/Prod/06-7daystothewolves.mp4",
    "audio": "source",
+   "chapter": "VI. 7 Days to the Wolves",
+   "_no_slide": "Card `act6` retired on the owner's 2026-08-14 instruction; its chapter string moved here.",
    "fade_in": 2.0,
+   "trim_from": 10.0,
+   "_trim_from": "Owner 2026-08-14: '16:43's title makes no sense anymore, let's tighten this up.' 16:43 was not a card -- it was act VI's OWN head plate ('Project Bluefin / Seven Days to the Wolves / Destiny footage used under Bungie's fan-content policy'), scripts/build_wolves.py TITLE_CARD_LEN = 10.000, playing straight after the act VI slide. Measured: 5.0 s of slide + 10.0 s of frozen title = 15.7 s in which nothing moved, announcing a main title the prologue had already delivered. Issue #206. The slide is cut above and the programme now starts the act at 10.000, ON THE ACT FILM CLOCK. THE ACT'S OWN FILE IS UNTOUCHED, and that is the point: the plate's copy is a rights condition, and it still plays wherever act VI plays standalone. What the programme loses is 10 s of the song's quiet intro -- measured -18.4 dB right up to 10 s, then rising to -15.0 at 12 s and -12.3 at 14 s -- so the scream card now hands into two seconds of intro and then the song kicks, rather than into ten seconds of a static card.",
    "trim_to": 431.267,
    "label": "Act VI — Seven Days to the Wolves: the musical, CUT AT THE COMIC (431.267) so the song hands straight to the next one",
    "_trim": "Owner 2026-08-14: 'when the song ends we want to go right into the next song, cut out the comic and fade so it goes right from wolves to this song.' Both things they asked to remove start on the SAME measured frame: 431.267 is act VI's last shot change, the comic cover ('SEVEN DAYS TO THE WOLVES / THE FIGHT FOR FREEDOM BEGINS!') comes up on it and holds 12.2 s to the end, and the song's fade-out begins on it too -- full level right up to 431.267 (-12.6 dB), then -13.9, -16.2, -26.3, -46.4 and silence by 441. So one cut removes the comic AND the fade, and the act now ends on the song's last full bar. The owner said 23:55; the measured frame is 23:59.5, and it is the frame their description names.",
@@ -207,5 +193,5 @@
   }
  ],
  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Act VIII has no slide, so it has no marker -- that is the ambush working as designed. AS OF v2.1 ACT VII HAS NONE EITHER: the owner asked for its title slide to go so movement 4 could hard-cut into Europa, and the marker went with the slide. Six published entries, not eight. If Europa should keep a scrub-bar entry without a card in front of it, chapters() would need to read a `chapter` off the CLIP -- a change nobody has asked for yet.",
- "_version": "v2.4 -- picture-quality and 4:40 transition pass. Act II is rebuilt from the source upload's 2160p rung and downscaled with Lanczos; movement 2 no longer fades out, the act II slide is retired, act II no longer fades in, and the outgoing music rises from -4 dB to unity over its final four seconds before the direct cut. The removed slide shortens v2.3 by 5.0 s. All v2.3 alpha-QA changes remain."
+ "_version": "v2.6 -- v2.5 plus the audio pass. THE ROMAN-NUMERAL SLIDES ARE GONE. Owner 2026-08-14, verbatim: \"we should remove the roman numeral chapter things - I'll design overlays later, let's just cut them where appropriate. Like 16:43's title makes no sense anymore, let's tighten this up.\" Cards act1, act3, act4-5 and act6 are retired (megacut-cards.json keeps their copy); the scream interstitial stays, being no numeral. Each retired card's `chapter` string moved onto its act's own clip, so the marker list is unchanged in content and now starts where each act starts. 16:43 was not a card at all: it was act VI's OWN 10.000 s head plate, and act II had the same shape with a 10.666667 s black head -- issue #206's 15.7 s of nothing at two joins. Both are now skipped by `trim_from`, the new mirror of `trim_to`, IN THE PROGRAMME ONLY: neither act file is re-rendered, so act VI's head plate still plays wherever the act plays standalone and its rights condition travels with it. 40.667 s shorter than v2.4 (4 x 5.0 s of card + 10.0 + 10.667 of head). All v2.3/v2.4 changes remain. ---- v2.6: TWO CLIPPING MASTERS FIXED AT SOURCE (00-prologue +0.4 dBTP, 08-credits +0.9), each by one derived static gain applied by tools/peaks.py trim with the picture copied untouched, both re-measured at -1.1 dBTP -- issue #82's hole, found again by pointing the standing sweep at every act rather than at the one that had failed before. AND THE PROGRAMME NOW SHIPS A LOSSLESS MASTER beside the distribution copy (issue #145): seven-days-to-the-wolves-v2.6.mkv, FLAC in Matroska off the same PCM segments and the same copied picture bitstream, so the final movie stops being the only artifact in the chain with no lossless option. tools/megacut.py's channel layout also stopped claiming 5.1 against nine stereo files (issue #146)."
 }

@@ -1,14 +1,16 @@
 {
  "_what": "The act slides for Seven Days to the Wolves. One card per act of the programme, in the owner's canonical order, each carrying its Roman numeral. `kind: \"act\"` is the cinematic handoff slide from the website (CinematicTransition.vue), rendered full-frame from its own CSS by cards/render-cards.mjs (cards/act.html).",
- "_order": "THE CANONICAL ORDER, codified by the owner on 2026-08-12 and settled: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). Eight acts, each announced by a slide carrying a huge Roman numeral. This list is the show's chapter list: see docs/running-order.md, which is the source of truth, and `tools/megacut.py --chapters`, which derives the timestamped markers from the built programme rather than from a hand-typed table.",
+ "_order": "THE CANONICAL ORDER, codified by the owner on 2026-08-12 and settled: intro (I) -> endlessformsmostbeautiful (II) -> mrbobbytables (III) -> kat (IV) -> nat (V) -> 7daystothewolves (VI) -> europa (VII) -> credits (VIII). Eight acts, each announced by a slide carrying a huge Roman numeral. FIVE of the eight slides are now RETIRED -- act II's on 2026-08-14 (the 4:40 crescendo), act VII's the same day, and acts I, III, IV-V and VI when the owner cut the Roman-numeral cards. The scream interstitial is the only card the programme still plays. This list is the show's chapter list: see docs/running-order.md, which is the source of truth, and `tools/megacut.py --chapters`, which derives the timestamped markers from the built programme rather than from a hand-typed table.",
  "_copy": "Chapter card copy is REPRODUCED, never authored. Where an act has no authored title, the row is omitted rather than filled -- see `unresolved`. The only strings the owner wrote for this pass are act II's title and the whole of act IV's terminal block, both quoted back verbatim.",
  "_chapters": "Every act is to carry chapters, and every `chapters` list below is populated. Five acts -- I, II, III, VI and VII -- carry agent-drafted lists read off the built films, each line cited in its card's `note`; none of those words are the owner's yet, and the rewrite-or-strike decision is recorded in `unresolved`. The merged IV-V slide carries the owner's two authored loglines in the same field, verbatim. A line nobody authored is still omitted, never invented.",
- "_gaps": "Act VIII has no film and therefore no card: a slide announcing an act that does not play is worse than a recorded gap. It keeps its numeral in `unresolved` so the numbering cannot drift when it is built. Act II had the same gap until 2026-08-12, when it was built (docs/cuts/02-endless-forms-most-beautiful.md) and this card was added.",
+ "_gaps": "Act VIII has no film and therefore no card: a slide announcing an act that does not play is worse than a recorded gap. It keeps its numeral in `unresolved` so the numbering cannot drift when it is built. Act II had the same gap until 2026-08-12, when it was built (docs/cuts/02-endless-forms-most-beautiful.md) and this card was added. On 2026-08-14 the owner cut the Roman-numeral cards entirely, so the numerals now live only here and in docs/running-order.md -- which is exactly why the retired cards keep their `act` field: the numbering cannot drift while the overlays that replace them are designed.",
  "_audio": "Every card is silent. Putting a bed under one is a licensing decision, the owner's alone.",
  "plates": [
   {
    "id": "act1",
    "kind": "act",
+   "retired": true,
+   "retired_note": "RETIRED 2026-08-14 on the owner's instruction, verbatim: \"we should remove the roman numeral chapter things - I'll design overlays later, let's just cut them where appropriate.\" All four Roman-numeral slides go together; the scream interstitial stays, because it is not a numeral card. The authored title and chapters remain below so restoring a slide never means rewriting them. Removing a card would also remove its slide-derived chapter marker, so the same `chapter` string now sits on the act's own CLIP in megacut.json and the marker starts where the act starts.",
    "at": 0.0,
    "dur": 5.0,
    "act": "I",
@@ -49,6 +51,8 @@
   {
    "id": "act3",
    "kind": "act",
+   "retired": true,
+   "retired_note": "RETIRED 2026-08-14 on the owner's instruction, verbatim: \"we should remove the roman numeral chapter things - I'll design overlays later, let's just cut them where appropriate.\" All four Roman-numeral slides go together; the scream interstitial stays, because it is not a numeral card. The authored title and chapters remain below so restoring a slide never means rewriting them. Removing a card would also remove its slide-derived chapter marker, so the same `chapter` string now sits on the act's own CLIP in megacut.json and the marker starts where the act starts.",
    "at": 429.534,
    "dur": 5.0,
    "act": "III",
@@ -65,6 +69,8 @@
   {
    "id": "act4-5",
    "kind": "act",
+   "retired": true,
+   "retired_note": "RETIRED 2026-08-14 on the owner's instruction, verbatim: \"we should remove the roman numeral chapter things - I'll design overlays later, let's just cut them where appropriate.\" All four Roman-numeral slides go together; the scream interstitial stays, because it is not a numeral card. The authored title and chapters remain below so restoring a slide never means rewriting them. Removing a card would also remove its slide-derived chapter marker, so the same `chapter` string now sits on the act's own CLIP in megacut.json and the marker starts where the act starts.",
    "at": 594.734,
    "dur": 5.0,
    "act": "IV–V",
@@ -86,6 +92,8 @@
   {
    "id": "act6",
    "kind": "act",
+   "retired": true,
+   "retired_note": "RETIRED 2026-08-14 on the owner's instruction, verbatim: \"we should remove the roman numeral chapter things - I'll design overlays later, let's just cut them where appropriate.\" All four Roman-numeral slides go together; the scream interstitial stays, because it is not a numeral card. The authored title and chapters remain below so restoring a slide never means rewriting them. Removing a card would also remove its slide-derived chapter marker, so the same `chapter` string now sits on the act's own CLIP in megacut.json and the marker starts where the act starts.",
    "at": 668.992,
    "dur": 5.0,
    "act": "VI",

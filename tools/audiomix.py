@@ -225,7 +225,7 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0,
     return ";".join(parts)
 
 
-def mux(video, bed, regions, out, bed_gain_db=0.0, ffmpeg=None, bitrate="320k",
+def mux(video, bed, regions, out, bed_gain_db=0.0, ffmpeg=None, codec="flac",
         source_gain_db=0.0, media_dir=None):
     """Mux the composed audio onto ``video``, stream-copying the picture."""
     if ffmpeg is None:
@@ -242,7 +242,11 @@ def mux(video, bed, regions, out, bed_gain_db=0.0, ffmpeg=None, bitrate="320k",
         "-filter_complex",
         build_filter(regions, bed_gain_db, source_gain_db, audio_inputs),
         "-map", "0:v:0", "-map", "[aout]",
-        "-c:v", "copy", "-c:a", "aac", "-b:a", bitrate, "-ar", "48000",
+        # FLAC, not AAC (issue #144): this mux sits INSIDE the chain the
+        # audio standard requires to be lossless, and a 320k generation here
+        # is inherited permanently by everything built from the output. The
+        # picture is copied either way, so the only cost is disk.
+        "-c:v", "copy", "-c:a", codec, "-ar", "48000",
         str(out),
     ]
     subprocess.run(cmd, check=True)

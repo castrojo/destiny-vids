@@ -1,47 +1,86 @@
 # Seven Days to the Wolves — the programme, in acts
 
-The whole show as **one continuous video**, assembled from the finished cuts and
-announced by act slides in the Wolves cinematic's own chrome.
+The whole show as **one continuous video**, assembled from the finished cuts.
+It **was** announced by act slides in the Wolves cinematic's own chrome; the
+owner cut them on 2026-08-14, and the overlays that replace them are theirs to
+design.
 
-**Status: v0.9 is built** — `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v0.9.mp4`,
-**20:32.765** measured on the delivered file, seven of the eight acts on six
-slides — acts IV and V share one. v0.9's one change over v0.8: **act VI's
-Ambassadors interruption now plays its hold music** — *Local Forecast –
-Slower*, CC BY 4.0, credited in [`ATTRIBUTIONS.md`](../../ATTRIBUTIONS.md).
-The slot shipped **silent** in v0.8, recorded as blocked on a licensing
-decision it never was: four cleared tracks had already been found, and
-choosing between them is taste. Act VI's duration is unchanged (443.533 s),
-so **no chapter moved** and every other act was copied rather than
-re-encoded. The interruption sits at **16:35.3–16:52.3** on the programme
-clock. Measured on the delivered v0.9: true peak **−0.9 dBTP**, integrated
-**−10.7 LUFS**, full `-xerror` decode passes. v0.8 carried two act changes
-over v0.7: **act II's overlay pass**
-([#98](https://github.com/castrojo/destiny-vids/issues/98) — the TOC exchange,
-the endgame timed cues, the closing quotes, the letterbox callout; duration
-byte-identical, so no chapter moved there) and **act VI's promotion to the #104
-interruption build** (v2, 443.5 s — the 17 s Ambassadors interruption over the
-unchanged bed; the Cayde-6 tail plates moved +10.811 s with it), which moved
-act VII's chapter to **18:37**. It also inherits act VII's corrected master
-(−1.1 dBTP, #82) from `Prod/`, so the programme peak is now −0.9. v0.7 added
-the **act-join treatment** of
-[#105](https://github.com/castrojo/destiny-vids/issues/105): explicit
-`fade_in`/`fade_out` shapes per act (act-film clock, `afade` at the segment
-encode, no gain anywhere). Earlier:
-v0.6 added **act VI's tail plates** (the Cayde-6 reveal that finally names
-Jorge Castro, and three gold credits behind it — see
-[`07-seven-days-to-the-wolves.md`](07-seven-days-to-the-wolves.md), "The tail
-plates"). The owner asked for "one
-supercut with everything that we have", and .5 was their name for it.
+**Status: v2.6 is built and published** — two files, from one assembly:
 
-It is **not the feature**. Act VIII, the credits, is not designed (#51), so the
-programme ends on Europa — though it no longer credits *nobody*: act VI's tail
-now names Jorge Castro, Kelsey Hightower, Brian Ketelsen and Angie Jones. Act
-VI is an editorial pass whose
-provenance is an open owner decision (#55); act II's picture comes from a fan
-compilation carrying the same question; act III is partially complete by the
-owner's own description. None of that
-is fixable by re-assembling — assembly joins finished things and never re-cuts
-one.
+| | |
+|---|---|
+| Distribution copy | `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.6.mp4` — **35:27.3**, 1920×1080 59.94p, AAC stereo ~440 kb/s |
+| **Lossless master** | `…-v2.6.mkv` — the same copied picture bitstream, FLAC stereo (issue #145) |
+
+Measured on the delivered files, not asserted: the master reads **−1.1 dBTP /
+−11.8 LUFS**, the distribution copy **−3.2 dBTP / −13.9 LUFS**, and
+`tools/deliver.py status` reports **0 stale**.
+
+**v2.6 is the slide cut and the audio pass, in that order.**
+
+The owner, 2026-08-14: *"we should remove the roman numeral chapter things —
+I'll design overlays later, let's just cut them where appropriate. Like 16:43's
+title makes no sense anymore, let's tighten this up."*
+
+- **All four remaining Roman-numeral slides are retired** — I, III, the shared
+  IV–V, and VI. The scream interstitial stays, being no numeral, and is now the
+  *only* card the programme plays. Their authored copy is kept in
+  `megacut-cards.json` against the overlays that will replace them.
+- **No chapter marker was lost with them.** Each retired card's `chapter`
+  string moved onto its act's own **clip**, and `chapters()` learned to read it
+  there; the marker list is unchanged in content and starts where each act now
+  starts. The scream card is marked `interstitial`, which opts it out — it had
+  been quietly publishing its build label as a marker.
+- **16:43 was not a card at all.** It was act VI's *own* 10.000 s head plate,
+  playing straight after the act VI slide: 15.7 s in which nothing moved,
+  announcing a main title the prologue had already delivered. Act II had the
+  same shape with a 10.666667 s black head. Both are now skipped by the
+  assembler's new `trim_from` — the mirror of `trim_to` — **in the programme
+  only**. Neither act file is re-rendered, so act VI's plate, whose copy is a
+  rights condition, still plays wherever the act plays standalone. Issue #206.
+- **The joins were re-judged, not carried over.** Four of them lost the five
+  seconds of digital silence their fades were shaped against; act I's
+  `fade_in` went 2.0 → 0.0, because that fade was shaping the card and both the
+  prologue's tail and act I's head already fade themselves. Details in the
+  plan's `_transitions`.
+- **40.667 s shorter** than v2.4: 4 × 5.0 s of card, plus 10.0 and 10.667 of
+  head.
+
+Then the audio, all of it measured on delivered files:
+
+- **Two more clipping masters, found by sweeping the whole folder** rather than
+  the one act that had failed before — the prologue at **+0.4 dBTP** and the
+  credits at **+0.9**, both FLAC, both invisible for exactly the reason Europa
+  was (#82). Corrected at source by `tools/peaks.py trim` (derived static gains
+  0.841 and 0.794, picture stream copied untouched), each re-measured at
+  **−1.1 dBTP**, and re-linked by `deliver.py publish`.
+- **The programme has a lossless master for the first time** (#145). Until now
+  the final movie — the file the show is actually watched and judged by — was
+  the only artifact in the chain with no lossless option, squashing seven FLAC
+  masters into one ~440 kb/s AAC at the join.
+- **Two gains, kept apart.** Built from the *same* PCM with the *same* −1.7 dB
+  mix gain, the master read −1.1 dBTP and the AAC copy **+1.0** — about 2.1 dB
+  of inter-sample overshoot the encoder reconstructs above the samples it was
+  given. So `master_gain_db` is the mix, carried by both, and
+  `distribution_gain_db` is headroom only the lossy leg needs. The copy landed
+  at −3.2 rather than −1.1, and that is **kept**: `peaks.py` records that the
+  overshoot is not monotonic in the gain, the rule is to stop at the first safe
+  result, and −13.9 LUFS is within a tenth of YouTube's own normalisation
+  target.
+- **The assembler stopped claiming 5.1** against nine stereo files (#146), and
+  `tools/render.py` / `tools/audiomix.py` stopped baking lossy AAC generations
+  into the middle of a chain the audio standard requires to be lossless (#144).
+
+**It is not the feature yet.** Act VIII is delivered and in the programme, but
+the credits sequence is still not designed (#51); act VI is an editorial pass
+whose provenance is an open owner decision (#55); act II's picture comes from a
+fan compilation carrying the same question; act III is partially complete by the
+owner's own description. None of that is fixable by re-assembling — assembly
+joins finished things and never re-cuts one.
+
+*The sections below still describe earlier builds where they have not been
+revised; the plan (`stories/megacut/megacut.json`) and
+[`docs/running-order.md`](../running-order.md) are authoritative.*
 
 ## What the current build contains
 

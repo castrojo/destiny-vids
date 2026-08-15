@@ -84,7 +84,7 @@ Segments genuinely disagree, so *some* re-encode is unavoidable:
 | Property | Rule | Why |
 |---|---|---|
 | Frame rate | **60000/1001** | Real sources here run 30/1, 60/1 and 60000/1001. 30 would throw away the 60fps material; 60/1 makes 59.94 material drift against its own audio. |
-| Audio | 48 kHz 5.1, **unprocessed** | The audio tenet: no normaliser, no limiter, no EQ. The one exception is an explicit fade the plan states (below). |
+| Audio | 48 kHz **stereo**, **unprocessed** | The audio tenet: no normaliser, no limiter, no EQ. The one exception is an explicit fade the plan states (below). Stereo because every act master, every `Prod/` file and every delivered megacut is two-channel — the default said `5.1` for months against seven stereo files (issue #146), and an upmix at assembly would be inventing a soundfield. |
 | Silence | **Generated**, length probed | Every segment must carry both streams. A silence source one frame short desynchronises everything after it. |
 | Colour | BT.709, written into the VUI | See the trap below. |
 

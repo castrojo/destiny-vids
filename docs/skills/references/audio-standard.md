@@ -33,19 +33,50 @@ that convention is gone.
 
 | Act | Cut | Bed source | In `Prod/` | True peak | Lossless master |
 |---|---|---|---|---|---|
+| 0 | Prologue | Nightwish *Perfume Of The Timeless* `oHCaZmIzr0o` | FLAC stereo | −1.1 dBTP (was **+0.4 — clipping**, fixed 2026-08-14) | `destiny-vids/renders/00-prologue.mp4` |
+| I | Into the Light | Bungie's own score | FLAC stereo | −4.6 dBTP; the show's quiet act, carrying +3.5 dB in the plan — #164 | *no committed builder* — #159 |
 | II | Endless Forms Most Beautiful | Nightwish *Endless Forms Most Beautiful (Instrumental)* `6-9667CV1zQ`, **Opus 251** @48 k, static −1.6 dB into 32-bit PCM | FLAC stereo | −1.0 dBTP / −11.7 LUFS | `destiny-vids/renders/efmb-plated.mp4` |
 | III | Contributors | Rammstein *Deutschland (Instrumental)* `WqaiHivKlsE`, **Opus 251** @48 k | FLAC stereo | −1.2 dBTP | `destiny-vids/renders/…-credited-hq.mp4` |
 | IV | Kat | dArtagnan *Holding out for a Hero* `egLoz_DPQ8E`, **Opus rung 251** @48 k | FLAC stereo | −0.9 dBTP | `wolves-kat/wolves-kat-reveal-hq.mp4` |
 | V | Natali | Nightwish *Shudder Before the Beautiful* `oTTITV4H9fo`, **Opus 251** @48 k | FLAC stereo | −1.0 dBTP | `wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4` |
-| VI | The musical | Nightwish *7 Days to the Wolves* | AAC stereo 323 k | −1.6 dBTP | **none — issue #58** |
+| VI | The musical | Nightwish *7 Days to the Wolves* | AAC stereo 323 k | −1.3 dBTP | **none — issue #58** |
 | VII | Europa | *Beauty Of The Beast* `X3WrCzLIIvk`, **Opus** @48 k | FLAC stereo | −1.1 dBTP (was **+0.3 — clipping**, issue #82) | `wolves-directors-cut/…-beauty-of-the-beast-hq.mp4` |
+| VIII | Credits | two bed passes | FLAC stereo | −1.1 dBTP (was **+0.9 — clipping**, fixed 2026-08-14) | `wolves-credits/08-credits-master.mp4` |
 
-**Measure after the final lossy encode.** v2.4's lossless programme segments
-were safe, but the joined AAC measured **+0.7 dBTP**. The fix is one derived
-static gain at the final mux, followed by another measurement of the decoded
-deliverable — never `loudnorm`, limiting, or compression. FFmpeg's `volume`
+**Issue #82 was never one act's bug, and 2026-08-14 proved it.** The sweep was
+re-run over *every* file in `Prod/` rather than over the one that had failed
+before, and it found **two more clipping masters** — the prologue at
+**+0.4 dBTP** and the credits at **+0.9** — both FLAC, both invisible for the
+same reason Europa was: nothing had measured them. Both were corrected the same
+way, by `tools/peaks.py trim` (derived static gains 0.841 and 0.794, picture
+stream **copied** untouched, each re-measured at −1.1 dBTP), and both were
+re-linked into `Prod/` by `tools/deliver.py publish`.
+
+Their **builders still produce the clipping version**, because gating belongs
+at the end of the build the way `run-final-hq.sh` now does it for Europa — and
+`scripts/` builders are frozen by the delivery digest (#167), so adding the
+gate is its own change. **Measure the whole folder, not the file you last
+fixed.**
+
+**Measure after the final lossy encode — and measure the master separately.**
+v2.4's lossless programme segments were safe while the joined AAC measured
+**+0.7 dBTP**. v2.6 made the size of that gap explicit: built from the *same*
+PCM segments with the *same* −1.7 dB mix gain, the **FLAC master read −1.1
+dBTP and the AAC copy +1.0** — about **2.1 dB** of inter-sample overshoot the
+encoder reconstructs above the samples it was given. So the programme now
+carries **two** static gains, and the split is deliberate: `master_gain_db` is
+the mix and both files carry it; `distribution_gain_db` is headroom only the
+lossy leg needs. One shared gain would either clip the copy or duck the master
+for nothing. Never `loudnorm`, limiting, or compression. FFmpeg's `volume`
 filter accepts dB values, and `ebur128=peak=true` measures true peak.
 Source: `/websites/ffmpeg_ffmpeg-all`.
+
+**The programme itself now has a lossless master** (issue #145):
+`~/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.6.mkv`, FLAC in Matroska
+off the same PCM segments and the same copied picture bitstream as the
+distribution `.mp4`. Until v2.6 the final movie — the file the show is actually
+watched and judged by — was the **only** artifact in the chain with no lossless
+option, squashing seven FLAC masters into one ~440 kb/s AAC at the join.
 
 Measured on the files in `Wolves/Prod/` on 2026-08-13, not recalled. Every cut
 **except the musical** has a lossless master behind it; each master's audio is

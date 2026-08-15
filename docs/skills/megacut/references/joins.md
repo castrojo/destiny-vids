@@ -90,6 +90,47 @@ than the file changed the plan's arithmetic while the segment still played to
 its own end; the clock and the picture disagreed and only `verify_segment`
 caught it. State `trim_to`, or state nothing.
 
+## `trim_from`: starting a delivered act late, for the same reasons
+
+The mirror of `trim_to`, and everything above applies to it unchanged: act
+film clock, both streams by one number, honoured by `item_duration()`, off
+the stream-copy path. Together the two are the clip's **window**.
+
+```json
+{ "kind": "clip", "path": "…/06-7daystothewolves.mp4",
+  "audio": "source", "trim_from": 10.0, "trim_to": 431.267 }
+```
+
+It exists because of issue #206 and the owner's *"16:43's title makes no sense
+anymore, let's tighten this up."* Two acts opened **static behind their
+slide** — the slide's 5 s, and then the act's own frozen head:
+
+| Act | Its own head | Total static |
+|---|---|---|
+| II | 10.666667 s of black (`blackdetect` on the delivered act), music already playing under it | 15.7 s |
+| VI | 10.000 s title plate (`scripts/build_wolves.py`, `TITLE_CARD_LEN`) | 15.7 s |
+
+Neither was fixable act-side without cost. Act II's head is **derived** from
+its music sync anchor (`HEAD + PICTURE + TAIL == SONG`), so shortening it
+re-syncs the whole act. Act VI's plate carries a **rights condition**.
+
+**Trimming in the programme is what makes both safe.** The act's file is not
+re-rendered, so act VI's attribution still plays wherever act VI plays
+standalone — the condition travels with the act rather than with the
+programme. That is the difference between removing a plate and skipping it.
+
+### Three things to check before trimming a head
+
+1. **What the sound is doing there.** A black head is rarely silent. Act VI's
+   song runs at −18.4 dB right up to 10 s and then builds to −12.3 by 14 s, so
+   the trim buys a *build* rather than a hold. Measure it; do not assume the
+   head is dead air.
+2. **`fade_in` now lands on the new first frame**, because the window is
+   rebased to zero. A fade authored against the old head is a different fade.
+3. **What the copy on the skipped head was for.** If it is a credit or a
+   licence condition, it must still play *somewhere* — and "the act's own
+   file" is a legitimate somewhere, but say so in the item note.
+
 ### Before you trim, read what is in the tail
 
 The cut that removed a comic cover also came within 21.6 s of the act's

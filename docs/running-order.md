@@ -17,17 +17,41 @@ Settled by the owner on 2026-08-12 and **canonical**:
 On 2026-08-14 the owner added a **prologue in front of it**. That order is
 untouched: the prologue takes **no numeral** and nothing is renumbered.
 
+**Later that day the owner cut the Roman-numeral slides**, verbatim: *"we
+should remove the roman numeral chapter things - I'll design overlays later,
+let's just cut them where appropriate. Like 16:43's title makes no sense
+anymore, let's tighten this up."* All four remaining act cards — **I**, **III**,
+the shared **IV–V**, and **VI** — are retired; acts II, VII and VIII already had
+none, so **the programme now plays exactly one card**, the scream interstitial,
+which is no numeral. **The numerals themselves are untouched** and stay the
+show's spine here and in `stories/megacut/megacut-cards.json`, whose retired
+cards keep their authored copy so restoring a slide never means rewriting it.
+
+**Removing a slide must never remove a chapter.** `chapters()` derived markers
+from cards, so each retired card's `chapter` string moved onto its **act's own
+clip** — the marker list is unchanged in content and now starts where each act
+starts. The one card left is marked `interstitial`, which opts it out: a
+scrub-bar entry would spoil the gag.
+
+**And 16:43 was not a card at all.** It was act VI's *own* 10.000 s head plate,
+playing straight after the act VI slide — 15.7 s in which nothing moved,
+announcing a main title the prologue had already delivered. Act II had the same
+shape with a 10.666667 s black head. Both are now skipped by the assembler's
+new `trim_from` **in the programme only**: neither act file is re-rendered, so
+act VI's plate — whose copy is a rights condition — still plays wherever the act
+plays standalone. Issue #206.
+
 | Act | Chapter | The film | State |
 |---|---|---|---|
-| **0** | *(no chapter — it is the main title)* | `Prod/00-prologue.mp4` — black, the lockup fading up on it, the picture exploding in at 0:12.2, then the March day→night bridge | delivered, **prototype**; shipping form is an embed |
-| **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the title cover | delivered |
-| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers, and *The Long Walk* inside them | delivered and **credited**, in the programme; **no slide or chapter marker** — movement 2 crescendos directly into it (owner 2026-08-14) |
-| **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete** |
-| **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **shares act V's slide** |
-| **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **shares act IV's slide**; plays the #118 Nat section, the docs.bazzite.gg button on its own fade; **followed by the interstitial card** — *On the Linux Desktop / No one can hear you scream* — up out of that fade (owner 2026-08-14; no chapter marker, deliberately; `scripts/build_scream_card.py`) |
-| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits; **the programme plays 431.267 of it** (v2.1) — the comic and the fade cut off the end, the file untouched |
+| **0** | *(no chapter — it is the main title)* | `Prod/00-prologue.mp4` — black, the lockup fading up on it, the picture exploding in at 0:12.2, then the March day→night bridge | delivered, **prototype**; shipping form is an embed; master corrected to −1.1 dBTP (was **+0.4 — clipping**), 2026-08-14 |
+| **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the title cover | delivered; **slide retired** (v2.5) — its chapter marker moved onto the act, and its `fade_in` went 2.0 → 0.0 because the fade was shaping the card's silence |
+| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers, and *The Long Walk* inside them | delivered and **credited**, in the programme; **no slide or chapter marker** — movement 2 crescendos directly into it (owner 2026-08-14); **its 10.666667 s black head is skipped** (v2.5, `trim_from`) so the crescendo hands straight to picture (#206) |
+| **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete**; **slide retired** (v2.5), marker on the act |
+| **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **the shared IV–V slide is retired** (v2.5) — it announced two acts, so its one marker stays one marker, on this act, carrying the card's authored title unchanged |
+| **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **the shared IV–V slide is retired** (v2.5); plays the #118 Nat section, the docs.bazzite.gg button on its own fade; **followed by the interstitial card** — *On the Linux Desktop / No one can hear you scream* — up out of that fade (owner 2026-08-14; no chapter marker, deliberately; `scripts/build_scream_card.py`) |
+| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits; **the programme plays 431.267 of it** (v2.1) — the comic and the fade cut off the end, the file untouched; **slide retired and the 10.000 s head plate skipped** (v2.5, `trim_from`) — the programme plays 421.267 of it, the act file untouched and its attribution intact standalone (#206) |
 | **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; **no slide, no chapter marker** (v2.1) — a quick cut off movement 4; **the programme plays 96.73 of its 1:37.266** (v2.3) — it ends ON the eclipse at full brightness, hard into movement 5 (the owner's alpha-QA note; A/B excerpts in `renders/review/`, #192); the comic cover cut so act VIII owns the reveal — #178; terse-pass re-render in flight — #102; master corrected to −1.1 dBTP — #82 |
-| **VIII** | Credits | `Prod/08-credits.mp4` — the **call to action**, the comic-cover reveal, then the cast and 723 contributors across **eight** projects | delivered, **in the programme**; **7:50.453**, two bed passes (instrumental loop, then the album version with vocals); **no slide, no chapter marker** — it is meant to surprise — #51 |
+| **VIII** | Credits | `Prod/08-credits.mp4` — the **call to action**, the comic-cover reveal, then the cast and 723 contributors across **eight** projects | delivered, **in the programme**; **7:50.453**, two bed passes (instrumental loop, then the album version with vocals); **no slide, no chapter marker** — it is meant to surprise — #51; master corrected to −1.1 dBTP (was **+0.9 — clipping**), 2026-08-14 |
 
 ## The prologue, and why it has no numeral
 
@@ -230,11 +254,11 @@ to source timecodes, so they cannot drift from the credits they belong to.
 **TODO(owner):** whether sub-chapters belong in the YouTube chapter list at
 all, or only in an ffmpeg metadata track.
 
-**Acts IV and V share one slide.** The owner's call: their films run 34 s and
-25 s, and two slides held 15 s each announced 59 s of picture. Both acts keep
-their numerals and their films — it merges the announcement, not the acts — and
-it is one chapter marker, because a chapter starts on its slide and there is now
-one slide.
+**Acts IV and V shared one slide, and share one marker.** The owner's call:
+their films run 34 s and 25 s, and two slides held 15 s each announced 59 s of
+picture. Both acts keep their numerals and their films — it merged the
+announcement, not the acts. The slide is retired (v2.5) and its **one** marker
+stays one marker, on act IV, carrying the card's authored title unchanged.
 
 **It holds 5 s, not 15 (v2.2).** The long hold was deliberate pacing while it
 was the one slide announcing two acts. The Perfume thread changed what sits
@@ -257,37 +281,48 @@ name — and that is the specific mistake this table exists to prevent.
 
 ## Chapters
 
-The acts **are** the chapters. Their titles are authored on the act slides
-(`chapter` in `stories/megacut/megacut-cards.json`'s companion plan), and the
-timestamps are **derived, never typed**:
+The acts **are** the chapters. Their titles are authored copy, and the
+timestamps are **derived, never typed**. Since v2.5 the `chapter` strings live
+on the acts' own **clips** in `stories/megacut/megacut.json`: the slides that
+used to carry them are retired, and a marker must not disappear with the card
+that announced it. The strings themselves are unchanged.
 
 ```bash
 python3 tools/megacut.py stories/megacut/megacut.json --chapters
 ```
 
 ```text
-0:00  I. Project Bluefin
-7:09  III. Bob Killen
-9:54  IV–V. Bias for Action
-11:08 VI. 7 Days to the Wolves
-18:37 VII. Europa
+1:39  I. Project Bluefin
+9:34  III. Bob Killen
+15:03 IV–V. Bias for Action
+16:07 VI. 7 Days to the Wolves
 ```
 
-**20:32.7**, six markers for seven acts. Every stamp after act I moved when act
-II was wired in, everything after act III moved again when acts IV and V were
-given one slide, and slide VII moved +10.811 s when act VI became the #104
-interruption build — which is exactly why they are derived and never typed.
+**35:27.3**, four markers. Every stamp moves whenever anything before it does —
+act II being wired in, acts IV and V sharing a slide, act VI becoming the #104
+interruption build (+10.811 s), the prologue landing in front of act I, and the
+slides being cut (−40.667 s) — which is exactly why they are derived and never
+typed.
 
-A chapter starts on its **act slide**, not on the film behind it: the slide is
-how the audience is told which act this is. The list regenerates from the plan's
-own clock, so it cannot drift when a cut's length changes — re-run it after
-every assembly and paste the output into the upload description.
+A chapter used to start on its **act slide**; with the slides gone it starts
+where the act does, which is the only place left that means anything. The list
+regenerates from the plan's own clock, so it cannot drift when a cut's length
+changes — re-run it after every assembly and paste the output into the upload
+description.
 
-Each act may also carry **sub-chapters** — a contents list rendered under the
-title. **They all live in one place:** `chapters[]` on that act's entry in
+**One known defect, recorded rather than papered over: the first marker is not
+0:00.** YouTube ignores a chapter list that does not open at zero, and the
+prologue carries no chapter by design, so the list currently begins at 1:39.
+Closing the gap means authoring a title for the prologue — the owner's call, not
+the tool's, and `format_chapters` deliberately does not invent one.
+
+Each act may also carry **sub-chapters** — a contents list that was rendered
+under the title on its slide. **They all live in one place:** `chapters[]` on
+that act's entry in
 [`stories/megacut/megacut-cards.json`](../stories/megacut/megacut-cards.json).
-Edit the array, re-render the cards, rebuild. A line nobody authored is omitted
-rather than defaulted, so deleting one removes it from the slide.
+A line nobody authored is omitted rather than defaulted. **Nothing renders them
+today** — the slides that displayed them are retired — and they are kept
+verbatim against the overlays the owner said they would design.
 
 Five acts carry a **drafted** list (I, II, III, VI, VII). Every line is either
 read off the built film or reproduced from that act's own cut record, and each

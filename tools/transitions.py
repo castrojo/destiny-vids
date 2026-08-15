@@ -201,16 +201,23 @@ def silence_run(buckets, start_idx, end_idx):
     return best
 
 
-def measure_join(path, join, rate, channels, decode_fn=decode):
+def measure_join(path, join, rate, channels, decode_fn=decode, pre=PRE, post=POST):
     """One join's per-second RMS rows plus its summary, programme clock.
 
-    The window runs from PRE seconds before the silent stretch (or boundary)
-    to POST seconds after it, aligned DOWN to an integer second so bucket N
-    is programme second N -- the same alignment the issue's hand table used,
-    so the numbers compare row for row.
+    The window runs from ``pre`` seconds before the silent stretch (or
+    boundary) to ``post`` seconds after it, aligned DOWN to an integer second
+    so bucket N is programme second N -- the same alignment the issue's hand
+    table used, so the numbers compare row for row.
+
+    ``pre``/``post`` default to the module's PRE/POST, which is what every
+    caller wanted; they are parameters because ``--pre``/``--post`` exist on
+    the CLI, and issue #204 was exactly this signature not accepting them --
+    ``main()`` passed them, ``measure_join()`` did not take them, and every
+    invocation of the CLI died with a TypeError. The tests called
+    ``measure_join`` directly, so CI never walked the path that crashed.
     """
-    win_start = max(0, math.floor(join["silent_start"] - PRE))
-    win_end = math.ceil(join["silent_end"] + POST)
+    win_start = max(0, math.floor(join["silent_start"] - pre))
+    win_end = math.ceil(join["silent_end"] + post)
     pcm = decode_fn(path, win_start, win_end - win_start)
     buckets = bucket_rms(pcm, channels, rate)
     rows = [(win_start + i, level) for i, level in enumerate(buckets)]
@@ -283,7 +290,7 @@ def main(argv=None):
     if not measured.exists():
         raise SystemExit(f"nothing to measure: {measured} does not exist")
     rate, channels = probe_audio_shape(measured)
-    results = [measure_join(measured, j, rate, channels,
+    results = [measure_join(measured, j, rate, channels, decode_fn=decode,
                             pre=args.pre, post=args.post)
                for j in find_joins(plan)]
     print_report(results, measured)
