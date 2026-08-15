@@ -51,10 +51,16 @@ TARGET_FPS = conform.DELIVERY.fps
 # path, so host paths resolve unchanged inside it (see docs/rendering.md).
 DEFAULT_CONTAINER = "bluefin-thumbnailer"
 
-# Where and how long detect_picture reads the source. Issue #161: a cut shorter
-# than PROBE_AT gets no reading at all, and silently falls back to the frame.
+# Where and how long detect_picture reads the source. PROBE_AT is now only the
+# fallback for a source whose duration cannot be read: issue #161's fix is to
+# probe RELATIVE to the cut's own length, at several points, because a fixed
+# 40 s offset reads nothing at all on anything shorter -- which was every act
+# under 40 s and nearly every hero video.
 PROBE_AT = 40.0
 PROBE_LEN = 5.0
+# Through the body of the cut, avoiding the head and the tail where fades and
+# title cards live and would be read as a different matte.
+PROBE_FRACTIONS = (0.25, 0.5, 0.75)
 
 # The one intermediate shape. Every clip -- cut or still -- is normalised to it,
 # because the concat demuxer joins only inputs whose stream properties match.
@@ -63,6 +69,28 @@ VIDEO_FILTER = (
     f"pad={TARGET_W}:{TARGET_H}:(ow-iw)/2:(oh-ih)/2,"
     f"fps={TARGET_FPS},format=yuv420p"
 )
+
+# Issue #144. `docs/skills/references/audio-standard.md` states the rule in one
+# line -- "source the best version that exists, KEEP THE CHAIN LOSSLESS, ship it
+# unaltered" -- and this module used to encode AAC 192k at three places inside
+# that chain. The loss was invisible where it happened (the file plays fine) and
+# permanent for everything built from the output; wrapping such a render in FLAC
+# afterwards makes the CONTAINER lossless while the content has already been
+# through a lossy generation.
+#
+# Intermediates carry PCM. Not FLAC, and that distinction is measured, not
+# theoretical: FLAC's STREAMINFO lives in extradata and the concat demuxer binds
+# the FIRST file's extradata to the whole joined stream, so every later segment
+# fails to decode. PCM has no extradata to mismatch. Disk cost is real and
+# temporary -- the same trade tools/megacut.py already makes. Matroska for the
+# same reason megacut uses it: an intermediate is read back by the demuxer and
+# never needs a faststart-able moov.
+INTERMEDIATE_AUDIO_ARGS = ("-c:a", "pcm_s24le", "-ar", "48000", "-ac", "2")
+INTERMEDIATE_SUFFIX = ".mkv"
+# The one place a lossy encode may happen is DELIVERY, and here it does not
+# happen at all: every act master in this project is FLAC, so a cut leaves this
+# module lossless and any fold-down to a distribution codec starts from it.
+DELIVERY_AUDIO_CODEC = "flac"
 
 
 def _container_running(name):
@@ -163,6 +191,99 @@ def resolve_media(video_id, media_dir):
     return None
 
 
+def probe_windows(duration, probe_len=None):
+    """Where to read a source for its picture area, given how long it is.
+
+    Issue #161: this used to be one fixed offset, ``PROBE_AT = 40.0``. Act IV
+    is 34.0 s long, so the probe seeked past the end, decoded nothing,
+    cropdetect reported nothing and ``detect_picture`` returned ``None`` --
+    which is ALSO the legitimate answer for an un-letterboxed source, so the
+    caller could not tell the two apart and placed plates against the raw
+    frame. Measured on that act, the fallback put the pill 18 px onto the
+    active picture; on a shorter cut it seats a nameplate on the matte, which
+    is the exact failure this function exists to prevent. Every act under 40 s
+    and nearly every hero video was affected.
+
+    So the offsets are now RELATIVE to the source, and there is more than one
+    of them: a single window can land on a fade, a title card or a shot that
+    happens to be letterboxed differently, and three readings across the body
+    of the cut outvote one. The head and the tail are avoided deliberately --
+    that is where fades and cards live.
+
+    ``duration`` of ``None`` (unprobeable) falls back to the old fixed offset,
+    which is the best guess available and no worse than before.
+    """
+    probe_len = PROBE_LEN if probe_len is None else probe_len
+    if not duration or duration <= 0:
+        return [(PROBE_AT, probe_len)]
+    windows = []
+    for fraction in PROBE_FRACTIONS:
+        length = min(probe_len, duration)
+        start = max(0.0, min(duration * fraction, duration - length))
+        window = (round(start, 3), round(length, 3))
+        if window not in windows:
+            windows.append(window)
+    return windows
+
+
+def probe_media_duration(video, ffmpeg=None):
+    """A source's length in seconds, or ``None`` if it cannot be read.
+
+    ``None`` is a real answer, not an error: ``find_ffprobe`` raises when the
+    only ffmpeg available is imageio's bundled binary, which ships with no
+    ffprobe beside it. A caller that cannot measure the source falls back to
+    the fixed probe offset, which is what it did before issue #161 anyway.
+    """
+    try:
+        ffprobe = find_ffprobe()
+    except Exception:
+        return None
+    cmd = [*ffprobe, "-v", "error",
+           "-show_entries", "format=duration", "-of",
+           "default=noprint_wrappers=1:nokey=1", str(Path(video).resolve())]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return float(proc.stdout.strip())
+    except (subprocess.CalledProcessError, ValueError, OSError):
+        return None
+
+
+def detect_picture_status(video):
+    """``(rect, status)`` -- the picture area, and how confidently it is known.
+
+    ``status`` is one of:
+
+    * ``"letterboxed"`` -- cropdetect agreed on a rect smaller than the frame;
+    * ``"full-frame"``  -- it decoded and found no matte, so the frame IS the
+      picture and placing against it is correct;
+    * ``"undecodable"`` -- nothing decoded anywhere: no decoder, an unreadable
+      file, or a source shorter than every probe window.
+
+    The last two used to be the same ``None``, which is the whole of issue
+    #161: a caller could not tell "there is no matte" from "I never looked",
+    and one of those is safe to place against and the other is not.
+    """
+    ffmpeg = find_ffmpeg()
+    src = str(Path(video).resolve())
+    readings = []
+    decoded = False
+    for start, length in probe_windows(probe_media_duration(video, ffmpeg)):
+        cmd = [*ffmpeg, "-nostdin", "-hide_banner",
+               "-ss", str(start), "-t", str(length), "-i", src,
+               "-vf", "cropdetect=24:2:0", "-f", "null", "-"]
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+        found = re.findall(r"crop=(\d+):(\d+):(\d+):(\d+)", proc.stderr)
+        if found:
+            decoded = True
+            readings.extend(found)
+    if not readings:
+        return None, ("full-frame" if decoded else "undecodable")
+    # The steadiest reading across every probe window, not the last one.
+    best = Counter(readings).most_common(1)[0][0]
+    w, h, x, y = (int(v) for v in best)
+    return (x, y, w, h), "letterboxed"
+
+
 def detect_picture(video):
     """Find the real picture area inside a letterboxed frame.
 
@@ -171,21 +292,11 @@ def detect_picture(video):
     against the *frame* -- a nameplate on a 10% bottom margin -- ends up
     hanging off the picture and onto the bar, which reads as a mistake.
 
-    Returns ``(x, y, w, h)``, falling back to the full frame when ffmpeg's
-    cropdetect finds nothing (an un-letterboxed source, or no decoder).
+    Returns ``(x, y, w, h)``, or ``None`` when there is no rect to give. Use
+    ``detect_picture_status`` when the caller needs to know WHY there is none
+    -- "no matte" and "never looked" are different answers (issue #161).
     """
-    ffmpeg = find_ffmpeg()
-    cmd = [*ffmpeg, "-nostdin", "-hide_banner",
-           "-ss", str(PROBE_AT), "-t", str(PROBE_LEN), "-i", str(Path(video).resolve()),
-           "-vf", "cropdetect=24:2:0", "-f", "null", "-"]
-    proc = subprocess.run(cmd, capture_output=True, text=True)
-    found = re.findall(r"crop=(\d+):(\d+):(\d+):(\d+)", proc.stderr)
-    if not found:
-        return None
-    # The steadiest reading across the probe window, not the last one.
-    best = Counter(found).most_common(1)[0][0]
-    w, h, x, y = (int(v) for v in best)
-    return x, y, w, h
+    return detect_picture_status(video)[0]
 
 
 def load_shots(path):
@@ -212,7 +323,12 @@ def still_clip(ffmpeg, image, duration, out_path, keep_audio=True):
                 # Explicit maps: with two inputs, implicit selection drops the
                 # silent track and the still stops matching the cut clips.
                 "-map", "0:v:0", "-map", "1:a:0",
-                "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2"]
+                # PCM, not AAC: an intermediate is a link in the middle of a
+                # chain the audio standard requires to be lossless (issue
+                # #144), and PCM also has no extradata for the concat demuxer
+                # to bind from the first segment -- the trap that rules FLAC
+                # out here. It is silence, so this costs only disk.
+                *INTERMEDIATE_AUDIO_ARGS]
     else:
         cmd += ["-map", "0:v:0", "-an"]
     cmd += ["-vf", VIDEO_FILTER,
@@ -245,7 +361,9 @@ def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
         *conform.video_encode_args(crf=18, preset="medium"),
     ]
     if keep_audio:
-        cmd += ["-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2"]
+        # PCM: no lossy generation mid-chain (issue #144), and no extradata for
+        # the concat demuxer to mismatch.
+        cmd += list(INTERMEDIATE_AUDIO_ARGS)
     else:
         cmd += ["-an"]
     cmd.append(str(out_path))
@@ -277,10 +395,14 @@ def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None,
             cmd += ["-i", str(audio_bed), "-map", "0:v:0", "-map", "1:a:0", "-shortest"]
             if audio_gain is not None:
                 cmd += ["-af", f"volume={audio_gain}"]
-            cmd += ["-c:a", "aac", "-b:a", "192k"]
-        elif audio_gain is not None:
-            # Source audio from the clips; the implicit selection picks it up.
-            cmd += ["-af", f"volume={audio_gain}"]
+            cmd += ["-c:a", DELIVERY_AUDIO_CODEC]
+        else:
+            if audio_gain is not None:
+                # Source audio from the clips; implicit selection picks it up.
+                cmd += ["-af", f"volume={audio_gain}"]
+            # State the codec even with no bed: the clips now carry PCM, and
+            # the container's default would put the lossy generation back.
+            cmd += ["-c:a", DELIVERY_AUDIO_CODEC]
         cmd += conform.video_encode_args(crf=18, preset="medium")
         cmd.append(str(out_path))
         subprocess.run(cmd, check=True)
@@ -362,7 +484,7 @@ def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=
     with tempfile.TemporaryDirectory(dir=out_path.parent, prefix=".render-") as tmp:
         for n, shot in enumerate(shots, 1):
             duration = resolve_duration(shot)
-            clip = Path(tmp) / f"clip_{n:03d}.mp4"
+            clip = Path(tmp) / f"clip_{n:03d}{INTERMEDIATE_SUFFIX}"
             if shot.get("still"):
                 image = Path(shot["still"]).expanduser().resolve()
                 if not image.exists():

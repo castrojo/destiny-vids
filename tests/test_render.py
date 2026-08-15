@@ -274,3 +274,143 @@ def test_concat_with_a_bed_gains_the_bed(monkeypatch, tmp_path):
     assert "volume=0.95" in cmd[cmd.index("-af") + 1]
     assert cmd[cmd.index("-map") + 1] == "0:v:0"
     assert "1:a:0" in cmd
+
+
+# --- the chain stays lossless (issue #144) -----------------------------------
+#
+# render.py encoded AAC 192k at three places INSIDE a chain the audio standard
+# requires to be lossless. The loss was invisible where it happened -- the file
+# plays fine -- and permanent for everything built from the output.
+
+def test_a_cut_clip_carries_pcm_not_a_lossy_generation(monkeypatch):
+    calls = []
+    monkeypatch.setattr(render.subprocess, "run",
+                        lambda cmd, **kw: calls.append(cmd))
+    render.cut_clip(["ffmpeg"], "src.mp4", 1.0, 2.0, "out.mkv", keep_audio=True)
+    cmd = calls[0]
+    assert cmd[cmd.index("-c:a") + 1] == "pcm_s24le"
+    assert "aac" not in cmd and "-b:a" not in cmd
+
+
+def test_a_still_carries_pcm_too(monkeypatch):
+    """A still takes the slot a dropped shot left behind, so its audio has to
+    be indistinguishable from a cut clip's to the concat demuxer."""
+    calls = []
+    monkeypatch.setattr(render.subprocess, "run",
+                        lambda cmd, **kw: calls.append(cmd))
+    render.still_clip(["ffmpeg"], "a.png", 2.0, "out.mkv", keep_audio=True)
+    cmd = calls[0]
+    assert cmd[cmd.index("-c:a") + 1] == "pcm_s24le"
+    assert "aac" not in cmd
+
+
+def test_intermediates_are_not_flac(monkeypatch):
+    """Measured, not theoretical: FLAC's STREAMINFO lives in extradata and the
+    concat demuxer binds the FIRST file's extradata to the whole joined stream,
+    so every later segment fails to decode. PCM has none to mismatch."""
+    assert render.INTERMEDIATE_AUDIO_ARGS[1] != "flac"
+    assert render.INTERMEDIATE_SUFFIX == ".mkv"
+
+
+def test_the_join_delivers_a_lossless_bed(monkeypatch, tmp_path):
+    calls = []
+    monkeypatch.setattr(render.subprocess, "run",
+                        lambda cmd, **kw: calls.append(cmd))
+    render.concat(["ffmpeg"], [tmp_path / "clip_001.mkv"], tmp_path / "out.mp4",
+                  audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
+    cmd = calls[0]
+    assert cmd[cmd.index("-c:a") + 1] == "flac"
+    assert "-b:a" not in cmd, "a lossless codec has no bitrate to state"
+
+
+def test_the_join_states_the_codec_even_with_no_bed(monkeypatch, tmp_path):
+    """The clips now carry PCM, so leaving the codec to the container's default
+    would put the lossy generation straight back."""
+    calls = []
+    monkeypatch.setattr(render.subprocess, "run",
+                        lambda cmd, **kw: calls.append(cmd))
+    render.concat(["ffmpeg"], [tmp_path / "clip_001.mkv"], tmp_path / "out.mp4",
+                  workdir=tmp_path)
+    cmd = calls[0]
+    assert cmd[cmd.index("-c:a") + 1] == "flac"
+
+
+# --- the picture probe reads the cut it was given (issue #161) ---------------
+#
+# The probe seeked to a fixed 40 s. Act IV is 34.0 s long, so it decoded
+# nothing, cropdetect reported nothing, and the function returned None -- which
+# is ALSO the answer for an un-letterboxed source. The caller could not tell
+# them apart and placed plates against the raw frame; measured on that act, the
+# pill landed 18 px onto the active picture.
+
+def test_a_short_cut_is_probed_inside_itself():
+    """34 s: every window must start before the end and fit inside it."""
+    windows = render.probe_windows(34.0)
+    assert windows, "a short cut got no window at all -- the #161 bug"
+    for start, length in windows:
+        assert 0 <= start < 34.0
+        assert start + length <= 34.0 + 1e-9
+
+
+def test_a_very_short_cut_still_gets_one_window():
+    windows = render.probe_windows(2.0)
+    for start, length in windows:
+        assert start + length <= 2.0 + 1e-9
+
+
+def test_a_long_cut_is_read_at_several_points():
+    """One window can land on a fade, a title card, or a shot letterboxed
+    differently; three readings across the body outvote one."""
+    windows = render.probe_windows(600.0)
+    assert len(windows) == 3
+    starts = [s for s, _ in windows]
+    assert starts == sorted(starts)
+    # The head and the tail are avoided deliberately.
+    assert starts[0] > 0.0
+    assert starts[-1] + windows[-1][1] < 600.0
+
+
+def test_an_unprobeable_duration_falls_back_to_the_old_offset():
+    """No worse than before, and stated rather than crashing."""
+    assert render.probe_windows(None) == [(render.PROBE_AT, render.PROBE_LEN)]
+    assert render.probe_windows(0) == [(render.PROBE_AT, render.PROBE_LEN)]
+
+
+def _fake_probe(monkeypatch, stderr_by_call):
+    calls = {"n": 0}
+
+    class R:
+        def __init__(self, stderr):
+            self.stderr = stderr
+
+    def fake_run(cmd, **kw):
+        i = calls["n"]
+        calls["n"] += 1
+        return R(stderr_by_call[min(i, len(stderr_by_call) - 1)])
+    monkeypatch.setattr(render.subprocess, "run", fake_run)
+    monkeypatch.setattr(render, "find_ffmpeg", lambda *a, **k: ["ffmpeg"])
+    monkeypatch.setattr(render, "probe_media_duration", lambda *a, **k: 100.0)
+
+
+def test_no_matte_and_never_looked_are_different_answers(monkeypatch):
+    """This is the whole of #161: one of these is safe to place against and
+    the other is not, and they used to be the same None."""
+    _fake_probe(monkeypatch, ["Parsed_cropdetect crop=1920:800:0:140\n"])
+    assert render.detect_picture_status("x.mp4") == ((0, 140, 1920, 800),
+                                                     "letterboxed")
+
+    _fake_probe(monkeypatch, ["frame= 120 fps=0.0 nothing here\n"])
+    rect, status = render.detect_picture_status("x.mp4")
+    assert rect is None and status == "undecodable"
+
+
+def test_the_steadiest_reading_wins_across_windows(monkeypatch):
+    """A single window landing on a title card must not outvote the body."""
+    _fake_probe(monkeypatch, [
+        "crop=1920:1080:0:0\n",           # a full-frame title card
+        "crop=1920:800:0:140\ncrop=1920:800:0:140\n",
+        "crop=1920:800:0:140\n",
+    ])
+    rect, status = render.detect_picture_status("x.mp4")
+    assert rect == (0, 140, 1920, 800)
+    assert status == "letterboxed"

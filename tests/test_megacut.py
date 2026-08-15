@@ -94,7 +94,7 @@ def test_silent_clip_gets_generated_silence_of_matching_length(tmp_path):
         {"kind": "clip", "path": "a.mp4", "audio": "silent", "dur": 111.5},
     ])
     graph = megacut.build_filtergraph(plan)
-    assert "anullsrc=channel_layout=5.1:sample_rate=48000:d=111.5" in graph
+    assert "anullsrc=channel_layout=stereo:sample_rate=48000:d=111.5" in graph
 
 
 def test_source_audio_is_never_gained(tmp_path):
@@ -217,7 +217,7 @@ def test_silent_clip_pins_both_legs_to_one_duration(tmp_path):
     ])
     graph = megacut.build_filtergraph(plan)
     assert "trim=duration=111.5" in graph, "video leg is not pinned"
-    assert "anullsrc=channel_layout=5.1:sample_rate=48000:d=111.5" in graph
+    assert "anullsrc=channel_layout=stereo:sample_rate=48000:d=111.5" in graph
 
 
 def test_source_clip_video_is_not_trimmed(tmp_path):
@@ -458,7 +458,7 @@ def test_no_fade_declared_means_the_audio_chain_is_byte_identical(tmp_path):
     af = megacut.build_segment_command(plan, 0, "seg000.mkv")
     af_str = af[af.index("-af") + 1]
     assert af_str == ("aresample=48000,"
-                      "aformat=sample_fmts=fltp:channel_layouts=5.1")
+                      "aformat=sample_fmts=fltp:channel_layouts=stereo")
     assert "afade" not in af_str
 
 
@@ -673,7 +673,10 @@ def test_a_healthy_build_passes_verification(tmp_path, monkeypatch):
     def fake_probe(path, stream=None):
         # The joined programme is the sum of its parts plus the measured
         # +0.112 s of non-accumulating join rounding; every source is 307.967.
-        return 5.0 + 307.967 + 10.0 + 0.112 if Path(path) == out_path else 307.967
+        # The lossless master (issue #145) is the same programme, so it
+        # probes the same: both joined files are checked, not just the copy.
+        joined = {out_path, out_path.with_suffix(".mkv")}
+        return 5.0 + 307.967 + 10.0 + 0.112 if Path(path) in joined else 307.967
     monkeypatch.setattr(megacut, "probe_duration", fake_probe)
     # Healthy extents: within a frame or two of each source.
     monkeypatch.setattr(megacut, "probe_video_extent",
@@ -756,7 +759,7 @@ def test_a_conforming_silent_clip_copies_picture_and_generates_silence(tmp_path)
     cmd = megacut.build_segment_copy_command(plan, 0, "seg000.mkv",
                                              "/cache/conformed.mp4")
     assert cmd[cmd.index("-c:v") + 1] == "copy"
-    assert "anullsrc=channel_layout=5.1:sample_rate=48000:d=10.0" in cmd
+    assert "anullsrc=channel_layout=stereo:sample_rate=48000:d=10.0" in cmd
     assert "-t" in cmd and cmd[cmd.index("-t") + 1] == "10.0"
 
 
@@ -800,7 +803,8 @@ def test_assemble_copies_every_clip_when_all_sources_conform(tmp_path, monkeypat
     _run_fake_ffmpeg(monkeypatch)
     monkeypatch.setattr(megacut, "probe_duration",
                         lambda path, stream=None:
-                        18.1 if str(path).endswith("out.mp4") else 3.0)
+                        18.1 if str(path).endswith(("out.mp4", "out.mkv"))
+                        else 3.0)
     monkeypatch.setattr(megacut, "probe_video_extent",
                         lambda path: 5.0 if "seg000" in str(path)
                         else (3.0 if "seg001" in str(path) else 10.0))
@@ -853,7 +857,8 @@ def test_parallel_builds_cannot_reorder_the_programme(tmp_path, monkeypatch):
     _run_fake_ffmpeg(monkeypatch)
     monkeypatch.setattr(megacut, "probe_duration",
                         lambda path, stream=None:
-                        12.1 if str(path).endswith("out.mp4") else 3.0)
+                        12.1 if str(path).endswith(("out.mp4", "out.mkv"))
+                        else 3.0)
     monkeypatch.setattr(megacut, "probe_video_extent", lambda path: 3.0)
     monkeypatch.setattr(megacut, "_segment_worker", _touch_segment_worker)
 
@@ -876,3 +881,240 @@ def test_default_jobs_scales_with_cores_and_items(monkeypatch):
     assert megacut.default_jobs(2) == 2, "never more workers than items"
     monkeypatch.setattr(megacut.os, "cpu_count", lambda: 4)
     assert megacut.default_jobs(13) == 1, "a small machine stays serial"
+
+
+# --- trim_from: skipping an act's authored head, in the programme only ------
+#
+# Issue #206. Two acts opened static behind their slide: act II with a 10.5 s
+# black head and act VI with its own 10 s title plate. Neither was fixable
+# plan-side, because `trim_to` only ever cut tails. `trim_from` is its mirror,
+# and the point of doing it in the PLAN rather than in the act is that the act
+# ships unchanged -- which is what keeps act VI's head plate, a rights
+# condition, playing wherever the act plays standalone.
+
+def test_a_window_is_the_two_trims_together():
+    assert megacut.clip_window({}) == (0.0, None)
+    assert megacut.clip_window({"trim_to": 431.267}) == (0.0, 431.267)
+    assert megacut.clip_window({"trim_from": 10.5}) == (10.5, None)
+    assert megacut.clip_window(
+        {"trim_from": 10.0, "trim_to": 431.267}) == (10.0, 431.267)
+
+
+def test_trim_from_shortens_the_programme_clock():
+    """The played length is the window's, everywhere -- expected_duration,
+    verify_segment and the chapter arithmetic all read it from here."""
+    assert megacut.item_duration({"trim_from": 10.0, "trim_to": 431.267}) \
+        == pytest.approx(421.267)
+    assert megacut.item_duration({"trim_to": 431.267}) == pytest.approx(431.267)
+
+
+def test_trim_from_cuts_both_streams_by_the_same_numbers(tmp_path):
+    """Picture and sound are cut by one window. If only the picture moved, the
+    act's head music would play over the act after it."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source",
+         "trim_from": 10.5, "trim_to": 300.0, "fade_in": 2.0},
+    ], layout="stereo")
+    argv = megacut.build_segment_command(plan, 0, tmp_path / "seg.mkv")
+    vf = argv[argv.index("-vf") + 1]
+    af = argv[argv.index("-af") + 1]
+    assert "trim=start=10.5:end=300.0" in vf
+    assert vf.endswith("setpts=PTS-STARTPTS")
+    assert "atrim=start=10.5:end=300.0,asetpts=PTS-STARTPTS," in af
+    # The fade lands on the first frame the programme plays, not on the head
+    # it skipped, because asetpts rebased the window to zero.
+    assert "afade=t=in:st=0:d=2.0" in af
+    assert argv[argv.index("-t") + 1] == "289.5"
+
+
+def test_trim_to_alone_still_reads_as_an_end(tmp_path):
+    """The old `trim=duration=` spelling is gone; on a window with no start,
+    `end=` is the same cut and the same length."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "trim_to": 60.0},
+    ], layout="stereo")
+    argv = megacut.build_segment_command(plan, 0, tmp_path / "seg.mkv")
+    assert "trim=end=60.0" in argv[argv.index("-vf") + 1]
+    assert argv[argv.index("-t") + 1] == "60.0"
+
+
+def test_trim_from_belongs_on_a_clip(tmp_path):
+    path, _ = _plan(tmp_path, [
+        {"kind": "card", "image": "a.png", "dur": 5.0, "trim_from": 1.0},
+    ])
+    with pytest.raises(ValueError, match="trim_from belongs on a CLIP"):
+        megacut.load_plan(path)
+
+
+def test_trim_from_and_dur_cannot_both_be_stated(tmp_path):
+    """`dur` would be read as the played length while trim_from cuts the head:
+    the plan's arithmetic would believe whichever it looked at first."""
+    path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source",
+         "trim_from": 10.0, "dur": 100.0},
+    ])
+    with pytest.raises(ValueError, match="dur and trim_from cannot both"):
+        megacut.load_plan(path)
+
+
+def test_an_empty_window_is_an_error(tmp_path):
+    path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source",
+         "trim_from": 60.0, "trim_to": 60.0},
+    ])
+    with pytest.raises(ValueError, match="the window is empty"):
+        megacut.load_plan(path)
+
+
+def test_fades_are_checked_against_the_window_not_the_file(tmp_path):
+    """A 5 s fade pair fits a 300 s act and does not fit the 4 s of it the
+    programme actually plays."""
+    path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source",
+         "trim_from": 296.0, "trim_to": 300.0,
+         "fade_in": 2.0, "fade_out": 2.0},
+    ])
+    with pytest.raises(ValueError, match="meets or exceeds"):
+        megacut.load_plan(path)
+
+
+def test_locate_reports_the_act_film_time_the_head_was_cut_from(tmp_path):
+    """The offset is what to scrub to in the ACT'S OWN project, so an act the
+    programme starts 10.5 s late has every note 10.5 s further into its file."""
+    plan = {"items": [
+        {"kind": "clip", "path": "one.mp4", "audio": "source", "dur": 100.0},
+        {"kind": "clip", "path": "two.mp4", "audio": "source",
+         "chapter": "II. Two", "trim_from": 10.5, "trim_to": 60.0},
+    ]}
+    assert megacut.locate(plan, 110.0) == ("II. Two", 20.5, "two.mp4")
+
+
+# --- chapters survive the cards being cut (owner, 2026-08-14) ---------------
+
+def test_a_clip_can_carry_the_chapter_its_retired_slide_used_to():
+    """The four Roman-numeral slides were cut. Markers are derived from the
+    plan, so removing a card must not silently remove a marker: the same
+    authored string moves onto the act's own clip and the marker starts where
+    the act does."""
+    plan = {"items": [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 99.2},
+        {"kind": "clip", "path": "b.mp4", "audio": "source", "dur": 100.0,
+         "chapter": "I. Project Bluefin"},
+        {"kind": "clip", "path": "c.mp4", "audio": "source", "dur": 30.0},
+    ]}
+    assert megacut.chapters(plan) == [(99.2, "I. Project Bluefin")]
+
+
+def test_a_clip_without_a_chapter_is_not_one():
+    """Most clips are not acts -- the Perfume movements and the interstitials
+    are not chapters, and must not fall back to their build labels."""
+    plan = {"items": [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 10.0,
+         "label": "Perfume, movement 2 -- a build note"},
+    ]}
+    assert megacut.chapters(plan) == []
+
+
+def test_a_clip_chapter_starts_after_the_head_it_skips():
+    """The marker is on the PROGRAMME clock, so a windowed act's marker moves
+    with the window rather than with the act's own file."""
+    plan = {"items": [
+        {"kind": "clip", "path": "a.mp4", "audio": "source",
+         "trim_from": 10.0, "trim_to": 110.0, "chapter": "VI. Wolves"},
+        {"kind": "clip", "path": "b.mp4", "audio": "source", "dur": 5.0,
+         "chapter": "VII. Europa"},
+    ]}
+    assert megacut.chapters(plan) == [(0.0, "VI. Wolves"), (100.0, "VII. Europa")]
+
+
+def test_an_interstitial_card_is_never_a_chapter():
+    """The scream card's own note says a scrub-bar entry would spoil the gag,
+    and the label fallback was publishing its build label as a marker anyway.
+    A card that declares itself an interstitial opts out."""
+    plan = {"items": [
+        {"kind": "card", "image": "a.png", "dur": 5.0, "chapter": "I. One"},
+        {"kind": "card", "image": "b.png", "dur": 5.0, "interstitial": True,
+         "label": "Interstitial — a build note"},
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 10.0,
+         "chapter": "II. Two"},
+    ]}
+    assert megacut.chapters(plan) == [(0.0, "I. One"), (10.0, "II. Two")]
+
+
+def test_the_default_layout_is_the_one_every_file_actually_has():
+    """Issue #146: the default said 5.1 for months while all seven acts, every
+    Prod/ master and every delivered megacut were two-channel -- so aformat
+    matched stereo sources against a 5.1 layout and anullsrc spliced 5.1
+    silence between stereo segments. An upmix here would be assembly inventing
+    a soundfield, which the audio tenet forbids."""
+    assert megacut.DEFAULT_LAYOUT == "stereo"
+
+
+def test_a_plan_without_a_bitrate_asks_for_the_encoder_ceiling(tmp_path):
+    """640k is not a 5.1 leftover: ffmpeg's native AAC encoder clamps stereo to
+    its own ceiling (~439 kb/s measured on every delivered megacut), so this
+    asks for the ceiling. A 'correct-looking' stereo number would ship a worse
+    file. The real fix for the join is the lossless master, issue #145."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 10.0},
+    ])
+    cmd = megacut.build_concat_command(plan, "list.txt", "out.mp4")
+    assert cmd[cmd.index("-b:a") + 1] == megacut.DEFAULT_AUDIO_BITRATE == "640k"
+
+
+# --- the lossless programme master (issue #145) ------------------------------
+#
+# Seven acts carry FLAC masters at ~1.6-1.8 Mb/s and the programme squashed all
+# of them into one ~439 kb/s AAC at the join -- so the only artifact in the
+# chain with no lossless option was the final movie, which is the file the show
+# is actually watched and judged by.
+
+def test_the_master_defaults_beside_the_distribution_copy():
+    assert megacut.master_output_path({}, "/x/wolves-v2.6.mp4") \
+        == "/x/wolves-v2.6.mkv"
+    assert megacut.master_output_path(
+        {"master_output": "/y/m.mkv"}, "/x/o.mp4") == "/y/m.mkv"
+
+
+def test_a_plan_can_say_it_wants_no_master():
+    """An explicit null is how a plan declines one -- distinguishable from the
+    key having been forgotten, which is what gets it a master."""
+    assert megacut.master_output_path({"master_output": None}, "/x/o.mp4") is None
+
+
+def test_the_master_keeps_the_picture_and_the_sound(tmp_path):
+    """One FLAC encode and nothing else: the picture is copied off the same PCM
+    segments, so the two files carry the SAME bitstream."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 10.0},
+    ], master_gain_db=-1.7)
+    cmd = megacut.build_master_command(plan, "list.txt", "out.mkv")
+    assert cmd[cmd.index("-c:v") + 1] == "copy"
+    assert cmd[cmd.index("-c:a") + 1] == "flac"
+    assert "-b:a" not in cmd, "a lossless codec has no bitrate to state"
+    # The MIX gain, and only that.
+    assert cmd[cmd.index("-af") + 1] == "volume=-1.7dB"
+
+
+def test_the_lossy_leg_carries_its_own_headroom_and_the_master_does_not(tmp_path):
+    """Measured on this programme: the same PCM gave a FLAC master at
+    -1.1 dBTP and an AAC copy at +1.0, because a lossy encoder reconstructs
+    inter-sample peaks above the samples it was given. One shared gain would
+    either clip the copy or needlessly duck the master."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 10.0},
+    ], master_gain_db=-1.7, distribution_gain_db=-2.1)
+    dist = megacut.build_concat_command(plan, "list.txt", "out.mp4")
+    master = megacut.build_master_command(plan, "list.txt", "out.mkv")
+    assert dist[dist.index("-af") + 1] == "volume=-3.8dB"
+    assert master[master.index("-af") + 1] == "volume=-1.7dB"
+
+
+def test_a_plan_with_no_distribution_gain_is_unchanged(tmp_path):
+    """The key is optional: a plan that never states it behaves exactly as it
+    did before the split."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 10.0},
+    ], master_gain_db=-1.7)
+    dist = megacut.build_concat_command(plan, "list.txt", "out.mp4")
+    assert dist[dist.index("-af") + 1] == "volume=-1.7dB"

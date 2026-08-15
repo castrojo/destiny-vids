@@ -49,7 +49,8 @@ The segments genuinely disagree, so a re-encode is unavoidable:
   integer-rate material resamples predictably. Choosing 30 would throw away the
   60fps Guardian intros; choosing 60/1 would make the 59.94 cut drift against
   its own audio.
-* **Audio.** Everything is 48 kHz 5.1, and it is passed through **unprocessed**
+* **Audio.** Everything is 48 kHz **stereo**, and it is passed through
+  **unprocessed**
   -- no normaliser, no limiter, no EQ (the audio tenet). The one exception is
   an **explicit fade**: a clip may carry ``fade_in``/``fade_out`` (seconds, on
   the ACT FILM clock -- the clip's own timeline, so a fade never moves when
@@ -65,7 +66,8 @@ The segments genuinely disagree, so a re-encode is unavoidable:
   ``crescendo_db`` may return an attenuated clip to unity over its final
   seconds; validation refuses a pair that would boost above the source level.
   Silent segments
-  get generated 5.1 silence of exactly matching length rather than being left
+  get generated silence, in the plan's own layout and of exactly matching
+  length, rather than being left
   with no stream, because ``concat`` needs every segment to carry both.
 * **Colour.** BT.709 SDR is tagged explicitly. Untagged 1080p is *assumed* to be
   BT.709 by most players, but "most" is not a guarantee, and a mis-tagged master
@@ -133,7 +135,23 @@ DEFAULT_FPS = "60000/1001"
 DEFAULT_WIDTH = 1920
 DEFAULT_HEIGHT = 1080
 DEFAULT_SAMPLE_RATE = 48000
-DEFAULT_LAYOUT = "5.1"
+# STEREO, because every file in the chain is (issue #146). The default said
+# "5.1" for months while all seven acts, every Prod/ master and every delivered
+# megacut were two-channel -- so `aformat` matched a stereo source against a
+# 5.1 layout, `anullsrc` spliced 5.1 silence between stereo segments, and the
+# bitrate default below was a 5.1 number. Owner confirmed 2026-08-14: the show
+# is delivered stereo. A stereo->5.1 upmix here would be assembly inventing a
+# soundfield, which the audio tenet forbids; if 5.1 is ever wanted it belongs
+# in the per-cut scripts that already know what is in the mix.
+DEFAULT_LAYOUT = "stereo"
+# The AAC request for the distribution copy. It reads like a 5.1 number and it
+# is not one any more: ffmpeg's native AAC encoder clamps stereo to its own
+# ceiling, so asking for 640k asks for THE CEILING -- measured at ~439 kb/s on
+# every delivered megacut. Asking for a "correct-looking" stereo number like
+# 320k would ship a WORSE file, which is the trap issue #146 nearly set. The
+# real fix for the join is a LOSSLESS programme master (issue #145), not a
+# different lossy number.
+DEFAULT_AUDIO_BITRATE = "640k"
 
 # Named so a test can point them somewhere that does not exist. The system
 # ffmpeg on an atomic Fedora/Bluefin host is `ffmpeg-free`, which has no H.264
@@ -222,6 +240,31 @@ def load_plan(path, require_sources=True):
                     f"disagree about how long this clip plays. trim_to is the "
                     f"one that cuts, so a differing dur is a stale number the "
                     f"programme's arithmetic would believe -- state one")
+        if "trim_from" in item:
+            if kind != "clip":
+                raise ValueError(
+                    f"item {i}: trim_from belongs on a CLIP -- a card has no "
+                    f"film to start late into")
+            try:
+                trim_from = float(item["trim_from"])
+            except (TypeError, ValueError):
+                raise ValueError(
+                    f"item {i}: trim_from must be seconds of ACT FILM time, "
+                    f"got {item['trim_from']!r}")
+            if trim_from <= 0:
+                raise ValueError(
+                    f"item {i}: trim_from must be positive -- a clip with no "
+                    f"head to skip states nothing")
+            if "dur" in item:
+                raise ValueError(
+                    f"item {i}: dur and trim_from cannot both be stated -- "
+                    f"`dur` would be read as the played length while "
+                    f"trim_from cuts the head, and the plan's arithmetic "
+                    f"would believe the wrong one. State trim_to instead")
+            if "trim_to" in item and float(item["trim_to"]) <= trim_from:
+                raise ValueError(
+                    f"item {i}: trim_from ({trim_from}s) is at or past "
+                    f"trim_to ({item['trim_to']}s) -- the window is empty")
         for fade in ("fade_in", "fade_out"):
             if fade not in item:
                 continue
@@ -267,6 +310,7 @@ def load_plan(path, require_sources=True):
         if kind == "clip" and ("dur" in item or "trim_to" in item):
             total = float(item.get("fade_in", 0)) + float(item.get("fade_out", 0))
             length = float(item.get("trim_to", item.get("dur", 0)))
+            length -= float(item.get("trim_from", 0))
             if total >= length:
                 raise ValueError(
                     f"item {i}: fade_in + fade_out ({total}s) meets or exceeds "
@@ -541,6 +585,24 @@ def verify_programme(plan, out_path):
     return built_sec
 
 
+def clip_window(item):
+    """A clip's authored in/out points on the ACT FILM clock: (start, end).
+
+    ``trim_from`` is the in-point and ``trim_to`` the out-point, both stated in
+    the delivered act's own seconds. Either may be absent -- ``start`` is 0.0
+    and ``end`` is ``None`` (play to the file's end). Together they are the one
+    sanctioned way a programme shortens a delivered act **without re-rendering
+    it**: the act's own file is untouched, so what it ships standalone is
+    unchanged, and only the programme skips the head or ends early.
+
+    That distinction is load-bearing for act VI, whose 10 s head plate carries
+    a rights condition: the standalone act still plays it.
+    """
+    start = float(item.get("trim_from", 0) or 0)
+    end = item.get("trim_to")
+    return start, (None if end is None else float(end))
+
+
 def segment_video_chain(plan, item):
     """The normalising video chain for a clip, as a plain -vf string."""
     fps = plan.get("fps", DEFAULT_FPS)
@@ -548,11 +610,20 @@ def segment_video_chain(plan, item):
     h = int(plan.get("height", DEFAULT_HEIGHT))
     chain = (f"scale={w}:{h}:flags=lanczos,setsar=1,"
              f"fps={fps},format=yuv420p")
-    if item.get("trim_to") is not None:
-        # An authored cut inside a delivered act: the act's own file is never
-        # re-rendered, so the programme ends it early instead. The trim is on
-        # the ACT FILM clock, like every other number the plan states.
-        chain += f",trim=duration={float(item['trim_to'])}"
+    start, end = clip_window(item)
+    if start or end is not None:
+        # An authored window inside a delivered act: the act's own file is
+        # never re-rendered, so the programme starts it late and/or ends it
+        # early instead. Both numbers are on the ACT FILM clock, like every
+        # other number the plan states. The trim is placed AFTER the fps
+        # conversion so the window is cut on the delivery timeline rather than
+        # on the source's -- and `setpts=PTS-STARTPTS` below rebases it to 0.
+        parts = []
+        if start:
+            parts.append(f"start={start}")
+        if end is not None:
+            parts.append(f"end={end}")
+        chain += ",trim=" + ":".join(parts)
     elif item["audio"] == "silent":
         # Both legs pinned to ONE duration so they are equal by construction.
         dur = item.get("dur")
@@ -603,14 +674,29 @@ def fade_chain(item, dur):
 
 
 def clip_audio_chain(item, rate, layout, dur):
-    """The audio filter string for a source-audio clip: resample if needed,
-    pin the layout for the join, then the plan's explicit gain and fades. No
-    gain unless the plan's owner-authored ``gain_db`` declares one. Shared by
-    the encode and the stream-copy segment commands so the two paths treat a
-    clip's sound identically -- ``dur`` is the clip's length on the ACT FILM
-    clock (authored, else probed by the caller).
+    """The audio filter string for a source-audio clip: cut the authored
+    window, resample if needed, pin the layout for the join, then the plan's
+    explicit gain and fades. No gain unless the plan's owner-authored
+    ``gain_db`` declares one. Shared by the encode and the stream-copy segment
+    commands so the two paths treat a clip's sound identically -- ``dur`` is
+    the clip's PLAYED length on the ACT FILM clock (authored, else probed by
+    the caller), which is the window's length when one is stated.
+
+    The window is cut on both streams by the same numbers, so sound cannot
+    outlive picture, and ``asetpts`` rebases it to zero -- which is what makes
+    a ``fade_in`` land on the first frame the programme actually plays rather
+    than on a head the programme skipped.
     """
-    return (f"aresample={rate},"
+    start, end = clip_window(item)
+    window = ""
+    if start or end is not None:
+        parts = []
+        if start:
+            parts.append(f"start={start}")
+        if end is not None:
+            parts.append(f"end={end}")
+        window = "atrim=" + ":".join(parts) + ",asetpts=PTS-STARTPTS,"
+    return (f"{window}aresample={rate},"
             f"aformat=sample_fmts=fltp:channel_layouts={layout}"
             f"{fade_chain(item, float(dur) if dur is not None else 0.0)}")
 
@@ -682,21 +768,24 @@ def build_segment_command(plan, index, seg_path, threads=None):
         af = []
     else:
         maps = ["-map", "0:v:0", "-map", "0:a:0"]
-        # Authored duration, else probed from the video stream -- the container
+        # The PLAYED length: the authored window if there is one, else the
+        # authored duration, else probed from the video stream -- the container
         # can report a longer audio stream, and a fade placed against that
         # starts early. Only a fade needs the number, so only a fade pays the probe.
-        dur = item.get("trim_to")
-        if dur is None:
+        start, end = clip_window(item)
+        if start or end is not None:
+            dur = (end if end is not None
+                   else probe_duration(resolve(item["path"]), stream="v:0")) - start
+            # A windowed clip is cut on BOTH streams by the same numbers, so
+            # the sound cannot outlive the picture -- and a fade_out lands
+            # against the authored end rather than against the file's.
+            maps += ["-t", str(float(dur))]
+        else:
             dur = item.get("dur")
             if dur is None and (
                     float(item.get("fade_out", 0))
                     or float(item.get("crescendo_out", 0))):
                 dur = probe_duration(resolve(item["path"]), stream="v:0")
-        else:
-            # A trimmed clip is cut on BOTH streams by the same number, so the
-            # sound cannot outlive the picture -- and a fade_out lands against
-            # the authored end rather than against the file's.
-            maps += ["-t", str(float(dur))]
         # aresample only where the rate differs; aformat pins the layout so the
         # join sees one shape. No gain is applied anywhere; the only treatment
         # is an explicit fade the plan asked for (issue #105).
@@ -752,10 +841,22 @@ def build_concat_command(plan, list_path, out_path):
     ``-safe 0`` because the list holds absolute paths. The video is copied, so
     every segment must share codec parameters -- they do, by construction:
     ``build_segment_command`` encodes them all from the same plan.
+
+    TWO GAINS, and keeping them apart is the point. ``master_gain_db`` is the
+    programme's mix, and the lossless master carries it too. ``distribution
+    _gain_db`` is EXTRA headroom this leg needs and the master does not,
+    because a lossy encoder reconstructs inter-sample peaks above the samples
+    it was given -- measured here at ~2.1 dB across the whole programme, with
+    the FLAC master reading -1.1 dBTP off the very same PCM that gave AAC
+    +1.0. Both are plain static gains: never a limiter, never a normaliser,
+    never EQ. Neither is guessed -- each is derived from a measurement of the
+    file it applies to, which is the audio standard's own rule (issue #82:
+    check the file you are actually shipping).
     """
-    abitrate = plan.get("audio_bitrate", "640k")
-    master_gain = float(plan.get("master_gain_db", 0))
-    audio_filter = ["-af", f"volume={master_gain:+.1f}dB"] if master_gain else []
+    abitrate = plan.get("audio_bitrate", DEFAULT_AUDIO_BITRATE)
+    gain = (float(plan.get("master_gain_db", 0))
+            + float(plan.get("distribution_gain_db", 0)))
+    audio_filter = ["-af", f"volume={gain:+.1f}dB"] if gain else []
     return [
         ffmpeg_bin(), "-nostdin", "-hide_banner",
         "-f", "concat", "-safe", "0", "-i", str(list_path),
@@ -767,6 +868,57 @@ def build_concat_command(plan, list_path, out_path):
         "-movflags", "+faststart",
         str(out_path), "-y",
     ]
+
+
+def build_master_command(plan, list_path, out_path):
+    """Join the segments into a LOSSLESS programme master: copy the picture,
+    encode the sound to FLAC.
+
+    Issue #145. Seven of the nine acts carry FLAC masters at ~1.6-1.8 Mb/s and
+    the programme squashed all of them into one ~439 kb/s AAC at the join --
+    so the only artifact in the whole chain with no lossless option was the
+    final movie, which is the file the show is actually watched and judged by.
+
+    It costs one FLAC encode and nothing else: the picture is ``-c:v copy``
+    here exactly as it is for the distribution copy, off the same PCM segments
+    that already exist, so the two files carry the SAME bitstream and differ
+    only in how the sound is stored.
+
+    **Matroska, not MP4.** FLAC in MP4 is a late addition that many players
+    still refuse; Matroska has carried FLAC since forever and is what the
+    segments already are.
+
+    The master carries ``master_gain_db`` and NOT ``distribution_gain_db``.
+    That split is the whole reason both keys exist: the mix is one thing, and
+    the extra headroom a lossy encoder's inter-sample overshoot demands is
+    another. Measured on this programme, the same PCM gave a FLAC master at
+    -1.1 dBTP and an AAC copy at +1.0 -- so making them carry one gain would
+    either clip the copy or needlessly duck the master. Each leg is measured
+    and corrected against the file that actually ships (issue #82).
+    """
+    master_gain = float(plan.get("master_gain_db", 0))
+    audio_filter = ["-af", f"volume={master_gain:+.1f}dB"] if master_gain else []
+    return [
+        ffmpeg_bin(), "-nostdin", "-hide_banner",
+        "-f", "concat", "-safe", "0", "-i", str(list_path),
+        "-map", "0:v:0", "-map", "0:a:0",
+        "-c:v", "copy",
+        *audio_filter,
+        "-c:a", "flac",
+        "-ar", str(plan.get("sample_rate", DEFAULT_SAMPLE_RATE)),
+        str(out_path), "-y",
+    ]
+
+
+def master_output_path(plan, out_path):
+    """Where the lossless master goes: the plan's `master_output`, else the
+    distribution copy's name with a `.mkv` extension. ``None`` disables it --
+    an explicit ``"master_output": null`` is how a plan says it does not want
+    one, rather than the key simply being forgotten."""
+    if "master_output" in plan:
+        stated = plan["master_output"]
+        return None if stated is None else str(stated)
+    return str(Path(out_path).with_suffix(".mkv"))
 
 
 def default_jobs(n_items):
@@ -866,7 +1018,7 @@ def assemble(plan, out_path, log=None, jobs=None,
         for i, item in enumerate(plan["items"]):
             seg = tmp / f"seg{i:03d}.mkv"
             segments[i] = seg
-            if item["kind"] == "clip" and copy_ok and item.get("trim_to") is None:
+            if item["kind"] == "clip" and copy_ok and clip_window(item) == (0.0, None):
                 argv = build_segment_copy_command(plan, i, seg, sources[i])
                 mode = "copy"
             else:
@@ -888,6 +1040,16 @@ def assemble(plan, out_path, log=None, jobs=None,
         log(f"  joining {len(segments)} segments")
         subprocess.run(build_concat_command(plan, list_path, out_path), check=True)
         verify_programme(plan, out_path)
+        master_path = master_output_path(plan, out_path)
+        if master_path:
+            # Issue #145. Same segments, same picture bitstream, sound kept
+            # lossless. Built AFTER the distribution copy is verified, so a
+            # programme that failed its own duration check never leaves a
+            # master behind implying it passed.
+            log(f"  lossless master -> {master_path}")
+            subprocess.run(
+                build_master_command(plan, list_path, master_path), check=True)
+            verify_programme(plan, master_path)
     finally:
         ctx.cleanup()
     return out_path
@@ -905,16 +1067,18 @@ def item_duration(item):
     the graph does not build. expected_duration and build_filtergraph test the
     same way, and the three must not disagree about what "no dur" is.
 
-    ``trim_to`` OUTRANKS both. It is the only key that shortens a clip whose
-    audio comes from the file -- `dur` never did, and that was the trap: an
-    authored `dur` shorter than the file changed the plan's arithmetic while
-    the segment still played to its own end, so the programme's clock and its
-    picture disagreed and only `verify_segment` caught it. A clip that
-    declares `trim_to` IS `trim_to` long, everywhere.
+    ``trim_to``/``trim_from`` OUTRANK both -- they are the authored window
+    (see ``clip_window``), and a clip that declares one IS its window long,
+    everywhere. `dur` never cut anything, and that was the trap: an authored
+    `dur` shorter than the file changed the plan's arithmetic while the segment
+    still played to its own end, so the programme's clock and its picture
+    disagreed and only `verify_segment` caught it.
     """
-    trim_to = item.get("trim_to")
-    if trim_to is not None:
-        return float(trim_to)
+    start, end = clip_window(item)
+    if end is not None:
+        return end - start
+    if start:
+        return probe_duration(resolve(item["path"]), stream="v:0") - start
     dur = item.get("dur")
     if dur is None:
         dur = probe_duration(resolve(item["path"]), stream="v:0")
@@ -958,12 +1122,25 @@ def chapters(plan, include_sub_chapters=False):
 
     A chapter starts where its ACT SLIDE starts, not where the film behind it
     does: the slide is how the audience is told which act this is, so a marker
-    landing after it would drop them into a card they have already read. The
-    The title is the card's `chapter` -- an authored audience-facing string,
+    landing after it would drop them into a card they have already read. Where
+    a slide has been RETIRED -- the owner cut the four Roman-numeral cards on
+    2026-08-14 -- the same `chapter` string sits on the act's own CLIP instead,
+    and the marker starts where the act starts, which is the only place left
+    that means anything. Removing a card must not silently remove a marker.
+
+    The title is the item's `chapter` -- an authored audience-facing string,
     NOT the item's `label`, which is a build note ("held long, by owner
     request"). It lives on the item so the running order and its markers cannot
     disagree; a card without one falls back to `label` and reads oddly, which is
-    the visible failure that gets it filled in.
+    the visible failure that gets it filled in. A CLIP without one is simply not
+    a chapter: most clips (the Perfume movements, the interstitials) are not.
+
+    ``interstitial: true`` opts a CARD out entirely. The label fallback above
+    exists so a missing `chapter` reads oddly and gets filled in -- but the
+    scream card is a gag whose whole design is that no scrub bar announces it,
+    and the fallback was quietly publishing its build label as a marker. A card
+    that says it is an interstitial is not a chapter, and stating it beats
+    relying on a card having no label.
 
     ``include_sub_chapters`` is OFF by default, so the published one-entry-per-
     act list is unchanged unless it is asked for. When on, a clip item may
@@ -981,10 +1158,14 @@ def chapters(plan, include_sub_chapters=False):
     out, t_programme = [], 0.0
     for item in plan["items"]:
         if item["kind"] == "card":
-            out.append(
-                (t_programme, item.get("chapter") or item.get("label") or "Chapter"))
+            if not item.get("interstitial"):
+                out.append(
+                    (t_programme,
+                     item.get("chapter") or item.get("label") or "Chapter"))
             t_programme += float(item["dur"])
             continue
+        if item.get("chapter"):
+            out.append((t_programme, item["chapter"]))
         if include_sub_chapters and item.get("sub_chapters"):
             for at_film, title in load_sub_chapters(item["sub_chapters"]):
                 out.append((t_programme + at_film, title))
@@ -995,8 +1176,13 @@ def chapters(plan, include_sub_chapters=False):
 def format_chapters(marks):
     """YouTube's chapter format: `H:MM:SS Title`, one per line.
 
-    The first marker must be at zero or YouTube ignores the whole list, which
-    holds here by construction -- the programme opens on act I's slide.
+    YouTube ignores a list whose first marker is not 0:00. That used to hold
+    here by construction, because the programme opened on act I's slide -- it
+    stopped holding when the prologue was placed in front of it (2026-08-14),
+    and the first marker is now act I's at 1:39. The prologue carries no
+    chapter by design (docs/running-order.md), so closing the gap means
+    authoring a title for it, which is the owner's call, not the tool's. This
+    function reports what the plan says and does not invent a zero marker.
     """
     lines = []
     for seconds, title in marks:
@@ -1030,23 +1216,31 @@ def locate(plan, seconds):
     Returns (title, offset_into_that_item, path_or_None). A card is an act
     slide, so a note landing on one is a note about the slide, not the film.
 
+    The offset is on the ACT'S OWN FILM clock, which is not the same as the
+    offset into the played item once a clip carries a window: an act the
+    programme starts 10.5 s late has every note 10.5 s further into its own
+    file than into the programme's copy of it. ``trim_from`` is added back for
+    exactly that reason -- the number this prints is the one to scrub to in the
+    act's own project.
+
     The title is the act's, not the item's: a clip carries a `label` that is a
     build note ("held long, by owner request"), so an act's film is reported
-    under the chapter its own SLIDE announced. That is what the audience --
-    and therefore the note -- calls it.
+    under the chapter it is announced by -- its own slide where one exists, and
+    its own `chapter` string where the slide has been retired. That is what the
+    audience -- and therefore the note -- calls it.
     """
     t = 0.0
     act = None
     for item in plan["items"]:
-        dur = item.get("dur")
-        if dur is None:
-            dur = probe_duration(resolve(item["path"]), stream="v:0")
-        dur = float(dur)
-        if item["kind"] == "card":
-            act = item.get("chapter") or item.get("label")
+        dur = item_duration(item)
+        if item.get("chapter"):
+            act = item["chapter"]
+        elif item["kind"] == "card":
+            act = item.get("label")
         if seconds < t + dur or item is plan["items"][-1]:
             title = act or item.get("label") or item.get("path") or "?"
-            return title, round(seconds - t, 3), item.get("path")
+            start, _ = clip_window(item)
+            return title, round(seconds - t + start, 3), item.get("path")
         t += dur
     raise ValueError("empty plan")
 
@@ -1103,7 +1297,7 @@ def main(argv=None):
     if args.dry_run:
         copy_ok = _copy_path_ok(plan, allow_copy=not args.no_copy)
         for i, item in enumerate(plan["items"]):
-            if item["kind"] == "clip" and copy_ok and item.get("trim_to") is None:
+            if item["kind"] == "clip" and copy_ok and clip_window(item) == (0.0, None):
                 print(f"# [{i}] COPY (via conform cache): "
                       f"{item.get('label', item['path'])}")
                 print(" ".join(build_segment_copy_command(
@@ -1112,6 +1306,11 @@ def main(argv=None):
                 print(f"# [{i}] ENCODE: {item.get('label', item['kind'])}")
                 print(" ".join(build_segment_command(plan, i, f"seg{i:03d}.mkv")))
         print(" ".join(build_concat_command(plan, "segments.txt", out_path)))
+        master_path = master_output_path(plan, out_path)
+        if master_path:
+            print("# lossless programme master (issue #145)")
+            print(" ".join(build_master_command(
+                plan, "segments.txt", master_path)))
         print(f"# expected duration: {expected_duration(plan):.3f}s "
               f"across {len(plan['items'])} items")
         return 0

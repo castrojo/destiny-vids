@@ -153,3 +153,51 @@ def test_print_report_names_the_clock(stream=None):
     out = buf.getvalue()
     assert "PROGRAMME" in out
     assert "-inf" in out
+
+
+# --- the CLI path itself (issue #204) ---------------------------------------
+#
+# main() passed pre=/post= that measure_join() did not accept, so EVERY
+# invocation of the tool died with a TypeError -- while the suite stayed green,
+# because every test called measure_join directly. The fix is the signature;
+# the guard against it coming back is a test that runs main().
+
+def test_measure_join_honours_a_narrower_window():
+    join = {"kind": "slide", "label": "II", "out_label": "a", "in_label": "b",
+            "silent_start": 105.0, "silent_end": 110.0}
+
+    def fake_decode(path, start, dur, ffmpeg=None):
+        assert start == 103, "pre= did not reach the window arithmetic"
+        assert dur == 9, "post= did not reach the window arithmetic"
+        return pcm_f32([0.5] * dur, rate=1)
+
+    r = transitions.measure_join("x.mp4", join, 1, 1, decode_fn=fake_decode,
+                                 pre=2.0, post=2.0)
+    assert r["window"] == (103, 112)
+
+
+def test_the_cli_runs_end_to_end(tmp_path, monkeypatch, capsys):
+    """The crash issue #204 records was invisible to CI because nothing ever
+    called main(). This does."""
+    import json
+
+    built = tmp_path / "built.mp4"
+    built.write_bytes(b"not really an mp4")
+    plan = {"output": str(tmp_path / "out.mp4"), "items": [
+        {"kind": "card", "image": "a.png", "dur": 5.0, "chapter": "I. One"},
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 20.0},
+        {"kind": "clip", "path": "b.mp4", "audio": "source", "dur": 20.0},
+    ]}
+    plan_path = tmp_path / "plan.json"
+    plan_path.write_text(json.dumps(plan))
+
+    monkeypatch.setattr(transitions, "probe_audio_shape", lambda p: (1, 1))
+    monkeypatch.setattr(transitions, "decode",
+                        lambda path, start, dur, ffmpeg=None:
+                        pcm_f32([0.5] * int(dur), rate=1))
+
+    assert transitions.main([str(plan_path), "--measure", str(built),
+                             "--pre", "2", "--post", "2"]) == 0
+    out = capsys.readouterr().out
+    assert "transitions on" in out
+    assert "PROGRAMME" in out
