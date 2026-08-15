@@ -46,13 +46,15 @@ actual file, and the exact commands are in ``docs/cuts/00-prologue.md``.
   falls from 46.9 at 88.8 s to a minimum of **30.0 at 91.2 s** and is climbing
   again by 91.4, so 1:31 sits one frame off a natural fade-to-black. The out
   point is moved to the actual minimum rather than the round number.
-* **BRIDGE of 8.000.** The owner: *"put up a 03-bluefin-day.jxl and fade to the
+* **BRIDGE of 10.000.** The owner: *"put up a 03-bluefin-day.jxl and fade to the
   dark version so that that replaces the black part, make it seem like one
   movie"*. March's pair is the same drawing at two times of day -- pink sunset
   with a white sun, then blue night with a crescent moon and fireflies -- and
   in both of them the pack is closing on the herd. Crossfading one to the other
   is a sun going down over the hunt, immediately before a film called *Seven
   Days to the Wolves*. It is a turn, not a dissolve, so it is given 2.6 s.
+  Its fade-DOWN was 1.2 s and is now 3.2 s -- see ``BRIDGE_DOWN``, which
+  records the measurement and the owner's 2026-08-15 note behind the change.
 
 The audio does not stop where the picture does
 ----------------------------------------------
@@ -103,13 +105,34 @@ BRIDGE_UP = 1.400           # black -> day
 BRIDGE_DAY_HOLD = 1.200
 BRIDGE_TURN = 2.600         # day -> night, the sun going down
 BRIDGE_NIGHT_HOLD = 1.600
-BRIDGE_DOWN = 1.200         # night -> black, so act I's slide rises out of it
+# THE FADE TAKES UP THE BLACK. Owner, 2026-08-15: *"1:32 shows a too-fast fade
+# and then a bunch of black, fix it so the fade takes up the black instead."*
+#
+# MEASURED on the delivered v2.8 programme rather than inferred. The bridge
+# fell 49.4 -> 16.0 (video-range black) between 98.1 and 99.2 -- 1.2 s -- and
+# then the frame sat at EXACTLY 16.00 from 99.35 to 101.02 before act I's
+# picture began to rise. That flat stretch is act I's own head: `01-intro.mp4`
+# holds 16.00 from 0.000 to 1.833 and starts climbing at 2.000, so the act
+# opens on a hard 2.000 s of black.
+#
+# So the note is two faults with one cause -- a hurried fade, and then two dead
+# seconds of nothing. Both are fixed by giving the fade the time the black was
+# wasting: BRIDGE_DOWN goes 1.200 -> 3.200, and act I's 2.000 s black head is
+# skipped in the PROGRAMME with `trim_from` (stories/megacut/megacut.json, the
+# same mechanism acts II and VI already use, #206). The night wallpaper now
+# sinks over 3.2 s and hands straight to act I's first lit frame.
+#
+# The programme's length is unchanged: the bridge gains the 2.000 s that act I
+# loses. The music's fade follows automatically, because AUDIO_FADE is derived
+# from TOTAL rather than typed -- it goes 6.200 -> 8.200, which is the same
+# instruction applied to the sound.
+BRIDGE_DOWN = 3.200         # night -> black, arriving as act I's picture does
 BRIDGE = (BRIDGE_UP + BRIDGE_DAY_HOLD + BRIDGE_TURN
-          + BRIDGE_NIGHT_HOLD + BRIDGE_DOWN)          # 8.000
+          + BRIDGE_NIGHT_HOLD + BRIDGE_DOWN)          # 10.000
 
 AUDIO_FADE_START = 93.000
-TOTAL = OUT_POINT + BRIDGE                             # 99.200
-AUDIO_FADE = TOTAL - AUDIO_FADE_START                  # 6.200
+TOTAL = OUT_POINT + BRIDGE                             # 101.200
+AUDIO_FADE = TOTAL - AUDIO_FADE_START                  # 8.200
 
 # --- the opening level ride ---------------------------------------------------
 # The owner, on the first cut: "the sparks in the beginning of the video is

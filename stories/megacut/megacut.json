@@ -43,8 +43,8 @@
       "path": "/var/home/jorge/Videos/Wolves/Prod/00-prologue.mp4",
       "audio": "source",
       "label": "Prologue — main title: 'Perfume Of The Timeless' 0 - 91.2, the title at 0:11, then the March day->night bridge",
-      "dur": 99.2,
-      "_dur_note": "91.200 of picture + an 8.000 bridge. The out point is the source's own luma MINIMUM (YAVG 30.0 at 91.2, against 46.9 at 88.8 and climbing again by 91.4), which is one frame off the owner's stated 1:31. NO fade_in: it opens on its own darkness, which is the first frame of the show. NO fade_out either -- like acts II and VI it fades ITSELF out, across the bridge, and a second fade on top would double the taper."
+      "dur": 101.2,
+      "_dur_note": "91.200 of picture + a 10.000 bridge. The out point is the source's own luma MINIMUM (YAVG 30.0 at 91.2, against 46.9 at 88.8 and climbing again by 91.4), which is one frame off the owner's stated 1:31. NO fade_in: it opens on its own darkness, which is the first frame of the show. NO fade_out either -- like acts II and VI it fades ITSELF out, across the bridge, and a second fade on top would double the taper."
     },
     {
       "kind": "clip",
@@ -58,8 +58,11 @@
       "gain_db": 3.5,
       "_gain": "Owner-approved 2026-08-14 (#164): act I measured -19.4 LUFS integrated where the other six acts cluster -9.7..-11.3, so the show opened ~9 dB quiet and jumped at the I->II join. Its true peak is -4.6 dBTP (re-measured on the delivered master before choosing this number), so +3.5 dB is the MOST a plain gain can add while staying inside the house -0.9..-1.1 dBTP band -- the audio tenet forbids a limiter, so the remaining ~5.6 LU needs a re-master of the act and is recorded on #164. The number is peak-constrained arithmetic, not taste.",
       "label": "Act I — Into the Light: six Guardians plated, the comic card, Bungie's score",
-      "dur": 111.567,
-      "_dur_note": "The frame-verified trim, 2.0 -> 113.55 of BKm0TPqeOjY. Recorded here so the running order and its chapter markers can be read before the segment is built."
+      "_dur_note": "The frame-verified trim, 2.0 -> 113.55 of BKm0TPqeOjY. Recorded here so the running order and its chapter markers can be read before the segment is built.",
+      "trim_from": 2.0,
+      "_trim_from": "Owner 2026-08-15: '1:32 shows a too-fast fade and then a bunch of black, fix it so the fade takes up the black instead.' MEASURED on v2.8, not inferred: the prologue's bridge fell to video-range black (YAVG 16.00) by 99.2 and the frame then sat at EXACTLY 16.00 until 101.02 before act I's picture rose. That flat stretch is act I's own head -- 01-intro.mp4 holds 16.00 from 0.000 to 1.833 and starts climbing at 2.000, so the act opens on a hard 2.000 s of black. The two dead seconds are skipped HERE, in the programme only, exactly as acts II and VI skip theirs (#206): the act file is not re-rendered and still opens on its own black wherever it plays standalone. The other half of the fix is in scripts/build_prologue.py, where BRIDGE_DOWN goes 1.200 -> 3.200 so the night wallpaper sinks over 3.2 s and arrives exactly as act I's first lit frame does. The programme's length is unchanged: the bridge gains the 2.000 s act I gives up.",
+      "trim_to": 111.567,
+      "_trim_to": "The act's full length, 111.567s. It was stated as `dur` until 2026-08-15; the assembler rejects `dur` beside `trim_from` on purpose (one counts output seconds, the other cuts the head, and the plan's arithmetic would believe the wrong one), so the same number is restated as the out point it always was. With trim_from 2.0 the act plays 2.000 -> 111.567, which is 109.567s."
     },
     {
       "kind": "clip",
@@ -70,7 +73,9 @@
       "crescendo_out": 4.0,
       "crescendo_db": 4.0,
       "label": "Perfume, movement 2 — source 93.000 -> 159.400, after the Destiny intro",
-      "_thread": "THE PERFUME THREAD, movement 2 of 5. No numeral, no slide, no chapter marker -- see stories/00-perfume-thread.json. The 6.2 s fade_in is not a default: it is the exact length of the fade the PROLOGUE went out on (afade st=93.0 d=6.2), replayed upside down, so the song dips across act I and swells back rather than restarting. It also resumes mid-shot -- there is no cut in the source between 91.200 and 108.960 -- so the picture continues the very frame the prologue left. At the other end, the old 2.0 s fade_out and act II's silent card are gone on the owner's 4:40 note. The whole movement is held 4 dB below source, then the final 4.0 s rises linearly in dB back to unity: a crescendo that never boosts above the source's existing peak, followed by a direct music-to-music cut."
+      "_thread": "THE PERFUME THREAD, movement 2 of 5. No numeral, no slide, no chapter marker -- see stories/00-perfume-thread.json. The 6.2 s fade_in is not a default: it is the exact length of the fade the PROLOGUE went out on (afade st=93.0 d=6.2), replayed upside down, so the song dips across act I and swells back rather than restarting. It also resumes mid-shot -- there is no cut in the source between 91.200 and 108.960 -- so the picture continues the very frame the prologue left. At the other end, the old 2.0 s fade_out and act II's silent card are gone on the owner's 4:40 note. The whole movement is held 4 dB below source, then the final 4.0 s rises linearly in dB back to unity: a crescendo that never boosts above the source's existing peak, followed by a direct music-to-music cut.",
+      "fade_out": 1.5,
+      "_fade_out": "Owner 2026-08-15: '4:39 audio cut off in transition needs a nicer transition.' MEASURED on v2.8 at the join (programme 277.2): movement 2's crescendo returns Perfume to unity and it peaks around -11.5 dB RMS, then act II's first bar enters at about -21 dB -- a TEN dB cliff with nothing between the two songs. Nothing was fading; the song was simply stopping at its loudest, which is exactly what 'cut off' describes. THE CRESCENDO STAYS -- it is the owner's own 2026-08-14 design, 'movement 2 crescendos directly into it', and the swell is not the fault. What was missing is its RELEASE: 1.5 s of fade at the very end, after the 4.0 s crescendo has peaked, so Perfume swells and then lets go into Endless Forms instead of being chopped mid-note. A dip is the right shape here and not the #105 fault, because act II enters QUIET rather than hot."
     },
     {
       "kind": "clip",
@@ -100,9 +105,10 @@
       "path": "renders/perfume-3.mp4",
       "audio": "source",
       "fade_in": 0.0,
-      "fade_out": 1.0,
+      "fade_out": 0.0,
       "label": "Perfume, movement 3 — source 159.400 -> 274.240, after mrbobbytables",
-      "_thread": "Movement 3 of 5, and the longest at 2:48.7 -- longer than acts IV, V and VII. That is what the owner's spans specify and it plays as a full movement of the song, but it is the one placement where an interlude outweighs the acts around it. Flagged in stories/00-perfume-thread.json for the owner, built as instructed."
+      "_thread": "Movement 3 of 5, and the longest at 2:48.7 -- longer than acts IV, V and VII. That is what the owner's spans specify and it plays as a full movement of the song, but it is the one placement where an interlude outweighs the acts around it. Flagged in stories/00-perfume-thread.json for the owner, built as instructed.",
+      "_hard_out": "NO fade_out. Owner 2026-08-15: '14:11 transition should be a jump cut.' It was 1.0 s (itself already shortened from 2.0 when the IV-V card was retired) and, with act IV's own 2.0 s fade_in, the join was a 3.0 s dip in the middle of a song. A jump cut is both numbers at zero -- the same shape the movement 4 -> Europa join already carries on the owner's identical instruction ('don't fade this it's awesome make it a quick cut')."
     },
     {
       "kind": "clip",
@@ -110,8 +116,9 @@
       "audio": "source",
       "chapter": "IV–V. Bias for Action",
       "_no_slide": "Card `act4-5` retired on the owner's 2026-08-14 instruction. It announced BOTH acts, so its one marker stays ONE marker, on act IV, carrying the card's authored title unchanged -- reproduced, not re-titled. Act V's own title is printed nowhere and is #91's open question, which this does not settle. Movement 3 now ends on its 1.0 s fade and act IV enters on its own 2.0 s, so the join is a 3.0 s dip where it used to be a dip plus five seconds of card.",
-      "fade_in": 2.0,
-      "label": "Act IV — Kat Cosgrove: Guardian intro"
+      "fade_in": 0.0,
+      "label": "Act IV — Kat Cosgrove: Guardian intro",
+      "_hard_in": "NO fade_in, the other half of the owner's 2026-08-15 jump cut at 14:11. Movement 3 now runs at full level to its last frame and act IV starts on the next one. If the audio clicks on the join the fix is an audio-only micro-fade, NEVER a picture dissolve -- the instruction is a jump CUT."
     },
     {
       "kind": "clip",
