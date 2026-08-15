@@ -848,7 +848,12 @@ def test_no_card_rides_onto_karenas_jump():
     jump_in = build_efmb.film_for_source(jump[0], lead)
 
     card = by_id["walk_chapter"]
-    assert card["at"] + card["dur"] <= jump_in + 1e-6, \
+    # STRICTLY BEFORE, not `<=`. The original assertion allowed the card to end
+    # exactly ON jump_in, and that is the frame the zone exists to protect --
+    # which is how this shipped green three times (#184, #192). The card ended
+    # at 148.533, and build_efmb_plates' own commit message calls 148.533 "the
+    # frame she jumps on".
+    assert card["at"] + card["dur"] < jump_in, \
         "the chapter card is on Karena's jump again"
     # ... and it is on the walk it names, which is only 1.8 s long.
     walk_in = build_efmb.film_for_source(build_efmb_plates.WALK_IN, lead)
@@ -856,6 +861,58 @@ def test_no_card_rides_onto_karenas_jump():
     assert card["at"] - walk_in == pytest.approx(
         build_efmb_plates.WALK_CARD_LEAD, abs=1e-3)
     assert card["dur"] >= build_efmb_plates.MIN_HOLD
+
+
+def test_no_cue_anywhere_ends_inside_a_no_plate_zone():
+    """The zone guarantee, for every cue rather than for the one that broke.
+
+    `clamp_hold` shortened a cue to end at `zone_start - at`, which lands its
+    LAST FRAME on the zone's FIRST frame. `_zones` already backs the zone's end
+    off by a hair; the start had no such guard, so a clamped cue was still on
+    the protected shot. Asserting it for the whole manifest is what stops the
+    next cue rediscovering it.
+    """
+    plates = build_efmb_plates.build()["plates"]
+    lead = build_efmb.derive_lead()
+    # The module's own zone conversion: it backs each zone's END off by a hair
+    # because some zone ends on a frame the act cuts (film_for_source raises
+    # NotInPicture on those).
+    zones = build_efmb_plates._zones(
+        lambda src: build_efmb.film_for_source(src, lead))
+
+    for p in plates:
+        start = p["at"]
+        end = p["at"] + p["dur"]
+        for z_in, z_out, why in zones:
+            assert not (z_in <= start <= z_out), (
+                f"{p['id']} starts inside {why}")
+            assert not (z_in <= end <= z_out), (
+                f"{p['id']} ends at {end:.3f}s, inside {why} "
+                f"({z_in:.3f}-{z_out:.3f})")
+
+
+def test_gloriouseggroll_has_no_nameplate_over_someone_elses_face():
+    """His card was anchored to a shot he is not in (#192).
+
+    src 180.533 is film ~156.7: a ship, then a hangar interior, then an extreme
+    close-up of a woman's face at 160.5 -- and the card held across all three
+    reading "BLUEBERRY // MAINTAINER / GloriousEggroll". That is a real
+    person's name over a different person, which AGENTS.md rule 3 forbids.
+
+    The walking shot the chapter card names is 1.8 s, under MIN_HOLD, so no
+    shot in this chapter can carry his credit. Omission credits nobody, so the
+    card comes out; his seven lines still name him as the speaker.
+    """
+    plates = build_efmb_plates.build()["plates"]
+    named = [p for p in plates
+             if p.get("kind") not in ("chat",)
+             and "Glorious" in str(p.get("name", ""))]
+    assert named == [], (
+        "GloriousEggroll has a nameplate again -- it has no shot to sit on "
+        "in this chapter")
+    # He is still in the film: his dialogue is untouched.
+    spoken = [p for p in plates if p.get("speaker") == "GloriousEggroll"]
+    assert len(spoken) >= 7, "his dialogue was dropped with his nameplate"
 
 
 

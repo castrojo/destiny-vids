@@ -36,20 +36,21 @@
       "id": "perfume-3",
       "out_file": "renders/perfume-3.mp4",
       "in": 159.400,
-      "out": 328.080,
-      "duration": 168.680,
+      "out": 273.840,
+      "duration": 114.440,
       "seat": "after act III (03-mrbobbytables), before the shared IV/V slide",
       "_in_point": "Continuous with movement 2's out point: the thread has no gaps.",
-      "_out_point": "The owner said '5:29' (329.0). 328.080 is a measured shot change 0.92 s earlier; 343.08 is the next one, 14 s later, so 328.080 is unambiguously the cut meant.",
-      "_longest": "At 2:48.7 this is longer than acts IV, V and VII. That is what the owner's spans specify and it plays as a full movement of the song, but it is the one placement where an interlude outweighs the acts around it. Flagged for the owner, built as instructed."
+      "_out_point": "REBALANCED (#192). The owner's span ran to '5:29' (measured 328.080), which made this 2:48.7 -- longer than acts IV, V and VII, and 2.8x the two acts it introduces (IV+V together are 59.3 s). 273.840 is a measured shot change (underwater cliff -> wide landscape, verified on frames) at the midpoint of the movement-3 + movement-4 span.",
+      "_rebalance": "NOTHING IS CUT FROM THE SONG. The 54.24 s taken off this out point is added to movement 4's in point, so the thread stays gapless and in source order and the whole song still plays -- 159.400 -> 273.840 -> 389.800 rather than 159.400 -> 328.080 -> 389.800. Both seats the owner specified are unchanged (this one after mrbobbytables, movement 4 before Europa); only the boundary between them moves. Result: 1:54.4 and 1:56.0 instead of 2:48.7 and 1:01.7."
     },
     {
       "id": "perfume-4",
       "out_file": "renders/perfume-4.mp4",
-      "in": 328.080,
+      "in": 273.840,
       "out": 389.800,
-      "duration": 61.720,
+      "duration": 115.960,
       "seat": "after act VI (06-7daystothewolves), before act VII's slide",
+      "_in_point": "REBALANCED (#192): continuous with movement 3's corrected out point, so the thread stays gapless. This movement absorbs the 54.24 s that made movement 3 the pacing outlier; seated between act VI (7:11) and act VII (1:37) the same span is proportionate where it was not before.",
       "_out_point": "The owner said '6:30' (390.0). 389.800 is a measured shot change 0.20 s earlier -- five frames at 25 fps, and the frame the owner was looking at."
     },
     {
