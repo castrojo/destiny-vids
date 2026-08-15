@@ -370,6 +370,36 @@ def test_the_bed_is_corrected_with_static_gain_and_never_a_normaliser():
         assert banned not in render_section
 
 
+def test_render_passes_planned_audio_regions_to_the_mux(monkeypatch):
+    """The mux consumes wall/bed-clock regions, never raw picture pieces."""
+    from tools import audiomix
+    from tools import render as render_tools
+
+    plan = build_efmb.build()
+    captured = {}
+    monkeypatch.setattr(build_efmb, "build", lambda: plan)
+    monkeypatch.setattr(render_tools, "find_ffmpeg", lambda: ["ffmpeg"])
+    monkeypatch.setattr(build_efmb.Path, "exists", lambda _: True)
+    monkeypatch.setattr(build_efmb, "_cut_run", lambda *args: None)
+    monkeypatch.setattr(build_efmb, "_black", lambda *args: None)
+    monkeypatch.setattr(build_efmb, "_concat", lambda *args: None)
+    monkeypatch.setattr(build_efmb, "_run", lambda *args: None)
+    monkeypatch.setattr(build_efmb, "probe_duration",
+                        lambda _: plan["film_sec"])
+
+    def capture_mux(_picture, _bed, regions, _out, *_args, **_kwargs):
+        captured["regions"] = regions
+
+    monkeypatch.setattr(audiomix, "mux", capture_mux)
+    build_efmb.render(out_path=REPO_ROOT / "renders" / "ignored.mp4",
+                      work_dir=REPO_ROOT / "renders" / "ignored-parts",
+                      verbose=False)
+
+    assert captured["regions"] == audiomix.plan_regions(
+        plan["timeline"], bed_offset=0.0)
+    assert all("wall_start" in region for region in captured["regions"])
+
+
 # --- the montage announcements (owner brief, issue #98) ---------------------
 
 def _montage(manifest):

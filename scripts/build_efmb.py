@@ -467,7 +467,8 @@ def render(out_path=None, work_dir=None, verbose=True):
 
     if verbose:
         print("  mux: paused bed, Local Forecast, hero source audio; FLAC")
-    audiomix.mux(picture, bed, plan["timeline"], out_path, MUX_GAIN_DB,
+    regions = audiomix.plan_regions(plan["timeline"], bed_offset=0.0)
+    audiomix.mux(picture, bed, regions, out_path, MUX_GAIN_DB,
                  ffmpeg=ffmpeg, codec="flac", media_dir=REPO_ROOT / "media")
 
     got = probe_duration(out_path)
