@@ -165,6 +165,69 @@
     line-height: 1.1;
   }
 
+  /* THE O IN WOLVES IS THE KUBERNETES HELM.
+
+     Owner, 2026-08-15: *"change the o in 'Wolves' to the kubernetes symbol -
+     not the blue one though, just the white symbolic one"*.
+
+     It is CNCF's own published white icon, cached by
+     scripts/fetch_brand_marks.py into renders/marks/kubernetes.png -- the helm
+     alone, no wordmark, and already `fill:#fff` in the source, so nothing here
+     recolours somebody's trademark.
+
+     THE COPY IS NOT TOUCHED. The authored string is still
+     'seven days to the wolves'; this substitutes a GLYPH for one letter at
+     render time, the same way `.accent` colours the B of BLUEFIN without
+     rewriting the eyebrow. A screen reader still reads the word, because the
+     letter it replaces is its `alt`.
+
+     Sized against the cap rather than the em so it sits on the same optical
+     line as the O it stands in for, and it inherits the lockup's halo through
+     `filter: drop-shadow` -- `text-shadow` does not apply to an image, and
+     without this the mark would be the one element on the card with no
+     protection against the 12.28 starburst. */
+  /* MEASURED IN THE RENDERED FRAME, and measured correctly the third time.
+
+     The first two attempts measured the wrong thing. `alpha > 0` catches the
+     drop-shadow halo, not the mark, so the helm appeared 80 px tall and its
+     centre appeared to be somewhere it was not; the halo is black, so the mark
+     has to be measured as WHITE INK (luminance > 170) with the shadow
+     excluded.
+
+     What the frame actually says, at font-size 78.4 px:
+
+         letters   y 484..537   cap height 54 px, baseline 537, centre 510.5
+         the helm  y 475..537   63 px tall -- 9 px ABOVE the cap line
+
+     So the mark was sitting ON the baseline correctly and overshooting the cap
+     line by 9 px, which is exactly what reads as "not centered": its optical
+     centre was 506 against the letters' 510.5.
+
+     THE FIX IS THE HEIGHT, not a nudge. 54 / 78.4 = 0.689em makes the helm
+     exactly cap-height, and because `vertical-align: baseline` already seats
+     an inline image's bottom edge on the baseline, a cap-height box spans
+     cap-line to baseline on its own -- the same band the O occupied. It fits
+     vertically and its centre lands on the letters' centre without a single
+     hand-tuned offset.
+
+     HORIZONTALLY, equal margins are not the same as centred. The W's right
+     side bearing is wide (it is a diagonal letter) and the L's left bearing is
+     narrow, so symmetric margins put 11 px of air on the left and 7 px on the
+     right -- the mark sat 2 px right of the optical centre of the gap. The
+     slack is redistributed by that 2 px (0.026em) and the TOTAL advance is
+     unchanged, so nothing after it moves. Measured, not nudged until it looked
+     right. */
+  .k8s-o {
+    height: 0.689em;
+    width: auto;
+    vertical-align: baseline;
+    margin: 0 0.046em 0 -0.006em;
+    filter:
+      drop-shadow(0 0 4px rgb(0 0 0 / 95%))
+      drop-shadow(0 2px 10px rgb(0 0 0 / 90%))
+      drop-shadow(0 0 28px rgb(0 0 0 / 75%));
+  }
+
   /* cards/act.html `.hairline`, at the lockup's own width. */
   .hairline {
     width: 34%;
@@ -217,22 +280,75 @@
   fill('eyebrow', params.get('label'))
   fill('title', params.get('title'))
 
-  // Colour the FIRST LETTER of one authored word in the eyebrow. `accent`
-  // names the word rather than a character offset, so the copy can be edited
-  // without silently moving the colour onto a different letter. It changes no
-  // text: the string still reads exactly as authored.
-  const accentWord = params.get('accent')
-  if (accentWord) {
-    const el = document.getElementById('eyebrow')
+  // EVERY B AND EVERY F IS BLUE. Owner, 2026-08-15: *"Ensure every b is blue,
+  // and every f is blue in all the dialogue except the chat bubbles and
+  // nameplates."*
+  //
+  // This is a main title, so the rule applies. It supersedes the narrower
+  // instruction this card was built on -- *"the words are fine just color in
+  // the b"*, which lit only the B of BLUEFIN -- and the `accent` param that
+  // carried it. The param is still read, and now means "this word is where the
+  // rule was first asked for"; it no longer restricts the colour to one
+  // letter, because the owner widened it.
+  //
+  // IT CHANGES NO TEXT. Every string still reads exactly as authored; only the
+  // fill of two letterforms differs. Same definition as tools/blueletters.py.
+  const BLUE_LETTERS = 'BbFf'
+
+  function blueify(el) {
+    if (!el) { return }
     const text = el.textContent
-    const at = text.toUpperCase().indexOf(accentWord.toUpperCase())
-    if (at !== -1) {
-      const span = document.createElement('span')
-      span.className = 'accent'
-      span.textContent = text[at]
-      el.textContent = ''
-      el.append(text.slice(0, at), span, text.slice(at + 1))
+    if (!text) { return }
+    const parts = []
+    let run = ''
+    for (const ch of text) {
+      if (BLUE_LETTERS.includes(ch)) {
+        if (run) { parts.push(document.createTextNode(run)); run = '' }
+        const span = document.createElement('span')
+        span.className = 'accent'
+        span.textContent = ch
+        parts.push(span)
+      } else {
+        run += ch
+      }
     }
+    if (run) { parts.push(document.createTextNode(run)) }
+    el.textContent = ''
+    el.append(...parts)
+  }
+
+  blueify(document.getElementById('eyebrow'))
+
+  // THE TITLE LINE IS NOT PUT THROUGH `blueify`, and that is deliberate rather
+  // than an omission. The authored title -- 'seven days to the wolves' --
+  // contains no b and no f, so the rule has nothing to colour, and the mark
+  // substitution below rebuilds this element's children. Running both would
+  // mean one pass throwing away the other's DOM. If the title copy ever gains
+  // a b or an f, the two passes have to be merged rather than ordered.
+  //
+  // THE O IN WOLVES BECOMES THE KUBERNETES HELM. Owner, 2026-08-15.
+  //
+  // The word is found in the AUTHORED casing ('wolves' -- the uppercase is a
+  // CSS transform, so `textContent` is still lower case), and only its single
+  // `o` is replaced. Nothing else on the card is searched: "to" has an o too,
+  // and the instruction named one word.
+  //
+  // DEGRADES. If the mark has not been cached, `onerror` puts the letter back
+  // and the title renders exactly as it did before. A main title does not fail
+  // because a PNG is missing.
+  const titleEl = document.getElementById('title')
+  const titleText = titleEl.textContent
+  const wordAt = titleText.toLowerCase().lastIndexOf('wolves')
+  if (wordAt !== -1) {
+    const oAt = wordAt + 1                       // w-O-l-v-e-s
+    const letter = titleText[oAt]
+    const mark = document.createElement('img')
+    mark.className = 'k8s-o'
+    mark.src = '../renders/marks/kubernetes.png'
+    mark.alt = letter
+    mark.onerror = () => mark.replaceWith(document.createTextNode(letter))
+    titleEl.textContent = ''
+    titleEl.append(titleText.slice(0, oAt), mark, titleText.slice(oAt + 1))
   }
 
   // BOTH staged cards carry the same `body`, so the credit rows always occupy
@@ -244,6 +360,7 @@
     const row = document.createElement('span')
     row.className = 'credit-line'
     row.textContent = line
+    blueify(row)
     host.appendChild(row)
   }
   if (params.get('stage') !== 'title') { host.classList.add('shown') }

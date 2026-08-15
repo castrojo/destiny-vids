@@ -1,55 +1,110 @@
 {
   "_what": "THE PERFUME THREAD -- Nightwish's 'Perfume Of The Timeless' (oHCaZmIzr0o) played from the first frame of the show to the last frame before the credits, with the eight acts living inside it. Movement 1 is the PROLOGUE (scripts/build_prologue.py, source 0 -> 91.200 picture / 99.200 audio). Movements 2-5 are this file: the rest of the same video, IN SOURCE ORDER AND WITHOUT GAPS, seated between the acts. It is not four interstitials -- it is one song the acts interrupt.",
-
   "_owner": "Owner instruction, 2026-08-14: 'Start at ~1:31 or wherever the last cut left off from (check another agent doing parallel work) - save the clip and cut it at ~2.39, then insert that after the destiny intro. 2-39-5:29 is the the next segment, insert after mrbobby. 5:29- start there and record that to 6:30, then insert that before europa. 6:30 match the transition panning up from laura after europa, then hold until the end of this, then roll credits.'",
-
   "_no_numerals": "These take NO ACT NUMERAL and get NO SLIDE and NO CHAPTER MARKER. AGENTS.md makes the eight numerals load-bearing, and the prologue already set the precedent for unnumbered connective tissue in front of act I. A slide announcing an interlude would announce the one thing whose whole job is to be unannounced.",
-
   "_not_in_prod": "They deliver to renders/ ONLY, not to ~/Videos/Wolves/Prod. Owner: 'also want the snippets in the render folder we will be editing them in the future with dino artwork.' They are work-in-progress elements, not finished acts: the megacut plan references renders/ directly, and no delivery.json key, Prod/ hardlink, README row or CHECKSUMS entry is created for them. When the dinosaur pass lands they can be promoted; until then Prod/ keeps meaning 'a finished act'.",
-
   "_clean_renders": "Every movement is rendered CLEAN -- no fades, no overlays, no cards. Fades live in stories/megacut/megacut.json in act-film time, which is this repo's convention (see megacut.json `_transitions`), and it is also what makes these files editable: the dinosaur pass gets unfaded picture to work on rather than footage with a dip already burned into it.",
-
   "_rights": "Third-party copyrighted: Nuclear Blast recording, Nightwish's own official music video. The full rights record is music/bed_perfume_of_the_timeless.json and videos/yt_nightwish_perfume_of_the_timeless.json, written for the prologue and unchanged by this file. PROTOTYPE OUTPUT, same as the prologue: the shipping presentation embeds the video rather than re-hosting it, so these renders are for cutting and review. NO SOCIAL COPIES ARE CUT FROM THEM -- a standalone clip is exactly the redistribution the owner's instruction rules out.",
-
   "source": "media/yt_nightwish_perfume_of_the_timeless.mkv",
   "source_video_id": "oHCaZmIzr0o",
   "source_duration": 507.021,
   "source_fps": 25,
   "source_width": 1920,
   "source_height": 804,
-
   "_measured": "Every cut point below was read off the file in this session with `select='gt(scene,0.25)'`, not taken from the owner's round numbers. The measured grid near the requested points: ... 108.96 110.84 114.32 115.28 116.20 121.68 125.28 134.44 138.92 144.52 145.80 148.16 150.08 151.92 156.52 159.40 | 190.84 211.48 220.88 223.36 228.72 240.56 245.96 252.20 253.96 258.80 262.32 266.32 273.84 276.68 279.40 281.28 287.36 292.52 299.72 301.88 303.48 304.60 315.16 318.72 321.96 325.40 328.08 | 343.08 ... 380.88 381.32 387.16 387.20 387.32 387.44 387.56 387.68 387.92 388.04 388.16 388.60 389.56 389.80 | 393.56 394.44 396.32 406.00 409.36 427.44 430.64 439.20 453.88 467.52 (then one held shot to EOF).",
-
   "movements": [
     {
       "id": "perfume-2",
       "out_file": "renders/perfume-2.mp4",
-      "in": 93.000,
-      "out": 159.400,
-      "duration": 66.400,
+      "in": 93.0,
+      "out": 159.4,
+      "duration": 66.4,
       "seat": "after act I (01-intro), before act II's slide",
       "_in_point": "The owner said '~1:31 or wherever the last cut left off'. There are TWO answers and this is the reconciliation. The prologue's PICTURE leaves off at 91.200; its SONG leaves off at 99.200, having faded from 93.000. Resuming at 93.000 replays exactly the 6.2 s the prologue faded DOWN, under a 6.2 s fade UP (applied in the megacut plan), so the song dips out across act I and swells back instead of restarting -- one continuous performance with a hole in it rather than two plays of the same bar. Resuming at 99.200 was the alternative: gapless song, but 8 s of picture silently skipped.",
       "_free_match": "There is NO shot boundary between 91.200 and 108.960 -- it is one continuous shot. So movement 2 resumes the very shot the prologue left, and the join is invisible by construction rather than by treatment. This is the reason 93.000 costs nothing on the picture side.",
-      "_out_point": "The owner said '~2:39' (159.0). 159.400 is a measured shot change 0.40 s later, so the movement ends ON a cut instead of 10 frames inside the outgoing shot."
+      "_out_point": "The owner said '~2:39' (159.0). 159.400 is a measured shot change 0.40 s later, so the movement ends ON a cut instead of 10 frames inside the outgoing shot.",
+      "replacements": [
+        {
+          "id": "dusk-turn",
+          "_what": "Owner 2026-08-15: '4:19 we want to cut this woman out and replace her with bluefin at dusk fading from day to night', and 'when there's a ROAR jump scare: angry.webp'. THE SHOT IS MEASURED, not the owner's timestamp: programme 4:19 is source 141.233, and the shot around it runs 138.920 -> 144.520 (`select='gt(scene,0.20)'`). It is a woman walking out of fire carrying a ram's pelt, confirmed on extracted frames rather than assumed. The replacement is exactly 5.600 s so movement 2 stays 66.400.",
+          "at": 45.92,
+          "dur": 5.6,
+          "source_in": 138.92,
+          "source_out": 144.52,
+          "art": [
+            "dusk-day",
+            "dusk-night"
+          ],
+          "turn_sec": 2.2,
+          "_art": "The `dusk` wallpaper's own day/night pair -- the same drawing at two times of day, which is what makes 'fading from day to night' a turn rather than a dissolve between two pictures. Same idea as the prologue's March bridge, with the artwork the owner named.",
+          "flash": {
+            "art": "roar",
+            "at": 2.04,
+            "dur": 0.1,
+            "_what": "THE JUMP SCARE. A hard full-frame cut-in of the angry Bluefin raptor, 0.100 s -- about six frames at the delivery rate, long enough to register and too short to read as a shot. PLACED ON THE LARGEST ONSET INSIDE THE SHOT, source 140.960 (replacement-relative 2.040). RECORDED HONESTLY: there is no roar in the music here. The largest transient anywhere in 138.920-144.520 is +0.73 dB -- this stretch of Perfume is a sustained compressed wall, not a track with hits in it. So the flash lands on the best onset that exists rather than on a roar, and if the owner meant a specific roar elsewhere in the film this is the number to move."
+          },
+          "_source": "renders/artwork/roar.png. THE SOURCE IS LOW RESOLUTION AND THAT IS A FINDING, not a choice: the largest published copy of this drawing anywhere is characters/angry.webp at 553x352 (the header/ copy the owner linked is 440x280), and ublue-os/artwork -- where the owner expected a high-quality one -- HAS NO CHARACTER ART AT ALL, only wallpapers. Checked 2026-08-15 across the whole website checkout including its worktrees and dist/. So the flash is a 2.82x upscale, composed in ONE Lanczos step straight to 1920x1080 so the renderer's fit is a no-op and it is never resampled twice. It is six frames of flat vector-style art, which is the only reason this is shippable. A master would be a straight swap: replace renders/artwork/roar.png and re-run scripts/build_interludes.py. NOT SUBSTITUTED: there is high-resolution raptor art on this host (chonky-utahraptor-bluefinskin.webp at 1800x1800 is a snarl), but it is a DIFFERENT DRAWING and the owner named this one."
+        }
+      ]
     },
     {
       "id": "perfume-3",
       "out_file": "renders/perfume-3.mp4",
-      "in": 159.400,
-      "out": 274.240,
-      "duration": 114.840,
+      "in": 159.4,
+      "out": 274.24,
+      "duration": 114.84,
       "seat": "after act III (03-mrbobbytables), before the shared IV/V slide",
       "_in_point": "Continuous with movement 2's out point: the thread has no gaps.",
       "_out_point": "REBALANCED (#192). The owner's span ran to '5:29' (measured 328.080), which made this 2:48.7 -- longer than acts IV, V and VII, and 2.8x the two acts it introduces (IV+V together are 59.3 s). 273.840 is a measured shot change (underwater cliff -> wide landscape, verified on frames) at the midpoint of the movement-3 + movement-4 span.",
       "_rebalance": "NOTHING IS CUT FROM THE SONG. The 54.24 s taken off this out point is added to movement 4's in point, so the thread stays gapless and in source order and the whole song still plays -- 159.400 -> 273.840 -> 389.800 rather than 159.400 -> 328.080 -> 389.800. Both seats the owner specified are unchanged (this one after mrbobbytables, movement 4 before Europa); only the boundary between them moves. Result: 1:54.4 and 1:56.0 instead of 2:48.7 and 1:01.7.",
-      "_needle_drop": "2026-08-15: the boundary moved again, 273.840 -> 274.240, and again NOTHING IS CUT -- the 0.400 s stays here instead of opening movement 4. The owner called the wolves -> Perfume transition 'a hot mess'; measured (spectral flux, 128-sample hop, on the delivered renders) movement 4 opened with a 0.421 s STUB of the previous phrase before its first hit, so the programme cut out of act VI at full level and then waited nearly half a second for the new song to land. 274.240 is the 25 fps frame boundary 21 ms ahead of that measured onset, so movement 4 now opens ON the hit with its transient intact. THE COST IS ON THIS SIDE: movement 3 used to end ON the measured shot change at 273.840 and now runs 0.400 s into the next shot, under the 1.0 s fade_out the plan already gives it -- the cheaper end of the trade, because the alternative was a 0.4 s hole in a thread whose whole premise is one continuous song. Act VI's out point moves with it (stories/megacut/megacut.json); the two edits are one change and are meaningless apart."
+      "_needle_drop": "2026-08-15: the boundary moved again, 273.840 -> 274.240, and again NOTHING IS CUT -- the 0.400 s stays here instead of opening movement 4. The owner called the wolves -> Perfume transition 'a hot mess'; measured (spectral flux, 128-sample hop, on the delivered renders) movement 4 opened with a 0.421 s STUB of the previous phrase before its first hit, so the programme cut out of act VI at full level and then waited nearly half a second for the new song to land. 274.240 is the 25 fps frame boundary 21 ms ahead of that measured onset, so movement 4 now opens ON the hit with its transient intact. THE COST IS ON THIS SIDE: movement 3 used to end ON the measured shot change at 273.840 and now runs 0.400 s into the next shot, under the 1.0 s fade_out the plan already gives it -- the cheaper end of the trade, because the alternative was a 0.4 s hole in a thread whose whole premise is one continuous song. Act VI's out point moves with it (stories/megacut/megacut.json); the two edits are one change and are meaningless apart.",
+      "replacements": [
+        {
+          "id": "ghost-singer",
+          "at": 58.28,
+          "dur": 3.2,
+          "source_in": 217.68,
+          "source_out": 220.88,
+          "art": [
+            "bluefin-night",
+            "prey-night"
+          ],
+          "turn_sec": 0.5
+        },
+        {
+          "id": "ghost-stacks",
+          "at": 74.96,
+          "dur": 6.2,
+          "source_in": 234.36,
+          "source_out": 240.56,
+          "art": [
+            "dusk-night",
+            "huntress",
+            "leaf-collector-night"
+          ],
+          "turn_sec": 0.5
+        },
+        {
+          "id": "ghost-reader",
+          "at": 86.56,
+          "dur": 6.24,
+          "source_in": 245.96,
+          "source_out": 252.2,
+          "art": [
+            "eyes",
+            "lazy-days"
+          ],
+          "turn_sec": 0.5
+        }
+      ],
+      "_replacements": "Owner 2026-08-15: '13:16 - replace all the ghost renditions of the band in this section with pictures of bluefin from the extra wallpapers', naming seven: bluefin, prey, dusk, huntress, leafcollector, eyes, lazydays. ALL THE GHOSTS, not just the one at the owner's timestamp -- the note says 'all ... in this section', so the section was scanned rather than the stamp taken literally. Programme 13:16 is source 220.767, inside the library sequence. Shot boundaries came from `select='gt(scene,0.10)'` over 210-258 and every candidate was checked on an extracted frame; exactly THREE shots are ghost renditions: 217.680-220.880 the singer, 234.360-240.560 a figure walking the stacks, 245.960-252.200 a seated reader whose face becomes a skull. The other shots in the section are books, specimens and birds and are left alone. SEVEN WALLPAPERS ACROSS THREE SHOTS, in the owner's own order, so all seven appear: 2 + 3 + 2. Night variants where the artwork ships a pair, because the sequence they replace is a dark library. TWO OF THE OWNER'S NAMES ARE NOT THE DIRECTORY NAMES and the mapping is written down rather than guessed: leafcollector -> leaf-collector, lazydays -> lazy-days."
     },
     {
       "id": "perfume-4",
       "out_file": "renders/perfume-4.mp4",
-      "in": 274.240,
-      "out": 389.800,
-      "duration": 115.560,
+      "in": 274.24,
+      "out": 389.8,
+      "duration": 115.56,
       "seat": "after act VI (06-7daystothewolves), before act VII's slide",
       "_in_point": "REBALANCED (#192): continuous with movement 3's corrected out point, so the thread stays gapless. This movement absorbs the 54.24 s that made movement 3 the pacing outlier; seated between act VI (7:11) and act VII (1:37) the same span is proportionate where it was not before.",
       "_needle_drop": "2026-08-15, +0.400 s off the head (273.840 -> 274.240) so this movement OPENS ON ITS FIRST HIT. Measured: the old head carried a 0.421 s stub of the previous phrase, which is what made the owner's 'hot mess' -- act VI stopped at full level and the new song did not land for another half second. Nothing is cut from the song: movement 3 keeps the 0.400 s. See its `_needle_drop`, and act VI's out point in stories/megacut/megacut.json, which is the other half of the same edit.",
@@ -58,7 +113,7 @@
     {
       "id": "perfume-5",
       "out_file": "renders/perfume-5.mp4",
-      "in": 389.800,
+      "in": 389.8,
       "out": 507.021,
       "duration": 117.221,
       "seat": "after act VII (07-europa), before act VIII (credits)",
@@ -66,5 +121,7 @@
       "_out_point": "EOF. The owner: 'hold until the end of this, then roll credits.' The source's last shot change is 467.52 and it holds to 507.021.",
       "_credits_join": "This moves the act VIII ambush. docs/running-order.md records that the credits carry no slide and no marker because 'Europa fades to black on its own tail and the drum smash lands on the next frame' -- the smash now lands off the end of a DIFFERENT song. The plan gives movement 5 a tail fade to black so the ambush still comes out of black rather than out of a held frame, but whether the two pieces of music collide is a listening judgement for the owner."
     }
-  ]
+  ],
+  "_replacements": "SHOT REPLACEMENT, added 2026-08-15 on two owner notes about the SAME thing -- putting Project Bluefin's own artwork into the interludes. This is the 'dinosaur pass' these movements were rendered clean FOR (_clean_renders below), arriving one pass earlier than expected. EVERY REPLACEMENT IS DURATION-LOCKED to the shot it covers, measured with `select='gt(scene,...)'` on the source and never rounded, so a movement's length cannot change and no chapter marker downstream can move. The picture is swapped; the SONG IS UNTOUCHED and plays through the replacement, which is what keeps the thread one continuous performance. Art is cached by scripts/fetch_artwork.py from ublue-os/artwork -- this project's own artwork, not a third party's.",
+  "_artwork_fidelity": "ALL ARTWORK IS CACHED AT ITS PUBLISHED RESOLUTION and resampled exactly ONCE, at render time, straight to the delivery frame. Owner, 2026-08-15: *'I am tired of you defaulting to low rez videos, music, and pictures, this is a HIGH FIDELITY presentation'*. The first pass did the opposite twice over -- it centre-cropped every wallpaper to 16:9 and downscaled it to 1920x1080 at fetch time, then stretched it to 1920x804 at render time to match the film's scope window. That cropped into the drawings AND squashed them. Now: scripts/fetch_artwork.py saves the native file (up to 7680x4320, vectors rasterised at a 3840 long edge on their own aspect), and build_interludes.py fits with force_original_aspect_ratio=decrease and pads the difference. Never stretched, never cropped -- the owner's call on the bars: *'letter box is fine'*."
 }

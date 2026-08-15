@@ -358,11 +358,100 @@ the most its −4.6 dBTP peak allows without a limiter — #164).
 
 ---
 
+# The 4K source swap (v3.0) — 2026-08-15
+
+> *"I found 4k perfume of timeless much higher quality swap it out and rebuild
+> everything."*
+
+All five movements come out of **one** gitignored file,
+`media/yt_nightwish_perfume_of_the_timeless.mkv`. That file was replaced, and
+the thread rebuilt end to end. The old file is kept beside it as
+`…perfume_of_the_timeless.1080p-orig.mkv`.
+
+| | before | after |
+|---|---|---|
+| Upload | `oHCaZmIzr0o` — Nightwish's own channel | **`O0lyFqLr3Cc`** — *Tribute to Floor Edition 2.0*, Nightwish Arena |
+| Rung | 1920×804 VP9 | **3840×1608 VP9, fmt 313** |
+| Bitrate | 1 667 k total | **5 896 k video — 3.5×** |
+| Runtime / fps | 507.021 s @ 25 | 507.04 s @ 25 |
+| Colour | tv / bt709 | **identical** |
+
+Nightwish's own upload **tops out at 1080p** — there is no official 4K rung, so
+the better picture only exists on a re-upload. Nothing about the rights posture
+moves: still `third_party_copyrighted`, still non-commercial, still no footage
+committed and no social copy cut from the thread.
+
+## It is conformed, not used raw
+
+A re-upload is not frame-trustworthy, so nothing was assumed:
+
+- **It runs one frame late.** Measured three ways and consistent: envelope
+  correlation over three 60 s windows all peak at −1 frame (r = 0.93–1.03), and
+  decoding both files from frame zero puts the first shot change at frame
+  **307** against the old file's **306**.
+- So the conform **drops frame 0**, lanczos-downscales 3840×1608 → the same
+  **1920×804** the builders already pad, **clones one frame back at the tail**,
+  and is pinned to `-frames:v 12675` — the old file's exact count.
+- Re-measured after conform: **0 frames offset** at 100 s, 250 s and 380 s.
+
+**So every measured timecode in `stories/00-perfume-thread.json` still holds**,
+and no builder changed. The whole point of the conform is that this document's
+tables — 93.000, 159.400, 274.240, 389.800, 507.021 — did not have to be
+re-derived.
+
+Downscaling rather than keeping 4K is where the quality actually lands:
+`build_interludes.py` **pads, never scales**, and delivery is 1920×1080. Coming
+off a 4K decode makes the 1080p a supersample instead of a re-encode.
+
+## The audio was deliberately NOT taken
+
+The upload is a **"No SFX"** edit. Same length, aligned to −0.10 s, but only
+r = 0.89 against the delivered bed — a different mix.
+
+`music/bed_perfume_of_the_timeless.json` carries a *measured* tempo grid
+(129.199 BPM, 1055 beats, downbeat phase with its evidence) and a measured
+spectral cutoff, and the prologue's clipping fix (+0.4 dBTP, 2026-08-14) was
+derived from that mix. Taking the new audio would silently invalidate all of it
+for no gain the standard recognises.
+
+**Picture only.** The conform copies the original Opus stream through
+bit-for-bit (`-c:a copy`), so the bed record is untouched and
+`docs/skills/references/audio-standard.md` needs no edit.
+
+## The watermark stays
+
+The upload burns a corner mark — *"Nightwish. ://: Arena."*, roughly x 3370–3790,
+y 60–120 in 4K coordinates. This is exactly what `redactions/` exists for, and
+**no redaction was written**: owner, 2026-08-15, *"the watermark is fine"*.
+
+The title's *"with lyrics"* is **soft CC**, not burned in — checked across
+eighteen sampled timestamps. There is no lyric burn to remove.
+
+## What it bought
+
+The win is largest exactly where the thread is darkest, which is where the old
+encode was worst. The **underwater shot** (source ≈ 396–400 s, movement 5) is
+one slow blue gradient — the 1 667 k VP9 blocked and banded across the water;
+the 4K holds it clean with the particulate and the bubble trail intact. An A/B
+is at `~/Videos/perfume-4k-ab-underwater.mp4` (12 s, current over new).
+
+## The decoy, so nobody re-finds it
+
+A search for "Perfume of the Timeless 4K" surfaces **`Gmf4TiBc7HA`** first — a
+genuine 3840×1920 60 fps rung that contains **no footage at all**: it is the
+Yesterwynde album cover held static for the whole runtime (nine sampled
+timestamps differ by < 0.8/255; two scene changes in 492 s). Its audio is the
+**album** master, 492.1 s and offset **+12.75 s** from the music video, so it
+cannot seat the prologue's opening either. Rejected on both counts.
+
+---
+
 # Where the thread stands
 
 | | |
 |---|---|
-| Delivered | `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v2.3.mp4`, **36:07.9** |
+| Delivered | `~/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.0.mp4`, **35:16.8** (FLAC master `.mkv` beside it) |
+| Source | **4K** `O0lyFqLr3Cc`, conformed to the old timeline; picture only |
 | Movements | 5, gapless in the source, `renders/perfume-2..5.mp4` + the prologue; the programme plays 109.5 of movement 5 (the 28:20 cut) |
-| Chapter marks | **five** — acts VII and VIII have no slide, so no marker |
+| Chapter marks | **four** — acts II, VII and VIII have no slide, so no marker |
 | Open for the owner | #190 (one builder), #192 (A or B off the excerpts in `renders/review/`, and movement 3's length) |

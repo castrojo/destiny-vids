@@ -152,23 +152,38 @@ NAME_CORRECTIONS = {"mara_sov": ("Karena Angell", "Karena Angel")}
 #    02:38 name plate github/jbeda - 'Out of Retirement'
 #    These are OG Guardians make them a proud bronze"
 #
-# All four times are megacut, like the trio's. Every string is the owner's,
-# verbatim -- including the capitalised NOT, which is the joke and is
+# All four times are megacut, like the trio's. Every authored string is the
+# owner's, verbatim -- including the capitalised NOT, which is the joke and is
 # reproduced rather than normalised.
 #
-# THE ROW EACH ONE DOES NOT HAVE IS THE POINT. Catherine Paganini was given a
-# name and no line, so her card carries no title: that is the "missing, so
-# omit and record" case, and writing one for her would be inventing copy about
-# a real person. The three logins the owner wrote as `github/<name>` are
-# printed as the login he wrote, and their pfps come from the same account.
+# THE NAMES ARE THE GITHUB PROFILES' OWN. Owner, 2026-08-15: *"guardian plaques
+# need to be filled in"*, and when asked how: *"jesus christ look up their
+# github name."* Three of these cards were printing a LOGIN where a name
+# belongs, because an earlier pass took the owner's `github/<name>` shorthand
+# as the copy. Each `name` below is now that account's own `name` field, read
+# with `gh api users/<login> --jq .name` on 2026-08-15:
+#
+#     dims    -> Davanum Srinivas      thockin -> Tim Hockin
+#     jbeda   -> Joe Beda              CathPag -> Catherine Paganini
+#
+# A published profile is a FACT ABOUT A REAL PERSON, stated by that person,
+# which is why this fill is allowed where writing a title would not be. Cathy's
+# lookup CONFIRMS the string her card already carried rather than correcting
+# it, and it gets her the pfp the other three had.
+#
+# THE ROW SHE DOES NOT HAVE IS STILL THE POINT. Catherine Paganini was given a
+# name and no line, so her card carries no title: that is the "missing, so omit
+# and record" case, and writing one for her would be inventing copy about a
+# real person. Recorded in the manifest's `unresolved`.
 OG_LABEL = "OG GUARDIAN"
 OG_GUARDIANS = [
-    {"id": "og_dims", "at_megacut": 135.0, "name": "dims",
+    {"id": "og_dims", "at_megacut": 135.0, "name": "Davanum Srinivas",
      "title": "Comes in Peace", "login": "dims"},
-    {"id": "og_paganini", "at_megacut": 140.0, "name": "Catherine Paganini"},
-    {"id": "og_thockin", "at_megacut": 148.0, "name": "thockin",
+    {"id": "og_paganini", "at_megacut": 140.0, "name": "Catherine Paganini",
+     "login": "CathPag"},
+    {"id": "og_thockin", "at_megacut": 148.0, "name": "Tim Hockin",
      "title": "Does NOT Come in Peace", "login": "thockin"},
-    {"id": "og_jbeda", "at_megacut": 158.0, "name": "jbeda",
+    {"id": "og_jbeda", "at_megacut": 158.0, "name": "Joe Beda",
      "title": "Out of Retirement", "login": "jbeda"},
 ]
 OG_HOLD = 4.0
@@ -1717,6 +1732,17 @@ def build():
         # What the brief authored but this manifest could not place. Recorded
         # so it is visible rather than buried: degrade, never block.
         "unresolved": montage_unresolved + walk_unresolved + [
+            "og_paganini HAS NO `title` ROW. The owner filled the OG Guardian "
+            "plaques on 2026-08-15 by pointing at GitHub, which gets every one "
+            "of them a verified NAME and a pfp -- but a title is authored copy "
+            "and no profile carries one. The other three have the owner's own "
+            "lines ('Comes in Peace', 'Does NOT Come in Peace', 'Out of "
+            "Retirement'); Catherine Paganini has none, so the row is OMITTED "
+            "and her card degrades to name and pfp. A lorem placeholder is NOT "
+            "available here: placeholder prose credits the vocab's uncast "
+            "speaker, and this card names a real person -- AGENTS.md, 'Lorem "
+            "under a real name is still putting words in a colleague's mouth.' "
+            "One line from the owner closes it",
             "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for "
             "now.' Three blocks went with him -- the four ranked montage "
             "cards, the two TOC payoff cards ('It's totally NOT like this' "

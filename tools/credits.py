@@ -74,6 +74,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
+from tools import blueletters
 from tools.plate import _draw_tracked, _tracked_width
 
 W, H = 1920, 1080
@@ -309,38 +310,30 @@ def summit_portrait(photo, size):
     return out
 
 
-def blue_letters(text):
-    """Which characters of ``text`` are set in the film's blue.
+def blue_letters(text=None):
+    """Which characters are set in the film's blue.
 
-    The owner's rule, in two parts:
+    **Both B and F, always**, in both cases. The owner, 2026-08-15: *"Ensure
+    every b is blue, and every f is blue in all the dialogue except the chat
+    bubbles and nameplates."*
 
-    * every **B** is blue -- the original instruction;
-    * **F** is blue instead, but *only for a name with no B in it*, so
-      somebody who already has blue does not get more of it.
+    The rule used to be an either/or -- every B, *or* F instead for a string
+    with no B in it, so that somebody who already had blue did not get more of
+    it. That reasoning was sound for a wall of logins and it is superseded:
+    the owner asked for both letters everywhere. Recorded rather than deleted,
+    because the wall of names is still the place where the difference shows.
 
-    The unit is the whole credit as it appears on screen, which is why this
-    takes a string rather than a character: "Jeefy" has no B, so its f lights
-    up; "Bob Killen" has two B's already and its name stays as it is.
-
-    Both cases throughout. A wall of GitHub logins is mostly lower-case, and
-    matching only capitals would leave the effect invisible exactly where the
-    names are.
+    The definition itself lives in ``tools.blueletters`` now, because three
+    other surfaces draw burned copy of their own and one rule may only have one
+    home. The **exclusions** -- chat bubbles and nameplates -- are enforced by
+    which renderers call it.
     """
-    return "Bb" if ("B" in text or "b" in text) else "Ff"
+    return blueletters.blue_letters(text)
 
 
 def _blue_bs(draw, xy, text, font, fill, tracking_em=0.0):
-    """Draw ``text`` with its blue letters picked out.
-
-    Glyph by glyph because Pillow has no letter-spacing -- the same reason
-    ``plate.py`` hand-places its tracked type.
-    """
-    lit = blue_letters(text)
-    x, y = xy
-    extra = tracking_em * font.size
-    for ch in text:
-        draw.text((x, y), ch, font=font, fill=ACCENT if ch in lit else fill)
-        x += draw.textlength(ch, font=font) + extra
+    """Draw ``text`` with its blue letters picked out."""
+    return blueletters.draw(draw, xy, text, font, fill, ACCENT, tracking_em)
 
 
 def _centre(draw, text, font, tracking_em=0.0):
@@ -382,11 +375,23 @@ REDACTED = "[ REDACTED ]"
 # italics, I want bold and blocky, make the filled in F's and blue sear with
 # heat for the big ones"*, and of FIGHT: *"HUGE BOLD FONT. BLUE F"*.
 #
-# Three sizes, so "noticeably larger" is a step somebody can see rather than a
-# nudge. The heights are capped against the frame below, so a long line sets
-# smaller instead of running off the sides -- WE MAKE OUR OWN FATE is twenty
-# characters and FIGHT is five.
-CTA_SCALE = {"medium": 150, "large": 250, "huge": 420}
+# Re-issued 2026-08-15 against MAKE YOUR OWN FATE and BECOME LEGEND, which is
+# how we learned the first pass had not actually delivered it. The sizes were
+# not the problem. **The fitter was.**
+#
+# `_cta_font` used to shrink a line until it fitted on ONE row, so a long cry
+# could never be big: MAKE YOUR OWN FATE is eighteen characters, and at the
+# `large` size that is over three thousand pixels of type being squeezed into
+# 1760. It came out around the `medium` size no matter what the card asked for,
+# and the ladder below was invisible because two of its three rungs collapsed
+# onto the same number. FIGHT, at five characters, was the only line that ever
+# rendered at the size it was given -- which is exactly the card the owner
+# never complained about.
+#
+# So the line WRAPS now and keeps its size. A battle cry stacked over three
+# rows at full height is the emphasis that was asked for; the same words set
+# small on one row is the thing that kept getting shipped instead.
+CTA_SCALE = {"medium": 200, "large": 320, "huge": 460, "colossal": 620}
 # Below this the sear is not drawn: a seared glyph on a small card is a smudge.
 CTA_SEAR_FROM = "large"
 
@@ -447,25 +452,100 @@ def _sear(img, glyphs, font, blur=None):
     return img
 
 
-def _cta_font(text, scale):
-    """The blocky face, at the biggest size the line fits in the frame.
+CTA_TRACKING = 0.05
+CTA_MARGIN = 160           # the type never comes closer than 80 px to an edge
+CTA_HEIGHT_ROOM = 900      # the block never fills the frame edge to edge
+CTA_LINE_SPACING = 1.14    # of the font size, centre to centre
+CTA_MAX_LINES = 3
+CTA_TIE = 0.92             # within this much of the best size, fewer lines win
 
-    Adwaita Sans **Black** upright -- no italics, per the instruction -- and
-    never a synthesised oblique. Long lines step down rather than overflowing:
-    the treatment is what makes a card read as huge, not a number that only
-    works for one string.
+
+def _cta_step(font):
+    """Baseline-to-baseline distance for stacked cries."""
+    return font.size * CTA_LINE_SPACING
+
+
+def _cta_split(draw, words, font, n):
+    """Break ``words`` into ``n`` contiguous lines, as evenly as possible.
+
+    Greedy wrapping produced ``MAKE / YOUR / OWN FATE`` -- three lines, two of
+    them one word. A battle cry set that way reads as a list. This minimises
+    the WIDEST line instead, which is what makes a stacked cry look like a
+    block: ``MAKE YOUR / OWN FATE``.
+
+    The copy here is a handful of words, so every split is enumerated rather
+    than solved cleverly.
     """
-    size = CTA_SCALE.get(scale, CTA_SCALE["large"])
-    probe = ImageDraw.Draw(Image.new("RGB", (8, 8)))
+    if n <= 1:
+        return [" ".join(words)]
+    if n > len(words):
+        return None
+
+    import itertools
+    best, best_width = None, None
+    for cuts in itertools.combinations(range(1, len(words)), n - 1):
+        bounds = (0,) + cuts + (len(words),)
+        lines = [" ".join(words[a:b]) for a, b in zip(bounds, bounds[1:])]
+        widest = max(_tracked_width(draw, ln, font, CTA_TRACKING) for ln in lines)
+        if best_width is None or widest < best_width:
+            best, best_width = lines, widest
+    return best
+
+
+def _cta_fit(probe, words, size, n):
+    """The largest size at or below ``size`` that sets ``words`` on ``n`` lines.
+
+    ``None`` when ``n`` lines cannot be made to fit at all.
+    """
     while size > 60:
         font = _font("black", size)
-        if _tracked_width(probe, text, font, CTA_TRACKING) <= W - 160:
-            return font
-        size = int(size * 0.92)
-    return _font("black", size)
+        lines = _cta_split(probe, words, font, n)
+        if lines is None:
+            return None
+        wide = max(_tracked_width(probe, ln, font, CTA_TRACKING) for ln in lines)
+        tall = _cta_step(font) * (n - 1) + font.size
+        if wide <= W - CTA_MARGIN and tall <= CTA_HEIGHT_ROOM:
+            return font, lines
+        size = int(size * 0.98)
+    return None
 
 
-CTA_TRACKING = 0.05
+def _cta_layout(text, scale):
+    """The blocky face at its full size, and the line breaks that let it stay.
+
+    Adwaita Sans **Black** upright -- no italics, per the instruction -- and
+    never a synthesised oblique.
+
+    **Wrapping comes before shrinking**, which is the whole fix. Every line
+    count up to ``CTA_MAX_LINES`` is fitted, and the biggest type wins -- so a
+    long cry is stacked at full height instead of being squeezed onto one row.
+    That is the difference between MAKE YOUR OWN FATE reading as a battle cry
+    and reading as a caption.
+
+    **Ties go to fewer lines.** Three lines bought MAKE YOUR OWN FATE twelve
+    pixels over two, and spent them on ``MAKE / YOUR / OWN FATE`` -- a cry set
+    as a list. Within ``CTA_TIE`` of the best size the shorter stack wins, so
+    it sets ``MAKE YOUR / OWN FATE`` instead.
+
+    Returns ``(font, [line, ...])``.
+    """
+    target = CTA_SCALE.get(scale, CTA_SCALE["large"])
+    probe = ImageDraw.Draw(Image.new("RGB", (8, 8)))
+    words = text.split() or [text]
+
+    fits = []
+    for n in range(1, CTA_MAX_LINES + 1):
+        got = _cta_fit(probe, words, target, n)
+        if got:
+            fits.append((n, got))
+    if not fits:
+        return _font("black", 60), [text]
+
+    best = max(font.size for _, (font, _) in fits)
+    for n, (font, lines) in fits:
+        if font.size >= best * CTA_TIE:
+            return font, lines
+    return fits[-1][1]
 
 
 def render_cta_card(text, scale="large", index=0):
@@ -473,24 +553,30 @@ def render_cta_card(text, scale="large", index=0):
 
     The F's are FILLED and glowing -- the owner's *"make the filled in F's and
     blue sear with heat for the big ones"*. Every other letter is the deck's
-    pale type, so the heat has something to be hot against. On the smallest
-    tier the sear is skipped and the F simply takes the film's blue: a bloom
-    at 150px is a smudge.
+    pale type, so the heat has something to be hot against, except the B's,
+    which take the film's blue under the b/f rule. On the smallest tier the
+    sear is skipped and the F simply takes the blue: a bloom at 200px is a
+    smudge.
+
+    Long copy is **stacked, not shrunk** -- see ``_cta_layout``.
     """
     img = backdrop(index)
     d = ImageDraw.Draw(img)
-    font = _cta_font(text, scale)
+    font, lines = _cta_layout(text, scale)
     seared = CTA_SCALE.get(scale, 0) >= CTA_SCALE[CTA_SEAR_FROM]
 
-    x = _centre(d, text, font, CTA_TRACKING)
-    y = H / 2 - font.size * 0.72
     extra = CTA_TRACKING * font.size
+    step = _cta_step(font)
+    y = H / 2 - font.size * 0.72 - step * (len(lines) - 1) / 2
 
     hot, cold = [], []
-    lit = blue_letters(text)
-    for ch in text:
-        (hot if ch in "Ff" else cold).append((x, y, ch))
-        x += d.textlength(ch, font=font) + extra
+    lit = blue_letters()
+    for line in lines:
+        x = _centre(d, line, font, CTA_TRACKING)
+        for ch in line:
+            (hot if ch in "Ff" else cold).append((x, y, ch))
+            x += d.textlength(ch, font=font) + extra
+        y += step
 
     if hot and seared:
         _sear(img, hot, font)
@@ -498,7 +584,7 @@ def render_cta_card(text, scale="large", index=0):
         for gx, gy, ch in hot:
             d.text((gx, gy), ch, font=font, fill=ACCENT)
     for gx, gy, ch in cold:
-        # The B rule still applies to the letters that are not on fire, so
+        # The b/f rule still applies to the letters that are not on fire, so
         # BECOME LEGEND keeps its blue B.
         d.text((gx, gy), ch, font=font, fill=ACCENT if ch in lit and ch not in "Ff" else TEXT)
     return img

@@ -175,11 +175,14 @@ def test_the_call_to_action_gives_way_to_the_anchor(manifest):
 def test_the_call_to_action_is_the_owners_words_in_his_order(manifest):
     cards = manifest["cta_cards"]
     assert [c.get("text") or c["name"] for c in cards] == [
-        "WE MAKE OUR OWN FATE", "BECOME LEGEND", "RAFAEL CASTRO", "FIGHT"]
+        "MAKE YOUR OWN FATE", "BECOME LEGEND", "RAFAEL CASTRO", "FIGHT"]
     assert [c["kind"] for c in cards] == ["cta", "cta", "birthday", "cta"]
     # "noticeably larger font" is a step somebody can see, in this order.
     scales = [C.CTA_SCALE[c["scale"]] for c in cards if c["kind"] == "cta"]
     assert scales == sorted(scales) and len(set(scales)) == 3
+    # ...and FIGHT stays the biggest thing in the act after the two cries above
+    # it were promoted.
+    assert scales[-1] == C.CTA_SCALE["colossal"]
 
 
 def test_fight_is_up_longer_than_the_first_two(manifest):
@@ -623,26 +626,24 @@ def test_the_director_card_is_still_jorges_one_reveal(manifest):
 
 # --- the blue letters ------------------------------------------------------
 
-@pytest.mark.parametrize("text,expected", [
-    ("Bob Killen", "Bb"),        # already has blue; the F rule does not apply
-    ("Jacob Schnurr", "Bb"),
-    ("Project Bluefin", "Bb"),   # 'Bluefin' has an f, but its B wins
-    ("Jeefy", "Ff"),             # no B anywhere -> the f lights up
-    ("Rafael Castro", "Ff"),
-    ("cflewis", "Ff"),
-    ("Kat Cosgrove", "Ff"),      # neither letter present: nothing is lit
+@pytest.mark.parametrize("text", [
+    "Bob Killen", "Jacob Schnurr", "Project Bluefin",
+    "Jeefy", "Rafael Castro", "cflewis", "Kat Cosgrove",
 ])
-def test_a_name_with_a_b_does_not_also_get_its_fs(text, expected):
-    """The owner's rule: F is blue only for a name with no B in it, so
-    somebody who already has blue does not get more of it."""
-    assert C.blue_letters(text) == expected
+def test_every_b_and_every_f_is_blue(text):
+    """The owner's rule, 2026-08-15: *"Ensure every b is blue, and every f is
+    blue in all the dialogue except the chat bubbles and nameplates."*
+
+    It used to be an either/or -- every B, *or* F instead for a string with no
+    B in it -- so that somebody who already had blue did not get more of it.
+    The owner superseded that: both letters, always.
+    """
+    assert C.blue_letters(text) == "BbFf"
 
 
 def test_the_rule_is_case_insensitive_both_ways():
-    assert C.blue_letters("BOB") == "Bb"
-    assert C.blue_letters("bob") == "Bb"
-    assert C.blue_letters("FRED") == "Ff"
-    assert C.blue_letters("fred") == "Ff"
+    for text in ("BOB", "bob", "FRED", "fred"):
+        assert C.blue_letters(text) == "BbFf"
 
 
 def test_a_name_with_no_b_paints_its_f_blue():
@@ -651,12 +652,32 @@ def test_a_name_with_no_b_paints_its_f_blue():
     assert C.ACCENT[:3] in colours
 
 
-def test_a_name_with_a_b_leaves_its_f_alone():
-    """'bf' must light the b and NOT the f -- the whole point of the rule."""
-    from PIL import ImageDraw
-    from tools.plate import _font
+def test_a_name_with_a_b_now_lights_its_f_too():
+    """'bf' lights BOTH -- the change the owner asked for on 2026-08-15."""
     lit = C.blue_letters("bf")
-    assert "f" not in lit and "b" in lit
+    assert "f" in lit and "b" in lit
+
+
+def test_the_rule_has_one_home():
+    """The definition lives in tools.blueletters; credits.py delegates.
+
+    It used to live only inside credits.py while three other surfaces drew
+    burned copy of their own. One rule, one definition.
+    """
+    from tools import blueletters
+    assert C.blue_letters("anything") == blueletters.BLUE
+
+
+def test_the_blue_rule_does_not_reach_chat_bubbles_or_nameplates():
+    """The owner drew the boundary and it is the part letters cannot imply.
+
+    Enforced by which renderers call the helper, so this asserts the two
+    excluded families do not import or use it.
+    """
+    import inspect
+    from tools import plate
+    for fn in (plate._render_chat, plate.render_plate):
+        assert "blueletters" not in inspect.getsource(fn)
 
 
 # --- Adwaita, the wallpapers, and the wordmark's dropped sub-line ----------
@@ -760,7 +781,34 @@ def test_the_vocal_version_follows_the_whole_instrumental_loop(manifest):
     assert passes[1]["bed_id"] == "bed_wish_i_had_an_angel_album"
     assert len(passes[0]["segments"]) == 2
     assert passes[0]["segments"][0]["start_sec"] == 193.42
-    assert passes[1]["segments"][0]["start_sec"] == 0.0
+
+
+def test_the_album_pass_skips_its_own_intro(manifest):
+    """Owner, 2026-08-15: *"the transition is weird you don't need to start the
+    song from the beginning just make it all fit so it sounds like they play
+    the instrumental version first and then go into the song."*
+
+    Pass one goes out MID-SONG, at instrumental 181.320. Entering the album at
+    0.0 therefore landed a mid-song hand-over on this recording's quiet intro,
+    and the song audibly started over. The album is entered on its full-band
+    vocal entry instead.
+
+    10.4722 is the album's own tracked beat 0.348 s ahead of the measured
+    +6.11 dB onset at 10.820, so the 0.25 s crossfade finishes BEFORE the hit
+    rather than shaving it.
+    """
+    album = B.bed_passes(manifest["bed"])[1]
+    start = album["segments"][0]["start_sec"]
+    assert start > 0.0, "the album must not restart the song from its intro"
+    assert start == 10.4722
+    grid = json.loads((REPO_ROOT / "music" /
+                       "bed_wish_i_had_an_angel_album.json").read_text())["grid"]
+    assert any(abs(b - start) < 1e-6 for b in grid["beats"]), (
+        "the in point must sit on the album's own tracked beat, not a round number")
+    xf = manifest["bed"].get("crossfade_sec", 0.0)
+    assert start + xf < 10.820, (
+        "the 0.25 s crossfade has to CLEAR before the band arrives at 10.820, "
+        "or the hand-over shaves the transient it exists to land on")
 
 
 def test_the_album_pass_stops_before_the_file_runs_out(manifest):
