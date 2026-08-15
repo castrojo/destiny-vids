@@ -5,8 +5,9 @@ keep the skill inside its size budget; this is the mechanics of turning a
 reviewed timing pass into a real cut — needed when the notes come back, not
 when planning one.
 
-The worked example throughout is
-[`docs/cuts/07-seven-days-to-the-wolves.md`](../../../cuts/07-seven-days-to-the-wolves.md).
+The worked example throughout is act VI, *7 Days to the Wolves* — its builder
+is `scripts/build_wolves.py` and its plan record is
+[`stories/megacut/megacut.json`](../../../../stories/megacut/megacut.json).
 
 ## What each note actually costs
 

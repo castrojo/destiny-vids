@@ -1,394 +1,137 @@
 # The running order
 
 **This file is the source of truth for what the show is and what order it plays
-in.** Everything else executes it: `stories/megacut/megacut.json` assembles it,
-`stories/megacut/megacut-cards.json` announces it, and
-`docs/cuts/08-directors-cut-megacut.md` records how the current build was made.
-If one of those disagrees with this file, this file is right and the other is a
-bug.
+in.** Everything else executes it. If another file disagrees with this one about
+the *order*, this one is right and the other is a bug.
 
-## Seven Days to the Wolves, in eight acts — behind a prologue
+This file names the acts. It does not restate how they were built — that lives
+in the machine records, which are the only copy:
 
-Settled by the owner on 2026-08-12 and **canonical**:
+| Question | Answer lives in |
+|---|---|
+| What plays, in what order, with what trims | [`stories/megacut/megacut.json`](../stories/megacut/megacut.json) — `items[]` |
+| Why the current build looks the way it does | the same file's `_version` |
+| Which master each act hardlinks, and why | [`stories/megacut/delivery.json`](../stories/megacut/delivery.json) — `masters` |
+| The authored card copy, including retired cards | [`stories/megacut/megacut-cards.json`](../stories/megacut/megacut-cards.json) |
+| Whether any of it is stale | `python3 tools/deliver.py status` |
 
-> intro → endlessformsmostbeautiful → mrbobbytables → kat → nat →
+## Seven Days to the Wolves — eight acts, behind a prologue
+
+The canonical order, settled by the owner and **not open for reinterpretation**:
+
+> prologue → intro → endlessformsmostbeautiful → mrbobbytables → kat → nat →
 > 7daystothewolves → europa → credits
 
-On 2026-08-14 the owner added a **prologue in front of it**. That order is
-untouched: the prologue takes **no numeral** and nothing is renumbered.
+| Act | Chapter title | The film |
+|---|---|---|
+| **0** | *(none — it is the main title)* | `Prod/00-prologue.mp4` |
+| **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated |
+| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers |
+| **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — monthly contributors |
+| **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove |
+| **V** | *(shares act IV's marker)* | `Prod/05-nat.mp4` — Natali Vlatko |
+| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical |
+| **VII** | *(no marker)* | `Prod/07-europa.mp4` — the director's cut |
+| **VIII** | *(no marker — it is meant to surprise)* | `Prod/08-credits.mp4` — the call to action, the comic reveal, the credits |
 
-**Later that day the owner cut the Roman-numeral slides**, verbatim: *"we
-should remove the roman numeral chapter things - I'll design overlays later,
-let's just cut them where appropriate. Like 16:43's title makes no sense
-anymore, let's tighten this up."* All four remaining act cards — **I**, **III**,
-the shared **IV–V**, and **VI** — are retired; acts II, VII and VIII already had
-none, so **the programme now plays exactly one card**, the scream interstitial,
-which is no numeral. **The numerals themselves are untouched** and stay the
-show's spine here and in `stories/megacut/megacut-cards.json`, whose retired
-cards keep their authored copy so restoring a slide never means rewriting it.
+**All nine films exist and all nine play.** The current programme is **v3.0**,
+**35:16.8**, at `~/Videos/Wolves/megacut/`.
 
-**Removing a slide must never remove a chapter.** `chapters()` derived markers
-from cards, so each retired card's `chapter` string moved onto its **act's own
-clip** — the marker list is unchanged in content and now starts where each act
-starts. The one card left is marked `interstitial`, which opts it out: a
-scrub-bar entry would spoil the gag.
+### Three things about this table that are load-bearing
 
-**And 16:43 was not a card at all.** It was act VI's *own* 10.000 s head plate,
-playing straight after the act VI slide — 15.7 s in which nothing moved,
-announcing a main title the prologue had already delivered. Act II had the same
-shape with a 10.666667 s black head. Both are now skipped by the assembler's
-new `trim_from` **in the programme only**: neither act file is re-rendered, so
-act VI's plate — whose copy is a rights condition — still plays wherever the act
-plays standalone. Issue #206.
+**The numerals never move.** III is `mrbobbytables` permanently. Renumbering to
+close a gap would move every chapter marker, every `Prod/NN-*.mp4` filename and
+every key in `delivery.json`. The prologue therefore takes **no numeral** and
+delivers as `00-prologue`.
 
-| Act | Chapter | The film | State |
-|---|---|---|---|
-| **0** | *(no chapter — it is the main title)* | `Prod/00-prologue.mp4` — black, the lockup fading up on it, the picture exploding in at 0:12.2, then the March day→night bridge | delivered, **prototype**; shipping form is an embed; master corrected to −1.1 dBTP (was **+0.4 — clipping**), 2026-08-14; **v2.9**: the O of WOLVES is the Kubernetes helm, every b and f in the burned copy is blue, and the bridge is **10.000 s** (was 8.000) so its fade-down occupies the dead black act I used to open on |
-| **I** | Project Bluefin | `Prod/01-intro.mp4` — Into the Light, six Guardians plated, the title cover | delivered; **slide retired** (v2.5) — its chapter marker moved onto the act, and its `fade_in` went 2.0 → 0.0 because the fade was shaping the card's silence; **v2.9**: its measured **2.000 s black head is skipped** in the programme (`trim_from`), the other half of the 1:32 fix |
-| **II** | *Endless Forms Most Beautiful* | `Prod/02-endlessformsmostbeautiful.mp4` — the live-action trailers, and *The Long Walk* inside them | delivered and **credited**, in the programme; **no slide or chapter marker** — movement 2 crescendos directly into it (owner 2026-08-14); **its 10.666667 s black head is skipped** (v2.5, `trim_from`) so the crescendo hands straight to picture (#206); **v2.9**: the four OG Guardian plaques carry their real names from verified GitHub profiles, and movement 2 gets a 1.5 s release so the crescendo stops being chopped off |
-| **III** | Bob Killen | `Prod/03-mrbobbytables.mp4` — August 2026 contributors | delivered, **partially complete**; **slide retired** (v2.5), marker on the act |
-| **IV** | Bias for Action | `Prod/04-kat.mp4` — Kat Cosgrove | delivered, with the owner's dialogue change; **the shared IV–V slide is retired** (v2.5) — it announced two acts, so its one marker stays one marker, on this act, carrying the card's authored title unchanged |
-| **V** | Wrong Place, Wrong Time, Right Attitude | `Prod/05-nat.mp4` — Natali Vlatko | delivered; **the shared IV–V slide is retired** (v2.5); plays the #118 Nat section, the docs.bazzite.gg button on its own fade; **followed by the interstitial card** — *On the Linux Desktop / No one can hear you scream* — up out of that fade (owner 2026-08-14; no chapter marker, deliberately; `scripts/build_scream_card.py`) |
-| **VI** | 7 Days to the Wolves | `Prod/06-7daystothewolves.mp4` — the musical | **editorial pass**, provenance open — #55; the **#104 interruption build** (v2, 443.5 s), its tail plating the Cayde-6 reveal and three gold credits; **the programme plays 431.231 of it** — the comic and the fade cut off the end, the file untouched; **slide retired and the 10.000 s head plate skipped** (v2.5, `trim_from`) — the programme plays 421.231 of it, the act file untouched and its attribution intact standalone (#206); **v4, 2026-08-15**: the narration card is retired and castrojo speaks six lines as chat pills, one per bar from film 411.390, and the out point moved 36 ms off a drum hit so the join into Perfume is a needle drop rather than a chopped transient |
-| **VII** | Europa | `Prod/07-europa.mp4` — the director's cut | delivered; **no slide, no chapter marker** (v2.1) — a quick cut off movement 4; **the programme plays 96.73 of its 1:37.266** (v2.3) — it ends ON the eclipse at full brightness, hard into movement 5 (the owner's alpha-QA note; A/B excerpts in `renders/review/`, #192); the comic cover cut so act VIII owns the reveal — #178; terse-pass re-render in flight — #102; master corrected to −1.1 dBTP — #82 |
-| **VIII** | Credits | `Prod/08-credits.mp4` — the **call to action**, the comic-cover reveal, then the cast and 723 contributors across **eight** projects | delivered, **in the programme**; **7:39.981** (was 7:50.453), two bed passes — the instrumental loop, then the album version with vocals, which **v2.9 enters on its own vocal entry (10.4722) instead of restarting the song from its quiet intro**; the call to action reads **MAKE YOUR OWN FATE** and its cries are stacked at full size rather than shrunk onto one line; **no slide, no chapter marker** — it is meant to surprise — #51; master corrected to −1.1 dBTP (was **+0.9 — clipping**), 2026-08-14 |
+**One person appears once.** `mrbobbytables` is act III and nowhere else. An
+earlier pass had him twice — as an empty act, and as another act's film under
+his character's name.
 
-## The prologue, and why it has no numeral
+**Not every act is announced.** The Roman-numeral slides were retired on the
+owner's instruction; the programme plays exactly one card, the scream
+interstitial between acts V and VI — *ON THE LINUX DESKTOP /
+No one can hear you scream* — which carries no numeral and no marker, because a
+scrub-bar entry would spoil the gag. Acts VII and VIII carry no marker
+deliberately either: act VIII's whole design is that it surprises the viewer.
 
-Added 2026-08-14 on the owner's instruction: *"Make this video the intro in
-front of endless forms"*, pointing at Nightwish's official music video for
-**"Perfume Of The Timeless"** (`oHCaZmIzr0o`). Asked where it should sit, the
-owner placed it as a **new cold open in front of act I** — *Into the Light*
-stays exactly where it was.
+## The Perfume thread
 
-**It takes no numeral, and that is the whole design.** The eight numerals are
-load-bearing: `AGENTS.md` says III is `mrbobbytables` permanently, and
-renumbering to make room for a ninth act at the front would move every chapter
-marker, every `Prod/NN-*.mp4` filename and every key in
-`stories/megacut/delivery.json`. So it delivers as `00-prologue` and the
-canonical eight-act order above is unchanged.
+Nightwish's *Perfume Of The Timeless* plays from the first frame of the show to
+the last frame before the credits, **in source order and without gaps**. The
+prologue is movement 1; four more movements sit between the acts.
 
-**It carries no slide and no chapter marker**, for the same reason act VIII
-carries none: `chapters()` derives markers from slides, and a card announcing
-the main title sequence would step on the main title sequence.
-
-| | |
+| Movement | Seat |
 |---|---|
-| Runtime | **1:39.200** — 91.200 of picture, then an 8.000 bridge |
-| Title at | **2.000**, on black, staged: the lockup, then the credit pair at 15.400 |
-| Picture in | **12.200** — the measured first frame off the void's luma plateau; the burst blooms out of black behind the title |
-| Out point | **91.200**, the source's own luma minimum (the owner said 1:31) |
-| Master | `renders/00-prologue.mp4`, built by `scripts/build_prologue.py` |
-| Copy | `stories/00-prologue-plates.json`, reproduced from the website's own cue |
-| Rights | `music/bed_perfume_of_the_timeless.json` |
+| **1** — the prologue | in front of act I |
+| **2** | after act I |
+| **3** | after act III |
+| **4** | after act VI, before Europa |
+| **5** | after Europa, into the credits |
 
-The build, the three measured numbers and the dramatic reasoning are in
-[`docs/cuts/00-prologue.md`](cuts/00-prologue.md).
+They take **no numerals, no slides and no chapter markers**, and they deliver to
+`renders/` rather than `Prod/`, rendered **clean** — no fades, no overlays,
+because a dinosaur-artwork pass is planned and wants unfaded picture. `Prod/`
+means "a finished act"; join treatment lives in `megacut.json`, in act-film
+time.
 
-**The rendered file is a prototype, and the distinction matters.** Asked about
-rights, the owner's answer was *"it's an iframe using their video don't
-download it"* — the shipping presentation **embeds** Nightwish's video rather
-than re-hosting it, and the web version is deliberately deferred (*"we are
-prototyping we'll do the web thing later"*). So `Prod/00-prologue.mp4` exists
-to cut and watch against, and the prologue is recorded in
-`stories/megacut/delivery.json` as having **no social copy by design** — a
-standalone clip is precisely the redistribution the embed avoids.
-
-**One thing the owner may still want moved.** The written request said *"stop
-at 1:31 and then transition to endless forms"*, while the placement chosen puts
-the prologue in front of act I — so it currently plays
-`PROLOGUE → I → II`, not `PROLOGUE → II`. The prologue was built
-self-contained, with the bridge as its own tail, so moving it is one reordered
-item in `stories/megacut/megacut.json` and a row here — not a re-render.
-
-## The Perfume thread — the prologue was the first movement of five
-
-Added 2026-08-14, later the same night, on the owner's instruction: take the
-**middle** of the same music video and seat it between the acts. So the
-prologue is no longer a cold open that ends — it is **movement 1 of five**, and
-"Perfume Of The Timeless" now plays from the first frame of the show to the
-last frame before the credits, **in source order and without gaps**. The eight
-acts live inside it.
-
-| Movement | Source in → out | Runtime | Seat |
-|---|---|---|---|
-| **1** — the prologue | 0 → 91.200 (+8 s bridge) | 1:39.200 | in front of act I |
-| **2** | 93.000 → 159.400 | 1:06.400 | after act I |
-| **3** | 159.400 → 274.240 | 1:54.848 | after act III |
-| **4** | 274.240 → 389.800 | 1:55.565 | after act VI, before Europa |
-| **5** | 389.800 → 507.021 (EOF) | 1:57.200 — **the programme plays 109.5 of it** (v2.3) | after Europa, into the credits |
-
-Movements 2–5 add **6:54.0**. They take **no numerals, no slides and no chapter
-markers** — the same reasoning that keeps the prologue outside the eight, and
-the chapter list still has its eight entries, though **every timestamp after
-act I moved**.
-
-They deliver to **`renders/` only, not `Prod/`**, and are rendered **clean** —
-no fades, no overlays. The owner: *"we will be editing them in the future with
-dino artwork"*, and a dinosaur pass wants unfaded picture. `Prod/` keeps meaning
-"a finished act"; join treatment lives in `megacut.json` in act-film time.
-
-**The two open joins were settled by the owner's alpha QA (2026-08-14).**
-Europa now ends on the eclipse at full brightness (act VII `trim_to 96.73`,
-no fade) and cuts hard into movement 5's music — the A/B excerpt pair for the
-final frame choice is in `renders/review/` (#192). The **act VIII ambush**
-was re-seated by the owner's 28:20 note: movement 5 trims at 109.5, while the
-camera is still inside the sunken ship — the source's burned director credits
-and its long fade to nothing are cut, the song fades 1.5 s ("not too much"),
-and the drum smash punches the next frame (#191).
-
-The measured cut points, the two-answer in point and the rest are in
-[`docs/cuts/00-perfume-thread.md`](cuts/00-perfume-thread.md).
-
-**Act VIII has a film and the programme plays it.** Built from
-`stories/08-credits.json` by `scripts/build_credits.py`. Its shape changed on
-2026-08-14 and the full design is
-[`docs/cuts/08-credits.md`](cuts/08-credits.md):
-
-> the **call to action** → the comic-cover reveal at **:22** → the credits
-
-**It runs 7:50.453 now**, not 3:47.303, because the bed is two passes: the
-instrumental loop plays in full, then the **album version, with vocals**
-(*"switch to the album version with vocals after the entire instrumental loops
-once"*). Everything below still holds; what is new on top of it:
-
-- **The credits moved behind the reveal.** *"Move the existing credits to after
-  the comic reveal, instead let's make this part leading up to it a call to
-  action."* The four cards in front of the cover are WE MAKE OUR OWN FATE,
-  BECOME LEGEND, a birthday card, and FIGHT — which is held longer than the
-  first two together. The reveal's own `at_sec` and `hold_sec` are untouched.
-- **The F's sear.** Blocky Adwaita Black, no italics, the F filled in the
-  film's blue with an additive bloom around it.
-- **The `Introducing` card is the birthday card**, and the redacted second
-  name went with the card that carried it.
-- **The upstream tier is four projects**: Fedora CoreOS, bootc, **GNOME OS**
-  (`gnome-build-meta` only) and **KDE Linux**, the last two fetched from
-  GitLab, by NAME and never by email. Universal Blue, Bazzite and Aurora now
-  play ahead of Bluefin.
-- **`#UPSTREAMFIRST`** heads the upstream walls, **`#linuxforever`** runs
-  along the bottom of every one, the ghost maintainer closes KDE Linux, and a
-  side bubble dissolves once across the tier.
-- **A brand mark is never taken off this host.** Bluefin rebrands
-  `/usr/share/pixmaps` — its `fedora_whitelogo_med.png` and
-  `gnome-boot-logo.png` are both the Bluefin wordmark, and the first build
-  credited Fedora CoreOS under one of them.
-
-**The 2026-08-14 pass rebuilt how act VIII looks and who it names.**
-
-- **It is set in Adwaita**, resolved in `tools/credits.py` alone. `plate.py`
-  still resolves DejaVu, because that reproduces the browser that baked the
-  reference plates and changing it would restyle acts I–VII.
-- **The frame is the desktop.** Every card sits on one of Project Bluefin's
-  monthly **dark-mode** wallpapers — the dinosaurs — advanced card by card in
-  calendar order and wrapping, graded blue rather than neutral (*"more blue
-  than gold"*). November has no night art installed on this host, so the cycle
-  is eleven months and says so. Cached by `scripts/fetch_wallpapers.py`, which
-  decodes JPEG XL through GdkPixbuf because neither Pillow nor this host's
-  ffmpeg can.
-- **The upstream tier leads the walls**, on its own larger grid — six across
-  by three down against nine by four — and each of its walls holds longer than
-  a Bluefin one. The order is enforced in `schedule()`, so reordering the
-  manifest cannot demote them.
-- **The cast is the README's table minus Cayde-6**, by owner instruction. The
-  six the vocab binds but the README does not list keep their bindings; only
-  act VIII's placards went. Karena is **"Angel"**, one L. It is **not**
-  re-derived by `--refresh-contributors` — that once threw the owner's casting
-  away in the middle of a contributor snapshot; `--refresh-cast` asks for it
-  by name.
-- **The bed loops properly.** Span A used to end at 240.780, which is 0.7 s
-  *inside* the song's own fade-out — so the loop played an ending and then the
-  drums. It ends at 239.653152 now, the nearest tracked beat to the owner's :46.
-- **"an ublue project" is off the wordmark.**
-- **The picture is padded to outlast the music.** The concat demuxer lands
-  short of the durations it is handed — 4.347 s short over 38 cards — so act
-  VIII muxed 227.303 s of audio over 222.956 s of picture and four and a half
-  seconds of the wordmark were not there. `tpad` clones the last frame and
-  `-t` cuts both streams on one frame. **The megacut's own join check is what
-  caught it**, not anybody's eyes.
-
-**Still open on act VIII:** the principals' summit portraits. The owner asked
-for *"a good shot of them from the CNCF contributor summit flickr feed"*; the
-feed is twelve frames of one **group** photograph, so every crop box has to be
-drawn by somebody who can say which face is whose — a visual judgement AND a
-claim about a real person. The mechanism is built
-(`tools/credits.summit_portrait`), `cast_photos` is empty, and the placards
-degrade to the verified avatar until the owner fills it in.
-
-**It is the one act with no slide and no chapter marker**, by owner
-instruction — *"no credits slide, go right to the metal … it should surprise
-the viewer."* Europa fades to black on its own tail and the drum smash lands on
-the next frame. The missing marker is deliberate too: `chapters()` derives them
-from slides, so a *VIII. Credits* entry on the scrub bar would spoil the same
-surprise the cut is built to land. Every other act is still announced.
-
-**Act VII no longer ends on the comic cover.** The cover is act VIII's reveal
-now, so Europa ends on the fade-to-black it already had, 12.934 s earlier
-(#178). Every chapter mark after act VII moved by that amount.
-
-**The numbering is fixed.** III is `mrbobbytables` permanently, whatever gets
-built later.
-
-**Act II has a film** ([`docs/cuts/02-endless-forms-most-beautiful.md`](cuts/02-endless-forms-most-beautiful.md)),
-delivered to `Prod/` and **in the programme**: it has a slide, a chapter marker,
-and its own place on the clock. Seven of the eight acts now play, which is what
-**v0.5** was; the current build is **v1.0** — all eight acts, 24:07.1. Its last pass (2026-08-14) rebuilt act VIII's look and cast and gave act II the CNCF round: four OG Guardians in bronze, a re-staggered trio, a team badge, four new lines, a full-frame Destiny-style **choice screen** with a cursor that never lands, and AN4-CH3CK-12 removed. It is also the first feature act to carry **nameplates** — thirteen
-of them, generated rather than placed by hand — now eighteen, plus a chapter
-card, twenty-six dialogue pills, a patch-queue HUD, a villain's bar and the
-letterbox callout, all of it still generated.
-
-**Act I carries the GUARDIAN BOND companion cards**, ported from the live
-overlay: Karl beside Kat, Alamo beside Natali, Katerina beside Kaslin, and Bob
-Killen's unnamed Torosaurus beside Cortney, which she inherits by the owner's
-explicit decision rather than by the recast.
-
-**Act II emits two sub-chapters, consumed only on opt-in.** `TOC` at 0:54.234
-and `The Long Walk` at 2:27.801, in the act's own film time
-(`python3 scripts/build_efmb_plates.py --chapters`). `chapters()` below derives
-markers from act **slides** only, so an act's internal marks stay out of the
-published list unless asked for: the act's clip in the programme plan carries a
-`sub_chapters` **pointer** at its own manifest (the source of the marks), and
-`--sub-chapters` emits them at slide-relative programme time. The default
-chapter list is unchanged —
-[#92](https://github.com/castrojo/destiny-vids/issues/92). They are anchored
-to source timecodes, so they cannot drift from the credits they belong to.
-**TODO(owner):** whether sub-chapters belong in the YouTube chapter list at
-all, or only in an ffmpeg metadata track.
-
-**Acts IV and V shared one slide, and share one marker.** The owner's call:
-their films run 34 s and 25 s, and two slides held 15 s each announced 59 s of
-picture. Both acts keep their numerals and their films — it merged the
-announcement, not the acts. The slide is retired (v2.5) and its **one** marker
-stays one marker, on act IV, carrying the card's authored title unchanged.
-
-**It holds 5 s, not 15 (v2.2).** The long hold was deliberate pacing while it
-was the one slide announcing two acts. The Perfume thread changed what sits
-either side of it: movement 3 ends on a **dark, static** shot of animal skulls,
-the song faded out over 2 s, and then the card froze for 15 s **in silence**
-before Kat's ships — about twenty seconds in which neither the picture nor the
-sound moved. The owner: *"15:31 entire transition is too weird and long, make it
-all fit."* It now holds what every other slide holds, and movement 3's fade-out
-is 1 s so the music carries closer to the card. The copy is untouched.
-
-The slide's copy is **owner-authored**: *Bias for Action*, subtitled *The Kat
-and the Nat*, over act IV's terminal block. Act V's own title, *Wrong Place,
-Wrong Time, Right Attitude*, stays its name here but **no longer appears on
-screen** — recorded in the manifest's `unresolved`, because losing a title
-somebody wrote should be deliberate.
-
-**One person, one act.** `mrbobbytables` appears once, at III. An earlier pass
-had him twice — as an empty act and as another act's film under his character's
-name — and that is the specific mistake this table exists to prevent.
+The measured in and out points are in `megacut.json`. Do not copy them here.
 
 ## Chapters
 
-The acts **are** the chapters. Their titles are authored copy, and the
-timestamps are **derived, never typed**. Since v2.5 the `chapter` strings live
-on the acts' own **clips** in `stories/megacut/megacut.json`: the slides that
-used to carry them are retired, and a marker must not disappear with the card
-that announced it. The strings themselves are unchanged.
+The acts **are** the chapters. Their titles are authored copy; the timestamps
+are **derived, never typed**, because every stamp moves whenever anything
+before it does.
 
 ```bash
 python3 tools/megacut.py stories/megacut/megacut.json --chapters
 ```
 
 ```text
-1:39  I. Project Bluefin
+1:41  I. Project Bluefin
 9:34  III. Bob Killen
-15:03 IV–V. Bias for Action
-16:07 VI. 7 Days to the Wolves
+14:09 IV–V. Bias for Action
+15:13 VI. 7 Days to the Wolves
 ```
 
-**35:27.3**, four markers. Every stamp moves whenever anything before it does —
-act II being wired in, acts IV and V sharing a slide, act VI becoming the #104
-interruption build (+10.811 s), the prologue landing in front of act I, and the
-slides being cut (−40.667 s) — which is exactly why they are derived and never
-typed.
+Re-run it after every assembly and paste the output into the upload
+description. Never hand-edit the list.
 
-A chapter used to start on its **act slide**; with the slides gone it starts
-where the act does, which is the only place left that means anything. The list
-regenerates from the plan's own clock, so it cannot drift when a cut's length
-changes — re-run it after every assembly and paste the output into the upload
-description.
+**One recorded defect: the first marker is not 0:00.** YouTube ignores a chapter
+list that does not open at zero, and the prologue carries no chapter by design.
+Closing the gap means authoring a title for the prologue — the owner's call, and
+`format_chapters` deliberately does not invent one.
+[#220](https://github.com/castrojo/destiny-vids/issues/220).
 
-**One known defect, recorded rather than papered over: the first marker is not
-0:00.** YouTube ignores a chapter list that does not open at zero, and the
-prologue carries no chapter by design, so the list currently begins at 1:39.
-Closing the gap means authoring a title for the prologue — the owner's call, not
-the tool's, and `format_chapters` deliberately does not invent one.
+Acts may also carry **sub-chapters** — `chapters[]` on that act's entry in
+`megacut-cards.json`. Nothing renders them today, and `--chapters` omits them
+unless asked with `--sub-chapters`.
 
-Each act may also carry **sub-chapters** — a contents list that was rendered
-under the title on its slide. **They all live in one place:** `chapters[]` on
-that act's entry in
-[`stories/megacut/megacut-cards.json`](../stories/megacut/megacut-cards.json).
-A line nobody authored is omitted rather than defaulted. **Nothing renders them
-today** — the slides that displayed them are retired — and they are kept
-verbatim against the overlays the owner said they would design.
+## Where the files go
 
-Five acts carry a **drafted** list (I, II, III, VI, VII). Every line is either
-read off the built film or reproduced from that act's own cut record, and each
-card's `note` cites which — **none of it is the owner's copy yet**. Acts IV and
-V carry none on purpose: 34 s and 25 s, one continuous scene each, so a contents
-list would be longer than the thing it indexes.
-
-```bash
-node cards/render-cards.mjs --manifest stories/megacut/megacut-cards.json \
-    --out-dir renders/plates-megacut-cards
-```
-
-## Where the files live
-
-`~/Videos/Wolves/` is the delivery workspace. Three folders, one job each:
+`~/Videos/Wolves/` — three folders, one job each, every file a regenerated
+artifact:
 
 | Folder | What goes in it |
 |---|---|
-| `Prod/` | **The show, at the highest quality that exists.** One file per act, named `NN-<act>.mp4`. FLAC audio where a lossless master exists (act VI is AAC pending #58), no re-encoded picture. Hardlinks to each project's own master, so Prod costs no disk and cannot drift from what built it. |
-| `10mb/` | Social copies, capped by bytes. Built by `tools/social.py` from `Prod/`, **never** from another social copy. |
-| `megacut/` | The final movie, and nothing else. Assembled by `tools/megacut.py`. |
-
-Nothing is hand-edited in any of them; every file is a regenerated artifact of a
-script in this repo or in its own `~/Videos/<project>/render/`.
+| `Prod/` | **The show at the highest quality that exists.** One file per act, `NN-<act>.mp4`, FLAC where a lossless master exists, picture never re-encoded. Hardlinks to each project's own master, so it costs no disk and cannot drift. |
+| `10mb/` | Social copies under a byte cap (`tools/social.py`), built from `Prod/` and never from each other. |
+| `megacut/` | The final movie, and nothing else. |
 
 ```bash
-# the final movie
-python3 tools/megacut.py stories/megacut/megacut.json
-
-# a social copy of one act
-python3 tools/social.py ~/Videos/Wolves/Prod/05-nat.mp4 \
-    --out ~/Videos/Wolves/10mb/05-nat.mp4 --audio-bitrate 256
+python3 tools/deliver.py status     # what is stale and why
+python3 tools/deliver.py build      # rebuild exactly what is stale
+python3 tools/deliver.py publish    # after ANY act rebuild
 ```
 
-## What Prod is still missing
+Applying a round of notes to the right act:
+[`skills/review.md`](skills/review.md). The audio the delivered files are held
+to: [`skills/audio/SKILL.md`](skills/audio/SKILL.md).
 
-Recorded, not hidden:
+## What is still open
 
-- **Act VI has no lossless master** — the musical is AAC, so `Prod` holds the
-  best that exists rather than the best possible. Issue #58. Its master lives in
-  `~/Videos/wolves-musical/`, re-homed out of the retired `UPLOAD/` staging
-  folder (issue #81) by moving the inode, so the hardlink never broke.
-- ~~**Act VII's master clips** at +0.3 dBTP — issue #82.~~ **Fixed 2026-08-13**:
-  Europa's own build was re-rendered under the new master gate
-  (`tools/peaks.py trim`, PR #130) and the delivered master now measures
-  **−1.1 dBTP**, inside the −0.9…−1.1 band. The issue stays open for its owner
-  to close.
-- **Act VIII does not exist.** Issue #51. The programme therefore ends on
-  Europa with **no credit roll**, which is the single biggest reason the
-  current build is not the feature. The only names in the show are act VI's
-  tail — the Cayde-6 reveal (Jorge Castro) and three gold credits behind it —
-  and a reveal inside an act is not a credits sequence.
-- **Act II's picture is a fan compilation**, not an official Bungie upload —
-  the same provenance question act VI carries (#55). See its cut doc.
-
-Delivered on 2026-08-12, so the two encode gaps this file used to list are
-closed:
-
-- **Act I** is rendered and delivered as `Prod/01-intro.mp4` — the frame-verified
-  2.0 → 113.55 trim of `BKm0TPqeOjY`, six Guardian plates and the title cover
-  burned, Bungie's own score decoded from the **plain 251 Opus rung** to
-  FLAC. Not `251-drc`: that rung is dynamic-range compressed, and taking it
-  would have been the pipeline applying processing it forbids.
-- **Act IV carries the owner's dialogue change** — the Kat/Ian split and
-  "Remember kids, cardio!" are rendered and on screen, verified frame by frame.
-  Rebuilt in `~/Videos/wolves-kat/` with `node render/render-plates.mjs`, then
-  `./render/run-kat.sh` and the `SURROUND=0 ACODEC=flac OUT=…-hq.mp4` variant.
-  The `Prod` hardlink survived the rebuild, because the script writes its master
-  in place rather than replacing the file.
+Tracked as issues, not as prose here, so this file cannot go stale behind them:
+[the open backlog](https://github.com/castrojo/destiny-vids/issues). The ones
+that block *the feature* rather than an act are the provenance question
+([#55](https://github.com/castrojo/destiny-vids/issues/55)) and act VI's
+lossless bed ([#58](https://github.com/castrojo/destiny-vids/issues/58)).

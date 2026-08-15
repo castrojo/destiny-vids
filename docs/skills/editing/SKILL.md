@@ -58,6 +58,7 @@ This skill is the contract. The procedure lives in `references/`:
 | Reference | What is in it |
 |---|---|
 | [`outline-and-shape.md`](references/outline-and-shape.md) | Writing beats the matcher can serve, and **spanning vs pinning** — the decision that decides what the cut is about. |
+| [`hero-video.md`](references/hero-video.md) | The **hero video** — one person, one video, every source — and when *not* to pin a cut to one cinematic. |
 | [`holds-and-windows.md`](references/holds-and-windows.md) | How long a shot may hold, cutting from a long source, and artwork cards. |
 | [`timing-pass.md`](references/timing-pass.md) | **Mark, don't cut.** The review convention, and how filling a span smuggles banned material in. |
 | [`shotlists-and-excisions.md`](references/shotlists-and-excisions.md) | Deriving in-points, the authored-shotlist invariant, and picking shots by eye. |
@@ -188,8 +189,9 @@ Upload order lives in a numeric filename prefix — `stories/01-dance.txt` →
 `renders/01-dance-web.mp4`, `renders/01-dance-youtube.mp4`. Sorting the
 directory sorts the playlist; there is no ordering manifest to keep in sync.
 
-Each shipped cut gets a doc in `docs/cuts/` recording its source cinematic, its
-skip points, its unresolved beats, and anything a human still has to decide.
+A cut's unresolved beats and anything a human still has to decide are recorded
+in its outline's own header (see `stories/01-dance.txt`) and filed as issues —
+there is no per-cut doc tree.
 
 Ranking weights and query mapping: `docs/agent-retrieval.md`. Encoder choices,
 seeking, and the ffmpeg resolution order: `docs/rendering.md`. What a character

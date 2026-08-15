@@ -1,7 +1,31 @@
 {
-  "generated_at": "2026-08-13",
+  "generated_at": "2026-08-15",
   "schema_version": "1.0",
   "skills": [
+    {
+      "id": "audio",
+      "name": "audio",
+      "one_line_purpose": "Source the best audio that exists, keep the chain lossless, and gate the delivered peak.",
+      "entry_point": "docs/skills/audio/SKILL.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "audio",
+        "true-peak",
+        "lossless",
+        "flac",
+        "opus",
+        "yt-dlp",
+        "sourcing",
+        "static-gain",
+        "headroom",
+        "delivery-band"
+      ],
+      "description": "The audio standard every delivered file is held to: source by codec never bitrate, decode at native rate, headroom as a derived static gain, and measure the delivered file rather than the bed. Use when sourcing, mixing, or gating audio.",
+      "version": "1.0",
+      "last_updated": "2026-08-15",
+      "doc_type": "reference"
+    },
     {
       "id": "casting",
       "name": "casting",
@@ -207,6 +231,27 @@
       "description": "The whole loop from an issue to a rendered cut, what resumes, where it stops on purpose, and how several agents make videos at once without colliding. Use when producing videos in volume rather than debugging one stage.",
       "version": "2.1",
       "last_updated": "2026-08-13",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "review",
+      "name": "review",
+      "one_line_purpose": "Turn a watched-programme timecode into a one-act rebuild.",
+      "entry_point": "docs/skills/review.md",
+      "category": "editing",
+      "status": "active",
+      "tags": [
+        "review",
+        "notes",
+        "timecode",
+        "locate",
+        "chapters",
+        "rebuild",
+        "act-clocks"
+      ],
+      "description": "The review loop: locate which act a programme timecode belongs to with tools/megacut.py --locate, fix the act in the project that made it, and re-assemble without re-encoding the others. Use when a round of notes comes back from watching the programme.",
+      "version": "1.0",
+      "last_updated": "2026-08-15",
       "doc_type": "procedure"
     },
     {

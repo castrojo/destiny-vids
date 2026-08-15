@@ -1,3 +1,24 @@
+---
+name: review
+version: "1.0"
+last_updated: "2026-08-15"
+id: review
+one_line_purpose: Turn a watched-programme timecode into a one-act rebuild.
+entry_point: docs/skills/review.md
+category: editing
+mcp_compliance_level: partial
+optimization_status: draft
+status: active
+dependencies: [megacut, production]
+tags: [review, notes, timecode, locate, chapters, rebuild, act-clocks]
+description: >-
+  The review loop: locate which act a programme timecode belongs to with tools/megacut.py --locate,
+  fix the act in the project that made it, and re-assemble without re-encoding the others.
+  Use when a round of notes comes back from watching the programme.
+metadata:
+  type: procedure
+---
+
 # The review loop
 
 **A round of notes should cost one act, not one show.** This file is how a
@@ -20,7 +41,7 @@ python3 tools/megacut.py stories/megacut/megacut.json
 
 `tools/megacut.py` normalises each item to a temporary segment and joins them
 with the **concat demuxer**, and the join is `-c:v copy`
-([`tools/megacut.py`](../tools/megacut.py), `build_concat_command`). **The
+([`tools/megacut.py`](../../tools/megacut.py), `build_concat_command`). **The
 picture is never re-encoded at assembly.** Only the act you changed is rebuilt
 by the project that owns it; everything else is copied through.
 
@@ -75,7 +96,7 @@ of it that has been pasted somewhere else.
 | a **nameplate**'s copy, timing or rank | that act's plate builder, then its act | one act |
 | an act's **picture or edit** | that act's project, then re-deliver to `Prod/` | one act |
 | an act **slide**'s copy | `stories/megacut/megacut-cards.json`, then assemble | assembly only |
-| the **running order** | [`docs/running-order.md`](running-order.md) first, always | assembly only |
+| the **running order** | [`docs/running-order.md`](../running-order.md) first, always | assembly only |
 
 Act II's plates, as the worked example:
 
@@ -128,4 +149,4 @@ the constant is an implementation detail.
 **Three kinds of note can never be actioned by an agent alone**, and they are
 worth marking as you write them: a visual judgement about a frame, a claim
 about a real person, and a licensing decision. An agent that reaches one and
-stops has done the right thing — see [`AGENTS.md`](../AGENTS.md).
+stops has done the right thing — see [`AGENTS.md`](../../AGENTS.md).

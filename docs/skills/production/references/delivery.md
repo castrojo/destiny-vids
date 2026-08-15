@@ -198,8 +198,8 @@ already been learned the hard way and must not be re-learned:
   later fold-down starts from the bed rather than from a lossy file. The
   default stays `aac`, and the defaults must keep rebuilding the shipped file.
   The standard is
-  [`references/audio-standard.md`](../../references/audio-standard.md) — thresholds,
-  the delivery band, the sourcing rule, and the two failures that have actually
+  [`docs/skills/audio/SKILL.md`](../../audio/SKILL.md) — the thresholds,
+  the delivery band, the sourcing rule, and the failures that have actually
   shipped. The checker that enforces it is `~/Videos/audio-check.sh`.
 - Prove it, don't assert it: `framemd5` proves an audio change touched no
   frames, an audio-stream MD5 proves a picture change touched no audio,
