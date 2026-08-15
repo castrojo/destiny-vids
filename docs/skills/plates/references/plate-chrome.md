@@ -32,6 +32,16 @@ always reserved in the layout, so the pill's size does not move.
 A missing or unreadable file degrades to the drawn crest with a stderr note —
 a punch-list item, never a crash (degrade, never block).
 
+### GitHub URLs identify assets, not people
+
+A GitHub login is a verified account identifier; an avatar URL is only the
+source for its cached local image. Keep both where the authored binding or
+owner brief supplied them: `avatar_url` records provenance and `avatar` names
+the local cache the offline renderer reads. A URL or login never authorises a
+display name, title, class, or other personal claim. In particular, do not
+derive a real name from a GitHub profile to fill a plate or chat: render the
+existing authored name, a deliberately authored login, or the drawn crest.
+
 ## `wreath: true` — the struck laurel
 
 A laurel ring around the crest, in the plate's own accent metal: the ring a

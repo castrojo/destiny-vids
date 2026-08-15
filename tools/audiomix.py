@@ -90,8 +90,28 @@ def plan_regions(shots, bed_offset=0.0):
             raise ValueError(
                 f"{shot.get('beat', '?')!r}: audio_from on a {kind!r} shot "
                 "would never be heard -- nothing plays there")
-        if (regions and regions[-1]["kind"] == kind
-                and regions[-1].get("audio_from") == audio_from):
+        bed_from = shot.get("bed_from")
+        if kind == "bed" and bed_from is not None:
+            bed_from = float(bed_from)
+            if bed_from < 0:
+                raise ValueError(
+                    f"{shot.get('beat', '?')!r}: bed_from must not be negative")
+            bed = bed_from
+        fade_in = float(shot.get("fade_in", 0.0))
+        fade_out = float(shot.get("fade_out", 0.0))
+        if fade_in < 0 or fade_out < 0 or fade_in + fade_out > dur:
+            raise ValueError(
+                f"{shot.get('beat', '?')!r}: fades must be non-negative and "
+                "fit inside their shot")
+        can_merge = (
+            regions and regions[-1]["kind"] == kind
+            and regions[-1].get("audio_from") == audio_from
+            and not fade_in and not fade_out
+            and not regions[-1].get("fade_in")
+            and not regions[-1].get("fade_out")
+            and (kind != "bed" or bed_from is None)
+        )
+        if can_merge:
             regions[-1]["wall_end"] += dur
             if kind == "bed":
                 regions[-1]["bed_end"] += dur
@@ -102,6 +122,10 @@ def plan_regions(shots, bed_offset=0.0):
                 r["bed_end"] = bed + dur
             if audio_from is not None:
                 r["audio_from"] = audio_from
+            if fade_in:
+                r["fade_in"] = fade_in
+            if fade_out:
+                r["fade_out"] = fade_out
             regions.append(r)
         wall += dur
         if kind == "bed":
@@ -142,6 +166,12 @@ def resolve_audio_inputs(regions, media_dir=None):
         if vid in paths:
             continue
         path = resolve_media(vid, media_dir) if media_dir else None
+        if path is None and media_dir:
+            for ext in (".wav", ".flac", ".mp3"):
+                candidate = (Path(media_dir) / f"{vid}{ext}").resolve()
+                if candidate.exists():
+                    path = candidate
+                    break
         if path is None:
             raise ValueError(
                 f"{vid!r}: audio_from names a source that is not in "
@@ -177,6 +207,12 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0,
         delay = int(round(r["wall_start"] * 1000))
         chain = (f"[1:a]atrim=start={r['bed_start']:.6f}:end={r['bed_end']:.6f},"
                  f"asetpts=PTS-STARTPTS")
+        if r.get("fade_in"):
+            chain += f",afade=t=in:st=0:d={r['fade_in']:.6f}"
+        if r.get("fade_out"):
+            dur = r["bed_end"] - r["bed_start"]
+            chain += (f",afade=t=out:st={dur - r['fade_out']:.6f}:"
+                      f"d={r['fade_out']:.6f}")
         if bed_gain_db:
             # A static gain, applied once. Not loudnorm and not a limiter: the
             # record's dynamics are the artist's (see docs/skills/scoring.md).
@@ -199,6 +235,11 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0,
         delay = int(round(r["wall_start"] * 1000))
         chain = (f"[{idx}:a]atrim=start={start:.6f}:end={start + dur:.6f},"
                  f"asetpts=PTS-STARTPTS")
+        if r.get("fade_in"):
+            chain += f",afade=t=in:st=0:d={r['fade_in']:.6f}"
+        if r.get("fade_out"):
+            chain += (f",afade=t=out:st={dur - r['fade_out']:.6f}:"
+                      f"d={r['fade_out']:.6f}")
         if source_gain_db:
             chain += f",volume={source_gain_db}dB"
         chain += f",adelay={delay}|{delay}[{lab}]"

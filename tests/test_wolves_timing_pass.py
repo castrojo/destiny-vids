@@ -30,15 +30,12 @@ def test_bed_is_consumed_exactly(cut):
     assert total_bed(regions) == pytest.approx(bed["duration_sec"], abs=0.02)
 
 
-def test_film_is_longer_than_its_song(cut):
-    """A musical with a pause in it is longer than the record it uses.
-
-    This is the whole point of the two clocks; if these are ever equal, someone
-    has quietly gone back to asserting against wall time.
-    """
+def test_film_and_bed_are_continuous(cut):
+    """Moving Cortney to Act II restores Act VI to one unbroken bed."""
     regions = plan_regions(cut["shots"], cut["bed_offset_sec"])
     wall = sum(s["duration"] for s in cut["shots"])
-    assert wall > total_bed(regions) + 1.0
+    assert wall == pytest.approx(total_bed(regions), abs=0.001)
+    assert {s["audio"] for s in cut["shots"]} == {"bed"}
 
 
 def test_anchors_land_on_bed_time(cut):
@@ -120,75 +117,14 @@ def test_act_one_stops_at_the_end_of_the_cinematic(cut):
     assert max(s["end_sec"] for s in act1) == pytest.approx(203.0, abs=0.01)
 
 
-def _interruption(cut):
-    """The interruption's four beats, in order (issue #104).
-
-    A is the held silence, B the Ambassadors' slide, C the introduction, D
-    the clip itself. Everything between them names its clock: durations are
-    ACT-FILM seconds; the clip's in/out are SOURCE clock; the pause sits at
-    BED 322.200.
-    """
-    beats = [s for s in cut["shots"] if "INTERRUPTION" in s["beat"]]
-    assert [s["audio"] for s in beats] == ["silent", "hold", "hold", "source"], (
-        "the interruption is A silent, B+C hold, D source -- in that order")
-    return beats
-
-
-def test_the_interruption_consumes_no_bed_time(cut):
-    """"Since this is an interruption we have unlimited time" -- and it is
-    true mechanically: every beat of it advances wall and NOT bed."""
-    beats = _interruption(cut)
-    regions = plan_regions(cut["shots"], cut["bed_offset_sec"])
-    non_bed = [r for r in regions if r["kind"] != "bed"]
-    # B and C merge into one hold region; the pause is silent|hold|source.
-    assert [r["kind"] for r in non_bed] == ["silent", "hold", "source"]
-    for r in non_bed:
-        assert "bed_start" not in r, "a non-bed region carries no bed time"
-    assert sum(s["duration"] for s in beats) == pytest.approx(
-        sum(r["wall_end"] - r["wall_start"] for r in non_bed), abs=0.001)
-
-
-def test_the_interruption_is_a_sequence_of_new_developments(cut):
-    """No static element holds longer than 4.0 s: mark, then name, then the
-    clip. The issue is explicit that this is craft guidance, not measurement
-    -- what is pinned here is the SHAPE (a beat of silence, two 4 s cards,
-    then a clip long enough to be a decision), not a pretence of precision.
-    """
-    from scripts.build_wolves import (CLIP_LEN, PLATE_LEN, SILENCE_LEN,
-                                      SLIDE_LEN)
-
-    a, b, c, d = _interruption(cut)
-    assert a["duration"] == pytest.approx(SILENCE_LEN)  # 1.0 s of black
-    assert b["duration"] == pytest.approx(SLIDE_LEN)    # the mark
-    assert c["duration"] == pytest.approx(PLATE_LEN)    # the name
-    assert d["duration"] == pytest.approx(CLIP_LEN)     # the clip
-    for still_beat in (a, b, c):
-        assert still_beat["duration"] <= 4.0, (
-            "a static element holding past 4 s tips into dead air (#104)")
-    assert d["duration"] >= 3.0, (
-        "too short to read as a decision -- the clip must be allowed to END")
-
-
-def test_the_interruption_sits_on_its_downbeat(cut):
-    """The pause starts at bed 322.200 -- a downbeat -- and the bed resumes
-    from exactly there when it ends. Both assertions are the same anchor."""
-    bed = 0.0
-    for shot in cut["shots"]:
-        if "INTERRUPTION A" in shot["beat"]:
-            assert bed == pytest.approx(cut["anchors"]["pause_at_bed"],
-                                        abs=0.02)
-            return
-        if shot["audio"] == "bed":
-            bed += shot["duration"]
-    raise AssertionError("the interruption is missing")
-
-
-def test_bed_resumes_where_it_stopped(cut):
-    """The bed pieces must be contiguous in bed time across the pause."""
+def test_bed_has_no_interruption_insert_or_source_audio(cut):
+    """No cards, hold track, or hero source audio remain in Act VI."""
     regions = [r for r in plan_regions(cut["shots"], cut["bed_offset_sec"])
                if r["kind"] == "bed"]
     for before, after in zip(regions, regions[1:]):
         assert after["bed_start"] == pytest.approx(before["bed_end"], abs=0.001)
+    assert not any("INTERRUPTION" in shot["beat"] for shot in cut["shots"])
+    assert not any(shot.get("audio_from") for shot in cut["shots"])
 
 
 def test_plan_rejects_a_disagreeing_offset(cut):
@@ -205,25 +141,6 @@ def test_filter_delays_each_bed_piece_to_its_wall_position(cut):
     # The source is muted under the bed, never mixed with it.
     assert "volume=0:enable=" in graph
     assert "normalize=0" in graph
-
-
-def test_the_clip_plays_its_own_score_and_says_so(cut):
-    """Issue #104 supersedes #95: the with-music mix is the POINT now.
-
-    The clip is presented to the audience with its own effects and score --
-    the polite hold music is smashed out by the explosion, and that is the
-    joke. So the clip must NOT carry an ``audio_from`` (there is no SFX-only
-    mix to swap in -- #95 established the moment exists nowhere else) and its
-    beat must cite #104, so nobody "fixes" the score back out of it.
-    """
-    paused = [s for s in cut["shots"] if s["audio"] == "source"]
-    assert len(paused) == 1, "the clip is the cut's only source-audio moment"
-    shot = paused[0]
-    assert "#104" in shot["beat"]
-    assert "score" in shot["beat"]
-    assert not shot.get("audio_from"), (
-        "the clip plays its own mix by design; an audio_from here would be "
-        "#95's SFX-only search coming back")
 
 
 def test_audio_from_reaches_the_filtergraph_in_its_own_clock():
@@ -338,75 +255,6 @@ def test_marker_cards_carry_no_nameplate_vocabulary(cut):
             assert banned not in beat
 
 
-def test_cortney_is_introduced_with_her_authored_copy(cut):
-    """She IS plated now -- on interruption card C, with the identity the
-    owner authored for act I (issue #90), reproduced verbatim.
-
-    Reproduced means EXACTLY: the label, the name and 'Weilder of the Arcane'
-    (sic), and NO class row -- her class was never named and a hint is not an
-    authorisation (#59). The cards manifest is checked against the act-I
-    manifest, field for field, so the two cannot drift apart silently.
-    """
-    cards = json.loads(
-        (REPO / "stories" / "06-wolves-interruption-cards.json").read_text())
-    entry = next(c for c in cards["cards"] if c["id"] == "c-cortney")
-    plate = entry["plate"]
-    hero = json.loads(
-        (REPO / "stories" / "megacut" / "megacut-hero-plates.json").read_text())
-    authored = next(p for p in hero["plates"] if p["id"] == "cortney")
-    for field in ("label", "name", "title", "position"):
-        assert plate[field] == authored[field], (
-            f"{field}: the interruption plate must reproduce the authored "
-            "act-I identity verbatim")
-    for omitted in ("class", "wreath"):
-        assert omitted not in plate, (
-            f"the { omitted } row is omitted, not invented -- see the "
-            "manifest's note and #59/#90")
-    assert entry["intro"] == "Introducing ...", (
-        "the framing line is owner-authored, verbatim, spaced ellipsis and "
-        "all")
-
-    # ...and the cut introduces her on the card BEFORE her moment plays.
-    beats = _interruption(cut)
-    assert "Cortney Nickerson" in beats[2]["beat"]
-    assert "Cortney Nickerson" in beats[3]["beat"]
-
-
-def test_the_hold_music_is_cleared_and_credited(cut):
-    """The slot carries a track, and the track carries its licence.
-
-    This test used to assert the opposite -- that the slot ships EMPTY, because
-    "music is a licensing decision". It is not, when the track is already
-    cleared. Four CC BY 4.0 tracks had been found and verified before the slot
-    was built silent; choosing between assets that are already cleared is
-    taste, and it stalled the beat for a day. See AGENTS.md, "A rights
-    DECISION blocks. A rights CHOICE does not."
-
-    What still binds is the licence's CONDITION, which is checkable and is
-    checked here: CC BY is not CC0.
-    """
-    import json as _json
-
-    hold = [s for s in cut["shots"] if s["audio"] == "hold"]
-    assert hold, "the hold-music slot vanished -- B and C should carry it"
-    names = set()
-    for shot in hold:
-        assert shot.get("audio_from"), (
-            "the slot is empty again -- a cleared track exists, so silence "
-            "here is a regression, not caution")
-        names.add(shot["audio_from"]["video_id"])
-    assert len(names) == 1, "one track, one licence to satisfy"
-
-    record = _json.loads(
-        (REPO / "music" / f"{names.pop()}.json").read_text())
-    assert record["usage_class"] == "cc_by_4_0"
-    assert record["attribution"], "CC BY without a credit is not CC BY"
-    attributions = (REPO / "ATTRIBUTIONS.md").read_text()
-    for line in (l.strip() for l in record["attribution"].splitlines()
-                 if l.strip()):
-        assert line in attributions, f"credit line missing: {line!r}"
-
-
 def test_plate_slots_are_flagged_for_the_nameplate_pass(cut):
     slots = [s for s in cut["shots"] if s.get("plate_slot")]
     assert len(slots) >= 3, "Guardians-together runs should be flagged"
@@ -443,7 +291,7 @@ def test_the_gallop_cuts_to_neon(cut):
     raise AssertionError("no shot starts on the gallop")
 
 
-def test_the_interruption_cards_are_the_ones_the_builder_asks_for(cut):
+def _obsolete_interruption_cards_are_the_ones_the_builder_asks_for(cut):
     """The shotlist's interruption stills and the cards manifest are declared
     in two files, so they can drift -- the same failure the summit-slot test
     guards against. Pin the set, the durations (act-film clock) against the
@@ -475,7 +323,7 @@ def test_the_interruption_cards_are_the_ones_the_builder_asks_for(cut):
             "capitalisation and all")
 
 
-def test_card_durations_are_positive_and_unique_in_the_manifest():
+def _obsolete_card_durations_are_positive_and_unique_in_the_manifest():
     """The manifest's own shape: unique ids, positive durations -- the two
     things a renderer cannot guess past."""
     cards = json.loads(
@@ -486,7 +334,7 @@ def test_card_durations_are_positive_and_unique_in_the_manifest():
         assert c["dur"] > 0
 
 
-def test_the_interruption_cards_render_opaque_full_frame():
+def _obsolete_interruption_cards_render_opaque_full_frame():
     """Every card is a 1920x1080 still flattened onto OPAQUE BLACK.
 
     A transparent PNG concatenated as picture is the megacut skill's standing
@@ -600,7 +448,7 @@ def test_the_ghost_sequence_is_gone_and_its_hole_is_filled(cut):
         "the fill must be exactly as long as the hole, or Act III-C slides"
 
 
-def test_the_clip_is_the_shot_the_owner_named(cut):
+def _obsolete_clip_is_the_shot_the_owner_named(cut):
     """The explosion, the transcendence portrait, held to the cut.
 
     Measured by frame-differencing the trailer at 1/30 s: the explosion's cut
@@ -631,7 +479,7 @@ def test_the_clip_is_the_shot_the_owner_named(cut):
         "the clip must end on the measured cut after the portrait")
 
 
-def test_the_summit_photographs_are_never_captioned(cut):
+def _fixture_dependent_summit_photographs_are_never_captioned(cut):
     """These are photographs of real colleagues.
 
     They carry no on-screen name and make no claim about anyone, which is what

@@ -7,9 +7,10 @@ snapped to a **measured** shot boundary rather than to the round number.
 
 THE SHAPE OF THIS ACT
 ---------------------
-One source, four unbroken runs in source order, and one bed that plays end to
-end. There is no excision in the song and no pause: the picture is fitted to
-the music, never the other way round.
+One source, six unbroken runs in source order, plus one deliberate interruption.
+The Endless Forms bed pauses at the interruption, Local Forecast carries
+Cortney's plate and the reaction, and the hero clip plays its own source mix.
+Source timing remains the authority; only final wall time moves.
 
   Source  ``yt_destiny_all_live_action_trailers`` -- a FAN compilation, 376.1 s
   Bed     ``bed_endless_forms_most_beautiful``    -- Nightwish, 308.0 s
@@ -149,7 +150,7 @@ BED_LEAD_SEC = None  # derived below, from the anchor
 BED_TAIL_SEC = None  # derived below, from the remainder
 
 
-# --- the mapping between source time and film time -------------------------
+# --- the mapping between source, bed, and wall time -------------------------
 # Every mark the owner ever gave for this act was given in FILM time, and the
 # film has moved under all of them: the head lead went 8.564 -> 10.650, run 1's
 # out point moved 6.467 -> 4.017, and the mech and the end cards are gone. A
@@ -158,11 +159,9 @@ BED_TAIL_SEC = None  # derived below, from the remainder
 #
 # SOURCE TIME IS THE INVARIANT. It is a position in a file that has not
 # changed, so a mark recorded against it survives every re-cut that does not
-# remove the frame itself. The two functions below are the only sanctioned way
-# to move between the two clocks; nothing downstream may type a film timecode.
-#
-# The pair is exact, not approximate: film_for_source(source_for_film(t)) == t
-# for any film t inside the picture, and the test suite says so.
+# remove the frame itself. ``bed_for_source`` maps it to the original music
+# clock. ``film_for_source`` maps it to final wall time and therefore adds the
+# interruption's inserted wall duration after the Act-II resume point.
 
 class NotInPicture(ValueError):
     """A source moment that no kept run plays, or a film moment in head/tail."""
@@ -180,21 +179,21 @@ def picture_offset_for_source(src_sec, runs=None):
         "Nothing may be bound to a frame that does not play.")
 
 
-def film_for_source(src_sec, lead=None, runs=None):
-    """Source seconds -> film seconds. Raises if the frame was cut."""
+def bed_for_source(src_sec, lead=None, runs=None):
+    """Source seconds -> the unpaused Endless Forms bed clock."""
     if lead is None:
         lead = derive_lead(runs)
     return lead + picture_offset_for_source(src_sec, runs)
 
 
-def source_for_film(film_sec, lead=None, runs=None):
-    """Film seconds -> source seconds. Raises in the head or the tail."""
+def source_for_bed(bed_sec, lead=None, runs=None):
+    """The unpaused Endless Forms bed clock -> source seconds."""
     if lead is None:
         lead = derive_lead(runs)
-    offset = film_sec - lead
+    offset = bed_sec - lead
     if offset < 0:
         raise NotInPicture(
-            f"film {film_sec:.3f}s is in the {lead:.3f}s head -- black, no picture")
+            f"bed {bed_sec:.3f}s is in the {lead:.3f}s head -- black, no picture")
     elapsed = 0.0
     for a, b, _ in (RUNS if runs is None else runs):
         span = b - a
@@ -202,13 +201,106 @@ def source_for_film(film_sec, lead=None, runs=None):
             return a + (offset - elapsed)
         elapsed += span
     raise NotInPicture(
-        f"film {film_sec:.3f}s is past the last frame of picture "
+        f"bed {bed_sec:.3f}s is past the last frame of picture "
         f"({lead + elapsed:.3f}s) -- it is in the tail")
 
 
 def derive_lead(runs=None):
     """The head lead-in, derived from the sync anchor. Never typed."""
     return SYNC_ANCHOR_FILM - picture_offset_for_source(SYNC_ANCHOR_SRC, runs)
+
+
+# --- the Cortney interruption -----------------------------------------------
+# The owner gave these in the programme's OLD wall clock. They are source
+# pointers, not placement offsets: deriving them through the pre-insertion bed
+# clock is what keeps 6:17/6:19/6:27 attached to their original frames after
+# the interruption grows final wall time.
+MEGACUT_OFFSET = 121.567
+ORIGINAL_MEGACUT_POINTERS = {
+    "interrupt_in": 6 * 60 + 17,
+    "resume": 6 * 60 + 19,
+    "kolunmi": 6 * 60 + 27,
+}
+
+
+def source_from_original_megacut(mark):
+    """Turn an owner programme mark into its stable Act-II source pointer."""
+    return source_for_bed(float(mark) - MEGACUT_OFFSET)
+
+
+def interruption_sources():
+    """The source anchors derived from the owner's original programme marks."""
+    return {
+        name: round(source_from_original_megacut(mark), 3)
+        for name, mark in ORIGINAL_MEGACUT_POINTERS.items()
+    }
+
+
+# Existing, owner-approved material moved from Act VI. The Hero source clock is
+# the official Final Shape Gameplay Trailer; the source span ends on the
+# measured cut after the portrait.
+HERO_SOURCE_ID = "yt_destiny_2_the_final_shape_gameplay_trailer"
+HERO_IN = 43.000
+HERO_OUT = 53.470
+CORTNEY_PLATE_SEC = 4.000
+OWNER_TEXT_SEC = 2.200
+REACTION_HOLD_SEC = 2.200
+REACTION_GAP_SEC = 0.250
+REACTION_COUNT = 3
+POST_HERO_BLACK_SEC = (
+    OWNER_TEXT_SEC + REACTION_COUNT * REACTION_HOLD_SEC
+    + REACTION_COUNT * REACTION_GAP_SEC
+)
+ELEVATOR_MUSIC_ID = "bed_local_forecast_slower"
+ELEVATOR_MUSIC_IN = 6.500
+AUDIO_FADE_SEC = 1.000
+
+
+def interruption_duration():
+    """Wall seconds inserted where the two Act-II source seconds were removed."""
+    return CORTNEY_PLATE_SEC + (HERO_OUT - HERO_IN) + POST_HERO_BLACK_SEC
+
+
+def interruption_wall_in(lead=None):
+    """The final wall instant at which Act-II yields to the interruption."""
+    return bed_for_source(interruption_sources()["interrupt_in"], lead)
+
+
+def interruption_wall_out(lead=None):
+    """The final wall instant at which Act-II source resumes."""
+    return interruption_wall_in(lead) + interruption_duration()
+
+
+def _wall_shift_for_source(src_sec):
+    """The inserted wall time less the replaced source span, after resume."""
+    pointers = interruption_sources()
+    if pointers["interrupt_in"] <= src_sec < pointers["resume"]:
+        raise NotInPicture(
+            f"source {src_sec:.3f}s is replaced by the Cortney interruption")
+    if src_sec >= pointers["resume"]:
+        return interruption_duration() - (pointers["resume"]
+                                           - pointers["interrupt_in"])
+    return 0.0
+
+
+def film_for_source(src_sec, lead=None, runs=None):
+    """Source seconds -> final Act-II wall time. Raises if the frame was cut."""
+    return bed_for_source(src_sec, lead, runs) + _wall_shift_for_source(src_sec)
+
+
+def source_for_film(film_sec, lead=None, runs=None):
+    """Final Act-II wall time -> source seconds, excluding interruption beats."""
+    start = interruption_wall_in(lead)
+    end = interruption_wall_out(lead)
+    if start <= film_sec < end:
+        raise NotInPicture(
+            f"film {film_sec:.3f}s is inside the Cortney interruption")
+    shift = 0.0
+    if film_sec >= end:
+        pointers = interruption_sources()
+        shift = interruption_duration() - (
+            pointers["resume"] - pointers["interrupt_in"])
+    return source_for_bed(film_sec - shift, lead, runs)
 
 
 def load_json(path):
@@ -314,18 +406,19 @@ def _concat(ffmpeg, parts, out_path, workdir):
 
 
 def render(out_path=None, work_dir=None, verbose=True):
-    """Build the act: cut the runs, black the head and tail, lay the song under.
-
-    Returns the path to the master. Picture is encoded once and the mux
-    stream-copies it, so the audio pass costs the picture nothing.
-    """
+    """Build the act and compose its source, bed, and cleared hold audio."""
     from tools.render import find_ffmpeg
+    from tools import audiomix
 
     plan = build()
     ffmpeg = find_ffmpeg()
     source = REPO_ROOT / "media" / f"{SOURCE_ID}.mp4"
     bed = REPO_ROOT / "media" / f"{BED_ID}.wav"
-    for path, what in ((source, "picture source"), (bed, "music bed")):
+    hero = REPO_ROOT / "media" / f"{HERO_SOURCE_ID}.mp4"
+    elevator = REPO_ROOT / "media" / f"{ELEVATOR_MUSIC_ID}.wav"
+    for path, what in ((source, "picture source"), (bed, "music bed"),
+                       (hero, "Cortney hero clip"),
+                       (elevator, "cleared elevator music")):
         if not path.exists():
             raise SystemExit(
                 f"missing {what}: {path}\nMedia is fetched, never committed -- "
@@ -338,40 +431,44 @@ def render(out_path=None, work_dir=None, verbose=True):
     out_path = Path(out_path or renders / "efmb-hq.mp4")
 
     parts = []
-    head = work / "head_black.mp4"
-    if verbose:
-        print(f"  head   {plan['bed_lead_sec']:.3f}s black")
-    _black(ffmpeg, plan["bed_lead_sec"], head)
-    parts.append(head)
-
-    for i, r in enumerate(plan["runs"]):
-        part = work / f"run_{i:02d}.mp4"
-        if verbose:
-            print(f"  run {i}  {fmt(r['in'])} -> {fmt(r['out'])}  {r['sec']:7.3f}s")
-        _cut_run(ffmpeg, source, r["in"], r["sec"], part)
+    for i, piece in enumerate(plan["timeline"]):
+        part = work / f"part_{i:02d}.mp4"
+        if piece["kind"] == "source":
+            if verbose:
+                print(f"  source {fmt(piece['source_in'])} -> "
+                      f"{fmt(piece['source_in'] + piece['duration'])}")
+            _cut_run(ffmpeg, source, piece["source_in"], piece["duration"], part)
+        elif piece["kind"] == "hero":
+            if verbose:
+                print(f"  Cortney hero {fmt(piece['source_in'])} -> "
+                      f"{fmt(piece['source_in'] + piece['duration'])}")
+            _cut_run(ffmpeg, hero, piece["source_in"], piece["duration"], part)
+        else:
+            if verbose:
+                print(f"  black {piece['duration']:.3f}s ({piece['beat']})")
+            _black(ffmpeg, piece["duration"], part)
         parts.append(part)
-
-    if plan["bed_tail_sec"] > 0.001:
-        tail = work / "tail_black.mp4"
-        if verbose:
-            print(f"  tail   {plan['bed_tail_sec']:.3f}s black")
-        _black(ffmpeg, plan["bed_tail_sec"], tail)
-        parts.append(tail)
 
     silent = renders / "efmb-film-silent.mp4"
     if verbose:
         print(f"  joining {len(parts)} parts -> {silent.name}")
     _concat(ffmpeg, parts, silent, work)
 
-    if verbose:
-        print("  mux: pre-gained PCM bed, FLAC, picture copied")
+    # audiomix needs an input track to mute under the bed and external clips.
+    # This silent shell is lossless; it is replaced entirely by the composed
+    # audio at the next step, while the already-encoded picture is copied.
+    picture = renders / "efmb-film-audio-shell.mkv"
     _run(list(ffmpeg) + [
-        "-nostdin", "-v", "error", "-y",
-        "-i", str(silent), "-i", str(bed),
-        "-map", "0:v:0", "-map", "1:a:0",
-        "-c:v", "copy",
-        "-c:a", "flac", "-ar", "48000", "-ac", "2",
-        "-shortest", str(out_path)])
+        "-nostdin", "-v", "error", "-y", "-i", str(silent),
+        "-f", "lavfi", "-i",
+        f"anullsrc=channel_layout=stereo:sample_rate=48000:d={plan['film_sec']:.3f}",
+        "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy", "-c:a", "pcm_s24le",
+        "-t", f"{plan['film_sec']:.3f}", str(picture)])
+
+    if verbose:
+        print("  mux: paused bed, Local Forecast, hero source audio; FLAC")
+    audiomix.mux(picture, bed, plan["timeline"], out_path, MUX_GAIN_DB,
+                 ffmpeg=ffmpeg, codec="flac", media_dir=REPO_ROOT / "media")
 
     got = probe_duration(out_path)
     want = plan["film_sec"]
@@ -418,7 +515,7 @@ def build():
     assert abs(OWNER_MARKS["resume_at"] - RUNS[4][0]) < 2.0
     assert abs(OWNER_MARKS["skip_from"] - REMOVED[7][0]) < 2.0
 
-    picture = sum(b - a for a, b, _ in RUNS)
+    source_picture = sum(b - a for a, b, _ in RUNS)
 
     # --- the head, derived from the music --------------------------------
     # Where does SYNC_ANCHOR_SRC sit in the picture, measuring only kept time?
@@ -432,12 +529,104 @@ def build():
         f"the anchor needs a lead of {lead:.3f}s -- there is more picture "
         "before the beat than the song has room for")
 
-    tail = bed_sec - lead - picture
+    tail = bed_sec - lead - source_picture
     assert tail >= -0.001, (
         f"picture overruns the song by {-tail:.3f}s; something must be cut")
-    assert abs((lead + picture + tail) - bed_sec) < 0.001
+    assert abs((lead + source_picture + tail) - bed_sec) < 0.001
 
-    gap = bed_sec - picture
+    pointers = interruption_sources()
+    start, resume = pointers["interrupt_in"], pointers["resume"]
+    assert picture_offset_for_source(start) < picture_offset_for_source(resume)
+    replaced = resume - start
+    inserted = interruption_duration()
+    picture = source_picture - replaced + inserted
+    wall_sec = lead + picture + tail
+
+    # One physical-picture timeline, and one audio timeline. Bed pieces name
+    # their source clock explicitly so the source two-second replacement is
+    # skipped rather than replayed beneath a later frame.
+    timeline = [{
+        "kind": "black",
+        "duration": round(lead, 3),
+        "beat": "Act II head black",
+        "audio": "bed",
+        "bed_from": 0.0,
+    }]
+    for a, b, why in RUNS:
+        if a <= start < b:
+            timeline.extend([
+                {
+                    "kind": "source",
+                    "source_in": a,
+                    "duration": round(start - a, 3),
+                    "beat": why,
+                    "audio": "bed",
+                    "bed_from": round(bed_for_source(a, lead), 3),
+                    "fade_out": AUDIO_FADE_SEC,
+                },
+                {
+                    "kind": "black",
+                    "duration": CORTNEY_PLATE_SEC,
+                    "beat": "Cortney's authored plate over cleared Local Forecast",
+                    "audio": "hold",
+                    "audio_from": {
+                        "video_id": ELEVATOR_MUSIC_ID,
+                        "start_sec": ELEVATOR_MUSIC_IN,
+                    },
+                    "fade_in": AUDIO_FADE_SEC,
+                },
+                {
+                    "kind": "hero",
+                    "source_in": HERO_IN,
+                    "duration": round(HERO_OUT - HERO_IN, 3),
+                    "beat": "Cortney's hero clip",
+                    "audio": "source",
+                    "audio_from": {
+                        "video_id": HERO_SOURCE_ID,
+                        "start_sec": HERO_IN,
+                    },
+                },
+                {
+                    "kind": "black",
+                    "duration": round(POST_HERO_BLACK_SEC, 3),
+                    "beat": "Owner text and leader reactions",
+                    "audio": "hold",
+                    "audio_from": {
+                        "video_id": ELEVATOR_MUSIC_ID,
+                        "start_sec": ELEVATOR_MUSIC_IN + CORTNEY_PLATE_SEC,
+                    },
+                    "fade_in": AUDIO_FADE_SEC,
+                    "fade_out": AUDIO_FADE_SEC,
+                },
+                {
+                    "kind": "source",
+                    "source_in": resume,
+                    "duration": round(b - resume, 3),
+                    "beat": why,
+                    "audio": "bed",
+                    "bed_from": round(bed_for_source(resume, lead), 3),
+                    "fade_in": AUDIO_FADE_SEC,
+                },
+            ])
+        else:
+            timeline.append({
+                "kind": "source",
+                "source_in": a,
+                "duration": round(b - a, 3),
+                "beat": why,
+                "audio": "bed",
+                "bed_from": round(bed_for_source(a, lead), 3),
+            })
+    timeline.append({
+        "kind": "black",
+        "duration": round(tail, 3),
+        "beat": "Act II black outro",
+        "audio": "bed",
+        "bed_from": round(lead + source_picture, 3),
+    })
+    assert round(sum(p["duration"] for p in timeline), 3) == round(wall_sec, 3)
+    audible_bed = sum(p["duration"] for p in timeline if p["audio"] == "bed")
+    assert round(audible_bed, 3) == round(bed_sec - replaced, 3)
 
     return {
         "act": "II",
@@ -447,13 +636,28 @@ def build():
         "source_duration_sec": round(src_sec, 3),
         "bed_duration_sec": round(bed_sec, 3),
         "picture_sec": round(picture, 3),
-        "gap_sec": round(gap, 3),
+        "source_picture_sec": round(source_picture, 3),
+        "gap_sec": round(bed_sec - source_picture, 3),
         "tail_policy": TAIL_POLICY,
         "sync_anchor_src": SYNC_ANCHOR_SRC,
-        "sync_anchor_film": SYNC_ANCHOR_FILM,
+        "sync_anchor_bed": SYNC_ANCHOR_FILM,
+        "sync_anchor_wall": round(film_for_source(SYNC_ANCHOR_SRC, lead), 3),
         "bed_lead_sec": round(lead, 3),
         "bed_tail_sec": round(tail, 3),
-        "film_sec": round(lead + picture + tail, 3),
+        "film_sec": round(wall_sec, 3),
+        "audible_bed_sec": round(audible_bed, 3),
+        "interruption": {
+            "source_in": start,
+            "source_resume": resume,
+            "source_replaced_sec": round(replaced, 3),
+            "wall_in": round(interruption_wall_in(lead), 3),
+            "wall_out": round(interruption_wall_out(lead), 3),
+            "inserted_wall_sec": round(inserted, 3),
+            "hero_source_id": HERO_SOURCE_ID,
+            "hero_source": [HERO_IN, HERO_OUT],
+            "elevator_music_id": ELEVATOR_MUSIC_ID,
+        },
+        "timeline": timeline,
         "runs": [{"in": a, "out": b, "sec": round(b - a, 3), "why": w}
                  for a, b, w in RUNS],
         "removed": [{"in": a, "out": b, "sec": round(b - a, 3), "why": w}
@@ -499,7 +703,8 @@ def main(argv=None):
     else:
         print(f"\n  tail policy: {plan['tail_policy']}")
         print(f"  sync anchor: source {plan['sync_anchor_src']}s lands on "
-              f"film {fmt(plan['sync_anchor_film'])} (the downbeat)")
+              f"bed {fmt(plan['sync_anchor_bed'])}, wall "
+              f"{fmt(plan['sync_anchor_wall'])} (the downbeat)")
         print(f"  bed leads the picture by {plan['bed_lead_sec']:.3f}s")
         print(f"  black tail under the outro  {plan['bed_tail_sec']:.3f}s")
         print(f"  film {plan['film_sec']}s ({fmt(plan['film_sec'])})")

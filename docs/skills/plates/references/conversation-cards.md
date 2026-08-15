@@ -14,11 +14,14 @@ GUARDIAN BOND card and the `banner` letterbox callout —
 `miniboss` bar is the only card here that may carry copy nobody's identity was
 authored for, because **it names a villain, not a person**.
 
-The `banner` is the persistent strip, not a credit: one tracked line on the
-bottom bar of a letterboxed frame (`position: "letterbox"`), below the
-picture entirely, so it can hold for a whole film without sharing the lower
-third's row. Its `text` is owner-authored copy, reproduced verbatim and never
-uppercased — the same rule the chat pill's message follows.
+The `banner` is the persistent top treatment, not a credit:
+`position: "banner-top"` holds it above the picture's action while chat stays
+in the lower treatment lane. Use `segments[]` for an owner-authored phrase;
+the renderer paints each segment separately and supplies glowing Bluefin `|`
+separators. The separators are chrome, not owner prose. A legacy single
+`text` remains readable, but new banners use segments. Segment text is
+reproduced verbatim and never uppercased — the same rule the chat pill's
+message follows.
 
 ## Showing a conversation
 

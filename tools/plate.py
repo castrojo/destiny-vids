@@ -276,6 +276,8 @@ BANNER_FS_MAX = 2.6 * REM    # "huge" -- bounded by the bar's ~140px
 BANNER_FS_MIN = 1.2 * REM    # below this it is not a callout; render whole anyway
 BANNER_LS = 0.18             # letter-spacing, em
 BANNER_MAX_W = 0.94          # of the frame's width
+BANNER_SEGMENT_GAP = 0.45    # whitespace either side of a rendered separator
+BANNER_TOP_INSET = 0.03      # of the active picture height
 
 # --- chat card (wolves-*/render/plate.html -- the baked dialogue pill) -------
 # The other videos' talking card is neither the reveal plate nor the site's
@@ -1160,33 +1162,67 @@ def _render_status(spec, glitch=False):
 
 
 def _render_banner(spec):
-    """The letterbox callout: one tracked line, sized to the frame's width.
+    """The top callout: owner segments divided by glowing Bluefin rules.
 
     NOT uppercased, for the same reason the chat pill's message is not: the
     string is owner-authored copy (`copy_source: owner_supplied`) and shouting
     the mixed-case part ("Support Open Gaming Collective") would put an
-    emphasis on it nobody wrote. Shrink-to-fit like the chat pill: one wide
-    line, never a wrap, and at the floor it renders whole rather than clip.
+    emphasis on it nobody wrote. A legacy `text` string is one segment; new
+    copy uses `segments` so the words and each Bluefin `|` are rendered as
+    separate elements instead of pretending punctuation is authored prose.
     """
-    text = spec.get("text") or ""
+    segments = spec.get("segments")
+    if segments is None:
+        segments = [spec.get("text") or ""]
+    if not segments or not all(isinstance(text, str) and text for text in segments):
+        raise ValueError("a banner needs one or more non-empty text segments")
     probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
     max_w = FRAME_W * BANNER_MAX_W
 
     size = BANNER_FS_MAX
     f_text = _font("bold", int(size))
-    while (int(size) > int(BANNER_FS_MIN)
-           and _tracked_width(probe, text, f_text, BANNER_LS) > max_w):
+    def width(font):
+        words = sum(_tracked_width(probe, text, font, BANNER_LS)
+                    for text in segments)
+        separators = max(0, len(segments) - 1)
+        separator_w = _tracked_width(probe, "|", font, BANNER_LS)
+        return words + separators * separator_w + (
+            separators * 2 * BANNER_SEGMENT_GAP * font.size)
+
+    while int(size) > int(BANNER_FS_MIN) and width(f_text) > max_w:
         size -= 1
         f_text = _font("bold", int(size))
 
-    w = int(math.ceil(_tracked_width(probe, text, f_text, BANNER_LS))) + 4
+    w = int(math.ceil(width(f_text))) + 4
     a, d = f_text.getmetrics()
     img = Image.new("RGBA", (w, int((a + d) * 1.3)), (0, 0, 0, 0))
-    layer = _gradient_text((w, int(f_text.size * 1.4)), text, f_text,
-                           [(0.0, (255, 255, 255, 255)),
-                            (0.6, NAME_MID), (1.0, NAME_BOTTOM)],
-                           tracking_em=BANNER_LS)
-    img.alpha_composite(_with_text_shadow(layer), (0, 0))
+    x = 0
+    for index, text in enumerate(segments):
+        text_w = int(math.ceil(_tracked_width(probe, text, f_text, BANNER_LS)))
+        layer = _gradient_text((text_w + 4, int(f_text.size * 1.4)), text,
+                               f_text,
+                               [(0.0, (255, 255, 255, 255)),
+                                (0.6, NAME_MID), (1.0, NAME_BOTTOM)],
+                               tracking_em=BANNER_LS)
+        img.alpha_composite(_with_text_shadow(layer), (int(x), 0))
+        x += text_w
+        if index == len(segments) - 1:
+            continue
+        x += BANNER_SEGMENT_GAP * f_text.size
+        separator = Image.new("RGBA", (int(f_text.size * 1.4),
+                                        int(f_text.size * 1.4)), (0, 0, 0, 0))
+        separator_draw = ImageDraw.Draw(separator)
+        _draw_tracked(separator_draw, (0, 0), "|", f_text, STATUS_ACCENT,
+                      BANNER_LS)
+        glow_alpha = separator.getchannel("A").filter(
+            ImageFilter.GaussianBlur(radius=max(1, f_text.size // 8))
+        ).point(lambda alpha: int(alpha * 0.72))
+        glow = Image.new("RGBA", separator.size, (*STATUS_ACCENT[:3], 0))
+        glow.putalpha(glow_alpha)
+        img.alpha_composite(glow, (int(x), 0))
+        img.alpha_composite(_with_text_shadow(separator), (int(x), 0))
+        x += _tracked_width(probe, "|", f_text, BANNER_LS)
+        x += BANNER_SEGMENT_GAP * f_text.size
     return img
 
 
@@ -1827,6 +1863,13 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
         else:
             y = FRAME_H - plate.height - int(0.02 * FRAME_H)
         frame.alpha_composite(plate, (x, y))
+        return frame
+    if position == "banner-top":
+        # The programme's callout lane. It stays above the picture's action;
+        # chat remains a lower-third treatment and never shares this lane.
+        frame.alpha_composite(
+            plate, (px + (pw - plate.width) // 2,
+                    py + int(ph * BANNER_TOP_INSET)))
         return frame
     if position == "boss":
         # Destiny puts a named enemy's bar at the top of frame, centred.

@@ -18,7 +18,7 @@ import build_efmb  # noqa: E402
 import build_efmb_plates  # noqa: E402
 
 
-# --- the two clocks --------------------------------------------------------
+# --- the source, bed, and wall clocks -------------------------------------
 
 def test_source_and_film_time_round_trip():
     """The two clocks are exact inverses, not approximations.
@@ -65,10 +65,60 @@ def test_the_head_is_derived_from_the_music_and_never_typed():
     """The lead-in is whatever puts the shield on the downbeat."""
     plan = build_efmb.build()
     assert build_efmb.BED_LEAD_SEC is None, "the head must not be a typed constant"
-    anchor_film = build_efmb.film_for_source(build_efmb.SYNC_ANCHOR_SRC)
-    assert anchor_film == pytest.approx(build_efmb.SYNC_ANCHOR_FILM, abs=1e-6)
-    assert (plan["bed_lead_sec"] + plan["picture_sec"] + plan["bed_tail_sec"]
+    anchor_bed = build_efmb.bed_for_source(build_efmb.SYNC_ANCHOR_SRC)
+    assert anchor_bed == pytest.approx(build_efmb.SYNC_ANCHOR_FILM, abs=1e-6)
+    assert (plan["bed_lead_sec"] + plan["source_picture_sec"]
+            + plan["bed_tail_sec"]
             == pytest.approx(plan["bed_duration_sec"], abs=0.001))
+
+
+def test_cortney_interruption_is_source_derived_and_moves_later_wall_time():
+    """06:17/06:19/06:27 are pre-insertion programme pointers, never outputs.
+
+    The two seconds of Act-II source are replaced by a longer block. Its source
+    anchors therefore stay put while every later *wall* timestamp moves.
+    """
+    sources = build_efmb.interruption_sources()
+    assert build_efmb.MEGACUT_OFFSET == build_efmb_plates.MEGACUT_OFFSET
+    assert sources == {
+        "interrupt_in": pytest.approx(323.933, abs=1e-3),
+        "resume": pytest.approx(325.933, abs=1e-3),
+        "kolunmi": pytest.approx(333.933, abs=1e-3),
+    }
+    for name, mark in build_efmb.ORIGINAL_MEGACUT_POINTERS.items():
+        assert sources[name] == pytest.approx(
+            build_efmb.source_for_bed(mark - build_efmb.MEGACUT_OFFSET),
+            abs=1e-6)
+
+    plan = build_efmb.build()
+    moved = build_efmb.film_for_source(sources["kolunmi"])
+    original = build_efmb.bed_for_source(sources["kolunmi"])
+    assert moved - original == pytest.approx(
+        plan["interruption"]["inserted_wall_sec"]
+        - plan["interruption"]["source_replaced_sec"], abs=1e-6)
+    assert moved + build_efmb.MEGACUT_OFFSET > 6 * 60 + 27
+
+
+def test_interruption_pauses_the_bed_for_cleared_and_source_audio():
+    """The bed fades out, then resumes at the source-derived resume point."""
+    plan = build_efmb.build()
+    timeline = plan["timeline"]
+    pause = [p for p in timeline if p["audio"] != "bed"]
+    assert [p["audio"] for p in pause] == ["hold", "source", "hold"]
+    assert pause[0]["audio_from"]["video_id"] == build_efmb.ELEVATOR_MUSIC_ID
+    assert pause[1]["audio_from"] == {
+        "video_id": build_efmb.HERO_SOURCE_ID, "start_sec": build_efmb.HERO_IN}
+    assert pause[2]["audio_from"]["start_sec"] == pytest.approx(
+        build_efmb.ELEVATOR_MUSIC_IN + build_efmb.CORTNEY_PLATE_SEC)
+    before, after = (
+        next(p for p in timeline if p.get("fade_out")
+             and p["audio"] == "bed"),
+        next(p for p in timeline if p.get("fade_in")
+             and p["audio"] == "bed"),
+    )
+    assert before["fade_out"] == after["fade_in"] == build_efmb.AUDIO_FADE_SEC
+    assert after["bed_from"] == pytest.approx(
+        build_efmb.bed_for_source(plan["interruption"]["source_resume"]))
 
 
 # --- the plate manifest ----------------------------------------------------
@@ -117,8 +167,8 @@ def test_no_plate_is_laid_over_bungies_burned_in_title():
     picture the act keeps, so the plates clear it instead -- laying our credit
     over the publisher's is the one thing that would look deliberate.
 
-    The zone guards the PICTURE. The letterbox banner lives on the bottom bar,
-    below the picture entirely, so it never touches the burned-in title and is
+    The zone guards the PICTURE.     The top banner is a separate treatment lane, so it never touches the
+    burned-in title and is
     exempt by position -- this is a time-overlap check and cannot see that.
     """
     lead = build_efmb.derive_lead()
@@ -126,7 +176,7 @@ def test_no_plate_is_laid_over_bungies_burned_in_title():
         zone = (build_efmb.film_for_source(src_in, lead),
                 build_efmb.film_for_source(src_out - 0.001, lead))
         for plate in committed()["plates"]:
-            if plate.get("position") == "letterbox":
+            if plate.get("position") in ("letterbox", "banner-top"):
                 continue
             start, end = plate["at"], plate["at"] + plate["dur"]
             # Touching is not overlapping. The chapter card is clamped to end
@@ -523,7 +573,7 @@ def test_every_dialogue_pill_in_the_walk_carries_its_speaker_s_pfp():
 
 def toc_plates():
     return {p["id"]: p for p in committed()["plates"]
-            if p["id"].startswith(("toc_", "timed_", "quote_", "letterbox_"))}
+            if p["id"].startswith(("toc_", "timed_", "quote_", "top_banner"))}
 
 
 def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
@@ -588,10 +638,12 @@ def test_the_toc_copy_is_reproduced_verbatim():
 
 
 def test_the_timed_cues_land_on_the_owners_marks():
-    """All ACT II FILM time, anchored to source so a cut that moves raises."""
+    """Original ACT-II marks are anchored to source before final wall shifts."""
     toc = toc_plates()
     assert toc["timed_krook"]["at"] == pytest.approx(250.0, abs=1e-3)
-    assert toc["timed_jorge"]["at"] == pytest.approx(291.0, abs=1e-3)
+    jorge_src = build_efmb.source_for_bed(291.0)
+    assert toc["timed_jorge"]["at"] == pytest.approx(
+        build_efmb.film_for_source(jorge_src), abs=1e-3)
     assert toc["timed_krook"]["text"] == (
         "Generational talent detected, call in the best")
     # The 4:01 Cayde speech bubble is the owner's call, and stays unscheduled.
@@ -613,26 +665,16 @@ def test_the_closing_quotes_end_on_the_final_second():
         committed()["_film_sec"], abs=0.01)
 
 
-def test_the_letterbox_callout_holds_for_the_rest_of_the_song():
-    """"Keep it up for the whole song": up where the brief's scene starts
-    (2:19, the montage's hand-off), down on the last frame, on the bottom bar
-    where it shares no card's row. It ducks exactly one thing -- the walk's
-    patch-queue HUD, whose card already occupies the bar's bottom-right."""
+def test_the_top_banner_holds_for_the_rest_of_the_act():
+    """The owner phrase is a top treatment, not bottom-bar chat chrome."""
     toc = toc_plates()
-    banners = [toc["letterbox_banner_1"], toc["letterbox_banner_2"]]
-    assert all(b["kind"] == "banner" and b["position"] == "letterbox"
-               for b in banners)
-    assert all(b["text"] == build_efmb_plates.LETTERBOX_BANNER
-               for b in banners)
-    assert "Support Open Gaming Collective" in banners[0]["text"]
-    # Up at the scene's start, down on the final frame...
-    assert banners[0]["at"] == build_efmb_plates.MONTAGE_OUT
-    assert banners[1]["at"] + banners[1]["dur"] == pytest.approx(
+    banner = toc["top_banner"]
+    assert banner["kind"] == "banner"
+    assert banner["position"] == "banner-top"
+    assert banner["segments"] == list(build_efmb_plates.TOP_BANNER_SEGMENTS)
+    assert banner["at"] == build_efmb_plates.MONTAGE_OUT
+    assert banner["at"] + banner["dur"] == pytest.approx(
         committed()["_film_sec"], abs=1e-3)
-    # ...and the duck is exactly the HUD's window, to the millisecond.
-    hud = next(p for p in committed()["plates"] if p["id"] == "walk_patch_queue")
-    assert banners[0]["at"] + banners[0]["dur"] == pytest.approx(hud["at"])
-    assert banners[1]["at"] == pytest.approx(hud["at"] + hud["dur"])
 
 
 def test_the_placeholder_speakers_are_recorded_never_guessed():
@@ -980,6 +1022,8 @@ def test_the_arc_hunter_before_kyle_is_credited():
     by_id = {p["id"]: p for p in manifest["plates"]}
     plate = by_id["solo_kolunmi"]
     assert plate["shot_src"] == [333.400, 335.267]
+    assert plate["at"] == pytest.approx(build_efmb.film_for_source(
+        build_efmb_plates.source_from_original_megacut(6 * 60 + 27)), abs=1e-3)
     assert plate["name"] == "kolunmi"
     assert plate["class"] == "Arc Hunter"
     assert "label" not in plate and "title" not in plate, \
@@ -989,5 +1033,35 @@ def test_the_arc_hunter_before_kyle_is_credited():
     # He plays BEFORE Kyle, and neither card sits on the other.
     kyle = by_id["solo_KyleGospo"]
     assert plate["at"] + plate["dur"] <= kyle["at"] + 1e-6
-    # Kyle's own anchor is untouched -- it is the act's sync anchor.
-    assert kyle["at"] == pytest.approx(269.700, abs=1e-3)
+    # Kyle's own bed anchor is untouched; its final wall time follows Cortney.
+    assert kyle["at"] == pytest.approx(
+        build_efmb.film_for_source(build_efmb.SYNC_ANCHOR_SRC), abs=1e-3)
+
+
+def test_cortney_moves_from_act_vi_to_act_iis_source_timeline():
+    """Her existing approved identity and only owner-supplied reaction words ship."""
+    manifest = build_efmb_plates.build()
+    by_id = {p["id"]: p for p in manifest["plates"]}
+    interruption = build_efmb.build()["interruption"]
+
+    cortney = by_id["interruption_cortney"]
+    hero = json.loads((REPO_ROOT / "stories" / "megacut" /
+                       "megacut-hero-plates.json").read_text())
+    authored = next(p for p in hero["plates"] if p["id"] == "cortney")
+    assert cortney["source_pointer"] == interruption["source_in"]
+    for field in ("position", "label", "name", "title"):
+        assert cortney[field] == authored[field]
+    assert "class" not in cortney
+
+    ready = by_id["interruption_ready"]
+    assert ready["title"] == "Well ... are they ready?"
+    reactions = [by_id[f"interruption_reaction_{i}"] for i in range(1, 4)]
+    assert {p["text"] for p in reactions} <= {"Hell yeah!", "YYES!"}
+    assert [p["at"] for p in reactions] == sorted(p["at"] for p in reactions)
+    assert all(p["at"] >= ready["at"] + ready["dur"] for p in reactions)
+    # The speakers are copied from existing leader/gold cards, not guessed
+    # from their GitHub accounts or supplied a personal name by the agent.
+    assert {p["speaker"] for p in reactions} <= {
+        by_id["trio_joseph_sandoval"]["name"],
+        by_id["trio_mara_sov"]["name"],
+    }

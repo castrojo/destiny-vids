@@ -29,8 +29,11 @@
     "scripts/build_efmb.py",
     "scripts/build_efmb_plates.py",
     "scripts/efmb_beats.py",
+    "tools/audiomix.py",
     "stories/02-endless-forms-plates.json",
+    "stories/megacut/megacut-hero-plates.json",
     "music/bed_endless_forms_most_beautiful.json",
+    "music/bed_local_forecast_slower.json",
     "dialogue/yt_destiny_all_live_action_trailers",
     "vocab/casting.yaml"
    ],
@@ -70,17 +73,14 @@
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v4.mp4",
-   "note": "the #104 interruption build with its **hold music now playing** (443.533 s): Local Forecast – Slower, CC BY 4.0, credited in the repo's `ATTRIBUTIONS.md`. The slot shipped silent in v2 because a cleared track was mistaken for a rights block. **AAC, the one act with no lossless master** (#58)",
+   "note": "continuous seven-days bed build (423.993 s); the Cortney interruption belongs to Act II. **AAC, the one act with no lossless master** (#58)",
    "sources": [
     "scripts/build_wolves.py",
     "scripts/rebuild-wolves.sh",
-    "scripts/build_interruption_cards.py",
     "scripts/build_summit_plates.py",
     "stories/seven-days-timing-pass.json",
     "stories/06-wolves-cayde-plates.json",
-    "stories/06-wolves-interruption-cards.json",
     "music/bed_seven_days_to_the_wolves.json",
-    "music/bed_local_forecast_slower.json",
     "vocab/casting.yaml"
    ],
    "source_digest": "d6b1ad8842f3e430bcee65583f4374b30cc03a2b783decdac0c120a3168ef646"
@@ -117,7 +117,7 @@
    "0": "NOT a rights call to make casually: the prologue's picture is Nightwish's own music video, and a social copy is a REDISTRIBUTION of it. The owner's instruction for this act is that the shipping form embeds the video rather than re-hosting it, so a standalone clip is exactly the thing that must not be cut. No social copy, by design and on purpose.",
    "II": "308.0 s leaves ~16 kbps of video budget under the 10 MiB cap -- it would look like mud. Recorded in 10mb/README.md; the fix is a shorter excerpt, which is an editorial decision for the owner.",
    "III": "160.2 s leaves ~268 kbps of video budget -- mud. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
-   "VI": "443.5 s: the 256k audio ALONE overruns the 10 MiB cap, so no copy can be encoded at all. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
+   "VI": "424.0 s: the 256k audio ALONE overruns the 10 MiB cap, so no copy can be encoded at all. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
    "VIII": "227.2 s: at the policy's 256k audio the sound alone is 7.3 MiB of the 10 MiB cap, leaving ~102 kbps of video -- and the encode came out 0.16 MiB OVER anyway. Act III was already judged mud at 268 kbps and this is a longer act, so the same call applies. Recorded rather than fixed by starving the bed, which is the one thing 10mb/README.md says not to do. A shorter excerpt is the owner's call, and act VIII takes one well: any single wall or the cover reveal stands alone."
   }
  },

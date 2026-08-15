@@ -24,6 +24,15 @@ python3 tools/plate.py burn --video base.mp4 --manifest plates.json \
 Detection falls back to the full frame when there is no letterbox, so passing
 it is always safe.
 
+## Treatment lanes
+
+The programme's persistent phrase banner belongs to `position: "banner-top"`.
+It uses `segments[]`; `tools/plate.py` renders the glowing Bluefin `|`
+separators between the owner-authored segments. Conversation `kind: "chat"`
+remains a lower treatment. Do not move chat into the banner or put a banner in
+the lower-third/letterbox lane: the separation is what keeps a persistent
+phrase from reading as dialogue.
+
 ## Styling provenance
 
 The plate treatment is ported from the website's `WolvesIntroOverlay.vue`, and
@@ -37,4 +46,3 @@ slide and the intro's comic title card — are still live on the site, so they a
 rendered from its own CSS by `cards/render-cards.mjs` rather than ported;
 `tools/plate.py` refuses one and names the driver. See
 [`references/full-frame-cards.md`](full-frame-cards.md).
-

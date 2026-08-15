@@ -130,6 +130,24 @@ TRIO_SCALE = 0.62
 # pair, then the row -- and for the row to stay up long enough to read, which
 # is what TRIO_HOLD after the LAST arrival buys.
 MEGACUT_OFFSET = 121.567
+
+
+def source_from_original_megacut(mark):
+    """Turn a pre-interruption programme mark into a stable Act-II source time.
+
+    The interruption changes final wall time after source 323.933. Owner
+    marks 06:17/06:19/06:27 predate it, so subtracting a later output offset
+    would silently bind cards to the wrong frame. The Act-II bed clock is the
+    original programme clock; source is the only stable placement authority.
+    """
+    return build_efmb.source_from_original_megacut(mark)
+
+
+INTERRUPTION_MARKS = {
+    "in": 6 * 60 + 17,
+    "resume": 6 * 60 + 19,
+    "kolunmi": 6 * 60 + 27,
+}
 TRIO = [
     ("joseph_sandoval", "left", 177.0),
     ("rochaporto", "center", 179.0),
@@ -319,6 +337,7 @@ SOLO = [
         # independently. 1.867 s of picture, the Guardian loosing an Arc bow.
         "key": "kolunmi",
         "src": (333.400, 335.267),
+        "at_src": source_from_original_megacut(INTERRUPTION_MARKS["kolunmi"]),
         "seen": 334.300,
         "why": "the Arc Hunter loosing a bow, one cut before Kyle's Sentinel",
     },
@@ -785,20 +804,28 @@ TIMED_JORGE_HOLD = 2.8
 # The untimed §4 cue, in the order the brief lists it: after krook.
 BEDAZZLE = {"speaker": "cncf marketing", "text": "Let's bedazzle this thing!"}
 
-# The letterbox callout. "Keep it up for the whole song": it comes up where
-# the brief's own scene starts (2:19, the montage's hand-off) and holds to
-# the last frame. It never shares the lower third's row -- it lives on the
-# bottom letterbox bar, below the picture.
-#
-# ONE DUCK, AND IT IS MEASURED, NOT AESTHETIC. The walk's patch-queue HUD is
-# bottom-right and its card dips 90px onto the bar (y 922-1030 in the shipped
-# geometry); no position on the bar clears it while it holds. So the callout
-# ducks exactly the HUD's window -- 28.4 s in a 169 s hold -- rather than
-# shrink to ticker height for the whole song to fix half a minute. The
-# alternative is the owner's to call (#98, Questions); recorded in
-# `unresolved`.
-LETTERBOX_BANNER = (
-    "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST")
+# The show callout lives in the TOP treatment lane. It is deliberately split
+# into three owner-authored segments: tools/plate.py renders the glowing
+# Bluefin `|` separators, rather than treating punctuation between authored
+# phrases as authored copy. Chat pills remain the lower treatment lane.
+TOP_BANNER_SEGMENTS = (
+    "#FIGHTFORCONTRIBUTORS",
+    "Support Open Gaming Collective",
+    "#UPSTREAMFIRST",
+)
+
+# The interruption moves the already-authored Cortney hero treatment rather
+# than recreating it. The brief's reaction words are placeholders supplied by
+# the owner; speaker identity comes only from existing gold/leader cards.
+CORTNEY_HERO_MANIFEST = (
+    REPO_ROOT / "stories" / "megacut" / "megacut-hero-plates.json"
+)
+CORTNEY_PLATE_LEAD = 0.5
+INTERRUPTION_REACTIONS = (
+    ("joseph_sandoval", "Hell yeah!"),
+    ("mara_sov", "YYES!"),
+    ("joseph_sandoval", "Hell yeah!"),
+)
 
 # The closing montage: five quotes the brief leaves untimed. Its own proposal
 # is 4:51 -> 5:07, and the preamble lands the last cue on the final second --
@@ -1067,6 +1094,16 @@ def chat_avatar(key, casting):
     if not copy.get("avatar"):
         return {}
     return localise_avatar(key, {"avatar": copy["avatar"]})
+
+
+def cortney_authored_copy():
+    """Read Cortney's approved plate, never compose a second identity."""
+    hero = json.loads(CORTNEY_HERO_MANIFEST.read_text())
+    entry = next(p for p in hero["plates"] if p["id"] == "cortney")
+    return {
+        field: entry[field]
+        for field in ("position", "label", "name", "title")
+    }
 
 
 def fetch_avatars(manifest, verbose=True):
@@ -1563,8 +1600,8 @@ def build():
     toc = []
 
     def src_of(film_sec):
-        """An owner mark is given in FILM time; anchor it in SOURCE time."""
-        return build_efmb.source_for_film(film_sec, lead)
+        """A pre-interruption film mark, anchored once in stable source time."""
+        return build_efmb.source_for_bed(film_sec, lead)
 
     def toc_chat(spec, at, hold):
         entry = {
@@ -1631,8 +1668,11 @@ def build():
     }, {
         "id": "timed_bedazzle",
         "kind": "chat",
-        "at": round(krook_at + 3.0 + PLATE_GAP, 3),
-        "dur": 2.6,
+        # Its owner mark is untimed. It is shortened to the readable minimum
+        # so the 06:17 source interruption starts on a clear frame instead of
+        # inheriting a chat from the preceding shot.
+        "at": round(krook_at + 3.2, 3),
+        "dur": MIN_HOLD,
         "position": "left",
         "copy_source": "owner_supplied",
         "speaker": BEDAZZLE["speaker"],
@@ -1682,27 +1722,68 @@ def build():
     assert abs(last_quote["at"] + last_quote["dur"] - film_sec) < 0.01, (
         "the preamble lands the last cue on the final second")
 
-    # The letterbox callout: up where the brief's scene starts, down on the
-    # last frame -- "keep it up for the whole song". Two windows: it ducks the
-    # patch-queue HUD, the one card that already owns a piece of the bar. The
-    # HUD holds from the enemies' reveal until the villain lands (see the
-    # walk's own schedule above), so those are the duck's edges.
-    for i, (b_start, b_end) in enumerate((
-            (MONTAGE_OUT, round(film_of(WALK_ENEMIES), 3)),
-            (villain_at, film_sec))):
-        toc.append({
-            "id": f"letterbox_banner_{i + 1}",
-            "kind": "banner",
-            "at": round(b_start, 3),
-            "dur": round(b_end - b_start, 3),
-            "position": "letterbox",
-            "copy_source": "owner_supplied",
-            "text": LETTERBOX_BANNER,
-            "text_source": "owner_supplied",
-        })
+    # The callout occupies the top treatment lane. It no longer ducks the
+    # bottom-right patch queue because chat and HUD chrome own lower lanes.
+    toc.append({
+        "id": "top_banner",
+        "kind": "banner",
+        "at": MONTAGE_OUT,
+        "dur": round(film_sec - MONTAGE_OUT, 3),
+        "position": "banner-top",
+        "copy_source": "owner_supplied",
+        "segments": list(TOP_BANNER_SEGMENTS),
+        "text_source": "owner_supplied",
+    })
 
     plates.extend(toc)
     plates.extend(timed)
+
+    # --- Cortney's moved interruption ------------------------------------
+    # These are final wall positions derived from source, not a copy of the
+    # old Act-VI timestamps. The source resumes after the black reaction, so
+    # every later source-bound card moves with this block automatically.
+    interruption = plan["interruption"]
+    plate_at = interruption["wall_in"] + CORTNEY_PLATE_LEAD
+    plates.append({
+        "id": "interruption_cortney",
+        "at": round(plate_at, 3),
+        "dur": round(build_efmb.CORTNEY_PLATE_SEC - CORTNEY_PLATE_LEAD, 3),
+        "copy_source": "stories/megacut/megacut-hero-plates.json",
+        "source_pointer": interruption["source_in"],
+        "why": "Cortney's existing authored plate, moved from Act VI",
+        **cortney_authored_copy(),
+    })
+
+    black_at = round(
+        interruption["wall_in"] + build_efmb.CORTNEY_PLATE_SEC
+        + (build_efmb.HERO_OUT - build_efmb.HERO_IN), 3)
+    plates.append({
+        "id": "interruption_ready",
+        "kind": "title",
+        "at": black_at,
+        "dur": build_efmb.OWNER_TEXT_SEC,
+        "position": "toast",
+        "copy_source": "owner_supplied",
+        "title": "Well ... are they ready?",
+    })
+    reaction_at = black_at + build_efmb.OWNER_TEXT_SEC + build_efmb.REACTION_GAP_SEC
+    for index, (key, text) in enumerate(INTERRUPTION_REACTIONS, start=1):
+        copy = _corrected(key, authored_copy(key, casting))
+        plates.append({
+            "id": f"interruption_reaction_{index}",
+            "kind": "chat",
+            "at": round(reaction_at, 3),
+            "dur": build_efmb.REACTION_HOLD_SEC,
+            "position": "left",
+            "copy_source": "owner_supplied",
+            "speaker": copy["name"],
+            "text": text,
+            "text_source": "owner_supplied",
+            **chat_avatar(key, casting),
+        })
+        reaction_at += build_efmb.REACTION_HOLD_SEC + build_efmb.REACTION_GAP_SEC
+    assert abs(reaction_at - build_efmb.REACTION_GAP_SEC
+               - interruption["wall_out"]) < 1e-3
 
     plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))
 
