@@ -53,7 +53,7 @@ looks identical across all five movements.
 Audio is FLAC and untouched
 ---------------------------
 Decoded to FLAC s32 and resampled to 48 kHz, and that is all: no normaliser,
-no limiter, no EQ, no gain (docs/skills/references/audio-standard.md). The
+no limiter, no EQ, no gain (docs/skills/audio/SKILL.md). The
 source is lossy Opus, so this is the best that exists rather than the best
 possible -- exactly what act I and the prologue record for the same reason.
 """

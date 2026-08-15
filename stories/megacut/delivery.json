@@ -11,7 +11,7 @@
     "cards/maintitle.html",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "78a0c0adc2a029ea551ead534ac13228e035e269c7a813ca4adb284122279503"
+   "source_digest": "45bbbbee19d7282d314d50b79cd14540ad611f85fee8ac33a903066cdbd32565"
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
@@ -34,7 +34,7 @@
     "dialogue/yt_destiny_all_live_action_trailers",
     "vocab/casting.yaml"
    ],
-   "source_digest": "ad4e86fa54afcb376ec2f350c1d81aa878e9c8bd6055045b9fe1c08fab1c664c"
+   "source_digest": "8c35ee6a6fa97fa0710ac4360b15923d26524c9a66439e6dc21eee79a6a658c5"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -83,7 +83,7 @@
     "music/bed_local_forecast_slower.json",
     "vocab/casting.yaml"
    ],
-   "source_digest": "d6b1ad8842f3e430bcee65583f4374b30cc03a2b783decdac0c120a3168ef646"
+   "source_digest": "b6f11423e64f9dd8cac4f09e266636440edc34f2ac331d94beb7695bddd5292a"
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
@@ -94,7 +94,7 @@
     "scripts/actbuild.py",
     "tools/plate.py"
    ],
-   "source_digest": "1530c6faf4b42b487a70d56cb2022b95f8309589e4b5ed72429f226819d752fd"
+   "source_digest": "2547ff19b129edc7f20ee88e79910cdc7a9a138bc3ac96682375cd9baf6763cd"
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",

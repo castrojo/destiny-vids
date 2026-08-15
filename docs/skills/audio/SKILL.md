@@ -45,20 +45,18 @@ cd ~/Videos
 
 ## The state of the show
 
-Listed in the canonical act order, which
-[`docs/running-order.md`](../../running-order.md) owns.
+Do not read it from a table here — every column has a machine record, and a
+pasted copy is wrong the next time an act is rebuilt:
 
-| Act | Cut | Bed source | In `Prod/` | True peak | Lossless master |
-|---|---|---|---|---|---|
-| 0 | Prologue | Nightwish *Perfume Of The Timeless* `oHCaZmIzr0o` | FLAC stereo | −1.1 dBTP | `destiny-vids/renders/00-prologue.mp4` |
-| I | Into the Light | Bungie's own score | FLAC stereo | −4.6 dBTP; the show's quiet act, carrying +3.5 dB in the plan — #164 | *no committed builder* — #159 |
-| II | Endless Forms Most Beautiful | Nightwish *Endless Forms Most Beautiful (Instrumental)* `6-9667CV1zQ`, **Opus 251** @48 k, static −1.6 dB into 32-bit PCM | FLAC stereo | −1.0 dBTP / −11.7 LUFS | `destiny-vids/renders/efmb-plated.mp4` |
-| III | Contributors | Rammstein *Deutschland (Instrumental)* `WqaiHivKlsE`, **Opus 251** @48 k | FLAC stereo | −1.2 dBTP | `destiny-vids/renders/…-credited-hq.mp4` |
-| IV | Kat | dArtagnan *Holding out for a Hero* `egLoz_DPQ8E`, **Opus rung 251** @48 k | FLAC stereo | −0.9 dBTP | `wolves-kat/wolves-kat-reveal-hq.mp4` |
-| V | Natali | Nightwish *Shudder Before the Beautiful* `oTTITV4H9fo`, **Opus 251** @48 k | FLAC stereo | −1.0 dBTP | `wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4` |
-| VI | The musical | Nightwish *7 Days to the Wolves* | AAC stereo 323 k | −1.3 dBTP | **none — issue #58** |
-| VII | Europa | *Beauty Of The Beast* `X3WrCzLIIvk`, **Opus** @48 k | FLAC stereo | −1.1 dBTP (#82) | `wolves-directors-cut/…-beauty-of-the-beast-hq.mp4` |
-| VIII | Credits | two bed passes | FLAC stereo | −1.1 dBTP | `wolves-credits/08-credits-master.mp4` |
+```bash
+python3 tools/deliver.py status              # each act's declared master and its rungs
+python3 tools/peaks.py measure <file>        # the delivered true peak
+```
+
+Bed provenance and rights live in `music/bed_*.json`; the act order is
+[`docs/running-order.md`](../../running-order.md). The two acts with a known
+gap are act I (quiet, +3.5 dB in the plan — #164; no committed builder — #159)
+and act VI (no lossless master — #58).
 
 **Measure the whole folder, not the file you last fixed.** A clipping master
 is invisible until something measures *it* — #82 was never one act's bug, and

@@ -26,7 +26,7 @@ This module fixes that in two halves:
 
 Conforming is a PICTURE operation. Audio is carried through losslessly --
 stream-copied, never re-encoded, and never passed near a normaliser, limiter,
-EQ or gain (docs/skills/references/audio-standard.md).
+EQ or gain (docs/skills/audio/SKILL.md).
 
     python3 tools/conform.py act.mp4 [--out DIR]   # conform (cached)
     python3 tools/conform.py act.mp4 --check       # report, do no work

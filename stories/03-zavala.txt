@@ -1,4 +1,4 @@
-# 03-zavala — the Zavala cut. Sequence position 03 (see docs/cuts/03-zavala.md).
+# 03-zavala — the Zavala cut. Sequence position 03.
 #
 # ONE CINEMATIC, SKIPPED FORWARD. Every beat below is cut from
 # yt_destiny_2_the_final_shape_launch_trailer and sits at or after the previous
@@ -22,7 +22,7 @@
 # Lightfall launch trailer, which is a different source and therefore a
 # different cut. Nothing here was widened to unclean footage and no shot was
 # invented. What the outline could not reach — including the owner's 1:50
-# reveal point — is recorded in docs/cuts/03-zavala.md and corpus/zavala.json.
+# reveal point — is recorded in corpus/zavala.json.
 
 # --- MOVEMENT 1 — WHAT IT COSTS (skip to 0:14) ------------------------------
 # Opens on the threat implied, never shown, and on the price already paid.

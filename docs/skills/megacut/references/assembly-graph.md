@@ -48,26 +48,9 @@ stills whose durations are authored rather than carried.
 `concat=n=1` on a single-item segment is not a harmless no-op either — it
 re-times the same file the same way. The join is a demuxer, not a filter.
 
-**What the root-cause hunt established (#88).** The trigger died with the
-hand-assembled master it was found on; the scripted rebuild
-(`scripts/build_efmb.py`) does not reproduce it. Established by measurement,
-not assumed:
-
-- The rebuilt act passes the issue's exact spellings — `-vf`, `-filter_complex`,
-  and `-filter_complex` + `-fps_mode cfr` — at full length on ffmpeg 8.1 and
-  9.0.1, as does the act's own source compilation.
-- The issue's "possibly relevant" timescale (`1/15360` with 512-tick frames)
-  is **refuted**: the rebuilt file carries the same pairing and is healthy, and
-  acts III and VII carry it too and never failed. It is just this host's normal
-  MP4 video timescale at 30/60 fps.
-- Sixteen synthetic pathologies a hand assembly could have left — stream-copy
-  concats of input- and output-seeked cuts, a concat-filter build, timestamp
-  jitter, duplicate-pts bursts, edit-list offsets, a forced 90000 timescale,
-  negative CTS, mkv and mpegts round-trips, a 23.98-in-a-30-container mismatch —
-  all produce **identical** durations under both spellings.
-- ffmpeg 8.1 → 8.1.2 (the binary in use at the time) changed nothing in the
-  timestamp path, and the 8.1 CLI source feeds identical frames to both graph
-  forms for this chain shape.
+**The trigger is not reproducible on the scripted path (#88).** It died with
+the hand-assembled master it was found on; `scripts/build_efmb.py` does not
+reproduce it, on ffmpeg 8.1 or 9.0.1, under any of the three spellings.
 
 So the rule stands as insurance, and the failure mode that actually burned the
 programme — **silence** — is what the tool now removes: `assemble()` fails the

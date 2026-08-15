@@ -246,7 +246,7 @@ if [ -n "$OUTLINE" ]; then
     say "renders/$VIDEO_ID-cut.mp4"
     echo "    Plates next, once you are happy with the cut:"
     echo "    python3 tools/plate.py plan $CUT --only leads --out plates.json"
-    echo "    (docs/skills/plates.md)"
+    echo "    (docs/skills/plates/SKILL.md)"
     exit 0
 fi
 

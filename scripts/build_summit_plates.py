@@ -19,7 +19,7 @@ are 3:2 and the film is 16:9.
 
 That is a licensing decision, which ``AGENTS.md`` reserves for the owner. It
 has been made, by the owner, and it is written down here and in
-``docs/cuts/07-seven-days-to-the-wolves.md`` so nobody re-litigates it and
+``ATTRIBUTIONS.md`` so nobody re-litigates it and
 nobody mistakes it for an agent's judgement. Attribution is **not** burned onto
 the slides; it belongs to the credits sequence (issue #51).
 

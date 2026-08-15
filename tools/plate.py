@@ -1114,7 +1114,7 @@ def _render_status(spec, glitch=False):
     It is animated brand artwork rather than copy, it cycles on a 20s timer
     that no still can represent honestly, and inventing a frozen stand-in for
     it would put a picture on the card that the deck never authored. Recorded
-    as a gap instead -- see docs/cuts/08-directors-cut-megacut.md.
+    as a gap instead, in the act's plate manifest under ``unresolved``.
     """
     detail = (spec.get("detail") or "").upper()   # text-transform: uppercase
     label = (spec.get("label") or "").upper()

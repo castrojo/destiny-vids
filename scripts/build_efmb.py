@@ -329,7 +329,8 @@ def render(out_path=None, work_dir=None, verbose=True):
         if not path.exists():
             raise SystemExit(
                 f"missing {what}: {path}\nMedia is fetched, never committed -- "
-                "see docs/cuts/02-endless-forms-most-beautiful.md.")
+                "see AGENTS.md ('Never commit footage') and the source's "
+                "record in videos/.")
 
     renders = REPO_ROOT / "renders"
     renders.mkdir(exist_ok=True)

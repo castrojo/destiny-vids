@@ -162,7 +162,7 @@ def indexed():
 
 
 def test_dance_cut_assembles_from_one_cinematic_skipped_forward(indexed):
-    """The shipped Dance cut (docs/cuts/01-dance.md) must stay reproducible.
+    """The shipped Dance cut (stories/01-dance.txt) must stay reproducible.
 
     Every beat lands, all of it comes out of one cinematic, and the cut only
     ever moves forward along that cinematic's timeline.
@@ -221,7 +221,7 @@ def test_cayde_cut_gives_cayde_the_reveal(indexed):
             assert shot["segment"]["shot_scale"] in {"ELS", "LS", "MLS"}
 
 
-# The Zavala cut (docs/cuts/03-zavala.md) comes out of the same cinematic, and
+# The Zavala cut (stories/03-zavala.txt) comes out of the same cinematic, and
 # is the one-cinematic mechanic pointed at a single lead instead of the
 # ensemble.
 
@@ -258,7 +258,7 @@ def test_zavala_cut_uses_every_clean_zavala_shot_this_cinematic_has(indexed):
 
     Six of his eight clean shots are in this cinematic, and the outline is
     written to spend all six -- which is also why the cut cannot be lengthened
-    toward a later reveal by finding more of him (see docs/cuts/03-zavala.md).
+    toward a later reveal by finding more of him (see stories/03-zavala.txt).
     """
     _, story = _zavala_story(indexed)
     available = {seg["segment_id"] for seg in indexed

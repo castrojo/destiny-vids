@@ -179,7 +179,7 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0,
                  f"asetpts=PTS-STARTPTS")
         if bed_gain_db:
             # A static gain, applied once. Not loudnorm and not a limiter: the
-            # record's dynamics are the artist's (see docs/skills/scoring.md).
+            # record's dynamics are the artist's (see docs/skills/scoring/SKILL.md).
             chain += f",volume={bed_gain_db}dB"
         chain += f",adelay={delay}|{delay}[{lab}]"
         parts.append(chain)

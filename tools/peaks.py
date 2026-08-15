@@ -3,7 +3,7 @@
 
 Shared by ``tools/redact.py`` (scored uncut videos) and ``tools/render.py``
 (every cut), so no deliverable ships above the delivery band. The rules that
-live here are ``docs/skills/references/audio-standard.md``'s:
+live here are ``docs/skills/audio/SKILL.md``'s:
 
 - headroom is a derived **static gain**, never a limiter, never a normaliser --
   loudnorm/compression would rewrite the dynamics the artist chose, where a

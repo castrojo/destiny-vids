@@ -87,15 +87,9 @@ before it does.
 python3 tools/megacut.py stories/megacut/megacut.json --chapters
 ```
 
-```text
-1:41  I. Project Bluefin
-9:34  III. Bob Killen
-14:09 IV–V. Bias for Action
-15:13 VI. 7 Days to the Wolves
-```
-
 Re-run it after every assembly and paste the output into the upload
-description. Never hand-edit the list.
+description. Never hand-edit the list, and **never paste a copy of it into a
+doc** — a pasted stamp is wrong the next time anything before it moves.
 
 **One recorded defect: the first marker is not 0:00.** YouTube ignores a chapter
 list that does not open at zero, and the prologue carries no chapter by design.

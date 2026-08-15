@@ -43,7 +43,7 @@ Three rules this module exists to enforce:
   spellings is dropped from the brief and listed in ``unresolved``, so the rest
   of the request still runs. What is never done is quietly mapping "Paris" onto
   the nearest key: casting a real person is an owner decision
-  (docs/skills/casting.md). Omit, report, continue -- never invent, never halt.
+  (docs/skills/casting/SKILL.md). Omit, report, continue -- never invent, never halt.
   Pass ``--strict`` to make it fatal where that is genuinely wanted.
 
 * **A derived field in a brief is an error.** ``clean``, ``footage_tier``,

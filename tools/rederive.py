@@ -2,7 +2,7 @@
 """Recompute every derived field across the checked-in index.
 
 `vocab/casting.yaml` promises that "a vocab edit re-casts the whole index with
-no re-tagging", and `docs/skills/casting.md` repeats it. That is true of the
+no re-tagging", and `docs/skills/casting/SKILL.md` repeats it. That is true of the
 *model* -- `casting` is a pure function of the tagger's `character` list plus the
 vocab -- but nothing acted on it: the only path that wrote `casting` into a
 segment was `tools/annotate.py index`, which needs the source video, and

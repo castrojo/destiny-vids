@@ -54,9 +54,8 @@ for `tools/story.py`, which never puts an unclean shot in a cut. `tools/search.p
 excludes unclean shots from its result pool by default; pass `--include-unclean`
 to surface them anyway, heavily penalized, for triage.
 
-This replaces the old regime, where the primary gate was `substitutability`
-(Axis D) and the whole system was tuned around one performer standing in for
-the cast. That framing is retired; see Axis D for what's left of it.
+This replaces the earlier model, in which the primary gate was
+`substitutability` (Axis D); see Axis D for what is left of it.
 
 ---
 
@@ -108,11 +107,9 @@ canonical enum for scale or movement; these are the common editorial abbreviatio
 
 ## Axis D — Identity / substitutability (`vocab/identity.yaml`) — demoted
 
-The anonymity axis, and it used to be the whole ballgame: in the old model one
-performer had to stand in for every Guardian, so `substitutability` was the
-primary retrieval filter. That framing is retired (see the casting section
-below) — the anonymous crowd is now cast from a rotating pool of contributors,
-so anonymity stopped being a scarce resource. What's left:
+The anonymity axis, and a demoted one. The anonymous crowd is cast from a
+rotating pool of contributors, so anonymity is not a scarce resource and
+`substitutability` is no longer a retrieval filter. What's left:
 
 - **`substitutability`** — ordinal `0..5`. `0` = clear, identifiable face,
   named/recognizable character, not substitutable; `5` = fully anonymous
@@ -174,27 +171,12 @@ tiers, and the difference between them is the whole model:
 - **`none`** — nobody to cast: environment, enemy, or artifact shots. Always
   `usable: false`, `constraints_failed: []`.
 
-**Current lead bindings** (`vocab/casting.yaml`, `leads`, open and extensible):
+**The lead bindings live in `vocab/casting.yaml`, under `leads`** — open and
+extensible. They are deliberately **not** copied here: every row names a real
+person, and a stale copy is a wrong credit waiting to be read by somebody who
+trusted the doc over the vocab.
 
-| Character | Person | aka | Constraints |
-|---|---|---|---|
-| `elsie_bray` | `laura_santamaria` (Laura Santamaria) | `elsie_gray`, `the_exo_stranger`, `exo_stranger` | — |
-| `nimbatus` | `laura_santamaria` (Nimbatus) | — | redaction: real name withheld until act VII (#103) |
-| `anna_bray` | `joanna_lee` (Joanna Lee) | `ana_bray` | — |
-| `zavala` | `kelsey_hightower` (Kelsey Hightower) | `commander_zavala` | — |
-| `cayde_6` | `castrojo` (castrojo) | `cayde`, `cayde6` | — |
-| `saladin` | `jeefy` (Jeefy) | `lord_saladin`, `iron_lord_saladin` | `require_helmet`, `require_far` |
-| `osiris` | `mrbobbytables` | — | — |
-| `sagira` | `lindsay_gendreau` (Lindsay Gendreau) | `sagira_ghost` | — |
-| `saint_14` | `kat` (Kat) | `saint`, `saint14` | — |
-| `mara_sov` | `karena_angell` (Karena Angell) | `queen_mara_sov` | — |
-| `petra_venj` | `lori_lorusso` (Lori Lorusso) | `petra` | — |
-| `variks` | `nate_waddington` (Nate Waddington) | `variks_the_loyal` | — |
-| `the_speaker` | `jonathan_bryce` (Jonathan Bryce) | `speaker` | — |
-| `amanda_holliday` | `ashley_willis` (Ashley Willis) | `amanda`, `holliday` | — |
-| `iron_lord_red_haired` | `paris_pittman` (Paris Pittman) | `red_haired_iron_lord`, `dying_iron_lord` | — |
-
-Notes on a few of these: `anna_bray` is Elsie's sister — the Bray line is the
+Notes on a few of the bindings: `anna_bray` is Elsie's sister — the Bray line is the
 project's through-thread, so both sisters are cast. `saint_14` carries a
 `note` field ("Kat from now on, but she remains the bubble in the original
 Wolves") — that's a standing direction for the humans doing the edit, not a
