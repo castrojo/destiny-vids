@@ -61,7 +61,7 @@ CORPUS: mara_sov
 
 That cross-source pool **is the shot list for that character's hero video** —
 one person, one video, every instance of them in the collection
-([`docs/cuts/hero-montage.md`](../cuts/hero-montage.md)). Read the corpus first
+([`hero-video.md`](editing/references/hero-video.md)). Read the corpus first
 and the outline writes itself: one beat per shot, and `tools/story.py` with no
 `--from-video` spans exactly the same pool.
 
@@ -102,7 +102,7 @@ per-cut: a corpus outlives the video it was first built for.
 |---|---|
 | "I'll add the missing shot to the corpus so the beat lands." | The corpus is derived from `segments/`. Index the footage or rewrite the beat. |
 | "The unclean shot covers it well enough." | Then the gap would not be reported. The clean gate is a gate, not a preference. |
-| "I'll note the music cue in the corpus file." | Editorial unknowns belong in the cut's doc under `docs/cuts/`. The corpus only holds what is derivable from the index. |
+| "I'll note the music cue in the corpus file." | Editorial unknowns belong in the outline's own notes or on the issue tracker. The corpus only holds what is derivable from the index. |
 | "`unknown` on an axis is a gap." | `unknown` means *not determinable*, not a shot someone could go get. It is excluded on purpose. |
 
 ## Red Flags
@@ -120,8 +120,8 @@ python3 -m pytest -q tests/test_corpus.py
 python3 tools/corpus.py --check
 ```
 
-Worked example, including how one cut's unresolved beats were recorded rather
-than guessed: [`docs/cuts/01-dance.md`](../cuts/01-dance.md). For a corpus
-written *before* the outline, so the beats could be shaped around the gaps it
-reported, see [`docs/cuts/03-zavala.md`](../cuts/03-zavala.md). The axes
-themselves are documented in `docs/taxonomy.md`.
+Worked examples: [`stories/01-dance.txt`](../../stories/01-dance.txt) records
+its unresolved beats in its own header rather than guessing them, and
+[`stories/03-zavala.txt`](../../stories/03-zavala.txt) was written against
+`corpus/zavala.json`, so its beats are shaped around the gaps the corpus
+reported. The axes themselves are documented in `docs/taxonomy.md`.

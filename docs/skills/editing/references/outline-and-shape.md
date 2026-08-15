@@ -38,8 +38,8 @@ it placed, in order, so check the credit times before rendering.
 **hero video** — one person, one video, every clean shot of that bound character
 in the whole index. Karena's Mara Sov video is her Season of the Lost shots
 *and* her Final Shape shots, summed. Hero videos are promotional material for
-the feature, *Seven Days to the Wolves*; the two kinds and their rules are
-[`docs/catalog.md`](../../../catalog.md).
+the feature, *Seven Days to the Wolves*: the feature is one whole unit,
+released as a single show; a hero video is one person across every source.
 
 ```bash
 # hero video: the whole index is the pool. No flags. This is the default.
@@ -49,7 +49,7 @@ python3 tools/story.py stories/mara-sov.txt --dir segments
 Start from the corpus, which already spans sources — `python3 tools/corpus.py
 mara_sov --dir segments` reports `6/6 clean shot(s), 11.304s across 2 video(s)`.
 That list *is* the hero video's shot list. Full walkthrough:
-[`docs/cuts/hero-montage.md`](../../../cuts/hero-montage.md).
+[`hero-video.md`](hero-video.md).
 
 **Reaching for `--from-video` by habit is a known failure.** Three consecutive
 Destiny chapters were all cut from `yt_destiny_2_the_final_shape_launch_trailer`
@@ -82,9 +82,9 @@ The beat order *is* the timeline; the skips are the gaps between chosen shots.
 This is deliberately not a sequencer — there is no cut-graph, no editing DSL,
 and no layer that lets cut order disagree with source order. Write the beats in
 source-time order and reorder by moving lines. Worked examples:
-[`docs/cuts/01-dance.md`](../../../cuts/01-dance.md) (ensemble) and
-[`docs/cuts/03-zavala.md`](../../../cuts/03-zavala.md) (a lead, where the beats had to
-bend to eight clean shots).
+[`stories/01-dance.txt`](../../../../stories/01-dance.txt) (ensemble) and
+[`stories/03-zavala.txt`](../../../../stories/03-zavala.txt) (a lead, where the
+beats had to bend to eight clean shots).
 
 Under `--forward-only` a mismatch cascades harder than usual: a wrong early
 pick can strand every later beat behind the playhead. Fix the earliest wrong

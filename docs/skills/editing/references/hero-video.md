@@ -1,8 +1,9 @@
 # The hero video — one person, one video, every source
 
-**This is one of the two things this project produces**
-([`docs/catalog.md`](../catalog.md)): a **hero video** is promotional material
-for the feature, *Seven Days to the Wolves*. A lead is bound to a real person,
+**This project produces two kinds of video.** The *feature* — *Seven Days to
+the Wolves* — is one whole unit: eight acts, released as a single show. A
+**hero video** is the other kind, promotional material for the feature: one
+person, one video, every source. A lead is bound to a real person,
 and their hero video is **every clean shot of that character in the entire
 index**, from every cinematic, cut into one piece. Karena's video is every
 instance of Mara Sov across the Destiny cinematics — not the Mara Sov shots that
@@ -22,7 +23,7 @@ Contrast the two *cut shapes*, and note which is the exception:
 | Flags | **none** | `--from-video` + `--forward-only` |
 | Answers | "who is this person?" | "what happens in this trailer?" |
 | Grows when… | any new cinematic is indexed | never — the source is fixed |
-| Worked example | this doc | [`01-dance`](01-dance.md), [`03-zavala`](03-zavala.md) |
+| Worked example | this doc | [`stories/01-dance.txt`](../../../../stories/01-dance.txt), [`stories/03-zavala.txt`](../../../../stories/03-zavala.txt) |
 
 The hero video is the default and needs no flags. The single-cinematic cut is
 right only when a cut is *retelling one trailer's own story*, and reaching for
@@ -74,8 +75,8 @@ The pool is every clean segment in the index. Shots from different cinematics
 sit next to each other, and `story.py` reports the `video_id` per shot so the
 cut list stays honest about where each frame came from.
 
-**Step 4 — render and plate as usual** ([`editing.md`](../skills/editing/SKILL.md),
-[`plates.md`](../skills/plates/SKILL.md)). Nothing downstream changes: `render.py`
+**Step 4 — render and plate as usual** ([`editing`](../SKILL.md),
+[`plates`](../../plates/SKILL.md)). Nothing downstream changes: `render.py`
 already resolves each shot's own `video_id` against `media/`, so a cross-source
 cut list needs no special handling.
 
