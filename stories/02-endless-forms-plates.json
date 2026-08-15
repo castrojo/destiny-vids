@@ -749,21 +749,7 @@
       "title": "The Long Walk",
       "subtitle": "Glorious Eggroll and the new kids ...",
       "at": 146.233,
-      "dur": 2.3,
-      "position": "left"
-    },
-    {
-      "id": "walk_GloriousEggroll",
-      "copy_source": "casting",
-      "seen_at_src": 180.533,
-      "why": "he takes the frame after the title, walking",
-      "label": "BLUEBERRY // MAINTAINER",
-      "name": "GloriousEggroll",
-      "variant": "nobara",
-      "avatar": "renders/avatars/GloriousEggroll.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/11287837?v=4",
-      "at": 157.067,
-      "dur": 4.0,
+      "dur": 2.267,
       "position": "left"
     },
     {
@@ -1091,7 +1077,7 @@
     {
       "id": "solo_EyeCantCU",
       "at": 283.666,
-      "dur": 2.567,
+      "dur": 2.534,
       "position": "left",
       "copy_source": "casting",
       "shot_src": [

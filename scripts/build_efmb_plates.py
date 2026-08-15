@@ -557,9 +557,24 @@ WALK_CARD = {
 # own spelling of "A1RMAX" inside his line -- his transcription of a name
 # stays as he typed it, while the CARD carries the channel's own @A1RM4X.
 WALK_SEQUENCE = [
-    {"cue": "plate", "key": "GloriousEggroll", "src": 180.533, "hold": 4.0,
-     "why": "he takes the frame after the title, walking"},
+    # NO NAMEPLATE FOR GloriousEggroll. Removed 2026-08-15 (#192): the cue was
+    # anchored at src 180.533, which is film ~156.7 -- a ship, then a hangar
+    # interior, then an EXTREME CLOSE-UP OF A WOMAN'S FACE at film 160.5. Its
+    # own `why` claimed "he takes the frame after the title, walking", and he
+    # does not; the walking shot the chapter card names is film 146.033 ->
+    # 147.833, 1.8 s, which is under MIN_HOLD and cannot carry a plate at all.
+    # So there is no shot in this chapter that can hold his credit, and what
+    # shipped instead was a real person's name over a different person's face
+    # -- AGENTS.md rule 3. Omission credits nobody, so the card comes out; he
+    # keeps all seven lines below, which name him as the speaker.
+    # TODO(owner): if he should carry a nameplate here, say which shot is him.
+    # ANCHORED, not chained. With the plate gone this block would chain off the
+    # chapter card and slide 4.65 s earlier -- straight into Karena's jump zone
+    # (clamp_hold raises on it). 185.183 is the source frame that maps to film
+    # 161.317, which is exactly where this line already plays, so removing the
+    # nameplate above moves his dialogue not at all.
     {"cue": "line", "id": "walk_ge_1", "speaker": "GloriousEggroll",
+     "at_src": 185.183,
      "text": "Watch how I do it", "hold": 2.6},
     {"cue": "line", "id": "walk_ge_2", "speaker": "GloriousEggroll",
      "text": "Half the trick is looking good", "hold": 2.6},
@@ -873,6 +888,11 @@ def _zones(film_of):
     return [(film_of(a), film_of(b - 0.001), why) for a, b, why in NO_PLATE_SRC]
 
 
+# One frame at the act's 30 fps. A cue that ends exactly ON a zone's first
+# frame is still ON the protected shot, so the clamp backs off by this much.
+ZONE_GUARD = round(1.0 / 30.0, 3)
+
+
 def clamp_hold(at, hold, film_of):
     """Shorten a plate so it never runs into a no-plate zone.
 
@@ -886,7 +906,13 @@ def clamp_hold(at, hold, film_of):
                 f"a plate at {at:.3f}s starts inside {why} -- re-anchor it to "
                 "another shot rather than trimming it")
         if at < start < at + hold:
-            hold = round(start - at, 3)
+            # END BEFORE THE ZONE, NOT ON IT. `start - at` lands the cue's last
+            # frame on the zone's FIRST frame -- which is the frame the zone
+            # exists to protect. That off-by-one is why the Long Walk card kept
+            # captioning Karena's jump (#184, #192): it was clamped to 2.300 s,
+            # ending at 148.533, the exact frame she jumps on. _zones already
+            # backs the zone's END off by a hair; the START needs the same.
+            hold = round(start - at - ZONE_GUARD, 3)
     return hold if hold >= MIN_HOLD else None
 
 
