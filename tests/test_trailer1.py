@@ -190,6 +190,19 @@ def test_both_book_lines_actually_move(manifest):
         assert entry["anchor"] != entry["anchor_out"]
 
 
+def test_the_book_lines_use_the_simple_box_treatment(manifest):
+    """Owner: 'I just want a simple box overlay'."""
+    for plate_id in ("book-a", "book-b"):
+        assert plate(manifest, plate_id)["variant"] == "box"
+
+
+def test_one_forty_seven_is_the_documented_wolves_fade_climax(manifest):
+    climax = manifest["_climax"]
+    assert climax.startswith("1:47.000")
+    assert "wolves" in climax
+    assert "no wolf sound is added" in climax
+
+
 def test_a_line_may_stop_tracking_when_its_page_is_gone(manifest):
     """book-b holds across the tank join and is still up over the iguana, so
     it tracks the page only until the cut."""
@@ -224,23 +237,17 @@ def test_the_enable_windows_use_escaped_commas(manifest):
 
 def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
     graph = T.filtergraph(manifest)
-    assert "[5:v]split=3[daysrc][enddaysrc][enddarksrc]" in graph
-    assert "[enddarkraw]eq=brightness=-0.55[enddark]" in graph
+    assert "[5:v]split=3[daysrc][bridgedarksrc][enddarksrc]" in graph
+    assert "[bridgedarkraw]eq=brightness=-0.55[bridgedark]" in graph
     assert (
-        f"[endday][enddark]xfade=transition=fade:"
-        f"duration={T.ENDCARD_DARKEN:.3f}:"
-        f"offset={T.ENDCARD_DAY_HOLD:.3f}[endbg]"
+        f"[day][bridgedark]xfade=transition=fade:"
+        f"duration={T.BRIDGE:.3f}:offset=0[bridge]"
     ) in graph
     assert "color=c=black" not in graph
 
 
 def test_the_end_card_wallpaper_is_bounded_to_its_own_window(manifest):
     graph = T.filtergraph(manifest)
-    assert (
-        f"trim=0:{T.ENDCARD_DAY_HOLD + T.ENDCARD_DARKEN:.3f},"
-        f"setpts=PTS-STARTPTS,format=yuv420p[endday]"
-        in graph
-    )
     assert (
         f"trim=0:{T.ENDCARD - T.ENDCARD_DAY_HOLD:.3f},"
         f"setpts=PTS-STARTPTS,format=yuv420p[enddarkraw]"

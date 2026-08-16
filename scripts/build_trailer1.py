@@ -317,19 +317,19 @@ def filtergraph(manifest):
     day_len = BRIDGE_UP + BRIDGE_DAY_HOLD + BRIDGE_TURN
     night_len = BRIDGE - day_len + BRIDGE_TURN
     day_input = inputs + 1
-    parts.append(f"[{day_input}:v]split=3[daysrc][enddaysrc][enddarksrc]")
+    parts.append(f"[{day_input}:v]split=3[daysrc][bridgedarksrc][enddarksrc]")
     parts.append(_still("daysrc", "day",
-                        f",trim=0:{day_len:.3f},setpts=PTS-STARTPTS,"
+                        f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
                         f"format=yuv420p"))
-    parts.append(_still(inputs + 2, "night",
-                        f",trim=0:{night_len:.3f},setpts=PTS-STARTPTS,"
+    parts.append(_still("bridgedarksrc", "bridgedarkraw",
+                        f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
                         f"format=yuv420p"))
-    parts.append(f"[day][night]xfade=transition=fade:"
-                 f"duration={BRIDGE_TURN:.3f}:"
-                 f"offset={BRIDGE_UP + BRIDGE_DAY_HOLD:.3f}[turned]")
-    parts.append(f"[turned]fade=t=in:st=0:d={BRIDGE_UP:.3f},"
-                 f"fade=t=out:st={BRIDGE - BRIDGE_DOWN:.3f}:"
-                 f"d={BRIDGE_DOWN:.3f}[bridge]")
+    parts.append("[bridgedarkraw]eq=brightness=-0.55[bridgedark]")
+    # One continuous fade: bright day wolves become dark day wolves over the
+    # whole bridge. The old day -> night -> black path reached black and then
+    # reset to bright day at the end card, the disruptive jump the owner saw.
+    parts.append(f"[day][bridgedark]xfade=transition=fade:"
+                 f"duration={BRIDGE:.3f}:offset=0[bridge]")
     inputs += 2
 
     # --- the end card, day falling into dark ---------------------------------
@@ -338,20 +338,12 @@ def filtergraph(manifest):
     # the bridge, and ffmpeg permits it to feed both end-card legs as well --
     # no duplicate input, no second asset choice.
     #
-    # xfade outputs d1 + d2 - duration, so the bright leg holds through the
-    # beginning of the transition and the dark leg takes the remaining window:
-    # (HOLD + DARKEN) + (ENDCARD - HOLD) - DARKEN == ENDCARD exactly.
-    parts.append(_still("enddaysrc", "endday",
-                        f",trim=0:{ENDCARD_DAY_HOLD + ENDCARD_DARKEN:.3f},"
-                        f"setpts=PTS-STARTPTS,"
-                        f"format=yuv420p"))
+    # The bridge ends on this same dark grade. Beginning the end card there
+    # removes the black-to-day reset and lets the Wolves fade be one long arc.
     parts.append(_still("enddarksrc", "enddarkraw",
                         f",trim=0:{ENDCARD - ENDCARD_DAY_HOLD:.3f},"
                         f"setpts=PTS-STARTPTS,format=yuv420p"))
-    parts.append("[enddarkraw]eq=brightness=-0.55[enddark]")
-    parts.append(f"[endday][enddark]xfade=transition=fade:"
-                 f"duration={ENDCARD_DARKEN:.3f}:"
-                 f"offset={ENDCARD_DAY_HOLD:.3f}[endbg]")
+    parts.append("[enddarkraw]eq=brightness=-0.55[endbg]")
 
     # The event and venue enter midway through the daylight-to-dark transition.
     # The CTA is a second transparent card: it hides the repeated event rows

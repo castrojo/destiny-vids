@@ -82,12 +82,31 @@
       0 0 60px rgb(0 0 0 / 55%);
     white-space: pre-line;
   }
+
+  /* THE SIMPLE BOX. Owner: "I just want a simple box overlay". This is a
+     card, not a fake piece of printed book type: quiet charcoal translucency,
+     one Bluefin edge, and the existing type. It replaces the hard page tilt
+     for `variant=box`; the build may still make the whole card drift gently
+     with the camera via its anchor walk. */
+  body[data-variant="box"] .line {
+    max-width: 66%;
+    padding: 1.05rem 1.45rem;
+    background: rgb(4 10 20 / 78%);
+    border-left: 4px solid #60a5fa;
+    border-radius: 3px;
+    box-shadow:
+      0 0 4px rgb(0 0 0 / 92%),
+      0 0 24px rgb(0 0 0 / 72%);
+    font-size: 2.8rem;
+    line-height: 1.2;
+  }
 </style>
 </head>
 <body>
   <div class="line" id="line"></div>
 <script>
   const params = new URLSearchParams(window.location.search)
+  if (params.get('variant')) { document.body.dataset.variant = params.get('variant') }
 
   const el = document.getElementById('line')
   // `body` repeats, exactly as it does on the other cards, so a beat may be
@@ -118,7 +137,9 @@
 
   // The page's tilt, in degrees, positive clockwise. Absent means level.
   const angle = parseFloat(params.get('angle') || '0')
-  if (angle) { el.style.transform = `rotate(${angle}deg)` }
+  if (angle && document.body.dataset.variant !== 'box') {
+    el.style.transform = `rotate(${angle}deg)`
+  }
 
   if (params.get('size')) { el.style.fontSize = params.get('size') }
 
