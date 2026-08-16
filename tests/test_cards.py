@@ -43,6 +43,9 @@ def test_maintitle_has_a_poster_variant_for_the_existing_body_shape():
     assert "poster-cta" in template
     assert "poster-tag" in template
     assert "host.classList.contains('poster')" in template
+    assert "if (ch === '.')" in template
+    assert "BLUE_LETTERS.includes(ch) || ch === '.'" not in template
+    assert 'data-stage="cta"' in template
 
 
 def test_plate_py_refuses_to_draw_a_card_and_says_what_does():

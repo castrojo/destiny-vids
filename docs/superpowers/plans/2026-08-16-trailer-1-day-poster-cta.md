@@ -4,7 +4,7 @@
 
 **Goal:** Make `wolves.projectbluefin.io` the large central call to action on Trailer 1's KubeCon end card over the March Bluefin day-wolves wallpaper.
 
-**Architecture:** Keep `stories/trailer-1-plates.json` within the existing title-card field shape: the event remains `title`, the venue remains `subtitle`, `body[0]` is the CTA, and the remaining body rows are hashtags. A `variant: "poster"` styling switch lets `cards/maintitle.html` render that established data with a poster hierarchy. `scripts/build_trailer1.py` uses the already-resolved March day wallpaper as the end-card background instead of creating a black colour source.
+**Architecture:** Keep `stories/trailer-1-plates.json` within the existing title-card field shape: the event remains `title`, the venue remains `subtitle`, `body[0]` is the CTA, and the remaining body rows are hashtags. A `variant: "poster"` styling switch lets `cards/maintitle.html` render that established data with a poster hierarchy. `scripts/build_trailer1.py` uses the already-resolved March day wallpaper twice: first ungraded, then darkened, joined with an `xfade` before the text arrives.
 
 **Tech Stack:** JSON manifest records, HTML/CSS/JavaScript rendered through Playwright, Python 3 build script, ffmpeg in `bluefin-thumbnailer`, pytest.
 
@@ -15,7 +15,8 @@
 - Copy is exact: `wolves.projectbluefin.io`, then `#KubeCon`, `#CloudNativeCon`, `#7wolves`.
 - Preserve `TOTAL == 110.020`, `ENDCARD == 7.820`, the end-card cue, bridge timing, and audio fade.
 - The event title retains its blue seared `|`; do not blueify the Linux Foundation trademarks in that title.
-- Never put a panel behind the type. Darken the whole wallpaper and use the established glyph halo.
+- In the CTA, only the two dots glow Bluefin blue; the owner explicitly keeps its `b` and `f` white.
+- Never put a panel behind the type. Start on ungraded day art, crossfade to a darkened version of the same art, then fade the text in during that transition; use the established glyph halo.
 - A missing day wallpaper exits explicitly; never silently substitute night or black.
 
 ---
@@ -184,8 +185,9 @@
   }
   ```
 
-  Apply the existing `blueify` implementation to `poster-cta`, so the dots
-  in the domain receive the established Bluefin treatment. Keep
+  Add a `blueifyDomain` implementation for `poster-cta` that accents **only**
+  `.` characters, so its two dots receive the Bluefin treatment while its `b`
+  and `f` stay white. Keep
   `sear(titleEl, { blue: false })` unchanged for the event title.
 
 - [ ] **Step 4: Classify the body rows by index**

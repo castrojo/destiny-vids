@@ -389,6 +389,14 @@
     font-size: 1.1rem;
     letter-spacing: 0.12em;
   }
+  /* The second poster beat is CTA-only. The hidden rows retain their flex
+     seats, so the domain lands where the full poster puts it rather than
+     jumping upward when the event has already arrived on its own card. */
+  body[data-variant="poster"][data-stage="cta"] .title,
+  body[data-variant="poster"][data-stage="cta"] .subtitle,
+  body[data-variant="poster"][data-stage="cta"] .hairline {
+    visibility: hidden;
+  }
 
   /* THE SEAR -- the vertical glow on the `|`.
 
@@ -469,6 +477,9 @@
   if (params.get('variant')) {
     document.body.dataset.variant = params.get('variant')
   }
+  if (params.get('stage')) {
+    document.body.dataset.stage = params.get('stage')
+  }
 
   function fill(id, value) {
     const el = document.getElementById(id)
@@ -521,8 +532,10 @@
     el.append(...parts)
   }
 
-  // The CTA names OUR domain, so the house b/f rule applies and its two dots
-  // take the same Bluefin blue. The event title remains separate: KubeCon and
+  // The CTA's two dots take the Bluefin blue, but its b and f stay white.
+  // Owner, 2026-08-16: "keep the f and b white on this one". This is a
+  // per-card treatment decision, not an exception that weakens the general
+  // b/f rule elsewhere. The event title remains separate: KubeCon and
   // CloudNativeCon are Linux Foundation marks and are deliberately not
   // recoloured (the `sear(titleEl, { blue: false })` path below).
   function blueifyDomain(el) {
@@ -532,7 +545,7 @@
     const parts = []
     let run = ''
     for (const ch of text) {
-      if (BLUE_LETTERS.includes(ch) || ch === '.') {
+      if (ch === '.') {
         if (run) { parts.push(document.createTextNode(run)); run = '' }
         const span = document.createElement('span')
         span.className = 'accent'
