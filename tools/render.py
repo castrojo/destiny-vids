@@ -370,6 +370,47 @@ def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
     subprocess.run(cmd, check=True)
 
 
+# A bed may run past the cut -- `-shortest` trims the tail, which is the whole
+# point of it. It may not fall SHORT, because the same flag then trims the
+# PICTURE. Rounding across a per-clip sum is real, so the comparison carries a
+# frame or two of slack.
+CONCAT_BED_TOLERANCE_SEC = 0.1
+
+
+def _check_bed_covers_the_cut(clip_paths, audio_bed):
+    """Refuse a bed shorter than the cut it is muxed against.
+
+    ``concat`` passes ``-shortest``, which stops the OUTPUT at the shorter of
+    the two mapped streams -- picture included. A bed longer than the cut is
+    the intended use and is trimmed. A bed that is shorter silently truncates
+    the film, exits 0, and says nothing: the render just ends early.
+
+    That is a wrong result rather than a missing string, so it fails loudly
+    instead of degrading -- AGENTS.md's degrade rule covers copy nobody has
+    written yet, not footage silently dropped on the floor.
+
+    Unmeasurable is not the same as wrong: ``probe_media_duration`` returns
+    ``None`` when there is no ffprobe to be had (imageio's bundled ffmpeg
+    ships without one), and a check that cannot run must not block a render
+    that would otherwise be fine.
+    """
+    bed_sec = probe_media_duration(audio_bed)
+    if bed_sec is None:
+        return
+    cut_sec = 0.0
+    for clip in clip_paths:
+        one = probe_media_duration(clip)
+        if one is None:
+            return
+        cut_sec += one
+    if bed_sec + CONCAT_BED_TOLERANCE_SEC < cut_sec:
+        raise RuntimeError(
+            f"the audio bed is {bed_sec:.3f}s but the cut is {cut_sec:.3f}s "
+            f"({cut_sec - bed_sec:.3f}s short). `-shortest` would trim the "
+            f"PICTURE to the bed and exit 0, shipping a film that ends early. "
+            f"Lengthen the bed, or shorten the cut deliberately.")
+
+
 def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None,
            audio_gain=None):
     """Join normalized clips with the concat demuxer.
@@ -392,6 +433,7 @@ def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None,
         cmd = list(ffmpeg) + ["-v", "error", "-y", "-f", "concat", "-safe", "0",
                               "-i", str(list_path)]
         if audio_bed:
+            _check_bed_covers_the_cut(clip_paths, audio_bed)
             cmd += ["-i", str(audio_bed), "-map", "0:v:0", "-map", "1:a:0", "-shortest"]
             if audio_gain is not None:
                 cmd += ["-af", f"volume={audio_gain}"]

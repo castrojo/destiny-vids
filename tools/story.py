@@ -120,10 +120,20 @@ def clamp_duration(requested, source_duration):
     at the material that was actually vetted. The overrun is returned rather
     than swallowed: silently shortening a beat the author asked to hold is its
     own surprise, and an anchored cut needs to know its timeline moved.
+
+    Both bounds are tested explicitly rather than by truthiness. A
+    ``source_duration`` of 0 is a malformed shot, not "no ceiling", and letting
+    it fall through returned an UNCLAMPED hold -- the exact hole this function
+    exists to close. A negative ``requested`` matched neither branch and passed
+    through untouched into ``to_edl``/``to_csv``, where it is not a hold at all.
     """
     if not requested:
         return source_duration, None
-    if source_duration and requested > source_duration:
+    if requested < 0:
+        # Not a shortening the author asked for: report it like an overrun so
+        # the caller sees the number it wrote, and cut nothing.
+        return source_duration, requested
+    if source_duration is not None and requested > source_duration:
         return source_duration, requested
     return requested, None
 

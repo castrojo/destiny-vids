@@ -189,3 +189,81 @@ def test_the_checked_in_roster_agrees_with_the_org():
     assert membership["ahmedadan"] is True
     assert membership["castrojo"] is True
     assert membership["Giklab"] is False
+
+
+# --- the lead exclusion --------------------------------------------------
+#
+# A person cannot be a named lead AND a nameless blueberry in the same
+# project. That rule was written down in `lead_people`'s docstring and
+# enforced against the wrong field: the exclusion set was built from the
+# snake_case `person` id while the pool is keyed by GitHub login, so it
+# matched nothing for every multi-word lead. None of it was covered.
+
+
+def lead(person=None, github=None, display_name=None):
+    return {"person": person, "github": github,
+            "display_name": display_name or person, "aka": [], "plate": None}
+
+
+def test_a_lead_is_excluded_by_their_github_login():
+    """The login is what the roster is keyed by, so it is what must match.
+
+    `person` is "Kelsey Hightower" normalized to kelsey_hightower; his login
+    is kelseyhightower. Matching the two strings excludes nobody, and he was
+    handed an anonymous Guardian tile while cast as Zavala.
+    """
+    leads = {"zavala": lead(person="kelsey_hightower", github="kelseyhightower",
+                            display_name="Kelsey Hightower")}
+    result = assign(roster("kelseyhightower", "someone_else"),
+                    [ensemble_seg("s1", 2)], leads=leads)
+
+    assert result["cast_as_lead"] == ["kelseyhightower"]
+    assert [t["login"] for t in result["tiles"]] == ["someone_else"]
+
+
+def test_a_lead_whose_person_id_is_already_their_login_stays_excluded():
+    """castrojo's `person` and login are the same string; do not regress him."""
+    leads = {"cayde_6": lead(person="castrojo", display_name="castrojo")}
+    result = assign(roster("castrojo", "hanthor"), [ensemble_seg("s1", 2)],
+                    leads=leads)
+
+    assert result["cast_as_lead"] == ["castrojo"]
+    assert [t["login"] for t in result["tiles"]] == ["hanthor"]
+
+
+def test_an_uncast_character_excludes_nobody():
+    leads = {"ikora_rey": lead(person=None)}
+    result = assign(roster("a", "b"), [ensemble_seg("s1", 2)], leads=leads)
+
+    assert result["cast_as_lead"] == []
+    assert len(result["tiles"]) == 2
+
+
+def test_a_lead_with_no_login_is_reported_rather_than_left_to_luck():
+    """Degrade, never block: the gap is recorded, not guessed at.
+
+    Nothing can exclude this person by login, because nobody has recorded
+    one. Inventing it would be a claim about a real person, so the caster
+    ships and says whose binding it cannot check.
+    """
+    leads = {
+        "zavala": lead(person="kelsey_hightower", display_name="Kelsey Hightower"),
+        "cayde_6": lead(person="castrojo", github="castrojo", display_name="castrojo"),
+    }
+    result = assign(roster("a"), [ensemble_seg("s1", 1)], leads=leads)
+
+    assert result["leads_unverifiable"] == ["Kelsey Hightower"]
+
+
+def test_the_committed_bindings_report_their_own_unverifiable_leads():
+    """Runs against vocab/casting.yaml, so the punch list stays honest."""
+    from tools.ensemble import lead_people, leads_without_login
+
+    logins = lead_people()
+    assert "castrojo" in logins, "castrojo is cast as Cayde-6"
+    assert "nimbinatus" in logins, (
+        "Laura Santamaria's verified login must be what excludes her, not the "
+        "character string `nimbatus`, which is a different account entirely")
+    # Not asserted as a fixed list: filling these in is owner work, and this
+    # test must not fail the day somebody records one.
+    assert isinstance(leads_without_login(), list)

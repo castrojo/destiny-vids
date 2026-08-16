@@ -391,3 +391,35 @@ def test_a_clamped_hold_never_runs_past_the_out_point(segments):
         source = shot["end_sec"] - shot["start_sec"]
         assert shot["duration"] <= source + 1e-9, shot["segment_id"]
         assert shot["start_sec"] + shot["duration"] <= shot["end_sec"] + 1e-9
+
+
+# --- clamp_duration's two unguarded edges ----------------------------------
+
+
+def test_a_zero_length_source_still_clamps():
+    """`if source_duration and ...` treated 0 as 'no ceiling'.
+
+    A malformed shot with no length is not a shot that may be held for as
+    long as you like -- it is the case the clamp exists for, since render.py
+    would decode `-t requested` straight into whatever follows.
+    """
+    from tools.story import clamp_duration
+
+    assert clamp_duration(5.0, 0) == (0, 5.0)
+
+
+def test_a_negative_hold_is_reported_not_passed_through():
+    """It matched neither branch and landed in to_edl/to_csv as a duration."""
+    from tools.story import clamp_duration
+
+    duration, over = clamp_duration(-5.0, 10.0)
+    assert duration == 10.0
+    assert over == -5.0
+
+
+def test_the_ordinary_clamp_is_unchanged():
+    from tools.story import clamp_duration
+
+    assert clamp_duration(30.0, 12.0) == (12.0, 30.0)
+    assert clamp_duration(8.0, 12.0) == (8.0, None)
+    assert clamp_duration(None, 12.0) == (12.0, None)

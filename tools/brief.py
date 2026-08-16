@@ -262,6 +262,17 @@ def parse_brief(text, casting_path=None):
     if unresolved:
         data["unresolved"] = unresolved
 
+    if "automatable" not in data:
+        # The schema marks this required, but `_validate_schema` is a no-op
+        # when jsonschema is not importable -- an explicitly supported mode
+        # here and in ingest.py. Without this the subscript below raised a
+        # bare KeyError, which `main()` does not catch, so a brief missing one
+        # key crashed instead of being reported as unexecutable.
+        raise BriefError(
+            "brief is missing `automatable`. Whether a task can be finished "
+            "without a human decision is the one field this block exists to "
+            "carry; `no` is a valid answer, absent is not."
+        )
     if data["automatable"] in ("no", "partly") and not data.get("blocked_on"):
         raise BriefError(
             f"automatable is {data['automatable']!r} but blocked_on is missing. "

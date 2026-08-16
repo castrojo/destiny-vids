@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the act-V interstitial card from ``stories/megacut/scream-card.json``.
+"""Render the act-V interstitial card from ``stories/megacut/megacut-cards.json``.
 
 Owner 2026-08-14: *"let the nat scene keep fading to black then put up a
 title card 'On the Linux Desktop' 'No one can hear you scream' - in a

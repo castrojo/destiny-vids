@@ -96,3 +96,24 @@ def test_a_video_without_redactions_is_untrimmed(tmp_path):
                             redactions_dir=tmp_path / "no-such-dir")
     assert cut["shots"][0]["start_sec"] == 0.0
     assert cut["shots"][-1]["end_sec"] == 10.0
+
+
+def test_a_redaction_that_leaves_nothing_reports_rather_than_crashes(
+        tmp_path, monkeypatch):
+    """`kept_range` refuses a kept span of <= 0, not a sub-frame sliver.
+
+    The empty-shot-list check runs BEFORE the redaction clamp, so a sliver
+    passed the range check, clamped every shot away, and `main()` then read
+    `cut["shots"][-1]` off an empty list and raised IndexError.
+    """
+    shots = [{"video_id": VIDEO_ID, "segment_id": "a", "start_sec": 0.0,
+              "end_sec": 5.0, "start_tc": "00:00:00.000", "end_tc": "00:00:05.000"},
+             {"video_id": VIDEO_ID, "segment_id": "b", "start_sec": 5.0,
+              "end_sec": 10.0, "start_tc": "00:00:05.000", "end_tc": "00:00:10.000"}]
+    monkeypatch.setattr(uncut, "load_segments", lambda d: shots)
+    monkeypatch.setattr(uncut, "load_redactions",
+                        lambda vid, root=None: {"redactions": []})
+    monkeypatch.setattr(uncut, "kept_range", lambda r, end: (0.0, 0.0005))
+
+    with pytest.raises(SystemExit, match="nothing survives the redaction"):
+        uncut.whole_video(VIDEO_ID)

@@ -632,6 +632,12 @@ def test_crescendo_fields_are_a_pair(tmp_path):
 def _run_fake_ffmpeg(monkeypatch):
     """Pretend every ffmpeg command succeeds and writes its output file."""
     def fake_run(cmd, **kw):
+        # A PROBE writes nothing. Touching cmd[-2] blindly created a file
+        # called `csv=p=0` in the working directory the moment anything
+        # probed through this fake -- harmless to the assertions, litter in
+        # the repo.
+        if any("ffprobe" in str(part) for part in cmd):
+            return subprocess.CompletedProcess(cmd, 0, stdout="")
         Path(cmd[-2]).touch()  # the output path sits just before "-y"
         return subprocess.CompletedProcess(cmd, 0)
     monkeypatch.setattr(megacut.subprocess, "run", fake_run)
@@ -1118,3 +1124,90 @@ def test_a_plan_with_no_distribution_gain_is_unchanged(tmp_path):
     ], master_gain_db=-1.7)
     dist = megacut.build_concat_command(plan, "list.txt", "out.mp4")
     assert dist[dist.index("-af") + 1] == "volume=-1.7dB"
+
+
+# --- a windowed silent clip: the #88 guard's blind spot ---------------------
+#
+# `audio: "silent"` sized its silence from the WHOLE source while the picture
+# was windowed by clip_window, so the two legs disagreed. verify_segment
+# measured only v:0, certified the segment as correct, and the concat demuxer
+# carried the overhang into every segment after it. The unwindowed case had
+# already been fixed once; the windowed one reopened it.
+
+
+def test_silence_is_cut_to_the_window_not_the_whole_source(tmp_path, monkeypatch):
+    """The silence must be the item's PLAYED length, as the picture is."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "silent", "trim_to": 5.0},
+    ])
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda path, stream=None: 42.0)  # the file is far longer
+    argv = megacut.build_segment_command(plan, 0, tmp_path / "seg000.mkv")
+
+    assert "anullsrc=channel_layout=stereo:sample_rate=48000:d=5.0" in " ".join(argv)
+    assert argv[argv.index("-t") + 1] == "5.0"
+    # The picture is windowed to the same number; the two legs must agree.
+    assert "trim=end=5.0" in " ".join(argv)
+
+
+def test_a_windowed_silent_clip_still_honours_trim_from(tmp_path, monkeypatch):
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "silent",
+         "trim_from": 2.0, "trim_to": 9.0},
+    ])
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda path, stream=None: 42.0)
+    argv = megacut.build_segment_command(plan, 0, tmp_path / "seg000.mkv")
+
+    assert argv[argv.index("-t") + 1] == "7.0"
+    assert "d=7.0" in " ".join(argv)
+
+
+def test_an_unwindowed_silent_clip_is_unchanged(tmp_path, monkeypatch):
+    """The fix must not move the case that was already correct."""
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "silent", "dur": 12.0},
+    ])
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda path, stream=None: 42.0)
+    argv = megacut.build_segment_command(plan, 0, tmp_path / "seg000.mkv")
+
+    assert argv[argv.index("-t") + 1] == "12.0"
+
+
+def test_a_segment_whose_sound_outlives_its_picture_fails_the_build(
+        tmp_path, monkeypatch):
+    """The durable half: measuring only v:0 is what hid this.
+
+    The picture is the right length, so the #88 check passes. The sound runs
+    to the source's full length, which the concat demuxer would carry into
+    every later segment as an offset.
+    """
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "silent", "trim_to": 5.0},
+    ])
+    _run_fake_ffmpeg(monkeypatch)
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda path, stream=None: 42.0)
+    monkeypatch.setattr(megacut, "probe_video_extent", lambda path: 5.0)
+    monkeypatch.setattr(megacut, "probe_audio_extent", lambda path: 42.0)
+
+    with pytest.raises(RuntimeError, match="desyncs every segment after it"):
+        megacut.assemble(plan, tmp_path / "out.mp4")
+
+
+def test_a_segment_with_no_audio_stream_does_not_trip_the_check(
+        tmp_path, monkeypatch):
+    """0.0 means 'no audio packets', not 'zero seconds of sound'."""
+    monkeypatch.setattr(megacut.subprocess, "run", lambda *a, **kw:
+                        subprocess.CompletedProcess(a[0], 0, stdout=""))
+    assert megacut.probe_audio_extent(tmp_path / "seg000.mkv") == 0.0
+
+
+def test_probe_audio_extent_takes_the_max_not_the_last_packet(
+        tmp_path, monkeypatch):
+    packets = "10.000000,0.021333\n10.021333,0.021333\n9.500000,0.021333\n"
+    monkeypatch.setattr(megacut.subprocess, "run", lambda *a, **kw:
+                        subprocess.CompletedProcess(a[0], 0, stdout=packets))
+    extent = megacut.probe_audio_extent(tmp_path / "seg000.mkv")
+    assert extent == pytest.approx(10.021333 + 0.021333)

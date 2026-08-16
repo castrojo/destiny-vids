@@ -63,9 +63,33 @@ def test_anchored_lines_land_where_their_footage_landed():
 
 
 def test_a_line_whose_footage_is_not_in_the_cut_is_reported_not_dropped_silently():
-    _, dropped = dialogue.plan_chat(CUES, SHOTS, LEADS)
+    # d03 is also the fixture's `uncertain` cue, and chat mode now drops that
+    # at the earlier gate (see the attribution test below). This test is about
+    # the FOOTAGE check, so keep the cue alive long enough to reach it.
+    _, dropped = dialogue.plan_chat(CUES, SHOTS, LEADS, skip_uncertain=False)
     assert any(d["id"] == "d03" and "not in this cut" in d["reason"]
                for d in dropped)
+
+
+def test_chat_mode_skips_a_speaker_the_anchors_do_not_settle():
+    """An unsettled line names one of two real people; it must not be shown.
+
+    `plan_script` has always dropped these. `plan_chat` -- the DEFAULT mode,
+    and the one the skill docs recommend -- did not check at all, so a cue the
+    recovered record explicitly says it cannot attribute was burned on screen
+    crediting whichever person the character happened to be bound to.
+    """
+    entries, dropped = dialogue.plan_chat(CUES, SHOTS, LEADS)
+    assert all(e["id"] != "d03" for e in entries)
+    assert any(d["id"] == "d03" and "not settled" in d["reason"] for d in dropped)
+
+
+def test_chat_mode_still_places_the_settled_lines():
+    """The fix drops the unsettled line only -- not the conversation."""
+    entries, _ = dialogue.plan_chat(CUES, SHOTS, LEADS)
+    assert [e["id"] for e in entries] == ["d01", "d02"]
+    assert [e["speaker"] for e in entries] == ["Lindsay Gendreau",
+                                               "Bob Killen"]
 
 
 def test_dialogue_never_double_books_the_screen():
