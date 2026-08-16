@@ -15,8 +15,7 @@
 - Fitting a cut to music → [`scoring.md`](../scoring/SKILL.md)
 - Delivering a finished file → [`production.md`](../production/SKILL.md)
 
-## Assembly is not editing
-This stage **joins finished things**. It never re-cuts, re-times or re-grades
+## Assembly is not editingThis stage **joins finished things**. It never re-cuts, re-times or re-grades
 one. Every item it is handed is either a rendered cut from this repo or an
 owner-approved deliverable, and if one of them is wrong the fix belongs
 upstream, in the thing that made it — not here.
@@ -30,6 +29,29 @@ programme end a delivered act early. It is not editing, because the act's own
 file is never touched — the cut lives in the plan, where it is read, tested
 and reverted like any other number. Anything more than "stop here" still
 belongs upstream.
+
+## It joins finished things — and checks they are still finished
+
+"Finished" was taken on trust: the tool resolved a path, found a file, and
+encoded it. Nothing asked whether that file was still the act its records
+describe, so an edited record with no rebuild shipped silently in the next
+programme — and the assembly stage is the one place where that reaches an
+audience.
+
+It now refuses. Before encoding, every seated clip is matched to its act (by
+**inode**, since `Prod/` entries are hardlinks to the declared masters) and
+checked against `stories/megacut/delivery.json`. An act whose master predates
+its own committed inputs is named, and the build exits non-zero.
+
+```bash
+python3 tools/deliver.py status --sources-only   # what moved, per act
+python3 tools/deliver.py build                   # rebuild exactly what is stale
+python3 tools/megacut.py <plan> --allow-stale    # ship the old masters anyway
+```
+
+This is not editing policy leaking downstream: the fix still belongs upstream,
+in the act. The gate only stops assembly from *pretending* the upstream fix
+happened.
 
 ## Core Process
 
@@ -159,6 +181,12 @@ This skill is the contract. The procedure lives in `references/`:
 - **Removing a slide removes that act's chapter marker.** `chapters()` derives
   markers from slides. If a card is dropped, keep its authored copy in the
   deck under `retired` with a note, and record the lost marker as a decision.
+- **A reported lost card is recovered from records, not guessed.** Before
+  touching it, run `git worktree list` and search each worktree's card or act
+  manifest for a distinctive phrase. Restore the entire card object, including
+  its text, scale, duration, and any adjacent removals or timing weights, then
+  compare the restored object with that source before rebuilding. A worktree
+  supplies authored state only; this repository's contract remains the policy.
 
 ## Verify, don't assert
 

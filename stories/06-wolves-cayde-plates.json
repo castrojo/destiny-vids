@@ -1,7 +1,7 @@
 {
-  "_what": "Act VI's tail plates -- the Cayde-6 reveal, the three gold credits that follow it, and the six lines castrojo speaks over the finale. AUTHORED, not derived: every window below is an owner mark, converted from megacut time to act VI FILM time and then CONFIRMED ON AN EXTRACTED FRAME before a name was attached to it. Copy is reproduced verbatim from the owner.",
+  "_what": "Act VI's plates -- the Ghost welcome, Jorge Castro's six lines over the close-up, the Cayde-6 reveal, and the three gold credits that follow it. AUTHORED, not derived: every window below is an owner mark, converted from megacut time to act VI FILM time and then CONFIRMED ON AN EXTRACTED FRAME before a name was attached to it. Copy is reproduced verbatim from the owner.",
   "_narration_became_pills": "2026-08-15, owner: the narration is 'individual senteces spaced out over the course of the shot, one line per with castrojo talking'. The single stacked title card (`cayde_narration`, 397.111 + 4.5 s, all six lines at once) is RETIRED and replaced by six `kind: chat` pills, one line each, credited to his GitHub handle -- act IV's precedent, and his name has already been said by the reveal three cards earlier. Two lines changed with the same instruction: 'For fives years' -> 'For five years' (the owner corrected his own brief), and 'Lead the way, open source will follow' -> 'Lead the way, we will follow'. Both are OWNER-SUPPLIED, hence `copy_source: owner_supplied` rather than `brief`.",
-  "_where_the_pills_sit": "NOT in the narration's old window. Measured: the reveal holds 393.511-396.911 and Kelsey's gold plate arrives at 401.819, so the old slot is 4.7 s -- six readable pills cannot live there (0.8 s each), and one plate at a time is a hard rule. The tail from 409.669 (the last gold credit clears) to the programme's cut is ~21 s of ONE unbroken finale run (scripts/build_wolves.py runs FINALE from film 380.670 to 431.170), so there is no shot boundary to violate inside it. The pills take that window at ONE LINE PER BAR: 3.157914 s apart from a measured onset at 411.390 (spectral flux on the delivered act; the bed's own bar is 3.157914 s), holding 2.8 s each. The last one clears at 429.38, ahead of the programme's out-point.",
+  "_where_the_pills_sit": "Programme 21:39 maps to Act VI 373.127, Jorge Castro's face close-up. The six readable pills start there, one per bar at 3.157914 s, and hold 2.8 s each. The last clears at 391.717, leaving 1.794 s before the Cayde reveal at 393.511; no two cards share a window.",
   "_letterbox": "Act VI is 2.40:1 in a 1920x1080 frame -- cropdetect on the delivered act gives crop=1920:800:0:140. The pills carry `position: letterbox`, so they seat in the bottom matte (rendered top edge y=979, picture bottom y=940) and never cover picture. The reveal and the gold credits keep `position: left` on the picture, unchanged.",
   "_clock": "The brief's marks are MEGACUT time. Act VI film = megacut - 673.992 (tools/megacut.py --locate agrees: 17:37 -> VI @ 6:23.041). Nothing here is a film timecode the owner typed, and nothing here was converted twice.",
   "_why_here": "Act II plates Jorge Castro as `[ REDACTED ]` with the note 'act II only -- he is revealed later in the programme'. This is that reveal: the programme withholds his name for sixteen minutes and pays it off on Cayde-6 walking out of the fog.",
@@ -11,6 +11,17 @@
   "title": "7 Days to the Wolves",
   "source_id": "prod_06_7daystothewolves",
   "plates": [
+    {
+      "id": "ghost_welcome",
+      "kind": "status",
+      "position": "status",
+      "detail": "AN4-CH4K-12",
+      "label": "Welcome to KubeCon + Cloud Native Con",
+      "copy_source": "owner_supplied",
+      "at": 36.127,
+      "dur": 6.0,
+      "_note": "Programme 16:02 maps to Act VI 0:36.127. The owner asked for the Ghost to welcome the audience, so this uses the top-of-frame status treatment rather than a normal lower-third chat."
+    },
     {
       "id": "cayde_reveal_castrojo",
       "at": 393.511,
@@ -100,10 +111,10 @@
       "avatar": "renders/avatars/castrojo.png",
       "text": "For five years you've trusted us",
       "copy_source": "owner_supplied",
-      "at": 411.39,
+      "at": 373.127,
       "dur": 2.8,
       "fade_in": 0.6,
-      "fade_out_at": 413.59,
+      "fade_out_at": 375.327,
       "fade_out": 0.25
     },
     {
@@ -114,10 +125,10 @@
       "avatar": "renders/avatars/castrojo.png",
       "text": "Mastered your tools",
       "copy_source": "owner_supplied",
-      "at": 414.548,
+      "at": 376.285,
       "dur": 2.8,
       "fade_in": 0.6,
-      "fade_out_at": 416.748,
+      "fade_out_at": 378.485,
       "fade_out": 0.25
     },
     {
@@ -128,10 +139,10 @@
       "avatar": "renders/avatars/castrojo.png",
       "text": "Honed your craft",
       "copy_source": "owner_supplied",
-      "at": 417.706,
+      "at": 379.443,
       "dur": 2.8,
       "fade_in": 0.6,
-      "fade_out_at": 419.906,
+      "fade_out_at": 381.643,
       "fade_out": 0.25
     },
     {
@@ -142,10 +153,10 @@
       "avatar": "renders/avatars/castrojo.png",
       "text": "Made Lifelong Friends",
       "copy_source": "owner_supplied",
-      "at": 420.864,
+      "at": 382.601,
       "dur": 2.8,
       "fade_in": 0.6,
-      "fade_out_at": 423.064,
+      "fade_out_at": 384.801,
       "fade_out": 0.25
     },
     {
@@ -156,10 +167,10 @@
       "avatar": "renders/avatars/castrojo.png",
       "text": "And now it's up to you, guardian",
       "copy_source": "owner_supplied",
-      "at": 424.022,
+      "at": 385.759,
       "dur": 2.8,
       "fade_in": 0.6,
-      "fade_out_at": 426.222,
+      "fade_out_at": 387.959,
       "fade_out": 0.25
     },
     {
@@ -170,10 +181,10 @@
       "avatar": "renders/avatars/castrojo.png",
       "text": "Lead the way, we will follow",
       "copy_source": "owner_supplied",
-      "at": 427.18,
+      "at": 388.917,
       "dur": 2.8,
       "fade_in": 0.6,
-      "fade_out_at": 429.38,
+      "fade_out_at": 391.117,
       "fade_out": 0.25
     }
   ],

@@ -1211,3 +1211,77 @@ def test_probe_audio_extent_takes_the_max_not_the_last_packet(
                         subprocess.CompletedProcess(a[0], 0, stdout=packets))
     extent = megacut.probe_audio_extent(tmp_path / "seg000.mkv")
     assert extent == pytest.approx(10.021333 + 0.021333)
+
+
+# --- assembly refuses stale acts (the "always ships stale" defect) ----------
+
+def _stale_ws(tmp_path, fresh=False):
+    """A one-act plan seating a master whose input moved after the render."""
+    import os
+    from tools import deliver
+
+    src_rel = "shotlist.json"
+    (tmp_path / src_rel).write_text("v1")
+    master = tmp_path / "master.mp4"
+    master.write_bytes(b"rendered")
+
+    # Digest recorded against v1, then the input moves -> the act is stale.
+    old_root = deliver.REPO_ROOT
+    deliver.REPO_ROOT = tmp_path
+    try:
+        digest = deliver.source_digest([src_rel])
+    finally:
+        deliver.REPO_ROOT = old_root
+    if not fresh:
+        (tmp_path / src_rel).write_text("v2")
+
+    delivery = tmp_path / "delivery.json"
+    delivery.write_text(json.dumps({"masters": {"I": {
+        "path": str(master), "sources": [src_rel], "source_digest": digest}}}))
+
+    prod = tmp_path / "01-intro.mp4"
+    os.link(master, prod)          # Prod is a hardlink, exactly as publish makes it
+    plan = {"output": str(tmp_path / "out.mp4"),
+            "items": [{"kind": "clip", "path": str(prod), "audio": "source",
+                       "label": "Act I"}]}
+    return plan, delivery, tmp_path
+
+
+def test_assembly_refuses_an_act_whose_master_predates_its_inputs(
+        tmp_path, monkeypatch):
+    """THE DEFECT: assembly seated whatever file it found.
+
+    Nothing in the assembly stage asked whether a master was still the act its
+    records describe, so an edited record with no rebuild shipped silently in
+    the next programme.
+    """
+    from tools import deliver
+    plan, delivery, root = _stale_ws(tmp_path)
+    monkeypatch.setattr(deliver, "REPO_ROOT", root)
+
+    stale = megacut.stale_seated_acts(plan, delivery_path=delivery)
+
+    assert [n for n, _ in stale] == ["I"]
+
+
+def test_assembly_does_not_cry_stale_over_a_rebuilt_act(tmp_path, monkeypatch):
+    """The gate must not block a correct build, or it will be switched off."""
+    from tools import deliver
+    plan, delivery, root = _stale_ws(tmp_path, fresh=True)
+    monkeypatch.setattr(deliver, "REPO_ROOT", root)
+
+    assert megacut.stale_seated_acts(plan, delivery_path=delivery) == []
+
+
+def test_a_stale_act_is_matched_through_its_prod_hardlink(tmp_path, monkeypatch):
+    """Plans seat `Prod/<act>.mp4`; delivery.json names the master.
+
+    They are the same inode and must resolve to the same act, or the gate
+    would silently match nothing on the one layout the repo actually uses.
+    """
+    from tools import deliver
+    plan, delivery, root = _stale_ws(tmp_path)
+    monkeypatch.setattr(deliver, "REPO_ROOT", root)
+    masters, _ = deliver.load_delivery(delivery)
+    assert Path(plan["items"][0]["path"]).name != Path(masters["I"]["path"]).name
+    assert megacut.stale_seated_acts(plan, delivery_path=delivery)

@@ -85,6 +85,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from tools import conform  # noqa: E402
 from tools import footage  # noqa: E402
+from tools import peaks  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "00-prologue-plates.json"
@@ -157,12 +158,11 @@ AUDIO_FADE = TOTAL - AUDIO_FADE_START                  # 8.200
 # dull the crackle into mush. The sanctioned lever is LEVEL. Every spark stays
 # exactly as mixed; it simply does not arrive at the listener at full scale.
 #
-# THE SHAPE IS THE CUT'S. The picture is a dark void until the 12.28 shot change,
-# so the ride reaches unity exactly there: the sparks are held down precisely
-# where they live, and full level lands on the film's biggest visual event
-# instead of on a black screen. Nothing after 12.28 is touched.
+# The source's broadband spark burst continues through the picture bloom, so
+# the ride reaches unity only once it has cleared. The burst remains intact;
+# it simply arrives roughly 4 dB lower at its 12.2-12.5 s peak.
 RIDE_START_DB = -12.0
-RIDE_TO = 12.280
+RIDE_TO = 15.000
 
 FPS = conform.DELIVERY.fps
 W, H = conform.DELIVERY.width, conform.DELIVERY.height
@@ -272,7 +272,8 @@ def filtergraph():
             f"'if(lt(t,{RIDE_TO:.3f}),"
             f"pow(10,({RIDE_START_DB:.1f}*(1-pow(t/{RIDE_TO:.3f},2)))/20),1)'")
 
-    audio = (f"[0:a]atrim=0:{TOTAL:.3f},asetpts=PTS-STARTPTS,{ride},"
+    audio = (f"[0:a]atrim=0:{TOTAL:.3f},asetpts=PTS-STARTPTS,"
+             f"afade=t=in:st=4.000:d=1.000,{ride},"
              f"afade=t=out:st={AUDIO_FADE_START:.3f}:d={AUDIO_FADE:.3f},"
              f"aresample=48000[aout]")
 
@@ -328,6 +329,7 @@ def main(argv=None):
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(argv_ff, check=True)
+    peaks.trim_master_peak(OUT.resolve())
     print(json.dumps({"out": str(OUT), "duration": round(TOTAL, 3),
                       "out_point": OUT_POINT, "bridge": BRIDGE}, indent=2))
     return 0

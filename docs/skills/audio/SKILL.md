@@ -19,6 +19,12 @@ cd ~/Videos
 ./audio-source.sh <URL_OR_ID> out.wav   # fetch the best rung + provenance
 ```
 
+**Verify the upload before measuring it.** A plausible YouTube ID can resolve
+to a different Nightwish video. Read the provenance file the fetch writes and
+confirm its `title`, `video id`, and URL match the chosen recording; format 251
+at 48 kHz proves source quality, not source identity. If it is wrong, remove
+that exact fetched artifact and re-fetch before creating a bed record.
+
 ## The state of the show
 
 Do not read it from a table here — every column has a machine record, and a
@@ -50,7 +56,8 @@ deliberate: `master_gain_db` is the mix and both files carry it;
 `distribution_gain_db` is headroom only the lossy leg needs. One shared gain
 would either clip the copy or duck the master for nothing. Never `loudnorm`,
 limiting, or compression. FFmpeg's `volume` filter accepts dB values, and
-`ebur128=peak=true` measures true peak. Source: `/websites/ffmpeg_ffmpeg-all`.
+`ebur128=peak=true` measures true peak. Source:
+`/websites/ffmpeg_documentation`.
 
 **The programme itself has a lossless master** (issue #145): FLAC in Matroska
 off the same PCM segments and the same copied picture bitstream as the
@@ -72,6 +79,13 @@ builders is its own change because they are frozen by the delivery digest
 (#167). A static gain shows in the measurements as exactly itself — LRA
 unchanged at 11.3 LU, integrated loudness down by exactly the gain — and the
 video stream MD5 untouched.
+
+**Standalone builders call `peaks.trim_master_peak(out_path.resolve())` after
+their final ffmpeg command.** The absolute path is essential when
+`find_ffmpeg()` resolves to the containerized encoder: a relative staged
+`.pretrim` input is not addressable inside the container. The gate copies the
+video stream and applies one measured static audio gain, so it runs after
+rendering and before `deliver.py publish`.
 
 ## The honest caveat: "lossless" here is relative
 

@@ -53,6 +53,9 @@ def test_the_delivery_map_covers_every_filmed_act_and_no_phantom_acts():
     numerals = {a.numeral for a in acts}
     assert set(masters) <= numerals, "the map names an act the order does not"
     assert set(social.get("absent", {})) <= numerals
+    assert social["absent"]["0"] == (
+        "A standalone 10mb copy is permitted only for private draft-level "
+        "review; it is not a publication deliverable.")
     for act in acts:
         if act.prod_file:
             assert act.numeral in masters, f"act {act.numeral} has a film " \
@@ -722,3 +725,77 @@ def test_every_declared_youtube_master_has_a_provenance_record():
     assert not unrecorded, (
         f"declared footage with no videos/<id>.json: {', '.join(unrecorded)}. "
         f"Every fetched master needs its source URL and rights recorded.")
+
+
+# --- publish must not launder staleness (the "always ships stale" defect) ---
+
+def _stamp_ws(tmp_path, monkeypatch):
+    """One act, one committed input, one master file, and a delivery map."""
+    monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
+    src = tmp_path / "shotlist.json"
+    src.write_text("v1")
+    master = tmp_path / "master.mp4"
+    master.write_bytes(b"rendered")
+    old, new = 1_000_000_000, 1_000_000_100
+    os.utime(master, (old, old))
+    os.utime(src, (old - 10, old - 10))
+    delivery = tmp_path / "delivery.json"
+    delivery.write_text(json.dumps({"masters": {"I": {
+        "path": str(master), "sources": ["shotlist.json"],
+        "source_digest": deliver.source_digest(["shotlist.json"])}}}))
+    return src, master, delivery, new
+
+
+def _publish_digests(delivery, acts=None):
+    doc = json.loads(Path(delivery).read_text())
+    masters = doc["masters"]
+    acts = acts or [deliver.Act(numeral="I", title="I", prod_file="01.mp4")]
+    deliver.record_source_digests(acts, masters, delivery, log=lambda *a: None)
+    return json.loads(Path(delivery).read_text())["masters"]["I"]
+
+
+def test_publish_refuses_to_stamp_a_master_that_predates_its_inputs(
+        tmp_path, monkeypatch):
+    """THE DEFECT: `publish` used to stamp every act unconditionally.
+
+    Editing an input and running `publish` without rebuilding recorded the new
+    digest over an old master, so the gate went green and the next megacut
+    seated a stale act. Whoever ran `publish` erased the only signal that the
+    act needed re-rendering -- which is why stale programmes shipped.
+    """
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")                    # the input moves...
+    os.utime(src, (new, new))               # ...after the master was written
+    before = json.loads(delivery.read_text())["masters"]["I"]["source_digest"]
+
+    after = _publish_digests(delivery)
+
+    assert after["source_digest"] == before, (
+        "publish stamped a digest over a master that was never rebuilt -- "
+        "that is the staleness eraser")
+
+
+def test_publish_stamps_once_the_act_is_actually_rebuilt(tmp_path, monkeypatch):
+    """The guard must not become a wall: a real rebuild still records."""
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")
+    os.utime(src, (new, new))
+    master.write_bytes(b"re-rendered")      # the rebuild...
+    os.utime(master, (new + 10, new + 10))  # ...lands after the input
+
+    after = _publish_digests(delivery)
+
+    assert after["source_digest"] == deliver.source_digest(["shotlist.json"])
+
+
+def test_a_master_that_predates_its_inputs_is_reported_not_silent(
+        tmp_path, monkeypatch, capsys):
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")
+    os.utime(src, (new, new))
+    lines = []
+    doc = json.loads(delivery.read_text())
+    deliver.record_source_digests(
+        [deliver.Act(numeral="I", title="I", prod_file="01.mp4")],
+        doc["masters"], delivery, log=lines.append)
+    assert any("rebuild the act" in ln for ln in lines), lines

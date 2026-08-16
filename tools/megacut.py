@@ -1303,6 +1303,57 @@ def locate(plan, seconds):
     raise ValueError("empty plan")
 
 
+def stale_seated_acts(plan, delivery_path=None):
+    """The acts this plan seats whose masters predate their own inputs.
+
+    Assembly "joins finished things", and it trusted that word completely: it
+    resolved a path, found a file, and encoded it. Nothing asked whether the
+    file was still the act its records describe. So the ONE stage that decides
+    what an audience sees was the only stage with no opinion about staleness,
+    and every stale act it seated shipped silently.
+
+    An item is matched to an act by INODE, not by path string: `Prod/` entries
+    are hardlinks to the declared masters (`deliver.py publish` only ever
+    links), so the same file reached by either name is the same act. A master
+    that is absent on this machine matches nothing and is skipped.
+    """
+    try:
+        from tools import deliver
+    except Exception:  # pragma: no cover - deliver is part of the repo
+        return []
+    path = delivery_path or (Path(__file__).resolve().parents[1]
+                             / "stories" / "megacut" / "delivery.json")
+    if not Path(path).exists():
+        return []
+    masters, _ = deliver.load_delivery(path)
+    stale = dict(deliver.stale_source_acts(masters))
+    if not stale:
+        return []
+    by_inode = {}
+    for numeral, master in stale.items():
+        f = deliver.resolve_master(master["path"])
+        try:
+            st = f.stat()
+        except OSError:
+            continue
+        by_inode[(st.st_dev, st.st_ino)] = numeral
+    seated = {}
+    for i, item in enumerate(plan.get("items", [])):
+        if item.get("kind") != "clip":
+            continue
+        got = resolve(item["path"])
+        if not got:
+            continue
+        try:
+            st = Path(got).stat()
+        except OSError:
+            continue
+        numeral = by_inode.get((st.st_dev, st.st_ino))
+        if numeral:
+            seated.setdefault(numeral, item.get("label") or item["path"])
+    return sorted(seated.items())
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("plan", help="JSON assembly plan")
@@ -1331,6 +1382,11 @@ def main(argv=None):
     ap.add_argument("--no-copy", action="store_true",
                     help="encode every segment even when sources conform to "
                          "the delivery spec (debugging; the slow path)")
+    ap.add_argument("--allow-stale", action="store_true",
+                    help="assemble even when a seated act's master predates "
+                         "its own committed inputs (a deliberate rough cut; "
+                         "the default refuses, because that is how stale "
+                         "programmes shipped)")
     args = ap.parse_args(argv)
 
     plan = load_plan(args.plan, require_sources=not (args.chapters or args.locate))
@@ -1372,6 +1428,20 @@ def main(argv=None):
         print(f"# expected duration: {expected_duration(plan):.3f}s "
               f"across {len(plan['items'])} items")
         return 0
+
+    stale = stale_seated_acts(plan)
+    if stale and not args.allow_stale:
+        lines = "\n".join(f"  act {n}: {label}" for n, label in stale)
+        raise SystemExit(
+            f"REFUSING to assemble: {len(stale)} seated act(s) have a master "
+            f"that predates its own committed inputs.\n{lines}\n\n"
+            f"Rebuild each act, then `python3 tools/deliver.py publish`. "
+            f"`python3 tools/deliver.py status --sources-only` shows what "
+            f"moved. Pass --allow-stale to ship the old masters anyway.")
+    if stale:
+        for n, label in stale:
+            print(f"WARNING: act {n} is STALE and seated anyway "
+                  f"(--allow-stale): {label}", file=sys.stderr)
 
     print(f"assembling {len(plan['items'])} items -> {out_path}", file=sys.stderr)
     assemble(plan, out_path, jobs=args.jobs,

@@ -4,7 +4,7 @@
  "masters": {
   "0": {
    "path": "~/src/destiny-vids/renders/00-prologue.mp4",
-   "note": "THE PROLOGUE -- the feature's main title sequence, and the one entry with NO NUMERAL. Built by scripts/build_prologue.py from the committed manifest, so unlike act I it is reproducible from this repo. Its picture is the first 91.2 s of Nightwish's official 'Perfume Of The Timeless' music video (oHCaZmIzr0o) plus an 8.0 s March-wallpaper bridge; see music/bed_perfume_of_the_timeless.json for what this film is permitted to do with it. PROTOTYPE OUTPUT: the shipping presentation EMBEDS the music video rather than re-hosting it (owner: \"it's an iframe using their video don't download it\"), so this rendered file is for cutting and review, not for publication.",
+   "note": "THE PROLOGUE -- the feature's main title sequence, and the one entry with NO NUMERAL. Built by scripts/build_prologue.py from the committed manifest, so unlike act I it is reproducible from this repo. Its picture is the first 91.2 s of Nightwish's official 'Perfume Of The Timeless' music video (oHCaZmIzr0o) plus a 10.0 s March-wallpaper bridge; see music/bed_perfume_of_the_timeless.json for what this film is permitted to do with it. PROTOTYPE OUTPUT: the shipping presentation embeds the music video rather than re-hosting it. A standalone 10mb copy is permitted only for private draft-level review; it is not a publication deliverable. The source master measures +0.5 dBTP and the review copy +0.2 dBTP; both retain the unaltered mix for level comparison, and final headroom needs a separate mastering decision.",
    "sources": [
     "stories/00-prologue-plates.json",
     "scripts/build_prologue.py",
@@ -22,7 +22,7 @@
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
-   "note": "the six Guardian plates and the comic title card burned over BKm0TPqeOjY, trimmed 2.0 -> 113.55. NO COMMITTED BUILDER: this act was assembled ad-hoc (raw x264 crf 14 trim, then a `tools/plate.py` burn at crf 18) rather than by a script under `scripts/`, so its `sources` cover the copy that goes on screen but not the assembly that places it. Re-rendering act I from the repo is therefore not reproducible today -- that gap is its own finding, not a reason to leave the act undeclared",
+   "note": "the six Guardian plates and the comic title card burned over BKm0TPqeOjY, trimmed 2.0 -> 113.55. Picture remains Bungie's official cinematic; audio is Destiny Music Archive's BV3BZKbpBns 'Into the Light (Without Dialogue)' at native 48 kHz Opus, aligned +1.978625 s to the official picture and muxed losslessly. That restores the score without Ikora's voice-over. NO COMMITTED BUILDER: this act was assembled ad-hoc (raw x264 crf 14 trim, then a `tools/plate.py` burn at crf 18) rather than by a script under `scripts/`, so its `sources` cover the copy that goes on screen but not the assembly that places it. Re-rendering act I from the repo is therefore not reproducible today -- that gap is its own finding, not a reason to leave the act undeclared",
    "sources": [
     "stories/megacut/megacut-hero-plates.json",
     "vocab/casting.yaml"
@@ -74,7 +74,9 @@
     "scripts/actbuild.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "f568c5533a79d5d50c003401ae05fa9477f2dcef0a52357312007427a7bd3bb2"
+   "source_digest": "1bb0e742edaa453f57463e48558cd9ea8168f3b6a349379daaa2bb0cf0e88f01",
+   "rebuild": "python3 scripts/build_kat.py",
+   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
@@ -85,11 +87,13 @@
     "scripts/actbuild.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "997d259bfcd054504bf4e08b30c2a0c5fcebb4af9bf1a1bdbb50e0d78e707961"
+   "source_digest": "974daa12d016ac6b9eef18a6815ed386f29d4f3f9ab133a5fd32f16328f29eba",
+   "rebuild": "python3 scripts/build_natali.py",
+   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },
   "VI": {
-   "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v4.mp4",
-   "note": "the #104 interruption build with its **hold music now playing** (443.533 s): Local Forecast – Slower, CC BY 4.0, credited in the repo's `ATTRIBUTIONS.md`. The slot shipped silent in v2 because a cleared track was mistaken for a rights block. **AAC, the one act with no lossless master** (#58)",
+   "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v6.mp4",
+   "note": "the slide-free interruption master (443.463 s), with the Ghost welcome and Jorge's close-up conversation. The v4 replacement is 424.074 s and cannot supply the plan's tail cut, so it is not a valid act master. **AAC, the one act with no lossless master** (#58)",
    "sources": [
     "scripts/build_wolves.py",
     "scripts/rebuild-wolves.sh",
@@ -115,14 +119,16 @@
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
-   "note": "1:37.266. The comic cover (97.200-110.200) is CUT: it is act VIII's reveal now (#178), and playing it twice made the second one the weaker. The act ends on the fade-to-black it already had -- measured luminance runs 23.6 mean at 95.5 s to 0.00 at 97.2 -- with a 2.5 s audio fade landing the outro with the picture. Picture is STREAM-COPIED from the -1.1 dBTP master (#82); no generation added. REPO-DRIVEN since the terse-pass re-render (#102, fixes #152 for act VII): plates are house pills rendered from the committed record by scripts/build_europa.py via scripts/actbuild.py.",
+   "note": "1:35.400. The comic cover (95.333333-108.333333) is CUT: it is act VIII's reveal now (#178), and playing it twice made the second one the weaker. The Exo walk-up keeps only the solo wide (source 114.767 through the original cut at 116.958) -- the close-up that introduced the other two Guardians is out, and the join to the wrap is a HARD CUT: no walk-up fade_out, no wrap fade_in. The KubeCon announcement overlay is RETIRED (owner 2026-08-16); the underlying Jupiter wrap remains, and the act still ends on the wrap's own fade-to-black, with a 2.5 s audio fade (92.833333 + 2.5) landing the outro with the picture. Picture is STREAM-COPIED from the -1.1 dBTP master (#82); no generation added. REPO-DRIVEN since the terse-pass re-render (#102, fixes #152 for act VII): plates are house pills rendered from the committed record by scripts/build_europa.py via scripts/actbuild.py.",
    "sources": [
     "stories/07-europa-plates.json",
     "scripts/build_europa.py",
     "scripts/actbuild.py",
     "tools/plate.py"
    ],
-   "source_digest": "c53d388bd54bafd4753de14ad400b848350492eab1a4aefd5697c0805b95ef6a"
+   "source_digest": "27b56ee26cef604704758be22748d69c21ff008ce5903e0c63efb78c08a5dd29",
+   "rebuild": "python3 scripts/build_europa.py",
+   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
@@ -132,7 +138,7 @@
     "scripts/build_credits.py",
     "tools/credits.py",
     "music/bed_wish_i_had_an_angel.json",
-    "music/bed_wish_i_had_an_angel_album.json",
+    "music/bed_storytime.json",
     "vocab/casting.yaml"
    ],
    "source_digest": "cb3b6966505f6c12b6a69ed34337acab1c14bb4b93ce87d3ddcf9dfb890b31ce"
@@ -142,7 +148,7 @@
   "audio_bitrate": 256,
   "_bitrate_note": "10mb/README.md builds with --audio-bitrate 256: the cap is spent on audio first, because a starved music bed is the artifact people actually hear on a phone.",
   "absent": {
-   "0": "NOT a rights call to make casually: the prologue's picture is Nightwish's own music video, and a social copy is a REDISTRIBUTION of it. The owner's instruction for this act is that the shipping form embeds the video rather than re-hosting it, so a standalone clip is exactly the thing that must not be cut. No social copy, by design and on purpose.",
+   "0": "A standalone 10mb copy is permitted only for private draft-level review; it is not a publication deliverable.",
    "II": "308.0 s leaves ~16 kbps of video budget under the 10 MiB cap -- it would look like mud. Recorded in 10mb/README.md; the fix is a shorter excerpt, which is an editorial decision for the owner.",
    "III": "160.2 s leaves ~268 kbps of video budget -- mud. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
    "VI": "443.5 s: the 256k audio ALONE overruns the 10 MiB cap, so no copy can be encoded at all. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",

@@ -6,7 +6,7 @@
     "bed_id": "bed_wish_i_had_an_angel",
     "media_filename": "bed_wish_i_had_an_angel.wav",
     "source_url": "https://www.youtube.com/watch?v=xgL1oBwVG6M",
-    "_what": "PASS ONE -- the instrumental, on loop. Two spans in order, so the song starts on the drum smash, loops back to its own top, and never plays the breakdown. Owner: 'we want the song on loop basically but starting at the drum smash', and 'cut out the weird drum section with the moaning'. When this pass has played once IN FULL the bed hands over to `then` -- the album version, with vocals: 'switch to the album version with vocals after the entire instrumental loops once'.",
+    "_what": "PASS ONE -- the instrumental, on loop. Two spans in order, so the song starts on the drum smash, loops back to its own top, and never plays the breakdown. Owner: 'we want the song on loop basically but starting at the drum smash', and 'cut out the weird drum section with the moaning'. When this pass has played once IN FULL the bed hands over to `then` -- Nightwish's vocal Storytime recording. The instrumental pass and its measured spans remain unchanged.",
     "segments": [
       {
         "_what": "A -- the drum smash to the last full bar. 193.420 is the MEASURED re-entry after the breakdown, +12.98 dB, the largest onset in the song. The out point was 240.780; the owner cut it: ':46 - cut all of this part and go right to the drums so the entire song sounds like a loop'. The song's ENDING starts at 240.08 -- the level falls -11 -> -17 dB and keeps falling to digital silence at 241.95 -- and an ending is exactly what a loop must not contain. :46 on the credits clock is source 239.420; the cut is at 239.653152, the nearest beat in the bed's own tracked grid, 0.23 s later and still 0.43 s clear of the decay.",
@@ -21,15 +21,15 @@
     ],
     "crossfade_sec": 0.25,
     "then": {
-      "_what": "PASS TWO -- the album version, WITH VOCALS. It takes over the moment the instrumental loop has run once, which is what 'after the entire instrumental loops once' means: the loop is not cut short to make room. IT DOES NOT RESTART THE SONG. Owner, 2026-08-15: 'the transition is weird you don't need to start the song from the beginning just make it all fit so it sounds like they play the instrumental version first and then go into the song.' Playing this recording from 0.0 is what produced the 'weird': the hand-over happens mid-song -- pass one goes out at instrumental 181.320, the top of the breakdown -- so landing on this recording's QUIET INTRO makes the song audibly start over. The intro is SKIPPED and the album is entered on its full-band vocal entry instead, so the instrumental reads as the opener and the song proper arrives with the voice. WHY NOT A LITERAL CONTINUATION at album ~184.5, the breakdown pass one stopped at: it would replay the 'weird drum section with the moaning' the owner cut from the loop, and it would leave only 59 s of song -- the last minute rather than 'the song'. The record's downbeat phase is UNRESOLVED and nothing here needs it: the in point is a measured onset snapped to a tracked beat, never to a bar.",
-      "bed_id": "bed_wish_i_had_an_angel_album",
-      "media_filename": "bed_wish_i_had_an_angel_album.wav",
-      "source_url": "https://www.youtube.com/watch?v=wEERFBI9eCg",
+      "_what": "PASS TWO -- Storytime, WITH VOCALS. It takes over only after the instrumental loop has run in full; pass one is never shortened to make room. Storytime's quiet opening is skipped so the hand-over lands on the full-band entry rather than losing momentum. Its grid phase is unresolved, which is honest: this pass needs a beat-aligned entrance, not an invented bar line.",
+      "bed_id": "bed_storytime",
+      "media_filename": "bed_storytime.wav",
+      "source_url": "https://www.youtube.com/watch?v=09MTDBb8qro",
       "segments": [
         {
-          "_what": "MEASURED 2026-08-15. The album version is entered at 10.4722, NOT at 0.0. Its own intro runs 0 -> 10.8 at about -13 dB and the full band and the vocal arrive on a +6.11 dB step at 10.820 -- the sharpest onset anywhere in the first minute. 10.4722 is the album's own tracked beat 0.348 s ahead of that step, chosen so the 0.25 s crossfade is COMPLETE before the hit lands: starting on the onset itself would put the transient inside the fade and shave the arrival. 243.400 is unchanged and is also measured -- the recording holds full level to 242, decays through 242-243 and is at -54.4 dB by 243, so the film still ends on the song's own ending with the digital silence left off the back.",
-          "start_sec": 10.4722,
-          "end_sec": 243.4
+          "_what": "MEASURED 2026-08-16 from Nightwish's official Storytime music video. The full-band vocal entry is a +6.23 dB re-entry at 14.880. 14.512472 is Storytime's own preceding tracked beat, chosen so the 0.25 s crossfade ends 0.118 s before the hit instead of shaving it. The recording sustains through 236 s and decays naturally to 244.134604 with no digital tail, so the credits end on the song's real ending.",
+          "start_sec": 14.512472,
+          "end_sec": 244.134604
         }
       ]
     }

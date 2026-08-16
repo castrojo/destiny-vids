@@ -317,6 +317,58 @@ def source_digest(sources):
     return h.hexdigest()
 
 
+def sources_newer_than(sources, path):
+    """The declared inputs modified AFTER `path` was written.
+
+    The mtime companion to `source_digest`. The digest answers "are these the
+    inputs that were recorded?"; this answers "could this master possibly have
+    been built from them?" -- and only the second one can catch a digest being
+    stamped over an act nobody re-rendered.
+
+    mtime is a hint, not authority (Syncthing and a fresh clone both move it),
+    but it is the hint that exists BEFORE anything is recorded, and it only
+    ever makes the tool refuse to record. Erring this way costs a needless
+    rebuild; erring the other way ships a stale act, which is the defect this
+    exists to stop.
+    """
+    path = Path(path)
+    if not path.exists():
+        return []
+    cutoff = path.stat().st_mtime
+    out = []
+    for rel in sources:
+        p = REPO_ROOT / rel
+        if p.is_dir():
+            newest = max((c.stat().st_mtime for c in p.rglob("*")
+                          if c.is_file()), default=None)
+            if newest is not None and newest > cutoff:
+                out.append(rel)
+        elif p.exists() and p.stat().st_mtime > cutoff:
+            out.append(rel)
+    return out
+
+
+def stale_source_acts(masters):
+    """Acts whose committed inputs have moved since their master was recorded.
+
+    The same judgement `check_sources` reports, in the form a caller can act
+    on. It needs no footage and no ~/Videos, so any stage can ask it -- which
+    is the point: the ASSEMBLY stage is where a stale act actually reaches an
+    audience, and it used to have no way to ask.
+    """
+    out = []
+    for numeral, master in (masters or {}).items():
+        sources = master.get("sources")
+        if not sources:
+            continue
+        recorded = master.get("source_digest")
+        if not recorded:
+            continue
+        if source_digest(sources) != recorded:
+            out.append((numeral, master))
+    return out
+
+
 def check_sources(act, master, report):
     """The rung BEFORE the master: did an act's inputs change without a render?
 
@@ -772,6 +824,18 @@ def record_source_digests(acts, masters, delivery_path, log=print):
         if not master:
             continue
         if master.get("sources"):
+            # The SAME guard the footage digest below has always had, and its
+            # absence here is what let stale programmes ship: `publish` claims
+            # "what is in Prod now is built from these inputs", so stamping a
+            # master that is OLDER than those inputs records a claim nobody
+            # can have made true. It went green, `check_sources` had nothing
+            # left to catch, and the next megacut seated the stale act.
+            src = resolve_master(master["path"])
+            behind = sources_newer_than(master["sources"], src)
+            if behind:
+                log(f"  {act.numeral}: inputs NOT recorded -- the master "
+                    f"predates {', '.join(behind)}; rebuild the act first")
+                continue
             digest = source_digest(master["sources"])
             if master.get("source_digest") != digest:
                 master["source_digest"] = digest

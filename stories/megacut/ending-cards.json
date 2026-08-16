@@ -1,0 +1,172 @@
+{
+  "$schema": "../../schema/ending-cards.schema.json",
+  "_what": "Authored copy and timing for the silent mission pause and the underwater closing passage.",
+  "pause": {
+    "fps": "60000/1001",
+    "fade_frames": 72,
+    "gap_frames": 30,
+    "black_hold_frames": 89,
+    "frames": 1439,
+    "duration": 24.007317,
+    "plate_ids": [
+      "mission",
+      "we-are",
+      "purpose",
+      "lesson",
+      "left-to-teach"
+    ]
+  },
+  "underwater": {
+    "source_in": 396.32,
+    "source_out": 427.44,
+    "active_y": 138,
+    "active_height": 804,
+    "plate_ids": [
+      "loves",
+      "not-immortal",
+      "loss-hurts",
+      "ever-understand",
+      "chain-unending",
+      "last-sighs",
+      "break-chain"
+    ]
+  },
+  "plates": [
+    {
+      "id": "mission",
+      "kind": "ending",
+      "section": "pause",
+      "mode": "pause",
+      "frames": 300,
+      "label": "Mission",
+      "title": "Bring new contributors to cloud native",
+      "wallpaper": "renders/artwork/bluefin-day.png"
+    },
+    {
+      "id": "we-are",
+      "kind": "ending",
+      "section": "pause",
+      "mode": "pause",
+      "frames": 240,
+      "title": "We are Project Bluefin",
+      "wallpaper": "renders/artwork/bluefin-night.png"
+    },
+    {
+      "id": "purpose",
+      "kind": "ending",
+      "section": "pause",
+      "mode": "pause",
+      "frames": 240,
+      "title": "And we have one purpose",
+      "wallpaper": "renders/artwork/dusk-day.png"
+    },
+    {
+      "id": "lesson",
+      "kind": "ending",
+      "section": "pause",
+      "mode": "pause",
+      "frames": 210,
+      "title": "One lesson",
+      "wallpaper": "renders/artwork/dusk-night.png"
+    },
+    {
+      "id": "left-to-teach",
+      "kind": "ending",
+      "section": "pause",
+      "mode": "pause",
+      "frames": 240,
+      "title": "Left to teach",
+      "wallpaper": "renders/artwork/huntress.png"
+    },
+    {
+      "id": "loves",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "bottom_matte",
+      "text": "A million loves",
+      "at": 6.92,
+      "dur": 3.4,
+      "fade_in": 0.6,
+      "fade_out": 0.6
+    },
+    {
+      "id": "not-immortal",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "bottom_matte",
+      "text": "We are not immortal",
+      "at": 10.62,
+      "dur": 3.4,
+      "fade_in": 0.6,
+      "fade_out": 0.6
+    },
+    {
+      "id": "loss-hurts",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "bottom_matte",
+      "text": "One loss hurts us more",
+      "at": 16.4,
+      "dur": 2.8,
+      "fade_in": 0.6,
+      "fade_out": 0.6
+    },
+    {
+      "id": "ever-understand",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "bottom_matte",
+      "text": "Than any of you will ever understand",
+      "emphasis": [
+        {
+          "text": "ever",
+          "style": "seared"
+        }
+      ],
+      "at": 19.8,
+      "dur": 4.2,
+      "fade_in": 0.6,
+      "fade_out": 0.6
+    },
+    {
+      "id": "chain-unending",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "bottom_matte",
+      "text": "Seven Days and one chain of lives unending",
+      "at": 24.3,
+      "dur": 4.2,
+      "fade_in": 0.6,
+      "fade_out": 0.6
+    },
+    {
+      "id": "last-sighs",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "bottom_matte",
+      "text": "Last sighs on a deathbed",
+      "at": 28.8,
+      "dur": 3.8,
+      "fade_in": 0.6,
+      "fade_out": 0.6
+    },
+    {
+      "id": "break-chain",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "center",
+      "text": "Break the Chain",
+      "at": 33.0,
+      "dur": 4.4,
+      "fade_in": 0.6,
+      "fade_out": 0.6
+    }
+  ]
+}

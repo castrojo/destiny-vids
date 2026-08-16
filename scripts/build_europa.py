@@ -12,9 +12,9 @@ has never needed:
 * the concat picture graph, compiled from the record's ``picture`` block
   (an input feeding two segments is split, never opened twice);
 * the two-part audio join from the record's ``audio`` block;
-* the nocover derivation: peaks-gate the 110.2 s master (#82), then cut the
-  delivered 97.266 s film from it with the picture STREAM-COPIED -- never
-  re-encoded -- and the audio faded and trimmed to 97.2 s.
+* the nocover derivation: peaks-gate the 108.333333 s master (#82), then cut
+  the delivered 95.4 s film from it with the picture STREAM-COPIED -- never
+  re-encoded -- and the audio faded and trimmed to 95.333333 s.
 
     python3 scripts/build_europa.py --print-command     # the ffmpeg calls
     python3 scripts/build_europa.py --plates-only       # just the pills
@@ -40,21 +40,28 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import actbuild  # noqa: E402
+from scripts import actbuild  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
 ACT = "VII"
 
 
 def _cues(doc):
-    """Every timed overlay in input order: the pills, then the two cards.
+    """Every timed overlay in input order: the pills, then the live cards.
 
     The reveal and the endcard are project-supplied full-frame PNGs (both carry
     authored copy this record must never rewrite) and composite last, in that
     order, so the endcard can take over the frame the moment the reveal
     clears. They never share the screen with each other or with a pill.
+
+    A cue marked ``retired`` (the KubeCon endcard, owner 2026-08-16) stays in
+    the record -- copy is recoverable, never rewritten -- but is excluded
+    here, so it creates no still input and no overlay filter.
     """
-    return [*doc["plates"], doc["reveal"], doc["endcard"]]
+    cues = [*doc["plates"], doc["reveal"]]
+    if doc.get("endcard") and not doc["endcard"].get("retired"):
+        cues.append(doc["endcard"])
+    return [cue for cue in cues if not cue.get("retired")]
 
 
 def _segment_chain(seg, in_label, out_label):
@@ -219,12 +226,12 @@ def build_commands(doc, project, plates_dir, master_out, delivered_out,
             "-c:a", doc["encode"]["delivered"]["acodec"],
             "-movflags", "+faststart", str(master_out)]
 
-    # The delivered film: the cover (97.2-110.2) is CUT, picture stream-copied
-    # from the peaks-gated master so no generation is added, audio faded and
-    # trimmed to land the outro with the picture. The video cut is by FRAME
-    # COUNT: with -c:v copy, -t flushes the two reordered B-frames past the
-    # boundary (2920 frames instead of 2918), so the record carries the
-    # delivered frame count and the cut is -frames:v.
+    # The delivered film: the cover (95.333333-108.333333) is CUT, picture
+    # stream-copied from the peaks-gated master so no generation is added,
+    # audio faded and trimmed to land the outro with the picture. The video
+    # cut is by FRAME COUNT: with -c:v copy, -t flushes the two reordered
+    # B-frames past the boundary (2864 frames instead of 2862), so the record
+    # carries the delivered frame count and the cut is -frames:v.
     audio = doc["audio"]
     fade = audio["delivered_fade_out"]
     derive = [*ff, "-y", "-i", str(master_out),
@@ -250,9 +257,10 @@ def main(argv=None):
                     help="override the delivered (nocover) output path")
     ap.add_argument("--plates-dir", default=str(default_plates))
     ap.add_argument("--master-out", default=None,
-                    help="where the 110.2 s peaks-gated master intermediate "
-                         "is written (default <project>/nimbatus-review/"
-                         "render/repo-build/wolves-master-hq.mp4)")
+                    help="where the 108.333333 s peaks-gated master "
+                         "intermediate is written (default <project>/"
+                         "nimbatus-review/render/repo-build/"
+                         "wolves-master-hq.mp4)")
     ap.add_argument("--print-command", action="store_true",
                     help="print the ffmpeg calls and stop")
     ap.add_argument("--plates-only", action="store_true",

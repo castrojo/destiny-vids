@@ -298,6 +298,8 @@ CHAT_FS_TEXT_MAX = 28    # render script MAX_FONT 56px -- the preferred size
 CHAT_FS_TEXT_MIN = 19    # ...MIN_FONT 38px -- the shrink-to-fit floor
 CHAT_RULE_W = 2          # .rule { width: 3px } -- 1.5px at 1x, rounded up
 CHAT_RULE_H = 23         # .rule { height: 46px }
+K8S_CENSOR_TOKEN = "{k8s}"
+K8S_CENSOR_MARK = REPO_ROOT / "renders" / "marks" / "kubernetes.png"
 
 # --- companion plate (the site's GUARDIAN BOND card) ------------------------
 # A DIFFERENT card again: `.wolves-companion-plate` in WolvesIntroOverlay.vue,
@@ -1014,16 +1016,38 @@ def _render_chat(spec):
     # prove it ("I guess I'm taking the long way around."): recovered dialogue
     # is real speech, and shouting it would put an emphasis on it nobody said.
     text = spec.get("text") or ""
+    for censor in spec.get("censor", []):
+        source = censor["find"]
+        replacement = censor["replace"]
+        occurrences = text.count(source)
+        if occurrences != 1:
+            raise ValueError(
+                f"chat plate {spec.get('id')!r} must contain its censorship "
+                f"source {source!r} exactly once; found {occurrences}")
+        text = text.replace(source, replacement)
 
     probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
     f_speaker = _font("regular", CHAT_FS_SPEAKER)
     speaker_w = _tracked_width(probe, speaker, f_speaker, CHAT_LS_SPEAKER)
 
+    def censor_size(f_text):
+        height = max(1, int(round(f_text.size * 0.72)))
+        mark = Image.open(K8S_CENSOR_MARK)
+        return int(round(mark.width * height / mark.height)), height
+
+    def message_width(f_text):
+        width = 0
+        for part in text.split(K8S_CENSOR_TOKEN):
+            if width:
+                width += censor_size(f_text)[0]
+            width += probe.textlength(part, font=f_text)
+        return width
+
     def pill_width(f_text):
         # the flex row: pad, avatar, gap, eyebrow, gap, rule, gap, message, pad
         return (CHAT_PAD_L + CHAT_AVATAR + CHAT_GAP + speaker_w + CHAT_GAP
                 + CHAT_RULE_W + CHAT_GAP
-                + probe.textlength(text, font=f_text) + CHAT_PAD_R)
+                + message_width(f_text) + CHAT_PAD_R)
 
     # plate.html's shrink-to-fit: start at MAX_FONT and step down until the
     # pill fits max-width -- one wide line, never a wrap ("Prefer one wide
@@ -1078,12 +1102,24 @@ def _render_chat(spec):
 
     if text:
         a, d = f_text.getmetrics()
-        layer = _gradient_text(
-            (int(math.ceil(probe.textlength(text, font=f_text))) + 4,
-             int(f_text.size * 1.4)),
-            text, f_text,
-            [(0.0, (255, 255, 255, 255)), (0.6, NAME_MID), (1.0, NAME_BOTTOM)])
-        text_layer.alpha_composite(layer, (int(x), int(mid - (a + d) / 2)))
+        y = int(mid - (a + d) / 2)
+        message_x = int(x)
+        for index, part in enumerate(text.split(K8S_CENSOR_TOKEN)):
+            if index:
+                mark_w, mark_h = censor_size(f_text)
+                with Image.open(K8S_CENSOR_MARK) as mark:
+                    text_layer.alpha_composite(
+                        mark.convert("RGBA").resize((mark_w, mark_h), Image.LANCZOS),
+                        (message_x, int(mid - mark_h / 2)))
+                message_x += mark_w
+            if part:
+                part_w = int(math.ceil(probe.textlength(part, font=f_text)))
+                layer = _gradient_text(
+                    (part_w + 4, int(f_text.size * 1.4)), part, f_text,
+                    [(0.0, (255, 255, 255, 255)),
+                     (0.6, NAME_MID), (1.0, NAME_BOTTOM)])
+                text_layer.alpha_composite(layer, (message_x, y))
+                message_x += part_w
 
     img.alpha_composite(_with_text_shadow(text_layer))
     return img

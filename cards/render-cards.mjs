@@ -11,9 +11,8 @@
 //   node cards/render-cards.mjs --manifest stories/megacut/megacut-cards.json \
 //        --out-dir renders/plates-megacut-cards
 //
-// It renders only the full-frame kinds (`act`, `comic`); Guardian nameplates,
-// the deck's title card, chat and status plates are tools/plate.py's job and
-// are skipped with a note.
+// It renders only browser-owned card kinds; Guardian nameplates, chat and
+// status plates are tools/plate.py's job and are skipped with a note.
 //
 // playwright is not vendored here. Point NODE_PATH or a node_modules symlink
 // at a checkout that has it (~/src/website/node_modules), exactly as the
@@ -33,6 +32,7 @@ const TEMPLATES = {
   maintitle: 'maintitle.html',
   bookline: 'bookline.html',
   daycard: 'daycard.html',
+  ending: 'ending.html',
 }
 // One authored row per key. A key absent from the manifest is absent from the
 // URL, and the card leaves that row out: a missing string is omitted, never
@@ -42,12 +42,13 @@ const TEMPLATES = {
 // same kind of thing: the main title's eyebrow weight option, a styling
 // switch that changes no string.
 const COPY = ['act', 'label', 'title', 'subtitle', 'quote', 'quote_by', 'quote_note',
-  'qr_dialogue', 'qr_domain', 'stage', 'accent', 'variant', 'angle', 'size']
+  'qr_dialogue', 'qr_domain', 'stage', 'accent', 'variant', 'angle', 'size',
+  'mode', 'text', 'placement']
 const LISTS = ['body', 'chapters']
-const ASSETS = ['art', 'qr']
+const ASSETS = ['art', 'qr', 'wallpaper']
 // Structured copy: one JSON param, because a caption box is a variable-length
 // stack of authored lines and a card may carry several.
-const JSON_COPY = ['captions']
+const JSON_COPY = ['captions', 'emphasis']
 
 function parseArgs(argv) {
   const args = { manifest: null, outDir: null, only: null, wallpaperSeed: null }

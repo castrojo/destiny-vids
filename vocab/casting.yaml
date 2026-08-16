@@ -101,7 +101,7 @@ leads:
     nimbatus:
       # NIMBATUS IS LAURA SANTAMARIA — "they are the same person we don't
       # reveal her real name until europa" (owner, first alpha watch; issue
-      # #103). Act VII's Guardian card (82.525-90.000) is the reveal; every act
+      # #103). Act VII's Guardian card (82.525-88.000) is the reveal; every act
       # before it calls her NIMBATUS. The binding is what stops an earlier act
       # crediting her by her real name BY DEFAULT: the pre-reveal name resolves
       # here, and this entry carries NO `plate:` block, so tools/plate.py has
@@ -135,7 +135,7 @@ leads:
       redacts: Laura Santamaria
       redaction_scope: >
         every act before VII -- she is revealed on act VII's Guardian card
-        (82.525-90.000); the programme calls her NIMBATUS until Europa
+        (82.525-88.000); the programme calls her NIMBATUS until Europa
     anna_bray:
       # Elsie's sister — the Bray line is the project's through-thread, so both
       # sisters are cast.

@@ -7,8 +7,9 @@ the programme and the feature.
 
 ## The music, and why it is cut this way
 
-The bed is Nightwish's *Wish I Had an Angel* (instrumental), already measured
-into ``music/bed_wish_i_had_an_angel.json``. The owner's instruction: *"design
+The bed starts with Nightwish's *Wish I Had an Angel* instrumental, already
+measured into ``music/bed_wish_i_had_an_angel.json``, then hands over to
+Nightwish's vocal *Storytime* recording. The owner's instruction: *"design
 the song to loop back to the beginning where it makes sense since people miss
 that part of the song. Also cut out the weird drum section with the moaning we
 want the song on loop basically but starting at the drum smash."*
@@ -78,6 +79,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from tools import conform  # noqa: E402
 from tools import credits as C  # noqa: E402
+from tools import peaks  # noqa: E402
 from tools.bed import fmt_tc  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
@@ -424,7 +426,7 @@ def build_manifest(refresh, refresh_cast=False):
 
 
 def bed_passes(bed):
-    """The bed's passes in play order: the instrumental loop, then the album.
+    """The bed's passes in play order: the instrumental loop, then Storytime.
 
     The manifest keeps pass one at the top level (it was the whole bed before
     the vocal version was added, and every measured number in it is unchanged)
@@ -690,7 +692,7 @@ def audio_filter(bed, stream=1):
     """One ffmpeg filtergraph: every span of every pass, in order, joined.
 
     ``stream`` is the INPUT index of the FIRST music file. The cards are input
-    0 (the concat demuxer), so the instrumental is input 1 and the album
+    0 (the concat demuxer), so the instrumental is input 1 and Storytime
     version is input 2 -- getting this wrong is a filtergraph that binds to
     nothing rather than a wrong sound.
 
@@ -833,6 +835,7 @@ def main(argv=None):
            "-t", f"{total:.3f}",
            str(out_path)]
     subprocess.run(cmd, check=True)
+    peaks.trim_master_peak(out_path.resolve())
     print(f"wrote {out_path}  ({fmt_tc(total)})")
     return 0
 

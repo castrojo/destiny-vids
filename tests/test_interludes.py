@@ -96,6 +96,11 @@ def test_every_movement_renders_to_the_render_folder(movements):
         assert "Prod" not in movement["out_file"], movement["id"]
 
 
+def test_the_prologue_gates_its_delivered_master_peak():
+    source = (REPO_ROOT / "scripts" / "build_prologue.py").read_text()
+    assert "peaks.trim_master_peak(OUT.resolve())" in source
+
+
 def _clip_paths(plan):
     return [item.get("path", item.get("image", ""))
             for item in plan["items"]]
@@ -130,6 +135,7 @@ def test_movement_two_fades_up_over_the_prologues_fade_down(plan):
     item = next(i for i in plan["items"]
                 if i.get("path") == "renders/perfume-2.mp4")
     assert item["fade_in"] == pytest.approx(PROLOGUE_FADE)
+    assert item["fade_out"] == 0, "the 4:36 join is a hard cut"
 
 
 def test_no_movement_announces_itself(plan, movements):

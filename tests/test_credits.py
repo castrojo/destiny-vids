@@ -787,11 +787,16 @@ def test_the_picture_is_padded_so_it_outlasts_the_music():
     assert B.CONCAT_TAIL_SEC > 0
 
 
+def test_the_credits_gate_the_delivered_master_peak():
+    source = (REPO_ROOT / "scripts" / "build_credits.py").read_text()
+    assert "peaks.trim_master_peak(out_path.resolve())" in source
+
+
 # --- the second pass of the bed --------------------------------------------
 
-def test_the_vocal_version_follows_the_whole_instrumental_loop(manifest):
-    """Owner: 'switch to the album version with vocals after the entire
-    instrumental loops once'.
+def test_storytime_follows_the_whole_instrumental_loop(manifest):
+    """Storytime replaces only the former vocal pass after the entire
+    instrumental loop.
 
     'the ENTIRE instrumental' is load-bearing: the loop is not cut short to
     make room for the vocal. Pass one keeps both of its measured spans.
@@ -799,52 +804,42 @@ def test_the_vocal_version_follows_the_whole_instrumental_loop(manifest):
     passes = B.bed_passes(manifest["bed"])
     assert len(passes) == 2
     assert passes[0]["bed_id"] == "bed_wish_i_had_an_angel"
-    assert passes[1]["bed_id"] == "bed_wish_i_had_an_angel_album"
+    assert passes[1]["bed_id"] == "bed_storytime"
     assert len(passes[0]["segments"]) == 2
     assert passes[0]["segments"][0]["start_sec"] == 193.42
 
 
-def test_the_album_pass_skips_its_own_intro(manifest):
-    """Owner, 2026-08-15: *"the transition is weird you don't need to start the
-    song from the beginning just make it all fit so it sounds like they play
-    the instrumental version first and then go into the song."*
+def test_storytime_pass_skips_its_own_intro(manifest):
+    """Storytime enters on its full-band vocal entry, not its quiet intro.
 
-    Pass one goes out MID-SONG, at instrumental 181.320. Entering the album at
-    0.0 therefore landed a mid-song hand-over on this recording's quiet intro,
-    and the song audibly started over. The album is entered on its full-band
-    vocal entry instead.
-
-    10.4722 is the album's own tracked beat 0.348 s ahead of the measured
-    +6.11 dB onset at 10.820, so the 0.25 s crossfade finishes BEFORE the hit
-    rather than shaving it.
+    14.512472 is Storytime's beat 0.368 s ahead of the measured +6.23 dB
+    re-entry at 14.880, so the 0.25 s crossfade clears the hit.
     """
-    album = B.bed_passes(manifest["bed"])[1]
-    start = album["segments"][0]["start_sec"]
-    assert start > 0.0, "the album must not restart the song from its intro"
-    assert start == 10.4722
+    storytime = B.bed_passes(manifest["bed"])[1]
+    start = storytime["segments"][0]["start_sec"]
+    assert start > 0.0, "Storytime must not restart from its quiet intro"
+    assert start == 14.512472
     grid = json.loads((REPO_ROOT / "music" /
-                       "bed_wish_i_had_an_angel_album.json").read_text())["grid"]
+                       "bed_storytime.json").read_text())["grid"]
     assert any(abs(b - start) < 1e-6 for b in grid["beats"]), (
-        "the in point must sit on the album's own tracked beat, not a round number")
+        "the in point must sit on Storytime's tracked beat, not a round number")
     xf = manifest["bed"].get("crossfade_sec", 0.0)
-    assert start + xf < 10.820, (
-        "the 0.25 s crossfade has to CLEAR before the band arrives at 10.820, "
+    assert start + xf < 14.880, (
+        "the 0.25 s crossfade has to CLEAR before the band arrives at 14.880, "
         "or the hand-over shaves the transient it exists to land on")
 
 
-def test_the_album_pass_stops_before_the_file_runs_out(manifest):
-    """243.400 is measured -- the recording is at -54 dB by 243 -- so the film
-    ends on the song's own ending rather than on digital silence."""
-    album = B.bed_passes(manifest["bed"])[1]
+def test_storytime_pass_stops_at_its_natural_ending(manifest):
+    """Storytime decays naturally to its file end, with no digital padding."""
+    storytime = B.bed_passes(manifest["bed"])[1]
     record = json.loads((REPO_ROOT / "music" /
-                         "bed_wish_i_had_an_angel_album.json").read_text())
-    end = album["segments"][0]["end_sec"]
-    assert end < record["duration_sec"]
-    assert record["duration_sec"] - end < 1.0
+                         "bed_storytime.json").read_text())
+    end = storytime["segments"][0]["end_sec"]
+    assert end == record["duration_sec"]
 
 
 def test_every_span_of_both_passes_reaches_the_filtergraph(manifest):
-    """The album version is a SECOND ffmpeg input; binding it to input 1
+    """Storytime is a SECOND ffmpeg input; binding it to input 1
     would silently play the instrumental twice."""
     graph = B.audio_filter(manifest["bed"], stream=1)
     assert graph.count("atrim") == len(B.bed_spans(manifest["bed"]))

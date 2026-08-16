@@ -22,21 +22,14 @@
  ],
  "shots": [
   {
-   "segment_id": "card_000",
-   "still": "renders/markers/title-project-bluefin-seven-days-to-the-wolves-e9f32c80.png",
-   "duration": 10.0,
-   "beat": "TITLE CARD (the film's own logo; the source's is never shown)",
-   "audio": "bed"
-  },
-  {
-   "segment_id": "wolves_act1_0010_072",
+   "segment_id": "wolves_act1_0000_072",
    "video_id": "wolves_act1",
-   "start_sec": 10.072,
+   "start_sec": 0.072,
    "end_sec": 58.166,
-   "duration": 48.094,
-   "start_tc": "0:10.1",
+   "duration": 58.094,
+   "start_tc": "0:00.1",
    "end_tc": "0:58.2",
-   "beat": "I. intro capture from source 0:10.1",
+   "beat": "I. intro capture from source 0:00.1",
    "audio": "bed"
   },
   {
@@ -51,7 +44,7 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_003",
+   "segment_id": "card_002",
    "still": "renders/summit-plates/act1_black_1.jpg",
    "duration": 3.016,
    "beat": "I. SUMMIT -- film 1:21 -- the black; the owner asked for it gone, and it becomes the summit instead",
@@ -80,7 +73,7 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_006",
+   "segment_id": "card_005",
    "still": "renders/summit-plates/act1_black_2.jpg",
    "duration": 1.374,
    "beat": "I. SUMMIT -- film 1:55 -- black",
@@ -120,7 +113,7 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_010",
+   "segment_id": "card_009",
    "still": "renders/summit-plates/act1_black_3.jpg",
    "duration": 2.078,
    "beat": "I. SUMMIT -- film 2:45 -- black",
@@ -195,14 +188,14 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_017",
+   "segment_id": "card_016",
    "still": "renders/summit-plates/enemy_cu.jpg",
    "duration": 3.51,
    "beat": "III. SUMMIT -- the whole Contributor Summit, over the enemy CU",
    "audio": "bed"
   },
   {
-   "segment_id": "card_018",
+   "segment_id": "card_017",
    "still": "/var/home/jorge/Pictures/Artwork/wolves.jpg",
    "duration": 2.661,
    "beat": "III. ARTWORK held through the HOWL and the 278.64-279.66s silence; picture returns on the slam",
@@ -232,7 +225,7 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_021",
+   "segment_id": "card_020",
    "still": "renders/summit-plates/raids.jpg",
    "duration": 1.966,
    "beat": "III. SUMMIT -- over the 7 RAIDS card",
@@ -250,7 +243,7 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_023",
+   "segment_id": "card_022",
    "still": "renders/summit-plates/buildcrafting.jpg",
    "duration": 1.967,
    "beat": "III. SUMMIT -- over the ENDLESS BUILDCRAFTING card",
@@ -268,14 +261,14 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_025",
+   "segment_id": "card_024",
    "still": "renders/interruption/a-silence.png",
    "duration": 1.0,
    "beat": "III. INTERRUPTION A -- the song stops; a held beat of black before anything appears (issue #104)",
    "audio": "silent"
   },
   {
-   "segment_id": "card_026",
+   "segment_id": "card_025",
    "still": "renders/interruption/b-ambassadors.png",
    "duration": 4.0,
    "beat": "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' (owner-authored, verbatim; hold music: Local Forecast - Slower, CC BY 4.0, credited in ATTRIBUTIONS.md)",
@@ -286,7 +279,7 @@
    }
   },
   {
-   "segment_id": "card_027",
+   "segment_id": "card_026",
    "still": "renders/interruption/c-cortney.png",
    "duration": 4.0,
    "beat": "III. INTERRUPTION C -- Introducing Cortney Nickerson, her authored #90 identity verbatim with the class row omitted, as in act I (hold music continues)",
@@ -377,7 +370,7 @@
    "plate_slot": true
   },
   {
-   "segment_id": "card_035",
+   "segment_id": "card_034",
    "still": "/var/home/jorge/Pictures/Artwork/wolves.jpg",
    "duration": 12.293,
    "beat": "ARTWORK (outro, over the fade)",

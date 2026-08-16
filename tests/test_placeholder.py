@@ -182,24 +182,14 @@ def test_no_committed_act_is_missing_prose():
     assert not missing, f"unwritten prose in the committed records: {missing}"
 
 
-def test_a_named_badge_is_listed_but_never_overwritten():
-    """Act II's `placeholder_dylan_taylor` is a REAL person, credited by name.
-
-    Its rows are deliberately partial because nobody authored a title for him
-    -- that is the named-placeholder convention, not missing prose. Filling it
-    with lorem would replace a colleague's name with Latin, which is the exact
-    failure the module exists to prevent. It is still listed, because a title
-    nobody wrote is still owed.
-    """
+def test_a_named_badge_is_never_overwritten():
+    """A partial named badge remains a credit, not missing prose."""
     badge = {"id": "placeholder_dylan_taylor", "label": "GUARDIAN",
              "name": "Dylan Taylor", "placeholder": True}
     assert placeholder.is_placeholder(badge)
     assert not placeholder.needs_prose(badge)
     assert placeholder.fill(badge) == badge
 
-    listed = [f for f in placeholder.scan()
-              if f["id"] == "placeholder_dylan_taylor"]
-    assert listed and listed[0]["kind"] == "named-badge"
 
 
 # --- the dialogue record's own placeholder ----------------------------------

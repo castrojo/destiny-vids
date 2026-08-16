@@ -179,6 +179,15 @@ punch list; the backlog is for work.
   written: `dialogue/<video_id>/dialogue.json` with source timecodes and
   per-line evidence, beside the `DIALOGUE.md` the owner edits.
   `redactions/<video_id>.json` only ever *removes* burned-in publisher copy.
+- **Recovering authored copy is lookup, not reconstruction.** If the owner says
+  a card, dialogue line, or credit was dropped, changed, or lost, inspect every
+  worktree before editing: `git worktree list`, then search its records for the
+  distinctive phrase. The record can intentionally remove adjacent cards or
+  transfer their timing weight. Copy that entire authored object and its
+  companion tests verbatim; never infer a shortened quote, re-add a removed
+  card, or render over a delivery master until the recovered object matches its
+  source exactly. The target repository remains authority; a worktree is
+  evidence of in-progress authored state, not a source of policy.
 - **Never publish commercially.** Bungie footage is used under Bungie's
   fan-content policy, which permits non-commercial fan creations. Every video
   record carries `usage_class` and `source_rights_note`. An asset claiming

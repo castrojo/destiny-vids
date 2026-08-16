@@ -80,7 +80,7 @@ def fetch(force=False):
     DEST.mkdir(parents=True, exist_ok=True)
     failed = []
     for name, url in sorted(MARKS.items()):
-        dest = DEST / f"{name}.png"
+        dest = DEST / f"{name}{'.svg' if name == 'kubernetes' else '.png'}"
         if dest.exists() and not force:
             print(f"have    {dest.relative_to(REPO_ROOT)}")
             continue
@@ -89,7 +89,9 @@ def fetch(force=False):
                 url, headers={"User-Agent": "destiny-vids"})
             with urllib.request.urlopen(req, timeout=30) as resp:
                 payload = resp.read()
-            if url.endswith(".svg"):
+            if name == "kubernetes":
+                dest.write_bytes(payload)
+            elif url.endswith(".svg"):
                 # A vector mark is rasterised through the same browser the
                 # wordmark uses; an atomic host has no rsvg or cairosvg.
                 from fetch_wordmark import rasterise, trim
