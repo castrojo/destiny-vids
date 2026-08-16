@@ -180,7 +180,7 @@ def test_no_plate_here_names_a_person(manifest):
     for entry in manifest["plates"]:
         assert "speaker" not in entry
         assert "name" not in entry
-        assert entry["kind"] in ("maintitle", "bookline")
+        assert entry["kind"] in ("maintitle", "bookline", "daycard")
 
 
 # --- the motion ---------------------------------------------------------------
@@ -252,7 +252,7 @@ def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
     assert (
         f"[day][bridgenight]xfade=transition=fade:"
         f"duration={T.BRIDGE - T.BRIDGE_DAY_SETTLE:.3f}:"
-        f"offset={T.BRIDGE_DAY_SETTLE:.3f}[bridge]"
+        f"offset={T.BRIDGE_DAY_SETTLE:.3f}[bridgepre]"
     ) in graph
     assert "color=c=black" not in graph
 

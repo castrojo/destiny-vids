@@ -63,6 +63,16 @@
       "note": "INTENTIONALLY EMPTY. The second line moved into book-a when the owner chose one continuous stationary box on the book shot. This entry remains only because the build's fixed input layout still reads plate_book-b.png; an empty body makes the card transparent and it covers nothing."
     },
     {
+      "id": "daytime-kindness",
+      "kind": "daycard",
+      "at": 88.8,
+      "dur": 3.4,
+      "title": "The Final Shape is Kindness",
+      "subtitle": "Wolves aren't Evil",
+      "body": ["Evolve or Die"],
+      "note": "OWNER COPY, verbatim. The day companion to the night KubeCon card. It sits bottom-left so the narrative enters beside the animals rather than covering them, then clears before the day wolves fade into their original night frame."
+    },
+    {
       "id": "endcard-event",
       "kind": "maintitle",
       "variant": "poster",

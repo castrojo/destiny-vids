@@ -32,6 +32,7 @@ const TEMPLATES = {
   comic: 'comic.html',
   maintitle: 'maintitle.html',
   bookline: 'bookline.html',
+  daycard: 'daycard.html',
 }
 // One authored row per key. A key absent from the manifest is absent from the
 // URL, and the card leaves that row out: a missing string is omitted, never
