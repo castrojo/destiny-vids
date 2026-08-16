@@ -37,7 +37,7 @@
     "dialogue/yt_destiny_all_live_action_trailers",
     "vocab/casting.yaml"
    ],
-   "source_digest": "ad4e86fa54afcb376ec2f350c1d81aa878e9c8bd6055045b9fe1c08fab1c664c"
+   "source_digest": "02df7cab887420ef8c507f237ca2d518edae97dd4b3224e502d9fcaf9a7e6566"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -83,7 +83,7 @@
     "music/bed_seven_days_to_the_wolves.json",
     "vocab/casting.yaml"
    ],
-   "source_digest": "d6b1ad8842f3e430bcee65583f4374b30cc03a2b783decdac0c120a3168ef646"
+   "source_digest": "370de4b889fbcf55e649cfff6433624c315101bdfc24b6116abbc8e9fd1d7687"
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
@@ -94,7 +94,7 @@
     "scripts/actbuild.py",
     "tools/plate.py"
    ],
-   "source_digest": "1530c6faf4b42b487a70d56cb2022b95f8309589e4b5ed72429f226819d752fd"
+   "source_digest": "f504865914e5f8a59c0ad7772d9c5415ed2289a92cffdbdd86b6376973083286"
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",

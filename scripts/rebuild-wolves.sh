@@ -7,9 +7,8 @@
 #
 #   ./scripts/rebuild-wolves.sh
 #
-# It also refuses to hand you a file with the two faults that have actually
-# shipped here: a silent pause, and a true peak over the headroom gate. Both
-# are invisible to "did it render" and both cost a re-render to find late.
+# It also refuses to hand you a file with a true peak over the headroom gate,
+# which is invisible to "did it render" and costs a re-render to find late.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -25,16 +24,12 @@ OUT=renders/07-wolves-timing-pass.mp4
 REVIEW=${REVIEW_DIR:-$HOME/Videos/destiny-cuts-review}/07-seven-days-to-the-wolves-review.mp4
 
 BED_GAIN=${BED_GAIN:--3.5}
-SOURCE_GAIN=${SOURCE_GAIN:--1.5}   # the insert brings its own peaks; see AUDIO
 
 echo "==> shotlist"
 "$PY" scripts/build_wolves.py
 
 echo "==> summit plates"
 "$PY" scripts/build_summit_plates.py --fetch
-
-echo "==> interruption cards"
-"$PY" scripts/build_interruption_cards.py
 
 echo "==> picture"
 DESTINY_FFMPEG="$FF" "$PY" tools/render.py "$SHOTLIST" \
@@ -43,7 +38,7 @@ DESTINY_FFMPEG="$FF" "$PY" tools/render.py "$SHOTLIST" \
 echo "==> audio"
 DESTINY_FFMPEG="$FF" "$PY" tools/audiomix.py "$SHOTLIST" \
     --video "$PICTURE" --bed media/bed_seven_days_to_the_wolves.wav \
-    --bed-gain-db "$BED_GAIN" --source-gain-db "$SOURCE_GAIN" \
+    --bed-gain-db "$BED_GAIN" \
     --media media \
     --out "$OUT" | tail -2
 

@@ -107,7 +107,7 @@ REMOVED = [
     # including one named above as "burned-in end title: BECOME LEGEND"; these
     # survived only because run 5 used to run to the end of the source. The act
     # was closing on an advert. Owner: "cut to black, end on the heroes".
-    (362.200, 376.134, "DESTINY / DESTINY 2 logo slates, Bungie/Activision copyright, 'AVAILABLE ON PC OCTOBER 24'"),
+    (362.200, 376.186, "DESTINY / DESTINY 2 logo slates, Bungie/Activision copyright, 'AVAILABLE ON PC OCTOBER 24'"),
 ]
 
 # The owner's rounded marks, kept beside the measured ones so the difference
@@ -486,7 +486,7 @@ def build():
     bed = load_json(REPO_ROOT / "music" / f"{BED_ID}.json")
     bed_sec = float(bed["duration_sec"])
     source = REPO_ROOT / "media" / f"{SOURCE_ID}.mp4"
-    src_sec = probe_duration(source) if source.exists() else 376.134
+    src_sec = probe_duration(source) if source.exists() else 376.186
 
     # --- invariants --------------------------------------------------------
     # 1. The runs are in source order, disjoint, and inside the source.
