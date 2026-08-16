@@ -159,8 +159,15 @@ python3 tools/deliver.py publish --act VII    # name what you rebuilt
 the master was replaced as `.mkv` and the builder could no longer find it,
 while `status` still said `ok`. Ask `tools/footage.py` for the path.
 
-## A refresh is every rung, or it is not a refresh
+**Long encodes run on the cluster.** `exo-0` has 32 cores and the
+`linuxserver/ffmpeg` image already cached; the workstation does not need to
+carry an hour of x264. Stage inputs into `/var/mnt/exo0-stage/dv`, run a pod
+pinned to that node with `imagePullPolicy: IfNotPresent`, and copy the result
+back. The recipe, and the two traps that make a naive attempt fail (the
+registry mirror times out, and the image's entrypoint is already `ffmpeg`), are
+in [`docs/rendering.md`](../../rendering.md).
 
+## A refresh is every rung, or it is not a refresh
 "Refresh the video" always means the **whole** chain, and it always includes
 the last two:
 

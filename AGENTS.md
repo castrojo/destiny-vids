@@ -266,6 +266,12 @@ read, so it has to buy more than tidiness.
   corrected in `docs/rendering.md`.
 - On an atomic Fedora/Bluefin host the default `ffmpeg` is `ffmpeg-free`: no
   H.264, and it fails only once decoding starts. See `docs/rendering.md`.
+- **Long encodes go to the cluster, not the workstation.** `exo-0`
+  (`core@192.168.1.170`, 32 cores) has the `linuxserver/ffmpeg` image cached;
+  stage inputs into `/var/mnt/exo0-stage/dv` and run a pod pinned to that node
+  with `imagePullPolicy: IfNotPresent`. The registry mirror times out on a
+  plain pull, and the footage is never already there. Recipe in
+  [`docs/rendering.md`](docs/rendering.md).
 
 ## The merge queue
 
