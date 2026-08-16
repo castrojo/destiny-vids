@@ -93,7 +93,7 @@ in the cut, or that a reveal already covers, is never lost silently.
 
 ## Unwritten prose: lorem ipsum, credited to nobody
 
-A chat pill with no `text` does **not** block, and no longer renders an empty
+A chat pill with no `text` does **not** block, and does not render an empty
 pill. `tools/placeholder.py` fills it with deterministic lorem ipsum so the cut
 is watchable before its words exist — timing, letterbox seat, read length and
 the gaps between plates are all reviewable while the copy is still being

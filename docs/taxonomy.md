@@ -14,12 +14,11 @@ frames/audio.
 ## Axis A — Cleanliness (`vocab/cleanliness.yaml`)
 
 The project's **primary gate**, ahead of every other axis in this document. The
-operative question for any shot is no longer *"can our performer stand in for
-this Guardian?"* (identity/substitutability, Axis D — demoted, see below) but
-*"is this frame clean enough to cut into a sequence at all?"* The fiction bends
-to the footage now: the story gets written to fit the best available shots,
-not the other way round, so a shot's editorial merit is moot if it physically
-cannot be cut in.
+operative question for any shot is *"is this frame clean enough to cut into a
+sequence at all?"* — not *"can our performer stand in for this Guardian?"*
+(identity/substitutability, Axis D). The fiction bends to the footage: the
+story gets written to fit the best available shots, not the other way round, so
+a shot's editorial merit is moot if it physically cannot be cut in.
 
 - **`overlays`** (multi, observed): `hud, nameplates, burned_text, talking_head,
   letterbox, none`. Overlays burned into the frame — nothing an edit can remove.
@@ -105,11 +104,11 @@ canonical enum for scale or movement; these are the common editorial abbreviatio
 
 ---
 
-## Axis D — Identity / substitutability (`vocab/identity.yaml`) — demoted
+## Axis D — Identity / substitutability (`vocab/identity.yaml`) — refinement
 
-The anonymity axis, and a demoted one. The anonymous crowd is cast from a
+The anonymity axis, and a secondary one. The anonymous crowd is cast from a
 rotating pool of contributors, so anonymity is not a scarce resource and
-`substitutability` is no longer a retrieval filter. What's left:
+`substitutability` is not a retrieval filter. What it carries:
 
 - **`substitutability`** — ordinal `0..5`. `0` = clear, identifiable face,
   named/recognizable character, not substitutable; `5` = fully anonymous
@@ -135,12 +134,10 @@ high-substitutability despite being tight (see `examples/titan-helmet-cu.json`,
 
 ### `casting` — lead / ensemble (`vocab/casting.yaml`)
 
-Derived object, **inverted** from the old model. The old rule made anonymity
-scarce and forced per-binding resemblance constraints on almost every casting.
-That's gone as a *general* rule: Bungie's cinematics already tell a good story,
-so the project simply **assigns names to the cast that is on screen**, and a
-resemblance constraint is now the rare exception rather than the default. Two
-tiers, and the difference between them is the whole model:
+Derived object. Anonymity is not scarce and a resemblance constraint is the
+rare exception rather than the default: Bungie's cinematics already tell a good
+story, so the project simply **assigns names to the cast that is on screen**.
+Two tiers, and the difference between them is the whole model:
 
 - **`lead`** — a named Destiny NPC bound **1:1** to one real person, fixed for
   the life of the project. Bindings are **usually unconstrained**: naming a
@@ -326,6 +323,6 @@ The example queries are answerable with: `overlays`, `clean`, `footage_tier`
 `destination`, `activity` (domain); `shot_scale`, `composition`, `camera_movement`,
 `content_type` (cinematography); `casting` (role/character/person — lead vs.
 ensemble); `subject_salience`; `register`; `action` + `traversal_hero`; and the
-free-text `caption`. `substitutability` is no longer part of the baseline set —
-it's a refinement, useful only as an ensemble tie-break. Everything else is
-refinement too — add fields only when a real query needs them.
+free-text `caption`. `substitutability` is not part of the baseline set — it's a
+refinement, useful only as an ensemble tie-break. Everything else is refinement
+too — add fields only when a real query needs them.

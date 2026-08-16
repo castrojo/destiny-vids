@@ -6,10 +6,9 @@ Part of the [casting skill](../SKILL.md).
 
 `casting` is a pure function of the tagger's `character` list plus this vocab,
 so a vocab edit re-casts the whole index **without re-tagging** — but the
-checked-in segments still carry the old value until something recomputes them.
-The only writer used to be `tools/annotate.py index`, which needs the source
-video, and `media/` is gitignored. So a rename left every segment stale with no
-runnable remedy.
+checked-in segments still carry the previous value until something recomputes
+them. `tools/annotate.py index` writes them too, but it needs the source video
+and `media/` is gitignored, so it cannot be the remedy for a vocab rename.
 
 `tools/rederive.py` is that remedy. It recomputes every derived field from the
 fields the record already carries — no video, no keyframes, no model:

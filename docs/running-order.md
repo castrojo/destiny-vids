@@ -34,8 +34,11 @@ The canonical order, settled by the owner and **not open for reinterpretation**:
 | **VII** | *(no marker)* | `Prod/07-europa.mp4` — the director's cut |
 | **VIII** | *(no marker — it is meant to surprise)* | `Prod/08-credits.mp4` — the call to action, the comic reveal, the credits |
 
-**All nine films exist and all nine play.** The current programme is **v3.0**,
-**35:16.8**, at `~/Videos/Wolves/megacut/`.
+**All nine films exist and all nine play.** The assembled programme is built
+from [`stories/megacut/megacut.json`](../stories/megacut/megacut.json), whose
+`output` names the delivered file and whose `_version` records what last
+changed; the per-act masters are in
+[`stories/megacut/delivery.json`](../stories/megacut/delivery.json).
 
 ### Three things about this table that are load-bearing
 
