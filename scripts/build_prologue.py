@@ -86,6 +86,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from tools import conform  # noqa: E402
 from tools import footage  # noqa: E402
 from tools import peaks  # noqa: E402
+from tools import freshness  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "00-prologue-plates.json"
@@ -313,7 +314,14 @@ def main(argv=None):
         sys.exit("footage is never committed; missing: "
                  + ", ".join(str(p) for p in missing))
 
-    if args.cards or not (PLATES_DIR / "plate_maintitle-b.png").exists():
+    # Existence is NOT freshness (tools/freshness.py): a card template that
+    # moved after the PNGs were written shipped a main title a day out of
+    # date, with every delivery gate green. --cards can only force EXTRA work.
+    if args.cards or freshness.needs_render(
+            [MANIFEST, REPO_ROOT / "cards" / "maintitle.html",
+             REPO_ROOT / "cards" / "render-cards.mjs"],
+            [PLATES_DIR / "plate_maintitle-a.png",
+             PLATES_DIR / "plate_maintitle-b.png"]):
         render_cards()
 
     day, night = wallpaper("day"), wallpaper("night")

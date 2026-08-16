@@ -159,6 +159,46 @@ python3 tools/deliver.py publish --act VII    # name what you rebuilt
 the master was replaced as `.mkv` and the builder could no longer find it,
 while `status` still said `ok`. Ask `tools/footage.py` for the path.
 
+## A refresh is every rung, or it is not a refresh
+
+"Refresh the video" always means the **whole** chain, and it always includes
+the last two:
+
+```
+cards / plates  ->  act master  ->  Prod/  ->  megacut/  ->  10mb/
+```
+
+`10mb/` social snippets and `Prod/` are **not optional trailing chores** —
+they are what the owner actually opens. A megacut rebuilt over a stale `Prod/`
+link, or shipped without regenerating the social copies, is a partial refresh
+that reads as a finished one. `deliver.py publish` handles `Prod/`;
+`deliver.py build` handles the megacut and the `10mb/` copies.
+
+**Existence is not freshness.** This is the rung that had no guard, and it is
+where a main title shipped 17 hours out of date with every other gate green:
+
+```python
+if args.cards or not (PLATES_DIR / "plate_maintitle-b.png").exists():   # WRONG
+    render_cards()
+```
+
+The template moved at 16:56; the PNGs were from 23:24 the night before; the
+file *existed*, so the "rebuild" ran on yesterday's cards, produced a new
+master, and published a digest saying it was current. The act really had been
+rebuilt — it had just been rebuilt **from yesterday**.
+
+Ask the only question that matters about a derived file — is it older than
+what derives it — with [`tools/freshness.py`](../../../tools/freshness.py):
+
+```python
+if args.cards or freshness.needs_render([MANIFEST, CARD_HTML], CARD_PNGS):
+    render_cards()
+```
+
+A flag may force **extra** work. A flag may never be the only thing standing
+between you and a current card. `tests/test_freshness.py` fails any builder
+that gates a card render on a bare `.exists()`.
+
 **`publish` after every act rebuild — and name the act.** It re-links `Prod/`,
 regenerates the checksums and README table, *and* stamps the act's input
 digest, which is what makes the next edit show up as drift.
@@ -209,6 +249,9 @@ fix, not adding a source list that lies.
 | "I'll explain what I learned, then give them the file." | Path and runtime first. Explanation after, and short. |
 | "I rebuilt the act, the delivery is fine." | Not until `deliver.py publish`. Until then `Prod/` may still link the old master and the megacut still contains it. |
 | "`publish` made the gate green, so the delivery is fresh." | `publish` records; it never rebuilds. A green gate you got without a render was the bug, not the proof. |
+| "The act rebuilt fine, so the video is current." | Only if its cards did too. A rebuild that consumes stale PNGs produces a new file full of old pictures, and every gate goes green. |
+| "The PNG is already there, no need to re-render." | Existence is not freshness. The question is whether it predates its template. |
+| "I'll regenerate the social copies next time." | `10mb/` is what the owner opens. A refresh that stops at the megacut is a partial refresh reported as a finished one. |
 | "I rebuilt one act, so I'll just run `publish`." | Name it: `publish --act <numeral>`. A blanket publish certifies every act, including the seven you did not touch. |
 | "`--print-command` needs a working encoder." | No. Printing is for reading and pasting; resolving ffmpeg is a precondition of *running*. Requiring one takes the offline suite offline. |
 | "The assembly stage just joins finished things, so staleness is somebody else's rung." | Assembly is the stage where a stale act reaches an audience. It checks, and refuses. |
