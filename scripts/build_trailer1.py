@@ -333,7 +333,13 @@ def filtergraph(manifest):
     # colour jump interrupts the climax.
     parts.append(f"[day][bridgenight]xfade=transition=fade:"
                  f"duration={BRIDGE - BRIDGE_DAY_SETTLE:.3f}:"
-                 f"offset={BRIDGE_DAY_SETTLE:.3f}[bridge]")
+                 f"offset={BRIDGE_DAY_SETTLE:.3f}[bridgepre]")
+    parts.append(_still(9, "daycard",
+                        f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
+                        "fade=t=in:st=0.600:d=0.400:alpha=1,"
+                        "fade=t=out:st=3.600:d=0.400:alpha=1"))
+    parts.append("[bridgepre][daycard]overlay=0:0:shortest=1:"
+                 "enable=between(t\\,0.600\\,4.000)[bridge]")
     inputs += 2
 
     # --- the end card, day falling into dark ---------------------------------
@@ -398,6 +404,7 @@ def command(manifest, day_png, night_png):
         "-i", str(night_png),
         "-i", str(PLATES_DIR / "plate_endcard-event.png"),
         "-i", str(PLATES_DIR / "plate_endcard-cta.png"),
+        "-i", str(PLATES_DIR / "plate_daytime-kindness.png"),
         "-filter_complex", filtergraph(manifest),
         "-map", "[vout]", "-map", "[aout]",
         *conform.video_encode_args(),
