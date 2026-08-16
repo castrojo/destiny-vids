@@ -224,6 +224,7 @@ def test_the_enable_windows_use_escaped_commas(manifest):
 
 def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
     graph = T.filtergraph(manifest)
+    assert "[5:v]split=3[daysrc][enddaysrc][enddarksrc]" in graph
     assert "[enddarkraw]eq=brightness=-0.55[enddark]" in graph
     assert (
         f"[endday][enddark]xfade=transition=fade:"
