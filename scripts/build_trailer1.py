@@ -337,7 +337,7 @@ def filtergraph(manifest):
     parts.append(_still(9, "daycard",
                         f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
                         "fade=t=in:st=0.600:d=0.400:alpha=1,"
-                        "fade=t=out:st=3.600:d=0.400:alpha=1"))
+                        "fade=t=out:st=3.400:d=0.600:alpha=1"))
     parts.append("[bridgepre][daycard]overlay=0:0:shortest=1:"
                  "enable=between(t\\,0.600\\,4.000)[bridge]")
     inputs += 2
