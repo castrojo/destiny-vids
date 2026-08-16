@@ -182,12 +182,10 @@ def test_no_plate_here_names_a_person(manifest):
 
 # --- the motion ---------------------------------------------------------------
 
-def test_both_book_lines_actually_move(manifest):
-    """'account for the movement' -- a line seated on a drifting page and left
-    static is the failure this is here to catch."""
+def test_both_book_lines_are_fixed_fancy_subtitles(manifest):
+    """Owner: 'dont make the boxes move ... think of it as a fancy subtitle'."""
     for plate_id in ("book-a", "book-b"):
-        entry = plate(manifest, plate_id)
-        assert entry["anchor"] != entry["anchor_out"]
+        assert plate(manifest, plate_id)["anchor"] == plate(manifest, plate_id)["anchor_out"]
 
 
 def test_the_book_lines_use_the_simple_box_treatment(manifest):
@@ -203,13 +201,12 @@ def test_one_forty_seven_is_the_documented_wolves_fade_climax(manifest):
     assert "no wolf sound is added" in climax
 
 
-def test_a_line_may_stop_tracking_when_its_page_is_gone(manifest):
-    """book-b holds across the tank join and is still up over the iguana, so
-    it tracks the page only until the cut."""
+def test_book_b_holds_across_the_join_without_tracking(manifest):
+    """It remains readable over the iguana instead of drifting with the book."""
     entry = plate(manifest, "book-b")
     assert entry["at"] + entry["dur"] > T.CUT_OUT, "book-b crosses the join"
-    assert entry["at"] + entry["walk"] == pytest.approx(T.CUT_OUT - T.JOIN_FADE,
-                                                        abs=0.01)
+    assert "walk" not in entry
+    assert entry["anchor"] == entry["anchor_out"]
 
 
 def test_the_walk_expression_is_clamped_at_both_ends():
