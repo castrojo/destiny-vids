@@ -51,6 +51,13 @@ delivers as `00-prologue`.
 earlier pass had him twice — as an empty act, and as another act's film under
 his character's name.
 
+**A trailer is not an act.** `Trailer 1` is cut from the prologue's own
+material — `scripts/build_trailer1.py`, `stories/trailer-1-plates.json` — and
+delivers to `~/Videos/Wolves/trailer-1.mp4`. It takes no numeral, no chapter
+marker and no key in `delivery.json`, and nothing in this table changes when it
+is recut. It runs 1:50, inside the 2:30 the MPA and NATO allow a theatrical
+trailer.
+
 **Not every act is announced.** The Roman-numeral slides were retired on the
 owner's instruction; the programme plays exactly one card, the scream
 interstitial between acts V and VI — *ON THE LINUX DESKTOP /

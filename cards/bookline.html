@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Book line</title>
+<style>
+  /*
+   * ONE LINE OF OWNER COPY, SEATED ON THE BOOK.
+   *
+   * Trailer 1 puts two lines over the source's book sequence -- the shot where
+   * Nightwish's lyric prints itself onto a page of Darwin. The owner's brief:
+   * *"Add dialogue boxes over the words in the book section :25 - :33 so that
+   * we can say words, account for the movement because we want to 'replace'
+   * these words with our overlay, wolves style"*.
+   *
+   * TWO THINGS IN THAT SENTENCE DECIDE THIS FILE.
+   *
+   * "WOLVES STYLE" -- so the type is the FILM'S, not the book's. The obvious
+   * reading was to set the lines in a serif and pass them off as printed on
+   * the page; the owner picked the unattributed plate instead, and a card that
+   * imitates the source's own typography is a forgery of it rather than a
+   * title over it. The face, the halo and the tracking below are all
+   * cards/maintitle.html's `.lockup`, which is itself the website's
+   * `.wolves-intro-overlay-text-slim`.
+   *
+   * "ACCOUNT FOR THE MOVEMENT" -- the page drifts and tilts under the words.
+   * The DRIFT is handled by the build, which animates the overlay's x and y
+   * (scripts/build_trailer1.py). The TILT is handled here, by `angle`: the
+   * card is rendered already rotated, so the composite needs no `rotate`
+   * filter and no second resample of the type.
+   *
+   * NO SPEAKER, AND THAT IS THE POINT. The owner chose an unattributed plate
+   * over a chat pill. A chat card names the person who said the line
+   * (docs/skills/plates/references/conversation-cards.md), and nobody said
+   * these -- they are the film narrating. Putting a real login on them would
+   * be exactly the mistake act IV made with lorem ipsum.
+   *
+   * NO BOX EITHER. "Dialogue boxes" was the owner's word for the beat, not a
+   * request for a panel: a filled box over moving picture reads as a box, and
+   * the owner has already rejected one on the main title. The protection is on
+   * the glyphs.
+   */
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  :root {
+    --wc-font-display: 'Inter', 'Arial Narrow', sans-serif;
+  }
+
+  /* The line is rendered into the middle of an otherwise empty 1920x1080
+     canvas and the BUILD moves that canvas, so the type can be positioned in
+     film coordinates by one overlay expression instead of being baked to a
+     corner here. */
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--wc-font-display);
+  }
+
+  .line {
+    max-width: 74%;
+    text-align: center;
+    font-weight: 600;
+    font-size: 3.4rem;
+    line-height: 1.24;
+    letter-spacing: 0.05em;
+    color: #f4f6f8;
+    /* `.lockup`'s halo, verbatim. The book page is a bright cream field and
+       the burning letters throw local highlights across it, so this line has
+       the same problem the main title had over the starburst and it gets the
+       same answer: a tight opaque core, then two soft falloffs. */
+    text-shadow:
+      0 0 4px rgb(0 0 0 / 95%),
+      0 2px 10px rgb(0 0 0 / 90%),
+      0 0 28px rgb(0 0 0 / 75%),
+      0 0 60px rgb(0 0 0 / 55%);
+    white-space: pre-line;
+  }
+</style>
+</head>
+<body>
+  <div class="line" id="line"></div>
+<script>
+  const params = new URLSearchParams(window.location.search)
+
+  const el = document.getElementById('line')
+  // `body` repeats, exactly as it does on the other cards, so a beat may be
+  // one line or two without a second parameter name.
+  const lines = params.getAll('body')
+  el.textContent = lines.join('\n')
+
+  // EVERY B AND EVERY F IS BLUE. Owner, 2026-08-15, on all dialogue except the
+  // chat bubbles and nameplates -- and this is neither. Same definition as
+  // cards/maintitle.html and tools/blueletters.py.
+  const BLUE_LETTERS = 'BbFf'
+  const parts = []
+  let run = ''
+  for (const ch of el.textContent) {
+    if (BLUE_LETTERS.includes(ch)) {
+      if (run) { parts.push(document.createTextNode(run)); run = '' }
+      const span = document.createElement('span')
+      span.style.color = '#4285f4'
+      span.textContent = ch
+      parts.push(span)
+    } else {
+      run += ch
+    }
+  }
+  if (run) { parts.push(document.createTextNode(run)) }
+  el.textContent = ''
+  el.append(...parts)
+
+  // The page's tilt, in degrees, positive clockwise. Absent means level.
+  const angle = parseFloat(params.get('angle') || '0')
+  if (angle) { el.style.transform = `rotate(${angle}deg)` }
+
+  if (params.get('size')) { el.style.fontSize = params.get('size') }
+
+  document.fonts.ready.then(() => { window.__renderReady = true })
+</script>
+</body>
+</html>

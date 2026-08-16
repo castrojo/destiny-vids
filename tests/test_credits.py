@@ -175,23 +175,44 @@ def test_the_call_to_action_gives_way_to_the_anchor(manifest):
 def test_the_call_to_action_is_the_owners_words_in_his_order(manifest):
     cards = manifest["cta_cards"]
     assert [c.get("text") or c["name"] for c in cards] == [
-        "MAKE YOUR OWN FATE", "BECOME LEGEND", "RAFAEL CASTRO", "FIGHT"]
-    assert [c["kind"] for c in cards] == ["cta", "cta", "birthday", "cta"]
+        "YOU ARE THE DREAM OF MANY ANCESTORS", "RAFAEL CASTRO", "FIGHT"]
+    assert [c["kind"] for c in cards] == ["cta", "birthday", "cta"]
     # "noticeably larger font" is a step somebody can see, in this order.
+    # Two rungs rather than three since the owner dropped MAKE YOUR OWN FATE
+    # and BECOME LEGEND: one cry, then FIGHT above it.
     scales = [C.CTA_SCALE[c["scale"]] for c in cards if c["kind"] == "cta"]
-    assert scales == sorted(scales) and len(set(scales)) == 3
-    # ...and FIGHT stays the biggest thing in the act after the two cries above
-    # it were promoted.
+    assert scales == sorted(scales) and len(set(scales)) == 2
+    # ...and FIGHT stays the biggest thing in the act.
     assert scales[-1] == C.CTA_SCALE["colossal"]
 
 
-def test_fight_is_up_longer_than_the_first_two(manifest):
-    """Owner: 'FIGHT <--- I want this one up longer than the first 2'."""
+def test_dropping_two_cries_did_not_lengthen_the_cards_that_stayed(manifest):
+    """Owner, 2026-08-16: drop MAKE YOUR OWN FATE and BECOME LEGEND, 'just
+    have that one phrase'.
+
+    ``cta_cards`` carry RELATIVE weights, so removing 4.0 + 4.5 without moving
+    that 8.5 somewhere would have quietly stretched the birthday card and
+    FIGHT. The surviving cry inherits the weight instead, and the pre-reveal
+    total is what it always was.
+    """
+    assert sum(c["dur_sec"] for c in manifest["cta_cards"]) == 23.0
+
+
+def test_fight_is_up_longer_than_everything_before_it(manifest):
+    """Owner: 'FIGHT <--- I want this one up longer than the first 2'.
+
+    The two cards that instruction named -- MAKE YOUR OWN FATE and BECOME
+    LEGEND -- were dropped on 2026-08-16, so the literal comparison has nothing
+    left to compare against. What the instruction was ASKING FOR survives it:
+    FIGHT is the last thing before the cover and it is up longer than any
+    single card ahead of it.
+    """
     items, _ = B.schedule(manifest)
-    cta = [i for i in items if i["kind"] == "cta"]
-    fight = next(i for i in cta if i["text"] == "FIGHT")
-    first_two = [i for i in cta if i["text"] != "FIGHT"][:2]
-    assert fight["dur"] > sum(c["dur"] for c in first_two)
+    cta = [i for i in items if i["kind"] in ("cta", "birthday")]
+    fight = next(i for i in cta if i.get("text") == "FIGHT")
+    before = [i for i in cta if i is not fight]
+    assert before, "FIGHT is not the only card in the run"
+    assert all(fight["dur"] > c["dur"] for c in before)
 
 
 def test_the_reveal_length_was_not_touched(manifest):

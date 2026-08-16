@@ -1,0 +1,87 @@
+{
+  "_what": "TRAILER 1 -- a promotional cut derived from the PROLOGUE, not a ninth act. It reuses the prologue's source (Nightwish's 'Perfume Of The Timeless'), its main title and its wolves bridge, then adds two owner-written lines over the book sequence and a KubeCon end card. It is delivered to ~/Videos/Wolves/trailer-1.mp4 and takes no numeral, no chapter marker and no slot in stories/megacut/megacut.json: the programme is unchanged by it.",
+  "_owner": "2026-08-16, in order: 'Now make a new video: Trailer 1 - make a copy of this video and then / Add dialogue boxes over the words in the book section :25 - :33 so that we can say words, account for the movement because we want to \"replace\" these words with our overlay, wolves style / Two Generations of Contributors / One, new, one old. Fighting to work together. / Then make the wolves fade longer and more dramatic and add a KubeCon | CloudNativeCon North America / Salt Lake City, Utah / #KubeCon #CloudNativeCon #7wolves at the end. Let the music play out longer than the original video, look up how long movie trailers should be given the things we have / Sear the | again'. Then: 'you can even go to :36 actually and skip the shot of the tank and go right to the iguana again'. And, on the second line: change 'Struggling to build together.' to 'Dreaming to build a better future'.",
+  "_length": "1:50.0 exactly -- the owner's target. The MPA and NATO cap a theatrical trailer at 2:30 and teasers run 0:30-1:30, so 1:50 sits between a teaser and a full trailer, which is what this is: the whole main title sequence, one narrative beat, and a venue card. The budget is picture 88.200 + bridge 14.000 + end card 7.820 = 110.020. The picture is 88.200 rather than the 88.520 the two trims add up to because the dissolve at the tank join costs its own 0.320 s -- xfade emits d1 + d2 - duration -- and the end card is where those 0.320 s are given back, so the delivered runtime is exactly 1:50.0.",
+  "_the_tank_is_cut": "Scene boundaries DETECTED on the source, not taken from the owner's timestamps: the book runs 24.880 -> 33.640, the empty specimen jar in the library 33.640 -> 36.320, and the iguana 36.320 -> 40.720. The owner asked to skip the tank and go straight to the iguana, so 33.640 -> 36.320 is excised and the two halves are joined with a short dissolve. THE AUDIO IS NOT CUT THERE. The song runs continuously from the source, so the music carries over the picture edit -- which means picture and sound run 2.680 s apart after 33.640, deliberately, and every timing below the join is in FILM time.",
+  "_the_watermark": "The source carries Nightwish's burned-in './/. Arena.' mark top right through every one of these shots. It is publisher copy and nothing in this brief asks for its removal; redactions/ is the route if that is ever wanted. Left alone, recorded here.",
+  "plates": [
+    {
+      "id": "maintitle-a",
+      "kind": "maintitle",
+      "stage": "title",
+      "at": 11.0,
+      "dur": 4.4,
+      "label": "PROJECT BLUEFIN",
+      "accent": "BLUEFIN",
+      "title": "seven days to the wolves",
+      "body": [
+        "Music by Nightwish | Action by Bungie"
+      ],
+      "note": "The prologue's own main title, unchanged in timing. The credit pair is now ONE authored line with a seared divider -- see stories/00-prologue-plates.json, which carries the same string."
+    },
+    {
+      "id": "maintitle-b",
+      "kind": "maintitle",
+      "stage": "credits",
+      "at": 15.4,
+      "dur": 7.2,
+      "label": "PROJECT BLUEFIN",
+      "accent": "BLUEFIN",
+      "title": "seven days to the wolves",
+      "body": [
+        "Music by Nightwish | Action by Bungie"
+      ],
+      "note": "Beat two, with the credit line and its sear made visible."
+    },
+    {
+      "id": "book-a",
+      "kind": "bookline",
+      "at": 28.3,
+      "dur": 2.3,
+      "angle": 4.0,
+      "body": [
+        "Two Generations of Contributors"
+      ],
+      "anchor": [1030, 443],
+      "anchor_out": [980, 395],
+      "note": "OWNER COPY, verbatim. Seated over the source's own printed line, 'In order to be born', which prints itself onto the page across 28.2-30.6. `anchor` and `anchor_out` are the line's centre in DELIVERY coordinates at `at` and at `at + dur`, and the build walks between them, which is the 'account for the movement' half of the brief. They already include the 138 px letterbox pad, so they can be read straight off a delivered frame."
+    },
+    {
+      "id": "book-b",
+      "kind": "bookline",
+      "at": 31.0,
+      "dur": 3.9,
+      "walk": 2.32,
+      "angle": -14.0,
+      "size": "3.0rem",
+      "body": [
+        "One, new, one old.",
+        "Dreaming to build a better future"
+      ],
+      "anchor": [1000, 470],
+      "anchor_out": [960, 505],
+      "note": "OWNER COPY. The second sentence was revised 2026-08-16: it read 'Fighting to work together.' in the first brief and the owner replaced it -- 'change \"Struggling to build together.\" to \"Dreaming to build a better future\"'. Reproduced exactly as given, including the missing full stop, because a punctuation mark nobody wrote is still a mark nobody wrote. It sits over 'you needed', which is tilted hard as the camera rolls, hence angle -14. Set a step smaller than book-a because it is two lines against one.",
+      "_why_it_crosses_the_cut": "Eight words cannot be read in the 1.4 s the book has left after book-a clears, and shrinking the gap between the two beats would only stack them. The owner had already given the room -- 'you can even go to :36 actually' -- so this line HOLDS ACROSS THE JOIN and is still on screen over the iguana's close-up. `walk` is 2.32 rather than the full 3.9: it tracks the page until the cut at 33.320 and then holds, because after the cut there is no page under it to track."
+    },
+    {
+      "id": "endcard",
+      "kind": "maintitle",
+      "at": 102.2,
+      "dur": 7.82,
+      "title": "KubeCon | CloudNativeCon North America",
+      "subtitle": "Salt Lake City, Utah",
+      "body": [
+        "#KubeCon",
+        "#CloudNativeCon",
+        "#7wolves"
+      ],
+      "note": "OWNER COPY, verbatim, in the owner's order. It uses the title card's existing closed field set -- title / subtitle / body[] -- so no new copy field was invented for it, and it carries no `label`, so the eyebrow row is simply absent. The pipe is seared, per 'Sear the | again'.",
+      "_no_blue": "The card's b/f rule is NOT applied to this title. 'KubeCon' and 'CloudNativeCon' are Linux Foundation marks set as type, and recolouring a letter of somebody else's trademark is a different decision from recolouring a letter of our own. The divider is drawn without touching the words. Reversible in one flag if the owner wants the b -- see cards/maintitle.html."
+    }
+  ],
+  "unresolved": [
+    "The end card names KubeCon and CloudNativeCon as text only -- no logo, no mark is fetched, and nothing here is cleared or needs clearing. If a mark is ever wanted on this card it is a rights decision and blocks; text is not.",
+    "The book lines' drift is modelled as a straight walk between two measured anchors with a fixed tilt. The page also scales slightly as the camera pushes in, and that is NOT modelled -- the type holds one size across each beat. Visible only if the beats are lengthened.",
+    "Michroma, the site's display face for this overlay, is not installed on this host, so every card here resolves the act slides' stack exactly as cards/act.html does. Recorded as the substitution it is."
+  ]
+}

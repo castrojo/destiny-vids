@@ -132,6 +132,66 @@
     margin: 0 0 1.4rem;
   }
 
+  /* WEIGHT VARIANTS FOR THE EYEBROW ONLY.
+
+     Owner, 2026-08-16: *"the Project Bluefin is a tad too thin on the font,
+     give me some options, the title itself is perfect"*. So `.title` is not
+     touched by any rule below, and only PROJECT BLUEFIN moves.
+
+     `font-weight: 500` AND `600` WOULD BE A NO-OP HERE, and that is the whole
+     reason these variants are shaped the way they are. The stack is the
+     site's -- 'Inter', 'Arial Narrow', sans-serif -- and Inter is not
+     installed on this host (`fc-list "Inter"` is empty), so it resolves to
+     DejaVu Sans, which ships Book (400) and Bold (700) and nothing between.
+     CSS font matching would snap 500 down to Book and 600 up to Bold, so a
+     "500/600/700" option set would really be two options wearing three names.
+
+     The levers that DO exist on this host are four, and each variant below
+     picks a different combination of them:
+
+       WEIGHT   400 -> 700, the only real step the family has.
+       STROKE   `-webkit-text-stroke`, which thickens the letterform
+                CONTINUOUSLY and is the only way to get a half-step between
+                Book and Bold without installing a font.
+       CONTRAST #cbd5e1 -> #fff. Half of "thin" over moving picture is
+                contrast, not weight: the same glyph at full white reads
+                heavier without a single stroke changing.
+       SIZE     a few per cent, which adds mass while keeping the letterform.
+
+     Selected by `?variant=` -- a STYLING switch, not copy, exactly like
+     `stage`. No variant means the card renders as it always has, so the
+     default path is unchanged until the owner picks one. */
+
+  /* B -- a half-step. Book letterform, thickened by stroke and lifted to
+     white: heavier, still the light face the site designed. */
+  body[data-variant="b"] .eyebrow {
+    color: #fff;
+    -webkit-text-stroke: 0.45px currentColor;
+  }
+
+  /* C -- the real Bold. Tracking comes IN slightly: 0.04em was chosen for a
+     light face, and bold letterforms at that tracking read sparse. */
+  body[data-variant="c"] .eyebrow {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  /* D -- Bold, white, and 10% larger. The most present option. */
+  body[data-variant="d"] .eyebrow {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+    font-size: clamp(1.98rem, 3.3vw, 2.86rem);
+  }
+
+  /* E -- heavy WITHOUT going bold: a full-pixel stroke on the Book face at
+     6% larger. Keeps the open counters the Bold options close up. */
+  body[data-variant="e"] .eyebrow {
+    color: #fff;
+    -webkit-text-stroke: 0.9px currentColor;
+    font-size: clamp(1.91rem, 3.18vw, 2.76rem);
+  }
+
   /* The blue B, at the owner's request ("don't forget the blue b" / "the words
      are fine just color in the b"). The value is NOT picked: #4285f4 is the
      published fill of the fin ligature in Project Bluefin's own wordmark
@@ -236,6 +296,24 @@
     background: rgb(96 165 250 / 28%);
   }
 
+  /* The title card's third authored field. `title` / `subtitle` / `body[]` is
+     the deck's full-frame card shape (docs/skills/plates/SKILL.md), and this
+     template previously implemented only two of the three because the main
+     title has no subtitle. The end card does -- "Salt Lake City, Utah" under
+     the KubeCon line -- so the row it was always entitled to now exists. A
+     card that passes no `subtitle` omits the row entirely, exactly as it
+     omits a missing `label`. It takes the eyebrow's face at the eyebrow's
+     size, so a card cannot arrive with a fourth typeface. */
+  .subtitle {
+    display: block;
+    font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: #cbd5e1;
+    text-align: center;
+    margin: 1.2rem 0 0;
+  }
+
   /* cards/act.html `.artist` -- the credit rows. The slot always occupies its
      space so the staged pair does not shift the title.
      COLOUR: act.html's `.artist` is --wc-grey (#8b8f96), which is right on a
@@ -255,17 +333,86 @@
   }
   .credits.shown { visibility: visible; }
   .credit-line { display: block; }
+
+  /* THE SEAR -- the vertical glow on the `|`.
+
+     Owner, 2026-08-16, on the credit pair: *"I want to change this: Music by
+     Nightwish | Action by Bungie -- and then put the vertical glow/sear in"*,
+     and later *"Sear the | again"* for the end card's own pipe.
+
+     THE COPY IS THE OWNER'S AND IS REPRODUCED EXACTLY, pipe included. What
+     changes is only how that one character is DRAWN: the font's `|` glyph is
+     replaced by a rule of controlled height, because a glyph's bar is sized by
+     the typeface and this one has to span the caps it divides.
+
+     THE SEAR IS BLUE, AND IT IS NOT A NEW TREATMENT. `tools/credits.py`
+     already implements it for act VIII's call to action, from the owner's own
+     instruction -- *"make the filled in F's and blue sear with heat for the
+     big ones"* -- and the three values below are ITS three values, not a new
+     palette invented for this card:
+
+         SEAR_FLARE  rgb(196 226 255)   the tight flare right off the stroke
+         SEAR_MID    rgb(147 197 253)   ACCENT, the film's blue -- the fill
+         SEAR_HALO   rgb( 37  99 235)   the deeper blue, the wide haze
+
+     Warm was the obvious reading of the word and it is the wrong one here: in
+     this film a sear is blue heat, and an amber divider would have been a
+     second, contradicting definition of a treatment the owner has already
+     specified once.
+
+     IT IS GLOW, NOT A PANEL. Same rule as `.lockup`: a tight near-opaque core
+     with wider soft falloffs, which travels with the mark and has no edge of
+     its own. Nothing is drawn behind the type. The relative strengths follow
+     `_sear`'s own gains (halo 0.34 / mid 0.36 / flare 0.26), so the divider
+     glows like the letters it sits between rather than out-shouting them.
+
+     STATIC, DELIBERATELY. This card is screenshotted to a PNG, so it carries
+     no animation; the sear arrives with the credit rows at the stage swap.
+     A burn-ON would need a third staged card and the swap machinery to go
+     with it, which is more mechanism than the beat is worth. */
+  .sear {
+    display: inline-block;
+    width: 3px;
+    height: 1.55em;
+    /* NOT equal margins, and the imbalance was MEASURED rather than reasoned.
+       `.credits` tracks at 0.24em and that air lands unevenly around an
+       inline-block rule. 0.86/0.62 put the bar visibly right of centre and
+       0.42/0.98 put it visibly left; these are the values between them. */
+    margin: 0 0.72em 0 0.62em;
+    vertical-align: -0.38em;
+    border-radius: 2px;
+    background: linear-gradient(
+      to bottom,
+      rgb(147 197 253 / 0%) 0%,
+      rgb(147 197 253 / 90%) 12%,
+      rgb(232 244 255) 50%,
+      rgb(147 197 253 / 90%) 88%,
+      rgb(147 197 253 / 0%) 100%);
+    box-shadow:
+      0 0 4px 0 rgb(196 226 255 / 95%),
+      0 0 12px 1px rgb(147 197 253 / 90%),
+      0 0 30px 2px rgb(147 197 253 / 55%),
+      0 0 64px 6px rgb(37 99 235 / 55%);
+  }
 </style>
 </head>
 <body>
   <div class="lockup">
     <span class="eyebrow" id="eyebrow"></span>
     <h1 class="title" id="title"></h1>
+    <span class="subtitle" id="subtitle"></span>
     <div class="hairline"></div>
     <div class="credits" id="credits"></div>
   </div>
 <script>
   const params = new URLSearchParams(window.location.search)
+
+  // A STYLING switch, not copy -- the same kind of parameter as `stage`. It
+  // selects one of the eyebrow weight options above; absent, the card renders
+  // exactly as it did before any of them existed.
+  if (params.get('variant')) {
+    document.body.dataset.variant = params.get('variant')
+  }
 
   function fill(id, value) {
     const el = document.getElementById(id)
@@ -279,6 +426,7 @@
   // repo uses, so the manifest needs almost no new vocabulary.
   fill('eyebrow', params.get('label'))
   fill('title', params.get('title'))
+  fill('subtitle', params.get('subtitle'))
 
   // EVERY B AND EVERY F IS BLUE. Owner, 2026-08-15: *"Ensure every b is blue,
   // and every f is blue in all the dialogue except the chat bubbles and
@@ -318,6 +466,40 @@
   }
 
   blueify(document.getElementById('eyebrow'))
+  blueify(document.getElementById('subtitle'))
+
+  // THE SEAR. Every ` | ` in an authored string is DRAWN as the vertical glow
+  // rule instead of the typeface's pipe glyph. The string is not edited: the
+  // same characters are on screen, in the same order, and one of them is a
+  // rule rather than a glyph.
+  //
+  // Only the spaced form ` | ` is matched. A pipe inside a word is not a
+  // divider, and this card should never guess which one an author meant.
+  function sear(el, { blue = true } = {}) {
+    if (!el) { return }
+    const text = el.textContent
+    if (!text || !text.includes(' | ')) {
+      if (blue) { blueify(el) }
+      return
+    }
+    const parts = text.split(' | ')
+    el.textContent = ''
+    parts.forEach((part, index) => {
+      if (index > 0) {
+        const rule = document.createElement('span')
+        rule.className = 'sear'
+        // The pipe is still a character of the authored string, so it is still
+        // readable as one to anything that is not a camera.
+        rule.setAttribute('role', 'separator')
+        rule.setAttribute('aria-label', '|')
+        el.appendChild(rule)
+      }
+      const span = document.createElement('span')
+      span.textContent = part
+      if (blue) { blueify(span) }
+      el.appendChild(span)
+    })
+  }
 
   // THE TITLE LINE IS NOT PUT THROUGH `blueify`, and that is deliberate rather
   // than an omission. The authored title -- 'seven days to the wolves' --
@@ -325,6 +507,14 @@
   // substitution below rebuilds this element's children. Running both would
   // mean one pass throwing away the other's DOM. If the title copy ever gains
   // a b or an f, the two passes have to be merged rather than ordered.
+  //
+  // THE END CARD'S TITLE IS THE CASE THAT ARRIVED. "KubeCon | CloudNativeCon
+  // North America" has a b in it, and it is a LINUX FOUNDATION TRADEMARK set
+  // as type. Recolouring a letter of somebody else's mark is not the same
+  // decision as recolouring a letter of our own, so the blue rule is NOT
+  // applied to the title line -- `sear` is called with `blue: false` -- and
+  // the divider is drawn without touching the words. Reversible in one flag if
+  // the owner wants the b; recorded in stories/trailer-1-plates.json.
   //
   // THE O IN WOLVES BECOMES THE KUBERNETES HELM. Owner, 2026-08-15.
   //
@@ -349,6 +539,25 @@
     mark.onerror = () => mark.replaceWith(document.createTextNode(letter))
     titleEl.textContent = ''
     titleEl.append(titleText.slice(0, oAt), mark, titleText.slice(oAt + 1))
+  } else {
+    sear(titleEl, { blue: false })
+  }
+
+  // THE TITLE IS FITTED, NOT TRUSTED. `.title`'s clamp was sized for a
+  // 24-character film title; the end card's line is half again as long and at
+  // the same size it runs off the frame. Rather than adding a per-card size
+  // param nobody can check, the rendered width is MEASURED and the size walked
+  // down until the line fits inside the lockup with the same ~12% of air
+  // either side the main title was given. A title that already fits is not
+  // touched, so this changes no existing card by a pixel.
+  const FIT_WIDTH = 0.88
+  if (titleEl.textContent || titleEl.children.length) {
+    const limit = document.querySelector('.lockup').clientWidth * FIT_WIDTH
+    let size = parseFloat(getComputedStyle(titleEl).fontSize)
+    for (let i = 0; i < 40 && titleEl.scrollWidth > limit && size > 16; i++) {
+      size *= 0.97
+      titleEl.style.fontSize = `${size}px`
+    }
   }
 
   // BOTH staged cards carry the same `body`, so the credit rows always occupy
@@ -360,7 +569,10 @@
     const row = document.createElement('span')
     row.className = 'credit-line'
     row.textContent = line
-    blueify(row)
+    // `sear` blueifies the words either side of the divider and draws the
+    // divider itself; a row with no ` | ` in it falls straight through to
+    // `blueify` and renders exactly as it always did.
+    sear(row)
     host.appendChild(row)
   }
   if (params.get('stage') !== 'title') { host.classList.add('shown') }

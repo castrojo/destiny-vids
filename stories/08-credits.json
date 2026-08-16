@@ -46,18 +46,11 @@
   "_cta_cards_what": "The call to action, and everything that plays BEFORE the reveal. Owner, 2026-08-14. dur_sec are RELATIVE WEIGHTS scaled into the window the cover's own time leaves (reveal.at_sec), exactly as fixed_cards are: the owner named :22 for the cover and the cards give way to it. FIGHT's weight is longer than the first two together, which is the instruction; the reveal's own hold_sec is untouched.",
   "cta_cards": [
     {
-      "_what": "Card one of the call to action. THE OWNER'S WORDING, 2026-08-15: 'MAKE YOUR OWN FATE'. It read 'WE MAKE OUR OWN FATE' until then; the owner restated the line and their instruction is the copy, so the string was updated rather than queried -- a committed string records what was decided last time, it does not outrank what the owner says now. Stepped medium -> large in the same pass ('noticeably larger font, more emphasis on the font'), which also brings it above CTA_SEAR_FROM so its F sears.",
+      "_what": "The call to action, and now the ONLY cry before the birthday card and FIGHT. Owner, 2026-08-16: 'have the first slide in the credits be \"you are the dream of many ancestors\" and drop \"make your own fate\" and \"become legend\" and just have that one phrase, it's a much more powerful statement'. So two committed cards were REMOVED rather than demoted -- MAKE YOUR OWN FATE (large, 4.0) and BECOME LEGEND (huge, 4.5) -- and this line takes the weight of both, 8.5, so the birthday card and FIGHT keep the durations they were tuned to: cta dur_sec are RELATIVE weights scaled into the window the cover's own time leaves, so dropping a card without moving its weight would have silently lengthened every card that stayed. The wording is the owner's, set in the deck's uppercase like every other cry -- the same casing treatment 'seven days to the wolves' gets. ITS ONE BLUE LETTER IS THE F OF 'OF' -- checked on a rendered frame, not assumed: the first draft of this note claimed the line had no b and no f at all, and the render says otherwise. At `huge` it is above CTA_SEAR_FROM, so that F is seared like the cries it replaced.",
       "kind": "cta",
-      "text": "MAKE YOUR OWN FATE",
-      "scale": "large",
-      "dur_sec": 4.0
-    },
-    {
-      "_what": "Owner, re-issued 2026-08-15 against this line and the one above: 'noticeably larger font, more emphasis on the font - no italics, I want bold and blocky, make the filled in F's and blue sear with heat for the big ones'. Stepped large -> huge. There is no F in this line; its B carries the film's blue under the b/f rule, which is now every b AND every f rather than an either/or.",
-      "kind": "cta",
-      "text": "BECOME LEGEND",
+      "text": "YOU ARE THE DREAM OF MANY ANCESTORS",
       "scale": "huge",
-      "dur_sec": 4.5
+      "dur_sec": 8.5
     },
     {
       "_what": "THE OWNER'S OWN WORDS, verbatim, replacing the 'Introducing' card: 'Change introducing Rafael to Happy Tenth Birthday / RAFAEL CASTRO / \"We love you\" - Mom and Dad'. The second, redacted name is GONE with the card that carried it and is recorded nowhere, which is what a redaction is for. This is the one card in the run set in the credit treatment rather than the seared one: it is a birthday card, not a battle cry.",

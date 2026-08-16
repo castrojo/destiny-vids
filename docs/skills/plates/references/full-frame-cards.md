@@ -13,6 +13,8 @@ rendering **the site's own CSS in a real browser** — the pattern
 |---|---|
 | `cards/act.html` | `src/components/wolves/cinematic/CinematicTransition.vue` + `src/style/wolves-cinematic.scss` |
 | `cards/comic.html` | `.wolves-intro-overlay-title-card` and friends, `src/components/wolves/WolvesIntroOverlay.vue` |
+| `cards/maintitle.html` | `.wolves-intro-overlay-text-slim`, with the two lines' treatments swapped at the owner's request |
+| `cards/bookline.html` | one owner line seated on moving picture — `maintitle.html`'s `.lockup` face and halo, nothing else |
 | `cards/render-cards.mjs` | the driver — playwright, 1920x1080 at 1x, `omitBackground` |
 
 ```bash
@@ -20,6 +22,42 @@ ln -sfn ~/src/website/node_modules node_modules     # playwright is not vendored
 node cards/render-cards.mjs --manifest <manifest> --out-dir <plates-dir>
 node cards/render-cards.mjs --manifest <manifest> --out-dir <dir> --only id1,id2
 ```
+
+## The seared divider
+
+A ` | ` inside a `title` or a `body` line is **drawn**, not typed: `maintitle.html`
+replaces the typeface's pipe glyph with a vertical rule carrying the film's blue
+sear. The three colours are `tools/credits.py`'s own `SEAR_MID` / `SEAR_HALO` /
+`SEAR_FLARE`, because act VIII already implements this treatment from the
+owner's instruction — *"blue sear with heat for the big ones"*. **A sear here is
+blue heat, not amber**; the obvious warm reading is a second, contradicting
+definition of a treatment that already exists.
+
+The string is untouched. Only the spaced form ` | ` matches, because a pipe
+inside a word is not a divider and a card must not guess which one an author
+meant.
+
+## Query parameters that are not copy
+
+`stage`, `variant`, `angle` and `size` travel the same query string as the
+authored fields and change no string:
+
+| Param | What it switches |
+|---|---|
+| `stage` | the main title's two beats — `title`, then `credits` |
+| `variant` | the eyebrow's weight option, `b`..`e` — see below |
+| `angle` | a `bookline`'s tilt in degrees, so it can sit on a tilted page |
+| `size` | a `bookline`'s type size, for a beat that runs to two lines |
+
+**`font-weight: 500` and `600` are no-ops on this host.** The stack is the
+site's — `'Inter', 'Arial Narrow', sans-serif` — and Inter is not installed, so
+it falls to DejaVu Sans: Book (400) and Bold (700), nothing between. CSS font
+matching snaps 500 down and 600 up, so a "400/500/600/700" option set is two
+options wearing four names. The levers that do exist are weight, stroke width
+(`-webkit-text-stroke`, the only continuous one), contrast and size.
+`scripts/build_font_options.py` renders the set **over the frame it will ship
+on**, not on a swatch, because half of "too thin" is contrast against the
+picture underneath.
 
 ## Why not Pillow
 
