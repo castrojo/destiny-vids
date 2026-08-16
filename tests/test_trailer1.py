@@ -130,12 +130,18 @@ def test_the_book_lines_are_the_owners_words_verbatim(manifest, plate_id, lines)
 
 def test_the_end_card_is_the_owners_words_in_the_owners_order(manifest):
     card = plate(manifest, "endcard")
+    assert card["variant"] == "poster"
     assert card["title"] == "KubeCon | CloudNativeCon North America"
     assert card["subtitle"] == "Salt Lake City, Utah"
-    assert card["body"] == ["#KubeCon", "#CloudNativeCon", "#7wolves"]
+    assert card["body"] == [
+        "wolves.projectbluefin.io",
+        "#KubeCon",
+        "#CloudNativeCon",
+        "#7wolves",
+    ]
 
 
-def test_the_end_card_invents_no_field(manifest):
+def test_the_end_card_poster_uses_no_new_copy_field(manifest):
     """The title card's shape is `title` / `subtitle` / `body[]`.
 
     A venue card is exactly the sort of thing somebody adds a row to. Nobody

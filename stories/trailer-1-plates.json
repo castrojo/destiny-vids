@@ -66,16 +66,18 @@
     {
       "id": "endcard",
       "kind": "maintitle",
+      "variant": "poster",
       "at": 102.2,
       "dur": 7.82,
       "title": "KubeCon | CloudNativeCon North America",
       "subtitle": "Salt Lake City, Utah",
       "body": [
+        "wolves.projectbluefin.io",
         "#KubeCon",
         "#CloudNativeCon",
         "#7wolves"
       ],
-      "note": "OWNER COPY, verbatim, in the owner's order. It uses the title card's existing closed field set -- title / subtitle / body[] -- so no new copy field was invented for it, and it carries no `label`, so the eyebrow row is simply absent. The pipe is seared, per 'Sear the | again'.",
+      "note": "OWNER COPY, verbatim, in the owner's order. Owner, 2026-08-16: 'add a large wolves.projectbluefin.io on the kubecon slide as a CTA. make it look awesome' and then selected the Poster treatment over a Bluefin DAY wallpaper. The existing title-card field set remains intact: title is the event, subtitle the venue, and body[0] is the CTA followed by the authored hashtags. It carries no label, so the eyebrow row is simply absent. The pipe is seared, per 'Sear the | again'.",
       "_no_blue": "The card's b/f rule is NOT applied to this title. 'KubeCon' and 'CloudNativeCon' are Linux Foundation marks set as type, and recolouring a letter of somebody else's trademark is a different decision from recolouring a letter of our own. The divider is drawn without touching the words. Reversible in one flag if the owner wants the b -- see cards/maintitle.html."
     }
   ],
