@@ -311,12 +311,18 @@ def filtergraph(manifest):
                  f"d={BRIDGE_DOWN:.3f}[bridge]")
     inputs += 2
 
-    # --- the end card, on its own black --------------------------------------
-    # It arrives out of the bridge's black rather than over a picture, so it is
-    # composited onto a colour source instead of borrowing the night's last
-    # frame -- which would have been a frozen wallpaper under a venue card.
-    parts.append(f"color=c=black:s={W}x{H}:r={FPS}:d={ENDCARD:.3f}"
-                 f",format=rgba[endbg]")
+    # --- the end card, on the selected Bluefin DAY wallpaper -----------------
+    # Owner, 2026-08-16: "no night I want day". Input 5 is already the March
+    # day wallpaper for the bridge, and ffmpeg permits it to feed this second
+    # bounded stream as well -- no duplicate input, no second asset choice.
+    #
+    # The global grade, not a panel, makes the daylight art a legible poster
+    # background. The text's own halo still travels with the glyphs, as it
+    # does over moving picture elsewhere in the film.
+    parts.append(_still(5, "endday",
+                        f",trim=0:{ENDCARD:.3f},setpts=PTS-STARTPTS,"
+                        f"format=yuv420p"))
+    parts.append("[endday]eq=brightness=-0.55[endbg]")
     parts.append(_still(inputs + 1, "ec",
                         f",trim=0:{ENDCARD:.3f},setpts=PTS-STARTPTS,"
                         f"fade=t=in:st=0:d={ENDCARD_FADE:.3f}:alpha=1,"

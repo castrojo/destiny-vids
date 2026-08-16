@@ -216,3 +216,17 @@ def test_the_enable_windows_use_escaped_commas(manifest):
     graph = T.filtergraph(manifest)
     assert "enable=between(t\\," in graph
     assert "enable='between" not in graph
+
+
+def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
+    graph = T.filtergraph(manifest)
+    assert "[endday]eq=brightness=-0.55[endbg]" in graph
+    assert "color=c=black" not in graph
+
+
+def test_the_end_card_wallpaper_is_bounded_to_its_own_window(manifest):
+    graph = T.filtergraph(manifest)
+    assert (
+        f"trim=0:{T.ENDCARD:.3f},setpts=PTS-STARTPTS,format=yuv420p[endday]"
+        in graph
+    )

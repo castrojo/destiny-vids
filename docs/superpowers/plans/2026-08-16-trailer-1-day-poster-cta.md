@@ -273,16 +273,17 @@
   In `filtergraph()`, replace the `color=c=black` end-card source with:
 
   ```python
-  parts.append(_still(inputs + 1, "endday",
+  parts.append(_still(5, "endday",
                       f",trim=0:{ENDCARD:.3f},setpts=PTS-STARTPTS,"
                       f"format=yuv420p"))
   parts.append("[endday]eq=brightness=-0.55[endbg]")
   ```
 
-  Increment `inputs` once for the day still and move the end-card PNG to the
-  next input index. The `command()` input order remains source, four card
-  PNGs, day wallpaper, night wallpaper, end-card PNG; do not add a second
-  wallpaper input.
+  Do **not** increment `inputs`: input 5 is already the day wallpaper used by
+  the bridge, and ffmpeg permits the same input to feed both filter chains.
+  The end-card PNG remains input 7. The `command()` input order remains
+  source, four card PNGs, day wallpaper, night wallpaper, end-card PNG; do
+  not add a second wallpaper input.
 
   Keep the card fade chain and the final:
 
