@@ -376,6 +376,23 @@
     letter-spacing: 0.045em;
     line-height: 1.05;
   }
+  /* THE URL DOTS SEAR, NOT THE URL.
+
+     Owner, 2026-08-16: *"sear the dots on the url!"*. `blueifyDomain()` wraps
+     ONLY `.` in `.accent`, so the treatment physically cannot leak onto the
+     CTA's b or f -- the owner explicitly kept both white.
+
+     These are the same flare / mid / halo colours as `.sear`, but at a dot's
+     scale: a one-pixel near-white core, then a tight blue falloff. The event
+     pipe gets the wide 64px halo because it is a full cap-height landmark; a
+     dot with that reach would be a blob. */
+  body[data-variant="poster"] .poster-cta .accent {
+    color: #4285f4;
+    text-shadow:
+      0 0 2px 0 rgb(196 226 255 / 95%),
+      0 0 7px 1px rgb(147 197 253 / 85%),
+      0 0 16px 2px rgb(37 99 235 / 45%);
+  }
   body[data-variant="poster"] .poster-tags {
     display: flex;
     justify-content: center;
