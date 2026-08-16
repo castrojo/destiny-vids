@@ -320,19 +320,18 @@ def filtergraph(manifest):
     day_len = BRIDGE_UP + BRIDGE_DAY_HOLD + BRIDGE_TURN
     night_len = BRIDGE - day_len + BRIDGE_TURN
     day_input = inputs + 1
-    parts.append(f"[{day_input}:v]split=3[daysrc][bridgedarksrc][enddarksrc]")
-    parts.append(_still("daysrc", "day",
+    parts.append(f"[{inputs + 2}:v]split=2[bridgenightsrc][endnightsrc]")
+    parts.append(_still(day_input, "day",
                         f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
                         f"format=yuv420p"))
-    parts.append(_still("bridgedarksrc", "bridgedarkraw",
+    parts.append(_still("bridgenightsrc", "bridgenight",
                         f",trim=0:{BRIDGE - BRIDGE_DAY_SETTLE:.3f},"
                         f"setpts=PTS-STARTPTS,"
                         f"format=yuv420p"))
-    parts.append("[bridgedarkraw]eq=brightness=-0.55[bridgedark]")
-    # One continuous fade: bright day wolves become dark day wolves over the
-    # whole bridge. The old day -> night -> black path reached black and then
-    # reset to bright day at the end card, the disruptive jump the owner saw.
-    parts.append(f"[day][bridgedark]xfade=transition=fade:"
+    # One continuous fade: bright day wolves settle into the original night
+    # wolves. The end card reuses that same night art, so no black reset or
+    # colour jump interrupts the climax.
+    parts.append(f"[day][bridgenight]xfade=transition=fade:"
                  f"duration={BRIDGE - BRIDGE_DAY_SETTLE:.3f}:"
                  f"offset={BRIDGE_DAY_SETTLE:.3f}[bridge]")
     inputs += 2
@@ -343,12 +342,12 @@ def filtergraph(manifest):
     # the bridge, and ffmpeg permits it to feed both end-card legs as well --
     # no duplicate input, no second asset choice.
     #
-    # The bridge ends on this same dark grade. Beginning the end card there
-    # removes the black-to-day reset and lets the Wolves fade be one long arc.
-    parts.append(_still("enddarksrc", "enddarkraw",
-                        f",trim=0:{ENDCARD - ENDCARD_DAY_HOLD:.3f},"
-                        f"setpts=PTS-STARTPTS,format=yuv420p"))
-    parts.append("[enddarkraw]eq=brightness=-0.55[endbg]")
+    # The bridge and the card share the original night image: the handoff is
+    # one continuous wolves fade and the event text remains legible.
+    parts.append(_still("endnightsrc", "endnight",
+                        f",trim=0:{ENDCARD:.3f},setpts=PTS-STARTPTS,"
+                        f"format=yuv420p"))
+    parts.append("[endnight]null[endbg]")
 
     # The event and venue enter midway through the daylight-to-dark transition.
     # The CTA is a second transparent card: it hides the repeated event rows
