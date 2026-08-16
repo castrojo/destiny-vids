@@ -1029,12 +1029,13 @@
     },
     {
       "id": "interruption_ready",
-      "kind": "title",
+      "kind": "chat",
       "at": 269.903,
       "dur": 2.2,
-      "position": "toast",
+      "position": "left",
       "copy_source": "owner_supplied",
-      "title": "Well ... are they ready?"
+      "text": "Well ... are they ready?",
+      "text_source": "owner_supplied"
     },
     {
       "id": "interruption_reaction_1",

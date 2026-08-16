@@ -1759,12 +1759,13 @@ def build():
         + (build_efmb.HERO_OUT - build_efmb.HERO_IN), 3)
     plates.append({
         "id": "interruption_ready",
-        "kind": "title",
+        "kind": "chat",
         "at": black_at,
         "dur": build_efmb.OWNER_TEXT_SEC,
-        "position": "toast",
+        "position": "left",
         "copy_source": "owner_supplied",
-        "title": "Well ... are they ready?",
+        "text": "Well ... are they ready?",
+        "text_source": "owner_supplied",
     })
     reaction_at = black_at + build_efmb.OWNER_TEXT_SEC + build_efmb.REACTION_GAP_SEC
     for index, (key, text) in enumerate(INTERRUPTION_REACTIONS, start=1):

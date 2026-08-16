@@ -1084,7 +1084,9 @@ def test_cortney_moves_from_act_vi_to_act_iis_source_timeline():
     assert "class" not in cortney
 
     ready = by_id["interruption_ready"]
-    assert ready["title"] == "Well ... are they ready?"
+    assert ready["kind"] == "chat"
+    assert ready["position"] == "left"
+    assert ready["text"] == "Well ... are they ready?"
     reactions = [by_id[f"interruption_reaction_{i}"] for i in range(1, 4)]
     assert {p["text"] for p in reactions} <= {"Hell yeah!", "YYES!"}
     assert [p["at"] for p in reactions] == sorted(p["at"] for p in reactions)
@@ -1095,3 +1097,14 @@ def test_cortney_moves_from_act_vi_to_act_iis_source_timeline():
         by_id["trio_joseph_sandoval"]["name"],
         by_id["trio_mara_sov"]["name"],
     }
+
+
+def test_the_interruption_owner_line_cannot_collide_with_the_top_banner():
+    """The persistent phrase stays top; the owner line stays in the chat lane."""
+    by_id = {p["id"]: p for p in committed()["plates"]}
+    banner = by_id["top_banner"]
+    owner_line = by_id["interruption_ready"]
+    assert banner["position"] == "banner-top"
+    assert owner_line["kind"] == "chat"
+    assert owner_line["position"] == "left"
+    assert banner["at"] < owner_line["at"] < banner["at"] + banner["dur"]

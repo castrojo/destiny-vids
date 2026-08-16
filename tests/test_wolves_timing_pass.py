@@ -291,68 +291,6 @@ def test_the_gallop_cuts_to_neon(cut):
     raise AssertionError("no shot starts on the gallop")
 
 
-def _obsolete_interruption_cards_are_the_ones_the_builder_asks_for(cut):
-    """The shotlist's interruption stills and the cards manifest are declared
-    in two files, so they can drift -- the same failure the summit-slot test
-    guards against. Pin the set, the durations (act-film clock) against the
-    builder's constants, and the flattening rule.
-    """
-    from scripts.build_wolves import PLATE_LEN, SILENCE_LEN, SLIDE_LEN
-
-    cards = json.loads(
-        (REPO / "stories" / "06-wolves-interruption-cards.json").read_text())
-    by_id = {c["id"]: c for c in cards["cards"]}
-    beats = _interruption(cut)
-    for shot, card_id, dur in ((beats[0], "a-silence", SILENCE_LEN),
-                               (beats[1], "b-ambassadors", SLIDE_LEN),
-                               (beats[2], "c-cortney", PLATE_LEN)):
-        assert card_id in by_id, f"the builder asks for a card {card_id!r} "
-        f"the manifest does not define"
-        assert by_id[card_id]["dur"] == pytest.approx(dur), (
-            f"{card_id}: manifest and builder disagree on the act-film length")
-        still = Path(shot["still"])
-        if still.parent.name == "interruption":
-            # The real slide, not the marker fallback: named for the card...
-            assert still.stem == card_id, still
-            # ...and OPAQUE -- a transparent still composited as picture is
-            # the megacut skill's standing red flag.
-            assert still.suffix == ".png", still
-    assert by_id["b-ambassadors"]["title"] == \
-        "The CNCF Ambassadors would like a moment.", (
-            "the slide copy is owner-authored; reproduce it verbatim, "
-            "capitalisation and all")
-
-
-def _obsolete_card_durations_are_positive_and_unique_in_the_manifest():
-    """The manifest's own shape: unique ids, positive durations -- the two
-    things a renderer cannot guess past."""
-    cards = json.loads(
-        (REPO / "stories" / "06-wolves-interruption-cards.json").read_text())
-    ids = [c["id"] for c in cards["cards"]]
-    assert len(ids) == len(set(ids))
-    for c in cards["cards"]:
-        assert c["dur"] > 0
-
-
-def _obsolete_interruption_cards_render_opaque_full_frame():
-    """Every card is a 1920x1080 still flattened onto OPAQUE BLACK.
-
-    A transparent PNG concatenated as picture is the megacut skill's standing
-    red flag; and a card smaller than the frame would letterbox the pause.
-    Renders in-process -- Pillow is already a hard dep of the offline suite
-    (tests/test_plate.py) -- and writes nothing.
-    """
-    from scripts.build_interruption_cards import render_card
-
-    cards = json.loads(
-        (REPO / "stories" / "06-wolves-interruption-cards.json").read_text())
-    for entry in cards["cards"]:
-        img = render_card(entry)
-        assert img.size == (1920, 1080), entry["id"]
-        assert img.getextrema()[3] == (255, 255), (
-            f"{entry['id']}: the still must be opaque black, edge to edge")
-
-
 def test_act_one_edits_are_bought_back_off_the_head(cut):
     """Dropping a span from the intro must not move the gallop.
 
@@ -446,37 +384,6 @@ def test_the_ghost_sequence_is_gone_and_its_hole_is_filled(cut):
     assert sum(s["duration"] for s in fill) == pytest.approx(
         GHOST_OUT - GHOST_IN, abs=0.01), \
         "the fill must be exactly as long as the hole, or Act III-C slides"
-
-
-def _obsolete_clip_is_the_shot_the_owner_named(cut):
-    """The explosion, the transcendence portrait, held to the cut.
-
-    Measured by frame-differencing the trailer at 1/30 s: the explosion's cut
-    is at 51.835 (frame delta 170 against a background under 30) and the cut
-    out of the portrait is at 53.470 (delta 89). The clip must contain both,
-    and must end ON that cut rather than running into the next shot.
-
-    The in-point is SOURCE clock 43.000 -- option B of the owner's correction
-    on issue #104 (the issue text's 43.0 -> 51.0 would drop the portrait;
-    51.0 is mid-combat and 53.470 is the cut). Verified on extracted frames
-    (renders/verify-104/): combat at 43.0, white bloom at 52.0, portrait at
-    53.0, the next shot at 53.6.
-    """
-    from scripts.build_wolves import CLIP_IN, CLIP_OUT, GAMEPLAY
-
-    paused = [s for s in cut["shots"] if s["audio"] == "source"]
-    assert len(paused) == 1
-    shot = paused[0]
-    assert shot["video_id"] == GAMEPLAY, (
-        "the clip is the Gameplay Trailer, not the Collection Trailer -- the "
-        "owner's reference clip frame-matches it at 45.0-54.009")
-    assert shot["start_sec"] == pytest.approx(CLIP_IN, abs=0.001), (
-        "the shotlist and the builder's CLIP_IN disagree")
-    assert shot["end_sec"] == pytest.approx(CLIP_OUT, abs=0.001), (
-        "the shotlist and the builder's CLIP_OUT disagree")
-    assert shot["start_sec"] < 51.835, "the explosion must be inside the clip"
-    assert CLIP_OUT == pytest.approx(53.470, abs=0.001), (
-        "the clip must end on the measured cut after the portrait")
 
 
 def _fixture_dependent_summit_photographs_are_never_captioned(cut):

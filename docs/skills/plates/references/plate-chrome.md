@@ -34,13 +34,18 @@ a punch-list item, never a crash (degrade, never block).
 
 ### GitHub URLs identify assets, not people
 
-A GitHub login is a verified account identifier; an avatar URL is only the
-source for its cached local image. Keep both where the authored binding or
+A supplied GitHub login is an exact account identifier; an avatar URL is only
+the source for its cached local image. Keep both where the authored binding or
 owner brief supplied them: `avatar_url` records provenance and `avatar` names
 the local cache the offline renderer reads. A URL or login never authorises a
-display name, title, class, or other personal claim. In particular, do not
-derive a real name from a GitHub profile to fill a plate or chat: render the
-existing authored name, a deliberately authored login, or the drawn crest.
+display name, title, class, or other personal claim by itself.
+
+An explicit owner instruction may authorise looking up that account's GitHub
+profile display name for the named plate field. Record the instruction and
+lookup provenance, then reproduce that returned display name exactly. That
+narrow exception does not authorise inferring any other plate field; without
+it, render the existing authored name, a deliberately authored login, or the
+drawn crest.
 
 ## `wreath: true` — the struck laurel
 
