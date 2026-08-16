@@ -13,6 +13,7 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from tools import deliver  # noqa: E402
+from tools import footage  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -542,3 +543,182 @@ def test_the_watcher_flushes_so_its_log_is_readable_while_it_runs(
     deliver.watch(acts, masters, social, ws / "wolves", ws / "plan.json",
                   interval=0.01, dry_run=True, once=True)
     assert flushed, "the watch loop never flushed stdout"
+
+
+# --- the footage rung (#229) ------------------------------------------------
+#
+# `sources` covers what git tracks. These cover what it cannot: media/ is
+# gitignored, so an act cut from picture that was later replaced used to
+# report `ok`.
+
+def _footage_report(master, media, monkeypatch, tmp_path):
+    monkeypatch.setattr(footage, "MEDIA", media)
+    monkeypatch.setenv("DESTINY_FOOTAGE_CACHE", str(tmp_path / "cache.json"))
+    act = deliver.Act("II", "Endless Forms", "02.mp4")
+    r = deliver.ActReport(act)
+    deliver.check_footage(act, master, r)
+    return r.findings[0]
+
+
+def test_footage_replaced_in_place_is_stale(tmp_path, monkeypatch):
+    """The defect #229 records: the master is swapped, nothing says a word."""
+    media = tmp_path / "media"
+    media.mkdir()
+    (media / "yt_trailers.mp4").write_bytes(b"the picture the act was cut from")
+    monkeypatch.setattr(footage, "MEDIA", media)
+    monkeypatch.setenv("DESTINY_FOOTAGE_CACHE", str(tmp_path / "cache.json"))
+    master = {"path": "~/m.mp4", "footage": ["yt_trailers"],
+              "footage_digest": footage.footage_digest(["yt_trailers"],
+                                                       media_dir=media)}
+    assert _footage_report(master, media, monkeypatch, tmp_path).state \
+        == deliver.OK
+
+    (media / "yt_trailers.mp4").write_bytes(b"a different upload entirely")
+    f = _footage_report(master, media, monkeypatch, tmp_path)
+    assert f.state == deliver.STALE
+    assert "rebuild the act" in f.detail
+
+
+def test_a_master_that_changed_container_still_resolves(tmp_path, monkeypatch):
+    """.mp4 -> .mkv is what actually broke scripts/build_efmb.py."""
+    media = tmp_path / "media"
+    media.mkdir()
+    (media / "yt_trailers.mkv").write_bytes(b"same bytes, new container")
+    monkeypatch.setattr(footage, "MEDIA", media)
+    assert footage.resolve("yt_trailers").name == "yt_trailers.mkv"
+    assert footage.missing(["yt_trailers"]) == []
+
+
+def test_a_similarly_named_file_is_not_the_master(tmp_path, monkeypatch):
+    """`<id>.1080p-orig.mkv` sits beside the real master and is NOT it."""
+    media = tmp_path / "media"
+    media.mkdir()
+    (media / "yt_perfume.1080p-orig.mkv").write_bytes(b"the superseded rung")
+    monkeypatch.setattr(footage, "MEDIA", media)
+    assert footage.resolve("yt_perfume") is None
+
+
+def test_absent_footage_is_reported_not_hashed_as_present(tmp_path, monkeypatch):
+    media = tmp_path / "media"
+    media.mkdir()
+    monkeypatch.setattr(footage, "MEDIA", media)
+    monkeypatch.setenv("DESTINY_FOOTAGE_CACHE", str(tmp_path / "cache.json"))
+    master = {"path": "~/m.mp4", "footage": ["yt_gone"], "footage_digest": "x"}
+    f = _footage_report(master, media, monkeypatch, tmp_path)
+    assert f.state == deliver.MISSING
+    assert "yt_gone" in f.detail
+
+
+def test_undeclared_footage_is_reported_never_assumed_fresh():
+    act = deliver.Act("II", "Endless Forms", "02.mp4")
+    r = deliver.ActReport(act)
+    deliver.check_footage(act, {"path": "~/m.mp4"}, r)
+    assert r.findings[0].state == deliver.UNDECLARED
+
+
+def test_the_digest_cache_is_keyed_on_content_not_just_mtime(tmp_path, monkeypatch):
+    """A rewrite that keeps the size must still change the digest, because
+    mtime_ns moves with it. The cache may be fast; it may not be wrong."""
+    media = tmp_path / "media"
+    media.mkdir()
+    monkeypatch.setattr(footage, "MEDIA", media)
+    monkeypatch.setenv("DESTINY_FOOTAGE_CACHE", str(tmp_path / "cache.json"))
+    f = media / "yt_x.mp4"
+    f.write_bytes(b"aaaa")
+    first = footage.file_digest(f)
+    assert footage.file_digest(f) == first  # cache hit
+    f.write_bytes(b"bbbb")                  # same size, new content
+    assert footage.file_digest(f) != first
+
+
+def test_sources_only_never_touches_footage(ws, capsys, monkeypatch):
+    """CI has no media/. The offline gate must stay offline."""
+    def explode(*a, **k):
+        raise AssertionError("--sources-only read footage")
+    monkeypatch.setattr(footage, "footage_digest", explode)
+    monkeypatch.setattr(footage, "missing", explode)
+    rc = deliver.main([
+        "status", "--sources-only",
+        "--running-order", str(ws / "running-order.md"),
+        "--delivery", str(ws / "delivery.json"),
+    ])
+    assert rc == 0
+    assert "footage" not in capsys.readouterr().out
+
+
+def test_a_master_older_than_its_footage_is_stale_before_any_digest(
+        tmp_path, monkeypatch):
+    """The #229 defect, caught with nothing recorded yet.
+
+    Act I is the real case: its master was built 08-13 and the Into the Light
+    cinematic in media/ was replaced 08-15, so it was cut from a file that is
+    no longer there -- and every rung reported `ok`.
+    """
+    media = tmp_path / "media"
+    media.mkdir()
+    master_file = tmp_path / "act.mp4"
+    master_file.write_bytes(b"the delivered act")
+    picture = media / "yt_trailers.mp4"
+    picture.write_bytes(b"a replacement upload")
+    os.utime(master_file, (1, 1))          # the act is old
+    os.utime(picture, (1 << 30, 1 << 30))  # its footage is newer
+
+    monkeypatch.setattr(footage, "MEDIA", media)
+    monkeypatch.setenv("DESTINY_FOOTAGE_CACHE", str(tmp_path / "cache.json"))
+    act = deliver.Act("I", "intro", "01.mp4")
+    r = deliver.ActReport(act)
+    deliver.check_footage(act, {"path": str(master_file),
+                                "footage": ["yt_trailers"]}, r)
+    assert r.findings[0].state == deliver.STALE
+    assert "PREDATES" in r.findings[0].detail
+
+
+def test_publish_refuses_to_stamp_footage_it_knows_is_stale(
+        tmp_path, monkeypatch):
+    """Recording a digest over a master that predates its picture would make
+    the drift disappear, which is worse than never having recorded it."""
+    media = tmp_path / "media"
+    media.mkdir()
+    master_file = tmp_path / "act.mp4"
+    master_file.write_bytes(b"the delivered act")
+    (media / "yt_trailers.mp4").write_bytes(b"a replacement upload")
+    os.utime(master_file, (1, 1))
+    os.utime(media / "yt_trailers.mp4", (1 << 30, 1 << 30))
+    monkeypatch.setattr(footage, "MEDIA", media)
+    monkeypatch.setenv("DESTINY_FOOTAGE_CACHE", str(tmp_path / "cache.json"))
+
+    delivery = tmp_path / "delivery.json"
+    delivery.write_text(json.dumps({"masters": {"I": {
+        "path": str(master_file), "footage": ["yt_trailers"]}}}))
+    deliver.record_source_digests(
+        [deliver.Act("I", "intro", "01.mp4")],
+        {}, delivery, log=lambda *a: None)
+    after = json.loads(delivery.read_text())["masters"]["I"]
+    assert "footage_digest" not in after, "publish laundered a stale master"
+
+
+def test_every_declared_youtube_master_has_a_provenance_record():
+    """Defect 1 of #229: three masters were used by the film with no record
+    in videos/, so the picture was unreproducible. Offline: reads only the
+    delivery map and videos/, never media/."""
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    unrecorded = []
+    for numeral, master in masters.items():
+        for video_id in master.get("footage") or []:
+            # `wolves_act*` are this project's own intermediate renders, not
+            # uploads; only fetched sources need a provenance record.
+            if not video_id.startswith("yt_"):
+                continue
+            record = REPO_ROOT / "videos" / f"{video_id}.json"
+            if record.exists():
+                continue
+            # A master that is not Destiny footage (the Perfume music video)
+            # is governed by a record outside videos/, named explicitly.
+            elsewhere = (master.get("footage_rights") or {}).get(video_id)
+            if elsewhere and (REPO_ROOT / elsewhere).exists():
+                continue
+            unrecorded.append(f"{numeral}:{video_id}")
+    assert not unrecorded, (
+        f"declared footage with no videos/<id>.json: {', '.join(unrecorded)}. "
+        f"Every fetched master needs its source URL and rights recorded.")

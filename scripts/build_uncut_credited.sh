@@ -16,6 +16,9 @@
 set -euo pipefail
 
 VIDEO_ID="${1:?usage: $0 <video_id> <roster.json> [music.mp3]}"
+# Resolved by id, never built as "media/$VIDEO_ID.mp4": a master that moves
+# container (.mp4 -> .mkv, #229) must still be found.
+SOURCE_VIDEO="$(python3 tools/footage.py path "$VIDEO_ID")"
 ROSTER="${2:?usage: $0 <video_id> <roster.json> [music.mp3]}"
 MUSIC="${3:-}"
 
@@ -69,16 +72,16 @@ python3 tools/plate.py merge "$WORK/leads.json" "$WORK/chat.json" \
 
 echo "==> redact burned-in copy${MUSIC:+ and score}"
 if [ -n "$MUSIC" ]; then
-    python3 tools/redact.py --video "media/$VIDEO_ID.mp4" --video-id "$VIDEO_ID" \
+    python3 tools/redact.py --video "$SOURCE_VIDEO" --video-id "$VIDEO_ID" \
         --audio "$MUSIC" --audio-codec "$ACODEC" --out "$BASE"
 else
-    python3 tools/redact.py --video "media/$VIDEO_ID.mp4" --video-id "$VIDEO_ID" \
+    python3 tools/redact.py --video "$SOURCE_VIDEO" --video-id "$VIDEO_ID" \
         --audio-codec "$ACODEC" --out "$BASE"
 fi
 
 echo "==> burn the deck"
 python3 tools/plate.py render --manifest "$MANIFEST" --out-dir "$PLATES_DIR" \
-    --fit-video "media/$VIDEO_ID.mp4" >/dev/null
+    --fit-video "$SOURCE_VIDEO" >/dev/null
 python3 tools/plate.py burn --video "$BASE" --manifest "$MANIFEST" \
     --plates-dir "$PLATES_DIR" --out "$FINAL"
 

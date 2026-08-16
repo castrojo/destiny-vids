@@ -1,6 +1,6 @@
 {
  "_what": "The delivery graph's declared intent: which master each act's Prod/ entry hardlinks, and which acts have no social copy ON PURPOSE. tools/deliver.py reads this beside docs/running-order.md (which stays the source of truth for the act list and its ORDER -- this file is keyed by act numeral and says nothing about order). A master path is `~`-rooted or absolute, never relative to a worktree: worktrees are ephemeral, and act II's link into dv-wt/feat-98-act2-overlay is the recorded hazard. When a project's build replaces its master as a NEW inode (tools/peaks.py trim does os.replace on purpose), the Prod link is detached and `deliver.py publish` re-links it -- that re-link is the step peaks.py deliberately does not do.",
- "_rules": "publish re-links only when the declared master is NEWER than what Prod carries, or when the content is identical (re-attaching is then free). A declared master that is OLDER than Prod's current content is a conflict -- reported, never force-linked: something built Prod's content and the master never received it (act II on 2026-08-13: the #98 build lived only in a worktree while the main checkout's renders/efmb-plated.mp4 was a revision behind; repaired under #150 by promoting the worktree build onto the durable master). A master path that resolves inside a git worktree is EPHEMERAL and publish refuses to link from it at any mtime -- promote it to a durable path first.",
+ "_rules": "publish re-links only when the declared master is NEWER than what Prod carries, or when the content is identical (re-attaching is then free). A declared master that is OLDER than Prod's current content is a conflict -- reported, never force-linked: something built Prod's content and the master never received it (act II on 2026-08-13: the #98 build lived only in a worktree while the main checkout's renders/efmb-plated.mp4 was a revision behind; repaired under #150 by promoting the worktree build onto the durable master). A master path that resolves inside a git worktree is EPHEMERAL and publish refuses to link from it at any mtime -- promote it to a durable path first. FOOTAGE is declared by video_id, never by path: media/ is gitignored, so the picture an act was cut from is invisible to `sources`, and a master that changes container (.mp4 -> .mkv, #229) must still resolve. tools/footage.py resolves an id to its file and hashes it, cached by (path, size, mtime_ns). An act with no `footage` key is UNDECLARED and reported, never assumed fresh.",
  "masters": {
   "0": {
    "path": "~/src/destiny-vids/renders/00-prologue.mp4",
@@ -11,7 +11,13 @@
     "cards/maintitle.html",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "359fdaebdd77a93574321d30ec54d8adb1d93d7939fab651dc6dc9e496b55929"
+   "footage": [
+    "yt_nightwish_perfume_of_the_timeless"
+   ],
+   "footage_rights": {
+    "yt_nightwish_perfume_of_the_timeless": "music/bed_perfume_of_the_timeless.json"
+   },
+   "source_digest": "b7a17a8d55f1c9e160f0fb21626a8ba6598b562e3325c3acd7eb0bcae1180394"
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
@@ -19,6 +25,9 @@
    "sources": [
     "stories/megacut/megacut-hero-plates.json",
     "vocab/casting.yaml"
+   ],
+   "footage": [
+    "yt_into_the_light_cinematic"
    ],
    "source_digest": "18dd1054136dbc69f9b433d8faffdaad09efc7a5b8187da1234509c3b4e7b42e"
   },
@@ -34,7 +43,10 @@
     "dialogue/yt_destiny_all_live_action_trailers",
     "vocab/casting.yaml"
    ],
-   "source_digest": "8c35ee6a6fa97fa0710ac4360b15923d26524c9a66439e6dc21eee79a6a658c5"
+   "footage": [
+    "yt_destiny_all_live_action_trailers"
+   ],
+   "source_digest": "c68dbb946f31614a147dd7de4c694f61a8f7b9a10b67540364d88560e862a96a"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -44,7 +56,10 @@
     "dialogue/yt_curse_of_osiris_opening_cinematic",
     "vocab/casting.yaml"
    ],
-   "source_digest": "222dfe7484cb9178370774a22d086f1031b1455054c815b772b85274520b99fd"
+   "footage": [
+    "yt_curse_of_osiris_opening_cinematic"
+   ],
+   "source_digest": "ccc9694c0b77c7cb50b3aabd4fef7fa50ffbb273b7ab0aab64aed1e8dd736f4c"
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
@@ -82,6 +97,14 @@
     "music/bed_seven_days_to_the_wolves.json",
     "music/bed_local_forecast_slower.json",
     "vocab/casting.yaml"
+   ],
+   "footage": [
+    "wolves_act1",
+    "wolves_act2",
+    "wolves_act3",
+    "wolves_act4",
+    "yt_destiny_2_lightfall_launch_trailer",
+    "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
    "source_digest": "b6f11423e64f9dd8cac4f09e266636440edc34f2ac331d94beb7695bddd5292a"
   },

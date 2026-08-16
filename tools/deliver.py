@@ -41,6 +41,20 @@ This rung reads only committed files, so `--sources-only` needs no footage and
 no `~/Videos` and runs on CI, where every other check here has to degrade to a
 report.
 
+The footage rung, and why it is separate
+----------------------------------------
+`sources` covers what git tracks. It cannot cover `media/`, which is
+gitignored, so an act cut from picture that has since been replaced still
+reported `ok`: the Final Shape gameplay trailer and the live-action trailer
+compilation were both swapped on 2026-08-15 and nothing said a word (#229).
+Worse, the swap moved both from `.mp4` to `.mkv`, and `scripts/build_efmb.py`
+built its path as `media/{id}.mp4` -- so act II could not be rebuilt at all.
+
+So each act also declares `footage`: **video_ids, never paths**, resolved
+through `tools/footage.py` and hashed by content with a `(path, size,
+mtime_ns)` cache. It is a separate rung because it needs the footage on disk,
+which CI does not have -- `--sources-only` stays footage-free on purpose.
+
 What it trusts
 --------------
 The **act list and order come from `docs/running-order.md`**, the source of
@@ -91,6 +105,9 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from tools import footage as footage_mod  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -342,6 +359,69 @@ def check_sources(act, master, report):
                    f"`publish`. Declared inputs: {', '.join(sources)}")
         return
     report.add("sources", OK, f"{len(sources)} input(s) match {digest[:12]}")
+
+
+def check_footage(act, master, report):
+    """The other half of the inputs rung: the picture, which git cannot see.
+
+    `media/` is gitignored, so `check_sources` is blind to it. An act whose
+    master footage was replaced in place still reported `ok` -- #229. This
+    rung declares footage by **video_id**, so a master that changes container
+    (`.mp4` -> `.mkv`, which really happened) is still found.
+
+    Needs the footage on disk, so it is skipped entirely by `--sources-only`
+    and reports rather than raising when `media/` is not there at all.
+    """
+    if master is None:
+        return
+    ids = master.get("footage")
+    if ids is None:
+        report.add("footage", UNDECLARED,
+                   "no footage declared -- nothing can tell whether this act "
+                   "was cut from picture that has since been replaced. Add "
+                   "`footage` to stories/megacut/delivery.json")
+        return
+    if not ids:
+        report.add("footage", ABSENT_BY_DESIGN,
+                   master.get("footage_note")
+                   or "no footage inputs: this act is not cut from media/")
+        return
+
+    gone = footage_mod.missing(ids)
+    if gone:
+        report.add("footage", MISSING,
+                   f"declared footage absent from media/: {', '.join(gone)}. "
+                   f"The act cannot be rebuilt until it is fetched back")
+        return
+
+    # The digest is the authority, but it only exists once `publish` records
+    # it. Until then mtime still catches the exact defect #229 describes: a
+    # master that is OLDER than the footage it declares was cut from a file
+    # that is no longer there. media/ is fetched locally and never cloned, so
+    # its mtimes mean something -- unlike the committed inputs, which is why
+    # `check_sources` hashes content instead.
+    newer = footage_mod.newer_than(ids, resolve_master(master["path"]))
+    digest = footage_mod.footage_digest(ids)
+    recorded = master.get("footage_digest")
+    if not recorded:
+        if newer:
+            report.add("footage", STALE,
+                       f"this master PREDATES its own footage "
+                       f"({', '.join(newer)} was replaced after the act was "
+                       f"built), so it was cut from picture that is no longer "
+                       f"there; rebuild the act, then `publish`")
+            return
+        report.add("footage", UNDECLARED,
+                   f"footage declared but never recorded -- run `deliver.py "
+                   f"publish` to record {digest[:12]}")
+        return
+    if digest != recorded:
+        report.add("footage", STALE,
+                   f"footage changed since this master was recorded "
+                   f"({recorded[:12]} -> {digest[:12]}); rebuild the act, then "
+                   f"`publish`. Declared footage: {', '.join(ids)}")
+        return
+    report.add("footage", OK, f"{len(ids)} master(s) match {digest[:12]}")
 
 
 def check_master(act, master, report):
@@ -689,12 +769,30 @@ def record_source_digests(acts, masters, delivery_path, log=print):
     changed = []
     for act in acts:
         master = doc.get("masters", {}).get(act.numeral)
-        if not master or not master.get("sources"):
+        if not master:
             continue
-        digest = source_digest(master["sources"])
-        if master.get("source_digest") != digest:
-            master["source_digest"] = digest
-            changed.append(f"{act.numeral} -> {digest[:12]}")
+        if master.get("sources"):
+            digest = source_digest(master["sources"])
+            if master.get("source_digest") != digest:
+                master["source_digest"] = digest
+                changed.append(f"{act.numeral} -> {digest[:12]}")
+        # Footage is stamped only when every declared master is present AND
+        # the delivered act is not older than the footage it names. Stamping
+        # either case would launder the drift this rung exists to catch: a
+        # digest recorded over "absent", or over a master that predates its
+        # own picture, goes green while being wrong.
+        ids = master.get("footage")
+        if ids and not footage_mod.missing(ids):
+            src = resolve_master(master["path"])
+            if footage_mod.newer_than(ids, src):
+                log(f"  {act.numeral}: footage NOT recorded -- the master "
+                    f"predates {', '.join(footage_mod.newer_than(ids, src))}; "
+                    f"rebuild the act first")
+            else:
+                digest = footage_mod.footage_digest(ids)
+                if master.get("footage_digest") != digest:
+                    master["footage_digest"] = digest
+                    changed.append(f"{act.numeral} footage -> {digest[:12]}")
     if changed:
         Path(delivery_path).write_text(
             json.dumps(doc, indent=1, ensure_ascii=False) + "\n",
@@ -800,6 +898,7 @@ def gather(acts, masters, social, wolves, plan_path, twin_roots=TWIN_ROOTS):
             continue
         master_path = check_master(r.act, masters.get(r.act.numeral), r)
         check_sources(r.act, masters.get(r.act.numeral), r)
+        check_footage(r.act, masters.get(r.act.numeral), r)
         check_link(r.act, master_path, wolves, r, twin_roots=twin_roots)
     programme = ActReport(Act("", "the programme", None))
     check_checksums(wolves, reports, programme)
