@@ -27,14 +27,21 @@ import { chromium } from 'playwright'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(here, '..')
 
-const TEMPLATES = { act: 'act.html', comic: 'comic.html', maintitle: 'maintitle.html' }
+const TEMPLATES = {
+  act: 'act.html',
+  comic: 'comic.html',
+  maintitle: 'maintitle.html',
+  bookline: 'bookline.html',
+}
 // One authored row per key. A key absent from the manifest is absent from the
 // URL, and the card leaves that row out: a missing string is omitted, never
 // defaulted. `body` and `chapters` repeat.
 // `stage` is not copy -- it is the main title's two-beat switch, and it is
-// listed here only because it travels the same query string.
+// listed here only because it travels the same query string. `variant` is the
+// same kind of thing: the main title's eyebrow weight option, a styling
+// switch that changes no string.
 const COPY = ['act', 'label', 'title', 'subtitle', 'quote', 'quote_by', 'quote_note',
-  'qr_dialogue', 'qr_domain', 'stage', 'accent']
+  'qr_dialogue', 'qr_domain', 'stage', 'accent', 'variant', 'angle', 'size']
 const LISTS = ['body', 'chapters']
 const ASSETS = ['art', 'qr']
 // Structured copy: one JSON param, because a caption box is a variable-length

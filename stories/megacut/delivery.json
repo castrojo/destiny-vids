@@ -17,7 +17,8 @@
    "footage_rights": {
     "yt_nightwish_perfume_of_the_timeless": "music/bed_perfume_of_the_timeless.json"
    },
-   "source_digest": "b7a17a8d55f1c9e160f0fb21626a8ba6598b562e3325c3acd7eb0bcae1180394"
+   "source_digest": "60c1530e600f448630dfd596c343368b81dcdac7392f7ccae546c936b5a61c43",
+   "footage_digest": "b44e5ba9341c2748030a5ecc1ac6d8a721410b0fac5f996cdc3cf6f1a65d9908"
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
@@ -29,7 +30,8 @@
    "footage": [
     "yt_into_the_light_cinematic"
    ],
-   "source_digest": "18dd1054136dbc69f9b433d8faffdaad09efc7a5b8187da1234509c3b4e7b42e"
+   "source_digest": "18dd1054136dbc69f9b433d8faffdaad09efc7a5b8187da1234509c3b4e7b42e",
+   "footage_digest": "25d76f4c47019115c61c1a70f3e5b9884f9cf80478cff485e0872d455887ff0d"
   },
   "II": {
    "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
@@ -46,7 +48,8 @@
    "footage": [
     "yt_destiny_all_live_action_trailers"
    ],
-   "source_digest": "c68dbb946f31614a147dd7de4c694f61a8f7b9a10b67540364d88560e862a96a"
+   "source_digest": "c68dbb946f31614a147dd7de4c694f61a8f7b9a10b67540364d88560e862a96a",
+   "footage_digest": "7cd0c5946c4ef8b295ac2da065c5ed379abe08a88e030321c8132198ebd7dadb"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -59,7 +62,8 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "ccc9694c0b77c7cb50b3aabd4fef7fa50ffbb273b7ab0aab64aed1e8dd736f4c"
+   "source_digest": "ccc9694c0b77c7cb50b3aabd4fef7fa50ffbb273b7ab0aab64aed1e8dd736f4c",
+   "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e"
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
@@ -106,7 +110,8 @@
     "yt_destiny_2_lightfall_launch_trailer",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "b6f11423e64f9dd8cac4f09e266636440edc34f2ac331d94beb7695bddd5292a"
+   "source_digest": "b6f11423e64f9dd8cac4f09e266636440edc34f2ac331d94beb7695bddd5292a",
+   "footage_digest": "21c943bcda5ccc2cbae2b3c08cebcf6794763babda3f4304e612e1724bb4220b"
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
@@ -130,7 +135,7 @@
     "music/bed_wish_i_had_an_angel_album.json",
     "vocab/casting.yaml"
    ],
-   "source_digest": "4029af051f03a872b34b2e153a4cafd2589cee2dc32a439a6efac22bc12ebf1f"
+   "source_digest": "cb3b6966505f6c12b6a69ed34337acab1c14bb4b93ce87d3ddcf9dfb890b31ce"
   }
  },
  "social": {
