@@ -144,8 +144,8 @@ behind. `tools/deliver.py` is the graph that notices —
 committed files, hashed by content, and gate CI. `footage` is what is in
 `media/`, which is gitignored — declared by **video_id, never by path**, so a
 master that changes container still resolves, and hashed with a
-`(path, size, mtime_ns)` cache. An act cut from picture that was later
-replaced used to report `ok` all the way down (#229).
+`(path, size, mtime_ns)` cache. An act cut from picture that was later replaced
+therefore reports stale rather than `ok` (#229).
 
 ```bash
 python3 tools/deliver.py status              # what is stale and why

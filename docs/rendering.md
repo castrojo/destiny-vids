@@ -261,8 +261,7 @@ intervening segment to ensure accuracy*. Both are accurate.
 
 The real reason is specific to this pipeline: input seeking **rebases output
 timestamps to zero**, which shifts the phase of the fps conversion every clip
-goes through (29.97 → 30 when this was measured; the delivery rate is now
-60000/1001 — the phase argument is unchanged), changing which source frames
+goes through (the delivery rate is 60000/1001), changing which source frames
 get duplicated. Measured on the same in-point, the two methods produce
 visibly different frames:
 

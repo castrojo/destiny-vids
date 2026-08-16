@@ -5,10 +5,9 @@ Part of the [megacut skill](../SKILL.md).
 ## Segments, then a join — and still one generation
 
 `tools/megacut.py` normalises each item to its own temporary segment and joins
-them with the **concat demuxer**. It used to build one `filter_complex` over
-every input at once, to avoid encoding each frame twice.
-
-**That does not run on a real programme.** Fourteen inputs and half an hour of
+them with the **concat demuxer**. One `filter_complex` over every input at once
+— the obvious way to avoid encoding each frame twice — **does not run on a real
+programme.** Fourteen inputs and half an hour of
 1080p: ffmpeg buffers the inputs `concat` is not consuming yet, climbs to ~2 GB
 resident, then **deadlocks** — every thread in `futex_do_wait`, 0% CPU, no
 output growth. Measured twice, at two presets, stalling at the same point.
@@ -103,9 +102,9 @@ into a cached one-time conform and a per-assembly remux:
 
 ## Fades at the joins (issue #105)
 
-Measured on v0.6 with `tools/transitions.py`: every act join was the same
-shape — the outgoing act faded (or cut) to digital silence, the slide held
-4–14 s of absolute `-inf`, and the next act entered dry, up to −15 dB one
+Measured with `tools/transitions.py`, an unfaded act join is always the same
+shape — the outgoing act cuts to digital silence, the slide holds
+4–14 s of absolute `-inf`, and the next act enters dry, up to −15 dB one
 second after the slide. The fix lives in the plan, not in a hand-render:
 
 - A clip item may carry `fade_in` / `fade_out` in **seconds on the ACT FILM

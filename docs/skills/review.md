@@ -65,10 +65,10 @@ python3 tools/megacut.py stories/megacut/megacut.json --chapters
 Which act owns which file is [`../running-order.md`](../running-order.md); the
 measured trims are in `stories/megacut/megacut.json`.
 
-This table used to be printed here, and it went stale the day the prologue was
-placed in front of act I — it still opened act I at `0:00`, which is now 1:41
-wrong and disagreed with `running-order.md`. **Never paste a copy of a derived
-stamp into a doc**, here or anywhere else.
+**Never paste a copy of a derived stamp into a doc**, here or anywhere else. A
+pasted chapter table goes stale the moment a trim moves: one that opens act I
+at `0:00` still reads that way once the prologue is placed in front of it,
+which puts it 1:41 wrong and in disagreement with `running-order.md`.
 
 ## Step 3 — rebuild only what changed
 

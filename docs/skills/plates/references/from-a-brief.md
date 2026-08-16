@@ -94,7 +94,7 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   margins; six cards still fit one row. Past `GROUP_MIN_SCALE` the type is too
   small to be a credit, so the slots split into the fewest balanced rows that
   each fit (an unusually wide mix goes 3+3 in separate windows), and a shot
-  that cannot hold a readable row at all falls back to the old sequential
+  that cannot hold a readable row at all falls back to the sequential
   right-hand plates. Either way contributors are never dropped over a layout:
   whoever the shot cannot hold still goes through the re-home pass and the
   tail roster card.

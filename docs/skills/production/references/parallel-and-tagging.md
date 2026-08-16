@@ -47,9 +47,9 @@ worth parallelizing: hand each video to its own tagger with its own context.
   file exists. `null` is never a default — `overlays` and `character` must be
   earned per frame (see [`indexing.md`](../../indexing.md)).
 - `tools/worksheet.py check tags/<id>.json` reports which beats still need
-  which fields, `overlays` first — progress, instead of the old binary "no
-  tags yet". Stage 5 stops on this check, so a half-filled file no longer
-  reaches assembly to fail there.
+  which fields, `overlays` first — progress, rather than a binary "no
+  tags yet". Stage 5 stops on this check, so a half-filled file does not
+  reach assembly to fail there.
 - Give every tagger **the same enum list and the same reference tag file**, or
   their output is not comparable across videos.
 - A tagger reads *its own* `keyframes/<video_id>/beats.json`. Beat index is

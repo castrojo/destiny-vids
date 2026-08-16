@@ -185,8 +185,8 @@ Three structural decisions cut across every axis:
   `{source: inherited|observed, label_source: manual|heuristic|model,
   confidence: 0..1}`, so retrieval can trust-tier on it.
 
-`substitutability` survives but is **demoted**: it no longer gates usability, it
-only tie-breaks between otherwise-equal ensemble shots — how comfortably a
+`substitutability` is a **refinement, not a gate**: it does not decide usability,
+it only tie-breaks between otherwise-equal ensemble shots — how comfortably a
 contributor's name sits on that Guardian.
 
 ## Build a story

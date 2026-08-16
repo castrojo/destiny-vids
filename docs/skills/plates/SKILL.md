@@ -29,7 +29,7 @@ the **chat card** (`speaker`, `text`) —
 
 ## Prose that is not written yet is lorem, never a gap
 
-A chat pill with no `text` does **not** block and no longer renders empty:
+A chat pill with no `text` does **not** block and does not render empty:
 `tools/placeholder.py` fills it with deterministic lorem ipsum, so timing,
 seat and read length are reviewable while the copy is still being written.
 `python3 tools/placeholder.py list` is the punch list.
