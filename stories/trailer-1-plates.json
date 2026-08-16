@@ -64,19 +64,41 @@
       "_why_it_crosses_the_cut": "Eight words cannot be read in the 1.4 s the book has left after book-a clears, and shrinking the gap between the two beats would only stack them. The owner had already given the room -- 'you can even go to :36 actually' -- so this line HOLDS ACROSS THE JOIN and is still on screen over the iguana's close-up. `walk` is 2.32 rather than the full 3.9: it tracks the page until the cut at 33.320 and then holds, because after the cut there is no page under it to track."
     },
     {
-      "id": "endcard",
+      "id": "endcard-event",
       "kind": "maintitle",
+      "variant": "poster",
       "at": 102.2,
       "dur": 7.82,
+      "stage": "title",
       "title": "KubeCon | CloudNativeCon North America",
       "subtitle": "Salt Lake City, Utah",
       "body": [
+        "wolves.projectbluefin.io",
         "#KubeCon",
         "#CloudNativeCon",
         "#7wolves"
       ],
-      "note": "OWNER COPY, verbatim, in the owner's order. It uses the title card's existing closed field set -- title / subtitle / body[] -- so no new copy field was invented for it, and it carries no `label`, so the eyebrow row is simply absent. The pipe is seared, per 'Sear the | again'.",
+      "note": "BEAT ONE. The ungraded March day wallpaper holds on the opening hit, then fades toward the dark poster grade as the source music breathes down. The event and venue fade in at 1.25 into this end-card window; `stage: title` leaves the CTA body invisible. The duplicate body is the same authored source the CTA beat uses and occupies the same flex seat, so the CTA lands without moving the event.",
+      "_copy": "OWNER COPY, verbatim, in the owner's order. Owner, 2026-08-16: 'add a large wolves.projectbluefin.io on the kubecon slide as a CTA. make it look awesome' and then selected the Poster treatment over a Bluefin DAY wallpaper. The existing title-card field set remains intact: title is the event, subtitle the venue, and body[0] is the CTA followed by the authored hashtags. It carries no label, so the eyebrow row is simply absent. The pipe is seared, per 'Sear the | again'. The CTA's two dots glow Bluefin blue; the owner explicitly kept its b and f white.",
       "_no_blue": "The card's b/f rule is NOT applied to this title. 'KubeCon' and 'CloudNativeCon' are Linux Foundation marks set as type, and recolouring a letter of somebody else's trademark is a different decision from recolouring a letter of our own. The divider is drawn without touching the words. Reversible in one flag if the owner wants the b -- see cards/maintitle.html."
+    },
+    {
+      "id": "endcard-cta",
+      "kind": "maintitle",
+      "variant": "poster",
+      "at": 105.2,
+      "dur": 4.82,
+      "stage": "cta",
+      "title": "KubeCon | CloudNativeCon North America",
+      "subtitle": "Salt Lake City, Utah",
+      "body": [
+        "wolves.projectbluefin.io",
+        "#KubeCon",
+        "#CloudNativeCon",
+        "#7wolves"
+      ],
+      "note": "BEAT TWO. At 3.000 into the end-card window, the musical tail climbs back from its 1–3 second breath (-19.6 dB RMS) toward -17.4 dB. The event card is already readable; this card hides its duplicate event/venue rows and fades only the domain and tags in on that return.",
+      "_copy": "Copied verbatim from endcard-event. Two timed cards carry the same record because one begins by hiding body[] and the other begins by hiding title/subtitle/hairline; the regression test asserts they cannot drift."
     }
   ],
   "unresolved": [

@@ -129,24 +129,34 @@ def test_the_book_lines_are_the_owners_words_verbatim(manifest, plate_id, lines)
 
 
 def test_the_end_card_is_the_owners_words_in_the_owners_order(manifest):
-    card = plate(manifest, "endcard")
-    assert card["title"] == "KubeCon | CloudNativeCon North America"
-    assert card["subtitle"] == "Salt Lake City, Utah"
-    assert card["body"] == ["#KubeCon", "#CloudNativeCon", "#7wolves"]
+    event = plate(manifest, "endcard-event")
+    cta = plate(manifest, "endcard-cta")
+    assert event["variant"] == cta["variant"] == "poster"
+    assert event["stage"] == "title"
+    assert cta["stage"] == "cta"
+    assert event["title"] == cta["title"] == "KubeCon | CloudNativeCon North America"
+    assert event["subtitle"] == cta["subtitle"] == "Salt Lake City, Utah"
+    assert event["body"] == cta["body"] == [
+        "wolves.projectbluefin.io",
+        "#KubeCon",
+        "#CloudNativeCon",
+        "#7wolves",
+    ]
 
 
-def test_the_end_card_invents_no_field(manifest):
+def test_the_end_card_poster_uses_no_new_copy_field(manifest):
     """The title card's shape is `title` / `subtitle` / `body[]`.
 
     A venue card is exactly the sort of thing somebody adds a row to. Nobody
     did.
     """
-    card = plate(manifest, "endcard")
-    copy_fields = {k for k in card
-                   if not k.startswith(("_", "note")) and k not in
-                   {"id", "kind", "at", "dur", "stage", "variant",
-                    "angle", "size", "anchor", "anchor_out", "walk"}}
-    assert copy_fields == {"title", "subtitle", "body"}
+    for plate_id in ("endcard-event", "endcard-cta"):
+        card = plate(manifest, plate_id)
+        copy_fields = {k for k in card
+                       if not k.startswith(("_", "note")) and k not in
+                       {"id", "kind", "at", "dur", "stage", "variant",
+                        "angle", "size", "anchor", "anchor_out", "walk"}}
+        assert copy_fields == {"title", "subtitle", "body"}
 
 
 def test_the_credit_line_is_one_seared_line_here_and_in_the_prologue(manifest):
@@ -210,3 +220,43 @@ def test_the_enable_windows_use_escaped_commas(manifest):
     graph = T.filtergraph(manifest)
     assert "enable=between(t\\," in graph
     assert "enable='between" not in graph
+
+
+def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
+    graph = T.filtergraph(manifest)
+    assert "[enddarkraw]eq=brightness=-0.55[enddark]" in graph
+    assert (
+        f"[endday][enddark]xfade=transition=fade:"
+        f"duration={T.ENDCARD_DARKEN:.3f}:"
+        f"offset={T.ENDCARD_DAY_HOLD:.3f}[endbg]"
+    ) in graph
+    assert "color=c=black" not in graph
+
+
+def test_the_end_card_wallpaper_is_bounded_to_its_own_window(manifest):
+    graph = T.filtergraph(manifest)
+    assert (
+        f"trim=0:{T.ENDCARD_DAY_HOLD + T.ENDCARD_DARKEN:.3f},"
+        f"setpts=PTS-STARTPTS,format=yuv420p[endday]"
+        in graph
+    )
+    assert (
+        f"trim=0:{T.ENDCARD - T.ENDCARD_DAY_HOLD:.3f},"
+        f"setpts=PTS-STARTPTS,format=yuv420p[enddarkraw]"
+        in graph
+    )
+
+
+def test_the_end_card_text_lands_in_two_music_timed_beats(manifest):
+    graph = T.filtergraph(manifest)
+    assert (
+        f"fade=t=in:st={T.ENDCARD_EVENT_IN:.3f}:"
+        f"d={T.ENDCARD_EVENT_FADE:.3f}:alpha=1"
+        in graph
+    )
+    assert (
+        f"fade=t=in:st={T.ENDCARD_CTA_IN:.3f}:"
+        f"d={T.ENDCARD_CTA_FADE:.3f}:alpha=1"
+        in graph
+    )
+    assert T.ENDCARD_EVENT_IN < T.ENDCARD_CTA_IN

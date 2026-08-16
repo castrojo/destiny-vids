@@ -128,6 +128,17 @@ BRIDGE_MONTH = 3            # the owner named 03-bluefin-day.jxl
 # owner's 1:50.0 instead of 1:49.7.
 ENDCARD = 7.820
 ENDCARD_FADE = 1.200
+# The existing music tail is loud on entry, falls from roughly -18 to -19.6 dB
+# RMS through 1-3 s, then rises back to -17.4 dB at 3-4 s. The visual does not
+# change the mix: it lets the day image breathe on the opening hit, darkens
+# through the musical breath, brings the event in during that turn, and lands
+# the CTA as the energy returns.
+ENDCARD_DAY_HOLD = 0.800
+ENDCARD_DARKEN = 2.400
+ENDCARD_EVENT_IN = 1.200
+ENDCARD_EVENT_FADE = 1.100
+ENDCARD_CTA_IN = 3.100
+ENDCARD_CTA_FADE = 0.600
 
 TOTAL = PICTURE + BRIDGE + ENDCARD                     # 110.020
 
@@ -311,19 +322,46 @@ def filtergraph(manifest):
                  f"d={BRIDGE_DOWN:.3f}[bridge]")
     inputs += 2
 
-    # --- the end card, on its own black --------------------------------------
-    # It arrives out of the bridge's black rather than over a picture, so it is
-    # composited onto a colour source instead of borrowing the night's last
-    # frame -- which would have been a frozen wallpaper under a venue card.
-    parts.append(f"color=c=black:s={W}x{H}:r={FPS}:d={ENDCARD:.3f}"
-                 f",format=rgba[endbg]")
-    parts.append(_still(inputs + 1, "ec",
+    # --- the end card, day falling into dark ---------------------------------
+    # Owner, 2026-08-16: "start the wallpaper at day and then as it fades into
+    # dark bring in the text". Input 5 is already the March day wallpaper for
+    # the bridge, and ffmpeg permits it to feed both end-card legs as well --
+    # no duplicate input, no second asset choice.
+    #
+    # xfade outputs d1 + d2 - duration, so the bright leg holds through the
+    # beginning of the transition and the dark leg takes the remaining window:
+    # (HOLD + DARKEN) + (ENDCARD - HOLD) - DARKEN == ENDCARD exactly.
+    parts.append(_still(5, "endday",
+                        f",trim=0:{ENDCARD_DAY_HOLD + ENDCARD_DARKEN:.3f},"
+                        f"setpts=PTS-STARTPTS,"
+                        f"format=yuv420p"))
+    parts.append(_still(5, "enddarkraw",
+                        f",trim=0:{ENDCARD - ENDCARD_DAY_HOLD:.3f},"
+                        f"setpts=PTS-STARTPTS,format=yuv420p"))
+    parts.append("[enddarkraw]eq=brightness=-0.55[enddark]")
+    parts.append(f"[endday][enddark]xfade=transition=fade:"
+                 f"duration={ENDCARD_DARKEN:.3f}:"
+                 f"offset={ENDCARD_DAY_HOLD:.3f}[endbg]")
+
+    # The event and venue enter midway through the daylight-to-dark transition.
+    # The CTA is a second transparent card: it hides the repeated event rows
+    # and arrives at the music's returning swell, not at the same time.
+    parts.append(_still(inputs + 1, "ecevent",
                         f",trim=0:{ENDCARD:.3f},setpts=PTS-STARTPTS,"
-                        f"fade=t=in:st=0:d={ENDCARD_FADE:.3f}:alpha=1,"
+                        f"fade=t=in:st={ENDCARD_EVENT_IN:.3f}:"
+                        f"d={ENDCARD_EVENT_FADE:.3f}:alpha=1,"
                         f"fade=t=out:st={ENDCARD - ENDCARD_FADE:.3f}:"
                         f"d={ENDCARD_FADE:.3f}:alpha=1"))
-    parts.append("[endbg][ec]overlay=0:0:shortest=1,format=yuv420p[endcard]")
-    inputs += 1
+    parts.append("[endbg][ecevent]overlay=0:0:shortest=1[endv1]")
+    parts.append(_still(inputs + 2, "eccta",
+                        f",trim=0:{ENDCARD:.3f},setpts=PTS-STARTPTS,"
+                        f"fade=t=in:st={ENDCARD_CTA_IN:.3f}:"
+                        f"d={ENDCARD_CTA_FADE:.3f}:alpha=1,"
+                        f"fade=t=out:st={ENDCARD - ENDCARD_FADE:.3f}:"
+                        f"d={ENDCARD_FADE:.3f}:alpha=1"))
+    parts.append("[endv1][eccta]overlay=0:0:shortest=1,"
+                 "format=yuv420p[endcard]")
+    inputs += 2
 
     parts.append("[picture][bridge][endcard]concat=n=3:v=1:a=0[vout]")
 
@@ -352,7 +390,8 @@ def command(manifest, day_png, night_png):
         "-i", str(PLATES_DIR / "plate_book-b.png"),
         "-i", str(day_png),
         "-i", str(night_png),
-        "-i", str(PLATES_DIR / "plate_endcard.png"),
+        "-i", str(PLATES_DIR / "plate_endcard-event.png"),
+        "-i", str(PLATES_DIR / "plate_endcard-cta.png"),
         "-filter_complex", filtergraph(manifest),
         "-map", "[vout]", "-map", "[aout]",
         *conform.video_encode_args(),
@@ -380,7 +419,7 @@ def main(argv=None):
     if not SOURCE.exists():
         sys.exit(f"footage is never committed; missing: {SOURCE}")
 
-    if args.cards or not (PLATES_DIR / "plate_endcard.png").exists():
+    if args.cards or not (PLATES_DIR / "plate_endcard-cta.png").exists():
         render_cards()
 
     day, night = wallpaper("day"), wallpaper("night")

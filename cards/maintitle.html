@@ -334,6 +334,70 @@
   .credits.shown { visibility: visible; }
   .credit-line { display: block; }
 
+  /* TRAILER 1'S POSTER END CARD.
+
+     Owner, 2026-08-16: *"add a large wolves.projectbluefin.io on the kubecon
+     slide as a CTA. make it look awesome"*. The owner selected the poster
+     direction, then corrected the background: *"no night I want day"*.
+
+     This is a VARIANT, not a second title-card shape. The record still uses
+     the deck's title / subtitle / body[] field set: event, venue, CTA, then
+     tags. The first body row is merely given the hierarchy it needs to be a
+     call to action and the remainder is gathered into the footer.
+
+     THE BACKGROUND DOES THE DARKENING. build_trailer1.py puts the transparent
+     card over the March Bluefin day wolves wallpaper and grades the whole
+     picture down. There is no local panel under this text -- `.lockup`'s
+     glyph halo is the contrast protection, exactly as it is over footage. */
+  body[data-variant="poster"] .lockup { width: 92%; }
+  body[data-variant="poster"] .title {
+    font-size: clamp(1.7rem, 2.5vw, 2.45rem);
+    letter-spacing: 0.07em;
+  }
+  body[data-variant="poster"] .subtitle {
+    margin-top: 0.8rem;
+    font-size: clamp(1.1rem, 1.7vw, 1.5rem);
+  }
+  body[data-variant="poster"] .hairline {
+    width: 42%;
+    margin-top: 1.65rem;
+  }
+  body[data-variant="poster"] .credits {
+    margin-top: 2.25rem;
+    gap: 0;
+    font-family: var(--wc-font-display);
+    letter-spacing: 0;
+  }
+  body[data-variant="poster"] .poster-cta {
+    display: block;
+    color: #fff;
+    font-size: clamp(2.8rem, 5vw, 5.2rem);
+    font-weight: 900;
+    letter-spacing: 0.045em;
+    line-height: 1.05;
+  }
+  body[data-variant="poster"] .poster-tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75em;
+    margin-top: 1.8rem;
+  }
+  body[data-variant="poster"] .poster-tag {
+    color: #cbd5e1;
+    font-family: var(--wc-font-mono);
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+  }
+  /* The second poster beat is CTA-only. The hidden rows retain their flex
+     seats, so the domain lands where the full poster puts it rather than
+     jumping upward when the event has already arrived on its own card. */
+  body[data-variant="poster"][data-stage="cta"] .title,
+  body[data-variant="poster"][data-stage="cta"] .subtitle,
+  body[data-variant="poster"][data-stage="cta"] .hairline {
+    visibility: hidden;
+  }
+
   /* THE SEAR -- the vertical glow on the `|`.
 
      Owner, 2026-08-16, on the credit pair: *"I want to change this: Music by
@@ -413,6 +477,9 @@
   if (params.get('variant')) {
     document.body.dataset.variant = params.get('variant')
   }
+  if (params.get('stage')) {
+    document.body.dataset.stage = params.get('stage')
+  }
 
   function fill(id, value) {
     const el = document.getElementById(id)
@@ -451,6 +518,34 @@
     let run = ''
     for (const ch of text) {
       if (BLUE_LETTERS.includes(ch)) {
+        if (run) { parts.push(document.createTextNode(run)); run = '' }
+        const span = document.createElement('span')
+        span.className = 'accent'
+        span.textContent = ch
+        parts.push(span)
+      } else {
+        run += ch
+      }
+    }
+    if (run) { parts.push(document.createTextNode(run)) }
+    el.textContent = ''
+    el.append(...parts)
+  }
+
+  // The CTA's two dots take the Bluefin blue, but its b and f stay white.
+  // Owner, 2026-08-16: "keep the f and b white on this one". This is a
+  // per-card treatment decision, not an exception that weakens the general
+  // b/f rule elsewhere. The event title remains separate: KubeCon and
+  // CloudNativeCon are Linux Foundation marks and are deliberately not
+  // recoloured (the `sear(titleEl, { blue: false })` path below).
+  function blueifyDomain(el) {
+    if (!el) { return }
+    const text = el.textContent
+    if (!text) { return }
+    const parts = []
+    let run = ''
+    for (const ch of text) {
+      if (ch === '.') {
         if (run) { parts.push(document.createTextNode(run)); run = '' }
         const span = document.createElement('span')
         span.className = 'accent'
@@ -565,15 +660,35 @@
   // only whether they are VISIBLE: `title` is the first beat, `credits` the
   // second. Anything else shows them, so a single unstaged card still works.
   const host = document.getElementById('credits')
-  for (const line of params.getAll('body')) {
+  if (document.body.dataset.variant === 'poster') { host.classList.add('poster') }
+  const poster = host.classList.contains('poster')
+  const body = params.getAll('body')
+  for (const [index, line] of body.entries()) {
     const row = document.createElement('span')
-    row.className = 'credit-line'
     row.textContent = line
-    // `sear` blueifies the words either side of the divider and draws the
-    // divider itself; a row with no ` | ` in it falls straight through to
-    // `blueify` and renders exactly as it always did.
-    sear(row)
-    host.appendChild(row)
+    if (poster) {
+      if (index === 0) {
+        row.className = 'poster-cta'
+        blueifyDomain(row)
+        host.appendChild(row)
+      } else {
+        row.className = 'poster-tag'
+        let tags = host.querySelector('.poster-tags')
+        if (!tags) {
+          tags = document.createElement('div')
+          tags.className = 'poster-tags'
+          host.appendChild(tags)
+        }
+        tags.appendChild(row)
+      }
+    } else {
+      row.className = 'credit-line'
+      // `sear` blueifies the words either side of the divider and draws the
+      // divider itself; a row with no ` | ` in it falls straight through to
+      // `blueify` and renders exactly as it always did.
+      sear(row)
+      host.appendChild(row)
+    }
   }
   if (params.get('stage') !== 'title') { host.classList.add('shown') }
 

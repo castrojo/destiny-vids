@@ -37,6 +37,17 @@ def test_every_card_kind_has_a_template():
         assert os.path.exists(os.path.join(CARDS, f"{kind}.html")), kind
 
 
+def test_maintitle_has_a_poster_variant_for_the_existing_body_shape():
+    template = open(os.path.join(CARDS, "maintitle.html"), encoding="utf-8").read()
+    assert 'body[data-variant="poster"] .credits' in template
+    assert "poster-cta" in template
+    assert "poster-tag" in template
+    assert "host.classList.contains('poster')" in template
+    assert "if (ch === '.')" in template
+    assert "BLUE_LETTERS.includes(ch) || ch === '.'" not in template
+    assert 'data-stage="cta"' in template
+
+
 def test_plate_py_refuses_to_draw_a_card_and_says_what_does():
     with pytest.raises(ValueError) as excinfo:
         plate.render_plate({"id": "act1", "kind": "act", "act": "I"})
