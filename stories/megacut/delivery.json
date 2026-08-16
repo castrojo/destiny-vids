@@ -11,7 +11,7 @@
     "cards/maintitle.html",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "45bbbbee19d7282d314d50b79cd14540ad611f85fee8ac33a903066cdbd32565"
+   "source_digest": "359fdaebdd77a93574321d30ec54d8adb1d93d7939fab651dc6dc9e496b55929"
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
@@ -20,7 +20,7 @@
     "stories/megacut/megacut-hero-plates.json",
     "vocab/casting.yaml"
    ],
-   "source_digest": "a5d16d9207a6b2348004daf9edba32128fcff838b133847c00822030c45a096b"
+   "source_digest": "18dd1054136dbc69f9b433d8faffdaad09efc7a5b8187da1234509c3b4e7b42e"
   },
   "II": {
    "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
@@ -55,7 +55,7 @@
     "scripts/actbuild.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "debb9321bdcdedee91e19200d026db8724228708847bfdc2cefe76e7da0f1e76"
+   "source_digest": "f568c5533a79d5d50c003401ae05fa9477f2dcef0a52357312007427a7bd3bb2"
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
@@ -66,7 +66,7 @@
     "scripts/actbuild.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "21a2e2bdd047187685927d4bdbae7d9864ba7da3a2fb74bd3137765eae0ec0c2"
+   "source_digest": "997d259bfcd054504bf4e08b30c2a0c5fcebb4af9bf1a1bdbb50e0d78e707961"
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v4.mp4",
@@ -94,7 +94,7 @@
     "scripts/actbuild.py",
     "tools/plate.py"
    ],
-   "source_digest": "2547ff19b129edc7f20ee88e79910cdc7a9a138bc3ac96682375cd9baf6763cd"
+   "source_digest": "c53d388bd54bafd4753de14ad400b848350492eab1a4aefd5697c0805b95ef6a"
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
@@ -107,7 +107,7 @@
     "music/bed_wish_i_had_an_angel_album.json",
     "vocab/casting.yaml"
    ],
-   "source_digest": "6203228b722f057cc279427db1a92ebccf52183d6dc471ffa735cd0889586c0f"
+   "source_digest": "4029af051f03a872b34b2e153a4cafd2589cee2dc32a439a6efac22bc12ebf1f"
   }
  },
  "social": {

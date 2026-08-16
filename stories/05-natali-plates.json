@@ -1,5 +1,5 @@
 {
- "_what": "Act V's record: the words that go on screen, the windows they occupy, and the build parameters that produce the delivered master. Act V had NO committed inputs at all (#152) -- it was cut entirely in ~/Videos/wolves-natali, so the Nat half of the dictated Kat/Nat round (#118) had nowhere to land and no check could tell whether a revision took. scripts/build_natali.py reads this; editing a line here changes the film. Same shape as stories/04-kat-plates.json, which came first.",
+ "_what": "Act V's record: the words that go on screen, the windows they occupy, and the build parameters that produce the delivered master. It exists so act V's inputs are COMMITTED rather than living only in ~/Videos/wolves-natali (#152): an act cut entirely outside the repo gives the Nat half of the dictated Kat/Nat round (#118) nowhere to land, and no check can tell whether a revision took. scripts/build_natali.py reads this; editing a line here changes the film. Same shape as stories/04-kat-plates.json.",
  "_provenance": "The copy is reproduced from ~/Videos/wolves-natali/render/render-plates.mjs and the windows from render/run-natali.sh, both of which built the delivered file. This is a RECORD of what shipped, not a new edit. Nothing here is invented.",
  "act": "V",
  "title": "Natali",
@@ -46,7 +46,7 @@
    "fade_in": 0.6,
    "fade_out_at": 4.95,
    "fade_out": 0.25,
-   "_note": "#118 Nat line 1, marked 10:45 (act V's head on the v0.6 clock). Seated on the cockpit close-up 2.269-6.073 -- her rule is 'dialogue only when her character is onscreen', and this is her in the ship under fire. Clears 0.87s before the 6.073 cut."
+   "_note": "#118 Nat line 1, marked by the owner at 10:45 on the programme clock of the cut they watched. Seated on the cockpit close-up 2.269-6.073 -- her rule is 'dialogue only when her character is onscreen', and this is her in the ship under fire. Clears 0.87s before the 6.073 cut."
   },
   {
    "id": "p2-nat-ceasefire",

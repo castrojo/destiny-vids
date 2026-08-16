@@ -176,7 +176,7 @@
   "unresolved": [
     {
       "what": "Cortney Nickerson's Void subclass",
-      "detail": "The owner authored her label, name and title this round (issue #90), so the plate no longer renders her name alone and Bob Killen's rows are still NOT inherited. One row is still missing: the owner wrote 'whatever the Void subclass is', and Void subclasses are class-specific -- Voidwalker (Warlock), Sentinel (Titan), Nightstalker (Hunter) -- so the row needs her class before it can be written. It is omitted, not guessed.",
+      "detail": "The owner authored her label, name and title (issue #90), so the plate renders those three rows; Bob Killen's are NOT inherited. One row is still missing: the owner wrote 'whatever the Void subclass is', and Void subclasses are class-specific -- Voidwalker (Warlock), Sentinel (Titan), Nightstalker (Hunter) -- so the row needs her class before it can be written. It is omitted, not guessed.",
       "automatable": "no",
       "blocked_on": "the owner naming her class -- issues #90 and #59."
     },
@@ -236,6 +236,6 @@
     }
   ],
   "_hud_removed": "The site's top-of-frame HUD nameplate is deliberately NOT burned in (owner decision, 2026-08-12: 'remove \"a project to bring their stories to life\", just the name plaquards'). That drops the persistent default card, the three #nova4ever glitch bursts and the closing 'Legends Sought' card -- every status row -- leaving only the six Guardian nameplates. tools/plate.py still renders `kind: \"status\"` and is tested, so restoring any of them is a manifest edit, not new code.",
-  "_comic": "Replaced 2026-08-12 by the TITLE COVER (`title-cover`). It previously held 23 full-frame comic cards cycling the site's hero shots over the MakeMeAComic QR panel and the Amber Graner quote, reproduced from `.wolves-intro-overlay-title-card` in WolvesIntroOverlay.vue. That cycle, its QR and its quote are gone from act I; the window (22.5 - 36.0) and its reason for starting at 22.5 rather than the site's 24 -- so it cannot overlap Kat's plate -- are unchanged.",
+  "_comic": "The window (22.5 - 36.0) holds the TITLE COVER (`title-cover`). It starts at 22.5 rather than the site's 24 so it cannot overlap Kat's plate. Neither the 23-card full-frame comic cycle from `.wolves-intro-overlay-title-card` in WolvesIntroOverlay.vue, nor the MakeMeAComic QR panel, nor the Amber Graner quote is in act I -- removed on the owner's 2026-08-12 instruction. Whether any of them returns elsewhere is the owner's call (#90).",
   "_companions": "The GUARDIAN BOND cards, ported from the live overlay this round (owner: 'Intro missing dinosaur companions from port. Alamo, karl, etc.'). Every bond is READ from ~/src/website/src/data/wolves-guardian-dinosaur-bonds.ts and its species from wolves-dinosaur-species.ts -- four bonds exist and all four are here. Orlin gets none: the bond list keys on the guardian NAME, it has no entry for Orlin, and Laura Santamaria has none either, so there is nothing to inherit even if the owner wanted it. Artwork is cached by scripts/fetch_companion_art.py into renders/ (gitignored) -- the renderer never reaches outside the repo and never touches the network."
 }
