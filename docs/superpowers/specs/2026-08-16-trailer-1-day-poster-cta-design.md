@@ -56,10 +56,11 @@ the established title-card shape:
 body row CTA styling while compacting the rest as tags. The card remains
 transparent. `scripts/build_trailer1.py` changes the end-card background from a black
 colour source to two bounded loops of `03-day.png`: an ungraded lead-in and a
-darkened continuation. An `xfade` joins them, preserving the fixed end-card
-duration. Two transparent title cards supply the timed visual beats: the event
-card hides its `body[]`, and the CTA card hides its title, subtitle, and
-hairline while retaining its layout seat.
+darkened continuation. The input is explicitly split into the bridge and the
+two end-card legs before filtering. An `xfade` joins the legs, preserving the
+fixed end-card duration. Two transparent title cards supply the timed visual
+beats: the event card hides its `body[]`, and the CTA card hides its title,
+subtitle, and hairline while retaining its layout seat.
 
 ## Failure handling and verification
 

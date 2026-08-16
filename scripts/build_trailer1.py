@@ -198,15 +198,23 @@ def wallpaper(variant):
     return fetch_wallpapers.cached(BRIDGE_MONTH, variant)
 
 
-def _still(index, label, extra=""):
+def _still(source, label, extra=""):
     """A PNG as a stream on the film's own clock, BOUNDED to the film.
 
     ``loop=loop=-1`` is an INFINITE stream and ``overlay``'s framesync will
     happily keep running once the main input ends, repeating its last frame --
     the prologue's first build emitted its film and then eight seconds of
     frozen final frame, and ffmpeg exited 0. Every still here is trimmed.
+
+    ``source`` is normally an input index, but the day wallpaper is split
+    before it serves the bridge and the end-card's two poster legs. ffmpeg
+    documents `split` as the way one input feeds more than one filter branch;
+    referencing `[5:v]` independently made the graph work by accident rather
+    than stating that contract. Source: Context7 `/websites/ffmpeg_documentation`,
+    "Split input streams".
     """
-    return (f"[{index}:v]format=rgba,loop=loop=-1:size=1:start=0,"
+    stream = f"[{source}:v]" if isinstance(source, int) else f"[{source}]"
+    return (f"{stream}format=rgba,loop=loop=-1:size=1:start=0,"
             f"fps={FPS},setpts=N/({FPS})/TB{extra}[{label}]")
 
 
@@ -308,7 +316,9 @@ def filtergraph(manifest):
     # --- the bridge ----------------------------------------------------------
     day_len = BRIDGE_UP + BRIDGE_DAY_HOLD + BRIDGE_TURN
     night_len = BRIDGE - day_len + BRIDGE_TURN
-    parts.append(_still(inputs + 1, "day",
+    day_input = inputs + 1
+    parts.append(f"[{day_input}:v]split=3[daysrc][enddaysrc][enddarksrc]")
+    parts.append(_still("daysrc", "day",
                         f",trim=0:{day_len:.3f},setpts=PTS-STARTPTS,"
                         f"format=yuv420p"))
     parts.append(_still(inputs + 2, "night",
@@ -331,11 +341,11 @@ def filtergraph(manifest):
     # xfade outputs d1 + d2 - duration, so the bright leg holds through the
     # beginning of the transition and the dark leg takes the remaining window:
     # (HOLD + DARKEN) + (ENDCARD - HOLD) - DARKEN == ENDCARD exactly.
-    parts.append(_still(5, "endday",
+    parts.append(_still("enddaysrc", "endday",
                         f",trim=0:{ENDCARD_DAY_HOLD + ENDCARD_DARKEN:.3f},"
                         f"setpts=PTS-STARTPTS,"
                         f"format=yuv420p"))
-    parts.append(_still(5, "enddarkraw",
+    parts.append(_still("enddarksrc", "enddarkraw",
                         f",trim=0:{ENDCARD - ENDCARD_DAY_HOLD:.3f},"
                         f"setpts=PTS-STARTPTS,format=yuv420p"))
     parts.append("[enddarkraw]eq=brightness=-0.55[enddark]")

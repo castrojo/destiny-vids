@@ -45,7 +45,7 @@ authored fields and change no string:
 | Param | What it switches |
 |---|---|
 | `stage` | the main title's two beats — `title`, then `credits` |
-| `variant` | the eyebrow's weight option, `b`..`e` — see below |
+| `variant` | the eyebrow's weight option, `b`..`e`, or `poster` for a CTA-first end card |
 | `angle` | a `bookline`'s tilt in degrees, so it can sit on a tilted page |
 | `size` | a `bookline`'s type size, for a beat that runs to two lines |
 
@@ -58,6 +58,42 @@ options wearing four names. The levers that do exist are weight, stroke width
 `scripts/build_font_options.py` renders the set **over the frame it will ship
 on**, not on a swatch, because half of "too thin" is contrast against the
 picture underneath.
+
+## A poster CTA over a wallpaper
+
+`variant: "poster"` is still the title-card shape — `title`, `subtitle`, then
+`body[]` — with the first body row treated as the CTA and later body rows as
+the tag footer. It does **not** add a copy field.
+
+When a poster has to enter in beats, use two cards with the same authored
+fields:
+
+| Stage | What is visible |
+|---|---|
+| `title` | event and venue; `body[]` stays invisible but keeps its layout seat |
+| `cta` | first body row and tags; title, subtitle, and hairline are invisible but keep their layout seat |
+
+That keeps the CTA from jumping when it arrives. A card that says it is
+`stage: "cta"` but omits the event fields is structurally wrong: the empty
+fields collapse the seat the CTA was timed against.
+
+For a wallpaper that must start bright and become dark, split its ffmpeg input
+before giving it to the bridge and both end-card legs:
+
+```text
+[5:v]split=3[bridge_day][poster_day][poster_dark];
+[poster_day]...trim=0:<hold+fade>...[day];
+[poster_dark]...trim=0:<total-hold>...,eq=brightness=-0.55[dark];
+[day][dark]xfade=transition=fade:duration=<fade>:offset=<hold>[poster_bg]
+```
+
+Do **not** reference `[5:v]` independently in three filter branches. FFmpeg's
+documented duplication primitive is `split`; explicit branches are the
+contract, not incidental framesync behavior. `xfade` starts at its `offset`
+relative to the first leg. Its output lasts `first + second - duration`, so
+choose the two trim lengths such that the transition occupies the requested
+window exactly. Source: FFmpeg documentation via Context7
+`/websites/ffmpeg_documentation`, “Split input streams” and “xfade”.
 
 ## Why not Pillow
 
