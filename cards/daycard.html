@@ -7,19 +7,17 @@
 html, body { margin: 0; width: 1920px; height: 1080px; background: transparent; overflow: hidden; }
 body { font-family: 'Inter', 'Arial Narrow', sans-serif; }
 .card {
-  position: absolute; left: 11%; bottom: 22%;
-  width: 42%; padding: 28px 34px;
+  position: absolute; left: 28%; bottom: 22%;
+  width: 31%; padding: 24px 28px;
   color: #f4f6f8; background: rgb(4 10 20 / 82%);
   border-left: 5px solid #60a5fa; border-radius: 3px;
   box-shadow: 0 0 30px rgb(0 0 0 / 75%);
 }
-.title { font-size: 2.2rem; font-weight: 800; letter-spacing: .04em; line-height: 1.12; }
-.subtitle { margin-top: .55rem; font-size: 1.55rem; color: #cbd5e1; letter-spacing: .04em; }
-.body { margin-top: 1rem; font: 1.05rem ui-monospace, monospace; color: #fff; letter-spacing: .14em; }
+.line { margin: .35rem 0; font-size: 1.45rem; font-weight: 700; letter-spacing: .035em; line-height: 1.15; }
 </style>
 </head>
 <body>
-<div class="card"><div class="title" id="title"></div><div class="subtitle" id="subtitle"></div><div class="body" id="body"></div></div>
+<div class="card"><div class="line" id="title"></div><div class="line" id="subtitle"></div><div class="line" id="body"></div></div>
 <script>
 const p = new URLSearchParams(location.search)
 document.getElementById('title').textContent = p.get('title') || ''
