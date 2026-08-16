@@ -1,26 +1,3 @@
----
-name: megacut
-version: "2.0"
-last_updated: "2026-08-13"
-id: megacut
-one_line_purpose: Join finished cuts into one programme, with act slides between them.
-entry_point: docs/skills/megacut/SKILL.md
-category: editing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [plates, editing]
-tags: [assembly, concat, chapter-cards, ffmpeg, programme]
-description: >-
-  Assembles already-finished cuts and owner-approved deliverables into one
-  continuous programme, separated by the reference deck's title cards, in a
-  single ffmpeg pass. Use when several cuts must play as one video.
-metadata:
-  type: procedure
-  context7-sources:
-    - /websites/ffmpeg_documentation
----
-
 # Assembling a programme
 
 ## When to Use

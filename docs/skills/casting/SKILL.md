@@ -1,23 +1,3 @@
----
-name: casting
-version: "2.0"
-last_updated: "2026-08-13"
-id: casting
-one_line_purpose: Bind a Destiny character to a person and credit the monthly ensemble.
-entry_point: docs/skills/casting/SKILL.md
-category: indexing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [indexing]
-tags: [casting, vocab, ensemble, leads, contributors, depiction]
-description: >-
-  Covers lead bindings, ensemble slots, depiction rules, and derived casting.
-  Use when adding a cast member, crediting contributors, recording a rule for how a character may be shown, or debugging a casting role.
-metadata:
-  type: reference
----
-
 # Casting
 
 Casting names **real people**. Every rule below exists because the cost of

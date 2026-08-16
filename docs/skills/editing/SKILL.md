@@ -1,25 +1,3 @@
----
-name: editing
-version: "2.0"
-last_updated: "2026-08-13"
-id: editing
-one_line_purpose: Turn a plain-language outline into a rendered cut.
-entry_point: docs/skills/editing/SKILL.md
-category: editing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [indexing]
-tags: [story, cut-list, render, ffmpeg, outline, still, artwork-card, window-extract, timing-pass, marker-card, two-clocks, bed-pause, excision, diegetic-insert, proxy-clip, editorial-pass, shot-boundary-measurement]
-description: >-
-  Covers outlines, shot matching, artwork cards, timing passes with marker cards, and a bed that pauses.
-  Use when writing an outline, marking material for removal before editing, or scoring a cut whose song does not run end to end.
-metadata:
-  type: procedure
-  context7-sources:
-    - /websites/ffmpeg_documentation
----
-
 # Editing a cut
 
 ## When to Use

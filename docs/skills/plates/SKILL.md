@@ -1,26 +1,3 @@
----
-name: plates
-version: "2.0"
-last_updated: "2026-08-13"
-id: plates
-one_line_purpose: Put Guardian nameplates and title cards on a rendered cut.
-entry_point: docs/skills/plates/SKILL.md
-category: editing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [casting, editing]
-tags: [nameplates, overlay, credits, bluefin, ffmpeg]
-description: >-
-  Plans, renders, and burns Project Bluefin Guardian nameplates onto a cut.
-  Use when crediting cast or contributors on screen, or changing plate copy,
-  timing, or chrome.
-metadata:
-  type: procedure
-  context7-sources:
-    - /websites/ffmpeg_documentation
----
-
 # Guardian nameplates
 
 ## When to Use

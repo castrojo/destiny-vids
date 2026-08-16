@@ -1,24 +1,3 @@
----
-name: intake
-version: "1.0"
-last_updated: "2026-08-13"
-id: intake
-one_line_purpose: Turn the owner's dictated notes into filed issues before anything acts on them.
-entry_point: docs/skills/intake.md
-category: meta
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [issues]
-tags: [whisp, dictation, notes, inbox, intake, worktree, two-clocks, session-end]
-description: >-
-  The owner dictates work orders into Whisp; a note is not submitted until it
-  is a GitHub issue. Use when starting a session, when the owner says work was
-  submitted but never landed, or when picking up dictated briefs.
-metadata:
-  type: procedure
----
-
 # Intake: from a dictated note to a filed issue
 
 ## Why this skill exists

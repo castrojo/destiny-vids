@@ -1,24 +1,3 @@
----
-name: corpus
-version: "1.0"
-last_updated: "2026-08-12"
-id: corpus
-one_line_purpose: Catalog every indexed shot of one character, and the coverage they lack.
-entry_point: docs/skills/corpus.md
-category: editing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [casting, editing]
-tags: [corpus, character, coverage, gaps, unresolved]
-description: >-
-  Builds a per-character catalog of indexed shots plus the vocabulary values
-  that have no clean coverage. Use before writing an outline for a character,
-  or when extending the index to the next character or story.
-metadata:
-  type: procedure
----
-
 # Character corpus
 
 ## When to Use
@@ -89,8 +68,7 @@ re-finding it and re-arguing it.
 1. Make sure the shots are cast: a lead needs its binding in
    `vocab/casting.yaml`, and `tools/derive.py` computes `casting` from there.
 2. `python3 tools/corpus.py <subject> --dir segments --out corpus/<subject>.json`
-3. Commit the file. `--write` / `--check` then keep it in sync for everyone,
-   the same way `scripts/generate_skill_index.py` keeps the skill catalog fresh.
+3. Commit the file. `--write` / `--check` then keep it in sync for everyone.
 
 The amount of Destiny footage is finite, so the corpus directory is meant to
 grow one subject at a time until it covers all of it. Nothing about it is

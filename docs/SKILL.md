@@ -28,9 +28,8 @@ load **only** that skill, then act.
 | Apply a round of notes without rebuilding acts that were already right | [`review`](skills/review.md) |
 | Run a long encode on the ghost cluster instead of the laptop | [`farm`](skills/farm.md) |
 
-The machine-readable catalog is [`skills/index.json`](skills/index.json), with a
-human-readable mirror at [`skills/index.md`](skills/index.md). Both are generated
-by `scripts/generate_skill_index.py` — do not hand-edit either.
+This table is the catalog. There is no generated index behind it — add a row
+when you add a skill.
 
 ## Design docs (reference, not skills)
 
@@ -47,34 +46,18 @@ than restating them:
 
 ## Writing a skill here
 
-Follow `projectbluefin/common`'s
-[`docs/skills/write-a-skill.md`](https://github.com/projectbluefin/common/blob/main/docs/skills/write-a-skill.md):
-same front matter, same size budget, same "link to canonical sources instead of
-duplicating them" rule. The one local difference is `category`, whose enum here
-is `indexing | editing | meta` (see [`skills/index.schema.json`](skills/index.schema.json)) —
-this repo builds videos, not container images.
-
-**The size budget is 200 lines soft, 500 hard, and it is *migrate on sight*.**
-A skill that outgrows one file becomes `skills/<name>/SKILL.md` plus
-`skills/<name>/references/*.md` — **in the same change that touched it**, with
-no exemptions and no deferral list. `SKILL.md` keeps the front matter, the
-triggers, the core workflow, the red flags, and a table pointing at each
-reference; the detail moves out. `plates` and `editing` are the worked examples.
+A skill is a plain Markdown file: an H1, when to use it, the workflow, the
+traps. No front matter, no version field, no catalog entry — the router table
+above is the only registration step.
 
 **Write the current state, not the history that produced it.** No
 version-by-version narration, and no prose copy of a fact that has a machine
 record — link the record instead. See "Documentation" in
 [`AGENTS.md`](../AGENTS.md).
 
-Three tests hold the line: `test_skill_size_budget` measures every flat skill,
-every `*/SKILL.md` **and** every reference file;
-`test_migrated_skill_points_at_its_references` fails a migrated skill that
-orphans one of its own references; and `tests/test_doc_links.py` proves every
-relative link in the docs tree still resolves.
+Keep a skill to one file until it is genuinely unreadable; only then split it
+into `skills/<name>/SKILL.md` plus `skills/<name>/references/*.md`. A split
+costs an agent an extra read, so it needs to buy more than tidiness.
 
-After adding or editing a skill:
-
-```bash
-python3 scripts/generate_skill_index.py --write
-python3 -m pytest -q tests/test_skill_catalog.py tests/test_doc_links.py
-```
+`tests/test_doc_links.py` proves every relative link in the docs tree
+resolves. That is the only check on this tree, and it is enough.

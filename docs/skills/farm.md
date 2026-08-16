@@ -1,24 +1,3 @@
----
-name: farm
-version: "1.0"
-last_updated: "2026-08-13"
-id: farm
-one_line_purpose: Offload a long encode to the idle k3s cluster and verify what comes back.
-entry_point: docs/skills/farm.md
-category: editing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: []
-tags: [encode, farm, cluster, argo, ffmpeg, rendering]
-description: >-
-  Runs one encode on the k3s cluster (exo-0) instead of the laptop:
-  frame-grid segments in parallel in one Argo pod, stream-copy join, ffprobe
-  verification, local fallback when the cluster is unreachable.
-metadata:
-  type: procedure
----
-
 # Encode farm
 
 ## When to Use

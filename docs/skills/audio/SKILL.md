@@ -1,27 +1,3 @@
----
-name: audio
-version: "1.0"
-last_updated: "2026-08-15"
-id: audio
-one_line_purpose: Source the best audio that exists, keep the chain lossless, and gate the delivered peak.
-entry_point: docs/skills/audio/SKILL.md
-category: editing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [scoring, production]
-tags: [audio, true-peak, lossless, flac, opus, yt-dlp, sourcing, static-gain, headroom, delivery-band]
-description: >-
-  The audio standard every delivered file is held to: source by codec never bitrate, decode at native
-  rate, headroom as a derived static gain, and measure the delivered file rather than the bed.
-  Use when sourcing, mixing, or gating audio.
-metadata:
-  type: reference
-  context7-sources:
-    - /yt-dlp/yt-dlp
-    - /websites/ffmpeg_ffmpeg-all
----
-
 # Audio standard
 
 **This is the standard every delivered file in this project is held to** — the
