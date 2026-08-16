@@ -267,3 +267,38 @@ def test_the_committed_bindings_report_their_own_unverifiable_leads():
     # Not asserted as a fixed list: filling these in is owner work, and this
     # test must not fail the day somebody records one.
     assert isinstance(leads_without_login(), list)
+
+
+def test_the_cli_entrypoint_runs_as_a_script(tmp_path):
+    """`python3 tools/ensemble.py assign ...` is the documented invocation.
+
+    Run as a script, sys.path[0] is `tools/`, not the repo root -- so
+    `assign`'s lazy `from tools.derive import load_leads` raised
+    ModuleNotFoundError. The tests never saw it because they import the
+    package. This runs the file the way the casting skill says to.
+    """
+    import json
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parents[1]
+    roster_path = tmp_path / "roster.json"
+    roster_path.write_text(json.dumps(roster("someone_nobody_cast")))
+    segments = tmp_path / "segments"
+    segments.mkdir()
+    (segments / "seg.json").write_text(json.dumps({
+        "segment_id": "seg_x", "video_id": "yt_test",
+        "start_sec": 0.0, "end_sec": 2.0,
+        "casting": {"role": "ensemble", "character": None, "person": None,
+                    "slots": 1},
+    }))
+
+    proc = subprocess.run(
+        [sys.executable, str(repo / "tools" / "ensemble.py"), "assign",
+         "--roster", str(roster_path), "--dir", str(segments)],
+        capture_output=True, text=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    assert "ModuleNotFoundError" not in proc.stderr
