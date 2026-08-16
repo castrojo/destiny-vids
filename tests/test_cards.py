@@ -46,6 +46,10 @@ def test_maintitle_has_a_poster_variant_for_the_existing_body_shape():
     assert "if (ch === '.')" in template
     assert "BLUE_LETTERS.includes(ch) || ch === '.'" not in template
     assert 'data-stage="cta"' in template
+    assert 'body[data-variant="poster"] .poster-cta .accent' in template
+    assert "0 0 2px 0 rgb(196 226 255 / 95%)" in template
+    assert "0 0 7px 1px rgb(147 197 253 / 85%)" in template
+    assert "0 0 16px 2px rgb(37 99 235 / 45%)" in template
 
 
 def test_plate_py_refuses_to_draw_a_card_and_says_what_does():
