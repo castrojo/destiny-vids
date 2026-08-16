@@ -37,6 +37,14 @@ import sys
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# `assign` imports tools.derive lazily to read the lead bindings, and running
+# this file as a SCRIPT ("python3 tools/ensemble.py assign ...", the form the
+# casting skill documents) puts tools/ on sys.path rather than the repo root --
+# so that import failed while the tests, which import the package, passed. Same
+# guard the other CLI tools carry.
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
 # Repositories whose contributors make up the pool. Override with --repo.
 DEFAULT_REPOS = [
     "projectbluefin/bluefin",
