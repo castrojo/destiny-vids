@@ -746,11 +746,17 @@ def _stamp_ws(tmp_path, monkeypatch):
     return src, master, delivery, new
 
 
-def _publish_digests(delivery, acts=None):
+def _publish_digests(delivery, acts=None, dirty=("shotlist.json",)):
     doc = json.loads(Path(delivery).read_text())
     masters = doc["masters"]
     acts = acts or [deliver.Act(numeral="I", title="I", prod_file="01.mp4")]
-    deliver.record_source_digests(acts, masters, delivery, log=lambda *a: None)
+    real = deliver.dirty_paths
+    deliver.dirty_paths = lambda: set(dirty)
+    try:
+        deliver.record_source_digests(acts, masters, delivery,
+                                      log=lambda *a: None)
+    finally:
+        deliver.dirty_paths = real
     return json.loads(Path(delivery).read_text())["masters"]["I"]
 
 
@@ -795,7 +801,47 @@ def test_a_master_that_predates_its_inputs_is_reported_not_silent(
     os.utime(src, (new, new))
     lines = []
     doc = json.loads(delivery.read_text())
+    monkeypatch.setattr(deliver, "dirty_paths", lambda: {"shotlist.json"})
     deliver.record_source_digests(
         [deliver.Act(numeral="I", title="I", prod_file="01.mp4")],
         doc["masters"], delivery, log=lines.append)
     assert any("rebuild the act" in ln for ln in lines), lines
+
+
+def test_a_checkout_does_not_block_every_act(tmp_path, monkeypatch):
+    """REGRESSION: a rebase rewrites every mtime at once.
+
+    An mtime-only guard then reports every act as "master predates its
+    inputs" and `publish` can never record again -- a wall, not a gate. Only
+    files that actually differ from HEAD carry a trustworthy mtime.
+    """
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")
+    os.utime(src, (new, new))          # every mtime moved, as a checkout does...
+    monkeypatch.setattr(deliver, "dirty_paths", lambda: set())  # ...but nothing is edited
+
+    assert deliver.sources_newer_than(["shotlist.json"], master) == []
+
+
+def test_publish_records_only_the_acts_it_was_told_to(tmp_path, monkeypatch):
+    """A rebuild of ONE act must never certify the others.
+
+    This is the blunt guarantee behind the mtime heuristics: whatever the
+    filesystem says, `publish --act VII` makes a claim about act VII and
+    about nothing else.
+    """
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    doc = json.loads(delivery.read_text())
+    doc["masters"]["II"] = {"path": str(master), "sources": ["shotlist.json"],
+                            "source_digest": "stale-on-purpose"}
+    delivery.write_text(json.dumps(doc))
+    src.write_text("v2")
+
+    acts = [deliver.Act(numeral="I", title="I", prod_file="01.mp4"),
+            deliver.Act(numeral="II", title="II", prod_file="02.mp4")]
+    deliver.record_source_digests(acts, doc["masters"], delivery,
+                                  log=lambda *a: None, only=["I"])
+
+    after = json.loads(delivery.read_text())["masters"]
+    assert after["I"]["source_digest"] == deliver.source_digest(["shotlist.json"])
+    assert after["II"]["source_digest"] == "stale-on-purpose"
