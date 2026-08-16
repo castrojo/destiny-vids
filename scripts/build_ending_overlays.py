@@ -169,6 +169,20 @@ def command(doc, thread_path, cards_dir, out, ffmpeg=None):
     ]
 
 
+def _ffmpeg_for_printing():
+    """The ffmpeg to print when we are only PRINTING.
+
+    `--print-command` exists to be read, diffed and pasted, and CI has no
+    H.264-capable ffmpeg -- so resolving one is a precondition of RUNNING the
+    command, never of showing it. Falling back to the bare name keeps the
+    offline suite offline instead of making a print depend on an encoder.
+    """
+    try:
+        return find_ffmpeg()
+    except Exception:
+        return ["ffmpeg"]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -197,7 +211,9 @@ def main(argv=None):
         sys.exit("missing rendered ending plates: "
                  + ", ".join(str(p) for p in missing))
 
-    cmd = command(doc, args.thread, args.cards_dir, args.out)
+    cmd = command(doc, args.thread, args.cards_dir, args.out,
+                  ffmpeg=_ffmpeg_for_printing() if args.print_command
+                  else None)
     if args.print_command:
         print(" ".join(cmd))
         return 0
