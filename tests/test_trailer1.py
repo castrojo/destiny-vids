@@ -113,8 +113,11 @@ def test_the_music_plays_out_past_where_the_prologue_faded():
 # --- the copy -----------------------------------------------------------------
 
 OWNER_COPY = {
-    "book-a": ["Two Generations of Contributors"],
-    "book-b": ["One, new, one old.", "Dreaming to build a better future"],
+    "book-a": [
+        "Two Generations of Contributors",
+        "One, new, one old. Dreaming to build a better future",
+    ],
+    "book-b": [],
 }
 
 
@@ -194,6 +197,17 @@ def test_the_book_lines_use_the_simple_box_treatment(manifest):
         assert plate(manifest, plate_id)["variant"] == "box"
 
 
+def test_one_stationary_box_holds_both_lines_and_clears_the_iguana(manifest):
+    box = plate(manifest, "book-a")
+    empty = plate(manifest, "book-b")
+    assert box["body"] == [
+        "Two Generations of Contributors",
+        "One, new, one old. Dreaming to build a better future",
+    ]
+    assert empty["body"] == []
+    assert box["at"] + box["dur"] < T.CUT_OUT - T.JOIN_FADE
+
+
 def test_one_forty_seven_is_the_documented_wolves_fade_climax(manifest):
     climax = manifest["_climax"]
     assert climax.startswith("1:47.000")
@@ -238,7 +252,8 @@ def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
     assert "[bridgedarkraw]eq=brightness=-0.55[bridgedark]" in graph
     assert (
         f"[day][bridgedark]xfade=transition=fade:"
-        f"duration={T.BRIDGE:.3f}:offset=0[bridge]"
+        f"duration={T.BRIDGE - T.BRIDGE_DAY_SETTLE:.3f}:"
+        f"offset={T.BRIDGE_DAY_SETTLE:.3f}[bridge]"
     ) in graph
     assert "color=c=black" not in graph
 

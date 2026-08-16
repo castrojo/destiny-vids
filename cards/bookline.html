@@ -112,6 +112,9 @@
   // `body` repeats, exactly as it does on the other cards, so a beat may be
   // one line or two without a second parameter name.
   const lines = params.getAll('body')
+  if (lines.length === 0) {
+    el.style.display = 'none'
+  }
   el.textContent = lines.join('\n')
 
   // EVERY B AND EVERY F IS BLUE. Owner, 2026-08-15, on all dialogue except the

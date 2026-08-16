@@ -120,6 +120,9 @@ BRIDGE_NIGHT_HOLD = 1.400   #                     (prologue: 1.600)
 BRIDGE_DOWN = 5.800         # night -> black      (prologue: 3.200)
 BRIDGE = (BRIDGE_UP + BRIDGE_DAY_HOLD + BRIDGE_TURN
           + BRIDGE_NIGHT_HOLD + BRIDGE_DOWN)           # 14.000
+# The underwater-to-day handoff needs a beat of clear daylight before the
+# wolves start sinking. The rest of the 14-second bridge is the one long fade.
+BRIDGE_DAY_SETTLE = 4.000
 BRIDGE_MONTH = 3            # the owner named 03-bluefin-day.jxl
 
 # --- the end card -------------------------------------------------------------
@@ -322,14 +325,16 @@ def filtergraph(manifest):
                         f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
                         f"format=yuv420p"))
     parts.append(_still("bridgedarksrc", "bridgedarkraw",
-                        f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
+                        f",trim=0:{BRIDGE - BRIDGE_DAY_SETTLE:.3f},"
+                        f"setpts=PTS-STARTPTS,"
                         f"format=yuv420p"))
     parts.append("[bridgedarkraw]eq=brightness=-0.55[bridgedark]")
     # One continuous fade: bright day wolves become dark day wolves over the
     # whole bridge. The old day -> night -> black path reached black and then
     # reset to bright day at the end card, the disruptive jump the owner saw.
     parts.append(f"[day][bridgedark]xfade=transition=fade:"
-                 f"duration={BRIDGE:.3f}:offset=0[bridge]")
+                 f"duration={BRIDGE - BRIDGE_DAY_SETTLE:.3f}:"
+                 f"offset={BRIDGE_DAY_SETTLE:.3f}[bridge]")
     inputs += 2
 
     # --- the end card, day falling into dark ---------------------------------
