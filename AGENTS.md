@@ -21,22 +21,20 @@ they are and what order they play in.
 
 ```bash
 python3 -m pytest -q                              # the whole suite (fast, offline)
-python3 scripts/generate_skill_index.py --check   # skill catalog
 python3 tools/corpus.py --check                   # per-character corpora
 python3 tools/rederive.py --check                 # no hand-edited derived field
 python3 scripts/generate_schema_enums.py --check  # schema enums match vocab/
 ```
 
-Run all five before every commit. The suite is offline: no model, no network,
+Run all four before every commit. The suite is offline: no model, no network,
 no footage. Optional extras matter only for frame-touching stages —
 `scenedetect` + `opencv-python-headless` (shot detection), `Pillow`
 (nameplates), `imageio-ffmpeg` (fallback ffmpeg).
 
-If one of the last four fails, **regenerate — never hand-resolve**:
-`generate_skill_index.py --write`, `corpus.py --write`,
-`generate_schema_enums.py --write`. A conflict in `docs/skills/index.json`,
-`docs/skills/index.md`, `corpus/*.json` or a schema's `enum` list is always
-settled by re-running the tool, because those are outputs.
+If one of the last three fails, **regenerate — never hand-resolve**:
+`corpus.py --write`, `generate_schema_enums.py --write`. A conflict in
+`corpus/*.json` or a schema's `enum` list is always settled by re-running the
+tool, because those are outputs.
 
 ## "A video now" means a video now
 
@@ -139,8 +137,22 @@ not.** A rights bucket with only one value is not a rights bucket — that is wh
 `usage_class` has `cc_by_4_0` beside the Bungie bucket.
 
 Record every gap where the next person will trip over it: `unresolved` in a
-parsed brief, a `TODO(owner)` beside the binding, and a GitHub issue when
-somebody has to decide.
+parsed brief, a `TODO(owner)` beside the binding, `speaker_pending` for prose.
+
+**That record is the tracking. Do not also file an issue for it.** A gap that
+is already recorded, already degrades correctly, and already ships is *done* —
+filing it again turns the backlog into a second copy of `unresolved` that
+nobody reconciles. File an issue only when one of these is true:
+
+| File it | Don't |
+|---|---|
+| A deliverable is blocked and cannot ship. | A shipped cut has a row nobody authored. |
+| Somebody must grant, approve, or decide before work continues. | The manifest already says the same thing in `unresolved`. |
+| There is real work to do, and it is worth a person's afternoon. | It is one word, one spelling, or one omitted row. |
+
+Batch the small owner-copy questions into one issue per act, not one per row.
+`python3 tools/placeholder.py list` and the manifests' `unresolved` are the
+punch list; the backlog is for work.
 
 ## Boundaries
 
@@ -230,10 +242,10 @@ master path, a bed's rights bucket — is *linked*, not restated. The record is
 the truth; a prose copy is a future contradiction.
 
 When a session surfaces a durable pattern, update the matching skill in the same
-change and regenerate the catalog. Skills are **200 lines soft / 500 hard** and
-**migrate on sight**: one that outgrows a flat file becomes
-`docs/skills/<name>/SKILL.md` + `references/`, in that same change. See
-[`docs/SKILL.md`](docs/SKILL.md), "Writing a skill here".
+change. A skill is plain Markdown with no front matter and no catalog entry;
+the router table in [`docs/SKILL.md`](docs/SKILL.md) is the only registration.
+Prefer one file per skill — a split into `references/` costs an agent an extra
+read, so it has to buy more than tidiness.
 
 ## Agent fast path
 

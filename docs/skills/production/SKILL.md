@@ -1,24 +1,3 @@
----
-name: production
-version: "2.1"
-last_updated: "2026-08-13"
-id: production
-one_line_purpose: Run the issue-to-render loop, repeatedly and in parallel.
-entry_point: docs/skills/production/SKILL.md
-category: editing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [issues, indexing, editing, casting, plates]
-tags: [pipeline, batch, parallel, make-video, resume]
-description: >-
-  The whole loop from an issue to a rendered cut, what resumes, where it stops
-  on purpose, and how several agents make videos at once without colliding.
-  Use when producing videos in volume rather than debugging one stage.
-metadata:
-  type: procedure
----
-
 # Making videos in volume
 
 ## When to Use
@@ -246,7 +225,6 @@ fix, not adding a source list that lies.
 ```bash
 python3 tools/gaps.py
 python3 -m pytest -q                  # includes committed-index integrity
-python3 scripts/generate_skill_index.py --check
 python3 tools/deliver.py status       # the delivery chain, as a report (never a gate here)
 ~/Videos/audio-check.sh --all         # gates every act in Wolves/Prod
 ```

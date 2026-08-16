@@ -1,24 +1,3 @@
----
-name: review
-version: "1.0"
-last_updated: "2026-08-15"
-id: review
-one_line_purpose: Turn a watched-programme timecode into a one-act rebuild.
-entry_point: docs/skills/review.md
-category: editing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [megacut, production]
-tags: [review, notes, timecode, locate, chapters, rebuild, act-clocks]
-description: >-
-  The review loop: locate which act a programme timecode belongs to with tools/megacut.py --locate,
-  fix the act in the project that made it, and re-assemble without re-encoding the others.
-  Use when a round of notes comes back from watching the programme.
-metadata:
-  type: procedure
----
-
 # The review loop
 
 **A round of notes should cost one act, not one show.** This file is how a

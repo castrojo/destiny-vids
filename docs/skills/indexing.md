@@ -1,24 +1,3 @@
----
-name: indexing
-version: "1.0"
-last_updated: "2026-08-11"
-id: indexing
-one_line_purpose: Index a source video into schema-valid, searchable segments.
-entry_point: docs/skills/indexing.md
-category: indexing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: []
-tags: [segments, scenedetect, keyframes, tagging, schema]
-description: >-
-  Turns a source video into schema-valid segment records via detection,
-  keyframes, and out-of-band tagging. Use when indexing new footage, writing a
-  Tagger, or debugging beat counts and the clean gate.
-metadata:
-  type: procedure
----
-
 # Indexing a video
 
 ## When to Use

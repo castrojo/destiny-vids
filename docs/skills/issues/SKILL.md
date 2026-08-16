@@ -1,24 +1,3 @@
----
-name: issues
-version: "2.0"
-last_updated: "2026-08-13"
-id: issues
-one_line_purpose: File work, pick it up, and know when to stop and ask.
-entry_point: docs/skills/issues/SKILL.md
-category: meta
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: []
-tags: [issues, brief, backlog, automatable, gaps]
-description: >-
-  GitHub issues are the backlog, and a fenced `brief` block is the executable
-  part of one. Use when filing work, picking work up, normalizing a prose
-  request, or deciding whether something is an agent's call at all.
-metadata:
-  type: procedure
----
-
 # Working from issues
 
 ## When to Use

@@ -41,18 +41,15 @@ jobs:
       - name: Tests
         run: python3 -m pytest -q
 
-      # Three derived artifacts. Each is generated from checked-in data, so a
+      # Two derived artifacts. Each is generated from checked-in data, so a
       # stale one means somebody hand-edited what a tool owns.
-      - name: The skill catalog is current
-        run: python3 scripts/generate_skill_index.py --check
-
       - name: Every committed corpus is current
         run: python3 tools/corpus.py --check
 
       - name: No derived field was hand-edited
         run: python3 tools/rederive.py --check
 
-      # A fourth: the schemas' enum lists, which are vocab/ copied into JSON.
+      # A third: the schemas' enum lists, which are vocab/ copied into JSON.
       # They were hand-maintained, and two had already drifted -- the segment
       # schema rejected six subclass_version values the vocab declares valid.
       - name: Every schema enum matches the vocabulary

@@ -1,26 +1,3 @@
----
-name: scoring
-version: "2.0"
-last_updated: "2026-08-13"
-id: scoring
-one_line_purpose: Measure a music bed, cut sections out of it, and cut to its bars.
-entry_point: docs/skills/scoring/SKILL.md
-category: editing
-mcp_compliance_level: partial
-optimization_status: draft
-status: active
-dependencies: [editing]
-tags: [music, bed, rights, attribution, insert-track, tempo, downbeat, excision, anchor, ffmpeg, true-peak, section-detection, two-clocks, bed-pause, diegetic-insert, insert-headroom, source-gain]
-description: >-
-  Covers bed records and their rights buckets, bar-snapped excisions, the cached grid, named anchors, a bed that pauses mid-cut, and a second track over that pause.
-  Use when scoring a cut, pausing the song, or clearing and crediting a track.
-metadata:
-  type: procedure
-  context7-sources:
-    - /librosa/librosa
-    - /websites/ffmpeg_documentation
----
-
 # Scoring a cut to a bed
 
 ## When to Use
