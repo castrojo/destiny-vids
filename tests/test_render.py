@@ -318,7 +318,11 @@ def test_the_join_delivers_a_lossless_bed(monkeypatch, tmp_path):
                         lambda cmd, **kw: calls.append(cmd))
     render.concat(["ffmpeg"], [tmp_path / "clip_001.mkv"], tmp_path / "out.mp4",
                   audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
-    cmd = calls[0]
+    # concat is no longer the only thing that shells out: the bed-length check
+    # probes first, and `find_ffprobe` asks podman whether the container is up.
+    # That probe degrades to a no-op here (no ffprobe is reachable), but it is
+    # still a recorded call, so pick the join rather than assuming it is first.
+    cmd = next(c for c in calls if "concat" in c)
     assert cmd[cmd.index("-c:a") + 1] == "flac"
     assert "-b:a" not in cmd, "a lossless codec has no bitrate to state"
 
@@ -414,3 +418,71 @@ def test_the_steadiest_reading_wins_across_windows(monkeypatch):
     rect, status = render.detect_picture_status("x.mp4")
     assert rect == (0, 140, 1920, 800)
     assert status == "letterboxed"
+
+
+# --- `-shortest` cuts the PICTURE too (the bed-length check) -----------------
+#
+# concat() muxes an --audio bed with `-shortest`, which stops the whole output
+# at the shorter of the two mapped streams. A bed longer than the cut is the
+# intended use. A bed SHORTER than the cut silently truncated the film: ffmpeg
+# exited 0 and nothing said the render had ended early.
+
+
+def test_a_bed_shorter_than_the_cut_stops_the_render(monkeypatch, tmp_path):
+    monkeypatch.setattr(render.subprocess, "run",
+                        lambda cmd, **kw: None)
+    lengths = {"bed.wav": 3.0, "a.mp4": 6.0, "b.mp4": 4.0}
+    monkeypatch.setattr(render, "probe_media_duration",
+                        lambda p, ffmpeg=None: lengths[Path(p).name])
+
+    with pytest.raises(RuntimeError, match=r"bed is 3\.000s but the cut is 10\.000s"):
+        render.concat(["ffmpeg"], [tmp_path / "a.mp4", tmp_path / "b.mp4"],
+                      tmp_path / "out.mp4", audio_bed=tmp_path / "bed.wav",
+                      workdir=tmp_path)
+
+
+def test_a_bed_longer_than_the_cut_is_fine(monkeypatch, tmp_path):
+    """`-shortest` trimming the bed's tail is the whole point of it."""
+    calls = []
+    monkeypatch.setattr(render.subprocess, "run",
+                        lambda cmd, **kw: calls.append(cmd))
+    lengths = {"bed.wav": 600.0, "a.mp4": 6.0}
+    monkeypatch.setattr(render, "probe_media_duration",
+                        lambda p, ffmpeg=None: lengths[Path(p).name])
+
+    render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
+                  audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
+    assert any("concat" in c for c in calls)
+
+
+def test_a_bed_a_frame_short_is_rounding_not_a_truncation(monkeypatch, tmp_path):
+    """The sum is per-clip, so the comparison carries a little slack."""
+    monkeypatch.setattr(render.subprocess, "run", lambda cmd, **kw: None)
+    lengths = {"bed.wav": 5.98, "a.mp4": 6.0}
+    monkeypatch.setattr(render, "probe_media_duration",
+                        lambda p, ffmpeg=None: lengths[Path(p).name])
+
+    render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
+                  audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
+
+
+def test_an_unmeasurable_bed_does_not_block_the_render(monkeypatch, tmp_path):
+    """No ffprobe is not the same as a wrong length -- degrade, never block."""
+    monkeypatch.setattr(render.subprocess, "run", lambda cmd, **kw: None)
+    monkeypatch.setattr(render, "probe_media_duration",
+                        lambda p, ffmpeg=None: None)
+
+    render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
+                  audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
+
+
+def test_no_bed_means_no_length_check(monkeypatch, tmp_path):
+    """Without a bed there is no `-shortest`, so nothing to check."""
+    def boom(*a, **kw):
+        raise AssertionError("probed with no bed")
+
+    monkeypatch.setattr(render.subprocess, "run", lambda cmd, **kw: None)
+    monkeypatch.setattr(render, "probe_media_duration", boom)
+
+    render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
+                  workdir=tmp_path)

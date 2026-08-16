@@ -335,3 +335,18 @@ def test_an_ensemble_beat_may_not_carry_an_unknown_field():
             "    ensemble: true\n"
             "    person: castrojo\n"
         )
+
+
+def test_automatable_is_still_required_without_jsonschema(monkeypatch):
+    """`_validate_schema` is a documented no-op when jsonschema is absent.
+
+    In that mode nothing enforced the schema's `required: [automatable]`, but
+    `parse_brief` still subscripted the key -- so a brief that omitted it
+    raised a bare KeyError, which `main()` does not catch. A brief that cannot
+    be executed is a BriefError, not a crash.
+    """
+    import tools.brief as brief_mod
+
+    monkeypatch.setattr(brief_mod, "_validate_schema", lambda data: None)
+    with pytest.raises(BriefError, match="missing `automatable`"):
+        brief_mod.parse_brief("title: a cut\n")

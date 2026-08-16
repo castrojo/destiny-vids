@@ -133,7 +133,7 @@
       "image": "renders/plates-megacut-cards/plate_scream.png",
       "dur": 5.0,
       "label": "Interstitial — ON THE LINUX DESKTOP / NO ONE CAN HEAR YOU SCREAM",
-      "_what": "Owner 2026-08-14, verbatim: 'let the nat scene keep fading to black then put up a title card \"On the Linux Desktop\" \"No one can hear you scream\" - in a terryfing overlay.' Act V keeps its own 2.0 s fade to black (unchanged, the item above), and this comes up out of that black. Copy is the owner's, reproduced from stories/megacut/scream-card.json; the treatment is the Alien one-sheet homage the line invokes, rendered by scripts/build_scream_card.py. It holds 5.0 s, the house card length.",
+      "_what": "Owner 2026-08-14, verbatim: 'let the nat scene keep fading to black then put up a title card \"On the Linux Desktop\" \"No one can hear you scream\" - in a terryfing overlay.' Act V keeps its own 2.0 s fade to black (unchanged, the item above), and this comes up out of that black. Copy is the owner's, reproduced from the `scream` entry in stories/megacut/megacut-cards.json; the treatment is the Alien one-sheet homage the line invokes, rendered by scripts/build_scream_card.py. It holds 5.0 s, the house card length.",
       "_no_chapter": "NO chapter key, deliberately: a scrub-bar entry would spoil the gag. It is the only card in the programme -- every act slide was cut on the owner's 2026-08-14 instruction.",
       "interstitial": true
     },

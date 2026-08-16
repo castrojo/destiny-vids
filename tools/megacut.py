@@ -533,6 +533,34 @@ PROGRAMME_DURATION_TOLERANCE_BASE_SEC = 0.5
 PROGRAMME_DURATION_TOLERANCE_PER_ITEM_SEC = 0.1
 
 
+def probe_audio_extent(path):
+    """The audio stream's own timeline length, measured like the video one.
+
+    ``verify_segment`` used to measure only the picture, which is exactly why
+    a segment whose silence was sized from the whole source -- while its
+    picture was windowed -- passed the check and desynced everything after it
+    at the join. Returns 0.0 for a file with no audio stream at all, which is
+    not this build's shape but is not worth crashing over.
+    """
+    out = subprocess.run(
+        [ffprobe_bin(), "-v", "error", "-select_streams", "a:0",
+         "-show_entries", "packet=pts_time,duration_time", "-of", "csv=p=0",
+         str(path)],
+        capture_output=True, text=True, check=True,
+    )
+    extent = 0.0
+    for line in (out.stdout or "").splitlines():
+        parts = line.strip().split(",")
+        if len(parts) < 2:
+            continue
+        try:
+            pts, dur = float(parts[0]), float(parts[1])
+        except ValueError:
+            continue
+        extent = max(extent, pts + dur)
+    return extent
+
+
 def verify_segment(plan, index, seg_path):
     """Fail the build if one segment's PICTURE is not its source's length.
 
@@ -547,17 +575,31 @@ def verify_segment(plan, index, seg_path):
     (the delivered file's video stream); for a card, the authored slide
     duration. The segment is that same clock re-encoded, so the two must agree
     within rounding.
+
+    The SOUND is checked against the same expectation, because a segment whose
+    legs disagree is just as broken and is invisible in the picture: the
+    concat demuxer carries the longer leg, so every later segment plays with
+    its audio offset. Measuring only v:0 is what let a windowed silent clip
+    certify itself as correct.
     """
     item = plan["items"][index]
     expected_sec = item_duration(item)
     built_sec = probe_video_extent(seg_path)
+    label = item.get("label", item.get("path") or item.get("image"))
     if abs(built_sec - expected_sec) > SEGMENT_DURATION_TOLERANCE_SEC:
-        label = item.get("label", item.get("path") or item.get("image"))
         raise RuntimeError(
             f"segment {index} ({label}) is {built_sec:.3f}s of picture but "
             f"its source is {expected_sec:.3f}s -- {built_sec - expected_sec:+.3f}s "
             f"is a re-time, not rounding (#88). The programme is NOT written; "
             f"fix the segment's chain rather than shipping the shortfall.")
+    audio_sec = probe_audio_extent(seg_path)
+    if audio_sec and abs(audio_sec - expected_sec) > SEGMENT_DURATION_TOLERANCE_SEC:
+        raise RuntimeError(
+            f"segment {index} ({label}) is {built_sec:.3f}s of picture but "
+            f"{audio_sec:.3f}s of sound against a {expected_sec:.3f}s source "
+            f"({audio_sec - expected_sec:+.3f}s). The concat demuxer carries "
+            f"the longer leg, so this desyncs every segment after it. The "
+            f"programme is NOT written; fix the segment's audio leg.")
     return built_sec
 
 
@@ -759,9 +801,13 @@ def build_segment_command(plan, index, seg_path, threads=None):
 
     args = [ffmpeg_bin(), "-nostdin", "-hide_banner", "-i", resolve(item["path"])]
     if item["audio"] == "silent":
-        dur = item.get("dur")
-        if dur is None:
-            dur = probe_duration(resolve(item["path"]), stream="v:0")
+        # The item's PLAYED length, not the file's. The picture is windowed by
+        # clip_window (segment_video_chain emits the matching `trim=`), so
+        # sizing the silence from the whole source leaves the sound running
+        # long after the last frame -- and the concat demuxer carries that
+        # overhang into every segment after this one, which is the same
+        # desync the unwindowed case was already fixed for.
+        dur = item_duration(item)
         args += ["-f", "lavfi", "-i",
                  f"anullsrc=channel_layout={layout}:sample_rate={rate}:d={dur}"]
         maps = ["-map", "0:v:0", "-map", "1:a:0", "-t", str(dur)]
@@ -815,9 +861,12 @@ def build_segment_copy_command(plan, index, seg_path, src_path):
 
     args = [ffmpeg_bin(), "-nostdin", "-hide_banner", "-i", str(src_path)]
     if item["audio"] == "silent":
-        dur = item.get("dur")
-        if dur is None:
-            dur = probe_duration(str(src_path), stream="v:0")
+        # Today the copy path is only taken for an UNWINDOWED clip (see the
+        # `clip_window(item) == (0.0, None)` guard at the call site), so this
+        # is the same number as before. It is expressed as the item's played
+        # length anyway, so the two builders cannot drift apart if that guard
+        # is ever loosened. Probed from the conformed file, per the docstring.
+        dur = item_duration(item, path=str(src_path))
         args += ["-f", "lavfi", "-i",
                  f"anullsrc=channel_layout={layout}:sample_rate={rate}:d={dur}"]
         maps = ["-map", "0:v:0", "-map", "1:a:0", "-t", str(dur)]
@@ -1060,7 +1109,7 @@ def expected_duration(plan):
     return sum(item_duration(item) for item in plan["items"])
 
 
-def item_duration(item):
+def item_duration(item, path=None):
     """One item's length on the PROGRAMME (megacut) clock.
 
     `is None`, not `or`: a 0 would fall through to a probe and report a length
@@ -1073,15 +1122,24 @@ def item_duration(item):
     `dur` shorter than the file changed the plan's arithmetic while the segment
     still played to its own end, so the programme's clock and its picture
     disagreed and only `verify_segment` caught it.
+
+    ``path`` overrides where a length is probed from, for a caller holding a
+    conformed copy of the same timeline (see ``build_segment_copy_command``).
+    It is resolved lazily, so a card -- which has no ``path`` at all -- never
+    touches it.
     """
+    def probe():
+        return probe_duration(
+            path if path is not None else resolve(item["path"]), stream="v:0")
+
     start, end = clip_window(item)
     if end is not None:
         return end - start
     if start:
-        return probe_duration(resolve(item["path"]), stream="v:0") - start
+        return probe() - start
     dur = item.get("dur")
     if dur is None:
-        dur = probe_duration(resolve(item["path"]), stream="v:0")
+        dur = probe()
     return float(dur)
 
 

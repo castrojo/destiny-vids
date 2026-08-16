@@ -66,6 +66,16 @@ def whole_video(video_id, segments_dir=None, redactions_dir=None):
                 if trimmed is not None:
                     kept.append(trimmed)
             shots = kept
+            if not shots:
+                # The emptiness check above runs BEFORE the clamp, and
+                # `kept_range` only refuses a kept span of <= 0 -- so a
+                # redaction leaving a sub-frame sliver passes it and then
+                # clamps every shot away. Report it the same way, rather than
+                # letting main() raise IndexError off an empty list.
+                raise SystemExit(
+                    f"nothing survives the redaction for {video_id!r}: the "
+                    f"kept range {start:.3f}s-{end:.3f}s leaves no shot longer "
+                    f"than a frame")
 
     gaps = [(a["end_sec"], b["start_sec"]) for a, b in zip(shots, shots[1:])
             if abs(b["start_sec"] - a["end_sec"]) > 0.001]

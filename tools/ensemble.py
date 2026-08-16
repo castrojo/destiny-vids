@@ -192,6 +192,15 @@ def load_shotlist(path=None, directory=None):
     return segs
 
 
+def _resolve_leads(leads=None):
+    """The lead cast map, loaded from vocab/casting.yaml unless supplied."""
+    if leads is not None:
+        return leads
+    from tools.derive import load_leads
+
+    return load_leads()
+
+
 def lead_people(leads=None):
     """Logins of people cast as a named lead character.
 
@@ -201,12 +210,48 @@ def lead_people(leads=None):
     video their character is not in. Lead bindings therefore remove someone
     from the ensemble pool entirely; they are credited where their character
     actually appears, from the `plate:` block on their binding.
-    """
-    if leads is None:
-        from tools.derive import load_leads
 
-        leads = load_leads()
-    return {entry.get("person") for entry in leads.values() if entry.get("person")}
+    The match is on the binding's ``github`` login, because a roster
+    contributor is only ever identified by login and ``github`` is the field
+    vocab/casting.yaml documents as the person's VERIFIED one. ``person`` is a
+    normalized snake_case id ("Kelsey Hightower" -> ``kelsey_hightower``), so
+    comparing it against a login excludes somebody only when the two happen to
+    be spelled alike -- which is why this used to match every multi-word lead
+    against nothing at all. It is kept as a SECONDARY match because for some
+    bindings the two genuinely are the same string (``castrojo``), and because
+    erring toward exclusion under-credits somebody rather than crediting one
+    real person twice under two identities.
+
+    A lead with no ``github`` login cannot be excluded by any login at all.
+    That gap is not silently accepted: see ``leads_without_login``.
+    """
+    logins = set()
+    for entry in _resolve_leads(leads).values():
+        if not entry.get("person"):
+            continue
+        for candidate in (entry.get("github"), entry.get("person")):
+            if candidate:
+                logins.add(candidate)
+    return logins
+
+
+def leads_without_login(leads=None):
+    """Cast leads carrying no ``github`` login, so no login can exclude them.
+
+    These are the bindings for which ``lead_people`` is guessing: the only
+    string it can match on is the snake_case ``person`` id, which is not a
+    login. If such a person is in the month's roster under their real login,
+    nothing here can tell, and they would be credited as an anonymous Guardian
+    while also being cast as a named lead.
+
+    Recording the login is a claim about a real person, so it is not this
+    tool's to invent -- the gap is reported and stays visible instead.
+    """
+    return sorted(
+        entry.get("display_name") or entry.get("person")
+        for entry in _resolve_leads(leads).values()
+        if entry.get("person") and not entry.get("github")
+    )
 
 
 def assign(roster, segments, leads=None):
@@ -216,8 +261,12 @@ def assign(roster, segments, leads=None):
     placed once before anyone is placed twice. Returns the tile manifest.
 
     People cast as leads are excluded from the pool -- see ``lead_people``.
+    Leads that no login could have excluded are reported in
+    ``leads_unverifiable`` rather than left to luck.
     """
+    leads = _resolve_leads(leads)
     cast_as_lead = lead_people(leads)
+    unverifiable = leads_without_login(leads)
     pool = [c["login"] for c in roster.get("contributors", [])
             if c["login"] not in cast_as_lead]
     excluded = [c["login"] for c in roster.get("contributors", [])
@@ -227,7 +276,8 @@ def assign(roster, segments, leads=None):
     if not pool:
         return {"month": roster.get("month"), "pool_size": 0,
                 "assignments": [], "tiles": [], "unfilled_slots": 0,
-                "cast_as_lead": excluded}
+                "cast_as_lead": excluded,
+                "leads_unverifiable": unverifiable}
 
     offset = month_offset(roster["month"], len(pool))
     rotated = pool[offset:] + pool[:offset]
@@ -276,6 +326,9 @@ def assign(roster, segments, leads=None):
         # Reported, not silently omitted: someone missing from the credits
         # because they are cast as a lead should be visible in the output.
         "cast_as_lead": excluded,
+        # Leads whose binding carries no `github` login, so no login could
+        # have excluded them. A punch-list item, not a failure.
+        "leads_unverifiable": unverifiable,
     }
 
 
@@ -302,6 +355,9 @@ def fmt_assignment(result):
     if result.get("uncredited"):
         lines.append(f"  UNCREDITED (not enough ensemble slots): "
                      f"{', '.join(result['uncredited'])}")
+    if result.get("leads_unverifiable"):
+        lines.append(f"  LEADS WITH NO github LOGIN (cannot be excluded by "
+                     f"login): {', '.join(result['leads_unverifiable'])}")
     if not result["tiles"]:
         lines.append("  (no ensemble slots found — are segments derived? run tools/derive.py)")
     return "\n".join(lines)

@@ -72,7 +72,7 @@ def _speaker_for(character, leads):
 
 
 def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=None,
-              log=None):
+              skip_uncertain=True, log=None):
     """Source-timed cues + a cut list -> chat plate entries.
 
     Returns ``(entries, dropped)``. ``dropped`` carries a reason per cue so an
@@ -83,6 +83,13 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
     job this index exists to do. An anchored line cannot slide out of the way
     without landing after its own beat, so a line that collides is dropped and
     reported rather than shown late.
+
+    A cue the recovered record marks ``evidence: "uncertain"`` is a turn the
+    anchors do not settle -- the record is saying it does not know which of two
+    real people said it. Rendering it anyway picks one of them and credits a
+    real person with words that may be somebody else's, so it is dropped by
+    default, exactly as ``plan_script`` already did. ``skip_uncertain=False``
+    is available for a caller who has settled the speaker another way.
     """
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
@@ -90,6 +97,9 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
 
     placed, dropped = [], []
     for cue in cues:
+        if skip_uncertain and cue.get("evidence") == "uncertain":
+            dropped.append({**cue, "reason": "speaker not settled by the anchors"})
+            continue
         speaker = _speaker_for(cue["character"], leads)
         if not speaker:
             dropped.append({**cue, "reason": f"{cue['character']} is not cast"})
@@ -252,7 +262,8 @@ def main(argv=None):
     else:
         entries, dropped = plan_chat(
             data["cues"], shots, leads, max_shot_sec=args.max_shot_sec,
-            hold=args.hold, busy=busy, log=print)
+            hold=args.hold, busy=busy,
+            skip_uncertain=not args.keep_uncertain, log=print)
 
     load_manifest_entries(entries)  # the same validation the burn path applies
     with Path(args.out).open("w", encoding="utf-8") as fh:
