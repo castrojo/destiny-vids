@@ -248,10 +248,9 @@ def test_the_enable_windows_use_escaped_commas(manifest):
 
 def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
     graph = T.filtergraph(manifest)
-    assert "[5:v]split=3[daysrc][bridgedarksrc][enddarksrc]" in graph
-    assert "[bridgedarkraw]eq=brightness=-0.55[bridgedark]" in graph
+    assert "[6:v]split=2[bridgenightsrc][endnightsrc]" in graph
     assert (
-        f"[day][bridgedark]xfade=transition=fade:"
+        f"[day][bridgenight]xfade=transition=fade:"
         f"duration={T.BRIDGE - T.BRIDGE_DAY_SETTLE:.3f}:"
         f"offset={T.BRIDGE_DAY_SETTLE:.3f}[bridge]"
     ) in graph
@@ -261,8 +260,8 @@ def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
 def test_the_end_card_wallpaper_is_bounded_to_its_own_window(manifest):
     graph = T.filtergraph(manifest)
     assert (
-        f"trim=0:{T.ENDCARD - T.ENDCARD_DAY_HOLD:.3f},"
-        f"setpts=PTS-STARTPTS,format=yuv420p[enddarkraw]"
+        f"trim=0:{T.ENDCARD:.3f},setpts=PTS-STARTPTS,"
+        f"format=yuv420p[endnight]"
         in graph
     )
 
