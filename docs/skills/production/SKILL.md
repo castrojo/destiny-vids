@@ -152,29 +152,39 @@ python3 tools/deliver.py status              # what is stale and why
 python3 tools/footage.py path <video_id>     # where that master actually is
 python3 tools/deliver.py build               # rebuild exactly what is stale
 python3 tools/deliver.py build --watch 60    # keep it fresh while you work
-python3 tools/deliver.py publish             # after ANY act rebuild
+python3 tools/deliver.py publish --act VII    # name what you rebuilt
 ```
 
 **Never build a media path by hand.** `media/<id>.mp4` is how act II broke:
 the master was replaced as `.mkv` and the builder could no longer find it,
 while `status` still said `ok`. Ask `tools/footage.py` for the path.
 
-**`publish` after every act rebuild — and only after one.** It re-links
-`Prod/`, regenerates the checksums and README table, *and* stamps the act's
-input digest, which is what makes the next edit show up as drift.
+**`publish` after every act rebuild — and name the act.** It re-links `Prod/`,
+regenerates the checksums and README table, *and* stamps the act's input
+digest, which is what makes the next edit show up as drift.
 
-It stamps **only acts whose master is newer than the inputs it names.** An act
-whose records moved without a rebuild is reported and left stale, because the
-alternative is worse than a missing record: `publish` claims "what is in
-`Prod/` now was built from these inputs", so stamping an act nobody re-rendered
-records a claim that cannot be true, and the gate goes green with a stale
-master behind it. That is how stale programmes shipped, repeatedly — the fix
-for a stale act is a rebuild, and `publish` can no longer be mistaken for one.
+**`--act` is repeatable, and it is the whole guarantee.** `publish --act VII`
+makes a claim about act VII and about nothing else. A blanket `publish`
+certifies **every** act at once, so a rebuild of one act declares the other
+seven freshly built too — that is how one render laundered a whole programme
+and stale acts kept shipping.
+
+It also stamps **only acts whose master is newer than the inputs it names**,
+and only counts inputs git reports as edited. A committed file's mtime says
+when the repo was checked out, not when anybody changed it, so trusting it
+blocks every act after a rebase — a wall, not a gate. The content digest is
+the authority; this is just the cheap proof that a render happened after the
+edit.
 
 **Assembly refuses stale acts.** `tools/megacut.py` will not seat an act whose
 master predates its own committed inputs; it names them and exits non-zero.
 `--allow-stale` ships the old masters anyway and says so on stderr, for a
 deliberate rough cut.
+
+**A builder's default output is not automatically its master.** Acts VI and
+VIII both write somewhere else by default, so a `rebuild` command is declared
+only once `--print-command` has been checked to name the declared master.
+Guessing one re-burns nameplates about real people.
 
 Transcoding is cheap and the megacut is what gets reviewed, so it should never
 be more than one edit behind. `--watch` polls rather than using inotify on
@@ -198,7 +208,9 @@ fix, not adding a source list that lies.
 | "I found something important on the way, so the detour was justified." | File it as an issue in one minute. A found problem is never a licence to spend the owner's afternoon. |
 | "I'll explain what I learned, then give them the file." | Path and runtime first. Explanation after, and short. |
 | "I rebuilt the act, the delivery is fine." | Not until `deliver.py publish`. Until then `Prod/` may still link the old master and the megacut still contains it. |
-| "`publish` made the gate green, so the delivery is fresh." | `publish` records; it never rebuilds. It now refuses to stamp an act whose master predates its inputs — a green gate you got without a render was the bug, not the proof. |
+| "`publish` made the gate green, so the delivery is fresh." | `publish` records; it never rebuilds. A green gate you got without a render was the bug, not the proof. |
+| "I rebuilt one act, so I'll just run `publish`." | Name it: `publish --act <numeral>`. A blanket publish certifies every act, including the seven you did not touch. |
+| "`--print-command` needs a working encoder." | No. Printing is for reading and pasting; resolving ffmpeg is a precondition of *running*. Requiring one takes the offline suite offline. |
 | "The assembly stage just joins finished things, so staleness is somebody else's rung." | Assembly is the stage where a stale act reaches an audience. It checks, and refuses. |
 | "The megacut is only one act behind, I'll roll it in next time." | Transcoding is cheap. `deliver.py build` rebuilds only what is stale; there is no next time to save for. |
 | "I'll tag the obvious ones and leave the rest." | An untagged beat derives `clean = false`. Half a tag file marks half the video uncuttable. |
