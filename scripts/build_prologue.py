@@ -84,10 +84,14 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 from tools import conform  # noqa: E402
+from tools import footage  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "00-prologue-plates.json"
-SOURCE = REPO_ROOT / "media" / "yt_nightwish_perfume_of_the_timeless.mkv"
+# Resolved by video_id, never by filename: this master has already moved
+# container once (#229).
+SOURCE_ID = "yt_nightwish_perfume_of_the_timeless"
+SOURCE = footage.resolve(SOURCE_ID) or REPO_ROOT / "media" / f"{SOURCE_ID}.mkv"
 PLATES_DIR = REPO_ROOT / "renders" / "plates-00-prologue"
 WALLPAPERS = REPO_ROOT / "renders" / "wallpapers"
 OUT = REPO_ROOT / "renders" / "00-prologue.mp4"

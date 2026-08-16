@@ -140,12 +140,24 @@ invisible: the file is still there, still plays, and is a round of notes
 behind. `tools/deliver.py` is the graph that notices —
 `inputs -> master -> Prod/ -> megacut/ -> 10mb/`.
 
+**`inputs` is two rungs, because git only sees one of them.** `sources` are
+committed files, hashed by content, and gate CI. `footage` is what is in
+`media/`, which is gitignored — declared by **video_id, never by path**, so a
+master that changes container still resolves, and hashed with a
+`(path, size, mtime_ns)` cache. An act cut from picture that was later
+replaced used to report `ok` all the way down (#229).
+
 ```bash
 python3 tools/deliver.py status              # what is stale and why
+python3 tools/footage.py path <video_id>     # where that master actually is
 python3 tools/deliver.py build               # rebuild exactly what is stale
 python3 tools/deliver.py build --watch 60    # keep it fresh while you work
 python3 tools/deliver.py publish             # after ANY act rebuild
 ```
+
+**Never build a media path by hand.** `media/<id>.mp4` is how act II broke:
+the master was replaced as `.mkv` and the builder could no longer find it,
+while `status` still said `ok`. Ask `tools/footage.py` for the path.
 
 **`publish` after every act rebuild.** It re-links `Prod/`, regenerates the
 checksums and README table, *and* stamps the act's input digest — which is what

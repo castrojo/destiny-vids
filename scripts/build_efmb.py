@@ -57,6 +57,14 @@ if str(REPO_ROOT) not in sys.path:
 SOURCE_ID = "yt_destiny_all_live_action_trailers"
 BED_ID = "bed_endless_forms_most_beautiful"
 
+# The measured length of the master this act's runs were cut against. It is a
+# constant, not a probe: the plan must be identical on CI (which has no
+# media/) and on a machine whose copy of the master has since been replaced.
+# `render` compares the file it is about to cut against this and refuses on a
+# mismatch, which is the check that would have caught #229's swap.
+SOURCE_SEC = 376.134
+SOURCE_TOLERANCE_SEC = 0.05
+
 # --- the cut ---------------------------------------------------------------
 # (in, out, why this boundary is here). Source timecodes, seconds.
 RUNS = [
@@ -320,12 +328,29 @@ def render(out_path=None, work_dir=None, verbose=True):
     stream-copies it, so the audio pass costs the picture nothing.
     """
     from tools.render import find_ffmpeg
+    from tools import footage
 
     plan = build()
     ffmpeg = find_ffmpeg()
-    source = REPO_ROOT / "media" / f"{SOURCE_ID}.mp4"
+    source = footage.resolve(SOURCE_ID)
     bed = REPO_ROOT / "media" / f"{BED_ID}.wav"
-    for path, what in ((source, "picture source"), (bed, "music bed")):
+    if source is None:
+        raise SystemExit(
+            f"missing picture source: no media/{SOURCE_ID}.* in any known "
+            f"container ({', '.join(footage.EXTENSIONS)})\nMedia is fetched, "
+            "never committed -- see AGENTS.md ('Never commit footage') and the "
+            "source's record in videos/.")
+    got = probe_duration(source)
+    if abs(got - SOURCE_SEC) > SOURCE_TOLERANCE_SEC:
+        raise SystemExit(
+            f"{source.name} is {got:.3f}s, but this act's runs were cut "
+            f"against a {SOURCE_SEC:.3f}s master -- the picture in media/ is "
+            f"NOT the one act II was made from (#229).\n"
+            "Every span in RUNS was measured on the old file, so cutting from "
+            "this one would silently move the picture under a bed that did "
+            "not move. Re-cutting the runs against a new upload is an "
+            "EDITORIAL decision, not a derivation: it needs the owner.")
+    for path, what in ((bed, "music bed"),):
         if not path.exists():
             raise SystemExit(
                 f"missing {what}: {path}\nMedia is fetched, never committed -- "
@@ -388,8 +413,12 @@ def render(out_path=None, work_dir=None, verbose=True):
 def build():
     bed = load_json(REPO_ROOT / "music" / f"{BED_ID}.json")
     bed_sec = float(bed["duration_sec"])
-    source = REPO_ROOT / "media" / f"{SOURCE_ID}.mp4"
-    src_sec = probe_duration(source) if source.exists() else 376.134
+    # The MEASURED duration of the master this act was cut against, not
+    # whatever is in media/ today. Planning stays deterministic and offline:
+    # a replaced master is drift for `deliver.py` to report (the footage rung,
+    # #229), and re-cutting the runs to a new upload is an editorial decision.
+    # `render` refuses to cut picture from a file that disagrees with this.
+    src_sec = SOURCE_SEC
 
     # --- invariants --------------------------------------------------------
     # 1. The runs are in source order, disjoint, and inside the source.

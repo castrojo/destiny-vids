@@ -135,7 +135,9 @@ RECORD="videos/$VIDEO_ID.json"
 [ -f "$RECORD" ] || { echo "no video record at $RECORD" >&2; exit 1; }
 say "video_id $VIDEO_ID"
 
-MEDIA="media/$VIDEO_ID.mp4"
+# Resolved by id: a master already on disk in another container (.mp4 -> .mkv,
+# #229) must not be re-fetched, and must not read as missing.
+MEDIA="$(python3 tools/footage.py path "$VIDEO_ID" 2>/dev/null || echo "media/$VIDEO_ID.mp4")"
 KEYFRAMES="keyframes/$VIDEO_ID"
 TAGS="tags/$VIDEO_ID.json"
 
