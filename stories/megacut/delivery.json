@@ -17,7 +17,7 @@
    "footage_rights": {
     "yt_nightwish_perfume_of_the_timeless": "music/bed_perfume_of_the_timeless.json"
    },
-   "source_digest": "fde88e1cc91ad2e0ee1e25c1e7d3282bb608eed6a1d37814cd23982e0db2dcd0",
+   "source_digest": "c206d5c251fd1a409652e512dbbde55d1100c4b39061be0de6f468f29dac3198",
    "footage_digest": "b44e5ba9341c2748030a5ecc1ac6d8a721410b0fac5f996cdc3cf6f1a65d9908"
   },
   "I": {
@@ -48,7 +48,7 @@
    "footage": [
     "yt_destiny_all_live_action_trailers"
    ],
-   "source_digest": "c68dbb946f31614a147dd7de4c694f61a8f7b9a10b67540364d88560e862a96a",
+   "source_digest": "f4100bcff8feeda0fd246bbc6a589fa5197eb861462dddedd9021dd2bae317be",
    "footage_digest": "7cd0c5946c4ef8b295ac2da065c5ed379abe08a88e030321c8132198ebd7dadb"
   },
   "III": {
@@ -114,7 +114,7 @@
     "yt_destiny_2_lightfall_launch_trailer",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "b6f11423e64f9dd8cac4f09e266636440edc34f2ac331d94beb7695bddd5292a",
+   "source_digest": "88607c6adf4d14bf2143995b2165a41c58147cc85539d75c5670e1bb745bd9ea",
    "footage_digest": "21c943bcda5ccc2cbae2b3c08cebcf6794763babda3f4304e612e1724bb4220b"
   },
   "VII": {
@@ -141,7 +141,7 @@
     "music/bed_storytime.json",
     "vocab/casting.yaml"
    ],
-   "source_digest": "cb3b6966505f6c12b6a69ed34337acab1c14bb4b93ce87d3ddcf9dfb890b31ce"
+   "source_digest": "e775c6b99ae5f432dbd553ec5d7991bf24acfad128d6217ad41888b7d3b3b6b9"
   }
  },
  "social": {
