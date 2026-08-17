@@ -79,6 +79,7 @@ W, H = conform.DELIVERY.width, conform.DELIVERY.height
 
 
 ARTWORK_DIR = REPO_ROOT / "renders" / "artwork"
+SUMMIT_DIR = REPO_ROOT / "renders" / "summit-plates"
 
 
 def load():
@@ -86,13 +87,36 @@ def load():
 
 
 def art_path(name):
-    """One cached wallpaper frame, or ``None`` if it was never fetched.
+    """One cached picture for a replacement, or ``None`` if it is not cached.
+
+    ``name`` is usually a wallpaper name, and the rungs are tried highest
+    first: ``renders/artwork/{name}.png`` (the published-resolution cache),
+    then the summit plates ``renders/summit-plates/{name}.png`` and
+    ``{name}.jpg`` (the graded 1920x1080 crops, stories/summit-photos.json).
+
+    A replacement may instead name an explicit cached file with
+    ``{"file": "renders/..."}``: the CNCF summit photograph movement 4
+    overlays is a JPEG, and a JPEG photograph is not a wallpaper name, so the
+    authored file path is the record. The rights record stays in
+    ``stories/summit-photos.json``; this resolver only finds the file.
 
     Missing art DEGRADES: the replacement that wanted it is skipped and the
     source shot plays, which is a note in the log rather than a failed render.
     """
-    path = ARTWORK_DIR / f"{name}.png"
-    return path if path.exists() else None
+    if isinstance(name, dict):
+        path = REPO_ROOT / name["file"]
+        return path if path.exists() else None
+    for path in (ARTWORK_DIR / f"{name}.png",
+                 SUMMIT_DIR / f"{name}.png",
+                 SUMMIT_DIR / f"{name}.jpg"):
+        if path.exists():
+            return path
+    return None
+
+
+def art_label(name):
+    """A printable name for log lines: the explicit file, or the name."""
+    return name["file"] if isinstance(name, dict) else name
 
 
 def usable_replacements(movement, log=None):
@@ -107,7 +131,7 @@ def usable_replacements(movement, log=None):
     for repl in movement.get("replacements", []):
         wanted = list(repl["art"]) + ([repl["flash"]["art"]]
                                       if repl.get("flash") else [])
-        missing = [n for n in wanted if art_path(n) is None]
+        missing = [art_label(n) for n in wanted if art_path(n) is None]
         if missing:
             if log is not None:
                 log.append(f"{repl['id']}: skipped, artwork not cached: "
@@ -149,12 +173,42 @@ FIT = f"scale={W}:{H}:force_original_aspect_ratio=decrease:flags=lanczos"
 PAD = f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:color=black"
 
 
-def _still_chain(idx, dur, label, letterbox=None):
-    """One cached wallpaper as a clip of exactly ``dur``, on the delivery clock.
+def scope_fit(src_h):
+    """Fill the film's OWN scope window, cropping the overflow.
 
-    Fitted, never stretched; padded, never cropped. See ``FIT`` above.
+    The default ``FIT`` is right for the ultrawide wallpapers, but an asset
+    that happens to be exactly 16:9 (the summit photograph is 1920x1080 by
+    construction) fits the delivery frame with NO remainder -- the picture
+    fills the whole frame for the length of the swap, the frame grows, and
+    in the middle of a scope film that reads as a mistake, not a cut
+    (owner, 2026-08-17, on the summit photo at file-local 38.5: "the picture
+    changes SHAPE for two seconds").
+
+    So a replacement may author ``"fit": "scope"``: scale on the asset's own
+    aspect to FILL the scope window (1920x804 here) and centre-crop the
+    overflow, then the shared PAD seats it at the film's own 138 px bars --
+    letterboxed exactly like the artwork around it, and the frame never
+    changes size. The owner made the fit-or-crop call explicitly for this
+    asset ("a 16:9 source cropped to 2.39:1 loses some height, which is
+    fine"), and the crop itself is the one already authorised in
+    stories/summit-photos.json. Never the default: for the drawings, the
+    never-cropped rule above stands.
     """
-    return (f"[{idx}:v]{FIT},{PAD},setsar=1,fps={FPS},format=yuv420p,"
+    return (f"scale={W}:{src_h}:force_original_aspect_ratio=increase:"
+            f"flags=lanczos,crop={W}:{src_h}")
+
+
+def _still_chain(idx, dur, label, letterbox=None, fit=None):
+    """One cached picture as a clip of exactly ``dur``, on the delivery clock.
+
+    Fitted, never stretched; padded, never cropped -- unless the replacement
+    authors ``"fit": "scope"``, which see on ``scope_fit``.
+    """
+    fit_expr = FIT
+    if fit == "scope":
+        src_h, _pad_y = letterbox
+        fit_expr = scope_fit(src_h)
+    return (f"[{idx}:v]{fit_expr},{PAD},setsar=1,fps={FPS},format=yuv420p,"
             f"trim=0:{dur:.3f},setpts=PTS-STARTPTS[{label}]")
 
 
@@ -168,6 +222,16 @@ def _replacement_chain(repl, first_input, out_label, letterbox):
     ``xfade`` shortens its output by the transition, so each leg is grown by
     that amount and the whole lands on ``dur`` exactly. Duration-locking is
     the point: the movement's length must not move.
+
+    The turn points default to an even division of ``dur``. A replacement may
+    author them instead with ``turn_at``: the crossfade offset(s) in
+    replacement-relative seconds -- one number for two arts, a list of n-1
+    for n arts -- so a note like "keep the day version until here" is a
+    recordable fact rather than an emergent property of the arithmetic. The
+    legs still sum to ``dur`` exactly for ANY offsets: leg 0 is
+    ``turn_at + turn``, each middle leg is the gap plus the turn, and the
+    last is what remains. An offset that would put a leg at or below zero
+    length is a record bug, not a render to attempt.
     """
     parts = []
     arts = list(repl["art"])
@@ -175,20 +239,45 @@ def _replacement_chain(repl, first_input, out_label, letterbox):
     turn = float(repl.get("turn_sec", 0.0)) if len(arts) > 1 else 0.0
     n = len(arts)
 
-    # n legs, n-1 overlaps: leg = (dur + (n-1)*turn) / n
-    leg = (dur + (n - 1) * turn) / n
+    turn_at = repl.get("turn_at")
+    if turn_at is None:
+        # n legs, n-1 overlaps: leg = (dur + (n-1)*turn) / n
+        leg = (dur + (n - 1) * turn) / n
+        legs = [leg] * n
+        offsets = [leg * i - turn * i for i in range(1, n)]
+    else:
+        if n < 2:
+            raise SystemExit(
+                f"{repl['id']}: turn_at on a single-art replacement -- "
+                "there is no turn to place")
+        offsets = [float(x) for x in
+                   (turn_at if isinstance(turn_at, list) else [turn_at])]
+        if len(offsets) != n - 1:
+            raise SystemExit(
+                f"{repl['id']}: {n} arts need {n - 1} turn_at offsets, "
+                f"got {len(offsets)}")
+        legs = ([offsets[0] + turn]
+                + [offsets[i] - offsets[i - 1] + turn
+                   for i in range(1, n - 1)]
+                + [dur - offsets[-1]])
+        if offsets[0] < 0 or any(leg <= 0 for leg in legs):
+            raise SystemExit(
+                f"{repl['id']}: turn_at {offsets} puts a leg at or below "
+                f"zero length (dur {dur:.3f}, turn {turn:.3f}) -- the turn "
+                "points must sit inside the replacement and keep every art "
+                "on screen")
     labels = []
     for i in range(n):
         label = f"{repl['id']}_a{i}".replace("-", "_")
-        parts.append(_still_chain(first_input + i, leg, label, letterbox))
+        parts.append(_still_chain(first_input + i, legs[i], label,
+                                  letterbox, fit=repl.get("fit")))
         labels.append(label)
 
     cur = labels[0]
     for i in range(1, n):
         nxt = f"{repl['id']}_x{i}".replace("-", "_")
-        offset = leg * i - turn * i
         parts.append(f"[{cur}][{labels[i]}]xfade=transition=fade:"
-                     f"duration={turn:.3f}:offset={offset:.3f}[{nxt}]")
+                     f"duration={turn:.3f}:offset={offsets[i - 1]:.3f}[{nxt}]")
         cur = nxt
 
     used = n
@@ -226,22 +315,14 @@ def _replacement_inputs(repls):
     return args
 
 
-def filtergraph(spec, movement, repls=()):
-    """One movement: trimmed, padded to 16:9, put on the delivery clock.
+def video_chain(spec, movement, repls=(), out_label="vout"):
+    """The movement's VIDEO chain, with the final output labelled out_label.
 
-    ``trim`` runs on the DECODED stream and the input is opened with an
-    accurate ``-ss``, so the in point is frame-exact rather than snapped to
-    the nearest keyframe -- the distinction docs/rendering.md records.
-
-    WITH REPLACEMENTS the picture is CONCATENATED rather than overlaid: the
-    source's own segments and the replacement clips are laid end to end in
-    order. Concatenation is what makes the arithmetic checkable -- every piece
-    has a stated length and they must sum to the movement's duration -- where
-    an overlay would hide a mistimed shot behind a correct-looking runtime.
-
-    THE AUDIO IS NEVER CUT. It is taken whole from the source across the whole
-    movement, so the song plays straight through a replaced shot. That is the
-    whole point of the thread: one continuous performance the acts interrupt.
+    Split out of ``filtergraph`` so scripts/build_ending_overlays.py can lay
+    its plates on top of the very same string -- the derivative then differs
+    from the clean render ONLY in the overlaid lines, and the two builders
+    can never drift. With no replacements and ``out_label="base"`` this is
+    byte-for-byte the base chain the overlays builder was written against.
     """
     src_h = int(spec["source_height"])
     pad_y = (H - src_h) // 2
@@ -249,11 +330,9 @@ def filtergraph(spec, movement, repls=()):
 
     base = (f"[0:v]pad={W}:{H}:0:{pad_y}:color=black,setsar=1,"
             f"fps={FPS},format=yuv420p")
-    audio = (f"[0:a]atrim=0:{dur:.3f},asetpts=PTS-STARTPTS,"
-             f"aresample=48000[aout]")
 
     if not repls:
-        return f"{base},trim=0:{dur:.3f},setpts=PTS-STARTPTS[vout];{audio}"
+        return f"{base},trim=0:{dur:.3f},setpts=PTS-STARTPTS[{out_label}]"
 
     # The source survives in the gaps between replacements.
     keeps, cursor = [], 0.0
@@ -290,8 +369,42 @@ def filtergraph(spec, movement, repls=()):
     if dur - cursor > 1e-6:
         order.append(f"[s{ki}]")
 
-    parts.append("".join(order) + f"concat=n={len(order)}:v=1:a=0[vout]")
-    return ";".join(parts) + ";" + audio
+    parts.append("".join(order) + f"concat=n={len(order)}:v=1:a=0"
+                                 f"[{out_label}]")
+    return ";".join(parts)
+
+
+def replacement_input_count(repls):
+    """How many ``-loop 1`` inputs the replacements consume, in graph order.
+
+    A builder that adds its own inputs after the artwork (the overlays
+    derivative numbers its plate inputs from here) needs the count, and
+    counting the records beats parsing argv back.
+    """
+    return sum(len(r["art"]) + (1 if r.get("flash") else 0) for r in repls)
+
+
+def filtergraph(spec, movement, repls=()):
+    """One movement: trimmed, padded to 16:9, put on the delivery clock.
+
+    ``trim`` runs on the DECODED stream and the input is opened with an
+    accurate ``-ss``, so the in point is frame-exact rather than snapped to
+    the nearest keyframe -- the distinction docs/rendering.md records.
+
+    WITH REPLACEMENTS the picture is CONCATENATED rather than overlaid: the
+    source's own segments and the replacement clips are laid end to end in
+    order. Concatenation is what makes the arithmetic checkable -- every piece
+    has a stated length and they must sum to the movement's duration -- where
+    an overlay would hide a mistimed shot behind a correct-looking runtime.
+
+    THE AUDIO IS NEVER CUT. It is taken whole from the source across the whole
+    movement, so the song plays straight through a replaced shot. That is the
+    whole point of the thread: one continuous performance the acts interrupt.
+    """
+    dur = float(movement["duration"])
+    audio = (f"[0:a]atrim=0:{dur:.3f},asetpts=PTS-STARTPTS,"
+             f"aresample=48000[aout]")
+    return video_chain(spec, movement, repls) + ";" + audio
 
 
 def command(spec, movement, repls=()):

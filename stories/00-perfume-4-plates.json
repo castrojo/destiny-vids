@@ -1,0 +1,109 @@
+{
+  "_what": "The chat exchange inside Perfume movement 4, owner copy 2026-08-15, VERBATIM and never edited: six lines in two groups, timed to the song and seated in the letterbox bar over the divers-and-whale-skeleton shot (source 328.080 -> 343.080). Burned into the DERIVATIVE renders/perfume-4-overlays.mp4 by scripts/build_ending_overlays.py; the clean renders/perfume-4.mp4 carries no overlays by the thread's own rule.",
+  "_clock": "All `at` times are MOVEMENT-LOCAL seconds: 0 is source 274.240, the movement's own in point, which is also the derivative's output clock. The owner's marks (23:31 and 23:40 on the old build) correct +0.234 for the act VI out-point move 431.231 -> 430.997: group one at local ~54.134, group two at local ~63.134. Each line sits on a MEASURED DOWNBEAT from music/bed_perfume_of_the_timeless.json (129.199 bpm, 4/4, downbeat_phase 1; the grid is the record's measured beats, not an idealised one): one line per bar, group one on beats 693/697/701/705, group two on beats 713/717. The seats land 0.18 s and 0.22 s from the corrected marks -- inside the +/-0.25 s the stamps carry. The last line holds 3.00 s so 'Of the wolves' is still up when the shot changes at local 68.840, and goes out 0.6 s before it so the cut is the picture's own.",
+  "_letterbox": "position 'letterbox' seats each pill in the bottom bar below the picture rect 0,138,1920,804 -- the same measured letterbox every Perfume movement pads to (source 1920x804 scope, 138 px bars). Render: python3 tools/plate.py render --manifest stories/00-perfume-4-plates.json --out-dir renders/perfume-4/plates --picture 0,138,1920,804",
+  "_people": "THESE NAME REAL PEOPLE. The copy is owner-authored and reproduced verbatim. A speaker's avatar is used ONLY where a handle resolves on evidence; everyone else renders the authored display name with the drawn crest fallback, and the gap is in `unresolved`. castrojo resolves (vocab/casting.yaml binding; avatar cached). Valerie resolves to valerie-tar-gz ON EVIDENCE, recorded here so one word from the owner revokes it: valerie-tar-gz is a credited contributor (stories/08-credits.json), the avatar renders/avatars/valerie-tar-gz.png is already cached, and the account's OWN GitHub display name is exactly 'Valerie' (user id 155010216, checked 2026-08-17). 'Jill Castro', 'Rafael' and 'LH' resolve nowhere -- no casting entry, no credits row, no login -- so they carry the crest and their names exactly as the owner wrote them.",
+  "chat": {
+    "source_in": 328.08,
+    "source_out": 343.08,
+    "active_y": 138,
+    "active_height": 804,
+    "plate_ids": [
+      "chat_loose_end",
+      "chat_escape",
+      "chat_promised",
+      "chat_fine",
+      "chat_minds",
+      "chat_wolves"
+    ],
+    "_window": "The exchange sits inside one measured shot, the divers approaching the whale skeleton (source 328.080 -> 343.080, local 53.840 -> 68.840), read off the file with select='gt(scene,0.25)'. source_in/source_out are that shot; the pills themselves start on the first downbeat after the owner marks."
+  },
+  "plates": [
+    {
+      "id": "chat_loose_end",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "Jill Castro",
+      "text": "One more loose end",
+      "copy_source": "owner_supplied",
+      "at": 53.951,
+      "dur": 1.7,
+      "fade_in": 0.4,
+      "fade_out_at": 55.401,
+      "fade_out": 0.25
+    },
+    {
+      "id": "chat_escape",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "Valerie",
+      "avatar": "renders/avatars/valerie-tar-gz.png",
+      "text": "You can't escape yourself",
+      "copy_source": "owner_supplied",
+      "at": 55.832,
+      "dur": 1.7,
+      "fade_in": 0.4,
+      "fade_out_at": 57.282,
+      "fade_out": 0.25
+    },
+    {
+      "id": "chat_promised",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "Rafael",
+      "text": "You promised",
+      "copy_source": "owner_supplied",
+      "at": 57.712,
+      "dur": 1.7,
+      "fade_in": 0.4,
+      "fade_out_at": 59.162,
+      "fade_out": 0.25
+    },
+    {
+      "id": "chat_fine",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "castrojo",
+      "avatar": "renders/avatars/castrojo.png",
+      "text": "Fine",
+      "copy_source": "owner_supplied",
+      "at": 59.593,
+      "dur": 1.7,
+      "fade_in": 0.4,
+      "fade_out_at": 61.043,
+      "fade_out": 0.25
+    },
+    {
+      "id": "chat_minds",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "LH",
+      "text": "Show them the minds",
+      "copy_source": "owner_supplied",
+      "at": 63.355,
+      "dur": 1.7,
+      "fade_in": 0.4,
+      "fade_out_at": 64.805,
+      "fade_out": 0.25
+    },
+    {
+      "id": "chat_wolves",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "Valerie",
+      "avatar": "renders/avatars/valerie-tar-gz.png",
+      "text": "Of the wolves",
+      "copy_source": "owner_supplied",
+      "at": 65.236,
+      "dur": 3.0,
+      "fade_in": 0.4,
+      "fade_out_at": 67.986,
+      "fade_out": 0.25
+    }
+  ],
+  "unresolved": [
+    "'Jill Castro' has no login on record -- not in vocab/casting.yaml, not in stories/08-credits.json. She renders her authored display name with the drawn crest fallback. If the owner names a handle, the avatar lands in renders/avatars/ and one line closes this.",
+    "'Rafael' has no login on record either -- the act VIII birthday card names Rafael Castro, the owner's son, but no handle exists to bind. Crest fallback, authored name, same one-line fix.",
+    "'LH' is initials nobody has resolved to a person on record. Crest fallback, authored name, same one-line fix. Never guessed: a wrong login would credit a real person for words they did not write."
+  ]
+}

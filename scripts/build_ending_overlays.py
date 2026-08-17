@@ -1,14 +1,33 @@
 #!/usr/bin/env python3
-"""Burn the underwater closing passage into a movement-5 DERIVATIVE.
+"""Burn a movement's plates into its DERIVATIVE -- overlays, never the clean render.
 
     python3 scripts/build_ending_overlays.py --print-command
     python3 scripts/build_ending_overlays.py
+    python3 scripts/build_ending_overlays.py --movement perfume-4 --print-command
 
 What this builds
 ----------------
-The seven closing lines of ``stories/megacut/ending-cards.json``
+Movement 5: the seven closing lines of ``stories/megacut/ending-cards.json``
 (``underwater``) revealed one at a time over the underwater pullback:
 ``renders/perfume-5-ending.mp4``.
+
+Movement 4: the six chat lines of ``stories/00-perfume-4-plates.json``
+(``chat``) over the whale-skeleton shot: ``renders/perfume-4-overlays.mp4``.
+This is the generalisation the movement-5 pattern predicted: ONE derivative
+per movement, and movement 4's ALSO composes the movement's own
+``replacements`` in the same encode -- the base chain is
+``build_interludes.video_chain`` itself, so a naive copy of the old pattern
+(plates over a bare base) can never ship the chat WITHOUT the wallpapers.
+One source read, one encode: swaps and words together.
+
+Which movement, which plates
+----------------------------
+``--movement`` names the movement; its ``ending_derivative`` block in the
+thread record supplies the defaults: ``out_file`` for ``--out``,
+``overlay_manifest`` for ``--manifest``, ``overlay_section`` for
+``--section``, and the optional ``plates_dir`` for ``--cards-dir``. Every
+default still resolves to the movement-5 values above, so an unflagged run
+is byte-for-byte the command this script has always printed.
 
 Why a DERIVATIVE, not a treatment on the clean movement
 -------------------------------------------------------
@@ -17,14 +36,14 @@ Why a DERIVATIVE, not a treatment on the clean movement
 overlays, no cards, because the dinosaur pass edits these files. The coda is
 a separately named output, recorded on the movement as ``ending_derivative``.
 
-And it is rebuilt DIRECTLY FROM THE ORIGINAL SOURCE -- the same 389.800 in
-point, the same 117.221 s window, the same ``media/`` .mkv -- rather than by
-re-encoding the clean render. Overlaying onto ``perfume-5.mp4`` would stack a
-second x264 generation on the picture before megacut assembly; encoding once
-from the source keeps the derivative at the same generation as the clean
-movement. The encode settings are exactly ``build_interludes.py``'s:
-native-width pad into the 16:9 delivery frame, delivery FPS, BT.709 written
-into the VUI, closed-GOP x264, one ``-t``.
+And it is rebuilt DIRECTLY FROM THE ORIGINAL SOURCE -- the same in point,
+the same window, the same ``media/`` .mkv -- rather than by re-encoding the
+clean render. Overlaying onto the clean render would stack a second x264
+generation on the picture before megacut assembly; encoding once from the
+source keeps the derivative at the same generation as the clean movement.
+The encode settings are exactly ``build_interludes.py``'s: native-width pad
+into the 16:9 delivery frame, delivery FPS, BT.709 written into the VUI,
+closed-GOP x264, one ``-t``.
 
 Audio is FLAC and untouched
 ---------------------------
@@ -57,6 +76,7 @@ if str(REPO) not in sys.path:
 
 from tools import conform  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
+from scripts import build_interludes  # noqa: E402
 
 THREAD = REPO / "stories" / "00-perfume-thread.json"
 MANIFEST = REPO / "stories" / "megacut" / "ending-cards.json"
@@ -97,32 +117,33 @@ def missing_cards(doc, cards_dir, section=SECTION):
             if not card_path(cards_dir, card).exists()]
 
 
-def filtergraph(spec, movement, cards):
+def filtergraph(spec, movement, cards, repls=()):
     """The clean movement's own chain, then the plates in manifest order.
 
-    Base, pad, clock and audio are byte-for-byte ``build_interludes.py``'s
-    movement chain, so the derivative differs from the clean render ONLY in
-    the overlaid lines. Each still is shifted onto the output clock
-    (``setpts=PTS-STARTPTS+at/TB``) so its alpha fades are expressed in
-    output time, and gated half-open so two lines never share a frame.
+    The base IS ``build_interludes.video_chain`` -- with the movement's
+    replacements composed in when it carries any -- so the derivative
+    differs from the clean render ONLY in the overlaid lines, and the
+    swaps and the plates can never ship in separate encodes. Each still is
+    shifted onto the output clock (``setpts=PTS-STARTPTS+at/TB``) so its
+    alpha fades are expressed in output time, and gated half-open so two
+    lines never share a frame.
     """
-    src_h = int(spec["source_height"])
-    pad_y = (H - src_h) // 2
     dur = float(movement["duration"])
 
-    parts = [f"[0:v]pad={W}:{H}:0:{pad_y}:color=black,setsar=1,"
-             f"fps={FPS},format=yuv420p,trim=0:{dur:.3f},"
-             f"setpts=PTS-STARTPTS[base]"]
+    parts = [build_interludes.video_chain(spec, movement, repls,
+                                          out_label="base")]
     audio = (f"[0:a]atrim=0:{dur:.3f},asetpts=PTS-STARTPTS,"
              f"aresample=48000[aout]")
 
+    # Plate inputs are numbered after the source (0) and the artwork loops.
+    first_plate = 1 + build_interludes.replacement_input_count(repls)
     prev = "base"
     for i, card in enumerate(cards):
         at = float(card["at"])
         end = at + float(card["dur"])
         fade_in = float(card.get("fade_in", 0))
         fade_out = float(card.get("fade_out", 0))
-        chain = f"[{i + 1}:v]format=rgba,setpts=PTS-STARTPTS+{at:.3f}/TB"
+        chain = f"[{i + first_plate}:v]format=rgba,setpts=PTS-STARTPTS+{at:.3f}/TB"
         if fade_in:
             chain += f",fade=t=in:st={at:.3f}:d={fade_in:.3f}:alpha=1"
         if fade_out:
@@ -138,13 +159,18 @@ def filtergraph(spec, movement, cards):
     return ";".join(parts) + ";" + audio
 
 
-def command(doc, thread_path, cards_dir, out, ffmpeg=None):
+def command(doc, thread_path, cards_dir, out, ffmpeg=None,
+            movement_id=MOVEMENT_ID, section=SECTION, repls=None):
     spec = load_thread(thread_path)
-    movement = find_movement(spec)
-    cards = underwater_cards(doc)
+    movement = find_movement(spec, movement_id)
+    cards = underwater_cards(doc, section)
+    if repls is None:
+        repls = build_interludes.usable_replacements(movement)
     source = REPO / spec["source"]
 
-    inputs = []
+    # The artwork loops come first: the filtergraph numbers its plate inputs
+    # after them, and the two orders must be the same list.
+    inputs = list(build_interludes._replacement_inputs(repls))
     for card in cards:
         end = float(card["at"]) + float(card["dur"])
         inputs += ["-loop", "1", "-framerate", FPS,
@@ -159,7 +185,7 @@ def command(doc, thread_path, cards_dir, out, ffmpeg=None):
         "-ss", f"{float(movement['in']):.3f}",
         "-i", str(source),
         *inputs,
-        "-filter_complex", filtergraph(spec, movement, cards),
+        "-filter_complex", filtergraph(spec, movement, cards, repls),
         "-map", "[vout]", "-map", "[aout]",
         *conform.video_encode_args(),
         "-c:a", "flac", "-sample_fmt", "s32",
@@ -187,41 +213,70 @@ def main(argv=None):
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--manifest", default=str(MANIFEST),
-                    help="the authored ending record")
+    ap.add_argument("--movement", default=MOVEMENT_ID,
+                    help="the movement whose derivative to build")
+    ap.add_argument("--manifest", default=None,
+                    help="the authored plate record (default: the movement's "
+                         "ending_derivative overlay_manifest)")
     ap.add_argument("--thread", default=str(THREAD),
                     help="the Perfume thread manifest")
-    ap.add_argument("--cards-dir", default=str(CARDS),
-                    help="where the rendered plate PNGs live")
-    ap.add_argument("--out", default=str(REPO / "renders" /
-                                         "perfume-5-ending.mp4"))
+    ap.add_argument("--section", default=None,
+                    help="the plate_ids section in the manifest (default: the "
+                         "movement's ending_derivative overlay_section)")
+    ap.add_argument("--cards-dir", default=None,
+                    help="where the rendered plate PNGs live (default: the "
+                         "movement's ending_derivative plates_dir, else "
+                         f"{CARDS})")
+    ap.add_argument("--out", default=None,
+                    help="the derivative to write (default: the movement's "
+                         "ending_derivative out_file)")
     ap.add_argument("--print-command", action="store_true",
                     help="print the ffmpeg call and exit")
     args = ap.parse_args(argv)
 
-    doc = json.loads(Path(args.manifest).read_text())
     spec = load_thread(args.thread)
-    movement = find_movement(spec)
+    movement = find_movement(spec, args.movement)
+    deriv = movement.get("ending_derivative")
+    if deriv is None and (args.manifest is None or args.out is None):
+        sys.exit(f"{movement['id']} declares no ending_derivative in "
+                 f"{args.thread}; pass --manifest and --out explicitly")
+
+    manifest = Path(args.manifest or REPO / deriv["overlay_manifest"])
+    section = args.section or (deriv or {}).get("overlay_section", SECTION)
+    cards_dir = Path(args.cards_dir
+                     or (deriv or {}).get("plates_dir") or CARDS)
+    if not cards_dir.is_absolute():
+        # ffmpeg may run inside a container whose CWD is not the repo, so
+        # every path handed to it is anchored -- a repo-relative plates_dir
+        # resolves here, not over there.
+        cards_dir = REPO / cards_dir
+    out = Path(args.out or REPO / deriv["out_file"])
+
+    doc = json.loads(manifest.read_text())
 
     source = REPO / spec["source"]
     if not source.exists():
         sys.exit(f"footage is never committed; missing: {source}")
-    missing = missing_cards(doc, args.cards_dir)
+    missing = missing_cards(doc, cards_dir, section)
     if missing:
         sys.exit("missing rendered ending plates: "
                  + ", ".join(str(p) for p in missing))
 
-    cmd = command(doc, args.thread, args.cards_dir, args.out,
+    notes = []
+    repls = build_interludes.usable_replacements(movement, notes)
+    cmd = command(doc, args.thread, cards_dir, out,
                   ffmpeg=_ffmpeg_for_printing() if args.print_command
-                  else None)
+                  else None,
+                  movement_id=args.movement, section=section, repls=repls)
+    for note in notes:
+        print(f"note: {note}", file=sys.stderr)
     if args.print_command:
         print(" ".join(cmd))
         return 0
-    out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(cmd, check=True)
     print(f"wrote {out} ({movement['duration']:.3f} s, "
-          f"{len(underwater_cards(doc))} underwater lines)")
+          f"{len(underwater_cards(doc, section))} {section} lines)")
     return 0
 
 

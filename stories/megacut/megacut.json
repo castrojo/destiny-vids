@@ -161,9 +161,22 @@
       "audio": "source",
       "fade_in": 0.0,
       "fade_out": 0.0,
-      "label": "Perfume, movement 4 — source 274.240 -> 389.800, wolves straight in ON ITS FIRST HIT, straight out to Europa",
+      "label": "Perfume, movement 4a — source 274.240 -> 287.360, wolves straight in ON ITS FIRST HIT",
       "_hard_both_ends": "NO fades, both owner calls. In: 'go right into the next song' -- act VI now ends on a full-level bar, so Perfume starts on the next frame at full level and the two songs meet like a needle drop. Out: '25:13 don't fade this it's awesome make it a quick cut to europa get rid of the title slide.'",
-      "_thread": "Movement 4 of 5."
+      "_thread": "Movement 4 of 5.",
+      "trim_to": 13.12,
+      "_split": "Movement 4 is split at 13.120 -- source 287.360, the measured shot boundary where the first wallpaper swap begins. Before it the clean render and the derivative are the same picture, so the programme plays the CLEAN file up to the split and the overlaid one after it. Same shape as movement 5, and the same reason: the clean render keeps its name, its window and its unfaded picture for the dinosaur pass, and it is genuinely what plays wherever nothing is overlaid."
+    },
+    {
+      "kind": "clip",
+      "path": "renders/perfume-4-overlays.mp4",
+      "audio": "source",
+      "fade_in": 0.0,
+      "fade_out": 0.0,
+      "trim_from": 13.12,
+      "label": "Perfume, movement 4b — source 287.360 onward: the wallpaper swaps and the chat exchange",
+      "_derivative": "Built from the ORIGINAL source in ONE encode by scripts/build_ending_overlays.py, composing the duration-locked picture swaps AND the six chat pills together. They cannot ship separately by construction: the plate overlays sit on top of the same video_chain the swaps are built with. No generation is added before assembly.",
+      "_hard_both_ends": "NO fades. This is the middle of a movement, not a join: 4a hands to 4b on a shot boundary inside one continuous song, and the out is the owner's 'don't fade this it's awesome make it a quick cut to europa'."
     },
     {
       "kind": "clip",

@@ -98,6 +98,13 @@ ARTWORK = {
     "huntress":            f"{RAW}/huntress/huntress.jxl",
     "eyes":                f"{RAW}/eyes/eyes.svg",
     "lazy-days":           f"{RAW}/lazy-days/lazy.jxl",
+    # Duality joined the owner's list for movement 4's band montage (2026-08-16,
+    # the 23:54 note). The website's `bluefin-duality-{day,night}.webp` copies
+    # are the LOWER RUNG -- web-optimised, 1920-wide -- and the fidelity rule
+    # below forbids them; the pair is fetched here from the artwork repository
+    # like everything else.
+    "duality-day":         f"{RAW}/duality/duality-day.svg",
+    "duality-night":       f"{RAW}/duality/duality-night.svg",
     # `bluefin` in the owner's list is the MONTHLY set, which ships with the
     # desktop and is already cached by scripts/fetch_wallpapers.py. It is
     # fetched here too so the interlude pass has one place to look and does not

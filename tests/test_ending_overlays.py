@@ -141,3 +141,148 @@ def test_the_derivative_window_matches_the_clean_movement():
     move = movement_five(thread())
     assert float(move["in"]) == pytest.approx(389.800)
     assert float(move["duration"]) == pytest.approx(117.221)
+
+
+# --- the generalisation, 2026-08-17 ----------------------------------------
+#
+# Movement 4 needed the same one-encode derivative as movement 5, but its
+# plates ride on a picture that ALSO carries the movement's own
+# replacements. The trap a naive copy would fall into: the old base chain
+# never applied replacements, so the derivative would ship the chat OR the
+# wallpapers and never both. The base is now build_interludes.video_chain
+# itself, and these tests pin the composition.
+
+CHAT = REPO / "stories" / "00-perfume-4-plates.json"
+
+
+def chat():
+    return json.loads(CHAT.read_text())
+
+
+def movement_four(doc):
+    return next(m for m in doc["movements"] if m["id"] == "perfume-4")
+
+
+def chat_command(tmp_path):
+    return build_ending_overlays.command(
+        chat(),
+        str(THREAD),
+        tmp_path / "plates",
+        tmp_path / "perfume-4-overlays.mp4",
+        ffmpeg=["ffmpeg"],
+        movement_id="perfume-4",
+        section="chat",
+    )
+
+
+def test_movement_four_declares_its_own_derivative():
+    move = movement_four(thread())
+    assert move["out_file"] == "renders/perfume-4.mp4"
+    burned = {"fade_in", "fade_out", "fade", "plates", "overlay", "cards"}
+    assert not burned & set(move)
+    derivative = move["ending_derivative"]
+    assert derivative["out_file"] == "renders/perfume-4-overlays.mp4"
+    assert derivative["overlay_manifest"] == "stories/00-perfume-4-plates.json"
+    assert derivative["overlay_section"] == "chat"
+
+
+def test_the_derivative_composes_replacements_and_plates_in_one_encode(
+        tmp_path):
+    cmd = chat_command(tmp_path)
+    joined = " ".join(cmd)
+    graph = cmd[cmd.index("-filter_complex") + 1]
+    # The source is read ONCE: swaps and words come out of a single encode.
+    assert joined.count("media/yt_nightwish_perfume_of_the_timeless.mkv") == 1
+    # The seven replacement clips are concat'd into the base the plates then
+    # overlay -- wallpapers AND chat, never one without the other.
+    assert "concat=n=12:v=1:a=0[base]" in graph
+    assert "[base][ov0]overlay=0:0:eof_action=pass:" in graph
+    assert "[v5]format=yuv420p[vout]" in graph
+    assert "-c:a flac" in joined
+    assert "afade" not in graph
+
+
+def test_plate_inputs_are_numbered_after_the_artwork(tmp_path):
+    """Source is input 0, the seven artwork loops are 1..7, the six chat
+    pills are 8..13. The graph and the argv must be the same ordering."""
+    cmd = chat_command(tmp_path)
+    graph = cmd[cmd.index("-filter_complex") + 1]
+    assert "[8:v]format=rgba,setpts=PTS-STARTPTS+53.951/TB" in graph
+    assert "[13:v]format=rgba,setpts=PTS-STARTPTS+65.236/TB" in graph
+    inputs = [cmd[i + 1] for i, a in enumerate(cmd[:-1]) if a == "-i"]
+    assert len(inputs) == 1 + 7 + 6
+    assert inputs[0].endswith("yt_nightwish_perfume_of_the_timeless.mkv")
+    assert inputs[1].endswith("renders/artwork/bluefin-day.png")
+    assert inputs[3].endswith("renders/summit-plates/enemy_cu.jpg")
+    assert inputs[4].endswith("renders/artwork/huntress.png")
+    assert inputs[5].endswith("renders/artwork/duality-day.png")
+    assert inputs[7].endswith("renders/artwork/eyes.png")
+    assert inputs[8].endswith("plate_chat_loose_end.png")
+    assert inputs[13].endswith("plate_chat_wolves.png")
+
+
+def test_the_chat_windows_are_half_open_and_faded_inside(tmp_path):
+    graph = chat_command(tmp_path)[
+        chat_command(tmp_path).index("-filter_complex") + 1]
+    assert "between(" not in graph
+    for card in chat()["plates"]:
+        at = float(card["at"])
+        end = at + float(card["dur"])
+        assert f"enable='gte(t,{at:.3f})*lt(t,{end:.3f})'" in graph, card["id"]
+        assert f"fade=t=in:st={at:.3f}:d={float(card['fade_in']):.3f}:alpha=1" \
+            in graph, card["id"]
+        fade_out_at = end - float(card["fade_out"])
+        assert f"fade=t=out:st={fade_out_at:.3f}:" \
+            f"d={float(card['fade_out']):.3f}:alpha=1" in graph, card["id"]
+
+
+def test_the_chat_copy_is_verbatim_and_one_line_at_a_time():
+    """The owner's six lines, in the two groups he wrote, never edited --
+    and never overlapping, so no pill ghosts onto the next."""
+    plates = chat()["plates"]
+    assert [p["text"] for p in plates] == [
+        "One more loose end",
+        "You can't escape yourself",
+        "You promised",
+        "Fine",
+        "Show them the minds",
+        "Of the wolves",
+    ]
+    assert [p["speaker"] for p in plates] == [
+        "Jill Castro", "Valerie", "Rafael", "castrojo", "LH", "Valerie"]
+    assert all(p["kind"] == "chat" and p["position"] == "letterbox"
+               and p["copy_source"] == "owner_supplied" for p in plates)
+    for previous, current in zip(plates, plates[1:]):
+        assert previous["at"] + previous["dur"] < current["at"]
+    # act VI's pill shape: fade_out_at is the window's end minus fade_out.
+    for p in plates:
+        assert p["fade_out_at"] == pytest.approx(
+            p["at"] + p["dur"] - p["fade_out"])
+
+
+def test_the_exchange_sits_inside_the_measured_whale_shot():
+    """The pills live inside one measured shot -- the divers and the whale
+    skeleton, source 328.080 -> 343.080 -- and the last line is out 0.6 s
+    before the cut so the cut is the picture's own."""
+    doc = chat()
+    window = doc["chat"]
+    local_in = window["source_in"] - 274.240
+    local_out = window["source_out"] - 274.240
+    plates = doc["plates"]
+    assert plates[0]["at"] >= local_in
+    assert plates[-1]["at"] + plates[-1]["dur"] <= local_out
+    assert [p["id"] for p in plates] == window["plate_ids"]
+
+
+def test_unresolved_speakers_carry_no_avatar():
+    """Never guess a login for a real person: the unresolved three render
+    the drawn crest, and the manifest records the gap."""
+    doc = chat()
+    by_speaker = {}
+    for p in doc["plates"]:
+        by_speaker.setdefault(p["speaker"], p)
+    for name in ("Jill Castro", "Rafael", "LH"):
+        assert "avatar" not in by_speaker[name], name
+    unresolved = " ".join(doc["unresolved"])
+    for name in ("Jill Castro", "Rafael", "LH"):
+        assert name in unresolved
