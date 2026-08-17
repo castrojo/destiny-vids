@@ -420,6 +420,29 @@ def vocab_logins():
             for person, login in logins.items()}
 
 
+def cast_title(person):
+    """The second line of a hero credit: what this person does, in their words.
+
+    Owner: *"for the 'hero' credits use the github titles"*. So the copy is
+    either supplied by the owner or lifted verbatim off the person's own GitHub
+    profile, and it is recorded in the manifest with `title_source` naming
+    which. Nothing here composes a sentence about anybody.
+
+    A title nobody has supplied renders as LOREM IPSUM rather than as a gap --
+    the deck's own rule -- and `title_pending` records who it is owed to. The
+    Latin is the safeguard: nobody mistakes it for approved English, and it is
+    visibly missing copy rather than an invented description of a colleague.
+    """
+    from tools import placeholder
+
+    title = person.get("title")
+    if title:
+        return title
+    if not person.get("title_pending"):
+        return None
+    return placeholder.lorem(chars=110, seed=f"cast:{person['person']}")
+
+
 def avatar_logins(manifest):
     """Every GitHub login act VIII will ask for a face for, in order.
 
@@ -625,13 +648,15 @@ def schedule(manifest):
             # otherwise the placard redacts a word and reveals the person.
             items.append({"kind": "cast", "t": t, "dur": target,
                           "person": C.REDACTED, "character": person["character"],
-                          "card": None, "login": None, "photo": None})
+                          "card": None, "login": None, "photo": None,
+                          "title": None})
         else:
             items.append({"kind": "cast", "t": t, "dur": target,
-                          "person": name, "character": person["character"],
+                          "person": name, "character": person.get("character"),
                           "card": person.get("card"),
                           "login": person.get("login") or verified.get(name),
-                          "photo": photos.get(name)})
+                          "photo": photos.get(name),
+                          "title": cast_title(person)})
         t += target
 
     wordmark = manifest["wordmark"]
@@ -724,7 +749,8 @@ def render_cards(items, out_dir):
         elif item["kind"] == "cast":
             img = C.render_cast_placard(item["person"], item["character"],
                                         card=item.get("card"), login=item.get("login"),
-                                        photo=item.get("photo"), index=i)
+                                        photo=item.get("photo"),
+                                        title=item.get("title"), index=i)
         elif item["kind"] == "wall":
             img = C.render_name_wall(item["section"], item["names"],
                                      item["page"], item["pages"],
@@ -836,7 +862,11 @@ def main(argv=None):
             if item["kind"] == "wall":
                 extra = f"  {item['section']} {item['page']}/{item['pages']} ({len(item['names'])} names)"
             elif item["kind"] == "cast":
-                extra = f"  {item['person']} as {item['character']}"
+                extra = f"  {item['person']}"
+                if item.get("character"):
+                    extra += f" as {item['character']}"
+                if item.get("title"):
+                    extra += "  [title]"
             elif item["kind"] == "role":
                 extra = f"  {item['role']}: {', '.join(item['names'])}"
             elif item["kind"] == "cover":

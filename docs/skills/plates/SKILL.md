@@ -119,6 +119,7 @@ This skill is the contract. The procedure lives in `references/`:
 | [`status-nameplate.md`](references/status-nameplate.md) | The top-of-frame HUD card. |
 | [`other-cards.md`](references/other-cards.md) | `miniboss`, `achievement`, `companion` detail. |
 | [`full-frame-cards.md`](references/full-frame-cards.md) | `act` and `comic` — rendered by the website's own CSS, not Pillow. |
+| [`hero-credit.md`](references/hero-credit.md) | Act VIII's cast placard — a lower third that credits the person, not the character. |
 
 ## Common Rationalizations
 
