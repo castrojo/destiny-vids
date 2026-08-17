@@ -162,7 +162,15 @@ for (const card of cards) {
   // flattened onto black as a programme item OR composited over footage. The
   // comic card paints its own opaque black, exactly as the site does.
   await page.screenshot({ path: dest, omitBackground: true })
-  console.info(`wrote ${path.relative(repoRoot, dest)}  (${card.kind})`)
+  // A card that had to shrink to fit says so on the way past. Silent clipping
+  // is the failure this reports: the card is 1920px wide and hides overflow,
+  // so copy that does not fit simply vanishes.
+  const fit = await page.evaluate('window.__fit ?? null')
+  const note = fit
+    ? `  [${fit.width}/${fit.room}px${fit.shrunk
+        ? `, shrunk ${fit.requested} -> ${fit.rendered}px` : ''}]`
+    : ''
+  console.info(`wrote ${path.relative(repoRoot, dest)}  (${card.kind})${note}`)
 }
 
 await browser.close()

@@ -52,26 +52,50 @@ def test_underwater_copy_and_emphasis_are_exact():
         "A million loves",
         "We are not immortal",
         "One loss hurts us more",
-        "Than any of you will ever understand",
-        "Seven Days and one chain of lives unending",
+        "Than any of you",
+        "Will EVER understand",
         "Last sighs on a deathbed",
-        "Break the Chain",
+        "Seven Days",
+        "One Chain of Lives Unending",
+        "Fight for Us",
+        "For Nóva",
     ]
-    assert cards[3]["emphasis"] == [{"text": "ever", "style": "seared"}]
+    assert cards[4]["emphasis"] == [{"text": "EVER", "style": "seared"}]
+
+
+def test_the_four_closing_cards_are_centred():
+    """The owner asked for the last four in one treatment -- 'same font/size as
+    the other 2', 'same font/placement as the others'. Everything before them is
+    a matte line under the picture."""
+    cards = selected(ending(), "underwater")
+    assert [card["placement"] for card in cards] == (
+        ["bottom_matte"] * 6 + ["center"] * 4)
 
 
 def test_underwater_windows_stay_inside_the_measured_sequence():
-    cards = selected(ending(), "underwater")
-    assert cards[0]["at"] >= 6.52
-    assert cards[-1]["at"] + cards[-1]["dur"] <= 37.64
+    doc = ending()
+    cards = selected(doc, "underwater")
+    movement_in = 389.8
+    assert cards[0]["at"] >= doc["underwater"]["source_in"] - movement_in
+    assert (cards[-1]["at"] + cards[-1]["dur"]
+            <= doc["underwater"]["source_out"] - movement_in)
     for left, right in zip(cards, cards[1:]):
         assert left["at"] + left["dur"] < right["at"]
+
+
+def test_retired_copy_is_kept_rather_than_deleted():
+    """A retired string is authored copy too. Both halves of the sentence the
+    owner split across two centre cards are still readable in the record."""
+    by_id = {card["id"]: card for card in ending()["plates"]}
+    assert "Break the Chain" in by_id["seven-days"]["_retired_copy"]
+    assert ("Seven Days and one chain of lives unending"
+            in by_id["chain-unending"]["_retired_copy"])
 
 
 def test_renderer_can_enumerate_every_ending_card():
     doc = ending()
     ids = [card["id"] for card in doc["plates"]]
-    assert len(ids) == 12
+    assert len(ids) == 15
     assert len(set(ids)) == len(ids)
     assert all(card["kind"] == "ending" for card in doc["plates"])
     assert set(doc["pause"]["plate_ids"] + doc["underwater"]["plate_ids"]) == set(ids)
@@ -102,8 +126,8 @@ def test_pause_cards_match_act_slide_chrome_without_darkening_wallpapers():
 
 def test_pause_duration_is_frame_exact():
     doc = ending()
-    assert build_ending_pause.frame_count(doc) == 1439
-    assert build_ending_pause.duration(doc) == 24.007317
+    assert build_ending_pause.frame_count(doc) == 1380
+    assert build_ending_pause.duration(doc) == 23.023
 
 
 def test_pause_command_has_fades_black_gaps_and_no_audio(tmp_path):
@@ -123,7 +147,7 @@ def test_pause_command_has_fades_black_gaps_and_no_audio(tmp_path):
     assert "concat=n=10:v=1:a=0" in graph
     assert "-an" in cmd
     assert "anullsrc" not in graph
-    assert cmd[cmd.index("-frames:v") + 1] == "1439"
+    assert cmd[cmd.index("-frames:v") + 1] == "1380"
 
 
 def test_pause_builder_runs_as_a_script(tmp_path):
@@ -144,4 +168,4 @@ def test_pause_builder_runs_as_a_script(tmp_path):
         text=True,
     )
     assert proc.returncode == 0, proc.stderr
-    assert "-frames:v 1439" in proc.stdout
+    assert "-frames:v 1380" in proc.stdout

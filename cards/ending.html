@@ -68,6 +68,17 @@
     text-align: center;
     text-shadow: 0 3px 12px #000, 0 0 18px rgb(0 0 0 / 90%);
   }
+  /* THE LINE IS ONE FLEX ITEM, NOT ONE PER WORD. `.overlay` is a flex
+     container, and a flex container drops the whitespace between its items --
+     which ate the space in front of every seared token and rendered
+     "WillEVER". Everything the card says lives inside this span, in normal
+     inline flow, so the spaces survive and the line can be measured as a
+     single box. */
+  .line {
+    display: block;
+    max-width: 100%;
+    white-space: pre-wrap;
+  }
   .bottom_matte {
     top: 942px;
     height: 138px;
@@ -79,17 +90,23 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
+  /* THE SEAR IS A WORD IN A SENTENCE, NOT A LOGO. Owner, 2026-08-16: "the
+     'ever' is wrong it's one word it should look like it's in a sentence."
+     So the token differs from the words either side of it ONLY in heat --
+     weight, colour and bloom. It inherits the line's tracking, sits in normal
+     inline flow, and carries no box, no margin and no letter-spacing of its
+     own. The old treatment set 0.11em tracking and 0.1em side margins on an
+     inline-block, which pulled the word out of the sentence and read as a
+     separate title; the flex container then ate the space in front of it and
+     rendered "WillEVER". Both faults are the same fault: the word had been
+     made into an object. */
   .seared {
-    display: inline-block;
-    margin: 0 0.1em;
     color: #fff8e8;
     font-weight: 900;
-    letter-spacing: 0.11em;
     text-shadow:
-      0 0 4px #fff,
-      0 0 12px #9dc8ff,
-      0 0 28px rgb(40 116 255 / 95%),
-      0 0 50px rgb(40 116 255 / 55%);
+      0 0 3px #fff,
+      0 0 8px rgb(157 200 255 / 95%),
+      0 0 16px rgb(40 116 255 / 70%);
   }
 </style>
 </head>
@@ -108,19 +125,46 @@
     card.appendChild(node)
   }
 
-  function appendEmphasized(text, emphasis) {
+  function appendEmphasized(host, text, emphasis) {
     let cursor = 0
     for (const token of emphasis) {
       const at = text.indexOf(token.text, cursor)
       if (at < 0) continue
-      card.appendChild(document.createTextNode(text.slice(cursor, at)))
+      host.appendChild(document.createTextNode(text.slice(cursor, at)))
       const span = document.createElement('span')
       span.className = token.style
       span.textContent = token.text
-      card.appendChild(span)
+      host.appendChild(span)
       cursor = at + token.text.length
     }
-    card.appendChild(document.createTextNode(text.slice(cursor)))
+    host.appendChild(document.createTextNode(text.slice(cursor)))
+  }
+
+  // MEASURE THE LINE, DO NOT TRUST IT. Owner, 2026-08-16: "measure this whole
+  // thing". The card is 1920px wide with `overflow: hidden`, so a line that
+  // does not fit is not a warning -- it is silently clipped copy, and nobody
+  // sees the half that went missing. The line is measured against the box it
+  // has to live in and stepped down until it fits. The final size is reported
+  // on `window.__fit` so the renderer can record it.
+  function fit(box, line) {
+    const style = window.getComputedStyle(box)
+    const room = box.clientWidth
+      - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+    const start = parseFloat(window.getComputedStyle(line).fontSize)
+    let size = start
+    const FLOOR = 28
+    while (size > FLOOR && (line.scrollWidth > room
+        || line.getBoundingClientRect().height > box.clientHeight)) {
+      size -= 1
+      line.style.fontSize = `${size}px`
+    }
+    return {
+      requested: start,
+      rendered: size,
+      shrunk: size < start,
+      width: Math.ceil(line.scrollWidth),
+      room: Math.floor(room),
+    }
   }
 
   async function ready() {
@@ -141,7 +185,12 @@
       card.className = `overlay ${placement}`
       const text = params.get('text') || ''
       const emphasis = JSON.parse(params.get('emphasis') || '[]')
-      appendEmphasized(text, emphasis)
+      const line = document.createElement('span')
+      line.className = 'line'
+      card.appendChild(line)
+      appendEmphasized(line, text, emphasis)
+      await document.fonts.ready
+      window.__fit = fit(card, line)
     }
     await document.fonts.ready
     window.__renderReady = true

@@ -5,31 +5,36 @@
     "fps": "60000/1001",
     "fade_frames": 72,
     "gap_frames": 30,
-    "black_hold_frames": 89,
-    "frames": 1439,
-    "duration": 24.007317,
+    "black_hold_frames": 30,
+    "frames": 1380,
+    "duration": 23.023,
     "plate_ids": [
       "mission",
       "we-are",
       "purpose",
       "lesson",
       "left-to-teach"
-    ]
+    ],
+    "_black_hold": "30 frames, matching gap_frames, DOWN FROM 89. The long hold existed because the asteroid impact followed the passage directly and the film wanted it to break the silence out of darkness. After the 2026-08-16 reorder the passage is followed by movement 5a instead -- a dark Earth limb that is itself near-black for 3.504 s. 89 frames of black in front of that made roughly five seconds of unbroken dark and buried the song's re-entry. The half second left is only enough for the last card to clear before the music arrives."
   },
   "underwater": {
     "source_in": 396.32,
-    "source_out": 427.44,
+    "source_out": 499.3,
     "active_y": 138,
     "active_height": 804,
     "plate_ids": [
       "loves",
       "not-immortal",
       "loss-hurts",
-      "ever-understand",
-      "chain-unending",
+      "than-any-of-you",
+      "will-ever-understand",
       "last-sighs",
-      "break-chain"
-    ]
+      "seven-days",
+      "chain-unending",
+      "fight-for-us",
+      "for-nova"
+    ],
+    "_window": "source_in is still the underwater pullback's first frame. source_out moved 427.44 -> 499.300 on 2026-08-16 because the passage grew past the pullback: the owner seated two centre cards in the long tail after it -- 'Fight for Us' on the ocean wide and 'For Nóva' on the sunken hull. 499.300 is the megacut's own out point for this clip (trim_to 109.5, plus the 389.800 in point), so the section describes exactly the picture the programme plays. active_y/active_height still describe the scope letterbox every bottom_matte card sits in; that has not changed."
   },
   "plates": [
     {
@@ -115,34 +120,36 @@
       "fade_out": 0.6
     },
     {
-      "id": "ever-understand",
+      "id": "than-any-of-you",
       "kind": "ending",
       "section": "underwater",
       "mode": "overlay",
       "placement": "bottom_matte",
-      "text": "Than any of you will ever understand",
+      "text": "Than any of you",
+      "at": 19.8,
+      "dur": 2.8,
+      "fade_in": 0.6,
+      "fade_out": 0.6,
+      "_what": "Owner 2026-08-16: 'Change \"than any of you will EVER understand\" to two lines / 26:52 \"Than any of you\" / 26:55 \"Will EVER understand\".' The two stamps land on the seat the single plate already had -- 19.8 is programme 26:51.3 -- so the line is SPLIT IN PLACE rather than re-timed: the first half keeps the original at, the second takes the owner's second stamp. EVER is uppercase in the owner's note and is uppercase here, which also makes it the emphasis token."
+    },
+    {
+      "id": "will-ever-understand",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "bottom_matte",
+      "text": "Will EVER understand",
       "emphasis": [
         {
-          "text": "ever",
+          "text": "EVER",
           "style": "seared"
         }
       ],
-      "at": 19.8,
-      "dur": 4.2,
+      "at": 23.4,
+      "dur": 3.4,
       "fade_in": 0.6,
-      "fade_out": 0.6
-    },
-    {
-      "id": "chain-unending",
-      "kind": "ending",
-      "section": "underwater",
-      "mode": "overlay",
-      "placement": "bottom_matte",
-      "text": "Seven Days and one chain of lives unending",
-      "at": 24.3,
-      "dur": 4.2,
-      "fade_in": 0.6,
-      "fade_out": 0.6
+      "fade_out": 0.6,
+      "_what": "The second half of the split. Owner's stamp is 26:55, which is 23.46 on this clock; 23.4 is the frame that leaves the first half a clean 0.8 s of black matte behind it."
     },
     {
       "id": "last-sighs",
@@ -157,16 +164,58 @@
       "fade_out": 0.6
     },
     {
-      "id": "break-chain",
+      "id": "seven-days",
       "kind": "ending",
       "section": "underwater",
       "mode": "overlay",
       "placement": "center",
-      "text": "Break the Chain",
+      "text": "Seven Days",
       "at": 33.0,
+      "dur": 4.2,
+      "fade_in": 0.6,
+      "fade_out": 0.6,
+      "_what": "Owner 2026-08-16: 'Change \"break the chain\" to -> \"Seven Days\".' Only the copy moves: the seat is the same centre placement at the same 33.0 the card has always held.",
+      "_retired_copy": "'Break the Chain' -- the copy this plate carried until 2026-08-16. Kept because a retired string is authored copy too, and the repo keeps retired card copy rather than deleting it."
+    },
+    {
+      "id": "chain-unending",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "center",
+      "text": "One Chain of Lives Unending",
+      "at": 37.46,
+      "dur": 4.2,
+      "fade_in": 0.6,
+      "fade_out": 0.6,
+      "_what": "Owner 2026-08-16: '27:09 One Chain of Lives Unending', which is 37.46 on this clock. It is the second half of a sentence the owner splits across two centre cards: `seven-days` carries the first three words and this card carries the rest, standing on its own after it.",
+      "_retired_copy": "'Seven Days and one chain of lives unending' -- the whole sentence on one card at 24.3. Retired copy is authored copy and is kept rather than deleted. The 24.3 seat belongs to 'Will EVER understand'."
+    },
+    {
+      "id": "fight-for-us",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "center",
+      "text": "Fight for Us",
+      "at": 77.728,
       "dur": 4.4,
       "fade_in": 0.6,
-      "fade_out": 0.6
+      "fade_out": 0.6,
+      "_what": "Owner 2026-08-16: '27:49 \"Fight for Us\" -- same font/size as the other 2. Blue F's.' The owner's stamp is 77.46; 77.728 is the MEASURED shot change beside it (select='gt(scene,0.15)' on this derivative, 0.268 s later), where the jungle cuts to a wide ocean surface -- an even mid-dark field that a centre title sits on cleanly. The card lands ON the cut."
+    },
+    {
+      "id": "for-nova",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "center",
+      "text": "For Nóva",
+      "at": 106.0,
+      "dur": 3.5,
+      "fade_in": 0.6,
+      "fade_out": 0.6,
+      "_what": "Owner 2026-08-16: '28:20 Same font/placement as the others: \"For Nóva\" ... This section was originally shorted, lengthen it a bit for dramatic purposes for a few seconds before going into the credits', and their answer on HOW: hold it longer on the picture that is already there. 28:20 is 108.46 on this clock and the passage ends at 109.5, which is one second of card. RUNNING PAST 109.5 IS RULED OUT BY MEASUREMENT, not by preference: the source's own burned credits ('(c) A LOVELY BUNCH OF COCONUTS 2024 / DIRECTED BY VILLE LIPIAINEN') fade in from 111.0 and are readable by 111.5. So the card comes UP EARLIER instead, at 106.0, and holds 3.5 s to the out point -- three and a half times the screen time, no new picture, and no risk of somebody else's credit under ours. It plays over the sunken hull interior, measured at YAVG 24-30 and falling, which is the darkest bed in the passage."
     }
   ]
 }

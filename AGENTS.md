@@ -68,6 +68,35 @@ caveats go after, and go short.
 publish a wrong credit — but "this cut could be better" is never a reason to
 withhold it.
 
+**A blocked act is seated, not waited for.** Owner, 2026-08-16, verbatim: *"I'd
+rather have broken plates than no video."* An act whose plates cannot be placed
+still plays: render it without them, record what is unresolved, and assemble the
+programme. Nothing in this repo may hold the show back for a card.
+
+**"Broken" means missing. It never means stale, and it never means false.**
+Owner, same session: *"stale is never ok because that's wrong."* The licence is
+exactly one square wide:
+
+| | |
+|---|---|
+| A plate that is **absent** because nobody could place it | Ship it missing. Record it. |
+| A plate that is **stale** — rendered from copy or a template that has since moved | **Never.** Re-render it. If it cannot be re-rendered, drop it. |
+| A plate placed on a shot the evidence does not support | **Never.** Omit it instead. |
+
+Stale is not a lesser fault than misplaced; it is the same fault with an older
+timestamp. It puts copy on screen that the record no longer says, which is how
+the main title once shipped 17 hours out of date because its PNGs merely
+*existed*. **Existence is not freshness.** Every card and plate is re-rendered
+from its current template before its act is rebuilt — and an act whose plates
+cannot be brought current ships with those plates **removed**, not with the old
+ones carried through.
+
+A cue 38 seconds from its shot is not a broken plate either; it is a real
+person's words against footage they were not written for. Omission degrades.
+Stale and misplaced both lie. When a plate cannot be placed on current evidence,
+**drop that plate and ship the act** — the film keeps moving and nobody is
+misquoted.
+
 ## The three rules that outrank convenience
 
 1. **`clean` is the primary gate, and it must be positively established.** An

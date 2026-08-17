@@ -86,8 +86,10 @@ def test_enable_windows_are_half_open(tmp_path):
         build_command(tmp_path).index("-filter_complex") + 1]
     assert "between(" not in graph
     assert "enable='gte(t,6.920)*lt(t,10.320)'" in graph
-    # Break the Chain: 33.000 + 4.400, half-open.
-    assert "enable='gte(t,33.000)*lt(t,37.400)'" in graph
+    # Seven Days: 33.000 + 4.200, half-open.
+    assert "enable='gte(t,33.000)*lt(t,37.200)'" in graph
+    # For Nóva, the last card, holds to the passage's own out point.
+    assert "enable='gte(t,106.000)*lt(t,109.500)'" in graph
 
 
 def test_alpha_fades_stay_inside_their_windows(tmp_path):

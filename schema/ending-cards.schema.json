@@ -48,10 +48,10 @@
           "minimum": 1
         },
         "frames": {
-          "const": 1439
+          "const": 1380
         },
         "duration": {
-          "const": 24.007317
+          "const": 23.023
         },
         "plate_ids": {
           "type": "array",
@@ -62,6 +62,11 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "_black_hold": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the tail hold is the length it is. Prose, not consumed by the builder."
         }
       }
     },
@@ -80,7 +85,7 @@
           "const": 396.32
         },
         "source_out": {
-          "const": 427.44
+          "const": 499.3
         },
         "active_y": {
           "const": 138
@@ -90,20 +95,25 @@
         },
         "plate_ids": {
           "type": "array",
-          "minItems": 7,
-          "maxItems": 7,
+          "minItems": 10,
+          "maxItems": 10,
           "uniqueItems": true,
           "items": {
             "type": "string",
             "minLength": 1
           }
+        },
+        "_window": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the window is what it is. Prose, not consumed by the builder."
         }
       }
     },
     "plates": {
       "type": "array",
-      "minItems": 12,
-      "maxItems": 12,
+      "minItems": 15,
+      "maxItems": 15,
       "items": {
         "oneOf": [
           {
@@ -263,6 +273,16 @@
             "fade_out": {
               "type": "number",
               "minimum": 0
+            },
+            "_what": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Why this card reads and sits the way it does, in the owner's words where they authored it. Prose, not rendered."
+            },
+            "_retired_copy": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Copy this plate used to carry. Retired strings are authored copy and are kept, never deleted."
             }
           }
         }
