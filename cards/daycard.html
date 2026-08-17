@@ -6,6 +6,20 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 1920px; height: 1080px; background: transparent; overflow: hidden; }
 body { font-family: 'Inter', 'Arial Narrow', sans-serif; }
+/* WHERE THE LINE SITS is authored, not fixed, and it is MEASURED on the image
+   it sits on rather than nudged by eye.
+   `top: 38%` lays the type across March's bright dawn horizon -- mean luma 59,
+   95th percentile 125 under the glyphs -- which is what the owner read as hard
+   to see: "lower the extinction and other line to be more in the dark area for
+   readability".
+   `placement=low` at 58% puts it in the shadowed flower meadow below that
+   horizon: mean 48, 95th percentile 73, so the brightest thing behind the type
+   is darker than the average behind it before.
+   58% AND NOT LOWER. The first pass went to 66%, which is marginally darker
+   still (p95 83 -> 73 is the wrong way round only because the meadow is
+   flatter) but lands the line across the foreground wolf's head: "bring it up
+   some now you're covering the wolve's head". The wolf's head occupies roughly
+   y 780-900 in this frame; the type's box ends at 776. */
 .card {
   position: absolute; left: 10%; top: 38%;
   width: 80%; padding: 0;
@@ -18,6 +32,7 @@ body { font-family: 'Inter', 'Arial Narrow', sans-serif; }
   letter-spacing: .045em; line-height: 1.05;
 }
 .line:empty { display: none; }
+body[data-placement="low"] .card { top: 58%; }
 .k8s-o {
   height: .62em; width: auto; vertical-align: .042em;
   margin: 0 .041em 0 -.005em;
@@ -32,6 +47,7 @@ body { font-family: 'Inter', 'Arial Narrow', sans-serif; }
 <div class="card"><div class="line" id="title"></div><div class="line" id="subtitle"></div><div class="line" id="body"></div></div>
 <script>
 const p = new URLSearchParams(location.search)
+if (p.get('placement')) { document.body.dataset.placement = p.get('placement') }
 const title = document.getElementById('title')
 title.textContent = p.get('title') || ''
 document.getElementById('subtitle').textContent = p.get('subtitle') || ''

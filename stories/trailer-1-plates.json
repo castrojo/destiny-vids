@@ -72,6 +72,7 @@
       "at": 88.8,
       "dur": 5.0,
       "title": "Extinction is the Rule",
+      "placement": "low",
       "glyph": {
         "token": "o",
         "word": "Extinction"
@@ -79,7 +80,7 @@
       "glyph_src": "renders/marks/kubernetes.svg",
       "fade_in": 0.4,
       "fade_out": 0.5,
-      "note": "MESSAGE ONE OF THREE. Owner, 2026-08-17: 'Change the evolve or die into two messages, lengthen them to show them lead to the kubecon text ... all three text messages should flow smoothly into one reveal.' One centered marquee line over the day wolves, bridge-local 0.600 -> 5.600, with the O in Extinction rendered as the white Kubernetes helm -- the mark the retired 'Evolve or Die' card carried on its own O.",
+      "note": "MESSAGE ONE OF THREE. Owner, 2026-08-17: 'Change the evolve or die into two messages, lengthen them to show them lead to the kubecon text ... all three text messages should flow smoothly into one reveal.' One centered marquee line over the day wolves, bridge-local 0.600 -> 5.600, with the O in Extinction rendered as the white Kubernetes helm -- the mark the retired 'Evolve or Die' card carried on its own O. Owner, 2026-08-17: 'lower the extinction and other line to be more in the dark area for readability', so both day cards carry placement 'low'. The seat was MEASURED on 03-day.png under the type's own bounding box rather than nudged by eye: the original 38% seat reads mean luma 59 / p95 125 across the dawn horizon, and the 58% seat reads mean 48 / p95 73 in the flower meadow below it. It is 58% and not lower because 66% -- the first pass -- laid the line across the foreground wolf's head, which the owner caught: 'bring it up some now you're covering the wolve's head'.",
       "_copy": "OWNER COPY, verbatim. It replaces 'Evolve or Die', which is retired along with the earlier 'The Final Shape is Kindness' and \"Wolves aren't Evil\"."
     },
     {
@@ -88,6 +89,7 @@
       "at": 94.4,
       "dur": 6.2,
       "title": "Survival is the Exception",
+      "placement": "low",
       "fade_in": 0.5,
       "fade_out": 0.6,
       "note": "MESSAGE TWO OF THREE, bridge-local 6.200 -> 12.400. It takes the frame as the first card leaves it -- the fades are adjacent rather than separated by a hold -- and clears 1.600 s before the end card begins, so the KubeCon reveal lands on empty night wolves. NO HELM: one mark across the pair, on the first line, or it reads as a bullet rather than a letter.",

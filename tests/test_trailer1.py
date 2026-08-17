@@ -255,6 +255,22 @@ def test_the_two_day_cards_lead_into_the_kubecon_reveal(manifest):
     assert plate(manifest, "endcard-event")["at"] == pytest.approx(endcard_at)
 
 
+def test_the_day_cards_sit_in_the_wallpapers_dark_band(manifest):
+    """Owner, 2026-08-17: 'lower the extinction and other line to be more in
+    the dark area for readability'.
+
+    The seat is authored on the plate rather than baked into the template,
+    which is a real distinction here: the default 38% is right for a card over
+    a different image, and this pair is over one whose horizon is its brightest
+    band. 58% is measured, not nudged: it is the dark meadow, and it is not the
+    66% of the first pass, which covered the foreground wolf's head."""
+    for card in T.day_cards(manifest):
+        assert card["placement"] == "low"
+    template = (REPO_ROOT / "cards" / "daycard.html").read_text()
+    assert 'body[data-placement="low"] .card { top: 58%; }' in template
+    assert "dataset.placement = p.get('placement')" in template
+
+
 def test_the_day_cards_are_overlaid_from_the_record(manifest):
     """Their windows are authored copy timing, so the graph takes them from the
     manifest. The first build hard-coded one card's fades in the script, which
