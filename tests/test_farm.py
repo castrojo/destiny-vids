@@ -150,8 +150,7 @@ def test_the_workflow_is_a_plain_workflow_pinned_to_exo0():
     wf = farm.build_workflow("farm-x-ab12", "echo hi",
                              namespace="argo", image=farm.DEFAULT_IMAGE,
                              cpu="2", limit_cpu="24", memory="4Gi",
-                             limit_memory="16Gi", node="exo-0",
-                             service_account="argo", keep=False)
+                             limit_memory="16Gi", node="exo-0", keep=False)
     assert wf["kind"] == "Workflow"  # a WorkflowTemplate would be GitOps'd
     spec = wf["spec"]
     assert spec["serviceAccountName"] == "argo"
@@ -175,7 +174,7 @@ def test_keep_omits_the_ttl_backstop():
     wf = farm.build_workflow("farm-x-ab12", "s", namespace="argo", image="i",
                              cpu="1", limit_cpu="1", memory="1Gi",
                              limit_memory="2Gi",
-                             node="exo-0", service_account="argo", keep=True)
+                             node="exo-0", keep=True)
     assert "ttlStrategy" not in wf["spec"]
 
 
@@ -629,8 +628,7 @@ def test_the_farm_is_both_nodes_unless_told_otherwise():
     nothing is pinned by default and the scheduler spreads the work."""
     assert farm.DEFAULT_NODE is None
     common = dict(namespace="argo", image="i", cpu="2", limit_cpu="24",
-                  memory="4Gi", limit_memory="16Gi", service_account="argo",
-                  keep=False)
+                  memory="4Gi", limit_memory="16Gi", keep=False)
     template = farm.build_workflow(
         "n", "s", node=None, **common)["spec"]["templates"][0]
     assert "nodeSelector" not in template

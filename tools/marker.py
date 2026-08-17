@@ -95,37 +95,6 @@ def marker_path(text, sub=None):
     return path
 
 
-def title_card_path(title, subtitle=None, body=None):
-    """The opening title card, as a full-frame still the cut can concatenate.
-
-    The card itself is ``tools/plate.py``'s existing ``kind: "title"`` shape --
-    the deck's ``title`` / ``subtitle`` / ``body`` and nothing else -- composited
-    onto black so it can stand in the timeline as a shot rather than being
-    burned over one. This is what blacks out the source's own logo: the picture
-    underneath is not dimmed, it is simply not there.
-    """
-    from tools.plate import render_plate
-
-    out_dir = DEFAULT_DIR
-    out_dir.mkdir(parents=True, exist_ok=True)
-    key = "|".join([title, subtitle or "", *(body or [])])
-    path = out_dir / f"title-{slug(key)}.png"
-    if path.exists():
-        return path
-
-    spec = {"kind": "title", "title": title}
-    if subtitle:
-        spec["subtitle"] = subtitle
-    if body:
-        spec["body"] = list(body)
-    card = render_plate(spec)
-
-    frame = Image.new("RGBA", (W, H), (0, 0, 0, 255))
-    frame.alpha_composite(card, ((W - card.width) // 2, (H - card.height) // 2))
-    frame.save(path)
-    return path
-
-
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
