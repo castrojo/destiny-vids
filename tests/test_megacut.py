@@ -889,6 +889,153 @@ def test_default_jobs_scales_with_cores_and_items(monkeypatch):
     assert megacut.default_jobs(13) == 1, "a small machine stays serial"
 
 
+# --- the farm path: ENCODE segments on the cluster, COPY segments local -----
+#
+# Owner's ruling, 2026-08-16: "always prefer remote encoding when available".
+# The windowed acts are still long x264 runs even with the conform cache, so
+# they ride tools/farm.py; a remux is not an encode, so the copy path never
+# leaves this host. All of it offline: the cluster call and the probes are
+# faked, and the assertions are about WHO is asked to build what.
+
+def _assemble_with_fakes(tmp_path, monkeypatch, items, **assemble_kw):
+    """Drive assemble() with no ffmpeg, no cluster, no probes. Returns the
+    (farmed, verified) call records."""
+    _, plan = _plan(tmp_path, items)
+    _run_fake_ffmpeg(monkeypatch)
+    farmed = []
+    verified = []
+
+    def fake_farm(argv, *, inputs, out, expected_duration=None, **kw):
+        farmed.append({"argv": argv, "inputs": inputs, "out": Path(out),
+                       "expected_duration": expected_duration})
+        Path(out).touch()
+
+    monkeypatch.setattr(megacut.farm, "run_ffmpeg_on_cluster", fake_farm)
+    monkeypatch.setattr(megacut, "verify_segment",
+                        lambda plan_, i, seg: verified.append(i) or 1.0)
+    total = sum(megacut.item_duration(it) for it in plan["items"])
+    monkeypatch.setattr(megacut, "probe_duration",
+                        lambda path, stream=None: total)
+    megacut.assemble(plan, tmp_path / "out.mp4", jobs=1, **assemble_kw)
+    return plan, farmed, verified
+
+
+def test_farm_mode_sends_encode_segments_to_the_cluster_only(tmp_path, monkeypatch):
+    """A card (always an encode) and a WINDOWED clip ride the farm; the
+    conformable unwindowed clip stays on the local copy path -- shipping a
+    stream copy to a cluster to memcpy it would be slower than doing it here.
+    Every segment is verified wherever it was built."""
+    plan, farmed, verified = _assemble_with_fakes(tmp_path, monkeypatch, [
+        {"kind": "card", "image": "c.png", "dur": 5.0},
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+        {"kind": "clip", "path": "b.mp4", "audio": "source", "trim_to": 7.0},
+    ], use_farm=True, farm_jobs=2, farm_threads=8)
+    # farmed is filled from worker threads: compare as a set keyed by segment.
+    by_seg = {f["out"].name: f for f in farmed}
+    assert sorted(by_seg) == ["seg000.mkv", "seg002.mkv"]
+    for f in farmed:
+        assert "libx264" in f["argv"], "a farmed segment is a real encode"
+        assert "copy" != f["argv"][f["argv"].index("-c:v") + 1]
+    assert by_seg["seg000.mkv"]["inputs"][0].endswith("c.png")
+    assert by_seg["seg002.mkv"]["inputs"][0].endswith("b.mp4")
+    # The farm-side check gets the item's own clock, not the file's.
+    assert by_seg["seg000.mkv"]["expected_duration"] == 5.0
+    assert by_seg["seg002.mkv"]["expected_duration"] == 7.0
+    assert sorted(verified) == [0, 1, 2], "copy AND farm segments verify"
+
+
+def test_no_farm_means_everything_stays_local(tmp_path, monkeypatch):
+    _, farmed, _ = _assemble_with_fakes(tmp_path, monkeypatch, [
+        {"kind": "card", "image": "c.png", "dur": 5.0},
+        {"kind": "clip", "path": "b.mp4", "audio": "source", "trim_to": 7.0},
+    ])
+    assert farmed == []
+
+
+def test_a_farm_failure_fails_the_build_before_the_join(tmp_path, monkeypatch):
+    _, plan = _plan(tmp_path, [
+        {"kind": "clip", "path": "b.mp4", "audio": "source", "trim_to": 7.0},
+    ])
+    _run_fake_ffmpeg(monkeypatch)
+
+    def boom(argv, **kw):
+        raise megacut.farm.FarmError("pod cannot run: unschedulable")
+    monkeypatch.setattr(megacut.farm, "run_ffmpeg_on_cluster", boom)
+    with pytest.raises(megacut.farm.FarmError, match="unschedulable"):
+        megacut.assemble(plan, tmp_path / "out.mp4", jobs=1, use_farm=True)
+    assert not (tmp_path / "out.mp4").exists()
+
+
+def _main_with_fake_cluster(tmp_path, monkeypatch, capsys, extra_args,
+                            available):
+    """Run main() with the cluster probe and the build itself faked; returns
+    the kwargs assemble() saw."""
+    plan_path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    monkeypatch.setattr(megacut.farm, "cluster_available",
+                        lambda *a, **k: available)
+    monkeypatch.setattr(megacut, "stale_seated_acts", lambda plan: [])
+    seen = {}
+    monkeypatch.setattr(megacut, "assemble",
+                        lambda plan, out_path, **kw: seen.update(kw))
+    megacut.main([str(plan_path), *extra_args])
+    return seen, capsys.readouterr().err
+
+
+def test_remote_is_the_default_when_the_cluster_is_reachable(tmp_path, monkeypatch, capsys):
+    seen, err = _main_with_fake_cluster(tmp_path, monkeypatch, capsys, [],
+                                        (True, ""))
+    assert seen["use_farm"] is True
+    assert "--local" in err, "the escape hatch is advertised in the output"
+
+
+def test_an_unreachable_cluster_falls_back_with_a_stated_reason(tmp_path, monkeypatch, capsys):
+    """The bug the owner caught was a SILENT local default: the fallback must
+    say why, in the output, every time."""
+    seen, err = _main_with_fake_cluster(tmp_path, monkeypatch, capsys, [],
+                                        (False, "kubectl not on PATH"))
+    assert seen["use_farm"] is False
+    assert "UNREACHABLE" in err and "kubectl not on PATH" in err
+
+
+def test_local_forces_local_even_with_a_healthy_cluster(tmp_path, monkeypatch, capsys):
+    calls = []
+
+    def recording_available(*a, **k):
+        calls.append(1)
+        return (True, "")
+    monkeypatch.setattr(megacut.farm, "cluster_available", recording_available)
+    monkeypatch.setattr(megacut, "stale_seated_acts", lambda plan: [])
+    seen = {}
+    monkeypatch.setattr(megacut, "assemble",
+                        lambda plan, out_path, **kw: seen.update(kw))
+    plan_path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    megacut.main([str(plan_path), "--local"])
+    assert seen["use_farm"] is False
+    assert calls == [], "--local never even asks the cluster"
+    assert "--local given" in capsys.readouterr().err
+
+
+def test_farm_flag_on_an_unreachable_cluster_still_ships_locally(tmp_path, monkeypatch, capsys):
+    """Degrade, never block: --farm pins the posture, it does not turn a
+    down cluster into no video."""
+    seen, err = _main_with_fake_cluster(tmp_path, monkeypatch, capsys,
+                                        ["--farm"], (False, "no route to host"))
+    assert seen["use_farm"] is False
+    assert "no route to host" in err
+
+
+def test_farm_and_local_are_mutually_exclusive(tmp_path):
+    plan_path, _ = _plan(tmp_path, [
+        {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
+    ])
+    with pytest.raises(SystemExit, match="mutually exclusive"):
+        megacut.main([str(plan_path), "--farm", "--local"])
+
+
 # --- trim_from: skipping an act's authored head, in the programme only ------
 #
 # Issue #206. Two acts opened static behind their slide: act II with a 10.5 s

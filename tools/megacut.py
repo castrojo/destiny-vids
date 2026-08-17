@@ -105,6 +105,12 @@ So the encode moved out of the loop:
   workers at fewer threads each beat one worker at all of them; the default
   is ``min(cpu_count() // 6, items)``. The concat list is written from the
   plan's index order, never from completion order -- order is the programme.
+* The remaining ENCODE segments are still long x264 runs, so they go to the
+  ghost k3s cluster through ``tools/farm.py``: **remote is the default
+  whenever the cluster answers** (owner's ruling), one pod per segment,
+  ``--farm-jobs`` in flight at most. The COPY segments stay local -- a remux
+  is not an encode. An unreachable cluster falls back to the local pool with
+  the reason printed; ``--local`` forces that path on purpose.
 
 A plan that does not target the delivery spec (another fps or frame size)
 takes the original per-segment encode path unchanged. ``verify_segment`` and
@@ -129,6 +135,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from tools import conform  # noqa: E402  (the delivery spec + conform cache)
+from tools import farm  # noqa: E402  (ENCODE segments run on the cluster)
 
 # 59.94, as a rational so ffmpeg never rounds it to 60.
 DEFAULT_FPS = "60000/1001"
@@ -977,6 +984,15 @@ def default_jobs(n_items):
     return max(1, min((os.cpu_count() or 1) // 6, n_items))
 
 
+# The farm defaults: how many ENCODE segments are in flight on the cluster at
+# once, and how many ffmpeg threads each pod spends. Every in-flight segment
+# is a kubectl cp of a large input, so the bound is staging bandwidth as much
+# as CPU; 3 x 8 threads sits inside exo-0's ~24 free cores with headroom for
+# the control plane and the local COPY segments running beside them.
+DEFAULT_FARM_JOBS = 3
+DEFAULT_FARM_THREADS = 8
+
+
 def _copy_path_ok(plan, allow_copy=True):
     """Only a plan targeting the delivery spec can stream-copy: its segments
     must BE spec files, or the conform cache would hand back 59.94/1080p
@@ -1009,8 +1025,32 @@ def _segment_worker(job):
     return index
 
 
+def _farm_segment_worker(job):
+    """Encode one segment ON THE CLUSTER via tools/farm.py, then verify it.
+
+    The argv is the very one ``build_segment_command`` produced -- farm
+    staging rewrites its paths to the pod's view, so the sound takes exactly
+    the chain the local build would (the audio tenet: nothing is re-encoded
+    to move it). The verify is the same one the local worker runs: a segment
+    that re-times fails the build the moment it lands (#88), wherever it ran.
+    """
+    argv, plan, index, seg = job
+    item = plan["items"][index]
+    src = resolve(item["path"]) if item["kind"] == "clip" else resolve(item["image"])
+    farm.run_ffmpeg_on_cluster(argv, inputs=[src], out=seg,
+                               expected_duration=item_duration(item),
+                               label=f"farm[seg{index:03d}]",
+                               # The segment lives in a tempfile dir the ffmpeg
+                               # CONTAINER cannot see; probe it with the same
+                               # native ffprobe every other megacut check uses.
+                               ffprobe=[ffprobe_bin()])
+    verify_segment(plan, index, seg)
+    return index
+
+
 def assemble(plan, out_path, log=None, jobs=None,
-             conform_cache=None, allow_copy=True):
+             conform_cache=None, allow_copy=True, use_farm=False,
+             farm_jobs=None, farm_threads=None):
     """Build every segment, then join them. Returns the output path.
 
     Every segment is verified against its source's length as it is built, and
@@ -1019,6 +1059,14 @@ def assemble(plan, out_path, log=None, jobs=None,
     short, ffmpeg exited 0, and the file played fine). This holds on the
     stream-copy path too -- a remux that re-times is exactly the failure
     those checks exist for, so they do not come off when the encode does.
+
+    With ``use_farm`` the ENCODE segments run on the ghost k3s cluster through
+    ``tools/farm.py`` (one pod per segment, ``farm_jobs`` in flight at most --
+    each in-flight segment is a kubectl cp of a large input, so the bound is
+    staging bandwidth as much as CPU). The COPY segments stay local: remuxing
+    a stream is not an encode, and shipping the bytes to a cluster to memcpy
+    them would be slower. Which way each segment went is logged, and the same
+    per-segment verify runs on both.
 
     The segments land in a temporary directory that is removed afterwards --
     they are pure intermediates, and keeping them would invite somebody to
@@ -1062,8 +1110,12 @@ def assemble(plan, out_path, log=None, jobs=None,
 
         # Phase 2: the segments. Cards always encode (they are generated);
         # clips copy their picture when the plan targets the delivery spec.
+        # With use_farm the encodes go to the cluster; the copies stay here.
         segments = [None] * n_items
         work = []
+        farmed = set()
+        farm_jobs = max(1, min(farm_jobs or DEFAULT_FARM_JOBS, n_items))
+        farm_threads = max(1, farm_threads or DEFAULT_FARM_THREADS)
         for i, item in enumerate(plan["items"]):
             seg = tmp / f"seg{i:03d}.mkv"
             segments[i] = seg
@@ -1071,17 +1123,38 @@ def assemble(plan, out_path, log=None, jobs=None,
                 argv = build_segment_copy_command(plan, i, seg, sources[i])
                 mode = "copy"
             else:
-                argv = build_segment_command(plan, i, seg, threads=threads)
-                mode = "encode"
+                argv = build_segment_command(
+                    plan, i, seg,
+                    threads=farm_threads if use_farm else threads)
+                mode = "encode->farm" if use_farm else "encode"
+                if use_farm:
+                    farmed.add(i)
             log(f"  segment {i + 1}/{n_items} [{mode}]: "
                 f"{item.get('label', item['kind'])}")
             work.append((argv, plan, i, seg))
-        if jobs > 1 and len(work) > 1:
-            with ProcessPoolExecutor(max_workers=jobs) as pool:
-                list(pool.map(_segment_worker, work))
-        else:
-            for w in work:
-                _segment_worker(w)
+        # Plan order is preserved in both lists: the farm pool takes the
+        # encode indices, the local pool everything else (which is the whole
+        # list, untouched, when the farm is off).
+        farm_work = [w for w in work if w[2] in farmed]
+        local_work = [w for w in work if w[2] not in farmed]
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=farm_jobs) as farm_pool:
+            farm_futures = []
+            if farm_work:
+                log(f"  farming {len(farm_work)} encode segment(s) to the "
+                    f"cluster, {farm_jobs} in flight x {farm_threads} threads")
+                farm_futures = [farm_pool.submit(_farm_segment_worker, w)
+                                for w in farm_work]
+            if jobs > 1 and len(local_work) > 1:
+                with ProcessPoolExecutor(max_workers=jobs) as pool:
+                    list(pool.map(_segment_worker, local_work))
+            else:
+                for w in local_work:
+                    _segment_worker(w)
+            # A farm failure fails the build here, before the join -- the
+            # same place a local failure surfaces.
+            for fut in farm_futures:
+                fut.result()
 
         list_path = tmp / "segments.txt"
         list_path.write_text(
@@ -1375,6 +1448,25 @@ def main(argv=None):
                     help="build this many segments in parallel "
                          "(default min(cpu//6, items)); x264 saturates early, "
                          "so workers x few threads beats one worker x all cores")
+    ap.add_argument("--farm", action="store_true",
+                    help="encode the ENCODE segments on the ghost k3s "
+                         "cluster. This is ALREADY the default whenever the "
+                         "cluster is reachable (owner's ruling: always prefer "
+                         "remote encoding); the flag only pins the posture. "
+                         "If the cluster is unreachable the build still runs "
+                         "locally, with the reason printed -- degrade, never "
+                         "block. COPY segments always stay local: a remux is "
+                         "not an encode.")
+    ap.add_argument("--local", action="store_true",
+                    help="force the local process pool even when the cluster "
+                         "is reachable (the escape hatch)")
+    ap.add_argument("--farm-jobs", type=int, default=None,
+                    help=f"ENCODE segments in flight on the cluster at once "
+                         f"(default {DEFAULT_FARM_JOBS}); each in-flight "
+                         f"segment is a kubectl cp of a large input")
+    ap.add_argument("--farm-threads", type=int, default=None,
+                    help=f"ffmpeg -threads per farmed encode "
+                         f"(default {DEFAULT_FARM_THREADS})")
     ap.add_argument("--conform-cache",
                     help="where conformed clip sources are cached "
                          "(default: $DESTINY_CONFORM_CACHE or "
@@ -1388,6 +1480,10 @@ def main(argv=None):
                          "the default refuses, because that is how stale "
                          "programmes shipped)")
     args = ap.parse_args(argv)
+    if args.farm and args.local:
+        raise SystemExit("--farm and --local are mutually exclusive: the farm "
+                         "is already the default when the cluster is reachable; "
+                         "--local is the escape hatch from it")
 
     plan = load_plan(args.plan, require_sources=not (args.chapters or args.locate))
     if args.chapters:
@@ -1443,9 +1539,31 @@ def main(argv=None):
             print(f"WARNING: act {n} is STALE and seated anyway "
                   f"(--allow-stale): {label}", file=sys.stderr)
 
+    # Remote encoding is the DEFAULT, per the owner's ruling ("always prefer
+    # remote encoding when available"). The fallback to this workstation is
+    # allowed exactly two ways: --local, or a cluster that does not answer --
+    # and both say so out loud. A SILENT local encode is the bug this guards.
+    use_farm = False
+    if args.local:
+        print("megacut: --local given; encoding segments on THIS host even "
+              "though the cluster may be reachable", file=sys.stderr)
+    else:
+        cluster_ok, why = farm.cluster_available()
+        if cluster_ok:
+            use_farm = True
+            print(f"megacut: cluster reachable; ENCODE segments run on "
+                  f"{farm.DEFAULT_NODE} (--local to force this host)",
+                  file=sys.stderr)
+        else:
+            print(f"megacut: cluster UNREACHABLE ({why}); falling back to "
+                  f"local segment encodes -- fix kubectl/KUBECONFIG to use "
+                  f"the farm", file=sys.stderr)
+
     print(f"assembling {len(plan['items'])} items -> {out_path}", file=sys.stderr)
     assemble(plan, out_path, jobs=args.jobs,
-             conform_cache=args.conform_cache, allow_copy=not args.no_copy)
+             conform_cache=args.conform_cache, allow_copy=not args.no_copy,
+             use_farm=use_farm, farm_jobs=args.farm_jobs,
+             farm_threads=args.farm_threads)
     print(f"wrote {out_path}")
     return 0
 

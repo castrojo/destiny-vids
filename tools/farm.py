@@ -59,6 +59,14 @@ cores (ghost only ~14), so the pod requests a schedulable 2 CPU / 4 Gi and
 may burst to ``--limit-cpu`` 24 / ``--limit-memory`` 16 Gi — requesting 24
 gets you Pending; requesting 2 with a limit of 24 measures 24 cores (nproc)
 inside the pod.
+
+TWO ENTRY POINTS share the machinery: the CLI above (one file, chunked
+internally) and ``run_ffmpeg_on_cluster`` — one caller-supplied ffmpeg argv
+run verbatim in a pod, with its local input paths staged by kubectl cp and
+rewritten to the pod's view (``rewrite_argv_for_pod``). megacut's ENCODE
+segments are the first caller of the second; remote is the default whenever
+the cluster is reachable, per the owner's ruling, and local is the stated
+fallback, never the silent one.
 """
 
 from __future__ import annotations
@@ -110,6 +118,36 @@ DEFAULT_AUDIO_ARGS = ["-c:a", "copy"]
 # audio frame granularity is tens of milliseconds. Half a second sits cleanly
 # between the two.
 SEAM_TOLERANCE_S = 0.5
+
+# Named so a test can point it somewhere that does not exist (megacut's
+# LINUXBREW_FFMPEG pattern): the NATIVE ffprobe on an atomic Fedora/Bluefin
+# host, beside the full linuxbrew ffmpeg.
+LINUXBREW_FFPROBE = "/home/linuxbrew/.linuxbrew/bin/ffprobe"
+
+
+def native_ffprobe():
+    """An ffprobe that can see the WHOLE local filesystem.
+
+    ``find_ffprobe`` prefers the running ffmpeg CONTAINER on this host, and
+    that container mounts only ``$HOME`` — a fetched output parked in a
+    tempfile directory (``/var/tmp``, where megacut's segments live) is "No
+    such file or directory" to it, which reads exactly like a failed
+    download. Verification of a LOCAL file the caller placed anywhere wants a
+    native probe: ``DESTINY_FFPROBE``, the binary beside ``DESTINY_FFMPEG``,
+    the linuxbrew build, and only then the container resolver (fine whenever
+    the output lives under ``$HOME``, as the farm CLI's does).
+    """
+    override = os.environ.get("DESTINY_FFPROBE")
+    if override:
+        return shlex.split(override)
+    ffmpeg_override = os.environ.get("DESTINY_FFMPEG")
+    if ffmpeg_override:
+        head, sep, tail = shlex.split(ffmpeg_override)[0].rpartition("ffmpeg")
+        if sep and Path(f"{head}ffprobe{tail}").exists():
+            return [f"{head}ffprobe{tail}"]
+    if Path(LINUXBREW_FFPROBE).exists():
+        return [LINUXBREW_FFPROBE]
+    return find_ffprobe()
 
 
 class FarmError(RuntimeError):
@@ -521,14 +559,14 @@ def cluster_available(kubeconfig=None, namespace=DEFAULT_NAMESPACE):
     return True, ""
 
 
-def _stream_logs(kc, pod):
+def _stream_logs(kc, pod, prefix="  "):
     """Copy the pod's main-container log to stdout until the container exits."""
     proc = subprocess.Popen(
         kc.base + ["-n", kc.namespace, "logs", "-f", "--tail=-1", "-c", "main", pod],
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
         errors="replace")
     for line in proc.stdout:
-        print(f"  {line}", end="", flush=True)
+        print(f"{prefix}{line}", end="", flush=True)
     proc.wait()
 
 
@@ -544,9 +582,20 @@ def _tail_log(kc, pod):
 # Executors
 
 
-def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
-                   memory, limit_memory, node, service_account, storage, keep,
-                   timeout):
+def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
+                        cpu, limit_cpu, memory, limit_memory, node,
+                        service_account, storage, keep, timeout, desc,
+                        label="farm", log_prefix="  "):
+    """The generic pod lifecycle: submit, stage, wait, fetch, clean up.
+
+    ``uploads`` is [(local_path, work_dir-relative staging path)]; every file
+    lands before the ``in/.ready`` marker is touched. ``out_rel`` is the
+    work_dir-relative result the pod's ``out/.done.json`` vouches for, fetched
+    to the local ``out``. This is the machinery both the chunked single-file
+    CLI (``run_on_cluster``) and the one-argv capability
+    (``run_ffmpeg_on_cluster``) share — the differences are all in the script
+    and the upload list, not here.
+    """
     deadline = time.monotonic() + timeout
     kc.apply_json(build_pvc(name, namespace=kc.namespace, storage=storage))
     kc.apply_json(build_workflow(name, script, namespace=kc.namespace,
@@ -554,8 +603,7 @@ def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
                                  memory=memory, limit_memory=limit_memory,
                                  node=node,
                                  service_account=service_account, keep=keep))
-    print(f"farm: workflow {name} submitted (node {node}, "
-          f"{len(plan['chunks'])} chunks x up to {limit_cpu} cpu)")
+    print(f"{label}: workflow {name} submitted (node {node}, {desc})")
     try:
         pod = ""
         while time.monotonic() < deadline:
@@ -566,7 +614,8 @@ def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
         if not pod:
             raise FarmError("no pod appeared for the workflow")
 
-        print("farm: waiting for the pod (image pull on first run ~5 min)…")
+        print(f"{label}: waiting for the pod (image pull on first run "
+              f"~5 min)…")
         blocker = "pending"
         while time.monotonic() < deadline:
             blocker = pod_blocker(kc.pod_status(pod))
@@ -580,14 +629,18 @@ def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
             _tail_log(kc, pod)
             raise FarmError(f"pod never became Ready (last state: {blocker})")
 
-        logs = threading.Thread(target=_stream_logs, args=(kc, pod), daemon=True)
+        logs = threading.Thread(target=_stream_logs, args=(kc, pod, log_prefix),
+                                daemon=True)
         logs.start()
 
-        size = src.stat().st_size
-        print(f"farm: uploading {size / (1024 ** 2):.1f} MiB …", flush=True)
-        t0 = time.monotonic()
-        kc.cp(src, f"{kc.namespace}/{pod}:{WORK_DIR}/in/{src.name}")
-        print(f"farm: uploaded in {time.monotonic() - t0:.0f}s", flush=True)
+        for local, rel in uploads:
+            size = Path(local).stat().st_size
+            print(f"{label}: uploading {size / (1024 ** 2):.1f} MiB "
+                  f"({Path(local).name}) …", flush=True)
+            t0 = time.monotonic()
+            kc.cp(local, f"{kc.namespace}/{pod}:{WORK_DIR}/{rel}")
+            print(f"{label}: uploaded in {time.monotonic() - t0:.0f}s",
+                  flush=True)
         kc.exec(pod, ["touch", f"{WORK_DIR}/in/.ready"])
 
         # Encode runs; poll for the completion marker the pod writes, watching
@@ -606,10 +659,10 @@ def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
         else:
             raise FarmError(f"encode exceeded --timeout {timeout}s")
 
-        out.parent.mkdir(parents=True, exist_ok=True)
+        Path(out).parent.mkdir(parents=True, exist_ok=True)
         t0 = time.monotonic()
-        kc.cp(f"{kc.namespace}/{pod}:{WORK_DIR}/{plan['out_rel']}", str(out))
-        print(f"farm: downloaded {plan['out_rel']} in "
+        kc.cp(f"{kc.namespace}/{pod}:{WORK_DIR}/{out_rel}", str(out))
+        print(f"{label}: downloaded {out_rel} in "
               f"{time.monotonic() - t0:.0f}s", flush=True)
         kc.exec(pod, ["touch", f"{WORK_DIR}/.fetched"], check=False)
 
@@ -623,12 +676,176 @@ def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
         logs.join(timeout=10)
     finally:
         if keep:
-            print(f"farm: --keep — workflow {name} and PVC {name} left in "
+            print(f"{label}: --keep — workflow {name} and PVC {name} left in "
                   f"namespace {kc.namespace}; delete both when done")
         else:
             kc.delete("workflow", name)
             kc.delete("pvc", name)
     return 0
+
+
+def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
+                   memory, limit_memory, node, service_account, storage, keep,
+                   timeout):
+    return _execute_on_cluster(
+        name=name, script=script,
+        uploads=[(src, f"in/{Path(src).name}")],
+        out_rel=plan["out_rel"], out=out, kc=kc, image=image, cpu=cpu,
+        limit_cpu=limit_cpu, memory=memory, limit_memory=limit_memory,
+        node=node, service_account=service_account, storage=storage,
+        keep=keep, timeout=timeout,
+        desc=f"{len(plan['chunks'])} chunks x up to {limit_cpu} cpu")
+
+
+# --------------------------------------------------------------------------
+# The generic capability: ONE ffmpeg invocation, run on the cluster.
+#
+# megacut's ENCODE segments are the first caller: each is a single argv over
+# one or two local inputs, and each is big enough (minutes of 1080p60 at
+# crf 16 preset slow) to be worth shipping. The chunked path above re-segments
+# one file internally; this path runs the caller's argv VERBATIM — the caller
+# owns the recipe, the farm owns the data movement and the proof.
+
+
+def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
+    """Map a LOCAL ffmpeg argv onto the pod's filesystem view.
+
+    ``argv[0]`` — the local ffmpeg binary, e.g. the linuxbrew build this host
+    needs for H.264 — becomes plain ``ffmpeg``; the farm image carries a full
+    non-free build on PATH, so the recipe travels, not the binary. Every
+    token that IS one of ``inputs`` is staged at ``{work_dir}/in/NN-name``
+    (the ordinal prefix keeps two same-named inputs distinct) and rewritten
+    there; the one token that IS ``out`` is rewritten to
+    ``{work_dir}/out/<name>``.
+
+    Matching is exact-token only, by design: a path embedded inside a filter
+    string would NOT be rewritten, so a caller whose argv works that way is
+    rejected loudly below rather than silently running against a missing pod
+    file. megacut's chains carry no paths inside filters.
+
+    Returns (pod_argv, uploads, pod_out) with uploads as
+    [(local_Path, work_dir-relative staging path)].
+    """
+    inputs = [Path(p) for p in inputs]
+    staged = {}
+    uploads = []
+    for i, p in enumerate(inputs):
+        rel = f"in/{i:02d}-{p.name}"
+        staged[str(p)] = f"{work_dir}/{rel}"
+        uploads.append((p, rel))
+    out_name = Path(out).name  # basename only inside the pod
+    pod_out = f"{work_dir}/out/{out_name}"
+    out_str = str(out)
+
+    seen_inputs = set()
+    seen_out = False
+    pod_argv = ["ffmpeg"]
+    for tok in argv[1:]:
+        if tok in staged:
+            pod_argv.append(staged[tok])
+            seen_inputs.add(tok)
+        elif tok == out_str:
+            pod_argv.append(pod_out)
+            seen_out = True
+        else:
+            pod_argv.append(tok)
+    missing = [str(p) for p in inputs if str(p) not in seen_inputs]
+    if missing:
+        raise FarmError(f"argv never reads staged input(s) {missing} — the "
+                        f"input list and the argv disagree")
+    if not seen_out:
+        raise FarmError(f"argv never writes {out_str} — nothing to fetch "
+                        f"back; the output path must appear verbatim")
+    return pod_argv, uploads, pod_out
+
+
+def pod_script_run(pod_argv, out_rel, *, work_dir=WORK_DIR):
+    """The bash for ONE caller-supplied ffmpeg invocation.
+
+    Same marker protocol as the chunked script — wait for staged input, run,
+    leave a probed ``out/.done.json``, wait to be harvested — because
+    ``_execute_on_cluster`` orchestrates both. A non-zero exit tails the job
+    log into the pod log, which is what the caller streams.
+    """
+    return f"""#!/bin/bash
+set -uo pipefail
+export LC_ALL=C
+cd {work_dir} || {{ echo "no {work_dir} mounted"; exit 1; }}
+mkdir -p in logs out
+say() {{ printf '%s [farm] %s\\n' "$(date +%H:%M:%S)" "$*"; }}
+say "pod up on $(hostname); waiting for input"
+while [ ! -f in/.ready ]; do sleep 2; done
+say "input arrived:"; ls -l in/
+say "running: {shlex.join(pod_argv)}"
+if ! {shlex.join(pod_argv)} > logs/job.log 2>&1; then
+  rc=$?
+  say "job FAILED (rc=$rc)"
+  tail -n 20 logs/job.log
+  exit 1
+fi
+dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 {shlex.quote(out_rel)} 2>/dev/null)
+printf '{{"output":%s,"duration":%s}}\\n' '"{out_rel}"' '"${{dur:-null}}"' > out/.done.json
+say "encoded {out_rel} duration=${{dur:-?}}s; waiting for fetch"
+while [ ! -f .fetched ]; do sleep 2; done
+say "output fetched; pod done"
+"""
+
+
+def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
+                          kubeconfig=None, namespace=DEFAULT_NAMESPACE,
+                          image=DEFAULT_IMAGE, cpu=DEFAULT_CPU,
+                          limit_cpu=DEFAULT_LIMIT_CPU, memory=DEFAULT_MEMORY,
+                          limit_memory=DEFAULT_LIMIT_MEMORY, node=DEFAULT_NODE,
+                          service_account=DEFAULT_SERVICE_ACCOUNT, keep=False,
+                          timeout=DEFAULT_TIMEOUT, expected_duration=None,
+                          label=None, ffprobe=None):
+    """Run ONE local ffmpeg argv on the cluster and fetch its output back.
+
+    The argv is the caller's recipe verbatim — inputs staged by kubectl cp,
+    paths rewritten to the pod's view (``rewrite_argv_for_pod``), output
+    fetched to the local ``out``. The audio tenet is structural here: the
+    SAME argv runs, so the sound takes exactly the generations the local run
+    would — the only difference is whose CPUs do the work.
+
+    Verification is the farm's own rule (exit 0 is not evidence, #88): the
+    fetched file must ffprobe as media with a video stream, and when
+    ``expected_duration`` is given its container duration must land within
+    SEAM_TOLERANCE_S of it. Semantic checks (video extent vs the item's own
+    clock) stay with the caller.
+    """
+    inputs = [Path(p) for p in inputs]
+    out = Path(out)
+    for p in inputs:
+        if not p.exists():
+            raise FarmError(f"input does not exist: {p}")
+    name = name or farm_name(out.name)
+    label = label or f"farm[{name}]"
+    pod_argv, uploads, pod_out = rewrite_argv_for_pod(argv, inputs, out)
+    out_rel = pod_out[len(WORK_DIR) + 1:]
+    script = pod_script_run(pod_argv, out_rel)
+    kc = kc or Kubectl(kubeconfig, namespace)
+    total = sum(p.stat().st_size for p in inputs)
+    _execute_on_cluster(
+        name=name, script=script, uploads=uploads, out_rel=out_rel, out=out,
+        kc=kc, image=image, cpu=cpu, limit_cpu=limit_cpu, memory=memory,
+        limit_memory=limit_memory, node=node, service_account=service_account,
+        storage=storage_for(total), keep=keep, timeout=timeout,
+        desc=f"1 encode x up to {limit_cpu} cpu",
+        label=label, log_prefix=f"  [{name}] ")
+    try:
+        facts = probe(out, ffprobe or native_ffprobe())
+    except (FarmError, RuntimeError) as exc:
+        raise FarmError(f"fetched output does not probe as media: {exc}")
+    if expected_duration is not None:
+        drift = facts["duration"] - float(expected_duration)
+        if abs(drift) > SEAM_TOLERANCE_S:
+            raise FarmError(
+                f"output is {facts['duration']:.3f}s but the caller expected "
+                f"{float(expected_duration):.3f}s — {drift:+.3f}s is a "
+                f"re-time, not rounding (#88)")
+    print(f"{label}: verify ok — {out.name} {facts['duration']:.3f}s "
+          f"{facts['codec_name']} {facts['width']}x{facts['height']}")
+    return facts
 
 
 def _local_progress(plan, done):
