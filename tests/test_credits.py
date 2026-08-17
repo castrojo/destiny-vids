@@ -926,38 +926,92 @@ def test_storytime_follows_the_whole_instrumental_loop(manifest):
     passes = B.bed_passes(manifest["bed"])
     assert len(passes) == 2
     assert passes[0]["bed_id"] == "bed_wish_i_had_an_angel"
-    assert passes[1]["bed_id"] == "bed_storytime"
+    assert passes[1]["bed_id"] == "bed_storytime_album"
     assert len(passes[0]["segments"]) == 2
     assert passes[0]["segments"][0]["start_sec"] == 193.42
+
+
+def test_storytime_pass_is_the_version_with_the_climax(manifest):
+    """Owner, 2026-08-16: 'have the double bass drums here ... We want the
+    double bass drum climax.' The official music video edit (bed_storytime,
+    244.135 s) has no such climax -- it is already decaying into its own end
+    at ~236 s. The album version carries the extended double-kick outro, so
+    the pass is the album bed, and the video edit stays on record beside it.
+    """
+    storytime = B.bed_passes(manifest["bed"])[1]
+    assert storytime["bed_id"] == "bed_storytime_album"
+    assert storytime["media_filename"] == "bed_storytime_album.wav"
+    record = json.loads((REPO_ROOT / "music" /
+                         "bed_storytime_album.json").read_text())
+    assert "measured_climax" in record["grid"], (
+        "the climax must be MEASURED and recorded, never asserted")
+    # The record of the earlier state is kept, not rewritten.
+    assert (REPO_ROOT / "music" / "bed_storytime.json").exists()
 
 
 def test_storytime_pass_skips_its_own_intro(manifest):
     """Storytime enters on its full-band vocal entry, not its quiet intro.
 
-    14.512472 is Storytime's beat 0.368 s ahead of the measured +6.23 dB
-    re-entry at 14.880, so the 0.25 s crossfade clears the hit.
+    22.732336 is the album recording's beat 0.368 s ahead of the measured
+    +11.05 dB re-entry at 23.100, so the 0.25 s crossfade clears the hit.
     """
     storytime = B.bed_passes(manifest["bed"])[1]
     start = storytime["segments"][0]["start_sec"]
     assert start > 0.0, "Storytime must not restart from its quiet intro"
-    assert start == 14.512472
+    assert start == 22.732336
     grid = json.loads((REPO_ROOT / "music" /
-                       "bed_storytime.json").read_text())["grid"]
+                       "bed_storytime_album.json").read_text())["grid"]
     assert any(abs(b - start) < 1e-6 for b in grid["beats"]), (
         "the in point must sit on Storytime's tracked beat, not a round number")
     xf = manifest["bed"].get("crossfade_sec", 0.0)
-    assert start + xf < 14.880, (
-        "the 0.25 s crossfade has to CLEAR before the band arrives at 14.880, "
+    assert start + xf < 23.100, (
+        "the 0.25 s crossfade has to CLEAR before the band arrives at 23.100, "
         "or the hand-over shaves the transient it exists to land on")
 
 
 def test_storytime_pass_stops_at_its_natural_ending(manifest):
-    """Storytime decays naturally to its file end, with no digital padding."""
+    """The pass ends where the ring-out actually ends, not on the file end.
+
+    The album file carries 2.56 s of digital floor after the ring; joining on
+    the file end would close the show on silence (the issue #105 failure).
+    The measured end of the ring lives in the bed record; the span uses it.
+    """
     storytime = B.bed_passes(manifest["bed"])[1]
     record = json.loads((REPO_ROOT / "music" /
-                         "bed_storytime.json").read_text())
+                         "bed_storytime_album.json").read_text())
     end = storytime["segments"][0]["end_sec"]
-    assert end == record["duration_sec"]
+    climax = record["grid"]["measured_climax"]
+    assert end == climax["end_of_music_sec"]
+    assert end < record["duration_sec"], (
+        "the digital tail past the ring must not play")
+
+
+def test_the_wordmark_is_up_for_the_whole_climax(manifest):
+    """Owner: 'hold the bluefin mark until the end of the song.' The mark
+    comes up when the measured double-bass outro arrives and is held to the
+    last note -- the dur_sec is derived from the spans, never a round number.
+    """
+    bed = manifest["bed"]
+    total = B.bed_total(bed)
+    passes = B.bed_passes(bed)
+    xf = bed.get("crossfade_sec", 0.0)
+    spans = B.bed_spans(bed)
+    # Pass two starts after pass one's spans and every seam before it.
+    pass2_at = sum(s["end_sec"] - s["start_sec"]
+                   for s in spans[:len(passes[0]["segments"])])
+    pass2_at -= (len(passes[0]["segments"])) * xf
+    record = json.loads((REPO_ROOT / "music" /
+                         "bed_storytime_album.json").read_text())
+    climax_src = record["grid"]["measured_climax"]["outro_start_sec"]
+    climax_at = pass2_at + (climax_src
+                            - passes[1]["segments"][0]["start_sec"])
+    wordmark = next(i for i in B.schedule(manifest)[0]
+                    if i["kind"] == "wordmark")
+    assert wordmark["t"] == pytest.approx(climax_at, abs=1e-6), (
+        "the mark must be UP when the double-bass outro arrives")
+    assert wordmark["t"] + wordmark["dur"] == pytest.approx(total, abs=1e-6)
+    assert manifest["wordmark"]["dur_sec"] == pytest.approx(
+        total - climax_at, abs=1e-6)
 
 
 def test_every_span_of_both_passes_reaches_the_filtergraph(manifest):

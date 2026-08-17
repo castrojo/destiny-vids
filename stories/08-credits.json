@@ -21,15 +21,15 @@
     ],
     "crossfade_sec": 0.25,
     "then": {
-      "_what": "PASS TWO -- Storytime, WITH VOCALS. It takes over only after the instrumental loop has run in full; pass one is never shortened to make room. Storytime's quiet opening is skipped so the hand-over lands on the full-band entry rather than losing momentum. Its grid phase is unresolved, which is honest: this pass needs a beat-aligned entrance, not an invented bar line.",
-      "bed_id": "bed_storytime",
-      "media_filename": "bed_storytime.wav",
-      "source_url": "https://www.youtube.com/watch?v=09MTDBb8qro",
+      "_what": "PASS TWO -- Storytime, WITH VOCALS, and from 2026-08-16 the ALBUM version (Imaginaerum), not the official music video edit. It takes over only after the instrumental loop has run in full; pass one is never shortened to make room. Storytime's quiet opening is skipped so the hand-over lands on the full-band entry rather than losing momentum. Its grid phase is unresolved, which is honest: this pass needs a beat-aligned entrance, not an invented bar line. WHY THE VERSION CHANGED: the owner watched 35:50 of the programme -- 'this is almost perfect but cuts off too early, in the version of the song have the double bass drums here and hold the bluefin mark until the end of the song. We want the double bass drum climax.' The video edit (bed_storytime, 244.135 s) has no such climax: it sustains through ~236 s and is already decaying into its own end. The album version runs 330.743 s and carries the extended double-kick outro the edit cut (measured in music/bed_storytime_album.json grid.measured_climax). The video edit bed stays on record because this act's earlier state was built on it; nothing else about the pass changes.",
+      "bed_id": "bed_storytime_album",
+      "media_filename": "bed_storytime_album.wav",
+      "source_url": "https://www.youtube.com/watch?v=nbtcFghyuN8",
       "segments": [
         {
-          "_what": "MEASURED 2026-08-16 from Nightwish's official Storytime music video. The full-band vocal entry is a +6.23 dB re-entry at 14.880. 14.512472 is Storytime's own preceding tracked beat, chosen so the 0.25 s crossfade ends 0.118 s before the hit instead of shaving it. The recording sustains through 236 s and decays naturally to 244.134604 with no digital tail, so the credits end on the song's real ending.",
-          "start_sec": 14.512472,
-          "end_sec": 244.134604
+          "_what": "MEASURED 2026-08-16 on the Nuclear Blast 'Storytime (Remastered)' delivery (the Imaginaerum album version). The full-band vocal entry is a +11.05 dB re-entry at 23.100. 22.732336 is the recording's own preceding tracked beat, chosen so the 0.25 s crossfade ends 0.118 s before the hit instead of shaving it -- the same 0.368 s offset the video-edit pass used. The out point is the song's REAL end: the final hit rings out from the last tracked beat (324.894) and decays to -75 dBFS at 328.183667; the file then carries 2.56 s of digital floor to 330.743104, and ending there would close the show on silence (the issue #105 failure). The double-bass outro starts at 250.403991 on this grid (boundary measured in the bed record) and sustains to the ring -- the climax the owner asked for plays out in full.",
+          "start_sec": 22.732336,
+          "end_sec": 328.183667
         }
       ]
     }
@@ -101,7 +101,8 @@
     "_what": "The REAL Project Bluefin wordmark, not the word typeset in the deck's font. Cached by scripts/fetch_wordmark.py from ublue-os/universal-blue-org content/ocis/bluefin.svg -- NOT ublue-os/artwork, which is wallpapers only and carries no wordmark in any branch or release. Reversed for this background by recolouring the black type to white; the fin's own #4285f4 is left exactly as published and no geometry is touched. THE SUB-LINE IS GONE, owner instruction: 'get rid of \"an ublue project\" on the logo'. The published lockup does not carry it either, so the mark now stands alone exactly as ublue publishes it.",
     "text": "Bluefin",
     "source": "ublue-os/universal-blue-org:content/ocis/bluefin.svg",
-    "dur_sec": 10.0
+    "dur_sec": 77.779676,
+    "_dur_sec_what": "Owner, 2026-08-16: 'hold the bluefin mark until the end of the song. We want the double bass drum climax.' So the mark is UP when the climax arrives and HELD to the last note, not a ten-second sign-off. The number is measured, not round: Storytime's album-version outro starts at source 250.403991 (the grid beat opening the measured boundary; see music/bed_storytime_album.json grid.measured_climax), which lands at 454.724807 on the credits clock, and the act ends at 532.504483 -- 77.779676 s later. DERIVATION: dur_sec = bed_total(bed) - (pass-one spans - 2 x crossfade + (250.403991 - 22.732336)); re-derive it if any span or the crossfade moves, or the mark drifts off the climax."
   },
   "unresolved": [
     "Act VII still ends on the comic cover -- see reveal.TODO(owner).",
