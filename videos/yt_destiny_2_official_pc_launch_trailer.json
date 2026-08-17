@@ -1,0 +1,27 @@
+{
+  "video_id": "yt_destiny_2_official_pc_launch_trailer",
+  "youtube_url": "https://www.youtube.com/watch?v=awh2XU3WrWI",
+  "title": "Destiny 2 – Official PC Launch Trailer",
+  "usage_class": "third_party_copyrighted",
+  "source_rights_note": "Bungie, Inc. copyrighted footage, used under Bungie's fan-content policy, which permits non-commercial fan creations. PROVENANCE IS STRONG: this is the official 'Destiny 2' channel's own upload (UC52XYgEExV9VG6Rt-6vnzVA), not a fan compilation -- it is the first-generation publisher master for the 2017 PC launch live-action campaign, including the dance sequence and the 'AVAILABLE ON PC OCTOBER 24' card that the Brutal Draconis compilation (yt_destiny_all_live_action_trailers) carries at one extra generation. Top rung is format 315: 3840x2160 VP9 at 20,780 kb/s, 60 fps, and that 4K is GENUINE -- a 4K frame downscaled to 1080p and back returns at 50.7 dB against 46.2 dB for a known-native official 4K reference and 55.4 dB for the fan compilation's upscaled 2160p. Prefer this source over the compilation wherever the two overlap (issues #55, #86). This index stores only metadata and timestamps, not the footage.",
+  "era": "d2_base",
+  "content_type": "trailer",
+  "activity": "cinematic",
+  "provenance": {
+    "era": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.99
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.9
+    },
+    "activity": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 0.8
+    }
+  }
+}
