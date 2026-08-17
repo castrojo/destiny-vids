@@ -65,6 +65,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from tools import conform  # noqa: E402  (needs REPO_ROOT on sys.path first)
+
 FRAME_W, FRAME_H = 1920, 1080
 
 # The site sizes everything in rem. 1rem = 16px reproduces the desktop layout
@@ -3103,7 +3105,8 @@ def _burn_units(entries):
     return units
 
 
-def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None):
+def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
+         encode_args=None):
     """Composite every plate onto ``video`` in one ffmpeg pass.
 
     Audio is stream-copied: this stage titles a cut, it does not re-cut it, and
@@ -3112,6 +3115,12 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None):
     ``runner`` defaults to a local subprocess; a caller (the farm path in
     ``scripts/build_act1.py``) may pass one that runs the same argv elsewhere
     and fetches ``out_path`` back.
+
+    ``encode_args`` is the x264 argv for the burn. Pass
+    ``conform.video_encode_args()`` to get the repo's DELIVERY rung and the
+    BT.709 VUI; ``None`` keeps the legacy ``crf 18``/``medium``/untagged argv
+    that acts not yet rebuilt were delivered with, so their masters stay
+    byte-identical and do not go stale. See the note at the argv itself.
     """
     if ffmpeg is None:
         from tools.render import find_ffmpeg
@@ -3207,8 +3216,26 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None):
         # runs long -- act II came out 318.767 s against a 307.998 s cut.
         # Naming the length is deterministic where `-shortest` is not.
         "-t", f"{duration:.3f}",
-        "-c:v", "libx264", "-preset", "medium", "-crf", "18",
-        "-pix_fmt", "yuv420p", "-c:a", "copy",
+        # The burn is the LAST picture generation before an act is delivered,
+        # so its argv decides what the standalone master's bitstream says.
+        # Rolling a private one is how acts II and VI shipped with
+        # color_space/transfer/primaries all `unknown`: the BT.709 VUI is
+        # written by `conform.video_encode_args` and by nothing else, and
+        # untagged SDR is only *assumed* 709 by a player (tools/megacut.py
+        # records why "most players" is not good enough). It also encoded a
+        # delivery master at crf 18/medium against the repo's own crf 16/slow
+        # DELIVERY spec.
+        #
+        # The legacy argv is still the DEFAULT, and that is deliberate rather
+        # than lazy: every act declaring tools/plate.py as a delivery source
+        # goes stale the moment this changes, and an act only stops being stale
+        # by being re-rendered. Flipping the default therefore forces a rebuild
+        # of acts nobody asked for. Callers opt in as they are rebuilt; act II
+        # is the first (issue #86's picture upgrade). See #271 to retire it.
+        *(encode_args if encode_args is not None else
+          ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
+           "-pix_fmt", "yuv420p"]),
+        "-c:a", "copy",
         str(out_path),
     ]
     print("ffmpeg:", " ".join(ffmpeg))
@@ -3270,6 +3297,11 @@ def main(argv=None):
     b.add_argument("--fit-picture", action="store_true",
                    help="re-render the plates onto the video's picture area first, "
                         "so nothing sits on a letterbox bar")
+    b.add_argument("--delivery-spec", action="store_true",
+                   help="encode the burn at the repo's DELIVERY rung (crf 16, "
+                        "preset slow) with the BT.709 VUI, instead of the legacy "
+                        "crf 18/medium/untagged argv. Opt-in per act: turning it "
+                        "on marks every act built without it as stale")
 
     p = sub.add_parser("plan", help="cut list (+ roster) -> timed plate manifest")
     p.add_argument("shotlist", help="JSON shot list from tools/story.py --format json")
@@ -3411,7 +3443,10 @@ def main(argv=None):
 
         picture = detect_picture(args.video)
     render_all(entries, args.plates_dir, picture)
-    out = burn(args.video, entries, args.plates_dir, args.out)
+    encode_args = (conform.video_encode_args()
+                   if getattr(args, "delivery_spec", False) else None)
+    out = burn(args.video, entries, args.plates_dir, args.out,
+               encode_args=encode_args)
     print(f"wrote {out}")
     return 0
 

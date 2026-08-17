@@ -91,6 +91,41 @@ The preview prints every plate's in and out point, so a timing note can be
 checked **before** anything renders. That is the cheapest verification in the
 repo — use it before every act II build.
 
+Act II's picture and burn, the full rebuild:
+
+```bash
+python3 scripts/build_efmb.py                   # the plan: kept runs, removals, gap
+python3 scripts/build_efmb.py --render          # picture + bed -> renders/efmb-hq.mp4
+python3 tools/plate.py burn --video renders/efmb-hq.mp4 \
+    --manifest stories/02-endless-forms-plates.json \
+    --plates-dir renders/plates-efmb --out renders/efmb-plated.mp4 \
+    --fit-picture --delivery-spec
+python3 tools/deliver.py publish --act II
+```
+
+`--delivery-spec` is not optional here: without it the burn emits act II's
+master untagged and a rung below `DELIVERY` — see
+[`rendering.md`](../rendering.md). Give `--render` an **absolute** path or none
+at all; a relative one resolves inside the ffmpeg container.
+
+Verify the result rather than trusting the exit code — the two faults this act
+has actually shipped are both invisible to "did it render":
+
+```bash
+ffprobe -v error -select_streams v:0 \
+    -show_entries stream=color_space,color_transfer,color_primaries \
+    -show_entries format=duration -of default=noprint_wrappers=1 \
+    renders/efmb-plated.mp4          # want bt709 x3, and 307.998
+ffmpeg -v info -i renders/efmb-plated.mp4 \
+    -vf "crop=1200:500:360:180,blackdetect=d=1.0:pic_th=0.98" -an -f null -
+```
+
+The act's only black is the **10.667 s head**, a **1.03 s** span at 115.167,
+and the **~16 s tail** from 291.967. Any other black span means the picture
+ran long and the plates are sitting on frames they were not timed for.
+`blackdetect` logs at *info*, so `-v error` silently prints nothing and looks
+like a pass; crop past the burned-in caption band or no frame is ever black.
+
 ## What the loop refuses to hand you
 
 Two faults have actually shipped here and both are invisible to "did it

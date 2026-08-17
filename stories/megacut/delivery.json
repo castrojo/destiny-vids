@@ -37,7 +37,7 @@
    "footage": [
     "yt_into_the_light_cinematic"
    ],
-   "source_digest": "99c67c171ff3051019779db525e4a014f7b2cb82b1c5d36d216b750f2218244e",
+   "source_digest": "35656c7add3924cf0db9bb63e52e73ee98217cf356d0602f094b6aeb1ef567ff",
    "footage_digest": "25d76f4c47019115c61c1a70f3e5b9884f9cf80478cff485e0872d455887ff0d",
    "rebuild": "python3 scripts/build_act1.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
@@ -57,7 +57,7 @@
    "footage": [
     "yt_destiny_all_live_action_trailers"
    ],
-   "source_digest": "f4100bcff8feeda0fd246bbc6a589fa5197eb861462dddedd9021dd2bae317be",
+   "source_digest": "fa31b8ab7eab53ecdbd714fb99ab0690502e9e54e6fee7e0085d745f4dce9254",
    "footage_digest": "7cd0c5946c4ef8b295ac2da065c5ed379abe08a88e030321c8132198ebd7dadb"
   },
   "III": {
@@ -136,7 +136,7 @@
     "scripts/actbuild.py",
     "tools/plate.py"
    ],
-   "source_digest": "e69fb467efe0cc294aaff79ba9cbc2792262fb847f79361b6d21431ba78b9595",
+   "source_digest": "553cc043578a38134c2038b36d0410514d8df56f81ffa75da1127688fc706e26",
    "rebuild": "python3 scripts/build_europa.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },
