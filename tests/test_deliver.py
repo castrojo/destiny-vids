@@ -754,7 +754,8 @@ def _publish_digests(delivery, acts=None, dirty=("shotlist.json",)):
     deliver.dirty_paths = lambda: set(dirty)
     try:
         deliver.record_source_digests(acts, masters, delivery,
-                                      log=lambda *a: None)
+                                      log=lambda *a: None,
+                                      only=[a.numeral for a in acts])
     finally:
         deliver.dirty_paths = real
     return json.loads(Path(delivery).read_text())["masters"]["I"]
@@ -804,7 +805,7 @@ def test_a_master_that_predates_its_inputs_is_reported_not_silent(
     monkeypatch.setattr(deliver, "dirty_paths", lambda: {"shotlist.json"})
     deliver.record_source_digests(
         [deliver.Act(numeral="I", title="I", prod_file="01.mp4")],
-        doc["masters"], delivery, log=lines.append)
+        doc["masters"], delivery, log=lines.append, only=["I"])
     assert any("rebuild the act" in ln for ln in lines), lines
 
 
@@ -845,3 +846,23 @@ def test_publish_records_only_the_acts_it_was_told_to(tmp_path, monkeypatch):
     after = json.loads(delivery.read_text())["masters"]
     assert after["I"]["source_digest"] == deliver.source_digest(["shotlist.json"])
     assert after["II"]["source_digest"] == "stale-on-purpose"
+
+
+def test_a_blanket_publish_certifies_nothing(tmp_path, monkeypatch):
+    """`publish` WRITES the digest gate, so it cannot be the thing that
+    decides an act is fresh. An input that moved in a commit looks untouched
+    on disk, and the mtime guard only sees dirty files -- so a publish with no
+    named acts once stamped a new digest over act III, whose rebuild is
+    blocked on an input that does not exist (#256), and turned its own gate
+    green. With no `only`, nothing is stamped."""
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")
+    before = json.loads(delivery.read_text())["masters"]["I"]["source_digest"]
+    lines = []
+    doc = json.loads(delivery.read_text())
+    deliver.record_source_digests(
+        [deliver.Act(numeral="I", title="I", prod_file="01.mp4")],
+        doc["masters"], delivery, log=lines.append)
+    after = json.loads(delivery.read_text())["masters"]["I"]["source_digest"]
+    assert after == before
+    assert any("name the acts you rebuilt" in ln for ln in lines), lines

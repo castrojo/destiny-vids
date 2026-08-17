@@ -850,12 +850,29 @@ def record_source_digests(acts, masters, delivery_path, log=print, only=None):
     up as drift instead of going unnoticed. Recording it anywhere else would
     let an act be declared fresh without anything being delivered.
 
-    `only` narrows it to the acts the caller actually rebuilt. Use it. A
-    blanket `publish` records a claim about EVERY act, and the claim is only
-    true for the ones somebody just rendered -- that is how a rebuild of one
-    act quietly certified seven others, and how stale programmes shipped.
+    `only` names the acts the caller actually rebuilt, and it is REQUIRED to
+    stamp anything. A blanket `publish` records a claim about EVERY act, and
+    the claim is only ever true for the ones somebody just rendered -- that is
+    how a rebuild of one act quietly certified seven others, and how stale
+    programmes shipped.
+
+    The mtime guard below catches that only for inputs that are still dirty. An
+    input that moved IN A COMMIT looks untouched on disk, so a blanket publish
+    could stamp its new digest over a master nobody re-rendered and turn its
+    own gate green -- which is exactly what happened to act III, whose rebuild
+    is blocked on an input that does not exist (#256). The digest gate cannot
+    catch it, because `publish` is the thing that writes the digest.
+
+    So with no `only`, nothing is stamped and the caller is told to name the
+    acts. Linking, checksums and the README still run: those describe what is
+    on disk, and they are true for every act whether or not it was rebuilt.
     """
-    only = {str(a).upper() for a in only} if only else None
+    if not only:
+        log("  source digests: NOT recorded -- name the acts you rebuilt "
+            "(--act VI --act VIII). A blanket publish would certify every "
+            "act, including any whose rebuild is blocked.")
+        return
+    only = {str(a).upper() for a in only}
     if delivery_path is None:
         return
     doc = json.loads(Path(delivery_path).read_text(encoding="utf-8"))
