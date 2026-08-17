@@ -6,6 +6,20 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 1920px; height: 1080px; background: transparent; overflow: hidden; }
 body { font-family: 'Inter', 'Arial Narrow', sans-serif; }
+/* WHERE THE LINE SITS is authored, not fixed, and it is MEASURED on the image
+   it sits on rather than nudged by eye.
+   `top: 38%` lays the type across March's bright dawn horizon -- mean luma 59,
+   95th percentile 125 under the glyphs -- which is what the owner read as hard
+   to see: "lower the extinction and other line to be more in the dark area for
+   readability".
+   `placement=low` at 58% puts it in the shadowed flower meadow below that
+   horizon: mean 48, 95th percentile 73, so the brightest thing behind the type
+   is darker than the average behind it before.
+   58% AND NOT LOWER. The first pass went to 66%, which is marginally darker
+   still (p95 83 -> 73 is the wrong way round only because the meadow is
+   flatter) but lands the line across the foreground wolf's head: "bring it up
+   some now you're covering the wolve's head". The wolf's head occupies roughly
+   y 780-900 in this frame; the type's box ends at 776. */
 .card {
   position: absolute; left: 10%; top: 38%;
   width: 80%; padding: 0;
@@ -18,6 +32,7 @@ body { font-family: 'Inter', 'Arial Narrow', sans-serif; }
   letter-spacing: .045em; line-height: 1.05;
 }
 .line:empty { display: none; }
+body[data-placement="low"] .card { top: 58%; }
 .k8s-o {
   height: .62em; width: auto; vertical-align: .042em;
   margin: 0 .041em 0 -.005em;
@@ -32,22 +47,34 @@ body { font-family: 'Inter', 'Arial Narrow', sans-serif; }
 <div class="card"><div class="line" id="title"></div><div class="line" id="subtitle"></div><div class="line" id="body"></div></div>
 <script>
 const p = new URLSearchParams(location.search)
+if (p.get('placement')) { document.body.dataset.placement = p.get('placement') }
 const title = document.getElementById('title')
 title.textContent = p.get('title') || ''
 document.getElementById('subtitle').textContent = p.get('subtitle') || ''
 document.getElementById('body').textContent = p.getAll('body').join(' ')
-const titleText = title.textContent
-const wordAt = titleText.toLowerCase().lastIndexOf('evolve')
-if (wordAt !== -1) {
-  const oAt = wordAt + 2
-  const letter = titleText[oAt]
-  const mark = document.createElement('img')
-  mark.className = 'k8s-o'
-  mark.src = '../renders/marks/kubernetes.svg'
-  mark.alt = letter
-  mark.onerror = () => mark.replaceWith(document.createTextNode(letter))
-  title.textContent = ''
-  title.append(titleText.slice(0, oAt), mark, titleText.slice(oAt + 1))
+
+// AN AUTHORED GLYPH STANDING IN FOR A LETTER -- the same `glyph` / `glyph_src`
+// contract cards/ending.html already carries, rather than a second spelling of
+// it. `token` is the letter the mark replaces and the optional `word` says
+// which word to look in, so the mark is placed by the RECORD and not by this
+// file guessing at a word. The first version of this card hard-coded "evolve",
+// which meant the copy could not change without the mark silently vanishing.
+const glyph = JSON.parse(p.get('glyph') || 'null')
+const src = p.get('glyph_src')
+const text = title.textContent
+if (glyph && glyph.token && src) {
+  const from = glyph.word ? text.toLowerCase().indexOf(glyph.word.toLowerCase()) : 0
+  const at = from < 0 ? -1 : text.indexOf(glyph.token, from)
+  const within = glyph.word ? from + glyph.word.length : text.length
+  if (at !== -1 && at + glyph.token.length <= within) {
+    const mark = document.createElement('img')
+    mark.className = 'k8s-o'
+    mark.src = src
+    mark.alt = glyph.token
+    mark.onerror = () => mark.replaceWith(document.createTextNode(glyph.token))
+    title.textContent = ''
+    title.append(text.slice(0, at), mark, text.slice(at + glyph.token.length))
+  }
 }
 document.fonts.ready.then(() => { window.__renderReady = true })
 </script>

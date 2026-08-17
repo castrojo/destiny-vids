@@ -30,6 +30,19 @@ def plate(manifest, plate_id):
     return next(p for p in manifest["plates"] if p["id"] == plate_id)
 
 
+def on_screen_copy(manifest):
+    """Only the fields that reach a pixel.
+
+    A retired line still appears in the record -- in the `_owner` brief that
+    asked for the change and in the `_copy` note that says what it replaced --
+    and that history is the point of those fields. What must never come back is
+    the line on SCREEN.
+    """
+    return json.dumps([{k: v for k, v in entry.items()
+                        if k in ("title", "subtitle", "body")}
+                       for entry in manifest["plates"]])
+
+
 # --- the length ---------------------------------------------------------------
 
 def test_the_trailer_is_one_minute_fifty():
@@ -130,7 +143,9 @@ def test_the_lossless_master_is_true_peak_gated_before_delivery():
 OWNER_COPY = {
     "book-a": [
         "Two Generations of Contributors",
-        "One, new, one old. Dreaming to build a better future",
+        "One at their beginning",
+        "One at their end",
+        "These are their Real Stories",
     ],
     "book-b": [],
 }
@@ -140,10 +155,31 @@ OWNER_COPY = {
 def test_the_book_lines_are_the_owners_words_verbatim(manifest, plate_id, lines):
     """Including the punctuation the owner did or did not type.
 
-    'Dreaming to build a better future' arrived without a full stop and keeps
-    it that way: a mark nobody wrote is still a mark nobody wrote.
+    Not one of the four lines ends in a full stop, and they keep it that way:
+    a mark nobody wrote is still a mark nobody wrote.
     """
     assert plate(manifest, plate_id)["body"] == lines
+
+
+def test_the_retired_book_line_does_not_come_back(manifest):
+    """Owner, 2026-08-17: 'The text box for the message is too wide'.
+
+    The 52-character line is what drove the box to its max width. A later copy
+    pass must not quietly restore it.
+    """
+    screen = on_screen_copy(manifest)
+    assert "One, new, one old" not in screen
+    assert "Dreaming to build a better future" not in screen
+
+
+def test_the_book_box_reads_four_lines_before_the_iguana(manifest):
+    """Four short lines need longer than two long ones, so the window opens
+    earlier -- but it still has to be over the BOOK, and still has to clear the
+    join. The book shot runs 24.880 -> 33.640."""
+    box = plate(manifest, "book-a")
+    assert box["at"] >= 24.880, "the box would open before the book shot"
+    assert box["dur"] >= 6.0, "four lines were given less read time than two"
+    assert box["at"] + box["dur"] < T.CUT_OUT - T.JOIN_FADE
 
 
 def test_the_end_card_is_the_owners_words_in_the_owners_order(manifest):
@@ -177,14 +213,87 @@ def test_the_end_card_poster_uses_no_new_copy_field(manifest):
         assert copy_fields == {"title", "subtitle", "body"}
 
 
-def test_the_daytime_card_keeps_only_the_single_marquee_line(manifest):
-    """The retired lines must not silently return with a later card pass."""
-    card = plate(manifest, "daytime-kindness")
-    assert card["title"] == "Evolve or Die"
-    assert "subtitle" not in card
-    assert "body" not in card
-    assert "The Final Shape is Kindness" not in json.dumps(card)
-    assert "Wolves aren't Evil" not in json.dumps(card)
+def test_the_day_cards_are_two_messages_in_the_owners_words(manifest):
+    """Owner, 2026-08-17: 'Change the evolve or die into two messages ...
+    have the text be Extinction is the Rule / Survival is the Exception'."""
+    cards = T.day_cards(manifest)
+    assert [c["title"] for c in cards] == [
+        "Extinction is the Rule",
+        "Survival is the Exception",
+    ]
+    for card in cards:
+        assert "subtitle" not in card
+        assert "body" not in card
+
+
+def test_the_retired_day_lines_do_not_come_back(manifest):
+    """The marquee line has now been rewritten three times; each retired line
+    must stay retired."""
+    screen = on_screen_copy(manifest)
+    for retired in ("Evolve or Die",
+                    "The Final Shape is Kindness",
+                    "Wolves aren't Evil"):
+        assert retired not in screen
+
+
+def test_the_two_day_cards_lead_into_the_kubecon_reveal(manifest):
+    """Owner: 'lengthem them to show them lead to the kubecon text ... all
+    three text messages should floow smoothly into one reveal'.
+
+    Longer than the single card they replace, adjacent rather than separated by
+    a hold, both finished before the end card so the reveal lands on empty
+    night wolves -- and all of it inside the existing bridge, which is why the
+    music-timed end card never had to move.
+    """
+    first, second = T.day_cards(manifest)
+    assert first["dur"] > 3.4 and second["dur"] > 3.4, "not lengthened"
+    assert first["at"] >= T.PICTURE, "a day card starts before the bridge"
+    gap = second["at"] - (first["at"] + first["dur"])
+    assert 0 <= gap <= 1.0, f"the two messages do not flow: {gap:.3f} s apart"
+    endcard_at = T.PICTURE + T.BRIDGE
+    assert second["at"] + second["dur"] <= endcard_at
+    assert plate(manifest, "endcard-event")["at"] == pytest.approx(endcard_at)
+
+
+def test_the_day_cards_sit_in_the_wallpapers_dark_band(manifest):
+    """Owner, 2026-08-17: 'lower the extinction and other line to be more in
+    the dark area for readability'.
+
+    The seat is authored on the plate rather than baked into the template,
+    which is a real distinction here: the default 38% is right for a card over
+    a different image, and this pair is over one whose horizon is its brightest
+    band. 58% is measured, not nudged: it is the dark meadow, and it is not the
+    66% of the first pass, which covered the foreground wolf's head."""
+    for card in T.day_cards(manifest):
+        assert card["placement"] == "low"
+    template = (REPO_ROOT / "cards" / "daycard.html").read_text()
+    assert 'body[data-placement="low"] .card { top: 58%; }' in template
+    assert "dataset.placement = p.get('placement')" in template
+
+
+def test_the_day_cards_are_overlaid_from_the_record(manifest):
+    """Their windows are authored copy timing, so the graph takes them from the
+    manifest. The first build hard-coded one card's fades in the script, which
+    is how a second card becomes a code change instead of a plate."""
+    graph = T.filtergraph(manifest)
+    for card in T.day_cards(manifest):
+        at = card["at"] - T.PICTURE
+        assert f"enable=between(t\\,{at:.3f}\\," in graph
+    assert graph.count("[bridgepre]") == 2, "one in, one consumed by card one"
+    assert "[bridge]" in graph
+
+
+def test_the_kubernetes_helm_is_placed_by_the_record_not_by_a_word(manifest):
+    """The mark used to be hard-coded to the letter 'o' of 'evolve', so the
+    copy could not change without it silently vanishing. It now travels as the
+    `glyph` / `glyph_src` pair cards/ending.html already defines."""
+    first, second = T.day_cards(manifest)
+    assert first["glyph"] == {"token": "o", "word": "Extinction"}
+    assert first["glyph_src"] == "renders/marks/kubernetes.svg"
+    assert "glyph" not in second, "one mark across the pair, on the first line"
+    card = (REPO_ROOT / "cards" / "daycard.html").read_text()
+    assert "lastIndexOf('evolve')" not in card
+    assert "JSON.parse(p.get('glyph')" in card
 
 
 def test_the_credit_line_is_one_seared_line_here_and_in_the_prologue(manifest):
@@ -222,13 +331,10 @@ def test_the_book_lines_use_the_simple_box_treatment(manifest):
         assert plate(manifest, plate_id)["variant"] == "box"
 
 
-def test_one_stationary_box_holds_both_lines_and_clears_the_iguana(manifest):
+def test_one_stationary_box_holds_the_lines_and_clears_the_iguana(manifest):
     box = plate(manifest, "book-a")
     empty = plate(manifest, "book-b")
-    assert box["body"] == [
-        "Two Generations of Contributors",
-        "One, new, one old. Dreaming to build a better future",
-    ]
+    assert box["body"] == OWNER_COPY["book-a"]
     assert empty["body"] == []
     assert box["at"] + box["dur"] < T.CUT_OUT - T.JOIN_FADE
 
