@@ -331,6 +331,27 @@ def test_the_book_lines_use_the_simple_box_treatment(manifest):
         assert plate(manifest, plate_id)["variant"] == "box"
 
 
+def test_the_book_box_is_set_at_the_size_the_owner_chose(manifest):
+    """Owner, 2026-08-17: 'the box in the first part is too small, increase
+    text size and the vertical space inbetween each sentence', then 'D is the
+    best' of four mockups rendered over the book frame itself."""
+    card = (REPO_ROOT / "cards" / "bookline.html").read_text()
+    box = card.split('body[data-variant="box"] .line')[1]
+    assert "font-size: 3.8rem;" in box
+    assert "line-height: 1.7;" in box
+
+
+def test_the_book_box_asks_for_no_blue_letters(manifest):
+    """Owner, 2026-08-17: 'get rid of the blue here'.
+
+    The project's b/f rule stands everywhere it was not switched off; this card
+    opts in the same way cards/ending.html does, and does not opt in.
+    """
+    assert "blue_letters" not in plate(manifest, "book-a")
+    card = (REPO_ROOT / "cards" / "bookline.html").read_text()
+    assert "if (params.get('blue_letters') === 'true') {" in card
+
+
 def test_one_stationary_box_holds_the_lines_and_clears_the_iguana(manifest):
     box = plate(manifest, "book-a")
     empty = plate(manifest, "book-b")
