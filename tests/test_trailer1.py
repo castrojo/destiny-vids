@@ -172,14 +172,14 @@ def test_the_retired_book_line_does_not_come_back(manifest):
     assert "Dreaming to build a better future" not in screen
 
 
-def test_the_book_box_reads_four_lines_before_the_iguana(manifest):
+def test_the_book_box_reads_four_lines_over_the_book(manifest):
     """Four short lines need longer than two long ones, so the window opens
-    earlier -- but it still has to be over the BOOK, and still has to clear the
-    join. The book shot runs 24.880 -> 33.640."""
+    earlier -- but it still has to be over the BOOK, which runs 24.880 ->
+    33.640, and it holds to the end of that shot."""
     box = plate(manifest, "book-a")
     assert box["at"] >= 24.880, "the box would open before the book shot"
     assert box["dur"] >= 6.0, "four lines were given less read time than two"
-    assert box["at"] + box["dur"] < T.CUT_OUT - T.JOIN_FADE
+    assert box["at"] + box["dur"] == pytest.approx(T.CUT_OUT, abs=1e-9)
 
 
 def test_the_end_card_is_the_owners_words_in_the_owners_order(manifest):
@@ -341,20 +341,37 @@ def test_the_book_box_is_set_at_the_size_the_owner_chose(manifest):
     assert "line-height: 1.7;" in box
 
 
-def test_the_box_is_cut_in_and_out_never_dissolved(manifest):
-    """Owner, 2026-08-17: "don't fade the box on it's own it reveals the text
-    underneath ... before switching to the iguana".
+def test_the_box_leaves_with_the_page_and_never_before_it(manifest):
+    """Owner, 2026-08-17: "HIDE THE WORDS ON THE BOOK PAGE WITH THIS SLIDE AND
+    THEN FADE INTO THE IGUANA", after "you fade the box differently than the
+    book page so the words 'you needed' show up".
 
-    A card that is mostly filled panel spends an alpha ramp semi-transparent,
-    so the book's printed lyric reads through it. The out ramp landed right
-    before the cut to the iguana, which is where it was seen.
+    The box is composited onto the HEAD LEG, so the join dissolve carries the
+    page and the box out as one picture. Any overlay on the joined film has an
+    out of its own, and the page goes on printing underneath -- so every frame
+    between the box leaving and the picture cutting reveals the words the box
+    was there to cover.
     """
     box = plate(manifest, "book-a")
     assert box["fade"] == 0
     graph = T.filtergraph(manifest)
     chunk = next(c for c in graph.split(";") if c.endswith("[bk0]"))
-    assert "fade=" not in chunk, "the box still dissolves"
-    assert box["at"] + box["dur"] < T.CUT_OUT - T.JOIN_FADE, "still up at the cut"
+    assert "fade=" not in chunk, "the box has a ramp of its own again"
+    seat = next(c for c in graph.split(";") if c.endswith("[headbox]"))
+    assert seat.startswith("[head][bk0]overlay="), "the box left the head leg"
+    assert f"\\,{T.CUT_OUT:.3f})" in seat, "the box stops before the head does"
+    join = next(c for c in graph.split(";") if "xfade" in c and "[tail]" in c)
+    assert join.startswith("[headbox][tail]"), "the join no longer carries it"
+
+
+def test_the_box_covers_the_page_for_the_whole_time_it_prints(manifest):
+    """The page keeps printing under the box -- 'In order to be born', then
+    'you needed' in close-up -- and every one of those words is inside the
+    box's footprint. That is what the box is for, so it may not open late or
+    close early."""
+    box = plate(manifest, "book-a")
+    assert box["at"] + box["dur"] >= T.CUT_OUT - 1e-9, \
+        "the box closes before the picture leaves the book"
 
 
 def test_the_box_panel_is_opaque(manifest):
@@ -377,12 +394,22 @@ def test_the_book_box_asks_for_no_blue_letters(manifest):
     assert "if (params.get('blue_letters') === 'true') {" in card
 
 
-def test_one_stationary_box_holds_the_lines_and_clears_the_iguana(manifest):
+def test_one_stationary_box_holds_the_lines_and_never_covers_the_iguana(manifest):
+    """Owner: "do NOT cover the iguana".
+
+    The box lives on the head leg, so the iguana is only ever under it while
+    the dissolve is running -- and at the end of that dissolve the head's
+    weight is zero, which is the same instant the iguana is clean. There is no
+    frame of clean iguana with a panel on it.
+    """
     box = plate(manifest, "book-a")
     empty = plate(manifest, "book-b")
     assert box["body"] == OWNER_COPY["book-a"]
     assert empty["body"] == []
-    assert box["at"] + box["dur"] < T.CUT_OUT - T.JOIN_FADE
+    assert box["at"] + box["dur"] == pytest.approx(T.CUT_OUT, abs=1e-9)
+    graph = T.filtergraph(manifest)
+    assert "[head][bk0]overlay=" in graph
+    assert "[headbox][tail]xfade=" in graph
 
 
 def test_one_forty_seven_is_the_documented_wolves_fade_climax(manifest):
