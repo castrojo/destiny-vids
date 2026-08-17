@@ -21,6 +21,24 @@ to seconds when the acts are unchanged. The full story, including why cards
 must encode to the same spec, is in
 [`skills/megacut/references/assembly-graph.md`](skills/megacut/references/assembly-graph.md).
 
+### The plate burn is the exception, and it is opt-in
+
+`tools/plate.py burn` is the **last** picture generation before an act is
+delivered, so its argv — not the builder's — decides what the standalone
+master's bitstream says. It still defaults to a private `crf 18` / `preset
+medium` / untagged argv, which is why acts II and VI shipped with
+`color_space`, `color_transfer` and `color_primaries` all `unknown` while
+every act whose final pass runs through `conform` carried BT.709. Untagged SDR
+is only *assumed* 709 by a player; `tools/megacut.py` records why "most
+players" is not a guarantee.
+
+Pass `--delivery-spec` (CLI) or `encode_args=conform.video_encode_args()`
+(API) to get the delivery rung and the VUI. It is opt-in per act rather than
+the default because every act declaring `tools/plate.py` as a delivery source
+goes stale the moment the default moves, and an act only stops being stale by
+being re-rendered — so flipping it forces rebuilds of acts nobody asked for.
+Act II opts in; the rest are converted as they are next rebuilt.
+
 ## The problem: `ffmpeg-free` has no H.264
 
 Fedora, and therefore Bluefin, ships **`ffmpeg-free`**: a build with patent-

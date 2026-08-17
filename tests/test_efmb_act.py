@@ -962,3 +962,47 @@ def test_the_arc_hunter_before_kyle_is_credited():
     assert plate["at"] + plate["dur"] <= kyle["at"] + 1e-6
     # Kyle's own anchor is untouched -- it is the act's sync anchor.
     assert kyle["at"] == pytest.approx(269.700, abs=1e-3)
+
+
+def test_act_ii_encodes_to_the_delivery_spec_not_a_private_one():
+    """Act II's picture is encoded at the repo's DELIVERY rung, with a VUI.
+
+    This act shipped its standalone master with color_space, color_transfer
+    and color_primaries all `unknown` -- the only act besides VI that did --
+    because both its own builder and the plate burn rolled a private
+    `-c:v libx264 -preset medium -crf 18` argv. `conform.video_encode_args`
+    is the single place that writes the BT.709 VUI, so anything that does not
+    call it cannot tag what it produces, and tools/megacut.py already records
+    why "untagged is assumed 709 by most players" is not good enough.
+
+    The same private argv also encoded a delivery master a rung BELOW
+    DELIVERY (crf 18/medium against crf 16/slow) on the act issue #86
+    measured as the most exposed to it: fog, smoke and dark gradients.
+    """
+    from tools import conform
+
+    assert build_efmb.X264 == conform.video_encode_args(), \
+        "act II must encode to the shared DELIVERY spec, not a private argv"
+
+    argv = " ".join(build_efmb.X264)
+    for field in ("-color_primaries", "-color_trc", "-colorspace"):
+        assert field in argv, f"{field} missing: the master would ship untagged"
+    assert "colorprim=bt709:transfer=bt709:colormatrix=bt709" in argv, \
+        "the -x264-params VUI write is what actually lands in the bitstream"
+    assert "-crf 16" in argv and "-preset slow" in argv
+
+
+def test_the_discarded_tail_absorbs_the_rung_change():
+    """Every frame of the source is accounted for, on the rung on disk.
+
+    The 2160p VP9 rung is 376.186 s where the 1080p AVC rung this act was
+    first cut from was 376.134 s. That 0.052 s must fall in the publisher
+    slates the act discards -- if it ever falls inside a kept run, the picture
+    moved under a bed that did not, which is the swap SOURCE_SEC guards.
+    """
+    assert build_efmb.REMOVED[-1][1] == build_efmb.SOURCE_SEC, \
+        "the discarded tail must run to the end of the source"
+    last_kept = max(b for _, b, _ in build_efmb.RUNS)
+    assert last_kept <= build_efmb.REMOVED[-1][0], \
+        "no kept run may reach into the tail the rung change lands in"
+    assert build_efmb.SOURCE_RUNG, "which rung this act is cut from is recorded"

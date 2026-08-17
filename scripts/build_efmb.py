@@ -54,6 +54,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+from tools import conform  # noqa: E402  (needs REPO_ROOT on sys.path first)
+
 SOURCE_ID = "yt_destiny_all_live_action_trailers"
 BED_ID = "bed_endless_forms_most_beautiful"
 
@@ -62,8 +65,37 @@ BED_ID = "bed_endless_forms_most_beautiful"
 # media/) and on a machine whose copy of the master has since been replaced.
 # `render` compares the file it is about to cut against this and refuses on a
 # mismatch, which is the check that would have caught #229's swap.
-SOURCE_SEC = 376.134
+#
+# 376.186 is the 2160p VP9 rung (see SOURCE_RUNG). The previous value, 376.134,
+# was measured on the 1080p AVC rung this act was first cut from, and it left
+# the guard 0.052 s outside its own 0.05 s tolerance -- so after the #86 picture
+# upgrade landed, `render` refused to rebuild the very act that had already been
+# delivered from this file. The rungs are the SAME UPLOAD, and frame-aligned:
+# verified on extracted frames, 4.017 is still the last clean visor frame before
+# the dissolve (the boy bleeds through by 4.150, as REMOVED describes) and
+# 362.200 is still the first DESTINY/Bungie/Activision publisher slate. The
+# whole 0.052 s difference falls in the tail this act discards -- every run ends
+# by 362.200 -- so no kept frame moved. Re-measure and re-verify the boundaries
+# if the rung ever changes again; a length that differs INSIDE a run is the swap
+# this guard is for.
+SOURCE_SEC = 376.186
 SOURCE_TOLERANCE_SEC = 0.05
+
+# WHICH PICTURE THIS ACT IS CUT FROM. media/ is gitignored, so without this
+# nothing in git records the rung -- and issue #86's whole finding was that
+# every source had silently been fetched at the default 1080p rung. Recorded in
+# the shape stories/megacut/megacut.json uses for the Perfume thread.
+SOURCE_RUNG = (
+    "YouTube lL9i6wqwFD8 format 313: 3840x2160 VP9 at 9,322 kb/s, 30 fps, "
+    "376.186 s. Downscaled to 1920x1080 with lanczos, which supersamples: it "
+    "resolves a visibly cleaner 1080p than the 1080p rung can, because the "
+    "lower rung's chroma and ringing are averaged away rather than carried. "
+    "Supersedes the 1080p AVC rung (format 137, 2,145 kb/s) this act was first "
+    "cut from -- issue #86, which measured that act II's fog, smoke and dark "
+    "gradients are exactly where 2 Mb/s bands. The 2160p AV1 rung (format 401, "
+    "3,688 kb/s) was an interim fallback while 313 was returning HTTP 403 "
+    "mid-transfer; 313 is the better rung and is what is on disk now."
+)
 
 # --- the cut ---------------------------------------------------------------
 # (in, out, why this boundary is here). Source timecodes, seconds.
@@ -114,7 +146,7 @@ REMOVED = [
     # including one named above as "burned-in end title: BECOME LEGEND"; these
     # survived only because run 5 used to run to the end of the source. The act
     # was closing on an advert. Owner: "cut to black, end on the heroes".
-    (362.200, 376.134, "DESTINY / DESTINY 2 logo slates, Bungie/Activision copyright, 'AVAILABLE ON PC OCTOBER 24'"),
+    (362.200, 376.186, "DESTINY / DESTINY 2 logo slates, Bungie/Activision copyright, 'AVAILABLE ON PC OCTOBER 24'"),
 ]
 
 # The owner's rounded marks, kept beside the measured ones so the difference
@@ -261,10 +293,17 @@ NORMALISE_VF = (
     f"scale={TARGET_W}:{TARGET_H}:force_original_aspect_ratio=decrease:"
     "flags=lanczos,"
     f"pad={TARGET_W}:{TARGET_H}:(ow-iw)/2:(oh-ih)/2,"
+    f"setsar=1,"
     f"fps={TARGET_FPS},format=yuv420p"
 )
-X264 = ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
-        "-pix_fmt", "yuv420p"]
+
+# THE DELIVERY SPEC, not a private one. This act used to carry its own
+# `-preset medium -crf 18 -pix_fmt yuv420p`, which is a quality rung BELOW
+# tools/conform.py's DELIVERY (crf 16, preset slow) on the act most exposed to
+# it: issue #86 measured that act II is fog, smoke and dark gradients, which is
+# exactly where a coarser quantiser bands. The private argv also omitted the
+# BT.709 VUI, so nothing downstream could tag what it could not read.
+X264 = conform.video_encode_args()
 
 
 def _run(cmd):
@@ -361,7 +400,15 @@ def render(out_path=None, work_dir=None, verbose=True):
     renders.mkdir(exist_ok=True)
     work = Path(work_dir or renders / "efmb-parts")
     work.mkdir(parents=True, exist_ok=True)
+    # ABSOLUTE, always. find_ffmpeg may return a `podman exec ...` prefix, and
+    # the container's cwd is not this checkout, so a relative --render path
+    # resolves somewhere that does not exist. Every other path handed to ffmpeg
+    # here is already absolute; this one came from argv. It failed at the MUX,
+    # which is the last step, so a relative argument burned the whole picture
+    # encode before reporting "No such file or directory".
     out_path = Path(out_path or renders / "efmb-hq.mp4")
+    if not out_path.is_absolute():
+        out_path = (Path.cwd() / out_path).resolve()
 
     parts = []
     head = work / "head_black.mp4"
