@@ -647,3 +647,43 @@ def test_requests_stay_small_enough_to_land_on_either_node():
     headroom of the two nodes, and the limit does the bursting."""
     assert int(farm.DEFAULT_CPU) <= 4
     assert int(farm.DEFAULT_LIMIT_CPU) > int(farm.DEFAULT_CPU)
+
+
+def test_a_broken_cp_stream_is_retried_not_fatal(monkeypatch):
+    """A 20-minute programme build died on its LAST upload because the API
+    server's stream hiccuped: `error reading from error stream: i/o timeout`.
+    15 of 17 segments were already encoded and were thrown away. The pod was
+    healthy and the bytes were fine, so the copy retries."""
+    kc = farm.Kubectl.__new__(farm.Kubectl)
+    kc.base, kc.namespace = ["kubectl"], "argo"
+    calls = []
+
+    def fake_run(args, timeout=60, check=True, input_text=None):
+        calls.append(args)
+        if len(calls) < 3:
+            return subprocess.CompletedProcess(
+                args, 1, "", "error reading from error stream: i/o timeout")
+        return subprocess.CompletedProcess(args, 0, "", "")
+
+    monkeypatch.setattr(kc, "run", fake_run)
+    proc = kc.cp("/tmp/x.mp4", "argo/pod:/work/in/x.mp4", sleep=lambda s: None)
+    assert proc.returncode == 0
+    assert len(calls) == 3
+
+
+def test_cp_still_fails_when_the_pod_is_genuinely_broken(monkeypatch):
+    """Bounded, so a real failure is still a failure -- three streams later."""
+    kc = farm.Kubectl.__new__(farm.Kubectl)
+    kc.base, kc.namespace = ["kubectl"], "argo"
+    calls = []
+
+    def fake_run(args, timeout=60, check=True, input_text=None):
+        calls.append(args)
+        if check:
+            raise farm.FarmError("kubectl cp failed:\nno such container")
+        return subprocess.CompletedProcess(args, 1, "", "no such container")
+
+    monkeypatch.setattr(kc, "run", fake_run)
+    with pytest.raises(farm.FarmError):
+        kc.cp("/tmp/x.mp4", "argo/pod:/work/in/x.mp4", sleep=lambda s: None)
+    assert len(calls) == farm.CP_ATTEMPTS
