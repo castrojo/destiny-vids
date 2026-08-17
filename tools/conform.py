@@ -237,11 +237,8 @@ def cache_root():
     """Where conformed files live. Big, derived, and safe to delete: every
     entry can be rebuilt from its source, which is the definition of a cache.
     """
-    override = os.environ.get("DESTINY_CONFORM_CACHE")
-    if override:
-        return Path(override)
-    return Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) \
-        / "destiny-vids" / "conform"
+    from tools.footage import xdg_cache
+    return xdg_cache("DESTINY_CONFORM_CACHE", "conform")
 
 
 def build_encode_command(src, dst, ffmpeg=None, threads=None):

@@ -238,8 +238,6 @@ def main(argv=None):
     ap.add_argument("--around", default=None,
                     help="a plate manifest whose windows the dialogue must avoid, "
                          "so a reveal is never buried under a line")
-    ap.add_argument("--keep-uncertain", action="store_true",
-                    help="keep cues whose speaker the vocative anchors do not settle")
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
 
@@ -258,12 +256,12 @@ def main(argv=None):
         entries, dropped = plan_script(
             data["cues"], shots, leads, max_shot_sec=args.max_shot_sec,
             hold=args.hold, busy=busy,
-            skip_uncertain=not args.keep_uncertain, log=print)
+            skip_uncertain=True, log=print)
     else:
         entries, dropped = plan_chat(
             data["cues"], shots, leads, max_shot_sec=args.max_shot_sec,
             hold=args.hold, busy=busy,
-            skip_uncertain=not args.keep_uncertain, log=print)
+            skip_uncertain=True, log=print)
 
     load_manifest_entries(entries)  # the same validation the burn path applies
     with Path(args.out).open("w", encoding="utf-8") as fh:

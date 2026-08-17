@@ -19,6 +19,7 @@ redacted file agree on where the picture is, and plates timed against one land
 on the other.
 """
 import argparse
+import itertools
 import json
 import sys
 from pathlib import Path
@@ -77,7 +78,7 @@ def whole_video(video_id, segments_dir=None, redactions_dir=None):
                     f"kept range {start:.3f}s-{end:.3f}s leaves no shot longer "
                     f"than a frame")
 
-    gaps = [(a["end_sec"], b["start_sec"]) for a, b in zip(shots, shots[1:])
+    gaps = [(a["end_sec"], b["start_sec"]) for a, b in itertools.pairwise(shots)
             if abs(b["start_sec"] - a["end_sec"]) > 0.001]
     return {
         "title": video_id,

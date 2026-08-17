@@ -79,6 +79,7 @@ fallback, never the silent one.
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import os
 import random
@@ -248,7 +249,7 @@ def chunk_boundaries(facts, segments):
     bounds = [round(i * frames / segments) for i in range(segments + 1)]
     return [(float(Fraction(b0) / fps), float(Fraction(b1 - b0) / fps),
              b1 - b0)
-            for b0, b1 in zip(bounds, bounds[1:])]
+            for b0, b1 in itertools.pairwise(bounds)]
 
 
 def _chunk_out_name(out_name, i):
@@ -421,12 +422,12 @@ def build_pvc(name, *, namespace, storage):
 
 
 def build_workflow(name, script, *, namespace, image, cpu, limit_cpu, memory,
-                   limit_memory, node, service_account, keep):
+                   limit_memory, node, keep):
     """A plain Workflow — never a WorkflowTemplate, which would have to be
     GitOps'd from lab/ and ArgoCD would fight it."""
     spec = {
         "entrypoint": "encode",
-        "serviceAccountName": service_account,
+        "serviceAccountName": DEFAULT_SERVICE_ACCOUNT,
         "volumes": [{"name": "work",
                      "persistentVolumeClaim": {"claimName": name}}],
         "templates": [{
@@ -625,7 +626,7 @@ def _tail_log(kc, pod):
 
 def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
                         cpu, limit_cpu, memory, limit_memory, node,
-                        service_account, storage, keep, timeout, desc,
+                        storage, keep, timeout, desc,
                         label="farm", log_prefix="  "):
     """The generic pod lifecycle: submit, stage, wait, fetch, clean up.
 
@@ -642,8 +643,7 @@ def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
     kc.apply_json(build_workflow(name, script, namespace=kc.namespace,
                                  image=image, cpu=cpu, limit_cpu=limit_cpu,
                                  memory=memory, limit_memory=limit_memory,
-                                 node=node,
-                                 service_account=service_account, keep=keep))
+                                 node=node, keep=keep))
     print(f"{label}: workflow {name} submitted (node {node}, {desc})")
     try:
         pod = ""
@@ -726,14 +726,14 @@ def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
 
 
 def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
-                   memory, limit_memory, node, service_account, storage, keep,
+                   memory, limit_memory, node, storage, keep,
                    timeout):
     return _execute_on_cluster(
         name=name, script=script,
         uploads=[(src, f"in/{Path(src).name}")],
         out_rel=plan["out_rel"], out=out, kc=kc, image=image, cpu=cpu,
         limit_cpu=limit_cpu, memory=memory, limit_memory=limit_memory,
-        node=node, service_account=service_account, storage=storage,
+        node=node, storage=storage,
         keep=keep, timeout=timeout,
         desc=f"{len(plan['chunks'])} chunks x up to {limit_cpu} cpu")
 
@@ -837,7 +837,7 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
                           image=DEFAULT_IMAGE, cpu=DEFAULT_CPU,
                           limit_cpu=DEFAULT_LIMIT_CPU, memory=DEFAULT_MEMORY,
                           limit_memory=DEFAULT_LIMIT_MEMORY, node=DEFAULT_NODE,
-                          service_account=DEFAULT_SERVICE_ACCOUNT, keep=False,
+                          keep=False,
                           timeout=DEFAULT_TIMEOUT, expected_duration=None,
                           label=None, ffprobe=None):
     """Run ONE local ffmpeg argv on the cluster and fetch its output back.
@@ -869,7 +869,7 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
     _execute_on_cluster(
         name=name, script=script, uploads=uploads, out_rel=out_rel, out=out,
         kc=kc, image=image, cpu=cpu, limit_cpu=limit_cpu, memory=memory,
-        limit_memory=limit_memory, node=node, service_account=service_account,
+        limit_memory=limit_memory, node=node,
         storage=storage_for(total), keep=keep, timeout=timeout,
         desc=f"1 encode x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
@@ -1118,9 +1118,7 @@ def main(argv=None):
                 farm_name(src.name), script, namespace=args.namespace,
                 image=args.image, cpu=args.cpu, limit_cpu=args.limit_cpu,
                 memory=args.memory, limit_memory=args.limit_memory,
-                node=args.node,
-                service_account=DEFAULT_SERVICE_ACCOUNT,
-                keep=args.keep), indent=2))
+                node=args.node, keep=args.keep), indent=2))
         return 0
 
     reference = Path(args.reference) if args.reference else src
@@ -1134,7 +1132,6 @@ def main(argv=None):
                            kc=kc, image=args.image, cpu=args.cpu,
                            limit_cpu=args.limit_cpu, memory=args.memory,
                            limit_memory=args.limit_memory, node=args.node,
-                           service_account=DEFAULT_SERVICE_ACCOUNT,
                            storage=args.storage or storage_for(src.stat().st_size),
                            keep=args.keep, timeout=args.timeout)
         else:

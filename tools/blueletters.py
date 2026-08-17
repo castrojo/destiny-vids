@@ -53,11 +53,6 @@ def blue_letters(text=None):
     return BLUE
 
 
-def is_blue(ch):
-    """Is this one character set in the accent?"""
-    return ch in BLUE
-
-
 def draw(drawer, xy, text, font, fill, accent, tracking_em=0.0):
     """Draw ``text`` glyph by glyph with its blue letters picked out.
 

@@ -316,11 +316,9 @@ def main(argv=None):
                         help="open or update a GitHub issue per gap")
     parser.add_argument("--dry-run", action="store_true",
                         help="with --file, print what would happen and stop")
-    parser.add_argument("--videos-dir", default=None)
-    parser.add_argument("--segments-dir", default=None)
     args = parser.parse_args(argv)
 
-    gaps = find_gaps(args.videos_dir, args.segments_dir)
+    gaps = find_gaps()
 
     if args.file:
         try:

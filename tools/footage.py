@@ -36,13 +36,21 @@ MEDIA = REPO_ROOT / "media"
 EXTENSIONS = (".mkv", ".mp4", ".webm", ".mov", ".m4v")
 
 
-def cache_path():
-    """Disposable, and outside the repo: a cache is never an input."""
-    override = os.environ.get("DESTINY_FOOTAGE_CACHE")
+def xdg_cache(env_var, *parts):
+    """A cache location under XDG, overridable by ``env_var``.
+
+    Disposable, and outside the repo: a cache is never an input. One home for
+    the rule so a second cache cannot drift to a different override name.
+    """
+    override = os.environ.get(env_var)
     if override:
         return Path(override)
     root = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
-    return root / "destiny-vids" / "footage-digests.json"
+    return root.joinpath("destiny-vids", *parts)
+
+
+def cache_path():
+    return xdg_cache("DESTINY_FOOTAGE_CACHE", "footage-digests.json")
 
 
 def resolve(video_id, media_dir=None):
