@@ -74,6 +74,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from tools import conform
 from tools import freshness  # noqa: E402
 from tools import footage  # noqa: E402
+from tools import peaks  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "trailer-1-plates.json"
@@ -149,10 +150,10 @@ TOTAL = PICTURE + BRIDGE + ENDCARD                     # 110.020
 # --- sound --------------------------------------------------------------------
 # The prologue fades from 93.000, under a bridge that ends its film. This one
 # has an end card after the bridge and the owner asked for the music to play
-# out longer, so the fade is the LAST few seconds of the whole thing and the
-# song is still going when the venue card arrives.
-AUDIO_FADE = 5.000
-AUDIO_FADE_START = TOTAL - AUDIO_FADE                  # 105.020
+# out longer. The wolves' howl is the 1:47 climax, so it must land at full
+# source level; only then does the final three-second fade begin.
+AUDIO_FADE = 3.020
+AUDIO_FADE_START = TOTAL - AUDIO_FADE                  # 107.000
 
 # The prologue's opening level ride, kept verbatim: it is a measured fix for a
 # real complaint ("tone down the spark noise at the beginning of the song so my
@@ -241,7 +242,7 @@ def _walk(a, b, at, dur):
             f"max(0\\,min(1\\,(t-{at:.3f})/{span:.3f}))")
 
 
-def filtergraph(manifest):
+def filtergraph(manifest, audio_gain=1.0):
     # --- the picture ---------------------------------------------------------
     # PADDED rather than scaled: the source already carries the delivery width
     # at native pixels, so 138 px of black top and bottom seats it in 16:9
@@ -388,12 +389,13 @@ def filtergraph(manifest):
     parts.append(f"[0:a]atrim=0:{TOTAL:.3f},asetpts=PTS-STARTPTS,"
                  f"afade=t=in:st=4.000:d=1.000,{ride},"
                  f"afade=t=out:st={AUDIO_FADE_START:.3f}:"
-                 f"d={AUDIO_FADE:.3f},aresample=48000[aout]")
+                 f"d={AUDIO_FADE:.3f},volume={audio_gain:.12g},"
+                 "aresample=48000[aout]")
 
     return ";".join(parts)
 
 
-def command(manifest, day_png, night_png):
+def command(manifest, day_png, night_png, audio_gain=1.0):
     return find_ffmpeg() + [
         "-hide_banner", "-y",
         "-i", str(SOURCE),
@@ -406,7 +408,7 @@ def command(manifest, day_png, night_png):
         "-i", str(PLATES_DIR / "plate_endcard-event.png"),
         "-i", str(PLATES_DIR / "plate_endcard-cta.png"),
         "-i", str(PLATES_DIR / "plate_daytime-kindness.png"),
-        "-filter_complex", filtergraph(manifest),
+        "-filter_complex", filtergraph(manifest, audio_gain),
         "-map", "[vout]", "-map", "[aout]",
         *conform.video_encode_args(),
         "-c:a", "flac", "-sample_fmt", "s32",
@@ -452,6 +454,16 @@ def main(argv=None):
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(argv_ff, check=True)
+    # The FLAC master is the delivery source. If its decoded true peak is hot,
+    # re-render from the original source at a derived static gain. A post-render
+    # remux through the container can see a stale inode after os.replace and
+    # truncate the delivery, so the correction reuses this complete graph.
+    def rerun_with_gain(gain):
+        subprocess.run(command(manifest, day, night, gain), check=True)
+
+    peaks.correct_delivered_peak(
+        OUT, 1.0, peaks.DEFAULT_TARGET_DBTP, rerun_with_gain,
+        ffmpeg=find_ffmpeg(), margin_db=peaks.DELIVERED_BAND_MARGIN_DB)
 
     delivered = None
     if not args.no_deliver:
