@@ -309,13 +309,24 @@ def filtergraph(manifest, audio_gain=1.0):
     for n, entry_id in enumerate(("book-a", "book-b")):
         entry = plate(manifest, entry_id)
         at, dur = entry["at"], entry["dur"]
-        fade = min(0.45, dur / 4)
+        # A PANEL MUST NOT DISSOLVE. Owner, 2026-08-17: "don't fade the box on
+        # it's own it reveals the text underneath ... before switching to the
+        # iguana". An alpha fade on a card that is mostly filled panel spends
+        # its whole ramp semi-transparent, so the book's printed lyric reads
+        # straight through the box -- worst at the out, which lands just before
+        # the cut to the iguana. `fade: 0` on the plate cuts it in and out
+        # instead; the fade is still the right treatment for a card that is
+        # only type.
+        fade = entry.get("fade", min(0.45, dur / 4))
+        ramps = ""
+        if fade > 0:
+            ramps = (f"fade=t=in:st={at:.3f}:d={fade:.3f}:alpha=1,"
+                     f"fade=t=out:st={at + dur - fade:.3f}:"
+                     f"d={fade:.3f}:alpha=1")
         idx = inputs + 1
         parts.append(_still(idx, f"bk{n}",
-                            f",trim=0:{PICTURE:.3f},setpts=PTS-STARTPTS,"
-                            f"fade=t=in:st={at:.3f}:d={fade:.3f}:alpha=1,"
-                            f"fade=t=out:st={at + dur - fade:.3f}:"
-                            f"d={fade:.3f}:alpha=1"))
+                            f",trim=0:{PICTURE:.3f},setpts=PTS-STARTPTS"
+                            + (f",{ramps}" if ramps else "")))
         ax, ay = entry["anchor"]
         bx, by = entry["anchor_out"]
         # A line may track the page for less time than it is on screen: book-b

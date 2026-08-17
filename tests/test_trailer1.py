@@ -341,6 +341,31 @@ def test_the_book_box_is_set_at_the_size_the_owner_chose(manifest):
     assert "line-height: 1.7;" in box
 
 
+def test_the_box_is_cut_in_and_out_never_dissolved(manifest):
+    """Owner, 2026-08-17: "don't fade the box on it's own it reveals the text
+    underneath ... before switching to the iguana".
+
+    A card that is mostly filled panel spends an alpha ramp semi-transparent,
+    so the book's printed lyric reads through it. The out ramp landed right
+    before the cut to the iguana, which is where it was seen.
+    """
+    box = plate(manifest, "book-a")
+    assert box["fade"] == 0
+    graph = T.filtergraph(manifest)
+    chunk = next(c for c in graph.split(";") if c.endswith("[bk0]"))
+    assert "fade=" not in chunk, "the box still dissolves"
+    assert box["at"] + box["dur"] < T.CUT_OUT - T.JOIN_FADE, "still up at the cut"
+
+
+def test_the_box_panel_is_opaque(manifest):
+    """At 90% the page's printed lyric was legible through the panel even at
+    full card opacity -- a second set of words behind ours."""
+    card = (REPO_ROOT / "cards" / "bookline.html").read_text()
+    box = card.split('body[data-variant="box"] .line')[1]
+    assert "background: rgb(4 10 20);" in box
+    assert "rgb(4 10 20 / 90%)" not in box
+
+
 def test_the_book_box_asks_for_no_blue_letters(manifest):
     """Owner, 2026-08-17: 'get rid of the blue here'.
 
