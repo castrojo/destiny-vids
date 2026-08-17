@@ -1362,7 +1362,7 @@ def test_probe_audio_extent_takes_the_max_not_the_last_packet(
 
 # --- assembly refuses stale acts (the "always ships stale" defect) ----------
 
-def _stale_ws(tmp_path, fresh=False):
+def _stale_ws(tmp_path, fresh=False, blocked_on=None):
     """A one-act plan seating a master whose input moved after the render."""
     import os
     from tools import deliver
@@ -1383,8 +1383,10 @@ def _stale_ws(tmp_path, fresh=False):
         (tmp_path / src_rel).write_text("v2")
 
     delivery = tmp_path / "delivery.json"
-    delivery.write_text(json.dumps({"masters": {"I": {
-        "path": str(master), "sources": [src_rel], "source_digest": digest}}}))
+    entry = {"path": str(master), "sources": [src_rel], "source_digest": digest}
+    if blocked_on:
+        entry["stale_blocked_on"] = blocked_on
+    delivery.write_text(json.dumps({"masters": {"I": entry}}))
 
     prod = tmp_path / "01-intro.mp4"
     os.link(master, prod)          # Prod is a hardlink, exactly as publish makes it
@@ -1408,7 +1410,7 @@ def test_assembly_refuses_an_act_whose_master_predates_its_inputs(
 
     stale = megacut.stale_seated_acts(plan, delivery_path=delivery)
 
-    assert [n for n, _ in stale] == ["I"]
+    assert [n for n, _, _ in stale] == ["I"]
 
 
 def test_assembly_does_not_cry_stale_over_a_rebuilt_act(tmp_path, monkeypatch):
@@ -1432,3 +1434,34 @@ def test_a_stale_act_is_matched_through_its_prod_hardlink(tmp_path, monkeypatch)
     masters, _ = deliver.load_delivery(delivery)
     assert Path(plan["items"][0]["path"]).name != Path(masters["I"]["path"]).name
     assert megacut.stale_seated_acts(plan, delivery_path=delivery)
+
+
+def test_assembly_never_refuses_over_a_stale_act(tmp_path, monkeypatch, capsys):
+    """A stale act is REPORTED and seated. It never withholds the programme.
+
+    Owner, 2026-08-17, when act III stopped every build: "you are blocking
+    releases for no reason. the reasons you are given are incorrect." He was
+    right on the evidence -- act III's digest covers all of vocab/casting.yaml,
+    so 503 lines about OTHER acts' people marked it stale while the only two
+    bindings it renders, osiris and sagira, were byte-identical. The digest
+    answers "did the inputs move", never "did the picture change", and a signal
+    that coarse may inform a person but may not hold the film.
+    """
+    plan, delivery, root = _stale_ws(tmp_path)
+    monkeypatch.setattr(megacut, "stale_seated_acts",
+                        lambda _plan: [("III", "Act III", None),
+                                       ("VI", "Act VI", "#58")])
+    monkeypatch.setattr(megacut, "expected_duration", lambda _p: 1.0)
+
+    rc = megacut.main([str(_plan_file(tmp_path, plan)), "--dry-run"])
+
+    assert rc == 0, "a stale act must not stop the build"
+    err = capsys.readouterr().err
+    assert "act III is stale and seated, with NO recorded reason" in err
+    assert "act VI is stale and seated, as recorded (#58)" in err
+
+
+def _plan_file(tmp_path, plan):
+    f = tmp_path / "plan.json"
+    f.write_text(json.dumps(plan))
+    return f
