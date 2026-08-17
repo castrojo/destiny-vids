@@ -111,6 +111,10 @@ DEFAULT_CPU = "2"               # request: low, so it always schedules
 DEFAULT_LIMIT_CPU = "24"        # limit: the burst ceiling on idle exo-0
 DEFAULT_MEMORY = "4Gi"          # request
 DEFAULT_LIMIT_MEMORY = "16Gi"   # limit
+# `kubectl cp` streams tar over the API server; a blip there is a broken
+# socket, not a broken encode, so the copy is retried before it is a failure.
+CP_ATTEMPTS = 3
+CP_BACKOFF_SECONDS = 5
 DEFAULT_THREADS = 6
 DEFAULT_TIMEOUT = 7200          # matches the controller's activeDeadlineSeconds
 WORK_DIR = "/work"
@@ -493,10 +497,37 @@ class Kubectl:
         return self.run(["-n", self.namespace, "exec", pod, "-c", "main",
                          "--", *argv], check=check)
 
-    def cp(self, src, dst):
+    def cp(self, src, dst, attempts=CP_ATTEMPTS, sleep=time.sleep):
+        """Copy a file in or out of the pod, retrying a transient stream break.
+
+        `kubectl cp` streams a tar over the API server's SPDY/websocket
+        channel, and a momentary blip there fails the whole copy with
+        `i/o timeout` on the error stream. That is not a failed encode: the
+        pod is fine, the bytes are fine, the socket hiccuped. Letting it
+        propagate threw away a 20-minute programme build that had already
+        farmed 15 of its 17 segments, on the LAST upload -- so it is retried,
+        with a short backoff, before it is allowed to be a failure.
+
+        Only the copy is retried, and only a bounded number of times: a
+        genuinely broken pod still fails, just three stream errors later.
+        """
         # -c main: the argo wait container matches kubectl's default pick on
         # some versions, and it has no tar.
-        return self.run(["cp", str(src), dst, "-c", "main"], timeout=3600)
+        args = ["cp", str(src), dst, "-c", "main"]
+        for attempt in range(1, attempts + 1):
+            try:
+                proc = self.run(args, timeout=3600, check=attempt == attempts)
+                if proc.returncode == 0:
+                    return proc
+                err = proc.stderr.strip()[:200]
+            except subprocess.TimeoutExpired as exc:
+                if attempt == attempts:
+                    raise FarmError(f"kubectl cp timed out: {exc}") from exc
+                err = "timed out"
+            print(f"farm: kubectl cp attempt {attempt}/{attempts} failed "
+                  f"({err}); retrying", file=sys.stderr, flush=True)
+            sleep(CP_BACKOFF_SECONDS * attempt)
+        raise FarmError("kubectl cp failed after retries")
 
     def workflow_phase(self, name):
         proc = self.run(["-n", self.namespace, "get", "workflow", name,
