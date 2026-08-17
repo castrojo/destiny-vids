@@ -132,7 +132,7 @@
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
-   "note": "7:50.453. Act VIII, the credits (#51), rebuilt 2026-08-14: a call to action before the comic reveal, the credits after it, a second bed pass with vocals, and four upstream projects. Encoded to the DELIVERY SPEC (59.94, high@4.2, bt709) so the megacut joins it by stream copy rather than conforming it at assembly time.",
+   "note": "7:36.675. Act VIII, the credits (#51): a call to action before the comic reveal, the credits after it, a second bed pass with vocals, and four upstream projects. Runs on the Bluefin DAY wallpapers over the same white-on-blue deck. Encoded to the DELIVERY SPEC (59.94, high@4.2, bt709) so the megacut joins it by stream copy rather than conforming it at assembly time.",
    "sources": [
     "stories/08-credits.json",
     "scripts/build_credits.py",
@@ -141,7 +141,7 @@
     "music/bed_storytime.json",
     "vocab/casting.yaml"
    ],
-   "source_digest": "e775c6b99ae5f432dbd553ec5d7991bf24acfad128d6217ad41888b7d3b3b6b9"
+   "source_digest": "aeb59c734aaf742baa0efbda6c76ec1c51c856688fd9f20a507f03ebf987a846"
   }
  },
  "social": {

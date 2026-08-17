@@ -729,8 +729,8 @@ def test_a_weight_is_an_axis_not_a_second_file():
 
 
 def test_the_wallpapers_cycle_the_calendar_and_keep_switching():
-    """Owner: 'use the dark mode wallpapers, make them go through the entire
-    calendar order and keep switching.'
+    """Owner: 'make them go through the entire calendar order and keep
+    switching', now on the light set.
 
     Consecutive cards get consecutive months, and the cycle wraps rather than
     stopping on December.
@@ -744,6 +744,93 @@ def test_the_wallpapers_cycle_the_calendar_and_keep_switching():
     picked = [walls[i % n] for i in range(n * 2 + 3)]
     assert picked[0] != picked[1], "consecutive cards must not share a month"
     assert picked[n] == picked[0], "the cycle must wrap"
+
+
+def test_the_cycle_is_the_day_set_and_never_mixes_the_two():
+    """Owner: 'I just want light colored wallpapers.'
+
+    The night frames still sit in the same directory under their bare NN.png
+    names, because the prologue's bridge reads them. A glob that picked up
+    both would deal a night frame into the roll every other card.
+    """
+    walls = C.wallpapers()
+    if not walls:
+        pytest.skip("no wallpapers cached; run scripts/fetch_wallpapers.py")
+    assert all(p.stem.endswith("-day") for p in walls), \
+        f"act VIII runs on the day set; got {[p.name for p in walls]}"
+
+
+def _relative_luminance(rgb):
+    """WCAG relative luminance of an 8-bit RGB triple."""
+    def channel(v):
+        v /= 255
+        return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+    r, g, b = (channel(v) for v in rgb[:3])
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def _contrast(a, b):
+    la, lb = _relative_luminance(a), _relative_luminance(b)
+    hi, lo = max(la, lb), min(la, lb)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+# WCAG's large-text threshold. Every credit here is display type and none of
+# it is body copy, so this is the floor -- most months clear it comfortably.
+CONTRAST_FLOOR = 3.0
+
+
+def test_the_type_can_be_read_off_every_month():
+    """The light wallpapers' real regression guard, measured in pixels.
+
+    The cycle test passes whether the roll is legible or not: it only checks
+    which file is picked. This measures the deck's white type against the
+    graded wallpaper in the band every card sets its name in, on EVERY month,
+    which is what lets the grade leave the day art's exposure alone -- the
+    centre scrim is carrying the type, and this is the proof.
+    """
+    walls = C.wallpapers()
+    if not walls:
+        pytest.skip("no wallpapers cached; run scripts/fetch_wallpapers.py")
+    for i in range(len(walls)):
+        frame = C.backdrop(i).convert("RGB")
+        band = frame.crop((0, int(C.H * 0.34), C.W, int(C.H * 0.66)))
+        small = band.resize((32, 12), Image.LANCZOS)
+        worst = min(_contrast(px, C.TEXT) for px in small.get_flattened_data())
+        assert worst >= CONTRAST_FLOOR, (
+            f"{walls[i].name} only reaches {worst:.2f}:1 in the name band; "
+            f"the scrim is not carrying the type")
+
+
+def test_a_login_is_never_shortened_to_something_nobody_is_called():
+    """Owner: 'fix the ellipsis.'
+
+    A wide login used to be cut to 'angelcerverarold...'. Rule 3 is about
+    crediting a real person correctly, and a name is not a string you may trim
+    to fit -- it comes down in SIZE instead.
+    """
+    import inspect
+    src = inspect.getsource(C.render_name_wall)
+    assert "\\u2026" not in src and "…" not in src, \
+        "a login is set whole; the ellipsis is gone"
+    assert "CELL_MIN_SIZE" in src, "the fitter shrinks the type instead"
+
+
+def test_a_placard_reproduces_the_authored_identity_and_never_the_splash():
+    """Owner: 'get rid of those hero splashes they suck.'
+
+    The 1200x630 card is a splash composite. What was AUTHORED is the copy --
+    label, class, name, title -- and that is what the placard reproduces, so
+    dropping the art costs nobody their identity. A row nobody wrote is not
+    drawn, and nothing here composes one.
+    """
+    import inspect
+    src = inspect.getsource(C.render_cast_placard)
+    assert "cast_identity" in src
+    assert not hasattr(C, "cast_card"), \
+        "the splash-card loader is gone, not merely unused"
+    assert C.cast_identity(None) is None
+    assert C.cast_identity("nobody-authored-this") is None
 
 
 def test_the_wordmark_no_longer_says_an_ublue_project(manifest):
@@ -887,7 +974,8 @@ def test_the_gitlab_names_are_never_fetched_as_github_logins(manifest, tmp_path)
 
     class Recorder:
         def __init__(self, *a, **k):
-            seen.append(a[0] if a else k.get("url"))
+            req = a[0] if a else k.get("url")
+            seen.append(getattr(req, "full_url", req))
             raise OSError("no network in tests")
 
     import urllib.request
