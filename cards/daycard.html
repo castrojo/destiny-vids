@@ -36,18 +36,29 @@ const title = document.getElementById('title')
 title.textContent = p.get('title') || ''
 document.getElementById('subtitle').textContent = p.get('subtitle') || ''
 document.getElementById('body').textContent = p.getAll('body').join(' ')
-const titleText = title.textContent
-const wordAt = titleText.toLowerCase().lastIndexOf('evolve')
-if (wordAt !== -1) {
-  const oAt = wordAt + 2
-  const letter = titleText[oAt]
-  const mark = document.createElement('img')
-  mark.className = 'k8s-o'
-  mark.src = '../renders/marks/kubernetes.svg'
-  mark.alt = letter
-  mark.onerror = () => mark.replaceWith(document.createTextNode(letter))
-  title.textContent = ''
-  title.append(titleText.slice(0, oAt), mark, titleText.slice(oAt + 1))
+
+// AN AUTHORED GLYPH STANDING IN FOR A LETTER -- the same `glyph` / `glyph_src`
+// contract cards/ending.html already carries, rather than a second spelling of
+// it. `token` is the letter the mark replaces and the optional `word` says
+// which word to look in, so the mark is placed by the RECORD and not by this
+// file guessing at a word. The first version of this card hard-coded "evolve",
+// which meant the copy could not change without the mark silently vanishing.
+const glyph = JSON.parse(p.get('glyph') || 'null')
+const src = p.get('glyph_src')
+const text = title.textContent
+if (glyph && glyph.token && src) {
+  const from = glyph.word ? text.toLowerCase().indexOf(glyph.word.toLowerCase()) : 0
+  const at = from < 0 ? -1 : text.indexOf(glyph.token, from)
+  const within = glyph.word ? from + glyph.word.length : text.length
+  if (at !== -1 && at + glyph.token.length <= within) {
+    const mark = document.createElement('img')
+    mark.className = 'k8s-o'
+    mark.src = src
+    mark.alt = glyph.token
+    mark.onerror = () => mark.replaceWith(document.createTextNode(glyph.token))
+    title.textContent = ''
+    title.append(text.slice(0, at), mark, text.slice(at + glyph.token.length))
+  }
 }
 document.fonts.ready.then(() => { window.__renderReady = true })
 </script>

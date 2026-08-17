@@ -30,15 +30,18 @@ The four departures from the prologue
    picture and sound run ``GAP`` seconds apart for the rest of the film. Every
    constant below is in FILM time; ``source_at()`` converts.
 
-2. **Two owner lines over the book**, seated on the printed lyric they replace
-   and walked along its drift. See ``stories/trailer-1-plates.json``.
+2. **Four owner lines over the book**, in one stationary box on the book shot.
+   See ``stories/trailer-1-plates.json``.
 
-3. **A longer, more dramatic wolves fade.** Owner: *"make the wolves fade
-   longer and more dramatic"*. The bridge goes 10.000 -> 14.000, and the four
-   extra seconds are spent on the TURN and the SINK rather than the holds --
-   the sun takes longer to go down and the night takes longer to take the
-   frame. Lengthening the holds would have made it longer without making it
-   more dramatic.
+3. **A longer, more dramatic wolves fade**, carrying two marquee lines. Owner:
+   *"make the wolves fade longer and more dramatic"*. The bridge goes 10.000 ->
+   14.000, and the four extra seconds are spent on the TURN and the SINK rather
+   than the holds -- the sun takes longer to go down and the night takes longer
+   to take the frame. Lengthening the holds would have made it longer without
+   making it more dramatic. Two day cards then play over that sink -- owner,
+   2026-08-17: *"Change the evolve or die into two messages ... all three text
+   messages should floow smoothly into one reveal"* -- and they are read off
+   the record, not timed by constants here.
 
 4. **A KubeCon end card**, and the music plays out under it. Owner: *"Let the
    music play out longer than the original video, look up how long movie
@@ -180,6 +183,17 @@ def plate(manifest, plate_id):
         if entry["id"] == plate_id:
             return entry
     raise KeyError(plate_id)
+
+
+def day_cards(manifest):
+    """The marquee lines over the day wolves, in the order they are authored.
+
+    There are two of them -- owner, 2026-08-17: *"Change the evolve or die into
+    two messages"* -- and there could be three tomorrow, so the build reads
+    them off the record instead of naming one plate id. Their windows are
+    authored copy timing and belong in the manifest with the words.
+    """
+    return [entry for entry in manifest["plates"] if entry["kind"] == "daycard"]
 
 
 def render_cards():
@@ -336,13 +350,31 @@ def filtergraph(manifest, audio_gain=1.0):
     parts.append(f"[day][bridgenight]xfade=transition=fade:"
                  f"duration={BRIDGE - BRIDGE_DAY_SETTLE:.3f}:"
                  f"offset={BRIDGE_DAY_SETTLE:.3f}[bridgepre]")
-    parts.append(_still(9, "daycard",
-                        f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
-                        "fade=t=in:st=0.600:d=0.400:alpha=1,"
-                        "fade=t=out:st=3.400:d=0.600:alpha=1"))
-    parts.append("[bridgepre][daycard]overlay=0:0:shortest=1:"
-                 "enable=between(t\\,0.600\\,4.000)[bridge]")
     inputs += 2
+
+    # THE DAY CARDS, one overlay each, taken from the record rather than from
+    # constants here: their windows are authored copy timing, and a second card
+    # was added by writing a second plate. They are seated in BRIDGE-local
+    # seconds, so the film times in the manifest have PICTURE taken off them.
+    last = "bridgepre"
+    cards = day_cards(manifest)
+    for n, entry in enumerate(cards):
+        at = entry["at"] - PICTURE
+        dur = entry["dur"]
+        fade_in = entry.get("fade_in", 0.400)
+        fade_out = entry.get("fade_out", 0.600)
+        parts.append(_still(inputs + 1, f"dc{n}",
+                            f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
+                            f"fade=t=in:st={at:.3f}:d={fade_in:.3f}:alpha=1,"
+                            f"fade=t=out:st={at + dur - fade_out:.3f}:"
+                            f"d={fade_out:.3f}:alpha=1"))
+        out = "bridge" if n == len(cards) - 1 else f"bridge{n}"
+        parts.append(f"[{last}][dc{n}]overlay=0:0:shortest=1:"
+                     f"enable=between(t\\,{at:.3f}\\,{at + dur:.3f})[{out}]")
+        inputs += 1
+        last = out
+    if not cards:
+        parts.append("[bridgepre]null[bridge]")
 
     # --- the end card, day falling into dark ---------------------------------
     # Owner, 2026-08-16: "start the wallpaper at day and then as it fades into
@@ -396,6 +428,10 @@ def filtergraph(manifest, audio_gain=1.0):
 
 
 def command(manifest, day_png, night_png, audio_gain=1.0):
+    # INPUT ORDER IS THE GRAPH'S ORDER. `filtergraph` counts inputs as it
+    # builds, so a PNG added here without a matching overlay -- or in the wrong
+    # place -- feeds the wrong card into the wrong window. The day cards are
+    # taken from the record, so they are listed from the record too.
     return find_ffmpeg() + [
         "-hide_banner", "-y",
         "-i", str(SOURCE),
@@ -405,9 +441,10 @@ def command(manifest, day_png, night_png, audio_gain=1.0):
         "-i", str(PLATES_DIR / "plate_book-b.png"),
         "-i", str(day_png),
         "-i", str(night_png),
+        *[arg for entry in day_cards(manifest)
+          for arg in ("-i", str(PLATES_DIR / f"plate_{entry['id']}.png"))],
         "-i", str(PLATES_DIR / "plate_endcard-event.png"),
         "-i", str(PLATES_DIR / "plate_endcard-cta.png"),
-        "-i", str(PLATES_DIR / "plate_daytime-kindness.png"),
         "-filter_complex", filtergraph(manifest, audio_gain),
         "-map", "[vout]", "-map", "[aout]",
         *conform.video_encode_args(),

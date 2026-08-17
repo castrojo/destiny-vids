@@ -1,6 +1,7 @@
 {
   "_what": "TRAILER 1 -- a promotional cut derived from the PROLOGUE, not a ninth act. It reuses the prologue's source (Nightwish's 'Perfume Of The Timeless'), its main title and its wolves bridge, then adds two owner-written lines over the book sequence and a KubeCon end card. It is delivered to ~/Videos/Wolves/trailer-1.mp4 and takes no numeral, no chapter marker and no slot in stories/megacut/megacut.json: the programme is unchanged by it.",
   "_owner": "2026-08-16, in order: 'Now make a new video: Trailer 1 - make a copy of this video and then / Add dialogue boxes over the words in the book section :25 - :33 so that we can say words, account for the movement because we want to \"replace\" these words with our overlay, wolves style / Two Generations of Contributors / One, new, one old. Fighting to work together. / Then make the wolves fade longer and more dramatic and add a KubeCon | CloudNativeCon North America / Salt Lake City, Utah / #KubeCon #CloudNativeCon #7wolves at the end. Let the music play out longer than the original video, look up how long movie trailers should be given the things we have / Sear the | again'. Then: 'you can even go to :36 actually and skip the shot of the tank and go right to the iguana again'. And, on the second line: change 'Struggling to build together.' to 'Dreaming to build a better future'.",
+  "_owner_2026_08_17": "'The text box for the message is too wide, let's do this: Two Generations of Contributors / One at their beginning / One at their end / These are their Real Stories. Change the evolve or die into two messages, lengthem them to show them lead to the kubecon text, have the text be Extinction is the Rule / Survival is the Exception. all three text messages should floow smoothly into one reveal.' Asked which capitalisation the first book line should carry, the owner kept the existing 'Two Generations of Contributors'; asked where the Kubernetes helm should go now that no line contains 'Evolve', the owner put it on the O in 'Extinction'; asked whether the lengthened cards should extend the film, the owner held the runtime at 1:50.000, so both cards were seated inside the existing 14.000 s bridge and no music-timed beat was re-measured.",
   "_length": "1:50.0 exactly -- the owner's target. The MPA and NATO cap a theatrical trailer at 2:30 and teasers run 0:30-1:30, so 1:50 sits between a teaser and a full trailer, which is what this is: the whole main title sequence, one narrative beat, and a venue card. The budget is picture 88.200 + bridge 14.000 + end card 7.820 = 110.020. The picture is 88.200 rather than the 88.520 the two trims add up to because the dissolve at the tank join costs its own 0.320 s -- xfade emits d1 + d2 - duration -- and the end card is where those 0.320 s are given back, so the delivered runtime is exactly 1:50.0.",
   "_climax": "1:47.000 is the trailer climax. The owner identified it as the wolves fading with the wolf sounds: the final Bluefin wolves image is sinking into black while the existing Nightwish source audio stays at full level through that howl, then fades 107.000 -> 110.020. This is a documented editorial read, not a sound-design instruction: no wolf sound is added, synthesized, moved, or processed; the music remains exactly as sourced.",
   "_the_tank_is_cut": "Scene boundaries DETECTED on the source, not taken from the owner's timestamps: the book runs 24.880 -> 33.640, the empty specimen jar in the library 33.640 -> 36.320, and the iguana 36.320 -> 40.720. The owner asked to skip the tank and go straight to the iguana, so 33.640 -> 36.320 is excised and the two halves are joined with a short dissolve. THE AUDIO IS NOT CUT THERE. The song runs continuously from the source, so the music carries over the picture edit -- which means picture and sound run 2.680 s apart after 33.640, deliberately, and every timing below the join is in FILM time.",
@@ -38,16 +39,19 @@
       "id": "book-a",
       "kind": "bookline",
       "variant": "box",
-      "at": 28.3,
-      "dur": 4.6,
+      "at": 26.9,
+      "dur": 6.0,
       "angle": 4.0,
       "body": [
         "Two Generations of Contributors",
-        "One, new, one old. Dreaming to build a better future"
+        "One at their beginning",
+        "One at their end",
+        "These are their Real Stories"
       ],
       "anchor": [1030, 443],
       "anchor_out": [1030, 443],
-      "note": "ONE BOX, ONE BOOK SHOT. Owner: 'make one continuous box and put the text on one shot and hold it. do NOT cover the iguana.' Both authored lines therefore live in this single stationary fancy-subtitle band, 28.300 -> 32.900; its 0.450 s fade out completes before the picture reaches the iguana join at 33.320."
+      "note": "ONE BOX, ONE BOOK SHOT. Owner: 'make one continuous box and put the text on one shot and hold it. do NOT cover the iguana.' All four authored lines live in this single stationary fancy-subtitle band, 26.900 -> 32.900; its 0.450 s fade out completes before the picture reaches the iguana join at 33.320.",
+      "_copy": "OWNER COPY, verbatim. Owner, 2026-08-17: 'The text box for the message is too wide, let's do this: Two Generations of Contributors / One at their beginning / One at their end / These are their Real Stories'. The retired second line -- 'One, new, one old. Dreaming to build a better future' -- was 52 characters and drove the box out to its 82% max width; four short lines are content-width and narrow it without a CSS change. The window opens 1.400 s earlier (28.300 -> 26.900) because four lines take longer to read than two; the book shot starts at 24.880, so the earlier in point is still inside it."
     },
     {
       "id": "book-b",
@@ -63,12 +67,31 @@
       "note": "INTENTIONALLY EMPTY. The second line moved into book-a when the owner chose one continuous stationary box on the book shot. This entry remains only because the build's fixed input layout still reads plate_book-b.png; an empty body makes the card transparent and it covers nothing."
     },
     {
-      "id": "daytime-kindness",
+      "id": "daycard-extinction",
       "kind": "daycard",
       "at": 88.8,
-      "dur": 3.4,
-      "title": "Evolve or Die",
-      "note": "OWNER COPY, verbatim. The day companion to the night KubeCon card: one centered marquee line over the day wolves, with the O in Evolve rendered as the white Kubernetes helm, then clearing before they fade into their original night frame."
+      "dur": 5.0,
+      "title": "Extinction is the Rule",
+      "glyph": {
+        "token": "o",
+        "word": "Extinction"
+      },
+      "glyph_src": "renders/marks/kubernetes.svg",
+      "fade_in": 0.4,
+      "fade_out": 0.5,
+      "note": "MESSAGE ONE OF THREE. Owner, 2026-08-17: 'Change the evolve or die into two messages, lengthen them to show them lead to the kubecon text ... all three text messages should flow smoothly into one reveal.' One centered marquee line over the day wolves, bridge-local 0.600 -> 5.600, with the O in Extinction rendered as the white Kubernetes helm -- the mark the retired 'Evolve or Die' card carried on its own O.",
+      "_copy": "OWNER COPY, verbatim. It replaces 'Evolve or Die', which is retired along with the earlier 'The Final Shape is Kindness' and \"Wolves aren't Evil\"."
+    },
+    {
+      "id": "daycard-survival",
+      "kind": "daycard",
+      "at": 94.4,
+      "dur": 6.2,
+      "title": "Survival is the Exception",
+      "fade_in": 0.5,
+      "fade_out": 0.6,
+      "note": "MESSAGE TWO OF THREE, bridge-local 6.200 -> 12.400. It takes the frame as the first card leaves it -- the fades are adjacent rather than separated by a hold -- and clears 1.600 s before the end card begins, so the KubeCon reveal lands on empty night wolves. NO HELM: one mark across the pair, on the first line, or it reads as a bullet rather than a letter.",
+      "_the_one_reveal": "The three messages are one reveal by continuity, not by a new transition. The bridge's night wolves and the end card's night wolves are the same image and there is no black between them, so both day cards, the sinking wolves and the KubeCon card all play over one uninterrupted picture. Nothing outside these two windows moved: the trailer is still 1:50.000 exactly, and the end card's fades are still on the measured RMS moments in the source music tail."
     },
     {
       "id": "endcard-event",
