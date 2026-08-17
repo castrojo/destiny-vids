@@ -48,6 +48,8 @@ authored fields and change no string:
 | `variant` | the eyebrow's weight option, `b`..`e`, or `poster` for a CTA-first end card |
 | `angle` | a `bookline`'s tilt in degrees, so it can sit on a tilted page |
 | `size` | a `bookline`'s type size, for a beat that runs to two lines |
+| `placement` | where a `daycard`'s line sits vertically over its wallpaper |
+| `glyph` / `glyph_src` | a mark that stands in for one letter of the title |
 
 **`font-weight: 500` and `600` are no-ops on this host.** The stack is the
 site's — `'Inter', 'Arial Narrow', sans-serif` — and Inter is not installed, so
@@ -94,6 +96,56 @@ relative to the first leg. Its output lasts `first + second - duration`, so
 choose the two trim lengths such that the transition occupies the requested
 window exactly. Source: FFmpeg documentation via Context7
 `/websites/ffmpeg_documentation`, “Split input streams” and “xfade”.
+
+## Where a line sits is authored, and it is measured
+
+A card over a wallpaper has one readability decision in it — which horizontal
+band of that picture the type sits on — and the band that works is a property
+of the *image*, not of the card. So the seat travels on the plate (`placement`)
+and the template carries the named seats, rather than one hard-coded `top`.
+
+**Measure it; do not nudge it.** Composite the rendered PNG's alpha bounding box
+against the wallpaper and read the luminance under the glyphs:
+
+```python
+from PIL import Image
+bg = Image.open("renders/wallpapers/03-day.png").convert("L").resize((1920, 1080))
+x0, y0, x1, y1 = Image.open("renders/plates-x/plate_card.png").split()[3].getbbox()
+px = bg.load()
+vals = sorted(px[x, y] for y in range(y0, y1, 3) for x in range(x0, x1, 4))
+print(sum(vals) / len(vals), vals[int(len(vals) * .95)])   # mean, p95
+```
+
+The **95th percentile matters more than the mean**: a dark band with a few
+bright specular hits is what actually eats a glyph. Compare candidate seats
+against each other and keep the numbers in the plate's note, because the next
+person to move the line needs to know which seats were already rejected.
+
+Luminance is not the only test. **The subject of the picture outranks it** — a
+darker band that lands the line across the face or head of whatever the image is
+of is the wrong band, and it is the correction an owner makes immediately.
+
+## An authored glyph standing in for a letter
+
+A mark replacing one letter — the Kubernetes helm as an `o` — travels as the
+`glyph` / `glyph_src` pair, which `cards/ending.html` defines and other
+templates reuse:
+
+```json
+"glyph": { "token": "o", "word": "Extinction" },
+"glyph_src": "renders/marks/kubernetes.svg"
+```
+
+`token` is the letter, and the optional `word` scopes the search so the mark
+lands in the intended word rather than on the first matching letter in the line.
+Every template that draws one falls back to the plain letter on `img.onerror`,
+because `renders/` is not committed and a checkout without the mark must still
+produce the word.
+
+**The record places the mark, never the template.** A template that matches a
+word — `title.toLowerCase().lastIndexOf('evolve')` — makes the mark vanish
+silently the first time the copy is rewritten, which is a card quietly losing an
+authored element with no error and no failing test.
 
 ## Why not Pillow
 
