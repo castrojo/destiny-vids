@@ -453,11 +453,12 @@ CHOICE_LINE = STATUS_LINE
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
 
-# The full-frame cards -- the cinematic act slide and the intro's comic title
-# card. They are the site's own components, reproduced by `cards/render-cards.mjs`
+# The full-frame cards -- the cinematic act slide, the intro's comic title
+# card, and the full-bleed photo card. They are the site's own components,
+# reproduced by `cards/render-cards.mjs`
 # in a real browser rather than ported into Pillow, so this module only ever
 # BURNS them: `render` skips them and `render_plate` refuses one outright.
-CARD_KINDS = ("act", "comic")
+CARD_KINDS = ("act", "comic", "photo")
 
 # The card kinds that own a row of their own rather than the lower third: the
 # site's top-left HUD, Destiny's boss bar at the top of frame, the console
@@ -1644,7 +1645,7 @@ def render_plate(spec):
     the site's own two: the top-of-frame `status` HUD, and the `companion`
     card that names a Guardian's bonded dinosaur beside their lower third.
 
-    The FULL-FRAME cards (`act`, `comic`) are not rendered here at all. They are
+    The FULL-FRAME cards (`act`, `comic`, `photo`) are not rendered here at all. They are
     the site's own components, and they are reproduced the way every other
     Wolves card is -- the real CSS in a browser (`cards/render-cards.mjs`),
     never a second implementation in Pillow. Rendering one here would silently
@@ -3019,7 +3020,7 @@ def render_all(entries, out_dir, picture=None):
     """Render every plate in a manifest -- except the full-frame cards.
 
     A manifest may mix the two: the megacut's hero segment carries six Guardian
-    plates and the comic title card. The cards come from `cards/render-cards.mjs`
+    plates and the full-frame title card. The cards come from `cards/render-cards.mjs`
     and land in the same directory under the same `plate_<id>.png` name, so
     both renderers fill one plates-dir and `burn` reads it without caring which
     tool drew which file. Skipped cards are returned so a caller can report
@@ -3102,11 +3103,15 @@ def _burn_units(entries):
     return units
 
 
-def burn(video, entries, plates_dir, out_path, ffmpeg=None):
+def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None):
     """Composite every plate onto ``video`` in one ffmpeg pass.
 
     Audio is stream-copied: this stage titles a cut, it does not re-cut it, and
     re-encoding audio here would be a second generation for no reason.
+
+    ``runner`` defaults to a local subprocess; a caller (the farm path in
+    ``scripts/build_act1.py``) may pass one that runs the same argv elsewhere
+    and fetches ``out_path`` back.
     """
     if ffmpeg is None:
         from tools.render import find_ffmpeg
@@ -3207,6 +3212,9 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None):
         str(out_path),
     ]
     print("ffmpeg:", " ".join(ffmpeg))
+    if runner is not None:
+        runner(cmd)
+        return out_path
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         tail = "\n".join(proc.stderr.strip().splitlines()[-15:])

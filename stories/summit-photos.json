@@ -6,7 +6,7 @@
  "license": "CC BY-NC-ND 4.0",
  "license_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
  "crop_authorisation": "NoDerivatives forbids distributing a crop, and every plate is a crop (3:2 sources into a 16:9 film). OWNER DECISION, verbatim: \"crop it I have authority I work for the cncf\". Recorded as the owner's, not an agent's -- see AGENTS.md, 'a licensing decision'.",
- "attribution": "Required by the licence and NOT burned onto the slides: it belongs to the credits sequence, issue #51. Until that exists this is an outstanding obligation, tracked on the cut's punch list.",
+ "attribution": "Required by the licence and NOT burned onto the slides: it belongs to the credits sequence, issue #51. Until that exists the credit is carried in ATTRIBUTIONS.md, which names this album, its creator and the licence verbatim.",
  "note": "Largest rendition only: sizes at _h and above carry their OWN secret, so a _b URL cannot be edited into a _k URL. Each `url` below was resolved from the photo's own sizes page.",
  "photos": [
   {
@@ -106,7 +106,7 @@
    "file": "media/summit/group-012.jpg"
   }
  ],
- "assignment_note": "Which photograph fills which slot in the cut. Chosen for MAXIMUM DISTINCTNESS as well as headcount: the first selection took the three biggest crowds (002, 003, 004) and they turned out to be three frames of the same overhead photo seconds apart -- on screen, one image shown three times. 002 is the overhead wide of the whole summit and takes the longest hold; the rest are ground-level crowds from the same minute, so the six still read as one set. Pairwise correlation peaks at 0.27 against the 0.42-0.57 of the rejected trio. Owner-rejected on the wider set: summit-11 (one person), summit-03 (its near-duplicate), summit-15 (blurred audience).",
+ "assignment_note": "Which photograph fills which slot in the cut. Chosen for MAXIMUM DISTINCTNESS as well as headcount: the first selection took the three biggest crowds (002, 003, 004) and they turned out to be three frames of the same overhead photo seconds apart -- on screen, one image shown three times. 002 is the overhead wide of the whole summit and takes the longest hold; the rest are ground-level crowds from the same minute, so the six still read as one set. Pairwise correlation peaks at 0.27 against the 0.42-0.57 of the rejected trio. Owner-rejected on the wider set: summit-11 (one person), summit-03 (its near-duplicate), summit-15 (blurred audience). act1_title_cover is the megacut's act I title cover (owner, 2026-08-15: '2:14 remove the comic book cover for this segment and use a group picture from kubecon contributor summit'): group-007 picked because it fills 16:9 with people -- two dozen faces, front row sharp, badges legible -- and its worst pairwise correlation against the six below is 0.18, under the limit.",
  "duplicate_correlation_limit": 0.35,
  "assignment": {
   "enemy_cu": "group-002",

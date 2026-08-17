@@ -29,6 +29,7 @@ const repoRoot = path.resolve(here, '..')
 const TEMPLATES = {
   act: 'act.html',
   comic: 'comic.html',
+  photo: 'photo.html',
   maintitle: 'maintitle.html',
   bookline: 'bookline.html',
   daycard: 'daycard.html',

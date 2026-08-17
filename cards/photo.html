@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Full-frame photo card</title>
+<style>
+  /*
+   * A full-bleed photograph card: one authored picture covering the whole
+   * 1920x1080 frame. Act I's TITLE COVER is the first user -- the Maintainer
+   * Summit NA 2025 group photograph that replaced the square comic cover
+   * (owner: "2:14 remove the comic book cover for this segment and use a
+   * group picture from kubecon contributor summit").
+   *
+   * This is NOT a site reproduction the way act.html and comic.html are --
+   * the website has no full-frame photo component to copy. What is copied is
+   * the house envelope those templates set: the same reset, the same fixed
+   * delivery size, the same __renderReady handshake with render-cards.mjs.
+   *
+   * The square-art treatment stays in comic.html: a 16:9 photograph has no
+   * 420px margins to wall paper, and no caption boxes -- a caption naming a
+   * person over a photograph claims they are in it, and the retired cover
+   * captions named people this photograph does not picture. Copy that belongs
+   * on a photo card is burned as copy ON the photo upstream
+   * (scripts/build_summit_plates.py), never composited here.
+   *
+   * The art arrives already at delivery size (1920x1080), so `cover` is a
+   * no-op safety net, not a resample: nothing here re-grades or re-crops the
+   * picture.
+   */
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    width: 1920px; height: 1080px;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .fill {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
+</head>
+<body>
+<img class="fill" id="art" alt="" />
+<script>
+  const params = new URLSearchParams(location.search);
+  const art = params.get('art');
+  const img = document.getElementById('art');
+  if (!art) {
+    // A photo card with no photograph is an authoring error, not a blank
+    // frame: say so on the card itself so the rendered PNG names the bug.
+    document.body.style.color = '#fff';
+    document.body.style.font = '32px monospace';
+    document.body.textContent = 'photo card: no art';
+    window.__renderReady = true;
+  } else {
+    img.src = art;
+    img.addEventListener('load', () => { window.__renderReady = true; });
+    img.addEventListener('error', () => {
+      document.body.style.color = '#fff';
+      document.body.style.font = '32px monospace';
+      document.body.textContent = 'photo card: art failed to load';
+      window.__renderReady = true;
+    });
+  }
+</script>
+</body>
+</html>

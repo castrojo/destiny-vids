@@ -34,6 +34,34 @@ Source: <https://incompetech.com/music/royalty-free/mp3-royaltyfree/Local%20Fore
 `TODO(owner)`: this credit also belongs in the video description at publication,
 and on screen once the credits act exists — [#51].
 
+## Still photography
+
+### Maintainer Summit North America 2025 — act I title cover, act VI plates, Perfume movement 4
+
+The KubeCon contributor summit group photographs are CNCF's, licensed
+**CC BY-NC-ND 4.0**. This film is non-commercial, which the NC clause permits;
+the ND clause forbids distributing a derivative, and every plate is a crop —
+the crop authorisation is the owner's own decision, recorded verbatim in the
+record. The same album's overhead wide (group-002) is also the "CNCF
+Contributor picture" overlaid in Perfume movement 4's derivative
+(`contributor-summit` in
+[`stories/00-perfume-thread.json`](stories/00-perfume-thread.json)) — the same
+licence, the same authorisation, the same credit. Required credit, built from
+the record's own fields:
+
+```text
+Maintainer Summit North America 2025 — Cloud Native Computing Foundation
+https://www.flickr.com/photos/143247548@N03/albums/72177720330210424/
+Licensed under Creative Commons: By Attribution-NonCommercial-NoDerivatives 4.0
+https://creativecommons.org/licenses/by-nc-nd/4.0/
+```
+
+Record: [`stories/summit-photos.json`](stories/summit-photos.json), including
+which photograph fills which slot.
+
+`TODO(owner)`: this credit also belongs in the video description at publication,
+and on screen once the credits act exists — [#51].
+
 ## Bungie footage
 
 Not an attribution licence and **not listed here**. Destiny footage is
@@ -63,8 +91,8 @@ and nothing else.
 ## Project Bluefin artwork
 
 The extra wallpapers in the Perfume interludes -- `bluefin`, `prey`, `dusk`,
-`huntress`, `leaf-collector`, `eyes`, `lazy-days` -- and the angry raptor used
-for the jump scare are **Project Bluefin's own artwork**, from
+`huntress`, `leaf-collector`, `eyes`, `lazy-days`, `duality` -- and the angry
+raptor used for the jump scare are **Project Bluefin's own artwork**, from
 [ublue-os/artwork](https://github.com/ublue-os/artwork) and the project's
 website. This film is Project Bluefin's; the art is not a third party's.
 Cached by `scripts/fetch_artwork.py`.
