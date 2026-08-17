@@ -14,6 +14,7 @@ in the machine records, which are the only copy:
 | Which master each act hardlinks, and why | [`stories/megacut/delivery.json`](../stories/megacut/delivery.json) — `masters` |
 | The authored card copy, including retired cards | [`stories/megacut/megacut-cards.json`](../stories/megacut/megacut-cards.json) |
 | Whether any of it is stale | `python3 tools/deliver.py status` |
+| Which words on screen the record already says are wrong | the same command's `copy` rung, per act |
 
 ## Seven Days to the Wolves — eight acts, behind a prologue
 
@@ -127,6 +128,15 @@ python3 tools/deliver.py status     # what is stale and why
 python3 tools/deliver.py build      # rebuild exactly what is stale
 python3 tools/deliver.py publish    # after ANY act rebuild
 ```
+
+**A green act is not a finished act.** Every rung above `copy` asks about
+files — is the master newer, does the digest match, is the link intact — so an
+act whose inputs have not moved reports `ok` while still carrying words the
+repo itself knows are wrong. The `copy` rung reads each act manifest's
+`unresolved` and prints it against the act, which is where "the dialogue is
+still out of date" is answered without opening a JSON. It is a **note, never a
+failure**: those gaps are owner decisions by construction, and the show does
+not stop for a word.
 
 Applying a round of notes to the right act:
 [`skills/review.md`](skills/review.md). The audio the delivered files are held
