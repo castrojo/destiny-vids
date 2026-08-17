@@ -1189,3 +1189,33 @@ def test_a_supplied_title_is_never_replaced_by_a_placeholder(manifest):
         if member.get("title"):
             assert B.cast_title(member) == member["title"]
             assert member.get("title_source"), member["person"]
+
+
+def test_an_authored_seal_reaches_the_placard(manifest):
+    """A seal is authored in two places, and both have to arrive.
+
+    The website carded four of the principals, so their `as` row resolves
+    through `card`. The other three -- Karena, Kyle, Kelsey -- are authored in
+    the manifest's own `guardian_title`, and the first build dropped that field
+    on the way to the renderer: three placards silently lost a row that had
+    been written for them, and every gate stayed green because an unauthored
+    seal is *supposed* to be omitted.
+    """
+    items, _ = B.schedule(manifest)
+    seats = {i["person"]: i for i in items if i["kind"] == "cast"}
+    authored = [c for c in manifest["cast"] if c.get("guardian_title")]
+    assert authored
+    for member in authored:
+        seat = seats[member["person"]]
+        assert seat["guardian_title"] == member["guardian_title"], member["person"]
+        assert member.get("guardian_title_source"), member["person"]
+
+
+def test_a_seal_nobody_authored_stays_off_the_card(manifest):
+    """The generic fallback is as invented as an invention."""
+    items, _ = B.schedule(manifest)
+    seats = {i["person"]: i for i in items if i["kind"] == "cast"}
+    for member in manifest["cast"]:
+        if member.get("guardian_title") or member.get("card"):
+            continue
+        assert not seats[member["person"]]["guardian_title"], member["person"]
