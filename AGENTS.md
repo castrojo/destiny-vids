@@ -295,12 +295,26 @@ read, so it has to buy more than tidiness.
   corrected in `docs/rendering.md`.
 - On an atomic Fedora/Bluefin host the default `ffmpeg` is `ffmpeg-free`: no
   H.264, and it fails only once decoding starts. See `docs/rendering.md`.
-- **Long encodes go to the cluster, not the workstation.** `exo-0`
-  (`core@192.168.1.170`, 32 cores) has the `linuxserver/ffmpeg` image cached;
-  stage inputs into `/var/mnt/exo0-stage/dv` and run a pod pinned to that node
-  with `imagePullPolicy: IfNotPresent`. The registry mirror times out on a
-  plain pull, and the footage is never already there. Recipe in
-  [`docs/rendering.md`](docs/rendering.md).
+- **Encoding is remote by default.** Owner, 2026-08-16, verbatim: *"why are you
+  defaulting to locally that is incorrect, always prefer remote encoding when
+  available."* The question is never "is this long enough to be worth the
+  cluster" — it is "is the cluster reachable". If it is, the encode runs there.
+  `exo-0` (`core@192.168.1.170`) has **32 cores against this workstation's 16**,
+  and it is not also running the agent sessions, so local encoding is slower
+  *and* it starves the thing asking for it.
+
+  Local is a **fallback with a stated reason**, never a default and never
+  silent: a tool that quietly encodes here because the cluster was awkward has
+  the bug the ruling above names. `tools/farm.py` is the reference posture —
+  cluster unless `cluster_available()` says otherwise, `--local` as an explicit
+  escape hatch.
+
+  The node has the `linuxserver/ffmpeg` image cached; stage inputs into
+  `/var/mnt/exo0-stage/dv` and pin the pod to it with
+  `imagePullPolicy: IfNotPresent`. The registry mirror times out on a plain
+  pull, and the footage is never already there. Recipe in
+  [`docs/rendering.md`](docs/rendering.md), operations in
+  [`docs/skills/farm.md`](docs/skills/farm.md).
 
 ## The merge queue
 
