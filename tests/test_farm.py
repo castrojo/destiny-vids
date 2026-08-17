@@ -426,6 +426,27 @@ def test_pod_script_run_is_valid_bash_and_waits_for_both_markers(tmp_path):
         assert proc.returncode == 0, proc.stderr
 
 
+def test_pod_script_survives_a_filter_full_of_quotes_and_parens(tmp_path):
+    """The perfume movements fade with `volume='if(lt(t,62.4),1,...)'`.
+    shlex.join renders that argument with `'"'"'` seams, so echoing the
+    command inside a double-quoted `say "..."` closed the string on the
+    first `"` and left bash staring at a bare `(` -- every movement segment
+    died in 1s with `syntax error near unexpected token '('`. The banner is
+    a single-quoted literal now; the command itself still runs unquoted."""
+    argv = ["ffmpeg", "-i", "/work/in/00-a.mp4", "-af",
+            "volume='if(lt(t,62.400),1,pow(10,(4.0*(t-62.4)/4.0)/20))'"
+            ":eval=frame", "/work/out/o.mkv", "-y"]
+    script = farm.pod_script_run(argv, "out/o.mkv")
+    script_file = tmp_path / "pod.sh"
+    script_file.write_text(script)
+    import shutil
+    import subprocess
+    if shutil.which("bash"):
+        proc = subprocess.run(["bash", "-n", str(script_file)],
+                              capture_output=True, text=True)
+        assert proc.returncode == 0, proc.stderr
+
+
 class _FakeKubectl:
     """Just enough of the cluster for run_ffmpeg_on_cluster: the pod is
     always Running, the encode is instant, and the download writes bytes."""
@@ -600,3 +621,29 @@ def test_cluster_roundtrip(tmp_path):
                     "--", "-c:v", "libx264", "-crf", "28", "-preset",
                     "ultrafast", "-c:a", "aac", "-b:a", "96k"])
     assert rc == 0 and out.exists()
+
+
+def test_the_farm_is_both_nodes_unless_told_otherwise():
+    """exo-0 and ghost are 32 cores each, neither tainted, both holding the
+    image. Pinning to one left half the cluster idle while segments queued, so
+    nothing is pinned by default and the scheduler spreads the work."""
+    assert farm.DEFAULT_NODE is None
+    common = dict(namespace="argo", image="i", cpu="2", limit_cpu="24",
+                  memory="4Gi", limit_memory="16Gi", service_account="argo",
+                  keep=False)
+    template = farm.build_workflow(
+        "n", "s", node=None, **common)["spec"]["templates"][0]
+    assert "nodeSelector" not in template
+
+    # --node still pins, for a run that has to land somewhere specific.
+    pinned = farm.build_workflow(
+        "n", "s", node="ghost", **common)["spec"]["templates"][0]
+    assert pinned["nodeSelector"] == {"kubernetes.io/hostname": "ghost"}
+
+
+def test_requests_stay_small_enough_to_land_on_either_node():
+    """Requests gate scheduling. A pod that asks for a burst ceiling's worth
+    of CPU pends instead of spreading -- the request has to fit the SMALLER
+    headroom of the two nodes, and the limit does the bursting."""
+    assert int(farm.DEFAULT_CPU) <= 4
+    assert int(farm.DEFAULT_LIMIT_CPU) > int(farm.DEFAULT_CPU)

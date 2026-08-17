@@ -53,10 +53,17 @@ runs the same segmented encode locally with ``tools.render.find_ffmpeg``.
 ``--local`` forces that path; ``--keep`` leaves the Workflow and PVC for
 debugging; ``--dry-run`` prints the plan and manifest and does nothing.
 
+BOTH NODES ARE THE FARM. Nothing is pinned by default: exo-0 and ghost each
+have 32 allocatable cores, neither is tainted, and BOTH carry the ffmpeg image
+(verified by running it on ghost — it resolved in 3.6 s). Pinning to exo-0 left
+half the cluster idle while a segment queued. One Workflow and one PVC per
+segment means segments are independent, so the scheduler spreads them; ``--node``
+still pins when a run has to land somewhere specific.
+
 RESOURCE SHAPE follows the house rule: requests gate SCHEDULING, limits gate
-BURST, and the cluster runs at 156–263% limit overcommit. exo-0 has ~24 free
-cores (ghost only ~14), so the pod requests a schedulable 2 CPU / 4 Gi and
-may burst to ``--limit-cpu`` 24 / ``--limit-memory`` 16 Gi — requesting 24
+BURST, and the cluster runs at 156–263% limit overcommit. The pod requests a
+schedulable 2 CPU / 4 Gi — low enough to land on either node — and may burst to
+``--limit-cpu`` 24 / ``--limit-memory`` 16 Gi — requesting 24
 gets you Pending; requesting 2 with a limit of 24 measures 24 cores (nproc)
 inside the pod.
 
@@ -97,7 +104,9 @@ from tools.render import find_ffmpeg, find_ffprobe  # noqa: E402
 DEFAULT_IMAGE = "lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76"
 DEFAULT_NAMESPACE = "argo"
 DEFAULT_SERVICE_ACCOUNT = "argo"
-DEFAULT_NODE = "exo-0"          # ~24 free cores vs ghost's ~14
+# None = let the scheduler choose. exo-0 and ghost are 32 cores each, both
+# untainted, both holding the image; pinning halves the farm. `--node` pins.
+DEFAULT_NODE = None
 DEFAULT_CPU = "2"               # request: low, so it always schedules
 DEFAULT_LIMIT_CPU = "24"        # limit: the burst ceiling on idle exo-0
 DEFAULT_MEMORY = "4Gi"          # request
@@ -418,7 +427,8 @@ def build_workflow(name, script, *, namespace, image, cpu, limit_cpu, memory,
                      "persistentVolumeClaim": {"claimName": name}}],
         "templates": [{
             "name": "encode",
-            "nodeSelector": {"kubernetes.io/hostname": node},
+            **({"nodeSelector": {"kubernetes.io/hostname": node}}
+               if node else {}),
             "container": {
                 "name": "main",
                 "image": image,
@@ -776,7 +786,7 @@ say() {{ printf '%s [farm] %s\\n' "$(date +%H:%M:%S)" "$*"; }}
 say "pod up on $(hostname); waiting for input"
 while [ ! -f in/.ready ]; do sleep 2; done
 say "input arrived:"; ls -l in/
-say "running: {shlex.join(pod_argv)}"
+say {shlex.quote("running: " + shlex.join(pod_argv))}
 if ! {shlex.join(pod_argv)} > logs/job.log 2>&1; then
   rc=$?
   say "job FAILED (rc=$rc)"
@@ -987,7 +997,9 @@ def main(argv=None):
                     help="PVC size (default: 3x the source, min 1Gi)")
     ap.add_argument("--image", default=DEFAULT_IMAGE)
     ap.add_argument("--namespace", default=DEFAULT_NAMESPACE)
-    ap.add_argument("--node", default=DEFAULT_NODE)
+    ap.add_argument("--node", default=DEFAULT_NODE,
+                    help="pin every segment to one node. Default: unpinned, "
+                         "so the scheduler uses the whole farm")
     ap.add_argument("--kubeconfig", default=None,
                     help="default: kubectl's own resolution ($KUBECONFIG, "
                          "~/.kube/config)")
