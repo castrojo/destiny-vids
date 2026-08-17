@@ -357,18 +357,76 @@ def authored_cards():
             if isinstance(r, dict) and r.get("name") and r.get("slug")}
 
 
-def fetch_avatars(manifest, verbose=True):
-    """Cache a face for every login the manifest names.
+# The four authored strings a placard reproduces. The `card` PNG is NOT among
+# them: it is a splash composite, and act VIII does not set type over one
+# ("get rid of those hero splashes they suck"). Copying more of that file than
+# the credits print would be a second, staler home for somebody's identity.
+IDENTITY_FIELDS = ("label", "class", "name", "title")
 
-    The renderer never touches the network (``tools/credits.avatar``), so a
-    contributor with no cached PFP silently degrades to a ring. Adding two
-    upstream sections added ~200 logins nobody had ever fetched, which would
-    have been two walls of empty rings and no error. Missing is still not
-    fatal -- this only fills the cache in.
+
+def cache_identities(verbose=True):
+    """Copy the authored Guardian identities into the render cache, verbatim.
+
+    ``tools/credits`` must not read another checkout -- several agents run
+    worktrees against the website -- so the strings are cached beside the cast
+    art in gitignored ``renders/cast-cards/identities.json``. Absent website,
+    absent cache, and the placard degrades to the person's name: never a
+    guessed label, never an invented title.
     """
-    import urllib.request
+    try:
+        data = json.loads(AUTHORED_CARDS.read_text())
+    except (OSError, ValueError) as exc:
+        if verbose:
+            print(f"note: no authored identities ({exc}); the cast placards "
+                  f"run on names alone.", file=sys.stderr)
+        return {}
+    rows = data.get("characters", []) if isinstance(data, dict) else data
+    out = {}
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("slug"):
+            continue
+        out[row["slug"]] = {k: row[k] for k in IDENTITY_FIELDS
+                            if isinstance(row.get(k), str) and row[k].strip()}
+    C.CAST_CARD_DIR.mkdir(parents=True, exist_ok=True)
+    (C.CAST_CARD_DIR / "identities.json").write_text(
+        json.dumps(out, indent=1, ensure_ascii=False) + "\n")
+    if verbose:
+        print(f"identities: {len(out)} cached from {AUTHORED_CARDS}")
+    return out
 
-    C.AVATAR_DIR.mkdir(parents=True, exist_ok=True)
+
+def vocab_logins():
+    """``{credited name: github login}`` for every lead the vocab verifies.
+
+    A login is recorded per BINDING, and one person can hold several -- so the
+    map is keyed by the name the credits print, which is the same key the
+    manifest's own ``cast_logins`` overlay uses. Only what the vocab states is
+    used; a lead with ``github: null`` stays faceless, because a login that
+    merely matches a character name is the nimbatus/nimbinatus trap.
+    """
+    from tools.derive import load_leads
+
+    real, logins = {}, {}
+    for entry in load_leads().values():
+        person = entry.get("person")
+        if not person:
+            continue
+        name = (entry.get("plate") or {}).get("name")
+        if name:
+            real.setdefault(person, name)
+        if entry.get("github"):
+            logins.setdefault(person, entry["github"])
+    return {real.get(person) or person: login
+            for person, login in logins.items()}
+
+
+def avatar_logins(manifest):
+    """Every GitHub login act VIII will ask for a face for, in order.
+
+    One definition, because two callers need exactly the same list: the build,
+    and ``tools/avatars.py`` when it runs on a CI runner with no idea what a
+    placard is.
+    """
     logins = []
     for section in manifest.get("contributors", []):
         # A GitLab section carries display NAMES, not logins. Asking
@@ -378,30 +436,40 @@ def fetch_avatars(manifest, verbose=True):
         if section.get("host") and section["host"] != GITHUB:
             continue
         logins.extend(section["names"])
-    for value in (manifest.get("cast_logins") or {}).values():
-        if isinstance(value, str) and not value.startswith("_"):
-            logins.append(value)
+    for key, value in (manifest.get("cast_logins") or {}).items():
+        # ``_comment`` is prose about the overlay, not a person. Asking
+        # github.com for a paragraph is one wasted request per build, and
+        # whatever it returned would be somebody else's face.
+        if key.startswith("_") or not isinstance(value, str):
+            continue
+        logins.append(value)
     for person in manifest.get("cast", []):
         if person.get("login"):
             logins.append(person["login"])
+    # The same overlay the schedule applies, so a face the vocab verifies is
+    # actually in the cache by the time a placard asks for it.
+    logins.extend(vocab_logins().values())
+    return list(dict.fromkeys(logins))
 
-    got = missed = 0
-    for login in dict.fromkeys(logins):
-        path = C.AVATAR_DIR / f"{login}.png"
-        if path.exists() and path.stat().st_size >= 512:
-            continue
-        url = f"https://github.com/{login}.png?size=256"
-        try:
-            with urllib.request.urlopen(url, timeout=20) as fh:
-                path.write_bytes(fh.read())
-            got += 1
-        except Exception as exc:  # noqa: BLE001 -- degrade, never block
-            missed += 1
-            if verbose:
-                print(f"note: no avatar for {login}: {exc}", file=sys.stderr)
-    if verbose:
-        print(f"avatars: {got} fetched, {missed} missing")
-    return got, missed
+
+def fetch_avatars(manifest, verbose=True, from_actions=False):
+    """Cache a face for every login the manifest names.
+
+    The renderer never touches the network (``tools/credits.avatar``), so a
+    contributor with no cached PFP silently degrades to a ring. Adding two
+    upstream sections added ~200 logins nobody had ever fetched, which would
+    have been two walls of empty rings and no error. Missing is still not
+    fatal -- this only fills the cache in.
+
+    The fetching itself lives in ``tools/avatars.py``: conditional requests,
+    negative caching and backoff, and the same code the Actions workflow runs.
+    """
+    from tools import avatars
+
+    if from_actions:
+        avatars.pull_from_actions(verbose=verbose)
+    tally, missing = avatars.fetch(avatar_logins(manifest), verbose=verbose)
+    return tally["fetched"], len(missing)
 
 
 def build_manifest(refresh, refresh_cast=False):
@@ -540,6 +608,12 @@ def schedule(manifest):
     # placard. Applying it every schedule keeps the two independent.
     verified = {k: v for k, v in (manifest.get("cast_logins") or {}).items()
                 if not k.startswith("_")}
+    # The vocab's own `github:` fields join that overlay, keyed by the person
+    # rather than by the binding they happen to sit on. Laura's verified login
+    # lives on the NIMBATUS binding while her authored identity lives on the
+    # Elsie Bray one; before the splash cards came out, the identity carried
+    # her face and nobody noticed the login never reached the placard.
+    verified = {**vocab_logins(), **verified}
     photos = {k: v for k, v in (manifest.get("cast_photos") or {}).items()
               if not k.startswith("_")}
     target = manifest.get("cast_hold_sec", 4.0)
@@ -626,6 +700,9 @@ def schedule(manifest):
 
 
 def render_cards(items, out_dir):
+    # The authored identities are refreshed from the website on every build,
+    # so a placard cannot print an identity the author has since rewritten.
+    cache_identities(verbose=False)
     # Cleared, not overwritten: the card set changes shape between builds (a
     # dropped placard, a new wall), and a stale `012-cover.png` sitting beside
     # this build's `012-cast.png` is a frame nobody can account for.
@@ -733,6 +810,9 @@ def main(argv=None):
                          "you want -- see build_manifest)")
     ap.add_argument("--fetch-avatars", action="store_true",
                     help="cache a PFP for every login the manifest names (network)")
+    ap.add_argument("--avatars-from-actions", action="store_true",
+                    help="pull CI's avatar artifact first, then fill any gaps "
+                         "-- one request instead of five hundred")
     ap.add_argument("--plan", action="store_true", help="print the schedule, render nothing")
     ap.add_argument("--cards-only", action="store_true", help="render the PNGs and stop")
     ap.add_argument("--out", default=str(OUT))
@@ -745,8 +825,8 @@ def main(argv=None):
         MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
         print(f"wrote {MANIFEST}")
 
-    if args.fetch_avatars:
-        fetch_avatars(manifest)
+    if args.fetch_avatars or args.avatars_from_actions:
+        fetch_avatars(manifest, from_actions=args.avatars_from_actions)
 
     items, total = schedule(manifest)
 

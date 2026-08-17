@@ -89,6 +89,7 @@ This skill is the contract. The procedure lives in `references/`:
 | [`delivery.md`](references/delivery.md) | The `~/Videos/Wolves/` workspace, the delivery graph (`tools/deliver.py` status/publish/build), the per-project contract, hardlinks and checksums, publishing via the playlist, the audio rules that bite at delivery, and the Syncthing hazard. |
 | [`parallel-and-tagging.md`](references/parallel-and-tagging.md) | Stale tags and `verify_tags_match_detection`, running several videos at once, batch tagging from generated worksheets, and what to work on first. |
 | [`social-copies.md`](references/social-copies.md) | Byte-capped social encodes with `tools/social.py`: encode from `Prod/`, re-encode but never process. |
+| [`avatars.md`](references/avatars.md) | The credits' avatar cache (`tools/avatars.py`): conditional requests, negative caching, backoff, and the Actions job that fetches on the built-in runner token instead of your laptop. |
 
 ## Where it stops, and why that is the design
 
