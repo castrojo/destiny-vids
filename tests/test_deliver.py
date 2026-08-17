@@ -5,6 +5,7 @@ the ffprobe duration check skips itself on a file that is not a real video.
 """
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -520,7 +521,17 @@ def test_an_act_with_no_committed_inputs_carries_its_reason():
 
 def test_the_recorded_digest_matches_what_is_committed():
     """The gate CI runs. If this fails, an act's inputs moved and nobody
-    re-rendered it -- rebuild the act and `deliver.py publish`."""
+    re-rendered it -- rebuild the act and `deliver.py publish`.
+
+    An act that DECLARES `stale_blocked_on` is exempt, and that is the whole
+    point of the field: act III cannot be rebuilt by anybody until the owner
+    names the roster it credits (#256), so failing here forever turned an
+    honestly-recorded owner decision into a red X that blocked the merge
+    queue -- 24 commits of authored work sat behind it. AGENTS.md: a gap that
+    is recorded and degrades correctly is a punch-list item, not a failure.
+    The act still announces itself in `status`, and seating it in the
+    programme still costs an explicit `--allow-stale`.
+    """
     masters, _ = deliver.load_delivery(
         REPO_ROOT / "stories" / "megacut" / "delivery.json")
     stale = []
@@ -528,11 +539,68 @@ def test_the_recorded_digest_matches_what_is_committed():
         sources = master.get("sources")
         if not sources or not master.get("source_digest"):
             continue
-        if deliver.source_digest(sources) != master["source_digest"]:
+        if deliver.source_digest(sources) == master["source_digest"]:
+            continue
+        blocker = deliver.blocked_on(master)
+        if not blocker:
             stale.append(numeral)
+            continue
+        assert re.match(r"^#\d+$", str(blocker)), (
+            f"act {numeral}: `stale_blocked_on` must name the issue holding "
+            f"the decision (e.g. '#256'), not {blocker!r} -- an unexplained "
+            f"exemption is how a stale act ships quietly")
     assert not stale, (
         f"act(s) {', '.join(stale)}: committed inputs no longer match the "
         f"delivered master. Rebuild, then `python3 tools/deliver.py publish`.")
+
+
+def test_a_blocked_act_is_still_stale_everywhere_that_reaches_picture():
+    """The exemption is scoped to the CI gate and nowhere else.
+
+    `stale_blocked_on` says "nobody can fix this yet", never "pretend it is
+    fresh". `stale_source_acts` is what `megacut.py` asks before it seats an
+    act, so a blocked act must still be in that list -- otherwise the flag
+    would quietly buy a stale act a seat in the programme, which is the exact
+    failure `--allow-stale` exists to make loud.
+    """
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    blocked = {n for n, m in masters.items() if deliver.blocked_on(m)
+               and m.get("sources") and m.get("source_digest")
+               and deliver.source_digest(m["sources"]) != m["source_digest"]}
+    assert blocked, "act III is the case this is written for"
+    assert blocked <= {n for n, _ in deliver.stale_source_acts(masters)}
+
+    report = deliver.ActReport(deliver.Act("III", "t", None))
+    deliver.check_sources(report.act, masters["III"], report)
+    state = {f.node: f.state for f in report.findings}["sources"]
+    assert state == deliver.BLOCKED
+    assert state not in deliver.FAILING
+
+
+def test_publish_cannot_certify_an_act_whose_rebuild_is_blocked(tmp_path):
+    """`publish --act III` must not stamp a digest for a render that did not
+    happen. The mtime guard cannot catch it -- act III's inputs moved in a
+    COMMIT, so they look untouched on disk -- and stamping would erase the
+    only record saying the act is stale, turning its own gate green."""
+    src = tmp_path / "master.mp4"
+    src.write_bytes(b"x")
+    inp = tmp_path / "in.txt"
+    inp.write_text("moved")
+    doc = {"masters": {"III": {
+        "path": str(src), "sources": [str(inp)],
+        "source_digest": "stale0000", "stale_blocked_on": "#256"}}}
+    path = tmp_path / "delivery.json"
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+    lines = []
+    deliver.record_source_digests(
+        [deliver.Act("III", "t", None)],
+        doc["masters"], path, log=lines.append, only=["III"])
+
+    after = json.loads(path.read_text(encoding="utf-8"))
+    assert after["masters"]["III"]["source_digest"] == "stale0000"
+    assert any("blocked on #256" in ln for ln in lines), lines
 
 
 def test_the_watcher_flushes_so_its_log_is_readable_while_it_runs(

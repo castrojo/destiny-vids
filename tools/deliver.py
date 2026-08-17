@@ -140,11 +140,11 @@ DURATION_TOLERANCE_S = 2.0
 # by the platform, so it is reported rather than trusted.
 SOCIAL_CAP_BYTES = 10 * 1024 * 1024
 
-# States. ABSENT_BY_DESIGN and NO_FILM are recorded decisions, not failures;
-# everything in FAILING fails --check. EPHEMERAL is distinct from CONFLICT on
-# purpose: conflict means "decide which content wins", ephemeral means "this
-# content's only home is a git worktree that `git worktree remove` deletes --
-# promote the master to a durable path".
+# States. ABSENT_BY_DESIGN, NO_FILM and BLOCKED are recorded decisions, not
+# failures; everything in FAILING fails --check. EPHEMERAL is distinct from
+# CONFLICT on purpose: conflict means "decide which content wins", ephemeral
+# means "this content's only home is a git worktree that `git worktree remove`
+# deletes -- promote the master to a durable path".
 OK = "ok"
 NO_FILM = "no-film"
 ABSENT_BY_DESIGN = "absent-by-design"
@@ -153,6 +153,7 @@ MISSING = "missing"
 CONFLICT = "conflict"
 EPHEMERAL = "ephemeral"
 UNDECLARED = "undeclared"
+BLOCKED = "blocked"
 
 FAILING = {STALE, MISSING, CONFLICT, EPHEMERAL}
 
@@ -403,6 +404,25 @@ def stale_source_acts(masters):
     return out
 
 
+def blocked_on(master):
+    """The issue an act's rebuild waits on, or None.
+
+    `stale_blocked_on` is how a master says "this act IS stale, everybody
+    knows, and closing it needs a decision nobody here can make" -- act III
+    cannot be rebuilt at all until the owner names the roster it credits
+    (#256), and act VI's lossless bed is the same shape (#58). AGENTS.md is
+    explicit that an agent which reaches an owner-held decision, records it
+    and stops has SUCCEEDED, so the CI digest gate treats a declared block as
+    a punch-list item rather than a red X.
+
+    It is deliberately NOT an escape hatch from the assembly refusal:
+    `stale_source_acts` still lists the act, so seating it in the programme
+    still costs an explicit `--allow-stale`. The gate stops blocking the merge
+    queue; nothing stops a stale act announcing itself on the way to picture.
+    """
+    return (master or {}).get("stale_blocked_on") or None
+
+
 def check_sources(act, master, report):
     """The rung BEFORE the master: did an act's inputs change without a render?
 
@@ -439,6 +459,14 @@ def check_sources(act, master, report):
                    f"publish` to record {digest[:12]}")
         return
     if digest != recorded:
+        blocker = blocked_on(master)
+        if blocker:
+            report.add("sources", BLOCKED,
+                       f"inputs changed ({recorded[:12]} -> {digest[:12]}) and "
+                       f"this act CANNOT be rebuilt until {blocker} is decided. "
+                       f"Seating it still costs `--allow-stale`. Declared "
+                       f"inputs: {', '.join(sources)}")
+            return
         report.add("sources", STALE,
                    f"inputs changed since this master was recorded "
                    f"({recorded[:12]} -> {digest[:12]}); rebuild the act, then "
@@ -884,6 +912,16 @@ def record_source_digests(acts, masters, delivery_path, log=print, only=None):
         if only is not None and act.numeral.upper() not in only:
             continue
         if master.get("sources"):
+            # A declared block outranks the mtime guard below, which cannot
+            # see an input that moved IN A COMMIT. Act III's rebuild does not
+            # exist yet (#256), so no `publish` can honestly claim its master
+            # was built from today's inputs -- and stamping it would erase the
+            # one record saying so.
+            if blocked_on(master):
+                log(f"  {act.numeral}: inputs NOT recorded -- the rebuild is "
+                    f"blocked on {blocked_on(master)}; nothing was rendered, "
+                    f"so nothing can be certified")
+                continue
             # The SAME guard the footage digest below has always had, and its
             # absence here is what let stale programmes ship: `publish` claims
             # "what is in Prod now is built from these inputs", so stamping a
@@ -1049,7 +1087,7 @@ def print_report(reports, wolves, log=print):
             log(f"  {f.node:<9} {f.state:<16} {f.detail}")
     failing = [f for r in reports for f in r.findings if f.state in FAILING]
     noted = [f for r in reports for f in r.findings
-             if f.state in (ABSENT_BY_DESIGN, NO_FILM)]
+             if f.state in (ABSENT_BY_DESIGN, NO_FILM, BLOCKED)]
     log(f"\n{len(failing)} stale, {len(noted)} recorded absences "
         f"(punch-list, not failures)")
     return 1 if failing else 0
