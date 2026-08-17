@@ -897,12 +897,7 @@
   ],
   "cast": [
     {
-      "person": "Laura Santamaria",
-      "character": "Elsie Bray",
-      "character_id": "elsie_bray",
-      "card": "laura"
-    },
-    {
+      "_why": "OWNER, 2026-08-16: 'laura is as nimbatus'. She held two placards -- Elsie Bray and Nimbatus -- with identical identity copy on both, because the vocab binds her authored identity to elsie_bray and her verified login to nimbatus. The credit is NIMBATUS, once. The elsie_bray binding stays in vocab/casting.yaml, where act VII's reveal still needs it; what came out is the second placard, not the character.",
       "person": "Laura Santamaria",
       "character": "Nimbatus",
       "character_id": "nimbatus",
