@@ -192,7 +192,14 @@ def test_the_nova_card_sets_the_wheel_as_a_letter_and_sears_only_the_accent():
     assert card["glyph"] == {
         "token": "ó", "accent": "´", "accent_style": "seared"}
     assert card["glyph_src"] == "renders/marks/kubernetes.png"
-    assert (REPO / card["glyph_src"]).exists()
+    # The mark is a FETCHED artifact in gitignored renders/, so asserting the
+    # file exists asserts that somebody ran the fetcher on this machine --
+    # true here, never true on CI, and the suite is offline by contract. What
+    # the record can promise is that the declared path is the one the fetcher
+    # writes, so `fetch_brand_marks.py` and this card cannot drift apart.
+    assert '"kubernetes"' in (REPO / "scripts" / "fetch_brand_marks.py"
+                              ).read_text()
+    assert card["glyph_src"].startswith("renders/marks/")
     # The mark is credited where a CC BY asset has to be credited.
     assert "kubernetes" in (REPO / "ATTRIBUTIONS.md").read_text().lower()
     # The renderer resolves and existence-checks the mark like any other asset.

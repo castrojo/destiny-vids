@@ -14,6 +14,7 @@ from pathlib import Path
 import pytest
 
 from scripts import build_ending_overlays
+from scripts import build_interludes
 
 REPO = Path(__file__).resolve().parents[1]
 THREAD = REPO / "stories" / "00-perfume-thread.json"
@@ -163,7 +164,21 @@ def movement_four(doc):
     return next(m for m in doc["movements"] if m["id"] == "perfume-4")
 
 
-def chat_command(tmp_path):
+def chat_command(tmp_path, monkeypatch=None):
+    """The movement-4 chat derivative's command.
+
+    The replacement artwork lives in gitignored ``renders/artwork/``, which
+    is FETCHED, so on a fresh checkout `usable_replacements` correctly finds
+    nothing and the graph degrades to the bare source. That degrade is right
+    and is tested below -- but it made the graph-shape assertions pass only
+    on a machine that happened to have the pictures, and fail on CI. So the
+    shape tests resolve artwork deterministically instead of asking the disk.
+    """
+    if monkeypatch is not None:
+        monkeypatch.setattr(
+            build_interludes, "art_path",
+            lambda name: (REPO / name["file"]) if isinstance(name, dict)
+            else build_interludes.ARTWORK_DIR / f"{name}.png")
     return build_ending_overlays.command(
         chat(),
         str(THREAD),
@@ -187,8 +202,8 @@ def test_movement_four_declares_its_own_derivative():
 
 
 def test_the_derivative_composes_replacements_and_plates_in_one_encode(
-        tmp_path):
-    cmd = chat_command(tmp_path)
+        tmp_path, monkeypatch):
+    cmd = chat_command(tmp_path, monkeypatch)
     joined = " ".join(cmd)
     graph = cmd[cmd.index("-filter_complex") + 1]
     # The source is read ONCE: swaps and words come out of a single encode.
@@ -202,10 +217,10 @@ def test_the_derivative_composes_replacements_and_plates_in_one_encode(
     assert "afade" not in graph
 
 
-def test_plate_inputs_are_numbered_after_the_artwork(tmp_path):
+def test_plate_inputs_are_numbered_after_the_artwork(tmp_path, monkeypatch):
     """Source is input 0, the seven artwork loops are 1..7, the six chat
     pills are 8..13. The graph and the argv must be the same ordering."""
-    cmd = chat_command(tmp_path)
+    cmd = chat_command(tmp_path, monkeypatch)
     graph = cmd[cmd.index("-filter_complex") + 1]
     assert "[8:v]format=rgba,setpts=PTS-STARTPTS+53.951/TB" in graph
     assert "[13:v]format=rgba,setpts=PTS-STARTPTS+65.236/TB" in graph
@@ -286,3 +301,22 @@ def test_unresolved_speakers_carry_no_avatar():
     unresolved = " ".join(doc["unresolved"])
     for name in ("Jill Castro", "Rafael", "LH"):
         assert name in unresolved
+
+
+def test_a_checkout_with_no_cached_artwork_still_builds_a_valid_encode(
+        tmp_path, monkeypatch):
+    """The degrade the two tests above deliberately look past.
+
+    `renders/artwork/` is fetched and gitignored, so a fresh checkout has
+    none of it. Movement 4 must then play its own picture with the words
+    still on it -- not fail, and above all not pass ``None`` to ffmpeg as an
+    input path, which is what an unguarded `art_path` would do.
+    """
+    monkeypatch.setattr(build_interludes, "art_path", lambda name: None)
+    cmd = chat_command(tmp_path)
+    inputs = [cmd[i + 1] for i, a in enumerate(cmd[:-1]) if a == "-i"]
+    assert "None" not in inputs
+    assert len(inputs) == 1 + 6          # the source, and the six chat pills
+    graph = cmd[cmd.index("-filter_complex") + 1]
+    assert "concat=" not in graph        # nothing to concat: no replacements
+    assert "[vout]" in graph and "[aout]" in graph
