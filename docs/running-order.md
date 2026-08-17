@@ -54,10 +54,15 @@ his character's name.
 
 **A trailer is not an act.** `Trailer 1` is cut from the prologue's own
 material — `scripts/build_trailer1.py`, `stories/trailer-1-plates.json` — and
-delivers to `~/Videos/Wolves/trailer-1.mp4`. It takes no numeral, no chapter
-marker and no key in `delivery.json`, and nothing in this table changes when it
-is recut. It runs 1:50, inside the 2:30 the MPA and NATO allow a theatrical
-trailer.
+delivers to `~/Videos/Wolves/trailer-1.mp4`, with a social copy beside it at
+`~/Videos/Wolves/10mb/trailer-1.mp4`. It takes no numeral, no chapter marker and
+no key in `delivery.json`, and nothing in this table changes when it is recut.
+It runs 1:50, inside the 2:30 the MPA and NATO allow a theatrical trailer. The
+cut the owner named **Trailer 1.0** carries the main title, four authored lines
+over the book, two marquee messages over the wolves fade, and the KubeCon end
+card; what it says at any moment is
+[`stories/trailer-1-plates.json`](../stories/trailer-1-plates.json), whose
+`_version` names the cut.
 
 **Not every act is announced.** The Roman-numeral slides were retired on the
 owner's instruction; the programme plays exactly one card, the scream

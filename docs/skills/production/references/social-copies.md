@@ -17,7 +17,10 @@ a CRF until one happens to fit. `--dry-run` prints the budget first.
 Two rules, and the second is the one that gets broken:
 
 - **Encode from `Prod/`, never from another social copy.** A copy of a copy is
-  two lossy generations for no reason.
+  two lossy generations for no reason. A cut that is not an act has no `Prod/`
+  entry — the trailer is delivered straight to `~/Videos/Wolves/` — so its
+  social copy is encoded from that master, which is the same rule and not an
+  exception to it.
 - **Re-encoding is allowed; processing is not.** No normaliser, no limiter, no
   EQ — the peak of a social copy must match its master's, and a test asserts the
   tool contains no filter that would change it. A starved music bed is the
