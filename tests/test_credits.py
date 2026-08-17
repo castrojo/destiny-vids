@@ -334,12 +334,24 @@ def test_the_credits_name_the_human_not_the_login(manifest):
     assert by_character["saint_14"]["person"] == "Kat Cosgrove"
 
 
-def test_one_person_playing_two_roles_is_named_the_same_both_times(manifest):
-    """Laura Santamaria is Elsie Bray AND Nimbatus; the nimbatus entry has no
-    plate, so a naive fallback credited her as 'Nimbatus as Nimbatus'."""
-    by_character = {c["character_id"]: c for c in manifest["cast"]}
-    assert by_character["nimbatus"]["person"] == "Laura Santamaria"
-    assert by_character["elsie_bray"]["person"] == "Laura Santamaria"
+def test_laura_is_credited_once_and_the_credit_is_nimbatus(manifest):
+    """Owner, 2026-08-16: "laura is as nimbatus".
+
+    She used to hold two placards -- Elsie Bray and Nimbatus -- with the same
+    authored identity copy on both, because the vocab binds her identity to one
+    binding and her verified login to the other. Nobody is credited twice for
+    one performance, and the name the credit prints is the owner's call.
+    """
+    laura = [c for c in manifest["cast"] if c["person"] == "Laura Santamaria"]
+    assert len(laura) == 1
+    assert laura[0]["character"] == "Nimbatus"
+    assert laura[0]["character_id"] == "nimbatus"
+
+
+def test_nobody_holds_two_placards(manifest):
+    """A second card for one person reads as a mistake, not as a second role."""
+    people = [c["person"] for c in manifest["cast"]]
+    assert len(people) == len(set(people))
 
 
 @pytest.mark.parametrize("raw,expected", [
@@ -551,12 +563,14 @@ def test_the_cast_is_the_readmes_table(manifest):
     remove some of these characters', and separately 'Remove cayde-6 redacted
     from the starring roles, he's fine in the credits with the rest.'
 
-    So the placards are the README's nine rows MINUS Cayde-6: eight. The six
-    the vocab binds but the README does not list keep their bindings; only
-    act VIII's placards went.
+    So the placards are the README's nine rows MINUS Cayde-6, and minus the
+    second of Laura's two bindings ("laura is as nimbatus", owner, 2026-08-16):
+    seven. The README table lists BINDINGS, of which she holds two; a placard
+    is a performance, of which she gave one. The six the vocab binds but the
+    README does not list keep their bindings; only act VIII's placards went.
     """
     items, _ = B.schedule(manifest)
-    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 8
+    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 7
 
     readme = (REPO_ROOT / "README.md").read_text()
     for member in manifest["cast"]:
