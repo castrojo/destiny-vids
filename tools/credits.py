@@ -647,81 +647,173 @@ def render_birthday_card(eyebrow, name, body, index=0):
     return img
 
 
-def render_cast_placard(person, character, card=None, login=None, photo=None,
-                        index=0):
-    """One member of the cast: their face, their Guardian identity, their role.
+# THE HERO CREDIT'S SECOND LINE IS THE PERSON'S OWN.
+#
+# Owner: *"for the 'hero' credits use the github titles"*. What a placard says
+# about somebody is therefore what THEY say about themselves -- the bio off
+# their GitHub profile, or copy the owner supplied verbatim -- and never a
+# sentence this repo composed. The authored Guardian identity is not lost; it
+# is where it was authored, on the acts' own plates, and the credit answers a
+# different question: who is this person when they are not a Guardian.
+#
+# `<br>` is a hard break, because the copy arrives with them in it.
+TITLE_SIZE = 29
+TITLE_LINE = 38
+TITLE_WIDTH = W * 0.62
+TITLE_MAX_LINES = 6
 
-    **One layout for everybody.** The website's 1200x630 card used to be
-    dropped in whole for the seven people who have one, which put a full-bleed
-    Destiny splash behind half the cast and made two different-looking placards
-    in one roll. Owner: *"get rid of those hero splashes they suck."*
 
-    The authored copy survives that intact, because the copy is what was
-    authored: ``label``, ``class`` and ``title`` are reproduced verbatim from
-    ``characters.json`` and a row nobody wrote is simply not drawn. A ``photo``
-    -- an owner-drawn crop out of a CNCF summit photograph -- still beats the
-    avatar, because it is the thing the owner asked for.
+def title_lines(text, draw, font, width=TITLE_WIDTH):
+    """Wrap a GitHub title. ``<br>`` breaks; the rest is greedy at ``width``."""
+    lines = []
+    for para in re.split(r"<br\s*/?>", text or ""):
+        words, current = para.split(), ""
+        if not words:
+            # A `<br><br>` is a blank line the author asked for, and it is the
+            # only reason an empty line is ever drawn.
+            if lines and lines[-1] != "":
+                lines.append("")
+            continue
+        for word in words:
+            trial = f"{current} {word}".strip()
+            if current and draw.textlength(trial, font=font) > width:
+                lines.append(current)
+                current = word
+            else:
+                current = trial
+        if current:
+            lines.append(current)
+    while lines and lines[-1] == "":
+        lines.pop()
+    return lines[:TITLE_MAX_LINES]
+
+
+# THE HERO CREDIT IS A LOWER THIRD.
+#
+# It got there by elimination, and every step is a thing the owner rejected.
+# Centred type over the day wallpapers measured 1.02:1 at its worst -- a
+# February snowfield puts near-white under near-white. Brightening the art:
+# *"don't brighten the slides that looks like shit."* An opaque surface behind
+# the type: *"what the hell is this."* A feathered veil: *"that veil contrast
+# is crappy."*
+#
+# So: *"or lower-third-like structure."* A chyron does not fight the picture,
+# it OWNS a corner of it. The ink is opaque where the type sits and ramps away
+# to nothing across the frame, so the month is still legible as a month -- the
+# dinosaurs, the snow, the sun -- and the copy sits on a field that does not
+# change from card to card.
+LOWER_HEIGHT = 384          # the band
+LOWER_TOP = H - 452         # its seat, clear of the 60px safe margin
+LOWER_FACE = 232            # the portrait inside it
+LOWER_PAD = 110             # left margin
+LOWER_RAMP = 0.62           # ink is solid to here, then falls to nothing
+LOWER_INK = 238             # the band's alpha where it is solid
+
+
+def _lower_third(img):
+    """The band: solid ink under the type, ramped to nothing across the frame.
+
+    The ramp is the whole idea. A full-width slab at one alpha is a letterbox
+    and reads as a mistake; a band that ends in the middle of the picture reads
+    as broadcast. The top edge carries a hairline in the film's blue, which is
+    what stops the ink looking like a smudge -- it is the only hard edge on the
+    card, and it fades on the same ramp as the ink under it.
+    """
+    ramp = Image.new("L", (W, 1), 0)
+    for x in range(W):
+        f = x / W
+        a = 1.0 if f <= LOWER_RAMP else max(0.0, 1 - (f - LOWER_RAMP) / (1 - LOWER_RAMP))
+        ramp.putpixel((x, 0), int(255 * a ** 2.2))
+    ramp = ramp.resize((W, LOWER_HEIGHT))
+
+    band = Image.new("RGBA", (W, LOWER_HEIGHT), (6, 10, 18, 255))
+    alpha = ramp.point(lambda v: int(v * LOWER_INK / 255))
+    band.putalpha(alpha)
+    img.alpha_composite(band, (0, LOWER_TOP))
+
+    rule = Image.new("RGBA", (W, 2), ACCENT)
+    rule.putalpha(ramp.crop((0, 0, W, 2)).point(lambda v: int(v * 0.72)))
+    img.alpha_composite(rule, (0, LOWER_TOP))
+
+
+def render_cast_placard(person, character=None, card=None, login=None,
+                        photo=None, title=None, guardian_title=None, index=0):
+    """One of the principals: their face, their name, their seal, their work.
+
+    Set as a lower third -- face left, three rows of type beside it:
+
+        Kat Cosgrove
+        as Defender Queen of the Lost
+        Village Sorceress at VillageSQL ...
+
+    **The Destiny character name is not printed** -- owner, 2026-08-16: *"drop
+    the Destiny names, do it like 'Kat Cosgrove as Defender Queen... blah'"*.
+    What follows *as* is the Guardian TITLE somebody authored for that person,
+    and a title nobody authored is left out rather than filled. The third row
+    is the person's own GitHub bio, which is the only row that is theirs rather
+    than the film's.
+
+    ``label`` and ``class`` are not here: Guardian chrome belongs on the acts'
+    plates, where it was authored. ``character`` is still accepted so a caller
+    that has one is not an error, and is deliberately not drawn.
+
+    A ``photo`` -- an owner-drawn crop out of a CNCF summit photograph -- still
+    beats the avatar, because it is the thing the owner asked for.
     """
     img = backdrop(index)
+
+    if person == REDACTED:
+        # A redaction suppresses the FACE and the identity too. Printing
+        # "[ REDACTED ]" over somebody's avatar, or over the seal that names
+        # them, is not a redaction -- it is a caption on a reveal.
+        card, login, photo, title, guardian_title = None, None, None, None, None
+
+    _lower_third(img)
     d = ImageDraw.Draw(img)
 
-    # A redaction suppresses the FACE and the identity too. Printing
-    # "[ REDACTED ]" over somebody's avatar, or over the Guardian identity that
-    # names them, is not a redaction -- it is a caption on a reveal.
-    if person == REDACTED:
-        card, login, photo = None, None, None
-
-    portrait = summit_portrait(photo, 380)
+    portrait = summit_portrait(photo, LOWER_FACE)
     identity = cast_identity(card) or {}
 
-    f_label = _font("regular", 26)
-    f_class = _font("semibold", 34)
-    f_person = _font("bold", 68)
-    f_title = _font("regular", 34)
-    f_as = _font("regular", 24)
-    f_char = _font("regular", 44)
+    f_person = _font("bold", 62)
+    f_as = _font("regular", 22)
+    f_seal = _font("regular", 38)
+    f_title = _font("regular", TITLE_SIZE)
 
-    label = identity.get("label")
-    guardian_class = identity.get("class")
-    title = identity.get("title")
     # The authored spelling of a person's own name wins over the manifest's.
     name = identity.get("name") or person
+    seal = guardian_title or identity.get("title")
 
-    size = 380 if portrait is not None else 300
-    block = size + 40 + (44 if label else 0) + (52 if guardian_class else 0) \
-        + 94 + (52 if title else 0) + 70
-    top = (H - block) / 2
-
-    face = portrait if portrait is not None else avatar(login, size)
-    img.alpha_composite(face if face is not None else _empty_circle(size),
-                        (int((W - size) / 2), int(top)))
+    face_x, face_y = LOWER_PAD, LOWER_TOP + (LOWER_HEIGHT - LOWER_FACE) / 2
+    face = portrait if portrait is not None else avatar(login, LOWER_FACE)
+    img.alpha_composite(face if face is not None else _empty_circle(LOWER_FACE),
+                        (int(face_x), int(face_y)))
     if face is None and person != REDACTED:
-        f_i = _font("bold", 110)
+        f_i = _font("bold", 88)
         initial = (person or "?")[0]
-        _blue_bs(d, (_centre(d, initial, f_i), top + size / 2 - 78), initial, f_i, DIM)
+        w = d.textlength(initial, font=f_i)
+        _blue_bs(d, (face_x + (LOWER_FACE - w) / 2, face_y + LOWER_FACE / 2 - 62),
+                 initial, f_i, DIM)
 
-    y = top + size + 40
-    if label:
-        _draw_tracked(d, (_centre(d, label, f_label, TRACKING), y), label,
-                      f_label, ACCENT, TRACKING)
-        y += 44
-    if guardian_class:
-        _draw_tracked(d, (_centre(d, guardian_class, f_class, 0.02), y),
-                      guardian_class, f_class, DIM, 0.02)
-        y += 52
-    _blue_bs(d, (_centre(d, name, f_person, NAME_TRACKING), y),
-             name, f_person, TEXT, NAME_TRACKING)
-    y += 94
-    if title:
-        _draw_tracked(d, (_centre(d, title, f_title, 0.04), y), title, f_title,
-                      DIM, 0.04)
-        y += 52
-    d.line([(W / 2 - 90, y + 6), (W / 2 + 90, y + 6)], fill=RULE, width=2)
-    y += 26
-    _draw_tracked(d, (_centre(d, "as", f_as, TRACKING), y), "as", f_as, ACCENT, TRACKING)
-    y += 46
-    _blue_bs(d, (_centre(d, character, f_char, NAME_TRACKING), y),
-             character, f_char, TEXT, NAME_TRACKING)
+    x = face_x + LOWER_FACE + 56
+    lines = title_lines(title, d, f_title, width=W * LOWER_RAMP - x - 40) if title else []
+
+    step = [TITLE_LINE if line else int(TITLE_LINE * 0.5) for line in lines]
+    rows = 74 + (56 if seal else 0) + (sum(step) + 12 if lines else 0)
+    y = LOWER_TOP + (LOWER_HEIGHT - rows) / 2
+
+    _blue_bs(d, (x, y), name, f_person, TEXT, NAME_TRACKING)
+    y += 74
+    if seal:
+        _draw_tracked(d, (x, y + 8), "as", f_as, ACCENT, TRACKING)
+        _draw_tracked(d, (x + _tracked_width(d, "as ", f_as, TRACKING) + 10, y),
+                      seal, f_seal, TEXT, 0.02)
+        y += 56
+    if lines:
+        y += 12
+    for line, dy in zip(lines, step):
+        if line:
+            d.text((x, y), line, font=f_title, fill=DIM)
+        y += dy
     return img
 
 

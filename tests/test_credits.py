@@ -344,7 +344,6 @@ def test_laura_is_credited_once_and_the_credit_is_nimbatus(manifest):
     """
     laura = [c for c in manifest["cast"] if c["person"] == "Laura Santamaria"]
     assert len(laura) == 1
-    assert laura[0]["character"] == "Nimbatus"
     assert laura[0]["character_id"] == "nimbatus"
 
 
@@ -368,7 +367,10 @@ def test_every_cast_member_is_bound_to_a_real_person(manifest):
     """Rule 3: a placard is a claim about somebody. An unbound lead is
     omitted, never guessed."""
     for member in manifest["cast"]:
-        assert member["person"] and member["character"]
+        assert member["person"]
+        # The Destiny character is no longer PRINTED, but the binding it came
+        # from is still recorded -- that is what a redaction is keyed on.
+        assert member["character_id"]
 
 
 # --- the schedule ----------------------------------------------------------
@@ -494,20 +496,28 @@ def test_a_credit_roll_names_people_not_machines(manifest):
 
 def test_a_cast_face_is_never_guessed(manifest):
     """Rule 3, and the vocab's own warning: github.com/nimbatus is NOT Laura
-    Santamaria. A placard shows a face only from an authored card or a
-    VERIFIED login -- never from a login inferred off a person's name."""
+    Santamaria. A placard shows a face only from an authored card, a login the
+    manifest's own overlay verifies, or a login whose verification is WRITTEN
+    DOWN beside it -- never from a login inferred off a person's name."""
     verified = {k for k in (manifest.get("cast_logins") or {}) if not k.startswith("_")}
     for member in manifest["cast"]:
-        if member.get("login"):
-            assert member["login"] in {"nimbinatus"} or member["person"] in verified
+        if not member.get("login"):
+            continue
+        assert (member["person"] in verified
+                or member["login"] == "nimbinatus"
+                or member.get("login_source")), member["person"]
 
 
-def test_kat_is_credited_from_her_authored_card_not_a_lookalike_login(manifest):
-    """github.com/kat is named only 'Kat' and is not confirmed to be Kat
-    Cosgrove -- the nimbatus trap exactly. She has an authored card instead."""
+def test_kats_login_is_the_one_that_was_checked_not_the_one_that_matched(manifest):
+    """github.com/kat is named only "Kat" and is not confirmed to be Kat
+    Cosgrove -- the nimbatus trap exactly. github.com/katcosgrove IS: the
+    account's own name, its company and its bio all match the credit. The
+    difference between the two is the note recorded beside the login."""
     kat = next(c for c in manifest["cast"] if c["person"] == "Kat Cosgrove")
     assert kat.get("card") == "kat"
-    assert kat.get("login") is None
+    assert kat.get("login") == "katcosgrove"
+    assert "kat" != kat["login"]
+    assert kat.get("login_source")
 
 
 def test_the_authored_cards_are_used_where_they_exist(manifest):
@@ -547,35 +557,46 @@ def test_every_cast_placard_gets_a_readable_hold(manifest):
             assert item["dur"] >= 3.5
 
 
-def test_the_cast_plays_in_the_vocabularys_order(manifest):
-    """Ordered by the binding, not by whoever happens to have a face.
-
-    Compared on the CHARACTER, because a redacted placard deliberately no
-    longer carries its person's name.
-    """
+def test_the_principals_play_in_the_order_the_show_introduces_them(manifest):
+    """The manifest's order IS the show's order -- act II's people first, act
+    VII's last -- and the schedule never re-sorts it by who happens to have a
+    face or a bio."""
     items, _ = B.schedule(manifest)
-    on_screen = [i["character"] for i in items if i["kind"] == "cast"]
-    assert on_screen == [c["character"] for c in manifest["cast"]]
+    on_screen = [i["person"] for i in items if i["kind"] == "cast"]
+    assert on_screen == [c["person"] for c in manifest["cast"]]
+    acts = [c["seen_in"].split(" --")[0] for c in manifest["cast"]]
+    order = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
+    assert acts == sorted(acts, key=order.index)
 
 
-def test_the_cast_is_the_readmes_table(manifest):
+def test_every_placard_is_somebody_who_is_on_screen(manifest):
     """Owner: 'ensure this list matches the readme for the characters ...
     remove some of these characters', and separately 'Remove cayde-6 redacted
     from the starring roles, he's fine in the credits with the rest.'
 
-    So the placards are the README's nine rows MINUS Cayde-6, and minus the
-    second of Laura's two bindings ("laura is as nimbatus", owner, 2026-08-16):
-    seven. The README table lists BINDINGS, of which she holds two; a placard
-    is a performance, of which she gave one. The six the vocab binds but the
-    README does not list keep their bindings; only act VIII's placards went.
+    That list has since been replaced by a stricter one -- owner, 2026-08-16:
+    "Remove people not in the movie from here and only use the principal
+    actors", "not jorge castro", "we want karena, bsherman, and kylegospo".
+    So the rule is no longer "the README's table": it is that EVERY placard is
+    somebody who is on screen in a delivered act, and each entry cites the act
+    it can be found in.
     """
     items, _ = B.schedule(manifest)
-    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 7
-
-    readme = (REPO_ROOT / "README.md").read_text()
+    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 9
     for member in manifest["cast"]:
-        assert member["character"] in readme or member["person"] in readme, \
-            f"{member['person']} as {member['character']} is not in the README"
+        assert member.get("seen_in"), member["person"]
+    people = {c["person"] for c in manifest["cast"]}
+    # The two the owner took out, and the reason each went.
+    assert "Jorge Castro" not in people      # "not jorge castro"
+    assert "Lindsay Gendreau" not in people  # Bungie's voice of Sagira, not in this film
+
+    # NOT compared against the README's table any more, and that is the point.
+    # That table lists BINDINGS -- Destiny characters and who plays them -- and
+    # three principals (Kyle Gospodnetich, Natali Vlatko, Benjamin Sherman) are
+    # on screen without playing a Destiny character at all. The evidence a
+    # placard needs is the act it can be found in, which is `seen_in` above.
+    cited = [c["seen_in"].split(" --")[1].strip() for c in manifest["cast"]]
+    assert all(cited), "every principal cites the record that puts them on screen"
 
 
 def test_cayde_is_not_in_the_starring_roles(manifest):
@@ -1095,3 +1116,76 @@ def test_a_brand_mark_is_never_taken_off_this_host():
     for url in fetch_brand_marks.MARKS.values():
         assert url.startswith("https://")
         assert "/usr/share" not in url
+
+
+# --- the hero credits ------------------------------------------------------
+
+def test_a_placard_never_prints_the_destiny_character(manifest):
+    """Owner, 2026-08-16: "drop the Destiny names, do it like 'Kat Cosgrove as
+    Defender Queen... blah'". The binding is still recorded -- a redaction is
+    keyed on it -- but the character name is not drawn, even when a caller
+    passes one."""
+    img = C.render_cast_placard("Kat Cosgrove", "Saint-14", card="kat",
+                                guardian_title="Defender Queen of the Lost")
+    plain = C.render_cast_placard("Kat Cosgrove", card="kat",
+                                  guardian_title="Defender Queen of the Lost")
+    assert list(img.getdata()) == list(plain.getdata())
+
+
+def test_a_seal_nobody_authored_is_omitted_not_filled():
+    """Jeefy's binding carries no plate, so his placard has no `as` row at all.
+    Inventing a Guardian title for a real person is the forbidden move."""
+    with_seal = C.render_cast_placard("Jeefy", guardian_title="Iron Lord")
+    without = C.render_cast_placard("Jeefy")
+    assert list(with_seal.getdata()) != list(without.getdata())
+
+
+def test_the_github_title_is_reproduced_whole_and_its_breaks_are_honoured():
+    """`<br><br>` is a paragraph the author asked for, not markup to strip.
+    Natali's title is five rows including the break; a three-row cap dropped
+    "Archaeologist and Egyptologist" off the end of her credit."""
+    from PIL import ImageDraw
+    probe = ImageDraw.Draw(C.backdrop(0))
+    text = ("Director of Open Source Software Engineering at Cisco, SIG Docs "
+            "Co-Chair for Kubernetes TODO Group Steering Committee member."
+            "<br><br>Archaeologist and Egyptologist")
+    lines = C.title_lines(text, probe, C._font("regular", C.TITLE_SIZE))
+    assert "" in lines, "the paragraph break survives"
+    assert lines[-1] == "Archaeologist and Egyptologist"
+    assert "<br>" not in " ".join(lines)
+
+
+def test_the_lower_third_is_ink_where_the_type_is(manifest):
+    """The reason this is a lower third at all: centred type over the day
+    wallpapers measured 1.02:1 at its worst. Under the band it is dark on every
+    month, so the same card reads the same on all eleven."""
+    for index in range(11):
+        img = C.render_cast_placard("Kat Cosgrove", card="kat",
+                                    guardian_title="Defender Queen of the Lost",
+                                    index=index).convert("RGB")
+        # The left margin: inside the band, never under a glyph or a face.
+        band = img.crop((0, C.LOWER_TOP + 20,
+                         C.LOWER_PAD - 20, C.LOWER_TOP + C.LOWER_HEIGHT - 20))
+        px = list(band.getdata())
+        assert max(_relative_luminance(p) for p in px) < 0.18, index
+
+
+def test_a_title_nobody_wrote_is_lorem_and_is_recorded(manifest):
+    """Owner: "placeholder for jeefy". A row nobody has authored renders as
+    Latin -- visibly not approved English -- and the manifest records who it is
+    owed to, so it turns up in the punch list instead of being forgotten."""
+    pending = [c for c in manifest["cast"] if c.get("title_pending")]
+    assert pending, "somebody is still owed a title"
+    for member in pending:
+        assert not member.get("title")
+        drawn = B.cast_title(member)
+        assert drawn and drawn != member["title_pending"]
+        # Latin, deterministic, and the same on every machine.
+        assert drawn == B.cast_title(member)
+
+
+def test_a_supplied_title_is_never_replaced_by_a_placeholder(manifest):
+    for member in manifest["cast"]:
+        if member.get("title"):
+            assert B.cast_title(member) == member["title"]
+            assert member.get("title_source"), member["person"]

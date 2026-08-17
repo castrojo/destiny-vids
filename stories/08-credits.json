@@ -895,45 +895,97 @@
       ]
     }
   ],
+  "_cast_who": "THE PRINCIPALS, IN THE ORDER THE SHOW INTRODUCES THEM. Owner, 2026-08-16: 'Remove people not in the movie from here and only use the principal actors', 'not jorge castro', 'we want karena, bsherman, and kylegospo', 'placeholder for jeefy'. Everybody below is ON SCREEN in a delivered act -- the act is named in each entry's `seen_in`. Lindsay Gendreau came out: she is Bungie's voice of Sagira, credited in dialogue/yt_curse_of_osiris_opening_cinematic/DIALOGUE.md, and has never been in this film. A placard reads NAME as GUARDIAN TITLE, then what the person does: the Destiny character name is no longer printed (owner: 'drop the Destiny names, do it like \"Kat Cosgrove as Defender Queen... blah\"'). `guardian_title` is authored copy reproduced verbatim -- from `card` when the website authored one, from the cited record otherwise -- and is OMITTED when nobody has authored it. `title` is the person's own GitHub bio or the owner's own words, VERBATIM, per `title_source`; `title_pending` means nobody has supplied one yet and the row renders as lorem until they do.",
   "cast": [
     {
-      "_why": "OWNER, 2026-08-16: 'laura is as nimbatus'. She held two placards -- Elsie Bray and Nimbatus -- with identical identity copy on both, because the vocab binds her authored identity to elsie_bray and her verified login to nimbatus. The credit is NIMBATUS, once. The elsie_bray binding stays in vocab/casting.yaml, where act VII's reveal still needs it; what came out is the second placard, not the character.",
-      "person": "Laura Santamaria",
-      "character": "Nimbatus",
-      "character_id": "nimbatus",
-      "card": "laura"
+      "person": "Karena Angel",
+      "character_id": "mara_sov",
+      "seen_in": "II -- stories/02-endless-forms-plates.json, trio_mara_sov",
+      "title_pending": "No GitHub login is recorded for Karena anywhere in this repo, and casting.yaml says so explicitly: guessing one is the nimbatus/nimbinatus trap. TODO(owner): her login, or her own words.",
+      "guardian_title": "Architect of the Consensus",
+      "guardian_title_source": "vocab/casting.yaml `mara_sov`, the owner's re-authored plate (issue #5), verbatim"
     },
     {
-      "person": "Kelsey Hightower",
-      "character": "Zavala",
-      "character_id": "zavala"
+      "person": "Kyle Gospodnetich",
+      "character_id": "kylegospo",
+      "login": "KyleGospo",
+      "seen_in": "II -- vocab/casting.yaml `KyleGospo`, the bazzite plate",
+      "title": "Creator of Bazzite and Maintainer @ublue-os & @frostyard | @OpenGamingCollective Member  | Linux Community Engineer @microsoft",
+      "title_source": "github.com/KyleGospo profile bio, fetched 2026-08-16, verbatim including the double space",
+      "guardian_title": "The First Knife",
+      "guardian_title_source": "vocab/casting.yaml `KyleGospo`, the bazzite plate, verbatim",
+      "login_source": "VERIFIED: vocab/casting.yaml's `KyleGospo` binding is keyed by the login itself ('github.com/KyleGospo'), and the account's own name is 'Kyle Gospodnetich'. Its avatar URL is already pinned in that binding."
     },
     {
       "person": "Bob Killen",
-      "character": "Osiris",
       "character_id": "osiris",
-      "card": "bob"
-    },
-    {
-      "person": "Lindsay Gendreau",
-      "character": "Sagira",
-      "character_id": "sagira"
+      "card": "bob",
+      "login": "mrbobbytables",
+      "seen_in": "III -- the act is his",
+      "title": "Kubernetes & OSS Advocate | CNCF cat wrangler",
+      "title_source": "github.com/mrbobbytables profile bio, fetched 2026-08-16, verbatim",
+      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
+      "login_source": "VERIFIED: vocab/casting.yaml's `osiris` binding records person `mrbobbytables`, and the account's own name is 'Bob Killen'."
     },
     {
       "person": "Kat Cosgrove",
-      "character": "Saint-14",
       "character_id": "saint_14",
-      "card": "kat"
+      "card": "kat",
+      "seen_in": "IV -- the act is hers",
+      "title": "Village Sorceress at VillageSQL @kubernetes Steering Committee + Release Team Subproject Lead, SIG Docs Tech Lead, Kubernetes v1.30 Release Lead",
+      "title_source": "OWNER-SUPPLIED verbatim, 2026-08-16. Her GitHub bio is the first clause of it; the owner supplied the whole line.",
+      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
+      "login": "katcosgrove",
+      "login_source": "VERIFIED 2026-08-16: the account's own name is 'Kat Cosgrove', its company is villagesql.com and its bio is the first clause of the title the owner supplied for her. The old note here -- 'github.com/kat is named just Kat and is NOT confirmed' -- was about a DIFFERENT account; this is not that one."
     },
     {
-      "person": "Karena Angel",
-      "character": "Mara Sov",
-      "character_id": "mara_sov"
+      "person": "Natali Vlatko",
+      "character_id": "natali",
+      "card": "natali",
+      "seen_in": "V -- the act is hers; also act I's sixth Guardian window",
+      "title": "Director of Open Source Software Engineering at Cisco, SIG Docs Co-Chair for Kubernetes TODO Group Steering Committee member.<br><br>Archaeologist and Egyptologist",
+      "title_source": "OWNER-SUPPLIED verbatim, 2026-08-16, including the paragraph break.",
+      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
+      "login": "natalisucks",
+      "login_source": "VERIFIED 2026-08-16: the account's own name is 'Natali Vlatko' and its company is @cisco-open, which is the employer in the title the owner supplied for her."
+    },
+    {
+      "person": "Kelsey Hightower",
+      "character_id": "zavala",
+      "login": "kelseyhightower",
+      "seen_in": "VI -- stories/06-wolves-cayde-plates.json, gold_kelsey_hightower",
+      "title_pending": "github.com/kelseyhightower carries no bio. TODO(owner): his own words, or leave the lorem.",
+      "guardian_title": "Evangelist of the Open Sky",
+      "guardian_title_source": "stories/06-wolves-cayde-plates.json `gold_kelsey_hightower`, owner brief 2026-08-13 (#111), verbatim",
+      "login_source": "VERIFIED: the account's own name is 'Kelsey Hightower'."
     },
     {
       "person": "Jeefy",
-      "character": "Lord Saladin",
-      "character_id": "saladin"
+      "character_id": "saladin",
+      "login": "jeefy",
+      "seen_in": "VI -- vocab/casting.yaml `saladin`, the constrained binding (far + helmeted)",
+      "title_pending": "OWNER, 2026-08-16: 'placeholder for jeefy'. He DOES have a GitHub bio ('Project things @cncf | Kubernetes & OSS Advocate | Goose Enthusiast'); the owner asked for a placeholder instead, so it waits for his word rather than being taken.",
+      "guardian_title_pending": "The saladin binding carries NO plate block -- nobody has authored a Guardian title for him. The row is omitted rather than filled; #103's shape, not a bug."
+    },
+    {
+      "person": "Laura Santamaria",
+      "character_id": "nimbatus",
+      "card": "laura",
+      "seen_in": "VII -- stories/07-europa-plates.json, character `laura`",
+      "title": "Community Architect at Red Hat. Community: DevOps focused. I ❤️ clouds. Weather nerd, Pythonista. Specializing in solving the unsolvable.",
+      "title_source": "github.com/nimbinatus profile bio, fetched 2026-08-16, verbatim",
+      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
+      "login_source": "VERIFIED in vocab/casting.yaml: github.com/nimbinatus is Laura Santamaria (u/1538692); github.com/nimbatus is an unrelated empty account."
+    },
+    {
+      "person": "Benjamin Sherman",
+      "character_id": "bsherman",
+      "login": "bsherman",
+      "seen_in": "VII -- stories/07-europa-plates.json, speaker BSHERMAN",
+      "title": "@ublue-os and ucore Maintainer • Software Engineer • Linux and Container Nerd",
+      "title_source": "github.com/bsherman profile bio, fetched 2026-08-16, verbatim",
+      "guardian_title_pending": "He speaks in act VII as BSHERMAN and has no authored Guardian identity anywhere. The row is omitted rather than invented.",
+      "login_source": "VERIFIED: the account's own name is 'Benjamin Sherman' and its bio names @ublue-os, which is the project act VII's BSHERMAN speaks for."
     }
   ],
   "cast_hold_sec": 4.0,
