@@ -283,6 +283,48 @@
               "type": "string",
               "minLength": 1,
               "description": "Copy this plate used to carry. Retired strings are authored copy and are kept, never deleted."
+            },
+            "blue_letters": {
+              "type": "boolean",
+              "description": "Light the b/B/f/F of 'bluefin' in the house accent, per tools/blueletters.py. Colour only."
+            },
+            "glyph": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "token",
+                "accent",
+                "accent_style"
+              ],
+              "description": "An authored mark drawn where a letter would be.",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The character in `text` the mark stands in for."
+                },
+                "accent": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The diacritic drawn above the mark."
+                },
+                "accent_style": {
+                  "enum": [
+                    "seared"
+                  ],
+                  "description": "How the accent is treated. The MARK is never restyled."
+                }
+              }
+            },
+            "glyph_src": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Repo-relative path to the mark. Checked for existence at render time."
+            },
+            "_treatment": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Why the card looks the way it does, and what may not be restyled. Prose, not rendered."
             }
           }
         }

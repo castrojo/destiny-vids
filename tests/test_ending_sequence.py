@@ -169,3 +169,43 @@ def test_pause_builder_runs_as_a_script(tmp_path):
     )
     assert proc.returncode == 0, proc.stderr
     assert "-frames:v 1380" in proc.stdout
+
+
+def test_the_fight_card_lights_the_bluefin_letters():
+    """Owner: "Blue F's". The letters are picked by the project's own rule --
+    tools/blueletters.py lights B, b, F and f -- not by hand, and the colour
+    is the credits' accent rather than a second blue invented for one card."""
+    card = {plate["id"]: plate for plate in ending()["plates"]}["fight-for-us"]
+    assert card["blue_letters"] is True
+    assert "BbFf" in (REPO / "tools" / "blueletters.py").read_text()
+    template = TEMPLATE.read_text()
+    assert "'BbFf'.includes(char)" in template
+    assert "#93c5fd" in template
+
+
+def test_the_nova_card_sets_the_wheel_as_a_letter_and_sears_only_the_accent():
+    """Owner: "make the o the k8s symbol and make the accent above the symbol
+    SEAR". The mark is somebody else's trademark and is reproduced as drawn;
+    what is seared is the acute, which is ours."""
+    card = {plate["id"]: plate for plate in ending()["plates"]}["for-nova"]
+    assert card["text"] == "For Nóva"
+    assert card["glyph"] == {
+        "token": "ó", "accent": "´", "accent_style": "seared"}
+    assert card["glyph_src"] == "renders/marks/kubernetes.png"
+    assert (REPO / card["glyph_src"]).exists()
+    # The mark is credited where a CC BY asset has to be credited.
+    assert "kubernetes" in (REPO / "ATTRIBUTIONS.md").read_text().lower()
+    # The renderer resolves and existence-checks the mark like any other asset.
+    source = RENDERER.read_text()
+    assert "'glyph_src'" in source
+    assert "'glyph'" in source
+
+
+def test_a_card_that_cannot_fit_is_measured_rather_than_clipped():
+    """The card is 1920px wide and hides overflow, so copy that does not fit
+    vanishes silently. Owner: "measure this whole thing"."""
+    template = TEMPLATE.read_text()
+    assert "function fit(" in template
+    assert "line.scrollWidth" in template
+    assert "window.__fit" in template
+    assert "__fit" in RENDERER.read_text()

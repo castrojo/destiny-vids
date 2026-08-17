@@ -90,6 +90,51 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
+  /* BLUE LETTERS. The project's own convention, from tools/blueletters.py:
+     the b and f of "bluefin" carry the accent, so B, b, F and f are the
+     letters that light up. #93c5fd is the credits' accent (tools/credits.py),
+     reused rather than a second blue invented here. */
+  .blue {
+    color: #93c5fd;
+  }
+  /* AN AUTHORED GLYPH STANDING IN FOR A LETTER. The mark sits on the text
+     baseline at the cap height of the type around it, so it reads as the
+     letter it replaces rather than as a logo dropped into a word. Its accent
+     is drawn above it, positioned off the glyph box, because the mark has no
+     glyph metrics of its own for a combining mark to attach to. */
+  .glyph {
+    position: relative;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.14em;
+  }
+  .glyph img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .glyph .accent {
+    position: absolute;
+    left: 52%;
+    top: -0.5em;
+    transform: translateX(-50%);
+    font-size: 0.88em;
+    line-height: 1;
+  }
+  /* THE ACCENT IS FILLED BLUE. Owner, 2026-08-16: "fill in the accent with
+     blue". It is the house accent -- #93c5fd, the same blue the b/f letters
+     take -- so a card carries one blue rather than two. The sear stays: the
+     bloom is what makes it read as heat above the mark, and the fill is what
+     makes it read as ours. The MARK below it is untouched, because it is
+     somebody else's trademark. */
+  .glyph .accent.seared {
+    color: #93c5fd;
+    text-shadow:
+      0 0 4px rgb(157 200 255 / 95%),
+      0 0 12px rgb(40 116 255 / 85%),
+      0 0 26px rgb(40 116 255 / 55%);
+  }
   /* THE SEAR IS A WORD IN A SENTENCE, NOT A LOGO. Owner, 2026-08-16: "the
      'ever' is wrong it's one word it should look like it's in a sentence."
      So the token differs from the words either side of it ONLY in heat --
@@ -125,19 +170,82 @@
     card.appendChild(node)
   }
 
-  function appendEmphasized(host, text, emphasis) {
-    let cursor = 0
+  // THE SENTENCE IS BUILT ONCE, IN THREE PASSES OVER THE SAME TEXT: the
+  // authored emphasis tokens, an authored glyph standing in for a letter, and
+  // the project's blue letters. Everything lands in one inline flow, so the
+  // spaces between words survive and the line measures as one box.
+  function decorate(host, text, emphasis, glyph, blueLetters) {
+    const spans = []
     for (const token of emphasis) {
-      const at = text.indexOf(token.text, cursor)
+      const at = text.indexOf(token.text, spanEnd(spans))
       if (at < 0) continue
-      host.appendChild(document.createTextNode(text.slice(cursor, at)))
-      const span = document.createElement('span')
-      span.className = token.style
-      span.textContent = token.text
-      host.appendChild(span)
-      cursor = at + token.text.length
+      spans.push({ at, end: at + token.text.length, className: token.style })
     }
-    host.appendChild(document.createTextNode(text.slice(cursor)))
+    if (glyph) {
+      const at = text.indexOf(glyph.token)
+      if (at >= 0 && !spans.some(s => at < s.end && at + glyph.token.length > s.at)) {
+        spans.push({ at, end: at + glyph.token.length, glyph })
+      }
+    }
+    spans.sort((a, b) => a.at - b.at)
+
+    let cursor = 0
+    for (const span of spans) {
+      plain(host, text.slice(cursor, span.at), blueLetters)
+      host.appendChild(span.glyph
+        ? glyphNode(span.glyph)
+        : marked(span.className, text.slice(span.at, span.end), blueLetters))
+      cursor = span.end
+    }
+    plain(host, text.slice(cursor), blueLetters)
+  }
+
+  function spanEnd(spans) {
+    return spans.length ? spans[spans.length - 1].end : 0
+  }
+
+  // Blue letters: the b and f of "bluefin", per tools/blueletters.py. A run of
+  // text becomes text nodes with those letters wrapped, so the word is still
+  // one word -- nothing here changes spacing, weight or tracking.
+  function plain(host, text, blueLetters) {
+    if (!text) return
+    if (!blueLetters) { host.appendChild(document.createTextNode(text)); return }
+    for (const char of text) {
+      if ('BbFf'.includes(char)) {
+        const span = document.createElement('span')
+        span.className = 'blue'
+        span.textContent = char
+        host.appendChild(span)
+      } else {
+        host.appendChild(document.createTextNode(char))
+      }
+    }
+  }
+
+  function marked(className, text, blueLetters) {
+    const span = document.createElement('span')
+    span.className = className
+    plain(span, text, blueLetters)
+    return span
+  }
+
+  // A mark drawn where a letter would be, with its diacritic placed above it.
+  // The accent carries its own style so it can be seared while the mark is
+  // not -- the mark is somebody else's trademark and is reproduced as drawn.
+  function glyphNode(glyph) {
+    const host = document.createElement('span')
+    host.className = 'glyph'
+    const image = document.createElement('img')
+    image.src = params.get('glyph_src')
+    image.alt = glyph.token
+    host.appendChild(image)
+    if (glyph.accent) {
+      const accent = document.createElement('span')
+      accent.className = `accent ${glyph.accent_style || ''}`.trim()
+      accent.textContent = glyph.accent
+      host.appendChild(accent)
+    }
+    return host
   }
 
   // MEASURE THE LINE, DO NOT TRUST IT. Owner, 2026-08-16: "measure this whole
@@ -188,7 +296,13 @@
       const line = document.createElement('span')
       line.className = 'line'
       card.appendChild(line)
-      appendEmphasized(line, text, emphasis)
+      decorate(line, text, emphasis,
+        JSON.parse(params.get('glyph') || 'null'),
+        params.get('blue_letters') === 'true')
+      // A glyph is an <img>: it has to be decoded before the line can be
+      // measured, or the box is measured around nothing.
+      await Promise.all([...line.querySelectorAll('img')]
+        .map(image => image.decode().catch(() => {})))
       await document.fonts.ready
       window.__fit = fit(card, line)
     }

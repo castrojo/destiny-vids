@@ -202,7 +202,9 @@
       "dur": 4.4,
       "fade_in": 0.6,
       "fade_out": 0.6,
-      "_what": "Owner 2026-08-16: '27:49 \"Fight for Us\" -- same font/size as the other 2. Blue F's.' The owner's stamp is 77.46; 77.728 is the MEASURED shot change beside it (select='gt(scene,0.15)' on this derivative, 0.268 s later), where the jungle cuts to a wide ocean surface -- an even mid-dark field that a centre title sits on cleanly. The card lands ON the cut."
+      "_what": "Owner 2026-08-16: '27:49 \"Fight for Us\" -- same font/size as the other 2. Blue F's.' The owner's stamp is 77.46; 77.728 is the MEASURED shot change beside it (select='gt(scene,0.15)' on this derivative, 0.268 s later), where the jungle cuts to a wide ocean surface -- an even mid-dark field that a centre title sits on cleanly. The card lands ON the cut.",
+      "blue_letters": true,
+      "_treatment": "Owner 2026-08-16: 'Blue F's.' The letters are chosen by the project's own rule rather than by hand -- tools/blueletters.py lights B, b, F and f, the letters of 'bluefin' -- so both F's in 'Fight for Us' carry it and nothing else does. The blue is #93c5fd, the credits' own accent (tools/credits.py), reused rather than a second blue invented for one card. Only the colour changes: same face, same weight, same tracking, so the words stay one line of type."
     },
     {
       "id": "for-nova",
@@ -215,7 +217,14 @@
       "dur": 3.5,
       "fade_in": 0.6,
       "fade_out": 0.6,
-      "_what": "Owner 2026-08-16: '28:20 Same font/placement as the others: \"For Nóva\" ... This section was originally shorted, lengthen it a bit for dramatic purposes for a few seconds before going into the credits', and their answer on HOW: hold it longer on the picture that is already there. 28:20 is 108.46 on this clock and the passage ends at 109.5, which is one second of card. RUNNING PAST 109.5 IS RULED OUT BY MEASUREMENT, not by preference: the source's own burned credits ('(c) A LOVELY BUNCH OF COCONUTS 2024 / DIRECTED BY VILLE LIPIAINEN') fade in from 111.0 and are readable by 111.5. So the card comes UP EARLIER instead, at 106.0, and holds 3.5 s to the out point -- three and a half times the screen time, no new picture, and no risk of somebody else's credit under ours. It plays over the sunken hull interior, measured at YAVG 24-30 and falling, which is the darkest bed in the passage."
+      "_what": "Owner 2026-08-16: '28:20 Same font/placement as the others: \"For Nóva\" ... This section was originally shorted, lengthen it a bit for dramatic purposes for a few seconds before going into the credits', and their answer on HOW: hold it longer on the picture that is already there. 28:20 is 108.46 on this clock and the passage ends at 109.5, which is one second of card. RUNNING PAST 109.5 IS RULED OUT BY MEASUREMENT, not by preference: the source's own burned credits ('(c) A LOVELY BUNCH OF COCONUTS 2024 / DIRECTED BY VILLE LIPIAINEN') fade in from 111.0 and are readable by 111.5. So the card comes UP EARLIER instead, at 106.0, and holds 3.5 s to the out point -- three and a half times the screen time, no new picture, and no risk of somebody else's credit under ours. It plays over the sunken hull interior, measured at YAVG 24-30 and falling, which is the darkest bed in the passage.",
+      "glyph": {
+        "token": "ó",
+        "accent": "´",
+        "accent_style": "seared"
+      },
+      "glyph_src": "renders/marks/kubernetes.png",
+      "_treatment": "Owner 2026-08-16: 'make the o the k8s symbol and make the accent above the symbol SEAR.' The mark is the Kubernetes wheel from cncf/artwork, cached by scripts/fetch_brand_marks.py at renders/marks/kubernetes.png and credited in ATTRIBUTIONS.md (CC BY 4.0; it is also a Linux Foundation trademark). IT IS REPRODUCED AS DRAWN AND IS NOT RECOLOURED: the sear is on the ACUTE ACCENT above it, which is ours, not on somebody else's mark -- the same line the trailer's KubeCon card draws when it sears its divider and leaves the wordmark alone. The glyph sits at 0.86em on the text baseline so it reads as the letter it stands in for rather than as a logo dropped into a word."
     }
   ]
 }

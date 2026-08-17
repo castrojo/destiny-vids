@@ -43,12 +43,12 @@ const TEMPLATES = {
 // switch that changes no string.
 const COPY = ['act', 'label', 'title', 'subtitle', 'quote', 'quote_by', 'quote_note',
   'qr_dialogue', 'qr_domain', 'stage', 'accent', 'variant', 'angle', 'size',
-  'mode', 'text', 'placement']
+  'mode', 'text', 'placement', 'blue_letters']
 const LISTS = ['body', 'chapters']
-const ASSETS = ['art', 'qr', 'wallpaper']
+const ASSETS = ['art', 'qr', 'wallpaper', 'glyph_src']
 // Structured copy: one JSON param, because a caption box is a variable-length
 // stack of authored lines and a card may carry several.
-const JSON_COPY = ['captions', 'emphasis']
+const JSON_COPY = ['captions', 'emphasis', 'glyph']
 
 function parseArgs(argv) {
   const args = { manifest: null, outDir: null, only: null, wallpaperSeed: null }
