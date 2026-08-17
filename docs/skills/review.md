@@ -70,6 +70,29 @@ pasted chapter table goes stale the moment a trim moves: one that opens act I
 at `0:00` still reads that way once the prologue is placed in front of it,
 which puts it 1:41 wrong and in disagreement with `running-order.md`.
 
+## Step 2b — read the whole show without watching it
+
+Watching the programme end to end costs half an hour, which makes "the card is
+on the wrong shot" expensive to check and expensive to re-check. `tools/shots.py`
+is the cheap version: one frame per detected shot, labelled with its timecode,
+tiled into one image per act.
+
+```bash
+python3 tools/shots.py                    # every act in Prod/ -> ~/Videos/Wolves/shots/
+python3 tools/shots.py --act II --act VI  # just these
+python3 tools/shots.py --video renders/efmb-hq.mp4 --out /tmp/sheet
+```
+
+The label is the **act's own clock** — the same clock `stories/*-plates.json`
+uses — so a plate's `at` can be read straight off the sheet. It is not the
+programme clock; `tools/megacut.py --locate` converts a note taken against the
+full movie back to the act that was playing.
+
+Detection is `ContentDetector(threshold=27)`, the same detector and the same
+threshold every measured boundary in this repo was found with, so a sheet and a
+cut list describe the same shots. **A sheet reporting one shot for a whole act
+is the AV1 trap, not a long take** — see [`../skills/indexing.md`](indexing.md).
+
 ## Step 3 — rebuild only what changed
 
 | The note is about | Rebuild | Cost |
