@@ -3,7 +3,7 @@
   "_owner": "Owner instruction, 2026-08-14: 'Start at ~1:31 or wherever the last cut left off from (check another agent doing parallel work) - save the clip and cut it at ~2.39, then insert that after the destiny intro. 2-39-5:29 is the the next segment, insert after mrbobby. 5:29- start there and record that to 6:30, then insert that before europa. 6:30 match the transition panning up from laura after europa, then hold until the end of this, then roll credits.'",
   "_no_numerals": "These take NO ACT NUMERAL and get NO SLIDE and NO CHAPTER MARKER. AGENTS.md makes the eight numerals load-bearing, and the prologue already set the precedent for unnumbered connective tissue in front of act I. A slide announcing an interlude would announce the one thing whose whole job is to be unannounced.",
   "_not_in_prod": "They deliver to renders/ ONLY, not to ~/Videos/Wolves/Prod. Owner: 'also want the snippets in the render folder we will be editing them in the future with dino artwork.' They are work-in-progress elements, not finished acts: the megacut plan references renders/ directly, and no delivery.json key, Prod/ hardlink, README row or CHECKSUMS entry is created for them. When the dinosaur pass lands they can be promoted; until then Prod/ keeps meaning 'a finished act'.",
-  "_clean_renders": "Every movement is rendered CLEAN -- no fades, no overlays, no cards. Fades live in stories/megacut/megacut.json in act-film time, which is this repo's convention (see megacut.json `_transitions`), and it is also what makes these files editable: the dinosaur pass gets unfaded picture to work on rather than footage with a dip already burned into it.",
+  "_clean_renders": "Every canonical movement is rendered CLEAN -- no fades, no overlays, no cards. Fades live in stories/megacut/megacut.json in act-film time, which is this repo's convention (see megacut.json `_transitions`), and it is also what makes these files editable: the dinosaur pass gets unfaded picture to work on rather than footage with a dip already burned into it. A movement may additionally declare an `ending_derivative` (movements 4 and 5 do): a SEPARATELY NAMED output rebuilt directly from the same original source and audio window by its own builder -- movement 5's carries the underwater passage, and movement 4's composes the movement's OWN REPLACEMENTS and its chat plates in the same single encode, so the swaps and the words never travel in separate encodes. The derivative is never a mutation of the clean render -- the clean file keeps its name, its window and its bit-identical audio, and the derivative adds no x264 generation before megacut assembly because it is encoded once from the source, not from the clean render.",
   "_rights": "Third-party copyrighted: Nuclear Blast recording, Nightwish's own official music video. The full rights record is music/bed_perfume_of_the_timeless.json and videos/yt_nightwish_perfume_of_the_timeless.json, written for the prologue and unchanged by this file. PROTOTYPE OUTPUT, same as the prologue: the shipping presentation embeds the video rather than re-hosting it, so these renders are for cutting and review. NO SOCIAL COPIES ARE CUT FROM THEM -- a standalone clip is exactly the redistribution the owner's instruction rules out.",
   "source": "media/yt_nightwish_perfume_of_the_timeless.mkv",
   "source_video_id": "oHCaZmIzr0o",
@@ -26,7 +26,7 @@
       "replacements": [
         {
           "id": "dusk-turn",
-          "_what": "Owner 2026-08-15: '4:19 we want to cut this woman out and replace her with bluefin at dusk fading from day to night', and 'when there's a ROAR jump scare: angry.webp'. THE SHOT IS MEASURED, not the owner's timestamp: programme 4:19 is source 141.233, and the shot around it runs 138.920 -> 144.520 (`select='gt(scene,0.20)'`). It is a woman walking out of fire carrying a ram's pelt, confirmed on extracted frames rather than assumed. The replacement is exactly 5.600 s so movement 2 stays 66.400.",
+          "_what": "Owner 2026-08-15: '4:19 we want to cut this woman out and replace her with bluefin at dusk fading from day to night', and 'when there's a ROAR jump scare: angry.webp'. THE SHOT IS MEASURED, not the owner's timestamp: programme 4:19 is source 141.233, and the shot around it runs 138.920 -> 144.520 (`select='gt(scene,0.20)'`). It is a woman walking out of fire carrying a ram's pelt, confirmed on extracted frames rather than assumed. The replacement is exactly 5.600 s so movement 2 stays 66.400. Owner 2026-08-17 adds: '4:17 keep this day mode version of dusk' -- the day leg now holds until source 141.016 (turn_at 2.096, replacement-relative; the even division it replaces began the turn at 1.700, programme 4:18.4, earlier than the owner wants). The turn completes at source 143.216, the exact frame the scare lands, so the raptor punches out of the NIGHT dusk.",
           "at": 45.92,
           "dur": 5.6,
           "source_in": 138.92,
@@ -36,12 +36,13 @@
             "dusk-night"
           ],
           "turn_sec": 2.2,
+          "turn_at": 2.096,
           "_art": "The `dusk` wallpaper's own day/night pair -- the same drawing at two times of day, which is what makes 'fading from day to night' a turn rather than a dissolve between two pictures. Same idea as the prologue's March bridge, with the artwork the owner named.",
           "flash": {
             "art": "roar",
-            "at": 2.04,
+            "at": 4.296,
             "dur": 0.1,
-            "_what": "THE JUMP SCARE. A hard full-frame cut-in of the angry Bluefin raptor, 0.100 s -- about six frames at the delivery rate, long enough to register and too short to read as a shot. PLACED ON THE LARGEST ONSET INSIDE THE SHOT, source 140.960 (replacement-relative 2.040). RECORDED HONESTLY: there is no roar in the music here. The largest transient anywhere in 138.920-144.520 is +0.73 dB -- this stretch of Perfume is a sustained compressed wall, not a track with hits in it. So the flash lands on the best onset that exists rather than on a roar, and if the owner meant a specific roar elsewhere in the film this is the number to move."
+            "_what": "THE JUMP SCARE. A hard full-frame cut-in of the angry Bluefin raptor, 0.100 s -- about six frames at the delivery rate, long enough to register and too short to read as a shot. Owner 2026-08-17: '4:17 ... the jump scare is too early' / '4:21 put the jump scare here. Analyze the audio for maximum effect' -- so it MOVED from source 140.960 to the largest onset inside the named window, re-measured rather than guessed: librosa onset strength (spectral flux) over the whole shot 138.920-144.520, window 142.983-143.483 (4:21 plus the +/-0.25 s the stamps carry). The window's best onset is 1.603 at source 143.216, replacement-relative 4.296. RECORDED HONESTLY, the number is weak: the shot's strongest onset is 7.051 at source 144.005, so the window's best is 23% of it (-12.9 dB). There is still no roar in this stretch of Perfume -- it is a sustained compressed wall, not a track with hits in it -- and 4:21 lands between hits. The flash lands on the best onset that exists where the owner pointed; if he meant a specific roar elsewhere in the film, this is still the number to move."
           },
           "_source": "renders/artwork/roar.png. THE SOURCE IS LOW RESOLUTION AND THAT IS A FINDING, not a choice: the largest published copy of this drawing anywhere is characters/angry.webp at 553x352 (the header/ copy the owner linked is 440x280), and ublue-os/artwork -- where the owner expected a high-quality one -- HAS NO CHARACTER ART AT ALL, only wallpapers. Checked 2026-08-15 across the whole website checkout including its worktrees and dist/. So the flash is a 2.82x upscale, composed in ONE Lanczos step straight to 1920x1080 so the renderer's fit is a no-op and it is never resampled twice. It is six frames of flat vector-style art, which is the only reason this is shippable. A master would be a straight swap: replace renders/artwork/roar.png and re-run scripts/build_interludes.py. NOT SUBSTITUTED: there is high-resolution raptor art on this host (chonky-utahraptor-bluefinskin.webp at 1800x1800 is a snarl), but it is a DIFFERENT DRAWING and the owner named this one."
         }
@@ -108,7 +109,103 @@
       "seat": "after act VI (06-7daystothewolves), before act VII's slide",
       "_in_point": "REBALANCED (#192): continuous with movement 3's corrected out point, so the thread stays gapless. This movement absorbs the 54.24 s that made movement 3 the pacing outlier; seated between act VI (7:11) and act VII (1:37) the same span is proportionate where it was not before.",
       "_needle_drop": "2026-08-15, +0.400 s off the head (273.840 -> 274.240) so this movement OPENS ON ITS FIRST HIT. Measured: the old head carried a 0.421 s stub of the previous phrase, which is what made the owner's 'hot mess' -- act VI stopped at full level and the new song did not land for another half second. Nothing is cut from the song: movement 3 keeps the 0.400 s. See its `_needle_drop`, and act VI's out point in stories/megacut/megacut.json, which is the other half of the same edit.",
-      "_out_point": "The owner said '6:30' (390.0). 389.800 is a measured shot change 0.20 s earlier -- five frames at 25 fps, and the frame the owner was looking at."
+      "_out_point": "The owner said '6:30' (390.0). 389.800 is a measured shot change 0.20 s earlier -- five frames at 25 fps, and the frame the owner was looking at.",
+      "replacements": [
+        {
+          "id": "ghost-tank",
+          "_what": "Owner 2026-08-15: '22:50 leave the music going but overlay a bluefin day wallpaper instead of this ghosty man', then '22:52 then resume here'. THE SHOT IS MEASURED, not the timestamp: the shot around programme 22:50 runs 287.360 -> 292.520 (`select='gt(scene,0.25)'`), and the swap anchors to its measured start. Frame-checked on extracted frames: the 'ghosty man' is a translucent white-haired FIGURE gazing up at a jellyfish tank -- she reads gaunt and slight, not male, the same class of finding as movement 3's pales -- and she exits frame ~289.5 while the camera holds the tank. The replacement is exactly 2.000 s so the movement stays 115.560.",
+          "at": 13.12,
+          "dur": 2.0,
+          "source_in": 287.36,
+          "source_out": 289.36,
+          "art": [
+            "bluefin-day"
+          ],
+          "_resume": "'22:52 then resume here' IS AN INVARIANT, NOT A GAP. The art runs 287.360 -> 289.360 (the owner's 22:52 stamp, corrected +0.234 for the act VI out-point move 431.231 -> 430.997, is source 289.134 -- inside the swap), and the source picture then runs UNTOUCHED from 289.360 until the next replacement's measured start at 292.520. Snap-to-shot would have held the wallpaper to 292.520 and swallowed the resume window; the window is asserted in tests/test_interludes.py."
+        },
+        {
+          "id": "ghost-desk",
+          "_what": "Owner 2026-08-15: '22:56-23:00 another bluefin day wallpaper'. A SECOND ghost, not the tank shot continuing: a translucent white-haired man writing at a library desk, frame-checked at source 294.250. The measured shot is 292.520 -> 297.160 and the swap is shot-locked at both ends.",
+          "at": 18.28,
+          "dur": 4.64,
+          "source_in": 292.52,
+          "source_out": 297.16,
+          "art": [
+            "bluefin-day"
+          ],
+          "_measured": "THE 0.25 GRID MISSED THE OUT POINT. It reports one shot 292.520 -> 299.720, but a `select='gt(scene,0.10)'` pass over 295.5-300.5 finds a soft cut at 297.160 (a cut under drifting smoke, score 0.09-0.14), and the owner's 23:00 end stamp -- source 297.134 corrected -- matches the measured cut to 0.02 s. The desk ghost is visible 292.520 -> ~296.3 and fades before the cut, so the whole of him is covered."
+        },
+        {
+          "id": "contributor-summit",
+          "_what": "Owner 2026-08-15: '23:15-23:17 CNCF Contributor picture'. The summit overhead wide (stories/summit-plates group-002, rendered as renders/summit-plates/enemy_cu.jpg): the whole summit in one frame, the contributor picture, over the two apparitions that rise through the 'ghosts climb the tower' dissolve -- a translucent bearded reader drifting over the library (~312.0-313.5), then a figure rising up the atrium (from ~314.0), both frame-checked.",
+          "at": 38.12,
+          "dur": 2.0,
+          "source_in": 312.36,
+          "source_out": 314.36,
+          "art": [
+            {"file": "renders/summit-plates/enemy_cu.jpg"}
+          ],
+          "fit": "scope",
+          "_fit": "THE PLATE IS EXACTLY 1920x1080, and the default fit left NO remainder -- the photograph filled the whole delivery frame for its two seconds, the frame grew and shrank back, and the owner caught it on the derivative (2026-08-17): 'the picture changes SHAPE for two seconds in the middle of a scope movement -- that reads as a mistake rather than as a cut to a photograph.' fit 'scope' scales the photograph on its own aspect to FILL the film's own 1920x804 window and centre-crops the overflow, so it letterboxes at the film's own 138 px bars exactly like the artwork around it. The fit-or-crop call is the owner's, verbatim: 'A 16:9 source cropped to 2.39:1 loses some height, which is fine'; the crop is the one already authorised in stories/summit-photos.json. The drawings keep the never-cropped default -- this rung exists for assets whose native aspect would otherwise fill the frame.",
+          "_stamp_anchored": "STAMP-ANCHORED, NOT SHOT-LOCKED: the apparitions live INSIDE one measured shot, the 304.600 -> 315.160 dissolve montage (fish -> ocean -> atrium), so there is no cut to lock to. The window is the owner's stamps corrected +0.234 (312.374 -> 314.374), frame-quantised to 312.360.",
+          "_rights": "The photograph is CNCF's, CC BY-NC-ND 4.0; the crop authorisation is the OWNER'S, recorded verbatim in stories/summit-photos.json, and this use is covered in ATTRIBUTIONS.md. No darker variant exists among the six graded summit plates -- recorded, not invented."
+        },
+        {
+          "id": "band-huntress",
+          "_what": "Owner 2026-08-15: '23:54 Replace this band montage with hero shots of bluefin start with, huntress, duality, bluefin (the original), and one more, sync so they switch matching the same pace as the individual band members switch out'. The montage is SIX member shots, measured one boundary per switch: 351.600 / 351.960 / 352.240 / 352.520 / 352.800 / 353.080, out at the 353.360 explosion. The owner named FOUR artworks, so exact sync is one artwork per member-GROUP with switches only on measured member boundaries: huntress opens across the first TWO members ('start with, huntress'), then one artwork per member to the explosion.",
+          "at": 77.36,
+          "dur": 0.64,
+          "source_in": 351.6,
+          "source_out": 352.24,
+          "art": [
+            "huntress"
+          ],
+          "_measured": "Members 1-2 of six: a woman tossing her hair in a white void of drifting debris, then a blond man. The montage entry itself is 351.600, found on a 0.04-threshold pass (the 351.350-351.575 fireball explosions score 0.09-0.14; the first member appears at 351.60), so the swap also hides the entry cut. Member switches measured at 0.08; each member shot is ~0.24-0.28 s."
+        },
+        {
+          "id": "band-duality",
+          "_what": "Duality (day) over members 3-4 -- a woman in a jacket, then a long-haired man in a coat, both in the same hazy sepia daylight.",
+          "at": 78.0,
+          "dur": 0.56,
+          "source_in": 352.24,
+          "source_out": 352.8,
+          "art": [
+            "duality-day"
+          ],
+          "_art": "The duality pair was fetched from ublue-os/artwork for this swap (scripts/fetch_artwork.py); the copies under ~/src/website are the smaller webp rung the artwork-fidelity rule forbids. Day variant because the member shots are bright haze -- movement 3's convention: the variant matches the shot it covers."
+        },
+        {
+          "id": "band-bluefin",
+          "_what": "'bluefin (the original)' -- the bluefin-day savannah -- over member 5, the white-haired man in the suit.",
+          "at": 78.56,
+          "dur": 0.28,
+          "source_in": 352.8,
+          "source_out": 353.08,
+          "art": [
+            "bluefin-day"
+          ]
+        },
+        {
+          "id": "band-eyes",
+          "_what": "Eyes -- the owner's 'one more', picked by the owner -- over member 6, the white-haired man in black, the montage's last face, held to the explosion that closes the montage.",
+          "at": 78.84,
+          "dur": 0.28,
+          "source_in": 353.08,
+          "source_out": 353.36,
+          "art": [
+            "eyes"
+          ],
+          "_art": "Eyes ships ONE drawing -- a dark night scene, raptor and butterflies under a full moon -- with no day variant upstream, so the night drawing is what exists. Recorded, not invented; if the owner wants a brighter fourth, that is a new artwork, not a variant."
+        }
+      ],
+      "_replacements": "Owner 2026-08-15, four notes inside the movement. File-local times in the note were taken on the OLD build; act VI's out point has since moved 431.231 -> 430.997, so every stamp carries up to ~0.25 s, and the stamps identify WHICH shot while the measurement gives the boundaries -- the same discipline as movements 2 and 3. 22:50/22:52 ('ghosty man' / 'then resume here') is the jellyfish-tank ghost, measured 287.360 -> 292.520, art held only to 289.360 so the source resumes on the stamp -- the resume is an invariant, asserted in tests. 22:56-23:00 is a SECOND ghost at a library desk, measured 292.520 -> 297.160; the 0.25 grid missed the soft cut at 297.160 and a 0.10 pass found it, with the owner's 23:00 end matching to 0.02 s. 23:15-23:17 'CNCF Contributor picture' is the summit overhead wide over the apparitions inside the 304.600 -> 315.160 dissolve, stamp-anchored because there is no cut to lock to. 23:54's band montage is SIX member shots (351.600/351.960/352.240/352.520/352.800/353.080, out 353.360) under FOUR artworks -- huntress, duality-day, bluefin-day, eyes in the owner's order -- one replacement per switch group, duration-locked, so every artwork change lands on a measured member switch and the movement stays exactly 115.560. Day variants match the hazy sepia daylight of the member shots; eyes ships one dark drawing with no day variant -- recorded. Art inputs are measured to the frame; none overlap.",
+      "ending_derivative": {
+        "out_file": "renders/perfume-4-overlays.mp4",
+        "overlay_manifest": "stories/00-perfume-4-plates.json",
+        "overlay_section": "chat",
+        "plates_dir": "renders/perfume-4/plates",
+        "_note": "The clean movement remains renders/perfume-4.mp4. The derivative is rebuilt directly from the same original source and audio window in ONE encode that composes this movement's own replacements AND the chat plates, so the swaps and the words never travel in separate encodes and no generation is added before megacut assembly. scripts/build_ending_overlays.py, generalised from the movement-5 pattern."
+      }
     },
     {
       "id": "perfume-5",
@@ -119,7 +216,13 @@
       "seat": "after act VII (07-europa), before act VIII (credits)",
       "_in_point": "The owner: 'match the transition panning up from laura after europa'. Laura Santamaria is Elsie Bray, act VII copy (vocab/casting.yaml, README:90). Act VII runs 97.266 s and its tail is flat at YAVG~37 from 89 s, then falls hard over its last half second (96.8 -> 97.27: 32.8 -> 24.8 -> 16.0) -- it fades down, it does not cut. Movement 5 opens on the measured cut at 389.800 and its upward camera move continues that fall. WHERE EXACTLY THE TWO MOVES MEET IS A CRAFT JUDGEMENT ABOUT FRAMES AND IS NOT AUTOMATABLE: the join is built at 389.800 and shown to the owner. Act VII's out point is settled (#178) and is never shortened to make this fit.",
       "_out_point": "EOF. The owner: 'hold until the end of this, then roll credits.' The source's last shot change is 467.52 and it holds to 507.021.",
-      "_credits_join": "This moves the act VIII ambush. docs/running-order.md records that the credits carry no slide and no marker because 'Europa fades to black on its own tail and the drum smash lands on the next frame' -- the smash now lands off the end of a DIFFERENT song. The plan gives movement 5 a tail fade to black so the ambush still comes out of black rather than out of a held frame, but whether the two pieces of music collide is a listening judgement for the owner."
+      "_credits_join": "This moves the act VIII ambush. docs/running-order.md records that the credits carry no slide and no marker because 'Europa fades to black on its own tail and the drum smash lands on the next frame' -- the smash now lands off the end of a DIFFERENT song. The plan gives movement 5 a tail fade to black so the ambush still comes out of black rather than out of a held frame, but whether the two pieces of music collide is a listening judgement for the owner.",
+      "ending_derivative": {
+        "out_file": "renders/perfume-5-ending.mp4",
+        "overlay_manifest": "stories/megacut/ending-cards.json",
+        "overlay_section": "underwater",
+        "_note": "The clean movement remains renders/perfume-5.mp4. The derivative is rebuilt directly from the same original source and audio window, so it does not add a generation before megacut assembly."
+      }
     }
   ],
   "_replacements": "SHOT REPLACEMENT, added 2026-08-15 on two owner notes about the SAME thing -- putting Project Bluefin's own artwork into the interludes. This is the 'dinosaur pass' these movements were rendered clean FOR (_clean_renders below), arriving one pass earlier than expected. EVERY REPLACEMENT IS DURATION-LOCKED to the shot it covers, measured with `select='gt(scene,...)'` on the source and never rounded, so a movement's length cannot change and no chapter marker downstream can move. The picture is swapped; the SONG IS UNTOUCHED and plays through the replacement, which is what keeps the thread one continuous performance. Art is cached by scripts/fetch_artwork.py from ublue-os/artwork -- this project's own artwork, not a third party's.",

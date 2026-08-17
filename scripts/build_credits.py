@@ -7,8 +7,9 @@ the programme and the feature.
 
 ## The music, and why it is cut this way
 
-The bed is Nightwish's *Wish I Had an Angel* (instrumental), already measured
-into ``music/bed_wish_i_had_an_angel.json``. The owner's instruction: *"design
+The bed starts with Nightwish's *Wish I Had an Angel* instrumental, already
+measured into ``music/bed_wish_i_had_an_angel.json``, then hands over to
+Nightwish's vocal *Storytime* recording. The owner's instruction: *"design
 the song to loop back to the beginning where it makes sense since people miss
 that part of the song. Also cut out the weird drum section with the moaning we
 want the song on loop basically but starting at the drum smash."*
@@ -78,6 +79,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from tools import conform  # noqa: E402
 from tools import credits as C  # noqa: E402
+from tools import peaks  # noqa: E402
 from tools.bed import fmt_tc  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
@@ -355,18 +357,99 @@ def authored_cards():
             if isinstance(r, dict) and r.get("name") and r.get("slug")}
 
 
-def fetch_avatars(manifest, verbose=True):
-    """Cache a face for every login the manifest names.
+# The four authored strings a placard reproduces. The `card` PNG is NOT among
+# them: it is a splash composite, and act VIII does not set type over one
+# ("get rid of those hero splashes they suck"). Copying more of that file than
+# the credits print would be a second, staler home for somebody's identity.
+IDENTITY_FIELDS = ("label", "class", "name", "title")
 
-    The renderer never touches the network (``tools/credits.avatar``), so a
-    contributor with no cached PFP silently degrades to a ring. Adding two
-    upstream sections added ~200 logins nobody had ever fetched, which would
-    have been two walls of empty rings and no error. Missing is still not
-    fatal -- this only fills the cache in.
+
+def cache_identities(verbose=True):
+    """Copy the authored Guardian identities into the render cache, verbatim.
+
+    ``tools/credits`` must not read another checkout -- several agents run
+    worktrees against the website -- so the strings are cached beside the cast
+    art in gitignored ``renders/cast-cards/identities.json``. Absent website,
+    absent cache, and the placard degrades to the person's name: never a
+    guessed label, never an invented title.
     """
-    import urllib.request
+    try:
+        data = json.loads(AUTHORED_CARDS.read_text())
+    except (OSError, ValueError) as exc:
+        if verbose:
+            print(f"note: no authored identities ({exc}); the cast placards "
+                  f"run on names alone.", file=sys.stderr)
+        return {}
+    rows = data.get("characters", []) if isinstance(data, dict) else data
+    out = {}
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("slug"):
+            continue
+        out[row["slug"]] = {k: row[k] for k in IDENTITY_FIELDS
+                            if isinstance(row.get(k), str) and row[k].strip()}
+    C.CAST_CARD_DIR.mkdir(parents=True, exist_ok=True)
+    (C.CAST_CARD_DIR / "identities.json").write_text(
+        json.dumps(out, indent=1, ensure_ascii=False) + "\n")
+    if verbose:
+        print(f"identities: {len(out)} cached from {AUTHORED_CARDS}")
+    return out
 
-    C.AVATAR_DIR.mkdir(parents=True, exist_ok=True)
+
+def vocab_logins():
+    """``{credited name: github login}`` for every lead the vocab verifies.
+
+    A login is recorded per BINDING, and one person can hold several -- so the
+    map is keyed by the name the credits print, which is the same key the
+    manifest's own ``cast_logins`` overlay uses. Only what the vocab states is
+    used; a lead with ``github: null`` stays faceless, because a login that
+    merely matches a character name is the nimbatus/nimbinatus trap.
+    """
+    from tools.derive import load_leads
+
+    real, logins = {}, {}
+    for entry in load_leads().values():
+        person = entry.get("person")
+        if not person:
+            continue
+        name = (entry.get("plate") or {}).get("name")
+        if name:
+            real.setdefault(person, name)
+        if entry.get("github"):
+            logins.setdefault(person, entry["github"])
+    return {real.get(person) or person: login
+            for person, login in logins.items()}
+
+
+def cast_title(person):
+    """The second line of a hero credit: what this person does, in their words.
+
+    Owner: *"for the 'hero' credits use the github titles"*. So the copy is
+    either supplied by the owner or lifted verbatim off the person's own GitHub
+    profile, and it is recorded in the manifest with `title_source` naming
+    which. Nothing here composes a sentence about anybody.
+
+    A title nobody has supplied renders as LOREM IPSUM rather than as a gap --
+    the deck's own rule -- and `title_pending` records who it is owed to. The
+    Latin is the safeguard: nobody mistakes it for approved English, and it is
+    visibly missing copy rather than an invented description of a colleague.
+    """
+    from tools import placeholder
+
+    title = person.get("title")
+    if title:
+        return title
+    if not person.get("title_pending"):
+        return None
+    return placeholder.lorem(chars=110, seed=f"cast:{person['person']}")
+
+
+def avatar_logins(manifest):
+    """Every GitHub login act VIII will ask for a face for, in order.
+
+    One definition, because two callers need exactly the same list: the build,
+    and ``tools/avatars.py`` when it runs on a CI runner with no idea what a
+    placard is.
+    """
     logins = []
     for section in manifest.get("contributors", []):
         # A GitLab section carries display NAMES, not logins. Asking
@@ -376,30 +459,40 @@ def fetch_avatars(manifest, verbose=True):
         if section.get("host") and section["host"] != GITHUB:
             continue
         logins.extend(section["names"])
-    for value in (manifest.get("cast_logins") or {}).values():
-        if isinstance(value, str) and not value.startswith("_"):
-            logins.append(value)
+    for key, value in (manifest.get("cast_logins") or {}).items():
+        # ``_comment`` is prose about the overlay, not a person. Asking
+        # github.com for a paragraph is one wasted request per build, and
+        # whatever it returned would be somebody else's face.
+        if key.startswith("_") or not isinstance(value, str):
+            continue
+        logins.append(value)
     for person in manifest.get("cast", []):
         if person.get("login"):
             logins.append(person["login"])
+    # The same overlay the schedule applies, so a face the vocab verifies is
+    # actually in the cache by the time a placard asks for it.
+    logins.extend(vocab_logins().values())
+    return list(dict.fromkeys(logins))
 
-    got = missed = 0
-    for login in dict.fromkeys(logins):
-        path = C.AVATAR_DIR / f"{login}.png"
-        if path.exists() and path.stat().st_size >= 512:
-            continue
-        url = f"https://github.com/{login}.png?size=256"
-        try:
-            with urllib.request.urlopen(url, timeout=20) as fh:
-                path.write_bytes(fh.read())
-            got += 1
-        except Exception as exc:  # noqa: BLE001 -- degrade, never block
-            missed += 1
-            if verbose:
-                print(f"note: no avatar for {login}: {exc}", file=sys.stderr)
-    if verbose:
-        print(f"avatars: {got} fetched, {missed} missing")
-    return got, missed
+
+def fetch_avatars(manifest, verbose=True, from_actions=False):
+    """Cache a face for every login the manifest names.
+
+    The renderer never touches the network (``tools/credits.avatar``), so a
+    contributor with no cached PFP silently degrades to a ring. Adding two
+    upstream sections added ~200 logins nobody had ever fetched, which would
+    have been two walls of empty rings and no error. Missing is still not
+    fatal -- this only fills the cache in.
+
+    The fetching itself lives in ``tools/avatars.py``: conditional requests,
+    negative caching and backoff, and the same code the Actions workflow runs.
+    """
+    from tools import avatars
+
+    if from_actions:
+        avatars.pull_from_actions(verbose=verbose)
+    tally, missing = avatars.fetch(avatar_logins(manifest), verbose=verbose)
+    return tally["fetched"], len(missing)
 
 
 def build_manifest(refresh, refresh_cast=False):
@@ -424,7 +517,7 @@ def build_manifest(refresh, refresh_cast=False):
 
 
 def bed_passes(bed):
-    """The bed's passes in play order: the instrumental loop, then the album.
+    """The bed's passes in play order: the instrumental loop, then Storytime.
 
     The manifest keeps pass one at the top level (it was the whole bed before
     the vocal version was added, and every measured number in it is unchanged)
@@ -538,6 +631,12 @@ def schedule(manifest):
     # placard. Applying it every schedule keeps the two independent.
     verified = {k: v for k, v in (manifest.get("cast_logins") or {}).items()
                 if not k.startswith("_")}
+    # The vocab's own `github:` fields join that overlay, keyed by the person
+    # rather than by the binding they happen to sit on. Laura's verified login
+    # lives on the NIMBATUS binding while her authored identity lives on the
+    # Elsie Bray one; before the splash cards came out, the identity carried
+    # her face and nobody noticed the login never reached the placard.
+    verified = {**vocab_logins(), **verified}
     photos = {k: v for k, v in (manifest.get("cast_photos") or {}).items()
               if not k.startswith("_")}
     target = manifest.get("cast_hold_sec", 4.0)
@@ -549,13 +648,22 @@ def schedule(manifest):
             # otherwise the placard redacts a word and reveals the person.
             items.append({"kind": "cast", "t": t, "dur": target,
                           "person": C.REDACTED, "character": person["character"],
-                          "card": None, "login": None, "photo": None})
+                          "card": None, "login": None, "photo": None,
+                          "guardian_title": None,
+                          "title": None})
         else:
             items.append({"kind": "cast", "t": t, "dur": target,
-                          "person": name, "character": person["character"],
+                          "person": name, "character": person.get("character"),
                           "card": person.get("card"),
                           "login": person.get("login") or verified.get(name),
-                          "photo": photos.get(name)})
+                          "photo": photos.get(name),
+                          # The seal is authored in two places -- the website's
+                          # identity card (reached through `card`) and, for the
+                          # people the website never carded, the manifest's own
+                          # `guardian_title`. Both have to reach the placard or
+                          # the `as` row silently disappears for half the cast.
+                          "guardian_title": person.get("guardian_title"),
+                          "title": cast_title(person)})
         t += target
 
     wordmark = manifest["wordmark"]
@@ -624,6 +732,9 @@ def schedule(manifest):
 
 
 def render_cards(items, out_dir):
+    # The authored identities are refreshed from the website on every build,
+    # so a placard cannot print an identity the author has since rewritten.
+    cache_identities(verbose=False)
     # Cleared, not overwritten: the card set changes shape between builds (a
     # dropped placard, a new wall), and a stale `012-cover.png` sitting beside
     # this build's `012-cast.png` is a frame nobody can account for.
@@ -645,7 +756,9 @@ def render_cards(items, out_dir):
         elif item["kind"] == "cast":
             img = C.render_cast_placard(item["person"], item["character"],
                                         card=item.get("card"), login=item.get("login"),
-                                        photo=item.get("photo"), index=i)
+                                        photo=item.get("photo"),
+                                        guardian_title=item.get("guardian_title"),
+                                        title=item.get("title"), index=i)
         elif item["kind"] == "wall":
             img = C.render_name_wall(item["section"], item["names"],
                                      item["page"], item["pages"],
@@ -690,7 +803,7 @@ def audio_filter(bed, stream=1):
     """One ffmpeg filtergraph: every span of every pass, in order, joined.
 
     ``stream`` is the INPUT index of the FIRST music file. The cards are input
-    0 (the concat demuxer), so the instrumental is input 1 and the album
+    0 (the concat demuxer), so the instrumental is input 1 and Storytime
     version is input 2 -- getting this wrong is a filtergraph that binds to
     nothing rather than a wrong sound.
 
@@ -731,6 +844,9 @@ def main(argv=None):
                          "you want -- see build_manifest)")
     ap.add_argument("--fetch-avatars", action="store_true",
                     help="cache a PFP for every login the manifest names (network)")
+    ap.add_argument("--avatars-from-actions", action="store_true",
+                    help="pull CI's avatar artifact first, then fill any gaps "
+                         "-- one request instead of five hundred")
     ap.add_argument("--plan", action="store_true", help="print the schedule, render nothing")
     ap.add_argument("--cards-only", action="store_true", help="render the PNGs and stop")
     ap.add_argument("--out", default=str(OUT))
@@ -743,8 +859,8 @@ def main(argv=None):
         MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
         print(f"wrote {MANIFEST}")
 
-    if args.fetch_avatars:
-        fetch_avatars(manifest)
+    if args.fetch_avatars or args.avatars_from_actions:
+        fetch_avatars(manifest, from_actions=args.avatars_from_actions)
 
     items, total = schedule(manifest)
 
@@ -754,7 +870,11 @@ def main(argv=None):
             if item["kind"] == "wall":
                 extra = f"  {item['section']} {item['page']}/{item['pages']} ({len(item['names'])} names)"
             elif item["kind"] == "cast":
-                extra = f"  {item['person']} as {item['character']}"
+                extra = f"  {item['person']}"
+                if item.get("character"):
+                    extra += f" as {item['character']}"
+                if item.get("title"):
+                    extra += "  [title]"
             elif item["kind"] == "role":
                 extra = f"  {item['role']}: {', '.join(item['names'])}"
             elif item["kind"] == "cover":
@@ -833,6 +953,7 @@ def main(argv=None):
            "-t", f"{total:.3f}",
            str(out_path)]
     subprocess.run(cmd, check=True)
+    peaks.trim_master_peak(out_path.resolve())
     print(f"wrote {out_path}  ({fmt_tc(total)})")
     return 0
 

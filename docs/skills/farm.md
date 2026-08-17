@@ -2,9 +2,18 @@
 
 ## When to Use
 
-- A render or re-encode takes minutes on the laptop and starves the agent
-  sessions running on the same machine
+**Whenever the cluster is reachable and something has to be encoded.** Owner,
+2026-08-16: *"always prefer remote encoding when available."* There is no length
+threshold to judge — `exo-0` has 32 cores to this workstation's 16 and is not
+also running the agent sessions, so the remote path is both faster and the one
+that does not starve the session that asked for it.
+
+Local is a fallback with a stated reason, never a default and never silent.
+
 - Re-encoding a Prod act, a megacut segment, or any single long file
+- Assembling the programme — `tools/megacut.py` farms its ENCODE segments and
+  keeps the COPY segments here, because shipping bytes to a cluster to memcpy
+  them is slower than doing it locally
 
 ## When NOT to Use
 
@@ -13,6 +22,7 @@
 - A social copy under a byte cap → `tools/social.py` (two-pass arithmetic the
   farm does not do)
 - Anything needing a working local ffmpeg → [`../rendering.md`](../rendering.md)
+- The cluster is unreachable — then, and only then, fall back and **say so**
 
 ## Core Process
 

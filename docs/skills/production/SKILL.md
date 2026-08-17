@@ -89,6 +89,7 @@ This skill is the contract. The procedure lives in `references/`:
 | [`delivery.md`](references/delivery.md) | The `~/Videos/Wolves/` workspace, the delivery graph (`tools/deliver.py` status/publish/build), the per-project contract, hardlinks and checksums, publishing via the playlist, the audio rules that bite at delivery, and the Syncthing hazard. |
 | [`parallel-and-tagging.md`](references/parallel-and-tagging.md) | Stale tags and `verify_tags_match_detection`, running several videos at once, batch tagging from generated worksheets, and what to work on first. |
 | [`social-copies.md`](references/social-copies.md) | Byte-capped social encodes with `tools/social.py`: encode from `Prod/`, re-encode but never process. |
+| [`avatars.md`](references/avatars.md) | The credits' avatar cache (`tools/avatars.py`): conditional requests, negative caching, backoff, and the Actions job that fetches on the built-in runner token instead of your laptop. |
 
 ## Where it stops, and why that is the design
 
@@ -152,17 +153,86 @@ python3 tools/deliver.py status              # what is stale and why
 python3 tools/footage.py path <video_id>     # where that master actually is
 python3 tools/deliver.py build               # rebuild exactly what is stale
 python3 tools/deliver.py build --watch 60    # keep it fresh while you work
-python3 tools/deliver.py publish             # after ANY act rebuild
+python3 tools/deliver.py publish --act VII    # name what you rebuilt
 ```
 
 **Never build a media path by hand.** `media/<id>.mp4` is how act II broke:
 the master was replaced as `.mkv` and the builder could no longer find it,
 while `status` still said `ok`. Ask `tools/footage.py` for the path.
 
-**`publish` after every act rebuild.** It re-links `Prod/`, regenerates the
-checksums and README table, *and* stamps the act's input digest — which is what
-makes the next edit show up as drift. Skip it and the act reports stale
-forever.
+**Long encodes run on the cluster.** `exo-0` has 32 cores and the
+`linuxserver/ffmpeg` image already cached; the workstation does not need to
+carry an hour of x264. Stage inputs into `/var/mnt/exo0-stage/dv`, run a pod
+pinned to that node with `imagePullPolicy: IfNotPresent`, and copy the result
+back. The recipe, and the two traps that make a naive attempt fail (the
+registry mirror times out, and the image's entrypoint is already `ffmpeg`), are
+in [`docs/rendering.md`](../../rendering.md).
+
+## A refresh is every rung, or it is not a refresh
+"Refresh the video" always means the **whole** chain, and it always includes
+the last two:
+
+```
+cards / plates  ->  act master  ->  Prod/  ->  megacut/  ->  10mb/
+```
+
+`10mb/` social snippets and `Prod/` are **not optional trailing chores** —
+they are what the owner actually opens. A megacut rebuilt over a stale `Prod/`
+link, or shipped without regenerating the social copies, is a partial refresh
+that reads as a finished one. `deliver.py publish` handles `Prod/`;
+`deliver.py build` handles the megacut and the `10mb/` copies.
+
+**Existence is not freshness.** This is the rung that had no guard, and it is
+where a main title shipped 17 hours out of date with every other gate green:
+
+```python
+if args.cards or not (PLATES_DIR / "plate_maintitle-b.png").exists():   # WRONG
+    render_cards()
+```
+
+The template moved at 16:56; the PNGs were from 23:24 the night before; the
+file *existed*, so the "rebuild" ran on yesterday's cards, produced a new
+master, and published a digest saying it was current. The act really had been
+rebuilt — it had just been rebuilt **from yesterday**.
+
+Ask the only question that matters about a derived file — is it older than
+what derives it — with [`tools/freshness.py`](../../../tools/freshness.py):
+
+```python
+if args.cards or freshness.needs_render([MANIFEST, CARD_HTML], CARD_PNGS):
+    render_cards()
+```
+
+A flag may force **extra** work. A flag may never be the only thing standing
+between you and a current card. `tests/test_freshness.py` fails any builder
+that gates a card render on a bare `.exists()`.
+
+**`publish` after every act rebuild — and name the act.** It re-links `Prod/`,
+regenerates the checksums and README table, *and* stamps the act's input
+digest, which is what makes the next edit show up as drift.
+
+**`--act` is repeatable, and it is the whole guarantee.** `publish --act VII`
+makes a claim about act VII and about nothing else. A blanket `publish`
+certifies **every** act at once, so a rebuild of one act declares the other
+seven freshly built too — that is how one render laundered a whole programme
+and stale acts kept shipping.
+
+It also stamps **only acts whose master is newer than the inputs it names**,
+and only counts inputs git reports as edited. A committed file's mtime says
+when the repo was checked out, not when anybody changed it, so trusting it
+blocks every act after a rebase — a wall, not a gate. The content digest is
+the authority; this is just the cheap proof that a render happened after the
+edit.
+
+**Assembly refuses stale acts.** `tools/megacut.py` will not seat an act whose
+master predates its own committed inputs; it names them and exits non-zero.
+`--allow-stale` ships the old masters anyway and says so on stderr, for a
+deliberate rough cut.
+
+**A builder's default output is not automatically its master.** Acts VI and
+VIII both write somewhere else by default, so a `rebuild` command is declared
+only once `--print-command` has been checked to name the declared master.
+Guessing one re-burns nameplates about real people.
 
 Transcoding is cheap and the megacut is what gets reviewed, so it should never
 be more than one edit behind. `--watch` polls rather than using inotify on
@@ -186,6 +256,13 @@ fix, not adding a source list that lies.
 | "I found something important on the way, so the detour was justified." | File it as an issue in one minute. A found problem is never a licence to spend the owner's afternoon. |
 | "I'll explain what I learned, then give them the file." | Path and runtime first. Explanation after, and short. |
 | "I rebuilt the act, the delivery is fine." | Not until `deliver.py publish`. Until then `Prod/` may still link the old master and the megacut still contains it. |
+| "`publish` made the gate green, so the delivery is fresh." | `publish` records; it never rebuilds. A green gate you got without a render was the bug, not the proof. |
+| "The act rebuilt fine, so the video is current." | Only if its cards did too. A rebuild that consumes stale PNGs produces a new file full of old pictures, and every gate goes green. |
+| "The PNG is already there, no need to re-render." | Existence is not freshness. The question is whether it predates its template. |
+| "I'll regenerate the social copies next time." | `10mb/` is what the owner opens. A refresh that stops at the megacut is a partial refresh reported as a finished one. |
+| "I rebuilt one act, so I'll just run `publish`." | Name it: `publish --act <numeral>`. A blanket publish certifies every act, including the seven you did not touch. |
+| "`--print-command` needs a working encoder." | No. Printing is for reading and pasting; resolving ffmpeg is a precondition of *running*. Requiring one takes the offline suite offline. |
+| "The assembly stage just joins finished things, so staleness is somebody else's rung." | Assembly is the stage where a stale act reaches an audience. It checks, and refuses. |
 | "The megacut is only one act behind, I'll roll it in next time." | Transcoding is cheap. `deliver.py build` rebuilds only what is stale; there is no next time to save for. |
 | "I'll tag the obvious ones and leave the rest." | An untagged beat derives `clean = false`. Half a tag file marks half the video uncuttable. |
 | "The delivered file needs one small fix, I'll edit it in place." | It is regenerated from checked-in data. A hand-edit is lost on the next month's render and nobody can tell it happened. |
@@ -209,6 +286,11 @@ fix, not adding a source list that lies.
   and nothing failed loudly. Check the frame count and a clean decode
   (`ffmpeg -v error -i out -f null -`) before trusting any master, and always
   before gating one.
+- **Rendering a guessed recovery over a master.** When an owner reports lost
+  authored copy, find it across `git worktree list` first and compare the
+  complete restored manifest object to that source. Only then replace the
+  master and run `deliver.py publish`; a clean encode cannot prove the words,
+  removals, or timing are right.
 - Exactly 1 beat for a cut-heavy video → the source is AV1, not H.264
   (`docs/rendering.md`). `make_video.sh` warns on the codec before this bites.
 - A video whose segments are 0 clean → `overlays` was skipped wholesale.

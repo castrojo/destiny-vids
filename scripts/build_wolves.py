@@ -92,7 +92,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-from tools.marker import marker_path, title_card_path  # noqa: E402
+from tools.marker import marker_path  # noqa: E402
 
 BED = json.loads((REPO / "music/bed_seven_days_to_the_wolves.json").read_text())
 GRID = BED["grid"]
@@ -237,7 +237,7 @@ FINALE = "wolves_act4"     # compilation 26:30-30:23    -- the Pale Heart finale
 # compilation the rest of the film rests on (issue #55).
 GAMEPLAY = "yt_destiny_2_the_final_shape_gameplay_trailer"
 
-TITLE_CARD_LEN = 10.000    # the card opens the film; the song plays under it
+TITLE_CARD_LEN = 0.000     # no intro slide: picture opens on the film
 CAPTURE_OUT = 203.000      # the first cinematic ends here (verified by frame)
 
 # Everything the owner asked for inside the intro, in source order on `act1`.
@@ -415,15 +415,6 @@ class Timeline:
 
 def build():
     t = Timeline()
-
-    # ---- the title card: the source's own logo, blacked out ----------------
-    # Not an overlay. The card IS the picture for ten seconds, so the Destiny
-    # logo is not dimmed, it is simply not in the film.
-    t.card(_rel(title_card_path(
-        "Project Bluefin", "Seven Days to the Wolves",
-        ["Destiny footage used under Bungie's fan-content policy"])),
-        TITLE_CARD_LEN,
-        "TITLE CARD (the film's own logo; the source's is never shown)")
 
     # ---- Act I: the intro capture ------------------------------------------
     pos = CAPTURE_IN

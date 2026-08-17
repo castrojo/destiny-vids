@@ -71,7 +71,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
-from tools import conform  # noqa: E402
+from tools import conform
+from tools import freshness  # noqa: E402
 from tools import footage  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
@@ -432,7 +433,11 @@ def main(argv=None):
     if not SOURCE.exists():
         sys.exit(f"footage is never committed; missing: {SOURCE}")
 
-    if args.cards or not (PLATES_DIR / "plate_endcard-cta.png").exists():
+    # Existence is NOT freshness (tools/freshness.py). --cards forces EXTRA
+    # work; it can never be the only thing that keeps the cards current.
+    if args.cards or freshness.needs_render(
+            [MANIFEST, REPO_ROOT / "cards", REPO_ROOT / "cards" / "render-cards.mjs"],
+            sorted(PLATES_DIR.glob("plate_*.png")) or [PLATES_DIR / "plate_endcard-cta.png"]):
         render_cards()
 
     day, night = wallpaper("day"), wallpaper("night")

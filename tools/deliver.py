@@ -140,11 +140,11 @@ DURATION_TOLERANCE_S = 2.0
 # by the platform, so it is reported rather than trusted.
 SOCIAL_CAP_BYTES = 10 * 1024 * 1024
 
-# States. ABSENT_BY_DESIGN and NO_FILM are recorded decisions, not failures;
-# everything in FAILING fails --check. EPHEMERAL is distinct from CONFLICT on
-# purpose: conflict means "decide which content wins", ephemeral means "this
-# content's only home is a git worktree that `git worktree remove` deletes --
-# promote the master to a durable path".
+# States. ABSENT_BY_DESIGN, NO_FILM and BLOCKED are recorded decisions, not
+# failures; everything in FAILING fails --check. EPHEMERAL is distinct from
+# CONFLICT on purpose: conflict means "decide which content wins", ephemeral
+# means "this content's only home is a git worktree that `git worktree remove`
+# deletes -- promote the master to a durable path".
 OK = "ok"
 NO_FILM = "no-film"
 ABSENT_BY_DESIGN = "absent-by-design"
@@ -153,6 +153,7 @@ MISSING = "missing"
 CONFLICT = "conflict"
 EPHEMERAL = "ephemeral"
 UNDECLARED = "undeclared"
+BLOCKED = "blocked"
 
 FAILING = {STALE, MISSING, CONFLICT, EPHEMERAL}
 
@@ -317,6 +318,111 @@ def source_digest(sources):
     return h.hexdigest()
 
 
+def dirty_paths():
+    """Repo-relative paths whose working tree differs from HEAD.
+
+    An mtime only means something for a file somebody is EDITING. A checkout,
+    a rebase or a fresh clone rewrites every mtime at once, so mtime alone
+    cannot tell "this record was just changed" from "this repo was just
+    checked out" -- and a guard that cannot tell those apart blocks every act
+    after any rebase, which is a wall, not a gate.
+
+    Git can tell them apart, so ask it. An empty answer (no git, no repo) is
+    an empty set: the guard then declines to block, because a guess in that
+    direction only costs a needless rebuild once the digest gate catches up.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "status", "--porcelain", "-z"],
+            capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return set()
+    if out.returncode != 0:
+        return set()
+    paths = set()
+    for entry in out.stdout.split("\0"):
+        if len(entry) > 3:
+            paths.add(entry[3:])
+    return paths
+
+
+def sources_newer_than(sources, path, dirty=None):
+    """The declared inputs that are being EDITED and are newer than `path`.
+
+    The mtime companion to `source_digest`. The digest answers "are these the
+    inputs that were recorded?"; this answers "could this master possibly have
+    been built from them?" -- and only the second one can catch a digest being
+    stamped over an act nobody re-rendered.
+
+    Only files that differ from HEAD are considered, because only those have a
+    trustworthy mtime (see `dirty_paths`). That is also exactly the case this
+    exists to stop: somebody edits a record, does not rebuild, and runs
+    `publish`, which used to record the new digest over the old master and
+    turn the gate green.
+
+    A committed input is left to the digest gate, which is content-based and
+    runs on CI. This guard only ever REFUSES to record, so a miss costs a
+    later rebuild, never a wrong claim about what produced a master.
+    """
+    path = Path(path)
+    if not path.exists():
+        return []
+    dirty = dirty_paths() if dirty is None else dirty
+    if not dirty:
+        return []
+    cutoff = path.stat().st_mtime
+    out = []
+    for rel in sources:
+        p = REPO_ROOT / rel
+        if p.is_dir():
+            children = [c for c in p.rglob("*") if c.is_file()
+                        and str(c.relative_to(REPO_ROOT)) in dirty]
+            newest = max((c.stat().st_mtime for c in children), default=None)
+            if newest is not None and newest > cutoff:
+                out.append(rel)
+        elif rel in dirty and p.exists() and p.stat().st_mtime > cutoff:
+            out.append(rel)
+    return out
+
+
+def stale_source_acts(masters):
+    """Acts whose committed inputs have moved since their master was recorded.
+
+    The same judgement `check_sources` reports, in the form a caller can act
+    on. Content-based and needing no footage, so any stage can ask it -- which
+    is the point: the ASSEMBLY stage is where a stale act actually reaches an
+    audience, and it used to have no way to ask.
+    """
+    out = []
+    for numeral, master in (masters or {}).items():
+        sources = master.get("sources")
+        recorded = master.get("source_digest")
+        if not sources or not recorded:
+            continue
+        if source_digest(sources) != recorded:
+            out.append((numeral, master))
+    return out
+
+
+def blocked_on(master):
+    """The issue an act's rebuild waits on, or None.
+
+    `stale_blocked_on` is how a master says "this act IS stale, everybody
+    knows, and closing it needs a decision nobody here can make" -- act III
+    cannot be rebuilt at all until the owner names the roster it credits
+    (#256), and act VI's lossless bed is the same shape (#58). AGENTS.md is
+    explicit that an agent which reaches an owner-held decision, records it
+    and stops has SUCCEEDED, so the CI digest gate treats a declared block as
+    a punch-list item rather than a red X.
+
+    It is deliberately NOT an escape hatch from the assembly refusal:
+    `stale_source_acts` still lists the act, so seating it in the programme
+    still costs an explicit `--allow-stale`. The gate stops blocking the merge
+    queue; nothing stops a stale act announcing itself on the way to picture.
+    """
+    return (master or {}).get("stale_blocked_on") or None
+
+
 def check_sources(act, master, report):
     """The rung BEFORE the master: did an act's inputs change without a render?
 
@@ -353,6 +459,14 @@ def check_sources(act, master, report):
                    f"publish` to record {digest[:12]}")
         return
     if digest != recorded:
+        blocker = blocked_on(master)
+        if blocker:
+            report.add("sources", BLOCKED,
+                       f"inputs changed ({recorded[:12]} -> {digest[:12]}) and "
+                       f"this act CANNOT be rebuilt until {blocker} is decided. "
+                       f"Seating it still costs `--allow-stale`. Declared "
+                       f"inputs: {', '.join(sources)}")
+            return
         report.add("sources", STALE,
                    f"inputs changed since this master was recorded "
                    f"({recorded[:12]} -> {digest[:12]}); rebuild the act, then "
@@ -686,7 +800,8 @@ def link_master(src, prod):
     os.replace(tmp, prod)
 
 
-def publish(acts, masters, wolves, delivery_path=None, log=print):
+def publish(acts, masters, wolves, delivery_path=None, log=print,
+            only=None):
     """Make Prod/ match the delivery map, then regenerate what describes it.
 
     Only ever `ln -f` semantics -- never a copy. A conflicted act (declared
@@ -751,18 +866,41 @@ def publish(acts, masters, wolves, delivery_path=None, log=print):
             log(f"  README.md: no {TABLE_BEGIN} markers -- table NOT "
                 f"touched; add the markers around the table to hand it to "
                 f"the tool")
-    record_source_digests(acts, masters, delivery_path, log=log)
+    record_source_digests(acts, masters, delivery_path, log=log, only=only)
     return 0
 
 
-def record_source_digests(acts, masters, delivery_path, log=print):
+def record_source_digests(acts, masters, delivery_path, log=print, only=None):
     """Stamp each act's current input digest into the delivery map.
 
     This is what closes the loop: `publish` is the step that says "what is in
     Prod NOW is built from these inputs", so a later edit to any of them shows
     up as drift instead of going unnoticed. Recording it anywhere else would
     let an act be declared fresh without anything being delivered.
+
+    `only` names the acts the caller actually rebuilt, and it is REQUIRED to
+    stamp anything. A blanket `publish` records a claim about EVERY act, and
+    the claim is only ever true for the ones somebody just rendered -- that is
+    how a rebuild of one act quietly certified seven others, and how stale
+    programmes shipped.
+
+    The mtime guard below catches that only for inputs that are still dirty. An
+    input that moved IN A COMMIT looks untouched on disk, so a blanket publish
+    could stamp its new digest over a master nobody re-rendered and turn its
+    own gate green -- which is exactly what happened to act III, whose rebuild
+    is blocked on an input that does not exist (#256). The digest gate cannot
+    catch it, because `publish` is the thing that writes the digest.
+
+    So with no `only`, nothing is stamped and the caller is told to name the
+    acts. Linking, checksums and the README still run: those describe what is
+    on disk, and they are true for every act whether or not it was rebuilt.
     """
+    if not only:
+        log("  source digests: NOT recorded -- name the acts you rebuilt "
+            "(--act VI --act VIII). A blanket publish would certify every "
+            "act, including any whose rebuild is blocked.")
+        return
+    only = {str(a).upper() for a in only}
     if delivery_path is None:
         return
     doc = json.loads(Path(delivery_path).read_text(encoding="utf-8"))
@@ -771,7 +909,31 @@ def record_source_digests(acts, masters, delivery_path, log=print):
         master = doc.get("masters", {}).get(act.numeral)
         if not master:
             continue
+        if only is not None and act.numeral.upper() not in only:
+            continue
         if master.get("sources"):
+            # A declared block outranks the mtime guard below, which cannot
+            # see an input that moved IN A COMMIT. Act III's rebuild does not
+            # exist yet (#256), so no `publish` can honestly claim its master
+            # was built from today's inputs -- and stamping it would erase the
+            # one record saying so.
+            if blocked_on(master):
+                log(f"  {act.numeral}: inputs NOT recorded -- the rebuild is "
+                    f"blocked on {blocked_on(master)}; nothing was rendered, "
+                    f"so nothing can be certified")
+                continue
+            # The SAME guard the footage digest below has always had, and its
+            # absence here is what let stale programmes ship: `publish` claims
+            # "what is in Prod now is built from these inputs", so stamping a
+            # master that is OLDER than those inputs records a claim nobody
+            # can have made true. It went green, `check_sources` had nothing
+            # left to catch, and the next megacut seated the stale act.
+            src = resolve_master(master["path"])
+            behind = sources_newer_than(master["sources"], src)
+            if behind:
+                log(f"  {act.numeral}: inputs NOT recorded -- the master "
+                    f"predates {', '.join(behind)}; rebuild the act first")
+                continue
             digest = source_digest(master["sources"])
             if master.get("source_digest") != digest:
                 master["source_digest"] = digest
@@ -925,7 +1087,7 @@ def print_report(reports, wolves, log=print):
             log(f"  {f.node:<9} {f.state:<16} {f.detail}")
     failing = [f for r in reports for f in r.findings if f.state in FAILING]
     noted = [f for r in reports for f in r.findings
-             if f.state in (ABSENT_BY_DESIGN, NO_FILM)]
+             if f.state in (ABSENT_BY_DESIGN, NO_FILM, BLOCKED)]
     log(f"\n{len(failing)} stale, {len(noted)} recorded absences "
         f"(punch-list, not failures)")
     return 1 if failing else 0
@@ -989,6 +1151,11 @@ def watch(acts, masters, social, wolves, plan_path, interval, dry_run,
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("command", choices=("status", "publish", "build"))
+    ap.add_argument("--act", action="append", metavar="NUMERAL",
+                    help="publish: record the input digest for THIS act only "
+                         "(repeatable). Name the acts you actually rebuilt; a "
+                         "blanket publish certifies every act at once, which "
+                         "is how stale programmes shipped")
     ap.add_argument("--check", action="store_true",
                     help="status as a gate: exit 1 when anything is stale")
     ap.add_argument("--dry-run", action="store_true",
@@ -1043,7 +1210,8 @@ def main(argv=None):
         rc = print_report(reports, wolves)
         return rc if args.check else 0
     if args.command == "publish":
-        return publish(acts, masters, wolves, args.delivery)
+        return publish(acts, masters, wolves, args.delivery,
+                       only=args.act)
     if args.watch:
         return watch(acts, masters, social, wolves, args.plan, args.watch,
                      args.dry_run)

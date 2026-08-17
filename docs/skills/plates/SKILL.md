@@ -27,6 +27,13 @@ The deck's other shapes are the title card (`title`, `subtitle`, `body[]`) and
 the **chat card** (`speaker`, `text`) —
 [`references/conversation-cards.md`](references/conversation-cards.md).
 
+Keep chat `text` verbatim. When an owner requests a swear censor, use the
+Kubernetes helm only as an `o` replacement: add a `censor` entry whose `find`
+value occurs exactly once and whose `replace` value uses `{k8s}`.
+`tools/plate.py` replaces that token with the cached official white helm; it
+does not alter the authored source string. Use an asterisk for other letters,
+and do not add censorship the owner did not request.
+
 ## Prose that is not written yet is lorem, never a gap
 
 A chat pill with no `text` does **not** block and does not render empty:
@@ -112,6 +119,7 @@ This skill is the contract. The procedure lives in `references/`:
 | [`status-nameplate.md`](references/status-nameplate.md) | The top-of-frame HUD card. |
 | [`other-cards.md`](references/other-cards.md) | `miniboss`, `achievement`, `companion` detail. |
 | [`full-frame-cards.md`](references/full-frame-cards.md) | `act` and `comic` — rendered by the website's own CSS, not Pillow. |
+| [`hero-credit.md`](references/hero-credit.md) | Act VIII's cast placard — a lower third that credits the person, not the character. |
 
 ## Common Rationalizations
 
@@ -137,6 +145,11 @@ This skill is the contract. The procedure lives in `references/`:
   wins; if the brief is right, the fix is a vocab edit, not a per-video
   override.
 - Calling a burn done because ffmpeg exited 0. Check a frame, not the manifest.
+- Guessing a pill's seat when the manifest's clock is in doubt. Omission
+  degrades, misplacement lies: a pill that cannot be placed on evidence is
+  omitted and recorded in `unresolved`, and the act ships with fewer pills.
+  Never hold the film — and never ship the old master instead, because stale
+  copy on screen is the same fault as misplaced copy with an older timestamp.
 - **Deck colours on a card that sits over MOVING PICTURE.** The deck's greys
   (`--wc-grey` #8b8f96, and the secondary #cbd5e1) are chosen against a slide's
   black. Over footage they hold for as long as the shot is dark and vanish the

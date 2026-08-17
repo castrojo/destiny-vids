@@ -52,51 +52,58 @@
     },
     {
       "id": "title-cover",
-      "kind": "comic",
+      "kind": "photo",
       "at": 22.5,
       "dur": 13.5,
-      "art": "/var/home/jorge/Downloads/wolves.jpg",
-      "note": "THE TITLE COVER -- the owner's name for it. Owner instruction: 'replace the dino/QR sequence with wolves.jpg, the same comic at the end of europa'. It takes the whole window the 23-shot comic/QR cycle held (22.5 - 36.0), and it is the SAME asset the Europa director's cut ends on (~/Videos/wolves-directors-cut/STORYBOARD.md, 'Scene: Comic cover'). What left with the cycle: the MakeMeAComic QR panel and the Amber Graner quote, both owner-authored -- flagged in issue #90 so dropping them is a decision rather than a side effect.\n\nWHY THE COVER IDENTITIES ARE CAPTIONS AND NOT PLATES: the art is square (9075x9075) and the frame is 16:9, so it fills the middle 1080px and leaves 420px of margin either side. A Guardian plate is 561px wide (tools/plate.py), so the owner's three authored cover identities could not be plates without covering the ink -- which the owner ruled out ('can't have the nameplates cover the art'). Every authored string is carried verbatim in the caption boxes below; only the chrome changed, to the white/chamfered/blue-hairline box the owner picked ('no tilt, use the same tech outline on the box but keep them white'). The two framing lines are owner-authored too.\n\nThe margins show a RANDOM Bluefin wallpaper per render, by owner request; cards/render-cards.mjs records which one it rolled in wallpapers.json beside the PNG, so a frame stays reproducible.\n\nStill open, all in issue #90: 'Wielder of the Kube' is the owner's spelling here and 'Weilder of the Arcane' is theirs on Cortney's plate -- both reproduced, neither corrected. The owner wrote 'DEINONYCHUS // speciesname'; ANTIRRHOPUS is PROPOSED from the art_label 'Deinonychus antirrhopus' the deleted comic entries carried, not decided. The trailing space in 'Really Hungry ' is authored and kept. The second Blueberry caption has NO NAME ROW: the owner wrote a class and a title for 'little girl behind him' and withheld her name in the plate request, then wrote 'Introducing Rafael and Lakshmi' as the framing line. Naming the child on her own caption is a claim the owner has not made in that place, so the row stays out.",
-      "wallpaper_dir": "/var/home/jorge/src/website/public/img/wallpapers",
-      "wallpaper_match": "^bluefin-",
-      "captions": [
-        {
-          "side": "left",
-          "lines": [
-            "Introducing Rafael and Lakshmi"
-          ]
-        },
-        {
-          "side": "left",
-          "label": "BLUEBERRY // HUMAN",
-          "lines": [
-            "Rafael Castro",
-            "Blueberry Hunter",
-            "Happy 10th Birthday!"
-          ]
-        },
-        {
-          "side": "left",
-          "lines": [
-            "Blueberry Warlock",
-            "Wielder of the Kube"
-          ]
-        },
-        {
-          "side": "right",
-          "lines": [
-            "Have you met Bluefin?"
-          ]
-        },
-        {
-          "side": "right",
-          "label": "DEINONYCHUS // ANTIRRHOPUS",
-          "lines": [
-            "BLUEFIN",
-            "Really Hungry "
-          ]
-        }
-      ]
+      "art": "renders/title-cover.jpg",
+      "art_source": "stories/summit-photos.json#group-007",
+      "note": "THE TITLE COVER -- the owner's name for it. It holds the whole window the 23-shot comic/QR cycle held (22.5 - 36.0), and it is now a GROUP PHOTOGRAPH on the owner's instruction: '2:14 remove the comic book cover for this segment and use a group picture from kubecon contributor summit'. The photograph is group-007 of the Maintainer Summit North America 2025 set (stories/summit-photos.json; CNCF, CC BY-NC-ND 4.0, credited in ATTRIBUTIONS.md; the crop authorisation is recorded there verbatim), rendered to 1920x1080 by scripts/build_summit_plates.py's detail-measured crop and float grade -- never centre-cropped, never resampled twice. group-007 was picked from the twelve because it fills the 16:9 frame with people: roughly two dozen faces looking up and laughing, the front row sharp with summit lanyards and badges legible, where the atrium-wide and signage-heavy candidates fill the frame with venue instead. A photograph is full-frame, so the square-art treatment -- middle 1080px of art, random Bluefin wallpaper in the 420px margins, caption boxes for the authored identities -- retired with the comic. Every authored string from that treatment is KEPT under `retired`, verbatim.",
+      "retired": {
+        "kind": "comic",
+        "art": "/var/home/jorge/Downloads/wolves.jpg",
+        "wallpaper_dir": "/var/home/jorge/src/website/public/img/wallpapers",
+        "wallpaper_match": "^bluefin-",
+        "captions": [
+          {
+            "side": "left",
+            "lines": [
+              "Introducing Rafael and Lakshmi"
+            ]
+          },
+          {
+            "side": "left",
+            "label": "BLUEBERRY // HUMAN",
+            "lines": [
+              "Rafael Castro",
+              "Blueberry Hunter",
+              "Happy 10th Birthday!"
+            ]
+          },
+          {
+            "side": "left",
+            "lines": [
+              "Blueberry Warlock",
+              "Wielder of the Kube"
+            ]
+          },
+          {
+            "side": "right",
+            "lines": [
+              "Have you met Bluefin?"
+            ]
+          },
+          {
+            "side": "right",
+            "label": "DEINONYCHUS // ANTIRRHOPUS",
+            "lines": [
+              "BLUEFIN",
+              "Really Hungry "
+            ]
+          }
+        ],
+        "note": "THE TITLE COVER -- the owner's name for it. Owner instruction: 'replace the dino/QR sequence with wolves.jpg, the same comic at the end of europa'. It takes the whole window the 23-shot comic/QR cycle held (22.5 - 36.0), and it is the SAME asset the Europa director's cut ends on (~/Videos/wolves-directors-cut/STORYBOARD.md, 'Scene: Comic cover'). What left with the cycle: the MakeMeAComic QR panel and the Amber Graner quote, both owner-authored -- flagged in issue #90 so dropping them is a decision rather than a side effect.\n\nWHY THE COVER IDENTITIES ARE CAPTIONS AND NOT PLATES: the art is square (9075x9075) and the frame is 16:9, so it fills the middle 1080px and leaves 420px of margin either side. A Guardian plate is 561px wide (tools/plate.py), so the owner's three authored cover identities could not be plates without covering the ink -- which the owner ruled out ('can't have the nameplates cover the art'). Every authored string is carried verbatim in the caption boxes below; only the chrome changed, to the white/chamfered/blue-hairline box the owner picked ('no tilt, use the same tech outline on the box but keep them white'). The two framing lines are owner-authored too.\n\nThe margins show a RANDOM Bluefin wallpaper per render, by owner request; cards/render-cards.mjs records which one it rolled in wallpapers.json beside the PNG, so a frame stays reproducible.\n\nStill open, all in issue #90: 'Wielder of the Kube' is the owner's spelling here and 'Weilder of the Arcane' is theirs on Cortney's plate -- both reproduced, neither corrected. The owner wrote 'DEINONYCHUS // speciesname'; ANTIRRHOPUS is PROPOSED from the art_label 'Deinonychus antirrhopus' the deleted comic entries carried, not decided. The trailing space in 'Really Hungry ' is authored and kept. The second Blueberry caption has NO NAME ROW: the owner wrote a class and a title for 'little girl behind him' and withheld her name in the plate request, then wrote 'Introducing Rafael and Lakshmi' as the framing line. Naming the child on her own caption is a claim the owner has not made in that place, so the row stays out.",
+        "retired_note": "RETIRED 2026-08-15 with the comic cover, on the owner's instruction, verbatim: '2:14 remove the comic book cover for this segment and use a group picture from kubecon contributor summit'. Asked directly whether the caption boxes should be re-seated over the group photograph, the owner chose RETIRE: the captions name Rafael Castro, Lakshmi and Bluefin, and a caption over a photograph claims the named person is pictured in it -- they are not in this one, and that is a claim about real people nobody may imply. The copy is KEPT here verbatim, the way every retired card's strings are kept, so restoring it never means rewriting it. Two open questions retire WITH the copy rather than get answered: the second Blueberry caption's withheld name row (issue #90), and the dinosaur's species, which the owner wrote as 'DEINONYCHUS // speciesname' -- ANTIRRHOPUS was only ever PROPOSED from the art_label on a deleted comic entry, never decided. If the captions ever return, both questions return with them. The trailing space in 'Really Hungry ' is authored and kept."
+      }
     },
     {
       "id": "kaslin",
@@ -211,24 +218,6 @@
       "blocked_on": "owner picking between two things they authored."
     },
     {
-      "what": "the comic card's three live behaviours",
-      "detail": "The site cross-fades between hero shots (0.35s), places each shot by an authored contentFrame before its alpha bounds are measured, and renders the QR through `filter: invert(1)`. The burn cuts between stills instead of cross-fading, centres each shot by its alpha bounds (what centerComicHeroShot() settles on anyway), and reproduces the inverted code as published -- an inverted QR is what the site shows, so it is copied rather than corrected.",
-      "automatable": "no",
-      "blocked_on": "an owner's eye on the rendered card; nothing here blocks the cut."
-    },
-    {
-      "what": "the second Blueberry caption's name row",
-      "detail": "The owner authored a class ('Blueberry Warlock') and a title ('Wielder of the Kube') for 'little girl behind him' on the title cover, and withheld a name there. The framing caption they wrote is 'Introducing Rafael and Lakshmi', which names her in the frame but not on her own box. Writing it onto the caption is a claim about a child the owner has not made in that place, so the row stays out until they say so.",
-      "automatable": "no",
-      "blocked_on": "the owner confirming the name goes on the box -- issue #90."
-    },
-    {
-      "what": "the dinosaur's species, written as `speciesname`",
-      "detail": "The owner wrote 'DEINONYCHUS // speciesname'. ANTIRRHOPUS is PROPOSED from the art_label 'Deinonychus antirrhopus' that the deleted comic entries carried in this same manifest -- a repo string, not an owner's. One word.",
-      "automatable": "no",
-      "blocked_on": "the owner confirming the word -- issue #90."
-    },
-    {
       "what": "the MakeMeAComic QR panel and the Amber Graner quote",
       "detail": "Both were owner-authored and both left with the 23-shot comic/QR cycle the title cover replaced. Nothing here re-authors them; they are recorded so dropping them stays a decision rather than a side effect.",
       "automatable": "no",
@@ -236,6 +225,6 @@
     }
   ],
   "_hud_removed": "The site's top-of-frame HUD nameplate is deliberately NOT burned in (owner decision, 2026-08-12: 'remove \"a project to bring their stories to life\", just the name plaquards'). That drops the persistent default card, the three #nova4ever glitch bursts and the closing 'Legends Sought' card -- every status row -- leaving only the six Guardian nameplates. tools/plate.py still renders `kind: \"status\"` and is tested, so restoring any of them is a manifest edit, not new code.",
-  "_comic": "The window (22.5 - 36.0) holds the TITLE COVER (`title-cover`). It starts at 22.5 rather than the site's 24 so it cannot overlap Kat's plate. Neither the 23-card full-frame comic cycle from `.wolves-intro-overlay-title-card` in WolvesIntroOverlay.vue, nor the MakeMeAComic QR panel, nor the Amber Graner quote is in act I -- removed on the owner's 2026-08-12 instruction. Whether any of them returns elsewhere is the owner's call (#90).",
+  "_comic": "The window (22.5 - 36.0) holds the TITLE COVER (`title-cover`). It starts at 22.5 rather than the site's 24 so it cannot overlap Kat's plate. The cover is a full-frame Maintainer Summit NA 2025 group photograph (owner, 2026-08-15: '2:14 remove the comic book cover for this segment and use a group picture from kubecon contributor summit'); the comic cover treatment it replaced -- square wolves.jpg art, wallpaper margins, caption boxes -- is kept verbatim under the card's `retired`. Neither the 23-card full-frame comic cycle from `.wolves-intro-overlay-title-card` in WolvesIntroOverlay.vue, nor the MakeMeAComic QR panel, nor the Amber Graner quote is in act I -- removed on the owner's 2026-08-12 instruction. Whether any of them returns elsewhere is the owner's call (#90).",
   "_companions": "The GUARDIAN BOND cards, ported from the live overlay this round (owner: 'Intro missing dinosaur companions from port. Alamo, karl, etc.'). Every bond is READ from ~/src/website/src/data/wolves-guardian-dinosaur-bonds.ts and its species from wolves-dinosaur-species.ts -- four bonds exist and all four are here. Orlin gets none: the bond list keys on the guardian NAME, it has no entry for Orlin, and Laura Santamaria has none either, so there is nothing to inherit even if the owner wanted it. Artwork is cached by scripts/fetch_companion_art.py into renders/ (gitignored) -- the renderer never reaches outside the repo and never touches the network."
 }

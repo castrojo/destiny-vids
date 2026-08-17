@@ -334,12 +334,23 @@ def test_the_credits_name_the_human_not_the_login(manifest):
     assert by_character["saint_14"]["person"] == "Kat Cosgrove"
 
 
-def test_one_person_playing_two_roles_is_named_the_same_both_times(manifest):
-    """Laura Santamaria is Elsie Bray AND Nimbatus; the nimbatus entry has no
-    plate, so a naive fallback credited her as 'Nimbatus as Nimbatus'."""
-    by_character = {c["character_id"]: c for c in manifest["cast"]}
-    assert by_character["nimbatus"]["person"] == "Laura Santamaria"
-    assert by_character["elsie_bray"]["person"] == "Laura Santamaria"
+def test_laura_is_credited_once_and_the_credit_is_nimbatus(manifest):
+    """Owner, 2026-08-16: "laura is as nimbatus".
+
+    She used to hold two placards -- Elsie Bray and Nimbatus -- with the same
+    authored identity copy on both, because the vocab binds her identity to one
+    binding and her verified login to the other. Nobody is credited twice for
+    one performance, and the name the credit prints is the owner's call.
+    """
+    laura = [c for c in manifest["cast"] if c["person"] == "Laura Santamaria"]
+    assert len(laura) == 1
+    assert laura[0]["character_id"] == "nimbatus"
+
+
+def test_nobody_holds_two_placards(manifest):
+    """A second card for one person reads as a mistake, not as a second role."""
+    people = [c["person"] for c in manifest["cast"]]
+    assert len(people) == len(set(people))
 
 
 @pytest.mark.parametrize("raw,expected", [
@@ -356,7 +367,10 @@ def test_every_cast_member_is_bound_to_a_real_person(manifest):
     """Rule 3: a placard is a claim about somebody. An unbound lead is
     omitted, never guessed."""
     for member in manifest["cast"]:
-        assert member["person"] and member["character"]
+        assert member["person"]
+        # The Destiny character is no longer PRINTED, but the binding it came
+        # from is still recorded -- that is what a redaction is keyed on.
+        assert member["character_id"]
 
 
 # --- the schedule ----------------------------------------------------------
@@ -482,20 +496,28 @@ def test_a_credit_roll_names_people_not_machines(manifest):
 
 def test_a_cast_face_is_never_guessed(manifest):
     """Rule 3, and the vocab's own warning: github.com/nimbatus is NOT Laura
-    Santamaria. A placard shows a face only from an authored card or a
-    VERIFIED login -- never from a login inferred off a person's name."""
+    Santamaria. A placard shows a face only from an authored card, a login the
+    manifest's own overlay verifies, or a login whose verification is WRITTEN
+    DOWN beside it -- never from a login inferred off a person's name."""
     verified = {k for k in (manifest.get("cast_logins") or {}) if not k.startswith("_")}
     for member in manifest["cast"]:
-        if member.get("login"):
-            assert member["login"] in {"nimbinatus"} or member["person"] in verified
+        if not member.get("login"):
+            continue
+        assert (member["person"] in verified
+                or member["login"] == "nimbinatus"
+                or member.get("login_source")), member["person"]
 
 
-def test_kat_is_credited_from_her_authored_card_not_a_lookalike_login(manifest):
-    """github.com/kat is named only 'Kat' and is not confirmed to be Kat
-    Cosgrove -- the nimbatus trap exactly. She has an authored card instead."""
+def test_kats_login_is_the_one_that_was_checked_not_the_one_that_matched(manifest):
+    """github.com/kat is named only "Kat" and is not confirmed to be Kat
+    Cosgrove -- the nimbatus trap exactly. github.com/katcosgrove IS: the
+    account's own name, its company and its bio all match the credit. The
+    difference between the two is the note recorded beside the login."""
     kat = next(c for c in manifest["cast"] if c["person"] == "Kat Cosgrove")
     assert kat.get("card") == "kat"
-    assert kat.get("login") is None
+    assert kat.get("login") == "katcosgrove"
+    assert "kat" != kat["login"]
+    assert kat.get("login_source")
 
 
 def test_the_authored_cards_are_used_where_they_exist(manifest):
@@ -535,33 +557,46 @@ def test_every_cast_placard_gets_a_readable_hold(manifest):
             assert item["dur"] >= 3.5
 
 
-def test_the_cast_plays_in_the_vocabularys_order(manifest):
-    """Ordered by the binding, not by whoever happens to have a face.
-
-    Compared on the CHARACTER, because a redacted placard deliberately no
-    longer carries its person's name.
-    """
+def test_the_principals_play_in_the_order_the_show_introduces_them(manifest):
+    """The manifest's order IS the show's order -- act II's people first, act
+    VII's last -- and the schedule never re-sorts it by who happens to have a
+    face or a bio."""
     items, _ = B.schedule(manifest)
-    on_screen = [i["character"] for i in items if i["kind"] == "cast"]
-    assert on_screen == [c["character"] for c in manifest["cast"]]
+    on_screen = [i["person"] for i in items if i["kind"] == "cast"]
+    assert on_screen == [c["person"] for c in manifest["cast"]]
+    acts = [c["seen_in"].split(" --")[0] for c in manifest["cast"]]
+    order = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
+    assert acts == sorted(acts, key=order.index)
 
 
-def test_the_cast_is_the_readmes_table(manifest):
+def test_every_placard_is_somebody_who_is_on_screen(manifest):
     """Owner: 'ensure this list matches the readme for the characters ...
     remove some of these characters', and separately 'Remove cayde-6 redacted
     from the starring roles, he's fine in the credits with the rest.'
 
-    So the placards are the README's nine rows MINUS Cayde-6: eight. The six
-    the vocab binds but the README does not list keep their bindings; only
-    act VIII's placards went.
+    That list has since been replaced by a stricter one -- owner, 2026-08-16:
+    "Remove people not in the movie from here and only use the principal
+    actors", "not jorge castro", "we want karena, bsherman, and kylegospo".
+    So the rule is no longer "the README's table": it is that EVERY placard is
+    somebody who is on screen in a delivered act, and each entry cites the act
+    it can be found in.
     """
     items, _ = B.schedule(manifest)
-    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 8
-
-    readme = (REPO_ROOT / "README.md").read_text()
+    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 9
     for member in manifest["cast"]:
-        assert member["character"] in readme or member["person"] in readme, \
-            f"{member['person']} as {member['character']} is not in the README"
+        assert member.get("seen_in"), member["person"]
+    people = {c["person"] for c in manifest["cast"]}
+    # The two the owner took out, and the reason each went.
+    assert "Jorge Castro" not in people      # "not jorge castro"
+    assert "Lindsay Gendreau" not in people  # Bungie's voice of Sagira, not in this film
+
+    # NOT compared against the README's table any more, and that is the point.
+    # That table lists BINDINGS -- Destiny characters and who plays them -- and
+    # three principals (Kyle Gospodnetich, Natali Vlatko, Benjamin Sherman) are
+    # on screen without playing a Destiny character at all. The evidence a
+    # placard needs is the act it can be found in, which is `seen_in` above.
+    cited = [c["seen_in"].split(" --")[1].strip() for c in manifest["cast"]]
+    assert all(cited), "every principal cites the record that puts them on screen"
 
 
 def test_cayde_is_not_in_the_starring_roles(manifest):
@@ -729,8 +764,8 @@ def test_a_weight_is_an_axis_not_a_second_file():
 
 
 def test_the_wallpapers_cycle_the_calendar_and_keep_switching():
-    """Owner: 'use the dark mode wallpapers, make them go through the entire
-    calendar order and keep switching.'
+    """Owner: 'make them go through the entire calendar order and keep
+    switching', now on the light set.
 
     Consecutive cards get consecutive months, and the cycle wraps rather than
     stopping on December.
@@ -744,6 +779,93 @@ def test_the_wallpapers_cycle_the_calendar_and_keep_switching():
     picked = [walls[i % n] for i in range(n * 2 + 3)]
     assert picked[0] != picked[1], "consecutive cards must not share a month"
     assert picked[n] == picked[0], "the cycle must wrap"
+
+
+def test_the_cycle_is_the_day_set_and_never_mixes_the_two():
+    """Owner: 'I just want light colored wallpapers.'
+
+    The night frames still sit in the same directory under their bare NN.png
+    names, because the prologue's bridge reads them. A glob that picked up
+    both would deal a night frame into the roll every other card.
+    """
+    walls = C.wallpapers()
+    if not walls:
+        pytest.skip("no wallpapers cached; run scripts/fetch_wallpapers.py")
+    assert all(p.stem.endswith("-day") for p in walls), \
+        f"act VIII runs on the day set; got {[p.name for p in walls]}"
+
+
+def _relative_luminance(rgb):
+    """WCAG relative luminance of an 8-bit RGB triple."""
+    def channel(v):
+        v /= 255
+        return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+    r, g, b = (channel(v) for v in rgb[:3])
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def _contrast(a, b):
+    la, lb = _relative_luminance(a), _relative_luminance(b)
+    hi, lo = max(la, lb), min(la, lb)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+# WCAG's large-text threshold. Every credit here is display type and none of
+# it is body copy, so this is the floor -- most months clear it comfortably.
+CONTRAST_FLOOR = 3.0
+
+
+def test_the_type_can_be_read_off_every_month():
+    """The light wallpapers' real regression guard, measured in pixels.
+
+    The cycle test passes whether the roll is legible or not: it only checks
+    which file is picked. This measures the deck's white type against the
+    graded wallpaper in the band every card sets its name in, on EVERY month,
+    which is what lets the grade leave the day art's exposure alone -- the
+    centre scrim is carrying the type, and this is the proof.
+    """
+    walls = C.wallpapers()
+    if not walls:
+        pytest.skip("no wallpapers cached; run scripts/fetch_wallpapers.py")
+    for i in range(len(walls)):
+        frame = C.backdrop(i).convert("RGB")
+        band = frame.crop((0, int(C.H * 0.34), C.W, int(C.H * 0.66)))
+        small = band.resize((32, 12), Image.LANCZOS)
+        worst = min(_contrast(px, C.TEXT) for px in small.get_flattened_data())
+        assert worst >= CONTRAST_FLOOR, (
+            f"{walls[i].name} only reaches {worst:.2f}:1 in the name band; "
+            f"the scrim is not carrying the type")
+
+
+def test_a_login_is_never_shortened_to_something_nobody_is_called():
+    """Owner: 'fix the ellipsis.'
+
+    A wide login used to be cut to 'angelcerverarold...'. Rule 3 is about
+    crediting a real person correctly, and a name is not a string you may trim
+    to fit -- it comes down in SIZE instead.
+    """
+    import inspect
+    src = inspect.getsource(C.render_name_wall)
+    assert "\\u2026" not in src and "…" not in src, \
+        "a login is set whole; the ellipsis is gone"
+    assert "CELL_MIN_SIZE" in src, "the fitter shrinks the type instead"
+
+
+def test_a_placard_reproduces_the_authored_identity_and_never_the_splash():
+    """Owner: 'get rid of those hero splashes they suck.'
+
+    The 1200x630 card is a splash composite. What was AUTHORED is the copy --
+    label, class, name, title -- and that is what the placard reproduces, so
+    dropping the art costs nobody their identity. A row nobody wrote is not
+    drawn, and nothing here composes one.
+    """
+    import inspect
+    src = inspect.getsource(C.render_cast_placard)
+    assert "cast_identity" in src
+    assert not hasattr(C, "cast_card"), \
+        "the splash-card loader is gone, not merely unused"
+    assert C.cast_identity(None) is None
+    assert C.cast_identity("nobody-authored-this") is None
 
 
 def test_the_wordmark_no_longer_says_an_ublue_project(manifest):
@@ -787,11 +909,16 @@ def test_the_picture_is_padded_so_it_outlasts_the_music():
     assert B.CONCAT_TAIL_SEC > 0
 
 
+def test_the_credits_gate_the_delivered_master_peak():
+    source = (REPO_ROOT / "scripts" / "build_credits.py").read_text()
+    assert "peaks.trim_master_peak(out_path.resolve())" in source
+
+
 # --- the second pass of the bed --------------------------------------------
 
-def test_the_vocal_version_follows_the_whole_instrumental_loop(manifest):
-    """Owner: 'switch to the album version with vocals after the entire
-    instrumental loops once'.
+def test_storytime_follows_the_whole_instrumental_loop(manifest):
+    """Storytime replaces only the former vocal pass after the entire
+    instrumental loop.
 
     'the ENTIRE instrumental' is load-bearing: the loop is not cut short to
     make room for the vocal. Pass one keeps both of its measured spans.
@@ -799,52 +926,96 @@ def test_the_vocal_version_follows_the_whole_instrumental_loop(manifest):
     passes = B.bed_passes(manifest["bed"])
     assert len(passes) == 2
     assert passes[0]["bed_id"] == "bed_wish_i_had_an_angel"
-    assert passes[1]["bed_id"] == "bed_wish_i_had_an_angel_album"
+    assert passes[1]["bed_id"] == "bed_storytime_album"
     assert len(passes[0]["segments"]) == 2
     assert passes[0]["segments"][0]["start_sec"] == 193.42
 
 
-def test_the_album_pass_skips_its_own_intro(manifest):
-    """Owner, 2026-08-15: *"the transition is weird you don't need to start the
-    song from the beginning just make it all fit so it sounds like they play
-    the instrumental version first and then go into the song."*
-
-    Pass one goes out MID-SONG, at instrumental 181.320. Entering the album at
-    0.0 therefore landed a mid-song hand-over on this recording's quiet intro,
-    and the song audibly started over. The album is entered on its full-band
-    vocal entry instead.
-
-    10.4722 is the album's own tracked beat 0.348 s ahead of the measured
-    +6.11 dB onset at 10.820, so the 0.25 s crossfade finishes BEFORE the hit
-    rather than shaving it.
+def test_storytime_pass_is_the_version_with_the_climax(manifest):
+    """Owner, 2026-08-16: 'have the double bass drums here ... We want the
+    double bass drum climax.' The official music video edit (bed_storytime,
+    244.135 s) has no such climax -- it is already decaying into its own end
+    at ~236 s. The album version carries the extended double-kick outro, so
+    the pass is the album bed, and the video edit stays on record beside it.
     """
-    album = B.bed_passes(manifest["bed"])[1]
-    start = album["segments"][0]["start_sec"]
-    assert start > 0.0, "the album must not restart the song from its intro"
-    assert start == 10.4722
+    storytime = B.bed_passes(manifest["bed"])[1]
+    assert storytime["bed_id"] == "bed_storytime_album"
+    assert storytime["media_filename"] == "bed_storytime_album.wav"
+    record = json.loads((REPO_ROOT / "music" /
+                         "bed_storytime_album.json").read_text())
+    assert "measured_climax" in record["grid"], (
+        "the climax must be MEASURED and recorded, never asserted")
+    # The record of the earlier state is kept, not rewritten.
+    assert (REPO_ROOT / "music" / "bed_storytime.json").exists()
+
+
+def test_storytime_pass_skips_its_own_intro(manifest):
+    """Storytime enters on its full-band vocal entry, not its quiet intro.
+
+    22.732336 is the album recording's beat 0.368 s ahead of the measured
+    +11.05 dB re-entry at 23.100, so the 0.25 s crossfade clears the hit.
+    """
+    storytime = B.bed_passes(manifest["bed"])[1]
+    start = storytime["segments"][0]["start_sec"]
+    assert start > 0.0, "Storytime must not restart from its quiet intro"
+    assert start == 22.732336
     grid = json.loads((REPO_ROOT / "music" /
-                       "bed_wish_i_had_an_angel_album.json").read_text())["grid"]
+                       "bed_storytime_album.json").read_text())["grid"]
     assert any(abs(b - start) < 1e-6 for b in grid["beats"]), (
-        "the in point must sit on the album's own tracked beat, not a round number")
+        "the in point must sit on Storytime's tracked beat, not a round number")
     xf = manifest["bed"].get("crossfade_sec", 0.0)
-    assert start + xf < 10.820, (
-        "the 0.25 s crossfade has to CLEAR before the band arrives at 10.820, "
+    assert start + xf < 23.100, (
+        "the 0.25 s crossfade has to CLEAR before the band arrives at 23.100, "
         "or the hand-over shaves the transient it exists to land on")
 
 
-def test_the_album_pass_stops_before_the_file_runs_out(manifest):
-    """243.400 is measured -- the recording is at -54 dB by 243 -- so the film
-    ends on the song's own ending rather than on digital silence."""
-    album = B.bed_passes(manifest["bed"])[1]
+def test_storytime_pass_stops_at_its_natural_ending(manifest):
+    """The pass ends where the ring-out actually ends, not on the file end.
+
+    The album file carries 2.56 s of digital floor after the ring; joining on
+    the file end would close the show on silence (the issue #105 failure).
+    The measured end of the ring lives in the bed record; the span uses it.
+    """
+    storytime = B.bed_passes(manifest["bed"])[1]
     record = json.loads((REPO_ROOT / "music" /
-                         "bed_wish_i_had_an_angel_album.json").read_text())
-    end = album["segments"][0]["end_sec"]
-    assert end < record["duration_sec"]
-    assert record["duration_sec"] - end < 1.0
+                         "bed_storytime_album.json").read_text())
+    end = storytime["segments"][0]["end_sec"]
+    climax = record["grid"]["measured_climax"]
+    assert end == climax["end_of_music_sec"]
+    assert end < record["duration_sec"], (
+        "the digital tail past the ring must not play")
+
+
+def test_the_wordmark_is_up_for_the_whole_climax(manifest):
+    """Owner: 'hold the bluefin mark until the end of the song.' The mark
+    comes up when the measured double-bass outro arrives and is held to the
+    last note -- the dur_sec is derived from the spans, never a round number.
+    """
+    bed = manifest["bed"]
+    total = B.bed_total(bed)
+    passes = B.bed_passes(bed)
+    xf = bed.get("crossfade_sec", 0.0)
+    spans = B.bed_spans(bed)
+    # Pass two starts after pass one's spans and every seam before it.
+    pass2_at = sum(s["end_sec"] - s["start_sec"]
+                   for s in spans[:len(passes[0]["segments"])])
+    pass2_at -= (len(passes[0]["segments"])) * xf
+    record = json.loads((REPO_ROOT / "music" /
+                         "bed_storytime_album.json").read_text())
+    climax_src = record["grid"]["measured_climax"]["outro_start_sec"]
+    climax_at = pass2_at + (climax_src
+                            - passes[1]["segments"][0]["start_sec"])
+    wordmark = next(i for i in B.schedule(manifest)[0]
+                    if i["kind"] == "wordmark")
+    assert wordmark["t"] == pytest.approx(climax_at, abs=1e-6), (
+        "the mark must be UP when the double-bass outro arrives")
+    assert wordmark["t"] + wordmark["dur"] == pytest.approx(total, abs=1e-6)
+    assert manifest["wordmark"]["dur_sec"] == pytest.approx(
+        total - climax_at, abs=1e-6)
 
 
 def test_every_span_of_both_passes_reaches_the_filtergraph(manifest):
-    """The album version is a SECOND ffmpeg input; binding it to input 1
+    """Storytime is a SECOND ffmpeg input; binding it to input 1
     would silently play the instrumental twice."""
     graph = B.audio_filter(manifest["bed"], stream=1)
     assert graph.count("atrim") == len(B.bed_spans(manifest["bed"]))
@@ -892,7 +1063,8 @@ def test_the_gitlab_names_are_never_fetched_as_github_logins(manifest, tmp_path)
 
     class Recorder:
         def __init__(self, *a, **k):
-            seen.append(a[0] if a else k.get("url"))
+            req = a[0] if a else k.get("url")
+            seen.append(getattr(req, "full_url", req))
             raise OSError("no network in tests")
 
     import urllib.request
@@ -998,3 +1170,106 @@ def test_a_brand_mark_is_never_taken_off_this_host():
     for url in fetch_brand_marks.MARKS.values():
         assert url.startswith("https://")
         assert "/usr/share" not in url
+
+
+# --- the hero credits ------------------------------------------------------
+
+def test_a_placard_never_prints_the_destiny_character(manifest):
+    """Owner, 2026-08-16: "drop the Destiny names, do it like 'Kat Cosgrove as
+    Defender Queen... blah'". The binding is still recorded -- a redaction is
+    keyed on it -- but the character name is not drawn, even when a caller
+    passes one."""
+    img = C.render_cast_placard("Kat Cosgrove", "Saint-14", card="kat",
+                                guardian_title="Defender Queen of the Lost")
+    plain = C.render_cast_placard("Kat Cosgrove", card="kat",
+                                  guardian_title="Defender Queen of the Lost")
+    assert list(img.getdata()) == list(plain.getdata())
+
+
+def test_a_seal_nobody_authored_is_omitted_not_filled():
+    """Jeefy's binding carries no plate, so his placard has no `as` row at all.
+    Inventing a Guardian title for a real person is the forbidden move."""
+    with_seal = C.render_cast_placard("Jeefy", guardian_title="Iron Lord")
+    without = C.render_cast_placard("Jeefy")
+    assert list(with_seal.getdata()) != list(without.getdata())
+
+
+def test_the_github_title_is_reproduced_whole_and_its_breaks_are_honoured():
+    """`<br><br>` is a paragraph the author asked for, not markup to strip.
+    Natali's title is five rows including the break; a three-row cap dropped
+    "Archaeologist and Egyptologist" off the end of her credit."""
+    from PIL import ImageDraw
+    probe = ImageDraw.Draw(C.backdrop(0))
+    text = ("Director of Open Source Software Engineering at Cisco, SIG Docs "
+            "Co-Chair for Kubernetes TODO Group Steering Committee member."
+            "<br><br>Archaeologist and Egyptologist")
+    lines = C.title_lines(text, probe, C._font("regular", C.TITLE_SIZE))
+    assert "" in lines, "the paragraph break survives"
+    assert lines[-1] == "Archaeologist and Egyptologist"
+    assert "<br>" not in " ".join(lines)
+
+
+def test_the_lower_third_is_ink_where_the_type_is(manifest):
+    """The reason this is a lower third at all: centred type over the day
+    wallpapers measured 1.02:1 at its worst. Under the band it is dark on every
+    month, so the same card reads the same on all eleven."""
+    for index in range(11):
+        img = C.render_cast_placard("Kat Cosgrove", card="kat",
+                                    guardian_title="Defender Queen of the Lost",
+                                    index=index).convert("RGB")
+        # The left margin: inside the band, never under a glyph or a face.
+        band = img.crop((0, C.LOWER_TOP + 20,
+                         C.LOWER_PAD - 20, C.LOWER_TOP + C.LOWER_HEIGHT - 20))
+        px = list(band.getdata())
+        assert max(_relative_luminance(p) for p in px) < 0.18, index
+
+
+def test_a_title_nobody_wrote_is_lorem_and_is_recorded(manifest):
+    """Owner: "placeholder for jeefy". A row nobody has authored renders as
+    Latin -- visibly not approved English -- and the manifest records who it is
+    owed to, so it turns up in the punch list instead of being forgotten."""
+    pending = [c for c in manifest["cast"] if c.get("title_pending")]
+    assert pending, "somebody is still owed a title"
+    for member in pending:
+        assert not member.get("title")
+        drawn = B.cast_title(member)
+        assert drawn and drawn != member["title_pending"]
+        # Latin, deterministic, and the same on every machine.
+        assert drawn == B.cast_title(member)
+
+
+def test_a_supplied_title_is_never_replaced_by_a_placeholder(manifest):
+    for member in manifest["cast"]:
+        if member.get("title"):
+            assert B.cast_title(member) == member["title"]
+            assert member.get("title_source"), member["person"]
+
+
+def test_an_authored_seal_reaches_the_placard(manifest):
+    """A seal is authored in two places, and both have to arrive.
+
+    The website carded four of the principals, so their `as` row resolves
+    through `card`. The other three -- Karena, Kyle, Kelsey -- are authored in
+    the manifest's own `guardian_title`, and the first build dropped that field
+    on the way to the renderer: three placards silently lost a row that had
+    been written for them, and every gate stayed green because an unauthored
+    seal is *supposed* to be omitted.
+    """
+    items, _ = B.schedule(manifest)
+    seats = {i["person"]: i for i in items if i["kind"] == "cast"}
+    authored = [c for c in manifest["cast"] if c.get("guardian_title")]
+    assert authored
+    for member in authored:
+        seat = seats[member["person"]]
+        assert seat["guardian_title"] == member["guardian_title"], member["person"]
+        assert member.get("guardian_title_source"), member["person"]
+
+
+def test_a_seal_nobody_authored_stays_off_the_card(manifest):
+    """The generic fallback is as invented as an invention."""
+    items, _ = B.schedule(manifest)
+    seats = {i["person"]: i for i in items if i["kind"] == "cast"}
+    for member in manifest["cast"]:
+        if member.get("guardian_title") or member.get("card"):
+            continue
+        assert not seats[member["person"]]["guardian_title"], member["person"]

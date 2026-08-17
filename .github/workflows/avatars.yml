@@ -1,0 +1,97 @@
+# Act VIII's avatar cache, built where the token already is.
+#
+# The credits put a face beside about five hundred people. Fetching those from a
+# workstation is five hundred requests against one home IP, and the run before
+# this workflow existed took long enough to be indistinguishable from a hang.
+#
+# So it happens here instead. `${{ github.token }}` is the runner's built-in
+# token -- there is NO personal access token in this repository and none is to
+# be added. `actions/cache` means a run that gains ten contributors fetches ten
+# faces and revalidates the rest with 304s, and the artifact is what a
+# workstation pulls with `gh run download` (`tools/avatars.py --from-actions`).
+#
+# Nothing here gates a merge: the cache is an optimisation, and a face that is
+# missing renders as a ring by design.
+name: Avatars
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      # The two files that decide which logins exist.
+      - stories/08-credits.json
+      - vocab/casting.yaml
+      - tools/avatars.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: avatars
+  cancel-in-progress: true
+
+jobs:
+  cache:
+    runs-on: ubuntu-latest
+    env:
+      # Authenticated GitHub API calls are 5000/hour; anonymous ones are 60.
+      # The avatar redirector needs no token, but anything reaching the API
+      # through `gh` uses this one.
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: pip install --quiet pyyaml pillow
+
+      # Restored on a prefix, saved on the exact login set: a manifest that
+      # gains a contributor still starts from the previous run's faces.
+      - name: Restore the avatar cache
+        uses: actions/cache@v4
+        with:
+          path: renders/avatars
+          key: avatars-v1-${{ hashFiles('stories/08-credits.json', 'vocab/casting.yaml') }}
+          restore-keys: |
+            avatars-v1-
+
+      - name: Fetch what is missing
+        run: python3 -m tools.avatars
+
+      - name: Say what the cache holds
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, pathlib, sys
+          sys.path.insert(0, ".")
+          sys.path.insert(0, "scripts")
+          import build_credits as B
+          from tools import avatars
+          logins = B.avatar_logins(json.loads(B.MANIFEST.read_text()))
+          index = avatars.load_index()
+          have = [n for n in logins if avatars.have(n)]
+          gone = [n for n in logins if (index.get(n) or {}).get("status") == "gone"]
+          missing = [n for n in logins if n not in have and n not in gone]
+          print(f"| | |\n|---|---|")
+          print(f"| Logins credited | {len(logins)} |")
+          print(f"| Faces cached | {len(have)} |")
+          print(f"| No account | {len(gone)} |")
+          print(f"| Still missing | {len(missing)} |")
+          if missing:
+              print()
+              print("Missing (these render as a ring): " + ", ".join(missing[:40]))
+          PY
+
+      - name: Publish the cache
+        uses: actions/upload-artifact@v4
+        with:
+          # Read back by tools/avatars.ARTIFACT -- the two are asserted equal
+          # in tests/test_avatars.py, because a rename here would silently turn
+          # every workstation build back into five hundred requests.
+          name: avatars
+          path: renders/avatars
+          retention-days: 90
+          if-no-files-found: warn

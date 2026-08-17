@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Ending card</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: transparent;
+  }
+  :root {
+    --wc-gold: #60a5fa;
+    --wc-white: #e9e9e5;
+    --wc-font-display: 'Inter', 'Arial Narrow', sans-serif;
+    --wc-font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--wc-font-display);
+  }
+  body.pause {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  .pause-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    width: min(64rem, 90vw);
+    padding: 2.4rem;
+    border-left: 2px solid var(--wc-gold);
+    text-shadow: 0 0.1rem 0.6rem rgb(0 0 0 / 85%);
+  }
+  .label {
+    font-family: var(--wc-font-mono);
+    font-size: 1.1rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--wc-gold);
+  }
+  .title {
+    margin: 0;
+    font-size: clamp(2.8rem, 5vw, 4.6rem);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--wc-white);
+    line-height: 1.1;
+  }
+  .overlay {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0 90px;
+    color: #f5f7fa;
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: 0.045em;
+    text-align: center;
+    text-shadow: 0 3px 12px #000, 0 0 18px rgb(0 0 0 / 90%);
+  }
+  /* THE LINE IS ONE FLEX ITEM, NOT ONE PER WORD. `.overlay` is a flex
+     container, and a flex container drops the whitespace between its items --
+     which ate the space in front of every seared token and rendered
+     "WillEVER". Everything the card says lives inside this span, in normal
+     inline flow, so the spaces survive and the line can be measured as a
+     single box. */
+  .line {
+    display: block;
+    max-width: 100%;
+    white-space: pre-wrap;
+  }
+  .bottom_matte {
+    top: 942px;
+    height: 138px;
+  }
+  .center {
+    inset: 0;
+    height: 1080px;
+    font-size: 86px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  /* BLUE LETTERS. The project's own convention, from tools/blueletters.py:
+     the b and f of "bluefin" carry the accent, so B, b, F and f are the
+     letters that light up. #93c5fd is the credits' accent (tools/credits.py),
+     reused rather than a second blue invented here. */
+  .blue {
+    color: #93c5fd;
+  }
+  /* AN AUTHORED GLYPH STANDING IN FOR A LETTER. The mark sits on the text
+     baseline at the cap height of the type around it, so it reads as the
+     letter it replaces rather than as a logo dropped into a word. Its accent
+     is drawn above it, positioned off the glyph box, because the mark has no
+     glyph metrics of its own for a combining mark to attach to. */
+  .glyph {
+    position: relative;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.14em;
+  }
+  .glyph img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .glyph .accent {
+    position: absolute;
+    left: 52%;
+    top: -0.5em;
+    transform: translateX(-50%);
+    font-size: 0.88em;
+    line-height: 1;
+  }
+  /* THE ACCENT IS FILLED BLUE. Owner, 2026-08-16: "fill in the accent with
+     blue". It is the house accent -- #93c5fd, the same blue the b/f letters
+     take -- so a card carries one blue rather than two. The sear stays: the
+     bloom is what makes it read as heat above the mark, and the fill is what
+     makes it read as ours. The MARK below it is untouched, because it is
+     somebody else's trademark. */
+  .glyph .accent.seared {
+    color: #93c5fd;
+    text-shadow:
+      0 0 4px rgb(157 200 255 / 95%),
+      0 0 12px rgb(40 116 255 / 85%),
+      0 0 26px rgb(40 116 255 / 55%);
+  }
+  /* THE SEAR IS A WORD IN A SENTENCE, NOT A LOGO. Owner, 2026-08-16: "the
+     'ever' is wrong it's one word it should look like it's in a sentence."
+     So the token differs from the words either side of it ONLY in heat --
+     weight, colour and bloom. It inherits the line's tracking, sits in normal
+     inline flow, and carries no box, no margin and no letter-spacing of its
+     own. The old treatment set 0.11em tracking and 0.1em side margins on an
+     inline-block, which pulled the word out of the sentence and read as a
+     separate title; the flex container then ate the space in front of it and
+     rendered "WillEVER". Both faults are the same fault: the word had been
+     made into an object. */
+  .seared {
+    color: #fff8e8;
+    font-weight: 900;
+    text-shadow:
+      0 0 3px #fff,
+      0 0 8px rgb(157 200 255 / 95%),
+      0 0 16px rgb(40 116 255 / 70%);
+  }
+</style>
+</head>
+<body>
+<main id="card"></main>
+<script>
+  const params = new URLSearchParams(window.location.search)
+  const mode = params.get('mode')
+  const card = document.getElementById('card')
+
+  function append(tag, className, text) {
+    if (!text) return
+    const node = document.createElement(tag)
+    node.className = className
+    node.textContent = text
+    card.appendChild(node)
+  }
+
+  // THE SENTENCE IS BUILT ONCE, IN THREE PASSES OVER THE SAME TEXT: the
+  // authored emphasis tokens, an authored glyph standing in for a letter, and
+  // the project's blue letters. Everything lands in one inline flow, so the
+  // spaces between words survive and the line measures as one box.
+  function decorate(host, text, emphasis, glyph, blueLetters) {
+    const spans = []
+    for (const token of emphasis) {
+      const at = text.indexOf(token.text, spanEnd(spans))
+      if (at < 0) continue
+      spans.push({ at, end: at + token.text.length, className: token.style })
+    }
+    if (glyph) {
+      const at = text.indexOf(glyph.token)
+      if (at >= 0 && !spans.some(s => at < s.end && at + glyph.token.length > s.at)) {
+        spans.push({ at, end: at + glyph.token.length, glyph })
+      }
+    }
+    spans.sort((a, b) => a.at - b.at)
+
+    let cursor = 0
+    for (const span of spans) {
+      plain(host, text.slice(cursor, span.at), blueLetters)
+      host.appendChild(span.glyph
+        ? glyphNode(span.glyph)
+        : marked(span.className, text.slice(span.at, span.end), blueLetters))
+      cursor = span.end
+    }
+    plain(host, text.slice(cursor), blueLetters)
+  }
+
+  function spanEnd(spans) {
+    return spans.length ? spans[spans.length - 1].end : 0
+  }
+
+  // Blue letters: the b and f of "bluefin", per tools/blueletters.py. A run of
+  // text becomes text nodes with those letters wrapped, so the word is still
+  // one word -- nothing here changes spacing, weight or tracking.
+  function plain(host, text, blueLetters) {
+    if (!text) return
+    if (!blueLetters) { host.appendChild(document.createTextNode(text)); return }
+    for (const char of text) {
+      if ('BbFf'.includes(char)) {
+        const span = document.createElement('span')
+        span.className = 'blue'
+        span.textContent = char
+        host.appendChild(span)
+      } else {
+        host.appendChild(document.createTextNode(char))
+      }
+    }
+  }
+
+  function marked(className, text, blueLetters) {
+    const span = document.createElement('span')
+    span.className = className
+    plain(span, text, blueLetters)
+    return span
+  }
+
+  // A mark drawn where a letter would be, with its diacritic placed above it.
+  // The accent carries its own style so it can be seared while the mark is
+  // not -- the mark is somebody else's trademark and is reproduced as drawn.
+  function glyphNode(glyph) {
+    const host = document.createElement('span')
+    host.className = 'glyph'
+    const image = document.createElement('img')
+    image.src = params.get('glyph_src')
+    image.alt = glyph.token
+    host.appendChild(image)
+    if (glyph.accent) {
+      const accent = document.createElement('span')
+      accent.className = `accent ${glyph.accent_style || ''}`.trim()
+      accent.textContent = glyph.accent
+      host.appendChild(accent)
+    }
+    return host
+  }
+
+  // MEASURE THE LINE, DO NOT TRUST IT. Owner, 2026-08-16: "measure this whole
+  // thing". The card is 1920px wide with `overflow: hidden`, so a line that
+  // does not fit is not a warning -- it is silently clipped copy, and nobody
+  // sees the half that went missing. The line is measured against the box it
+  // has to live in and stepped down until it fits. The final size is reported
+  // on `window.__fit` so the renderer can record it.
+  function fit(box, line) {
+    const style = window.getComputedStyle(box)
+    const room = box.clientWidth
+      - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+    const start = parseFloat(window.getComputedStyle(line).fontSize)
+    let size = start
+    const FLOOR = 28
+    while (size > FLOOR && (line.scrollWidth > room
+        || line.getBoundingClientRect().height > box.clientHeight)) {
+      size -= 1
+      line.style.fontSize = `${size}px`
+    }
+    return {
+      requested: start,
+      rendered: size,
+      shrunk: size < start,
+      width: Math.ceil(line.scrollWidth),
+      room: Math.floor(room),
+    }
+  }
+
+  async function ready() {
+    if (mode === 'pause') {
+      document.body.classList.add('pause')
+      card.className = 'pause-card'
+      append('div', 'label', params.get('label'))
+      append('h1', 'title', params.get('title'))
+      const wallpaper = params.get('wallpaper')
+      if (wallpaper) {
+        const image = new Image()
+        image.src = wallpaper
+        await image.decode()
+        document.body.style.backgroundImage = `url("${wallpaper}")`
+      }
+    } else {
+      const placement = params.get('placement') || 'bottom_matte'
+      card.className = `overlay ${placement}`
+      const text = params.get('text') || ''
+      const emphasis = JSON.parse(params.get('emphasis') || '[]')
+      const line = document.createElement('span')
+      line.className = 'line'
+      card.appendChild(line)
+      decorate(line, text, emphasis,
+        JSON.parse(params.get('glyph') || 'null'),
+        params.get('blue_letters') === 'true')
+      // A glyph is an <img>: it has to be decoded before the line can be
+      // measured, or the box is measured around nothing.
+      await Promise.all([...line.querySelectorAll('img')]
+        .map(image => image.decode().catch(() => {})))
+      await document.fonts.ready
+      window.__fit = fit(card, line)
+    }
+    await document.fonts.ready
+    window.__renderReady = true
+  }
+
+  ready()
+</script>
+</body>
+</html>

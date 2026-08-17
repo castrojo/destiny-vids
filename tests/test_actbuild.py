@@ -63,12 +63,13 @@ def test_the_words_are_the_owners(doc):
     assert [(c["speaker"], c["text"]) for c in doc["plates"]] == [
         ("kat", "Hey why are they shooting at me!"),
         ("mrbobbytables", "The gamers don't know you're here to help"),
+        ("kat", "Nice to meet you too!"),
         ("kat", "I miss ONE email now I gotta use a Linux desktop?"),
         ("kat", "How much you want to bet their sound just doesn't work?"),
         ("TBD", "HEY! We know when you're not upstreaming!"),
         ("kat", "I have better sh*t to do!"),
         ("kat", "I miss ingress-nginx sometimes"),
-        ("kat", "Fine I'll fix your shit too"),
+        ("kat", "Fine I'll fix your sh*t too"),
         ("kat", "Remember kids, cardio!"),
     ]
 
@@ -122,9 +123,33 @@ def test_the_lines_clear_the_measured_cuts(doc):
     assert 14.83 in doc["cut_list"]
     setup_last = doc["plates"][1]
     assert setup_last["at"] + setup_last["dur"] < 6.03
-    linux1 = doc["plates"][2]
-    assert linux1["at"] == 12.2
+    linux1 = doc["plates"][3]
+    assert linux1["at"] == 12.65
     assert linux1["at"] + linux1["dur"] < 14.833
+
+
+def test_goddamn_uses_the_kubernetes_helm_censor(any_act):
+    """The helm substitutes an O; other active swears keep asterisks."""
+    expected = {
+        "p3-nat-goddamn": ("Goddamn", "G{k8s}ddamn"),
+    }
+    expected_ids = {cue["id"] for cue in any_act["plates"]} & set(expected)
+    seen = set()
+    for cue in any_act["plates"]:
+        if cue["id"] not in expected:
+            continue
+        seen.add(cue["id"])
+        find, replacement = expected[cue["id"]]
+        assert cue["censor"] == [{"find": find, "replace": replacement}]
+    assert seen == expected_ids
+
+
+def test_kat_swears_use_asterisks(doc):
+    kat_swears = [cue["text"] for cue in doc["plates"]
+                  if cue["id"] in {"p3d-kat-bettershit", "p5-kat-linux3"}]
+    assert kat_swears == ["I have better sh*t to do!", "Fine I'll fix your sh*t too"]
+    assert all("censor" not in cue for cue in doc["plates"]
+               if cue["id"] in {"p3d-kat-bettershit", "p5-kat-linux3"})
 
 
 def test_the_delivered_variant_is_lossless_stereo(any_act):

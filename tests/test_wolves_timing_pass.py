@@ -106,11 +106,11 @@ def test_every_run_is_a_forward_run(cut):
             shot["duration"], abs=0.002)
 
 
-def test_the_song_plays_from_the_first_frame(cut):
-    """No pre-roll: the film opens on the song, under the title card."""
+def test_the_song_and_picture_play_from_the_first_frame(cut):
+    """No pre-roll or title slide: the film opens on its first source run."""
     assert cut["bed_offset_sec"] == 0.0
     assert cut["shots"][0]["audio"] == "bed"
-    assert cut["shots"][0].get("still"), "the film opens on the title card"
+    assert "video_id" in cut["shots"][0]
 
 
 def test_act_one_stops_at_the_end_of_the_cinematic(cut):

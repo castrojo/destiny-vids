@@ -6,7 +6,7 @@
     "bed_id": "bed_wish_i_had_an_angel",
     "media_filename": "bed_wish_i_had_an_angel.wav",
     "source_url": "https://www.youtube.com/watch?v=xgL1oBwVG6M",
-    "_what": "PASS ONE -- the instrumental, on loop. Two spans in order, so the song starts on the drum smash, loops back to its own top, and never plays the breakdown. Owner: 'we want the song on loop basically but starting at the drum smash', and 'cut out the weird drum section with the moaning'. When this pass has played once IN FULL the bed hands over to `then` -- the album version, with vocals: 'switch to the album version with vocals after the entire instrumental loops once'.",
+    "_what": "PASS ONE -- the instrumental, on loop. Two spans in order, so the song starts on the drum smash, loops back to its own top, and never plays the breakdown. Owner: 'we want the song on loop basically but starting at the drum smash', and 'cut out the weird drum section with the moaning'. When this pass has played once IN FULL the bed hands over to `then` -- Nightwish's vocal Storytime recording. The instrumental pass and its measured spans remain unchanged.",
     "segments": [
       {
         "_what": "A -- the drum smash to the last full bar. 193.420 is the MEASURED re-entry after the breakdown, +12.98 dB, the largest onset in the song. The out point was 240.780; the owner cut it: ':46 - cut all of this part and go right to the drums so the entire song sounds like a loop'. The song's ENDING starts at 240.08 -- the level falls -11 -> -17 dB and keeps falling to digital silence at 241.95 -- and an ending is exactly what a loop must not contain. :46 on the credits clock is source 239.420; the cut is at 239.653152, the nearest beat in the bed's own tracked grid, 0.23 s later and still 0.43 s clear of the decay.",
@@ -21,15 +21,15 @@
     ],
     "crossfade_sec": 0.25,
     "then": {
-      "_what": "PASS TWO -- the album version, WITH VOCALS. It takes over the moment the instrumental loop has run once, which is what 'after the entire instrumental loops once' means: the loop is not cut short to make room. IT DOES NOT RESTART THE SONG. Owner, 2026-08-15: 'the transition is weird you don't need to start the song from the beginning just make it all fit so it sounds like they play the instrumental version first and then go into the song.' Playing this recording from 0.0 is what produced the 'weird': the hand-over happens mid-song -- pass one goes out at instrumental 181.320, the top of the breakdown -- so landing on this recording's QUIET INTRO makes the song audibly start over. The intro is SKIPPED and the album is entered on its full-band vocal entry instead, so the instrumental reads as the opener and the song proper arrives with the voice. WHY NOT A LITERAL CONTINUATION at album ~184.5, the breakdown pass one stopped at: it would replay the 'weird drum section with the moaning' the owner cut from the loop, and it would leave only 59 s of song -- the last minute rather than 'the song'. The record's downbeat phase is UNRESOLVED and nothing here needs it: the in point is a measured onset snapped to a tracked beat, never to a bar.",
-      "bed_id": "bed_wish_i_had_an_angel_album",
-      "media_filename": "bed_wish_i_had_an_angel_album.wav",
-      "source_url": "https://www.youtube.com/watch?v=wEERFBI9eCg",
+      "_what": "PASS TWO -- Storytime, WITH VOCALS, and from 2026-08-16 the ALBUM version (Imaginaerum), not the official music video edit. It takes over only after the instrumental loop has run in full; pass one is never shortened to make room. Storytime's quiet opening is skipped so the hand-over lands on the full-band entry rather than losing momentum. Its grid phase is unresolved, which is honest: this pass needs a beat-aligned entrance, not an invented bar line. WHY THE VERSION CHANGED: the owner watched 35:50 of the programme -- 'this is almost perfect but cuts off too early, in the version of the song have the double bass drums here and hold the bluefin mark until the end of the song. We want the double bass drum climax.' The video edit (bed_storytime, 244.135 s) has no such climax: it sustains through ~236 s and is already decaying into its own end. The album version runs 330.743 s and carries the extended double-kick outro the edit cut (measured in music/bed_storytime_album.json grid.measured_climax). The video edit bed stays on record because this act's earlier state was built on it; nothing else about the pass changes.",
+      "bed_id": "bed_storytime_album",
+      "media_filename": "bed_storytime_album.wav",
+      "source_url": "https://www.youtube.com/watch?v=nbtcFghyuN8",
       "segments": [
         {
-          "_what": "MEASURED 2026-08-15. The album version is entered at 10.4722, NOT at 0.0. Its own intro runs 0 -> 10.8 at about -13 dB and the full band and the vocal arrive on a +6.11 dB step at 10.820 -- the sharpest onset anywhere in the first minute. 10.4722 is the album's own tracked beat 0.348 s ahead of that step, chosen so the 0.25 s crossfade is COMPLETE before the hit lands: starting on the onset itself would put the transient inside the fade and shave the arrival. 243.400 is unchanged and is also measured -- the recording holds full level to 242, decays through 242-243 and is at -54.4 dB by 243, so the film still ends on the song's own ending with the digital silence left off the back.",
-          "start_sec": 10.4722,
-          "end_sec": 243.4
+          "_what": "MEASURED 2026-08-16 on the Nuclear Blast 'Storytime (Remastered)' delivery (the Imaginaerum album version). The full-band vocal entry is a +11.05 dB re-entry at 23.100. 22.732336 is the recording's own preceding tracked beat, chosen so the 0.25 s crossfade ends 0.118 s before the hit instead of shaving it -- the same 0.368 s offset the video-edit pass used. The out point is the song's REAL end: the final hit rings out from the last tracked beat (324.894) and decays to -75 dBFS at 328.183667; the file then carries 2.56 s of digital floor to 330.743104, and ending there would close the show on silence (the issue #105 failure). The double-bass outro starts at 250.403991 on this grid (boundary measured in the bed record) and sustains to the ring -- the climax the owner asked for plays out in full.",
+          "start_sec": 22.732336,
+          "end_sec": 328.183667
         }
       ]
     }
@@ -101,7 +101,8 @@
     "_what": "The REAL Project Bluefin wordmark, not the word typeset in the deck's font. Cached by scripts/fetch_wordmark.py from ublue-os/universal-blue-org content/ocis/bluefin.svg -- NOT ublue-os/artwork, which is wallpapers only and carries no wordmark in any branch or release. Reversed for this background by recolouring the black type to white; the fin's own #4285f4 is left exactly as published and no geometry is touched. THE SUB-LINE IS GONE, owner instruction: 'get rid of \"an ublue project\" on the logo'. The published lockup does not carry it either, so the mark now stands alone exactly as ublue publishes it.",
     "text": "Bluefin",
     "source": "ublue-os/universal-blue-org:content/ocis/bluefin.svg",
-    "dur_sec": 10.0
+    "dur_sec": 77.779676,
+    "_dur_sec_what": "Owner, 2026-08-16: 'hold the bluefin mark until the end of the song. We want the double bass drum climax.' So the mark is UP when the climax arrives and HELD to the last note, not a ten-second sign-off. The number is measured, not round: Storytime's album-version outro starts at source 250.403991 (the grid beat opening the measured boundary; see music/bed_storytime_album.json grid.measured_climax), which lands at 454.724807 on the credits clock, and the act ends at 532.504483 -- 77.779676 s later. DERIVATION: dur_sec = bed_total(bed) - (pass-one spans - 2 x crossfade + (250.403991 - 22.732336)); re-derive it if any span or the crossfade moves, or the mark drifts off the climax."
   },
   "unresolved": [
     "Act VII still ends on the comic cover -- see reveal.TODO(owner).",
@@ -895,50 +896,97 @@
       ]
     }
   ],
+  "_cast_who": "THE PRINCIPALS, IN THE ORDER THE SHOW INTRODUCES THEM. Owner, 2026-08-16: 'Remove people not in the movie from here and only use the principal actors', 'not jorge castro', 'we want karena, bsherman, and kylegospo', 'placeholder for jeefy'. Everybody below is ON SCREEN in a delivered act -- the act is named in each entry's `seen_in`. Lindsay Gendreau came out: she is Bungie's voice of Sagira, credited in dialogue/yt_curse_of_osiris_opening_cinematic/DIALOGUE.md, and has never been in this film. A placard reads NAME as GUARDIAN TITLE, then what the person does: the Destiny character name is no longer printed (owner: 'drop the Destiny names, do it like \"Kat Cosgrove as Defender Queen... blah\"'). `guardian_title` is authored copy reproduced verbatim -- from `card` when the website authored one, from the cited record otherwise -- and is OMITTED when nobody has authored it. `title` is the person's own GitHub bio or the owner's own words, VERBATIM, per `title_source`; `title_pending` means nobody has supplied one yet and the row renders as lorem until they do.",
   "cast": [
     {
-      "person": "Laura Santamaria",
-      "character": "Elsie Bray",
-      "character_id": "elsie_bray",
-      "card": "laura"
+      "person": "Karena Angel",
+      "character_id": "mara_sov",
+      "seen_in": "II -- stories/02-endless-forms-plates.json, trio_mara_sov",
+      "title_pending": "No GitHub login is recorded for Karena anywhere in this repo, and casting.yaml says so explicitly: guessing one is the nimbatus/nimbinatus trap. TODO(owner): her login, or her own words.",
+      "guardian_title": "Architect of the Consensus",
+      "guardian_title_source": "vocab/casting.yaml `mara_sov`, the owner's re-authored plate (issue #5), verbatim"
     },
     {
-      "person": "Laura Santamaria",
-      "character": "Nimbatus",
-      "character_id": "nimbatus",
-      "card": "laura"
-    },
-    {
-      "person": "Kelsey Hightower",
-      "character": "Zavala",
-      "character_id": "zavala"
+      "person": "Kyle Gospodnetich",
+      "character_id": "kylegospo",
+      "login": "KyleGospo",
+      "seen_in": "II -- vocab/casting.yaml `KyleGospo`, the bazzite plate",
+      "title": "Creator of Bazzite and Maintainer @ublue-os & @frostyard | @OpenGamingCollective Member  | Linux Community Engineer @microsoft",
+      "title_source": "github.com/KyleGospo profile bio, fetched 2026-08-16, verbatim including the double space",
+      "guardian_title": "The First Knife",
+      "guardian_title_source": "vocab/casting.yaml `KyleGospo`, the bazzite plate, verbatim",
+      "login_source": "VERIFIED: vocab/casting.yaml's `KyleGospo` binding is keyed by the login itself ('github.com/KyleGospo'), and the account's own name is 'Kyle Gospodnetich'. Its avatar URL is already pinned in that binding."
     },
     {
       "person": "Bob Killen",
-      "character": "Osiris",
       "character_id": "osiris",
-      "card": "bob"
-    },
-    {
-      "person": "Lindsay Gendreau",
-      "character": "Sagira",
-      "character_id": "sagira"
+      "card": "bob",
+      "login": "mrbobbytables",
+      "seen_in": "III -- the act is his",
+      "title": "Kubernetes & OSS Advocate | CNCF cat wrangler",
+      "title_source": "github.com/mrbobbytables profile bio, fetched 2026-08-16, verbatim",
+      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
+      "login_source": "VERIFIED: vocab/casting.yaml's `osiris` binding records person `mrbobbytables`, and the account's own name is 'Bob Killen'."
     },
     {
       "person": "Kat Cosgrove",
-      "character": "Saint-14",
       "character_id": "saint_14",
-      "card": "kat"
+      "card": "kat",
+      "seen_in": "IV -- the act is hers",
+      "title": "Village Sorceress at VillageSQL @kubernetes Steering Committee + Release Team Subproject Lead, SIG Docs Tech Lead, Kubernetes v1.30 Release Lead",
+      "title_source": "OWNER-SUPPLIED verbatim, 2026-08-16. Her GitHub bio is the first clause of it; the owner supplied the whole line.",
+      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
+      "login": "katcosgrove",
+      "login_source": "VERIFIED 2026-08-16: the account's own name is 'Kat Cosgrove', its company is villagesql.com and its bio is the first clause of the title the owner supplied for her. The old note here -- 'github.com/kat is named just Kat and is NOT confirmed' -- was about a DIFFERENT account; this is not that one."
     },
     {
-      "person": "Karena Angel",
-      "character": "Mara Sov",
-      "character_id": "mara_sov"
+      "person": "Natali Vlatko",
+      "character_id": "natali",
+      "card": "natali",
+      "seen_in": "V -- the act is hers; also act I's sixth Guardian window",
+      "title": "Director of Open Source Software Engineering at Cisco, SIG Docs Co-Chair for Kubernetes TODO Group Steering Committee member.<br><br>Archaeologist and Egyptologist",
+      "title_source": "OWNER-SUPPLIED verbatim, 2026-08-16, including the paragraph break.",
+      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
+      "login": "natalisucks",
+      "login_source": "VERIFIED 2026-08-16: the account's own name is 'Natali Vlatko' and its company is @cisco-open, which is the employer in the title the owner supplied for her."
+    },
+    {
+      "person": "Kelsey Hightower",
+      "character_id": "zavala",
+      "login": "kelseyhightower",
+      "seen_in": "VI -- stories/06-wolves-cayde-plates.json, gold_kelsey_hightower",
+      "title_pending": "github.com/kelseyhightower carries no bio. TODO(owner): his own words, or leave the lorem.",
+      "guardian_title": "Evangelist of the Open Sky",
+      "guardian_title_source": "stories/06-wolves-cayde-plates.json `gold_kelsey_hightower`, owner brief 2026-08-13 (#111), verbatim",
+      "login_source": "VERIFIED: the account's own name is 'Kelsey Hightower'."
     },
     {
       "person": "Jeefy",
-      "character": "Lord Saladin",
-      "character_id": "saladin"
+      "character_id": "saladin",
+      "login": "jeefy",
+      "seen_in": "VI -- vocab/casting.yaml `saladin`, the constrained binding (far + helmeted)",
+      "title_pending": "OWNER, 2026-08-16: 'placeholder for jeefy'. He DOES have a GitHub bio ('Project things @cncf | Kubernetes & OSS Advocate | Goose Enthusiast'); the owner asked for a placeholder instead, so it waits for his word rather than being taken.",
+      "guardian_title_pending": "The saladin binding carries NO plate block -- nobody has authored a Guardian title for him. The row is omitted rather than filled; #103's shape, not a bug."
+    },
+    {
+      "person": "Laura Santamaria",
+      "character_id": "nimbatus",
+      "card": "laura",
+      "seen_in": "VII -- stories/07-europa-plates.json, character `laura`",
+      "title": "Community Architect at Red Hat. Community: DevOps focused. I ❤️ clouds. Weather nerd, Pythonista. Specializing in solving the unsolvable.",
+      "title_source": "github.com/nimbinatus profile bio, fetched 2026-08-16, verbatim",
+      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
+      "login_source": "VERIFIED in vocab/casting.yaml: github.com/nimbinatus is Laura Santamaria (u/1538692); github.com/nimbatus is an unrelated empty account."
+    },
+    {
+      "person": "Benjamin Sherman",
+      "character_id": "bsherman",
+      "login": "bsherman",
+      "seen_in": "VII -- stories/07-europa-plates.json, speaker BSHERMAN",
+      "title": "@ublue-os and ucore Maintainer • Software Engineer • Linux and Container Nerd",
+      "title_source": "github.com/bsherman profile bio, fetched 2026-08-16, verbatim",
+      "guardian_title_pending": "He speaks in act VII as BSHERMAN and has no authored Guardian identity anywhere. The row is omitted rather than invented.",
+      "login_source": "VERIFIED: the account's own name is 'Benjamin Sherman' and its bio names @ublue-os, which is the project act VII's BSHERMAN speaks for."
     }
   ],
   "cast_hold_sec": 4.0,

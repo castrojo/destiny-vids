@@ -298,6 +298,8 @@ CHAT_FS_TEXT_MAX = 28    # render script MAX_FONT 56px -- the preferred size
 CHAT_FS_TEXT_MIN = 19    # ...MIN_FONT 38px -- the shrink-to-fit floor
 CHAT_RULE_W = 2          # .rule { width: 3px } -- 1.5px at 1x, rounded up
 CHAT_RULE_H = 23         # .rule { height: 46px }
+K8S_CENSOR_TOKEN = "{k8s}"
+K8S_CENSOR_MARK = REPO_ROOT / "renders" / "marks" / "kubernetes.png"
 
 # --- companion plate (the site's GUARDIAN BOND card) ------------------------
 # A DIFFERENT card again: `.wolves-companion-plate` in WolvesIntroOverlay.vue,
@@ -451,11 +453,12 @@ CHOICE_LINE = STATUS_LINE
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
 
-# The full-frame cards -- the cinematic act slide and the intro's comic title
-# card. They are the site's own components, reproduced by `cards/render-cards.mjs`
+# The full-frame cards -- the cinematic act slide, the intro's comic title
+# card, and the full-bleed photo card. They are the site's own components,
+# reproduced by `cards/render-cards.mjs`
 # in a real browser rather than ported into Pillow, so this module only ever
 # BURNS them: `render` skips them and `render_plate` refuses one outright.
-CARD_KINDS = ("act", "comic")
+CARD_KINDS = ("act", "comic", "photo")
 
 # The card kinds that own a row of their own rather than the lower third: the
 # site's top-left HUD, Destiny's boss bar at the top of frame, the console
@@ -1014,16 +1017,38 @@ def _render_chat(spec):
     # prove it ("I guess I'm taking the long way around."): recovered dialogue
     # is real speech, and shouting it would put an emphasis on it nobody said.
     text = spec.get("text") or ""
+    for censor in spec.get("censor", []):
+        source = censor["find"]
+        replacement = censor["replace"]
+        occurrences = text.count(source)
+        if occurrences != 1:
+            raise ValueError(
+                f"chat plate {spec.get('id')!r} must contain its censorship "
+                f"source {source!r} exactly once; found {occurrences}")
+        text = text.replace(source, replacement)
 
     probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
     f_speaker = _font("regular", CHAT_FS_SPEAKER)
     speaker_w = _tracked_width(probe, speaker, f_speaker, CHAT_LS_SPEAKER)
 
+    def censor_size(f_text):
+        height = max(1, int(round(f_text.size * 0.72)))
+        mark = Image.open(K8S_CENSOR_MARK)
+        return int(round(mark.width * height / mark.height)), height
+
+    def message_width(f_text):
+        width = 0
+        for part in text.split(K8S_CENSOR_TOKEN):
+            if width:
+                width += censor_size(f_text)[0]
+            width += probe.textlength(part, font=f_text)
+        return width
+
     def pill_width(f_text):
         # the flex row: pad, avatar, gap, eyebrow, gap, rule, gap, message, pad
         return (CHAT_PAD_L + CHAT_AVATAR + CHAT_GAP + speaker_w + CHAT_GAP
                 + CHAT_RULE_W + CHAT_GAP
-                + probe.textlength(text, font=f_text) + CHAT_PAD_R)
+                + message_width(f_text) + CHAT_PAD_R)
 
     # plate.html's shrink-to-fit: start at MAX_FONT and step down until the
     # pill fits max-width -- one wide line, never a wrap ("Prefer one wide
@@ -1078,12 +1103,24 @@ def _render_chat(spec):
 
     if text:
         a, d = f_text.getmetrics()
-        layer = _gradient_text(
-            (int(math.ceil(probe.textlength(text, font=f_text))) + 4,
-             int(f_text.size * 1.4)),
-            text, f_text,
-            [(0.0, (255, 255, 255, 255)), (0.6, NAME_MID), (1.0, NAME_BOTTOM)])
-        text_layer.alpha_composite(layer, (int(x), int(mid - (a + d) / 2)))
+        y = int(mid - (a + d) / 2)
+        message_x = int(x)
+        for index, part in enumerate(text.split(K8S_CENSOR_TOKEN)):
+            if index:
+                mark_w, mark_h = censor_size(f_text)
+                with Image.open(K8S_CENSOR_MARK) as mark:
+                    text_layer.alpha_composite(
+                        mark.convert("RGBA").resize((mark_w, mark_h), Image.LANCZOS),
+                        (message_x, int(mid - mark_h / 2)))
+                message_x += mark_w
+            if part:
+                part_w = int(math.ceil(probe.textlength(part, font=f_text)))
+                layer = _gradient_text(
+                    (part_w + 4, int(f_text.size * 1.4)), part, f_text,
+                    [(0.0, (255, 255, 255, 255)),
+                     (0.6, NAME_MID), (1.0, NAME_BOTTOM)])
+                text_layer.alpha_composite(layer, (message_x, y))
+                message_x += part_w
 
     img.alpha_composite(_with_text_shadow(text_layer))
     return img
@@ -1608,7 +1645,7 @@ def render_plate(spec):
     the site's own two: the top-of-frame `status` HUD, and the `companion`
     card that names a Guardian's bonded dinosaur beside their lower third.
 
-    The FULL-FRAME cards (`act`, `comic`) are not rendered here at all. They are
+    The FULL-FRAME cards (`act`, `comic`, `photo`) are not rendered here at all. They are
     the site's own components, and they are reproduced the way every other
     Wolves card is -- the real CSS in a browser (`cards/render-cards.mjs`),
     never a second implementation in Pillow. Rendering one here would silently
@@ -2983,7 +3020,7 @@ def render_all(entries, out_dir, picture=None):
     """Render every plate in a manifest -- except the full-frame cards.
 
     A manifest may mix the two: the megacut's hero segment carries six Guardian
-    plates and the comic title card. The cards come from `cards/render-cards.mjs`
+    plates and the full-frame title card. The cards come from `cards/render-cards.mjs`
     and land in the same directory under the same `plate_<id>.png` name, so
     both renderers fill one plates-dir and `burn` reads it without caring which
     tool drew which file. Skipped cards are returned so a caller can report
@@ -3066,11 +3103,15 @@ def _burn_units(entries):
     return units
 
 
-def burn(video, entries, plates_dir, out_path, ffmpeg=None):
+def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None):
     """Composite every plate onto ``video`` in one ffmpeg pass.
 
     Audio is stream-copied: this stage titles a cut, it does not re-cut it, and
     re-encoding audio here would be a second generation for no reason.
+
+    ``runner`` defaults to a local subprocess; a caller (the farm path in
+    ``scripts/build_act1.py``) may pass one that runs the same argv elsewhere
+    and fetches ``out_path`` back.
     """
     if ffmpeg is None:
         from tools.render import find_ffmpeg
@@ -3171,6 +3212,9 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None):
         str(out_path),
     ]
     print("ffmpeg:", " ".join(ffmpeg))
+    if runner is not None:
+        runner(cmd)
+        return out_path
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         tail = "\n".join(proc.stderr.strip().splitlines()[-15:])

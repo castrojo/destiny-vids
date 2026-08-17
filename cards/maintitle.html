@@ -230,8 +230,8 @@
      Owner, 2026-08-15: *"change the o in 'Wolves' to the kubernetes symbol -
      not the blue one though, just the white symbolic one"*.
 
-     It is CNCF's own published white icon, cached by
-     scripts/fetch_brand_marks.py into renders/marks/kubernetes.png -- the helm
+     It is CNCF's own published white SVG icon, cached by
+     scripts/fetch_brand_marks.py into renders/marks/kubernetes.svg -- the helm
      alone, no wordmark, and already `fill:#fff` in the source, so nothing here
      recolours somebody's trademark.
 
@@ -259,29 +259,20 @@
          letters   y 484..537   cap height 54 px, baseline 537, centre 510.5
          the helm  y 475..537   63 px tall -- 9 px ABOVE the cap line
 
-     So the mark was sitting ON the baseline correctly and overshooting the cap
-     line by 9 px, which is exactly what reads as "not centered": its optical
-     centre was 506 against the letters' 510.5.
+     Matching the cap height made the full white hexagon too visually heavy
+     beside the outline-like letter O. The symbol is deliberately 0.62em:
+     49 px tall, enough to read as the Kubernetes helm without becoming a
+     white tile in the word.
 
-     THE FIX IS THE HEIGHT, not a nudge. 54 / 78.4 = 0.689em makes the helm
-     exactly cap-height, and because `vertical-align: baseline` already seats
-     an inline image's bottom edge on the baseline, a cap-height box spans
-     cap-line to baseline on its own -- the same band the O occupied. It fits
-     vertically and its centre lands on the letters' centre without a single
-     hand-tuned offset.
-
-     HORIZONTALLY, equal margins are not the same as centred. The W's right
-     side bearing is wide (it is a diagonal letter) and the L's left bearing is
-     narrow, so symmetric margins put 11 px of air on the left and 7 px on the
-     right -- the mark sat 2 px right of the optical centre of the gap. The
-     slack is redistributed by that 2 px (0.026em) and the TOTAL advance is
-     unchanged, so nothing after it moves. Measured, not nudged until it looked
-     right. */
+     At 0.62em the mark's ink centroid is 3.3 px below the round O in "TO":
+     2.5 px from its shorter height and 0.8 px from the apex-up helm's lower
+     visual mass. A positive 0.042em vertical alignment raises it by those
+     3.3 px; the margins keep it visually centred between W and L. */
   .k8s-o {
-    height: 0.689em;
+    height: 0.62em;
     width: auto;
-    vertical-align: baseline;
-    margin: 0 0.046em 0 -0.006em;
+    vertical-align: 0.042em;
+    margin: 0 0.041em 0 -0.005em;
     filter:
       drop-shadow(0 0 4px rgb(0 0 0 / 95%))
       drop-shadow(0 2px 10px rgb(0 0 0 / 90%))
@@ -646,7 +637,7 @@
     const letter = titleText[oAt]
     const mark = document.createElement('img')
     mark.className = 'k8s-o'
-    mark.src = '../renders/marks/kubernetes.png'
+    mark.src = '../renders/marks/kubernetes.svg'
     mark.alt = letter
     mark.onerror = () => mark.replaceWith(document.createTextNode(letter))
     titleEl.textContent = ''

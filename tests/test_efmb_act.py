@@ -538,12 +538,8 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
     # CHAINED BACKWARD FROM THE WALK, not forward from 2:19. Correcting
     # WALK_IN to the walking shot's real first frame left 7.033 s for three
     # cards that need 7.100, so the exchange moves earlier as a block rather
-    # than squeezing Ricardo's question under the readable minimum. The floor
-    # is Dylan Taylor's badge, which is out at 134.767.
-    dylan = next(p for p in committed()["plates"]
-                 if p["id"] == "placeholder_dylan_taylor")
+    # than squeezing Ricardo's question under the readable minimum.
     for p in pre:
-        assert p["at"] >= dylan["at"] + dylan["dur"]
         assert p["at"] + p["dur"] <= walk_in + 1e-6
         assert p["dur"] >= build_efmb_plates.MIN_HOLD
     post = [toc[k] for k in ("toc_joseph_faith", "toc_ricardo_desktop",
@@ -740,8 +736,7 @@ def test_the_new_dialogue_lands_on_the_owners_seconds():
     assert by_id["chat_joseph_slop"]["text"] == "Here comes the slop"
     assert by_id["chat_karena_job"]["at"] == pytest.approx(77.433, abs=1e-3)
     assert by_id["chat_karena_job"]["text"] == "I love this job"
-    assert by_id["chat_riaan_choices"]["speaker"] == "riaankleinhans"
-    assert by_id["chat_riaan_choices"]["text"] == "Your choices are:"
+    assert all(p["label"] == "Your choices are:" for p in _choice_frames())
 
 
 def test_josephs_last_two_lines_keep_their_order_when_the_clock_cannot():
@@ -770,13 +765,16 @@ def test_the_choice_screen_is_a_full_frame_pause_menu():
     assert all(f["group"] == "choice_lfx" for f in frames)
 
 
-def test_the_menu_comes_up_on_riaans_line_and_is_a_quick_cut():
+def test_the_menu_owns_riaans_line_and_has_room_to_read():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    riaan = by_id["chat_riaan_choices"]
     frames = _choice_frames()
-    assert frames[0]["at"] >= riaan["at"] + riaan["dur"]
+    assert "chat_riaan_choices" not in by_id
+    assert frames[0]["at"] == pytest.approx(
+        206.0 - build_efmb_plates.MEGACUT_OFFSET, abs=1e-3)
+    assert all(frame["label"] == "Your choices are:" for frame in frames)
     span = round(frames[-1]["at"] + frames[-1]["dur"] - frames[0]["at"], 3)
     assert span == pytest.approx(build_efmb_plates.CHOICE_HOLD, abs=0.05)
+    assert span >= 4.0
 
 
 def test_the_frames_are_contiguous():
@@ -830,37 +828,10 @@ def test_nothing_on_the_menu_is_selected():
 
 
 
-def test_no_card_rides_onto_karenas_jump():
-    """"there's an erroneous long walk in the part with karena".
-
-    The chapter card was anchored to source 165.567 -- 0.032 s before the
-    walking shot's LAST frame, a whole shot late -- so it came up after the
-    walk had cut away and held five seconds over Karena diving into the
-    sinkhole, captioned "Glorious Eggroll and the new kids ...".
-
-    The fix is not a nudge: her jump is a NO-PLATE ZONE now, so the guarantee
-    is against every future cue rather than against the one that happened to
-    hit it.
-    """
-    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    lead = build_efmb.derive_lead()
-    jump = next(z for z in build_efmb_plates.NO_PLATE_SRC if "Karena" in z[2])
-    jump_in = build_efmb.film_for_source(jump[0], lead)
-
-    card = by_id["walk_chapter"]
-    # STRICTLY BEFORE, not `<=`. The original assertion allowed the card to end
-    # exactly ON jump_in, and that is the frame the zone exists to protect --
-    # which is how this shipped green three times (#184, #192). The card ended
-    # at 148.533, and build_efmb_plates' own commit message calls 148.533 "the
-    # frame she jumps on".
-    assert card["at"] + card["dur"] < jump_in, \
-        "the chapter card is on Karena's jump again"
-    # ... and it is on the walk it names, which is only 1.8 s long.
-    walk_in = build_efmb.film_for_source(build_efmb_plates.WALK_IN, lead)
-    assert card["at"] >= walk_in
-    assert card["at"] - walk_in == pytest.approx(
-        build_efmb_plates.WALK_CARD_LEAD, abs=1e-3)
-    assert card["dur"] >= build_efmb_plates.MIN_HOLD
+def test_the_long_walk_has_a_marker_but_no_title_card():
+    manifest = build_efmb_plates.build()
+    assert any(c["title"] == "The Long Walk" for c in manifest["chapters"])
+    assert not any(p["id"] == "walk_chapter" for p in manifest["plates"])
 
 
 def test_no_cue_anywhere_ends_inside_a_no_plate_zone():

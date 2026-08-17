@@ -1,0 +1,334 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destiny-vids.local/schema/ending-cards.schema.json",
+  "title": "MegacutEndingCards",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "_what",
+    "pause",
+    "underwater",
+    "plates"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "_what": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pause": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fps",
+        "fade_frames",
+        "gap_frames",
+        "black_hold_frames",
+        "frames",
+        "duration",
+        "plate_ids"
+      ],
+      "properties": {
+        "fps": {
+          "const": "60000/1001"
+        },
+        "fade_frames": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "gap_frames": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "black_hold_frames": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "frames": {
+          "const": 1380
+        },
+        "duration": {
+          "const": 23.023
+        },
+        "plate_ids": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "_black_hold": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the tail hold is the length it is. Prose, not consumed by the builder."
+        }
+      }
+    },
+    "underwater": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_in",
+        "source_out",
+        "active_y",
+        "active_height",
+        "plate_ids"
+      ],
+      "properties": {
+        "source_in": {
+          "const": 396.32
+        },
+        "source_out": {
+          "const": 499.3
+        },
+        "active_y": {
+          "const": 138
+        },
+        "active_height": {
+          "const": 804
+        },
+        "plate_ids": {
+          "type": "array",
+          "minItems": 10,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "_window": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the window is what it is. Prose, not consumed by the builder."
+        }
+      }
+    },
+    "plates": {
+      "type": "array",
+      "minItems": 15,
+      "maxItems": 15,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/pause_card"
+          },
+          {
+            "$ref": "#/$defs/underwater_card"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "base_card": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "ending"
+        }
+      },
+      "required": [
+        "id",
+        "kind"
+      ]
+    },
+    "pause_card": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/base_card"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "section",
+            "mode",
+            "frames",
+            "wallpaper",
+            "title"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "ending"
+            },
+            "section": {
+              "const": "pause"
+            },
+            "mode": {
+              "const": "pause"
+            },
+            "frames": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "wallpaper": {
+              "type": "string",
+              "minLength": 1
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "underwater_card": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/base_card"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "section",
+            "mode",
+            "placement",
+            "text",
+            "at",
+            "dur",
+            "fade_in",
+            "fade_out"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "const": "ending"
+            },
+            "section": {
+              "const": "underwater"
+            },
+            "mode": {
+              "const": "overlay"
+            },
+            "placement": {
+              "enum": [
+                "bottom_matte",
+                "center"
+              ]
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            },
+            "emphasis": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "text",
+                  "style"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "style": {
+                    "const": "seared"
+                  }
+                }
+              }
+            },
+            "at": {
+              "type": "number",
+              "minimum": 0
+            },
+            "dur": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "fade_in": {
+              "type": "number",
+              "minimum": 0
+            },
+            "fade_out": {
+              "type": "number",
+              "minimum": 0
+            },
+            "_what": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Why this card reads and sits the way it does, in the owner's words where they authored it. Prose, not rendered."
+            },
+            "_retired_copy": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Copy this plate used to carry. Retired strings are authored copy and are kept, never deleted."
+            },
+            "blue_letters": {
+              "type": "boolean",
+              "description": "Light the b/B/f/F of 'bluefin' in the house accent, per tools/blueletters.py. Colour only."
+            },
+            "glyph": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "token",
+                "accent",
+                "accent_style"
+              ],
+              "description": "An authored mark drawn where a letter would be.",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The character in `text` the mark stands in for."
+                },
+                "accent": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The diacritic drawn above the mark."
+                },
+                "accent_style": {
+                  "enum": [
+                    "seared"
+                  ],
+                  "description": "How the accent is treated. The MARK is never restyled."
+                }
+              }
+            },
+            "glyph_src": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Repo-relative path to the mark. Checked for existence at render time."
+            },
+            "_treatment": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Why the card looks the way it does, and what may not be restyled. Prose, not rendered."
+            }
+          }
+        }
+      ]
+    }
+  }
+}

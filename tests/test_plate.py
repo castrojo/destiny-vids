@@ -2256,9 +2256,9 @@ def test_the_act_vi_tail_speaks_in_pills_not_a_stacked_card():
     gaps = [round(b["at"] - a["at"], 3) for a, b in zip(lines, lines[1:])]
     assert gaps == [3.158] * 5, gaps
 
-    # After every gold credit, and never two on screen at once.
-    credits_end = max(p["at"] + p["dur"] for p in plates if p.get("kind") != "chat")
-    assert lines[0]["at"] > credits_end
+    # Before the Cayde reveal, and never two cards on screen at once.
+    reveal = next(p for p in plates if p["id"] == "cayde_reveal_castrojo")
+    assert lines[-1]["at"] + lines[-1]["dur"] < reveal["at"]
     for a, b in zip(lines, lines[1:]):
         assert a["at"] + a["dur"] <= b["at"], f"{a['id']} overlaps {b['id']}"
 

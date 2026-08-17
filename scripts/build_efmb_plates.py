@@ -287,21 +287,20 @@ NEW_CHATS = [
 #   "whip up a quick mouse pointer starting at the center and then moving
 #    towards the fighting choice but have it cut so it's a teaser quick cut"
 #
-# So: a FULL-FRAME pause menu straight after riaankleinhans's line, the second
-# option carrying Destiny's amber legendary chrome, and a cursor that leaves
-# the centre of the screen heading for it and never arrives -- the film cuts
-# first. It is animated the only way a still-plate pipeline can animate: a
-# short run of frames, each one a plate, one group, back to back.
+# So: a FULL-FRAME pause menu that carries riaankleinhans's question in its
+# heading, the second option carrying Destiny's amber legendary chrome, and a
+# cursor that leaves the centre of the screen heading for it and never arrives
+# before the film cuts. It is animated the only way a still-plate pipeline can
+# animate: a short run of frames, each one a plate, one group, back to back.
 CHOICE_OPTIONS = [
     "Update your LFX Profile",
     {"text": "Do it the hard way", "tier": "legendary"},
 ]
-CHOICE_HOLD = 1.5          # the whole teaser, cut to cut
+CHOICE_HOLD = 4.2          # Riaan's prompt and the decision screen, one window
 CHOICE_FPS = 16            # the cursor's frame rate; the film's is 59.94.
-                           # 16 x 1.5 s = 24 frames exactly, so the image2
+                           # Rounded to 67 frames, long enough to read.
                            # sequence has an integral rate and tpad does not
                            # have to round one.
-CHOICE_LEAD = 0.2          # air between riaan's pill and the menu
 
 # One person, one shot. Each verified by eye at the frame named in `seen`.
 # REMOVED, owner instruction for "The Long Walk": William Rizzo's credit sat
@@ -348,24 +347,10 @@ SOLO = [
     },
 ]
 
-# The people the owner NAMED for act II but authored no plate copy for
-# (`ensemble.placeholders`). They are credited as named placeholders: the name
-# he gave, and the neutral eyebrow -- no title, no class, no seal, because
-# nobody wrote one. This is the "missing, so omit and record" case, and it is
-# the opposite of inventing the words to fill the row.
-PLACEHOLDERS = [
-    {"key": "dylan_taylor", "src": (147.633, 150.533), "seen": 148.500,
-     "why": "the Titan walking out of the dark"},
-    # AHMED ADAN'S BADGE IS REMOVED, owner instruction: "get rid of the
-    # hanthor plate, ahmed, etc. here". It sat at source 241.167 (film
-    # 3:37.3), at the end of "The Long Walk" and directly after the villain
-    # arrives. He was ALREADY re-anchored once, off 171.800 where the plate
-    # came up under Bungie's burned-in "BECOME LEGEND"; this time the chapter
-    # itself is what displaces him.
-    #
-    # He stays in ensemble.placeholders, which is the queue that owes him a
-    # plate -- nothing about his standing changed, only where act II had room.
-]
+# Dylan Taylor and Ahmed Adan remain recorded in `ensemble.placeholders`, but
+# neither has a scheduled Act II nameplate. The owner removed Dylan's card;
+# Ahmed's had already been removed when The Long Walk displaced it.
+PLACEHOLDERS = []
 
 # The blueberries -- the month's contributors, in the anonymous slots. Copy is
 # resolved by tools/plate.py's own ensemble path, so a contributor whose
@@ -537,27 +522,6 @@ WALK_OUT = 244.832         # run 4's last frame; nothing here may cross it
 # The owner's own marks, where a cue is timed to one rather than to a shot.
 WALK_MARK_STREAM = 201.299     # "4:59 Alright A1RMAX turn the stream on"
 WALK_MARK_UPSTREAM = 210.299   # "5:08 he says ..."
-
-# THE CHAPTER CARD. `kind: "title"` is the deck's own title card, so this adds
-# no renderer: `title` over `subtitle`, and no third row.
-#
-# Both strings are the owner's, verbatim and from the same brief: he wrote the
-# chapter in as "Glorious Eggroll and the new kids ..." and then named it --
-# 'Make this one "The Long Walk"'. The name is the title and the line he wrote
-# it in as is the subtitle; the ellipsis is his.
-# TODO(owner): if the subtitle is not wanted, delete it -- it is reproduced,
-# not required.
-# The chapter card gets a SHORTER lead than everything else. Its shot is only
-# 1.8 s long and Karena's jump is the next frame after it, so the ordinary
-# 0.4 s of "let the cut land first" is 0.2 s the card cannot spare: at 0.4 it
-# clears the jump zone with 2.1 s, under the readable minimum, and would be
-# dropped entirely.
-WALK_CARD_LEAD = 0.2
-
-WALK_CARD = {
-    "title": "The Long Walk",
-    "subtitle": "Glorious Eggroll and the new kids ...",
-}
 
 # THE SCENE, IN ORDER. One lane, one card at a time: a plate arrives, then the
 # lines that follow it, then the next plate.
@@ -1352,30 +1316,13 @@ def build():
             at = round(spec["at_megacut"] - MEGACUT_OFFSET, 3)
         else:
             at = round(chat_cursor + PLATE_GAP, 3)
-        entry = {
-            "id": spec["id"],
-            "kind": "chat",
-            "at": at,
-            "dur": spec["hold"],
-            "copy_source": "owner_supplied",
-            "speaker": spec["speaker"],
-            "text": spec["text"],
-            "text_source": "owner_supplied",
-        }
-        if spec.get("key"):
-            entry.update(chat_avatar(spec["key"], casting))
-        elif spec.get("login"):
-            entry["avatar"] = str(AVATAR_DIR / f"{spec['login']}.png")
-            entry["avatar_url"] = (
-                f"https://github.com/{spec['login']}.png?size=256")
-        plates.append(entry)
-        chat_cursor = round(at + spec["hold"], 3)
 
-        # riaankleinhans asks, and the menu comes up on his line's tail.
+        # The full-frame choice screen owns Riaan's question. Rendering a
+        # separate chat pill spends the same text twice and delays the graphic.
         if spec["id"] == "chat_riaan_choices":
             frames = max(2, int(round(CHOICE_HOLD * CHOICE_FPS)))
             step = round(CHOICE_HOLD / frames, 4)
-            start = round(chat_cursor + CHOICE_LEAD, 3)
+            start = at
             for n in range(frames):
                 t = n / (frames - 1)
                 plates.append({
@@ -1394,6 +1341,26 @@ def build():
                 })
             choice_end = round(start + frames * step, 3)
             chat_cursor = max(chat_cursor, choice_end)
+            continue
+
+        entry = {
+            "id": spec["id"],
+            "kind": "chat",
+            "at": at,
+            "dur": spec["hold"],
+            "copy_source": "owner_supplied",
+            "speaker": spec["speaker"],
+            "text": spec["text"],
+            "text_source": "owner_supplied",
+        }
+        if spec.get("key"):
+            entry.update(chat_avatar(spec["key"], casting))
+        elif spec.get("login"):
+            entry["avatar"] = str(AVATAR_DIR / f"{spec['login']}.png")
+            entry["avatar_url"] = (
+                f"https://github.com/{spec['login']}.png?size=256")
+        plates.append(entry)
+        chat_cursor = round(at + spec["hold"], 3)
 
     # --- the montage asides (owner brief #98) ------------------------------
     # The ranked announcement cards are GONE with AN4-CH3CK-12; the owner's own
@@ -1443,15 +1410,6 @@ def build():
         cursor[0] = round(at + room + PLATE_GAP, 3)
         walk.append(entry)
         return entry
-
-    walk_cue({
-        "id": "walk_chapter",
-        "kind": "title",
-        "copy_source": "owner_supplied",
-        "seen_at_src": WALK_IN,
-        "why": "the chapter card, on the walk it names",
-        **WALK_CARD,
-    }, src=WALK_IN, hold=5.0, lead=WALK_CARD_LEAD)
 
     for spec in WALK_SEQUENCE:
         if spec["cue"] == "plate":

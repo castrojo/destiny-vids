@@ -68,6 +68,13 @@ caveats go after, and go short.
 publish a wrong credit — but "this cut could be better" is never a reason to
 withhold it.
 
+**A blocked act is seated, not waited for.** Owner, 2026-08-16, verbatim: *"I'd
+rather have broken plates than no video."* An act whose plates cannot be placed
+still plays: render it without them, record what is unresolved, and assemble the
+programme. Nothing in this repo may hold the show back for a card. The width of
+that licence — and it is exactly one square wide — is under **Degrade, never
+block** below.
+
 ## The three rules that outrank convenience
 
 1. **`clean` is the primary gate, and it must be positively established.** An
@@ -118,7 +125,44 @@ because CI must stay green while copy is being written.
 **Three classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, and a licensing decision. An agent that
 reaches one, records `automatable: no` with the missing decision in
-`blocked_on`, and stops has **succeeded**.
+`blocked_on`, and stops has **succeeded** — the *decision* stops there. The
+film does not.
+
+### A plate may be missing. It may never be stale, and never false
+
+Owner ruling: *"I'd rather have broken plates than no video."* And its limit,
+from the same session: *"stale is never ok because that's wrong."* So **broken
+means missing** — nothing else:
+
+| | |
+|---|---|
+| A plate that is **absent** because nobody could place it | Ship it missing. Record it in `unresolved`. |
+| A plate that is **stale** — rendered from copy or a template that has since moved | **Never.** Re-render it. If it cannot be brought current, drop it. |
+| A plate placed on a shot the evidence does not support | **Never.** Omit it instead. |
+
+Stale is not a lesser fault than misplaced; it is the same fault with an older
+timestamp. It puts copy on screen that the record no longer says, which is how
+the main title once shipped 17 hours out of date because its PNGs merely
+*existed*. **Existence is not freshness** — every card and plate is re-rendered
+from its current template before its act is rebuilt.
+
+A false plate is worse again: a pill placed without evidence puts a real
+person's words against a shot they were not written for, which is a claim about
+a real person. **Omission degrades; stale and misplaced both lie.**
+
+No finding about an act's clock stops the programme either. When a manifest's
+clock is in question, take the best rung the evidence supports and stop there:
+
+| Rung | What ships |
+|---|---|
+| (a) | Clock resolved by measurement; every plate re-rendered and re-verified on the shot its `why` describes. |
+| (b) | The requested change applied and verified; the already-verified plates carried through from a burn whose placement is itself evidenced. |
+| (c) | The act re-rendered from current templates carrying **only** the plates that can be placed, the rest dropped and recorded. |
+
+Rung (c) is always reachable, so "blocked, nothing delivered" is not an
+outcome — and neither is "shipped the old master because its plates were
+awkward". Escalating the clock decision still follows the `blocked_on` record
+above; that record rides beside a shipped act, never instead of one.
 
 ### A rights *decision* blocks. A rights *choice* does not
 
@@ -179,6 +223,15 @@ punch list; the backlog is for work.
   written: `dialogue/<video_id>/dialogue.json` with source timecodes and
   per-line evidence, beside the `DIALOGUE.md` the owner edits.
   `redactions/<video_id>.json` only ever *removes* burned-in publisher copy.
+- **Recovering authored copy is lookup, not reconstruction.** If the owner says
+  a card, dialogue line, or credit was dropped, changed, or lost, inspect every
+  worktree before editing: `git worktree list`, then search its records for the
+  distinctive phrase. The record can intentionally remove adjacent cards or
+  transfer their timing weight. Copy that entire authored object and its
+  companion tests verbatim; never infer a shortened quote, re-add a removed
+  card, or render over a delivery master until the recovered object matches its
+  source exactly. The target repository remains authority; a worktree is
+  evidence of in-progress authored state, not a source of policy.
 - **Never publish commercially.** Bungie footage is used under Bungie's
   fan-content policy, which permits non-commercial fan creations. Every video
   record carries `usage_class` and `source_rights_note`. An asset claiming
@@ -257,6 +310,26 @@ read, so it has to buy more than tidiness.
   corrected in `docs/rendering.md`.
 - On an atomic Fedora/Bluefin host the default `ffmpeg` is `ffmpeg-free`: no
   H.264, and it fails only once decoding starts. See `docs/rendering.md`.
+- **Encoding is remote by default.** Owner, 2026-08-16, verbatim: *"why are you
+  defaulting to locally that is incorrect, always prefer remote encoding when
+  available."* The question is never "is this long enough to be worth the
+  cluster" — it is "is the cluster reachable". If it is, the encode runs there.
+  `exo-0` (`core@192.168.1.170`) has **32 cores against this workstation's 16**,
+  and it is not also running the agent sessions, so local encoding is slower
+  *and* it starves the thing asking for it.
+
+  Local is a **fallback with a stated reason**, never a default and never
+  silent: a tool that quietly encodes here because the cluster was awkward has
+  the bug the ruling above names. `tools/farm.py` is the reference posture —
+  cluster unless `cluster_available()` says otherwise, `--local` as an explicit
+  escape hatch.
+
+  The node has the `linuxserver/ffmpeg` image cached; stage inputs into
+  `/var/mnt/exo0-stage/dv` and pin the pod to it with
+  `imagePullPolicy: IfNotPresent`. The registry mirror times out on a plain
+  pull, and the footage is never already there. Recipe in
+  [`docs/rendering.md`](docs/rendering.md), operations in
+  [`docs/skills/farm.md`](docs/skills/farm.md).
 
 ## The merge queue
 

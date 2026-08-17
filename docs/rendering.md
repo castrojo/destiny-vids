@@ -181,6 +181,58 @@ never a guess:
 ffmpeg: podman exec bluefin-thumbnailer ffmpeg
 ```
 
+## Encoding on the cluster: `exo-0`
+
+Long encodes belong on **exo-0** (32 cores) rather than the workstation. The
+image is already in that node's containerd, so the whole loop is SSH plus one
+pod.
+
+**The node and its staging area.** `core@192.168.1.170`, k3s node `exo-0`.
+`~/Videos` and `media/` are **not** there and `/var/mnt/exo0-stage` is
+root-owned, so make the work directory once:
+
+```bash
+ssh core@192.168.1.170 'sudo mkdir -p /var/mnt/exo0-stage/dv \
+    && sudo chown core:core /var/mnt/exo0-stage/dv'
+scp <inputs> core@192.168.1.170:/var/mnt/exo0-stage/dv/
+```
+
+**Pin the tag and never pull.** The cluster resolves images through a registry
+mirror on ghost (`192.168.1.102:30501`) which times out on these tags, and the
+pod then sits in `ErrImagePull` with the image already on disk. Both
+`lscr.io/linuxserver/ffmpeg:latest` and `:8.1.2-cli-ls76` are cached — pin the
+digest-bearing tag and `imagePullPolicy: IfNotPresent`.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata: {name: ffmpeg-encode}
+spec:
+  restartPolicy: Never
+  nodeSelector: {kubernetes.io/hostname: exo-0}
+  containers:
+  - name: ffmpeg
+    image: lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76
+    imagePullPolicy: IfNotPresent          # the mirror will time out otherwise
+    args: ["-hide_banner","-y","-i","/work/in.mp4", ...,"/work/out.mp4"]
+    volumeMounts: [{name: work, mountPath: /work}]
+  volumes:
+  - name: work
+    hostPath: {path: /var/mnt/exo0-stage/dv, type: Directory}
+```
+
+The **entrypoint is already `ffmpeg`**, so `args` are its arguments — do not
+repeat the binary name. Collect the result with `scp` from the same directory.
+
+Verified on that image: `libx264`, `aac`, `libfdk_aac`, `flac`, `libopus`. It
+is a full build, so unlike `/usr/bin/ffmpeg` it will not die once decoding
+starts.
+
+**What it does not solve.** Storage is `local-path` (RWO) and the footage lives
+on the workstation, so every input is staged by hand and every output copied
+back. That transfer is the real cost, which makes the cluster worth it for long
+encodes and not worth it for a card render.
+
 ## Fallback: `imageio-ffmpeg`
 
 Off Bluefin, or with no container running, `pip install imageio-ffmpeg` supplies

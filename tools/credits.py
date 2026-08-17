@@ -20,11 +20,11 @@ their authored case too.
 
 ## Faces, in strict order of what can be proved
 
-1. **The authored Guardian card.** Seven people have one, written by the owner
-   and living in the website's ``characters.json`` -- a full 1200x630 card with
-   their nameplate, class, title and Guardian bond. Where one exists it is
-   reproduced whole, because it *is* the authored identity; nothing here
-   redraws it.
+1. **The authored Guardian identity.** Seven people have one, written by the
+   owner and living in the website's ``characters.json`` -- ``label``,
+   ``class``, ``name``, ``title``. Those strings are reproduced verbatim
+   beside their face. The 1200x630 splash card they also live on is NOT used:
+   *"get rid of those hero splashes they suck."*
 2. **A verified GitHub avatar.** ``vocab/casting.yaml`` carries an optional
    ``github:`` field for exactly this and says why: a login "is verifiable; a
    real name may not be", recording the ``nimbatus``/``nimbinatus`` trap where
@@ -57,13 +57,19 @@ setting rather than a second file.
 
 ## The frame is the desktop
 
-Owner: *"Use the dinosaur artwork here instead of black, use the dark mode
-wallpapers, make them go through the entire calendar order and keep switching."*
-Every card sits on one of Project Bluefin's monthly **night** wallpapers,
-advanced card by card in calendar order and wrapping, cached by
-``scripts/fetch_wallpapers.py``. A month whose art is not installed is skipped,
+Owner: *"Use the dinosaur artwork here instead of black, make them go through
+the entire calendar order and keep switching"*, and then *"I just want light
+colored wallpapers"*. Every card sits on one of Project Bluefin's monthly
+**day** wallpapers, advanced card by card in calendar order and wrapping,
+cached by ``scripts/fetch_wallpapers.py``. A month whose art is not installed
+is skipped -- November ships none in either variant, so the cycle is eleven --
 and a machine with none of them falls back to the deck's ink rather than
 failing.
+
+The wallpapers changed; **the presentation did not**. This is still a
+white-on-dark credit roll, so the grade under the type is the same one, only
+lighter: the day art keeps enough of its daylight to be recognisably the light
+wallpaper while the type still reads off it.
 """
 
 from __future__ import annotations
@@ -72,7 +78,7 @@ import re
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 from tools import blueletters
 from tools.plate import _draw_tracked, _tracked_width
@@ -152,29 +158,38 @@ def _ink():
 
 
 def wallpapers():
-    """The installed monthly night wallpapers, in calendar order."""
+    """The installed monthly **day** wallpapers, in calendar order.
+
+    The night frames sit in the same directory under their bare ``NN.png``
+    names, because the prologue's bridge reads them. The glob is anchored so
+    the two sets can never mix into one cycle.
+    """
     if not WALLPAPER_DIR.is_dir():
         return []
-    return sorted(p for p in WALLPAPER_DIR.glob("[0-1][0-9].png"))
+    return sorted(p for p in WALLPAPER_DIR.glob("[0-1][0-9]-day.png"))
 
 
 def _graded(path):
     """One wallpaper, graded so a credit can be read off it.
 
-    Three things, in order, and each is doing a job:
+    Two things now, and each is doing a job:
 
-    * **darken** -- the art is night-lit but its skies are bright enough to
-      swallow white type;
     * **blue** -- the green channel is pulled back and the blue lifted, which
       is the owner's *"more blue than gold"* in one operation. It cannot turn
       a warm month warm again;
     * **a centre scrim** -- a soft dark band through the middle third, where
       every card puts its name. The corners keep their dinosaurs.
+
+    **The exposure is not touched.** The night set was darkened to 0.46 because
+    its skies could still swallow white type; the day set is here because the
+    owner asked for the light wallpapers, and darkening one back down is how
+    you get a night wallpaper with extra steps. The scrim alone carries the
+    type -- measured, not assumed, by
+    ``test_the_type_can_be_read_off_every_month``.
     """
     if path in _WALLS:
         return _WALLS[path]
     img = Image.open(path).convert("RGB").resize((W, H), Image.LANCZOS)
-    img = ImageEnhance.Brightness(img).enhance(0.46)
     r, g, b = img.split()
     img = Image.merge("RGB", (r.point(lambda v: int(v * 0.80)),
                               g.point(lambda v: int(v * 0.86)),
@@ -249,17 +264,33 @@ def avatar(login, size):
         return None
 
 
-def cast_card(slug):
-    """An authored Guardian card, reproduced whole, or ``None``."""
+def cast_identity(slug):
+    """The authored Guardian identity for ``slug`` as **fields**, or ``None``.
+
+    Owner: *"get rid of those hero splashes they suck."* The website's
+    1200x630 card is a splash composite -- somebody's nameplate over a
+    full-bleed Destiny still -- and it is no longer dropped into the frame
+    whole.
+
+    What was authored is the COPY, and that is reproduced verbatim: ``label``,
+    ``class``, ``name``, ``title``, exactly as written in the website's
+    ``characters.json``. Nothing here writes an identity, shortens one, or
+    fills a row nobody authored -- a person with no ``title`` gets no title
+    row. Cached by ``scripts/build_credits.py`` so the render needs neither the
+    network nor the other checkout.
+    """
     if not slug:
         return None
-    path = CAST_CARD_DIR / f"{slug}.png"
+    path = CAST_CARD_DIR / "identities.json"
     if not path.exists():
         return None
     try:
-        return Image.open(path).convert("RGBA")
-    except OSError:
+        import json
+        rows = json.loads(path.read_text())
+    except (OSError, ValueError):
         return None
+    row = rows.get(slug) if isinstance(rows, dict) else None
+    return row or None
 
 
 def summit_portrait(photo, size):
@@ -616,66 +647,173 @@ def render_birthday_card(eyebrow, name, body, index=0):
     return img
 
 
-def render_cast_placard(person, character, card=None, login=None, photo=None,
-                        index=0):
-    """One member of the cast.
+# THE HERO CREDIT'S SECOND LINE IS THE PERSON'S OWN.
+#
+# Owner: *"for the 'hero' credits use the github titles"*. What a placard says
+# about somebody is therefore what THEY say about themselves -- the bio off
+# their GitHub profile, or copy the owner supplied verbatim -- and never a
+# sentence this repo composed. The authored Guardian identity is not lost; it
+# is where it was authored, on the acts' own plates, and the credit answers a
+# different question: who is this person when they are not a Guardian.
+#
+# `<br>` is a hard break, because the copy arrives with them in it.
+TITLE_SIZE = 29
+TITLE_LINE = 38
+TITLE_WIDTH = W * 0.62
+TITLE_MAX_LINES = 6
 
-    With an authored Guardian card, the card IS the placard: it already carries
-    their label, class, name, title and bond, all owner-written, and the only
-    thing added is the character they played. Redrawing that copy here would be
-    a second source of truth for words somebody already authored.
 
-    A ``photo`` -- an owner-drawn crop out of a CNCF summit photograph -- beats
-    both the card and the avatar, because it is the thing the owner asked for.
+def title_lines(text, draw, font, width=TITLE_WIDTH):
+    """Wrap a GitHub title. ``<br>`` breaks; the rest is greedy at ``width``."""
+    lines = []
+    for para in re.split(r"<br\s*/?>", text or ""):
+        words, current = para.split(), ""
+        if not words:
+            # A `<br><br>` is a blank line the author asked for, and it is the
+            # only reason an empty line is ever drawn.
+            if lines and lines[-1] != "":
+                lines.append("")
+            continue
+        for word in words:
+            trial = f"{current} {word}".strip()
+            if current and draw.textlength(trial, font=font) > width:
+                lines.append(current)
+                current = word
+            else:
+                current = trial
+        if current:
+            lines.append(current)
+    while lines and lines[-1] == "":
+        lines.pop()
+    return lines[:TITLE_MAX_LINES]
+
+
+# THE HERO CREDIT IS A LOWER THIRD.
+#
+# It got there by elimination, and every step is a thing the owner rejected.
+# Centred type over the day wallpapers measured 1.02:1 at its worst -- a
+# February snowfield puts near-white under near-white. Brightening the art:
+# *"don't brighten the slides that looks like shit."* An opaque surface behind
+# the type: *"what the hell is this."* A feathered veil: *"that veil contrast
+# is crappy."*
+#
+# So: *"or lower-third-like structure."* A chyron does not fight the picture,
+# it OWNS a corner of it. The ink is opaque where the type sits and ramps away
+# to nothing across the frame, so the month is still legible as a month -- the
+# dinosaurs, the snow, the sun -- and the copy sits on a field that does not
+# change from card to card.
+LOWER_HEIGHT = 384          # the band
+LOWER_TOP = H - 452         # its seat, clear of the 60px safe margin
+LOWER_FACE = 232            # the portrait inside it
+LOWER_PAD = 110             # left margin
+LOWER_RAMP = 0.62           # ink is solid to here, then falls to nothing
+LOWER_INK = 238             # the band's alpha where it is solid
+
+
+def _lower_third(img):
+    """The band: solid ink under the type, ramped to nothing across the frame.
+
+    The ramp is the whole idea. A full-width slab at one alpha is a letterbox
+    and reads as a mistake; a band that ends in the middle of the picture reads
+    as broadcast. The top edge carries a hairline in the film's blue, which is
+    what stops the ink looking like a smudge -- it is the only hard edge on the
+    card, and it fades on the same ramp as the ink under it.
+    """
+    ramp = Image.new("L", (W, 1), 0)
+    for x in range(W):
+        f = x / W
+        a = 1.0 if f <= LOWER_RAMP else max(0.0, 1 - (f - LOWER_RAMP) / (1 - LOWER_RAMP))
+        ramp.putpixel((x, 0), int(255 * a ** 2.2))
+    ramp = ramp.resize((W, LOWER_HEIGHT))
+
+    band = Image.new("RGBA", (W, LOWER_HEIGHT), (6, 10, 18, 255))
+    alpha = ramp.point(lambda v: int(v * LOWER_INK / 255))
+    band.putalpha(alpha)
+    img.alpha_composite(band, (0, LOWER_TOP))
+
+    rule = Image.new("RGBA", (W, 2), ACCENT)
+    rule.putalpha(ramp.crop((0, 0, W, 2)).point(lambda v: int(v * 0.72)))
+    img.alpha_composite(rule, (0, LOWER_TOP))
+
+
+def render_cast_placard(person, character=None, card=None, login=None,
+                        photo=None, title=None, guardian_title=None, index=0):
+    """One of the principals: their face, their name, their seal, their work.
+
+    Set as a lower third -- face left, three rows of type beside it:
+
+        Kat Cosgrove
+        as Defender Queen of the Lost
+        Village Sorceress at VillageSQL ...
+
+    **The Destiny character name is not printed** -- owner, 2026-08-16: *"drop
+    the Destiny names, do it like 'Kat Cosgrove as Defender Queen... blah'"*.
+    What follows *as* is the Guardian TITLE somebody authored for that person,
+    and a title nobody authored is left out rather than filled. The third row
+    is the person's own GitHub bio, which is the only row that is theirs rather
+    than the film's.
+
+    ``label`` and ``class`` are not here: Guardian chrome belongs on the acts'
+    plates, where it was authored. ``character`` is still accepted so a caller
+    that has one is not an error, and is deliberately not drawn.
+
+    A ``photo`` -- an owner-drawn crop out of a CNCF summit photograph -- still
+    beats the avatar, because it is the thing the owner asked for.
     """
     img = backdrop(index)
+
+    if person == REDACTED:
+        # A redaction suppresses the FACE and the identity too. Printing
+        # "[ REDACTED ]" over somebody's avatar, or over the seal that names
+        # them, is not a redaction -- it is a caption on a reveal.
+        card, login, photo, title, guardian_title = None, None, None, None, None
+
+    _lower_third(img)
     d = ImageDraw.Draw(img)
 
-    # A redacted name suppresses the FACE and the authored card too. Printing
-    # "[ REDACTED ]" over somebody's avatar, or over a Guardian card that has
-    # their real name set into the art, is not a redaction -- it is a caption
-    # on a reveal.
-    if person == REDACTED:
-        card, login, photo = None, None, None
+    portrait = summit_portrait(photo, LOWER_FACE)
+    identity = cast_identity(card) or {}
 
-    portrait = summit_portrait(photo, 420)
-    art = None if portrait is not None else cast_card(card)
+    f_person = _font("bold", 62)
+    f_as = _font("regular", 22)
+    f_seal = _font("regular", 38)
+    f_title = _font("regular", TITLE_SIZE)
 
-    if art is not None:
-        target_w = 1500
-        scaled = art.resize((target_w, int(art.height * target_w / art.width)),
-                            Image.LANCZOS)
-        top = (H - scaled.height) / 2 - 70
-        img.alpha_composite(scaled, (int((W - target_w) / 2), int(top)))
-        y = top + scaled.height + 40
-        f_as = _font("regular", 24)
-        _draw_tracked(d, (_centre(d, "as", f_as, TRACKING), y), "as", f_as, ACCENT, TRACKING)
-        f_char = _font("bold", 52)
-        _blue_bs(d, (_centre(d, character, f_char, NAME_TRACKING), y + 44),
-                 character, f_char, TEXT, NAME_TRACKING)
-        return img
+    # The authored spelling of a person's own name wins over the manifest's.
+    name = identity.get("name") or person
+    seal = guardian_title or identity.get("title")
 
-    size = 420 if portrait is not None else 300
-    face = portrait if portrait is not None else avatar(login, size)
-    top = (H - (size + 250)) / 2
-    img.alpha_composite(face if face is not None else _empty_circle(size),
-                        (int((W - size) / 2), int(top)))
+    face_x, face_y = LOWER_PAD, LOWER_TOP + (LOWER_HEIGHT - LOWER_FACE) / 2
+    face = portrait if portrait is not None else avatar(login, LOWER_FACE)
+    img.alpha_composite(face if face is not None else _empty_circle(LOWER_FACE),
+                        (int(face_x), int(face_y)))
     if face is None and person != REDACTED:
-        f_i = _font("bold", 110)
+        f_i = _font("bold", 88)
         initial = (person or "?")[0]
-        _blue_bs(d, (_centre(d, initial, f_i), top + size / 2 - 78), initial, f_i, DIM)
+        w = d.textlength(initial, font=f_i)
+        _blue_bs(d, (face_x + (LOWER_FACE - w) / 2, face_y + LOWER_FACE / 2 - 62),
+                 initial, f_i, DIM)
 
-    y = top + size + 54
-    f_person = _font("bold", 68)
-    _blue_bs(d, (_centre(d, person, f_person, NAME_TRACKING), y),
-             person, f_person, TEXT, NAME_TRACKING)
-    y += 94
-    f_as = _font("regular", 24)
-    _draw_tracked(d, (_centre(d, "as", f_as, TRACKING), y), "as", f_as, ACCENT, TRACKING)
-    y += 46
-    f_char = _font("regular", 44)
-    _blue_bs(d, (_centre(d, character, f_char, NAME_TRACKING), y),
-             character, f_char, DIM, NAME_TRACKING)
+    x = face_x + LOWER_FACE + 56
+    lines = title_lines(title, d, f_title, width=W * LOWER_RAMP - x - 40) if title else []
+
+    step = [TITLE_LINE if line else int(TITLE_LINE * 0.5) for line in lines]
+    rows = 74 + (56 if seal else 0) + (sum(step) + 12 if lines else 0)
+    y = LOWER_TOP + (LOWER_HEIGHT - rows) / 2
+
+    _blue_bs(d, (x, y), name, f_person, TEXT, NAME_TRACKING)
+    y += 74
+    if seal:
+        _draw_tracked(d, (x, y + 8), "as", f_as, ACCENT, TRACKING)
+        _draw_tracked(d, (x + _tracked_width(d, "as ", f_as, TRACKING) + 10, y),
+                      seal, f_seal, TEXT, 0.02)
+        y += 56
+    if lines:
+        y += 12
+    for line, dy in zip(lines, step):
+        if line:
+            d.text((x, y), line, font=f_title, fill=DIM)
+        y += dy
     return img
 
 
@@ -694,6 +832,11 @@ NAMES_PER_WALL = GRID_COLS * GRID_ROWS
 # badge lockup above the section name, and a rule the full width of the block
 # rather than a 600px dash.
 UPSTREAM_COLS, UPSTREAM_ROWS = 6, 3
+
+# The floor a login is allowed to shrink to before it would rather overlap
+# than be readable. No login in the four projects reaches it; it exists so the
+# fitter terminates, not as a design choice.
+CELL_MIN_SIZE = 12
 UPSTREAM_PER_WALL = UPSTREAM_COLS * UPSTREAM_ROWS
 
 # THE EYEBROW IS A CALL TO ACTION NOW. Owner, 2026-08-14: *"Change Upstream to
@@ -879,9 +1022,8 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0,
 
     Nine across, four down -- six by three for the upstream tier, which is the
     whole of what "larger" means here. A login prints exactly as its owner
-    writes it, and is truncated with an ellipsis rather than allowed to collide
-    with its neighbour: a name running into the next one is worse than a
-    shortened one.
+    writes it, **whole**: a name too wide for its cell is set smaller, never
+    cut short.
 
     ``ghost`` puts the outlined maintainer in the last cell. ``bubble_mix``
     dissolves the side gag from its first line to its second: 0 is all of the
@@ -949,13 +1091,15 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0,
         face = avatar(login, size)
         img.alpha_composite(face if face is not None else _empty_circle(size),
                             (int(cx - size / 2), int(y)))
-        label = login
-        while d.textlength(label, font=f_name) > col_w - 14 and len(label) > 4:
-            label = label[:-1]
-        if label != login:
-            label = label[:-1] + "\u2026"
-        _blue_bs(d, (cx - d.textlength(label, font=f_name) / 2, y + size + 16),
-                 label, f_name, TEXT)
+        # A LOGIN IS SET WHOLE. Long names come down in size until they fit
+        # their cell -- the ellipsis that used to do this printed
+        # "angelcerverarold...", which is nobody's name.
+        f_cell = f_name
+        while (d.textlength(login, font=f_cell) > col_w - 14
+               and f_cell.size > CELL_MIN_SIZE):
+            f_cell = _font("regular", f_cell.size - 1, mono=not up)
+        _blue_bs(d, (cx - d.textlength(login, font=f_cell) / 2, y + size + 16),
+                 login, f_cell, TEXT)
 
     # THE CALL TO ACTION ALONG THE BOTTOM, on every team wall.
     f_tag = _font("black", 76)

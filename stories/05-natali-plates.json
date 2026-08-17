@@ -68,6 +68,12 @@
    "position": "letterbox",
    "speaker": "Nat",
    "text": "Goddamn it!",
+   "censor": [
+    {
+     "find": "Goddamn",
+     "replace": "G{k8s}ddamn"
+    }
+   ],
    "avatar": "natali.jpg",
    "at": 10.3,
    "dur": 1.4,

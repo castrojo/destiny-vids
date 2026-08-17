@@ -5,6 +5,7 @@ the ffprobe duration check skips itself on a file that is not a real video.
 """
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -53,6 +54,9 @@ def test_the_delivery_map_covers_every_filmed_act_and_no_phantom_acts():
     numerals = {a.numeral for a in acts}
     assert set(masters) <= numerals, "the map names an act the order does not"
     assert set(social.get("absent", {})) <= numerals
+    assert social["absent"]["0"] == (
+        "A standalone 10mb copy is permitted only for private draft-level "
+        "review; it is not a publication deliverable.")
     for act in acts:
         if act.prod_file:
             assert act.numeral in masters, f"act {act.numeral} has a film " \
@@ -517,7 +521,17 @@ def test_an_act_with_no_committed_inputs_carries_its_reason():
 
 def test_the_recorded_digest_matches_what_is_committed():
     """The gate CI runs. If this fails, an act's inputs moved and nobody
-    re-rendered it -- rebuild the act and `deliver.py publish`."""
+    re-rendered it -- rebuild the act and `deliver.py publish`.
+
+    An act that DECLARES `stale_blocked_on` is exempt, and that is the whole
+    point of the field: act III cannot be rebuilt by anybody until the owner
+    names the roster it credits (#256), so failing here forever turned an
+    honestly-recorded owner decision into a red X that blocked the merge
+    queue -- 24 commits of authored work sat behind it. AGENTS.md: a gap that
+    is recorded and degrades correctly is a punch-list item, not a failure.
+    The act still announces itself in `status`, and seating it in the
+    programme still costs an explicit `--allow-stale`.
+    """
     masters, _ = deliver.load_delivery(
         REPO_ROOT / "stories" / "megacut" / "delivery.json")
     stale = []
@@ -525,11 +539,68 @@ def test_the_recorded_digest_matches_what_is_committed():
         sources = master.get("sources")
         if not sources or not master.get("source_digest"):
             continue
-        if deliver.source_digest(sources) != master["source_digest"]:
+        if deliver.source_digest(sources) == master["source_digest"]:
+            continue
+        blocker = deliver.blocked_on(master)
+        if not blocker:
             stale.append(numeral)
+            continue
+        assert re.match(r"^#\d+$", str(blocker)), (
+            f"act {numeral}: `stale_blocked_on` must name the issue holding "
+            f"the decision (e.g. '#256'), not {blocker!r} -- an unexplained "
+            f"exemption is how a stale act ships quietly")
     assert not stale, (
         f"act(s) {', '.join(stale)}: committed inputs no longer match the "
         f"delivered master. Rebuild, then `python3 tools/deliver.py publish`.")
+
+
+def test_a_blocked_act_is_still_stale_everywhere_that_reaches_picture():
+    """The exemption is scoped to the CI gate and nowhere else.
+
+    `stale_blocked_on` says "nobody can fix this yet", never "pretend it is
+    fresh". `stale_source_acts` is what `megacut.py` asks before it seats an
+    act, so a blocked act must still be in that list -- otherwise the flag
+    would quietly buy a stale act a seat in the programme, which is the exact
+    failure `--allow-stale` exists to make loud.
+    """
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    blocked = {n for n, m in masters.items() if deliver.blocked_on(m)
+               and m.get("sources") and m.get("source_digest")
+               and deliver.source_digest(m["sources"]) != m["source_digest"]}
+    assert blocked, "act III is the case this is written for"
+    assert blocked <= {n for n, _ in deliver.stale_source_acts(masters)}
+
+    report = deliver.ActReport(deliver.Act("III", "t", None))
+    deliver.check_sources(report.act, masters["III"], report)
+    state = {f.node: f.state for f in report.findings}["sources"]
+    assert state == deliver.BLOCKED
+    assert state not in deliver.FAILING
+
+
+def test_publish_cannot_certify_an_act_whose_rebuild_is_blocked(tmp_path):
+    """`publish --act III` must not stamp a digest for a render that did not
+    happen. The mtime guard cannot catch it -- act III's inputs moved in a
+    COMMIT, so they look untouched on disk -- and stamping would erase the
+    only record saying the act is stale, turning its own gate green."""
+    src = tmp_path / "master.mp4"
+    src.write_bytes(b"x")
+    inp = tmp_path / "in.txt"
+    inp.write_text("moved")
+    doc = {"masters": {"III": {
+        "path": str(src), "sources": [str(inp)],
+        "source_digest": "stale0000", "stale_blocked_on": "#256"}}}
+    path = tmp_path / "delivery.json"
+    path.write_text(json.dumps(doc), encoding="utf-8")
+
+    lines = []
+    deliver.record_source_digests(
+        [deliver.Act("III", "t", None)],
+        doc["masters"], path, log=lines.append, only=["III"])
+
+    after = json.loads(path.read_text(encoding="utf-8"))
+    assert after["masters"]["III"]["source_digest"] == "stale0000"
+    assert any("blocked on #256" in ln for ln in lines), lines
 
 
 def test_the_watcher_flushes_so_its_log_is_readable_while_it_runs(
@@ -722,3 +793,144 @@ def test_every_declared_youtube_master_has_a_provenance_record():
     assert not unrecorded, (
         f"declared footage with no videos/<id>.json: {', '.join(unrecorded)}. "
         f"Every fetched master needs its source URL and rights recorded.")
+
+
+# --- publish must not launder staleness (the "always ships stale" defect) ---
+
+def _stamp_ws(tmp_path, monkeypatch):
+    """One act, one committed input, one master file, and a delivery map."""
+    monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
+    src = tmp_path / "shotlist.json"
+    src.write_text("v1")
+    master = tmp_path / "master.mp4"
+    master.write_bytes(b"rendered")
+    old, new = 1_000_000_000, 1_000_000_100
+    os.utime(master, (old, old))
+    os.utime(src, (old - 10, old - 10))
+    delivery = tmp_path / "delivery.json"
+    delivery.write_text(json.dumps({"masters": {"I": {
+        "path": str(master), "sources": ["shotlist.json"],
+        "source_digest": deliver.source_digest(["shotlist.json"])}}}))
+    return src, master, delivery, new
+
+
+def _publish_digests(delivery, acts=None, dirty=("shotlist.json",)):
+    doc = json.loads(Path(delivery).read_text())
+    masters = doc["masters"]
+    acts = acts or [deliver.Act(numeral="I", title="I", prod_file="01.mp4")]
+    real = deliver.dirty_paths
+    deliver.dirty_paths = lambda: set(dirty)
+    try:
+        deliver.record_source_digests(acts, masters, delivery,
+                                      log=lambda *a: None,
+                                      only=[a.numeral for a in acts])
+    finally:
+        deliver.dirty_paths = real
+    return json.loads(Path(delivery).read_text())["masters"]["I"]
+
+
+def test_publish_refuses_to_stamp_a_master_that_predates_its_inputs(
+        tmp_path, monkeypatch):
+    """THE DEFECT: `publish` used to stamp every act unconditionally.
+
+    Editing an input and running `publish` without rebuilding recorded the new
+    digest over an old master, so the gate went green and the next megacut
+    seated a stale act. Whoever ran `publish` erased the only signal that the
+    act needed re-rendering -- which is why stale programmes shipped.
+    """
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")                    # the input moves...
+    os.utime(src, (new, new))               # ...after the master was written
+    before = json.loads(delivery.read_text())["masters"]["I"]["source_digest"]
+
+    after = _publish_digests(delivery)
+
+    assert after["source_digest"] == before, (
+        "publish stamped a digest over a master that was never rebuilt -- "
+        "that is the staleness eraser")
+
+
+def test_publish_stamps_once_the_act_is_actually_rebuilt(tmp_path, monkeypatch):
+    """The guard must not become a wall: a real rebuild still records."""
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")
+    os.utime(src, (new, new))
+    master.write_bytes(b"re-rendered")      # the rebuild...
+    os.utime(master, (new + 10, new + 10))  # ...lands after the input
+
+    after = _publish_digests(delivery)
+
+    assert after["source_digest"] == deliver.source_digest(["shotlist.json"])
+
+
+def test_a_master_that_predates_its_inputs_is_reported_not_silent(
+        tmp_path, monkeypatch, capsys):
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")
+    os.utime(src, (new, new))
+    lines = []
+    doc = json.loads(delivery.read_text())
+    monkeypatch.setattr(deliver, "dirty_paths", lambda: {"shotlist.json"})
+    deliver.record_source_digests(
+        [deliver.Act(numeral="I", title="I", prod_file="01.mp4")],
+        doc["masters"], delivery, log=lines.append, only=["I"])
+    assert any("rebuild the act" in ln for ln in lines), lines
+
+
+def test_a_checkout_does_not_block_every_act(tmp_path, monkeypatch):
+    """REGRESSION: a rebase rewrites every mtime at once.
+
+    An mtime-only guard then reports every act as "master predates its
+    inputs" and `publish` can never record again -- a wall, not a gate. Only
+    files that actually differ from HEAD carry a trustworthy mtime.
+    """
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")
+    os.utime(src, (new, new))          # every mtime moved, as a checkout does...
+    monkeypatch.setattr(deliver, "dirty_paths", lambda: set())  # ...but nothing is edited
+
+    assert deliver.sources_newer_than(["shotlist.json"], master) == []
+
+
+def test_publish_records_only_the_acts_it_was_told_to(tmp_path, monkeypatch):
+    """A rebuild of ONE act must never certify the others.
+
+    This is the blunt guarantee behind the mtime heuristics: whatever the
+    filesystem says, `publish --act VII` makes a claim about act VII and
+    about nothing else.
+    """
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    doc = json.loads(delivery.read_text())
+    doc["masters"]["II"] = {"path": str(master), "sources": ["shotlist.json"],
+                            "source_digest": "stale-on-purpose"}
+    delivery.write_text(json.dumps(doc))
+    src.write_text("v2")
+
+    acts = [deliver.Act(numeral="I", title="I", prod_file="01.mp4"),
+            deliver.Act(numeral="II", title="II", prod_file="02.mp4")]
+    deliver.record_source_digests(acts, doc["masters"], delivery,
+                                  log=lambda *a: None, only=["I"])
+
+    after = json.loads(delivery.read_text())["masters"]
+    assert after["I"]["source_digest"] == deliver.source_digest(["shotlist.json"])
+    assert after["II"]["source_digest"] == "stale-on-purpose"
+
+
+def test_a_blanket_publish_certifies_nothing(tmp_path, monkeypatch):
+    """`publish` WRITES the digest gate, so it cannot be the thing that
+    decides an act is fresh. An input that moved in a commit looks untouched
+    on disk, and the mtime guard only sees dirty files -- so a publish with no
+    named acts once stamped a new digest over act III, whose rebuild is
+    blocked on an input that does not exist (#256), and turned its own gate
+    green. With no `only`, nothing is stamped."""
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")
+    before = json.loads(delivery.read_text())["masters"]["I"]["source_digest"]
+    lines = []
+    doc = json.loads(delivery.read_text())
+    deliver.record_source_digests(
+        [deliver.Act(numeral="I", title="I", prod_file="01.mp4")],
+        doc["masters"], delivery, log=lines.append)
+    after = json.loads(delivery.read_text())["masters"]["I"]["source_digest"]
+    assert after == before
+    assert any("name the acts you rebuilt" in ln for ln in lines), lines

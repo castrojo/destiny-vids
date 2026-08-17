@@ -193,18 +193,21 @@ def test_every_retired_card_says_why_it_was_retired():
             assert card.get("retired_note"), card["id"]
 
 
-def test_the_comic_card_covers_one_unbroken_window_beside_the_guardian_plates():
+def test_the_title_card_covers_one_unbroken_window_beside_the_guardian_plates():
     entries = plate.load_manifest(os.path.join(MEGACUT, "megacut-hero-plates.json"))
-    comics = sorted((e for e in entries if e.get("kind") == "comic"),
+    covers = sorted((e for e in entries if e["id"] == "title-cover"),
                     key=lambda e: e["at"])
-    assert comics, "the comic title card is gone from the hero segment"
-    for a, b in zip(comics, comics[1:]):
-        # Back to back: a gap would flash the cinematic through the card.
-        assert abs((a["at"] + a["dur"]) - b["at"]) < 1e-6
+    assert covers, "the title cover is gone from the hero segment"
+    assert len(covers) == 1, "one cover, one window -- a second full-frame card would overlap it"
+    cover = covers[0]
+    # The whole 22.5 - 36.0 window, unbroken: a gap would flash the cinematic
+    # through the card.
+    assert abs(cover["at"] - 22.5) < 1e-6
+    assert abs(cover["at"] + cover["dur"] - 36.0) < 1e-6
     # load_manifest already refused an overlap against the Guardian plates.
-    plates = [e for e in entries if e.get("kind") != "comic"]
-    assert all(p["at"] + p["dur"] <= comics[0]["at"] + 1e-6
-               or p["at"] >= comics[-1]["at"] + comics[-1]["dur"] - 1e-6
+    plates = [e for e in entries if e["id"] != "title-cover"]
+    assert all(p["at"] + p["dur"] <= cover["at"] + 1e-6
+               or p["at"] >= cover["at"] + cover["dur"] - 1e-6
                for p in plates)
 
 
@@ -229,39 +232,75 @@ def test_a_recast_plate_carries_a_name_and_no_inherited_rows():
     assert "Cortney Nickerson" in gaps and "Orlin" in gaps
 
 
-def test_the_cover_identities_are_captions_because_a_plate_would_cover_the_art():
-    """The owner ruled out nameplates over the cover art. The art is square, so
-    a 16:9 frame leaves 420px either side and a 561px Guardian plate cannot fit
-    -- the authored identities are carried as caption boxes on the card itself.
-    A `cover-*` plate reappearing means somebody has put one back over the ink.
+def test_the_cover_is_a_full_frame_photo_and_nobody_is_captioned_into_it():
+    """Owner, 2026-08-15: '2:14 remove the comic book cover for this segment and
+    use a group picture from kubecon contributor summit'. The cover is now a
+    Maintainer Summit group photograph, full-frame -- so it carries NO caption
+    boxes: a caption over a photograph claims the named person is pictured, and
+    the retired captions name people this photograph does not picture. A
+    `cover-*` plate reappearing means somebody has put a nameplate over the
+    picture, which is the same claim in other chrome.
     """
     entries = plate.load_manifest(os.path.join(MEGACUT, "megacut-hero-plates.json"))
     assert not [e for e in entries if e["id"].startswith("cover-")]
 
-    cover = next(e for e in entries if e.get("kind") == "comic")
-    captions = cover["captions"]
+    cover = next(e for e in entries if e["id"] == "title-cover")
+    assert cover["kind"] == "photo"
+    assert cover["art"] and cover["art_source"]
+    # The summit record must be the named source, and the licence lives there.
+    assert "summit-photos.json" in cover["art_source"]
+    for field in ("captions", "wallpaper_dir", "wallpaper_match", "wallpaper"):
+        assert field not in cover, (
+            f"{field}: the comic treatment retired with the comic; a "
+            "full-frame photograph has no margins and no caption boxes")
+
+
+def test_the_retired_cover_captions_are_kept_verbatim_in_the_record():
+    """The caption copy was owner-authored, so retirement KEEPS it -- the way
+    every retired card's strings are kept -- with the reason recorded. Deleting
+    it would make restoring the comic cover mean rewriting authored copy.
+    """
+    cover = next(p for p in _load("megacut-hero-plates.json")["plates"]
+                 if p["id"] == "title-cover")
+    retired = cover.get("retired")
+    assert retired, "the comic cover's copy was retired, not deleted"
+    assert retired.get("retired_note"), "a retirement without its reason"
+    assert retired["kind"] == "comic"
+    assert "wolves.jpg" in retired["art"]
+
+    captions = retired["captions"]
     assert {c["side"] for c in captions} == {"left", "right"}
-    # Every authored string the owner wrote for the cover, still on the card.
+    # Every authored string the owner wrote for the cover, still in the record.
     text = json.dumps(captions)
     for authored in ("Introducing Rafael and Lakshmi", "Have you met Bluefin?",
                      "BLUEBERRY // HUMAN", "Rafael Castro", "Blueberry Hunter",
                      "Happy 10th Birthday!", "Blueberry Warlock",
                      "Wielder of the Kube", "BLUEFIN", "Really Hungry "):
         assert authored in text, authored
-    # The child's name is not on her own box: see `unresolved`.
+    # The child's name is not on her own box, in the retired copy either.
     warlock = next(c for c in captions if "Blueberry Warlock" in c.get("lines", []))
     assert "Lakshmi" not in json.dumps(warlock)
+    # The questions that were open when the copy retired are recorded WITH it,
+    # so they come back if the copy ever does.
+    note = retired["retired_note"] + retired.get("note", "")
+    assert "speciesname" in note
+    assert "#90" in note
 
 
-def test_the_cover_wallpaper_roll_is_recorded_so_a_frame_is_reproducible():
+def test_the_wallpaper_roll_is_recorded_so_a_frame_is_reproducible():
     """A random wallpaper per render is the owner's instruction. A random
     render nobody wrote down cannot be rebuilt, so the driver records the roll
-    and can replay it."""
-    cover = next(e for e in _load("megacut-hero-plates.json")["plates"]
-                 if e.get("kind") == "comic")
-    assert cover["wallpaper_dir"]
+    and can replay it. The title cover no longer rolls one -- a full-frame
+    photograph has no margins -- but the comic treatment that did is kept in
+    its `retired` record, and the driver's roll-logging stays for every card
+    that still carries `wallpaper_dir`.
+    """
+    cover = next(p for p in _load("megacut-hero-plates.json")["plates"]
+                 if p["id"] == "title-cover")
+    retired = cover["retired"]
+    assert retired["wallpaper_dir"]
     # The directory holds aurora wallpapers too; the owner asked for Bluefin.
-    assert re.search(r"bluefin", cover["wallpaper_match"], re.I)
+    assert re.search(r"bluefin", retired["wallpaper_match"], re.I)
     driver = open(os.path.join(CARDS, "render-cards.mjs"), encoding="utf-8").read()
     assert "wallpapers.json" in driver
     assert "--wallpaper-seed" in driver or "wallpaper-seed" in driver
@@ -287,6 +326,24 @@ def test_the_card_templates_copy_the_sites_own_rules():
     for name, source in (("act.html", act), ("comic.html", comic)):
         style = source.split("<style>", 1)[1].split("</style>", 1)[0]
         assert style.count("/*") == style.count("*/"), name
+
+
+def test_the_photo_card_is_full_bleed_and_honours_the_driver_handshake():
+    """The photo card is the one template that is NOT a site reproduction --
+    the site has no full-frame photo component -- so its contract is pinned
+    here instead: the art covers the whole 1920x1080 frame (never a
+    square-with-margins), and the render-cards.mjs handshake is honoured or the
+    screenshot races the image load."""
+    photo = open(os.path.join(CARDS, "photo.html"), encoding="utf-8").read()
+    assert "width: 1920px; height: 1080px" in photo
+    assert "object-fit: cover" in photo
+    assert "__renderReady" in photo
+    assert "params.get('art')" in photo
+    # No caption or wallpaper MACHINERY: a full-frame photograph has no
+    # margins, and copy over a photograph claims the named person is pictured.
+    # (The words may appear in the header comment that says why they are out.)
+    assert "params.get('captions')" not in photo
+    assert "params.get('wallpaper')" not in photo
 
 
 def test_every_act_slide_holds_the_same_length():
