@@ -271,13 +271,38 @@ def filtergraph(manifest, audio_gain=1.0):
     tail = (f"[0:v]trim={CUT_IN:.3f}:{OUT_POINT:.3f},setpts=PTS-STARTPTS,"
             f"pad={W}:{H}:0:{PAD_Y}:color=black,setsar=1,fps={FPS},"
             f"format=rgba[tail]")
+    parts = [head, tail]
+
+    # THE BOX BELONGS TO THE BOOK SHOT, so it is composited onto the HEAD LEG
+    # and the join dissolve carries the page and the box out together.
+    #
+    # Owner, 2026-08-17: "HIDE THE WORDS ON THE BOOK PAGE WITH THIS SLIDE AND
+    # THEN FADE INTO THE IGUANA", after "you fade the box differently than the
+    # book page so the words 'you needed' show up".
+    #
+    # Overlaying it on the JOINED film cannot satisfy that, whatever its fade
+    # is: the box then has an out of its own, and the page keeps printing under
+    # it -- "In order to be born", then "you needed" in close-up -- so any frame
+    # where the box has left and the picture has not cut is a frame that reveals
+    # the words the box was there to cover. Ending it early leaves them bare;
+    # ending it late puts a panel over the iguana. Seating it on the head leg
+    # removes the choice: there is no such frame, because the box and the page
+    # are one picture by the time the transition runs.
+    box = plate(manifest, "book-a")
+    box_at = box["at"]
+    parts.append(_still(3, "bk0",
+                        f",trim=0:{CUT_OUT:.3f},setpts=PTS-STARTPTS"))
+    bx0, by0 = box["anchor"]
+    parts.append(f"[head][bk0]overlay=x={bx0 - W / 2:.0f}:y={by0 - H / 2:.0f}:"
+                 f"shortest=1:"
+                 f"enable=between(t\\,{box_at:.3f}\\,{CUT_OUT:.3f})[headbox]")
+
     # xfade's output runs d1 + d2 - duration, so the join costs JOIN_FADE of
     # runtime; PICTURE is the sum of the two trims and the offset is set so the
     # dissolve straddles the cut rather than following it.
-    join = (f"[head][tail]xfade=transition=fade:duration={JOIN_FADE:.3f}:"
-            f"offset={CUT_OUT - JOIN_FADE:.3f},format=rgba[film]")
-
-    parts = [head, tail, join]
+    parts.append(f"[headbox][tail]xfade=transition=fade:"
+                 f"duration={JOIN_FADE:.3f}:"
+                 f"offset={CUT_OUT - JOIN_FADE:.3f},format=rgba[film]")
     # Input 0 is the source; every card and wallpaper below takes the next
     # index in the order `command()` passes them. The first build had this
     # counter starting at 1, which fed the SECOND title card into the first
@@ -302,44 +327,29 @@ def filtergraph(manifest, audio_gain=1.0):
     inputs += 2
     last = "v2"
 
-    # --- the two book lines --------------------------------------------------
+    # --- book-b, the empty plate --------------------------------------------
     # `enable=between(t\,a\,b)` with ESCAPED commas, not the quoted form the
     # docs show: tools/plate.py records a build that failed to parse the quoted
     # spelling, disabled the overlay and still exited 0 -- a silent no-op.
-    for n, entry_id in enumerate(("book-a", "book-b")):
-        entry = plate(manifest, entry_id)
-        at, dur = entry["at"], entry["dur"]
-        # A PANEL MUST NOT DISSOLVE. Owner, 2026-08-17: "don't fade the box on
-        # it's own it reveals the text underneath ... before switching to the
-        # iguana". An alpha fade on a card that is mostly filled panel spends
-        # its whole ramp semi-transparent, so the book's printed lyric reads
-        # straight through the box -- worst at the out, which lands just before
-        # the cut to the iguana. `fade: 0` on the plate cuts it in and out
-        # instead; the fade is still the right treatment for a card that is
-        # only type.
-        fade = entry.get("fade", min(0.45, dur / 4))
-        ramps = ""
-        if fade > 0:
-            ramps = (f"fade=t=in:st={at:.3f}:d={fade:.3f}:alpha=1,"
-                     f"fade=t=out:st={at + dur - fade:.3f}:"
-                     f"d={fade:.3f}:alpha=1")
-        idx = inputs + 1
-        parts.append(_still(idx, f"bk{n}",
-                            f",trim=0:{PICTURE:.3f},setpts=PTS-STARTPTS"
-                            + (f",{ramps}" if ramps else "")))
-        ax, ay = entry["anchor"]
-        bx, by = entry["anchor_out"]
-        # A line may track the page for less time than it is on screen: book-b
-        # rides the book, then the picture cuts to the iguana under it and
-        # there is no longer a page to track, so it holds.
-        walk = entry.get("walk", dur)
-        x = _walk(ax - W / 2, bx - W / 2, at, walk)
-        y = _walk(ay - H / 2, by - H / 2, at, walk)
-        out = f"v{3 + n}"
-        parts.append(f"[{last}][bk{n}]overlay=x='{x}':y='{y}':shortest=1:"
-                     f"enable=between(t\\,{at:.3f}\\,{at + dur:.3f})[{out}]")
-        inputs += 1
-        last = out
+    #
+    # book-a is seated on the head leg above. This one carries no body, so it
+    # draws nothing; it keeps its input seat and its window so the build's fixed
+    # input layout is unchanged.
+    entry = plate(manifest, "book-b")
+    at, dur = entry["at"], entry["dur"]
+    fade = entry.get("fade", min(0.45, dur / 4))
+    ramps = ""
+    if fade > 0:
+        ramps = (f",fade=t=in:st={at:.3f}:d={fade:.3f}:alpha=1,"
+                 f"fade=t=out:st={at + dur - fade:.3f}:d={fade:.3f}:alpha=1")
+    parts.append(_still(4, "bk1",
+                        f",trim=0:{PICTURE:.3f},setpts=PTS-STARTPTS{ramps}"))
+    ax, ay = entry["anchor"]
+    parts.append(f"[{last}][bk1]overlay=x={ax - W / 2:.0f}:y={ay - H / 2:.0f}:"
+                 f"shortest=1:"
+                 f"enable=between(t\\,{at:.3f}\\,{at + dur:.3f})[v4]")
+    inputs += 2
+    last = "v4"
 
     parts.append(f"[{last}]format=yuv420p[picture]")
 

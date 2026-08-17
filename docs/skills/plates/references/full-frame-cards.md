@@ -97,24 +97,44 @@ choose the two trim lengths such that the transition occupies the requested
 window exactly. Source: FFmpeg documentation via Context7
 `/websites/ffmpeg_documentation`, “Split input streams” and “xfade”.
 
-## A panel card is cut, not dissolved
+## A panel that hides something leaves with the shot, not on its own clock
 
-An alpha fade spends its whole ramp semi-transparent. On a card that is mostly
-*type* that is invisible — the glyphs simply arrive. On a card carrying a filled
-**panel** it is not: for the length of the ramp the picture underneath reads
-straight through the box, and if the picture underneath is itself printed words,
-the audience sees two sets of words at once.
+A box over picture is often there to **cover** what is underneath. The moment
+it is, its exit stops being a styling choice: every frame where the box has
+gone and the picture has not cut is a frame showing the thing the box was
+hiding.
 
-So a box overlay is **cut in and cut out**, and the panel behind the type is
-opaque. Two consequences worth stating:
+Two ways to get this wrong, and this repo shipped both in one afternoon:
 
-- **The out is the dangerous end.** A box is usually timed to leave just before
-  a cut, so its dissolve lands exactly where the shot is changing — the busiest
-  moment on screen, and the one an owner notices.
-- **`enable=` alone is a hard cut.** Dropping the `fade` filters is all it
-  takes; the overlay's window still gates it. Keep the fade as a per-plate
-  option (`"fade": 0` to switch it off) rather than deleting it, because a card
-  that is only type still wants one.
+| Attempt | What the audience saw |
+|---|---|
+| Fade the box out before the cut | The panel is semi-transparent for the whole ramp, so the picture underneath reads *through* it — and if that picture is printed words, two sets of words at once. |
+| Cut the box out before the cut | Cleaner, and still wrong: the bare picture plays for the rest of the shot. Here the page went on printing, so a line the box existed to cover appeared in the clear. |
+
+**The fix is structural, not a timing tweak.** Composite the card onto the
+**shot's own leg** of the join, before the transition:
+
+```text
+[head][card]overlay=...:enable=between(t\,<in>\,<shot_end>)[headcard];
+[headcard][tail]xfade=transition=fade:duration=<d>:offset=<shot_end - d>[film]
+```
+
+Now the card and the picture are one image by the time the transition runs, so
+they leave together and there is no in-between frame to get wrong. It also
+answers "do not cover the incoming shot" for free: the outgoing leg's weight
+reaches zero at the same instant the incoming shot is clean.
+
+Keep the per-plate `fade` option (`"fade": 0` to switch it off) for cards that
+are only type — those genuinely want a ramp, because there is no panel to see
+through.
+
+Two supporting rules:
+
+- **The panel itself is opaque.** A 90% fill still lets printed words underneath
+  read at full card opacity, which is the same fault standing still.
+- **Check what the picture does under the card for the whole window**, not at
+  one frame. A shot that looks static can be printing type, drifting, or cutting
+  to a close-up inside its own boundaries.
 
 ## Blue letters are opt-in, per card
 
