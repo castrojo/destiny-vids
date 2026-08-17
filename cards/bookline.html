@@ -91,7 +91,10 @@
   body[data-variant="box"] .line {
     max-width: 82%;
     padding: 1.35rem 2rem;
-    background: rgb(4 10 20 / 90%);
+    /* OPAQUE. Owner, 2026-08-17: "it reveals the text underneath". At 90%
+       the book's printed lyric was legible through the panel even at full
+       card opacity, which is a second set of words behind ours. */
+    background: rgb(4 10 20);
     border-left: 4px solid #60a5fa;
     border-radius: 3px;
     box-shadow:

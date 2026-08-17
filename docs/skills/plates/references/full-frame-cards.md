@@ -97,6 +97,25 @@ choose the two trim lengths such that the transition occupies the requested
 window exactly. Source: FFmpeg documentation via Context7
 `/websites/ffmpeg_documentation`, “Split input streams” and “xfade”.
 
+## A panel card is cut, not dissolved
+
+An alpha fade spends its whole ramp semi-transparent. On a card that is mostly
+*type* that is invisible — the glyphs simply arrive. On a card carrying a filled
+**panel** it is not: for the length of the ramp the picture underneath reads
+straight through the box, and if the picture underneath is itself printed words,
+the audience sees two sets of words at once.
+
+So a box overlay is **cut in and cut out**, and the panel behind the type is
+opaque. Two consequences worth stating:
+
+- **The out is the dangerous end.** A box is usually timed to leave just before
+  a cut, so its dissolve lands exactly where the shot is changing — the busiest
+  moment on screen, and the one an owner notices.
+- **`enable=` alone is a hard cut.** Dropping the `fade` filters is all it
+  takes; the overlay's window still gates it. Keep the fade as a per-plate
+  option (`"fade": 0` to switch it off) rather than deleting it, because a card
+  that is only type still wants one.
+
 ## Blue letters are opt-in, per card
 
 The project's b/f rule — every `B` and `F` in the film's blue,
