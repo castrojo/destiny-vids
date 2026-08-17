@@ -934,3 +934,48 @@ def test_a_blanket_publish_certifies_nothing(tmp_path, monkeypatch):
     after = json.loads(delivery.read_text())["masters"]["I"]["source_digest"]
     assert after == before
     assert any("name the acts you rebuilt" in ln for ln in lines), lines
+
+
+def test_the_copy_rung_surfaces_what_an_act_says_is_still_wrong(tmp_path):
+    """An act can be perfectly fresh against its FILES and still carry copy
+    the repo already knows is wrong. Act VII's manifest has said "the reveal
+    still credits Laura Santamaria: the Orlin recast (#73) stays open" all
+    along, while `status` reported the act `ok` -- every other rung asks
+    about files, none asked what the act says about itself."""
+    (tmp_path / "stories").mkdir()
+    manifest = tmp_path / "stories" / "act-plates.json"
+    manifest.write_text(json.dumps({
+        "unresolved": ["the reveal still credits somebody who was recast"]}),
+        encoding="utf-8")
+    report = deliver.ActReport(deliver.Act("VII", "t", "07.mp4"))
+    deliver.check_copy(report.act, {"sources": ["stories/act-plates.json"]},
+                       report, root=tmp_path)
+    finding = {f.node: f for f in report.findings}["copy"]
+    assert finding.state == deliver.UNRESOLVED
+    assert "recast" in finding.detail
+    # A recorded gap is a punch-list item; it must never fail the gate.
+    assert deliver.UNRESOLVED not in deliver.FAILING
+
+
+def test_the_copy_rung_stays_quiet_when_nothing_is_recorded(tmp_path):
+    """No note when there is nothing to say -- and a source that is missing,
+    unreadable or not JSON must not crash a delivery report."""
+    (tmp_path / "stories").mkdir()
+    (tmp_path / "stories" / "clean.json").write_text("{}", encoding="utf-8")
+    (tmp_path / "stories" / "junk.json").write_text("not json", encoding="utf-8")
+    report = deliver.ActReport(deliver.Act("I", "t", "01.mp4"))
+    deliver.check_copy(report.act, {"sources": [
+        "stories/clean.json", "stories/junk.json", "stories/gone.json",
+        "scripts/build.sh"]}, report, root=tmp_path)
+    assert not [f for f in report.findings if f.node == "copy"]
+
+
+def test_act_seven_really_does_declare_the_gap_the_owner_spotted():
+    """The committed record, not a fixture: act VII is the case this rung was
+    written for, and it must keep reaching the report."""
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    report = deliver.ActReport(deliver.Act("VII", "t", "07-europa.mp4"))
+    deliver.check_copy(report.act, masters["VII"], report)
+    detail = {f.node: f.detail for f in report.findings}["copy"]
+    assert "Laura Santamaria" in detail

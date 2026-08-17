@@ -154,6 +154,8 @@ CONFLICT = "conflict"
 EPHEMERAL = "ephemeral"
 UNDECLARED = "undeclared"
 BLOCKED = "blocked"
+# Copy the act's own record says is still wrong: a note, never a failure.
+UNRESOLVED = "unresolved"
 
 FAILING = {STALE, MISSING, CONFLICT, EPHEMERAL}
 
@@ -536,6 +538,46 @@ def check_footage(act, master, report):
                    f"`publish`. Declared footage: {', '.join(ids)}")
         return
     report.add("footage", OK, f"{len(ids)} master(s) match {digest[:12]}")
+
+
+def check_copy(act, master, report, root=None):
+    """The words on screen that the act's OWN record already says are wrong.
+
+    Every act manifest carries an `unresolved` list -- the punch line of
+    "degrade, never block": a gap is shipped and RECORDED rather than
+    invented. But the record was write-only. Act VII's manifest has said
+    "the reveal still credits Laura Santamaria: the Orlin recast (#73) stays
+    open" since it was written, and `status` still reported the act `ok`,
+    because every rung here asks about FILES -- is the master newer, does the
+    digest match, is the link intact -- and none of them asks what the act
+    says about itself. So an act could be perfectly fresh against its inputs
+    and still be carrying copy the repo knows is out of date, which is
+    exactly how "the videos coming out keep being stale" survives a green
+    delivery report.
+
+    A wrong credit names a real person, so this is reported at the same rung
+    as the picture -- but as a NOTE, never a failure: these gaps are owner
+    decisions by construction, and blocking on them would stop the show for
+    a word, which the contract forbids.
+    """
+    root = Path(root or REPO_ROOT)
+    notes = []
+    for src in (master or {}).get("sources") or []:
+        path = root / src
+        if path.suffix != ".json" or not path.is_file():
+            continue
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+        except (ValueError, OSError):
+            continue
+        if not isinstance(doc, dict):
+            continue
+        for item in doc.get("unresolved") or []:
+            notes.append(f"{src}: {item}")
+    if notes:
+        report.add("copy", UNRESOLVED,
+                   f"{len(notes)} recorded gap(s) in the words on screen\n"
+                   + "\n".join(f"      - {n}" for n in notes))
 
 
 def check_master(act, master, report):
@@ -1061,6 +1103,7 @@ def gather(acts, masters, social, wolves, plan_path, twin_roots=TWIN_ROOTS):
         master_path = check_master(r.act, masters.get(r.act.numeral), r)
         check_sources(r.act, masters.get(r.act.numeral), r)
         check_footage(r.act, masters.get(r.act.numeral), r)
+        check_copy(r.act, masters.get(r.act.numeral), r)
         check_link(r.act, master_path, wolves, r, twin_roots=twin_roots)
     programme = ActReport(Act("", "the programme", None))
     check_checksums(wolves, reports, programme)
@@ -1087,7 +1130,7 @@ def print_report(reports, wolves, log=print):
             log(f"  {f.node:<9} {f.state:<16} {f.detail}")
     failing = [f for r in reports for f in r.findings if f.state in FAILING]
     noted = [f for r in reports for f in r.findings
-             if f.state in (ABSENT_BY_DESIGN, NO_FILM, BLOCKED)]
+             if f.state in (ABSENT_BY_DESIGN, NO_FILM, BLOCKED, UNRESOLVED)]
     log(f"\n{len(failing)} stale, {len(noted)} recorded absences "
         f"(punch-list, not failures)")
     return 1 if failing else 0
