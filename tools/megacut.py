@@ -1385,6 +1385,13 @@ def stale_seated_acts(plan, delivery_path=None):
     what an audience sees was the only stage with no opinion about staleness,
     and every stale act it seated shipped silently.
 
+    Each act comes back with the issue its rebuild waits on, or None. A
+    DECLARED block is a recorded owner decision, and AGENTS.md seats those
+    rather than waiting for them ("I'd rather have broken plates than no
+    video"): it is reported, never refused. What still refuses is UNRECORDED
+    drift -- an act nobody has noticed moved, which is how stale programmes
+    shipped silently.
+
     An item is matched to an act by INODE, not by path string: `Prod/` entries
     are hardlinks to the declared masters (`deliver.py publish` only ever
     links), so the same file reached by either name is the same act. A master
@@ -1402,6 +1409,7 @@ def stale_seated_acts(plan, delivery_path=None):
     stale = dict(deliver.stale_source_acts(masters))
     if not stale:
         return []
+    blockers = {n: deliver.blocked_on(m) for n, m in stale.items()}
     by_inode = {}
     for numeral, master in stale.items():
         f = deliver.resolve_master(master["path"])
@@ -1424,7 +1432,7 @@ def stale_seated_acts(plan, delivery_path=None):
         numeral = by_inode.get((st.st_dev, st.st_ino))
         if numeral:
             seated.setdefault(numeral, item.get("label") or item["path"])
-    return sorted(seated.items())
+    return [(n, label, blockers.get(n)) for n, label in sorted(seated.items())]
 
 
 def main(argv=None):
@@ -1504,6 +1512,21 @@ def main(argv=None):
     if not out_path:
         raise SystemExit("no output: pass --out or set `output` in the plan")
 
+    # ASSEMBLY NEVER REFUSES. A stale act is REPORTED and seated, never a
+    # reason to withhold the programme -- owner, 2026-08-17, on act III
+    # blocking the show over a comment about somebody else's casting: "you are
+    # blocking releases for no reason."
+    #
+    # The digest is a whole-FILE hash, so an act reads stale when any byte of
+    # any input moves, including a comment about a different act. It answers
+    # "did the inputs move", never "did the picture change" -- act III's own
+    # two bindings were byte-identical while it was stopping every build. A
+    # signal that coarse may inform a person; it may not hold the film.
+    for numeral, label, blocker in stale_seated_acts(plan):
+        why = f"as recorded ({blocker})" if blocker else "with NO recorded reason"
+        print(f"NOTE: act {numeral} is stale and seated, {why}: {label}",
+              file=sys.stderr)
+
     if args.dry_run:
         copy_ok = _copy_path_ok(plan, allow_copy=not args.no_copy)
         for i, item in enumerate(plan["items"]):
@@ -1524,20 +1547,6 @@ def main(argv=None):
         print(f"# expected duration: {expected_duration(plan):.3f}s "
               f"across {len(plan['items'])} items")
         return 0
-
-    stale = stale_seated_acts(plan)
-    if stale and not args.allow_stale:
-        lines = "\n".join(f"  act {n}: {label}" for n, label in stale)
-        raise SystemExit(
-            f"REFUSING to assemble: {len(stale)} seated act(s) have a master "
-            f"that predates its own committed inputs.\n{lines}\n\n"
-            f"Rebuild each act, then `python3 tools/deliver.py publish`. "
-            f"`python3 tools/deliver.py status --sources-only` shows what "
-            f"moved. Pass --allow-stale to ship the old masters anyway.")
-    if stale:
-        for n, label in stale:
-            print(f"WARNING: act {n} is STALE and seated anyway "
-                  f"(--allow-stale): {label}", file=sys.stderr)
 
     # Remote encoding is the DEFAULT, per the owner's ruling ("always prefer
     # remote encoding when available"). The fallback to this workstation is

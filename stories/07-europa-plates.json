@@ -42,150 +42,131 @@
   },
   "plates": [
     {
-      "id": "c01a",
+      "id": "d01",
       "kind": "chat",
       "position": "letterbox",
-      "speaker": "AN4-CH4K-12",
-      "text": "Evolution Leads to Stagnation. Good hunting.",
-      "at": 0.0,
-      "dur": 4.0,
+      "speaker": "krook",
+      "text": "Deploy CNCF Projects Team",
+      "avatar": "/var/home/jorge/Videos/wolves-directors-cut/nimbatus-review/render/krook.png",
+      "at": 0.564,
+      "dur": 1.6,
       "fade_in": 0.6,
-      "fade_out_at": 3.7,
-      "fade_out": 0.25,
-      "_note": "Terse-pass cold open, line 1 of 4 (#102, copy verbatim). Speaker string is the owner's own -- see unresolved for AN4-CH4K-12 vs act II's AN4-CH3CK-12 (#98). No pfp exists, so the pill carries the drawn crest (the documented fallback)."
+      "fade_out_at": 1.864,
+      "fade_out": 0.25
     },
     {
-      "id": "c01b",
+      "id": "d02",
       "kind": "chat",
       "position": "letterbox",
-      "speaker": "tabbysable",
-      "text": "Oh did I leave the door open?",
-      "at": 4.4,
-      "dur": 2.4,
+      "speaker": "preethi",
+      "text": "Stand down",
+      "at": 2.564,
+      "dur": 1.6,
       "fade_in": 0.6,
-      "fade_out_at": 6.5,
-      "fade_out": 0.25,
-      "_note": "Cold open, line 2 of 4. Window compressed from #102's proposed 4.4-7.4 so the block clears before the clock shot; 2.4 s still meets the act's own ~2.2 s/card floor. No pfp -> drawn crest."
+      "fade_out_at": 3.864,
+      "fade_out": 0.25
     },
     {
-      "id": "c01c",
+      "id": "d03",
       "kind": "chat",
       "position": "letterbox",
-      "speaker": "IAN",
-      "text": "I guess we're flunking that security audit",
-      "at": 7.2,
-      "dur": 2.4,
+      "speaker": "alolita",
+      "text": "It's all for naught we fail",
+      "at": 4.564,
+      "dur": 2.6,
       "fade_in": 0.6,
-      "fade_out_at": 9.3,
-      "fade_out": 0.25,
-      "_note": "Cold open, line 3 of 4 (proposed 7.8-10.8, compressed as above). No pfp -> drawn crest."
+      "fade_out_at": 6.864,
+      "fade_out": 0.25
     },
     {
-      "id": "c01d",
+      "id": "d04",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "preethi",
+      "text": "I'm sending our best",
+      "at": 7.564,
+      "dur": 2.0,
+      "fade_in": 0.6,
+      "fade_out_at": 9.264,
+      "fade_out": 0.25
+    },
+    {
+      "id": "d05",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "castrojo",
+      "text": "They must never know who we are",
+      "avatar": "/var/home/jorge/src/destiny-vids/renders/avatars/castrojo.png",
+      "at": 24.564,
+      "dur": 2.6,
+      "fade_in": 0.6,
+      "fade_out_at": 26.864,
+      "fade_out": 0.25
+    },
+    {
+      "id": "d06",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "castrojo",
+      "text": "Don't get caught",
+      "avatar": "/var/home/jorge/src/destiny-vids/renders/avatars/castrojo.png",
+      "at": 27.564,
+      "dur": 2.0,
+      "fade_in": 0.6,
+      "fade_out_at": 29.264,
+      "fade_out": 0.25
+    },
+    {
+      "id": "d07",
       "kind": "chat",
       "position": "letterbox",
       "speaker": "jeefy",
-      "text": "the f*cking paperwork on this",
-      "at": 10.0,
-      "dur": 2.4,
-      "fade_in": 0.6,
-      "fade_out_at": 12.1,
-      "fade_out": 0.25,
-      "_note": "Cold open, line 4 of 4, asterisk verbatim from #102. Proposed 11.2-14.2 overlapped the clock shot the owner pinned c02 to, so the whole block shifts earlier; this line's fade completes 12.35, clear of c02's 12.433 open. No pfp -> drawn crest."
-    },
-    {
-      "id": "c02",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "BSHERMAN",
-      "text": "That factory has everything we need to help maintainers, forever",
-      "at": 12.433,
-      "dur": 2.434,
-      "fade_in": 0.6,
-      "fade_out_at": 14.567,
-      "fade_out": 0.25,
-      "_note": "The factory line, speaker recast Foreman -> BSHERMAN per #102, words unchanged. The owner identified the shot as 'in the europa video, after launch, there's a green clock'. FRAME-PINNED 2026-08-14: the shot is the cockpit dashboard with the glitching green LED timer, frames 373-445 of the delivered cut (t in [12.4333, 14.8667), ~2.43 s) -- frame 372 is still the satellite exterior (station and solar panels among asteroids, blue energy arc growing) and frame 446 cuts to the planet horizon. Evidence frames in the session QA folder (qsheet-3, qc-12.417). The window is the whole shot: a pill crossing either cut would dilute the pin. COMPROMISE, recorded: 10 words in 2.43 s is under the house read length -- the fiction bends to the footage (the owner pinned the shot), and re-timing is one edit here if the owner wants it longer."
-    },
-    {
-      "id": "c04a",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "BSHERMAN",
-      "text": "Anomaly Detected",
-      "at": 23.9,
+      "text": "It's all in your hands",
+      "avatar": "/var/home/jorge/src/destiny-vids/renders/avatars/jeefy.png",
+      "at": 29.964,
       "dur": 2.2,
       "fade_in": 0.6,
-      "fade_out_at": 25.8,
-      "fade_out": 0.25,
-      "_note": "Radio beat 1 of 3, #102's proposed window kept. The old c04's 3.7 s could not carry three lines; the terse split gives each its own 2.2 s beat."
+      "fade_out_at": 31.864,
+      "fade_out": 0.25
     },
     {
-      "id": "c04b",
+      "id": "d08",
       "kind": "chat",
       "position": "letterbox",
-      "speaker": "BSHERMAN",
-      "text": "Sending coordinates",
-      "at": 26.3,
+      "speaker": "ihor",
+      "text": "G{k8s}dspeed",
+      "avatar": "/var/home/jorge/src/destiny-vids/renders/avatars/idvoretskyi.png",
+      "at": 32.564,
       "dur": 2.2,
       "fade_in": 0.6,
-      "fade_out_at": 28.2,
-      "fade_out": 0.25,
-      "_note": "Radio beat 2 of 3."
+      "fade_out_at": 34.464,
+      "fade_out": 0.25
     },
     {
-      "id": "c04c",
+      "id": "d09",
       "kind": "chat",
       "position": "letterbox",
-      "speaker": "NIMBATUS",
-      "text": "Roger. Out",
+      "speaker": "nimbatus",
+      "text": "Wilco",
       "avatar": "/var/home/jorge/src/website/public/wolves/characters/nimbatus.webp",
-      "at": 28.7,
-      "dur": 2.2,
+      "at": 61.564,
+      "dur": 1.8,
       "fade_in": 0.6,
-      "fade_out_at": 30.6,
-      "fade_out": 0.25,
-      "_note": "Radio beat 3 of 3. #102's table reads 'Roger. Out' -- the table wins over render-plates.mjs, which had 'Roger, out'. Runs 3.3 s past the old c04 out (27.6), which #102 flagged for a picture check: the matte below the picture is pure black through 28.7-30.9, so the pill seats clean."
+      "fade_out_at": 63.064,
+      "fade_out": 0.25
     },
     {
-      "id": "c05",
+      "id": "d10",
       "kind": "chat",
       "position": "letterbox",
-      "speaker": "BSHERMAN",
-      "text": "If you're caught",
-      "at": 43.8,
-      "dur": 4.6,
-      "fade_in": 0.6,
-      "fade_out_at": 48.1,
-      "fade_out": 0.25,
-      "_note": "Window unchanged from the delivered cut; only the speaker changes (Foreman -> BSHERMAN)."
-    },
-    {
-      "id": "c06",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "NIMBATUS",
-      "text": "Wilco. Out",
+      "speaker": "nimbatus",
+      "text": "{k8s}ut",
       "avatar": "/var/home/jorge/src/website/public/wolves/characters/nimbatus.webp",
-      "at": 48.8,
-      "dur": 3.2,
+      "at": 63.764,
+      "dur": 2.0,
       "fade_in": 0.6,
-      "fade_out_at": 51.7,
-      "fade_out": 0.25,
-      "_note": "Shortened from the delivered 48.8-55.6: the removed sign-off ('... disavow my existence. Tell the medic and the engineer I'll meet them there. Out.') stays removed (#102), so the two-word line takes #102's proposed 48.8-52.0."
-    },
-    {
-      "id": "krook",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "Krook",
-      "text": "Obviously not supposed to be here",
-      "avatar": "/var/home/jorge/Videos/wolves-directors-cut/nimbatus-review/render/krook.png",
-      "at": 77.7,
-      "dur": 2.8,
-      "fade_in": 0.6,
-      "fade_out_at": 80.2,
-      "fade_out": 0.25,
-      "_note": "Window and copy unchanged from the delivered cut; this line predates the terse pass and was already terse."
+      "fade_out_at": 65.464,
+      "fade_out": 0.25
     }
   ],
   "cut_list": [
@@ -208,24 +189,100 @@
       "cover": "/var/home/jorge/Downloads/wolves.jpg"
     },
     "segments": [
-      {"label": "cold-open", "from": "intro", "frames": [0, 1725]},
-      {"label": "speeder", "from": "beyond", "window": [60.041667, 65.166667], "fps": 30, "scale": true},
-      {"label": "approach", "from": "intro", "frames": [1725, 2370]},
-      {"label": "walk-up", "from": "beyond", "fps_first": 30, "frames": [3443, 3509], "scale": true},
-      {"label": "wrap", "from": "wrap", "fade_out": {"at": 8.5, "dur": 0.5}},
-      {"label": "cover", "from": "cover", "still": true, "dur": 13.0, "fps": 30, "scale_pad": {"side": 1080, "x": 420}, "fade_in": {"at": 0.0, "dur": 1.2}, "fade_out": {"at": 11.0, "dur": 2.0}}
+      {
+        "label": "cold-open",
+        "from": "intro",
+        "frames": [
+          0,
+          1725
+        ]
+      },
+      {
+        "label": "speeder",
+        "from": "beyond",
+        "window": [
+          60.041667,
+          65.166667
+        ],
+        "fps": 30,
+        "scale": true
+      },
+      {
+        "label": "approach",
+        "from": "intro",
+        "frames": [
+          1725,
+          2370
+        ]
+      },
+      {
+        "label": "walk-up",
+        "from": "beyond",
+        "fps_first": 30,
+        "frames": [
+          3443,
+          3509
+        ],
+        "scale": true
+      },
+      {
+        "label": "wrap",
+        "from": "wrap",
+        "fade_out": {
+          "at": 8.5,
+          "dur": 0.5
+        }
+      },
+      {
+        "label": "cover",
+        "from": "cover",
+        "still": true,
+        "dur": 13.0,
+        "fps": 30,
+        "scale_pad": {
+          "side": 1080,
+          "x": 420
+        },
+        "fade_in": {
+          "at": 0.0,
+          "dur": 1.2
+        },
+        "fade_out": {
+          "at": 11.0,
+          "dur": 2.0
+        }
+      }
     ],
     "_note": "The concat reproduces nimbatus-review/render/run-final-hq.sh's [b0a][bsp][b0b][b1][b2][b3] graph, minus the close-up: 57.5 + 5.133333 + 21.5 + 2.2 + 9.0 = 95.333333 s of content, then the 13 s comic cover to a 108.333333 s master. The walk-up's fps=30 runs BEFORE its frame trim (so frames 3443-3509 are counted on the 30 fps conversion, i.e. source times 114.767-116.967; the measured native cut is 116.958): the solo wide runs from source 114.767 through that original cut, and the close-up is removed because both other Guardians are already visible behind the Exo Stranger. The walk-up's baked fade_out and the wrap's fade_in are both GONE -- the join is a hard cut, so both sides stay clean; the wrap's own closing fade stays. The speeder's window is a TIME trim on the native 24 fps stream, then fps=30. An input feeding two segments is split, never opened twice -- frame-exactness by construction, not by seek.",
     "_sources_note": "intro: the act's own 79 s plate-free picture (built by nimbatus-review/hq/build-intro-hq.sh). beyond: Bungie's Act 2 / Beyond Light reveal (T9FIbmj1Qf0), third-party copyrighted, used under Bungie's fan-content policy like the rest of the index (#55). wrap: the project's Nimbatus outro sting. cover: ~/Downloads/wolves.jpg, the comic cover act VIII owns (#178). Footage is never committed."
   },
   "audio": {
     "join": [
-      {"from": "intro", "window": [0.0, 79.0]},
-      {"from": "song", "window": [575.9, 607.2], "format": true}
+      {
+        "from": "intro",
+        "window": [
+          0.0,
+          79.0
+        ]
+      },
+      {
+        "from": "song",
+        "window": [
+          575.9,
+          607.2
+        ],
+        "format": true
+      }
     ],
     "crossfade": 0.1,
-    "master_fade_out": {"at": 106.333333, "dur": 2.0},
-    "delivered_fade_out": {"at": 92.833333, "dur": 2.5},
+    "master_fade_out": {
+      "at": 106.333333,
+      "dur": 2.0
+    },
+    "delivered_fade_out": {
+      "at": 92.833333,
+      "dur": 2.5
+    },
     "_note": "The master's bed is the intro's own audio (0-79 s) crossfaded 0.1 s (tri/tri) into Nightwish's Beauty of the Beast (575.9-607.2), then faded out over the cover (106.333333 + 2.0) and trimmed to 108.333333 -- the delivered film's audio is the peaks-gated master's, faded 92.833333 + 2.5 and trimmed to 95.333333 as the cover is cut. Song usage: third-party copyrighted, same fan-content position as the footage (#55); staged in the project, never committed.",
     "_usage_class": "third_party_copyrighted -- see #55 and the rights section of AGENTS.md."
   },
@@ -247,12 +304,13 @@
     "_loop_framerate_note": "run-final-hq.sh passed -framerate 30 on every still input. The endcard was the visible ghost-frame bug when a still came in at the 25 fps default -- the plate outlasted its window and burned into the cover. Load-bearing, not ceremonial."
   },
   "unresolved": [
-    "AN4-CH4K-12 here vs AN4-CH3CK-12 in the act II brief (#98): two authored strings for what looks like the same announcer. Neither is normalised; the owner picks the canonical one (#102, 'Also flagged' 1).",
-    "No pfps for AN4-CH4K-12, tabbysable, IAN, jeefy or BSHERMAN: their pills render with the drawn crest, the documented fallback. nimbatus and krook have theirs (#102, 'Also flagged' 2). Degrading, not blocking.",
     "The Clarke 'ALL THESE WORLDS ARE YOURS' intro slide stays OUT: a different rightsholder than Bungie and outside this repo's rights position. Owner decision required (#102, Blocked #1). Not built, not burned in.",
-    "c01b/c01c/c01d sit in compressed windows (2.4 s each) and c02 runs 10 words in the 2.43 s clock shot -- both consequences of the owner's shot pin; see c01d/c02 _notes. Re-timing is a one-line edit here now.",
+    "No pfps for preethi or alolita: their pills render with the drawn crest, the documented fallback. krook, nimbatus, castrojo, jeefy and ihor (github.com/idvoretskyi, owner-supplied) have theirs. Degrading, not blocking -- name the two logins and they gain faces.",
     "The reveal still credits Laura Santamaria: the Orlin recast (#73) stays open and was out of scope for this render.",
-    "delivery.json's VII entry gains real sources with this record; the digest is stamped by deliver.py publish, which the delivery session owns."
+    "delivery.json's VII entry gains real sources with this record; the digest is stamped by deliver.py publish, which the delivery session owns.",
+    "DIALOGUE REPLACED (owner, this round): every chat pill here is the owner's new Europa dialogue, given with programme marks 24:33 / 24:35 / 24:57 / 25:34 (act film 0.564 / 2.564 / 24.564 / 61.564). It REPLACES the previous set, which was agent-written and never owner-authored -- see the Jul 17 Whisp dictation (#120), whose deployment chat none of the old lines came from. Lines the owner pinned carry his mark; the lines he listed without one take the following gap in the order he listed them (0.4 s between pills, the convention the rest of this record uses).",
+    "THE {k8s} MARK REPLACES AN O, never trails the word (owner, this round) -- the same treatment act V already uses for `G{k8s}ddamn` in stories/05-natali-plates.json. Here it is ihor's `G{k8s}dspeed` and nimbatus's `{k8s}ut`.",
+    "OPEN BEAT at programme 25:30 (act film 57.564): the owner's note carries the mark with no line against it. Nothing is placed there rather than something guessed; it is a slot waiting for copy."
   ],
   "_plate_kind": "Every dialogue plate is kind: chat -- tools/plate.py's port of the wolves plate.html pill, this repo's renderer for the house treatment. THIS is the restyle the owner asked for: the delivered master's pills were screenshotted from the project's own plate.html by playwright (nimbatus-review/render/render-plates.mjs), a chrome that matches nothing else in the show; a rebuild from this record renders every pill with plate.py, the same renderer acts IV and V use. WORDS UNCHANGED -- chrome only.",
   "_timing": "at + dur are tools/plate.py's own manifest fields, so this file renders with plate.py render --manifest unmodified. fade_out_at is absolute film time, matching the ffmpeg fade=t=out:st= it generates; the house fade pair (in 0.6, out 0.25 completing 0.05 s before the window boundary) keeps a plate from ever ghosting into the next shot."

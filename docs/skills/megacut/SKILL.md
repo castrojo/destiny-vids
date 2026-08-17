@@ -46,7 +46,8 @@ its own committed inputs is named, and the build exits non-zero.
 ```bash
 python3 tools/deliver.py status --sources-only   # what moved, per act
 python3 tools/deliver.py build                   # rebuild exactly what is stale
-python3 tools/megacut.py <plan> --allow-stale    # ship the old masters anyway
+python3 tools/megacut.py <plan>                  # always assembles; stale acts
+                                                 # are named on stderr, never refused
 ```
 
 This is not editing policy leaking downstream: the fix still belongs upstream,

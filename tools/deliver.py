@@ -417,10 +417,13 @@ def blocked_on(master):
     and stops has SUCCEEDED, so the CI digest gate treats a declared block as
     a punch-list item rather than a red X.
 
-    It is deliberately NOT an escape hatch from the assembly refusal:
-    `stale_source_acts` still lists the act, so seating it in the programme
-    still costs an explicit `--allow-stale`. The gate stops blocking the merge
-    queue; nothing stops a stale act announcing itself on the way to picture.
+    A declared block SEATS the act rather than stopping the programme --
+    AGENTS.md, owner verbatim: "I'd rather have broken plates than no video."
+    `stale_source_acts` still lists it, and assembly still announces it on the
+    way to picture; what assembly refuses is drift with NO recorded reason,
+    because that is the kind nobody has looked at. Recording the block is the
+    work: an act that says why it is stale is a punch-list item, and one that
+    goes quiet is the bug.
     """
     return (master or {}).get("stale_blocked_on") or None
 
@@ -466,7 +469,7 @@ def check_sources(act, master, report):
             report.add("sources", BLOCKED,
                        f"inputs changed ({recorded[:12]} -> {digest[:12]}) and "
                        f"this act CANNOT be rebuilt until {blocker} is decided. "
-                       f"Seating it still costs `--allow-stale`. Declared "
+                       f"It seats itself in the programme meanwhile. Declared "
                        f"inputs: {', '.join(sources)}")
             return
         report.add("sources", STALE,

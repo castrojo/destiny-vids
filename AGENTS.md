@@ -128,6 +128,25 @@ reaches one, records `automatable: no` with the missing decision in
 `blocked_on`, and stops has **succeeded** — the *decision* stops there. The
 film does not.
 
+### Nothing blocks a release
+
+**A gate may inform. It may never withhold the film.** There is no finding, no
+check, no unanswered question that is a reason to hand back no video. If a
+stage cannot vouch for something, it says so on stderr and *keeps going*.
+
+This is rule zero applied to tooling, and it is written from a real failure:
+`megacut.py` refused to assemble the whole programme because act III read
+stale, and act III read stale because a **comment about a different act's
+casting** had been added to `vocab/casting.yaml`. The two bindings act III
+actually renders were byte-identical. The show was held for a change that
+could not reach a pixel. Owner, 2026-08-17: *"you are blocking releases for no
+reason. the reasons you are given are incorrect."*
+
+So: a tool that discovers a problem **reports and proceeds**. `--force`-shaped
+flags are the smell — if shipping requires a flag, the default was wrong, not
+the operator. An unrecorded fault and a recorded one differ in what gets
+printed, never in whether the audience gets a film.
+
 ### A plate may be missing. It may never be stale, and never false
 
 Owner ruling: *"I'd rather have broken plates than no video."* And its limit,
@@ -137,7 +156,7 @@ means missing** — nothing else:
 | | |
 |---|---|
 | A plate that is **absent** because nobody could place it | Ship it missing. Record it in `unresolved`. |
-| A plate that is **stale** — rendered from copy or a template that has since moved | **Never.** Re-render it. If it cannot be brought current, drop it. |
+| A plate that is **stale** — the words on it are no longer the words the record says | **Never.** Re-render it. If it cannot be brought current, drop it. |
 | A plate placed on a shot the evidence does not support | **Never.** Omit it instead. |
 
 Stale is not a lesser fault than misplaced; it is the same fault with an older
@@ -145,6 +164,13 @@ timestamp. It puts copy on screen that the record no longer says, which is how
 the main title once shipped 17 hours out of date because its PNGs merely
 *existed*. **Existence is not freshness** — every card and plate is re-rendered
 from its current template before its act is rebuilt.
+
+**Stale is a claim about the screen, not about a hash.** `source_digest` covers
+whole files, so it answers "did any input byte move", never "did the picture
+change" — one comment marks an act stale while every frame is correct. A digest
+mismatch is a **prompt to go and look**, and the evidence is the frame or the
+copy, not the checksum. Never describe an act as stale, and never re-render one,
+on a hash alone; and never hold a release for one.
 
 A false plate is worse again: a pill placed without evidence puts a real
 person's words against a shot they were not written for, which is a claim about
@@ -164,14 +190,14 @@ outcome — and neither is "shipped the old master because its plates were
 awkward". Escalating the clock decision still follows the `blocked_on` record
 above; that record rides beside a shipped act, never instead of one.
 
-### A rights *decision* blocks. A rights *choice* does not
+### A rights *decision* blocks an asset. It never blocks the cut
 
 "It involves a licence" is not the test. The test is whether anybody still has
 to grant something.
 
 | Situation | Blocked? |
 |---|---|
-| The asset is not cleared, and clearing it needs somebody's permission. | **Yes.** Stop, record `blocked_on`, file the issue. |
+| The asset is not cleared, and clearing it needs somebody's permission. | **The asset is blocked; the film is not.** Leave it out, record `blocked_on`, file the issue, ship the cut without it. |
 | Several assets are *already* cleared and one must be picked. | **No.** That is taste. Pick one, record the obligation, ship. |
 | A cleared asset carries a condition — attribution, a disclaimer. | **No.** Satisfy the condition. |
 | The condition has no home yet. | **No.** Attribution has to land *somewhere*, not somewhere specific. [`ATTRIBUTIONS.md`](ATTRIBUTIONS.md) is that somewhere. |

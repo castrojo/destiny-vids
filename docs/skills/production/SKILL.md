@@ -224,10 +224,13 @@ blocks every act after a rebase — a wall, not a gate. The content digest is
 the authority; this is just the cheap proof that a render happened after the
 edit.
 
-**Assembly refuses stale acts.** `tools/megacut.py` will not seat an act whose
-master predates its own committed inputs; it names them and exits non-zero.
-`--allow-stale` ships the old masters anyway and says so on stderr, for a
-deliberate rough cut.
+**Assembly reports stale acts; it never refuses them.** `tools/megacut.py`
+names every seated act whose master predates its own committed inputs, on
+stderr, and assembles anyway -- AGENTS.md, *Nothing blocks a release*. The
+digest hashes whole files, so it answers "did an input move", not "did the
+picture change": act III once held the entire programme over a comment about a
+different act's casting, with every frame of it correct. Go and look at the
+frame before calling an act stale.
 
 **A builder's default output is not automatically its master.** Acts VI and
 VIII both write somewhere else by default, so a `rebuild` command is declared
