@@ -12,16 +12,43 @@ body { font-family: 'Inter', 'Arial Narrow', sans-serif; }
   color: #f4f6f8; text-align: center;
   text-shadow: 0 0 4px rgb(0 0 0 / 95%), 0 2px 10px rgb(0 0 0 / 90%), 0 0 28px rgb(0 0 0 / 75%);
 }
-.line { margin: .55rem 0; font-size: 2rem; font-weight: 800; letter-spacing: .055em; line-height: 1.12; }
+.line {
+  margin: .55rem 0; color: #fff;
+  font-size: clamp(2.8rem, 5vw, 5.2rem); font-weight: 900;
+  letter-spacing: .045em; line-height: 1.05;
+}
+.line:empty { display: none; }
+.k8s-o {
+  height: .62em; width: auto; vertical-align: .042em;
+  margin: 0 .041em 0 -.005em;
+  filter:
+    drop-shadow(0 0 4px rgb(0 0 0 / 95%))
+    drop-shadow(0 2px 10px rgb(0 0 0 / 90%))
+    drop-shadow(0 0 28px rgb(0 0 0 / 75%));
+}
 </style>
 </head>
 <body>
 <div class="card"><div class="line" id="title"></div><div class="line" id="subtitle"></div><div class="line" id="body"></div></div>
 <script>
 const p = new URLSearchParams(location.search)
-document.getElementById('title').textContent = p.get('title') || ''
+const title = document.getElementById('title')
+title.textContent = p.get('title') || ''
 document.getElementById('subtitle').textContent = p.get('subtitle') || ''
 document.getElementById('body').textContent = p.getAll('body').join(' ')
+const titleText = title.textContent
+const wordAt = titleText.toLowerCase().lastIndexOf('evolve')
+if (wordAt !== -1) {
+  const oAt = wordAt + 2
+  const letter = titleText[oAt]
+  const mark = document.createElement('img')
+  mark.className = 'k8s-o'
+  mark.src = '../renders/marks/kubernetes.svg'
+  mark.alt = letter
+  mark.onerror = () => mark.replaceWith(document.createTextNode(letter))
+  title.textContent = ''
+  title.append(titleText.slice(0, oAt), mark, titleText.slice(oAt + 1))
+}
 document.fonts.ready.then(() => { window.__renderReady = true })
 </script>
 </body>

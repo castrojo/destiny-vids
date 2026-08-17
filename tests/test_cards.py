@@ -52,6 +52,20 @@ def test_maintitle_has_a_poster_variant_for_the_existing_body_shape():
     assert "0 0 16px 2px rgb(37 99 235 / 45%)" in template
 
 
+def test_daycard_uses_the_poster_cta_hierarchy_and_kubernetes_evolve_o():
+    template = open(os.path.join(CARDS, "daycard.html"), encoding="utf-8").read()
+    assert "font-size: clamp(2.8rem, 5vw, 5.2rem)" in template
+    assert "font-weight: 900" in template
+    assert "letter-spacing: .045em" in template
+    assert "line-height: 1.05" in template
+    assert ".line:empty { display: none; }" in template
+    assert "background:" not in template.split(".card", 1)[1].split("</style>", 1)[0]
+    assert "className = 'k8s-o'" in template
+    assert "lastIndexOf('evolve')" in template
+    assert "mark.src = '../renders/marks/kubernetes.svg'" in template
+    assert "mark.onerror = () => mark.replaceWith(document.createTextNode(letter))" in template
+
+
 def test_plate_py_refuses_to_draw_a_card_and_says_what_does():
     with pytest.raises(ValueError) as excinfo:
         plate.render_plate({"id": "act1", "kind": "act", "act": "I"})

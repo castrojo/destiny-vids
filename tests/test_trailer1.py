@@ -110,6 +110,21 @@ def test_the_music_plays_out_past_where_the_prologue_faded():
     assert T.AUDIO_FADE_START + T.AUDIO_FADE == pytest.approx(T.TOTAL)
 
 
+def test_the_wolves_howl_lands_before_the_final_fade():
+    """The 1:47 howl is the trailer's climax, not a quiet tail detail."""
+    assert T.AUDIO_FADE_START == pytest.approx(107.000)
+    assert T.AUDIO_FADE == pytest.approx(3.020)
+
+
+def test_the_lossless_master_is_true_peak_gated_before_delivery():
+    """A fresh visual render must not reintroduce a clipping audio master."""
+    source = (REPO_ROOT / "scripts" / "build_trailer1.py").read_text()
+    assert "peaks.correct_delivered_peak(" in source
+    assert "def rerun_with_gain(gain):" in source
+    assert "command(manifest, day, night, gain)" in source
+    assert source.index("peaks.correct_delivered_peak") < source.index("shutil.copy2")
+
+
 # --- the copy -----------------------------------------------------------------
 
 OWNER_COPY = {
@@ -160,6 +175,16 @@ def test_the_end_card_poster_uses_no_new_copy_field(manifest):
                        {"id", "kind", "at", "dur", "stage", "variant",
                         "angle", "size", "anchor", "anchor_out", "walk"}}
         assert copy_fields == {"title", "subtitle", "body"}
+
+
+def test_the_daytime_card_keeps_only_the_single_marquee_line(manifest):
+    """The retired lines must not silently return with a later card pass."""
+    card = plate(manifest, "daytime-kindness")
+    assert card["title"] == "Evolve or Die"
+    assert "subtitle" not in card
+    assert "body" not in card
+    assert "The Final Shape is Kindness" not in json.dumps(card)
+    assert "Wolves aren't Evil" not in json.dumps(card)
 
 
 def test_the_credit_line_is_one_seared_line_here_and_in_the_prologue(manifest):
