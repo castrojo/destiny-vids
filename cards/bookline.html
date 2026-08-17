@@ -97,8 +97,14 @@
     box-shadow:
       0 0 4px rgb(0 0 0 / 92%),
       0 0 24px rgb(0 0 0 / 72%);
-    font-size: 2.65rem;
-    line-height: 1.2;
+    /* OWNER SIZE, 2026-08-17: "the box in the first part is too small,
+       increase text size and the vertical space inbetween each sentence",
+       then "D is the best" from four mockups rendered over the book frame
+       itself (2.65/1.20, 3.10/1.45, 3.45/1.55, 3.80/1.70). D is the largest
+       that still clears the letterbox bars and the page gutter: the box
+       measures 1168x514 of the 1920x1080 frame. */
+    font-size: 3.8rem;
+    line-height: 1.7;
   }
 </style>
 </head>
@@ -117,26 +123,32 @@
   }
   el.textContent = lines.join('\n')
 
-  // EVERY B AND EVERY F IS BLUE. Owner, 2026-08-15, on all dialogue except the
-  // chat bubbles and nameplates -- and this is neither. Same definition as
-  // cards/maintitle.html and tools/blueletters.py.
-  const BLUE_LETTERS = 'BbFf'
-  const parts = []
-  let run = ''
-  for (const ch of el.textContent) {
-    if (BLUE_LETTERS.includes(ch)) {
-      if (run) { parts.push(document.createTextNode(run)); run = '' }
-      const span = document.createElement('span')
-      span.style.color = '#4285f4'
-      span.textContent = ch
-      parts.push(span)
-    } else {
-      run += ch
+  // BLUE LETTERS ARE OPT-IN, as they are on cards/ending.html: `blue_letters`
+  // must say `true`. The b/f rule is the project's (owner, 2026-08-15, on all
+  // dialogue except the chat bubbles and nameplates), but the owner turned it
+  // off on this card -- "get rid of the blue here" -- because a recoloured
+  // letter mid-word reads as a typo at this size over a printed page. The rule
+  // stands everywhere it was not switched off; this card simply does not ask
+  // for it. Definition unchanged: tools/blueletters.py.
+  if (params.get('blue_letters') === 'true') {
+    const BLUE_LETTERS = 'BbFf'
+    const parts = []
+    let run = ''
+    for (const ch of el.textContent) {
+      if (BLUE_LETTERS.includes(ch)) {
+        if (run) { parts.push(document.createTextNode(run)); run = '' }
+        const span = document.createElement('span')
+        span.style.color = '#4285f4'
+        span.textContent = ch
+        parts.push(span)
+      } else {
+        run += ch
+      }
     }
+    if (run) { parts.push(document.createTextNode(run)) }
+    el.textContent = ''
+    el.append(...parts)
   }
-  if (run) { parts.push(document.createTextNode(run)) }
-  el.textContent = ''
-  el.append(...parts)
 
   // The page's tilt, in degrees, positive clockwise. Absent means level.
   const angle = parseFloat(params.get('angle') || '0')

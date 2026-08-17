@@ -97,6 +97,39 @@ choose the two trim lengths such that the transition occupies the requested
 window exactly. Source: FFmpeg documentation via Context7
 `/websites/ffmpeg_documentation`, “Split input streams” and “xfade”.
 
+## Blue letters are opt-in, per card
+
+The project's b/f rule — every `B` and `F` in the film's blue,
+`tools/blueletters.py` — is asked for by `blue_letters=true`, never applied by
+a template on its own. `cards/ending.html` and `cards/bookline.html` both gate
+it that way.
+
+A card is allowed not to ask. At display sizes over a printed page a recoloured
+letter mid-word reads as a typo rather than as branding, and the owner has
+switched it off for exactly that reason. Switching it off on one card is not a
+change to the rule; a template that applies it unconditionally is, because then
+no card can decline it.
+
+## Sizing a card: render the candidates over the frame they ship on
+
+The same rule `scripts/build_font_options.py` follows for weights applies to
+type size and leading, and for the same reason: half of "too small" is the
+picture behind the type, so a swatch cannot answer it.
+
+Composite each candidate over a real frame pulled from the source at the beat's
+own timecode, and give the owner the set:
+
+```bash
+ffmpeg -v error -y -ss <t> -i media/<video_id>.mkv -frames:v 1     -vf "pad=1920:1080:0:<pad_y>:color=black" /tmp/frame.png
+node cards/render-cards.mjs --manifest <manifest> --out-dir /tmp/cards --only <id>
+# then alpha-composite plate over frame with Pillow and report the box size
+```
+
+Report each candidate's **box dimensions in pixels of the 1920x1080 frame**
+alongside the CSS values. "3.8rem" means nothing to the person choosing;
+"1168x514, the largest that still clears the letterbox bars and the page
+gutter" is the decision they are actually making.
+
 ## Where a line sits is authored, and it is measured
 
 A card over a wallpaper has one readability decision in it — which horizontal
