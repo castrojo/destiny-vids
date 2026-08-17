@@ -649,6 +649,7 @@ def schedule(manifest):
             items.append({"kind": "cast", "t": t, "dur": target,
                           "person": C.REDACTED, "character": person["character"],
                           "card": None, "login": None, "photo": None,
+                          "guardian_title": None,
                           "title": None})
         else:
             items.append({"kind": "cast", "t": t, "dur": target,
@@ -656,6 +657,12 @@ def schedule(manifest):
                           "card": person.get("card"),
                           "login": person.get("login") or verified.get(name),
                           "photo": photos.get(name),
+                          # The seal is authored in two places -- the website's
+                          # identity card (reached through `card`) and, for the
+                          # people the website never carded, the manifest's own
+                          # `guardian_title`. Both have to reach the placard or
+                          # the `as` row silently disappears for half the cast.
+                          "guardian_title": person.get("guardian_title"),
                           "title": cast_title(person)})
         t += target
 
@@ -750,6 +757,7 @@ def render_cards(items, out_dir):
             img = C.render_cast_placard(item["person"], item["character"],
                                         card=item.get("card"), login=item.get("login"),
                                         photo=item.get("photo"),
+                                        guardian_title=item.get("guardian_title"),
                                         title=item.get("title"), index=i)
         elif item["kind"] == "wall":
             img = C.render_name_wall(item["section"], item["names"],
