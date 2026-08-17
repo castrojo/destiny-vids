@@ -18,9 +18,10 @@
       "detail": "AN4-CH4K-12",
       "label": "Welcome to KubeCon + Cloud Native Con",
       "copy_source": "owner_supplied",
-      "at": 36.127,
+      "at": 60.127,
       "dur": 6.0,
-      "_note": "Programme 16:02 maps to Act VI 0:36.127. The owner asked for the Ghost to welcome the audience, so this uses the top-of-frame status treatment rather than a normal lower-third chat."
+      "seen_at_film": 60.127,
+      "_note": "Programme 16:26 maps to Act VI 1:00.127 -- owner note 2026-08-16: \"the 'Welcome to KubeCon' text line goes here\". The owner asked for the Ghost to welcome the audience, so this uses the top-of-frame status treatment rather than a normal lower-third chat; the seat is the Ghost's own shot (the Ghost over the Moon), confirmed on an extracted frame. Moved from 36.127, the star-map HUD shot."
     },
     {
       "id": "cayde_reveal_castrojo",
@@ -198,6 +199,7 @@
     "NOT IN casting.yaml: Brian Ketelsen and Angie Jones have no binding and no ensemble title. Their copy exists only in the brief and only in this manifest. Both need a casting.yaml entry keyed by GitHub login before they are credited anywhere else -- the login is the owner's to supply, not an agent's to guess.",
     "Brian Ketelsen and Kelsey Hightower carry the SAME title, 'Evangelist of the Open Sky', exactly as the brief wrote it. Reproduced rather than de-duplicated; owner to confirm it is deliberate.",
     "ORDER (the reveal, unchanged): the brief lists 'reveal Jorge Castro' and the narration together at 17:37. Rendered as reveal FIRST (382.7) and narration SECOND (386.3), because the two are both lower-third cards and cannot share a window, and because the name is the payoff. Swap is one edit to `at`.",
+    "CLOCK RECORD, settled 2026-08-16 (issue #257): every `at` window here is on the CURRENT picture's clock -- the 443.463 s shotlist's render (renders/07-wolves-picture.mp4 -> 07-wolves-timing-pass.mp4, geometry-identical to the delivered v6 master, which already carries these windows). Verified on extracted frames from v6: the reveal plate sits on Cayde-6 walking out of the fog and the hooded close-up, the six lines run over the approach, each gold credit sits on the shot its `why` names. The `shot_film`/`seen_at_film` anchors on the four credit plates are the PRE-#104 verification record: the 2026-08-13 +10.811 s shift (`_shifted`) moved every `at` but not the anchors, so each anchor reads 10.811 s early against the current picture (the fog walk is 392.711-396.911 there, not 381.9-386.1; the fire is 401.819, not 391.008). Anchors kept as the v1 record, not rewritten; `at` is the authority.",
     "CONTRACT VIOLATION, KNOWN AND DELIBERATE -- see issue #111. plates/SKILL.md lists 'the brief's copy contradicts the binding, but the owner wrote it today' as a RATIONALIZATION: the vocab is the reviewed record and it WINS a conflict; tools/plate.py `plan` enforces exactly that. This hand-authored manifest bypasses `plan`, so the two cards flagged `copy_override` below ship the brief's copy against the binding. That is the owner's brief being honoured for a review render, NOT a precedent. Resolution is #111: either vocab/casting.yaml is edited to match, or these two cards are re-burned from the binding."
   ]
 }

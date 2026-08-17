@@ -166,7 +166,7 @@ def test_the_source_is_never_committed(thread):
 # to "tidy up" the plan would put them back.
 
 ACT_VI = "06-7daystothewolves"
-COMIC_CUT = 431.231   # 36 ms ahead of the 431.243 hit; the comic comes up at 431.267
+FLASH_CUT = 430.997   # act VI's last shot change; the 14-frame flash starts here
 
 
 def _item(plan, needle):
@@ -174,21 +174,19 @@ def _item(plan, needle):
                 if needle in (i.get("path") or i.get("image", "")))
 
 
-def test_act_six_is_cut_at_the_comic(plan):
-    """One frame removes the comic cover and the song's fade-out together.
+def test_act_six_is_cut_before_its_closing_flash(plan):
+    """One frame removes three things the owner asked to lose.
 
-    Measured: 431.267 is act VI's last shot change. The cover comes up on it
-    and holds 12.2 s to the end, and the audio is at full level right up to
-    it (-12.6 dB) and decaying immediately after. The owner asked for both to
-    go, and both go with one cut.
+    The comic cover comes up at 431.267 and holds 12.2 s, the song's fade-out
+    begins on the same frame, and the act's last 14 frames are a separate shot
+    -- a pink tableau flashing to a dark Exo shot from 430.997 -- which is the
+    "too janky" the owner named at programme 22:38.
 
-    The cut sits 36 ms EARLIER than that shot change, at 431.231, and the 36 ms
-    are the owner's 'hot mess' note (2026-08-15): there is a hit at 431.243, so
-    cutting on the shot change played the attack of a drum and took the rest
-    away. 431.231 is the frame boundary ahead of the transient. The comic is
-    still never seen -- it starts 36 ms after the cut.
+    Cutting on 430.997 takes all three. The needle drop survives it: post-seam
+    audio cross-correlates with the longer cut at lag 0.00 ms, r = 0.997, and
+    movement 4 still opens on its own first hit +0.032 s past the seam.
     """
-    assert _item(plan, ACT_VI)["trim_to"] == COMIC_CUT
+    assert _item(plan, ACT_VI)["trim_to"] == FLASH_CUT
 
 
 def test_the_trim_keeps_every_tail_credit(plan):
@@ -203,8 +201,8 @@ def test_the_trim_keeps_every_tail_credit(plan):
     plates = json.loads(
         (REPO_ROOT / "stories" / "06-wolves-cayde-plates.json").read_text())
     last = max(p["at"] + p.get("dur", 0) for p in plates["plates"])
-    assert last < COMIC_CUT, (
-        f"the trim at {COMIC_CUT} would cut a credit ending at {last}")
+    assert last < FLASH_CUT, (
+        f"the trim at {FLASH_CUT} would cut a credit ending at {last}")
 
 
 def test_the_wolves_join_is_hard_on_both_sides(plan):

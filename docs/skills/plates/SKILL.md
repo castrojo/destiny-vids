@@ -145,6 +145,11 @@ This skill is the contract. The procedure lives in `references/`:
   wins; if the brief is right, the fix is a vocab edit, not a per-video
   override.
 - Calling a burn done because ffmpeg exited 0. Check a frame, not the manifest.
+- Guessing a pill's seat when the manifest's clock is in doubt. Omission
+  degrades, misplacement lies: a pill that cannot be placed on evidence is
+  omitted and recorded in `unresolved`, and the act ships with fewer pills.
+  Never hold the film — and never ship the old master instead, because stale
+  copy on screen is the same fault as misplaced copy with an older timestamp.
 - **Deck colours on a card that sits over MOVING PICTURE.** The deck's greys
   (`--wc-grey` #8b8f96, and the secondary #cbd5e1) are chosen against a slide's
   black. Over footage they hold for as long as the shot is dark and vanish the

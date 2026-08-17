@@ -71,31 +71,9 @@ withhold it.
 **A blocked act is seated, not waited for.** Owner, 2026-08-16, verbatim: *"I'd
 rather have broken plates than no video."* An act whose plates cannot be placed
 still plays: render it without them, record what is unresolved, and assemble the
-programme. Nothing in this repo may hold the show back for a card.
-
-**"Broken" means missing. It never means stale, and it never means false.**
-Owner, same session: *"stale is never ok because that's wrong."* The licence is
-exactly one square wide:
-
-| | |
-|---|---|
-| A plate that is **absent** because nobody could place it | Ship it missing. Record it. |
-| A plate that is **stale** — rendered from copy or a template that has since moved | **Never.** Re-render it. If it cannot be re-rendered, drop it. |
-| A plate placed on a shot the evidence does not support | **Never.** Omit it instead. |
-
-Stale is not a lesser fault than misplaced; it is the same fault with an older
-timestamp. It puts copy on screen that the record no longer says, which is how
-the main title once shipped 17 hours out of date because its PNGs merely
-*existed*. **Existence is not freshness.** Every card and plate is re-rendered
-from its current template before its act is rebuilt — and an act whose plates
-cannot be brought current ships with those plates **removed**, not with the old
-ones carried through.
-
-A cue 38 seconds from its shot is not a broken plate either; it is a real
-person's words against footage they were not written for. Omission degrades.
-Stale and misplaced both lie. When a plate cannot be placed on current evidence,
-**drop that plate and ship the act** — the film keeps moving and nobody is
-misquoted.
+programme. Nothing in this repo may hold the show back for a card. The width of
+that licence — and it is exactly one square wide — is under **Degrade, never
+block** below.
 
 ## The three rules that outrank convenience
 
@@ -147,7 +125,44 @@ because CI must stay green while copy is being written.
 **Three classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, and a licensing decision. An agent that
 reaches one, records `automatable: no` with the missing decision in
-`blocked_on`, and stops has **succeeded**.
+`blocked_on`, and stops has **succeeded** — the *decision* stops there. The
+film does not.
+
+### A plate may be missing. It may never be stale, and never false
+
+Owner ruling: *"I'd rather have broken plates than no video."* And its limit,
+from the same session: *"stale is never ok because that's wrong."* So **broken
+means missing** — nothing else:
+
+| | |
+|---|---|
+| A plate that is **absent** because nobody could place it | Ship it missing. Record it in `unresolved`. |
+| A plate that is **stale** — rendered from copy or a template that has since moved | **Never.** Re-render it. If it cannot be brought current, drop it. |
+| A plate placed on a shot the evidence does not support | **Never.** Omit it instead. |
+
+Stale is not a lesser fault than misplaced; it is the same fault with an older
+timestamp. It puts copy on screen that the record no longer says, which is how
+the main title once shipped 17 hours out of date because its PNGs merely
+*existed*. **Existence is not freshness** — every card and plate is re-rendered
+from its current template before its act is rebuilt.
+
+A false plate is worse again: a pill placed without evidence puts a real
+person's words against a shot they were not written for, which is a claim about
+a real person. **Omission degrades; stale and misplaced both lie.**
+
+No finding about an act's clock stops the programme either. When a manifest's
+clock is in question, take the best rung the evidence supports and stop there:
+
+| Rung | What ships |
+|---|---|
+| (a) | Clock resolved by measurement; every plate re-rendered and re-verified on the shot its `why` describes. |
+| (b) | The requested change applied and verified; the already-verified plates carried through from a burn whose placement is itself evidenced. |
+| (c) | The act re-rendered from current templates carrying **only** the plates that can be placed, the rest dropped and recorded. |
+
+Rung (c) is always reachable, so "blocked, nothing delivered" is not an
+outcome — and neither is "shipped the old master because its plates were
+awkward". Escalating the clock decision still follows the `blocked_on` record
+above; that record rides beside a shipped act, never instead of one.
 
 ### A rights *decision* blocks. A rights *choice* does not
 
