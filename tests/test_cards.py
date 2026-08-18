@@ -156,6 +156,30 @@ def test_every_act_slide_carries_an_audience_facing_chapter_title():
             assert "held long" not in item["chapter"]
 
 
+def test_act_i_megacut_clip_keeps_the_cinematic_tail():
+    plan = _load("megacut.json")
+    act_i = next(
+        item for item in plan["items"]
+        if item.get("path", "").endswith("01-intro.mp4")
+    )
+    assert act_i["trim_from"] == pytest.approx(2.0)
+    assert act_i["trim_to"] == pytest.approx(118.2)
+    assert act_i["trim_to"] >= 114.2 + 4.0
+
+
+def test_act_ii_megacut_clip_keeps_its_now_carded_black_head():
+    plan = _load("megacut.json")
+    act_ii = next(
+        item for item in plan["items"]
+        if item.get("path", "").endswith("02-endlessformsmostbeautiful.mp4")
+    )
+    assert act_ii["audio"] == "source"
+    assert act_ii["fade_in"] == 0.0
+    assert "trim_from" not in act_ii
+    assert "approved authored copy for Act II's derived black head" in act_ii["_head_card"]
+    assert act_ii["sub_chapters"] == "stories/02-endless-forms-plates.json"
+
+
 def test_the_programme_is_delivered_from_the_wolves_workspace():
     """Prod holds the highest-quality master of each act; the movie goes to
     megacut/. Reading anywhere else would ship a lossy copy of the same cut --
@@ -224,21 +248,24 @@ def test_the_title_card_covers_one_unbroken_window_beside_the_guardian_plates():
     assert abs(cover["at"] - 22.5) < 1e-6
     assert abs(cover["at"] + cover["dur"] - 36.0) < 1e-6
     # load_manifest already refused an overlap against the Guardian plates.
-    plates = [e for e in entries if e["id"] != "title-cover"]
+    # Chrome rows (caption/context/warning) intentionally coexist with the
+    # full-frame cover by occupying their own screen lanes.
+    plates = [e for e in entries if e["id"] != "title-cover"
+              and e.get("kind") not in plate.CHROME_ROWS]
     assert all(p["at"] + p["dur"] <= cover["at"] + 1e-6
                or p["at"] >= cover["at"] + cover["dur"] - 1e-6
                for p in plates)
 
 
 def test_a_recast_plate_carries_a_name_and_no_inherited_rows():
-    """Orlin has no authored identity: name only, never Laura's label, subclass
-    and title. Cortney's identity WAS authored (issue #90), so hers is checked
-    the other way -- every row present, and the one row nobody wrote absent."""
+    """OrliX has an owner-supplied GitHub identity but no Guardian rows; never
+    inherit Laura's label, subclass, or title."""
     entries = plate.load_manifest(os.path.join(MEGACUT, "megacut-hero-plates.json"))
-    orlin = next(e for e in entries if e["id"] == "orlin")
-    assert orlin["name"]
+    orlix = next(e for e in entries if e["id"] == "orlix")
+    assert orlix["name"] == "OrliX"
+    assert orlix["avatar"] == "renders/avatars/orlix.png"
     for row in ("label", "class", "title", "trustee"):
-        assert row not in orlin, f"orlin inherited {row}"
+        assert row not in orlix, f"orlix inherited {row}"
 
     cortney = next(e for e in entries if e["id"] == "cortney")
     assert cortney["name"] == "Cortney Nickerson"
@@ -248,7 +275,8 @@ def test_a_recast_plate_carries_a_name_and_no_inherited_rows():
 
     manifest = _load("megacut-hero-plates.json")
     gaps = " ".join(u["what"] for u in manifest["unresolved"])
-    assert "Cortney Nickerson" in gaps and "Orlin" in gaps
+    assert "Cortney Nickerson" in gaps
+    assert "Orlin" not in gaps and "OrliX" not in gaps
 
 
 def test_the_cover_is_a_full_frame_photo_and_nobody_is_captioned_into_it():

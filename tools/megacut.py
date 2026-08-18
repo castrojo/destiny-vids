@@ -1560,8 +1560,8 @@ def main(argv=None):
         cluster_ok, why = farm.cluster_available()
         if cluster_ok:
             use_farm = True
-            print(f"megacut: cluster reachable; ENCODE segments run on "
-                  f"{farm.DEFAULT_NODE} (--local to force this host)",
+            print("megacut: cluster reachable; ENCODE segments run on "
+                  "scheduler-selected nodes (--local to force this host)",
                   file=sys.stderr)
         else:
             print(f"megacut: cluster UNREACHABLE ({why}); falling back to "

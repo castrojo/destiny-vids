@@ -72,6 +72,7 @@
       "position": "letterbox",
       "speaker": "alolita",
       "text": "It's all for naught we fail",
+      "avatar": "/var/home/jorge/src/destiny-vids/renders/avatars/alolita.png",
       "at": 4.564,
       "dur": 2.6,
       "fade_in": 0.6,
@@ -305,7 +306,7 @@
   },
   "unresolved": [
     "The Clarke 'ALL THESE WORLDS ARE YOURS' intro slide stays OUT: a different rightsholder than Bungie and outside this repo's rights position. Owner decision required (#102, Blocked #1). Not built, not burned in.",
-    "No pfps for preethi or alolita: their pills render with the drawn crest, the documented fallback. krook, nimbatus, castrojo, jeefy and ihor (github.com/idvoretskyi, owner-supplied) have theirs. Degrading, not blocking -- name the two logins and they gain faces.",
+    "No verified GitHub login for preethi: that pill renders with the drawn crest, the documented fallback. Alolita is verified as github.com/alolita; krook, nimbatus, castrojo, jeefy and ihor (github.com/idvoretskyi, owner-supplied) also have portraits. Degrading, not blocking -- name preethi's login and that pill gains a face.",
     "The reveal still credits Laura Santamaria: the Orlin recast (#73) stays open and was out of scope for this render.",
     "delivery.json's VII entry gains real sources with this record; the digest is stamped by deliver.py publish, which the delivery session owns.",
     "DIALOGUE REPLACED (owner, this round): every chat pill here is the owner's new Europa dialogue, given with programme marks 24:33 / 24:35 / 24:57 / 25:34 (act film 0.564 / 2.564 / 24.564 / 61.564). It REPLACES the previous set, which was agent-written and never owner-authored -- see the Jul 17 Whisp dictation (#120), whose deployment chat none of the old lines came from. Lines the owner pinned carry his mark; the lines he listed without one take the following gap in the order he listed them (0.4 s between pills, the convention the rest of this record uses).",

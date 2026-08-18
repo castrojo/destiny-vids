@@ -198,7 +198,7 @@ def test_movement_four_declares_its_own_derivative():
     derivative = move["ending_derivative"]
     assert derivative["out_file"] == "renders/perfume-4-overlays.mp4"
     assert derivative["overlay_manifest"] == "stories/00-perfume-4-plates.json"
-    assert derivative["overlay_section"] == "chat"
+    assert derivative["overlay_section"] == ["chat_wolf", "chat"]
 
 
 def test_the_derivative_composes_replacements_and_plates_in_one_encode(
@@ -237,10 +237,12 @@ def test_plate_inputs_are_numbered_after_the_artwork(tmp_path, monkeypatch):
 
 
 def test_the_chat_windows_are_half_open_and_faded_inside(tmp_path):
-    graph = chat_command(tmp_path)[
-        chat_command(tmp_path).index("-filter_complex") + 1]
+    cmd = chat_command(tmp_path)
+    graph = cmd[cmd.index("-filter_complex") + 1]
+    by_id = {p["id"]: p for p in chat()["plates"]}
     assert "between(" not in graph
-    for card in chat()["plates"]:
+    for id_ in chat()["chat"]["plate_ids"]:
+        card = by_id[id_]
         at = float(card["at"])
         end = at + float(card["dur"])
         assert f"enable='gte(t,{at:.3f})*lt(t,{end:.3f})'" in graph, card["id"]
@@ -252,9 +254,11 @@ def test_the_chat_windows_are_half_open_and_faded_inside(tmp_path):
 
 
 def test_the_chat_copy_is_verbatim_and_one_line_at_a_time():
-    """The owner's six lines, in the two groups he wrote, never edited --
-    and never overlapping, so no pill ghosts onto the next."""
-    plates = chat()["plates"]
+    """The owner's six whale-shot lines, in the two groups he wrote, never
+    edited -- and never overlapping, so no pill ghosts onto the next."""
+    doc = chat()
+    by_id = {p["id"]: p for p in doc["plates"]}
+    plates = [by_id[id_] for id_ in doc["chat"]["plate_ids"]]
     assert [p["text"] for p in plates] == [
         "One more loose end",
         "You can't escape yourself",
@@ -283,7 +287,8 @@ def test_the_exchange_sits_inside_the_measured_whale_shot():
     window = doc["chat"]
     local_in = window["source_in"] - 274.240
     local_out = window["source_out"] - 274.240
-    plates = doc["plates"]
+    by_id = {p["id"]: p for p in doc["plates"]}
+    plates = [by_id[id_] for id_ in window["plate_ids"]]
     assert plates[0]["at"] >= local_in
     assert plates[-1]["at"] + plates[-1]["dur"] <= local_out
     assert [p["id"] for p in plates] == window["plate_ids"]
@@ -301,6 +306,113 @@ def test_unresolved_speakers_carry_no_avatar():
     unresolved = " ".join(doc["unresolved"])
     for name in ("Jill Castro", "Rafael", "LH"):
         assert name in unresolved
+
+
+
+def test_chat_wolf_cue_is_exactly_at_local_17_163():
+    """Rafael's programme note at 23:30 is locked to the movement-local
+    seat derived from the old programme clock: 23:30 - 23:12.837 = 17.163.
+    No avatar: Rafael has no resolved login on record.
+    """
+    doc = chat()
+    by_id = {p["id"]: p for p in doc["plates"]}
+    wolf = by_id["chat_wolf"]
+    assert float(wolf["at"]) == pytest.approx(17.163)
+    assert float(wolf["dur"]) == pytest.approx(3.0)
+    assert float(wolf["fade_in"]) == pytest.approx(0.4)
+    assert float(wolf["fade_out"]) == pytest.approx(0.25)
+    assert float(wolf["fade_out_at"]) == pytest.approx(19.913)
+    assert wolf["speaker"] == "Rafael"
+    assert wolf["text"] == "What's a wolf?"
+    assert wolf["kind"] == "chat"
+    assert wolf["position"] == "letterbox"
+    assert wolf["copy_source"] == "owner_supplied"
+    assert "avatar" not in wolf
+
+
+def test_chat_wolf_section_is_separate_from_whale_chat():
+    doc = chat()
+    assert doc["chat"]["plate_ids"] == [
+        "chat_loose_end",
+        "chat_escape",
+        "chat_promised",
+        "chat_fine",
+        "chat_minds",
+        "chat_wolves",
+    ]
+    assert doc["chat_wolf"]["plate_ids"] == ["chat_wolf"]
+
+
+def test_default_sections_burn_all_seven_plates_in_one_encode(
+        tmp_path, monkeypatch):
+    """The derivative's ordered section list flattens to all seven plates
+    in source-time order, in a single source encode."""
+    monkeypatch.setattr(
+        build_interludes, "art_path",
+        lambda name: (REPO / name["file"]) if isinstance(name, dict)
+        else build_interludes.ARTWORK_DIR / f"{name}.png")
+    move = movement_four(thread())
+    section = move["ending_derivative"]["overlay_section"]
+    assert section == ["chat_wolf", "chat"]
+    cmd = build_ending_overlays.command(
+        chat(),
+        str(THREAD),
+        tmp_path / "plates",
+        tmp_path / "perfume-4-overlays.mp4",
+        ffmpeg=["ffmpeg"],
+        movement_id="perfume-4",
+        section=section,
+    )
+    joined = " ".join(cmd)
+    graph = cmd[cmd.index("-filter_complex") + 1]
+    # One read of the original source: no stacked encode.
+    assert joined.count("media/yt_nightwish_perfume_of_the_timeless.mkv") == 1
+    # Replacements are still composed into the same base chain.
+    assert "concat=n=12:v=1:a=0[base]" in graph
+    assert "[base][ov0]overlay=0:0:eof_action=pass:" in graph
+    # Seven plates, numbered after the seven artwork inputs.
+    inputs = [cmd[i + 1] for i, a in enumerate(cmd[:-1]) if a == "-i"]
+    assert len(inputs) == 1 + 7 + 7
+    assert inputs[0].endswith("yt_nightwish_perfume_of_the_timeless.mkv")
+    plate_inputs = inputs[8:]
+    assert [Path(p).name for p in plate_inputs] == [
+        "plate_chat_wolf.png",
+        "plate_chat_loose_end.png",
+        "plate_chat_escape.png",
+        "plate_chat_promised.png",
+        "plate_chat_fine.png",
+        "plate_chat_minds.png",
+        "plate_chat_wolves.png",
+    ]
+    # chat_wolf sits at the movement-local seat 17.163.
+    assert "[8:v]format=rgba,setpts=PTS-STARTPTS+17.163/TB" in graph
+    assert "[14:v]format=rgba,setpts=PTS-STARTPTS+65.236/TB" in graph
+    assert "enable='gte(t,17.163)*lt(t,20.163)'" in graph
+    assert "-c:a flac" in joined
+    assert "afade" not in graph
+
+
+def test_chat_wolf_window_is_half_open_and_faded_inside(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        build_interludes, "art_path",
+        lambda name: (REPO / name["file"]) if isinstance(name, dict)
+        else build_interludes.ARTWORK_DIR / f"{name}.png")
+    move = movement_four(thread())
+    section = move["ending_derivative"]["overlay_section"]
+    cmd = build_ending_overlays.command(
+        chat(),
+        str(THREAD),
+        tmp_path / "plates",
+        tmp_path / "perfume-4-overlays.mp4",
+        ffmpeg=["ffmpeg"],
+        movement_id="perfume-4",
+        section=section,
+    )
+    graph = cmd[cmd.index("-filter_complex") + 1]
+    assert "between(" not in graph
+    assert "enable='gte(t,17.163)*lt(t,20.163)'" in graph
+    assert "fade=t=in:st=17.163:d=0.400:alpha=1" in graph
+    assert "fade=t=out:st=19.913:d=0.250:alpha=1" in graph
 
 
 def test_a_checkout_with_no_cached_artwork_still_builds_a_valid_encode(

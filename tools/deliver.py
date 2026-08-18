@@ -773,9 +773,26 @@ def check_megacut(plan_path, wolves, reports, programme):
         megadir = wolves / "megacut"
         builds = sorted(megadir.glob("*.mp4")) if megadir.exists() else []
         detail = f"the plan's output {out.name} has not been built"
+        master = out.with_suffix(".mkv")
+        if master.exists():
+            detail += (f"; same-stem master {master.name} is unpromoted, so "
+                       "it cannot stand in for the declared distribution "
+                       "output")
         if builds:
             detail += f"; newest present is {builds[-1].name}"
         programme.add("megacut", MISSING, detail)
+        return
+    provenance = out.with_suffix(out.suffix + ".prod.md5")
+    checksums = wolves / "Prod" / CHECKSUMS
+    if not provenance.exists():
+        programme.add("megacut", STALE,
+                      f"{out.name} has no Prod checksum digest; rebuild it "
+                      "through deliver.py build")
+        return
+    if checksums.exists() and provenance.read_text(encoding="utf-8").strip() != md5(checksums):
+        programme.add("megacut", STALE,
+                      f"{out.name} was not built from the current Prod "
+                      "checksum set")
         return
     if newest and out.stat().st_mtime < newest:
         programme.add("megacut", STALE,
@@ -812,6 +829,7 @@ def check_social(acts, social, wolves, reports):
         report = by_numeral[act.numeral]
         prod = wolves / "Prod" / act.prod_file
         copy = wolves / "10mb" / act.prod_file
+        provenance = copy.with_suffix(copy.suffix + ".source.md5")
         if act.numeral in absent:
             report.add("social", ABSENT_BY_DESIGN, absent[act.numeral])
         elif not prod.exists():
@@ -820,6 +838,13 @@ def check_social(acts, social, wolves, reports):
             report.add("social", MISSING,
                        f"no 10mb copy (build encodes one with tools/social.py "
                        f"at {bitrate}k audio)")
+        elif not provenance.exists():
+            report.add("social", STALE,
+                       "10mb copy has no source digest; rebuild it to record "
+                       "which Prod master it derives from")
+        elif provenance.read_text(encoding="utf-8").strip() != md5(prod):
+            report.add("social", STALE,
+                       "10mb copy source digest does not match its Prod master")
         elif copy.stat().st_mtime < prod.stat().st_mtime:
             report.add("social", STALE, "10mb copy is older than its Prod "
                                         "master")
@@ -843,6 +868,16 @@ def link_master(src, prod):
     tmp.unlink(missing_ok=True)
     os.link(src, tmp)
     os.replace(tmp, prod)
+
+
+def record_megacut_provenance(plan_path, wolves):
+    """Record the exact verified Prod checksum set seated in a megacut."""
+    plan = json.loads(Path(plan_path).read_text(encoding="utf-8"))
+    out = Path(plan["output"]).expanduser()
+    checksums = wolves / "Prod" / CHECKSUMS
+    if out.exists() and checksums.exists():
+        out.with_suffix(out.suffix + ".prod.md5").write_text(
+            md5(checksums) + "\n", encoding="utf-8")
 
 
 def publish(acts, masters, wolves, delivery_path=None, log=print,
@@ -1011,13 +1046,15 @@ def record_source_digests(acts, masters, delivery_path, log=print, only=None):
 
 
 def build(acts, masters, social, wolves, plan_path, reports, programme,
-          dry_run, log=print):
+          dry_run, delivery_path=None, log=print):
     """Rebuild what is stale, in dependency order: Prod links, then the
     megacut, then the social copies. The graph is master -> Prod -> megacut
     -> 10mb, so a conflicted upstream link refuses the megacut rather than
     baking old content into a new encode."""
     actions = []  # (order, label, argv or None for a re-link)
     conflicted = set()
+    rebuilt = set()
+    prod_mutations = set()
     for r in reports:
         if not r.act.prod_file:
             continue
@@ -1028,6 +1065,7 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                 argv = shlex.split(cmd) if isinstance(cmd, str) else list(cmd)
                 actions.append((-1, f"rebuild {r.act.numeral}", argv,
                                 shlex.join(argv)))
+                rebuilt.add(r.act.numeral)
             else:
                 # Degrade, never block: an act whose inputs moved but which has
                 # no one-command rebuild is REPORTED, not silently skipped and
@@ -1037,7 +1075,7 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                     f"command is declared in delivery.json -- rebuild it by "
                     f"hand, then `deliver.py publish`")
         link = next((f for f in r.findings if f.node == "link"), None)
-        if link and link.state in FAILING:
+        if link and (link.state in FAILING or r.act.numeral in rebuilt):
             if link.state in (CONFLICT, EPHEMERAL):
                 # Both block downstream the same way; the remedies differ
                 # (decide the content vs promote the master to a durable
@@ -1047,8 +1085,11 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                 actions.append((0, f"link {r.act.numeral}", None,
                                 f"re-link Prod/{r.act.prod_file} to its "
                                 f"declared master"))
+                prod_mutations.add(r.act.numeral)
         soc = next((f for f in r.findings if f.node == "social"), None)
-        if soc and soc.state in FAILING and r.act.numeral not in conflicted:
+        if (soc and (soc.state in FAILING or
+                     r.act.numeral in prod_mutations)
+                and r.act.numeral not in conflicted):
             src = wolves / "Prod" / r.act.prod_file
             out = wolves / "10mb" / r.act.prod_file
             argv = [sys.executable, str(REPO_ROOT / "tools" / "social.py"),
@@ -1057,7 +1098,7 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
             actions.append((2, f"social {r.act.numeral}", argv,
                             shlex.join(argv)))
     mega = next((f for f in programme.findings if f.node == "megacut"), None)
-    if mega and mega.state in FAILING:
+    if mega and (mega.state in FAILING or prod_mutations):
         if conflicted:
             log(f"megacut: REFUSED -- act(s) {', '.join(sorted(conflicted))} "
                 f"have unresolved links; rebuilding would bake in the wrong "
@@ -1075,7 +1116,8 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
         if argv is None:
             numeral = label.split()[-1]
             act = next(a for a in acts if a.numeral == numeral)
-            publish([act], masters, wolves, log=log)
+            publish([act], masters, wolves, delivery_path=delivery_path,
+                    log=log, only=[numeral])
         else:
             proc = subprocess.run(argv, capture_output=True, text=True)
             if proc.returncode != 0:
@@ -1083,6 +1125,8 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                         proc.stdout.strip().splitlines() or ["no output"])
                 log(f"  FAILED: {tail[-1]}")
                 return 1
+            if label == "megacut":
+                record_megacut_provenance(plan_path, wolves)
     if not actions:
         log("  nothing stale")
     if conflicted:
@@ -1143,7 +1187,7 @@ def print_report(reports, wolves, log=print):
 
 
 def watch(acts, masters, social, wolves, plan_path, interval, dry_run,
-          log=print, once=False):
+          log=print, once=False, delivery_path=None):
     """Keep the delivery fresh: re-gather, rebuild what is stale, repeat.
 
     The owner's standard is that the megacut is never more than one edit
@@ -1183,7 +1227,8 @@ def watch(acts, masters, social, wolves, plan_path, interval, dry_run,
             if failing:
                 emit(f"[{rounds}] {failing} stale finding(s); rebuilding")
                 build(acts, masters, social, wolves, plan_path, reports,
-                      reports[-1], dry_run, log=emit)
+                      reports[-1], dry_run, delivery_path=delivery_path,
+                      log=emit)
             else:
                 emit(f"[{rounds}] fresh")
             if once:
@@ -1260,10 +1305,10 @@ def main(argv=None):
                        only=args.act)
     if args.watch:
         return watch(acts, masters, social, wolves, args.plan, args.watch,
-                     args.dry_run)
+                     args.dry_run, delivery_path=args.delivery)
     reports = gather(acts, masters, social, wolves, args.plan)
     return build(acts, masters, social, wolves, args.plan, reports,
-                 reports[-1], args.dry_run)
+                 reports[-1], args.dry_run, delivery_path=args.delivery)
 
 
 if __name__ == "__main__":

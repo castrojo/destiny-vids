@@ -16,7 +16,7 @@ land *somewhere*, not somewhere specific.
 
 ## Music
 
-### Local Forecast – Slower — act VI, the Ambassadors interruption
+### Local Forecast – Slower — acts II and VI, interruption sequences
 
 Kevin MacLeod / Incompetech, licensed **CC BY 4.0**. Commercial use, sync and
 redistribution are all permitted; attribution is the only condition. **Not

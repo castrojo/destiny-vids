@@ -1,6 +1,8 @@
 """Tests for the recovered-dialogue planner (tools/dialogue.py)."""
+import json
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -11,10 +13,12 @@ from tools import dialogue, plate  # noqa: E402
 
 LEADS = {
     "osiris": {"person": "mrbobbytables", "display_name": "mrbobbytables",
+               "github": "mrbobbytables",
                "plate": {"label": "TRUSTEE // GUARDIAN", "name": "Bob Killen"}},
-    "sagira": {"person": "lindsay_gendreau", "display_name": "Lindsay Gendreau",
-               "plate": {"label": "EMOTIONAL SUPPORT // GHOST",
-                         "name": "Lindsay Gendreau", "kind": "ghost"}},
+    "sagira": {"person": "clubanderson", "display_name": "clubanderson",
+               "github": "clubanderson",
+               "plate": {"label": "MAINTAINER // GUARDIAN",
+                         "name": "Doctor Andy Anderson"}},
     "ikora_rey": {"person": None, "display_name": None, "plate": None},
 }
 
@@ -58,8 +62,9 @@ def test_anchored_lines_land_where_their_footage_landed():
     # Shot "a" starts at 8.0 of source and at 0.0 of the cut, so the cue at
     # 10.0 lands 2.0s in.
     assert first["at"] == pytest.approx(2.0)
-    assert first["speaker"] == "Lindsay Gendreau"
+    assert first["speaker"] == "Doctor Andy Anderson"
     assert first["kind"] == "chat"
+    assert first["avatar"] == "renders/avatars/clubanderson.png"
 
 
 def test_a_line_whose_footage_is_not_in_the_cut_is_reported_not_dropped_silently():
@@ -88,8 +93,12 @@ def test_chat_mode_still_places_the_settled_lines():
     """The fix drops the unsettled line only -- not the conversation."""
     entries, _ = dialogue.plan_chat(CUES, SHOTS, LEADS)
     assert [e["id"] for e in entries] == ["d01", "d02"]
-    assert [e["speaker"] for e in entries] == ["Lindsay Gendreau",
+    assert [e["speaker"] for e in entries] == ["Doctor Andy Anderson",
                                                "Bob Killen"]
+    assert [e["avatar"] for e in entries] == [
+        "renders/avatars/clubanderson.png",
+        "renders/avatars/mrbobbytables.png",
+    ]
 
 
 def test_dialogue_never_double_books_the_screen():
@@ -126,6 +135,12 @@ def test_script_mode_flows_around_a_reveal():
     plate.load_manifest_entries(entries)
 
 
+def test_script_mode_can_begin_at_the_first_authored_display_cue():
+    entries, _ = dialogue.plan_script(
+        CUES, [shot("long", 0.0, 100.0)], LEADS, start_at=32.56)
+    assert entries[0]["at"] == pytest.approx(32.56)
+
+
 def test_the_indexed_dialogue_file_is_loadable_and_attributed():
     """The checked-in recovery must stay machine-readable and fully attributed."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
@@ -136,6 +151,37 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
                                    "owner_supplied")
         assert cue["end_sec"] > cue["start_sec"]
         assert cue["text"].strip()
-    # Provenance is the point: the copy is recovered, not authored here.
-    assert data["text_source"]["method"] == "youtube_auto_captions"
-    assert data["speaker_source"]["method"] == "vocative_alternation"
+    assert data["text_source"]["method"] == "owner_supplied"
+    assert data["speaker_source"]["method"] == "owner_supplied"
+    assert data["display"] == {
+        "mode": "script",
+        "start_sec": 32.56,
+        "standalone_leads": False,
+        "note": (
+            "The owner replaced the complete conversation. Script layout keeps "
+            "all 25 lines readable in order; standalone lead plates are omitted "
+            "because every dialogue pill identifies Doctor Andy Anderson or "
+            "Bob Killen."
+        ),
+    }
+
+
+def test_the_act3_retirement_copy_is_uncast_chat_before_the_wolf_day_shot():
+    path = Path("stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    plate.load_manifest_entries(data["plates"])
+    retirement = data["plates"]
+    assert [p["kind"] for p in retirement] == ["chat", "chat"]
+    assert [p["speaker"] for p in retirement] == ["[redacted]", "[redacted]"]
+    assert [p["text"] for p in retirement] == [
+        "Finally, retirement",
+        "The long walk beckons",
+    ]
+    assert retirement[0]["at"] < retirement[1]["at"]
+    assert retirement[0]["at"] + retirement[0]["dur"] < retirement[1]["at"]
+    assert data["_anchor"] == "immediately before the wolf day shot appears"
+
+    builder = Path("scripts/build_uncut_credited.sh").read_text(encoding="utf-8")
+    assert 'FIXED_MANIFEST="stories/$VIDEO_ID-fixed-plates.json"' in builder
+    assert 'FIXED_INPUTS+=("$FIXED_MANIFEST")' in builder
+    assert 'display.get("standalone_leads", True)' in builder

@@ -27,6 +27,15 @@
       "bond_of": "cortney"
     },
     {
+      "id": "act-i-cue-01",
+      "kind": "caption",
+      "at": 9.0,
+      "dur": 9.5,
+      "position": "caption",
+      "text": "What is a Contributor-Guardian?",
+      "copy_source": "owner_supplied"
+    },
+    {
       "id": "kat",
       "at": 12.5,
       "dur": 10.0,
@@ -49,6 +58,33 @@
       "art": "renders/companions/karl.webp",
       "note": "Kat Cosgrove's documented bond. Name and species reproduced from wolves-guardian-dinosaur-bonds.ts + wolves-dinosaur-species.ts; nothing here is composed.",
       "bond_of": "kat"
+    },
+    {
+      "id": "act-i-cue-02a",
+      "kind": "caption",
+      "at": 19.0,
+      "dur": 3.5,
+      "position": "caption",
+      "text": "We are connected to the weft and weave of the universe.",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-cue-02b",
+      "kind": "caption",
+      "at": 22.75,
+      "dur": 3.5,
+      "position": "caption",
+      "text": "No one knows how long we will serve.",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-cue-02c",
+      "kind": "caption",
+      "at": 26.5,
+      "dur": 4.0,
+      "position": "caption",
+      "text": "We stand alongside those without our gifts",
+      "copy_source": "owner_supplied"
     },
     {
       "id": "title-cover",
@@ -106,6 +142,15 @@
       }
     },
     {
+      "id": "act-i-cue-03",
+      "kind": "caption",
+      "at": 31.0,
+      "dur": 11.5,
+      "position": "caption",
+      "text": "When all else fails, we fight for the user.",
+      "copy_source": "owner_supplied"
+    },
+    {
       "id": "kaslin",
       "at": 38.0,
       "dur": 8.0,
@@ -130,12 +175,76 @@
       "bond_of": "kaslin"
     },
     {
-      "id": "orlin",
+      "id": "act-i-cue-04a",
+      "kind": "caption",
+      "at": 43.0,
+      "dur": 8.0,
+      "position": "caption",
+      "text": "Every Seven Years, the Kube of Destiny visits the Sol System.",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-cue-04b",
+      "kind": "caption",
+      "at": 51.25,
+      "dur": 8.25,
+      "position": "caption",
+      "text": "An ancient artifact from beyond The Veil",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-cue-05",
+      "kind": "caption",
+      "at": 60.0,
+      "dur": 9.5,
+      "position": "caption",
+      "text": "Inside, the generational knowledge of an entire civilization - unlimited power",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "orlix",
       "at": 68.5,
       "dur": 6.5,
       "position": "left",
-      "name": "Orlin",
-      "note": "RECAST, owner instruction (editorial pass, this session): \"laura santamaria is orlin\". Source window 70.5 - 77, unchanged. NAME ONLY, and the string is the owner's own, verbatim: no Guardian identity is authored for Orlin in nameplates.json, characters.json or vocab/casting.yaml, and no surname was given -- so Laura's label, subclass and title are OMITTED rather than inherited. Two things stay open and are recorded rather than guessed: which person 'orlin' names, and whether the recast reaches the Europa director's cut, which still credits Laura Santamaria. Neither is automatable."
+      "name": "OrliX",
+      "avatar": "renders/avatars/orlix.png",
+      "note": "OWNER CORRECTION: Orlin is github.com/orlix. GitHub resolves that account as OrliX (id 891481); the plate uses the account's authored casing and portrait. Source window 70.5 - 77 is unchanged. No Guardian label, class, or title was supplied, so those rows remain omitted rather than inherited from Laura Santamaria."
+    },
+    {
+      "id": "act-i-cue-06a",
+      "kind": "caption",
+      "at": 70.0,
+      "dur": 3.25,
+      "position": "caption",
+      "text": "Now, across our ecosystem, the forces of the Toilmaster surge.",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-cue-06b",
+      "kind": "caption",
+      "at": 73.5,
+      "dur": 3.25,
+      "position": "caption",
+      "text": "Our borders are under siege.",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-cue-06c",
+      "kind": "caption",
+      "at": 77.0,
+      "dur": 3.5,
+      "position": "caption",
+      "text": "Across Sol, our Guardians fight.",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-cue-07",
+      "kind": "caption",
+      "at": 81.0,
+      "dur": 9.5,
+      "position": "caption",
+      "text": "Pushing back buys us only time, but the alternative is unthinkable.",
+      "copy_source": "owner_supplied"
     },
     {
       "id": "christoph",
@@ -178,6 +287,73 @@
       "bond_of": "natali",
       "group": "christoph-natali",
       "art_max_h": 200
+    },
+    {
+      "id": "act-i-cue-08a",
+      "kind": "caption",
+      "at": 91.0,
+      "dur": 3.5,
+      "position": "caption",
+      "text": "We built a Community none of us dared to dream of, with allies from unlikely places.",
+      "copy_source": "owner_supplied",
+      "glyphs": [
+        {
+          "word": "Community",
+          "token": "o",
+          "index": 0,
+          "src": "renders/marks/kubernetes.png"
+        }
+      ]
+    },
+    {
+      "id": "act-i-cue-08b",
+      "kind": "caption",
+      "at": 94.75,
+      "dur": 3.75,
+      "position": "caption",
+      "text": "We have never had more to lose.",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-cue-09a",
+      "kind": "caption",
+      "at": 99.0,
+      "dur": 6.0,
+      "position": "caption",
+      "text": "You are the dream of many ancestors",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-cue-09b",
+      "kind": "caption",
+      "at": 105.25,
+      "dur": 6.25,
+      "position": "caption",
+      "text": "This one is machine and nerve, and has its mind concluded",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "act-i-warning",
+      "kind": "warning",
+      "at": 112.0,
+      "dur": 2.2,
+      "position": "warning",
+      "text": "[ PREPARE FOR TITANFALL ]",
+      "copy_source": "owner_supplied"
+    },
+    {
+      "id": "platform-wars",
+      "kind": "act",
+      "at": 114.2,
+      "dur": 4.0,
+      "position": "full",
+      "title": "The Platform Wars",
+      "subtitle": "2015-2019",
+      "body": [
+        "Guardians Deliver the Final Blow",
+        "to Legacy Infrastructure"
+      ],
+      "copy_source": "owner_supplied"
     }
   ],
   "unresolved": [
@@ -186,12 +362,6 @@
       "detail": "The owner authored her label, name and title (issue #90), so the plate renders those three rows; Bob Killen's are NOT inherited. One row is still missing: the owner wrote 'whatever the Void subclass is', and Void subclasses are class-specific -- Voidwalker (Warlock), Sentinel (Titan), Nightstalker (Hunter) -- so the row needs her class before it can be written. It is omitted, not guessed.",
       "automatable": "no",
       "blocked_on": "the owner naming her class -- issues #90 and #59."
-    },
-    {
-      "what": "who 'Orlin' is, and how far the recast reaches",
-      "detail": "The owner wrote \"laura santamaria is orlin\" while giving intro notes, so it is applied to the intro plate and nowhere else. The Europa director's cut still credits Laura Santamaria. No surname and no Guardian identity exist for Orlin, so the plate is the owner's string alone.",
-      "automatable": "no",
-      "blocked_on": "the owner naming the person and authoring the identity."
     },
     {
       "what": "top status nameplate (`statusOnly`)",

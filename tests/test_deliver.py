@@ -115,6 +115,8 @@ def ws(tmp_path):
     os.link(masters / "intro-master.mp4", wolves / "Prod" / "01-intro.mp4")
     os.link(masters / "song-master.mp4", wolves / "Prod" / "02-song.mp4")
     (wolves / "10mb" / "01-intro.mp4").write_bytes(b"social-copy")
+    social_stamp = wolves / "10mb" / "01-intro.mp4.source.md5"
+    social_stamp.write_text(deliver.md5(masters / "intro-master.mp4") + "\n")
     (wolves / "megacut" / "show-v1.mp4").write_bytes(b"megacut")
     future = 2_000_000_000  # mtimes lie under Syncthing; fixtures pin them
     os.utime(wolves / "10mb" / "01-intro.mp4", (future, future))
@@ -126,6 +128,8 @@ def ws(tmp_path):
     sums = "\n".join(f"{deliver.md5(f)}  {f.name}"
                      for f in sorted((wolves / "Prod").glob("*.mp4")))
     (wolves / "Prod" / deliver.CHECKSUMS).write_text(sums + "\n")
+    (wolves / "megacut" / "show-v1.mp4.prod.md5").write_text(
+        deliver.md5(wolves / "Prod" / deliver.CHECKSUMS) + "\n")
     return root
 
 
@@ -176,7 +180,7 @@ def test_a_master_rewritten_as_a_new_inode_detaches_the_link(ws):
     assert findings(gather(ws), "I")["link"].state == deliver.STALE
     assert run(ws, "publish") == 0
     assert deliver.same_file(ws / "wolves" / "Prod" / "01-intro.mp4", master)
-    assert run(ws, "status", "--check") == 0
+    assert findings(gather(ws), "I")["social"].state == deliver.STALE
 
 
 def test_an_older_master_never_reverts_newer_prod_content(ws):
@@ -227,12 +231,66 @@ def test_a_missing_social_copy_is_built_but_an_exempt_one_never_is(ws, capsys):
     assert not (ws / "wolves" / "10mb" / "01-intro.mp4").exists()
 
 
+def test_social_provenance_detects_a_replaced_prod_despite_newer_copy(ws):
+    """Syncthing timestamps are not provenance; the source content is."""
+    prod = ws / "wolves" / "Prod" / "01-intro.mp4"
+    prod.write_bytes(b"intro-replacement")
+    social = ws / "wolves" / "10mb" / "01-intro.mp4"
+    future = 2_000_000_000
+    os.utime(social, (future, future))
+
+    finding = findings(gather(ws), "I")["social"]
+    assert finding.state == deliver.STALE
+    assert "source digest" in finding.detail
+
+
+def test_rebuilding_an_act_schedules_every_downstream_delivery_rung(
+        ws, capsys):
+    """The status snapshot predates the rebuild, so descendants are explicit."""
+    delivery = json.loads((ws / "delivery.json").read_text())
+    source = ws / "stories.json"
+    source.write_text('{"copy": "new"}')
+    delivery["masters"]["I"].update({
+        "sources": [str(source)],
+        "source_digest": "outdated",
+        "rebuild": ["echo", "rebuild-intro"],
+    })
+    (ws / "delivery.json").write_text(json.dumps(delivery))
+
+    capsys.readouterr()
+    assert run(ws, "build", "--dry-run") == 0
+    output = capsys.readouterr().out
+    for label in ("rebuild I", "link I", "megacut", "social I"):
+        assert f"would {label}" in output
+
+
 def test_a_missing_megacut_is_a_build_action(ws, capsys):
     (ws / "wolves" / "megacut" / "show-v1.mp4").unlink()
     assert findings(gather(ws), "")["megacut"].state == deliver.MISSING
     capsys.readouterr()
     assert run(ws, "build", "--dry-run") == 0
     assert "megacut.py" in capsys.readouterr().out
+
+
+def test_missing_distribution_megacut_names_unpromoted_same_stem_master(ws):
+    """A remote build can leave its archival MKV behind if MP4 promotion fails."""
+    out = ws / "wolves" / "megacut" / "show-v1.mp4"
+    out.unlink()
+    out.with_suffix(".mkv").write_bytes(b"remote-master")
+
+    finding = findings(gather(ws), "")["megacut"]
+    assert finding.state == deliver.MISSING
+    assert "show-v1.mkv" in finding.detail
+    assert "unpromoted" in finding.detail
+
+
+def test_megacut_provenance_detects_a_changed_prod_checksum_set(ws):
+    checksums = ws / "wolves" / "Prod" / deliver.CHECKSUMS
+    checksums.write_text("changed\n")
+
+    finding = findings(gather(ws), "")["megacut"]
+    assert finding.state == deliver.STALE
+    assert "checksum set" in finding.detail
 
 
 def test_the_megacut_is_refused_while_a_link_conflicts(ws, capsys):
@@ -554,7 +612,7 @@ def test_the_recorded_digest_matches_what_is_committed():
         f"delivered master. Rebuild, then `python3 tools/deliver.py publish`.")
 
 
-def test_a_blocked_act_is_still_stale_everywhere_that_reaches_picture():
+def test_a_blocked_act_is_still_stale_everywhere_that_reaches_picture(tmp_path):
     """The exemption is scoped to the CI gate and nowhere else.
 
     `stale_blocked_on` says "nobody can fix this yet", never "pretend it is
@@ -563,13 +621,14 @@ def test_a_blocked_act_is_still_stale_everywhere_that_reaches_picture():
     would quietly buy a stale act a seat in the programme, which is the exact
     failure `--allow-stale` exists to make loud.
     """
-    masters, _ = deliver.load_delivery(
-        REPO_ROOT / "stories" / "megacut" / "delivery.json")
-    blocked = {n for n, m in masters.items() if deliver.blocked_on(m)
-               and m.get("sources") and m.get("source_digest")
-               and deliver.source_digest(m["sources"]) != m["source_digest"]}
-    assert blocked, "act III is the case this is written for"
-    assert blocked <= {n for n, _ in deliver.stale_source_acts(masters)}
+    source = tmp_path / "source.txt"
+    source.write_text("current", encoding="utf-8")
+    masters = {"III": {
+        "sources": [str(source)],
+        "source_digest": "stale0000",
+        "stale_blocked_on": "#256",
+    }}
+    assert {"III"} <= {n for n, _ in deliver.stale_source_acts(masters)}
 
     report = deliver.ActReport(deliver.Act("III", "t", None))
     deliver.check_sources(report.act, masters["III"], report)

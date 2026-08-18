@@ -59,9 +59,11 @@ folder and mtimes lie: the hardlink layer is checked by **inode identity**
 against the declared master, `CHECKSUMS.md5` by recomputation, and the
 README's master table is **generated** between `<!-- deliver:table -->`
 markers so a hand-edit that disagrees with the map is detected as drift. The
-megacut is a re-encode, so mtime against Prod is the signal there, plus a
-duration check against the plan's own arithmetic when ffprobe is available —
-which is also what catches a build still being written.
+megacut carries a sidecar digest of the exact verified Prod checksum set it
+seated, plus a duration check against the plan's arithmetic. Prefer
+`deliver.py build`, which records that sidecar; a direct `tools/megacut.py`
+run is still stale until its verified build is followed by
+`deliver.record_megacut_provenance`.
 
 Two deliberate behaviours, both learned the hard way on 2026-08-13:
 
@@ -210,4 +212,3 @@ already been learned the hard way and must not be re-learned:
 directory while you are working in it — it has already destroyed a live
 `render/` mid-session. It is a move to Trash, so check
 `~/.local/share/Trash/info` before rebuilding anything.
-

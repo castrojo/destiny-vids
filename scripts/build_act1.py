@@ -8,20 +8,19 @@ The chain, established 2026-07-15 from the record (`megacut.json`'s
      `scripts/build_summit_plates.py`'s detail-measured crop and grade
      (skipped when the jpg already exists — the crop window is a recorded
      taste call, not something a rebuild silently re-makes).
-  2. `cards/render-cards.mjs` renders the full-frame cards (the title-cover
-     photograph) into `renders/plates-01-hero/`. It needs the sibling website
-     checkout for playwright, like every card stage — skipped with a warning
-     when that checkout is absent, because an already-rendered
-     `plate_title-cover.png` in the plates dir is still burnable.
-  3. `tools/plate.py render` renders the Guardian plates into the same dir.
-  4. ffmpeg trims the Into the Light capture: `-ss 2.0` on BOTH inputs, so
-     with input seeking the `-t 111.55` output duration lands the window at
-     2.0 -> 113.55 exactly as `_sources.hero` records. Video is x264
-     crf 14; audio is the capture's OFFICIAL 251 Opus rung — Ikora's VO
-     included — decoded to FLAC, picture-aligned (both legs `-ss 2.0`).
-     An earlier delivery note claimed the without-dialogue capture with a
-     +1.979 s offset; the rebuilt audio cross-correlates with the shipped
-     master at lag 0.0, ncorr 1.0, so the record is what this builds.
+  2. `cards/render-cards.mjs` renders the full-frame title-cover photograph
+     and Platform Wars card into `renders/plates-01-hero/`. Missing or stale
+     cards fail closed when the sibling website checkout cannot run Playwright;
+     an old PNG is never treated as current merely because it exists.
+  3. `tools/plate.py render` renders the Guardian, companion, caption, context,
+     and deployment-warning plates into the same directory.
+  4. ffmpeg trims the Into the Light picture from 2.0 -> 113.60, including
+     the first black frame of the source fade, then holds that terminal black
+     frame to make the 118.2 s output. Audio comes from
+     `media/yt_into_the_light_without_dialogue.webm`, beginning at
+     2.0 + 1.978625 = 3.978625 s; that offset was measured against the prior
+     instrumental master at 94974 samples / 48 kHz (ncorr 0.999999920). It is
+     decoded once to FLAC with no normalization, EQ, compression, or limiter.
   5. `tools/plate.py burn` stamps every manifest entry over the trim in one
      pass: x264 crf 18, preset medium, audio stream-copied.
 
@@ -49,6 +48,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from tools import freshness  # noqa: E402
 from tools import plate  # noqa: E402
 from tools import render  # noqa: E402
 
@@ -58,21 +58,30 @@ COVER_ART = "renders/title-cover.jpg"
 COVER_SOURCE = "media/summit/group-007.jpg"
 TRIM = "renders/megacut-01-hero-trim.mp4"
 MASTER = "renders/megacut-01-hero.mp4"
-# megacut.json `_sources.hero`: trim 2.0 -> 113.55 of the Into the Light
-# capture, official audio (the plain 251 Opus rung — NOT 251-drc).
+# Picture extends the established window by 0.05s to include the source fade's
+# first black frame; that frame holds the new cards to 118.2. Dialogue-free
+# audio needs the measured offset.
 VIDEO_SRC = "media/yt_into_the_light_cinematic.mkv"
-AUDIO_SRC = "media/yt_into_the_light_cinematic-audio.webm"
+AUDIO_SRC = "media/yt_into_the_light_without_dialogue.webm"
 TRIM_START = 2.0
-TRIM_END = 113.55
+TRIM_END = 113.60
+AUDIO_SYNC_OFFSET = 1.978625
+OUTPUT_DURATION = 118.2
 
 
 def trim_command(ffmpeg):
+    video_duration = TRIM_END - TRIM_START
+    freeze_duration = OUTPUT_DURATION - video_duration
+    audio_start = TRIM_START + AUDIO_SYNC_OFFSET
     return [
         *ffmpeg, "-y",
-        "-ss", f"{TRIM_START}", "-i", str(REPO_ROOT / VIDEO_SRC),
-        "-ss", f"{TRIM_START}", "-i", str(REPO_ROOT / AUDIO_SRC),
+        "-ss", f"{TRIM_START}", "-t", f"{video_duration:.2f}",
+        "-i", str(REPO_ROOT / VIDEO_SRC),
+        "-ss", f"{audio_start:.6f}",
+        "-i", str(REPO_ROOT / AUDIO_SRC),
         "-map", "0:v", "-map", "1:a",
-        "-t", f"{TRIM_END - TRIM_START:.2f}",
+        "-vf", f"tpad=stop_mode=clone:stop_duration={freeze_duration:.6f}",
+        "-t", f"{OUTPUT_DURATION:.3f}",
         "-c:v", "libx264", "-crf", "14", "-pix_fmt", "yuv420p",
         "-c:a", "flac",
         str(REPO_ROOT / TRIM),
@@ -93,20 +102,43 @@ def cover_art():
     print(f"cover art: rendered {written}")
 
 
-def render_cards():
-    """Full-frame cards need the sibling website checkout (playwright)."""
-    website_modules = Path.home() / "src/website/node_modules"
-    if not website_modules.is_dir():
-        print(
-            "cards: ~/src/website/node_modules not found — skipping the card "
-            f"render (an already-rendered {PLATES_DIR}/plate_title-cover.png "
-            "is still burnable; render the cards where playwright is "
-            "installed)",
-            file=sys.stderr,
-        )
+def render_cards(manifest=None, out_dir=None, website_modules=None):
+    """Full-frame cards need the sibling website checkout (playwright).
+
+    Rendered only when the manifest, renderer, or HTML templates have changed
+    since the card PNGs were produced. Missing/stale cards are regenerated;
+    if regeneration is required but the website's playwright checkout is
+    absent, fail closed and name the stale outputs.
+    """
+    manifest = Path(manifest) if manifest else REPO_ROOT / MANIFEST
+    out_dir = Path(out_dir) if out_dir else REPO_ROOT / PLATES_DIR
+    website_modules = (
+        Path(website_modules) if website_modules
+        else Path.home() / "src/website/node_modules"
+    )
+
+    entries = plate.load_manifest(manifest)
+    card_entries = [e for e in entries if e.get("kind") in plate.CARD_KINDS]
+    if not card_entries:
         return
+    out_dir.mkdir(parents=True, exist_ok=True)
+    outputs = [out_dir / f"plate_{e['id']}.png" for e in card_entries]
+    inputs = [manifest, REPO_ROOT / "cards/render-cards.mjs",
+              *sorted((REPO_ROOT / "cards").glob("*.html"))]
+    stale = freshness.stale_outputs(inputs, outputs)
+    if not stale:
+        print(f"cards: {len(outputs)} card(s) are up to date, skipping render")
+        return
+    if not website_modules.is_dir():
+        names = [out.name for out in stale]
+        raise RuntimeError(
+            "cards need rendering but the website playwright checkout is missing "
+            f"({website_modules}); stale/missing cards: {', '.join(names)}. "
+            "Install deps in ~/src/website or render the cards where playwright "
+            "is available."
+        )
     cmd = ["node", "cards/render-cards.mjs",
-           "--manifest", MANIFEST, "--out-dir", PLATES_DIR]
+           "--manifest", str(manifest), "--out-dir", str(out_dir)]
     subprocess.run(cmd, check=True, cwd=REPO_ROOT,
                    env={**os.environ, "NODE_PATH": str(website_modules)})
 
@@ -141,7 +173,7 @@ def build_act1(skip_encode=False, use_farm=False):
         print("--skip-encode: trim and burn not run")
         return
 
-    duration = TRIM_END - TRIM_START
+    duration = OUTPUT_DURATION
     trim_cmd = trim_command(ffmpeg)
     if use_farm:
         _farm_runner(trim_cmd, [VIDEO_SRC, AUDIO_SRC], TRIM, duration)(trim_cmd)

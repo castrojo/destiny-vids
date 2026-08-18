@@ -34,6 +34,26 @@ value occurs exactly once and whose `replace` value uses `{k8s}`.
 does not alter the authored source string. Use an asterisk for other letters,
 and do not add censorship the owner did not request.
 
+### Cinematic text that shares the frame with identity plates
+
+Owner-authored narration can use `kind: caption` in the top-safe rail while
+Guardian and companion cards keep the lower third. Scene-setting metadata uses
+`kind: context` above that lower-third lane; a full-screen deployment beat uses
+`kind: warning`. These are independent chrome rows, not extra nameplate fields,
+and each carries `copy_source: owner_supplied`.
+
+A caption glyph replacement keeps the authored `text` unchanged and records the
+mark under `glyphs`. The renderer reserves the mark's real width before wrapping
+or centering, so a Kubernetes helm replacing one `o` cannot cover the next
+letter. A missing mark degrades to the plain authored letter.
+
+When one movement derivative burns more than one authored block,
+`ending_derivative.overlay_section` may be an ordered list. The list is flattened
+in order and all plate inputs are composed in one encode from the original
+source; do not make one derivative per section or re-encode the clean movement.
+FFmpeg documents this as a cascading complex overlay graph.
+`source: /websites/ffmpeg_documentation, “Cascading Multiple Overlays”`
+
 ## Prose that is not written yet is lorem, never a gap
 
 A chat pill with no `text` does **not** block and does not render empty:
@@ -99,6 +119,15 @@ python3 tools/plate.py plan cut.json --roster roster.json --max-shot-sec 9 \
 python3 tools/plate.py burn --video renders/cut.mp4 --manifest plates.json \
     --out renders/cut-plated.mp4
 ```
+
+A dense schedule must still end in **one picture encode**. If the burn grows to
+so many independent still inputs that FFmpeg spends its time building scaler
+graphs instead of emitting frames, composite the already-rendered full-frame
+RGBA plates at their manifest boundaries into one alpha-preserving overlay
+stream, then overlay that stream onto the clean act once. Do not split the deck
+across successive lossy burns. FFmpeg's `overlay` filter accepts an alpha input
+and supports straight, premultiplied, or automatic alpha handling.
+`source: /websites/ffmpeg_documentation, “overlay”`
 
 `plan` reads copy from `vocab/casting.yaml`'s `plate:` block — the same file
 that binds a character to a person — so recasting a role changes the on-screen

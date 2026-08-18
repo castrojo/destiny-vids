@@ -143,7 +143,9 @@
           "source_in": 312.36,
           "source_out": 314.36,
           "art": [
-            {"file": "renders/summit-plates/enemy_cu.jpg"}
+            {
+              "file": "renders/summit-plates/enemy_cu.jpg"
+            }
           ],
           "fit": "scope",
           "_fit": "THE PLATE IS EXACTLY 1920x1080, and the default fit left NO remainder -- the photograph filled the whole delivery frame for its two seconds, the frame grew and shrank back, and the owner caught it on the derivative (2026-08-17): 'the picture changes SHAPE for two seconds in the middle of a scope movement -- that reads as a mistake rather than as a cut to a photograph.' fit 'scope' scales the photograph on its own aspect to FILL the film's own 1920x804 window and centre-crops the overflow, so it letterboxes at the film's own 138 px bars exactly like the artwork around it. The fit-or-crop call is the owner's, verbatim: 'A 16:9 source cropped to 2.39:1 loses some height, which is fine'; the crop is the one already authorised in stories/summit-photos.json. The drawings keep the never-cropped default -- this rung exists for assets whose native aspect would otherwise fill the frame.",
@@ -202,7 +204,10 @@
       "ending_derivative": {
         "out_file": "renders/perfume-4-overlays.mp4",
         "overlay_manifest": "stories/00-perfume-4-plates.json",
-        "overlay_section": "chat",
+        "overlay_section": [
+          "chat_wolf",
+          "chat"
+        ],
         "plates_dir": "renders/perfume-4/plates",
         "_note": "The clean movement remains renders/perfume-4.mp4. The derivative is rebuilt directly from the same original source and audio window in ONE encode that composes this movement's own replacements AND the chat plates, so the swaps and the words never travel in separate encodes and no generation is added before megacut assembly. scripts/build_ending_overlays.py, generalised from the movement-5 pattern."
       }

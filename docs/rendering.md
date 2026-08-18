@@ -4,6 +4,28 @@
 stage most likely to fail on a Bluefin/Fedora atomic host — for a reason that is
 easy to misdiagnose. This documents which ffmpeg to use and why.
 
+## Production video encoding runs on Kubernetes
+
+The local ffmpeg resolution below is for probes, still extraction, lightweight
+assets, and an operator-forced `--local` fallback. It is **not** the default
+production renderer. Video-producing ffmpeg commands go to the ghost
+Kubernetes cluster in `lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76`, with
+`imagePullPolicy: IfNotPresent`; Kubernetes chooses between the two
+scheduler-eligible roughly 32-core nodes. Never hostname-pin a build.
+
+For the programme, use:
+
+```bash
+python3 tools/megacut.py stories/megacut/megacut.json \
+    --farm --no-copy --farm-jobs 3
+```
+
+`--no-copy` is currently the safety switch for a cold conform cache:
+`--farm` alone farms segment encodes but can still let
+`tools/conform.ensure()` start local x264 first. Stop any build that prints a
+new `~/.cache/destiny-vids/conform/` encode. The local final concat is allowed
+because it stream-copies picture and only muxes/encodes audio.
+
 ## The delivery spec: render output is born conformant
 
 Everything `render.py` emits now conforms to the one delivery spec defined in

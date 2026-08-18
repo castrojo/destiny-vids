@@ -70,10 +70,11 @@ node cards/render-cards.mjs --manifest stories/<name>/<name>-cards.json \
 # 2. Check the graph before paying for the encode
 python3 tools/megacut.py stories/<name>/<name>.json --dry-run
 
-# 3. Assemble. Clips whose sources match the delivery spec (tools/conform.py)
-#    are stream-copied, not re-encoded; the first run conforms what is new and
-#    caches it, so re-runs cost seconds. --jobs N parallelises what encodes.
-python3 tools/megacut.py stories/<name>/<name>.json
+# 3. Assemble on Kubernetes. --no-copy is currently required for a strict
+#    cluster-only build: without it, a cold conform cache can start local x264
+#    before the farmed segment phase. The final local join only remuxes picture.
+python3 tools/megacut.py stories/<name>/<name>.json \
+    --farm --no-copy --farm-jobs 3
 
 # 4. Measure the joins on the BUILT file (issue #105)
 python3 tools/transitions.py stories/<name>/<name>.json --measure <built>.mp4

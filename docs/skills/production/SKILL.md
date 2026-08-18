@@ -160,13 +160,15 @@ python3 tools/deliver.py publish --act VII    # name what you rebuilt
 the master was replaced as `.mkv` and the builder could no longer find it,
 while `status` still said `ok`. Ask `tools/footage.py` for the path.
 
-**Long encodes run on the cluster.** `exo-0` has 32 cores and the
-`linuxserver/ffmpeg` image already cached; the workstation does not need to
-carry an hour of x264. Stage inputs into `/var/mnt/exo0-stage/dv`, run a pod
-pinned to that node with `imagePullPolicy: IfNotPresent`, and copy the result
-back. The recipe, and the two traps that make a naive attempt fail (the
-registry mirror times out, and the image's entrypoint is already `ffmpeg`), are
-in [`docs/rendering.md`](../../rendering.md).
+**Video encodes run on the ghost Kubernetes cluster.** Its two
+scheduler-eligible nodes each provide about 32 cores. Submit unpinned
+Workflows through `tools/farm.py` and let Kubernetes place them; never choose
+`ghost` or `exo-0` by hostname. The pinned CPU image is
+`lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76` with
+`imagePullPolicy: IfNotPresent`. One pod uses one node, so submit independent
+encode units as independent Workflows to use both nodes. PNG/card generation
+may remain local; workstation video encoding requires the explicit local
+escape hatch. See [`docs/skills/farm.md`](../farm.md).
 
 ## A refresh is every rung, or it is not a refresh
 "Refresh the video" always means the **whole** chain, and it always includes
@@ -181,6 +183,14 @@ they are what the owner actually opens. A megacut rebuilt over a stale `Prod/`
 link, or shipped without regenerating the social copies, is a partial refresh
 that reads as a finished one. `deliver.py publish` handles `Prod/`;
 `deliver.py build` handles the megacut and the `10mb/` copies.
+
+The declared megacut `output` is the distribution artifact. Its same-stem
+`.mkv` is an archival master, never a substitute for a missing distribution
+file. `deliver.py build` records the checked `Prod/` checksum set beside the
+distribution output; status treats a missing or mismatched record as stale.
+Running `tools/megacut.py` directly does not close that provenance rung: after
+verifying a direct build, record the checksum set with
+`deliver.record_megacut_provenance`, or prefer `deliver.py build`.
 
 **Existence is not freshness.** This is the rung that had no guard, and it is
 where a main title shipped 17 hours out of date with every other gate green:
@@ -210,6 +220,13 @@ that gates a card render on a bare `.exists()`.
 **`publish` after every act rebuild — and name the act.** It re-links `Prod/`,
 regenerates the checksums and README table, *and* stamps the act's input
 digest, which is what makes the next edit show up as drift.
+
+**Declare only inputs the builder actually consumes.** A broad shared file in
+`sources` makes unrelated edits report the act stale. Before rebuilding on a
+digest mismatch, trace whether the changed value can reach a rendered frame.
+If the builder consumes a committed manifest that already freezes the copy,
+declare that manifest rather than also declaring the vocab file from which it
+was once authored.
 
 **`--act` is repeatable, and it is the whole guarantee.** `publish --act VII`
 makes a claim about act VII and about nothing else. A blanket `publish`

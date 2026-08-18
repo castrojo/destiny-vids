@@ -68,6 +68,14 @@ caveats go after, and go short.
 publish a wrong credit — but "this cut could be better" is never a reason to
 withhold it.
 
+**A full build starts with a positive freshness proof.** Before encoding any
+Prod derivative or megacut, run both `python3 tools/deliver.py status --check`
+and `python3 tools/megacut.py stories/megacut/megacut.json --dry-run`. Any
+`stale`, `blocked`, or `NOTE: act ... is stale and seated` result means the
+programme is stale even if a summary says `0 stale`. Rebuild or omit that act
+before spending time on social copies or programme segments. Never describe a
+megacut as fresh because its output and provenance files merely exist.
+
 **A blocked act is seated, not waited for.** Owner, 2026-08-16, verbatim: *"I'd
 rather have broken plates than no video."* An act whose plates cannot be placed
 still plays: render it without them, record what is unresolved, and assemble the

@@ -146,22 +146,24 @@ def test_pod_script_is_valid_bash_and_waits_for_both_markers(tmp_path):
 # the manifest
 
 
-def test_the_workflow_is_a_plain_workflow_pinned_to_exo0():
+def test_the_workflow_is_plain_scheduler_driven_and_admission_compliant():
     wf = farm.build_workflow("farm-x-ab12", "echo hi",
                              namespace="argo", image=farm.DEFAULT_IMAGE,
                              cpu="2", limit_cpu="24", memory="4Gi",
-                             limit_memory="16Gi", node="exo-0", keep=False)
+                             limit_memory="16Gi", node=None, keep=False)
     assert wf["kind"] == "Workflow"  # a WorkflowTemplate would be GitOps'd
     spec = wf["spec"]
     assert spec["serviceAccountName"] == "argo"
     tpl = spec["templates"][0]
-    # exo-0 has ~24 free cores; ghost only ~14.
-    assert tpl["nodeSelector"] == {"kubernetes.io/hostname": "exo-0"}
+    assert "nodeSelector" not in tpl
     res = tpl["container"]["resources"]
     # House style: a low request always schedules, the high limit is the real
     # budget on an idle node (the cluster runs at 156-263% limit overcommit).
-    assert res["requests"] == {"cpu": "2", "memory": "4Gi"}
-    assert res["limits"] == {"cpu": "24", "memory": "16Gi"}
+    assert res["requests"] == {
+        "cpu": "2", "memory": "4Gi", "ephemeral-storage": "1Gi"}
+    assert res["limits"] == {
+        "cpu": "24", "memory": "16Gi", "ephemeral-storage": "4Gi"}
+    assert tpl["container"]["imagePullPolicy"] == "IfNotPresent"
     assert tpl["container"]["command"][:2] == ["/bin/bash", "-c"]
     assert spec["volumes"][0]["persistentVolumeClaim"]["claimName"] == "farm-x-ab12"
     # No artifacts section anywhere: the cluster has no artifact repository.
@@ -519,6 +521,32 @@ def test_run_ffmpeg_on_cluster_stages_rewrites_and_fetches(tmp_path, monkeypatch
     # The fetched file was verified with the local ffprobe (issue #88:
     # exit 0 is not evidence).
     assert probed == [str(out)]
+
+
+def test_remote_ordered_commands_share_one_staged_workspace(tmp_path, monkeypatch):
+    """Two-pass x264 requires the stats file written by pass one in pass two."""
+    src = tmp_path / "act.mp4"
+    src.write_bytes(b"footage")
+    out = tmp_path / "social.mp4"
+    kc = _FakeKubectl()
+    monkeypatch.setattr(farm, "_stream_logs", lambda *a, **k: None)
+    monkeypatch.setattr(farm, "probe", lambda *_args: {
+        "duration": 30.0, "fps": Fraction(30, 1), "vfr": False,
+        "frame_count": 900, "codec_name": "h264", "width": 1280,
+        "height": 720, "pix_fmt": "yuv420p", "stream_kinds": ["video", "audio"]})
+    commands = [
+        ["ffmpeg", "-i", str(src), "-pass", "1", str(out), "-y"],
+        ["ffmpeg", "-i", str(src), "-pass", "2", str(out), "-y"],
+    ]
+
+    farm.run_ffmpeg_commands_on_cluster(
+        commands, inputs=[src], out=out, kc=kc, expected_duration=30.0)
+
+    workflow = next(doc for doc in kc.docs if doc.get("kind") == "Workflow")
+    script = workflow["spec"]["templates"][0]["container"]["command"][2]
+    assert script.count("ffmpeg -i /work/in/00-act.mp4 -pass") >= 2
+    assert script.count("/work/out/social.mp4") >= 2
+    assert "running pass 1" in script and "running pass 2" in script
 
 
 def test_native_ffprobe_never_resolves_to_the_container_when_avoidable(

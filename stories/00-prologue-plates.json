@@ -32,6 +32,35 @@
         "Music by Nightwish | Action by Bungie"
       ],
       "note": "Beat two: identical card with the credit pair made visible, hard-cut in at 15.4 so only the credits appear. Holds, then fades out over 1.4s ending at 22.6 -- clear of the 24.88 cut."
+    },
+    {
+      "id": "book-a",
+      "kind": "bookline",
+      "variant": "box",
+      "at": 26.9,
+      "dur": 6.74,
+      "angle": 4.0,
+      "body": [
+        "Two Generations of Contributors",
+        "One at their beginning",
+        "One at their end",
+        "These are their Real Stories"
+      ],
+      "fade": 0,
+      "anchor": [1030, 443],
+      "anchor_out": [1030, 443]
+    },
+    {
+      "id": "book-b",
+      "kind": "bookline",
+      "variant": "box",
+      "at": 31.0,
+      "dur": 3.9,
+      "angle": -14.0,
+      "size": "3.0rem",
+      "body": [],
+      "anchor": [1000, 470],
+      "anchor_out": [1000, 470]
     }
   ],
   "unresolved": [

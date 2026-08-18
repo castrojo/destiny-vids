@@ -303,8 +303,14 @@ def test_the_credit_line_is_one_seared_line_here_and_in_the_prologue(manifest):
         assert plate(manifest, plate_id)["body"] == [line]
     prologue = json.loads(
         (REPO_ROOT / "stories" / "00-prologue-plates.json").read_text())
-    for entry in prologue["plates"]:
-        assert entry["body"] == [line]
+    prologue_titles = {
+        entry["id"]: entry["body"] for entry in prologue["plates"]
+        if entry["id"] in ("maintitle-a", "maintitle-b")
+    }
+    assert prologue_titles == {
+        "maintitle-a": [line],
+        "maintitle-b": [line],
+    }
 
 
 def test_no_plate_here_names_a_person(manifest):

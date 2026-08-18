@@ -81,3 +81,31 @@ def test_the_picture_is_scaled_only_when_it_needs_to_be(tmp_path, monkeypatch):
         ffmpeg=["ffmpeg"], passlog=str(tmp_path / "x264"))
     vf = cmds[0][cmds[0].index("-vf") + 1]
     assert vf.startswith("null"), "a 720p source must not be re-scaled to 720p"
+
+
+def test_reachable_farm_runs_both_encode_passes_in_one_remote_job(
+        tmp_path, monkeypatch):
+    """Two-pass x264 needs one remote workspace so its stats survive pass one."""
+    src, out = tmp_path / "in.mp4", tmp_path / "out.mp4"
+    src.write_bytes(b"source")
+    monkeypatch.setattr(social, "source_facts", lambda _p: {
+        "width": 1920, "height": 1080, "fps": "30/1", "duration": 30.0})
+    monkeypatch.setattr(social.farm, "cluster_available", lambda: (True, ""))
+    calls = []
+
+    def remote(cmds, *, inputs, out, expected_duration, label):
+        calls.append((cmds, inputs, out, expected_duration, label))
+        out.write_bytes(b"remote-social")
+
+    monkeypatch.setattr(social.farm, "run_ffmpeg_commands_on_cluster", remote)
+
+    assert social.main([str(src), "--out", str(out)]) == 0
+    assert len(calls) == 1
+    commands, inputs, remote_out, duration, label = calls[0]
+    assert len(commands) == 2
+    assert inputs == [src]
+    assert remote_out == out
+    assert duration == 30.0
+    assert label == "social[out.mp4]"
+    assert commands[0][commands[0].index("-pass") + 1] == "1"
+    assert commands[1][commands[1].index("-pass") + 1] == "2"

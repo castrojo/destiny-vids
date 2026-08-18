@@ -48,6 +48,13 @@ each value came from so the two can be diffed by eye. Entrance animation is
 deliberately NOT reproduced: a still plate that cuts in cleanly reads better at
 this length than a 0.6s CSS transform ported by hand, and it keeps the burn a
 single ffmpeg overlay rather than an image sequence.
+
+The cinematic chrome kinds are rendered by the same primitives:
+``kind: "caption"`` is a top-safe narrative rail; ``kind: "context"`` is a
+restrained lower-left stack; ``kind: "warning"`` is a full-frame deployment
+card. ``caption`` supports structured glyphs that replace individual
+characters with a mark image while reserving the mark's real width during
+layout, so adjacent text stays visible.
 """
 
 from __future__ import annotations
@@ -55,6 +62,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -279,6 +287,31 @@ BANNER_FS_MIN = 1.2 * REM    # below this it is not a callout; render whole anyw
 BANNER_LS = 0.18             # letter-spacing, em
 BANNER_MAX_W = 0.94          # of the frame's width
 
+# --- cinematic caption / context / warning (owner brief, Task 1) -------------
+# A wrapped bold-white top rail for narrative cues; a restrained lower-left
+# context stack; and a full-frame red deployment warning. Each owns its own
+# chrome row, so they may share the screen with Guardian plates while a
+# second card of the same kind remains an error.
+CAPTION_FS = 2.4 * REM
+CAPTION_PAD = 1.25 * REM
+CAPTION_LINE_GAP = 0.4 * REM
+CAPTION_MAX_W = FRAME_W * 0.88
+CAPTION_TOP = 0.06
+CAPTION_RULE = 3
+
+CONTEXT_FS_TITLE = 2.0 * REM
+CONTEXT_FS_LINE = 1.5 * REM
+CONTEXT_PAD = 1.25 * REM
+CONTEXT_LINE_GAP = 0.5 * REM
+CONTEXT_TOP = 0.36
+
+WARNING_RED = (220, 38, 38, 255)          # the owner's deployment-warning red
+WARNING_PANEL = (153, 27, 27, 235)
+WARNING_STRIPE = (0, 0, 0, 220)
+WARNING_TEXT = (245, 245, 245, 255)
+WARNING_FS = 4.5 * REM
+WARNING_STRIPE_H = 20
+
 # --- chat card (wolves-*/render/plate.html -- the baked dialogue pill) -------
 # The other videos' talking card is neither the reveal plate nor the site's
 # .wc-nameplate: it is the one-line pill plate.html bakes -- [crest] SPEAKER |
@@ -467,7 +500,7 @@ CARD_KINDS = ("act", "comic", "photo")
 # toast under it, and the letterbox banner on the bottom bar of a letterboxed
 # frame. Each may share the screen with a lower third and with a different
 # chrome row; two of the SAME kind at once are still an error.
-CHROME_ROWS = ("status", "miniboss", "achievement", "banner")
+CHROME_ROWS = ("status", "miniboss", "achievement", "banner", "caption", "context", "warning")
 
 # --- group rows (the reference deck's roll call, ~/Videos/nameplates.json) ---
 # The deck's gp_* entries are one row of credits, doubly staggered: spatially,
@@ -1229,6 +1262,298 @@ def _render_banner(spec):
     return img
 
 
+
+def _wrap_text_to_width(text, font, max_width):
+    """Wrap text to a pixel width, preserving explicit newlines."""
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    lines = []
+    for paragraph in text.split("\n"):
+        words = paragraph.split(" ")
+        current = ""
+        for word in words:
+            trial = f"{current} {word}".strip()
+            if probe.textlength(trial, font=font) <= max_width or not current:
+                current = trial
+            else:
+                lines.append(current)
+                current = word
+        if current:
+            lines.append(current)
+    return lines
+
+
+def _render_caption(spec):
+    """Top-safe narrative cue: wrapped bold white text on a dark rail.
+
+    Glyph-aware layout: each active glyph reserves its actual mark width in
+    line measurement, wraps based on that visual width, and shifts the text
+    after it by the accumulated width delta. A missing mark falls back to the
+    plain letter, leaving the line width unchanged.
+    """
+    text = spec.get("text") or ""
+    f_text = _font("bold", CAPTION_FS)
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    inner_w = CAPTION_MAX_W - 2 * CAPTION_PAD
+    line_h = f_text.size * 1.25
+
+    # Resolve active glyphs and the exact character offset each replaces in
+    # the raw authored text. Missing/unreadable marks are silently ignored so
+    # the original letter renders instead.
+    active = {}
+    for glyph in spec.get("glyphs") or []:
+        token = glyph.get("token", "")
+        if not token:
+            continue
+        word = glyph.get("word") or ""
+        idx = int(glyph.get("index", 0))
+        src = glyph.get("src") or str(K8S_CENSOR_MARK)
+        try:
+            mark = Image.open(_resolve(src)).convert("RGBA")
+        except (OSError, ValueError):
+            continue
+        mark_h = int(round(f_text.size * 0.85))
+        mark_w = int(round(mark.width * mark_h / mark.height))
+        resized = mark.resize((mark_w, mark_h), Image.LANCZOS)
+
+        if word:
+            wstart = text.find(word)
+            if wstart == -1:
+                continue
+            occurrences = [
+                i for i, ch in enumerate(text[wstart:wstart + len(word)])
+                if ch == token
+            ]
+            if not occurrences or idx >= len(occurrences):
+                continue
+            char_offset = wstart + occurrences[idx]
+        else:
+            occurrences = [i for i, ch in enumerate(text) if ch == token]
+            if not occurrences or idx >= len(occurrences):
+                continue
+            char_offset = occurrences[idx]
+        if char_offset in active:
+            continue
+        active[char_offset] = {"token": token, "mark": resized,
+                               "mark_w": mark_w, "mark_h": mark_h}
+
+    class TextSeg:
+        __slots__ = ("text", "width")
+        def __init__(self, text_):
+            self.text = text_
+            self.width = probe.textlength(text_, font=f_text)
+
+    class GlyphSeg:
+        __slots__ = ("mark", "mark_w", "mark_h")
+        def __init__(self, info):
+            self.mark = info["mark"]
+            self.mark_w = info["mark_w"]
+            self.mark_h = info["mark_h"]
+        @property
+        def width(self):
+            return self.mark_w
+
+    class WordPiece:
+        __slots__ = ("segments", "width")
+        def __init__(self, segments):
+            self.segments = segments
+            self.width = sum(s.width for s in segments)
+
+    class SpacePiece:
+        __slots__ = ("text", "width")
+        def __init__(self, text_):
+            self.text = text_
+            self.width = probe.textlength(text_, font=f_text)
+
+    def pieces_for(paragraph, base_offset):
+        pieces = []
+        for m in re.finditer(r"\S+|\s+", paragraph):
+            piece_text = m.group()
+            start = m.start()
+            if piece_text.isspace():
+                pieces.append(SpacePiece(piece_text))
+                continue
+            segments = []
+            i = start
+            end = m.end()
+            while i < end:
+                global_i = base_offset + i
+                info = active.get(global_i)
+                if info is not None and text.startswith(info["token"], global_i):
+                    segments.append(GlyphSeg(info))
+                    i += len(info["token"])
+                    continue
+                next_glyph = min(
+                    (off - base_offset for off in active
+                     if start <= off - base_offset < end and off - base_offset > i),
+                    default=end,
+                )
+                chunk = paragraph[i:min(next_glyph, end)]
+                if chunk:
+                    segments.append(TextSeg(chunk))
+                    i += len(chunk)
+                else:
+                    # Defensive: should only happen if a glyph offset <= i.
+                    i += 1
+            pieces.append(WordPiece(segments))
+        return pieces
+
+    def trim_line(line):
+        while line and isinstance(line[-1], SpacePiece):
+            line.pop()
+        while line and isinstance(line[0], SpacePiece):
+            line.pop(0)
+        return line
+
+    all_lines = []
+    base_offset = 0
+    for paragraph in text.split("\n"):
+        pieces = pieces_for(paragraph, base_offset)
+        cur_line = []
+        cur_w = 0.0
+        for p in pieces:
+            if isinstance(p, SpacePiece) and not cur_line:
+                continue
+            if not cur_line or cur_w + p.width <= inner_w:
+                cur_line.append(p)
+                cur_w += p.width
+            else:
+                all_lines.append(trim_line(cur_line))
+                cur_line = []
+                cur_w = 0.0
+                if isinstance(p, SpacePiece):
+                    continue
+                cur_line.append(p)
+                cur_w = p.width
+        if cur_line:
+            all_lines.append(trim_line(cur_line))
+        base_offset += len(paragraph) + 1
+    if not all_lines:
+        all_lines = [[]]
+
+    line_widths = [sum(p.width for p in line) for line in all_lines]
+    box_w = int(round(min(CAPTION_MAX_W, max(line_widths) + 2 * CAPTION_PAD)))
+    text_h = len(all_lines) * line_h + (len(all_lines) - 1) * CAPTION_LINE_GAP
+    box_h = int(round(
+        CAPTION_PAD + text_h + CAPTION_PAD + CAPTION_RULE + CAPTION_PAD))
+
+    img = _chamfered((box_w, box_h), INK, VARIANTS["default"]["border"],
+                     radius=CHAMFER, corner=CORNER_RADIUS)
+    rule_y = int(round(box_h - CAPTION_PAD - CAPTION_RULE / 2))
+    img.alpha_composite(_horizon(box_w - 2 * CAPTION_PAD, CAPTION_RULE,
+                                 VARIANTS["default"]["accent"]),
+                        (int(CAPTION_PAD), rule_y))
+
+    text_layer = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_layer)
+    glyph_placements = []
+
+    for ln_idx, line in enumerate(all_lines):
+        line_w = line_widths[ln_idx]
+        x = (box_w - line_w) / 2
+        y = int(round(CAPTION_PAD + ln_idx * (line_h + CAPTION_LINE_GAP)))
+        for p in line:
+            if isinstance(p, WordPiece):
+                for seg in p.segments:
+                    if isinstance(seg, TextSeg):
+                        draw.text((int(round(x)), y), seg.text,
+                                  font=f_text, fill=TEXT)
+                    else:
+                        my = y - (seg.mark_h - f_text.size) // 2
+                        glyph_placements.append(
+                            (seg.mark, int(round(x)), int(round(my))))
+                    x += seg.width
+            else:
+                x += p.width
+
+    img.alpha_composite(_with_text_shadow(text_layer))
+    for mark, mx, my in glyph_placements:
+        img.alpha_composite(mark, (mx, my))
+    return img
+
+def _render_context(spec):
+    """Restrained lower-left context stack: title, subtitle, body lines.
+
+    Sits above the Guardian-plate plaque lane; no crest, because this is
+    scene-setting metadata rather than a named identity.
+    """
+    title = spec.get("title") or ""
+    subtitle = spec.get("subtitle") or ""
+    body = list(spec.get("body") or [])
+
+    f_title = _font("bold", CONTEXT_FS_TITLE)
+    f_line = _font("bold", CONTEXT_FS_LINE)
+
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    widths = [probe.textlength(title, font=f_title)]
+    if subtitle:
+        widths.append(probe.textlength(subtitle, font=f_line))
+    for line in body:
+        widths.append(probe.textlength(line, font=f_line))
+    inner_w = max(widths) if widths else 0
+    box_w = int(round(inner_w + 2 * CONTEXT_PAD))
+
+    rows = []
+    if title:
+        rows.append((title, f_title, TEXT))
+    if subtitle:
+        rows.append((subtitle, f_line, VARIANTS["default"]["label"]))
+    for line in body:
+        rows.append((line, f_line, TEXT))
+    line_h_title = f_title.size * 1.3
+    line_h_body = f_line.size * 1.25
+    text_h = 0.0
+    for i, (_, f, _) in enumerate(rows):
+        text_h += (line_h_title if f is f_title else line_h_body)
+        if i < len(rows) - 1:
+            text_h += CONTEXT_LINE_GAP
+    box_h = int(round(CONTEXT_PAD + text_h + CONTEXT_PAD))
+
+    img = _chamfered((box_w, box_h), INK, VARIANTS["default"]["border"],
+                     radius=CHAMFER, corner=CORNER_RADIUS)
+    text_layer = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_layer)
+    y = int(round(CONTEXT_PAD))
+    for line, f, colour in rows:
+        draw.text((int(round(CONTEXT_PAD)), int(round(y))), line, font=f, fill=colour)
+        y += (line_h_title if f is f_title else line_h_body) + CONTEXT_LINE_GAP
+
+    img.alpha_composite(_with_text_shadow(text_layer))
+    return img
+
+
+def _render_warning(spec):
+    """Full-frame deployment warning: red panel, two warning stripes, text."""
+    text = spec.get("text") or ""
+    f_text = _font("bold", WARNING_FS)
+
+    frame = Image.new("RGBA", (FRAME_W, FRAME_H), WARNING_PANEL)
+    # Diagonal deployment hazard bars at top and bottom: the warning red cuts
+    # through a near-black track instead of reading as a plain divider.
+    stripe = Image.new("RGBA", (FRAME_W, WARNING_STRIPE_H), WARNING_STRIPE)
+    stripe_draw = ImageDraw.Draw(stripe)
+    step = WARNING_STRIPE_H * 4
+    slash = WARNING_STRIPE_H * 2
+    for x in range(-slash, FRAME_W + step, step):
+        stripe_draw.polygon([
+            (x, 0), (x + slash, 0),
+            (x + slash - WARNING_STRIPE_H, WARNING_STRIPE_H),
+            (x - WARNING_STRIPE_H, WARNING_STRIPE_H),
+        ], fill=WARNING_RED)
+    frame.alpha_composite(stripe, (0, 0))
+    frame.alpha_composite(stripe, (0, FRAME_H - WARNING_STRIPE_H))
+
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    w = probe.textlength(text, font=f_text)
+    a, d = f_text.getmetrics()
+    text_layer = Image.new("RGBA", (int(w + 4), int(a + d + 4)), (0, 0, 0, 0))
+    ImageDraw.Draw(text_layer).text((2, 0), text, font=f_text, fill=WARNING_TEXT)
+    shadowed = _with_text_shadow(text_layer)
+    x = (FRAME_W - shadowed.width) // 2
+    y = (FRAME_H - shadowed.height) // 2
+    frame.alpha_composite(shadowed, (x, y))
+    return frame
+
+
 def _render_companion(spec):
     """The site's GUARDIAN BOND card: species artwork over a three-row plate.
 
@@ -1678,6 +2003,12 @@ def render_plate(spec):
         return _render_status(spec, glitch=bool(spec.get("glitch")))
     if spec.get("kind") == "banner":
         return _render_banner(spec)
+    if spec.get("kind") == "caption":
+        return _render_caption(spec)
+    if spec.get("kind") == "context":
+        return _render_context(spec)
+    if spec.get("kind") == "warning":
+        return _render_warning(spec)
     if spec.get("kind") == "choice":
         return _render_choice(spec)
     variant = _variant_for(spec)
@@ -1827,6 +2158,21 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
         # .wolves-guardian-plate-raised { bottom: auto; top: 28% } -- for a
         # Guardian who towers above the frame's lower third.
         y = py + int(ph * RAISED_TOP)
+    if position == "caption":
+        # Top-safe rail, horizontally centred on the picture.
+        x = px + (pw - plate.width) // 2
+        y = py + int(ph * CAPTION_TOP)
+        frame.alpha_composite(plate, (x, y))
+        return frame
+    if position == "context":
+        # Lower-left stack, above the Guardian-plaque lane.
+        x = px + int(pw * MARGIN_X)
+        y = py + int(ph * CONTEXT_TOP)
+        frame.alpha_composite(plate, (x, y))
+        return frame
+    if position == "warning":
+        frame.alpha_composite(plate, (0, 0))
+        return frame
     if position == "full":
         # A FULL-FRAME card: the pause menu draws its own scrim over the whole
         # picture, so it is composited at the origin rather than measured into

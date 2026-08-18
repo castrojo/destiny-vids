@@ -138,7 +138,7 @@ has actually shipped are both invisible to "did it render":
 ffprobe -v error -select_streams v:0 \
     -show_entries stream=color_space,color_transfer,color_primaries \
     -show_entries format=duration -of default=noprint_wrappers=1 \
-    renders/efmb-plated.mp4          # want bt709 x3, and 307.998
+    renders/efmb-plated.mp4          # want bt709 x3, and 355.468
 ffmpeg -v info -i renders/efmb-plated.mp4 \
     -vf "crop=1200:500:360:180,blackdetect=d=1.0:pic_th=0.98" -an -f null -
 ```

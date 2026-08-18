@@ -338,38 +338,28 @@ def test_marker_cards_carry_no_nameplate_vocabulary(cut):
             assert banned not in beat
 
 
-def test_cortney_is_introduced_with_her_authored_copy(cut):
-    """She IS plated now -- on interruption card C, with the identity the
-    owner authored for act I (issue #90), reproduced verbatim.
-
-    Reproduced means EXACTLY: the label, the name and 'Weilder of the Arcane'
-    (sic), and NO class row -- her class was never named and a hint is not an
-    authorisation (#59). The cards manifest is checked against the act-I
-    manifest, field for field, so the two cannot drift apart silently.
-    """
+def test_cortney_appears_only_in_the_intro_and_amber_owns_the_interruption(cut):
+    """Cortney's only credit is Act I; the later sequence belongs to Amber."""
     cards = json.loads(
         (REPO / "stories" / "06-wolves-interruption-cards.json").read_text())
-    entry = next(c for c in cards["cards"] if c["id"] == "c-cortney")
+    entry = next(c for c in cards["cards"] if c["id"] == "c-amber")
     plate = entry["plate"]
-    hero = json.loads(
-        (REPO / "stories" / "megacut" / "megacut-hero-plates.json").read_text())
-    authored = next(p for p in hero["plates"] if p["id"] == "cortney")
-    for field in ("label", "name", "title", "position"):
-        assert plate[field] == authored[field], (
-            f"{field}: the interruption plate must reproduce the authored "
-            "act-I identity verbatim")
-    for omitted in ("class", "wreath"):
-        assert omitted not in plate, (
-            f"the { omitted } row is omitted, not invented -- see the "
-            "manifest's note and #59/#90")
+    assert plate == {
+        "position": "left",
+        "label": "MAINTAINER // GUARDIAN",
+        "class": "Striker Titan",
+        "name": "Amber Graner",
+        "title": "The Iron Standard",
+        "avatar": "renders/avatars/akgraner.png",
+    }
     assert entry["intro"] == "Introducing ...", (
         "the framing line is owner-authored, verbatim, spaced ellipsis and "
         "all")
 
-    # ...and the cut introduces her on the card BEFORE her moment plays.
     beats = _interruption(cut)
-    assert "Cortney Nickerson" in beats[2]["beat"]
-    assert "Cortney Nickerson" in beats[3]["beat"]
+    assert "Amber Graner" in beats[2]["beat"]
+    assert "Amber Graner" in beats[3]["beat"]
+    assert all("Cortney" not in shot["beat"] for shot in cut["shots"])
 
 
 def test_the_hold_music_is_cleared_and_credited(cut):
@@ -457,7 +447,7 @@ def test_the_interruption_cards_are_the_ones_the_builder_asks_for(cut):
     beats = _interruption(cut)
     for shot, card_id, dur in ((beats[0], "a-silence", SILENCE_LEN),
                                (beats[1], "b-ambassadors", SLIDE_LEN),
-                               (beats[2], "c-cortney", PLATE_LEN)):
+                               (beats[2], "c-amber", PLATE_LEN)):
         assert card_id in by_id, f"the builder asks for a card {card_id!r} "
         f"the manifest does not define"
         assert by_id[card_id]["dur"] == pytest.approx(dur), (

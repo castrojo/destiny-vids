@@ -188,10 +188,9 @@ The binding carries her verified login (`nimbinatus` — *not* the unrelated
 `nimbatus` account) and deliberately **no `plate` block**: her authored identity
 lives on `elsie_bray`, its name row is the redacted string itself, and no
 Nimbatus plate copy has been authored — so a plate pass over a pre-reveal
-appearance reports `no_plate_copy` instead of printing her real name. `sagira`
-is the one binding that is **not a Guardian** —
-she is Osiris's Ghost, so no framing or helmet question applies and she is cast
-on presence in frame alone; her nameplate accordingly carries no subclass line.
+appearance reports `no_plate_copy` instead of printing her real name. Source
+character keys used for footage matching are internal only; rendered dialogue
+and plates carry the owner-authored contributor identities.
 
 A binding may also carry an optional `plate` block: the on-screen nameplate copy
 in the same four-field form as the reference deck (`label`, `class`, `name`,

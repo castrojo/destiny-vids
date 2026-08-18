@@ -52,6 +52,21 @@ def test_a_music_bed_replaces_the_source_audio_and_never_extends_the_picture():
     assert "volume=0.9" in cmd[cmd.index("-af") + 1]
 
 
+def test_a_music_bed_can_start_on_an_authored_picture_cue():
+    cmd = redact.build_command(
+        ["ffmpeg"], "in.mp4", [], "out.mp4",
+        audio="bed.wav", audio_gain=0.8, audio_at=27.835,
+        audio_codec="flac")
+    graph = cmd[cmd.index("-filter_complex") + 1]
+    assert "atrim=start=0.000:duration=27.835" in graph
+    assert "[1:a]asetpts=PTS-STARTPTS,volume=0.8[music]" in graph
+    assert "[pre][music]concat=n=2:v=0:a=1[aout]" in graph
+    assert cmd[cmd.index("-map", cmd.index("-filter_complex")) + 1] == "0:v:0"
+    assert "[aout]" in cmd
+    assert "-shortest" in cmd
+    assert cmd[cmd.index("-c:a") + 1] == "flac"
+
+
 def test_the_checked_in_redactions_cut_the_full_frame_cards():
     """All three cards on the Osiris upload ARE the whole frame, so they are
     cut, not boxed: nothing to paint, and the kept range is the cinematic."""

@@ -623,7 +623,8 @@ def test_no_invented_title_survives_in_the_vocab():
     A person's Guardian identity is reference-deck data
     (~/Videos/nameplates.json), never a lore call: Bob Killen is a Voidwalker
     Warlock (np_bob) even though he plays Osiris, and a person with no
-    authored seal is a Bluefin Blueberry, per the owner's standing rule.
+    authored seal is reproduced verbatim; only a person with no authored seal
+    falls back to Bluefin Blueberry.
     """
     import yaml
     from pathlib import Path
@@ -632,7 +633,7 @@ def test_no_invented_title_survives_in_the_vocab():
     casting = yaml.safe_load(path.read_text())
     values = casting["leads"]["values"]
     assert values["osiris"]["plate"]["class"] == "Voidwalker Warlock"
-    assert values["sagira"]["plate"]["title"] == "Bluefin Blueberry"
+    assert values["sagira"]["plate"]["title"] == "Foundry of the Forbidden"
     raw = path.read_text()
     assert "Master of the Labyrinths" not in raw
     # "Dawnblade Warlock" was once invented for Bob and is banned from every

@@ -71,6 +71,11 @@ def _speaker_for(character, leads):
     return (entry.get("plate") or {}).get("name") or entry.get("display_name")
 
 
+def _avatar_for(character, leads):
+    login = (leads.get(character) or {}).get("github")
+    return f"renders/avatars/{login}.png" if login else None
+
+
 def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=None,
               skip_uncertain=True, log=None):
     """Source-timed cues + a cut list -> chat plate entries.
@@ -121,12 +126,16 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
             continue
 
         spoken = cue["end_sec"] - cue["start_sec"]
-        placed.append({
+        entry = {
             "id": cue["id"], "at": round(landing, 3),
             "dur": round(min(spoken, hold), 3),
             "position": "center", "kind": "chat",
             "speaker": speaker, "text": cue["text"],
-        })
+        }
+        avatar = _avatar_for(cue["character"], leads)
+        if avatar:
+            entry["avatar"] = avatar
+        placed.append(entry)
 
     placed.sort(key=lambda e: e["at"])
 
@@ -161,7 +170,7 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
 
 
 def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
-                busy=None, skip_uncertain=True, log=None):
+                busy=None, skip_uncertain=True, log=None, start_at=0.0):
     """Same cues, laid out as a SCRIPT rather than anchored to their footage.
 
     ``plan_chat`` puts every line where its own footage landed, which is the
@@ -190,7 +199,7 @@ def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
                     moved = True
         return cursor
 
-    entries, dropped, cursor = [], [], 0.0
+    entries, dropped, cursor = [], [], float(start_at)
     for cue in cues:
         if skip_uncertain and cue.get("evidence") == "uncertain":
             dropped.append({**cue, "reason": "speaker not settled by the anchors"})
@@ -206,11 +215,15 @@ def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
         if at + duration > total - TAIL_OUT:
             dropped.append({**cue, "reason": "the cut ends before this line"})
             continue
-        entries.append({
+        entry = {
             "id": cue["id"], "at": round(at, 3), "dur": round(duration, 3),
             "position": "center", "kind": "chat",
             "speaker": speaker, "text": cue["text"],
-        })
+        }
+        avatar = _avatar_for(cue["character"], leads)
+        if avatar:
+            entry["avatar"] = avatar
+        entries.append(entry)
         cursor = at + duration + TAIL_OUT
         if log:
             log(f"  {cue['id']:<4} {at:6.2f}s +{duration:.1f}s  "
@@ -232,9 +245,11 @@ def main(argv=None):
     ap.add_argument("--max-shot-sec", type=float, default=None,
                     help="the same hold cap render.py was given, so timings line up")
     ap.add_argument("--hold", type=float, default=MAX_CHAT_HOLD)
-    ap.add_argument("--mode", choices=("anchored", "script"), default="anchored",
+    ap.add_argument("--mode", choices=("anchored", "script"), default=None,
                     help="anchored: each line sits where its own footage landed. "
-                         "script: the exchange runs in spoken order across the cut.")
+                         "script: the exchange runs in spoken order across the cut. "
+                         "Defaults to the dialogue record's display.mode, then "
+                         "anchored.")
     ap.add_argument("--around", default=None,
                     help="a plate manifest whose windows the dialogue must avoid, "
                          "so a reveal is never buried under a line")
@@ -246,17 +261,20 @@ def main(argv=None):
     from tools.render import load_shots
 
     data = load_dialogue(args.video_id)
+    display = data.get("display") or {}
+    mode = args.mode or display.get("mode", "anchored")
     shots, leads = load_shots(args.shotlist), load_leads()
     busy = []
     if args.around:
         busy = [(float(e["at"]), float(e["at"]) + float(e["dur"]))
                 for e in load_manifest(args.around)]
 
-    if args.mode == "script":
+    if mode == "script":
         entries, dropped = plan_script(
             data["cues"], shots, leads, max_shot_sec=args.max_shot_sec,
             hold=args.hold, busy=busy,
-            skip_uncertain=True, log=print)
+            skip_uncertain=True, log=print,
+            start_at=float(display.get("start_sec", 0.0)))
     else:
         entries, dropped = plan_chat(
             data["cues"], shots, leads, max_shot_sec=args.max_shot_sec,

@@ -18,9 +18,11 @@ from tools import dialogue, dialogue_md  # noqa: E402
 
 LEADS = {
     "osiris": {"person": "mrbobbytables", "display_name": "mrbobbytables",
-               "aka": [], "plate": {"name": "Bob Killen"}},
-    "sagira": {"person": "lindsay_gendreau", "display_name": "Lindsay Gendreau",
-               "aka": ["sagira_ghost"], "plate": {"name": "Lindsay Gendreau"}},
+               "dialogue_label": "mrbobbytables", "aka": [],
+               "plate": {"name": "Bob Killen"}},
+    "sagira": {"person": "clubanderson", "display_name": "clubanderson",
+               "dialogue_label": "clubanderson", "aka": ["sagira_ghost"],
+               "plate": {"name": "Doctor Andy Anderson"}},
 }
 
 DATA = {
@@ -75,19 +77,44 @@ def test_rewriting_twice_still_points_at_the_original_recovery():
 
 
 def test_the_speaker_can_be_renamed_by_character_or_by_person():
-    for spelling in ("Sagira", "sagira_ghost", "Lindsay Gendreau"):
+    for spelling in ("clubanderson", "sagira_ghost", "Doctor Andy Anderson"):
         text = dialogue_md.export(DATA, LEADS).replace(
-            "## d02 | Osiris (Bob Killen)", f"## d02 | {spelling}")
+            "## d02 | mrbobbytables", f"## d02 | {spelling}")
         cues = dialogue_md.parse(text, LEADS)
         assert next(c for c in cues if c["id"] == "d02")["character"] == "sagira"
+
+
+def test_owner_facing_dialogue_labels_round_trip_after_normalization():
+    leads = {
+        **LEADS,
+        "sagira": {
+            **LEADS["sagira"],
+            "dialogue_label": "Doctor Andy Anderson",
+        },
+    }
+    text = dialogue_md.export(DATA, leads)
+    cues = dialogue_md.parse(text, leads)
+    assert next(c for c in cues if c["id"] == "d01")["character"] == "sagira"
 
 
 def test_an_uncast_speaker_is_refused_rather_than_silently_dropped():
     """An unresolvable name would render no card at all; fail loudly instead."""
     text = dialogue_md.export(DATA, LEADS).replace(
-        "## d02 | Osiris (Bob Killen)", "## d02 | Ikora Rey")
+        "## d02 | mrbobbytables", "## d02 | Ikora Rey")
     with pytest.raises(ValueError, match="not a cast character"):
         dialogue_md.parse(text, LEADS)
+
+
+def test_replacing_a_complete_conversation_discards_obsolete_recovery():
+    edited = dialogue_md.parse(dialogue_md.export(DATA, LEADS), LEADS)
+    updated = dialogue_md.replace(DATA, edited)
+
+    assert updated["text_source"]["method"] == "owner_supplied"
+    assert updated["speaker_source"]["method"] == "owner_supplied"
+    assert updated["dropped"] == []
+    assert all(cue["evidence"] == "owner_supplied" for cue in updated["cues"])
+    assert all(cue["text_source"] == "owner_supplied" for cue in updated["cues"])
+    assert all("recovered_text" not in cue for cue in updated["cues"])
 
 
 def test_a_deleted_section_is_recorded_as_dropped_not_lost():

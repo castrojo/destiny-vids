@@ -526,6 +526,17 @@ def test_the_authored_cards_are_used_where_they_exist(manifest):
     assert cards["Laura Santamaria"] == "laura"
 
 
+def test_a_mutable_card_for_another_person_is_ignored(monkeypatch):
+    monkeypatch.setattr(C, "cast_identity", lambda _slug: {
+        "name": "Cortney Nickerson",
+        "title": "Reconciler of the Plane",
+    })
+    mismatched = C.render_cast_placard("Bob Killen", card="bob", index=0)
+    monkeypatch.setattr(C, "cast_identity", lambda _slug: None)
+    fallback = C.render_cast_placard("Bob Killen", index=0)
+    assert list(mismatched.getdata()) == list(fallback.getdata())
+
+
 def test_verified_logins_survive_a_contributor_refresh(manifest):
     """cast_logins is hand-maintained; the schedule applies it every time, so
     a login added after the cast was generated still reaches its placard.

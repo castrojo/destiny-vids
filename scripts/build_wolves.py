@@ -133,7 +133,7 @@ PAUSE_AT = 322.200         # a downbeat (FIRST_BEAT + 102 bars) -- BED clock
 # guidance from the issue, not measurement; do not dress it up as precise.
 SILENCE_LEN = 1.000        # A: the held beat of realization -- black, silent
 SLIDE_LEN = 4.000          # B: "The CNCF Ambassadors would like a moment."
-PLATE_LEN = 4.000          # C: "Introducing ..." -> Cortney Nickerson's plate
+PLATE_LEN = 4.000          # C: "Introducing ..." -> Amber Graner's plate
 
 # The hold music for B and C. CC BY 4.0 (Kevin MacLeod / Incompetech): the
 # licence permits commercial use, sync and redistribution, and attribution is
@@ -542,16 +542,12 @@ def build():
            "CC BY 4.0, credited in ATTRIBUTIONS.md)", audio="hold",
            audio_from={"video_id": HOLD_MUSIC_ID,
                        "start_sec": HOLD_MUSIC_IN})
-    # C -- introducing Cortney Nickerson. Her Guardian identity is OWNER-
-    # AUTHORED (issue #90, already on screen in act I) and reproduced
-    # verbatim, 'Weilder' and all; the class row stays OMITTED, exactly as in
-    # act I, because her class was never named and a hint is not an
-    # authorisation (#59/#90). The wreath question is the owner's (#104).
-    t.card(interruption("c-cortney", "INTERRUPTION C", "nameplate missing"),
+    # C -- introducing Amber Graner with her existing authored Guardian
+    # identity. Cortney Nickerson appears only in the Act I intro.
+    t.card(interruption("c-amber", "INTERRUPTION C", "nameplate missing"),
            PLATE_LEN,
-           "III. INTERRUPTION C -- Introducing Cortney Nickerson, her "
-           "authored #90 identity verbatim with the class row omitted, as in "
-           "act I (hold music continues)", audio="hold",
+           "III. INTERRUPTION C -- Introducing Amber Graner with her authored "
+           "Guardian identity (hold music continues)", audio="hold",
            audio_from={"video_id": HOLD_MUSIC_ID,
                        "start_sec": HOLD_MUSIC_IN})
     # D -- the clip, with its OWN effects and score: the polite hold music is
@@ -562,7 +558,7 @@ def build():
           "III. INTERRUPTION D -- the clip plays to the audience with its own "
           "effects and score (issue #104; supersedes #95, whose SFX-only mix "
           "does not exist): the explosion, then the transcendence portrait, "
-          "held to the cut at source 53.470. Cortney Nickerson's moment, "
+          "held to the cut at source 53.470. Amber Graner's moment, "
           "introduced on the card before it.",
           audio="source")
     t.at_bed(PAUSE_AT, "the interruption consumed no bed time")
@@ -639,19 +635,12 @@ def main():
             "moment.'); the CNCF logo/mark is not used because the rights to "
             "it have not been cleared. Text only until the owner says "
             "otherwise.",
-            "WREATH, TODO(owner): Cortney Nickerson's plate on interruption "
-            "card C reproduces her authored act-I identity verbatim with no "
-            "wreath; whether the interruption treatment should add one is "
-            "the owner's call (#104).",
             "CLIP RANGE: the clip plays source 43.000 -> 53.470 -- option B "
             "of the owner's own correction on #104 (the issue text's "
             "43.0 -> 51.0 would cut the transcendence portrait they "
             "previously insisted on). Verified on frames in "
             "renders/verify-104/. One-line revert to option A: CLIP_IN = "
             "44.811.",
-            "CORTNEY'S CLASS: still unrecorded -- the plate omits the class "
-            "row exactly as her authored act-I plate does; a hint is not an "
-            "authorisation (#59/#90 remain open).",
         ],
         "shots": t.shots,
     }

@@ -90,8 +90,8 @@ The destiny names are there for convenience
 | Nimbatus | Laura Santamaria | name-only binding (#103): pre-reveal credit, login `nimbinatus`, no plate copy authored |
 | Zavala | Kelsey Hightower | authored plate (#8), gold chrome (#33) |
 | [Redacted] Cayde-6 | castrojo | authored plate (this character is very famous so we only reveal jorge's name once)| 
-| Osiris | mrbobbytables | Only person who knows wtf is going on |
-| Sagira | Lindsay Gendreau | Sends bobs emails to contributors |
+| Bob Killen | mrbobbytables | Only person who knows wtf is going on |
+| Doctor Andy Anderson | clubanderson | Foundry of the Forbidden |
 | Saint-14 | Kat | remains the bubble in the original Wolves; authored plate - doesn't read maintainer email, gets shot down |
 | Mara Sov | Karena Angel | authored plate (Stasis Warlock — answers #5), wreath chrome |
 | **Lord Saladin** | **Jeefy** | **constrained: far + helmeted only** |
