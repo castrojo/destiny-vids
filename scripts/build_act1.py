@@ -51,6 +51,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from tools import plate  # noqa: E402
 from tools import render  # noqa: E402
+from tools import peaks  # noqa: E402
 
 MANIFEST = "stories/megacut/megacut-hero-plates.json"
 PLATES_DIR = "renders/plates-01-hero"
@@ -165,6 +166,7 @@ def build_act1(skip_encode=False, use_farm=False):
         ffmpeg=ffmpeg,
         runner=runner,
     )
+    peaks.trim_master_peak((REPO_ROOT / MASTER).resolve())
     print(f"wrote {MASTER}")
 
 
