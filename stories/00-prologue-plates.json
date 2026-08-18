@@ -34,10 +34,24 @@
       "note": "Beat two: identical card with the credit pair made visible, hard-cut in at 15.4 so only the credits appear. Holds, then fades out over 1.4s ending at 22.6 -- clear of the 24.88 cut."
     },
     {
+      "id": "mission-briefing",
+      "kind": "act",
+      "at": 26.9,
+      "dur": 6.74,
+      "label": "PROJECT BLUEFIN MISSION BRIEFING",
+      "title": "Thanks for Volunteering",
+      "body": [
+        "Tophee Protocol Quick Insertion // ACTIVATED",
+        "Agones Cluster // Cycling",
+        "Mechaphippy Deployment // UNAUTHORIZED"
+      ],
+      "copy_source": "owner_supplied"
+    },
+    {
       "id": "book-a",
       "kind": "bookline",
       "variant": "box",
-      "at": 26.9,
+      "at": 34.0,
       "dur": 6.74,
       "angle": 4.0,
       "body": [
