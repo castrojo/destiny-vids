@@ -206,9 +206,9 @@
       "at": 68.5,
       "dur": 6.5,
       "position": "left",
-      "name": "OrliX",
-      "avatar": "renders/avatars/orlix.png",
-      "note": "OWNER CORRECTION: Orlin is github.com/orlix. GitHub resolves that account as OrliX (id 891481); the plate uses the account's authored casing and portrait. Source window 70.5 - 77 is unchanged. No Guardian label, class, or title was supplied, so those rows remain omitted rather than inherited from Laura Santamaria."
+      "name": "Orlix",
+      "avatar": "renders/avatars/OrlinVasilev.png",
+      "note": "OWNER CORRECTION 2026-08-18: the verified GitHub profile is https://github.com/OrlinVasilev (login OrlinVasilev, user id 7236111, name Orlix, avatar https://avatars.githubusercontent.com/u/7236111?v=4). Local avatar renders/avatars/OrlinVasilev.png. The previous claim that github.com/orlix / id 891481 was authoritative is removed. Source window 70.5 - 77 is unchanged. No Guardian label, class, or title was supplied, so those rows remain omitted rather than inherited from Laura Santamaria."
     },
     {
       "id": "act-i-cue-06a",

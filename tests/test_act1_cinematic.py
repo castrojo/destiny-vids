@@ -114,8 +114,8 @@ def test_act_i_captions_use_one_authored_sentence_per_card():
 
 def test_orlix_nameplate_uses_the_owner_supplied_github_identity():
     entry = next(e for e in _manifest() if e.get("id") == "orlix")
-    assert entry["name"] == "OrliX"
-    assert entry["avatar"] == "renders/avatars/orlix.png"
+    assert entry["name"] == "Orlix"
+    assert entry["avatar"] == "renders/avatars/OrlinVasilev.png"
 
 
 def test_warning_card_at_112_with_exact_text():

@@ -258,12 +258,12 @@ def test_the_title_card_covers_one_unbroken_window_beside_the_guardian_plates():
 
 
 def test_a_recast_plate_carries_a_name_and_no_inherited_rows():
-    """OrliX has an owner-supplied GitHub identity but no Guardian rows; never
+    """Orlix has a verified GitHub identity but no Guardian rows; never
     inherit Laura's label, subclass, or title."""
     entries = plate.load_manifest(os.path.join(MEGACUT, "megacut-hero-plates.json"))
     orlix = next(e for e in entries if e["id"] == "orlix")
-    assert orlix["name"] == "OrliX"
-    assert orlix["avatar"] == "renders/avatars/orlix.png"
+    assert orlix["name"] == "Orlix"
+    assert orlix["avatar"] == "renders/avatars/OrlinVasilev.png"
     for row in ("label", "class", "title", "trustee"):
         assert row not in orlix, f"orlix inherited {row}"
 
