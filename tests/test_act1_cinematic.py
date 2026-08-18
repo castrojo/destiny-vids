@@ -115,7 +115,17 @@ def test_act_i_captions_use_one_authored_sentence_per_card():
 def test_orlix_nameplate_uses_the_owner_supplied_github_identity():
     entry = next(e for e in _manifest() if e.get("id") == "orlix")
     assert entry["name"] == "Orlix"
-    assert entry["avatar"] == "renders/avatars/OrlinVasilev.png"
+    assert entry["avatar"] == "renders/avatars/OrlinVasilev.jpg"
+    assert entry["at"] == pytest.approx(68.5)
+    assert entry["dur"] == pytest.approx(6.5)
+    assert entry["position"] == "left"
+    note = entry.get("note", "")
+    assert "https://github.com/OrlinVasilev" in note
+    assert "https://avatars.githubusercontent.com/u/7236111?v=4" in note
+    assert "7236111" in note
+    raw = MANIFEST.read_text(encoding="utf-8")
+    assert "github.com/orlix" not in raw
+    assert "891481" not in raw
 
 
 def test_warning_card_at_112_with_exact_text():

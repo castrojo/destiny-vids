@@ -263,7 +263,10 @@ def test_a_recast_plate_carries_a_name_and_no_inherited_rows():
     entries = plate.load_manifest(os.path.join(MEGACUT, "megacut-hero-plates.json"))
     orlix = next(e for e in entries if e["id"] == "orlix")
     assert orlix["name"] == "Orlix"
-    assert orlix["avatar"] == "renders/avatars/OrlinVasilev.png"
+    assert orlix["avatar"] == "renders/avatars/OrlinVasilev.jpg"
+    assert orlix["at"] == pytest.approx(68.5)
+    assert orlix["dur"] == pytest.approx(6.5)
+    assert orlix["position"] == "left"
     for row in ("label", "class", "title", "trustee"):
         assert row not in orlix, f"orlix inherited {row}"
 
