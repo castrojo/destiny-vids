@@ -52,7 +52,22 @@ python3 tools/chapter_md.py check 0
 
 ## 0:26.900
 
-* [book-a] bookline @ 0:26.900 +6.74
+* [mission-briefing] act @ 0:26.900 +6.74
+  - label: PROJECT BLUEFIN MISSION BRIEFING
+  - title: Thanks for Volunteering
+  - body: Tophee Protocol Quick Insertion // ACTIVATED
+  - body: Agones Cluster // Cycling
+  - body: Mechaphippy Deployment // UNAUTHORIZED
+  - copy_source: owner_supplied
+
+## 0:34.000
+
+**`book-b` was not moved with `book-a`.** It still opens at 0:31.000 and runs
+to 0:34.900, so it now starts *before* the card it follows and the two overlap
+for 0.9s. Moving it is a second authored beat and needs its own decision — see
+the manifest's `unresolved`.
+
+* [book-a] bookline @ 0:34.000 +6.74
   - variant: box
   - angle: 4.0
   - body: Two Generations of Contributors
