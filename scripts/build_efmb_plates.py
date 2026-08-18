@@ -1911,21 +1911,31 @@ def build():
             frames = max(2, int(round(CHOICE_HOLD * CHOICE_FPS)))
             step = round(CHOICE_HOLD / frames, 4)
             start = at
+            plates.append({
+                "id": "choice_lfx_base",
+                "kind": "choice",
+                "at": start,
+                "dur": CHOICE_HOLD,
+                "position": "full",
+                "copy_source": "owner_supplied",
+                "label": spec["text"],
+                "group": "choice_lfx_cursor",
+                "options": CHOICE_OPTIONS,
+            })
             for n in range(frames):
-                t = n / (frames - 1)
                 plates.append({
-                    "id": f"choice_lfx_{n:02d}",
-                    "kind": "choice",
+                    "id": f"choice_lfx_cursor_{n:02d}",
+                    "kind": "choice_cursor",
                     "at": round(start + n * step, 3),
                     "dur": step,
                     "position": "full",
-                    "group": "choice_lfx",
+                    "group": "choice_lfx_cursor",
                     "order": n,
                     "animation": True,
                     "copy_source": "owner_supplied",
                     "label": spec["text"],
                     "options": CHOICE_OPTIONS,
-                    "pointer": round(t * CHOICE_POINTER_CUT, 4),
+                    "pointer": round((n / (frames - 1)) * CHOICE_POINTER_CUT, 4),
                 })
             choice_end = round(start + frames * step, 3)
             chat_cursor = max(chat_cursor, choice_end)

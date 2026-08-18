@@ -1773,27 +1773,8 @@ def _render_achievement(spec):
     return img
 
 
-def _render_choice(spec):
-    """The **video-game choice screen**: the film stops and asks the player.
-
-    Owner: *"design it like a video game choice screen and 'pause' here to let
-    the player 'decide' then it cuts to the descent."*
-
-    So this is not a lower third at all -- it is a FULL-FRAME card, placed with
-    ``position: "full"``. A scrim goes over the whole picture, the way a pause
-    menu dims the game behind it, and the two options sit in the middle at
-    button scale. The picture is still moving underneath: a true freeze would
-    have to be cut into the film itself, which moves every timecode after it,
-    so it is recorded as a punch-list item rather than faked here.
-
-    NOTHING IS HIGHLIGHTED -- no cursor, no selected row, no confirm prompt --
-    because the joke is that neither option is a choice, and lighting one up
-    would answer it. The `o` the owner typed is drawn as a ring rather than
-    typeset as the letter: it is a marker, not a lowercase o.
-
-    `label` is the prompt and `options` are the boxes. Both are authored copy,
-    and the field set is closed like every other card kind's.
-    """
+def _choice_layout(spec):
+    """Geometry shared by the static choice menu and its cursor layer."""
     label = (spec.get("label") or "").upper()
     # An option is either a string or ``{"text": ..., "tier": "legendary"}``.
     options = []
@@ -1825,12 +1806,99 @@ def _render_choice(spec):
     stack_h = (label_h + sum(heights)
                + max(0, len(options) - 1) * CHOICE_BOX_GAP)
 
+    top = int((FRAME_H - stack_h) / 2)
+    left = int((FRAME_W - box_w) / 2)
+
+    y = top + label_h
+    centres = []
+    for option, height in zip(options, heights):
+        legendary = option.get("tier") == "legendary"
+        ty = CHOICE_PAD_Y
+        if legendary:
+            ty += tag_h
+        cy = ty + f_option.size * 0.62
+        x = CHOICE_RULE + CHOICE_PAD_X
+        centres.append((left + x + CHOICE_BULLET / 2, y + cy))
+        y += height + CHOICE_BOX_GAP
+
+    return {
+        "label": label,
+        "options": options,
+        "fonts": {"label": f_label, "option": f_option, "tag": f_tag},
+        "box_w": box_w,
+        "heights": heights,
+        "label_h": label_h,
+        "top": top,
+        "left": left,
+        "centres": centres,
+        "row_w": row_w,
+    }
+
+
+
+def _choice_cursor_position(spec, layout=None):
+    """Return the integer (x, y) top-left where the eased cursor is placed.
+
+    ``layout`` may be the output of ``_choice_layout(spec)``; passing it in
+    avoids recomputing fonts and text metrics when both the static base and
+    the cursor layer are rendered from the same spec.
+    """
+    if layout is None:
+        layout = _choice_layout(spec)
+    centres = layout["centres"]
+    progress = spec.get("pointer")
+    if progress is None or not centres:
+        return None
+    target = centres[min(CHOICE_POINTER_TARGET, len(centres) - 1)]
+    t = max(0.0, min(1.0, float(progress)))
+    # Ease-IN: the hand is still winding up. Ease-out would put the pointer
+    # almost on the button by the time the cut lands, which reads as having
+    # chosen. It has not chosen -- that is the whole gag.
+    k = t ** 1.5
+    px = FRAME_W / 2 + (target[0] - FRAME_W / 2) * k
+    py = FRAME_H / 2 + (target[1] - FRAME_H / 2) * k
+    return (int(px), int(py))
+
+
+def _render_choice(spec):
+    """The **video-game choice screen**: the film stops and asks the player.
+
+    Owner: *"design it like a video game choice screen and 'pause' here to let
+    the player 'decide' then it cuts to the descent."*
+
+    So this is not a lower third at all -- it is a FULL-FRAME card, placed with
+    ``position: "full"``. A scrim goes over the whole picture, the way a pause
+    menu dims the game behind it, and the two options sit in the middle at
+    button scale. The picture is still moving underneath: a true freeze would
+    have to be cut into the film itself, which moves every timecode after it,
+    so it is recorded as a punch-list item rather than faked here.
+
+    NOTHING IS HIGHLIGHTED -- no cursor, no selected row, no confirm prompt --
+    because the joke is that neither option is a choice, and lighting one up
+    would answer it. The `o` the owner typed is drawn as a ring rather than
+    typeset as the letter: it is a marker, not a lowercase o.
+
+    `label` is the prompt and `options` are the boxes. Both are authored copy,
+    and the field set is closed like every other card kind's.
+    """
+    layout = _choice_layout(spec)
+    label = layout["label"]
+    options = layout["options"]
+    box_w = layout["box_w"]
+    heights = layout["heights"]
+    label_h = layout["label_h"]
+    top = layout["top"]
+    left = layout["left"]
+    row_w = layout["row_w"]
+    f_label = layout["fonts"]["label"]
+    f_option = layout["fonts"]["option"]
+    f_tag = layout["fonts"]["tag"]
+    tag_h = int(round(f_tag.size * 1.5))
+
     # The pause scrim: the whole frame goes down so the menu reads as chrome
     # over a stopped game rather than as a caption on a moving shot.
     frame = Image.new("RGBA", (FRAME_W, FRAME_H), CHOICE_SCRIM)
-
-    top = int((FRAME_H - stack_h) / 2)
-    left = int((FRAME_W - box_w) / 2)
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
 
     if label:
         layer = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
@@ -1841,7 +1909,6 @@ def _render_choice(spec):
         frame.alpha_composite(_with_text_shadow(layer))
 
     y = top + label_h
-    centres = []
     for option, height in zip(options, heights):
         legendary = option.get("tier") == "legendary"
         panel = CHOICE_LEGENDARY_PANEL if legendary else CHOICE_PANEL
@@ -1873,22 +1940,23 @@ def _render_choice(spec):
         draw.text((x + row_w, ty), option["text"], font=f_option, fill=TEXT)
         box.alpha_composite(_with_text_shadow(layer))
         frame.alpha_composite(box, (left, int(round(y))))
-        # Aimed at the MARKER, not at the words: a cursor sitting on the text
-        # reads as a typo, and the marker is what you would click.
-        centres.append((left + x + CHOICE_BULLET / 2, y + cy))
         y += height + CHOICE_BOX_GAP
 
-    progress = spec.get("pointer")
-    if progress is not None and centres:
-        target = centres[min(CHOICE_POINTER_TARGET, len(centres) - 1)]
-        t = max(0.0, min(1.0, float(progress)))
-        # Ease-IN: the hand is still winding up. Ease-out would put the
-        # pointer almost on the button by the time the cut lands, which reads
-        # as having chosen. It has not chosen -- that is the whole gag.
-        k = t ** 1.5
-        px = FRAME_W / 2 + (target[0] - FRAME_W / 2) * k
-        py = FRAME_H / 2 + (target[1] - FRAME_H / 2) * k
-        frame.alpha_composite(_cursor(), (int(px), int(py)))
+    return frame
+
+
+def _render_choice_cursor(spec):
+    """Transparent frame carrying only the eased choice cursor.
+
+    The static menu is rendered once as ``kind="choice"`` and burned for the
+    whole window. This layer is the moving cursor only, so a single input can
+    change between frames while the menu pixels stay put.
+    """
+    layout = _choice_layout(spec)
+    frame = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+    pos = _choice_cursor_position(spec, layout)
+    if pos is not None:
+        frame.alpha_composite(_cursor(), pos)
     return frame
 
 
@@ -2009,6 +2077,8 @@ def render_plate(spec):
         return _render_context(spec)
     if spec.get("kind") == "warning":
         return _render_warning(spec)
+    if spec.get("kind") == "choice_cursor":
+        return _render_choice_cursor(spec)
     if spec.get("kind") == "choice":
         return _render_choice(spec)
     variant = _variant_for(spec)

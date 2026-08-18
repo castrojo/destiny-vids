@@ -1113,7 +1113,9 @@ def test_the_new_dialogue_lands_on_the_owners_seconds():
     assert by_id["chat_joseph_slop"]["text"] == "Here comes the slop"
     assert by_id["chat_karena_job"]["at"] == pytest.approx(77.433, abs=1e-3)
     assert by_id["chat_karena_job"]["text"] == "I love this job"
-    assert all(p["label"] == "Your choices are:" for p in _choice_frames())
+    base_label = [
+        p["label"] for p in _choice_frames() if p["id"] == "choice_lfx_base"]
+    assert base_label and base_label[0] == "Your choices are:"
 
 
 def test_the_new_face_shot_copy_replaces_josephs_old_pair():
@@ -1135,10 +1137,13 @@ def _choice_frames():
 def test_the_choice_screen_is_a_full_frame_pause_menu():
     frames = _choice_frames()
     assert frames, "the choice screen is not scheduled"
-    assert all(f["kind"] == "choice" for f in frames)
-    assert all(f["position"] == "full" for f in frames)
-    assert all(f["animation"] for f in frames)
-    assert all(f["group"] == "choice_lfx" for f in frames)
+    base = [p for p in frames if p["id"] == "choice_lfx_base"]
+    cursor = [p for p in frames if p["id"].startswith("choice_lfx_cursor_")]
+    assert base and base[0]["kind"] == "choice"
+    assert all(p["position"] == "full" for p in frames)
+    assert all(c["animation"] for c in cursor)
+    assert base[0]["dur"] == pytest.approx(build_efmb_plates.CHOICE_HOLD)
+    assert all(c["group"] == "choice_lfx_cursor" for c in cursor)
 
 
 def test_the_menu_owns_riaans_line_and_has_room_to_read():
@@ -1147,7 +1152,9 @@ def test_the_menu_owns_riaans_line_and_has_room_to_read():
     assert "chat_riaan_choices" not in by_id
     assert frames[0]["at"] == pytest.approx(
         206.0 - build_efmb_plates.MEGACUT_OFFSET, abs=1e-3)
-    assert all(frame["label"] == "Your choices are:" for frame in frames)
+    base_label = [
+        frame["label"] for frame in frames if frame["id"] == "choice_lfx_base"]
+    assert base_label and base_label[0] == "Your choices are:"
     span = round(frames[-1]["at"] + frames[-1]["dur"] - frames[0]["at"], 3)
     assert span == pytest.approx(build_efmb_plates.CHOICE_HOLD, abs=0.05)
     assert span >= 4.0
@@ -1155,8 +1162,9 @@ def test_the_menu_owns_riaans_line_and_has_room_to_read():
 
 def test_the_frames_are_contiguous():
     """A gap between two frames of a cursor is a flicker."""
-    frames = _choice_frames()
-    for a, b in zip(frames, frames[1:]):
+    cursor = [p for p in _choice_frames()
+              if p["id"].startswith("choice_lfx_cursor_")]
+    for a, b in zip(cursor, cursor[1:]):
         assert b["at"] == pytest.approx(a["at"] + a["dur"], abs=2e-3)
 
 
@@ -1176,11 +1184,15 @@ def test_the_cursor_starts_in_the_centre_and_never_arrives():
     have it cut so it's a teaser quick cut". A pointer that lands has chosen,
     and the joke is that nobody gets to."""
     from tools import plate
-    frames = _choice_frames()
-    assert frames[0]["pointer"] == 0.0
-    assert frames[-1]["pointer"] == pytest.approx(plate.CHOICE_POINTER_CUT)
+    cursor = sorted(
+        [p for p in _choice_frames()
+         if p["id"].startswith("choice_lfx_cursor_")],
+        key=lambda p: p["order"],
+    )
+    assert cursor[0]["pointer"] == 0.0
+    assert cursor[-1]["pointer"] == pytest.approx(plate.CHOICE_POINTER_CUT)
     assert plate.CHOICE_POINTER_CUT < 1.0
-    progress = [f["pointer"] for f in frames]
+    progress = [f["pointer"] for f in cursor]
     assert progress == sorted(progress)
 
 
@@ -1192,15 +1204,44 @@ def test_nothing_on_the_menu_is_selected():
     on the box the pointer is heading for would light up here.
     """
     from tools import plate
-    spec = {"kind": "choice", "label": "Your choices are:",
-            "options": build_efmb_plates.CHOICE_OPTIONS}
-    start = plate.render_plate({**spec, "pointer": 0.0})
-    end = plate.render_plate({**spec, "pointer": plate.CHOICE_POINTER_CUT})
+    base_spec = {"kind": "choice", "label": "Your choices are:",
+                 "options": build_efmb_plates.CHOICE_OPTIONS}
+    base = plate.render_plate(base_spec)
+    start = base.copy()
+    end = base.copy()
+    cursor_start = plate.render_plate(
+        {**base_spec, "kind": "choice_cursor", "pointer": 0.0})
+    cursor_end = plate.render_plate(
+        {**base_spec, "kind": "choice_cursor",
+         "pointer": plate.CHOICE_POINTER_CUT})
+    start.alpha_composite(cursor_start)
+    end.alpha_composite(cursor_end)
     cursor = plate._cursor()
     changed = sum(1 for a, b in zip(start.getdata(), end.getdata()) if a != b)
     # Two cursor footprints' worth of pixels, and no more: anything else is a
     # box that reacted to being approached.
     assert changed <= 2 * cursor.width * cursor.height
+
+
+def test_choice_menu_is_one_persistent_base_with_cursor_only_animation():
+    from tools import plate
+    frames = _choice_frames()
+    base = [p for p in frames if p["id"] == "choice_lfx_base"]
+    cursor = [p for p in frames if p["id"].startswith("choice_lfx_cursor_")]
+    assert len(base) == 1
+    assert base[0]["kind"] == "choice"
+    assert base[0]["dur"] == pytest.approx(build_efmb_plates.CHOICE_HOLD)
+    assert cursor
+    assert all(p["kind"] == "choice_cursor" for p in cursor)
+    assert all(p["group"] == "choice_lfx_cursor" for p in cursor)
+    assert all(c.get("label") == base[0]["label"] for c in cursor)
+    base_spec = dict(base[0])
+    for c in cursor:
+        pos = plate._choice_cursor_position(c)
+        ref = plate._choice_cursor_position(
+            {**base_spec, "kind": "choice_cursor", "pointer": c["pointer"]}
+        )
+        assert pos == ref, f"cursor {c['id']} layout drift"
 
 
 
