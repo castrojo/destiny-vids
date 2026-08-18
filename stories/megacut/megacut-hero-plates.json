@@ -326,11 +326,12 @@
     {
       "id": "act-i-cue-09b",
       "kind": "caption",
-      "at": 105.25,
-      "dur": 6.25,
+      "at": 107.8,
+      "dur": 4.2,
       "position": "caption",
-      "text": "This one is machine and nerve, and has its mind concluded",
-      "copy_source": "owner_supplied"
+      "copy_source": "owner_supplied",
+      "_retired_copy": "This one is machine and nerve, and has its mind concluded",
+      "text": "Your Potential is Off the Charts"
     },
     {
       "id": "act-i-warning",

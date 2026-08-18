@@ -484,6 +484,14 @@ CHOICE_POINTER_EDGE = (8, 12, 20, 235)
 CHOICE_ACCENT = STATUS_ACCENT
 CHOICE_LINE = STATUS_LINE
 
+# --- programme countdown -----------------------------------------------------
+# A compact lower-matte card: the digits are the copy, the rule/panel are the
+# existing Bluefin HUD chrome. It stays tight so the letterbox remains visible.
+COUNTDOWN_FS = 3.2 * REM
+COUNTDOWN_PAD_X = 1.5 * REM
+COUNTDOWN_PAD_Y = 0.7 * REM
+COUNTDOWN_RULE = 3
+
 
 MARGIN_X = 0.05
 MARGIN_BOTTOM = 0.10
@@ -1773,6 +1781,22 @@ def _render_achievement(spec):
     return img
 
 
+def _render_countdown(spec):
+    """Render one whole-second countdown value in Bluefin's lower matte."""
+    text = str(spec.get("text") or "")
+    font = _font("bold", COUNTDOWN_FS)
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    text_w = int(math.ceil(probe.textlength(text, font=font)))
+    box_w = int(round(text_w + 2 * COUNTDOWN_PAD_X + COUNTDOWN_RULE))
+    box_h = int(round(font.size * 1.25 + 2 * COUNTDOWN_PAD_Y))
+    img = _chamfered((box_w, box_h), STATUS_PANEL, STATUS_LINE)
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, COUNTDOWN_RULE - 1, box_h - 1), fill=STATUS_ACCENT)
+    draw.text((COUNTDOWN_PAD_X + COUNTDOWN_RULE,
+               (box_h - font.size) / 2 - 1), text, font=font, fill=STATUS_WHITE)
+    return img
+
+
 def _choice_layout(spec):
     """Geometry shared by the static choice menu and its cursor layer."""
     label = (spec.get("label") or "").upper()
@@ -2077,6 +2101,8 @@ def render_plate(spec):
         return _render_context(spec)
     if spec.get("kind") == "warning":
         return _render_warning(spec)
+    if spec.get("kind") == "countdown":
+        return _render_countdown(spec)
     if spec.get("kind") == "choice_cursor":
         return _render_choice_cursor(spec)
     if spec.get("kind") == "choice":
@@ -2242,6 +2268,17 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
         return frame
     if position == "warning":
         frame.alpha_composite(plate, (0, 0))
+        return frame
+    if position == "countdown-bottom":
+        # Scope footage leaves a lower matte below the measured picture. With
+        # a full-frame picture, use the same bottom safe margin as lower thirds.
+        x = px + (pw - plate.width) // 2
+        matte_top = py + ph
+        if matte_top < FRAME_H:
+            y = matte_top + (FRAME_H - matte_top - plate.height) // 2
+        else:
+            y = FRAME_H - int(FRAME_H * MARGIN_BOTTOM) - plate.height
+        frame.alpha_composite(plate, (x, y))
         return frame
     if position == "full":
         # A FULL-FRAME card: the pause menu draws its own scrim over the whole

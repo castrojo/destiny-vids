@@ -85,6 +85,13 @@ what the other owns, so a manifest may mix them — the Wolves hero segment
 carries six Guardian plates *and* the comic title card, and `burn` reads one
 plates-dir without caring which tool drew which file.
 
+For a timed overlay derivative, keep the clean render named and record the
+relationship beside the source record. Point the programme item at the named
+derivative, not at a mutated clean file. Countdown labels are derived from
+`Fraction(60000, 1001)` delivery frames; convert segment and target boundaries
+to frames before deriving whole-second text, and make the zero entry's
+programme time the authored target boundary.
+
 ## Where the detail lives
 
 This skill is the contract. The procedure lives in `references/`:

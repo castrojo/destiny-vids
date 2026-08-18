@@ -67,13 +67,13 @@
     },
     {
       "kind": "clip",
-      "path": "renders/perfume-2.mp4",
+      "path": "renders/perfume-2-countdown.mp4",
       "audio": "source",
       "fade_in": 6.2,
       "gain_db": -4.0,
       "crescendo_out": 4.0,
       "crescendo_db": 4.0,
-      "label": "Perfume, movement 2 — source 93.000 -> 159.400, after the Destiny intro",
+      "label": "Perfume, movement 2 countdown — source 93.000 -> 159.400, after the Destiny intro",
       "_thread": "THE PERFUME THREAD, movement 2 of 5. No numeral, no slide, no chapter marker -- see stories/00-perfume-thread.json. The 6.2 s fade_in is not a default: it is the exact length of the fade the PROLOGUE went out on (afade st=93.0 d=6.2), replayed upside down, so the song dips across act I and swells back rather than restarting. It also resumes mid-shot -- there is no cut in the source between 91.200 and 108.960 -- so the picture continues the very frame the prologue left. At the other end, the old 2.0 s fade_out and act II's silent card are gone on the owner's 4:40 note. The whole movement is held 4 dB below source, then the final 4.0 s rises linearly in dB back to unity: a crescendo that never boosts above the source's existing peak, followed by a direct music-to-music cut.",
       "fade_out": 0.0,
       "_hard_out": "Owner 2026-08-15: remove the repeated broken fade at 4:36. Movement 2 stays at full level through its last frame and Act II begins on the next; the 4.0-second crescendo remains, but it is not followed by a release."

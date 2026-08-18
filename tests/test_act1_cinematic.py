@@ -40,7 +40,7 @@ CUES = [
     (91.000, 94.500, "We built a Community none of us dared to dream of, with allies from unlikely places."),
     (94.750, 98.500, "We have never had more to lose."),
     (99.000, 105.000, "You are the dream of many ancestors"),
-    (105.250, 111.500, "This one is machine and nerve, and has its mind concluded"),
+    (107.800, 112.000, "Your Potential is Off the Charts"),
     (112.000, 114.200, "[ PREPARE FOR TITANFALL ]"),
 ]
 
@@ -95,9 +95,18 @@ def test_the_ancestral_cue_uses_two_cards_at_the_authored_line_break():
             {"act-i-cue-09a", "act-i-cue-09b"}]
     assert [e["text"] for e in pair] == [
         "You are the dream of many ancestors",
-        "This one is machine and nerve, and has its mind concluded",
+        "Your Potential is Off the Charts",
     ]
     assert all(plate.render_plate(e).getchannel("A").getbbox() for e in pair)
+
+
+def test_your_potential_replaces_machine_and_nerve_on_the_review_mark():
+    by_id = {p["id"]: p for p in _manifest()}
+    cue = by_id["act-i-cue-09b"]
+    assert cue["text"] == "Your Potential is Off the Charts"
+    assert cue["at"] == pytest.approx(107.8, abs=0.05)
+    assert cue["at"] + cue["dur"] <= by_id["act-i-warning"]["at"]
+    assert cue["_retired_copy"] == "This one is machine and nerve, and has its mind concluded"
 
 
 def test_clankers_context_moved_out_of_act_i():

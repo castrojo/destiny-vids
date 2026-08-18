@@ -106,11 +106,15 @@ def _clip_paths(plan):
             for item in plan["items"]]
 
 
-def test_the_programme_seats_every_movement(plan, movements):
+def test_the_programme_seats_every_movement(plan, movements, thread):
     paths = _clip_paths(plan)
+    derivatives = thread.get("_derivatives", {}).values()
     for movement in movements:
-        assert movement["out_file"] in paths, (
-            f"{movement['id']} is built but never plays")
+        derivative = next((d for d in derivatives
+                           if d.get("source") == movement["out_file"]), None)
+        seated = movement["out_file"] in paths or (derivative and
+                                                    derivative["out_file"] in paths)
+        assert seated, f"{movement['id']} is built but never plays"
 
 
 def test_the_movements_sit_where_the_owner_put_them(plan):
@@ -124,16 +128,23 @@ def test_the_movements_sit_where_the_owner_put_them(plan):
     def seat(needle):
         return next(i for i, p in enumerate(paths) if needle in p)
 
-    assert seat("01-intro") < seat("renders/perfume-2.mp4") < seat("02-endless")
+    assert seat("01-intro") < seat("perfume-2-countdown.mp4") < seat("02-endless")
     assert seat("03-mrbobbytables") < seat("renders/perfume-3.mp4") < seat("04-kat")
     assert seat("06-7daystothewolves") < seat("renders/perfume-4.mp4") < seat("07-europa")
     assert seat("07-europa") < seat("renders/perfume-5.mp4") < seat("08-credits")
 
 
+def test_movement_two_countdown_is_a_derivative_of_the_clean_movement(thread, plan):
+    derivative = thread["_derivatives"]["perfume-2-countdown"]
+    assert derivative["source"] == "renders/perfume-2.mp4"
+    assert derivative["out_file"] == "renders/perfume-2-countdown.mp4"
+    assert _item(plan, "perfume-2-countdown")["path"] == derivative["out_file"]
+
+
 def test_movement_two_fades_up_over_the_prologues_fade_down(plan):
     """6.2 s is not a default -- it is the prologue's own fade, reversed."""
     item = next(i for i in plan["items"]
-                if i.get("path") == "renders/perfume-2.mp4")
+                if i.get("path") == "renders/perfume-2-countdown.mp4")
     assert item["fade_in"] == pytest.approx(PROLOGUE_FADE)
     assert item["fade_out"] == 0, "the 4:36 join is a hard cut"
 
