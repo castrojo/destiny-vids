@@ -119,12 +119,11 @@ Act II's picture and burn, the full rebuild:
 ```bash
 python3 scripts/build_efmb.py                   # the plan: kept runs, removals, gap
 python3 scripts/build_efmb.py --render          # picture + bed -> renders/efmb-hq.mp4
-python3 tools/plate.py burn --video renders/efmb-hq.mp4 \
-    --manifest stories/02-endless-forms-plates.json \
-    --plates-dir renders/plates-efmb --out renders/efmb-plated.mp4 \
-    --fit-picture --delivery-spec
+python3 scripts/build_efmb.py --render --burn   # plated + gated -> renders/efmb-plated.mp4
 python3 tools/deliver.py publish --act II
 ```
+
+``--render`` alone writes the picture+bed intermediate to ``renders/efmb-hq.mp4``; that file is useful for timing, shot sheets, and plate authoring, but it is not the delivered master. ``--render --burn`` is the completion route: it renders the picture, burns the plates at the delivery spec, and runs the shared peak gate on ``renders/efmb-plated.mp4`` before anything is published. The lower-level ``tools/plate.py burn`` command still exists, but for a full rebuild the ``--render --burn`` path is the one that is wired to the gate.
 
 `--delivery-spec` is not optional here: without it the burn emits act II's
 master untagged and a rung below `DELIVERY` — see

@@ -87,6 +87,8 @@ their final ffmpeg command.** The absolute path is essential when
 video stream and applies one measured static audio gain, so it runs after
 rendering and before `deliver.py publish`.
 
+**Tests must exercise the final-master path and post-burn order.** Behavioral tests that mock the burn and the gate are required for every standalone builder: they prove the gate runs after the burn and receives the resolved path of the delivered master (``efmb-plated.mp4``, ``megacut-01-hero.mp4``, etc.). Gating a pre-plate intermediate such as ``efmb-hq.mp4`` is not enough, and source-text substring checks do not prove the order in which the real calls happen.
+
 ## The honest caveat: "lossless" here is relative
 
 **Every** bed in this show originates from a YouTube Opus rung. None comes from

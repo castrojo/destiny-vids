@@ -42,6 +42,12 @@ THE ONE ARITHMETIC FACT THAT GOVERNS THE ACT
 Picture after removals is SHORTER than the song. That gap is asserted below,
 not hidden: if an edit changes it, the assertion fails and somebody decides
 again. How the gap is closed is the owner's call (``TAIL_POLICY``).
+
+CLI
+---
+  python3 scripts/build_efmb.py              # print the plan
+  python3 scripts/build_efmb.py --render     # picture+bed -> renders/efmb-hq.mp4
+  python3 scripts/build_efmb.py --render --burn  # plated + gated -> renders/efmb-plated.mp4
 """
 from __future__ import annotations
 
@@ -56,9 +62,19 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from tools import conform  # noqa: E402  (needs REPO_ROOT on sys.path first)
+from tools import plate  # noqa: E402
+from tools import peaks  # noqa: E402
 
 SOURCE_ID = "yt_destiny_all_live_action_trailers"
 BED_ID = "bed_endless_forms_most_beautiful"
+
+# Paths for the complete act-II deliverable. ``render()`` writes the pre-plate
+# picture; ``plated_master()`` burns the plates and gates the file that is
+# actually delivered (``renders/efmb-plated.mp4``).
+MANIFEST = REPO_ROOT / "stories" / "02-endless-forms-plates.json"
+PLATES_DIR = REPO_ROOT / "renders" / "plates-efmb"
+HQ_MASTER = REPO_ROOT / "renders" / "efmb-hq.mp4"
+PLATED_MASTER = REPO_ROOT / "renders" / "efmb-plated.mp4"
 
 # The measured length of the master this act's runs were cut against. It is a
 # constant, not a probe: the plan must be identical on CI (which has no
@@ -360,7 +376,7 @@ def _concat(ffmpeg, parts, out_path, workdir):
         list_path.unlink(missing_ok=True)
 
 
-def render(out_path=None, work_dir=None, verbose=True):
+def render(out_path=None, work_dir=None, verbose=True, ffmpeg=None):
     """Build the act: cut the runs, black the head and tail, lay the song under.
 
     Returns the path to the master. Picture is encoded once and the mux
@@ -370,7 +386,7 @@ def render(out_path=None, work_dir=None, verbose=True):
     from tools import footage
 
     plan = build()
-    ffmpeg = find_ffmpeg()
+    ffmpeg = ffmpeg or find_ffmpeg()
     source = footage.resolve(SOURCE_ID)
     bed = REPO_ROOT / "media" / f"{BED_ID}.wav"
     if source is None:
@@ -455,6 +471,39 @@ def render(out_path=None, work_dir=None, verbose=True):
     if verbose:
         print(f"  {out_path}  {got:.3f}s (plan {want:.3f}s)")
     return out_path
+
+
+def plated_master(out_path=None, ffmpeg=None, render_plates=True, verbose=False):
+    """Complete act II: render, burn the plates, and gate the delivered master.
+
+    ``render()`` produces the pre-plate picture; this function runs the burn
+    at the repo's DELIVERY spec and then applies the same delivered-peak gate
+    act VII uses, so a rebuild cannot put a clipping master back into
+    ``Prod/`` (issue #219). The gate is on ``efmb-plated.mp4`` -- the file
+    declared in ``stories/megacut/delivery.json`` -- never on the intermediate
+    ``efmb-hq.mp4``.
+    """
+    from tools.render import find_ffmpeg
+
+    ffmpeg = ffmpeg or find_ffmpeg()
+    hq = render(out_path=HQ_MASTER, ffmpeg=ffmpeg, verbose=verbose)
+    entries = plate.load_manifest(MANIFEST)
+    if render_plates:
+        plate.render_all(entries, PLATES_DIR)
+    target = Path(out_path or PLATED_MASTER)
+    if not target.is_absolute():
+        target = (Path.cwd() / target).resolve()
+    plate.burn(
+        hq,
+        entries,
+        PLATES_DIR,
+        target,
+        ffmpeg=ffmpeg,
+        encode_args=conform.video_encode_args(),
+    )
+    peaks.trim_master_peak(target.resolve())
+    print(f"wrote {target}")
+    return target
 
 
 def build():
@@ -545,7 +594,10 @@ def main(argv=None):
     if "--render" in argv:
         i = argv.index("--render")
         out = argv[i + 1] if len(argv) > i + 1 and not argv[i + 1].startswith("-") else None
-        render(out_path=out)
+        if "--burn" in argv:
+            plated_master(out_path=out, verbose=True)
+        else:
+            render(out_path=out)
         return 0
 
     if "--json" in argv:
