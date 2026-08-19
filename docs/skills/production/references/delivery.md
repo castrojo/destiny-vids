@@ -37,24 +37,42 @@ so the assertion it writes is the one it checked.
 
 **"Stream it" means the film is playing on the owner's TV before you do
 anything else.** It is `AGENTS.md`'s rule zero at the last rung: a path in a
-message is not something anybody is watching. The workstation casts to Google
-Cast devices with [`catt`](https://github.com/skorokithakis/catt), which is
-installed as a `uv` tool at `~/.local/bin/catt`.
+message is not something anybody is watching.
+
+This section exists because it was rediscovered from scratch in at least six
+sessions — each one re-running `which catt` and `catt scan`, each one falling
+into the same two traps below, one of them reinstalling the tool. **Nothing
+here is new; it is written down.**
+
+The workstation casts to Google Cast devices with
+[`catt`](https://github.com/skorokithakis/catt), installed as a `uv` tool:
 
 ```bash
+uv tool install catt                         # only if it is genuinely absent
+export PATH="$HOME/.local/bin:$PATH"         # agent shells do not always have it
 catt scan                                    # devices on the network, with IPs
+```
+
+`catt` lives at `~/.local/bin/catt`, which is **not on every agent shell's
+`PATH`** — export it, or call the absolute path. A bare `catt: command not
+found` means the `PATH`, not a missing install; check before installing
+anything.
+
+### Casting the programme
+
+```bash
 cd ~/Videos/Wolves/megacut
 setsid nohup catt -d "Home Theater" cast seven-days-to-the-wolves-v3.9.mp4 \
     < /dev/null > /tmp/catt-wolves.log 2>&1 & disown
-catt -d "Home Theater" status                # Title / Time / State: the proof
+sleep 30 && catt -d "Home Theater" status         # Title / Time / State: the proof
 ```
 
-`Home Theater` is the NVIDIA SHIELD. `catt scan` is the authority on what
-exists — never hardcode a device's IP, because they are DHCP leases and the
-name is the stable handle.
+`Home Theater` is the NVIDIA SHIELD. A device is addressable by **name or IP**,
+and the name is the stable handle — IPs are DHCP leases, so `catt scan` is the
+authority and a hardcoded address is a future failure.
 
-Transport control is a separate invocation against the same device, so a cast
-can be adjusted without restarting it:
+Transport control is a separate invocation against the same device, so a
+running cast is adjusted without restarting it:
 
 ```bash
 catt -d "Home Theater" seek 00:12:30      # also: ffwd, rewind, pause, play
@@ -72,13 +90,38 @@ in byte ranges for the whole runtime. The consequences are the whole trap:
 |---|---|
 | The `catt` process **is** the video source | Kill it and playback stalls partway in, long after the command "succeeded" |
 | A `timeout N` wrapper caps the **film**, not the command | `timeout 90 catt cast` ends a 38-minute film after 90 seconds |
-| An agent shell exiting takes the server with it | Use `setsid nohup … & disown`, not a plain `&` |
+| An agent shell exiting takes the server with it | `setsid nohup … < /dev/null & disown`. A plain `&`, and a backgrounded tool call, both die with the shell |
 | The workstation must stay awake and on the network | Sleeping it is the same as stopping the cast |
 
 `catt status` a minute *after* casting is the only claim worth making. A cast
 that "started" proves the device accepted a URL; it does not prove anything is
-still being served. The log named above shows the device's range requests
-(`GET /?loaded_from_catt … 206`), which is the server-side proof.
+still being served. `pgrep -a catt` is the other half — no process, no film.
+The log shows the device's range requests (`GET /?loaded_from_catt … 206`),
+which is the server-side proof.
+
+**Cast logs are session scratch, not repo records.** Write them to the session
+folder or `/tmp` — never `work/`, which is tracked. A 35 KB cast log and a
+saved-position file were committed that way, and are removed with this change.
+
+### Keeping a screening alive across a rebuild
+
+The owner watches while work continues, so a new build has to reach the
+television **without restarting the film from zero**. Read the position out of
+`status`, then hand it back with `-t`:
+
+```bash
+POS=$(catt -d "Home Theater" status | awk '/^Time:/ {print $2}')   # 00:24:20
+catt -d "Home Theater" stop
+sleep 5                                                            # let the app tear down
+cd ~/Videos/Wolves/megacut
+setsid nohup catt -d "Home Theater" cast -t "$POS" <new-build>.mp4 \
+    < /dev/null > /tmp/catt-wolves.log 2>&1 & disown
+```
+
+`stop` then `cast` — not `cast` over a live one, which is how a cast lands on
+the default receiver and silently ignores the file. The `sleep` is not
+superstition: the receiver needs a moment to release before it will accept a
+new load.
 
 ### Cast the `.mp4`, never the `.mkv`
 
