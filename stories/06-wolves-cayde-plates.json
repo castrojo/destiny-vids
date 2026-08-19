@@ -1,9 +1,9 @@
 {
   "_what": "Act VI's plates -- the Ghost welcome, Jorge Castro's six lines over the close-up, the Cayde-6 reveal, and the three gold credits that follow it. AUTHORED, not derived: every window below is an owner mark, converted from megacut time to act VI FILM time and then CONFIRMED ON AN EXTRACTED FRAME before a name was attached to it. Copy is reproduced verbatim from the owner.",
   "_narration_became_pills": "2026-08-15, owner: the narration is 'individual senteces spaced out over the course of the shot, one line per with castrojo talking'. The single stacked title card (`cayde_narration`, 397.111 + 4.5 s, all six lines at once) is RETIRED and replaced by six `kind: chat` pills, one line each, credited to his GitHub handle -- act IV's precedent, and his name has already been said by the reveal three cards earlier. Two lines changed with the same instruction: 'For fives years' -> 'For five years' (the owner corrected his own brief), and 'Lead the way, open source will follow' -> 'Lead the way, we will follow'. Both are OWNER-SUPPLIED, hence `copy_source: owner_supplied` rather than `brief`.",
-  "_where_the_pills_sit": "The six readable pills start at Act VI film 353.657, one per bar at 3.157914 s, and hold 2.8 s each. The last clears at 372.247; the Cayde reveal begins at 374.041. The current timing pass is the source of truth for these windows and their shot boundaries.",
+  "_where_the_pills_sit": "The six readable pills start at Act VI film 353.657, one per bar at 3.157914 s, and hold 2.8 s each. Their exact source seats are recorded in `source_at`; the last clears at 372.247 and the Cayde reveal begins at 374.041.",
   "_letterbox": "Act VI is 2.40:1 in a 1920x1080 frame -- cropdetect on the delivered act gives crop=1920:800:0:140. The pills carry `position: letterbox`, so they seat in the bottom matte (rendered top edge y=979, picture bottom y=940) and never cover picture. The reveal and the gold credits keep `position: left` on the picture, unchanged.",
-  "_clock": "The brief's marks are MEGACUT time. Act VI film is the current 423.993 s timing pass, and every `at`/fade field below is ACT-FILM time on that record. The current timing-pass source window and film anchor for every reveal, credit and dialogue plate are recorded in `shot_film` and `seen_at_film`; nothing is converted twice.",
+  "_clock": "Act VI film is the current 423.993 s timing pass. Every shifted `at` and `fade_out_at` is the prior plate clock minus 19.470 s; `source_at` is the exact source-clock seat inside the matching run, while `shot_film` records that run's measured source window.",
   "_why_here": "Act II plates Jorge Castro as `[ REDACTED ]` with the note 'act II only -- he is revealed later in the programme'. This is that reveal: the programme withholds his name for sixteen minutes and pays it off on Cayde-6 walking out of the fog.",
   "_film_sec": 423.993,
   "act": "VI",
@@ -33,6 +33,7 @@
         50.5
       ],
       "seen_at_film": 374.041,
+      "source_at": 12.841,
       "why": "Cayde-6 alone, walking out of the fog, then the hooded close-up -- the shot the programme has been withholding his name for",
       "label": "MAINTAINER // GUARDIAN",
       "class": "Harbringer Hunter",
@@ -55,6 +56,7 @@
         50.5
       ],
       "seen_at_film": 382.349,
+      "source_at": 21.149,
       "why": "the Guardians assembled around the fire",
       "label": "TRUSTEE // GUARDIAN",
       "class": "Sentinel Titan",
@@ -78,6 +80,7 @@
         50.5
       ],
       "seen_at_film": 386.349,
+      "source_at": 25.149,
       "why": "the Guardians standing together, sunset behind",
       "label": "MAINTAINER // GUARDIAN",
       "class": "Stormbreaker Titan",
@@ -96,6 +99,7 @@
         50.5
       ],
       "seen_at_film": 388.349,
+      "source_at": 27.149,
       "why": "the same assembled group, the front rank walking into camera",
       "label": "TRUSTEE // GUARDIAN",
       "class": "Voidwalker Warlock",
@@ -117,7 +121,8 @@
       "fade_out_at": 355.857,
       "fade_out": 0.25,
       "shot_film": [200.965, 210.0],
-      "seen_at_film": 353.657
+      "seen_at_film": 353.657,
+      "source_at": 202.457
     },
     {
       "id": "castrojo_line_2",
@@ -133,7 +138,8 @@
       "fade_out_at": 359.015,
       "fade_out": 0.25,
       "shot_film": [200.965, 210.0],
-      "seen_at_film": 356.815
+      "seen_at_film": 356.815,
+      "source_at": 205.615
     },
     {
       "id": "castrojo_line_3",
@@ -149,7 +155,8 @@
       "fade_out_at": 362.173,
       "fade_out": 0.25,
       "shot_film": [200.965, 210.0],
-      "seen_at_film": 359.973
+      "seen_at_film": 359.973,
+      "source_at": 208.773
     },
     {
       "id": "castrojo_line_4",
@@ -165,7 +172,8 @@
       "fade_out_at": 365.331,
       "fade_out": 0.25,
       "shot_film": [0.0, 50.5],
-      "seen_at_film": 363.131
+      "seen_at_film": 363.131,
+      "source_at": 1.931
     },
     {
       "id": "castrojo_line_5",
@@ -181,7 +189,8 @@
       "fade_out_at": 368.489,
       "fade_out": 0.25,
       "shot_film": [0.0, 50.5],
-      "seen_at_film": 366.289
+      "seen_at_film": 366.289,
+      "source_at": 5.089
     },
     {
       "id": "castrojo_line_6",
@@ -197,7 +206,8 @@
       "fade_out_at": 371.647,
       "fade_out": 0.25,
       "shot_film": [0.0, 50.5],
-      "seen_at_film": 369.447
+      "seen_at_film": 369.447,
+      "source_at": 8.247
     }
   ],
   "unresolved": [
@@ -210,7 +220,6 @@
     "NOT IN casting.yaml: Brian Ketelsen and Angie Jones have no binding and no ensemble title. Their copy exists only in the brief and only in this manifest. Both need a casting.yaml entry keyed by GitHub login before they are credited anywhere else -- the login is the owner's to supply, not an agent's to guess.",
     "Brian Ketelsen and Kelsey Hightower carry the SAME title, 'Evangelist of the Open Sky', exactly as the brief wrote it. Reproduced rather than de-duplicated; owner to confirm it is deliberate.",
     "ORDER (current timing pass): the reveal begins at 374.041 after the six dialogue pills, whose final window clears at 372.247; the reveal and dialogue remain separate windows, preserving the owner-authored copy and identity.",
-    "CURRENT CLOCK RECORD: the current 423.993 s timing pass is the authority. Every downstream window is translated 19.470 s earlier from the removed Act VI interruption; `at`, `fade_out_at`, `shot_film` and `seen_at_film` now describe the current picture and source boundaries.",
     "CONTRACT VIOLATION, KNOWN AND DELIBERATE -- see issue #111. plates/SKILL.md lists 'the brief's copy contradicts the binding, but the owner wrote it today' as a RATIONALIZATION: the vocab is the reviewed record and it WINS a conflict; tools/plate.py `plan` enforces exactly that. This hand-authored manifest bypasses `plan`, so the two cards flagged `copy_override` below ship the brief's copy against the binding. That is the owner's brief being honoured for a review render, NOT a precedent. Resolution is #111: either vocab/casting.yaml is edited to match, or these two cards are re-burned from the binding."
   ]
 }

@@ -107,7 +107,7 @@
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v8.mp4",
-   "note": "the current no-interruption Act VI master (423.993 s), with the Ghost welcome and Jorge's close-up conversation. The current timing pass hands directly from Act III-B to Act III-C at bed 322.200; every plate is re-rendered from the current manifest and its timing-pass source boundary. **AAC, the one act with no lossless master** (#58)",
+   "note": "Prior Act VI delivery remains at `~/Videos/wolves-musical/wolves-7days-plated-master-v8.mp4`; this record does not certify the changed Act VI cut. The Act VI timing and plate inputs changed, so `source_digest` is intentionally stale and `deliver.py status --sources-only` reports rebuild required. The next encode must inspect and publish the updated master and provenance. **AAC, the one act with no lossless master** (#58)",
    "sources": [
     "scripts/build_wolves.py",
     "scripts/rebuild-wolves.sh",
@@ -124,7 +124,7 @@
     "yt_destiny_2_lightfall_launch_trailer",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "540c035a68dd2bb1a89ba591a795254325e8db7abf7ada1fc1329a19e5bc748c",
+   "source_digest": "cd979a7675f8d4f25da626e1a9b0bf554a8cf716aad9d1166c863978588e67f5",
    "footage_digest": "21c943bcda5ccc2cbae2b3c08cebcf6794763babda3f4304e612e1724bb4220b"
   },
   "VII": {

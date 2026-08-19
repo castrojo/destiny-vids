@@ -577,6 +577,16 @@ def test_an_act_with_no_committed_inputs_carries_its_reason():
                 f"act {numeral} declares no inputs and does not say why"
 
 
+def test_task7_leaves_act_vi_delivery_stale_until_task10():
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    vi = masters["VI"]
+    assert vi["path"].endswith("wolves-7days-plated-master-v8.mp4")
+    assert vi["source_digest"] != deliver.source_digest(vi["sources"])
+    assert "re-render" not in vi["note"].lower()
+    assert "current no-interruption" not in vi["note"].lower()
+    assert "next encode" in vi["note"].lower()
+
 def test_the_recorded_digest_matches_what_is_committed():
     """The gate CI runs. If this fails, an act's inputs moved and nobody
     re-rendered it -- rebuild the act and `deliver.py publish`.

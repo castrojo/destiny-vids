@@ -36,9 +36,8 @@ are the same mechanic:
 > **`wall` is position in the film; `bed` is position in the song. A shot
 > marked `audio: "source"` advances wall and not bed.**
 
-Two more non-bed dispositions exist, added for act VI's interruption
-([issue #104](https://github.com/castrojo/destiny-vids/issues/104)), and they
-are different promises rather than synonyms: **`silent`** is a deliberate
+Two more non-bed dispositions exist for authored inserts, and they are
+different promises rather than synonyms: **`silent`** is a deliberate
 silence, forever; **`hold`** is a music slot that is silent *today* and takes
 an `audio_from` once the owner clears a track (a licensing decision — never
 filled unilaterally). Any other `audio` value is an error, because a typo

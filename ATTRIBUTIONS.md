@@ -16,7 +16,7 @@ land *somewhere*, not somewhere specific.
 
 ## Music
 
-### Local Forecast – Slower — acts II and VI, interruption sequences
+### Local Forecast – Slower — act II
 
 Kevin MacLeod / Incompetech, licensed **CC BY 4.0**. Commercial use, sync and
 redistribution are all permitted; attribution is the only condition. **Not
@@ -29,6 +29,8 @@ https://creativecommons.org/licenses/by/4.0/
 ```
 
 Record: [`music/bed_local_forecast_slower.json`](music/bed_local_forecast_slower.json).
+The retired Act VI interruption rights context remains in
+[`stories/retired/06-wolves-interruption-cards.json`](stories/retired/06-wolves-interruption-cards.json); it is not an active use.
 Source: <https://incompetech.com/music/royalty-free/mp3-royaltyfree/Local%20Forecast%20-%20Slower.mp3>
 
 `TODO(owner)`: this credit also belongs in the video description at publication,

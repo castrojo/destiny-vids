@@ -14,6 +14,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from tools.audiomix import build_filter, plan_regions, total_bed  # noqa: E402
+from tools import deliver  # noqa: E402
 from scripts import build_wolves  # noqa: E402
 
 SHOTLIST = REPO / "stories/seven-days-timing-pass.json"
@@ -473,10 +474,41 @@ def test_act_vi_record_and_delivery_graph_retire_the_interruption(cut):
         (REPO / "stories" / "megacut" / "delivery.json").read_text())
     sources = delivery["masters"]["VI"]["sources"]
     assert not any("interruption" in source for source in sources)
-    assert delivery["masters"]["VI"]["note"].startswith(
-        "the current no-interruption Act VI master (423.993 s)")
+    assert "rebuild required" in delivery["masters"]["VI"]["note"]
+    assert delivery["masters"]["VI"]["source_digest"] != deliver.source_digest(
+        delivery["masters"]["VI"]["sources"])
     assert cut["shots"][-1]["duration"] == pytest.approx(423.993 - 411.7)
 
+
+def test_every_shifted_plate_clock_is_old_clock_minus_removed_interruption():
+    manifest = json.loads((REPO / "stories" / "06-wolves-cayde-plates.json").read_text())
+    old = {
+        "cayde_reveal_castrojo": 393.511,
+        "gold_kelsey_hightower": 401.819,
+        "gold_brian_ketelsen": 405.819,
+        "gold_angie_jones": 407.819,
+        "castrojo_line_1": 373.127,
+        "castrojo_line_2": 376.285,
+        "castrojo_line_3": 379.443,
+        "castrojo_line_4": 382.601,
+        "castrojo_line_5": 385.759,
+        "castrojo_line_6": 388.917,
+    }
+    old_fade_out = {
+        "castrojo_line_1": 375.327,
+        "castrojo_line_2": 378.485,
+        "castrojo_line_3": 381.643,
+        "castrojo_line_4": 384.801,
+        "castrojo_line_5": 387.959,
+        "castrojo_line_6": 391.117,
+    }
+    for plate in manifest["plates"]:
+        if plate["id"] not in old:
+            continue
+        assert plate["at"] == pytest.approx(old[plate["id"]] - 19.470)
+        if plate["id"] in old_fade_out:
+            assert plate["fade_out_at"] == pytest.approx(
+                old_fade_out[plate["id"]] - 19.470)
 
 def test_tail_plates_map_to_current_timing_pass_shots(cut):
     """Every tail plate keeps a source window and a current film anchor."""
@@ -495,7 +527,7 @@ def test_tail_plates_map_to_current_timing_pass_shots(cut):
     }
     by_id = {p["id"]: p for p in manifest["plates"]}
     assert set(expected) <= set(by_id)
-    assert 443.463 - manifest["_film_sec"] == pytest.approx(19.470)
+    assert manifest["_film_sec"] == pytest.approx(423.993)
     wall = 0.0
     shots = []
     for shot in cut["shots"]:
@@ -509,6 +541,12 @@ def test_tail_plates_map_to_current_timing_pass_shots(cut):
         assert containing["video_id"] == video_id
         assert plate["shot_film"] == pytest.approx(source_window)
         assert plate["seen_at_film"] == pytest.approx(plate["at"])
+        assert "source_at" in plate, f"{ident}: exact source seat is required"
+        containing_start = containing["start_sec"]
+        source_at = containing_start + (plate["at"] - next(
+            start for start, end, shot in shots if shot is containing
+        ))
+        assert plate["source_at"] == pytest.approx(source_at, abs=0.001)
 
 
 
