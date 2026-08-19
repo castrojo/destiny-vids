@@ -149,6 +149,12 @@ ran long and the plates are sitting on frames they were not timed for.
 `blackdetect` logs at *info*, so `-v error` silently prints nothing and looks
 like a pass; crop past the burned-in caption band or no frame is ever black.
 
+## Review verification
+
+A programme timestamp belongs to the exact review baseline that produced it. Keep that baseline until every note has been translated with `--locate`; after an upstream duration changes, re-running the same timestamp against the new plan answers a different question.
+
+Animation timing is not visual continuity. Any animated plate must pass a burned-pixel check at delivery frame rate: decode every frame in its visible window and assert the persistent chrome never disappears.
+
 ## What the loop refuses to hand you
 
 Two faults have actually shipped here and both are invisible to "did it
