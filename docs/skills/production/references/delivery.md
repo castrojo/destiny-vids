@@ -158,26 +158,45 @@ them is:
 
 | Not proof | Why |
 |---|---|
-| **Duration** matching `megacut.py --dry-run`'s expected total | The plan's arithmetic describes the *graph*, not the acts seated in it. A build from yesterday's masters has today's runtime. |
-| **mtime** — the newest build in the folder | `~/Videos` is a Syncthing folder, so mtimes arrive from other machines. A newer file may be an experiment; an older one may be the declared output. |
+| **Duration** matching the plan's expected total | The plan's arithmetic describes the *graph*, not the acts seated in it. A build from yesterday's masters has today's runtime. |
+| **mtime**, used to rank sibling builds | `~/Videos` is a Syncthing folder, so mtimes arrive from other machines. A newer file may be an experiment; an older one may be the declared output. |
 | **The filename** — `-fresh`, `-current`, `-degraded`, a version bump | A name is written once, by hand, and never updated when the thing it describes changes. |
 | **The file existing** | The `AGENTS.md` rung: existence is not freshness. |
-| **A `.prod.md5` existing beside the output** | It is keyed to the output *path*, and the declared output is a fixed versioned filename. A stamp left by an earlier build of that same version survives the next one. |
 
-Only two things settle it: `deliver.py status`, which recomputes the digests,
-and **looking at the frame**. `AGENTS.md` is explicit that a digest mismatch is
-a prompt to go and look, never a verdict on its own — the hash covers whole
-files, so it answers "did an input move", not "did the picture change".
+Only two things settle it: `deliver.py status`, and **looking at the frame**.
+`AGENTS.md` is explicit that a digest mismatch is a prompt to go and look, never
+a verdict on its own — the hash covers whole files, so it answers "did an input
+move", not "did the picture change".
 
-**A provenance stamp older than the output it describes proves nothing.**
-`status` compares the recorded digest against `Prod/CHECKSUMS.md5`; it does not
-assert that the stamp postdates the build. The two failures look identical from
-the outside and want opposite fixes:
+### What `check_megacut` actually proves, and what it does not
 
-| What you see | What it means |
-|---|---|
-| `.prod.md5` **older** than the `.mp4` beside it | The output was rebuilt by `tools/megacut.py` directly, which does not close the provenance rung. Verify the build, then record it — `deliver.record_megacut_provenance`, or rebuild through `deliver.py build`. |
-| `.prod.md5` **newer**, digest still mismatched | `Prod/` genuinely moved after the build. The programme is a rebuild behind. |
+Read [`tools/deliver.py`](../../../../tools/deliver.py) before quoting it. The
+programme rung asks two questions, and neither is the one an agent usually
+assumes:
+
+| Signal | What it catches | What it cannot catch |
+|---|---|---|
+| Output mtime **older than the newest `Prod/` act** | A programme built before an act it contains — the show being watched lacks the current acts | Nothing about a build *newer* than every act. Newer is not the same as built *from* them |
+| Decoded duration against the plan's arithmetic | A **truncated or still-being-written** file, and a build of a different plan | A complete build seated on stale acts. It has the right runtime |
+
+So the mtime rung is **directional**: output older than input is conclusive
+staleness, and that is sound. It is the *converse* that gets misread — an
+output newer than every act only means no act has moved since, which is why the
+`OK` line says "newer than every Prod act" rather than "current".
+
+And duration is used here for **completeness, not currency**. That is a
+legitimate use and the reason it is in the tool; it is not a licence to pick a
+build by matching its runtime against `--dry-run`, which is the mistake in the
+first row above.
+
+**There is no content-level provenance on the programme rung.** Nothing records
+which `Prod/` checksum set a given megacut was actually assembled from, so two
+builds of the same plan minutes apart — one before an act rebuild, one after —
+are distinguishable only by mtime. Closing that is [issue #280]; until it
+lands, a megacut reported `ok` means "no act has moved since it was built", and
+the frame is still the authority.
+
+[issue #280]: https://github.com/castrojo/destiny-vids/issues/280
 
 ## The delivery graph: `tools/deliver.py`
 
