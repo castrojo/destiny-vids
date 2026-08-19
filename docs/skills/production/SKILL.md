@@ -86,7 +86,7 @@ This skill is the contract. The procedure lives in `references/`:
 
 | Reference | What is in it |
 |---|---|
-| [`delivery.md`](references/delivery.md) | The `~/Videos/Wolves/` workspace, the delivery graph (`tools/deliver.py` status/publish/build), the per-project contract, hardlinks and checksums, publishing via the playlist, the audio rules that bite at delivery, and the Syncthing hazard. |
+| [`delivery.md`](references/delivery.md) | The `~/Videos/Wolves/` workspace, the delivery graph (`tools/deliver.py` status/publish/build), the per-project contract, hardlinks and checksums, **putting the film on the owner's television with `catt`**, **why freshness cannot be eyeballed**, publishing via the playlist, the audio rules that bite at delivery, and the Syncthing hazard. |
 | [`parallel-and-tagging.md`](references/parallel-and-tagging.md) | Stale tags and `verify_tags_match_detection`, running several videos at once, batch tagging from generated worksheets, and what to work on first. |
 | [`social-copies.md`](references/social-copies.md) | Byte-capped social encodes with `tools/social.py`: encode from `Prod/`, re-encode but never process. |
 | [`avatars.md`](references/avatars.md) | The credits' avatar cache (`tools/avatars.py`): conditional requests, negative caching, backoff, and the Actions job that fetches on the built-in runner token instead of your laptop. |
@@ -270,6 +270,10 @@ fix, not adding a source list that lies.
 | "I'll tag the obvious ones and leave the rest." | An untagged beat derives `clean = false`. Half a tag file marks half the video uncuttable. |
 | "The delivered file needs one small fix, I'll edit it in place." | It is regenerated from checked-in data. A hand-edit is lost on the next month's render and nobody can tell it happened. |
 | "I'll upload it and share the video link." | YouTube cannot replace a file. Share the playlist; `yt-refresh.py` swaps the contents. |
+| "I cast it and the command returned, so it's playing." | `catt` **is** the HTTP server. If its process ended, so did the film. `catt status` a minute later, or you have not cast anything. |
+| "I'll wrap the cast in `timeout` so it can't hang." | `timeout` caps the *film*, not the command. It is how a 38-minute programme stops after 90 seconds. |
+| "This build's duration matches the plan, so it's the current one." | The plan's arithmetic describes the graph, not the acts seated in it. Ask `deliver.py status`, then look at the frame. |
+| "The newest file in `megacut/` is the one to ship." | `~/Videos` is a Syncthing folder and mtimes arrive from other machines. Cast the plan's declared `output`. |
 | "The gameplay trailer has almost nothing clean, the tagging must be wrong." | Gameplay trailers have HUD in the footage. That is what the tier is for. |
 | "I'll re-run detection, it's cheap." | Beat index is positional. New detection invalidates the tag file. |
 | "I'll bump `vocab/casting.yaml` while I'm here." | It names real people and every video reads it. Its own PR. |

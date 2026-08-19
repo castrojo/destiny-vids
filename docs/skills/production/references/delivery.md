@@ -13,6 +13,7 @@ file in it is a regenerated artifact.
 | `Prod/` | The show at the **highest quality that exists** — one file per act, `NN-<act>.mp4`, FLAC audio, picture never re-encoded |
 | `10mb/` | Social copies under a byte cap (`tools/social.py`), built from `Prod/` |
 | `megacut/` | The final movie, and nothing else (`tools/megacut.py`) |
+| Watch | `catt` to the owner's TV — see [Putting it on the television](#putting-it-on-the-television) |
 | Publish | `python3 ~/Videos/yt-refresh.py` — one unlisted playlist |
 
 **The order is [`docs/running-order.md`](../../../running-order.md)'s, not the
@@ -32,7 +33,111 @@ exactly this reason and was deliberately left alone. The exception is
 `deliver.py publish`: it recomputes every line before it rewrites the file,
 so the assertion it writes is the one it checked.
 
+## Putting it on the television
+
+**"Stream it" means the film is playing on the owner's TV before you do
+anything else.** It is `AGENTS.md`'s rule zero at the last rung: a path in a
+message is not something anybody is watching. The workstation casts to Google
+Cast devices with [`catt`](https://github.com/skorokithakis/catt), which is
+installed as a `uv` tool at `~/.local/bin/catt`.
+
+```bash
+catt scan                                    # devices on the network, with IPs
+cd ~/Videos/Wolves/megacut
+setsid nohup catt -d "Home Theater" cast seven-days-to-the-wolves-v3.9.mp4 \
+    < /dev/null > /tmp/catt-wolves.log 2>&1 & disown
+catt -d "Home Theater" status                # Title / Time / State: the proof
+```
+
+`Home Theater` is the NVIDIA SHIELD. `catt scan` is the authority on what
+exists — never hardcode a device's IP, because they are DHCP leases and the
+name is the stable handle.
+
+Transport control is a separate invocation against the same device, so a cast
+can be adjusted without restarting it:
+
+```bash
+catt -d "Home Theater" seek 00:12:30      # also: ffwd, rewind, pause, play
+catt -d "Home Theater" volume 60          # also: volumeup, volumedown, volumemute
+catt -d "Home Theater" stop               # ends playback AND the server below
+```
+
+### `catt` is the server, so it has to outlive your shell
+
+Casting a **local file** does not upload it. `catt` starts an HTTP server on
+this workstation and hands the device a URL, which the device then pulls from
+in byte ranges for the whole runtime. The consequences are the whole trap:
+
+| | |
+|---|---|
+| The `catt` process **is** the video source | Kill it and playback stalls partway in, long after the command "succeeded" |
+| A `timeout N` wrapper caps the **film**, not the command | `timeout 90 catt cast` ends a 38-minute film after 90 seconds |
+| An agent shell exiting takes the server with it | Use `setsid nohup … & disown`, not a plain `&` |
+| The workstation must stay awake and on the network | Sleeping it is the same as stopping the cast |
+
+`catt status` a minute *after* casting is the only claim worth making. A cast
+that "started" proves the device accepted a URL; it does not prove anything is
+still being served. The log named above shows the device's range requests
+(`GET /?loaded_from_catt … 206`), which is the server-side proof.
+
+### Cast the `.mp4`, never the `.mkv`
+
+Every programme build writes both, and only one of them plays. The distribution
+`.mp4` is H.264 High\@4.2 with **AAC**; the same-stem `.mkv` archival master is
+**FLAC**, which Cast devices do not decode — it fails as audio-only silence or a
+refused load, not as an error you can read. The rule the rest of this file
+already states applies here too: the declared `output` in
+[`stories/megacut/megacut.json`](../../../../stories/megacut/megacut.json) is
+the distribution artifact, and the `.mkv` is never a substitute for it.
+
+### Which file to cast, and how to be sure
+
+Ask [`tools/deliver.py`](../../../../tools/deliver.py), and cast the plan's
+declared `output`:
+
+```bash
+python3 -c "import json;print(json.load(open('stories/megacut/megacut.json'))['output'])"
+python3 tools/deliver.py status            # what that file's freshness actually is
+```
+
+**Never pick a build by reading the directory.** `megacut/` accumulates
+superseded builds, and a filename cannot say which one is current — see
+*Freshness is not something you can eyeball* below. If the declared output is
+stale, say so in one line and **cast it anyway**: `AGENTS.md`'s *Nothing blocks
+a release* holds here, and a stale film the owner can watch beats a fresh one
+they cannot.
+
+## Freshness is not something you can eyeball
+
+`Prod/` and `megacut/` are the two places where a wrong file is indistinguishable
+from a right one at a glance. Each of these has been used as proof and none of
+them is:
+
+| Not proof | Why |
+|---|---|
+| **Duration** matching `megacut.py --dry-run`'s expected total | The plan's arithmetic describes the *graph*, not the acts seated in it. A build from yesterday's masters has today's runtime. |
+| **mtime** — the newest build in the folder | `~/Videos` is a Syncthing folder, so mtimes arrive from other machines. A newer file may be an experiment; an older one may be the declared output. |
+| **The filename** — `-fresh`, `-current`, `-degraded`, a version bump | A name is written once, by hand, and never updated when the thing it describes changes. |
+| **The file existing** | The `AGENTS.md` rung: existence is not freshness. |
+| **A `.prod.md5` existing beside the output** | It is keyed to the output *path*, and the declared output is a fixed versioned filename. A stamp left by an earlier build of that same version survives the next one. |
+
+Only two things settle it: `deliver.py status`, which recomputes the digests,
+and **looking at the frame**. `AGENTS.md` is explicit that a digest mismatch is
+a prompt to go and look, never a verdict on its own — the hash covers whole
+files, so it answers "did an input move", not "did the picture change".
+
+**A provenance stamp older than the output it describes proves nothing.**
+`status` compares the recorded digest against `Prod/CHECKSUMS.md5`; it does not
+assert that the stamp postdates the build. The two failures look identical from
+the outside and want opposite fixes:
+
+| What you see | What it means |
+|---|---|
+| `.prod.md5` **older** than the `.mp4` beside it | The output was rebuilt by `tools/megacut.py` directly, which does not close the provenance rung. Verify the build, then record it — `deliver.record_megacut_provenance`, or rebuild through `deliver.py build`. |
+| `.prod.md5` **newer**, digest still mismatched | `Prod/` genuinely moved after the build. The programme is a rebuild behind. |
+
 ## The delivery graph: `tools/deliver.py`
+
 
 The chain is `master -> Prod/NN-act.mp4 -> megacut/<version>.mp4 ->
 10mb/NN-act.mp4`, and drift anywhere along it is the owner's "my copies are

@@ -17,6 +17,7 @@ load **only** that skill, then act.
 | Turn the owner's dictated Whisp notes into filed issues, or find out why a submitted request never landed | [`intake`](skills/intake.md) |
 | File work, pick up an issue, or normalize a request into a brief | [`issues`](skills/issues/SKILL.md) |
 | Take an issue all the way to a rendered cut, or make videos in volume | [`production`](skills/production/SKILL.md) |
+| Put the film on the owner's television, or work out which build to play | [`production`](skills/production/SKILL.md) → [`delivery`](skills/production/references/delivery.md) |
 | Index a new video: detect beats, extract keyframes, tag, assemble segments | [`indexing`](skills/indexing.md) |
 | Cast a character, add a lead binding, or credit the monthly ensemble | [`casting`](skills/casting/SKILL.md) |
 | Find out what footage a character actually has — and what they lack | [`corpus`](skills/corpus.md) |
