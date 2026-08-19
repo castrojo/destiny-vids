@@ -35,24 +35,25 @@ in an act's own file, on that act's own clock — and doing that subtraction by
 hand, per note, off a chapter list is exactly how a round of notes gets applied
 to the wrong act.
 
-```console
-$ python3 tools/megacut.py stories/megacut/megacut.json --locate 12:43 4:01 18:30
-    12:43  ->  VI. 7 Days to the Wolves  @ 1:29.041  [.../Prod/06-7daystothewolves.mp4]
-     4:01  ->  II. Endless Forms Most Beautiful  @ 1:59.433  [.../Prod/02-endlessformsmostbeautiful.mp4]
-    18:30  ->  VII. Europa  @ 0:03.341  [act slide]
+```bash
+python3 tools/megacut.py stories/megacut/megacut.json --locate 12:43 4:01 18:30
 ```
 
-It takes several stamps at once, reads `12:43`, `1:02:11`, `763` and `12:43.5`,
-and needs **no footage** — it runs off the plan's own clock, so it works before
-a build and on a machine with no media. `[act slide]` means the note landed on
-a card, so it is a note about the *announcement*, not the film behind it.
+Each stamp comes back as the act that is playing plus the offset on that act's
+own clock, and as `[act slide]` when the note landed on a card — a note about
+the *announcement*, not the film behind it. It takes several stamps at once,
+reads `12:43`, `1:02:11`, `763` and `12:43.5`, and needs **no footage** — it
+runs off the plan's own clock, so it works before a build and on a machine with
+no media. The act clock it answers from is the plan,
+[`stories/megacut/megacut.json`](../../stories/megacut/megacut.json) — run the
+command for the current mapping rather than trusting any table pasted into a
+doc, this one included.
 
 **It also tells you which clock a note was written on.** If a stamp resolves to
 an act whose content does not match the note, the note was taken on the *act's*
-clock rather than the programme's. That has already happened once: an owner
-brief whose last cue read `5:07` was written against act II's film, which runs
-`5:07.998` — a perfect fit, and a 2:45 error if it had been read as programme
-time ([#98](https://github.com/castrojo/destiny-vids/issues/98)).
+clock rather than the programme's. That has already happened once, and read as
+programme time the brief's cues would have landed minutes from their frames
+([#98](https://github.com/castrojo/destiny-vids/issues/98)).
 
 ## Step 2 — the act clocks, so you can predict the answer
 
@@ -159,9 +160,10 @@ watch.
 
 Known and tracked, so nobody re-measures them:
 
-- Every act is inside the −4.6…−0.9 dBTP band, and the programme peak is
-  −0.9. The gate that keeps it there is `tools/peaks.py trim`
-  ([#82](https://github.com/castrojo/destiny-vids/issues/82)).
+- The delivered band is −4.6…−0.9 dBTP and the gate that holds it is
+  `tools/peaks.py trim` ([#82](https://github.com/castrojo/destiny-vids/issues/82)).
+  Whether every act is inside it right now is a measurement, not a doc fact —
+  ask `~/Videos/audio-check.sh --all`.
 - The delivered-peak trim is enforced by `tools/redact.py`, `tools/render.py`
   and the master gate `tools/peaks.py trim`; `tools/social.py` still encodes
   audio blind and relies on its master's peak

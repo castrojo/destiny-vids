@@ -239,4 +239,4 @@ Use `/home/linuxbrew/.linuxbrew/bin/ffmpeg`. The system `ffmpeg` is
 reads like a corrupt input file.
 
 Claims about yt-dlp's format selection were verified against current upstream
-documentation (see the front matter's `context7-sources`), not recalled.
+documentation, not recalled.

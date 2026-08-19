@@ -63,7 +63,7 @@ Ten people have a Guardian identity somebody actually authored, in files this
 repo does not own — `~/Videos/nameplates.json` and, for seven of them,
 `~/src/website public/wolves/characters/characters.json`. The roster and the
 precedence between those sources are in
-[`plates.md`](../../plates/SKILL.md#where-the-copy-is-authored). Two consequences here:
+[`plates.md`](../../plates/SKILL.md). Two consequences here:
 
 - **Copying an authored identity onto an existing binding is reproduction**, and
   is allowed without asking — verbatim, with the source cited in a comment, as

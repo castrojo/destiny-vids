@@ -2,10 +2,8 @@
 
 ## Why this skill exists
 
-On the night of 2026-08-12→13 the owner dictated four notes. The two an agent
-happened to read landed in the repo; the two it did not — a full Kat/Nat
-dialogue round and act III's plate round — were silently lost for a day and
-found only by a forensic audit. The pipeline was never broken; the handoff
+Dictated notes have been silently lost: an agent reads and does the newest,
+and the ones before it get nothing. The pipeline was never broken; the handoff
 was. **A note in Whisp has no queue, no state, and no acknowledgement.**
 
 ## The one rule
@@ -45,9 +43,9 @@ of every session:
 ## Every timecode names its clock
 
 The owner reviews from whichever file he watched, so his marks come off that
-file's clock — megacut time, act film time, or source time. Two are already
-paid for (#109: act II film vs megacut; the act III round's ambiguous 5:43).
-When filing:
+file's clock — megacut time, act film time, or source time, and a brief that
+guesses the wrong one lands its fixes minutes from their frames
+([#109](https://github.com/castrojo/destiny-vids/issues/109)). When filing:
 
 - Ask the note which clock it is on; **settle it by frame, not by argument** —
   `python3 tools/megacut.py stories/megacut/megacut.json --locate <mm:ss>` and
@@ -69,7 +67,7 @@ behind main). The lifecycle:
 | Rationalization | Reality |
 |---|---|
 | "I read the note, so it's received." | Reading leaves no record. The next agent cannot tell a read note from an ignored one. The issue number is the receipt. |
-| "I'll do the work directly, filing is overhead." | Tonight's loss was exactly this: the newest note got done, the two before it got nothing. File first; the issue costs a minute. |
+| "I'll do the work directly, filing is overhead." | The recorded loss was exactly this: the newest note got done, the ones before it got nothing. File first; the issue costs a minute. |
 | "The note is old, it must have landed already." | Grep the repo for its distinctive strings. A 4,000-word dialogue bank sat unfiled for a month. |
 | "The timecode is obviously megacut time." | #109 cost a session's investigation. Prove the clock with a frame. |
 | "I'll clean the worktree up later." | Later is never; that is why the stale tree existed. Remove on merge. |

@@ -119,8 +119,7 @@ not a note to file. Re-asking a question that has been answered is the same
 cost as inventing an answer: the work does not happen.
 
 **Do not cite a tool, test, or file you have not opened.** #222 and #223 were
-filed on the findings of `tools/quality.py`, recorded in `sources/unindexed.json`
-and guarded by `tests/test_quality.py` — none of which have ever existed here.
+filed on the findings of tools, records and tests that have never existed here.
 Both issues had a real defect inside them, and both were unusable, because
 nothing they pointed at could be read. Check with `git log --all -- <path>`
 before you cite: a path with no history never existed, and one with history was

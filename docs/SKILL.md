@@ -48,17 +48,10 @@ than restating them:
 ## Writing a skill here
 
 A skill is a plain Markdown file: an H1, when to use it, the workflow, the
-traps. No front matter, no version field, no catalog entry — the router table
-above is the only registration step.
-
-**Write the current state, not the history that produced it.** No
-version-by-version narration, and no prose copy of a fact that has a machine
-record — link the record instead. See "Documentation" in
-[`AGENTS.md`](../AGENTS.md).
-
-Keep a skill to one file until it is genuinely unreadable; only then split it
-into `skills/<name>/SKILL.md` plus `skills/<name>/references/*.md`. A split
-costs an agent an extra read, so it needs to buy more than tidiness.
+traps. The documentation contract for this tree — what belongs in a doc, and
+what must be linked rather than restated — is "Documentation" in
+[`AGENTS.md`](../AGENTS.md); the router table above is the only registration
+step.
 
 `tests/test_doc_links.py` proves every relative link in the docs tree
 resolves. That is the only check on this tree, and it is enough.

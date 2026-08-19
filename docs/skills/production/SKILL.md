@@ -244,11 +244,11 @@ machine, and none of those raise a local file event.
 
 **An act with `sources: []` is not configured — it is a finding.** It means the
 act is cut outside the repo, so there is nothing to edit here and nothing to
-watch. Acts IV, V and VII are in that state, which is exactly why the Kat/Nat
-dialogue round ([#118]) had nowhere to land. Giving those acts a builder is the
-fix, not adding a source list that lies.
-
-[#118]: https://github.com/castrojo/destiny-vids/issues/118
+watch. No act is in that state: every act in
+[`stories/megacut/delivery.json`](../../../stories/megacut/delivery.json) names
+its committed sources, and acts IV, V and VII are repo-driven — their builders
+are the `rebuild` commands declared in that map. An act that reads `[]` again
+is a finding to report, not a list to fill in with guesses.
 
 ## Common Rationalizations
 
@@ -265,7 +265,7 @@ fix, not adding a source list that lies.
 | "I'll regenerate the social copies next time." | `10mb/` is what the owner opens. A refresh that stops at the megacut is a partial refresh reported as a finished one. |
 | "I rebuilt one act, so I'll just run `publish`." | Name it: `publish --act <numeral>`. A blanket publish certifies every act, including the seven you did not touch. |
 | "`--print-command` needs a working encoder." | No. Printing is for reading and pasting; resolving ffmpeg is a precondition of *running*. Requiring one takes the offline suite offline. |
-| "The assembly stage just joins finished things, so staleness is somebody else's rung." | Assembly is the stage where a stale act reaches an audience. It checks, and refuses. |
+| "The assembly stage just joins finished things, so staleness is somebody else's rung." | Assembly is the stage where a stale act reaches an audience. It checks and reports — it never refuses. |
 | "The megacut is only one act behind, I'll roll it in next time." | Transcoding is cheap. `deliver.py build` rebuilds only what is stale; there is no next time to save for. |
 | "I'll tag the obvious ones and leave the rest." | An untagged beat derives `clean = false`. Half a tag file marks half the video uncuttable. |
 | "The delivered file needs one small fix, I'll edit it in place." | It is regenerated from checked-in data. A hand-edit is lost on the next month's render and nobody can tell it happened. |
@@ -318,9 +318,9 @@ fix, not adding a source list that lies.
 - Trusting a bed's measured true peak as the *delivered* peak. The encoder adds
   inter-sample overshoot; measure the output file.
 - Renumbering an act, or "closing the gap" in `Prod/`'s numbering. `NN-` is the
-  act number from [`docs/running-order.md`](../../running-order.md): act VIII has
-  no film, and its numeral is load-bearing so nothing renumbers around it. III
-  is `mrbobbytables` permanently.
+  act number from [`docs/running-order.md`](../../running-order.md), and every
+  numeral is load-bearing, so nothing renumbers. III is `mrbobbytables`
+  permanently.
 - A music bed at 44.1 kHz, or one with nothing above 16 kHz. Both mean the
   fetch took the wrong rung. So does a format id ending in `-drc`.
 
