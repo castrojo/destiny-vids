@@ -25,6 +25,12 @@ python3 tools/render.py cut.json --media media --out renders/<name>.mp4 \
 shot, and prints its reasoning. It never reuses a shot, and unmatched beats are
 reported rather than silently dropped.
 
+For an authored timing pass, remove a duplicate beat at the builder's source,
+not by hiding its cards in a downstream manifest. Rebuild the timing pass and
+verify the direct hand-off: no replacement silence, slide, plate, gameplay run,
+or bed pause may remain, and every later music and credit anchor must still be
+measured on the same bed clock.
+
 **The fiction bends to the footage.** When a beat finds nothing, rewrite the
 beat — do not widen the pool to unclean footage, and do not invent a shot.
 

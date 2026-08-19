@@ -19,10 +19,9 @@ this pass actually removes it, and fills every slot with picture:
   * the COUNTLESS LEGENDS publisher slide is removed outright rather than marked;
   * three action runs from the official Final Shape *Gameplay* Trailer fill the
     hole left by excising the Pale Heart's long Ghost sequence;
-  * the pause is recut from that same trailer, to the shot the owner named --
-    and then REMAINED as the interruption (issue #104, superseding #95): the
-    song pauses at bed 322.200, the CNCF Ambassadors interrupt the film, and
-    the clip is presented to the audience with its own effects and score.
+  * Act VI's duplicate Amber interruption is removed: Act II now owns that
+    moment, so the music and picture continue naturally from Act III-B into
+    Act III-C.
 
 WHAT CHANGED FROM THE FIRST CUT, AND WHY
 ----------------------------------------
@@ -42,15 +41,13 @@ order. Act II and Act III-A are literally contiguous -- the window crash is not
 a cut at all, it simply happens, which is the strongest possible way to land it
 on the flute entry.
 
-**Two clocks.** ``wall`` is position in the film, ``bed`` is position in the
-song. Any shot not marked ``audio: "bed"`` -- the clip, the held silence, the
-hold-music slot -- advances wall and not bed, so the film is longer than its
-own song. Every anchor is asserted against BED time; see
-``tools/audiomix.py``.
+**One clock.** ``wall`` and ``bed`` stay together: every surviving shot plays
+under the song, so removing the duplicate interruption does not introduce a
+new pause or shift any downstream music anchor.
 
 THREE TIMING INVARIANTS, WHICH THE ASSERTIONS BELOW ENFORCE
 -----------------------------------------------------------
-1. Bed anchors never move -- the gallop, the flute entry, the HOWL, the pause.
+1. Bed anchors never move -- the gallop, the flute entry, and the HOWL.
 2. Act I removals are bought back off the HEAD, automatically, by the derived
    ``CAPTURE_IN``. Cut more out of the intro and the capture simply starts
    earlier; the gallop does not move.
@@ -71,12 +68,6 @@ MEASURED, NOT GUESSED
   the shot starts a beat early -- "4:19 backed up a tad", as a number.
 * **Every Act I edit is a measured span**, from ``blackdetect`` for the black
   and from ``ContentDetector`` for the picture. See ``ACT1_EDITS``.
-* **The pause is the shot the owner named.** Frame-differencing the trailer at
-  1/30 s finds the explosion's cut at **51.835** (frame delta 170 against a
-  background of <30) and the cut out of the transcendence portrait at
-  **53.470** (delta 89). Nothing there was chosen by eye. The interruption's
-  in-point (**43.000**) is the owner's own correction on issue #104, verified
-  here frame by frame (see the constants block).
 
 EDITORIAL RULES ENFORCED HERE RATHER THAN REMEMBERED
 ----------------------------------------------------
@@ -95,9 +86,6 @@ sys.path.insert(0, str(REPO))
 from tools.marker import marker_path  # noqa: E402
 
 BED = json.loads((REPO / "music/bed_seven_days_to_the_wolves.json").read_text())
-GRID = BED["grid"]
-BAR = GRID["bar_sec"]
-FIRST_BEAT = GRID["first_beat_sec"]
 END = BED["duration_sec"]                       # 423.993
 
 # --- the two act hinges, measured in the first cut ---------------------------
@@ -110,53 +98,9 @@ HOWL_SLAM = 279.661        # ...and returns, on this downbeat
 ARTWORK_IN = 277.00        # the artwork is up before the shout, over the CU
 ENEMY_CU_IN = 273.490      # the enemy close-up the artwork will replace
 
-# --- the interruption: the song is paused and the clip is PRESENTED ----------
-# Issue #104 is the owner's solution to #95, and it dissolves that problem
-# rather than solving it: stop trying to hide that it is a clip. The song
-# pauses, the CNCF Ambassadors interrupt the film, and the clip is PLAYED TO
-# THE AUDIENCE with its own effects and score. The music stops being a defect
-# and becomes the point -- which retires #95's search for an SFX-only mix
-# (the moment is not in the named source, yNBMDXdp69g, at all; PR #132).
-#
-# "Since this is an interruption we have unlimited time." True mechanically as
-# well as dramatically: the bed does not advance across the pause (asserted
-# below), so every second here is FREE -- it costs the song nothing.
-#
-# FOUR CLOCKS, and every constant names its own (issue #109):
-#   PAUSE_AT               BED clock -- where the song stops, and resumes
-#   SILENCE/SLIDE/PLATE_LEN, CLIP_LEN   ACT-FILM clock -- screen time
-#   CLIP_IN / CLIP_OUT     SOURCE clock -- a span in the gameplay trailer file
-PAUSE_AT = 322.200         # a downbeat (FIRST_BEAT + 102 bars) -- BED clock
-
-# The sequence (issue #104). No static element holds longer than 4.0 s and
-# each is a new development -- mark, then name, then the clip. That is craft
-# guidance from the issue, not measurement; do not dress it up as precise.
-SILENCE_LEN = 1.000        # A: the held beat of realization -- black, silent
-SLIDE_LEN = 4.000          # B: "The CNCF Ambassadors would like a moment."
-PLATE_LEN = 4.000          # C: "Introducing ..." -> Amber Graner's plate
-
-# The hold music for B and C. CC BY 4.0 (Kevin MacLeod / Incompetech): the
-# licence permits commercial use, sync and redistribution, and attribution is
-# its only condition -- carried verbatim in ATTRIBUTIONS.md and in
-# music/bed_local_forecast_slower.json, which the suite checks agree.
-# HOLD_MUSIC_IN is a SOURCE clock: past the intro flourish, into the steady
-# lounge. The music is cut off dead by the explosion, which is the joke.
-HOLD_MUSIC_ID = "bed_local_forecast_slower"
-HOLD_MUSIC_IN = 6.500
-
-# D, the clip itself, SOURCE clock in the gameplay trailer. Issue #104 as
-# written said 43.0 -> 51.0; the owner's own comment on the issue corrects
-# it -- 51.0 is mid-combat and 53.470 is the cut, so the literal range would
-# DROP the transcendence portrait the owner previously insisted on. The
-# comment offers 43.000 -> 53.470 as "very likely what was meant" (option B),
-# and it is adopted here after frame verification in this worktree
-# (renders/verify-104/): combat with supers at 43.0, the white bloom at 52.0,
-# the portrait at 53.0, and the next shot (Guardians running) at 53.6.
-# 44.811 -> 53.470 (the as-shipped pause, option A) is the one-line fallback
-# if the owner disagrees. 10.470 s instead of the issue's 8.0 s -- free.
-CLIP_IN = 43.000         # SOURCE clock: the run-up the moment builds from
-CLIP_OUT = 53.470        # SOURCE clock: the cut out of the portrait
-CLIP_LEN = CLIP_OUT - CLIP_IN
+# Act III-B hands directly to Act III-C at this bed position. Amber's
+# interruption is authored in Act II and must not be duplicated here.
+ACT3C_IN = 322.200
 
 # Publisher mechanic cards inside the Collection Trailer montage. Two are
 # replaced by a Contributor Summit photograph at their exact duration, so the
@@ -175,11 +119,6 @@ ART = str(Path.home() / "Pictures/Artwork/wolves.jpg")
 # CNCF, CC BY-NC-ND 4.0; cropped to 16:9 on the owner's explicit authority.
 # See that script's header and ATTRIBUTIONS.md.
 SUMMIT_DIR = REPO / "renders" / "summit-plates"
-
-# The interruption's slides, built by scripts/build_interruption_cards.py from
-# stories/06-wolves-interruption-cards.json. The copy is owner-authored and
-# reproduced verbatim; the CNCF mark is NOT on the slide (rights, #104).
-INTERRUPTION_DIR = REPO / "renders" / "interruption"
 
 
 def _rel(path):
@@ -204,20 +143,6 @@ def summit(slot, fallback_text, fallback_sub):
     if plate.exists():
         return _rel(plate)
     print(f"  MISSING PLATE {slot}: falling back to the marker card",
-          file=sys.stderr)
-    return _rel(marker_path(fallback_text, fallback_sub))
-
-
-def interruption(slot, fallback_text, fallback_sub):
-    """An interruption slide, or a marker card if the cards pass has not run.
-
-    Same degrade-never-block rule as the summit photographs: a missing slide
-    is reported and the cut still builds, with the slot marked in place.
-    """
-    card = INTERRUPTION_DIR / f"{slot}.png"
-    if card.exists():
-        return _rel(card)
-    print(f"  MISSING INTERRUPTION CARD {slot}: falling back to a marker",
           file=sys.stderr)
     return _rel(marker_path(fallback_text, fallback_sub))
 
@@ -330,9 +255,9 @@ def tc(seconds):
     return f"{int(seconds) // 60}:{seconds % 60:04.1f}"
 
 
-# The audio dispositions a shot may carry (tools/audiomix.py owns the mix
-# semantics). The bed advances ONLY under "bed" -- the source clip, the held
-# silence and the hold-music slot all cost the song nothing (issue #104).
+# The audio dispositions a Timeline may carry (tools/audiomix.py owns the
+# mix semantics). This build uses only "bed" after removing the duplicate
+# interruption; the other values remain available to generic Timeline tests.
 AUDIO_KINDS = ("bed", "source", "silent", "hold")
 
 
@@ -486,13 +411,12 @@ def build():
     t.at_bed(a3a_out, "Act III-A")
 
     # ---- Act III-B: the Collection Trailer montage, in source order --------
-    # The montage's length is fixed by the anchors either side, so removing the
-    # COUNTLESS LEGENDS slide cannot simply shorten it -- the pause would slide
-    # off its downbeat. The run starts EARLIER instead, and stops before the
-    # slide. Bed time is unchanged and the slide never appears.
+    # The montage's length is fixed by the Act III-C boundary. Removing the
+    # COUNTLESS LEGENDS slide must not add it back, so the run starts earlier
+    # and stops before the slide while the bed anchor stays unchanged.
     montage_in = 51.767            # a detected boundary, 3.3 s earlier than the
                                    # timing pass's 55.0
-    montage_len = PAUSE_AT - a3a_out
+    montage_len = ACT3C_IN - a3a_out
     pos = montage_in
     for card_in, card_out, what, slot in TRAILER_CARDS:
         t.run(TRAILER, pos, card_in - pos,
@@ -503,67 +427,18 @@ def build():
         pos = card_out
     montage_out = montage_in + montage_len
     t.run(TRAILER, pos, montage_out - pos,
-          "III. the montage runs out to the pause, stopping before the "
+          "III. the montage runs to Act III-C, stopping before the "
           "COUNTLESS LEGENDS slide")
     assert montage_out <= COUNTLESS_LEGENDS_IN + 1e-9, (
         f"the montage reaches source {montage_out:.3f}s but the COUNTLESS "
         f"LEGENDS slide starts at {COUNTLESS_LEGENDS_IN:.3f}s -- the publisher "
         "slide the owner asked to cut would be back on screen.")
-    t.at_bed(PAUSE_AT, "Act III-B")
+    # ---- Act III-C: direct continuation after the montage ------------------
+    # Act II already owns Amber's moment. There is no second silence, slide,
+    # gold plate, gameplay clip, or bed pause here: picture and song continue
+    # directly from Act III-B into the Pale Heart.
+    t.at_bed(ACT3C_IN, "Act III-B -> Act III-C")
 
-    # ---- the interruption: the song is paused and the clip is PRESENTED ----
-    # Issue #104, which supersedes #95: the clip is not hidden, it is played
-    # to the audience. Four beats, all free -- the bed clock does not advance
-    # across any of them (asserted below), so this costs the song nothing.
-    #
-    # A -- 1.0 s of black and true silence: the realization, before anything
-    # appears. `audio="silent"` is a promise this beat stays silent forever.
-    t.card(interruption("a-silence", "INTERMISSION", "the song stops"),
-           SILENCE_LEN,
-           "III. INTERRUPTION A -- the song stops; a held beat of black before "
-           "anything appears (issue #104)", audio="silent")
-    # B -- the Ambassadors' slide. Copy owner-authored in #104 and reproduced
-    # VERBATIM; the CNCF mark itself is rights-blocked, so the slide is text
-    # only. `audio="hold"` is the hold-music slot, and it now CARRIES A TRACK:
-    # Local Forecast - Slower, CC BY 4.0 (Kevin MacLeod / Incompetech).
-    # Commercial use, sync and redistribution are all permitted; attribution is
-    # the only condition and is reproduced verbatim in ATTRIBUTIONS.md and in
-    # music/bed_local_forecast_slower.json.
-    #
-    # The slot was left silent "until a track is cleared". Four cleared tracks
-    # had already been found and verified on #104 -- picking between assets
-    # that are ALREADY cleared is taste, not a licensing decision, and it never
-    # blocked anything. See AGENTS.md, "A rights DECISION blocks. A rights
-    # CHOICE does not."
-    t.card(interruption("b-ambassadors", "INTERRUPTION B", "slide missing"),
-           SLIDE_LEN,
-           "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' "
-           "(owner-authored, verbatim; hold music: Local Forecast - Slower, "
-           "CC BY 4.0, credited in ATTRIBUTIONS.md)", audio="hold",
-           audio_from={"video_id": HOLD_MUSIC_ID,
-                       "start_sec": HOLD_MUSIC_IN})
-    # C -- introducing Amber Graner with her existing authored Guardian
-    # identity. Cortney Nickerson appears only in the Act I intro.
-    t.card(interruption("c-amber", "INTERRUPTION C", "nameplate missing"),
-           PLATE_LEN,
-           "III. INTERRUPTION C -- Introducing Amber Graner with her authored "
-           "Guardian identity (hold music continues)", audio="hold",
-           audio_from={"video_id": HOLD_MUSIC_ID,
-                       "start_sec": HOLD_MUSIC_IN})
-    # D -- the clip, with its OWN effects and score: the polite hold music is
-    # smashed out by the explosion. That is the joke, and it is why #95's
-    # with-music mix is no longer a defect. SOURCE clock 43.000 -> 53.470 --
-    # option B of the owner's correction on #104; see the constants above.
-    t.run(GAMEPLAY, CLIP_IN, CLIP_LEN,
-          "III. INTERRUPTION D -- the clip plays to the audience with its own "
-          "effects and score (issue #104; supersedes #95, whose SFX-only mix "
-          "does not exist): the explosion, then the transcendence portrait, "
-          "held to the cut at source 53.470. Amber Graner's moment, "
-          "introduced on the card before it.",
-          audio="source")
-    t.at_bed(PAUSE_AT, "the interruption consumed no bed time")
-
-    # ---- Act III-C: the Pale Heart, around the excised Ghost sequence ------
     pale_out = 361.200
     t.run(COMP, PALE_IN, GHOST_IN - PALE_IN,
           "III. the Pale Heart, unbroken from source 25:51 -- Guardians "
@@ -621,27 +496,15 @@ def main():
             "act2_gallop_in": ACT2_IN,
             "act3_flute_change": ACT3_IN,
             "howl_silence": [HOWL_GAP_IN, HOWL_SLAM],
-            "pause_at_bed": PAUSE_AT,
+            "act3c_in": ACT3C_IN,
         },
-        "note": "AUTHORED shotlist, not a story.py output. A TIMING PASS: "
-                "spans destined for removal or artwork are blacked out with "
-                "marker cards at their exact duration, so nothing is cut yet. "
-                "Only audio=bed shots advance the bed clock; the "
-                "interruption (issue #104) is silent/hold/source beats that "
-                "are all free to the song.",
-        "unresolved": [
-            "CNCF MARK, TODO(owner): the interruption slide reproduces only "
-            "the owner-authored LINE ('The CNCF Ambassadors would like a "
-            "moment.'); the CNCF logo/mark is not used because the rights to "
-            "it have not been cleared. Text only until the owner says "
-            "otherwise.",
-            "CLIP RANGE: the clip plays source 43.000 -> 53.470 -- option B "
-            "of the owner's own correction on #104 (the issue text's "
-            "43.0 -> 51.0 would cut the transcendence portrait they "
-            "previously insisted on). Verified on frames in "
-            "renders/verify-104/. One-line revert to option A: CLIP_IN = "
-            "44.811.",
-        ],
+        "note": "AUTHORED shotlist, not a story.py output. Act VI now "
+                "continues naturally from Act III-B into Act III-C: the "
+                "duplicate Amber interruption at bed 322.200 is absent "
+                "because Act II owns that moment. All "
+                "surviving picture runs play under the bed, so wall and bed "
+                "clocks remain aligned.",
+        "unresolved": [],
         "shots": t.shots,
     }
     dest = REPO / "stories/seven-days-timing-pass.json"

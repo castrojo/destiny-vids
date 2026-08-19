@@ -11,13 +11,10 @@
    278.64,
    279.661
   ],
-  "pause_at_bed": 322.2
+  "act3c_in": 322.2
  },
- "note": "AUTHORED shotlist, not a story.py output. A TIMING PASS: spans destined for removal or artwork are blacked out with marker cards at their exact duration, so nothing is cut yet. Only audio=bed shots advance the bed clock; the interruption (issue #104) is silent/hold/source beats that are all free to the song.",
- "unresolved": [
-  "CNCF MARK, TODO(owner): the interruption slide reproduces only the owner-authored LINE ('The CNCF Ambassadors would like a moment.'); the CNCF logo/mark is not used because the rights to it have not been cleared. Text only until the owner says otherwise.",
-  "CLIP RANGE: the clip plays source 43.000 -> 53.470 -- option B of the owner's own correction on #104 (the issue text's 43.0 -> 51.0 would cut the transcendence portrait they previously insisted on). Verified on frames in renders/verify-104/. One-line revert to option A: CLIP_IN = 44.811."
- ],
+ "note": "AUTHORED shotlist, not a story.py output. Act VI now continues naturally from Act III-B into Act III-C: the duplicate Amber interruption at bed 322.200 is absent because Act II owns that moment. All surviving picture runs play under the bed, so wall and bed clocks remain aligned.",
+ "unresolved": [],
  "shots": [
   {
    "segment_id": "wolves_act1_0000_072",
@@ -43,7 +40,7 @@
   },
   {
    "segment_id": "card_002",
-   "still": "renders/summit-plates/act1_black_1.jpg",
+   "still": "renders/markers/comic-placeholder-film-1-21-the-black-th-17e9497d.png",
    "duration": 3.016,
    "beat": "I. SUMMIT -- film 1:21 -- the black; the owner asked for it gone, and it becomes the summit instead",
    "audio": "bed"
@@ -72,7 +69,7 @@
   },
   {
    "segment_id": "card_005",
-   "still": "renders/summit-plates/act1_black_2.jpg",
+   "still": "renders/markers/comic-placeholder-film-1-55-black-79ae2b98.png",
    "duration": 1.374,
    "beat": "I. SUMMIT -- film 1:55 -- black",
    "audio": "bed"
@@ -112,7 +109,7 @@
   },
   {
    "segment_id": "card_009",
-   "still": "renders/summit-plates/act1_black_3.jpg",
+   "still": "renders/markers/comic-placeholder-film-2-45-black-15b6e3ec.png",
    "duration": 2.078,
    "beat": "I. SUMMIT -- film 2:45 -- black",
    "audio": "bed"
@@ -187,7 +184,7 @@
   },
   {
    "segment_id": "card_016",
-   "still": "renders/summit-plates/enemy_cu.jpg",
+   "still": "renders/markers/comic-placeholder-4-33-4-37-enemy-cu-9cd1d516.png",
    "duration": 3.51,
    "beat": "III. SUMMIT -- the whole Contributor Summit, over the enemy CU",
    "audio": "bed"
@@ -224,7 +221,7 @@
   },
   {
    "segment_id": "card_020",
-   "still": "renders/summit-plates/raids.jpg",
+   "still": "renders/markers/comic-placeholder-7-raids-card-39d605b4.png",
    "duration": 1.966,
    "beat": "III. SUMMIT -- over the 7 RAIDS card",
    "audio": "bed"
@@ -242,7 +239,7 @@
   },
   {
    "segment_id": "card_022",
-   "still": "renders/summit-plates/buildcrafting.jpg",
+   "still": "renders/markers/comic-placeholder-endless-buildcrafting--718d0698.png",
    "duration": 1.967,
    "beat": "III. SUMMIT -- over the ENDLESS BUILDCRAFTING card",
    "audio": "bed"
@@ -255,48 +252,8 @@
    "duration": 13.967,
    "start_tc": "1:13.0",
    "end_tc": "1:27.0",
-   "beat": "III. the montage runs out to the pause, stopping before the COUNTLESS LEGENDS slide",
+   "beat": "III. the montage runs to Act III-C, stopping before the COUNTLESS LEGENDS slide",
    "audio": "bed"
-  },
-  {
-   "segment_id": "card_024",
-   "still": "renders/interruption/a-silence.png",
-   "duration": 1.0,
-   "beat": "III. INTERRUPTION A -- the song stops; a held beat of black before anything appears (issue #104)",
-   "audio": "silent"
-  },
-  {
-   "segment_id": "card_025",
-   "still": "renders/interruption/b-ambassadors.png",
-   "duration": 4.0,
-   "beat": "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' (owner-authored, verbatim; hold music: Local Forecast - Slower, CC BY 4.0, credited in ATTRIBUTIONS.md)",
-   "audio": "hold",
-   "audio_from": {
-    "video_id": "bed_local_forecast_slower",
-    "start_sec": 6.5
-   }
-  },
-  {
-   "segment_id": "card_026",
-   "still": "renders/interruption/c-amber.png",
-   "duration": 4.0,
-   "beat": "III. INTERRUPTION C -- Introducing Amber Graner with her authored Guardian identity (hold music continues)",
-   "audio": "hold",
-   "audio_from": {
-    "video_id": "bed_local_forecast_slower",
-    "start_sec": 6.5
-   }
-  },
-  {
-   "segment_id": "yt_destiny_2_the_final_shape_gameplay_trailer_0043_000",
-   "video_id": "yt_destiny_2_the_final_shape_gameplay_trailer",
-   "start_sec": 43.0,
-   "end_sec": 53.47,
-   "duration": 10.47,
-   "start_tc": "0:43.0",
-   "end_tc": "0:53.5",
-   "beat": "III. INTERRUPTION D -- the clip plays to the audience with its own effects and score (issue #104; supersedes #95, whose SFX-only mix does not exist): the explosion, then the transcendence portrait, held to the cut at source 53.470. Amber Graner's moment, introduced on the card before it.",
-   "audio": "source"
   },
   {
    "segment_id": "wolves_act2_0171_000",
@@ -368,7 +325,7 @@
    "plate_slot": true
   },
   {
-   "segment_id": "card_034",
+   "segment_id": "card_030",
    "still": "/var/home/jorge/Pictures/Artwork/wolves.jpg",
    "duration": 12.293,
    "beat": "ARTWORK (outro, over the fade)",

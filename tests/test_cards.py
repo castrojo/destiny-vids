@@ -12,10 +12,12 @@ import re
 import sys
 
 import pytest
+from PIL import Image
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from tools import plate  # noqa: E402
+from scripts import build_scream_card  # noqa: E402
 
 REPO = os.path.join(os.path.dirname(__file__), "..")
 CARDS = os.path.join(REPO, "cards")
@@ -25,6 +27,15 @@ MEGACUT = os.path.join(REPO, "stories", "megacut")
 def _load(name):
     with open(os.path.join(MEGACUT, name), encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def test_scream_card_is_opaque_black(tmp_path, monkeypatch):
+    monkeypatch.setattr(build_scream_card, "OUT", tmp_path / "scream.png")
+    build_scream_card.render()
+    image = Image.open(build_scream_card.OUT)
+    assert image.mode == "RGB"
+    assert image.getpixel((0, 0)) == (0, 0, 0)
+    assert image.getpixel((1919, 1079)) == (0, 0, 0)
 
 
 def test_every_card_kind_has_a_template():
