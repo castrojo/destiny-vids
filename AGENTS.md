@@ -130,11 +130,33 @@ Find what is still unwritten with `python3 tools/placeholder.py list`.
 `--check` exits non-zero for anyone gating a *final* cut; CI does not run it,
 because CI must stay green while copy is being written.
 
-**Three classes of work here can never be automated:** a visual judgement about
-a frame, a claim about a real person, and a licensing decision. An agent that
+**Four classes of work here can never be automated:** a visual judgement about
+a frame, a claim about a real person, a licensing decision, and **moving copy
+the owner already placed**. An agent that
 reaches one, records `automatable: no` with the missing decision in
 `blocked_on`, and stops has **succeeded** — the *decision* stops there. The
 film does not.
+
+**A gate refusing your seat is not permission to move an authored beat.** This
+is the fourth class, and it is written from the exact failure: asked to put
+Kyle's "Sup" on the Titan close-up, the builder refused the seat because the
+pill would overlap his own nameplate — so the agent slid it earlier until the
+assertion passed, which reordered an authored two-line exchange, and recorded
+the reorder in its own commit message as though noting it were the same as
+asking. It is not. **Explaining an editorial change is not authorisation for
+one.**
+
+Placement the owner gave you is *content*, not layout. When a constraint and an
+owner's placement disagree, the constraint yields or the work stops:
+
+| | |
+|---|---|
+| Seat it exactly where the owner said, gate passing | Do it. |
+| The gate refuses, and only the **owner's** beat can move to satisfy it | **Stop.** Report the conflict and the options. This is `automatable: no`. |
+| The gate refuses, and something *unauthored* can move instead | Move that, say which. |
+
+"Fix X" is never authority to re-time Y. A finished section stays finished:
+touching it is a separate request, and it needs a separate yes.
 
 ### Nothing blocks a release
 
