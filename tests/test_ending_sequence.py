@@ -2,6 +2,8 @@
 
 import json
 import subprocess
+
+import pytest
 import sys
 from pathlib import Path
 
@@ -31,20 +33,22 @@ def test_ending_record_matches_its_schema():
     Draft202012Validator(schema).validate(ending())
 
 
-def test_pause_copy_is_owner_authored_and_ordered():
+def test_reviewed_pause_copy_is_exact_and_ordered():
     cards = selected(ending(), "pause")
-    assert [card["id"] for card in cards] == [
-        "mission", "we-are", "purpose", "lesson", "left-to-teach"
-    ]
-    assert cards[0]["label"] == "Mission"
-    assert cards[0]["title"] == "Bring new contributors to cloud native"
-    assert [card.get("title") for card in cards[1:]] == [
-        "We are Project Bluefin",
-        "And we have one purpose",
-        "One lesson",
-        "Left to teach",
+    assert [(c.get("label"), c["title"], c.get("subtitle")) for c in cards[:4]] == [
+        ("Our Mission", "Bring new contributors to cloud native", None),
+        (None, "We are Bluefin", None),
+        (None, "We are not nice.", None),
+        (None, "We do what must be done.", "(Wait for it)"),
     ]
 
+
+def test_support_and_prove_it_cards_are_exact():
+    by_id = {p["id"]: p for p in ending()["plates"]}
+    assert by_id["fight-for-us"]["text"] == '"We support the Community"'
+    assert by_id["prove-it"]["text"] == "Prove it."
+    assert by_id["prove-it"]["placement"] == "center"
+    assert by_id["prove-it"]["at"] == pytest.approx(93.075, abs=0.05)
 
 def test_underwater_copy_and_emphasis_are_exact():
     cards = selected(ending(), "underwater")
@@ -57,7 +61,8 @@ def test_underwater_copy_and_emphasis_are_exact():
         "Last sighs on a deathbed",
         "Seven Days",
         "One Chain of Lives Unending",
-        "Fight for Us",
+        '"We support the Community"',
+        "Prove it.",
         "For Nóva",
     ]
     assert cards[4]["emphasis"] == [{"text": "EVER", "style": "seared"}]
@@ -69,7 +74,7 @@ def test_the_four_closing_cards_are_centred():
     a matte line under the picture."""
     cards = selected(ending(), "underwater")
     assert [card["placement"] for card in cards] == (
-        ["bottom_matte"] * 6 + ["center"] * 4)
+        ["bottom_matte"] * 6 + ["center"] * 5)
 
 
 def test_underwater_windows_stay_inside_the_measured_sequence():
@@ -95,7 +100,7 @@ def test_retired_copy_is_kept_rather_than_deleted():
 def test_renderer_can_enumerate_every_ending_card():
     doc = ending()
     ids = [card["id"] for card in doc["plates"]]
-    assert len(ids) == 15
+    assert len(ids) == 16
     assert len(set(ids)) == len(ids)
     assert all(card["kind"] == "ending" for card in doc["plates"])
     assert set(doc["pause"]["plate_ids"] + doc["underwater"]["plate_ids"]) == set(ids)
@@ -106,6 +111,7 @@ def test_renderer_can_enumerate_every_ending_card():
     assert "'placement'" in source
     assert "'emphasis'" in source
     assert "'wallpaper'" in source
+    assert "params.set('id', card.id)" in source
 
 
 def test_ending_template_has_safe_emphasis_and_placement_hooks():
@@ -114,6 +120,14 @@ def test_ending_template_has_safe_emphasis_and_placement_hooks():
     assert "seared" in source
     assert "bottom_matte" in source
     assert "window.__renderReady = true" in source
+
+
+def test_mission_is_larger_and_bird_card_moves_right_and_down():
+    template = TEMPLATE.read_text()
+    assert "document.body.dataset.cardId = card.id" in template
+    assert 'body[data-card-id="mission"]' in template
+    assert 'body[data-card-id="purpose"]' in template
+    assert "translate(8vw, 7vh)" in template
 
 
 def test_pause_cards_match_act_slide_chrome_without_darkening_wallpapers():
@@ -171,17 +185,11 @@ def test_pause_builder_runs_as_a_script(tmp_path):
     assert "-frames:v 1380" in proc.stdout
 
 
-def test_the_fight_card_lights_the_bluefin_letters():
-    """Owner: "Blue F's". The letters are picked by the project's own rule --
-    tools/blueletters.py lights B, b, F and f -- not by hand, and the colour
-    is the credits' accent rather than a second blue invented for one card."""
+def test_the_support_card_keeps_the_centered_treatment():
     card = {plate["id"]: plate for plate in ending()["plates"]}["fight-for-us"]
-    assert card["blue_letters"] is True
-    assert "BbFf" in (REPO / "tools" / "blueletters.py").read_text()
-    template = TEMPLATE.read_text()
-    assert "'BbFf'.includes(char)" in template
-    assert "#93c5fd" in template
-
+    assert card["text"] == '"We support the Community"'
+    assert card["placement"] == "center"
+    assert "blue_letters" not in card
 
 def test_the_nova_card_sets_the_wheel_as_a_letter_and_sears_only_the_accent():
     """Owner: "make the o the k8s symbol and make the accent above the symbol

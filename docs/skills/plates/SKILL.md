@@ -36,6 +36,21 @@ upper-right safe area. The renderer measures both margins against the detected
 picture rectangle, so the card stays on the image when the source is
 letterboxed.
 
+## Ending cards
+
+The ending manifest's pause cards use the existing title-card renderer. A pause
+card may carry an optional, non-empty `subtitle`; render it as a smaller line
+below the title, not as a new generic card configuration. The renderer passes the
+manifest card ID to `ending.html`, which uses `body[data-card-id="..."]` for
+small, authored exceptions such as a larger mission title or an optical
+translation around artwork. Keep those selectors ID-specific; do not add a
+manifest-wide offset abstraction.
+
+The underwater coda remains one ordered overlay section. Add a new card to both
+`underwater.plate_ids` and `plates`, keep its half-open window inside the
+measured movement, and preserve the existing centered treatment when the copy
+belongs with the centered closing cards.
+
 Keep chat `text` verbatim. An owner-retired authored card remains complete in
 the generator's `RETIRED` record, including timing and identity fields, and is
 removed from active pass data; never preserve a partial duplicate.

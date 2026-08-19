@@ -129,6 +129,7 @@ const wallpaperLog = {}
 
 for (const card of cards) {
   const params = new URLSearchParams()
+  if (card.kind === 'ending') { params.set('id', card.id) }
   for (const key of COPY) {
     if (card[key]) { params.set(key, String(card[key])) }
   }
