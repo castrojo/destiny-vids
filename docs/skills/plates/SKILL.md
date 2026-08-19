@@ -37,6 +37,8 @@ value occurs exactly once and whose `replace` value uses `{k8s}`.
 does not alter the authored source string. Use an asterisk for other letters,
 and do not add censorship the owner did not request.
 
+For owner-sequenced dialogue around a freeze, derive every window from the picture builder's evidenced constants, keep each card at `MIN_HOLD`, and regenerate the manifest; never hand-edit a generated plate clock.
+
 ### Cinematic text that shares the frame with identity plates
 
 Owner-authored narration can use `kind: caption` in the top-safe rail while

@@ -502,6 +502,15 @@ MAPPED_TAIL_REPLACEMENTS = {
 }
 MAPPED_TAIL_PASS = [
     {
+        "id": "mapped_empathy_tacos",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 245.650,
+        "hold": 2.2,
+        "speaker": "Empathy",
+        "text": "tacos.",
+    },
+    {
         "id": "mapped_redacted_blow",
         "kind": "chat",
         "position": "left",
@@ -546,7 +555,7 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_kyle_sup",
         "kind": "chat",
         "position": "left",
-        "at_film": 310.4,
+        "at_film": round(build_efmb.HALLWAY_RETURN_AT + 0.997, 3),
         "hold": 2.2,
         "speaker": "kylegospo",
         "text": "Sup",
@@ -556,11 +565,39 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_kolunmi_disco",
         "kind": "chat",
         "position": "left",
-        "at_film": 313.2,
+        "at_film": round(build_efmb.HALLWAY_RETURN_AT + 3.797, 3),
         "hold": 2.2,
         "speaker": "kolunmi",
         "text": "Disco!",
         "avatar_login": "kolunmi",
+    },
+    {
+        "id": "mapped_redacted_harbringer",
+        "kind": "chat",
+        "position": "left",
+        "at_film": round(build_efmb.KYLE_REVEAL_AT + 3.450, 3),
+        "hold": 2.2,
+        "speaker": "[redacted]",
+        "text": "Harbringer to the TOC",
+    },
+    {
+        "id": "mapped_redacted_ready",
+        "kind": "chat",
+        "position": "left",
+        "at_film": round(build_efmb.KYLE_REVEAL_AT + 5.900, 3),
+        "hold": 2.2,
+        "speaker": "[redacted]",
+        "text": "They're ready",
+    },
+    {
+        "id": "mapped_akgraner_disco",
+        "kind": "chat",
+        "position": "left",
+        "at_film": round(build_efmb.KYLE_REVEAL_AT + 8.350, 3),
+        "hold": 2.2,
+        "speaker": "akgraner",
+        "text": "Disco!",
+        "avatar_login": "akgraner",
     },
     {
         "id": "mapped_eyecantcu_reveal",
@@ -576,8 +613,8 @@ MAPPED_TAIL_PASS = [
 ]
 
 BLACK_CONVERSATION = [
-    ("mapped_akgraner_kyle", "akgraner", "Hi sugar, I'm looking for Kyle", 2.2,
-     "akgraner"),
+    # The owner replaces the opening akgraner question with Hikari's reaction;
+    # the remaining exchange stays in its authored order before the action.
     ("mapped_hikari_ouch", "HikariKnight", "Ouch man wtf!", 2.2,
      "HikariKnight"),
     ("mapped_owen_sorry", "Owen", "Oh sorry my bad", 2.2, None),
@@ -589,10 +626,16 @@ BLACK_CONVERSATION = [
      "HikariKnight"),
     ("mapped_kolunmi_users", "kolunmi",
      "Are those ... other linux users?", 2.6, "kolunmi"),
+    ("mapped_akgraner_help", "akgraner", "Sounds like you need some help",
+     2.2, "akgraner"),
+    ("mapped_akgraner_take_care", "akgraner",
+     "Let me take care of this for you", 2.2, "akgraner"),
 ]
 
 AFTER_AMBER_CONVERSATION = [
     ("mapped_owen_slay", "Owen", "Slay out, Queen!", 2.2, None, 1.0),
+    ("mapped_which_kyle", "akgraner", "Which one of you is Kyle?", 2.6,
+     "akgraner", 1.0),
     ("mapped_akgraner_kindness_1", "akgraner",
      "Kindness is doing what's right", 2.2, "akgraner", 1.18),
     ("mapped_akgraner_kindness_2", "akgraner",
@@ -605,8 +648,6 @@ AFTER_AMBER_CONVERSATION = [
      "Don't be nice.", 2.2, "akgraner", 1.18),
     ("mapped_akgraner_kindness_6", "akgraner",
      "Be kind.", 2.2, "akgraner", 1.18),
-    ("mapped_which_kyle", "akgraner", "Which one of you is Kyle?", 2.6,
-     "akgraner", 1.0),
 ]
 
 # --- THE MAPPED 7:03 -> 8:26 OWNER PASS -----------------------------------

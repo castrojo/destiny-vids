@@ -86,7 +86,7 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
 
     assert hallway["at"] == pytest.approx(build_efmb.HALLWAY_AT, abs=1e-3)
     assert hallway["source_at"] == pytest.approx(323.933, abs=1e-3)
-    assert hallway["duration"] == pytest.approx(22.0, abs=1e-3)
+    assert hallway["duration"] == pytest.approx(24.0, abs=1e-3)
     assert hallway["darken"] > 0
     assert amber["source_id"] == build_efmb.AMBER_SOURCE_ID
     assert amber["at"] == pytest.approx(build_efmb.AMBER_AT, abs=1e-3)
@@ -97,6 +97,17 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
     assert after["darken"] > hallway["darken"]
     assert returned["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
     assert returned["source_in"] == pytest.approx(325.933, abs=1e-3)
+    assert build_efmb.AMBER_AT == pytest.approx(
+        build_efmb.HALLWAY_AT + build_efmb.HALLWAY_FREEZE_SEC, abs=1e-6)
+    assert build_efmb.HALLWAY_AFTER_AMBER_AT == pytest.approx(
+        build_efmb.AMBER_AT + build_efmb.AMBER_CLIP_SEC, abs=1e-6)
+    assert build_efmb.HALLWAY_RETURN_AT == pytest.approx(
+        build_efmb.HALLWAY_AFTER_AMBER_AT + build_efmb.HALLWAY_AFTER_AMBER_SEC,
+        abs=1e-6)
+    assert build_efmb.INTERRUPTION_SHIFT_SEC == pytest.approx(
+        2.0 + (22.0 + build_efmb.AMBER_CLIP_SEC
+               + build_efmb.HALLWAY_AFTER_AMBER_SEC
+               - build_efmb.INTERRUPTION_REPLACED_SEC), abs=1e-6)
 
 
 def test_kyle_and_eyecantcu_each_get_their_evidenced_picture():
@@ -618,7 +629,6 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
     expected = {
         "mapped_redacted_blow": ("[redacted]", "Or go blow some shit up"),
         "mapped_owen_slay": ("Owen", "Slay out, Queen!"),
-        "mapped_akgraner_kyle": ("akgraner", "Hi sugar, I'm looking for Kyle"),
         "mapped_kyle_sup": ("kylegospo", "Sup"),
         "mapped_kolunmi_disco": ("kolunmi", "Disco!"),
     }
@@ -784,6 +794,43 @@ def test_mars_intro_owns_clankers_context_and_red_warning():
     assert warning["name"] == "POOR TECHNICAL DECISIONS"
 
 
+def test_hallway_round_follows_owner_order():
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    ordered = [
+        "mapped_hikari_ouch",
+        "mapped_akgraner_help",
+        "mapped_akgraner_take_care",
+        "mapped_owen_slay",
+        "mapped_which_kyle",
+        "mapped_akgraner_kindness_1",
+    ]
+    assert [by_id[i]["text"] for i in ordered] == [
+        "Ouch man wtf!",
+        "Sounds like you need some help",
+        "Let me take care of this for you",
+        "Slay out, Queen!",
+        "Which one of you is Kyle?",
+        "Kindness is doing what's right",
+    ]
+    assert [by_id[i]["at"] for i in ordered] == sorted(
+        by_id[i]["at"] for i in ordered)
+    assert by_id["mapped_akgraner_help"]["at"] < build_efmb.AMBER_AT
+    assert by_id["mapped_owen_slay"]["at"] >= build_efmb.HALLWAY_AFTER_AMBER_AT
+
+
+def test_restored_empathy_and_endfight_lines_are_exact():
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert by_id["mapped_empathy_tacos"]["speaker"] == "Empathy"
+    assert by_id["mapped_empathy_tacos"]["text"] == "tacos."
+    assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
+    assert by_id["mapped_kyle_sup"]["text"] == "Sup"
+    assert by_id["mapped_kolunmi_disco"]["text"] == "Disco!"
+    assert by_id["mapped_redacted_harbringer"]["text"] == (
+        "Harbringer to the TOC")
+    assert by_id["mapped_redacted_ready"]["text"] == "They're ready"
+    assert by_id["mapped_akgraner_disco"]["text"] == "Disco!"
+
+
 def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     removed = {
@@ -791,8 +838,9 @@ def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
         "mapped_reaction_yyes_1", "mapped_reaction_yyes_2",
     }
     assert removed.isdisjoint(by_id)
-    assert by_id["mapped_akgraner_kyle"]["at"] < by_id["mapped_kolunmi_pvp"]["at"]
-    assert by_id["mapped_kolunmi_users"]["at"] < build_efmb.AMBER_AT
+    assert by_id["mapped_hikari_ouch"]["at"] < by_id["mapped_kolunmi_pvp"]["at"]
+    assert by_id["mapped_kolunmi_users"]["at"] < by_id["mapped_akgraner_help"]["at"]
+    assert by_id["mapped_akgraner_take_care"]["at"] < build_efmb.AMBER_AT
     assert by_id["mapped_owen_slay"]["at"] >= build_efmb.HALLWAY_AFTER_AMBER_AT
     kindness = [by_id[f"mapped_akgraner_kindness_{i}"] for i in range(1, 7)]
     assert [p["text"] for p in kindness] == [
@@ -804,8 +852,7 @@ def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
         "Be kind.",
     ]
     assert all(p["scale"] > 1 for p in kindness)
-    assert kindness[-1]["at"] + kindness[-1]["dur"] < \
-        by_id["mapped_which_kyle"]["at"]
+    assert by_id["mapped_which_kyle"]["at"] < kindness[0]["at"]
     assert by_id["mapped_which_kyle"]["text"] == "Which one of you is Kyle?"
 
 
@@ -817,9 +864,11 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     assert haters["at"] == pytest.approx(308.2, abs=1e-3)
     assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
-    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(310.4, abs=1e-3)
+    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(
+        build_efmb.HALLWAY_RETURN_AT + 0.997, abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["speaker"] == "kolunmi"
-    assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(313.2, abs=1e-3)
+    assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(
+        build_efmb.HALLWAY_RETURN_AT + 3.797, abs=1e-3)
     assert by_id["owner_convo_karena"]["avatar"].endswith("/karena.png")
 
 
