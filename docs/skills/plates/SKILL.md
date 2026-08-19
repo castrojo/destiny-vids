@@ -89,6 +89,15 @@ The deck's other authored shapes are the title card (`title`, `subtitle`, `body[
 
 Keep chat `text` verbatim. For owner-requested censors, use the Kubernetes helm only for an `o`, an asterisk for other letters, and no unrequested censorship; the complete data contract is in [`references/conversation-cards.md`](references/conversation-cards.md).
 
+A title card may use `position: "top-right"` for a sign in the picture's
+upper-right safe area. The renderer measures both margins against the detected
+picture rectangle, so the card stays on the image when the source is
+letterboxed.
+
+An owner-retired authored card remains complete in the generator's `RETIRED`
+record, including timing and identity fields, and is removed from active pass
+data; never preserve a partial duplicate.
+
 ### The GitHub login is the identity, not the name
 
 Owner, on finding the show inconsistent: *"all of the nameplates are

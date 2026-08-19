@@ -149,7 +149,7 @@ def test_the_act3_retirement_copy_is_uncast_chat_before_the_wolf_day_shot():
     path = Path("stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json")
     data = json.loads(path.read_text(encoding="utf-8"))
     plate.load_manifest_entries(data["plates"])
-    retirement = data["plates"]
+    retirement = [p for p in data["plates"] if p["id"].startswith("retirement-")]
     assert [p["kind"] for p in retirement] == ["chat", "chat"]
     assert [p["speaker"] for p in retirement] == ["[redacted]", "[redacted]"]
     assert [p["text"] for p in retirement] == [
@@ -164,3 +164,19 @@ def test_the_act3_retirement_copy_is_uncast_chat_before_the_wolf_day_shot():
     assert 'FIXED_MANIFEST="stories/$VIDEO_ID-fixed-plates.json"' in builder
     assert 'FIXED_INPUTS+=("$FIXED_MANIFEST")' in builder
     assert 'display.get("standalone_leads", True)' in builder
+    assert 'python3 tools/plate.py merge "${FIXED_INPUTS[@]}" --out "$WORK/fixed.json"' in builder
+    assert '    --around "$WORK/fixed.json"' in builder
+
+
+def test_act_three_review_copy_and_splits_are_exact():
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    by_id = {c["id"]: c for c in data["cues"]}
+    assert by_id["d01"]["text"] == "What a shitshow"
+    assert by_id["d20a"]["text"] == "Everyone forgot how to use KVM! We need to split up"
+    assert by_id["d20b"]["text"] == "Everyone's making their own and it's all bad!"
+    assert by_id["d21"]["text"] == "They've broken out of the sandbox"
+    assert by_id["d23a"]["text"] == "The open rate of maintainer emails is 7%"
+    assert by_id["d23b"]["text"] == "I don't like this plan"
+    ids = [c["id"] for c in data["cues"]]
+    assert ids.index("d20a") < ids.index("d20b") < ids.index("d21")
+    assert ids.index("d23a") < ids.index("d23b") < ids.index("d24")
