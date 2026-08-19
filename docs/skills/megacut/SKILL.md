@@ -56,6 +56,9 @@ happened.
 
 ## Core Process
 
+Closing-line overlays are authored by the ending-card manifest. Keep tool and
+test descriptions timeless; do not bake a current card count into them.
+
 ```bash
 # 1a. Chapter cards, deck format (title / subtitle / body): a Python plate
 python3 tools/plate.py render --manifest stories/<name>/<name>-cards.json \

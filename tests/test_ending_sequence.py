@@ -68,8 +68,8 @@ def test_underwater_copy_and_emphasis_are_exact():
     assert cards[4]["emphasis"] == [{"text": "EVER", "style": "seared"}]
 
 
-def test_the_four_closing_cards_are_centred():
-    """The owner asked for the last four in one treatment -- 'same font/size as
+def test_the_five_closing_cards_are_centred():
+    """The owner asked for the last five in one treatment -- 'same font/size as
     the other 2', 'same font/placement as the others'. Everything before them is
     a matte line under the picture."""
     cards = selected(ending(), "underwater")
