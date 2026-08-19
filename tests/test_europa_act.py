@@ -58,8 +58,10 @@ def test_alolita_uses_the_verified_repo_avatar():
     doc = load()
     alolita = next(p for p in doc["plates"] if p["id"] == "d03")
     assert alolita["speaker"] == "alolita"
-    assert Path(alolita["avatar"]) == (
-        REPO / "renders" / "avatars" / "alolita.png")
+    avatar = Path(alolita["avatar"])
+    if not avatar.is_absolute():
+        avatar = REPO / avatar
+    assert avatar == REPO / "renders" / "avatars" / "alolita.png"
 
 
 def test_build_command_has_no_endcard_input_or_overlay(tmp_path):

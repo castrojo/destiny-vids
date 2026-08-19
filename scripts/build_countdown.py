@@ -142,16 +142,16 @@ def _farm_runner(source, entries, plates_dir, out, expected_duration, local_ffmp
     def run(argv):
         farm.run_ffmpeg_on_cluster(
             _remote_argv(argv, local_ffmpeg),
-            inputs=[source] + [
-                plates_dir / f"plate_{unit['id']}.png"
+            inputs=[source.resolve()] + [
+                (plates_dir / f"plate_{unit['id']}.png").resolve()
                 for unit in plate._burn_units(entries)
                 if not unit["animation"]
             ] + [
-                plates_dir / unit["pattern"]
+                (plates_dir / unit["pattern"]).resolve()
                 for unit in plate._burn_units(entries)
                 if unit["animation"]
             ],
-            out=out,
+            out=out.resolve(),
             expected_duration=expected_duration,
         )
 

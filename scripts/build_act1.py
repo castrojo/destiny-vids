@@ -184,11 +184,11 @@ def build_act1(skip_encode=False, use_farm=False):
     if use_farm:
         # The farm stages exact argv tokens, so the burn leg lists the plate
         # PNGs themselves, not their directory.
-        burn_inputs = [TRIM] + [
-            str(Path(PLATES_DIR) / f"plate_{u['id']}.png")
+        burn_inputs = [str(Path(TRIM).resolve())] + [
+            str((REPO_ROOT / PLATES_DIR / f"plate_{u['id']}.png").resolve())
             for u in plate._burn_units(entries)
         ]
-        runner = _farm_runner(None, burn_inputs, MASTER, duration)
+        runner = _farm_runner(None, burn_inputs, str(Path(MASTER).resolve()), duration)
     plate.burn(
         REPO_ROOT / TRIM,
         entries,
