@@ -56,6 +56,7 @@ say so in one line and give an ETA.
 | Signal | What it means |
 |---|---|
 | "I want a video" / "ship it" / "publish" | Stop. Render. Deliver a path. Then continue. |
+| "stream it" / "put it on" / "cast it" | The film plays on the owner's television *first*. A path is not a screening — [`delivery`](docs/skills/production/references/delivery.md). |
 | "quick" / "for iteration" | A rough cut beats a correct cut that does not exist. |
 | An owner asking twice | You already got this wrong once. Deliver before your next tool call. |
 
