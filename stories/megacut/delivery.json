@@ -59,8 +59,9 @@
     "yt_destiny_all_live_action_trailers",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "c474f9ff80f9d0ea2ba779923ad7cd5e1d80b44fad101c45fcbc04d9f934c037",
-   "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad"
+   "source_digest": "6f34de6275bf08afc0be24381989fee289b757484cba770026ee224b9f01d58c",
+   "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad",
+   "built_from_commit": "8569f86223b8d499ff92c0ba1a554109bdbcf204"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -139,7 +140,7 @@
     "scripts/actbuild.py",
     "tools/plate.py"
    ],
-   "source_digest": "7baabfc5f82bb992da1283ea882ba6178691dfe920ca7255f273a6385ba75b6e",
+   "source_digest": "4968dd4c0b755075eaa541b7f3db97a208631a0e4ca5e8dba10bbd84e0484415",
    "rebuild": "python3 scripts/build_europa.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },

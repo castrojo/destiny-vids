@@ -815,13 +815,13 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     haters = by_id["mapped_haters"]
     assert haters["kind"] == "miniboss"  # owner: match the kernel bar
     assert haters["name"] == "HATERS"
-    assert haters["at"] == pytest.approx(308.2, abs=1e-3)
+    assert haters["at"] == pytest.approx(316.2, abs=1e-3)  # owner: 10:00, red face
     assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
     # Owner, 2026-08-19: "sup is a purple titan ... put it when it's zoomed
     # into his face." Film 317.0 is the Titan close-up behind the purple Void
     # shield -- programme 10:00.8, the "around 10:00" he asked for.
-    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(310.4, abs=1e-3)
+    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(316.967, abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["speaker"] == "kolunmi"
     assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(313.2, abs=1e-3)
     assert by_id["owner_convo_karena"]["avatar"].endswith("/karena.png")

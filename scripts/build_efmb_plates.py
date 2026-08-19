@@ -534,7 +534,14 @@ MAPPED_TAIL_PASS = [
         # a missing title rather than inventing one.
         "kind": "miniboss",
         "position": "boss",
-        "at_film": 308.2,
+        "at_film": 316.2,
+        # OWNER: "Haters goes at 10:00 on the red face with the bright
+        # red dot." Programme 10:00 is act II film 316.2 (the act is
+        # seated at programme 283.80), and that lands inside the red-lit
+        # face shot, measured 315.267 -> 316.967 by scene detection.
+        # It was on the 308.2 hallway, which is not that shot.
+        # The boss bar is a CHROME_ROW at the top of frame, so it shares
+        # the screen with Kyle's lower-third pill by design.
         "hold": 2.2,
         "seen_at_src": build_efmb.HALLWAY_FRAME_SRC,
         "name": "HATERS",
@@ -559,11 +566,22 @@ MAPPED_TAIL_PASS = [
         #
         # The conflict is the owner's to settle -- move the reveal, shorten the
         # hold, or keep 310.4. Until he does, his number stands.
-        "at_film": 310.4,
+        "at_film": 316.967,
+        # OWNER, verbatim: "sup is a purple titan", "put it when it's
+        # zoomed into his face". 316.967 is the first frame of that
+        # close-up, measured by scene detection (the shot runs
+        # 316.967 -> 317.733). The pill OPENS on his face, which is what
+        # he asked for. Nothing else moves.
         "hold": 2.2,
         "speaker": "kylegospo",
         "text": "Sup",
         "avatar_login": "KyleGospo",
+        # BONDED to his own nameplate. The owner pinned this pill to
+        # the Titan close-up and LOCKED the reveal, so the two share
+        # the screen by instruction. bond_of is the repo's named
+        # exemption for exactly that -- named, so it can never
+        # quietly overlap somebody else's plate.
+        "bond_of": "mapped_kyle_reveal",
     },
     {
         "id": "mapped_kolunmi_disco",
@@ -2232,6 +2250,8 @@ def build():
                 entry["class"] = spec["class"]
             if spec.get("variant"):
                 entry["variant"] = spec["variant"]
+            if spec.get("bond_of"):
+                entry["bond_of"] = spec["bond_of"]
             if spec.get("avatar_login"):
                 entry.update(github_avatar(spec["avatar_login"]))
             if at <= plan["picture_sec"]:
@@ -2440,6 +2460,8 @@ def build():
             })
             if spec.get("avatar_login"):
                 entry.update(github_avatar(spec["avatar_login"]))
+            if spec.get("bond_of"):
+                entry["bond_of"] = spec["bond_of"]
         elif spec["kind"] == "title":
             entry["title"] = spec["title"]
             if spec.get("body"):

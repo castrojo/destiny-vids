@@ -61,6 +61,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import math
 import re
 import subprocess
@@ -3588,10 +3589,26 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
     if runner is not None:
         runner(cmd)
         return out_path
-    proc = subprocess.run(cmd, capture_output=True, text=True)
-    if proc.returncode != 0:
-        tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
-        raise RuntimeError(f"plate burn failed:\n{tail}")
+    # NEVER WRITE STRAIGHT AT THE MASTER. `out_path` is routinely a hardlink
+    # into ~/Videos/Wolves/Prod/, so opening it for writing truncates the
+    # DELIVERED act before a single frame is encoded -- and an interrupted
+    # burn then leaves the film with no copy anywhere. Act II was destroyed
+    # exactly that way (#286); the only surviving copy was the megacut.
+    # tools/peaks.py already writes-then-replaces, so this is that pattern.
+    tmp = out_path.with_name(out_path.stem + ".burntmp" + out_path.suffix)
+    cmd[-1] = str(tmp)
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+        if proc.returncode != 0:
+            tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
+            raise RuntimeError(f"plate burn failed:\n{tail}")
+        # A stubbed encoder (the tests') returns 0 without writing; only a
+        # file that actually exists may replace the master.
+        if tmp.exists():
+            os.replace(tmp, out_path)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
     return out_path
 
 
