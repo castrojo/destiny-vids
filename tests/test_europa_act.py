@@ -7,7 +7,7 @@ overlays.
 """
 
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 REPO = Path(__file__).resolve().parents[1]
 MANIFEST = REPO / "stories" / "07-europa-plates.json"
@@ -65,3 +65,34 @@ def test_build_command_has_no_endcard_input_or_overlay(tmp_path):
     assert "endcard.png" not in " ".join(cmd)
     assert len(build_europa._cues(doc)) == len(doc["plates"]) + 1
     assert "90.8" not in graph
+
+
+def test_no_avatar_is_named_by_an_absolute_path():
+    """An absolute path in a manifest resolves on exactly one machine.
+
+    These read `/var/home/jorge/src/destiny-vids/renders/avatars/...`, so they
+    were green on the owner's workstation and red in every other checkout --
+    the worst shape a check can have, because the agent verifies, pushes, and
+    gets a red it cannot reproduce.
+
+    The invariant is the one `tools/plate.py::_load_avatar` already
+    implements: a path is either RELATIVE, and resolves against the repo root,
+    or `~`-rooted, and resolves against the home of whoever is running. Both
+    travel. An absolute path travels nowhere, so neither kind is spelled that
+    way -- including the `~/Videos` and `~/src/website` assets, which are
+    outside the repo but no less machine-specific when written out in full.
+
+    Anchoring on the *current* repo root instead would invert the test: a
+    reverted `/var/home/jorge/...` string does not start with the runner's own
+    checkout path, so it would pass in CI and fail only on the one machine
+    where it happens to work.
+    """
+    doc = load()
+    for plate in doc["plates"]:
+        avatar = plate.get("avatar")
+        if not avatar:
+            continue
+        assert not PurePosixPath(avatar).is_absolute(), (
+            f"plate {plate.get('id')}: {avatar!r} is an absolute path -- use a "
+            f"repo-relative path for a file in this repo, or a `~`-rooted one "
+            f"for a file outside it")
