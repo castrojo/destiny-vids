@@ -114,6 +114,20 @@ No login means the crest stands in and the gap is recorded — the correct
 outcome, and where `preethi` and Karena sit today. `github: null` with *"not
 an agent's to guess"* beside it is a decision already taken.
 
+### Dialogue the owner re-sequenced
+
+For owner-sequenced dialogue around a freeze, derive every window from the
+picture builder's evidenced constants, keep each card at `MIN_HOLD`, and
+regenerate the manifest; never hand-edit a generated plate clock. When review
+splits a cue, pin each authored `(start_sec, end_sec, character)` tuple and its
+hundredth-second adjacency in focused tests. If review notes use a programme
+baseline, record the programme mark beside its baseline act film and source
+anchors, then derive the post-insert film time from the timeline shift. A
+source-attached cue must still resolve to the evidenced picture — including a
+held frame — not merely retain a stale film number. An external insert and its
+surrounding held frame are separate half-open intervals: raise inside the
+insert, and resolve the hold to its exact `source_at`.
+
 ### Cinematic text that shares the frame with identity plates
 
 Owner-authored narration uses `kind: caption` in the top-safe rail while
