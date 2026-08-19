@@ -443,7 +443,7 @@ def test_the_new_face_dialogue_hands_off_before_the_lead_in_banner():
     cues = [by_id[i] for i in (
         "late_jrsapi_learn",
         "late_rochaporto_move",
-        "late_metrics_cluster",
+        "late_metrics_1",
         "late_karena_cardio",
     )]
     assert max(p["at"] + p["dur"] for p in cues) <= build_efmb_plates.MONTAGE_OUT
@@ -648,7 +648,8 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
         "For our users.", "And for our maintainers.",
         "Don't be nice.", "Be kind.",
     ]
-    assert by_id["mapped_haters"]["text"] == "HATERS"
+    assert by_id["mapped_haters"]["kind"] == "miniboss"
+    assert by_id["mapped_haters"]["name"] == "HATERS"
     assert "solo_EyeCantCU" not in by_id
 
 
@@ -713,8 +714,8 @@ def test_the_post_walk_dialogue_is_replaced_by_the_mapped_pass():
     assert by_id["mapped_pastaq_what_tests"]["text"] == "Hey man WHAT tests?"
     assert by_id["mapped_redacted_unlearning"]["speaker"] == "[redacted]"
     assert by_id["mapped_redacted_unlearning"]["at"] == pytest.approx(221.5, abs=1e-3)
-    assert by_id["mapped_redacted_options"]["text"] == (
-        "Your options are success "
+    assert by_id["mapped_redacted_options_1"]["text"] == "Your options are success"
+    assert by_id["mapped_redacted_options_2"]["text"] == (
         "Or a lifetime of servitude in the Toilmaster's Packaging Mines")
 
 
@@ -780,9 +781,9 @@ def test_mars_intro_owns_clankers_context_and_red_warning():
     assert context["title"] == "Clankers and Contributors"
     assert context["at"] == pytest.approx(45.2, abs=1e-3)
     assert context["at"] < mars["at"]
-    assert warning["kind"] == "warning"
-    assert warning["position"] == "warning"
-    assert warning["text"] == "POOR TECHNICAL DECISIONS"
+    assert warning["kind"] == "miniboss"
+    assert warning["position"] == "boss"
+    assert warning["name"] == "POOR TECHNICAL DECISIONS"
 
 
 def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
@@ -813,8 +814,8 @@ def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
 def test_endfight_warnings_and_speakers_match_owner_copy():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     haters = by_id["mapped_haters"]
-    assert haters["kind"] == "warning"
-    assert haters["text"] == "HATERS"
+    assert haters["kind"] == "miniboss"
+    assert haters["name"] == "HATERS"
     assert haters["at"] == pytest.approx(308.2, abs=1e-3)
     assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
@@ -863,7 +864,7 @@ def test_the_ogc_banner_keeps_its_top_lane_over_the_owner_conversation():
     late = late_plates()
     assert not any(key.startswith("letterbox_banner_") for key in late)
     top = [late[f"top_banner_ogc_{i}"] for i in (1, 2)]
-    assert all(b["kind"] == "banner" and b["position"] == "boss" for b in top)
+    assert all(b["kind"] == "banner" and b["position"] == "letterbox-top" for b in top)
     assert all(b["text"] == (
         "#UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | "
         "#UPSTREAMFIRST") for b in top)
@@ -877,7 +878,7 @@ def test_the_ogc_banner_keeps_its_top_lane_over_the_owner_conversation():
 def test_the_late_pass_records_only_the_precise_remaining_gaps():
     late_gaps = " ".join(committed()["unresolved"])
     assert "brandtkeller" in late_gaps
-    assert "Your Bad Decisions" in late_gaps
+    assert "7:50 standalone extra-dollar scheduling entry is retired" in late_gaps
     assert "Greg Kroah-Hartman" in late_gaps
     assert "Shuah Khan" in late_gaps
     assert "Tulip Blossom" in late_gaps
@@ -886,7 +887,7 @@ def test_the_late_pass_records_only_the_precise_remaining_gaps():
     assert "rare drop in a game" in late_gaps
     assert "hallway-and-dogs frame, Amber's owner-identified" in late_gaps
     assert "EyeCantCU's owner-timed megacut 9:31 seat" in late_gaps
-    assert "requested flashing red boss treatment is still missing" in late_gaps
+    assert "requested flashing effect remains unrendered" in late_gaps
     assert "exact owner-authored words" not in late_gaps
 
 
@@ -894,7 +895,8 @@ def test_present_day_lands_on_the_owner_mark_with_outro_title_chrome():
     late = late_plates()
     card = late["late_present_day"]
     assert card["kind"] == "title"
-    assert card["position"] == "boss"
+    assert card["position"] == "center"
+    assert card["scale"] >= 1.25
     assert card["at"] == pytest.approx(46.5, abs=1e-3)
     assert card["title"] == "PRESENT DAY"
     lead = build_efmb.derive_lead()
@@ -934,7 +936,7 @@ def test_the_remaining_face_shot_dialogue_cards_still_land():
     ]
     learn = late["late_jrsapi_learn"]
     move = late["late_rochaporto_move"]
-    metrics = late["late_metrics_cluster"]
+    metrics = late["late_metrics_1"]
     cardio = late["late_karena_cardio"]
 
     assert all(p["kind"] == "chat" for p in cluster)
@@ -951,25 +953,27 @@ def test_the_remaining_face_shot_dialogue_cards_still_land():
     assert move["at"] == pytest.approx(101.95, abs=1e-3)
     assert metrics["kind"] == "chat"
     assert metrics["speaker"] == "jrsapi"
-    assert metrics["text"] == (
-        "Projects Teams Metrics are strong "
-        "They just need mentoring in the right skills")
-    assert metrics["avatar"] == "renders/avatars/jrsapi.png"
+    metrics_2 = late["late_metrics_2"]
+    assert metrics["text"] == "Projects Teams Metrics are strong"
+    assert metrics_2["text"] == "They just need mentoring in the right skills"
+    assert metrics["avatar"] == metrics_2["avatar"] == "renders/avatars/jrsapi.png"
     assert metrics["at"] == pytest.approx(104.5, abs=1e-3)
+    assert metrics_2["at"] == pytest.approx(107.2, abs=1e-3)
     assert cardio["speaker"] == "karena"
     assert cardio["text"] == "Like cardio!"
-    assert cardio["at"] == pytest.approx(107.5, abs=1e-3)
+    assert cardio["at"] == pytest.approx(109.65, abs=1e-3)
 
 
 def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
     by_id = {p["id"]: p for p in committed()["plates"]}
     expected = {
         "mapped_a1rmax_intro": ("A1RM4X", "renders/avatars/A1RM4X.png"),
-        "mapped_lionheartp_together": (
+        "mapped_lionheartp_together_1": (
             "LionHeartP", "renders/avatars/LionHeartP.png"),
-        "mapped_eggroll_title": (
+        "mapped_eggroll_title_1": (
             "GloriousEggroll", "renders/avatars/GloriousEggroll.png"),
-        "mapped_redacted_options": ("[redacted]", None),
+        "mapped_redacted_options_1": ("[redacted]", None),
+        "mapped_redacted_options_2": ("[redacted]", None),
         "mapped_akgraner_kindness_1": (
             "akgraner", "renders/avatars/akgraner.png"),
     }
@@ -1068,12 +1072,13 @@ def test_karena_is_angel_with_one_l():
                for u in build_efmb_plates.build()["unresolved"])
 
 
-def test_the_correct_opening_guardians_are_on_the_owners_marks():
+def test_the_remaining_opening_guardians_are_on_the_owners_marks():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    marks = {"opening_sarahnovotny": 13.433, "opening_bdburns": 18.433,
-             "og_thockin": 26.433, "og_jbeda": 36.433}
+    marks = {"og_thockin": 26.433, "og_jbeda": 36.433}
     for pid, at in marks.items():
         assert by_id[pid]["at"] == pytest.approx(at, abs=1e-3)
+    assert "opening_sarahnovotny" not in by_id
+    assert "opening_bdburns" not in by_id
     assert "og_dims" not in by_id
     assert "og_paganini" not in by_id
 
@@ -1251,27 +1256,14 @@ def test_the_long_walk_has_a_marker_but_no_title_card():
     assert not any(p["id"] == "walk_chapter" for p in manifest["plates"])
 
 
-def test_bdburns_and_sarah_are_verified_and_scheduled_in_the_opening_gap():
+def test_bdburns_and_sarah_remain_casting_records_but_not_scheduled():
     manifest = build_efmb_plates.build()
-    by_id = {p["id"]: p for p in manifest["plates"]}
-    bdburns = by_id["opening_bdburns"]
-    sarah = by_id["opening_sarahnovotny"]
-
-    assert bdburns["name"] == "Brent D Burns"
-    assert bdburns["avatar"] == "renders/avatars/bdburns.png"
-    assert bdburns["avatar_url"] == "https://avatars.githubusercontent.com/u/4357134?v=4"
-    assert sarah["name"] == "Sarah Novotny"
-    assert sarah["avatar"] == "renders/avatars/sarahnovotny.png"
-    assert sarah["avatar_url"] == "https://avatars.githubusercontent.com/u/127370?v=4"
-
-    og_thockin = by_id["og_thockin"]
-    og_jbeda = by_id["og_jbeda"]
-    assert sarah["at"] + sarah["dur"] <= bdburns["at"]
-    assert bdburns["at"] + bdburns["dur"] <= og_thockin["at"]
-    assert og_thockin["at"] + og_thockin["dur"] <= og_jbeda["at"]
-    assert "seen_at_src" not in bdburns
-    assert "seen_at_src" not in sarah
-    assert bdburns["dur"] == sarah["dur"] == pytest.approx(4.0, abs=1e-3)
+    ids = {p["id"] for p in manifest["plates"]}
+    assert "opening_bdburns" not in ids
+    assert "opening_sarahnovotny" not in ids
+    casting = Path("vocab/casting.yaml").read_text()
+    assert "sarahnovotny:" in casting
+    assert "bdburns:" in casting
 
 
 def test_opening_three_no_longer_stay_unresolved():
@@ -1441,3 +1433,51 @@ def test_the_discarded_tail_absorbs_the_rung_change():
     assert last_kept <= build_efmb.REMOVED[-1][0], \
         "no kept run may reach into the tail the rung change lands in"
     assert build_efmb.SOURCE_RUNG, "which rung this act is cut from is recorded"
+
+# --- Task 4: Act II opening, major titles, boss bars, and split notes ---------
+
+def test_opening_removes_sarah_and_brent_from_this_act_only():
+    ids = {p["id"] for p in build_efmb_plates.build()["plates"]}
+    assert "opening_sarahnovotny" not in ids
+    assert "opening_bdburns" not in ids
+    casting = Path("vocab/casting.yaml").read_text()
+    assert "sarahnovotny:" in casting and "bdburns:" in casting
+
+
+def test_black_head_and_present_day_use_major_title_treatment():
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert by_id["opening_black_head"]["position"] == "center"
+    assert by_id["opening_black_head"]["scale"] >= 1.25
+    assert by_id["late_present_day"]["position"] == "center"
+    assert by_id["late_present_day"]["scale"] >= 1.25
+
+
+def test_bad_decisions_and_haters_use_red_boss_chrome():
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert by_id["late_poor_technical_decisions"]["kind"] == "miniboss"
+    assert by_id["late_poor_technical_decisions"]["name"] == "POOR TECHNICAL DECISIONS"
+    assert by_id["mapped_haters"]["kind"] == "miniboss"
+    assert by_id["mapped_haters"]["name"] == "HATERS"
+
+
+def test_ogc_banner_uses_top_letterbox_lane():
+    banners = [p for p in build_efmb_plates.build()["plates"]
+               if p["id"].startswith("top_banner_ogc_")]
+    assert banners and all(p["position"] == "letterbox-top" for p in banners)
+
+
+def test_task_4_split_copy_is_exact():
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    expected = {
+        "late_metrics_1": "Projects Teams Metrics are strong",
+        "late_metrics_2": "They just need mentoring in the right skills",
+        "mapped_lionheartp_hardware": "Why spend the extra dollar to support Linux hardware",
+        "mapped_lionheartp_together_1": "When we work together",
+        "mapped_lionheartp_together_2": "This gets easier",
+        "mapped_eggroll_title_1": "Nice work testing that patch",
+        "mapped_eggroll_title_2": "Usually Blueberries just Send me a bunch of crap",
+        "mapped_redacted_options_1": "Your options are success",
+        "mapped_redacted_options_2": "Or a lifetime of servitude in the Toilmaster's Packaging Mines",
+    }
+    for plate_id, text in expected.items():
+        assert by_id[plate_id]["text"] == text

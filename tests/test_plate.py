@@ -2372,3 +2372,17 @@ def test_an_animation_group_is_padded_from_the_start_of_the_timeline():
     assert "tpad=start_duration=" in body
     assert "start_mode=add" in body and "color=black@0" in body
     assert "eof_action=pass" in body
+
+
+def test_the_top_letterbox_banner_sits_in_the_top_matte():
+    img = plate.render_plate(dict(BANNER))
+    picture = (0, 140, 1920, 800)
+    frame = plate.place(img, "letterbox-top", picture)
+    left, top, right, bottom = frame.getchannel("A").getbbox()
+    image_left, image_top, image_right, image_bottom = img.getchannel("A").getbbox()
+    expected_x = picture[0] + (picture[2] - img.width) // 2
+    expected_y = max(0, picture[1] - img.height)
+    assert left == expected_x + image_left
+    assert top == expected_y + image_top
+    assert right - left == image_right - image_left
+    assert bottom - top == image_bottom - image_top

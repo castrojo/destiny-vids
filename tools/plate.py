@@ -2305,6 +2305,13 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
             plate, (px + pw - int(STATUS_INSET) - plate.width,
                     py + ph - int(STATUS_INSET) - plate.height))
         return frame
+    if position == "letterbox-top":
+        # The banner's strip is the top matte of a letterboxed frame. Center it
+        # against the picture, then seat it immediately above the picture edge.
+        x = px + (pw - plate.width) // 2
+        y = max(0, py - plate.height)
+        frame.alpha_composite(plate, (x, y))
+        return frame
     if position == "letterbox":
         # The banner's strip is the bottom BAR of a letterboxed frame: below
         # the picture entirely, so it can hold for a whole film and never

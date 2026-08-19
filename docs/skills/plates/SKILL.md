@@ -103,6 +103,9 @@ variant is colour only. Owner-authored imagery chrome — `avatar`,
 `wreath`, bracketed names like `[ REDACTED ]` — is likewise not copy:
 [`references/plate-chrome.md`](references/plate-chrome.md).
 
+A banner may use `position: "letterbox-top"` to center against the measured
+picture and seat in the top matte without adding another banner renderer.
+
 The deck's `gp_*` entries add three **placement** fields, which are deck data,
 not new copy: `position: "group"` with an absolute `x` (measured against the
 picture, never the raw frame), a `scale` that shrinks the card, and a `group`

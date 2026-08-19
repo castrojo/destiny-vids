@@ -152,6 +152,7 @@ OPENING_HEAD_CARD = {
     "id": "opening_black_head",
     "kind": "title",
     "position": "center",
+    "scale": 1.25,
     "title": "Eons later",
     "subtitle": "Open Source has led us to the stars",
     "body": [
@@ -180,10 +181,9 @@ NAME_CORRECTIONS = {"mara_sov": ("Karena Angell", "Karena Angel")}
 # Sarah and Brent replace the retired Davanum/Catherine cards in the first two
 # slots. Their verified records carry only names and PFPs, so the standard
 # nameplate chrome omits unauthored class/title rows rather than inventing them.
-OPENING_NAMEPLATES = [
-    {"key": "sarahnovotny", "at_megacut": 135.0},
-    {"key": "bdburns", "at_megacut": 140.0},
-]
+# Sarah Novotny and Brent Burns remain authored in vocab/casting.yaml; the
+# owner retired only their Act II schedule.
+OPENING_NAMEPLATES = []
 
 OG_LABEL = "OG GUARDIAN"
 OG_GUARDIANS = [
@@ -297,7 +297,13 @@ NEW_CHATS = [
 # 2. The 6:29 "red miniboss flashing" cue is a visual treatment, not a title,
 #    chat or banner. This batch is limited to the existing three kinds, so that
 #    one stays recorded rather than faked.
-PRESENT_DAY = {"at_megacut": 313.0, "hold": 2.6, "title": "PRESENT DAY"}
+PRESENT_DAY = {
+    "at_megacut": 313.0,
+    "hold": 2.6,
+    "title": "PRESENT DAY",
+    "position": "center",
+    "scale": 1.25,
+}
 LATE_PASS = [
     {
         "id": "late_mfahlandt_clean",
@@ -357,16 +363,23 @@ LATE_PASS = [
         "hold": 2.2,
     },
     {
-        "id": "late_metrics_cluster",
+        "id": "late_metrics_1",
         "kind": "chat",
         "position": "left",
         "at_megacut": 371.0,
-        "hold": 2.75,
+        "hold": 2.2,
         "login": "jrsapi",
         "speaker": "jrsapi",
-        "text": (
-            "Projects Teams Metrics are strong "
-            "They just need mentoring in the right skills"),
+        "text": "Projects Teams Metrics are strong",
+    },
+    {
+        "id": "late_metrics_2",
+        "kind": "chat",
+        "position": "left",
+        "hold": 2.2,
+        "login": "jrsapi",
+        "speaker": "jrsapi",
+        "text": "They just need mentoring in the right skills",
     },
     {
         "id": "late_karena_cardio",
@@ -401,11 +414,11 @@ LATE_PASS = [
     },
     {
         "id": "late_poor_technical_decisions",
-        "kind": "warning",
-        "position": "warning",
+        "kind": "miniboss",
+        "position": "boss",
         "at_film": 122.75,
         "hold": 2.2,
-        "text": "POOR TECHNICAL DECISIONS",
+        "name": "POOR TECHNICAL DECISIONS",
     },
     {
         "id": "late_karena_lessons",
@@ -522,12 +535,12 @@ MAPPED_TAIL_PASS = [
     },
     {
         "id": "mapped_haters",
-        "kind": "warning",
-        "position": "warning",
+        "kind": "miniboss",
+        "position": "boss",
         "at_film": 308.2,
         "hold": 2.2,
         "seen_at_src": build_efmb.HALLWAY_FRAME_SRC,
-        "text": "HATERS",
+        "name": "HATERS",
     },
     {
         "id": "mapped_kyle_sup",
@@ -740,26 +753,40 @@ MAPPED_PASS = [
         "text": "There's nothing glorious about this job",
     },
     {
-        "id": "mapped_lionheartp_together",
+        "id": "mapped_lionheartp_together_1",
         "kind": "chat",
         "position": "left",
         "at_film": 195.5,
-        "hold": 3.8,
+        "hold": 2.2,
         "avatar_login": "LionHeartP",
         "speaker": "LionHeartP",
-        "text": "When we work together This gets easier",
+        "text": "When we work together",
     },
     {
-        "id": "mapped_eggroll_title",
+        "id": "mapped_lionheartp_together_2",
+        "kind": "chat",
+        "position": "left",
+        "hold": 2.2,
+        "avatar_login": "LionHeartP",
+        "speaker": "LionHeartP",
+        "text": "This gets easier",
+    },
+    {
+        "id": "mapped_eggroll_title_1",
         "kind": "chat",
         "position": "left",
         "at_film": 205.5,
-        "hold": 4.5,
+        "hold": 2.2,
         "speaker": "GloriousEggroll",
-        "text": (
-            "Nice work testing that patch "
-            "Usually Blueberries just "
-            "Send me a bunch of crap"),
+        "text": "Nice work testing that patch",
+    },
+    {
+        "id": "mapped_eggroll_title_2",
+        "kind": "chat",
+        "position": "left",
+        "hold": 2.2,
+        "speaker": "GloriousEggroll",
+        "text": "Usually Blueberries just Send me a bunch of crap",
     },
     {
         "id": "mapped_eggroll_didyou",
@@ -801,15 +828,21 @@ MAPPED_PASS = [
         "text": "Unlearning bad habits takes time",
     },
     {
-        "id": "mapped_redacted_options",
+        "id": "mapped_redacted_options_1",
         "kind": "chat",
         "position": "left",
         "at_film": 224.5,
-        "hold": 6.75,
+        "hold": 2.2,
         "speaker": "[redacted]",
-        "text": (
-            "Your options are success "
-            "Or a lifetime of servitude in the Toilmaster's Packaging Mines"),
+        "text": "Your options are success",
+    },
+    {
+        "id": "mapped_redacted_options_2",
+        "kind": "chat",
+        "position": "left",
+        "hold": 2.2,
+        "speaker": "[redacted]",
+        "text": "Or a lifetime of servitude in the Toilmaster's Packaging Mines",
     },
     {
         "id": "mapped_kyle_titanfall",
@@ -829,6 +862,17 @@ OWNER_CONVO = [
      "We can't let The Toilmaster enslave another generation"),
 ]
 OWNER_CONVO_AT = 231.5
+
+# The owner retired the standalone 7:50 scheduling entry, but not its exact
+# authored copy. Keep the source record so a later re-seat does not reconstruct
+# the sentence from memory.
+RETIRED = {
+    "extra_dollar_line": {
+        "id": "mapped_lionheartp_hardware",
+        "speaker": "LionHeartP",
+        "text": "Why spend the extra dollar to support Linux hardware",
+    },
+}
 
 # --- THE CHOICE SCREEN -----------------------------------------------------
 #
@@ -2118,7 +2162,8 @@ def build():
         "kind": "title",
         "at": present_day_at,
         "dur": PRESENT_DAY["hold"],
-        "position": "boss",
+        "position": PRESENT_DAY["position"],
+        "scale": PRESENT_DAY["scale"],
         "copy_source": "owner_supplied",
         "seen_at_src": round(build_efmb.source_for_film(present_day_at, lead), 3),
         "title": PRESENT_DAY["title"],
@@ -2318,6 +2363,10 @@ def build():
         elif spec["kind"] == "warning":
             entry["text"] = spec["text"]
             entry["text_source"] = "owner_supplied"
+        elif spec["kind"] == "miniboss":
+            entry["name"] = spec["name"]
+            if spec.get("title"):
+                entry["title"] = spec["title"]
         else:
             entry["title"] = spec["title"]
             if spec.get("subtitle"):
@@ -2344,7 +2393,7 @@ def build():
             "kind": "banner",
             "at": start,
             "dur": round(end - start, 3),
-            "position": "boss",
+            "position": "letterbox-top",
             "copy_source": "owner_supplied",
             "text": TOP_BANNER["text"],
             "text_source": "owner_supplied",
@@ -2423,6 +2472,10 @@ def build():
         elif spec["kind"] == "warning":
             entry["text"] = spec["text"]
             entry["text_source"] = "owner_supplied"
+        elif spec["kind"] == "miniboss":
+            entry["name"] = spec["name"]
+            if spec.get("title"):
+                entry["title"] = spec["title"]
         elif spec["kind"] == "guardian":
             entry.pop("kind")
             entry["copy_source"] = "casting"
@@ -2562,11 +2615,9 @@ def build():
             "A1RM4X's ghost card. This batch stays inside the existing plate "
             "renderer, so the card uses the verified YouTube ghost chrome and "
             "the rarer drop treatment stays unrendered rather than faked",
-            "the 6:29 cue is 'red miniboss flashing / Your Bad Decisions'. "
-            "This deterministic batch is limited to the existing title/chat/"
-            "banner kinds, and none of them is a flashing red miniboss bar, "
-            "so the line stays recorded rather than faked with the wrong "
-            "chrome",
+            "the 7:50 standalone extra-dollar scheduling entry is retired; "
+            "its exact owner copy remains in RETIRED rather than being "
+            "reconstructed or silently lost",
             "the mapped hallway edit uses the owner-supplied source-323.933 "
             "hallway-and-dogs frame, Amber's owner-identified gameplay "
             "sequence, and the cleared Local Forecast - Slower bed. Source "
@@ -2574,9 +2625,9 @@ def build():
             "EyeCantCU's owner-timed megacut 9:31 seat uses a freeze of the "
             "evidenced source-354.600 Warlock frame; the stale old 283.666 "
             "plate seat remains removed",
-            "the 9:10 HATERS title renders through existing title chrome. The "
-            "requested flashing red boss treatment is still missing; the copy "
-            "ships without that effect rather than being dropped",
+            "the 9:10 HATERS cue uses the existing red miniboss treatment; "
+            "the requested flashing effect remains unrendered rather than "
+            "being faked as a different chrome",
             "the Kyle and kolunmi pills land at film 335.650 and 338.100 "
             "after Amber's conversation and Bungie's burned-in "
             "'NEW LEGENDS WILL RISE' zone. The order and copy are the owner's; "
