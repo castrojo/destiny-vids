@@ -128,10 +128,20 @@ def plan_countdown(target=TARGET):
 
 
 
-def _farm_runner(source, entries, plates_dir, out, expected_duration):
+def _remote_argv(argv, local_ffmpeg):
+    """Replace a local resolver prefix with the farm's native executable."""
+    if argv and argv[0] == "ffmpeg":
+        return argv
+    prefix = list(local_ffmpeg)
+    if argv[:len(prefix)] != prefix:
+        raise ValueError("burn argv does not start with its local ffmpeg resolver")
+    return ["ffmpeg", *argv[len(prefix):]]
+
+
+def _farm_runner(source, entries, plates_dir, out, expected_duration, local_ffmpeg):
     def run(argv):
         farm.run_ffmpeg_on_cluster(
-            argv,
+            _remote_argv(argv, local_ffmpeg),
             inputs=[source] + [
                 plates_dir / f"plate_{unit['id']}.png"
                 for unit in plate._burn_units(entries)
@@ -172,7 +182,8 @@ def build(local=False):
     ffmpeg = render.find_ffmpeg()
     use_farm = _use_farm(local)
     runner = (_farm_runner(source, spec["entries"], plates_dir, out,
-                           spec["segment_duration"]) if use_farm else None)
+                           spec["segment_duration"], ffmpeg)
+              if use_farm else None)
     plate.burn(source, spec["entries"], plates_dir, out, ffmpeg=ffmpeg,
                runner=runner, encode_args=conform.video_encode_args())
     return spec

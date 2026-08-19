@@ -129,22 +129,25 @@ across successive lossy burns. FFmpeg's `overlay` filter accepts an alpha input
 and supports straight, premultiplied, or automatic alpha handling.
 `source: /websites/ffmpeg_documentation, “overlay”`
 
-## Burn on the delivery frame grid
+## Burn on the main stream's frame grid
 
 `tools/plate.py burn` expresses every overlay window with FFmpeg's timeline
 `enable` expression using `n`, the output frame count, and a half-open
-`gte(n,start)*lt(n,end)` window. Convert both boundaries to the delivery rate
-(`60000/1001`) and ceil them: decimal seconds such as `46.596550` are frame
-boundaries, and rounding them to milliseconds can move the first visible frame
-late. The half-open upper bound is deliberate: when adjacent overlays meet, the
-later overlay owns its first frame. FFmpeg's timeline evaluator supplies both
-`n` and `t` per frame and treats a non-zero expression as enabled.
+`gte(n,start)*lt(n,end)` window. It probes the main video stream's
+`r_frame_rate` and ceils both boundaries on that grid: decimal seconds such as
+`46.596550` are frame boundaries, and rounding them to milliseconds can move the
+first visible frame late. Do not assume the delivery rate: an Act II base at
+30 fps must show a `1.0`–`3.0` plate on frames 30 through 89. The half-open upper
+bound is deliberate: when adjacent overlays meet, the later overlay owns its
+first frame. FFmpeg's timeline evaluator supplies both `n` and `t` per frame and
+treats a non-zero expression as enabled.
 `source: /websites/ffmpeg_doxygen_8_0, “Evaluate Timeline Expression”`
 
-A burn-path regression test must use the resolved local H.264 encoder, a
-synthetic `60000/1001` source, and decoded frames on both sides of a boundary.
-Skip only when the resolver cannot provide H.264 encode/decode; a mocked argv
-does not prove a pixel landed.
+A burn-path regression test must use the resolved local H.264 encoder, synthetic
+`60000/1001` and 30 fps sources, and decoded frames on both sides of each
+boundary. Skip only when the resolver cannot provide H.264 encode/decode; a
+mocked argv does not prove a pixel landed. Farm runners must replace any local
+container resolver prefix with native remote `ffmpeg` before submission.
 
 `plan` reads copy from `vocab/casting.yaml`'s `plate:` block — the same file
 that binds a character to a person — so recasting a role changes the on-screen

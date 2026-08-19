@@ -340,7 +340,8 @@ def test_burn_builds_one_enable_gated_overlay_per_plate(tmp_path):
         if any("ffprobe" in str(part) for part in cmd):
             class P:
                 returncode = 0
-                stdout = "20.0\n"
+                stdout = ("60000/1001\n" if any("r_frame_rate" in str(part) for part in cmd)
+                          else "20.0\n")
                 stderr = ""
             return P()
         captured["cmd"] = cmd

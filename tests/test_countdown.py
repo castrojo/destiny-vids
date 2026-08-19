@@ -122,6 +122,53 @@ def test_countdown_burn_changes_on_the_exact_target_frame():
         shutil.rmtree(work, ignore_errors=True)
 
 
+def test_30fps_burn_keeps_a_one_to_three_second_plate_on_frames_30_to_89():
+    """A 30 fps main stream must not inherit the 59.94 delivery grid."""
+    ffmpeg = _require_h264_ffmpeg()
+    work = Path(tempfile.mkdtemp(dir="/tmp", prefix="countdown_30fps_"))
+    try:
+        source = work / "source.mp4"
+        subprocess.run(
+            list(ffmpeg) + ["-v", "error", "-y", "-f", "lavfi",
+                            "-i", "color=black:s=1920x1080:r=30",
+                            "-t", "4", "-c:v", "libx264rgb", "-crf", "0",
+                            str(source)],
+            check=True, capture_output=True,
+        )
+        plates_dir = work / "plates"
+        plates_dir.mkdir()
+        card = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+        card.putpixel((0, 0), (255, 0, 0, 255))
+        card.save(plates_dir / "plate_one.png")
+        output = work / "burn.mp4"
+        plate.burn(
+            source,
+            [{"id": "one", "at": 1.0, "dur": 2.0}],
+            plates_dir,
+            output,
+            ffmpeg=ffmpeg,
+            encode_args=("-c:v", "libx264rgb", "-crf", "0"),
+        )
+
+        frames = work / "frames"
+        frames.mkdir()
+        subprocess.run(
+            list(ffmpeg) + ["-v", "error", "-y", "-i", str(output),
+                            "-vf", "select='eq(n,29)+eq(n,30)+eq(n,89)+eq(n,90)'",
+                            "-vsync", "0", str(frames / "frame_%02d.png")],
+            check=True, capture_output=True,
+        )
+        decoded = sorted(frames.glob("frame_*.png"))
+        assert len(decoded) == 4
+        pixels = [Image.open(path).convert("RGB").getpixel((0, 0))
+                  for path in decoded]
+        assert pixels[0] == (0, 0, 0)
+        assert pixels[1] != (0, 0, 0) and pixels[2] != (0, 0, 0)
+        assert pixels[3] == (0, 0, 0)
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
 def test_plan_uses_the_named_derivative_not_a_source_scan(monkeypatch, tmp_path):
     thread = tmp_path / "thread.json"
     plan = tmp_path / "plan.json"
@@ -165,6 +212,32 @@ def test_builder_defaults_to_the_reachable_farm(monkeypatch, tmp_path):
     assert captured["runner"] is not None
     captured["runner"](["ffmpeg", "-y"])
     assert farmed
+
+
+def test_farm_runner_submits_remote_native_argv(monkeypatch, tmp_path):
+    source = tmp_path / "source.mp4"
+    source.touch()
+    prefix = ["podman", "exec", "dv-ffmpeg", "ffmpeg"]
+    spec = {
+        "source": str(source), "out_file": str(tmp_path / "out.mp4"),
+        "segment_duration": 2.0, "entries": [],
+    }
+    captured = {}
+    monkeypatch.setattr(build_countdown, "plan_countdown", lambda: spec)
+    monkeypatch.setattr(build_countdown.plate, "render_all", lambda *a, **k: [])
+    monkeypatch.setattr(build_countdown.render, "find_ffmpeg", lambda: prefix)
+    monkeypatch.setattr(build_countdown.plate, "burn",
+                        lambda *a, **k: captured.update(k))
+    monkeypatch.setattr(build_countdown.farm, "cluster_available",
+                        lambda: (True, ""))
+    submitted = []
+    monkeypatch.setattr(build_countdown.farm, "run_ffmpeg_on_cluster",
+                        lambda argv, **kwargs: submitted.append(argv))
+
+    build_countdown.build()
+    captured["runner"]([*prefix, "-nostdin", "-y"])
+
+    assert submitted == [["ffmpeg", "-nostdin", "-y"]]
 
 
 def test_print_command_exposes_the_complete_burn_argv(capsys, tmp_path):

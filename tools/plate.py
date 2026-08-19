@@ -3523,6 +3523,28 @@ def _probe_duration(path, ffmpeg=None):
         raise RuntimeError(f"could not read the duration of {path}: {out.stderr}")
 
 
+def _probe_fps(path, ffmpeg=None):
+    """Return the main video stream's nominal frame rate as a ``Fraction``."""
+    probe = ["ffprobe"]
+    if ffmpeg and ffmpeg[-1].endswith("ffmpeg"):
+        probe = [*ffmpeg[:-1], "ffprobe"]
+    out = subprocess.run(
+        [*probe, "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "stream=r_frame_rate", "-of", "csv=p=0", str(path)],
+        capture_output=True, text=True)
+    try:
+        fps = Fraction(out.stdout.strip())
+    except (ValueError, ZeroDivisionError) as exc:
+        raise RuntimeError(f"could not read the frame rate of {path}: {out.stderr}") from exc
+    if fps <= 0:
+        raise RuntimeError(f"could not read the frame rate of {path}: {out.stderr}")
+    return fps
+
+
+def _fps_fraction(fps=None):
+    return Fraction(conform.DELIVERY.fps) if fps is None else Fraction(fps)
+
+
 def _burn_units(entries):
     """One overlay unit per still, and one per ANIMATION GROUP.
 
@@ -3559,31 +3581,31 @@ def _burn_units(entries):
     return units
 
 
-def _frame_index(seconds):
-    """Nearest delivery frame for a manifest boundary."""
+def _frame_index(seconds, fps=None):
+    """Nearest main-stream frame for a manifest boundary."""
     value = seconds if isinstance(seconds, Fraction) else Fraction(str(seconds))
-    value *= Fraction(conform.DELIVERY.fps)
+    value *= _fps_fraction(fps)
     return (value.numerator * 2 + value.denominator) // (2 * value.denominator)
 
 
-def _ceil_frame_index(seconds):
+def _ceil_frame_index(seconds, fps=None):
     value = seconds if isinstance(seconds, Fraction) else Fraction(str(seconds))
-    value *= Fraction(conform.DELIVERY.fps)
+    value *= _fps_fraction(fps)
     return -(-value.numerator // value.denominator)
 
 
-def _frame_enable(start, dur):
-    """Half-open overlay window expressed on the delivery frame grid."""
+def _frame_enable(start, dur, fps=None):
+    """Half-open overlay window expressed on the main frame grid."""
     # The first frame whose timestamp is at/after the start owns the plate;
     # the first frame at/after the end is excluded. Ceil both boundaries so a
     # decimal second such as 12.000 does not drop frame 719 at 11.995.
-    first = _ceil_frame_index(start)
-    last = _ceil_frame_index(start + dur)
+    first = _ceil_frame_index(start, fps)
+    last = _ceil_frame_index(start + dur, fps)
     return f"gte(n\\,{first})*lt(n\\,{last})"
 
 
 def burn_command(video, entries, plates_dir, out_path, duration, ffmpeg=None,
-                 encode_args=None):
+                 encode_args=None, fps=None):
     """Build the complete ffmpeg argv for a plate burn without running it."""
     if ffmpeg is None:
         from tools.render import find_ffmpeg
@@ -3607,11 +3629,11 @@ def burn_command(video, entries, plates_dir, out_path, duration, ffmpeg=None,
     for i, unit in enumerate(units, start=1):
         start = unit["at"]
         label = f"v{i}"
-        enable = _frame_enable(start, unit["dur"])
+        enable = _frame_enable(start, unit["dur"], fps)
         if unit["animation"]:
-            start_frame = _frame_index(start)
+            start_frame = _frame_index(start, fps)
             start_time = float(Fraction(start_frame, 1) /
-                               Fraction(conform.DELIVERY.fps))
+                               _fps_fraction(fps))
             steps.append(
                 f"[{i}:v]tpad=start_duration={start_time:.9f}:start_mode=add:"
                 f"color=black@0[a{i}]"
@@ -3667,8 +3689,9 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
     out_path = Path(out_path).resolve()
     plates_dir = Path(plates_dir).resolve()
     duration = _probe_duration(video, ffmpeg)
+    fps = _probe_fps(video, ffmpeg)
     cmd = burn_command(video, entries, plates_dir, out_path, duration,
-                       ffmpeg=ffmpeg, encode_args=encode_args)
+                       ffmpeg=ffmpeg, encode_args=encode_args, fps=fps)
     print("ffmpeg:", " ".join(ffmpeg))
     if runner is not None:
         runner(cmd)
