@@ -2321,20 +2321,6 @@
       "text_source": "owner_supplied"
     },
     {
-      "id": "mapped_kyle_sup",
-      "kind": "chat",
-      "at": 310.4,
-      "dur": 2.2,
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "seen_at_src": 326.93,
-      "speaker": "kylegospo",
-      "text": "Sup",
-      "text_source": "owner_supplied",
-      "avatar": "renders/avatars/KyleGospo.png",
-      "avatar_url": "https://github.com/KyleGospo.png?size=256"
-    },
-    {
       "id": "mapped_kolunmi_disco",
       "kind": "chat",
       "at": 313.2,
@@ -2347,6 +2333,20 @@
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/kolunmi.png",
       "avatar_url": "https://github.com/kolunmi.png?size=256"
+    },
+    {
+      "id": "mapped_kyle_sup",
+      "kind": "chat",
+      "at": 316.287,
+      "dur": 2.2,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "seen_at_src": 332.817,
+      "speaker": "kylegospo",
+      "text": "Sup",
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/KyleGospo.png",
+      "avatar_url": "https://github.com/KyleGospo.png?size=256"
     },
     {
       "id": "mapped_kyle_reveal",

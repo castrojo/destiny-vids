@@ -533,7 +533,15 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_kyle_sup",
         "kind": "chat",
         "position": "left",
-        "at_film": 310.4,
+        # Owner, 2026-08-19: "Kyle's 'sup' should be at around 10:00 when the
+        # titan nods ... sup is a purple titan ... put it when it's zoomed into
+        # his face." The Titan close-up -- helmet centred behind the purple
+        # Void shield -- is film 317.0, verified by eye. The pill is seated at
+        # 316.287 so its 2.2 s hold SPANS that frame rather than starting on
+        # it: 316.537 is the latest start that still clears KYLE_REVEAL_AT
+        # (318.487 effective) by the readable minimum, and the builder asserts that gap.
+        # Programme 10:00.09.
+        "at_film": 316.287,
         "hold": 2.2,
         "speaker": "kylegospo",
         "text": "Sup",

@@ -818,7 +818,10 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     assert haters["at"] == pytest.approx(308.2, abs=1e-3)
     assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
-    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(310.4, abs=1e-3)
+    # Owner, 2026-08-19: "sup is a purple titan ... put it when it's zoomed
+    # into his face." Film 317.0 is the Titan close-up behind the purple Void
+    # shield -- programme 10:00.8, the "around 10:00" he asked for.
+    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(316.287, abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["speaker"] == "kolunmi"
     assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(313.2, abs=1e-3)
     assert by_id["owner_convo_karena"]["avatar"].endswith("/karena.png")
