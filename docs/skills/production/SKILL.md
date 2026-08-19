@@ -272,6 +272,9 @@ fix, not adding a source list that lies.
 | "I'll upload it and share the video link." | YouTube cannot replace a file. Share the playlist; `yt-refresh.py` swaps the contents. |
 | "I cast it and the command returned, so it's playing." | `catt` **is** the HTTP server. If its process ended, so did the film. `catt status` a minute later, or you have not cast anything. |
 | "I'll wrap the cast in `timeout` so it can't hang." | `timeout` caps the *film*, not the command. It is how a 38-minute programme stops after 90 seconds. |
+| "`catt: command not found` — I'll install it." | It is installed. `~/.local/bin` is not on every agent shell's `PATH`. Export it before installing anything. |
+| "A new build is ready, I'll cast it." | Not from zero. Read the position out of `status` and hand it back with `-t`, or you restart the owner's screening. |
+| "I'll drop the cast log in `work/`." | `work/` is tracked. Session scratch goes in the session folder or `/tmp`. |
 | "This build's duration matches the plan, so it's the current one." | The plan's arithmetic describes the graph, not the acts seated in it. Ask `deliver.py status`, then look at the frame. |
 | "The newest file in `megacut/` is the one to ship." | `~/Videos` is a Syncthing folder and mtimes arrive from other machines. Cast the plan's declared `output`. |
 | "The gameplay trailer has almost nothing clean, the tagging must be wrong." | Gameplay trailers have HUD in the footage. That is what the tier is for. |
