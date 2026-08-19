@@ -18,7 +18,7 @@ python3 tools/dialogue_md.py apply yt_curse_of_osiris_opening_cinematic
 
 ## d01 | clubanderson | 0:35.96 -> 0:41.99
 
-Wow, what a mess. Who uses their computers this way?
+What a shitshow
 
 ## d02 | mrbobbytables | 0:42.00 -> 0:45.55
 
@@ -92,9 +92,13 @@ New fork, pushing!
 
 You keep picking the places where they shoot at us.
 
-## d20 | mrbobbytables | 2:01.44 -> 2:08.91
+## d20a | mrbobbytables | 2:01.44 -> 2:04.91
 
-We need to split up, I told you this was too dangerous!
+Everyone forgot how to use KVM! We need to split up
+
+## d20b | mrbobbytables | 2:04.92 -> 2:08.91
+
+Everyone's making their own and it's all bad!
 
 ## d21 | mrbobbytables | 2:08.92 -> 2:13.95
 
@@ -104,9 +108,13 @@ They've broken out of the sandbox
 
 You need to get a message to the Kubernetes Maintainers
 
-## d23 | clubanderson | 2:14.64 -> 2:17.59
+## d23a | clubanderson | 2:14.64 -> 2:16.11
 
-The open rate of maintainer emails is 7% I don't like this plan
+The open rate of maintainer emails is 7%
+
+## d23b | clubanderson | 2:16.12 -> 2:17.59
+
+I don't like this plan
 
 ## d24 | mrbobbytables | 2:17.60 -> 2:22.27
 

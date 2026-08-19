@@ -29,8 +29,9 @@
       "end_sec": 41.99,
       "character": "sagira",
       "evidence": "owner_supplied",
-      "text": "Wow, what a mess. Who uses their computers this way?",
-      "text_source": "owner_supplied"
+      "text": "What a shitshow",
+      "text_source": "owner_supplied",
+      "recovered_text": "Wow, what a mess. Who uses their computers this way?"
     },
     {
       "id": "d02",
@@ -195,12 +196,21 @@
       "text_source": "owner_supplied"
     },
     {
-      "id": "d20",
+      "id": "d20a",
       "start_sec": 121.44,
+      "end_sec": 124.91,
+      "character": "osiris",
+      "evidence": "owner_supplied",
+      "text": "Everyone forgot how to use KVM! We need to split up",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "d20b",
+      "start_sec": 124.92,
       "end_sec": 128.91,
       "character": "osiris",
       "evidence": "owner_supplied",
-      "text": "We need to split up, I told you this was too dangerous!",
+      "text": "Everyone's making their own and it's all bad!",
       "text_source": "owner_supplied"
     },
     {
@@ -222,12 +232,21 @@
       "text_source": "owner_supplied"
     },
     {
-      "id": "d23",
+      "id": "d23a",
       "start_sec": 134.64,
+      "end_sec": 136.11,
+      "character": "sagira",
+      "evidence": "owner_supplied",
+      "text": "The open rate of maintainer emails is 7%",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "d23b",
+      "start_sec": 136.12,
       "end_sec": 137.59,
       "character": "sagira",
       "evidence": "owner_supplied",
-      "text": "The open rate of maintainer emails is 7% I don't like this plan",
+      "text": "I don't like this plan",
       "text_source": "owner_supplied"
     },
     {
@@ -249,5 +268,20 @@
       "text_source": "owner_supplied"
     }
   ],
-  "dropped": []
+  "dropped": [
+    {
+      "id": "d20",
+      "start_sec": 121.44,
+      "end_sec": 128.91,
+      "raw": "We need to split up, I told you this was too dangerous!",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d23",
+      "start_sec": 134.64,
+      "end_sec": 137.59,
+      "raw": "The open rate of maintainer emails is 7% I don't like this plan",
+      "reason": "removed by the owner while rewriting the conversation"
+    }
+  ]
 }

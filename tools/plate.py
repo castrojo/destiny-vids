@@ -2255,6 +2255,14 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
         # .wolves-guardian-plate-raised { bottom: auto; top: 28% } -- for a
         # Guardian who towers above the frame's lower third.
         y = py + int(ph * RAISED_TOP)
+    if position == "top-right":
+        # Title-card sign in the picture's top-right safe area. Measure both
+        # edges against the picture so letterboxed footage keeps the card on
+        # the image rather than on a matte.
+        x = px + int(pw * (1 - MARGIN_X)) - plate.width
+        y = py + int(ph * MARGIN_X)
+        frame.alpha_composite(plate, (x, y))
+        return frame
     if position == "caption":
         # Top-safe rail, horizontally centred on the picture.
         x = px + (pw - plate.width) // 2

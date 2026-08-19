@@ -27,6 +27,11 @@ The deck's other shapes are the title card (`title`, `subtitle`, `body[]`) and
 the **chat card** (`speaker`, `text`) —
 [`references/conversation-cards.md`](references/conversation-cards.md).
 
+A title card may use `position: "top-right"` for a sign in the picture's
+upper-right safe area. The renderer measures both margins against the detected
+picture rectangle, so the card stays on the image when the source is
+letterboxed.
+
 Keep chat `text` verbatim. An owner-retired authored card remains complete in
 the generator's `RETIRED` record, including timing and identity fields, and is
 removed from active pass data; never preserve a partial duplicate.

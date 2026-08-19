@@ -8,6 +8,7 @@ rather than quietly replacing the recovered wording.
 import json
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -243,3 +244,16 @@ def test_the_placeholder_cue_renders_credited_to_nobody():
     assert plate_spec["speaker"] == "TBD"
     assert plate_spec["speaker_pending"] == "osiris"
     assert plate_spec["text"]
+
+
+def test_act_three_fixed_deck_has_gold_bob_and_top_right_email_sign():
+    doc = json.loads(Path("stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json").read_text())
+    by_id = {p["id"]: p for p in doc["plates"]}
+    bob = by_id["mrbobbytables-gold"]
+    assert bob["name"] == "Bob Killen"
+    assert bob["variant"] == "leader"
+    sign = by_id["maintainer-emails"]
+    assert sign["position"] == "top-right"
+    assert sign["title"] == "Maintainers Reading Emails"
+    assert sign["subtitle"] == "And Other Preposterous Tales"
+    assert sign["body"] == ["Summer 2027"]

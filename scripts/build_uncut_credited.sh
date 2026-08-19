@@ -96,21 +96,25 @@ else
     echo "    omitted: dialogue pills carry the owner-authored speaker identities"
 fi
 
-echo "==> 2/3 dialogue, around the reveals"
-python3 tools/dialogue.py "$WORK/cut.json" --video-id "$VIDEO_ID" \
-    --around "$WORK/leads.json" --out "$WORK/chat.json"
-
-echo "==> 3/3 the ensemble, around both"
-FIXED_INPUTS=("$WORK/leads.json" "$WORK/chat.json")
+echo "==> fixed cards and lead reveals"
+FIXED_INPUTS=("$WORK/leads.json")
 if [ -f "$FIXED_MANIFEST" ]; then
     FIXED_INPUTS+=("$FIXED_MANIFEST")
 fi
 python3 tools/plate.py merge "${FIXED_INPUTS[@]}" --out "$WORK/fixed.json"
+
+echo "==> 2/3 dialogue, around the fixed cards"
+python3 tools/dialogue.py "$WORK/cut.json" --video-id "$VIDEO_ID" \
+    --around "$WORK/fixed.json" --out "$WORK/chat.json"
+
+echo "==> 3/3 the ensemble, around both"
+python3 tools/plate.py merge "$WORK/fixed.json" "$WORK/chat.json" \
+    --out "$WORK/fixed-with-chat.json"
 python3 tools/plate.py plan "$WORK/cut.json" --roster "$ROSTER" \
-    --only ensemble --hold 2.6 --around "$WORK/fixed.json" \
+    --only ensemble --hold 2.6 --around "$WORK/fixed-with-chat.json" \
     --out "$WORK/ensemble.json"
 
-python3 tools/plate.py merge "${FIXED_INPUTS[@]}" "$WORK/ensemble.json" \
+python3 tools/plate.py merge "$WORK/fixed-with-chat.json" "$WORK/ensemble.json" \
     --out "$MANIFEST"
 
 echo "==> redact burned-in copy${MUSIC:+ and score}"
