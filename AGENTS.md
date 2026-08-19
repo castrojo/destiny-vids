@@ -123,6 +123,15 @@ Find what is still unwritten with `python3 tools/placeholder.py list`.
 `--check` exits non-zero for anyone gating a *final* cut; CI does not run it,
 because CI must stay green while copy is being written.
 
+**Prose that is written but cannot be read in the time it is up is the same
+gap one step later.** `dur` is authored by hand and nothing derives it from
+the words, so a two-word pill and a twelve-word pill can both sit on screen
+for 1.2 seconds. `python3 tools/readtime.py` lists every plate held shorter
+than its own copy needs, and takes the same posture as `placeholder.py`: it
+reports, exits 0, and only `--check` fails. **It never re-times anything** —
+widening a hold shoves the beat after it, and moving an authored beat is the
+owner's call.
+
 **Three classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, and a licensing decision. An agent that
 reaches one, records `automatable: no` with the missing decision in
