@@ -734,16 +734,6 @@ MAPPED_PASS = [
         "text": "Let's get these numbers up",
     },
     {
-        "id": "mapped_lionheartp_hardware",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 183.5,
-        "hold": 2.7,
-        "avatar_login": "LionHeartP",
-        "speaker": "LionHeartP",
-        "text": "Why spend the extra dollar to support Linux hardware",
-    },
-    {
         "id": "walk_ge_glorious",
         "kind": "chat",
         "position": "left",
@@ -869,6 +859,11 @@ OWNER_CONVO_AT = 231.5
 RETIRED = {
     "extra_dollar_line": {
         "id": "mapped_lionheartp_hardware",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 183.5,
+        "hold": 2.7,
+        "avatar_login": "LionHeartP",
         "speaker": "LionHeartP",
         "text": "Why spend the extra dollar to support Linux hardware",
     },

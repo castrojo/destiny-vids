@@ -598,8 +598,6 @@ def test_the_mapped_megacut_pass_rewrites_the_walk_window_verbatim():
     assert by_id["walk_ge_stream"]["text"] == "It's your patch, turn the stream on"
     assert by_id["walk_a1rm4x"]["speaker"] == "LionHeartP"
     assert by_id["walk_a1rm4x"]["text"] == "Let's get these numbers up"
-    assert by_id["mapped_lionheartp_hardware"]["text"] == (
-        "Why spend the extra dollar to support Linux hardware")
     assert by_id["walk_ge_glorious"]["text"] == (
         "There's nothing glorious about this job")
     assert by_id["walk_ge_lesson"]["speaker"] == "LionHeartP"
@@ -1466,12 +1464,26 @@ def test_ogc_banner_uses_top_letterbox_lane():
     assert banners and all(p["position"] == "letterbox-top" for p in banners)
 
 
+def test_task_4_retires_extra_dollar_chat_without_building_it():
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert "mapped_lionheartp_hardware" not in by_id
+    assert build_efmb_plates.RETIRED["extra_dollar_line"] == {
+        "id": "mapped_lionheartp_hardware",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 183.5,
+        "hold": 2.7,
+        "avatar_login": "LionHeartP",
+        "speaker": "LionHeartP",
+        "text": "Why spend the extra dollar to support Linux hardware",
+    }
+
+
 def test_task_4_split_copy_is_exact():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     expected = {
         "late_metrics_1": "Projects Teams Metrics are strong",
         "late_metrics_2": "They just need mentoring in the right skills",
-        "mapped_lionheartp_hardware": "Why spend the extra dollar to support Linux hardware",
         "mapped_lionheartp_together_1": "When we work together",
         "mapped_lionheartp_together_2": "This gets easier",
         "mapped_eggroll_title_1": "Nice work testing that patch",

@@ -27,8 +27,11 @@ The deck's other shapes are the title card (`title`, `subtitle`, `body[]`) and
 the **chat card** (`speaker`, `text`) —
 [`references/conversation-cards.md`](references/conversation-cards.md).
 
-Keep chat `text` verbatim. When an owner requests a swear censor, use the
-Kubernetes helm only as an `o` replacement: add a `censor` entry whose `find`
+Keep chat `text` verbatim. An owner-retired authored card remains complete in
+the generator's `RETIRED` record, including timing and identity fields, and is
+removed from active pass data; never preserve a partial duplicate.
+When an owner requests a swear censor, use the Kubernetes helm only as an `o`
+replacement: add a `censor` entry whose `find`
 value occurs exactly once and whose `replace` value uses `{k8s}`.
 `tools/plate.py` replaces that token with the cached official white helm; it
 does not alter the authored source string. Use an asterisk for other letters,
