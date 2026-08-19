@@ -50,9 +50,19 @@ jobs:
 
       # tools/plate.py draws with DejaVu Sans Mono and refuses to substitute a
       # font, because a plate in the wrong face matches none of the other
-      # videos. The runner may not carry it.
+      # videos. The runner usually already carries it, so look before
+      # reaching for apt: `apt-get update` talks to a mirror, and when that
+      # mirror stalls the step hangs indefinitely. That is not theoretical --
+      # it is what wedged the run that held the concurrency group for 5h44m.
       - name: Install the plate font
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-dejavu-core
+        timeout-minutes: 5
+        run: |
+          if [ -f /usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf ]; then
+            echo "DejaVu Sans Mono is already present"
+          else
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq fonts-dejavu-core
+          fi
 
       - name: Install dependencies
         run: pip install --quiet jsonschema pyyaml pytest pillow
