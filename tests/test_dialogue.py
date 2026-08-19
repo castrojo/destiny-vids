@@ -9,6 +9,7 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from tools import dialogue, plate  # noqa: E402
+from tools.derive import load_leads  # noqa: E402
 
 
 LEADS = {
@@ -164,6 +165,39 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
             "Bob Killen."
         ),
     }
+
+
+@pytest.mark.parametrize(
+    "cue_id, expected",
+    [
+        ("d20a", (121.44, 124.91, "osiris")),
+        ("d20b", (124.92, 128.91, "osiris")),
+        ("d21", (128.92, 133.95, "osiris")),
+        ("d23a", (134.64, 136.11, "sagira")),
+        ("d23b", (136.12, 137.59, "sagira")),
+    ],
+)
+def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cue = next(cue for cue in data["cues"] if cue["id"] == cue_id)
+    assert (cue["start_sec"], cue["end_sec"], cue["character"]) == expected
+
+
+def test_act3_review_cue_splits_keep_the_owner_marked_hundredth_adjacency():
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cues = {cue["id"]: cue for cue in data["cues"]}
+    for earlier, later in (("d20a", "d20b"), ("d20b", "d21"), ("d23a", "d23b")):
+        assert cues[later]["start_sec"] == cues[earlier]["end_sec"] + 0.01
+
+
+def test_act3_fixed_gold_bob_plate_matches_authored_copy_and_leader_variant():
+    manifest = json.loads(
+        Path("stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json")
+        .read_text(encoding="utf-8")
+    )
+    gold = next(plate for plate in manifest["plates"] if plate["id"] == "mrbobbytables-gold")
+    expected = dict(load_leads()["osiris"]["plate"], variant="leader")
+    assert {field: gold[field] for field in expected} == expected
 
 
 def test_the_act3_retirement_copy_is_uncast_chat_before_the_wolf_day_shot():
