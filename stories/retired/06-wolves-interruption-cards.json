@@ -2,8 +2,10 @@
   "_what": "The slides for act VI's INTERRUPTION (issue #104, the owner's solution to #95): at bed 322.200 the song pauses, the CNCF Ambassadors interrupt the film, and the gameplay-trailer clip is played to the audience with its own effects and score. These are the three full-screen stills the pause is built from; the clip itself is footage and lives in scripts/build_wolves.py (CLIP_IN/CLIP_OUT, source clock).",
   "_copy": "Every string here is OWNER-AUTHORED and reproduced VERBATIM, including the spaced ellipsis in 'Introducing ...'. Card C uses Amber Graner's existing authored Guardian identity from vocab/casting.yaml; Cortney Nickerson appears only in the Act I intro.",
   "_rights": "The CNCF MARK (logo) is NOT on the slide: the rights to it have not been cleared, and rights are one of the two things that genuinely stop work. The slide is the owner-authored line as text only, until the owner says otherwise.",
-  "_render": "scripts/build_interruption_cards.py renders these to renders/interruption/<id>.png, flattened onto OPAQUE BLACK (a transparent PNG concatenated as a still is the megacut skill's standing red flag). scripts/build_wolves.py consumes them via its interruption() helper, falling back to a marker card if a slide is missing (degrade, never block).",
+  "_render": "The former interruption cards were full-frame stills flattened onto OPAQUE BLACK; this retired record preserves their authored copy and render contract without making them active build inputs.",
   "_clocks": "dur is ACT-FILM seconds and must equal the matching constant in scripts/build_wolves.py (SILENCE_LEN / SLIDE_LEN / PLATE_LEN) -- a test pins the two together. None of these beats consumes BED time: the song stays paused at bed 322.200 across all of them.",
+  "_status": "retired",
+  "_retired": "Act VI now hands directly from Act III-B to Act III-C at bed 322.200. The authored card copy is retained here for provenance; this record is not an active build input.",
   "cards": [
     {
       "id": "a-silence",
@@ -34,7 +36,8 @@
       "note": "C: the name. 'Introducing ...' is the owner-authored framing line from issue #104, verbatim; the plate reproduces Amber Graner's existing authored Guardian identity from vocab/casting.yaml. Also under the hold-music slot."
     }
   ],
-  "unresolved": [
+  "_retired_unresolved": [
     "CNCF MARK, TODO(owner): the slide carries the owner-authored line only. If the rights to use the CNCF logo are cleared, the mark joins the text on card B."
-  ]
+  ],
+  "unresolved": []
 }

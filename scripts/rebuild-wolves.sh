@@ -25,16 +25,13 @@ OUT=renders/07-wolves-timing-pass.mp4
 REVIEW=${REVIEW_DIR:-$HOME/Videos/destiny-cuts-review}/07-seven-days-to-the-wolves-review.mp4
 
 BED_GAIN=${BED_GAIN:--3.5}
-SOURCE_GAIN=${SOURCE_GAIN:--1.5}   # the insert brings its own peaks; see AUDIO
-
-echo "==> shotlist"
-"$PY" scripts/build_wolves.py
+SOURCE_GAIN=${SOURCE_GAIN:--1.5}   # source-audio slots bring their own peaks; see AUDIO
 
 echo "==> summit plates"
 "$PY" scripts/build_summit_plates.py --fetch
 
-echo "==> interruption cards"
-"$PY" scripts/build_interruption_cards.py
+echo "==> shotlist"
+"$PY" scripts/build_wolves.py
 
 echo "==> picture"
 DESTINY_FFMPEG="$FF" "$PY" tools/render.py "$SHOTLIST" \
@@ -55,22 +52,9 @@ shotlist, out = sys.argv[1], sys.argv[2]
 FF = os.environ.get("DESTINY_FFMPEG", "/home/linuxbrew/.linuxbrew/bin/ffmpeg")
 shots = json.load(open(shotlist))["shots"]
 
-# Where does the film play its own audio? That region is the one place a
-# missing audio track is INAUDIBLE as a bug: the bed is muted there by design,
-# so a silent insert sounds exactly like a working pause.
-#
-# The interruption (#104) adds the inverse fault: a `silent` beat -- or the
-# `hold` slot while no track is cleared -- that is AUDIBLE is the bed leaking
-# into the pause. Both directions are measured here, from the shotlist's own
-# wall clock.
-wall, inserts, silences = 0.0, [], []
-for s in shots:
-    audio = s.get("audio", "bed")
-    if audio == "source":
-        inserts.append((wall, s["duration"]))
-    elif audio in ("silent", "hold") and not s.get("audio_from"):
-        silences.append((wall, s["duration"], audio))
-    wall += s["duration"]
+# The timing pass is continuous: every shot carries the bed, so there are no
+# special interruption windows to audit here. The delivered true-peak gate
+# below remains the final audio check.
 
 
 def measure(start, dur):
@@ -84,19 +68,6 @@ def measure(start, dur):
 
 
 fail = []
-for start, dur in inserts:
-    db = measure(start, dur)
-    print(f"    insert  @{start:7.2f}s  {dur:5.2f}s  rms {db:6.1f} dB")
-    if db < -60:
-        fail.append(f"the insert at {start:.2f}s is SILENT ({db:.1f} dB). "
-                    "yt-dlp DASH formats are video-only -- fetch audio too.")
-
-for start, dur, audio in silences:
-    db = measure(start, dur)
-    print(f"    {audio:6s} @{start:7.2f}s  {dur:5.2f}s  rms {db:6.1f} dB")
-    if db >= -60:
-        fail.append(f"the {audio} beat at {start:.2f}s is AUDIBLE "
-                    f"({db:.1f} dB) -- the bed is leaking into the pause.")
 
 peak = None
 for line in subprocess.run(

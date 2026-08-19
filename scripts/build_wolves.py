@@ -83,8 +83,6 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-from tools.marker import marker_path  # noqa: E402
-
 BED = json.loads((REPO / "music/bed_seven_days_to_the_wolves.json").read_text())
 END = BED["duration_sec"]                       # 423.993
 
@@ -133,18 +131,16 @@ def _rel(path):
         return str(path)
 
 
-def summit(slot, fallback_text, fallback_sub):
-    """A summit photograph, or the marker card it replaces if it is missing.
+def summit(slot, fallback_text=None, fallback_sub=None):
+    """Return the committed summit-plate path for a slot.
 
-    Degrade, never block: an absent plate is reported by the plate builder and
-    the cut still renders, with the slot's original marker in place.
+    The path is an authored part of the timing pass, not a cache probe. A
+    missing photograph degrades when ``tools/render.py`` reads the record and
+    reports the missing still; probing here would make the committed record
+    depend on which ignored renders happen to exist.
     """
-    plate = SUMMIT_DIR / f"{slot}.jpg"
-    if plate.exists():
-        return _rel(plate)
-    print(f"  MISSING PLATE {slot}: falling back to the marker card",
-          file=sys.stderr)
-    return _rel(marker_path(fallback_text, fallback_sub))
+    del fallback_text, fallback_sub  # kept for the call sites' editorial labels
+    return _rel(SUMMIT_DIR / f"{slot}.jpg")
 
 
 # --- sources -----------------------------------------------------------------

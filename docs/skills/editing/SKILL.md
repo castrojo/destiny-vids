@@ -31,6 +31,12 @@ verify the direct hand-off: no replacement silence, slide, plate, gameplay run,
 or bed pause may remain, and every later music and credit anchor must still be
 measured on the same bed clock.
 
+**Active records describe the current state.** When an excision changes the
+film clock, rewrite the duration, windows, fades, and source-boundary evidence
+in the active manifest together. Keep superseded authored copy only under an
+explicit `retired` record, and do not leave old offsets or resolved rights
+questions in active prose for a status check to report.
+
 **The fiction bends to the footage.** When a beat finds nothing, rewrite the
 beat — do not widen the pool to unclean footage, and do not invent a shot.
 

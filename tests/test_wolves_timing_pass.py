@@ -87,6 +87,24 @@ def test_amber_interruption_is_removed_because_act_two_now_owns_it(cut):
     assert all(s["audio"] == "bed" for s in cut["shots"])
 
 
+def test_act_three_b_hands_directly_to_act_three_c_at_322_2(cut):
+    """The removed section leaves a picture-and-bed-contiguous hand-off."""
+    wall = 0.0
+    for index, shot in enumerate(cut["shots"]):
+        end = wall + shot["duration"]
+        if end == pytest.approx(build_wolves.ACT3C_IN, abs=0.001):
+            assert "III. the montage runs" in shot["beat"]
+            following = cut["shots"][index + 1]
+            assert following["audio"] == "bed"
+            assert following["video_id"] == build_wolves.COMP
+            assert following["start_sec"] == pytest.approx(build_wolves.PALE_IN)
+            assert not following.get("still")
+            assert "INTERRUPTION" not in following["beat"]
+            return
+        wall = end
+    raise AssertionError("the Act III-B -> Act III-C hand-off is missing")
+
+
 def test_no_shot_is_used_twice(cut):
     """The first cut replayed 25 shots to fill a span. Never again."""
     seen = set()
@@ -413,14 +431,85 @@ def test_the_summit_photographs_are_never_captioned(cut):
     slots = [s for s in cut["shots"]
              if s["beat"].startswith(("I. SUMMIT", "III. SUMMIT"))]
     assert slots, "the summit slots vanished"
-    if any(Path(s["still"]).parent.name == MARKER_DIR.name for s in slots):
-        pytest.skip("summit photographs are not generated in this checkout")
     for shot in slots:
         still = Path(shot["still"])
         assert still.suffix == ".jpg", still
         assert still.parent.name == "summit-plates", still
         assert MARKER_DIR not in still.parents, "a marker renders text"
         assert "plate" not in shot and "name" not in shot
+
+
+def test_summit_slots_have_deterministic_builder_paths(cut):
+    """The committed record names the plate even when the cache is absent."""
+    from scripts.build_wolves import ACT1_EDITS, SUMMIT_DIR, TRAILER_CARDS, summit
+    from tools.marker import DEFAULT_DIR as MARKER_DIR
+
+    wanted = {kind for _, _, kind, _ in ACT1_EDITS if kind != "cut"}
+    wanted |= {slot for _, _, _, slot in TRAILER_CARDS}
+    wanted.add("enemy_cu")
+    slots = {s["beat"].split("--", 1)[1].strip() for s in cut["shots"]
+             if s["beat"].startswith(("I. SUMMIT", "III. SUMMIT"))}
+    assert len(slots) == len(wanted)
+    for shot in (s for s in cut["shots"]
+                 if s["beat"].startswith(("I. SUMMIT", "III. SUMMIT"))):
+        slot = Path(shot["still"]).stem
+        expected = build_wolves._rel(SUMMIT_DIR / f"{slot}.jpg")
+        assert shot["still"] == expected
+        assert shot["still"] != str(MARKER_DIR / f"{slot}.png")
+        assert summit(slot, "unused", "unused") == expected
+
+
+def test_act_vi_record_and_delivery_graph_retire_the_interruption(cut):
+    """Authored interruption copy remains retired, not an active input."""
+    retired = REPO / "stories" / "retired" / "06-wolves-interruption-cards.json"
+    active = REPO / "stories" / "06-wolves-interruption-cards.json"
+    assert not active.exists()
+    record = json.loads(retired.read_text())
+    assert record["_status"] == "retired"
+    assert record["unresolved"] == []
+    assert record["cards"][1]["title"] == \
+        "The CNCF Ambassadors would like a moment."
+    delivery = json.loads(
+        (REPO / "stories" / "megacut" / "delivery.json").read_text())
+    sources = delivery["masters"]["VI"]["sources"]
+    assert not any("interruption" in source for source in sources)
+    assert delivery["masters"]["VI"]["note"].startswith(
+        "the current no-interruption Act VI master (423.993 s)")
+    assert cut["shots"][-1]["duration"] == pytest.approx(423.993 - 411.7)
+
+
+def test_tail_plates_map_to_current_timing_pass_shots(cut):
+    """Every tail plate keeps a source window and a current film anchor."""
+    manifest = json.loads((REPO / "stories" / "06-wolves-cayde-plates.json").read_text())
+    expected = {
+        "cayde_reveal_castrojo": ("wolves_act4", [0.0, 50.5]),
+        "gold_kelsey_hightower": ("wolves_act4", [0.0, 50.5]),
+        "gold_brian_ketelsen": ("wolves_act4", [0.0, 50.5]),
+        "gold_angie_jones": ("wolves_act4", [0.0, 50.5]),
+        "castrojo_line_1": ("wolves_act2", [200.965, 210.0]),
+        "castrojo_line_2": ("wolves_act2", [200.965, 210.0]),
+        "castrojo_line_3": ("wolves_act2", [200.965, 210.0]),
+        "castrojo_line_4": ("wolves_act4", [0.0, 50.5]),
+        "castrojo_line_5": ("wolves_act4", [0.0, 50.5]),
+        "castrojo_line_6": ("wolves_act4", [0.0, 50.5]),
+    }
+    by_id = {p["id"]: p for p in manifest["plates"]}
+    assert set(expected) <= set(by_id)
+    assert 443.463 - manifest["_film_sec"] == pytest.approx(19.470)
+    wall = 0.0
+    shots = []
+    for shot in cut["shots"]:
+        shots.append((wall, wall + shot["duration"], shot))
+        wall += shot["duration"]
+    for ident, (video_id, source_window) in expected.items():
+        plate = by_id[ident]
+        containing = next((shot for start, end, shot in shots
+                           if start <= plate["at"] < end), None)
+        assert containing is not None, ident
+        assert containing["video_id"] == video_id
+        assert plate["shot_film"] == pytest.approx(source_window)
+        assert plate["seen_at_film"] == pytest.approx(plate["at"])
+
 
 
 def test_the_hunter_run_credits_nobody_on_screen(cut):

@@ -40,7 +40,7 @@
   },
   {
    "segment_id": "card_002",
-   "still": "renders/markers/comic-placeholder-film-1-21-the-black-th-17e9497d.png",
+   "still": "renders/summit-plates/act1_black_1.jpg",
    "duration": 3.016,
    "beat": "I. SUMMIT -- film 1:21 -- the black; the owner asked for it gone, and it becomes the summit instead",
    "audio": "bed"
@@ -69,7 +69,7 @@
   },
   {
    "segment_id": "card_005",
-   "still": "renders/markers/comic-placeholder-film-1-55-black-79ae2b98.png",
+   "still": "renders/summit-plates/act1_black_2.jpg",
    "duration": 1.374,
    "beat": "I. SUMMIT -- film 1:55 -- black",
    "audio": "bed"
@@ -109,7 +109,7 @@
   },
   {
    "segment_id": "card_009",
-   "still": "renders/markers/comic-placeholder-film-2-45-black-15b6e3ec.png",
+   "still": "renders/summit-plates/act1_black_3.jpg",
    "duration": 2.078,
    "beat": "I. SUMMIT -- film 2:45 -- black",
    "audio": "bed"
@@ -184,7 +184,7 @@
   },
   {
    "segment_id": "card_016",
-   "still": "renders/markers/comic-placeholder-4-33-4-37-enemy-cu-9cd1d516.png",
+   "still": "renders/summit-plates/enemy_cu.jpg",
    "duration": 3.51,
    "beat": "III. SUMMIT -- the whole Contributor Summit, over the enemy CU",
    "audio": "bed"
@@ -221,7 +221,7 @@
   },
   {
    "segment_id": "card_020",
-   "still": "renders/markers/comic-placeholder-7-raids-card-39d605b4.png",
+   "still": "renders/summit-plates/raids.jpg",
    "duration": 1.966,
    "beat": "III. SUMMIT -- over the 7 RAIDS card",
    "audio": "bed"
@@ -239,7 +239,7 @@
   },
   {
    "segment_id": "card_022",
-   "still": "renders/markers/comic-placeholder-endless-buildcrafting--718d0698.png",
+   "still": "renders/summit-plates/buildcrafting.jpg",
    "duration": 1.967,
    "beat": "III. SUMMIT -- over the ENDLESS BUILDCRAFTING card",
    "audio": "bed"
