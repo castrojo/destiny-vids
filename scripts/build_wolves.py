@@ -511,57 +511,20 @@ def build():
         "slide the owner asked to cut would be back on screen.")
     t.at_bed(PAUSE_AT, "Act III-B")
 
-    # ---- the interruption: the song is paused and the clip is PRESENTED ----
-    # Issue #104, which supersedes #95: the clip is not hidden, it is played
-    # to the audience. Four beats, all free -- the bed clock does not advance
-    # across any of them (asserted below), so this costs the song nothing.
+    # ---- the interruption: REMOVED --------------------------------------
+    # Owner, 2026-08-19: "I asked for the amber section to be removed from
+    # the wolves song and instead they made it better, get rid of it lol this
+    # moved to the endless song."
     #
-    # A -- 1.0 s of black and true silence: the realization, before anything
-    # appears. `audio="silent"` is a promise this beat stays silent forever.
-    t.card(interruption("a-silence", "INTERMISSION", "the song stops"),
-           SILENCE_LEN,
-           "III. INTERRUPTION A -- the song stops; a held beat of black before "
-           "anything appears (issue #104)", audio="silent")
-    # B -- the Ambassadors' slide. Copy owner-authored in #104 and reproduced
-    # VERBATIM; the CNCF mark itself is rights-blocked, so the slide is text
-    # only. `audio="hold"` is the hold-music slot, and it now CARRIES A TRACK:
-    # Local Forecast - Slower, CC BY 4.0 (Kevin MacLeod / Incompetech).
-    # Commercial use, sync and redistribution are all permitted; attribution is
-    # the only condition and is reproduced verbatim in ATTRIBUTIONS.md and in
-    # music/bed_local_forecast_slower.json.
+    # Interruptions A-D (black/silence, the CNCF ambassadors' card, Amber
+    # Graner's nameplate, and the clip) existed only to present Amber, and
+    # she is presented in act II now. The block was FREE by construction --
+    # its own note said "the bed clock does not advance across any of them"
+    # -- so removing it costs the song nothing and moves no other beat.
     #
-    # The slot was left silent "until a track is cleared". Four cleared tracks
-    # had already been found and verified on #104 -- picking between assets
-    # that are ALREADY cleared is taste, not a licensing decision, and it never
-    # blocked anything. See AGENTS.md, "A rights DECISION blocks. A rights
-    # CHOICE does not."
-    t.card(interruption("b-ambassadors", "INTERRUPTION B", "slide missing"),
-           SLIDE_LEN,
-           "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' "
-           "(owner-authored, verbatim; hold music: Local Forecast - Slower, "
-           "CC BY 4.0, credited in ATTRIBUTIONS.md)", audio="hold",
-           audio_from={"video_id": HOLD_MUSIC_ID,
-                       "start_sec": HOLD_MUSIC_IN})
-    # C -- introducing Amber Graner with her existing authored Guardian
-    # identity. Cortney Nickerson appears only in the Act I intro.
-    t.card(interruption("c-amber", "INTERRUPTION C", "nameplate missing"),
-           PLATE_LEN,
-           "III. INTERRUPTION C -- Introducing Amber Graner with her authored "
-           "Guardian identity (hold music continues)", audio="hold",
-           audio_from={"video_id": HOLD_MUSIC_ID,
-                       "start_sec": HOLD_MUSIC_IN})
-    # D -- the clip, with its OWN effects and score: the polite hold music is
-    # smashed out by the explosion. That is the joke, and it is why #95's
-    # with-music mix is no longer a defect. SOURCE clock 43.000 -> 53.470 --
-    # option B of the owner's correction on #104; see the constants above.
-    t.run(GAMEPLAY, CLIP_IN, CLIP_LEN,
-          "III. INTERRUPTION D -- the clip plays to the audience with its own "
-          "effects and score (issue #104; supersedes #95, whose SFX-only mix "
-          "does not exist): the explosion, then the transcendence portrait, "
-          "held to the cut at source 53.470. Amber Graner's moment, "
-          "introduced on the card before it.",
-          audio="source")
-    t.at_bed(PAUSE_AT, "the interruption consumed no bed time")
+    # Issue #104's authored copy is not re-authored anywhere: it is kept in
+    # stories/06-wolves-interruption-cards.json, which is where it was
+    # already recorded, so restoring this never means rewriting it.
 
     # ---- Act III-C: the Pale Heart, around the excised Ghost sequence ------
     pale_out = 361.200

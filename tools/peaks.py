@@ -23,6 +23,7 @@ import re
 import shlex
 import subprocess
 import sys
+import math
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +51,8 @@ DELIVERED_BAND_MARGIN_DB = 0.2
 
 # Below this far under target, say so: safe, but quieter than the other cuts.
 QUIET_WARN_DB = 1.0
+# A correction that moves the measured peak by less than this bought nothing.
+NO_PROGRESS_DB = 0.1
 
 
 def measure_true_peak(path, ffmpeg=None):
@@ -105,8 +108,26 @@ def correct_delivered_peak(out_path, gain, target_dbtp, rerun, ffmpeg=None,
     about rather than failed: degrade, never block.
     """
     ceiling = target_dbtp + margin_db
+    gain0, previous = gain, None
     for attempt in range(attempts):
         delivered = measure_true_peak(out_path, ffmpeg)
+        # IS THE GAIN EVEN THE LEVER? `gain` scales the bed; the measurement
+        # is of the MIX. When the peak is set by source audio the bed cannot
+        # touch, every correction attenuates the bed and moves the peak by
+        # nothing -- act III came back 2.2 LU quieter after four corrections
+        # bought 0.0 dB. Quieter-for-nothing is a regression, so revert to
+        # the gain that was actually derived and say why.
+        if previous is not None and abs(previous - delivered) < NO_PROGRESS_DB:
+            log(f"  WARNING: delivered true peak {delivered:+.1f} dBTP "
+                f"did not move "
+                f"when the gain dropped {20 * math.log10(gain / gain0):+.1f} "
+                f"dB -- the peak is not the bed's, so attenuating it only "
+                f"loses level. Reverting to gain {gain0:.3f} and leaving the "
+                f"peak for a person.")
+            if gain != gain0:
+                rerun(gain0)
+            return gain0
+        previous = delivered
         if delivered <= ceiling:
             log(f"  delivered true peak {delivered:+.1f} dBTP")
             if delivered < target_dbtp - QUIET_WARN_DB:
@@ -191,10 +212,11 @@ def trim_master_peak(path, target_dbtp=DEFAULT_TARGET_DBTP, ffmpeg=None,
     gain = correct_delivered_peak(path, 1.0, target_dbtp, rerun, ffmpeg=ffmpeg,
                                   attempts=attempts, log=log,
                                   margin_db=margin_db)
-    if gain == 1.0:
-        # Inside the band: the seed link is the original, byte for byte.
-        orig.unlink()
-        return gain
+    # NO SHORTCUT ON gain == 1.0. It used to mean "never corrected, so it was
+    # in band" -- but the loop now also returns the derived gain when it
+    # REVERTS, having found the peak is not the bed's to move. That file is
+    # still hot, and deleting its pristine original on the old inference
+    # would throw the only good copy away. Measure instead of inferring.
     # The loop does not report whether its last measurement passed, and
     # whether the pristine original may be deleted depends on exactly that.
     if measure_true_peak(path, ffmpeg) > target_dbtp + margin_db:

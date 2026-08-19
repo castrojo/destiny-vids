@@ -88,13 +88,19 @@ def test_corrections_stop_at_the_first_safe_result(monkeypatch):
 def test_a_file_that_stays_hot_is_warned_about_not_blocked(monkeypatch, capsys):
     """Degrade, never block: after the attempt budget the file ships with a
     WARNING, not an exception."""
+    # A CONSTANT peak is the case where the gain is not the lever: the bed is
+    # being attenuated but the mix's peak comes from source audio. Correcting
+    # again only loses level -- act III lost 2.2 LU that way -- so the loop
+    # reverts to the derived gain instead of grinding the budget down. Still
+    # no exception: degrade, never block.
     monkeypatch.setattr(peaks, "measure_true_peak", lambda *a, **k: 0.3)
     reruns = []
     gain = peaks.correct_delivered_peak("out.mp4", 1.0, -1.1,
                                         lambda g: reruns.append(g),
                                         ffmpeg=["ffmpeg"], attempts=3)
-    assert len(reruns) == 2          # measured 3 times, corrected twice
-    assert "WARNING" in capsys.readouterr().out
+    assert gain == 1.0               # the derived gain, not an attenuated one
+    assert reruns[-1] == 1.0         # and the file on disk carries it
+    assert "did not move" in capsys.readouterr().out
 
 
 def test_a_very_quiet_result_is_noted_but_accepted(monkeypatch, capsys):
