@@ -535,7 +535,8 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_kyle_reveal",
         "kind": "guardian",
         "position": "left",
-        "at_film": build_efmb.KYLE_REVEAL_AT,
+        "at_film": (build_efmb.OWNER_REVIEW_BASELINE_ANCHORS[
+            "mapped_kyle_reveal"]["film"] + build_efmb.HALLWAY_REVIEW_CLOCK_SHIFT_SEC),
         "hold": build_efmb.KYLE_REVEAL_SEC,
         "key": "KyleGospo",
         "seen_at_src": build_efmb.SYNC_ANCHOR_SRC,
@@ -546,7 +547,8 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_haters",
         "kind": "miniboss",
         "position": "boss",
-        "at_film": 308.2,
+        "at_film": (build_efmb.OWNER_REVIEW_BASELINE_ANCHORS[
+            "mapped_haters"]["film"] + build_efmb.HALLWAY_REVIEW_CLOCK_SHIFT_SEC),
         "hold": 2.2,
         "seen_at_src": build_efmb.HALLWAY_FRAME_SRC,
         "name": "HATERS",
@@ -555,7 +557,8 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_kyle_sup",
         "kind": "chat",
         "position": "left",
-        "at_film": round(build_efmb.HALLWAY_RETURN_AT + 0.997, 3),
+        "at_film": (build_efmb.OWNER_REVIEW_BASELINE_ANCHORS[
+            "mapped_kyle_sup"]["film"] + build_efmb.HALLWAY_REVIEW_CLOCK_SHIFT_SEC),
         "hold": 2.2,
         "speaker": "kylegospo",
         "text": "Sup",
@@ -565,7 +568,8 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_kolunmi_disco",
         "kind": "chat",
         "position": "left",
-        "at_film": round(build_efmb.HALLWAY_RETURN_AT + 3.797, 3),
+        "at_film": (build_efmb.OWNER_REVIEW_BASELINE_ANCHORS[
+            "mapped_kolunmi_disco"]["film"] + build_efmb.HALLWAY_REVIEW_CLOCK_SHIFT_SEC),
         "hold": 2.2,
         "speaker": "kolunmi",
         "text": "Disco!",
@@ -575,7 +579,8 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_redacted_harbringer",
         "kind": "chat",
         "position": "left",
-        "at_film": round(build_efmb.KYLE_REVEAL_AT + 3.450, 3),
+        "at_film": (build_efmb.OWNER_REVIEW_BASELINE_ANCHORS[
+            "mapped_redacted_harbringer"]["film"] + build_efmb.HALLWAY_REVIEW_CLOCK_SHIFT_SEC),
         "hold": 2.2,
         "speaker": "[redacted]",
         "text": "Harbringer to the TOC",
@@ -584,7 +589,8 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_redacted_ready",
         "kind": "chat",
         "position": "left",
-        "at_film": round(build_efmb.KYLE_REVEAL_AT + 5.900, 3),
+        "at_film": (build_efmb.OWNER_REVIEW_BASELINE_ANCHORS[
+            "mapped_redacted_ready"]["film"] + build_efmb.HALLWAY_REVIEW_CLOCK_SHIFT_SEC),
         "hold": 2.2,
         "speaker": "[redacted]",
         "text": "They're ready",
@@ -593,7 +599,8 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_akgraner_disco",
         "kind": "chat",
         "position": "left",
-        "at_film": round(build_efmb.KYLE_REVEAL_AT + 8.350, 3),
+        "at_film": (build_efmb.OWNER_REVIEW_BASELINE_ANCHORS[
+            "mapped_akgraner_disco"]["film"] + build_efmb.HALLWAY_REVIEW_CLOCK_SHIFT_SEC),
         "hold": 2.2,
         "speaker": "akgraner",
         "text": "Disco!",
@@ -649,6 +656,22 @@ AFTER_AMBER_CONVERSATION = [
     ("mapped_akgraner_kindness_6", "akgraner",
      "Be kind.", 2.2, "akgraner", 1.18),
 ]
+
+# These are the three authored lanes in the review note. Keep the complete
+# ordered IDs and copy together so a re-seat cannot silently drop a line.
+FIRST_PAUSE_SEQUENCE = tuple((pid, text) for pid, _speaker, text, *_ in
+                             BLACK_CONVERSATION)
+SECOND_PAUSE_SEQUENCE = tuple((pid, text) for pid, _speaker, text, *_ in
+                              AFTER_AMBER_CONVERSATION)
+END_FIGHT_SEQUENCE = (
+    ("mapped_haters", "HATERS"),
+    ("mapped_kyle_sup", "Sup"),
+    ("mapped_kolunmi_disco", "Disco!"),
+    ("mapped_kyle_reveal", "Kyle Gospodnetich"),
+    ("mapped_redacted_harbringer", "Harbringer to the TOC"),
+    ("mapped_redacted_ready", "They're ready"),
+    ("mapped_akgraner_disco", "Disco!"),
+)
 
 # --- THE MAPPED 7:03 -> 8:26 OWNER PASS -----------------------------------
 #
@@ -1461,6 +1484,10 @@ TRIO_HOLD = 4.0
 # The gap between two credits in the same position. Below this the outgoing
 # card and the incoming one read as one flicker rather than two people.
 PLATE_GAP = 0.25
+SECOND_PAUSE_EXPECTED_AIR_SEC = round(
+    build_efmb.HALLWAY_AFTER_AMBER_SEC - 0.5
+    - sum(spec[3] for spec in AFTER_AMBER_CONVERSATION)
+    - PLATE_GAP * (len(AFTER_AMBER_CONVERSATION) - 1), 3)
 
 # The trio arrives one card at a time, 0.8 s apart, and the row clears
 # together. Owner instruction, same note: "stagger intros so that each
@@ -2453,6 +2480,17 @@ def build():
             entry.update(github_avatar(avatar_login))
         mapped_tail.append(entry)
         black_cursor = round(black_cursor + hold + PLATE_GAP, 3)
+    first_pause = [
+        next(p for p in mapped_tail if p["id"] == plate_id)
+        for plate_id, _text in FIRST_PAUSE_SEQUENCE
+    ]
+    assert first_pause[0]["at"] == round(build_efmb.HALLWAY_AT + 0.5, 3)
+    assert first_pause[-1]["at"] + first_pause[-1]["dur"] == round(
+        build_efmb.AMBER_AT - 0.5, 3)
+    assert all(p["dur"] >= MIN_HOLD for p in first_pause)
+    assert all(
+        nxt["at"] - (cur["at"] + cur["dur"]) >= PLATE_GAP - 1e-6
+        for cur, nxt in zip(first_pause, first_pause[1:]))
     assert black_cursor <= build_efmb.AMBER_AT
 
     after_cursor = round(build_efmb.HALLWAY_AFTER_AMBER_AT + 0.5, 3)
@@ -2473,6 +2511,22 @@ def build():
             entry.update(github_avatar(avatar_login))
         mapped_tail.append(entry)
         after_cursor = round(after_cursor + hold + PLATE_GAP, 3)
+    second_pause = [
+        next(p for p in mapped_tail if p["id"] == plate_id)
+        for plate_id, _text in SECOND_PAUSE_SEQUENCE
+    ]
+    assert second_pause[0]["at"] == round(
+        build_efmb.HALLWAY_AFTER_AMBER_AT + 0.5, 3)
+    assert second_pause[-1]["at"] + second_pause[-1]["dur"] <= \
+        build_efmb.HALLWAY_RETURN_AT
+    assert all(p["dur"] >= MIN_HOLD for p in second_pause)
+    assert all(
+        nxt["at"] - (cur["at"] + cur["dur"]) >= PLATE_GAP - 1e-6
+        for cur, nxt in zip(second_pause, second_pause[1:]))
+    assert round(
+        build_efmb.HALLWAY_RETURN_AT
+        - (second_pause[-1]["at"] + second_pause[-1]["dur"]), 3) == \
+        SECOND_PAUSE_EXPECTED_AIR_SEC
     assert after_cursor <= build_efmb.HALLWAY_RETURN_AT
 
     for spec in MAPPED_TAIL_PASS:
@@ -2521,6 +2575,16 @@ def build():
                 spec["key"],
                 _corrected(spec["key"], authored_copy(spec["key"], casting))))
         mapped_tail.append(entry)
+
+    endfight = [
+        next(p for p in mapped_tail if p["id"] == plate_id)
+        for plate_id, _text in END_FIGHT_SEQUENCE
+    ]
+    lower_thirds = [p for p in endfight if p.get("kind") != "miniboss"]
+    assert all(p["dur"] >= MIN_HOLD for p in lower_thirds)
+    assert all(
+        nxt["at"] - (cur["at"] + cur["dur"]) >= PLATE_GAP - 1e-6
+        for cur, nxt in zip(lower_thirds, lower_thirds[1:]))
 
     # The newer 8:28 pass replaces the old gaslighting pill. Its authored copy
     # remains above in TIMED_JORGE; no stale plate is built on the shifted film.
@@ -2661,15 +2725,18 @@ def build():
             "EyeCantCU's owner-timed megacut 9:31 seat uses a freeze of the "
             "evidenced source-354.600 Warlock frame; the stale old 283.666 "
             "plate seat remains removed",
-            "the 9:10 HATERS cue uses the existing red miniboss treatment; "
-            "the requested flashing effect remains unrendered rather than "
-            "being faked as a different chrome",
-            "the Kyle and kolunmi pills land at film 335.650 and 338.100 "
-            "after Amber's conversation and Bungie's burned-in "
-            "'NEW LEGENDS WILL RISE' zone. The order and copy are the owner's; "
-            "the protected publisher-title gap moves the seats",
-            "KyleGospo's mapped reveal sits on his verified source-335.267 "
-            "Sentinel shot at film 314.237, after Amber's sequence",
+            "the owner's 9:57 HATERS mark is Act II film 308.200 on the "
+            "baseline review clock; after the +2.000s hallway insert it lands "
+            "at final film 310.200, still over the evidenced bad-guy "
+            "HALLWAY_FRAME source 323.933. The requested flashing effect remains "
+            "unrendered rather than being faked as a different chrome",
+            "the owner's baseline 9:59 Kyle and 10:10 kolunmi marks translate "
+            "from Act II film 310.400/313.200 to final film 312.400/315.200 "
+            "after the +2.000s hallway insert; their source anchors stay "
+            "326.930/329.730",
+            "KyleGospo's mapped reveal sits on his verified source-338.200 "
+            "Sentinel frame at final film 320.737, translated from the "
+            "baseline Act II film 318.737",
             "the brief names the same person two ways -- 'Jorge Castro' in "
             "the montage and 'jorge' at 4:51. Both are reproduced verbatim; "
             "the pill's own chrome uppercases the speaker row",

@@ -861,7 +861,7 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     haters = by_id["mapped_haters"]
     assert haters["kind"] == "miniboss"
     assert haters["name"] == "HATERS"
-    assert haters["at"] == pytest.approx(308.2, abs=1e-3)
+    assert haters["at"] == pytest.approx(310.2, abs=1e-3)
     assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
     assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(
@@ -1542,3 +1542,75 @@ def test_task_4_split_copy_is_exact():
     }
     for plate_id, text in expected.items():
         assert by_id[plate_id]["text"] == text
+
+
+def test_owner_review_marks_translate_from_baseline_to_final_clock():
+    """Review marks retain their evidence when the hallway grows by two seconds."""
+    expected_marks = {
+        "mapped_haters": 9 * 60 + 57,
+        "mapped_kyle_sup": 9 * 60 + 59,
+        "mapped_kolunmi_disco": 10 * 60 + 10,
+        "mapped_redacted_harbringer": 10 * 60 + 24,
+        "mapped_redacted_ready": 10 * 60 + 24,
+        "mapped_akgraner_disco": 10 * 60 + 26,
+    }
+    assert build_efmb.OWNER_REVIEW_PROGRAMME_MARKS == expected_marks
+    assert build_efmb.HALLWAY_REVIEW_CLOCK_SHIFT_SEC == pytest.approx(2.0)
+
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    for plate_id, anchor in build_efmb.OWNER_REVIEW_BASELINE_ANCHORS.items():
+        assert by_id[plate_id]["at"] == pytest.approx(
+            anchor["film"] + build_efmb.HALLWAY_REVIEW_CLOCK_SHIFT_SEC,
+            abs=1e-3)
+        assert by_id[plate_id]["seen_at_src"] == pytest.approx(
+            anchor["source"], abs=1e-3)
+
+    haters = by_id["mapped_haters"]
+    assert haters["seen_at_src"] == pytest.approx(
+        build_efmb.HALLWAY_FRAME_SRC, abs=1e-3)
+    assert build_efmb.AMBER_AT <= haters["at"] < build_efmb.HALLWAY_RETURN_AT
+
+
+def test_hallway_pause_and_endfight_arrays_are_complete_and_spaced():
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+
+    for sequence in (
+        build_efmb_plates.FIRST_PAUSE_SEQUENCE,
+        build_efmb_plates.SECOND_PAUSE_SEQUENCE,
+    ):
+        entries = [by_id[plate_id] for plate_id, _text in sequence]
+        assert [p["text"] for p in entries] == [text for _id, text in sequence]
+        assert all(p["dur"] >= build_efmb_plates.MIN_HOLD for p in entries)
+        assert all(
+            nxt["at"] - (cur["at"] + cur["dur"])
+            >= build_efmb_plates.PLATE_GAP - 1e-6
+            for cur, nxt in zip(entries, entries[1:]))
+
+    first = [by_id[plate_id] for plate_id, _text in
+             build_efmb_plates.FIRST_PAUSE_SEQUENCE]
+    assert first[0]["at"] == pytest.approx(
+        build_efmb.HALLWAY_AT + 0.5, abs=1e-3)
+    assert first[-1]["at"] + first[-1]["dur"] == pytest.approx(
+        build_efmb.AMBER_AT - 0.5, abs=1e-3)
+
+    second = [by_id[plate_id] for plate_id, _text in
+              build_efmb_plates.SECOND_PAUSE_SEQUENCE]
+    assert second[0]["at"] == pytest.approx(
+        build_efmb.HALLWAY_AFTER_AMBER_AT + 0.5, abs=1e-3)
+    assert second[-1]["at"] + second[-1]["dur"] <= \
+        build_efmb.HALLWAY_RETURN_AT
+    assert build_efmb_plates.SECOND_PAUSE_EXPECTED_AIR_SEC == pytest.approx(
+        build_efmb.HALLWAY_RETURN_AT
+        - (second[-1]["at"] + second[-1]["dur"]), abs=1e-3)
+
+    endfight = [by_id[plate_id] for plate_id, _text in
+                build_efmb_plates.END_FIGHT_SEQUENCE]
+    assert [p.get("text", p.get("name")) for p in endfight] == [
+        "HATERS", "Sup", "Disco!", "Kyle Gospodnetich",
+        "Harbringer to the TOC", "They're ready", "Disco!",
+    ]
+    lower_thirds = [p for p in endfight if p.get("kind") != "miniboss"]
+    assert all(
+        nxt["at"] - (cur["at"] + cur["dur"])
+        >= build_efmb_plates.PLATE_GAP - 1e-6
+        for cur, nxt in zip(lower_thirds, lower_thirds[1:]))

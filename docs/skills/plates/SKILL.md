@@ -37,7 +37,7 @@ value occurs exactly once and whose `replace` value uses `{k8s}`.
 does not alter the authored source string. Use an asterisk for other letters,
 and do not add censorship the owner did not request.
 
-For owner-sequenced dialogue around a freeze, derive every window from the picture builder's evidenced constants, keep each card at `MIN_HOLD`, and regenerate the manifest; never hand-edit a generated plate clock.
+For owner-sequenced dialogue around a freeze, derive every window from the picture builder's evidenced constants, keep each card at `MIN_HOLD`, and regenerate the manifest; never hand-edit a generated plate clock. If review notes use a programme baseline, record the programme mark beside its baseline Act II film and source anchors, then derive the post-insert film time from the timeline shift. A source-attached cue must still resolve to the evidenced picture (including a held frame), not merely retain a stale film number.
 
 ### Cinematic text that shares the frame with identity plates
 

@@ -202,6 +202,7 @@ HALLWAY_FRAME_SRC = 323.933
 HALLWAY_RESUME_SRC = 325.933
 HALLWAY_AT = 255.433
 # Hold the hallway while Amber asks for Kyle and the PvP exchange plays.
+HALLWAY_BASELINE_FREEZE_SEC = 22.000
 HALLWAY_FREEZE_SEC = 24.000
 AMBER_CLIP_IN = 43.000
 AMBER_CLIP_OUT = 53.470
@@ -222,6 +223,43 @@ INTERRUPTION_SHIFT_SEC = INTERRUPTION_SEC - INTERRUPTION_REPLACED_SEC
 KYLE_REVEAL_SRC = 335.267
 KYLE_REVEAL_SEC = 3.200
 KYLE_REVEAL_AT = HALLWAY_RETURN_AT + (KYLE_REVEAL_SRC - HALLWAY_RESUME_SRC)
+
+# The review notes were timed against the pre-insert Act II clock. Keep that
+# baseline beside the final clock: the two-second first-freeze extension moves
+# every later source-attached cue, but it must not move the picture it names.
+HALLWAY_REVIEW_CLOCK_SHIFT_SEC = (
+    HALLWAY_FREEZE_SEC - HALLWAY_BASELINE_FREEZE_SEC)
+BASELINE_HALLWAY_RETURN_AT = (
+    HALLWAY_AT + HALLWAY_BASELINE_FREEZE_SEC + AMBER_CLIP_SEC
+    + HALLWAY_AFTER_AMBER_SEC)
+BASELINE_KYLE_REVEAL_AT = BASELINE_HALLWAY_RETURN_AT + (
+    KYLE_REVEAL_SRC - HALLWAY_RESUME_SRC)
+OWNER_REVIEW_PROGRAMME_MARKS = {
+    "mapped_haters": 9 * 60 + 57,
+    "mapped_kyle_sup": 9 * 60 + 59,
+    "mapped_kolunmi_disco": 10 * 60 + 10,
+    "mapped_redacted_harbringer": 10 * 60 + 24,
+    "mapped_redacted_ready": 10 * 60 + 24,
+    "mapped_akgraner_disco": 10 * 60 + 26,
+}
+OWNER_REVIEW_BASELINE_ANCHORS = {
+    "mapped_haters": {"film": 308.2, "source": HALLWAY_FRAME_SRC},
+    "mapped_kyle_sup": {"film": 310.4, "source": 326.930},
+    "mapped_kolunmi_disco": {"film": 313.2, "source": 329.730},
+    "mapped_kyle_reveal": {
+        "film": BASELINE_KYLE_REVEAL_AT, "source": SYNC_ANCHOR_SRC,
+    },
+    "mapped_redacted_harbringer": {
+        "film": BASELINE_KYLE_REVEAL_AT + 3.450, "source": 338.717,
+    },
+    "mapped_redacted_ready": {
+        "film": BASELINE_KYLE_REVEAL_AT + 5.900, "source": 341.167,
+    },
+    "mapped_akgraner_disco": {
+        "film": BASELINE_KYLE_REVEAL_AT + 8.350, "source": 343.617,
+    },
+}
+
 EDITED_PICTURE_END = HALLWAY_RETURN_AT + (
     RUNS[4][1] - HALLWAY_RESUME_SRC + RUNS[5][1] - RUNS[5][0])
 
