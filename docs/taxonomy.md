@@ -53,9 +53,6 @@ for `tools/story.py`, which never puts an unclean shot in a cut. `tools/search.p
 excludes unclean shots from its result pool by default; pass `--include-unclean`
 to surface them anyway, heavily penalized, for triage.
 
-This replaces the earlier model, in which the primary gate was
-`substitutability` (Axis D); see Axis D for what is left of it.
-
 ---
 
 ## Axis B — Domain semantics (`vocab/domain.yaml`)
@@ -200,14 +197,14 @@ character→person binding is what stops the credit and the casting from driftin
 apart — recast a role and the plate follows, with no other edit. Derivation
 never reads it; `tools/plate.py` does.
 
-Five bindings carry one today; four of them — `cayde_6`, `osiris`, `elsie_bray`
-and `saint_14` — are **reproduced verbatim** from a file this repo does not own
-(`~/Videos/nameplates.json`, or the website's
-`public/wolves/characters/characters.json`). None of it was written here. The
-fifth, `sagira`, carries the documented unknown-seal fallback (`title: Bluefin
-Blueberry`), not an authored identity. Which source wins, who else has an
-authored identity, and where two sources disagree is
-[`docs/skills/plates/SKILL.md`](skills/plates/SKILL.md#where-the-copy-is-authored).
+Which bindings carry one is the vocab's own fact — count the `plate:` blocks in
+`vocab/casting.yaml`, never a prose count here. Their copy is **reproduced
+verbatim** from sources this repo does not own (`~/Videos/nameplates.json`, the
+website's `public/wolves/characters/characters.json`, or the issue that authored
+the identity); none of it is written here. `sagira` is the exception shape: the
+documented unknown-seal fallback (`title: Bluefin Blueberry`), not an authored
+identity. Which source wins, who else has an authored identity, and where two
+sources disagree is [`docs/skills/plates/SKILL.md`](skills/plates/SKILL.md).
 
 Querying either half of a binding retrieves the same footage — "Zavala" and
 "Kelsey" are the same lead, so both resolve to it. Alongside these, `leads`
@@ -227,9 +224,8 @@ ensemble slot so a re-render never reshuffles who played whom.
 **The derived `casting` object** is exactly (`schema/segment.schema.json`
 `$defs/casting`): `{role: "lead"|"ensemble"|"none", character: string|null,
 person: string|null, usable: boolean, constraints_failed: array of string,
-slots: integer}`. The pre-inversion `performer`/`basis` keys are gone for good;
-`usable` and `constraints_failed` are how the one constrained binding blocks a
-shot from that character's retrieval.
+slots: integer}`. `usable` and `constraints_failed` are how the one constrained
+binding blocks a shot from that character's retrieval.
 
 **Derivation** (deterministic, `label_source = heuristic`), applied in order:
 

@@ -17,8 +17,8 @@ file in it is a regenerated artifact.
 | Publish | `python3 ~/Videos/yt-refresh.py` — one unlisted playlist |
 
 **The order is [`docs/running-order.md`](../../../running-order.md)'s, not the
-filenames'.** `NN-` is the act number, which is fixed: act VIII has no film, so
-the numbering has a gap and closing it would renumber the show.
+filenames'.** `NN-` is the act number, which is fixed — every numeral is
+load-bearing, and renumbering to close a gap renumbers the show.
 
 **`Prod/` is hardlinks** to each project's master, so it costs no disk. The
 link itself cannot drift — but everything downstream of it can and has:
@@ -195,8 +195,7 @@ python3 tools/deliver.py build             # rebuild the stale: megacut, then so
 ```
 
 The **acts and their order come from `docs/running-order.md`**, parsed from
-its table — deliver.py carries no act list of its own, and act VIII's missing
-film is reported as by-design, never as an error. The **declared masters**
+its table — deliver.py carries no act list of its own. The **declared masters**
 (and the acts that deliberately have no social copy) live in
 [`stories/megacut/delivery.json`](../../../../stories/megacut/delivery.json),
 keyed by act numeral. That file is intent; `publish` is the only thing that
@@ -250,11 +249,6 @@ file with **no plates on it at all**
 ([`docs/rendering.md`](../../../rendering.md#burning-plates-onto-a-cut)). Pull frames
 inside two or three plate windows and look before you deliver.
 
-`~/Videos/UPLOAD/` was the older staging folder — a different order, AAC copies.
-It has been superseded and emptied of everything load-bearing; its removal is
-[issue #81]. **Nothing is staged there any more.** If you find a doc or a script
-that still writes to it, that doc or script is the bug.
-
 ### The per-project contract
 
 Each act is built by its own project directory under `~/Videos/<project>/`, and
@@ -295,7 +289,6 @@ Three rules there that this repo has to respect:
 
 [issue #41]: https://github.com/castrojo/destiny-vids/issues/41
 [issue #82]: https://github.com/castrojo/destiny-vids/issues/82
-[issue #81]: https://github.com/castrojo/destiny-vids/issues/81
 
 Delivery is also where the audio rules bite, and they are not this repo's:
 load **`audio-quality-tenet`** before touching a deliverable's audio. What has

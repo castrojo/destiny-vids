@@ -59,8 +59,7 @@ What it trusts
 --------------
 The **act list and order come from `docs/running-order.md`**, the source of
 truth -- parsed from its act table, never duplicated into a second
-hand-maintained list here. Act VIII has no film (issue #51); its absence is
-reported as by-design, never an error. The **declared masters** live in
+hand-maintained list here. The **declared masters** live in
 `stories/megacut/delivery.json`, keyed by act numeral; that file is intent,
 and `publish` is the only thing that makes `Prod/` match it.
 
@@ -161,7 +160,6 @@ FAILING = {STALE, MISSING, CONFLICT, EPHEMERAL}
 
 # One act row in docs/running-order.md's table:
 #   | **I** | Project Bluefin | `Prod/01-intro.mp4` — ... | delivered |
-# Act VIII's film cell is a dash -- it has no film and keeps its numeral.
 # `0` is the PROLOGUE, which deliberately has no numeral: the eight act
 # numerals are load-bearing (AGENTS.md), so a cold open in front of act I is
 # numbered outside them rather than by renumbering everything behind it.
@@ -173,7 +171,7 @@ PROD_FILE = re.compile(r"`Prod/([0-9]{2}-[^`]+\.mp4)`")
 class Act:
     numeral: str           # "VI"
     title: str             # "7 Days to the Wolves"
-    prod_file: str | None  # "06-7daystothewolves.mp4", None for act VIII
+    prod_file: str | None  # "06-7daystothewolves.mp4"; None when the row's film cell names no Prod file
 
 
 @dataclass
