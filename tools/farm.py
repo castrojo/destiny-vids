@@ -686,6 +686,11 @@ def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
                                 daemon=True)
         logs.start()
 
+        seq_dirs = {rel.rsplit("/", 1)[0] for _, rel in uploads
+                    if rel.count("/") > 1}
+        for d in sorted(seq_dirs):
+            # kubectl cp will not create an intermediate directory.
+            kc.exec(pod, ["mkdir", "-p", f"{WORK_DIR}/{d}"])
         for local, rel in uploads:
             size = Path(local).stat().st_size
             print(f"{label}: uploading {size / (1024 ** 2):.1f} MiB "
@@ -760,6 +765,15 @@ def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
 # owns the recipe, the farm owns the data movement and the proof.
 
 
+SEQUENCE_RE = re.compile(r"%0\d+d")
+
+
+def sequence_frames(pattern):
+    """The local frames a ``%0Nd`` image-sequence pattern reads, in order."""
+    pattern = Path(pattern)
+    return sorted(pattern.parent.glob(SEQUENCE_RE.sub("*", pattern.name)))
+
+
 def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
     """Map a LOCAL ffmpeg argv onto the pod's filesystem view.
 
@@ -783,6 +797,22 @@ def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
     staged = {}
     uploads = []
     for i, p in enumerate(inputs):
+        if SEQUENCE_RE.search(p.name):
+            # AN IMAGE SEQUENCE IS READ AS A PATTERN, so its frames never
+            # appear in argv and the exact-token guard below would reject
+            # them as unread. Stage the frames into their own directory and
+            # point the pattern at that directory instead. Without this a
+            # plate burn cannot run on the cluster at all, and the caller
+            # falls back to encoding on the workstation -- which is the one
+            # thing the farm exists to prevent.
+            frames = sequence_frames(p)
+            if not frames:
+                raise FarmError(
+                    f"input sequence matches no frames on disk: {p}")
+            rel_dir = f"in/{i:02d}-seq"
+            uploads.extend((f, f"{rel_dir}/{f.name}") for f in frames)
+            staged[str(p)] = f"{work_dir}/{rel_dir}/{p.name}"
+            continue
         rel = f"in/{i:02d}-{p.name}"
         staged[str(p)] = f"{work_dir}/{rel}"
         uploads.append((p, rel))
@@ -869,7 +899,10 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
     inputs = [Path(p) for p in inputs]
     out = Path(out)
     for p in inputs:
-        if not p.exists():
+        if SEQUENCE_RE.search(p.name):
+            if not sequence_frames(p):
+                raise FarmError(f"input sequence matches no frames: {p}")
+        elif not p.exists():
             raise FarmError(f"input does not exist: {p}")
     name = name or farm_name(out.name)
     label = label or f"farm[{name}]"

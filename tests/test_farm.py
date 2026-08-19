@@ -713,3 +713,34 @@ def test_cp_still_fails_when_the_pod_is_genuinely_broken(monkeypatch):
     with pytest.raises(farm.FarmError):
         kc.cp("/tmp/x.mp4", "argo/pod:/work/in/x.mp4", sleep=lambda s: None)
     assert len(calls) == farm.CP_ATTEMPTS
+
+
+def test_an_image_sequence_pattern_is_staged_as_its_frames(tmp_path):
+    """A %0Nd input must reach the pod, or a plate burn cannot be farmed.
+
+    The exact-token guard cannot see a pattern's frames -- they never appear
+    in argv -- so before this the burn was rejected and the caller fell back
+    to encoding locally on the owner's workstation.
+    """
+    from tools import farm
+
+    seq = tmp_path / "plate_%02d.png"
+    for i in range(3):
+        (tmp_path / f"plate_{i:02d}.png").write_bytes(b"x")
+    video = tmp_path / "in.mp4"
+    video.write_bytes(b"v")
+    out = tmp_path / "out.mp4"
+
+    argv = ["/local/ffmpeg", "-i", str(video), "-i", str(seq), str(out)]
+    pod_argv, uploads, pod_out = farm.rewrite_argv_for_pod(
+        argv, [video, seq], out)
+
+    # every frame is staged, into one directory
+    staged = [rel for _, rel in uploads if rel.endswith(".png")]
+    assert len(staged) == 3, staged
+    assert len({r.rsplit("/", 1)[0] for r in staged}) == 1
+
+    # and the pattern still reads as a pattern inside the pod
+    pattern_tok = [t for t in pod_argv if t.endswith("plate_%02d.png")]
+    assert len(pattern_tok) == 1, pod_argv
+    assert pattern_tok[0].startswith(farm.WORK_DIR)
