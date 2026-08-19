@@ -110,6 +110,15 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
                - build_efmb.INTERRUPTION_REPLACED_SEC), abs=1e-6)
 
 
+@pytest.mark.parametrize("film_sec", [
+    build_efmb.AMBER_AT,
+    (build_efmb.AMBER_AT + build_efmb.HALLWAY_AFTER_AMBER_AT) / 2,
+])
+def test_amber_external_interval_is_not_in_picture(film_sec):
+    with pytest.raises(build_efmb.NotInPicture):
+        build_efmb.edited_source_for_film(film_sec)
+
+
 def test_kyle_and_eyecantcu_each_get_their_evidenced_picture():
     sequence = build_efmb.picture_sequence()
     eye = next(p for p in sequence if p["id"] == "eyecantcu_tail")
