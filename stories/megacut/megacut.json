@@ -25,7 +25,7 @@
     "prologue": "Wolves/Prod/00-prologue.mp4 -> destiny-vids/renders/00-prologue.mp4, built by scripts/build_prologue.py from stories/00-prologue-plates.json and cards/maintitle.html. Born conformant (1920x1080, 60000/1001, bt709 on all three fields, FLAC 48 kHz stereo) so the join stream-copies its picture. Audio decoded from the plain 251 Opus rung, NOT 251-drc, per the audio standard -- the same lossy-source posture act I records.",
     "perfume": "renders/00-prologue.mp4 and renders/perfume-2..5.mp4, all five movements cut from ONE source file, media/yt_nightwish_perfume_of_the_timeless.mkv (gitignored): YouTube O0lyFqLr3Cc fmt 313, 3840x1608 VP9 at 5896 kb/s. It is a third-party re-upload, so it is conformed rather than used raw: frame 0 dropped (the upload runs ONE frame late -- measured three ways, and the first shot change sits at frame 307), lanczos down to 1920x804, one frame cloned back at the tail, pinned to exactly 12675 frames. Every measured timecode in stories/00-perfume-thread.json therefore holds, verified at 0 frames offset over three windows. PICTURE ONLY: the upload is a 'No SFX' edit (r=0.89 against the delivered bed), so the ORIGINAL audio stream is copied through bit-for-bit and music/bed_perfume_of_the_timeless.json -- whose tempo grid and levels are all measured off that mix -- is untouched. The upload's corner watermark 'Nightwish. ://: Arena.' is left in frame: owner, 2026-08-15, 'the watermark is fine'."
   },
-  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v4.1.mp4",
+  "output": "/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v4.2.mp4",
   "width": 1920,
   "height": 1080,
   "fps": "60000/1001",

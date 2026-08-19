@@ -115,6 +115,26 @@ of 0 is not evidence (issue #88).
   to a node.
 - **Cleanup is automatic** (Workflow + PVC deleted); `--keep` opts out. A
   one-hour TTL after success is the backstop if the tool dies mid-run.
+- **Resolve ffmpeg to a single binary before farming: `DESTINY_FFMPEG=/home/linuxbrew/.linuxbrew/bin/ffmpeg`.**
+  The farm rewrites `argv[0]` only, so this host's default
+  `podman exec bluefin-thumbnailer ffmpeg` leaks its middle tokens into the
+  pod and the job dies on `Unable to choose an output format for 'exec'`.
+  It has cost a full render round more than once.
+- **A plate burn is farmable, and it must be farmed.** Its argv carries ~78
+  PNG `-i` inputs plus any `%0Nd` image sequence, and all of them have to be
+  named in `inputs` or the pod cannot open them. Sequences stage as their
+  frames; the pattern is rewritten to the pod's staged directory.
+- **One 78-deep `overlay` chain does not finish.** It stalls locally at ~12
+  threads with a zero-byte output, and kills the pod on the cluster. Burn in
+  batches. Batching by PLATE COUNT is correct but SERIAL -- pass N+1 consumes
+  pass N -- so it uses one pod and about 3 of the cluster's 64 cores, and
+  takes ~25 minutes for act II. Batching by TIME is independent and runs
+  every segment at once, ~4 minutes, but a `-c copy` cut snaps to keyframes,
+  so the segments do not sum to the source: act II came back 0.5 s long with
+  held frames at each join. Aligning the cuts to real keyframes shrinks the
+  error without removing it. Until the boundaries are frame-exact, the serial
+  batch is what ships.
+
 - If the cluster is unreachable, stop. `--local` is the only authorization to
   encode video on the workstation. A *wrong* output is the one unforgivable
   failure: verification failures exit 1 with the diff printed.
