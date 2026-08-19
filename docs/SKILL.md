@@ -28,6 +28,7 @@ load **only** that skill, then act.
 | Join the finished acts into one programme | [`megacut`](skills/megacut/SKILL.md) |
 | Apply a round of notes without rebuilding acts that were already right | [`review`](skills/review.md) |
 | Run a long encode on the ghost cluster instead of the laptop | [`farm`](skills/farm.md) |
+| Work out why CI is red when the suite is green here, or add a check | [`testing`](skills/testing.md) |
 
 This table is the catalog. There is no generated index behind it — add a row
 when you add a skill.
