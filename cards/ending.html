@@ -54,6 +54,22 @@
     color: var(--wc-white);
     line-height: 1.1;
   }
+  /* The reviewed mission card is intentionally larger than the other pause
+     cards. The purpose card's source wallpaper has a bird in the lower-left;
+     move only that authored card's treatment to clear it. */
+  body[data-card-id="mission"] .pause-card .title {
+    font-size: clamp(3.4rem, 6vw, 5.6rem);
+  }
+  body[data-card-id="purpose"] .pause-card {
+    transform: translate(8vw, 7vh);
+  }
+  .subtitle {
+    margin: 0;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--wc-white);
+  }
   .overlay {
     position: absolute;
     display: flex;
@@ -161,6 +177,8 @@
   const params = new URLSearchParams(window.location.search)
   const mode = params.get('mode')
   const card = document.getElementById('card')
+  card.id = params.get('id') || card.id
+  document.body.dataset.cardId = card.id
 
   function append(tag, className, text) {
     if (!text) return
@@ -281,6 +299,7 @@
       card.className = 'pause-card'
       append('div', 'label', params.get('label'))
       append('h1', 'title', params.get('title'))
+      append('div', 'subtitle', params.get('subtitle'))
       const wallpaper = params.get('wallpaper')
       if (wallpaper) {
         const image = new Image()

@@ -137,6 +137,22 @@ genuinely needs a new line, add the field to the data model deliberately.
 `AS <CHARACTER>` line, a role, a pronoun — puts unauthored text on a card whose
 entire purpose is naming real people.
 
+## Ending cards
+
+The ending manifest's pause cards use the existing title-card renderer. A pause
+card may carry an optional, non-empty `subtitle`; render it as a smaller line
+below the title, not as a new generic card configuration. The renderer passes
+the manifest card ID to `ending.html`, which uses `body[data-card-id="..."]` for
+small, authored exceptions such as a larger mission title or an optical
+translation around artwork. Keep those selectors ID-specific; do not add a
+manifest-wide offset abstraction.
+
+The underwater coda remains one ordered overlay section. Add a new card to both
+`underwater.plate_ids` and `plates`, keep its half-open window inside the
+measured movement, and preserve the existing centered treatment when the copy
+belongs with the centered closing cards. Both counts are pinned by
+`schema/ending-cards.schema.json`, so a new card is a two-file change.
+
 ## Prose that is not written yet is lorem, never a gap
 
 A chat pill with no `text` does **not** block and does not render empty:
