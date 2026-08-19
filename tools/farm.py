@@ -910,7 +910,10 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
     out_rel = pod_out[len(WORK_DIR) + 1:]
     script = pod_script_run(pod_argv, out_rel)
     kc = kc or Kubectl(kubeconfig, namespace)
-    total = sum(p.stat().st_size for p in inputs)
+    # A %0Nd input is a PATTERN, not a file on disk: size it by its frames.
+    total = sum(sum(f.stat().st_size for f in sequence_frames(p))
+                if SEQUENCE_RE.search(p.name) else p.stat().st_size
+                for p in inputs)
     _execute_on_cluster(
         name=name, script=script, uploads=uploads, out_rel=out_rel, out=out,
         kc=kc, image=image, cpu=cpu, limit_cpu=limit_cpu, memory=memory,
