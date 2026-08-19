@@ -367,8 +367,8 @@ def test_burn_builds_one_enable_gated_overlay_per_plate(tmp_path):
     # so ffmpeg got the quotes literally, failed to parse the expression,
     # disabled every overlay and exited 0 — burning a video with no plates on
     # it. The test agreed with the bug, so nothing caught it.
-    assert "between(t\\,1.000\\,6.000)" in chain
-    assert "between(t\\,8.000\\,12.000)" in chain
+    assert "gte(n\\,60)*lt(n\\,360)" in chain
+    assert "gte(n\\,480)*lt(n\\,720)" in chain
     assert "'" not in chain, "shell quotes cannot survive an argv filtergraph"
     # audio is carried through, not re-encoded
     assert "-c:a" in captured["cmd"] and "copy" in captured["cmd"]
@@ -2367,7 +2367,7 @@ def test_an_animation_group_is_padded_from_the_start_of_the_timeline():
     stream that simply starts late is how the graph stalls. `tpad` holds
     transparent frames in front of it."""
     source = (Path(__file__).resolve().parents[1] / "tools" / "plate.py").read_text()
-    body = source.split("def burn(")[1].split("\ndef ")[0]
+    body = source.split("def burn_command(")[1].split("\ndef ")[0]
     assert "tpad=start_duration=" in body
     assert "start_mode=add" in body and "color=black@0" in body
     assert "eof_action=pass" in body

@@ -336,7 +336,7 @@ def test_the_burn_filter_carries_no_shell_quotes():
 
     graph = seen["cmd"][seen["cmd"].index("-filter_complex") + 1]
     assert "'" not in graph, f"shell quotes in an argv filtergraph: {graph}"
-    assert "enable=between(t\\," in graph, (
+    assert "enable=gte(n\\," in graph, (
         f"unquoted commas are argument separators to the filter parser: {graph}")
 
 

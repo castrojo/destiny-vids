@@ -65,6 +65,7 @@ import math
 import re
 import subprocess
 import sys
+from fractions import Fraction
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
@@ -3558,6 +3559,95 @@ def _burn_units(entries):
     return units
 
 
+def _frame_index(seconds):
+    """Nearest delivery frame for a manifest boundary."""
+    value = seconds if isinstance(seconds, Fraction) else Fraction(str(seconds))
+    value *= Fraction(conform.DELIVERY.fps)
+    return (value.numerator * 2 + value.denominator) // (2 * value.denominator)
+
+
+def _ceil_frame_index(seconds):
+    value = seconds if isinstance(seconds, Fraction) else Fraction(str(seconds))
+    value *= Fraction(conform.DELIVERY.fps)
+    return -(-value.numerator // value.denominator)
+
+
+def _frame_enable(start, dur):
+    """Half-open overlay window expressed on the delivery frame grid."""
+    # The first frame whose timestamp is at/after the start owns the plate;
+    # the first frame at/after the end is excluded. Ceil both boundaries so a
+    # decimal second such as 12.000 does not drop frame 719 at 11.995.
+    first = _ceil_frame_index(start)
+    last = _ceil_frame_index(start + dur)
+    return f"gte(n\\,{first})*lt(n\\,{last})"
+
+
+def burn_command(video, entries, plates_dir, out_path, duration, ffmpeg=None,
+                 encode_args=None):
+    """Build the complete ffmpeg argv for a plate burn without running it."""
+    if ffmpeg is None:
+        from tools.render import find_ffmpeg
+
+        ffmpeg = find_ffmpeg()
+    video = Path(video).resolve()
+    out_path = Path(out_path).resolve()
+    plates_dir = Path(plates_dir).resolve()
+    units = _burn_units(entries)
+
+    cmd = [*ffmpeg, "-nostdin", "-y", "-i", str(video)]
+    for unit in units:
+        if unit["animation"]:
+            cmd += ["-framerate", f"{unit['fps']:.6f}", "-start_number", "0",
+                    "-i", str(plates_dir / unit["pattern"])]
+        else:
+            cmd += ["-loop", "1", "-framerate", "1", "-t", f"{duration:.9f}",
+                    "-i", str(plates_dir / f"plate_{unit['id']}.png")]
+
+    steps, last = [], "0:v"
+    for i, unit in enumerate(units, start=1):
+        start = unit["at"]
+        label = f"v{i}"
+        enable = _frame_enable(start, unit["dur"])
+        if unit["animation"]:
+            start_frame = _frame_index(start)
+            start_time = float(Fraction(start_frame, 1) /
+                               Fraction(conform.DELIVERY.fps))
+            steps.append(
+                f"[{i}:v]tpad=start_duration={start_time:.9f}:start_mode=add:"
+                f"color=black@0[a{i}]"
+            )
+            steps.append(
+                f"[{last}][a{i}]overlay=0:0:eof_action=pass:"
+                f"enable={enable}[{label}]"
+            )
+            last = label
+            continue
+        # The argv is passed directly to ffmpeg, so commas are escaped for the
+        # filter parser and shell quotes must not be added. Frame expressions
+        # avoid decimal boundary drift at 60000/1001 (notably 46.596550 ->
+        # frame 2793), and the half-open upper bound makes adjacent plates
+        # deterministic: the later plate owns its first frame.
+        steps.append(
+            f"[{last}][{i}:v]overlay=0:0:"
+            f"enable={enable}[{label}]"
+        )
+        last = label
+    if not steps:
+        raise ValueError("no plates to burn")
+
+    cmd += [
+        "-filter_complex", ";".join(steps),
+        "-map", f"[{last}]", "-map", "0:a?",
+        "-t", f"{duration:.9f}",
+        *(encode_args if encode_args is not None else
+          ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
+           "-pix_fmt", "yuv420p"]),
+        "-c:a", "copy",
+        str(out_path),
+    ]
+    return cmd
+
+
 def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
          encode_args=None):
     """Composite every plate onto ``video`` in one ffmpeg pass.
@@ -3568,12 +3658,6 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
     ``runner`` defaults to a local subprocess; a caller (the farm path in
     ``scripts/build_act1.py``) may pass one that runs the same argv elsewhere
     and fetches ``out_path`` back.
-
-    ``encode_args`` is the x264 argv for the burn. Pass
-    ``conform.video_encode_args()`` to get the repo's DELIVERY rung and the
-    BT.709 VUI; ``None`` keeps the legacy ``crf 18``/``medium``/untagged argv
-    that acts not yet rebuilt were delivered with, so their masters stay
-    byte-identical and do not go stale. See the note at the argv itself.
     """
     if ffmpeg is None:
         from tools.render import find_ffmpeg
@@ -3582,115 +3666,9 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
     video = Path(video).resolve()
     out_path = Path(out_path).resolve()
     plates_dir = Path(plates_dir).resolve()
-
-    # HOW LONG THE PLATES HAVE TO EXIST FOR.
-    #
-    # A PNG is a ONE-FRAME input. Fed to overlay as-is it reaches EOF almost
-    # immediately, and while `eof_action=repeat` holds the last frame for a
-    # while, it does not hold it for five minutes: a plate gated to t=5 draws
-    # and the identical plate gated to t=269 does not, on the same file, with
-    # the same filtergraph. That is how act II came out fully credited on paper
-    # and completely unplated on screen.
-    #
-    # So each image input is LOOPED for the length of the video. `-loop 1`
-    # alone is an infinite input and the encode never terminates; bounding it
-    # with `-t` makes it finite, so the frame is available at every timestamp
-    # the enable expression might name and the muxer still stops.
-    #
-    # `-framerate 1` is the cheap part: the looped stream is the SAME still
-    # frame at every timestamp, so decoding it 30 times a second buys nothing.
-    # One frame a second cut this burn from ten minutes back to about one.
     duration = _probe_duration(video, ffmpeg)
-
-    # AN ANIMATION IS ONE INPUT, NOT ONE INPUT PER FRAME.
-    #
-    # Act II's choice screen is 24 plates a sixteenth of a second apart. Fed
-    # to this graph as 24 more stills it took the burn from 52 inputs to 74,
-    # and ffmpeg died on `Failed initializing scaling graph (Resource
-    # temporarily unavailable)` -- one rgba->yuva420p scaler per input, and
-    # the box ran out. It did not fail fast either: it span for thirty
-    # minutes and wrote a zero-byte file.
-    #
-    # A contiguous run of frames is exactly what the image2 demuxer reads
-    # natively, so a whole animation costs ONE input at its own frame rate.
-    # `tpad` then holds transparent frames in front of it so the stream spans
-    # the timeline from t=0 -- overlay's framesync wants a secondary frame to
-    # pair with every primary one, and a stream that simply starts late is
-    # how a graph stalls.
-    units = _burn_units(entries)
-
-    cmd = [*ffmpeg, "-nostdin", "-y", "-i", str(video)]
-    for unit in units:
-        if unit["animation"]:
-            cmd += ["-framerate", f"{unit['fps']:.6f}", "-start_number", "0",
-                    "-i", str(plates_dir / unit["pattern"])]
-        else:
-            cmd += ["-loop", "1", "-framerate", "1", "-t", f"{duration:.3f}",
-                    "-i", str(plates_dir / f"plate_{unit['id']}.png")]
-
-    steps, last = [], "0:v"
-    for i, unit in enumerate(units, start=1):
-        start = unit["at"]
-        end = start + unit["dur"]
-        label = f"v{i}"
-        if unit["animation"]:
-            steps.append(
-                f"[{i}:v]tpad=start_duration={start:.3f}:start_mode=add:"
-                f"color=black@0[a{i}]")
-            steps.append(
-                f"[{last}][a{i}]overlay=0:0:eof_action=pass:"
-                f"enable=between(t\\,{start:.3f}\\,{end:.3f})[{label}]")
-            last = label
-            continue
-        # NO SHELL QUOTES HERE, AND THE COMMAS ARE ESCAPED.
-        #
-        # `enable='between(t,269.7,272.9)'` is the form the ffmpeg docs show,
-        # and it is correct -- on a COMMAND LINE, where the shell strips the
-        # quotes. This command is built as an argv list and never sees a shell,
-        # so ffmpeg received the quote characters as part of the expression,
-        # failed to parse it, disabled the overlay, and exited 0. The result
-        # was a video that looked finished and carried no plates at all.
-        #
-        # Unquoted, the commas must be escaped instead, or the filtergraph
-        # parser reads them as argument separators.
-        steps.append(
-            f"[{last}][{i}:v]overlay=0:0:"
-            f"enable=between(t\\,{start:.3f}\\,{end:.3f})[{label}]"
-        )
-        last = label
-    if not steps:
-        raise ValueError("no plates to burn")
-
-    cmd += [
-        "-filter_complex", ";".join(steps),
-        "-map", f"[{last}]", "-map", "0:a?",
-        # The looped plate inputs are the same length as the picture, so the
-        # muxer has no unambiguous shortest stream to stop at and the output
-        # runs long -- act II came out 318.767 s against a 307.998 s cut.
-        # Naming the length is deterministic where `-shortest` is not.
-        "-t", f"{duration:.3f}",
-        # The burn is the LAST picture generation before an act is delivered,
-        # so its argv decides what the standalone master's bitstream says.
-        # Rolling a private one is how acts II and VI shipped with
-        # color_space/transfer/primaries all `unknown`: the BT.709 VUI is
-        # written by `conform.video_encode_args` and by nothing else, and
-        # untagged SDR is only *assumed* 709 by a player (tools/megacut.py
-        # records why "most players" is not good enough). It also encoded a
-        # delivery master at crf 18/medium against the repo's own crf 16/slow
-        # DELIVERY spec.
-        #
-        # The legacy argv is still the DEFAULT, and that is deliberate rather
-        # than lazy: every act declaring tools/plate.py as a delivery source
-        # goes stale the moment this changes, and an act only stops being stale
-        # by being re-rendered. Flipping the default therefore forces a rebuild
-        # of acts nobody asked for. Callers opt in as they are rebuilt; act II
-        # is the first (issue #86's picture upgrade). See #271 to retire it.
-        *(encode_args if encode_args is not None else
-          ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
-           "-pix_fmt", "yuv420p"]),
-        "-c:a", "copy",
-        str(out_path),
-    ]
+    cmd = burn_command(video, entries, plates_dir, out_path, duration,
+                       ffmpeg=ffmpeg, encode_args=encode_args)
     print("ffmpeg:", " ".join(ffmpeg))
     if runner is not None:
         runner(cmd)
@@ -3700,7 +3678,6 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
         tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
         raise RuntimeError(f"plate burn failed:\n{tail}")
     return out_path
-
 
 def parse_picture(text):
     """``"X,Y,W,H"`` -> the picture rect ``place`` measures its margins against.

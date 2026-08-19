@@ -138,7 +138,15 @@ def test_movement_two_countdown_is_a_derivative_of_the_clean_movement(thread, pl
     derivative = thread["_derivatives"]["perfume-2-countdown"]
     assert derivative["source"] == "renders/perfume-2.mp4"
     assert derivative["out_file"] == "renders/perfume-2-countdown.mp4"
-    assert _item(plan, "perfume-2-countdown")["path"] == derivative["out_file"]
+    seat = _item(plan, derivative["out_file"])
+    assert seat["path"] == derivative["out_file"]
+
+    countdown = build_countdown.plan_countdown()
+    zero = next(e for e in countdown["entries"] if e["text"] == "00:00")
+    assert zero["programme_frame"] == build_countdown._frame_number(264.0)
+    final_frame = (build_countdown._frame_number(
+        countdown["programme_start"] + countdown["segment_duration"]) - 1)
+    assert zero["programme_frame"] <= final_frame
 
 
 def test_movement_two_fades_up_over_the_prologues_fade_down(plan):
@@ -266,7 +274,7 @@ def test_the_two_dramatic_joins_carry_no_audio_dip(plan):
 # INVARIANT: the source picture between the two ghost windows is not a gap
 # that a snap-to-boundary may swallow.
 
-from scripts import build_interludes
+from scripts import build_countdown, build_interludes
 
 
 def _movement(movements, movement_id):

@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""Build the movement-2 countdown derivative without changing its clean source."""
+"""Build the movement-2 countdown derivative without changing its clean source.
+
+The default encoder is the farm when it is reachable. If it is not, pass
+``--local`` explicitly; ``--print-command`` exposes the complete local argv
+without encoding.
+"""
 
 from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import sys
 from fractions import Fraction
 from pathlib import Path
@@ -13,7 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from tools import conform, megacut, plate  # noqa: E402
+from tools import conform, farm, megacut, plate, render  # noqa: E402
 
 THREAD = REPO_ROOT / "stories" / "00-perfume-thread.json"
 PLAN = REPO_ROOT / "stories" / "megacut" / "megacut.json"
@@ -106,12 +112,9 @@ def plan_countdown(target=TARGET):
     programme = _load(PLAN)
     movement = next(m for m in thread["movements"] if m["id"] == MOVEMENT_ID)
     derivative = thread["_derivatives"]["perfume-2-countdown"]
-    seat_path = next(
-        (item.get("out_file") for item in thread.get("_derivatives", {}).values()
-         if item.get("source") == movement["out_file"]),
-        movement["out_file"],
-    )
-    start = _movement_start(programme, seat_path)
+    # The named derivative is the programme contract. Do not infer the seat by
+    # scanning sources: another derivative may intentionally share this source.
+    start = _movement_start(programme, derivative["out_file"])
     entries = countdown_entries(start, movement["duration"], target=target)
     return {
         "movement": MOVEMENT_ID,
@@ -119,34 +122,94 @@ def plan_countdown(target=TARGET):
         "out_file": derivative["out_file"],
         "programme_start": start,
         "programme_target": target,
+        "segment_duration": movement["duration"],
         "entries": entries,
     }
 
 
 
-def build():
+def _farm_runner(source, entries, plates_dir, out, expected_duration):
+    def run(argv):
+        farm.run_ffmpeg_on_cluster(
+            argv,
+            inputs=[source] + [
+                plates_dir / f"plate_{unit['id']}.png"
+                for unit in plate._burn_units(entries)
+                if not unit["animation"]
+            ] + [
+                plates_dir / unit["pattern"]
+                for unit in plate._burn_units(entries)
+                if unit["animation"]
+            ],
+            out=out,
+            expected_duration=expected_duration,
+        )
+
+    return run
+
+
+def _use_farm(local):
+    if local:
+        print("encoder: local (--local explicitly authorizes the workstation fallback)")
+        return False
+    available, reason = farm.cluster_available()
+    if not available:
+        raise SystemExit(
+            f"farm unavailable: {reason}; rerun with --local to authorize "
+            "local encoding")
+    print("encoder: farm (cluster reachable)")
+    return True
+
+
+def build(local=False):
     spec = plan_countdown()
     source = REPO_ROOT / spec["source"]
+    out = REPO_ROOT / spec["out_file"]
     if not source.exists():
         raise SystemExit(f"clean movement is missing: {source}")
     plates_dir = REPO_ROOT / "renders" / "perfume-2" / "countdown"
     plate.render_all(spec["entries"], plates_dir, picture=PICTURE)
-    plate.burn(source, spec["entries"], plates_dir,
-               REPO_ROOT / spec["out_file"],
-               encode_args=conform.video_encode_args())
+    ffmpeg = render.find_ffmpeg()
+    use_farm = _use_farm(local)
+    runner = (_farm_runner(source, spec["entries"], plates_dir, out,
+                           spec["segment_duration"]) if use_farm else None)
+    plate.burn(source, spec["entries"], plates_dir, out, ffmpeg=ffmpeg,
+               runner=runner, encode_args=conform.video_encode_args())
     return spec
 
+
+def _print_ffmpeg():
+    try:
+        return render.find_ffmpeg(prefer_container=False)
+    except RuntimeError:
+        return ["ffmpeg"]
+
+
+def print_command(spec):
+    argv = plate.burn_command(
+        REPO_ROOT / spec["source"], spec["entries"],
+        REPO_ROOT / "renders" / "perfume-2" / "countdown",
+        REPO_ROOT / spec["out_file"], spec["segment_duration"],
+        ffmpeg=_print_ffmpeg(), encode_args=conform.video_encode_args())
+    print(shlex.join(argv))
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--print-plan", action="store_true")
+    parser.add_argument("--print-command", action="store_true",
+                        help="print the complete ffmpeg argv and exit")
+    parser.add_argument("--local", action="store_true",
+                        help="explicitly authorize workstation encoding")
     args = parser.parse_args(argv)
     spec = plan_countdown()
     if args.print_plan:
         print(json.dumps(spec, indent=2))
         return 0
-    build()
+    if args.print_command:
+        print_command(spec)
+        return 0
+    build(local=args.local)
     return 0
 
 
