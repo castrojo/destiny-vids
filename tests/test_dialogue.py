@@ -9,7 +9,6 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from tools import dialogue, plate  # noqa: E402
-from tools.derive import load_leads  # noqa: E402
 
 
 LEADS = {
@@ -190,14 +189,25 @@ def test_act3_review_cue_splits_keep_the_owner_marked_hundredth_adjacency():
         assert cues[later]["start_sec"] == cues[earlier]["end_sec"] + 0.01
 
 
-def test_act3_fixed_gold_bob_plate_matches_authored_copy_and_leader_variant():
+def test_act3_fixed_gold_bob_plate_matches_complete_authored_entry():
     manifest = json.loads(
         Path("stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json")
         .read_text(encoding="utf-8")
     )
     gold = next(plate for plate in manifest["plates"] if plate["id"] == "mrbobbytables-gold")
-    expected = dict(load_leads()["osiris"]["plate"], variant="leader")
-    assert {field: gold[field] for field in expected} == expected
+    assert gold == {
+        "id": "mrbobbytables-gold",
+        "at": 43.96,
+        "dur": 4.0,
+        "position": "left",
+        "copy_source": "casting",
+        "label": "TRUSTEE // GUARDIAN",
+        "class": "Voidwalker Warlock",
+        "name": "Bob Killen",
+        "title": "Reconciler of the Plane",
+        "trustee": True,
+        "variant": "leader",
+    }
 
 
 def test_the_act3_retirement_copy_is_uncast_chat_before_the_wolf_day_shot():

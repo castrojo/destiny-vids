@@ -23,6 +23,10 @@ A Guardian nameplate carries **exactly**:
 | `title` | `Reconciler of the Plane` |
 | `trustee` | `true` — the burnished-silver chrome |
 
+A fixed-manifest regression test for a plate should compare the complete literal
+entry, including timing, provenance, and chrome flags, so omitted or extra fields
+cannot drift past the closed field set.
+
 The deck's other shapes are the title card (`title`, `subtitle`, `body[]`) and
 the **chat card** (`speaker`, `text`) —
 [`references/conversation-cards.md`](references/conversation-cards.md).
