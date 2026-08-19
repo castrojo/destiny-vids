@@ -1568,40 +1568,62 @@ def test_owner_review_marks_translate_from_baseline_to_final_clock():
     haters = by_id["mapped_haters"]
     assert haters["seen_at_src"] == pytest.approx(
         build_efmb.HALLWAY_FRAME_SRC, abs=1e-3)
-    assert build_efmb.AMBER_AT <= haters["at"] < build_efmb.HALLWAY_RETURN_AT
+    assert build_efmb.HALLWAY_AFTER_AMBER_AT <= haters["at"] < \
+        build_efmb.HALLWAY_RETURN_AT
+    assert build_efmb.edited_source_for_film(haters["at"]) == pytest.approx(
+        build_efmb.HALLWAY_FRAME_SRC, abs=1e-6)
 
 
 def test_hallway_pause_and_endfight_arrays_are_complete_and_spaced():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    expected_first = [
+        ("mapped_hikari_ouch", "Ouch man wtf!"),
+        ("mapped_owen_sorry", "Oh sorry my bad"),
+        ("mapped_kolunmi_pvp", "Who turned PvP on?"),
+        ("mapped_karena_pve", "Don't look at me I only put PvE on Legendary"),
+        ("mapped_cam_noone", "Mom no one plays this game"),
+        ("mapped_hikari_wait", "Hey wait?!"),
+        ("mapped_kolunmi_users", "Are those ... other linux users?"),
+        ("mapped_akgraner_help", "Sounds like you need some help"),
+        ("mapped_akgraner_take_care", "Let me take care of this for you"),
+    ]
+    expected_second = [
+        ("mapped_owen_slay", "Slay out, Queen!"),
+        ("mapped_which_kyle", "Which one of you is Kyle?"),
+        ("mapped_akgraner_kindness_1", "Kindness is doing what's right"),
+        ("mapped_akgraner_kindness_2", "For the ecosystem."),
+        ("mapped_akgraner_kindness_3", "For our users."),
+        ("mapped_akgraner_kindness_4", "And for our maintainers."),
+        ("mapped_akgraner_kindness_5", "Don't be nice."),
+        ("mapped_akgraner_kindness_6", "Be kind."),
+    ]
+    expected_holds = {
+        "first": [2.2, 2.2, 2.2, 3.0, 2.2, 2.2, 2.6, 2.2, 2.2],
+        "second": [2.2, 2.6, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2],
+    }
 
-    for sequence in (
-        build_efmb_plates.FIRST_PAUSE_SEQUENCE,
-        build_efmb_plates.SECOND_PAUSE_SEQUENCE,
-    ):
-        entries = [by_id[plate_id] for plate_id, _text in sequence]
-        assert [p["text"] for p in entries] == [text for _id, text in sequence]
-        assert all(p["dur"] >= build_efmb_plates.MIN_HOLD for p in entries)
+    first = [by_id[plate_id] for plate_id, _text in expected_first]
+    second = [by_id[plate_id] for plate_id, _text in expected_second]
+    assert [(p["id"], p["text"]) for p in first] == expected_first
+    assert [(p["id"], p["text"]) for p in second] == expected_second
+    assert [p["dur"] for p in first] == expected_holds["first"]
+    assert [p["dur"] for p in second] == expected_holds["second"]
+    for entries in (first, second):
         assert all(
             nxt["at"] - (cur["at"] + cur["dur"])
-            >= build_efmb_plates.PLATE_GAP - 1e-6
+            == pytest.approx(0.250, abs=1e-6)
             for cur, nxt in zip(entries, entries[1:]))
 
-    first = [by_id[plate_id] for plate_id, _text in
-             build_efmb_plates.FIRST_PAUSE_SEQUENCE]
-    assert first[0]["at"] == pytest.approx(
-        build_efmb.HALLWAY_AT + 0.5, abs=1e-3)
-    assert first[-1]["at"] + first[-1]["dur"] == pytest.approx(
-        build_efmb.AMBER_AT - 0.5, abs=1e-3)
-
-    second = [by_id[plate_id] for plate_id, _text in
-              build_efmb_plates.SECOND_PAUSE_SEQUENCE]
-    assert second[0]["at"] == pytest.approx(
-        build_efmb.HALLWAY_AFTER_AMBER_AT + 0.5, abs=1e-3)
-    assert second[-1]["at"] + second[-1]["dur"] <= \
-        build_efmb.HALLWAY_RETURN_AT
-    assert build_efmb_plates.SECOND_PAUSE_EXPECTED_AIR_SEC == pytest.approx(
-        build_efmb.HALLWAY_RETURN_AT
-        - (second[-1]["at"] + second[-1]["dur"]), abs=1e-3)
+    assert first[0]["at"] - build_efmb.HALLWAY_AT == pytest.approx(
+        0.500, abs=1e-6)
+    assert (build_efmb.AMBER_AT
+            - (first[-1]["at"] + first[-1]["dur"])) == pytest.approx(
+                0.500, abs=1e-6)
+    assert second[0]["at"] - build_efmb.HALLWAY_AFTER_AMBER_AT == pytest.approx(
+        0.500, abs=1e-6)
+    assert build_efmb.HALLWAY_RETURN_AT - (
+        second[-1]["at"] + second[-1]["dur"]
+    ) == pytest.approx(1.250, abs=1e-6)
 
     endfight = [by_id[plate_id] for plate_id, _text in
                 build_efmb_plates.END_FIGHT_SEQUENCE]

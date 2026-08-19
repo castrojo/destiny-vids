@@ -484,9 +484,11 @@ def edited_source_for_film(film_sec, lead=None):
         lead = derive_lead()
     if HALLWAY_AT <= film_sec < AMBER_AT:
         return HALLWAY_FRAME_SRC
-    if AMBER_AT <= film_sec < HALLWAY_RETURN_AT:
+    if AMBER_AT <= film_sec < HALLWAY_AFTER_AMBER_AT:
         raise NotInPicture(
             f"film {film_sec:.3f}s is inside Amber's external sequence")
+    if HALLWAY_AFTER_AMBER_AT <= film_sec < HALLWAY_RETURN_AT:
+        return HALLWAY_FRAME_SRC
     if HALLWAY_RETURN_AT <= film_sec < EDITED_PICTURE_END:
         return source_for_film(film_sec - INTERRUPTION_SHIFT_SEC, lead)
     if EDITED_PICTURE_END <= film_sec < EYECANTCU_AT:
