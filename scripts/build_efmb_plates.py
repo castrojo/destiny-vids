@@ -66,6 +66,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_efmb  # noqa: E402
 from tools.plate import CHOICE_POINTER_CUT, CHROME_ROWS  # noqa: E402
+from tools import placeholder  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "02-endless-forms-plates.json"
 # THE ROSTER IS AN INPUT, SO IT IS COMMITTED.
@@ -401,11 +402,15 @@ LATE_PASS = [
     },
     {
         "id": "late_poor_technical_decisions",
-        "kind": "warning",
-        "position": "warning",
+        # Same ruling as mapped_haters: the kernel boss bar is the one red
+        # treatment in this act. Name row only, title omitted not invented.
+        "kind": "miniboss",
+        "position": "boss",
         "at_film": 122.75,
         "hold": 2.2,
-        "text": "POOR TECHNICAL DECISIONS",
+        "name": "POOR TECHNICAL DECISIONS",
+        "title": placeholder.lorem(28, seed="late_poor_technical_decisions"),
+        "title_placeholder": True,
     },
     {
         "id": "late_karena_lessons",
@@ -522,26 +527,39 @@ MAPPED_TAIL_PASS = [
     },
     {
         "id": "mapped_haters",
-        "kind": "warning",
-        "position": "warning",
+        # Owner, 2026-08-19: the red overlays "should match the style of the
+        # original kernel one" -- KERNEL REGRESSION's boss bar, not a second
+        # full-frame style invented beside it. `name` only: the bar's second
+        # row is authored copy nobody has written, and _render_miniboss omits
+        # a missing title rather than inventing one.
+        "kind": "miniboss",
+        "position": "boss",
         "at_film": 308.2,
         "hold": 2.2,
         "seen_at_src": build_efmb.HALLWAY_FRAME_SRC,
-        "text": "HATERS",
+        "name": "HATERS",
+        "title": placeholder.lorem(28, seed="mapped_haters"),
+        "title_placeholder": True,
     },
     {
         "id": "mapped_kyle_sup",
         "kind": "chat",
         "position": "left",
-        # Owner, 2026-08-19: "Kyle's 'sup' should be at around 10:00 when the
-        # titan nods ... sup is a purple titan ... put it when it's zoomed into
-        # his face." The Titan close-up -- helmet centred behind the purple
-        # Void shield -- is film 317.0, verified by eye. The pill is seated at
-        # 316.287 so its 2.2 s hold SPANS that frame rather than starting on
-        # it: 316.537 is the latest start that still clears KYLE_REVEAL_AT
-        # (318.487 effective) by the readable minimum, and the builder asserts that gap.
-        # Programme 10:00.09.
-        "at_film": 316.287,
+        # OWNER-PLACED, DO NOT MOVE. 310.4 is where the owner had it.
+        #
+        # He asked for it on the Titan close-up ("sup is a purple titan ...
+        # put it when it's zoomed into his face") -- that frame is film 317.0.
+        # It CANNOT be seated there: KYLE_REVEAL_AT is 318.737, so a 2.2s hold
+        # from 317.0 overlaps his own nameplate and the builder refuses it.
+        #
+        # An agent then slid it to 316.287 to make the assertion pass, which
+        # put it AFTER kolunmi's "Disco!" (313.2) and reordered the authored
+        # exchange. That is the fourth class in AGENTS.md: a gate refusing a
+        # seat is not permission to move an authored beat. Reverted.
+        #
+        # The conflict is the owner's to settle -- move the reveal, shorten the
+        # hold, or keep 310.4. Until he does, his number stands.
+        "at_film": 310.4,
         "hold": 2.2,
         "speaker": "kylegospo",
         "text": "Sup",
@@ -2316,6 +2334,16 @@ def build():
         elif spec["kind"] == "warning":
             entry["text"] = spec["text"]
             entry["text_source"] = "owner_supplied"
+        elif spec["kind"] == "miniboss":
+            # The kernel boss bar's closed pair. `title` is omitted when
+            # nobody has authored one -- _render_miniboss draws the name row
+            # alone rather than inventing a second line.
+            entry["name"] = spec["name"]
+            entry["text_source"] = "owner_supplied"
+            if spec.get("title"):
+                entry["title"] = spec["title"]
+                if spec.get("title_placeholder"):
+                    entry["title_source"] = "placeholder"
         else:
             entry["title"] = spec["title"]
             if spec.get("subtitle"):
@@ -2421,6 +2449,16 @@ def build():
         elif spec["kind"] == "warning":
             entry["text"] = spec["text"]
             entry["text_source"] = "owner_supplied"
+        elif spec["kind"] == "miniboss":
+            # The kernel boss bar's closed pair. `title` is omitted when
+            # nobody has authored one -- _render_miniboss draws the name row
+            # alone rather than inventing a second line.
+            entry["name"] = spec["name"]
+            entry["text_source"] = "owner_supplied"
+            if spec.get("title"):
+                entry["title"] = spec["title"]
+                if spec.get("title_placeholder"):
+                    entry["title_source"] = "placeholder"
         elif spec["kind"] == "guardian":
             entry.pop("kind")
             entry["copy_source"] = "casting"

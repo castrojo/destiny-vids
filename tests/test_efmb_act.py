@@ -648,7 +648,7 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
         "For our users.", "And for our maintainers.",
         "Don't be nice.", "Be kind.",
     ]
-    assert by_id["mapped_haters"]["text"] == "HATERS"
+    assert by_id["mapped_haters"]["name"] == "HATERS"
     assert "solo_EyeCantCU" not in by_id
 
 
@@ -780,9 +780,9 @@ def test_mars_intro_owns_clankers_context_and_red_warning():
     assert context["title"] == "Clankers and Contributors"
     assert context["at"] == pytest.approx(45.2, abs=1e-3)
     assert context["at"] < mars["at"]
-    assert warning["kind"] == "warning"
-    assert warning["position"] == "warning"
-    assert warning["text"] == "POOR TECHNICAL DECISIONS"
+    assert warning["kind"] == "miniboss"  # owner: match the kernel bar
+    assert warning["position"] == "boss"  # the kernel bar's own position
+    assert warning["name"] == "POOR TECHNICAL DECISIONS"
 
 
 def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
@@ -813,15 +813,15 @@ def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
 def test_endfight_warnings_and_speakers_match_owner_copy():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     haters = by_id["mapped_haters"]
-    assert haters["kind"] == "warning"
-    assert haters["text"] == "HATERS"
+    assert haters["kind"] == "miniboss"  # owner: match the kernel bar
+    assert haters["name"] == "HATERS"
     assert haters["at"] == pytest.approx(308.2, abs=1e-3)
     assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
     # Owner, 2026-08-19: "sup is a purple titan ... put it when it's zoomed
     # into his face." Film 317.0 is the Titan close-up behind the purple Void
     # shield -- programme 10:00.8, the "around 10:00" he asked for.
-    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(316.287, abs=1e-3)
+    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(310.4, abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["speaker"] == "kolunmi"
     assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(313.2, abs=1e-3)
     assert by_id["owner_convo_karena"]["avatar"].endswith("/karena.png")

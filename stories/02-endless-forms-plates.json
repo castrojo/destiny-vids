@@ -1640,13 +1640,15 @@
     },
     {
       "id": "late_poor_technical_decisions",
-      "kind": "warning",
+      "kind": "miniboss",
       "at": 122.75,
       "dur": 2.2,
-      "position": "warning",
+      "position": "boss",
       "copy_source": "owner_supplied",
-      "text": "POOR TECHNICAL DECISIONS",
-      "text_source": "owner_supplied"
+      "name": "POOR TECHNICAL DECISIONS",
+      "text_source": "owner_supplied",
+      "title": "Proident sunt culpa qui",
+      "title_source": "placeholder"
     },
     {
       "id": "late_karena_lessons",
@@ -2311,14 +2313,30 @@
     },
     {
       "id": "mapped_haters",
-      "kind": "warning",
+      "kind": "miniboss",
       "at": 308.2,
       "dur": 2.2,
-      "position": "warning",
+      "position": "boss",
       "copy_source": "owner_supplied",
       "seen_at_src": 323.933,
-      "text": "HATERS",
-      "text_source": "owner_supplied"
+      "name": "HATERS",
+      "text_source": "owner_supplied",
+      "title": "Reprehenderit voluptate",
+      "title_source": "placeholder"
+    },
+    {
+      "id": "mapped_kyle_sup",
+      "kind": "chat",
+      "at": 310.4,
+      "dur": 2.2,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "seen_at_src": 326.93,
+      "speaker": "kylegospo",
+      "text": "Sup",
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/KyleGospo.png",
+      "avatar_url": "https://github.com/KyleGospo.png?size=256"
     },
     {
       "id": "mapped_kolunmi_disco",
@@ -2333,20 +2351,6 @@
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/kolunmi.png",
       "avatar_url": "https://github.com/kolunmi.png?size=256"
-    },
-    {
-      "id": "mapped_kyle_sup",
-      "kind": "chat",
-      "at": 316.287,
-      "dur": 2.2,
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "seen_at_src": 332.817,
-      "speaker": "kylegospo",
-      "text": "Sup",
-      "text_source": "owner_supplied",
-      "avatar": "renders/avatars/KyleGospo.png",
-      "avatar_url": "https://github.com/KyleGospo.png?size=256"
     },
     {
       "id": "mapped_kyle_reveal",
