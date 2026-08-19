@@ -154,10 +154,14 @@ CONFLICT = "conflict"
 EPHEMERAL = "ephemeral"
 UNDECLARED = "undeclared"
 BLOCKED = "blocked"
+# A master built from a commit outside this checkout's history: somebody
+# else's in-flight act, riding out on my render. Prod/ is shared mutable
+# state, so this is the only thing that can catch it.
+FOREIGN = "foreign"
 # Copy the act's own record says is still wrong: a note, never a failure.
 UNRESOLVED = "unresolved"
 
-FAILING = {STALE, MISSING, CONFLICT, EPHEMERAL}
+FAILING = {STALE, MISSING, CONFLICT, EPHEMERAL, FOREIGN}
 
 # One act row in docs/running-order.md's table:
 #   | **I** | Project Bluefin | `Prod/01-intro.mp4` — ... | delivered |
@@ -426,6 +430,63 @@ def blocked_on(master):
     goes quiet is the bug.
     """
     return (master or {}).get("stale_blocked_on") or None
+
+
+def git_head(root=None):
+    """The commit this checkout is on, or None outside a repo."""
+    try:
+        out = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root or REPO_ROOT,
+                             capture_output=True, text=True, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        return None
+    return out.stdout.strip() or None
+
+
+def commit_in_history(commit, root=None):
+    """Is ``commit`` an ancestor of (or equal to) this checkout's HEAD?
+
+    An act's master is a FILE in ~/Videos/Wolves/Prod/, which any agent can
+    replace at any time. The branch you have checked out says nothing about
+    who built it -- so a prologue slide committed on someone else's branch
+    shipped in the next programme, and every gate stayed green because
+    "fresh" only ever meant "not stale".
+
+    This is the missing question: was this master built from work that is in
+    MY history? If not, the act is somebody else's in-flight change riding
+    out on my render.
+    """
+    if not commit:
+        return None                      # nothing recorded: unknown, not bad
+    try:
+        r = subprocess.run(["git", "merge-base", "--is-ancestor", commit,
+                            "HEAD"], cwd=root or REPO_ROOT, capture_output=True)
+    except (FileNotFoundError, OSError):
+        return None
+    return r.returncode == 0
+
+
+def check_provenance(act, master, report):
+    """Name an act whose master was built outside this build's history."""
+    commit = master.get("built_from_commit")
+    if not commit:
+        report.add("provenance", UNDECLARED,
+                   "no build commit recorded -- nothing can tell whether this "
+                   "master came from work in this checkout's history. "
+                   "`deliver.py publish --act` records it.")
+        return
+    known = commit_in_history(commit)
+    if known is None:
+        report.add("provenance", UNDECLARED,
+                   f"recorded commit {commit[:12]} could not be checked")
+    elif known:
+        report.add("provenance", OK, f"built from {commit[:12]}, in history")
+    else:
+        report.add("provenance", FOREIGN,
+                   f"built from {commit[:12]}, which is NOT in this "
+                   f"checkout's history -- this master carries somebody "
+                   f"else's in-flight work and will ship in the next "
+                   f"programme. Rebuild the act here, or check out the work "
+                   f"it came from.")
 
 
 def check_sources(act, master, report):
@@ -1018,6 +1079,15 @@ def record_source_digests(acts, masters, delivery_path, log=print, only=None):
             if master.get("source_digest") != digest:
                 master["source_digest"] = digest
                 changed.append(f"{act.numeral} -> {digest[:12]}")
+            # WHICH COMMIT BUILT THIS MASTER. Prod/ is shared mutable state:
+            # any agent can replace an act's file, and the branch you have
+            # checked out cannot tell you who did. Recording it here -- in
+            # the one step that says "what is in Prod NOW is this" -- is what
+            # lets the next build name a foreign act instead of shipping it.
+            head = git_head()
+            if head and master.get("built_from_commit") != head:
+                master["built_from_commit"] = head
+                changed.append(f"{act.numeral} built_from {head[:12]}")
         # Footage is stamped only when every declared master is present AND
         # the delivered act is not older than the footage it names. Stamping
         # either case would launder the drift this rung exists to catch: a
@@ -1150,6 +1220,7 @@ def gather(acts, masters, social, wolves, plan_path, twin_roots=TWIN_ROOTS):
         master_path = check_master(r.act, masters.get(r.act.numeral), r)
         check_sources(r.act, masters.get(r.act.numeral), r)
         check_footage(r.act, masters.get(r.act.numeral), r)
+        check_provenance(r.act, masters.get(r.act.numeral) or {}, r)
         check_copy(r.act, masters.get(r.act.numeral), r)
         check_link(r.act, master_path, wolves, r, twin_roots=twin_roots)
     programme = ActReport(Act("", "the programme", None))

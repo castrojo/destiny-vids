@@ -3,6 +3,7 @@
 Offline: fixtures are tiny text "videos" under tmp_path; nothing encodes, and
 the ffprobe duration check skips itself on a file that is not a real video.
 """
+import types
 import json
 import os
 import re
@@ -1038,3 +1039,33 @@ def test_act_seven_really_does_declare_the_gap_the_owner_spotted():
     deliver.check_copy(report.act, masters["VII"], report)
     detail = {f.node: f.detail for f in report.findings}["copy"]
     assert "Laura Santamaria" in detail
+
+
+def test_a_master_built_outside_this_history_is_named_foreign(monkeypatch):
+    """Prod/ is shared mutable state, so 'not stale' never meant 'mine'.
+
+    A prologue slide committed on another agent's branch shipped in the next
+    programme because every gate only ever asked whether inputs had moved.
+    This is the question nobody was asking.
+    """
+    from tools import deliver
+
+    act = types.SimpleNamespace(numeral="0", prod_file="00-prologue.mp4")
+
+    # a commit this checkout has never seen
+    monkeypatch.setattr(deliver, "commit_in_history", lambda c, root=None: False)
+    r = deliver.ActReport(act)
+    deliver.check_provenance(act, {"built_from_commit": "d" * 40}, r)
+    assert [f.state for f in r.findings] == [deliver.FOREIGN]
+    assert deliver.FOREIGN in deliver.FAILING      # --check must fail on it
+
+    # a commit that IS in history is fine
+    monkeypatch.setattr(deliver, "commit_in_history", lambda c, root=None: True)
+    r = deliver.ActReport(act)
+    deliver.check_provenance(act, {"built_from_commit": "d" * 40}, r)
+    assert [f.state for f in r.findings] == [deliver.OK]
+
+    # and nothing recorded is UNKNOWN, not an accusation
+    r = deliver.ActReport(act)
+    deliver.check_provenance(act, {}, r)
+    assert [f.state for f in r.findings] == [deliver.UNDECLARED]
