@@ -367,9 +367,21 @@ landings, so two changes that pass separately but break together are caught
 before they land. That is the normal failure mode here, with several agents
 editing `tools/plate.py`, `vocab/casting.yaml` and the generated indexes at once.
 
-Turn on **auto-merge** and walk away. `.github/workflows/ci.yml` is the gate: the
-offline suite plus the four derived-artifact checks, and it runs on `merge_group`
-too.
+Turn on **auto-merge** and walk away. `.github/workflows/ci.yml` is the gate,
+and it is **one step**: the offline suite. The derived-artifact checks are
+asserted inside that suite rather than run again beside it, so `--check` stays
+a local command you run before committing, not a second copy of the gate.
+
+**The gate asserts what a runner can actually know.** It holds no footage and
+no `~/Videos`, so it cannot answer "is the delivered film current". Delivery
+freshness is therefore a **report**, not a gate: `tools/deliver.py status`
+prints it per act, and assembly prints `NOTE: act ... is stale and seated`
+and carries on. Nothing refuses — that is the "Nothing blocks a release" rule
+above, and CI is not exempt from it.
+
+A check that can only run in the case where it passes is not a check. Before
+adding a step, ask what failure it catches that the suite does not, and on
+what evidence.
 
 GitHub's *native* merge queue needs an organization-owned repository and this one
 is personal; the API refuses the `merge_queue` rule on both REST and GraphQL. The

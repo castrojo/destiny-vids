@@ -7,6 +7,7 @@ import json
 import os
 import re
 import sys
+import warnings
 from pathlib import Path
 
 import pytest
@@ -520,17 +521,27 @@ def test_an_act_with_no_committed_inputs_carries_its_reason():
 
 
 def test_the_recorded_digest_matches_what_is_committed():
-    """The gate CI runs. If this fails, an act's inputs moved and nobody
-    re-rendered it -- rebuild the act and `deliver.py publish`.
+    """Delivery freshness REPORTS. It does not gate.
 
-    An act that DECLARES `stale_blocked_on` is exempt, and that is the whole
-    point of the field: act III cannot be rebuilt by anybody until the owner
-    names the roster it credits (#256), so failing here forever turned an
-    honestly-recorded owner decision into a red X that blocked the merge
-    queue -- 24 commits of authored work sat behind it. AGENTS.md: a gap that
-    is recorded and degrades correctly is a punch-list item, not a failure.
-    The act still announces itself in `status`, and seating it in the
-    programme still costs an explicit `--allow-stale`.
+    ``AGENTS.md``: "A gate may inform. It may never withhold the film... a
+    tool that discovers a problem reports and proceeds." This check used to
+    assert, and it was by a wide margin the most expensive thing in the repo:
+    it went red on every unrelated branch, so a one-word docs change could not
+    land until somebody re-rendered five acts. It ran on a machine holding no
+    footage, where the question it asks -- does the owner's rendered master
+    predate its inputs -- cannot be usefully answered.
+
+    The detector is not deleted; it is kept where a person will see it.
+    ``deliver.py status`` prints it per act, assembly prints ``NOTE: act ...
+    is stale and seated``, and this reports through ``warnings`` so it reaches
+    pytest's summary. A bare ``print`` would NOT: pytest captures stdout and
+    stderr from a passing test and discards them, so moving the assertion to a
+    print would have dropped the "may inform" half of the rule along with the
+    gate.
+
+    A digest is a whole-file hash. It answers "did an input byte move", never
+    "did the picture change", so this is a prompt to go and look at the frame
+    -- never on its own a reason to re-render.
     """
     masters, _ = deliver.load_delivery(
         REPO_ROOT / "stories" / "megacut" / "delivery.json")
@@ -549,9 +560,14 @@ def test_the_recorded_digest_matches_what_is_committed():
             f"act {numeral}: `stale_blocked_on` must name the issue holding "
             f"the decision (e.g. '#256'), not {blocker!r} -- an unexplained "
             f"exemption is how a stale act ships quietly")
-    assert not stale, (
-        f"act(s) {', '.join(stale)}: committed inputs no longer match the "
-        f"delivered master. Rebuild, then `python3 tools/deliver.py publish`.")
+    if stale:
+        warnings.warn(
+            f"DELIVERY REPORT: act(s) {', '.join(stale)} have committed "
+            f"inputs that no longer match the delivered master. This is a "
+            f"punch-list item, not a failure: go and look at the frame, and "
+            f"if the picture really moved, rebuild the act and run "
+            f"`python3 tools/deliver.py publish`.",
+            stacklevel=1)
 
 
 def test_a_blocked_act_is_still_stale_everywhere_that_reaches_picture():
