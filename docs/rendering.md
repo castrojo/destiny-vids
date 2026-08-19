@@ -477,6 +477,11 @@ a stub command in. Resolution is the part that raises:
 render.render(shots, media, out, ffmpeg=["ffmpeg-not-invoked"])
 ```
 
+Resolution is also what a *fake* has to cover. Faking the function that uses a
+binary is not enough when something resolves the binary before calling it —
+see [`testing`](skills/testing.md), which also carries the `PATH` sandbox that
+reproduces the runner locally in fifty seconds.
+
 ## Sources
 
 Technical claims about `-ss` semantics and the concat demuxer's

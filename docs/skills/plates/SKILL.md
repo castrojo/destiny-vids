@@ -41,6 +41,17 @@ A chat pill with no `text` does **not** block and does not render empty:
 seat and read length are reviewable while the copy is still being written.
 `python3 tools/placeholder.py list` is the punch list.
 
+**Copy that is written but cannot be read in the time it is up is the same gap
+one step later.** `dur` is authored by hand and nothing derives it from the
+words, so a four-character pill and a ninety-character one can both sit up for
+1.2 seconds. `python3 tools/readtime.py` lists every plate held shorter than
+its own copy needs, separating the ones under `plate.py`'s 2.2s floor from the
+ones that clear the floor and are still too fast to read.
+
+It **reports and never re-times**. Widening a hold shoves whatever is seated
+after it, and moving an authored beat is the owner's call — so the default
+exits 0, and `--check` is only for whoever is gating a final cut.
+
 **A placeholder credits nobody** — the vocab's uncast speaker (`TBD`) and the
 drawn crest, never a real login or somebody's avatar; the intended speaker is
 kept in `speaker_pending`. Lorem under a real name is still putting words in a
