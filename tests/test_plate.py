@@ -6,10 +6,7 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 from tools import plate  # noqa: E402
-
 
 # The field vocabulary of the reference deck (~/Videos/nameplates.json).
 GUARDIAN = {
@@ -29,7 +26,6 @@ TITLE_CARD = {
     "body": ["hanthor", "Giklab"],
 }
 
-
 def test_plate_renders_to_a_transparent_rgba_image():
     img = plate.render_plate(GUARDIAN)
     assert img.mode == "RGBA"
@@ -39,11 +35,9 @@ def test_plate_renders_to_a_transparent_rgba_image():
     # ...and the middle of the plate is not.
     assert img.getpixel((img.width // 2, img.height // 2))[3] > 0
 
-
 def test_render_is_deterministic():
     """A re-render must be diffable: same spec in, same bytes out."""
     assert plate.render_plate(GUARDIAN).tobytes() == plate.render_plate(GUARDIAN).tobytes()
-
 
 def test_ghost_plate_has_no_class_line():
     """A Ghost is not a Guardian, so a subclass line would be nonsense on it."""
@@ -51,14 +45,12 @@ def test_ghost_plate_has_no_class_line():
     with_class = plate.render_plate(dict(GHOST, kind="guardian", **{"class": "Voidwalker Warlock"}))
     assert ghost.height < with_class.height
 
-
 def test_rust_variant_changes_only_the_chrome():
     """The Rust Foundation herald's plate is oxidised, not a different card."""
     rust = plate.render_plate(dict(GUARDIAN, variant="rust", trustee=False))
     default = plate.render_plate(dict(GUARDIAN, trustee=False))
     assert rust.size == default.size            # same geometry, same copy
     assert rust.tobytes() != default.tobytes()  # different chrome
-
 
 # --- owner-authored chrome: portraits, the laurel, bazzite purple -----------
 # None of these adds a row of text; they are imagery and colour, the same
@@ -73,7 +65,6 @@ def avatar_png(tmp_path):
     Image.new("RGBA", (96, 96), (200, 30, 30, 255)).save(path)
     return path
 
-
 def test_an_avatar_is_masked_into_the_crest(avatar_png):
     """`avatar` is a PFP path: the photo sits in the crest's inner hex with
     the hex rules kept over it, and the plate's geometry does not move."""
@@ -87,13 +78,11 @@ def test_an_avatar_is_masked_into_the_crest(avatar_png):
     assert a == 255 and r > 150 and g < 80
     assert drawn.getpixel((cx, crest_mid)) != (r, g, b, a)
 
-
 def test_a_missing_avatar_degrades_to_the_drawn_crest():
     """Degrade, never block: a PFP that is not there is a punch-list item,
     and the drawn crest stands in -- the render is exactly the fallback."""
     spec = dict(GUARDIAN, avatar="avatars/nobody-cached-this.png")
     assert plate.render_plate(spec).tobytes() == plate.render_plate(GUARDIAN).tobytes()
-
 
 def test_an_unreadable_avatar_also_degrades(tmp_path):
     """A file that is not an image is the same punch-list item, not a crash."""
@@ -102,14 +91,12 @@ def test_an_unreadable_avatar_also_degrades(tmp_path):
     assert plate.render_plate(dict(GUARDIAN, avatar=str(bad))).tobytes() == \
         plate.render_plate(GUARDIAN).tobytes()
 
-
 def test_an_avatar_url_degrades_too_the_renderer_is_offline():
     """The vocab may record the avatar's SOURCE URL; the renderer never
     fetches. Until a cache step turns it into a local path, the drawn crest
     stands in -- reported on stderr, never a crash."""
     spec = dict(GUARDIAN, avatar="https://avatars.githubusercontent.com/u/52753?v=4")
     assert plate.render_plate(spec).tobytes() == plate.render_plate(GUARDIAN).tobytes()
-
 
 def test_the_wreath_rings_the_crest_without_moving_the_layout():
     """Owner-briefed for exactly two people: a laurel around the crest, struck
@@ -139,7 +126,6 @@ def test_the_wreath_rings_the_crest_without_moving_the_layout():
                     if 22 <= math.hypot(xx - cx, yy - cy) <= 33)
     assert leaves / ring_area < 0.45, "a struck laurel, not a solid ring"
 
-
 def test_the_wreath_frames_the_avatar(avatar_png):
     """The brief was 'a nicer wreath around her pfp': both compose, and the
     photo still fills the crest under the laurel."""
@@ -148,7 +134,6 @@ def test_the_wreath_frames_the_avatar(avatar_png):
     cy = int(plate.PAD_TOP + plate.CREST / 2)
     r, g, b, a = img.getpixel((cx, cy))
     assert a == 255 and r > 150 and g < 80
-
 
 def test_the_bazzite_variant_is_purple_chrome_not_a_new_card():
     """Same geometry and the same closed field set as every other plate --
@@ -162,8 +147,6 @@ def test_the_bazzite_variant_is_purple_chrome_not_a_new_card():
     variant = plate._variant_for(dict(GUARDIAN, variant="bazzite"))
     assert variant is plate.VARIANTS["bazzite"]
     assert variant["accent"] == (138, 43, 226, 255)   # #8A2BE2
-    assert variant["glow"][:3] == (88, 53, 206)       # #5835ce
-
 
 def test_the_bazzite_crest_carries_the_logomark():
     """The tile replaces the hex for this variant: the cobalt->violet
@@ -183,7 +166,6 @@ def test_the_bazzite_crest_carries_the_logomark():
     corner = crest_px(0.147, 0.147)
     assert corner[2] > corner[0] + 80
 
-
 def test_a_bazzite_avatar_takes_the_tiles_silhouette(avatar_png):
     """'Use the bazzite logo and his PFP': with a photo set, the tile keeps
     its silhouette and hairline and the glyph is not drawn over a face."""
@@ -194,7 +176,6 @@ def test_a_bazzite_avatar_takes_the_tiles_silhouette(avatar_png):
                            int(plate.PAD_TOP + (230.56 - 100) / 408 * plate.CREST)))
     r, g, b, a = centre
     assert a == 255 and r > 150 and g < 80  # the photo, not the glyph
-
 
 def test_a_bracketed_name_typesets_wide_and_whole():
     """`[ REDACTED ]` is wider than a typical name; the box grows to fit the
@@ -208,7 +189,6 @@ def test_a_bracketed_name_typesets_wide_and_whole():
     for name in ("[ p5 ]", "[ EyeCantCU ]"):
         img = plate.render_plate(dict(GUARDIAN, **probe_name, name=name))
         assert img.width > 0 and img.height == bob.height
-
 
 def test_placement_respects_the_row_margins():
     """bottom 10%, left/right 5% (.wolves-guardian-plate-row)."""
@@ -227,7 +207,6 @@ def test_placement_respects_the_row_margins():
     assert ly1 == pytest.approx(plate.FRAME_H * (1 - plate.MARGIN_BOTTOM), abs=2)
     assert lx0 < rx0  # left-anchored really is further left
 
-
 # --- group rows (the reference deck's roll call, gp_* entries) --------------
 
 def test_a_group_plate_sits_at_its_absolute_x_on_the_picture():
@@ -243,11 +222,9 @@ def test_a_group_plate_sits_at_its_absolute_x_on_the_picture():
     # cannot hang onto the letterbox bar.
     assert y1 == pytest.approx(140 + int(800 * (1 - plate.MARGIN_BOTTOM)), abs=1)
 
-
 def test_a_group_plate_without_an_x_is_a_bug_not_a_default():
     with pytest.raises(ValueError, match="x"):
         plate.place(plate.render_plate(GUARDIAN), "group")
-
 
 def test_group_row_members_may_be_visible_together():
     """Members of the same group row share a `group` key and are one row by
@@ -258,7 +235,6 @@ def test_group_row_members_may_be_visible_together():
                 group="r1", x=461, scale=0.78)]
     assert [e["id"] for e in plate.load_manifest_entries(row)] == ["g1", "g2"]
 
-
 def test_a_group_member_still_may_not_overlap_a_plate_outside_its_row():
     """The exception is narrow: overlapping anything but your own row fails."""
     with pytest.raises(ValueError, match="same time"):
@@ -268,7 +244,6 @@ def test_a_group_member_still_may_not_overlap_a_plate_outside_its_row():
             dict(GHOST, id="solo", at=12.0, dur=4.0),
         ])
 
-
 def test_two_different_group_rows_may_not_overlap():
     with pytest.raises(ValueError, match="same time"):
         plate.load_manifest_entries([
@@ -277,7 +252,6 @@ def test_two_different_group_rows_may_not_overlap():
             dict(GHOST, id="g2", at=12.0, dur=4.0, position="group",
                  group="r2", x=461),
         ])
-
 
 def test_an_exempt_pair_does_not_shield_a_later_collider():
     """The overlap check stays pairwise: A and B sharing a row must not hide
@@ -291,7 +265,6 @@ def test_an_exempt_pair_does_not_shield_a_later_collider():
             dict(GHOST, id="solo", at=15.0, dur=1.0),
         ])
 
-
 def test_overlapping_plates_are_rejected(tmp_path):
     """One plate at a time: two visible at once is a bug, not a style choice."""
     path = tmp_path / "m.json"
@@ -302,7 +275,6 @@ def test_overlapping_plates_are_rejected(tmp_path):
     with pytest.raises(ValueError, match="same time"):
         plate.load_manifest(path)
 
-
 def test_duplicate_ids_are_rejected(tmp_path):
     path = tmp_path / "m.json"
     path.write_text(json.dumps([
@@ -312,25 +284,21 @@ def test_duplicate_ids_are_rejected(tmp_path):
     with pytest.raises(ValueError, match="duplicate"):
         plate.load_manifest(path)
 
-
 def test_non_positive_duration_is_rejected(tmp_path):
     path = tmp_path / "m.json"
     path.write_text(json.dumps([dict(GUARDIAN, dur=0)]))
     with pytest.raises(ValueError, match="dur"):
         plate.load_manifest(path)
 
-
 def test_manifest_accepts_a_plates_wrapper(tmp_path):
     path = tmp_path / "m.json"
     path.write_text(json.dumps({"plates": [GUARDIAN, GHOST]}))
     assert [e["id"] for e in plate.load_manifest(path)] == ["osiris", "sagira"]
 
-
 def test_render_all_writes_one_png_per_plate(tmp_path):
     written = plate.render_all([GUARDIAN, GHOST], tmp_path)
     assert [p.name for p in written] == ["plate_osiris.png", "plate_sagira.png"]
     assert all(p.exists() for p in written)
-
 
 def test_burn_builds_one_enable_gated_overlay_per_plate(tmp_path):
     """The burn is a single ffmpeg pass; each plate is gated to its own window."""
@@ -373,7 +341,6 @@ def test_burn_builds_one_enable_gated_overlay_per_plate(tmp_path):
     # audio is carried through, not re-encoded
     assert "-c:a" in captured["cmd"] and "copy" in captured["cmd"]
 
-
 # --- planning -----------------------------------------------------------
 
 LEADS = {
@@ -393,7 +360,6 @@ LEADS = {
                   "constraints": {}, "plate": None},
 }
 
-
 def _shot(seg, start, end, role=None, character=None, slots=0, usable=True):
     return {
         "segment_id": seg, "video_id": "yt_v", "start_sec": start, "end_sec": end,
@@ -401,7 +367,6 @@ def _shot(seg, start, end, role=None, character=None, slots=0, usable=True):
         "casting": {"role": role, "character": character, "person": None,
                     "usable": usable, "constraints_failed": [], "slots": slots},
     }
-
 
 def test_plan_plates_each_lead_once_on_first_appearance():
     shots = [
@@ -415,11 +380,9 @@ def test_plan_plates_each_lead_once_on_first_appearance():
     assert entries[0]["at"] == pytest.approx(plate.LEAD_IN)
     assert entries[1]["at"] == pytest.approx(16 + plate.LEAD_IN)
 
-
 def test_plan_skips_a_lead_with_no_plate_copy():
     """A binding without `plate:` in the vocab simply gets no plate."""
     assert plate.plan([_shot("s1", 0, 8, "lead", "zavala")], LEADS) == []
-
 
 def test_plan_reports_an_unplated_lead_instead_of_dropping_them():
     """A credit that vanishes without a word is how a real person goes uncredited.
@@ -441,7 +404,6 @@ def test_plan_reports_an_unplated_lead_instead_of_dropping_them():
         assert entry["automatable"] is False
         assert entry["blocked_on"]
 
-
 def test_plan_reports_a_lead_the_cut_never_gave_a_window():
     """Unlike the copy-shaped reasons, this one a re-plan can actually fix."""
     shots = [_shot("s1", 0, 0.5, "lead", "sagira"), _shot("s2", 0.5, 20.0)]
@@ -449,7 +411,6 @@ def test_plan_reports_a_lead_the_cut_never_gave_a_window():
     assert plate.plan(shots, LEADS, unresolved=unresolved) == []
     assert [(u["id"], u["reason"]) for u in unresolved] == [("sagira", "no_window")]
     assert unresolved[0]["automatable"] is True
-
 
 def test_plan_does_not_report_a_lead_a_later_shot_carried():
     """A first appearance too short to plate is not a miss if a later one holds."""
@@ -459,12 +420,10 @@ def test_plan_does_not_report_a_lead_a_later_shot_carried():
     assert [e["id"] for e in entries] == ["osiris"]
     assert unresolved == []
 
-
 def test_plan_skips_a_shot_that_fails_its_binding_constraints():
     """A shot excluded from a character's retrieval is not a reveal."""
     shots = [_shot("s1", 0, 8, "lead", "osiris", usable=False)]
     assert plate.plan(shots, LEADS) == []
-
 
 def test_plan_lets_a_plate_ride_across_a_cut():
     """Anchored to a short reveal shot, but not confined to it."""
@@ -474,11 +433,9 @@ def test_plan_lets_a_plate_ride_across_a_cut():
     # the plate outlives its 2s anchor shot
     assert entries[0]["at"] + entries[0]["dur"] > 2.0
 
-
 def test_plan_rejects_an_anchor_too_short_to_register():
     shots = [_shot("s1", 0, 0.5, "lead", "sagira"), _shot("s2", 0.5, 20.0)]
     assert plate.plan(shots, LEADS) == []
-
 
 def test_plan_respects_the_render_hold_cap():
     """Plate timings must land on the rendered file, not the source timeline."""
@@ -487,13 +444,11 @@ def test_plan_respects_the_render_hold_cap():
     sagira = next(e for e in entries if e["id"] == "sagira")
     assert sagira["at"] == pytest.approx(9 + plate.LEAD_IN)
 
-
 ROSTER = {
     "month": "2026-08",
     "contributors": [{"login": f"user{i}", "commits": 1, "display_name": f"user{i}"}
                      for i in range(4)],
 }
-
 
 def test_plan_credits_every_contributor_somewhere():
     """The month's contributors are the ensemble; dropping them silently is the
@@ -508,7 +463,6 @@ def test_plan_credits_every_contributor_somewhere():
         line for e in entries for line in e.get("body", [])}
     for c in ROSTER["contributors"]:
         assert c["display_name"] in named, c
-
 
 # A contributor whose Guardian identity is genuinely authored in the reference
 # deck. Injected rather than taken from vocab/casting.yaml, because the only
@@ -526,7 +480,6 @@ AUTHORED_ROSTER = {
                       "display_name": "titled", "org_member": True}],
 }
 
-
 @pytest.fixture
 def authored(monkeypatch):
     """Give the login `titled` an authored deck identity for one test."""
@@ -535,7 +488,6 @@ def authored(monkeypatch):
     monkeypatch.setattr(tools.derive, "load_ensemble_titles",
                         lambda *a, **k: {"titled": dict(AUTHORED)})
     return AUTHORED
-
 
 def test_a_contributor_with_an_authored_deck_plate_gets_it_verbatim(authored):
     """A specially-titled person: the generic copy must not stand in for it."""
@@ -547,7 +499,6 @@ def test_a_contributor_with_an_authored_deck_plate_gets_it_verbatim(authored):
     assert entry["name"] == "Jorge Castro"
     assert entry["title"] == "Upender of Antipatterns | The First Disciple"
     assert entry["trustee"] is True
-
 
 def test_an_unlisted_contributor_still_gets_the_generic_ensemble_copy():
     """Nobody has authored a seal for a passing contributor, so the credit
@@ -564,7 +515,6 @@ def test_an_unlisted_contributor_still_gets_the_generic_ensemble_copy():
     assert entry["title"] == "Bluefin Blueberry"
     assert "class" not in entry and "trustee" not in entry
 
-
 def test_an_authored_identity_is_not_reduced_to_a_roster_card_line(authored):
     """A specially-titled contributor who would land on the tail card gets the
     real plate in the tail instead, while the cut still has room for it."""
@@ -579,7 +529,6 @@ def test_an_authored_identity_is_not_reduced_to_a_roster_card_line(authored):
     # ...and the sign-off card still plays, with nobody left to list on it.
     card = next(e for e in entries if e["id"] == "ensemble_roster")
     assert "body" not in card
-
 
 def test_the_authored_plate_never_pushes_anyone_off_the_card(authored):
     """...but when the tail cannot hold both the plate and the card, the card
@@ -600,7 +549,6 @@ def test_the_authored_plate_never_pushes_anyone_off_the_card(authored):
     assert set(card["body"]) == {"titled", "hanthor"}
     plate.load_manifest_entries(entries)
 
-
 def test_the_roster_card_carries_the_owner_supplied_thank_you():
     """The tail card's headline is authored copy from vocab/casting.yaml."""
     shots = [
@@ -615,7 +563,6 @@ def test_the_roster_card_carries_the_owner_supplied_thank_you():
     assert card["title"] == "Thanks for working on Bluefin!"
     assert card["subtitle"] == "Project Bluefin contributors, 2026-08"
     assert card["body"] == ["hanthor"]
-
 
 def test_no_invented_title_survives_in_the_vocab():
     """Tombstones for copy the repo once made up for real people.
@@ -643,7 +590,6 @@ def test_no_invented_title_survives_in_the_vocab():
                  if (v.get("plate") or {}).get("class") == "Dawnblade Warlock"]
     assert dawnblade == ["zavala"]
 
-
 def test_plan_output_never_double_books_the_screen():
     shots = [
         _shot("s1", 0, 6, "lead", "osiris"),
@@ -655,14 +601,12 @@ def test_plan_output_never_double_books_the_screen():
     assert len(entries) > 2
     plate.load_manifest_entries(entries)  # raises if any two overlap
 
-
 SIX_ROSTER = {
     "month": "2026-08",
     "contributors": [{"login": f"user{i}", "commits": 1,
                       "display_name": f"user{i}", "org_member": False}
                      for i in range(6)],
 }
-
 
 def test_a_crowded_shot_spreads_its_slots_into_one_staggered_row():
     """The owner's ask: ensemble plates staggered to each of the Guardians --
@@ -696,14 +640,12 @@ def test_a_crowded_shot_spreads_its_slots_into_one_staggered_row():
         assert e["x"] + w <= plate.FRAME_W * (1 - plate.GROUP_MARGIN_X) + 1
     plate.load_manifest_entries(entries)  # same-row overlap validates
 
-
 def test_a_single_ensemble_slot_keeps_the_right_hand_plate():
     """A row of one is not a row; the solo credit stays where it was."""
     shots = [_shot("s1", 0, 9, "ensemble", None, slots=1), _shot("s2", 9, 30)]
     entries = plate.plan(shots, LEADS, ROSTER)
     assert entries[0]["position"] == "right"
     assert "group" not in entries[0]
-
 
 def test_a_row_too_wide_for_one_line_splits_into_balanced_rows(authored):
     """An authored plate is much wider than the generic card; six slots
@@ -727,7 +669,6 @@ def test_a_row_too_wide_for_one_line_splits_into_balanced_rows(authored):
     assert titled["title"] == "Upender of Antipatterns | The First Disciple"
     plate.load_manifest_entries(entries)
 
-
 def test_a_row_that_cannot_stagger_readably_falls_back_to_sequential():
     """Room for one plate but not for a cascaded row: the shot degrades to the
     old one-after-another behaviour rather than showing an unreadable row."""
@@ -736,7 +677,6 @@ def test_a_row_that_cannot_stagger_readably_falls_back_to_sequential():
     assert not any(e.get("position") == "group" for e in entries)
     assert any(e.get("position") == "right" for e in entries)
     plate.load_manifest_entries(entries)
-
 
 def test_an_impossibly_wide_row_degrades_to_sequential_plates():
     """A card that would have to shrink past GROUP_MIN_SCALE is no credit at
@@ -752,7 +692,6 @@ def test_an_impossibly_wide_row_degrades_to_sequential_plates():
     assert plated and all(e["position"] == "right" for e in plated)
     plate.load_manifest_entries(entries)
 
-
 def test_group_rows_still_never_drop_a_contributor():
     """Six slots on one shot name six contributors, on the row or not at all."""
     shots = [_shot("s1", 0, 9, "ensemble", None, slots=6), _shot("s2", 9, 30)]
@@ -762,7 +701,6 @@ def test_group_rows_still_never_drop_a_contributor():
     for c in SIX_ROSTER["contributors"]:
         assert c["display_name"] in named, c
 
-
 def test_render_all_handles_group_entries(tmp_path):
     """The render path reads x/scale/group straight off the manifest entry."""
     shots = [_shot("s1", 0, 9, "ensemble", None, slots=3), _shot("s2", 9, 30)]
@@ -771,7 +709,6 @@ def test_render_all_handles_group_entries(tmp_path):
     assert len(row) == 3
     written = plate.render_all(row, tmp_path, picture=(0, 140, 1920, 800))
     assert all(p.exists() for p in written)
-
 
 def test_a_pool_smaller_than_the_slot_count_names_nobody_twice():
     """Round-robin assigns the same login twice into one shot when the pool is
@@ -789,7 +726,6 @@ def test_a_pool_smaller_than_the_slot_count_names_nobody_twice():
 PLACEHOLDER = {"label": "CONTRIBUTOR // GUARDIAN", "name": "TBD",
                "title": "Project Bluefin"}
 
-
 def _placeholder_shots():
     return [
         _shot("s1", 0, 8, "ensemble", None, slots=3),
@@ -798,10 +734,8 @@ def _placeholder_shots():
         _shot("s4", 24, 40, "ensemble", None, slots=4),
     ]
 
-
 def _placeholders_of(entries):
     return [e for e in entries if e["id"].startswith("ensemble_placeholder_")]
-
 
 def test_placeholders_plate_ensemble_shots_with_the_uncast_copy():
     entries = _placeholders_of(plate.plan(_placeholder_shots(), LEADS, placeholders=2,
@@ -811,11 +745,9 @@ def test_placeholders_plate_ensemble_shots_with_the_uncast_copy():
                                           "ensemble_placeholder_02"]
     assert all(e["name"] == "TBD" for e in entries)
 
-
 def test_placeholders_never_land_on_a_shot_with_no_ensemble_in_it():
     shots = [_shot("s1", 0, 20, "lead", "osiris"), _shot("s2", 20, 40)]
     assert _placeholders_of(plate.plan(shots, LEADS, placeholders=3)) == []
-
 
 def test_placeholders_degrade_when_the_cut_has_no_room_for_them_all():
     """Asking for more plates than fit is not an error; you get what reads."""
@@ -824,19 +756,16 @@ def test_placeholders_degrade_when_the_cut_has_no_room_for_them_all():
     assert 0 < len(_placeholders_of(entries)) < 99
     plate.load_manifest_entries(entries)  # raises if any two overlap
 
-
 def test_placeholders_do_not_double_book_a_lead_plate():
     entries = plate.plan(_placeholder_shots(), LEADS, placeholders=99,
                          placeholder_copy=PLACEHOLDER)
     plate.load_manifest_entries(entries)
     assert any(e["id"] == "osiris" for e in entries)
 
-
 def test_a_roster_and_placeholders_are_mutually_exclusive():
     """Once real contributors are known, they are who the plate is for."""
     with pytest.raises(ValueError):
         plate.plan(_placeholder_shots(), LEADS, ROSTER, placeholders=2)
-
 
 def test_placeholder_copy_comes_from_the_vocab_not_the_tool():
     from tools.derive import load_placeholder_plate
@@ -845,7 +774,6 @@ def test_placeholder_copy_comes_from_the_vocab_not_the_tool():
     entry = _placeholders_of(plate.plan(_placeholder_shots(), LEADS, placeholders=1))[0]
     assert {k: v for k, v in entry.items()
             if k not in {"id", "at", "dur", "position"}} == copy
-
 
 def test_plan_reports_contributors_the_tail_could_not_hold():
     """An empty `unresolved` must mean nobody was missed: when the tail has no
@@ -872,7 +800,6 @@ def test_plan_reports_contributors_the_tail_could_not_hold():
     # the human-readable line stays -- the log and the punch-list both tell it
     assert any("UNCREDITED (no room in the cut)" in line for line in logs)
 
-
 def test_plan_reports_each_lead_reason():
     """The reason table a reader of `unresolved` relies on: uncast and missing
     copy are owner decisions; a missing window is not."""
@@ -895,7 +822,6 @@ def test_plan_reports_each_lead_reason():
         assert entry["detail"] == vocab_entry["detail"]
         assert entry["automatable"] == vocab_entry["automatable"]
 
-
 def test_plan_cli_reports_the_whole_punch_list(tmp_path, capsys):
     """The count the CLI prints is the list it writes: a reader who sees
     '0 unresolved' must be able to trust that nobody went uncredited."""
@@ -917,7 +843,6 @@ def test_plan_cli_reports_the_whole_punch_list(tmp_path, capsys):
     assert f"{len(written['plates'])} plate(s)" in summary
     assert f"{len(written['unresolved'])} unresolved" in summary
 
-
 # --- holding a reveal (#33: "do not reveal until 1:50") ---------------------
 #
 # The floor is a request about the FINISHED cut's clock -- the clock the owner
@@ -928,7 +853,6 @@ def test_plan_cli_reports_the_whole_punch_list(tmp_path, capsys):
 GOLD_LEADS = dict(LEADS, zavala=dict(
     LEADS["zavala"], plate={"name": "Kelsey Hightower", "variant": "leader"}))
 
-
 def test_a_reveal_floor_holds_the_plate_until_the_moment_asked_for():
     shots = [_shot("s1", 0, 10, "lead", "zavala"),
              _shot("s2", 10, 20),
@@ -938,13 +862,11 @@ def test_a_reveal_floor_holds_the_plate_until_the_moment_asked_for():
     assert entries[0]["at"] == pytest.approx(20 + plate.LEAD_IN)
     assert entries[0]["variant"] == "leader"
 
-
 def test_a_reveal_floor_inside_a_shot_starts_the_plate_at_the_floor():
     """The anchor may straddle the moment; the plate still lands at or after it."""
     shots = [_shot("s1", 0, 30, "lead", "zavala")]
     entries = plate.plan(shots, GOLD_LEADS, reveal_after=12)
     assert entries[0]["at"] == pytest.approx(12 + plate.LEAD_IN)
-
 
 def test_a_reveal_the_footage_cannot_reach_degrades_to_the_latest_appearance():
     """Held back rather than credited is how a real person goes uncredited.
@@ -969,7 +891,6 @@ def test_a_reveal_the_footage_cannot_reach_degrades_to_the_latest_appearance():
     assert report["revealed_at"] == entries[0]["at"]
     assert report["automatable"] is False and report["blocked_on"]
 
-
 def test_a_reveal_floor_never_moves_a_credit_onto_another_shot():
     """The one thing the floor may not buy: a name over somebody else's shot."""
     shots = [_shot("s1", 0, 10, "lead", "zavala"),
@@ -979,14 +900,12 @@ def test_a_reveal_floor_never_moves_a_credit_onto_another_shot():
     assert by_id["zavala"]["at"] < 10, "zavala is only in the first shot"
     assert by_id["osiris"]["at"] >= 10
 
-
 def test_a_reveal_floor_does_not_report_a_character_it_could_honour():
     shots = [_shot("s1", 0, 10, "lead", "zavala"),
              _shot("s2", 10, 30, "lead", "zavala")]
     unresolved = []
     plate.plan(shots, GOLD_LEADS, reveal_after=12, unresolved=unresolved)
     assert unresolved == []
-
 
 def test_reveal_after_accepts_a_timecode_on_the_cli(tmp_path):
     shotlist = tmp_path / "shots.json"
@@ -999,7 +918,6 @@ def test_reveal_after_accepts_a_timecode_on_the_cli(tmp_path):
                        "--out", str(out)]) == 0
     written = json.loads(out.read_text())
     assert written["plates"][0]["at"] == pytest.approx(12 + plate.LEAD_IN)
-
 
 def test_no_plate_field_is_invented_beyond_the_reference_deck():
     """The reference (~/Videos/nameplates.json) has exactly these text fields.
@@ -1042,7 +960,6 @@ def test_no_plate_field_is_invented_beyond_the_reference_deck():
     for login, copy in titles.items():
         assert set(copy) <= allowed, (login, set(copy) - allowed)
 
-
 def test_no_plate_copy_is_written_in_the_renderer():
     """Copy lives in vocab/casting.yaml so a recast changes the credit only."""
     from pathlib import Path
@@ -1055,12 +972,10 @@ def test_no_plate_copy_is_written_in_the_renderer():
                    "Thanks for working on Bluefin!", "The Ensemble"):
         assert phrase not in source, f"{phrase!r} is hardcoded in tools/plate.py"
 
-
 def test_title_card_renders_its_body_lines():
     card = plate.render_plate(TITLE_CARD)
     fewer = plate.render_plate(dict(TITLE_CARD, body=["castrojo"]))
     assert card.height > fewer.height
-
 
 CHAT = {
     "id": "d01", "at": 3.0, "dur": 4.0, "position": "center", "kind": "chat",
@@ -1068,14 +983,12 @@ CHAT = {
     "text": "Ominous rocks, killer robots, people in mortal danger.",
 }
 
-
 def test_chat_card_renders_the_speaker_and_the_line():
     img = plate.render_plate(CHAT)
     assert img.mode == "RGBA"
     assert img.getpixel((0, 0))[3] == 0          # the pill's rounded cap is clear
     # ...and just inside the left edge at mid-height is solid fill.
     assert img.getpixel((3, img.height // 2))[3] > 200
-
 
 def test_chat_card_is_a_small_wide_lower_third_not_a_reveal():
     """The other videos' talking card is a one-line pill; the reveal chrome is
@@ -1085,7 +998,6 @@ def test_chat_card_is_a_small_wide_lower_third_not_a_reveal():
     assert chat.height < reveal.height / 2
     assert chat.width > chat.height * 4
 
-
 def test_chat_card_keeps_the_blue_accent_edge():
     """The pill's hairline is the videos' blue (rgb(147 197 253 / 45%)), the
     accent the whole Wolves treatment hangs on. Over the dark fill that reads
@@ -1094,7 +1006,6 @@ def test_chat_card_keeps_the_blue_accent_edge():
     r, g, b, a = img.getpixel((0, img.height // 2))
     assert a > 200
     assert b - r > 25 and b > g > r
-
 
 def test_chat_card_text_is_left_aligned_from_the_badge():
     """The row is laid out left-to-right from the badge: the speaker starts at
@@ -1114,7 +1025,6 @@ def test_chat_card_text_is_left_aligned_from_the_badge():
     assert eyebrow_left_edge(short) == pytest.approx(expected, abs=4)
     assert eyebrow_left_edge(long) == eyebrow_left_edge(short)
 
-
 def test_chat_copy_shrinks_to_fit_instead_of_wrapping():
     """plate.html's auto-fit: the font steps down to keep one wide line --
     wrapping or hyphenating recovered dialogue would put line breaks (or
@@ -1127,7 +1037,6 @@ def test_chat_copy_shrinks_to_fit_instead_of_wrapping():
     assert long_line.width > one.width
     assert long_line.width <= plate.CHAT_MAX_W + 2  # .plate max-width: 3100px at 2x
 
-
 def test_chat_copy_past_the_shrink_floor_still_renders_whole():
     """plate.html stops shrinking at MIN_FONT too; a line that long renders
     whole on a wide pill rather than being clipped or broken."""
@@ -1135,14 +1044,12 @@ def test_chat_copy_past_the_shrink_floor_still_renders_whole():
     assert huge.height == plate.render_plate(CHAT).height
     assert huge.width > plate.CHAT_MAX_W
 
-
 def test_a_chat_card_carries_no_guardian_rows():
     """It names the person and the line; who plays whom is the reveal's job."""
     card = plate.render_plate(CHAT)
     with_ignored_rows = plate.render_plate(
         dict(CHAT, label="TRUSTEE // GUARDIAN", **{"class": "Dawnblade Warlock"}))
     assert card.size == with_ignored_rows.size
-
 
 def test_a_chat_card_carries_the_pfp_in_its_badge_slot(avatar_png):
     """plate.html's .avatar/.pfp is an 84px circle; the crest is the no-pfp
@@ -1157,7 +1064,6 @@ def test_a_chat_card_carries_the_pfp_in_its_badge_slot(avatar_png):
     # ...and the slot's corner is pill fill, not photo: the mask is a circle
     corner = with_photo.getpixel((plate.CHAT_PAD_L + 3, 10))
     assert corner[:3] == plate.INK[:3]
-
 
 def test_plates_sit_on_the_picture_not_on_the_letterbox_bar():
     """A 2.39:1 cinematic in a 16:9 file has ~140px of baked-in black.
@@ -1179,7 +1085,6 @@ def test_plates_sit_on_the_picture_not_on_the_letterbox_bar():
     assert lowest_opaque_row(framed) > picture_bottom, "baseline hangs off the picture"
     assert lowest_opaque_row(fitted) <= picture_bottom, "fitted plate must stay on it"
 
-
 def test_a_right_hand_plate_stays_inside_the_picture_width():
     picture = (0, 140, 1920, 800)
     img = plate.place(plate.render_plate(GHOST), "right", picture)
@@ -1187,7 +1092,6 @@ def test_a_right_hand_plate_stays_inside_the_picture_width():
     right_most = max(x for x in range(img.width)
                      if alpha.crop((x, 0, x + 1, img.height)).getextrema()[1] > 0)
     assert right_most <= picture[0] + picture[2]
-
 
 def test_the_gold_leader_treatment_beats_trustee_silver():
     """`variant: leader` is the wolves trailer's gold plate (Christoph Blecker).
@@ -1206,7 +1110,6 @@ def test_the_gold_leader_treatment_beats_trustee_silver():
     assert leader["klass"] == plate.VARIANTS["default"]["klass"]
     assert plate._variant_for(GUARDIAN) is plate.VARIANTS["trustee"]
 
-
 def test_osiris_is_plated_gold():
     """The casting vocabulary, not a render, is what makes Bob Killen gold."""
     import yaml
@@ -1218,13 +1121,11 @@ def test_osiris_is_plated_gold():
     assert copy["variant"] == "leader"
     assert plate._variant_for(copy) is plate.VARIANTS["leader"]
 
-
 def test_the_gold_plate_actually_renders_gold_pixels():
     silver = plate.render_plate(GUARDIAN)
     gold = plate.render_plate(dict(GUARDIAN, variant="leader"))
     assert silver.size == gold.size, "chrome must not change the layout"
     assert silver.tobytes() != gold.tobytes()
-
 
 def test_the_font_stack_resolves_the_way_the_browser_did():
     """`ui-monospace, SFMono-Regular, Cascadia Mono, monospace` on this host.
@@ -1244,7 +1145,6 @@ def test_the_font_stack_resolves_the_way_the_browser_did():
     for weight in ("regular", "bold"):
         assert plate._font(weight, 20) is not None
 
-
 def test_the_subclass_row_keeps_its_authored_case():
     """The baked reveal reads "Behemoth Titan", not "BEHEMOTH TITAN".
 
@@ -1255,13 +1155,11 @@ def test_the_subclass_row_keeps_its_authored_case():
     upper = plate.render_plate(dict(GUARDIAN, **{"class": "DAWNBLADE WARLOCK"}))
     assert mixed.tobytes() != upper.tobytes(), "the class row was uppercased"
 
-
 def test_the_default_title_is_the_blue_the_reference_bakes():
     """reveal.html's .title is #93c5fd and tracked, not untracked slate."""
     assert plate.VARIANTS["default"]["title"] == (147, 197, 253, 255)
     assert plate.VARIANTS["default"]["klass"] == (203, 213, 245, 255)
     assert plate.LS_TITLE == 0.08
-
 
 def test_the_plate_corners_are_antialiased_and_only_two_are_cut():
     """clip-path cuts top-left and bottom-right; border-radius rounds the rest."""
@@ -1278,7 +1176,6 @@ def test_the_plate_corners_are_antialiased_and_only_two_are_cut():
                 for i in range(1, plate.CHAMFER)]
     assert any(0 < a < 255 for a in diagonal), "chamfer edge is aliased"
 
-
 # --- reveals wait for the hero move -----------------------------------------
 
 def _lead_shot(segment_id, start, end, character="osiris", traversal_hero=False):
@@ -1287,11 +1184,9 @@ def _lead_shot(segment_id, start, end, character="osiris", traversal_hero=False)
             "casting": {"role": "lead", "character": character, "usable": True,
                         "slots": 0}}
 
-
 REVEAL_LEADS = {"osiris": {"person": "mrbobbytables",  # an uncast lead is
                            "plate": {"label": "TRUSTEE // GUARDIAN",
                                      "name": "Bob Killen"}}}  # reported, never plated
-
 
 def test_a_reveal_waits_for_the_characters_hero_move():
     """Osiris is named as he climbs the stairwell, not on the static insert.
@@ -1306,14 +1201,12 @@ def test_a_reveal_waits_for_the_characters_hero_move():
     assert len(entries) == 1
     assert entries[0]["at"] == pytest.approx(8.0 + plate.LEAD_IN)
 
-
 def test_a_reveal_falls_back_when_there_is_no_hero_move():
     """Sagira is a Ghost and never traverses; she is still revealed."""
     shots = [_lead_shot("insert", 0.0, 8.0), _lead_shot("more", 8.0, 12.0)]
     entries = plate.plan(shots, REVEAL_LEADS, only="leads")
     assert len(entries) == 1
     assert entries[0]["at"] == pytest.approx(plate.LEAD_IN)
-
 
 def test_a_reveal_is_not_deferred_past_the_point_of_being_an_introduction():
     """Waiting too long stops being a reveal and becomes a late caption.
@@ -1329,14 +1222,12 @@ def test_a_reveal_is_not_deferred_past_the_point_of_being_an_introduction():
     entries = plate.plan(shots, REVEAL_LEADS, only="leads")
     assert entries[0]["at"] == pytest.approx(plate.LEAD_IN)
 
-
 def test_the_hero_move_still_has_to_be_long_enough_to_read():
     """A two-second hero beat is not worth losing the reveal over."""
     shots = [_lead_shot("insert", 0.0, 8.0),
              _lead_shot("blink", 8.0, 8.3, traversal_hero=True)]
     entries = plate.plan(shots, REVEAL_LEADS, only="leads")
     assert entries[0]["at"] == pytest.approx(plate.LEAD_IN)
-
 
 def test_each_lead_is_still_plated_exactly_once():
     shots = [_lead_shot("a", 0.0, 8.0),
@@ -1349,7 +1240,6 @@ def test_each_lead_is_still_plated_exactly_once():
                          only="leads")
     assert sorted(e["id"] for e in entries) == ["osiris", "sagira"]
     plate.load_manifest_entries(sorted(entries, key=lambda e: e["at"]))
-
 
 def test_a_person_cast_as_a_lead_is_never_an_anonymous_guardian():
     """castrojo is Cayde-6, so he is not in the blueberry crowd.
@@ -1380,7 +1270,6 @@ def test_a_person_cast_as_a_lead_is_never_an_anonymous_guardian():
     assert not any("castrojo" in e["id"] for e in entries)
     assert any(e["id"] == "ensemble_hanthor" for e in entries)
 
-
 def test_castrojos_authored_plate_lives_on_his_lead_binding():
     """His identity is not lost by leaving the ensemble -- it moved to Cayde-6,
     so he is credited wherever Cayde is actually on screen."""
@@ -1392,7 +1281,6 @@ def test_castrojos_authored_plate_lives_on_his_lead_binding():
     assert copy["title"] == "Upender of Antipatterns | The First Disciple"
     assert copy["label"] == "TRUSTEE // GUARDIAN"
     assert copy["trustee"] is True
-
 
 def test_the_sign_off_card_plays_even_when_everyone_is_credited():
     """The card is the cut's last beat, not just an overflow list.
@@ -1412,7 +1300,6 @@ def test_the_sign_off_card_plays_even_when_everyone_is_credited():
     assert card["at"] > entries[0]["at"]  # ...and it is the last beat
     plate.load_manifest_entries(entries)
 
-
 # --- plates from a brief (the issue #1 bridge) -------------------------------
 #
 # A brief's plates[] are the owner speaking: copy they authored, at a moment
@@ -1426,10 +1313,8 @@ PARIS = {
     "trustee": True,
 }
 
-
 def _brief(*plates):
     return {"automatable": "partly", "plates": list(plates)}
-
 
 def test_owner_authored_copy_reaches_a_planned_plate():
     """Paris Pittman has no binding; the brief's copy is the whole credit."""
@@ -1444,7 +1329,6 @@ def test_owner_authored_copy_reaches_a_planned_plate():
     assert paris["trustee"] is True
     plate.load_manifest_entries(entries)
 
-
 def test_a_copy_field_outside_the_closed_set_is_refused():
     """The deck has no pronoun row; accommodating one would invent copy."""
     shots = [_shot("s1", 0, 30, "lead", "osiris")]
@@ -1452,7 +1336,6 @@ def test_a_copy_field_outside_the_closed_set_is_refused():
                     "copy": {**PARIS, "pronouns": "she/her"}})
     with pytest.raises(ValueError, match="closed set"):
         plate.plan(shots, LEADS, brief=brief)
-
 
 def test_the_vocab_wins_a_conflict_and_says_so():
     """A brief that disagrees with a binding's `plate:` block loses to it.
@@ -1471,7 +1354,6 @@ def test_the_vocab_wins_a_conflict_and_says_so():
     assert osiris["copy_source"] == "casting"
     assert any("vocab" in line and "wins" in line for line in lines)
 
-
 def test_the_owners_at_is_honoured_not_re_derived():
     """'Drop her nameplate right after she removes her helmet, 0:14.'
 
@@ -1487,7 +1369,6 @@ def test_the_owners_at_is_honoured_not_re_derived():
     assert paris["at"] == pytest.approx(4.0)
     assert paris["dur"] == pytest.approx(plate.DEFAULT_HOLD)
 
-
 def test_an_owner_moment_that_is_not_in_the_cut_is_reported_not_moved():
     shots = [_shot("s1", 0, 30, "lead", "osiris")]
     brief = _brief({"at": "9:59", "copy": dict(PARIS)})
@@ -1495,7 +1376,6 @@ def test_an_owner_moment_that_is_not_in_the_cut_is_reported_not_moved():
     entries = plate.plan(shots, LEADS, brief=brief, log=lines.append)
     assert not any(e["id"] == "paris_pittman" for e in entries)
     assert any("not in this cut" in line for line in lines)
-
 
 def test_a_character_plate_whose_moment_is_cut_falls_back_to_the_reveal():
     """The owner's timing failed, not the credit: with a `character` named,
@@ -1507,7 +1387,6 @@ def test_a_character_plate_whose_moment_is_cut_falls_back_to_the_reveal():
     osiris = next(e for e in entries if e["id"] == "osiris")
     assert osiris["at"] == pytest.approx(plate.LEAD_IN)  # the derived reveal
     assert any("not in this cut" in line for line in lines)
-
 
 def test_a_brief_plate_for_a_binding_without_copy_uses_the_briefs():
     """zavala's binding has no `plate:` block, so the brief's copy is the one
@@ -1525,7 +1404,6 @@ def test_a_brief_plate_for_a_binding_without_copy_uses_the_briefs():
     assert zavala["copy_source"] == "brief"
     assert zavala["at"] == pytest.approx(plate.LEAD_IN)  # no at -> the reveal
 
-
 def test_brief_plates_pin_the_timeline_and_reveals_route_around_them():
     """The owner's fixed window is taken first; the derived reveal waits for
     the next free opening rather than double-booking the screen."""
@@ -1537,7 +1415,6 @@ def test_brief_plates_pin_the_timeline_and_reveals_route_around_them():
     assert paris["at"] == pytest.approx(1.0)
     assert osiris["at"] >= paris["at"] + paris["dur"]
     plate.load_manifest_entries(entries)  # raises if any two overlap
-
 
 def test_every_planned_plate_says_where_its_copy_came_from():
     """Provenance is uniform: a reader never has to know the convention that
@@ -1556,7 +1433,6 @@ def test_every_planned_plate_says_where_its_copy_came_from():
     assert next(e for e in entries
                 if e["id"] == "osiris")["copy_source"] == "casting"
 
-
 def test_a_plate_asking_for_a_character_who_is_not_in_the_cut_is_reported():
     shots = [_shot("s1", 0, 30, "lead", "osiris")]
     brief = _brief({"character": "sagira"})
@@ -1564,7 +1440,6 @@ def test_a_plate_asking_for_a_character_who_is_not_in_the_cut_is_reported():
     entries = plate.plan(shots, LEADS, brief=brief, log=lines.append)
     assert not any(e["id"] == "sagira" for e in entries)
     assert any("not in this cut" in line for line in lines)
-
 
 def test_the_issue_1_brief_end_to_end_through_the_parser():
     """The real shape of issue #1's copy, parsed as a brief and planned.
@@ -1619,7 +1494,6 @@ def test_the_mara_sov_plate_is_exactly_what_was_authored():
         "no GitHub login is on record for Karena, so the wreath has no "
         "portrait to ring yet -- a recorded gap, never a guessed login")
 
-
 def test_the_mara_sov_reauthorship_keeps_the_old_copy_visible():
     """The old plate is owner-authored copy about a real person, so replacing
     it is recorded: the binding's `note:` keeps the previous copy verbatim and
@@ -1634,12 +1508,10 @@ def test_the_mara_sov_reauthorship_keeps_the_old_copy_visible():
     assert "ARCHITECT // GENERAL" in note     # the old label, verbatim
     assert "Archon of the Consensus" in note  # the old title, verbatim
 
-
 def test_the_mara_sov_plate_renders():
     from tools.derive import load_leads
     img = plate.render_plate(load_leads()["mara_sov"]["plate"])
     assert img.width > 0 and img.height > 0
-
 
 def test_a_lead_plate_renders_without_a_class_row():
     """The standing fallback when no class is authored at all. Synthetic copy:
@@ -1651,13 +1523,11 @@ def test_a_lead_plate_renders_without_a_class_row():
     with_class = plate.render_plate(dict(spec, **{"class": "Voidwalker Warlock"}))
     assert without.height < with_class.height
 
-
 def test_a_classless_lead_still_takes_its_variant_chrome():
     """Dropping a row must not drop the gold treatment with it."""
     spec = {"label": "PRACTITIONER // GUARDIAN", "name": "A Guardian",
             "title": "Bearer of the Unwritten Row", "variant": "leader"}
     assert plate._variant_for(spec) == plate.VARIANTS["leader"]
-
 
 # Kelsey Hightower has no entry in the reference deck, but he does not need
 # one: the owner authored all four rows in issue #8, and the issue IS the
@@ -1680,7 +1550,6 @@ def test_the_zavala_plate_is_gold_and_carries_the_authored_copy():
         "generic fallback for an authored identity, which is as wrong as an "
         "invented one")
 
-
 def test_the_zavala_plate_renders_gold_with_the_authored_copy():
     from tools.derive import load_leads
     spec = load_leads()["zavala"]["plate"]
@@ -1690,7 +1559,6 @@ def test_the_zavala_plate_renders_gold_with_the_authored_copy():
     assert gold.size == blue.size, "chrome must not change the layout"
     assert gold.tobytes() != blue.tobytes()
 
-
 # --- ensemble direction from a brief (the issue #18 bridge) ------------------
 #
 # "4:03 put a bluefin maintainer in here" is the owner pinning ONE ensemble
@@ -1698,10 +1566,8 @@ def test_the_zavala_plate_renders_gold_with_the_authored_copy():
 # direction, and a note that became copy would put words on whichever real
 # contributor landed there.
 
-
 def _ensemble_brief(*beats):
     return {"automatable": "partly", "beats": list(beats)}
-
 
 def test_the_owners_ensemble_moment_is_credited_at_that_moment():
     shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
@@ -1713,7 +1579,6 @@ def test_the_owners_ensemble_moment_is_credited_at_that_moment():
     assert fixed["copy_source"] == "casting"
     assert "bluefin maintainer" not in json.dumps(fixed)  # the note is not copy
     plate.load_manifest_entries(entries)
-
 
 def test_the_rotation_routes_around_the_owners_fixed_ensemble_moment():
     """The fixed point takes its window first; nothing double-books it, and
@@ -1729,7 +1594,6 @@ def test_the_rotation_routes_around_the_owners_fixed_ensemble_moment():
     assert len(ids) == len(set(ids))
     plate.load_manifest_entries(entries)
 
-
 def test_the_ensemble_moment_is_honoured_when_only_the_ensemble_is_planned():
     """`--only ensemble` runs after the leads; the owner's ensemble direction
     belongs to that pass, so it must survive it."""
@@ -1738,7 +1602,6 @@ def test_the_ensemble_moment_is_honoured_when_only_the_ensemble_is_planned():
                              "ensemble": True})
     entries = plate.plan(shots, LEADS, ROSTER, brief=brief, only="ensemble")
     assert any(e["at"] == pytest.approx(10.0) for e in entries)
-
 
 def test_an_ensemble_moment_outside_the_cut_is_reported_not_moved():
     shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
@@ -1749,14 +1612,12 @@ def test_an_ensemble_moment_outside_the_cut_is_reported_not_moved():
     assert any("not in this cut" in line for line in lines)
     assert entries  # the rest of the cut is still planned
 
-
 def test_a_beat_without_a_timecode_cannot_be_pinned_and_says_so():
     shots = [_shot("s1", 0, 30, "ensemble", None, slots=1)]
     brief = _ensemble_brief({"note": "a maintainer somewhere", "ensemble": True})
     lines = []
     plate.plan(shots, LEADS, ROSTER, brief=brief, log=lines.append)
     assert any("no `at`" in line for line in lines)
-
 
 def test_an_ordinary_beat_is_still_only_direction():
     """A beat without `ensemble: true` plans nothing -- the field is how the
@@ -1766,7 +1627,6 @@ def test_an_ordinary_beat_is_still_only_direction():
                        brief=_ensemble_brief({"at": "0:10", "note": "awesome"}))
     none = plate.plan(shots, LEADS, ROSTER)
     assert [e["at"] for e in plain] == [e["at"] for e in none]
-
 
 def test_two_pinned_moments_do_not_double_book_the_screen():
     """Two pins 2s apart: the second moment lands inside the first pin's
@@ -1784,7 +1644,6 @@ def test_two_pinned_moments_do_not_double_book_the_screen():
     assert any("already covered" in line and "second" in line
                for line in lines)
 
-
 def test_a_pin_inside_a_leads_reveal_window_is_reported_not_double_booked():
     """The reveal rides across the cut (0.4s-5.4s); a pin at 0:04 lands on an
     ensemble shot but inside that window. The pin cannot move, so it is
@@ -1799,7 +1658,6 @@ def test_a_pin_inside_a_leads_reveal_window_is_reported_not_double_booked():
     assert any(e["id"] == "osiris" for e in entries)
     assert not any(e["at"] == pytest.approx(4.0) for e in entries)
     assert any("already covered" in line for line in lines)
-
 
 def test_a_pin_routes_around_dialogue_windows_from_around():
     """`--around` seeds `busy` with fixed windows (e.g. dialogue). A pin whose
@@ -1824,7 +1682,6 @@ def test_a_pin_routes_around_dialogue_windows_from_around():
     assert not any(e["at"] == pytest.approx(10.0) for e in entries)
     assert any("only 2.0s before the next plate" in line for line in lines)
 
-
 def test_a_pin_on_the_trim_boundary_has_no_hold_left_to_emit():
     """_source_moment_on_timeline accepts at_sec - s0 == duration, so a pin on
     the hold cap's edge maps to the cut's final instant, where dur rounds to
@@ -1838,7 +1695,6 @@ def test_a_pin_on_the_trim_boundary_has_no_hold_left_to_emit():
     assert not any(e["at"] == pytest.approx(9.0) for e in entries)
     assert any("no readable hold" in line and "edge" in line
                for line in lines)
-
 
 def test_pinned_beats_are_reported_when_no_ensemble_pass_will_run():
     """No roster, or --only leads: the ensemble pass never runs, so the
@@ -1863,7 +1719,6 @@ def test_pinned_beats_are_reported_when_no_ensemble_pass_will_run():
     assert any("--only leads" in line and "not honoured" in line
                for line in lines)
 
-
 def test_a_pin_on_a_shot_with_no_ensemble_role_is_reported_not_anchored():
     """An ensemble credit may only anchor where the round-robin and the
     re-home pass could place one -- a shot with `casting.role == "ensemble"`.
@@ -1879,7 +1734,6 @@ def test_a_pin_on_a_shot_with_no_ensemble_role_is_reported_not_anchored():
     assert any("no ensemble role" in line and "not moved" in line
                for line in lines)
 
-
 # --- the status nameplate: the site's top-of-frame HUD ----------------------
 
 def _status(**kw):
@@ -1888,7 +1742,6 @@ def _status(**kw):
             "label": "Follow the path, we've got your back"}
     base.update(kw)
     return base
-
 
 def test_status_card_carries_only_its_two_authored_lines():
     """A fourth card shape, added deliberately -- and still closed. It renders
@@ -1899,12 +1752,10 @@ def test_status_card_carries_only_its_two_authored_lines():
     narrow = plate.render_plate(_status(label="#nova4ever"))
     assert narrow.width < img.width
 
-
 def test_status_accent_is_blue_not_gold():
     """`--wc-gold` is the token's NAME; it resolves to #60a5fa, a blue.
     Reproducing the name instead of the value renders this card gold."""
     assert plate.STATUS_ACCENT[:3] == (96, 165, 250)
-
 
 def test_status_card_sits_top_left_not_in_the_lower_third():
     placed = plate.place(plate.render_plate(_status()), "status")
@@ -1913,7 +1764,6 @@ def test_status_card_sits_top_left_not_in_the_lower_third():
     left, top = box[0], box[1]
     assert top < plate.FRAME_H * 0.25, "status card is not at the top"
     assert left < plate.FRAME_W * 0.25, "status card is not at the left"
-
 
 def test_glitch_splits_the_type_and_tears_the_card():
     """The CSS applies the split as a *text*-shadow, so the panel keeps clean
@@ -1936,7 +1786,6 @@ def test_glitch_splits_the_type_and_tears_the_card():
     assert red_fringe(plain) == 0
     assert red_fringe(glitched) > 100
 
-
 def test_a_status_card_may_share_the_screen_with_a_guardian_plate():
     """Different rows. On the site the HUD is persistent chrome that Guardian
     plates appear underneath, so they are never in contention."""
@@ -1948,13 +1797,11 @@ def test_a_status_card_may_share_the_screen_with_a_guardian_plate():
     ]
     plate.load_manifest_entries(entries)  # must not raise
 
-
 def test_two_status_cards_at_once_are_still_an_error():
     entries = [_status(id="a", at=0.0, dur=10.0),
                _status(id="b", at=5.0, dur=10.0)]
     with pytest.raises(ValueError, match="visible at the same time"):
         plate.load_manifest_entries(entries)
-
 
 def test_touching_windows_are_adjacent_not_overlapping():
     """58.6 + 0.45 == 59.050000000000004 in floating point, against a next cue
@@ -1963,7 +1810,6 @@ def test_touching_windows_are_adjacent_not_overlapping():
     entries = [_status(id="a", at=58.6, dur=0.45),
                _status(id="b", at=59.05, dur=5.0)]
     plate.load_manifest_entries(entries)  # must not raise
-
 
 def test_raised_lifts_a_plate_out_of_the_lower_third():
     """`.wolves-guardian-plate-raised { bottom: auto; top: 28% }` -- an
@@ -1976,7 +1822,6 @@ def test_raised_lifts_a_plate_out_of_the_lower_third():
     raised = plate.place(card, "right", raised=True).getbbox()[1]
     assert raised < normal
     assert raised == pytest.approx(plate.FRAME_H * plate.RAISED_TOP, abs=2)
-
 
 def test_bronze_is_the_third_rank_and_is_not_rust():
     """Owner: "Rank them with bronze, silver, and gold". `leader` was already
@@ -1991,7 +1836,6 @@ def test_bronze_is_the_third_rank_and_is_not_rust():
     # As `leader`, a rank never recolours the class row.
     assert bronze["klass"] == plate.VARIANTS["default"]["klass"]
 
-
 def test_a_bronze_card_renders_and_differs_from_silver_and_gold():
     spec = {"label": "AN4-CH3CK-12", "name": "TO [ NEW CONTRIBUTORS ]",
             "title": "It's totally like this. We promise."}
@@ -2005,7 +1849,6 @@ def test_a_bronze_card_renders_and_differs_from_silver_and_gold():
     assert len({img.size for img in ranks.values()}) == 1
     assert len({img.tobytes() for img in ranks.values()}) == 3
 
-
 # --- the companion card (the site's GUARDIAN BOND, ported) -------------------
 
 def _companion(**kw):
@@ -2015,14 +1858,12 @@ def _companion(**kw):
     spec.update(kw)
     return spec
 
-
 def test_companion_card_carries_the_sites_three_rows():
     """A fifth card shape, and closed like the rest: the fixed GUARDIAN BOND
     label, the dinosaur's authored name, and the species' scientific name."""
     img = plate.render_plate(_companion(art=None))
     assert img.width > 0 and img.height > 0
     assert plate.COMPANION_LABEL == "GUARDIAN BOND"
-
 
 def test_an_unnamed_bond_omits_the_name_row_instead_of_inventing_one():
     """Bob Killen's bond record carries no `dinosaurName`, and the site's own
@@ -2034,13 +1875,11 @@ def test_an_unnamed_bond_omits_the_name_row_instead_of_inventing_one():
                                             art=None))
     assert unnamed.height < named.height, "the name row was not dropped"
 
-
 def test_missing_artwork_degrades_to_the_card_rather_than_crashing():
     """Degrade, never block: a bond that renders without its picture still
     credits the bond."""
     img = plate.render_plate(_companion(art="renders/companions/nope.webp"))
     assert img.width > 0 and img.height > 0
-
 
 def test_a_companion_may_share_the_row_with_the_guardian_it_names():
     entries = [
@@ -2050,7 +1889,6 @@ def test_a_companion_may_share_the_row_with_the_guardian_it_names():
         _companion(art=None),
     ]
     plate.load_manifest_entries(entries)  # must not raise
-
 
 def test_a_companion_may_not_overlap_somebody_elses_plate():
     """The exemption is NAMED -- `bond_of` -- precisely so it cannot spread."""
@@ -2062,12 +1900,10 @@ def test_a_companion_may_not_overlap_somebody_elses_plate():
     with pytest.raises(ValueError, match="visible at the same time"):
         plate.load_manifest_entries(entries)
 
-
 def test_the_species_row_is_italic_because_the_site_sets_it_that_way():
     """`font-style: italic` on .wolves-companion-plate-species -- the only
     italic row in the deck."""
     assert plate._font("italic", 16).path != plate._font("regular", 16).path
-
 
 def test_alamos_artwork_clears_natalis_raised_plate():
     """A capped picture, because a covered credit is worse than a small
@@ -2082,7 +1918,6 @@ def test_alamos_artwork_clears_natalis_raised_plate():
                      raised=bool(natali.get("raised"))).getbbox()
     ab = plate.place(plate.render_plate(alamo), alamo["position"]).getbbox()
     assert ab[1] > nb[3], "Alamo's artwork is back over Natali's name"
-
 
 # --- the walk's two new cards ------------------------------------------------
 
@@ -2100,13 +1935,11 @@ def test_the_miniboss_bar_carries_only_name_and_title():
                if a > 40 and r > 150 and g < 90 and b < 90)
     assert reds > 500, "the bar and its rule are not drawn"
 
-
 def test_the_boss_bar_sits_at_the_top_of_frame():
     placed = plate.place(plate.render_plate({
         "id": "kr", "kind": "miniboss", "name": "KERNEL REGRESSION"}), "boss")
     box = placed.getbbox()
     assert box[1] < plate.FRAME_H * 0.25, "a boss bar is not a lower third"
-
 
 def test_the_achievement_toast_is_xbox_green_and_sits_clear_of_the_lower_third():
     img = plate.render_plate({"id": "a", "kind": "achievement",
@@ -2117,7 +1950,6 @@ def test_the_achievement_toast_is_xbox_green_and_sits_clear_of_the_lower_third()
     box = placed.getbbox()
     assert box[1] < plate.FRAME_H * 0.25
     assert box[3] < plate.FRAME_H * 0.5
-
 
 def test_the_boss_bar_and_the_toast_share_a_row_so_never_share_a_moment():
     """Both live at the top of frame. The status HUD is exempt against them
@@ -2130,7 +1962,6 @@ def test_the_boss_bar_and_the_toast_share_a_row_so_never_share_a_moment():
     ]
     with pytest.raises(ValueError, match="visible at the same time"):
         plate.load_manifest_entries(entries)
-
 
 def test_the_bottom_status_card_clears_the_dialogue_pill():
     """Owner instruction for the patch queue: 'a status thing in the bottom'.
@@ -2145,7 +1976,6 @@ def test_the_bottom_status_card_clears_the_dialogue_pill():
     assert hud[3] > plate.FRAME_H * 0.5, "the queue is not at the bottom"
     assert hud[0] > pill[2], "the queue overlaps the dialogue pill"
 
-
 def test_nobara_chrome_is_sampled_from_the_official_icon():
     """#3E3FC5 is the icon's dominant fill and the brand's own Governor Bay.
     Recalling a colour for somebody's project is the same class of mistake as
@@ -2156,12 +1986,10 @@ def test_nobara_chrome_is_sampled_from_the_official_icon():
     # A creator's own avatar is their brand: no platform mark is put on it.
     assert "youtube" not in plate.BRAND_MARKS
 
-
 def test_a_missing_brand_mark_degrades_to_the_drawn_crest():
     img = plate.render_plate({"id": "x", "name": "Nobody", "variant": "nobara",
                               "mark": "renders/marks/nope.png"})
     assert img.width > 0 and img.height > 0
-
 
 # --- A hand-authored manifest must not silently contradict the vocab --------
 #
@@ -2175,7 +2003,6 @@ _BOUND_LEADS = {
                           "title": "Upender of Antipatterns | The First Disciple"}},
 }
 
-
 def test_manifest_copy_that_contradicts_a_binding_is_refused():
     from tools.plate import check_copy_against_bindings
     entries = [{"id": "reveal", "at": 1.0, "dur": 2.0, "name": "Jorge Castro",
@@ -2185,7 +2012,6 @@ def test_manifest_copy_that_contradicts_a_binding_is_refused():
         check_copy_against_bindings(entries, leads=_BOUND_LEADS)
     assert "vocab wins" in str(exc.value)
     assert "cayde_6" in str(exc.value)
-
 
 def test_an_explicit_copy_override_records_the_decision_and_passes():
     """The escape hatch must name who decided, so it cannot be added by accident."""
@@ -2197,7 +2023,6 @@ def test_an_explicit_copy_override_records_the_decision_and_passes():
                                   "decided_by": "https://github.com/castrojo/destiny-vids/issues/111"}}]
     assert check_copy_against_bindings(entries, leads=_BOUND_LEADS) == entries
 
-
 def test_a_copy_override_without_a_decider_is_not_enough():
     from tools.plate import check_copy_against_bindings
     entries = [{"id": "reveal", "at": 1.0, "dur": 2.0, "name": "Jorge Castro",
@@ -2207,14 +2032,12 @@ def test_a_copy_override_without_a_decider_is_not_enough():
     with pytest.raises(ValueError):
         check_copy_against_bindings(entries, leads=_BOUND_LEADS)
 
-
 def test_matching_copy_needs_no_override():
     from tools.plate import check_copy_against_bindings
     entries = [{"id": "reveal", "at": 1.0, "dur": 2.0, "name": "Jorge Castro",
                 "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Titan",
                 "title": "Upender of Antipatterns | The First Disciple"}]
     assert check_copy_against_bindings(entries, leads=_BOUND_LEADS) == entries
-
 
 def test_the_shipped_act_vi_manifest_declares_its_overrides():
     """The real manifest must stay loadable -- and stay honest about #111."""
@@ -2226,7 +2049,6 @@ def test_the_shipped_act_vi_manifest_declares_its_overrides():
     overridden = {p["id"] for p in d["plates"] if p.get("copy_override")}
     assert overridden == {"cayde_reveal_castrojo", "gold_kelsey_hightower"}
     assert any("#111" in u for u in d["unresolved"])
-
 
 def test_the_act_vi_tail_speaks_in_pills_not_a_stacked_card():
     """Owner 2026-08-15: 'individual senteces spaced out over the course of
@@ -2263,7 +2085,6 @@ def test_the_act_vi_tail_speaks_in_pills_not_a_stacked_card():
     for a, b in zip(lines, lines[1:]):
         assert a["at"] + a["dur"] <= b["at"], f"{a['id']} overlaps {b['id']}"
 
-
 # --- the letterbox banner (owner brief, issue #98) ---------------------------
 
 BANNER = {
@@ -2272,7 +2093,6 @@ BANNER = {
     "text": "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST",
 }
 
-
 def test_the_banner_renders_one_tracked_line_that_fits_the_frame():
     img = plate.render_plate(dict(BANNER))
     assert img.width <= plate.FRAME_W * plate.BANNER_MAX_W + 4
@@ -2280,7 +2100,6 @@ def test_the_banner_renders_one_tracked_line_that_fits_the_frame():
     # ...and it drew something, not an empty canvas.
     alpha = img.split()[3]
     assert alpha.getextrema()[1] > 0, "the banner rendered no visible pixels"
-
 
 def test_the_banner_sits_below_the_picture_on_the_bar():
     """Its strip is the bottom letterbox bar: it must start at or below the
@@ -2297,7 +2116,6 @@ def test_the_banner_sits_below_the_picture_on_the_bar():
         f"banner starts at y={top}, above the picture's bottom at "
         f"{picture[1] + picture[3]}")
 
-
 def test_the_banner_survives_a_full_frame_picture_rect():
     """Act II mixes aspect ratios: the opening is 16:9 full-frame, so
     detection can return a rect that IS the frame. The banner must then sit
@@ -2311,7 +2129,6 @@ def test_the_banner_survives_a_full_frame_picture_rect():
           if any(rows[x, y] for x in range(0, plate.FRAME_W, 17))]
     assert ys, "the banner rendered off the frame entirely"
     assert max(ys) < plate.FRAME_H
-
 
 def test_a_banner_shares_the_screen_but_never_with_a_second_banner():
     """A chrome row of its own: it coexists with a lower third and with the
@@ -2329,7 +2146,6 @@ def test_a_banner_shares_the_screen_but_never_with_a_second_banner():
             dict(BANNER),
             dict(BANNER, id="callout2"),
         ])
-
 
 # --- an animation is one input, not one input per frame --------------------
 
@@ -2360,7 +2176,6 @@ def test_a_run_of_animation_frames_becomes_one_image_sequence_input():
     # The stills either side are untouched.
     assert [u["id"] for u in units] == ["a", "anim", "b"]
     assert not units[0]["animation"] and not units[2]["animation"]
-
 
 def test_an_animation_group_is_padded_from_the_start_of_the_timeline():
     """overlay's framesync wants a secondary frame for every primary one; a

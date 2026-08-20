@@ -254,7 +254,7 @@ def chunk_boundaries(facts, segments):
             for b0, b1 in itertools.pairwise(bounds)]
 
 
-def _chunk_out_name(out_name, i):
+def _chunk_out_name(i):
     return f"chunk_{i:04d}.mp4"
 
 
@@ -293,10 +293,10 @@ def build_plan(*, facts, out_name, segments, video_args, audio_args, threads,
                 # After the recipe so the farm's threading wins even when the
                 # recipe carries its own -threads (documented, not a bug).
                 "-threads", str(threads),
-                "-progress", f"{work_dir}/logs/{_chunk_out_name(out_name, i)}.progress",
-                "-y", f"{work_dir}/chunks/{_chunk_out_name(out_name, i)}"]
+                "-progress", f"{work_dir}/logs/{_chunk_out_name(i)}.progress",
+                "-y", f"{work_dir}/chunks/{_chunk_out_name(i)}"]
         chunks.append({"index": i, "ss": ss, "dur": dur, "argv": argv})
-    concat_list = [f"{work_dir}/chunks/{_chunk_out_name(out_name, i)}"
+    concat_list = [f"{work_dir}/chunks/{_chunk_out_name(i)}"
                    for i in range(len(chunks))]
 
     has_audio = "audio" in facts["stream_kinds"]

@@ -1,20 +1,14 @@
 """Tests for the burned-in-copy redactor (tools/redact.py)."""
 import math
-import os
-import sys
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 from tools import peaks, redact  # noqa: E402
-
 
 BOXED = {"id": "logo", "start_sec": 10.0, "end_sec": 20.0, "reason": "logo",
          "boxes": [{"x": 100, "y": 200, "w": 300, "h": 40}]}
 FULL = {"id": "card", "start_sec": 0.0, "end_sec": 3.4, "reason": "ratings card",
         "boxes": "full"}
-
 
 def test_a_box_becomes_one_timeline_gated_drawbox():
     filters = redact.drawbox_filters([BOXED])
@@ -23,24 +17,20 @@ def test_a_box_becomes_one_timeline_gated_drawbox():
     # FFmpeg timeline editing: the filter passes the frame through when false.
     assert "enable='between(t,10.000,20.000)'" in filters[0]
 
-
 def test_full_covers_the_whole_frame():
     filters = redact.drawbox_filters([FULL])
     assert f"w={redact.FRAME_W}:h={redact.FRAME_H}" in filters[0]
     assert "x=0:y=0" in filters[0]
 
-
 def test_a_backwards_window_is_rejected():
     with pytest.raises(ValueError):
         redact.drawbox_filters([dict(BOXED, start_sec=20.0, end_sec=10.0)])
-
 
 def test_source_audio_is_stream_copied_when_no_bed_is_given():
     cmd = redact.build_command(["ffmpeg"], "in.mp4",
                                redact.drawbox_filters([BOXED]), "out.mp4")
     assert "-c:a" in cmd and cmd[cmd.index("-c:a") + 1] == "copy"
     assert "0:a?" in cmd
-
 
 def test_a_music_bed_replaces_the_source_audio_and_never_extends_the_picture():
     cmd = redact.build_command(["ffmpeg"], "in.mp4",
@@ -50,7 +40,6 @@ def test_a_music_bed_replaces_the_source_audio_and_never_extends_the_picture():
     assert "1:a:0" in cmd, "the bed, not the source, is mapped to audio"
     assert "-shortest" in cmd, "a long track must not extend the video"
     assert "volume=0.9" in cmd[cmd.index("-af") + 1]
-
 
 def test_a_music_bed_can_start_on_an_authored_picture_cue():
     cmd = redact.build_command(
@@ -66,7 +55,6 @@ def test_a_music_bed_can_start_on_an_authored_picture_cue():
     assert "-shortest" in cmd
     assert cmd[cmd.index("-c:a") + 1] == "flac"
 
-
 def test_the_checked_in_redactions_cut_the_full_frame_cards():
     """All three cards on the Osiris upload ARE the whole frame, so they are
     cut, not boxed: nothing to paint, and the kept range is the cinematic."""
@@ -78,7 +66,6 @@ def test_the_checked_in_redactions_cut_the_full_frame_cards():
     extent = redact.video_extent("yt_curse_of_osiris_opening_cinematic")
     assert redact.kept_range(data["redactions"], extent) == (3.4, 163.6)
 
-
 def test_a_record_with_no_action_still_draws_a_box():
     """The field defaults to 'box', so pre-action data behaves exactly as before."""
     assert redact.action_of(BOXED) == "box"
@@ -86,23 +73,19 @@ def test_a_record_with_no_action_still_draws_a_box():
     # And with no cut windows anywhere, nothing is trimmed.
     assert redact.kept_range([BOXED], 173.194) == (0.0, 173.194)
 
-
 def test_a_cut_record_draws_no_box():
     cut = {"id": "card", "start_sec": 0.0, "end_sec": 3.4, "reason": "card",
            "action": "cut", "boxes": "full"}
     assert redact.drawbox_filters([cut, BOXED]) == redact.drawbox_filters([BOXED])
 
-
 def test_an_unknown_action_is_rejected_loudly():
     with pytest.raises(ValueError):
         redact.action_of(dict(BOXED, action="blur"))
-
 
 def test_a_backwards_cut_window_is_rejected():
     with pytest.raises(ValueError):
         redact.kept_range([dict(BOXED, action="cut",
                                 start_sec=20.0, end_sec=10.0)], 173.194)
-
 
 def test_kept_range_is_the_complement_of_the_cut_window_union():
     # Overlapping cut windows merge before the range is computed, so two
@@ -115,14 +98,12 @@ def test_kept_range_is_the_complement_of_the_cut_window_union():
     assert redact.kept_range(records[:1], 173.194) == (3.4, 173.194)
     assert redact.kept_range(records[1:], 173.194) == (0.0, 163.6)
 
-
 def test_a_cut_window_in_the_middle_is_rejected():
     """A middle cut would split the video in two, which one trimmed encode
     cannot express -- fail loudly instead of disagreeing with uncut.py."""
     records = [dict(BOXED, id="mid", action="cut", start_sec=50.0, end_sec=60.0)]
     with pytest.raises(ValueError):
         redact.kept_range(records, 173.194)
-
 
 def test_a_tail_window_must_reach_the_end_of_the_video():
     """A 'tail' window ending early leaves a hole, not a trim."""
@@ -134,7 +115,6 @@ def test_a_tail_window_must_reach_the_end_of_the_video():
     records[0]["end_sec"] = 173.194 - redact.EDGE_SLOP / 2
     assert redact.kept_range(records, 173.194) == (0.0, 163.6)
 
-
 def test_a_trimmed_encode_trims_video_after_the_boxes():
     cmd = redact.build_command(["ffmpeg"], "in.mp4",
                                redact.drawbox_filters([BOXED]), "out.mp4",
@@ -144,7 +124,6 @@ def test_a_trimmed_encode_trims_video_after_the_boxes():
     assert vf.endswith("trim=start=3.400:end=163.600,setpts=PTS-STARTPTS")
     assert vf.index("drawbox") < vf.index("trim")
 
-
 def test_a_trimmed_encode_without_a_bed_reencodes_a_trimmed_audio():
     """A trimmed source track cannot be stream-copied."""
     cmd = redact.build_command(["ffmpeg"], "in.mp4", [], "out.mp4",
@@ -152,7 +131,6 @@ def test_a_trimmed_encode_without_a_bed_reencodes_a_trimmed_audio():
     assert "atrim=start=3.400:end=163.600,asetpts=PTS-STARTPTS" \
         in cmd[cmd.index("-af") + 1]
     assert cmd[cmd.index("-c:a") + 1] == "aac"
-
 
 def test_a_trimmed_encode_with_a_bed_starts_the_bed_at_the_trimmed_picture():
     """The bed maps from its own beginning; the video trim must not skip its
@@ -164,7 +142,6 @@ def test_a_trimmed_encode_with_a_bed_starts_the_bed_at_the_trimmed_picture():
     af = cmd[cmd.index("-af") + 1]
     assert "atrim" not in af and af == "volume=0.9"
     assert "trim=start=3.400:end=163.600" in cmd[cmd.index("-vf") + 1]
-
 
 # --- music bed headroom ------------------------------------------------------
 
@@ -183,13 +160,11 @@ def test_gain_is_derived_from_the_beds_true_peak(monkeypatch):
     # ...and applying it lands on the target.
     assert 1.5 + 20 * math.log10(gain) == pytest.approx(-1.1)
 
-
 def test_a_quiet_bed_is_never_pushed_up_to_the_target(monkeypatch):
     """The target is a ceiling, not a loudness mandate."""
     monkeypatch.setattr(peaks, "measure_true_peak", lambda *a, **k: -8.0)
     gain, peak = redact.gain_for_headroom("bed.mp3", target_dbtp=-1.1)
     assert gain == 1.0 and peak == -8.0
-
 
 def test_true_peak_is_read_from_the_last_ebur128_summary(monkeypatch):
     """ebur128 prints running peaks; only the final summary is the answer."""
@@ -198,7 +173,6 @@ def test_true_peak_is_read_from_the_last_ebur128_summary(monkeypatch):
                   "  True peak:\n    Peak:        0.5 dBFS\n")
     monkeypatch.setattr(peaks.subprocess, "run", lambda *a, **k: Proc())
     assert redact.measure_true_peak("x.mp3", ffmpeg=["ffmpeg"]) == 0.5
-
 
 def test_flac_deliverable_gets_no_bitrate():
     """A bitrate is meaningless for a lossless codec, so it is not passed.
@@ -209,7 +183,6 @@ def test_flac_deliverable_gets_no_bitrate():
     assert redact.audio_encode_opts("aac") == ["-c:a", "aac", "-b:a", "192k"]
     assert redact.audio_encode_opts("flac") == ["-c:a", "flac"]
 
-
 def test_the_default_deliverable_codec_is_unchanged():
     """Adding the lossless option must not move the shipped default."""
     cmd = redact.build_command(["ffmpeg"], "in.mp4", [], "out.mp4",
@@ -217,14 +190,12 @@ def test_the_default_deliverable_codec_is_unchanged():
     assert "-c:a" in cmd and cmd[cmd.index("-c:a") + 1] == "aac"
     assert "192k" in cmd
 
-
 def test_a_lossless_deliverable_is_requested_by_codec():
     cmd = redact.build_command(["ffmpeg"], "in.mp4", [], "out.mp4",
                                audio="bed.wav", audio_gain=0.8,
                                audio_codec="flac")
     assert cmd[cmd.index("-c:a") + 1] == "flac"
     assert "192k" not in cmd
-
 
 def test_delivered_peak_is_corrected_when_the_encoder_overshoots(monkeypatch, tmp_path):
     """The bed landing on target is not the same as the FILE landing on target.
@@ -255,7 +226,6 @@ def test_delivered_peak_is_corrected_when_the_encoder_overshoots(monkeypatch, tm
     assert len(gains) == 2
     assert gains[1] < gains[0]
     assert gains[1] == pytest.approx(0.8 * 10 ** (-1.4 / 20), rel=1e-6)
-
 
 def test_a_delivered_file_with_headroom_is_not_re_encoded(monkeypatch, tmp_path):
     """Corrections stop at the first safe result -- the overshoot is not

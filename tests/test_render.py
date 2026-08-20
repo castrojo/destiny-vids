@@ -13,35 +13,28 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
+    
 from tools import render  # noqa: E402
-
 
 @pytest.fixture(autouse=True)
 def _clear_env(monkeypatch):
     for var in ("DESTINY_FFMPEG", "DESTINY_FFMPEG_CONTAINER", "DESTINY_FFMPEG_IMAGE"):
         monkeypatch.delenv(var, raising=False)
 
-
 def test_find_ffmpeg_returns_argv_prefix_list(monkeypatch):
     """A list, never a bare string: a container ffmpeg is multiple argv words."""
     monkeypatch.setenv("DESTINY_FFMPEG", "/usr/bin/ffmpeg")
     assert render.find_ffmpeg() == ["/usr/bin/ffmpeg"]
-
 
 def test_env_override_is_shell_split_and_wins(monkeypatch):
     monkeypatch.setattr(render, "_container_running", lambda name: True)
     monkeypatch.setenv("DESTINY_FFMPEG", "podman exec other ffmpeg")
     assert render.find_ffmpeg() == ["podman", "exec", "other", "ffmpeg"]
 
-
 def test_running_container_is_preferred_over_path(monkeypatch):
     monkeypatch.setattr(render.shutil, "which", lambda name: f"/usr/bin/{name}")
     monkeypatch.setattr(render, "_container_running", lambda name: True)
     assert render.find_ffmpeg() == ["podman", "exec", render.DEFAULT_CONTAINER, "ffmpeg"]
-
 
 def test_container_name_is_configurable(monkeypatch):
     monkeypatch.setattr(render.shutil, "which", lambda name: f"/usr/bin/{name}")
@@ -49,12 +42,10 @@ def test_container_name_is_configurable(monkeypatch):
     monkeypatch.setenv("DESTINY_FFMPEG_CONTAINER", "custom-ff")
     assert render.find_ffmpeg() == ["podman", "exec", "custom-ff", "ffmpeg"]
 
-
 def test_no_container_flag_skips_podman(monkeypatch):
     monkeypatch.setattr(render.shutil, "which", lambda name: f"/usr/bin/{name}")
     monkeypatch.setattr(render, "_container_running", lambda name: True)
     assert render.find_ffmpeg(prefer_container=False)[0] != "podman"
-
 
 def test_ephemeral_run_used_when_image_set_and_no_container(monkeypatch):
     monkeypatch.setattr(render.shutil, "which", lambda name: f"/usr/bin/{name}")
@@ -66,20 +57,17 @@ def test_ephemeral_run_used_when_image_set_and_no_container(monkeypatch):
     home = str(Path.home())
     assert f"{home}:{home}" in cmd, "home must be bind-mounted at the same path"
 
-
 def test_path_ffmpeg_is_last_resort(monkeypatch):
     monkeypatch.setattr(render.shutil, "which",
                         lambda name: "/usr/bin/ffmpeg" if name == "ffmpeg" else None)
     monkeypatch.setitem(sys.modules, "imageio_ffmpeg", None)
     assert render.find_ffmpeg() == ["/usr/bin/ffmpeg"]
 
-
 def test_raises_when_nothing_available(monkeypatch):
     monkeypatch.setattr(render.shutil, "which", lambda name: None)
     monkeypatch.setitem(sys.modules, "imageio_ffmpeg", None)
     with pytest.raises(RuntimeError, match="no ffmpeg found"):
         render.find_ffmpeg()
-
 
 def test_resolve_media_returns_absolute_path(tmp_path, monkeypatch):
     """Relative paths break under `podman exec`: it has a different cwd."""
@@ -91,10 +79,8 @@ def test_resolve_media_returns_absolute_path(tmp_path, monkeypatch):
     assert found.is_absolute()
     assert found == (media / "yt_x.mp4").resolve()
 
-
 def test_resolve_media_missing_returns_none(tmp_path):
     assert render.resolve_media("nope", tmp_path) is None
-
 
 def test_concat_list_is_written_beside_output_not_tmp(tmp_path, monkeypatch):
     """A containerized ffmpeg only sees the bind-mounted home, never /tmp."""
@@ -118,7 +104,6 @@ def test_concat_list_is_written_beside_output_not_tmp(tmp_path, monkeypatch):
     assert str(clips[0].resolve()) in seen["contents"]
     assert not list(workdir.glob("concat_list.txt")), "list file must be cleaned up"
 
-
 def test_cap_holds_trims_from_the_tail_only():
     """The in-point is what the index worked to find; trims come off the end."""
     shots = [
@@ -132,16 +117,13 @@ def test_cap_holds_trims_from_the_tail_only():
     assert capped[1] == shots[1]          # under the cap, untouched
     assert shots[0]["duration"] == 25.0   # input list is not mutated
 
-
 def test_cap_holds_without_a_cap_is_a_passthrough():
     shots = [{"segment_id": "a", "start_sec": 0.0, "end_sec": 30.0, "duration": 30.0}]
     assert render.cap_holds(shots, None) == shots
 
-
 def test_cap_holds_derives_duration_when_absent():
     shots = [{"segment_id": "a", "start_sec": 2.0, "end_sec": 22.0}]
     assert render.cap_holds(shots, 5.0)[0]["end_sec"] == 7.0
-
 
 def test_resolve_duration_clamps_a_hold_past_the_out_point(capsys):
     """build_story clamps a hold at the cut, but a shotlist it never produced
@@ -154,19 +136,16 @@ def test_resolve_duration_clamps_a_hold_past_the_out_point(capsys):
     assert "CLAMPED" in err
     assert "seg_a" in err
 
-
 def test_resolve_duration_within_the_span_is_quiet(capsys):
     shot = {"segment_id": "seg_a", "start_sec": 10.0, "end_sec": 14.2,
             "duration": 3.0}
     assert render.resolve_duration(shot) == 3.0
     assert capsys.readouterr().err == ""
 
-
 def test_resolve_duration_derives_the_span_when_duration_is_absent(capsys):
     shot = {"segment_id": "seg_a", "start_sec": 10.0, "end_sec": 14.2}
     assert render.resolve_duration(shot) == pytest.approx(4.2)
     assert capsys.readouterr().err == ""
-
 
 def test_cap_holds_keeps_the_clamp_so_the_render_does_not_warn_twice(capsys):
     """cap_holds and render both resolve the duration; the clamp must be
@@ -177,7 +156,6 @@ def test_cap_holds_keeps_the_clamp_so_the_render_does_not_warn_twice(capsys):
     assert capped[0]["end_sec"] == 4.0        # the clamp is to the vetted span
     assert render.resolve_duration(capped[0]) == 4.0
     assert capsys.readouterr().err.count("CLAMPED") == 1
-
 
 # --- delivered true-peak trim (issue #44) ------------------------------------
 
@@ -207,7 +185,6 @@ def _one_shot_render(monkeypatch, tmp_path, delivered_peaks, **render_kwargs):
                   ffmpeg=["ffmpeg-not-invoked"], verbose=False, **render_kwargs)
     return gains
 
-
 def test_a_cut_above_the_band_is_re_concatenated_at_a_static_gain(monkeypatch, tmp_path):
     """Issue #44: a cut measured -0.7 dBTP is 0.4 dB over the -1.1 target, so
     the concat is re-run with a STATIC volume gain -- never a limiter, never a
@@ -218,11 +195,9 @@ def test_a_cut_above_the_band_is_re_concatenated_at_a_static_gain(monkeypatch, t
     assert gains[1] == pytest.approx(10 ** (-0.4 / 20), rel=1e-6)
     assert gains[1] < 1.0, "corrections only ever go down"
 
-
 def test_a_cut_inside_the_band_is_not_re_concatenated(monkeypatch, tmp_path):
     gains = _one_shot_render(monkeypatch, tmp_path, [-1.0])
     assert gains == [None]
-
 
 def test_the_peak_check_also_covers_a_music_bed(monkeypatch, tmp_path):
     """--audio replaces the source audio at the concat; the delivered file is
@@ -232,14 +207,12 @@ def test_the_peak_check_also_covers_a_music_bed(monkeypatch, tmp_path):
     gains = _one_shot_render(monkeypatch, tmp_path, [-0.4, -1.2], audio_bed=bed)
     assert len(gains) == 2 and gains[1] < 1.0
 
-
 def test_a_muted_render_is_never_measured(monkeypatch, tmp_path):
     """No audio stream means nothing to measure -- the loop must not run."""
     monkeypatch.setattr(render.peaks, "measure_true_peak",
                         lambda *a, **k: pytest.fail("measured a muted file"))
     gains = _one_shot_render(monkeypatch, tmp_path, [], keep_audio=False)
     assert gains == [None]
-
 
 def test_concat_applies_the_correction_as_a_static_volume_filter(monkeypatch, tmp_path):
     """The corrective pass is a plain volume= scale, not a dynamics filter."""
@@ -258,7 +231,6 @@ def test_concat_applies_the_correction_as_a_static_volume_filter(monkeypatch, tm
     assert "loudnorm" not in joined and "acompressor" not in joined \
         and "alimiter" not in joined
 
-
 def test_concat_with_a_bed_gains_the_bed(monkeypatch, tmp_path):
     seen = []
 
@@ -275,7 +247,6 @@ def test_concat_with_a_bed_gains_the_bed(monkeypatch, tmp_path):
     assert cmd[cmd.index("-map") + 1] == "0:v:0"
     assert "1:a:0" in cmd
 
-
 # --- the chain stays lossless (issue #144) -----------------------------------
 #
 # render.py encoded AAC 192k at three places INSIDE a chain the audio standard
@@ -291,7 +262,6 @@ def test_a_cut_clip_carries_pcm_not_a_lossy_generation(monkeypatch):
     assert cmd[cmd.index("-c:a") + 1] == "pcm_s24le"
     assert "aac" not in cmd and "-b:a" not in cmd
 
-
 def test_a_still_carries_pcm_too(monkeypatch):
     """A still takes the slot a dropped shot left behind, so its audio has to
     be indistinguishable from a cut clip's to the concat demuxer."""
@@ -303,14 +273,12 @@ def test_a_still_carries_pcm_too(monkeypatch):
     assert cmd[cmd.index("-c:a") + 1] == "pcm_s24le"
     assert "aac" not in cmd
 
-
 def test_intermediates_are_not_flac(monkeypatch):
     """Measured, not theoretical: FLAC's STREAMINFO lives in extradata and the
     concat demuxer binds the FIRST file's extradata to the whole joined stream,
     so every later segment fails to decode. PCM has none to mismatch."""
     assert render.INTERMEDIATE_AUDIO_ARGS[1] != "flac"
     assert render.INTERMEDIATE_SUFFIX == ".mkv"
-
 
 def test_the_join_delivers_a_lossless_bed(monkeypatch, tmp_path):
     calls = []
@@ -326,7 +294,6 @@ def test_the_join_delivers_a_lossless_bed(monkeypatch, tmp_path):
     assert cmd[cmd.index("-c:a") + 1] == "flac"
     assert "-b:a" not in cmd, "a lossless codec has no bitrate to state"
 
-
 def test_the_join_states_the_codec_even_with_no_bed(monkeypatch, tmp_path):
     """The clips now carry PCM, so leaving the codec to the container's default
     would put the lossy generation straight back."""
@@ -337,7 +304,6 @@ def test_the_join_states_the_codec_even_with_no_bed(monkeypatch, tmp_path):
                   workdir=tmp_path)
     cmd = calls[0]
     assert cmd[cmd.index("-c:a") + 1] == "flac"
-
 
 # --- the picture probe reads the cut it was given (issue #161) ---------------
 #
@@ -355,12 +321,10 @@ def test_a_short_cut_is_probed_inside_itself():
         assert 0 <= start < 34.0
         assert start + length <= 34.0 + 1e-9
 
-
 def test_a_very_short_cut_still_gets_one_window():
     windows = render.probe_windows(2.0)
     for start, length in windows:
         assert start + length <= 2.0 + 1e-9
-
 
 def test_a_long_cut_is_read_at_several_points():
     """One window can land on a fade, a title card, or a shot letterboxed
@@ -373,12 +337,10 @@ def test_a_long_cut_is_read_at_several_points():
     assert starts[0] > 0.0
     assert starts[-1] + windows[-1][1] < 600.0
 
-
 def test_an_unprobeable_duration_falls_back_to_the_old_offset():
     """No worse than before, and stated rather than crashing."""
     assert render.probe_windows(None) == [(render.PROBE_AT, render.PROBE_LEN)]
     assert render.probe_windows(0) == [(render.PROBE_AT, render.PROBE_LEN)]
-
 
 def _fake_probe(monkeypatch, stderr_by_call):
     calls = {"n": 0}
@@ -395,7 +357,6 @@ def _fake_probe(monkeypatch, stderr_by_call):
     monkeypatch.setattr(render, "find_ffmpeg", lambda *a, **k: ["ffmpeg"])
     monkeypatch.setattr(render, "probe_media_duration", lambda *a, **k: 100.0)
 
-
 def test_no_matte_and_never_looked_are_different_answers(monkeypatch):
     """This is the whole of #161: one of these is safe to place against and
     the other is not, and they used to be the same None."""
@@ -406,7 +367,6 @@ def test_no_matte_and_never_looked_are_different_answers(monkeypatch):
     _fake_probe(monkeypatch, ["frame= 120 fps=0.0 nothing here\n"])
     rect, status = render.detect_picture_status("x.mp4")
     assert rect is None and status == "undecodable"
-
 
 def test_the_steadiest_reading_wins_across_windows(monkeypatch):
     """A single window landing on a title card must not outvote the body."""
@@ -419,14 +379,12 @@ def test_the_steadiest_reading_wins_across_windows(monkeypatch):
     assert rect == (0, 140, 1920, 800)
     assert status == "letterboxed"
 
-
 # --- `-shortest` cuts the PICTURE too (the bed-length check) -----------------
 #
 # concat() muxes an --audio bed with `-shortest`, which stops the whole output
 # at the shorter of the two mapped streams. A bed longer than the cut is the
 # intended use. A bed SHORTER than the cut silently truncated the film: ffmpeg
 # exited 0 and nothing said the render had ended early.
-
 
 def test_a_bed_shorter_than_the_cut_stops_the_render(monkeypatch, tmp_path):
     monkeypatch.setattr(render.subprocess, "run",
@@ -439,7 +397,6 @@ def test_a_bed_shorter_than_the_cut_stops_the_render(monkeypatch, tmp_path):
         render.concat(["ffmpeg"], [tmp_path / "a.mp4", tmp_path / "b.mp4"],
                       tmp_path / "out.mp4", audio_bed=tmp_path / "bed.wav",
                       workdir=tmp_path)
-
 
 def test_a_bed_longer_than_the_cut_is_fine(monkeypatch, tmp_path):
     """`-shortest` trimming the bed's tail is the whole point of it."""
@@ -454,7 +411,6 @@ def test_a_bed_longer_than_the_cut_is_fine(monkeypatch, tmp_path):
                   audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
     assert any("concat" in c for c in calls)
 
-
 def test_a_bed_a_frame_short_is_rounding_not_a_truncation(monkeypatch, tmp_path):
     """The sum is per-clip, so the comparison carries a little slack."""
     monkeypatch.setattr(render.subprocess, "run", lambda cmd, **kw: None)
@@ -465,7 +421,6 @@ def test_a_bed_a_frame_short_is_rounding_not_a_truncation(monkeypatch, tmp_path)
     render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
                   audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
 
-
 def test_an_unmeasurable_bed_does_not_block_the_render(monkeypatch, tmp_path):
     """No ffprobe is not the same as a wrong length -- degrade, never block."""
     monkeypatch.setattr(render.subprocess, "run", lambda cmd, **kw: None)
@@ -474,7 +429,6 @@ def test_an_unmeasurable_bed_does_not_block_the_render(monkeypatch, tmp_path):
 
     render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
                   audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
-
 
 def test_no_bed_means_no_length_check(monkeypatch, tmp_path):
     """Without a bed there is no `-shortest`, so nothing to check."""

@@ -11,12 +11,10 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_efmb  # noqa: E402
 import build_efmb_plates  # noqa: E402
-
 
 # --- the two clocks --------------------------------------------------------
 
@@ -31,7 +29,6 @@ def test_source_and_film_time_round_trip():
     for src in (0.0, 3.9, 30.0, 100.0, 244.0, 338.2, 360.4):
         film = build_efmb.film_for_source(src, lead)
         assert build_efmb.source_for_film(film, lead) == pytest.approx(src, abs=1e-6)
-
 
 def test_a_splice_is_one_film_instant_and_two_source_instants():
     """At a cut the round trip is ambiguous, and that is the cut existing.
@@ -48,7 +45,6 @@ def test_a_splice_is_one_film_instant_and_two_source_instants():
     joined = build_efmb.film_for_source(22.033, lead)
     assert build_efmb.source_for_film(joined, lead) == pytest.approx(4.017, abs=1e-6)
 
-
 def test_a_cut_frame_raises_instead_of_sliding_onto_its_neighbour():
     """Binding a name to a frame that no longer plays must be loud.
 
@@ -59,7 +55,6 @@ def test_a_cut_frame_raises_instead_of_sliding_onto_its_neighbour():
         build_efmb.film_for_source(260.0)          # inside the dance section
     with pytest.raises(build_efmb.NotInPicture):
         build_efmb.film_for_source(370.0)          # the publisher end cards
-
 
 def test_the_head_is_derived_from_the_music_and_never_typed():
     """The lead-in is whatever puts the shield on the downbeat."""
@@ -75,7 +70,6 @@ def test_the_head_is_derived_from_the_music_and_never_typed():
     assert plan["film_sec"] == pytest.approx(
         plan["bed_duration_sec"] + build_efmb.INTERRUPTION_SHIFT_SEC,
         abs=0.001)
-
 
 def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
     sequence = build_efmb.picture_sequence()
@@ -98,7 +92,6 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
     assert returned["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
     assert returned["source_in"] == pytest.approx(325.933, abs=1e-3)
 
-
 def test_kyle_and_eyecantcu_each_get_their_evidenced_picture():
     sequence = build_efmb.picture_sequence()
     eye = next(p for p in sequence if p["id"] == "eyecantcu_tail")
@@ -111,7 +104,6 @@ def test_kyle_and_eyecantcu_each_get_their_evidenced_picture():
         build_efmb.build()["film_sec"] - 351.97, abs=1e-3)
     assert sum(p["duration"] for p in sequence) == pytest.approx(
         build_efmb.build()["film_sec"], abs=1e-3)
-
 
 def test_the_interruption_audio_uses_only_recorded_sources():
     audio = build_efmb.audio_sequence()
@@ -132,18 +124,15 @@ def test_the_interruption_audio_uses_only_recorded_sources():
     assert sum(p["duration"] for p in audio) == pytest.approx(
         build_efmb.build()["film_sec"], abs=1e-3)
 
-
 # --- the plate manifest ----------------------------------------------------
 
 def committed():
     with open(REPO_ROOT / "stories" / "02-endless-forms-plates.json") as fh:
         return json.load(fh)
 
-
 def test_the_committed_manifest_matches_its_generator():
     """It is an OUTPUT. A conflict in it is settled by re-running the tool."""
     assert committed() == build_efmb_plates.build()
-
 
 def test_the_manifest_builds_from_committed_inputs_only():
     """Everything the generator reads must be in the repository.
@@ -163,7 +152,6 @@ def test_the_manifest_builds_from_committed_inputs_only():
         assert ignored.returncode != 0, (
             f"{path} is gitignored -- the generator cannot depend on it")
 
-
 def test_the_opening_black_head_is_now_a_full_length_card():
     manifest = committed()
     card = manifest["plates"][0]
@@ -181,14 +169,12 @@ def test_the_opening_black_head_is_now_a_full_length_card():
     ]
     assert "seen_at_src" not in card
 
-
 def test_every_plate_sits_on_a_frame_that_still_plays():
     for plate in committed()["plates"]:
         src = plate.get("seen_at_src")
         if src is None:
             continue
         build_efmb.film_for_source(src)      # raises if that frame was cut
-
 
 def test_no_plate_is_laid_over_bungies_burned_in_title():
     """Source 356.500 -> 358.200 burns "NEW LEGENDS WILL RISE" across frame.
@@ -217,7 +203,6 @@ def test_no_plate_is_laid_over_bungies_burned_in_title():
             assert not (start < zone[1] - EPS and end > zone[0] + EPS), (
                 f"{plate['id']} overlaps the no-plate zone at {zone}")
 
-
 def test_the_authored_handles_are_never_replaced_with_real_names():
     """Retiming may omit a plate; it may not rewrite its authored identity."""
     casting = build_efmb_plates.load_casting()
@@ -227,7 +212,6 @@ def test_the_authored_handles_are_never_replaced_with_real_names():
     names = {p.get("name") for p in committed()["plates"]}
     for banned in ("Robert Sturla", "RJ Trujillo"):
         assert banned not in names
-
 
 def test_cayde_is_redacted_in_this_act_and_only_by_covering_a_known_name():
     """The joke needs the audience not to be told yet.
@@ -239,7 +223,6 @@ def test_cayde_is_redacted_in_this_act_and_only_by_covering_a_known_name():
     assert "cayde_signoff" not in {p["id"] for p in committed()["plates"]}
     assert build_efmb_plates.CAYDE["redacted_speaker"] == "[ REDACTED ]"
     assert build_efmb_plates.CAYDE["reveals"] == "cayde_6"
-
 
 def test_nobody_is_credited_twice_with_two_different_faces():
     """One name, two different cards, is the bug this guards. A card repeated
@@ -259,7 +242,6 @@ def test_nobody_is_credited_twice_with_two_different_faces():
             f"{copies} -- a reprise reproduces the card verbatim; anything "
             "else is two faces for one person")
 
-
 def test_every_plate_can_be_read():
     for plate in committed()["plates"]:
         # An ANIMATION frame is not a credit. The choice screen is a run of
@@ -270,11 +252,9 @@ def test_every_plate_can_be_read():
         assert plate["dur"] >= build_efmb_plates.MIN_HOLD, (
             f"{plate['id']} holds {plate['dur']}s -- too brief to read")
 
-
 def test_the_manifest_obeys_one_plate_at_a_time():
     from tools.plate import load_manifest_entries
     load_manifest_entries(committed()["plates"])
-
 
 def test_copy_is_reproduced_rather_than_composed():
     """A missing key must raise, never fall back to the generic plate.
@@ -286,14 +266,12 @@ def test_copy_is_reproduced_rather_than_composed():
     with pytest.raises(KeyError):
         build_efmb_plates.authored_copy("nobody_has_authored_this", casting)
 
-
 def test_a_placeholder_carries_a_name_and_no_invented_rows():
     """Named, but nothing written for them yet: omit the rows, keep the name."""
     casting = build_efmb_plates.load_casting()
     copy = build_efmb_plates.placeholder_copy("dylan_taylor", casting)
     assert copy["name"] == "Dylan Taylor"
     assert "title" not in copy and "class" not in copy
-
 
 def test_the_manifest_never_hands_the_renderer_a_url():
     """tools/plate.py never touches the network, so an avatar URL renders as
@@ -303,7 +281,6 @@ def test_the_manifest_never_hands_the_renderer_a_url():
         avatar = plate.get("avatar")
         if avatar:
             assert not str(avatar).startswith("http"), plate["id"]
-
 
 # --- the two ffmpeg spellings that have cost this act a rebuild ------------
 
@@ -338,7 +315,6 @@ def test_the_burn_filter_carries_no_shell_quotes():
     assert "'" not in graph, f"shell quotes in an argv filtergraph: {graph}"
     assert "enable=between(t\\," in graph, (
         f"unquoted commas are argument separators to the filter parser: {graph}")
-
 
 def test_every_plate_input_is_looped_for_the_length_of_the_picture():
     """REGRESSION, and it shipped: a plate gated late in a long cut never drew.
@@ -375,7 +351,6 @@ def test_every_plate_input_is_looped_for_the_length_of_the_picture():
         "input the same length there is no unambiguous shortest stream, and "
         "act II came out 318.767 s against a 307.998 s cut")
 
-
 def test_the_picture_chain_never_uses_filter_complex():
     """ISSUE #88: the same chain, spelled two ways, gives two lengths.
 
@@ -389,7 +364,6 @@ def test_the_picture_chain_never_uses_filter_complex():
     assert '"-c:v", "copy"' in render_section
     assert "filter_complex" not in build_efmb.NORMALISE_VF
 
-
 def test_the_bed_is_corrected_with_static_gain_and_never_a_normaliser():
     """The fetched PCM is already safely gained; the mux does not process it."""
     assert build_efmb.MUX_GAIN_DB == 0
@@ -398,13 +372,11 @@ def test_the_bed_is_corrected_with_static_gain_and_never_a_normaliser():
     for banned in ("loudnorm", "alimiter", "acompressor"):
         assert banned not in render_section
 
-
 # --- the montage announcements (owner brief, issue #98) ---------------------
 
 def _montage(manifest):
     return [p for p in manifest["plates"]
             if p["id"].startswith(("montage_chat_", "announce_"))]
-
 
 def test_the_new_face_dialogue_replaces_the_old_montage_asides():
     manifest = build_efmb_plates.build()
@@ -412,7 +384,6 @@ def test_the_new_face_dialogue_replaces_the_old_montage_asides():
     assert _montage(manifest) == []
     assert {"late_jrsapi_learn", "late_rochaporto_move"} <= ids
     assert any("two montage asides" in u for u in manifest["unresolved"])
-
 
 def test_the_announcer_is_gone_entirely():
     """Owner: "Remove all this anacheck stuff for now." All three of his
@@ -428,7 +399,6 @@ def test_the_announcer_is_gone_entirely():
     assert "timed_natewaddington" not in ids
     assert any("anacheck" in u.lower() for u in manifest["unresolved"])
 
-
 def test_giklab_is_gone_and_nobody_moved_into_his_slot():
     """Owner: "03:16 get rid of giklab". Megacut 3:16 is film 74.4, and the
     only blueberry plate in the act was at 73.400. The SHOT came out, so the
@@ -436,7 +406,6 @@ def test_giklab_is_gone_and_nobody_moved_into_his_slot():
     assert build_efmb_plates.BLUEBERRY_SHOTS == []
     ids = {p["id"] for p in build_efmb_plates.build()["plates"]}
     assert not {i for i in ids if i.startswith("blueberry_")}
-
 
 def test_the_new_face_dialogue_hands_off_before_the_lead_in_banner():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -447,7 +416,6 @@ def test_the_new_face_dialogue_hands_off_before_the_lead_in_banner():
         "late_karena_cardio",
     )]
     assert max(p["at"] + p["dur"] for p in cues) <= build_efmb_plates.MONTAGE_OUT
-
 
 def _retired_the_montage_never_stacks_a_cue_on_the_badge():
     """Dylan Taylor's badge sits at 130.267 inside the montage. An announcement
@@ -460,19 +428,16 @@ def _retired_the_montage_never_stacks_a_cue_on_the_badge():
     assert last["at"] + last["dur"] <= dylan["at"]
     assert last["dur"] == build_efmb_plates.SOLO_HOLD  # never trimmed
 
-
 def test_the_superseded_owner_typo_remains_in_the_authored_source():
     """Replacement removes scheduling, never rewrites the owner's copy."""
     assert build_efmb_plates.MONTAGE_CHATS[1][2] == (
         "Ready to the #FIGHTFORCONTRIBUTORS?")
-
 
 def test_copy_the_card_has_no_row_for_is_recorded_not_dropped():
     """A fourth authored line on a three-row card is a punch-list item, not a
     licence to cram it into the class row."""
     unresolved = build_efmb_plates.build()["unresolved"]
     assert any("lead-in banner" in u for u in unresolved)
-
 
 def test_the_owner_s_superseded_asides_remain_authored_verbatim():
     assert build_efmb_plates.MONTAGE_CHATS == [
@@ -481,20 +446,17 @@ def test_the_owner_s_superseded_asides_remain_authored_verbatim():
          "Ready to the #FIGHTFORCONTRIBUTORS?"),
     ]
 
-
 # --- "The Long Walk" (owner brief, this round) -----------------------------
 
 def walk_plates():
     return {p["id"]: p for p in committed()["plates"]
             if p["id"].startswith("walk_")}
 
-
 def test_the_mapped_walk_lines_land_on_their_owner_marks():
     """The mapped 7:25 and 7:34 lines stay on their Act II film seconds."""
     walk = walk_plates()
     assert walk["walk_ge_stream"]["at"] == pytest.approx(178.5, abs=1e-3)
     assert walk["walk_ge_glorious"]["at"] == pytest.approx(187.5, abs=1e-3)
-
 
 def test_the_villain_arrives_with_the_villain():
     """The bar is on the shot the winged figure walks out of, not on the
@@ -506,7 +468,6 @@ def test_the_villain_arrives_with_the_villain():
     assert bar["seen_at_src"] == build_efmb_plates.WALK_VILLAIN
     assert bar["name"] == "KERNEL REGRESSION"
     assert bar["title"] == "Enslaver of Maintainers | Ruiner of User Experience"
-
 
 def test_nobody_else_is_credited_inside_the_walk():
     """Owner: 'No other guardians'. Rizzo, HuntedRaven7, hanthor and Ahmed
@@ -528,7 +489,6 @@ def test_nobody_else_is_credited_inside_the_walk():
         assert not (walk_in <= p["at"] < walk_out), (
             f"{p['id']} is still credited inside The Long Walk")
 
-
 def test_the_patch_queue_holds_from_the_enemies_until_the_villain():
     """A queue that blinks once is a caption. It is the site's own HUD card,
     at the bottom because the owner said bottom."""
@@ -540,7 +500,6 @@ def test_the_patch_queue_holds_from_the_enemies_until_the_villain():
         build_efmb.film_for_source(build_efmb_plates.WALK_ENEMIES), abs=1e-3)
     assert hud["at"] + hud["dur"] == pytest.approx(walk["walk_villain"]["at"],
                                                    abs=1e-3)
-
 
 def test_the_achievement_gag_is_built_but_not_scheduled_until_it_is_approved():
     """The owner asked to approve the strings before anything is burned. Only
@@ -555,18 +514,15 @@ def test_the_achievement_gag_is_built_but_not_scheduled_until_it_is_approved():
                    if g["copy"] == "owner_supplied"]
     assert [g["name"] for g in owner_lines] == ["Mailing List Bullshit"]
 
-
 def test_the_walk_never_rides_over_the_hard_cut_at_the_end_of_run_four():
     walk = walk_plates()
     end = max(p["at"] + p["dur"] for p in walk.values())
     assert end <= build_efmb.film_for_source(build_efmb_plates.WALK_OUT) + 1e-6
 
-
 def test_the_chapter_replaces_rizzo_rather_than_pointing_at_a_gone_credit():
     chapters = {c["title"]: c for c in committed()["chapters"]}
     assert "Rizzo" not in chapters, "a marker points at a credit that is gone"
     assert chapters["The Long Walk"]["src"] == build_efmb_plates.WALK_IN
-
 
 def test_the_mapped_megacut_pass_rewrites_the_walk_window_verbatim():
     """The mapped 7:03 -> 8:26 pass owns this whole window now."""
@@ -613,7 +569,6 @@ def test_the_mapped_megacut_pass_rewrites_the_walk_window_verbatim():
     ):
         assert removed not in by_id
 
-
 def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
     by_id = {p["id"]: p for p in committed()["plates"]}
 
@@ -651,7 +606,6 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
     assert by_id["mapped_haters"]["name"] == "HATERS"
     assert "solo_EyeCantCU" not in by_id
 
-
 def test_every_dialogue_pill_in_the_walk_carries_its_speaker_s_pfp():
     """The pill has an avatar slot and its fallback is the drawn crest --
     which is what every chat here silently rendered before, because the
@@ -662,18 +616,15 @@ def test_every_dialogue_pill_in_the_walk_carries_its_speaker_s_pfp():
         assert p.get("avatar"), f"{pid} lost its pfp badge"
         assert not str(p["avatar"]).startswith("http")
 
-
 # --- the TOC exchange and the endgame (owner brief, issue #98 §3-§4) ----------
 
 def toc_plates():
     return {p["id"]: p for p in committed()["plates"]
             if p["id"].startswith(("toc_", "timed_", "quote_", "letterbox_"))}
 
-
 def late_plates():
     return {p["id"]: p for p in committed()["plates"]
             if p["id"].startswith(("late_", "top_banner_", "letterbox_"))}
-
 
 def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
     """The greenery exchange keeps its pre-walk questions and loses its old
@@ -693,7 +644,6 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
     for removed in ("toc_joseph_faith", "toc_ricardo_desktop", "toc_joseph_lol"):
         assert removed not in ids
 
-
 def test_the_remaining_pre_walk_toc_copy_is_reproduced_verbatim():
     toc = toc_plates()
     assert toc["toc_karena"]["text"] == (
@@ -702,7 +652,6 @@ def test_the_remaining_pre_walk_toc_copy_is_reproduced_verbatim():
         "You really think they can save open source?")
     # The brief's own speaker tags, not a casting.yaml lookup.
     assert toc["toc_karena"]["speaker"] == "Karena"
-
 
 def test_the_post_walk_dialogue_is_replaced_by_the_mapped_pass():
     by_id = {p["id"]: p for p in committed()["plates"]}
@@ -716,7 +665,6 @@ def test_the_post_walk_dialogue_is_replaced_by_the_mapped_pass():
     assert by_id["mapped_redacted_options"]["text"] == (
         "Your options are success "
         "Or a lifetime of servitude in the Toilmaster's Packaging Mines")
-
 
 def test_the_owner_conversation_replaces_the_skill_banners():
     """The 8:18 skill banners are replaced by the owner-supplied conversation."""
@@ -758,7 +706,6 @@ def test_the_owner_conversation_replaces_the_skill_banners():
     assert blow["dur"] == pytest.approx(2.6, abs=1e-3)
     assert blow["at"] + blow["dur"] < build_efmb.AMBER_AT
 
-
 def test_latest_owner_notes_remove_the_wrong_people_and_update_the_lines():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     assert "owner_convo_krook" not in by_id
@@ -771,7 +718,6 @@ def test_latest_owner_notes_remove_the_wrong_people_and_update_the_lines():
     assert by_id["late_rochaporto_cern"]["text"] == (
         "One reference architecture coming up!")
 
-
 def test_mars_intro_owns_clankers_context_and_red_warning():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     context = by_id["late_clankers_context"]
@@ -783,7 +729,6 @@ def test_mars_intro_owns_clankers_context_and_red_warning():
     assert warning["kind"] == "miniboss"  # owner: match the kernel bar
     assert warning["position"] == "boss"  # the kernel bar's own position
     assert warning["name"] == "POOR TECHNICAL DECISIONS"
-
 
 def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -809,7 +754,6 @@ def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
         by_id["mapped_which_kyle"]["at"]
     assert by_id["mapped_which_kyle"]["text"] == "Which one of you is Kyle?"
 
-
 def test_endfight_warnings_and_speakers_match_owner_copy():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     haters = by_id["mapped_haters"]
@@ -826,7 +770,6 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(313.2, abs=1e-3)
     assert by_id["owner_convo_karena"]["avatar"].endswith("/karena.png")
 
-
 def test_the_owner_conversation_hands_to_kyle_without_overlap():
     by_id = {p["id"]: p for p in committed()["plates"]}
     last = by_id["owner_convo_joseph"]
@@ -836,13 +779,11 @@ def test_the_owner_conversation_hands_to_kyle_without_overlap():
     assert round(blow["at"] - (kyle["at"] + kyle["dur"]), 3) == pytest.approx(
         0.250, abs=1e-3)
 
-
 def test_the_owner_conversation_records_unverified_handles():
     gaps = " ".join(committed()["unresolved"])
     assert "owner conversation" in gaps.lower()
     for handle in ("karena", "joseph", "krook", "rochaporta"):
         assert handle in gaps
-
 
 def test_the_remaining_older_timed_cue_is_still_on_its_mark():
     """The later owner pass replaced the older 4:10/4:20 and tail block, but
@@ -850,7 +791,6 @@ def test_the_remaining_older_timed_cue_is_still_on_its_mark():
     assert "timed_jorge" not in {p["id"] for p in committed()["plates"]}
     assert any(p["id"] == "mapped_redacted_blow" and p["at"] == pytest.approx(242.4, abs=1e-3)
                for p in committed()["plates"])
-
 
 def test_the_late_owner_question_uses_the_current_programme_clock():
     late = late_plates()
@@ -860,7 +800,6 @@ def test_the_late_owner_question_uses_the_current_programme_clock():
     assert not any(p["id"].startswith("quote_") for p in committed()["plates"])
     assert any("6:56 question replaces the earlier five closing quotes" in u
                for u in committed()["unresolved"])
-
 
 def test_the_ogc_banner_keeps_its_top_lane_over_the_owner_conversation():
     late = late_plates()
@@ -875,7 +814,6 @@ def test_the_ogc_banner_keeps_its_top_lane_over_the_owner_conversation():
     assert top[1]["at"] == pytest.approx(239.5, abs=1e-3)
     assert top[1]["at"] + top[1]["dur"] == pytest.approx(
         build_efmb.HALLWAY_AT, abs=1e-3)
-
 
 def test_the_late_pass_records_only_the_precise_remaining_gaps():
     late_gaps = " ".join(committed()["unresolved"])
@@ -892,7 +830,6 @@ def test_the_late_pass_records_only_the_precise_remaining_gaps():
     assert "requested flashing red boss treatment is still missing" in late_gaps
     assert "exact owner-authored words" not in late_gaps
 
-
 def test_present_day_lands_on_the_owner_mark_with_outro_title_chrome():
     late = late_plates()
     card = late["late_present_day"]
@@ -904,7 +841,6 @@ def test_present_day_lands_on_the_owner_mark_with_outro_title_chrome():
     assert card["seen_at_src"] == pytest.approx(
         build_efmb.source_for_film(card["at"], lead), abs=1e-3)
 
-
 def test_the_828_redacted_line_replaces_the_old_gaslighting_seat():
     by_id = {p["id"]: p for p in committed()["plates"]}
     clue = by_id["mapped_redacted_blow"]
@@ -912,7 +848,6 @@ def test_the_828_redacted_line_replaces_the_old_gaslighting_seat():
     assert clue["speaker"] == "[redacted]"
     assert clue["text"] == "Or go blow some shit up"
     assert "timed_jorge" not in by_id
-
 
 def test_the_endfight_reseats_kyle_and_eyecantcu_on_evidenced_picture():
     by_id = {p["id"]: p for p in committed()["plates"]}
@@ -925,7 +860,6 @@ def test_the_endfight_reseats_kyle_and_eyecantcu_on_evidenced_picture():
     assert "solo_EyeCantCU" not in by_id
     assert "stale old 283.666 plate seat remains removed" in \
         " ".join(committed()["unresolved"])
-
 
 def test_the_remaining_face_shot_dialogue_cards_still_land():
     late = late_plates()
@@ -963,7 +897,6 @@ def test_the_remaining_face_shot_dialogue_cards_still_land():
     assert cardio["text"] == "Like cardio!"
     assert cardio["at"] == pytest.approx(107.5, abs=1e-3)
 
-
 def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
     by_id = {p["id"]: p for p in committed()["plates"]}
     expected = {
@@ -982,7 +915,6 @@ def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
         assert entry["speaker"] == speaker
         assert entry.get("avatar") == avatar
 
-
 def test_amber_conversation_fills_the_black_pause_before_sup():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     conversation = [by_id[pid] for pid, *_ in build_efmb_plates.BLACK_CONVERSATION]
@@ -993,7 +925,6 @@ def test_amber_conversation_fills_the_black_pause_before_sup():
     assert by_id["mapped_kyle_sup"]["at"] > build_efmb.HALLWAY_RETURN_AT
     assert "mapped_amber_ready" not in by_id
     assert "mapped_reaction_hell" not in by_id
-
 
 def test_the_late_titles_and_last_chats_replace_the_old_conflicting_windows():
     late = late_plates()
@@ -1029,7 +960,6 @@ def test_out_of_picture_replacements_are_recorded_and_existing_walk_lines_stay()
     assert "late_saturn_title" not in ids
     assert "late_kernel_bump" not in ids
 
-
 # --- this round: the OG Guardians, the team badge, and the choice screen ---
 
 def test_the_owners_marks_are_megacut_time():
@@ -1047,7 +977,6 @@ def test_the_owners_marks_are_megacut_time():
     assert by_id["trio_rochaporto"]["at"] == pytest.approx(57.433, abs=1e-3)
     assert by_id["trio_mara_sov"]["at"] == pytest.approx(61.433, abs=1e-3)
 
-
 def test_the_trio_staggers_and_then_holds_together():
     """"only show joseph sandoval, we're going to stagger these, keep them up
     for readability" -- one name, then a pair, then the row, and the row
@@ -1060,7 +989,6 @@ def test_the_trio_staggers_and_then_holds_together():
         max(c["at"] for c in cards) + build_efmb_plates.TRIO_HOLD, abs=1e-3)
     assert cards[0]["dur"] > cards[-1]["dur"], "Joseph is up longest"
 
-
 def test_karena_is_angel_with_one_l():
     """Owner, twice: the README's spelling and "(Angel, one L)". The vocab is
     frozen (#167), so the correction is applied to this act's copy and
@@ -1069,7 +997,6 @@ def test_karena_is_angel_with_one_l():
     assert by_id["trio_mara_sov"]["name"] == "Karena Angel"
     assert any("Angel" in u and "Angell" in u
                for u in build_efmb_plates.build()["unresolved"])
-
 
 def test_the_correct_opening_guardians_are_on_the_owners_marks():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -1080,13 +1007,11 @@ def test_the_correct_opening_guardians_are_on_the_owners_marks():
     assert "og_dims" not in by_id
     assert "og_paganini" not in by_id
 
-
 def test_the_og_copy_is_the_owners_word_for_word():
     """Including the capitalised NOT, which is the joke."""
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     assert by_id["og_thockin"]["title"] == "Does NOT Come in Peace"
     assert by_id["og_jbeda"]["title"] == "Out of Retirement"
-
 
 def test_thockin_is_evidenced_on_the_opening_revolver_shot():
     """The approved opening thockin note is the hooded Hunter revolver shot."""
@@ -1098,17 +1023,14 @@ def test_thockin_is_evidenced_on_the_opening_revolver_shot():
     assert "revolver" in thockin["why"]
     assert start <= thockin["at"] <= end
 
-
 def test_removed_opening_people_do_not_remain_in_the_manifest():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     assert "og_dims" not in by_id
     assert "og_paganini" not in by_id
 
-
 def test_the_wrong_cncf_community_leadership_card_is_absent():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     assert "team_cncf_leadership" not in by_id
-
 
 def test_the_new_dialogue_lands_on_the_owners_seconds():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -1117,7 +1039,6 @@ def test_the_new_dialogue_lands_on_the_owners_seconds():
     assert by_id["chat_karena_job"]["at"] == pytest.approx(77.433, abs=1e-3)
     assert by_id["chat_karena_job"]["text"] == "I love this job"
     assert all(p["label"] == "Your choices are:" for p in _choice_frames())
-
 
 def test_the_new_face_shot_copy_replaces_josephs_old_pair():
     manifest = build_efmb_plates.build()
@@ -1129,11 +1050,9 @@ def test_the_new_face_shot_copy_replaces_josephs_old_pair():
     assert any("Joseph master/got-this pair" in u
                for u in manifest["unresolved"])
 
-
 def _choice_frames():
     return [p for p in build_efmb_plates.build()["plates"]
             if p["id"].startswith("choice_lfx_")]
-
 
 def test_the_choice_screen_is_a_full_frame_pause_menu():
     frames = _choice_frames()
@@ -1142,7 +1061,6 @@ def test_the_choice_screen_is_a_full_frame_pause_menu():
     assert all(f["position"] == "full" for f in frames)
     assert all(f["animation"] for f in frames)
     assert all(f["group"] == "choice_lfx" for f in frames)
-
 
 def test_the_menu_owns_riaans_line_and_has_room_to_read():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -1155,13 +1073,11 @@ def test_the_menu_owns_riaans_line_and_has_room_to_read():
     assert span == pytest.approx(build_efmb_plates.CHOICE_HOLD, abs=0.05)
     assert span >= 4.0
 
-
 def test_the_frames_are_contiguous():
     """A gap between two frames of a cursor is a flicker."""
     frames = _choice_frames()
     for a, b in zip(frames, frames[1:]):
         assert b["at"] == pytest.approx(a["at"] + a["dur"], abs=2e-3)
-
 
 def test_the_fighting_option_is_the_legendary_one():
     """"design it like the destiny legendary campaign screen -- the fight one
@@ -1172,7 +1088,6 @@ def test_the_fighting_option_is_the_legendary_one():
     from tools import plate
     assert plate.CHOICE_POINTER_TARGET == 1, \
         "the cursor must head for the legendary option"
-
 
 def test_the_cursor_starts_in_the_centre_and_never_arrives():
     """"starting at the center and then moving towards the fighting choice but
@@ -1185,7 +1100,6 @@ def test_the_cursor_starts_in_the_centre_and_never_arrives():
     assert plate.CHOICE_POINTER_CUT < 1.0
     progress = [f["pointer"] for f in frames]
     assert progress == sorted(progress)
-
 
 def test_nothing_on_the_menu_is_selected():
     """A highlight would answer the question, so the boxes never change.
@@ -1205,13 +1119,10 @@ def test_nothing_on_the_menu_is_selected():
     # box that reacted to being approached.
     assert changed <= 2 * cursor.width * cursor.height
 
-
-
 def test_the_long_walk_has_a_marker_but_no_title_card():
     manifest = build_efmb_plates.build()
     assert any(c["title"] == "The Long Walk" for c in manifest["chapters"])
     assert not any(p["id"] == "walk_chapter" for p in manifest["plates"])
-
 
 def test_bdburns_and_sarah_are_verified_and_scheduled_in_the_opening_gap():
     manifest = build_efmb_plates.build()
@@ -1235,13 +1146,11 @@ def test_bdburns_and_sarah_are_verified_and_scheduled_in_the_opening_gap():
     assert "seen_at_src" not in sarah
     assert bdburns["dur"] == sarah["dur"] == pytest.approx(4.0, abs=1e-3)
 
-
 def test_opening_three_no_longer_stay_unresolved():
     gaps = " ".join(build_efmb_plates.build()["unresolved"])
     assert "bdburns" not in gaps
     assert "sarahnovotny" not in gaps
     assert "Hunter revolver shot" not in gaps
-
 
 def test_no_cue_anywhere_ends_inside_a_no_plate_zone():
     """The zone guarantee, for every cue rather than for the one that broke.
@@ -1270,7 +1179,6 @@ def test_no_cue_anywhere_ends_inside_a_no_plate_zone():
                 f"{p['id']} ends at {end:.3f}s, inside {why} "
                 f"({z_in:.3f}-{z_out:.3f})")
 
-
 def test_gloriouseggroll_has_no_nameplate_over_someone_elses_face():
     """His card was anchored to a shot he is not in (#192).
 
@@ -1293,8 +1201,6 @@ def test_gloriouseggroll_has_no_nameplate_over_someone_elses_face():
     # He is still in the film: his dialogue is untouched.
     spoken = [p for p in plates if p.get("speaker") == "GloriousEggroll"]
     assert len(spoken) >= 3, "his remaining owner-timed dialogue was dropped"
-
-
 
 def test_hikariknight_is_out_of_the_eggroll_scene():
     """Owner: "remove hikari from the eggroll scene."
@@ -1319,7 +1225,6 @@ def test_hikariknight_is_out_of_the_eggroll_scene():
     assert by_id["walk_ge_stream"]["at"] == pytest.approx(178.5, abs=1e-3)
     assert by_id["walk_ge_stream"]["text"] == "It's your patch, turn the stream on"
 
-
 def test_natewaddington_is_out_of_the_climax():
     """Owner: "get rid of the nate wassington in the endless climax in endless."
 
@@ -1343,7 +1248,6 @@ def test_natewaddington_is_out_of_the_climax():
         p["id"] == "late_mars_title" and 116.0 <= p["at"] <= 119.0
         for p in manifest["plates"])
 
-
 def test_the_arc_hunter_stays_out_but_kyle_s_reveal_is_restored():
     """kolunmi stays displaced; Kyle's authored reveal card comes back."""
     manifest = build_efmb_plates.build()
@@ -1359,7 +1263,6 @@ def test_the_arc_hunter_stays_out_but_kyle_s_reveal_is_restored():
     assert kyle["name"] == "Kyle Gospodnetich"
     assert kyle["title"] == "The First Knife"
     assert kyle["dur"] >= build_efmb_plates.MIN_HOLD
-
 
 def test_act_ii_encodes_to_the_delivery_spec_not_a_private_one():
     """Act II's picture is encoded at the repo's DELIVERY rung, with a VUI.
@@ -1387,7 +1290,6 @@ def test_act_ii_encodes_to_the_delivery_spec_not_a_private_one():
     assert "colorprim=bt709:transfer=bt709:colormatrix=bt709" in argv, \
         "the -x264-params VUI write is what actually lands in the bitstream"
     assert "-crf 16" in argv and "-preset slow" in argv
-
 
 def test_the_discarded_tail_absorbs_the_rung_change():
     """Every frame of the source is accounted for, on the rung on disk.

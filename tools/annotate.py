@@ -46,8 +46,6 @@ except ImportError:  # older API layout or not installed at all
     try:
         from scenedetect import SceneManager  # type: ignore
         from scenedetect.detectors import ContentDetector  # type: ignore
-        from scenedetect.video_manager import VideoManager  # type: ignore
-
         open_video = None
         HAVE_SCENEDETECT = True
     except ImportError:
@@ -239,7 +237,7 @@ class StubTagger(Tagger):
         return out
 
 
-def verify_tags_match_detection(tags_path, beats, manifest_path=None, log=print):
+def verify_tags_match_detection(tags_path, beats, manifest_path=None):
     """Refuse tags that were written against a different shot list.
 
     Beat index is positional, so a tag file and a detection pass agree only if
@@ -495,7 +493,6 @@ def index_video(video_path, video_record, tags_path=None, keyframes_dir=None,
     verify_tags_match_detection(
         tags_path, beats,
         manifest_path=keyframes_dir_for(video_record) / "beats.json",
-        log=log,
     )
 
     tagger = JsonTagger.from_file(tags_path)

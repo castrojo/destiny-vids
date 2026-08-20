@@ -1020,7 +1020,7 @@ MONTAGE_STEP = 5.5
 #
 # The announcer carried three blocks -- the four ranked montage cards, the two
 # TOC payoff cards, and the label on Natewaddington's placard (the placard
-# itself is out too now, see TIMED_KROOK below). All three are
+# itself is out too now). All three are
 # removed rather than re-voiced: the copy was written FOR that character, and
 # putting somebody else's name on his lines would be a different joke nobody
 # asked for. Every string survives in git and in `unresolved`, so bringing him
@@ -1038,49 +1038,6 @@ MONTAGE_CHATS = [
     ("castrojo", "Jorge Castro", "Enjoying the metal?"),
     ("castrojo", "Jorge Castro", "Ready to the #FIGHTFORCONTRIBUTORS?"),
 ]
-
-# The heraldic lower thirds. `name` is who is being addressed, `title` is what
-# is said to them -- the closed field set, no row invented.
-MONTAGE_ANNOUNCEMENTS = [
-    {
-        "id": "announce_new",
-        "rank": "bronze",
-        "name": "TO [ NEW CONTRIBUTORS ]",
-        "title": "It's totally like this. We promise.",
-    },
-    {
-        "id": "announce_current",
-        "rank": "silver",
-        "name": "TO [ CURRENT CONTRIBUTORS ]",
-        "title": "Look how good you look, it totally is like this!",
-    },
-    {
-        "id": "announce_emeritus",
-        "rank": "gold",
-        "name": "[ EMERITUS CONTRIBUTORS ]",
-        "title": "It's totally NOT like this. We promise.",
-        # The owner's block for this one carries a SECOND line -- "Look how
-        # good you look!" -- and the card has three rows, all spoken for. It
-        # is recorded in `unresolved` rather than dropped or crammed into the
-        # class row, which is a subclass and would be nonsense here.
-        "orphan_copy": "Look how good you look!",
-    },
-    {
-        "id": "announce_all",
-        "rank": "gold",
-        "name": "[ALL CONTRIBUTORS]",
-        "title": "You are not wrong",
-    },
-]
-
-# `trustee: true` IS the silver treatment (tools/plate.py `_variant_for`), so
-# the middle rank is a flag rather than a `variant` -- same as every silver
-# plate in the show.
-RANK_CHROME = {
-    "bronze": {"variant": "bronze"},
-    "silver": {"trustee": True},
-    "gold": {"variant": "leader"},
-}
 
 # --- "THE LONG WALK" (owner brief, this round) -----------------------------
 #
@@ -1308,80 +1265,6 @@ TOC_POST = [
     {"id": "toc_joseph_lol", "key": "joseph_sandoval", "speaker": "Joseph",
      "text": "LOL", "hold": 2.2},
 ]
-
-# The payoff pair from §3's announcement block. The first REPRISES the
-# montage's emeritus card verbatim -- a callback, so the copy is identical,
-# row for row, rank included. The second is the pivot it sets up; the brief's
-# block gives it no addressee row, so the card carries none.
-TOC_ANNOUNCEMENTS = [
-    {"id": "toc_announce_emeritus", "rank": "gold",
-     "name": "[ EMERITUS CONTRIBUTORS ]",
-     "title": "It's totally NOT like this. We promise."},
-    {"id": "toc_announce_ambassadors", "rank": None,
-     "name": None,
-     "title": "Have you met our Ambassadors?"},
-]
-
-# §4's owner-marked cues, pinned to his second. Like every window in this file
-# the anchor is carried in SOURCE time (`src_of` below), so a cut that moves
-# raises rather than slides.
-#
-# NOT HERE: the 4:01 cue -- "[pfp] Jorge Castro: They are not ready for Shua
-# Khan and Greg KH", drawn as a speech bubble ON Cayde. Cayde's [ REDACTED ]
-# card is at 287.933 (4:47.9), so a bubble anchored on him cannot also be at
-# 4:01. Which moves is the owner's call (#98, Questions) -- recorded in
-# `unresolved`, scheduled nowhere.
-TIMED_KROOK = 250.0          # 4:10
-# NATEWADDINGTON IS OUT, owner: "get rid of the nate wassington in the endless
-# climax in endless". His placard sat at film 260.000 (4:20) for SOLO_HOLD,
-# inside the run into the act's climax -- the song breaks down at 258.0 and the
-# band re-enters on the 269.700 downbeat, so his card was the last thing on
-# screen before the biggest musical event in the act.
-#
-# Only the SCHEDULING goes, exactly as it did for HikariKnight: the placard's
-# two rows were the owner's copy and they stay in git, the drop is recorded in
-# `unresolved`, and nothing slides up into the hole -- krook and the bedazzle
-# pill keep their own anchors and Jorge stays pinned to 291.0.
-TIMED_JORGE = 291.0          # 4:51 -- inside the cathedral shot, which ends
-                             # 291.933; the pill rides the black tail
-TIMED_JORGE_HOLD = 2.8
-
-# The untimed §4 cue, in the order the brief lists it: after krook.
-BEDAZZLE = {"speaker": "cncf marketing", "text": "Let's bedazzle this thing!"}
-
-# The letterbox callout. "Keep it up for the whole song": it comes up where
-# the brief's own scene starts (2:19, the montage's hand-off) and holds to
-# the last frame. It never shares the lower third's row -- it lives on the
-# bottom letterbox bar, below the picture.
-#
-# ONE DUCK, AND IT IS MEASURED, NOT AESTHETIC. The walk's patch-queue HUD is
-# bottom-right and its card dips 90px onto the bar (y 922-1030 in the shipped
-# geometry); no position on the bar clears it while it holds. So the callout
-# ducks exactly the HUD's window -- 28.4 s in a 169 s hold -- rather than
-# shrink to ticker height for the whole song to fix half a minute. The
-# alternative is the owner's to call (#98, Questions); recorded in
-# `unresolved`.
-LETTERBOX_BANNER = (
-    "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST")
-
-# The closing montage: five quotes the brief leaves untimed. Its own proposal
-# is 4:51 -> 5:07, and the preamble lands the last cue on the final second --
-# so they are spread evenly from the gaslighting pill's out to the film's last
-# frame, over the black outro the owner is keeping "for future flexibility".
-#
-# siosm's line carries authored emphasis (`**powering up**` in the brief). The
-# asterisks are emphasis markup, not words -- burning them would put
-# punctuation on screen nobody meant to say -- so they are stripped here and
-# recorded in `unresolved`: the pill's message row is set in bold throughout
-# (the site's own style), so the emphasis survives but is not differentiated.
-CLOSING_QUOTES = [
-    ("cgwalters", "Use open source responsibly!"),
-    ("siosm", "I can feel Fedora powering up!"),
-    ("jberkus", "I knew they could do it!"),
-    ("preethi", "Great, more paperwork"),
-    ("castrojo", "Just another day on the CNCF Projects team"),
-]
-QUOTE_HOLD = 2.2
 
 LEAD_IN = 0.4      # let the cut land before the plate arrives
 MIN_HOLD = 2.2     # below this a plate cannot be read
@@ -2209,8 +2092,6 @@ def build():
         at = round(cursor - PLATE_GAP + spec.get("lead", PLATE_GAP), 3)
         toc.append(toc_chat(spec, at, spec["hold"]))
         cursor = round(at + spec["hold"] + PLATE_GAP, 3)
-    # TOC_ANNOUNCEMENTS are NOT scheduled: they are AN4-CH3CK-12's payoff pair,
-    # and he is out this round. See the ANNOUNCER note.
 
     # --- the mapped 7:03 -> 8:26 owner pass -------------------------------
     mapped_unresolved = []
@@ -2491,21 +2372,7 @@ def build():
                 _corrected(spec["key"], authored_copy(spec["key"], casting))))
         mapped_tail.append(entry)
 
-    # The newer 8:28 pass replaces the old gaslighting pill. Its authored copy
-    # remains above in TIMED_JORGE; no stale plate is built on the shifted film.
-    timed = []
-    film_sec = plan["film_sec"]
-
-    # The letterbox callout: up where the brief's scene starts, down on the
-    # last frame -- "keep it up for the whole song". Two windows: it ducks the
-    # patch-queue HUD, the one card that already owns a piece of the bar. The
-    # HUD holds from the enemies' reveal until the villain lands (see the
-    # walk's own schedule above), so those are the duck's edges.
-    # The owner's newer pass moves this banner to the top at film 2:18.5.
-    # The old bottom-letterbox windows are superseded rather than layered.
-
     plates.extend(toc)
-    plates.extend(timed)
     plates.extend(late)
     plates.extend(mapped_tail)
     plates = [p for p in plates if p["id"] not in (
