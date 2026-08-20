@@ -128,9 +128,9 @@ This skill is the contract. The procedure lives in `references/`:
 | Reference | What is in it |
 |---|---|
 | [`copy-authoring.md`](references/copy-authoring.md) | **Read before writing copy.** The authored identities, their source files, and the known divergences. |
-| [`from-a-brief.md`](references/from-a-brief.md) | Issue `brief` block → roster → planned manifest → burned cut, and the ordering rules. |
+| [`from-a-brief.md`](references/from-a-brief.md) | Issue `brief` block → roster → planned manifest → burned cut, the ordering rules, and `gp_*` placement data. |
 | [`conversation-cards.md`](references/conversation-cards.md) | `chat`, `status`, `miniboss`, `achievement`, and `companion` cards; censors, caption glyphs, and placeholders. |
-| [`placement-and-styling.md`](references/placement-and-styling.md) | Letterbox-safe placement, `gp_*` data, and the treatment's provenance. |
+| [`placement-and-styling.md`](references/placement-and-styling.md) | Letterbox-safe placement and the treatment's provenance. |
 | [`plate-chrome.md`](references/plate-chrome.md) | `avatar`, `wreath`, variants, Ghost handling, and brand-mark rules. |
 | [`plate-styling.md`](references/plate-styling.md) | Constant-by-constant CSS provenance and the font trap. |
 | [`status-nameplate.md`](references/status-nameplate.md) | The top-of-frame HUD card. |
