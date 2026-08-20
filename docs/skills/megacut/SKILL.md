@@ -128,6 +128,9 @@ This skill is the contract. The procedure lives in `references/`:
   do not rely on pixel format conversion to drop alpha safely.
 - **"Drop the audio" is not the same as "mute it".** A dialogue-free music
   choice is a different source or a different edit, never silence.
+- **When a segment's audio is a fraction short of its picture, pad it** with
+  `apad` and let the picture decide the length. Cutting to the shorter stream
+  drops a frame and, in a concat, drifts everything after it.
 - **Never assume an anchor measured on a different upload.** Two uploads of the
   same cinematic can differ by seconds.
 - **Never hand-edit the assembled file.** Fix the plan or the upstream cut and
