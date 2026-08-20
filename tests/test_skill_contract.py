@@ -88,10 +88,87 @@ def test_agents_contract_requires_issue_applicability_check():
     assert "still applies" in text
 
 
+def test_agents_read_order_links_the_common_agentic_model_as_a_sidecar():
+    text = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    assert "5. [`projectbluefin/common/docs/factory/agentic-model.md`]" in text
+    assert "github.com/projectbluefin/common/blob/main/docs/factory/agentic-model.md" in text
+    assert "shared compatibility sidecar only; it never overrides local authority" in text
+
+
 def test_router_links_generated_catalog():
     text = (REPO_ROOT / "docs/SKILL.md").read_text()
     assert "skills/index.json" in text
     assert "skills/index.md" in text
+
+
+def test_plates_docs_keep_the_high_risk_contract_and_navigation():
+    skill = SKILLS / "plates" / "SKILL.md"
+    front_matter = _front_matter(skill)
+    assert front_matter["metadata"]["context7-sources"] == [
+        "/websites/ffmpeg_documentation"
+    ]
+
+    expected = {
+        skill: (
+            "## Common Rationalizations",
+            '"One extra line makes the plate clearer."',
+            '"I\'ll hardcode the copy just for this render."',
+            '"The brief\'s copy contradicts the binding, but the owner wrote it today."',
+            '"I\'ll hand-author the manifest, so `plan`\'s rules don\'t apply."',
+            '"The plate is short, it can share the screen."',
+            '"The shot is only two seconds, so nobody can be plated there."',
+            '"I\'ll put a plausible name on the placeholder so it looks finished."',
+            '"No copy for this lead? Write them something."',
+            "brief plate without it is a hand-edit",
+            "Never ship the old master instead",
+            "Styling taken from the live site where the baked reveal disagrees",
+            "Do not make one derivative per section",
+            "Cascading Multiple Overlays",
+            "`premultiplied`",
+            "references/conversation-cards.md",
+            "references/plate-chrome.md",
+            "references/full-frame-cards.md",
+        ),
+        SKILLS / "plates" / "references" / "conversation-cards.md": (
+            "Use an asterisk for other letters",
+            "do not add censorship the owner did not request",
+            "records the mark under `glyphs`",
+            "real width before wrapping or centering",
+            "plain authored letter",
+        ),
+        SKILLS / "plates" / "references" / "plate-chrome.md": (
+            "takes precedence over `trustee`",
+            "default blue `#cbd5f5`",
+            "Rust Foundation herald",
+            "Nobara Project indigo",
+            "YouTube logo red `#FF0000`",
+            "scripts/fetch_brand_marks.py",
+            "renders/marks/",
+            "/usr/share/pixmaps",
+            "Fedora CoreOS",
+        ),
+        SKILLS / "plates" / "references" / "from-a-brief.md": (
+            "`plan` refuses a `copy` key",
+            "A brief plate without `copy_source` is a hand-edit",
+            "measured against the **picture**, never the raw frame",
+            "`top: 28%`",
+            "bug in `plan`, not a gap to work around",
+        ),
+        SKILLS / "plates" / "references" / "full-frame-cards.md": (
+            "`--wc-grey`",
+            "`signalstats` → `YAVG`",
+            "white starburst **1.3 seconds later**",
+            "Protect the glyphs, never readability with a scrim panel",
+            "add `shortest=1`",
+        ),
+    }
+    for path, snippets in expected.items():
+        text = path.read_text(encoding="utf-8")
+        normalized = " ".join(text.split())
+        for snippet in snippets:
+            assert " ".join(snippet.split()) in normalized, (
+                f"{path.relative_to(REPO_ROOT)} lost {snippet!r}"
+            )
 
 
 def test_hygiene_hooks_cover_the_complete_skill_contract_surface():

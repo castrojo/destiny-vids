@@ -197,6 +197,39 @@ Luminance is not the only test. **The subject of the picture outranks it** — a
 darker band that lands the line across the face or head of whatever the image is
 of is the wrong band, and it is the correction an owner makes immediately.
 
+## Moving-picture type is measured across its whole window
+
+Deck greys belong on a slide's black, not automatically on footage. `--wc-grey`
+(`#8b8f96`) and the secondary `#cbd5e1` can read over a dark cue and vanish
+when the image changes. Measure the luma under the card's full window with
+`signalstats` → `YAVG`, not only the frame where it was cued. FFmpeg documents
+that `signalstats` records Y-plane average statistics; provenance:
+`/websites/ffmpeg_documentation`, “signalstats” (verified through Context7).
+
+This is incident-derived: the prologue's main title was cued over a near-black
+void, then the source cut to a white starburst **1.3 seconds later**, inside the
+same card. A still approval did not prove the window readable.
+
+**Protect the glyphs, never readability with a scrim panel.** A scrim diagnoses
+the contrast problem and creates the wrong object over moving picture: a visible
+box the owner will call out. Give the letters a tight near-opaque core and wider
+soft falloffs so the protection travels with the glyphs and has no edge. The
+radial wash in `act.html` is for a slide, where nothing moves behind it. This
+does not weaken the structural panel rule above: an opaque panel that hides
+source content must leave with that shot; it is not a contrast treatment.
+
+## A looped still needs a finite bound
+
+`loop=loop=-1` is an **infinite** stream. Without a bound, `overlay` framesync
+can keep producing output after the main input ends by repeating its final
+frame. The prologue's first build emitted the film, then eight seconds of frozen
+last frame; the material after it never played, and ffmpeg still exited 0.
+Trim the still to the picture's length and add `shortest=1`. FFmpeg's documented
+looping-overlay example uses `shortest=1` to synchronize output duration;
+provenance: `/websites/ffmpeg_documentation`, “Overlay Looping GIF” (verified
+through Context7). The incident was caught by pulling three identical frames,
+not by watching a process exit successfully.
+
 ## An authored glyph standing in for a letter
 
 A mark replacing one letter — the Kubernetes helm as an `o` — travels as the

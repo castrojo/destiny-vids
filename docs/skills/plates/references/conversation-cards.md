@@ -20,6 +20,30 @@ picture entirely, so it can hold for a whole film without sharing the lower
 third's row. Its `text` is owner-authored copy, reproduced verbatim and never
 uppercased — the same rule the chat pill's message follows.
 
+## Cinematic text and authorised censors
+
+Owner-authored narration uses `kind: caption` in the top-safe rail while
+Guardian and companion cards keep the lower third. Scene-setting metadata uses
+`kind: context` above that lower-third lane; a full-screen deployment beat uses
+`kind: warning`. Each is an independent chrome row, not an extra nameplate
+field, and carries `copy_source: owner_supplied`.
+
+Keep chat `text` verbatim. When an owner requests a swear censor, use the
+Kubernetes helm only as an `o` replacement: add a `censor` entry whose `find`
+value occurs exactly once and whose `replace` value uses `{k8s}`.
+`tools/plate.py` replaces that token with the cached official white helm and
+does not alter the authored source string. Use an asterisk for other letters;
+do not add censorship the owner did not request.
+
+Caption glyphs are data, not template guesses. A replacement keeps the authored
+`text` unchanged and records the mark under `glyphs`, identifying the target
+letter (and its word/index where needed). The renderer reserves the mark's
+**real width before wrapping or centering**, so a Kubernetes helm replacing an
+`o` cannot cover the next letter. If the mark is missing, it degrades to the
+plain authored letter. This `glyphs` contract is distinct from a full-frame
+card's `glyph` / `glyph_src` query pair; see
+[`full-frame-cards.md`](full-frame-cards.md).
+
 ## Showing a conversation
 
 The chat card (`kind: chat`) puts a line of dialogue on screen under the name

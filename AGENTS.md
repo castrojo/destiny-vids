@@ -14,8 +14,11 @@ they are and what order they play in.
 1. This file — repo rules, commands, and boundaries.
 2. [`docs/running-order.md`](docs/running-order.md) — what the show is.
 3. [`docs/SKILL.md`](docs/SKILL.md) — find the skill for your task and load it.
-4. The design docs that skill links to (`docs/taxonomy.md`,
-   `docs/pipeline.md`, `docs/agent-retrieval.md`, `docs/rendering.md`).
+4. The routed local skill, its references, and the design docs it links to
+   (`docs/taxonomy.md`, `docs/pipeline.md`, `docs/agent-retrieval.md`,
+   `docs/rendering.md`).
+5. [`projectbluefin/common/docs/factory/agentic-model.md`](https://github.com/projectbluefin/common/blob/main/docs/factory/agentic-model.md)
+   — a shared compatibility sidecar only; it never overrides local authority.
 
 ## Local authority and common compatibility
 

@@ -19,6 +19,8 @@ description: >-
   burning Guardian nameplates, chat cards, or full-frame cards onto a video.
 metadata:
   type: policy
+  context7-sources:
+    - /websites/ffmpeg_documentation
 ---
 
 # Guardian nameplates
@@ -46,22 +48,28 @@ A Guardian nameplate carries **exactly**:
 | `title` | `Reconciler of the Plane` |
 | `trustee` | `true` — the burnished-silver chrome |
 
-The deck's other authored shapes are the title card (`title`, `subtitle`,
-`body[]`) and the **chat card** (`speaker`, `text`) —
+The deck's other authored shapes are the title card (`title`, `subtitle`, `body[]`) and the **chat card** (`speaker`, `text`) — see [`references/conversation-cards.md`](references/conversation-cards.md).
+
+Keep chat `text` verbatim. For owner-requested censors, use the Kubernetes helm only for an `o`, an asterisk for other letters, and no unrequested censorship; the complete data contract is in [`references/conversation-cards.md`](references/conversation-cards.md).
+
+### Cinematic text that shares the frame with identity plates
+
+Owner-authored narration uses `kind: caption` in the top-safe rail while
+Guardian and companion cards keep the lower third. Scene-setting metadata uses
+`kind: context` above that lane; a full-screen deployment beat uses
+`kind: warning`. These are independent chrome rows, not extra nameplate fields,
+and each carries `copy_source: owner_supplied`. A caption's `glyphs` record
+replaces a mark without changing its authored `text`; the renderer reserves the
+mark's real width before wrapping or centering, and a missing mark degrades to
+the plain authored letter. See
 [`references/conversation-cards.md`](references/conversation-cards.md).
 
-Keep chat `text` verbatim. When an owner requests a swear censor, use the
-Kubernetes helm only as an `o` replacement: add a `censor` entry whose `find`
-value occurs exactly once and whose `replace` value uses `{k8s}`.
-`tools/plate.py` replaces that token with the cached official white helm; it
-does not alter the authored source string.
-
-Cinematic text that shares the frame with identity plates uses its own kinds
-(`caption`, `context`, `warning`) and `copy_source: owner_supplied`; these are
-independent chrome rows, not extra nameplate fields. When one movement
-derivative burns more than one authored block,
+When one movement derivative burns more than one authored block,
 `ending_derivative.overlay_section` may be an ordered list, flattened in order
-into one encode from the original source.
+into one encode from the original source. Do not make one derivative per section
+or re-encode the clean movement: FFmpeg documents a cascading complex overlay graph;
+provenance: `/websites/ffmpeg_documentation`, “Cascading Multiple Overlays” (verified
+through Context7).
 
 Local additions to the deck's shape are chrome and placement only:
 `kind: ghost`, `variant`, `avatar`, `wreath`, group rows, and the `raised` /
@@ -69,7 +77,8 @@ Local additions to the deck's shape are chrome and placement only:
 [`references/plate-chrome.md`](references/plate-chrome.md),
 [`references/placement-and-styling.md`](references/placement-and-styling.md),
 and [`references/full-frame-cards.md`](references/full-frame-cards.md). A brand
-mark comes from the project's own site, never `/usr/share/pixmaps`.
+mark comes from the project's own site, never `/usr/share/pixmaps`. If a plate
+genuinely needs a new line, add the field to the data model deliberately.
 
 **Do not add a line the deck has no field for.** An invented row — an
 `AS <CHARACTER>` line, a role, a pronoun — puts unauthored text on a card whose
@@ -104,7 +113,9 @@ so many independent still inputs that FFmpeg spends its time building scaler
 graphs instead of emitting frames, composite the already-rendered full-frame
 RGBA plates at their manifest boundaries into one alpha-preserving overlay
 stream, then overlay that stream onto the clean act once. Do not split the deck
-across successive lossy burns.
+across successive lossy burns. FFmpeg's `overlay` filter supports `straight`,
+`premultiplied`, and `auto` alpha handling; provenance:
+`/websites/ffmpeg_documentation`, “overlay” (verified through Context7).
 
 `plan` reads copy from `vocab/casting.yaml`'s `plate:` block — the same file
 that binds a character to a person — so recasting a role changes the on-screen
@@ -118,33 +129,54 @@ This skill is the contract. The procedure lives in `references/`:
 |---|---|
 | [`copy-authoring.md`](references/copy-authoring.md) | **Read before writing copy.** The authored identities, their source files, and the known divergences. |
 | [`from-a-brief.md`](references/from-a-brief.md) | Issue `brief` block → roster → planned manifest → burned cut, and the ordering rules. |
-| [`conversation-cards.md`](references/conversation-cards.md) | `chat`, `status`, `miniboss`, `achievement`, and `companion` cards, plus placeholder behaviour. |
-| [`placement-and-styling.md`](references/placement-and-styling.md) | Letterbox-safe placement and the treatment's provenance. |
-| [`plate-chrome.md`](references/plate-chrome.md) | `avatar`, `wreath`, `variant`, Ghost handling, and brand-mark rules. |
+| [`conversation-cards.md`](references/conversation-cards.md) | `chat`, `status`, `miniboss`, `achievement`, and `companion` cards; censors, caption glyphs, and placeholders. |
+| [`placement-and-styling.md`](references/placement-and-styling.md) | Letterbox-safe placement, `gp_*` data, and the treatment's provenance. |
+| [`plate-chrome.md`](references/plate-chrome.md) | `avatar`, `wreath`, variants, Ghost handling, and brand-mark rules. |
 | [`plate-styling.md`](references/plate-styling.md) | Constant-by-constant CSS provenance and the font trap. |
 | [`status-nameplate.md`](references/status-nameplate.md) | The top-of-frame HUD card. |
 | [`other-cards.md`](references/other-cards.md) | `miniboss`, `achievement`, and `companion` detail. |
-| [`full-frame-cards.md`](references/full-frame-cards.md) | `act` and `comic` cards, rendered by the site's own CSS. |
+| [`full-frame-cards.md`](references/full-frame-cards.md) | `act` and `comic` cards, rendered by the site's own CSS; moving-picture contrast and finite overlays. |
 | [`hero-credit.md`](references/hero-credit.md) | Act VIII's cast placard — a lower third that credits the person, not the character. |
 | [`binding-conflicts.md`](references/binding-conflicts.md) | What to do when authored card copy must deliberately diverge from a committed binding. |
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "One extra line makes the plate clearer." | It makes the plate say something nobody wrote. The deck's fields are the contract. |
+| "I'll hardcode the copy just for this render." | Then the credit and the casting drift apart the first time a role is recast. Copy lives in `vocab/casting.yaml` — or, for someone the vocab does not bind yet, in the issue's brief, which `plan` marks `copy_source: brief`. |
+| "The brief's copy contradicts the binding, but the owner wrote it today." | Recency is not authority: the vocab is the reviewed record, the issue body is editable. The vocab wins; edit it if the brief is right. |
+| "I'll hand-author the manifest, so `plan`'s rules don't apply." | They still apply — `plan` was just the only thing enforcing them. `render` and `burn` now run `check_copy_against_bindings`, and a card contradicting its binding is refused unless it carries a `copy_override` naming the deciding issue. |
+| "The plate is short, it can share the screen." | Two plates at once is unreadable; both `plan` and `burn` refuse it. The only exception is a group row, whose members are built to be seen together. |
+| "The shot is only two seconds, so nobody can be plated there." | The plate rides across the cut. Only the *anchor* must be long enough to register. |
+| "I'll put a plausible name on the placeholder so it looks finished." | A plate names a real person. `TBD` is the honest answer until a roster exists. |
+| "No copy for this lead? Write them something." | Then the plate says what nobody wrote. Leave them in `unresolved` until the owner writes it. |
 
 ## Red Flags
 
 - Inventing a plate line, a role, or a pronoun row.
 - Hardcoding copy in the manifest instead of `vocab/casting.yaml`.
 - A plate manifest that hides where its copy came from; every planned entry
-  needs `copy_source`.
+  needs `copy_source`, and a brief plate without it is a hand-edit.
 - Letting a brief override a binding's `plate:` block silently. The vocab wins;
   if the brief is right, fix the vocab.
 - Calling a burn done because ffmpeg exited 0. Check a frame, not the manifest.
 - Guessing a pill's seat when the manifest's clock is in doubt. Omission
-  degrades; misplacement lies.
+  degrades; misplacement lies. Never ship the old master instead: stale copy is
+  the same fault with an older timestamp.
 - A looped still overlaid on a finite picture without a bound. Trim the still
   to the picture's length and add `shortest=1`.
-- Shipping a cut with a non-empty `unresolved` list without reading it.
+- Shipping a cut with a non-empty `unresolved` list without reading it. An empty
+  list means nobody was missed; an omission it does not report is a `plan` bug,
+  not a gap to work around.
+- Deck-grey text over moving picture without measuring its full window with
+  `signalstats` → `YAVG`, or readability protection that adds a scrim panel
+  instead of protecting the glyphs. See
+  [`references/full-frame-cards.md`](references/full-frame-cards.md).
 - Planning with a different `--max-shot-sec` than the render used.
 - A subclass line on a Ghost.
 - A plate rendered in anything but DejaVu Sans Mono.
+- Styling taken from the live site where the baked reveal disagrees.
 - A full-frame card re-implemented in Python instead of rendered from the
   site's CSS.
 - Falling back to `Bluefin Blueberry` for somebody whose Guardian identity is

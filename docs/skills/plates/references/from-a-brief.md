@@ -26,8 +26,8 @@ reveal or die on `merge`'s overlap check.
 
 Three rules keep the exception narrow:
 
-- **The field set is still closed.** A `copy` key the deck has no field for is
-  refused, from a brief same as anywhere else.
+- **The field set is still closed.** `plan` refuses a `copy` key the deck has
+  no field for, from a brief same as anywhere else.
 - **The vocab wins a conflict.** If the character's binding already has a
   `plate:` block, that copy is used and the brief's is reported as deferred.
   The vocab is the durable record, changed by reviewed PR; a brief is one
@@ -49,6 +49,7 @@ Every planned entry carries `copy_source` — `"brief"` or `"casting"` — so a
 reader of the manifest can tell an owner-authored plate from a vocab-derived
 one without knowing the convention. Brief plates are lead-tier: with
 `--only ensemble` they arrive via `--around`, the same way dialogue does.
+**A brief plate without `copy_source` is a hand-edit.**
 
 Scheduling rules, all of which exist because a plate is a claim about a person:
 
@@ -98,6 +99,11 @@ Scheduling rules, all of which exist because a plate is a claim about a person:
   right-hand plates. Either way contributors are never dropped over a layout:
   whoever the shot cannot hold still goes through the re-home pass and the
   tail roster card.
+- The deck's `gp_*` entries carry placement data, not new copy:
+  `position: "group"`; an absolute `x` measured against the **picture**, never
+  the raw frame; a `scale` that shrinks the card; and a `group` key naming the
+  row. The intro overlay also supplies `raised` (`top: 28%`, for a Guardian
+  towering above the lower third) and `position: "status"`.
 - Contributors whose shot is too short are credited together on a roster title
   card over the tail — the card's headline is the owner-supplied
   `roster_title` in `vocab/casting.yaml` ("Thanks for working on Bluefin!"),
@@ -153,6 +159,8 @@ an ensemble contributor even the tail roster card had no room for:
 Nothing blocks: the manifest is written either way, and `render`/`burn` read the
 `plates` list and ignore the punch-list. Someone being cast but plate-only is a
 legitimate resting state — see [`casting.md`](../../casting/SKILL.md).
+`unresolved` is the whole punch-list: an empty list means nobody was missed, so
+an omission it does not report is a bug in `plan`, not a gap to work around.
 
 ### Before a roster exists
 
