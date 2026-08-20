@@ -246,6 +246,17 @@ punch list; the backlog is for work.
   have. Fix the tag file and re-run assembly.
   `tests/test_index_integrity.py` validates every committed segment, video and
   tag file against its schema.
+- **Some plate manifests are outputs too.** `stories/02-endless-forms-plates.json`
+  is built by `scripts/build_efmb_plates.py`, and
+  `tests/test_efmb_act.py::test_the_committed_manifest_matches_its_generator`
+  asserts the committed file equals what the generator produces. A card added
+  to it by hand is reverted by the next build, so **the copy goes in the
+  generator** and the manifest is regenerated. Check for a generator before
+  editing any `stories/*.json`.
+- **A card count can be pinned by schema.** `schema/ending-cards.schema.json`
+  fixes the ending at `minItems: 15, maxItems: 15`, so adding a card is a
+  **two-file** change — the manifest and the bound — in one commit. The bound
+  is hand-authored; only `enum` lists are generated.
 - **`vocab/` is the single source of truth for every enum.** Adding a value is
   **one** edit — the `vocab/*.yaml` file — then
   `python3 scripts/generate_schema_enums.py --write`, because the schemas' enum
@@ -296,6 +307,42 @@ rather than written, and the reference deck's field set. A delivered file is
 likewise regenerated, never hand-edited. `~/Videos` is a Syncthing folder, so a
 directory can vanish mid-session; check `~/.local/share/Trash` before rebuilding
 anything.
+
+### A worktree is a workspace, not a filing cabinet
+
+**Authored copy must never live only in a worktree, and never in a temp
+directory at all.** `/tmp` is `tmpfs` on this host: it is erased on reboot. A
+worktree there holding the only copy of a card is a card that is one power cut
+from never having existed.
+
+This is not hypothetical. Three agent worktrees were found carrying **27, 4 and
+2 commits that were on no branch anywhere**, one of them in `/tmp`. Between them
+they held the 2026-08-18 revision of the ending — "We support the Community",
+and the card `prove-it` — plus act II dialogue split for readability. All of it
+had been *rendered*, and the delivered file went to `~/Videos` while the records
+stayed behind. That is the whole reason a build could look a month old while
+somebody was actively authoring it.
+
+| | |
+|---|---|
+| Where a worktree goes | Beside the repo — `~/src/<name>` — never `/tmp`, never `/var/tmp` |
+| What it is checked out on | A **named branch**. A detached HEAD is invisible to `git branch` and cannot be pushed by name |
+| When it is pushed | **Before the render, not after.** A render is the moment the records become load-bearing; if the picture is worth encoding, the copy that produced it is worth pushing |
+| When it is removed | Only once its branch is on the remote |
+
+Before ending a session, prove nothing is stranded:
+
+```bash
+git worktree list
+for w in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
+  h=$(git -C "$w" rev-parse HEAD)
+  [ "$(git branch -r --contains "$h" 2>/dev/null | wc -l)" -eq 0 ] &&
+    echo "UNPUSHED: $w ($h)"
+done
+```
+
+Anything it names is work that exists nowhere else. Push it to a branch —
+`rescue/<name>` if it has no better one — before you do anything else.
 
 ## Where the work lives
 

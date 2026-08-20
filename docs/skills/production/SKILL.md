@@ -301,6 +301,13 @@ is a finding to report, not a list to fill in with guesses.
   complete restored manifest object to that source. Only then replace the
   master and run `deliver.py publish`; a clean encode cannot prove the words,
   removals, or timing are right.
+- **Rendering from a worktree whose branch was never pushed.** This is the same
+  failure one step earlier, and it is how the shipped ending fell two days
+  behind the authored one: three worktrees held 27, 4 and 2 commits on no
+  branch at all, one of them in `/tmp`, which is `tmpfs`. The picture reached
+  `~/Videos` and the copy that produced it did not reach anything. **Push
+  before you encode** — see "A worktree is a workspace, not a filing cabinet"
+  in [`AGENTS.md`](../../../AGENTS.md).
 - Exactly 1 beat for a cut-heavy video → the source is AV1, not H.264
   (`docs/rendering.md`). `make_video.sh` warns on the codec before this bites.
 - A video whose segments are 0 clean → `overlays` was skipped wholesale.
@@ -330,7 +337,15 @@ is a finding to report, not a list to fill in with guesses.
 python3 tools/gaps.py
 python3 -m pytest -q                  # includes committed-index integrity
 python3 tools/deliver.py status       # the delivery chain, as a report (never a gate here)
+python3 tools/readtime.py             # plates held too briefly to read (reports, never gates)
 ~/Videos/audio-check.sh --all         # gates every act in Wolves/Prod
+
+# before any encode: nothing authored is stranded on an unpushed branch
+for w in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
+  h=$(git -C "$w" rev-parse HEAD)
+  [ "$(git branch -r --contains "$h" 2>/dev/null | wc -l)" -eq 0 ] &&
+    echo "UNPUSHED: $w ($h)"
+done
 ```
 
 `tests/test_index_integrity.py` validates every committed segment, video and

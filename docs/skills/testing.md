@@ -139,6 +139,8 @@ change for six hours, both inside `apt-get update` waiting on a mirror.
 - A `print` used to report from a test that passes
 - A step that installs a package unconditionally, or a job with no timeout
 - A new `--force`/`--allow-*` flag added to get past a check
+- A worktree under `/tmp` or `/var/tmp`, or one on a detached HEAD
+- A render started from a branch that has never been pushed
 
 ## Verification
 
@@ -151,12 +153,20 @@ python3 tools/deliver.py status --check           # reports; never gates
 
 # and the runner, before pushing:
 env -u DESTINY_FFMPEG -u DESTINY_FFPROBE PATH=/tmp/ci-sim/bin python3 -m pytest -q
+
+# nothing authored is stranded in a worktree that is on no branch:
+for w in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
+  h=$(git -C "$w" rev-parse HEAD)
+  [ "$(git branch -r --contains "$h" 2>/dev/null | wc -l)" -eq 0 ] &&
+    echo "UNPUSHED: $w ($h)"
+done
 ```
 
 - [ ] The suite passes in the ffmpeg-free sandbox, not only on this machine
 - [ ] No new absolute path, in a record or a test
 - [ ] Any new report reaches the log — `warnings.warn`, not `print`
 - [ ] No new blocking step that the suite could have asserted
+- [ ] No worktree is holding commits that exist on no branch
 
 ## See also
 
