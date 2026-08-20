@@ -646,12 +646,9 @@ ensemble:
       label: MAINTAINER // GUARDIAN
       name: William Rizzo
       title: Hammer of Kairos
-    bdburns:
-      # github.com/bdburns (verified u/4357134). Only the GitHub profile's own
-      # name and avatar are established here; no label, class or title row is
-      # authored, so none is invented.
-      name: Brent D Burns
-      avatar: https://avatars.githubusercontent.com/u/4357134?v=4
+    # bdburns is OUT ENTIRELY, owner order 2026-08-20: "remove him entirely".
+    # Not "unplated this chapter, copy retained" like William Rizzo above --
+    # the whole record goes, so no future pass can seat him from the vocab.
     sarahnovotny:
       # github.com/sarahnovotny (verified u/127370). Only the profile name and
       # avatar are established here; every other row stays omitted until

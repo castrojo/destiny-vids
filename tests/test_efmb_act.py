@@ -1073,7 +1073,7 @@ def test_karena_is_angel_with_one_l():
 
 def test_the_correct_opening_guardians_are_on_the_owners_marks():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    marks = {"opening_sarahnovotny": 13.433, "opening_bdburns": 18.433,
+    marks = {"opening_sarahnovotny": 13.433,
              "og_thockin": 26.433, "og_jbeda": 36.433}
     for pid, at in marks.items():
         assert by_id[pid]["at"] == pytest.approx(at, abs=1e-3)
@@ -1213,27 +1213,35 @@ def test_the_long_walk_has_a_marker_but_no_title_card():
     assert not any(p["id"] == "walk_chapter" for p in manifest["plates"])
 
 
-def test_bdburns_and_sarah_are_verified_and_scheduled_in_the_opening_gap():
+def test_brent_burns_is_out_entirely():
+    """Owner order, 2026-08-20: "remove him entirely".
+
+    Not unplated-this-chapter like the Long Walk credits -- the record goes
+    too, so no future pass can seat him from the vocab. His old slot
+    (act-film 18.433) stays empty: nobody is promoted into an owner's mark.
+    """
     manifest = build_efmb_plates.build()
     by_id = {p["id"]: p for p in manifest["plates"]}
-    bdburns = by_id["opening_bdburns"]
-    sarah = by_id["opening_sarahnovotny"]
+    assert not any("bdburns" in pid for pid in by_id)
+    assert not any(p.get("name") == "Brent D Burns"
+                   for p in manifest["plates"])
 
-    assert bdburns["name"] == "Brent D Burns"
-    assert bdburns["avatar"] == "renders/avatars/bdburns.png"
-    assert bdburns["avatar_url"] == "https://avatars.githubusercontent.com/u/4357134?v=4"
+    import yaml
+    casting = build_efmb_plates.load_casting()
+    assert "bdburns" not in yaml.safe_dump(casting)
+    assert "Brent D Burns" not in yaml.safe_dump(casting)
+
+    sarah = by_id["opening_sarahnovotny"]
     assert sarah["name"] == "Sarah Novotny"
     assert sarah["avatar"] == "renders/avatars/sarahnovotny.png"
     assert sarah["avatar_url"] == "https://avatars.githubusercontent.com/u/127370?v=4"
 
     og_thockin = by_id["og_thockin"]
     og_jbeda = by_id["og_jbeda"]
-    assert sarah["at"] + sarah["dur"] <= bdburns["at"]
-    assert bdburns["at"] + bdburns["dur"] <= og_thockin["at"]
+    assert sarah["at"] + sarah["dur"] <= og_thockin["at"]
     assert og_thockin["at"] + og_thockin["dur"] <= og_jbeda["at"]
-    assert "seen_at_src" not in bdburns
     assert "seen_at_src" not in sarah
-    assert bdburns["dur"] == sarah["dur"] == pytest.approx(4.0, abs=1e-3)
+    assert sarah["dur"] == pytest.approx(4.0, abs=1e-3)
 
 
 def test_opening_three_no_longer_stay_unresolved():

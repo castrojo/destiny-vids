@@ -178,12 +178,16 @@ NAME_CORRECTIONS = {"mara_sov": ("Karena Angell", "Karena Angel")}
 #    02:38 name plate github/jbeda - 'Out of Retirement'
 #    The last two are OG Guardians; make them a proud bronze"
 #
-# Sarah and Brent replace the retired Davanum/Catherine cards in the first two
-# slots. Their verified records carry only names and PFPs, so the standard
-# nameplate chrome omits unauthored class/title rows rather than inventing them.
+# Sarah replaces the retired Davanum/Catherine cards in the first opening
+# slot. Her verified record carries only a name and a PFP, so the standard
+# nameplate chrome omits unauthored class/title rows rather than inventing
+# them.
+#
+# BRENT BURNS IS OUT ENTIRELY, owner order 2026-08-20: "remove him entirely".
+# He held the second opening slot (02:20) until then; the slot stays empty --
+# nobody is promoted into an owner's mark.
 OPENING_NAMEPLATES = [
     {"key": "sarahnovotny", "at_megacut": 135.0},
-    {"key": "bdburns", "at_megacut": 140.0},
 ]
 
 OG_LABEL = "OG GUARDIAN"
@@ -1764,7 +1768,7 @@ def build():
             **localise_avatar(key, _corrected(key, authored_copy(key, casting))),
         })
 
-    # --- Sarah and Brent, in the first two opening slots -------------------
+    # --- the opening nameplates (Brent's slot stays empty -- see above) ----
     for spec in OPENING_NAMEPLATES:
         at = round(spec["at_megacut"] - MEGACUT_OFFSET, 3)
         hold = clamp_hold(at, OG_HOLD, film_of)
