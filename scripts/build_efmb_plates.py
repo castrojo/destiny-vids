@@ -70,18 +70,6 @@ from tools.plate import CHOICE_POINTER_CUT, CHROME_ROWS  # noqa: E402
 from tools import placeholder  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "02-endless-forms-plates.json"
-# THE ROSTER IS AN INPUT, SO IT IS COMMITTED.
-#
-# tools/ensemble.py FETCHES a month's contributors from GitHub into
-# gitignored renders/. That is fine for a scratch artifact and wrong for this:
-# the roster decides WHICH REAL PEOPLE this act credits, so it is an authored
-# input to the cut, and a manifest generated from a file nobody else has cannot
-# be checked, reproduced, or reviewed. CI proved the point by failing on a
-# missing renders/roster-2026-08.json.
-#
-# Committed under stories/, the same way the summit photo list and the megacut
-# manifests are, and for the same reason.
-ROSTER = REPO_ROOT / "stories" / "roster-2026-08.json"
 
 # WHERE AVATARS LIVE, AND WHY THE MANIFEST NEVER CARRIES A URL.
 #
