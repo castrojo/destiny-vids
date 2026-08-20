@@ -174,13 +174,14 @@ class FarmError(RuntimeError):
 # Probing (always local: the source and the output both live on the laptop)
 
 
-def probe(path, ffprobe):
+def probe(path, ffprobe=None):
     """The facts the plan and the verifier need about one media file.
 
     Duration comes from the VIDEO stream where possible — the same lesson
     social.py learned: a format-level duration can be the longest stream,
     which is the wrong number when audio outruns the picture.
     """
+    ffprobe = ffprobe or native_ffprobe()
     cmd = [*ffprobe, "-v", "error", "-print_format", "json",
            "-show_entries",
            "stream=codec_type,codec_name,width,height,pix_fmt,r_frame_rate,"
@@ -922,7 +923,7 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
         desc=f"1 encode x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
     try:
-        facts = probe(out, ffprobe or native_ffprobe())
+        facts = probe(out, ffprobe)
     except (FarmError, RuntimeError) as exc:
         raise FarmError(f"fetched output does not probe as media: {exc}")
     if expected_duration is not None:
@@ -1012,7 +1013,7 @@ def run_ffmpeg_commands_on_cluster(argvs, *, inputs, out, name=None, kc=None,
         desc=f"{len(argvs)} ordered encode pass(es) x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
     try:
-        facts = probe(out, ffprobe or native_ffprobe())
+        facts = probe(out, ffprobe)
     except (FarmError, RuntimeError) as exc:
         raise FarmError(f"fetched output does not probe as media: {exc}")
     if expected_duration is not None:
