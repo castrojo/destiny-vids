@@ -1,3 +1,26 @@
+---
+name: issues
+version: "1.0"
+last_updated: "2026-08-19"
+id: issues
+one_line_purpose: Turn approved work into executable briefs and repository issues.
+entry_point: docs/skills/issues/SKILL.md
+category: operations
+status: active
+dependencies: []
+tags:
+  - whisp
+  - issues
+  - briefs
+  - backlog
+  - requests
+description: >-
+  Turn approved work into executable briefs and repository issues. Use when
+  filing work or picking up tracked requests.
+metadata:
+  type: procedure
+---
+
 # Working from issues
 
 ## When to Use
@@ -13,7 +36,7 @@
 - Assembling and rendering the cut → [`production.md`](../production/SKILL.md)
 - Deciding who a shot depicts → [`casting.md`](../casting/SKILL.md)
 
-## The shape of the backlog
+## Core Process
 
 Issues are the only backlog. There is no TODO file, no notes doc, and no
 planning markdown in the repo — those go stale and mislead the next agent.

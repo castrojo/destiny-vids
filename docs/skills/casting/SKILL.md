@@ -1,3 +1,27 @@
+---
+name: casting
+version: "1.0"
+last_updated: "2026-08-19"
+id: casting
+one_line_purpose: Bind visible Destiny characters to verified contributor identities.
+entry_point: docs/skills/casting/SKILL.md
+category: metadata
+status: active
+dependencies: []
+tags:
+  - characters
+  - leads
+  - ensemble
+  - credits
+  - bindings
+description: >-
+  Bind visible Destiny characters to verified contributor identities. Use when
+  adding or reviewing lead bindings, monthly ensemble credits, or cast-derived
+  permissions.
+metadata:
+  type: policy
+---
+
 # Casting
 
 Casting names **real people**. Every rule below exists because the cost of
