@@ -21,6 +21,7 @@ VIDEO_ID="${1:?usage: $0 <video_id> <roster.json> [music.mp3]}"
 SOURCE_VIDEO="$(python3 tools/footage.py path "$VIDEO_ID")"
 ROSTER="${2:?usage: $0 <video_id> <roster.json> [music.mp3]}"
 MUSIC="${3:-}"
+MUSIC_AT=""
 
 # ACODEC=flac builds a LOSSLESS master alongside the normal deliverable, so a
 # later re-encode (a stereo fold-down for streaming, a different container)
@@ -32,6 +33,26 @@ SUFFIX=""
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
+
+if [ -z "$MUSIC" ]; then
+    mapfile -t SCORE < <(python3 - "$VIDEO_ID" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+record = Path("dialogue") / sys.argv[1] / "dialogue.json"
+if record.exists():
+    score = json.loads(record.read_text(encoding="utf-8")).get("score") or {}
+    if score.get("bed_id"):
+        print(Path("media") / f"{score['bed_id']}.wav")
+        print(score.get("start_sec", 0))
+PY
+)
+    if [ "${#SCORE[@]}" -ge 2 ]; then
+        MUSIC="${SCORE[0]}"
+        MUSIC_AT="${SCORE[1]}"
+    fi
+fi
 
 # Intermediates live under the repo, not /tmp: the containerized ffmpeg on an
 # atomic host only bind-mounts $HOME, so a /tmp path resolves inside the
@@ -45,6 +66,7 @@ OUT_DIR="renders"
 PLATES_DIR="$OUT_DIR/plates-$VIDEO_ID"
 BASE="$WORK/base.mp4"
 MANIFEST="$OUT_DIR/$VIDEO_ID-plates.json"
+FIXED_MANIFEST="stories/$VIDEO_ID-fixed-plates.json"
 FINAL="$OUT_DIR/$VIDEO_ID-credited${SUFFIX}.mp4"
 
 mkdir -p "$OUT_DIR"
@@ -53,27 +75,51 @@ echo "==> whole video as a cut list"
 python3 tools/uncut.py "$VIDEO_ID" --out "$WORK/cut.json"
 
 echo "==> 1/3 lead reveals"
-python3 tools/plate.py plan "$WORK/cut.json" --only leads --hold 4 \
-    --out "$WORK/leads.json"
+STANDALONE_LEADS="$(python3 - "$VIDEO_ID" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+record = Path("dialogue") / sys.argv[1] / "dialogue.json"
+if not record.exists():
+    print("true")
+else:
+    display = json.loads(record.read_text(encoding="utf-8")).get("display") or {}
+    print("true" if display.get("standalone_leads", True) else "false")
+PY
+)"
+if [ "$STANDALONE_LEADS" = "true" ]; then
+    python3 tools/plate.py plan "$WORK/cut.json" --only leads --hold 4 \
+        --out "$WORK/leads.json"
+else
+    printf '[]\n' > "$WORK/leads.json"
+    echo "    omitted: dialogue pills carry the owner-authored speaker identities"
+fi
 
 echo "==> 2/3 dialogue, around the reveals"
 python3 tools/dialogue.py "$WORK/cut.json" --video-id "$VIDEO_ID" \
     --around "$WORK/leads.json" --out "$WORK/chat.json"
 
 echo "==> 3/3 the ensemble, around both"
-python3 tools/plate.py merge "$WORK/leads.json" "$WORK/chat.json" \
-    --out "$WORK/fixed.json"
+FIXED_INPUTS=("$WORK/leads.json" "$WORK/chat.json")
+if [ -f "$FIXED_MANIFEST" ]; then
+    FIXED_INPUTS+=("$FIXED_MANIFEST")
+fi
+python3 tools/plate.py merge "${FIXED_INPUTS[@]}" --out "$WORK/fixed.json"
 python3 tools/plate.py plan "$WORK/cut.json" --roster "$ROSTER" \
     --only ensemble --hold 2.6 --around "$WORK/fixed.json" \
     --out "$WORK/ensemble.json"
 
-python3 tools/plate.py merge "$WORK/leads.json" "$WORK/chat.json" \
-    "$WORK/ensemble.json" --out "$MANIFEST"
+python3 tools/plate.py merge "${FIXED_INPUTS[@]}" "$WORK/ensemble.json" \
+    --out "$MANIFEST"
 
 echo "==> redact burned-in copy${MUSIC:+ and score}"
 if [ -n "$MUSIC" ]; then
+    SCORE_ARGS=()
+    [ -z "$MUSIC_AT" ] || SCORE_ARGS+=(--audio-at "$MUSIC_AT")
     python3 tools/redact.py --video "$SOURCE_VIDEO" --video-id "$VIDEO_ID" \
-        --audio "$MUSIC" --audio-codec "$ACODEC" --out "$BASE"
+        --audio "$MUSIC" "${SCORE_ARGS[@]}" \
+        --audio-codec "$ACODEC" --out "$BASE"
 else
     python3 tools/redact.py --video "$SOURCE_VIDEO" --video-id "$VIDEO_ID" \
         --audio-codec "$ACODEC" --out "$BASE"

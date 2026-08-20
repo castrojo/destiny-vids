@@ -99,11 +99,30 @@
       "fade_in": 0.4,
       "fade_out_at": 67.986,
       "fade_out": 0.25
+    },
+    {
+      "id": "chat_wolf",
+      "kind": "chat",
+      "position": "letterbox",
+      "speaker": "Rafael",
+      "text": "What's a wolf?",
+      "copy_source": "owner_supplied",
+      "at": 17.163,
+      "dur": 3.0,
+      "fade_in": 0.4,
+      "fade_out_at": 19.913,
+      "fade_out": 0.25
     }
   ],
   "unresolved": [
     "'Jill Castro' has no login on record -- not in vocab/casting.yaml, not in stories/08-credits.json. She renders her authored display name with the drawn crest fallback. If the owner names a handle, the avatar lands in renders/avatars/ and one line closes this.",
     "'Rafael' has no login on record either -- the act VIII birthday card names Rafael Castro, the owner's son, but no handle exists to bind. Crest fallback, authored name, same one-line fix.",
     "'LH' is initials nobody has resolved to a person on record. Crest fallback, authored name, same one-line fix. Never guessed: a wrong login would credit a real person for words they did not write."
-  ]
+  ],
+  "chat_wolf": {
+    "plate_ids": [
+      "chat_wolf"
+    ]
+  },
+  "_chat_wolf": "Owner programme note at 23:30 (movement-local 17.163 from the old 23:12.837 movement start): Rafael, 'What's a wolf?'. Rendered in its own section so the whale-shot chat invariants remain untouched."
 }

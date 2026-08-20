@@ -14,9 +14,8 @@ Three shapes, all drawn with tools/plate.py's own components:
   * ``title``        -- the Ambassadors' slide (B); the owner-authored line as
                         a title card, centred. The CNCF mark is NOT on it
                         (rights -- see the manifest's _rights).
-  * ``introduction`` -- "Introducing ..." above a Guardian plate (C). The
-                        plate reproduces Cortney Nickerson's authored act-I
-                        identity verbatim, class row omitted as there (#90).
+  * ``introduction`` -- "Introducing ..." above Amber Graner's existing
+                        authored Guardian plate (C).
 
 Offline: Pillow only, no network, no footage. Re-runs are byte-identical.
 """

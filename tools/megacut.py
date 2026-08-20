@@ -1376,6 +1376,33 @@ def locate(plan, seconds):
     raise ValueError("empty plan")
 
 
+def foreign_seated_acts(plan):
+    """Acts seated here whose master was built outside this history.
+
+    Yields (numeral, commit, label). Silent when nothing is recorded: an
+    unstamped act is unknown, not foreign, and guessing would cry wolf on
+    every act until `publish` has run once.
+    """
+    from tools import deliver
+    try:
+        doc = json.loads((deliver.REPO_ROOT / "stories" / "megacut"
+                          / "delivery.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+    seated = {Path(i["path"]).name for i in plan.get("items", [])
+              if i.get("path")}
+    for numeral, master in sorted(doc.get("masters", {}).items()):
+        commit = master.get("built_from_commit")
+        if not commit:
+            continue
+        prod = master.get("prod_file") or ""
+        if prod and prod not in seated:
+            continue
+        if deliver.commit_in_history(commit) is False:
+            yield numeral, commit, master.get("path", "")
+
+
+
 def stale_seated_acts(plan, delivery_path=None):
     """The acts this plan seats whose masters predate their own inputs.
 
@@ -1522,6 +1549,16 @@ def main(argv=None):
         print(f"NOTE: act {numeral} is stale and seated, {why}: {label}",
               file=sys.stderr)
 
+    # A FOREIGN ACT is the failure a digest cannot see. Prod/ is shared
+    # mutable state: another agent rebuilds an act's master and the next
+    # programme carries it, while every gate stays green because "fresh" only
+    # ever meant "not stale". A prologue slide shipped that way. Named here,
+    # loudly, and still seated -- assembly never refuses.
+    for numeral, commit, label in foreign_seated_acts(plan):
+        print(f"NOTE: act {numeral} was built from commit {commit[:12]}, "
+              f"which is NOT in this checkout's history -- it carries work "
+              f"from another branch: {label}", file=sys.stderr)
+
     if args.dry_run:
         copy_ok = _copy_path_ok(plan, allow_copy=not args.no_copy)
         for i, item in enumerate(plan["items"]):
@@ -1555,8 +1592,8 @@ def main(argv=None):
         cluster_ok, why = farm.cluster_available()
         if cluster_ok:
             use_farm = True
-            print(f"megacut: cluster reachable; ENCODE segments run on "
-                  f"{farm.DEFAULT_NODE} (--local to force this host)",
+            print("megacut: cluster reachable; ENCODE segments run on "
+                  "scheduler-selected nodes (--local to force this host)",
                   file=sys.stderr)
         else:
             print(f"megacut: cluster UNREACHABLE ({why}); falling back to "

@@ -66,6 +66,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -135,17 +136,18 @@ def _svg_size(svg_text):
     16:9 viewport with ``object-fit: cover``, which silently cropped into
     artwork whose aspect was not 16:9.
     """
-    import re
+    import xml.etree.ElementTree as ET
 
-    box = re.search(r'viewBox\s*=\s*["\']([^"\']+)["\']', svg_text)
+    root = ET.fromstring(svg_text)
+    box = root.get("viewBox")
     if box:
-        nums = [float(v) for v in re.split(r'[\s,]+', box.group(1).strip())]
+        nums = [float(v) for v in re.split(r"[\s,]+", box.strip())]
         if len(nums) == 4 and nums[2] > 0 and nums[3] > 0:
             return nums[2], nums[3]
-    w = re.search(r'\bwidth\s*=\s*["\']([\d.]+)', svg_text)
-    h = re.search(r'\bheight\s*=\s*["\']([\d.]+)', svg_text)
+    w, h = root.get("width"), root.get("height")
     if w and h:
-        return float(w.group(1)), float(h.group(1))
+        return float(re.match(r"[\d.]+", w).group()), \
+            float(re.match(r"[\d.]+", h).group())
     return 3840.0, 2160.0
 
 

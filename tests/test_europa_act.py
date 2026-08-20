@@ -54,6 +54,16 @@ def test_laura_reveal_clears_before_its_half_open_boundary():
     assert reveal["fade_out_at"] + reveal["fade_out"] < end
 
 
+def test_alolita_uses_the_verified_repo_avatar():
+    doc = load()
+    alolita = next(p for p in doc["plates"] if p["id"] == "d03")
+    assert alolita["speaker"] == "alolita"
+    # The record names the repo's avatar cache, not the website asset.
+    # Repo-relative by convention (see the no-absolute-paths test above), so
+    # the assertion must not bake in any one checkout's location.
+    assert alolita["avatar"] == "renders/avatars/alolita.png"
+
+
 def test_build_command_has_no_endcard_input_or_overlay(tmp_path):
     doc = load()
     cmd, _ = build_europa.build_commands(

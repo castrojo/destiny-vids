@@ -1,3 +1,26 @@
+---
+name: editing
+version: "1.0"
+last_updated: "2026-08-19"
+id: editing
+one_line_purpose: Build and revise cuts from indexed footage without inventing shots.
+entry_point: docs/skills/editing/SKILL.md
+category: editorial
+status: active
+dependencies: []
+tags:
+  - story
+  - cuts
+  - render
+  - beats
+  - segments
+description: >-
+  Build and revise cuts from indexed footage without inventing shots. Use when
+  making story outlines or renders from indexed segments.
+metadata:
+  type: procedure
+---
+
 # Editing a cut
 
 ## When to Use
@@ -28,19 +51,6 @@ reported rather than silently dropped.
 **The fiction bends to the footage.** When a beat finds nothing, rewrite the
 beat — do not widen the pool to unclean footage, and do not invent a shot.
 
-
-## Where the detail lives
-
-This skill is the contract. The procedure lives in `references/`:
-
-| Reference | What is in it |
-|---|---|
-| [`outline-and-shape.md`](references/outline-and-shape.md) | Writing beats the matcher can serve, and **spanning vs pinning** — the decision that decides what the cut is about. |
-| [`hero-video.md`](references/hero-video.md) | The **hero video** — one person, one video, every source — and when *not* to pin a cut to one cinematic. |
-| [`holds-and-windows.md`](references/holds-and-windows.md) | How long a shot may hold, cutting from a long source, and artwork cards. |
-| [`timing-pass.md`](references/timing-pass.md) | **Mark, don't cut.** The review convention, and how filling a span smuggles banned material in. |
-| [`shotlists-and-excisions.md`](references/shotlists-and-excisions.md) | Deriving in-points, the authored-shotlist invariant, and picking shots by eye. |
-| [`timing-pass-notes.md`](references/timing-pass-notes.md) | The worked act VI timing pass. |
 
 ## Not every piece is a cut
 Sometimes the source already tells the story and the job is to credit the cast
@@ -171,6 +181,5 @@ A cut's unresolved beats and anything a human still has to decide are recorded
 in its outline's own header (see `stories/01-dance.txt`) and filed as issues —
 there is no per-cut doc tree.
 
-Ranking weights and query mapping: `docs/agent-retrieval.md`. Encoder choices,
-seeking, and the ffmpeg resolution order: `docs/rendering.md`. What a character
-does and does not have on film: [`corpus.md`](../corpus.md).
+Encoder choices, seeking, and the ffmpeg resolution order: `docs/rendering.md`. What a character
+does and does not have on film: `python3 tools/corpus.py`.

@@ -25,4 +25,3 @@ Two rules, and the second is the one that gets broken:
   EQ — the peak of a social copy must match its master's, and a test asserts the
   tool contains no filter that would change it. A starved music bed is the
   artifact people actually hear on a phone, so spend bitrate on audio first.
-

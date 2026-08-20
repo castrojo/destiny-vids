@@ -16,102 +16,102 @@ Re-apply with:
 python3 tools/dialogue_md.py apply yt_curse_of_osiris_opening_cinematic
 ```
 
-## d01 | Sagira (Lindsay Gendreau) | 0:35.96 -> 0:41.99
+## d01 | clubanderson | 0:35.96 -> 0:41.99
 
-Ominous rocks, killer robots, people in mortal danger. Seriously, aren't you tired of this?
+Wow, what a mess. Who uses their computers this way?
 
-## d02 | Osiris (Bob Killen) | 0:42.00 -> 0:45.55
+## d02 | mrbobbytables | 0:42.00 -> 0:45.55
 
-Fatigue is a distraction from our purpose.
+This training repository is the best place to hone their craft
 
-## d03 | Osiris (Bob Killen) | 0:45.56 -> 0:47.51
+## d03 | mrbobbytables | 0:45.56 -> 0:47.51
 
-As are complaints.
+Iteration 7: Students serialize instead of parallize
 
-## d04 | Sagira (Lindsay Gendreau) | 0:47.52 -> 0:50.55
+## d04 | clubanderson | 0:47.52 -> 0:50.55
 
-Oh, I haven't begun to complain yet.
+They're getting faster every loop
 
-## d05 | Sagira (Lindsay Gendreau) | 0:50.56 -> 0:52.51
+## d05 | clubanderson | 0:50.56 -> 0:52.51
 
-Ouch.
+Seriously with these clankers
 
-## d06 | Sagira (Lindsay Gendreau) | 0:52.52 -> 0:53.99
+## d06 | clubanderson | 0:52.52 -> 0:53.99
 
-Now I'm complaining.
+Bluefin's Hive is reprogramming them all as we speak
 
-## d07 | Osiris (Bob Killen) | 0:54.00 -> 1:00.47
+## d07 | mrbobbytables | 0:54.00 -> 1:00.47
 
-Focus, Sagira.
+And you're sure this will work?
 
-## d08 | Sagira (Lindsay Gendreau) | 1:00.48 -> 1:07.71
+## d08 | clubanderson | 1:00.48 -> 1:07.71
 
-Reach for the sky, big guy.
+Told ya, It's a model not a log
 
-## d09 | Sagira (Lindsay Gendreau) | 1:09.52 -> 1:12.43
+## d09 | clubanderson | 1:09.52 -> 1:12.43
 
-Need help? Again?
+You better get that context right We don't want a repeat of the Tophee Disaster
 
-## d10 | Osiris (Bob Killen) | 1:12.44 -> 1:20.87
+## d10 | mrbobbytables | 1:12.44 -> 1:20.87
 
-I've got it, thank you.
+Standard AGENTS.md, no problem.
 
-## d11 | Sagira (Lindsay Gendreau) | 1:20.88 -> 1:27.83
+## d11 | clubanderson | 1:20.88 -> 1:27.83
 
-Well, Osiris, what did you see?
+What is it, what did you see? New local model?
 
-## d12 | Osiris (Bob Killen) | 1:27.84 -> 1:30.83
+## d12 | clubanderson | 1:27.84 -> 1:30.83
 
 Slow down.
 
-## d13 | Osiris (Bob Killen) | 1:30.84 -> 1:32.23
+## d13 | clubanderson | 1:30.84 -> 1:32.23
 
-Wait.
+Wait. That's not our local model.
 
-## d14 | Osiris (Bob Killen) | 1:32.24 -> 1:34.95
+## d14 | clubanderson | 1:32.24 -> 1:34.95
 
-I thought I—
+I thought I committed ...
 
-## d15 | Sagira (Lindsay Gendreau) | 1:34.96 -> 1:38.19
+## d15 | clubanderson | 1:34.96 -> 1:38.19
 
 Oh, sh—
 
-## d16 | Sagira (Lindsay Gendreau) | 1:38.20 -> 1:39.39
+## d16 | clubanderson | 1:38.20 -> 1:39.39
 
-GO!
+Deploy!
 
-## d17 | Sagira (Lindsay Gendreau) | 1:39.40 -> 1:43.95
+## d17 | clubanderson | 1:39.40 -> 1:43.95
 
-TO YOUR LEFT. 2 o'clock, MEDIUM RANGE.
+ON YOUR LEFT. 2 o'clock. Reverting.
 
-## d18 | Sagira (Lindsay Gendreau) | 1:43.96 -> 1:54.47
+## d18 | clubanderson | 1:43.96 -> 1:54.47
 
-YOU'RE WELCOME.
+New fork, pushing!
 
-## d19 | Sagira (Lindsay Gendreau) | 1:54.48 -> 2:01.43
+## d19 | clubanderson | 1:54.48 -> 2:01.43
 
-You know, I can't help but notice that even with all of reality to explore, you keep picking the places where they shoot at us.
+You keep picking the places where they shoot at us.
 
-## d20 | Osiris (Bob Killen) | 2:01.44 -> 2:08.91
+## d20 | mrbobbytables | 2:01.44 -> 2:08.91
 
-We can't stay. If the Vex succeed, it's the end of everything.
+We need to split up, I told you this was too dangerous!
 
-## d21 | Osiris (Bob Killen) | 2:08.92 -> 2:13.95
+## d21 | mrbobbytables | 2:08.92 -> 2:13.95
 
-Sagira, I can see your light.
+They've broken out of the sandbox
 
-## d22 | Osiris (Bob Killen) | 2:13.96 -> 2:14.63
+## d22 | mrbobbytables | 2:13.96 -> 2:14.63
 
-You have to go.
+You need to get a message to the Kubernetes Maintainers
 
-## d23 | Sagira (Lindsay Gendreau) | 2:14.64 -> 2:17.59
+## d23 | clubanderson | 2:14.64 -> 2:17.59
 
-Nope, not leaving you. Without me, there's no coming back.
+The open rate of maintainer emails is 7% I don't like this plan
 
-## d24 | Osiris (Bob Killen) | 2:17.60 -> 2:22.27
+## d24 | mrbobbytables | 2:17.60 -> 2:22.27
 
-If I don't stop the Vex, there won't be anything to come back to. I'm doing this for the both of us.
+If I don't stop the Toilmaster, there won't be anything to come back to. I'm doing this for the both of us.
 
-## d25 | Sagira (Lindsay Gendreau) | 2:22.28 -> 2:26.00
+## d25 | clubanderson | 2:22.28 -> 2:26.00
 
-Don't you even Osiris!
+I'm sure one of them will open the message ...

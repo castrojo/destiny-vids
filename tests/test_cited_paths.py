@@ -1,4 +1,4 @@
-"""A repo path named in a committed record or doc must actually exist.
+"""A repo path named outside fenced Markdown examples must actually exist.
 
 `tests/test_doc_links.py` checks relative *Markdown links*. It does not see a
 path cited in prose -- inside a JSON `_note`, a module docstring, a comment --
@@ -43,6 +43,7 @@ CITATION = re.compile(
     r"(?<![\w/.-])((?:" + "|".join(CITED_DIRS) + r")/[A-Za-z0-9_./-]+"
     r"\.(?:json|jsonl|py|yaml|yml|md|sh|mjs|js|html|css|png|webp|srt|vtt))\b"
 )
+FENCED_BLOCK = re.compile(r"^(```|~~~).*?^\1\s*$", re.MULTILINE | re.DOTALL)
 
 # Trees that are searched for citations.
 SEARCH_DIRS = ("docs", "scripts", "stories", "tools", "vocab", "videos",
@@ -91,6 +92,10 @@ def _searched_files():
     return seen
 
 
+def _cited_text(path: Path, text: str) -> str:
+    return FENCED_BLOCK.sub("", text) if path.suffix == ".md" else text
+
+
 @pytest.mark.parametrize("path", _searched_files(),
                          ids=lambda p: str(p.relative_to(REPO_ROOT)))
 def test_every_cited_repo_path_resolves(path):
@@ -100,7 +105,7 @@ def test_every_cited_repo_path_resolves(path):
         pytest.skip("not text")
 
     missing = sorted({
-        cited for cited in CITATION.findall(text)
+        cited for cited in CITATION.findall(_cited_text(path, text))
         if cited not in ALLOWED_MISSING and not (REPO_ROOT / cited).exists()
     })
 
@@ -138,3 +143,14 @@ def test_the_gate_ignores_gitignored_build_outputs():
     """`renders/` is a build output; citing one is not a broken citation."""
     text = "Output: renders/plates-megacut-cards/plate_scream.png -- a still."
     assert CITATION.findall(text) == []
+
+
+def test_the_gate_ignores_fenced_markdown_examples():
+    text = """\
+The record lives elsewhere.
+
+```python
+record = "stories/megacut/example-only.json"
+```
+"""
+    assert CITATION.findall(_cited_text(Path("guide.md"), text)) == []

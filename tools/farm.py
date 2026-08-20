@@ -112,6 +112,8 @@ DEFAULT_CPU = "2"               # request: low, so it always schedules
 DEFAULT_LIMIT_CPU = "24"        # limit: the burst ceiling on idle exo-0
 DEFAULT_MEMORY = "4Gi"          # request
 DEFAULT_LIMIT_MEMORY = "16Gi"   # limit
+DEFAULT_EPHEMERAL_STORAGE = "1Gi"
+DEFAULT_LIMIT_EPHEMERAL_STORAGE = "4Gi"
 # `kubectl cp` streams tar over the API server; a blip there is a broken
 # socket, not a broken encode, so the copy is retried before it is a failure.
 CP_ATTEMPTS = 3
@@ -172,13 +174,14 @@ class FarmError(RuntimeError):
 # Probing (always local: the source and the output both live on the laptop)
 
 
-def probe(path, ffprobe):
+def probe(path, ffprobe=None):
     """The facts the plan and the verifier need about one media file.
 
     Duration comes from the VIDEO stream where possible — the same lesson
     social.py learned: a format-level duration can be the longest stream,
     which is the wrong number when audio outruns the picture.
     """
+    ffprobe = ffprobe or native_ffprobe()
     cmd = [*ffprobe, "-v", "error", "-print_format", "json",
            "-show_entries",
            "stream=codec_type,codec_name,width,height,pix_fmt,r_frame_rate,"
@@ -252,7 +255,7 @@ def chunk_boundaries(facts, segments):
             for b0, b1 in itertools.pairwise(bounds)]
 
 
-def _chunk_out_name(out_name, i):
+def _chunk_out_name(i):
     return f"chunk_{i:04d}.mp4"
 
 
@@ -291,10 +294,10 @@ def build_plan(*, facts, out_name, segments, video_args, audio_args, threads,
                 # After the recipe so the farm's threading wins even when the
                 # recipe carries its own -threads (documented, not a bug).
                 "-threads", str(threads),
-                "-progress", f"{work_dir}/logs/{_chunk_out_name(out_name, i)}.progress",
-                "-y", f"{work_dir}/chunks/{_chunk_out_name(out_name, i)}"]
+                "-progress", f"{work_dir}/logs/{_chunk_out_name(i)}.progress",
+                "-y", f"{work_dir}/chunks/{_chunk_out_name(i)}"]
         chunks.append({"index": i, "ss": ss, "dur": dur, "argv": argv})
-    concat_list = [f"{work_dir}/chunks/{_chunk_out_name(out_name, i)}"
+    concat_list = [f"{work_dir}/chunks/{_chunk_out_name(i)}"
                    for i in range(len(chunks))]
 
     has_audio = "audio" in facts["stream_kinds"]
@@ -437,14 +440,23 @@ def build_workflow(name, script, *, namespace, image, cpu, limit_cpu, memory,
             "container": {
                 "name": "main",
                 "image": image,
+                "imagePullPolicy": "IfNotPresent",
                 # The image's entrypoint is ffmpeg itself; command replaces it.
                 "command": ["/bin/bash", "-c", script],
                 "resources": {
                     # House style (156–263% limit overcommit): a LOW request
                     # always schedules; the HIGH limit is the real budget on
                     # an idle node.
-                    "requests": {"cpu": cpu, "memory": memory},
-                    "limits": {"cpu": limit_cpu, "memory": limit_memory},
+                    "requests": {
+                        "cpu": cpu,
+                        "memory": memory,
+                        "ephemeral-storage": DEFAULT_EPHEMERAL_STORAGE,
+                    },
+                    "limits": {
+                        "cpu": limit_cpu,
+                        "memory": limit_memory,
+                        "ephemeral-storage": DEFAULT_LIMIT_EPHEMERAL_STORAGE,
+                    },
                 },
                 "volumeMounts": [{"name": "work", "mountPath": WORK_DIR}],
             },
@@ -644,7 +656,8 @@ def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
                                  image=image, cpu=cpu, limit_cpu=limit_cpu,
                                  memory=memory, limit_memory=limit_memory,
                                  node=node, keep=keep))
-    print(f"{label}: workflow {name} submitted (node {node}, {desc})")
+    placement = f"node {node}" if node else "scheduler-selected node"
+    print(f"{label}: workflow {name} submitted ({placement}, {desc})")
     try:
         pod = ""
         while time.monotonic() < deadline:
@@ -674,6 +687,11 @@ def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
                                 daemon=True)
         logs.start()
 
+        seq_dirs = {rel.rsplit("/", 1)[0] for _, rel in uploads
+                    if rel.count("/") > 1}
+        for d in sorted(seq_dirs):
+            # kubectl cp will not create an intermediate directory.
+            kc.exec(pod, ["mkdir", "-p", f"{WORK_DIR}/{d}"])
         for local, rel in uploads:
             size = Path(local).stat().st_size
             print(f"{label}: uploading {size / (1024 ** 2):.1f} MiB "
@@ -748,6 +766,15 @@ def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
 # owns the recipe, the farm owns the data movement and the proof.
 
 
+SEQUENCE_RE = re.compile(r"%0\d+d")
+
+
+def sequence_frames(pattern):
+    """The local frames a ``%0Nd`` image-sequence pattern reads, in order."""
+    pattern = Path(pattern)
+    return sorted(pattern.parent.glob(SEQUENCE_RE.sub("*", pattern.name)))
+
+
 def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
     """Map a LOCAL ffmpeg argv onto the pod's filesystem view.
 
@@ -771,6 +798,22 @@ def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
     staged = {}
     uploads = []
     for i, p in enumerate(inputs):
+        if SEQUENCE_RE.search(p.name):
+            # AN IMAGE SEQUENCE IS READ AS A PATTERN, so its frames never
+            # appear in argv and the exact-token guard below would reject
+            # them as unread. Stage the frames into their own directory and
+            # point the pattern at that directory instead. Without this a
+            # plate burn cannot run on the cluster at all, and the caller
+            # falls back to encoding on the workstation -- which is the one
+            # thing the farm exists to prevent.
+            frames = sequence_frames(p)
+            if not frames:
+                raise FarmError(
+                    f"input sequence matches no frames on disk: {p}")
+            rel_dir = f"in/{i:02d}-seq"
+            uploads.extend((f, f"{rel_dir}/{f.name}") for f in frames)
+            staged[str(p)] = f"{work_dir}/{rel_dir}/{p.name}"
+            continue
         rel = f"in/{i:02d}-{p.name}"
         staged[str(p)] = f"{work_dir}/{rel}"
         uploads.append((p, rel))
@@ -857,7 +900,10 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
     inputs = [Path(p) for p in inputs]
     out = Path(out)
     for p in inputs:
-        if not p.exists():
+        if SEQUENCE_RE.search(p.name):
+            if not sequence_frames(p):
+                raise FarmError(f"input sequence matches no frames: {p}")
+        elif not p.exists():
             raise FarmError(f"input does not exist: {p}")
     name = name or farm_name(out.name)
     label = label or f"farm[{name}]"
@@ -865,7 +911,10 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
     out_rel = pod_out[len(WORK_DIR) + 1:]
     script = pod_script_run(pod_argv, out_rel)
     kc = kc or Kubectl(kubeconfig, namespace)
-    total = sum(p.stat().st_size for p in inputs)
+    # A %0Nd input is a PATTERN, not a file on disk: size it by its frames.
+    total = sum(sum(f.stat().st_size for f in sequence_frames(p))
+                if SEQUENCE_RE.search(p.name) else p.stat().st_size
+                for p in inputs)
     _execute_on_cluster(
         name=name, script=script, uploads=uploads, out_rel=out_rel, out=out,
         kc=kc, image=image, cpu=cpu, limit_cpu=limit_cpu, memory=memory,
@@ -874,7 +923,97 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
         desc=f"1 encode x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
     try:
-        facts = probe(out, ffprobe or native_ffprobe())
+        facts = probe(out, ffprobe)
+    except (FarmError, RuntimeError) as exc:
+        raise FarmError(f"fetched output does not probe as media: {exc}")
+    if expected_duration is not None:
+        drift = facts["duration"] - float(expected_duration)
+        if abs(drift) > SEAM_TOLERANCE_S:
+            raise FarmError(
+                f"output is {facts['duration']:.3f}s but the caller expected "
+                f"{float(expected_duration):.3f}s — {drift:+.3f}s is a "
+                f"re-time, not rounding (#88)")
+    print(f"{label}: verify ok — {out.name} {facts['duration']:.3f}s "
+          f"{facts['codec_name']} {facts['width']}x{facts['height']}")
+    return facts
+
+
+def pod_script_runs(pod_argvs, out_rel, *, work_dir=WORK_DIR):
+    """Run ordered ffmpeg commands in one pod workspace.
+
+    Two-pass encodes share x264's stats file. Splitting their passes into
+    separate farm jobs loses that file, so the commands must run sequentially
+    against the same staged inputs and output directory.
+    """
+    commands = []
+    for index, argv in enumerate(pod_argvs, start=1):
+        commands.append(f"""say {shlex.quote(f"running pass {index}: " + shlex.join(argv))}
+if {shlex.join(argv)} > logs/pass-{index}.log 2>&1; then
+  :
+else
+  rc=$?
+  say "pass {index} FAILED (rc=$rc)"
+  tail -n 20 logs/pass-{index}.log
+  exit 1
+fi""")
+    return f"""#!/bin/bash
+set -uo pipefail
+export LC_ALL=C
+cd {work_dir} || {{ echo "no {work_dir} mounted"; exit 1; }}
+mkdir -p in logs out
+say() {{ printf '%s [farm] %s\\n' "$(date +%H:%M:%S)" "$*"; }}
+say "pod up on $(hostname); waiting for input"
+while [ ! -f in/.ready ]; do sleep 2; done
+say "input arrived:"; ls -l in/
+{chr(10).join(commands)}
+dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 {shlex.quote(out_rel)} 2>/dev/null)
+printf '{{"output":%s,"duration":%s}}\\n' '"{out_rel}"' '"${{dur:-null}}"' > out/.done.json
+say "encoded {out_rel} duration=${{dur:-?}}s; waiting for fetch"
+while [ ! -f .fetched ]; do sleep 2; done
+say "output fetched; pod done"
+"""
+
+
+def run_ffmpeg_commands_on_cluster(argvs, *, inputs, out, name=None, kc=None,
+                                   kubeconfig=None, namespace=DEFAULT_NAMESPACE,
+                                   image=DEFAULT_IMAGE, cpu=DEFAULT_CPU,
+                                   limit_cpu=DEFAULT_LIMIT_CPU,
+                                   memory=DEFAULT_MEMORY,
+                                   limit_memory=DEFAULT_LIMIT_MEMORY,
+                                   node=DEFAULT_NODE, keep=False,
+                                   timeout=DEFAULT_TIMEOUT,
+                                   expected_duration=None, label=None,
+                                   ffprobe=None):
+    """Run ordered ffmpeg commands in one verified farm workspace."""
+    if not argvs:
+        raise ValueError("at least one ffmpeg command is required")
+    inputs = [Path(p) for p in inputs]
+    out = Path(out)
+    for path in inputs:
+        if not path.exists():
+            raise FarmError(f"input does not exist: {path}")
+
+    rewritten = [rewrite_argv_for_pod(argv, inputs, out) for argv in argvs]
+    pod_argvs = [entry[0] for entry in rewritten]
+    uploads, pod_out = rewritten[0][1:]
+    if any(entry[1] != uploads or entry[2] != pod_out for entry in rewritten[1:]):
+        raise FarmError("all farm commands must use the same inputs and output")
+
+    name = name or farm_name(out.name)
+    label = label or f"farm[{name}]"
+    out_rel = pod_out[len(WORK_DIR) + 1:]
+    kc = kc or Kubectl(kubeconfig, namespace)
+    _execute_on_cluster(
+        name=name, script=pod_script_runs(pod_argvs, out_rel),
+        uploads=uploads, out_rel=out_rel, out=out, kc=kc, image=image,
+        cpu=cpu, limit_cpu=limit_cpu, memory=memory,
+        limit_memory=limit_memory, node=node,
+        storage=storage_for(sum(path.stat().st_size for path in inputs)),
+        keep=keep, timeout=timeout,
+        desc=f"{len(argvs)} ordered encode pass(es) x up to {limit_cpu} cpu",
+        label=label, log_prefix=f"  [{name}] ")
+    try:
+        facts = probe(out, ffprobe)
     except (FarmError, RuntimeError) as exc:
         raise FarmError(f"fetched output does not probe as media: {exc}")
     if expected_duration is not None:

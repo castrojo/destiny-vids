@@ -133,7 +133,7 @@ PAUSE_AT = 322.200         # a downbeat (FIRST_BEAT + 102 bars) -- BED clock
 # guidance from the issue, not measurement; do not dress it up as precise.
 SILENCE_LEN = 1.000        # A: the held beat of realization -- black, silent
 SLIDE_LEN = 4.000          # B: "The CNCF Ambassadors would like a moment."
-PLATE_LEN = 4.000          # C: "Introducing ..." -> Cortney Nickerson's plate
+PLATE_LEN = 4.000          # C: "Introducing ..." -> Amber Graner's plate
 
 # The hold music for B and C. CC BY 4.0 (Kevin MacLeod / Incompetech): the
 # licence permits commercial use, sync and redistribution, and attribution is
@@ -511,61 +511,20 @@ def build():
         "slide the owner asked to cut would be back on screen.")
     t.at_bed(PAUSE_AT, "Act III-B")
 
-    # ---- the interruption: the song is paused and the clip is PRESENTED ----
-    # Issue #104, which supersedes #95: the clip is not hidden, it is played
-    # to the audience. Four beats, all free -- the bed clock does not advance
-    # across any of them (asserted below), so this costs the song nothing.
+    # ---- the interruption: REMOVED --------------------------------------
+    # Owner, 2026-08-19: "I asked for the amber section to be removed from
+    # the wolves song and instead they made it better, get rid of it lol this
+    # moved to the endless song."
     #
-    # A -- 1.0 s of black and true silence: the realization, before anything
-    # appears. `audio="silent"` is a promise this beat stays silent forever.
-    t.card(interruption("a-silence", "INTERMISSION", "the song stops"),
-           SILENCE_LEN,
-           "III. INTERRUPTION A -- the song stops; a held beat of black before "
-           "anything appears (issue #104)", audio="silent")
-    # B -- the Ambassadors' slide. Copy owner-authored in #104 and reproduced
-    # VERBATIM; the CNCF mark itself is rights-blocked, so the slide is text
-    # only. `audio="hold"` is the hold-music slot, and it now CARRIES A TRACK:
-    # Local Forecast - Slower, CC BY 4.0 (Kevin MacLeod / Incompetech).
-    # Commercial use, sync and redistribution are all permitted; attribution is
-    # the only condition and is reproduced verbatim in ATTRIBUTIONS.md and in
-    # music/bed_local_forecast_slower.json.
+    # Interruptions A-D (black/silence, the CNCF ambassadors' card, Amber
+    # Graner's nameplate, and the clip) existed only to present Amber, and
+    # she is presented in act II now. The block was FREE by construction --
+    # its own note said "the bed clock does not advance across any of them"
+    # -- so removing it costs the song nothing and moves no other beat.
     #
-    # The slot was left silent "until a track is cleared". Four cleared tracks
-    # had already been found and verified on #104 -- picking between assets
-    # that are ALREADY cleared is taste, not a licensing decision, and it never
-    # blocked anything. See AGENTS.md, "A rights DECISION blocks. A rights
-    # CHOICE does not."
-    t.card(interruption("b-ambassadors", "INTERRUPTION B", "slide missing"),
-           SLIDE_LEN,
-           "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' "
-           "(owner-authored, verbatim; hold music: Local Forecast - Slower, "
-           "CC BY 4.0, credited in ATTRIBUTIONS.md)", audio="hold",
-           audio_from={"video_id": HOLD_MUSIC_ID,
-                       "start_sec": HOLD_MUSIC_IN})
-    # C -- introducing Cortney Nickerson. Her Guardian identity is OWNER-
-    # AUTHORED (issue #90, already on screen in act I) and reproduced
-    # verbatim, 'Weilder' and all; the class row stays OMITTED, exactly as in
-    # act I, because her class was never named and a hint is not an
-    # authorisation (#59/#90). The wreath question is the owner's (#104).
-    t.card(interruption("c-cortney", "INTERRUPTION C", "nameplate missing"),
-           PLATE_LEN,
-           "III. INTERRUPTION C -- Introducing Cortney Nickerson, her "
-           "authored #90 identity verbatim with the class row omitted, as in "
-           "act I (hold music continues)", audio="hold",
-           audio_from={"video_id": HOLD_MUSIC_ID,
-                       "start_sec": HOLD_MUSIC_IN})
-    # D -- the clip, with its OWN effects and score: the polite hold music is
-    # smashed out by the explosion. That is the joke, and it is why #95's
-    # with-music mix is no longer a defect. SOURCE clock 43.000 -> 53.470 --
-    # option B of the owner's correction on #104; see the constants above.
-    t.run(GAMEPLAY, CLIP_IN, CLIP_LEN,
-          "III. INTERRUPTION D -- the clip plays to the audience with its own "
-          "effects and score (issue #104; supersedes #95, whose SFX-only mix "
-          "does not exist): the explosion, then the transcendence portrait, "
-          "held to the cut at source 53.470. Cortney Nickerson's moment, "
-          "introduced on the card before it.",
-          audio="source")
-    t.at_bed(PAUSE_AT, "the interruption consumed no bed time")
+    # Issue #104's authored copy is not re-authored anywhere: it is kept in
+    # stories/06-wolves-interruption-cards.json, which is where it was
+    # already recorded, so restoring this never means rewriting it.
 
     # ---- Act III-C: the Pale Heart, around the excised Ghost sequence ------
     pale_out = 361.200
@@ -639,19 +598,12 @@ def main():
             "moment.'); the CNCF logo/mark is not used because the rights to "
             "it have not been cleared. Text only until the owner says "
             "otherwise.",
-            "WREATH, TODO(owner): Cortney Nickerson's plate on interruption "
-            "card C reproduces her authored act-I identity verbatim with no "
-            "wreath; whether the interruption treatment should add one is "
-            "the owner's call (#104).",
             "CLIP RANGE: the clip plays source 43.000 -> 53.470 -- option B "
             "of the owner's own correction on #104 (the issue text's "
             "43.0 -> 51.0 would cut the transcendence portrait they "
             "previously insisted on). Verified on frames in "
             "renders/verify-104/. One-line revert to option A: CLIP_IN = "
             "44.811.",
-            "CORTNEY'S CLASS: still unrecorded -- the plate omits the class "
-            "row exactly as her authored act-I plate does; a hint is not an "
-            "authorisation (#59/#90 remain open).",
         ],
         "shots": t.shots,
     }

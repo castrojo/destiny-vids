@@ -245,16 +245,20 @@ def filtergraph():
     over_b = (f"[v1][tb]overlay=0:0:shortest=1:"
               f"enable=between(t\\,{STAGE_SWAP:.3f}\\,{TITLE_OUT:.3f})"
               f"[v2pre]")
-    v2 = f"[v2pre]format=yuv420p[v2]"
+    book = _still(3, "book",
+                  f",trim=0:{OUT_POINT:.3f},setpts=PTS-STARTPTS")
+    book_overlay = (f"[v2pre][book]overlay=0:0:shortest=1:"
+                    f"enable=between(t\\,26.900\\,33.640)[v2prebook]")
+    v2 = f"[v2prebook]format=yuv420p[v2]"
 
     # The bridge. xfade's output runs d1 + d2 - duration, so the two legs are
     # sized to land the total exactly on BRIDGE rather than trusting a trim
     # after the fact.
     day_len = BRIDGE_UP + BRIDGE_DAY_HOLD + BRIDGE_TURN
     night_len = BRIDGE - day_len + BRIDGE_TURN
-    day = _still(3, "day", f",trim=0:{day_len:.3f},setpts=PTS-STARTPTS,"
+    day = _still(4, "day", f",trim=0:{day_len:.3f},setpts=PTS-STARTPTS,"
                            f"format=yuv420p")
-    night = _still(4, "night", f",trim=0:{night_len:.3f},setpts=PTS-STARTPTS,"
+    night = _still(5, "night", f",trim=0:{night_len:.3f},setpts=PTS-STARTPTS,"
                                f"format=yuv420p")
     turn = (f"[day][night]xfade=transition=fade:duration={BRIDGE_TURN:.3f}:"
             f"offset={BRIDGE_UP + BRIDGE_DAY_HOLD:.3f}[turned]")
@@ -278,7 +282,7 @@ def filtergraph():
              f"afade=t=out:st={AUDIO_FADE_START:.3f}:d={AUDIO_FADE:.3f},"
              f"aresample=48000[aout]")
 
-    return ";".join([film, title_a, over_a, title_b, over_b, v2,
+    return ";".join([film, title_a, over_a, title_b, over_b, book, book_overlay, v2,
                      day, night, turn, bridge, join, audio])
 
 
@@ -288,6 +292,7 @@ def command(day_png, night_png):
         "-i", str(SOURCE),
         "-i", str(PLATES_DIR / "plate_maintitle-a.png"),
         "-i", str(PLATES_DIR / "plate_maintitle-b.png"),
+        "-i", str(PLATES_DIR / "plate_book-a.png"),
         "-i", str(day_png),
         "-i", str(night_png),
         "-filter_complex", filtergraph(),
@@ -319,9 +324,11 @@ def main(argv=None):
     # date, with every delivery gate green. --cards can only force EXTRA work.
     if args.cards or freshness.needs_render(
             [MANIFEST, REPO_ROOT / "cards" / "maintitle.html",
+             REPO_ROOT / "cards" / "bookline.html",
              REPO_ROOT / "cards" / "render-cards.mjs"],
             [PLATES_DIR / "plate_maintitle-a.png",
-             PLATES_DIR / "plate_maintitle-b.png"]):
+             PLATES_DIR / "plate_maintitle-b.png",
+             PLATES_DIR / "plate_book-a.png"]):
         render_cards()
 
     day, night = wallpaper("day"), wallpaper("night")

@@ -45,6 +45,7 @@ repeat it.
 """
 from __future__ import annotations
 
+import itertools
 import json
 import sys
 from pathlib import Path
@@ -179,12 +180,10 @@ def assert_distinct(stems):
     sigs = {s: signature(SRC_DIR / f"{s}.jpg") for s in stems
             if (SRC_DIR / f"{s}.jpg").exists()}
     worst = []
-    keys = sorted(sigs)
-    for i, a in enumerate(keys):
-        for b in keys[i + 1:]:
-            r = float(np.dot(sigs[a], sigs[b]) / len(sigs[a]))
-            if r > DUPLICATE_CORRELATION:
-                worst.append((r, a, b))
+    for a, b in itertools.combinations(sorted(sigs), 2):
+        r = float(np.dot(sigs[a], sigs[b]) / len(sigs[a]))
+        if r > DUPLICATE_CORRELATION:
+            worst.append((r, a, b))
     if worst:
         worst.sort(reverse=True)
         raise SystemExit(
@@ -192,7 +191,8 @@ def assert_distinct(stems):
                 f"  {a} vs {b}: correlation {r:.2f} "
                 f"(limit {DUPLICATE_CORRELATION})" for r, a, b in worst))
     return max((float(np.dot(sigs[a], sigs[b]) / len(sigs[a]))
-                for i, a in enumerate(keys) for b in keys[i + 1:]), default=0.0)
+                for a, b in itertools.combinations(sorted(sigs), 2)),
+               default=0.0)
 
 
 def fetch():

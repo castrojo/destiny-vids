@@ -1,3 +1,26 @@
+---
+name: testing
+version: "1.0"
+last_updated: "2026-08-20"
+id: testing
+one_line_purpose: Keep the offline suite the whole gate, and diagnose checks red only in CI.
+entry_point: docs/skills/testing.md
+category: meta
+status: active
+dependencies: []
+tags:
+  - testing
+  - ci
+  - pytest
+  - runner
+description: >-
+  The suite is the gate. Use when a test passes locally and fails in CI, when
+  adding a check, or when anything resolves a binary, font, or path outside
+  the repo.
+metadata:
+  type: procedure
+---
+
 # Testing and CI
 
 The suite is the gate. Everything about keeping it honest, and about the one

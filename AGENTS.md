@@ -14,8 +14,24 @@ they are and what order they play in.
 1. This file — repo rules, commands, and boundaries.
 2. [`docs/running-order.md`](docs/running-order.md) — what the show is.
 3. [`docs/SKILL.md`](docs/SKILL.md) — find the skill for your task and load it.
-4. The design docs that skill links to (`docs/taxonomy.md`,
-   `docs/pipeline.md`, `docs/agent-retrieval.md`, `docs/rendering.md`).
+4. The routed local skill, its references, and the design docs it links to
+   (`docs/rendering.md`).
+5. [`projectbluefin/common/docs/factory/agentic-model.md`](https://github.com/projectbluefin/common/blob/main/docs/factory/agentic-model.md)
+   — a shared compatibility sidecar only; it never overrides local authority.
+
+## Local authority and common compatibility
+
+This repository's `AGENTS.md`, records, schemas, and routed skills are the
+local authority. `projectbluefin/common` is a shared agent-contract sidecar for
+compatible documentation and self-repair practices; it never overrides local
+editorial, delivery, rights, GitHub, or merge policy.
+
+## Self-repair and durable learning
+
+Every implementation produces two outputs: the work and any durable learning
+it exposed. Verify the repository and loaded skills, detect contradictory or
+stale guidance, repair the nearest authoritative contract when source-backed,
+validate the repair, and update the matching skill in the same logical change.
 
 ## Build, test, and lint
 
@@ -24,10 +40,13 @@ python3 -m pytest -q                              # the whole suite (fast, offli
 python3 tools/corpus.py --check                   # per-character corpora
 python3 tools/rederive.py --check                 # no hand-edited derived field
 python3 scripts/generate_schema_enums.py --check  # schema enums match vocab/
+pre-commit run --all-files                        # documentation and process checks
 ```
 
-Run all four before every commit. The suite is offline: no model, no network,
-no footage. Optional extras matter only for frame-touching stages —
+Run this sequence before every commit. The suite is offline: no model, no
+network, no footage. Regenerate stale catalog outputs with
+`python3 scripts/generate_skill_index.py --write`. Optional extras matter only
+for frame-touching stages —
 `scenedetect` + `opencv-python-headless` (shot detection), `Pillow`
 (nameplates), `imageio-ffmpeg` (fallback ffmpeg).
 
@@ -68,6 +87,14 @@ caveats go after, and go short.
 **A found problem is an issue, not a detour.** Rule 3 below still binds — never
 publish a wrong credit — but "this cut could be better" is never a reason to
 withhold it.
+
+**A full build starts with a positive freshness proof.** Before encoding any
+Prod derivative or megacut, run both `python3 tools/deliver.py status --check`
+and `python3 tools/megacut.py stories/megacut/megacut.json --dry-run`. Any
+`stale`, `blocked`, or `NOTE: act ... is stale and seated` result means the
+programme is stale even if a summary says `0 stale`. Rebuild or omit that act
+before spending time on social copies or programme segments. Never describe a
+megacut as fresh because its output and provenance files merely exist.
 
 **A blocked act is seated, not waited for.** Owner, 2026-08-16, verbatim: *"I'd
 rather have broken plates than no video."* An act whose plates cannot be placed
@@ -132,11 +159,33 @@ reports, exits 0, and only `--check` fails. **It never re-times anything** —
 widening a hold shoves the beat after it, and moving an authored beat is the
 owner's call.
 
-**Three classes of work here can never be automated:** a visual judgement about
-a frame, a claim about a real person, and a licensing decision. An agent that
+**Four classes of work here can never be automated:** a visual judgement about
+a frame, a claim about a real person, a licensing decision, and **moving copy
+the owner already placed**. An agent that
 reaches one, records `automatable: no` with the missing decision in
 `blocked_on`, and stops has **succeeded** — the *decision* stops there. The
 film does not.
+
+**A gate refusing your seat is not permission to move an authored beat.** This
+is the fourth class, and it is written from the exact failure: asked to put
+Kyle's "Sup" on the Titan close-up, the builder refused the seat because the
+pill would overlap his own nameplate — so the agent slid it earlier until the
+assertion passed, which reordered an authored two-line exchange, and recorded
+the reorder in its own commit message as though noting it were the same as
+asking. It is not. **Explaining an editorial change is not authorisation for
+one.**
+
+Placement the owner gave you is *content*, not layout. When a constraint and an
+owner's placement disagree, the constraint yields or the work stops:
+
+| | |
+|---|---|
+| Seat it exactly where the owner said, gate passing | Do it. |
+| The gate refuses, and only the **owner's** beat can move to satisfy it | **Stop.** Report the conflict and the options. This is `automatable: no`. |
+| The gate refuses, and something *unauthored* can move instead | Move that, say which. |
+
+"Fix X" is never authority to re-time Y. A finished section stays finished:
+touching it is a separate request, and it needs a separate yes.
 
 ### Nothing blocks a release
 
@@ -348,9 +397,8 @@ Anything it names is work that exists nowhere else. Push it to a branch —
 
 **GitHub issues are the backlog.** Session state stays in the agent's session
 folder. An issue carries the owner's prose *and* a fenced `brief` block that
-makes it executable — see
-[`docs/skills/issues/SKILL.md`](docs/skills/issues/SKILL.md), with the field
-reference in [`schema/brief.schema.json`](schema/brief.schema.json).
+makes it executable — the field reference is
+[`schema/brief.schema.json`](schema/brief.schema.json).
 
 The one exception is `docs/plans/<name>/`: a planning tree may be committed when
 a design is too large for one issue body. **A plan decides nothing** — it may
@@ -359,6 +407,14 @@ act. CI may assert that a plan is navigable *while it exists*, never that one
 exists, so deleting a tree is always green. **Delete the tree in the same commit
 that files its contents as issues.** A plan that survives its filing is the
 stale planning doc this contract exists to prevent.
+
+## Issue applicability
+
+When assessing applicability, issue references are historical evidence, not
+proof of current work. Before reporting or acting on an issue, check current
+authoritative records and git history to establish that the issue still applies.
+A stale `unresolved` line must not revive a settled casting or editorial
+decision.
 
 ## Documentation
 
@@ -378,10 +434,15 @@ master path, a bed's rights bucket — is *linked*, not restated. The record is
 the truth; a prose copy is a future contradiction.
 
 When a session surfaces a durable pattern, update the matching skill in the same
-change. A skill is plain Markdown with no front matter and no catalog entry;
-the router table in [`docs/SKILL.md`](docs/SKILL.md) is the only registration.
-Prefer one file per skill — a split into `references/` costs an agent an extra
-read, so it has to buy more than tidiness.
+change. Every canonical skill carries the local YAML front matter required by
+the skill metadata contract, validated by
+`scripts/check-skill-frontmatter.sh`. [`docs/SKILL.md`](docs/SKILL.md) is the
+curated task router; the complete catalog is generated as
+[`docs/skills/index.json`](docs/skills/index.json), with a human-readable mirror
+in [`docs/skills/index.md`](docs/skills/index.md). Generate both with
+`python3 scripts/generate_skill_index.py --write`; never hand-edit them. Prefer
+one file per skill — a split into `references/` costs an agent an extra read, so
+it has to buy more than tidiness.
 
 ## Agent fast path
 

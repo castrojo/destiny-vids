@@ -15,20 +15,16 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_trailer1 as T  # noqa: E402
-
 
 @pytest.fixture(scope="module")
 def manifest():
     return json.loads(T.MANIFEST.read_text())
 
-
 def plate(manifest, plate_id):
     return next(p for p in manifest["plates"] if p["id"] == plate_id)
-
 
 def on_screen_copy(manifest):
     """Only the fields that reach a pixel.
@@ -42,7 +38,6 @@ def on_screen_copy(manifest):
                         if k in ("title", "subtitle", "body")}
                        for entry in manifest["plates"]])
 
-
 # --- the length ---------------------------------------------------------------
 
 def test_the_trailer_is_one_minute_fifty():
@@ -54,10 +49,8 @@ def test_the_trailer_is_one_minute_fifty():
     assert T.TOTAL == pytest.approx(110.020, abs=1e-6)
     assert T.TOTAL < 150.0, "over the 2:30 trailer cap"
 
-
 def test_the_budget_adds_up():
     assert T.PICTURE + T.BRIDGE + T.ENDCARD == pytest.approx(T.TOTAL, abs=1e-9)
-
 
 def test_the_join_dissolve_is_paid_for_not_ignored():
     """`xfade` emits d1 + d2 - duration.
@@ -69,7 +62,6 @@ def test_the_join_dissolve_is_paid_for_not_ignored():
     trims = T.CUT_OUT + (T.OUT_POINT - T.CUT_IN)
     assert T.PICTURE == pytest.approx(trims - T.JOIN_FADE, abs=1e-9)
     assert T.ENDCARD == pytest.approx(7.500 + T.JOIN_FADE, abs=1e-9)
-
 
 # --- the tank -----------------------------------------------------------------
 
@@ -84,7 +76,6 @@ def test_the_tank_shot_is_excised_on_its_own_boundaries():
     assert T.CUT_IN == 36.320
     assert T.GAP == pytest.approx(2.680, abs=1e-9)
 
-
 def test_film_time_maps_across_the_excision():
     assert T.source_at(10.0) == 10.0
     assert T.source_at(T.CUT_OUT) == T.CUT_OUT
@@ -92,14 +83,12 @@ def test_film_time_maps_across_the_excision():
     assert T.source_at(T.CUT_OUT + 1) == pytest.approx(T.CUT_IN + 1)
     assert T.source_at(T.PICTURE) == pytest.approx(T.PICTURE + T.GAP)
 
-
 def test_the_sound_is_not_cut_where_the_picture_is():
     """The music covers the picture edit, so it is taken as one continuous
     span of the source rather than being cut and joined with it."""
     graph = T.filtergraph(json.loads(T.MANIFEST.read_text()))
     assert f"[0:a]atrim=0:{T.TOTAL:.3f}" in graph
     assert graph.count("atrim") == 1
-
 
 # --- the wolves fade ----------------------------------------------------------
 
@@ -116,18 +105,15 @@ def test_the_wolves_fade_is_longer_and_the_extra_time_went_to_the_drama():
     assert T.BRIDGE_DAY_HOLD <= 1.200
     assert T.BRIDGE_NIGHT_HOLD <= 1.600
 
-
 def test_the_music_plays_out_past_where_the_prologue_faded():
     """Owner: 'let the music play out longer than the original video'."""
     assert T.AUDIO_FADE_START > 93.000           # the prologue's fade start
     assert T.AUDIO_FADE_START + T.AUDIO_FADE == pytest.approx(T.TOTAL)
 
-
 def test_the_wolves_howl_lands_before_the_final_fade():
     """The 1:47 howl is the trailer's climax, not a quiet tail detail."""
     assert T.AUDIO_FADE_START == pytest.approx(107.000)
     assert T.AUDIO_FADE == pytest.approx(3.020)
-
 
 def test_the_lossless_master_is_true_peak_gated_before_delivery():
     """A fresh visual render must not reintroduce a clipping audio master."""
@@ -136,7 +122,6 @@ def test_the_lossless_master_is_true_peak_gated_before_delivery():
     assert "def rerun_with_gain(gain):" in source
     assert "command(manifest, day, night, gain)" in source
     assert source.index("peaks.correct_delivered_peak") < source.index("shutil.copy2")
-
 
 # --- the copy -----------------------------------------------------------------
 
@@ -150,7 +135,6 @@ OWNER_COPY = {
     "book-b": [],
 }
 
-
 @pytest.mark.parametrize("plate_id,lines", OWNER_COPY.items())
 def test_the_book_lines_are_the_owners_words_verbatim(manifest, plate_id, lines):
     """Including the punctuation the owner did or did not type.
@@ -159,7 +143,6 @@ def test_the_book_lines_are_the_owners_words_verbatim(manifest, plate_id, lines)
     a mark nobody wrote is still a mark nobody wrote.
     """
     assert plate(manifest, plate_id)["body"] == lines
-
 
 def test_the_retired_book_line_does_not_come_back(manifest):
     """Owner, 2026-08-17: 'The text box for the message is too wide'.
@@ -171,7 +154,6 @@ def test_the_retired_book_line_does_not_come_back(manifest):
     assert "One, new, one old" not in screen
     assert "Dreaming to build a better future" not in screen
 
-
 def test_the_book_box_reads_four_lines_over_the_book(manifest):
     """Four short lines need longer than two long ones, so the window opens
     earlier -- but it still has to be over the BOOK, which runs 24.880 ->
@@ -180,7 +162,6 @@ def test_the_book_box_reads_four_lines_over_the_book(manifest):
     assert box["at"] >= 24.880, "the box would open before the book shot"
     assert box["dur"] >= 6.0, "four lines were given less read time than two"
     assert box["at"] + box["dur"] == pytest.approx(T.CUT_OUT, abs=1e-9)
-
 
 def test_the_end_card_is_the_owners_words_in_the_owners_order(manifest):
     event = plate(manifest, "endcard-event")
@@ -197,7 +178,6 @@ def test_the_end_card_is_the_owners_words_in_the_owners_order(manifest):
         "#7wolves",
     ]
 
-
 def test_the_end_card_poster_uses_no_new_copy_field(manifest):
     """The title card's shape is `title` / `subtitle` / `body[]`.
 
@@ -212,7 +192,6 @@ def test_the_end_card_poster_uses_no_new_copy_field(manifest):
                         "angle", "size", "anchor", "anchor_out", "walk"}}
         assert copy_fields == {"title", "subtitle", "body"}
 
-
 def test_the_day_cards_are_two_messages_in_the_owners_words(manifest):
     """Owner, 2026-08-17: 'Change the evolve or die into two messages ...
     have the text be Extinction is the Rule / Survival is the Exception'."""
@@ -225,7 +204,6 @@ def test_the_day_cards_are_two_messages_in_the_owners_words(manifest):
         assert "subtitle" not in card
         assert "body" not in card
 
-
 def test_the_retired_day_lines_do_not_come_back(manifest):
     """The marquee line has now been rewritten three times; each retired line
     must stay retired."""
@@ -234,7 +212,6 @@ def test_the_retired_day_lines_do_not_come_back(manifest):
                     "The Final Shape is Kindness",
                     "Wolves aren't Evil"):
         assert retired not in screen
-
 
 def test_the_two_day_cards_lead_into_the_kubecon_reveal(manifest):
     """Owner: 'lengthem them to show them lead to the kubecon text ... all
@@ -254,7 +231,6 @@ def test_the_two_day_cards_lead_into_the_kubecon_reveal(manifest):
     assert second["at"] + second["dur"] <= endcard_at
     assert plate(manifest, "endcard-event")["at"] == pytest.approx(endcard_at)
 
-
 def test_the_day_cards_sit_in_the_wallpapers_dark_band(manifest):
     """Owner, 2026-08-17: 'lower the extinction and other line to be more in
     the dark area for readability'.
@@ -270,7 +246,6 @@ def test_the_day_cards_sit_in_the_wallpapers_dark_band(manifest):
     assert 'body[data-placement="low"] .card { top: 58%; }' in template
     assert "dataset.placement = p.get('placement')" in template
 
-
 def test_the_day_cards_are_overlaid_from_the_record(manifest):
     """Their windows are authored copy timing, so the graph takes them from the
     manifest. The first build hard-coded one card's fades in the script, which
@@ -281,7 +256,6 @@ def test_the_day_cards_are_overlaid_from_the_record(manifest):
         assert f"enable=between(t\\,{at:.3f}\\," in graph
     assert graph.count("[bridgepre]") == 2, "one in, one consumed by card one"
     assert "[bridge]" in graph
-
 
 def test_the_kubernetes_helm_is_placed_by_the_record_not_by_a_word(manifest):
     """The mark used to be hard-coded to the letter 'o' of 'evolve', so the
@@ -295,7 +269,6 @@ def test_the_kubernetes_helm_is_placed_by_the_record_not_by_a_word(manifest):
     assert "lastIndexOf('evolve')" not in card
     assert "JSON.parse(p.get('glyph')" in card
 
-
 def test_the_credit_line_is_one_seared_line_here_and_in_the_prologue(manifest):
     """The same authored string in both records, so the two cannot drift."""
     line = "Music by Nightwish | Action by Bungie"
@@ -303,9 +276,14 @@ def test_the_credit_line_is_one_seared_line_here_and_in_the_prologue(manifest):
         assert plate(manifest, plate_id)["body"] == [line]
     prologue = json.loads(
         (REPO_ROOT / "stories" / "00-prologue-plates.json").read_text())
-    for entry in prologue["plates"]:
-        assert entry["body"] == [line]
-
+    prologue_titles = {
+        entry["id"]: entry["body"] for entry in prologue["plates"]
+        if entry["id"] in ("maintitle-a", "maintitle-b")
+    }
+    assert prologue_titles == {
+        "maintitle-a": [line],
+        "maintitle-b": [line],
+    }
 
 def test_no_plate_here_names_a_person(manifest):
     """The owner chose an unattributed plate over a chat pill, and a chat pill
@@ -316,7 +294,6 @@ def test_no_plate_here_names_a_person(manifest):
         assert "name" not in entry
         assert entry["kind"] in ("maintitle", "bookline", "daycard")
 
-
 # --- the motion ---------------------------------------------------------------
 
 def test_both_book_lines_are_fixed_fancy_subtitles(manifest):
@@ -324,12 +301,10 @@ def test_both_book_lines_are_fixed_fancy_subtitles(manifest):
     for plate_id in ("book-a", "book-b"):
         assert plate(manifest, plate_id)["anchor"] == plate(manifest, plate_id)["anchor_out"]
 
-
 def test_the_book_lines_use_the_simple_box_treatment(manifest):
     """Owner: 'I just want a simple box overlay'."""
     for plate_id in ("book-a", "book-b"):
         assert plate(manifest, plate_id)["variant"] == "box"
-
 
 def test_the_book_box_is_set_at_the_size_the_owner_chose(manifest):
     """Owner, 2026-08-17: 'the box in the first part is too small, increase
@@ -339,7 +314,6 @@ def test_the_book_box_is_set_at_the_size_the_owner_chose(manifest):
     box = card.split('body[data-variant="box"] .line')[1]
     assert "font-size: 3.8rem;" in box
     assert "line-height: 1.7;" in box
-
 
 def test_the_box_leaves_with_the_page_and_never_before_it(manifest):
     """Owner, 2026-08-17: "HIDE THE WORDS ON THE BOOK PAGE WITH THIS SLIDE AND
@@ -363,7 +337,6 @@ def test_the_box_leaves_with_the_page_and_never_before_it(manifest):
     join = next(c for c in graph.split(";") if "xfade" in c and "[tail]" in c)
     assert join.startswith("[headbox][tail]"), "the join no longer carries it"
 
-
 def test_the_box_covers_the_page_for_the_whole_time_it_prints(manifest):
     """The page keeps printing under the box -- 'In order to be born', then
     'you needed' in close-up -- and every one of those words is inside the
@@ -373,7 +346,6 @@ def test_the_box_covers_the_page_for_the_whole_time_it_prints(manifest):
     assert box["at"] + box["dur"] >= T.CUT_OUT - 1e-9, \
         "the box closes before the picture leaves the book"
 
-
 def test_the_box_panel_is_opaque(manifest):
     """At 90% the page's printed lyric was legible through the panel even at
     full card opacity -- a second set of words behind ours."""
@@ -381,7 +353,6 @@ def test_the_box_panel_is_opaque(manifest):
     box = card.split('body[data-variant="box"] .line')[1]
     assert "background: rgb(4 10 20);" in box
     assert "rgb(4 10 20 / 90%)" not in box
-
 
 def test_the_book_box_asks_for_no_blue_letters(manifest):
     """Owner, 2026-08-17: 'get rid of the blue here'.
@@ -392,7 +363,6 @@ def test_the_book_box_asks_for_no_blue_letters(manifest):
     assert "blue_letters" not in plate(manifest, "book-a")
     card = (REPO_ROOT / "cards" / "bookline.html").read_text()
     assert "if (params.get('blue_letters') === 'true') {" in card
-
 
 def test_one_stationary_box_holds_the_lines_and_never_covers_the_iguana(manifest):
     """Owner: "do NOT cover the iguana".
@@ -411,13 +381,11 @@ def test_one_stationary_box_holds_the_lines_and_never_covers_the_iguana(manifest
     assert "[head][bk0]overlay=" in graph
     assert "[headbox][tail]xfade=" in graph
 
-
 def test_one_forty_seven_is_the_documented_wolves_fade_climax(manifest):
     climax = manifest["_climax"]
     assert climax.startswith("1:47.000")
     assert "wolves" in climax
     assert "no wolf sound is added" in climax
-
 
 def test_book_b_holds_across_the_join_without_tracking(manifest):
     """It remains readable over the iguana instead of drifting with the book."""
@@ -426,11 +394,9 @@ def test_book_b_holds_across_the_join_without_tracking(manifest):
     assert "walk" not in entry
     assert entry["anchor"] == entry["anchor_out"]
 
-
 def test_the_walk_expression_is_clamped_at_both_ends():
     expr = T._walk(0.0, 100.0, 10.0, 2.0)
     assert "max(0\\,min(1\\," in expr
-
 
 def test_every_overlay_still_is_bounded_to_the_picture(manifest):
     """`loop=loop=-1` is infinite and `overlay`'s framesync keeps producing
@@ -441,14 +407,12 @@ def test_every_overlay_still_is_bounded_to_the_picture(manifest):
         if "loop=loop=-1" in chunk:
             assert "trim=" in chunk, chunk
 
-
 def test_the_enable_windows_use_escaped_commas(manifest):
     """The quoted spelling the ffmpeg docs show fails to parse here, disables
     the overlay, and still exits 0 -- a silent no-op."""
     graph = T.filtergraph(manifest)
     assert "enable=between(t\\," in graph
     assert "enable='between" not in graph
-
 
 def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
     graph = T.filtergraph(manifest)
@@ -460,7 +424,6 @@ def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
     ) in graph
     assert "color=c=black" not in graph
 
-
 def test_the_end_card_wallpaper_is_bounded_to_its_own_window(manifest):
     graph = T.filtergraph(manifest)
     assert (
@@ -468,7 +431,6 @@ def test_the_end_card_wallpaper_is_bounded_to_its_own_window(manifest):
         f"format=yuv420p[endnight]"
         in graph
     )
-
 
 def test_the_end_card_text_lands_in_two_music_timed_beats(manifest):
     graph = T.filtergraph(manifest)

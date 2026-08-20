@@ -16,9 +16,7 @@
  "note": "AUTHORED shotlist, not a story.py output. A TIMING PASS: spans destined for removal or artwork are blacked out with marker cards at their exact duration, so nothing is cut yet. Only audio=bed shots advance the bed clock; the interruption (issue #104) is silent/hold/source beats that are all free to the song.",
  "unresolved": [
   "CNCF MARK, TODO(owner): the interruption slide reproduces only the owner-authored LINE ('The CNCF Ambassadors would like a moment.'); the CNCF logo/mark is not used because the rights to it have not been cleared. Text only until the owner says otherwise.",
-  "WREATH, TODO(owner): Cortney Nickerson's plate on interruption card C reproduces her authored act-I identity verbatim with no wreath; whether the interruption treatment should add one is the owner's call (#104).",
-  "CLIP RANGE: the clip plays source 43.000 -> 53.470 -- option B of the owner's own correction on #104 (the issue text's 43.0 -> 51.0 would cut the transcendence portrait they previously insisted on). Verified on frames in renders/verify-104/. One-line revert to option A: CLIP_IN = 44.811.",
-  "CORTNEY'S CLASS: still unrecorded -- the plate omits the class row exactly as her authored act-I plate does; a hint is not an authorisation (#59/#90 remain open)."
+  "CLIP RANGE: the clip plays source 43.000 -> 53.470 -- option B of the owner's own correction on #104 (the issue text's 43.0 -> 51.0 would cut the transcendence portrait they previously insisted on). Verified on frames in renders/verify-104/. One-line revert to option A: CLIP_IN = 44.811."
  ],
  "shots": [
   {
@@ -280,9 +278,9 @@
   },
   {
    "segment_id": "card_026",
-   "still": "renders/interruption/c-cortney.png",
+   "still": "renders/interruption/c-amber.png",
    "duration": 4.0,
-   "beat": "III. INTERRUPTION C -- Introducing Cortney Nickerson, her authored #90 identity verbatim with the class row omitted, as in act I (hold music continues)",
+   "beat": "III. INTERRUPTION C -- Introducing Amber Graner with her authored Guardian identity (hold music continues)",
    "audio": "hold",
    "audio_from": {
     "video_id": "bed_local_forecast_slower",
@@ -297,7 +295,7 @@
    "duration": 10.47,
    "start_tc": "0:43.0",
    "end_tc": "0:53.5",
-   "beat": "III. INTERRUPTION D -- the clip plays to the audience with its own effects and score (issue #104; supersedes #95, whose SFX-only mix does not exist): the explosion, then the transcendence portrait, held to the cut at source 53.470. Cortney Nickerson's moment, introduced on the card before it.",
+   "beat": "III. INTERRUPTION D -- the clip plays to the audience with its own effects and score (issue #104; supersedes #95, whose SFX-only mix does not exist): the explosion, then the transcendence portrait, held to the cut at source 53.470. Amber Graner's moment, introduced on the card before it.",
    "audio": "source"
   },
   {

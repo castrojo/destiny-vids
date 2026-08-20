@@ -178,9 +178,10 @@ def test_the_real_boundaries_tile_the_plan(report):
     for r, run in zip(rows, plan["runs"]):
         elapsed += run["sec"]
         assert r["film_sec"] == pytest.approx(plan["bed_lead_sec"] + elapsed)
-    # and the last boundary plus the last run lands exactly on the picture end
+    # These boundaries describe the five source runs, not the later authored
+    # hallway/Amber interruption inserted into the delivered picture.
     assert rows[-1]["film_sec"] + plan["runs"][-1]["sec"] == \
-        pytest.approx(plan["bed_lead_sec"] + plan["picture_sec"])
+        pytest.approx(plan["bed_lead_sec"] + plan["source_picture_sec"])
 
 
 @needs_files

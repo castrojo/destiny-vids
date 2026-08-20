@@ -69,4 +69,3 @@ Recorded, not resolved. Each one is somebody's call, not an agent's:
   Andy (see #26); Bob, Laura and Kat are bound and their copy is reproduced
   above. Adding a binding is a casting decision ([`casting.md`](../../casting/SKILL.md));
   copying authored copy onto an existing binding is reproduction and is allowed.
-

@@ -45,7 +45,7 @@ WHAT IS DELIBERATELY NOT HERE
 -----------------------------
 - **No invented copy.** Every word comes from ``vocab/casting.yaml`` verbatim.
   A person the owner named but authored no plate for (``ensemble.placeholders``)
-  renders as a *named placeholder*, never as a credit with a title nobody wrote.
+  is omitted and recorded, never credited with a title nobody wrote.
 - **No plate on the burned-in title.** Source 356.500 -> 358.200 carries
   Bungie's "NEW LEGENDS WILL RISE" across the middle of frame. Nothing is
   placed there.
@@ -56,6 +56,7 @@ WHAT IS DELIBERATELY NOT HERE
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import sys
 from pathlib import Path
@@ -65,21 +66,10 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_efmb  # noqa: E402
-from tools.plate import CHOICE_POINTER_CUT  # noqa: E402
+from tools.plate import CHOICE_POINTER_CUT, CHROME_ROWS  # noqa: E402
+from tools import placeholder  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "02-endless-forms-plates.json"
-# THE ROSTER IS AN INPUT, SO IT IS COMMITTED.
-#
-# tools/ensemble.py FETCHES a month's contributors from GitHub into
-# gitignored renders/. That is fine for a scratch artifact and wrong for this:
-# the roster decides WHICH REAL PEOPLE this act credits, so it is an authored
-# input to the cut, and a manifest generated from a file nobody else has cannot
-# be checked, reproduced, or reviewed. CI proved the point by failing on a
-# missing renders/roster-2026-08.json.
-#
-# Committed under stories/, the same way the summit photo list and the megacut
-# manifests are, and for the same reason.
-ROSTER = REPO_ROOT / "stories" / "roster-2026-08.json"
 
 # WHERE AVATARS LIVE, AND WHY THE MANIFEST NEVER CARRIES A URL.
 #
@@ -130,11 +120,36 @@ TRIO_SCALE = 0.62
 # pair, then the row -- and for the row to stay up long enough to read, which
 # is what TRIO_HOLD after the LAST arrival buys.
 MEGACUT_OFFSET = 121.567
+# The owner's 2026-08-17 Endless pass was marked against the then-current
+# programme, where Act II starts at 4:26.500. This is a different clock from
+# the earlier ALPHA notes above; mixing the two is what pushed 5:59 copy into
+# the 8:41 window.
+OWNER_PASS_OFFSET = 266.5
 TRIO = [
     ("joseph_sandoval", "left", 177.0),
     ("rochaporto", "center", 179.0),
     ("mara_sov", "right", 183.0),
 ]
+
+# --- THE OPENING BLACK-HEAD CARD ------------------------------------------
+#
+# The first 10.65 s of Act II are DERIVED black head: there is no picture yet,
+# only the bed coming in under black until the first kept frame of the moon
+# battle. The owner has now authored that silent-visual seat instead of
+# skipping it in the megacut. The card uses the existing title-card treatment:
+# title, subtitle, then one authored line per body row.
+OPENING_HEAD_CARD = {
+    "id": "opening_black_head",
+    "kind": "title",
+    "position": "center",
+    "title": "Eons later",
+    "subtitle": "Open Source has led us to the stars",
+    "body": [
+        "Maintainer-Guardians hold the line for humanity",
+        "Fighting against the Toilmaster and his Legion of Clankers",
+        "It all started with Kubernetes.",
+    ],
+}
 
 # ONE L. The README says "Karena Angel" and the owner said it again this round
 # ("add karena (Angel, one L)"). vocab/casting.yaml spells it "Angell", and it
@@ -144,66 +159,32 @@ TRIO = [
 # something to leave wrong while waiting for a freeze to lift.
 NAME_CORRECTIONS = {"mara_sov": ("Karena Angell", "Karena Angel")}
 
-# --- THE OG GUARDIANS (owner brief, this round) ----------------------------
+# --- THE OPENING NAMEPLATES -------------------------------------------------
 #
-#   "02:15 name plate github/dims - 'Comes in Peace'
-#    02:20 name plate Catherine Paganini
+#   "02:15 name plate Sarah Novotny
+#    02:20 name plate Brent Burns
 #    02:28 name plate github/thockin - 'Does NOT Come in Peace'
 #    02:38 name plate github/jbeda - 'Out of Retirement'
-#    These are OG Guardians make them a proud bronze"
+#    The last two are OG Guardians; make them a proud bronze"
 #
-# All four times are megacut, like the trio's. Every authored string is the
-# owner's, verbatim -- including the capitalised NOT, which is the joke and is
-# reproduced rather than normalised.
-#
-# THE NAMES ARE THE GITHUB PROFILES' OWN. Owner, 2026-08-15: *"guardian plaques
-# need to be filled in"*, and when asked how: *"jesus christ look up their
-# github name."* Three of these cards were printing a LOGIN where a name
-# belongs, because an earlier pass took the owner's `github/<name>` shorthand
-# as the copy. Each `name` below is now that account's own `name` field, read
-# with `gh api users/<login> --jq .name` on 2026-08-15:
-#
-#     dims    -> Davanum Srinivas      thockin -> Tim Hockin
-#     jbeda   -> Joe Beda              CathPag -> Catherine Paganini
-#
-# A published profile is a FACT ABOUT A REAL PERSON, stated by that person,
-# which is why this fill is allowed where writing a title would not be. Cathy's
-# lookup CONFIRMS the string her card already carried rather than correcting
-# it, and it gets her the pfp the other three had.
-#
-# THE ROW SHE DOES NOT HAVE IS STILL THE POINT. Catherine Paganini was given a
-# name and no line, so her card carries no title: that is the "missing, so omit
-# and record" case, and writing one for her would be inventing copy about a
-# real person. Recorded in the manifest's `unresolved`.
+# Sarah and Brent replace the retired Davanum/Catherine cards in the first two
+# slots. Their verified records carry only names and PFPs, so the standard
+# nameplate chrome omits unauthored class/title rows rather than inventing them.
+OPENING_NAMEPLATES = [
+    {"key": "sarahnovotny", "at_megacut": 135.0},
+    {"key": "bdburns", "at_megacut": 140.0},
+]
+
 OG_LABEL = "OG GUARDIAN"
 OG_GUARDIANS = [
-    {"id": "og_dims", "at_megacut": 135.0, "name": "Davanum Srinivas",
-     "title": "Comes in Peace", "login": "dims"},
-    {"id": "og_paganini", "at_megacut": 140.0, "name": "Catherine Paganini",
-     "login": "CathPag"},
     {"id": "og_thockin", "at_megacut": 148.0, "name": "Tim Hockin",
-     "title": "Does NOT Come in Peace", "login": "thockin"},
+     "title": "Does NOT Come in Peace", "login": "thockin",
+     "seen_at_src": 32.800,
+     "why": "the hooded Hunter raising the revolver into frame"},
     {"id": "og_jbeda", "at_megacut": 158.0, "name": "Joe Beda",
      "title": "Out of Retirement", "login": "jbeda"},
 ]
 OG_HOLD = 4.0
-
-# --- THE TEAM BADGE --------------------------------------------------------
-#
-#   "Make a Team Badge: CNCF Community Leadership / Looking for Open Source's
-#    Brightest Future"
-#
-# It lands after the trio's row clears, so it reads as the caption on the three
-# people who just arrived rather than as a fourth name competing with them.
-# `name` and `title` are the owner's two lines; there is no third row.
-TEAM_BADGE = {
-    "id": "team_cncf_leadership",
-    "label": "TEAM",
-    "name": "CNCF Community Leadership",
-    "title": "Looking for Open Source's Brightest Future",
-}
-TEAM_BADGE_HOLD = 3.5
-TEAM_BADGE_LEAD = 0.25
 
 # --- THE KERNEL TRUSTEES (owner note, dictated 2026-08-13 01:09; #119) -----
 #
@@ -273,6 +254,614 @@ NEW_CHATS = [
     {"id": "chat_joseph_gotthis", "key": "joseph_sandoval", "speaker": "Joseph",
      "text": "You got this", "at_megacut": None, "hold": 2.2},
 ]
+
+# --- THE LATER OWNER PASS (megacut 5:13 -> 6:56) --------------------------
+#
+# Owner note, 2026-08-17: Act II's later programme-time pass is timed off the
+# MEGACUT again, so the same 121.567 s offset applies:
+#
+#   "TITLE OVERLAY SIMILAR TO THE OUTRO / 5:13 PRESENT DAY"
+#   "5:59 [mfahlandt] K1 Logistics is clean / [kfaseela] ... /
+#    [markmandel] Agones Cluster - ONLINE"
+#   "[[github.com/riaankleinhans]] You're getting close"
+#   "[github.com/brandtkeller]"
+#   "There are two shots with people's faces, add this:
+#      6:06 [jrsapi] They learn quickly
+#      6:07 [rochaporto] We need to move!
+#      6:11 [jrsapi] Projects Teams Metrics are strong
+#            They just need mentoring in the right skills
+#      6:14 [karena] Like cardio!"
+#   "6:23 Mars"
+#   "6:29 red miniboss flashing / Your Bad Decisions"
+#   "6:30 [karena] Hit 'em with your lessons learned
+#    6:32 [rochaporto] One CERN Special coming up!
+#    6:41 [jrsapi] Shit are you taking notes?
+#    6:45 Move the banner to the top
+#    6:56 Do we even know who they are?
+#    #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST"
+#
+# TWO TIMING CONSTRAINTS MATTER:
+# 1. The 5:59 block is a conversation, not a title card. It begins immediately
+#    after the choice animation and flows as four standard GitHub-PFP pills;
+#    the 6:06 cue still keeps its owner-timed seat.
+# 2. The 6:29 "red miniboss flashing" cue is a visual treatment, not a title,
+#    chat or banner. This batch is limited to the existing three kinds, so that
+#    one stays recorded rather than faked.
+PRESENT_DAY = {"at_megacut": 313.0, "hold": 2.6, "title": "PRESENT DAY"}
+LATE_PASS = [
+    {
+        "id": "late_mfahlandt_clean",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 88.883,
+        "hold": 2.2,
+        "login": "mfahlandt",
+        "speaker": "mfahlandt",
+        "text": "K1 Logistics is clean",
+    },
+    {
+        "id": "late_kfaseela_gamers",
+        "kind": "chat",
+        "position": "left",
+        "hold": 2.2,
+        "login": "kfaseela",
+        "speaker": "kfaseela",
+        "text": "The gamers were here alright",
+    },
+    {
+        "id": "late_markmandel_online",
+        "kind": "chat",
+        "position": "left",
+        "hold": 2.2,
+        "login": "markmandel",
+        "speaker": "markmandel",
+        "text": "Agones Cluster - ONLINE",
+    },
+    {
+        "id": "late_riaankleinhans_close",
+        "kind": "chat",
+        "position": "left",
+        "hold": 2.2,
+        "login": "riaankleinhans",
+        "speaker": "riaankleinhans",
+        "text": "You're getting close",
+    },
+    {
+        "id": "late_jrsapi_learn",
+        "kind": "chat",
+        "position": "left",
+        "login": "jrsapi",
+        "speaker": "jrsapi",
+        "text": "They learn quickly",
+        "at_megacut": 366.0,
+        "hold": 2.2,
+    },
+    {
+        "id": "late_rochaporto_move",
+        "kind": "chat",
+        "position": "left",
+        "login": "rochaporto",
+        "speaker": "rochaporto",
+        "text": "We need to move!",
+        "at_megacut": 367.0,
+        "hold": 2.2,
+    },
+    {
+        "id": "late_metrics_cluster",
+        "kind": "chat",
+        "position": "left",
+        "at_megacut": 371.0,
+        "hold": 2.75,
+        "login": "jrsapi",
+        "speaker": "jrsapi",
+        "text": (
+            "Projects Teams Metrics are strong "
+            "They just need mentoring in the right skills"),
+    },
+    {
+        "id": "late_karena_cardio",
+        "kind": "chat",
+        "position": "left",
+        "speaker": "karena",
+        "text": "Like cardio!",
+        "at_megacut": 374.0,
+        "hold": 2.2,
+    },
+    {
+        "id": "late_mars_title",
+        "kind": "title",
+        "position": "boss",
+        "at_megacut": 383.0,
+        "hold": 2.2,
+        "title": "Mars",
+    },
+    {
+        "id": "late_clankers_context",
+        "kind": "context",
+        "position": "context",
+        "at_film": 45.2,
+        "hold": 6.0,
+        "title": "Clankers and Contributors",
+        "subtitle": "2026",
+        "body": [
+            "The Community fights its way",
+            "Through the Chaos",
+            "To Find the Kube of Destiny",
+        ],
+    },
+    {
+        "id": "late_poor_technical_decisions",
+        # Same ruling as mapped_haters: the kernel boss bar is the one red
+        # treatment in this act. Name row only, title omitted not invented.
+        "kind": "miniboss",
+        "position": "boss",
+        "at_film": 122.75,
+        "hold": 2.2,
+        "name": "POOR TECHNICAL DECISIONS",
+        "title": placeholder.lorem(28, seed="late_poor_technical_decisions"),
+        "title_placeholder": True,
+    },
+    {
+        "id": "late_karena_lessons",
+        "kind": "chat",
+        "position": "left",
+        "speaker": "karena",
+        "text": "Hit 'em with your lessons learned",
+        "at_megacut": 390.0,
+        "hold": 2.2,
+    },
+    {
+        "id": "late_rochaporto_cern",
+        "kind": "chat",
+        "position": "left",
+        "login": "rochaporto",
+        "speaker": "rochaporto",
+        "text": "One reference architecture coming up!",
+        "at_megacut": 392.0,
+        "hold": 2.6,
+    },
+    {
+        "id": "late_jrsapi_notes",
+        "kind": "chat",
+        "position": "left",
+        "login": "jrsapi",
+        "speaker": "jrsapi",
+        "text": "Shit are you taking notes?",
+        "at_megacut": 401.0,
+        "hold": 2.6,
+    },
+    {
+        "id": "late_final_question",
+        "kind": "title",
+        "position": "center",
+        "scale": 0.9,
+        "at_megacut": 416.0,
+        "at_film": 150.0,
+        "hold": 2.6,
+        "title": "Do we even know who they are?",
+    },
+]
+TOP_BANNER = {
+    "id": "top_banner_ogc",
+    "kind": "banner",
+    "position": "boss",
+    "at_megacut": 405.0,
+    "text": "#UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST",
+}
+LATE_PASS_REPLACEMENTS = {
+    "chat_joseph_master",
+    "chat_joseph_gotthis",
+    "montage_chat_1",
+    "montage_chat_2",
+    "walk_ge_upstream",
+    "trustee_gregkh",
+    "trustee_shuah_khan",
+    "solo_tulilirockz",
+    "timed_krook",
+    "timed_bedazzle",
+    "solo_kolunmi",
+    "quote_cgwalters",
+    "quote_siosm",
+    "quote_jberkus",
+    "quote_preethi",
+    "quote_castrojo",
+}
+
+# --- THE MAPPED 8:28 -> 9:31 OWNER PASS -----------------------------------
+#
+# The next mapped megacut block starts at act-II film 4:01.5. The complete
+# owner-authored copy was recovered from the original session record after the
+# first implementation incorrectly claimed it was unavailable. The picture
+# freeze, Amber insert, and music treatment are mirrored by build_efmb.py;
+# missing picture never licenses dropping the words.
+MAPPED_TAIL_REPLACEMENTS = {
+    "solo_EyeCantCU",
+    "solo_KyleGospo",
+    "solo_p5",
+    "cayde_signoff",
+    "timed_jorge",
+}
+MAPPED_TAIL_PASS = [
+    {
+        "id": "mapped_redacted_blow",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 242.4,
+        "hold": 2.6,
+        "speaker": "[redacted]",
+        "text": "Or go blow some shit up",
+    },
+    {
+        "id": "mapped_amber_reveal",
+        "kind": "guardian",
+        "position": "left",
+        "at_film": build_efmb.AMBER_AT,
+        "hold": 4.0,
+        "key": "akgraner",
+        "seen_at_src": 48.0,
+        "seen_in_video": build_efmb.AMBER_SOURCE_ID,
+        "shot_src": [build_efmb.AMBER_CLIP_IN, build_efmb.AMBER_CLIP_OUT],
+        "why": "the owner identified this gameplay clip as Amber's sequence",
+    },
+    {
+        "id": "mapped_kyle_reveal",
+        "kind": "guardian",
+        "position": "left",
+        "at_film": build_efmb.KYLE_REVEAL_AT,
+        "hold": build_efmb.KYLE_REVEAL_SEC,
+        "key": "KyleGospo",
+        "seen_at_src": build_efmb.SYNC_ANCHOR_SRC,
+        "shot_src": [335.267, 339.767],
+        "why": "the Sentinel raising the Void shield in the authored reveal",
+    },
+    {
+        "id": "mapped_haters",
+        # Owner, 2026-08-19: the red overlays "should match the style of the
+        # original kernel one" -- KERNEL REGRESSION's boss bar, not a second
+        # full-frame style invented beside it. `name` only: the bar's second
+        # row is authored copy nobody has written, and _render_miniboss omits
+        # a missing title rather than inventing one.
+        "kind": "miniboss",
+        "position": "boss",
+        "at_film": 316.2,
+        # OWNER: "Haters goes at 10:00 on the red face with the bright
+        # red dot." Programme 10:00 is act II film 316.2 (the act is
+        # seated at programme 283.80), and that lands inside the red-lit
+        # face shot, measured 315.267 -> 316.967 by scene detection.
+        # It was on the 308.2 hallway, which is not that shot.
+        # The boss bar is a CHROME_ROW at the top of frame, so it shares
+        # the screen with Kyle's lower-third pill by design.
+        "hold": 2.2,
+        "seen_at_src": build_efmb.HALLWAY_FRAME_SRC,
+        "name": "HATERS",
+        "title": placeholder.lorem(28, seed="mapped_haters"),
+        "title_placeholder": True,
+    },
+    {
+        "id": "mapped_kyle_sup",
+        "kind": "chat",
+        "position": "left",
+        # OWNER-PLACED, DO NOT MOVE. 310.4 is where the owner had it.
+        #
+        # He asked for it on the Titan close-up ("sup is a purple titan ...
+        # put it when it's zoomed into his face") -- that frame is film 317.0.
+        # It CANNOT be seated there: KYLE_REVEAL_AT is 318.737, so a 2.2s hold
+        # from 317.0 overlaps his own nameplate and the builder refuses it.
+        #
+        # An agent then slid it to 316.287 to make the assertion pass, which
+        # put it AFTER kolunmi's "Disco!" (313.2) and reordered the authored
+        # exchange. That is the fourth class in AGENTS.md: a gate refusing a
+        # seat is not permission to move an authored beat. Reverted.
+        #
+        # The conflict is the owner's to settle -- move the reveal, shorten the
+        # hold, or keep 310.4. Until he does, his number stands.
+        "at_film": 316.967,
+        # OWNER, verbatim: "sup is a purple titan", "put it when it's
+        # zoomed into his face". 316.967 is the first frame of that
+        # close-up, measured by scene detection (the shot runs
+        # 316.967 -> 317.733). The pill OPENS on his face, which is what
+        # he asked for. Nothing else moves.
+        "hold": 2.2,
+        "speaker": "kylegospo",
+        "text": "Sup",
+        "avatar_login": "KyleGospo",
+        # BONDED to his own nameplate. The owner pinned this pill to
+        # the Titan close-up and LOCKED the reveal, so the two share
+        # the screen by instruction. bond_of is the repo's named
+        # exemption for exactly that -- named, so it can never
+        # quietly overlap somebody else's plate.
+        "bond_of": "mapped_kyle_reveal",
+    },
+    {
+        "id": "mapped_kolunmi_disco",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 313.2,
+        "hold": 2.2,
+        "speaker": "kolunmi",
+        "text": "Disco!",
+        "avatar_login": "kolunmi",
+    },
+    {
+        "id": "mapped_eyecantcu_reveal",
+        "kind": "guardian",
+        "position": "left",
+        "at_film": build_efmb.EYECANTCU_AT,
+        "hold": 3.2,
+        "key": "EyeCantCU",
+        "seen_at_src": build_efmb.EYECANTCU_SRC,
+        "shot_src": [353.533, 355.167],
+        "why": "the evidenced Warlock frame held in the authored 9:31 seat",
+    },
+]
+
+BLACK_CONVERSATION = [
+    ("mapped_akgraner_kyle", "akgraner", "Hi sugar, I'm looking for Kyle", 2.2,
+     "akgraner"),
+    ("mapped_hikari_ouch", "HikariKnight", "Ouch man wtf!", 2.2,
+     "HikariKnight"),
+    ("mapped_owen_sorry", "Owen", "Oh sorry my bad", 2.2, None),
+    ("mapped_kolunmi_pvp", "kolunmi", "Who turned PvP on?", 2.2, "kolunmi"),
+    ("mapped_karena_pve", "karena",
+     "Don't look at me I only put PvE on Legendary", 3.0, "karena"),
+    ("mapped_cam_noone", "cam", "Mom no one plays this game", 2.2, None),
+    ("mapped_hikari_wait", "HikariKnight", "Hey wait?!", 2.2,
+     "HikariKnight"),
+    ("mapped_kolunmi_users", "kolunmi",
+     "Are those ... other linux users?", 2.6, "kolunmi"),
+]
+
+AFTER_AMBER_CONVERSATION = [
+    ("mapped_owen_slay", "Owen", "Slay out, Queen!", 2.2, None, 1.0),
+    ("mapped_akgraner_kindness_1", "akgraner",
+     "Kindness is doing what's right", 2.2, "akgraner", 1.18),
+    ("mapped_akgraner_kindness_2", "akgraner",
+     "For the ecosystem.", 2.2, "akgraner", 1.18),
+    ("mapped_akgraner_kindness_3", "akgraner",
+     "For our users.", 2.2, "akgraner", 1.18),
+    ("mapped_akgraner_kindness_4", "akgraner",
+     "And for our maintainers.", 2.2, "akgraner", 1.18),
+    ("mapped_akgraner_kindness_5", "akgraner",
+     "Don't be nice.", 2.2, "akgraner", 1.18),
+    ("mapped_akgraner_kindness_6", "akgraner",
+     "Be kind.", 2.2, "akgraner", 1.18),
+    ("mapped_which_kyle", "akgraner", "Which one of you is Kyle?", 2.6,
+     "akgraner", 1.0),
+]
+
+# --- THE MAPPED 7:03 -> 8:26 OWNER PASS -----------------------------------
+#
+# The later owner notes past 7:03 are NOT Act II standalone time. They were
+# mapped against the actual megacut plan and land here on Act II's FILM clock:
+#
+#   7:03 -> 2:36.5   7:42 -> 3:15.5   8:08 -> 3:41.5
+#   7:06 -> 2:39.5   7:52 -> 3:25.5   8:11 -> 3:44.5
+#   7:09 -> 2:42.5   7:59 -> 3:32.5   8:18 -> 3:51.5
+#   7:12 -> 2:45.5   8:03 -> 3:36.5   8:26 -> 3:59.5
+#   7:16 -> 2:49.5
+#
+# Every record below is the owner's own words. Anything that was only an
+# effect note ("rare drop", "flashing") is rendered with the nearest existing
+# chrome and recorded in `unresolved` rather than invented as a new treatment.
+MAPPED_PASS_REPLACEMENTS = {
+    "walk_ge_1",
+    "walk_ge_2",
+    "walk_ge_3",
+    "walk_A1RM4X",
+    "walk_ge_stream",
+    "walk_a1rm4x",
+    "walk_ge_soundcard",
+    "walk_ge_glorious",
+    "walk_ge_lesson",
+    "toc_joseph_faith",
+    "toc_ricardo_desktop",
+    "toc_joseph_lol",
+}
+MAPPED_PASS = [
+    {
+        "id": "mapped_saturn_title",
+        "kind": "title",
+        "position": "boss",
+        "at_film": 156.666,
+        "hold": 2.2,
+        "title": "SATURN",
+        "subtitle": "Nobara Contributor LionHeartP and A1RMAX",
+    },
+    {
+        "id": "mapped_kernel_bump",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 159.5,
+        "hold": 2.2,
+        "speaker": "[redacted]",
+        "text": "Time to bump the kernel",
+    },
+    {
+        "id": "walk_lionheartp",
+        "kind": "plate",
+        "position": "right",
+        "at_film": 162.5,
+        "hold": 2.75,
+        "avatar_login": "LionHeartP",
+        "variant": "nobara",
+        "label": "NOBARA CONTRIBUTOR",
+        "class": "Sunbreaker Titan",
+        "name": "LionHeartP",
+        "title": "Nessus of Nobara",
+        "why": "the centered Guardian against Saturn, one shot before pastaq's cue",
+    },
+    {
+        "id": "mapped_pastaq_tests",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 165.5,
+        "hold": 2.2,
+        "avatar_login": "pastaq",
+        "speaker": "pastaq",
+        "text": "All your tests passed right?",
+    },
+    {
+        "id": "mapped_lionheartp_what_tests",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 169.5,
+        "hold": 2.2,
+        "avatar_login": "LionHeartP",
+        "speaker": "LionHeartP",
+        "text": "What tests?",
+    },
+    {
+        "id": "walk_A1RM4X",
+        "kind": "ghost",
+        "position": "left",
+        "at_src": 195.267,
+        "hold": 3.0,
+        "avatar_login": "A1RM4X",
+        "variant": "youtube",
+        "label": "NEW CONTRIBUTOR",
+        "name": "A1RM4X",
+        "title": "Useful Youtuber (UNCOMMON)",
+        "why": "the freed-up ghost seat before GloriousEggroll speaks to him",
+    },
+    {
+        "id": "mapped_a1rmax_intro",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 175.5,
+        "hold": 2.5,
+        "avatar_login": "A1RM4X",
+        "speaker": "A1RM4X",
+        "text": (
+            "Thank you I never thought I could help! "
+            "I'm not like you I'm just a lowly user"),
+    },
+    {
+        "id": "walk_ge_stream",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 178.5,
+        "hold": 2.2,
+        "speaker": "GloriousEggroll",
+        "text": "It's your patch, turn the stream on",
+    },
+    {
+        "id": "walk_a1rm4x",
+        "kind": "chat",
+        "position": "left",
+        "hold": 2.2,
+        "avatar_login": "LionHeartP",
+        "speaker": "LionHeartP",
+        "text": "Let's get these numbers up",
+    },
+    {
+        "id": "mapped_lionheartp_hardware",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 183.5,
+        "hold": 2.7,
+        "avatar_login": "LionHeartP",
+        "speaker": "LionHeartP",
+        "text": "Why spend the extra dollar to support Linux hardware",
+    },
+    {
+        "id": "walk_ge_glorious",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 187.5,
+        "hold": 2.8,
+        "speaker": "GloriousEggroll",
+        "text": "There's nothing glorious about this job",
+    },
+    {
+        "id": "mapped_lionheartp_together",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 195.5,
+        "hold": 3.8,
+        "avatar_login": "LionHeartP",
+        "speaker": "LionHeartP",
+        "text": "When we work together This gets easier",
+    },
+    {
+        "id": "mapped_eggroll_title",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 205.5,
+        "hold": 4.5,
+        "speaker": "GloriousEggroll",
+        "text": (
+            "Nice work testing that patch "
+            "Usually Blueberries just "
+            "Send me a bunch of crap"),
+    },
+    {
+        "id": "mapped_eggroll_didyou",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 212.5,
+        "hold": 2.2,
+        "speaker": "GloriousEggroll",
+        "text": "You didn't test any of this did you.",
+    },
+    {
+        "id": "mapped_pastaq_what_tests",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 216.5,
+        "hold": 2.2,
+        "gap_after": 0.0,
+        "avatar_login": "pastaq",
+        "speaker": "pastaq",
+        "text": "Hey man WHAT tests?",
+    },
+    {
+        "id": "walk_ge_lesson",
+        "kind": "chat",
+        "position": "right",
+        "at_film": 218.766,
+        "hold": 2.2,
+        "avatar_login": "LionHeartP",
+        "speaker": "LionHeartP",
+        "text": "Let's go!",
+    },
+    {
+        "id": "mapped_redacted_unlearning",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 221.5,
+        "hold": 2.75,
+        "speaker": "[redacted]",
+        "text": "Unlearning bad habits takes time",
+    },
+    {
+        "id": "mapped_redacted_options",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 224.5,
+        "hold": 6.75,
+        "speaker": "[redacted]",
+        "text": (
+            "Your options are success "
+            "Or a lifetime of servitude in the Toilmaster's Packaging Mines"),
+    },
+    {
+        "id": "mapped_kyle_titanfall",
+        "kind": "chat",
+        "position": "left",
+        "at_film": 239.95,
+        "hold": 2.2,
+        "avatar_login": "KyleGospo",
+        "speaker": "KyleGospo",
+        "text": "FOR TITANFALL!",
+    },
+]
+OWNER_CONVO = [
+    ("owner_convo_karena", "karena",
+     "The Kube always seeks open source potential"),
+    ("owner_convo_joseph", "joseph",
+     "We can't let The Toilmaster enslave another generation"),
+]
+OWNER_CONVO_AT = 231.5
 
 # --- THE CHOICE SCREEN -----------------------------------------------------
 #
@@ -347,29 +936,6 @@ SOLO = [
     },
 ]
 
-# Dylan Taylor and Ahmed Adan remain recorded in `ensemble.placeholders`, but
-# neither has a scheduled Act II nameplate. The owner removed Dylan's card;
-# Ahmed's had already been removed when The Long Walk displaced it.
-PLACEHOLDERS = []
-
-# The blueberries -- the month's contributors, in the anonymous slots. Copy is
-# resolved by tools/plate.py's own ensemble path, so a contributor whose
-# identity IS authored gets it verbatim and everyone else gets the generic
-# blueberry plate with the eyebrow their org membership earns. Leads are
-# excluded: castrojo is Cayde-6 and is credited only where Cayde is on screen.
-# TWO SHOTS REMOVED, same instruction. 195.267 (HuntedRaven7, film 2:51.4)
-# and 233.500 (hanthor, film 3:29.6) are both inside "The Long Walk". The
-# roster is walked in order against this list, so dropping two shots does not
-# reshuffle who played whom -- it shortens the list, and the two contributors
-# it reached are reported in `unresolved` rather than silently dropped.
-# EMPTY, owner instruction: "03:16 get rid of giklab". Megacut 3:16 is film
-# 74.4, and the one blueberry plate in this act was `blueberry_Giklab` at film
-# 73.400 -- the shot at source 90.767. The SHOT is what came out, so the roster
-# is not reshuffled: nobody else moved into his slot, and Giklab stays on the
-# roster for a later act. The window is now clear for the OG Guardians above.
-BLUEBERRY_SHOTS = []
-BLUEBERRY_EXCLUDE = {"castrojo"}  # a lead; see the comment above
-
 # Cayde signs off. Source 358.200 -> 360.500 is 2.30 s against a 2.2 s minimum
 # hold, so it fits by a tenth of a second -- DO NOT SHORTEN IT. It is the
 # second-to-last shot: he says it, and then three figures walk into the
@@ -420,7 +986,7 @@ MONTAGE_STEP = 5.5
 #
 # The announcer carried three blocks -- the four ranked montage cards, the two
 # TOC payoff cards, and the label on Natewaddington's placard (the placard
-# itself is out too now, see TIMED_KROOK below). All three are
+# itself is out too now). All three are
 # removed rather than re-voiced: the copy was written FOR that character, and
 # putting somebody else's name on his lines would be a different joke nobody
 # asked for. Every string survives in git and in `unresolved`, so bringing him
@@ -438,49 +1004,6 @@ MONTAGE_CHATS = [
     ("castrojo", "Jorge Castro", "Enjoying the metal?"),
     ("castrojo", "Jorge Castro", "Ready to the #FIGHTFORCONTRIBUTORS?"),
 ]
-
-# The heraldic lower thirds. `name` is who is being addressed, `title` is what
-# is said to them -- the closed field set, no row invented.
-MONTAGE_ANNOUNCEMENTS = [
-    {
-        "id": "announce_new",
-        "rank": "bronze",
-        "name": "TO [ NEW CONTRIBUTORS ]",
-        "title": "It's totally like this. We promise.",
-    },
-    {
-        "id": "announce_current",
-        "rank": "silver",
-        "name": "TO [ CURRENT CONTRIBUTORS ]",
-        "title": "Look how good you look, it totally is like this!",
-    },
-    {
-        "id": "announce_emeritus",
-        "rank": "gold",
-        "name": "[ EMERITUS CONTRIBUTORS ]",
-        "title": "It's totally NOT like this. We promise.",
-        # The owner's block for this one carries a SECOND line -- "Look how
-        # good you look!" -- and the card has three rows, all spoken for. It
-        # is recorded in `unresolved` rather than dropped or crammed into the
-        # class row, which is a subclass and would be nonsense here.
-        "orphan_copy": "Look how good you look!",
-    },
-    {
-        "id": "announce_all",
-        "rank": "gold",
-        "name": "[ALL CONTRIBUTORS]",
-        "title": "You are not wrong",
-    },
-]
-
-# `trustee: true` IS the silver treatment (tools/plate.py `_variant_for`), so
-# the middle rank is a flag rather than a `variant` -- same as every silver
-# plate in the show.
-RANK_CHROME = {
-    "bronze": {"variant": "bronze"},
-    "silver": {"trustee": True},
-    "gold": {"variant": "leader"},
-}
 
 # --- "THE LONG WALK" (owner brief, this round) -----------------------------
 #
@@ -709,80 +1232,6 @@ TOC_POST = [
      "text": "LOL", "hold": 2.2},
 ]
 
-# The payoff pair from §3's announcement block. The first REPRISES the
-# montage's emeritus card verbatim -- a callback, so the copy is identical,
-# row for row, rank included. The second is the pivot it sets up; the brief's
-# block gives it no addressee row, so the card carries none.
-TOC_ANNOUNCEMENTS = [
-    {"id": "toc_announce_emeritus", "rank": "gold",
-     "name": "[ EMERITUS CONTRIBUTORS ]",
-     "title": "It's totally NOT like this. We promise."},
-    {"id": "toc_announce_ambassadors", "rank": None,
-     "name": None,
-     "title": "Have you met our Ambassadors?"},
-]
-
-# §4's owner-marked cues, pinned to his second. Like every window in this file
-# the anchor is carried in SOURCE time (`src_of` below), so a cut that moves
-# raises rather than slides.
-#
-# NOT HERE: the 4:01 cue -- "[pfp] Jorge Castro: They are not ready for Shua
-# Khan and Greg KH", drawn as a speech bubble ON Cayde. Cayde's [ REDACTED ]
-# card is at 287.933 (4:47.9), so a bubble anchored on him cannot also be at
-# 4:01. Which moves is the owner's call (#98, Questions) -- recorded in
-# `unresolved`, scheduled nowhere.
-TIMED_KROOK = 250.0          # 4:10
-# NATEWADDINGTON IS OUT, owner: "get rid of the nate wassington in the endless
-# climax in endless". His placard sat at film 260.000 (4:20) for SOLO_HOLD,
-# inside the run into the act's climax -- the song breaks down at 258.0 and the
-# band re-enters on the 269.700 downbeat, so his card was the last thing on
-# screen before the biggest musical event in the act.
-#
-# Only the SCHEDULING goes, exactly as it did for HikariKnight: the placard's
-# two rows were the owner's copy and they stay in git, the drop is recorded in
-# `unresolved`, and nothing slides up into the hole -- krook and the bedazzle
-# pill keep their own anchors and Jorge stays pinned to 291.0.
-TIMED_JORGE = 291.0          # 4:51 -- inside the cathedral shot, which ends
-                             # 291.933; the pill rides the black tail
-TIMED_JORGE_HOLD = 2.8
-
-# The untimed §4 cue, in the order the brief lists it: after krook.
-BEDAZZLE = {"speaker": "cncf marketing", "text": "Let's bedazzle this thing!"}
-
-# The letterbox callout. "Keep it up for the whole song": it comes up where
-# the brief's own scene starts (2:19, the montage's hand-off) and holds to
-# the last frame. It never shares the lower third's row -- it lives on the
-# bottom letterbox bar, below the picture.
-#
-# ONE DUCK, AND IT IS MEASURED, NOT AESTHETIC. The walk's patch-queue HUD is
-# bottom-right and its card dips 90px onto the bar (y 922-1030 in the shipped
-# geometry); no position on the bar clears it while it holds. So the callout
-# ducks exactly the HUD's window -- 28.4 s in a 169 s hold -- rather than
-# shrink to ticker height for the whole song to fix half a minute. The
-# alternative is the owner's to call (#98, Questions); recorded in
-# `unresolved`.
-LETTERBOX_BANNER = (
-    "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST")
-
-# The closing montage: five quotes the brief leaves untimed. Its own proposal
-# is 4:51 -> 5:07, and the preamble lands the last cue on the final second --
-# so they are spread evenly from the gaslighting pill's out to the film's last
-# frame, over the black outro the owner is keeping "for future flexibility".
-#
-# siosm's line carries authored emphasis (`**powering up**` in the brief). The
-# asterisks are emphasis markup, not words -- burning them would put
-# punctuation on screen nobody meant to say -- so they are stripped here and
-# recorded in `unresolved`: the pill's message row is set in bold throughout
-# (the site's own style), so the emphasis survives but is not differentiated.
-CLOSING_QUOTES = [
-    ("cgwalters", "Use open source responsibly!"),
-    ("siosm", "I can feel Fedora powering up!"),
-    ("jberkus", "I knew they could do it!"),
-    ("preethi", "Great, more paperwork"),
-    ("castrojo", "Just another day on the CNCF Projects team"),
-]
-QUOTE_HOLD = 2.2
-
 LEAD_IN = 0.4      # let the cut land before the plate arrives
 MIN_HOLD = 2.2     # below this a plate cannot be read
 
@@ -928,57 +1377,6 @@ def authored_copy(key, casting):
         "rather than something to work around")
 
 
-def placeholder_copy(key, casting):
-    """A named placeholder badge: the owner's name, and nothing invented.
-
-    ``ensemble.placeholders`` is a queue, not copy -- these are people he named
-    with no plate authored. They are still credited, because a missing word is
-    omitted and recorded rather than allowed to block, but every row nobody
-    wrote is simply absent.
-    """
-    entry = casting["ensemble"]["placeholders"][key]
-    generic = casting["ensemble"]["plate"]
-    return {
-        "label": generic.get("label_unknown", "GUARDIAN"),
-        "name": entry["name"],
-        "placeholder": True,
-    }
-
-
-def roster_items(casting):
-    """The month's contributors, minus anyone already credited elsewhere.
-
-    Two exclusions, and both are about not crediting one person twice with two
-    different faces. A LEAD is credited where their character is on screen
-    (castrojo is Cayde-6). A PLACEHOLDER is someone the owner named for this
-    act, so they already have a badge of their own -- letting the roster hand
-    them a second, generic blueberry plate would put the same person on two
-    different Guardians in the same five minutes.
-    """
-    with open(ROSTER) as fh:
-        roster = json.load(fh)
-    named = {p["key"] for p in PLACEHOLDERS}
-    skip = BLUEBERRY_EXCLUDE | named
-    return [c for c in roster["contributors"] if c["login"] not in skip]
-
-
-def blueberry_entry(item, at, dur, casting):
-    """One contributor's credit, resolved the same way tools/plate.py does."""
-    authored = _titles(casting).get(item["login"])
-    if authored:
-        return {"copy_source": "casting", **dict(authored)}
-    copy = casting["ensemble"]["plate"]
-    member = item.get("org_member")
-    label = (copy["label_member"] if member
-             else copy["label"] if member is False
-             else copy["label_unknown"])
-    entry = {"copy_source": "casting", "label": label,
-             "name": item["display_name"]}
-    if copy.get("title"):
-        entry["title"] = copy["title"]
-    return entry
-
-
 def _corrected(key, copy):
     """Apply an owner-stated spelling of somebody's name to this act's copy.
 
@@ -1031,6 +1429,74 @@ def chat_avatar(key, casting):
     if not copy.get("avatar"):
         return {}
     return localise_avatar(key, {"avatar": copy["avatar"]})
+
+
+def github_avatar(login):
+    """A direct GitHub avatar binding for owner-seated login copy."""
+    return {
+        "avatar": str(AVATAR_DIR / f"{login}.png"),
+        "avatar_url": f"https://github.com/{login}.png?size=256",
+    }
+
+
+def _entry_from_spec(spec, casting):
+    """The kind-specific fields of one owner-seated card.
+
+    The three owner passes (MAPPED_PASS, LATE_PASS, MAPPED_TAIL_PASS) build
+    their cards from the same closed set of kinds; what differs between them
+    is seating -- when a card lands and whether it earns a ``seen_at_src`` --
+    and that stays in the caller.
+    """
+    fields = {}
+    if spec["kind"] in {"plate", "ghost"}:
+        fields.update({
+            "label": spec["label"],
+            "name": spec["name"],
+            "title": spec["title"],
+        })
+        if spec.get("class"):
+            fields["class"] = spec["class"]
+        if spec.get("variant"):
+            fields["variant"] = spec["variant"]
+        if spec.get("bond_of"):
+            fields["bond_of"] = spec["bond_of"]
+        if spec.get("avatar_login"):
+            fields.update(github_avatar(spec["avatar_login"]))
+    elif spec["kind"] == "chat":
+        fields.update({
+            "speaker": spec["speaker"],
+            "text": spec["text"],
+            "text_source": "owner_supplied",
+        })
+        login = spec.get("avatar_login") or spec.get("login")
+        if login:
+            fields.update(github_avatar(login))
+        elif spec["speaker"] in ("GloriousEggroll",):
+            fields.update(chat_avatar(spec["speaker"], casting))
+        if spec.get("bond_of"):
+            fields["bond_of"] = spec["bond_of"]
+    elif spec["kind"] == "warning":
+        fields["text"] = spec["text"]
+        fields["text_source"] = "owner_supplied"
+    elif spec["kind"] == "miniboss":
+        # The kernel boss bar's closed pair. `title` is omitted when
+        # nobody has authored one -- _render_miniboss draws the name row
+        # alone rather than inventing a second line.
+        fields["name"] = spec["name"]
+        fields["text_source"] = "owner_supplied"
+        if spec.get("title"):
+            fields["title"] = spec["title"]
+            if spec.get("title_placeholder"):
+                fields["title_source"] = "placeholder"
+    else:  # title, context
+        fields["title"] = spec["title"]
+        if spec.get("subtitle"):
+            fields["subtitle"] = spec["subtitle"]
+        if spec.get("body"):
+            fields["body"] = list(spec["body"])
+        if spec.get("scale") is not None:
+            fields["scale"] = spec["scale"]
+    return fields
 
 
 def fetch_avatars(manifest, verbose=True):
@@ -1088,11 +1554,13 @@ def space_plates(plates):
         # construction, so there is nothing here to space.
         if p.get("animation"):
             continue
+        if p.get("kind") in CHROME_ROWS:
+            continue
         by_position.setdefault(p.get("position"), []).append(p)
 
     for lane in by_position.values():
         lane.sort(key=lambda p: p["at"])
-        for cur, nxt in zip(lane, lane[1:]):
+        for cur, nxt in itertools.pairwise(lane):
             room = round(nxt["at"] - cur["at"] - PLATE_GAP, 3)
             if cur["dur"] <= room:
                 continue
@@ -1115,9 +1583,16 @@ def build():
     lead = build_efmb.derive_lead()
 
     def film_of(src):
-        return build_efmb.film_for_source(src, lead)
+        return build_efmb.edited_film_for_source(src, lead)
 
     plates = []
+    opening_head_dur = round(plan["bed_lead_sec"], 3)
+    plates.append({
+        "at": 0.0,
+        "dur": opening_head_dur,
+        "copy_source": "owner_supplied",
+        **OPENING_HEAD_CARD,
+    })
 
     # --- the trio, as one row ---------------------------------------------
     # The row assembles one card at a time and clears together: each Guardian
@@ -1147,7 +1622,24 @@ def build():
             **localise_avatar(key, _corrected(key, authored_copy(key, casting))),
         })
 
-    # --- the OG Guardians, in bronze --------------------------------------
+    # --- Sarah and Brent, in the first two opening slots -------------------
+    for spec in OPENING_NAMEPLATES:
+        at = round(spec["at_megacut"] - MEGACUT_OFFSET, 3)
+        hold = clamp_hold(at, OG_HOLD, film_of)
+        assert hold, (
+            f"{spec['key']} at {at:.3f}s cannot clear a no-plate zone and "
+            "still be readable -- the owner's mark has to move")
+        plates.append({
+            "id": f"opening_{spec['key']}",
+            "at": at,
+            "dur": hold,
+            "position": "left",
+            "copy_source": "casting",
+            "why": "owner-seated opening nameplate replacing a retired credit",
+            **localise_avatar(spec["key"], authored_copy(spec["key"], casting)),
+        })
+
+    # --- the remaining OG Guardians, in bronze ----------------------------
     for og in OG_GUARDIANS:
         at = round(og["at_megacut"] - MEGACUT_OFFSET, 3)
         hold = clamp_hold(at, OG_HOLD, film_of)
@@ -1171,17 +1663,11 @@ def build():
             # about the person is read off it.
             entry["avatar"] = str(AVATAR_DIR / f"{og['login']}.png")
             entry["avatar_url"] = f"https://github.com/{og['login']}.png?size=256"
+        if og.get("seen_at_src") is not None:
+            entry["seen_at_src"] = og["seen_at_src"]
+        if og.get("why"):
+            entry["why"] = og["why"]
         plates.append(entry)
-
-    # --- the team badge ----------------------------------------------------
-    badge_at = round(trio_out + TEAM_BADGE_LEAD, 3)
-    plates.append({
-        **TEAM_BADGE,
-        "at": badge_at,
-        "dur": TEAM_BADGE_HOLD,
-        "position": "center",
-        "copy_source": "owner_supplied",
-    })
 
     # --- the kernel trustees, one platinum pair held across the cuts -------
     for order, key in enumerate(TRUSTEE_ROW):
@@ -1217,6 +1703,10 @@ def build():
 
     # --- one person, one shot ---------------------------------------------
     for b in SOLO:
+        if f"solo_{b['key']}" in (
+                LATE_PASS_REPLACEMENTS | MAPPED_PASS_REPLACEMENTS
+                | MAPPED_TAIL_REPLACEMENTS):
+            continue
         src_in, src_out = b["src"]
         at = (round(film_of(b["at_src"]), 3) if b.get("at_src")
               else _at(src_in, film_of))
@@ -1234,47 +1724,6 @@ def build():
             "seen_at_src": b["seen"],
             "why": b["why"],
             **localise_avatar(b["key"], authored_copy(b["key"], casting)),
-        })
-
-    # --- named placeholders -----------------------------------------------
-    for b in PLACEHOLDERS:
-        src_in, src_out = b["src"]
-        at = _at(src_in, film_of)
-        hold = clamp_hold(at, SOLO_HOLD, film_of)
-        assert hold, (
-            f"{b['key']}'s badge at {at:.3f}s cannot clear a no-plate zone and "
-            "still be readable -- move the anchor to another shot")
-        plates.append({
-            "id": f"placeholder_{b['key']}",
-            "at": at,
-            "dur": hold,
-            "position": "right",
-            "copy_source": "casting",
-            "shot_src": list(b["src"]),
-            "seen_at_src": b["seen"],
-            "why": b["why"],
-            **placeholder_copy(b["key"], casting),
-        })
-
-    # --- the blueberries ---------------------------------------------------
-    # Deterministic: the roster is walked in its own order against the shot
-    # list in timeline order, so a re-render never reshuffles who played whom.
-    items = roster_items(casting)
-    for i, shot in enumerate(BLUEBERRY_SHOTS):
-        if i >= len(items):
-            break
-        src_in, src_out = shot["src"]
-        item = items[i]
-        plates.append({
-            "id": f"blueberry_{item['login']}",
-            "at": _at(src_in, film_of),
-            "dur": SOLO_HOLD,
-            "position": "right",
-            "shot_src": [src_in, src_out],
-            "seen_at_src": shot["seen"],
-            "why": shot["why"],
-            **localise_avatar(item["login"],
-                              blueberry_entry(item, None, None, casting)),
         })
 
     # --- Cayde's sign-off --------------------------------------------------
@@ -1513,6 +1962,19 @@ def build():
         f"{film_of(WALK_OUT):.3f}s -- a card would ride over the hard cut")
     plates.extend(walk)
 
+    # --- the later owner pass's opening title -----------------------------
+    present_day_at = round(PRESENT_DAY["at_megacut"] - OWNER_PASS_OFFSET, 3)
+    plates.append({
+        "id": "late_present_day",
+        "kind": "title",
+        "at": present_day_at,
+        "dur": PRESENT_DAY["hold"],
+        "position": "boss",
+        "copy_source": "owner_supplied",
+        "seen_at_src": round(build_efmb.source_for_film(present_day_at, lead), 3),
+        "title": PRESENT_DAY["title"],
+    })
+
     # --- the TOC exchange (owner brief #98, section 3) ---------------------
     # One screen, one card: the exchange shares the lower third with
     # everything else, so it is scheduled on ONE cursor even where the card's
@@ -1522,7 +1984,7 @@ def build():
 
     def src_of(film_sec):
         """An owner mark is given in FILM time; anchor it in SOURCE time."""
-        return build_efmb.source_for_film(film_sec, lead)
+        return build_efmb.edited_source_for_film(film_sec, lead)
 
     def toc_chat(spec, at, hold):
         entry = {
@@ -1564,103 +2026,198 @@ def build():
         at = round(cursor - PLATE_GAP + spec.get("lead", PLATE_GAP), 3)
         toc.append(toc_chat(spec, at, spec["hold"]))
         cursor = round(at + spec["hold"] + PLATE_GAP, 3)
-    # TOC_ANNOUNCEMENTS are NOT scheduled: they are AN4-CH3CK-12's payoff pair,
-    # and he is out this round. See the ANNOUNCER note.
 
-    # --- the timed cues (owner brief #98, section 4) -----------------------
-    # krook and the placard are pinned to the owner's marks (4:10, 4:20); the
-    # bedazzle line is untimed and takes the gap between them in the order he
-    # listed them. All three are over run 5's end fight.
-    krook_at = round(film_of(src_of(TIMED_KROOK)), 3)
-    assert krook_at >= cursor, (
-        f"krook's 4:10 mark lands at {krook_at:.3f}s but the TOC exchange "
-        f"runs to {cursor:.3f}s -- one of them has to move")
-    timed = [{
-        "id": "timed_krook",
-        "kind": "chat",
-        "at": krook_at,
-        "dur": 3.0,
-        "position": "left",
-        "copy_source": "owner_supplied",
-        "seen_at_src": round(src_of(TIMED_KROOK), 3),
-        "speaker": "krook",
-        "text": "Generational talent detected, call in the best",
-        "text_source": "owner_supplied",
-    }, {
-        "id": "timed_bedazzle",
-        "kind": "chat",
-        "at": round(krook_at + 3.0 + PLATE_GAP, 3),
-        "dur": 2.6,
-        "position": "left",
-        "copy_source": "owner_supplied",
-        "speaker": BEDAZZLE["speaker"],
-        "text": BEDAZZLE["text"],
-        "text_source": "owner_supplied",
-    }]
-    # NATEWADDINGTON'S PLACARD IS NOT HERE. Owner: "get rid of the nate
-    # wassington in the endless climax in endless." It stood at film 260.000
-    # for SOLO_HOLD, centre frame, the last card before the 269.700 downbeat.
-    # Nothing takes its slot -- the run into the climax plays clean now.
+    # --- the mapped 7:03 -> 8:26 owner pass -------------------------------
+    mapped_unresolved = []
+    mapped = []
+    mapped_cursor = 0.0
+    for spec in MAPPED_PASS:
+        if spec.get("at_src") is not None:
+            want = round(film_of(spec["at_src"]) + LEAD_IN, 3)
+        elif spec.get("at_film") is not None:
+            want = round(spec["at_film"], 3)
+        else:
+            want = round(mapped_cursor + PLATE_GAP, 3)
+        at = round(max(want, mapped_cursor), 3)
+        if ((spec.get("at_src") is not None or spec.get("at_film") is not None)
+                and at > want + 1e-6):
+            mapped_unresolved.append(
+                f"{spec['id']} is owner-timed to Act II film {want:.3f}, but "
+                f"the previous mapped card clears at {mapped_cursor:.3f}, so "
+                f"it lands at {at:.3f} instead. The order is the owner's; "
+                "only the gap is the timeline's")
+        entry = {
+            "id": spec["id"],
+            "at": at,
+            "dur": spec["hold"],
+            "position": spec["position"],
+            "copy_source": "owner_supplied",
+        }
+        if spec["kind"] != "plate":
+            entry["kind"] = spec["kind"]
+        entry.update(_entry_from_spec(spec, casting))
+        if at <= plan["picture_sec"]:
+            entry["seen_at_src"] = round(src_of(at), 3)
+            if spec["kind"] in {"plate", "ghost"}:
+                entry["why"] = spec["why"]
+        mapped.append(entry)
+        mapped_cursor = round(at + spec["hold"] + spec.get("gap_after", PLATE_GAP), 3)
 
-    # The gaslighting pill and the closing quotes: his 4:51, then an even
-    # spread whose last card ENDS on the film's final frame, over the black
-    # outro. None of them are casting lookups -- the speakers are the brief's
-    # own handles, and every one without a recorded login renders the drawn
-    # crest (recorded in `unresolved`).
-    jorge_at = round(film_of(src_of(TIMED_JORGE)), 3)
-    timed.append({
-        "id": "timed_jorge",
-        "kind": "chat",
-        "at": jorge_at,
-        "dur": TIMED_JORGE_HOLD,
-        "copy_source": "owner_supplied",
-        "seen_at_src": round(src_of(TIMED_JORGE), 3),
-        "speaker": "jorge",
-        "text": "Well shut my gaslighting mouth ....",
-        "text_source": "owner_supplied",
-        **chat_avatar("castrojo", casting),
-    })
-    film_sec = plan["film_sec"]
-    quotes_start = round(jorge_at + TIMED_JORGE_HOLD + PLATE_GAP, 3)
-    quote_step = round(
-        (film_sec - QUOTE_HOLD - quotes_start) / (len(CLOSING_QUOTES) - 1), 3)
-    for i, (speaker, text) in enumerate(CLOSING_QUOTES):
-        timed.append({
-            "id": f"quote_{speaker}",
+    convo_cursor = OWNER_CONVO_AT
+    for pid, speaker, txt in OWNER_CONVO:
+        hold = round(max(MIN_HOLD, len(txt) / 15), 3)
+        at = round(convo_cursor, 3)
+        entry = {
+            "id": pid,
             "kind": "chat",
-            "at": round(quotes_start + i * quote_step, 3),
-            "dur": QUOTE_HOLD,
+            "at": at,
+            "dur": hold,
+            "position": "left",
+            "copy_source": "owner_supplied",
+            "speaker": speaker,
+            "text": txt,
+            "text_source": "owner_supplied",
+        }
+        if speaker == "karena":
+            entry.update(github_avatar("karena"))
+        if at <= plan["picture_sec"]:
+            entry["seen_at_src"] = round(src_of(at), 3)
+        mapped.append(entry)
+        convo_cursor = round(at + hold + PLATE_GAP, 3)
+    mapped_unresolved.append(
+        "the owner conversation at 231.500 now keeps only karena and joseph; "
+        "krook and both rochaporta lines were removed by the owner. Karena's "
+        "chat uses github.com/karena, as explicitly supplied this round")
+
+    # --- the later owner pass (megacut 5:59 -> 6:56) ----------------------
+    late_unresolved = []
+    late = []
+    late_cursor = 0.0
+    for spec in LATE_PASS:
+        if spec.get("at_film") is not None:
+            want = round(spec["at_film"], 3)
+        elif spec.get("at_megacut") is not None:
+            want = round(spec["at_megacut"] - OWNER_PASS_OFFSET, 3)
+        else:
+            want = round(late_cursor + PLATE_GAP, 3)
+        at = round(want if spec["kind"] == "context" else max(want, late_cursor), 3)
+        if spec.get("at_megacut") is not None and at > want + 1e-6:
+            mm = int(spec["at_megacut"] // 60)
+            ss = spec["at_megacut"] % 60
+            late_unresolved.append(
+                f"{spec['id']} is owner-timed to megacut "
+                f"{mm}:{ss:04.1f} "
+                f"(film {want:.3f}) but the previous card clears at "
+                f"{late_cursor:.3f}, so it lands at {at:.3f} instead. The "
+                "order is the owner's; only the gap is the timeline's")
+        entry = {
+            "id": spec["id"],
+            "kind": spec["kind"],
+            "at": at,
+            "dur": spec["hold"],
+            "position": spec["position"],
+            "copy_source": "owner_supplied",
+        }
+        entry.update(_entry_from_spec(spec, casting))
+        if spec.get("at_megacut") is not None and at <= plan["picture_sec"]:
+            entry["seen_at_src"] = round(src_of(at), 3)
+        late.append(entry)
+        if spec["kind"] != "context":
+            late_cursor = round(at + spec["hold"] + PLATE_GAP, 3)
+
+    top_banner_at = round(TOP_BANNER["at_megacut"] - OWNER_PASS_OFFSET, 3)
+    # The OGC top banner is unchanged: it still ducked the old skill-banner
+    # zone at 231.5 -> 239.5, even though that lane is now lower-third chat.
+    ogc_resume_at = 239.5
+    for i, (start, end) in enumerate((
+            (top_banner_at, OWNER_CONVO_AT),
+            (ogc_resume_at, build_efmb.HALLWAY_AT)), 1):
+        late.append({
+            "id": f"{TOP_BANNER['id']}_{i}",
+            "kind": "banner",
+            "at": start,
+            "dur": round(end - start, 3),
+            "position": "boss",
+            "copy_source": "owner_supplied",
+            "text": TOP_BANNER["text"],
+            "text_source": "owner_supplied",
+        })
+
+    mapped_tail = []
+    black_cursor = round(build_efmb.HALLWAY_AT + 0.5, 3)
+    for pid, speaker, text, hold, avatar_login in BLACK_CONVERSATION:
+        entry = {
+            "id": pid,
+            "kind": "chat",
+            "at": black_cursor,
+            "dur": hold,
+            "position": "left",
             "copy_source": "owner_supplied",
             "speaker": speaker,
             "text": text,
             "text_source": "owner_supplied",
-            **chat_avatar(speaker, casting),
-        })
-    last_quote = timed[-1]
-    assert abs(last_quote["at"] + last_quote["dur"] - film_sec) < 0.01, (
-        "the preamble lands the last cue on the final second")
+        }
+        if avatar_login:
+            entry.update(github_avatar(avatar_login))
+        mapped_tail.append(entry)
+        black_cursor = round(black_cursor + hold + PLATE_GAP, 3)
+    assert black_cursor <= build_efmb.AMBER_AT
 
-    # The letterbox callout: up where the brief's scene starts, down on the
-    # last frame -- "keep it up for the whole song". Two windows: it ducks the
-    # patch-queue HUD, the one card that already owns a piece of the bar. The
-    # HUD holds from the enemies' reveal until the villain lands (see the
-    # walk's own schedule above), so those are the duck's edges.
-    for i, (b_start, b_end) in enumerate((
-            (MONTAGE_OUT, round(film_of(WALK_ENEMIES), 3)),
-            (villain_at, film_sec))):
-        toc.append({
-            "id": f"letterbox_banner_{i + 1}",
-            "kind": "banner",
-            "at": round(b_start, 3),
-            "dur": round(b_end - b_start, 3),
-            "position": "letterbox",
+    after_cursor = round(build_efmb.HALLWAY_AFTER_AMBER_AT + 0.5, 3)
+    for pid, speaker, text, hold, avatar_login, scale in AFTER_AMBER_CONVERSATION:
+        entry = {
+            "id": pid,
+            "kind": "chat",
+            "at": after_cursor,
+            "dur": hold,
+            "position": "left",
             "copy_source": "owner_supplied",
-            "text": LETTERBOX_BANNER,
+            "speaker": speaker,
+            "text": text,
             "text_source": "owner_supplied",
-        })
+            "scale": scale,
+        }
+        if avatar_login:
+            entry.update(github_avatar(avatar_login))
+        mapped_tail.append(entry)
+        after_cursor = round(after_cursor + hold + PLATE_GAP, 3)
+    assert after_cursor <= build_efmb.HALLWAY_RETURN_AT
+
+    for spec in MAPPED_TAIL_PASS:
+        entry = {
+            "id": spec["id"],
+            "kind": spec["kind"],
+            "at": round(spec["at_film"], 3),
+            "dur": spec["hold"],
+            "position": spec["position"],
+            "copy_source": "owner_supplied",
+        }
+        seen_at_src = (
+            spec["seen_at_src"] if spec.get("seen_at_src") is not None
+            else src_of(spec["at_film"])
+        )
+        entry["seen_at_src"] = round(seen_at_src, 3)
+        if spec.get("seen_in_video"):
+            entry["seen_in_video"] = spec["seen_in_video"]
+        if spec["kind"] == "guardian":
+            entry.pop("kind")
+            entry["copy_source"] = "casting"
+            entry["shot_src"] = list(spec["shot_src"])
+            entry["why"] = spec["why"]
+            entry.update(localise_avatar(
+                spec["key"],
+                _corrected(spec["key"], authored_copy(spec["key"], casting))))
+        else:
+            entry.update(_entry_from_spec(spec, casting))
+        mapped_tail.append(entry)
 
     plates.extend(toc)
-    plates.extend(timed)
+    plates.extend(late)
+    plates.extend(mapped_tail)
+    plates = [p for p in plates if p["id"] not in (
+        LATE_PASS_REPLACEMENTS | MAPPED_PASS_REPLACEMENTS
+        | MAPPED_TAIL_REPLACEMENTS)]
+    plates.extend(mapped)
 
     plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))
 
@@ -1689,18 +2246,8 @@ def build():
         "plates": plates,
         # What the brief authored but this manifest could not place. Recorded
         # so it is visible rather than buried: degrade, never block.
-        "unresolved": montage_unresolved + walk_unresolved + [
-            "og_paganini HAS NO `title` ROW. The owner filled the OG Guardian "
-            "plaques on 2026-08-15 by pointing at GitHub, which gets every one "
-            "of them a verified NAME and a pfp -- but a title is authored copy "
-            "and no profile carries one. The other three have the owner's own "
-            "lines ('Comes in Peace', 'Does NOT Come in Peace', 'Out of "
-            "Retirement'); Catherine Paganini has none, so the row is OMITTED "
-            "and her card degrades to name and pfp. A lorem placeholder is NOT "
-            "available here: placeholder prose credits the vocab's uncast "
-            "speaker, and this card names a real person -- AGENTS.md, 'Lorem "
-            "under a real name is still putting words in a colleague's mouth.' "
-            "One line from the owner closes it",
+        "unresolved": (montage_unresolved + walk_unresolved + mapped_unresolved
+                        + late_unresolved + [
             "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for "
             "now.' Three blocks went with him -- the four ranked montage "
             "cards, the two TOC payoff cards ('It's totally NOT like this' "
@@ -1713,10 +2260,6 @@ def build():
             "269.700 downbeat the act climaxes on. Only the scheduling went: "
             "his two authored rows are still in git, nothing moved into the "
             "slot, and he is owed a credit somewhere nobody has decided yet",
-            "the owner marked Joseph's last two lines one second apart "
-            "(megacut 3:39 and 3:40) and a pill needs 2.2s to be read, so "
-            "'You got this' is chained behind 'Master your skills' at 99.883 "
-            "rather than stacked on it. The ORDER is his and is kept",
             "the choice screen is a full-frame PAUSE MENU over MOVING "
             "picture: the owner asked to 'pause here to let the player "
             "decide', and a real freeze-frame has to be cut into the film "
@@ -1726,13 +2269,6 @@ def build():
             "the descent' is an EDIT instruction, not a plate: the menu ends "
             "at 88.533 and whatever the film already cuts to is what plays. "
             "TODO(owner): confirm the shot after it is the one meant",
-            "Catherine Paganini's OG Guardian card carries NO title row -- "
-            "the owner named her and wrote no line, and the other three OG "
-            "cards have one. Omitted rather than composed",
-            "dims, thockin and jbeda are printed as the LOGINS the owner "
-            "wrote ('github/dims'), not as their real names, and their pfps "
-            "come from those accounts. Whether the cards should carry real "
-            "names instead is the owner's call",
             "vocab/casting.yaml spells Karena's surname 'Angell'; the README "
             "and the owner both say 'Angel', one L. Act II prints the "
             "correction (NAME_CORRECTIONS) rather than editing the vocab, "
@@ -1752,15 +2288,14 @@ def build():
             "no title row is authored for GloriousEggroll or A1RM4X -- their "
             "affiliation rides as chrome and the row is omitted rather than "
             "composed",
-            "HikariKnight is no longer credited in act II, owner: 'remove "
-            "hikari from the eggroll scene'. His plate sat at source 193.800 "
-            "(film 2:50.667). His authored copy stays in vocab/casting.yaml "
-            "and only the scheduling went -- he is owed a credit elsewhere "
-            "and nobody has decided where",
+            "HikariKnight's Guardian plate remains removed from the Eggroll "
+            "scene on the owner's instruction. His later black-screen chat "
+            "lines are a separate owner-authored conversation, not a restored "
+            "credit on that shot",
             "the owner's own chat pills still have no pfp: `castrojo` is a "
             "lead, his identity lives on the `cayde_6` binding, and no avatar "
             "is recorded on it. The drawn crest stands in on the montage's "
-            "two pills, the 4:51 gaslighting pill, and his closing quote",
+            "two pills and the 4:51 gaslighting pill",
             "the 2:19 lead-in banner (owner: \"setting up this scene it's "
             "important\") has no authored copy, so nothing is emitted for it "
             "-- the TOC exchange's first line takes its slot",
@@ -1768,56 +2303,68 @@ def build():
             "has no asset in this repo; the cards render without it",
             "AN4-CH3CK-12 is not in vocab/casting.yaml -- it is reproduced as "
             "the announcer's label, and casts nobody",
-            "the 4:01 cue ('They are not ready for Shua Khan and Greg KH', "
-            "a speech bubble ON Cayde) is NOT scheduled: Cayde's "
-            "[ REDACTED ] card is at 287.933 (4:47.9), so a bubble anchored "
-            "on him cannot also be at 4:01. TODO(owner): which moves -- the "
-            "bubble to ~4:48, or the anchor (#98, Questions)",
-            "the #119 note's dictated badge anchor (megacut 5:43 = film "
-            "221.433) sits inside the #98 pill run (218.484 -> 230.766), "
-            "which did not exist on the ALPHA2 cut the owner was watching "
-            "-- the pills are the NEWER instruction. The kernel-trustee "
-            "badges land at 231.016 instead, the first clear frame, and "
-            "still hold across the recruits, the Troy slot and Cayde's 6:01 "
-            "shot as the note asks. TODO(owner): badges at 5:43 over the "
-            "pills, or the pills keep the window",
-            "the #119 note's 6:27 (film 265.433) names github.com/m2 for "
-            "the Arc Hunter -- the same shot #198 gave kolunmi the day "
-            "AFTER the note was dictated. One shot, two owner-given names: "
-            "kolunmi's plate stands (the newer instruction), and m2's "
-            "authored copy is in vocab/casting.yaml (he is owed a plate "
-            "wherever the owner points). TODO(owner): which name the Arc "
-            "Hunter keeps",
-            "Troy renders NOTHING: 'Nameplate - Troy (I'll fill in later) "
-            "Stormbreaker Titan' (megacut 5:58 = film 236.433) is an "
-            "explicit owner placeholder, so he is queued in "
-            "ensemble.placeholders and his slot sits empty inside the "
-            "trustee badges' hold. The class words are his; every other "
-            "row is his to write",
-            "Tulip's 'keep it up until 6:20' (film 258.433) is not "
-            "honoured: her window-leap shot ends 249.567 and the #98 pills "
-            "own 250.000 -> 255.850, so she holds 247.467 -> 249.750 -- up "
-            "at the dictated 6:11, gone with her shot. TODO(owner): move "
-            "the pills or accept the shot-length hold",
-            "krook, cgwalters, siosm, jberkus and preethi are "
-            "not in vocab/casting.yaml -- their pills render "
-            "as placeholder badges with the drawn crest, and their GitHub "
-            "logins are the owner's to confirm before any avatar is fetched "
-            "(a login is not guessed). 'cncf marketing' as a speaker and the "
-            "Open Gaming Collective callout are reproduced as written; "
-            "neither casts anybody",
-            "the brief names the same person three ways -- 'Jorge Castro' in "
-            "the montage, 'jorge' at 4:51, 'castrojo' in the closing quotes. "
-            "All three are reproduced verbatim; the pill's own chrome "
-            "uppercases the speaker row",
+            "the later owner-timed 5:59 -> 6:56 pass REPLACES the earlier "
+            "#119 trustee/Tulip block and the #98 krook/bedazzle/closing "
+            "quotes in this window. Greg Kroah-Hartman, Shuah Khan, Tulip "
+            "Blossom, krook and kolunmi no longer render in act "
+            "II on those earlier seats; if any of those credits still belong "
+            "in this act they need new owner-seated windows rather than "
+            "quietly colliding with the later pass",
+            "the owner supplied only a bare `[github.com/brandtkeller]` in "
+            "the 5:59 -> 6:56 pass -- no text, no plate fields, no timing "
+            "beyond its place in the note. Nothing is emitted for it; one "
+            "authored line or one authored card closes it",
+            "the prior mapped 8:26 Kyle line clears at film 241.700, so the "
+            "next mapped redacted clue cannot also start on 241.500. It lands "
+            "at 241.950 instead: the order is the owner's; only the gap is the "
+            "timeline's",
+            "the SATURN title's mapped 2:36.5 mark lands inside Bungie's "
+            "burned-in 'BECOME LEGEND' copy. The card therefore starts on the "
+            "first clean frame after that publisher title clears (film 156.666) "
+            "rather than over the burned-in words",
+            "the owner asked to 'stylize it like a rare drop in a game' for "
+            "A1RM4X's ghost card. This batch stays inside the existing plate "
+            "renderer, so the card uses the verified YouTube ghost chrome and "
+            "the rarer drop treatment stays unrendered rather than faked",
+            "the 6:29 cue is 'red miniboss flashing / Your Bad Decisions'. "
+            "This deterministic batch is limited to the existing title/chat/"
+            "banner kinds, and none of them is a flashing red miniboss bar, "
+            "so the line stays recorded rather than faked with the wrong "
+            "chrome",
+            "the mapped hallway edit uses the owner-supplied source-323.933 "
+            "hallway-and-dogs frame, Amber's owner-identified gameplay "
+            "sequence, and the cleared Local Forecast - Slower bed. Source "
+            "resumes at 325.933 after the readable black-screen conversation",
+            "EyeCantCU's owner-timed megacut 9:31 seat uses a freeze of the "
+            "evidenced source-354.600 Warlock frame; the stale old 283.666 "
+            "plate seat remains removed",
+            "the 9:10 HATERS title renders through existing title chrome. The "
+            "requested flashing red boss treatment is still missing; the copy "
+            "ships without that effect rather than being dropped",
+            "the Kyle and kolunmi pills land at film 335.650 and 338.100 "
+            "after Amber's conversation and Bungie's burned-in "
+            "'NEW LEGENDS WILL RISE' zone. The order and copy are the owner's; "
+            "the protected publisher-title gap moves the seats",
+            "KyleGospo's mapped reveal sits on his verified source-335.267 "
+            "Sentinel shot at film 314.237, after Amber's sequence",
+            "the brief names the same person two ways -- 'Jorge Castro' in "
+            "the montage and 'jorge' at 4:51. Both are reproduced verbatim; "
+            "the pill's own chrome uppercases the speaker row",
             "Karena's jump carries no card ('the beat is the jump'): it is "
             f"{JUMP_BEAT}s of clear screen between Joseph's DO line and "
             "Ricardo's answer. No shot was verified as HER jump and picking "
             "one would be casting by inference -- TODO(owner): the frame",
-            "the closing five quotes play over the black outro (picture ends "
-            "4:51.933): the brief's own schedule put them 4:51 -> 5:07 and "
-            "its preamble lands the last cue on the final second. The tail "
-            "is black by the owner's standing decision",
+            "the later owner-timed 6:56 question replaces the earlier five "
+            "closing quotes on the black tail. The tail still plays black by "
+            "the owner's standing decision; the new seat is the question, "
+            "not the quote spread",
+            "the 6:56 question maps to film 149.500 inside Karena's protected "
+            "jump. It lands at the first clean frame, 150.000, rather than "
+            "captioning the beat",
+            "the newer 5:59 -> 6:14 owner pass replaces the older Joseph "
+            "master/got-this pair and the two montage asides on the same face "
+            "shots. Their authored strings remain in this generator, but only "
+            "the newer dialogue reaches the frame",
             "Joseph's 'DO' and siosm's 'powering up' carry authored emphasis; "
             "the pill's message row is set bold throughout (the site's own "
             "style), so both ARE bold on screen but not differentiated. "
@@ -1833,7 +2380,7 @@ def build():
             "the TOC payoff REPRISES the montage's emeritus card verbatim -- "
             "a callback, not a second credit; the double-credit guard was "
             "taught that a verbatim reprise is not two faces",
-        ],
+        ]),
     }
 
 

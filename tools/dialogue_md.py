@@ -89,6 +89,8 @@ def _speaker_label(cue, leads):
     """
     character = cue.get("character") or ""
     entry = leads.get(character) or {}
+    if entry.get("dialogue_label"):
+        return entry["dialogue_label"]
     person = (entry.get("plate") or {}).get("name") or entry.get("display_name")
     pretty = character.replace("_", " ").title()
     return f"{pretty} ({person})" if person else pretty
@@ -103,7 +105,10 @@ def _resolve_character(label, leads):
     name = re.sub(r"\s*\(.*?\)\s*$", "", label).strip()
     key = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
     for character, entry in leads.items():
-        if key == character or key in {
+        dialogue_label = re.sub(
+            r"[^a-z0-9]+", "_",
+            str(entry.get("dialogue_label") or "").lower()).strip("_")
+        if key == character or key == dialogue_label or key in {
             re.sub(r"[^a-z0-9]+", "_", a.lower()).strip("_")
             for a in (entry.get("aka") or [])
         }:
@@ -115,6 +120,38 @@ def _resolve_character(label, leads):
         if name in {p for p in people if p}:
             return character
     return None
+
+
+def replace(data, edited):
+    """Replace a recovered conversation with owner-authored copy."""
+    cues = []
+    for cue in edited:
+        cues.append({
+            "id": cue["id"],
+            "start_sec": round(cue["start_sec"], 2),
+            "end_sec": round(cue["end_sec"], 2),
+            "character": cue["character"],
+            "evidence": "owner_supplied",
+            "text": cue["text"],
+            "text_source": "owner_supplied",
+        })
+    return {
+        **data,
+        "source_rights_note": (
+            "Dialogue and speaker assignments supplied by the project owner. "
+            "This file stores timed metadata, not audio."
+        ),
+        "text_source": {
+            "method": "owner_supplied",
+            "note": "The project owner replaced the complete conversation.",
+        },
+        "speaker_source": {
+            "method": "owner_supplied",
+            "note": "The project owner supplied both speaker bindings.",
+        },
+        "cues": cues,
+        "dropped": [],
+    }
 
 
 def export(data, leads):
@@ -307,6 +344,8 @@ def main(argv=None):
                    help=f"default: dialogue/<video_id>/{MARKDOWN_NAME}")
     a.add_argument("--dry-run", action="store_true",
                    help="report what would change without writing")
+    a.add_argument("--replace", action="store_true",
+                   help="replace the complete recovered conversation with owner-authored copy")
 
     args = ap.parse_args(argv)
 
@@ -324,7 +363,11 @@ def main(argv=None):
 
     source = Path(args.markdown) if args.markdown else markdown_path(args.video_id)
     edited = parse(source.read_text(encoding="utf-8"), leads)
-    updated, changes = merge(data, edited)
+    if args.replace:
+        updated = replace(data, edited)
+        changes = ["  replaced complete conversation with owner-authored copy"]
+    else:
+        updated, changes = merge(data, edited)
     for change in changes:
         print(change)
     if not changes:

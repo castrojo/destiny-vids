@@ -59,6 +59,8 @@ from tools import conform  # noqa: E402  (needs REPO_ROOT on sys.path first)
 
 SOURCE_ID = "yt_destiny_all_live_action_trailers"
 BED_ID = "bed_endless_forms_most_beautiful"
+AMBER_SOURCE_ID = "yt_destiny_2_the_final_shape_gameplay_trailer"
+HOLD_MUSIC_ID = "bed_local_forecast_slower"
 
 # The measured length of the master this act's runs were cut against. It is a
 # constant, not a probe: the plan must be identical on CI (which has no
@@ -188,6 +190,49 @@ SYNC_ANCHOR_FILM = 269.700
 BED_LEAD_SEC = None  # derived below, from the anchor
 BED_TAIL_SEC = None  # derived below, from the remainder
 
+# --- the hallway interruption ---------------------------------------------
+#
+# These are the owner's recovered source pointers, not inferred timestamps:
+# source 323.933 is the backed-up white hallway with people on the left and dog
+# creatures on the right; source 325.933 is where the Destiny picture resumes.
+# The interruption is intentionally longer than those replaced two seconds so
+# the complete conversation can play on black after Amber's action shot.
+HALLWAY_CUT_SRC = 323.933
+HALLWAY_FRAME_SRC = 323.933
+HALLWAY_RESUME_SRC = 325.933
+HALLWAY_AT = 255.433
+# Hold the hallway while Amber asks for Kyle and the PvP exchange plays.
+HALLWAY_FREEZE_SEC = 22.000
+AMBER_CLIP_IN = 43.000
+AMBER_CLIP_OUT = 53.470
+AMBER_CLIP_SEC = AMBER_CLIP_OUT - AMBER_CLIP_IN
+AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
+# Return to the same hallway frame for Owen, Amber's kindness speech, and the
+# held Kyle question before the Destiny picture resumes.
+HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
+HALLWAY_AFTER_AMBER_SEC = 21.500
+HALLWAY_RETURN_AT = HALLWAY_AFTER_AMBER_AT + HALLWAY_AFTER_AMBER_SEC
+BLACK_CONVERSATION_AT = HALLWAY_AT
+BLACK_CONVERSATION_SEC = HALLWAY_FREEZE_SEC
+INTERRUPTION_SEC = (
+    HALLWAY_FREEZE_SEC + AMBER_CLIP_SEC + HALLWAY_AFTER_AMBER_SEC)
+INTERRUPTION_REPLACED_SEC = HALLWAY_RESUME_SRC - HALLWAY_CUT_SRC
+INTERRUPTION_SHIFT_SEC = INTERRUPTION_SEC - INTERRUPTION_REPLACED_SEC
+
+KYLE_REVEAL_SRC = 335.267
+KYLE_REVEAL_SEC = 3.200
+KYLE_REVEAL_AT = HALLWAY_RETURN_AT + (KYLE_REVEAL_SRC - HALLWAY_RESUME_SRC)
+EDITED_PICTURE_END = 343.903
+
+# EyeCantCU's requested 9:31 seat was black in the base cut. The exact
+# evidenced Warlock frame is held there instead; no different Guardian is
+# credited by inference.
+EYECANTCU_AT = 351.970
+EYECANTCU_SRC = 354.600
+
+HOLD_MUSIC_IN = 6.500
+HOLD_MUSIC_OUT_FILM = HALLWAY_RETURN_AT
+
 
 # --- the mapping between source time and film time -------------------------
 # Every mark the owner ever gave for this act was given in FILM time, and the
@@ -249,6 +294,169 @@ def source_for_film(film_sec, lead=None, runs=None):
 def derive_lead(runs=None):
     """The head lead-in, derived from the sync anchor. Never typed."""
     return SYNC_ANCHOR_FILM - picture_offset_for_source(SYNC_ANCHOR_SRC, runs)
+
+
+def _source_part(part_id, source_id, at, source_in, source_out):
+    return {
+        "id": part_id,
+        "kind": "source",
+        "source_id": source_id,
+        "at": round(at, 3),
+        "source_in": round(source_in, 3),
+        "source_out": round(source_out, 3),
+        "duration": round(source_out - source_in, 3),
+    }
+
+
+def picture_sequence():
+    """The exact picture assembly, including the extended owner interruption."""
+    film_sec = build()["film_sec"]
+    lead = derive_lead()
+    parts = [{
+        "id": "head_black",
+        "kind": "black",
+        "at": 0.0,
+        "duration": round(lead, 3),
+    }]
+    at = lead
+    for i, (start, end, _why) in enumerate(RUNS[:4]):
+        parts.append(_source_part(
+            f"run_{i:02d}", SOURCE_ID, at, start, end))
+        at += end - start
+    parts.append(_source_part(
+        "pre_hallway", SOURCE_ID, at, RUNS[4][0], HALLWAY_CUT_SRC))
+    at += HALLWAY_CUT_SRC - RUNS[4][0]
+    assert abs(at - HALLWAY_AT) < 1e-6
+
+    parts.append({
+        "id": "hallway_freeze",
+        "kind": "freeze",
+        "source_id": SOURCE_ID,
+        "at": round(at, 3),
+        "source_at": HALLWAY_FRAME_SRC,
+        "duration": HALLWAY_FREEZE_SEC,
+        "darken": 0.20,
+    })
+    at += HALLWAY_FREEZE_SEC
+    parts.append(_source_part(
+        "amber_clip", AMBER_SOURCE_ID, at,
+        AMBER_CLIP_IN, AMBER_CLIP_OUT))
+    at += AMBER_CLIP_SEC
+    assert abs(at - HALLWAY_AFTER_AMBER_AT) < 1e-6
+    parts.append({
+        "id": "hallway_after_amber",
+        "kind": "freeze",
+        "source_id": SOURCE_ID,
+        "at": round(at, 3),
+        "source_at": HALLWAY_FRAME_SRC,
+        "duration": HALLWAY_AFTER_AMBER_SEC,
+        "darken": 0.32,
+    })
+    at += HALLWAY_AFTER_AMBER_SEC
+    assert abs(at - HALLWAY_RETURN_AT) < 1e-6
+
+    parts.append(_source_part(
+        "hallway_return", SOURCE_ID, at, HALLWAY_RESUME_SRC, RUNS[4][1]))
+    at += RUNS[4][1] - HALLWAY_RESUME_SRC
+    parts.append(_source_part(
+        "finale", SOURCE_ID, at, RUNS[5][0], RUNS[5][1]))
+    at += RUNS[5][1] - RUNS[5][0]
+
+    assert abs(at - EDITED_PICTURE_END) < 1e-6
+    parts.append({
+        "id": "tail_black",
+        "kind": "black",
+        "at": round(at, 3),
+        "duration": round(EYECANTCU_AT - at, 3),
+    })
+    at = EYECANTCU_AT
+    parts.append({
+        "id": "eyecantcu_tail",
+        "kind": "freeze",
+        "source_id": SOURCE_ID,
+        "at": round(at, 3),
+        "source_at": EYECANTCU_SRC,
+        "duration": round(film_sec - at, 3),
+    })
+    assert abs(sum(p["duration"] for p in parts) - film_sec) < 0.001
+    return parts
+
+
+def audio_sequence():
+    """Audio seats for the extended hallway interruption."""
+    film_sec = build()["film_sec"]
+    parts = [
+        {
+            "id": "endless_before_hallway",
+            "source_id": BED_ID,
+            "at": 0.0,
+            "source_in": 0.0,
+            "duration": HALLWAY_AT,
+        },
+        {
+            "id": "elevator_hallway_before_amber",
+            "source_id": HOLD_MUSIC_ID,
+            "at": HALLWAY_AT,
+            "source_in": HOLD_MUSIC_IN,
+            "duration": HALLWAY_FREEZE_SEC,
+        },
+        {
+            "id": "amber_clip_audio",
+            "source_id": AMBER_SOURCE_ID,
+            "at": AMBER_AT,
+            "source_in": AMBER_CLIP_IN,
+            "duration": AMBER_CLIP_SEC,
+        },
+        {
+            "id": "elevator_hallway_after_amber",
+            "source_id": HOLD_MUSIC_ID,
+            "at": HALLWAY_AFTER_AMBER_AT,
+            "source_in": HOLD_MUSIC_IN + HALLWAY_FREEZE_SEC,
+            "duration": HALLWAY_AFTER_AMBER_SEC,
+        },
+        {
+            "id": "endless_after_interruption",
+            "source_id": BED_ID,
+            "at": HOLD_MUSIC_OUT_FILM,
+            "source_in": HALLWAY_AT + INTERRUPTION_REPLACED_SEC,
+            "duration": film_sec - HOLD_MUSIC_OUT_FILM,
+        },
+    ]
+    assert abs(sum(p["duration"] for p in parts) - film_sec) < 0.001
+    return parts
+
+
+def edited_film_for_source(src_sec, lead=None):
+    """Source -> film for the rendered edit, not the pre-interruption base cut."""
+    if lead is None:
+        lead = derive_lead()
+    if HALLWAY_CUT_SRC <= src_sec < HALLWAY_RESUME_SRC:
+        raise NotInPicture(
+            f"source {src_sec:.3f}s is replaced by the hallway interruption")
+    at = film_for_source(src_sec, lead)
+    if src_sec >= HALLWAY_RESUME_SRC:
+        at += INTERRUPTION_SHIFT_SEC
+    return at
+
+
+def edited_source_for_film(film_sec, lead=None):
+    """Film -> source for the rendered edit's Destiny picture."""
+    if lead is None:
+        lead = derive_lead()
+    if HALLWAY_AT <= film_sec < AMBER_AT:
+        return HALLWAY_FRAME_SRC
+    if AMBER_AT <= film_sec < HALLWAY_RETURN_AT:
+        raise NotInPicture(
+            f"film {film_sec:.3f}s is inside Amber's external sequence")
+    if HALLWAY_RETURN_AT <= film_sec < EDITED_PICTURE_END:
+        return source_for_film(film_sec - INTERRUPTION_SHIFT_SEC, lead)
+    if EDITED_PICTURE_END <= film_sec < EYECANTCU_AT:
+        raise NotInPicture(
+            f"film {film_sec:.3f}s is in the black outro gap")
+    if EYECANTCU_AT <= film_sec < float(load_json(
+            REPO_ROOT / "music" / f"{BED_ID}.json")["duration_sec"]):
+        return EYECANTCU_SRC
+    return source_for_film(film_sec, lead)
 
 
 def load_json(path):
@@ -342,6 +550,26 @@ def _black(ffmpeg, duration, out_path):
         "-t", f"{duration:.3f}", *X264, "-an", str(out_path)])
 
 
+def _freeze(ffmpeg, src, source_at, duration, out_path, darken=0.0):
+    """Hold one evidenced source frame for an authored pause."""
+    frame = out_path.with_suffix(".png")
+    vf = NORMALISE_VF
+    if darken:
+        vf += f",eq=brightness=-{darken:.3f}"
+    try:
+        _run(list(ffmpeg) + [
+            "-nostdin", "-v", "error", "-y",
+            "-ss", f"{source_at:.3f}", "-i", str(src),
+            "-frames:v", "1", "-vf", vf, str(frame)])
+        _run(list(ffmpeg) + [
+            "-nostdin", "-v", "error", "-y",
+            "-loop", "1", "-i", str(frame), "-t", f"{duration:.3f}",
+            "-vf", f"fps={TARGET_FPS},format=yuv420p",
+            *X264, "-an", str(out_path)])
+    finally:
+        frame.unlink(missing_ok=True)
+
+
 def _concat(ffmpeg, parts, out_path, workdir):
     """Join the normalised parts with the concat DEMUXER.
 
@@ -360,6 +588,31 @@ def _concat(ffmpeg, parts, out_path, workdir):
         list_path.unlink(missing_ok=True)
 
 
+def audio_filtergraph(sequence=None):
+    """Build the audio-only concat graph for the authored interruption."""
+    sequence = audio_sequence() if sequence is None else sequence
+    input_index = {
+        BED_ID: 1,
+        HOLD_MUSIC_ID: 2,
+        AMBER_SOURCE_ID: 3,
+    }
+    chains = []
+    labels = []
+    for i, part in enumerate(sequence):
+        label = f"a{i}"
+        start = part["source_in"]
+        duration = part["duration"]
+        chains.append(
+            f"[{input_index[part['source_id']]}:a]"
+            f"atrim=start={start:.3f}:duration={duration:.3f},"
+            "asetpts=PTS-STARTPTS,aresample=48000,"
+            f"aformat=sample_fmts=fltp:channel_layouts=stereo[{label}]")
+        labels.append(f"[{label}]")
+    chains.append(
+        "".join(labels) + f"concat=n={len(labels)}:v=0:a=1[aout]")
+    return ";".join(chains)
+
+
 def render(out_path=None, work_dir=None, verbose=True):
     """Build the act: cut the runs, black the head and tail, lay the song under.
 
@@ -372,13 +625,19 @@ def render(out_path=None, work_dir=None, verbose=True):
     plan = build()
     ffmpeg = find_ffmpeg()
     source = footage.resolve(SOURCE_ID)
+    amber_source = footage.resolve(AMBER_SOURCE_ID)
     bed = REPO_ROOT / "media" / f"{BED_ID}.wav"
+    hold_music = REPO_ROOT / "media" / f"{HOLD_MUSIC_ID}.wav"
     if source is None:
         raise SystemExit(
             f"missing picture source: no media/{SOURCE_ID}.* in any known "
             f"container ({', '.join(footage.EXTENSIONS)})\nMedia is fetched, "
             "never committed -- see AGENTS.md ('Never commit footage') and the "
             "source's record in videos/.")
+    if amber_source is None:
+        raise SystemExit(
+            f"missing Amber sequence source: no media/{AMBER_SOURCE_ID}.* in "
+            "any known container. Media is fetched, never committed.")
     got = probe_duration(source)
     if abs(got - SOURCE_SEC) > SOURCE_TOLERANCE_SEC:
         raise SystemExit(
@@ -389,7 +648,9 @@ def render(out_path=None, work_dir=None, verbose=True):
             "this one would silently move the picture under a bed that did "
             "not move. Re-cutting the runs against a new upload is an "
             "EDITORIAL decision, not a derivation: it needs the owner.")
-    for path, what in ((bed, "music bed"),):
+    for path, what in (
+            (bed, "music bed"),
+            (hold_music, "cleared elevator music")):
         if not path.exists():
             raise SystemExit(
                 f"missing {what}: {path}\nMedia is fetched, never committed -- "
@@ -410,26 +671,28 @@ def render(out_path=None, work_dir=None, verbose=True):
     if not out_path.is_absolute():
         out_path = (Path.cwd() / out_path).resolve()
 
+    sources = {
+        SOURCE_ID: source,
+        AMBER_SOURCE_ID: amber_source,
+    }
     parts = []
-    head = work / "head_black.mp4"
-    if verbose:
-        print(f"  head   {plan['bed_lead_sec']:.3f}s black")
-    _black(ffmpeg, plan["bed_lead_sec"], head)
-    parts.append(head)
-
-    for i, r in enumerate(plan["runs"]):
-        part = work / f"run_{i:02d}.mp4"
+    for i, spec in enumerate(picture_sequence()):
+        part = work / f"{i:02d}_{spec['id']}.mp4"
         if verbose:
-            print(f"  run {i}  {fmt(r['in'])} -> {fmt(r['out'])}  {r['sec']:7.3f}s")
-        _cut_run(ffmpeg, source, r["in"], r["sec"], part)
+            print(
+                f"  {spec['id']:<20} {spec['at']:7.3f}  "
+                f"{spec['duration']:7.3f}s")
+        if spec["kind"] == "black":
+            _black(ffmpeg, spec["duration"], part)
+        elif spec["kind"] == "freeze":
+            _freeze(
+                ffmpeg, sources[spec["source_id"]], spec["source_at"],
+                spec["duration"], part, spec.get("darken", 0.0))
+        else:
+            _cut_run(
+                ffmpeg, sources[spec["source_id"]], spec["source_in"],
+                spec["duration"], part)
         parts.append(part)
-
-    if plan["bed_tail_sec"] > 0.001:
-        tail = work / "tail_black.mp4"
-        if verbose:
-            print(f"  tail   {plan['bed_tail_sec']:.3f}s black")
-        _black(ffmpeg, plan["bed_tail_sec"], tail)
-        parts.append(tail)
 
     silent = renders / "efmb-film-silent.mp4"
     if verbose:
@@ -437,11 +700,13 @@ def render(out_path=None, work_dir=None, verbose=True):
     _concat(ffmpeg, parts, silent, work)
 
     if verbose:
-        print("  mux: pre-gained PCM bed, FLAC, picture copied")
+        print("  mux: authored audio sequence, FLAC, picture copied")
     _run(list(ffmpeg) + [
         "-nostdin", "-v", "error", "-y",
-        "-i", str(silent), "-i", str(bed),
-        "-map", "0:v:0", "-map", "1:a:0",
+        "-i", str(silent), "-i", str(bed), "-i", str(hold_music),
+        "-i", str(amber_source),
+        "-filter_complex", audio_filtergraph(),
+        "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy",
         "-c:a", "flac", "-ar", "48000", "-ac", "2",
         "-shortest", str(out_path)])
@@ -495,7 +760,7 @@ def build():
     assert abs(OWNER_MARKS["resume_at"] - RUNS[4][0]) < 2.0
     assert abs(OWNER_MARKS["skip_from"] - REMOVED[7][0]) < 2.0
 
-    picture = sum(b - a for a, b, _ in RUNS)
+    source_picture = sum(b - a for a, b, _ in RUNS)
 
     # --- the head, derived from the music --------------------------------
     # Where does SYNC_ANCHOR_SRC sit in the picture, measuring only kept time?
@@ -509,12 +774,14 @@ def build():
         f"the anchor needs a lead of {lead:.3f}s -- there is more picture "
         "before the beat than the song has room for")
 
-    tail = bed_sec - lead - picture
+    tail = bed_sec - lead - source_picture
     assert tail >= -0.001, (
         f"picture overruns the song by {-tail:.3f}s; something must be cut")
-    assert abs((lead + picture + tail) - bed_sec) < 0.001
+    assert abs((lead + source_picture + tail) - bed_sec) < 0.001
 
-    gap = bed_sec - picture
+    picture = source_picture + INTERRUPTION_SHIFT_SEC
+    film_sec = bed_sec + INTERRUPTION_SHIFT_SEC
+    gap = bed_sec - source_picture
 
     return {
         "act": "II",
@@ -524,13 +791,21 @@ def build():
         "source_duration_sec": round(src_sec, 3),
         "bed_duration_sec": round(bed_sec, 3),
         "picture_sec": round(picture, 3),
+        "source_picture_sec": round(source_picture, 3),
         "gap_sec": round(gap, 3),
         "tail_policy": TAIL_POLICY,
         "sync_anchor_src": SYNC_ANCHOR_SRC,
         "sync_anchor_film": SYNC_ANCHOR_FILM,
         "bed_lead_sec": round(lead, 3),
         "bed_tail_sec": round(tail, 3),
-        "film_sec": round(lead + picture + tail, 3),
+        "film_sec": round(film_sec, 3),
+        "interruption": {
+            "source_in": HALLWAY_CUT_SRC,
+            "source_resume": HALLWAY_RESUME_SRC,
+            "wall_in": HALLWAY_AT,
+            "wall_out": HALLWAY_RETURN_AT,
+            "black_conversation_sec": BLACK_CONVERSATION_SEC,
+        },
         "runs": [{"in": a, "out": b, "sec": round(b - a, 3), "why": w}
                  for a, b, w in RUNS],
         "removed": [{"in": a, "out": b, "sec": round(b - a, 3), "why": w}

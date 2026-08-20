@@ -172,7 +172,7 @@ def audio_encode_opts(codec):
 
 
 def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
-                  trim=None, audio_codec="aac"):
+                  trim=None, audio_codec="aac", audio_at=None):
     """One pass: paint out the boxes, trim to the kept range, swap or keep audio.
 
     The music bed replaces the source audio rather than mixing with it, so a
@@ -203,7 +203,20 @@ def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
     cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
             "-pix_fmt", "yuv420p"]
 
-    if audio:
+    if audio and audio_at is not None:
+        if audio_at < 0:
+            raise ValueError("audio_at must be non-negative")
+        source_start = trim[0] if trim else 0.0
+        gain = f",volume={audio_gain}" if audio_gain is not None else ""
+        graph = (
+            f"[0:a]atrim=start={source_start:.3f}:duration={audio_at:.3f},"
+            "asetpts=PTS-STARTPTS[pre];"
+            f"[1:a]asetpts=PTS-STARTPTS{gain}[music];"
+            "[pre][music]concat=n=2:v=0:a=1[aout]"
+        )
+        cmd += ["-filter_complex", graph, "-map", "0:v:0", "-map", "[aout]",
+                "-shortest", *audio_encode_opts(audio_codec)]
+    elif audio:
         if audio_gain is not None:
             cmd += ["-af", f"volume={audio_gain}"]
         cmd += ["-map", "0:v:0", "-map", "1:a:0", "-shortest",
@@ -222,7 +235,7 @@ def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
 
 def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
           video_end=None, target_dbtp=None, audio_codec="aac",
-          _attempts_left=5):
+          audio_at=None, _attempts_left=5):
     if ffmpeg is None:
         from tools.render import find_ffmpeg
 
@@ -238,7 +251,7 @@ def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
     cmd = build_command(ffmpeg, Path(video).resolve(), drawbox_filters(redactions),
                         Path(out_path).resolve(),
                         Path(audio).resolve() if audio else None, audio_gain,
-                        trim=trim, audio_codec=audio_codec)
+                        trim=trim, audio_codec=audio_codec, audio_at=audio_at)
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
@@ -253,7 +266,7 @@ def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
                                 drawbox_filters(redactions),
                                 Path(out_path).resolve(),
                                 Path(audio).resolve(), new_gain, trim=trim,
-                                audio_codec=audio_codec)
+                                audio_codec=audio_codec, audio_at=audio_at)
             proc = subprocess.run(cmd, capture_output=True, text=True)
             if proc.returncode != 0:
                 tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
@@ -281,6 +294,9 @@ def main(argv=None):
     ap.add_argument("--audio-codec", default="aac",
                     help="deliverable audio codec; 'flac' builds a lossless "
                          "master (default aac)")
+    ap.add_argument("--audio-at", type=float, default=None,
+                    help="keep source audio until this output second, then "
+                         "start the replacement bed")
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
 
@@ -301,6 +317,7 @@ def main(argv=None):
     apply(args.video, data["redactions"], args.out,
           audio=args.audio, audio_gain=gain, video_end=video_end,
           audio_codec=args.audio_codec,
+          audio_at=args.audio_at,
           target_dbtp=args.target_dbtp if args.audio_gain is None else None)
     print(f"wrote {args.out}")
     return 0

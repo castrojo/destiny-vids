@@ -190,7 +190,7 @@ def _validate_schema(data):
                          + "\n".join(lines))
 
 
-def _resolve_character(name, alias_index, leads):
+def _resolve_character(name, alias_index):
     """A brief's character name -> its canonical key, or None if unknown.
 
     Returns None rather than raising. An unrecognized name is far more often
@@ -239,7 +239,7 @@ def parse_brief(text, casting_path=None):
     if "characters" in data:
         resolved = []
         for name in data["characters"]:
-            key = _resolve_character(name, alias_index, leads)
+            key = _resolve_character(name, alias_index)
             if key is None:
                 unresolved.append({"field": "characters", "name": name})
             elif key not in resolved:
@@ -249,7 +249,7 @@ def parse_brief(text, casting_path=None):
     for plate in data.get("plates") or []:
         if not plate.get("character"):
             continue
-        key = _resolve_character(plate["character"], alias_index, leads)
+        key = _resolve_character(plate["character"], alias_index)
         if key is None:
             # The plate keeps its copy: an owner-authored plate names somebody
             # real whether or not the vocab knows them yet, and dropping the

@@ -773,6 +773,8 @@ def render_cast_placard(person, character=None, card=None, login=None,
 
     portrait = summit_portrait(photo, LOWER_FACE)
     identity = cast_identity(card) or {}
+    if identity.get("name") and identity["name"] != person:
+        identity = {}
 
     f_person = _font("bold", 62)
     f_as = _font("regular", 22)

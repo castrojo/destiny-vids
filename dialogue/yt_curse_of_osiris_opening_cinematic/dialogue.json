@@ -1,16 +1,26 @@
 {
   "video_id": "yt_curse_of_osiris_opening_cinematic",
   "usage_class": "third_party_copyrighted",
-  "source_rights_note": "Dialogue written and owned by Bungie, Inc. Recovered here as timed metadata so on-screen copy is never invented. Bungie's fan-content policy permits non-commercial fan creations; this file stores text and timecodes, not audio.",
+  "source_rights_note": "Dialogue and speaker assignments supplied by the project owner. This file stores timed metadata, not audio.",
   "text_source": {
-    "method": "youtube_auto_captions",
-    "url": "https://www.youtube.com/watch?v=3nRzli5m8B8",
-    "fetched": "2026-08-11",
-    "note": "ASR, not an authored script. Rolling caption windows were de-duplicated into whole lines; `raw` keeps the caption text a line was assembled from. Correct `text` here rather than in a render."
+    "method": "owner_supplied",
+    "note": "The project owner replaced the complete conversation."
   },
   "speaker_source": {
-    "method": "vocative_alternation",
-    "note": "Two speakers only. Lines that name the other party ('Focus, Sagira.', 'Well, Osiris...', 'Sagira, I can see your light.', \"Don't you even Osiris!\") pin the turn; the lines between them alternate from those anchors. `evidence` records which applies, and `uncertain` marks a turn the anchors do not settle."
+    "method": "owner_supplied",
+    "note": "The project owner supplied both speaker bindings."
+  },
+  "score": {
+    "bed_id": "bed_wish_i_had_an_angel",
+    "start_sec": 27.835,
+    "source_in": 0.0,
+    "note": "Nightwish enters on the portal-opening frame the owner marked at programme 10:13 in the pre-Act-II-extension cut. The stable Act III clock is 27.835."
+  },
+  "display": {
+    "mode": "script",
+    "start_sec": 32.56,
+    "standalone_leads": false,
+    "note": "The owner replaced the complete conversation. Script layout keeps all 25 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
   },
   "cues": [
     {
@@ -18,209 +28,226 @@
       "start_sec": 35.96,
       "end_sec": 41.99,
       "character": "sagira",
-      "evidence": "alternation",
-      "text": "Ominous rocks, killer robots, people in mortal danger. Seriously, aren't you tired of this?"
+      "evidence": "owner_supplied",
+      "text": "Wow, what a mess. Who uses their computers this way?",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d02",
       "start_sec": 42.0,
       "end_sec": 45.55,
       "character": "osiris",
-      "evidence": "alternation",
-      "text": "Fatigue is a distraction from our purpose."
+      "evidence": "owner_supplied",
+      "text": "This training repository is the best place to hone their craft",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d03",
       "start_sec": 45.56,
       "end_sec": 47.51,
       "character": "osiris",
-      "evidence": "alternation",
-      "text": "As are complaints."
+      "evidence": "owner_supplied",
+      "text": "Iteration 7: Students serialize instead of parallize",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d04",
       "start_sec": 47.52,
       "end_sec": 50.55,
       "character": "sagira",
-      "evidence": "alternation",
-      "text": "Oh, I haven't begun to complain yet."
+      "evidence": "owner_supplied",
+      "text": "They're getting faster every loop",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d05",
       "start_sec": 50.56,
       "end_sec": 52.51,
       "character": "sagira",
-      "evidence": "uncertain",
-      "text": "Ouch."
+      "evidence": "owner_supplied",
+      "text": "Seriously with these clankers",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d06",
       "start_sec": 52.52,
       "end_sec": 53.99,
       "character": "sagira",
-      "evidence": "alternation",
-      "text": "Now I'm complaining."
+      "evidence": "owner_supplied",
+      "text": "Bluefin's Hive is reprogramming them all as we speak",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d07",
       "start_sec": 54.0,
       "end_sec": 60.47,
       "character": "osiris",
-      "evidence": "vocative",
-      "text": "Focus, Sagira."
+      "evidence": "owner_supplied",
+      "text": "And you're sure this will work?",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d08",
       "start_sec": 60.48,
       "end_sec": 67.71,
       "character": "sagira",
-      "evidence": "alternation",
-      "text": "Reach for the sky, big guy."
+      "evidence": "owner_supplied",
+      "text": "Told ya, It's a model not a log",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d09",
       "start_sec": 69.52,
       "end_sec": 72.43,
       "character": "sagira",
-      "evidence": "alternation",
-      "text": "Need help? Again?"
+      "evidence": "owner_supplied",
+      "text": "You better get that context right We don't want a repeat of the Tophee Disaster",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d10",
       "start_sec": 72.44,
       "end_sec": 80.87,
       "character": "osiris",
-      "evidence": "alternation",
-      "text": "I've got it, thank you."
+      "evidence": "owner_supplied",
+      "text": "Standard AGENTS.md, no problem.",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d11",
       "start_sec": 80.88,
       "end_sec": 87.83,
       "character": "sagira",
-      "evidence": "vocative",
-      "text": "Well, Osiris, what did you see?",
-      "raw": "Well, | Osiris, | what what did you see?"
+      "evidence": "owner_supplied",
+      "text": "What is it, what did you see? New local model?",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d12",
       "start_sec": 87.84,
       "end_sec": 90.83,
-      "character": "osiris",
-      "evidence": "uncertain",
-      "text": "Slow down."
+      "character": "sagira",
+      "evidence": "owner_supplied",
+      "text": "Slow down.",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d13",
       "start_sec": 90.84,
       "end_sec": 92.23,
-      "character": "osiris",
-      "evidence": "uncertain",
-      "text": "Wait."
+      "character": "sagira",
+      "evidence": "owner_supplied",
+      "text": "Wait. That's not our local model.",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d14",
       "start_sec": 92.24,
       "end_sec": 94.95,
-      "character": "osiris",
-      "evidence": "uncertain",
-      "text": "I thought I\u2014"
+      "character": "sagira",
+      "evidence": "owner_supplied",
+      "text": "I thought I committed ...",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d15",
       "start_sec": 94.96,
       "end_sec": 98.19,
       "character": "sagira",
-      "evidence": "uncertain",
-      "text": "Oh, sh\u2014"
+      "evidence": "owner_supplied",
+      "text": "Oh, sh—",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d16",
       "start_sec": 98.2,
       "end_sec": 99.39,
       "character": "sagira",
-      "evidence": "uncertain",
-      "text": "GO!"
+      "evidence": "owner_supplied",
+      "text": "Deploy!",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d17",
       "start_sec": 99.4,
       "end_sec": 103.95,
       "character": "sagira",
-      "evidence": "alternation",
-      "text": "TO YOUR LEFT. 2 o'clock, MEDIUM RANGE."
+      "evidence": "owner_supplied",
+      "text": "ON YOUR LEFT. 2 o'clock. Reverting.",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d18",
       "start_sec": 103.96,
       "end_sec": 114.47,
       "character": "sagira",
-      "evidence": "alternation",
-      "text": "YOU'RE WELCOME."
+      "evidence": "owner_supplied",
+      "text": "New fork, pushing!",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d19",
       "start_sec": 114.48,
       "end_sec": 121.43,
       "character": "sagira",
-      "evidence": "alternation",
-      "text": "You know, I can't help but notice that even with all of reality to explore, you keep picking the places where they shoot at us."
+      "evidence": "owner_supplied",
+      "text": "You keep picking the places where they shoot at us.",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d20",
       "start_sec": 121.44,
       "end_sec": 128.91,
       "character": "osiris",
-      "evidence": "alternation",
-      "text": "We can't stay. If the Vex succeed, it's the end of everything."
+      "evidence": "owner_supplied",
+      "text": "We need to split up, I told you this was too dangerous!",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d21",
       "start_sec": 128.92,
       "end_sec": 133.95,
       "character": "osiris",
-      "evidence": "vocative",
-      "text": "Sagira, I can see your light."
+      "evidence": "owner_supplied",
+      "text": "They've broken out of the sandbox",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d22",
       "start_sec": 133.96,
       "end_sec": 134.63,
       "character": "osiris",
-      "evidence": "alternation",
-      "text": "You have to go."
+      "evidence": "owner_supplied",
+      "text": "You need to get a message to the Kubernetes Maintainers",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d23",
       "start_sec": 134.64,
       "end_sec": 137.59,
       "character": "sagira",
-      "evidence": "alternation",
-      "text": "Nope, not leaving you. Without me, there's no coming back."
+      "evidence": "owner_supplied",
+      "text": "The open rate of maintainer emails is 7% I don't like this plan",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d24",
       "start_sec": 137.6,
       "end_sec": 142.27,
       "character": "osiris",
-      "evidence": "alternation",
-      "text": "If I don't stop the Vex, there won't be anything to come back to. I'm doing this for the both of us."
+      "evidence": "owner_supplied",
+      "text": "If I don't stop the Toilmaster, there won't be anything to come back to. I'm doing this for the both of us.",
+      "text_source": "owner_supplied"
     },
     {
       "id": "d25",
       "start_sec": 142.28,
       "end_sec": 146.0,
       "character": "sagira",
-      "evidence": "vocative",
-      "text": "Don't you even Osiris!"
+      "evidence": "owner_supplied",
+      "text": "I'm sure one of them will open the message ...",
+      "text_source": "owner_supplied"
     }
   ],
-  "dropped": [
-    {
-      "start_sec": 67.72,
-      "end_sec": 69.51,
-      "raw": "ARGH, ALAF SEL.",
-      "reason": "ASR noise over combat, not a recoverable line. Dropped rather than guessed."
-    }
-  ]
+  "dropped": []
 }

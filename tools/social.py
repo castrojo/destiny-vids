@@ -29,6 +29,7 @@ can be checked before the encode runs (``--dry-run``).
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -37,6 +38,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+from tools import farm
 
 # Mebibytes. Platforms quote "10MB" and mean 10 * 1024 * 1024 often enough that
 # the smaller unit is the safe reading of an ambiguous limit.
@@ -91,7 +94,14 @@ def video_bitrate_for(target_bytes, duration, audio_kbps):
     return int(video_bits / duration / 1000)
 
 
-def build_commands(src, out, *, target_mb, height, audio_kbps, ffmpeg, passlog):
+def source_digest(path):
+    """The exact Prod bytes this social derivative was encoded from."""
+    with Path(path).open("rb") as source:
+        return hashlib.file_digest(source, "md5").hexdigest()
+
+
+def build_commands(src, out, *, target_mb, height, audio_kbps, ffmpeg, passlog,
+                   pass1_out="/dev/null"):
     facts = source_facts(src)
     target_bytes = int(target_mb * MIB)
     v_kbps = video_bitrate_for(target_bytes, facts["duration"], audio_kbps)
@@ -107,7 +117,7 @@ def build_commands(src, out, *, target_mb, height, audio_kbps, ffmpeg, passlog):
         "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
         "-x264-params", f"colorprim=bt709:transfer=bt709:colormatrix=bt709:stats={passlog}",
     ]
-    first = [*common, "-pass", "1", "-an", "-f", "mp4", "/dev/null"]
+    first = [*common, "-pass", "1", "-an", "-f", "mp4", str(pass1_out)]
     second = [*common, "-pass", "2",
               "-c:a", "aac", "-b:a", f"{audio_kbps}k", "-ar", "48000",
               "-movflags", "+faststart", str(out)]
@@ -123,6 +133,8 @@ def main(argv=None):
     ap.add_argument("--height", type=int, default=DEFAULT_HEIGHT)
     ap.add_argument("--audio-bitrate", type=int, default=DEFAULT_AUDIO_BITRATE,
                     help="kbit/s AAC; spend what the cap allows (default 192)")
+    ap.add_argument("--local", action="store_true",
+                    help="force this host even when the farm is reachable")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
 
@@ -139,9 +151,22 @@ def main(argv=None):
     # directory is mounted by definition -- it is where the file is written.
     passlog = str(out.with_suffix("")) + ".x264"
     try:
+        use_farm, reason = (False, "--local given") if args.local else \
+            farm.cluster_available()
+        if use_farm:
+            ffmpeg = ["ffmpeg"]
+            remote_passlog = f"out/{out.stem}.x264"
+            pass1_out = out
+            print("encoder  farm (cluster reachable; two passes share one pod)")
+        else:
+            ffmpeg = find_ffmpeg()
+            remote_passlog = passlog
+            pass1_out = "/dev/null"
+            print(f"encoder  local ({reason or 'farm unavailable'})")
         facts, v_kbps, target_bytes, cmds = build_commands(
             src, out, target_mb=args.target_mb, height=args.height,
-            audio_kbps=args.audio_bitrate, ffmpeg=find_ffmpeg(), passlog=passlog)
+            audio_kbps=args.audio_bitrate, ffmpeg=ffmpeg, passlog=remote_passlog,
+            pass1_out=pass1_out)
 
         print(f"source   {src}")
         print(f"         {facts['width']}x{facts['height']} @ {facts['fps']}, "
@@ -155,11 +180,16 @@ def main(argv=None):
                 print(" ".join(cmd))
             return 0
 
-        for i, cmd in enumerate(cmds, start=1):
-            proc = subprocess.run(cmd, capture_output=True, text=True)
-            if proc.returncode != 0:
-                tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
-                raise SystemExit(f"pass {i} failed:\n{tail}")
+        if use_farm:
+            farm.run_ffmpeg_commands_on_cluster(
+                cmds, inputs=[src], out=out, expected_duration=facts["duration"],
+                label=f"social[{out.name}]")
+        else:
+            for i, cmd in enumerate(cmds, start=1):
+                proc = subprocess.run(cmd, capture_output=True, text=True)
+                if proc.returncode != 0:
+                    tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
+                    raise SystemExit(f"pass {i} failed:\n{tail}")
     finally:
         for leftover in Path(passlog).parent.glob(Path(passlog).name + "*"):
             leftover.unlink(missing_ok=True)
@@ -173,6 +203,8 @@ def main(argv=None):
         print(f"OVER CAP by {(size - target_bytes) / MIB:.2f} MiB -- "
               f"lower --audio-bitrate or --height and re-run")
         return 1
+    out.with_suffix(out.suffix + ".source.md5").write_text(
+        source_digest(src) + "\n", encoding="utf-8")
     return 0
 
 

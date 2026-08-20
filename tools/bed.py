@@ -84,11 +84,8 @@ def parse_tc(value):
     text = str(value).strip()
     if ":" not in text:
         return float(text)
-    parts = [float(p) for p in text.split(":")]
-    total = 0.0
-    for part in parts:
-        total = total * 60 + part
-    return total
+    return sum(float(p) * 60**i
+               for i, p in enumerate(reversed(text.split(":"))))
 
 
 def fmt_tc(seconds):

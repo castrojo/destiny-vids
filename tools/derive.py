@@ -56,7 +56,7 @@ TIER_BY_CONTENT_TYPE = {
 }
 
 # Shot scales wide enough to show the world but tight enough to read as a
-# Guardian (docs/pipeline.md §4).
+# Guardian.
 TRAVERSAL_HERO_SCALES = frozenset({"ELS", "LS", "MLS", "MS"})
 
 # Constraint evaluation for a CONSTRAINED lead binding (jeefy -> Saladin), where
@@ -87,7 +87,7 @@ def load_leads(path=None):
     """Load the lead cast map from vocab/casting.yaml.
 
     Returns ``{character_id: {"person": str|None, "display_name": str|None,
-    "aka": [...]}}``, preserving YAML order.
+    "dialogue_label": str|None, "aka": [...]}}``, preserving YAML order.
     """
     data = _casting(path)
     values = ((data or {}).get("leads") or {}).get("values") or {}
@@ -95,6 +95,7 @@ def load_leads(path=None):
         character_id: {
             "person": entry.get("person"),
             "display_name": entry.get("display_name"),
+            "dialogue_label": entry.get("dialogue_label"),
             "aka": list(entry.get("aka") or []),
             # Documented in vocab/casting.yaml as the person's VERIFIED GitHub
             # login, recorded "so avatar tooling resolves the person and never

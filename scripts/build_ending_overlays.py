@@ -11,8 +11,9 @@ Movement 5: the seven closing lines of ``stories/megacut/ending-cards.json``
 (``underwater``) revealed one at a time over the underwater pullback:
 ``renders/perfume-5-ending.mp4``.
 
-Movement 4: the six chat lines of ``stories/00-perfume-4-plates.json``
-(``chat``) over the whale-skeleton shot: ``renders/perfume-4-overlays.mp4``.
+Movement 4: Rafael's early ``chat_wolf`` cue followed by the six ``chat``
+lines over the whale-skeleton shot, all from
+``stories/00-perfume-4-plates.json`` into ``renders/perfume-4-overlays.mp4``.
 This is the generalisation the movement-5 pattern predicted: ONE derivative
 per movement, and movement 4's ALSO composes the movement's own
 ``replacements`` in the same encode -- the base chain is
@@ -25,7 +26,9 @@ Which movement, which plates
 ``--movement`` names the movement; its ``ending_derivative`` block in the
 thread record supplies the defaults: ``out_file`` for ``--out``,
 ``overlay_manifest`` for ``--manifest``, ``overlay_section`` for
-``--section``, and the optional ``plates_dir`` for ``--cards-dir``. Every
+``--section``, and the optional ``plates_dir`` for ``--cards-dir``.
+``overlay_section`` may be one section name or an ordered list; list order is
+input and overlay order in the same one-source encode. Every
 default still resolves to the movement-5 values above, so an unflagged run
 is byte-for-byte the command this script has always printed.
 
@@ -100,8 +103,12 @@ def find_movement(spec, movement_id=MOVEMENT_ID):
 
 
 def underwater_cards(doc, section=SECTION):
+    sections = [section] if isinstance(section, str) else list(section)
     by_id = {plate["id"]: plate for plate in doc["plates"]}
-    return [by_id[id_] for id_ in doc[section]["plate_ids"]]
+    cards = []
+    for sec in sections:
+        cards.extend(by_id[id_] for id_ in doc[sec]["plate_ids"])
+    return cards
 
 
 def card_path(cards_dir, card):
@@ -275,8 +282,9 @@ def main(argv=None):
         return 0
     out.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(cmd, check=True)
+    section_label = section if isinstance(section, str) else "+".join(section)
     print(f"wrote {out} ({movement['duration']:.3f} s, "
-          f"{len(underwater_cards(doc, section))} {section} lines)")
+          f"{len(underwater_cards(doc, section))} {section_label} lines)")
     return 0
 
 

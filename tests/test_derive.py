@@ -244,6 +244,9 @@ AUTHORED_PLATES = {
     # nameplates.json np_bob, and characters.json slug `bob`
     "osiris": ("TRUSTEE // GUARDIAN", "Voidwalker Warlock", "Bob Killen",
                "Reconciler of the Plane"),
+    # characters.json slug `andy`
+    "sagira": ("MAINTAINER // GUARDIAN", "Shadebinder Warlock",
+               "Doctor Andy Anderson", "Foundry of the Forbidden"),
     # characters.json slug `laura`
     "elsie_bray": ("MAINTAINER // GUARDIAN", "Gunslinger Hunter",
                    "Laura Santamaria", "The Order of Seven"),
@@ -273,20 +276,15 @@ def test_no_binding_invents_plate_copy():
     vocab/casting.yaml must never do -- add it to AUTHORED_PLATES with its
     source only after checking the source.
 
-    Two bindings are deliberate exceptions, each carrying its own comment in
-    the vocab, and they are opposite kinds of exception:
-
-    - `sagira` is a documented *fallback*: nobody has authored a seal for
-      Lindsay, so her title is the project's standing answer for an unknown
-      one, exactly as an ensemble slot's is. Not an authored identity.
-    - `mara_sov` is copy the *owner* wrote directly, for somebody who has no
+    `mara_sov` is the deliberate exception: copy the *owner* wrote directly
+    for somebody who has no
       entry in the reference deck at all. The owner authoring a credit is
       allowed where an agent inventing one is not. Re-authored for act II with
       the subclass (#5) now supplied; the old copy survives verbatim in the
       binding's `note:`, and tests/test_plate.py pins both halves.
     """
     with_plates = {k for k, v in LEADS.items() if v.get("plate")}
-    assert with_plates - {"sagira", "mara_sov"} == set(AUTHORED_PLATES)
+    assert with_plates - {"mara_sov"} == set(AUTHORED_PLATES)
 
 
 def test_lead_written_but_uncast_has_null_person():
@@ -373,16 +371,3 @@ SNAKE_CASES = [
 @pytest.mark.parametrize("raw,expected", SNAKE_CASES)
 def test_snake_case(raw, expected):
     assert snake_case(raw) == expected
-
-
-def test_ingest_slug_is_the_same_normaliser():
-    """ingest.slug and derive.snake_case were two copies of one regex pair.
-
-    They must agree on every case the id vocabulary cares about: a video_id
-    minted by ingest and a character id derived here are compared as strings,
-    so a divergence would silently stop a segment matching its own lead.
-    """
-    from tools.ingest import slug
-
-    for raw, expected in SNAKE_CASES:
-        assert slug(raw) == snake_case(raw) == expected

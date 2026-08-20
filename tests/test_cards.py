@@ -9,11 +9,8 @@ card it is not the renderer for.
 import json
 import os
 import re
-import sys
 
 import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from tools import plate  # noqa: E402
 
@@ -21,11 +18,9 @@ REPO = os.path.join(os.path.dirname(__file__), "..")
 CARDS = os.path.join(REPO, "cards")
 MEGACUT = os.path.join(REPO, "stories", "megacut")
 
-
 def _load(name):
     with open(os.path.join(MEGACUT, name), encoding="utf-8") as fh:
         return json.load(fh)
-
 
 def test_every_card_kind_has_a_template():
     """A kind with no template renders nothing and fails at burn time."""
@@ -35,7 +30,6 @@ def test_every_card_kind_has_a_template():
     assert kinds, "the megacut manifests carry no full-frame cards any more"
     for kind in kinds:
         assert os.path.exists(os.path.join(CARDS, f"{kind}.html")), kind
-
 
 def test_maintitle_has_a_poster_variant_for_the_existing_body_shape():
     template = open(os.path.join(CARDS, "maintitle.html"), encoding="utf-8").read()
@@ -50,7 +44,6 @@ def test_maintitle_has_a_poster_variant_for_the_existing_body_shape():
     assert "0 0 2px 0 rgb(196 226 255 / 95%)" in template
     assert "0 0 7px 1px rgb(147 197 253 / 85%)" in template
     assert "0 0 16px 2px rgb(37 99 235 / 45%)" in template
-
 
 def test_daycard_uses_the_poster_cta_hierarchy_and_an_authored_glyph():
     template = open(os.path.join(CARDS, "daycard.html"), encoding="utf-8").read()
@@ -70,12 +63,10 @@ def test_daycard_uses_the_poster_cta_hierarchy_and_an_authored_glyph():
     assert "lastIndexOf('evolve')" not in template
     assert "mark.onerror = () => mark.replaceWith(document.createTextNode(glyph.token))" in template
 
-
 def test_plate_py_refuses_to_draw_a_card_and_says_what_does():
     with pytest.raises(ValueError) as excinfo:
         plate.render_plate({"id": "act1", "kind": "act", "act": "I"})
     assert "cards/render-cards.mjs" in str(excinfo.value)
-
 
 def test_render_all_skips_cards_instead_of_drawing_them(tmp_path):
     """One plates-dir, two renderers: the Python one leaves the cards alone."""
@@ -87,7 +78,6 @@ def test_render_all_skips_cards_instead_of_drawing_them(tmp_path):
     ]
     written = plate.render_all(entries, tmp_path)
     assert [p.name for p in written] == ["plate_kat.png"]
-
 
 def test_the_act_slides_are_numbered_in_the_owners_canonical_order():
     """The canonical order, from docs/running-order.md: intro (I) ->
@@ -111,14 +101,12 @@ def test_the_act_slides_are_numbered_in_the_owners_canonical_order():
     assert "act II --" not in unresolved, (
         "act II has a film now; a gap that outlives its cause is a stale note")
 
-
 def test_one_person_is_never_two_acts():
     """mrbobbytables was once an empty act AND another act's film, under his
     character's name. One subject, one act."""
     cards = _load("megacut-cards.json")
     subjects = [c.get("title") for c in cards["plates"]]
     assert len(subjects) == len(set(subjects))
-
 
 def test_the_running_order_doc_is_the_source_of_truth_and_agrees_with_the_plan():
     doc = open(os.path.join(REPO, "docs", "running-order.md"), encoding="utf-8").read()
@@ -137,7 +125,6 @@ def test_the_running_order_doc_is_the_source_of_truth_and_agrees_with_the_plan()
             title = item["chapter"].split(". ", 1)[1]
             assert title in doc, title
 
-
 def test_every_act_slide_carries_an_audience_facing_chapter_title():
     """`label` is a build note; `chapter` is what the viewer reads.
 
@@ -155,6 +142,27 @@ def test_every_act_slide_carries_an_audience_facing_chapter_title():
             assert item.get("chapter"), item.get("label")
             assert "held long" not in item["chapter"]
 
+def test_act_i_megacut_clip_keeps_the_cinematic_tail():
+    plan = _load("megacut.json")
+    act_i = next(
+        item for item in plan["items"]
+        if item.get("path", "").endswith("01-intro.mp4")
+    )
+    assert act_i["trim_from"] == pytest.approx(2.0)
+    assert act_i["trim_to"] == pytest.approx(118.2)
+    assert act_i["trim_to"] >= 114.2 + 4.0
+
+def test_act_ii_megacut_clip_keeps_its_now_carded_black_head():
+    plan = _load("megacut.json")
+    act_ii = next(
+        item for item in plan["items"]
+        if item.get("path", "").endswith("02-endlessformsmostbeautiful.mp4")
+    )
+    assert act_ii["audio"] == "source"
+    assert act_ii["fade_in"] == 0.0
+    assert "trim_from" not in act_ii
+    assert "approved authored copy for Act II's derived black head" in act_ii["_head_card"]
+    assert act_ii["sub_chapters"] == "stories/02-endless-forms-plates.json"
 
 def test_the_programme_is_delivered_from_the_wolves_workspace():
     """Prod holds the highest-quality master of each act; the movie goes to
@@ -166,7 +174,6 @@ def test_the_programme_is_delivered_from_the_wolves_workspace():
         if item["kind"] == "clip" and item["path"].startswith("/"):
             assert "/Videos/Wolves/Prod/" in item["path"], item["path"]
 
-
 def test_act_slides_run_in_time_order_and_carry_a_chapters_field():
     cards = [p for p in _load("megacut-cards.json")["plates"]
              if p.get("kind") != "interstitial"]
@@ -176,7 +183,6 @@ def test_act_slides_run_in_time_order_and_carry_a_chapters_field():
         # The owner's instruction is that every act has chapters. Empty is the
         # honest state until somebody writes them; missing is a dropped field.
         assert "chapters" in card, card["id"]
-
 
 def test_the_programme_plays_every_card_the_cards_manifest_authored():
     """Every authored card plays, and every played card is authored.
@@ -205,12 +211,10 @@ def test_the_programme_plays_every_card_the_cards_manifest_authored():
         f"{played - live}. A card that should not play needs `retired` with "
         f"a reason, so the decision is recorded rather than inferred.")
 
-
 def test_every_retired_card_says_why_it_was_retired():
     for card in _load("megacut-cards.json")["plates"]:
         if card.get("retired"):
             assert card.get("retired_note"), card["id"]
-
 
 def test_the_title_card_covers_one_unbroken_window_beside_the_guardian_plates():
     entries = plate.load_manifest(os.path.join(MEGACUT, "megacut-hero-plates.json"))
@@ -224,21 +228,23 @@ def test_the_title_card_covers_one_unbroken_window_beside_the_guardian_plates():
     assert abs(cover["at"] - 22.5) < 1e-6
     assert abs(cover["at"] + cover["dur"] - 36.0) < 1e-6
     # load_manifest already refused an overlap against the Guardian plates.
-    plates = [e for e in entries if e["id"] != "title-cover"]
+    # Chrome rows (caption/context/warning) intentionally coexist with the
+    # full-frame cover by occupying their own screen lanes.
+    plates = [e for e in entries if e["id"] != "title-cover"
+              and e.get("kind") not in plate.CHROME_ROWS]
     assert all(p["at"] + p["dur"] <= cover["at"] + 1e-6
                or p["at"] >= cover["at"] + cover["dur"] - 1e-6
                for p in plates)
 
-
 def test_a_recast_plate_carries_a_name_and_no_inherited_rows():
-    """Orlin has no authored identity: name only, never Laura's label, subclass
-    and title. Cortney's identity WAS authored (issue #90), so hers is checked
-    the other way -- every row present, and the one row nobody wrote absent."""
+    """OrliX has an owner-supplied GitHub identity but no Guardian rows; never
+    inherit Laura's label, subclass, or title."""
     entries = plate.load_manifest(os.path.join(MEGACUT, "megacut-hero-plates.json"))
-    orlin = next(e for e in entries if e["id"] == "orlin")
-    assert orlin["name"]
+    orlix = next(e for e in entries if e["id"] == "orlix")
+    assert orlix["name"] == "OrliX"
+    assert orlix["avatar"] == "renders/avatars/orlix.png"
     for row in ("label", "class", "title", "trustee"):
-        assert row not in orlin, f"orlin inherited {row}"
+        assert row not in orlix, f"orlix inherited {row}"
 
     cortney = next(e for e in entries if e["id"] == "cortney")
     assert cortney["name"] == "Cortney Nickerson"
@@ -248,8 +254,8 @@ def test_a_recast_plate_carries_a_name_and_no_inherited_rows():
 
     manifest = _load("megacut-hero-plates.json")
     gaps = " ".join(u["what"] for u in manifest["unresolved"])
-    assert "Cortney Nickerson" in gaps and "Orlin" in gaps
-
+    assert "Cortney Nickerson" in gaps
+    assert "Orlin" not in gaps and "OrliX" not in gaps
 
 def test_the_cover_is_a_full_frame_photo_and_nobody_is_captioned_into_it():
     """Owner, 2026-08-15: '2:14 remove the comic book cover for this segment and
@@ -272,7 +278,6 @@ def test_the_cover_is_a_full_frame_photo_and_nobody_is_captioned_into_it():
         assert field not in cover, (
             f"{field}: the comic treatment retired with the comic; a "
             "full-frame photograph has no margins and no caption boxes")
-
 
 def test_the_retired_cover_captions_are_kept_verbatim_in_the_record():
     """The caption copy was owner-authored, so retirement KEEPS it -- the way
@@ -305,7 +310,6 @@ def test_the_retired_cover_captions_are_kept_verbatim_in_the_record():
     assert "speciesname" in note
     assert "#90" in note
 
-
 def test_the_wallpaper_roll_is_recorded_so_a_frame_is_reproducible():
     """A random wallpaper per render is the owner's instruction. A random
     render nobody wrote down cannot be rebuilt, so the driver records the roll
@@ -323,7 +327,6 @@ def test_the_wallpaper_roll_is_recorded_so_a_frame_is_reproducible():
     driver = open(os.path.join(CARDS, "render-cards.mjs"), encoding="utf-8").read()
     assert "wallpapers.json" in driver
     assert "--wallpaper-seed" in driver or "wallpaper-seed" in driver
-
 
 def test_the_card_templates_copy_the_sites_own_rules():
     """The cards are a reproduction of the website's CSS, not a new design.
@@ -346,7 +349,6 @@ def test_the_card_templates_copy_the_sites_own_rules():
         style = source.split("<style>", 1)[1].split("</style>", 1)[0]
         assert style.count("/*") == style.count("*/"), name
 
-
 def test_the_photo_card_is_full_bleed_and_honours_the_driver_handshake():
     """The photo card is the one template that is NOT a site reproduction --
     the site has no full-frame photo component -- so its contract is pinned
@@ -363,7 +365,6 @@ def test_the_photo_card_is_full_bleed_and_honours_the_driver_handshake():
     # (The words may appear in the header comment that says why they are out.)
     assert "params.get('captions')" not in photo
     assert "params.get('wallpaper')" not in photo
-
 
 def test_every_act_slide_holds_the_same_length():
     """One house length for slides, so none of them reads as a stall.

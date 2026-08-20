@@ -48,4 +48,3 @@ authored name, its species' scientific name, and the species artwork.
 A bond does **not** follow a recast on its own. Cortney Nickerson inherits Bob
 Killen's Torosaurus because the owner said so, and that is recorded on the
 plate.
-

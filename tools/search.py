@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Natural-language search over Destiny 2 segment records.
 
-Implements the hybrid retrieval + editorial-ranking recipe from
-docs/agent-retrieval.md over the JSON segment records in a directory
-(default: examples/).
+Hybrid retrieval + editorial ranking over the JSON segment records in a
+directory (default: examples/).
 
 Retrieval is hybrid:
   * controlled-vocab ENUM FILTERS for hard facets (class, element, faction,
@@ -14,8 +13,7 @@ Retrieval is hybrid:
 
 Then a standing EDITORIAL RANKING pass orders the survivors: CLEAN footage
 first (a shot with a HUD or burned-in text cannot be cut into the story at all),
-cinematic tier over gameplay tier, then Guardian-centric and mythic. See
-docs/agent-retrieval.md for the weights.
+cinematic tier over gameplay tier, then Guardian-centric and mythic.
 
 Usage:
     python3 tools/search.py "show us Hunters with Arc"
@@ -117,8 +115,9 @@ PHRASES = {
     "osiris": [("casting.character", {"osiris"})],
     "mrbobbytables": [("casting.person", {"mrbobbytables"})],
     "sagira": [("casting.character", {"sagira"})],
-    "lindsay": [("casting.person", {"lindsay_gendreau"})],
-    "gendreau": [("casting.person", {"lindsay_gendreau"})],
+    "clubanderson": [("casting.person", {"clubanderson"})],
+    "andy": [("casting.person", {"clubanderson"})],
+    "anderson": [("casting.person", {"clubanderson"})],
     "saint-14": [("casting.character", {"saint_14"})],
     "saint 14": [("casting.character", {"saint_14"})],
     "saint": [("casting.character", {"saint_14"})],

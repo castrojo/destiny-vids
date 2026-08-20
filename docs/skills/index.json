@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-20",
+  "skills": [
+    {
+      "id": "farm",
+      "name": "farm",
+      "one_line_purpose": "Run frame-touching encodes on the remote Kubernetes farm.",
+      "entry_point": "docs/skills/farm.md",
+      "category": "operations",
+      "status": "active",
+      "tags": [
+        "ffmpeg",
+        "kubernetes",
+        "encode",
+        "remote",
+        "render"
+      ],
+      "description": "Run frame-touching encodes on the remote farm. Use when the cluster is reachable and you need a Prod encode, a megacut segment, or another long render.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "runbook"
+    },
+    {
+      "id": "testing",
+      "name": "testing",
+      "one_line_purpose": "Keep the offline suite the whole gate, and diagnose checks red only in CI.",
+      "entry_point": "docs/skills/testing.md",
+      "category": "meta",
+      "status": "active",
+      "tags": [
+        "testing",
+        "ci",
+        "pytest",
+        "runner"
+      ],
+      "description": "The suite is the gate. Use when a test passes locally and fails in CI, when adding a check, or when anything resolves a binary, font, or path outside the repo.",
+      "version": "1.0",
+      "last_updated": "2026-08-20",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "audio",
+      "name": "audio",
+      "one_line_purpose": "Preserve source fidelity and enforce delivery audio headroom.",
+      "entry_point": "docs/skills/audio/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "audio",
+        "delivery",
+        "source",
+        "headroom",
+        "ffmpeg"
+      ],
+      "description": "Preserve source fidelity and enforce delivery audio headroom. Use when sourcing a bed, measuring a deliverable, or deciding whether a file meets the repo's audio standard.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "policy"
+    },
+    {
+      "id": "casting",
+      "name": "casting",
+      "one_line_purpose": "Bind visible Destiny characters to verified contributor identities.",
+      "entry_point": "docs/skills/casting/SKILL.md",
+      "category": "metadata",
+      "status": "active",
+      "tags": [
+        "characters",
+        "leads",
+        "ensemble",
+        "credits",
+        "bindings"
+      ],
+      "description": "Bind visible Destiny characters to verified contributor identities. Use when adding or reviewing lead bindings, monthly ensemble credits, or cast-derived permissions.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "policy"
+    },
+    {
+      "id": "editing",
+      "name": "editing",
+      "one_line_purpose": "Build and revise cuts from indexed footage without inventing shots.",
+      "entry_point": "docs/skills/editing/SKILL.md",
+      "category": "editorial",
+      "status": "active",
+      "tags": [
+        "story",
+        "cuts",
+        "render",
+        "beats",
+        "segments"
+      ],
+      "description": "Build and revise cuts from indexed footage without inventing shots. Use when making story outlines or renders from indexed segments.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "megacut",
+      "name": "megacut",
+      "one_line_purpose": "Assemble finished acts into the canonical programme without re-editing them.",
+      "entry_point": "docs/skills/megacut/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "programme",
+        "assembly",
+        "cards",
+        "joins",
+        "delivery"
+      ],
+      "description": "Assemble finished acts into the canonical programme without re-editing them. Use when joining delivered cuts into one continuous video and verifying the joins.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "plates",
+      "name": "plates",
+      "one_line_purpose": "Render authored identity and dialogue cards without inventing copy.",
+      "entry_point": "docs/skills/plates/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "nameplates",
+        "copy",
+        "cards",
+        "credits",
+        "rendering"
+      ],
+      "description": "Render authored identity and dialogue cards without inventing copy. Use when burning Guardian nameplates, chat cards, or full-frame cards onto a video.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "policy"
+    },
+    {
+      "id": "production",
+      "name": "production",
+      "one_line_purpose": "Take approved video work from issue brief to delivered artifact.",
+      "entry_point": "docs/skills/production/SKILL.md",
+      "category": "operations",
+      "status": "active",
+      "tags": [
+        "production",
+        "delivery",
+        "issues",
+        "workflow",
+        "video"
+      ],
+      "description": "Take approved video work from issue brief to delivered artifact. Use when an issue needs to run from brief, through indexing or rendering, to a file in the delivery workspace.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    }
+  ]
+}

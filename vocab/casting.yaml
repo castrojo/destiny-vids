@@ -66,6 +66,10 @@ leads:
       authorise is omitted, never invented, so a plate carrying only `name`
       is a valid plate. Derivation never reads it — a binding without one
       simply gets no plate.
+    dialogue_label: >
+      OPTIONAL owner-facing speaker label used in DIALOGUE.md instead of the
+      footage character key. This does not change shot matching; it prevents
+      internal source-character names from leaking into authored conversation.
     constraints:  >
       OPTIONAL per-binding usability constraints, for a person who does not
       resemble their character. Keys: `require_helmet` (identity_visibility must
@@ -190,7 +194,9 @@ leads:
     osiris:
       person: mrbobbytables
       display_name: mrbobbytables
+      github: mrbobbytables
       aka: []
+      dialogue_label: mrbobbytables
       # On-screen nameplate copy (tools/plate.py), in the same four-field form
       # as the reference deck: label / class / name / title, plus `trustee`.
       # Every field is Bob Killen's OWN plate from the deck (np_bob) -- a real
@@ -210,19 +216,18 @@ leads:
         trustee: true
         variant: leader
     sagira:
-      # Osiris's Ghost. A Ghost is not a Guardian, so nothing about framing or
-      # helmets applies -- she is cast on presence in frame alone.
-      person: lindsay_gendreau
-      display_name: Lindsay Gendreau
+      # Internal footage-character key only. The authored conversation and
+      # rendered plate credit Andy directly; the source role never prints.
+      person: clubanderson
+      display_name: clubanderson
+      github: clubanderson
       aka: [sagira_ghost]
+      dialogue_label: clubanderson
       plate:
-        label: EMOTIONAL SUPPORT // GHOST
-        name: Lindsay Gendreau
-        # Nobody has authored a seal for Lindsay, so the title is the project's
-        # standing answer for an unknown one (the owner's rule), the same as an
-        # ensemble slot's.
-        title: Bluefin Blueberry
-        kind: ghost
+        label: MAINTAINER // GUARDIAN
+        class: Shadebinder Warlock
+        name: Doctor Andy Anderson
+        title: Foundry of the Forbidden
     saint_14:
       person: kat
       display_name: Kat
@@ -548,10 +553,9 @@ ensemble:
       wreath: true
       avatar: https://avatars.githubusercontent.com/u/52753?v=4
     joseph_sandoval:
-      # KEYED BY NAME, not login: no GitHub login is recorded for him in this
-      # repo or in the owner's instruction. TODO(owner): supply his login and
-      # re-key this entry -- plate matching is by roster login, so until then
-      # a cut can only find this copy by looking the key up directly.
+      # KEYED BY NAME because the authored plate predates the verified account
+      # binding. github.com/jrsapi is Joseph Sandoval (u/5437766); the avatar
+      # is safe to reuse without changing the owner-authored visible name.
       #
       # Owner: "he no longer does leadership he used to [do] Ricardo's job,
       # now he just fights. He still has a gold badge he's just not the Chair
@@ -562,6 +566,7 @@ ensemble:
       name: Joseph Sandoval
       title: "Master Wielder | Uplifter of Users"
       variant: leader
+      avatar: https://avatars.githubusercontent.com/u/5437766?v=4
     KyleGospo:
       # github.com/KyleGospo. Owner: "he is special but don't say why" -- so
       # the plate carries NO explanation, only the bazzite chrome and the
@@ -575,6 +580,15 @@ ensemble:
       title: The First Knife
       variant: bazzite
       avatar: https://avatars.githubusercontent.com/u/10704358?v=4
+    akgraner:
+      # The owner identified the Final Shape gameplay clip used in Act II as
+      # Amber's sequence. Her Guardian identity is copied from the authored
+      # Wolves nameplate record; none of these rows is inferred from the clip.
+      label: MAINTAINER // GUARDIAN
+      name: Amber Graner
+      class: Striker Titan
+      title: The Iron Standard
+      avatar: https://avatars.githubusercontent.com/u/6200805?v=4
     p5:
       # github.com/p5. The name row is the bracketed HANDLE, exactly as the
       # owner authored it. His real name is deliberately NOT used -- the
@@ -632,6 +646,18 @@ ensemble:
       label: MAINTAINER // GUARDIAN
       name: William Rizzo
       title: Hammer of Kairos
+    bdburns:
+      # github.com/bdburns (verified u/4357134). Only the GitHub profile's own
+      # name and avatar are established here; no label, class or title row is
+      # authored, so none is invented.
+      name: Brent D Burns
+      avatar: https://avatars.githubusercontent.com/u/4357134?v=4
+    sarahnovotny:
+      # github.com/sarahnovotny (verified u/127370). Only the profile name and
+      # avatar are established here; every other row stays omitted until
+      # somebody authors it.
+      name: Sarah Novotny
+      avatar: https://avatars.githubusercontent.com/u/127370?v=4
 
     # --- ACT II, "THE LONG WALK" ---------------------------------------------
     # The owner's chapter inside act II: three people walking, and nobody else.
