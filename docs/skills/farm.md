@@ -1,3 +1,27 @@
+---
+name: farm
+version: "1.0"
+last_updated: "2026-08-19"
+id: farm
+one_line_purpose: Run frame-touching encodes on the remote Kubernetes farm.
+entry_point: docs/skills/farm.md
+category: operations
+status: active
+dependencies: []
+tags:
+  - ffmpeg
+  - kubernetes
+  - encode
+  - remote
+  - render
+description: >-
+  Run frame-touching encodes on the remote farm. Use when the cluster is
+  reachable and you need a Prod encode, a megacut segment, or another long
+  render.
+metadata:
+  type: runbook
+---
+
 # Encode farm
 
 ## When to Use

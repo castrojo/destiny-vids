@@ -1,11 +1,44 @@
+---
+name: review
+version: "1.0"
+last_updated: "2026-08-19"
+id: review
+one_line_purpose: Map programme notes to the owning act and rebuild only that act.
+entry_point: docs/skills/review.md
+category: editorial
+status: active
+dependencies: []
+tags:
+  - megacut
+  - timecodes
+  - acts
+  - rebuild
+  - notes
+description: >-
+  Map programme notes to the owning act and rebuild only that act. Use when a
+  timecoded note needs an act lookup, a one-act fix, or a re-delivery.
+metadata:
+  type: procedure
+---
+
 # The review loop
+
+## When to Use
+
+- Applying a watched note to the act that owns it
+- Locating a programme timecode and rebuilding only the touched act
+
+## When NOT to Use
+
+- Normal issue work, filing a brief, or starting from scratch →
+  [`issues/SKILL.md`](issues/SKILL.md)
 
 **A round of notes should cost one act, not one show.** This file is how a
 sentence typed while watching becomes a rebuilt file, and it exists because the
 expensive part of a revision has never been the render — it is working out
 *which act a note is about*, and then rebuilding six that were already right.
 
-## The three-second version
+## Core Process
 
 ```bash
 # 1. what is playing at the timecode you wrote down?
@@ -149,7 +182,7 @@ ran long and the plates are sitting on frames they were not timed for.
 `blackdetect` logs at *info*, so `-v error` silently prints nothing and looks
 like a pass; crop past the burned-in caption band or no frame is ever black.
 
-## What the loop refuses to hand you
+## Red Flags
 
 Two faults have actually shipped here and both are invisible to "did it
 render": a **silent pause** and a **true peak over the headroom gate**.
@@ -167,7 +200,7 @@ Known and tracked, so nobody re-measures them:
   audio blind and relies on its master's peak
   ([#44](https://github.com/castrojo/destiny-vids/issues/44)).
 
-## Taking notes so they survive the watch
+## Verification
 
 Write the **programme timecode** and what you saw. Nothing else is needed —
 `--locate` supplies the act, and the act supplies the project.

@@ -1,3 +1,27 @@
+---
+name: corpus
+version: "1.0"
+last_updated: "2026-08-19"
+id: corpus
+one_line_purpose: Inspect and regenerate per-character footage coverage.
+entry_point: docs/skills/corpus.md
+category: metadata
+status: active
+dependencies: []
+tags:
+  - coverage
+  - gaps
+  - hero-video
+  - casting
+  - shots
+description: >-
+  Build per-subject coverage ledgers from the index. Use when checking what a
+  character actually has, finding gaps, or regenerating a corpus after new
+  shots land.
+metadata:
+  type: procedure
+---
+
 # Character corpus
 
 ## When to Use
