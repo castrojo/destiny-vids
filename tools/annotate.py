@@ -1,6 +1,6 @@
 """Annotator pipeline scaffold for the destiny-vids index.
 
-Stages (docs/pipeline.md):
+Stages:
   1. Segmentation — ``detect_beats`` uses PySceneDetect when installed, else a
      deterministic fixed-window splitter. Shot boundaries are computed BEFORE
      any model runs; the model never decides where a beat starts.
@@ -53,7 +53,7 @@ except ImportError:  # older API layout or not installed at all
     except ImportError:
         HAVE_SCENEDETECT = False
 
-# Video-scoped defaults every segment inherits (README / pipeline.md §2).
+# Video-scoped defaults every segment inherits (README).
 INHERITABLE_FIELDS = ("era", "activity", "content_type", "destination", "subclass_version")
 
 # Fields a Tagger must populate (source = observed).
@@ -79,10 +79,10 @@ TAGGER_FIELDS = (
     "caption",
 )
 
-DEFAULT_WINDOW_SEC = 3.0  # gameplay fixed-window sampling (~2-4s, pipeline.md §1)
+DEFAULT_WINDOW_SEC = 3.0  # gameplay fixed-window sampling (~2-4s)
 
 # Shots shorter than this are merged into their neighbour by the detector. See
-# the Destiny false-cut hazard in docs/pipeline.md §1.
+# the Destiny false-cut hazard: a teleport flash reads as a boundary.
 DEFAULT_MIN_SHOT_SEC = 0.5
 
 
@@ -125,7 +125,7 @@ def _scenedetect_beats(video_path, min_shot_sec=DEFAULT_MIN_SHOT_SEC):
     video = open_video(str(video_path))
     manager = SceneManager()
     # Destiny is full of super activations, explosions and muzzle flash, all of
-    # which read to a frame-difference detector as a cut (docs/pipeline.md §1).
+    # which read to a frame-difference detector as a cut.
     # A minimum shot length merges those sub-threshold "shots" back into their
     # neighbours instead of littering the index with 3-frame beats.
     min_len = max(1, int(round(min_shot_sec * (video.frame_rate or 30.0))))
@@ -263,7 +263,7 @@ def verify_tags_match_detection(tags_path, beats, manifest_path=None, log=print)
             f"found {len(beats)}. Beat index is positional, so these tags "
             "describe different shots. Re-tag against the current keyframes, "
             "or restore the detector settings the tags were written for "
-            "(docs/skills/indexing.md)."
+            ""
         )
 
     manifest_path = Path(manifest_path) if manifest_path else None
@@ -293,7 +293,7 @@ class JsonTagger(Tagger):
     ``detect_beats`` returned, so a tag file is only valid against the shot list
     the same detector settings produce.
 
-    Underscore-prefixed keys (``_worksheet``, from tools/worksheet.py) are
+    Underscore-prefixed keys (``_worksheet``) are
     scaffolding — the keyframe a tagger looked at, the timecodes it saw — and
     are stripped here, so ``assemble_segment``'s tagger-fields strictness keeps
     catching genuine mistakes instead of metadata.
@@ -606,7 +606,7 @@ def main(argv=None):
         help="detect beats + keyframes for a real video, and assemble segments once tagged",
     )
     idx.add_argument("--video", required=True, help="source media file")
-    idx.add_argument("--video-record", required=True, help="videos/<video_id>.json from tools/ingest.py")
+    idx.add_argument("--video-record", required=True, help="videos/<video_id>.json")
     idx.add_argument("--keyframes-dir", default=None,
                      help="override the still destination (default: keyframes/<video_id>/)")
     idx.add_argument("--tags", default=None,

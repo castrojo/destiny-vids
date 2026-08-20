@@ -36,7 +36,6 @@ metadata:
 
 - Building a cut from indexed shots → [`editing`](../editing/SKILL.md)
 - Putting names on people → [`plates`](../plates/SKILL.md)
-- Fitting a cut to music → [`scoring`](../scoring/SKILL.md)
 - Delivering a finished file → [`production`](../production/SKILL.md)
 
 ## Assembly is not editing

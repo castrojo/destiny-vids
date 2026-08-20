@@ -16,7 +16,7 @@
     },
     "sources": {
       "type": "array",
-      "description": "Source footage the cut may draw from, in the order the owner wants it considered. An entry is a YouTube URL plus, once the video has been ingested, the index video_id that tools/ingest.py assigned it. A brief may name footage that is not indexed yet: that is the normal starting state, and it is what tells an agent an indexing pass is needed first.",
+      "description": "Source footage the cut may draw from, in the order the owner wants it considered. An entry is a YouTube URL plus, once the video has been ingested, its index video_id. A brief may name footage that is not indexed yet: that is the normal starting state, and it is what tells an agent an indexing pass is needed first.",
       "items": {
         "$ref": "#/$defs/source"
       }
