@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
 import pytest
 
 from scripts import generate_skill_index as catalog
@@ -124,6 +125,41 @@ def test_build_catalog_collects_and_validates_fixture_skills(tmp_path: Path):
         "nested-skill",
     ]
     catalog.validate_catalog(catalog_data, SCHEMA_PATH)
+
+
+@pytest.mark.parametrize(
+    "field_path",
+    [
+        ("generated_at",),
+        ("skills", 0, "last_updated"),
+    ],
+)
+def test_invalid_dates_are_rejected(field_path):
+    catalog_data = {
+        "schema_version": "1.0",
+        "generated_at": "2026-08-19",
+        "skills": [
+            {
+                "id": "demo-skill",
+                "name": "demo-skill",
+                "one_line_purpose": "Demonstrate catalog generation.",
+                "entry_point": "docs/skills/demo-skill.md",
+                "category": "meta",
+                "status": "active",
+                "tags": ["demo"],
+                "description": "Demonstrates catalog generation.",
+                "version": "1.0",
+                "last_updated": "2026-08-19",
+            }
+        ],
+    }
+    target = catalog_data
+    for key in field_path[:-1]:
+        target = target[key]
+    target[field_path[-1]] = "2026-02-30"
+
+    with pytest.raises(ValidationError, match="date"):
+        catalog.validate_catalog(catalog_data, SCHEMA_PATH)
 
 
 def test_unchanged_catalog_keeps_previous_generated_date():

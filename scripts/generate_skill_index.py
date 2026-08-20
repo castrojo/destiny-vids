@@ -109,12 +109,12 @@ def pin_unchanged_generated_at(catalog: dict, existing: dict | None) -> None:
 
 def validate_catalog(catalog: dict, schema_path: Path) -> None:
     try:
-        from jsonschema import Draft202012Validator
+        from jsonschema import Draft202012Validator, FormatChecker
     except ImportError as exc:  # pragma: no cover - CI installs it
         raise RuntimeError("jsonschema is required to validate the skill catalog") from exc
     schema = json.loads(Path(schema_path).read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
-    Draft202012Validator(schema).validate(catalog)
+    Draft202012Validator(schema, format_checker=FormatChecker()).validate(catalog)
 
 
 def render_markdown(catalog: dict) -> str:
