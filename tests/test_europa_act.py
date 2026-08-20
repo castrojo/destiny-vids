@@ -58,8 +58,11 @@ def test_alolita_uses_the_verified_repo_avatar():
     doc = load()
     alolita = next(p for p in doc["plates"] if p["id"] == "d03")
     assert alolita["speaker"] == "alolita"
-    assert Path(alolita["avatar"]) == (
-        REPO / "renders" / "avatars" / "alolita.png")
+    # The record names the repo's avatar cache, not the website asset.
+    # Absolute by convention (avatars are never committed), so the
+    # assertion must not bake in any one checkout's location.
+    assert Path(alolita["avatar"]).is_absolute()
+    assert alolita["avatar"].endswith("renders/avatars/alolita.png")
 
 
 def test_build_command_has_no_endcard_input_or_overlay(tmp_path):
