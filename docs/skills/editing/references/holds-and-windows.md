@@ -84,4 +84,3 @@ detector artifact.
 
 **This does not weaken the `clean` gate.** The card record never cuts the
 source's burned-in frames at all — it puts artwork in the hole they leave.
-

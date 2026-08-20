@@ -37,4 +37,3 @@ slide and the intro's comic title card — are still live on the site, so they a
 rendered from its own CSS by `cards/render-cards.mjs` rather than ported;
 `tools/plate.py` refuses one and names the driver. See
 [`references/full-frame-cards.md`](full-frame-cards.md).
-

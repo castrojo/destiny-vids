@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -8,6 +9,7 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS = REPO_ROOT / "docs" / "skills"
+PRE_COMMIT_CONFIG = REPO_ROOT / ".pre-commit-config.yaml"
 
 
 def _canonical_skills() -> list[Path]:
@@ -90,6 +92,27 @@ def test_router_links_generated_catalog():
     text = (REPO_ROOT / "docs/SKILL.md").read_text()
     assert "skills/index.json" in text
     assert "skills/index.md" in text
+
+
+def test_hygiene_hooks_cover_the_complete_skill_contract_surface():
+    config = yaml.safe_load(PRE_COMMIT_CONFIG.read_text(encoding="utf-8"))
+    hooks = {
+        hook["id"]: hook
+        for repo in config["repos"]
+        for hook in repo["hooks"]
+    }
+    skill_paths = [
+        path.relative_to(REPO_ROOT).as_posix()
+        for path in SKILLS.rglob("*")
+        if path.is_file()
+    ]
+
+    for hook_id in ("end-of-file-fixer", "trailing-whitespace"):
+        matcher = re.compile(hooks[hook_id]["files"]).search
+        unmatched = [path for path in skill_paths if not matcher(path)]
+        assert not unmatched, f"{hook_id} misses {unmatched}"
+        assert not matcher("docs/running-order.md")
+        assert not matcher("README.md")
 
 
 def test_validator_scripts_parse_cleanly():

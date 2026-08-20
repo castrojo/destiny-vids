@@ -176,4 +176,3 @@ an `enable=between(t,in,out)` expression, evaluated per frame — and
 stream-copies audio, so titling never costs the soundtrack a second generation.
 Two spellings of it have shipped a video with **no plates on it**, exiting 0 at
 the right length — [`docs/rendering.md`](../../../rendering.md#burning-plates-onto-a-cut).
-

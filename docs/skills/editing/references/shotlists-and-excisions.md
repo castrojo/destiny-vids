@@ -72,4 +72,3 @@ Two rules make this honest rather than a shortcut around the gate:
 - **It buys a cut, not an index.** Nothing lands in `segments/`, so the shots are
   not searchable and no later cut can find them. That is the trade; make it
   deliberately.
-

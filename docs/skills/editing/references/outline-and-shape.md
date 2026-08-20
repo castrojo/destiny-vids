@@ -92,4 +92,3 @@ beat, not the stranded one. (A hero video has no playhead, so nothing is ever
 stranded there — only distinctness cascades.)
 
 [issue #49]: https://github.com/castrojo/destiny-vids/issues/49
-

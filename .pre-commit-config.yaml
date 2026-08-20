@@ -5,9 +5,9 @@ repos:
       - id: check-json
       - id: check-yaml
       - id: end-of-file-fixer
-        files: ^(?:AGENTS\.md|\.github/workflows/ci\.yml|\.pre-commit-config\.yaml|docs/SKILL\.md|docs/skills/(?:[^/]+\.md|[^/]+/SKILL\.md|index\.json))$
+        files: ^(?:AGENTS\.md|\.github/workflows/ci\.yml|\.pre-commit-config\.yaml|docs/SKILL\.md|docs/skills/.*)$
       - id: trailing-whitespace
-        files: ^(?:AGENTS\.md|\.github/workflows/ci\.yml|\.pre-commit-config\.yaml|docs/SKILL\.md|docs/skills/(?:[^/]+\.md|[^/]+/SKILL\.md|index\.json))$
+        files: ^(?:AGENTS\.md|\.github/workflows/ci\.yml|\.pre-commit-config\.yaml|docs/SKILL\.md|docs/skills/.*)$
       - id: check-merge-conflict
       - id: detect-private-key
       - id: check-added-large-files

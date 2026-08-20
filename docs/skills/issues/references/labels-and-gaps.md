@@ -68,4 +68,3 @@ is skipped rather than buried under a robot copy.
 
 `gaps.py` never closes an issue. Opening one and closing one are very different
 amounts of trust.
-

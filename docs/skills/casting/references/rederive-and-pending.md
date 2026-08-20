@@ -83,4 +83,3 @@ un-ingested video). `tests/test_casting_pending.py` pins the queue so it cannot
 be silently dropped. Promoting an entry is an ordinary binding: move it under
 its character key in `values`, add the search phrases, and run the checklist
 above.
-
