@@ -371,16 +371,3 @@ SNAKE_CASES = [
 @pytest.mark.parametrize("raw,expected", SNAKE_CASES)
 def test_snake_case(raw, expected):
     assert snake_case(raw) == expected
-
-
-def test_ingest_slug_is_the_same_normaliser():
-    """ingest.slug and derive.snake_case were two copies of one regex pair.
-
-    They must agree on every case the id vocabulary cares about: a video_id
-    minted by ingest and a character id derived here are compared as strings,
-    so a divergence would silently stop a segment matching its own lead.
-    """
-    from tools.ingest import slug
-
-    for raw, expected in SNAKE_CASES:
-        assert slug(raw) == snake_case(raw) == expected

@@ -105,7 +105,6 @@ VARIANTS = {
         "label": (147, 197, 253, 255),
         "klass": (203, 213, 245, 255),    # #cbd5f5 (reveal.html .class)
         "title": (147, 197, 253, 255),    # #93c5fd (reveal.html .title)
-        "glow": (147, 197, 253, 140),
     },
     "trustee": {
         "border": (203, 213, 225, 140),   # rgb(203 213 225 / 55%)
@@ -113,7 +112,6 @@ VARIANTS = {
         "label": (229, 231, 235, 255),    # #e5e7eb
         "klass": (226, 232, 240, 255),
         "title": (203, 213, 225, 255),    # #cbd5e1
-        "glow": (226, 232, 240, 140),
     },
     "leader": {
         "border": (250, 204, 21, 140),    # rgb(250 204 21 / 55%)
@@ -124,7 +122,6 @@ VARIANTS = {
         # Christoph Blecker's "Broodweaver Warlock" renders exactly this way.
         "klass": (203, 213, 245, 255),    # #cbd5f5, as default
         "title": (253, 230, 138, 255),    # #fde68a
-        "glow": (250, 204, 21, 140),
     },
     # Bronze, the third rank. `leader` is already the gold and `trustee` the
     # silver, so a medal set only needed its lowest step -- owner instruction:
@@ -139,7 +136,6 @@ VARIANTS = {
         # As `leader`, the rank never recolours the class row.
         "klass": (203, 213, 245, 255),    # #cbd5f5, as default
         "title": (222, 164, 110, 255),    # #dea46e
-        "glow": (205, 127, 50, 140),
     },
     # Oxidised iron, for the Rust Foundation herald. Same geometry and the same
     # closed field set as every other plate — only the chrome changes, so this
@@ -150,7 +146,6 @@ VARIANTS = {
         "label": (251, 146, 60, 255),     # #fb923c
         "klass": (253, 186, 116, 255),    # #fdba74
         "title": (168, 121, 92, 255),     # #a8795c, weathered iron
-        "glow": (194, 91, 32, 140),
     },
     # Bazzite purple, for the three end-fight plates. The brand colours are
     # VERIFIED from the official logo (ublue-os/bazzite,
@@ -166,7 +161,6 @@ VARIANTS = {
         "label": (196, 181, 253, 255),    # #c4b5fd (Tailwind violet-300)
         "klass": (221, 214, 254, 255),    # #ddd6fe (Tailwind violet-200)
         "title": (167, 139, 250, 255),    # #a78bfa (Tailwind violet-400)
-        "glow": (88, 53, 206, 140),       # #5835ce, the wordmark purple
     },
     # Nobara indigo, for GloriousEggroll -- the peer of Kyle's bazzite purple,
     # and for the same reason: the affiliation is CHROME, and the card says
@@ -182,7 +176,6 @@ VARIANTS = {
         "label": (165, 180, 252, 255),    # #a5b4fc (Tailwind indigo-300)
         "klass": (199, 210, 254, 255),    # #c7d2fe (Tailwind indigo-200)
         "title": (129, 140, 248, 255),    # #818cf8 (Tailwind indigo-400)
-        "glow": (102, 79, 248, 140),      # #664FF8, the gradient's light end
     },
     # YouTube red, for a creator whose affiliation IS their channel. Same
     # rule: the platform is chrome, and #FF0000 is YouTube's own logo red,
@@ -193,7 +186,6 @@ VARIANTS = {
         "label": (252, 165, 165, 255),    # #fca5a5 (Tailwind red-300)
         "klass": (254, 202, 202, 255),    # #fecaca (Tailwind red-200)
         "title": (248, 113, 113, 255),    # #f87171 (Tailwind red-400)
-        "glow": (255, 0, 0, 140),
     },
 }
 
@@ -864,7 +856,7 @@ def _mark_tile(s, path, photo):
     return img
 
 
-def _crest(size, accent, glow, avatar=None, mark=None):
+def _crest(size, accent, avatar=None, mark=None):
     """The hex crest with its chevron (inline SVG in the Vue component).
 
     ``avatar`` is the path to a PFP image: the photo is cover-fit and masked
@@ -1117,7 +1109,7 @@ def _render_chat(spec):
             badge.resize((CHAT_AVATAR, CHAT_AVATAR), Image.LANCZOS),
             (CHAT_PAD_L, int(mid - CHAT_AVATAR / 2)))
     else:
-        img.alpha_composite(_crest(CHAT_AVATAR, chrome["accent"], chrome["glow"]),
+        img.alpha_composite(_crest(CHAT_AVATAR, chrome["accent"]),
                             (CHAT_PAD_L, int(mid - CHAT_AVATAR / 2)))
 
     # Text goes on its own layer so one text-shadow sits under all of it
@@ -2090,7 +2082,7 @@ def render_plate(spec):
         img.alpha_composite(_horizon(rule_w, 2, variant["accent"], to_left=True),
                             (int(box_w - PAD_X * scale - rule_w), rule_y))
     img.alpha_composite(
-        _crest(crest_h, variant["accent"], variant["glow"], avatar=avatar,
+        _crest(crest_h, variant["accent"], avatar=avatar,
                mark=mark),
         (int(cx - crest_h / 2), int(y)))
     if wreath:

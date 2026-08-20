@@ -56,7 +56,7 @@ TIER_BY_CONTENT_TYPE = {
 }
 
 # Shot scales wide enough to show the world but tight enough to read as a
-# Guardian (docs/pipeline.md §4).
+# Guardian.
 TRAVERSAL_HERO_SCALES = frozenset({"ELS", "LS", "MLS", "MS"})
 
 # Constraint evaluation for a CONSTRAINED lead binding (jeefy -> Saladin), where

@@ -14,18 +14,12 @@ load **only** that skill, then act.
 
 | I need to... | Load |
 |---|---|
-| Turn the owner's dictated Whisp notes into filed issues, or find out why a submitted request never landed | [`intake`](skills/intake.md) |
-| File work, pick up an issue, or normalize a request into a brief | [`issues`](skills/issues/SKILL.md) |
 | Take an issue all the way to a rendered cut, or make videos in volume | [`production`](skills/production/SKILL.md) |
-| Index a new video: detect beats, extract keyframes, tag, assemble segments | [`indexing`](skills/indexing.md) |
 | Cast a character, add a lead binding, or credit the monthly ensemble | [`casting`](skills/casting/SKILL.md) |
-| Find out what footage a character actually has — and what they lack | [`corpus`](skills/corpus.md) |
 | Write an outline, assemble a cut list, mark material for removal, or render it | [`editing`](skills/editing/SKILL.md) |
-| Score a cut to a music bed, pause the song mid-cut, or land a shot on a beat | [`scoring`](skills/scoring/SKILL.md) |
 | Meet the audio standard every delivered file is held to | [`audio`](skills/audio/SKILL.md) |
 | Put a name on screen — Guardian nameplates and title cards | [`plates`](skills/plates/SKILL.md) |
 | Join the finished acts into one programme | [`megacut`](skills/megacut/SKILL.md) |
-| Apply a round of notes without rebuilding acts that were already right | [`review`](skills/review.md) |
 | Run a long encode on the ghost cluster instead of the laptop | [`farm`](skills/farm.md) |
 
 This table is the curated task router. The complete generated catalog lives in
@@ -40,9 +34,6 @@ than restating them:
 
 | Doc | What it covers |
 |---|---|
-| [`taxonomy.md`](taxonomy.md) | Every axis and field, and the casting model. |
-| [`pipeline.md`](pipeline.md) | Segmentation, inheritance, review tiers, cost posture. |
-| [`agent-retrieval.md`](agent-retrieval.md) | How a natural-language query maps to filters and ranking. |
 | [`rendering.md`](rendering.md) | Which ffmpeg, why, and the seeking/AV1 traps. |
 | [`../schema/brief.schema.json`](../schema/brief.schema.json) | Every field of an issue's `brief` block. |
 

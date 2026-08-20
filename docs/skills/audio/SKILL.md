@@ -28,7 +28,7 @@ metadata:
 
 **This is the standard every delivered file in this project is held to** — the
 thresholds, the sourcing rule, and the gates that enforce them. Companion to
-[`production`](../production/SKILL.md) and [`scoring`](../scoring/SKILL.md).
+[`production`](../production/SKILL.md).
 
 **One line:** *impeccable audio, as the artist intended* — source the best
 version that exists, keep the chain lossless, ship it unaltered.
@@ -45,7 +45,6 @@ project-specific part.
 
 ## When NOT to Use
 
-- Placing or pausing a bed in a cut → [`scoring`](../scoring/SKILL.md)
 - Delivering a finished file through the workspace graph →
   [`production`](../production/SKILL.md)
 - Getting ffmpeg working on an atomic host → [`../../rendering.md`](../../rendering.md)

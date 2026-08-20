@@ -15,8 +15,7 @@ they are and what order they play in.
 2. [`docs/running-order.md`](docs/running-order.md) — what the show is.
 3. [`docs/SKILL.md`](docs/SKILL.md) — find the skill for your task and load it.
 4. The routed local skill, its references, and the design docs it links to
-   (`docs/taxonomy.md`, `docs/pipeline.md`, `docs/agent-retrieval.md`,
-   `docs/rendering.md`).
+   (`docs/rendering.md`).
 5. [`projectbluefin/common/docs/factory/agentic-model.md`](https://github.com/projectbluefin/common/blob/main/docs/factory/agentic-model.md)
    — a shared compatibility sidecar only; it never overrides local authority.
 
@@ -341,9 +340,8 @@ anything.
 
 **GitHub issues are the backlog.** Session state stays in the agent's session
 folder. An issue carries the owner's prose *and* a fenced `brief` block that
-makes it executable — see
-[`docs/skills/issues/SKILL.md`](docs/skills/issues/SKILL.md), with the field
-reference in [`schema/brief.schema.json`](schema/brief.schema.json).
+makes it executable — the field reference is
+[`schema/brief.schema.json`](schema/brief.schema.json).
 
 The one exception is `docs/plans/<name>/`: a planning tree may be committed when
 a design is too large for one issue body. **A plan decides nothing** — it may

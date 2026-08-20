@@ -33,9 +33,8 @@ metadata:
 ## When NOT to Use
 
 - Debugging one stage — go to that stage's skill
-  ([`indexing`](../indexing.md), [`editing`](../editing/SKILL.md),
+  ([`editing`](../editing/SKILL.md),
   [`plates`](../plates/SKILL.md))
-- Filing or triaging the work itself → [`issues`](../issues/SKILL.md)
 
 ## Rule zero: deliver first, improve second
 
@@ -140,7 +139,6 @@ This skill is the contract. The procedure lives in `references/`:
 | Reference | What is in it |
 |---|---|
 | [`delivery.md`](references/delivery.md) | The `~/Videos/Wolves/` workspace, the delivery graph, hardlinks, checksums, playlists, and the Syncthing hazard. |
-| [`parallel-and-tagging.md`](references/parallel-and-tagging.md) | Stale tags, `verify_tags_match_detection`, batch worksheets, and working several videos at once. |
 | [`social-copies.md`](references/social-copies.md) | Byte-capped social encodes from `Prod/`. |
 | [`avatars.md`](references/avatars.md) | The credits avatar cache and the Actions job that fetches it. |
 | [`freshness.md`](references/freshness.md) | Keeping delivery current across `cards / plates -> master -> Prod -> megacut -> 10mb/`. |

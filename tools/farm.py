@@ -174,13 +174,14 @@ class FarmError(RuntimeError):
 # Probing (always local: the source and the output both live on the laptop)
 
 
-def probe(path, ffprobe):
+def probe(path, ffprobe=None):
     """The facts the plan and the verifier need about one media file.
 
     Duration comes from the VIDEO stream where possible — the same lesson
     social.py learned: a format-level duration can be the longest stream,
     which is the wrong number when audio outruns the picture.
     """
+    ffprobe = ffprobe or native_ffprobe()
     cmd = [*ffprobe, "-v", "error", "-print_format", "json",
            "-show_entries",
            "stream=codec_type,codec_name,width,height,pix_fmt,r_frame_rate,"
@@ -254,7 +255,7 @@ def chunk_boundaries(facts, segments):
             for b0, b1 in itertools.pairwise(bounds)]
 
 
-def _chunk_out_name(out_name, i):
+def _chunk_out_name(i):
     return f"chunk_{i:04d}.mp4"
 
 
@@ -293,10 +294,10 @@ def build_plan(*, facts, out_name, segments, video_args, audio_args, threads,
                 # After the recipe so the farm's threading wins even when the
                 # recipe carries its own -threads (documented, not a bug).
                 "-threads", str(threads),
-                "-progress", f"{work_dir}/logs/{_chunk_out_name(out_name, i)}.progress",
-                "-y", f"{work_dir}/chunks/{_chunk_out_name(out_name, i)}"]
+                "-progress", f"{work_dir}/logs/{_chunk_out_name(i)}.progress",
+                "-y", f"{work_dir}/chunks/{_chunk_out_name(i)}"]
         chunks.append({"index": i, "ss": ss, "dur": dur, "argv": argv})
-    concat_list = [f"{work_dir}/chunks/{_chunk_out_name(out_name, i)}"
+    concat_list = [f"{work_dir}/chunks/{_chunk_out_name(i)}"
                    for i in range(len(chunks))]
 
     has_audio = "audio" in facts["stream_kinds"]
@@ -922,7 +923,7 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
         desc=f"1 encode x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
     try:
-        facts = probe(out, ffprobe or native_ffprobe())
+        facts = probe(out, ffprobe)
     except (FarmError, RuntimeError) as exc:
         raise FarmError(f"fetched output does not probe as media: {exc}")
     if expected_duration is not None:
@@ -1012,7 +1013,7 @@ def run_ffmpeg_commands_on_cluster(argvs, *, inputs, out, name=None, kc=None,
         desc=f"{len(argvs)} ordered encode pass(es) x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
     try:
-        facts = probe(out, ffprobe or native_ffprobe())
+        facts = probe(out, ffprobe)
     except (FarmError, RuntimeError) as exc:
         raise FarmError(f"fetched output does not probe as media: {exc}")
     if expected_duration is not None:

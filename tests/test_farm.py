@@ -14,10 +14,7 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 from tools import farm  # noqa: E402
-
 
 FACTS = {
     "duration": 111.6, "fps": Fraction(30, 1), "vfr": False,
@@ -25,14 +22,11 @@ FACTS = {
     "height": 1080, "pix_fmt": "yuv420p", "stream_kinds": ["video", "audio"],
 }
 
-
 def facts(**over):
     return {**FACTS, **over}
 
-
 # --------------------------------------------------------------------------
 # chunk boundaries: the seam arithmetic is the whole ballgame
-
 
 def test_boundaries_cover_the_file_exactly_on_the_frame_grid():
     spans = farm.chunk_boundaries(facts(), 4)
@@ -51,17 +45,14 @@ def test_boundaries_cover_the_file_exactly_on_the_frame_grid():
             frames = t * 30
             assert abs(frames - round(frames)) < 1e-6
 
-
 def test_boundaries_clamp_to_the_frame_count():
     spans = farm.chunk_boundaries(facts(duration=0.1, frame_count=3), 8)
     assert len(spans) == 3
-
 
 def test_a_vfr_source_falls_back_to_time_slices():
     spans = farm.chunk_boundaries(facts(vfr=True), 3)
     assert [round(d, 3) for _, d, n in spans] == [37.2, 37.2, 37.2]
     assert all(n is None for _, _, n in spans)
-
 
 def test_cfr_chunks_encode_an_exact_integer_frame_count():
     """issue-#88-class bug, measured on act VI: a float -t truncates into the
@@ -76,10 +67,8 @@ def test_cfr_chunks_encode_an_exact_integer_frame_count():
         counts.append(int(argv[argv.index("-frames:v") + 1]))
     assert sum(counts) == 3348
 
-
 # --------------------------------------------------------------------------
 # the plan
-
 
 def test_chunk_commands_seek_input_side_and_force_threads_after_the_recipe():
     plan = farm.build_plan(facts=facts(), out_name="o.mp4", segments=2,
@@ -96,7 +85,6 @@ def test_chunk_commands_seek_input_side_and_force_threads_after_the_recipe():
         assert last > argv.index("99")
         assert "-progress" in argv
 
-
 def test_join_is_stream_copy_and_faststart_for_mp4_only():
     plan = farm.build_plan(facts=facts(), out_name="o.mp4", segments=2,
                            video_args=[], audio_args=[], threads=6,
@@ -109,7 +97,6 @@ def test_join_is_stream_copy_and_faststart_for_mp4_only():
                           work_dir="/w", src_arg="/w/in/s.mp4")
     assert "+faststart" not in mkv["join"]
 
-
 def test_concat_list_matches_the_chunks_in_order():
     plan = farm.build_plan(facts=facts(), out_name="o.mp4", segments=3,
                            video_args=[], audio_args=[], threads=6,
@@ -117,10 +104,8 @@ def test_concat_list_matches_the_chunks_in_order():
     assert plan["concat_list"] == [f"/w/chunks/chunk_{i:04d}.mp4"
                                    for i in range(3)]
 
-
 # --------------------------------------------------------------------------
 # the pod script
-
 
 def test_pod_script_is_valid_bash_and_waits_for_both_markers(tmp_path):
     plan = farm.build_plan(facts=facts(), out_name="o.mp4", segments=3,
@@ -141,10 +126,8 @@ def test_pod_script_is_valid_bash_and_waits_for_both_markers(tmp_path):
                               capture_output=True, text=True)
         assert proc.returncode == 0, proc.stderr
 
-
 # --------------------------------------------------------------------------
 # the manifest
-
 
 def test_the_workflow_is_plain_scheduler_driven_and_admission_compliant():
     wf = farm.build_workflow("farm-x-ab12", "echo hi",
@@ -171,14 +154,12 @@ def test_the_workflow_is_plain_scheduler_driven_and_admission_compliant():
     assert "amd.com/gpu" not in json.dumps(wf)  # CPU-only: faster AND better
     assert spec["ttlStrategy"]["secondsAfterSuccess"] == 3600
 
-
 def test_keep_omits_the_ttl_backstop():
     wf = farm.build_workflow("farm-x-ab12", "s", namespace="argo", image="i",
                              cpu="1", limit_cpu="1", memory="1Gi",
                              limit_memory="2Gi",
                              node="exo-0", keep=True)
     assert "ttlStrategy" not in wf["spec"]
-
 
 def test_the_default_image_is_pullable_through_the_zot_allowlist():
     """ghcr.io/jrottenberg/ffmpeg is NOT reachable on this cluster: the zot
@@ -189,12 +170,10 @@ def test_the_default_image_is_pullable_through_the_zot_allowlist():
     assert farm.DEFAULT_IMAGE == "lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76"
     assert "@sha256:" not in farm.DEFAULT_IMAGE  # digests 404 through zot
 
-
 def test_pvc_is_local_path_rwo():
     pvc = farm.build_pvc("farm-x-ab12", namespace="argo", storage="4Gi")
     assert pvc["spec"]["storageClassName"] == "local-path"
     assert pvc["spec"]["accessModes"] == ["ReadWriteOnce"]
-
 
 def test_pod_blocker_surfaces_unschedulable_and_image_errors():
     unsched = {"status": {"conditions": [{
@@ -210,21 +189,17 @@ def test_pod_blocker_surfaces_unschedulable_and_image_errors():
         "name": "main", "state": {"running": {}}}]}}
     assert farm.pod_blocker(running) is None
 
-
 def test_storage_scales_with_the_source():
     assert farm.storage_for(100 * 1024 ** 2) == "1Gi"
     assert farm.storage_for(2 * 1024 ** 3) == "6Gi"
 
-
 # --------------------------------------------------------------------------
 # availability and verification
-
 
 def test_cluster_unavailable_when_kubectl_is_missing(monkeypatch):
     monkeypatch.setattr(farm.shutil, "which", lambda _: None)
     ok, why = farm.cluster_available()
     assert not ok and "kubectl" in why
-
 
 def test_cluster_unavailable_when_the_api_errors(monkeypatch):
     monkeypatch.setattr(farm.shutil, "which", lambda _: "/usr/bin/kubectl")
@@ -244,7 +219,6 @@ def test_cluster_unavailable_when_the_api_errors(monkeypatch):
     ok, why = farm.cluster_available()
     assert not ok and "refused" in why
 
-
 def _probe_doc(duration, frames="600", codec="h264", fps="30/1",
                kinds=("video", "audio")):
     streams = []
@@ -257,7 +231,6 @@ def _probe_doc(duration, frames="600", codec="h264", fps="30/1",
         streams.append(s)
     return {"streams": streams, "format": {"duration": str(duration)}}
 
-
 def test_probe_parses_the_video_stream(monkeypatch, tmp_path):
     import subprocess as sp
     doc = _probe_doc(20.0)
@@ -266,7 +239,6 @@ def test_probe_parses_the_video_stream(monkeypatch, tmp_path):
     f = farm.probe(tmp_path / "x.mp4", ["ffprobe"])
     assert f["duration"] == 20.0 and f["frame_count"] == 600
     assert f["fps"] == Fraction(30, 1)
-
 
 def test_verify_catches_a_short_file_and_a_dropped_stream(monkeypatch):
     """issue #88: ffmpeg exited 0 and shipped a file 8.5s short."""
@@ -286,7 +258,6 @@ def test_verify_catches_a_short_file_and_a_dropped_stream(monkeypatch):
     assert any("stream count" in p for p in problems)
     assert any("frame count" in p for p in problems)
 
-
 def test_verify_passes_a_matching_output(monkeypatch):
     good = {"duration": 111.63, "fps": Fraction(30), "frame_count": 3348,
             "codec_name": "h264", "width": 1920, "height": 1080,
@@ -294,7 +265,6 @@ def test_verify_passes_a_matching_output(monkeypatch):
     monkeypatch.setattr(farm, "probe", lambda path, _: dict(good))
     assert farm.verify_output("out.mp4", "ref.mp4", ffprobe=["x"],
                               strict_streams=True) == []
-
 
 def test_strict_streams_only_against_an_explicit_reference(monkeypatch):
     """A recipe that legitimately scales must not fail against the source."""
@@ -312,11 +282,9 @@ def test_strict_streams_only_against_an_explicit_reference(monkeypatch):
     assert farm.verify_output("out.mp4", "src.mp4", ffprobe=["x"],
                               strict_streams=True) != []
 
-
 # --------------------------------------------------------------------------
 # local executor, with a fake ffmpeg: offline, hermetic, and it still proves
 # the chunk -> join -> output flow end to end.
-
 
 def _fake_ffmpeg(tmp_path):
     """A stand-in ffmpeg that copies -i to the output, and concatenates for
@@ -338,7 +306,6 @@ def _fake_ffmpeg(tmp_path):
     exe.chmod(0o755)
     return [str(exe)]
 
-
 def test_local_run_executes_chunks_and_join(tmp_path, monkeypatch):
     src = tmp_path / "in.mp4"
     src.write_bytes(b"footage" * 100)
@@ -353,7 +320,6 @@ def test_local_run_executes_chunks_and_join(tmp_path, monkeypatch):
     # Progress files were written, which is what the monitor thread reads.
     assert list((tmp_path / "w" / "logs").glob("*.progress"))
 
-
 def test_local_run_reports_a_failing_chunk(tmp_path, monkeypatch):
     src = tmp_path / "in.mp4"
     src.write_bytes(b"x")
@@ -364,14 +330,12 @@ def test_local_run_reports_a_failing_chunk(tmp_path, monkeypatch):
     with pytest.raises(farm.FarmError, match="chunk"):
         farm.run_locally(plan, workers=2)
 
-
 # --------------------------------------------------------------------------
 # The generic one-argv capability (run_ffmpeg_on_cluster): megacut's ENCODE
 # segments ride this. Offline like everything above — the kubectl layer is
 # faked, the pod never exists.
 
 import subprocess  # noqa: E402  (module-level: the fakes below use it)
-
 
 def test_rewrite_argv_maps_binary_inputs_and_output():
     argv = ["/home/linuxbrew/.linuxbrew/bin/ffmpeg", "-nostdin", "-i",
@@ -390,7 +354,6 @@ def test_rewrite_argv_maps_binary_inputs_and_output():
     # none) — and the rest of the recipe travels byte-for-byte.
     assert "fps=60000/1001,trim=end=431.231" in pod_argv
 
-
 def test_rewrite_argv_stages_same_named_inputs_distinctly():
     argv = ["ffmpeg", "-i", "/a/seg.mp4", "-i", "/b/seg.mp4",
             "/out/o.mkv", "-y"]
@@ -401,7 +364,6 @@ def test_rewrite_argv_stages_same_named_inputs_distinctly():
     assert "/work/in/00-seg.mp4" in pod_argv
     assert "/work/in/01-seg.mp4" in pod_argv
 
-
 def test_rewrite_argv_rejects_an_argv_that_disagrees_with_its_io():
     with pytest.raises(farm.FarmError, match="never writes"):
         farm.rewrite_argv_for_pod(["ffmpeg", "-i", "/a.mp4", "/else.mkv"],
@@ -409,7 +371,6 @@ def test_rewrite_argv_rejects_an_argv_that_disagrees_with_its_io():
     with pytest.raises(farm.FarmError, match="never reads"):
         farm.rewrite_argv_for_pod(["ffmpeg", "-i", "/a.mp4", "/out.mkv"],
                                   ["/a.mp4", "/unused.mp4"], "/out.mkv")
-
 
 def test_pod_script_run_is_valid_bash_and_waits_for_both_markers(tmp_path):
     script = farm.pod_script_run(["ffmpeg", "-i", "/work/in/00-a.mp4",
@@ -425,7 +386,6 @@ def test_pod_script_run_is_valid_bash_and_waits_for_both_markers(tmp_path):
         proc = subprocess.run(["bash", "-n", str(script_file)],
                               capture_output=True, text=True)
         assert proc.returncode == 0, proc.stderr
-
 
 def test_pod_script_survives_a_filter_full_of_quotes_and_parens(tmp_path):
     """The perfume movements fade with `volume='if(lt(t,62.4),1,...)'`.
@@ -446,7 +406,6 @@ def test_pod_script_survives_a_filter_full_of_quotes_and_parens(tmp_path):
         proc = subprocess.run(["bash", "-n", str(script_file)],
                               capture_output=True, text=True)
         assert proc.returncode == 0, proc.stderr
-
 
 class _FakeKubectl:
     """Just enough of the cluster for run_ffmpeg_on_cluster: the pod is
@@ -486,7 +445,6 @@ class _FakeKubectl:
     def delete(self, kind, name):
         pass
 
-
 def _run_generic_offline(tmp_path, monkeypatch, **kw):
     src = tmp_path / "act.mp4"
     src.write_bytes(b"footage" * 100)
@@ -508,7 +466,6 @@ def _run_generic_offline(tmp_path, monkeypatch, **kw):
                                expected_duration=421.231, **kw)
     return kc, src, out, probed
 
-
 def test_run_ffmpeg_on_cluster_stages_rewrites_and_fetches(tmp_path, monkeypatch):
     kc, src, out, probed = _run_generic_offline(tmp_path, monkeypatch)
     assert out.read_bytes() == b"encoded-segment"
@@ -521,7 +478,6 @@ def test_run_ffmpeg_on_cluster_stages_rewrites_and_fetches(tmp_path, monkeypatch
     # The fetched file was verified with the local ffprobe (issue #88:
     # exit 0 is not evidence).
     assert probed == [str(out)]
-
 
 def test_remote_ordered_commands_share_one_staged_workspace(tmp_path, monkeypatch):
     """Two-pass x264 requires the stats file written by pass one in pass two."""
@@ -548,7 +504,6 @@ def test_remote_ordered_commands_share_one_staged_workspace(tmp_path, monkeypatc
     assert script.count("/work/out/social.mp4") >= 2
     assert "running pass 1" in script and "running pass 2" in script
 
-
 def test_native_ffprobe_never_resolves_to_the_container_when_avoidable(
         tmp_path, monkeypatch):
     """The container ffprobe mounts only $HOME: a fetched segment parked in
@@ -574,7 +529,6 @@ def test_native_ffprobe_never_resolves_to_the_container_when_avoidable(
     monkeypatch.setattr(farm, "find_ffprobe", lambda: ["podman", "exec", "x", "ffprobe"])
     assert farm.native_ffprobe() == ["podman", "exec", "x", "ffprobe"]
 
-
 def test_run_ffmpeg_on_cluster_refuses_a_retimed_output(tmp_path, monkeypatch):
     monkeypatch.setattr(farm, "_stream_logs", lambda *a, **k: None)
     monkeypatch.setattr(farm, "find_ffprobe", lambda: ["ffprobe-fake"])
@@ -590,10 +544,8 @@ def test_run_ffmpeg_on_cluster_refuses_a_retimed_output(tmp_path, monkeypatch):
             inputs=[src], out=tmp_path / "o.mkv", kc=_FakeKubectl(),
             expected_duration=307.967)
 
-
 # --------------------------------------------------------------------------
 # Gated live checks: these skip anywhere but the owner's setup.
-
 
 def _local_ffmpeg():
     try:
@@ -606,7 +558,6 @@ def _local_ffmpeg():
     except (OSError, subprocess.CalledProcessError):
         pytest.skip("ffmpeg is not runnable here")
     return ffmpeg
-
 
 def test_local_fallback_actually_encodes(tmp_path):
     """The --local path end to end, gated on a real ffmpeg (skipped in CI).
@@ -630,7 +581,6 @@ def test_local_fallback_actually_encodes(tmp_path):
     assert rc == 0
     assert out.exists()
 
-
 @pytest.mark.skipif(os.environ.get("DESTINY_FARM_E2E") != "1",
                     reason="live cluster encode; set DESTINY_FARM_E2E=1")
 def test_cluster_roundtrip(tmp_path):
@@ -649,7 +599,6 @@ def test_cluster_roundtrip(tmp_path):
                     "ultrafast", "-c:a", "aac", "-b:a", "96k"])
     assert rc == 0 and out.exists()
 
-
 def test_the_farm_is_both_nodes_unless_told_otherwise():
     """exo-0 and ghost are 32 cores each, neither tainted, both holding the
     image. Pinning to one left half the cluster idle while segments queued, so
@@ -666,14 +615,12 @@ def test_the_farm_is_both_nodes_unless_told_otherwise():
         "n", "s", node="ghost", **common)["spec"]["templates"][0]
     assert pinned["nodeSelector"] == {"kubernetes.io/hostname": "ghost"}
 
-
 def test_requests_stay_small_enough_to_land_on_either_node():
     """Requests gate scheduling. A pod that asks for a burst ceiling's worth
     of CPU pends instead of spreading -- the request has to fit the SMALLER
     headroom of the two nodes, and the limit does the bursting."""
     assert int(farm.DEFAULT_CPU) <= 4
     assert int(farm.DEFAULT_LIMIT_CPU) > int(farm.DEFAULT_CPU)
-
 
 def test_a_broken_cp_stream_is_retried_not_fatal(monkeypatch):
     """A 20-minute programme build died on its LAST upload because the API
@@ -696,7 +643,6 @@ def test_a_broken_cp_stream_is_retried_not_fatal(monkeypatch):
     assert proc.returncode == 0
     assert len(calls) == 3
 
-
 def test_cp_still_fails_when_the_pod_is_genuinely_broken(monkeypatch):
     """Bounded, so a real failure is still a failure -- three streams later."""
     kc = farm.Kubectl.__new__(farm.Kubectl)
@@ -713,7 +659,6 @@ def test_cp_still_fails_when_the_pod_is_genuinely_broken(monkeypatch):
     with pytest.raises(farm.FarmError):
         kc.cp("/tmp/x.mp4", "argo/pod:/work/in/x.mp4", sleep=lambda s: None)
     assert len(calls) == farm.CP_ATTEMPTS
-
 
 def test_an_image_sequence_pattern_is_staged_as_its_frames(tmp_path):
     """A %0Nd input must reach the pod, or a plate burn cannot be farmed.

@@ -70,7 +70,7 @@ def resolve(video_id, media_dir=None):
 def file_digest(path):
     """SHA-256 of a file's bytes, cached by (path, size, mtime_ns).
 
-    ponytail: whole-file hash, chunked. A head+tail sample would be quicker on
+    ponytail: whole-file hash. A head+tail sample would be quicker on
     a 500 MB master, but it cannot see a re-encode that preserves the ends, and
     the cache already makes the second call free.
     """
@@ -90,11 +90,8 @@ def file_digest(path):
     if hit and hit.get("stamp") == stamp:
         return hit["digest"]
 
-    h = hashlib.sha256()
     with path.open("rb") as fh:
-        for chunk in iter(lambda: fh.read(4 << 20), b""):
-            h.update(chunk)
-    digest = h.hexdigest()
+        digest = hashlib.file_digest(fh, "sha256").hexdigest()
 
     cache[key] = {"stamp": stamp, "digest": digest}
     try:

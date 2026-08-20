@@ -13,34 +13,27 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
+    
 from scripts import actbuild  # noqa: E402
 from tools import plate  # noqa: E402
 
-
 ACTS = ("IV", "V")
-
 
 @pytest.fixture(scope="module")
 def doc():
     """Act IV's record -- the one the shape was proved on."""
     return actbuild.load_act("IV")[0]
 
-
 @pytest.fixture(scope="module", params=ACTS)
 def any_act(request):
     """Both records. Everything that is true of an act is asserted on both."""
     return actbuild.load_act(request.param)[0]
-
 
 def test_manifest_renders_as_a_plate_manifest(any_act):
     """plate.py loads it unmodified -- it is not a private format."""
     manifest, _, _ = actbuild.act_paths(any_act["act"])
     entries = plate.load_manifest(manifest)
     assert [e["id"] for e in entries] == [p["id"] for p in any_act["plates"]]
-
 
 def test_every_dialogue_plate_is_a_chat_pill_in_the_letterbox(any_act):
     for cue in any_act["plates"]:
@@ -49,7 +42,6 @@ def test_every_dialogue_plate_is_a_chat_pill_in_the_letterbox(any_act):
         # covers picture. Anything else is the lower-third row, which on this
         # letterboxed act lands 18px onto the frame.
         assert cue["position"] == "letterbox"
-
 
 def test_the_words_are_the_owners(doc):
     """The copy is a RECORD of what shipped, reproduced, never re-authored.
@@ -73,7 +65,6 @@ def test_the_words_are_the_owners(doc):
         ("kat", "Remember kids, cardio!"),
     ]
 
-
 def test_the_retired_round_keeps_its_words(doc):
     """A retired plate keeps its authored copy -- restoring must never mean
     rewriting (the megacut deck's own convention, applied to an act record)."""
@@ -85,13 +76,11 @@ def test_the_retired_round_keeps_its_words(doc):
     ]
     assert all(c.get("retired_note") for c in doc["retired"])
 
-
 def test_no_two_plates_share_the_screen(any_act):
     """One plate at a time -- plate.py enforces it, and so does the record."""
     windows = sorted((c["at"], c["at"] + c["dur"]) for c in any_act["plates"])
     for (_, end), (start, _) in zip(windows, windows[1:]):
         assert start > end, f"{start} overlaps a plate still on screen at {end}"
-
 
 def test_the_conversation_breaks_on_the_reveal(doc):
     """#118's note order: the setup pair plays BEFORE 'nameplate reveal', the
@@ -106,13 +95,11 @@ def test_the_conversation_breaks_on_the_reveal(doc):
     for cue in rest:
         assert cue["at"] > reveal_end, cue["id"]
 
-
 def test_fade_out_finishes_inside_the_window(any_act):
     for cue in [*any_act["plates"], any_act["reveal"]]:
         end = cue["at"] + cue["dur"]
         assert cue["fade_out_at"] + cue["fade_out"] == pytest.approx(end), cue["id"]
         assert cue["at"] + cue["fade_in"] <= cue["fade_out_at"], cue["id"]
-
 
 def test_the_lines_clear_the_measured_cuts(doc):
     """Plates sit inside their frame-verified seats: the setup pair clears
@@ -126,7 +113,6 @@ def test_the_lines_clear_the_measured_cuts(doc):
     linux1 = doc["plates"][3]
     assert linux1["at"] == 12.65
     assert linux1["at"] + linux1["dur"] < 14.833
-
 
 def test_goddamn_uses_the_kubernetes_helm_censor(any_act):
     """The helm substitutes an O; other active swears keep asterisks."""
@@ -143,14 +129,12 @@ def test_goddamn_uses_the_kubernetes_helm_censor(any_act):
         assert cue["censor"] == [{"find": find, "replace": replacement}]
     assert seen == expected_ids
 
-
 def test_kat_swears_use_asterisks(doc):
     kat_swears = [cue["text"] for cue in doc["plates"]
                   if cue["id"] in {"p3d-kat-bettershit", "p5-kat-linux3"}]
     assert kat_swears == ["I have better sh*t to do!", "Fine I'll fix your sh*t too"]
     assert all("censor" not in cue for cue in doc["plates"]
                if cue["id"] in {"p3d-kat-bettershit", "p5-kat-linux3"})
-
 
 def test_the_delivered_variant_is_lossless_stereo(any_act):
     """Prod/04 hardlinks the FLAC stereo master, not the AAC 5.1 sibling.
@@ -163,7 +147,6 @@ def test_the_delivered_variant_is_lossless_stereo(any_act):
     assert delivered["surround"] is False
     assert "audio_bitrate" not in delivered, "a bitrate is meaningless for FLAC"
 
-
 def test_the_delivered_command_carries_no_bitrate_and_no_upmix(doc):
     cmd, target = actbuild.build_command(doc, "/tmp/proj", "delivered",
                                           ffmpeg=["ffmpeg"])
@@ -172,7 +155,6 @@ def test_the_delivered_command_carries_no_bitrate_and_no_upmix(doc):
     assert "[apre]anull[aout]" in graph, "the bed reaches the encoder untouched"
     assert "pan=5.1" not in graph
     assert target.name == "wolves-kat-reveal-hq.mp4"
-
 
 def test_the_51_variant_adds_only_an_lfe(any_act):
     """The stereo mix passes through bit-exact; FC/BL/BR stay digital silence."""
@@ -185,7 +167,6 @@ def test_the_51_variant_adds_only_an_lfe(any_act):
     # latency, which would desync audio from picture.
     assert "surround" not in graph
 
-
 def test_every_cue_becomes_one_input_in_order(any_act):
     cmd, _ = actbuild.build_command(any_act, "/tmp/proj", "delivered",
                                      ffmpeg=["ffmpeg"])
@@ -193,7 +174,6 @@ def test_every_cue_becomes_one_input_in_order(any_act):
     assert offsets == [f"{float(c['at']):g}" for c in actbuild._cues(any_act)]
     # source + the pills + the reveal + the bed
     assert cmd.count("-i") == len(any_act["plates"]) + 3
-
 
 def test_avatar_paths_resolve_in_both_recorded_shapes():
     """Act IV's record carries ~-rooted paths; act V's carries bare names.
@@ -213,7 +193,6 @@ def test_avatar_paths_resolve_in_both_recorded_shapes():
     assert all(not p["avatar"].startswith("/proj")
                for p in resolved["plates"] if p.get("avatar"))
 
-
 def test_the_reveal_is_taken_from_the_project_not_rendered(any_act):
     """Its copy is an authored Guardian identity, reproduced, never written."""
     assert any_act["reveal"]["file"]
@@ -222,7 +201,6 @@ def test_the_reveal_is_taken_from_the_project_not_rendered(any_act):
                                     ffmpeg=["ffmpeg"])
     assert f"/tmp/proj/{any_act['reveal']['file']}" in cmd
 
-
 def test_the_letterbox_rect_is_measured_not_probed(any_act):
     """detect_picture probes at 40s and this act is 34s, so it finds nothing.
 
@@ -230,7 +208,6 @@ def test_the_letterbox_rect_is_measured_not_probed(any_act):
     """
     assert any_act["film_sec"] < 40.0
     assert actbuild.picture_rect(any_act) == (0, 140, 1920, 800)
-
 
 def test_the_picture_rect_seats_the_pill_in_the_matte(any_act):
     """The measured rect is what puts the pill on black rather than 18px up."""
@@ -241,13 +218,11 @@ def test_the_picture_rect_seats_the_pill_in_the_matte(any_act):
     assert top >= y + h, "the pill must start below the picture, on the matte"
     assert bottom <= 1080
 
-
 def test_parse_picture_rejects_nonsense():
     assert plate.parse_picture("0,140,1920,800") == (0, 140, 1920, 800)
     for bad in ("0,140,1920", "a,b,c,d", "0,140,0,800", "0,140,1920,-1"):
         with pytest.raises(ValueError):
             plate.parse_picture(bad)
-
 
 def test_act_iv_is_declared_repo_driven():
     """The delivery map must agree that act IV now has inputs."""
@@ -259,9 +234,7 @@ def test_act_iv_is_declared_repo_driven():
     assert "scripts/actbuild.py" in act["sources"]
     assert "sources_note" not in act, "that note said it had no inputs"
 
-
 # --- what act V added, and act IV must not have grown ------------------------
-
 
 def test_act_v_starts_inside_a_longer_source():
     """`source_in` and the cut's own clock are different numbers.
@@ -282,7 +255,6 @@ def test_act_v_starts_inside_a_longer_source():
     kat = actbuild.load_act("IV")[0]
     assert "source_in" not in kat["trim"]
 
-
 def test_only_the_act_that_fades_to_black_gets_a_final_fade():
     """Act V resolves into the cinematic's own fade; act IV ends on a hard cut."""
     nat = actbuild.load_act("V")[0]
@@ -299,7 +271,6 @@ def test_only_the_act_that_fades_to_black_gets_a_final_fade():
     next_label = f"[t{len(kat['plates']) + 1}]"
     assert next_label not in kgraph
 
-
 def test_the_loop_framerate_is_per_act_not_assumed():
     """run-kat.sh passed `-framerate 60`; run-natali.sh passed none.
 
@@ -313,7 +284,6 @@ def test_the_loop_framerate_is_per_act_not_assumed():
                                      ffmpeg=["ffmpeg"])
     assert "-framerate" not in ncmd
 
-
 def test_the_rejected_sfx_layer_is_a_variant_and_never_the_default():
     """The owner picked the bed-only cut by ear. The experiment is provenance."""
     nat = actbuild.load_act("V")[0]
@@ -326,7 +296,6 @@ def test_the_rejected_sfx_layer_is_a_variant_and_never_the_default():
     # the bed and the sfx are two inputs, so the act gains one over delivered
     delivered, _ = actbuild.build_command(nat, "/tmp/proj", ffmpeg=["ffmpeg"])
     assert cmd.count("-i") == delivered.count("-i") + 1
-
 
 def test_the_nat_dialogue_round_is_recorded_as_still_blocked():
     """#118's Nat section is `automatable: no` -- the record must not fake it."""

@@ -1,521 +1,0 @@
-WARNING: act III is STALE and seated anyway (--allow-stale): Act III — mrbobbytables: August 2026 contributors (partially complete)
-megacut: cluster reachable; ENCODE segments run on exo-0 (--local to force this host)
-assembling 16 items -> /var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.6.mp4
-  conform [cache-hit]: Act I — Into the Light: six Guardians plated, the comic card, dialogue-free score
-  conform [cache-hit]: Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end
-  conform [cache-hit]: Act III — mrbobbytables: August 2026 contributors (partially complete)
-  conform [cache-hit]: Act IV — Kat Cosgrove: Guardian intro
-  conform [cache-hit]: Act V — Natali Vlatko: Guardian arrival
-  conform [cache-hit]: Act VI — Seven Days to the Wolves: the musical, CUT ON THE LAST SHOT CHANGE (430.997) so the song hands straight to the next one and the closing flash never plays
-  conform [cache-hit]: Act VII — Europa Director's Cut (no slide: a quick cut off movement 4; runs out on its own fade to black)
-  segment 1/16 [copy]: Prologue — main title: 'Perfume Of The Timeless' 0 - 91.2, the title at 0:11, then the March day->night bridge
-  segment 2/16 [encode->farm]: Act I — Into the Light: six Guardians plated, the comic card, dialogue-free score
-  segment 3/16 [copy]: Perfume, movement 2 — source 93.000 -> 159.400, after the Destiny intro
-  segment 4/16 [encode->farm]: Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end
-  segment 5/16 [copy]: Act III — mrbobbytables: August 2026 contributors (partially complete)
-  segment 6/16 [copy]: Perfume, movement 3 — source 159.400 -> 274.240, after mrbobbytables
-  segment 7/16 [copy]: Act IV — Kat Cosgrove: Guardian intro
-  segment 8/16 [copy]: Act V — Natali Vlatko: Guardian arrival
-  segment 9/16 [encode->farm]: Interstitial — ON THE LINUX DESKTOP / NO ONE CAN HEAR YOU SCREAM
-  segment 10/16 [encode->farm]: Act VI — Seven Days to the Wolves: the musical, CUT ON THE LAST SHOT CHANGE (430.997) so the song hands straight to the next one and the closing flash never plays
-  segment 11/16 [copy]: Perfume, movement 4 — source 274.240 -> 389.800, wolves straight in ON ITS FIRST HIT, straight out to Europa
-  segment 12/16 [encode->farm]: Act VII — Europa Director's Cut (no slide: a quick cut off movement 4; runs out on its own fade to black)
-  segment 13/16 [copy]: Ending — the Project Bluefin mission, in silence
-  segment 14/16 [encode->farm]: Perfume, movement 5a — source 389.800 -> 393.560, the dark Earth limb before the impact
-  segment 15/16 [encode->farm]: Perfume, movement 5b — source 393.560 onward: the impact, then the underwater passage and its seven lines
-  segment 16/16 [copy]: Act VIII — Credits
-  farming 7 encode segment(s) to the cluster, 3 in flight x 8 threads
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/home/jorge/Videos/Wolves/Prod/00-prologue.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf62.12.100
-  Duration: 00:01:41.20, start: 0.000000, bitrate: 6014 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 4472 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1[0x2](und): Audio: flac (fLaC / 0x43614C66), 48000 Hz, stereo, s32 (24 bit), 1534 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (flac (native) -> pcm_s24le (native))
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/home/jorge/src/destiny-vids/renders/perfume-2.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf62.12.100
-  Duration: 00:01:06.40, start: 0.000000, bitrate: 6315 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 4717 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1[0x2](und): Audio: flac (fLaC / 0x43614C66), 48000 Hz, stereo, s32 (24 bit), 1591 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-Output #0, matroska, to '/var/tmp/megacut-hw3qjigh/seg000.mkv':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 4472 kb/s, 59.94 fps, 59.94 tbr, 1k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1(und): Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s (default)
-    Metadata:
-      encoder         : Lavc63.1.101 pcm_s24le
-      handler_name    : SoundHandler
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (flac (native) -> pcm_s24le (native))
-[Parsed_volume_4 @ 0x7fc288014f80] Invalid value NaN for volume, setting to 0
-Output #0, matroska, to '/var/tmp/megacut-hw3qjigh/seg002.mkv':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 4717 kb/s, 59.94 fps, 59.94 tbr, 1k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1(und): Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s (default)
-    Metadata:
-      encoder         : Lavc63.1.101 pcm_s24le
-      handler_name    : SoundHandler
-[out#0/matroska @ 0x55d69841b980] video:38235KiB audio:18675KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.062323%
-frame= 3980 fps=0.0 q=-1.0 Lsize=   56945KiB time=00:01:06.40 bitrate=7025.5kbits/s speed= 690x elapsed=0:00:00.09    
-[out#0/matroska @ 0x55f2a078e1c0] video:55252KiB audio:28462KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.062573%
-frame= 6066 fps=0.0 q=-1.0 Lsize=   83767KiB time=00:01:41.20 bitrate=6780.8kbits/s speed= 777x elapsed=0:00:00.13    
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/home/jorge/.cache/destiny-vids/conform/delivery-v1/8eada24e91ef8b8cf3bb6209f1c47743a44ca14816eca73f3648ddba96cb4d61.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Duration: 00:02:40.19, start: 0.000000, bitrate: 8136 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 6440 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc63.1.101 libx264
-  Stream #0:1[0x2](und): Audio: flac (fLaC / 0x43614C66), 48000 Hz, stereo, s32 (24 bit), 1690 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (flac (native) -> pcm_s24le (native))
-Output #0, matroska, to '/var/tmp/megacut-hw3qjigh/seg004.mkv':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 6440 kb/s, 59.94 fps, 59.94 tbr, 1k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc63.1.101 libx264
-  Stream #0:1(und): Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s (default)
-    Metadata:
-      encoder         : Lavc63.1.101 pcm_s24le
-      handler_name    : SoundHandler
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/home/jorge/src/destiny-vids/renders/perfume-3.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf62.12.100
-  Duration: 00:01:54.85, start: 0.000000, bitrate: 6480 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 4592 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1[0x2](und): Audio: flac (fLaC / 0x43614C66), 48000 Hz, stereo, s32 (24 bit), 1880 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (flac (native) -> pcm_s24le (native))
-Output #0, matroska, to '/var/tmp/megacut-hw3qjigh/seg005.mkv':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 4592 kb/s, 59.94 fps, 59.94 tbr, 1k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1(und): Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s (default)
-    Metadata:
-      encoder         : Lavc63.1.101 pcm_s24le
-      handler_name    : SoundHandler
-[out#0/matroska @ 0x5567b5455b80] video:64388KiB audio:32299KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.061629%
-frame= 6884 fps=0.0 q=-1.0 Lsize=   96746KiB time=00:01:54.84 bitrate=6901.3kbits/s speed= 840x elapsed=0:00:00.13    
-[out#0/matroska @ 0x555f80a31840] video:125939KiB audio:45036KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.049659%
-frame= 9602 fps=0.0 q=-1.0 Lsize=  171060KiB time=00:02:40.16 bitrate=8749.5kbits/s speed= 743x elapsed=0:00:00.21    
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/home/jorge/.cache/destiny-vids/conform/delivery-v1/78ba37fcf9df78cab569107d241119b6761b01f39472a7e1abbaee69b4e5aa7d.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Duration: 00:00:34.00, start: 0.000000, bitrate: 9920 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 8083 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc63.1.101 libx264
-  Stream #0:1[0x2](und): Audio: flac (fLaC / 0x43614C66), 48000 Hz, stereo, s32 (24 bit), 1829 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (flac (native) -> pcm_s24le (native))
-Output #0, matroska, to '/var/tmp/megacut-hw3qjigh/seg006.mkv':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 8083 kb/s, 59.94 fps, 59.94 tbr, 1k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc63.1.101 libx264
-  Stream #0:1(und): Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s (default)
-    Metadata:
-      encoder         : Lavc63.1.101 pcm_s24le
-      handler_name    : SoundHandler
-[out#0/matroska @ 0x5647c7744d00] video:33551KiB audio:9562KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.043859%
-frame= 2038 fps=0.0 q=-1.0 Lsize=   43132KiB time=00:00:34.00 bitrate=10392.3kbits/s speed= 658x elapsed=0:00:00.05    
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/home/jorge/.cache/destiny-vids/conform/delivery-v1/60e9b8024001cbecbd1d0bf89c556f4968e35c8527b84479a27498541d3a6726.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Duration: 00:00:25.26, start: 0.000000, bitrate: 8925 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 7114 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc63.1.101 libx264
-  Stream #0:1[0x2](und): Audio: flac (fLaC / 0x43614C66), 48000 Hz, stereo, s32 (24 bit), 1804 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (flac (native) -> pcm_s24le (native))
-Output #0, matroska, to '/var/tmp/megacut-hw3qjigh/seg007.mkv':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 7114 kb/s, 59.94 fps, 59.94 tbr, 1k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc63.1.101 libx264
-  Stream #0:1(und): Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s (default)
-    Metadata:
-      encoder         : Lavc63.1.101 pcm_s24le
-      handler_name    : SoundHandler
-[out#0/matroska @ 0x5565eb439600] video:21937KiB audio:7102KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.049177%
-frame= 1514 fps=0.0 q=-1.0 Lsize=   29053KiB time=00:00:25.25 bitrate=9425.8kbits/s speed= 633x elapsed=0:00:00.03    
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/home/jorge/src/destiny-vids/renders/perfume-4.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf62.12.100
-  Duration: 00:01:55.57, start: 0.000000, bitrate: 7679 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 5761 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1[0x2](und): Audio: flac (fLaC / 0x43614C66), 48000 Hz, stereo, s32 (24 bit), 1910 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (flac (native) -> pcm_s24le (native))
-Output #0, matroska, to '/var/tmp/megacut-hw3qjigh/seg010.mkv':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 5761 kb/s, 59.94 fps, 59.94 tbr, 1k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1(und): Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s (default)
-    Metadata:
-      encoder         : Lavc63.1.101 pcm_s24le
-      handler_name    : SoundHandler
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/home/jorge/src/destiny-vids/renders/ending/mission-pause.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Duration: 00:00:23.02, start: 0.000000, bitrate: 3326 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 3320 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc63.1.101 libx264
-Input #1, lavfi, from 'anullsrc=channel_layout=stereo:sample_rate=48000:d=23.023':
-  Duration: N/A, start: 0.000000, bitrate: 768 kb/s
-  Stream #1:0: Audio: pcm_u8, 48000 Hz, stereo, u8, 768 kb/s
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #1:0 -> #0:1 (pcm_u8 (native) -> pcm_s24le (native))
-Output #0, matroska, to '/var/tmp/megacut-hw3qjigh/seg012.mkv':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 3320 kb/s, 59.94 fps, 59.94 tbr, 1k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc63.1.101 libx264
-  Stream #0:1: Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s
-    Metadata:
-      encoder         : Lavc63.1.101 pcm_s24le
-[out#0/matroska @ 0x55c8cb054c00] video:9333KiB audio:6475KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.113037%
-frame= 1380 fps=0.0 q=-1.0 Lsize=   15826KiB time=00:00:23.02 bitrate=5631.2kbits/s speed= 925x elapsed=0:00:00.02    
-[out#0/matroska @ 0x559d0b85ca80] video:81274KiB audio:32501KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.055085%
-frame= 6927 fps=0.0 q=-1.0 Lsize=  113838KiB time=00:01:55.56 bitrate=8069.9kbits/s speed= 789x elapsed=0:00:00.14    
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/home/jorge/Videos/Wolves/Prod/08-credits.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf62.12.100
-  Duration: 00:07:36.68, start: 0.000000, bitrate: 3235 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1445 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1[0x2](und): Audio: flac (fLaC / 0x43614C66), 48000 Hz, stereo, s32 (24 bit), 1782 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (flac (native) -> pcm_s24le (native))
-Output #0, matroska, to '/var/tmp/megacut-hw3qjigh/seg015.mkv':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf63.1.101
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 1445 kb/s, 59.94 fps, 59.94 tbr, 1k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      encoder         : Lavc62.28.100 libx264
-  Stream #0:1(und): Audio: pcm_s24le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s32 (24 bit), 2304 kb/s (default)
-    Metadata:
-      encoder         : Lavc63.1.101 pcm_s24le
-      handler_name    : SoundHandler
-[out#0/matroska @ 0x555a6d7b0880] video:80573KiB audio:128440KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.099291%
-frame=27373 fps=0.0 q=-1.0 Lsize=  209221KiB time=00:07:36.67 bitrate=3753.1kbits/s speed=1.43e+03x elapsed=0:00:00.31    
-farm[seg003]: workflow farm-seg003-nsks submitted (node exo-0, 1 encode x up to 24 cpu)
-farm[seg003]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg001]: workflow farm-seg001-3mas submitted (node exo-0, 1 encode x up to 24 cpu)
-farm[seg008]: workflow farm-seg008-9wzq submitted (node exo-0, 1 encode x up to 24 cpu)
-farm[seg001]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg008]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg003]: uploading 273.4 MiB (02-endlessformsmostbeautiful.mp4) …
-  [farm-seg003-nsks] 03:14:50 [farm] pod up on farm-seg003-nsks; waiting for input
-farm[seg008]: uploading 0.1 MiB (plate_scream.png) …
-farm[seg001]: uploading 93.6 MiB (01-intro.mp4) …
-  [farm-seg008-9wzq] 03:14:51 [farm] pod up on farm-seg008-9wzq; waiting for input
-  [farm-seg001-3mas] 03:14:51 [farm] pod up on farm-seg001-3mas; waiting for input
-farm[seg008]: uploaded in 0s
-  [farm-seg008-9wzq] 03:14:53 [farm] input arrived:
-  [farm-seg008-9wzq] total 72
-  [farm-seg008-9wzq] -rw-r--r--. 1 1000 1000 73356 Aug 17 03:14 00-plate_scream.png
-  [farm-seg008-9wzq] 03:14:53 [farm] running: ffmpeg -nostdin -hide_banner -loop 1 -framerate 60000/1001 -t 5.0 -i /work/in/00-plate_scream.png -filter_complex 'color=c=black:s=1920x1080:r=60000/1001:d=5.0[bg0];[0:v]scale=1920:1080:flags=lanczos,format=rgba[fg0];[bg0][fg0]overlay=0:0:shortest=1,fps=60000/1001,format=yuv420p,setsar=1,setpts=PTS-STARTPTS[v0];anullsrc=channel_layout=stereo:sample_rate=48000:d=5.0,asetpts=PTS-STARTPTS[a0];[v0]null[vout];[a0]anull[aout]' -map '[vout]' -map '[aout]' -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg008.mkv -y
-farm[seg001]: uploaded in 2s
-farm[seg003]: uploaded in 3s
-  [farm-seg008-9wzq] 03:14:54 [farm] encoded out/seg008.mkv duration=5.005000s; waiting for fetch
-  [farm-seg003-nsks] 03:14:54 [farm] input arrived:
-  [farm-seg003-nsks] total 279932
-  [farm-seg003-nsks] -rw-r--r--. 1 1000 1000 286646725 Aug 17 03:14 00-02-endlessformsmostbeautiful.mp4
-  [farm-seg003-nsks] 03:14:54 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-02-endlessformsmostbeautiful.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=start=10.666667,setpts=PTS-STARTPTS -af atrim=start=10.666667,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -t 319.4 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg003.mkv -y
-  [farm-seg001-3mas] 03:14:55 [farm] input arrived:
-  [farm-seg001-3mas] total 95876
-  [farm-seg001-3mas] -rw-r--r--. 1 1000 1000 98176495 Aug 17 03:14 00-01-intro.mp4
-  [farm-seg001-3mas] 03:14:55 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-01-intro.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=start=2.0:end=111.567,setpts=PTS-STARTPTS -af atrim=start=2.0:end=111.567,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=+2.3dB,afade=t=out:st=107.567:d=2.000 -map 0:v:0 -map 0:a:0 -t 109.567 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg001.mkv -y
-farm[seg008]: downloaded out/seg008.mkv in 0s
-  [farm-seg008-9wzq] 03:14:58 [farm] output fetched; pod done
-  [farm-seg008-9wzq] time="2026-08-17T03:14:58.887Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg008]: verify ok — seg008.mkv 5.005s h264 1920x1080
-farm[seg009]: workflow farm-seg009-ssd0 submitted (node exo-0, 1 encode x up to 24 cpu)
-farm[seg009]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg009]: uploading 405.1 MiB (06-7daystothewolves.mp4) …
-  [farm-seg009-ssd0] 03:15:15 [farm] pod up on farm-seg009-ssd0; waiting for input
-farm[seg009]: uploaded in 4s
-  [farm-seg009-ssd0] 03:15:21 [farm] input arrived:
-  [farm-seg009-ssd0] total 414804
-  [farm-seg009-ssd0] -rw-r--r--. 1 1000 1000 424757522 Aug 17 03:15 00-06-7daystothewolves.mp4
-  [farm-seg009-ssd0] 03:15:21 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-06-7daystothewolves.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=start=10.0:end=430.997,setpts=PTS-STARTPTS -af atrim=start=10.0:end=430.997,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,afade=t=in:st=0:d=2.000 -map 0:v:0 -map 0:a:0 -t 420.997 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg009.mkv -y
-  [farm-seg001-3mas] 03:16:22 [farm] encoded out/seg001.mkv duration=109.567000s; waiting for fetch
-farm[seg001]: downloaded out/seg001.mkv in 1s
-  [farm-seg001-3mas] 03:16:28 [farm] output fetched; pod done
-  [farm-seg001-3mas] time="2026-08-17T03:16:28.935Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg001]: verify ok — seg001.mkv 109.567s h264 1920x1080
-farm[seg011]: workflow farm-seg011-8b5t submitted (node exo-0, 1 encode x up to 24 cpu)
-farm[seg011]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg011]: uploading 117.1 MiB (07-europa.mp4) …
-  [farm-seg011-8b5t] 03:16:45 [farm] pod up on farm-seg011-8b5t; waiting for input
-farm[seg011]: uploaded in 1s
-  [farm-seg011-8b5t] 03:16:49 [farm] input arrived:
-  [farm-seg011-8b5t] total 119900
-  [farm-seg011-8b5t] -rw-r--r--. 1 1000 1000 122774171 Aug 17 03:16 00-07-europa.mp4
-  [farm-seg011-8b5t] 03:16:49 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-07-europa.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=end=95.333333,setpts=PTS-STARTPTS -af atrim=end=95.333333,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -t 95.333333 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg011.mkv -y
-  [farm-seg011-8b5t] 03:18:05 [farm] encoded out/seg011.mkv duration=95.333000s; waiting for fetch
-farm[seg011]: downloaded out/seg011.mkv in 1s
-  [farm-seg011-8b5t] 03:18:11 [farm] output fetched; pod done
-  [farm-seg011-8b5t] time="2026-08-17T03:18:11.963Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg011]: verify ok — seg011.mkv 95.333s h264 1920x1080
-farm[seg013]: workflow farm-seg013-4xz9 submitted (node exo-0, 1 encode x up to 24 cpu)
-farm[seg013]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg013]: uploading 91.4 MiB (perfume-5.mp4) …
-  [farm-seg013-4xz9] 03:18:27 [farm] pod up on farm-seg013-4xz9; waiting for input
-farm[seg013]: uploaded in 1s
-  [farm-seg013-4xz9] 03:18:31 [farm] input arrived:
-  [farm-seg013-4xz9] total 93592
-  [farm-seg013-4xz9] -rw-r--r--. 1 1000 1000 95835441 Aug 17 03:18 00-perfume-5.mp4
-  [farm-seg013-4xz9] 03:18:31 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-perfume-5.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=end=3.76,setpts=PTS-STARTPTS -af atrim=end=3.76,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -t 3.76 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg013.mkv -y
-  [farm-seg013-4xz9] 03:18:33 [farm] encoded out/seg013.mkv duration=3.760000s; waiting for fetch
-farm[seg013]: downloaded out/seg013.mkv in 0s
-  [farm-seg013-4xz9] 03:18:37 [farm] output fetched; pod done
-  [farm-seg013-4xz9] time="2026-08-17T03:18:37.863Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg013]: verify ok — seg013.mkv 3.760s h264 1920x1080
-farm[seg014]: workflow farm-seg014-ktgk submitted (node exo-0, 1 encode x up to 24 cpu)
-farm[seg014]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg014]: uploading 92.3 MiB (perfume-5-ending.mp4) …
-  [farm-seg014-ktgk] 03:18:57 [farm] pod up on farm-seg014-ktgk; waiting for input
-farm[seg014]: uploaded in 1s
-  [farm-seg014-ktgk] 03:18:59 [farm] input arrived:
-  [farm-seg014-ktgk] total 94544
-  [farm-seg014-ktgk] -rw-r--r--. 1 1000 1000 96812635 Aug 17 03:18 00-perfume-5-ending.mp4
-  [farm-seg014-ktgk] 03:18:59 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-perfume-5-ending.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=start=3.76:end=109.5,setpts=PTS-STARTPTS -af atrim=start=3.76:end=109.5,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,afade=t=out:st=104.240:d=1.500 -map 0:v:0 -map 0:a:0 -t 105.74 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg014.mkv -y
-  [farm-seg003-nsks] 03:19:02 [farm] encoded out/seg003.mkv duration=319.403000s; waiting for fetch
-farm[seg003]: downloaded out/seg003.mkv in 3s
-  [farm-seg003-nsks] 03:19:08 [farm] output fetched; pod done
-  [farm-seg003-nsks] time="2026-08-17T03:19:09.108Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg003]: verify ok — seg003.mkv 319.403s h264 1920x1080
-  [farm-seg014-ktgk] 03:20:00 [farm] encoded out/seg014.mkv duration=105.741000s; waiting for fetch
-farm[seg014]: downloaded out/seg014.mkv in 1s
-  [farm-seg014-ktgk] 03:20:02 [farm] output fetched; pod done
-  [farm-seg014-ktgk] time="2026-08-17T03:20:02.409Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg014]: verify ok — seg014.mkv 105.741s h264 1920x1080
-  [farm-seg009-ssd0] 03:20:31 [farm] encoded out/seg009.mkv duration=421.004000s; waiting for fetch
-farm[seg009]: downloaded out/seg009.mkv in 4s
-  [farm-seg009-ssd0] 03:20:39 [farm] output fetched; pod done
-  [farm-seg009-ssd0] time="2026-08-17T03:20:40.427Z" level=info msg="sub-process exited" argo=true error="<nil>"
-  joining 16 segments
-[matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-[aist#0:1/pcm_s24le @ 0x556ca0114080] Guessed Channel Layout: stereo
-Input #0, concat, from '/var/tmp/megacut-hw3qjigh/segments.txt':
-  Duration: N/A, start: 0.000000, bitrate: N/A
-  Stream #0:0: Video: h264 (High), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 59.94 fps, 59.94 tbr, 1k tbn
-    Metadata:
-      HANDLER_NAME    : VideoHandler
-      ENCODER         : Lavc62.28.100 libx264
-      DURATION        : 00:01:41.201000000
-  Stream #0:1: Audio: pcm_s24le, 48000 Hz, stereo, s32 (24 bit), 2304 kb/s
-    Metadata:
-      ENCODER         : Lavc63.1.101 pcm_s24le
-      HANDLER_NAME    : SoundHandler
-      DURATION        : 00:01:41.200000000
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (pcm_s24le (native) -> aac (native))
-[aac @ 0x556ca013c140] Too many bits 13653.333333 > 12288 per frame requested, clamping to max
-Output #0, mp4, to '/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.6.mp4':
-  Metadata:
-    encoder         : Lavf63.1.101
-  Stream #0:0: Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 59.94 fps, 59.94 tbr, 16k tbn
-    Metadata:
-      HANDLER_NAME    : VideoHandler
-      ENCODER         : Lavc62.28.100 libx264
-      DURATION        : 00:01:41.201000000
-  Stream #0:1: Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 576 kb/s
-    Metadata:
-      encoder         : Lavc63.1.101 aac
-      HANDLER_NAME    : SoundHandler
-      DURATION        : 00:01:41.200000000
-frame=  555 fps=0.0 q=-1.0 size=     256KiB time=00:00:09.22 bitrate= 227.4kbits/s speed=18.4x elapsed=0:00:00.50    frame=  854 fps=852 q=-1.0 size=    1536KiB time=00:00:14.21 bitrate= 885.3kbits/s speed=14.2x elapsed=0:00:01.00    frame= 1136 fps=756 q=-1.0 size=    5888KiB time=00:00:18.91 bitrate=2549.7kbits/s speed=12.6x elapsed=0:00:01.50    frame= 1447 fps=723 q=-1.0 size=   12032KiB time=00:00:24.10 bitrate=4088.7kbits/s speed=  12x elapsed=0:00:02.00    frame= 1735 fps=693 q=-1.0 size=   15104KiB time=00:00:28.91 bitrate=4279.6kbits/s speed=11.6x elapsed=0:00:02.50    frame= 2034 fps=677 q=-1.0 size=   18176KiB time=00:00:33.90 bitrate=4392.3kbits/s speed=11.3x elapsed=0:00:03.00    frame= 2304 fps=658 q=-1.0 size=   21248KiB time=00:00:38.40 bitrate=4532.4kbits/s speed=  11x elapsed=0:00:03.50    frame= 2684 fps=670 q=-1.0 size=   25344KiB time=00:00:44.74 bitrate=4640.1kbits/s speed=11.2x elapsed=0:00:04.00    frame= 2989 fps=664 q=-1.0 size=   30976KiB time=00:00:49.83 bitrate=5092.2kbits/s speed=11.1x elapsed=0:00:04.50    frame= 3288 fps=657 q=-1.0 size=   35072KiB time=00:00:54.82 bitrate=5240.9kbits/s speed=  11x elapsed=0:00:05.00    frame= 3576 fps=650 q=-1.0 size=   38912KiB time=00:00:59.62 bitrate=5346.1kbits/s speed=10.8x elapsed=0:00:05.50    frame= 3892 fps=648 q=-1.0 size=   43264KiB time=00:01:04.89 bitrate=5461.3kbits/s speed=10.8x elapsed=0:00:06.00    frame= 4197 fps=645 q=-1.0 size=   45824KiB time=00:01:09.98 bitrate=5363.8kbits/s speed=10.8x elapsed=0:00:06.50    frame= 4497 fps=642 q=-1.0 size=   48384KiB time=00:01:14.99 bitrate=5285.5kbits/s speed=10.7x elapsed=0:00:07.00    frame= 4865 fps=648 q=-1.0 size=   50432KiB time=00:01:21.13 bitrate=5092.3kbits/s speed=10.8x elapsed=0:00:07.50    frame= 5135 fps=641 q=-1.0 size=   51712KiB time=00:01:25.63 bitrate=4946.9kbits/s speed=10.7x elapsed=0:00:08.00    frame= 5458 fps=641 q=-1.0 size=   53504KiB time=00:01:31.02 bitrate=4815.3kbits/s speed=10.7x elapsed=0:00:08.50    frame= 5740 fps=637 q=-1.0 size=   56320KiB time=00:01:35.72 bitrate=4819.6kbits/s speed=10.6x elapsed=0:00:09.00    frame= 6027 fps=634 q=-1.0 size=   58624KiB time=00:01:40.51 bitrate=4777.8kbits/s speed=10.6x elapsed=0:00:09.50    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame= 6208 fps=620 q=-1.0 size=   59904KiB time=00:01:43.53 bitrate=4739.7kbits/s speed=10.3x elapsed=0:00:10.00    frame= 6513 fps=620 q=-1.0 size=   64512KiB time=00:01:48.62 bitrate=4865.2kbits/s speed=10.3x elapsed=0:00:10.50    frame= 6860 fps=623 q=-1.0 size=   70144KiB time=00:01:54.41 bitrate=5022.3kbits/s speed=10.4x elapsed=0:00:11.01    frame= 7143 fps=621 q=-1.0 size=   76800KiB time=00:01:59.13 bitrate=5281.0kbits/s speed=10.3x elapsed=0:00:11.51    frame= 7415 fps=617 q=-1.0 size=   80384KiB time=00:02:03.67 bitrate=5324.6kbits/s speed=10.3x elapsed=0:00:12.01    frame= 7686 fps=614 q=-1.0 size=   81152KiB time=00:02:08.22 bitrate=5184.5kbits/s speed=10.2x elapsed=0:00:12.51    frame= 8009 fps=615 q=-1.0 size=   81664KiB time=00:02:13.61 bitrate=5006.8kbits/s speed=10.3x elapsed=0:00:13.01    frame= 8264 fps=612 q=-1.0 size=   85248KiB time=00:02:17.83 bitrate=5066.5kbits/s speed=10.2x elapsed=0:00:13.51    frame= 8593 fps=613 q=-1.0 size=   92160KiB time=00:02:23.32 bitrate=5267.5kbits/s speed=10.2x elapsed=0:00:14.01    frame= 8888 fps=612 q=-1.0 size=   96768KiB time=00:02:28.24 bitrate=5347.3kbits/s speed=10.2x elapsed=0:00:14.51    frame= 9164 fps=610 q=-1.0 size=  100096KiB time=00:02:32.85 bitrate=5364.6kbits/s speed=10.2x elapsed=0:00:15.01    frame= 9472 fps=610 q=-1.0 size=  104192KiB time=00:02:37.99 bitrate=5402.5kbits/s speed=10.2x elapsed=0:00:15.51    frame= 9750 fps=609 q=-1.0 size=  107008KiB time=00:02:42.62 bitrate=5390.3kbits/s speed=10.2x elapsed=0:00:16.01    frame=10047 fps=608 q=-1.0 size=  110592KiB time=00:02:47.58 bitrate=5406.1kbits/s speed=10.1x elapsed=0:00:16.51    frame=10287 fps=605 q=-1.0 size=  115456KiB time=00:02:51.58 bitrate=5512.2kbits/s speed=10.1x elapsed=0:00:17.01    frame=10530 fps=601 q=-1.0 size=  120320KiB time=00:02:55.64 bitrate=5611.8kbits/s speed=  10x elapsed=0:00:17.51    frame=10864 fps=603 q=-1.0 size=  124672KiB time=00:03:01.21 bitrate=5636.0kbits/s speed=10.1x elapsed=0:00:18.01    frame=11097 fps=599 q=-1.0 size=  129024KiB time=00:03:05.10 bitrate=5710.2kbits/s speed=  10x elapsed=0:00:18.51    frame=11371 fps=598 q=-1.0 size=  134400KiB time=00:03:09.67 bitrate=5804.8kbits/s speed=9.97x elapsed=0:00:19.01    frame=11636 fps=596 q=-1.0 size=  138752KiB time=00:03:14.09 bitrate=5856.2kbits/s speed=9.94x elapsed=0:00:19.51    frame=11938 fps=596 q=-1.0 size=  142848KiB time=00:03:19.13 bitrate=5876.6kbits/s speed=9.95x elapsed=0:00:20.01    frame=12199 fps=595 q=-1.0 size=  146432KiB time=00:03:23.48 bitrate=5895.1kbits/s speed=9.92x elapsed=0:00:20.51    frame=12447 fps=592 q=-1.0 size=  149504KiB time=00:03:27.62 bitrate=5898.9kbits/s speed=9.88x elapsed=0:00:21.01    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame=12774 fps=594 q=-1.0 size=  151808KiB time=00:03:33.08 bitrate=5836.2kbits/s speed= 9.9x elapsed=0:00:21.51    frame=13027 fps=592 q=-1.0 size=  153344KiB time=00:03:37.30 bitrate=5780.7kbits/s speed=9.87x elapsed=0:00:22.02    frame=13303 fps=591 q=-1.0 size=  154880KiB time=00:03:41.91 bitrate=5717.5kbits/s speed=9.85x elapsed=0:00:22.52    frame=13545 fps=588 q=-1.0 size=  156928KiB time=00:03:45.94 bitrate=5689.6kbits/s speed=9.82x elapsed=0:00:23.02    frame=13827 fps=588 q=-1.0 size=  160256KiB time=00:03:50.65 bitrate=5691.7kbits/s speed=9.81x elapsed=0:00:23.52    frame=14086 fps=586 q=-1.0 size=  162304KiB time=00:03:54.97 bitrate=5658.5kbits/s speed=9.78x elapsed=0:00:24.02    frame=14396 fps=587 q=-1.0 size=  166912KiB time=00:04:00.14 bitrate=5693.8kbits/s speed=9.79x elapsed=0:00:24.52    frame=14747 fps=589 q=-1.0 size=  171520KiB time=00:04:06.00 bitrate=5711.7kbits/s speed=9.83x elapsed=0:00:25.02    frame=15012 fps=588 q=-1.0 size=  175104KiB time=00:04:10.42 bitrate=5728.1kbits/s speed=9.81x elapsed=0:00:25.52    frame=15311 fps=588 q=-1.0 size=  178688KiB time=00:04:15.41 bitrate=5731.2kbits/s speed=9.82x elapsed=0:00:26.02    frame=15587 fps=588 q=-1.0 size=  180992KiB time=00:04:20.01 bitrate=5702.3kbits/s speed= 9.8x elapsed=0:00:26.52    frame=15979 fps=591 q=-1.0 size=  184320KiB time=00:04:26.55 bitrate=5664.7kbits/s speed=9.86x elapsed=0:00:27.02    frame=16600 fps=603 q=-1.0 size=  191744KiB time=00:04:36.91 bitrate=5672.3kbits/s speed=10.1x elapsed=0:00:27.52    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame=17064 fps=609 q=-1.0 size=  197632KiB time=00:04:44.65 bitrate=5687.5kbits/s speed=10.2x elapsed=0:00:28.02    frame=17513 fps=614 q=-1.0 size=  205568KiB time=00:04:52.14 bitrate=5764.2kbits/s speed=10.2x elapsed=0:00:28.52    frame=18076 fps=623 q=-1.0 size=  216576KiB time=00:05:01.64 bitrate=5881.8kbits/s speed=10.4x elapsed=0:00:29.02    frame=18583 fps=629 q=-1.0 size=  226560KiB time=00:05:10.00 bitrate=5987.0kbits/s speed=10.5x elapsed=0:00:29.52    frame=19095 fps=636 q=-1.0 size=  233984KiB time=00:05:18.54 bitrate=6017.4kbits/s speed=10.6x elapsed=0:00:30.02    frame=19480 fps=638 q=-1.0 size=  237568KiB time=00:05:24.96 bitrate=5988.8kbits/s speed=10.6x elapsed=0:00:30.52    frame=19849 fps=640 q=-1.0 size=  240896KiB time=00:05:31.12 bitrate=5959.8kbits/s speed=10.7x elapsed=0:00:31.02    frame=20321 fps=645 q=-1.0 size=  246528KiB time=00:05:38.99 bitrate=5957.5kbits/s speed=10.8x elapsed=0:00:31.52    frame=20700 fps=646 q=-1.0 size=  251648KiB time=00:05:45.31 bitrate=5969.8kbits/s speed=10.8x elapsed=0:00:32.02    frame=21046 fps=647 q=-1.0 size=  257024KiB time=00:05:51.09 bitrate=5997.1kbits/s speed=10.8x elapsed=0:00:32.52    frame=21408 fps=648 q=-1.0 size=  259840KiB time=00:05:57.13 bitrate=5960.3kbits/s speed=10.8x elapsed=0:00:33.02    frame=21684 fps=647 q=-1.0 size=  264448KiB time=00:06:01.73 bitrate=5988.8kbits/s speed=10.8x elapsed=0:00:33.52    frame=22007 fps=647 q=-1.0 size=  269568KiB time=00:06:07.12 bitrate=6015.1kbits/s speed=10.8x elapsed=0:00:34.02    frame=22306 fps=646 q=-1.0 size=  274944KiB time=00:06:12.11 bitrate=6052.9kbits/s speed=10.8x elapsed=0:00:34.52    frame=22645 fps=647 q=-1.0 size=  281088KiB time=00:06:17.76 bitrate=6095.5kbits/s speed=10.8x elapsed=0:00:35.02    frame=23180 fps=652 q=-1.0 size=  287232KiB time=00:06:26.69 bitrate=6084.9kbits/s speed=10.9x elapsed=0:00:35.52    frame=23744 fps=659 q=-1.0 size=  296448KiB time=00:06:36.10 bitrate=6131.0kbits/s speed=  11x elapsed=0:00:36.02    frame=24136 fps=661 q=-1.0 size=  302080KiB time=00:06:42.64 bitrate=6146.0kbits/s speed=  11x elapsed=0:00:36.52    frame=24561 fps=663 q=-1.0 size=  307968KiB time=00:06:49.73 bitrate=6157.4kbits/s speed=11.1x elapsed=0:00:37.02    frame=25039 fps=667 q=-1.0 size=  314624KiB time=00:06:57.70 bitrate=6170.3kbits/s speed=11.1x elapsed=0:00:37.52    frame=25413 fps=668 q=-1.0 size=  319488KiB time=00:07:03.94 bitrate=6173.5kbits/s speed=11.1x elapsed=0:00:38.02    frame=25770 fps=669 q=-1.0 size=  323584KiB time=00:07:09.90 bitrate=6166.0kbits/s speed=11.2x elapsed=0:00:38.52    frame=26109 fps=669 q=-1.0 size=  327168KiB time=00:07:15.55 bitrate=6153.4kbits/s speed=11.2x elapsed=0:00:39.02    frame=26403 fps=668 q=-1.0 size=  330496KiB time=00:07:20.46 bitrate=6146.8kbits/s speed=11.1x elapsed=0:00:39.52    frame=26765 fps=669 q=-1.0 size=  334592KiB time=00:07:26.50 bitrate=6138.8kbits/s speed=11.2x elapsed=0:00:40.02    frame=27134 fps=669 q=-1.0 size=  339456KiB time=00:07:32.65 bitrate=6143.3kbits/s speed=11.2x elapsed=0:00:40.52    frame=27525 fps=671 q=-1.0 size=  343808KiB time=00:07:39.18 bitrate=6133.7kbits/s speed=11.2x elapsed=0:00:41.02    frame=27841 fps=670 q=-1.0 size=  347392KiB time=00:07:44.45 bitrate=6127.3kbits/s speed=11.2x elapsed=0:00:41.53    frame=28112 fps=669 q=-1.0 size=  350720KiB time=00:07:48.97 bitrate=6126.3kbits/s speed=11.2x elapsed=0:00:42.03    frame=28394 fps=668 q=-1.0 size=  354304KiB time=00:07:53.68 bitrate=6127.5kbits/s speed=11.1x elapsed=0:00:42.53    frame=28699 fps=667 q=-1.0 size=  357120KiB time=00:07:58.76 bitrate=6110.5kbits/s speed=11.1x elapsed=0:00:43.03    frame=28986 fps=666 q=-1.0 size=  359936KiB time=00:08:03.55 bitrate=6097.7kbits/s speed=11.1x elapsed=0:00:43.53    frame=29280 fps=665 q=-1.0 size=  363520KiB time=00:08:08.46 bitrate=6096.6kbits/s speed=11.1x elapsed=0:00:44.03    frame=29637 fps=665 q=-1.0 size=  367616KiB time=00:08:14.41 bitrate=6091.0kbits/s speed=11.1x elapsed=0:00:44.53    frame=30034 fps=667 q=-1.0 size=  372736KiB time=00:08:21.04 bitrate=6094.2kbits/s speed=11.1x elapsed=0:00:45.03    frame=30437 fps=668 q=-1.0 size=  377344KiB time=00:08:27.76 bitrate=6087.9kbits/s speed=11.2x elapsed=0:00:45.53    frame=30782 fps=669 q=-1.0 size=  382208KiB time=00:08:33.52 bitrate=6097.2kbits/s speed=11.2x elapsed=0:00:46.03    frame=31087 fps=668 q=-1.0 size=  386560KiB time=00:08:38.60 bitrate=6106.1kbits/s speed=11.1x elapsed=0:00:46.54    frame=31415 fps=668 q=-1.0 size=  390656KiB time=00:08:44.08 bitrate=6106.4kbits/s speed=11.1x elapsed=0:00:47.04    frame=31737 fps=668 q=-1.0 size=  397056KiB time=00:08:49.45 bitrate=6143.5kbits/s speed=11.1x elapsed=0:00:47.54    frame=32140 fps=669 q=-1.0 size=  414976KiB time=00:08:56.17 bitrate=6340.2kbits/s speed=11.2x elapsed=0:00:48.04    frame=32433 fps=668 q=-1.0 size=  417536KiB time=00:09:01.06 bitrate=6321.7kbits/s speed=11.1x elapsed=0:00:48.54    frame=32761 fps=668 q=-1.0 size=  417792KiB time=00:09:06.53 bitrate=6262.3kbits/s speed=11.1x elapsed=0:00:49.04    frame=33118 fps=668 q=-1.0 size=  422912KiB time=00:09:12.49 bitrate=6270.7kbits/s speed=11.2x elapsed=0:00:49.54    frame=33578 fps=671 q=-1.0 size=  431616KiB time=00:09:20.16 bitrate=6312.0kbits/s speed=11.2x elapsed=0:00:50.04    frame=33918 fps=671 q=-1.0 size=  438272KiB time=00:09:25.83 bitrate=6345.1kbits/s speed=11.2x elapsed=0:00:50.54    frame=34257 fps=671 q=-1.0 size=  444672KiB time=00:09:31.49 bitrate=6374.1kbits/s speed=11.2x elapsed=0:00:51.04    frame=34637 fps=672 q=-1.0 size=  451840KiB time=00:09:37.83 bitrate=6405.8kbits/s speed=11.2x elapsed=0:00:51.55    frame=34959 fps=672 q=-1.0 size=  454400KiB time=00:09:43.20 bitrate=6382.7kbits/s speed=11.2x elapsed=0:00:52.05    frame=35362 fps=673 q=-1.0 size=  454656KiB time=00:09:49.93 bitrate=6313.5kbits/s speed=11.2x elapsed=0:00:52.55    frame=35656 fps=672 q=-1.0 size=  454912KiB time=00:09:54.83 bitrate=6265.0kbits/s speed=11.2x elapsed=0:00:53.05    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame=36077 fps=674 q=-1.0 size=  457216KiB time=00:10:01.85 bitrate=6223.2kbits/s speed=11.2x elapsed=0:00:53.55    frame=36405 fps=673 q=-1.0 size=  461056KiB time=00:10:07.33 bitrate=6219.0kbits/s speed=11.2x elapsed=0:00:54.05    frame=36756 fps=674 q=-1.0 size=  466944KiB time=00:10:13.18 bitrate=6238.2kbits/s speed=11.2x elapsed=0:00:54.55    frame=37113 fps=674 q=-1.0 size=  472064KiB time=00:10:19.14 bitrate=6246.0kbits/s speed=11.2x elapsed=0:00:55.05    frame=37429 fps=674 q=-1.0 size=  475136KiB time=00:10:24.41 bitrate=6233.5kbits/s speed=11.2x elapsed=0:00:55.55    frame=37798 fps=674 q=-1.0 size=  479232KiB time=00:10:30.57 bitrate=6225.9kbits/s speed=11.2x elapsed=0:00:56.05    frame=38172 fps=675 q=-1.0 size=  484096KiB time=00:10:36.81 bitrate=6227.5kbits/s speed=11.3x elapsed=0:00:56.55    frame=38465 fps=674 q=-1.0 size=  487936KiB time=00:10:41.69 bitrate=6229.0kbits/s speed=11.2x elapsed=0:00:57.05    frame=38730 fps=673 q=-1.0 size=  492544KiB time=00:10:46.12 bitrate=6244.8kbits/s speed=11.2x elapsed=0:00:57.55    frame=39075 fps=673 q=-1.0 size=  496896KiB time=00:10:51.87 bitrate=6244.4kbits/s speed=11.2x elapsed=0:00:58.05    frame=39472 fps=674 q=-1.0 size=  500736KiB time=00:10:58.49 bitrate=6229.4kbits/s speed=11.2x elapsed=0:00:58.55    frame=39927 fps=676 q=-1.0 size=  506368KiB time=00:11:06.09 bitrate=6227.6kbits/s speed=11.3x elapsed=0:00:59.05    frame=40289 fps=676 q=-1.0 size=  511232KiB time=00:11:12.12 bitrate=6231.0kbits/s speed=11.3x elapsed=0:00:59.55    frame=40600 fps=676 q=-1.0 size=  514048KiB time=00:11:17.31 bitrate=6217.3kbits/s speed=11.3x elapsed=0:01:00.05    frame=40934 fps=676 q=-1.0 size=  517120KiB time=00:11:22.89 bitrate=6203.4kbits/s speed=11.3x elapsed=0:01:00.55    frame=41221 fps=675 q=-1.0 size=  519680KiB time=00:11:27.67 bitrate=6190.7kbits/s speed=11.3x elapsed=0:01:01.05    frame=41584 fps=676 q=-1.0 size=  523776KiB time=00:11:33.73 bitrate=6185.0kbits/s speed=11.3x elapsed=0:01:01.55    frame=41975 fps=676 q=-1.0 size=  531456KiB time=00:11:40.25 bitrate=6217.3kbits/s speed=11.3x elapsed=0:01:02.05    frame=42309 fps=676 q=-1.0 size=  537856KiB time=00:11:45.82 bitrate=6242.5kbits/s speed=11.3x elapsed=0:01:02.55    frame=42620 fps=676 q=-1.0 size=  542208KiB time=00:11:51.01 bitrate=6247.1kbits/s speed=11.3x elapsed=0:01:03.05    frame=42890 fps=675 q=-1.0 size=  546816KiB time=00:11:55.52 bitrate=6260.5kbits/s speed=11.3x elapsed=0:01:03.55    frame=43258 fps=675 q=-1.0 size=  552192KiB time=00:12:01.66 bitrate=6268.2kbits/s speed=11.3x elapsed=0:01:04.05    frame=43627 fps=676 q=-1.0 size=  559360KiB time=00:12:07.81 bitrate=6295.9kbits/s speed=11.3x elapsed=0:01:04.55    frame=44087 fps=678 q=-1.0 size=  565760KiB time=00:12:15.49 bitrate=6301.5kbits/s speed=11.3x elapsed=0:01:05.05    frame=44611 fps=680 q=-1.0 size=  577280KiB time=00:12:24.23 bitrate=6354.3kbits/s speed=11.4x elapsed=0:01:05.55    frame=45031 fps=682 q=-1.0 size=  583936KiB time=00:12:31.24 bitrate=6367.6kbits/s speed=11.4x elapsed=0:01:06.05    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame=45535 fps=684 q=-1.0 size=  590592KiB time=00:12:39.65 bitrate=6368.9kbits/s speed=11.4x elapsed=0:01:06.55    frame=46076 fps=687 q=-1.0 size=  599296KiB time=00:12:48.67 bitrate=6386.9kbits/s speed=11.5x elapsed=0:01:07.05    frame=46669 fps=691 q=-1.0 size=  608256KiB time=00:12:58.56 bitrate=6400.0kbits/s speed=11.5x elapsed=0:01:07.55    frame=47382 fps=696 q=-1.0 size=  616192KiB time=00:13:10.46 bitrate=6385.9kbits/s speed=11.6x elapsed=0:01:08.05    frame=47935 fps=699 q=-1.0 size=  619264KiB time=00:13:19.69 bitrate=6343.7kbits/s speed=11.7x elapsed=0:01:08.56    frame=48481 fps=702 q=-1.0 size=  623872KiB time=00:13:28.80 bitrate=6318.9kbits/s speed=11.7x elapsed=0:01:09.06    frame=49281 fps=708 q=-1.0 size=  630784KiB time=00:13:42.14 bitrate=6285.2kbits/s speed=11.8x elapsed=0:01:09.56    frame=50242 fps=717 q=-1.0 size=  641536KiB time=00:13:58.17 bitrate=6270.1kbits/s speed=  12x elapsed=0:01:10.06    frame=51117 fps=724 q=-1.0 size=  647936KiB time=00:14:12.77 bitrate=6224.2kbits/s speed=12.1x elapsed=0:01:10.56    frame=51600 fps=726 q=-1.0 size=  653824KiB time=00:14:20.83 bitrate=6222.0kbits/s speed=12.1x elapsed=0:01:11.06    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame=52252 fps=730 q=-1.0 size=  659456KiB time=00:14:31.71 bitrate=6197.3kbits/s speed=12.2x elapsed=0:01:11.56    frame=52707 fps=731 q=-1.0 size=  665600KiB time=00:14:39.30 bitrate=6201.0kbits/s speed=12.2x elapsed=0:01:12.06    frame=53196 fps=733 q=-1.0 size=  673280KiB time=00:14:47.46 bitrate=6214.9kbits/s speed=12.2x elapsed=0:01:12.56    frame=53582 fps=733 q=-1.0 size=  680448KiB time=00:14:53.90 bitrate=6235.8kbits/s speed=12.2x elapsed=0:01:13.06    frame=54168 fps=736 q=-1.0 size=  691968KiB time=00:15:03.67 bitrate=6272.8kbits/s speed=12.3x elapsed=0:01:13.56    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame=54584 fps=737 q=-1.0 size=  699392KiB time=00:15:10.61 bitrate=6291.8kbits/s speed=12.3x elapsed=0:01:14.06    frame=55015 fps=738 q=-1.0 size=  707072KiB time=00:15:17.80 bitrate=6311.0kbits/s speed=12.3x elapsed=0:01:14.56    frame=55476 fps=739 q=-1.0 size=  715264KiB time=00:15:25.50 bitrate=6331.1kbits/s speed=12.3x elapsed=0:01:15.06    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 1 times
-frame=56225 fps=744 q=-1.0 size=  719360KiB time=00:15:37.99 bitrate=6282.5kbits/s speed=12.4x elapsed=0:01:15.56    frame=57105 fps=751 q=-1.0 size=  728320KiB time=00:15:52.67 bitrate=6262.8kbits/s speed=12.5x elapsed=0:01:16.06    frame=57995 fps=757 q=-1.0 size=  737536KiB time=00:16:07.52 bitrate=6244.7kbits/s speed=12.6x elapsed=0:01:16.56    frame=58159 fps=755 q=-1.0 size=  739072KiB time=00:16:10.34 bitrate=6239.5kbits/s speed=12.6x elapsed=0:01:17.06    frame=58210 fps=750 q=-1.0 size=  739584KiB time=00:16:11.19 bitrate=6238.4kbits/s speed=12.5x elapsed=0:01:17.58    frame=58522 fps=750 q=-1.0 size=  743168KiB time=00:16:16.31 bitrate=6235.7kbits/s speed=12.5x elapsed=0:01:18.08    frame=59018 fps=751 q=-1.0 size=  749824KiB time=00:16:24.59 bitrate=6238.7kbits/s speed=12.5x elapsed=0:01:18.58    frame=59560 fps=753 q=-1.0 size=  755456KiB time=00:16:33.63 bitrate=6228.3kbits/s speed=12.6x elapsed=0:01:19.08    frame=60056 fps=755 q=-1.0 size=  762112KiB time=00:16:41.91 bitrate=6231.3kbits/s speed=12.6x elapsed=0:01:19.58    frame=60297 fps=753 q=-1.0 size=  765440KiB time=00:16:45.93 bitrate=6233.5kbits/s speed=12.6x elapsed=0:01:20.08    frame=60798 fps=754 q=-1.0 size=  770816KiB time=00:16:54.28 bitrate=6225.6kbits/s speed=12.6x elapsed=0:01:20.58    frame=61243 fps=755 q=-1.0 size=  774912KiB time=00:17:01.71 bitrate=6213.2kbits/s speed=12.6x elapsed=0:01:21.08    frame=61739 fps=757 q=-1.0 size=  782848KiB time=00:17:09.98 bitrate=6226.4kbits/s speed=12.6x elapsed=0:01:21.58    frame=62210 fps=758 q=-1.0 size=  788480KiB time=00:17:17.84 bitrate=6223.7kbits/s speed=12.6x elapsed=0:01:22.08    frame=62307 fps=754 q=-1.0 size=  789760KiB time=00:17:19.46 bitrate=6224.1kbits/s speed=12.6x elapsed=0:01:22.58    frame=62834 fps=756 q=-1.0 size=  795904KiB time=00:17:28.25 bitrate=6219.9kbits/s speed=12.6x elapsed=0:01:23.08    frame=63407 fps=759 q=-1.0 size=  807168KiB time=00:17:37.89 bitrate=6250.4kbits/s speed=12.7x elapsed=0:01:23.58    frame=63790 fps=759 q=-1.0 size=  813568KiB time=00:17:44.28 bitrate=6262.2kbits/s speed=12.7x elapsed=0:01:24.08    frame=63954 fps=756 q=-1.0 size=  816384KiB time=00:17:47.02 bitrate=6267.7kbits/s speed=12.6x elapsed=0:01:24.58    frame=64174 fps=754 q=-1.0 size=  820480KiB time=00:17:50.67 bitrate=6277.7kbits/s speed=12.6x elapsed=0:01:25.08    frame=64235 fps=750 q=-1.0 size=  821504KiB time=00:17:51.71 bitrate=6279.4kbits/s speed=12.5x elapsed=0:01:25.59    frame=64246 fps=746 q=-1.0 size=  821760KiB time=00:17:51.89 bitrate=6280.3kbits/s speed=12.5x elapsed=0:01:26.09    frame=64353 fps=743 q=-1.0 size=  824320KiB time=00:17:53.59 bitrate=6289.9kbits/s speed=12.4x elapsed=0:01:26.59    frame=64665 fps=742 q=-1.0 size=  830208KiB time=00:17:58.80 bitrate=6304.3kbits/s speed=12.4x elapsed=0:01:27.09    frame=64921 fps=741 q=-1.0 size=  834560KiB time=00:18:03.15 bitrate=6311.8kbits/s speed=12.4x elapsed=0:01:27.59    frame=65207 fps=740 q=-1.0 size=  839424KiB time=00:18:07.84 bitrate=6321.3kbits/s speed=12.3x elapsed=0:01:28.09    frame=65494 fps=739 q=-1.0 size=  844544KiB time=00:18:12.63 bitrate=6332.0kbits/s speed=12.3x elapsed=0:01:28.59    frame=65903 fps=740 q=-1.0 size=  850688KiB time=00:18:19.54 bitrate=6338.0kbits/s speed=12.3x elapsed=0:01:29.09    frame=65917 fps=736 q=-1.0 size=  850944KiB time=00:18:19.77 bitrate=6338.5kbits/s speed=12.3x elapsed=0:01:29.59    frame=66015 fps=733 q=-1.0 size=  853504KiB time=00:18:21.32 bitrate=6348.6kbits/s speed=12.2x elapsed=0:01:30.09    frame=66153 fps=730 q=-1.0 size=  856320KiB time=00:18:23.62 bitrate=6356.3kbits/s speed=12.2x elapsed=0:01:30.59    frame=66327 fps=728 q=-1.0 size=  859648KiB time=00:18:26.53 bitrate=6364.2kbits/s speed=12.1x elapsed=0:01:31.10    frame=66532 fps=726 q=-1.0 size=  862208KiB time=00:18:29.95 bitrate=6363.5kbits/s speed=12.1x elapsed=0:01:31.60    frame=66772 fps=725 q=-1.0 size=  865280KiB time=00:18:34.03 bitrate=6362.8kbits/s speed=12.1x elapsed=0:01:32.10    frame=66936 fps=723 q=-1.0 size=  868352KiB time=00:18:36.77 bitrate=6369.7kbits/s speed=12.1x elapsed=0:01:32.60    frame=67008 fps=720 q=-1.0 size=  869888KiB time=00:18:37.89 bitrate=6374.6kbits/s speed=  12x elapsed=0:01:33.10    frame=67161 fps=717 q=-1.0 size=  874496KiB time=00:18:40.44 bitrate=6393.8kbits/s speed=  12x elapsed=0:01:33.60    frame=67371 fps=716 q=-1.0 size=  878336KiB time=00:18:43.94 bitrate=6401.8kbits/s speed=11.9x elapsed=0:01:34.11    frame=67453 fps=713 q=-1.0 size=  879872KiB time=00:18:45.31 bitrate=6405.2kbits/s speed=11.9x elapsed=0:01:34.61    frame=67744 fps=712 q=-1.0 size=  884736KiB time=00:18:50.17 bitrate=6413.0kbits/s speed=11.9x elapsed=0:01:35.11    frame=68066 fps=712 q=-1.0 size=  887808KiB time=00:18:55.54 bitrate=6404.8kbits/s speed=11.9x elapsed=0:01:35.61    frame=68414 fps=712 q=-1.0 size=  892160KiB time=00:19:01.34 bitrate=6403.5kbits/s speed=11.9x elapsed=0:01:36.11    frame=68915 fps=713 q=-1.0 size=  899328KiB time=00:19:09.70 bitrate=6408.0kbits/s speed=11.9x elapsed=0:01:36.61    frame=69386 fps=714 q=-1.0 size=  906240KiB time=00:19:17.56 bitrate=6413.4kbits/s speed=11.9x elapsed=0:01:37.11    frame=70056 fps=718 q=-1.0 size=  914432KiB time=00:19:28.74 bitrate=6409.5kbits/s speed=  12x elapsed=0:01:37.61    frame=70629 fps=720 q=-1.0 size=  920320KiB time=00:19:38.30 bitrate=6398.4kbits/s speed=  12x elapsed=0:01:38.11    frame=71125 fps=721 q=-1.0 size=  927232KiB time=00:19:46.57 bitrate=6401.5kbits/s speed=  12x elapsed=0:01:38.61    frame=71631 fps=723 q=-1.0 size=  935424KiB time=00:19:55.02 bitrate=6412.4kbits/s speed=12.1x elapsed=0:01:39.11    frame=72158 fps=724 q=-1.0 size=  942080KiB time=00:20:03.81 bitrate=6410.9kbits/s speed=12.1x elapsed=0:01:39.61    frame=72736 fps=727 q=-1.0 size=  948480KiB time=00:20:13.45 bitrate=6403.2kbits/s speed=12.1x elapsed=0:01:40.11    frame=73345 fps=729 q=-1.0 size=  955648KiB time=00:20:23.61 bitrate=6398.0kbits/s speed=12.2x elapsed=0:01:40.61    frame=73989 fps=732 q=-1.0 size=  963840KiB time=00:20:34.35 bitrate=6396.7kbits/s speed=12.2x elapsed=0:01:41.11    frame=74619 fps=734 q=-1.0 size=  975616KiB time=00:20:44.86 bitrate=6420.2kbits/s speed=12.3x elapsed=0:01:41.61    frame=75135 fps=736 q=-1.0 size=  980736KiB time=00:20:53.47 bitrate=6409.5kbits/s speed=12.3x elapsed=0:01:42.11    frame=75544 fps=736 q=-1.0 size=  985856KiB time=00:21:00.30 bitrate=6408.1kbits/s speed=12.3x elapsed=0:01:42.61    frame=76041 fps=737 q=-1.0 size= 1004288KiB time=00:21:08.59 bitrate=6485.2kbits/s speed=12.3x elapsed=0:01:43.11    frame=76705 fps=740 q=-1.0 size= 1013248KiB time=00:21:19.67 bitrate=6486.5kbits/s speed=12.4x elapsed=0:01:43.61    frame=77570 fps=745 q=-1.0 size= 1037056KiB time=00:21:34.10 bitrate=6564.8kbits/s speed=12.4x elapsed=0:01:44.11    frame=78414 fps=750 q=-1.0 size= 1054976KiB time=00:21:48.26 bitrate=6606.0kbits/s speed=12.5x elapsed=0:01:44.61    frame=79048 fps=752 q=-1.0 size= 1064192KiB time=00:21:58.76 bitrate=6610.7kbits/s speed=12.5x elapsed=0:01:45.11    frame=79698 fps=755 q=-1.0 size= 1070336KiB time=00:22:09.60 bitrate=6594.6kbits/s speed=12.6x elapsed=0:01:45.61    frame=80416 fps=758 q=-1.0 size= 1079040KiB time=00:22:21.58 bitrate=6588.9kbits/s speed=12.6x elapsed=0:01:46.11    frame=81145 fps=761 q=-1.0 size= 1088768KiB time=00:22:33.74 bitrate=6588.5kbits/s speed=12.7x elapsed=0:01:46.61    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame=81754 fps=763 q=-1.0 size= 1096960KiB time=00:22:43.90 bitrate=6588.7kbits/s speed=12.7x elapsed=0:01:47.11    frame=82243 fps=764 q=-1.0 size= 1103360KiB time=00:22:52.06 bitrate=6587.7kbits/s speed=12.7x elapsed=0:01:47.61    frame=83135 fps=769 q=-1.0 size= 1113856KiB time=00:23:06.94 bitrate=6579.0kbits/s speed=12.8x elapsed=0:01:48.11    frame=84285 fps=776 q=-1.0 size= 1130240KiB time=00:23:26.13 bitrate=6584.7kbits/s speed=12.9x elapsed=0:01:48.61    frame=84999 fps=779 q=-1.0 size= 1135872KiB time=00:23:38.04 bitrate=6561.9kbits/s speed=  13x elapsed=0:01:49.11    frame=85408 fps=779 q=-1.0 size= 1138944KiB time=00:23:44.88 bitrate=6548.1kbits/s speed=  13x elapsed=0:01:49.61    frame=85971 fps=781 q=-1.0 size= 1145600KiB time=00:23:54.25 bitrate=6543.3kbits/s speed=  13x elapsed=0:01:50.11    frame=86553 fps=782 q=-1.0 size= 1155328KiB time=00:24:03.96 bitrate=6554.5kbits/s speed=13.1x elapsed=0:01:50.61    frame=87324 fps=786 q=-1.0 size= 1167360KiB time=00:24:16.83 bitrate=6564.3kbits/s speed=13.1x elapsed=0:01:51.11    frame=87813 fps=787 q=-1.0 size= 1173504KiB time=00:24:24.98 bitrate=6562.1kbits/s speed=13.1x elapsed=0:01:51.61    frame=88204 fps=787 q=-1.0 size= 1178368KiB time=00:24:31.51 bitrate=6560.0kbits/s speed=13.1x elapsed=0:01:52.11    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame=88468 fps=786 q=-1.0 size= 1182464KiB time=00:24:35.91 bitrate=6563.2kbits/s speed=13.1x elapsed=0:01:52.61    frame=88744 fps=785 q=-1.0 size= 1187328KiB time=00:24:40.52 bitrate=6569.7kbits/s speed=13.1x elapsed=0:01:53.11    frame=89060 fps=784 q=-1.0 size= 1191424KiB time=00:24:45.79 bitrate=6569.0kbits/s speed=13.1x elapsed=0:01:53.61    frame=89371 fps=783 q=-1.0 size= 1195776KiB time=00:24:50.98 bitrate=6570.0kbits/s speed=13.1x elapsed=0:01:54.11    frame=89670 fps=782 q=-1.0 size= 1197312KiB time=00:24:56.07 bitrate=6556.1kbits/s speed=13.1x elapsed=0:01:54.61    frame=90004 fps=782 q=-1.0 size= 1200896KiB time=00:25:01.54 bitrate=6551.8kbits/s speed=  13x elapsed=0:01:55.11    frame=90298 fps=781 q=-1.0 size= 1204224KiB time=00:25:06.44 bitrate=6548.5kbits/s speed=  13x elapsed=0:01:55.61    frame=90643 fps=781 q=-1.0 size= 1208064KiB time=00:25:12.20 bitrate=6544.4kbits/s speed=  13x elapsed=0:01:56.11    frame=90954 fps=780 q=-1.0 size= 1210624KiB time=00:25:17.39 bitrate=6535.8kbits/s speed=  13x elapsed=0:01:56.61    frame=91253 fps=779 q=-1.0 size= 1213696KiB time=00:25:22.38 bitrate=6531.0kbits/s speed=  13x elapsed=0:01:57.11    frame=91563 fps=778 q=-1.0 size= 1218048KiB time=00:25:27.55 bitrate=6532.2kbits/s speed=  13x elapsed=0:01:57.62    frame=91880 fps=778 q=-1.0 size= 1220864KiB time=00:25:32.84 bitrate=6524.7kbits/s speed=  13x elapsed=0:01:58.12    frame=92196 fps=777 q=-1.0 size= 1224960KiB time=00:25:38.11 bitrate=6524.1kbits/s speed=  13x elapsed=0:01:58.62    frame=92510 fps=777 q=-1.0 size= 1229312KiB time=00:25:43.35 bitrate=6525.1kbits/s speed=  13x elapsed=0:01:59.12    frame=92835 fps=776 q=-1.0 size= 1234432KiB time=00:25:48.77 bitrate=6529.3kbits/s speed=12.9x elapsed=0:01:59.62    frame=93152 fps=775 q=-1.0 size= 1238528KiB time=00:25:54.06 bitrate=6528.7kbits/s speed=12.9x elapsed=0:02:00.12    frame=93508 fps=775 q=-1.0 size= 1242112KiB time=00:26:00.00 bitrate=6522.7kbits/s speed=12.9x elapsed=0:02:00.62    frame=93813 fps=774 q=-1.0 size= 1246208KiB time=00:26:05.09 bitrate=6522.9kbits/s speed=12.9x elapsed=0:02:01.12    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 2 times
-frame=95588 fps=786 q=-1.0 size= 1259776KiB time=00:26:34.71 bitrate=6471.4kbits/s speed=13.1x elapsed=0:02:01.62    frame=96904 fps=793 q=-1.0 size= 1273600KiB time=00:26:56.66 bitrate=6453.6kbits/s speed=13.2x elapsed=0:02:02.12    frame=97551 fps=795 q=-1.0 size= 1277696KiB time=00:27:07.46 bitrate=6431.4kbits/s speed=13.3x elapsed=0:02:02.62    frame=97850 fps=795 q=-1.0 size= 1280768KiB time=00:27:12.45 bitrate=6427.2kbits/s speed=13.3x elapsed=0:02:03.13    frame=98224 fps=794 q=-1.0 size= 1283072KiB time=00:27:18.69 bitrate=6414.2kbits/s speed=13.3x elapsed=0:02:03.63    frame=98533 fps=794 q=-1.0 size= 1285120KiB time=00:27:23.86 bitrate=6404.2kbits/s speed=13.2x elapsed=0:02:04.13    frame=98851 fps=793 q=-1.0 size= 1287680KiB time=00:27:29.15 bitrate=6396.4kbits/s speed=13.2x elapsed=0:02:04.63    frame=99187 fps=793 q=-1.0 size= 1290752KiB time=00:27:34.75 bitrate=6390.0kbits/s speed=13.2x elapsed=0:02:05.13    frame=99503 fps=792 q=-1.0 size= 1295872KiB time=00:27:40.02 bitrate=6394.9kbits/s speed=13.2x elapsed=0:02:05.63    frame=99861 fps=792 q=-1.0 size= 1301504KiB time=00:27:46.00 bitrate=6399.7kbits/s speed=13.2x elapsed=0:02:06.13    frame=100222 fps=791 q=-1.0 size= 1311744KiB time=00:27:52.02 bitrate=6426.8kbits/s speed=13.2x elapsed=0:02:06.63    frame=100580 fps=791 q=-1.0 size= 1318400KiB time=00:27:57.99 bitrate=6436.4kbits/s speed=13.2x elapsed=0:02:07.13    frame=100954 fps=791 q=-1.0 size= 1322240KiB time=00:28:04.23 bitrate=6431.3kbits/s speed=13.2x elapsed=0:02:07.63    frame=101317 fps=791 q=-1.0 size= 1325568KiB time=00:28:10.29 bitrate=6424.4kbits/s speed=13.2x elapsed=0:02:08.13    frame=101671 fps=790 q=-1.0 size= 1328640KiB time=00:28:16.19 bitrate=6416.8kbits/s speed=13.2x elapsed=0:02:08.63    [matroska,webm @ 0x556ca010e240] Auto-inserting h264_mp4toannexb bitstream filter
-frame=102033 fps=790 q=-1.0 size= 1330944KiB time=00:28:22.24 bitrate=6405.1kbits/s speed=13.2x elapsed=0:02:09.13    frame=102378 fps=790 q=-1.0 size= 1331968KiB time=00:28:27.99 bitrate=6388.5kbits/s speed=13.2x elapsed=0:02:09.63    frame=102746 fps=790 q=-1.0 size= 1332992KiB time=00:28:34.13 bitrate=6370.5kbits/s speed=13.2x elapsed=0:02:10.13    frame=103086 fps=789 q=-1.0 size= 1334272KiB time=00:28:39.80 bitrate=6355.6kbits/s speed=13.2x elapsed=0:02:10.63    frame=103460 fps=789 q=-1.0 size= 1335808KiB time=00:28:46.04 bitrate=6339.9kbits/s speed=13.2x elapsed=0:02:11.13    frame=103914 fps=789 q=-1.0 size= 1337600KiB time=00:28:53.62 bitrate=6320.7kbits/s speed=13.2x elapsed=0:02:11.63    frame=104352 fps=790 q=-1.0 size= 1339136KiB time=00:29:00.92 bitrate=6301.4kbits/s speed=13.2x elapsed=0:02:12.13    frame=104662 fps=789 q=-1.0 size= 1340672KiB time=00:29:06.10 bitrate=6289.9kbits/s speed=13.2x elapsed=0:02:12.63    frame=105002 fps=789 q=-1.0 size= 1342208KiB time=00:29:11.77 bitrate=6276.7kbits/s speed=13.2x elapsed=0:02:13.13    frame=105336 fps=788 q=-1.0 size= 1343744KiB time=00:29:17.34 bitrate=6264.0kbits/s speed=13.2x elapsed=0:02:13.63    frame=105589 fps=787 q=-1.0 size= 1344512KiB time=00:29:21.56 bitrate=6252.5kbits/s speed=13.1x elapsed=0:02:14.13    frame=105853 fps=786 q=-1.0 size= 1345280KiB time=00:29:25.97 bitrate=6240.5kbits/s speed=13.1x elapsed=0:02:14.63    frame=106176 fps=786 q=-1.0 size= 1345792KiB time=00:29:31.35 bitrate=6223.9kbits/s speed=13.1x elapsed=0:02:15.13    frame=106532 fps=785 q=-1.0 size= 1346816KiB time=00:29:37.29 bitrate=6207.8kbits/s speed=13.1x elapsed=0:02:15.63    frame=106906 fps=785 q=-1.0 size= 1347840KiB time=00:29:43.53 bitrate=6190.8kbits/s speed=13.1x elapsed=0:02:16.13    frame=107298 fps=785 q=-1.0 size= 1349120KiB time=00:29:50.07 bitrate=6174.0kbits/s speed=13.1x elapsed=0:02:16.63    frame=107764 fps=786 q=-1.0 size= 1350912KiB time=00:29:57.85 bitrate=6155.5kbits/s speed=13.1x elapsed=0:02:17.13    frame=108201 fps=786 q=-1.0 size= 1353216KiB time=00:30:05.14 bitrate=6141.1kbits/s speed=13.1x elapsed=0:02:17.63    frame=108518 fps=786 q=-1.0 size= 1353984KiB time=00:30:10.43 bitrate=6126.6kbits/s speed=13.1x elapsed=0:02:18.13    frame=108869 fps=785 q=-1.0 size= 1355008KiB time=00:30:16.28 bitrate=6111.5kbits/s speed=13.1x elapsed=0:02:18.63    frame=109197 fps=785 q=-1.0 size= 1357056KiB time=00:30:21.75 bitrate=6102.3kbits/s speed=13.1x elapsed=0:02:19.13    frame=109565 fps=785 q=-1.0 size= 1358080KiB time=00:30:27.89 bitrate=6086.4kbits/s speed=13.1x elapsed=0:02:19.63    frame=109922 fps=784 q=-1.0 size= 1360128KiB time=00:30:33.85 bitrate=6075.8kbits/s speed=13.1x elapsed=0:02:20.14    frame=110307 fps=784 q=-1.0 size= 1361152KiB time=00:30:40.27 bitrate=6059.2kbits/s speed=13.1x elapsed=0:02:20.64    frame=110750 fps=785 q=-1.0 size= 1363456KiB time=00:30:47.66 bitrate=6045.2kbits/s speed=13.1x elapsed=0:02:21.14    frame=111205 fps=785 q=-1.0 size= 1365248KiB time=00:30:55.25 bitrate=6028.3kbits/s speed=13.1x elapsed=0:02:21.64    frame=111521 fps=785 q=-1.0 size= 1366016KiB time=00:31:00.53 bitrate=6014.6kbits/s speed=13.1x elapsed=0:02:22.14    frame=111849 fps=784 q=-1.0 size= 1366784KiB time=00:31:06.00 bitrate=6000.4kbits/s speed=13.1x elapsed=0:02:22.64    frame=112195 fps=784 q=-1.0 size= 1368832KiB time=00:31:11.77 bitrate=5990.8kbits/s speed=13.1x elapsed=0:02:23.14    frame=112551 fps=784 q=-1.0 size= 1369856KiB time=00:31:17.71 bitrate=5976.3kbits/s speed=13.1x elapsed=0:02:23.64    frame=112989 fps=784 q=-1.0 size= 1371648KiB time=00:31:25.02 bitrate=5961.0kbits/s speed=13.1x elapsed=0:02:24.14    frame=113495 fps=785 q=-1.0 size= 1373440KiB time=00:31:33.46 bitrate=5942.1kbits/s speed=13.1x elapsed=0:02:24.64    frame=113863 fps=784 q=-1.0 size= 1374208KiB time=00:31:39.60 bitrate=5926.2kbits/s speed=13.1x elapsed=0:02:25.14    frame=114134 fps=784 q=-1.0 size= 1375232KiB time=00:31:44.12 bitrate=5916.6kbits/s speed=13.1x elapsed=0:02:25.64    frame=114410 fps=783 q=-1.0 size= 1376768KiB time=00:31:48.72 bitrate=5908.9kbits/s speed=13.1x elapsed=0:02:26.14    frame=114738 fps=782 q=-1.0 size= 1378560KiB time=00:31:54.20 bitrate=5899.7kbits/s speed=13.1x elapsed=0:02:26.64    frame=115147 fps=783 q=-1.0 size= 1380352KiB time=00:32:01.02 bitrate=5886.4kbits/s speed=13.1x elapsed=0:02:27.14    frame=115647 fps=783 q=-1.0 size= 1381632KiB time=00:32:09.36 bitrate=5866.3kbits/s speed=13.1x elapsed=0:02:27.64    frame=116136 fps=784 q=-1.0 size= 1383680KiB time=00:32:17.52 bitrate=5850.3kbits/s speed=13.1x elapsed=0:02:28.14    frame=116499 fps=784 q=-1.0 size= 1385984KiB time=00:32:23.58 bitrate=5841.8kbits/s speed=13.1x elapsed=0:02:28.64    frame=116844 fps=783 q=-1.0 size= 1386752KiB time=00:32:29.33 bitrate=5827.8kbits/s speed=13.1x elapsed=0:02:29.14    frame=117224 fps=783 q=-1.0 size= 1388288KiB time=00:32:35.67 bitrate=5815.3kbits/s speed=13.1x elapsed=0:02:29.64    frame=117632 fps=783 q=-1.0 size= 1389824KiB time=00:32:42.48 bitrate=5801.5kbits/s speed=13.1x elapsed=0:02:30.14    frame=118012 fps=783 q=-1.0 size= 1392128KiB time=00:32:48.82 bitrate=5792.5kbits/s speed=13.1x elapsed=0:02:30.64    frame=118283 fps=783 q=-1.0 size= 1393152KiB time=00:32:53.34 bitrate=5783.4kbits/s speed=13.1x elapsed=0:02:31.15    frame=118582 fps=782 q=-1.0 size= 1393920KiB time=00:32:58.33 bitrate=5772.0kbits/s speed=  13x elapsed=0:02:31.65    frame=118852 fps=781 q=-1.0 size= 1394944KiB time=00:33:02.83 bitrate=5763.1kbits/s speed=  13x elapsed=0:02:32.15    frame=119140 fps=780 q=-1.0 size= 1395968KiB time=00:33:07.64 bitrate=5753.4kbits/s speed=  13x elapsed=0:02:32.65    frame=119416 fps=780 q=-1.0 size= 1396736KiB time=00:33:12.24 bitrate=5743.3kbits/s speed=  13x elapsed=0:02:33.15    frame=119727 fps=779 q=-1.0 size= 1397760KiB time=00:33:17.43 bitrate=5732.6kbits/s speed=  13x elapsed=0:02:33.65    frame=120158 fps=779 q=-1.0 size= 1398784KiB time=00:33:24.62 bitrate=5716.2kbits/s speed=  13x elapsed=0:02:34.15    frame=120556 fps=780 q=-1.0 size= 1400832KiB time=00:33:31.26 bitrate=5705.7kbits/s speed=  13x elapsed=0:02:34.65    frame=120889 fps=779 q=-1.0 size= 1402368KiB time=00:33:36.82 bitrate=5696.2kbits/s speed=  13x elapsed=0:02:35.15    frame=121269 fps=779 q=-1.0 size= 1403136KiB time=00:33:43.16 bitrate=5681.5kbits/s speed=  13x elapsed=0:02:35.65    frame=121724 fps=780 q=-1.0 size= 1404672KiB time=00:33:50.75 bitrate=5666.4kbits/s speed=  13x elapsed=0:02:36.15    frame=122063 fps=779 q=-1.0 size= 1406208KiB time=00:33:56.40 bitrate=5656.9kbits/s speed=  13x elapsed=0:02:36.65    frame=122357 fps=779 q=-1.0 size= 1408000KiB time=00:34:01.31 bitrate=5650.5kbits/s speed=  13x elapsed=0:02:37.15    frame=122662 fps=778 q=-1.0 size= 1409024KiB time=00:34:06.40 bitrate=5640.5kbits/s speed=  13x elapsed=0:02:37.65    frame=122921 fps=777 q=-1.0 size= 1409792KiB time=00:34:10.72 bitrate=5631.7kbits/s speed=  13x elapsed=0:02:38.15    frame=123202 fps=777 q=-1.0 size= 1411072KiB time=00:34:15.40 bitrate=5623.9kbits/s speed=  13x elapsed=0:02:38.65    frame=123479 fps=776 q=-1.0 size= 1412096KiB time=00:34:20.03 bitrate=5615.4kbits/s speed=12.9x elapsed=0:02:39.15    frame=123749 fps=775 q=-1.0 size= 1413120KiB time=00:34:24.53 bitrate=5607.2kbits/s speed=12.9x elapsed=0:02:39.65    frame=124031 fps=774 q=-1.0 size= 1414912KiB time=00:34:29.24 bitrate=5601.6kbits/s speed=12.9x elapsed=0:02:40.15    frame=124365 fps=774 q=-1.0 size= 1415680KiB time=00:34:34.81 bitrate=5589.5kbits/s speed=12.9x elapsed=0:02:40.65    frame=124716 fps=774 q=-1.0 size= 1417472KiB time=00:34:40.66 bitrate=5580.9kbits/s speed=12.9x elapsed=0:02:41.15    frame=125055 fps=774 q=-1.0 size= 1419264KiB time=00:34:46.32 bitrate=5572.8kbits/s speed=12.9x elapsed=0:02:41.65    frame=125366 fps=773 q=-1.0 size= 1420032KiB time=00:34:51.61 bitrate=5561.7kbits/s speed=12.9x elapsed=0:02:42.16    frame=125688 fps=773 q=-1.0 size= 1421824KiB time=00:34:56.88 bitrate=5554.7kbits/s speed=12.9x elapsed=0:02:42.66    frame=126005 fps=772 q=-1.0 size= 1423360KiB time=00:35:02.17 bitrate=5546.7kbits/s speed=12.9x elapsed=0:02:43.16    frame=126344 fps=772 q=-1.0 size= 1424640KiB time=00:35:07.82 bitrate=5536.8kbits/s speed=12.9x elapsed=0:02:43.66    frame=126667 fps=772 q=-1.0 size= 1425408KiB time=00:35:13.21 bitrate=5525.7kbits/s speed=12.9x elapsed=0:02:44.16    frame=126937 fps=771 q=-1.0 size= 1426176KiB time=00:35:17.72 bitrate=5516.9kbits/s speed=12.9x elapsed=0:02:44.66    frame=127230 fps=770 q=-1.0 size= 1427968KiB time=00:35:22.61 bitrate=5511.1kbits/s speed=12.9x elapsed=0:02:45.16    frame=127512 fps=770 q=-1.0 size= 1428736KiB time=00:35:27.31 bitrate=5501.9kbits/s speed=12.8x elapsed=0:02:45.66    frame=127806 fps=769 q=-1.0 size= 1430016KiB time=00:35:32.21 bitrate=5494.1kbits/s speed=12.8x elapsed=0:02:46.16    frame=128099 fps=769 q=-1.0 size= 1430784KiB time=00:35:37.10 bitrate=5484.5kbits/s speed=12.8x elapsed=0:02:46.66    frame=128358 fps=768 q=-1.0 size= 1431552KiB time=00:35:41.42 bitrate=5476.4kbits/s speed=12.8x elapsed=0:02:47.16    frame=128640 fps=767 q=-1.0 size= 1432576KiB time=00:35:46.13 bitrate=5468.3kbits/s speed=12.8x elapsed=0:02:47.66    frame=128905 fps=767 q=-1.0 size= 1434112KiB time=00:35:50.55 bitrate=5462.9kbits/s speed=12.8x elapsed=0:02:48.16    frame=129204 fps=766 q=-1.0 size= 1435136KiB time=00:35:55.54 bitrate=5454.1kbits/s speed=12.8x elapsed=0:02:48.66    [mp4 @ 0x556ca01161c0] Starting second pass: moving the moov atom to the beginning of the file
-[out#0/mp4 @ 0x556ca01bf800] video:1323337KiB audio:112657KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.278579%
-frame=129288 fps=749 q=-1.0 Lsize= 1439994KiB time=00:35:56.97 bitrate=5469.0kbits/s speed=12.5x elapsed=0:02:52.68    
-[aac @ 0x556ca013c140] Qavg: 65535.828
-  lossless master -> /var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.6.mkv
-[matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-[aist#0:1/pcm_s24le @ 0x561fc9c1c000] Guessed Channel Layout: stereo
-Input #0, concat, from '/var/tmp/megacut-hw3qjigh/segments.txt':
-  Duration: N/A, start: 0.000000, bitrate: N/A
-  Stream #0:0: Video: h264 (High), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 59.94 fps, 59.94 tbr, 1k tbn
-    Metadata:
-      HANDLER_NAME    : VideoHandler
-      ENCODER         : Lavc62.28.100 libx264
-      DURATION        : 00:01:41.201000000
-  Stream #0:1: Audio: pcm_s24le, 48000 Hz, stereo, s32 (24 bit), 2304 kb/s
-    Metadata:
-      ENCODER         : Lavc63.1.101 pcm_s24le
-      HANDLER_NAME    : SoundHandler
-      DURATION        : 00:01:41.200000000
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (pcm_s24le (native) -> flac (native))
-[flac @ 0x561fc9c440c0] encoding as 24 bits-per-sample, more is considered experimental. Add -strict experimental if you want to encode more than 24 bits-per-sample
-Output #0, matroska, to '/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.6.mkv':
-  Metadata:
-    encoder         : Lavf63.1.101
-  Stream #0:0: Video: h264 (High) (H264 / 0x34363248), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 59.94 fps, 59.94 tbr, 1k tbn
-    Metadata:
-      HANDLER_NAME    : VideoHandler
-      ENCODER         : Lavc62.28.100 libx264
-      DURATION        : 00:01:41.201000000
-  Stream #0:1: Audio: flac ([172][241][0][0] / 0xF1AC), 48000 Hz, stereo, s32 (24 bit), 128 kb/s
-    Metadata:
-      encoder         : Lavc63.1.101 flac
-      HANDLER_NAME    : SoundHandler
-      DURATION        : 00:01:41.200000000
-[matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame= 7493 fps=0.0 q=-1.0 size=   97280KiB time=00:02:05.09 bitrate=6370.7kbits/s speed= 250x elapsed=0:00:00.50    [matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=14572 fps=14568 q=-1.0 size=  201728KiB time=00:04:03.10 bitrate=6797.8kbits/s speed= 243x elapsed=0:00:01.00    [matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=22127 fps=14747 q=-1.0 size=  326400KiB time=00:06:09.14 bitrate=7243.4kbits/s speed= 246x elapsed=0:00:01.50    frame=30937 fps=15460 q=-1.0 size=  460288KiB time=00:08:36.10 bitrate=7306.0kbits/s speed= 258x elapsed=0:00:02.00    [matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=37884 fps=15146 q=-1.0 size=  572672KiB time=00:10:32.10 bitrate=7421.7kbits/s speed= 253x elapsed=0:00:02.50    [matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=45520 fps=15158 q=-1.0 size=  705280KiB time=00:12:39.40 bitrate=7608.2kbits/s speed= 253x elapsed=0:00:03.00    [matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 1 times
-frame=54472 fps=15550 q=-1.0 size=  836864KiB time=00:15:08.76 bitrate=7543.8kbits/s speed= 259x elapsed=0:00:03.50    [matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 1 times
-frame=63142 fps=15773 q=-1.0 size=  963584KiB time=00:17:33.47 bitrate=7493.0kbits/s speed= 263x elapsed=0:00:04.00    frame=72189 fps=16031 q=-1.0 size= 1126912KiB time=00:20:04.44 bitrate=7664.7kbits/s speed= 267x elapsed=0:00:04.50    frame=81331 fps=16255 q=-1.0 size= 1301504KiB time=00:22:36.84 bitrate=7857.9kbits/s speed= 271x elapsed=0:00:05.00    [matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 1 times
-frame=90597 fps=16458 q=-1.0 size= 1443584KiB time=00:25:11.43 bitrate=7824.2kbits/s speed= 275x elapsed=0:00:05.50    [matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 2 times
-frame=100159 fps=16680 q=-1.0 size= 1566976KiB time=00:27:51.07 bitrate=7681.7kbits/s speed= 278x elapsed=0:00:06.00    [matroska,webm @ 0x561fc9c161c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=109950 fps=16903 q=-1.0 size= 1643520KiB time=00:30:34.32 bitrate=7339.9kbits/s speed= 282x elapsed=0:00:06.50    frame=121062 fps=17282 q=-1.0 size= 1715456KiB time=00:33:39.70 bitrate=6957.9kbits/s speed= 288x elapsed=0:00:07.00    [out#0/matroska @ 0x561fc9cc7780] video:1323337KiB audio:447256KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.061955%
-frame=129288 fps=17407 q=-1.0 Lsize= 1771690KiB time=00:35:56.97 bitrate=6728.7kbits/s speed= 290x elapsed=0:00:07.42    
-farm[seg009]: verify ok — seg009.mkv 421.004s h264 1920x1080
-wrote /var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.6.mp4

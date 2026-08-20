@@ -45,7 +45,7 @@ WHAT IS DELIBERATELY NOT HERE
 -----------------------------
 - **No invented copy.** Every word comes from ``vocab/casting.yaml`` verbatim.
   A person the owner named but authored no plate for (``ensemble.placeholders``)
-  renders as a *named placeholder*, never as a credit with a title nobody wrote.
+  is omitted and recorded, never credited with a title nobody wrote.
 - **No plate on the burned-in title.** Source 356.500 -> 358.200 carries
   Bungie's "NEW LEGENDS WILL RISE" across the middle of frame. Nothing is
   placed there.
@@ -56,6 +56,7 @@ WHAT IS DELIBERATELY NOT HERE
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import sys
 from pathlib import Path
@@ -947,29 +948,6 @@ SOLO = [
     },
 ]
 
-# Dylan Taylor and Ahmed Adan remain recorded in `ensemble.placeholders`, but
-# neither has a scheduled Act II nameplate. The owner removed Dylan's card;
-# Ahmed's had already been removed when The Long Walk displaced it.
-PLACEHOLDERS = []
-
-# The blueberries -- the month's contributors, in the anonymous slots. Copy is
-# resolved by tools/plate.py's own ensemble path, so a contributor whose
-# identity IS authored gets it verbatim and everyone else gets the generic
-# blueberry plate with the eyebrow their org membership earns. Leads are
-# excluded: castrojo is Cayde-6 and is credited only where Cayde is on screen.
-# TWO SHOTS REMOVED, same instruction. 195.267 (HuntedRaven7, film 2:51.4)
-# and 233.500 (hanthor, film 3:29.6) are both inside "The Long Walk". The
-# roster is walked in order against this list, so dropping two shots does not
-# reshuffle who played whom -- it shortens the list, and the two contributors
-# it reached are reported in `unresolved` rather than silently dropped.
-# EMPTY, owner instruction: "03:16 get rid of giklab". Megacut 3:16 is film
-# 74.4, and the one blueberry plate in this act was `blueberry_Giklab` at film
-# 73.400 -- the shot at source 90.767. The SHOT is what came out, so the roster
-# is not reshuffled: nobody else moved into his slot, and Giklab stays on the
-# roster for a later act. The window is now clear for the OG Guardians above.
-BLUEBERRY_SHOTS = []
-BLUEBERRY_EXCLUDE = {"castrojo"}  # a lead; see the comment above
-
 # Cayde signs off. Source 358.200 -> 360.500 is 2.30 s against a 2.2 s minimum
 # hold, so it fits by a tenth of a second -- DO NOT SHORTEN IT. It is the
 # second-to-last shot: he says it, and then three figures walk into the
@@ -1020,7 +998,7 @@ MONTAGE_STEP = 5.5
 #
 # The announcer carried three blocks -- the four ranked montage cards, the two
 # TOC payoff cards, and the label on Natewaddington's placard (the placard
-# itself is out too now, see TIMED_KROOK below). All three are
+# itself is out too now). All three are
 # removed rather than re-voiced: the copy was written FOR that character, and
 # putting somebody else's name on his lines would be a different joke nobody
 # asked for. Every string survives in git and in `unresolved`, so bringing him
@@ -1038,49 +1016,6 @@ MONTAGE_CHATS = [
     ("castrojo", "Jorge Castro", "Enjoying the metal?"),
     ("castrojo", "Jorge Castro", "Ready to the #FIGHTFORCONTRIBUTORS?"),
 ]
-
-# The heraldic lower thirds. `name` is who is being addressed, `title` is what
-# is said to them -- the closed field set, no row invented.
-MONTAGE_ANNOUNCEMENTS = [
-    {
-        "id": "announce_new",
-        "rank": "bronze",
-        "name": "TO [ NEW CONTRIBUTORS ]",
-        "title": "It's totally like this. We promise.",
-    },
-    {
-        "id": "announce_current",
-        "rank": "silver",
-        "name": "TO [ CURRENT CONTRIBUTORS ]",
-        "title": "Look how good you look, it totally is like this!",
-    },
-    {
-        "id": "announce_emeritus",
-        "rank": "gold",
-        "name": "[ EMERITUS CONTRIBUTORS ]",
-        "title": "It's totally NOT like this. We promise.",
-        # The owner's block for this one carries a SECOND line -- "Look how
-        # good you look!" -- and the card has three rows, all spoken for. It
-        # is recorded in `unresolved` rather than dropped or crammed into the
-        # class row, which is a subclass and would be nonsense here.
-        "orphan_copy": "Look how good you look!",
-    },
-    {
-        "id": "announce_all",
-        "rank": "gold",
-        "name": "[ALL CONTRIBUTORS]",
-        "title": "You are not wrong",
-    },
-]
-
-# `trustee: true` IS the silver treatment (tools/plate.py `_variant_for`), so
-# the middle rank is a flag rather than a `variant` -- same as every silver
-# plate in the show.
-RANK_CHROME = {
-    "bronze": {"variant": "bronze"},
-    "silver": {"trustee": True},
-    "gold": {"variant": "leader"},
-}
 
 # --- "THE LONG WALK" (owner brief, this round) -----------------------------
 #
@@ -1309,80 +1244,6 @@ TOC_POST = [
      "text": "LOL", "hold": 2.2},
 ]
 
-# The payoff pair from §3's announcement block. The first REPRISES the
-# montage's emeritus card verbatim -- a callback, so the copy is identical,
-# row for row, rank included. The second is the pivot it sets up; the brief's
-# block gives it no addressee row, so the card carries none.
-TOC_ANNOUNCEMENTS = [
-    {"id": "toc_announce_emeritus", "rank": "gold",
-     "name": "[ EMERITUS CONTRIBUTORS ]",
-     "title": "It's totally NOT like this. We promise."},
-    {"id": "toc_announce_ambassadors", "rank": None,
-     "name": None,
-     "title": "Have you met our Ambassadors?"},
-]
-
-# §4's owner-marked cues, pinned to his second. Like every window in this file
-# the anchor is carried in SOURCE time (`src_of` below), so a cut that moves
-# raises rather than slides.
-#
-# NOT HERE: the 4:01 cue -- "[pfp] Jorge Castro: They are not ready for Shua
-# Khan and Greg KH", drawn as a speech bubble ON Cayde. Cayde's [ REDACTED ]
-# card is at 287.933 (4:47.9), so a bubble anchored on him cannot also be at
-# 4:01. Which moves is the owner's call (#98, Questions) -- recorded in
-# `unresolved`, scheduled nowhere.
-TIMED_KROOK = 250.0          # 4:10
-# NATEWADDINGTON IS OUT, owner: "get rid of the nate wassington in the endless
-# climax in endless". His placard sat at film 260.000 (4:20) for SOLO_HOLD,
-# inside the run into the act's climax -- the song breaks down at 258.0 and the
-# band re-enters on the 269.700 downbeat, so his card was the last thing on
-# screen before the biggest musical event in the act.
-#
-# Only the SCHEDULING goes, exactly as it did for HikariKnight: the placard's
-# two rows were the owner's copy and they stay in git, the drop is recorded in
-# `unresolved`, and nothing slides up into the hole -- krook and the bedazzle
-# pill keep their own anchors and Jorge stays pinned to 291.0.
-TIMED_JORGE = 291.0          # 4:51 -- inside the cathedral shot, which ends
-                             # 291.933; the pill rides the black tail
-TIMED_JORGE_HOLD = 2.8
-
-# The untimed §4 cue, in the order the brief lists it: after krook.
-BEDAZZLE = {"speaker": "cncf marketing", "text": "Let's bedazzle this thing!"}
-
-# The letterbox callout. "Keep it up for the whole song": it comes up where
-# the brief's own scene starts (2:19, the montage's hand-off) and holds to
-# the last frame. It never shares the lower third's row -- it lives on the
-# bottom letterbox bar, below the picture.
-#
-# ONE DUCK, AND IT IS MEASURED, NOT AESTHETIC. The walk's patch-queue HUD is
-# bottom-right and its card dips 90px onto the bar (y 922-1030 in the shipped
-# geometry); no position on the bar clears it while it holds. So the callout
-# ducks exactly the HUD's window -- 28.4 s in a 169 s hold -- rather than
-# shrink to ticker height for the whole song to fix half a minute. The
-# alternative is the owner's to call (#98, Questions); recorded in
-# `unresolved`.
-LETTERBOX_BANNER = (
-    "#FIGHTFORCONTRIBUTORS - Support Open Gaming Collective - #UPSTREAMFIRST")
-
-# The closing montage: five quotes the brief leaves untimed. Its own proposal
-# is 4:51 -> 5:07, and the preamble lands the last cue on the final second --
-# so they are spread evenly from the gaslighting pill's out to the film's last
-# frame, over the black outro the owner is keeping "for future flexibility".
-#
-# siosm's line carries authored emphasis (`**powering up**` in the brief). The
-# asterisks are emphasis markup, not words -- burning them would put
-# punctuation on screen nobody meant to say -- so they are stripped here and
-# recorded in `unresolved`: the pill's message row is set in bold throughout
-# (the site's own style), so the emphasis survives but is not differentiated.
-CLOSING_QUOTES = [
-    ("cgwalters", "Use open source responsibly!"),
-    ("siosm", "I can feel Fedora powering up!"),
-    ("jberkus", "I knew they could do it!"),
-    ("preethi", "Great, more paperwork"),
-    ("castrojo", "Just another day on the CNCF Projects team"),
-]
-QUOTE_HOLD = 2.2
-
 LEAD_IN = 0.4      # let the cut land before the plate arrives
 MIN_HOLD = 2.2     # below this a plate cannot be read
 
@@ -1528,57 +1389,6 @@ def authored_copy(key, casting):
         "rather than something to work around")
 
 
-def placeholder_copy(key, casting):
-    """A named placeholder badge: the owner's name, and nothing invented.
-
-    ``ensemble.placeholders`` is a queue, not copy -- these are people he named
-    with no plate authored. They are still credited, because a missing word is
-    omitted and recorded rather than allowed to block, but every row nobody
-    wrote is simply absent.
-    """
-    entry = casting["ensemble"]["placeholders"][key]
-    generic = casting["ensemble"]["plate"]
-    return {
-        "label": generic.get("label_unknown", "GUARDIAN"),
-        "name": entry["name"],
-        "placeholder": True,
-    }
-
-
-def roster_items(casting):
-    """The month's contributors, minus anyone already credited elsewhere.
-
-    Two exclusions, and both are about not crediting one person twice with two
-    different faces. A LEAD is credited where their character is on screen
-    (castrojo is Cayde-6). A PLACEHOLDER is someone the owner named for this
-    act, so they already have a badge of their own -- letting the roster hand
-    them a second, generic blueberry plate would put the same person on two
-    different Guardians in the same five minutes.
-    """
-    with open(ROSTER) as fh:
-        roster = json.load(fh)
-    named = {p["key"] for p in PLACEHOLDERS}
-    skip = BLUEBERRY_EXCLUDE | named
-    return [c for c in roster["contributors"] if c["login"] not in skip]
-
-
-def blueberry_entry(item, at, dur, casting):
-    """One contributor's credit, resolved the same way tools/plate.py does."""
-    authored = _titles(casting).get(item["login"])
-    if authored:
-        return {"copy_source": "casting", **dict(authored)}
-    copy = casting["ensemble"]["plate"]
-    member = item.get("org_member")
-    label = (copy["label_member"] if member
-             else copy["label"] if member is False
-             else copy["label_unknown"])
-    entry = {"copy_source": "casting", "label": label,
-             "name": item["display_name"]}
-    if copy.get("title"):
-        entry["title"] = copy["title"]
-    return entry
-
-
 def _corrected(key, copy):
     """Apply an owner-stated spelling of somebody's name to this act's copy.
 
@@ -1639,6 +1449,66 @@ def github_avatar(login):
         "avatar": str(AVATAR_DIR / f"{login}.png"),
         "avatar_url": f"https://github.com/{login}.png?size=256",
     }
+
+
+def _entry_from_spec(spec, casting):
+    """The kind-specific fields of one owner-seated card.
+
+    The three owner passes (MAPPED_PASS, LATE_PASS, MAPPED_TAIL_PASS) build
+    their cards from the same closed set of kinds; what differs between them
+    is seating -- when a card lands and whether it earns a ``seen_at_src`` --
+    and that stays in the caller.
+    """
+    fields = {}
+    if spec["kind"] in {"plate", "ghost"}:
+        fields.update({
+            "label": spec["label"],
+            "name": spec["name"],
+            "title": spec["title"],
+        })
+        if spec.get("class"):
+            fields["class"] = spec["class"]
+        if spec.get("variant"):
+            fields["variant"] = spec["variant"]
+        if spec.get("bond_of"):
+            fields["bond_of"] = spec["bond_of"]
+        if spec.get("avatar_login"):
+            fields.update(github_avatar(spec["avatar_login"]))
+    elif spec["kind"] == "chat":
+        fields.update({
+            "speaker": spec["speaker"],
+            "text": spec["text"],
+            "text_source": "owner_supplied",
+        })
+        login = spec.get("avatar_login") or spec.get("login")
+        if login:
+            fields.update(github_avatar(login))
+        elif spec["speaker"] in ("GloriousEggroll",):
+            fields.update(chat_avatar(spec["speaker"], casting))
+        if spec.get("bond_of"):
+            fields["bond_of"] = spec["bond_of"]
+    elif spec["kind"] == "warning":
+        fields["text"] = spec["text"]
+        fields["text_source"] = "owner_supplied"
+    elif spec["kind"] == "miniboss":
+        # The kernel boss bar's closed pair. `title` is omitted when
+        # nobody has authored one -- _render_miniboss draws the name row
+        # alone rather than inventing a second line.
+        fields["name"] = spec["name"]
+        fields["text_source"] = "owner_supplied"
+        if spec.get("title"):
+            fields["title"] = spec["title"]
+            if spec.get("title_placeholder"):
+                fields["title_source"] = "placeholder"
+    else:  # title, context
+        fields["title"] = spec["title"]
+        if spec.get("subtitle"):
+            fields["subtitle"] = spec["subtitle"]
+        if spec.get("body"):
+            fields["body"] = list(spec["body"])
+        if spec.get("scale") is not None:
+            fields["scale"] = spec["scale"]
+    return fields
 
 
 def fetch_avatars(manifest, verbose=True):
@@ -1702,7 +1572,7 @@ def space_plates(plates):
 
     for lane in by_position.values():
         lane.sort(key=lambda p: p["at"])
-        for cur, nxt in zip(lane, lane[1:]):
+        for cur, nxt in itertools.pairwise(lane):
             room = round(nxt["at"] - cur["at"] - PLATE_GAP, 3)
             if cur["dur"] <= room:
                 continue
@@ -1866,47 +1736,6 @@ def build():
             "seen_at_src": b["seen"],
             "why": b["why"],
             **localise_avatar(b["key"], authored_copy(b["key"], casting)),
-        })
-
-    # --- named placeholders -----------------------------------------------
-    for b in PLACEHOLDERS:
-        src_in, src_out = b["src"]
-        at = _at(src_in, film_of)
-        hold = clamp_hold(at, SOLO_HOLD, film_of)
-        assert hold, (
-            f"{b['key']}'s badge at {at:.3f}s cannot clear a no-plate zone and "
-            "still be readable -- move the anchor to another shot")
-        plates.append({
-            "id": f"placeholder_{b['key']}",
-            "at": at,
-            "dur": hold,
-            "position": "right",
-            "copy_source": "casting",
-            "shot_src": list(b["src"]),
-            "seen_at_src": b["seen"],
-            "why": b["why"],
-            **placeholder_copy(b["key"], casting),
-        })
-
-    # --- the blueberries ---------------------------------------------------
-    # Deterministic: the roster is walked in its own order against the shot
-    # list in timeline order, so a re-render never reshuffles who played whom.
-    items = roster_items(casting)
-    for i, shot in enumerate(BLUEBERRY_SHOTS):
-        if i >= len(items):
-            break
-        src_in, src_out = shot["src"]
-        item = items[i]
-        plates.append({
-            "id": f"blueberry_{item['login']}",
-            "at": _at(src_in, film_of),
-            "dur": SOLO_HOLD,
-            "position": "right",
-            "shot_src": [src_in, src_out],
-            "seen_at_src": shot["seen"],
-            "why": shot["why"],
-            **localise_avatar(item["login"],
-                              blueberry_entry(item, None, None, casting)),
         })
 
     # --- Cayde's sign-off --------------------------------------------------
@@ -2209,8 +2038,6 @@ def build():
         at = round(cursor - PLATE_GAP + spec.get("lead", PLATE_GAP), 3)
         toc.append(toc_chat(spec, at, spec["hold"]))
         cursor = round(at + spec["hold"] + PLATE_GAP, 3)
-    # TOC_ANNOUNCEMENTS are NOT scheduled: they are AN4-CH3CK-12's payoff pair,
-    # and he is out this round. See the ANNOUNCER note.
 
     # --- the mapped 7:03 -> 8:26 owner pass -------------------------------
     mapped_unresolved = []
@@ -2238,51 +2065,13 @@ def build():
             "position": spec["position"],
             "copy_source": "owner_supplied",
         }
-        if spec["kind"] in {"plate", "ghost"}:
-            if spec["kind"] == "ghost":
-                entry["kind"] = "ghost"
-            entry.update({
-                "label": spec["label"],
-                "name": spec["name"],
-                "title": spec["title"],
-            })
-            if spec.get("class"):
-                entry["class"] = spec["class"]
-            if spec.get("variant"):
-                entry["variant"] = spec["variant"]
-            if spec.get("bond_of"):
-                entry["bond_of"] = spec["bond_of"]
-            if spec.get("avatar_login"):
-                entry.update(github_avatar(spec["avatar_login"]))
-            if at <= plan["picture_sec"]:
-                entry["seen_at_src"] = round(src_of(at), 3)
+        if spec["kind"] != "plate":
+            entry["kind"] = spec["kind"]
+        entry.update(_entry_from_spec(spec, casting))
+        if at <= plan["picture_sec"]:
+            entry["seen_at_src"] = round(src_of(at), 3)
+            if spec["kind"] in {"plate", "ghost"}:
                 entry["why"] = spec["why"]
-        elif spec["kind"] == "chat":
-            entry.update({
-                "kind": "chat",
-                "speaker": spec["speaker"],
-                "text": spec["text"],
-                "text_source": "owner_supplied",
-            })
-            if spec.get("avatar_login"):
-                entry.update(github_avatar(spec["avatar_login"]))
-            elif spec["speaker"] in ("GloriousEggroll",):
-                entry.update(chat_avatar(spec["speaker"], casting))
-            if at <= plan["picture_sec"]:
-                entry["seen_at_src"] = round(src_of(at), 3)
-        elif spec["kind"] == "title":
-            entry.update({
-                "kind": "title",
-                "title": spec["title"],
-            })
-            if spec.get("subtitle"):
-                entry["subtitle"] = spec["subtitle"]
-            if spec.get("body"):
-                entry["body"] = list(spec["body"])
-            if spec.get("scale") is not None:
-                entry["scale"] = spec["scale"]
-            if at <= plan["picture_sec"]:
-                entry["seen_at_src"] = round(src_of(at), 3)
         mapped.append(entry)
         mapped_cursor = round(at + spec["hold"] + spec.get("gap_after", PLATE_GAP), 3)
 
@@ -2341,37 +2130,7 @@ def build():
             "position": spec["position"],
             "copy_source": "owner_supplied",
         }
-        if spec["kind"] == "chat":
-            entry.update({
-                "speaker": spec["speaker"],
-                "text": spec["text"],
-                "text_source": "owner_supplied",
-            })
-            if spec.get("login"):
-                entry["avatar"] = str(AVATAR_DIR / f"{spec['login']}.png")
-                entry["avatar_url"] = (
-                    f"https://github.com/{spec['login']}.png?size=256")
-        elif spec["kind"] == "warning":
-            entry["text"] = spec["text"]
-            entry["text_source"] = "owner_supplied"
-        elif spec["kind"] == "miniboss":
-            # The kernel boss bar's closed pair. `title` is omitted when
-            # nobody has authored one -- _render_miniboss draws the name row
-            # alone rather than inventing a second line.
-            entry["name"] = spec["name"]
-            entry["text_source"] = "owner_supplied"
-            if spec.get("title"):
-                entry["title"] = spec["title"]
-                if spec.get("title_placeholder"):
-                    entry["title_source"] = "placeholder"
-        else:
-            entry["title"] = spec["title"]
-            if spec.get("subtitle"):
-                entry["subtitle"] = spec["subtitle"]
-            if spec.get("body"):
-                entry["body"] = list(spec["body"])
-            if spec.get("scale") is not None:
-                entry["scale"] = spec["scale"]
+        entry.update(_entry_from_spec(spec, casting))
         if spec.get("at_megacut") is not None and at <= plan["picture_sec"]:
             entry["seen_at_src"] = round(src_of(at), 3)
         late.append(entry)
@@ -2452,36 +2211,7 @@ def build():
         entry["seen_at_src"] = round(seen_at_src, 3)
         if spec.get("seen_in_video"):
             entry["seen_in_video"] = spec["seen_in_video"]
-        if spec["kind"] == "chat":
-            entry.update({
-                "speaker": spec["speaker"],
-                "text": spec["text"],
-                "text_source": "owner_supplied",
-            })
-            if spec.get("avatar_login"):
-                entry.update(github_avatar(spec["avatar_login"]))
-            if spec.get("bond_of"):
-                entry["bond_of"] = spec["bond_of"]
-        elif spec["kind"] == "title":
-            entry["title"] = spec["title"]
-            if spec.get("body"):
-                entry["body"] = list(spec["body"])
-            if spec.get("scale") is not None:
-                entry["scale"] = spec["scale"]
-        elif spec["kind"] == "warning":
-            entry["text"] = spec["text"]
-            entry["text_source"] = "owner_supplied"
-        elif spec["kind"] == "miniboss":
-            # The kernel boss bar's closed pair. `title` is omitted when
-            # nobody has authored one -- _render_miniboss draws the name row
-            # alone rather than inventing a second line.
-            entry["name"] = spec["name"]
-            entry["text_source"] = "owner_supplied"
-            if spec.get("title"):
-                entry["title"] = spec["title"]
-                if spec.get("title_placeholder"):
-                    entry["title_source"] = "placeholder"
-        elif spec["kind"] == "guardian":
+        if spec["kind"] == "guardian":
             entry.pop("kind")
             entry["copy_source"] = "casting"
             entry["shot_src"] = list(spec["shot_src"])
@@ -2489,23 +2219,11 @@ def build():
             entry.update(localise_avatar(
                 spec["key"],
                 _corrected(spec["key"], authored_copy(spec["key"], casting))))
+        else:
+            entry.update(_entry_from_spec(spec, casting))
         mapped_tail.append(entry)
 
-    # The newer 8:28 pass replaces the old gaslighting pill. Its authored copy
-    # remains above in TIMED_JORGE; no stale plate is built on the shifted film.
-    timed = []
-    film_sec = plan["film_sec"]
-
-    # The letterbox callout: up where the brief's scene starts, down on the
-    # last frame -- "keep it up for the whole song". Two windows: it ducks the
-    # patch-queue HUD, the one card that already owns a piece of the bar. The
-    # HUD holds from the enemies' reveal until the villain lands (see the
-    # walk's own schedule above), so those are the duck's edges.
-    # The owner's newer pass moves this banner to the top at film 2:18.5.
-    # The old bottom-letterbox windows are superseded rather than layered.
-
     plates.extend(toc)
-    plates.extend(timed)
     plates.extend(late)
     plates.extend(mapped_tail)
     plates = [p for p in plates if p["id"] not in (

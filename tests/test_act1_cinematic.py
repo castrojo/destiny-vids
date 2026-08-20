@@ -11,12 +11,9 @@ All copy is owner_supplied and asserted verbatim.
 """
 import json
 import os
-import sys
 from pathlib import Path
 
 import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from tools import plate
 from scripts import build_act1
@@ -51,12 +48,10 @@ PLATFORM_WARS = {
     "body": ["Guardians Deliver the Final Blow", "to Legacy Infrastructure"],
 }
 
-
 def _manifest():
     with MANIFEST.open(encoding="utf-8") as fh:
         data = json.load(fh)
     return data["plates"]
-
 
 def test_ten_narrative_cues_are_in_the_manifest():
     entries = _manifest()
@@ -74,7 +69,6 @@ def test_ten_narrative_cues_are_in_the_manifest():
         assert by_start[key].get("position") == "caption"
         assert by_start[key].get("copy_source") == "owner_supplied"
 
-
 def test_the_community_cue_carries_a_kubernetes_glyph():
     entries = _manifest()
     cue = next(e for e in entries if e.get("kind") == "caption"
@@ -88,7 +82,6 @@ def test_the_community_cue_carries_a_kubernetes_glyph():
     assert glyph.get("index") == 0
     assert "kubernetes" in glyph.get("src", "")
 
-
 def test_the_ancestral_cue_uses_two_cards_at_the_authored_line_break():
     entries = _manifest()
     pair = [e for e in entries if e.get("id") in
@@ -99,11 +92,9 @@ def test_the_ancestral_cue_uses_two_cards_at_the_authored_line_break():
     ]
     assert all(plate.render_plate(e).getchannel("A").getbbox() for e in pair)
 
-
 def test_clankers_context_moved_out_of_act_i():
     entries = _manifest()
     assert not any(e.get("kind") == "context" for e in entries)
-
 
 def test_act_i_captions_use_one_authored_sentence_per_card():
     captions = [e for e in _manifest() if e.get("kind") == "caption"]
@@ -111,12 +102,10 @@ def test_act_i_captions_use_one_authored_sentence_per_card():
     assert all("\n" not in e["text"] for e in captions)
     assert all(". " not in e["text"] for e in captions)
 
-
 def test_orlix_nameplate_uses_the_owner_supplied_github_identity():
     entry = next(e for e in _manifest() if e.get("id") == "orlix")
     assert entry["name"] == "OrliX"
     assert entry["avatar"] == "renders/avatars/orlix.png"
-
 
 def test_warning_card_at_112_with_exact_text():
     entries = _manifest()
@@ -126,7 +115,6 @@ def test_warning_card_at_112_with_exact_text():
     assert warn["position"] == "warning"
     assert warn["text"] == "[ PREPARE FOR TITANFALL ]"
     assert warn.get("copy_source") == "owner_supplied"
-
 
 def test_platform_wars_act_card_follows_the_warning():
     entries = _manifest()
@@ -138,11 +126,9 @@ def test_platform_wars_act_card_follows_the_warning():
     assert pw["subtitle"] == PLATFORM_WARS["subtitle"]
     assert pw["body"] == PLATFORM_WARS["body"]
 
-
 def test_manifest_loads_without_overlapping_errors():
     # Overlaps are intentional and resolved by chrome rows / group.
     plate.load_manifest(MANIFEST)
-
 
 def test_caption_renders_in_the_top_safe_lane():
     spec = {"id": "c1", "kind": "caption", "text": CUES[0][2]}
@@ -150,7 +136,6 @@ def test_caption_renders_in_the_top_safe_lane():
     x0, y0, x1, y1 = img.getchannel("A").getbbox()
     assert y1 <= plate.FRAME_H * 0.35, "caption must stay in the top safe lane"
     assert x0 >= 0 and x1 <= plate.FRAME_W
-
 
 def test_context_renders_lower_left_above_the_plaque_lane():
     spec = {
@@ -165,13 +150,11 @@ def test_context_renders_lower_left_above_the_plaque_lane():
     assert y1 <= plate.FRAME_H * 0.72, "context must clear the lower-third plaque lane"
     assert y0 >= plate.FRAME_H * 0.35, "context must not ride into the top rail"
 
-
 def test_warning_renders_full_frame():
     spec = {"id": "warn", "kind": "warning", "text": "[ PREPARE FOR TITANFALL ]"}
     img = plate.place(plate.render_plate(spec), "warning")
     bbox = img.getchannel("A").getbbox()
     assert bbox == (0, 0, plate.FRAME_W, plate.FRAME_H)
-
 
 def test_warning_uses_diagonal_deployment_hazard_stripes():
     img = plate.render_plate({"kind": "warning", "text": "ALERT"})
@@ -180,7 +163,6 @@ def test_warning_uses_diagonal_deployment_hazard_stripes():
     assert len(colours) >= 2
     assert max(r for r, _, _, _ in colours) - min(r for r, _, _, _ in colours) > 80
 
-
 def test_two_captions_at_once_are_rejected():
     with pytest.raises(ValueError, match="visible at the same time"):
         plate.load_manifest_entries([
@@ -188,14 +170,12 @@ def test_two_captions_at_once_are_rejected():
             {"id": "b", "kind": "caption", "at": 3.0, "dur": 5.0, "position": "caption", "text": "y"},
         ])
 
-
 def test_caption_may_overlap_a_guardian_plate():
     plate.load_manifest_entries([
         {"id": "cap", "kind": "caption", "at": 10.0, "dur": 5.0, "position": "caption", "text": "x"},
         {"id": "guard", "at": 11.0, "dur": 5.0, "position": "left",
          "label": "TRUSTEE // GUARDIAN", "name": "A Guardian", "title": "T"},
     ])
-
 
 def test_build_contract_describes_the_current_dialogue_free_cut():
     contract = build_act1.__doc__
@@ -205,7 +185,6 @@ def test_build_contract_describes_the_current_dialogue_free_cut():
     assert "Ikora" not in contract
     assert "111.55 output" not in contract
 
-
 def test_trim_command_switches_to_the_dialogue_free_source():
     cmd = build_act1.trim_command(["ffmpeg"])
     assert build_act1.AUDIO_SRC.endswith("without_dialogue.webm")
@@ -214,7 +193,6 @@ def test_trim_command_switches_to_the_dialogue_free_source():
     inputs = [i for i, token in enumerate(cmd) if token == "-i"]
     assert len(inputs) == 2
     assert build_act1.AUDIO_SRC in cmd[inputs[1] + 1]
-
 
 def test_terminal_source_frame_held_by_tpad_is_black(tmp_path):
     """The half-open picture trim must include the first black frame."""
@@ -237,7 +215,6 @@ def test_terminal_source_frame_held_by_tpad_is_black(tmp_path):
     image = Image.open(frame).convert("L")
     assert sum(image.getdata()) / (image.width * image.height) < 1.0
 
-
 def test_trim_command_offsets_audio_and_holds_the_picture_to_118_2():
     cmd = build_act1.trim_command(["ffmpeg"])
     audio_ss_idx = None
@@ -254,18 +231,15 @@ def test_trim_command_offsets_audio_and_holds_the_picture_to_118_2():
     assert any(float(cmd[i+1]) == pytest.approx(build_act1.OUTPUT_DURATION, abs=0.01) for i, tok in enumerate(cmd) if tok == "-t")
     assert "tpad" in " ".join(cmd), "the video must freeze its last decoded frame"
 
-
 def _synthetic_mark(tmp_path, *, fill=(255, 0, 0, 255)):
     from PIL import Image
     path = tmp_path / "mark.png"
     Image.new("RGBA", (80, 80), fill).save(path)
     return path
 
-
 def _boxes_overlap(a, b):
     """True when two (x0, y0, x1, y1) bboxes intersect."""
     return a[0] < b[2] and a[2] > b[0] and a[1] < b[3] and a[3] > b[1]
-
 
 # --- Review finding 1: farm encode legs must expect OUTPUT_DURATION ----------
 
@@ -292,7 +266,6 @@ def test_farm_trim_and_burn_legs_expect_output_duration(monkeypatch):
     assert len(captured) == 2, f"expected two farm legs, got {captured}"
     for out, dur in captured:
         assert dur == pytest.approx(build_act1.OUTPUT_DURATION, abs=0.01), out
-
 
 # --- Review finding 2: caption glyph must truly replace the target letter ----
 
@@ -335,14 +308,12 @@ def test_caption_glyph_falls_back_to_plain_letter_when_mark_missing(tmp_path):
     fallback = plate.place(plate.render_plate(spec), "caption")
     assert fallback.tobytes() == plain.tobytes()
 
-
 # --- Review finding 3: Platform Wars body second row has no period -----------
 
 def test_platform_wars_body_second_row_has_no_period():
     entries = _manifest()
     pw = next(e for e in entries if e.get("kind") == "act" and "Platform Wars" in e.get("title", ""))
     assert pw["body"] == ["Guardians Deliver the Final Blow", "to Legacy Infrastructure"]
-
 
 # --- Review finding 4: card freshness must not silently reuse stale/missing ---
 
@@ -366,7 +337,6 @@ def test_render_cards_reuses_fresh_cards_without_playwright(monkeypatch, tmp_pat
                             website_modules=tmp_path / "missing")
     assert not ran
 
-
 def test_render_cards_fails_when_stale_and_playwright_missing(tmp_path):
     manifest = tmp_path / "cards.json"
     manifest.write_text(json.dumps({"plates": [{
@@ -384,7 +354,6 @@ def test_render_cards_fails_when_stale_and_playwright_missing(tmp_path):
     with pytest.raises(RuntimeError, match="website playwright checkout is missing"):
         build_act1.render_cards(manifest=manifest, out_dir=out_dir,
                                 website_modules=tmp_path / "missing")
-
 
 def test_render_cards_renders_stale_cards_when_playwright_available(tmp_path):
     manifest = tmp_path / "cards.json"
@@ -411,7 +380,6 @@ def test_render_cards_renders_stale_cards_when_playwright_available(tmp_path):
     finally:
         monkeypatch.undo()
     assert any("render-cards.mjs" in str(part) for cmd in ran for part in cmd)
-
 
 def test_render_cards_renders_when_template_is_newer_than_output(monkeypatch, tmp_path):
     """A newer HTML template must trigger re-rendering even if the manifest is old."""
@@ -452,7 +420,6 @@ def test_render_cards_renders_when_template_is_newer_than_output(monkeypatch, tm
                             website_modules=wm)
     assert any("render-cards.mjs" in str(part) for cmd in ran for part in cmd)
 
-
 # --- Review finding 5: layout at 44-46s and caption over title-cover at 31-36 -
 
 def test_layout_at_44_46s_caption_and_guardian_lanes_do_not_overlap(tmp_path):
@@ -481,7 +448,6 @@ def test_layout_at_44_46s_caption_and_guardian_lanes_do_not_overlap(tmp_path):
     assert not _boxes_overlap(cap_box, guard_box)
     assert not _boxes_overlap(cap_box, bond_box)
 
-
 def test_caption_over_title_cover_at_31_36_is_allowed_and_stays_in_top_lane():
     entries = _manifest()
     by_id = {e["id"]: e for e in entries}
@@ -492,7 +458,6 @@ def test_caption_over_title_cover_at_31_36_is_allowed_and_stays_in_top_lane():
     cap_frame = plate.place(plate.render_plate(caption), "caption")
     _, _, _, y1 = cap_frame.getchannel("A").getbbox()
     assert y1 <= plate.FRAME_H * 0.35, "caption remains top-safe over the title cover"
-
 
 # --- Review finding 6: Christoph's title uses a literal em dash -------------
 
@@ -505,7 +470,6 @@ def test_christoph_title_carries_literal_em_dash():
     raw = MANIFEST.read_text(encoding="utf-8")
     assert "First Among Equals — The North Star" in raw
     assert "\\u2014" not in raw
-
 
 # --- Glyph-aware layout: adjacent characters stay visible ------------------
 
@@ -562,7 +526,6 @@ def test_caption_glyph_reserves_mark_width_and_does_not_obscure_next_character(t
     )
     assert red_right is not None, "Kubernetes mark was not drawn"
     assert red_right <= glyph_right, "mark bleeds past the shifted text"
-
 
 # --- Stale output naming ----------------------------------------------------
 

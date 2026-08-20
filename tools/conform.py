@@ -47,7 +47,6 @@ import json
 import os
 import subprocess
 import sys
-from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -311,14 +310,6 @@ def ensure(source, out_dir=None, ffmpeg=None, threads=None,
     return entry, "conformed"
 
 
-def _ensure_one(job):
-    """Picklable worker for the CLI's --jobs."""
-    src, out_dir, ffmpeg, threads = job
-    path, status = ensure(src, out_dir=out_dir, ffmpeg=ffmpeg,
-                          threads=threads, log=lambda _m: None)
-    return src, str(path), status
-
-
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("inputs", nargs="+", help="delivered acts to conform")
@@ -327,8 +318,6 @@ def main(argv=None):
     ap.add_argument("--check", action="store_true",
                     help="report whether each file already conforms; "
                          "encode nothing. Exit 1 if any file does not conform.")
-    ap.add_argument("--jobs", type=int, default=None,
-                    help="parallel conforms (default: min(cpu//6, inputs))")
     args = ap.parse_args(argv)
 
     ffmpeg = _find_ffmpeg()
@@ -347,17 +336,11 @@ def main(argv=None):
                 worst = 1
         return worst
 
-    jobs = args.jobs or min(max(1, (os.cpu_count() or 1) // 6),
-                            len(args.inputs))
-    threads = max(1, (os.cpu_count() or 1) // jobs) if jobs > 1 else None
-    if jobs > 1 and len(args.inputs) > 1:
-        with ProcessPoolExecutor(max_workers=jobs) as pool:
-            results = list(pool.map(_ensure_one, [
-                (src, args.out, ffmpeg, threads) for src in args.inputs]))
-    else:
-        results = [_ensure_one((src, args.out, ffmpeg, None))
-                   for src in args.inputs]
-    for src, path, status in results:
+    # Sequential: megacut owns conform parallelism across segments; this CLI
+    # exists for one-off conforms and --check.
+    for src in args.inputs:
+        path, status = ensure(src, out_dir=args.out, ffmpeg=ffmpeg,
+                              log=lambda _m: None)
         print(f"{status:<10} {src} -> {path}")
     return 0
 

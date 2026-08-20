@@ -1509,11 +1509,6 @@ def main(argv=None):
     ap.add_argument("--no-copy", action="store_true",
                     help="encode every segment even when sources conform to "
                          "the delivery spec (debugging; the slow path)")
-    ap.add_argument("--allow-stale", action="store_true",
-                    help="assemble even when a seated act's master predates "
-                         "its own committed inputs (a deliberate rough cut; "
-                         "the default refuses, because that is how stale "
-                         "programmes shipped)")
     args = ap.parse_args(argv)
     if args.farm and args.local:
         raise SystemExit("--farm and --local are mutually exclusive: the farm "

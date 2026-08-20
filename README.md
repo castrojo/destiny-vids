@@ -51,8 +51,7 @@ plus `--forward-only` builds a chronological cut inside one trailer, which is
 right when a cut retells that trailer's own story. It is wrong for a hero video,
 and using it by habit is how three consecutive Destiny chapters ended up cut
 from the same 1:53 trailer, two of them sharing 68% of their footage
-([issue #49]). See
-[`docs/skills/editing/references/hero-video.md`](docs/skills/editing/references/hero-video.md).
+([issue #49]).
 
 [issue #49]: https://github.com/castrojo/destiny-vids/issues/49
 
@@ -125,15 +124,12 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `tools/render.py` | **Cut list → rendered video.** ffmpeg cut + concat against local source media. |
 | `tools/ensemble.py` | Monthly Bluefin contributor roster → Guardian credit tiles. |
 | `tools/search.py` | NL query → enum filters + caption match + editorial ranking. |
-| `tools/ingest.py` | Video-level ingestion: Bungie YouTube title (oEmbed, no API key) → inherited defaults → `video.schema.json` record. |
 | `tools/annotate.py` | Annotator pipeline: shot detection → keyframes → pluggable tagger → schema-valid records. |
 | `tools/derive.py` | Pure derivation of `clean`, `footage_tier`, `traversal_hero` and `casting`. |
 | `tools/brief.py` | **Issue → executable brief.** Parses the fenced `brief` block in an issue body, or proposes one from prose for the owner to confirm. |
 | `tools/corpus.py` | **Casting subject → footage corpus.** Every indexed shot a character appears in, plus the vocabulary values they have no clean coverage of. |
-| `tools/gaps.py` | What in the index is unfinished — unindexed videos, unreviewed beats, uncast leads — optionally filed as fingerprinted issues. |
 | `tools/plate.py` | **Cut list → Guardian nameplates.** Plans timed plates from the casting vocab + contributor roster, renders them as transparent PNGs, and burns them into a cut. |
 | `tools/ffmpeg-container-shim.sh` | Host setup, not a pipeline stage: installs a containerized `ffmpeg`/`ffprobe` on `PATH` so the whole machine has H.264. See `docs/rendering.md`. |
-| `scripts/make_video.sh` | The whole loop, issue → rendered cut, resuming at whatever stage is unfinished and stopping at tagging. |
 | `stories/` | Worked outlines. A numeric prefix (`01-dance.txt`) is the cut's position in the story sequence. A `-prototype.json` is an **authored** shotlist, not a `story.py` output. |
 | `music/` | Music bed records — provenance, the cached beat grid, named anchors and the measured spectral cutoff. Never the audio. |
 | `scripts/build_wolves.py` | Builds act VI's authored shotlist, hinged on the bed's measured anchors, with the artwork cards. |
@@ -143,7 +139,7 @@ assigned per month, so a rotating pool never invalidates a tagged segment.
 | `segments/` | Assembled, schema-valid segment records for real footage — 69 shots from the TFS launch trailer and 50 from the Curse of Osiris opening cinematic. |
 | `tests/` | `pytest` suite across search, derivation, story assembly, ensemble casting, ingestion, the stub pipeline, and ffmpeg resolution. |
 | `stories/megacut/` | The programme's own records: `megacut.json` (what plays, in what order, with what trims), `megacut-cards.json` (authored card copy) and `delivery.json` (which master each act hardlinks). These are the truth about the show; docs link them rather than restating them. |
-| `docs/` | `SKILL.md` (agent skill router), `running-order.md` (what the show is), `skills/`, plus the design docs: `taxonomy.md` (axis reference), `pipeline.md` (segmentation + cost tiers), `agent-retrieval.md` (query mapping), `rendering.md` (which ffmpeg, and why). |
+| `docs/` | `SKILL.md` (agent skill router), `running-order.md` (what the show is), `skills/`, plus `rendering.md` (which ffmpeg, and why). |
 | `AGENTS.md` | Agent operating contract: commands, boundaries, and the three rules that outrank convenience. |
 
 ## The unit: a "beat"
@@ -155,7 +151,7 @@ long/absent cuts → fixed-window sampling (~2–4s) coalesced into tag-stable r
 
 Shot cuts are free, deterministic and reproducible, so a cheap flash-tier model
 **never has to decide where a segment starts** — killing the biggest
-ambiguity-and-cost sink. See `docs/pipeline.md`.
+ambiguity-and-cost sink.
 
 ## The axes
 
@@ -233,9 +229,7 @@ python3 tools/story.py stories/01-dance.txt --dir segments \
 playhead so each beat may only take a shot at or after the previous shot's
 out-point, reporting the jump as `[skip +Xs]`. The beat order *is* the
 timeline — there is no sequencer, no cut-graph, and no way for cut order to
-disagree with source order. **This is the exception, not the default** — see
-[`docs/skills/editing/references/hero-video.md`](docs/skills/editing/references/hero-video.md)
-before reaching for it.
+disagree with source order. **This is the exception, not the default** — reach for it only with a reason.
 
 ## Know what a character has on film
 
@@ -429,65 +423,11 @@ triage. The `+0.40` lead boost applies **only when the query asked for a
 character** — its purpose is "when you ask for Elsie, hand me Elsie's footage",
 not to let a named lead muscle in on an unrelated query.
 
-Full weights and query-mapping behavior are in `docs/agent-retrieval.md`. The
-caption signal is a dependency-free token-overlap stand-in; swap `caption_sim()`
-for embedding cosine similarity in production.
-
-## Ingest real footage (metadata-first)
-
-```bash
-python3 tools/ingest.py https://www.youtube.com/watch?v=6Gm5mbwrqSA --playlist "Destiny 2 Trailers"
-python3 tools/ingest.py --id yt_demo --title "Destiny 2: Lightfall | Neomuna Gameplay Trailer"  # offline
-```
-
-## Index a video end to end
-
-Indexing runs in two passes, because tagging happens out-of-band. The first
-detects beats and writes one keyframe per beat — the stills a vision model or a
-human reads. The second replays the resulting tags into schema-valid segments:
-
-```bash
-yt-dlp -S "vcodec:h264,res:1080" -o "media/<video_id>.%(ext)s" <url>
-python3 tools/ingest.py <url> --id <video_id>
-
-# pass 1 — detect + keyframes (also writes keyframes/<video_id>/beats.json)
-python3 tools/annotate.py index --video media/<video_id>.mp4 \
-    --video-record videos/<video_id>.json
-
-# ...tag every keyframe into tags/<video_id>.json...
-
-# pass 2 — assemble
-python3 tools/annotate.py index --video media/<video_id>.mp4 \
-    --video-record videos/<video_id>.json --tags tags/<video_id>.json
-```
-
-Stills land in `keyframes/<video_id>/`, derived from the record rather than
-chosen at the command line, so two videos cannot collide on the same `000.jpg`.
-
-Or run the whole loop from the issue that asked for the video:
-
-```bash
-scripts/make_video.sh 3          # resumes at whatever stage is unfinished
-```
-
-It skips any stage whose output already exists and **stops at tagging**, which
-is the stage that needs somebody to look at frames.
-
-Both passes run the **same detector settings**, so beat indices line up; a tag
-file is only ever valid against the shot list its own detection pass produced.
-`--min-shot-sec` (default 0.5s) merges the sub-second "shots" Destiny's ability
-flashes and explosions provoke out of a frame-difference detector.
-
-`overlays` is a **required** tagger field — an untagged `overlays` derives
-`clean = false`, so a tagger that skips it silently marks its whole output
-unusable.
+The caption signal is a dependency-free token-overlap stand-in.
 
 ## Cost posture
 
-The schema is designed to be populated by a **flash-tier model** at scale.
-`docs/pipeline.md` buckets every field into Tier 0 (free/deterministic), Tier 1
-(flash-tier / cheap heuristic), and Tier 2 (heavy model or human). All four
-derived fields are Tier 0 pure functions.
+The schema is designed to be populated cheaply: all four derived fields are pure functions.
 
 ## Prior art borrowed
 
@@ -539,13 +479,11 @@ confirms it:
 ```bash
 python3 tools/brief.py normalize 3   # prose -> a proposed block
 python3 tools/brief.py check         # validate every open issue
-python3 tools/gaps.py                # what in the index is unfinished
 ```
 
 `automatable` is required, because three classes of work here can never be
 automated: a visual judgement about a frame, a claim about a real person, and a
-licensing decision. An agent that names one and stops has succeeded. See
-`docs/skills/issues/SKILL.md`.
+licensing decision. An agent that names one and stops has succeeded.
 
 ## Where a finished cut goes
 

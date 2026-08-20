@@ -465,7 +465,7 @@ def commit_in_history(commit, root=None):
     return r.returncode == 0
 
 
-def check_provenance(act, master, report):
+def check_provenance(master, report):
     """Name an act whose master was built outside this build's history."""
     commit = master.get("built_from_commit")
     if not commit:
@@ -489,7 +489,7 @@ def check_provenance(act, master, report):
                    f"it came from.")
 
 
-def check_sources(act, master, report):
+def check_sources(master, report):
     """The rung BEFORE the master: did an act's inputs change without a render?
 
     `master -> Prod/ -> megacut/ -> 10mb/` starts at a rendered file, so it
@@ -541,7 +541,7 @@ def check_sources(act, master, report):
     report.add("sources", OK, f"{len(sources)} input(s) match {digest[:12]}")
 
 
-def check_footage(act, master, report):
+def check_footage(master, report):
     """The other half of the inputs rung: the picture, which git cannot see.
 
     `media/` is gitignored, so `check_sources` is blind to it. An act whose
@@ -604,7 +604,7 @@ def check_footage(act, master, report):
     report.add("footage", OK, f"{len(ids)} master(s) match {digest[:12]}")
 
 
-def check_copy(act, master, report, root=None):
+def check_copy(master, report, root=None):
     """The words on screen that the act's OWN record already says are wrong.
 
     Every act manifest carries an `unresolved` list -- the punch line of
@@ -644,7 +644,7 @@ def check_copy(act, master, report, root=None):
                    + "\n".join(f"      - {n}" for n in notes))
 
 
-def check_master(act, master, report):
+def check_master(master, report):
     if master is None:
         report.add("master", MISSING,
                    "no master declared in the delivery map")
@@ -1007,11 +1007,11 @@ def publish(acts, masters, wolves, delivery_path=None, log=print,
             log(f"  README.md: no {TABLE_BEGIN} markers -- table NOT "
                 f"touched; add the markers around the table to hand it to "
                 f"the tool")
-    record_source_digests(acts, masters, delivery_path, log=log, only=only)
+    record_source_digests(acts, delivery_path, log=log, only=only)
     return 0
 
 
-def record_source_digests(acts, masters, delivery_path, log=print, only=None):
+def record_source_digests(acts, delivery_path, log=print, only=None):
     """Stamp each act's current input digest into the delivery map.
 
     This is what closes the loop: `publish` is the step that says "what is in
@@ -1217,11 +1217,11 @@ def gather(acts, masters, social, wolves, plan_path, twin_roots=TWIN_ROOTS):
                   "no film by design (issue #51); the numeral is held so "
                   "nothing renumbers around it")
             continue
-        master_path = check_master(r.act, masters.get(r.act.numeral), r)
-        check_sources(r.act, masters.get(r.act.numeral), r)
-        check_footage(r.act, masters.get(r.act.numeral), r)
-        check_provenance(r.act, masters.get(r.act.numeral) or {}, r)
-        check_copy(r.act, masters.get(r.act.numeral), r)
+        master_path = check_master(masters.get(r.act.numeral), r)
+        check_sources(masters.get(r.act.numeral), r)
+        check_footage(masters.get(r.act.numeral), r)
+        check_provenance(masters.get(r.act.numeral) or {}, r)
+        check_copy(masters.get(r.act.numeral), r)
         check_link(r.act, master_path, wolves, r, twin_roots=twin_roots)
     programme = ActReport(Act("", "the programme", None))
     check_checksums(wolves, reports, programme)
@@ -1348,7 +1348,7 @@ def main(argv=None):
             if act.prod_file is None:
                 continue
             report = ActReport(act)
-            check_sources(act, masters.get(act.numeral), report)
+            check_sources(masters.get(act.numeral), report)
             for f in report.findings:
                 print(f"{act.numeral:4s} {f.node:9s} {f.state:16s} {f.detail}")
                 if f.state == STALE:

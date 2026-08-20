@@ -12,16 +12,12 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 from tools import deliver  # noqa: E402
 from tools import footage  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-
 # --- the committed inputs ---------------------------------------------------
-
 
 def test_the_act_list_comes_from_the_real_running_order():
     """The tool must never carry its own act list: it parses the source of
@@ -43,7 +39,6 @@ def test_the_act_list_comes_from_the_real_running_order():
     # life, which is why this used to assert the opposite.
     assert acts[-1].prod_file == "08-credits.mp4"
 
-
 def test_the_delivery_map_covers_every_filmed_act_and_no_phantom_acts():
     """delivery.json is intent, not a second act list: it may not invent acts
     the running order does not have, and every act WITH a film must declare
@@ -62,7 +57,6 @@ def test_the_delivery_map_covers_every_filmed_act_and_no_phantom_acts():
         if act.prod_file:
             assert act.numeral in masters, f"act {act.numeral} has a film " \
                                            f"but no declared master"
-
 
 # --- fixture ----------------------------------------------------------------
 
@@ -83,7 +77,6 @@ Hand-written prose the tool must preserve.
 
 Trailing prose.
 """
-
 
 @pytest.fixture
 def ws(tmp_path):
@@ -133,7 +126,6 @@ def ws(tmp_path):
         deliver.md5(wolves / "Prod" / deliver.CHECKSUMS) + "\n")
     return root
 
-
 def run(root, *argv):
     return deliver.main([
         *argv,
@@ -143,7 +135,6 @@ def run(root, *argv):
         "--plan", str(root / "plan.json"),
     ])
 
-
 def gather(root, twin_roots=[]):
     """Hermetic gather: twin search defaults OFF ([]), so a test never walks
     the real ~/Videos. Tests about twins pass the fixture root explicitly."""
@@ -152,14 +143,11 @@ def gather(root, twin_roots=[]):
     return deliver.gather(acts, masters, social, root / "wolves",
                           root / "plan.json", twin_roots=twin_roots)
 
-
 def findings(reports, numeral):
     return {f.node: f for r in reports if r.act.numeral == numeral
             for f in r.findings}
 
-
 # --- the chain, healthy and broken ------------------------------------------
-
 
 def test_an_up_to_date_chain_passes_check(ws):
     assert run(ws, "status", "--check") == 0
@@ -168,7 +156,6 @@ def test_an_up_to_date_chain_passes_check(ws):
     assert findings(reports, "III")["film"].state == deliver.NO_FILM
     # A recorded absence is reported but never fails the gate.
     assert findings(reports, "II")["social"].state == deliver.ABSENT_BY_DESIGN
-
 
 def test_a_master_rewritten_as_a_new_inode_detaches_the_link(ws):
     """The peaks.py trim flow: the master is os.replace'd by a corrected file,
@@ -182,7 +169,6 @@ def test_a_master_rewritten_as_a_new_inode_detaches_the_link(ws):
     assert run(ws, "publish") == 0
     assert deliver.same_file(ws / "wolves" / "Prod" / "01-intro.mp4", master)
     assert findings(gather(ws), "I")["social"].state == deliver.STALE
-
 
 def test_an_older_master_never_reverts_newer_prod_content(ws):
     """Act II on 2026-08-13: the build lived in a worktree, the declared
@@ -201,7 +187,6 @@ def test_an_older_master_never_reverts_newer_prod_content(ws):
     assert run(ws, "publish") == 0
     assert prod.read_bytes() == b"song-content", "publish must not downgrade"
 
-
 def test_a_stale_checksum_is_detected_and_regenerated(ws):
     prod = ws / "wolves" / "Prod" / "01-intro.mp4"
     prod.unlink()
@@ -214,7 +199,6 @@ def test_a_stale_checksum_is_detected_and_regenerated(ws):
     assert run(ws, "status", "--check") == 1
     run(ws, "publish")
     assert findings(gather(ws), "I")["checksum"].state == deliver.OK
-
 
 def test_a_missing_social_copy_is_built_but_an_exempt_one_never_is(ws, capsys):
     (ws / "wolves" / "10mb" / "01-intro.mp4").unlink()
@@ -231,7 +215,6 @@ def test_a_missing_social_copy_is_built_but_an_exempt_one_never_is(ws, capsys):
     # Nothing was actually built.
     assert not (ws / "wolves" / "10mb" / "01-intro.mp4").exists()
 
-
 def test_social_provenance_detects_a_replaced_prod_despite_newer_copy(ws):
     """Syncthing timestamps are not provenance; the source content is."""
     prod = ws / "wolves" / "Prod" / "01-intro.mp4"
@@ -243,7 +226,6 @@ def test_social_provenance_detects_a_replaced_prod_despite_newer_copy(ws):
     finding = findings(gather(ws), "I")["social"]
     assert finding.state == deliver.STALE
     assert "source digest" in finding.detail
-
 
 def test_rebuilding_an_act_schedules_every_downstream_delivery_rung(
         ws, capsys):
@@ -264,14 +246,12 @@ def test_rebuilding_an_act_schedules_every_downstream_delivery_rung(
     for label in ("rebuild I", "link I", "megacut", "social I"):
         assert f"would {label}" in output
 
-
 def test_a_missing_megacut_is_a_build_action(ws, capsys):
     (ws / "wolves" / "megacut" / "show-v1.mp4").unlink()
     assert findings(gather(ws), "")["megacut"].state == deliver.MISSING
     capsys.readouterr()
     assert run(ws, "build", "--dry-run") == 0
     assert "megacut.py" in capsys.readouterr().out
-
 
 def test_missing_distribution_megacut_names_unpromoted_same_stem_master(ws):
     """A remote build can leave its archival MKV behind if MP4 promotion fails."""
@@ -284,7 +264,6 @@ def test_missing_distribution_megacut_names_unpromoted_same_stem_master(ws):
     assert "show-v1.mkv" in finding.detail
     assert "unpromoted" in finding.detail
 
-
 def test_megacut_provenance_detects_a_changed_prod_checksum_set(ws):
     checksums = ws / "wolves" / "Prod" / deliver.CHECKSUMS
     checksums.write_text("changed\n")
@@ -292,7 +271,6 @@ def test_megacut_provenance_detects_a_changed_prod_checksum_set(ws):
     finding = findings(gather(ws), "")["megacut"]
     assert finding.state == deliver.STALE
     assert "checksum set" in finding.detail
-
 
 def test_the_megacut_is_refused_while_a_link_conflicts(ws, capsys):
     """Baking a reverted act into a fresh megacut is the failure the whole
@@ -308,7 +286,6 @@ def test_the_megacut_is_refused_while_a_link_conflicts(ws, capsys):
     assert run(ws, "build", "--dry-run") == 0
     out = capsys.readouterr().out
     assert "REFUSED" in out and "megacut.py" not in out
-
 
 def test_the_readme_table_is_regenerated_and_the_prose_survives(ws):
     # Drift the table by hand -- the historical failure, act VI naming v2
@@ -327,15 +304,12 @@ def test_the_readme_table_is_regenerated_and_the_prose_survives(ws):
     assert "Act III has no film" in text
     assert findings(gather(ws), "")["readme"].state == deliver.OK
 
-
 def test_a_checksum_line_for_a_file_that_is_not_an_act_is_stale(ws):
     with (ws / "wolves" / "Prod" / deliver.CHECKSUMS).open("a") as fh:
         fh.write(f"{'0' * 32}  09-phantom.mp4\n")
     assert findings(gather(ws), "")["checksum"].state == deliver.STALE
 
-
 # --- the worktree hazard (#150): location, not mtime -------------------------
-
 
 def make_worktree(ws, name="wt-feature"):
     """A directory that IS a linked git worktree: `.git` as a FILE, which is
@@ -345,7 +319,6 @@ def make_worktree(ws, name="wt-feature"):
     (wt / "renders").mkdir(parents=True)
     (wt / ".git").write_text(f"gitdir: {ws}/main/.git/worktrees/{name}\n")
     return wt
-
 
 def test_worktree_detection_reads_git_not_the_path_string(tmp_path):
     """`dv-wt/` is our naming convention; the hazard is being a worktree. A
@@ -359,7 +332,6 @@ def test_worktree_detection_reads_git_not_the_path_string(tmp_path):
     assert deliver.is_worktree_path(wt / "renders" / "x.mp4")
     assert not deliver.is_worktree_path(main / "renders" / "x.mp4")
     assert not deliver.is_worktree_path(elsewhere / "x.mp4")
-
 
 def test_a_worktree_master_is_ephemeral_even_intact_and_newer(ws):
     """The case that slipped through before: the declared master LIVES in a
@@ -382,7 +354,6 @@ def test_a_worktree_master_is_ephemeral_even_intact_and_newer(ws):
     assert report["link"].state == deliver.EPHEMERAL
     assert run(ws, "status", "--check") == 1
 
-
 def test_a_twin_that_lives_only_in_a_worktree_is_ephemeral_not_conflict(ws):
     """Act II on 2026-08-13: the durable master was a revision behind and the
     build's only twin sat in dv-wt/feat-98-act2-overlay. It was caught as a
@@ -403,7 +374,6 @@ def test_a_twin_that_lives_only_in_a_worktree_is_ephemeral_not_conflict(ws):
     assert f.state == deliver.EPHEMERAL
     assert "durable" in f.detail and "worktree" in f.detail
 
-
 def test_a_newer_durable_master_supersedes_a_worktree_twin(ws):
     """When the durable master is NEWER, re-linking resolves the hazard by
     superseding the worktree content -- that is the ordinary stale path, not
@@ -417,7 +387,6 @@ def test_a_newer_durable_master_supersedes_a_worktree_twin(ws):
     f = findings(gather(ws, twin_roots=[ws]), "II")["link"]
     assert f.state == deliver.STALE
     assert "BEHIND" in f.detail
-
 
 def test_publish_never_links_from_a_worktree(ws, capsys):
     """The refusal that makes the state structural: publish cannot 'fix' a
@@ -435,7 +404,6 @@ def test_publish_never_links_from_a_worktree(ws, capsys):
     assert not prod.exists(), "publish linked from a worktree"
     assert "EPHEMERAL" in capsys.readouterr().out
 
-
 def test_the_megacut_is_refused_while_a_link_is_ephemeral(ws, capsys):
     (ws / "wolves" / "megacut" / "show-v1.mp4").unlink()
     wt = make_worktree(ws)
@@ -449,7 +417,6 @@ def test_the_megacut_is_refused_while_a_link_is_ephemeral(ws, capsys):
     out = capsys.readouterr().out
     assert "REFUSED" in out and "megacut.py" not in out
 
-
 def test_an_absent_workspace_is_a_report_not_a_crash(tmp_path, capsys):
     """CI runners have no ~/Videos; the suite must stay green there."""
     rc = deliver.main(["status", "--wolves-root", str(tmp_path / "nope")])
@@ -460,9 +427,7 @@ def test_an_absent_workspace_is_a_report_not_a_crash(tmp_path, capsys):
     assert deliver.main(["status", "--check",
                          "--wolves-root", str(tmp_path / "nope")]) == 1
 
-
 # --- the real workspace, as a report ----------------------------------------
-
 
 @pytest.mark.skipif(not deliver.DEFAULT_WOLVES.exists(),
                     reason="no ~/Videos/Wolves on this machine")
@@ -479,9 +444,7 @@ def test_the_real_workspace_reports_without_failing(capsys):
     for numeral in ("I", "II", "III", "IV", "V", "VI", "VII", "VIII"):
         assert f"\n{numeral:<4}" in out
 
-
 # --- the rung before the master: inputs -> master ---------------------------
-
 
 def test_a_digest_is_content_not_mtime(tmp_path, monkeypatch):
     """These inputs come out of git, where every mtime is checkout time.
@@ -498,7 +461,6 @@ def test_a_digest_is_content_not_mtime(tmp_path, monkeypatch):
     f.write_text("two")
     assert deliver.source_digest(["a.json"]) != first, "content must count"
 
-
 def test_a_directory_input_hashes_every_file_under_it(tmp_path, monkeypatch):
     # A dialogue record is a directory; a new line in it must register.
     monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
@@ -509,18 +471,15 @@ def test_a_directory_input_hashes_every_file_under_it(tmp_path, monkeypatch):
     (d / "DIALOGUE.md").write_text("[Kat] Fine I'll fix your shit too")
     assert deliver.source_digest(["dialogue/vid"]) != before
 
-
 def test_a_renamed_input_is_drift_not_a_crash(tmp_path, monkeypatch):
     monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
     assert deliver.source_digest(["gone.json"])  # absent hashes, never raises
 
-
 def _report(master):
     act = deliver.Act("VI", "7 Days to the Wolves", "06.mp4")
     r = deliver.ActReport(act)
-    deliver.check_sources(act, master, r)
+    deliver.check_sources(master, r)
     return r.findings[0]
-
 
 def test_inputs_that_moved_since_the_render_are_stale(tmp_path, monkeypatch):
     monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
@@ -533,7 +492,6 @@ def test_inputs_that_moved_since_the_render_are_stale(tmp_path, monkeypatch):
     assert f.state == deliver.STALE
     assert "rebuild the act" in f.detail
 
-
 def test_an_act_with_no_committed_inputs_says_so(tmp_path, monkeypatch):
     """Acts IV and V are cut outside the repo, so there is nothing to watch.
 
@@ -545,11 +503,9 @@ def test_an_act_with_no_committed_inputs_says_so(tmp_path, monkeypatch):
     assert f.state == deliver.ABSENT_BY_DESIGN
     assert "NOT REPO-DRIVEN" in f.detail
 
-
 def test_undeclared_inputs_are_never_mistaken_for_fresh(tmp_path, monkeypatch):
     monkeypatch.setattr(deliver, "REPO_ROOT", tmp_path)
     assert _report({"path": "~/m.mp4"}).state == deliver.UNDECLARED
-
 
 def test_declared_but_unrecorded_is_undeclared_not_ok(tmp_path, monkeypatch):
     # A digest nobody stamped proves nothing; publish is what stamps it.
@@ -557,7 +513,6 @@ def test_declared_but_unrecorded_is_undeclared_not_ok(tmp_path, monkeypatch):
     (tmp_path / "s.json").write_text("x")
     assert _report({"path": "~/m.mp4",
                     "sources": ["s.json"]}).state == deliver.UNDECLARED
-
 
 def test_every_declared_source_actually_exists():
     """A path typo would silently hash as 'absent' and then look stable."""
@@ -568,7 +523,6 @@ def test_every_declared_source_actually_exists():
             assert (REPO_ROOT / rel).exists(), \
                 f"act {numeral} declares a source that does not exist: {rel}"
 
-
 def test_an_act_with_no_committed_inputs_carries_its_reason():
     masters, _ = deliver.load_delivery(
         REPO_ROOT / "stories" / "megacut" / "delivery.json")
@@ -576,7 +530,6 @@ def test_an_act_with_no_committed_inputs_carries_its_reason():
         if master.get("sources") == []:
             assert master.get("sources_note"), \
                 f"act {numeral} declares no inputs and does not say why"
-
 
 def test_the_recorded_digest_matches_what_is_committed():
     """The gate CI runs. If this fails, an act's inputs moved and nobody
@@ -588,8 +541,8 @@ def test_the_recorded_digest_matches_what_is_committed():
     honestly-recorded owner decision into a red X that blocked the merge
     queue -- 24 commits of authored work sat behind it. AGENTS.md: a gap that
     is recorded and degrades correctly is a punch-list item, not a failure.
-    The act still announces itself in `status`, and seating it in the
-    programme still costs an explicit `--allow-stale`.
+    The act still announces itself in `status` and in megacut's
+    stale-and-seated NOTE.
     """
     masters, _ = deliver.load_delivery(
         REPO_ROOT / "stories" / "megacut" / "delivery.json")
@@ -612,7 +565,6 @@ def test_the_recorded_digest_matches_what_is_committed():
         f"act(s) {', '.join(stale)}: committed inputs no longer match the "
         f"delivered master. Rebuild, then `python3 tools/deliver.py publish`.")
 
-
 def test_a_blocked_act_is_still_stale_everywhere_that_reaches_picture(tmp_path):
     """The exemption is scoped to the CI gate and nowhere else.
 
@@ -620,7 +572,7 @@ def test_a_blocked_act_is_still_stale_everywhere_that_reaches_picture(tmp_path):
     fresh". `stale_source_acts` is what `megacut.py` asks before it seats an
     act, so a blocked act must still be in that list -- otherwise the flag
     would quietly buy a stale act a seat in the programme, which is the exact
-    failure `--allow-stale` exists to make loud.
+    failure megacut's NOTE exists to make loud.
     """
     source = tmp_path / "source.txt"
     source.write_text("current", encoding="utf-8")
@@ -632,11 +584,10 @@ def test_a_blocked_act_is_still_stale_everywhere_that_reaches_picture(tmp_path):
     assert {"III"} <= {n for n, _ in deliver.stale_source_acts(masters)}
 
     report = deliver.ActReport(deliver.Act("III", "t", None))
-    deliver.check_sources(report.act, masters["III"], report)
+    deliver.check_sources(masters["III"], report)
     state = {f.node: f.state for f in report.findings}["sources"]
     assert state == deliver.BLOCKED
     assert state not in deliver.FAILING
-
 
 def test_publish_cannot_certify_an_act_whose_rebuild_is_blocked(tmp_path):
     """`publish --act III` must not stamp a digest for a render that did not
@@ -656,12 +607,11 @@ def test_publish_cannot_certify_an_act_whose_rebuild_is_blocked(tmp_path):
     lines = []
     deliver.record_source_digests(
         [deliver.Act("III", "t", None)],
-        doc["masters"], path, log=lines.append, only=["III"])
+        path, log=lines.append, only=["III"])
 
     after = json.loads(path.read_text(encoding="utf-8"))
     assert after["masters"]["III"]["source_digest"] == "stale0000"
     assert any("blocked on #256" in ln for ln in lines), lines
-
 
 def test_the_watcher_flushes_so_its_log_is_readable_while_it_runs(
         ws, monkeypatch, capsys):
@@ -675,7 +625,6 @@ def test_the_watcher_flushes_so_its_log_is_readable_while_it_runs(
                   interval=0.01, dry_run=True, once=True)
     assert flushed, "the watch loop never flushed stdout"
 
-
 # --- the footage rung (#229) ------------------------------------------------
 #
 # `sources` covers what git tracks. These cover what it cannot: media/ is
@@ -687,9 +636,8 @@ def _footage_report(master, media, monkeypatch, tmp_path):
     monkeypatch.setenv("DESTINY_FOOTAGE_CACHE", str(tmp_path / "cache.json"))
     act = deliver.Act("II", "Endless Forms", "02.mp4")
     r = deliver.ActReport(act)
-    deliver.check_footage(act, master, r)
+    deliver.check_footage(master, r)
     return r.findings[0]
-
 
 def test_footage_replaced_in_place_is_stale(tmp_path, monkeypatch):
     """The defect #229 records: the master is swapped, nothing says a word."""
@@ -709,7 +657,6 @@ def test_footage_replaced_in_place_is_stale(tmp_path, monkeypatch):
     assert f.state == deliver.STALE
     assert "rebuild the act" in f.detail
 
-
 def test_a_master_that_changed_container_still_resolves(tmp_path, monkeypatch):
     """.mp4 -> .mkv is what actually broke scripts/build_efmb.py."""
     media = tmp_path / "media"
@@ -719,7 +666,6 @@ def test_a_master_that_changed_container_still_resolves(tmp_path, monkeypatch):
     assert footage.resolve("yt_trailers").name == "yt_trailers.mkv"
     assert footage.missing(["yt_trailers"]) == []
 
-
 def test_a_similarly_named_file_is_not_the_master(tmp_path, monkeypatch):
     """`<id>.1080p-orig.mkv` sits beside the real master and is NOT it."""
     media = tmp_path / "media"
@@ -727,7 +673,6 @@ def test_a_similarly_named_file_is_not_the_master(tmp_path, monkeypatch):
     (media / "yt_perfume.1080p-orig.mkv").write_bytes(b"the superseded rung")
     monkeypatch.setattr(footage, "MEDIA", media)
     assert footage.resolve("yt_perfume") is None
-
 
 def test_absent_footage_is_reported_not_hashed_as_present(tmp_path, monkeypatch):
     media = tmp_path / "media"
@@ -739,13 +684,11 @@ def test_absent_footage_is_reported_not_hashed_as_present(tmp_path, monkeypatch)
     assert f.state == deliver.MISSING
     assert "yt_gone" in f.detail
 
-
 def test_undeclared_footage_is_reported_never_assumed_fresh():
     act = deliver.Act("II", "Endless Forms", "02.mp4")
     r = deliver.ActReport(act)
-    deliver.check_footage(act, {"path": "~/m.mp4"}, r)
+    deliver.check_footage({"path": "~/m.mp4"}, r)
     assert r.findings[0].state == deliver.UNDECLARED
-
 
 def test_the_digest_cache_is_keyed_on_content_not_just_mtime(tmp_path, monkeypatch):
     """A rewrite that keeps the size must still change the digest, because
@@ -761,7 +704,6 @@ def test_the_digest_cache_is_keyed_on_content_not_just_mtime(tmp_path, monkeypat
     f.write_bytes(b"bbbb")                  # same size, new content
     assert footage.file_digest(f) != first
 
-
 def test_sources_only_never_touches_footage(ws, capsys, monkeypatch):
     """CI has no media/. The offline gate must stay offline."""
     def explode(*a, **k):
@@ -775,7 +717,6 @@ def test_sources_only_never_touches_footage(ws, capsys, monkeypatch):
     ])
     assert rc == 0
     assert "footage" not in capsys.readouterr().out
-
 
 def test_a_master_older_than_its_footage_is_stale_before_any_digest(
         tmp_path, monkeypatch):
@@ -798,11 +739,10 @@ def test_a_master_older_than_its_footage_is_stale_before_any_digest(
     monkeypatch.setenv("DESTINY_FOOTAGE_CACHE", str(tmp_path / "cache.json"))
     act = deliver.Act("I", "intro", "01.mp4")
     r = deliver.ActReport(act)
-    deliver.check_footage(act, {"path": str(master_file),
+    deliver.check_footage({"path": str(master_file),
                                 "footage": ["yt_trailers"]}, r)
     assert r.findings[0].state == deliver.STALE
     assert "PREDATES" in r.findings[0].detail
-
 
 def test_publish_refuses_to_stamp_footage_it_knows_is_stale(
         tmp_path, monkeypatch):
@@ -823,10 +763,9 @@ def test_publish_refuses_to_stamp_footage_it_knows_is_stale(
         "path": str(master_file), "footage": ["yt_trailers"]}}}))
     deliver.record_source_digests(
         [deliver.Act("I", "intro", "01.mp4")],
-        {}, delivery, log=lambda *a: None)
+        delivery, log=lambda *a: None)
     after = json.loads(delivery.read_text())["masters"]["I"]
     assert "footage_digest" not in after, "publish laundered a stale master"
-
 
 def test_every_declared_youtube_master_has_a_provenance_record():
     """Defect 1 of #229: three masters were used by the film with no record
@@ -854,7 +793,6 @@ def test_every_declared_youtube_master_has_a_provenance_record():
         f"declared footage with no videos/<id>.json: {', '.join(unrecorded)}. "
         f"Every fetched master needs its source URL and rights recorded.")
 
-
 # --- publish must not launder staleness (the "always ships stale" defect) ---
 
 def _stamp_ws(tmp_path, monkeypatch):
@@ -873,7 +811,6 @@ def _stamp_ws(tmp_path, monkeypatch):
         "source_digest": deliver.source_digest(["shotlist.json"])}}}))
     return src, master, delivery, new
 
-
 def _publish_digests(delivery, acts=None, dirty=("shotlist.json",)):
     doc = json.loads(Path(delivery).read_text())
     masters = doc["masters"]
@@ -881,13 +818,12 @@ def _publish_digests(delivery, acts=None, dirty=("shotlist.json",)):
     real = deliver.dirty_paths
     deliver.dirty_paths = lambda: set(dirty)
     try:
-        deliver.record_source_digests(acts, masters, delivery,
+        deliver.record_source_digests(acts, delivery,
                                       log=lambda *a: None,
                                       only=[a.numeral for a in acts])
     finally:
         deliver.dirty_paths = real
     return json.loads(Path(delivery).read_text())["masters"]["I"]
-
 
 def test_publish_refuses_to_stamp_a_master_that_predates_its_inputs(
         tmp_path, monkeypatch):
@@ -909,7 +845,6 @@ def test_publish_refuses_to_stamp_a_master_that_predates_its_inputs(
         "publish stamped a digest over a master that was never rebuilt -- "
         "that is the staleness eraser")
 
-
 def test_publish_stamps_once_the_act_is_actually_rebuilt(tmp_path, monkeypatch):
     """The guard must not become a wall: a real rebuild still records."""
     src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
@@ -922,7 +857,6 @@ def test_publish_stamps_once_the_act_is_actually_rebuilt(tmp_path, monkeypatch):
 
     assert after["source_digest"] == deliver.source_digest(["shotlist.json"])
 
-
 def test_a_master_that_predates_its_inputs_is_reported_not_silent(
         tmp_path, monkeypatch, capsys):
     src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
@@ -933,9 +867,8 @@ def test_a_master_that_predates_its_inputs_is_reported_not_silent(
     monkeypatch.setattr(deliver, "dirty_paths", lambda: {"shotlist.json"})
     deliver.record_source_digests(
         [deliver.Act(numeral="I", title="I", prod_file="01.mp4")],
-        doc["masters"], delivery, log=lines.append, only=["I"])
+        delivery, log=lines.append, only=["I"])
     assert any("rebuild the act" in ln for ln in lines), lines
-
 
 def test_a_checkout_does_not_block_every_act(tmp_path, monkeypatch):
     """REGRESSION: a rebase rewrites every mtime at once.
@@ -950,7 +883,6 @@ def test_a_checkout_does_not_block_every_act(tmp_path, monkeypatch):
     monkeypatch.setattr(deliver, "dirty_paths", lambda: set())  # ...but nothing is edited
 
     assert deliver.sources_newer_than(["shotlist.json"], master) == []
-
 
 def test_publish_records_only_the_acts_it_was_told_to(tmp_path, monkeypatch):
     """A rebuild of ONE act must never certify the others.
@@ -968,13 +900,12 @@ def test_publish_records_only_the_acts_it_was_told_to(tmp_path, monkeypatch):
 
     acts = [deliver.Act(numeral="I", title="I", prod_file="01.mp4"),
             deliver.Act(numeral="II", title="II", prod_file="02.mp4")]
-    deliver.record_source_digests(acts, doc["masters"], delivery,
+    deliver.record_source_digests(acts, delivery,
                                   log=lambda *a: None, only=["I"])
 
     after = json.loads(delivery.read_text())["masters"]
     assert after["I"]["source_digest"] == deliver.source_digest(["shotlist.json"])
     assert after["II"]["source_digest"] == "stale-on-purpose"
-
 
 def test_a_blanket_publish_certifies_nothing(tmp_path, monkeypatch):
     """`publish` WRITES the digest gate, so it cannot be the thing that
@@ -990,11 +921,10 @@ def test_a_blanket_publish_certifies_nothing(tmp_path, monkeypatch):
     doc = json.loads(delivery.read_text())
     deliver.record_source_digests(
         [deliver.Act(numeral="I", title="I", prod_file="01.mp4")],
-        doc["masters"], delivery, log=lines.append)
+        delivery, log=lines.append)
     after = json.loads(delivery.read_text())["masters"]["I"]["source_digest"]
     assert after == before
     assert any("name the acts you rebuilt" in ln for ln in lines), lines
-
 
 def test_the_copy_rung_surfaces_what_an_act_says_is_still_wrong(tmp_path):
     """An act can be perfectly fresh against its FILES and still carry copy
@@ -1008,14 +938,13 @@ def test_the_copy_rung_surfaces_what_an_act_says_is_still_wrong(tmp_path):
         "unresolved": ["the reveal still credits somebody who was recast"]}),
         encoding="utf-8")
     report = deliver.ActReport(deliver.Act("VII", "t", "07.mp4"))
-    deliver.check_copy(report.act, {"sources": ["stories/act-plates.json"]},
+    deliver.check_copy({"sources": ["stories/act-plates.json"]},
                        report, root=tmp_path)
     finding = {f.node: f for f in report.findings}["copy"]
     assert finding.state == deliver.UNRESOLVED
     assert "recast" in finding.detail
     # A recorded gap is a punch-list item; it must never fail the gate.
     assert deliver.UNRESOLVED not in deliver.FAILING
-
 
 def test_the_copy_rung_stays_quiet_when_nothing_is_recorded(tmp_path):
     """No note when there is nothing to say -- and a source that is missing,
@@ -1024,11 +953,10 @@ def test_the_copy_rung_stays_quiet_when_nothing_is_recorded(tmp_path):
     (tmp_path / "stories" / "clean.json").write_text("{}", encoding="utf-8")
     (tmp_path / "stories" / "junk.json").write_text("not json", encoding="utf-8")
     report = deliver.ActReport(deliver.Act("I", "t", "01.mp4"))
-    deliver.check_copy(report.act, {"sources": [
+    deliver.check_copy({"sources": [
         "stories/clean.json", "stories/junk.json", "stories/gone.json",
         "scripts/build.sh"]}, report, root=tmp_path)
     assert not [f for f in report.findings if f.node == "copy"]
-
 
 def test_act_seven_really_does_declare_the_gap_the_owner_spotted():
     """The committed record, not a fixture: act VII is the case this rung was
@@ -1036,10 +964,9 @@ def test_act_seven_really_does_declare_the_gap_the_owner_spotted():
     masters, _ = deliver.load_delivery(
         REPO_ROOT / "stories" / "megacut" / "delivery.json")
     report = deliver.ActReport(deliver.Act("VII", "t", "07-europa.mp4"))
-    deliver.check_copy(report.act, masters["VII"], report)
+    deliver.check_copy(masters["VII"], report)
     detail = {f.node: f.detail for f in report.findings}["copy"]
     assert "Laura Santamaria" in detail
-
 
 def test_a_master_built_outside_this_history_is_named_foreign(monkeypatch):
     """Prod/ is shared mutable state, so 'not stale' never meant 'mine'.
@@ -1055,17 +982,17 @@ def test_a_master_built_outside_this_history_is_named_foreign(monkeypatch):
     # a commit this checkout has never seen
     monkeypatch.setattr(deliver, "commit_in_history", lambda c, root=None: False)
     r = deliver.ActReport(act)
-    deliver.check_provenance(act, {"built_from_commit": "d" * 40}, r)
+    deliver.check_provenance({"built_from_commit": "d" * 40}, r)
     assert [f.state for f in r.findings] == [deliver.FOREIGN]
     assert deliver.FOREIGN in deliver.FAILING      # --check must fail on it
 
     # a commit that IS in history is fine
     monkeypatch.setattr(deliver, "commit_in_history", lambda c, root=None: True)
     r = deliver.ActReport(act)
-    deliver.check_provenance(act, {"built_from_commit": "d" * 40}, r)
+    deliver.check_provenance({"built_from_commit": "d" * 40}, r)
     assert [f.state for f in r.findings] == [deliver.OK]
 
     # and nothing recorded is UNKNOWN, not an accusation
     r = deliver.ActReport(act)
-    deliver.check_provenance(act, {}, r)
+    deliver.check_provenance({}, r)
     assert [f.state for f in r.findings] == [deliver.UNDECLARED]

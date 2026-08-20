@@ -57,7 +57,7 @@ it falls to DejaVu Sans: Book (400) and Bold (700), nothing between. CSS font
 matching snaps 500 down and 600 up, so a "400/500/600/700" option set is two
 options wearing four names. The levers that do exist are weight, stroke width
 (`-webkit-text-stroke`, the only continuous one), contrast and size.
-`scripts/build_font_options.py` renders the set **over the frame it will ship
+The font-options pass rendered the set **over the frame it shipped
 on**, not on a swatch, because half of "too thin" is contrast against the
 picture underneath.
 
@@ -151,7 +151,7 @@ no card can decline it.
 
 ## Sizing a card: render the candidates over the frame they ship on
 
-The same rule `scripts/build_font_options.py` follows for weights applies to
+The same weight rule applies to
 type size and leading, and for the same reason: half of "too small" is the
 picture behind the type, so a swatch cannot answer it.
 
