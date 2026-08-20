@@ -38,10 +38,13 @@ python3 -m pytest -q                              # the whole suite (fast, offli
 python3 tools/corpus.py --check                   # per-character corpora
 python3 tools/rederive.py --check                 # no hand-edited derived field
 python3 scripts/generate_schema_enums.py --check  # schema enums match vocab/
+pre-commit run --all-files                        # documentation and process checks
 ```
 
-Run all four before every commit. The suite is offline: no model, no network,
-no footage. Optional extras matter only for frame-touching stages —
+Run this sequence before every commit. The suite is offline: no model, no
+network, no footage. Regenerate stale catalog outputs with
+`python3 scripts/generate_skill_index.py --write`. Optional extras matter only
+for frame-touching stages —
 `scenedetect` + `opencv-python-headless` (shot detection), `Pillow`
 (nameplates), `imageio-ffmpeg` (fallback ffmpeg).
 

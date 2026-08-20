@@ -36,7 +36,7 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-dejavu-core
 
       - name: Install dependencies
-        run: pip install --quiet jsonschema pyyaml pytest pillow
+        run: pip install --quiet jsonschema pyyaml pytest pillow pre-commit
 
       - name: Tests
         run: python3 -m pytest -q
@@ -63,3 +63,6 @@ jobs:
       # sat a dialogue round behind for days exactly this way (#118).
       - name: No act's inputs moved without a rebuild
         run: python3 tools/deliver.py status --sources-only --check
+
+      - name: Documentation and process checks
+        run: pre-commit run --all-files
