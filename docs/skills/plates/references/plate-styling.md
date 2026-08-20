@@ -40,9 +40,6 @@ Also carried from the baked reveal: the name's gradient has a **middle stop**
 footage moves behind it), and the box applies `border-radius` *and* a
 `clip-path`, so two corners are chamfered and the other two are rounded.
 
-The `ov/*.py` renderer described in `~/Videos/OVERLAYS.md` **no longer exists**;
-`tools/plate.py` is the live implementation.
-
 ## Checking a binding for drift
 
 `vocab/casting.yaml` reproduces the website's authored identities, so the two

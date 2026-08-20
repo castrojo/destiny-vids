@@ -166,10 +166,17 @@ This skill is the contract. The procedure lives in `references/`:
 ## Verification
 
 ```bash
-python3 tools/gaps.py
-python3 -m pytest -q
-python3 tools/deliver.py status
-~/Videos/audio-check.sh --all
+python3 -m pytest -q                  # includes committed-index integrity
+python3 tools/deliver.py status       # the delivery chain, as a report (never a gate here)
+python3 tools/readtime.py             # plates held too briefly to read (reports, never gates)
+~/Videos/audio-check.sh --all         # gates every act in Wolves/Prod
+
+# before any encode: nothing authored is stranded on an unpushed branch
+for w in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
+  h=$(git -C "$w" rev-parse HEAD)
+  [ "$(git branch -r --contains "$h" 2>/dev/null | wc -l)" -eq 0 ] &&
+    echo "UNPUSHED: $w ($h)"
+done
 ```
 
 `tests/test_index_integrity.py` validates every committed segment, video and

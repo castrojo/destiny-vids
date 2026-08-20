@@ -122,4 +122,8 @@ ffmpeg -i <master>.mp4 -map a:0 -f md5 -     # prove a master is bit-exact
 ```
 
 Use `/home/linuxbrew/.linuxbrew/bin/ffmpeg`. The system `ffmpeg` is
-`ffmpeg-free`: no H.264 decoder, and it fails only once decoding starts.
+`ffmpeg-free`: no H.264 decoder, and it fails only once decoding starts, which
+reads like a corrupt input file.
+
+Claims about yt-dlp's format selection were verified against current upstream
+documentation, not recalled.

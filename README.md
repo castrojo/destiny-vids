@@ -369,9 +369,7 @@ sync.
 build parameters in that cut's own manifest, and its reasoning in the issue that
 asked for it. For the feature, the programme's records are under
 `stories/megacut/` and the act list is
-[`docs/running-order.md`](docs/running-order.md). Nine per-act build logs used
-to live in `docs/cuts/`; they drifted out of agreement with the running order
-they were meant to explain, and they are gone.
+[`docs/running-order.md`](docs/running-order.md).
 
 ## Editorial direction
 

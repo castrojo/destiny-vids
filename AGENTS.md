@@ -75,6 +75,7 @@ say so in one line and give an ETA.
 | Signal | What it means |
 |---|---|
 | "I want a video" / "ship it" / "publish" | Stop. Render. Deliver a path. Then continue. |
+| "stream it" / "put it on" / "cast it" | The film plays on the owner's television *first*. A path is not a screening — [`delivery`](docs/skills/production/references/delivery.md). |
 | "quick" / "for iteration" | A rough cut beats a correct cut that does not exist. |
 | An owner asking twice | You already got this wrong once. Deliver before your next tool call. |
 
@@ -148,6 +149,15 @@ real name is still putting words in a colleague's mouth.**
 Find what is still unwritten with `python3 tools/placeholder.py list`.
 `--check` exits non-zero for anyone gating a *final* cut; CI does not run it,
 because CI must stay green while copy is being written.
+
+**Prose that is written but cannot be read in the time it is up is the same
+gap one step later.** `dur` is authored by hand and nothing derives it from
+the words, so a two-word pill and a twelve-word pill can both sit on screen
+for 1.2 seconds. `python3 tools/readtime.py` lists every plate held shorter
+than its own copy needs, and takes the same posture as `placeholder.py`: it
+reports, exits 0, and only `--check` fails. **It never re-times anything** —
+widening a hold shoves the beat after it, and moving an authored beat is the
+owner's call.
 
 **Four classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, a licensing decision, and **moving copy
@@ -285,6 +295,17 @@ punch list; the backlog is for work.
   have. Fix the tag file and re-run assembly.
   `tests/test_index_integrity.py` validates every committed segment, video and
   tag file against its schema.
+- **Some plate manifests are outputs too.** `stories/02-endless-forms-plates.json`
+  is built by `scripts/build_efmb_plates.py`, and
+  `tests/test_efmb_act.py::test_the_committed_manifest_matches_its_generator`
+  asserts the committed file equals what the generator produces. A card added
+  to it by hand is reverted by the next build, so **the copy goes in the
+  generator** and the manifest is regenerated. Check for a generator before
+  editing any `stories/*.json`.
+- **A card count can be pinned by schema.** `schema/ending-cards.schema.json`
+  fixes the ending at `minItems: 15, maxItems: 15`, so adding a card is a
+  **two-file** change — the manifest and the bound — in one commit. The bound
+  is hand-authored; only `enum` lists are generated.
 - **`vocab/` is the single source of truth for every enum.** Adding a value is
   **one** edit — the `vocab/*.yaml` file — then
   `python3 scripts/generate_schema_enums.py --write`, because the schemas' enum
@@ -335,6 +356,42 @@ rather than written, and the reference deck's field set. A delivered file is
 likewise regenerated, never hand-edited. `~/Videos` is a Syncthing folder, so a
 directory can vanish mid-session; check `~/.local/share/Trash` before rebuilding
 anything.
+
+### A worktree is a workspace, not a filing cabinet
+
+**Authored copy must never live only in a worktree, and never in a temp
+directory at all.** `/tmp` is `tmpfs` on this host: it is erased on reboot. A
+worktree there holding the only copy of a card is a card that is one power cut
+from never having existed.
+
+This is not hypothetical. Three agent worktrees were found carrying **27, 4 and
+2 commits that were on no branch anywhere**, one of them in `/tmp`. Between them
+they held the 2026-08-18 revision of the ending — "We support the Community",
+and the card `prove-it` — plus act II dialogue split for readability. All of it
+had been *rendered*, and the delivered file went to `~/Videos` while the records
+stayed behind. That is the whole reason a build could look a month old while
+somebody was actively authoring it.
+
+| | |
+|---|---|
+| Where a worktree goes | Beside the repo — `~/src/<name>` — never `/tmp`, never `/var/tmp` |
+| What it is checked out on | A **named branch**. A detached HEAD is invisible to `git branch` and cannot be pushed by name |
+| When it is pushed | **Before the render, not after.** A render is the moment the records become load-bearing; if the picture is worth encoding, the copy that produced it is worth pushing |
+| When it is removed | Only once its branch is on the remote |
+
+Before ending a session, prove nothing is stranded:
+
+```bash
+git worktree list
+for w in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
+  h=$(git -C "$w" rev-parse HEAD)
+  [ "$(git branch -r --contains "$h" 2>/dev/null | wc -l)" -eq 0 ] &&
+    echo "UNPUSHED: $w ($h)"
+done
+```
+
+Anything it names is work that exists nowhere else. Push it to a branch —
+`rescue/<name>` if it has no better one — before you do anything else.
 
 ## Where the work lives
 
@@ -427,9 +484,21 @@ landings, so two changes that pass separately but break together are caught
 before they land. That is the normal failure mode here, with several agents
 editing `tools/plate.py`, `vocab/casting.yaml` and the generated indexes at once.
 
-Turn on **auto-merge** and walk away. `.github/workflows/ci.yml` is the gate: the
-offline suite plus the four derived-artifact checks, and it runs on `merge_group`
-too.
+Turn on **auto-merge** and walk away. `.github/workflows/ci.yml` is the gate,
+and it is **one step**: the offline suite. The derived-artifact checks are
+asserted inside that suite rather than run again beside it, so `--check` stays
+a local command you run before committing, not a second copy of the gate.
+
+**The gate asserts what a runner can actually know.** It holds no footage and
+no `~/Videos`, so it cannot answer "is the delivered film current". Delivery
+freshness is therefore a **report**, not a gate: `tools/deliver.py status`
+prints it per act, and assembly prints `NOTE: act ... is stale and seated`
+and carries on. Nothing refuses — that is the "Nothing blocks a release" rule
+above, and CI is not exempt from it.
+
+A check that can only run in the case where it passes is not a check. Before
+adding a step, ask what failure it catches that the suite does not, and on
+what evidence.
 
 GitHub's *native* merge queue needs an organization-owned repository and this one
 is personal; the API refuses the `merge_queue` rule on both REST and GraphQL. The

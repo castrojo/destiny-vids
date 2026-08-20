@@ -21,6 +21,7 @@ load **only** that skill, then act.
 | Put a name on screen — Guardian nameplates and title cards | [`plates`](skills/plates/SKILL.md) |
 | Join the finished acts into one programme | [`megacut`](skills/megacut/SKILL.md) |
 | Run a long encode on the ghost cluster instead of the laptop | [`farm`](skills/farm.md) |
+| Work out why CI is red when the suite is green here, or add a check | [`testing`](skills/testing.md) |
 
 This table is the curated task router. The complete generated catalog lives in
 [`skills/index.json`](skills/index.json), with a human-readable mirror in

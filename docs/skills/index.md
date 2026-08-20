@@ -1,10 +1,11 @@
 # Skill catalog
 
-Generated 2026-08-19.
+Generated 2026-08-20.
 
 | Skill | Category | Type | One-line purpose |
 |---|---|---|---|
 | [farm](farm.md) | operations | runbook | Run frame-touching encodes on the remote Kubernetes farm. |
+| [testing](testing.md) | meta | procedure | Keep the offline suite the whole gate, and diagnose checks red only in CI. |
 | [audio](audio/SKILL.md) | media-production | policy | Preserve source fidelity and enforce delivery audio headroom. |
 | [casting](casting/SKILL.md) | metadata | policy | Bind visible Destiny characters to verified contributor identities. |
 | [editing](editing/SKILL.md) | editorial | procedure | Build and revise cuts from indexed footage without inventing shots. |

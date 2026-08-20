@@ -36,6 +36,43 @@ metadata:
 - Narration captions → the `authoring-video-closed-captions` skill
 - Deciding *who* is cast → [`casting`](../casting/SKILL.md)
 
+## Before you edit a manifest: is it an output?
+
+Three checks, in order, before changing any `stories/*.json`. Each one has
+already caught a wrong edit.
+
+**1. Is it generated?** `stories/02-endless-forms-plates.json` is built by
+`scripts/build_efmb_plates.py`, and the suite asserts the committed file equals
+what the generator produces. A card added by hand survives until the next
+build and no longer. Put the copy in the generator and regenerate.
+
+```bash
+grep -rl "$(basename <manifest>)" scripts/    # a builder here means it is an output
+```
+
+**2. Is the count pinned?** `schema/ending-cards.schema.json` fixes the ending
+at `minItems: 15, maxItems: 15`. Adding a card fails validation until the bound
+moves in the same commit. That pairing is deliberate — the ending is a fixed
+sequence, so growing it is a decision, not a side effect.
+
+**3. Will the seat collide?** `tools/plate.py::load_manifest_entries` refuses
+two plates visible at once. Run it before committing:
+
+```bash
+python3 -c "
+import json,sys; sys.path.insert(0,'.')
+from tools import plate
+d=json.load(open('stories/<manifest>.json'))
+e=[p for p in (d.get('plates') or d.get('cards') or [])
+   if isinstance(p.get('at'),(int,float)) and isinstance(p.get('dur'),(int,float))]
+plate.load_manifest_entries(e)"
+```
+
+**If it refuses, that is the end of the automated road.** Sliding a
+neighbouring plate to make room re-times an authored beat, which is the fourth
+thing an agent may never do. Report the collision and the options; do not
+resolve it. See "Degrade, never block" in [`AGENTS.md`](../../../AGENTS.md).
+
 ## The field set is closed
 
 A Guardian nameplate carries **exactly**:
@@ -90,6 +127,17 @@ A chat pill with no `text` does **not** block and does not render empty:
 `tools/placeholder.py` fills it with deterministic lorem ipsum, so timing,
 seat and read length are reviewable while the copy is still being written.
 `python3 tools/placeholder.py list` is the punch list.
+
+**Copy that is written but cannot be read in the time it is up is the same gap
+one step later.** `dur` is authored by hand and nothing derives it from the
+words, so a four-character pill and a ninety-character one can both sit up for
+1.2 seconds. `python3 tools/readtime.py` lists every plate held shorter than
+its own copy needs, separating the ones under `plate.py`'s 2.2s floor from the
+ones that clear the floor and are still too fast to read.
+
+It **reports and never re-times**. Widening a hold shoves whatever is seated
+after it, and moving an authored beat is the owner's call — so the default
+exits 0, and `--check` is only for whoever is gating a final cut.
 
 **A placeholder credits nobody** — the vocab's uncast speaker (`TBD`) and the
 drawn crest, never a real login or somebody's avatar; the intended speaker is

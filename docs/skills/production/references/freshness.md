@@ -129,8 +129,8 @@ machine, and none of those raise a local file event.
 
 **An act with `sources: []` is not configured — it is a finding.** It means the
 act is cut outside the repo, so there is nothing to edit here and nothing to
-watch. Acts IV, V and VII are in that state, which is exactly why the Kat/Nat
-dialogue round ([#118]) had nowhere to land. Giving those acts a builder is the
-fix, not adding a source list that lies.
-
-[#118]: https://github.com/castrojo/destiny-vids/issues/118
+watch. No act is in that state: every act in
+[`stories/megacut/delivery.json`](../../../../stories/megacut/delivery.json)
+names its committed sources, and acts IV, V and VII are repo-driven — their
+builders are the `rebuild` commands declared in that map. An act that reads
+`[]` again is a finding to report, not a list to fill in with guesses.

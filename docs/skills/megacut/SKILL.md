@@ -57,9 +57,18 @@ belongs upstream.
 
 ## It joins finished things — and checks they are still finished
 
-"Finished" was once taken on trust: the tool resolved a path, found a file, and
-encoded it. It now checks each seated clip against
-`stories/megacut/delivery.json` before it encodes.
+"Finished" was taken on trust: the tool resolved a path, found a file, and
+encoded it. Nothing asked whether that file was still the act its records
+describe, so an edited record with no rebuild shipped silently in the next
+programme — and the assembly stage is the one place where that reaches an
+audience.
+
+So it checks, and reports. Before encoding, every seated clip is matched to its
+act (by **inode**, since `Prod/` entries are hardlinks to the declared masters)
+and checked against `stories/megacut/delivery.json`. An act whose master
+predates its own committed inputs is **named on stderr and seated anyway** —
+assembly reports stale acts; it never refuses one (`AGENTS.md`, *Nothing blocks
+a release*).
 
 ```bash
 python3 tools/deliver.py status --sources-only   # what moved, per act
@@ -68,8 +77,9 @@ python3 tools/megacut.py <plan>                  # always assembles; stale acts
                                                  # are named on stderr, never refused
 ```
 
-The fix still belongs upstream, in the act. The gate only stops assembly from
-*pretending* the upstream fix happened.
+This is not editing policy leaking downstream: the fix still belongs upstream,
+in the act. The report keeps assembly from *silently pretending* the upstream
+fix happened; it never withholds the programme over one.
 
 ## Core Process
 

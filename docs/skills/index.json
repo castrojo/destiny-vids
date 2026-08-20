@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-19",
+  "generated_at": "2026-08-20",
   "skills": [
     {
       "id": "farm",
@@ -20,6 +20,24 @@
       "version": "1.0",
       "last_updated": "2026-08-19",
       "doc_type": "runbook"
+    },
+    {
+      "id": "testing",
+      "name": "testing",
+      "one_line_purpose": "Keep the offline suite the whole gate, and diagnose checks red only in CI.",
+      "entry_point": "docs/skills/testing.md",
+      "category": "meta",
+      "status": "active",
+      "tags": [
+        "testing",
+        "ci",
+        "pytest",
+        "runner"
+      ],
+      "description": "The suite is the gate. Use when a test passes locally and fails in CI, when adding a check, or when anything resolves a binary, font, or path outside the repo.",
+      "version": "1.0",
+      "last_updated": "2026-08-20",
+      "doc_type": "procedure"
     },
     {
       "id": "audio",
