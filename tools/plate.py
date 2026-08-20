@@ -3665,6 +3665,10 @@ def main(argv=None):
                         "preset slow) with the BT.709 VUI, instead of the legacy "
                         "crf 18/medium/untagged argv. Opt-in per act: turning it "
                         "on marks every act built without it as stale")
+    b.add_argument("--farm", action="store_true",
+                   help="submit the burn encode to the farm cluster "
+                        "(tools.farm.run_ffmpeg_on_cluster); the video and the "
+                        "rendered plate PNGs are staged to the pod")
 
     p = sub.add_parser("plan", help="cut list (+ roster) -> timed plate manifest")
     p.add_argument("shotlist", help="JSON shot list from tools/story.py --format json")
@@ -3808,8 +3812,26 @@ def main(argv=None):
     render_all(entries, args.plates_dir, picture)
     encode_args = (conform.video_encode_args()
                    if getattr(args, "delivery_spec", False) else None)
-    out = burn(args.video, entries, args.plates_dir, args.out,
-               encode_args=encode_args)
+    runner = None
+    if getattr(args, "farm", False):
+        from tools import farm
+
+        # The farm stages exact argv tokens, so the inputs are the video plus
+        # each plate PNG itself, not their directory (same pattern as the
+        # burn leg in scripts/build_act1.py).
+        burn_inputs = [Path(args.video).resolve()] + [
+            (Path(args.plates_dir) / f"plate_{u['id']}.png").resolve()
+            for u in _burn_units(entries)
+        ]
+        expected = _probe_duration(args.video)
+
+        def runner(argv, _inputs=burn_inputs, _out=args.out, _dur=expected):
+            farm.run_ffmpeg_on_cluster(argv, inputs=_inputs, out=Path(_out),
+                                       expected_duration=_dur)
+
+    video = Path(args.video).resolve() if runner else args.video
+    out = burn(video, entries, args.plates_dir, args.out,
+               encode_args=encode_args, runner=runner)
     print(f"wrote {out}")
     return 0
 
