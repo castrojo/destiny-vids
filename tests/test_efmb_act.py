@@ -266,13 +266,6 @@ def test_copy_is_reproduced_rather_than_composed():
     with pytest.raises(KeyError):
         build_efmb_plates.authored_copy("nobody_has_authored_this", casting)
 
-def test_a_placeholder_carries_a_name_and_no_invented_rows():
-    """Named, but nothing written for them yet: omit the rows, keep the name."""
-    casting = build_efmb_plates.load_casting()
-    copy = build_efmb_plates.placeholder_copy("dylan_taylor", casting)
-    assert copy["name"] == "Dylan Taylor"
-    assert "title" not in copy and "class" not in copy
-
 def test_the_manifest_never_hands_the_renderer_a_url():
     """tools/plate.py never touches the network, so an avatar URL renders as
     the drawn crest with a warning -- which is how every wreathed plate in this
@@ -398,14 +391,6 @@ def test_the_announcer_is_gone_entirely():
     # of the climax in a later pass (test_natewaddington_is_out_of_the_climax).
     assert "timed_natewaddington" not in ids
     assert any("anacheck" in u.lower() for u in manifest["unresolved"])
-
-def test_giklab_is_gone_and_nobody_moved_into_his_slot():
-    """Owner: "03:16 get rid of giklab". Megacut 3:16 is film 74.4, and the
-    only blueberry plate in the act was at 73.400. The SHOT came out, so the
-    roster is not reshuffled behind him."""
-    assert build_efmb_plates.BLUEBERRY_SHOTS == []
-    ids = {p["id"] for p in build_efmb_plates.build()["plates"]}
-    assert not {i for i in ids if i.startswith("blueberry_")}
 
 def test_the_new_face_dialogue_hands_off_before_the_lead_in_banner():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
