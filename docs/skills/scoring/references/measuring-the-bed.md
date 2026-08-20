@@ -131,4 +131,3 @@ person re-measuring — or worse, not measuring.
 **Say so when the source is not the best available.** An official artist upload
 is still lossy and is not "the highest-quality upstream version". That is fine
 for a prototype and must be recorded as a known gap, not quietly shipped.
-

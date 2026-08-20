@@ -1,14 +1,56 @@
 # Owner-authored plate chrome
 
 The detail behind [`../plates.md`](../SKILL.md)'s "Owner-authored chrome"
-section: four additions the owner briefed directly. All four are **chrome and
-imagery, not copy** — none adds a row of text the reference deck has no field
+section: additions the owner briefed directly. They are **chrome and imagery,
+not copy** — none adds a row of text the reference deck has no field
 for, so the closed field set is untouched. They ride in a manifest entry — or
 on a binding's `plate:` block in `vocab/casting.yaml`, which the
 closed-vocabulary test allows as chrome flags — but **not** in a brief's
 `copy`, whose schema pins the text rows only. `variant: bazzite` is the
 exception: `variant` was already in the brief's set, so a brief may ask for
 the purple.
+
+## `variant` is a complete chrome catalogue
+
+`variant` changes colour and imagery chrome only. It never adds a text row or
+explains an affiliation. The complete Guardian-plate catalogue is:
+
+| Flag or variant | Treatment and reservation |
+|---|---|
+| no `variant`, no `trustee` | The deck's default blue chrome. |
+| `trustee: true` | Burnished silver chrome. |
+| `leader` | Gold. The Wolves trailer reserves this treatment for Christoph Blecker. It **takes precedence over `trustee`**, matching `.wolves-guardian-plate-trustee:not(.wolves-guardian-plate-leader)`: a binding may carry both flags and still plate gold. The leader block does not restyle the class row, which remains the default blue `#cbd5f5`. |
+| `bronze` | The third rank below gold (`leader`) and silver (`trustee`): `#cd7f32`, deliberately more golden than rust so rank does not read as a Foundation herald. |
+| `rust` | Oxidised iron (`#c25b20`) for the Rust Foundation herald, per #8. |
+| `bazzite` | Bazzite purple for the end fight; its verified values and crest construction are below. |
+| `nobara` | Nobara Project indigo, sampled from its official icon: dominant `#3E3FC5`, gradient `#2431A5` → `#664FF8`. |
+| `youtube` | YouTube logo red `#FF0000` for a creator whose affiliation is their channel. |
+
+The `leader`, `bronze`, and `rust` treatments retain the deck's geometry and
+closed field set. `bazzite`, `nobara`, and `youtube` use lighter palette-family
+tints for small type rather than placing a dark wordmark colour on a translucent
+plate. A variant is never a second kind of card.
+
+## Brand artwork comes from the publisher, not the host
+
+The renderer is offline. Cache official marks before rendering:
+
+```bash
+python3 scripts/fetch_brand_marks.py          # download missing marks
+python3 scripts/fetch_brand_marks.py --force  # re-download every mark
+```
+
+The script writes gitignored assets to `renders/marks/`; a missing mark
+degrades to the drawn crest with a stderr note. **Never source a brand mark
+from `/usr/share/pixmaps`.** Bluefin rebrands that directory, so
+`fedora_whitelogo_med.png` and `gnome-boot-logo.png` on this machine are both
+Project Bluefin wordmarks, not Fedora artwork. Act VIII's first pass credited
+“Fedora CoreOS” under a Bluefin logo; only a rendered frame exposed it.
+
+Prefer the **icon** to a horizontal wordmark lockup. A wordmark cannot be set
+small, and the owner rejected the first pass: *“you overdid the logos those are
+tacky, smaller and symbolic.”* The mark must come from the project's own site
+or official published asset, never a convenient host-local substitute.
 
 ## `avatar` — a profile picture in the crest
 

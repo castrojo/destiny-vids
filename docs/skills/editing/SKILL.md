@@ -1,3 +1,26 @@
+---
+name: editing
+version: "1.0"
+last_updated: "2026-08-19"
+id: editing
+one_line_purpose: Build and revise cuts from indexed footage without inventing shots.
+entry_point: docs/skills/editing/SKILL.md
+category: editorial
+status: active
+dependencies: []
+tags:
+  - story
+  - cuts
+  - render
+  - beats
+  - segments
+description: >-
+  Build and revise cuts from indexed footage without inventing shots. Use when
+  making story outlines or renders from indexed segments.
+metadata:
+  type: procedure
+---
+
 # Editing a cut
 
 ## When to Use

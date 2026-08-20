@@ -87,4 +87,3 @@ is an edit, not a mastering pass.
 Prefer a copy already in the project over a fresh download. The Nightwish bed
 existed at 24-bit in `~/Videos/wolves-natali/sources/`; a re-fetch produced
 16-bit for the same YouTube id.
-

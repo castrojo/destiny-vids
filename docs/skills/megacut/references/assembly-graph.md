@@ -123,4 +123,3 @@ second after the slide. The fix lives in the plan, not in a hand-render:
 check: per-second RMS around every join, the silence-run length, and each
 act's exit and entry level — all on the **programme clock**, with the tool
 saying so in its header.
-

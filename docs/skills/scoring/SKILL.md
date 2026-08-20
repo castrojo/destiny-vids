@@ -1,3 +1,26 @@
+---
+name: scoring
+version: "1.0"
+last_updated: "2026-08-19"
+id: scoring
+one_line_purpose: Fit picture to measured music structure without changing the mix.
+entry_point: docs/skills/scoring/SKILL.md
+category: media-production
+status: active
+dependencies: []
+tags:
+  - music
+  - bed
+  - beats
+  - timing
+  - excisions
+description: >-
+  Fit picture to measured music structure without changing the mix. Use when
+  scoring a cut to a bed or landing shots on beats.
+metadata:
+  type: procedure
+---
+
 # Scoring a cut to a bed
 
 ## When to Use

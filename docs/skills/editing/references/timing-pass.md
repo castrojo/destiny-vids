@@ -91,4 +91,3 @@ assert min(s["start_sec"] for s in run) >= BOUNDARY   # not a comment. a test.
 The Wolves fix pulled 17.8 s from an official trailer rather than reaching
 backwards — which also improved the cut's provenance, because a deliberate
 choice can be made for more than one reason and a fill cannot.
-

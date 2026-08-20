@@ -1,12 +1,40 @@
+---
+name: intake
+version: "1.0"
+last_updated: "2026-08-19"
+id: intake
+one_line_purpose: Convert owner dictation into durable executable issue briefs.
+entry_point: docs/skills/intake.md
+category: editorial
+status: active
+dependencies: []
+tags:
+  - whisp
+  - issues
+  - briefs
+  - notes
+  - receipts
+description: >-
+  Turn dictated owner notes into filed issue briefs. Use when converting a
+  Whisp note into a GitHub issue or checking why a request never landed.
+metadata:
+  type: procedure
+---
+
 # Intake: from a dictated note to a filed issue
 
-## Why this skill exists
+## When to Use
 
 On the night of 2026-08-12→13 the owner dictated four notes. The two an agent
 happened to read landed in the repo; the two it did not — a full Kat/Nat
 dialogue round and act III's plate round — were silently lost for a day and
 found only by a forensic audit. The pipeline was never broken; the handoff
 was. **A note in Whisp has no queue, no state, and no acknowledgement.**
+
+## When NOT to Use
+
+- Normal issue work, filing a brief, or picking up tracked repo work →
+  [`issues/SKILL.md`](issues/SKILL.md)
 
 ## The one rule
 

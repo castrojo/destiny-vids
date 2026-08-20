@@ -128,4 +128,3 @@ rms = 20*log10(rms(pcm(out, pause_in, pause_len)))   # -240 dB is the bug
 Assert a floor on the region's RMS, and assert its correlation against the bed
 is ~0. The first catches a silent insert; the second catches the bed leaking
 into a region that was supposed to be a pause. Neither is implied by the other.
-

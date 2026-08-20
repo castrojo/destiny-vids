@@ -68,4 +68,3 @@ cut, so indexing one adds more usable material than reviewing the tail of a
 video that already works. **uncast** leads and **untagged-character** videos
 are owner decisions and visual judgement respectively — file them, do not
 grind them.
-

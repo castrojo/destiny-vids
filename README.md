@@ -321,7 +321,7 @@ Copy that somebody *has* authored is reproduced verbatim rather than written
 here — ten people have a Guardian identity in the deck or in the website's
 `public/wolves/characters/characters.json`, and the roster, the precedence
 between those sources and the known divergences are in
-[`docs/skills/plates/SKILL.md`](docs/skills/plates/SKILL.md#where-the-copy-is-authored).
+[`docs/skills/plates/references/copy-authoring.md`](docs/skills/plates/references/copy-authoring.md#where-plate-copy-is-authored).
 
 Each lead is plated **once**, on the first appearance long enough to read, and
 never on a shot that failed its binding's constraints (that shot is already

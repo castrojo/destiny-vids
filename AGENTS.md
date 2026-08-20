@@ -14,8 +14,25 @@ they are and what order they play in.
 1. This file — repo rules, commands, and boundaries.
 2. [`docs/running-order.md`](docs/running-order.md) — what the show is.
 3. [`docs/SKILL.md`](docs/SKILL.md) — find the skill for your task and load it.
-4. The design docs that skill links to (`docs/taxonomy.md`,
-   `docs/pipeline.md`, `docs/agent-retrieval.md`, `docs/rendering.md`).
+4. The routed local skill, its references, and the design docs it links to
+   (`docs/taxonomy.md`, `docs/pipeline.md`, `docs/agent-retrieval.md`,
+   `docs/rendering.md`).
+5. [`projectbluefin/common/docs/factory/agentic-model.md`](https://github.com/projectbluefin/common/blob/main/docs/factory/agentic-model.md)
+   — a shared compatibility sidecar only; it never overrides local authority.
+
+## Local authority and common compatibility
+
+This repository's `AGENTS.md`, records, schemas, and routed skills are the
+local authority. `projectbluefin/common` is a shared agent-contract sidecar for
+compatible documentation and self-repair practices; it never overrides local
+editorial, delivery, rights, GitHub, or merge policy.
+
+## Self-repair and durable learning
+
+Every implementation produces two outputs: the work and any durable learning
+it exposed. Verify the repository and loaded skills, detect contradictory or
+stale guidance, repair the nearest authoritative contract when source-backed,
+validate the repair, and update the matching skill in the same logical change.
 
 ## Build, test, and lint
 
@@ -24,10 +41,13 @@ python3 -m pytest -q                              # the whole suite (fast, offli
 python3 tools/corpus.py --check                   # per-character corpora
 python3 tools/rederive.py --check                 # no hand-edited derived field
 python3 scripts/generate_schema_enums.py --check  # schema enums match vocab/
+pre-commit run --all-files                        # documentation and process checks
 ```
 
-Run all four before every commit. The suite is offline: no model, no network,
-no footage. Optional extras matter only for frame-touching stages —
+Run this sequence before every commit. The suite is offline: no model, no
+network, no footage. Regenerate stale catalog outputs with
+`python3 scripts/generate_skill_index.py --write`. Optional extras matter only
+for frame-touching stages —
 `scenedetect` + `opencv-python-headless` (shot detection), `Pillow`
 (nameplates), `imageio-ffmpeg` (fallback ffmpeg).
 
@@ -333,6 +353,14 @@ exists, so deleting a tree is always green. **Delete the tree in the same commit
 that files its contents as issues.** A plan that survives its filing is the
 stale planning doc this contract exists to prevent.
 
+## Issue applicability
+
+When assessing applicability, issue references are historical evidence, not
+proof of current work. Before reporting or acting on an issue, check current
+authoritative records and git history to establish that the issue still applies.
+A stale `unresolved` line must not revive a settled casting or editorial
+decision.
+
 ## Documentation
 
 The docs tree is the `projectbluefin/common` layout: a contract (this file), a
@@ -351,10 +379,15 @@ master path, a bed's rights bucket — is *linked*, not restated. The record is
 the truth; a prose copy is a future contradiction.
 
 When a session surfaces a durable pattern, update the matching skill in the same
-change. A skill is plain Markdown with no front matter and no catalog entry;
-the router table in [`docs/SKILL.md`](docs/SKILL.md) is the only registration.
-Prefer one file per skill — a split into `references/` costs an agent an extra
-read, so it has to buy more than tidiness.
+change. Every canonical skill carries the local YAML front matter required by
+the skill metadata contract, validated by
+`scripts/check-skill-frontmatter.sh`. [`docs/SKILL.md`](docs/SKILL.md) is the
+curated task router; the complete catalog is generated as
+[`docs/skills/index.json`](docs/skills/index.json), with a human-readable mirror
+in [`docs/skills/index.md`](docs/skills/index.md). Generate both with
+`python3 scripts/generate_skill_index.py --write`; never hand-edit them. Prefer
+one file per skill — a split into `references/` costs an agent an extra read, so
+it has to buy more than tidiness.
 
 ## Agent fast path
 

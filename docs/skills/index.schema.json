@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/castrojo/destiny-vids/docs/skills/index.schema.json",
+  "title": "destiny-vids skill catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "skills"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/skill"
+      }
+    }
+  },
+  "$defs": {
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "one_line_purpose",
+        "entry_point",
+        "category",
+        "status",
+        "tags",
+        "description",
+        "version",
+        "last_updated"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "one_line_purpose": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "entry_point": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "editorial",
+            "media-production",
+            "metadata",
+            "operations",
+            "meta"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "deprecated",
+            "reserved"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "version": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "doc_type": {
+          "type": "string",
+          "enum": [
+            "procedure",
+            "reference",
+            "runbook",
+            "policy"
+          ]
+        }
+      }
+    }
+  }
+}

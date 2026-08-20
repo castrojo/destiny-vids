@@ -1,3 +1,26 @@
+---
+name: indexing
+version: "1.0"
+last_updated: "2026-08-19"
+id: indexing
+one_line_purpose: Turn source footage into validated shot-level records.
+entry_point: docs/skills/indexing.md
+category: metadata
+status: active
+dependencies: []
+tags:
+  - ingest
+  - beats
+  - keyframes
+  - tags
+  - segments
+description: >-
+  Turn source footage into validated shot-level records. Use when adding a
+  Bungie video, tagging beats, or replaying tags into segments.
+metadata:
+  type: procedure
+---
+
 # Indexing a video
 
 ## When to Use

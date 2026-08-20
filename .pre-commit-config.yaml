@@ -1,0 +1,57 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 2c9f875913ee60ca25ce70243dc24d5b6415598c
+    hooks:
+      - id: check-json
+      - id: check-yaml
+      - id: end-of-file-fixer
+        files: ^(?:AGENTS\.md|\.github/workflows/ci\.yml|\.pre-commit-config\.yaml|docs/SKILL\.md|docs/skills/.*)$
+      - id: trailing-whitespace
+        files: ^(?:AGENTS\.md|\.github/workflows/ci\.yml|\.pre-commit-config\.yaml|docs/SKILL\.md|docs/skills/.*)$
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-added-large-files
+  - repo: local
+    hooks:
+      - id: check-skill-frontmatter
+        name: Validate skill front matter
+        language: system
+        entry: bash scripts/check-skill-frontmatter.sh
+        pass_filenames: false
+        always_run: true
+      - id: check-skill-index
+        name: Validate docs/SKILL.md coverage
+        language: system
+        entry: bash scripts/check-skill-index.sh
+        pass_filenames: false
+        always_run: true
+      - id: check-doc-links
+        name: Validate internal Markdown links
+        language: system
+        entry: python3 scripts/check-doc-links.sh
+        pass_filenames: false
+        always_run: true
+      - id: check-skill-catalog
+        name: Validate generated skill catalog
+        language: system
+        entry: python3 scripts/generate_skill_index.py --check
+        pass_filenames: false
+        always_run: true
+      - id: check-corpus
+        name: Validate generated character corpora
+        language: system
+        entry: python3 tools/corpus.py --check
+        pass_filenames: false
+        always_run: true
+      - id: check-derived-fields
+        name: Validate derived metadata
+        language: system
+        entry: python3 tools/rederive.py --check
+        pass_filenames: false
+        always_run: true
+      - id: check-schema-enums
+        name: Validate generated schema enums
+        language: system
+        entry: python3 scripts/generate_schema_enums.py --check
+        pass_filenames: false
+        always_run: true
