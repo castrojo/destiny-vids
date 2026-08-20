@@ -3818,19 +3818,31 @@ def main(argv=None):
 
         # The farm stages exact argv tokens, so the inputs are the video plus
         # each plate PNG itself, not their directory (same pattern as the
-        # burn leg in scripts/build_act1.py).
+        # burn leg in scripts/build_act1.py). An animation unit's argv token
+        # is its %0Nd PATTERN, not a file -- farm.sequence_frames expands it,
+        # so the staged token must be the pattern too (38e221b).
         burn_inputs = [Path(args.video).resolve()] + [
-            (Path(args.plates_dir) / f"plate_{u['id']}.png").resolve()
+            (Path(args.plates_dir) / (
+                u["pattern"] if u["animation"] else f"plate_{u['id']}.png")
+             ).resolve()
             for u in _burn_units(entries)
         ]
         expected = _probe_duration(args.video)
+        resolved_out = str(Path(args.out).resolve())
 
-        def runner(argv, _inputs=burn_inputs, _out=args.out, _dur=expected):
+        # 48Gi, not the farm's 16Gi default: act II's burn is ~78 overlay
+        # inputs, and the 16Gi pod was OOMKilled (exit 137) 52 s in -- the
+        # cgroup version of the local "Failed initializing scaling graph"
+        # failure _burn_units' comment describes. exo-0 has 65Gi.
+        def runner(argv, _inputs=burn_inputs, _out=resolved_out,
+                   _dur=expected):
             farm.run_ffmpeg_on_cluster(argv, inputs=_inputs, out=Path(_out),
-                                       expected_duration=_dur)
+                                       expected_duration=_dur,
+                                       limit_memory="48Gi")
 
     video = Path(args.video).resolve() if runner else args.video
-    out = burn(video, entries, args.plates_dir, args.out,
+    out_arg = str(Path(args.out).resolve()) if runner else args.out
+    out = burn(video, entries, args.plates_dir, out_arg,
                encode_args=encode_args, runner=runner)
     print(f"wrote {out}")
     return 0
