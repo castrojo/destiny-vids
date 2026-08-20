@@ -37,7 +37,7 @@
 ## Decisions
 - Switched catalog validation to `Draft202012Validator(..., format_checker=FormatChecker())` so `format: date` is actually enforced.
 - Added a focused regression test that mutates `generated_at` and `last_updated` to an invalid date and expects schema validation to fail.
-- Kept the full-suite baseline untouched; the remaining failures are the same pre-existing plan/spec citation, delivery digest, and Europa avatar issues.
+- Kept the full-suite baseline untouched; the remaining failures collapse to the same five pre-existing issue groups (the plan doc also trips link validation).
 
 ## Exact commands / results
 - `cd /var/home/jorge/src/destiny-vids/.superpowers/worktrees/common-doc-alignment && python3 -m pytest -q tests/test_skill_catalog.py` -> `9 passed in 0.14s`
@@ -50,7 +50,7 @@
 - Kept the change narrow: no unrelated baseline fixes were attempted.
 
 ## Commit
-- pending
+- `54dd529` — `fix(docs): enforce skill catalog date formats`
 
 ## Concerns
 - The repo still has the known baseline failures outside this fix.
