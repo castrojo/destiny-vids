@@ -28,8 +28,10 @@ load **only** that skill, then act.
 | Apply a round of notes without rebuilding acts that were already right | [`review`](skills/review.md) |
 | Run a long encode on the ghost cluster instead of the laptop | [`farm`](skills/farm.md) |
 
-This table is the catalog. There is no generated index behind it — add a row
-when you add a skill.
+This table is the curated task router. The complete generated catalog lives in
+[`skills/index.json`](skills/index.json), with a human-readable mirror in
+[`skills/index.md`](skills/index.md). Both are generated from skill front
+matter by `scripts/generate_skill_index.py`; never hand-edit them.
 
 ## Design docs (reference, not skills)
 
@@ -46,9 +48,9 @@ than restating them:
 
 ## Writing a skill here
 
-A skill is a plain Markdown file: an H1, when to use it, the workflow, the
-traps. No front matter, no version field, no catalog entry — the router table
-above is the only registration step.
+Follow the local [skill metadata rules](../AGENTS.md#documentation) for every
+canonical skill. [`projectbluefin/common`'s `write-a-skill.md`](https://github.com/projectbluefin/common/blob/main/docs/skills/write-a-skill.md)
+is the compatible cross-repository reference.
 
 **Write the current state, not the history that produced it.** No
 version-by-version narration, and no prose copy of a fact that has a machine
@@ -59,5 +61,7 @@ Keep a skill to one file until it is genuinely unreadable; only then split it
 into `skills/<name>/SKILL.md` plus `skills/<name>/references/*.md`. A split
 costs an agent an extra read, so it needs to buy more than tidiness.
 
-`tests/test_doc_links.py` proves every relative link in the docs tree
-resolves. That is the only check on this tree, and it is enough.
+`tests/test_doc_links.py` proves every relative link in the docs tree resolves.
+`scripts/check-skill-frontmatter.sh` and
+`scripts/generate_skill_index.py --check` validate the skill metadata and
+generated catalog.

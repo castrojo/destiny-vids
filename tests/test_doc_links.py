@@ -1,4 +1,4 @@
-"""Every relative Markdown link in the docs tree must resolve.
+"""Every relative Markdown link outside fenced code in the docs tree must resolve.
 
 A skill that was split into `<name>/SKILL.md` + `references/` is only an
 improvement if the links survived the move. This is the check that proves it:
@@ -16,6 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DOC_ROOTS = ["docs", "README.md", "AGENTS.md"]
 
 LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
+FENCED_BLOCK = re.compile(r"^(```|~~~).*?^\1\s*$", re.MULTILINE | re.DOTALL)
 
 
 def _markdown_files():
@@ -32,7 +33,8 @@ def _markdown_files():
 @pytest.mark.parametrize("path", _markdown_files(), ids=lambda p: str(p.relative_to(REPO_ROOT)))
 def test_relative_links_resolve(path):
     broken = []
-    for target in LINK.findall(path.read_text()):
+    text = FENCED_BLOCK.sub("", path.read_text())
+    for target in LINK.findall(text):
         target = target.strip()
         if target.startswith(("http://", "https://", "mailto:", "#")):
             continue

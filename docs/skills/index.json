@@ -1,0 +1,253 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-19",
+  "skills": [
+    {
+      "id": "corpus",
+      "name": "corpus",
+      "one_line_purpose": "Inspect and regenerate per-character footage coverage.",
+      "entry_point": "docs/skills/corpus.md",
+      "category": "metadata",
+      "status": "active",
+      "tags": [
+        "coverage",
+        "gaps",
+        "hero-video",
+        "casting",
+        "shots"
+      ],
+      "description": "Build per-subject coverage ledgers from the index. Use when checking what a character actually has, finding gaps, or regenerating a corpus after new shots land.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "farm",
+      "name": "farm",
+      "one_line_purpose": "Run frame-touching encodes on the remote Kubernetes farm.",
+      "entry_point": "docs/skills/farm.md",
+      "category": "operations",
+      "status": "active",
+      "tags": [
+        "ffmpeg",
+        "kubernetes",
+        "encode",
+        "remote",
+        "render"
+      ],
+      "description": "Run frame-touching encodes on the remote farm. Use when the cluster is reachable and you need a Prod encode, a megacut segment, or another long render.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "runbook"
+    },
+    {
+      "id": "indexing",
+      "name": "indexing",
+      "one_line_purpose": "Turn source footage into validated shot-level records.",
+      "entry_point": "docs/skills/indexing.md",
+      "category": "metadata",
+      "status": "active",
+      "tags": [
+        "ingest",
+        "beats",
+        "keyframes",
+        "tags",
+        "segments"
+      ],
+      "description": "Turn source footage into validated shot-level records. Use when adding a Bungie video, tagging beats, or replaying tags into segments.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "intake",
+      "name": "intake",
+      "one_line_purpose": "Convert owner dictation into durable executable issue briefs.",
+      "entry_point": "docs/skills/intake.md",
+      "category": "editorial",
+      "status": "active",
+      "tags": [
+        "whisp",
+        "issues",
+        "briefs",
+        "notes",
+        "receipts"
+      ],
+      "description": "Turn dictated owner notes into filed issue briefs. Use when converting a Whisp note into a GitHub issue or checking why a request never landed.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "review",
+      "name": "review",
+      "one_line_purpose": "Map programme notes to the owning act and rebuild only that act.",
+      "entry_point": "docs/skills/review.md",
+      "category": "editorial",
+      "status": "active",
+      "tags": [
+        "megacut",
+        "timecodes",
+        "acts",
+        "rebuild",
+        "notes"
+      ],
+      "description": "Map programme notes to the owning act and rebuild only that act. Use when a timecoded note needs an act lookup, a one-act fix, or a re-delivery.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "audio",
+      "name": "audio",
+      "one_line_purpose": "Preserve source fidelity and enforce delivery audio headroom.",
+      "entry_point": "docs/skills/audio/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "audio",
+        "delivery",
+        "source",
+        "headroom",
+        "ffmpeg"
+      ],
+      "description": "Preserve source fidelity and enforce delivery audio headroom. Use when sourcing a bed, measuring a deliverable, or deciding whether a file meets the repo's audio standard.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "policy"
+    },
+    {
+      "id": "casting",
+      "name": "casting",
+      "one_line_purpose": "Bind visible Destiny characters to verified contributor identities.",
+      "entry_point": "docs/skills/casting/SKILL.md",
+      "category": "metadata",
+      "status": "active",
+      "tags": [
+        "characters",
+        "leads",
+        "ensemble",
+        "credits",
+        "bindings"
+      ],
+      "description": "Bind visible Destiny characters to verified contributor identities. Use when adding or reviewing lead bindings, monthly ensemble credits, or cast-derived permissions.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "policy"
+    },
+    {
+      "id": "editing",
+      "name": "editing",
+      "one_line_purpose": "Build and revise cuts from indexed footage without inventing shots.",
+      "entry_point": "docs/skills/editing/SKILL.md",
+      "category": "editorial",
+      "status": "active",
+      "tags": [
+        "story",
+        "cuts",
+        "render",
+        "beats",
+        "segments"
+      ],
+      "description": "Build and revise cuts from indexed footage without inventing shots. Use when making story outlines or renders from indexed segments.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "issues",
+      "name": "issues",
+      "one_line_purpose": "Turn approved work into executable briefs and repository issues.",
+      "entry_point": "docs/skills/issues/SKILL.md",
+      "category": "operations",
+      "status": "active",
+      "tags": [
+        "whisp",
+        "issues",
+        "briefs",
+        "backlog",
+        "requests"
+      ],
+      "description": "Turn approved work into executable briefs and repository issues. Use when filing work or picking up tracked requests.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "megacut",
+      "name": "megacut",
+      "one_line_purpose": "Assemble finished acts into the canonical programme without re-editing them.",
+      "entry_point": "docs/skills/megacut/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "programme",
+        "assembly",
+        "cards",
+        "joins",
+        "delivery"
+      ],
+      "description": "Assemble finished acts into the canonical programme without re-editing them. Use when joining delivered cuts into one continuous video and verifying the joins.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "plates",
+      "name": "plates",
+      "one_line_purpose": "Render authored identity and dialogue cards without inventing copy.",
+      "entry_point": "docs/skills/plates/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "nameplates",
+        "copy",
+        "cards",
+        "credits",
+        "rendering"
+      ],
+      "description": "Render authored identity and dialogue cards without inventing copy. Use when burning Guardian nameplates, chat cards, or full-frame cards onto a video.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "policy"
+    },
+    {
+      "id": "production",
+      "name": "production",
+      "one_line_purpose": "Take approved video work from issue brief to delivered artifact.",
+      "entry_point": "docs/skills/production/SKILL.md",
+      "category": "operations",
+      "status": "active",
+      "tags": [
+        "production",
+        "delivery",
+        "issues",
+        "workflow",
+        "video"
+      ],
+      "description": "Take approved video work from issue brief to delivered artifact. Use when an issue needs to run from brief, through indexing or rendering, to a file in the delivery workspace.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "scoring",
+      "name": "scoring",
+      "one_line_purpose": "Fit picture to measured music structure without changing the mix.",
+      "entry_point": "docs/skills/scoring/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "music",
+        "bed",
+        "beats",
+        "timing",
+        "excisions"
+      ],
+      "description": "Fit picture to measured music structure without changing the mix. Use when scoring a cut to a bed or landing shots on beats.",
+      "version": "1.0",
+      "last_updated": "2026-08-19",
+      "doc_type": "procedure"
+    }
+  ]
+}

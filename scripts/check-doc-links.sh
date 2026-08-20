@@ -13,6 +13,7 @@ if len(sys.argv) > 1:
 
 DOC_ROOTS = ["docs", "README.md", "AGENTS.md"]
 LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
+FENCED_BLOCK = re.compile(r"^(```|~~~).*?^\1\s*$", re.MULTILINE | re.DOTALL)
 
 
 def markdown_files() -> list[Path]:
@@ -28,7 +29,8 @@ def markdown_files() -> list[Path]:
 
 broken = []
 for source in markdown_files():
-    for target in LINK.findall(source.read_text(encoding="utf-8")):
+    text = FENCED_BLOCK.sub("", source.read_text(encoding="utf-8"))
+    for target in LINK.findall(text):
         target = target.strip()
         if target.startswith(("http://", "https://", "mailto:", "#")):
             continue

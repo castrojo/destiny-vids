@@ -72,6 +72,26 @@ def test_agent_contract_is_not_duplicated():
     assert not list((REPO_ROOT / ".github" / "agents").glob("**/*"))
 
 
+def test_agents_contract_declares_local_authority_and_common_sidecar():
+    text = (REPO_ROOT / "AGENTS.md").read_text()
+    assert "local authority" in text
+    assert "projectbluefin/common" in text
+    assert "never overrides" in text
+
+
+def test_agents_contract_requires_issue_applicability_check():
+    text = (REPO_ROOT / "AGENTS.md").read_text()
+    assert "issue references are historical evidence" in text
+    assert "git history" in text
+    assert "still applies" in text
+
+
+def test_router_links_generated_catalog():
+    text = (REPO_ROOT / "docs/SKILL.md").read_text()
+    assert "skills/index.json" in text
+    assert "skills/index.md" in text
+
+
 def test_validator_scripts_parse_cleanly():
     subprocess.run(["bash", "-n", str(REPO_ROOT / "scripts" / "check-skill-frontmatter.sh")],
                    check=True)

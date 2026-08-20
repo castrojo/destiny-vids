@@ -17,6 +17,20 @@ they are and what order they play in.
 4. The design docs that skill links to (`docs/taxonomy.md`,
    `docs/pipeline.md`, `docs/agent-retrieval.md`, `docs/rendering.md`).
 
+## Local authority and common compatibility
+
+This repository's `AGENTS.md`, records, schemas, and routed skills are the
+local authority. `projectbluefin/common` is a shared agent-contract sidecar for
+compatible documentation and self-repair practices; it never overrides local
+editorial, delivery, rights, GitHub, or merge policy.
+
+## Self-repair and durable learning
+
+Every implementation produces two outputs: the work and any durable learning
+it exposed. Verify the repository and loaded skills, detect contradictory or
+stale guidance, repair the nearest authoritative contract when source-backed,
+validate the repair, and update the matching skill in the same logical change.
+
 ## Build, test, and lint
 
 ```bash
@@ -333,6 +347,14 @@ exists, so deleting a tree is always green. **Delete the tree in the same commit
 that files its contents as issues.** A plan that survives its filing is the
 stale planning doc this contract exists to prevent.
 
+## Issue applicability
+
+When assessing applicability, issue references are historical evidence, not
+proof of current work. Before reporting or acting on an issue, check current
+authoritative records and git history to establish that the issue still applies.
+A stale `unresolved` line must not revive a settled casting or editorial
+decision.
+
 ## Documentation
 
 The docs tree is the `projectbluefin/common` layout: a contract (this file), a
@@ -351,10 +373,15 @@ master path, a bed's rights bucket — is *linked*, not restated. The record is
 the truth; a prose copy is a future contradiction.
 
 When a session surfaces a durable pattern, update the matching skill in the same
-change. A skill is plain Markdown with no front matter and no catalog entry;
-the router table in [`docs/SKILL.md`](docs/SKILL.md) is the only registration.
-Prefer one file per skill — a split into `references/` costs an agent an extra
-read, so it has to buy more than tidiness.
+change. Every canonical skill carries the local YAML front matter required by
+the skill metadata contract, validated by
+`scripts/check-skill-frontmatter.sh`. [`docs/SKILL.md`](docs/SKILL.md) is the
+curated task router; the complete catalog is generated as
+[`docs/skills/index.json`](docs/skills/index.json), with a human-readable mirror
+in [`docs/skills/index.md`](docs/skills/index.md). Generate both with
+`python3 scripts/generate_skill_index.py --write`; never hand-edit them. Prefer
+one file per skill — a split into `references/` costs an agent an extra read, so
+it has to buy more than tidiness.
 
 ## Agent fast path
 
