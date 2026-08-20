@@ -402,6 +402,19 @@ def test_rewrite_argv_stages_same_named_inputs_distinctly():
     assert "/work/in/01-seg.mp4" in pod_argv
 
 
+def test_rewrite_argv_strips_glob_metacharacters_from_staging_names():
+    # kubectl cp glob-expands the remote path: a bracketed name delivers
+    # nothing with exit 0 (act VII's bed never landed). Spaces are safe.
+    bed = "/d/Beauty Of The Beast [X3WrCzLIIvk].webm"
+    pod_argv, uploads, pod_out = farm.rewrite_argv_for_pod(
+        ["ffmpeg", "-i", bed, "/o/07-europa [dc].mp4"], [bed],
+        "/o/07-europa [dc].mp4")
+    staged = uploads[0][1]
+    assert staged == "in/00-Beauty Of The Beast _X3WrCzLIIvk_.webm"
+    assert pod_argv[pod_argv.index("-i") + 1] == f"/work/{staged}"
+    assert pod_out == "/work/out/07-europa _dc_.mp4"
+
+
 def test_rewrite_argv_rejects_an_argv_that_disagrees_with_its_io():
     with pytest.raises(farm.FarmError, match="never writes"):
         farm.rewrite_argv_for_pod(["ffmpeg", "-i", "/a.mp4", "/else.mkv"],
@@ -713,6 +726,30 @@ def test_cp_still_fails_when_the_pod_is_genuinely_broken(monkeypatch):
     with pytest.raises(farm.FarmError):
         kc.cp("/tmp/x.mp4", "argo/pod:/work/in/x.mp4", sleep=lambda s: None)
     assert len(calls) == farm.CP_ATTEMPTS
+
+
+def test_cp_copies_a_glob_named_source_through_a_hardlink(tmp_path,
+                                                          monkeypatch):
+    """kubectl glob-expands the LOCAL source: "[x]" in a name matches
+    nothing and the copy exits 0 having delivered nothing. The copy must go
+    through a glob-free hardlink that is removed afterwards."""
+    src = tmp_path / "Beauty Of The Beast [X3WrCzLIIvk].webm"
+    src.write_bytes(b"bed")
+    kc = farm.Kubectl.__new__(farm.Kubectl)
+    kc.base, kc.namespace = ["kubectl"], "argo"
+    calls = []
+
+    def fake_run(args, timeout=60, check=True, input_text=None):
+        calls.append(args)
+        return subprocess.CompletedProcess(args, 0, "", "")
+
+    monkeypatch.setattr(kc, "run", fake_run)
+    kc.cp(src, "argo/pod:/work/in/00-bed.webm", sleep=lambda s: None)
+    copied = calls[0][1]
+    assert "[" not in copied and "]" not in copied
+    assert Path(copied).parent == tmp_path  # same filesystem as the source
+    assert not Path(copied).exists()        # cleaned up after the copy
+    assert src.exists()                     # the original is untouched
 
 
 def test_an_image_sequence_pattern_is_staged_as_its_frames(tmp_path):

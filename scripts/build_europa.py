@@ -267,6 +267,11 @@ def main(argv=None):
                     help="re-render the dialogue pills and stop")
     ap.add_argument("--skip-plates", action="store_true",
                     help="reuse the rendered pills already in --plates-dir")
+    ap.add_argument("--farm", action="store_true",
+                    help="run the master encode on the farm cluster "
+                         "(tools.farm.run_ffmpeg_on_cluster); the peaks trim "
+                         "and the nocover derive are stream-copies and stay "
+                         "local")
     args = ap.parse_args(argv)
 
     project = Path(args.project).expanduser()
@@ -313,7 +318,14 @@ def main(argv=None):
     cmd, derive = build_commands(doc, project, Path(args.plates_dir),
                                  master, delivered)
     print(f"build_europa: act {ACT} master -> {master}")
-    subprocess.run(cmd, check=True)
+    if args.farm:
+        from tools import farm
+        inputs = [Path(cmd[i + 1]) for i, tok in enumerate(cmd)
+                  if tok == "-i"]
+        farm.run_ffmpeg_on_cluster(cmd, inputs=inputs, out=master,
+                                   expected_duration=108.333333)
+    else:
+        subprocess.run(cmd, check=True)
     # The delivered-peak gate (#82): static trim into the -0.9..-1.1 dBTP
     # band, video stream-copied. Runs on the 110.2 s master BEFORE the cover
     # is cut, so the delivered film's picture is copied from the gated master.
