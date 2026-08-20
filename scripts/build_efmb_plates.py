@@ -178,16 +178,20 @@ NAME_CORRECTIONS = {"mara_sov": ("Karena Angell", "Karena Angel")}
 #    02:38 name plate github/jbeda - 'Out of Retirement'
 #    The last two are OG Guardians; make them a proud bronze"
 #
-# Sarah replaces the retired Davanum/Catherine cards in the first opening
-# slot. Her verified record carries only a name and a PFP, so the standard
-# nameplate chrome omits unauthored class/title rows rather than inventing
-# them.
+# The opening slot introduces RICARDO ROCHA, owner order 2026-08-20, while
+# watching the v4.2 build: "move rochoporto's nameplate introduction to where
+# novotny is, this hunter is now rochaporto, lock it in". The hunter in that
+# shot is him; his full authored identity (label/class/name/title/wreath)
+# rides the plate. Sarah Novotny's record STAYS in casting.yaml -- the order
+# named a seat, not her removal (contrast Brent Burns, "remove him
+# entirely", same day). She is owed a seat and that is recorded in
+# `unresolved`.
 #
 # BRENT BURNS IS OUT ENTIRELY, owner order 2026-08-20: "remove him entirely".
 # He held the second opening slot (02:20) until then; the slot stays empty --
 # nobody is promoted into an owner's mark.
 OPENING_NAMEPLATES = [
-    {"key": "sarahnovotny", "at_megacut": 135.0},
+    {"key": "rochaporto", "at_megacut": 135.0},
 ]
 
 OG_LABEL = "OG GUARDIAN"
@@ -196,8 +200,10 @@ OG_GUARDIANS = [
      "title": "Does NOT Come in Peace", "login": "thockin",
      "seen_at_src": 32.800,
      "why": "the hooded Hunter raising the revolver into frame"},
-    {"id": "og_jbeda", "at_megacut": 158.0, "name": "Joe Beda",
-     "title": "Out of Retirement", "login": "jbeda"},
+    # JOE BEDA IS OUT ENTIRELY, owner order 2026-08-20: "Remove jbeda as
+    # well" -- as well as Brent Burns, who was "remove him entirely". The
+    # 02:38 'Out of Retirement' mark stays empty; nobody inherits an owner's
+    # mark. The dictation quoted above keeps his line as history.
 ]
 OG_HOLD = 4.0
 
@@ -1768,7 +1774,7 @@ def build():
             **localise_avatar(key, _corrected(key, authored_copy(key, casting))),
         })
 
-    # --- the opening nameplates (Brent's slot stays empty -- see above) ----
+    # --- the opening nameplates (Brent's and Joe's slots stay empty) -------
     for spec in OPENING_NAMEPLATES:
         at = round(spec["at_megacut"] - MEGACUT_OFFSET, 3)
         hold = clamp_hold(at, OG_HOLD, film_of)
@@ -2552,6 +2558,12 @@ def build():
             "and 'Have you met our Ambassadors?'), and the eyebrow on "
             "Natewaddington's placard. Every string is still in git; 'for "
             "now' means this is a revert, not a rewrite",
+            "SARAH NOVOTNY'S SEAT WENT TO RICARDO ROCHA, owner 2026-08-20: "
+            "'move rochoporto's nameplate introduction to where novotny is, "
+            "this hunter is now rochaporto'. Unlike Brent Burns and Joe Beda "
+            "the same day, she was NOT ordered out -- her authored record "
+            "stays in vocab/casting.yaml and she is owed a seat nobody has "
+            "named yet",
             "NATEWADDINGTON IS OUT, owner: 'get rid of the nate wassington "
             "in the endless climax in endless'. His placard stood at film "
             "260.000 (4:20) -- centre frame, the last card before the "

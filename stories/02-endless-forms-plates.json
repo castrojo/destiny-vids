@@ -34,15 +34,19 @@
       ]
     },
     {
-      "id": "opening_sarahnovotny",
+      "id": "opening_rochaporto",
       "at": 13.433,
       "dur": 4.0,
       "position": "left",
       "copy_source": "casting",
       "why": "owner-seated opening nameplate replacing a retired credit",
-      "name": "Sarah Novotny",
-      "avatar": "renders/avatars/sarahnovotny.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/127370?v=4"
+      "label": "PRACTITIONER // GUARDIAN",
+      "class": "Hunter",
+      "name": "Ricardo Rocha",
+      "title": "Cloud Native Atom Smasher",
+      "wreath": true,
+      "avatar": "renders/avatars/rochaporto.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
     },
     {
       "id": "og_thockin",
@@ -58,19 +62,6 @@
       "avatar_url": "https://github.com/thockin.png?size=256",
       "seen_at_src": 32.8,
       "why": "the hooded Hunter raising the revolver into frame"
-    },
-    {
-      "id": "og_jbeda",
-      "at": 36.433,
-      "dur": 4.0,
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "label": "OG GUARDIAN",
-      "name": "Joe Beda",
-      "variant": "bronze",
-      "title": "Out of Retirement",
-      "avatar": "renders/avatars/jbeda.png",
-      "avatar_url": "https://github.com/jbeda.png?size=256"
     },
     {
       "id": "late_clankers_context",
@@ -2390,6 +2381,7 @@
     "late_karena_lessons is owner-timed to megacut 6:30.0 (film 123.500) but the previous card clears at 125.200, so it lands at 125.200 instead. The order is the owner's; only the gap is the timeline's",
     "late_rochaporto_cern is owner-timed to megacut 6:32.0 (film 125.500) but the previous card clears at 127.650, so it lands at 127.650 instead. The order is the owner's; only the gap is the timeline's",
     "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for now.' Three blocks went with him -- the four ranked montage cards, the two TOC payoff cards ('It's totally NOT like this' and 'Have you met our Ambassadors?'), and the eyebrow on Natewaddington's placard. Every string is still in git; 'for now' means this is a revert, not a rewrite",
+    "SARAH NOVOTNY'S SEAT WENT TO RICARDO ROCHA, owner 2026-08-20: 'move rochoporto's nameplate introduction to where novotny is, this hunter is now rochaporto'. Unlike Brent Burns and Joe Beda the same day, she was NOT ordered out -- her authored record stays in vocab/casting.yaml and she is owed a seat nobody has named yet",
     "NATEWADDINGTON IS OUT, owner: 'get rid of the nate wassington in the endless climax in endless'. His placard stood at film 260.000 (4:20) -- centre frame, the last card before the 269.700 downbeat the act climaxes on. Only the scheduling went: his two authored rows are still in git, nothing moved into the slot, and he is owed a credit somewhere nobody has decided yet",
     "the choice screen is a full-frame PAUSE MENU over MOVING picture: the owner asked to 'pause here to let the player decide', and a real freeze-frame has to be cut into the film itself, which moves every timecode after it. TODO(owner): whether the 1.5s teaser is enough or the picture should stop",
     "'Then just cut to the shot of them firing' / 'then it cuts to the descent' is an EDIT instruction, not a plate: the menu ends at 88.533 and whatever the film already cuts to is what plays. TODO(owner): confirm the shot after it is the one meant",

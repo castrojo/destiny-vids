@@ -1073,19 +1073,25 @@ def test_karena_is_angel_with_one_l():
 
 def test_the_correct_opening_guardians_are_on_the_owners_marks():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    marks = {"opening_sarahnovotny": 13.433,
-             "og_thockin": 26.433, "og_jbeda": 36.433}
+    marks = {"opening_rochaporto": 13.433, "og_thockin": 26.433}
     for pid, at in marks.items():
         assert by_id[pid]["at"] == pytest.approx(at, abs=1e-3)
     assert "og_dims" not in by_id
     assert "og_paganini" not in by_id
+    # Owner, 2026-08-20: "Remove jbeda as well" -- the 02:38 mark stays empty.
+    assert "og_jbeda" not in by_id
 
 
 def test_the_og_copy_is_the_owners_word_for_word():
-    """Including the capitalised NOT, which is the joke."""
+    """Including the capitalised NOT, which is the joke.
+
+    Joe Beda's 'Out of Retirement' line is history, not copy: the owner
+    removed him entirely on 2026-08-20, so it lives in the quoted dictation
+    and in git, never on screen."""
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     assert by_id["og_thockin"]["title"] == "Does NOT Come in Peace"
-    assert by_id["og_jbeda"]["title"] == "Out of Retirement"
+    assert not any(p.get("title") == "Out of Retirement"
+                   for p in by_id.values())
 
 
 def test_thockin_is_evidenced_on_the_opening_revolver_shot():
@@ -1213,17 +1219,20 @@ def test_the_long_walk_has_a_marker_but_no_title_card():
     assert not any(p["id"] == "walk_chapter" for p in manifest["plates"])
 
 
-def test_brent_burns_is_out_entirely():
-    """Owner order, 2026-08-20: "remove him entirely".
+def test_brent_burns_and_joe_beda_are_out_entirely():
+    """Owner orders, 2026-08-20: "remove him entirely" (Brent), and
+    "Remove jbeda as well" (Joe).
 
-    Not unplated-this-chapter like the Long Walk credits -- the record goes
-    too, so no future pass can seat him from the vocab. His old slot
-    (act-film 18.433) stays empty: nobody is promoted into an owner's mark.
+    Not unplated-this-chapter like the Long Walk credits -- Brent's record
+    goes too, so no future pass can seat him from the vocab. Joe lived only
+    in the generator. Both old slots (act-film 18.433 and 36.433) stay
+    empty: nobody is promoted into an owner's mark.
     """
     manifest = build_efmb_plates.build()
     by_id = {p["id"]: p for p in manifest["plates"]}
     assert not any("bdburns" in pid for pid in by_id)
-    assert not any(p.get("name") == "Brent D Burns"
+    assert not any("jbeda" in pid for pid in by_id)
+    assert not any(p.get("name") in ("Brent D Burns", "Joe Beda")
                    for p in manifest["plates"])
 
     import yaml
@@ -1231,17 +1240,43 @@ def test_brent_burns_is_out_entirely():
     assert "bdburns" not in yaml.safe_dump(casting)
     assert "Brent D Burns" not in yaml.safe_dump(casting)
 
-    sarah = by_id["opening_sarahnovotny"]
-    assert sarah["name"] == "Sarah Novotny"
-    assert sarah["avatar"] == "renders/avatars/sarahnovotny.png"
-    assert sarah["avatar_url"] == "https://avatars.githubusercontent.com/u/127370?v=4"
+
+def test_the_opening_hunter_is_rochaporto():
+    """Owner order, 2026-08-20, watching v4.2: "move rochoporto's nameplate
+    introduction to where novotny is, this hunter is now rochaporto, lock
+    it in".
+
+    The opening seat introduces Ricardo Rocha with his full authored
+    identity. Sarah Novotny was NOT ordered out -- her record stays in the
+    vocab, and her displacement is recorded in `unresolved` (the William
+    Rizzo precedent: a dropped seat never deletes an authored identity).
+    """
+    manifest = build_efmb_plates.build()
+    by_id = {p["id"]: p for p in manifest["plates"]}
+
+    opening = by_id["opening_rochaporto"]
+    assert opening["name"] == "Ricardo Rocha"
+    assert opening["label"] == "PRACTITIONER // GUARDIAN"
+    assert opening["title"] == "Cloud Native Atom Smasher"
+    assert opening["avatar"] == "renders/avatars/rochaporto.png"
+    assert opening["dur"] == pytest.approx(4.0, abs=1e-3)
+
+    # He keeps his Long Walk row credit too -- the introduction moved, the
+    # group shot still names its three walkers.
+    assert by_id["trio_rochaporto"]["name"] == "Ricardo Rocha"
+
+    assert "opening_sarahnovotny" not in by_id
+    assert not any(p.get("name") == "Sarah Novotny"
+                   for p in manifest["plates"])
+
+    import yaml
+    casting = build_efmb_plates.load_casting()
+    assert "sarahnovotny" in yaml.safe_dump(casting)
+    assert any("SARAH NOVOTNY" in u for u in manifest["unresolved"])
 
     og_thockin = by_id["og_thockin"]
-    og_jbeda = by_id["og_jbeda"]
-    assert sarah["at"] + sarah["dur"] <= og_thockin["at"]
-    assert og_thockin["at"] + og_thockin["dur"] <= og_jbeda["at"]
-    assert "seen_at_src" not in sarah
-    assert sarah["dur"] == pytest.approx(4.0, abs=1e-3)
+    assert opening["at"] + opening["dur"] <= og_thockin["at"]
+    assert "seen_at_src" not in opening
 
 
 def test_opening_three_no_longer_stay_unresolved():
