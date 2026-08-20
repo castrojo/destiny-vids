@@ -65,6 +65,7 @@ def test_agent_contract_is_not_duplicated():
     forbidden = [
         REPO_ROOT / "CLAUDE.md",
         REPO_ROOT / "GEMINI.md",
+        REPO_ROOT / ".github" / "copilot-instructions.md",
     ]
     assert not [str(path.relative_to(REPO_ROOT))
                 for path in forbidden if path.exists()]
