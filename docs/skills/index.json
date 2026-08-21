@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-20",
+  "generated_at": "2026-08-21",
   "skills": [
     {
       "id": "chapters",
@@ -36,7 +36,7 @@
       ],
       "description": "Run frame-touching encodes on the remote farm. Use when the cluster is reachable and you need a Prod encode, a megacut segment, or another long render.",
       "version": "1.0",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "doc_type": "runbook"
     },
     {
@@ -111,7 +111,7 @@
       ],
       "description": "Build and revise cuts from indexed footage without inventing shots. Use when making story outlines or renders from indexed segments.",
       "version": "1.0",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "doc_type": "procedure"
     },
     {
@@ -149,7 +149,7 @@
       ],
       "description": "Render authored identity and dialogue cards without inventing copy. Use when burning Guardian nameplates, chat cards, or full-frame cards onto a video.",
       "version": "1.0",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "doc_type": "policy"
     },
     {

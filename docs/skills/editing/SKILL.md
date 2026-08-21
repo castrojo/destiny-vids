@@ -1,7 +1,7 @@
 ---
 name: editing
 version: "1.0"
-last_updated: "2026-08-19"
+last_updated: "2026-08-20"
 id: editing
 one_line_purpose: Build and revise cuts from indexed footage without inventing shots.
 entry_point: docs/skills/editing/SKILL.md
@@ -98,6 +98,7 @@ Two things follow, and both bite:
 | "The act came out a bit short, the render will pad it." | It will not. A cut is a concatenation with no absolute timeline, so a short act slides every later shot earlier and every musical anchor with it. |
 | "I'll skip the window extract, it's just one flag." | Output seeking decodes from the file start. A clip at 24:00 in a 30-minute source costs ~40s of decode, every time. |
 | "The act is short, I'll loop the pool / start the run earlier to fill it." | That is not filling, it is choosing footage blind. It is how 25 shots got replayed and how a Savathûn montage entered a no-Savathûn film. Name the extra source and assert the boundary. |
+| "The replacement is already built, so keep its dissolve." | If the native source fills the exact slot, remove the obsolete transition and play the native frames; do not preserve a vestigial handoff just because it already renders. |
 | "The pause is in the right place but feels wrong, so I'll move it." | Position and length are separate faults. Measure the insert's phrase and fix the out-point first. |
 | "I'll just cut the bits we don't want, then judge the timing." | You have thrown away the thing you were going to judge. Black them out in place at their exact duration first — a timing pass keeps every later anchor where it will actually land. |
 | "Duck the song under the action beat, it's simpler than pausing." | A −6.8 LUFS master has to drop ~18 dB to sit under anything, which is a stop with mud on top. Pause it, and put the seam in a gap the artist already left. |
