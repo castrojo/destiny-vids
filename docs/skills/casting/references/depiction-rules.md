@@ -39,4 +39,3 @@ Three properties make it work, and all three are deliberate:
 The mechanism is generic — any binding may carry `depiction` — while the rules
 themselves are specific and few. Add one only when the owner states it as a rule
 about the character, not as a note about one cut.
-

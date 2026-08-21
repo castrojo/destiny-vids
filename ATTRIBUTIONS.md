@@ -8,11 +8,13 @@ shortened, or merged. `tests/test_index_integrity.py` asserts that every bed
 record claiming `usage_class: cc_by_4_0` has each line of its credit present in
 this file, so deleting a line here fails the suite rather than the licence.
 
-This file is where an attribution obligation lands **today**. Act VIII, the
-credits sequence, is not designed yet ([#51]) — when it is, these credits get an
-on-screen home too, and this file stays as the machine-checkable record. A
-missing credits sequence is not a reason to refuse a track: attribution has to
-land *somewhere*, not somewhere specific.
+This file is where an attribution obligation lands first. Act VIII, the
+credits sequence ([#51]), exists and plays; the credits it carries on screen
+are authored in [`stories/08-credits.json`](stories/08-credits.json), and
+whether or not a given credit has an on-screen home there yet, this file stays
+the machine-checkable record. A credit with no on-screen home is not a reason
+to refuse a track: attribution has to land *somewhere*, not somewhere
+specific.
 
 ## Music
 

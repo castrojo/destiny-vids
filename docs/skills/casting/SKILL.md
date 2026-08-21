@@ -1,3 +1,27 @@
+---
+name: casting
+version: "1.0"
+last_updated: "2026-08-19"
+id: casting
+one_line_purpose: Bind visible Destiny characters to verified contributor identities.
+entry_point: docs/skills/casting/SKILL.md
+category: metadata
+status: active
+dependencies: []
+tags:
+  - characters
+  - leads
+  - ensemble
+  - credits
+  - bindings
+description: >-
+  Bind visible Destiny characters to verified contributor identities. Use when
+  adding or reviewing lead bindings, monthly ensemble credits, or cast-derived
+  permissions.
+metadata:
+  type: policy
+---
+
 # Casting
 
 Casting names **real people**. Every rule below exists because the cost of
@@ -12,7 +36,6 @@ getting it wrong is crediting someone for a shot they are not in.
 ## When NOT to Use
 
 - Rendering the credit on screen → [`plates.md`](../plates/SKILL.md)
-- Tagging what is visible in a frame → [`indexing.md`](../indexing.md)
 
 ## Core Process
 
@@ -36,8 +59,7 @@ enforces exactly that:
    `constraints`, optional `plate` copy.
 2. `tools/search.py` `PHRASES`: at least one phrase for the character and one
    for the person.
-3. Docs: the cast table in `README.md` and the bindings table in
-   `docs/taxonomy.md`.
+3. Docs: the cast table in `README.md`.
 4. `python3 tools/rederive.py` — the checked-in segments still carry the old
    casting until it is run. Renaming a person is five places, not four.
 
@@ -128,5 +150,4 @@ for p in sorted(glob.glob('segments/*<video_id>*.json')):
 PY
 ```
 
-The full casting model, including why it is inverted (the crowd is the cast), is
-in `docs/taxonomy.md`.
+The casting model is inverted: the crowd is the cast.

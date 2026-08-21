@@ -144,7 +144,7 @@ failure**: those gaps are owner decisions by construction, and the show does
 not stop for a word.
 
 Applying a round of notes to the right act:
-[`skills/review.md`](skills/review.md). The audio the delivered files are held
+a notes pass. The audio the delivered files are held
 to: [`skills/audio/SKILL.md`](skills/audio/SKILL.md).
 
 ## What is still open

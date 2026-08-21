@@ -96,11 +96,8 @@ def video_bitrate_for(target_bytes, duration, audio_kbps):
 
 def source_digest(path):
     """The exact Prod bytes this social derivative was encoded from."""
-    digest = hashlib.md5()
     with Path(path).open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+        return hashlib.file_digest(source, "md5").hexdigest()
 
 
 def build_commands(src, out, *, target_mb, height, audio_kbps, ffmpeg, passlog,

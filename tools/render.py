@@ -226,7 +226,7 @@ def probe_windows(duration, probe_len=None):
     return windows
 
 
-def probe_media_duration(video, ffmpeg=None):
+def probe_media_duration(video):
     """A source's length in seconds, or ``None`` if it cannot be read.
 
     ``None`` is a real answer, not an error: ``find_ffprobe`` raises when the
@@ -267,7 +267,7 @@ def detect_picture_status(video):
     src = str(Path(video).resolve())
     readings = []
     decoded = False
-    for start, length in probe_windows(probe_media_duration(video, ffmpeg)):
+    for start, length in probe_windows(probe_media_duration(video)):
         cmd = [*ffmpeg, "-nostdin", "-hide_banner",
                "-ss", str(start), "-t", str(length), "-i", src,
                "-vf", "cropdetect=24:2:0", "-f", "null", "-"]

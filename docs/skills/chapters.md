@@ -1,3 +1,27 @@
+---
+name: chapters
+version: "1.0"
+last_updated: "2026-08-20"
+id: chapters
+one_line_purpose: Author an act's chat dialogue in one Markdown file per chapter.
+entry_point: docs/skills/chapters.md
+category: editorial
+status: active
+dependencies: []
+tags:
+  - dialogue
+  - chat
+  - chapters
+  - markdown
+description: >-
+  Add or re-time an act's chat dialogue without computing timecodes: one
+  Markdown file per chapter, whole conversations dropped at one programme
+  timestamp, per-line timing derived from readability. Use when writing or
+  rewriting chat pills or red splashes.
+metadata:
+  type: procedure
+---
+
 # Chapter conversations
 
 ## When to Use

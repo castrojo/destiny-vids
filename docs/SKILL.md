@@ -14,23 +14,20 @@ load **only** that skill, then act.
 
 | I need to... | Load |
 |---|---|
-| Turn the owner's dictated Whisp notes into filed issues, or find out why a submitted request never landed | [`intake`](skills/intake.md) |
-| File work, pick up an issue, or normalize a request into a brief | [`issues`](skills/issues/SKILL.md) |
 | Take an issue all the way to a rendered cut, or make videos in volume | [`production`](skills/production/SKILL.md) |
-| Index a new video: detect beats, extract keyframes, tag, assemble segments | [`indexing`](skills/indexing.md) |
 | Cast a character, add a lead binding, or credit the monthly ensemble | [`casting`](skills/casting/SKILL.md) |
-| Find out what footage a character actually has — and what they lack | [`corpus`](skills/corpus.md) |
 | Write an outline, assemble a cut list, mark material for removal, or render it | [`editing`](skills/editing/SKILL.md) |
-| Score a cut to a music bed, pause the song mid-cut, or land a shot on a beat | [`scoring`](skills/scoring/SKILL.md) |
 | Meet the audio standard every delivered file is held to | [`audio`](skills/audio/SKILL.md) |
 | Put a name on screen — Guardian nameplates and title cards | [`plates`](skills/plates/SKILL.md) |
 | Add or re-time an act's chat dialogue in one Markdown file per chapter | [`chapters`](skills/chapters.md) |
 | Join the finished acts into one programme | [`megacut`](skills/megacut/SKILL.md) |
-| Apply a round of notes without rebuilding acts that were already right | [`review`](skills/review.md) |
 | Run a long encode on the ghost cluster instead of the laptop | [`farm`](skills/farm.md) |
+| Work out why CI is red when the suite is green here, or add a check | [`testing`](skills/testing.md) |
 
-This table is the catalog. There is no generated index behind it — add a row
-when you add a skill.
+This table is the curated task router. The complete generated catalog lives in
+[`skills/index.json`](skills/index.json), with a human-readable mirror in
+[`skills/index.md`](skills/index.md). Both are generated from skill front
+matter by `scripts/generate_skill_index.py`; never hand-edit them.
 
 ## Design docs (reference, not skills)
 
@@ -39,17 +36,14 @@ than restating them:
 
 | Doc | What it covers |
 |---|---|
-| [`taxonomy.md`](taxonomy.md) | Every axis and field, and the casting model. |
-| [`pipeline.md`](pipeline.md) | Segmentation, inheritance, review tiers, cost posture. |
-| [`agent-retrieval.md`](agent-retrieval.md) | How a natural-language query maps to filters and ranking. |
 | [`rendering.md`](rendering.md) | Which ffmpeg, why, and the seeking/AV1 traps. |
 | [`../schema/brief.schema.json`](../schema/brief.schema.json) | Every field of an issue's `brief` block. |
 
 ## Writing a skill here
 
-A skill is a plain Markdown file: an H1, when to use it, the workflow, the
-traps. No front matter, no version field, no catalog entry — the router table
-above is the only registration step.
+Follow the local [skill metadata rules](../AGENTS.md#documentation) for every
+canonical skill. [`projectbluefin/common`'s `write-a-skill.md`](https://github.com/projectbluefin/common/blob/main/docs/skills/write-a-skill.md)
+is the compatible cross-repository reference.
 
 **Write the current state, not the history that produced it.** No
 version-by-version narration, and no prose copy of a fact that has a machine
@@ -60,5 +54,7 @@ Keep a skill to one file until it is genuinely unreadable; only then split it
 into `skills/<name>/SKILL.md` plus `skills/<name>/references/*.md`. A split
 costs an agent an extra read, so it needs to buy more than tidiness.
 
-`tests/test_doc_links.py` proves every relative link in the docs tree
-resolves. That is the only check on this tree, and it is enough.
+`tests/test_doc_links.py` proves every relative link in the docs tree resolves.
+`scripts/check-skill-frontmatter.sh` and
+`scripts/generate_skill_index.py --check` validate the skill metadata and
+generated catalog.

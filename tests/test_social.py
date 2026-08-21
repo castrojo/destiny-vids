@@ -3,14 +3,10 @@
 Offline: the arithmetic and the command are checked, nothing is encoded.
 """
 import os
-import sys
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 from tools import social  # noqa: E402
-
 
 def test_the_video_bitrate_fills_the_cap_and_nothing_more():
     # 10 MiB, 100s, 192k audio.
@@ -21,13 +17,11 @@ def test_the_video_bitrate_fills_the_cap_and_nothing_more():
     # ...and it is not leaving a whole rung on the table.
     assert spent > budget_bits * 0.99
 
-
 def test_headroom_is_held_back_so_muxing_overhead_cannot_bust_the_cap():
     assert 0 < social.OVERHEAD < 0.1
     kbps = social.video_bitrate_for(10 * social.MIB, 60.0, 128)
     total_bits = (kbps + 128) * 1000 * 60
     assert total_bits < 10 * social.MIB * 8
-
 
 def test_a_cap_the_audio_alone_cannot_fit_is_an_error_not_a_negative_bitrate():
     """Silently encoding at a negative or zero bitrate would produce a file
@@ -35,11 +29,9 @@ def test_a_cap_the_audio_alone_cannot_fit_is_an_error_not_a_negative_bitrate():
     with pytest.raises(ValueError, match="exceeds"):
         social.video_bitrate_for(1 * social.MIB, 600.0, 256)
 
-
 def test_mb_means_mebibytes():
     """Platforms quote '10MB' ambiguously; the smaller unit is the safe read."""
     assert social.MIB == 1024 * 1024
-
 
 def test_the_command_is_two_pass_and_carries_the_colour_vui(tmp_path, monkeypatch):
     src = tmp_path / "in.mp4"
@@ -60,7 +52,6 @@ def test_the_command_is_two_pass_and_carries_the_colour_vui(tmp_path, monkeypatc
         assert key in params
     assert f"-b:v" in second and f"{kbps}k" in second
 
-
 def test_no_audio_processing_is_applied():
     """Re-encoding is allowed; processing is not. A normaliser or limiter here
     would break the audio tenet in the one file most people actually hear."""
@@ -69,7 +60,6 @@ def test_no_audio_processing_is_applied():
     for forbidden in ("loudnorm", "dynaudnorm", "alimiter", "acompressor",
                       "equalizer", "-af "):
         assert forbidden not in source, forbidden
-
 
 def test_the_picture_is_scaled_only_when_it_needs_to_be(tmp_path, monkeypatch):
     src = tmp_path / "in.mp4"

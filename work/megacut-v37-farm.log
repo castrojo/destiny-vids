@@ -1,367 +1,0 @@
-WARNING: act III is STALE and seated anyway (--allow-stale): Act III — mrbobbytables: August 2026 contributors (partially complete)
-megacut: cluster reachable; ENCODE segments run on None (--local to force this host)
-assembling 17 items -> /var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.7.mp4
-  segment 1/17 [encode->farm]: Prologue — main title: 'Perfume Of The Timeless' 0 - 91.2, the title at 0:11, then the March day->night bridge
-  segment 2/17 [encode->farm]: Act I — Into the Light: six Guardians plated, the comic card, dialogue-free score
-  segment 3/17 [encode->farm]: Perfume, movement 2 — source 93.000 -> 159.400, after the Destiny intro
-  segment 4/17 [encode->farm]: Act II — Endless Forms Most Beautiful: Bungie's live-action trailers, one song end to end
-  segment 5/17 [encode->farm]: Act III — mrbobbytables: August 2026 contributors (partially complete)
-  segment 6/17 [encode->farm]: Perfume, movement 3 — source 159.400 -> 274.240, after mrbobbytables
-  segment 7/17 [encode->farm]: Act IV — Kat Cosgrove: Guardian intro
-  segment 8/17 [encode->farm]: Act V — Natali Vlatko: Guardian arrival
-  segment 9/17 [encode->farm]: Interstitial — ON THE LINUX DESKTOP / NO ONE CAN HEAR YOU SCREAM
-  segment 10/17 [encode->farm]: Act VI — Seven Days to the Wolves: the musical, CUT ON THE LAST SHOT CHANGE (430.997) so the song hands straight to the next one and the closing flash never plays
-  segment 11/17 [encode->farm]: Perfume, movement 4a — source 274.240 -> 287.360, wolves straight in ON ITS FIRST HIT
-  segment 12/17 [encode->farm]: Perfume, movement 4b — source 287.360 onward: the wallpaper swaps and the chat exchange
-  segment 13/17 [encode->farm]: Act VII — Europa Director's Cut (no slide: a quick cut off movement 4; runs out on its own fade to black)
-  segment 14/17 [encode->farm]: Ending — the Project Bluefin mission, in silence
-  segment 15/17 [encode->farm]: Perfume, movement 5a — source 389.800 -> 393.560, the dark Earth limb before the impact
-  segment 16/17 [encode->farm]: Perfume, movement 5b — source 393.560 onward: the impact, then the underwater passage and its seven lines
-  segment 17/17 [encode->farm]: Act VIII — Credits
-  farming 17 encode segment(s) to the cluster, 3 in flight x 8 threads
-farm[seg000]: workflow farm-seg000-mq6c submitted (node None, 1 encode x up to 24 cpu)
-farm[seg001]: workflow farm-seg001-s5q4 submitted (node None, 1 encode x up to 24 cpu)
-farm[seg002]: workflow farm-seg002-po3e submitted (node None, 1 encode x up to 24 cpu)
-farm[seg000]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg001]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg002]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg002]: uploading 50.0 MiB (perfume-2.mp4) …
-  [farm-seg002-po3e] 05:31:54 [farm] pod up on farm-seg002-po3e; waiting for input
-farm[seg002]: uploaded in 1s
-  [farm-seg002-po3e] 05:31:56 [farm] input arrived:
-  [farm-seg002-po3e] total 51244
-  [farm-seg002-po3e] -rw-r--r--. 1 1000 1000 52469913 Aug 17 05:31 00-perfume-2.mp4
-  [farm-seg002-po3e] 05:31:56 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-perfume-2.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,setpts=PTS-STARTPTS -af 'aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=-4.0dB,afade=t=in:st=0:d=6.200,volume='"'"'if(lt(t,62.400),1,pow(10,(4.000*(t-62.400)/4.000)/20))'"'"':eval=frame' -map 0:v:0 -map 0:a:0 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg002.mkv -y
-farm[seg001]: uploading 87.2 MiB (01-intro.mp4) …
-farm[seg000]: uploading 72.6 MiB (00-prologue.mp4) …
-  [farm-seg001-s5q4] 05:31:59 [farm] pod up on farm-seg001-s5q4; waiting for input
-  [farm-seg000-mq6c] 05:31:59 [farm] pod up on farm-seg000-mq6c; waiting for input
-farm[seg001]: uploaded in 1s
-farm[seg000]: uploaded in 1s
-  [farm-seg000-mq6c] 05:32:03 [farm] input arrived:
-  [farm-seg000-mq6c] total 74304
-  [farm-seg001-s5q4] 05:32:03 [farm] input arrived:
-  [farm-seg000-mq6c] -rw-r--r--. 1 1000 1000 76086714 Aug 17 05:32 00-00-prologue.mp4
-  [farm-seg001-s5q4] total 89268
-  [farm-seg001-s5q4] -rw-r--r--. 1 1000 1000 91406574 Aug 17 05:32 00-01-intro.mp4
-  [farm-seg000-mq6c] 05:32:03 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-00-prologue.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,setpts=PTS-STARTPTS -af aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg000.mkv -y
-  [farm-seg001-s5q4] 05:32:03 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-01-intro.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=start=2.0:end=111.567,setpts=PTS-STARTPTS -af atrim=start=2.0:end=111.567,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=+2.3dB,afade=t=out:st=107.567:d=2.000 -map 0:v:0 -map 0:a:0 -t 109.567 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg001.mkv -y
-  [farm-seg002-po3e] 05:32:35 [farm] encoded out/seg002.mkv duration=66.400000s; waiting for fetch
-farm[seg002]: downloaded out/seg002.mkv in 1s
-  [farm-seg002-po3e] 05:32:39 [farm] output fetched; pod done
-  [farm-seg002-po3e] time="2026-08-17T05:32:39.619Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg002]: verify ok — seg002.mkv 66.400s h264 1920x1080
-farm[seg003]: workflow farm-seg003-meh2 submitted (node None, 1 encode x up to 24 cpu)
-farm[seg003]: waiting for the pod (image pull on first run ~5 min)…
-  [farm-seg000-mq6c] 05:32:58 [farm] encoded out/seg000.mkv duration=101.201000s; waiting for fetch
-farm[seg003]: uploading 273.4 MiB (02-endlessformsmostbeautiful.mp4) …
-  [farm-seg003-meh2] 05:32:58 [farm] pod up on farm-seg003-meh2; waiting for input
-farm[seg000]: downloaded out/seg000.mkv in 1s
-  [farm-seg000-mq6c] 05:33:02 [farm] output fetched; pod done
-farm[seg003]: uploaded in 3s
-  [farm-seg000-mq6c] time="2026-08-17T05:33:02.866Z" level=info msg="sub-process exited" argo=true error="<nil>"
-  [farm-seg003-meh2] 05:33:04 [farm] input arrived:
-  [farm-seg003-meh2] total 279932
-  [farm-seg003-meh2] -rw-r--r--. 1 1000 1000 286646725 Aug 17 05:33 00-02-endlessformsmostbeautiful.mp4
-  [farm-seg003-meh2] 05:33:04 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-02-endlessformsmostbeautiful.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=start=10.666667,setpts=PTS-STARTPTS -af atrim=start=10.666667,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -t 319.4 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg003.mkv -y
-farm[seg000]: verify ok — seg000.mkv 101.201s h264 1920x1080
-farm[seg004]: workflow farm-seg004-wuva submitted (node None, 1 encode x up to 24 cpu)
-farm[seg004]: waiting for the pod (image pull on first run ~5 min)…
-  [farm-seg001-s5q4] 05:33:16 [farm] encoded out/seg001.mkv duration=109.560000s; waiting for fetch
-farm[seg001]: downloaded out/seg001.mkv in 1s
-farm[seg004]: uploading 133.0 MiB (03-mrbobbytables.mp4) …
-  [farm-seg004-wuva] 05:33:22 [farm] pod up on farm-seg004-wuva; waiting for input
-  [farm-seg001-s5q4] 05:33:22 [farm] output fetched; pod done
-farm[seg004]: uploaded in 1s
-  [farm-seg001-s5q4] time="2026-08-17T05:33:23.874Z" level=info msg="sub-process exited" argo=true error="<nil>"
-  [farm-seg004-wuva] 05:33:24 [farm] input arrived:
-  [farm-seg004-wuva] total 136184
-  [farm-seg004-wuva] -rw-r--r--. 1 1000 1000 139452199 Aug 17 05:33 00-03-mrbobbytables.mp4
-  [farm-seg004-wuva] 05:33:24 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-03-mrbobbytables.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,setpts=PTS-STARTPTS -af aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,afade=t=in:st=0:d=2.000 -map 0:v:0 -map 0:a:0 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg004.mkv -y
-farm[seg001]: verify ok — seg001.mkv 109.560s h264 1920x1080
-farm[seg005]: workflow farm-seg005-nupb submitted (node None, 1 encode x up to 24 cpu)
-farm[seg005]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg005]: uploading 88.7 MiB (perfume-3.mp4) …
-  [farm-seg005-nupb] 05:33:39 [farm] pod up on farm-seg005-nupb; waiting for input
-farm[seg005]: uploaded in 1s
-  [farm-seg005-nupb] 05:33:41 [farm] input arrived:
-  [farm-seg005-nupb] total 90860
-  [farm-seg005-nupb] -rw-r--r--. 1 1000 1000 93037573 Aug 17 05:33 00-perfume-3.mp4
-  [farm-seg005-nupb] 05:33:41 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-perfume-3.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,setpts=PTS-STARTPTS -af aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg005.mkv -y
-  [farm-seg005-nupb] 05:34:57 [farm] encoded out/seg005.mkv duration=114.848000s; waiting for fetch
-farm[seg005]: downloaded out/seg005.mkv in 1s
-  [farm-seg005-nupb] 05:34:59 [farm] output fetched; pod done
-  [farm-seg005-nupb] time="2026-08-17T05:35:00.539Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg005]: verify ok — seg005.mkv 114.848s h264 1920x1080
-farm[seg006]: workflow farm-seg006-cpck submitted (node None, 1 encode x up to 24 cpu)
-farm[seg006]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg006]: uploading 47.9 MiB (04-kat.mp4) …
-  [farm-seg006-cpck] 05:35:20 [farm] pod up on farm-seg006-cpck; waiting for input
-farm[seg006]: uploaded in 0s
-  [farm-seg006-cpck] 05:35:25 [farm] input arrived:
-  [farm-seg006-cpck] total 49040
-  [farm-seg006-cpck] -rw-r--r--. 1 1000 1000 50215151 Aug 17 05:35 00-04-kat.mp4
-  [farm-seg006-cpck] 05:35:25 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-04-kat.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,setpts=PTS-STARTPTS -af aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg006.mkv -y
-  [farm-seg004-wuva] 05:35:30 [farm] encoded out/seg004.mkv duration=160.194000s; waiting for fetch
-farm[seg004]: downloaded out/seg004.mkv in 2s
-  [farm-seg004-wuva] 05:35:34 [farm] output fetched; pod done
-  [farm-seg004-wuva] time="2026-08-17T05:35:34.284Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg004]: verify ok — seg004.mkv 160.194s h264 1920x1080
-farm[seg007]: workflow farm-seg007-m4nw submitted (node None, 1 encode x up to 24 cpu)
-farm[seg007]: waiting for the pod (image pull on first run ~5 min)…
-  [farm-seg006-cpck] 05:35:50 [farm] encoded out/seg006.mkv duration=34.001000s; waiting for fetch
-farm[seg007]: uploading 31.6 MiB (05-nat.mp4) …
-  [farm-seg007-m4nw] 05:35:51 [farm] pod up on farm-seg007-m4nw; waiting for input
-farm[seg007]: uploaded in 0s
-  [farm-seg007-m4nw] 05:35:53 [farm] input arrived:
-  [farm-seg007-m4nw] total 32396
-  [farm-seg007-m4nw] -rw-r--r--. 1 1000 1000 33170246 Aug 17 05:35 00-05-nat.mp4
-  [farm-seg007-m4nw] 05:35:53 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-05-nat.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,setpts=PTS-STARTPTS -af aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,afade=t=out:st=23.259:d=2.000 -map 0:v:0 -map 0:a:0 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg007.mkv -y
-farm[seg006]: downloaded out/seg006.mkv in 0s
-  [farm-seg006-cpck] 05:35:56 [farm] output fetched; pod done
-  [farm-seg006-cpck] time="2026-08-17T05:35:57.014Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg006]: verify ok — seg006.mkv 34.001s h264 1920x1080
-farm[seg008]: workflow farm-seg008-cr16 submitted (node None, 1 encode x up to 24 cpu)
-farm[seg008]: waiting for the pod (image pull on first run ~5 min)…
-  [farm-seg007-m4nw] 05:36:10 [farm] encoded out/seg007.mkv duration=25.259000s; waiting for fetch
-farm[seg007]: downloaded out/seg007.mkv in 0s
-farm[seg008]: uploading 0.1 MiB (plate_scream.png) …
-  [farm-seg008-cr16] 05:36:13 [farm] pod up on farm-seg008-cr16; waiting for input
-farm[seg008]: uploaded in 0s
-  [farm-seg007-m4nw] 05:36:14 [farm] output fetched; pod done
-  [farm-seg007-m4nw] time="2026-08-17T05:36:14.953Z" level=info msg="sub-process exited" argo=true error="<nil>"
-  [farm-seg008-cr16] 05:36:15 [farm] input arrived:
-  [farm-seg008-cr16] total 72
-  [farm-seg008-cr16] -rw-r--r--. 1 1000 1000 73356 Aug 17 05:36 00-plate_scream.png
-  [farm-seg008-cr16] 05:36:15 [farm] running: ffmpeg -nostdin -hide_banner -loop 1 -framerate 60000/1001 -t 5.0 -i /work/in/00-plate_scream.png -filter_complex 'color=c=black:s=1920x1080:r=60000/1001:d=5.0[bg0];[0:v]scale=1920:1080:flags=lanczos,format=rgba[fg0];[bg0][fg0]overlay=0:0:shortest=1,fps=60000/1001,format=yuv420p,setsar=1,setpts=PTS-STARTPTS[v0];anullsrc=channel_layout=stereo:sample_rate=48000:d=5.0,asetpts=PTS-STARTPTS[a0];[v0]null[vout];[a0]anull[aout]' -map '[vout]' -map '[aout]' -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg008.mkv -y
-  [farm-seg008-cr16] 05:36:16 [farm] encoded out/seg008.mkv duration=5.005000s; waiting for fetch
-farm[seg008]: downloaded out/seg008.mkv in 0s
-  [farm-seg008-cr16] 05:36:20 [farm] output fetched; pod done
-  [farm-seg008-cr16] time="2026-08-17T05:36:20.303Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg007]: verify ok — seg007.mkv 25.259s h264 1920x1080
-farm[seg009]: workflow farm-seg009-zrit submitted (node None, 1 encode x up to 24 cpu)
-farm[seg009]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg008]: verify ok — seg008.mkv 5.005s h264 1920x1080
-farm[seg010]: workflow farm-seg010-3nym submitted (node None, 1 encode x up to 24 cpu)
-farm[seg010]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg009]: uploading 324.7 MiB (06-7daystothewolves.mp4) …
-  [farm-seg009-zrit] 05:36:30 [farm] pod up on farm-seg009-zrit; waiting for input
-farm[seg009]: uploaded in 3s
-  [farm-seg009-zrit] 05:36:36 [farm] input arrived:
-  [farm-seg009-zrit] total 332500
-  [farm-seg009-zrit] -rw-r--r--. 1 1000 1000 340479108 Aug 17 05:36 00-06-7daystothewolves.mp4
-  [farm-seg009-zrit] 05:36:36 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-06-7daystothewolves.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=start=10.0:end=430.997,setpts=PTS-STARTPTS -af atrim=start=10.0:end=430.997,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,afade=t=in:st=0:d=2.000 -map 0:v:0 -map 0:a:0 -t 420.997 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg009.mkv -y
-farm[seg010]: uploading 104.1 MiB (perfume-4.mp4) …
-  [farm-seg010-3nym] 05:36:37 [farm] pod up on farm-seg010-3nym; waiting for input
-farm[seg010]: uploaded in 1s
-  [farm-seg010-3nym] 05:36:41 [farm] input arrived:
-  [farm-seg010-3nym] total 106552
-  [farm-seg010-3nym] -rw-r--r--. 1 1000 1000 109105967 Aug 17 05:36 00-perfume-4.mp4
-  [farm-seg010-3nym] 05:36:41 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-perfume-4.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=end=13.12,setpts=PTS-STARTPTS -af atrim=end=13.12,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -t 13.12 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg010.mkv -y
-  [farm-seg010-3nym] 05:36:51 [farm] encoded out/seg010.mkv duration=13.120000s; waiting for fetch
-farm[seg010]: downloaded out/seg010.mkv in 0s
-  [farm-seg010-3nym] 05:36:55 [farm] output fetched; pod done
-  [farm-seg010-3nym] time="2026-08-17T05:36:56.719Z" level=info msg="sub-process exited" argo=true error="<nil>"
-  [farm-seg003-meh2] 05:37:04 [farm] encoded out/seg003.mkv duration=319.403000s; waiting for fetch
-farm[seg010]: verify ok — seg010.mkv 13.120s h264 1920x1080
-farm[seg011]: workflow farm-seg011-0mtu submitted (node None, 1 encode x up to 24 cpu)
-farm[seg011]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg003]: downloaded out/seg003.mkv in 3s
-  [farm-seg003-meh2] 05:37:12 [farm] output fetched; pod done
-  [farm-seg003-meh2] time="2026-08-17T05:37:12.957Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg011]: uploading 104.2 MiB (perfume-4-overlays.mp4) …
-  [farm-seg011-0mtu] 05:37:14 [farm] pod up on farm-seg011-0mtu; waiting for input
-farm[seg011]: uploaded in 1s
-  [farm-seg011-0mtu] 05:37:16 [farm] input arrived:
-  [farm-seg011-0mtu] total 106696
-  [farm-seg011-0mtu] -rw-r--r--. 1 1000 1000 109254732 Aug 17 05:37 00-perfume-4-overlays.mp4
-  [farm-seg011-0mtu] 05:37:16 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-perfume-4-overlays.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=start=13.12,setpts=PTS-STARTPTS -af atrim=start=13.12,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -t 102.44545 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg011.mkv -y
-farm[seg003]: verify ok — seg003.mkv 319.403s h264 1920x1080
-farm[seg012]: workflow farm-seg012-lumv submitted (node None, 1 encode x up to 24 cpu)
-farm[seg012]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg012]: uploading 117.7 MiB (07-europa.mp4) …
-  [farm-seg012-lumv] 05:37:29 [farm] pod up on farm-seg012-lumv; waiting for input
-farm[seg012]: uploaded in 1s
-  [farm-seg012-lumv] 05:37:31 [farm] input arrived:
-  [farm-seg012-lumv] total 120532
-  [farm-seg012-lumv] -rw-r--r--. 1 1000 1000 123421243 Aug 17 05:37 00-07-europa.mp4
-  [farm-seg012-lumv] 05:37:31 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-07-europa.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=end=95.333333,setpts=PTS-STARTPTS -af atrim=end=95.333333,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -t 95.333333 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg012.mkv -y
-  [farm-seg011-0mtu] 05:38:25 [farm] encoded out/seg011.mkv duration=102.453000s; waiting for fetch
-farm[seg011]: downloaded out/seg011.mkv in 1s
-  [farm-seg011-0mtu] 05:38:29 [farm] output fetched; pod done
-  [farm-seg011-0mtu] time="2026-08-17T05:38:30.160Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg011]: verify ok — seg011.mkv 102.453s h264 1920x1080
-farm[seg013]: workflow farm-seg013-e4bm submitted (node None, 1 encode x up to 24 cpu)
-  [farm-seg012-lumv] 05:38:44 [farm] encoded out/seg012.mkv duration=95.333000s; waiting for fetch
-farm[seg013]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg012]: downloaded out/seg012.mkv in 1s
-  [farm-seg012-lumv] 05:38:50 [farm] output fetched; pod done
-farm[seg013]: uploading 9.1 MiB (mission-pause.mp4) …
-  [farm-seg013-e4bm] 05:38:49 [farm] pod up on farm-seg013-e4bm; waiting for input
-farm[seg013]: uploaded in 0s
-  [farm-seg012-lumv] time="2026-08-17T05:38:50.670Z" level=info msg="sub-process exited" argo=true error="<nil>"
-  [farm-seg013-e4bm] 05:38:51 [farm] input arrived:
-  [farm-seg013-e4bm] total 9352
-  [farm-seg013-e4bm] -rw-r--r--. 1 1000 1000 9573899 Aug 17 05:38 00-mission-pause.mp4
-  [farm-seg013-e4bm] 05:38:51 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-mission-pause.mp4 -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=48000:d=23.023 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=duration=23.023,setpts=PTS-STARTPTS -map 0:v:0 -map 1:a:0 -t 23.023 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg013.mkv -y
-farm[seg012]: verify ok — seg012.mkv 95.333s h264 1920x1080
-farm[seg014]: workflow farm-seg014-dwdg submitted (node None, 1 encode x up to 24 cpu)
-farm[seg014]: waiting for the pod (image pull on first run ~5 min)…
-  [farm-seg013-e4bm] 05:39:05 [farm] encoded out/seg013.mkv duration=23.023000s; waiting for fetch
-farm[seg013]: downloaded out/seg013.mkv in 0s
-  [farm-seg013-e4bm] 05:39:07 [farm] output fetched; pod done
-farm[seg014]: uploading 91.4 MiB (perfume-5.mp4) …
-  [farm-seg014-dwdg] 05:39:07 [farm] pod up on farm-seg014-dwdg; waiting for input
-  [farm-seg013-e4bm] time="2026-08-17T05:39:08.065Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg014]: uploaded in 1s
-  [farm-seg014-dwdg] 05:39:09 [farm] input arrived:
-  [farm-seg014-dwdg] total 93592
-  [farm-seg014-dwdg] -rw-r--r--. 1 1000 1000 95835441 Aug 17 05:39 00-perfume-5.mp4
-  [farm-segfarm[seg014]: workflow farm-seg014-yzr4 submitted (node None, 1 encode x up to 24 cpu)
-farm[seg014]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg014]: uploading 91.4 MiB (perfume-5.mp4) …
-  [farm-seg014-yzr4] 07:14:22 [farm] pod up on farm-seg014-yzr4; waiting for input
-farm[seg014]: uploaded in 1s
-  [farm-seg014-yzr4] 07:14:24 [farm] input arrived:
-  [farm-seg014-yzr4] total 93592
-  [farm-seg014-yzr4] -rw-r--r--. 1 1000 1000 95835441 Aug 17 07:14 00-perfume-5.mp4
-  [farm-seg014-yzr4] 07:14:24 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-perfume-5.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=end=3.76,setpts=PTS-STARTPTS -af atrim=end=3.76,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -t 3.76 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg014.mkv -y
-  [farm-seg014-yzr4] 07:14:25 [farm] encoded out/seg014.mkv duration=3.760000s; waiting for fetch
-farm[seg014]: downloaded out/seg014.mkv in 0s
-  [farm-seg014-yzr4] 07:14:29 [farm] output fetched; pod done
-  [farm-seg014-yzr4] time="2026-08-17T07:14:30.433Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg014]: verify ok — seg014.mkv 3.760s h264 1920x1080
-farm[seg015]: workflow farm-seg015-va4u submitted (node None, 1 encode x up to 24 cpu)
-farm[seg015]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg015]: uploading 92.3 MiB (perfume-5-ending.mp4) …
-  [farm-seg015-va4u] 07:14:48 [farm] pod up on farm-seg015-va4u; waiting for input
-farm[seg015]: uploaded in 1s
-  [farm-seg015-va4u] 07:14:52 [farm] input arrived:
-  [farm-seg015-va4u] total 94548
-  [farm-seg015-va4u] -rw-r--r--. 1 1000 1000 96813994 Aug 17 07:14 00-perfume-5-ending.mp4
-  [farm-seg015-va4u] 07:14:52 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-perfume-5-ending.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,trim=start=3.76:end=109.5,setpts=PTS-STARTPTS -af atrim=start=3.76:end=109.5,asetpts=PTS-STARTPTS,aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,afade=t=out:st=104.240:d=1.500 -map 0:v:0 -map 0:a:0 -t 105.74 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg015.mkv -y
-farm[seg016]: workflow farm-seg016-ah6k submitted (node None, 1 encode x up to 24 cpu)
-farm[seg016]: waiting for the pod (image pull on first run ~5 min)…
-farm[seg016]: uploading 206.3 MiB (08-credits.mp4) …
-  [farm-seg016-ah6k] 07:15:28 [farm] pod up on farm-seg016-ah6k; waiting for input
-farm[seg016]: uploaded in 2s
-  [farm-seg016-ah6k] 07:15:32 [farm] input arrived:
-  [farm-seg016-ah6k] total 211276
-  [farm-seg016-ah6k] -rw-r--r--. 1 1000 1000 216342860 Aug 17 07:15 00-08-credits.mp4
-  [farm-seg016-ah6k] 07:15:32 [farm] running: ffmpeg -nostdin -hide_banner -i /work/in/00-08-credits.mp4 -vf scale=1920:1080:flags=lanczos,setsar=1,fps=60000/1001,format=yuv420p,setpts=PTS-STARTPTS -af aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo -map 0:v:0 -map 0:a:0 -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p -profile:v high -level:v 4.2 -flags +cgop -color_primaries bt709 -color_trc bt709 -colorspace bt709 -x264-params colorprim=bt709:transfer=bt709:colormatrix=bt709 -threads 8 -c:a pcm_s24le -ar 48000 /work/out/seg016.mkv -y
-  [farm-seg015-va4u] 07:15:51 [farm] encoded out/seg015.mkv duration=105.741000s; waiting for fetch
-farm[seg015]: downloaded out/seg015.mkv in 1s
-  [farm-seg015-va4u] 07:15:55 [farm] output fetched; pod done
-  [farm-seg015-va4u] time="2026-08-17T07:15:55.325Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg015]: verify ok — seg015.mkv 105.741s h264 1920x1080
-  [farm-seg016-ah6k] 07:17:41 [farm] encoded out/seg016.mkv duration=532.504000s; waiting for fetch
-farm[seg016]: downloaded out/seg016.mkv in 2s
-  [farm-seg016-ah6k] 07:17:47 [farm] output fetched; pod done
-  [farm-seg016-ah6k] time="2026-08-17T07:17:47.596Z" level=info msg="sub-process exited" argo=true error="<nil>"
-farm[seg016]: verify ok — seg016.mkv 532.504s h264 1920x1080
-Traceback (most recent call last):
-  File "/var/home/jorge/src/destiny-vids/tools/megacut.py", line 1572, in <module>
-    raise SystemExit(main())
-                     ~~~~^^
-  File "/var/home/jorge/src/destiny-vids/tools/megacut.py", line 1563, in main
-    assemble(plan, out_path, jobs=args.jobs,
-    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-             conform_cache=args.conform_cache, allow_copy=not args.no_copy,
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-             use_farm=use_farm, farm_jobs=args.farm_jobs,
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-             farm_threads=args.farm_threads)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/var/home/jorge/src/destiny-vids/tools/megacut.py", line 1157, in assemble
-    fut.result()
-    ~~~~~~~~~~^^
-  File "/usr/lib/python3.13/concurrent/futures/_base.py", line 460, in result
-    return self.__get_result()
-           ~~~~~~~~~~~~~~~~~^^
-  File "/usr/lib/python3.13/concurrent/futures/_base.py", line 402, in __get_result
-    raise self._exception
-  File "/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
-    result = self.fn(*self.args, **self.kwargs)
-  File "/var/home/jorge/src/destiny-vids/tools/megacut.py", line 1040, in _farm_segment_worker
-    farm.run_ffmpeg_on_cluster(argv, inputs=[src], out=seg,
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                               expected_duration=item_duration(item),
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-                               # native ffprobe every other megacut check uses.
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                               ffprobe=[ffprobe_bin()])
-                               ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/var/home/jorge/src/destiny-vids/tools/farm.py", line 838, in run_ffmpeg_on_cluster
-                          limit_cpu=DEFAULT_LIMIT_CPU, memory=DEFAULT_MEMORY,
-    ...<5 lines>...
-    
-  File "/var/home/jorge/src/destiny-vids/tools/farm.py", line 685, in _execute_on_cluster
-    kc.exec(pod, ["touch", f"{WORK_DIR}/in/.ready"])
-        ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tools.farm.FarmError: pod did not exit after fetch; inspect with --keep
-speed=16.6x elapsed=0:00:03.50    frame= 3961 fps=990 q=-1.0 size=   41472KiB time=00:01:06.04 bitrate=5143.7kbits/s speed=16.5x elapsed=0:00:04.00    frame= 4445 fps=988 q=-1.0 size=   45056KiB time=00:01:14.12 bitrate=4979.5kbits/s speed=16.5x elapsed=0:00:04.50    frame= 4986 fps=997 q=-1.0 size=   48128KiB time=00:01:23.14 bitrate=4741.7kbits/s speed=16.6x elapsed=0:00:05.00    frame= 5458 fps=992 q=-1.0 size=   50944KiB time=00:01:31.02 bitrate=4584.9kbits/s speed=16.5x elapsed=0:00:05.50    frame= 5912 fps=985 q=-1.0 size=   55808KiB time=00:01:38.59 bitrate=4636.8kbits/s speed=16.4x elapsed=0:00:06.00    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame= 6323 fps=973 q=-1.0 size=   58112KiB time=00:01:45.45 bitrate=4514.3kbits/s speed=16.2x elapsed=0:00:06.50    frame= 6772 fps=967 q=-1.0 size=   65280KiB time=00:01:52.94 bitrate=4734.8kbits/s speed=16.1x elapsed=0:00:07.00    frame= 7215 fps=962 q=-1.0 size=   74240KiB time=00:02:00.33 bitrate=5054.0kbits/s speed=  16x elapsed=0:00:07.50    frame= 7686 fps=961 q=-1.0 size=   78336KiB time=00:02:08.19 bitrate=5005.9kbits/s speed=  16x elapsed=0:00:08.00    frame= 8222 fps=967 q=-1.0 size=   80896KiB time=00:02:17.13 bitrate=4832.4kbits/s speed=16.1x elapsed=0:00:08.50    frame= 8745 fps=972 q=-1.0 size=   91392KiB time=00:02:25.86 bitrate=5132.8kbits/s speed=16.2x elapsed=0:00:09.00    frame= 9200 fps=968 q=-1.0 size=   96768KiB time=00:02:33.45 bitrate=5165.9kbits/s speed=16.2x elapsed=0:00:09.50    frame= 9660 fps=966 q=-1.0 size=  102656KiB time=00:02:41.12 bitrate=5219.2kbits/s speed=16.1x elapsed=0:00:10.00    frame=10138 fps=965 q=-1.0 size=  108288KiB time=00:02:49.10 bitrate=5246.0kbits/s speed=16.1x elapsed=0:00:10.50    frame=10592 fps=963 q=-1.0 size=  117248KiB time=00:02:56.67 bitrate=5436.5kbits/s speed=16.1x elapsed=0:00:11.00    frame=11047 fps=960 q=-1.0 size=  123392KiB time=00:03:04.26 bitrate=5485.7kbits/s speed=  16x elapsed=0:00:11.50    frame=11490 fps=957 q=-1.0 size=  131328KiB time=00:03:11.65 bitrate=5613.4kbits/s speed=  16x elapsed=0:00:12.00    frame=11956 fps=956 q=-1.0 size=  137984KiB time=00:03:19.43 bitrate=5667.9kbits/s speed=  16x elapsed=0:00:12.50    frame=12388 fps=953 q=-1.0 size=  142592KiB time=00:03:26.63 bitrate=5652.9kbits/s speed=15.9x elapsed=0:00:13.00    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=12825 fps=950 q=-1.0 size=  147200KiB time=00:03:33.93 bitrate=5636.7kbits/s speed=15.8x elapsed=0:00:13.50    frame=13217 fps=944 q=-1.0 size=  149504KiB time=00:03:40.47 bitrate=5555.1kbits/s speed=15.7x elapsed=0:00:14.00    frame=13631 fps=940 q=-1.0 size=  152576KiB time=00:03:47.37 bitrate=5497.1kbits/s speed=15.7x elapsed=0:00:14.50    frame=14051 fps=937 q=-1.0 size=  156928KiB time=00:03:54.38 bitrate=5484.8kbits/s speed=15.6x elapsed=0:00:15.00    frame=14488 fps=935 q=-1.0 size=  162816KiB time=00:04:01.67 bitrate=5518.9kbits/s speed=15.6x elapsed=0:00:15.50    frame=14914 fps=932 q=-1.0 size=  167936KiB time=00:04:08.78 bitrate=5529.9kbits/s speed=15.5x elapsed=0:00:16.00    frame=15346 fps=930 q=-1.0 size=  173056KiB time=00:04:15.98 bitrate=5538.0kbits/s speed=15.5x elapsed=0:00:16.50    frame=15783 fps=928 q=-1.0 size=  176896KiB time=00:04:23.27 bitrate=5504.2kbits/s speed=15.5x elapsed=0:00:17.00    frame=16531 fps=944 q=-1.0 size=  184832KiB time=00:04:35.75 bitrate=5490.8kbits/s speed=15.8x elapsed=0:00:17.50    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=17248 fps=958 q=-1.0 size=  194560KiB time=00:04:47.72 bitrate=5539.5kbits/s speed=  16x elapsed=0:00:18.00    frame=18053 fps=976 q=-1.0 size=  209920KiB time=00:05:01.15 bitrate=5710.3kbits/s speed=16.3x elapsed=0:00:18.50    frame=18807 fps=990 q=-1.0 size=  224256KiB time=00:05:13.73 bitrate=5855.7kbits/s speed=16.5x elapsed=0:00:19.00    frame=19469 fps=998 q=-1.0 size=  231424KiB time=00:05:24.77 bitrate=5837.4kbits/s speed=16.7x elapsed=0:00:19.50    frame=20159 fps=1008 q=-1.0 size=  238080KiB time=00:05:36.28 bitrate=5799.7kbits/s speed=16.8x elapsed=0:00:20.00    frame=20729 fps=1011 q=-1.0 size=  246016KiB time=00:05:45.79 bitrate=5828.2kbits/s speed=16.9x elapsed=0:00:20.50    frame=21172 fps=1008 q=-1.0 size=  251904KiB time=00:05:53.18 bitrate=5842.8kbits/s speed=16.8x elapsed=0:00:21.00    frame=21633 fps=1006 q=-1.0 size=  257280KiB time=00:06:00.87 bitrate=5840.3kbits/s speed=16.8x elapsed=0:00:21.50    frame=22053 fps=1002 q=-1.0 size=  264192KiB time=00:06:07.88 bitrate=5883.0kbits/s speed=16.7x elapsed=0:00:22.00    frame=22565 fps=1003 q=-1.0 size=  273408KiB time=00:06:16.42 bitrate=5950.1kbits/s speed=16.7x elapsed=0:00:22.50    frame=23198 fps=1008 q=-1.0 size=  281088KiB time=00:06:26.98 bitrate=5950.3kbits/s speed=16.8x elapsed=0:00:23.00    frame=23911 fps=1017 q=-1.0 size=  292608KiB time=00:06:38.88 bitrate=6009.4kbits/s speed=  17x elapsed=0:00:23.50    frame=24527 fps=1022 q=-1.0 size=  301312KiB time=00:06:49.15 bitrate=6032.7kbits/s speed=  17x elapsed=0:00:24.00    frame=25154 fps=1027 q=-1.0 size=  310272KiB time=00:06:59.61 bitrate=6057.3kbits/s speed=17.1x elapsed=0:00:24.50    frame=25620 fps=1025 q=-1.0 size=  315648KiB time=00:07:07.39 bitrate=6050.1kbits/s speed=17.1x elapsed=0:00:25.00    frame=26127 fps=1024 q=-1.0 size=  321024KiB time=00:07:15.85 bitrate=6033.8kbits/s speed=17.1x elapsed=0:00:25.50    frame=26668 fps=1026 q=-1.0 size=  327424KiB time=00:07:24.87 bitrate=6029.2kbits/s speed=17.1x elapsed=0:00:26.00    frame=27191 fps=1026 q=-1.0 size=  334080KiB time=00:07:33.60 bitrate=6033.4kbits/s speed=17.1x elapsed=0:00:26.50    frame=27698 fps=1026 q=-1.0 size=  339456KiB time=00:07:42.06 bitrate=6018.3kbits/s speed=17.1x elapsed=0:00:27.00    frame=28210 fps=1026 q=-1.0 size=  345600KiB time=00:07:50.60 bitrate=6016.0kbits/s speed=17.1x elapsed=0:00:27.50    frame=28653 fps=1023 q=-1.0 size=  350720KiB time=00:07:57.99 bitrate=6010.7kbits/s speed=17.1x elapsed=0:00:28.00    frame=29153 fps=1023 q=-1.0 size=  355584KiB time=00:08:06.33 bitrate=5989.6kbits/s speed=17.1x elapsed=0:00:28.50    frame=29723 fps=1025 q=-1.0 size=  362240KiB time=00:08:15.84 bitrate=5984.7kbits/s speed=17.1x elapsed=0:00:29.00    frame=30241 fps=1025 q=-1.0 size=  368896KiB time=00:08:24.48 bitrate=5990.2kbits/s speed=17.1x elapsed=0:00:29.50    frame=30828 fps=1027 q=-1.0 size=  376576KiB time=00:08:34.28 bitrate=5998.5kbits/s speed=17.1x elapsed=0:00:30.00    frame=31305 fps=1026 q=-1.0 size=  383744KiB time=00:08:42.23 bitrate=6019.5kbits/s speed=17.1x elapsed=0:00:30.50    frame=31731 fps=1023 q=-1.0 size=  390656KiB time=00:08:49.34 bitrate=6045.7kbits/s speed=17.1x elapsed=0:00:31.00    frame=32266 fps=1024 q=-1.0 size=  411136KiB time=00:08:58.27 bitrate=6257.1kbits/s speed=17.1x elapsed=0:00:31.50    frame=32698 fps=1022 q=-1.0 size=  411648KiB time=00:09:05.47 bitrate=6182.1kbits/s speed=  17x elapsed=0:00:32.00    frame=33227 fps=1022 q=-1.0 size=  418560KiB time=00:09:14.30 bitrate=6185.9kbits/s speed=17.1x elapsed=0:00:32.50    frame=33826 fps=1025 q=-1.0 size=  430848KiB time=00:09:24.29 bitrate=6254.7kbits/s speed=17.1x elapsed=0:00:33.00    frame=34292 fps=1023 q=-1.0 size=  439040KiB time=00:09:32.07 bitrate=6287.0kbits/s speed=17.1x elapsed=0:00:33.50    frame=34856 fps=1025 q=-1.0 size=  448000KiB time=00:09:41.48 bitrate=6311.5kbits/s speed=17.1x elapsed=0:00:34.00    frame=35414 fps=1026 q=-1.0 size=  448512KiB time=00:09:50.79 bitrate=6219.1kbits/s speed=17.1x elapsed=0:00:34.50    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=35789 fps=1022 q=-1.0 size=  448768KiB time=00:09:57.04 bitrate=6157.5kbits/s speed=17.1x elapsed=0:00:35.00    frame=36353 fps=1024 q=-1.0 size=  454400KiB time=00:10:06.45 bitrate=6138.0kbits/s speed=17.1x elapsed=0:00:35.50    frame=36860 fps=1024 q=-1.0 size=  462336KiB time=00:10:14.91 bitrate=6159.3kbits/s speed=17.1x elapsed=0:00:36.00    frame=37400 fps=1024 q=-1.0 size=  468736KiB time=00:10:23.92 bitrate=6154.4kbits/s speed=17.1x elapsed=0:00:36.50    frame=37941 fps=1025 q=-1.0 size=  474880KiB time=00:10:32.95 bitrate=6146.2kbits/s speed=17.1x elapsed=0:00:37.00    frame=38396 fps=1024 q=-1.0 size=  481024KiB time=00:10:40.54 bitrate=6151.9kbits/s speed=17.1x elapsed=0:00:37.50    frame=38879 fps=1023 q=-1.0 size=  488704KiB time=00:10:48.59 bitrate=6172.5kbits/s speed=17.1x elapsed=0:00:38.00    frame=39581 fps=1028 q=-1.0 size=  495616KiB time=00:11:00.31 bitrate=6148.8kbits/s speed=17.1x elapsed=0:00:38.50    frame=40151 fps=1029 q=-1.0 size=  503552KiB time=00:11:09.82 bitrate=6158.5kbits/s speed=17.2x elapsed=0:00:39.00    frame=40646 fps=1029 q=-1.0 size=  508160KiB time=00:11:18.07 bitrate=6139.2kbits/s speed=17.2x elapsed=0:00:39.50    frame=41170 fps=1029 q=-1.0 size=  513024KiB time=00:11:26.82 bitrate=6119.1kbits/s speed=17.2x elapsed=0:00:40.00    frame=41768 fps=1031 q=-1.0 size=  521216KiB time=00:11:36.79 bitrate=6127.8kbits/s speed=17.2x elapsed=0:00:40.50    frame=42257 fps=1030 q=-1.0 size=  531200KiB time=00:11:44.95 bitrate=6172.9kbits/s speed=17.2x elapsed=0:00:41.00    frame=42717 fps=1029 q=-1.0 size=  537856KiB time=00:11:52.62 bitrate=6182.9kbits/s speed=17.2x elapsed=0:00:41.50    frame=43230 fps=1029 q=-1.0 size=  545792KiB time=00:12:01.18 bitrate=6199.7kbits/s speed=17.2x elapsed=0:00:42.00    frame=43753 fps=1029 q=-1.0 size=  554752KiB time=00:12:09.91 bitrate=6226.1kbits/s speed=17.2x elapsed=0:00:42.50    frame=44288 fps=1030 q=-1.0 size=  562944KiB time=00:12:18.83 bitrate=6241.7kbits/s speed=17.2x elapsed=0:00:43.00    frame=44823 fps=1030 q=-1.0 size=  574208KiB time=00:12:27.76 bitrate=6290.6kbits/s speed=17.2x elapsed=0:00:43.50    frame=45301 fps=1029 q=-1.0 size=  581376KiB time=00:12:35.73 bitrate=6302.0kbits/s speed=17.2x elapsed=0:00:44.00    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=45869 fps=1031 q=-1.0 size=  589312KiB time=00:12:45.21 bitrate=6308.9kbits/s speed=17.2x elapsed=0:00:44.50    frame=46513 fps=1033 q=-1.0 size=  598272KiB time=00:12:55.96 bitrate=6316.1kbits/s speed=17.2x elapsed=0:00:45.00    frame=47267 fps=1039 q=-1.0 size=  606976KiB time=00:13:08.53 bitrate=6305.8kbits/s speed=17.3x elapsed=0:00:45.50    frame=47900 fps=1041 q=-1.0 size=  610816KiB time=00:13:19.10 bitrate=6261.8kbits/s speed=17.4x elapsed=0:00:46.00    frame=48545 fps=1044 q=-1.0 size=  615936KiB time=00:13:29.86 bitrate=6230.4kbits/s speed=17.4x elapsed=0:00:46.50    frame=49678 fps=1057 q=-1.0 size=  626432KiB time=00:13:48.76 bitrate=6192.0kbits/s speed=17.6x elapsed=0:00:47.00    frame=50875 fps=1071 q=-1.0 size=  637440KiB time=00:14:08.73 bitrate=6152.6kbits/s speed=17.9x elapsed=0:00:47.50    frame=51629 fps=1075 q=-1.0 size=  645376KiB time=00:14:21.31 bitrate=6138.2kbits/s speed=17.9x elapsed=0:00:48.00    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=52385 fps=1080 q=-1.0 size=  652032KiB time=00:14:33.92 bitrate=6112.0kbits/s speed=  18x elapsed=0:00:48.50    frame=52885 fps=1079 q=-1.0 size=  659712KiB time=00:14:42.26 bitrate=6125.5kbits/s speed=  18x elapsed=0:00:49.00    frame=53426 fps=1079 q=-1.0 size=  668416KiB time=00:14:51.29 bitrate=6143.5kbits/s speed=  18x elapsed=0:00:49.50    frame=54082 fps=1081 q=-1.0 size=  681216KiB time=00:15:02.23 bitrate=6185.2kbits/s speed=  18x elapsed=0:00:50.00    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=54647 fps=1082 q=-1.0 size=  691456KiB time=00:15:11.66 bitrate=6213.3kbits/s speed=  18x elapsed=0:00:50.50    frame=55159 fps=1081 q=-1.0 size=  701440KiB time=00:15:20.20 bitrate=6244.5kbits/s speed=  18x elapsed=0:00:51.00    frame=55740 fps=1082 q=-1.0 size=  708608KiB time=00:15:29.89 bitrate=6242.5kbits/s speed=18.1x elapsed=0:00:51.50    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 1 times
-frame=56678 fps=1090 q=-1.0 size=  713984KiB time=00:15:45.54 bitrate=6185.8kbits/s speed=18.2x elapsed=0:00:52.00    frame=57784 fps=1100 q=-1.0 size=  729600KiB time=00:16:03.99 bitrate=6200.1kbits/s speed=18.4x elapsed=0:00:52.50    frame=58320 fps=1100 q=-1.0 size=  734976KiB time=00:16:12.94 bitrate=6188.4kbits/s speed=18.4x elapsed=0:00:53.00    frame=58842 fps=1100 q=-1.0 size=  743680KiB time=00:16:21.64 bitrate=6206.1kbits/s speed=18.3x elapsed=0:00:53.50    frame=59377 fps=1099 q=-1.0 size=  750336KiB time=00:16:30.57 bitrate=6205.2kbits/s speed=18.3x elapsed=0:00:54.00    frame=60106 fps=1103 q=-1.0 size=  760832KiB time=00:16:42.73 bitrate=6215.7kbits/s speed=18.4x elapsed=0:00:54.50    frame=60868 fps=1107 q=-1.0 size=  770304KiB time=00:16:55.45 bitrate=6214.3kbits/s speed=18.5x elapsed=0:00:55.00    frame=61448 fps=1107 q=-1.0 size=  779008KiB time=00:17:05.12 bitrate=6225.2kbits/s speed=18.5x elapsed=0:00:55.50    frame=62086 fps=1108 q=-1.0 size=  787968KiB time=00:17:15.77 bitrate=6232.1kbits/s speed=18.5x elapsed=0:00:56.00    frame=62697 fps=1110 q=-1.0 size=  795648KiB time=00:17:25.96 bitrate=6231.5kbits/s speed=18.5x elapsed=0:00:56.50    frame=63385 fps=1112 q=-1.0 size=  810496KiB time=00:17:37.44 bitrate=6278.9kbits/s speed=18.5x elapsed=0:00:57.00    frame=64142 fps=1115 q=-1.0 size=  825344KiB time=00:17:50.07 bitrate=6318.5kbits/s speed=18.6x elapsed=0:00:57.50    frame=64702 fps=1115 q=-1.0 size=  837376KiB time=00:17:59.41 bitrate=6355.1kbits/s speed=18.6x elapsed=0:00:58.00    frame=65327 fps=1117 q=-1.0 size=  849920KiB time=00:18:09.84 bitrate=6388.6kbits/s speed=18.6x elapsed=0:00:58.50    frame=66354 fps=1124 q=-1.0 size=  870656KiB time=00:18:26.97 bitrate=6443.2kbits/s speed=18.8x elapsed=0:00:59.00    frame=66843 fps=1123 q=-1.0 size=  878080KiB time=00:18:35.13 bitrate=6450.6kbits/s speed=18.7x elapsed=0:00:59.50    frame=67348 fps=1122 q=-1.0 size=  890112KiB time=00:18:43.55 bitrate=6489.9kbits/s speed=18.7x elapsed=0:01:00.00    frame=67922 fps=1122 q=-1.0 size=  899072KiB time=00:18:53.13 bitrate=6499.8kbits/s speed=18.7x elapsed=0:01:00.50    frame=68575 fps=1124 q=-1.0 size=  908544KiB time=00:19:04.02 bitrate=6505.8kbits/s speed=18.8x elapsed=0:01:01.00    frame=69394 fps=1128 q=-1.0 size=  922112KiB time=00:19:17.69 bitrate=6525.0kbits/s speed=18.8x elapsed=0:01:01.50    frame=70207 fps=1132 q=-1.0 size=  932608KiB time=00:19:31.25 bitrate=6522.9kbits/s speed=18.9x elapsed=0:01:02.00    frame=70834 fps=1133 q=-1.0 size=  941824KiB time=00:19:41.71 bitrate=6529.0kbits/s speed=18.9x elapsed=0:01:02.50    frame=71438 fps=1134 q=-1.0 size=  951808KiB time=00:19:51.79 bitrate=6542.4kbits/s speed=18.9x elapsed=0:01:03.01    frame=72094 fps=1135 q=-1.0 size=  962048KiB time=00:20:02.73 bitrate=6552.6kbits/s speed=18.9x elapsed=0:01:03.51    frame=72745 fps=1136 q=-1.0 size=  971264KiB time=00:20:13.59 bitrate=6556.2kbits/s speed=  19x elapsed=0:01:04.01    frame=73383 fps=1138 q=-1.0 size=  978944KiB time=00:20:24.24 bitrate=6550.6kbits/s speed=  19x elapsed=0:01:04.51    frame=74165 fps=1141 q=-1.0 size=  990464KiB time=00:20:37.28 bitrate=6557.8kbits/s speed=  19x elapsed=0:01:05.01    frame=75388 fps=1151 q=-1.0 size= 1007104KiB time=00:20:57.69 bitrate=6559.8kbits/s speed=19.2x elapsed=0:01:05.51    frame=76007 fps=1151 q=-1.0 size= 1032448KiB time=00:21:08.01 bitrate=6670.1kbits/s speed=19.2x elapsed=0:01:06.01    frame=76840 fps=1155 q=-1.0 size= 1044736KiB time=00:21:21.91 bitrate=6676.3kbits/s speed=19.3x elapsed=0:01:06.51    frame=77777 fps=1161 q=-1.0 size= 1079040KiB time=00:21:37.54 bitrate=6812.5kbits/s speed=19.4x elapsed=0:01:07.01    frame=78774 fps=1167 q=-1.0 size= 1095936KiB time=00:21:54.18 bitrate=6831.6kbits/s speed=19.5x elapsed=0:01:07.51    frame=79441 fps=1168 q=-1.0 size= 1104128KiB time=00:22:05.30 bitrate=6824.8kbits/s speed=19.5x elapsed=0:01:08.01    frame=80384 fps=1173 q=-1.0 size= 1116416KiB time=00:22:21.04 bitrate=6819.8kbits/s speed=19.6x elapsed=0:01:08.51    frame=81143 fps=1176 q=-1.0 size= 1127936KiB time=00:22:33.70 bitrate=6825.8kbits/s speed=19.6x elapsed=0:01:09.01    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=81805 fps=1177 q=-1.0 size= 1136896KiB time=00:22:44.74 bitrate=6824.3kbits/s speed=19.6x elapsed=0:01:09.51    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=82409 fps=1177 q=-1.0 size= 1143552KiB time=00:22:54.83 bitrate=6813.9kbits/s speed=19.6x elapsed=0:01:10.01    frame=83462 fps=1184 q=-1.0 size= 1153280KiB time=00:23:12.40 bitrate=6785.2kbits/s speed=19.7x elapsed=0:01:10.51    frame=84596 fps=1191 q=-1.0 size= 1169152KiB time=00:23:31.31 bitrate=6786.3kbits/s speed=19.9x elapsed=0:01:11.01    frame=85281 fps=1193 q=-1.0 size= 1174016KiB time=00:23:42.74 bitrate=6759.8kbits/s speed=19.9x elapsed=0:01:11.51    frame=86149 fps=1196 q=-1.0 size= 1184000KiB time=00:23:57.22 bitrate=6748.6kbits/s speed=  20x elapsed=0:01:12.01    frame=87087 fps=1201 q=-1.0 size= 1198848KiB time=00:24:12.87 bitrate=6759.7kbits/s speed=  20x elapsed=0:01:12.51    frame=87715 fps=1201 q=-1.0 size= 1207296KiB time=00:24:23.35 bitrate=6758.6kbits/s speed=  20x elapsed=0:01:13.01    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=88280 fps=1201 q=-1.0 size= 1215488KiB time=00:24:32.78 bitrate=6760.9kbits/s speed=  20x elapsed=0:01:13.51    frame=88752 fps=1199 q=-1.0 size= 1222912KiB time=00:24:40.65 bitrate=6766.0kbits/s speed=  20x elapsed=0:01:14.01    frame=89188 fps=1197 q=-1.0 size= 1229568KiB time=00:24:47.92 bitrate=6769.6kbits/s speed=  20x elapsed=0:01:14.51    frame=89614 fps=1195 q=-1.0 size= 1232384KiB time=00:24:55.03 bitrate=6752.8kbits/s speed=19.9x elapsed=0:01:15.01    frame=90116 fps=1193 q=-1.0 size= 1238016KiB time=00:25:03.41 bitrate=6745.9kbits/s speed=19.9x elapsed=0:01:15.51    frame=90650 fps=1193 q=-1.0 size= 1243648KiB time=00:25:12.32 bitrate=6736.6kbits/s speed=19.9x elapsed=0:01:16.01    frame=91144 fps=1191 q=-1.0 size= 1248512KiB time=00:25:20.56 bitrate=6726.3kbits/s speed=19.9x elapsed=0:01:16.51    frame=91669 fps=1190 q=-1.0 size= 1254656KiB time=00:25:29.32 bitrate=6720.7kbits/s speed=19.9x elapsed=0:01:17.01    frame=92199 fps=1189 q=-1.0 size= 1261056KiB time=00:25:38.16 bitrate=6716.2kbits/s speed=19.8x elapsed=0:01:17.51    frame=92735 fps=1189 q=-1.0 size= 1268992KiB time=00:25:47.10 bitrate=6719.4kbits/s speed=19.8x elapsed=0:01:18.01    frame=93271 fps=1188 q=-1.0 size= 1275392KiB time=00:25:56.04 bitrate=6714.5kbits/s speed=19.8x elapsed=0:01:18.51    frame=93813 fps=1187 q=-1.0 size= 1282048KiB time=00:26:05.09 bitrate=6710.5kbits/s speed=19.8x elapsed=0:01:19.01    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 2 times
-frame=95694 fps=1204 q=-1.0 size= 1297920KiB time=00:26:36.48 bitrate=6660.0kbits/s speed=20.1x elapsed=0:01:19.51    frame=96956 fps=1212 q=-1.0 size= 1310720KiB time=00:26:57.53 bitrate=6638.1kbits/s speed=20.2x elapsed=0:01:20.01    frame=97614 fps=1212 q=-1.0 size= 1314560KiB time=00:27:08.51 bitrate=6612.7kbits/s speed=20.2x elapsed=0:01:20.51    frame=98089 fps=1211 q=-1.0 size= 1318912KiB time=00:27:16.43 bitrate=6602.5kbits/s speed=20.2x elapsed=0:01:21.01    frame=98537 fps=1209 q=-1.0 size= 1321728KiB time=00:27:23.91 bitrate=6586.5kbits/s speed=20.2x elapsed=0:01:21.51    frame=99005 fps=1207 q=-1.0 size= 1325824KiB time=00:27:31.72 bitrate=6575.7kbits/s speed=20.1x elapsed=0:01:22.01    frame=99428 fps=1205 q=-1.0 size= 1330944KiB time=00:27:38.77 bitrate=6573.0kbits/s speed=20.1x elapsed=0:01:22.51    frame=99867 fps=1203 q=-1.0 size= 1338112KiB time=00:27:46.10 bitrate=6579.3kbits/s speed=20.1x elapsed=0:01:23.01    frame=100312 fps=1201 q=-1.0 size= 1352448KiB time=00:27:53.52 bitrate=6620.3kbits/s speed=  20x elapsed=0:01:23.51    frame=100760 fps=1199 q=-1.0 size= 1356544KiB time=00:28:01.00 bitrate=6610.8kbits/s speed=  20x elapsed=0:01:24.01    frame=101210 fps=1198 q=-1.0 size= 1361152KiB time=00:28:08.50 bitrate=6603.8kbits/s speed=  20x elapsed=0:01:24.51    frame=101658 fps=1196 q=-1.0 size= 1364992KiB time=00:28:15.98 bitrate=6593.2kbits/s speed=19.9x elapsed=0:01:25.01    [matroska,webm @ 0x55f5f3dc70c0] Auto-inserting h264_mp4toannexb bitstream filter
-frame=102096 fps=1194 q=-1.0 size= 1367552KiB time=00:28:23.29 bitrate=6577.3kbits/s speed=19.9x elapsed=0:01:25.51    frame=102583 fps=1193 q=-1.0 size= 1369088KiB time=00:28:31.41 bitrate=6553.4kbits/s speed=19.9x elapsed=0:01:26.01    frame=103066 fps=1191 q=-1.0 size= 1370624KiB time=00:28:39.47 bitrate=6530.0kbits/s speed=19.9x elapsed=0:01:26.51    frame=103605 fps=1191 q=-1.0 size= 1373184KiB time=00:28:48.46 bitrate=6508.2kbits/s speed=19.9x elapsed=0:01:27.01    frame=104235 fps=1191 q=-1.0 size= 1375744KiB time=00:28:58.97 bitrate=6480.9kbits/s speed=19.9x elapsed=0:01:27.51    frame=104700 fps=1190 q=-1.0 size= 1377280KiB time=00:29:06.73 bitrate=6459.3kbits/s speed=19.8x elapsed=0:01:28.01    frame=105199 fps=1188 q=-1.0 size= 1380352KiB time=00:29:15.05 bitrate=6443.0kbits/s speed=19.8x elapsed=0:01:28.51    frame=105574 fps=1186 q=-1.0 size= 1381120KiB time=00:29:21.31 bitrate=6423.7kbits/s speed=19.8x elapsed=0:01:29.01    frame=105950 fps=1184 q=-1.0 size= 1382400KiB time=00:29:27.58 bitrate=6406.8kbits/s speed=19.7x elapsed=0:01:29.51    frame=106465 fps=1183 q=-1.0 size= 1383680KiB time=00:29:36.18 bitrate=6381.7kbits/s speed=19.7x elapsed=0:01:30.01    frame=107022 fps=1182 q=-1.0 size= 1385216KiB time=00:29:45.47 bitrate=6355.6kbits/s speed=19.7x elapsed=0:01:30.51    frame=107654 fps=1183 q=-1.0 size= 1387776KiB time=00:29:56.01 bitrate=6329.9kbits/s speed=19.7x elapsed=0:01:31.01    frame=108241 fps=1183 q=-1.0 size= 1390080KiB time=00:30:05.81 bitrate=6306.1kbits/s speed=19.7x elapsed=0:01:31.51    frame=108717 fps=1182 q=-1.0 size= 1391872KiB time=00:30:13.75 bitrate=6286.5kbits/s speed=19.7x elapsed=0:01:32.01    frame=109180 fps=1180 q=-1.0 size= 1394176KiB time=00:30:21.47 bitrate=6270.2kbits/s speed=19.7x elapsed=0:01:32.51    frame=109719 fps=1180 q=-1.0 size= 1396736KiB time=00:30:30.46 bitrate=6250.9kbits/s speed=19.7x elapsed=0:01:33.01    frame=110248 fps=1179 q=-1.0 size= 1398528KiB time=00:30:39.29 bitrate=6228.9kbits/s speed=19.7x elapsed=0:01:33.51    frame=110820 fps=1179 q=-1.0 size= 1400832KiB time=00:30:48.83 bitrate=6206.9kbits/s speed=19.7x elapsed=0:01:34.01    frame=111347 fps=1178 q=-1.0 size= 1402880KiB time=00:30:57.62 bitrate=6186.6kbits/s speed=19.7x elapsed=0:01:34.51    frame=111822 fps=1177 q=-1.0 size= 1404416KiB time=00:31:05.55 bitrate=6167.1kbits/s speed=19.6x elapsed=0:01:35.01    frame=112307 fps=1176 q=-1.0 size= 1406720KiB time=00:31:13.64 bitrate=6150.5kbits/s speed=19.6x elapsed=0:01:35.51    frame=112873 fps=1176 q=-1.0 size= 1408768KiB time=00:31:23.08 bitrate=6128.6kbits/s speed=19.6x elapsed=0:01:36.01    frame=113435 fps=1175 q=-1.0 size= 1410304KiB time=00:31:32.46 bitrate=6104.9kbits/s speed=19.6x elapsed=0:01:36.51    frame=113842 fps=1173 q=-1.0 size= 1412352KiB time=00:31:39.25 bitrate=6091.9kbits/s speed=19.6x elapsed=0:01:37.01    frame=114218 fps=1171 q=-1.0 size= 1413376KiB time=00:31:45.52 bitrate=6076.2kbits/s speed=19.5x elapsed=0:01:37.51    frame=114728 fps=1171 q=-1.0 size= 1415680KiB time=00:31:54.03 bitrate=6059.1kbits/s speed=19.5x elapsed=0:01:38.01    frame=115478 fps=1172 q=-1.0 size= 1419008KiB time=00:32:06.54 bitrate=6033.9kbits/s speed=19.6x elapsed=0:01:38.51    frame=115941 fps=1171 q=-1.0 size= 1420800KiB time=00:32:14.27 bitrate=6017.4kbits/s speed=19.5x elapsed=0:01:39.01    frame=116709 fps=1173 q=-1.0 size= 1424128KiB time=00:32:27.08 bitrate=5991.8kbits/s speed=19.6x elapsed=0:01:39.51    frame=117204 fps=1172 q=-1.0 size= 1425920KiB time=00:32:35.34 bitrate=5974.0kbits/s speed=19.6x elapsed=0:01:40.01    frame=117853 fps=1172 q=-1.0 size= 1428992KiB time=00:32:46.17 bitrate=5953.9kbits/s speed=19.6x elapsed=0:01:40.51    frame=118424 fps=1172 q=-1.0 size= 1431040KiB time=00:32:55.69 bitrate=5933.6kbits/s speed=19.6x elapsed=0:01:41.01    frame=118843 fps=1171 q=-1.0 size= 1432576KiB time=00:33:02.68 bitrate=5919.1kbits/s speed=19.5x elapsed=0:01:41.51    frame=119242 fps=1169 q=-1.0 size= 1434368KiB time=00:33:09.34 bitrate=5906.6kbits/s speed=19.5x elapsed=0:01:42.01    frame=119643 fps=1167 q=-1.0 size= 1435392KiB time=00:33:16.03 bitrate=5891.1kbits/s speed=19.5x elapsed=0:01:42.51    frame=120086 fps=1166 q=-1.0 size= 1437184KiB time=00:33:23.42 bitrate=5876.6kbits/s speed=19.4x elapsed=0:01:43.01    frame=120790 fps=1167 q=-1.0 size= 1440000KiB time=00:33:35.16 bitrate=5853.8kbits/s speed=19.5x elapsed=0:01:43.51    frame=121338 fps=1167 q=-1.0 size= 1441536KiB time=00:33:44.31 bitrate=5833.6kbits/s speed=19.5x elapsed=0:01:44.01    frame=122161 fps=1169 q=-1.0 size= 1444608KiB time=00:33:58.04 bitrate=5806.7kbits/s speed=19.5x elapsed=0:01:44.51    frame=122544 fps=1167 q=-1.0 size= 1446400KiB time=00:34:04.43 bitrate=5795.7kbits/s speed=19.5x elapsed=0:01:45.01    frame=122896 fps=1165 q=-1.0 size= 1448192KiB time=00:34:10.30 bitrate=5786.3kbits/s speed=19.4x elapsed=0:01:45.51    frame=123240 fps=1162 q=-1.0 size= 1449216KiB time=00:34:16.04 bitrate=5774.2kbits/s speed=19.4x elapsed=0:01:46.01    frame=123602 fps=1160 q=-1.0 size= 1450496KiB time=00:34:22.08 bitrate=5762.4kbits/s speed=19.4x elapsed=0:01:46.51    frame=123981 fps=1159 q=-1.0 size= 1452544KiB time=00:34:28.40 bitrate=5752.9kbits/s speed=19.3x elapsed=0:01:47.01    frame=124373 fps=1157 q=-1.0 size= 1454336KiB time=00:34:34.94 bitrate=5741.8kbits/s speed=19.3x elapsed=0:01:47.51    frame=124852 fps=1156 q=-1.0 size= 1455872KiB time=00:34:42.93 bitrate=5725.8kbits/s speed=19.3x elapsed=0:01:48.01    frame=125338 fps=1155 q=-1.0 size= 1457664KiB time=00:34:51.04 bitrate=5710.6kbits/s speed=19.3x elapsed=0:01:48.51    frame=125828 fps=1154 q=-1.0 size= 1460224KiB time=00:34:59.22 bitrate=5698.4kbits/s speed=19.3x elapsed=0:01:49.01    frame=126315 fps=1153 q=-1.0 size= 1462016KiB time=00:35:07.34 bitrate=5683.4kbits/s speed=19.2x elapsed=0:01:49.51    frame=126792 fps=1152 q=-1.0 size= 1464064KiB time=00:35:15.30 bitrate=5669.9kbits/s speed=19.2x elapsed=0:01:50.01    frame=127229 fps=1151 q=-1.0 size= 1465600KiB time=00:35:22.59 bitrate=5656.4kbits/s speed=19.2x elapsed=0:01:50.51    frame=127626 fps=1150 q=-1.0 size= 1467392KiB time=00:35:29.21 bitrate=5645.7kbits/s speed=19.2x elapsed=0:01:51.01    frame=128034 fps=1148 q=-1.0 size= 1468928KiB time=00:35:36.02 bitrate=5633.6kbits/s speed=19.2x elapsed=0:01:51.51    frame=128426 fps=1146 q=-1.0 size= 1469696KiB time=00:35:42.56 bitrate=5619.3kbits/s speed=19.1x elapsed=0:01:52.01    frame=128922 fps=1146 q=-1.0 size= 1472000KiB time=00:35:50.83 bitrate=5606.5kbits/s speed=19.1x elapsed=0:01:52.51    frame=129361 fps=1145 q=-1.0 size= 1473792KiB time=00:35:58.16 bitrate=5594.3kbits/s speed=19.1x elapsed=0:01:53.01    frame=129773 fps=1143 q=-1.0 size= 1475584KiB time=00:36:05.03 bitrate=5583.3kbits/s speed=19.1x elapsed=0:01:53.51    frame=130165 fps=1142 q=-1.0 size= 1476608KiB time=00:36:11.57 bitrate=5570.3kbits/s speed=  19x elapsed=0:01:54.01    frame=130563 fps=1140 q=-1.0 size= 1478656KiB time=00:36:18.21 bitrate=5561.0kbits/s speed=  19x elapsed=0:01:54.51    frame=130951 fps=1139 q=-1.0 size= 1479680KiB time=00:36:24.68 bitrate=5548.4kbits/s speed=  19x elapsed=0:01:55.01    frame=131339 fps=1137 q=-1.0 size= 1481728KiB time=00:36:31.16 bitrate=5539.7kbits/s speed=  19x elapsed=0:01:55.51    frame=131718 fps=1135 q=-1.0 size= 1483520KiB time=00:36:37.48 bitrate=5530.4kbits/s speed=18.9x elapsed=0:01:56.01    frame=132115 fps=1134 q=-1.0 size= 1484800KiB time=00:36:44.10 bitrate=5518.6kbits/s speed=18.9x elapsed=0:01:56.51    frame=132490 fps=1132 q=-1.0 size= 1486592KiB time=00:36:50.36 bitrate=5509.6kbits/s speed=18.9x elapsed=0:01:57.01    frame=132863 fps=1131 q=-1.0 size= 1487616KiB time=00:36:56.58 bitrate=5497.9kbits/s speed=18.9x elapsed=0:01:57.51    frame=133282 fps=1129 q=-1.0 size= 1489664KiB time=00:37:03.57 bitrate=5488.2kbits/s speed=18.8x elapsed=0:01:58.01    frame=133644 fps=1128 q=-1.0 size= 1490688KiB time=00:37:09.61 bitrate=5477.0kbits/s speed=18.8x elapsed=0:01:58.51    [mp4 @ 0x55f5f3dd0940] Starting second pass: moving the moov atom to the beginning of the file
-[out#0/mp4 @ 0x55f5f3e7a080] video:1375326KiB audio:116450KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.277604%
-frame=133833 fps=1120 q=-1.0 Lsize= 1495917KiB time=00:37:12.80 bitrate=5488.4kbits/s speed=18.7x elapsed=0:01:59.54    
-[aac @ 0x55f5f3df6c00] Qavg: 65535.746
-  lossless master -> /var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.7.mkv
-[matroska,webm @ 0x5649002f6040] Auto-inserting h264_mp4toannexb bitstream filter
-[aist#0:1/pcm_s24le @ 0x5649002fd7c0] Guessed Channel Layout: stereo
-Input #0, concat, from '/var/tmp/megacut-rjnmwlvk/segments.txt':
-  Duration: N/A, start: 0.000000, bitrate: N/A
-  Stream #0:0: Video: h264 (High), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 59.94 fps, 59.94 tbr, 1k tbn
-    Metadata:
-      ENCODER         : Lavc62.28.102 libx264
-      HANDLER_NAME    : VideoHandler
-      DURATION        : 00:01:41.201000000
-  Stream #0:1: Audio: pcm_s24le, 48000 Hz, stereo, s32 (24 bit), 2304 kb/s
-    Metadata:
-      ENCODER         : Lavc62.28.102 pcm_s24le
-      HANDLER_NAME    : SoundHandler
-      DURATION        : 00:01:41.200000000
-Stream mapping:
-  Stream #0:0 -> #0:0 (copy)
-  Stream #0:1 -> #0:1 (pcm_s24le (native) -> flac (native))
-[flac @ 0x5649003258c0] encoding as 24 bits-per-sample, more is considered experimental. Add -strict experimental if you want to encode more than 24 bits-per-sample
-Output #0, matroska, to '/var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.7.mkv':
-  Metadata:
-    encoder         : Lavf63.1.101
-  Stream #0:0: Video: h264 (High) (H264 / 0x34363248), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 59.94 fps, 59.94 tbr, 1k tbn
-    Metadata:
-      ENCODER         : Lavc62.28.102 libx264
-      HANDLER_NAME    : VideoHandler
-      DURATION        : 00:01:41.201000000
-  Stream #0:1: Audio: flac ([172][241][0][0] / 0xF1AC), 48000 Hz, stereo, s32 (24 bit), 128 kb/s
-    Metadata:
-      encoder         : Lavc63.1.101 flac
-      HANDLER_NAME    : SoundHandler
-      DURATION        : 00:01:41.200000000
-[matroska,webm @ 0x5649002f6040] Auto-inserting h264_mp4toannexb bitstream filter
-frame= 9160 fps=0.0 q=-1.0 size=  116480KiB time=00:02:32.78 bitrate=6245.4kbits/s speed= 306x elapsed=0:00:00.50    [matroska,webm @ 0x5649002f6040] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 1 times
-frame=22283 fps=22280 q=-1.0 size=  321024KiB time=00:06:11.72 bitrate=7074.7kbits/s speed= 372x elapsed=0:00:01.00    [matroska,webm @ 0x5649002f6040] Auto-inserting h264_mp4toannexb bitstream filter
-frame=36537 fps=24354 q=-1.0 size=  548608KiB time=00:10:09.62 bitrate=7372.1kbits/s speed= 406x elapsed=0:00:01.50    [matroska,webm @ 0x5649002f6040] Auto-inserting h264_mp4toannexb bitstream filter
-frame=51968 fps=25980 q=-1.0 size=  780544KiB time=00:14:27.06 bitrate=7374.5kbits/s speed= 433x elapsed=0:00:02.00    [matroska,webm @ 0x5649002f6040] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 3 times
-frame=66078 fps=26427 q=-1.0 size= 1034496KiB time=00:18:22.37 bitrate=7687.6kbits/s speed= 441x elapsed=0:00:02.50    frame=81331 fps=27106 q=-1.0 size= 1339136KiB time=00:22:36.84 bitrate=8085.1kbits/s speed= 452x elapsed=0:00:03.00    [matroska,webm @ 0x5649002f6040] Auto-inserting h264_mp4toannexb bitstream filter
-    Last message repeated 5 times
-frame=96396 fps=27537 q=-1.0 size= 1553408KiB time=00:26:48.19 bitrate=7912.9kbits/s speed= 459x elapsed=0:00:03.50    [matroska,webm @ 0x5649002f6040] Auto-inserting h264_mp4toannexb bitstream filter
-frame=112125 fps=28027 q=-1.0 size= 1693184KiB time=00:31:10.60 bitrate=7415.0kbits/s speed= 468x elapsed=0:00:04.00    frame=129302 fps=28729 q=-1.0 size= 1807104KiB time=00:35:57.17 bitrate=6862.6kbits/s speed= 479x elapsed=0:00:04.50    [out#0/matroska @ 0x5649003a9000] video:1375326KiB audio:462075KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.061448%
-frame=133833 fps=28888 q=-1.0 Lsize= 1838531KiB time=00:37:12.80 bitrate=6745.4kbits/s speed= 482x elapsed=0:00:04.63    
-farm[seg009]: verify ok — seg009.mkv 421.004s h264 1920x1080
-wrote /var/home/jorge/Videos/Wolves/megacut/seven-days-to-the-wolves-v3.7.mp4

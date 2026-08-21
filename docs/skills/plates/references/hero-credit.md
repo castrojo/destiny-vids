@@ -66,7 +66,7 @@ step.
 
 ```bash
 python3 -m pytest -q tests/test_credits.py
-python3 scripts/build_credits.py --cards --master
+python3 scripts/build_credits.py --cards-only
 python3 tools/deliver.py publish --act VIII
 ```
 

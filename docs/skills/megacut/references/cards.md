@@ -40,4 +40,3 @@ The plan is an ordered list of two kinds of item:
 `audio` has no default **on purpose**. A clip that silently defaulted to
 silence would ship a mute segment that looks fine in every log, so the tool
 refuses a clip that does not say which it is.
-

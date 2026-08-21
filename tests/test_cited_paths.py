@@ -1,4 +1,4 @@
-"""A repo path named in a committed record or doc must actually exist.
+"""A repo path named outside fenced Markdown examples must actually exist.
 
 `tests/test_doc_links.py` checks relative *Markdown links*. It does not see a
 path cited in prose -- inside a JSON `_note`, a module docstring, a comment --
@@ -43,6 +43,7 @@ CITATION = re.compile(
     r"(?<![\w/.-])((?:" + "|".join(CITED_DIRS) + r")/[A-Za-z0-9_./-]+"
     r"\.(?:json|jsonl|py|yaml|yml|md|sh|mjs|js|html|css|png|webp|srt|vtt))\b"
 )
+FENCED_BLOCK = re.compile(r"^(```|~~~).*?^\1\s*$", re.MULTILINE | re.DOTALL)
 
 # Trees that are searched for citations.
 SEARCH_DIRS = ("docs", "scripts", "stories", "tools", "vocab", "videos",
@@ -72,34 +73,17 @@ ALLOWED_MISSING = {
         "ENTRY when #226 lands.",
 }
 
-# The 2026-08-19 common-documentation-alignment plan and spec PROPOSE these
-# files; a design doc names what it would create, and the name is the
-# proposal. None of them exist until the plan is implemented -- remove each
-# entry as its file lands, or the whole set when the plan tree is filed and
-# deleted.
-_PLAN = ("proposed by docs/superpowers/plans|specs "
-         "2026-08-19-common-documentation-alignment -- the file is the "
-         "proposal and does not exist yet")
+# The 2026-08-19 common-documentation-alignment plan and spec named these as
+# worked examples; the docs that cite them mean "a file shaped like this",
+# not a file that exists. The plan tree itself was pruned in #300 and the
+# proposal's real files have all landed since.
+_PLAN = ("a worked example in the common-layout skill docs -- the name is "
+         "the illustration and the file does not exist")
 ALLOWED_MISSING.update({
     "docs/skills/demo-skill.md": _PLAN + " (a worked example)",
     "docs/skills/foo.md": _PLAN + " (a worked example)",
     "docs/skills/foo/SKILL.md": _PLAN + " (a worked example)",
     "docs/skills/wrong.md": _PLAN + " (a worked counterexample)",
-    "docs/skills/index.json": _PLAN,
-    "docs/skills/index.md": _PLAN,
-    "docs/skills/index.schema.json": _PLAN,
-    "docs/skills/audio/references/delivery-gates.md": _PLAN,
-    "docs/skills/audio/references/source-quality.md": _PLAN,
-    "docs/skills/megacut/references/delivery.md": _PLAN,
-    "docs/skills/megacut/references/verification.md": _PLAN,
-    "docs/skills/plates/references/binding-conflicts.md": _PLAN,
-    "docs/skills/production/references/freshness.md": _PLAN,
-    "scripts/check-doc-links.sh": _PLAN,
-    "scripts/check-skill-frontmatter.sh": _PLAN,
-    "scripts/check-skill-index.sh": _PLAN,
-    "scripts/generate_skill_index.py": _PLAN,
-    "tests/test_skill_catalog.py": _PLAN,
-    "tests/test_skill_contract.py": _PLAN,
 })
 
 
@@ -121,6 +105,10 @@ def _searched_files():
     return seen
 
 
+def _cited_text(path: Path, text: str) -> str:
+    return FENCED_BLOCK.sub("", text) if path.suffix == ".md" else text
+
+
 @pytest.mark.parametrize("path", _searched_files(),
                          ids=lambda p: str(p.relative_to(REPO_ROOT)))
 def test_every_cited_repo_path_resolves(path):
@@ -130,7 +118,7 @@ def test_every_cited_repo_path_resolves(path):
         pytest.skip("not text")
 
     missing = sorted({
-        cited for cited in CITATION.findall(text)
+        cited for cited in CITATION.findall(_cited_text(path, text))
         if cited not in ALLOWED_MISSING and not (REPO_ROOT / cited).exists()
     })
 
@@ -168,3 +156,14 @@ def test_the_gate_ignores_gitignored_build_outputs():
     """`renders/` is a build output; citing one is not a broken citation."""
     text = "Output: renders/plates-megacut-cards/plate_scream.png -- a still."
     assert CITATION.findall(text) == []
+
+
+def test_the_gate_ignores_fenced_markdown_examples():
+    text = """\
+The record lives elsewhere.
+
+```python
+record = "stories/megacut/example-only.json"
+```
+"""
+    assert CITATION.findall(_cited_text(Path("guide.md"), text)) == []

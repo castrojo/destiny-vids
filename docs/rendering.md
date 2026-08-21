@@ -419,8 +419,8 @@ Two consequences worth stating:
 
 ### Two ways this pass has silently produced an unplated video
 
-Both exited 0 and wrote a file of the right length. Neither is theoretical —
-act II shipped both, and they are now pinned by tests that inspect the argv.
+Both exit 0 and write a file of the right length, and both are pinned by
+tests that inspect the argv.
 
 **Shell quotes in an argv list.** `enable='between(t,1,2)'` is the spelling the
 ffmpeg docs use, and it is correct *on a command line*, where the shell strips
@@ -498,6 +498,11 @@ a stub command in. Resolution is the part that raises:
 ```python
 render.render(shots, media, out, ffmpeg=["ffmpeg-not-invoked"])
 ```
+
+Resolution is also what a *fake* has to cover. Faking the function that uses a
+binary is not enough when something resolves the binary before calling it —
+see [`testing`](skills/testing.md), which also carries the `PATH` sandbox that
+reproduces the runner locally in fifty seconds.
 
 ## Sources
 
