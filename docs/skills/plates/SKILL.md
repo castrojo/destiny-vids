@@ -1,7 +1,7 @@
 ---
 name: plates
-version: "1.0"
-last_updated: "2026-08-20"
+version: "1.1"
+last_updated: "2026-08-21"
 id: plates
 one_line_purpose: Render authored identity and dialogue cards without inventing copy.
 entry_point: docs/skills/plates/SKILL.md
@@ -88,6 +88,22 @@ A Guardian nameplate carries **exactly**:
 The deck's other authored shapes are the title card (`title`, `subtitle`, `body[]`) and the **chat card** (`speaker`, `text`) — see [`references/conversation-cards.md`](references/conversation-cards.md).
 
 Keep chat `text` verbatim. For owner-requested censors, use the Kubernetes helm only for an `o`, an asterisk for other letters, and no unrequested censorship; the complete data contract is in [`references/conversation-cards.md`](references/conversation-cards.md).
+
+### The GitHub login is the identity, not the name
+
+Owner, on finding the show inconsistent: *"all of the nameplates are
+inconsistent all over the show, ensure that people have proper nameplates
+(github is the source of truth) and assign proper metadata."*
+
+A binding's `github:` is what a plate resolves a person by, because a login is
+verifiable and a display name is not. `vocab/casting.yaml` carries the scar:
+`github.com/nimbatus` is an unrelated empty account while Laura Santamaria is
+`nimbinatus`, so binding her by the character string would have put a
+stranger's face on her credit.
+
+No login means the crest stands in and the gap is recorded — the correct
+outcome, and where `preethi` and Karena sit today. `github: null` with *"not
+an agent's to guess"* beside it is a decision already taken.
 
 ### Cinematic text that shares the frame with identity plates
 
@@ -199,6 +215,7 @@ This skill is the contract. The procedure lives in `references/`:
 | "The shot is only two seconds, so nobody can be plated there." | The plate rides across the cut. Only the *anchor* must be long enough to register. |
 | "I'll put a plausible name on the placeholder so it looks finished." | A plate names a real person. `TBD` is the honest answer until a roster exists. |
 | "No copy for this lead? Write them something." | Then the plate says what nobody wrote. Leave them in `unresolved` until the owner writes it. |
+| "Their GitHub handle is probably their name — I'll set `github:` to that." | A login is verifiable; a guess resolves to whoever holds the handle. `github.com/nimbatus` is a stranger's empty account, and Laura Santamaria is `nimbinatus`. Leave it null and let the crest stand in. |
 
 ## Red Flags
 
