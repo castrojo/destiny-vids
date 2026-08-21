@@ -33,6 +33,12 @@ skill forbids. Both of its fields are recovered, never authored here:
   source timecodes, the recovery method, and per-line `evidence` for who is
   speaking. Fix a wrong line **there**, not in a render.
 
+Owner-authored act conversations are moving to one Markdown file per
+chapter, `chapters/<act>.md` — see [`../../chapters.md`](../../chapters.md),
+whose table says which acts are migrated and where the rest of the copy
+still lives. What follows is the per-video record that convention seats
+against:
+
 Each video's conversation lives in its own folder, beside the Markdown the
 owner actually edits:
 

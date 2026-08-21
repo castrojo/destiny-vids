@@ -76,7 +76,8 @@ def test_the_login_is_nimbinatus_not_nimbatus():
 
 
 def test_the_redaction_scope_is_recorded():
-    """Same fields as cayde_signoff's card: what is redacted, and for how long."""
+    """Same fields as the retired cayde_signoff card carried: what is
+    redacted, and for how long."""
     assert BINDING["redacts"] == REAL_NAME
     scope = BINDING["redaction_scope"]
     assert "before VII" in scope

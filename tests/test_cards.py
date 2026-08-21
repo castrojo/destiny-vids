@@ -248,8 +248,10 @@ def test_the_title_card_covers_one_unbroken_window_beside_the_guardian_plates():
     assert abs(cover["at"] - 22.5) < 1e-6
     assert abs(cover["at"] + cover["dur"] - 36.0) < 1e-6
     # load_manifest already refused an overlap against the Guardian plates.
-    # Chrome rows (caption/context/warning) intentionally coexist with the
-    # full-frame cover by occupying their own screen lanes.
+    # Chrome rows (caption/context) intentionally coexist with the
+    # full-frame cover by occupying their own screen lanes; `warning` is
+    # itself full-frame, so it is held to the same no-overlap rule as the
+    # Guardian plates.
     plates = [e for e in entries if e["id"] != "title-cover"
               and e.get("kind") not in plate.CHROME_ROWS]
     assert all(p["at"] + p["dur"] <= cover["at"] + 1e-6

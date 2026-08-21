@@ -24,6 +24,7 @@ load **only** that skill, then act.
 | Score a cut to a music bed, pause the song mid-cut, or land a shot on a beat | [`scoring`](skills/scoring/SKILL.md) |
 | Meet the audio standard every delivered file is held to | [`audio`](skills/audio/SKILL.md) |
 | Put a name on screen — Guardian nameplates and title cards | [`plates`](skills/plates/SKILL.md) |
+| Add or re-time an act's chat dialogue in one Markdown file per chapter | [`chapters`](skills/chapters.md) |
 | Join the finished acts into one programme | [`megacut`](skills/megacut/SKILL.md) |
 | Apply a round of notes without rebuilding acts that were already right | [`review`](skills/review.md) |
 | Run a long encode on the ghost cluster instead of the laptop | [`farm`](skills/farm.md) |

@@ -229,16 +229,18 @@ def test_the_authored_handles_are_never_replaced_with_real_names():
         assert banned not in names
 
 
-def test_cayde_is_redacted_in_this_act_and_only_by_covering_a_known_name():
-    """The joke needs the audience not to be told yet.
+def test_caydes_signoff_stays_retired():
+    """Owner, 2026-08-20: "I don't want it in the movie."
 
-    A redaction only ever HIDES something this repo already knows -- the plate
-    it covers is recorded beside it -- and it is scoped to act II, because he
-    is revealed later in the programme.
+    The sign-off card and its one-line dialogue record are gone; this stops
+    the builder growing them back. The redaction joke itself lives on the
+    `cayde_6` casting binding and act VIII's Directed-by card, not here.
     """
-    assert "cayde_signoff" not in {p["id"] for p in committed()["plates"]}
-    assert build_efmb_plates.CAYDE["redacted_speaker"] == "[ REDACTED ]"
-    assert build_efmb_plates.CAYDE["reveals"] == "cayde_6"
+    assert not hasattr(build_efmb_plates, "CAYDE")
+    plates = committed()["plates"]
+    assert "cayde_signoff" not in {p["id"] for p in plates}
+    assert "proud of you kids" not in {
+        p.get("text", "") for p in plates}
 
 
 def test_nobody_is_credited_twice_with_two_different_faces():
@@ -866,7 +868,8 @@ def test_the_ogc_banner_keeps_its_top_lane_over_the_owner_conversation():
     late = late_plates()
     assert not any(key.startswith("letterbox_banner_") for key in late)
     top = [late[f"top_banner_ogc_{i}"] for i in (1, 2)]
-    assert all(b["kind"] == "banner" and b["position"] == "boss" for b in top)
+    assert all(b["kind"] == "banner" and b["position"] == "letterbox_top"
+               for b in top)
     assert all(b["text"] == (
         "#UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | "
         "#UPSTREAMFIRST") for b in top)

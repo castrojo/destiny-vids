@@ -111,6 +111,18 @@ def correct_delivered_peak(out_path, gain, target_dbtp, rerun, ffmpeg=None,
     gain0, previous = gain, None
     for attempt in range(attempts):
         delivered = measure_true_peak(out_path, ffmpeg)
+        # THE CEILING IS TESTED FIRST. A correction that lands in band is
+        # kept even when it barely moved -- the no-progress check below
+        # reverts to gain0, which is the HOT measurement, so running it
+        # before this test would discard a result that already passes.
+        if delivered <= ceiling:
+            log(f"  delivered true peak {delivered:+.1f} dBTP")
+            if delivered < target_dbtp - QUIET_WARN_DB:
+                log(f"  note: {target_dbtp - delivered:.1f} dB below the "
+                    f"{target_dbtp:+.1f} dBTP target -- the encoder left "
+                    f"more headroom than asked for, which is safe but "
+                    f"quieter than the other cuts")
+            return gain
         # IS THE GAIN EVEN THE LEVER? `gain` scales the bed; the measurement
         # is of the MIX. When the peak is set by source audio the bed cannot
         # touch, every correction attenuates the bed and moves the peak by
@@ -128,14 +140,6 @@ def correct_delivered_peak(out_path, gain, target_dbtp, rerun, ffmpeg=None,
                 rerun(gain0)
             return gain0
         previous = delivered
-        if delivered <= ceiling:
-            log(f"  delivered true peak {delivered:+.1f} dBTP")
-            if delivered < target_dbtp - QUIET_WARN_DB:
-                log(f"  note: {target_dbtp - delivered:.1f} dB below the "
-                    f"{target_dbtp:+.1f} dBTP target -- the encoder left "
-                    f"more headroom than asked for, which is safe but "
-                    f"quieter than the other cuts")
-            return gain
         if attempt == attempts - 1:
             log(f"  WARNING: delivered true peak {delivered:+.1f} dBTP "
                 f"still above {ceiling:+.1f} after {attempts} "

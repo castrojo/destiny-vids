@@ -2313,6 +2313,45 @@ def test_the_banner_survives_a_full_frame_picture_rect():
     assert max(ys) < plate.FRAME_H
 
 
+# --- the top-letterbox lane for hashtag banners (owner, 2026-08-20) --------
+
+TOP_BANNER_SPEC = {
+    "id": "callout_top", "at": 139.0, "dur": 169.0, "kind": "banner",
+    "position": "letterbox_top",
+    "text": "#UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST",
+}
+
+
+def test_the_top_banner_sits_above_the_picture_on_the_bar():
+    """Banners and CTAs with #hashtags ride the TOP letterbox bar, never the
+    content: the whole strip must end at or above the picture's top edge."""
+    img = plate.render_plate(dict(TOP_BANNER_SPEC))
+    picture = (0, 140, 1920, 800)      # a 2.39:1 letterbox inside 16:9
+    frame = plate.place(img, "letterbox_top", picture)
+    alpha = frame.split()[3]
+    rows = alpha.load()
+    ys = [y for y in range(plate.FRAME_H)
+          if any(rows[x, y] for x in range(0, plate.FRAME_W, 17))]
+    assert ys, "the banner rendered no visible pixels"
+    assert max(ys) < picture[1], (
+        f"banner bottoms at y={max(ys)}, below the picture's top at "
+        f"{picture[1]}")
+
+
+def test_the_top_banner_survives_a_full_frame_picture_rect():
+    """The same full-frame trap as the bottom bar: an un-letterboxed stretch
+    must park the banner just inside the TOP edge, never above the canvas."""
+    img = plate.render_plate(dict(TOP_BANNER_SPEC))
+    frame = plate.place(img, "letterbox_top",
+                        (0, 0, plate.FRAME_W, plate.FRAME_H))
+    alpha = frame.split()[3]
+    rows = alpha.load()
+    ys = [y for y in range(plate.FRAME_H)
+          if any(rows[x, y] for x in range(0, plate.FRAME_W, 17))]
+    assert ys, "the banner rendered off the frame entirely"
+    assert min(ys) >= 0
+
+
 def test_a_banner_shares_the_screen_but_never_with_a_second_banner():
     """A chrome row of its own: it coexists with a lower third and with the
     other chrome rows, but two banners at once is still an error."""
@@ -2371,3 +2410,53 @@ def test_an_animation_group_is_padded_from_the_start_of_the_timeline():
     assert "tpad=start_duration=" in body
     assert "start_mode=add" in body and "color=black@0" in body
     assert "eof_action=pass" in body
+
+
+def _stub_ffprobe(monkeypatch, duration="20.0"):
+    """burn() probes the input's duration before encoding; stub ffprobe."""
+
+    class P:
+        returncode = 0
+        stdout = duration + "\n"
+        stderr = ""
+
+    monkeypatch.setattr(plate.subprocess, "run",
+                        lambda cmd, **k: P() if any("ffprobe" in str(part)
+                                                    for part in cmd)
+                        else P())
+
+
+
+def test_a_farm_runner_also_burns_to_a_tmp_and_replaces(tmp_path, monkeypatch):
+    _stub_ffprobe(monkeypatch)
+    """The runner path is the same #286 hazard one network cut closer: a
+    kubectl cp fetch into out_path would truncate the delivered master. The
+    argv must name the .burntmp sibling, and only a completed fetch may
+    replace it."""
+    master = tmp_path / "out.mp4"
+    master.write_bytes(b"DELIVERED MASTER")
+    captured = {}
+
+    def runner(cmd):
+        captured["cmd"] = cmd
+        # The farm fetches the pod's output to the path the argv named.
+        Path(cmd[-1]).write_bytes(b"freshly burned")
+
+    plate.burn("in.mp4", [dict(GUARDIAN)], tmp_path, master,
+               ffmpeg=["ffmpeg"], runner=runner)
+    assert captured["cmd"][-1].endswith(".burntmp.mp4")
+    assert captured["cmd"][-1] != str(master)
+    assert master.read_bytes() == b"freshly burned"
+    assert not (tmp_path / "out.burntmp.mp4").exists()
+
+
+def test_a_runner_that_delivers_nothing_leaves_the_master_alone(
+        tmp_path, monkeypatch):
+    _stub_ffprobe(monkeypatch)
+    """An interrupted or empty fetch must not touch the delivered act."""
+    master = tmp_path / "out.mp4"
+    master.write_bytes(b"DELIVERED MASTER")
+
+    plate.burn("in.mp4", [dict(GUARDIAN)], tmp_path, master,
+               ffmpeg=["ffmpeg"], runner=lambda cmd: None)
+    assert master.read_bytes() == b"DELIVERED MASTER"

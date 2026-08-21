@@ -8,6 +8,7 @@ them.
 """
 import json
 import os
+import re
 import sys
 from fractions import Fraction
 from pathlib import Path
@@ -781,3 +782,23 @@ def test_an_image_sequence_pattern_is_staged_as_its_frames(tmp_path):
     pattern_tok = [t for t in pod_argv if t.endswith("plate_%02d.png")]
     assert len(pattern_tok) == 1, pod_argv
     assert pattern_tok[0].startswith(farm.WORK_DIR)
+
+
+def test_the_chunked_path_stages_a_glob_free_name(monkeypatch):
+    """run_on_cluster is the chunked single-file CLI: it must stage under the
+    same glob-free name build_plan wrote into the script, or kubectl cp
+    delivers nothing and the pod encodes an empty in/ (the 4c0bc0c fix only
+    covered rewrite_argv_for_pod)."""
+    captured = {}
+    monkeypatch.setattr(farm, "_execute_on_cluster",
+                        lambda **kw: captured.update(kw) or 0)
+    src = "/d/Beauty Of The Beast [X3WrCzLIIvk].webm"
+    farm.run_on_cluster({"out_rel": "out/o.mp4", "chunks": [1, 2]},
+                        name="n", src=src,
+                        out="/o/o.mp4", script="s", kc=None, image="i",
+                        cpu=1, limit_cpu=1, memory="1Gi", limit_memory="1Gi",
+                        node="n", storage="1Gi", keep=False, timeout=1)
+    (local, rel), = captured["uploads"]
+    assert local == src
+    assert rel == "in/Beauty Of The Beast _X3WrCzLIIvk_.webm"
+    assert not re.search(r"[\[\]*?]", rel)

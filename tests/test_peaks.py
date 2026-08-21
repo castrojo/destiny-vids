@@ -103,6 +103,21 @@ def test_a_file_that_stays_hot_is_warned_about_not_blocked(monkeypatch, capsys):
     assert "did not move" in capsys.readouterr().out
 
 
+def test_an_in_band_result_is_kept_even_when_it_barely_moved(monkeypatch):
+    """The ceiling is tested BEFORE no-progress: a correction that straddles
+    the target by less than NO_PROGRESS_DB (-0.75 -> -0.85 against a -0.8
+    ceiling) is a pass, not a reason to re-encode back to the hot gain."""
+    peaks_seen = iter([0.5, -0.85])   # hot, then in band but barely moved
+    monkeypatch.setattr(peaks, "measure_true_peak",
+                        lambda *a, **k: next(peaks_seen))
+    reruns = []
+    gain = peaks.correct_delivered_peak("out.mp4", 1.0, -0.8,
+                                        lambda g: reruns.append(g),
+                                        ffmpeg=["ffmpeg"], margin_db=0.0)
+    assert len(reruns) == 1          # one correction, kept -- never reverted
+    assert gain == reruns[0] != 1.0
+
+
 def test_a_very_quiet_result_is_noted_but_accepted(monkeypatch, capsys):
     monkeypatch.setattr(peaks, "measure_true_peak", lambda *a, **k: -5.0)
     reruns = []

@@ -45,13 +45,14 @@ def on_screen_copy(manifest):
 
 # --- the length ---------------------------------------------------------------
 
-def test_the_trailer_is_one_minute_fifty():
-    """Owner: 'let's shoot for 1:50'.
+def test_the_music_stays_one_minute_fifty():
+    assert T.MUSIC_END == pytest.approx(110.020, abs=1e-6)
 
-    The MPA and NATO cap a theatrical trailer at 2:30, so this is inside the
-    convention as well as inside the brief.
-    """
-    assert T.TOTAL == pytest.approx(110.020, abs=1e-6)
+
+def test_the_url_holds_five_seconds_after_the_music():
+    assert T.URL_HOLD == pytest.approx(5.000, abs=1e-9)
+    assert T.TOTAL == pytest.approx(115.020, abs=1e-6)
+    assert T.TOTAL == pytest.approx(T.MUSIC_END + T.URL_HOLD, abs=1e-9)
     assert T.TOTAL < 150.0, "over the 2:30 trailer cap"
 
 
@@ -68,7 +69,7 @@ def test_the_join_dissolve_is_paid_for_not_ignored():
     """
     trims = T.CUT_OUT + (T.OUT_POINT - T.CUT_IN)
     assert T.PICTURE == pytest.approx(trims - T.JOIN_FADE, abs=1e-9)
-    assert T.ENDCARD == pytest.approx(7.500 + T.JOIN_FADE, abs=1e-9)
+    assert T.ENDCARD == pytest.approx(7.500 + T.JOIN_FADE + T.URL_HOLD, abs=1e-9)
 
 
 # --- the tank -----------------------------------------------------------------
@@ -97,7 +98,7 @@ def test_the_sound_is_not_cut_where_the_picture_is():
     """The music covers the picture edit, so it is taken as one continuous
     span of the source rather than being cut and joined with it."""
     graph = T.filtergraph(json.loads(T.MANIFEST.read_text()))
-    assert f"[0:a]atrim=0:{T.TOTAL:.3f}" in graph
+    assert f"[0:a]atrim=0:{T.MUSIC_END:.3f}" in graph
     assert graph.count("atrim") == 1
 
 
@@ -120,7 +121,7 @@ def test_the_wolves_fade_is_longer_and_the_extra_time_went_to_the_drama():
 def test_the_music_plays_out_past_where_the_prologue_faded():
     """Owner: 'let the music play out longer than the original video'."""
     assert T.AUDIO_FADE_START > 93.000           # the prologue's fade start
-    assert T.AUDIO_FADE_START + T.AUDIO_FADE == pytest.approx(T.TOTAL)
+    assert T.AUDIO_FADE_START + T.AUDIO_FADE == pytest.approx(T.MUSIC_END)
 
 
 def test_the_wolves_howl_lands_before_the_final_fade():

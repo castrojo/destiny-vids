@@ -776,7 +776,10 @@ def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
                    timeout):
     return _execute_on_cluster(
         name=name, script=script,
-        uploads=[(src, f"in/{Path(src).name}")],
+        # Glob-safe, like every other staging name: kubectl cp expands
+        # metacharacters in the remote path, so a bracketed source must be
+        # staged under the name build_plan was given for it.
+        uploads=[(src, f"in/{_pod_safe_name(Path(src).name)}")],
         out_rel=plan["out_rel"], out=out, kc=kc, image=image, cpu=cpu,
         limit_cpu=limit_cpu, memory=memory, limit_memory=limit_memory,
         node=node, storage=storage,
@@ -1241,7 +1244,7 @@ def main(argv=None):
     src, out = Path(args.source), Path(args.out)
     if not src.exists():
         raise SystemExit(f"source does not exist: {src}")
-    out_name = Path(out.name).name  # basename only inside the pod
+    out_name = _pod_safe_name(Path(out.name).name)  # basename only inside the pod
 
     try:
         ffprobe = find_ffprobe()
@@ -1264,7 +1267,7 @@ def main(argv=None):
         plan = build_plan(facts=facts, out_name=out_name, segments=segments,
                           video_args=video_args, audio_args=audio_args,
                           threads=args.threads, work_dir=WORK_DIR,
-                          src_arg=f"{WORK_DIR}/in/{src.name}")
+                          src_arg=f"{WORK_DIR}/in/{_pod_safe_name(src.name)}")
     else:
         if not args.local:
             print(f"farm: cluster unreachable ({why}); falling back to a "

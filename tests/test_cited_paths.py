@@ -72,6 +72,36 @@ ALLOWED_MISSING = {
         "ENTRY when #226 lands.",
 }
 
+# The 2026-08-19 common-documentation-alignment plan and spec PROPOSE these
+# files; a design doc names what it would create, and the name is the
+# proposal. None of them exist until the plan is implemented -- remove each
+# entry as its file lands, or the whole set when the plan tree is filed and
+# deleted.
+_PLAN = ("proposed by docs/superpowers/plans|specs "
+         "2026-08-19-common-documentation-alignment -- the file is the "
+         "proposal and does not exist yet")
+ALLOWED_MISSING.update({
+    "docs/skills/demo-skill.md": _PLAN + " (a worked example)",
+    "docs/skills/foo.md": _PLAN + " (a worked example)",
+    "docs/skills/foo/SKILL.md": _PLAN + " (a worked example)",
+    "docs/skills/wrong.md": _PLAN + " (a worked counterexample)",
+    "docs/skills/index.json": _PLAN,
+    "docs/skills/index.md": _PLAN,
+    "docs/skills/index.schema.json": _PLAN,
+    "docs/skills/audio/references/delivery-gates.md": _PLAN,
+    "docs/skills/audio/references/source-quality.md": _PLAN,
+    "docs/skills/megacut/references/delivery.md": _PLAN,
+    "docs/skills/megacut/references/verification.md": _PLAN,
+    "docs/skills/plates/references/binding-conflicts.md": _PLAN,
+    "docs/skills/production/references/freshness.md": _PLAN,
+    "scripts/check-doc-links.sh": _PLAN,
+    "scripts/check-skill-frontmatter.sh": _PLAN,
+    "scripts/check-skill-index.sh": _PLAN,
+    "scripts/generate_skill_index.py": _PLAN,
+    "tests/test_skill_catalog.py": _PLAN,
+    "tests/test_skill_contract.py": _PLAN,
+})
+
 
 def _searched_files():
     seen = []

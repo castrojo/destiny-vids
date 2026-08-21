@@ -653,7 +653,7 @@ def _retired_caydes_placard_redacts_the_person_not_the_character(manifest):
     once.' His one reveal in act VIII is the Directed by card.
 
     Which half is redacted is not a coin toss: act II's authored treatment
-    (scripts/build_efmb_plates.py, CAYDE) carries redacted_speaker
+    (the retired cayde_signoff card) carried redacted_speaker
     '[ REDACTED ]' with redacts=<real name> and reveals='cayde_6'. The famous
     character is the known half; the person behind it is the secret.
     """

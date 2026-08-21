@@ -1621,9 +1621,9 @@
     {
       "id": "late_poor_technical_decisions",
       "kind": "miniboss",
-      "at": 122.75,
-      "dur": 2.2,
       "position": "boss",
+      "at": 121.2,
+      "dur": 2.2,
       "copy_source": "owner_supplied",
       "name": "POOR TECHNICAL DECISIONS",
       "text_source": "owner_supplied",
@@ -1633,19 +1633,19 @@
     {
       "id": "late_karena_lessons",
       "kind": "chat",
-      "at": 125.2,
+      "at": 123.5,
       "dur": 2.2,
       "position": "left",
       "copy_source": "owner_supplied",
       "speaker": "karena",
       "text": "Hit 'em with your lessons learned",
       "text_source": "owner_supplied",
-      "seen_at_src": 142.966
+      "seen_at_src": 141.266
     },
     {
       "id": "late_rochaporto_cern",
       "kind": "chat",
-      "at": 127.65,
+      "at": 125.95,
       "dur": 2.6,
       "position": "left",
       "copy_source": "owner_supplied",
@@ -1654,7 +1654,7 @@
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/rochaporto.png",
       "avatar_url": "https://github.com/rochaporto.png?size=256",
-      "seen_at_src": 145.416
+      "seen_at_src": 143.716
     },
     {
       "id": "late_jrsapi_notes",
@@ -1686,7 +1686,7 @@
       "kind": "banner",
       "at": 138.5,
       "dur": 93.0,
-      "position": "boss",
+      "position": "letterbox_top",
       "copy_source": "owner_supplied",
       "text": "#UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST",
       "text_source": "owner_supplied"
@@ -2030,7 +2030,7 @@
       "kind": "banner",
       "at": 239.5,
       "dur": 15.933,
-      "position": "boss",
+      "position": "letterbox_top",
       "copy_source": "owner_supplied",
       "text": "#UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST",
       "text_source": "owner_supplied"
@@ -2308,11 +2308,10 @@
     {
       "id": "mapped_haters",
       "kind": "miniboss",
+      "position": "boss",
       "at": 316.2,
       "dur": 2.2,
-      "position": "boss",
       "copy_source": "owner_supplied",
-      "seen_at_src": 323.933,
       "name": "HATERS",
       "text_source": "owner_supplied",
       "title": "Reprehenderit voluptate",
@@ -2323,7 +2322,7 @@
       "kind": "chat",
       "at": 316.967,
       "dur": 2.2,
-      "position": "left",
+      "position": "right",
       "copy_source": "owner_supplied",
       "seen_at_src": 333.497,
       "speaker": "kylegospo",
@@ -2378,8 +2377,7 @@
     "mapped_lionheartp_hardware is owner-timed to Act II film 183.500, but the previous mapped card clears at 183.650, so it lands at 183.650 instead. The order is the owner's; only the gap is the timeline's",
     "the owner conversation at 231.500 now keeps only karena and joseph; krook and both rochaporta lines were removed by the owner. Karena's chat uses github.com/karena, as explicitly supplied this round",
     "late_rochaporto_move is owner-timed to megacut 6:07.0 (film 100.500) but the previous card clears at 101.950, so it lands at 101.950 instead. The order is the owner's; only the gap is the timeline's",
-    "late_karena_lessons is owner-timed to megacut 6:30.0 (film 123.500) but the previous card clears at 125.200, so it lands at 125.200 instead. The order is the owner's; only the gap is the timeline's",
-    "late_rochaporto_cern is owner-timed to megacut 6:32.0 (film 125.500) but the previous card clears at 127.650, so it lands at 127.650 instead. The order is the owner's; only the gap is the timeline's",
+    "late_rochaporto_cern is owner-timed to megacut 6:32.0 (film 125.500) but the previous card clears at 125.950, so it lands at 125.950 instead. The order is the owner's; only the gap is the timeline's",
     "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for now.' Three blocks went with him -- the four ranked montage cards, the two TOC payoff cards ('It's totally NOT like this' and 'Have you met our Ambassadors?'), and the eyebrow on Natewaddington's placard. Every string is still in git; 'for now' means this is a revert, not a rewrite",
     "SARAH NOVOTNY'S SEAT WENT TO RICARDO ROCHA, owner 2026-08-20: 'move rochoporto's nameplate introduction to where novotny is, this hunter is now rochaporto'. Unlike Brent Burns and Joe Beda the same day, she was NOT ordered out -- her authored record stays in vocab/casting.yaml and she is owed a seat nobody has named yet",
     "NATEWADDINGTON IS OUT, owner: 'get rid of the nate wassington in the endless climax in endless'. His placard stood at film 260.000 (4:20) -- centre frame, the last card before the 269.700 downbeat the act climaxes on. Only the scheduling went: his two authored rows are still in git, nothing moved into the slot, and he is owed a credit somewhere nobody has decided yet",

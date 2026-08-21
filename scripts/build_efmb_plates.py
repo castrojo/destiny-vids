@@ -66,6 +66,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_efmb  # noqa: E402
 from tools.plate import CHOICE_POINTER_CUT, CHROME_ROWS  # noqa: E402
+from tools import chapter_md  # noqa: E402
 from tools import placeholder  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "02-endless-forms-plates.json"
@@ -410,18 +411,10 @@ LATE_PASS = [
             "To Find the Kube of Destiny",
         ],
     },
-    {
-        "id": "late_poor_technical_decisions",
-        # Same ruling as mapped_haters: the kernel boss bar is the one red
-        # treatment in this act. Name row only, title omitted not invented.
-        "kind": "miniboss",
-        "position": "boss",
-        "at_film": 122.75,
-        "hold": 2.2,
-        "name": "POOR TECHNICAL DECISIONS",
-        "title": placeholder.lorem(28, seed="late_poor_technical_decisions"),
-        "title_placeholder": True,
-    },
+    # THE RED FLASH IS AUTHORED IN chapters/II-endless-forms.md NOW --
+    # `! [late_poor_technical_decisions] POOR TECHNICAL DECISIONS |` under
+    # `## 6:45`. Deleting it here would strand the evidence; editing it here
+    # would fork the copy. The chapter file owns seat and wording.
     {
         "id": "late_karena_lessons",
         "kind": "chat",
@@ -465,7 +458,9 @@ LATE_PASS = [
 TOP_BANNER = {
     "id": "top_banner_ogc",
     "kind": "banner",
-    "position": "boss",
+    # Owner, 2026-08-20: banners and CTAs with #hashtags ride the TOP
+    # letterbox bar, never the picture -- the boss lane is for boss bars.
+    "position": "letterbox_top",
     "at_megacut": 405.0,
     "text": "#UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST",
 }
@@ -499,7 +494,6 @@ MAPPED_TAIL_REPLACEMENTS = {
     "solo_EyeCantCU",
     "solo_KyleGospo",
     "solo_p5",
-    "cayde_signoff",
     "timed_jorge",
 }
 MAPPED_TAIL_PASS = [
@@ -535,33 +529,17 @@ MAPPED_TAIL_PASS = [
         "shot_src": [335.267, 339.767],
         "why": "the Sentinel raising the Void shield in the authored reveal",
     },
-    {
-        "id": "mapped_haters",
-        # Owner, 2026-08-19: the red overlays "should match the style of the
-        # original kernel one" -- KERNEL REGRESSION's boss bar, not a second
-        # full-frame style invented beside it. `name` only: the bar's second
-        # row is authored copy nobody has written, and _render_miniboss omits
-        # a missing title rather than inventing one.
-        "kind": "miniboss",
-        "position": "boss",
-        "at_film": 316.2,
-        # OWNER: "Haters goes at 10:00 on the red face with the bright
-        # red dot." Programme 10:00 is act II film 316.2 (the act is
-        # seated at programme 283.80), and that lands inside the red-lit
-        # face shot, measured 315.267 -> 316.967 by scene detection.
-        # It was on the 308.2 hallway, which is not that shot.
-        # The boss bar is a CHROME_ROW at the top of frame, so it shares
-        # the screen with Kyle's lower-third pill by design.
-        "hold": 2.2,
-        "seen_at_src": build_efmb.HALLWAY_FRAME_SRC,
-        "name": "HATERS",
-        "title": placeholder.lorem(28, seed="mapped_haters"),
-        "title_placeholder": True,
-    },
+    # HATERS IS AUTHORED IN chapters/II-endless-forms.md NOW --
+    # `! [mapped_haters] HATERS |` under `## 10:00`. The seat's evidence
+    # (the red-lit face shot, film 315.267 -> 316.967 by scene detection)
+    # is recorded beside the line there. This spec's old seen_at_src pointed
+    # at the hallway frame, which is NOT that shot; the card now carries no
+    # seen_at_src rather than a wrong one.
     {
         "id": "mapped_kyle_sup",
         "kind": "chat",
-        "position": "left",
+        # RIGHT lane, not the default left -- see the bond note below.
+        "position": "right",
         # OWNER-PLACED, DO NOT MOVE. 310.4 is where the owner had it.
         #
         # He asked for it on the Titan close-up ("sup is a purple titan ...
@@ -586,11 +564,13 @@ MAPPED_TAIL_PASS = [
         "speaker": "kylegospo",
         "text": "Sup",
         "avatar_login": "KyleGospo",
-        # BONDED to his own nameplate. The owner pinned this pill to
-        # the Titan close-up and LOCKED the reveal, so the two share
-        # the screen by instruction. bond_of is the repo's named
-        # exemption for exactly that -- named, so it can never
-        # quietly overlap somebody else's plate.
+        # BONDED to his own nameplate, in the deck's bonded-pair shape:
+        # nameplate holds the left, the pill takes the RIGHT. The owner
+        # locked both TIMES ("lock the plate"; the pill on the close-up's
+        # first frame) -- the lane was never his instruction, and stacking
+        # both on the left drew them on top of each other for the pill's
+        # last 0.43 s (the nameplate arrives at 318.737). Right lane, same
+        # seats: the pair reads as the site's GUARDIAN BOND composition.
         "bond_of": "mapped_kyle_reveal",
     },
     {
@@ -980,29 +960,14 @@ PLACEHOLDERS = []
 BLUEBERRY_SHOTS = []
 BLUEBERRY_EXCLUDE = {"castrojo"}  # a lead; see the comment above
 
-# Cayde signs off. Source 358.200 -> 360.500 is 2.30 s against a 2.2 s minimum
-# hold, so it fits by a tenth of a second -- DO NOT SHORTEN IT. It is the
-# second-to-last shot: he says it, and then three figures walk into the
-# cathedral light.
-#
-# The line is the OWNER'S, not Bungie's. Bungie's Cayde never said it, so it
-# lives in dialogue/ as owner-authored and is reproduced here; it must never
-# read as recovered source dialogue.
-#
-# THE SPEAKER IS REDACTED, AND ONLY IN THIS ACT. The `cayde_6` binding names
-# Jorge Castro, and that name is correct everywhere else in the programme --
-# he is revealed as Cayde later, so acts I and III-VII are untouched. Here the
-# joke depends on the audience not being told yet, so the pill reads
-# `[ REDACTED ]`. The bracketed form is the owner's own treatment, the same one
-# he authored for `[ p5 ]` and `[ EyeCantCU ]`; it is a redaction of a name
-# this repo already knows, never an invented one.
-CAYDE = {
-    "src": (358.200, 360.500),
-    "seen": 359.000,
-    "why": "the hero pose under the caged Traveler, neon city behind",
-    "redacted_speaker": "[ REDACTED ]",
-    "reveals": "cayde_6",
-}
+# Cayde's sign-off ("I'm so proud of you kids!") is RETIRED -- owner,
+# 2026-08-20: "I don't want it in the movie." The card left the manifest in
+# the v3.9 converge; the emission code and the one-line
+# dialogue/yt_destiny_all_live_action_trailers/ record followed it out. His
+# hero pose at source 358.200 -> 360.500 plays clean, then three figures
+# walk into the cathedral light. The redaction joke itself is untouched: the
+# `cayde_6` binding in vocab/casting.yaml still carries it, and act VIII's
+# "Directed by" card is still his one reveal.
 
 # --- THE MONTAGE ANNOUNCEMENTS (owner brief, issue #98) --------------------
 #
@@ -1919,31 +1884,6 @@ def build():
                               blueberry_entry(item, None, None, casting)),
         })
 
-    # --- Cayde's sign-off --------------------------------------------------
-    src_in, src_out = CAYDE["src"]
-    room = round(film_of(src_out) - film_of(src_in), 3)
-    assert room >= MIN_HOLD, (
-        f"Cayde's shot is {room:.3f}s, under the {MIN_HOLD}s the card needs")
-    # The card takes the whole shot up to the minimum hold and no more: at
-    # 2.30 s of room against a 2.2 s hold there is no lead-in to spend, and
-    # riding past the cut would put his line over the cathedral ending.
-    real_name = authored_copy(CAYDE["reveals"], casting)["name"]
-    plates.append({
-        "id": "cayde_signoff",
-        "kind": "chat",
-        "at": round(film_of(src_in), 3),
-        "dur": MIN_HOLD,
-        "copy_source": "dialogue",
-        "shot_src": [src_in, src_out],
-        "seen_at_src": CAYDE["seen"],
-        "why": CAYDE["why"],
-        "speaker": CAYDE["redacted_speaker"],
-        "redacts": real_name,
-        "redaction_scope": "act II only -- he is revealed later in the programme",
-        "text": "I'm so proud of you kids!",
-        "text_source": "owner_supplied",
-    })
-
     # --- the new dialogue, and the choice screen ---------------------------
     #
     # These share the pill lane with the montage asides below, so they are
@@ -2389,8 +2329,10 @@ def build():
             late_cursor = round(at + spec["hold"] + PLATE_GAP, 3)
 
     top_banner_at = round(TOP_BANNER["at_megacut"] - OWNER_PASS_OFFSET, 3)
-    # The OGC top banner is unchanged: it still ducked the old skill-banner
-    # zone at 231.5 -> 239.5, even though that lane is now lower-third chat.
+    # The OGC banner rides the TOP letterbox bar now (owner, 2026-08-20:
+    # hashtag banners and CTAs live in the letterbox, not on the content).
+    # Its windows are unchanged: it still ducked the old skill-banner zone at
+    # 231.5 -> 239.5, even though that lane is now lower-third chat.
     ogc_resume_at = 239.5
     for i, (start, end) in enumerate((
             (top_banner_at, OWNER_CONVO_AT),
@@ -2400,7 +2342,7 @@ def build():
             "kind": "banner",
             "at": start,
             "dur": round(end - start, 3),
-            "position": "boss",
+            "position": TOP_BANNER["position"],
             "copy_source": "owner_supplied",
             "text": TOP_BANNER["text"],
             "text_source": "owner_supplied",
@@ -2523,6 +2465,16 @@ def build():
         | MAPPED_TAIL_REPLACEMENTS)]
     plates.extend(mapped)
 
+    # The owner-authored conversations in chapters/II-endless-forms.md. Same
+    # entry shape as everything above; whatever its scheduler cannot honour
+    # is recorded in `unresolved`, never raised -- and every note is printed,
+    # because the owner's rule is "always inform the operator of
+    # improvements", not file them away.
+    chapter_entries, chapter_unresolved = chapter_md.entries("II")
+    for note in chapter_unresolved:
+        print(f"chapter: {note}", file=sys.stderr)
+    plates.extend(chapter_entries)
+
     plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))
 
     for cur, nxt, room in space_plates(plates):
@@ -2551,7 +2503,7 @@ def build():
         # What the brief authored but this manifest could not place. Recorded
         # so it is visible rather than buried: degrade, never block.
         "unresolved": (montage_unresolved + walk_unresolved + mapped_unresolved
-                        + late_unresolved + [
+                        + late_unresolved + chapter_unresolved + [
             "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for "
             "now.' Three blocks went with him -- the four ranked montage "
             "cards, the two TOC payoff cards ('It's totally NOT like this' "

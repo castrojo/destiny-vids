@@ -472,7 +472,7 @@ def check_provenance(act, master, report):
         report.add("provenance", UNDECLARED,
                    "no build commit recorded -- nothing can tell whether this "
                    "master came from work in this checkout's history. "
-                   "`deliver.py publish --act` records it.")
+                   "Rebuilding it through `deliver.py build` records it.")
         return
     known = commit_in_history(commit)
     if known is None:
@@ -910,10 +910,16 @@ def check_social(acts, social, wolves, reports):
             report.add("social", STALE, "10mb copy is older than its Prod "
                                         "master")
         elif copy.stat().st_size > SOCIAL_CAP_BYTES:
-            report.add("social", STALE,
+            # NOT rebuildable: the digest above already proved the copy
+            # derives from the current master, so re-encoding the same
+            # recipe yields the same bytes forever. Smaller is a different
+            # recipe -- a lower audio rung or height -- which is an editorial
+            # call, so this is BLOCKED (a recorded decision), never STALE.
+            report.add("social", BLOCKED,
                        f"10mb copy is over the 10 MiB cap "
-                       f"({copy.stat().st_size / (1024 * 1024):.2f} MiB) -- "
-                       f"the platform will reject it")
+                       f"({copy.stat().st_size / (1024 * 1024):.2f} MiB) "
+                       f"-- the platform will reject it; making it smaller "
+                       f"means changing the recipe, not re-encoding it")
         else:
             report.add("social", OK, "10mb copy current")
 
@@ -942,12 +948,17 @@ def record_megacut_provenance(plan_path, wolves):
 
 
 def publish(acts, masters, wolves, delivery_path=None, log=print,
-            only=None):
+            only=None, rebuilt=None):
     """Make Prod/ match the delivery map, then regenerate what describes it.
 
     Only ever `ln -f` semantics -- never a copy. A conflicted act (declared
     master older than Prod's content) is SKIPPED and reported: the tool
     refuses to revert content to keep a queue moving.
+
+    `rebuilt` names the acts the caller just rendered IN THIS CHECKOUT
+    (`deliver.py build`, after the rebuild command exits 0). Only those earn
+    a `built_from_commit` stamp -- a bare publish records input digests but
+    cannot know which commit rendered the master on disk.
     """
     prod_dir = wolves / "Prod"
     prod_dir.mkdir(parents=True, exist_ok=True)
@@ -1007,11 +1018,13 @@ def publish(acts, masters, wolves, delivery_path=None, log=print,
             log(f"  README.md: no {TABLE_BEGIN} markers -- table NOT "
                 f"touched; add the markers around the table to hand it to "
                 f"the tool")
-    record_source_digests(acts, masters, delivery_path, log=log, only=only)
+    record_source_digests(acts, masters, delivery_path, log=log, only=only,
+                          rebuilt=rebuilt)
     return 0
 
 
-def record_source_digests(acts, masters, delivery_path, log=print, only=None):
+def record_source_digests(acts, masters, delivery_path, log=print, only=None,
+                          rebuilt=None):
     """Stamp each act's current input digest into the delivery map.
 
     This is what closes the loop: `publish` is the step that says "what is in
@@ -1024,6 +1037,11 @@ def record_source_digests(acts, masters, delivery_path, log=print, only=None):
     the claim is only ever true for the ones somebody just rendered -- that is
     how a rebuild of one act quietly certified seven others, and how stale
     programmes shipped.
+
+    `rebuilt` is the narrower, stronger claim: the caller watched this
+    checkout's rebuild command exit 0 (deliver.py build's rebuild action).
+    Only those acts earn a `built_from_commit` stamp; a digest refresh alone
+    never moves it.
 
     The mtime guard below catches that only for inputs that are still dirty. An
     input that moved IN A COMMIT looks untouched on disk, so a blanket publish
@@ -1076,18 +1094,33 @@ def record_source_digests(acts, masters, delivery_path, log=print, only=None):
                     f"predates {', '.join(behind)}; rebuild the act first")
                 continue
             digest = source_digest(master["sources"])
-            if master.get("source_digest") != digest:
+            digest_changed = master.get("source_digest") != digest
+            if digest_changed:
                 master["source_digest"] = digest
                 changed.append(f"{act.numeral} -> {digest[:12]}")
             # WHICH COMMIT BUILT THIS MASTER. Prod/ is shared mutable state:
             # any agent can replace an act's file, and the branch you have
-            # checked out cannot tell you who did. Recording it here -- in
-            # the one step that says "what is in Prod NOW is this" -- is what
-            # lets the next build name a foreign act instead of shipping it.
-            head = git_head()
-            if head and master.get("built_from_commit") != head:
-                master["built_from_commit"] = head
-                changed.append(f"{act.numeral} built_from {head[:12]}")
+            # checked out cannot tell you who did. So the stamp is written
+            # ONLY when the caller certifies the act was rebuilt in this
+            # checkout just now (`rebuilt`) -- `deliver.py build` after a
+            # successful rebuild action. A bare `publish` re-records the
+            # input digest but canNOT know which commit rendered the master
+            # on disk; stamping HEAD there is how 29bb646 certified acts I,
+            # III and VII as built by a commit that only re-published them,
+            # and the FOREIGN gate then reads green on exactly the master it
+            # exists to name.
+            if rebuilt and act.numeral.upper() in {str(a).upper()
+                                                   for a in rebuilt}:
+                head = git_head()
+                if head and master.get("built_from_commit") != head:
+                    master["built_from_commit"] = head
+                    changed.append(f"{act.numeral} built_from {head[:12]}")
+            elif digest_changed and master.get("built_from_commit"):
+                log(f"  {act.numeral}: input digest recorded, "
+                    f"built_from_commit left at "
+                    f"{master['built_from_commit'][:12]} -- no rebuild was "
+                    f"certified, so the commit that rendered this master is "
+                    f"what it was")
         # Footage is stamped only when every declared master is present AND
         # the delivered act is not older than the footage it names. Stamping
         # either case would launder the drift this rung exists to catch: a
@@ -1195,6 +1228,13 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                         proc.stdout.strip().splitlines() or ["no output"])
                 log(f"  FAILED: {tail[-1]}")
                 return 1
+            if label.startswith("rebuild "):
+                # The one moment built_from_commit can be written honestly:
+                # this checkout's rebuild command just exited 0.
+                numeral = label.split()[-1]
+                act = next(a for a in acts if a.numeral == numeral)
+                publish([act], masters, wolves, delivery_path=delivery_path,
+                        log=log, only=[numeral], rebuilt={numeral})
             if label == "megacut":
                 record_megacut_provenance(plan_path, wolves)
     if not actions:

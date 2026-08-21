@@ -184,6 +184,18 @@ def test_a_master_rewritten_as_a_new_inode_detaches_the_link(ws):
     assert findings(gather(ws), "I")["social"].state == deliver.STALE
 
 
+def test_an_over_cap_social_copy_with_current_provenance_is_blocked_not_stale(ws):
+    """Over the cap with a digest that matches its master is a RECIPE
+    problem: re-encoding the same recipe yields the same bytes, so STALE
+    there is an infinite re-encode loop under --watch. It is BLOCKED -- a
+    recorded editorial decision (lower the audio rung or the height)."""
+    copy = ws / "wolves" / "10mb" / "01-intro.mp4"
+    copy.write_bytes(b"0" * (deliver.SOCIAL_CAP_BYTES + 1))
+    f = findings(gather(ws), "I")["social"]
+    assert f.state == deliver.BLOCKED
+    assert f.state not in deliver.FAILING
+
+
 def test_an_older_master_never_reverts_newer_prod_content(ws):
     """Act II on 2026-08-13: the build lived in a worktree, the declared
     master was a revision behind. Re-linking would silently revert the show.
@@ -887,6 +899,42 @@ def _publish_digests(delivery, acts=None, dirty=("shotlist.json",)):
     finally:
         deliver.dirty_paths = real
     return json.loads(Path(delivery).read_text())["masters"]["I"]
+
+
+def test_a_digest_refresh_without_a_rebuild_never_stamps_a_build_commit(
+        tmp_path, monkeypatch):
+    """THE 29bb646 DEFECT: re-publishing acts whose digests moved stamped
+    `built_from_commit` with the publish-time HEAD for masters that commit
+    never rendered -- and the FOREIGN gate then reads green on exactly the
+    master it exists to name. Only a certified rebuild may write it."""
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    src.write_text("v2")
+    os.utime(src, (new, new))
+    master.write_bytes(b"re-rendered")
+    os.utime(master, (new + 10, new + 10))
+    monkeypatch.setattr(deliver, "git_head", lambda: "f" * 40)
+
+    after = _publish_digests(delivery)
+
+    assert after["source_digest"] == deliver.source_digest(["shotlist.json"])
+    assert "built_from_commit" not in after
+
+
+def test_a_certified_rebuild_stamps_the_build_commit(tmp_path, monkeypatch):
+    src, master, delivery, new = _stamp_ws(tmp_path, monkeypatch)
+    monkeypatch.setattr(deliver, "git_head", lambda: "f" * 40)
+    doc = json.loads(Path(delivery).read_text())
+    real = deliver.dirty_paths
+    deliver.dirty_paths = lambda: set()
+    try:
+        deliver.record_source_digests(
+            [deliver.Act(numeral="I", title="I", prod_file="01.mp4")],
+            doc["masters"], delivery, log=lambda *a: None,
+            only=["I"], rebuilt={"I"})
+    finally:
+        deliver.dirty_paths = real
+    after = json.loads(Path(delivery).read_text())["masters"]["I"]
+    assert after["built_from_commit"] == "f" * 40
 
 
 def test_publish_refuses_to_stamp_a_master_that_predates_its_inputs(
