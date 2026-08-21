@@ -3297,6 +3297,20 @@ def check_copy_against_bindings(entries, leads=None):
 
 
 def load_manifest(path):
+    """A plate manifest, brought current with the chapter file that owns it.
+
+    THE WORDS LIVE IN ``chapters/<act>.md``. A manifest an act has migrated is
+    an output of that file, so it is synced here rather than trusted: this is
+    the single place every burn reads its plates from, which makes it the
+    single place a plate can be caught carrying copy the owner has already
+    replaced. Rendering a card from superseded words is the "never stale"
+    rule in AGENTS.md, and a render is where it would go unnoticed.
+
+    A manifest nobody has migrated syncs nothing and reports nothing.
+    """
+    from tools import chapter_md
+    for note in chapter_md.sync_manifest(path):
+        print(f"chapter: {note}", file=sys.stderr)
     with Path(path).open(encoding="utf-8") as fh:
         entries = json.load(fh)
     if isinstance(entries, dict):

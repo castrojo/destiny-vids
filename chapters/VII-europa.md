@@ -74,7 +74,7 @@ python3 tools/chapter_md.py check VII
   - avatar: renders/avatars/alolita.png
   - fade_out_at: 6.864
 
-[d04] preethi @ 25:07.731 +2: I'm sending our best
+[d04] preethi @ 25:07.731 +2.0: I'm sending our best
   - fade_out_at: 9.264
 
 ## 25:24.731
@@ -83,7 +83,7 @@ python3 tools/chapter_md.py check VII
   - avatar: renders/avatars/castrojo.png
   - fade_out_at: 26.864
 
-[d06] castrojo @ 25:27.731 +2: Don't get caught
+[d06] castrojo @ 25:27.731 +2.0: Don't get caught
   - avatar: renders/avatars/castrojo.png
   - fade_out_at: 29.264
 
@@ -101,6 +101,6 @@ python3 tools/chapter_md.py check VII
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 63.064
 
-[d10] nimbatus @ 26:03.931 +2: {k8s}ut
+[d10] nimbatus @ 26:03.931 +2.0: {k8s}ut
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 65.464

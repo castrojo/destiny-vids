@@ -106,13 +106,18 @@ SYNC_MATCH = 0.65
 
 TIME = r"[0-9]+(?::[0-9]+(?:\.[0-9]+)?){0,2}"
 HEADING = re.compile(rf"^##\s+(?P<at>{TIME})\s*(?P<label>.*)$")
+# An UNTIMED chapter's heading, for a run of cards that has no clock at all.
+# Act VIII's credits are the case: its cards carry relative WEIGHTS that get
+# scaled into whatever window the cover's own runtime leaves, so there is no
+# second to pin them to and inventing one would be a lie about the picture.
+UNTIMED_HEADING = re.compile(r"^##\s+(?P<label>.+)$")
 # `Speaker: line`, with three optional prefixes/suffixes that exist so a
 # migrated pill reproduces exactly: `[an_id]` binds the line to the plate
 # that id already names, `@ <time>` pins it, and `+<seconds>` states the
 # hold instead of deriving it from read speed.
 LINE = re.compile(
     rf"^(?:\[(?P<id>[A-Za-z0-9_.-]+)\]\s*)?"
-    rf"(?P<speaker>[^:@\[\s][^:@]*?)"
+    rf"(?P<speaker>[^:@\s][^:@]*?)"
     rf"(?:\s*@\s*(?P<at>{TIME}))?"
     rf"(?:\s*\+\s*(?P<dur>[0-9]+(?:\.[0-9]+)?))?"
     rf"\s*:\s*(?P<text>.*)$")
@@ -134,7 +139,7 @@ BOSS = re.compile(
 #       - title: Eons later
 #       - body: Maintainer-Guardians hold the line for humanity
 CARD = re.compile(
-    rf"^\*\s+(?:\[(?P<id>[A-Za-z0-9_.-]+)\]\s*)?(?P<kind>[a-z][a-z0-9_]*)"
+    rf"^\*\s+(?:\[(?P<id>[A-Za-z0-9_.-]+)\]\s*)?(?P<kind>[a-z][a-z0-9_]*|-)"
     rf"(?:\s*@\s*(?P<at>{TIME}))?"
     rf"(?:\s*\+\s*(?P<dur>[0-9]+(?:\.[0-9]+)?))?\s*$")
 # A field of the entry above it. Repeating a key builds a list, which is how
@@ -264,8 +269,11 @@ class Chapter:
 
         Authored in the file with its derivation beside it, because it is a
         measurement of a running order and not something to recompute from
-        memory.
+        memory. An untimed chapter has none, and needs none: nothing in it
+        is pinned to a second.
         """
+        if self.fields.get("timed") is False:
+            return 0.0
         return float(self.fields["programme_start"])
 
     @property
@@ -434,12 +442,27 @@ def parse(text):
     reads as a document first.
     """
     fields, text = parse_front_matter(text)
+    timed = fields.get("timed", True) is not False
+    # WHICH KEYS ARE ALWAYS LISTS is a fact about an act, not about a word.
+    # The prologue's `body` is the lines of a book page and stays a list even
+    # when there is one of them; act VIII's `body` is a single sentence under
+    # a name. Same key, different records, so the file says which it means.
+    list_keys = fields.get("list_keys")
+    if isinstance(list_keys, str):
+        list_keys = {k.strip() for k in list_keys.split(",") if k.strip()}
+    elif isinstance(list_keys, dict):
+        # `list_keys:` with nothing after it -- an act that declares no list
+        # keys at all, which is not the same as an act that never mentioned
+        # them and takes the default set.
+        list_keys = set()
+    else:
+        list_keys = None
     blocks, current, entry = [], None, None
     for lineno, raw in enumerate(text.splitlines(), 1):
-        heading = HEADING.match(raw)
+        heading = HEADING.match(raw) if timed else UNTIMED_HEADING.match(raw)
         if heading:
             current = {
-                "anchor": parse_tc(heading["at"]),
+                "anchor": parse_tc(heading["at"]) if timed else None,
                 "label": heading["label"].strip(),
                 "lineno": lineno,
                 "lines": [],
@@ -447,15 +470,21 @@ def parse(text):
             blocks.append(current)
             entry = None
             continue
-        if raw.startswith("##"):
+        if timed and raw.startswith("##"):
             raise ValueError(
                 f"line {lineno}: a block heading is `## <time>` -- "
                 f"could not read a time in {raw!r}")
         if current is None:
             continue
+        if raw.lstrip().startswith("#"):
+            # A comment inside an entry's rows -- why this card holds for six
+            # seconds, why that one carries no fade. It must not end the
+            # entry: an owner annotating their own copy would silently
+            # detach every row below the note.
+            continue
         attr = ATTR.match(raw)
         if attr and entry is not None:
-            add_attr(entry["attrs"], attr["key"], attr["value"])
+            add_attr(entry["attrs"], attr["key"], attr["value"], list_keys)
             continue
         card = CARD.match(raw)
         if card:
@@ -506,13 +535,18 @@ def parse(text):
     return blocks
 
 
-def add_attr(attrs, key, raw):
+def add_attr(attrs, key, raw, list_keys=None):
     """One ``- key: value`` row into an entry's fields.
 
     Repeating a key builds a list, which is how a card's ``body`` rows keep
-    their order, and how a pill carries more than one censor rule.
+    their order, and how a pill carries more than one censor rule. ``[]`` is
+    the one piece of punctuation the format needs: a list with nothing in it
+    cannot be written as a number of rows, because that number is zero.
     """
     value = scalar(raw)
+    if value == "[]" and key not in attrs:
+        attrs[key] = []
+        return
     if key == "censor":
         match = CENSOR.match(raw.strip())
         value = ({"find": match["find"], "replace": match["replace"]}
@@ -521,7 +555,7 @@ def add_attr(attrs, key, raw):
         if not isinstance(attrs[key], list):
             attrs[key] = [attrs[key]]
         attrs[key].append(value)
-    elif key in LIST_KEYS:
+    elif key in (LIST_KEYS if list_keys is None else list_keys):
         attrs[key] = [value]
     else:
         attrs[key] = value
@@ -619,6 +653,8 @@ def entries(act):
     order = ([k.strip() for k in order.split(",")] if isinstance(order, str)
              else None)
     blocks = parse(path.read_text(encoding="utf-8"))
+    if chap.fields.get("timed") is False:
+        return untimed_entries(act, blocks, defaults, order)
     out, unresolved = [], []
     for b, block in enumerate(blocks, 1):
         if not block["lines"]:
@@ -644,6 +680,26 @@ def entries(act):
     return out, unresolved
 
 
+def untimed_entries(act, blocks, defaults, order):
+    """Cards in a chapter that has no clock: order is the only timing there is.
+
+    Nothing is scheduled and no ``at`` or ``dur`` is invented. A card here
+    says how long it wants relative to its neighbours -- ``dur_sec`` on act
+    VIII's credits is a WEIGHT, scaled at build time into the window the
+    comic reveal leaves -- so a pin would be a number nobody could honour.
+    """
+    out, unresolved = [], []
+    for b, block in enumerate(blocks, 1):
+        if not block["lines"]:
+            unresolved.append(f"the {block['label']} block has a heading and "
+                              "no cards -- nothing is written for it")
+            continue
+        for n, line in enumerate(block["lines"], 1):
+            out.append(build_entry(act, b, n, line, None, None,
+                                   defaults, order))
+    return out, unresolved
+
+
 # What an entry is before the chapter file says anything. A front-matter
 # `defaults:` section merges over these, and a `null` there REMOVES a field:
 # an act whose delivered pills never carried `copy_source` has to come back
@@ -664,9 +720,28 @@ def build_entry(act, b, n, line, start, hold, defaults, order=None):
     if line["kind"] == "card":
         base = {"kind": line["card_kind"]}
     base.update(defaults or {})
+    if line["kind"] == "card":
+        # A card names its own kind on its own row. The act default -- almost
+        # always `chat`, because most rows in a chapter file are dialogue --
+        # must never quietly turn a status card into a pill. A kind of `-` is
+        # a card that carries NO kind field: act VIII's credits are told
+        # apart by their role, and never had one.
+        base["kind"] = line["card_kind"]
+        if line["card_kind"] == "-":
+            base.pop("kind")
 
     entry = {"id": line["id"] or _generated_id(act, b, n, line),
              "at": start, "dur": hold}
+    if start is None:
+        # An untimed chapter. The card has no clock of its own, so it gets no
+        # `at`/`dur` fields at all rather than a pair of nulls that would
+        # read as "nought seconds, held for nothing".
+        del entry["at"], entry["dur"]
+        if not line["id"]:
+            # Nor an invented id. Act VIII's credit cards are addressed by
+            # their order and nothing else; minting one here would write a
+            # new field into a delivered record to no purpose.
+            del entry["id"]
 
     if line["kind"] == "chat":
         entry["speaker"] = line["speaker"]
@@ -689,12 +764,38 @@ def build_entry(act, b, n, line, start, hold, defaults, order=None):
         if resolved is not None:
             entry[key] = resolved
 
-    entry.update(line["attrs"])
+    for key, value in line["attrs"].items():
+        # An explicit `- key: null` DELETES a field the defaults supplied,
+        # which is how one card opts out of the fades every pill around it
+        # carries. Writing a real null into a manifest is never what is meant.
+        if value is None:
+            entry.pop(key, None)
+        else:
+            entry[key] = value
 
-    if entry.get("fade_out_at") == "derived":
-        entry["fade_out_at"] = round(
-            entry["at"] + entry["dur"] - entry.get("fade_out", 0), 3)
+    if "at" in entry:
+        entry["fade_out_at"] = _derive_fade_out_at(
+            entry.get("fade_out_at"), entry)
+    if entry.get("fade_out_at") is None:
+        entry.pop("fade_out_at", None)
     return _ordered(entry, order)
+
+
+def _derive_fade_out_at(value, entry):
+    """``derived`` -> the moment this plate starts fading, from its own clock.
+
+    Bare ``derived`` is ``at + dur - fade_out``: the fade ENDS as the plate's
+    window does. ``derived 0.6`` subtracts 0.6 instead, because some acts were
+    timed to start the fade a fade-IN's length early and that is what is on
+    screen. The number is stated in the act's front matter rather than derived
+    from which field it happens to equal, since those two being the same
+    length is a coincidence, not a rule.
+    """
+    if not isinstance(value, str) or not value.startswith("derived"):
+        return value
+    lead = value[len("derived"):].strip()
+    back = float(lead) if lead else entry.get("fade_out", 0)
+    return round(entry["at"] + entry["dur"] - back, 3)
 
 
 def _generated_id(act, b, n, line):
@@ -759,6 +860,17 @@ def manifest_plates(act):
     return doc.get(chap.plates_key) or []
 
 
+DERIVED_COPY = frozenset({"casting", "brief"})
+"""Plates whose words are NOT the owner's to type here.
+
+A ``casting`` or ``brief`` nameplate resolves from ``vocab/casting.yaml`` and
+the act's brief, which are already the one place those names live. Copying
+them into a chapter file would make a second one, and the second one is always
+the one that goes wrong -- these are claims about real people. The chapter
+file leaves them alone; ``sync`` carries them through untouched.
+"""
+
+
 def extract(act, gap=3.0):
     """The act's committed manifest -> the chapter file that reproduces it.
 
@@ -770,7 +882,8 @@ def extract(act, gap=3.0):
     chap = chapter(act)
     offset = chap.programme_start
     defaults = chap.defaults or {}
-    plates = manifest_plates(act)
+    plates = [p for p in manifest_plates(act)
+              if p.get("copy_source") not in DERIVED_COPY]
     header, _ = _split_header(chap.path.read_text(encoding="utf-8"))
     out = [header.rstrip("\n"), ""]
     previous_end = None
@@ -835,7 +948,7 @@ def _attr_rows(key, value):
     if key == "censor" and isinstance(value, list):
         return [f"{item['find']} -> {item['replace']}" for item in value]
     if isinstance(value, list):
-        return [_scalar_out(item) for item in value]
+        return [_scalar_out(item) for item in value] or ["[]"]
     return [_scalar_out(value)]
 
 
@@ -856,10 +969,15 @@ def _scalar_out(value):
 
 
 def _num(value):
-    """A number as short as it can be written without changing it."""
-    if isinstance(value, int) or float(value).is_integer():
-        return str(int(value))
-    return repr(round(float(value), 6)).rstrip("0").rstrip(".")
+    """A number written so it reads back as the same number AND the same type.
+
+    ``4.0`` must not become ``4``: the manifest is regenerated from this, and
+    an angle that was a float coming back as an int rewrites a line of a
+    delivered record for no reason at all.
+    """
+    if isinstance(value, int):
+        return str(value)
+    return repr(round(float(value), 6))
 
 
 def _split_header(text):
@@ -895,11 +1013,72 @@ def sync(act, write=False):
     plates, unresolved = entries(act)
     if not plates:
         return raw, unresolved
-    doc[chap.plates_key] = plates
+    before = doc.get(chap.plates_key) or []
+    merged, notes = _merge_plates(before, plates)
+    unresolved.extend(notes)
+    doc[chap.plates_key] = merged
+    if merged == before:
+        # The manifest already says exactly this. Leaving the file alone --
+        # rather than round-tripping it through a serialiser -- keeps the
+        # hand-formatting these records were written with, and keeps a
+        # delivered act off the stale list for whitespace nobody can see.
+        return raw, unresolved
     text = json.dumps(doc, indent=_json_indent(raw), ensure_ascii=False) + "\n"
     if write and text != raw:
         path.write_text(text, encoding="utf-8")
     return text, unresolved
+
+
+def _check_in_order(resolved, committed):
+    """Drift for a run of cards that has no ids -- position is the identity.
+
+    Act VIII's credit cards are addressed by their order in the run and by
+    nothing else, so "the third card changed" is the most that can honestly
+    be said about them.
+    """
+    notes = []
+    if len(resolved) != len(committed):
+        notes.append(f"the chapter file has {len(resolved)} card(s) and the "
+                     f"manifest has {len(committed)}")
+    for n, (new, old) in enumerate(zip(resolved, committed), 1):
+        for key in sorted(set(new) | set(old)):
+            if new.get(key) != old.get(key):
+                notes.append(f"card {n}.{key}: chapter file says "
+                             f"{new.get(key)!r}, manifest says "
+                             f"{old.get(key)!r}")
+    return notes
+
+
+def _merge_plates(before, authored):
+    """The manifest's plates with the chapter file's words put back, by id.
+
+    A chapter file owns the plates it authors, NOT the whole array: act VI's
+    pills sit in the same list as four ``brief`` nameplates that resolve from
+    the roster. Replacing the array would delete them, so every plate the
+    chapter file does not name is carried through in the position it already
+    holds, and a newly written line lands beside the plate it follows in time.
+    """
+    if any("id" not in plate for plate in authored):
+        # A run with no ids is owned outright: there is nothing to merge
+        # against, and its order IS its content.
+        return authored, []
+    by_id = {plate.get("id"): plate for plate in authored}
+    merged, notes = [], []
+    for plate in before:
+        merged.append(by_id.pop(plate.get("id"), plate))
+    for plate in by_id.values():
+        if plate.get("copy_source") in DERIVED_COPY:
+            notes.append(f"{plate.get('id')}: a chapter file cannot author "
+                         f"{plate['copy_source']} copy; it is derived")
+            continue
+        at = plate.get("at", 0.0)
+        index = len(merged)
+        for position, existing in enumerate(merged):
+            if existing.get("at", 0.0) > at:
+                index = position
+                break
+        merged.insert(index, plate)
+    return merged, notes
 
 
 def _json_indent(raw):
@@ -928,8 +1107,16 @@ def check(act):
         return []
     committed = manifest_plates(act)
     resolved, _ = entries(act)
-    if not resolved:
-        return []
+    if not resolved and any(p.get("copy_source") not in DERIVED_COPY
+                            for p in committed):
+        # A file that resolves to nothing used to report nothing, which is
+        # how a chapter whose grammar had stopped matching its own lines
+        # looked exactly like a chapter in perfect agreement.
+        return [f"the chapter file resolves to no plates at all, and the "
+                f"manifest holds {len(committed)} -- its lines are not "
+                f"being read"]
+    if any("id" not in plate for plate in committed):
+        return _check_in_order(resolved, committed)
     by_id = {plate["id"]: plate for plate in committed}
     notes = []
     for plate in resolved:
@@ -945,10 +1132,38 @@ def check(act):
                              f"{old.get(key)!r}")
     authored = {plate["id"] for plate in resolved}
     for plate in committed:
-        if plate["id"] not in authored:
-            notes.append(f"{plate['id']} is in the manifest and not in the "
-                         "chapter file -- it is still built elsewhere")
+        if plate["id"] in authored:
+            continue
+        if not chap.fields.get("owns_plates"):
+            # A chapter that declares itself a PARTIAL author -- act II, whose
+            # builder still generates most of its plates -- is not drifting by
+            # having plates it does not author. Listing all 130 of them would
+            # bury the two lines that mean something.
+            continue
+        if plate.get("copy_source") in DERIVED_COPY:
+            # A nameplate resolving from the roster is SUPPOSED to be absent
+            # here. Reporting it would train the reader to ignore this list,
+            # which is the only way this report stops working.
+            continue
+        notes.append(f"{plate['id']} is in the manifest and not in the "
+                     "chapter file -- it is still built elsewhere")
     return notes
+
+
+def sync_manifest(path, write=True):
+    """Bring one plate manifest current with whichever chapter file owns it.
+
+    Builders address manifests by path, not by act -- ``build_ending_overlays``
+    renders whichever movement it is pointed at -- so this resolves the act
+    backwards from the file. A manifest nobody has migrated is left alone and
+    reports nothing: not every manifest has a chapter file yet, and that is a
+    punch-list item, never a stop.
+    """
+    path = Path(path).resolve()
+    for chap in discover().values():
+        if chap.manifest_path() and chap.manifest_path().resolve() == path:
+            return sync(chap.act, write=write)[1]
+    return []
 
 
 def main(argv=None):

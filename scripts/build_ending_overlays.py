@@ -78,6 +78,7 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from tools import conform  # noqa: E402
+from tools import chapter_md  # noqa: E402
 from tools.render import ffmpeg_for_printing, find_ffmpeg  # noqa: E402
 from scripts import build_interludes  # noqa: E402
 
@@ -245,6 +246,8 @@ def main(argv=None):
         cards_dir = REPO / cards_dir
     out = Path(args.out or REPO / deriv["out_file"])
 
+    for note in chapter_md.sync_manifest(manifest):
+        print(f"chapter: {note}", file=sys.stderr)
     doc = json.loads(manifest.read_text())
 
     source = REPO / spec["source"]

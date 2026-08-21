@@ -25,17 +25,27 @@ if str(REPO_ROOT) not in sys.path:
 
 from tools import chapter_md  # noqa: E402
 
-# Every act whose chapter file authors its manifest's whole plate list. Act
-# II is deliberately absent: its builder contributes most of its plates, so
-# its chapter file is a partial author and `sync` skips it by design.
+# Every act whose chapter file authors the plates in its manifest. Act II is
+# deliberately absent: its builder contributes most of its plates, so its
+# chapter file is a partial author and `sync` skips it by design.
 OWNED = sorted(act for act, chap in chapter_md.discover().items()
                if chap.fields.get("owns_plates"))
 
 
 def committed(act):
+    """The plates in the manifest that the chapter file is answerable for.
+
+    A `casting` or `brief` nameplate resolves from the roster, not from the
+    Markdown, so an act like VI holds both kinds in one array. The chapter
+    file is asked to reproduce its own, and to leave the others alone --
+    which `test_the_manifest_is_current_with_its_chapter_file` checks, since
+    a dropped nameplate changes the manifest text.
+    """
     chap = chapter_md.chapter(act)
     with chap.manifest_path().open(encoding="utf-8") as fh:
-        return json.load(fh)[chap.plates_key]
+        plates = json.load(fh)[chap.plates_key]
+    return [p for p in plates
+            if p.get("copy_source") not in chapter_md.DERIVED_COPY]
 
 
 @pytest.mark.parametrize("act", OWNED)
@@ -76,8 +86,19 @@ def test_at_least_one_act_is_migrated():
 
 @pytest.mark.parametrize("act", OWNED)
 def test_every_plate_keeps_the_id_the_delivered_master_refers_to(act):
-    """Ids are how a note, an issue and a rendered PNG name the same pill."""
+    """Ids are how a note, an issue and a rendered PNG name the same pill.
+
+    A run with no ids at all is addressed by its order instead -- act VIII's
+    credit cards never had one, and minting some here would write a new field
+    into a delivered record. What is checked there is that they still have
+    none, so nobody starts half-identifying them.
+    """
     resolved, _ = chapter_md.entries(act)
+    want = committed(act)
+    if any("id" not in plate for plate in want):
+        assert all("id" not in plate for plate in resolved)
+        assert len(resolved) == len(want)
+        return
     ids = [plate["id"] for plate in resolved]
-    assert ids == [plate["id"] for plate in committed(act)]
+    assert ids == [plate["id"] for plate in want]
     assert len(set(ids)) == len(ids)
