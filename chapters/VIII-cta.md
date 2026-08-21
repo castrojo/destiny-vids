@@ -7,6 +7,11 @@ plates_key: cta_cards
 # Changing one card's weight changes every other card's length, which is why
 # removing a card here means moving its weight onto the cards that stay.
 timed: false
+# Nothing here is pinned to a second. This is where the chapter falls in the
+# running order, so a read-through of the whole show puts it in the right
+# place -- it is never used to seat a card. Act VIII starts at 1728.024 by
+# the summed running order (see any timed chapter's derivation).
+programme_start: 1728.024
 # No key in this run is a list: `body` here is one sentence under a name,
 # not the several lines a book page carries.
 list_keys:

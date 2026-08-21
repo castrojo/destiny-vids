@@ -273,7 +273,10 @@ class Chapter:
         is pinned to a second.
         """
         if self.fields.get("timed") is False:
-            return 0.0
+            # An untimed chapter pins nothing, so this is not a clock -- it
+            # is only where the chapter falls in the running order, for
+            # anything that reads the show end to end.
+            return float(self.fields.get("programme_start", 0.0))
         return float(self.fields["programme_start"])
 
     @property

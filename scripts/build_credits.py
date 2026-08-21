@@ -77,6 +77,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from tools import chapter_md  # noqa: E402
 from tools import conform  # noqa: E402
 from tools import credits as C  # noqa: E402
 from tools import peaks  # noqa: E402
@@ -496,6 +497,14 @@ def fetch_avatars(manifest, verbose=True, from_actions=False):
 
 
 def build_manifest(refresh, refresh_cast=False):
+    # THE CARDS' WORDS LIVE IN `chapters/VIII-cta.md` AND `VIII-fixed.md`.
+    # Both write into this manifest, so both are put back before it is read:
+    # the cries and the birthday card are the act's most-edited copy, and
+    # rendering last week's version of them is the one thing a build here
+    # must never do.
+    for act in ("VIII-cta", "VIII-fixed"):
+        for note in chapter_md.sync(act, write=True)[1]:
+            print(f"chapter: {note}", file=sys.stderr)
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
     if refresh or "contributors" not in manifest:
         manifest["contributors"] = fetch_contributors()

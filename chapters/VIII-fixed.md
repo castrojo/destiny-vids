@@ -5,6 +5,11 @@ plates_key: fixed_cards
 # NO CLOCK, and no ids: these cards are addressed by their ORDER, which the
 # owner set deliberately. `dur_sec` is a real duration here, not a weight.
 timed: false
+# Nothing here is pinned to a second. This is where the chapter falls in the
+# running order, so a read-through of the whole show puts it in the right
+# place -- it is never used to seat a card. Act VIII starts at 1728.024 by
+# the summed running order (see any timed chapter's derivation).
+programme_start: 1728.024
 list_keys: names
 owns_plates: true
 # No `field_order`: these three cards do NOT agree on one. The first card
