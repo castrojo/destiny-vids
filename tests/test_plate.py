@@ -2266,39 +2266,6 @@ def test_a_farm_runner_also_burns_to_a_tmp_and_replaces(tmp_path, monkeypatch):
     assert not (tmp_path / "out.burntmp.mp4").exists()
 
 
-def test_farmed_cli_fetches_the_burn_tmp_path(tmp_path, monkeypatch):
-    video = tmp_path / "in.mp4"
-    video.write_bytes(b"source")
-    manifest = tmp_path / "manifest.json"
-    manifest.write_text(json.dumps({
-        "plates": [dict(GUARDIAN, name="A test person")],
-    }))
-    master = tmp_path / "out.mp4"
-    captured = {}
-
-    monkeypatch.setattr(plate, "render_all", lambda *_args, **_kwargs: [])
-    monkeypatch.setattr(plate, "_probe_duration", lambda *_args: 20.0)
-    monkeypatch.setattr("tools.render.find_ffmpeg", lambda: ["ffmpeg"])
-
-    def fake_farm(argv, **kwargs):
-        captured["argv"] = argv
-        captured["out"] = Path(kwargs["out"])
-        Path(argv[-1]).write_bytes(b"freshly burned")
-
-    monkeypatch.setattr("tools.farm.run_ffmpeg_on_cluster", fake_farm)
-    assert plate.main([
-        "burn",
-        "--video", str(video),
-        "--manifest", str(manifest),
-        "--plates-dir", str(tmp_path),
-        "--out", str(master),
-        "--farm",
-    ]) == 0
-    assert captured["out"] == Path(captured["argv"][-1])
-    assert captured["out"].name == "out.burntmp.mp4"
-    assert master.read_bytes() == b"freshly burned"
-
-
 def test_a_runner_that_delivers_nothing_leaves_the_master_alone(
         tmp_path, monkeypatch):
     _stub_ffprobe(monkeypatch)

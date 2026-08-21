@@ -3867,8 +3867,9 @@ def main(argv=None):
         # inputs, and the 16Gi pod was OOMKilled (exit 137) 52 s in -- the
         # cgroup version of the local "Failed initializing scaling graph"
         # failure _burn_units' comment describes. exo-0 has 65Gi.
-        def runner(argv, _inputs=burn_inputs, _dur=expected):
-            farm.run_ffmpeg_on_cluster(argv, inputs=_inputs, out=Path(argv[-1]),
+        def runner(argv, _inputs=burn_inputs, _out=resolved_out,
+                   _dur=expected):
+            farm.run_ffmpeg_on_cluster(argv, inputs=_inputs, out=Path(_out),
                                        expected_duration=_dur,
                                        limit_memory="48Gi")
 
