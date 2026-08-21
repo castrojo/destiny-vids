@@ -84,6 +84,8 @@ def test_an_over_cap_encode_still_writes_its_source_digest(
     monkeypatch.setattr(social, "source_facts", lambda _p: {
         "width": 1920, "height": 1080, "fps": "30/1", "duration": 30.0})
     monkeypatch.setattr(social.farm, "cluster_available", lambda: (False, "x"))
+    # No ffmpeg on the CI runner; the encode itself is faked below.
+    monkeypatch.setattr("tools.render.find_ffmpeg", lambda: ["ffmpeg"])
 
     def fake_run(cmd, **k):
         class R:
