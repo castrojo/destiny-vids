@@ -1,3 +1,17 @@
+---
+act: II
+manifest: stories/02-endless-forms-plates.json
+# WHERE THIS ACT STARTS IN THE PROGRAMME, in seconds. A measurement of the
+# running order, not something to recompute from memory: prologue 101.200
+# (megacut.json item 0 `dur`) + act I 116.200 (trim 2.000 -> 118.200) +
+# Perfume movement 2, 66.400 (source 93.000 -> 159.400) = 283.800 --
+# verified against the seven-days-to-the-wolves-v4.2 dry run on 2026-08-20.
+# Restate the derivation when the running order's timings move.
+programme_start: 283.800
+# The act's own length comes from the manifest's `_film_sec`; it is not
+# restated here, because a second copy is a future contradiction.
+---
+
 # Act II — Endless Forms Most Beautiful: conversations
 
 This file is where you write and rewrite this chapter's chat dialogue. The
