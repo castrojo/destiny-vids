@@ -184,6 +184,7 @@
     "audio_sec": 95.333333,
     "inputs": {
       "intro": "wolves-directors-cut-europa-intro-hq.mp4",
+      "jupiter": "nimbatus-review/jupiter/cand/PIA22906_nasa.mp4",
       "wrap": "nimbatus-review/ext/wrap1080.mp4",
       "beyond": "sources/Act2-BeyondLight-reveal-T9FIbmj1Qf0-1080p24-2262k.mp4",
       "song": "Beauty Of The Beast [X3WrCzLIIvk].webm",
@@ -191,10 +192,28 @@
     },
     "segments": [
       {
-        "label": "cold-open",
+        "label": "intro-before-jupiter",
         "from": "intro",
         "frames": [
           0,
+          497
+        ]
+      },
+      {
+        "label": "jupiter-native",
+        "from": "jupiter",
+        "window": [
+          0.0,
+          6.5
+        ],
+        "fps": 30,
+        "scale": true
+      },
+      {
+        "label": "intro-after-jupiter",
+        "from": "intro",
+        "frames": [
+          692,
           1725
         ]
       },
@@ -254,8 +273,8 @@
         }
       }
     ],
-    "_note": "The concat reproduces nimbatus-review/render/run-final-hq.sh's [b0a][bsp][b0b][b1][b2][b3] graph, minus the close-up: 57.5 + 5.133333 + 21.5 + 2.2 + 9.0 = 95.333333 s of content, then the 13 s comic cover to a 108.333333 s master. The walk-up's fps=30 runs BEFORE its frame trim (so frames 3443-3509 are counted on the 30 fps conversion, i.e. source times 114.767-116.967; the measured native cut is 116.958): the solo wide runs from source 114.767 through that original cut, and the close-up is removed because both other Guardians are already visible behind the Exo Stranger. The walk-up's baked fade_out and the wrap's fade_in are both GONE -- the join is a hard cut, so both sides stay clean; the wrap's own closing fade stays. The speeder's window is a TIME trim on the native 24 fps stream, then fps=30. An input feeding two segments is split, never opened twice -- frame-exactness by construction, not by seek.",
-    "_sources_note": "intro: the act's own 79 s plate-free picture (built by nimbatus-review/hq/build-intro-hq.sh). beyond: Bungie's Act 2 / Beyond Light reveal (T9FIbmj1Qf0), third-party copyrighted, used under Bungie's fan-content policy like the rest of the index (#55). wrap: the project's Nimbatus outro sting. cover: ~/Downloads/wolves.jpg, the comic cover act VIII owns (#178). Footage is never committed."
+    "_note": "The concat reproduces nimbatus-review/render/run-final-hq.sh's picture order, minus the close-up and the old Jupiter dissolve/held-still transition: the 57.5 s intro is split around a native 195-frame Juno video slot, followed by 5.133333 + 21.5 + 2.2 + 9.0 = 95.333333 s of content, then the 13 s comic cover to a 108.333333 s master. The Jupiter source is already 1920x1080 at 30 fps; the graph only aligns its timestamps and concat format. The walk-up's fps=30 runs BEFORE its frame trim (so frames 3443-3509 are counted on the 30 fps conversion, i.e. source times 114.767-116.967; the measured native cut is 116.958): the solo wide runs from source 114.767 through that original cut, and the close-up is removed because both other Guardians are already visible behind the Exo Stranger. The walk-up's baked fade_out and the wrap's fade_in are both GONE -- the join is a hard cut, so both sides stay clean; the wrap's own closing fade stays. The speeder's window is a TIME trim on the native 24 fps stream, then fps=30. An input feeding multiple segments is split, never opened twice -- frame-exactness by construction, not by seek.",
+    "_sources_note": "intro: the act's own 79 s plate-free picture (built by nimbatus-review/hq/build-intro-hq.sh). jupiter: the native PIA22906 Juno video, NASA/JPL-Caltech/SwRI/MSSS/Kevin M. Gill, public-domain source, staged in the project and never committed. beyond: Bungie's Act 2 / Beyond Light reveal (T9FIbmj1Qf0), third-party copyrighted, used under Bungie's fan-content policy like the rest of the index (#55). wrap: the project's Nimbatus outro sting. cover: ~/Downloads/wolves.jpg, the comic cover act VIII owns (#178). Footage is never committed."
   },
   "audio": {
     "join": [
