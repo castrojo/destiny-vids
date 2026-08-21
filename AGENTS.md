@@ -302,6 +302,22 @@ punch list; the backlog is for work.
   to it by hand is reverted by the next build, so **the copy goes in the
   generator** and the manifest is regenerated. Check for a generator before
   editing any `stories/*.json`.
+- **A builder listed in `delivery.json` is frozen; check before you edit it.**
+  Every path under a master's `sources` is hashed into that act's
+  `source_digest`, so editing one — even to delete a dead constant or fix a
+  comment — marks a delivered act **stale** for a change that cannot reach a
+  pixel. Ask first, then decide:
+
+  ```bash
+  python3 -c "import json;print('\n'.join(sorted(s for m in json.load(open('stories/megacut/delivery.json'))['masters'].values() for s in m.get('sources') or [])))"
+  ```
+
+  Roughly forty files are on that list, including every `scripts/build_*.py`,
+  `tools/plate.py`, `tools/credits.py` and `vocab/casting.yaml` — which is to
+  say most of what an agent reaches for. A change that reaches a **frame**
+  belongs in the same commit as the rebuild that justifies the new digest;
+  tidying that reaches no frame is filed as an issue and rides along with the
+  next real rebuild. Neither is a reason to hand-edit a digest.
 - **A card count can be pinned by schema.** `schema/ending-cards.schema.json`
   fixes the ending at `minItems: 15, maxItems: 15`, so adding a card is a
   **two-file** change — the manifest and the bound — in one commit. The bound
@@ -422,6 +438,15 @@ The docs tree is the `projectbluefin/common` layout: a contract (this file), a
 router ([`docs/SKILL.md`](docs/SKILL.md)), skills under `docs/skills/`, and a
 short shelf of design docs beside them.
 
+**This file and `docs/skills/` are the whole agent contract.** Never add a
+vendor-specific instruction file beside them — no `.github/copilot-instructions.md`,
+no `CLAUDE.md`, no `.cursorrules`, no `.windsurfrules`. Owner, on an agent
+starting one: *"Why are you violating my policies? Fix the skills and docs, no
+copilot specific things."* A second contract is a second thing to keep in
+step, and the one that drifts is always the one nobody routes through. Every
+tool that reads instructions here reads `AGENTS.md`; guidance worth writing
+down goes in this file or in the routed skill, and nowhere else.
+
 **Docs describe the current state, never the sequence of states that produced
 it.** Version-by-version narration is the failure mode this repo has already
 had: nine per-act build logs, several of them contradicting the running order
@@ -488,6 +513,35 @@ Turn on **auto-merge** and walk away. `.github/workflows/ci.yml` is the gate,
 and it is **one step**: the offline suite. The derived-artifact checks are
 asserted inside that suite rather than run again beside it, so `--check` stays
 a local command you run before committing, not a second copy of the gate.
+
+**"Walk away" means auto-merge is on, not that you stopped.** Opening a PR and
+sitting beside it is not landing it — owner, verbatim: *"I told you to turn
+inference off not send a PR and sit there, merge it."* If a PR is the last
+thing between the owner and the change they asked for, enable auto-merge (or
+merge it) rather than reporting that a PR exists.
+
+**Leave the checkout clean.** Owner, on finding one that was not: *"why is
+there a dirty checkout? did you forget how to use git?"* Everything you
+authored is committed to a named branch, or it is one `git checkout` from
+being nobody's work. `git status --short` before you hand back, every time —
+it costs a second and it is the difference between a finished change and a
+pile of edits the next agent has to guess the intent of. Uncommitted scratch
+belongs in the session folder, never in the tree.
+
+**A merge is where work disappears.** Several agents edit `tools/plate.py`,
+`vocab/casting.yaml` and the generated indexes at once, so a resolution that
+takes one side wholesale silently drops the other. Count the test functions
+across a merge, not just at the end of it:
+
+```bash
+git show <merge>^:tests/test_deliver.py | grep -c '^def test_'
+git show <merge>:tests/test_deliver.py  | grep -c '^def test_'
+```
+
+A green suite proves nothing here: deleted tests do not fail. `69ebfca` took
+`tests/test_deliver.py` from 59 test functions to 15 — the whole delivery
+guard, and it stayed green for a day, because 44 tests that no longer exist
+cannot go red.
 
 **The gate asserts what a runner can actually know.** It holds no footage and
 no `~/Videos`, so it cannot answer "is the delivered film current". Delivery

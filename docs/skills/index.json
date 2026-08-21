@@ -53,8 +53,8 @@
         "runner"
       ],
       "description": "The suite is the gate. Use when a test passes locally and fails in CI, when adding a check, or when anything resolves a binary, font, or path outside the repo.",
-      "version": "1.0",
-      "last_updated": "2026-08-20",
+      "version": "1.1",
+      "last_updated": "2026-08-21",
       "doc_type": "procedure"
     },
     {

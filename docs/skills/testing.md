@@ -1,7 +1,7 @@
 ---
 name: testing
-version: "1.0"
-last_updated: "2026-08-20"
+version: "1.1"
+last_updated: "2026-08-21"
 id: testing
 one_line_purpose: Keep the offline suite the whole gate, and diagnose checks red only in CI.
 entry_point: docs/skills/testing.md
@@ -133,6 +133,30 @@ if stale:
 `pytest -rpP` will show captured output from passing tests when you actually
 want it. (Verified against Context7 `/pytest-dev/pytest`.)
 
+## A deleted test cannot go red
+
+The suite passing says nothing about tests that are no longer in it, and this
+repo loses them in **merges**: several agents edit the same files at once, so
+a resolution that takes one side wholesale drops the other side's tests
+without a conflict marker or a failure. `69ebfca` took
+`tests/test_deliver.py` from 59 test functions to 15 — every footage-drift
+test, both worktree-ephemerality tests, all three publish refusals and both
+provenance detectors — and the suite stayed green, because 44 tests that do
+not exist cannot fail. It was not the prune that shipped alongside it: the
+prune removed **zero** test functions from that file.
+
+Count both sides of any merge that touches `tests/`:
+
+```bash
+git show <merge>^:tests/test_deliver.py | grep -c '^def test_'
+git show <merge>:tests/test_deliver.py  | grep -c '^def test_'
+```
+
+The same reasoning as *"a check that can only run in the case where it passes
+is not a check"* — a suite that shrank silently is a gate that quietly got
+smaller. Restoring is usually mechanical: the tests still apply, they just
+need whatever signature change happened while they were gone.
+
 ## Nothing in CI may hang
 
 A step with no ceiling can hold the concurrency group indefinitely, and
@@ -164,6 +188,10 @@ change for six hours, both inside `apt-get update` waiting on a mirror.
 - A new `--force`/`--allow-*` flag added to get past a check
 - A worktree under `/tmp` or `/var/tmp`, or one on a detached HEAD
 - A render started from a branch that has never been pushed
+- A merge that touched `tests/` and was not counted on both sides
+- A validator whose extension does not match its shebang: `bash foo.sh` on a
+  Python file prints "command not found" and **exits 0**, so the check passes
+  having checked nothing
 
 ## Verification
 
