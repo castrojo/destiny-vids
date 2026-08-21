@@ -1,7 +1,7 @@
 ---
 name: plates
 version: "1.0"
-last_updated: "2026-08-19"
+last_updated: "2026-08-20"
 id: plates
 one_line_purpose: Render authored identity and dialogue cards without inventing copy.
 entry_point: docs/skills/plates/SKILL.md
@@ -212,6 +212,9 @@ This skill is the contract. The procedure lives in `references/`:
 - Guessing a pill's seat when the manifest's clock is in doubt. Omission
   degrades; misplacement lies. Never ship the old master instead: stale copy is
   the same fault with an older timestamp.
+- Using a freeze-frame or looped source frame to make an old plate seat fit.
+  Re-seat the plate on the evidenced source frame in its generator; leave the
+  picture unchanged, and let a short shot carry the plate across its cut.
 - A looped still overlaid on a finite picture without a bound. Trim the still
   to the picture's length and add `shortest=1`.
 - Shipping a cut with a non-empty `unresolved` list without reading it. An empty

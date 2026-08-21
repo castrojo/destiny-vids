@@ -587,12 +587,12 @@ MAPPED_TAIL_PASS = [
         "id": "mapped_eyecantcu_reveal",
         "kind": "guardian",
         "position": "left",
-        "at_film": build_efmb.EYECANTCU_AT,
+        "at_film": build_efmb.edited_film_for_source(352.85),
         "hold": 3.2,
         "key": "EyeCantCU",
-        "seen_at_src": build_efmb.EYECANTCU_SRC,
-        "shot_src": [353.533, 355.167],
-        "why": "the evidenced Warlock frame held in the authored 9:31 seat",
+        "seen_at_src": 352.85,
+        "shot_src": [352.667, 353.533],
+        "why": "the solar Warlock pulling out the glowing orange sword",
     },
 ]
 
@@ -931,9 +931,9 @@ SOLO = [
     },
     {
         "key": "EyeCantCU",
-        "src": (353.533, 355.167),
-        "seen": 354.600,
-        "why": "the Warlock, arms spread, going off in a wreath of solar fire",
+        "src": (352.667, 353.533),
+        "seen": 352.85,
+        "why": "the solar Warlock pulling out the glowing orange sword",
     },
 ]
 
@@ -2597,9 +2597,9 @@ def build():
             "hallway-and-dogs frame, Amber's owner-identified gameplay "
             "sequence, and the cleared Local Forecast - Slower bed. Source "
             "resumes at 325.933 after the readable black-screen conversation",
-            "EyeCantCU's owner-timed megacut 9:31 seat uses a freeze of the "
-            "evidenced source-354.600 Warlock frame; the stale old 283.666 "
-            "plate seat remains removed",
+            "EyeCantCU's owner-timed reveal is seated at source-352.850, the "
+            "close-up where the solar Warlock pulls out the glowing orange "
+            "sword",
             "the 9:10 HATERS title renders through existing title chrome. The "
             "requested flashing red boss treatment is still missing; the copy "
             "ships without that effect rather than being dropped",

@@ -1,7 +1,7 @@
 ---
 name: farm
 version: "1.0"
-last_updated: "2026-08-19"
+last_updated: "2026-08-20"
 id: farm
 one_line_purpose: Run frame-touching encodes on the remote Kubernetes farm.
 entry_point: docs/skills/farm.md
@@ -148,6 +148,10 @@ of 0 is not evidence (issue #88).
   PNG `-i` inputs plus any `%0Nd` image sequence, and all of them have to be
   named in `inputs` or the pod cannot open them. Sequences stage as their
   frames; the pattern is rewritten to the pod's staged directory.
+- **Fetch the burn's temporary output, not the master path.** `tools/plate.py`
+  writes `<master>.burntmp.mp4` and atomically replaces the master only after
+  the farm fetch succeeds; the runner must pass the output path named by the
+  argv to `run_ffmpeg_on_cluster`.
 - **One 78-deep `overlay` chain does not finish.** It stalls locally at ~12
   threads with a zero-byte output, and kills the pod on the cluster. Burn in
   batches. Batching by PLATE COUNT is correct but SERIAL -- pass N+1 consumes

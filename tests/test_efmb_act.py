@@ -92,16 +92,20 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
     assert returned["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
     assert returned["source_in"] == pytest.approx(325.933, abs=1e-3)
 
-def test_kyle_and_eyecantcu_each_get_their_evidenced_picture():
+def test_the_picture_tail_is_black_after_the_last_evidenced_run():
     sequence = build_efmb.picture_sequence()
-    eye = next(p for p in sequence if p["id"] == "eyecantcu_tail")
+    tail = next(p for p in sequence if p["id"] == "tail_black")
+    assert not any(p["id"] == "eyecantcu_tail" for p in sequence)
     assert build_efmb.edited_film_for_source(
         build_efmb.KYLE_REVEAL_SRC) == pytest.approx(
-            build_efmb.KYLE_REVEAL_AT, abs=1e-3)
-    assert eye["at"] == pytest.approx(351.97, abs=1e-3)
-    assert eye["source_at"] == pytest.approx(354.6, abs=1e-3)
-    assert eye["duration"] == pytest.approx(
-        build_efmb.build()["film_sec"] - 351.97, abs=1e-3)
+        build_efmb.KYLE_REVEAL_AT, abs=1e-3)
+    assert tail["at"] == pytest.approx(
+        build_efmb.EDITED_PICTURE_END, abs=1e-3)
+    assert tail["duration"] == pytest.approx(
+        build_efmb.build()["film_sec"] - build_efmb.EDITED_PICTURE_END,
+        abs=1e-3)
+    with pytest.raises(build_efmb.NotInPicture):
+        build_efmb.edited_source_for_film(build_efmb.EDITED_PICTURE_END)
     assert sum(p["duration"] for p in sequence) == pytest.approx(
         build_efmb.build()["film_sec"], abs=1e-3)
 
@@ -812,7 +816,8 @@ def test_the_late_pass_records_only_the_precise_remaining_gaps():
     assert "kolunmi" in late_gaps
     assert "rare drop in a game" in late_gaps
     assert "hallway-and-dogs frame, Amber's owner-identified" in late_gaps
-    assert "EyeCantCU's owner-timed megacut 9:31 seat" in late_gaps
+    assert "EyeCantCU's owner-timed reveal is seated at source-352.850" in \
+        late_gaps
     assert "requested flashing red boss treatment is still missing" in late_gaps
     assert "exact owner-authored words" not in late_gaps
 
@@ -841,11 +846,14 @@ def test_the_endfight_reseats_kyle_and_eyecantcu_on_evidenced_picture():
     eye = by_id["mapped_eyecantcu_reveal"]
     assert kyle["at"] == pytest.approx(build_efmb.KYLE_REVEAL_AT, abs=1e-3)
     assert kyle["name"] == "Kyle Gospodnetich"
-    assert eye["at"] == pytest.approx(351.97, abs=1e-3)
+    assert eye["at"] == pytest.approx(
+        build_efmb.edited_film_for_source(352.85), abs=1e-3)
     assert eye["name"] == "[ EyeCantCU ]"
+    assert eye["seen_at_src"] == pytest.approx(352.85, abs=1e-3)
+    assert eye["shot_src"] == pytest.approx([352.667, 353.533], abs=1e-3)
+    assert eye["why"] == (
+        "the solar Warlock pulling out the glowing orange sword")
     assert "solo_EyeCantCU" not in by_id
-    assert "stale old 283.666 plate seat remains removed" in \
-        " ".join(committed()["unresolved"])
 
 def test_the_remaining_face_shot_dialogue_cards_still_land():
     late = late_plates()
