@@ -72,6 +72,39 @@ cd ~/Videos
 ./audio-check.sh --all                  # gate Wolves/Prod
 ```
 
+## Auditioning a change without a rebuild
+
+A music note — "try the vocal version", "start the bed at 7:45" — does not
+need the act's builder, which can cost minutes to hours. Remux the
+**delivered** act: picture stream-copied, only the audio decoded and re-laid:
+
+```bash
+ffmpeg -y -i ~/Videos/Wolves/Prod/<act>.mp4 \
+  -ss <start> -t <dur> -i "song-source.webm" \
+  -map 0:v -c:v copy -map 1:a -c:a flac \
+  -movflags +faststart ~/Videos/Wolves/preview/<name>.mp4
+```
+
+FLAC at the native 48 kHz keeps the audition on the same lossless footing as
+Prod itself; verify duration and streams with ffprobe before showing it. The
+sidecar lands in `preview/` — never overwrite Prod for an audition, because
+Prod's entries are hardlinks to declared masters.
+
+If the audition is approved, promotion is: overwrite the act's declared master
+in place (`cp` preserves the inode, so the Prod hardlink sees the new content
+immediately), then `python3 tools/deliver.py publish --act <N>` to regenerate
+CHECKSUMS.md5 and the README table, then rebuild the social copy with
+`tools/social.py` (it rewrites the copy's `.source.md5` itself). **The record
+amendment is part of the same change, not a follow-up to skip**: until the
+act's committed record describes the new audio, the builder still produces the
+old mix and a rebuild silently reverts the promotion. Record that gap in the
+record's `unresolved` the moment the promotion ships.
+
+Casting the audition to the owner's screen is `catt -d "<device>" cast <file>`.
+An `UnsupportedNamespace: ... com.google.cast.media is not supported by
+current app` error means a stuck receiver app, not a bad file:
+`catt -d "<device>" stop`, then re-cast with `--force-default`.
+
 ## Read current state from records, not prose
 
 Live delivery state does not belong in this skill. Read the machine record:
@@ -108,6 +141,11 @@ This skill is the contract. The detail lives in `references/`:
 - Shipping after `audio-check.sh --bed` while skipping
   `./audio-check.sh --all`.
 - Using `loudnorm`, limiting, compression, EQ, or any non-static processing.
+- Treating a meter as a content detector: on a dense metal mix the 300–3400 Hz
+  band ratio, 2.5–7 Hz envelope modulation (a ~161 bpm track's drums sit
+  inside that band) and autocorrelation pitch salience all read instrumental
+  and sung passages alike. "Where are the vocals" is answered by an ear —
+  render a probe clip and ask.
 - A standalone builder that never calls
   `peaks.trim_master_peak(out_path.resolve())` after its final ffmpeg command.
 
