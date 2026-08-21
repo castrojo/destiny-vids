@@ -51,17 +51,19 @@ Two tiers, and the difference between them is the whole model:
 
 ### Adding a binding
 
-Edit `vocab/casting.yaml` under `leads.values`, then make it queryable — a
-binding nobody can search for is a binding that does not exist, and a test
-enforces exactly that:
+Edit `vocab/casting.yaml` under `leads.values`, then make it reachable:
 
 1. `vocab/casting.yaml`: `person`, `display_name`, `aka`, optional
    `constraints`, optional `plate` copy.
-2. `tools/search.py` `PHRASES`: at least one phrase for the character and one
-   for the person.
-3. Docs: the cast table in `README.md`.
-4. `python3 tools/rederive.py` — the checked-in segments still carry the old
-   casting until it is run. Renaming a person is five places, not four.
+2. Docs: the cast table in `README.md`.
+3. `python3 tools/rederive.py` — the checked-in segments still carry the old
+   casting until it is run. Renaming a person is three places, not two.
+
+**Search follows the vocabulary on its own.** `tools/search.py` derives a query
+phrase from every character key, every `aka`, and the bound person's id and
+display name, so a new binding is queryable with no edit there. The one thing
+it cannot derive is a nickname nobody wrote down — a bare first name or
+surname — which is what `search.CAST_SHORTHAND` is for.
 
 `constraints` (`require_helmet`, `require_far`) exist only where the project
 wants the figure to read as the character rather than as the person — currently
