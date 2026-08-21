@@ -284,7 +284,7 @@
       "at": 92.833333,
       "dur": 2.5
     },
-    "_note": "The master's bed is the intro's own audio (0-79 s) crossfaded 0.1 s (tri/tri) into Nightwish's Beauty of the Beast (575.9-607.2), then faded out over the cover (106.333333 + 2.0) and trimmed to 108.333333 -- the delivered film's audio is the peaks-gated master's, faded 92.833333 + 2.5 and trimmed to 95.333333 as the cover is cut. Song usage: third-party copyrighted, same fan-content position as the footage (#55); staged in the project, never committed.",
+    "_note": "SHIPPED AUDIO DIFFERS FROM THIS BLOCK (owner, 2026-08-20): the delivered master carries the song leg ALONE, window 465.0-560.4 s (7:45 through picture end), full replacement, no crossfade and no fades -- a remux of the delivered picture onto the same staged vocal rung. The two-leg join below is the PREVIOUS mix and is still what scripts/build_europa.py builds; re-author this block (the builder assumes two legs, a crossfade and both fade-outs) before any rebuild, or a rebuild silently reverts the audio. -- The previous mix: the intro's own audio (0-79 s) crossfaded 0.1 s (tri/tri) into Nightwish's Beauty of the Beast (575.9-607.2), then faded out over the cover (106.333333 + 2.0) and trimmed to 108.333333 -- the delivered film's audio is the peaks-gated master's, faded 92.833333 + 2.5 and trimmed to 95.333333 as the cover is cut. Song usage: third-party copyrighted, same fan-content position as the footage (#55); staged in the project, never committed.",
     "_usage_class": "third_party_copyrighted -- see #55 and the rights section of AGENTS.md."
   },
   "encode": {
@@ -305,6 +305,7 @@
     "_loop_framerate_note": "run-final-hq.sh passed -framerate 30 on every still input. The endcard was the visible ghost-frame bug when a still came in at the 25 fps default -- the plate outlasted its window and burned into the cover. Load-bearing, not ceremonial."
   },
   "unresolved": [
+    "The shipped Prod/ and 10mb/ audio is the vocal-window remux (Beauty of the Beast 465.0-560.4 s, full replacement, no fades; owner, 2026-08-20), published ahead of this record: the audio block above still describes the previous two-leg mix, and scripts/build_europa.py would rebuild THAT. Re-authoring the block and the builder's join/fade assumptions is the follow-up.",
     "The Clarke 'ALL THESE WORLDS ARE YOURS' intro slide stays OUT: a different rightsholder than Bungie and outside this repo's rights position. Owner decision required (#102, Blocked #1). Not built, not burned in.",
     "No verified GitHub login for preethi: that pill renders with the drawn crest, the documented fallback. Alolita is verified as github.com/alolita; krook, nimbatus, castrojo, jeefy and ihor (github.com/idvoretskyi, owner-supplied) also have portraits. Degrading, not blocking -- name preethi's login and that pill gains a face.",
     "The reveal still credits Laura Santamaria: the Orlin recast (#73) stays open and was out of scope for this render.",
