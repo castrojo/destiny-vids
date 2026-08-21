@@ -24,6 +24,20 @@ python3 tools/plate.py burn --video base.mp4 --manifest plates.json \
 Detection falls back to the full frame when there is no letterbox, so passing
 it is always safe.
 
+## The letterbox bars are lanes of their own
+
+Two positions live *on* the bars, off the picture by construction:
+
+- `letterbox` — the bottom bar: the long-hold callout (issue #98, "keep it up
+  for the whole song").
+- `letterbox_top` — the top bar: **every banner or CTA carrying a #hashtag**
+  (e.g. `#UPSTREAMFIRST`). Owner ruling, 2026-08-20: they ride the letterbox
+  up top, never the content.
+
+Both centre on the frame and fall back to just inside the frame edge when
+detection finds no bar (act II mixes aspect ratios: the opening is full-frame,
+the rest is not).
+
 ## Styling provenance
 
 The plate treatment is ported from the website's `WolvesIntroOverlay.vue`, and

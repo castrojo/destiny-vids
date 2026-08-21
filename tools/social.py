@@ -194,6 +194,13 @@ def main(argv=None):
         for leftover in Path(passlog).parent.glob(Path(passlog).name + "*"):
             leftover.unlink(missing_ok=True)
 
+    # The digest rides with EVERY completed encode, over cap or not: the cap
+    # is a platform rule about the bytes, the digest is provenance about
+    # which master they came from. Returning before writing it turned an
+    # over-cap copy into a permanently missing digest, which check_social
+    # reads as STALE -- and --watch re-encoded the same recipe forever.
+    out.with_suffix(out.suffix + ".source.md5").write_text(
+        source_digest(src) + "\n", encoding="utf-8")
     size = out.stat().st_size
     print(f"wrote    {out}  {size / MIB:.2f} MiB")
     if size > target_bytes:

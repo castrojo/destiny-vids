@@ -166,7 +166,10 @@ def test_the_source_is_never_committed(thread):
 # to "tidy up" the plan would put them back.
 
 ACT_VI = "06-7daystothewolves"
-FLASH_CUT = 430.997   # act VI's last shot change; the 14-frame flash starts here
+FLASH_CUT = 411.527   # act VI's last shot change; the 14-frame flash starts here
+                      # (411.700 - 0.173, the same 0.173 s margin the v8 trim
+                      # kept before its own shot change; the interruption's
+                      # removal shifted everything after it -19.470 s)
 
 
 def _item(plan, needle):
@@ -177,12 +180,12 @@ def _item(plan, needle):
 def test_act_six_is_cut_before_its_closing_flash(plan):
     """One frame removes three things the owner asked to lose.
 
-    The comic cover comes up at 431.267 and holds 12.2 s, the song's fade-out
+    The comic cover comes up at 411.797 and holds 12.2 s, the song's fade-out
     begins on the same frame, and the act's last 14 frames are a separate shot
-    -- a pink tableau flashing to a dark Exo shot from 430.997 -- which is the
+    -- a pink tableau flashing to a dark Exo shot from 411.527 -- which is the
     "too janky" the owner named at programme 22:38.
 
-    Cutting on 430.997 takes all three. The needle drop survives it: post-seam
+    Cutting on 411.527 takes all three. The needle drop survives it: post-seam
     audio cross-correlates with the longer cut at lag 0.00 ms, r = 0.997, and
     movement 4 still opens on its own first hit +0.032 s past the seam.
     """
@@ -194,9 +197,9 @@ def test_the_trim_keeps_every_tail_credit(plan):
 
     Act VI's tail plates -- the Cayde-6 reveal, the three gold credits, and
     castrojo's six spoken lines -- all end before the cut. This reads the
-    plate manifest rather than trusting a number copied into a comment, and
-    the margin is now 1.25 s rather than 21.6 s: the six pills were seated
-    into the empty tail this cut used to have to spare.
+    plate manifest rather than trusting a number copied into a comment. With
+    the interruption removed the margin is 21.3 s: the tail plates all end by
+    390.199, and the trim moved to 411.527 with them.
     """
     plates = json.loads(
         (REPO_ROOT / "stories" / "06-wolves-cayde-plates.json").read_text())

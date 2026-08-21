@@ -72,6 +72,35 @@ def test_the_picture_is_scaled_only_when_it_needs_to_be(tmp_path, monkeypatch):
     vf = cmds[0][cmds[0].index("-vf") + 1]
     assert vf.startswith("null"), "a 720p source must not be re-scaled to 720p"
 
+
+def test_an_over_cap_encode_still_writes_its_source_digest(
+        tmp_path, monkeypatch):
+    """The cap is a platform rule about the bytes; the digest is provenance
+    about which master they came from. Returning 1 before writing it made
+    check_social read the copy as STALE forever -- an infinite re-encode
+    loop under deliver --watch."""
+    src, out = tmp_path / "in.mp4", tmp_path / "out.mp4"
+    src.write_bytes(b"source")
+    monkeypatch.setattr(social, "source_facts", lambda _p: {
+        "width": 1920, "height": 1080, "fps": "30/1", "duration": 30.0})
+    monkeypatch.setattr(social.farm, "cluster_available", lambda: (False, "x"))
+    # No ffmpeg on the CI runner; the encode itself is faked below.
+    monkeypatch.setattr("tools.render.find_ffmpeg", lambda: ["ffmpeg"])
+
+    def fake_run(cmd, **k):
+        class R:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+        out.write_bytes(b"0" * (social.MIB * 11))  # over cap
+        return R()
+
+    monkeypatch.setattr(social.subprocess, "run", fake_run)
+    assert social.main([str(src), "--out", str(out)]) == 1
+    stamp = out.with_suffix(out.suffix + ".source.md5")
+    assert stamp.read_text().strip() == social.source_digest(src)
+
+
 def test_reachable_farm_runs_both_encode_passes_in_one_remote_job(
         tmp_path, monkeypatch):
     """Two-pass x264 needs one remote workspace so its stats survive pass one."""

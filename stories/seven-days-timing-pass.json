@@ -259,46 +259,6 @@
    "audio": "bed"
   },
   {
-   "segment_id": "card_024",
-   "still": "renders/interruption/a-silence.png",
-   "duration": 1.0,
-   "beat": "III. INTERRUPTION A -- the song stops; a held beat of black before anything appears (issue #104)",
-   "audio": "silent"
-  },
-  {
-   "segment_id": "card_025",
-   "still": "renders/interruption/b-ambassadors.png",
-   "duration": 4.0,
-   "beat": "III. INTERRUPTION B -- 'The CNCF Ambassadors would like a moment.' (owner-authored, verbatim; hold music: Local Forecast - Slower, CC BY 4.0, credited in ATTRIBUTIONS.md)",
-   "audio": "hold",
-   "audio_from": {
-    "video_id": "bed_local_forecast_slower",
-    "start_sec": 6.5
-   }
-  },
-  {
-   "segment_id": "card_026",
-   "still": "renders/interruption/c-amber.png",
-   "duration": 4.0,
-   "beat": "III. INTERRUPTION C -- Introducing Amber Graner with her authored Guardian identity (hold music continues)",
-   "audio": "hold",
-   "audio_from": {
-    "video_id": "bed_local_forecast_slower",
-    "start_sec": 6.5
-   }
-  },
-  {
-   "segment_id": "yt_destiny_2_the_final_shape_gameplay_trailer_0043_000",
-   "video_id": "yt_destiny_2_the_final_shape_gameplay_trailer",
-   "start_sec": 43.0,
-   "end_sec": 53.47,
-   "duration": 10.47,
-   "start_tc": "0:43.0",
-   "end_tc": "0:53.5",
-   "beat": "III. INTERRUPTION D -- the clip plays to the audience with its own effects and score (issue #104; supersedes #95, whose SFX-only mix does not exist): the explosion, then the transcendence portrait, held to the cut at source 53.470. Amber Graner's moment, introduced on the card before it.",
-   "audio": "source"
-  },
-  {
    "segment_id": "wolves_act2_0171_000",
    "video_id": "wolves_act2",
    "start_sec": 171.0,
@@ -368,7 +328,7 @@
    "plate_slot": true
   },
   {
-   "segment_id": "card_034",
+   "segment_id": "card_030",
    "still": "/var/home/jorge/Pictures/Artwork/wolves.jpg",
    "duration": 12.293,
    "beat": "ARTWORK (outro, over the fade)",

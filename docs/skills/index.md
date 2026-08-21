@@ -4,6 +4,7 @@ Generated 2026-08-20.
 
 | Skill | Category | Type | One-line purpose |
 |---|---|---|---|
+| [chapters](chapters.md) | editorial | procedure | Author an act's chat dialogue in one Markdown file per chapter. |
 | [farm](farm.md) | operations | runbook | Run frame-touching encodes on the remote Kubernetes farm. |
 | [testing](testing.md) | meta | procedure | Keep the offline suite the whole gate, and diagnose checks red only in CI. |
 | [audio](audio/SKILL.md) | media-production | policy | Preserve source fidelity and enforce delivery audio headroom. |

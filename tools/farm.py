@@ -527,20 +527,37 @@ class Kubectl:
         # -c main: the argo wait container matches kubectl's default pick on
         # some versions, and it has no tar.
         args = ["cp", str(src), dst, "-c", "main"]
-        for attempt in range(1, attempts + 1):
-            try:
-                proc = self.run(args, timeout=3600, check=attempt == attempts)
-                if proc.returncode == 0:
-                    return proc
-                err = proc.stderr.strip()[:200]
-            except subprocess.TimeoutExpired as exc:
-                if attempt == attempts:
-                    raise FarmError(f"kubectl cp timed out: {exc}") from exc
-                err = "timed out"
-            print(f"farm: kubectl cp attempt {attempt}/{attempts} failed "
-                  f"({err}); retrying", file=sys.stderr, flush=True)
-            sleep(CP_BACKOFF_SECONDS * attempt)
-        raise FarmError("kubectl cp failed after retries")
+        # kubectl GLOB-EXPANDS the local source path, so a name like
+        # "Beauty Of The Beast [X3WrCzLIIvk].webm" matches nothing and the
+        # copy exits 0 having delivered nothing. Copy through a hardlink
+        # with a glob-free name instead.
+        link = None
+        if re.search(r"[\[\]*?]", str(src)):
+            link = Path(src).with_name(
+                f".farm-cp-{os.getpid()}-{_pod_safe_name(Path(src).name)}")
+            os.link(src, link)
+            args[1] = str(link)
+        try:
+            for attempt in range(1, attempts + 1):
+                try:
+                    proc = self.run(args, timeout=3600,
+                                    check=attempt == attempts)
+                    if proc.returncode == 0:
+                        return proc
+                    err = proc.stderr.strip()[:200]
+                except subprocess.TimeoutExpired as exc:
+                    if attempt == attempts:
+                        raise FarmError(
+                            f"kubectl cp timed out: {exc}") from exc
+                    err = "timed out"
+                print(f"farm: kubectl cp attempt {attempt}/{attempts} "
+                      f"failed ({err}); retrying", file=sys.stderr,
+                      flush=True)
+                sleep(CP_BACKOFF_SECONDS * attempt)
+            raise FarmError("kubectl cp failed after retries")
+        finally:
+            if link is not None:
+                link.unlink(missing_ok=True)
 
     def workflow_phase(self, name):
         proc = self.run(["-n", self.namespace, "get", "workflow", name,
@@ -700,6 +717,18 @@ def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
             kc.cp(local, f"{kc.namespace}/{pod}:{WORK_DIR}/{rel}")
             print(f"{label}: uploaded in {time.monotonic() - t0:.0f}s",
                   flush=True)
+        # kubectl cp exits 0 even when a glob metacharacter in the remote
+        # name makes it deliver nothing, so verify every staged file arrived
+        # before the pod is told its input is ready.
+        check = " && ".join(
+            f"test -f {shlex.quote(f'{WORK_DIR}/{rel}')}"
+            for _, rel in uploads)
+        if kc.exec(pod, ["sh", "-c", check], check=False).returncode != 0:
+            _tail_log(kc, pod)
+            raise FarmError(
+                f"staged inputs missing in the pod — kubectl cp reported "
+                f"success for bytes that never landed "
+                f"({len(uploads)} expected)")
         kc.exec(pod, ["touch", f"{WORK_DIR}/in/.ready"])
 
         # Encode runs; poll for the completion marker the pod writes, watching
@@ -748,7 +777,10 @@ def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
                    timeout):
     return _execute_on_cluster(
         name=name, script=script,
-        uploads=[(src, f"in/{Path(src).name}")],
+        # Glob-safe, like every other staging name: kubectl cp expands
+        # metacharacters in the remote path, so a bracketed source must be
+        # staged under the name build_plan was given for it.
+        uploads=[(src, f"in/{_pod_safe_name(Path(src).name)}")],
         out_rel=plan["out_rel"], out=out, kc=kc, image=image, cpu=cpu,
         limit_cpu=limit_cpu, memory=memory, limit_memory=limit_memory,
         node=node, storage=storage,
@@ -773,6 +805,18 @@ def sequence_frames(pattern):
     """The local frames a ``%0Nd`` image-sequence pattern reads, in order."""
     pattern = Path(pattern)
     return sorted(pattern.parent.glob(SEQUENCE_RE.sub("*", pattern.name)))
+
+
+def _pod_safe_name(name):
+    """Strip shell-glob metacharacters from a staging name.
+
+    kubectl cp streams the remote path through a shell that GLOB-EXPANDS it:
+    ``Beauty Of The Beast [X3WrCzLIIvk].webm`` stages as a character class
+    that matches nothing, and the copy exits 0 having delivered nothing --
+    the pod then runs ffmpeg against an empty in/. Spaces survive; brackets,
+    stars and question marks do not.
+    """
+    return re.sub(r"[\[\]*?]", "_", name)
 
 
 def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
@@ -811,13 +855,14 @@ def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
                 raise FarmError(
                     f"input sequence matches no frames on disk: {p}")
             rel_dir = f"in/{i:02d}-seq"
-            uploads.extend((f, f"{rel_dir}/{f.name}") for f in frames)
-            staged[str(p)] = f"{work_dir}/{rel_dir}/{p.name}"
+            uploads.extend((f, f"{rel_dir}/{_pod_safe_name(f.name)}")
+                           for f in frames)
+            staged[str(p)] = f"{work_dir}/{rel_dir}/{_pod_safe_name(p.name)}"
             continue
-        rel = f"in/{i:02d}-{p.name}"
+        rel = f"in/{i:02d}-{_pod_safe_name(p.name)}"
         staged[str(p)] = f"{work_dir}/{rel}"
         uploads.append((p, rel))
-    out_name = Path(out).name  # basename only inside the pod
+    out_name = _pod_safe_name(Path(out).name)  # basename only inside the pod
     pod_out = f"{work_dir}/out/{out_name}"
     out_str = str(out)
 
@@ -1200,7 +1245,7 @@ def main(argv=None):
     src, out = Path(args.source), Path(args.out)
     if not src.exists():
         raise SystemExit(f"source does not exist: {src}")
-    out_name = Path(out.name).name  # basename only inside the pod
+    out_name = _pod_safe_name(Path(out.name).name)  # basename only inside the pod
 
     try:
         ffprobe = find_ffprobe()
@@ -1223,7 +1268,7 @@ def main(argv=None):
         plan = build_plan(facts=facts, out_name=out_name, segments=segments,
                           video_args=video_args, audio_args=audio_args,
                           threads=args.threads, work_dir=WORK_DIR,
-                          src_arg=f"{WORK_DIR}/in/{src.name}")
+                          src_arg=f"{WORK_DIR}/in/{_pod_safe_name(src.name)}")
     else:
         if not args.local:
             print(f"farm: cluster unreachable ({why}); falling back to a "

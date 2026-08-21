@@ -493,7 +493,11 @@ CARD_KINDS = ("act", "comic", "photo")
 # toast under it, and the letterbox banner on the bottom bar of a letterboxed
 # frame. Each may share the screen with a lower third and with a different
 # chrome row; two of the SAME kind at once are still an error.
-CHROME_ROWS = ("status", "miniboss", "achievement", "banner", "caption", "context", "warning")
+#
+# `warning` is deliberately NOT here: it renders a full 1920x1080 panel over
+# the picture, so it contends for the whole screen like any full-frame card
+# and gets no coexistence exemption.
+CHROME_ROWS = ("status", "miniboss", "achievement", "banner", "caption", "context")
 
 # --- group rows (the reference deck's roll call, ~/Videos/nameplates.json) ---
 # The deck's gp_* entries are one row of credits, doubly staggered: spatially,
@@ -2206,6 +2210,21 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
             y = FRAME_H - plate.height - int(0.02 * FRAME_H)
         frame.alpha_composite(plate, (x, y))
         return frame
+    if position == "letterbox_top":
+        # Hashtag banners and CTAs ride the TOP bar of a letterboxed frame:
+        # above the picture entirely, never on the content. Owner,
+        # 2026-08-20: "upstream first and other banners and CTAs with
+        # #hashtags should be in the letterbox area up top, not on the
+        # content." When the picture rect IS the frame -- an un-letterboxed
+        # stretch, or a source that mixes aspect ratios (act II's opening is
+        # full-frame, the rest is not) -- it sits just inside the top edge.
+        x = (FRAME_W - plate.width) // 2
+        if py >= plate.height:
+            y = (py - plate.height) // 2
+        else:
+            y = int(0.02 * FRAME_H)
+        frame.alpha_composite(plate, (x, y))
+        return frame
     if position == "boss":
         # Destiny puts a named enemy's bar at the top of frame, centred.
         frame.alpha_composite(plate, (px + (pw - plate.width) // 2,
@@ -3319,7 +3338,10 @@ def load_manifest_entries(entries):
     #     bottom-right -- so they are the same exemption as a group, but
     #     NAMED: the companion has to say whose bond it is, which means it can
     #     never quietly overlap somebody else's plate the way a shared group
-    #     string could.
+    #     string could. The same named bond covers an owner-instructed
+    #     pill/nameplate pair (act II's "Sup" on Kyle's locked reveal), and it
+    #     keeps the deck's shape there too: left and right lanes, never two
+    #     cards stacked on one.
     #
     # A group member overlapping anything outside its own row is still an
     # error, so the check is pairwise rather than the old adjacent-pair scan
@@ -3578,24 +3600,29 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
         str(out_path),
     ]
     print("ffmpeg:", " ".join(ffmpeg))
-    if runner is not None:
-        runner(cmd)
-        return out_path
-    # NEVER WRITE STRAIGHT AT THE MASTER. `out_path` is routinely a hardlink
-    # into ~/Videos/Wolves/Prod/, so opening it for writing truncates the
-    # DELIVERED act before a single frame is encoded -- and an interrupted
-    # burn then leaves the film with no copy anywhere. Act II was destroyed
-    # exactly that way (#286); the only surviving copy was the megacut.
-    # tools/peaks.py already writes-then-replaces, so this is that pattern.
+    # NEVER WRITE STRAIGHT AT THE MASTER -- not locally, and not through a
+    # runner. `out_path` is routinely a hardlink into ~/Videos/Wolves/Prod/,
+    # so opening it for writing truncates the DELIVERED act before a single
+    # frame is encoded -- and an interrupted burn then leaves the film with
+    # no copy anywhere. Act II was destroyed exactly that way (#286); the
+    # only surviving copy was the megacut. A farm runner is the same hazard
+    # one network cut closer: kubectl cp fetches INTO the path the argv
+    # names, so the argv names the tmp here too, and only a completed fetch
+    # replaces the master. tools/peaks.py already writes-then-replaces, so
+    # this is that pattern.
     tmp = out_path.with_name(out_path.stem + ".burntmp" + out_path.suffix)
     cmd[-1] = str(tmp)
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True)
-        if proc.returncode != 0:
-            tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
-            raise RuntimeError(f"plate burn failed:\n{tail}")
-        # A stubbed encoder (the tests') returns 0 without writing; only a
-        # file that actually exists may replace the master.
+        if runner is not None:
+            runner(cmd)
+        else:
+            proc = subprocess.run(cmd, capture_output=True, text=True)
+            if proc.returncode != 0:
+                tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
+                raise RuntimeError(f"plate burn failed:\n{tail}")
+        # A stubbed encoder (the tests') and a failed fetch alike return
+        # having written nothing; only a file that actually exists may
+        # replace the master.
         if tmp.exists():
             os.replace(tmp, out_path)
     finally:
@@ -3657,6 +3684,10 @@ def main(argv=None):
                         "preset slow) with the BT.709 VUI, instead of the legacy "
                         "crf 18/medium/untagged argv. Opt-in per act: turning it "
                         "on marks every act built without it as stale")
+    b.add_argument("--farm", action="store_true",
+                   help="submit the burn encode to the farm cluster "
+                        "(tools.farm.run_ffmpeg_on_cluster); the video and the "
+                        "rendered plate PNGs are staged to the pod")
 
     p = sub.add_parser("plan", help="cut list (+ roster) -> timed plate manifest")
     p.add_argument("shotlist", help="JSON shot list from tools/story.py --format json")
@@ -3800,8 +3831,38 @@ def main(argv=None):
     render_all(entries, args.plates_dir, picture)
     encode_args = (conform.video_encode_args()
                    if getattr(args, "delivery_spec", False) else None)
-    out = burn(args.video, entries, args.plates_dir, args.out,
-               encode_args=encode_args)
+    runner = None
+    if getattr(args, "farm", False):
+        from tools import farm
+
+        # The farm stages exact argv tokens, so the inputs are the video plus
+        # each plate PNG itself, not their directory (same pattern as the
+        # burn leg in scripts/build_act1.py). An animation unit's argv token
+        # is its %0Nd PATTERN, not a file -- farm.sequence_frames expands it,
+        # so the staged token must be the pattern too (38e221b).
+        burn_inputs = [Path(args.video).resolve()] + [
+            (Path(args.plates_dir) / (
+                u["pattern"] if u["animation"] else f"plate_{u['id']}.png")
+             ).resolve()
+            for u in _burn_units(entries)
+        ]
+        expected = _probe_duration(args.video)
+        resolved_out = str(Path(args.out).resolve())
+
+        # 48Gi, not the farm's 16Gi default: act II's burn is ~78 overlay
+        # inputs, and the 16Gi pod was OOMKilled (exit 137) 52 s in -- the
+        # cgroup version of the local "Failed initializing scaling graph"
+        # failure _burn_units' comment describes. exo-0 has 65Gi.
+        def runner(argv, _inputs=burn_inputs, _out=resolved_out,
+                   _dur=expected):
+            farm.run_ffmpeg_on_cluster(argv, inputs=_inputs, out=Path(_out),
+                                       expected_duration=_dur,
+                                       limit_memory="48Gi")
+
+    video = Path(args.video).resolve() if runner else args.video
+    out_arg = str(Path(args.out).resolve()) if runner else args.out
+    out = burn(video, entries, args.plates_dir, out_arg,
+               encode_args=encode_args, runner=runner)
     print(f"wrote {out}")
     return 0
 

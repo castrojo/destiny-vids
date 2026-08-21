@@ -3,6 +3,24 @@
   "generated_at": "2026-08-20",
   "skills": [
     {
+      "id": "chapters",
+      "name": "chapters",
+      "one_line_purpose": "Author an act's chat dialogue in one Markdown file per chapter.",
+      "entry_point": "docs/skills/chapters.md",
+      "category": "editorial",
+      "status": "active",
+      "tags": [
+        "dialogue",
+        "chat",
+        "chapters",
+        "markdown"
+      ],
+      "description": "Add or re-time an act's chat dialogue without computing timecodes: one Markdown file per chapter, whole conversations dropped at one programme timestamp, per-line timing derived from readability. Use when writing or rewriting chat pills or red splashes.",
+      "version": "1.0",
+      "last_updated": "2026-08-20",
+      "doc_type": "procedure"
+    },
+    {
       "id": "farm",
       "name": "farm",
       "one_line_purpose": "Run frame-touching encodes on the remote Kubernetes farm.",

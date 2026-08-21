@@ -45,9 +45,8 @@ The four departures from the prologue
 
 4. **A KubeCon end card**, and the music plays out under it. Owner: *"Let the
    music play out longer than the original video, look up how long movie
-   trailers should be given the things we have"*. The MPA and NATO cap a
-   theatrical trailer at **2:30**; teasers run 0:30-1:30. The owner set the
-   target at **1:50**, which is where this lands, exactly.
+   trailers should be given the things we have"*. The music keeps its approved
+   **1:50** edit, then the URL holds for five silent seconds.
 
 The arithmetic
 --------------
@@ -58,9 +57,9 @@ The arithmetic
                                   ------
                                   88.520
     wolves bridge                 14.000
-    end card                       7.500
+    end card                      12.820
                                   ------
-                                 110.020   = 1:50.0
+                                 115.020   = 1:55.0
 """
 
 from __future__ import annotations
@@ -131,10 +130,11 @@ BRIDGE_DAY_SETTLE = 4.000
 BRIDGE_MONTH = 3            # the owner named 03-bluefin-day.jxl
 
 # --- the end card -------------------------------------------------------------
-# 7.820 rather than a round 7.500: the end card is where the 0.320 s the join
-# dissolve spends is given back, so the delivered runtime is exactly the
-# owner's 1:50.0 instead of 1:49.7.
-ENDCARD = 7.820
+# The music keeps the approved 1:50 edit. The URL then holds for five silent
+# seconds instead of disappearing with the song.
+URL_HOLD = 5.000
+MUSIC_END = PICTURE + BRIDGE + 7.820                  # 110.020
+ENDCARD = 7.820 + URL_HOLD                            # 12.820
 ENDCARD_FADE = 1.200
 # The existing music tail is loud on entry, falls from roughly -18 to -19.6 dB
 # RMS through 1-3 s, then rises back to -17.4 dB at 3-4 s. The visual does not
@@ -148,7 +148,7 @@ ENDCARD_EVENT_FADE = 1.100
 ENDCARD_CTA_IN = 3.100
 ENDCARD_CTA_FADE = 0.600
 
-TOTAL = PICTURE + BRIDGE + ENDCARD                     # 110.020
+TOTAL = PICTURE + BRIDGE + ENDCARD                     # 115.020
 
 # --- sound --------------------------------------------------------------------
 # The prologue fades from 93.000, under a bridge that ends its film. This one
@@ -156,7 +156,7 @@ TOTAL = PICTURE + BRIDGE + ENDCARD                     # 110.020
 # out longer. The wolves' howl is the 1:47 climax, so it must land at full
 # source level; only then does the final three-second fade begin.
 AUDIO_FADE = 3.020
-AUDIO_FADE_START = TOTAL - AUDIO_FADE                  # 107.000
+AUDIO_FADE_START = MUSIC_END - AUDIO_FADE              # 107.000
 
 # The prologue's opening level ride, kept verbatim: it is a measured fix for a
 # real complaint ("tone down the spark noise at the beginning of the song so my
@@ -439,7 +439,7 @@ def filtergraph(manifest, audio_gain=1.0):
     ride = (f"volume=eval=frame:volume="
             f"'if(lt(t,{RIDE_TO:.3f}),"
             f"pow(10,({RIDE_START_DB:.1f}*(1-pow(t/{RIDE_TO:.3f},2)))/20),1)'")
-    parts.append(f"[0:a]atrim=0:{TOTAL:.3f},asetpts=PTS-STARTPTS,"
+    parts.append(f"[0:a]atrim=0:{MUSIC_END:.3f},asetpts=PTS-STARTPTS,"
                  f"afade=t=in:st=4.000:d=1.000,{ride},"
                  f"afade=t=out:st={AUDIO_FADE_START:.3f}:"
                  f"d={AUDIO_FADE:.3f},volume={audio_gain:.12g},"

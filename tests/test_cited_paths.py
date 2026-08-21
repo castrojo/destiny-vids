@@ -73,6 +73,19 @@ ALLOWED_MISSING = {
         "ENTRY when #226 lands.",
 }
 
+# The 2026-08-19 common-documentation-alignment plan and spec named these as
+# worked examples; the docs that cite them mean "a file shaped like this",
+# not a file that exists. The plan tree itself was pruned in #300 and the
+# proposal's real files have all landed since.
+_PLAN = ("a worked example in the common-layout skill docs -- the name is "
+         "the illustration and the file does not exist")
+ALLOWED_MISSING.update({
+    "docs/skills/demo-skill.md": _PLAN + " (a worked example)",
+    "docs/skills/foo.md": _PLAN + " (a worked example)",
+    "docs/skills/foo/SKILL.md": _PLAN + " (a worked example)",
+    "docs/skills/wrong.md": _PLAN + " (a worked counterexample)",
+})
+
 
 def _searched_files():
     seen = []

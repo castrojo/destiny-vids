@@ -105,6 +105,12 @@ An `UnsupportedNamespace: ... com.google.cast.media is not supported by
 current app` error means a stuck receiver app, not a bad file:
 `catt -d "<device>" stop`, then re-cast with `--force-default`.
 
+- Treating a meter as a content detector: on a dense metal mix the 300–3400 Hz
+  band ratio, 2.5–7 Hz envelope modulation (a ~161 bpm track's drums sit
+  inside that band) and autocorrelation pitch salience all read instrumental
+  and sung passages alike. "Where are the vocals" is answered by an ear —
+  render a probe clip and ask.
+
 ## Read current state from records, not prose
 
 Live delivery state does not belong in this skill. Read the machine record:
@@ -141,11 +147,6 @@ This skill is the contract. The detail lives in `references/`:
 - Shipping after `audio-check.sh --bed` while skipping
   `./audio-check.sh --all`.
 - Using `loudnorm`, limiting, compression, EQ, or any non-static processing.
-- Treating a meter as a content detector: on a dense metal mix the 300–3400 Hz
-  band ratio, 2.5–7 Hz envelope modulation (a ~161 bpm track's drums sit
-  inside that band) and autocorrelation pitch salience all read instrumental
-  and sung passages alike. "Where are the vocals" is answered by an ear —
-  render a probe clip and ask.
 - A standalone builder that never calls
   `peaks.trim_master_peak(out_path.resolve())` after its final ffmpeg command.
 

@@ -6,6 +6,9 @@ the migration that inspired this file rewired 25 files, and a single stale
 `skills/plates.md` would have sent an agent to a file that no longer exists.
 
 Only *relative* links are checked. External URLs are somebody else's uptime.
+Links inside fenced code blocks are not links at all -- they are example
+content (a plan doc's sample output, a test snippet) and clicking nothing,
+so fences are skipped.
 """
 import re
 from pathlib import Path
