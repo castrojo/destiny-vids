@@ -87,71 +87,6 @@ PHRASES = {
     "slowmo": [("pacing", {"slow"})],
     "super": [("action", {"ability_cast"})],
     "supers": [("action", {"ability_cast"})],
-    # Lead cast: a character name or the person playing them both resolve to the
-    # same lead binding, so "zavala" and "kelsey" retrieve the same footage.
-    # Kept in sync with vocab/casting.yaml `leads`.
-    "elsie bray": [("casting.character", {"elsie_bray"})],
-    "exo stranger": [("casting.character", {"elsie_bray"})],
-    "elsie": [("casting.character", {"elsie_bray"})],
-    "laura": [("casting.person", {"laura_santamaria"})],
-    "santamaria": [("casting.person", {"laura_santamaria"})],
-    # Nimbatus is the same person's PRE-REVEAL credit (issue #103): her own
-    # binding, deliberately NOT an elsie_bray aka — folding the two together
-    # would route a pre-act-VII cut to the plate that prints her real name.
-    "nimbatus": [("casting.character", {"nimbatus"})],
-    "anna bray": [("casting.character", {"anna_bray"})],
-    "ana bray": [("casting.character", {"anna_bray"})],
-    "joanna": [("casting.person", {"joanna_lee"})],
-    "commander zavala": [("casting.character", {"zavala"})],
-    "zavala": [("casting.character", {"zavala"})],
-    "kelsey": [("casting.person", {"kelsey_hightower"})],
-    "hightower": [("casting.person", {"kelsey_hightower"})],
-    "cayde-6": [("casting.character", {"cayde_6"})],
-    "cayde": [("casting.character", {"cayde_6"})],
-    "lord saladin": [("casting.character", {"saladin"})],
-    "saladin": [("casting.character", {"saladin"})],
-    "castrojo": [("casting.person", {"castrojo"})],
-    "jeefy": [("casting.person", {"jeefy"})],
-    "osiris": [("casting.character", {"osiris"})],
-    "mrbobbytables": [("casting.person", {"mrbobbytables"})],
-    "sagira": [("casting.character", {"sagira"})],
-    "clubanderson": [("casting.person", {"clubanderson"})],
-    "andy": [("casting.person", {"clubanderson"})],
-    "anderson": [("casting.person", {"clubanderson"})],
-    "saint-14": [("casting.character", {"saint_14"})],
-    "saint 14": [("casting.character", {"saint_14"})],
-    "saint": [("casting.character", {"saint_14"})],
-    "kat": [("casting.person", {"kat"})],
-    "mara sov": [("casting.character", {"mara_sov"})],
-    "mara": [("casting.character", {"mara_sov"})],
-    "karena": [("casting.person", {"karena_angell"})],
-    "petra venj": [("casting.character", {"petra_venj"})],
-    "petra": [("casting.character", {"petra_venj"})],
-    "lori": [("casting.person", {"lori_lorusso"})],
-    "lorusso": [("casting.person", {"lori_lorusso"})],
-    "variks": [("casting.character", {"variks"})],
-    "waddington": [("casting.person", {"nate_waddington"})],
-    "the speaker": [("casting.character", {"the_speaker"})],
-    "speaker": [("casting.character", {"the_speaker"})],
-    "jonathan bryce": [("casting.person", {"jonathan_bryce"})],
-    "amanda holliday": [("casting.character", {"amanda_holliday"})],
-    "amanda": [("casting.character", {"amanda_holliday"})],
-    "holliday": [("casting.character", {"amanda_holliday"})],
-    "ashley": [("casting.person", {"ashley_willis"})],
-    "ashley willis": [("casting.person", {"ashley_willis"})],
-    "iron lord": [("casting.character", {"iron_lord_red_haired"})],
-    "paris pittman": [("casting.person", {"paris_pittman"})],
-    "ikora": [("casting.character", {"ikora_rey"})],
-    "drifter": [("casting.character", {"the_drifter"})],
-    "eris morn": [("casting.character", {"eris_morn"})],
-    "shaxx": [("casting.character", {"shaxx"})],
-    "caiatl": [("casting.character", {"caiatl"})],
-    "savathun": [("casting.character", {"savathun"})],
-    "the witness": [("casting.character", {"the_witness"})],
-    "crow": [("casting.character", {"crow"})],
-    "uldren": [("casting.character", {"crow"})],
-    "ghost": [("casting.character", {"ghost"})],
-    "little light": [("casting.character", {"ghost"})],
     # Tier + casting-tier facets, so a query can ask for the crowd directly.
     "ensemble": [("casting.role", {"ensemble"})],
     "background guardians": [("casting.role", {"ensemble"})],
@@ -161,6 +96,88 @@ PHRASES = {
     "gameplay": [("footage_tier", {"gameplay"})],
     "cinematic": [("footage_tier", {"cinematic", "mixed"})],
 }
+
+# Nicknames the vocabulary cannot supply: a first name, a surname, or a
+# shortening people actually type. Everything else about the cast -- every
+# character key, every `aka`, every person id and display name -- is derived
+# from vocab/casting.yaml below, so a recast reaches search with no edit here.
+CAST_SHORTHAND = {
+    "elsie": ("casting.character", "elsie_bray"),
+    "laura": ("casting.person", "laura_santamaria"),
+    "santamaria": ("casting.person", "laura_santamaria"),
+    "joanna": ("casting.person", "joanna_lee"),
+    "kelsey": ("casting.person", "kelsey_hightower"),
+    "hightower": ("casting.person", "kelsey_hightower"),
+    "andy": ("casting.person", "clubanderson"),
+    "anderson": ("casting.person", "clubanderson"),
+    "saint": ("casting.character", "saint_14"),
+    "mara": ("casting.character", "mara_sov"),
+    "karena": ("casting.person", "karena_angell"),
+    "lori": ("casting.person", "lori_lorusso"),
+    "lorusso": ("casting.person", "lori_lorusso"),
+    "waddington": ("casting.person", "nate_waddington"),
+    "ashley": ("casting.person", "ashley_willis"),
+    "ikora": ("casting.character", "ikora_rey"),
+    "iron lord": ("casting.character", "iron_lord_red_haired"),
+    "uldren": ("casting.character", "crow"),
+}
+
+
+def _cast_phrases(leads):
+    """Query phrases for every lead binding, straight from the vocabulary.
+
+    ``vocab/casting.yaml`` is the single source of truth for the cast
+    (AGENTS.md), and this table used to be a hand-kept second copy of it --
+    two tests existed only to assert the two agreed. A character key, each of
+    its ``aka`` spellings, and the bound person's id and display name are all
+    spellings somebody will type, so all four become phrases; the residue that
+    a vocabulary genuinely cannot carry is ``CAST_SHORTHAND`` above.
+    """
+    out = {}
+
+    def add(phrase, facet, value):
+        phrase = str(phrase).replace("_", " ").lower().strip()
+        if not phrase:
+            return
+        out.setdefault(phrase, []).append((facet, {value}))
+        # `cayde_6` is typed "cayde-6" at least as often as "cayde 6", and the
+        # matcher is literal, so both spellings are registered rather than
+        # relying on whichever one the vocab key happens to look like.
+        hyphenated = phrase.replace(" ", "-")
+        if hyphenated != phrase:
+            out.setdefault(hyphenated, []).append((facet, {value}))
+
+    for character, entry in leads.items():
+        add(character, "casting.character", character)
+        for alias in entry.get("aka") or []:
+            add(alias, "casting.character", character)
+        person = entry.get("person")
+        if person:
+            add(person, "casting.person", person)
+            if entry.get("display_name"):
+                add(entry["display_name"], "casting.person", person)
+    for phrase, (facet, value) in CAST_SHORTHAND.items():
+        add(phrase, facet, value)
+    return out
+
+
+def _load_cast_phrases():
+    """Fold the cast phrases into PHRASES, degrading if the vocab is unreadable.
+
+    An unreadable vocabulary costs the CAST facets and nothing else: the
+    vocabulary-driven enum filters and the caption signal still answer, which
+    is the repo's standing degrade-never-block posture.
+    """
+    try:
+        from tools.derive import load_leads
+    except ImportError:  # running as a script with tools/ on sys.path
+        from derive import load_leads
+    for phrase, contributions in _cast_phrases(load_leads()).items():
+        PHRASES.setdefault(phrase, []).extend(contributions)
+
+
+_load_cast_phrases()
+
 # single tokens
 SINGLE = {
     "wide": [("shot_scale", {"ELS", "LS", "MLS"})],

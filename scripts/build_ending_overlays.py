@@ -78,7 +78,7 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from tools import conform  # noqa: E402
-from tools.render import find_ffmpeg  # noqa: E402
+from tools.render import ffmpeg_for_printing, find_ffmpeg  # noqa: E402
 from scripts import build_interludes  # noqa: E402
 
 THREAD = REPO / "stories" / "00-perfume-thread.json"
@@ -202,20 +202,6 @@ def command(doc, thread_path, cards_dir, out, ffmpeg=None,
     ]
 
 
-def _ffmpeg_for_printing():
-    """The ffmpeg to print when we are only PRINTING.
-
-    `--print-command` exists to be read, diffed and pasted, and CI has no
-    H.264-capable ffmpeg -- so resolving one is a precondition of RUNNING the
-    command, never of showing it. Falling back to the bare name keeps the
-    offline suite offline instead of making a print depend on an encoder.
-    """
-    try:
-        return find_ffmpeg()
-    except Exception:
-        return ["ffmpeg"]
-
-
 def main(argv=None):
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -272,7 +258,7 @@ def main(argv=None):
     notes = []
     repls = build_interludes.usable_replacements(movement, notes)
     cmd = command(doc, args.thread, cards_dir, out,
-                  ffmpeg=_ffmpeg_for_printing() if args.print_command
+                  ffmpeg=ffmpeg_for_printing() if args.print_command
                   else None,
                   movement_id=args.movement, section=section, repls=repls)
     for note in notes:

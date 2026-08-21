@@ -15,7 +15,6 @@ is then concatenated as a still is the megacut skill's standing red flag).
 Offline: Pillow only. Re-runs are byte-identical.
 """
 import json
-import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont

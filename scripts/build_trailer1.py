@@ -237,25 +237,6 @@ def _still(source, label, extra=""):
             f"fps={FPS},setpts=N/({FPS})/TB{extra}[{label}]")
 
 
-def _walk(a, b, at, dur):
-    """An `overlay` coordinate expression that walks from ``a`` to ``b``.
-
-    The card is a full 1920x1080 canvas with the line in its middle, so the
-    overlay offset is the anchor's displacement from frame centre rather than
-    the anchor itself -- which is why these read as differences.
-
-    Clamped at both ends with `min`/`max` so the expression is still correct on
-    the frames either side of the window; `enable=` gates the drawing, but a
-    coordinate that keeps extrapolating is a coordinate somebody will one day
-    widen a window onto and find has flown off frame. The clamp is also what
-    lets a line KEEP TRACKING the page for part of its life and then hold: pass
-    a ``dur`` shorter than the beat and the walk finishes early.
-    """
-    span = max(dur, 1e-6)
-    return (f"({a:.1f})+(({b:.1f})-({a:.1f}))*"
-            f"max(0\\,min(1\\,(t-{at:.3f})/{span:.3f}))")
-
-
 def filtergraph(manifest, audio_gain=1.0):
     # --- the picture ---------------------------------------------------------
     # PADDED rather than scaled: the source already carries the delivery width
@@ -311,8 +292,6 @@ def filtergraph(manifest, audio_gain=1.0):
     last = "film"
 
     # --- the main title, two staged cards ------------------------------------
-    a = plate(manifest, "maintitle-a")
-    b = plate(manifest, "maintitle-b")
     parts.append(_still(inputs + 1, "ta",
                         f",trim=0:{PICTURE:.3f},setpts=PTS-STARTPTS,"
                         f"fade=t=in:st={TITLE_IN:.3f}:d={TITLE_FADE}:alpha=1"))
@@ -354,8 +333,6 @@ def filtergraph(manifest, audio_gain=1.0):
     parts.append(f"[{last}]format=yuv420p[picture]")
 
     # --- the bridge ----------------------------------------------------------
-    day_len = BRIDGE_UP + BRIDGE_DAY_HOLD + BRIDGE_TURN
-    night_len = BRIDGE - day_len + BRIDGE_TURN
     day_input = inputs + 1
     parts.append(f"[{inputs + 2}:v]split=2[bridgenightsrc][endnightsrc]")
     parts.append(_still(day_input, "day",

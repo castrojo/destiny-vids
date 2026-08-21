@@ -219,7 +219,7 @@ def build_filter(regions, bed_gain_db=0.0, source_gain_db=0.0,
     src += "volume=0:enable='" + (mute or "0") + "'[src]"
     parts.append(src)
 
-    inputs = "".join(f"[{l}]" for l in labels) + "[src]"
+    inputs = "".join(f"[{label}]" for label in labels) + "[src]"
     parts.append(f"{inputs}amix=inputs={len(labels) + 1}:normalize=0:"
                  f"dropout_transition=0[aout]")
     return ";".join(parts)

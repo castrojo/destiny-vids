@@ -363,7 +363,8 @@ def video_chain(spec, movement, repls=(), out_label="vout"):
     order, ki, cursor = [], 0, 0.0
     for repl in repls:
         if float(repl["at"]) - cursor > 1e-6:
-            order.append(f"[s{ki}]"); ki += 1
+            order.append(f"[s{ki}]")
+            ki += 1
         order.append(f"[{repl_labels[repl['id']]}]")
         cursor = float(repl["at"]) + float(repl["dur"])
     if dur - cursor > 1e-6:
