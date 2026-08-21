@@ -58,6 +58,18 @@ def test_frame_rate_compares_as_a_rational():
                                "avg_frame_rate": "60/1"})
 
 
+def test_an_indeterminate_frame_rate_is_a_mismatch_not_a_crash():
+    """ffprobe reports `0/0` when it cannot average a stream's frame rate.
+
+    `float(den or 1)` does not save that case -- "0" is a truthy string -- so
+    the division raised ZeroDivisionError, which was not in the caught tuple.
+    It travelled out through mismatches() -> conforms() -> ensure(), and
+    assemble() conforms every clip, so one odd stream took the whole
+    programme build down instead of being reported as unconformant.
+    """
+    assert conform.mismatches({**_conformant_props(), "avg_frame_rate": "0/0"})
+
+
 def test_profile_accepts_either_ffprobe_spelling():
     """The linuxbrew ffprobe prints `High`; the container build prints the
     numeric IDC 100. Both are the same profile and both must pass."""

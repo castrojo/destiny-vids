@@ -35,10 +35,10 @@ def _parse_casting(path, _mtime):
 def _casting(path=None):
     """vocab/casting.yaml, parsed once per (path, mtime).
 
-    Four loaders below read this same 793-line file, and a rederive walks 1321
-    segments, so the uncached form reparsed it thousands of times. Keyed on
-    mtime, not just path, so an edit mid-session is still picked up -- and the
-    result is shared, so every caller copies before it mutates.
+    Four loaders below read this same file, and a rederive walks every
+    committed segment, so the uncached form reparsed it thousands of times.
+    Keyed on mtime, not just path, so an edit mid-session is still picked up
+    -- and the result is shared, so every caller copies before it mutates.
     """
     p = Path(path) if path else DEFAULT_CASTING_PATH
     return _parse_casting(str(p), p.stat().st_mtime_ns)

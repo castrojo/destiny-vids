@@ -120,12 +120,25 @@ def needs_prose(spec):
 def is_placeholder(spec):
     """True when this plate is a punch-list item of ANY kind.
 
-    The union: a pill with no prose (above) plus anything already flagged
-    ``placeholder: true``, which is the named-badge convention act II
-    established. ``list`` reports both because both are copy somebody still
-    owes; only the first is ever filled with lorem.
+    The union of three things, and only the first is ever filled with lorem
+    here: a pill with no prose (above), anything already flagged
+    ``placeholder: true`` (the named-badge convention act II established), and
+    any row whose ``*_source`` says ``placeholder``.
+
+    That last clause is what makes the list honest about SECOND rows. A
+    miniboss card authored ``! NAME |`` in a chapter file carries an authored
+    ``name`` and a lorem ``title`` -- ``title_source: "placeholder"`` --
+    which ``needs_prose`` deliberately does not match, because overwriting the
+    authored name row would be the exact failure this module exists to
+    prevent. Without this the two lorem titles burned into act II
+    (``late_poor_technical_decisions``, ``mapped_haters``) reported as zero
+    unwritten copy, which is the one direction this tool must never be wrong
+    in: "I looked and it is fine" is not "I did not look".
     """
-    return bool(spec.get(MARKER)) or needs_prose(spec)
+    if bool(spec.get(MARKER)) or needs_prose(spec):
+        return True
+    return any(value == MARKER for key, value in spec.items()
+               if key.endswith("_source"))
 
 
 def fill(spec, uncast_name=None):

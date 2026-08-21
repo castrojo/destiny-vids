@@ -1285,10 +1285,21 @@ def print_report(reports, wolves, log=print):
         for f in programme.findings:
             log(f"  {f.node:<9} {f.state:<16} {f.detail}")
     failing = [f for r in reports for f in r.findings if f.state in FAILING]
+    blocked = [f for r in reports for f in r.findings if f.state == BLOCKED]
     noted = [f for r in reports for f in r.findings
              if f.state in (ABSENT_BY_DESIGN, NO_FILM, BLOCKED, UNRESOLVED)]
-    log(f"\n{len(failing)} stale, {len(noted)} recorded absences "
-        f"(punch-list, not failures)")
+    # BLOCKED is counted in `noted` -- it is not a failure, and nothing here
+    # withholds the film for one -- but it is still an act that is STALE and
+    # seated, so it gets its own number rather than disappearing into the
+    # punch-list total. AGENTS.md: "Any stale, blocked, or `NOTE: act ... is
+    # stale and seated` result means the programme is stale even if a summary
+    # says 0 stale." A headline that reads "3 stale" while five acts are
+    # seated stale is the summary that ruling is about.
+    parts = [f"{len(failing)} stale"]
+    if blocked:
+        parts.append(f"{len(blocked)} blocked (stale, seated, decision-held)")
+    parts.append(f"{len(noted)} recorded absences (punch-list, not failures)")
+    log("\n" + ", ".join(parts))
     return 1 if failing else 0
 
 
