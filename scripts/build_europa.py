@@ -2,12 +2,12 @@
 """Build act VII (Europa, the director's cut) from its committed record.
 
 Thin front end on ``scripts/actbuild.py`` the way ``build_kat.py`` is, but
-act VII is the one act whose picture is not a single source: it is a six-
-segment concat (two films, an outro sting and a comic-cover still) with a
-two-part audio join, and the delivered master is derived from that concat by
-cutting the cover off. So this script reuses actbuild's record loading, plate
-rendering and avatar resolution, and adds the three things the shared builder
-has never needed:
+act VII is the one act whose picture is not a single source: it is an eight-
+segment concat (the intro split around a native Jupiter video, two films, an
+outro sting and a comic-cover still) with a two-part audio join, and the
+delivered master is derived from that concat by cutting the cover off. So this
+script reuses actbuild's record loading, plate rendering and avatar resolution,
+and adds the three things the shared builder has never needed:
 
 * the concat picture graph, compiled from the record's ``picture`` block
   (an input feeding two segments is split, never opened twice);

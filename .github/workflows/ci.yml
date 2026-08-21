@@ -72,4 +72,3 @@ jobs:
       # without it".
       - name: Tests
         run: python3 -m pytest -q
-

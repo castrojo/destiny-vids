@@ -12,7 +12,7 @@ import pytest
 from tools.bed import (
     build_filter, downbeats, edited_downbeats, edited_duration, fmt_tc,
     guard_no_overlap, load_record, nearest_edited_downbeat, parse_tc,
-    plan_excision, snap_to_downbeat, to_edited, to_source,
+    plan_excision, to_edited, to_source,
 )
 
 REPO_ROOT = __import__("pathlib").Path(__file__).resolve().parents[1]
@@ -53,13 +53,6 @@ def test_tc_round_trips():
 def test_downbeats_are_every_fourth_beat():
     g = grid(bar=2.0, n_bars=5)
     assert downbeats(g) == [0.0, 2.0, 4.0, 6.0, 8.0]
-
-
-def test_snap_picks_the_nearest_bar_line():
-    g = grid(bar=2.0, n_bars=5)
-    assert snap_to_downbeat(g, 3.9) == 4.0
-    assert snap_to_downbeat(g, 4.1) == 4.0
-    assert snap_to_downbeat(g, 5.2) == 6.0
 
 
 def test_an_excision_is_snapped_to_whole_bars():

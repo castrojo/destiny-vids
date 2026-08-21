@@ -198,7 +198,7 @@ def test_validator_scripts_parse_cleanly():
     subprocess.run(["bash", "-n", str(REPO_ROOT / "scripts" / "check-skill-index.sh")],
                    check=True)
     subprocess.run([sys.executable, "-m", "py_compile",
-                    str(REPO_ROOT / "scripts" / "check-doc-links.sh")],
+                    str(REPO_ROOT / "scripts" / "check-doc-links.py")],
                    check=True)
 
 
@@ -272,7 +272,7 @@ See [README](../README.md).
         check=True,
     )
     subprocess.run(
-        [sys.executable, str(REPO_ROOT / "scripts" / "check-doc-links.sh"),
+        [sys.executable, str(REPO_ROOT / "scripts" / "check-doc-links.py"),
          str(repo)],
         check=True,
     )

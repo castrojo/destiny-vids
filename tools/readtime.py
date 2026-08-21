@@ -147,6 +147,45 @@ def _display(path: Path) -> str:
         return str(path)
 
 
+def chapter_source(path: Path) -> tuple[str, dict]:
+    """(where a copyedit goes, that file's plates by id) for one manifest.
+
+    A finding names the file the OWNER edits, not the file the build reads.
+    Once an act's words live in `chapters/<act>.md`, saying "05-natali-plates
+    .json, plate p2c-nat-docs is short" points at an output; saying the
+    chapter file and the line in it points at the sentence to rewrite.
+
+    A manifest nobody has migrated reports itself, and so does a plate its
+    chapter file does not author: act II's chapter file holds two of its
+    plates and its builder generates the other hundred-odd, so pointing an
+    owner at the Markdown for one of those hundred would send them looking
+    for a line that is not in it.
+    """
+    try:
+        from tools import chapter_md
+        for chap in chapter_md.discover().values():
+            manifest = chap.manifest_path()
+            if manifest and manifest.resolve() == path.resolve():
+                plates, _ = chapter_md.entries(chap.act)
+                return (str(chap.path.relative_to(REPO_ROOT)),
+                        {p["id"]: p for p in plates if "id" in p})
+    except Exception:
+        # Naming the file is never allowed to be the thing that fails: a
+        # chapter file mid-edit must not stop a read-speed report.
+        pass
+    return _display(path), {}
+
+
+def chapter_line(plates: dict, plate_id: str) -> str:
+    """How the short plate is written in its chapter file, for searching."""
+    plate = plates.get(plate_id)
+    if not plate:
+        return ""
+    speaker = plate.get("speaker") or ""
+    text = plate.get("text") or plate.get("title") or ""
+    return f"[{plate_id}] {speaker}: {text}".strip() if text else ""
+
+
 def audit_manifest(path: Path, cps: float = DEFAULT_CPS):
     """``(short, skipped, problems)`` for one manifest.
 
@@ -170,6 +209,8 @@ def audit_manifest(path: Path, cps: float = DEFAULT_CPS):
 
     if not isinstance(doc, dict) or not isinstance(doc.get("plates"), list):
         return short, skipped, problems
+
+    edited_in, chapter_plates = chapter_source(path)
 
     for plate in doc["plates"]:
         if not isinstance(plate, dict):
@@ -198,7 +239,9 @@ def audit_manifest(path: Path, cps: float = DEFAULT_CPS):
         if on_screen + 1e-6 >= need:
             continue
         short.append({
-            "manifest": _display(path),
+            "manifest": (edited_in if plate_id in chapter_plates
+                         else _display(path)),
+            "grep": chapter_line(chapter_plates, plate_id),
             "id": plate_id,
             "speaker": plate.get("speaker") or "",
             "chars": len(text),
@@ -273,6 +316,8 @@ def main(argv=None) -> int:
                       f"{row['deficit']:.2f}s, {row['chars']} chars")
                 speaker = f"{row['speaker']}: " if row["speaker"] else ""
                 print(f"      {speaker}{row['text']}")
+                if row.get("grep"):
+                    print(f"      the line reads: {row['grep']}")
             print()
     else:
         print(f"0 plate(s) held below a readable hold at {args.cps:g} cps")

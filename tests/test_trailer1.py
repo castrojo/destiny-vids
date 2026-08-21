@@ -395,10 +395,6 @@ def test_book_b_holds_across_the_join_without_tracking(manifest):
     assert "walk" not in entry
     assert entry["anchor"] == entry["anchor_out"]
 
-def test_the_walk_expression_is_clamped_at_both_ends():
-    expr = T._walk(0.0, 100.0, 10.0, 2.0)
-    assert "max(0\\,min(1\\," in expr
-
 def test_every_overlay_still_is_bounded_to_the_picture(manifest):
     """`loop=loop=-1` is infinite and `overlay`'s framesync keeps producing
     output after the main input ends. The prologue shipped eight seconds of

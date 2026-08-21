@@ -173,11 +173,20 @@ def probe_video(path, ffprobe):
 def _fps_close(reported, wanted):
     """Rational comparison, with room for spelling: 60000/1001 and 2997/50
     are both 59.94 (they differ in the fifth decimal), while 60/1 and 30/1
-    are unmistakably something else."""
+    are unmistakably something else.
+
+    ``ZeroDivisionError`` is caught beside the parse errors because ffprobe
+    reports ``0/0`` for a stream whose average frame rate is indeterminate,
+    and ``float(den or 1)`` does not save us there -- ``"0"`` is a truthy
+    string, so the fallback never fires. An unreadable rate is "not the spec",
+    which is a mismatch to report; raising instead took the whole assembly
+    down with it, since ``assemble()`` conforms every clip.
+    ``farm._is_vfr`` guards the same shape for the same reason.
+    """
     try:
         num, _, den = str(reported).partition("/")
         value = float(num) / float(den or 1)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, ZeroDivisionError):
         return False
     wnum, _, wden = str(wanted).partition("/")
     return abs(value - float(wnum) / float(wden or 1)) < 1e-3

@@ -70,9 +70,9 @@ precedence between those sources are in
   `elsie_bray` (Laura Santamaria) and `saint_14` (Kat Cosgrove) do.
 - **Binding a new person is still a casting decision**, and stays the owner's.
   An authored plate says who somebody *is*; it does not say which Destiny
-  character they play. Kaslin Fields, Christoph Blecker, Natali Vlatko and
-  Doctor Andy Anderson have authored identities and no binding here, and that
-  is a question for an issue, not an edit.
+  character they play. Kaslin Fields, Christoph Blecker and Natali Vlatko have
+  authored identities and no binding here, and that is a question for an
+  issue, not an edit.
 
 An authored identity also does not travel between tiers on its own: a person
 cast as a **lead** is excluded from the ensemble pool entirely, so their copy

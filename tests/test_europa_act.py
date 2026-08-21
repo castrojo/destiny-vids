@@ -30,6 +30,33 @@ def test_walk_up_keeps_only_the_solo_wide():
     assert "fade_in" not in wrap
 
 
+def test_jupiter_slot_uses_native_video_without_transition():
+    doc = load()
+    inputs = doc["picture"]["inputs"]
+    assert inputs["jupiter"] == (
+        "nimbatus-review/jupiter/cand/PIA22906_nasa.mp4")
+
+    segments = doc["picture"]["segments"]
+    before, native, after = segments[:3]
+    assert before == {"label": "intro-before-jupiter", "from": "intro",
+                      "frames": [0, 497]}
+    assert native == {
+        "label": "jupiter-native",
+        "from": "jupiter",
+        "window": [0.0, 6.5],
+        "fps": 30,
+        "scale": True,
+    }
+    assert after == {"label": "intro-after-jupiter", "from": "intro",
+                     "frames": [692, 1725]}
+
+    picture_parts, _ = build_europa.picture_graph(doc)
+    picture_graph = ";".join(picture_parts)
+    assert "blend=" not in picture_graph
+    assert "xfade=" not in picture_graph
+    assert "jupiter_styled.mp4" not in " ".join(inputs.values())
+
+
 def test_kubecon_card_is_retired_but_its_copy_is_recoverable():
     doc = load()
     assert doc["endcard"]["retired"] is True

@@ -14,7 +14,7 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from tools import conform
-from tools.render import find_ffmpeg
+from tools.render import ffmpeg_for_printing, find_ffmpeg
 
 MANIFEST = REPO / "stories" / "megacut" / "ending-cards.json"
 CARDS = REPO / "renders" / "ending" / "cards"
@@ -82,20 +82,6 @@ def command(doc, cards_dir, out, ffmpeg=None):
     ]
 
 
-def _ffmpeg_for_printing():
-    """The ffmpeg to print when we are only PRINTING.
-
-    `--print-command` exists to be read, diffed and pasted, and CI has no
-    H.264-capable ffmpeg -- so resolving one is a precondition of RUNNING the
-    command, never of showing it. Falling back to the bare name keeps the
-    offline suite offline instead of making a print depend on an encoder.
-    """
-    try:
-        return find_ffmpeg()
-    except Exception:
-        return ["ffmpeg"]
-
-
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--manifest", default=str(MANIFEST))
@@ -108,7 +94,7 @@ def main(argv=None):
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     cmd = command(doc, args.cards_dir, out,
-                  ffmpeg=_ffmpeg_for_printing() if args.print_command
+                  ffmpeg=ffmpeg_for_printing() if args.print_command
                   else None)
     if args.print_command:
         print(" ".join(cmd))

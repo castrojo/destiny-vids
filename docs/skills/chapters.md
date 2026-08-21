@@ -1,9 +1,9 @@
 ---
 name: chapters
 version: "1.0"
-last_updated: "2026-08-20"
+last_updated: "2026-08-21"
 id: chapters
-one_line_purpose: Author an act's chat dialogue in one Markdown file per chapter.
+one_line_purpose: Author a chapter's on-screen copy in one Markdown file per chapter.
 entry_point: docs/skills/chapters.md
 category: editorial
 status: active
@@ -14,10 +14,10 @@ tags:
   - chapters
   - markdown
 description: >-
-  Add or re-time an act's chat dialogue without computing timecodes: one
-  Markdown file per chapter, whole conversations dropped at one programme
-  timestamp, per-line timing derived from readability. Use when writing or
-  rewriting chat pills or red splashes.
+  Edit any word the audience reads without computing timecodes: one Markdown
+  file per chapter, with per-line timing derived from readability. Use when
+  writing or rewriting chat pills, red splashes, or title, status and credit
+  cards.
 metadata:
   type: procedure
 ---
@@ -26,43 +26,64 @@ metadata:
 
 ## When to Use
 
-- Adding or rewriting an act's chat dialogue without computing timecodes
+- Rewriting **any** word the audience reads, in any act but II
+- Adding or rewriting chat dialogue without computing timecodes
 - Giving one character several lines in a row — each its own pill
 - Seating or rewording a red splash (the boss bar) — `! NAME` lines
-- Dropping a whole conversation at one programme timestamp
+- Editing a title, status, bookline or credit card
+- Reading the whole show through in one page — `chapters/full-script.md`
 
 ## When NOT to Use
 
 - Recovered footage dialogue for a source video → `dialogue/<video_id>/`
   and `tools/dialogue_md.py`
-- Nameplates, title cards, and other chrome → [`plates`](plates/SKILL.md)
+- A nameplate's name, or a roster credit wall — those resolve from
+  `vocab/casting.yaml` and `stories/roster-*.json`, which is the one place
+  those names live. A chapter file leaves them alone.
+- Plate geometry, fade curves, letterbox rects and encode parameters →
+  [`plates`](plates/SKILL.md). Those live beside the plate in the manifest;
+  nobody opens that file to change a word.
 
-## Where each act's chat lives today
+## Where each act's copy lives
 
-Read this table before touching any chat copy — the convention is only
-partly rolled out, and the two systems with similar names are easy to
-confuse:
+Read this table before touching any on-screen copy. Two systems with similar
+names are easy to confuse:
 
-- `chapters/<act>.md` — **what the owner writes.** One file per act with
-  chapter dialogue; the build reads it and the pills land in the generated
-  manifest. The owner's format spec (one `## <programme time>` heading per
-  conversation, `Speaker: line` rows, `@ <time>` pins, `!` splashes) is in
-  the file's own header.
-- `dialogue/<video_id>/` — **recovered-footage provenance.** What the
-  characters in a *source video* visibly say, with timecodes and evidence.
-  Chapter seating uses it as evidence; it is not where act copy is edited.
+- `chapters/<act>.md` — **what the owner writes.** One file per chapter,
+  carrying that chapter's dialogue and cards. The build reads it and the
+  plates land in the generated manifest.
+- `dialogue/<video_id>/` — **recovered-footage provenance.** What people in a
+  *source video* visibly say, with timecodes and evidence. Chapter seating
+  uses it as evidence; it is not where act copy is edited.
 
-| Act | Chat copy lives in |
-|---|---|
-| 0 — prologue | `stories/00-perfume-4-plates.json` (inline pills) |
-| I — intro | — (no chat) |
-| II — endlessforms | `chapters/II-endless-forms.md` — today it authors only the two red splashes; the conversation pills are still `NEW_CHATS` in `scripts/build_efmb_plates.py` |
-| III — mrbobbytables | `dialogue/yt_curse_of_osiris_opening_cinematic/` — the whole Bob/Andy conversation, burned into the act master |
-| IV — kat | `stories/04-kat-plates.json` (inline pills) |
-| V — nat | `stories/05-natali-plates.json` (inline pills) |
-| VI — 7daystothewolves | `stories/06-wolves-cayde-plates.json` (inline pills) |
-| VII — europa | `stories/07-europa-plates.json` (inline pills) |
-| VIII — credits | — (no chat) |
+| Chapter | Copy lives in | Owns its manifest? |
+|---|---|---|
+| 0 — prologue titles | `chapters/0-prologue.md` | yes |
+| I — intro | — (no authored copy) | — |
+| II — endlessforms | **`scripts/build_efmb_plates.py`** — except the two red splashes, which are in `chapters/II-endless-forms.md` | no, partial |
+| III — mrbobbytables | `chapters/III-mrbobbytables.md` (the two fixed pills); the act's conversation is recovered speech in `dialogue/yt_curse_of_osiris_opening_cinematic/` | yes |
+| IV — kat | `chapters/IV-kat.md` | yes |
+| V — nat | `chapters/V-nat.md` | yes |
+| VI — 7daystothewolves | `chapters/VI-wolves.md` | yes, its own plates only |
+| P4 — underwater interlude | `chapters/P4-underwater.md` | yes |
+| VII — europa | `chapters/VII-europa.md` | yes |
+| VIII — the cries | `chapters/VIII-cta.md` | yes, `cta_cards` |
+| VIII — fixed credits | `chapters/VIII-fixed.md` | yes, `fixed_cards` |
+
+**Act II is the one exception, and it is deliberate.** Its 53 pills are
+generated from megacut-relative constants across about ten code paths
+(`NEW_CHATS`, `LATE_PASS`, `MAPPED_PASS`, `OWNER_CONVO`, `MONTAGE_CHATS`,
+`WALK_SEQUENCE`, …), several of them half-generated, and
+`tests/test_efmb_act.py` asserts the committed manifest equals the
+generator's output byte for byte. Owner ruling during the sweep: anything
+that resists a **lossless** lift stays in Python and is recorded here rather
+than forced into a syntax invented to hold it. To copyedit act II, edit the
+constant in the builder and re-run it.
+
+**Never edit a manifest to change a word.** Once a chapter owns its plates,
+the manifest is an *output*: `tools/plate.py` re-syncs it from the chapter
+file before every burn, so a hand-edit is reverted at the moment it would
+otherwise reach a frame.
 
 **The orphan trap, retired:** `dialogue/yt_destiny_all_live_action_trailers/`
 used to carry exactly one line — Cayde's "I'm so proud of you kids!"
@@ -76,21 +97,41 @@ conversation — re-wire the line or retire the record, never wordsmith it.
 
 ## The file is the tool
 
-Each act with chapter dialogue has one Markdown file, `chapters/<act>.md`
-(today: act II). The owner edits it; the act's build script reads it and the
-pills land in the generated plate manifest. The file's own header is the
-usage doc — one `## <programme time>` heading per conversation, `Speaker:
-line` rows under it, `@ <time>` on a row to pin that line exactly.
+Each chapter file is self-describing: its **front matter** declares which
+manifest it writes, where the chapter starts in the programme (with the
+derivation stated), the field order the manifest reads in, and the defaults
+its plates take. There is no registry to update — `chapter_md` discovers the
+files, so adding a chapter is one new file and nothing else.
 
-Timing is derived, never typed: a line holds for `len(text) / 15` seconds
-clamped to [2.2, 7.0] — characters-per-second, the metric pysrt exposes as
-`characters_per_second`, set conservative for a theatre screen — with a
-0.25 s beat between pills. A pinned line lands exactly; slack before it is
-silence, and a pin that overruns its neighbour is honoured with the overlap
-recorded in the manifest's `unresolved`. **The clock is the whole show's** —
-the conversion constants live in `tools/chapter_md.py`
-(`ACT_PROGRAMME_START`) with their derivations, and are the only thing to
-revisit when the running order's timings change.
+The grammar, in full:
+
+```markdown
+## 15:31.472                       a block: one heading, the lines under it
+kat: I miss ONE email now          a pill, held by read speed
+kat @ 15:33.770: How much you...   pinned to an exact programme moment
+[p2c-kat-nice] kat +1.3: Fine      bound to an existing plate, held 1.3 s
+! [id] BOSS NAME @ 6:52 | title    a red splash
+* [id] status @ 17:23.202 +6.0     a card; its copy is the rows below
+  - label: Welcome to KubeCon      a field of the card above
+  - body: first line               repeat a key to build a list
+  - body: second line
+  - fade_in: null                  delete a field the defaults supplied
+  - censor: Goddamn -> G{k8s}ddamn
+```
+
+Front matter worth knowing: `owns_plates` (this file is answerable for its
+plates, so the manifest is regenerated from it), `field_order`, `defaults`
+(a `null` there **removes** a field), `fade_out_at: derived [N]`,
+`list_keys` (which keys are always lists — a fact about the act, not the
+key), and `timed: false` for a run of cards that has no clock, like act
+VIII's weighted cries.
+
+Timing is derived, never typed: an unpinned line holds for `len(text) / 15`
+seconds clamped to [2.2, 7.0] — characters-per-second, set conservative for
+a theatre screen — with a 0.25 s beat between pills. An explicit `+<dur>`
+bypasses the clamp entirely, which is what makes a migrated act reproduce
+exactly. A pinned line lands exactly; a pin that overruns its neighbour is
+honoured with the overlap recorded in `unresolved`.
 
 **Seats follow the speech on screen.** A line whose words match the act's
 recovered dialogue — the shots where the characters visibly say them — is
@@ -102,33 +143,44 @@ always inform the operator of improvements, never apply them silently.
 ## Core Process
 
 ```bash
-$EDITOR chapters/II-endless-forms.md
-python3 tools/chapter_md.py show II          # the schedule it resolves to
-python3 scripts/build_efmb_plates.py --write # regenerate, never hand-edit
+python3 tools/chapter_md.py list              # every chapter and what it owns
+$EDITOR chapters/V-nat.md                     # the words
+python3 tools/chapter_md.py show V            # the schedule it resolves to
+python3 tools/chapter_md.py check             # drift against every manifest
+python3 tools/chapter_md.py sync V --write    # put the words in the manifest
+python3 scripts/generate_full_script.py --write   # refresh the read-through
 ```
+
+`chapters/full-script.md` is the whole programme in one page, in the order
+the audience hears it, and it is **generated** — every block says which file
+its lines are edited in.
 
 ## Red Flags
 
+- **Editing a manifest to change a word.** It is an output. The next burn
+  re-syncs it from the chapter file and your edit is gone.
+- Adding a plate to `stories/02-endless-forms-plates.json` by hand. CI
+  regenerates it from `scripts/build_efmb_plates.py`; the builder is the
+  source for act II.
 - Opening `dialogue/` folders looking for an act's chat to copyedit. Only
-  act III's lives there; the trailers folder is the orphan stub in the table
-  above. The other acts' copy is in their plate manifests (or, for act II,
-  the builder's `NEW_CHATS`).
-- Migrating one act and stopping. The convention is per-chapter; an act left
-  inline in its manifest is a copyedit the owner has to do in JSON.
+  act III's *recovered* conversation lives there, and it is provenance, not
+  copy.
 - Typing per-line timecodes for every row — that is what the heading and the
   read-speed timing replace; pin only the lines that must land exactly.
-- Editing the generated `stories/02-endless-forms-plates.json` by hand.
-  CI regenerates it; the Markdown is the source.
 - A line left blank under a real name. Blank text renders as a placeholder
   credited to nobody — which is right for an unwritten slot and wrong as a
   way to silence a line. Delete the row to drop the line.
-- Recomputing `ACT_PROGRAMME_START` from memory. The constant carries its
-  derivation; restate it from `stories/megacut/megacut.json` when the
-  programme's timings move.
+- Recomputing `programme_start` from memory. Each chapter file carries its
+  derivation; restate it from a `tools/megacut.py --dry-run` when the
+  running order moves.
+- Widening a hold because `tools/readtime.py` says a line is short. Moving
+  an authored beat is the owner's call, never a tool's.
 
 ## Verification
 
 ```bash
-python3 -m pytest -q tests/test_chapter_md.py
-python3 tools/chapter_md.py show II
+python3 -m pytest -q tests/test_chapter_md.py tests/test_chapter_identity.py
+python3 -m pytest -q tests/test_full_script.py
+python3 tools/chapter_md.py check
+python3 scripts/generate_full_script.py --check
 ```

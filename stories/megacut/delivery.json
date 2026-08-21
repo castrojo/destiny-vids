@@ -9,7 +9,10 @@
         "stories/00-prologue-plates.json",
         "scripts/build_prologue.py",
         "cards/maintitle.html",
-        "music/bed_perfume_of_the_timeless.json"
+        "music/bed_perfume_of_the_timeless.json",
+        "chapters/0-prologue.md",
+        "chapters/P4-underwater.md",
+        "tools/chapter_md.py"
       ],
       "footage": [
         "yt_nightwish_perfume_of_the_timeless"
@@ -77,7 +80,9 @@
         "dialogue/yt_curse_of_osiris_opening_cinematic",
         "stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json",
         "music/bed_wish_i_had_an_angel.json",
-        "vocab/casting.yaml"
+        "vocab/casting.yaml",
+        "chapters/III-mrbobbytables.md",
+        "tools/chapter_md.py"
       ],
       "footage": [
         "yt_curse_of_osiris_opening_cinematic"
@@ -92,7 +97,9 @@
       "sources": [
         "stories/04-kat-plates.json",
         "scripts/build_kat.py",
-        "scripts/actbuild.py"
+        "scripts/actbuild.py",
+        "chapters/IV-kat.md",
+        "tools/chapter_md.py"
       ],
       "source_digest": "3f783a5847913f027f425e153f4a2a4eafca7f9fd590e66958fff60c7a0e86a7",
       "rebuild": "python3 scripts/build_kat.py",
@@ -104,7 +111,9 @@
       "sources": [
         "stories/05-natali-plates.json",
         "scripts/build_natali.py",
-        "scripts/actbuild.py"
+        "scripts/actbuild.py",
+        "chapters/V-nat.md",
+        "tools/chapter_md.py"
       ],
       "source_digest": "f99b234b44e7049becf743cd128fb1ec45b3005ba44cfb8a5f6407483deabb98",
       "rebuild": "python3 scripts/build_natali.py",
@@ -122,7 +131,9 @@
         "stories/06-wolves-cayde-plates.json",
         "stories/06-wolves-interruption-cards.json",
         "music/bed_seven_days_to_the_wolves.json",
-        "music/bed_local_forecast_slower.json"
+        "music/bed_local_forecast_slower.json",
+        "chapters/VI-wolves.md",
+        "tools/chapter_md.py"
       ],
       "footage": [
         "wolves_act1",
@@ -143,7 +154,9 @@
         "stories/07-europa-plates.json",
         "scripts/build_europa.py",
         "scripts/actbuild.py",
-        "tools/plate.py"
+        "tools/plate.py",
+        "chapters/VII-europa.md",
+        "tools/chapter_md.py"
       ],
       "source_digest": "30b5c9ec6da8423234dbb110b8341db0caf473892bf35bc5b6a9c2a8ac8a6fb4",
       "rebuild": "python3 scripts/build_europa.py",
@@ -158,7 +171,10 @@
         "scripts/build_credits.py",
         "tools/credits.py",
         "music/bed_wish_i_had_an_angel.json",
-        "music/bed_storytime.json"
+        "music/bed_storytime.json",
+        "chapters/VIII-cta.md",
+        "chapters/VIII-fixed.md",
+        "tools/chapter_md.py"
       ],
       "source_digest": "ef5c8182342cd91ad6c113d4070a8fabc7535023c1ab82d355ac042d1fd8ff47"
     }

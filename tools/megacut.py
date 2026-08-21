@@ -462,8 +462,8 @@ def build_filtergraph(plan, items=None):
             "joined by the concat DEMUXER, in build_concat_command")
     # `null`/`anull` rename the labels and do nothing else. Naming the outputs
     # keeps build_segment_command's -map arguments independent of the chain.
-    chains.append(f"[v0]null[vout]")
-    chains.append(f"[a0]anull[aout]")
+    chains.append("[v0]null[vout]")
+    chains.append("[a0]anull[aout]")
     return ";".join(chains)
 
 

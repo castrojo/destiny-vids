@@ -210,8 +210,6 @@ def main(argv=None):
         print(f"OVER CAP by {(size - target_bytes) / MIB:.2f} MiB -- "
               f"lower --audio-bitrate or --height and re-run")
         return 1
-    out.with_suffix(out.suffix + ".source.md5").write_text(
-        source_digest(src) + "\n", encoding="utf-8")
     return 0
 
 

@@ -149,6 +149,20 @@ def find_ffmpeg(prefer_container=True):
     return [found]
 
 
+def ffmpeg_for_printing():
+    """The ffmpeg to name when a caller is only PRINTING a command.
+
+    ``--print-command`` exists to be read, diffed and pasted, so resolving a
+    real encoder is a precondition of RUNNING the command, never of showing
+    it. Falling back to the bare name keeps the offline suite offline instead
+    of making a print depend on an H.264 build the runner does not have.
+    """
+    try:
+        return find_ffmpeg()
+    except Exception:
+        return ["ffmpeg"]
+
+
 def find_ffprobe(prefer_container=True):
     """``find_ffmpeg``'s sibling: same resolution order, for ffprobe.
 

@@ -28,7 +28,7 @@ repos:
       - id: check-doc-links
         name: Validate internal Markdown links
         language: system
-        entry: python3 scripts/check-doc-links.sh
+        entry: python3 scripts/check-doc-links.py
         pass_filenames: false
         always_run: true
       - id: check-skill-catalog

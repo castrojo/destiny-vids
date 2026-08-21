@@ -225,3 +225,119 @@ def test_instructions_prose_and_indented_examples_parse_as_nothing():
     for block in blocks:
         assert len(block["lines"]) == 1
         assert block["lines"][0]["kind"] == "boss"
+
+
+# ---------------------------------------------------------------------------
+# The grammar the sweep added, each rule written from a bug the identity
+# tests caught while acts 0, III, VI and VIII were being migrated.
+# ---------------------------------------------------------------------------
+
+def _one(text, act="X"):
+    """Parse a scrap of chapter Markdown and build its single entry."""
+    blocks = chapter_md.parse(text)
+    fields, _ = chapter_md.parse_front_matter(text)
+    defaults = fields.get("defaults") or {}
+    order = fields.get("field_order")
+    order = ([k.strip() for k in order.split(",")] if isinstance(order, str)
+             else None)
+    line = blocks[0]["lines"][0]
+    return chapter_md.build_entry(act, 1, 1, line, line["pin"] or 0.0,
+                                  line["hold"] or 1.0, defaults, order)
+
+
+def test_an_empty_list_can_be_written():
+    """Zero repeated rows is indistinguishable from an absent field."""
+    entry = _one("## 0:00\n\n* thing @ 0:00 +1.0\n  - body: []\n")
+    assert entry["body"] == []
+
+
+def test_a_comment_does_not_detach_the_rows_below_it():
+    """An owner annotating their own card must not silently lose it."""
+    entry = _one("## 0:00\n\n* thing @ 0:00 +1.0\n"
+                 "  - label: one\n  # why this card is here\n  - detail: two\n")
+    assert entry["label"] == "one"
+    assert entry["detail"] == "two"
+
+
+def test_an_act_default_never_overrides_a_card_s_own_kind():
+    """Most rows in a chapter file are chat; a status card still is not."""
+    entry = _one("---\nact: X\ndefaults:\n  kind: chat\n---\n\n"
+                 "## 0:00\n\n* status @ 0:00 +1.0\n  - label: hello\n")
+    assert entry["kind"] == "status"
+
+
+def test_an_explicit_null_row_deletes_a_field_the_defaults_supplied():
+    """One card opting out of the fades every pill around it carries."""
+    entry = _one("---\nact: X\ndefaults:\n  fade_in: 0.6\n---\n\n"
+                 "## 0:00\n\n* status @ 0:00 +1.0\n  - fade_in: null\n")
+    assert "fade_in" not in entry
+
+
+def test_derived_fade_out_at_can_be_offset_by_the_act_s_own_number():
+    """Some acts start the fade a fade-IN's length early. That is on screen."""
+    plain = _one("---\nact: X\ndefaults:\n  fade_out: 0.25\n"
+                 "  fade_out_at: derived\n---\n\n"
+                 "## 0:00\n\nSomeone @ 0:10 +2.8: hello\n")
+    offset = _one("---\nact: X\ndefaults:\n  fade_out: 0.25\n"
+                  "  fade_out_at: derived 0.6\n---\n\n"
+                  "## 0:00\n\nSomeone @ 0:10 +2.8: hello\n")
+    assert plain["fade_out_at"] == 12.55
+    assert offset["fade_out_at"] == 12.2
+
+
+def test_a_speaker_may_be_bracketed_even_after_an_id():
+    """Act III's speaker is `[redacted]` -- he is revealed in act VI."""
+    entry = _one("## 0:00\n\n[retirement-1] [redacted] @ 0:03.567 +2.125: "
+                 "Finally, retirement\n")
+    assert entry["id"] == "retirement-1"
+    assert entry["speaker"] == "[redacted]"
+    assert entry["text"] == "Finally, retirement"
+
+
+def test_an_untimed_chapter_invents_no_clock_and_no_id():
+    """Act VIII's credit cards are weights, and are addressed by order."""
+    text = ("---\nact: X\ntimed: false\nlist_keys:\n---\n\n"
+            "## the cries\n\n* cta\n  - text: FIGHT\n  - dur_sec: 9.5\n")
+    entries, _ = chapter_md.untimed_entries(
+        "X", chapter_md.parse(text), {}, None)
+    assert entries == [{"kind": "cta", "text": "FIGHT", "dur_sec": 9.5}]
+
+
+def test_a_kindless_card_carries_no_kind_field():
+    """Act VIII's fixed credits are told apart by role and never had one."""
+    entry = _one("## 0:00\n\n* - @ 0:00 +1.0\n  - role: Music by\n")
+    assert "kind" not in entry
+    assert entry["role"] == "Music by"
+
+
+def test_which_keys_are_lists_is_a_fact_about_the_act():
+    """The prologue's `body` is a page of lines; act VIII's is a sentence."""
+    listed = _one("---\nact: X\nlist_keys: body\n---\n\n"
+                  "## 0:00\n\n* thing @ 0:00 +1.0\n  - body: one line\n")
+    scalar = _one("---\nact: X\nlist_keys:\n---\n\n"
+                  "## 0:00\n\n* thing @ 0:00 +1.0\n  - body: one line\n")
+    assert listed["body"] == ["one line"]
+    assert scalar["body"] == "one line"
+
+
+def test_a_float_field_does_not_come_back_as_an_int():
+    """`4.0` rewritten as `4` is a delivered record changed for nothing."""
+    assert chapter_md._num(4.0) == "4.0"
+    assert chapter_md._num(4) == "4"
+    assert chapter_md._num(2.4) == "2.4"
+
+
+def test_a_chapter_that_resolves_to_nothing_says_so():
+    """Silence used to look exactly like perfect agreement."""
+    notes = chapter_md._check_in_order([], [{"text": "a"}, {"text": "b"}])
+    assert notes and "0 card(s)" in notes[0]
+
+
+def test_a_derived_nameplate_is_carried_through_a_sync_untouched():
+    """A chapter file owns its words, not the whole array around them."""
+    before = [{"id": "plate", "copy_source": "brief", "name": "Someone Real"},
+              {"id": "pill", "text": "old"}]
+    merged, notes = chapter_md._merge_plates(
+        before, [{"id": "pill", "text": "new"}])
+    assert merged == [before[0], {"id": "pill", "text": "new"}]
+    assert notes == []

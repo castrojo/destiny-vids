@@ -162,6 +162,28 @@ def test_a_named_badge_is_never_overwritten():
     assert not placeholder.needs_prose(badge)
     assert placeholder.fill(badge) == badge
 
+def test_a_lorem_second_row_is_on_the_punch_list():
+    """A `! NAME |` chapter card authors the name and leaves the TITLE lorem.
+
+    `title_source: "placeholder"` was invisible to the punch list, so act II
+    shipped "Proident sunt culpa qui" and "Reprehenderit voluptate" while
+    `placeholder.py list` reported zero unwritten copy. Being wrong in that
+    direction -- claiming nothing is missing -- is the one thing this tool
+    must never do.
+    """
+    card = {"id": "late_poor_technical_decisions", "kind": "miniboss",
+            "name": "POOR TECHNICAL DECISIONS", "title": "Proident sunt culpa qui",
+            "title_source": "placeholder", "text_source": "owner_supplied"}
+    assert placeholder.is_placeholder(card)
+    # ...and the authored NAME row is still never overwritten with lorem.
+    assert not placeholder.needs_prose(card)
+    assert placeholder.fill(card) == card
+
+def test_the_committed_lorem_titles_are_listed():
+    """The two act II cards are on the list until somebody writes their rows."""
+    found = {f["id"] for f in placeholder.scan()}
+    assert {"late_poor_technical_decisions", "mapped_haters"} <= found
+
 # --- the dialogue record's own placeholder ----------------------------------
 
 def test_a_cue_the_owner_left_blank_is_a_placeholder():

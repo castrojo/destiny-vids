@@ -2353,16 +2353,16 @@
     },
     {
       "id": "mapped_eyecantcu_reveal",
-      "at": 351.97,
+      "at": 334.553,
       "dur": 3.2,
       "position": "left",
       "copy_source": "casting",
-      "seen_at_src": 354.6,
+      "seen_at_src": 352.85,
       "shot_src": [
-        353.533,
-        355.167
+        352.667,
+        353.533
       ],
-      "why": "the evidenced Warlock frame held in the authored 9:31 seat",
+      "why": "the solar Warlock pulling out the glowing orange sword",
       "label": "BLUEBERRY // MAINTAINER",
       "name": "[ EyeCantCU ]",
       "title": "Seer of the Truth",
@@ -2400,7 +2400,7 @@
     "the owner asked to 'stylize it like a rare drop in a game' for A1RM4X's ghost card. This batch stays inside the existing plate renderer, so the card uses the verified YouTube ghost chrome and the rarer drop treatment stays unrendered rather than faked",
     "the 6:29 cue is 'red miniboss flashing / Your Bad Decisions'. This deterministic batch is limited to the existing title/chat/banner kinds, and none of them is a flashing red miniboss bar, so the line stays recorded rather than faked with the wrong chrome",
     "the mapped hallway edit uses the owner-supplied source-323.933 hallway-and-dogs frame, Amber's owner-identified gameplay sequence, and the cleared Local Forecast - Slower bed. Source resumes at 325.933 after the readable black-screen conversation",
-    "EyeCantCU's owner-timed megacut 9:31 seat uses a freeze of the evidenced source-354.600 Warlock frame; the stale old 283.666 plate seat remains removed",
+    "EyeCantCU's owner-timed reveal is seated at source-352.850, the close-up where the solar Warlock pulls out the glowing orange sword",
     "the 9:10 HATERS title renders through existing title chrome. The requested flashing red boss treatment is still missing; the copy ships without that effect rather than being dropped",
     "the Kyle and kolunmi pills land at film 335.650 and 338.100 after Amber's conversation and Bungie's burned-in 'NEW LEGENDS WILL RISE' zone. The order and copy are the owner's; the protected publisher-title gap moves the seats",
     "KyleGospo's mapped reveal sits on his verified source-335.267 Sentinel shot at film 314.237, after Amber's sequence",

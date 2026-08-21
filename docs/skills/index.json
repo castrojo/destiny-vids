@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-20",
+  "generated_at": "2026-08-21",
   "skills": [
     {
       "id": "chapters",
       "name": "chapters",
-      "one_line_purpose": "Author an act's chat dialogue in one Markdown file per chapter.",
+      "one_line_purpose": "Author a chapter's on-screen copy in one Markdown file per chapter.",
       "entry_point": "docs/skills/chapters.md",
       "category": "editorial",
       "status": "active",
@@ -15,9 +15,9 @@
         "chapters",
         "markdown"
       ],
-      "description": "Add or re-time an act's chat dialogue without computing timecodes: one Markdown file per chapter, whole conversations dropped at one programme timestamp, per-line timing derived from readability. Use when writing or rewriting chat pills or red splashes.",
+      "description": "Edit any word the audience reads without computing timecodes: one Markdown file per chapter, with per-line timing derived from readability. Use when writing or rewriting chat pills, red splashes, or title, status and credit cards.",
       "version": "1.0",
-      "last_updated": "2026-08-20",
+      "last_updated": "2026-08-21",
       "doc_type": "procedure"
     },
     {
@@ -36,7 +36,7 @@
       ],
       "description": "Run frame-touching encodes on the remote farm. Use when the cluster is reachable and you need a Prod encode, a megacut segment, or another long render.",
       "version": "1.0",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "doc_type": "runbook"
     },
     {
@@ -53,8 +53,8 @@
         "runner"
       ],
       "description": "The suite is the gate. Use when a test passes locally and fails in CI, when adding a check, or when anything resolves a binary, font, or path outside the repo.",
-      "version": "1.0",
-      "last_updated": "2026-08-20",
+      "version": "1.1",
+      "last_updated": "2026-08-21",
       "doc_type": "procedure"
     },
     {
@@ -111,7 +111,7 @@
       ],
       "description": "Build and revise cuts from indexed footage without inventing shots. Use when making story outlines or renders from indexed segments.",
       "version": "1.0",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "doc_type": "procedure"
     },
     {
@@ -148,8 +148,8 @@
         "rendering"
       ],
       "description": "Render authored identity and dialogue cards without inventing copy. Use when burning Guardian nameplates, chat cards, or full-frame cards onto a video.",
-      "version": "1.0",
-      "last_updated": "2026-08-19",
+      "version": "1.1",
+      "last_updated": "2026-08-21",
       "doc_type": "policy"
     },
     {

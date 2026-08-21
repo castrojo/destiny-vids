@@ -114,15 +114,6 @@ ARTWORK = {
     "bluefin-day":         f"{RAW}/bluefin/png/03-bluefin-day.png",
 }
 
-# THE JUMP SCARE. Owner: *"when there's a ROAR jump scare: [angry.webp] use a
-# high quality one from ublue-os/artwork"* -- so the mark comes from the
-# artwork repository rather than the website's web-optimised header copy.
-ROAR = "roar"
-ROAR_CANDIDATES = [
-    f"{RAW}/huntress/huntress.jxl",
-]
-
-
 def _fetch_bytes(url):
     req = urllib.request.Request(url, headers={"User-Agent": "destiny-vids"})
     with urllib.request.urlopen(req, timeout=60) as resp:

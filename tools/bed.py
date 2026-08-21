@@ -208,12 +208,6 @@ def downbeats(grid):
                                     grid["beats_per_bar"])]
 
 
-def snap_to_downbeat(grid, seconds):
-    """Nearest bar line to ``seconds``."""
-    bars = downbeats(grid)
-    return min(bars, key=lambda b: abs(b - seconds))
-
-
 # --- musical events: the evidence a downbeat phase rests on ------------------
 #
 # A beat grid says where beats fall; it does not say where anything HAPPENS.
@@ -742,7 +736,7 @@ def main(argv=None):
         record.setdefault("excisions", []).append(exc)
         record["excisions"].sort(key=lambda x: x["start_sec"])
         save_record(record, args.record)
-        print(f"excision snapped to bar lines:")
+        print("excision snapped to bar lines:")
         print(f"  requested {fmt_tc(start)} -> {fmt_tc(end)}")
         print(f"  snapped   {fmt_tc(exc['start_sec'])} -> {fmt_tc(exc['end_sec'])}"
               f"  ({exc['start_moved_sec']:+.3f}s / {exc['end_moved_sec']:+.3f}s)")

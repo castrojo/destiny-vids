@@ -224,12 +224,6 @@ KYLE_REVEAL_SEC = 3.200
 KYLE_REVEAL_AT = HALLWAY_RETURN_AT + (KYLE_REVEAL_SRC - HALLWAY_RESUME_SRC)
 EDITED_PICTURE_END = 343.903
 
-# EyeCantCU's requested 9:31 seat was black in the base cut. The exact
-# evidenced Warlock frame is held there instead; no different Guardian is
-# credited by inference.
-EYECANTCU_AT = 351.970
-EYECANTCU_SRC = 354.600
-
 HOLD_MUSIC_IN = 6.500
 HOLD_MUSIC_OUT_FILM = HALLWAY_RETURN_AT
 
@@ -367,15 +361,6 @@ def picture_sequence():
         "id": "tail_black",
         "kind": "black",
         "at": round(at, 3),
-        "duration": round(EYECANTCU_AT - at, 3),
-    })
-    at = EYECANTCU_AT
-    parts.append({
-        "id": "eyecantcu_tail",
-        "kind": "freeze",
-        "source_id": SOURCE_ID,
-        "at": round(at, 3),
-        "source_at": EYECANTCU_SRC,
         "duration": round(film_sec - at, 3),
     })
     assert abs(sum(p["duration"] for p in parts) - film_sec) < 0.001
@@ -448,14 +433,11 @@ def edited_source_for_film(film_sec, lead=None):
     if AMBER_AT <= film_sec < HALLWAY_RETURN_AT:
         raise NotInPicture(
             f"film {film_sec:.3f}s is inside Amber's external sequence")
+    if film_sec >= EDITED_PICTURE_END:
+        raise NotInPicture(
+            f"film {film_sec:.3f}s is in the black outro tail")
     if HALLWAY_RETURN_AT <= film_sec < EDITED_PICTURE_END:
         return source_for_film(film_sec - INTERRUPTION_SHIFT_SEC, lead)
-    if EDITED_PICTURE_END <= film_sec < EYECANTCU_AT:
-        raise NotInPicture(
-            f"film {film_sec:.3f}s is in the black outro gap")
-    if EYECANTCU_AT <= film_sec < float(load_json(
-            REPO_ROOT / "music" / f"{BED_ID}.json")["duration_sec"]):
-        return EYECANTCU_SRC
     return source_for_film(film_sec, lead)
 
 

@@ -87,6 +87,7 @@ from tools import conform  # noqa: E402
 from tools import footage  # noqa: E402
 from tools import peaks  # noqa: E402
 from tools import freshness  # noqa: E402
+from tools import chapter_md  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "00-prologue-plates.json"
@@ -180,8 +181,22 @@ def render_cards():
         node_modules.symlink_to(website)
     subprocess.run(
         ["node", str(REPO_ROOT / "cards" / "render-cards.mjs"),
-         "--manifest", str(MANIFEST), "--out-dir", str(PLATES_DIR)],
+         "--manifest", str(sync_copy("0")), "--out-dir", str(PLATES_DIR)],
         cwd=REPO_ROOT, check=True)
+
+
+def sync_copy(act):
+    """Put the chapter file's words in the manifest, then hand it over.
+
+    THE WORDS LIVE IN ``chapters/<act>.md``. This manifest is where the
+    renderer reads them from, which makes it an output -- so it is brought
+    current here rather than trusted to have been, and a card can never be
+    rendered from copy the owner has already replaced.
+    """
+    _, unresolved = chapter_md.sync(act, write=True)
+    for note in unresolved:
+        print(f"chapter: {note}", file=sys.stderr)
+    return MANIFEST
 
 
 def wallpaper(variant):

@@ -49,6 +49,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from tools.render import find_ffmpeg  # noqa: E402
+from tools import chapter_md  # noqa: E402
 
 # Each act's front end passes its own; nothing here is Kat-specific.
 ACTS = {
@@ -275,10 +276,26 @@ def build_command(doc, project, variant_key="delivered", plates_dir=None,
 
 
 def load_act(act):
-    """The act's manifest, tagged with the file it came from."""
+    """The act's manifest, tagged with the file it came from.
+
+    THE COPY COMES FROM THE CHAPTER FILE, not from the manifest. An act with
+    a ``chapters/<act>.md`` has its pills resolved from the Markdown the owner
+    edits, and the manifest supplies only what the Markdown is not about --
+    the trim, the measured letterbox, the encode parameters. That way a
+    copyedit is one line in one readable file, and the manifest is an output.
+
+    An act with no chapter file keeps its manifest's own plates, so this is
+    additive: nothing has to be migrated for the build to work.
+    """
     manifest, project, plates_dir = act_paths(act)
     doc = load_manifest(manifest)
     doc["_manifest_name"] = manifest.name
+    plates, unresolved = chapter_md.entries(act)
+    if plates:
+        doc["plates"] = plates
+        for note in unresolved:
+            print(f"chapter: {note}", file=sys.stderr)
+        doc["unresolved"] = [*doc.get("unresolved", []), *unresolved]
     return doc, project, plates_dir
 
 
