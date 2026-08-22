@@ -819,16 +819,39 @@ def _pod_safe_name(name):
     return re.sub(r"[\[\]*?]", "_", name)
 
 
+def _strip_launcher(argv):
+    """Drop the LOCAL ffmpeg launcher, however many tokens it takes.
+
+    ``find_ffmpeg()`` does not always return a bare binary. On an atomic
+    Fedora/Bluefin host the system ffmpeg is ffmpeg-free with no H.264, so the
+    resolver hands back a container wrapper --
+    ``['podman', 'exec', 'bluefin-thumbnailer', 'ffmpeg']`` -- and assuming
+    argv[0] alone is the binary leaves ``exec bluefin-thumbnailer ffmpeg`` as
+    stray positional arguments. ffmpeg then treats the last of them as the
+    output file and dies with "Unable to choose an output format for 'exec'".
+
+    Everything before the first option token is the launcher, whatever its
+    length; the pod supplies its own full non-free ffmpeg on PATH. The recipe
+    travels, never the binary.
+    """
+    first_opt = next((i for i, tok in enumerate(argv) if tok.startswith("-")),
+                     len(argv))
+    if first_opt == 0:
+        raise FarmError(
+            "argv starts with an option, so it names no ffmpeg to replace")
+    return argv[first_opt:]
+
+
 def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
     """Map a LOCAL ffmpeg argv onto the pod's filesystem view.
 
-    ``argv[0]`` — the local ffmpeg binary, e.g. the linuxbrew build this host
-    needs for H.264 — becomes plain ``ffmpeg``; the farm image carries a full
-    non-free build on PATH, so the recipe travels, not the binary. Every
-    token that IS one of ``inputs`` is staged at ``{work_dir}/in/NN-name``
-    (the ordinal prefix keeps two same-named inputs distinct) and rewritten
-    there; the one token that IS ``out`` is rewritten to
-    ``{work_dir}/out/<name>``.
+    The local ffmpeg launcher — one token for a plain binary, four for this
+    host's ``podman exec`` wrapper — becomes plain ``ffmpeg``; the farm image
+    carries a full non-free build on PATH, so the recipe travels, not the
+    binary. Every token that IS one of ``inputs`` is staged at
+    ``{work_dir}/in/NN-name`` (the ordinal prefix keeps two same-named inputs
+    distinct) and rewritten there; the one token that IS ``out`` is rewritten
+    to ``{work_dir}/out/<name>``.
 
     Matching is exact-token only, by design: a path embedded inside a filter
     string would NOT be rewritten, so a caller whose argv works that way is
@@ -869,7 +892,7 @@ def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
     seen_inputs = set()
     seen_out = False
     pod_argv = ["ffmpeg"]
-    for tok in argv[1:]:
+    for tok in _strip_launcher(list(argv)):
         if tok in staged:
             pod_argv.append(staged[tok])
             seen_inputs.add(tok)

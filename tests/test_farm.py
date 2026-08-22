@@ -355,6 +355,45 @@ def test_rewrite_argv_maps_binary_inputs_and_output():
     # none) — and the rest of the recipe travels byte-for-byte.
     assert "fps=60000/1001,trim=end=431.231" in pod_argv
 
+def test_rewrite_argv_strips_a_multi_token_container_launcher():
+    # find_ffmpeg() does not always return a bare binary: on an atomic
+    # Fedora/Bluefin host the system ffmpeg is ffmpeg-free with no H.264, so
+    # the resolver hands back `podman exec bluefin-thumbnailer ffmpeg`.
+    # Replacing only argv[0] left `exec bluefin-thumbnailer ffmpeg` as stray
+    # positionals, ffmpeg took the last as the output file, and act 0's farm
+    # encode died with "Unable to choose an output format for 'exec'".
+    argv = ["podman", "exec", "bluefin-thumbnailer", "ffmpeg",
+            "-hide_banner", "-y", "-i", "/abs/src.mkv",
+            "-c:v", "libx264", "/abs/00-prologue.mp4"]
+    pod_argv, _, pod_out = farm.rewrite_argv_for_pod(
+        argv, ["/abs/src.mkv"], "/abs/00-prologue.mp4")
+    assert pod_argv[0] == "ffmpeg"
+    # The launcher leaves NO residue: these tokens must not survive as args.
+    for stray in ("podman", "exec", "bluefin-thumbnailer"):
+        assert stray not in pod_argv
+    assert pod_argv[1] == "-hide_banner"
+    assert pod_argv[pod_argv.index("-i") + 1] == "/work/in/00-src.mkv"
+    assert pod_out == "/work/out/00-prologue.mp4"
+    assert pod_argv[-1] == pod_out
+
+
+def test_rewrite_argv_keeps_a_bare_binary_working():
+    # The one-token shape must still behave: the fix generalises argv[0],
+    # it does not trade one launcher shape for another.
+    pod_argv, _, _ = farm.rewrite_argv_for_pod(
+        ["ffmpeg", "-i", "/a/s.mkv", "/o/o.mp4"], ["/a/s.mkv"], "/o/o.mp4")
+    assert pod_argv == ["ffmpeg", "-i", "/work/in/00-s.mkv",
+                        "/work/out/o.mp4"]
+
+
+def test_rewrite_argv_rejects_an_argv_that_names_no_ffmpeg():
+    # An argv opening on an option has no launcher to replace; stripping
+    # nothing would silently prepend `ffmpeg` to a recipe missing its own.
+    with pytest.raises(farm.FarmError, match="names no ffmpeg"):
+        farm.rewrite_argv_for_pod(
+            ["-i", "/a/s.mkv", "/o/o.mp4"], ["/a/s.mkv"], "/o/o.mp4")
+
+
 def test_rewrite_argv_stages_same_named_inputs_distinctly():
     argv = ["ffmpeg", "-i", "/a/seg.mp4", "-i", "/b/seg.mp4",
             "/out/o.mkv", "-y"]
