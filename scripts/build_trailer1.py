@@ -176,6 +176,26 @@ W, H = conform.DELIVERY.width, conform.DELIVERY.height
 SCOPE_W, SCOPE_H = 1920, 804
 PAD_Y = (H - SCOPE_H) // 2
 
+# The authored composition is expressed at 1x (1920x1080). `--uhd` renders the
+# SAME composition at 2x, so every geometric fact here is multiplied by one
+# number and nothing is re-authored: the seat, the pad, the frame and the box
+# anchor all scale together, which is what keeps the 4K master a faithful
+# enlargement of the approved cut rather than a second, subtly different edit.
+#
+# The pixels this buys are real. The source is our own 3840x1608 neural
+# upscale, and the wallpapers resample from 6300x2700 art, so at 2x nothing in
+# the frame is a 1080p image stretched to fit.
+SCALE = 1
+
+
+def set_scale(scale):
+    """Re-derive every geometric constant for a 1x or 2x render."""
+    global SCALE, W, H, SCOPE_W, SCOPE_H, PAD_Y
+    SCALE = scale
+    W, H = conform.DELIVERY.width * scale, conform.DELIVERY.height * scale
+    SCOPE_W, SCOPE_H = 1920 * scale, 804 * scale
+    PAD_Y = (H - SCOPE_H) // 2
+
 
 def source_scope(path=None):
     """The scale prefix that brings this source to the authored scope frame."""
@@ -222,7 +242,8 @@ def render_cards():
         node_modules.symlink_to(website)
     subprocess.run(
         ["node", str(REPO_ROOT / "cards" / "render-cards.mjs"),
-         "--manifest", str(MANIFEST), "--out-dir", str(PLATES_DIR)],
+         "--manifest", str(MANIFEST), "--out-dir", str(PLATES_DIR),
+         "--scale", str(SCALE)],
         cwd=REPO_ROOT, check=True)
 
 
@@ -230,7 +251,7 @@ def wallpaper(variant):
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
     import fetch_wallpapers
 
-    return fetch_wallpapers.cached(BRIDGE_MONTH, variant)
+    return fetch_wallpapers.cached(BRIDGE_MONTH, variant, SCALE)
 
 
 def _still(source, label, extra=""):
@@ -253,7 +274,7 @@ def _still(source, label, extra=""):
             f"fps={FPS},setpts=N/({FPS})/TB{extra}[{label}]")
 
 
-def filtergraph(manifest, audio_gain=1.0, scope=""):
+def filtergraph(manifest, audio_gain=1.0, *, scope):
     # --- the picture ---------------------------------------------------------
     # The source is brought to the AUTHORED SCOPE FRAME (1920x804) if it is not
     # already there, then padded to 16:9. Those are two separate facts: the seat
@@ -292,7 +313,10 @@ def filtergraph(manifest, audio_gain=1.0, scope=""):
     box_at = box["at"]
     parts.append(_still(3, "bk0",
                         f",trim=0:{CUT_OUT:.3f},setpts=PTS-STARTPTS"))
-    bx0, by0 = box["anchor"]
+    # The anchor is authored in 1x frame coordinates, so it scales with the
+    # frame. Leaving it unscaled at 2x would seat the box a quarter-frame up
+    # and to the left of the words it exists to cover.
+    bx0, by0 = (v * SCALE for v in box["anchor"])
     parts.append(f"[head][bk0]overlay=x={bx0 - W / 2:.0f}:y={by0 - H / 2:.0f}:"
                  f"shortest=1:"
                  f"enable=between(t\\,{box_at:.3f}\\,{CUT_OUT:.3f})[headbox]")
@@ -444,7 +468,7 @@ def filtergraph(manifest, audio_gain=1.0, scope=""):
     return ";".join(parts)
 
 
-def command(manifest, day_png, night_png, audio_gain=1.0, scope=""):
+def command(manifest, day_png, night_png, audio_gain=1.0, *, scope):
     # INPUT ORDER IS THE GRAPH'S ORDER. `filtergraph` counts inputs as it
     # builds, so a PNG added here without a matching overlay -- or in the wrong
     # place -- feeds the wrong card into the wrong window. The day cards are
@@ -462,13 +486,42 @@ def command(manifest, day_png, night_png, audio_gain=1.0, scope=""):
           for arg in ("-i", str(PLATES_DIR / f"plate_{entry['id']}.png"))],
         "-i", str(PLATES_DIR / "plate_endcard-event.png"),
         "-i", str(PLATES_DIR / "plate_endcard-cta.png"),
-        "-filter_complex", filtergraph(manifest, audio_gain, scope),
+        "-filter_complex", filtergraph(manifest, audio_gain, scope=scope),
         "-map", "[vout]", "-map", "[aout]",
-        *conform.video_encode_args(),
+        *video_encode_args(),
         "-c:a", "flac", "-sample_fmt", "s32",
         "-t", f"{TOTAL:.3f}",
         "-movflags", "+faststart",
         str(OUT),
+    ]
+
+
+def video_encode_args():
+    """The delivery bitstream, which cannot be the same codec at both sizes.
+
+    The 1080p master keeps `conform.video_encode_args()` verbatim, so it stays
+    byte-comparable with the rest of the programme. The UHD master cannot: the
+    spec pins H.264 High@**4.2**, and 3840x2160 at 59.94 is far outside that
+    level -- x264 would silently emit a stream no level-4.2 decoder can play.
+
+    So UHD delivers HEVC 10-bit, which is also what the upscale benchmark
+    concluded this footage needs: "80% of pixels fall in 42 code values, so
+    8-bit output would band. 10-bit is mandatory." Banding is exactly the
+    artefact a 4K master would otherwise showcase.
+    """
+    if SCALE == 1:
+        return conform.video_encode_args()
+    return [
+        "-c:v", "libx265",
+        "-preset", "medium",
+        "-crf", "18",
+        "-pix_fmt", "yuv420p10le",
+        "-x265-params",
+        "colorprim=bt709:transfer=bt709:colormatrix=bt709:range=limited",
+        "-color_primaries", "bt709",
+        "-color_trc", "bt709",
+        "-colorspace", "bt709",
+        "-tag:v", "hvc1",
     ]
 
 
@@ -482,7 +535,30 @@ def main(argv=None):
                     help="re-render the card PNGs first")
     ap.add_argument("--no-deliver", action="store_true",
                     help="render to renders/ without copying to ~/Videos")
+    ap.add_argument("--uhd", action="store_true",
+                    help="render the 2x (3840x2160) master from the 4K upscale")
+    ap.add_argument("--source",
+                    help="override the resolved source file")
+    ap.add_argument("--plates-dir",
+                    help="override where the card PNGs are read from")
+    ap.add_argument("--out",
+                    help="override the output path")
+    ap.add_argument("--rewrite-root", nargs=2, metavar=("FROM", "TO"),
+                    help="print the command with FROM replaced by TO, for a "
+                         "remote render whose paths differ from this host's")
     args = ap.parse_args(argv)
+
+    global SOURCE, PLATES_DIR, OUT
+    if args.uhd:
+        set_scale(2)
+        PLATES_DIR = REPO_ROOT / "renders" / "plates-trailer-1-uhd"
+        OUT = REPO_ROOT / "renders" / "trailer-1-4k.mp4"
+    if args.source:
+        SOURCE = Path(args.source)
+    if args.plates_dir:
+        PLATES_DIR = Path(args.plates_dir)
+    if args.out:
+        OUT = Path(args.out)
 
     manifest = load()
 
@@ -506,6 +582,9 @@ def main(argv=None):
         print(f"  {note}", file=sys.stderr)
 
     argv_ff = command(manifest, day, night, scope=scope)
+    if args.rewrite_root:
+        src, dst = args.rewrite_root
+        argv_ff = [a.replace(src, dst) for a in argv_ff]
     if args.print_command:
         print(" ".join(argv_ff))
         return 0
@@ -517,7 +596,7 @@ def main(argv=None):
     # remux through the container can see a stale inode after os.replace and
     # truncate the delivery, so the correction reuses this complete graph.
     def rerun_with_gain(gain):
-        subprocess.run(command(manifest, day, night, gain), check=True)
+        subprocess.run(command(manifest, day, night, gain, scope=scope), check=True)
 
     peaks.correct_delivered_peak(
         OUT, 1.0, peaks.DEFAULT_TARGET_DBTP, rerun_with_gain,

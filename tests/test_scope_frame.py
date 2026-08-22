@@ -51,7 +51,7 @@ def test_a_source_at_the_authored_scope_is_not_resampled(monkeypatch):
     scope, note = build_prologue.source_scope(Path("perfume.mkv"))
     assert scope == ""
     assert "no resampling" in note
-    assert "scale=" not in build_prologue.filtergraph(scope)
+    assert "scale=" not in build_prologue.filtergraph(scope=scope)
 
 
 def test_a_larger_source_is_downscaled_to_the_authored_scope(monkeypatch):
@@ -69,7 +69,7 @@ def test_the_downscale_runs_before_the_pad(monkeypatch):
     # is "Padded dimensions cannot be smaller than input dimensions".
     fake_probe(monkeypatch, 3840, 1608)
     scope, _ = build_prologue.source_scope(Path("perfume.mkv"))
-    graph = build_prologue.filtergraph(scope)
+    graph = build_prologue.filtergraph(scope=scope)
     assert "scale=1920:804:flags=lanczos,pad=1920:1080:0:138" in graph
 
 
@@ -78,7 +78,7 @@ def test_the_authored_seat_is_138px_whatever_the_source(scope):
     # The title cards and the bookline are rendered against this seat, so it
     # is authored geometry. A source swap may change what is resampled; it may
     # never move the picture inside the frame.
-    assert "pad=1920:1080:0:138:color=black" in build_prologue.filtergraph(scope)
+    assert "pad=1920:1080:0:138:color=black" in build_prologue.filtergraph(scope=scope)
 
 
 def test_the_seat_is_derived_from_the_scope_constant_not_retyped():
@@ -203,8 +203,8 @@ def test_no_perfume_builder_pads_footage_without_scaling_it_first(monkeypatch):
     fake_probe(monkeypatch, 3840, 1608)
 
     scope, _ = build_prologue.source_scope(Path("perfume.mkv"))
-    for graph in (build_prologue.filtergraph(scope),
-                  build_trailer1.filtergraph(build_trailer1.load(), 1.0, scope)):
+    for graph in (build_prologue.filtergraph(scope=scope),
+                  build_trailer1.filtergraph(build_trailer1.load(), 1.0, scope=scope)):
         assert "scale=" in graph, "the 4K source is not resampled at all"
         assert graph.index("scale=") < graph.index("pad="), (
             "pad runs before scale, so ffmpeg is asked to shrink a frame")
@@ -223,3 +223,66 @@ def test_no_builder_resolves_ffmpeg_merely_to_ask_about_a_file():
         assert "find_ffmpeg" not in call, (
             f"{path.name} resolves ffmpeg to call scope_filter; let conform do "
             f"it lazily or the offline suite cannot reach this path")
+
+
+def test_no_perfume_call_site_can_omit_the_scope_filter():
+    """Every call that BUILDS a chain must hand it the scope filter.
+
+    Written from the failure it catches. `build_trailer1` threaded `scope` into
+    the FIRST render and then rebuilt the same command for the loudness
+    correction without it -- `command(manifest, day, night, gain)` -- so the
+    rerun fell back to `scope=""` and emitted a bare `pad=1920:1080:0:138`
+    against the 3840x1608 master. The first pass encoded fine and the retry died
+    on "Padded dimensions cannot be smaller than input dimensions", which is the
+    worst shape for this bug: it only appears when the audio happens to be hot
+    enough to need a second pass.
+
+    This asserts the CALL SITES, not the signatures. An earlier version of this
+    guard flagged any defaulted `scope` parameter, which condemned
+    `build_prologue` for a default no call site actually relies on -- it has no
+    rerun path at all, it trims the finished master with `peaks.trim_master_peak`.
+    A default is only a bug when somebody omits it, so that is what is measured,
+    for the same reason the sibling test checks the built chain rather than the
+    source line: what reaches ffmpeg is the only thing that can be wrong.
+    """
+    import ast
+
+    builders = perfume_builders()
+    assert builders, "discovery found no perfume builders; the guard is vacuous"
+
+    checked = 0
+    for path in builders:
+        tree = ast.parse(path.read_text())
+        # Where does `scope` sit in each chain-building signature?
+        position = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name in {"filtergraph", "command"}:
+                names = [a.arg for a in node.args.args]
+                if "scope" in names:
+                    position[node.name] = names.index("scope")   # positional
+                elif any(a.arg == "scope" for a in node.args.kwonlyargs):
+                    position[node.name] = "kwonly"               # must be named
+                else:
+                    position[node.name] = None                   # takes no scope
+
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            name = getattr(node.func, "id", None) or getattr(node.func, "attr", None)
+            if name not in position:
+                continue
+            idx = position[name]
+            # A builder that takes no `scope` at all splices it in elsewhere --
+            # `build_interludes` holds it in a constant that `video_chain`
+            # inserts after the scope. There is no parameter to omit, and the
+            # sibling scale-before-pad test already checks its built chain.
+            if idx is None:
+                continue
+            by_keyword = any(k.arg == "scope" for k in node.keywords)
+            by_position = idx != "kwonly" and len(node.args) > idx
+            assert by_keyword or by_position, (
+                f"{path.name} line {node.lineno}: {name}(...) is built without a "
+                f"scope filter, so the chain pads a source it never resampled")
+            checked += 1
+
+    assert checked, "no filtergraph/command call sites were found to check"
