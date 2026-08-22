@@ -40,13 +40,43 @@ def on_screen_copy(manifest):
 
 # --- the length ---------------------------------------------------------------
 
-def test_the_music_stays_one_minute_fifty():
-    assert T.MUSIC_END == pytest.approx(110.020, abs=1e-6)
+def test_the_music_plays_two_full_minutes():
+    """Owner, on a six-second extension: '+6s sounds too short'.
+
+    The song is unbroken and flat through 2:15 -- measured, not assumed -- so
+    ending at 2:00 cuts through no cadence, and the 1:47 howl still lands ten
+    seconds clear of the fade rather than underneath it.
+    """
+    assert T.MUSIC_END == pytest.approx(120.020, abs=1e-6)
 
 
-def test_the_url_holds_five_seconds_after_the_music():
-    assert T.URL_HOLD == pytest.approx(5.000, abs=1e-9)
-    assert T.TOTAL == pytest.approx(115.020, abs=1e-6)
+def test_the_url_holds_seven_seconds_after_the_music():
+    """Owner: 'hold out the url wolves.projectbluefin.io ... until it's a
+    natural break in the movie, but don't over do it'.
+
+    The natural break is the cut to silence: the address arrives into quiet,
+    and seven seconds is long enough to read it twice without becoming a slate.
+    """
+    assert T.URL_HOLD == pytest.approx(7.000, abs=1e-9)
+    assert T.TOTAL == pytest.approx(127.020, abs=1e-6)
+
+
+def test_the_url_arrives_on_the_cut_to_silence(manifest):
+    """The 'natural break' the owner asked for is the moment the song stops.
+
+    This is the assertion the whole title-staging incident was missing: the
+    builder's constant and the authored plate are checked AGAINST EACH OTHER,
+    so neither can be re-derived from a nearby number without the other
+    noticing. TITLE_IN drifted nine seconds from its manifest precisely
+    because nothing compared the two.
+    """
+    endcard = plate(manifest, "endcard-event")
+    cta = plate(manifest, "endcard-cta")
+    assert cta["at"] == pytest.approx(T.MUSIC_END, abs=1e-6)
+    assert cta["at"] - endcard["at"] == pytest.approx(T.ENDCARD_CTA_IN, abs=1e-6)
+    assert cta["dur"] == pytest.approx(T.URL_HOLD, abs=1e-6)
+    for p in (endcard, cta):
+        assert p["at"] + p["dur"] == pytest.approx(T.TOTAL, abs=1e-6)
     assert T.TOTAL == pytest.approx(T.MUSIC_END + T.URL_HOLD, abs=1e-9)
     assert T.TOTAL < 150.0, "over the 2:30 trailer cap"
 
@@ -126,11 +156,13 @@ def test_the_wolves_fade_is_longer_and_the_extra_time_went_to_the_drama():
     to the TURN and the SINK and not to the holds -- a longer hold is a longer
     still, not a bigger moment.
     """
-    assert T.BRIDGE == 14.0                      # the prologue's is 10.0
-    assert T.BRIDGE_TURN > 2.600                 # the prologue's turn
-    assert T.BRIDGE_DOWN > 3.200                 # the prologue's sink
-    assert T.BRIDGE_DAY_HOLD <= 1.200
-    assert T.BRIDGE_NIGHT_HOLD <= 1.600
+    assert T.BRIDGE == 24.0                      # the prologue's is 10.0
+    assert T.BRIDGE_TURN_LEN == 10.000           # the prologue's turn is 2.600
+    # The tail is what the third message plays on, and what leaves the reveal
+    # its empty night. It is the whole reason the bridge grew past 14.0.
+    assert T.BRIDGE_NIGHT_TAIL == 10.000
+    assert T.BRIDGE == pytest.approx(
+        T.BRIDGE_DAY_SETTLE + T.BRIDGE_TURN_LEN + T.BRIDGE_NIGHT_TAIL)
 
 def test_the_music_plays_out_past_where_the_prologue_faded():
     """Owner: 'let the music play out longer than the original video'."""
@@ -139,8 +171,9 @@ def test_the_music_plays_out_past_where_the_prologue_faded():
 
 def test_the_wolves_howl_lands_before_the_final_fade():
     """The 1:47 howl is the trailer's climax, not a quiet tail detail."""
-    assert T.AUDIO_FADE_START == pytest.approx(107.000)
+    assert T.AUDIO_FADE_START == pytest.approx(117.000)
     assert T.AUDIO_FADE == pytest.approx(3.020)
+    assert T.AUDIO_FADE_START > 107.0 + 5.0, "the fade swallows the howl"
 
 def test_the_lossless_master_is_true_peak_gated_before_delivery():
     """A fresh visual render must not reintroduce a clipping audio master."""
@@ -219,13 +252,20 @@ def test_the_end_card_poster_uses_no_new_copy_field(manifest):
                         "angle", "size", "anchor", "anchor_out", "walk"}}
         assert copy_fields == {"title", "subtitle", "body"}
 
-def test_the_day_cards_are_two_messages_in_the_owners_words(manifest):
+def test_the_day_cards_are_three_messages_in_the_owners_words(manifest):
     """Owner, 2026-08-17: 'Change the evolve or die into two messages ...
-    have the text be Extinction is the Rule / Survival is the Exception'."""
+    have the text be Extinction is the Rule / Survival is the Exception'.
+
+    Then, 2026-08-22: 'Make the three dramatic lines ... and then "Take back
+    what they took from you"', settled after two revisions as 'make it just
+    "Take Back What is Yours"'. The pair became a trio, and the casing is the
+    owner's answer to 'Figure out if that needs caps in certain words'.
+    """
     cards = T.day_cards(manifest)
     assert [c["title"] for c in cards] == [
         "Extinction is the Rule",
         "Survival is the Exception",
+        "Take Back What is Yours",
     ]
     for card in cards:
         assert "subtitle" not in card
@@ -237,25 +277,36 @@ def test_the_retired_day_lines_do_not_come_back(manifest):
     screen = on_screen_copy(manifest)
     for retired in ("Evolve or Die",
                     "The Final Shape is Kindness",
-                    "Wolves aren't Evil"):
+                    "Wolves aren't Evil",
+                    "Take back what they took from you",
+                    "Take Back What They Took"):
         assert retired not in screen
 
-def test_the_two_day_cards_lead_into_the_kubecon_reveal(manifest):
+def test_the_three_day_cards_lead_into_the_kubecon_reveal(manifest):
     """Owner: 'lengthem them to show them lead to the kubecon text ... all
     three text messages should floow smoothly into one reveal'.
 
-    Longer than the single card they replace, adjacent rather than separated by
-    a hold, both finished before the end card so the reveal lands on empty
-    night wolves -- and all of it inside the existing bridge, which is why the
-    music-timed end card never had to move.
+    Adjacent rather than separated by a hold, and all finished before the end
+    card so the reveal still lands on empty night wolves. The third message is
+    why the bridge grew: owner, on a six-second extension, '+6s sounds too
+    short'.
     """
-    first, second = T.day_cards(manifest)
-    assert first["dur"] > 3.4 and second["dur"] > 3.4, "not lengthened"
-    assert first["at"] >= T.PICTURE, "a day card starts before the bridge"
-    gap = second["at"] - (first["at"] + first["dur"])
-    assert 0 <= gap <= 1.0, f"the two messages do not flow: {gap:.3f} s apart"
+    cards = T.day_cards(manifest)
+    assert len(cards) == 3, "the owner asked for three dramatic lines"
+    for card in cards:
+        assert card["dur"] > 3.4, f"{card['id']} not lengthened"
+        assert card["at"] >= T.PICTURE, f"{card['id']} starts before the bridge"
+    for before, after in zip(cards, cards[1:]):
+        gap = after["at"] - (before["at"] + before["dur"])
+        assert 0 <= gap <= 1.0, (
+            f"{before['id']} does not flow into {after['id']}: {gap:.3f} s")
     endcard_at = T.PICTURE + T.BRIDGE
-    assert second["at"] + second["dur"] <= endcard_at
+    last = cards[-1]
+    assert last["at"] + last["dur"] <= endcard_at
+    # The reveal must arrive on night that has been empty for a beat, not onto
+    # a line that has only just left. This is the 'don't over do it' margin.
+    assert endcard_at - (last["at"] + last["dur"]) >= 3.0, (
+        "the KubeCon reveal treads on the last message")
     assert plate(manifest, "endcard-event")["at"] == pytest.approx(endcard_at)
 
 def test_the_day_cards_sit_in_the_wallpapers_dark_band(manifest):
@@ -288,10 +339,13 @@ def test_the_kubernetes_helm_is_placed_by_the_record_not_by_a_word(manifest):
     """The mark used to be hard-coded to the letter 'o' of 'evolve', so the
     copy could not change without it silently vanishing. It now travels as the
     `glyph` / `glyph_src` pair cards/ending.html already defines."""
-    first, second = T.day_cards(manifest)
+    first, *rest = T.day_cards(manifest)
     assert first["glyph"] == {"token": "o", "word": "Extinction"}
     assert first["glyph_src"] == "renders/marks/kubernetes.svg"
-    assert "glyph" not in second, "one mark across the pair, on the first line"
+    for card in rest:
+        assert "glyph" not in card, (
+            "one mark across the set, on the first line -- a second mark reads "
+            "as a bullet rather than as a letter")
     card = (REPO_ROOT / "cards" / "daycard.html").read_text()
     assert "lastIndexOf('evolve')" not in card
     assert "JSON.parse(p.get('glyph')" in card
@@ -465,7 +519,7 @@ def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
     assert "[6:v]split=2[bridgenightsrc][endnightsrc]" in graph
     assert (
         f"[day][bridgenight]xfade=transition=fade:"
-        f"duration={T.BRIDGE - T.BRIDGE_DAY_SETTLE:.3f}:"
+        f"duration={T.BRIDGE_TURN_LEN:.3f}:"
         f"offset={T.BRIDGE_DAY_SETTLE:.3f}[bridgepre]"
     ) in graph
     assert "color=c=black" not in graph
