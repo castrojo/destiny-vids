@@ -18,9 +18,10 @@
       "accent": "BLUEFIN",
       "title": "seven days to the wolves",
       "body": [
-        "Music by Nightwish | Action by Bungie"
+        "Music by Nightwish | Action by Destiny",
+        "Open Source Fights Back"
       ],
-      "note": "The prologue's own main title, unchanged in timing. The credit pair is now ONE authored line with a seared divider -- see stories/00-prologue-plates.json, which carries the same string."
+      "note": "The prologue's own main title, unchanged in timing. The credit pair is ONE authored line with a seared divider. THE TRAILER'S CREDIT NOW DIVERGES FROM THE PROLOGUE'S: owner, 2026-08-22, 'Make it Music by Nightwish | Action by Destiny, keep the sear'. stories/00-prologue-plates.json still reads 'Action by Bungie' because changing the film's own opening is a separate decision the owner has not made; the parity test is re-authored to assert that divergence deliberately rather than to forbid it. The second row is the same owner instruction: 'Underneath in the same font, centered ... Open Source Fights Back'. It carries no pipe, so `sear` falls through to `blueify` and it renders as a plain row -- with the B of Back and the F of Fights blue, which is the film's standing rule, not a new treatment."
     },
     {
       "id": "maintitle-b",
@@ -32,9 +33,10 @@
       "accent": "BLUEFIN",
       "title": "seven days to the wolves",
       "body": [
-        "Music by Nightwish | Action by Bungie"
+        "Music by Nightwish | Action by Destiny",
+        "Open Source Fights Back"
       ],
-      "note": "Beat two, with the credit line and its sear made visible."
+      "note": "Beat two, with the credit line, its sear, and the tagline row made visible. Both staged cards carry the same body so the rows always occupy their space and the two PNGs are identical above them; `stage` decides only visibility."
     },
     {
       "id": "book-a",

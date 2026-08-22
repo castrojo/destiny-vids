@@ -91,16 +91,29 @@ def test_the_sound_is_not_cut_where_the_picture_is():
     assert f"[0:a]atrim=0:{T.MUSIC_END:.3f}" in graph
     assert graph.count("atrim") == 1
 
-def test_the_title_staging_is_measured_on_the_trailer_not_the_prologue():
-    """Written from the failure it catches. The trailer's source opens on
-    12.200 s of black before the burst; transplanting the prologue's staging
-    (2.000 / 15.400 / 22.600) put the title 12.2 s early in picture terms,
-    which read on screen as the film starting over at :22 -- title on black
-    until 12.2, then the title-led picture arriving as if from the top.
+def test_the_title_staging_matches_the_authored_manifest():
+    """Written from the failure it catches, twice over.
+
+    stories/trailer-1-plates.json is the authority for this title, and the
+    website's src/data/wolves-trailer-plates.ts carries the same window. Only
+    TITLE_IN ever disagreed, at 2.000 against the manifest's 11.000, which put
+    the card up nine seconds early: it rose on black, hung through the whole
+    void, and was stale before the picture bloomed at 12.200 -- read on screen
+    as the film starting over.
+
+    The first repair guessed 7.000 and derived STAGE_SWAP from BURST instead of
+    re-porting both from the manifest, which desynced three records to fix one.
+    So this asserts the builder against the manifest itself rather than against
+    any rule about the burst.
     """
-    assert T.TITLE_IN > 2.000                # out of the void, not over it
-    assert T.TITLE_IN < T.BURST              # but ahead of the bloom
-    assert T.STAGE_SWAP == pytest.approx(T.BURST)
+    plates = {p["id"]: p for p in json.loads(
+        (REPO_ROOT / "stories" / "trailer-1-plates.json").read_text())["plates"]}
+    a, b = plates["maintitle-a"], plates["maintitle-b"]
+
+    assert T.TITLE_IN == pytest.approx(a["at"])
+    assert T.STAGE_SWAP == pytest.approx(a["at"] + a["dur"])
+    assert T.STAGE_SWAP == pytest.approx(b["at"])
+    assert T.TITLE_OUT == pytest.approx(b["at"] + b["dur"])
     assert T.TITLE_OUT < 24.880              # clear of the book cut
 
 
@@ -283,21 +296,44 @@ def test_the_kubernetes_helm_is_placed_by_the_record_not_by_a_word(manifest):
     assert "lastIndexOf('evolve')" not in card
     assert "JSON.parse(p.get('glyph')" in card
 
-def test_the_credit_line_is_one_seared_line_here_and_in_the_prologue(manifest):
-    """The same authored string in both records, so the two cannot drift."""
-    line = "Music by Nightwish | Action by Bungie"
+def test_the_trailer_credit_diverges_from_the_prologue_deliberately(manifest):
+    """These two records used to be pinned together so they could not drift.
+    They now differ on purpose, so this asserts the divergence instead.
+
+    Owner, 2026-08-22: "Make it 'Music by Nightwish | Action by Destiny' keep
+    the sear. Underneath in the same font, centered and in the same font...
+    'Open Source Fights Back'". That instruction was given for the TRAILER. The
+    prologue is the film's own opening and changing it is a separate decision
+    the owner has not made, so it keeps its line until they say otherwise.
+
+    The pipe survives in row one because the sear is drawn from it. Row two has
+    no pipe, so `sear` falls through to `blueify` in cards/maintitle.html and it
+    renders as a plain centred row in the same face.
+    """
+    trailer_body = [
+        "Music by Nightwish | Action by Destiny",
+        "Open Source Fights Back",
+    ]
     for plate_id in ("maintitle-a", "maintitle-b"):
-        assert plate(manifest, plate_id)["body"] == [line]
+        assert plate(manifest, plate_id)["body"] == trailer_body, (
+            "both staged cards carry the same body, so the rows hold their "
+            "space and the two PNGs are identical above them")
+
+    assert " | " in trailer_body[0], "the sear is drawn from the pipe"
+    assert " | " not in trailer_body[1], "row two is plain, not seared"
+
     prologue = json.loads(
         (REPO_ROOT / "stories" / "00-prologue-plates.json").read_text())
-    prologue_titles = {
+    prologue_bodies = {
         entry["id"]: entry["body"] for entry in prologue["plates"]
         if entry["id"] in ("maintitle-a", "maintitle-b")
     }
-    assert prologue_titles == {
-        "maintitle-a": [line],
-        "maintitle-b": [line],
-    }
+    prologue_line = "Music by Nightwish | Action by Bungie"
+    assert prologue_bodies == {
+        "maintitle-a": [prologue_line],
+        "maintitle-b": [prologue_line],
+    }, "the prologue is untouched; changing the film's opening needs its own yes"
+
 
 def test_no_plate_here_names_a_person(manifest):
     """The owner chose an unattributed plate over a chat pill, and a chat pill
