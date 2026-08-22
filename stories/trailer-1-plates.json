@@ -18,9 +18,10 @@
       "accent": "BLUEFIN",
       "title": "seven days to the wolves",
       "body": [
-        "Music by Nightwish | Action by Bungie"
+        "Music by Nightwish | Action by Destiny",
+        "Open Source Fights Back"
       ],
-      "note": "The prologue's own main title, unchanged in timing. The credit pair is now ONE authored line with a seared divider -- see stories/00-prologue-plates.json, which carries the same string."
+      "note": "The prologue's own main title, unchanged in timing. The credit pair is ONE authored line with a seared divider. THE TRAILER'S CREDIT NOW DIVERGES FROM THE PROLOGUE'S: owner, 2026-08-22, 'Make it Music by Nightwish | Action by Destiny, keep the sear'. stories/00-prologue-plates.json still reads 'Action by Bungie' because changing the film's own opening is a separate decision the owner has not made; the parity test is re-authored to assert that divergence deliberately rather than to forbid it. The second row is the same owner instruction: 'Underneath in the same font, centered ... Open Source Fights Back'. It carries no pipe, so `sear` falls through to `blueify` and it renders as a plain row -- with the B of Back and the F of Fights blue, which is the film's standing rule, not a new treatment."
     },
     {
       "id": "maintitle-b",
@@ -32,9 +33,10 @@
       "accent": "BLUEFIN",
       "title": "seven days to the wolves",
       "body": [
-        "Music by Nightwish | Action by Bungie"
+        "Music by Nightwish | Action by Destiny",
+        "Open Source Fights Back"
       ],
-      "note": "Beat two, with the credit line and its sear made visible."
+      "note": "Beat two, with the credit line, its sear, and the tagline row made visible. Both staged cards carry the same body so the rows always occupy their space and the two PNGs are identical above them; `stage` decides only visibility."
     },
     {
       "id": "book-a",
@@ -110,11 +112,23 @@
       "_the_one_reveal": "The three messages are one reveal by continuity, not by a new transition. The bridge's night wolves and the end card's night wolves are the same image and there is no black between them, so both day cards, the sinking wolves and the KubeCon card all play over one uninterrupted picture. Nothing outside these two windows moved: the trailer is still 1:50.000 exactly, and the end card's fades are still on the measured RMS moments in the source music tail."
     },
     {
+      "id": "daycard-takeback",
+      "kind": "daycard",
+      "at": 101.2,
+      "dur": 6.4,
+      "title": "Take Back What is Yours",
+      "placement": "low",
+      "fade_in": 0.5,
+      "fade_out": 0.6,
+      "note": "MESSAGE THREE OF THREE, bridge-local 13.000 -> 19.400. Owner, 2026-08-22: first 'Take back what they took from you', then 'or is \"take back what they took\" better?', settled as 'make it just \"Take Back What is Yours\"'. The casing follows the pair above it -- significant words capitalised, the copula lowercase, exactly as 'Extinction is the Rule' sets it. NO HELM: one mark across the set, on the first line, or it reads as a bullet rather than a letter. This card is the first of the three to play on CLEAN NIGHT rather than on the day or the turn, which is why the bridge grew a tail (BRIDGE_NIGHT_TAIL): owner, on a six-second extension, '+6s sounds too short'. It clears 4.600 s before the end card begins, so the KubeCon reveal still lands on empty night wolves -- more empty night than before, not less.",
+      "_copy": "OWNER COPY, verbatim. The line turns the pair from a diagnosis into an instruction: the first two are third-person statements about the world, and this one is an imperative addressed to the audience. That grammatical turn is the drama, which is why it takes no extra emphasis."
+    },
+    {
       "id": "endcard-event",
       "kind": "maintitle",
       "variant": "poster",
-      "at": 102.2,
-      "dur": 12.82,
+      "at": 112.2,
+      "dur": 14.82,
       "stage": "title",
       "title": "KubeCon | CloudNativeCon North America",
       "subtitle": "Salt Lake City, Utah",
@@ -132,8 +146,8 @@
       "id": "endcard-cta",
       "kind": "maintitle",
       "variant": "poster",
-      "at": 105.2,
-      "dur": 9.82,
+      "at": 120.02,
+      "dur": 7.0,
       "stage": "cta",
       "title": "KubeCon | CloudNativeCon North America",
       "subtitle": "Salt Lake City, Utah",

@@ -93,18 +93,22 @@ BURST = 12.200              # the explosion the picture blooms out of
 # The title staging, measured ON THE DELIVERED FRAME, not taken from the
 # prologue. The trailer's source opens on black: 0 -> 12.200 is the void the
 # burst blooms out of. `build_prologue`'s 2.000 / 15.400 / 22.600 were
-# measured against a picture that starts at 0.000, and transplanting them
-# wholesale put the whole title 12.200 s early in picture terms -- on screen
-# that read as the film starting over at :22, because the title ran on black
-# until 12.2 and the title-led picture only began at 15.4.
+# THE MANIFEST IS THE AUTHORITY FOR THIS TITLE, NOT THIS FILE.
+# stories/trailer-1-plates.json seats maintitle-a at 11.000 for 4.400 and
+# maintitle-b at 15.400 for 7.200, and src/data/wolves-trailer-plates.ts in the
+# website carries the same 11.000 -> 22.600 window. Only TITLE_IN ever
+# disagreed, at 2.000, which put the card up nine seconds before its authored
+# seat: it rose on black, hung there through the whole void, and was already
+# stale by the time the picture bloomed at 12.200 -- which is what read on
+# screen as the film starting over.
 #
-# The staging is the same design, re-seated: the card rises out of the void
-# before the picture can, the music credit lands as the burst blooms, and the
-# whole title is clear before the 24.880 book cut.
-TITLE_IN = 7.000            # out of the void, ahead of the burst
+# 11.000 is 1.200 s ahead of the burst, so the card leads the picture in by a
+# beat instead of waiting on it. Do not re-derive these from BURST; re-port
+# them from the manifest.
+TITLE_IN = 11.000           # manifest: maintitle-a `at`
 TITLE_FADE = 1.400
-STAGE_SWAP = BURST          # the credit pair arrives WITH the bloom
-TITLE_OUT = 22.600          # clear of the 24.880 cut
+STAGE_SWAP = 15.400         # manifest: maintitle-a `at` + `dur`, = maintitle-b `at`
+TITLE_OUT = 22.600          # manifest: maintitle-b `at` + `dur`
 
 # THE TANK. Detected with `select='gt(scene,0.20)'` on the source: 24.880 (the
 # book), 33.640 (the jar), 36.320 (the iguana), 40.720 (underwater). The owner
@@ -126,26 +130,38 @@ JOIN_FADE = 0.320
 PICTURE = CUT_OUT + (OUT_POINT - CUT_IN) - JOIN_FADE   # 88.200
 
 # --- the bridge, in bridge seconds --------------------------------------------
-# The prologue's 10.000 s bridge, given four more seconds -- all of them to the
-# turn and the sink.
-BRIDGE_UP = 1.400           # black -> day        (prologue: 1.400)
-BRIDGE_DAY_HOLD = 1.000     #                     (prologue: 1.200)
-BRIDGE_TURN = 4.400         # day -> night        (prologue: 2.600)
-BRIDGE_NIGHT_HOLD = 1.400   #                     (prologue: 1.600)
-BRIDGE_DOWN = 5.800         # night -> black      (prologue: 3.200)
-BRIDGE = (BRIDGE_UP + BRIDGE_DAY_HOLD + BRIDGE_TURN
-          + BRIDGE_NIGHT_HOLD + BRIDGE_DOWN)           # 14.000
-# The underwater-to-day handoff needs a beat of clear daylight before the
-# wolves start sinking. The rest of the 14-second bridge is the one long fade.
-BRIDGE_DAY_SETTLE = 4.000
+# THREE PARTS, and they are the graph's real shape. The earlier five constants
+# (up / day-hold / turn / night-hold / down) were inherited from the prologue,
+# which genuinely fades black -> day -> night -> black. This bridge does not:
+# it is ONE continuous xfade between two stills, with clean picture either
+# side, so the honest description is settle, turn, tail. The prologue keeps its
+# own five in build_prologue.py, where they still drive its graph.
+BRIDGE_DAY_SETTLE = 4.000   # clean day, before the wolves start sinking
+BRIDGE_TURN_LEN = 10.000    # the one long day -> night fade
+# THE TAIL IS WHERE MESSAGE THREE PLAYS. The turn ends on full night, and the
+# end card reuses that same night art, so this tail and the reveal after it are
+# one uninterrupted picture. Owner, 2026-08-22, on a six-second extension:
+# "+6s sounds too short" -- so the tail buys the third card a clean night to
+# land on AND leaves empty night after it, rather than butting the card up
+# against the KubeCon reveal.
+BRIDGE_NIGHT_TAIL = 10.000
+BRIDGE = (BRIDGE_DAY_SETTLE + BRIDGE_TURN_LEN
+          + BRIDGE_NIGHT_TAIL)                         # 24.000
 BRIDGE_MONTH = 3            # the owner named 03-bluefin-day.jxl
 
 # --- the end card -------------------------------------------------------------
-# The music keeps the approved 1:50 edit. The URL then holds for five silent
-# seconds instead of disappearing with the song.
-URL_HOLD = 5.000
-MUSIC_END = PICTURE + BRIDGE + 7.820                  # 110.020
-ENDCARD = 7.820 + URL_HOLD                            # 12.820
+# MUSIC_TAIL is how much song plays over the end card before the cut to
+# silence. It is 7.500 plus the join's stolen frames, exactly as before.
+MUSIC_TAIL = 7.500 + JOIN_FADE                         # 7.820
+# THE URL LANDS ON THE SILENCE. Owner, 2026-08-22: "hold the final url until
+# it's a natural break in the movie". The most natural break this film has is
+# the moment the music stops, so the CTA's fade-in is seated exactly on
+# MUSIC_TAIL: the song ends, and the address arrives into the quiet rather
+# than competing with the swell. The hold after it is seven seconds, not five,
+# because the URL is now the only thing left on screen.
+URL_HOLD = 7.000
+MUSIC_END = PICTURE + BRIDGE + MUSIC_TAIL              # 120.020
+ENDCARD = MUSIC_TAIL + URL_HOLD                        # 14.820
 ENDCARD_FADE = 1.200
 # The existing music tail is loud on entry, falls from roughly -18 to -19.6 dB
 # RMS through 1-3 s, then rises back to -17.4 dB at 3-4 s. The visual does not
@@ -156,7 +172,7 @@ ENDCARD_DAY_HOLD = 0.800
 ENDCARD_DARKEN = 2.400
 ENDCARD_EVENT_IN = 1.200
 ENDCARD_EVENT_FADE = 1.100
-ENDCARD_CTA_IN = 3.100
+ENDCARD_CTA_IN = MUSIC_TAIL   # the cut to silence; see URL_HOLD above
 ENDCARD_CTA_FADE = 0.600
 
 TOTAL = PICTURE + BRIDGE + ENDCARD                     # 115.020
@@ -389,8 +405,11 @@ def filtergraph(manifest, audio_gain=1.0, *, scope):
     # --- the bridge ----------------------------------------------------------
     day_input = inputs + 1
     parts.append(f"[{inputs + 2}:v]split=2[bridgenightsrc][endnightsrc]")
+    # The day leg only has to last until the turn is over; the night leg carries
+    # the tail. xfade emits d1 + d2 - duration, so these three land on BRIDGE.
     parts.append(_still(day_input, "day",
-                        f",trim=0:{BRIDGE:.3f},setpts=PTS-STARTPTS,"
+                        f",trim=0:{BRIDGE_DAY_SETTLE + BRIDGE_TURN_LEN:.3f},"
+                        f"setpts=PTS-STARTPTS,"
                         f"format=yuv420p"))
     parts.append(_still("bridgenightsrc", "bridgenight",
                         f",trim=0:{BRIDGE - BRIDGE_DAY_SETTLE:.3f},"
@@ -400,7 +419,7 @@ def filtergraph(manifest, audio_gain=1.0, *, scope):
     # wolves. The end card reuses that same night art, so no black reset or
     # colour jump interrupts the climax.
     parts.append(f"[day][bridgenight]xfade=transition=fade:"
-                 f"duration={BRIDGE - BRIDGE_DAY_SETTLE:.3f}:"
+                 f"duration={BRIDGE_TURN_LEN:.3f}:"
                  f"offset={BRIDGE_DAY_SETTLE:.3f}[bridgepre]")
     inputs += 2
 
