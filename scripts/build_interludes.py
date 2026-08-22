@@ -43,12 +43,20 @@ prologue and not restated here. Like the prologue these are **prototype
 output**: the shipping presentation embeds the video rather than re-hosting
 it, so no social copy is ever cut from them.
 
-Picture is padded, never scaled
--------------------------------
-The source is 1920x804 scope, so it already carries the delivery width at
-native pixels; 138 px of black top and bottom seats it in 16:9 without
-resampling a single one of them. Same treatment as the prologue, so the thread
-looks identical across all five movements.
+Picture is seated at 1920x804, and resampled only if it has to be
+----------------------------------------------------------------
+The thread is composed as 1920x804 inside the 1920x1080 delivery raster:
+138 px of black top and bottom seats it in 16:9. That seat is AUTHORED
+geometry and never moves.
+
+Whether anything is resampled to reach it depends on the source file, which
+gets replaced. The original arrived at exactly 1920x804 and was padded with
+nothing rescaled; the 4K re-upload that replaced it arrives at 3840x1608 --
+the same 2.388:1 scope at twice the linear size -- and is downscaled once,
+here, in the same pass as the encode. ``conform.scope_filter`` resolves which
+applies and carries the reasoning; ``scope_for`` below wires it in. Same
+treatment as the prologue, so the thread looks identical across all five
+movements.
 
 Audio is FLAC and untouched
 ---------------------------
@@ -315,6 +323,43 @@ def _replacement_inputs(repls):
     return args
 
 
+_SCOPE_CACHE = {}
+
+
+def scope_for(spec):
+    """The resampling this thread's source needs to reach the authored seat.
+
+    Resolved HERE, inside the shared chain, rather than by each caller:
+    scripts/build_ending_overlays.py builds its derivative from
+    ``video_chain`` precisely so the two can never drift, and a scale that
+    one applied and the other did not would be exactly that drift -- with the
+    overlaid movement seated differently from the clean one.
+
+    ``source_height`` in the manifest is the AUTHORED scope height, which is
+    what ``pad_y`` is derived from. It is not a claim about the file: the
+    perfume source was replaced by a 3840x1608 re-upload of the same 2.388:1
+    scope, at which point padding to 1920x1080 failed because you cannot pad
+    a frame down. ``conform.scope_filter`` carries the full reasoning.
+
+    Missing footage yields no filter rather than an error: footage is never
+    committed, so the chain has to remain constructible offline for the tests
+    and for anyone reading the graph without the media on disk.
+    """
+    src = REPO_ROOT / spec["source"]
+    scope_h = int(spec["source_height"])
+    key = (str(src), scope_h)
+    if key not in _SCOPE_CACHE:
+        if not src.exists():
+            _SCOPE_CACHE[key] = ""
+        else:
+            try:
+                _SCOPE_CACHE[key] = conform.scope_filter(
+                    src, W, scope_h)[0]
+            except conform.ScopeMismatch as exc:
+                sys.exit(str(exc))
+    return _SCOPE_CACHE[key]
+
+
 def video_chain(spec, movement, repls=(), out_label="vout"):
     """The movement's VIDEO chain, with the final output labelled out_label.
 
@@ -328,7 +373,7 @@ def video_chain(spec, movement, repls=(), out_label="vout"):
     pad_y = (H - src_h) // 2
     dur = float(movement["duration"])
 
-    base = (f"[0:v]pad={W}:{H}:0:{pad_y}:color=black,setsar=1,"
+    base = (f"[0:v]{scope_for(spec)}pad={W}:{H}:0:{pad_y}:color=black,setsar=1,"
             f"fps={FPS},format=yuv420p")
 
     if not repls:

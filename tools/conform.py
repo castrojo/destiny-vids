@@ -170,6 +170,75 @@ def probe_video(path, ffprobe):
     return streams[0]
 
 
+class ScopeMismatch(RuntimeError):
+    """A source whose shape is not the one an act was composed against."""
+
+
+def scope_filter(path, scope_w, scope_h, *, ffmpeg=None, ffprobe=None,
+                 label=None):
+    """The filter that brings a source to an act's AUTHORED scope frame.
+
+    A scope act is composed at ``scope_w x scope_h`` inside the delivery
+    raster and seated there with black bars. That seat is authored geometry —
+    title cards and plates are rendered against it — while the size the source
+    file happens to arrive at is a property of the FILE, and files get
+    replaced.
+
+    Conflating the two is a real failure here. Both perfume builders hardcoded
+    the seat as ``pad=1920:1080:0:138``, correct only while the source arrived
+    at exactly 1920x804. When the 4K re-upload replaced it (3840x1608 — the
+    same 2.388:1 scope at twice the linear size) ``pad`` failed outright:
+    "Padded dimensions cannot be smaller than input dimensions". You cannot
+    pad a frame down.
+
+    So the resampling is resolved from the source and the seat is not:
+
+    * already at the scope frame — no filter at all, because a no-op
+      downscale is still a generation;
+    * larger — one lanczos downscale, in the same pass as the grade and the
+      encode. At a 1080p ``DELIVERY`` that is the entire benefit of a 4K
+      source: one resampling generation from the original bit depth instead
+      of somebody else's downscale plus an 8-bit re-encode. It does NOT make
+      the delivered picture 4K;
+    * smaller — still scaled, so the act builds, but reported: an upscale
+      invents no detail and the operator should know a better source is
+      wanted.
+
+    Aspect is a gate, not a guess. Scaling a differently-shaped source onto
+    this frame would stretch the picture, moving every frame nobody asked to
+    move, so it raises ``ScopeMismatch`` instead.
+
+    Returns ``(filter_prefix, note)``. The prefix is ``""`` or ends in a
+    comma, so callers can splice it straight into a chain.
+
+    ffmpeg is resolved HERE and only if a probe actually happens, so a caller
+    does not have to find an encoder just to ask a question about a file. The
+    offline suite has no ffmpeg at all, and a caller that resolved one eagerly
+    made these paths untestable on CI.
+    """
+    who = label or Path(path).name
+    if ffprobe is None:
+        ffprobe = ffprobe_for(ffmpeg if ffmpeg is not None else _find_ffmpeg())
+    stream = probe_video(path, ffprobe)
+    w, h = int(stream["width"]), int(stream["height"])
+    if (w, h) == (scope_w, scope_h):
+        return "", f"{w}x{h} (authored scope, no resampling)"
+    want, got = scope_w / scope_h, w / h
+    if abs(want - got) > 0.005:
+        raise ScopeMismatch(
+            f"{who} is {w}x{h} ({got:.3f}:1), but this act is composed for "
+            f"{scope_w}x{scope_h} ({want:.3f}:1). Scaling it would stretch "
+            f"the picture and move a frame nobody asked to move. Re-conform "
+            f"the source, or re-author the seat.")
+    if w < scope_w:
+        print(f"scope: {who} is {w}x{h}, SMALLER than the {scope_w}x{scope_h} "
+              f"scope frame -- upscaling, which adds no detail. A better "
+              f"source exists somewhere.", file=sys.stderr)
+    return (f"scale={scope_w}:{scope_h}:flags=lanczos,",
+            f"{w}x{h} -> {scope_w}x{scope_h} (one lanczos generation, "
+            f"{stream.get('pix_fmt', '?')} source)")
+
+
 def _fps_close(reported, wanted):
     """Rational comparison, with room for spelling: 60000/1001 and 2997/50
     are both 59.94 (they differ in the fifth decimal), while 60/1 and 30/1

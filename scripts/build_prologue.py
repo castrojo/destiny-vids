@@ -88,6 +88,7 @@ from tools import footage  # noqa: E402
 from tools import peaks  # noqa: E402
 from tools import freshness  # noqa: E402
 from tools import chapter_md  # noqa: E402
+from tools import farm  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "00-prologue-plates.json"
@@ -169,6 +170,31 @@ RIDE_TO = 15.000
 FPS = conform.DELIVERY.fps
 W, H = conform.DELIVERY.width, conform.DELIVERY.height
 
+# The AUTHORED scope frame, and the seat that follows from it. The picture is
+# composed as 1920x804 inside the 1920x1080 delivery raster, which puts 138 px
+# of black top and bottom. Both title cards and the bookline are rendered
+# against that seat, so it is authored geometry, not a property of whichever
+# source file happens to be on disk -- see source_scope().
+SCOPE_W, SCOPE_H = 1920, 804
+
+
+def source_scope(path):
+    """The filter that brings SOURCE to this act's authored scope frame.
+
+    Thin wrapper over ``conform.scope_filter``, which carries the reasoning
+    and is shared with scripts/build_interludes.py -- the other builder that
+    cuts this same source and hardcoded the same seat. Keeping one
+    implementation is the point: both broke on the 4K swap for one reason,
+    and a second copy is a second thing to fix next time.
+
+    Degrades to a stop, not a traceback: a mis-shaped source is an operator
+    decision (re-conform, or re-author the seat), not a crash.
+    """
+    try:
+        return conform.scope_filter(path, SCOPE_W, SCOPE_H)
+    except conform.ScopeMismatch as exc:
+        sys.exit(str(exc))
+
 
 def render_cards():
     """Render the two staged title PNGs with the site's own CSS in a browser."""
@@ -229,19 +255,21 @@ def _still(index, label, extra=""):
             f"fps={FPS},setpts=N/({FPS})/TB{extra}[{label}]")
 
 
-def filtergraph():
-    # The picture: trimmed, and PADDED rather than scaled. The source is
-    # 1920x804 scope, so it already carries the delivery width at native
-    # pixels; 138 px of black top and bottom seats it in 16:9 without
-    # resampling a single one of them.
+def filtergraph(scope=""):
+    # The picture: trimmed, brought to the authored scope frame, and PADDED.
+    # The act is composed as SCOPE_W x SCOPE_H inside the delivery raster, so
+    # 138 px of black top and bottom seats it in 16:9. `scope` is empty when
+    # the source already arrives at that size -- then nothing is resampled,
+    # which is how the 1080p source behaved -- and a lanczos downscale when it
+    # arrives larger, as the 4K re-upload does. See source_scope().
     #
     # THE GATE. `fade=t=in:st=X` holds every frame before X fully black -- it
     # is not only a ramp -- so one filter both blacks out the void and lets the
     # burst bloom out of it. The duration is two frames: long enough not to be
     # a hard-edged pop on the first bright pixel, short enough that this reads
     # as an explosion rather than a dissolve.
-    film = (f"[0:v]trim=0:{OUT_POINT:.3f},setpts=PTS-STARTPTS,"
-            f"pad={W}:{H}:0:{(H - 804) // 2}:color=black,setsar=1,"
+    film = (f"[0:v]trim=0:{OUT_POINT:.3f},setpts=PTS-STARTPTS,{scope}"
+            f"pad={W}:{H}:0:{(H - SCOPE_H) // 2}:color=black,setsar=1,"
             f"fps={FPS},fade=t=in:st={BURST:.3f}:d={2 * 1001 / 60000:.4f},"
             f"format=rgba[film]")
 
@@ -301,7 +329,7 @@ def filtergraph():
                      day, night, turn, bridge, join, audio])
 
 
-def command(day_png, night_png):
+def command(day_png, night_png, scope=""):
     return find_ffmpeg() + [
         "-hide_banner", "-y",
         "-i", str(SOURCE),
@@ -310,7 +338,7 @@ def command(day_png, night_png):
         "-i", str(PLATES_DIR / "plate_book-a.png"),
         "-i", str(day_png),
         "-i", str(night_png),
-        "-filter_complex", filtergraph(),
+        "-filter_complex", filtergraph(scope),
         "-map", "[vout]", "-map", "[aout]",
         *conform.video_encode_args(),
         "-c:a", "flac", "-sample_fmt", "s32",
@@ -320,6 +348,36 @@ def command(day_png, night_png):
     ]
 
 
+def encode(argv_ff, day, night):
+    """Run the act's one ffmpeg call, on the cluster when it is reachable.
+
+    Remote is the default, not an optimisation: exo-0 has twice this
+    workstation's cores and is not also hosting the agent session, so a local
+    encode is both slower and starves the thing that asked for it. Local is a
+    fallback with a stated reason (AGENTS.md) -- never a silent one.
+
+    The argv is identical either way; only the CPUs differ. That is what keeps
+    the picture and the sound byte-comparable across the two paths.
+    """
+    ok, why = farm.cluster_available()
+    if not ok:
+        print(f"farm: encoding locally -- the cluster is not reachable ({why})",
+              file=sys.stderr)
+        subprocess.run(argv_ff, check=True)
+        return "local"
+    farm.run_ffmpeg_on_cluster(
+        argv_ff,
+        inputs=[SOURCE,
+                PLATES_DIR / "plate_maintitle-a.png",
+                PLATES_DIR / "plate_maintitle-b.png",
+                PLATES_DIR / "plate_book-a.png",
+                day, night],
+        out=OUT,
+        expected_duration=TOTAL,
+    )
+    return "cluster"
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -327,6 +385,8 @@ def main(argv=None):
                     help="print the ffmpeg call and exit")
     ap.add_argument("--cards", action="store_true",
                     help="re-render the title PNGs first")
+    ap.add_argument("--local", action="store_true",
+                    help="encode on this workstation even when the farm is up")
     args = ap.parse_args(argv)
 
     missing = [p for p in (SOURCE,) if not p.exists()]
@@ -352,16 +412,25 @@ def main(argv=None):
                  f"this host; the bridge has no picture. Install the Bluefin "
                  f"backgrounds or choose another month.")
 
-    argv_ff = command(day, night)
+    scope, scope_note = source_scope(SOURCE)
+    print(f"prologue: source picture {scope_note}")
+    argv_ff = command(day, night, scope)
     if args.print_command:
         print(" ".join(argv_ff))
         return 0
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(argv_ff, check=True)
+    if args.local:
+        print("farm: --local was asked for; encoding on this workstation",
+              file=sys.stderr)
+        subprocess.run(argv_ff, check=True)
+        where = "local"
+    else:
+        where = encode(argv_ff, day, night)
     peaks.trim_master_peak(OUT.resolve())
     print(json.dumps({"out": str(OUT), "duration": round(TOTAL, 3),
-                      "out_point": OUT_POINT, "bridge": BRIDGE}, indent=2))
+                      "out_point": OUT_POINT, "bridge": BRIDGE,
+                      "encoded_on": where}, indent=2))
     return 0
 
 
