@@ -90,10 +90,21 @@ DELIVER = Path.home() / "Videos" / "Wolves" / "trailer-1.mp4"
 # Taken from build_prologue, which measured them.
 OUT_POINT = 91.200          # the luma minimum at the end of the borrowed span
 BURST = 12.200              # the explosion the picture blooms out of
-TITLE_IN = 2.000
+# The title staging, measured ON THE DELIVERED FRAME, not taken from the
+# prologue. The trailer's source opens on black: 0 -> 12.200 is the void the
+# burst blooms out of. `build_prologue`'s 2.000 / 15.400 / 22.600 were
+# measured against a picture that starts at 0.000, and transplanting them
+# wholesale put the whole title 12.200 s early in picture terms -- on screen
+# that read as the film starting over at :22, because the title ran on black
+# until 12.2 and the title-led picture only began at 15.4.
+#
+# The staging is the same design, re-seated: the card rises out of the void
+# before the picture can, the music credit lands as the burst blooms, and the
+# whole title is clear before the 24.880 book cut.
+TITLE_IN = 7.000            # out of the void, ahead of the burst
 TITLE_FADE = 1.400
-STAGE_SWAP = 15.400
-TITLE_OUT = 22.600
+STAGE_SWAP = BURST          # the credit pair arrives WITH the bloom
+TITLE_OUT = 22.600          # clear of the 24.880 cut
 
 # THE TANK. Detected with `select='gt(scene,0.20)'` on the source: 24.880 (the
 # book), 33.640 (the jar), 36.320 (the iguana), 40.720 (underwater). The owner

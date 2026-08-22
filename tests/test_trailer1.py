@@ -91,6 +91,19 @@ def test_the_sound_is_not_cut_where_the_picture_is():
     assert f"[0:a]atrim=0:{T.MUSIC_END:.3f}" in graph
     assert graph.count("atrim") == 1
 
+def test_the_title_staging_is_measured_on_the_trailer_not_the_prologue():
+    """Written from the failure it catches. The trailer's source opens on
+    12.200 s of black before the burst; transplanting the prologue's staging
+    (2.000 / 15.400 / 22.600) put the title 12.2 s early in picture terms,
+    which read on screen as the film starting over at :22 -- title on black
+    until 12.2, then the title-led picture arriving as if from the top.
+    """
+    assert T.TITLE_IN > 2.000                # out of the void, not over it
+    assert T.TITLE_IN < T.BURST              # but ahead of the bloom
+    assert T.STAGE_SWAP == pytest.approx(T.BURST)
+    assert T.TITLE_OUT < 24.880              # clear of the book cut
+
+
 # --- the wolves fade ----------------------------------------------------------
 
 def test_the_wolves_fade_is_longer_and_the_extra_time_went_to_the_drama():
