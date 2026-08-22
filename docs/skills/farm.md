@@ -143,6 +143,32 @@ of 0 is not evidence (issue #88).
   The farm rewrites `argv[0]` only, so this host's default
   `podman exec bluefin-thumbnailer ffmpeg` leaks its middle tokens into the
   pod and the job dies on `Unable to choose an output format for 'exec'`.
+- **A 4K file in `media/` is not automatically our upscale, and the watermark
+  is how you tell.** Publisher re-uploads of the same title exist at 2160p and
+  sort next to ours. Ours is the **`upscale-scratch` PVC**, `final/master.mov`
+  (ProRes), and its provenance is legible in its own dimensions: 3840x1608 is
+  exactly 2x the authored 1920x804 scope, so it was upscaled from the **clean
+  1080p**, which is why it carries no burned-in publisher copy. A source whose
+  size is not 2x an authored scope did not come from us. Crop the watermark
+  region of a mid-film frame and look before spending an encode:
+  `ffmpeg -ss <t> -i <src> -vf crop=<w>:<h>:<x>:<y> -frames:v 1 /tmp/wm.png`.
+- **Take the ProRes, never the upscaler's `master.mov` audio.** The upscale
+  pipeline resamples to AAC 44.1 kHz while every original source carries Opus
+  48 kHz. Remux the ProRes video against the **original** audio to get a
+  working source with no generation loss on either stream.
+- **`--print-command` output is a plan, not a master, and running it clips.**
+  A builder that corrects peaks does so in `main()`: it renders, measures the
+  true peak, derives a static gain and renders *again*. Lifting the printed
+  command and running it on the farm skips the second half, so the file
+  lands wherever the mix happened to peak — twice this session that was
+  **+0.20 dBTP against a -1.10 ceiling**, i.e. clipping, from a run that
+  reported success. Either farm the builder itself, or re-measure and re-render
+  at the derived gain and verify the result lands on the ceiling.
+- **That printed command is also not shell-safe.** The filtergraph contains
+  `(` and `)`, so space-joining it into a script is a syntax error. Build farm
+  scripts with `shlex.quote()` over the argv list, and strip the
+  `podman exec bluefin-thumbnailer` prefix (see the `DESTINY_FFMPEG` flag
+  above).
   It has cost a full render round more than once.
 - **A plate burn is farmable, and it must be farmed.** Its argv carries ~78
   PNG `-i` inputs plus any `%0Nd` image sequence, and all of them have to be

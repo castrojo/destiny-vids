@@ -99,6 +99,35 @@ still being served. `pgrep -a catt` is the other half — no process, no film.
 The log shows the device's range requests (`GET /?loaded_from_catt … 206`),
 which is the server-side proof.
 
+### `UnsupportedNamespace` means an app is already holding the device
+
+A cast can print `Playing "…" on "Home Theater"` and *then* die with:
+
+```
+pychromecast.error.UnsupportedNamespace: Namespace urn:x-cast:com.google.cast.media
+is not supported by current app.
+```
+
+This is not a codec problem and not a file problem — the device has some other
+app in the foreground, and that app does not speak the media namespace. The
+traceback names `pychromecast`, which reads like a broken install; nothing is
+broken. **Stop the device first, then cast:**
+
+```bash
+catt -d "Home Theater" stop && sleep 8
+setsid nohup catt -d "Home Theater" cast <file>.mp4 < /dev/null > /tmp/catt.log 2>&1 & disown
+```
+
+The same cast that failed succeeds unchanged afterwards, which is how you know
+it was the foreground app and not the encode.
+
+### The SHIELD takes HEVC 10-bit 2160p
+
+Measured, not assumed: `trailer-1-4k-cast.mp4` — 3840x2160, `hvc1`, `yuv420p10le`,
+AAC — direct-played to `Home Theater` and ran to the end. So a UHD master does
+not need a H.264 reduction to reach the television; it needs **AAC**, which is
+the rule already stated above and the only thing the master's FLAC breaks.
+
 **Cast logs are session scratch, not repo records.** Write them to the session
 folder or `/tmp` — never `work/`, which is tracked. A 35 KB cast log and a
 saved-position file were committed that way, and are removed with this change.
