@@ -58,7 +58,7 @@ def months(variant="night"):
     return out
 
 
-def cached(month, variant="night"):
+def cached(month, variant="night", scale=1):
     """Path of one cached frame, decoding it on demand. None if not installed.
 
     The night frames keep their bare ``NN.png`` names because act VIII's build
@@ -66,13 +66,13 @@ def cached(month, variant="night"):
     match the day ones would be tidier and would silently invalidate act VIII's
     cache, so it is deliberately not done.
     """
-    out = cached_name(month, variant)
+    out = cached_name(month, variant, scale)
     if out.exists():
         return out
     for m, path in months(variant):
         if m == month:
             OUT_DIR.mkdir(parents=True, exist_ok=True)
-            crop_16x9(decode(path)).save(out)
+            crop_16x9(decode(path), scale).save(out)
             return out
     return None
 
@@ -95,8 +95,14 @@ def decode(path):
     return img.convert("RGB")
 
 
-def crop_16x9(img):
-    """Centre-crop to 16:9 and scale to the delivery frame."""
+def crop_16x9(img, scale=1):
+    """Centre-crop to 16:9 and scale to the delivery frame.
+
+    ``scale`` multiplies the delivery frame, so the UHD master gets a genuine
+    3840x2160 resample rather than an upscaled 1080p cache. The installed art
+    is 6300x2700, well above either target, so both sizes are downsamples of
+    the same original and 4K costs nothing in fidelity.
+    """
     from PIL import Image
 
     want = W / H
@@ -107,7 +113,7 @@ def crop_16x9(img):
     else:
         side = int(round(img.width / want))
         box = (0, (img.height - side) // 2, img.width, (img.height + side) // 2)
-    return img.crop(box).resize((W, H), Image.LANCZOS)
+    return img.crop(box).resize((W * scale, H * scale), Image.LANCZOS)
 
 
 def main(argv=None):
@@ -145,9 +151,13 @@ def main(argv=None):
     return 0
 
 
-def cached_name(month, variant="night"):
-    return OUT_DIR / (f"{month:02d}.png" if variant == "night"
-                      else f"{month:02d}-{variant}.png")
+def cached_name(month, variant="night", scale=1):
+    # The 1x names are UNCHANGED: act VIII already reads `NN.png`, and giving
+    # the existing frames a new name would silently invalidate its cache. The
+    # scale suffix is additive, so a 4K cache sits beside the 1080p one rather
+    # than replacing it.
+    stem = f"{month:02d}" if variant == "night" else f"{month:02d}-{variant}"
+    return OUT_DIR / (f"{stem}.png" if scale == 1 else f"{stem}@{scale}x.png")
 
 
 if __name__ == "__main__":

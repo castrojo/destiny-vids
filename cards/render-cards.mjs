@@ -52,7 +52,7 @@ const ASSETS = ['art', 'qr', 'wallpaper', 'glyph_src']
 const JSON_COPY = ['captions', 'emphasis', 'glyph']
 
 function parseArgs(argv) {
-  const args = { manifest: null, outDir: null, only: null, wallpaperSeed: null }
+  const args = { manifest: null, outDir: null, only: null, wallpaperSeed: null, scale: 1 }
   for (let i = 0; i < argv.length; i++) {
     const [key, inline] = argv[i].startsWith('--') ? argv[i].slice(2).split('=', 2) : []
     if (!key) { continue }
@@ -61,6 +61,7 @@ function parseArgs(argv) {
     else if (key === 'out-dir') { args.outDir = value }
     else if (key === 'only') { args.only = value.split(',') }
     else if (key === 'wallpaper-seed') { args.wallpaperSeed = value }
+    else if (key === 'scale') { args.scale = value }
     else { throw new Error(`unknown option --${key}`) }
   }
   if (!args.manifest || !args.outDir) {
@@ -118,11 +119,22 @@ const browser = await chromium.launch({
   args: ['--allow-file-access-from-files'],
 })
 // 1920x1080 at 1x: the programme is 1080p, so this is the delivered size and
-// nothing is resampled. A 4K master would raise deviceScaleFactor to 2, the
-// way the ~/Videos plate renderers do for their 3840x2160 composites.
+// nothing is resampled. `--scale 2` raises deviceScaleFactor to 2 for a 4K
+// master, the way the ~/Videos plate renderers do for their 3840x2160
+// composites.
+//
+// The VIEWPORT stays 1920x1080 in CSS pixels at every scale, so the layout the
+// cards were authored against is bit-for-bit the same and only the device
+// pixels double. That is what makes this safe for the 1080p programme: at the
+// default scale of 1 the output is unchanged, so every delivered act still
+// renders exactly the card it was signed off on.
+const cardScale = Number(args.scale ?? 1)
+if (!Number.isFinite(cardScale) || cardScale < 1) {
+  throw new Error(`--scale must be a number >= 1, got ${args.scale}`)
+}
 const page = await browser.newPage({
   viewport: { width: 1920, height: 1080 },
-  deviceScaleFactor: 1,
+  deviceScaleFactor: cardScale,
 })
 
 const wallpaperLog = {}

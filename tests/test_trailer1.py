@@ -87,7 +87,7 @@ def test_film_time_maps_across_the_excision():
 def test_the_sound_is_not_cut_where_the_picture_is():
     """The music covers the picture edit, so it is taken as one continuous
     span of the source rather than being cut and joined with it."""
-    graph = T.filtergraph(json.loads(T.MANIFEST.read_text()))
+    graph = T.filtergraph(json.loads(T.MANIFEST.read_text()), scope="")
     assert f"[0:a]atrim=0:{T.MUSIC_END:.3f}" in graph
     assert graph.count("atrim") == 1
 
@@ -121,7 +121,7 @@ def test_the_lossless_master_is_true_peak_gated_before_delivery():
     source = (REPO_ROOT / "scripts" / "build_trailer1.py").read_text()
     assert "peaks.correct_delivered_peak(" in source
     assert "def rerun_with_gain(gain):" in source
-    assert "command(manifest, day, night, gain)" in source
+    assert "command(manifest, day, night, gain, scope=scope)" in source
     assert source.index("peaks.correct_delivered_peak") < source.index("shutil.copy2")
 
 # --- the copy -----------------------------------------------------------------
@@ -251,7 +251,7 @@ def test_the_day_cards_are_overlaid_from_the_record(manifest):
     """Their windows are authored copy timing, so the graph takes them from the
     manifest. The first build hard-coded one card's fades in the script, which
     is how a second card becomes a code change instead of a plate."""
-    graph = T.filtergraph(manifest)
+    graph = T.filtergraph(manifest, scope="")
     for card in T.day_cards(manifest):
         at = card["at"] - T.PICTURE
         assert f"enable=between(t\\,{at:.3f}\\," in graph
@@ -329,7 +329,7 @@ def test_the_box_leaves_with_the_page_and_never_before_it(manifest):
     """
     box = plate(manifest, "book-a")
     assert box["fade"] == 0
-    graph = T.filtergraph(manifest)
+    graph = T.filtergraph(manifest, scope="")
     chunk = next(c for c in graph.split(";") if c.endswith("[bk0]"))
     assert "fade=" not in chunk, "the box has a ramp of its own again"
     seat = next(c for c in graph.split(";") if c.endswith("[headbox]"))
@@ -378,7 +378,7 @@ def test_one_stationary_box_holds_the_lines_and_never_covers_the_iguana(manifest
     assert box["body"] == OWNER_COPY["book-a"]
     assert empty["body"] == []
     assert box["at"] + box["dur"] == pytest.approx(T.CUT_OUT, abs=1e-9)
-    graph = T.filtergraph(manifest)
+    graph = T.filtergraph(manifest, scope="")
     assert "[head][bk0]overlay=" in graph
     assert "[headbox][tail]xfade=" in graph
 
@@ -399,7 +399,7 @@ def test_every_overlay_still_is_bounded_to_the_picture(manifest):
     """`loop=loop=-1` is infinite and `overlay`'s framesync keeps producing
     output after the main input ends. The prologue shipped eight seconds of
     frozen final frame that way, and ffmpeg exited 0."""
-    graph = T.filtergraph(manifest)
+    graph = T.filtergraph(manifest, scope="")
     for chunk in graph.split(";"):
         if "loop=loop=-1" in chunk:
             assert "trim=" in chunk, chunk
@@ -407,12 +407,12 @@ def test_every_overlay_still_is_bounded_to_the_picture(manifest):
 def test_the_enable_windows_use_escaped_commas(manifest):
     """The quoted spelling the ffmpeg docs show fails to parse here, disables
     the overlay, and still exits 0 -- a silent no-op."""
-    graph = T.filtergraph(manifest)
+    graph = T.filtergraph(manifest, scope="")
     assert "enable=between(t\\," in graph
     assert "enable='between" not in graph
 
 def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
-    graph = T.filtergraph(manifest)
+    graph = T.filtergraph(manifest, scope="")
     assert "[6:v]split=2[bridgenightsrc][endnightsrc]" in graph
     assert (
         f"[day][bridgenight]xfade=transition=fade:"
@@ -422,7 +422,7 @@ def test_the_end_card_uses_the_resolved_day_wallpaper(manifest):
     assert "color=c=black" not in graph
 
 def test_the_end_card_wallpaper_is_bounded_to_its_own_window(manifest):
-    graph = T.filtergraph(manifest)
+    graph = T.filtergraph(manifest, scope="")
     assert (
         f"trim=0:{T.ENDCARD:.3f},setpts=PTS-STARTPTS,"
         f"format=yuv420p[endnight]"
@@ -430,7 +430,7 @@ def test_the_end_card_wallpaper_is_bounded_to_its_own_window(manifest):
     )
 
 def test_the_end_card_text_lands_in_two_music_timed_beats(manifest):
-    graph = T.filtergraph(manifest)
+    graph = T.filtergraph(manifest, scope="")
     assert (
         f"fade=t=in:st={T.ENDCARD_EVENT_IN:.3f}:"
         f"d={T.ENDCARD_EVENT_FADE:.3f}:alpha=1"
