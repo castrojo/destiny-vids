@@ -24,6 +24,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from tools import conform  # noqa: E402
 from scripts import build_prologue  # noqa: E402
 from scripts import build_interludes  # noqa: E402
+from scripts import build_trailer1  # noqa: E402
 
 
 def fake_probe(monkeypatch, width, height, pix_fmt="yuv420p"):
@@ -158,14 +159,67 @@ def test_a_mismatched_source_raises_rather_than_exits_in_the_library():
     assert issubclass(conform.ScopeMismatch, RuntimeError)
 
 
+PERFUME_ID = "yt_nightwish_perfume_of_the_timeless"
+
+
+def perfume_builders():
+    """Every script that cuts the perfume source, found rather than listed.
+
+    This is deliberately DISCOVERED. The first version of this guard carried a
+    hand-written list of two builders, and scripts/build_trailer1.py -- a third
+    builder with the identical unscaled `pad`, which would have hard-failed
+    against the replacement source -- was simply not on it. A list only guards
+    the files somebody remembered; the failure mode is the file they did not.
+    """
+    found = sorted(p for p in (REPO_ROOT / "scripts").glob("build_*.py")
+                   if PERFUME_ID in p.read_text())
+    assert found, "no perfume builders found -- has the source id changed?"
+    return found
+
+
+def test_every_perfume_builder_resolves_the_scope_from_its_source():
+    # The seat (1920x804) is authored and must never move. The SOURCE's own
+    # size is a property of a file, and that file has already been replaced
+    # once -- by a 3840x1608 master that `pad` cannot shrink. A builder that
+    # pads without first resolving the scope dies the day a better source
+    # arrives, which is the whole bug this module exists for.
+    for path in perfume_builders():
+        text = path.read_text()
+        assert "conform.scope_filter" in text, (
+            f"{path.name} cuts the perfume source but never calls "
+            f"conform.scope_filter, so it assumes the source's shape. Seat it "
+            f"with scope_filter the way build_prologue.py does.")
+
+
+def test_no_perfume_builder_pads_footage_without_scaling_it_first(monkeypatch):
+    # `pad` cannot shrink a frame: a larger source fails outright with
+    # "Padded dimensions cannot be smaller than input dimensions". So the
+    # ASSEMBLED chain -- not the source line, which may hold `pad` in a
+    # constant spliced in later -- must put the scale first.
+    #
+    # This is checked behaviourally for every builder that has a chain we can
+    # construct offline. The discovery test above is what catches a builder
+    # that skips scope_filter entirely.
+    fake_probe(monkeypatch, 3840, 1608)
+
+    scope, _ = build_prologue.source_scope(Path("perfume.mkv"))
+    for graph in (build_prologue.filtergraph(scope),
+                  build_trailer1.filtergraph(build_trailer1.load(), 1.0, scope)):
+        assert "scale=" in graph, "the 4K source is not resampled at all"
+        assert graph.index("scale=") < graph.index("pad="), (
+            "pad runs before scale, so ffmpeg is asked to shrink a frame")
+
+
 def test_no_builder_resolves_ffmpeg_merely_to_ask_about_a_file():
-    # These tests failed on CI first time out: both callers passed
+    # These tests failed on CI first time out: the callers passed
     # ffmpeg=find_ffmpeg(), evaluated eagerly, and the runner has no ffmpeg.
     # Resolution belongs inside scope_filter, where it happens only if a probe
     # actually runs -- so the guard is that the callers pass nothing.
-    for script in ("build_prologue.py", "build_interludes.py"):
-        text = (REPO_ROOT / "scripts" / script).read_text()
+    for path in perfume_builders() + [REPO_ROOT / "scripts" / "build_interludes.py"]:
+        text = path.read_text()
+        if "conform.scope_filter" not in text:
+            continue
         call = text.split("conform.scope_filter", 1)[1].split(")", 1)[0]
         assert "find_ffmpeg" not in call, (
-            f"{script} resolves ffmpeg to call scope_filter; let conform do "
+            f"{path.name} resolves ffmpeg to call scope_filter; let conform do "
             f"it lazily or the offline suite cannot reach this path")
