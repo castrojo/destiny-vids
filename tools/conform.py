@@ -174,7 +174,8 @@ class ScopeMismatch(RuntimeError):
     """A source whose shape is not the one an act was composed against."""
 
 
-def scope_filter(path, scope_w, scope_h, *, ffmpeg=None, label=None):
+def scope_filter(path, scope_w, scope_h, *, ffmpeg=None, ffprobe=None,
+                 label=None):
     """The filter that brings a source to an act's AUTHORED scope frame.
 
     A scope act is composed at ``scope_w x scope_h`` inside the delivery
@@ -209,9 +210,16 @@ def scope_filter(path, scope_w, scope_h, *, ffmpeg=None, label=None):
 
     Returns ``(filter_prefix, note)``. The prefix is ``""`` or ends in a
     comma, so callers can splice it straight into a chain.
+
+    ffmpeg is resolved HERE and only if a probe actually happens, so a caller
+    does not have to find an encoder just to ask a question about a file. The
+    offline suite has no ffmpeg at all, and a caller that resolved one eagerly
+    made these paths untestable on CI.
     """
     who = label or Path(path).name
-    stream = probe_video(path, ffprobe_for(ffmpeg or _find_ffmpeg()))
+    if ffprobe is None:
+        ffprobe = ffprobe_for(ffmpeg if ffmpeg is not None else _find_ffmpeg())
+    stream = probe_video(path, ffprobe)
     w, h = int(stream["width"]), int(stream["height"])
     if (w, h) == (scope_w, scope_h):
         return "", f"{w}x{h} (authored scope, no resampling)"

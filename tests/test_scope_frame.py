@@ -27,7 +27,14 @@ from scripts import build_interludes  # noqa: E402
 
 
 def fake_probe(monkeypatch, width, height, pix_fmt="yuv420p"):
-    """ffprobe's answer, without ffprobe."""
+    """ffprobe's answer, without ffprobe -- or an ffmpeg to find it beside.
+
+    The suite is offline and CI has no ffmpeg at all, so the resolver is faked
+    too. That is not test scaffolding around a wart: scope_filter resolves
+    ffmpeg lazily and only when it actually probes, precisely so asking a
+    question about a file does not require an encoder.
+    """
+    monkeypatch.setattr(conform, "_find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(conform, "ffprobe_for", lambda ffmpeg: ["ffprobe"])
     monkeypatch.setattr(
         conform, "probe_video",
@@ -149,3 +156,16 @@ def test_a_mismatched_source_raises_rather_than_exits_in_the_library():
     # decide. build_prologue turns it into a clean exit; a caller that wanted
     # to try another rung could catch it instead.
     assert issubclass(conform.ScopeMismatch, RuntimeError)
+
+
+def test_no_builder_resolves_ffmpeg_merely_to_ask_about_a_file():
+    # These tests failed on CI first time out: both callers passed
+    # ffmpeg=find_ffmpeg(), evaluated eagerly, and the runner has no ffmpeg.
+    # Resolution belongs inside scope_filter, where it happens only if a probe
+    # actually runs -- so the guard is that the callers pass nothing.
+    for script in ("build_prologue.py", "build_interludes.py"):
+        text = (REPO_ROOT / "scripts" / script).read_text()
+        call = text.split("conform.scope_filter", 1)[1].split(")", 1)[0]
+        assert "find_ffmpeg" not in call, (
+            f"{script} resolves ffmpeg to call scope_filter; let conform do "
+            f"it lazily or the offline suite cannot reach this path")

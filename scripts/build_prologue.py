@@ -191,8 +191,7 @@ def source_scope(path):
     decision (re-conform, or re-author the seat), not a crash.
     """
     try:
-        return conform.scope_filter(path, SCOPE_W, SCOPE_H,
-                                    ffmpeg=find_ffmpeg())
+        return conform.scope_filter(path, SCOPE_W, SCOPE_H)
     except conform.ScopeMismatch as exc:
         sys.exit(str(exc))
 

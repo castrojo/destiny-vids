@@ -354,7 +354,7 @@ def scope_for(spec):
         else:
             try:
                 _SCOPE_CACHE[key] = conform.scope_filter(
-                    src, W, scope_h, ffmpeg=find_ffmpeg())[0]
+                    src, W, scope_h)[0]
             except conform.ScopeMismatch as exc:
                 sys.exit(str(exc))
     return _SCOPE_CACHE[key]
