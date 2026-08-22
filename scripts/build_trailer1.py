@@ -166,7 +166,23 @@ RIDE_TO = 15.000
 
 FPS = conform.DELIVERY.fps
 W, H = conform.DELIVERY.width, conform.DELIVERY.height
-PAD_Y = (H - 804) // 2      # the source is 1920x804 scope
+
+# The authored SEAT: the scope frame the cards and the box were composed
+# against. It is 1920x804 because that is the shape of the picture, NOT
+# because that is the shape of the source file -- the source has already been
+# replaced once, by a 3840x1608 master of the same 2.388:1 scope, and `pad`
+# cannot shrink a frame. Resolving the two separately is what lets a better
+# source arrive without moving a single authored pixel.
+SCOPE_W, SCOPE_H = 1920, 804
+PAD_Y = (H - SCOPE_H) // 2
+
+
+def source_scope(path=None):
+    """The scale prefix that brings this source to the authored scope frame."""
+    try:
+        return conform.scope_filter(path or SOURCE, SCOPE_W, SCOPE_H)
+    except conform.ScopeMismatch as exc:
+        sys.exit(str(exc))
 
 
 def source_at(film_t):
@@ -237,19 +253,22 @@ def _still(source, label, extra=""):
             f"fps={FPS},setpts=N/({FPS})/TB{extra}[{label}]")
 
 
-def filtergraph(manifest, audio_gain=1.0):
+def filtergraph(manifest, audio_gain=1.0, scope=""):
     # --- the picture ---------------------------------------------------------
-    # PADDED rather than scaled: the source already carries the delivery width
-    # at native pixels, so 138 px of black top and bottom seats it in 16:9
-    # without resampling one of them.
+    # The source is brought to the AUTHORED SCOPE FRAME (1920x804) if it is not
+    # already there, then padded to 16:9. Those are two separate facts: the seat
+    # is what the cards were composed against and must never move, while the
+    # source's own size is a property of a file that has already been replaced
+    # once. `scope` is empty when the source is already at the seat, so a file
+    # that needs nothing is not resampled for the sake of symmetry.
     #
     # THE GATE. `fade=t=in:st=X` holds every frame before X fully black, so one
     # filter both blacks out the void and lets the burst bloom out of it.
-    head = (f"[0:v]trim=0:{CUT_OUT:.3f},setpts=PTS-STARTPTS,"
+    head = (f"[0:v]trim=0:{CUT_OUT:.3f},setpts=PTS-STARTPTS,{scope}"
             f"pad={W}:{H}:0:{PAD_Y}:color=black,setsar=1,fps={FPS},"
             f"fade=t=in:st={BURST:.3f}:d={2 * 1001 / 60000:.4f},"
             f"format=rgba[head]")
-    tail = (f"[0:v]trim={CUT_IN:.3f}:{OUT_POINT:.3f},setpts=PTS-STARTPTS,"
+    tail = (f"[0:v]trim={CUT_IN:.3f}:{OUT_POINT:.3f},setpts=PTS-STARTPTS,{scope}"
             f"pad={W}:{H}:0:{PAD_Y}:color=black,setsar=1,fps={FPS},"
             f"format=rgba[tail]")
     parts = [head, tail]
@@ -425,7 +444,7 @@ def filtergraph(manifest, audio_gain=1.0):
     return ";".join(parts)
 
 
-def command(manifest, day_png, night_png, audio_gain=1.0):
+def command(manifest, day_png, night_png, audio_gain=1.0, scope=""):
     # INPUT ORDER IS THE GRAPH'S ORDER. `filtergraph` counts inputs as it
     # builds, so a PNG added here without a matching overlay -- or in the wrong
     # place -- feeds the wrong card into the wrong window. The day cards are
@@ -443,7 +462,7 @@ def command(manifest, day_png, night_png, audio_gain=1.0):
           for arg in ("-i", str(PLATES_DIR / f"plate_{entry['id']}.png"))],
         "-i", str(PLATES_DIR / "plate_endcard-event.png"),
         "-i", str(PLATES_DIR / "plate_endcard-cta.png"),
-        "-filter_complex", filtergraph(manifest, audio_gain),
+        "-filter_complex", filtergraph(manifest, audio_gain, scope),
         "-map", "[vout]", "-map", "[aout]",
         *conform.video_encode_args(),
         "-c:a", "flac", "-sample_fmt", "s32",
@@ -482,7 +501,11 @@ def main(argv=None):
         sys.exit(f"month {BRIDGE_MONTH:02d}'s wallpaper pair is not installed "
                  f"on this host; the bridge has no picture.")
 
-    argv_ff = command(manifest, day, night)
+    scope, note = source_scope()
+    if note:
+        print(f"  {note}", file=sys.stderr)
+
+    argv_ff = command(manifest, day, night, scope=scope)
     if args.print_command:
         print(" ".join(argv_ff))
         return 0
