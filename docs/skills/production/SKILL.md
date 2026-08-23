@@ -140,6 +140,7 @@ This skill is the contract. The procedure lives in `references/`:
 |---|---|
 | [`delivery.md`](references/delivery.md) | The `~/Videos/Wolves/` workspace, the delivery graph, hardlinks, checksums, playlists, and the Syncthing hazard. |
 | [`social-copies.md`](references/social-copies.md) | Byte-capped social encodes from `Prod/`. |
+| [`key-art.md`](references/key-art.md) | Stills cut from the key art: YouTube thumbnails and the website's social preview card. |
 | [`avatars.md`](references/avatars.md) | The credits avatar cache and the Actions job that fetches it. |
 | [`freshness.md`](references/freshness.md) | Keeping delivery current across `cards / plates -> master -> Prod -> megacut -> 10mb/`. |
 
