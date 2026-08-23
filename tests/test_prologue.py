@@ -93,3 +93,41 @@ def test_filtergraph_reads_manifest_once_and_uses_changed_timing(tmp_path, monke
     inputs = _input_paths(cmd)
     assert len(inputs) >= 4
     assert "plate_mission-briefing.png" in str(inputs[3])
+
+
+def test_the_cluster_uploads_carry_every_card_the_filtergraph_overlays(monkeypatch):
+    """A plate the argv reads but the farm never stages is a card the remote
+    encode cannot find. `mission-briefing` was added to the filtergraph without
+    being added to `inputs=`, and the cluster leg failed on it."""
+    sent = {}
+    monkeypatch.setattr(build_prologue.farm, "cluster_available",
+                        lambda: (True, ""))
+    monkeypatch.setattr(build_prologue.farm, "run_ffmpeg_on_cluster",
+                        lambda argv, **kw: sent.update(kw))
+    monkeypatch.setattr(build_prologue, "find_ffmpeg", lambda: ["ffmpeg"])
+
+    argv = build_prologue.command(Path("day.png"), Path("night.png"))
+    assert build_prologue.encode(argv, Path("day.png"), Path("night.png")) == "cluster"
+
+    staged = {Path(p).name for p in sent["inputs"]}
+    for tok, nxt in zip(argv, argv[1:]):
+        if tok == "-i" and nxt.endswith(".png"):
+            assert Path(nxt).name in staged, f"{nxt} is read but never staged"
+
+
+def test_a_failed_cluster_encode_falls_back_instead_of_blocking_the_release(monkeypatch):
+    """AGENTS.md: nothing blocks a release. The farm going down is a reason to
+    say so on stderr and encode here, never a reason to hand back no picture."""
+    def boom(argv, **kw):
+        raise build_prologue.farm.FarmError("workflow Failed")
+
+    ran = []
+    monkeypatch.setattr(build_prologue.farm, "cluster_available",
+                        lambda: (True, ""))
+    monkeypatch.setattr(build_prologue.farm, "run_ffmpeg_on_cluster", boom)
+    monkeypatch.setattr(build_prologue.subprocess, "run",
+                        lambda argv, **kw: ran.append(argv))
+
+    where = build_prologue.encode(["ffmpeg", "-i", "x"], Path("d.png"), Path("n.png"))
+    assert where == "local"
+    assert ran == [["ffmpeg", "-i", "x"]], "the fallback runs the identical argv"

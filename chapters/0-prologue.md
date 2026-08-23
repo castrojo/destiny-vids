@@ -60,10 +60,11 @@ python3 tools/chapter_md.py check 0
   - body: Mechaphippy Deployment // UNAUTHORIZED
   - copy_source: owner_supplied
 
-**`book-b` was not moved with `book-a`.** It still opens at 31.0s and runs to
-34.9s, so it now starts *before* the card it follows and the two overlap for
-0.9s. Moving it is a second authored beat and needs its own decision — see the
-manifest's `unresolved`.
+**`book-b` was not moved with `book-a`, and does not need to be.** It opens at
+31.0s and runs to 34.9s, so on paper it starts *before* the card it follows —
+but it carries an empty `body` and `scripts/build_prologue.py` never overlays
+it, so the collision reaches no pixel. Verified on the rendered master, not
+reasoned about. See the manifest's `unresolved`.
 
 ## 0:34.000
 
