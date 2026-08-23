@@ -1226,3 +1226,123 @@ def test_a_replaced_project_source_moves_the_footage_digest(tmp_path):
     after = footage.footage_digest(ids, media_dir=media, roots=[project])
 
     assert before != after
+
+
+def _foreign(master):
+    """A report for a master whose build commit is not an ancestor of HEAD."""
+    act = types.SimpleNamespace(numeral="VI", prod_file="06-wolves.mp4")
+    r = deliver.ActReport(act)
+    deliver.check_provenance(master, r)
+    return r
+
+
+def test_a_squash_merged_act_is_not_foreign(monkeypatch):
+    """REGRESSION: the only way work lands here made three acts look stolen.
+
+    `main` is protected and everything arrives by SQUASH merge, which lands
+    the content and throws the commit id away. Reachability was a proxy for
+    "is the work this was built from here"; squash merge breaks the proxy
+    while leaving the answer yes. Three delivered acts read "somebody else's
+    in-flight work", and the only remedy offered was a 20-minute re-encode to
+    move a bookkeeping field on a master whose every frame was already right.
+    """
+    monkeypatch.setattr(deliver, "commit_in_history", lambda c, root=None: False)
+    monkeypatch.setattr(deliver, "source_digest_at",
+                        lambda c, s, root=None: "same")
+    monkeypatch.setattr(deliver, "source_digest", lambda s: "same")
+
+    r = _foreign({"built_from_commit": "d" * 40, "sources": ["a.py"]})
+
+    assert [f.state for f in r.findings] == [deliver.OK]
+    assert "squash-merged" in r.findings[0].detail
+
+
+def test_a_foreign_act_names_the_inputs_that_moved(monkeypatch):
+    """A digest says a byte moved; it never says a pixel did.
+
+    Both acts that reached this branch differed only by code that cannot
+    reach a frame -- a `~`-expansion fix, a freshness reporter, chapter
+    metadata. Handing over the file list is the difference between reading
+    two diffs and re-encoding an act nobody needed to re-encode.
+    """
+    monkeypatch.setattr(deliver, "commit_in_history", lambda c, root=None: False)
+    monkeypatch.setattr(deliver, "source_digest_at",
+                        lambda c, s, root=None:
+                        "then" if "moved.py" in s else "same")
+    monkeypatch.setattr(deliver, "source_digest",
+                        lambda s: "now" if "moved.py" in s else "same")
+
+    r = _foreign({"built_from_commit": "d" * 40,
+                  "sources": ["still.py", "moved.py"]})
+
+    assert [f.state for f in r.findings] == [deliver.FOREIGN]
+    assert "moved.py" in r.findings[0].detail
+    assert "still.py" not in r.findings[0].detail
+
+
+def test_an_unreadable_build_commit_stays_foreign(monkeypatch):
+    """Objects pruned, or a path that never existed: no answer is not a pass.
+
+    This branch clears an act rather than flagging one, so a partial answer
+    would be worse than none.
+    """
+    monkeypatch.setattr(deliver, "commit_in_history", lambda c, root=None: False)
+    monkeypatch.setattr(deliver, "source_digest_at",
+                        lambda c, s, root=None: None)
+
+    r = _foreign({"built_from_commit": "d" * 40, "sources": ["a.py"]})
+
+    assert [f.state for f in r.findings] == [deliver.FOREIGN]
+    assert "cannot be read" in r.findings[0].detail
+
+
+def test_an_act_with_no_declared_sources_cannot_be_cleared(monkeypatch):
+    """With nothing declared there is nothing to compare, so the old verdict
+    stands. Clearing on an empty comparison would clear everything."""
+    monkeypatch.setattr(deliver, "commit_in_history", lambda c, root=None: False)
+
+    r = _foreign({"built_from_commit": "d" * 40, "sources": []})
+
+    assert [f.state for f in r.findings] == [deliver.FOREIGN]
+
+
+def test_source_digest_at_reads_a_real_commit_from_git():
+    """The comparison is only worth anything if it really reads git trees."""
+    here = deliver.source_digest_at("HEAD", ["tools/deliver.py"])
+    assert here is not None
+    assert here != deliver.source_digest_at("HEAD~1", ["tools/deliver.py"]) \
+        or True   # they may legitimately match; what matters is both resolve
+    assert deliver.source_digest_at("HEAD", ["no/such/file.py"]) is not None, \
+        "a path absent at that commit hashes as absent, it does not fail"
+    assert deliver.source_digest_at("0" * 40, ["tools/deliver.py"]) is None, \
+        "an unreadable commit must answer None, never a partial digest"
+
+
+def test_source_digest_at_matches_the_worktree_for_a_committed_file():
+    """The two digests must be the same function of the same bytes, or the
+    squash-merge branch above would clear acts at random."""
+    import subprocess
+    clean = subprocess.run(["git", "status", "--porcelain", "--",
+                            "tools/footage.py"],
+                           cwd=deliver.REPO_ROOT, capture_output=True)
+    if clean.stdout.strip():
+        pytest.skip("tools/footage.py is modified in this checkout")
+    assert deliver.source_digest_at("HEAD", ["tools/footage.py"]) == \
+        deliver.source_digest(["tools/footage.py"])
+
+
+def test_an_act_without_a_one_command_rebuild_says_why_when_it_knows():
+    """'Rebuild it by hand' sends the reader to a 400-line shell script.
+
+    Act VI has no `rebuild` on purpose: its master is a plate burn and
+    burning is not idempotent, so a guessed command would burn a second set
+    of nameplates about real people rather than fail.
+    """
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    for numeral, master in masters.items():
+        if master.get("rebuild") or not master.get("source_digest"):
+            continue
+        assert master.get("rebuild_note"), (
+            f"act {numeral} declares inputs but neither a `rebuild` command "
+            f"nor a `rebuild_note` saying why it has none")

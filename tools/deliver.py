@@ -463,6 +463,42 @@ def commit_in_history(commit, root=None):
     return r.returncode == 0
 
 
+def source_digest_at(commit, sources, root=None):
+    """`source_digest` computed from a commit's trees instead of the worktree.
+
+    Returns None when any part of it cannot be read -- an unreachable commit
+    whose objects have been pruned, or a path that did not exist yet. A
+    partial answer here would be worse than no answer, because it is used to
+    clear an act rather than to flag one.
+    """
+    h = hashlib.sha256()
+    for rel in sources:
+        h.update(rel.encode())
+        try:
+            r = subprocess.run(["git", "ls-tree", "-r", "-z", "--full-name",
+                                commit, "--", rel],
+                               cwd=root or REPO_ROOT, capture_output=True)
+        except (FileNotFoundError, OSError):
+            return None
+        if r.returncode != 0:
+            return None
+        entries = [e for e in r.stdout.decode().split("\0") if e]
+        if not entries:
+            h.update(b"\0absent")
+            continue
+        for entry in sorted(entries):
+            meta, _, path = entry.partition("\t")
+            blob = meta.split()[2]
+            b = subprocess.run(["git", "cat-file", "blob", blob],
+                               cwd=root or REPO_ROOT, capture_output=True)
+            if b.returncode != 0:
+                return None
+            if path != rel:
+                h.update(path.encode())
+            h.update(b.stdout)
+    return h.hexdigest()
+
+
 def check_provenance(master, report):
     """Name an act whose master was built outside this build's history."""
     commit = master.get("built_from_commit")
@@ -479,12 +515,53 @@ def check_provenance(master, report):
     elif known:
         report.add("provenance", OK, f"built from {commit[:12]}, in history")
     else:
+        # Unreachable is not the same as foreign, and `main` is protected
+        # here: every change lands by SQUASH merge, which lands the CONTENT
+        # and throws the commit id away. So the single normal way work
+        # arrives in this repo made three delivered acts read "somebody
+        # else's in-flight work" -- and the only cure on offer was a
+        # 20-minute re-encode to move a bookkeeping field, for a master whose
+        # every frame was already right. That is the shape of blocking a
+        # release for a reason that is not true.
+        #
+        # Reachability was only ever a proxy. The question underneath it is
+        # whether the work this master was built from is in the checkout now,
+        # and that is answerable directly: recompute the act's declared
+        # inputs from the build commit's own trees and compare them with the
+        # inputs here. Equal means the work landed, however it landed.
+        sources = master.get("sources") or []
+        there = source_digest_at(commit, sources) if sources else None
+        if there is not None and there == source_digest(sources):
+            report.add("provenance", OK,
+                       f"built from {commit[:12]}, which is not an ancestor "
+                       f"of HEAD -- squash-merged. Its declared inputs are "
+                       f"byte-identical to this checkout's, so the work it "
+                       f"was built from is here.")
+            return
+        # Name the files. "Its inputs differ" is a dead end -- a digest
+        # covers whole files, so it answers "did any byte move", never "did
+        # the picture change", and the only way to tell those apart is to go
+        # and look at the diff. Both acts that reached this branch turned out
+        # to differ by code that cannot reach a frame (a `~`-expansion fix, a
+        # freshness reporter, chapter metadata). Handing over the list is the
+        # difference between a two-minute answer and a 20-minute re-encode
+        # nobody needed.
+        if there is None:
+            detail = ("and what it was built from cannot be read, so nothing "
+                      "can vouch for it")
+        else:
+            moved = [rel for rel in sources
+                     if source_digest_at(commit, [rel]) != source_digest([rel])]
+            detail = ("and these declared inputs have moved since: "
+                      + ", ".join(moved)
+                      if moved else "and its declared inputs differ from this "
+                                    "checkout's")
         report.add("provenance", FOREIGN,
                    f"built from {commit[:12]}, which is NOT in this "
-                   f"checkout's history -- this master carries somebody "
-                   f"else's in-flight work and will ship in the next "
-                   f"programme. Rebuild the act here, or check out the work "
-                   f"it came from.")
+                   f"checkout's history, {detail}. Either this master carries "
+                   f"work that is not here, or it predates a change that "
+                   f"never reached a frame. Read the diffs to tell which, "
+                   f"then rebuild the act or `publish` it.")
 
 
 def check_sources(master, report):
@@ -1192,9 +1269,14 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                 # no one-command rebuild is REPORTED, not silently skipped and
                 # not faked with a guessed command. A wrong rebuild here
                 # re-burns nameplates about real people.
+                # "By hand" on its own sends the next person to read a
+                # 400-line shell script to find out why. When the act knows
+                # why it has no one-liner, it says so.
+                note = (masters.get(r.act.numeral) or {}).get("rebuild_note")
                 log(f"act {r.act.numeral}: inputs changed but no `rebuild` "
                     f"command is declared in delivery.json -- rebuild it by "
-                    f"hand, then `deliver.py publish`")
+                    f"hand, then `deliver.py publish`"
+                    + (f"\n  why, and how: {note}" if note else ""))
         link = next((f for f in r.findings if f.node == "link"), None)
         if link and (link.state in FAILING or r.act.numeral in rebuilt):
             if link.state in (CONFLICT, EPHEMERAL):
