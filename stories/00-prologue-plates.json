@@ -34,10 +34,24 @@
       "note": "Beat two: identical card with the credit pair made visible, hard-cut in at 15.4 so only the credits appear. Holds, then fades out over 1.4s ending at 22.6 -- clear of the 24.88 cut."
     },
     {
+      "id": "mission-briefing",
+      "kind": "act",
+      "at": 26.9,
+      "dur": 6.74,
+      "label": "PROJECT BLUEFIN MISSION BRIEFING",
+      "title": "Thanks for Volunteering",
+      "body": [
+        "Tophee Protocol Quick Insertion // ACTIVATED",
+        "Agones Cluster // Cycling",
+        "Mechaphippy Deployment // UNAUTHORIZED"
+      ],
+      "copy_source": "owner_supplied"
+    },
+    {
       "id": "book-a",
       "kind": "bookline",
       "variant": "box",
-      "at": 26.9,
+      "at": 34.0,
       "dur": 6.74,
       "angle": 4.0,
       "body": [
@@ -47,8 +61,14 @@
         "These are their Real Stories"
       ],
       "fade": 0,
-      "anchor": [1030, 443],
-      "anchor_out": [1030, 443]
+      "anchor": [
+        1030,
+        443
+      ],
+      "anchor_out": [
+        1030,
+        443
+      ]
     },
     {
       "id": "book-b",
@@ -59,12 +79,19 @@
       "angle": -14.0,
       "size": "3.0rem",
       "body": [],
-      "anchor": [1000, 470],
-      "anchor_out": [1000, 470]
+      "anchor": [
+        1000,
+        470
+      ],
+      "anchor_out": [
+        1000,
+        470
+      ]
     }
   ],
   "unresolved": [
     "SETTLED 2026-08-14: the eyebrow is type, not the real wordmark -- the owner asked for the words to stay and only the B to be coloured. scripts/fetch_wordmark.py remains the route if that is ever revisited.",
-    "Michroma -- the site's Weyland-era display face for this overlay -- is not installed on this host, so the card resolves the act slides' own stack ('Inter', 'Arial Narrow', -> DejaVu Sans here) exactly as cards/act.html does. That keeps the main title in the same face as every act slide it sits in front of, which is arguably right anyway, but it is a substitution and is recorded as one."
+    "Michroma -- the site's Weyland-era display face for this overlay -- is not installed on this host, so the card resolves the act slides' own stack ('Inter', 'Arial Narrow', -> DejaVu Sans here) exactly as cards/act.html does. That keeps the main title in the same face as every act slide it sits in front of, which is arguably right anyway, but it is a substitution and is recorded as one.",
+    "book-a moved 26.9 -> 34.0 to make room for `mission-briefing` (owner, 2026-08-18; the move re-confirmed 2026-08-22). book-b was NOT moved: it still opens at 31.0 and runs to 34.9, so it now starts BEFORE book-a and the two overlap for 0.9s. Moving book-b is a second authored beat and needs its own decision -- either book-b follows book-a (40.74 keeps the 3.1s gap the pair had before) or book-a's seat moves again. Recorded rather than guessed."
   ]
 }
