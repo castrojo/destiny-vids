@@ -1323,3 +1323,33 @@ def test_the_survivors_are_matched_case_insensitively():
 def test_a_first_ever_fetch_is_taken_as_is():
     fetched = [{"section": "Bazzite", "names": ["a"]}]
     assert B.merge_contributors(None, fetched) is fetched
+
+
+def test_a_rebuild_route_with_a_tilde_reaches_a_builder_that_expands_it():
+    """delivery.json quotes its rebuild commands, so `~` is never shelled out.
+
+    Act VIII's recorded route passes `--out ~/Videos/...`. deliver.py runs it
+    without a shell and quotes the argument, so the tilde arrives at the
+    builder literally; a builder that does not expanduser() it hands ffmpeg a
+    relative path and dies at the encode -- after nine minutes of card
+    rendering, and after creating a directory named `~` in the repo.
+    """
+    root = Path(__file__).resolve().parents[1]
+    delivery = json.loads(
+        (root / "stories/megacut/delivery.json").read_text(encoding="utf-8"))
+    checked = 0
+    for numeral, master in delivery["masters"].items():
+        route = master.get("rebuild") or ""
+        if "~" not in route:
+            continue
+        script = next((Path(tok) for tok in route.split()
+                       if tok.endswith(".py")), None)
+        assert script is not None, (
+            f"act {numeral}'s rebuild route carries a `~` but names no python "
+            f"builder, so nothing here can prove the tilde is expanded")
+        source = (root / script).read_text(encoding="utf-8")
+        assert "expanduser()" in source, (
+            f"act {numeral} rebuilds with {script} and its route contains a "
+            f"`~`, but {script.name} never calls expanduser()")
+        checked += 1
+    assert checked, "no rebuild route carries a `~` -- this guard is asleep"

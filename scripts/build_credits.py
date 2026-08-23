@@ -976,7 +976,11 @@ def main(argv=None):
     lines.append(f"file '{paths[-1]}'\n")
     concat.write_text("".join(lines))
 
-    out_path = Path(args.out)
+    # `~` must be expanded here, not left to a shell: deliver.py's recorded
+    # rebuild route quotes the path, so the tilde reaches ffmpeg literally and
+    # the encode dies after nine minutes of card rendering -- having created a
+    # directory named `~` in the repo on its way past.
+    out_path = Path(args.out).expanduser()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     cmd = [*ffmpeg, "-nostdin", "-hide_banner", "-v", "error", "-y",
            "-f", "concat", "-safe", "0", "-i", str(concat),

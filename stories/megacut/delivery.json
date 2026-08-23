@@ -174,8 +174,9 @@
     "chapters/VIII-fixed.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "c2219fa07aeadac182222346f4fdb7ed6f1466d70ffc1e07267b37259ee5841d",
-   "rebuild": "python3 scripts/build_credits.py --out ~/Videos/wolves-credits/08-credits-master.mp4"
+   "source_digest": "7aeb661e5755394d0a4c98abf073e9a198a4766b20b356cb985c25b8437b280b",
+   "rebuild": "python3 scripts/build_credits.py --out ~/Videos/wolves-credits/08-credits-master.mp4",
+   "built_from_commit": "1e391c5c7f991badeb8fdba26f8f9297c899911e"
   }
  },
  "social": {
