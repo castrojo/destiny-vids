@@ -85,6 +85,10 @@ def test_filtergraph_reads_manifest_once_and_uses_changed_timing(tmp_path, monke
     # because briefing at 40.125 is laid down before book at 50.25.
     assert fg.index(briefing_window) < fg.index(book_window)
 
+    # The suite is offline: no ffmpeg is installed on the CI runner, and
+    # command() prefixes the argv with find_ffmpeg(). Stub it so this test
+    # stays about the manifest-derived timing, which is what it pins.
+    monkeypatch.setattr(build_prologue, "find_ffmpeg", lambda: ["ffmpeg"])
     cmd = build_prologue.command(Path("day.png"), Path("night.png"))
     inputs = _input_paths(cmd)
     assert len(inputs) >= 4
