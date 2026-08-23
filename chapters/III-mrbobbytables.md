@@ -40,3 +40,21 @@ programme, in act VI.
 [retirement-1] [redacted] @ 10:47.335 +2.125: Finally, retirement
 
 [retirement-2] [redacted] @ 10:49.710 +2.125: The long walk beckons
+
+Bob's gold trustee plate is **not** authored here. Its `copy_source` is
+`casting`, so every row on it resolves from his binding in
+`vocab/casting.yaml`, and a chapter file cannot author derived copy. It lives
+in the manifest and is carried through untouched, exactly as act VI's roster
+nameplates are.
+
+The sign over the maintainer-email beat sits in the picture's upper-right safe
+area rather than the lower third, so it does not collide with the pills below.
+
+## 13:14.728
+
+* [maintainer-emails] title @ 13:14.728 +4.0
+  - position: top-right
+  - copy_source: owner_supplied
+  - title: Maintainers Reading Emails
+  - subtitle: And Other Preposterous Tales
+  - body: Summer 2027
