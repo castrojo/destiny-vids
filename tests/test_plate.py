@@ -2314,3 +2314,26 @@ def test_top_right_title_card_uses_picture_safe_top_right_placement():
     assert x1 == 40 + 1840 - int(plate.MARGIN_X * 1840)
     assert y0 == 140 + int(plate.MARGIN_X * 800)
     assert x0 < x1 and y1 < 140 + 800
+
+
+def test_a_centred_slide_is_centred_on_both_axes():
+    """position: "center" is for a card with NO PICTURE BEHIND IT -- an
+    intermission slide on black. Every other placement measures a row against
+    the frame the plate sits over; on black that same measurement reads as a
+    card that missed its mark."""
+    p = plate.render_plate(GUARDIAN)
+    frame = plate.place(p, "center")
+    assert frame.size == (plate.FRAME_W, plate.FRAME_H)
+    x0, y0, x1, y1 = frame.getchannel("A").getbbox()
+    assert (x0 + x1) / 2 == pytest.approx(plate.FRAME_W / 2, abs=2)
+    assert (y0 + y1) / 2 == pytest.approx(plate.FRAME_H / 2, abs=2)
+
+
+def test_a_centred_slide_ignores_the_picture_it_is_given():
+    """There is no picture: a slide plays on black, so a letterbox passed in
+    by a caller must not shove it off centre."""
+    p = plate.render_plate(GUARDIAN)
+    plain = plate.place(p, "center").getchannel("A").getbbox()
+    boxed = plate.place(p, "center",
+                        picture=(0, 140, plate.FRAME_W, 940))
+    assert boxed.getchannel("A").getbbox() == plain

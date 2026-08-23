@@ -665,14 +665,40 @@ def entries(act):
     own chat cards, so the manifest cannot tell which file a line came from.
     A missing chapter file is not an error: it is an act with no authored
     conversation this way yet.
+
+    Copy written PAST the end of the act's picture is not the act's -- it is
+    the deck that plays after it, and `deck_entries` below is what reads it.
     """
+    act_entries, _, unresolved = _split_entries(act)
+    return act_entries, unresolved
+
+
+def deck_entries(act):
+    """The slides that play AFTER the act -> (entries, unresolved).
+
+    An act whose front matter declares ``deck: <label>`` may keep that deck's
+    copy at the end of its own chapter file, which is the whole point: the
+    words that conclude a scene are edited in the same place as the scene.
+    Any block whose heading carries that label is the deck rather than the
+    act -- ``## 16:23.000 intermission`` -- so the boundary is written down
+    where the copy is, instead of being inferred from a runtime.
+
+    Their ``at`` comes back rebased to the deck's own clock, because a deck
+    is rendered as its own film and starts at zero.
+    """
+    _, deck, unresolved = _split_entries(act)
+    return deck, unresolved
+
+
+def _split_entries(act):
+    """(the act's plates, the trailing deck's plates, unresolved)."""
     try:
         chap = chapter(act)
     except KeyError:
-        return [], []
+        return [], [], []
     path = chap.path
     if not path.exists():
-        return [], []
+        return [], [], []
     offset = chap.programme_start
     film_sec = chap.film_sec
     defaults = chap.defaults
@@ -681,8 +707,13 @@ def entries(act):
              else None)
     blocks = parse(path.read_text(encoding="utf-8"))
     if chap.fields.get("timed") is False:
-        return untimed_entries(act, blocks, defaults, order)
-    out, unresolved = [], []
+        resolved, notes = untimed_entries(act, blocks, defaults, order)
+        return resolved, [], notes
+    # `deck: <label>` in the front matter, matched against a block heading's
+    # own label. A deck plays after the act, so its plates are not the act's
+    # and never reach the act's manifest.
+    deck_label = chap.fields.get("deck")
+    out, deck, unresolved = [], [], []
     for b, block in enumerate(blocks, 1):
         if not block["lines"]:
             unresolved.append(
@@ -693,10 +724,15 @@ def entries(act):
                                           seats=seat_lines(act,
                                                            block["lines"]))
         unresolved.extend(notes)
+        into = (deck if deck_label and block["label"] == deck_label else out)
         for n, (line, start, hold) in enumerate(zip(block["lines"],
                                                     at, holds), 1):
-            out.append(build_entry(act, b, n, line, start, hold,
-                                   defaults, order))
+            into.append(build_entry(act, b, n, line, start, hold,
+                                    defaults, order))
+        if into is deck:
+            # Running off the picture is what a slide DOES. The note below
+            # would fire on every one of them and mean nothing.
+            continue
         end = at[-1] + holds[-1] + offset
         if film_sec is not None and (at[0] < 0 or end - offset > film_sec):
             unresolved.append(
@@ -704,7 +740,13 @@ def entries(act):
                 f"runs off the act's picture ({format_tc(at[0])} -> "
                 f"{format_tc(at[-1] + holds[-1])} film); it is scheduled "
                 "anyway so the conversation is reviewable")
-    return out, unresolved
+    if deck:
+        base = deck[0]["at"]
+        for slide in deck:
+            slide["at"] = round(slide["at"] - base, 3)
+            if "fade_out_at" in slide:
+                slide["fade_out_at"] = round(slide["fade_out_at"] - base, 3)
+    return out, deck, unresolved
 
 
 def untimed_entries(act, blocks, defaults, order):

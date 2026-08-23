@@ -231,6 +231,17 @@
    ],
    "source_digest": "695f52eb45e6ff50c12c9435092554899e1846f2924403e202b9e675b3ae7fbc"
   },
+  "renders/intermission/03-intermission.mp4": {
+   "note": "The intermission slide deck that concludes the mrbobbytables section. Silent -- the owner's different song is not chosen yet. CARRIES AUTHORED COPY, which is why the chapter file, the plate manifest, tools/plate.py and vocab/casting.yaml are all declared: every one of them restates what a slide says. Right now every word is lorem ipsum and the deck credits nobody, so a change here changes prose and not a claim about a person -- that stops being true the moment real copy lands.",
+   "sources": [
+    "scripts/build_intermission.py",
+    "chapters/III-mrbobbytables.md",
+    "stories/03-intermission-plates.json",
+    "tools/plate.py",
+    "vocab/casting.yaml"
+   ],
+   "source_digest": "19f21462bb5b09dffcfd84d8f8060fd85ef7d1ef908cb2920315f66b75c1b88d"
+  },
   "renders/perfume-4.mp4": {
    "note": "Perfume movement 4, clean base. The programme seats its first 13.12 s before cutting to the overlay derivative below.",
    "sources": [

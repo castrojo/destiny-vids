@@ -64,6 +64,17 @@ card; what it says at any moment is
 [`stories/trailer-1-plates.json`](../stories/trailer-1-plates.json), whose
 `_version` names the cut.
 
+**An intermission is not an act either.** One slide deck plays after
+movement 3 — the concluding text of Bob's scene. It takes no numeral, no
+chapter marker and no `Prod/` file, delivering to
+`renders/intermission/03-intermission.mp4` and seated in `megacut.json` like
+the Perfume movements. Its copy is **authored at the bottom of
+[`chapters/III-mrbobbytables.md`](../chapters/III-mrbobbytables.md)**, under the
+labelled block that file's `deck:` front matter names, so the scene and its
+conclusion are edited in one place; `scripts/build_intermission.py` renders it.
+It is currently silent and every word of it is a placeholder — the owner's
+different song and its real copy are both still to come.
+
 **Not every act is announced.** The Roman-numeral slides were retired on the
 owner's instruction; the programme plays exactly one card, the scream
 interstitial between acts V and VI — *ON THE LINUX DESKTOP /
@@ -82,6 +93,7 @@ prologue is movement 1; four more movements sit between the acts.
 | **1** — the prologue | in front of act I |
 | **2** | after act I |
 | **3** | after act III |
+| *(intermission)* | after movement 3 — see above; the movements stay contiguous in source order across it |
 | **4** | after act VI, before Europa |
 | **5** | after Europa, into the credits |
 

@@ -146,3 +146,18 @@ def test_act_two_pills_reproduce_the_manifest_exactly():
             continue
         assert entry == by_id[entry["id"]]
         assert list(entry) == list(by_id[entry["id"]])
+
+
+def test_no_act_resolves_a_line_that_looks_like_prose():
+    """REGRESSION: a sentence in a chapter file's prose containing `word:
+    text` matches the pill grammar, and act III silently grew a 2.2 s pill
+    reading 'each row carries lorem ipsum and a `*_source' -- from a
+    paragraph explaining placeholders. Prose is not inert. A resolved line
+    whose speaker runs to several words is one of these, every time."""
+    for act in chapter_md.discover():
+        resolved, _ = chapter_md.entries(act)
+        for entry in resolved:
+            speaker = entry.get("speaker") or ""
+            assert len(speaker.split()) <= 3, (
+                f"act {act}: {entry['id']} looks like prose that parsed as a "
+                f"pill -- speaker {speaker!r}")
