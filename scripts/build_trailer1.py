@@ -178,7 +178,7 @@ ENDCARD_EVENT_FADE = 1.100
 ENDCARD_CTA_IN = MUSIC_TAIL   # the cut to silence; see URL_HOLD above
 ENDCARD_CTA_FADE = 0.600
 
-TOTAL = PICTURE + BRIDGE + ENDCARD                     # 115.020
+TOTAL = PICTURE + BRIDGE + ENDCARD                     # 124.300
 
 # --- sound --------------------------------------------------------------------
 # The prologue fades from 93.000, under a bridge that ends its film. This one
