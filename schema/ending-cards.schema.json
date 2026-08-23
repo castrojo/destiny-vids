@@ -48,15 +48,15 @@
           "minimum": 1
         },
         "frames": {
-          "const": 1380
+          "const": 1404
         },
         "duration": {
-          "const": 23.023
+          "const": 23.4234
         },
         "plate_ids": {
           "type": "array",
-          "minItems": 5,
-          "maxItems": 5,
+          "minItems": 4,
+          "maxItems": 4,
           "uniqueItems": true,
           "items": {
             "type": "string",
@@ -67,6 +67,16 @@
           "type": "string",
           "minLength": 1,
           "description": "Why the tail hold is the length it is. Prose, not consumed by the builder."
+        },
+        "_pacing": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the card holds and the gap between them are the lengths they are. Prose, not consumed by the builder."
+        },
+        "_retired_card": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Authored copy for a card removed from the pause, kept so re-seating it is a move rather than a rewrite. Prose, not consumed by the builder."
         }
       }
     },
@@ -112,8 +122,8 @@
     },
     "plates": {
       "type": "array",
-      "minItems": 16,
-      "maxItems": 16,
+      "minItems": 15,
+      "maxItems": 15,
       "items": {
         "oneOf": [
           {

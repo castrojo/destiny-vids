@@ -100,7 +100,7 @@ def test_retired_copy_is_kept_rather_than_deleted():
 def test_renderer_can_enumerate_every_ending_card():
     doc = ending()
     ids = [card["id"] for card in doc["plates"]]
-    assert len(ids) == 16
+    assert len(ids) == 15
     assert len(set(ids)) == len(ids)
     assert all(card["kind"] == "ending" for card in doc["plates"])
     assert set(doc["pause"]["plate_ids"] + doc["underwater"]["plate_ids"]) == set(ids)
@@ -152,8 +152,8 @@ def test_pause_cards_match_act_slide_chrome_without_darkening_wallpapers():
 
 def test_pause_duration_is_frame_exact():
     doc = ending()
-    assert build_ending_pause.frame_count(doc) == 1380
-    assert build_ending_pause.duration(doc) == 23.023
+    assert build_ending_pause.frame_count(doc) == 1404
+    assert build_ending_pause.duration(doc) == 23.4234
 
 
 def test_pause_command_has_fades_black_gaps_and_no_audio(tmp_path):
@@ -167,13 +167,13 @@ def test_pause_command_has_fades_black_gaps_and_no_audio(tmp_path):
         doc, cards, tmp_path / "mission-pause.mp4", ffmpeg=["ffmpeg"]
     )
     graph = cmd[cmd.index("-filter_complex") + 1]
-    assert graph.count("fade=t=in") == 5
-    assert graph.count("fade=t=out") == 5
-    assert graph.count("color=c=black") == 5
-    assert "concat=n=10:v=1:a=0" in graph
+    assert graph.count("fade=t=in") == 4
+    assert graph.count("fade=t=out") == 4
+    assert graph.count("color=c=black") == 4
+    assert "concat=n=8:v=1:a=0" in graph
     assert "-an" in cmd
     assert "anullsrc" not in graph
-    assert cmd[cmd.index("-frames:v") + 1] == "1380"
+    assert cmd[cmd.index("-frames:v") + 1] == "1404"
 
 
 def test_pause_builder_runs_as_a_script(tmp_path):
@@ -194,7 +194,7 @@ def test_pause_builder_runs_as_a_script(tmp_path):
         text=True,
     )
     assert proc.returncode == 0, proc.stderr
-    assert "-frames:v 1380" in proc.stdout
+    assert "-frames:v 1404" in proc.stdout
 
 
 def test_the_support_card_keeps_the_centered_treatment():

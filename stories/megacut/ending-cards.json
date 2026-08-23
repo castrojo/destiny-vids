@@ -4,18 +4,19 @@
   "pause": {
     "fps": "60000/1001",
     "fade_frames": 72,
-    "gap_frames": 30,
+    "gap_frames": 48,
     "black_hold_frames": 30,
-    "frames": 1380,
-    "duration": 23.023,
+    "frames": 1404,
+    "duration": 23.4234,
     "plate_ids": [
       "mission",
       "we-are",
       "purpose",
-      "lesson",
-      "left-to-teach"
+      "lesson"
     ],
-    "_black_hold": "30 frames, matching gap_frames, DOWN FROM 89. The long hold existed because the asteroid impact followed the passage directly and the film wanted it to break the silence out of darkness. After the 2026-08-16 reorder the passage is followed by movement 5a instead -- a dark Earth limb that is itself near-black for 3.504 s. 89 frames of black in front of that made roughly five seconds of unbroken dark and buried the song's re-entry. The half second left is only enough for the last card to clear before the music arrives."
+    "_black_hold": "30 frames, DOWN FROM 89 and no longer tied to gap_frames (see `_pacing`; the gap is 48). The long hold existed because the asteroid impact followed the passage directly and the film wanted it to break the silence out of darkness. After the 2026-08-16 reorder the passage is followed by movement 5a instead -- a dark Earth limb that is itself near-black for 3.504 s. 89 frames of black in front of that made roughly five seconds of unbroken dark and buried the song's re-entry. The half second left is only enough for the last card to clear before the music arrives, which is what 'kick them with the boom' needs: the cards breathe, the black does not.",
+    "_retired_card": "'Left to teach' (240 frames, renders/artwork/huntress.png) was REMOVED from the pause on 2026-08-23 at the owner's word: \"remove the 'left to teach' slide\". Recorded rather than deleted, because a retired string is authored copy too and re-seating it anywhere is then a move rather than a rewrite.",
+    "_pacing": "Owner 2026-08-23: \"lengthen the slide intervals, this is a dramatic moment. Then kick them with the boom!\" Both intervals grew. The gap between cards went 30 -> 48 frames (0.5 -> 0.8 s), and every remaining card gained 60 frames of hold (mission 300->360, we-are 240->300, purpose 240->300, lesson 210->270), because at fade_frames=72 a 240-frame card sat at full brightness for only 1.6 s and the 210-frame `lesson` for 1.1 s -- the fades, not the holds, were most of the card. black_hold_frames is DELIBERATELY LEFT AT 30 and no longer matches gap_frames: it is the run-up to the impact, and the reason it is short is in `_black_hold`. Dropping a card and lengthening what is left lands within half a second of the old 23.023 s."
   },
   "underwater": {
     "source_in": 396.32,
@@ -43,7 +44,7 @@
       "kind": "ending",
       "section": "pause",
       "mode": "pause",
-      "frames": 300,
+      "frames": 360,
       "label": "Our Mission",
       "title": "Bring new contributors to cloud native",
       "wallpaper": "renders/artwork/bluefin-night.png"
@@ -53,7 +54,7 @@
       "kind": "ending",
       "section": "pause",
       "mode": "pause",
-      "frames": 240,
+      "frames": 300,
       "title": "We are Bluefin",
       "wallpaper": "renders/artwork/bluefin-night.png"
     },
@@ -62,7 +63,7 @@
       "kind": "ending",
       "section": "pause",
       "mode": "pause",
-      "frames": 240,
+      "frames": 300,
       "title": "We are not nice.",
       "wallpaper": "renders/artwork/dusk-day.png"
     },
@@ -71,19 +72,10 @@
       "kind": "ending",
       "section": "pause",
       "mode": "pause",
-      "frames": 210,
+      "frames": 270,
       "title": "We do what must be done.",
       "subtitle": "(Wait for it)",
       "wallpaper": "renders/artwork/dusk-night.png"
-    },
-    {
-      "id": "left-to-teach",
-      "kind": "ending",
-      "section": "pause",
-      "mode": "pause",
-      "frames": 240,
-      "title": "Left to teach",
-      "wallpaper": "renders/artwork/huntress.png"
     },
     {
       "id": "loves",
