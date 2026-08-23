@@ -37,11 +37,12 @@
   "reveal": {
     "_what": "THE REAL REVEAL, and the owner named its time: ':22 is when I want the comic book shot, put the cast after'. 22.080 rather than a flat 22.000 because a measured +5.01 dB onset sits there -- 0.080 s, under three frames, so the cut lands on a hit instead of mid-bar. The earlier anchor (the song's opening crescendo, 9.080 s into span B) is kept below: it is why the loop exists, and it is what to fall back to if `at_sec` is ever removed.",
     "hold_sec": 14.0,
-    "image": "~/Pictures/Artwork/wolves.jpg",
+    "image": "~/Pictures/Artwork/wolves-final.jpg",
     "TODO(owner)": "The cover is to be REMOVED from the end of the Europa director's cut, per the owner: 'we are removing it from the end of europa, this is the real reveal.' This builder cannot do that -- act VII has no committed inputs at all and is cut in ~/Videos/wolves-directors-cut (#152). Act VII must be re-cut separately or the reveal plays twice.",
     "segment": 1,
     "source_sec": 9.08,
-    "at_sec": 22.08
+    "at_sec": 22.08,
+    "_art": "Owner 2026-08-23: \"swap out the cover in the credits with this final version\", supplying ~/Pictures/bluefin.jpg. It is the FINISHED COLOUR ART of the same cover: same composition, same title and tagline, and the same 9075x9075 square, so cover_frame()'s letterbox geometry is unchanged and this is a drop-in swap. Its predecessor ~/Pictures/Artwork/wolves.jpg is the greyscale ink version and is NOT deleted -- it is still what the act I title cover (stories/megacut/megacut-hero-plates.json) renders, and swapping that one was not asked for. Copied to the Artwork folder under a stable name rather than referenced at the loose ~/Pictures/bluefin.jpg, which is the kind of path the next download overwrites."
   },
   "_cta_cards_what": "The call to action, and everything that plays BEFORE the reveal. Owner, 2026-08-14. dur_sec are RELATIVE WEIGHTS scaled into the window the cover's own time leaves (reveal.at_sec), exactly as fixed_cards are: the owner named :22 for the cover and the cards give way to it. FIGHT's weight is longer than the first two together, which is the instruction; the reveal's own hold_sec is untouched.",
   "cta_cards": [

@@ -46,11 +46,14 @@ the song and it is precisely the part the loop exists to let people hear.
 On the credits clock that is **47.360 + 9.080 = 56.440 s**, and the cover lands
 there.
 
-The cover is ``wolves.jpg``, the same asset act I uses as its title cover and
-the one the Europa director's cut currently ends on. **Removing it from the end
-of Europa is act VII's job, and act VII has no committed inputs at all (#152)**
--- it is cut in ``~/Videos/wolves-directors-cut``, so this builder cannot do it
-and does not pretend to. It is recorded in the manifest and reported here.
+The cover is ``wolves-final.jpg`` -- the finished colour art, swapped in at the
+owner's word on 2026-08-23 (see the manifest's ``reveal._art``). Act I's title
+cover still renders the greyscale ink ``wolves.jpg``; the two are the same
+9075x9075 composition, so only the credits reveal changed. **Removing the cover
+from the end of Europa is act VII's job, and act VII has no committed inputs at
+all (#152)** -- it is cut in ``~/Videos/wolves-directors-cut``, so this builder
+cannot do it and does not pretend to. It is recorded in the manifest and
+reported here.
 
 ## What is on screen
 
@@ -973,7 +976,11 @@ def main(argv=None):
     lines.append(f"file '{paths[-1]}'\n")
     concat.write_text("".join(lines))
 
-    out_path = Path(args.out)
+    # `~` must be expanded here, not left to a shell: deliver.py's recorded
+    # rebuild route quotes the path, so the tilde reaches ffmpeg literally and
+    # the encode dies after nine minutes of card rendering -- having created a
+    # directory named `~` in the repo on its way past.
+    out_path = Path(args.out).expanduser()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     cmd = [*ffmpeg, "-nostdin", "-hide_banner", "-v", "error", "-y",
            "-f", "concat", "-safe", "0", "-i", str(concat),
