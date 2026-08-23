@@ -67,8 +67,80 @@ those names live. Edit them there.
 
 [castrojo_line_3] castrojo @ 22:23.048 +2.8: Honed your craft
 
-[castrojo_line_4] castrojo @ 22:26.206 +2.8: Made Lifelong Friends
+[castrojo_line_4] castrojo @ 22:26.206 +2.8: Depended on your friends
 
-[castrojo_line_5] castrojo @ 22:29.364 +2.8: And now it's up to you, guardian
+[castrojo_line_5] castrojo @ 22:29.364 +2.8: Now you're one of us, you are the dream
 
-[castrojo_line_6] castrojo @ 22:32.522 +2.8: Lead the way, we will follow
+* [gold_robertsirc] - @ 22:32.522 +2.8
+  - position: left
+  - label: "#HIREAWOLF // MAINTAINER"
+  - class: Harbringer Titan
+  - name: robertsirc
+  - title: Protector of the Helm
+  - variant: leader
+  - why: >
+      SEAT UNVERIFIED. The owner asked for this on "the guardian lifting the
+      other one", which is the shot under "Depended on your friends" at film
+      363.131 -- but a pill already holds the left lane there for its whole
+      2.8 s, and this act is one-plate-at-a-time. This is the nearest clear
+      air, film 369.289, immediately before Jorge's own reveal at 374.041.
+      It reads: depended on your friends -> robertsirc -> now you're one of
+      us -> Jorge. Whether it is still the lifting shot is a judgement about
+      a picture, so it is flagged rather than claimed.
+  - _note: >
+      OWNER-AUTHORED, 2026-08-23, verbatim: `#HIREAWOLF // MAINTAINER
+      HARBRINGER TITAN "Protector of the Helm"`. Split into the four plate
+      fields as written -- HARBRINGER is reproduced, not corrected to
+      "Harbinger", because authored copy is never tidied. `name` is his own
+      GitHub login: vocab/casting.yaml records `display_name: null` with a
+      note that a plate must not invent one, and a login is the person
+      naming himself rather than this repo naming him.
+
+>> THE FREEZE IS STILL OPEN. The owner asked to "freeze this section" for
+this plate. Not done yet, deliberately: act VI is rebuildable, so a
+freeze-frame is reachable, but lengthening the act shifts every pill after
+it, acts VII and VIII's programme starts, and every chapter marker. The
+plate plays over the moving shot until he has watched it and said. <<
+
+>> THE MENTOR LINES PLAY AFTER THE PLATES, NOT ON THEM, and that is the one
+thing here the owner asked for that could not be done. He wrote, 2026-08-23:
+"their plates are up, add my dialogue to match their plates, I am
+introducing them narratively." The plates are real and already in this act's
+manifest -- gold_kelsey_hightower at film 382.349, gold_brian_ketelsen at
+386.349, gold_angie_jones at 388.349 -- but they hold the left lane, which
+is where a pill sits, and act VI is one-plate-at-a-time. Kelsey's clears
+0.4 s before Ketelsen's opens; there is no window for a pill between them
+and none over them.
+
+So the reveals roll past / present / future in silence, and the seven lines
+take the free BARS of the bed after them, in his order. If he wants a line
+ON a plate, the plate has to shorten or the pill has to share the lane --
+both are his calls, not mine.
+
+THE BAR IS WHY THE SEATS LOOK ODD. Every pill in this act lands on a
+multiple of 3.157914 s from line 1, which is the bed's own bar, and the
+reveals occupy bars 6, 7, 9, 10 and 11. That leaves bar 8 and bars 12 to 17
+-- exactly seven, for exactly seven lines. So "I follow my mentors of the
+past" gets bar 8, immediately before Kelsey's plate, which is the line
+doing the introducing anyway; "Present" and "and Future" take the first two
+bars after Angie's clears. <<
+
+[castrojo_line_6] castrojo @ 22:41.996 +2.8: I follow my mentors of the past
+
+[castrojo_line_7] castrojo @ 22:54.627 +2.8: Present
+
+[castrojo_line_8] castrojo @ 22:57.785 +2.8: and Future
+
+[castrojo_line_9] castrojo @ 23:00.943 +2.8: The only winning move is not to play
+
+[castrojo_line_10] castrojo @ 23:04.101 +2.8: Think like a dinosaur
+
+[castrojo_line_11] castrojo @ 23:07.259 +2.8: When you fall, rise.
+
+[castrojo_line_12] castrojo @ 23:10.417 +2.8: We've got your back
+
+    THE OWNER REWROTE THIS TAIL ON 2026-08-23. Three lines went: "Made
+    Lifelong Friends" (line 4), "And now it's up to you, guardian" (line 5)
+    and "Lead the way, we will follow" (line 6, which used to close the act).
+    They are recorded here because a deleted line is easy to miss in a diff,
+    and they are in git if he wants one back.

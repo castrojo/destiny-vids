@@ -543,8 +543,13 @@ def test_the_mapped_megacut_pass_rewrites_the_walk_window_verbatim():
     assert by_id["walk_ge_stream"]["text"] == "It's your patch, turn the stream on"
     assert by_id["walk_a1rm4x"]["speaker"] == "LionHeartP"
     assert by_id["walk_a1rm4x"]["text"] == "Let's get these numbers up"
-    assert by_id["mapped_lionheartp_hardware"]["text"] == (
-        "Why spend the extra dollar to support Linux hardware")
+    # Owner, 2026-08-23: LionHeartP's "Why spend the extra dollar to support
+    # Linux hardware" was replaced on this seat by wrkode's line. The old
+    # string is in git; what this guards is that the SEAT still speaks.
+    assert by_id["mapped_wrkode_dibs"]["speaker"] == "wrkode"
+    assert by_id["mapped_wrkode_dibs"]["text"] == "Oh dibs on this one"
+    assert by_id["mapped_wrkode_dibs"]["avatar"] == "renders/avatars/wrkode.png", (
+        "wrkode inherited LionHeartP's face from the line he replaced")
     assert by_id["walk_ge_glorious"]["text"] == (
         "There's nothing glorious about this job")
     assert by_id["walk_ge_lesson"]["speaker"] == "LionHeartP"
@@ -581,7 +586,6 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
         "mapped_owen_slay": ("Owen", "Slay out, Queen!"),
         "mapped_akgraner_kyle": ("akgraner", "Hi sugar, I'm looking for Kyle"),
         "mapped_kyle_sup": ("kylegospo", "Sup"),
-        "mapped_kolunmi_disco": ("kolunmi", "Disco!"),
     }
     for plate_id, (speaker, text) in expected.items():
         assert by_id[plate_id]["speaker"] == speaker
@@ -603,9 +607,9 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
     assert by_id["mapped_amber_reveal"]["title"] == "The Iron Standard"
     assert [by_id[f"mapped_akgraner_kindness_{i}"]["text"]
             for i in range(1, 7)] == [
-        "Kindness is doing what's right", "For the ecosystem.",
-        "For our users.", "And for our maintainers.",
-        "Don't be nice.", "Be kind.",
+        "Kindness is doing what's right", "For the ecosystem",
+        "For our users", "And for our maintainers",
+        "Don't be nice", "Be kind",
     ]
     assert by_id["mapped_haters"]["name"] == "HATERS"
     assert "solo_EyeCantCU" not in by_id
@@ -652,8 +656,7 @@ def test_the_remaining_pre_walk_toc_copy_is_reproduced_verbatim():
     toc = toc_plates()
     assert toc["toc_karena"]["text"] == (
         "One hundred thousand bootc volunteers, ready to power up")
-    assert toc["toc_ricardo"]["text"] == (
-        "You really think they can save open source?")
+    assert toc["toc_ricardo"]["text"] == "Look man I am so tired just jump"
     # The brief's own speaker tags, not a casting.yaml lookup.
     assert toc["toc_karena"]["speaker"] == "Karena"
 
@@ -666,8 +669,9 @@ def test_the_post_walk_dialogue_is_replaced_by_the_mapped_pass():
     assert by_id["mapped_pastaq_what_tests"]["text"] == "Hey man WHAT tests?"
     assert by_id["mapped_redacted_unlearning"]["speaker"] == "[redacted]"
     assert by_id["mapped_redacted_unlearning"]["at"] == pytest.approx(221.5, abs=1e-3)
-    assert by_id["mapped_redacted_options"]["text"] == (
-        "Your options are success "
+    # Split in two by the owner, 2026-08-23, inside the old pill's own span.
+    assert by_id["mapped_redacted_options"]["text"] == "Your options are success"
+    assert by_id["mapped_redacted_mines"]["text"] == (
         "Or a lifetime of servitude in the Toilmaster's Packaging Mines")
 
 def test_the_owner_conversation_replaces_the_skill_banners():
@@ -732,7 +736,7 @@ def test_mars_intro_owns_clankers_context_and_red_warning():
     assert context["at"] < mars["at"]
     assert warning["kind"] == "miniboss"  # owner: match the kernel bar
     assert warning["position"] == "boss"  # the kernel bar's own position
-    assert warning["name"] == "POOR TECHNICAL DECISIONS"
+    assert warning["name"] == "YOUR POOR TECHNICAL DECISIONS"
 
 def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -747,16 +751,19 @@ def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
     kindness = [by_id[f"mapped_akgraner_kindness_{i}"] for i in range(1, 7)]
     assert [p["text"] for p in kindness] == [
         "Kindness is doing what's right",
-        "For the ecosystem.",
-        "For our users.",
-        "And for our maintainers.",
-        "Don't be nice.",
-        "Be kind.",
+        "For the ecosystem",
+        "For our users",
+        "And for our maintainers",
+        "Don't be nice",
+        "Be kind",
     ]
     assert all(p["scale"] > 1 for p in kindness)
     assert kindness[-1]["at"] + kindness[-1]["dur"] < \
         by_id["mapped_which_kyle"]["at"]
-    assert by_id["mapped_which_kyle"]["text"] == "Which one of you is Kyle?"
+    # Owner, 2026-08-23: akgraner's closing line became "Extinction is the
+    # Rule"; the question moved to her own earlier pill, spelled "Kyleford".
+    assert by_id["mapped_which_kyle"]["text"] == "Extinction is the Rule"
+    assert by_id["chat_amber_kyleford"]["text"] == "Which one of you is Kyleford?"
 
 def test_endfight_warnings_and_speakers_match_owner_copy():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -770,8 +777,10 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     # into his face." Film 317.0 is the Titan close-up behind the purple Void
     # shield -- programme 10:00.8, the "around 10:00" he asked for.
     assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(316.967, abs=1e-3)
-    assert by_id["mapped_kolunmi_disco"]["speaker"] == "kolunmi"
-    assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(313.2, abs=1e-3)
+    # kolunmi's "Disco!" was deleted by the owner on 2026-08-23 and the air it
+    # freed now carries akgraner's and cortney's lines. It stays deleted.
+    assert "mapped_kolunmi_disco" not in by_id
+    assert by_id["chat_amber_problem"]["at"] == pytest.approx(308.403, abs=1e-3)
     assert by_id["owner_convo_karena"]["avatar"].endswith("/karena.png")
 
 def test_the_owner_conversation_hands_to_kyle_without_overlap():
@@ -897,11 +906,16 @@ def test_the_remaining_face_shot_dialogue_cards_still_land():
     assert move["at"] == pytest.approx(101.95, abs=1e-3)
     assert metrics["kind"] == "chat"
     assert metrics["speaker"] == "jrsapi"
-    assert metrics["text"] == (
-        "Projects Teams Metrics are strong "
-        "They just need mentoring in the right skills")
+    # Split by the owner, 2026-08-23. There are 3.0 s between this seat and
+    # karena's, and two readable pills need 5.2, so the second half plays
+    # after her rather than sliding an authored beat.
+    assert metrics["text"] == "Projects Teams Metrics are strong"
     assert metrics["avatar"] == "renders/avatars/jrsapi.png"
     assert metrics["at"] == pytest.approx(104.5, abs=1e-3)
+    mentoring = late["late_metrics_mentoring"]
+    assert mentoring["speaker"] == "jrsapi"
+    assert mentoring["text"] == "They just need mentoring in the right skills"
+    assert mentoring["at"] > cardio["at"]
     assert cardio["speaker"] == "karena"
     assert cardio["text"] == "Like cardio!"
     assert cardio["at"] == pytest.approx(107.5, abs=1e-3)
@@ -912,8 +926,9 @@ def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
         "mapped_a1rmax_intro": ("A1RM4X", "renders/avatars/A1RM4X.png"),
         "mapped_lionheartp_together": (
             "LionHeartP", "renders/avatars/LionHeartP.png"),
+        # Recast by the owner, 2026-08-23: GloriousEggroll -> lionheartp.
         "mapped_eggroll_title": (
-            "GloriousEggroll", "renders/avatars/GloriousEggroll.png"),
+            "lionheartp", "renders/avatars/LionHeartP.png"),
         "mapped_redacted_options": ("[redacted]", None),
         "mapped_akgraner_kindness_1": (
             "akgraner", "renders/avatars/akgraner.png"),
@@ -941,7 +956,8 @@ def test_the_late_titles_and_last_chats_replace_the_old_conflicting_windows():
     assert late["late_mars_title"]["title"] == "Mars"
     assert late["late_mars_title"]["at"] == pytest.approx(116.5, abs=1e-3)
     assert late["late_jrsapi_notes"]["at"] == pytest.approx(134.5, abs=1e-3)
-    assert late["late_jrsapi_notes"]["text"] == "Shit are you taking notes?"
+    assert late["late_jrsapi_notes"]["text"] == (
+        "I still don't know which Ricardo this is")
 
     ids = {p["id"] for p in committed()["plates"]}
     for removed in (
@@ -1050,7 +1066,7 @@ def test_the_wrong_cncf_community_leadership_card_is_absent():
 def test_the_new_dialogue_lands_on_the_owners_seconds():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     assert by_id["chat_joseph_slop"]["at"] == pytest.approx(70.433, abs=1e-3)
-    assert by_id["chat_joseph_slop"]["text"] == "Here comes the slop"
+    assert by_id["chat_joseph_slop"]["text"] == "That explains the slop"
     assert by_id["chat_karena_job"]["at"] == pytest.approx(77.433, abs=1e-3)
     assert by_id["chat_karena_job"]["text"] == "I love this job"
     assert all(p["label"] == "Your choices are:" for p in _choice_frames())
@@ -1253,7 +1269,7 @@ def test_gloriouseggroll_has_no_nameplate_over_someone_elses_face():
         "in this chapter")
     # He is still in the film: his dialogue is untouched.
     spoken = [p for p in plates if p.get("speaker") == "GloriousEggroll"]
-    assert len(spoken) >= 3, "his remaining owner-timed dialogue was dropped"
+    assert len(spoken) >= 2, "his remaining owner-timed dialogue was dropped"
 
 def test_hikariknight_is_out_of_the_eggroll_scene():
     """Owner: "remove hikari from the eggroll scene."

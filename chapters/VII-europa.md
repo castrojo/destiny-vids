@@ -67,33 +67,42 @@ python3 tools/chapter_md.py check VII
   - avatar: ~/Videos/wolves-directors-cut/nimbatus-review/render/krook.png
   - fade_out_at: 1.864
 
-[d02] preethi @ 25:02.731 +1.6: Stand down
+[d02] preethi @ 25:02.731 +1.6: Stand down, I'm sending my wolf
   - fade_out_at: 3.864
 
-[d03] alolita @ 25:04.731 +2.6: It's all for naught we fail
+[d03] alolita @ 25:04.731 +2.6: Are you sure the Kube is on Europa?
   - avatar: renders/avatars/alolita.png
   - fade_out_at: 6.864
 
-[d04] preethi @ 25:07.731 +2.0: I'm sending our best
+[d04] preethi @ 25:07.731 +2.0: It is my duty to test her.
   - fade_out_at: 9.264
+
+[d04b] preethi @ 25:10.131 +2.2: I must not fail
 
 ## 25:24.731
 
-[d05] castrojo @ 25:24.731 +2.6: They must never know who we are
+[d05] castrojo @ 25:24.731 +2.6: In and out
   - avatar: renders/avatars/castrojo.png
   - fade_out_at: 26.864
 
-[d06] castrojo @ 25:27.731 +2.0: Don't get caught
-  - avatar: renders/avatars/castrojo.png
+[d06] mrbobbytables @ 25:27.731 +2.0: Don't get caught
+  - avatar: renders/avatars/mrbobbytables.png
   - fade_out_at: 29.264
 
-[d07] jeefy @ 25:30.131 +2.2: It's all in your hands
+[d07] jeefy @ 25:30.131 +2.2: Standing by for extraction
   - avatar: renders/avatars/jeefy.png
   - fade_out_at: 31.864
 
 [d08] ihor @ 25:32.731 +2.2: G{k8s}dspeed
   - avatar: renders/avatars/idvoretskyi.png
   - fade_out_at: 34.464
+
+[d11] preethi @ 25:35.331 +2.2: Hummingbird will find the girl
+
+[d12] preethi @ 25:37.931 +2.2: We'll return soon.
+
+[d13] nimbatus @ 25:40.531 +2.6: We are the Wolves amongst the Wolves
+  - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
 
 ## 26:01.731
 

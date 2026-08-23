@@ -81,15 +81,52 @@ Then rebuild the manifest (never hand-edit the JSON):
 
     python3 scripts/build_efmb_plates.py --write
 
-## 5:54.233
+>> THE GLIDER LINK IS AN UPLOAD ANNOTATION, NOT A PLATE. Owner, 2026-08-23:
+"Add youtube click link thing to this video, it's the backstory to the
+glider: https://www.youtube.com/watch?v=P-rIeI6ynuM ... Have it show up
+during this combo and stay in the top right until later." A YouTube card is
+set on the upload, so nothing here burns it into a frame -- filed as an
+issue against the publish step. The window it wants is this block. <<
 
-[chat_joseph_slop] Joseph @ 5:54.233 +2.6: Here comes the slop
+## 5:14.433
+
+>> THESE FOUR SEATS ARE MINE, NOT THE OWNER'S. He wrote the banter with no
+times, above the 5:54 block, and 5:54 onwards is packed with authored beats
+that may not move. This is the largest clear stretch in the act -- film
+30.433 -> 45.200, measured from the manifest, not from this file, because
+the builder adds plates this file never sees. It is the combo the note
+above describes. Worth a look when he watches it: the words are his, the
+moment is a guess. <<
+
+[chat_joseph_ricardos] Joseph @ 5:14.433 +3.4: No one can tell which Ricardo is which so roll with it
   - cast: joseph_sandoval
   - position: null
 
-    Owner brief, this round: "03:12 chat bubble for Joseph: Here comes the
-    slop / 03:19 karena: I love this job". Megacut marks; these are the
-    programme seats they land on. He also asked for Joseph's "Master your
+[chat_ricardo_nukeguy] Ricardo @ 5:18.233 +3.4: It's me the nuke guy how do you think I got here?
+
+    THE OTHER RICARDO, deliberately uncast. This act has two: Ricardo Rocha
+    (`rochaporto`, who carries `toc_ricardo` below) and the one jrsapi
+    cannot tell apart. Naming the second would credit a real person on the
+    strength of a joke about not knowing which one he is, so he takes the
+    display name and the drawn crest, and no portrait.
+
+[chat_pilot_lunar] pilot @ 5:22.033 +2.8: Lunar record baby! Hello KubeCon + CloudNativeCon
+  - avatar: null
+  - avatar_url: null
+
+[chat_ricardo_ai] Ricardo @ 5:25.233 +3.4: They wanted us to put AI in the glider so we did.
+
+## 5:54.233
+
+[chat_joseph_slop] Joseph @ 5:54.233 +2.6: That explains the slop
+  - cast: joseph_sandoval
+  - position: null
+
+    Owner brief, this round: "03:12 chat bubble for Joseph: That explains
+    the slop / 03:19 karena: I love this job". Megacut marks; these are the
+    programme seats they land on. The line was "Here comes the slop" until
+    2026-08-23, when he revised the brief above it -- it answers the new
+    glider banter now, so the pill follows the brief. He also asked for Joseph's "Master your
     skills" and "You got this" one second apart at 3:39 and 3:40 — a pill
     needs 2.2 s to be read, so they could never both play. The later
     5:59 → 6:14 pass replaced them on the same face shots and neither ever
@@ -116,16 +153,25 @@ Then rebuild the manifest (never hand-edit the JSON):
 [late_rochaporto_move] rochaporto @ 6:25.750 +2.2: We need to move!
   - seen_at_src: 119.716
 
-[late_metrics_cluster] jrsapi @ 6:28.300 +2.75: Projects Teams Metrics are strong They just need mentoring in the right skills
+[late_metrics_cluster] jrsapi @ 6:28.300 +2.2: Projects Teams Metrics are strong
   - seen_at_src: 122.266
+
+>> THE SECOND HALF OF JRSAPI'S LINE PLAYS AFTER KARENA'S, not before it.
+The owner split "Projects Teams Metrics are strong / They just need
+mentoring in the right skills" into two pills, and there are 3.0 s between
+this seat and karena's -- two readable pills need 5.2. Karena's "Like
+cardio!" is an authored beat and does not move, so the second half takes
+the clear air after her instead. <<
 
 [late_karena_cardio] karena @ 6:31.300 +2.2: Like cardio!
   - seen_at_src: 125.266
   - avatar: null
   - avatar_url: null
 
+[late_metrics_mentoring] jrsapi @ 6:34.000 +2.8: They just need mentoring in the right skills
+
 ## 6:45
-! [late_poor_technical_decisions] POOR TECHNICAL DECISIONS |
+! [late_poor_technical_decisions] YOUR POOR TECHNICAL DECISIONS |
 
     The red flash. Owner, 2026-08-20: it goes to 6:45 on the programme
     clock. The trailing `|` keeps the second-row slot: it renders as lorem
@@ -143,15 +189,28 @@ Then rebuild the manifest (never hand-edit the JSON):
 
 ## 6:58.300
 
-[late_jrsapi_notes] jrsapi @ 6:58.300 +2.6: Shit are you taking notes?
+[late_jrsapi_notes] jrsapi @ 6:58.300 +2.6: I still don't know which Ricardo this is
   - seen_at_src: 152.266
+
+>> "Timed to when the hunter shows off with the hoodie pulloff." -- owner,
+2026-08-23, about the line above. It is already pinned at 6:58.300; whether
+that is the pulloff frame is a judgement about a picture, so it is left
+where he put it and flagged for his eye. <<
 
 [toc_karena] Karena @ 7:01.333 +3.2: One hundred thousand bootc volunteers, ready to power up
 
-[toc_joseph_worth] Joseph @ 7:04.783 +2.2: Is it worth it?
+[toc_joseph_worth] Joseph @ 7:04.783 +2.2: The gamers would have to impress BOTH Ricardos
   - cast: joseph_sandoval
 
-[toc_ricardo] Ricardo @ 7:07.233 +2.4: You really think they can save open source?
+    ONE PILL, NOT TWO. The owner wrote "BOTH Ricardos" on its own line, but
+    this exchange is chained backward from the walk's first frame and has
+    7.033 s for three cards needing 7.100 -- there is no room for a fourth,
+    and no authored beat here may be slid to make one. It is one sentence
+    with no punctuation between the halves, so every word he wrote reaches
+    the screen; only the line break does not. `tools/readtime.py` will call
+    the hold short, which is a report, not a re-time.
+
+[toc_ricardo] Ricardo @ 7:07.233 +2.4: Look man I am so tired just jump
   - cast: rochaporto
 
     THE EXCHANGE BELONGS TO THE WALK, and its seats were chained backward
@@ -173,6 +232,12 @@ Then rebuild the manifest (never hand-edit the JSON):
     portrait; Karena has no recorded avatar, so she gets the drawn crest by
     omission rather than by accident. The 2:19 lead-in banner that was to
     open the scene has no copy yet (#98), so the first line takes its slot.
+
+>> "It could be either one" HAS NOWHERE TO GO, and it is in the overflow
+below. Its own question clears at 7:00.900 and Karena is pinned at 7:01.333;
+the next second and a half is a no-plate zone on her jump; and everything
+after that until film 220.966 is The Long Walk, which credits only its own
+speakers. <<
 
     Their three answers — "Dunno, how much faith DO we have in the CNCF?",
     "Cloud native desktop? ...", "LOL" — went out with AN4-CH3CK-12's pass
@@ -198,6 +263,12 @@ Then rebuild the manifest (never hand-edit the JSON):
   - seen_at_src: 199.366
   - avatar_login: A1RM4X
 
+    ONE PILL, as it was. The owner broke the line in two and tagged the
+    second half `[a1irmax]`, a typo for this pill's own speaker, so it is
+    the same person still talking. 7:39.300 clears at 7:41.800 and
+    GloriousEggroll is pinned at 7:42.300; there is no room for a second
+    pill and nothing here may be moved to make one.
+
 [walk_ge_stream] GloriousEggroll @ 7:42.300 +2.2: It's your patch, turn the stream on
   - seen_at_src: 202.366
   - cast: GloriousEggroll
@@ -206,9 +277,15 @@ Then rebuild the manifest (never hand-edit the JSON):
   - seen_at_src: 205.066
   - avatar_login: LionHeartP
 
-[mapped_lionheartp_hardware] LionHeartP @ 7:47.450 +2.7: Why spend the extra dollar to support Linux hardware
+[mapped_wrkode_dibs] wrkode @ 7:47.450 +2.7: Oh dibs on this one
   - seen_at_src: 207.516
-  - avatar_login: LionHeartP
+  - avatar_login: wrkode
+
+    THIS SEAT WAS LIONHEARTP'S "Why spend the extra dollar to support Linux
+    hardware". The owner replaced the line and the speaker on 2026-08-23;
+    the deleted string is in git. `avatar_login` came across from the old
+    line and is corrected here -- left as it was, wrkode would have worn
+    LionHeartP's face.
 
 [walk_ge_glorious] GloriousEggroll @ 7:51.300 +2.8: There's nothing glorious about this job
   - seen_at_src: 211.366
@@ -216,19 +293,35 @@ Then rebuild the manifest (never hand-edit the JSON):
 
 ## 7:59.300
 
-[mapped_lionheartp_together] LionHeartP @ 7:59.300 +3.8: When we work together This gets easier
+[mapped_lionheartp_together] LionHeartP @ 7:59.300 +3.8: When we work together
   - seen_at_src: 219.366
   - avatar_login: LionHeartP
 
+[mapped_wrkode_kairos] wrkode @ 8:03.500 +3.0: Have I shown you Kairos my friend?
+  - avatar_login: wrkode
+
 ## 8:09.300
 
-[mapped_eggroll_title] GloriousEggroll @ 8:09.300 +4.5: Nice work testing that patch Usually Blueberries just Send me a bunch of crap
+[mapped_eggroll_title] lionheartp @ 8:09.300 +2.2: Nice work testing that patch
   - seen_at_src: 229.366
-  - cast: GloriousEggroll
+  - cast: lionheartp
+  - avatar_login: LionHeartP
 
-[mapped_eggroll_didyou] GloriousEggroll @ 8:16.300 +2.2: You didn't test any of this did you.
+[mapped_eggroll_blueberries] lionheartp @ 8:12.000 +3.4: Usually Blueberries just send me a bunch of crap
+  - cast: lionheartp
+  - avatar_login: LionHeartP
+
+    THE OWNER SPLIT ONE 4.5 s PILL INTO TWO and recast it from
+    GloriousEggroll to lionheartp. There was room: 8:09.300 + 4.5 cleared at
+    8:13.800 and the next beat is 8:16.300, so the two halves fit inside the
+    old line's own span plus a beat. The id of the first is kept -- it lost
+    its `[id]` in the rewrite, and an auto-derived id is unstable across
+    edits, which is how a delivered plate loses its seat.
+
+[mapped_eggroll_didyou] lionheartp @ 8:16.300 +2.2: You didn't test any of this did you.
   - seen_at_src: 236.366
-  - cast: GloriousEggroll
+  - cast: lionheartp
+  - avatar_login: LionHeartP
 
 [mapped_pastaq_what_tests] pastaq @ 8:20.300 +2.2: Hey man WHAT tests?
   - seen_at_src: 240.366
@@ -243,8 +336,13 @@ Then rebuild the manifest (never hand-edit the JSON):
 [mapped_redacted_unlearning] [redacted] @ 8:25.300 +2.75: Unlearning bad habits takes time
   - seen_at_src: 290.0
 
-[mapped_redacted_options] [redacted] @ 8:28.300 +6.75: Your options are success Or a lifetime of servitude in the Toilmaster's Packaging Mines
+[mapped_redacted_options] [redacted] @ 8:28.300 +2.75: Your options are success
   - seen_at_src: 293.0
+
+[mapped_redacted_mines] [redacted] @ 8:31.500 +3.55: Or a lifetime of servitude in the Toilmaster's Packaging Mines
+
+    THE SPLIT FITS INSIDE THE OLD PILL'S OWN 6.75 s span (8:28.300 ->
+    8:35.050), and the next beat is karena at 8:35.300, so nothing moves.
 
 [owner_convo_karena] karena @ 8:35.300 +2.867: The Kube always seeks open source potential
   - seen_at_src: 300.0
@@ -283,6 +381,36 @@ Then rebuild the manifest (never hand-edit the JSON):
 
 [mapped_kolunmi_users] kolunmi @ 9:17.683 +2.6: Are those ... other linux users?
 
+>> ACT II IS FULL, AND THIS IS WHERE IT RAN OUT. The owner wrote eighteen
+new lines into the 9:12 -> 9:40 stretch on 2026-08-23. Between kolunmi's
+"other linux users?" and Owen's "Slay out, Queen!" there is 6.97 seconds
+of clear air once her own nameplate has been up -- two readable pills.
+Every other second in this act is an authored beat that may not be slid.
+Two are seated below, two more in the air the deleted "Disco!" left before
+the HATERS splash, and five in the stretch after Kyle's reveal. The other
+eight, and two more from earlier in the act, are recorded verbatim under "OVERFLOW" further down -- reported,
+never dropped -- and filed as one issue so he can say what gives. <<
+
+[chat_amber_dungeon] akgraner @ 9:25.433 +2.2: Oh wow I forgot what the starter dungeon was like! Hi!
+  - avatar_login: akgraner
+
+    "AMBER" IS AKGRANER. The owner tagged these lines `[amber]` and others
+    in the same scene `[akgraner]`; the act's own `mapped_amber_reveal`
+    nameplate names her Amber Graner, so they are one person and she keeps
+    her face rather than losing it to a first name.
+
+    THE SEATS ARE BEHIND HER NAMEPLATE. That reveal and the plate beside it
+    hold the left lane, which is where a pill sits, until film 281.433, so
+    her first words open the moment her name clears -- which is the right
+    beat anyway.
+
+[chat_amber_kyleford] akgraner @ 9:27.883 +2.2: Which one of you is Kyleford?
+  - avatar_login: akgraner
+
+    "Kyleford" is the owner's spelling and is reproduced. This line takes
+    over the question the act used to ask at 9:49.353 -- akgraner's "Which
+    one of you is Kyle?", which he rewrote to "Extinction is the Rule".
+
 ## 9:32.203
 
 [mapped_owen_slay] Owen @ 9:32.203 +2.2: Slay out, Queen!
@@ -291,28 +419,39 @@ Then rebuild the manifest (never hand-edit the JSON):
 [mapped_akgraner_kindness_1] akgraner @ 9:34.653 +2.2: Kindness is doing what's right
   - scale: 1.18
 
-[mapped_akgraner_kindness_2] akgraner @ 9:37.103 +2.2: For the ecosystem.
+[mapped_akgraner_kindness_2] akgraner @ 9:37.103 +2.2: For the ecosystem
   - scale: 1.18
 
-[mapped_akgraner_kindness_3] akgraner @ 9:39.553 +2.2: For our users.
+[mapped_akgraner_kindness_3] akgraner @ 9:39.553 +2.2: For our users
   - scale: 1.18
 
-[mapped_akgraner_kindness_4] akgraner @ 9:42.003 +2.2: And for our maintainers.
+[mapped_akgraner_kindness_4] akgraner @ 9:42.003 +2.2: And for our maintainers
   - scale: 1.18
 
-[mapped_akgraner_kindness_5] akgraner @ 9:44.453 +2.2: Don't be nice.
+[mapped_akgraner_kindness_5] akgraner @ 9:44.453 +2.2: Don't be nice
   - scale: 1.18
 
-[mapped_akgraner_kindness_6] akgraner @ 9:46.903 +2.2: Be kind.
+[mapped_akgraner_kindness_6] akgraner @ 9:46.903 +2.2: Be kind
   - scale: 1.18
 
-[mapped_which_kyle] akgraner @ 9:49.353 +2.6: Which one of you is Kyle?
+[mapped_which_kyle] akgraner @ 9:49.353 +2.6: Extinction is the Rule
   - scale: 1.0
 
-## 9:57.000
+## 9:52.203
 
-[mapped_kolunmi_disco] kolunmi @ 9:57.000 +2.2: Disco!
-  - seen_at_src: 329.73
+>> THE AIR "DISCO!" LEFT. kolunmi's "Disco!" was deleted at 9:57.000 on
+2026-08-23; two take the stretch it freed. It is 5.05 s, film
+308.153 -> 313.200, so "Take out the trash" does not fit and is in the
+overflow below. <<
+
+[chat_amber_problem] akgraner @ 9:52.203 +2.2: Oh I see your problem
+  - avatar_login: akgraner
+
+[chat_cortney_solid] cortney @ 9:54.653 +2.2: And we're gonna do you a solid
+  - avatar_login: CortNick
+
+    The owner wrote the speaker as `https://github.com/CortNick [cortney]`.
+    The login resolves the portrait; the name row prints what he typed.
 
 ## 10:00
 ! [mapped_haters] HATERS |
@@ -344,7 +483,8 @@ Then rebuild the manifest (never hand-edit the JSON):
     exchange. That is the fourth class in AGENTS.md: a gate refusing a seat
     is not permission to move an authored beat. It was reverted, and the
     assertion that provoked it is gone — an overrun is reported now, never
-    raised.
+    raised. ("Disco!" itself was deleted on 2026-08-23; the warning stands,
+    because the seat it protects has not moved.)
 
     `bond_of` puts it in the deck's bonded-pair shape: his nameplate holds
     the left lane, the pill takes the RIGHT. The owner locked both TIMES
@@ -353,3 +493,62 @@ Then rebuild the manifest (never hand-edit the JSON):
     top of each other for the pill's last 0.43 s, since the nameplate
     arrives at 318.737. Right lane, same seats: the pair reads as the site's
     GUARDIAN BOND composition.
+
+## 10:05.937
+
+>> THE BLOCK THE OWNER WROTE UNDER "Slay out, Queen!". There is no air
+there -- akgraner's six kindness pills run 9:34.653 to 9:51.953 without a
+gap -- but film 321.937 -> 334.553, after Kyle's reveal and before
+EyeCantCU's, holds exactly these five. Same scene, a beat later. <<
+
+[chat_kyle_bobonomics] kyle @ 10:05.937 +2.2: I'm not calling this Bobonomics
+  - avatar: null
+  - avatar_url: null
+
+[chat_kyle_movie] kyle @ 10:08.387 +2.2: We had to make this movie
+  - avatar: null
+  - avatar_url: null
+
+[chat_nwoods3_seen] nwoods3 @ 10:10.837 +2.2: I feel seen
+  - avatar_login: nwoods3
+
+    The owner wrote the speaker as `https://github.com/nwoods3`; the URL
+    resolves the login and the portrait, and never reaches a frame.
+
+[chat_eva_level] Eva @ 10:13.287 +2.2: Hey did you see how we just loaded up in a new level?
+  - avatar: null
+  - avatar_url: null
+
+[chat_hikari_warframe] Hikari @ 10:15.737 +2.366: Finally, I can play WARFRAME!
+  - avatar: null
+  - avatar_url: null
+
+>> OVERFLOW -- TEN LINES THE OWNER WROTE ON 2026-08-23 THAT THIS ACT HAS NO ROOM FOR.
+Not a heading the parser reads -- there is no time on it, so nothing below
+reaches a frame. They are here, verbatim, because copy that exists only in a
+diff is copy that gets lost, and because the choice of what gives is his:
+lengthen a hold, cut an existing beat, or let these go.
+
+  jrsapi:   It could be either one
+  akgraner: [Redacted] Sent me.
+  akgraner: Who writes this crap?
+  Eve:      I'm sorry it's just like, why are people so sweaty?
+  kyle:     castrojo killed me in Halo today
+  noel:     I feel seen
+  akgraner: Ok well, it gets harder from here on out
+  cortney:  Take out the trash
+  akgraner: Those kinds of people will not be there when it matters the most
+  akgraner: Trust me, I have the scars to prove it
+
+The owner tagged two of these `[amber]` and two `[akgraner]`; they are the
+same person, so they are listed under the login her nameplate already
+carries. "kyle" is lowercase and deliberately NOT KyleGospo, who speaks at
+8:43.750 and 10:00.767 with his own face -- a second Kyle, uncast, because
+giving him that portrait would put a real person's face on somebody else's
+line.
+
+Also unresolved: "Eve" above and "Eva" at 10:13.287 may be the same person,
+and `Hikari` at 10:15.737 may be the act's existing `HikariKnight`, who
+already speaks at 9:02.183 and 9:15.233 with his own portrait. Neither is
+guessed -- naming either would credit a real person on a hunch, so both
+render uncast until the owner says. <<
