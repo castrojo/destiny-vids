@@ -1142,3 +1142,87 @@ def test_a_master_built_outside_this_history_is_named_foreign(monkeypatch):
     r = deliver.ActReport(act)
     deliver.check_provenance({}, r)
     assert [f.state for f in r.findings] == [deliver.UNDECLARED]
+
+
+def test_every_act_declares_what_picture_it_was_cut_from():
+    """REGRESSION: four of nine acts could not answer #229's question.
+
+    `footage` is the only rung that can see `media/` and the project folders,
+    because git cannot -- so an act with no `footage` has nothing that would
+    notice its picture being replaced under it. Acts IV, V and VII were in
+    that state not because nobody typed the key, but because
+    `tools/footage.py` resolved ids under `media/` alone while their picture
+    lives beside their own master. Act VIII declares `[]`: it is drawn, not
+    filmed, and "no picture" is an answer where "undeclared" is not.
+    """
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    undeclared = [n for n, m in masters.items() if m.get("footage") is None]
+    assert not undeclared, (
+        "these acts cannot tell whether they were cut from picture that has "
+        f"since been replaced: {', '.join(sorted(undeclared))}. Declare "
+        "`footage` (or `[]` with a `footage_note` when the act is drawn)")
+
+
+def test_an_act_with_no_footage_says_so_out_loud():
+    """`[]` is a claim and needs a reason; it must not be a shrug."""
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    for numeral, master in masters.items():
+        if master.get("footage") == []:
+            assert master.get("footage_note"), (
+                f"act {numeral} declares no footage but records no reason")
+
+
+def test_footage_resolves_a_source_staged_beside_its_master(tmp_path):
+    """REGRESSION: half the show's picture is not in `media/` at all.
+
+    Acts IV, V and VII cut from a project directory next to their own master
+    (`<project>/sources/<file>`, and Europa's `nimbatus-review/...` legs), so
+    while `resolve` looked only under `media/` those acts could not declare
+    `footage` -- declaring it reported MISSING forever, which is why they were
+    left undeclared and unprotected instead.
+    """
+    project = tmp_path / "wolves-kat"
+    (project / "sources").mkdir(parents=True)
+    src = project / "sources" / "det0BbS_9GU.mkv"
+    src.write_bytes(b"picture")
+
+    media = tmp_path / "media"
+    media.mkdir()
+
+    assert footage.resolve("sources/det0BbS_9GU.mkv", media_dir=media) is None
+    assert footage.resolve("sources/det0BbS_9GU.mkv", media_dir=media,
+                           roots=[project]) == src
+    assert footage.missing(["sources/det0BbS_9GU.mkv"], media_dir=media,
+                           roots=[project]) == []
+
+
+def test_media_still_wins_and_a_bare_id_still_tries_every_container(tmp_path):
+    """The extra roots are additive: `media/` keeps its meaning and order."""
+    media = tmp_path / "media"
+    media.mkdir()
+    (media / "yt_trailers.mkv").write_bytes(b"in media")
+    other = tmp_path / "project"
+    other.mkdir()
+    (other / "yt_trailers.mp4").write_bytes(b"beside the master")
+
+    assert footage.resolve("yt_trailers", media_dir=media,
+                           roots=[other]).name == "yt_trailers.mkv"
+
+
+def test_a_replaced_project_source_moves_the_footage_digest(tmp_path):
+    """The whole point: a remaster landing in a project folder is now visible."""
+    project = tmp_path / "wolves-kat"
+    (project / "sources").mkdir(parents=True)
+    src = project / "sources" / "det0BbS_9GU.mkv"
+    src.write_bytes(b"the 1080p rung")
+    media = tmp_path / "media"
+    media.mkdir()
+
+    ids = ["sources/det0BbS_9GU.mkv"]
+    before = footage.footage_digest(ids, media_dir=media, roots=[project])
+    src.write_bytes(b"the 4K remaster")
+    after = footage.footage_digest(ids, media_dir=media, roots=[project])
+
+    assert before != after

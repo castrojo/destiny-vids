@@ -53,17 +53,36 @@ def cache_path():
     return xdg_cache("DESTINY_FOOTAGE_CACHE", "footage-digests.json")
 
 
-def resolve(video_id, media_dir=None):
+def resolve(video_id, media_dir=None, roots=None):
     """The file for a video_id, whatever container it landed in.
+
+    `roots` are searched after `media/`, and exist because half the show is
+    not cut from `media/` at all: acts IV, V and VII take their picture from
+    a project directory beside their own master (`<project>/sources/...`,
+    `<project>/nimbatus-review/...`). Those acts could not declare `footage`
+    while this looked in exactly one place, so the rung that answers "was this
+    act cut from picture that has since been replaced" was structurally
+    unavailable to them -- which is the same #229 hole it was built to close,
+    still open on four of nine acts.
+
+    An entry that already carries a suffix is taken as the filename it is:
+    a project source is pinned by name in the act's own manifest, so there is
+    no container to guess at. A bare id keeps the media/ behaviour of trying
+    each container in preference order.
 
     Returns None when nothing matches -- an absent master is drift to report,
     not an exception to raise, which is the same call `source_digest` makes.
     """
-    media = Path(media_dir) if media_dir else MEDIA
-    for ext in EXTENSIONS:
-        candidate = media / f"{video_id}{ext}"
-        if candidate.exists():
-            return candidate
+    search = [Path(media_dir) if media_dir else MEDIA]
+    search += [Path(r).expanduser() for r in (roots or [])]
+    for root in search:
+        named = root / video_id
+        if named.suffix and named.exists():
+            return named
+        for ext in EXTENSIONS:
+            candidate = root / f"{video_id}{ext}"
+            if candidate.exists():
+                return candidate
     return None
 
 
@@ -102,7 +121,7 @@ def file_digest(path):
     return digest
 
 
-def footage_digest(video_ids, media_dir=None):
+def footage_digest(video_ids, media_dir=None, roots=None):
     """One digest over an act's footage inputs, in declared order.
 
     A missing master hashes as absent rather than raising, so a replaced or
@@ -112,17 +131,17 @@ def footage_digest(video_ids, media_dir=None):
     h = hashlib.sha256()
     for video_id in video_ids:
         h.update(video_id.encode())
-        path = resolve(video_id, media_dir)
+        path = resolve(video_id, media_dir, roots)
         h.update(file_digest(path).encode() if path else b"\0absent")
     return h.hexdigest()
 
 
-def missing(video_ids, media_dir=None):
-    """The declared ids with no file in media/, in declared order."""
-    return [v for v in video_ids if resolve(v, media_dir) is None]
+def missing(video_ids, media_dir=None, roots=None):
+    """The declared ids with no file in media/ or `roots`, in declared order."""
+    return [v for v in video_ids if resolve(v, media_dir, roots) is None]
 
 
-def newer_than(video_ids, path, media_dir=None):
+def newer_than(video_ids, path, media_dir=None, roots=None):
     """The declared masters modified AFTER `path` was written.
 
     A delivered act that is older than its own footage was cut from a file
@@ -136,7 +155,7 @@ def newer_than(video_ids, path, media_dir=None):
     cutoff = path.stat().st_mtime
     out = []
     for video_id in video_ids:
-        found = resolve(video_id, media_dir)
+        found = resolve(video_id, media_dir, roots)
         if found and found.stat().st_mtime > cutoff:
             out.append(video_id)
     return out

@@ -84,10 +84,53 @@ def _gates_a_render_on_bare_existence(path):
         rendered = [
             c.func.id for c in ast.walk(node)
             if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)
-            and "render" in c.func.id and "card" in c.func.id.lower()
+            and "render" in c.func.id
+            and ("card" in c.func.id.lower() or "plate" in c.func.id.lower())
         ]
         if rendered:
             offenders.append(f"{path.name}:{node.lineno} gates {rendered[0]}")
+    return offenders
+
+
+def _imports_freshness(tree):
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if (node.module and "freshness" in node.module) or any(
+                    a.name == "freshness" for a in node.names):
+                return True
+        elif isinstance(node, ast.Import):
+            if any("freshness" in a.name for a in node.names):
+                return True
+    return False
+
+
+def _asks_only_whether_a_plate_is_there(path):
+    """`.exists()` on a plate/card PNG in a module that never asks its age.
+
+    The `if`-shaped gate above is one spelling of "existence is not freshness".
+    `scripts/build_ending_overlays.py` shipped a different spelling -- a list
+    comprehension filtering on `card_path(...).exists()` -- which the AST walk
+    above cannot see, because there is no `if` and no `render_*` call to find.
+
+    So this asks the blunter structural question instead: a builder that
+    decides anything from whether a plate PNG is on disk has to have an
+    opinion about whether that PNG is CURRENT, and the only way to hold one
+    is `tools.freshness`. Reporting the staleness counts; a builder is not
+    required to block on it (AGENTS.md: degrade, never block).
+    """
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    if _imports_freshness(tree):
+        return []
+    offenders = []
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "exists"):
+            continue
+        subject = ast.unparse(node.func.value).lower()
+        if "card" in subject or "plate" in subject:
+            offenders.append(f"{path.name}:{node.lineno} "
+                             f"{ast.unparse(node)[:60]}")
     return offenders
 
 
@@ -104,4 +147,29 @@ def test_no_builder_gates_a_card_render_on_bare_existence(script):
     offenders = _gates_a_render_on_bare_existence(script)
     assert not offenders, (
         "existence is not freshness -- use tools/freshness.needs_render():\n  "
+        + "\n  ".join(offenders))
+
+
+@pytest.mark.parametrize(
+    "script", sorted((REPO / "scripts").glob("build_*.py")),
+    ids=lambda p: p.name)
+def test_a_builder_that_reads_plate_pngs_has_an_opinion_on_their_age(script):
+    """REGRESSION: `build_ending_overlays.py` burned plates on existence alone.
+
+    Its `missing_cards()` asked only whether each `plate_<id>.png` was on
+    disk, so plates drawn before their own copy changed were composited into
+    the master with every gate green -- the same failure `tools/freshness.py`
+    was written for, one builder over, in the code path that puts eleven
+    closing lines about real people on screen.
+
+    The `if`-shaped test above could not see it: a comprehension filter is not
+    an `ast.If`. This one is structural instead -- read a plate PNG's
+    existence, and you must import `tools.freshness` and say something about
+    whether it is current.
+    """
+    offenders = _asks_only_whether_a_plate_is_there(script)
+    assert not offenders, (
+        f"{script.name} decides something from whether a plate PNG exists, "
+        "but never asks whether it is older than what draws it. Import "
+        "tools.freshness and report (or redraw) the stale ones:\n  "
         + "\n  ".join(offenders))

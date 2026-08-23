@@ -81,10 +81,27 @@ def _authored_identities():
 @pytest.mark.parametrize("path", _manifest_paths(),
                          ids=lambda p: str(p.relative_to(REPO_ROOT)))
 def test_committed_plates_match_their_binding_chrome(path):
-    by_name = _authored_identities()
-    problems = []
+    problems = _chrome_problems(_entries(path), _authored_identities())
 
-    for entry in _entries(path):
+    assert not problems, (
+        f"{path.relative_to(REPO_ROOT)} disagrees with vocab/casting.yaml on "
+        "plate chrome. The vocab wins a conflict: fix the manifest, edit the "
+        "binding, or record the decision with a `copy_override` carrying a "
+        "`decided_by` issue URL.\n  " + "\n  ".join(problems)
+    )
+
+
+def _chrome_problems(entries, by_name):
+    """Every entry whose chrome disagrees with the binding it credits.
+
+    THE comparison -- the parametrized sweep over the committed manifests and
+    the two miniature regressions below all run this one function. They used
+    to assert on dicts they had just built themselves (`False != True`), which
+    is a tautology wearing a guard's name: it could not fail, so it could not
+    notice the comparison it was named after regressing.
+    """
+    problems = []
+    for entry in entries:
         name = entry["name"]
         if name not in by_name:
             continue
@@ -105,13 +122,7 @@ def test_committed_plates_match_their_binding_chrome(path):
                     f"{field}={got!r}, but the `{character}` binding in "
                     f"vocab/casting.yaml says {field}={want!r}"
                 )
-
-    assert not problems, (
-        f"{path.relative_to(REPO_ROOT)} disagrees with vocab/casting.yaml on "
-        "plate chrome. The vocab wins a conflict: fix the manifest, edit the "
-        "binding, or record the decision with a `copy_override` carrying a "
-        "`decided_by` issue URL.\n  " + "\n  ".join(problems)
-    )
+    return problems
 
 
 def test_the_gate_catches_a_dropped_trustee():
@@ -122,13 +133,22 @@ def test_the_gate_catches_a_dropped_trustee():
     the treatment it was granted -- and the runtime guard says nothing.
     """
     by_name = _authored_identities()
-    if "Bob Killen" not in by_name:
-        pytest.skip("the osiris binding no longer carries authored copy")
+    assert "Bob Killen" in by_name, (
+        "the osiris binding no longer carries authored copy -- this guard "
+        "needs a new fixture rather than a skip, or it stops guarding")
     _, bound = by_name["Bob Killen"]
     assert bound.get("trustee") is True, "the fixture this test relies on moved"
 
     dropped = {"id": "x", "name": "Bob Killen"}
-    assert dropped.get("trustee", False) != bound.get("trustee", False)
+    problems = _chrome_problems([dropped], by_name)
+    assert problems, "a card that drops Bob Killen's trustee flag went unseen"
+    assert "trustee" in problems[0]
+
+    # ...and a card carrying the binding's own chrome is clean, so the guard is
+    # discriminating rather than merely noisy.
+    kept = {"id": "x", "name": "Bob Killen"}
+    kept.update({f: bound[f] for f in CHROME_DEFAULTS if f in bound})
+    assert not _chrome_problems([kept], by_name)
 
 
 def test_the_gate_catches_a_stolen_leader_variant():
@@ -136,8 +156,13 @@ def test_the_gate_catches_a_stolen_leader_variant():
     by_name = _authored_identities()
     plain = [(name, copy) for name, (_, copy) in by_name.items()
              if not copy.get("variant")]
-    if not plain:
-        pytest.skip("every authored identity carries a variant")
-    name, bound = plain[0]
+    assert plain, (
+        "every authored identity carries a variant -- this guard needs a new "
+        "fixture rather than a skip, or it stops guarding")
+    name, _bound = plain[0]
     stolen = {"id": "x", "name": name, "variant": "leader"}
-    assert stolen.get("variant", None) != bound.get("variant", None)
+    problems = _chrome_problems([stolen], by_name)
+    assert problems, f"a card stealing `leader` chrome for {name!r} went unseen"
+    assert "variant" in problems[0]
+
+    assert not _chrome_problems([{"id": "x", "name": name}], by_name)

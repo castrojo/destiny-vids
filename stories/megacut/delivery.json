@@ -92,6 +92,9 @@
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
+   "footage": [
+    "sources/det0BbS_9GU.mkv"
+   ],
    "note": "REPO-DRIVEN AS OF #152's act IV pass. The words, the windows and the measured build parameters are committed in stories/04-kat-plates.json and scripts/build_kat.py rebuilds the film from them -- verified against this master: the AUDIO IS BIT-IDENTICAL (same stream MD5) and 1167 of 2040 frames are bit-identical, every differing frame falling inside a dialogue-plate window because the pills are re-rendered by tools/plate.py rather than screenshotted from plate.html (overall SSIM 0.9973, worst frame 0.9887). The nameplate card is NOT repo-rendered and is consumed from the project folder; see the manifest's `_not_repo_rendered`.",
    "sources": [
     "stories/04-kat-plates.json",
@@ -102,10 +105,14 @@
    ],
    "source_digest": "9af0e3f9ce0c52483a73340f2bf7d54064f297ade70708fe48f680fad5615ca3",
    "rebuild": "python3 scripts/build_kat.py",
-   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
+   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
+   "footage_digest": "60f24af4c12ea8a9973aaf76b1602dee7cca177620d58d3c369aa8439b1269f4"
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
+   "footage": [
+    "sources/owner-f3JuiIei4r0.mp4"
+   ],
    "note": "REPO-DRIVEN AS OF #152's act V pass, the same shape act IV got first. The words, the windows and the measured build parameters are committed in stories/05-natali-plates.json and scripts/build_natali.py rebuilds the film from them -- verified against this master: the AUDIO IS BIT-IDENTICAL (same stream MD5) and 676 of 1514 frames are bit-identical, every differing frame falling inside a dialogue-plate window because the pills are re-rendered by tools/plate.py rather than screenshotted from plate.html (worst frame 0.9873). The reveal card and the closing fade are untouched. The nameplate is NOT repo-rendered; see the manifest's `_not_repo_rendered`.",
    "sources": [
     "stories/05-natali-plates.json",
@@ -116,7 +123,8 @@
    ],
    "source_digest": "6d887696a76a456770961e08d79a326f2b529bd74472d5b3f50743427761cbd1",
    "rebuild": "python3 scripts/build_natali.py",
-   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
+   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
+   "footage_digest": "b18bdaaf50692c0897aba07e91ac31c2c3b67c77b18606450554dc231eec07cf"
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v9.mp4",
@@ -148,7 +156,13 @@
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
-   "note": "1:35.400. The comic cover (95.333333-108.333333) is CUT: it is act VIII's reveal now (#178), and playing it twice made the second one the weaker. The Exo walk-up keeps only the solo wide (source 114.767 through the original cut at 116.958) -- the close-up that introduced the other two Guardians is out, and the join to the wrap is a HARD CUT: no walk-up fade_out, no wrap fade_in. The KubeCon announcement overlay is RETIRED (owner 2026-08-16); the underlying Jupiter wrap remains, and the act still ends on the wrap's own fade-to-black, with a 2.5 s audio fade (92.833333 + 2.5) landing the outro with the picture. Picture is STREAM-COPIED from the -1.1 dBTP master (#82); no generation added. REPO-DRIVEN since the terse-pass re-render (#102, fixes #152 for act VII): plates are house pills rendered from the committed record by scripts/build_europa.py via scripts/actbuild.py. AUDIO REPLACED (owner, 2026-08-20): the master on disk is a remux of that picture with Beauty of the Beast from 465.0 s (7:45) playing straight to picture end -- full replacement, no crossfade, no fades -- from the same staged vocal rung (X3WrCzLIIvk). stories/07-europa-plates.json's audio block predates this; a build_europa.py run would rebuild the OLD mix until the block is re-authored.",
+   "footage": [
+    "wolves-directors-cut-europa-intro-hq.mp4",
+    "sources/Act2-BeyondLight-reveal-T9FIbmj1Qf0-1080p24-2262k.mp4",
+    "nimbatus-review/jupiter/cand/PIA22906_nasa.mp4",
+    "nimbatus-review/ext/wrap1080.mp4"
+   ],
+   "note": "1:35.400. The comic cover (95.333333-108.333333) is CUT: it is act VIII's reveal now (#178), and playing it twice made the second one the weaker. The Exo walk-up keeps only the solo wide (source 114.767 through the original cut at 116.958) -- the close-up that introduced the other two Guardians is out, and the join to the wrap is a HARD CUT: no walk-up fade_out, no wrap fade_in. The KubeCon announcement overlay is RETIRED (owner 2026-08-16); the underlying Jupiter wrap remains, and the act still ends on the wrap's own fade-to-black, with a 2.5 s audio fade (92.833333 + 2.5) landing the outro with the picture. Picture is STREAM-COPIED from the -1.1 dBTP master (#82); no generation added. REPO-DRIVEN since the terse-pass re-render (#102, fixes #152 for act VII): plates are house pills rendered from the committed record by scripts/build_europa.py via scripts/actbuild.py. AUDIO REPLACED (owner, 2026-08-20): the master on disk is a remux of that picture with Beauty of the Beast from 465.0 s (7:45) playing straight to picture end -- full replacement, no crossfade, no fades -- from the same staged vocal rung (X3WrCzLIIvk). stories/07-europa-plates.json's audio block DESCRIBES this mix as of #328: a build_europa.py run now rebuilds the song the owner shipped, and tests/test_europa_act.py pins the 465.0-560.4 window so a rebuild cannot silently revert the act again.",
    "sources": [
     "stories/07-europa-plates.json",
     "scripts/build_europa.py",
@@ -159,10 +173,13 @@
    ],
    "source_digest": "db1ebac632212d4fbe81182ac657035234a228f0103fa508812d57e8ffbd6cda",
    "rebuild": "python3 scripts/build_europa.py",
-   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
+   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
+   "footage_digest": "d22c307e1c824644364ab1e2f6fd372be916cce45f89ef8fe51efdc22a01a2bd"
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
+   "footage": [],
+   "footage_note": "no footage inputs: act VIII carries no filmed picture at all. It is drawn -- contributor walls, placards, the wallpaper cycle and the comic reveal, all rendered from stories/08-credits.json by tools/credits.py. Declared empty rather than left undeclared so the difference between AN ACT WITH NO PICTURE and AN ACT NOBODY HAS DECLARED YET is on the record.",
    "note": "8:52.504. Act VIII, the credits (#51): a call to action before the comic reveal, the credits after it, a second bed pass with vocals, and four upstream projects. Runs on the Bluefin DAY wallpapers over the same white-on-blue deck. Encoded to the DELIVERY SPEC (59.94, high@4.2, bt709) so the megacut joins it by stream copy rather than conforming it at assembly time.",
    "sources": [
     "stories/08-credits.json",
