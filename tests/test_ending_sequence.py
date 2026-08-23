@@ -122,12 +122,24 @@ def test_ending_template_has_safe_emphasis_and_placement_hooks():
     assert "window.__renderReady = true" in source
 
 
-def test_mission_is_larger_and_bird_card_moves_right_and_down():
+def test_mission_is_larger_and_the_raptor_cards_sit_bottom_right():
+    """Owner, 2026-08-22: "don't block the raptor. bottom right instead."
+
+    Both dusk wallpapers put the silhouette in the left of frame, so the two
+    cards that sit on them are seated in the lower-right quadrant and their
+    rule moves to the right edge. Pinning the hooks *and* the seat keeps a
+    later restyle from quietly walking the type back across the bird.
+    """
     template = TEMPLATE.read_text()
     assert "document.body.dataset.cardId = card.id" in template
     assert 'body[data-card-id="mission"]' in template
     assert 'body[data-card-id="purpose"]' in template
-    assert "translate(8vw, 7vh)" in template
+    assert 'body[data-card-id="lesson"]' in template
+    assert "translate(8vw, 7vh)" not in template
+    assert "align-items: flex-end" in template
+    assert "justify-content: flex-end" in template
+    assert "text-align: right" in template
+    assert "border-right: 2px solid var(--wc-gold)" in template
 
 
 def test_pause_cards_match_act_slide_chrome_without_darkening_wallpapers():
