@@ -392,3 +392,69 @@ def test_every_act_slide_holds_the_same_length():
     durs = {round(float(i["dur"]), 3)
             for i in plan["items"] if i["kind"] == "card"}
     assert len(durs) == 1, f"act slides hold different lengths: {sorted(durs)}"
+
+
+def test_a_card_removed_from_the_manifest_is_reported_as_an_orphan(tmp_path,
+                                                                   monkeypatch):
+    """REGRESSION: a removed card's PNG outlives the decision to remove it.
+
+    `renders/` is gitignored, so nothing sweeps it. c-cortney.png was drawn on
+    2026-08-15, cut from the interruption the same week, and was still sitting
+    in renders/interruption eight days later -- a card naming a real person
+    that the cut no longer contains, in a directory whose slot lookup reads by
+    filename. Reading the directory called it merely stale, forever. Reading
+    the manifest says the truer thing: nobody owns it.
+    """
+    import sys
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    import build_wolves
+
+    out = tmp_path / "interruption"
+    out.mkdir()
+    manifest = tmp_path / "cards.json"
+    manifest.write_text(json.dumps({"cards": [{"id": "a-silence"}]}))
+    os.utime(manifest, (0, 0))
+    (out / "a-silence.png").write_bytes(b"declared")
+    (out / "c-cortney.png").write_bytes(b"removed from the manifest")
+
+    monkeypatch.setattr(build_wolves, "CARD_SOURCES", {
+        out: {"inputs": [manifest],
+              "declared": lambda: ["a-silence.png"]},
+    })
+
+    said = []
+    stale = build_wolves.report_stale_cards(log=said.append)
+
+    orphans = [m for m in said if "ORPHAN CARD" in m]
+    assert len(orphans) == 1, said
+    assert "c-cortney.png" in orphans[0]
+    assert not any("a-silence" in m for m in said), (
+        "a card the manifest still declares is not an orphan")
+    assert not stale, "the declared card is newer than its manifest"
+
+
+def test_an_orphan_is_not_also_reported_as_stale(tmp_path, monkeypatch):
+    """Two faults, two names. An unowned file has no freshness to assess --
+    calling it stale invites somebody to 'fix' it by redrawing a card that
+    was deliberately cut."""
+    import sys
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    import build_wolves
+
+    out = tmp_path / "interruption"
+    out.mkdir()
+    orphan = out / "c-cortney.png"
+    orphan.write_bytes(b"old")
+    os.utime(orphan, (0, 0))
+    manifest = tmp_path / "cards.json"
+    manifest.write_text(json.dumps({"cards": []}))
+
+    monkeypatch.setattr(build_wolves, "CARD_SOURCES", {
+        out: {"inputs": [manifest], "declared": lambda: []},
+    })
+
+    said = []
+    stale = build_wolves.report_stale_cards(log=said.append)
+
+    assert stale == [], "an unowned file was reported as stale picture"
+    assert any("ORPHAN CARD" in m for m in said)
