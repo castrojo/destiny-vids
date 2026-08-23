@@ -50,15 +50,22 @@ python3 tools/chapter_md.py check 0
   - body: Music by Nightwish | Action by Bungie
   - note: Beat two: identical card with the credit pair made visible, hard-cut in at 15.4 so only the credits appear. Holds, then fades out over 1.4s ending at 22.6 -- clear of the 24.88 cut.
 
-## 0:26.900
+**The mission briefing card is parked, not deleted.** The owner pulled it out
+of the prologue on 2026-08-23 — *"get rid of that thanks for volunteering
+slide"*, *"I will put it somewhere else"* — so it is unseated here and waiting
+for the seat they choose. Its copy is authored and is reproduced verbatim
+below so that re-seating it is a move, never a rewrite. Nothing else moved with
+it; `book-a` stays at 34.0s, which the owner re-confirmed on 2026-08-22.
 
-* [mission-briefing] act @ 0:26.900 +6.74
-  - label: PROJECT BLUEFIN MISSION BRIEFING
-  - title: Thanks for Volunteering
-  - body: Tophee Protocol Quick Insertion // ACTIVATED
-  - body: Agones Cluster // Cycling
-  - body: Mechaphippy Deployment // UNAUTHORIZED
-  - copy_source: owner_supplied
+    id     mission-briefing
+    kind   act
+    dur    6.74
+    label  PROJECT BLUEFIN MISSION BRIEFING
+    title  Thanks for Volunteering
+    body   Tophee Protocol Quick Insertion // ACTIVATED
+    body   Agones Cluster // Cycling
+    body   Mechaphippy Deployment // UNAUTHORIZED
+    copy   owner_supplied
 
 **`book-b` was not moved with `book-a`, and does not need to be.** It opens at
 31.0s and runs to 34.9s, so on paper it starts *before* the card it follows —

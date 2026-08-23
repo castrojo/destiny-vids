@@ -10,24 +10,37 @@ def _load_manifest():
     return json.loads(build_prologue.MANIFEST.read_text())
 
 
-def test_volunteer_briefing_precedes_the_moved_book():
+def test_the_briefing_is_unseated_but_its_copy_is_not_lost():
+    """Owner, 2026-08-23: "get rid of that thanks for volunteering slide",
+    "I will put it somewhere else".
+
+    Unseated is not cancelled. The card must be off the prologue's timeline AND
+    off its picture -- but the words are authored, so re-seating it later has
+    to be a move rather than a rewrite. The parked copy lives in the chapter
+    file; this pins that it is still there, verbatim, and still findable.
+    """
     doc = _load_manifest()
     by_id = {p["id"]: p for p in doc["plates"]}
-    card = by_id["mission-briefing"]
-    assert card == {
-        "id": "mission-briefing", "kind": "act",
-        "at": 26.9, "dur": 6.74,
-        "label": "PROJECT BLUEFIN MISSION BRIEFING",
-        "title": "Thanks for Volunteering",
-        "body": [
-            "Tophee Protocol Quick Insertion // ACTIVATED",
-            "Agones Cluster // Cycling",
-            "Mechaphippy Deployment // UNAUTHORIZED",
-        ],
-        "copy_source": "owner_supplied",
-    }
-    assert by_id["book-a"]["at"] == 34.0
-    assert card["at"] + card["dur"] <= by_id["book-a"]["at"]
+    assert "mission-briefing" not in by_id, "the card is off the prologue"
+    assert "plate_mission-briefing.png" not in build_prologue.filtergraph()
+
+    parked = (build_prologue.REPO_ROOT / "chapters" / "0-prologue.md").read_text()
+    for line in ("PROJECT BLUEFIN MISSION BRIEFING",
+                 "Thanks for Volunteering",
+                 "Tophee Protocol Quick Insertion // ACTIVATED",
+                 "Agones Cluster // Cycling",
+                 "Mechaphippy Deployment // UNAUTHORIZED"):
+        assert line in parked, f"parked copy lost the line {line!r}"
+
+    assert any("unseated from the prologue" in u.lower()
+               for u in doc["unresolved"]), "the unseating is unrecorded"
+
+
+def test_book_a_keeps_the_seat_the_owner_confirmed():
+    """Dropping the briefing frees 26.9 again, but book-a does not go back to
+    it. The 34.0 seat is an authored beat the owner re-confirmed on 2026-08-22,
+    and undoing one needs its own yes (AGENTS.md)."""
+    assert _load_plate("book-a")["at"] == 34.0
 
 
 def _load_plate(id_):
@@ -35,55 +48,29 @@ def _load_plate(id_):
     return {p["id"]: p for p in doc["plates"]}[id_]
 
 
-def test_filtergraph_briefing_before_book():
-    fg = build_prologue.filtergraph()
-    briefing = _load_plate("mission-briefing")
-    book = _load_plate("book-a")
-    briefing_window = (
-        f"enable=between(t\\,{briefing['at']:.3f}\\,"
-        f"{briefing['at'] + briefing['dur']:.3f})"
-    )
-    book_window = (
-        f"enable=between(t\\,{book['at']:.3f}\\,"
-        f"{book['at'] + book['dur']:.3f})"
-    )
-    assert briefing_window in fg
-    assert book_window in fg
-    assert fg.index(briefing_window) < fg.index(book_window)
-
-
 def _input_paths(cmd):
     return [cmd[i + 1] for i, arg in enumerate(cmd) if arg == "-i"]
 
 
 def test_filtergraph_reads_manifest_once_and_uses_changed_timing(tmp_path, monkeypatch):
-    """A monkeypatched MANIFEST with swapped/different timings drives the graph.
+    """A monkeypatched MANIFEST with a different book time drives the graph.
 
-    This fails if filtergraph() ever falls back to hard-coded old numbers
-    (briefing 26.9-33.640, book 34.0-40.740) instead of reading the file.
+    This fails if filtergraph() ever falls back to the hard-coded production
+    number (book 34.0-40.740) instead of reading the file.
     """
     modified_manifest = tmp_path / "modified-prologue-plates.json"
     doc = _load_manifest()
     plates_by_id = {p["id"]: p for p in doc["plates"]}
-    # Swap and shift timings so the order and values differ from production.
     plates_by_id["book-a"]["at"] = 50.25
     plates_by_id["book-a"]["dur"] = 4.5
-    plates_by_id["mission-briefing"]["at"] = 40.125
-    plates_by_id["mission-briefing"]["dur"] = 5.25
     modified_manifest.write_text(json.dumps(doc))
 
     monkeypatch.setattr(build_prologue, "MANIFEST", modified_manifest)
 
     fg = build_prologue.filtergraph()
-    book_window = "enable=between(t\\,50.250\\,54.750)"
-    briefing_window = "enable=between(t\\,40.125\\,45.375)"
-
-    assert briefing_window in fg, "briefing window must come from the monkeypatched manifest"
-    assert book_window in fg, "book window must come from the monkeypatched manifest"
-    # Order now flips: book follows briefing in production, but here book is later
-    # than briefing, so the literal string for briefing should appear before book
-    # because briefing at 40.125 is laid down before book at 50.25.
-    assert fg.index(briefing_window) < fg.index(book_window)
+    assert "enable=between(t\\,50.250\\,54.750)" in fg, \
+        "the book window must come from the monkeypatched manifest"
+    assert "enable=between(t\\,34.000\\,40.740)" not in fg
 
     # The suite is offline: no ffmpeg is installed on the CI runner, and
     # command() prefixes the argv with find_ffmpeg(). Stub it so this test
@@ -91,8 +78,8 @@ def test_filtergraph_reads_manifest_once_and_uses_changed_timing(tmp_path, monke
     monkeypatch.setattr(build_prologue, "find_ffmpeg", lambda: ["ffmpeg"])
     cmd = build_prologue.command(Path("day.png"), Path("night.png"))
     inputs = _input_paths(cmd)
-    assert len(inputs) >= 4
-    assert "plate_mission-briefing.png" in str(inputs[3])
+    assert "plate_book-a.png" in str(inputs[3])
+    assert not any("mission-briefing" in str(i) for i in inputs)
 
 
 def test_the_cluster_uploads_carry_every_card_the_filtergraph_overlays(monkeypatch):
@@ -131,3 +118,24 @@ def test_a_failed_cluster_encode_falls_back_instead_of_blocking_the_release(monk
     where = build_prologue.encode(["ffmpeg", "-i", "x"], Path("d.png"), Path("n.png"))
     assert where == "local"
     assert ran == [["ffmpeg", "-i", "x"]], "the fallback runs the identical argv"
+
+
+def test_every_stream_the_filtergraph_reads_has_an_input_behind_it(monkeypatch):
+    """ffmpeg numbers inputs by position, so removing one silently re-points
+    every later `[N:v]` at the wrong file -- or, as here, at no file at all.
+    Dropping the briefing card left `day` and `night` reading [5] and [6] of a
+    six-input command, and the encode died with exit 234 rather than saying so.
+    """
+    import re
+
+    monkeypatch.setattr(build_prologue, "find_ffmpeg", lambda: ["ffmpeg"])
+    cmd = build_prologue.command(Path("day.png"), Path("night.png"))
+    n_inputs = len(_input_paths(cmd))
+
+    read = {int(m) for m in re.findall(r"\[(\d+):[va]\]",
+                                       build_prologue.filtergraph())}
+    assert read, "the graph reads no inputs at all"
+    assert max(read) < n_inputs, (
+        f"the graph reads input [{max(read)}] but only {n_inputs} are passed")
+    assert read >= set(range(n_inputs)), (
+        f"inputs {sorted(set(range(n_inputs)) - read)} are passed but never read")
