@@ -146,6 +146,30 @@ CARD = re.compile(
 # a card's `body` rows keep their order without any punctuation to count.
 ATTR = re.compile(r"^\s*-\s+(?P<key>[A-Za-z_][A-Za-z0-9_]*)\s*:\s?(?P<value>.*)$")
 LOGIN_SHAPE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
+GITHUB_AVATAR = "https://github.com/{login}.png?size=256"
+
+# WHERE A PORTRAIT COMES FROM, AND WHY IT IS NOT TYPED HERE.
+#
+# A pill's picture is a claim about a real person, and this repo keeps those
+# in exactly one place. So a chapter file names the PERSON and the resolution
+# happens here:
+#
+#   - cast: joseph_sandoval     the portrait vocab/casting.yaml records
+#   - avatar_login: KyleGospo   this GitHub account's picture
+#
+# Both are AUTHORING keys: they are consumed here and never reach the
+# manifest, which carries the resolved cache path and the URL beside it as
+# provenance. Pasting the URL into the chapter file instead would make a
+# second copy of a casting fact, and the second copy is always the one that
+# goes wrong.
+#
+# They are two keys because they answer two different questions. `cast` is
+# "whatever the casting record says", which is right for somebody whose
+# portrait is not a GitHub picture at all; `avatar_login` is "this account's
+# picture", which is what act II's owner-seated pills were built from even
+# for people whose casting record names a different image. Collapsing them
+# would silently swap portraits on eight delivered pills.
+PORTRAIT_KEYS = ("cast", "avatar_login")
 
 # Keys whose value is a list even when it appears once: writing one `- body:`
 # row must not produce a bare string where the renderer wants rows.
@@ -767,7 +791,10 @@ def build_entry(act, b, n, line, start, hold, defaults, order=None):
         if resolved is not None:
             entry[key] = resolved
 
-    for key, value in line["attrs"].items():
+    attrs = dict(line["attrs"])
+    portrait = _portrait({key: attrs.pop(key) for key in PORTRAIT_KEYS
+                          if key in attrs})
+    for key, value in attrs.items():
         # An explicit `- key: null` DELETES a field the defaults supplied,
         # which is how one card opts out of the fades every pill around it
         # carries. Writing a real null into a manifest is never what is meant.
@@ -775,6 +802,12 @@ def build_entry(act, b, n, line, start, hold, defaults, order=None):
             entry.pop(key, None)
         else:
             entry[key] = value
+    if portrait is not None:
+        # A named portrait overrules whatever the speaker's own login
+        # derived, including deriving nothing: the row said who this is.
+        entry.pop("avatar", None)
+        entry.pop("avatar_url", None)
+        entry.update(portrait)
 
     if "at" in entry:
         entry["fade_out_at"] = _derive_fade_out_at(
@@ -822,8 +855,59 @@ def _resolve_default(key, value, line, entry):
     if key == "avatar":
         return f"renders/avatars/{speaker}.png"
     if key == "avatar_url":
-        return f"https://github.com/{speaker}.png?size=256"
+        return GITHUB_AVATAR.format(login=speaker)
     return None
+
+
+def _casting_avatars():
+    """``{casting key: portrait URL}``, read once from vocab/casting.yaml.
+
+    Only the URL is taken. A casting record holds a person's authored plate
+    copy as well, and none of that is a chapter file's business: a pill says
+    a name because the owner typed one, and the record is consulted for the
+    picture and nothing else.
+    """
+    global _CASTING_AVATARS
+    if _CASTING_AVATARS is None:
+        import yaml
+        with (REPO_ROOT / "vocab" / "casting.yaml").open(
+                encoding="utf-8") as fh:
+            doc = yaml.safe_load(fh) or {}
+        found = {}
+        for key, record in (doc.get("ensemble", {}).get("titles") or {}).items():
+            if isinstance(record, dict):
+                found[key] = record.get("avatar")
+        for key, binding in (doc.get("leads", {}).get("values") or {}).items():
+            if isinstance(binding, dict):
+                found.setdefault(key, (binding.get("plate") or {})
+                                 .get("avatar"))
+        _CASTING_AVATARS = found
+    return _CASTING_AVATARS
+
+
+_CASTING_AVATARS = None
+
+
+def _portrait(named):
+    """``{cast: key}`` or ``{avatar_login: login}`` -> the plate's picture.
+
+    Returns ``None`` when the row named nobody, so the speaker's own login
+    still derives what it always did. Returns an EMPTY dict when the row
+    named somebody with no portrait on record -- that is an answer, and it
+    is the answer that keeps a pill's drawn crest instead of inventing a URL
+    for a person who has none.
+    """
+    if not named:
+        return None
+    login = named.get("avatar_login")
+    if login:
+        return {"avatar": f"renders/avatars/{login}.png",
+                "avatar_url": GITHUB_AVATAR.format(login=login)}
+    key = named.get("cast")
+    url = _casting_avatars().get(key)
+    if not url:
+        return {}
+    return {"avatar": f"renders/avatars/{key}.png", "avatar_url": url}
 
 
 def _ordered(entry, order):
@@ -936,14 +1020,41 @@ def _extract_entry(plate, offset, defaults):
 
     predicted = build_entry("x", 0, 0, line, at, dur, defaults)
     rows = [row]
+    portrait = _portrait_row(plate, predicted)
     for key, value in plate.items():
         if key in STRUCTURAL or predicted.get(key) == value:
             continue
+        if portrait and key in ("avatar", "avatar_url"):
+            continue
         rows.extend(f"  - {key}: {item}" for item in _attr_rows(key, value))
+    if portrait:
+        rows.append(f"  - {portrait}")
     for key in predicted:
         if key not in plate and key not in STRUCTURAL:
             rows.append(f"  - {key}: null")
     return rows
+
+
+def _portrait_row(plate, predicted):
+    """The ``cast:``/``avatar_login:`` row that restores a plate's picture.
+
+    A lift that wrote the URL out longhand would move a casting fact into a
+    second file, so the picture is described by WHO it is of. ``None`` when
+    the speaker's own login already derives it, or when no naming reproduces
+    it -- in which case the plain field rows are still written and nothing
+    is lost.
+    """
+    avatar, url = plate.get("avatar"), plate.get("avatar_url")
+    if not avatar or not url:
+        return None
+    if predicted.get("avatar") == avatar and predicted.get("avatar_url") == url:
+        return None
+    key = str(avatar).rsplit("/", 1)[-1].removesuffix(".png")
+    if url == GITHUB_AVATAR.format(login=key):
+        return f"avatar_login: {key}"
+    if _casting_avatars().get(key) == url:
+        return f"cast: {key}"
+    return None
 
 
 def _attr_rows(key, value):

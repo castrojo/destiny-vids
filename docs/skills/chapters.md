@@ -26,7 +26,7 @@ metadata:
 
 ## When to Use
 
-- Rewriting **any** word the audience reads, in any act but II
+- Rewriting **any** word the audience reads, in any act
 - Adding or rewriting chat dialogue without computing timecodes
 - Giving one character several lines in a row — each its own pill
 - Seating or rewording a red splash (the boss bar) — `! NAME` lines
@@ -60,7 +60,7 @@ names are easy to confuse:
 |---|---|---|
 | 0 — prologue titles | `chapters/0-prologue.md` | yes |
 | I — intro | — (no authored copy) | — |
-| II — endlessforms | **`scripts/build_efmb_plates.py`** — except the two red splashes, which are in `chapters/II-endless-forms.md` | no, partial |
+| II — endlessforms | `chapters/II-endless-forms.md` — every pill and both red splashes; the act's titles, banners, Guardian reveals and choice screen are still placed by `scripts/build_efmb_plates.py` | no, partial |
 | III — mrbobbytables | `chapters/III-mrbobbytables.md` (the two fixed pills); the act's conversation is recovered speech in `dialogue/yt_curse_of_osiris_opening_cinematic/` | yes |
 | IV — kat | `chapters/IV-kat.md` | yes |
 | V — nat | `chapters/V-nat.md` | yes |
@@ -70,15 +70,25 @@ names are easy to confuse:
 | VIII — the cries | `chapters/VIII-cta.md` | yes, `cta_cards` |
 | VIII — fixed credits | `chapters/VIII-fixed.md` | yes, `fixed_cards` |
 
-**Act II is the one exception, and it is deliberate.** Its 53 pills are
-generated from megacut-relative constants across about ten code paths
-(`NEW_CHATS`, `LATE_PASS`, `MAPPED_PASS`, `OWNER_CONVO`, `MONTAGE_CHATS`,
-`WALK_SEQUENCE`, …), several of them half-generated, and
-`tests/test_efmb_act.py` asserts the committed manifest equals the
-generator's output byte for byte. Owner ruling during the sweep: anything
-that resists a **lossless** lift stays in Python and is recorded here rather
-than forced into a syntax invented to hold it. To copyedit act II, edit the
-constant in the builder and re-run it.
+**Act II is a partial author, and that is the whole difference.** Every word
+anybody *speaks* in it — all 53 pills and both red splashes — is authored in
+its chapter file, exactly like the other ten. What it does not own is its
+**manifest**: `scripts/build_efmb_plates.py` still places the act's titles,
+banners, Guardian reveals and the 67-frame choice screen, and it is the file
+that writes `stories/02-endless-forms-plates.json`. So act II is absent from
+`owns_plates` and `sync` skips it, while
+`tests/test_chapter_identity.py` still holds the same identity claim over its
+dialogue: every chat plate the manifest renders is one the chapter file
+authored, key order included.
+
+The pills used to be generated from megacut-relative constants across about
+ten code paths, which meant a copyedit was a code edit. They were lifted with
+`chapter_md.extract`, every one pinned with an explicit hold so no seat could
+re-time, and the result was proven byte-identical against the delivered
+manifest before the constants were deleted. Where a card the builder still
+places has to give way to a line, the builder reads the line's clear time off
+the chapter entries (`chapter_floor`) rather than off a table of its own —
+so lengthening a line still moves the card after it.
 
 **Never edit a manifest to change a word.** Once a chapter owns its plates,
 the manifest is an *output*: `tools/plate.py` re-syncs it from the chapter
@@ -117,7 +127,22 @@ kat @ 15:33.770: How much you...   pinned to an exact programme moment
   - body: second line
   - fade_in: null                  delete a field the defaults supplied
   - censor: Goddamn -> G{k8s}ddamn
+  - cast: joseph_sandoval        the portrait vocab/casting.yaml records
+  - avatar_login: KyleGospo      the portrait github.com/<login> serves
 ```
+
+**A pill names the person, never the URL.** `cast:` takes whatever avatar
+`vocab/casting.yaml` holds for that binding; `avatar_login:` takes
+`https://github.com/<login>.png`. They are **not** interchangeable — several
+people in act II have a casting avatar that is not their GitHub one
+(A1RM4X's is a YouTube URL), so swapping the key swaps the face. Neither key
+reaches the manifest: both resolve to `avatar`/`avatar_url` at build time, so
+a portrait that moves in the vocab moves on every pill that cites it. Write a
+URL into a chapter file and it is a copy that will go stale silently.
+
+A speaker whose name *is* a GitHub login needs neither key — the login shape
+is recognised and the portrait derived. `- avatar: null` removes a portrait
+that was derived but is not wanted.
 
 Front matter worth knowing: `owns_plates` (this file is answerable for its
 plates, so the manifest is regenerated from it), `field_order`, `defaults`

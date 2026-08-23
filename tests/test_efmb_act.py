@@ -558,6 +558,21 @@ def test_the_mapped_megacut_pass_rewrites_the_walk_window_verbatim():
     ):
         assert removed not in by_id
 
+# The black-screen conversation, in the order it plays. The ids used to be
+# read off a table in the generator; the words are authored in
+# chapters/II-endless-forms.md now, so the test names them itself rather
+# than asking the code under test what it built.
+BLACK_CONVERSATION_IDS = [
+    "mapped_akgraner_kyle", "mapped_hikari_ouch", "mapped_owen_sorry",
+    "mapped_kolunmi_pvp", "mapped_karena_pve", "mapped_cam_noone",
+    "mapped_hikari_wait", "mapped_kolunmi_users", "mapped_owen_slay",
+    "mapped_akgraner_kindness_1", "mapped_akgraner_kindness_2",
+    "mapped_akgraner_kindness_3", "mapped_akgraner_kindness_4",
+    "mapped_akgraner_kindness_5", "mapped_akgraner_kindness_6",
+    "mapped_which_kyle",
+]
+
+
 def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
     by_id = {p["id"]: p for p in committed()["plates"]}
 
@@ -581,8 +596,8 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
     assert by_id["mapped_hikari_wait"]["text"] == "Hey wait?!"
     assert by_id["mapped_kolunmi_users"]["text"] == \
         "Are those ... other linux users?"
-    assert all(by_id[pid]["kind"] == "chat" for pid, *_ in
-               build_efmb_plates.BLACK_CONVERSATION)
+    assert all(by_id[pid]["kind"] == "chat"
+               for pid in BLACK_CONVERSATION_IDS)
     assert by_id["mapped_amber_reveal"]["name"] == "Amber Graner"
     assert by_id["mapped_amber_reveal"]["class"] == "Striker Titan"
     assert by_id["mapped_amber_reveal"]["title"] == "The Iron Standard"
@@ -911,7 +926,7 @@ def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
 
 def test_amber_conversation_fills_the_black_pause_before_sup():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    conversation = [by_id[pid] for pid, *_ in build_efmb_plates.BLACK_CONVERSATION]
+    conversation = [by_id[pid] for pid in BLACK_CONVERSATION_IDS]
     assert all(p["kind"] == "chat" for p in conversation)
     assert conversation[0]["at"] >= build_efmb.BLACK_CONVERSATION_AT
     assert conversation[-1]["at"] + conversation[-1]["dur"] <= \
