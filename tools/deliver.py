@@ -223,6 +223,12 @@ def load_delivery(path):
     return data.get("masters", {}), data.get("social", {})
 
 
+def load_segments(path):
+    """The programme's non-act segments, keyed by their `src` in the plan."""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    return data.get("segments", {})
+
+
 def resolve_master(path):
     """Masters are stored `~`-rooted or absolute, never worktree-relative."""
     return Path(path).expanduser()
@@ -1357,6 +1363,82 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
 # --- status -----------------------------------------------------------------
 
 
+def plan_segments(plan_path):
+    """Every programme item cut from `renders/` rather than from a Prod act."""
+    try:
+        plan = json.loads(Path(plan_path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    items = plan.get("items", plan) if isinstance(plan, dict) else plan
+    out = []
+    for item in items:
+        # Prod acts are seated by ABSOLUTE path and are covered by the act
+        # rungs; a repo-relative path is a `renders/` segment nothing else
+        # watches. That is the discriminator, and it is the plan's own.
+        src = item.get("path") or item.get("src")
+        if not src or Path(src).is_absolute():
+            continue
+        out.append((src, item.get("label") or item.get("note") or ""))
+    return out
+
+
+def check_segments(plan_path, segments, programme):
+    """The rung for the 7 of 17 programme items that are not acts.
+
+    `master`, `sources`, `footage`, `provenance` and `link` are all keyed by
+    act numeral, so a programme item cut straight from `renders/` was seen by
+    NONE of them -- not `gather`, not `stale_seated_acts`, not
+    `foreign_seated_acts`. Six of the seven are the Perfume thread and one is
+    the ending's silent mission pause; two of them carry authored copy about
+    real people, and `renders/` is gitignored, so nothing at all watched
+    them. That is how a Perfume regression hid for a day.
+
+    The segment files cannot be hashed from git, but the records that BUILD
+    them can, which is the same trick `sources` already plays for acts.
+    Reports, never blocks.
+    """
+    declared = 0
+    for src, label in plan_segments(plan_path):
+        spec = segments.get(src)
+        if spec is None:
+            programme.add("segment", UNDECLARED,
+                          f"{src} is seated in the programme but declared "
+                          f"nowhere -- no rung watches it, and renders/ is "
+                          f"gitignored. Add it to `segments` in "
+                          f"stories/megacut/delivery.json")
+            continue
+        sources = spec.get("sources") or []
+        if not sources:
+            programme.add("segment", ABSENT_BY_DESIGN,
+                          spec.get("note") or f"{src}: no committed inputs")
+            continue
+        digest = source_digest(sources)
+        recorded = spec.get("source_digest")
+        if not recorded:
+            # `publish` is scoped by ACT numeral and a segment has none, so
+            # it cannot record these -- and telling somebody to run a command
+            # that will not do the thing is the same fault this rung exists
+            # to catch. The digest is recorded where the declaration is.
+            programme.add("segment", UNDECLARED,
+                          f"{src}: inputs declared but never recorded -- set "
+                          f"`source_digest` to {digest} in this segment's "
+                          f"entry in stories/megacut/delivery.json")
+        elif digest != recorded:
+            programme.add("segment", STALE,
+                          f"{src}: inputs changed since this segment was "
+                          f"recorded ({recorded[:12]} -> {digest[:12]}). Read "
+                          f"those diffs; if the picture really moved, rebuild "
+                          f"the segment and set `source_digest` to {digest} "
+                          f"in stories/megacut/delivery.json. Declared "
+                          f"inputs: " + ", ".join(sources))
+        else:
+            declared += 1
+    if declared:
+        programme.add("segment", OK,
+                      f"{declared} non-act programme segment(s) match their "
+                      f"declared inputs")
+
+
 def gather(acts, masters, social, wolves, plan_path, twin_roots=TWIN_ROOTS):
     reports = [ActReport(act) for act in acts]
     for r in reports:
@@ -1375,6 +1457,7 @@ def gather(acts, masters, social, wolves, plan_path, twin_roots=TWIN_ROOTS):
     check_checksums(wolves, reports, programme)
     check_readme(wolves, acts, masters, programme)
     check_megacut(plan_path, wolves, reports, programme)
+    check_segments(plan_path, load_segments(DEFAULT_DELIVERY), programme)
     check_social(acts, social, wolves, reports)
     reports.append(programme)
     return reports

@@ -211,5 +211,76 @@
    "VIII": "532.5 s: at the policy's 256k audio the sound alone exceeds the 10 MiB cap, leaving no picture budget. Recorded rather than fixed by starving the bed, which is the one thing 10mb/README.md says not to do. A shorter excerpt is the owner's call, and act VIII takes one well: any single wall or the cover reveal stands alone."
   }
  },
- "_sources": "`sources` is the rung BEFORE the master: the committed inputs an act is built from. tools/deliver.py hashes them and compares against `source_digest`, which `publish` stamps -- so editing a shotlist, a plate manifest, a dialogue record or vocab/casting.yaml marks that act's delivered film STALE instead of letting it silently predate its own inputs. Content hashed, never mtime: these come out of git, where every mtime is checkout time. An empty list means the act has no committed inputs AT ALL and its note must say so -- that is a finding, not a configuration. An act with no `sources` key is reported UNDECLARED so nobody mistakes silence for freshness."
+ "_sources": "`sources` is the rung BEFORE the master: the committed inputs an act is built from. tools/deliver.py hashes them and compares against `source_digest`, which `publish` stamps -- so editing a shotlist, a plate manifest, a dialogue record or vocab/casting.yaml marks that act's delivered film STALE instead of letting it silently predate its own inputs. Content hashed, never mtime: these come out of git, where every mtime is checkout time. An empty list means the act has no committed inputs AT ALL and its note must say so -- that is a finding, not a configuration. An act with no `sources` key is reported UNDECLARED so nobody mistakes silence for freshness.",
+ "segments": {
+  "renders/perfume-2.mp4": {
+   "note": "Perfume movement 2, clean. Built by build_interludes.py from the thread manifest; carries no plates.",
+   "sources": [
+    "scripts/build_interludes.py",
+    "stories/00-perfume-thread.json",
+    "music/bed_perfume_of_the_timeless.json"
+   ],
+   "source_digest": "695f52eb45e6ff50c12c9435092554899e1846f2924403e202b9e675b3ae7fbc"
+  },
+  "renders/perfume-3.mp4": {
+   "note": "Perfume movement 3, clean. Same chain as movement 2.",
+   "sources": [
+    "scripts/build_interludes.py",
+    "stories/00-perfume-thread.json",
+    "music/bed_perfume_of_the_timeless.json"
+   ],
+   "source_digest": "695f52eb45e6ff50c12c9435092554899e1846f2924403e202b9e675b3ae7fbc"
+  },
+  "renders/perfume-4.mp4": {
+   "note": "Perfume movement 4, clean base. The programme seats its first 13.12 s before cutting to the overlay derivative below.",
+   "sources": [
+    "scripts/build_interludes.py",
+    "stories/00-perfume-thread.json",
+    "music/bed_perfume_of_the_timeless.json"
+   ],
+   "source_digest": "695f52eb45e6ff50c12c9435092554899e1846f2924403e202b9e675b3ae7fbc"
+  },
+  "renders/perfume-4-overlays.mp4": {
+   "note": "Movement 4's overlay derivative: the wallpaper swaps and the chat exchange. CARRIES AUTHORED COPY ABOUT REAL PEOPLE, which is why the plate manifest, tools/plate.py and vocab/casting.yaml are all declared -- a change to any of them restates somebody's words.",
+   "sources": [
+    "scripts/build_ending_overlays.py",
+    "stories/00-perfume-thread.json",
+    "music/bed_perfume_of_the_timeless.json",
+    "stories/00-perfume-4-plates.json",
+    "tools/plate.py",
+    "vocab/casting.yaml"
+   ],
+   "source_digest": "ed798abdfb4dc473ac4f692c5a6dc7319dbb4f89a7c6370fad67d705a256fb40"
+  },
+  "renders/perfume-5.mp4": {
+   "note": "Perfume movement 5, clean base: the dark Earth limb before the impact. Stays clean by the thread's own rule.",
+   "sources": [
+    "scripts/build_interludes.py",
+    "stories/00-perfume-thread.json",
+    "music/bed_perfume_of_the_timeless.json"
+   ],
+   "source_digest": "695f52eb45e6ff50c12c9435092554899e1846f2924403e202b9e675b3ae7fbc"
+  },
+  "renders/perfume-5-ending.mp4": {
+   "note": "Movement 5's overlay derivative: the impact, the underwater passage and its eleven closing lines. CARRIES AUTHORED COPY ABOUT REAL PEOPLE -- the ending cards.",
+   "sources": [
+    "scripts/build_ending_overlays.py",
+    "stories/00-perfume-thread.json",
+    "music/bed_perfume_of_the_timeless.json",
+    "stories/megacut/ending-cards.json",
+    "tools/plate.py",
+    "vocab/casting.yaml"
+   ],
+   "source_digest": "02ff762d04ccee74ecb529e8a0d2dfc52f1d01f973ec627d9f4c6cac9d8b756d"
+  },
+  "renders/ending/mission-pause.mp4": {
+   "note": "The Project Bluefin mission, held in silence. Drawn from the ending cards; no footage.",
+   "sources": [
+    "scripts/build_ending_pause.py",
+    "stories/megacut/ending-cards.json",
+    "tools/plate.py"
+   ],
+   "source_digest": "e47e3ba0887755825b36f032e1a57d964d76a1b04a44115732eb8e4d52479e9f"
+  }
+ }
 }
