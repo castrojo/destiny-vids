@@ -1620,15 +1620,15 @@
     },
     {
       "id": "late_poor_technical_decisions",
-      "kind": "miniboss",
-      "position": "boss",
       "at": 121.2,
       "dur": 2.2,
-      "copy_source": "owner_supplied",
       "name": "POOR TECHNICAL DECISIONS",
-      "text_source": "owner_supplied",
       "title": "Proident sunt culpa qui",
-      "title_source": "placeholder"
+      "title_source": "placeholder",
+      "kind": "miniboss",
+      "position": "boss",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied"
     },
     {
       "id": "late_karena_lessons",
@@ -2307,15 +2307,15 @@
     },
     {
       "id": "mapped_haters",
-      "kind": "miniboss",
-      "position": "boss",
       "at": 316.2,
       "dur": 2.2,
-      "copy_source": "owner_supplied",
       "name": "HATERS",
-      "text_source": "owner_supplied",
       "title": "Reprehenderit voluptate",
-      "title_source": "placeholder"
+      "title_source": "placeholder",
+      "kind": "miniboss",
+      "position": "boss",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied"
     },
     {
       "id": "mapped_kyle_sup",

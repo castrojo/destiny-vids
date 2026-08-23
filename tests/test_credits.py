@@ -1284,3 +1284,42 @@ def test_a_seal_nobody_authored_stays_off_the_card(manifest):
         if member.get("guardian_title") or member.get("card"):
             continue
         assert not seats[member["person"]]["guardian_title"], member["person"]
+
+
+def test_a_refresh_never_uncredits_somebody_it_stops_seeing():
+    """Upstream history is not append-only. A rebase, a squash or a change of
+    default branch rewrites who GitLab's contributor endpoint reports, and on
+    2026-08-23 a refresh of GNOME/gnome-build-meta came back with 56 names
+    where the roster held 58 -- Dan Yeaw and Jamie Murphy had not stopped
+    contributing, the API had stopped counting them.
+
+    Removing a real person from a credit roll is as much a claim about them as
+    inventing one. The refresh may only ever add.
+    """
+    previous = [
+        {"section": "GNOME OS", "names": ["Ada", "Dan Yeaw", "Jamie Murphy"]},
+        {"section": "Bazzite", "names": ["kyle"]},
+    ]
+    fetched = [
+        {"section": "GNOME OS", "names": ["Ada", "Newcomer"]},
+        {"section": "Bazzite", "names": ["kyle", "shinylisan"]},
+    ]
+    merged = {s["section"]: s["names"]
+              for s in B.merge_contributors(previous, fetched)}
+
+    assert merged["GNOME OS"] == ["Ada", "Newcomer", "Dan Yeaw", "Jamie Murphy"]
+    assert merged["Bazzite"] == ["kyle", "shinylisan"]
+
+
+def test_the_survivors_are_matched_case_insensitively():
+    """A login that comes back with different capitalisation is the same
+    person, not a second credit for them."""
+    merged = B.merge_contributors(
+        [{"section": "Bazzite", "names": ["KyleGospo"]}],
+        [{"section": "Bazzite", "names": ["kylegospo"]}])
+    assert merged[0]["names"] == ["kylegospo"]
+
+
+def test_a_first_ever_fetch_is_taken_as_is():
+    fetched = [{"section": "Bazzite", "names": ["a"]}]
+    assert B.merge_contributors(None, fetched) is fetched
