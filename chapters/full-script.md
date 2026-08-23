@@ -16,7 +16,6 @@ Edit in `chapters/0-prologue.md`.
 
 - `0:11.00` seven days to the wolves / PROJECT BLUEFIN / Music by Nightwish | Action by Bungie
 - `0:15.40` seven days to the wolves / PROJECT BLUEFIN / Music by Nightwish | Action by Bungie
-- `0:26.90` Thanks for Volunteering / PROJECT BLUEFIN MISSION BRIEFING / Tophee Protocol Quick Insertion // ACTIVATED / Agones Cluster // Cycling / Mechaphippy Deployment // UNAUTHORIZED
 - `0:34.00` Two Generations of Contributors / One at their beginning / One at their end / These are their Real Stories
 
 ## II
