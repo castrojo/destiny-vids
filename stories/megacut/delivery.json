@@ -41,7 +41,7 @@
     "yt_into_the_light_cinematic",
     "yt_into_the_light_without_dialogue"
    ],
-   "source_digest": "50efb8b9d4307ac76887088079a9a74ef51961d3ff4bd3a220c86473d8e293d7",
+   "source_digest": "a508117d82643268feea8e1746ba59f12dc2209df542e2eaf451eaa6e0765da5",
    "footage_digest": "154a0dba529d838b1dd61e0e82b5bfd5c9bb34d57b68243bae60c1d107dd9f1e",
    "rebuild": "python3 scripts/build_act1.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
@@ -65,7 +65,7 @@
     "yt_destiny_all_live_action_trailers",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "34dc2ec62dfe7e856921a86fee66dab0bbe702d0f1def3facb3b38b49c260be9",
+   "source_digest": "b22f40a130d5f6bcb5f3fdda3ee6a61d2ea240a3343d8aaa084a9139bebc3588",
    "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad",
    "built_from_commit": "4469daa45e7dc85e5502dc2472725c51491f0fab"
   },
@@ -87,7 +87,7 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "801f30c41efdf71945eb3c9ea1baedafc2d987f9bb29c711c08e98617dc1bcbb",
+   "source_digest": "997c2d1e164483b7fb0b60098d0a3f0d0f725f7e7105ada4050366a4b7cf51e5",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json"
   },
@@ -153,7 +153,7 @@
     "yt_destiny_2_lightfall_launch_trailer",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "1b9a9fbab8a0cdafe0b3a57d41db18c4eed5d6211cd08577cf9215c096cd60fa",
+   "source_digest": "b62bb3421dbaf38a7d3722cd9eacc73f1ace6ba10f8790618a8ffcbc9262b8d1",
    "footage_digest": "21c943bcda5ccc2cbae2b3c08cebcf6794763babda3f4304e612e1724bb4220b",
    "built_from_commit": "51c0f7ad95de9f623ec1158f0f69b4624995b16c"
   },
@@ -174,7 +174,7 @@
     "chapters/VII-europa.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "86526b01773dfcf50ecc25fbddcfa114fe57158b21d43f731d756c8ce779d01e",
+   "source_digest": "22c0a9b20af33360c9e00a9554112b6bbfef5abaa20c2efe89bbb210b6ba39d7",
    "rebuild": "python3 scripts/build_europa.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "d22c307e1c824644364ab1e2f6fd372be916cce45f89ef8fe51efdc22a01a2bd"

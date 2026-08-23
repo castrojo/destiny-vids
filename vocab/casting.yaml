@@ -224,9 +224,29 @@ leads:
       aka: [sagira_ghost]
       dialogue_label: clubanderson
       plate:
-        label: MAINTAINER // GUARDIAN
+        # SETTLED 2026-08-23, owner, verbatim: "doc is the ghost codify that".
+        # Sagira is Osiris's Ghost, and `aka` has recorded that association
+        # since this binding was written -- but the plate still described a
+        # Guardian, so act III played as two Guardians talking instead of a
+        # Guardian and his Ghost. `kind: ghost` is the codification: it drops
+        # the class row (a Ghost has no subclass) and shrinks the card, so the
+        # difference is visible before a word is read.
+        kind: ghost
+        # ONE WORD SUBSTITUTED, owner to confirm: the eyebrow was authored as
+        # "MAINTAINER // GUARDIAN". He is not a Guardian, so leaving it would
+        # print something the owner has now said is untrue -- and stale is
+        # worse than missing. GHOST is his own word from the ruling above, put
+        # in the authored pattern rather than a phrase invented for it.
+        label: MAINTAINER // GHOST
+        # Retained, no longer printed: `kind: ghost` drops the class row. Kept
+        # rather than deleted because it is authored copy, and deleting an
+        # authored string is a separate decision from ceasing to render it.
         class: Shadebinder Warlock
-        name: Doctor Andy Anderson
+        # SETTLED 2026-08-23, owner, verbatim: "Call him Doc Anderson." This is
+        # the name on his chat pills and on his Guardian plate both, because
+        # tools/dialogue.py resolves a pill's speaker from this row -- one
+        # binding, so a reply and a reveal can never credit him differently.
+        name: Doc Anderson
         title: Foundry of the Forbidden
     saint_14:
       person: kat
@@ -320,18 +340,19 @@ leads:
       person: lori_lorusso
       display_name: Lori Lorusso
       aka: [petra]
-      # Plate copy as authored in castrojo/destiny-vids#8, verbatim — including
-      # the `class` spelling ("Harbringer"). Lori has no entry in the reference
-      # deck, so the issue is the only authored source; on-screen copy is
-      # quoted, never corrected here.
-      # TODO(owner): if "Harbringer" was meant to be "Harbinger", say so.
+      # Plate copy as authored in castrojo/destiny-vids#8, verbatim except for
+      # the `class` spelling. The issue writes "Harbringer"; the reference deck
+      # writes "Harbinger" on the one Guardian who appears in both. SETTLED
+      # 2026-08-23, owner, verbatim: "harbinger is fine". The word was a typo
+      # in the brief, not a coinage, and it is corrected everywhere it appears
+      # rather than in one place -- half a spelling is worse than either.
       #
       # `variant: rust` is a chrome flag, not a new copy field: oxidised iron
       # instead of the blue chrome, for the Rust Foundation herald ("make it
       # rusted out ... but make it look cool").
       plate:
         label: HERALD // GUARDIAN
-        class: Harbringer Hunter
+        class: Harbinger Hunter
         name: Lori Lorusso
         title: Pathfinder of the Iron Weave
         variant: rust

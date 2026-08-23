@@ -501,13 +501,11 @@ there -- akgraner's six kindness pills run 9:34.653 to 9:51.953 without a
 gap -- but film 321.937 -> 334.553, after Kyle's reveal and before
 EyeCantCU's, holds exactly these five. Same scene, a beat later. <<
 
-[chat_kyle_bobonomics] kyle @ 10:05.937 +2.2: I'm not calling this Bobonomics
-  - avatar: null
-  - avatar_url: null
+[chat_kyle_bobonomics] KyleGospo @ 10:05.937 +2.2: I'm not calling this Bobonomics
+  - avatar_login: KyleGospo
 
-[chat_kyle_movie] kyle @ 10:08.387 +2.2: We had to make this movie
-  - avatar: null
-  - avatar_url: null
+[chat_kyle_movie] KyleGospo @ 10:08.387 +2.2: We had to make this movie
+  - avatar_login: KyleGospo
 
 [chat_nwoods3_seen] nwoods3 @ 10:10.837 +2.2: I feel seen
   - avatar_login: nwoods3
@@ -533,7 +531,7 @@ lengthen a hold, cut an existing beat, or let these go.
   akgraner: [Redacted] Sent me.
   akgraner: Who writes this crap?
   Eve:      I'm sorry it's just like, why are people so sweaty?
-  kyle:     castrojo killed me in Halo today
+  KyleGospo: castrojo killed me in Halo today
   noel:     I feel seen
   akgraner: Ok well, it gets harder from here on out
   cortney:  Take out the trash
@@ -542,10 +540,10 @@ lengthen a hold, cut an existing beat, or let these go.
 
 The owner tagged two of these `[amber]` and two `[akgraner]`; they are the
 same person, so they are listed under the login her nameplate already
-carries. "kyle" is lowercase and deliberately NOT KyleGospo, who speaks at
-8:43.750 and 10:00.767 with his own face -- a second Kyle, uncast, because
-giving him that portrait would put a real person's face on somebody else's
-line.
+carries. SETTLED 2026-08-23, owner, verbatim: "kyle is kylegospo" -- so the
+lowercase `kyle` is KyleGospo, who also speaks at 8:43.750 and 10:00.767, and
+every one of his lines now carries his own portrait rather than the drawn
+crest. There is no second Kyle.
 
 Also unresolved: "Eve" above and "Eva" at 10:13.287 may be the same person,
 and `Hikari` at 10:15.737 may be the act's existing `HikariKnight`, who

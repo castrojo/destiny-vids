@@ -76,6 +76,29 @@ def _avatar_for(character, leads):
     return f"renders/avatars/{login}.png" if login else None
 
 
+def lanes_for(cues):
+    """Character -> chat lane, so a two-hander reads as two sides.
+
+    Every pill in one lane is the fault the owner named on act III: the cards
+    stack in the same place and the eye has to *read the name* to tell a reply
+    from the same person carrying on. Sides do that work before the words are
+    read at all, which is how every chat interface has ever done it.
+
+    Lanes go by first appearance, so the mapping is deterministic and stable
+    across rebuilds. Only a two-hander gets sides: with three or more voices a
+    side stops identifying anybody, so everybody keeps the single lane and the
+    name does the work again.
+    """
+    order = []
+    for cue in cues:
+        who = cue.get("character")
+        if who and who not in order:
+            order.append(who)
+    if len(order) != 2:
+        return {}
+    return {order[0]: "left", order[1]: "right"}
+
+
 def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=None,
               skip_uncertain=True, log=None):
     """Source-timed cues + a cut list -> chat plate entries.
@@ -99,6 +122,7 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     busy = list(busy or [])
+    lanes = lanes_for(cues)
 
     placed, dropped = [], []
     for cue in cues:
@@ -129,7 +153,7 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
         entry = {
             "id": cue["id"], "at": round(landing, 3),
             "dur": round(min(spoken, hold), 3),
-            "position": "center", "kind": "chat",
+            "position": lanes.get(cue["character"], "center"), "kind": "chat",
             "speaker": speaker, "text": cue["text"],
         }
         avatar = _avatar_for(cue["character"], leads)
@@ -187,6 +211,7 @@ def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     busy = sorted(busy or [])
+    lanes = lanes_for(cues)
 
     def next_free(cursor, duration):
         """First point at or after ``cursor`` where ``duration`` fits."""
@@ -217,7 +242,7 @@ def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
             continue
         entry = {
             "id": cue["id"], "at": round(at, 3), "dur": round(duration, 3),
-            "position": "center", "kind": "chat",
+            "position": lanes.get(cue["character"], "center"), "kind": "chat",
             "speaker": speaker, "text": cue["text"],
         }
         avatar = _avatar_for(cue["character"], leads)

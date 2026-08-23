@@ -2178,13 +2178,23 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
     if position == "warning":
         frame.alpha_composite(plate, (0, 0))
         return frame
-    if position == "center":
+    if position == "slide":
         # A card with NO PICTURE BEHIND IT -- a slide in a deck that plays
         # between acts. Every other placement here measures a row against the
         # frame the plate sits over, which is right when there is one: a
         # lower third belongs in the lower third. On black there is nothing
         # to sit under, and the same measurement reads as a card that missed
         # its mark, so a slide is centred on both axes instead.
+        #
+        # It is NOT `center`, and the distinction cost a delivered act. This
+        # branch first shipped as `center`, which silently shadowed the
+        # `center` fallthrough at the bottom of this function -- a lane that
+        # centres a card horizontally and leaves it in the lower third, and
+        # the lane every act III dialogue pill has always been emitted in.
+        # Adding a slide moved a whole two-hander conversation into the dead
+        # middle of the picture, over the faces. An early return that reuses
+        # a live position name is not a new placement, it is a hijack of the
+        # old one.
         frame.alpha_composite(plate, ((FRAME_W - plate.width) // 2,
                                       (FRAME_H - plate.height) // 2))
         return frame
