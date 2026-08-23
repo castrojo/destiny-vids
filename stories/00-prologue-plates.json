@@ -87,28 +87,6 @@
         1000,
         470
       ]
-    },
-    {
-      "id": "ch_0_3_1_book_b_was_not_moved_with_book_a_it_still_opens_at_0",
-      "kind": "chat",
-      "at": 34.0,
-      "dur": 2.2,
-      "speaker": "**`book-b` was not moved with `book-a`.** It still opens at 0",
-      "text": "31.000 and runs",
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "text_source": "owner_supplied"
-    },
-    {
-      "id": "ch_0_3_2_to_0",
-      "kind": "chat",
-      "at": 36.45,
-      "dur": 4.867,
-      "speaker": "to 0",
-      "text": "34.900, so it now starts *before* the card it follows and the two overlap",
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "text_source": "owner_supplied"
     }
   ],
   "unresolved": [

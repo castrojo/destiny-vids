@@ -60,12 +60,12 @@ python3 tools/chapter_md.py check 0
   - body: Mechaphippy Deployment // UNAUTHORIZED
   - copy_source: owner_supplied
 
-## 0:34.000
+**`book-b` was not moved with `book-a`.** It still opens at 31.0s and runs to
+34.9s, so it now starts *before* the card it follows and the two overlap for
+0.9s. Moving it is a second authored beat and needs its own decision — see the
+manifest's `unresolved`.
 
-**`book-b` was not moved with `book-a`.** It still opens at 0:31.000 and runs
-to 0:34.900, so it now starts *before* the card it follows and the two overlap
-for 0.9s. Moving it is a second authored beat and needs its own decision — see
-the manifest's `unresolved`.
+## 0:34.000
 
 * [book-a] bookline @ 0:34.000 +6.74
   - variant: box
