@@ -36,11 +36,18 @@ def test_the_briefing_is_unseated_but_its_copy_is_not_lost():
                for u in doc["unresolved"]), "the unseating is unrecorded"
 
 
-def test_book_a_keeps_the_seat_the_owner_confirmed():
-    """Dropping the briefing frees 26.9 again, but book-a does not go back to
-    it. The 34.0 seat is an authored beat the owner re-confirmed on 2026-08-22,
-    and undoing one needs its own yes (AGENTS.md)."""
-    assert _load_plate("book-a")["at"] == 34.0
+def test_book_a_sits_on_the_book_not_the_terrarium():
+    """book-a is the seat the owner authored before #321 displaced it.
+
+    The briefing card pushed it to 34.0 to make room; once the briefing was
+    unseated, 34.0 was no longer the Origin of Species page the box is written
+    against but the library/terrarium shot that follows the ~33.5 dissolve.
+    The owner called that a severe regression on 2026-08-23, so it is back at
+    26.9 -- restored to its previous value rather than re-derived, and verified
+    on frame. 26.9 + 6.74 = 33.64, inside the book shot that opens at the
+    24.875 cut.
+    """
+    assert _load_plate("book-a")["at"] == 26.9
 
 
 def _load_plate(id_):
@@ -56,7 +63,7 @@ def test_filtergraph_reads_manifest_once_and_uses_changed_timing(tmp_path, monke
     """A monkeypatched MANIFEST with a different book time drives the graph.
 
     This fails if filtergraph() ever falls back to the hard-coded production
-    number (book 34.0-40.740) instead of reading the file.
+    number (book 26.9-33.640) instead of reading the file.
     """
     modified_manifest = tmp_path / "modified-prologue-plates.json"
     doc = _load_manifest()
