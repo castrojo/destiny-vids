@@ -253,25 +253,32 @@ def test_the_bluefin_creators_open_the_credits(manifest):
     The first card after the drum smash is the strongest in the sequence, and
     it goes to the people who created Bluefin. Do not 'fix' this back on the
     assumption that the director leads.
+
+    On 2026-08-23 he deleted the separate 'Directed by' card and joined this
+    one instead, with Marco Ceppi: the four who created Bluefin, credited
+    together, and no directing credit anywhere in the film.
     """
     assert manifest["fixed_cards"][0]["role"] == "Bluefin Created by"
-    assert manifest["fixed_cards"][0]["names"] == ["Jacob Schnurr", "Andy Frazer"]
+    assert manifest["fixed_cards"][0]["names"] == [
+        "Jacob Schnurr", "Andy Frazer", "Marco Ceppi", "Jorge O. Castro"]
 
 
 def test_the_introducing_card_became_the_birthday_card(manifest):
     """Owner, 2026-08-14: 'Change introducing Rafael to Happy Tenth Birthday'.
 
     The card left the fixed credits entirely -- it is a call-to-action card
-    now -- and the fixed credits are the three that remain.
+    now -- and the fixed credits are what remain. 'Directed by' went the same
+    way on 2026-08-23; 'Music by' closes them.
     """
     roles = [c["role"] for c in manifest["fixed_cards"]]
     assert "Introducing" not in roles
-    assert roles[-1] == "Directed by"
+    assert "Directed by" not in roles
+    assert roles[-1] == "Music by"
 
 
 def test_the_fixed_cards_are_in_the_owners_order(manifest):
     assert [c["role"] for c in manifest["fixed_cards"]] == [
-        "Bluefin Created by", "Music by", "Directed by"]
+        "Bluefin Created by", "Music by"]
 
 
 def test_the_second_introduced_name_stays_redacted(manifest):
@@ -611,12 +618,15 @@ def test_every_placard_is_somebody_who_is_on_screen(manifest):
 
 
 def test_cayde_is_not_in_the_starring_roles(manifest):
-    """'he's fine in the credits with the rest' -- his reveal is the Directed
-    by card, and castrojo is on three contributor walls."""
+    """'he's fine in the credits with the rest' -- he is named on the
+    'Bluefin Created by' card, and castrojo is on three contributor walls.
+
+    The 'Directed by' card that used to carry him was deleted on 2026-08-23.
+    """
     assert not any(c["character_id"] == "cayde_6" for c in manifest["cast"])
-    directed = next(c for c in manifest["fixed_cards"]
-                    if c["role"] == "Directed by")
-    assert directed["names"] == ["Jorge O. Castro"]
+    created = next(c for c in manifest["fixed_cards"]
+                   if c["role"] == "Bluefin Created by")
+    assert "Jorge O. Castro" in created["names"]
     assert any("castrojo" in s["names"] for s in manifest["contributors"])
 
 
@@ -684,11 +694,13 @@ def test_the_director_card_is_still_jorges_one_reveal(manifest):
     """He is named exactly once in the credits.
 
     The Introducing card used to name him a second time; it became the
-    birthday card, which names Rafael and credits nobody as a role.
+    birthday card, which names Rafael and credits nobody as a role. The
+    'Directed by' card was deleted on 2026-08-23 and he moved onto 'Bluefin
+    Created by' -- still exactly one card, a different one.
     """
     named = [c for c in manifest["fixed_cards"]
              if any("Castro" in n for n in c["names"])]
-    assert [c["role"] for c in named] == ["Directed by"]
+    assert [c["role"] for c in named] == ["Bluefin Created by"]
 
 
 # --- the blue letters ------------------------------------------------------

@@ -24,9 +24,13 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 
 - `4:43.80` Eons later / Maintainer-Guardians hold the line for humanity / Fighting against the Toilmaster and his Legion of Clankers / It all started with Kubernetes.
 - `5:10.23` Does NOT Come in Peace / OG GUARDIAN / Tim Hockin
+- `5:14.43` **Joseph** — No one can tell which Ricardo is which so roll with it
+- `5:18.23` **Ricardo** — It's me the nuke guy how do you think I got here?
+- `5:22.03` **pilot** — Lunar record baby! Hello KubeCon + CloudNativeCon
+- `5:25.23` **Ricardo** — They wanted us to put AI in the glider so we did.
 - `5:29.00` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
 - `5:30.30` PRESENT DAY
-- `5:54.23` **Joseph** — Here comes the slop
+- `5:54.23` **Joseph** — That explains the slop
 - `6:01.23` **Karena** — I love this job
 - `6:08.23` Your choices are:
 - `6:08.30` Your choices are:
@@ -101,17 +105,18 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `6:20.78` **riaankleinhans** — You're getting close
 - `6:23.30` **jrsapi** — They learn quickly
 - `6:25.75` **rochaporto** — We need to move!
-- `6:28.30` **jrsapi** — Projects Teams Metrics are strong They just need mentoring in the right skills
+- `6:28.30` **jrsapi** — Projects Teams Metrics are strong
 - `6:31.30` **karena** — Like cardio!
+- `6:34.00` **jrsapi** — They just need mentoring in the right skills
 - `6:40.30` Mars
-- `6:45.00` Proident sunt culpa qui / POOR TECHNICAL DECISIONS
+- `6:45.00` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
 - `6:47.30` **karena** — Hit 'em with your lessons learned
 - `6:49.75` **rochaporto** — One reference architecture coming up!
-- `6:58.30` **jrsapi** — Shit are you taking notes?
+- `6:58.30` **jrsapi** — I still don't know which Ricardo this is
 - `7:01.33` **Karena** — One hundred thousand bootc volunteers, ready to power up
 - `7:02.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
-- `7:04.78` **Joseph** — Is it worth it?
-- `7:07.23` **Ricardo** — You really think they can save open source?
+- `7:04.78` **Joseph** — The gamers would have to impress BOTH Ricardos
+- `7:07.23` **Ricardo** — Look man I am so tired just jump
 - `7:13.80` Do we even know who they are?
 - `7:20.47` SATURN
 - `7:23.30` **[redacted]** — Time to bump the kernel
@@ -122,17 +127,20 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `7:39.30` **A1RM4X** — Thank you I never thought I could help! I'm not like you I'm just a lowly user
 - `7:42.30` **GloriousEggroll** — It's your patch, turn the stream on
 - `7:45.00` **LionHeartP** — Let's get these numbers up
-- `7:47.45` **LionHeartP** — Why spend the extra dollar to support Linux hardware
+- `7:47.45` **wrkode** — Oh dibs on this one
 - `7:50.13` KERNEL 6.11-RC / UPSTREAM PATCH QUEUE
 - `7:51.30` **GloriousEggroll** — There's nothing glorious about this job
-- `7:59.30` **LionHeartP** — When we work together This gets easier
-- `8:09.30` **GloriousEggroll** — Nice work testing that patch Usually Blueberries just Send me a bunch of crap
-- `8:16.30` **GloriousEggroll** — You didn't test any of this did you.
+- `7:59.30` **LionHeartP** — When we work together
+- `8:03.50` **wrkode** — Have I shown you Kairos my friend?
+- `8:09.30` **lionheartp** — Nice work testing that patch
+- `8:12.00` **lionheartp** — Usually Blueberries just send me a bunch of crap
+- `8:16.30` **lionheartp** — You didn't test any of this did you.
 - `8:18.53` Enslaver of Maintainers | Ruiner of User Experience / KERNEL REGRESSION
 - `8:20.30` **pastaq** — Hey man WHAT tests?
 - `8:22.57` **LionHeartP** — Let's go!
 - `8:25.30` **[redacted]** — Unlearning bad habits takes time
-- `8:28.30` **[redacted]** — Your options are success Or a lifetime of servitude in the Toilmaster's Packaging Mines
+- `8:28.30` **[redacted]** — Your options are success
+- `8:31.50` **[redacted]** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
 - `8:35.30` **karena** — The Kube always seeks open source potential
 - `8:38.42` **joseph** — We can't let The Toilmaster enslave another generation
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
@@ -146,17 +154,25 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `9:12.78` **cam** — Mom no one plays this game
 - `9:15.23` **HikariKnight** — Hey wait?!
 - `9:17.68` **kolunmi** — Are those ... other linux users?
+- `9:25.43` **akgraner** — Oh wow I forgot what the starter dungeon was like! Hi!
+- `9:27.88` **akgraner** — Which one of you is Kyleford?
 - `9:32.20` **Owen** — Slay out, Queen!
 - `9:34.65` **akgraner** — Kindness is doing what's right
-- `9:37.10` **akgraner** — For the ecosystem.
-- `9:39.55` **akgraner** — For our users.
-- `9:42.00` **akgraner** — And for our maintainers.
-- `9:44.45` **akgraner** — Don't be nice.
-- `9:46.90` **akgraner** — Be kind.
-- `9:49.35` **akgraner** — Which one of you is Kyle?
-- `9:57.00` **kolunmi** — Disco!
+- `9:37.10` **akgraner** — For the ecosystem
+- `9:39.55` **akgraner** — For our users
+- `9:42.00` **akgraner** — And for our maintainers
+- `9:44.45` **akgraner** — Don't be nice
+- `9:46.90` **akgraner** — Be kind
+- `9:49.35` **akgraner** — Extinction is the Rule
+- `9:52.20` **akgraner** — Oh I see your problem
+- `9:54.65` **cortney** — And we're gonna do you a solid
 - `10:00.00` Reprehenderit voluptate / HATERS
 - `10:00.77` **kylegospo** — Sup
+- `10:05.94` **kyle** — I'm not calling this Bobonomics
+- `10:08.39` **kyle** — We had to make this movie
+- `10:10.84` **nwoods3** — I feel seen
+- `10:13.29` **Eva** — Hey did you see how we just loaded up in a new level?
+- `10:15.74` **Hikari** — Finally, I can play WARFRAME!
 
 ## III
 
@@ -204,9 +220,16 @@ Edit in `chapters/VI-wolves.md`.
 - `22:16.73` **castrojo** — For five years you've trusted us
 - `22:19.89` **castrojo** — Mastered your tools
 - `22:23.05` **castrojo** — Honed your craft
-- `22:26.21` **castrojo** — Made Lifelong Friends
-- `22:29.36` **castrojo** — And now it's up to you, guardian
-- `22:32.52` **castrojo** — Lead the way, we will follow
+- `22:26.21` **castrojo** — Depended on your friends
+- `22:29.36` **castrojo** — Now you're one of us, you are the dream
+- `22:32.52` Protector of the Helm / #HIREAWOLF // MAINTAINER / robertsirc
+- `22:42.00` **castrojo** — I follow my mentors of the past
+- `22:54.63` **castrojo** — Present
+- `22:57.79` **castrojo** — and Future
+- `23:00.94` **castrojo** — The only winning move is not to play
+- `23:04.10` **castrojo** — Think like a dinosaur
+- `23:07.26` **castrojo** — When you fall, rise.
+- `23:10.42` **castrojo** — We've got your back
 
 ## P4
 
@@ -225,13 +248,17 @@ Edit in `chapters/P4-underwater.md`.
 Edit in `chapters/VII-europa.md`.
 
 - `25:00.73` **krook** — Deploy CNCF Projects Team
-- `25:02.73` **preethi** — Stand down
-- `25:04.73` **alolita** — It's all for naught we fail
-- `25:07.73` **preethi** — I'm sending our best
-- `25:24.73` **castrojo** — They must never know who we are
-- `25:27.73` **castrojo** — Don't get caught
-- `25:30.13` **jeefy** — It's all in your hands
+- `25:02.73` **preethi** — Stand down, I'm sending my wolf
+- `25:04.73` **alolita** — Are you sure the Kube is on Europa?
+- `25:07.73` **preethi** — It is my duty to test her.
+- `25:10.13` **preethi** — I must not fail
+- `25:24.73` **castrojo** — In and out
+- `25:27.73` **mrbobbytables** — Don't get caught
+- `25:30.13` **jeefy** — Standing by for extraction
 - `25:32.73` **ihor** — G{k8s}dspeed
+- `25:35.33` **preethi** — Hummingbird will find the girl
+- `25:37.93` **preethi** — We'll return soon.
+- `25:40.53` **nimbatus** — We are the Wolves amongst the Wolves
 - `26:01.73` **nimbatus** — Wilco
 - `26:03.93` **nimbatus** — {k8s}ut
 
@@ -247,6 +274,5 @@ Edit in `chapters/VIII-cta.md`.
 
 Edit in `chapters/VIII-fixed.md`.
 
-- `        ` **Bluefin Created by** — Jacob Schnurr / Andy Frazer
+- `        ` **Bluefin Created by** — Jacob Schnurr / Andy Frazer / Marco Ceppi / Jorge O. Castro
 - `        ` **Music by** — Nightwish
-- `        ` **Directed by** — Jorge O. Castro

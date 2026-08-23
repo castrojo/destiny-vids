@@ -75,24 +75,18 @@
       "role": "Bluefin Created by",
       "names": [
         "Jacob Schnurr",
-        "Andy Frazer"
+        "Andy Frazer",
+        "Marco Ceppi",
+        "Jorge O. Castro"
       ],
       "dur_sec": 6.0,
-      "_what": "FIRST OF THE CREDITS, by the owner's revision on 2026-08-13: 'Put jorge castro before contributions by you so the bluefin creators get credit.' The credits now open AFTER the comic reveal -- the owner moved them: 'Move the existing credits to after the comic reveal' -- so this is the first card the audience reads once the cover has landed, and it goes to the people who created Bluefin rather than to the director."
+      "_what": "FIRST OF THE CREDITS, by the owner's revision on 2026-08-13: 'Put jorge castro before contributions by you so the bluefin creators get credit.' The credits open AFTER the comic reveal -- the owner moved them: 'Move the existing credits to after the comic reveal' -- so this is the first card the audience reads once the cover has landed. On 2026-08-23 he deleted the separate 'Directed by' card and put himself and Marco Ceppi on this one instead: the four names who created Bluefin, credited together, with no directing credit anywhere in the film. The deleted card is in git."
     },
     {
       "_what": "Reproduced as the bed record spells it (music/bed_wish_i_had_an_angel.json, artist: Nightwish); the session note's 'Nightwise' is a typo, and a band's name is copy, not something to pass through unchecked.",
       "role": "Music by",
       "names": [
         "Nightwish"
-      ],
-      "dur_sec": 6.0
-    },
-    {
-      "_what": "Moved from first to third, immediately before 'Contributions by YOU', so the Bluefin creators open the credits. The owner gave up the opening slot; do not 'fix' this back on the assumption that the director leads.",
-      "role": "Directed by",
-      "names": [
-        "Jorge O. Castro"
       ],
       "dur_sec": 6.0
     }

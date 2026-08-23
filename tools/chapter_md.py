@@ -142,6 +142,29 @@ CARD = re.compile(
     rf"^\*\s+(?:\[(?P<id>[A-Za-z0-9_.-]+)\]\s*)?(?P<kind>[a-z][a-z0-9_]*|-)"
     rf"(?:\s*@\s*(?P<at>{TIME}))?"
     rf"(?:\s*\+\s*(?P<dur>[0-9]+(?:\.[0-9]+)?))?\s*$")
+# A NOTE TO THE AGENT, never to the audience: `>> re-time this once the bed
+# lands <<`. It exists because the owner writes instructions in the same
+# breath as dialogue, and before this marker they were indistinguishable from
+# it -- "Add youtube click link thing to this video" was a pill on screen,
+# speaker blank, because it happened to end in a colon. A note may span
+# lines; everything from `>>` to `<<` is invisible to every rule below.
+NOTE_OPEN = re.compile(r"^\s*>>")
+NOTE_CLOSE = re.compile(r"<<\s*$")
+# `[speaker] the words`, the shorthand the owner actually writes when a new
+# voice cuts in. It is NOT the `[an_id]` prefix: an id is always followed by
+# a speaker, so a bracket followed by the words themselves -- or straight by
+# `@` or `+` or `:` -- is naming who is talking.
+#
+#     [amber] Which one of you is Kyleford?
+#     [https://github.com/wrkode] Oh dibs on this one
+#
+# A GitHub URL in the brackets resolves to the login and its portrait. The
+# URL itself never reaches the screen: it is a way of pointing at a person,
+# not a thing to render.
+SPEAKER_TAG = re.compile(r"^\[(?P<who>[^\]]+)\]\s*(?P<rest>.*)$")
+GITHUB_URL = re.compile(
+    r"^(?:https?://)?(?:www\.)?github\.com/"
+    r"(?P<login>[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)/?$")
 # A field of the entry above it. Repeating a key builds a list, which is how
 # a card's `body` rows keep their order without any punctuation to count.
 ATTR = re.compile(r"^\s*-\s+(?P<key>[A-Za-z_][A-Za-z0-9_]*)\s*:\s?(?P<value>.*)$")
@@ -485,7 +508,18 @@ def parse(text):
     else:
         list_keys = None
     blocks, current, entry = [], None, None
+    in_note = False
+    previous_blank = True
     for lineno, raw in enumerate(text.splitlines(), 1):
+        was_blank, previous_blank = previous_blank, not raw.strip()
+        if in_note:
+            # Inside `>> ... <<`. It says nothing to the parser, and -- like a
+            # `#` comment -- it must not detach the rows below it.
+            in_note = not NOTE_CLOSE.search(raw)
+            continue
+        if NOTE_OPEN.match(raw):
+            in_note = not NOTE_CLOSE.search(raw)
+            continue
         heading = HEADING.match(raw) if timed else UNTIMED_HEADING.match(raw)
         if heading:
             current = {
@@ -543,6 +577,23 @@ def parse(text):
             }
             current["lines"].append(entry)
             continue
+        tagged = speaker_tag(raw)
+        if tagged is not None:
+            speaker, rest, attrs = tagged
+            shape = LINE.match(f"{speaker}{rest}" if rest[:1] in "@+:"
+                               else f"{speaker}: {rest}")
+            entry = {
+                "kind": "chat",
+                "id": None,
+                "speaker": speaker,
+                "pin": (parse_tc(shape["at"]) if shape["at"] else None),
+                "hold": (float(shape["dur"]) if shape["dur"] else None),
+                "text": shape["text"].strip(),
+                "attrs": dict(attrs),
+                "lineno": lineno,
+            }
+            current["lines"].append(entry)
+            continue
         line = LINE.match(raw)
         if line and line["speaker"].strip():
             entry = {
@@ -557,9 +608,63 @@ def parse(text):
             }
             current["lines"].append(entry)
             continue
+        if raw.strip() and not was_blank and entry is not None \
+                and entry["kind"] == "chat":
+            # THE NEXT LINE OF THE SAME CONVERSATION. Owner, 2026-08-23:
+            # "if there is an indent under a pill make it a new line."
+            # Before this, such a line was dropped in silence -- about twenty
+            # authored lines existed only as text in a file.
+            #
+            # ADJACENCY is the whole guard, and it is enough. Every editorial
+            # note in these files is separated from its pill by a blank line,
+            # so notes are untouched (proven: all ten acts resolve
+            # byte-identically). Indentation deliberately does NOT matter --
+            # the owner writes a continuation both ways, and a rule that
+            # depended on whether he happened to indent would silently drop
+            # half of them, which is the exact failure this replaces.
+            entry = {
+                "kind": "chat",
+                "id": None,
+                "speaker": entry["speaker"],
+                "pin": None,
+                "hold": None,
+                "text": raw.strip(),
+                "attrs": {},
+                "lineno": lineno,
+            }
+            current["lines"].append(entry)
+            continue
         if raw.strip():
             entry = None
     return blocks
+
+
+def speaker_tag(raw):
+    """``[who] the words`` -> ``(speaker, rest, attrs)``, or ``None``.
+
+    Distinguishing this from the `[an_id]` prefix is the whole job. An id is
+    always followed by a speaker and a colon, so a bracket is naming a
+    SPEAKER when what follows it either starts the timing (`@`, `+`, `:`) or
+    carries no colon at all -- there is no speaker left for the colon to
+    belong to.
+    """
+    tag = SPEAKER_TAG.match(raw)
+    if not tag:
+        return None
+    who, rest = tag["who"].strip(), tag["rest"].strip()
+    if not rest:
+        return None
+    if rest[:1] not in "@+:" and ":" in rest:
+        return None            # `[an_id] speaker: words` -- the id form
+    attrs = {}
+    url = GITHUB_URL.match(who)
+    if url:
+        # A URL points AT a person; it is not something to put on screen.
+        who = url["login"]
+        attrs["avatar_login"] = who
+    if not who or who.startswith("!") or who.startswith("*"):
+        return None
+    return who, rest, attrs
 
 
 def add_attr(attrs, key, raw, list_keys=None):

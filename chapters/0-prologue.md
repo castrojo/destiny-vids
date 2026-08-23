@@ -66,6 +66,7 @@ in #321 — the owner reported the 34.0s seat as a severe regression on
     title  Thanks for Volunteering
     body   Tophee Protocol Quick Insertion // ACTIVATED
     body   Agones Cluster // Cycling
+    body   Clearly Helldivers 2 // Maximum Freedom
     body   Mechaphippy Deployment // UNAUTHORIZED
     copy   owner_supplied
 

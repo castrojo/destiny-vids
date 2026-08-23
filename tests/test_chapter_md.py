@@ -461,3 +461,98 @@ def test_act_iii_authors_its_intermission_at_the_end_of_its_own_file():
     assert not [e for e in act if e["id"].startswith("intermission")]
     assert deck[0]["at"] == pytest.approx(0.0)
     assert all(e["position"] == "center" for e in deck)
+
+
+# --- writing the way the owner writes ---------------------------------------
+
+def _lines(md):
+    blocks = chapter_md.parse("## 1:00\n" + md)
+    return [(e.get("speaker"), e.get("text")) for e in blocks[0]["lines"]]
+
+
+def test_a_line_under_a_pill_is_the_next_line_of_the_conversation():
+    """REGRESSION: about twenty authored lines existed only as text in a
+    file. A continuation was dropped in silence."""
+    assert _lines("kat: The gamers would have to impress\nBOTH Ricardos\n") == [
+        ("kat", "The gamers would have to impress"),
+        ("kat", "BOTH Ricardos"),
+    ]
+
+
+def test_a_continuation_chain_keeps_going():
+    got = _lines("kat: one\ntwo\nthree\n")
+    assert got == [("kat", "one"), ("kat", "two"), ("kat", "three")]
+
+
+def test_an_indented_line_under_a_pill_is_the_next_line():
+    """Owner, 2026-08-23: "if there is an indent under a pill make it a new
+    line". He writes a continuation both flush-left and indented, so the
+    grammar reads both; a rule that keyed on indentation would drop half of
+    them in silence, which is the failure this replaces."""
+    assert _lines("kat: one\n    and the rest of it\n") == [
+        ("kat", "one"), ("kat", "and the rest of it")]
+
+
+def test_an_indented_note_a_blank_line_later_is_still_a_note():
+    """Dozens of existing notes are indented, and every one of them is
+    separated from its pill by a blank line. ADJACENCY, not indentation, is
+    what keeps them off the screen."""
+    assert _lines("kat: one\n\n    Owner brief: this is commentary\n") == [
+        ("kat", "one")]
+
+
+def test_a_paragraph_a_blank_line_later_is_prose_not_speech():
+    """Adjacency is what separates 'still talking' from 'writing about the
+    act'."""
+    assert _lines("kat: one\n\nThis paragraph explains the act\n") == [
+        ("kat", "one")]
+
+
+def test_a_bracketed_name_is_a_speaker():
+    assert _lines("[amber] Which one of you is Kyleford?\n") == [
+        ("amber", "Which one of you is Kyleford?")]
+
+
+def test_a_bracketed_name_takes_a_pin_and_a_hold():
+    blocks = chapter_md.parse("## 1:00\n[amber] @ 1:02.5 +3.0: Hi\n")
+    entry, = blocks[0]["lines"]
+    assert (entry["speaker"], entry["pin"], entry["hold"], entry["text"]) == (
+        "amber", 62.5, 3.0, "Hi")
+
+
+def test_a_bracketed_id_is_still_an_id_not_a_speaker():
+    """`[an_id] speaker: words` must keep working -- every migrated act is
+    written that way."""
+    blocks = chapter_md.parse("## 1:00\n[the_id] kat @ 1:02 +2.0: words\n")
+    entry, = blocks[0]["lines"]
+    assert entry["id"] == "the_id" and entry["speaker"] == "kat"
+
+
+def test_a_github_url_in_the_brackets_names_the_person_not_the_url():
+    """A URL points AT somebody. Putting it on screen is the bug."""
+    blocks = chapter_md.parse(
+        "## 1:00\n[https://github.com/wrkode] Oh dibs on this one\n")
+    entry, = blocks[0]["lines"]
+    assert entry["speaker"] == "wrkode"
+    assert entry["attrs"]["avatar_login"] == "wrkode"
+    assert "github.com" not in entry["text"]
+
+
+def test_an_agent_note_never_reaches_the_screen():
+    """REGRESSION: 'Add youtube click link thing to this video...' was a
+    pill on screen with a blank speaker, because it ended in a colon."""
+    assert _lines(
+        "kat: one\n>> Add youtube click link thing to this video: <<\n") == [
+        ("kat", "one")]
+
+
+def test_an_agent_note_can_span_lines_and_does_not_detach_the_rows_below():
+    blocks = chapter_md.parse(
+        "## 1:00\n* [c] card\n>> think about\nthis later <<\n  - label: KEPT\n")
+    entry, = blocks[0]["lines"]
+    assert entry["attrs"]["label"] == "KEPT"
+
+
+def test_a_note_between_two_pills_does_not_glue_them_together():
+    assert _lines("kat: one\n>> a note <<\ntwo\n") == [
+        ("kat", "one"), ("kat", "two")]
