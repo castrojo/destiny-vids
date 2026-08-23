@@ -48,7 +48,14 @@ def test_maintitle_has_a_poster_variant_for_the_existing_body_shape():
 def test_daycard_uses_the_poster_cta_hierarchy_and_an_authored_glyph():
     template = open(os.path.join(CARDS, "daycard.html"), encoding="utf-8").read()
     assert "font-size: clamp(2.8rem, 5vw, 5.2rem)" in template
-    assert "font-weight: 900" in template
+    # 700, NOT 900. This was authored as 900 against a stack that fell through
+    # to DejaVu Sans, which has no Black -- CSS font matching clamped it to
+    # Bold, so 900 and 700 rendered identically and 700 is what shipped and was
+    # approved. Adwaita Sans DOES have a Black, so leaving the 900 in place
+    # made every card heavier than the cut it was signed off on. Owner: "the
+    # font is too bold".
+    assert "font-weight: 700" in template
+    assert "font-weight: 900" not in template
     assert "letter-spacing: .045em" in template
     assert "line-height: 1.05" in template
     assert ".line:empty { display: none; }" in template

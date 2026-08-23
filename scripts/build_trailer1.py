@@ -140,28 +140,31 @@ BRIDGE_DAY_SETTLE = 4.000   # clean day, before the wolves start sinking
 BRIDGE_TURN_LEN = 10.000    # the one long day -> night fade
 # THE TAIL IS WHERE MESSAGE THREE PLAYS. The turn ends on full night, and the
 # end card reuses that same night art, so this tail and the reveal after it are
-# one uninterrupted picture. Owner, 2026-08-22, on a six-second extension:
-# "+6s sounds too short" -- so the tail buys the third card a clean night to
-# land on AND leaves empty night after it, rather than butting the card up
-# against the KubeCon reveal.
-BRIDGE_NIGHT_TAIL = 10.000
+# one uninterrupted picture. It is sized to clear message three by about a
+# second and a half and no more. An earlier pass left 4.600 s of empty night
+# here on the theory that the reveal wanted room to breathe; owner: "do you
+# seriously spend at least three seconds showing nothing on the screen".
+BRIDGE_NIGHT_TAIL = 7.000
 BRIDGE = (BRIDGE_DAY_SETTLE + BRIDGE_TURN_LEN
-          + BRIDGE_NIGHT_TAIL)                         # 24.000
+          + BRIDGE_NIGHT_TAIL)                         # 21.000
 BRIDGE_MONTH = 3            # the owner named 03-bluefin-day.jxl
 
 # --- the end card -------------------------------------------------------------
 # MUSIC_TAIL is how much song plays over the end card before the cut to
-# silence. It is 7.500 plus the join's stolen frames, exactly as before.
-MUSIC_TAIL = 7.500 + JOIN_FADE                         # 7.820
-# THE URL LANDS ON THE SILENCE. Owner, 2026-08-22: "hold the final url until
-# it's a natural break in the movie". The most natural break this film has is
-# the moment the music stops, so the CTA's fade-in is seated exactly on
-# MUSIC_TAIL: the song ends, and the address arrives into the quiet rather
-# than competing with the swell. The hold after it is seven seconds, not five,
-# because the URL is now the only thing left on screen.
-URL_HOLD = 7.000
-MUSIC_END = PICTURE + BRIDGE + MUSIC_TAIL              # 120.020
-ENDCARD = MUSIC_TAIL + URL_HOLD                        # 14.820
+# silence, and it is also when the URL arrives (ENDCARD_CTA_IN below).
+MUSIC_TAIL = 3.100
+# THE URL IS THE POINT OF THE FILM. Owner: "The entire point is to show the
+# URL, why is there a huge gap between the call to actions and the URL", and
+# "you only show the CTA for the last 7 seconds".
+#
+# So the address arrives 3.100 s after the KubeCon lockup -- close enough to
+# read as one reveal in two beats -- and it is on screen for TWELVE seconds,
+# longer than any other card in the cut. The music stops as it lands, which is
+# the "natural break" the hold was originally asked for, but the break is now
+# bought by ending the song sooner rather than by holding the address back.
+URL_HOLD = 12.000
+MUSIC_END = PICTURE + BRIDGE + MUSIC_TAIL              # 112.300
+ENDCARD = MUSIC_TAIL + URL_HOLD                        # 15.100
 ENDCARD_FADE = 1.200
 # The existing music tail is loud on entry, falls from roughly -18 to -19.6 dB
 # RMS through 1-3 s, then rises back to -17.4 dB at 3-4 s. The visual does not
