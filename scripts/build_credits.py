@@ -46,11 +46,14 @@ the song and it is precisely the part the loop exists to let people hear.
 On the credits clock that is **47.360 + 9.080 = 56.440 s**, and the cover lands
 there.
 
-The cover is ``wolves.jpg``, the same asset act I uses as its title cover and
-the one the Europa director's cut currently ends on. **Removing it from the end
-of Europa is act VII's job, and act VII has no committed inputs at all (#152)**
--- it is cut in ``~/Videos/wolves-directors-cut``, so this builder cannot do it
-and does not pretend to. It is recorded in the manifest and reported here.
+The cover is ``wolves-final.jpg`` -- the finished colour art, swapped in at the
+owner's word on 2026-08-23 (see the manifest's ``reveal._art``). Act I's title
+cover still renders the greyscale ink ``wolves.jpg``; the two are the same
+9075x9075 composition, so only the credits reveal changed. **Removing the cover
+from the end of Europa is act VII's job, and act VII has no committed inputs at
+all (#152)** -- it is cut in ``~/Videos/wolves-directors-cut``, so this builder
+cannot do it and does not pretend to. It is recorded in the manifest and
+reported here.
 
 ## What is on screen
 
