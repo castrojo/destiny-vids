@@ -556,12 +556,20 @@ def check_provenance(master, report):
                       + ", ".join(moved)
                       if moved else "and its declared inputs differ from this "
                                     "checkout's")
+        # Somebody has usually already read these diffs. Recording what they
+        # found is the difference between one investigation and one per
+        # agent -- and it stays evidence rather than a rubber stamp, because
+        # it names the commit it was written against: move the master, or
+        # move an input, and the note is visibly about a different question.
+        found = master.get("provenance_note")
         report.add("provenance", FOREIGN,
                    f"built from {commit[:12]}, which is NOT in this "
                    f"checkout's history, {detail}. Either this master carries "
                    f"work that is not here, or it predates a change that "
                    f"never reached a frame. Read the diffs to tell which, "
-                   f"then rebuild the act or `publish` it.")
+                   f"then rebuild the act or `publish` it."
+                   + (f"\n  already read, against {commit[:12]}: {found}"
+                      if found else ""))
 
 
 def check_sources(master, report):
