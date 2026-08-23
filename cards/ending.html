@@ -55,13 +55,27 @@
     line-height: 1.1;
   }
   /* The reviewed mission card is intentionally larger than the other pause
-     cards. The purpose card's source wallpaper has a bird in the lower-left;
-     move only that authored card's treatment to clear it. */
+     cards. */
   body[data-card-id="mission"] .pause-card .title {
     font-size: clamp(3.4rem, 6vw, 5.6rem);
   }
-  body[data-card-id="purpose"] .pause-card {
-    transform: translate(8vw, 7vh);
+  /* The two dusk wallpapers put a raptor in the left of frame, and a centred
+     card lands across it. Owner, 2026-08-22: "don't block the raptor. bottom
+     right instead." Seat those two authored cards in the lower-right quadrant
+     and let their type ragged-right, so the silhouette keeps the left of the
+     picture to itself. */
+  body[data-card-id="purpose"],
+  body[data-card-id="lesson"] {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+  body[data-card-id="purpose"] .pause-card,
+  body[data-card-id="lesson"] .pause-card {
+    width: min(48rem, 55vw);
+    margin: 0 6vw 8vh 0;
+    text-align: right;
+    border-left: none;
+    border-right: 2px solid var(--wc-gold);
   }
   .subtitle {
     margin: 0;
