@@ -399,6 +399,50 @@ it at a corrected static gain, video stream copied untouched. That is how a
 lossless FLAC master is held to the same standard as the AAC deliverable —
 the gap that let act VII ship at +0.3 dBTP (issue #82).
 
+## A YouTube upload is 8-bit H.264 and AAC, never HEVC and never FLAC
+
+A mastering codec and an **ingest** codec are different jobs. Our masters are
+10-bit HEVC with a FLAC soundtrack because that is the right thing to archive.
+Handing that same file to YouTube is what produces "it's broken in Firefox and
+fine in Chrome".
+
+YouTube does not serve the file you upload; it re-encodes it into a ladder and
+the browser picks a rendition. **Firefox on Linux takes VP9, Chrome takes AV1.**
+So a defect in one arm of that ladder is invisible to whoever tested in the
+other browser.
+
+Given a 10-bit HEVC upload, YouTube's **VP9** renditions have come back with
+picture out of order — on trailer 1 the main title played, disappeared for three
+seconds under footage from thirty seconds later, then played *again*, which
+reads to a viewer as the film looping. The AV1 renditions of the same upload were
+correct, as was the master. Reproduced independently in the 1080p60 and 720p60
+VP9 renditions; verified by decoding each from frame zero and diffing per second
+against the master, because `-ss` seeking on a DASH `webm` lands in the wrong
+place and will manufacture a phantom version of this bug.
+
+Deliver a separate upload master. It is a transcode of the finished file, not a
+re-render, and it costs about two minutes on the cluster:
+
+```
+-c:v libx264 -profile:v high -pix_fmt yuv420p -preset fast -crf 16
+-maxrate 100M -bufsize 200M
+-x264-params keyint=120:min-keyint=120:scenecut=0:open-gop=0
+-color_primaries bt709 -color_trc bt709 -colorspace bt709 -color_range tv
+-af apad -shortest -c:a aac -b:a 384k -ar 48000 -ac 2
+-movflags +faststart
+```
+
+`apad` with `-shortest` is not decoration. Our music ends before the picture
+does, so the encoder stops writing audio at the last note and the delivered
+track is **shorter than the video** — 112.30 s against 124.31 s on trailer 1.
+Local players tolerate it; an ingest pipeline has to invent the difference.
+Pad the silence yourself rather than leaving it to be guessed at.
+
+Check the result rather than assuming it: the picture must diff to nothing
+against the master, and the peak still has to pass
+[the delivery band](#the-delivered-peak-is-trimmed-not-assumed) — transcoding
+re-encodes the audio, so the measured peak is a **new** fact each time.
+
 ## Burning plates onto a cut
 
 `tools/plate.py` is a separate stage from `render.py`, deliberately: cutting and
