@@ -245,6 +245,32 @@ the outside and want opposite fixes:
 | `.prod.md5` **older** than the `.mp4` beside it | The output was rebuilt by `tools/megacut.py` directly, which does not close the provenance rung. Verify the build, then record it — `deliver.record_megacut_provenance`, or rebuild through `deliver.py build`. |
 | `.prod.md5` **newer**, digest still mismatched | `Prod/` genuinely moved after the build. The programme is a rebuild behind. |
 
+### What the programme rung proves, and what it does not
+
+`check_megacut` asks three questions, and two of them are narrower than an
+agent tends to assume. Read [`tools/deliver.py`](../../../../tools/deliver.py)
+before quoting it.
+
+| Signal | What it catches | What it cannot catch |
+|---|---|---|
+| The `.prod.md5` sidecar against `md5(Prod/CHECKSUMS.md5)` | The real currency question: which Prod checksum set this programme was assembled from | Whether the stamp postdates the build — see the table above |
+| Output mtime older than the newest `Prod/` act | A programme built before an act it contains, so the show being watched lacks the current acts | Nothing about a build *newer* than every act |
+| Decoded duration against the plan's arithmetic | A truncated or still-being-written file, and a build of a different plan | A complete build seated on stale acts: it has the right runtime |
+
+The mtime rung is **directional**. Output older than input is conclusive
+staleness; the converse is not, which is why the `OK` line says "newer than
+every Prod act" rather than "current". Duration is likewise used for
+**completeness, not currency** — a legitimate use, and not a licence to pick a
+build by matching its runtime against `--dry-run`.
+
+Content-level provenance on the programme rung is the `.prod.md5` sidecar, and
+it is the one signal here that is about *what went in* rather than *when*. It
+is written by `deliver.py build` and by `deliver.record_megacut_provenance`;
+`tools/megacut.py` run directly does not write it, which is the gap
+[issue #280] describes.
+
+[issue #280]: https://github.com/castrojo/destiny-vids/issues/280
+
 ## The delivery graph: `tools/deliver.py`
 
 
