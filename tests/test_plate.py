@@ -1145,6 +1145,35 @@ def test_the_font_stack_resolves_the_way_the_browser_did():
     for weight in ("regular", "bold"):
         assert plate._font(weight, 20) is not None
 
+def test_the_card_templates_use_the_house_face_not_inter():
+    """Owner: 'inter should not be used our font is adwaita'.
+
+    The card templates were authored against the WEBSITE's stack -- 'Inter',
+    'Arial Narrow', sans-serif -- and neither of the first two is installed
+    here, so every full-frame card silently rendered in DejaVu Sans: Book (400)
+    and Bold (700) and nothing between. Adwaita Sans ships the whole ramp, so
+    intermediate `font-weight` values are real faces rather than names that
+    snap to one of two.
+
+    This is the DISPLAY face only. The Guardian nameplates above are a separate,
+    deliberate decision and stay on DejaVu Sans Mono.
+    """
+    cards = sorted((Path(__file__).resolve().parents[1] / "cards").glob("*.html"))
+    assert cards, "no card templates found"
+    declares = [p for p in cards if "font-family" in p.read_text()]
+    assert declares, "no template declares a font-family"
+    for path in declares:
+        decls = [ln.strip() for ln in path.read_text().splitlines()
+                 if "font-family:" in ln or "--wc-font-display:" in ln
+                 or "--wc-font-mono:" in ln]
+        for ln in decls:
+            assert "Inter" not in ln, f"{path.name} still reaches for Inter: {ln}"
+            assert "Arial Narrow" not in ln, f"{path.name} keeps a dead fallback: {ln}"
+    for path in cards:
+        text = path.read_text()
+        if "--wc-font-display:" in text:
+            assert "--wc-font-display: 'Adwaita Sans'" in text, path.name
+
 def test_the_subclass_row_keeps_its_authored_case():
     """The baked reveal reads "Behemoth Titan", not "BEHEMOTH TITAN".
 
