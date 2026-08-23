@@ -87,7 +87,20 @@ A Guardian nameplate carries **exactly**:
 
 The deck's other authored shapes are the title card (`title`, `subtitle`, `body[]`) and the **chat card** (`speaker`, `text`) — see [`references/conversation-cards.md`](references/conversation-cards.md).
 
+A fixed-manifest regression test for a plate should compare the complete literal
+entry, including timing, provenance, and chrome flags, so omitted or extra
+fields cannot drift past the closed field set.
+
 Keep chat `text` verbatim. For owner-requested censors, use the Kubernetes helm only for an `o`, an asterisk for other letters, and no unrequested censorship; the complete data contract is in [`references/conversation-cards.md`](references/conversation-cards.md).
+
+A title card may use `position: "top-right"` for a sign in the picture's
+upper-right safe area. The renderer measures both margins against the detected
+picture rectangle, so the card stays on the image when the source is
+letterboxed.
+
+An owner-retired authored card remains complete in the generator's `RETIRED`
+record, including timing and identity fields, and is removed from active pass
+data; never preserve a partial duplicate.
 
 ### The GitHub login is the identity, not the name
 
@@ -104,6 +117,20 @@ stranger's face on her credit.
 No login means the crest stands in and the gap is recorded — the correct
 outcome, and where `preethi` and Karena sit today. `github: null` with *"not
 an agent's to guess"* beside it is a decision already taken.
+
+### Dialogue the owner re-sequenced
+
+For owner-sequenced dialogue around a freeze, derive every window from the
+picture builder's evidenced constants, keep each card at `MIN_HOLD`, and
+regenerate the manifest; never hand-edit a generated plate clock. When review
+splits a cue, pin each authored `(start_sec, end_sec, character)` tuple and its
+hundredth-second adjacency in focused tests. If review notes use a programme
+baseline, record the programme mark beside its baseline act film and source
+anchors, then derive the post-insert film time from the timeline shift. A
+source-attached cue must still resolve to the evidenced picture — including a
+held frame — not merely retain a stale film number. An external insert and its
+surrounding held frame are separate half-open intervals: raise inside the
+insert, and resolve the hold to its exact `source_at`.
 
 ### Cinematic text that shares the frame with identity plates
 

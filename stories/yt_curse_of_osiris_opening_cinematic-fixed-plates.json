@@ -21,6 +21,32 @@
       "copy_source": "owner_supplied",
       "speaker": "[redacted]",
       "text": "The long walk beckons"
+    },
+    {
+      "id": "mrbobbytables-gold",
+      "at": 43.96,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "casting",
+      "label": "TRUSTEE // GUARDIAN",
+      "class": "Voidwalker Warlock",
+      "name": "Bob Killen",
+      "title": "Reconciler of the Plane",
+      "trustee": true,
+      "variant": "leader"
+    },
+    {
+      "id": "maintainer-emails",
+      "kind": "title",
+      "at": 150.96,
+      "dur": 4.0,
+      "position": "top-right",
+      "copy_source": "owner_supplied",
+      "title": "Maintainers Reading Emails",
+      "subtitle": "And Other Preposterous Tales",
+      "body": [
+        "Summer 2027"
+      ]
     }
   ],
   "unresolved": []

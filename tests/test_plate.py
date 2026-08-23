@@ -2305,3 +2305,12 @@ def test_a_runner_that_delivers_nothing_leaves_the_master_alone(
     plate.burn("in.mp4", [dict(GUARDIAN)], tmp_path, master,
                ffmpeg=["ffmpeg"], runner=lambda cmd: None)
     assert master.read_bytes() == b"DELIVERED MASTER"
+
+
+def test_top_right_title_card_uses_picture_safe_top_right_placement():
+    card = plate.render_plate(TITLE_CARD)
+    frame = plate.place(card, "top-right", picture=(40, 140, 1840, 800))
+    x0, y0, x1, y1 = frame.getchannel("A").getbbox()
+    assert x1 == 40 + 1840 - int(plate.MARGIN_X * 1840)
+    assert y0 == 140 + int(plate.MARGIN_X * 800)
+    assert x0 < x1 and y1 < 140 + 800

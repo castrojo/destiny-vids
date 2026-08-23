@@ -145,11 +145,56 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         ),
     }
 
+
+@pytest.mark.parametrize(
+    "cue_id, expected",
+    [
+        ("d20a", (121.44, 124.91, "osiris")),
+        ("d20b", (124.92, 128.91, "osiris")),
+        ("d21", (128.92, 133.95, "osiris")),
+        ("d23a", (134.64, 136.11, "sagira")),
+        ("d23b", (136.12, 137.59, "sagira")),
+    ],
+)
+def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cue = next(cue for cue in data["cues"] if cue["id"] == cue_id)
+    assert (cue["start_sec"], cue["end_sec"], cue["character"]) == expected
+
+
+def test_act3_review_cue_splits_keep_the_owner_marked_hundredth_adjacency():
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cues = {cue["id"]: cue for cue in data["cues"]}
+    for earlier, later in (("d20a", "d20b"), ("d20b", "d21"), ("d23a", "d23b")):
+        assert cues[later]["start_sec"] == cues[earlier]["end_sec"] + 0.01
+
+
+def test_act3_fixed_gold_bob_plate_matches_complete_authored_entry():
+    manifest = json.loads(
+        Path("stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json")
+        .read_text(encoding="utf-8")
+    )
+    gold = next(plate for plate in manifest["plates"] if plate["id"] == "mrbobbytables-gold")
+    assert gold == {
+        "id": "mrbobbytables-gold",
+        "at": 43.96,
+        "dur": 4.0,
+        "position": "left",
+        "copy_source": "casting",
+        "label": "TRUSTEE // GUARDIAN",
+        "class": "Voidwalker Warlock",
+        "name": "Bob Killen",
+        "title": "Reconciler of the Plane",
+        "trustee": True,
+        "variant": "leader",
+    }
+
+
 def test_the_act3_retirement_copy_is_uncast_chat_before_the_wolf_day_shot():
     path = Path("stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json")
     data = json.loads(path.read_text(encoding="utf-8"))
     plate.load_manifest_entries(data["plates"])
-    retirement = data["plates"]
+    retirement = [p for p in data["plates"] if p["id"].startswith("retirement-")]
     assert [p["kind"] for p in retirement] == ["chat", "chat"]
     assert [p["speaker"] for p in retirement] == ["[redacted]", "[redacted]"]
     assert [p["text"] for p in retirement] == [
@@ -164,3 +209,19 @@ def test_the_act3_retirement_copy_is_uncast_chat_before_the_wolf_day_shot():
     assert 'FIXED_MANIFEST="stories/$VIDEO_ID-fixed-plates.json"' in builder
     assert 'FIXED_INPUTS+=("$FIXED_MANIFEST")' in builder
     assert 'display.get("standalone_leads", True)' in builder
+    assert 'python3 tools/plate.py merge "${FIXED_INPUTS[@]}" --out "$WORK/fixed.json"' in builder
+    assert '    --around "$WORK/fixed.json"' in builder
+
+
+def test_act_three_review_copy_and_splits_are_exact():
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    by_id = {c["id"]: c for c in data["cues"]}
+    assert by_id["d01"]["text"] == "What a shitshow"
+    assert by_id["d20a"]["text"] == "Everyone forgot how to use KVM! We need to split up"
+    assert by_id["d20b"]["text"] == "Everyone's making their own and it's all bad!"
+    assert by_id["d21"]["text"] == "They've broken out of the sandbox"
+    assert by_id["d23a"]["text"] == "The open rate of maintainer emails is 7%"
+    assert by_id["d23b"]["text"] == "I don't like this plan"
+    ids = [c["id"] for c in data["cues"]]
+    assert ids.index("d20a") < ids.index("d20b") < ids.index("d21")
+    assert ids.index("d23a") < ids.index("d23b") < ids.index("d24")

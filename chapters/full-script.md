@@ -164,6 +164,7 @@ Edit in `chapters/III-mrbobbytables.md`.
 
 - `10:47.34` **[redacted]** — Finally, retirement
 - `10:49.71` **[redacted]** — The long walk beckons
+- `13:14.73` Maintainers Reading Emails / Summer 2027
 
 ## IV
 
