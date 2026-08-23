@@ -252,30 +252,20 @@ TRUSTEE_ROW = ["gregkh", "shuah_khan"]  # the pair, left to right
 # `unresolved`; the pills are the owner's to move if she should hold longer.
 TULIP = {"key": "tulilirockz", "at": 247.467, "out": 249.750}
 
-# --- THE NEW DIALOGUE (owner brief, this round) ----------------------------
+# --- THE CHOICE SCREEN'S PROMPT --------------------------------------------
 #
-#   "03:12 chat bubble for Joseph: Here comes the slop
-#    03:19 karena: I love this job
-#    03:39 joseph: Master your skills
-#    03:40 joseph: You got this"
+# Riaan's question is not a pill: the full-frame choice screen owns the words,
+# and rendering a chat as well would spend the same text twice and delay the
+# graphic. The line and its megacut mark are the owner's.
 #
-# Megacut marks again. 3:39 and 3:40 are ONE SECOND apart and a pill needs
-# MIN_HOLD to be read, so the second is chained behind the first rather than
-# stacked on it -- the ORDER is his and it is kept; only the gap is the
-# timeline's. Recorded in `unresolved`.
-NEW_CHATS = [
-    {"id": "chat_joseph_slop", "key": "joseph_sandoval", "speaker": "Joseph",
-     "text": "Here comes the slop", "at_megacut": 192.0, "hold": 2.6},
-    {"id": "chat_karena_job", "key": "mara_sov", "speaker": "Karena",
-     "text": "I love this job", "at_megacut": 199.0, "hold": 2.6},
-    {"id": "chat_riaan_choices", "key": None, "speaker": "riaankleinhans",
-     "text": "Your choices are:", "at_megacut": 206.0, "hold": 2.4,
-     "login": "riaankleinhans"},
-    {"id": "chat_joseph_master", "key": "joseph_sandoval", "speaker": "Joseph",
-     "text": "Master your skills", "at_megacut": 219.0, "hold": 2.2},
-    {"id": "chat_joseph_gotthis", "key": "joseph_sandoval", "speaker": "Joseph",
-     "text": "You got this", "at_megacut": None, "hold": 2.2},
-]
+# The four pills that used to stand beside it -- Joseph's "Here comes the
+# slop" and "Master your skills", Karena's "I love this job", "You got this"
+# -- are authored in chapters/II-endless-forms.md now, or were replaced by
+# the later pass. Nothing about their seats is computed here any more.
+CHOICE_PROMPT = {
+    "id": "chat_riaan_choices", "text": "Your choices are:",
+    "at_megacut": 206.0, "hold": 2.4,
+}
 
 # --- THE LATER OWNER PASS (megacut 5:13 -> 6:56) --------------------------
 #
@@ -312,84 +302,6 @@ NEW_CHATS = [
 PRESENT_DAY = {"at_megacut": 313.0, "hold": 2.6, "title": "PRESENT DAY"}
 LATE_PASS = [
     {
-        "id": "late_mfahlandt_clean",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 88.883,
-        "hold": 2.2,
-        "login": "mfahlandt",
-        "speaker": "mfahlandt",
-        "text": "K1 Logistics is clean",
-    },
-    {
-        "id": "late_kfaseela_gamers",
-        "kind": "chat",
-        "position": "left",
-        "hold": 2.2,
-        "login": "kfaseela",
-        "speaker": "kfaseela",
-        "text": "The gamers were here alright",
-    },
-    {
-        "id": "late_markmandel_online",
-        "kind": "chat",
-        "position": "left",
-        "hold": 2.2,
-        "login": "markmandel",
-        "speaker": "markmandel",
-        "text": "Agones Cluster - ONLINE",
-    },
-    {
-        "id": "late_riaankleinhans_close",
-        "kind": "chat",
-        "position": "left",
-        "hold": 2.2,
-        "login": "riaankleinhans",
-        "speaker": "riaankleinhans",
-        "text": "You're getting close",
-    },
-    {
-        "id": "late_jrsapi_learn",
-        "kind": "chat",
-        "position": "left",
-        "login": "jrsapi",
-        "speaker": "jrsapi",
-        "text": "They learn quickly",
-        "at_megacut": 366.0,
-        "hold": 2.2,
-    },
-    {
-        "id": "late_rochaporto_move",
-        "kind": "chat",
-        "position": "left",
-        "login": "rochaporto",
-        "speaker": "rochaporto",
-        "text": "We need to move!",
-        "at_megacut": 367.0,
-        "hold": 2.2,
-    },
-    {
-        "id": "late_metrics_cluster",
-        "kind": "chat",
-        "position": "left",
-        "at_megacut": 371.0,
-        "hold": 2.75,
-        "login": "jrsapi",
-        "speaker": "jrsapi",
-        "text": (
-            "Projects Teams Metrics are strong "
-            "They just need mentoring in the right skills"),
-    },
-    {
-        "id": "late_karena_cardio",
-        "kind": "chat",
-        "position": "left",
-        "speaker": "karena",
-        "text": "Like cardio!",
-        "at_megacut": 374.0,
-        "hold": 2.2,
-    },
-    {
         "id": "late_mars_title",
         "kind": "title",
         "position": "boss",
@@ -416,35 +328,6 @@ LATE_PASS = [
     # `## 6:45`. Deleting it here would strand the evidence; editing it here
     # would fork the copy. The chapter file owns seat and wording.
     {
-        "id": "late_karena_lessons",
-        "kind": "chat",
-        "position": "left",
-        "speaker": "karena",
-        "text": "Hit 'em with your lessons learned",
-        "at_megacut": 390.0,
-        "hold": 2.2,
-    },
-    {
-        "id": "late_rochaporto_cern",
-        "kind": "chat",
-        "position": "left",
-        "login": "rochaporto",
-        "speaker": "rochaporto",
-        "text": "One reference architecture coming up!",
-        "at_megacut": 392.0,
-        "hold": 2.6,
-    },
-    {
-        "id": "late_jrsapi_notes",
-        "kind": "chat",
-        "position": "left",
-        "login": "jrsapi",
-        "speaker": "jrsapi",
-        "text": "Shit are you taking notes?",
-        "at_megacut": 401.0,
-        "hold": 2.6,
-    },
-    {
         "id": "late_final_question",
         "kind": "title",
         "position": "center",
@@ -465,8 +348,6 @@ TOP_BANNER = {
     "text": "#UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST",
 }
 LATE_PASS_REPLACEMENTS = {
-    "chat_joseph_master",
-    "chat_joseph_gotthis",
     "montage_chat_1",
     "montage_chat_2",
     "walk_ge_upstream",
@@ -498,15 +379,6 @@ MAPPED_TAIL_REPLACEMENTS = {
 }
 MAPPED_TAIL_PASS = [
     {
-        "id": "mapped_redacted_blow",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 242.4,
-        "hold": 2.6,
-        "speaker": "[redacted]",
-        "text": "Or go blow some shit up",
-    },
-    {
         "id": "mapped_amber_reveal",
         "kind": "guardian",
         "position": "left",
@@ -536,54 +408,6 @@ MAPPED_TAIL_PASS = [
     # at the hallway frame, which is NOT that shot; the card now carries no
     # seen_at_src rather than a wrong one.
     {
-        "id": "mapped_kyle_sup",
-        "kind": "chat",
-        # RIGHT lane, not the default left -- see the bond note below.
-        "position": "right",
-        # OWNER-PLACED, DO NOT MOVE. 310.4 is where the owner had it.
-        #
-        # He asked for it on the Titan close-up ("sup is a purple titan ...
-        # put it when it's zoomed into his face") -- that frame is film 317.0.
-        # It CANNOT be seated there: KYLE_REVEAL_AT is 318.737, so a 2.2s hold
-        # from 317.0 overlaps his own nameplate and the builder refuses it.
-        #
-        # An agent then slid it to 316.287 to make the assertion pass, which
-        # put it AFTER kolunmi's "Disco!" (313.2) and reordered the authored
-        # exchange. That is the fourth class in AGENTS.md: a gate refusing a
-        # seat is not permission to move an authored beat. Reverted.
-        #
-        # The conflict is the owner's to settle -- move the reveal, shorten the
-        # hold, or keep 310.4. Until he does, his number stands.
-        "at_film": 316.967,
-        # OWNER, verbatim: "sup is a purple titan", "put it when it's
-        # zoomed into his face". 316.967 is the first frame of that
-        # close-up, measured by scene detection (the shot runs
-        # 316.967 -> 317.733). The pill OPENS on his face, which is what
-        # he asked for. Nothing else moves.
-        "hold": 2.2,
-        "speaker": "kylegospo",
-        "text": "Sup",
-        "avatar_login": "KyleGospo",
-        # BONDED to his own nameplate, in the deck's bonded-pair shape:
-        # nameplate holds the left, the pill takes the RIGHT. The owner
-        # locked both TIMES ("lock the plate"; the pill on the close-up's
-        # first frame) -- the lane was never his instruction, and stacking
-        # both on the left drew them on top of each other for the pill's
-        # last 0.43 s (the nameplate arrives at 318.737). Right lane, same
-        # seats: the pair reads as the site's GUARDIAN BOND composition.
-        "bond_of": "mapped_kyle_reveal",
-    },
-    {
-        "id": "mapped_kolunmi_disco",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 313.2,
-        "hold": 2.2,
-        "speaker": "kolunmi",
-        "text": "Disco!",
-        "avatar_login": "kolunmi",
-    },
-    {
         "id": "mapped_eyecantcu_reveal",
         "kind": "guardian",
         "position": "left",
@@ -596,39 +420,6 @@ MAPPED_TAIL_PASS = [
     },
 ]
 
-BLACK_CONVERSATION = [
-    ("mapped_akgraner_kyle", "akgraner", "Hi sugar, I'm looking for Kyle", 2.2,
-     "akgraner"),
-    ("mapped_hikari_ouch", "HikariKnight", "Ouch man wtf!", 2.2,
-     "HikariKnight"),
-    ("mapped_owen_sorry", "Owen", "Oh sorry my bad", 2.2, None),
-    ("mapped_kolunmi_pvp", "kolunmi", "Who turned PvP on?", 2.2, "kolunmi"),
-    ("mapped_karena_pve", "karena",
-     "Don't look at me I only put PvE on Legendary", 3.0, "karena"),
-    ("mapped_cam_noone", "cam", "Mom no one plays this game", 2.2, None),
-    ("mapped_hikari_wait", "HikariKnight", "Hey wait?!", 2.2,
-     "HikariKnight"),
-    ("mapped_kolunmi_users", "kolunmi",
-     "Are those ... other linux users?", 2.6, "kolunmi"),
-]
-
-AFTER_AMBER_CONVERSATION = [
-    ("mapped_owen_slay", "Owen", "Slay out, Queen!", 2.2, None, 1.0),
-    ("mapped_akgraner_kindness_1", "akgraner",
-     "Kindness is doing what's right", 2.2, "akgraner", 1.18),
-    ("mapped_akgraner_kindness_2", "akgraner",
-     "For the ecosystem.", 2.2, "akgraner", 1.18),
-    ("mapped_akgraner_kindness_3", "akgraner",
-     "For our users.", 2.2, "akgraner", 1.18),
-    ("mapped_akgraner_kindness_4", "akgraner",
-     "And for our maintainers.", 2.2, "akgraner", 1.18),
-    ("mapped_akgraner_kindness_5", "akgraner",
-     "Don't be nice.", 2.2, "akgraner", 1.18),
-    ("mapped_akgraner_kindness_6", "akgraner",
-     "Be kind.", 2.2, "akgraner", 1.18),
-    ("mapped_which_kyle", "akgraner", "Which one of you is Kyle?", 2.6,
-     "akgraner", 1.0),
-]
 
 # --- THE MAPPED 7:03 -> 8:26 OWNER PASS -----------------------------------
 #
@@ -669,15 +460,6 @@ MAPPED_PASS = [
         "subtitle": "Nobara Contributor LionHeartP and A1RMAX",
     },
     {
-        "id": "mapped_kernel_bump",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 159.5,
-        "hold": 2.2,
-        "speaker": "[redacted]",
-        "text": "Time to bump the kernel",
-    },
-    {
         "id": "walk_lionheartp",
         "kind": "plate",
         "position": "right",
@@ -692,26 +474,6 @@ MAPPED_PASS = [
         "why": "the centered Guardian against Saturn, one shot before pastaq's cue",
     },
     {
-        "id": "mapped_pastaq_tests",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 165.5,
-        "hold": 2.2,
-        "avatar_login": "pastaq",
-        "speaker": "pastaq",
-        "text": "All your tests passed right?",
-    },
-    {
-        "id": "mapped_lionheartp_what_tests",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 169.5,
-        "hold": 2.2,
-        "avatar_login": "LionHeartP",
-        "speaker": "LionHeartP",
-        "text": "What tests?",
-    },
-    {
         "id": "walk_A1RM4X",
         "kind": "ghost",
         "position": "left",
@@ -724,144 +486,10 @@ MAPPED_PASS = [
         "title": "Useful Youtuber (UNCOMMON)",
         "why": "the freed-up ghost seat before GloriousEggroll speaks to him",
     },
-    {
-        "id": "mapped_a1rmax_intro",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 175.5,
-        "hold": 2.5,
-        "avatar_login": "A1RM4X",
-        "speaker": "A1RM4X",
-        "text": (
-            "Thank you I never thought I could help! "
-            "I'm not like you I'm just a lowly user"),
-    },
-    {
-        "id": "walk_ge_stream",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 178.5,
-        "hold": 2.2,
-        "speaker": "GloriousEggroll",
-        "text": "It's your patch, turn the stream on",
-    },
-    {
-        "id": "walk_a1rm4x",
-        "kind": "chat",
-        "position": "left",
-        "hold": 2.2,
-        "avatar_login": "LionHeartP",
-        "speaker": "LionHeartP",
-        "text": "Let's get these numbers up",
-    },
-    {
-        "id": "mapped_lionheartp_hardware",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 183.5,
-        "hold": 2.7,
-        "avatar_login": "LionHeartP",
-        "speaker": "LionHeartP",
-        "text": "Why spend the extra dollar to support Linux hardware",
-    },
-    {
-        "id": "walk_ge_glorious",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 187.5,
-        "hold": 2.8,
-        "speaker": "GloriousEggroll",
-        "text": "There's nothing glorious about this job",
-    },
-    {
-        "id": "mapped_lionheartp_together",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 195.5,
-        "hold": 3.8,
-        "avatar_login": "LionHeartP",
-        "speaker": "LionHeartP",
-        "text": "When we work together This gets easier",
-    },
-    {
-        "id": "mapped_eggroll_title",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 205.5,
-        "hold": 4.5,
-        "speaker": "GloriousEggroll",
-        "text": (
-            "Nice work testing that patch "
-            "Usually Blueberries just "
-            "Send me a bunch of crap"),
-    },
-    {
-        "id": "mapped_eggroll_didyou",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 212.5,
-        "hold": 2.2,
-        "speaker": "GloriousEggroll",
-        "text": "You didn't test any of this did you.",
-    },
-    {
-        "id": "mapped_pastaq_what_tests",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 216.5,
-        "hold": 2.2,
-        "gap_after": 0.0,
-        "avatar_login": "pastaq",
-        "speaker": "pastaq",
-        "text": "Hey man WHAT tests?",
-    },
-    {
-        "id": "walk_ge_lesson",
-        "kind": "chat",
-        "position": "right",
-        "at_film": 218.766,
-        "hold": 2.2,
-        "avatar_login": "LionHeartP",
-        "speaker": "LionHeartP",
-        "text": "Let's go!",
-    },
-    {
-        "id": "mapped_redacted_unlearning",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 221.5,
-        "hold": 2.75,
-        "speaker": "[redacted]",
-        "text": "Unlearning bad habits takes time",
-    },
-    {
-        "id": "mapped_redacted_options",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 224.5,
-        "hold": 6.75,
-        "speaker": "[redacted]",
-        "text": (
-            "Your options are success "
-            "Or a lifetime of servitude in the Toilmaster's Packaging Mines"),
-    },
-    {
-        "id": "mapped_kyle_titanfall",
-        "kind": "chat",
-        "position": "left",
-        "at_film": 239.95,
-        "hold": 2.2,
-        "avatar_login": "KyleGospo",
-        "speaker": "KyleGospo",
-        "text": "FOR TITANFALL!",
-    },
 ]
-OWNER_CONVO = [
-    ("owner_convo_karena", "karena",
-     "The Kube always seeks open source potential"),
-    ("owner_convo_joseph", "joseph",
-     "We can't let The Toilmaster enslave another generation"),
-]
+# Where the owner's 231.5 conversation starts. The LINES are authored in
+# chapters/II-endless-forms.md; this is kept because the OGC banner ducks
+# out of the lane here, which is a fact about the banner, not about them.
 OWNER_CONVO_AT = 231.5
 
 # --- THE CHOICE SCREEN -----------------------------------------------------
@@ -1252,16 +880,15 @@ JUMP_BEAT = 1.5
 # Castro". The `key` rides along ONLY to find the pfp; a speaker with no
 # recorded avatar (Karena, Joseph) gets the drawn crest, by omission rather
 # than by accident.
-TOC_PRE = [
-    {"id": "toc_karena", "key": "mara_sov", "speaker": "Karena",
-     "text": "One hundred thousand bootc volunteers, ready to power up",
-     "hold": 3.2},
-    {"id": "toc_joseph_worth", "key": "joseph_sandoval", "speaker": "Joseph",
-     "text": "Is it worth it?", "hold": 2.2},
-    {"id": "toc_ricardo", "key": "rochaporto", "speaker": "Ricardo",
-     "text": "You really think they can save open source?",
-     "hold": 2.4},
-]
+# The pre-walk questions -- Karena's "One hundred thousand bootc
+# volunteers", Joseph's "Is it worth it?", Ricardo's "You really think they
+# can save open source?" -- are authored in chapters/II-endless-forms.md.
+#
+# They used to be chained BACKWARD from the walk's first frame so the last
+# line landed exactly on it, with an assert that raised if the run reached
+# back onto Dylan Taylor's badge. Their seats are pinned in the chapter file
+# now, and `space_plates` reports a collision with the badge rather than
+# stopping the build.
 # THE EXCHANGE IS CHAINED BACKWARD FROM THE WALK, not forward from 2:19.
 #
 # It used to start at MONTAGE_OUT and give the last line "whatever is left"
@@ -1274,15 +901,9 @@ TOC_PRE = [
 # 1.07 s earlier instead -- into clear air, since Dylan Taylor's badge is out
 # at 134.767. The scene it belongs to is the walk, so the walk is what it is
 # pinned to.
-TOC_PRE_TAIL_GAP = 0.2   # air between the last question and the chapter card
-TOC_POST = [
-    {"id": "toc_joseph_faith", "key": "joseph_sandoval", "speaker": "Joseph",
-     "text": "Dunno, how much faith DO we have in the CNCF?", "hold": 3.0},
-    {"id": "toc_ricardo_desktop", "key": "rochaporto", "speaker": "Ricardo",
-     "text": "Cloud native desktop? ...", "hold": 2.6, "lead": JUMP_BEAT},
-    {"id": "toc_joseph_lol", "key": "joseph_sandoval", "speaker": "Joseph",
-     "text": "LOL", "hold": 2.2},
-]
+# TOC_POST's three answers went with AN4-CH3CK-12's pass: every one of them
+# is in MAPPED_PASS_REPLACEMENTS, so they were built and then filtered out
+# on every run. The words are in git, and the mapped pass renders the beat.
 
 # The payoff pair from §3's announcement block. The first REPRISES the
 # montage's emeritus card verbatim -- a callback, so the copy is identical,
@@ -1702,6 +1323,35 @@ def build():
     def film_of(src):
         return build_efmb.edited_film_for_source(src, lead)
 
+    # THE ACT'S CONVERSATIONS, READ FIRST BECAUSE THE PICTURE MAKES WAY FOR
+    # THEM. Every chat pill in act II is authored in
+    # chapters/II-endless-forms.md; whatever its scheduler cannot honour is
+    # recorded in `unresolved`, never raised -- and every note is printed,
+    # because the owner's rule is "always inform the operator of
+    # improvements", not file them away.
+    #
+    # They are resolved up here rather than appended at the end because the
+    # cards this file DOES still place have to give way to them, exactly as
+    # they did when the pills were Python tables in the same lists. Where the
+    # words live changed; who yields to whom did not.
+    chapter_entries, chapter_unresolved = chapter_md.entries("II")
+    for note in chapter_unresolved:
+        print(f"chapter: {note}", file=sys.stderr)
+
+    def chapter_floor(want):
+        """When the last pill starting before ``want`` is off the screen.
+
+        A card that would open on top of a line already up is pushed to the
+        beat after it, which is what the removed spec tables used to do with
+        a running cursor. Reading it off the pills themselves means a
+        copyedit that lengthens a line still moves the card that follows it,
+        instead of drawing the two on top of each other.
+        """
+        return max((round(e["at"] + e["dur"] + PLATE_GAP, 3)
+                    for e in chapter_entries
+                    if e.get("kind") == "chat" and e["at"] < want),
+                   default=0.0)
+
     plates = []
     opening_head_dur = round(plan["bed_lead_sec"], 3)
     plates.append({
@@ -1884,65 +1534,32 @@ def build():
                               blueberry_entry(item, None, None, casting)),
         })
 
-    # --- the new dialogue, and the choice screen ---------------------------
+    # --- the choice screen -------------------------------------------------
     #
-    # These share the pill lane with the montage asides below, so they are
-    # scheduled first and the montage takes what is left. Every mark is the
-    # owner's own; only the pair he put one second apart is chained, because a
-    # pill under MIN_HOLD cannot be read.
+    # It shares the pill lane with the montage asides below, so it is
+    # scheduled first and the montage takes what is left.
     montage_unresolved = []
-    chat_cursor = 0.0
-    choice_end = 0.0
-    for spec in NEW_CHATS:
-        if spec["at_megacut"] is not None:
-            at = round(spec["at_megacut"] - MEGACUT_OFFSET, 3)
-        else:
-            at = round(chat_cursor + PLATE_GAP, 3)
-
-        # The full-frame choice screen owns Riaan's question. Rendering a
-        # separate chat pill spends the same text twice and delays the graphic.
-        if spec["id"] == "chat_riaan_choices":
-            frames = max(2, int(round(CHOICE_HOLD * CHOICE_FPS)))
-            step = round(CHOICE_HOLD / frames, 4)
-            start = at
-            for n in range(frames):
-                t = n / (frames - 1)
-                plates.append({
-                    "id": f"choice_lfx_{n:02d}",
-                    "kind": "choice",
-                    "at": round(start + n * step, 3),
-                    "dur": step,
-                    "position": "full",
-                    "group": "choice_lfx",
-                    "order": n,
-                    "animation": True,
-                    "copy_source": "owner_supplied",
-                    "label": spec["text"],
-                    "options": CHOICE_OPTIONS,
-                    "pointer": round(t * CHOICE_POINTER_CUT, 4),
-                })
-            choice_end = round(start + frames * step, 3)
-            chat_cursor = max(chat_cursor, choice_end)
-            continue
-
-        entry = {
-            "id": spec["id"],
-            "kind": "chat",
-            "at": at,
-            "dur": spec["hold"],
+    at = round(CHOICE_PROMPT["at_megacut"] - MEGACUT_OFFSET, 3)
+    frames = max(2, int(round(CHOICE_HOLD * CHOICE_FPS)))
+    step = round(CHOICE_HOLD / frames, 4)
+    for n in range(frames):
+        t = n / (frames - 1)
+        plates.append({
+            "id": f"choice_lfx_{n:02d}",
+            "kind": "choice",
+            "at": round(at + n * step, 3),
+            "dur": step,
+            "position": "full",
+            "group": "choice_lfx",
+            "order": n,
+            "animation": True,
             "copy_source": "owner_supplied",
-            "speaker": spec["speaker"],
-            "text": spec["text"],
-            "text_source": "owner_supplied",
-        }
-        if spec.get("key"):
-            entry.update(chat_avatar(spec["key"], casting))
-        elif spec.get("login"):
-            entry["avatar"] = str(AVATAR_DIR / f"{spec['login']}.png")
-            entry["avatar_url"] = (
-                f"https://github.com/{spec['login']}.png?size=256")
-        plates.append(entry)
-        chat_cursor = round(at + spec["hold"], 3)
+            "label": CHOICE_PROMPT["text"],
+            "options": CHOICE_OPTIONS,
+            "pointer": round(t * CHOICE_POINTER_CUT, 4),
+        })
+    choice_end = round(at + frames * step, 3)
+    chat_cursor = choice_end
 
     # --- the montage asides (owner brief #98) ------------------------------
     # The ranked announcement cards are GONE with AN4-CH3CK-12; the owner's own
@@ -2113,54 +1730,10 @@ def build():
     # everything else, so it is scheduled on ONE cursor even where the card's
     # lane changes -- load_manifest_entries is position-blind, and two cards
     # in different thirds of the frame still read as two cards at once.
-    toc = []
 
     def src_of(film_sec):
         """An owner mark is given in FILM time; anchor it in SOURCE time."""
         return build_efmb.edited_source_for_film(film_sec, lead)
-
-    def toc_chat(spec, at, hold):
-        entry = {
-            "id": spec["id"],
-            "kind": "chat",
-            "at": round(at, 3),
-            "dur": round(hold, 3),
-            "position": "left",
-            "copy_source": "owner_supplied",
-            "speaker": spec["speaker"],
-            "text": spec["text"],
-            "text_source": "owner_supplied",
-            **chat_avatar(spec["key"], casting),
-        }
-        return entry
-
-    # The questions, in the pre-walk window. The scene starts at 2:19 -- the
-    # lead-in banner that was to open it has no copy yet (#98, Questions), so
-    # the first line takes its slot.
-    span = (sum(spec["hold"] for spec in TOC_PRE)
-            + PLATE_GAP * (len(TOC_PRE) - 1) + TOC_PRE_TAIL_GAP)
-    cursor = round(film_of(WALK_IN) - span, 3)
-    assert cursor >= 134.767, (
-        f"the pre-walk exchange would start at {cursor:.3f}s, on top of Dylan "
-        "Taylor's badge -- a hold has to come down")
-    for spec in TOC_PRE:
-        hold = spec["hold"]
-        assert hold >= MIN_HOLD, (
-            f"{spec['id']} holds {hold:.3f}s, under the {MIN_HOLD}s a card "
-            "needs to be read")
-        toc.append(toc_chat(spec, cursor, hold))
-        cursor = round(cursor + hold + PLATE_GAP, 3)
-
-    # The answer, after the walk's last card has cleared. `lead` is the TOTAL
-    # clear screen before the card -- the jump beat is measured in clear air,
-    # not in clear air plus a gap nobody asked for.
-    cursor = round(film_of(WALK_OUT) + PLATE_GAP, 3)
-    for spec in TOC_POST:
-        at = round(cursor - PLATE_GAP + spec.get("lead", PLATE_GAP), 3)
-        toc.append(toc_chat(spec, at, spec["hold"]))
-        cursor = round(at + spec["hold"] + PLATE_GAP, 3)
-    # TOC_ANNOUNCEMENTS are NOT scheduled: they are AN4-CH3CK-12's payoff pair,
-    # and he is out this round. See the ANNOUNCER note.
 
     # --- the mapped 7:03 -> 8:26 owner pass -------------------------------
     mapped_unresolved = []
@@ -2173,13 +1746,13 @@ def build():
             want = round(spec["at_film"], 3)
         else:
             want = round(mapped_cursor + PLATE_GAP, 3)
-        at = round(max(want, mapped_cursor), 3)
+        at = round(max(want, mapped_cursor, chapter_floor(want)), 3)
         if ((spec.get("at_src") is not None or spec.get("at_film") is not None)
                 and at > want + 1e-6):
             mapped_unresolved.append(
                 f"{spec['id']} is owner-timed to Act II film {want:.3f}, but "
-                f"the previous mapped card clears at {mapped_cursor:.3f}, so "
-                f"it lands at {at:.3f} instead. The order is the owner's; "
+                f"the card or line before it clears at {at:.3f}, so "
+                f"it lands there instead. The order is the owner's; "
                 "only the gap is the timeline's")
         entry = {
             "id": spec["id"],
@@ -2236,27 +1809,6 @@ def build():
         mapped.append(entry)
         mapped_cursor = round(at + spec["hold"] + spec.get("gap_after", PLATE_GAP), 3)
 
-    convo_cursor = OWNER_CONVO_AT
-    for pid, speaker, txt in OWNER_CONVO:
-        hold = round(max(MIN_HOLD, len(txt) / 15), 3)
-        at = round(convo_cursor, 3)
-        entry = {
-            "id": pid,
-            "kind": "chat",
-            "at": at,
-            "dur": hold,
-            "position": "left",
-            "copy_source": "owner_supplied",
-            "speaker": speaker,
-            "text": txt,
-            "text_source": "owner_supplied",
-        }
-        if speaker == "karena":
-            entry.update(github_avatar("karena"))
-        if at <= plan["picture_sec"]:
-            entry["seen_at_src"] = round(src_of(at), 3)
-        mapped.append(entry)
-        convo_cursor = round(at + hold + PLATE_GAP, 3)
     mapped_unresolved.append(
         "the owner conversation at 231.500 now keeps only karena and joseph; "
         "krook and both rochaporta lines were removed by the owner. Karena's "
@@ -2348,45 +1900,14 @@ def build():
             "text_source": "owner_supplied",
         })
 
+    # The two hallway conversations -- the one over black and the one after
+    # Amber's reveal -- are authored in chapters/II-endless-forms.md now.
+    # They used to be tuple tables chained off build_efmb's HALLWAY_AT and
+    # HALLWAY_AFTER_AMBER_AT, guarded by asserts that RAISED if a line ran
+    # past the reveal. Their seats are pinned in the chapter file, and an
+    # overrun is reported by `space_plates` below instead of stopping the
+    # build: nothing here may withhold the act over a hold that is 0.2s long.
     mapped_tail = []
-    black_cursor = round(build_efmb.HALLWAY_AT + 0.5, 3)
-    for pid, speaker, text, hold, avatar_login in BLACK_CONVERSATION:
-        entry = {
-            "id": pid,
-            "kind": "chat",
-            "at": black_cursor,
-            "dur": hold,
-            "position": "left",
-            "copy_source": "owner_supplied",
-            "speaker": speaker,
-            "text": text,
-            "text_source": "owner_supplied",
-        }
-        if avatar_login:
-            entry.update(github_avatar(avatar_login))
-        mapped_tail.append(entry)
-        black_cursor = round(black_cursor + hold + PLATE_GAP, 3)
-    assert black_cursor <= build_efmb.AMBER_AT
-
-    after_cursor = round(build_efmb.HALLWAY_AFTER_AMBER_AT + 0.5, 3)
-    for pid, speaker, text, hold, avatar_login, scale in AFTER_AMBER_CONVERSATION:
-        entry = {
-            "id": pid,
-            "kind": "chat",
-            "at": after_cursor,
-            "dur": hold,
-            "position": "left",
-            "copy_source": "owner_supplied",
-            "speaker": speaker,
-            "text": text,
-            "text_source": "owner_supplied",
-            "scale": scale,
-        }
-        if avatar_login:
-            entry.update(github_avatar(avatar_login))
-        mapped_tail.append(entry)
-        after_cursor = round(after_cursor + hold + PLATE_GAP, 3)
-    assert after_cursor <= build_efmb.HALLWAY_RETURN_AT
 
     for spec in MAPPED_TAIL_PASS:
         entry = {
@@ -2456,7 +1977,6 @@ def build():
     # The owner's newer pass moves this banner to the top at film 2:18.5.
     # The old bottom-letterbox windows are superseded rather than layered.
 
-    plates.extend(toc)
     plates.extend(timed)
     plates.extend(late)
     plates.extend(mapped_tail)
@@ -2465,14 +1985,7 @@ def build():
         | MAPPED_TAIL_REPLACEMENTS)]
     plates.extend(mapped)
 
-    # The owner-authored conversations in chapters/II-endless-forms.md. Same
-    # entry shape as everything above; whatever its scheduler cannot honour
-    # is recorded in `unresolved`, never raised -- and every note is printed,
-    # because the owner's rule is "always inform the operator of
-    # improvements", not file them away.
-    chapter_entries, chapter_unresolved = chapter_md.entries("II")
-    for note in chapter_unresolved:
-        print(f"chapter: {note}", file=sys.stderr)
+    # The owner-authored conversations are resolved at the top of build().
     plates.extend(chapter_entries)
 
     plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))

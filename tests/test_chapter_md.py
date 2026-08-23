@@ -218,13 +218,20 @@ def test_boss_entries_carry_the_miniboss_shape_and_placeholder_seed():
 def test_instructions_prose_and_indented_examples_parse_as_nothing():
     md = chapter_md.chapter_path("II").read_text()
     blocks = chapter_md.parse(md)
-    # The committed file carries the two red splashes and nothing else: the
-    # instructions, the indented example and the evidence notes must not
-    # leak in as scheduleable lines.
-    assert len(blocks) == 2
+    # The file carries the act's conversations AND a grammar guide written in
+    # the same syntax it describes. The guide's prose, its indented examples
+    # and the evidence notes beside each line must not leak in as
+    # scheduleable lines: every parsed line has to be one the act declares.
+    ids = {line["id"] for block in blocks for line in block["lines"]}
+    assert "example" not in ids
     for block in blocks:
-        assert len(block["lines"]) == 1
-        assert block["lines"][0]["kind"] == "boss"
+        for line in block["lines"]:
+            assert line["kind"] in {"chat", "boss", "card"}
+            assert line["id"], "a line parsed without an id"
+    # And the two red splashes are still the only minibosses in the act.
+    boss = [line["id"] for block in blocks for line in block["lines"]
+            if line["kind"] == "boss"]
+    assert boss == ["late_poor_technical_decisions", "mapped_haters"]
 
 
 # ---------------------------------------------------------------------------
@@ -341,3 +348,49 @@ def test_a_derived_nameplate_is_carried_through_a_sync_untouched():
         before, [{"id": "pill", "text": "new"}])
     assert merged == [before[0], {"id": "pill", "text": "new"}]
     assert notes == []
+
+
+# ---------------------------------------------------------------------------
+# The two portrait keys, from act II's migration.
+# ---------------------------------------------------------------------------
+
+def test_avatar_login_takes_that_accounts_github_picture():
+    entry = _one("## 0:00\n\nkylegospo @ 0:00 +2.2: Sup\n"
+                 "  - avatar_login: KyleGospo\n")
+    assert entry["avatar"] == "renders/avatars/KyleGospo.png"
+    assert entry["avatar_url"] == \
+        "https://github.com/KyleGospo.png?size=256"
+    assert "avatar_login" not in entry, \
+        "an authoring key reached the manifest"
+
+
+def test_cast_takes_the_portrait_the_casting_vocab_records():
+    entry = _one("## 0:00\n\nJoseph @ 0:00 +2.2: Is it worth it?\n"
+                 "  - cast: joseph_sandoval\n")
+    assert entry["avatar"] == "renders/avatars/joseph_sandoval.png"
+    assert entry["avatar_url"] == \
+        chapter_md._casting_avatars()["joseph_sandoval"]
+    assert "cast" not in entry
+
+
+def test_naming_somebody_with_no_recorded_portrait_draws_the_crest():
+    """An answer, not a gap: the pill keeps its crest rather than a made-up
+    URL for a person whose picture nobody has recorded."""
+    entry = _one("## 0:00\n\nkarena @ 0:00 +2.2: I love this job\n"
+                 "  - cast: nobody_has_this_key\n")
+    assert "avatar" not in entry and "avatar_url" not in entry
+
+
+def test_a_speaker_who_is_a_login_still_needs_no_portrait_row():
+    entry = _one("## 0:00\n\nkylegospo @ 0:00 +2.2: Sup\n")
+    assert entry["avatar_url"] == "https://github.com/kylegospo.png?size=256"
+
+
+def test_the_two_portrait_keys_are_not_interchangeable():
+    """Collapsing them would swap faces on eight delivered pills."""
+    by_cast = _one("## 0:00\n\nA1RM4X @ 0:00 +2.2: hi\n  - cast: a1rm4x\n")
+    by_login = _one("## 0:00\n\nA1RM4X @ 0:00 +2.2: hi\n"
+                    "  - avatar_login: A1RM4X\n")
+    assert by_login["avatar_url"] == "https://github.com/A1RM4X.png?size=256"
+    if "avatar_url" in by_cast:
+        assert by_cast["avatar_url"] != by_login["avatar_url"]

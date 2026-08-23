@@ -102,3 +102,47 @@ def test_every_plate_keeps_the_id_the_delivered_master_refers_to(act):
     ids = [plate["id"] for plate in resolved]
     assert ids == [plate["id"] for plate in want]
     assert len(set(ids)) == len(ids)
+
+
+# ---------------------------------------------------------------------------
+# Act II, the last act to migrate and the only partial author.
+# ---------------------------------------------------------------------------
+# It cannot join OWNED: `scripts/build_efmb_plates.py` still places its
+# titles, banners, Guardian reveals and the 67-frame choice screen, and it is
+# the manifest's generator. What DID move is every word anybody speaks. So
+# the claim this act can make is narrower than the others' and is checked in
+# its own shape: the chapter file is the sole author of act II's dialogue.
+
+def _act_two_chats():
+    chap = chapter_md.chapter("II")
+    with chap.manifest_path().open(encoding="utf-8") as fh:
+        plates = json.load(fh)[chap.plates_key]
+    return [p for p in plates if p.get("kind") == "chat"]
+
+
+def test_every_word_spoken_in_act_two_is_authored_in_its_chapter_file():
+    """The guard against a pill drifting back into Python.
+
+    Act II's dialogue lived in about ten constant tables in its generator,
+    and the cost was that a copyedit meant reading code. Adding a pill back
+    to one of those tables would work, and nobody would notice until the next
+    person went looking for the words in the obvious place. This notices.
+    """
+    authored = {e["id"] for e in chapter_md.entries("II")[0]
+                if e.get("kind") == "chat"}
+    rendered = {p["id"] for p in _act_two_chats()}
+    assert rendered - authored == set(), \
+        "act II renders chat pills its chapter file does not author"
+    assert authored - rendered == set(), \
+        "the chapter file authors pills act II does not render"
+    assert len(rendered) > 50, "act II's conversations have gone missing"
+
+
+def test_act_two_pills_reproduce_the_manifest_exactly():
+    """Same identity claim as the migrated acts, over the dialogue only."""
+    by_id = {p["id"]: p for p in _act_two_chats()}
+    for entry in chapter_md.entries("II")[0]:
+        if entry.get("kind") != "chat":
+            continue
+        assert entry == by_id[entry["id"]]
+        assert list(entry) == list(by_id[entry["id"]])
