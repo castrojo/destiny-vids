@@ -1394,3 +1394,103 @@ def test_a_provenance_note_names_the_commit_it_was_written_against():
             f"act {numeral}'s provenance_note does not say which build "
             f"commit it was written against, so nothing can tell whether it "
             f"is still answering the current question")
+
+
+def test_every_programme_segment_that_is_not_an_act_is_declared():
+    """REGRESSION: 7 of the programme's 17 items had no gate of any kind.
+
+    `master`, `sources`, `footage`, `provenance` and `link` are all keyed by
+    act numeral, so an item cut straight from `renders/` was seen by none of
+    them -- not `gather`, not `stale_seated_acts`, not `foreign_seated_acts`.
+    Six are the Perfume thread and one is the ending's silent mission pause;
+    two carry authored copy about real people, and `renders/` is gitignored,
+    so literally nothing watched them. That is how a Perfume regression hid
+    for a day.
+    """
+    segments = deliver.load_segments(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    seated = [src for src, _ in deliver.plan_segments(
+        REPO_ROOT / "stories" / "megacut" / "megacut.json")]
+    assert seated, "the plan seats no renders/ segment -- did the key change?"
+    undeclared = [s for s in seated if s not in segments]
+    assert not undeclared, (
+        f"seated in the programme but watched by nothing: {undeclared}")
+
+
+def test_a_segment_carrying_authored_copy_declares_what_writes_that_copy():
+    """A plate manifest, tools/plate.py and vocab/casting.yaml each restate
+    somebody's words. A segment that burns copy must be able to notice."""
+    segments = deliver.load_segments(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    for src, spec in segments.items():
+        if "AUTHORED COPY" not in (spec.get("note") or "").upper():
+            continue
+        sources = spec.get("sources") or []
+        assert "tools/plate.py" in sources, f"{src} burns copy without plate.py"
+        assert "vocab/casting.yaml" in sources, f"{src} burns copy without casting"
+
+
+def test_every_declared_segment_input_exists_and_is_recorded():
+    """A path typo hashes as 'absent' and then looks perfectly stable."""
+    segments = deliver.load_segments(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    for src, spec in segments.items():
+        for rel in spec.get("sources") or []:
+            assert (REPO_ROOT / rel).exists(), f"{src} declares missing {rel}"
+        if spec.get("sources"):
+            assert spec.get("source_digest"), f"{src} records no digest"
+
+
+def test_a_moved_segment_input_is_reported_stale(tmp_path):
+    """The point of the rung: a Perfume rebuild must not be able to hide."""
+    plan = tmp_path / "megacut.json"
+    plan.write_text(json.dumps({"items": [
+        {"path": "/abs/Prod/01-intro.mp4"},        # an act: not this rung's
+        {"path": "renders/perfume-4-overlays.mp4"},
+    ]}))
+    programme = deliver.ActReport(
+        types.SimpleNamespace(numeral="", name="the programme",
+                              prod_file=None))
+    segs = {"renders/perfume-4-overlays.mp4":
+            {"sources": ["tools/plate.py"], "source_digest": "0" * 64}}
+
+    deliver.check_segments(plan, segs, programme)
+
+    states = [f.state for f in programme.findings]
+    assert deliver.STALE in states
+    assert not any("/abs/Prod" in f.detail for f in programme.findings), \
+        "an act seated by absolute path belongs to the act rungs, not here"
+
+
+def test_an_undeclared_segment_is_named_rather_than_skipped(tmp_path):
+    """Silence is what the whole regression was made of."""
+    plan = tmp_path / "megacut.json"
+    plan.write_text(json.dumps({"items": [{"path": "renders/surprise.mp4"}]}))
+    programme = deliver.ActReport(
+        types.SimpleNamespace(numeral="", name="the programme",
+                              prod_file=None))
+
+    deliver.check_segments(plan, {}, programme)
+
+    assert [f.state for f in programme.findings] == [deliver.UNDECLARED]
+    assert "renders/surprise.mp4" in programme.findings[0].detail
+
+
+def test_the_segment_rung_does_not_tell_anyone_to_run_publish(tmp_path):
+    """`publish` is scoped by act numeral and a segment has none.
+
+    Telling somebody to run a command that will not do the thing is the same
+    fault this rung exists to catch, one layer up.
+    """
+    plan = tmp_path / "megacut.json"
+    plan.write_text(json.dumps({"items": [{"path": "renders/perfume-2.mp4"}]}))
+    programme = deliver.ActReport(
+        types.SimpleNamespace(numeral="", name="the programme",
+                              prod_file=None))
+    segs = {"renders/perfume-2.mp4": {"sources": ["tools/plate.py"]}}
+
+    deliver.check_segments(plan, segs, programme)
+
+    detail = programme.findings[0].detail
+    assert "publish" not in detail, detail
+    assert "delivery.json" in detail
