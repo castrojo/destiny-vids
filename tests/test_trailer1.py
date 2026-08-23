@@ -40,25 +40,33 @@ def on_screen_copy(manifest):
 
 # --- the length ---------------------------------------------------------------
 
-def test_the_music_plays_two_full_minutes():
-    """Owner, on a six-second extension: '+6s sounds too short'.
+def test_the_music_stops_to_make_room_for_the_url():
+    """The song is unbroken and flat through 2:15 -- measured, not assumed --
+    so it can be ended anywhere in that window without cutting a cadence.
 
-    The song is unbroken and flat through 2:15 -- measured, not assumed -- so
-    ending at 2:00 cuts through no cadence, and the 1:47 howl still lands ten
-    seconds clear of the fade rather than underneath it.
+    Where it ends is an EDITORIAL choice, not a musical one: the music stops
+    exactly as the address arrives, so the cut to silence IS the reveal. The
+    1:47 howl still plays clear, two seconds ahead of the fade.
     """
-    assert T.MUSIC_END == pytest.approx(120.020, abs=1e-6)
+    assert T.MUSIC_END == pytest.approx(112.300, abs=1e-6)
 
 
-def test_the_url_holds_seven_seconds_after_the_music():
+def test_the_url_is_the_longest_held_card_in_the_cut():
     """Owner: 'hold out the url wolves.projectbluefin.io ... until it's a
     natural break in the movie, but don't over do it'.
 
-    The natural break is the cut to silence: the address arrives into quiet,
-    and seven seconds is long enough to read it twice without becoming a slate.
+    Then, once he had watched it: "The entire point is to show the URL, why is
+    there a huge gap between the call to actions and the URL", and "you only
+    show the CTA for the last 7 seconds".
+
+    So the break is bought by ending the SONG sooner, not by holding the
+    address back. The address is on screen longer than any other card in the
+    film -- that is what "the entire point" has to mean in a timing record.
     """
-    assert T.URL_HOLD == pytest.approx(7.000, abs=1e-9)
-    assert T.TOTAL == pytest.approx(127.020, abs=1e-6)
+    assert T.URL_HOLD == pytest.approx(12.000, abs=1e-9)
+    assert T.TOTAL == pytest.approx(124.300, abs=1e-6)
+    longest = max(p["dur"] for p in T.load()["plates"] if p["id"] != "endcard-event")
+    assert T.URL_HOLD >= longest, "something is on screen longer than the URL"
 
 
 def test_the_url_arrives_on_the_cut_to_silence(manifest):
@@ -92,7 +100,7 @@ def test_the_join_dissolve_is_paid_for_not_ignored():
     """
     trims = T.CUT_OUT + (T.OUT_POINT - T.CUT_IN)
     assert T.PICTURE == pytest.approx(trims - T.JOIN_FADE, abs=1e-9)
-    assert T.ENDCARD == pytest.approx(7.500 + T.JOIN_FADE + T.URL_HOLD, abs=1e-9)
+    assert T.ENDCARD == pytest.approx(T.MUSIC_TAIL + T.URL_HOLD, abs=1e-9)
 
 # --- the tank -----------------------------------------------------------------
 
@@ -156,11 +164,12 @@ def test_the_wolves_fade_is_longer_and_the_extra_time_went_to_the_drama():
     to the TURN and the SINK and not to the holds -- a longer hold is a longer
     still, not a bigger moment.
     """
-    assert T.BRIDGE == 24.0                      # the prologue's is 10.0
+    assert T.BRIDGE == 21.0                      # the prologue's is 10.0
     assert T.BRIDGE_TURN_LEN == 10.000           # the prologue's turn is 2.600
-    # The tail is what the third message plays on, and what leaves the reveal
-    # its empty night. It is the whole reason the bridge grew past 14.0.
-    assert T.BRIDGE_NIGHT_TAIL == 10.000
+    # The tail is what the third message plays on. It clears that message and
+    # stops: owner, on an earlier 10.000 s tail, "do you seriously spend at
+    # least three seconds showing nothing on the screen".
+    assert T.BRIDGE_NIGHT_TAIL == 7.000
     assert T.BRIDGE == pytest.approx(
         T.BRIDGE_DAY_SETTLE + T.BRIDGE_TURN_LEN + T.BRIDGE_NIGHT_TAIL)
 
@@ -171,9 +180,9 @@ def test_the_music_plays_out_past_where_the_prologue_faded():
 
 def test_the_wolves_howl_lands_before_the_final_fade():
     """The 1:47 howl is the trailer's climax, not a quiet tail detail."""
-    assert T.AUDIO_FADE_START == pytest.approx(117.000)
+    assert T.AUDIO_FADE_START == pytest.approx(109.280)
     assert T.AUDIO_FADE == pytest.approx(3.020)
-    assert T.AUDIO_FADE_START > 107.0 + 5.0, "the fade swallows the howl"
+    assert T.AUDIO_FADE_START > 107.0, "the fade starts on top of the howl"
 
 def test_the_lossless_master_is_true_peak_gated_before_delivery():
     """A fresh visual render must not reintroduce a clipping audio master."""
@@ -303,10 +312,10 @@ def test_the_three_day_cards_lead_into_the_kubecon_reveal(manifest):
     endcard_at = T.PICTURE + T.BRIDGE
     last = cards[-1]
     assert last["at"] + last["dur"] <= endcard_at
-    # The reveal must arrive on night that has been empty for a beat, not onto
-    # a line that has only just left. This is the 'don't over do it' margin.
-    assert endcard_at - (last["at"] + last["dur"]) >= 3.0, (
-        "the KubeCon reveal treads on the last message")
+    # A beat of clear night, and NO MORE. Owner, on a 4.600 s version: "do you
+    # seriously spend at least three seconds showing nothing on the screen".
+    clear = endcard_at - (last["at"] + last["dur"])
+    assert 1.0 <= clear <= 2.5, f"{clear:.3f} s of dead air before the reveal"
     assert plate(manifest, "endcard-event")["at"] == pytest.approx(endcard_at)
 
 def test_the_day_cards_sit_in_the_wallpapers_dark_band(manifest):
