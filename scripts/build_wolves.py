@@ -182,32 +182,67 @@ SUMMIT_DIR = REPO / "renders" / "summit-plates"
 # reproduced verbatim; the CNCF mark is NOT on the slide (rights, #104).
 INTERRUPTION_DIR = REPO / "renders" / "interruption"
 
-# What draws each of those directories. `summit` and `interruption` below ask
-# only whether a file is THERE, and existence is not freshness
-# (tools/freshness.py): a slide drawn before its own copy changed is used
-# without a word, which is how a card ships yesterday's text with every gate
-# green. This act degrades rather than blocks (an absent plate falls back to a
-# marker), so a STALE plate is reported rather than refused -- but it is never
-# silent again.
-CARD_INPUTS = {
-    SUMMIT_DIR: [REPO / "stories" / "summit-photos.json",
-                 REPO / "scripts" / "build_summit_plates.py",
-                 REPO / "tools" / "plate.py"],
-    INTERRUPTION_DIR: [REPO / "stories" / "06-wolves-interruption-cards.json",
-                       REPO / "scripts" / "build_interruption_cards.py"],
+# What draws each of those directories, and which cards it is *supposed* to
+# draw. Both questions matter and they catch different faults.
+#
+# The inputs answer freshness: these directories used to be consulted for
+# existence alone, and existence is not freshness (tools/freshness.py). A slide
+# drawn before its own copy changed is used without a word, which is how a card
+# ships yesterday's text with every gate green.
+#
+# The declared names answer ownership, which is the sharper of the two. A card
+# that is REMOVED from its manifest leaves its PNG behind -- renders/ is
+# gitignored, so nothing sweeps it -- and that orphan still sits in the
+# directory a slot lookup reads by filename. c-cortney.png was exactly that:
+# drawn on 2026-08-15, removed from the interruption the same week, and still
+# on disk eight days later naming a real person on a card the cut no longer
+# contains. Reading the directory would report it stale forever; reading the
+# manifest says the truer thing, which is that nobody owns it.
+CARD_SOURCES = {
+    SUMMIT_DIR: {
+        "inputs": [REPO / "stories" / "summit-photos.json",
+                   REPO / "scripts" / "build_summit_plates.py",
+                   REPO / "tools" / "plate.py"],
+        "declared": lambda: sorted(
+            f"{slot}.jpg" for slot in
+            json.loads((REPO / "stories" / "summit-photos.json").read_text())
+            ["assignment"]),
+    },
+    INTERRUPTION_DIR: {
+        "inputs": [REPO / "stories" / "06-wolves-interruption-cards.json",
+                   REPO / "scripts" / "build_interruption_cards.py"],
+        "declared": lambda: sorted(
+            f"{card['id']}.png" for card in
+            json.loads(
+                (REPO / "stories" / "06-wolves-interruption-cards.json")
+                .read_text())["cards"]),
+    },
 }
 
 
 def report_stale_cards(log=None):
-    """Name every card PNG older than what draws it. Reports, never blocks."""
+    """Name every declared card older than what draws it, and every orphan.
+
+    Reports, never blocks: this act degrades rather than refuses, and an
+    absent plate falls back to a marker. But it is never silent again.
+    """
     log = log or (lambda msg: print(msg, file=sys.stderr))
     stale = []
-    for out_dir, inputs in CARD_INPUTS.items():
+    for out_dir, spec in CARD_SOURCES.items():
         if not out_dir.exists():
             continue
-        drawn = sorted(p for p in out_dir.iterdir()
-                       if p.suffix.lower() in (".png", ".jpg"))
-        for path in freshness.stale_outputs(inputs, drawn):
+        declared = set(spec["declared"]())
+        on_disk = {p.name: p for p in out_dir.iterdir()
+                   if p.suffix.lower() in (".png", ".jpg")}
+
+        for name in sorted(set(on_disk) - declared):
+            log(f"  ORPHAN CARD {_rel(on_disk[name])}: drawn once and no "
+                f"longer declared in the manifest -- nothing in the cut asks "
+                f"for it. Delete it; a slot named {Path(name).stem} would "
+                f"pick it up by filename alone.")
+
+        drawn = sorted(on_disk[n] for n in sorted(declared & set(on_disk)))
+        for path in freshness.stale_outputs(spec["inputs"], drawn):
             stale.append(path)
             log(f"  STALE CARD {_rel(path)}: older than what draws it -- "
                 f"rerun the pass that builds {_rel(out_dir)}")
