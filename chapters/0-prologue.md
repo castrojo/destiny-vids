@@ -54,8 +54,10 @@ python3 tools/chapter_md.py check 0
 of the prologue on 2026-08-23 — *"get rid of that thanks for volunteering
 slide"*, *"I will put it somewhere else"* — so it is unseated here and waiting
 for the seat they choose. Its copy is authored and is reproduced verbatim
-below so that re-seating it is a move, never a rewrite. Nothing else moved with
-it; `book-a` stays at 34.0s, which the owner re-confirmed on 2026-08-22.
+below so that re-seating it is a move, never a rewrite. `book-a` has been
+returned to **26.9s**, the seat it held before the briefing card displaced it
+in #321 — the owner reported the 34.0s seat as a severe regression on
+2026-08-23, because with the briefing gone 34.0s is no longer the book shot.
 
     id     mission-briefing
     kind   act
@@ -68,14 +70,14 @@ it; `book-a` stays at 34.0s, which the owner re-confirmed on 2026-08-22.
     copy   owner_supplied
 
 **`book-b` was not moved with `book-a`, and does not need to be.** It opens at
-31.0s and runs to 34.9s, so on paper it starts *before* the card it follows —
-but it carries an empty `body` and `scripts/build_prologue.py` never overlays
-it, so the collision reaches no pixel. Verified on the rendered master, not
-reasoned about. See the manifest's `unresolved`.
+31.0s and runs to 34.9s, so on paper it overlaps the tail of `book-a` — but it
+carries an empty `body` and `scripts/build_prologue.py` never overlays it, so
+the collision reaches no pixel. Verified on the rendered master, not reasoned
+about. See the manifest's `unresolved`.
 
-## 0:34.000
+## 0:26.900
 
-* [book-a] bookline @ 0:34.000 +6.74
+* [book-a] bookline @ 0:26.900 +6.74
   - variant: box
   - angle: 4.0
   - body: Two Generations of Contributors

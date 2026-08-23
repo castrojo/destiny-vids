@@ -37,7 +37,7 @@
       "id": "book-a",
       "kind": "bookline",
       "variant": "box",
-      "at": 34.0,
+      "at": 26.9,
       "dur": 6.74,
       "angle": 4.0,
       "body": [
@@ -78,7 +78,7 @@
   "unresolved": [
     "SETTLED 2026-08-14: the eyebrow is type, not the real wordmark -- the owner asked for the words to stay and only the B to be coloured. scripts/fetch_wordmark.py remains the route if that is ever revisited.",
     "Michroma -- the site's Weyland-era display face for this overlay -- is not installed on this host, so the card resolves the act slides' own stack ('Inter', 'Arial Narrow', -> DejaVu Sans here) exactly as cards/act.html does. That keeps the main title in the same face as every act slide it sits in front of, which is arguably right anyway, but it is a substitution and is recorded as one.",
-    "book-a moved 26.9 -> 34.0 to make room for `mission-briefing` (owner, 2026-08-18; the move re-confirmed 2026-08-22). book-b was NOT moved and is not going to be: it opens at 31.0 and runs to 34.9, so on paper it starts before the card it follows -- but it carries an EMPTY `body` and scripts/build_prologue.py never overlays it (its input list is maintitle-a, maintitle-b, book-a, day, night). The overlap is therefore a record-only collision that reaches no pixel, verified on the rendered master rather than reasoned about. Nothing is owed here; the plate is kept because deleting an authored object is a separate decision from re-timing one.",
-    "mission-briefing (`Thanks for Volunteering`) was UNSEATED from the prologue on 2026-08-23 at the owner's word -- \"get rid of that thanks for volunteering slide\", \"I will put it somewhere else\". The card is not cancelled, it is homeless: its verbatim copy is parked in chapters/0-prologue.md so re-seating it anywhere in the show is a move, not a rewrite. book-a was NOT moved back to 26.9 -- the owner re-confirmed its 34.0 seat on 2026-08-22, and un-doing an authored beat needs its own yes."
+    "book-a was returned to 26.9 on 2026-08-23 after the owner reported the 34.0 seat as a severe regression -- with `mission-briefing` unseated, 34.0 is the library/terrarium shot, not the Origin of Species page the box is written against. 26.9 is the seat it held before #321 displaced it, restored verbatim rather than re-derived. book-b was NOT moved: it opens at 31.0 and runs to 34.9, so it overlaps the tail of book-a -- but it carries an EMPTY `body` and scripts/build_prologue.py never overlays it (its input list is maintitle-a, maintitle-b, book-a, day, night). The overlap is a record-only collision that reaches no pixel, verified on the rendered master rather than reasoned about. The plate is kept because deleting an authored object is a separate decision from re-timing one.",
+    "mission-briefing (`Thanks for Volunteering`) was UNSEATED from the prologue on 2026-08-23 at the owner's word -- \"get rid of that thanks for volunteering slide\", \"I will put it somewhere else\". The card is not cancelled, it is homeless: its verbatim copy is parked in chapters/0-prologue.md so re-seating it anywhere in the show is a move, not a rewrite."
   ]
 }
