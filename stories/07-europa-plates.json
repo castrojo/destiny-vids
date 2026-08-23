@@ -1,338 +1,321 @@
 {
-  "_what": "Act VII's record: the words that go on screen, the windows they occupy, the measured letterbox, and the build parameters that produce the delivered master. It exists so act VII's inputs are COMMITTED rather than living only in ~/Videos/wolves-directors-cut, where nimbatus-review/render/run-final-hq.sh cuts it (#152). Without it a dialogue round (#102) has nowhere to land, and the plates can be re-rendered in the project while the film keeps playing the older cut. scripts/build_europa.py reads this; editing a line here changes the film.",
-  "_provenance": "Every line of copy is the OWNER'S OWN, from #102's terse-pass table, reproduced VERBATIM -- including 'AN4-CH4K-12' and the asterisk in 'f*cking' -- with the BSHERMAN recast applied. The removed sign-off ('... disavow my existence. Tell the medic and the engineer I'll meet them there. Out.') stays removed; it lives on in #102 and the project's _backups/. The picture graph, the audio join, the reveal/endcard cards and their windows are a RECORD of what shipped (nimbatus-review/render/run-final-hq.sh), not a new edit. The pill windows are the one new authoring: #102's proposed schedule with the cold open compressed to clear the clock shot (see c02's _note).",
-  "act": "VII",
-  "title": "Europa",
-  "film_sec": 95.4,
-  "trim": {
-    "in": 0.0,
-    "out": 95.4,
-    "_note": "The delivered act is 95.4 s (2862 frames at 30 fps): the 108.333333 s master is cut at 95.4 with the picture STREAM-COPIED, dropping the comic-cover tail (95.333333-108.333333), which is act VIII's reveal now (#178). The audio is faded out over its last 2.5 s (92.833333 + 2.5) and trimmed to 95.333333. Every window below is on the delivered cut's own clock, which matches the master's clock for 0-95.333333."
+ "_what": "Act VII's record: the words that go on screen, the windows they occupy, the measured letterbox, and the build parameters that produce the delivered master. It exists so act VII's inputs are COMMITTED rather than living only in ~/Videos/wolves-directors-cut, where nimbatus-review/render/run-final-hq.sh cuts it (#152). Without it a dialogue round (#102) has nowhere to land, and the plates can be re-rendered in the project while the film keeps playing the older cut. scripts/build_europa.py reads this; editing a line here changes the film.",
+ "_provenance": "Every line of copy is the OWNER'S OWN, from #102's terse-pass table, reproduced VERBATIM -- including 'AN4-CH4K-12' and the asterisk in 'f*cking' -- with the BSHERMAN recast applied. The removed sign-off ('... disavow my existence. Tell the medic and the engineer I'll meet them there. Out.') stays removed; it lives on in #102 and the project's _backups/. The picture graph, the audio join, the reveal/endcard cards and their windows are a RECORD of what shipped (nimbatus-review/render/run-final-hq.sh), not a new edit. The pill windows are the one new authoring: #102's proposed schedule with the cold open compressed to clear the clock shot (see c02's _note).",
+ "act": "VII",
+ "title": "Europa",
+ "film_sec": 95.4,
+ "trim": {
+  "in": 0.0,
+  "out": 95.4,
+  "_note": "The delivered act is 95.4 s (2862 frames at 30 fps): the 108.333333 s master is cut at 95.4 with the picture STREAM-COPIED, dropping the comic-cover tail (95.333333-108.333333), which is act VIII's reveal now (#178). The audio is faded out over its last 2.5 s (92.833333 + 2.5) and trimmed to 95.333333. Every window below is on the delivered cut's own clock, which matches the master's clock for 0-95.333333."
+ },
+ "letterbox": {
+  "active_height": 804,
+  "active_y": 138,
+  "matte_px": 138,
+  "_note": "2.39:1, MEASURED on the plate-free source (wolves-directors-cut-europa-intro-hq.mp4): cropdetect limit=24 gives crop=1920:804:0:138, and a per-region signalstats pass confirms the top and bottom 138 px bands are pure video-black (YAVG ~16.0). Measuring the DELIVERED master instead reads 1920:902:0:140 at dialogue moments -- that is the baked-in PRE-terse pills being detected as content, which is precisely what this rebuild removes. Dialogue plates seat INSIDE the bottom matte and never cover the picture."
+ },
+ "reveal": {
+  "id": "europa-reveal",
+  "character": "laura",
+  "file": "nimbatus-review/render/reveal-options/D-2.png",
+  "at": 82.525,
+  "dur": 5.475,
+  "fade_in": 0.6,
+  "fade_out_at": 87.35,
+  "fade_out": 0.6,
+  "_note": "The credit nameplate, on the Exo walk-up. It sits RIGHT to stay clear of the Guardian walking up centre, and holds the whole walk-up, clearing at 88.000. Nothing follows it, so its fade completes inside the half-open boundary. Class reads 'Revenant Hunter' to match the Beyond Light footage; the website's authored Gunslinger (Solar) labels her Into the Light appearance instead, so the two legitimately differ -- do not 'correct' it. The credit is Laura Santamaria's, unchanged: the Orlin recast (#73) stays open and is NOT landed here.",
+  "_not_repo_rendered": "The nameplate card is NOT rendered from this record. It is the project's reveal-options/D-2.png (a 3840x2160 RGBA card), whose copy is Laura's authored Guardian identity, reproduced verbatim and never written here -- same division of labour as act IV's reveal. Giving the reveal a repo-rendered card is separate work."
+ },
+ "endcard": {
+  "id": "europa-endcard",
+  "file": "nimbatus-review/render/out/endcard.png",
+  "at": 90.8,
+  "dur": 6.4,
+  "fade_in": 0.6,
+  "fade_out_at": 96.6,
+  "fade_out": 0.5,
+  "retired": true,
+  "retired_note": "Owner 2026-08-16: remove the KubeCon announcement from Europa. The underlying Jupiter wrap remains.",
+  "_note": "The KubeCon announcement card ('Coming to KubeCon + Cloud Native Con NA / Salt Lake City, UT, USA / Kube of Destiny Located. Status: Calamitous'), project-supplied like the reveal. Runs to 97.2, 66 ms before the delivered cut ends. It is a full-frame card: a still input that was NOT opened with -framerate 30 was the original ghost-frame bug, so the record's encode.loop_framerate is load-bearing.",
+  "_not_repo_rendered": "Rendered by the project's render-endcards.mjs from endcard.html; consumed here as an existing PNG, same as the reveal."
+ },
+ "plates": [
+  {
+   "id": "d01",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "krook",
+   "text": "Deploy CNCF Projects Team",
+   "avatar": "~/Videos/wolves-directors-cut/nimbatus-review/render/krook.png",
+   "at": 0.564,
+   "dur": 1.6,
+   "fade_in": 0.6,
+   "fade_out_at": 1.864,
+   "fade_out": 0.25
   },
-  "letterbox": {
-    "active_height": 804,
-    "active_y": 138,
-    "matte_px": 138,
-    "_note": "2.39:1, MEASURED on the plate-free source (wolves-directors-cut-europa-intro-hq.mp4): cropdetect limit=24 gives crop=1920:804:0:138, and a per-region signalstats pass confirms the top and bottom 138 px bands are pure video-black (YAVG ~16.0). Measuring the DELIVERED master instead reads 1920:902:0:140 at dialogue moments -- that is the baked-in PRE-terse pills being detected as content, which is precisely what this rebuild removes. Dialogue plates seat INSIDE the bottom matte and never cover the picture."
+  {
+   "id": "d02",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "preethi",
+   "text": "Stand down",
+   "at": 2.564,
+   "dur": 1.6,
+   "fade_in": 0.6,
+   "fade_out_at": 3.864,
+   "fade_out": 0.25
   },
-  "reveal": {
-    "id": "europa-reveal",
-    "character": "laura",
-    "file": "nimbatus-review/render/reveal-options/D-2.png",
-    "at": 82.525,
-    "dur": 5.475,
-    "fade_in": 0.6,
-    "fade_out_at": 87.35,
-    "fade_out": 0.6,
-    "_note": "The credit nameplate, on the Exo walk-up. It sits RIGHT to stay clear of the Guardian walking up centre, and holds the whole walk-up, clearing at 88.000. Nothing follows it, so its fade completes inside the half-open boundary. Class reads 'Revenant Hunter' to match the Beyond Light footage; the website's authored Gunslinger (Solar) labels her Into the Light appearance instead, so the two legitimately differ -- do not 'correct' it. The credit is Laura Santamaria's, unchanged: the Orlin recast (#73) stays open and is NOT landed here.",
-    "_not_repo_rendered": "The nameplate card is NOT rendered from this record. It is the project's reveal-options/D-2.png (a 3840x2160 RGBA card), whose copy is Laura's authored Guardian identity, reproduced verbatim and never written here -- same division of labour as act IV's reveal. Giving the reveal a repo-rendered card is separate work."
+  {
+   "id": "d03",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "alolita",
+   "text": "It's all for naught we fail",
+   "avatar": "renders/avatars/alolita.png",
+   "at": 4.564,
+   "dur": 2.6,
+   "fade_in": 0.6,
+   "fade_out_at": 6.864,
+   "fade_out": 0.25
   },
-  "endcard": {
-    "id": "europa-endcard",
-    "file": "nimbatus-review/render/out/endcard.png",
-    "at": 90.8,
-    "dur": 6.4,
-    "fade_in": 0.6,
-    "fade_out_at": 96.6,
-    "fade_out": 0.5,
-    "retired": true,
-    "retired_note": "Owner 2026-08-16: remove the KubeCon announcement from Europa. The underlying Jupiter wrap remains.",
-    "_note": "The KubeCon announcement card ('Coming to KubeCon + Cloud Native Con NA / Salt Lake City, UT, USA / Kube of Destiny Located. Status: Calamitous'), project-supplied like the reveal. Runs to 97.2, 66 ms before the delivered cut ends. It is a full-frame card: a still input that was NOT opened with -framerate 30 was the original ghost-frame bug, so the record's encode.loop_framerate is load-bearing.",
-    "_not_repo_rendered": "Rendered by the project's render-endcards.mjs from endcard.html; consumed here as an existing PNG, same as the reveal."
+  {
+   "id": "d04",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "preethi",
+   "text": "I'm sending our best",
+   "at": 7.564,
+   "dur": 2.0,
+   "fade_in": 0.6,
+   "fade_out_at": 9.264,
+   "fade_out": 0.25
   },
-  "plates": [
-    {
-      "id": "d01",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "krook",
-      "text": "Deploy CNCF Projects Team",
-      "avatar": "~/Videos/wolves-directors-cut/nimbatus-review/render/krook.png",
-      "at": 0.564,
-      "dur": 1.6,
-      "fade_in": 0.6,
-      "fade_out_at": 1.864,
-      "fade_out": 0.25
-    },
-    {
-      "id": "d02",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "preethi",
-      "text": "Stand down",
-      "at": 2.564,
-      "dur": 1.6,
-      "fade_in": 0.6,
-      "fade_out_at": 3.864,
-      "fade_out": 0.25
-    },
-    {
-      "id": "d03",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "alolita",
-      "text": "It's all for naught we fail",
-      "avatar": "renders/avatars/alolita.png",
-      "at": 4.564,
-      "dur": 2.6,
-      "fade_in": 0.6,
-      "fade_out_at": 6.864,
-      "fade_out": 0.25
-    },
-    {
-      "id": "d04",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "preethi",
-      "text": "I'm sending our best",
-      "at": 7.564,
-      "dur": 2.0,
-      "fade_in": 0.6,
-      "fade_out_at": 9.264,
-      "fade_out": 0.25
-    },
-    {
-      "id": "d05",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "castrojo",
-      "text": "They must never know who we are",
-      "avatar": "renders/avatars/castrojo.png",
-      "at": 24.564,
-      "dur": 2.6,
-      "fade_in": 0.6,
-      "fade_out_at": 26.864,
-      "fade_out": 0.25
-    },
-    {
-      "id": "d06",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "castrojo",
-      "text": "Don't get caught",
-      "avatar": "renders/avatars/castrojo.png",
-      "at": 27.564,
-      "dur": 2.0,
-      "fade_in": 0.6,
-      "fade_out_at": 29.264,
-      "fade_out": 0.25
-    },
-    {
-      "id": "d07",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "jeefy",
-      "text": "It's all in your hands",
-      "avatar": "renders/avatars/jeefy.png",
-      "at": 29.964,
-      "dur": 2.2,
-      "fade_in": 0.6,
-      "fade_out_at": 31.864,
-      "fade_out": 0.25
-    },
-    {
-      "id": "d08",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "ihor",
-      "text": "G{k8s}dspeed",
-      "avatar": "renders/avatars/idvoretskyi.png",
-      "at": 32.564,
-      "dur": 2.2,
-      "fade_in": 0.6,
-      "fade_out_at": 34.464,
-      "fade_out": 0.25
-    },
-    {
-      "id": "d09",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "nimbatus",
-      "text": "Wilco",
-      "avatar": "~/src/website/public/wolves/characters/nimbatus.webp",
-      "at": 61.564,
-      "dur": 1.8,
-      "fade_in": 0.6,
-      "fade_out_at": 63.064,
-      "fade_out": 0.25
-    },
-    {
-      "id": "d10",
-      "kind": "chat",
-      "position": "letterbox",
-      "speaker": "nimbatus",
-      "text": "{k8s}ut",
-      "avatar": "~/src/website/public/wolves/characters/nimbatus.webp",
-      "at": 63.764,
-      "dur": 2.0,
-      "fade_in": 0.6,
-      "fade_out_at": 65.464,
-      "fade_out": 0.25
+  {
+   "id": "d05",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "castrojo",
+   "text": "They must never know who we are",
+   "avatar": "renders/avatars/castrojo.png",
+   "at": 24.564,
+   "dur": 2.6,
+   "fade_in": 0.6,
+   "fade_out_at": 26.864,
+   "fade_out": 0.25
+  },
+  {
+   "id": "d06",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "castrojo",
+   "text": "Don't get caught",
+   "avatar": "renders/avatars/castrojo.png",
+   "at": 27.564,
+   "dur": 2.0,
+   "fade_in": 0.6,
+   "fade_out_at": 29.264,
+   "fade_out": 0.25
+  },
+  {
+   "id": "d07",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "jeefy",
+   "text": "It's all in your hands",
+   "avatar": "renders/avatars/jeefy.png",
+   "at": 29.964,
+   "dur": 2.2,
+   "fade_in": 0.6,
+   "fade_out_at": 31.864,
+   "fade_out": 0.25
+  },
+  {
+   "id": "d08",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "ihor",
+   "text": "G{k8s}dspeed",
+   "avatar": "renders/avatars/idvoretskyi.png",
+   "at": 32.564,
+   "dur": 2.2,
+   "fade_in": 0.6,
+   "fade_out_at": 34.464,
+   "fade_out": 0.25
+  },
+  {
+   "id": "d09",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "nimbatus",
+   "text": "Wilco",
+   "avatar": "~/src/website/public/wolves/characters/nimbatus.webp",
+   "at": 61.564,
+   "dur": 1.8,
+   "fade_in": 0.6,
+   "fade_out_at": 63.064,
+   "fade_out": 0.25
+  },
+  {
+   "id": "d10",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "nimbatus",
+   "text": "{k8s}ut",
+   "avatar": "~/src/website/public/wolves/characters/nimbatus.webp",
+   "at": 63.764,
+   "dur": 2.0,
+   "fade_in": 0.6,
+   "fade_out_at": 65.464,
+   "fade_out": 0.25
+  }
+ ],
+ "cut_list": [
+  12.4333,
+  14.8667
+ ],
+ "_cut_list_note": "Only the two cuts that bound the c02 pin are recorded here, both measured frame-exact on the delivered cut (satellite exterior ends frame 372; the green-clock dashboard is frames 373-445; the planet-horizon shot opens frame 446). A full scene pass over 0-97.2 was not re-run for this record.",
+ "picture": {
+  "fps": 30,
+  "master_sec": 108.333333,
+  "content_sec": 95.333333,
+  "delivered_sec": 95.4,
+  "delivered_frames": 2862,
+  "audio_sec": 95.333333,
+  "inputs": {
+   "intro": "wolves-directors-cut-europa-intro-hq.mp4",
+   "jupiter": "nimbatus-review/jupiter/cand/PIA22906_nasa.mp4",
+   "wrap": "nimbatus-review/ext/wrap1080.mp4",
+   "beyond": "sources/Act2-BeyondLight-reveal-T9FIbmj1Qf0-1080p24-2262k.mp4",
+   "song": "Beauty Of The Beast [X3WrCzLIIvk].webm",
+   "cover": "~/Downloads/wolves.jpg"
+  },
+  "segments": [
+   {
+    "label": "intro-before-jupiter",
+    "from": "intro",
+    "frames": [
+     0,
+     497
+    ]
+   },
+   {
+    "label": "jupiter-native",
+    "from": "jupiter",
+    "window": [
+     0.0,
+     6.5
+    ],
+    "fps": 30,
+    "scale": true
+   },
+   {
+    "label": "intro-after-jupiter",
+    "from": "intro",
+    "frames": [
+     692,
+     1725
+    ]
+   },
+   {
+    "label": "speeder",
+    "from": "beyond",
+    "window": [
+     60.041667,
+     65.166667
+    ],
+    "fps": 30,
+    "scale": true
+   },
+   {
+    "label": "approach",
+    "from": "intro",
+    "frames": [
+     1725,
+     2370
+    ]
+   },
+   {
+    "label": "walk-up",
+    "from": "beyond",
+    "fps_first": 30,
+    "frames": [
+     3443,
+     3509
+    ],
+    "scale": true
+   },
+   {
+    "label": "wrap",
+    "from": "wrap",
+    "fade_out": {
+     "at": 8.5,
+     "dur": 0.5
     }
-  ],
-  "cut_list": [
-    12.4333,
-    14.8667
-  ],
-  "_cut_list_note": "Only the two cuts that bound the c02 pin are recorded here, both measured frame-exact on the delivered cut (satellite exterior ends frame 372; the green-clock dashboard is frames 373-445; the planet-horizon shot opens frame 446). A full scene pass over 0-97.2 was not re-run for this record.",
-  "picture": {
+   },
+   {
+    "label": "cover",
+    "from": "cover",
+    "still": true,
+    "dur": 13.0,
     "fps": 30,
-    "master_sec": 108.333333,
-    "content_sec": 95.333333,
-    "delivered_sec": 95.4,
-    "delivered_frames": 2862,
-    "audio_sec": 95.333333,
-    "inputs": {
-      "intro": "wolves-directors-cut-europa-intro-hq.mp4",
-      "jupiter": "nimbatus-review/jupiter/cand/PIA22906_nasa.mp4",
-      "wrap": "nimbatus-review/ext/wrap1080.mp4",
-      "beyond": "sources/Act2-BeyondLight-reveal-T9FIbmj1Qf0-1080p24-2262k.mp4",
-      "song": "Beauty Of The Beast [X3WrCzLIIvk].webm",
-      "cover": "~/Downloads/wolves.jpg"
+    "scale_pad": {
+     "side": 1080,
+     "x": 420
     },
-    "segments": [
-      {
-        "label": "intro-before-jupiter",
-        "from": "intro",
-        "frames": [
-          0,
-          497
-        ]
-      },
-      {
-        "label": "jupiter-native",
-        "from": "jupiter",
-        "window": [
-          0.0,
-          6.5
-        ],
-        "fps": 30,
-        "scale": true
-      },
-      {
-        "label": "intro-after-jupiter",
-        "from": "intro",
-        "frames": [
-          692,
-          1725
-        ]
-      },
-      {
-        "label": "speeder",
-        "from": "beyond",
-        "window": [
-          60.041667,
-          65.166667
-        ],
-        "fps": 30,
-        "scale": true
-      },
-      {
-        "label": "approach",
-        "from": "intro",
-        "frames": [
-          1725,
-          2370
-        ]
-      },
-      {
-        "label": "walk-up",
-        "from": "beyond",
-        "fps_first": 30,
-        "frames": [
-          3443,
-          3509
-        ],
-        "scale": true
-      },
-      {
-        "label": "wrap",
-        "from": "wrap",
-        "fade_out": {
-          "at": 8.5,
-          "dur": 0.5
-        }
-      },
-      {
-        "label": "cover",
-        "from": "cover",
-        "still": true,
-        "dur": 13.0,
-        "fps": 30,
-        "scale_pad": {
-          "side": 1080,
-          "x": 420
-        },
-        "fade_in": {
-          "at": 0.0,
-          "dur": 1.2
-        },
-        "fade_out": {
-          "at": 11.0,
-          "dur": 2.0
-        }
-      }
-    ],
-    "_note": "The concat reproduces nimbatus-review/render/run-final-hq.sh's picture order, minus the close-up and the old Jupiter dissolve/held-still transition: the 57.5 s intro is split around a native 195-frame Juno video slot, followed by 5.133333 + 21.5 + 2.2 + 9.0 = 95.333333 s of content, then the 13 s comic cover to a 108.333333 s master. The Jupiter source is already 1920x1080 at 30 fps; the graph only aligns its timestamps and concat format. The walk-up's fps=30 runs BEFORE its frame trim (so frames 3443-3509 are counted on the 30 fps conversion, i.e. source times 114.767-116.967; the measured native cut is 116.958): the solo wide runs from source 114.767 through that original cut, and the close-up is removed because both other Guardians are already visible behind the Exo Stranger. The walk-up's baked fade_out and the wrap's fade_in are both GONE -- the join is a hard cut, so both sides stay clean; the wrap's own closing fade stays. The speeder's window is a TIME trim on the native 24 fps stream, then fps=30. An input feeding multiple segments is split, never opened twice -- frame-exactness by construction, not by seek.",
-    "_sources_note": "intro: the act's own 79 s plate-free picture (built by nimbatus-review/hq/build-intro-hq.sh). jupiter: the native PIA22906 Juno video, NASA/JPL-Caltech/SwRI/MSSS/Kevin M. Gill, public-domain source, staged in the project and never committed. beyond: Bungie's Act 2 / Beyond Light reveal (T9FIbmj1Qf0), third-party copyrighted, used under Bungie's fan-content policy like the rest of the index (#55). wrap: the project's Nimbatus outro sting. cover: ~/Downloads/wolves.jpg, the comic cover act VIII owns (#178). Footage is never committed."
-  },
-  "audio": {
-    "join": [
-      {
-        "from": "intro",
-        "window": [
-          0.0,
-          79.0
-        ]
-      },
-      {
-        "from": "song",
-        "window": [
-          575.9,
-          607.2
-        ],
-        "format": true
-      }
-    ],
-    "crossfade": 0.1,
-    "master_fade_out": {
-      "at": 106.333333,
-      "dur": 2.0
+    "fade_in": {
+     "at": 0.0,
+     "dur": 1.2
     },
-    "delivered_fade_out": {
-      "at": 92.833333,
-      "dur": 2.5
-    },
-    "_note": "SHIPPED AUDIO DIFFERS FROM THIS BLOCK (owner, 2026-08-20): the delivered master carries the song leg ALONE, window 465.0-560.4 s (7:45 through picture end), full replacement, no crossfade and no fades -- a remux of the delivered picture onto the same staged vocal rung. The two-leg join below is the PREVIOUS mix and is still what scripts/build_europa.py builds; re-author this block (the builder assumes two legs, a crossfade and both fade-outs) before any rebuild, or a rebuild silently reverts the audio. -- The previous mix: the intro's own audio (0-79 s) crossfaded 0.1 s (tri/tri) into Nightwish's Beauty of the Beast (575.9-607.2), then faded out over the cover (106.333333 + 2.0) and trimmed to 108.333333 -- the delivered film's audio is the peaks-gated master's, faded 92.833333 + 2.5 and trimmed to 95.333333 as the cover is cut. Song usage: third-party copyrighted, same fan-content position as the footage (#55); staged in the project, never committed.",
-    "_usage_class": "third_party_copyrighted -- see #55 and the rights section of AGENTS.md."
-  },
-  "encode": {
-    "delivered": {
-      "out": "wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
-      "acodec": "flac",
-      "surround": false,
-      "_note": "THIS is what ~/Videos/Wolves/Prod/07-europa.mp4 hardlinks to: 95.4 s (2862 frames), FLAC stereo, picture stream-copied from the peaks-gated 108.333333 s master (-0.9..-1.1 dBTP, #82) with the cover cut. The master itself is a build intermediate (kept in the project's render/repo-build/), not a deliverable."
-    },
-    "vcodec": "libx264",
-    "preset": "veryslow",
-    "crf": 12,
-    "pix_fmt": "yuv420p",
-    "colorspace": "bt709",
-    "fps": 30,
-    "_fps_note": "The intro and wrap are natively 30 fps; the two Beyond Light segments are conformed with fps=30 inside the picture graph. No rate change anywhere else.",
-    "loop_framerate": 30,
-    "_loop_framerate_note": "run-final-hq.sh passed -framerate 30 on every still input. The endcard was the visible ghost-frame bug when a still came in at the 25 fps default -- the plate outlasted its window and burned into the cover. Load-bearing, not ceremonial."
-  },
-  "unresolved": [
-    "The shipped Prod/ and 10mb/ audio is the vocal-window remux (Beauty of the Beast 465.0-560.4 s, full replacement, no fades; owner, 2026-08-20), published ahead of this record: the audio block above still describes the previous two-leg mix, and scripts/build_europa.py would rebuild THAT. Re-authoring the block and the builder's join/fade assumptions is the follow-up.",
-    "The Clarke 'ALL THESE WORLDS ARE YOURS' intro slide stays OUT: a different rightsholder than Bungie and outside this repo's rights position. Owner decision required (#102, Blocked #1). Not built, not burned in.",
-    "No verified GitHub login for preethi: that pill renders with the drawn crest, the documented fallback. Alolita is verified as github.com/alolita; krook, nimbatus, castrojo, jeefy and ihor (github.com/idvoretskyi, owner-supplied) also have portraits. Degrading, not blocking -- name preethi's login and that pill gains a face.",
-    "The reveal still credits Laura Santamaria: the Orlin recast (#73) stays open and was out of scope for this render.",
-    "delivery.json's VII entry gains real sources with this record; the digest is stamped by deliver.py publish, which the delivery session owns.",
-    "DIALOGUE REPLACED (owner, this round): every chat pill here is the owner's new Europa dialogue, given with programme marks 24:33 / 24:35 / 24:57 / 25:34 (act film 0.564 / 2.564 / 24.564 / 61.564). It REPLACES the previous set, which was agent-written and never owner-authored -- see the Jul 17 Whisp dictation (#120), whose deployment chat none of the old lines came from. Lines the owner pinned carry his mark; the lines he listed without one take the following gap in the order he listed them (0.4 s between pills, the convention the rest of this record uses).",
-    "THE {k8s} MARK REPLACES AN O, never trails the word (owner, this round) -- the same treatment act V already uses for `G{k8s}ddamn` in stories/05-natali-plates.json. Here it is ihor's `G{k8s}dspeed` and nimbatus's `{k8s}ut`.",
-    "OPEN BEAT at programme 25:30 (act film 57.564): the owner's note carries the mark with no line against it. Nothing is placed there rather than something guessed; it is a slot waiting for copy."
+    "fade_out": {
+     "at": 11.0,
+     "dur": 2.0
+    }
+   }
   ],
-  "_plate_kind": "Every dialogue plate is kind: chat -- tools/plate.py's port of the wolves plate.html pill, this repo's renderer for the house treatment. THIS is the restyle the owner asked for: the delivered master's pills were screenshotted from the project's own plate.html by playwright (nimbatus-review/render/render-plates.mjs), a chrome that matches nothing else in the show; a rebuild from this record renders every pill with plate.py, the same renderer acts IV and V use. WORDS UNCHANGED -- chrome only.",
-  "_timing": "at + dur are tools/plate.py's own manifest fields, so this file renders with plate.py render --manifest unmodified. fade_out_at is absolute film time, matching the ffmpeg fade=t=out:st= it generates; the house fade pair (in 0.6, out 0.25 completing 0.05 s before the window boundary) keeps a plate from ever ghosting into the next shot."
+  "_note": "The concat reproduces nimbatus-review/render/run-final-hq.sh's picture order, minus the close-up and the old Jupiter dissolve/held-still transition: the 57.5 s intro is split around a native 195-frame Juno video slot, followed by 5.133333 + 21.5 + 2.2 + 9.0 = 95.333333 s of content, then the 13 s comic cover to a 108.333333 s master. The Jupiter source is already 1920x1080 at 30 fps; the graph only aligns its timestamps and concat format. The walk-up's fps=30 runs BEFORE its frame trim (so frames 3443-3509 are counted on the 30 fps conversion, i.e. source times 114.767-116.967; the measured native cut is 116.958): the solo wide runs from source 114.767 through that original cut, and the close-up is removed because both other Guardians are already visible behind the Exo Stranger. The walk-up's baked fade_out and the wrap's fade_in are both GONE -- the join is a hard cut, so both sides stay clean; the wrap's own closing fade stays. The speeder's window is a TIME trim on the native 24 fps stream, then fps=30. An input feeding multiple segments is split, never opened twice -- frame-exactness by construction, not by seek.",
+  "_sources_note": "intro: the act's own 79 s plate-free picture (built by nimbatus-review/hq/build-intro-hq.sh). jupiter: the native PIA22906 Juno video, NASA/JPL-Caltech/SwRI/MSSS/Kevin M. Gill, public-domain source, staged in the project and never committed. beyond: Bungie's Act 2 / Beyond Light reveal (T9FIbmj1Qf0), third-party copyrighted, used under Bungie's fan-content policy like the rest of the index (#55). wrap: the project's Nimbatus outro sting. cover: ~/Downloads/wolves.jpg, the comic cover act VIII owns (#178). Footage is never committed."
+ },
+ "audio": {
+  "join": [
+   {
+    "from": "song",
+    "window": [
+     465.0,
+     560.4
+    ],
+    "format": true
+   }
+  ],
+  "_note": "THE SONG ALONE, AND NO FADES (owner, 2026-08-20). Beauty of the Beast 465.0-560.4 s runs under the whole delivered film -- 7:45 through picture end -- as a FULL REPLACEMENT: the intro's own audio is not heard, there is no crossfade, and neither the master nor the delivered derivative fades out. 95.4 s of song covers the delivered 95.333333 s with 0.067 s spare, so the cut lands inside the song rather than on a fade. The cover (95.333333-108.333333) therefore plays silent in the master; the master is an intermediate and the nocover derivative is what ships. \n\nTHIS BLOCK WAS OUT OF DATE FOR THREE DAYS AND A REBUILD REVERTED THE ACT. The owner remuxed this mix onto the delivered picture on 2026-08-20 and it shipped, but the record kept describing the PREVIOUS two-leg mix and scripts/build_europa.py kept building it, so the 2026-08-23 programme regeneration silently put the old song back -- the owner caught it on the screen ('europa is stale I want the new song'). The record now describes what ships, and tests/test_europa_act.py pins it, because a builder that disagrees with the delivered file is a revert waiting for the next rebuild.\n\nThe PREVIOUS mix, kept for provenance only: the intro's own audio (0-79 s) crossfaded 0.1 s (tri/tri) into Beauty of the Beast (575.9-607.2), faded out over the cover (106.333333 + 2.0) and trimmed to 108.333333; the delivered film faded 92.833333 + 2.5 and trimmed to 95.333333.",
+  "_usage_class": "third_party_copyrighted -- see #55 and the rights section of AGENTS.md."
+ },
+ "encode": {
+  "delivered": {
+   "out": "wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
+   "acodec": "flac",
+   "surround": false,
+   "_note": "THIS is what ~/Videos/Wolves/Prod/07-europa.mp4 hardlinks to: 95.4 s (2862 frames), FLAC stereo, picture stream-copied from the peaks-gated 108.333333 s master (-0.9..-1.1 dBTP, #82) with the cover cut. The master itself is a build intermediate (kept in the project's render/repo-build/), not a deliverable."
+  },
+  "vcodec": "libx264",
+  "preset": "veryslow",
+  "crf": 12,
+  "pix_fmt": "yuv420p",
+  "colorspace": "bt709",
+  "fps": 30,
+  "_fps_note": "The intro and wrap are natively 30 fps; the two Beyond Light segments are conformed with fps=30 inside the picture graph. No rate change anywhere else.",
+  "loop_framerate": 30,
+  "_loop_framerate_note": "run-final-hq.sh passed -framerate 30 on every still input. The endcard was the visible ghost-frame bug when a still came in at the 25 fps default -- the plate outlasted its window and burned into the cover. Load-bearing, not ceremonial."
+ },
+ "unresolved": [
+  "The Clarke 'ALL THESE WORLDS ARE YOURS' intro slide stays OUT: a different rightsholder than Bungie and outside this repo's rights position. Owner decision required (#102, Blocked #1). Not built, not burned in.",
+  "No verified GitHub login for preethi: that pill renders with the drawn crest, the documented fallback. Alolita is verified as github.com/alolita; krook, nimbatus, castrojo, jeefy and ihor (github.com/idvoretskyi, owner-supplied) also have portraits. Degrading, not blocking -- name preethi's login and that pill gains a face.",
+  "The reveal still credits Laura Santamaria: the Orlin recast (#73) stays open and was out of scope for this render.",
+  "delivery.json's VII entry gains real sources with this record; the digest is stamped by deliver.py publish, which the delivery session owns.",
+  "DIALOGUE REPLACED (owner, this round): every chat pill here is the owner's new Europa dialogue, given with programme marks 24:33 / 24:35 / 24:57 / 25:34 (act film 0.564 / 2.564 / 24.564 / 61.564). It REPLACES the previous set, which was agent-written and never owner-authored -- see the Jul 17 Whisp dictation (#120), whose deployment chat none of the old lines came from. Lines the owner pinned carry his mark; the lines he listed without one take the following gap in the order he listed them (0.4 s between pills, the convention the rest of this record uses).",
+  "THE {k8s} MARK REPLACES AN O, never trails the word (owner, this round) -- the same treatment act V already uses for `G{k8s}ddamn` in stories/05-natali-plates.json. Here it is ihor's `G{k8s}dspeed` and nimbatus's `{k8s}ut`.",
+  "OPEN BEAT at programme 25:30 (act film 57.564): the owner's note carries the mark with no line against it. Nothing is placed there rather than something guessed; it is a slot waiting for copy."
+ ],
+ "_plate_kind": "Every dialogue plate is kind: chat -- tools/plate.py's port of the wolves plate.html pill, this repo's renderer for the house treatment. THIS is the restyle the owner asked for: the delivered master's pills were screenshotted from the project's own plate.html by playwright (nimbatus-review/render/render-plates.mjs), a chrome that matches nothing else in the show; a rebuild from this record renders every pill with plate.py, the same renderer acts IV and V use. WORDS UNCHANGED -- chrome only.",
+ "_timing": "at + dur are tools/plate.py's own manifest fields, so this file renders with plate.py render --manifest unmodified. fade_out_at is absolute film time, matching the ffmpeg fade=t=out:st= it generates; the house fade pair (in 0.6, out 0.25 completing 0.05 s before the window boundary) keeps a plate from ever ghosting into the next shot."
 }

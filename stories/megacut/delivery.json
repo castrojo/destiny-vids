@@ -157,7 +157,7 @@
     "chapters/VII-europa.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "99d57c56ffc3e1d9037b11b53231de3e11fb81a51c5fc1bed75aab72a571d045",
+   "source_digest": "db1ebac632212d4fbe81182ac657035234a228f0103fa508812d57e8ffbd6cda",
    "rebuild": "python3 scripts/build_europa.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },

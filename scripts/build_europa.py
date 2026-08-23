@@ -4,17 +4,20 @@
 Thin front end on ``scripts/actbuild.py`` the way ``build_kat.py`` is, but
 act VII is the one act whose picture is not a single source: it is an eight-
 segment concat (the intro split around a native Jupiter video, two films, an
-outro sting and a comic-cover still) with a two-part audio join, and the
+outro sting and a comic-cover still) with its own audio join, and the
 delivered master is derived from that concat by cutting the cover off. So this
 script reuses actbuild's record loading, plate rendering and avatar resolution,
 and adds the three things the shared builder has never needed:
 
 * the concat picture graph, compiled from the record's ``picture`` block
   (an input feeding two segments is split, never opened twice);
-* the two-part audio join from the record's ``audio`` block;
+* the audio join from the record's ``audio`` block -- one leg (the song
+  alone, a full replacement, which is what ships) or two crossfaded, with
+  both fades optional, because the shipped mix has none;
 * the nocover derivation: peaks-gate the 108.333333 s master (#82), then cut
   the delivered 95.4 s film from it with the picture STREAM-COPIED -- never
-  re-encoded -- and the audio faded and trimmed to 95.333333 s.
+  re-encoded -- and the audio trimmed to 95.333333 s, faded only if the
+  record asks for a fade.
 
     python3 scripts/build_europa.py --print-command     # the ffmpeg calls
     python3 scripts/build_europa.py --plates-only       # just the pills
@@ -162,7 +165,13 @@ def overlay_graph(doc, base, first_input):
 
 
 def audio_graph(doc):
-    """The two-part join: the intro's own audio crossfaded into the song."""
+    """The record's ``join``, however many legs it has.
+
+    One leg is a FULL REPLACEMENT -- the song alone, no crossfade -- and is
+    what the act currently ships. Two legs are crossfaded. The fades are
+    optional in both cases, because the shipped mix has none, and a builder
+    that hard-codes them cannot express the act it is supposed to build.
+    """
     pic, aud = doc["picture"], doc["audio"]
     parts = []
     labels = []
@@ -177,11 +186,18 @@ def audio_graph(doc):
         chain += f"[{label}]"
         parts.append(chain)
         labels.append(label)
-    fade = aud["master_fade_out"]
-    parts.append(f"[{labels[0]}][{labels[1]}]"
-                 f"acrossfade=d={aud['crossfade']:g}:c1=tri:c2=tri,"
-                 f"afade=t=out:st={fade['at']:g}:d={fade['dur']:g},"
-                 f"atrim=0:{pic['master_sec']:g}[aout]")
+
+    if len(labels) == 1:
+        tail = f"[{labels[0]}]"
+    else:
+        tail = (f"[{labels[0]}][{labels[1]}]"
+                f"acrossfade=d={aud['crossfade']:g}:c1=tri:c2=tri,")
+    fade = aud.get("master_fade_out")
+    if fade:
+        tail += f"afade=t=out:st={fade['at']:g}:d={fade['dur']:g},"
+    elif len(labels) == 1:
+        tail += "anull,"
+    parts.append(f"{tail}atrim=0:{pic['master_sec']:g}[aout]")
     return parts
 
 
@@ -233,13 +249,13 @@ def build_commands(doc, project, plates_dir, master_out, delivered_out,
     # B-frames past the boundary (2864 frames instead of 2862), so the record
     # carries the delivered frame count and the cut is -frames:v.
     audio = doc["audio"]
-    fade = audio["delivered_fade_out"]
+    fade = audio.get("delivered_fade_out")
+    af = f"afade=t=out:st={fade['at']:g}:d={fade['dur']:g}," if fade else ""
     derive = [*ff, "-y", "-i", str(master_out),
               "-map", "0:v", "-c:v", "copy",
               "-frames:v", str(pic["delivered_frames"]),
               "-map", "0:a",
-              "-af", f"afade=t=out:st={fade['at']:g}:d={fade['dur']:g},"
-                     f"atrim=0:{pic['audio_sec']:g}",
+              "-af", f"{af}atrim=0:{pic['audio_sec']:g}",
               "-c:a", doc["encode"]["delivered"]["acodec"],
               "-movflags", "+faststart", str(delivered_out)]
     return cmd, derive
