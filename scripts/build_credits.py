@@ -275,6 +275,43 @@ def fetch_contributors():
     return out
 
 
+def merge_contributors(previous, fetched):
+    """Union a fresh snapshot with the roster already on record.
+
+    A refresh may only ADD people. Upstream history is not append-only --
+    a rebase, a squash, or a default-branch change quietly rewrites who
+    GitLab's contributor endpoint reports, and on 2026-08-23 a routine
+    refresh of GNOME/gnome-build-meta returned 56 names where the committed
+    roster had 58. The two it no longer named, Dan Yeaw and Jamie Murphy,
+    had not stopped contributing; the API had stopped counting them.
+
+    Dropping them would be this repo's third rule inverted: a credit roll
+    that removes a real person is as much a claim about them as one that
+    invents them, and it is the claim nobody made. So a name once earned
+    stays, and a disappearance is REPORTED for the owner rather than acted
+    on -- un-crediting somebody is `automatable: no`.
+
+    Ordering stays the fetch's own, with survivors appended in their
+    previous order, so the walls only ever grow at their tail.
+    """
+    if not previous:
+        return fetched
+    was = {s.get("section"): list(s.get("names") or []) for s in previous}
+    for section in fetched:
+        old = was.get(section["section"])
+        if not old:
+            continue
+        have = {n.lower() for n in section["names"]}
+        kept = [n for n in old if n.lower() not in have]
+        if kept:
+            print(f"note: {section['section']} no longer reports "
+                  f"{len(kept)} previously credited name(s); keeping them "
+                  f"({', '.join(kept)}). Removing a credit is the owner's "
+                  f"call, never a refresh's.", file=sys.stderr)
+            section["names"] = section["names"] + kept
+    return fetched
+
+
 def character_name(character_id):
     """A character id as the credits print it: ``cayde_6`` -> ``Cayde-6``.
 
@@ -507,7 +544,8 @@ def build_manifest(refresh, refresh_cast=False):
             print(f"chapter: {note}", file=sys.stderr)
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
     if refresh or "contributors" not in manifest:
-        manifest["contributors"] = fetch_contributors()
+        manifest["contributors"] = merge_contributors(
+            manifest.get("contributors"), fetch_contributors())
     # THE CAST IS NOT REFRESHED WITH THE CONTRIBUTORS, and that is deliberate.
     #
     # A credit names a real person, so the owner gets the last word on how

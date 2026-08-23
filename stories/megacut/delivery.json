@@ -41,11 +41,10 @@
     "yt_into_the_light_cinematic",
     "yt_into_the_light_without_dialogue"
    ],
-   "source_digest": "d835a8813298049b32cbd0f6e4a0c0a590fba65b227151a0822b4e5a3c463941",
+   "source_digest": "0fc2c10ed4bd6c31bfca527e0f1fa87ffab1a1bacd3851d9951b51a4a27e8068",
    "footage_digest": "154a0dba529d838b1dd61e0e82b5bfd5c9bb34d57b68243bae60c1d107dd9f1e",
    "rebuild": "python3 scripts/build_act1.py",
-   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
-   "stale_blocked_on": "#302"
+   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },
   "II": {
    "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
@@ -65,10 +64,9 @@
     "yt_destiny_all_live_action_trailers",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "b1dd4ba2c1e2924553ac297cd4566237543b4f83f8ecd8ba6fffa0ac3f0b2bf7",
+   "source_digest": "7bcc0e8166c84010e96ae060cbec0dabc73cb2e15f1f24047e82194422e54dfb",
    "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad",
-   "built_from_commit": "eb0075a039db6fa318fc8564955a0d185097e03a",
-   "stale_blocked_on": "#302"
+   "built_from_commit": "4469daa45e7dc85e5502dc2472725c51491f0fab"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -88,9 +86,9 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "de235f0af5035db95b9ca25b69fee1d2bc1e6240bf635905bf80775f993537ee",
+   "source_digest": "fd0b154492042775042442f3829c78e48535772df620bcaab1cc71929970dc67",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
-   "stale_blocked_on": "#256"
+   "rebuild": "ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json"
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
@@ -102,7 +100,7 @@
     "chapters/IV-kat.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "3f783a5847913f027f425e153f4a2a4eafca7f9fd590e66958fff60c7a0e86a7",
+   "source_digest": "9af0e3f9ce0c52483a73340f2bf7d54064f297ade70708fe48f680fad5615ca3",
    "rebuild": "python3 scripts/build_kat.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },
@@ -116,7 +114,7 @@
     "chapters/V-nat.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "f99b234b44e7049becf743cd128fb1ec45b3005ba44cfb8a5f6407483deabb98",
+   "source_digest": "6d887696a76a456770961e08d79a326f2b529bd74472d5b3f50743427761cbd1",
    "rebuild": "python3 scripts/build_natali.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },
@@ -144,7 +142,7 @@
     "yt_destiny_2_lightfall_launch_trailer",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "eceabfd1db4188ea39890a1532ce27e000be5ab72eb2958efc5ffcaeb057949e",
+   "source_digest": "77a3e93e640cb010956743a339c12174d1e3b6980ee2ef400eb87c076f326d65",
    "footage_digest": "21c943bcda5ccc2cbae2b3c08cebcf6794763babda3f4304e612e1724bb4220b",
    "built_from_commit": "51c0f7ad95de9f623ec1158f0f69b4624995b16c"
   },
@@ -159,10 +157,9 @@
     "chapters/VII-europa.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "30b5c9ec6da8423234dbb110b8341db0caf473892bf35bc5b6a9c2a8ac8a6fb4",
+   "source_digest": "99d57c56ffc3e1d9037b11b53231de3e11fb81a51c5fc1bed75aab72a571d045",
    "rebuild": "python3 scripts/build_europa.py",
-   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
-   "stale_blocked_on": "#302"
+   "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people."
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
@@ -177,7 +174,8 @@
     "chapters/VIII-fixed.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "ef5c8182342cd91ad6c113d4070a8fabc7535023c1ab82d355ac042d1fd8ff47"
+   "source_digest": "0dc37f946606d095607f10b621484f54840ff27dc760c818ff4c12cbfcc3c363",
+   "rebuild": "python3 scripts/build_credits.py --out ~/Videos/wolves-credits/08-credits-master.mp4"
   }
  },
  "social": {
