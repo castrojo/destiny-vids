@@ -539,6 +539,16 @@ def check_sources(master, report):
     report.add("sources", OK, f"{len(sources)} input(s) match {digest[:12]}")
 
 
+def footage_roots(master):
+    """Where this act's footage may live besides `media/`.
+
+    An act's project directory IS the directory its master sits in, so this
+    derives the root rather than adding a key somebody has to keep in step.
+    """
+    path = master.get("path")
+    return [resolve_master(path).parent] if path else []
+
+
 def check_footage(master, report):
     """The other half of the inputs rung: the picture, which git cannot see.
 
@@ -549,6 +559,12 @@ def check_footage(master, report):
 
     Needs the footage on disk, so it is skipped entirely by `--sources-only`
     and reports rather than raising when `media/` is not there at all.
+
+    Not every act is cut from `media/`. Acts IV, V and VII take their picture
+    from a project directory beside their own master, so the master's own
+    parent is searched too -- that is where `sources/<id>.mkv` and the Europa
+    act's `nimbatus-review/...` legs live. No new key: an act's project is
+    where its master already is.
     """
     if master is None:
         return
@@ -565,7 +581,8 @@ def check_footage(master, report):
                    or "no footage inputs: this act is not cut from media/")
         return
 
-    gone = footage_mod.missing(ids)
+    roots = footage_roots(master)
+    gone = footage_mod.missing(ids, roots=roots)
     if gone:
         report.add("footage", MISSING,
                    f"declared footage absent from media/: {', '.join(gone)}. "
@@ -578,8 +595,9 @@ def check_footage(master, report):
     # that is no longer there. media/ is fetched locally and never cloned, so
     # its mtimes mean something -- unlike the committed inputs, which is why
     # `check_sources` hashes content instead.
-    newer = footage_mod.newer_than(ids, resolve_master(master["path"]))
-    digest = footage_mod.footage_digest(ids)
+    newer = footage_mod.newer_than(ids, resolve_master(master["path"]),
+                                   roots=roots)
+    digest = footage_mod.footage_digest(ids, roots=roots)
     recorded = master.get("footage_digest")
     if not recorded:
         if newer:
@@ -1125,14 +1143,16 @@ def record_source_digests(acts, masters, delivery_path, log=print, only=None,
         # digest recorded over "absent", or over a master that predates its
         # own picture, goes green while being wrong.
         ids = master.get("footage")
-        if ids and not footage_mod.missing(ids):
+        roots = footage_roots(master)
+        if ids and not footage_mod.missing(ids, roots=roots):
             src = resolve_master(master["path"])
-            if footage_mod.newer_than(ids, src):
+            behind = footage_mod.newer_than(ids, src, roots=roots)
+            if behind:
                 log(f"  {act.numeral}: footage NOT recorded -- the master "
-                    f"predates {', '.join(footage_mod.newer_than(ids, src))}; "
+                    f"predates {', '.join(behind)}; "
                     f"rebuild the act first")
             else:
-                digest = footage_mod.footage_digest(ids)
+                digest = footage_mod.footage_digest(ids, roots=roots)
                 if master.get("footage_digest") != digest:
                     master["footage_digest"] = digest
                     changed.append(f"{act.numeral} footage -> {digest[:12]}")

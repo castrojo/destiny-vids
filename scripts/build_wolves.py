@@ -93,6 +93,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from tools.marker import marker_path  # noqa: E402
+from tools import freshness  # noqa: E402
 
 BED = json.loads((REPO / "music/bed_seven_days_to_the_wolves.json").read_text())
 GRID = BED["grid"]
@@ -180,6 +181,37 @@ SUMMIT_DIR = REPO / "renders" / "summit-plates"
 # stories/06-wolves-interruption-cards.json. The copy is owner-authored and
 # reproduced verbatim; the CNCF mark is NOT on the slide (rights, #104).
 INTERRUPTION_DIR = REPO / "renders" / "interruption"
+
+# What draws each of those directories. `summit` and `interruption` below ask
+# only whether a file is THERE, and existence is not freshness
+# (tools/freshness.py): a slide drawn before its own copy changed is used
+# without a word, which is how a card ships yesterday's text with every gate
+# green. This act degrades rather than blocks (an absent plate falls back to a
+# marker), so a STALE plate is reported rather than refused -- but it is never
+# silent again.
+CARD_INPUTS = {
+    SUMMIT_DIR: [REPO / "stories" / "summit-photos.json",
+                 REPO / "scripts" / "build_summit_plates.py",
+                 REPO / "tools" / "plate.py"],
+    INTERRUPTION_DIR: [REPO / "stories" / "06-wolves-interruption-cards.json",
+                       REPO / "scripts" / "build_interruption_cards.py"],
+}
+
+
+def report_stale_cards(log=None):
+    """Name every card PNG older than what draws it. Reports, never blocks."""
+    log = log or (lambda msg: print(msg, file=sys.stderr))
+    stale = []
+    for out_dir, inputs in CARD_INPUTS.items():
+        if not out_dir.exists():
+            continue
+        drawn = sorted(p for p in out_dir.iterdir()
+                       if p.suffix.lower() in (".png", ".jpg"))
+        for path in freshness.stale_outputs(inputs, drawn):
+            stale.append(path)
+            log(f"  STALE CARD {_rel(path)}: older than what draws it -- "
+                f"rerun the pass that builds {_rel(out_dir)}")
+    return stale
 
 
 def _rel(path):
@@ -571,6 +603,7 @@ def audit(shots):
 
 
 def main():
+    report_stale_cards()
     t = build()
     audit(t.shots)
 

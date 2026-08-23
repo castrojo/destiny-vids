@@ -1376,6 +1376,41 @@ def locate(plan, seconds):
     raise ValueError("empty plan")
 
 
+def seated_numerals(plan, masters):
+    """{(dev, ino): numeral} for the masters this plan actually seats.
+
+    Identity is the INODE, not the name: an act reaches the plan through its
+    `Prod/` hardlink, so comparing filenames answers a different question than
+    "is this the file we are about to encode". `stale_seated_acts` has always
+    matched this way; `foreign_seated_acts` used to filter on a `prod_file`
+    key that no master carries, so its filter was dead and every foreign act
+    was announced whether the plan seated it or not.
+    """
+    by_inode = {}
+    for numeral, master in masters.items():
+        from tools import deliver
+        try:
+            st = deliver.resolve_master(master["path"]).stat()
+        except OSError:
+            continue
+        by_inode[(st.st_dev, st.st_ino)] = numeral
+    seated = set()
+    for item in plan.get("items", []):
+        if item.get("kind") != "clip":
+            continue
+        got = resolve(item.get("path") or "")
+        if not got:
+            continue
+        try:
+            st = Path(got).stat()
+        except OSError:
+            continue
+        numeral = by_inode.get((st.st_dev, st.st_ino))
+        if numeral:
+            seated.add(numeral)
+    return seated
+
+
 def foreign_seated_acts(plan):
     """Acts seated here whose master was built outside this history.
 
@@ -1389,14 +1424,13 @@ def foreign_seated_acts(plan):
                           / "delivery.json").read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return
-    seated = {Path(i["path"]).name for i in plan.get("items", [])
-              if i.get("path")}
-    for numeral, master in sorted(doc.get("masters", {}).items()):
+    masters = doc.get("masters", {})
+    seated = seated_numerals(plan, masters)
+    for numeral, master in sorted(masters.items()):
         commit = master.get("built_from_commit")
         if not commit:
             continue
-        prod = master.get("prod_file") or ""
-        if prod and prod not in seated:
+        if numeral not in seated:
             continue
         if deliver.commit_in_history(commit) is False:
             yield numeral, commit, master.get("path", "")

@@ -79,6 +79,8 @@ if str(REPO) not in sys.path:
 
 from tools import conform  # noqa: E402
 from tools import chapter_md  # noqa: E402
+from tools import freshness  # noqa: E402
+from tools import plate as plate_mod  # noqa: E402
 from tools.render import ffmpeg_for_printing, find_ffmpeg  # noqa: E402
 from scripts import build_interludes  # noqa: E402
 
@@ -123,6 +125,36 @@ def missing_cards(doc, cards_dir, section=SECTION):
     return [card_path(cards_dir, card)
             for card in underwater_cards(doc, section)
             if not card_path(cards_dir, card).exists()]
+
+
+# What draws a plate: its own copy, the renderer, and the bindings the
+# renderer reproduces. A plate older than any of these was drawn by something
+# this checkout no longer has.
+def plate_inputs(manifest):
+    return [Path(manifest),
+            REPO / "tools" / "plate.py",
+            REPO / "vocab" / "casting.yaml"]
+
+
+def refresh_cards(manifest, doc, cards_dir, section=SECTION):
+    """Redraw the section's plates whenever they predate what draws them.
+
+    `missing_cards` below asks only whether a PNG exists, and existence is not
+    freshness (tools/freshness.py): a plate drawn before its own copy changed
+    burns yesterday's words into today's master with every gate green. So the
+    burn never *chooses* to reuse a stale plate -- anything older than its
+    manifest, `tools/plate.py` or `vocab/casting.yaml` is redrawn first.
+
+    Returns the paths redrawn, so a caller can report them rather than assume.
+    """
+    wanted = [card_path(cards_dir, card)
+              for card in underwater_cards(doc, section)]
+    if not freshness.stale_outputs(plate_inputs(manifest), wanted):
+        return []
+    entries = plate_mod.load_manifest(manifest)
+    plate_mod.check_copy_against_bindings(entries)
+    plate_mod.render_all(entries, cards_dir)
+    return wanted
 
 
 def filtergraph(spec, movement, cards, repls=()):
@@ -253,11 +285,13 @@ def main(argv=None):
     source = REPO / spec["source"]
     if not source.exists():
         sys.exit(f"footage is never committed; missing: {source}")
+    redrawn = refresh_cards(manifest, doc, cards_dir, section)
+    for path in redrawn:
+        print(f"plate redrawn (stale): {path}", file=sys.stderr)
     missing = missing_cards(doc, cards_dir, section)
     if missing:
         sys.exit("missing rendered ending plates: "
                  + ", ".join(str(p) for p in missing))
-
     notes = []
     repls = build_interludes.usable_replacements(movement, notes)
     cmd = command(doc, args.thread, cards_dir, out,

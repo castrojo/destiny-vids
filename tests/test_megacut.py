@@ -1465,3 +1465,76 @@ def _plan_file(tmp_path, plan):
     f = tmp_path / "plan.json"
     f.write_text(json.dumps(plan))
     return f
+
+
+def _foreign_ws(tmp_path):
+    """Two stamped acts, only ONE of which the plan seats.
+
+    Both masters carry a `built_from_commit` that is not in this history, so
+    the only thing separating them is whether the programme plays them.
+    """
+    import os
+
+    mega = tmp_path / "stories" / "megacut"
+    mega.mkdir(parents=True)
+
+    seated_master = tmp_path / "seated.mp4"
+    seated_master.write_bytes(b"seated")
+    bench_master = tmp_path / "benched.mp4"
+    bench_master.write_bytes(b"benched")
+
+    (mega / "delivery.json").write_text(json.dumps({"masters": {
+        "I": {"path": str(seated_master), "built_from_commit": "dead" * 10},
+        "II": {"path": str(bench_master), "built_from_commit": "beef" * 10},
+    }}))
+
+    prod = tmp_path / "01-intro.mp4"
+    os.link(seated_master, prod)   # Prod is a hardlink, exactly as publish makes it
+    plan = {"output": str(tmp_path / "out.mp4"),
+            "items": [{"kind": "clip", "path": str(prod), "audio": "source",
+                       "label": "Act I"}]}
+    return plan, tmp_path
+
+
+def test_only_the_acts_the_plan_seats_are_announced_as_foreign(
+        tmp_path, monkeypatch):
+    """REGRESSION: the "seated" in the name was unproven.
+
+    The filter read `master.get("prod_file")`, a key no master in
+    stories/megacut/delivery.json carries, so it was always `""`, the guard
+    never fired, and a benched act was announced as though the programme
+    played it. Over-reporting never ships wrong picture, but it trains an
+    operator to scroll past the notes that matter.
+    """
+    from tools import deliver
+    plan, root = _foreign_ws(tmp_path)
+    monkeypatch.setattr(deliver, "REPO_ROOT", root)
+    monkeypatch.setattr(deliver, "commit_in_history", lambda _c: False)
+
+    assert [n for n, _, _ in megacut.foreign_seated_acts(plan)] == ["I"]
+
+
+def test_a_seated_act_built_in_this_history_is_not_foreign(
+        tmp_path, monkeypatch):
+    """The gate must stay quiet on a correct build, or it gets ignored."""
+    from tools import deliver
+    plan, root = _foreign_ws(tmp_path)
+    monkeypatch.setattr(deliver, "REPO_ROOT", root)
+    monkeypatch.setattr(deliver, "commit_in_history", lambda _c: True)
+
+    assert list(megacut.foreign_seated_acts(plan)) == []
+
+
+def test_an_unstamped_act_is_unknown_rather_than_foreign(
+        tmp_path, monkeypatch):
+    """No `built_from_commit` means nobody recorded one -- not that it is
+    somebody else's. Guessing would cry wolf until `publish` had run once."""
+    from tools import deliver
+    plan, root = _foreign_ws(tmp_path)
+    doc = json.loads((root / "stories" / "megacut" / "delivery.json").read_text())
+    del doc["masters"]["I"]["built_from_commit"]
+    (root / "stories" / "megacut" / "delivery.json").write_text(json.dumps(doc))
+    monkeypatch.setattr(deliver, "REPO_ROOT", root)
+    monkeypatch.setattr(deliver, "commit_in_history", lambda _c: False)
+
+    assert list(megacut.foreign_seated_acts(plan)) == []
