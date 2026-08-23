@@ -198,6 +198,43 @@ and **looking at the frame**. `AGENTS.md` is explicit that a digest mismatch is
 a prompt to go and look, never a verdict on its own — the hash covers whole
 files, so it answers "did an input move", not "did the picture change".
 
+### Going and looking costs two minutes; the re-encode costs twenty
+
+"Go and look" needs a cheaper move than rebuilding, or nobody does it. There
+is one, and it works for every card, plate and act in the show: **re-run the
+generator into a scratch directory and diff the pixels against what shipped.**
+
+```bash
+cp -r renders/<dir> renders/_qa_old            # keep what is on screen now
+python3 scripts/build_<thing>.py               # redraw from current templates
+# then diff each pair: mean absolute difference and a difference bbox
+```
+
+Read the result against what the mismatch was:
+
+| Diff | What it means |
+|---|---|
+| MAD 0, no bbox | The bytes that moved never reached a frame. The shipped picture is right. Record it and move on. |
+| MAD under ~1 in a narrow band | Antialiasing. Compare crops side by side before believing anything more. |
+| Copy or layout differs | Genuinely stale. Re-render, and rebuild the act that carries it. |
+
+A whole quality pass over the 4K remasters resolved this way and moved no
+frame: seventeen plates and cards across acts 0 and VI all came back MAD 0.000
+or sub-pixel, and the two acts reading `provenance foreign` turned out to
+differ by a `~`-expansion fix and a freshness reporter — neither of which can
+reach a pixel. That is the normal outcome, which is exactly why the check must
+never be a re-encode.
+
+Two traps in the comparison itself:
+
+- **Frames only compare at the same timestamp *and* the same content.** A
+  letterbox or framing difference reads as MAD 15+ and looks like a wrong
+  source; ~1.0 is encode noise. Anchor to the source at `in_point + t`, or the
+  number means nothing.
+- **A derivative being older than its parent is not evidence.** The Perfume
+  overlay renders predate the plain renders they descend from by hours and are
+  still correct.
+
 **A provenance stamp older than the output it describes proves nothing.**
 `status` compares the recorded digest against `Prod/CHECKSUMS.md5`; it does not
 assert that the stamp postdates the build. The two failures look identical from
