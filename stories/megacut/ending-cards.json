@@ -32,6 +32,7 @@
       "seven-days",
       "chain-unending",
       "fight-for-us",
+      "prove-it",
       "for-nova"
     ],
     "_window": "source_in is still the underwater pullback's first frame. source_out moved 427.44 -> 499.300 on 2026-08-16 because the passage grew past the pullback: the owner seated two centre cards in the long tail after it -- 'Fight for Us' on the ocean wide and 'For Nóva' on the sunken hull. 499.300 is the megacut's own out point for this clip (trim_to 109.5, plus the 389.800 in point), so the section describes exactly the picture the programme plays. active_y/active_height still describe the scope letterbox every bottom_matte card sits in; that has not changed."
@@ -43,9 +44,9 @@
       "section": "pause",
       "mode": "pause",
       "frames": 300,
-      "label": "Mission",
+      "label": "Our Mission",
       "title": "Bring new contributors to cloud native",
-      "wallpaper": "renders/artwork/bluefin-day.png"
+      "wallpaper": "renders/artwork/bluefin-night.png"
     },
     {
       "id": "we-are",
@@ -53,7 +54,7 @@
       "section": "pause",
       "mode": "pause",
       "frames": 240,
-      "title": "We are Project Bluefin",
+      "title": "We are Bluefin",
       "wallpaper": "renders/artwork/bluefin-night.png"
     },
     {
@@ -62,7 +63,7 @@
       "section": "pause",
       "mode": "pause",
       "frames": 240,
-      "title": "And we have one purpose",
+      "title": "We are not nice.",
       "wallpaper": "renders/artwork/dusk-day.png"
     },
     {
@@ -71,7 +72,8 @@
       "section": "pause",
       "mode": "pause",
       "frames": 210,
-      "title": "One lesson",
+      "title": "We do what must be done.",
+      "subtitle": "(Wait for it)",
       "wallpaper": "renders/artwork/dusk-night.png"
     },
     {
@@ -197,14 +199,26 @@
       "section": "underwater",
       "mode": "overlay",
       "placement": "center",
-      "text": "Fight for Us",
+      "text": "\"We support the Community\"",
       "at": 77.728,
       "dur": 4.4,
       "fade_in": 0.6,
       "fade_out": 0.6,
-      "_what": "Owner 2026-08-16: '27:49 \"Fight for Us\" -- same font/size as the other 2. Blue F's.' The owner's stamp is 77.46; 77.728 is the MEASURED shot change beside it (select='gt(scene,0.15)' on this derivative, 0.268 s later), where the jungle cuts to a wide ocean surface -- an even mid-dark field that a centre title sits on cleanly. The card lands ON the cut.",
-      "blue_letters": true,
-      "_treatment": "Owner 2026-08-16: 'Blue F's.' The letters are chosen by the project's own rule rather than by hand -- tools/blueletters.py lights B, b, F and f, the letters of 'bluefin' -- so both F's in 'Fight for Us' carry it and nothing else does. The blue is #93c5fd, the credits' own accent (tools/credits.py), reused rather than a second blue invented for one card. Only the colour changes: same face, same weight, same tracking, so the words stay one line of type."
+      "_what": "Owner 2026-08-18: \"We support the Community\". The card keeps its centered treatment and measured cut placement.",
+      "_treatment": "Owner 2026-08-18: retain the existing centered treatment for the quoted Community support line."
+    },
+    {
+      "id": "prove-it",
+      "kind": "ending",
+      "section": "underwater",
+      "mode": "overlay",
+      "placement": "center",
+      "text": "Prove it.",
+      "at": 93.075,
+      "dur": 4.4,
+      "fade_in": 0.6,
+      "fade_out": 0.6,
+      "_what": "Owner 2026-08-18: show Prove it. in the same centered treatment before For Nóva."
     },
     {
       "id": "for-nova",

@@ -1,4 +1,4 @@
-"""The underwater coda: the seven closing lines burned into a movement-5
+"""The underwater coda: the closing lines burned into a movement-5
 DERIVATIVE, never into the clean movement.
 
 The clean movement 5 (renders/perfume-5.mp4) stays clean for the dinosaur
@@ -64,6 +64,24 @@ def test_each_line_replaces_the_previous_line():
     cards = underwater(ending())
     for previous, current in zip(cards, cards[1:]):
         assert previous["at"] + previous["dur"] < current["at"]
+
+
+def test_support_and_prove_it_keep_their_authored_windows():
+    cards = {card["id"]: card for card in underwater(ending())}
+    assert cards["fight-for-us"]["text"] == '"We support the Community"'
+    assert cards["prove-it"] == {
+        "id": "prove-it",
+        "kind": "ending",
+        "section": "underwater",
+        "mode": "overlay",
+        "placement": "center",
+        "text": "Prove it.",
+        "at": 93.075,
+        "dur": 4.4,
+        "fade_in": 0.6,
+        "fade_out": 0.6,
+        "_what": "Owner 2026-08-18: show Prove it. in the same centered treatment before For Nóva.",
+    }
 
 
 def test_the_command_renders_the_full_movement_from_its_measured_in_point(
