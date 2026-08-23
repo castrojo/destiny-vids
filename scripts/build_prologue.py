@@ -381,16 +381,26 @@ def encode(argv_ff, day, night):
               file=sys.stderr)
         subprocess.run(argv_ff, check=True)
         return "local"
-    farm.run_ffmpeg_on_cluster(
-        argv_ff,
-        inputs=[SOURCE,
-                PLATES_DIR / "plate_maintitle-a.png",
-                PLATES_DIR / "plate_maintitle-b.png",
-                PLATES_DIR / "plate_book-a.png",
-                day, night],
-        out=OUT,
-        expected_duration=TOTAL,
-    )
+    try:
+        farm.run_ffmpeg_on_cluster(
+            argv_ff,
+            inputs=[SOURCE,
+                    PLATES_DIR / "plate_maintitle-a.png",
+                    PLATES_DIR / "plate_maintitle-b.png",
+                    PLATES_DIR / "plate_mission-briefing.png",
+                    PLATES_DIR / "plate_book-a.png",
+                    day, night],
+            out=OUT,
+            expected_duration=TOTAL,
+        )
+    except farm.FarmError as exc:
+        # AGENTS.md: nothing blocks a release. A farm that fails mid-encode is
+        # a reason to say so and keep going, never a reason to hand back no
+        # picture -- the argv is identical either way.
+        print(f"farm: the cluster encode failed ({exc}); encoding locally",
+              file=sys.stderr)
+        subprocess.run(argv_ff, check=True)
+        return "local"
     return "cluster"
 
 
