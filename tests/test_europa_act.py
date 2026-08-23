@@ -133,3 +133,52 @@ def test_no_avatar_is_named_by_an_absolute_path():
             f"plate {plate.get('id')}: {avatar!r} is an absolute path -- use a "
             f"repo-relative path for a file in this repo, or a `~`-rooted one "
             f"for a file outside it")
+
+
+def test_the_song_plays_alone_with_no_crossfade_and_no_fades():
+    """The mix the owner remuxed on 2026-08-20 and shipped: Beauty of the
+    Beast 465.0-560.4 s under the whole delivered film, a full replacement.
+
+    This is pinned because the record and the builder disagreed with the
+    delivered file for three days, and the 2026-08-23 programme regeneration
+    duly rebuilt the act back to the PREVIOUS two-leg mix. The owner caught it
+    on the screen. A builder that cannot express what ships will revert it
+    again on the next rebuild.
+    """
+    doc = load()
+    aud = doc["audio"]
+
+    assert [leg["from"] for leg in aud["join"]] == ["song"]
+    assert aud["join"][0]["window"] == [465.0, 560.4]
+    assert "crossfade" not in aud
+    assert "master_fade_out" not in aud
+    assert "delivered_fade_out" not in aud
+
+    graph = ";".join(build_europa.audio_graph(doc))
+    assert "atrim=465.0:560.4" in graph
+    assert "acrossfade" not in graph
+    assert "afade" not in graph
+
+
+def test_the_song_covers_the_whole_delivered_film():
+    """95.4 s of song against 95.333333 s of picture, so the cut lands inside
+    the song rather than running out of it."""
+    doc = load()
+    start, end = doc["audio"]["join"][0]["window"]
+    assert end - start >= doc["picture"]["audio_sec"]
+
+
+def test_the_delivered_derivation_fades_only_when_the_record_asks(tmp_path):
+    doc = load()
+    _, derive = build_europa.build_commands(
+        doc, tmp_path, tmp_path, tmp_path / "m.mp4", tmp_path / "d.mp4",
+        ffmpeg=["ffmpeg"])
+    af = derive[derive.index("-af") + 1]
+    assert af == f"atrim=0:{doc['picture']['audio_sec']:g}"
+
+    faded = json.loads(MANIFEST.read_text())
+    faded["audio"]["delivered_fade_out"] = {"at": 1.0, "dur": 2.0}
+    _, derive = build_europa.build_commands(
+        faded, tmp_path, tmp_path, tmp_path / "m.mp4", tmp_path / "d.mp4",
+        ffmpeg=["ffmpeg"])
+    assert derive[derive.index("-af") + 1].startswith("afade=t=out:st=1:d=2,")
