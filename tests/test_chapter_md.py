@@ -460,7 +460,7 @@ def test_act_iii_authors_its_intermission_at_the_end_of_its_own_file():
     assert [e["id"] for e in deck] == [f"intermission-{n}" for n in (1, 2, 3, 4)]
     assert not [e for e in act if e["id"].startswith("intermission")]
     assert deck[0]["at"] == pytest.approx(0.0)
-    assert all(e["position"] == "center" for e in deck)
+    assert all(e["position"] == "slide" for e in deck)
 
 
 # --- writing the way the owner writes ---------------------------------------

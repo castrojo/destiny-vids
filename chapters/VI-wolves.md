@@ -74,7 +74,7 @@ those names live. Edit them there.
 * [gold_robertsirc] - @ 22:32.522 +2.8
   - position: left
   - label: "#HIREAWOLF // MAINTAINER"
-  - class: Harbringer Titan
+  - class: Harbinger Titan
   - name: robertsirc
   - title: Protector of the Helm
   - variant: leader

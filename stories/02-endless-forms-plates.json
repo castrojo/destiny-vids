@@ -2490,10 +2490,12 @@
       "dur": 2.2,
       "kind": "chat",
       "position": "left",
-      "speaker": "kyle",
+      "speaker": "KyleGospo",
       "text": "I'm not calling this Bobonomics",
       "copy_source": "owner_supplied",
-      "text_source": "owner_supplied"
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/KyleGospo.png",
+      "avatar_url": "https://github.com/KyleGospo.png?size=256"
     },
     {
       "id": "chat_kyle_movie",
@@ -2501,10 +2503,12 @@
       "dur": 2.2,
       "kind": "chat",
       "position": "left",
-      "speaker": "kyle",
+      "speaker": "KyleGospo",
       "text": "We had to make this movie",
       "copy_source": "owner_supplied",
-      "text_source": "owner_supplied"
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/KyleGospo.png",
+      "avatar_url": "https://github.com/KyleGospo.png?size=256"
     },
     {
       "id": "chat_nwoods3_seen",

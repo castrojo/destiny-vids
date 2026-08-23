@@ -93,7 +93,7 @@ python3 scripts/build_intermission.py --render    # and the film
 ## 15:18.816 intermission
 
 * [intermission-1] slide @ 15:18.816 +6.0
-  - position: center
+  - position: slide
   - copy_source: placeholder
   - label: Lorem ipsum
   - label_source: placeholder
@@ -101,7 +101,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title_source: placeholder
 
 * [intermission-2] slide @ 15:25.616 +6.0
-  - position: center
+  - position: slide
   - copy_source: placeholder
   - label: Sed do eiusmod
   - label_source: placeholder
@@ -109,7 +109,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title_source: placeholder
 
 * [intermission-3] slide @ 15:32.416 +6.0
-  - position: center
+  - position: slide
   - copy_source: placeholder
   - label: Ut enim ad minim
   - label_source: placeholder
@@ -117,7 +117,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title_source: placeholder
 
 * [intermission-4] slide @ 15:39.216 +6.0
-  - position: center
+  - position: slide
   - copy_source: placeholder
   - label: Duis aute irure
   - label_source: placeholder

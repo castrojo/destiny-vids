@@ -245,8 +245,8 @@ AUTHORED_PLATES = {
     "osiris": ("TRUSTEE // GUARDIAN", "Voidwalker Warlock", "Bob Killen",
                "Reconciler of the Plane"),
     # characters.json slug `andy`
-    "sagira": ("MAINTAINER // GUARDIAN", "Shadebinder Warlock",
-               "Doctor Andy Anderson", "Foundry of the Forbidden"),
+    "sagira": ("MAINTAINER // GHOST", "Shadebinder Warlock",
+               "Doc Anderson", "Foundry of the Forbidden"),
     # characters.json slug `laura`
     "elsie_bray": ("MAINTAINER // GUARDIAN", "Gunslinger Hunter",
                    "Laura Santamaria", "The Order of Seven"),
@@ -257,7 +257,7 @@ AUTHORED_PLATES = {
     "zavala": ("ARCHITECT // GUARDIAN", "Dawnblade Warlock",
                "Kelsey Hightower", "Evangelist of the Open Sky"),
     # issue #8, owner-authored (Lori has no deck entry)
-    "petra_venj": ("HERALD // GUARDIAN", "Harbringer Hunter",
+    "petra_venj": ("HERALD // GUARDIAN", "Harbinger Hunter",
                    "Lori Lorusso", "Pathfinder of the Iron Weave"),
 }
 

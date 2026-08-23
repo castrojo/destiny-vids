@@ -168,8 +168,8 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `9:54.65` **cortney** — And we're gonna do you a solid
 - `10:00.00` Reprehenderit voluptate / HATERS
 - `10:00.77` **kylegospo** — Sup
-- `10:05.94` **kyle** — I'm not calling this Bobonomics
-- `10:08.39` **kyle** — We had to make this movie
+- `10:05.94` **KyleGospo** — I'm not calling this Bobonomics
+- `10:08.39` **KyleGospo** — We had to make this movie
 - `10:10.84` **nwoods3** — I feel seen
 - `10:13.29` **Eva** — Hey did you see how we just loaded up in a new level?
 - `10:15.74` **Hikari** — Finally, I can play WARFRAME!

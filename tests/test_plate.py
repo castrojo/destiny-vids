@@ -2335,12 +2335,12 @@ def test_top_right_title_card_uses_picture_safe_top_right_placement():
 
 
 def test_a_centred_slide_is_centred_on_both_axes():
-    """position: "center" is for a card with NO PICTURE BEHIND IT -- an
+    """position: "slide" is for a card with NO PICTURE BEHIND IT -- an
     intermission slide on black. Every other placement measures a row against
     the frame the plate sits over; on black that same measurement reads as a
     card that missed its mark."""
     p = plate.render_plate(GUARDIAN)
-    frame = plate.place(p, "center")
+    frame = plate.place(p, "slide")
     assert frame.size == (plate.FRAME_W, plate.FRAME_H)
     x0, y0, x1, y1 = frame.getchannel("A").getbbox()
     assert (x0 + x1) / 2 == pytest.approx(plate.FRAME_W / 2, abs=2)
@@ -2351,7 +2351,21 @@ def test_a_centred_slide_ignores_the_picture_it_is_given():
     """There is no picture: a slide plays on black, so a letterbox passed in
     by a caller must not shove it off centre."""
     p = plate.render_plate(GUARDIAN)
-    plain = plate.place(p, "center").getchannel("A").getbbox()
-    boxed = plate.place(p, "center",
+    plain = plate.place(p, "slide").getchannel("A").getbbox()
+    boxed = plate.place(p, "slide",
                         picture=(0, 140, plate.FRAME_W, 940))
     assert boxed.getchannel("A").getbbox() == plain
+
+
+def test_a_center_pill_stays_in_the_lower_third():
+    """`center` is a chat LANE -- horizontally centred, still in the lower
+    third -- and act III's dialogue has always been emitted in it. The
+    intermission deck briefly took the name for a both-axes slide, which
+    silently lifted a whole two-hander conversation into the middle of the
+    picture, over the faces. A slide is `slide`; these two must never converge
+    again."""
+    p = plate.render_plate(GUARDIAN)
+    lane = plate.place(p, "center").getchannel("A").getbbox()
+    deck = plate.place(p, "slide").getchannel("A").getbbox()
+    assert lane != deck
+    assert lane[3] > plate.FRAME_H * 0.75

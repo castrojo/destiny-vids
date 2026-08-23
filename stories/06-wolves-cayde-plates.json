@@ -103,7 +103,7 @@
    "fade_in": 0.6,
    "fade_out_at": 371.647,
    "fade_out": 0.25,
-   "class": "Harbringer Titan",
+   "class": "Harbinger Titan",
    "name": "robertsirc",
    "title": "Protector of the Helm",
    "variant": "leader",
@@ -122,7 +122,7 @@
    "seen_at_film": 363.538,
    "why": "Cayde-6 alone, walking out of the fog, then the hooded close-up -- the shot the programme has been withholding his name for",
    "label": "MAINTAINER // GUARDIAN",
-   "class": "Harbringer Hunter",
+   "class": "Harbinger Hunter",
    "name": "Jorge Castro",
    "title": "Upender of Antipatterns",
    "copy_override": {
@@ -290,11 +290,11 @@
   }
  ],
  "unresolved": [
-  "SPELLING, owner to confirm: the brief writes Jorge Castro's subclass as 'Harbringer Hunter'. The reference deck (~/Videos/nameplates.json, np_jorge) writes the same word 'Harbinger'. Reproduced from the BRIEF verbatim rather than silently corrected -- one character, on his own credit. Say the word and it changes.",
-  "SETTLED 2026-08-15, kept for the record: the first spoken line read \"For fives years you've trusted us\" in the 2026-08-13 brief and again in the owner's 2026-08-15 note. Asked, the owner corrected it, so it now reads \"For five years you've trusted us\". Fixed by the AUTHOR, not by an agent -- 'Harbringer' above is the same shape of typo and is still reproduced verbatim, because nobody has said the word.",
+  "SETTLED 2026-08-23, owner, verbatim: \"harbinger is fine\". The brief wrote Jorge Castro's subclass as 'Harbringer Hunter'; the reference deck (~/Videos/nameplates.json, np_jorge) wrote 'Harbinger'. Asked, the owner said the word, so it is corrected here and in vocab/casting.yaml's lori_lorusso binding together -- a spelling fixed on one plate and not the other is worse than either.",
+  "SETTLED 2026-08-15, kept for the record: the first spoken line read \"For fives years you've trusted us\" in the 2026-08-13 brief and again in the owner's 2026-08-15 note. Asked, the owner corrected it, so it now reads \"For five years you've trusted us\". Fixed by the AUTHOR, not by an agent. 'Harbringer' was the same shape of typo and was reproduced verbatim until 2026-08-23, when the owner said the word; see the SETTLED note above.",
   "SETTLED 2026-08-15: the sixth line read 'Lead the way, open source will follow' and the owner's note writes 'Lead the way, we will follow'. His wording ships; the earlier one is recorded here rather than overwritten silently.",
   "NO DIALOGUE RECORD: act VI has no `dialogue/<video_id>/` folder, so these six pills carry `copy_source: owner_supplied` in this manifest instead of coming from a recovery record -- act IV's precedent (stories/04-kat-plates.json), and the same reason: the words are the owner's own, never recovered from a source. If act VI ever gets a dialogue record, these lines move into it and the manifest reads them.",
-  "DIVERGENCE, Jorge Castro: the committed `cayde_6` binding in vocab/casting.yaml is TRUSTEE // GUARDIAN / Harbinger Titan / 'Upender of Antipatterns | The First Disciple' / trustee (silver). The brief asks for MAINTAINER // GUARDIAN / Harbringer Hunter / 'Upender of Antipatterns' / basic blue 'like the blueberries'. The brief is the owner speaking, so it wins here; casting.yaml is NOT edited by this manifest and the two records now disagree.",
+  "DIVERGENCE, Jorge Castro: the committed `cayde_6` binding in vocab/casting.yaml is TRUSTEE // GUARDIAN / Harbinger Titan / 'Upender of Antipatterns | The First Disciple' / trustee (silver). The brief asks for MAINTAINER // GUARDIAN / Harbinger Hunter (the brief's 'Harbringer' corrected 2026-08-23 at the owner's word) / 'Upender of Antipatterns' / basic blue 'like the blueberries'. The brief is the owner speaking, so it wins here; casting.yaml is NOT edited by this manifest and the two records now disagree.",
   "DIVERGENCE, Kelsey Hightower: the committed `zavala` binding is ARCHITECT // GUARDIAN / Dawnblade Warlock. The brief asks for TRUSTEE // GUARDIAN / Sentinel Titan, same title and same gold. Brief used; casting.yaml untouched.",
   "NOT IN casting.yaml: Brian Ketelsen and Angie Jones have no binding and no ensemble title. Their copy exists only in the brief and only in this manifest. Both need a casting.yaml entry keyed by GitHub login before they are credited anywhere else -- the login is the owner's to supply, not an agent's to guess.",
   "Brian Ketelsen and Kelsey Hightower carry the SAME title, 'Evangelist of the Open Sky', exactly as the brief wrote it. Reproduced rather than de-duplicated; owner to confirm it is deliberate.",
