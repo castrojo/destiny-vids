@@ -1346,3 +1346,51 @@ def test_an_act_without_a_one_command_rebuild_says_why_when_it_knows():
         assert master.get("rebuild_note"), (
             f"act {numeral} declares inputs but neither a `rebuild` command "
             f"nor a `rebuild_note` saying why it has none")
+
+
+def test_a_recorded_provenance_finding_is_shown_with_the_commit_it_answers():
+    """Somebody has usually already read these diffs.
+
+    Recording the answer is the difference between one investigation and one
+    per agent. It stays evidence rather than a rubber stamp because the
+    commit it was written against is printed beside it -- rebuild the act, or
+    move an input, and the note is visibly about a different question.
+    """
+    act = types.SimpleNamespace(numeral="VI", prod_file="06-wolves.mp4")
+    r = deliver.ActReport(act)
+    deliver.check_provenance({"built_from_commit": "d" * 40,
+                              "sources": [],
+                              "provenance_note": "reads no pixel"}, r)
+    assert [f.state for f in r.findings] == [deliver.FOREIGN]
+    assert "reads no pixel" in r.findings[0].detail
+    assert "dddddddddddd" in r.findings[0].detail
+
+
+def test_a_provenance_note_cannot_turn_a_finding_green():
+    """A note is evidence for a reader, never a `--force` flag.
+
+    AGENTS.md: if shipping requires a flag, the default was wrong. FOREIGN
+    stays FOREIGN; what changes is how much the next person has to redo.
+    """
+    act = types.SimpleNamespace(numeral="VI", prod_file="06-wolves.mp4")
+    r = deliver.ActReport(act)
+    deliver.check_provenance({"built_from_commit": "d" * 40, "sources": [],
+                              "provenance_note": "it is all completely fine"},
+                             r)
+    assert r.findings[0].state == deliver.FOREIGN
+    assert deliver.FOREIGN in deliver.FAILING
+
+
+def test_a_provenance_note_names_the_commit_it_was_written_against():
+    """A finding recorded against a commit nobody can locate is a rumour."""
+    masters, _ = deliver.load_delivery(
+        REPO_ROOT / "stories" / "megacut" / "delivery.json")
+    for numeral, master in masters.items():
+        note = master.get("provenance_note")
+        if not note:
+            continue
+        commit = master.get("built_from_commit") or ""
+        assert commit[:12] in note, (
+            f"act {numeral}'s provenance_note does not say which build "
+            f"commit it was written against, so nothing can tell whether it "
+            f"is still answering the current question")
