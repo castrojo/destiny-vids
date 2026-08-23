@@ -51,15 +51,31 @@ authored fields and change no string:
 | `placement` | where a `daycard`'s line sits vertically over its wallpaper |
 | `glyph` / `glyph_src` | a mark that stands in for one letter of the title |
 
-**`font-weight: 500` and `600` are no-ops on this host.** The stack is the
-site's — `'Inter', 'Arial Narrow', sans-serif` — and Inter is not installed, so
-it falls to DejaVu Sans: Book (400) and Bold (700), nothing between. CSS font
-matching snaps 500 down and 600 up, so a "400/500/600/700" option set is two
-options wearing four names. The levers that do exist are weight, stroke width
-(`-webkit-text-stroke`, the only continuous one), contrast and size.
-The font-options pass rendered the set **over the frame it shipped
-on**, not on a swatch, because half of "too thin" is contrast against the
-picture underneath.
+**The house display face is Adwaita Sans.** Owner: *"inter should not be used
+our font is adwaita"*. It ships the full ramp — Thin, ExtraLight, Light,
+Regular, Medium, SemiBold, Bold, ExtraBold, Black — so every `font-weight`
+between 100 and 900 is a real, distinct face.
+
+That is a change from what these cards were authored against. The old stack was
+the website's — `'Inter', 'Arial Narrow', sans-serif` — and neither of the first
+two is installed here, so it fell through to DejaVu Sans: Book (400) and Bold
+(700) and nothing between. CSS font matching snapped 500 down and 600 up, so a
+"400/500/600/700" option set was two options wearing four names, and the
+variants had to reach for weight, stroke width (`-webkit-text-stroke`, the only
+continuous lever), contrast and size instead.
+
+**The eyebrow variants have not been re-cut as a weight ramp**, even though they
+now could be. They are the ones the owner picked by eye, rendered **over the
+frame they ship on** rather than on a swatch, because half of "too thin" is
+contrast against the picture underneath. Re-deriving them from a number would
+discard that judgement.
+
+**The Guardian nameplates are a separate decision and use DejaVu Sans Mono.**
+`tools/plate.py` pins it explicitly and `test_the_font_stack_resolves_the_way_the_browser_did`
+guards it: the reference plates were baked by a headless browser that fell
+through to DejaVu Sans Mono, and preferring the desktop's Adwaita Mono rendered
+them in a face that matched neither the stack nor any already-shipped video.
+Do not "fix" that to Adwaita for consistency.
 
 ## A poster CTA over a wallpaper
 
