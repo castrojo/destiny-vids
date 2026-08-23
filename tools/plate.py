@@ -2178,6 +2178,16 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
     if position == "warning":
         frame.alpha_composite(plate, (0, 0))
         return frame
+    if position == "center":
+        # A card with NO PICTURE BEHIND IT -- a slide in a deck that plays
+        # between acts. Every other placement here measures a row against the
+        # frame the plate sits over, which is right when there is one: a
+        # lower third belongs in the lower third. On black there is nothing
+        # to sit under, and the same measurement reads as a card that missed
+        # its mark, so a slide is centred on both axes instead.
+        frame.alpha_composite(plate, ((FRAME_W - plate.width) // 2,
+                                      (FRAME_H - plate.height) // 2))
+        return frame
     if position == "full":
         # A FULL-FRAME card: the pause menu draws its own scrim over the whole
         # picture, so it is composited at the origin rather than measured into

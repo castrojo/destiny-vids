@@ -11,6 +11,13 @@ programme_start: 643.768
 # This act's fixed plates come from this file, so the manifest is regenerated
 # from it: `python3 tools/chapter_md.py sync III --write`.
 owns_plates: true
+# THE INTERMISSION THAT PLAYS AFTER THIS SECTION IS AUTHORED AT THE BOTTOM OF
+# THIS FILE. Any block whose heading carries this label is the deck, not the
+# act: its slides never reach the act's manifest and are rendered as their
+# own short film by `scripts/build_intermission.py`. The owner's reason for
+# the arrangement is that the deck IS the concluding text of Bob's scene, so
+# it is edited where the rest of his scene is edited.
+deck: intermission
 field_order: id, kind, at, dur, position, copy_source, speaker, text
 defaults:
   kind: chat
@@ -58,3 +65,61 @@ area rather than the lower third, so it does not collide with the pills below.
   - title: Maintainers Reading Emails
   - subtitle: And Other Preposterous Tales
   - body: Summer 2027
+
+**The intermission.** The deck below plays **after** this section — after act III and after
+Perfume's third movement, in the slot before act IV. It is the concluding
+text of Bob's scene, so it lives here rather than in a file of its own.
+
+Two things about that seat are deliberate. The act III → movement 3 join is a
+hard cut covered by the Vex gate blooming to white (`_hard_out` on that item
+in [`megacut.json`](../stories/megacut/megacut.json)); putting slides inside
+it would break the one frame doing the most work. And the intermission is
+where a **different song** goes — the owner's, not Perfume's — which is why
+it is its own segment with its own audio rather than an overlay on the
+movement.
+
+**Every word below is a placeholder.** Nobody has written this copy yet, so
+each row carries lorem ipsum and a source marker reading `placeholder`, which
+is how `python3 tools/placeholder.py list` finds it again. Replace the words
+and flip that marker to `owner_supplied`. The timing, the pacing and the read
+length are reviewable now, which is the whole point of shipping a slot with
+Latin in it rather than shipping a gap.
+
+```bash
+python3 scripts/build_intermission.py --write     # regenerate the manifest
+python3 scripts/build_intermission.py --render    # and the film
+```
+
+## 15:18.816 intermission
+
+* [intermission-1] slide @ 15:18.816 +6.0
+  - position: center
+  - copy_source: placeholder
+  - label: Lorem ipsum
+  - label_source: placeholder
+  - title: Dolor sit amet consectetur adipiscing elit
+  - title_source: placeholder
+
+* [intermission-2] slide @ 15:25.616 +6.0
+  - position: center
+  - copy_source: placeholder
+  - label: Sed do eiusmod
+  - label_source: placeholder
+  - title: Tempor incididunt ut labore et dolore magna
+  - title_source: placeholder
+
+* [intermission-3] slide @ 15:32.416 +6.0
+  - position: center
+  - copy_source: placeholder
+  - label: Ut enim ad minim
+  - label_source: placeholder
+  - title: Veniam quis nostrud exercitation ullamco laboris
+  - title_source: placeholder
+
+* [intermission-4] slide @ 15:39.216 +6.0
+  - position: center
+  - copy_source: placeholder
+  - label: Duis aute irure
+  - label_source: placeholder
+  - title: In reprehenderit voluptate velit esse cillum
+  - title_source: placeholder

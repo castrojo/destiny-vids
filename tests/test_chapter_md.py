@@ -394,3 +394,70 @@ def test_the_two_portrait_keys_are_not_interchangeable():
     assert by_login["avatar_url"] == "https://github.com/A1RM4X.png?size=256"
     if "avatar_url" in by_cast:
         assert by_cast["avatar_url"] != by_login["avatar_url"]
+
+
+# --- decks: copy that plays AFTER the act, authored inside it ---------------
+
+DECK_MD = """---
+act: ZZ
+programme_start: 100.0
+deck: intermission
+defaults:
+  copy_source: owner_supplied
+---
+
+## 1:41.000
+someone: A line that belongs to the act itself
+
+## 1:50.000 intermission
+* [slide-1] slide @ 1:50.000 +6.0
+  - label: FIRST
+* [slide-2] slide @ 1:56.800 +6.0
+  - label: SECOND
+"""
+
+
+def _wire(tmp_path, monkeypatch, text=DECK_MD, name="ZZ-deck.md"):
+    (tmp_path / name).write_text(text, encoding="utf-8")
+    monkeypatch.setattr(chapter_md, "CHAPTERS_DIR", tmp_path)
+
+
+def test_a_labelled_block_leaves_the_act_and_becomes_a_deck(tmp_path, monkeypatch):
+    """`deck: <label>` in the front matter is the boundary. It is written
+    down where the copy is, rather than inferred from the act's runtime --
+    act III's manifest has no film_sec at all."""
+    _wire(tmp_path, monkeypatch)
+    act, _ = chapter_md.entries("ZZ")
+    deck, _ = chapter_md.deck_entries("ZZ")
+    assert [e.get("speaker") for e in act] == ["someone"]
+    assert [e["id"] for e in deck] == ["slide-1", "slide-2"]
+
+
+def test_a_deck_comes_back_rebased_to_its_own_clock(tmp_path, monkeypatch):
+    """A deck renders as its own film, so its first slide starts at 0 --
+    not at wherever it sits in the act's or the programme's clock."""
+    _wire(tmp_path, monkeypatch)
+    deck, _ = chapter_md.deck_entries("ZZ")
+    assert deck[0]["at"] == pytest.approx(0.0)
+    assert deck[1]["at"] == pytest.approx(6.8)
+
+
+def test_an_act_with_no_deck_key_keeps_every_block(tmp_path, monkeypatch):
+    """The label is only a boundary when the front matter names it. A file
+    that says nothing about decks behaves exactly as it always did."""
+    _wire(tmp_path, monkeypatch,
+          DECK_MD.replace("deck: intermission\n", ""))
+    act, _ = chapter_md.entries("ZZ")
+    deck, _ = chapter_md.deck_entries("ZZ")
+    assert len(act) == 3 and deck == []
+
+
+def test_act_iii_authors_its_intermission_at_the_end_of_its_own_file():
+    """The owner's arrangement, verbatim: 'Have it be the concluding text of
+    his scene so I can edit it in one place.'"""
+    act, _ = chapter_md.entries("III")
+    deck, _ = chapter_md.deck_entries("III")
+    assert [e["id"] for e in deck] == [f"intermission-{n}" for n in (1, 2, 3, 4)]
+    assert not [e for e in act if e["id"].startswith("intermission")]
+    assert deck[0]["at"] == pytest.approx(0.0)
+    assert all(e["position"] == "center" for e in deck)

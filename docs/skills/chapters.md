@@ -151,6 +151,21 @@ plates, so the manifest is regenerated from it), `field_order`, `defaults`
 key), and `timed: false` for a run of cards that has no clock, like act
 VIII's weighted cries.
 
+**`deck: <label>` routes a block out of the act.** A block whose heading
+carries that label (`## 15:18.816 intermission`) leaves `entries()` and comes
+back from `deck_entries()` instead, rebased so its first card starts at 0.
+That is how act III's intermission is authored: the deck is the *conclusion*
+of Bob's scene, so the owner edits it where the scene is, while it renders as
+its own film after the act rather than burning over the act's picture. A deck
+block is exempt from the "runs off the act's picture" note, because running
+off the picture is exactly what it does.
+
+**Prose is not as inert as it looks.** A sentence containing `word: text`
+matches the pill grammar and becomes a pill nobody wrote. Keep colons out of
+chapter-file prose — say "a source marker reading `placeholder`", not
+"`*_source: placeholder`" — and let `python3 tools/chapter_md.py show <act>`
+confirm the act resolves to only the lines you meant.
+
 Timing is derived, never typed: an unpinned line holds for `len(text) / 15`
 seconds clamped to [2.2, 7.0] — characters-per-second, set conservative for
 a theatre screen — with a 0.25 s beat between pills. An explicit `+<dur>`
