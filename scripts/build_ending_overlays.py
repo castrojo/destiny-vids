@@ -7,7 +7,7 @@
 
 What this builds
 ----------------
-Movement 5: the seven closing lines of ``stories/megacut/ending-cards.json``
+Movement 5: the eleven closing lines of ``stories/megacut/ending-cards.json``
 (``underwater``) revealed one at a time over the underwater pullback:
 ``renders/perfume-5-ending.mp4``.
 
