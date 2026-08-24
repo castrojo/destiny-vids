@@ -37,7 +37,12 @@ authored name, its species' scientific name, and the species artwork.
   does — Bob Killen's Torosaurus has no `dinosaurName`, so its card has none.
 - `bond_of: "<guardian plate id>"` is what lets the pair share the screen. The
   exemption is **named** on purpose: a shared `group` string could quietly
-  cover somebody else's plate too.
+  cover somebody else's plate too. It also covers other owner-instructed
+  pairs: act II's "Sup" pill bonded to Kyle's locked nameplate, and
+  kolunmi's "Disco!" bonded to that "Sup" (a pill answering a pill,
+  2026-08-24). Do **not** relax the one-plate rule by lane instead — a
+  left/right auto-exemption spreads to cards nobody named; it was tried and
+  reverted the same day.
 - Artwork is cached by `scripts/fetch_companion_art.py` into gitignored
   `renders/`; a missing file degrades to the card alone.
 - `art_max_h` caps the picture's height. It is a **frame judgement**, never a

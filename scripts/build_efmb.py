@@ -227,6 +227,12 @@ BLACK_CONVERSATION_SEC = HALLWAY_FREEZE_SEC
 INTERRUPTION_SEC = (
     HALLWAY_FREEZE_SEC + AMBER_CLIP_SEC + HALLWAY_AFTER_AMBER_SEC)
 INTERRUPTION_REPLACED_SEC = HALLWAY_RESUME_SRC - HALLWAY_CUT_SRC
+# film_sec == bed_sec + THIS, so lengthening the interruption GROWS THE ACT
+# and every act after it starts that much later: restate every downstream
+# chapter file's programme_start and pins by the same delta in the same
+# commit (done 2026-08-24, +4.1). The proof that no other act's frames moved
+# is that its manifest regenerates byte-identical -- chapter_md.sync writes
+# nothing when nothing changed.
 INTERRUPTION_SHIFT_SEC = INTERRUPTION_SEC - INTERRUPTION_REPLACED_SEC
 
 KYLE_REVEAL_SRC = 335.267
