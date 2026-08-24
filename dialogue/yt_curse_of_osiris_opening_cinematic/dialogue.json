@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "The owner replaced the complete conversation. Script layout keeps all 26 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
+    "note": "The owner replaced the complete conversation. Script layout keeps all 27 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
   },
   "cues": [
     {
@@ -97,12 +97,21 @@
       "text_source": "owner_supplied"
     },
     {
-      "id": "d09",
+      "id": "d09a",
       "start_sec": 69.52,
-      "end_sec": 72.43,
+      "end_sec": 71.72,
       "character": "sagira",
       "evidence": "owner_supplied",
-      "text": "You better get that context right We don't want a repeat of the Tophee Disaster",
+      "text": "You better get that context right",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "d09b",
+      "start_sec": 71.73,
+      "end_sec": 74.8,
+      "character": "sagira",
+      "evidence": "owner_supplied",
+      "text": "We don't want a repeat of the Tophee Disaster",
       "text_source": "owner_supplied"
     },
     {
@@ -292,6 +301,13 @@
       "start_sec": 87.84,
       "end_sec": 90.83,
       "raw": "Slow down.",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d09",
+      "start_sec": 69.52,
+      "end_sec": 72.43,
+      "raw": "You better get that context right We don't want a repeat of the Tophee Disaster",
       "reason": "removed by the owner while rewriting the conversation"
     }
   ]

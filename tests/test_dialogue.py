@@ -139,7 +139,7 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         "standalone_leads": False,
         "note": (
             "The owner replaced the complete conversation. Script layout keeps "
-            "all 26 lines readable in order; standalone lead plates are omitted "
+            "all 27 lines readable in order; standalone lead plates are omitted "
             "because every dialogue pill identifies Doctor Andy Anderson or "
             "Bob Killen."
         ),
@@ -196,6 +196,19 @@ def test_act3_wait_slow_down_is_dropped_and_d13_stands_alone():
     assert dropped["d12"]["raw"] == "Slow down."
 
 
+def test_act3_tophee_disaster_is_its_own_line():
+    """Owner, 2026-08-24: 'We don't want a repeat of the Tophee Disaster'
+    should be its own line -- d09 splits into d09a/d09b, d09 retired."""
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cues = {cue["id"]: cue for cue in data["cues"]}
+    assert "d09" not in cues
+    assert cues["d09a"]["text"] == "You better get that context right"
+    assert cues["d09b"]["text"] == "We don't want a repeat of the Tophee Disaster"
+    assert cues["d09a"]["character"] == cues["d09b"]["character"] == "sagira"
+    dropped = {cue["id"]: cue for cue in data["dropped"]}
+    assert "Tophee Disaster" in dropped["d09"]["raw"]
+
+
 def test_a_pinned_cue_lands_exactly_in_script_mode():
     cues = [
         {"id": "d01", "start_sec": 0.0, "end_sec": 3.0, "character": "osiris",
@@ -217,7 +230,8 @@ def test_a_pinned_cue_lands_exactly_in_script_mode():
 def test_act3_review_cue_splits_keep_the_owner_marked_hundredth_adjacency():
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
-    for earlier, later in (("d20a", "d20b"), ("d20b", "d21"), ("d23a", "d23b")):
+    for earlier, later in (("d09a", "d09b"), ("d20a", "d20b"),
+                           ("d20b", "d21"), ("d23a", "d23b")):
         assert cues[later]["start_sec"] == pytest.approx(
             cues[earlier]["end_sec"] + 0.01, abs=1e-9)
 

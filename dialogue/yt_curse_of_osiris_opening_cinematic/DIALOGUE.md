@@ -53,9 +53,13 @@ And you're sure this will work?
 
 Told ya, It's a model not a log
 
-## d09 | clubanderson | 1:09.52 -> 1:12.43
+## d09a | clubanderson | 1:09.52 -> 1:11.72
 
-You better get that context right We don't want a repeat of the Tophee Disaster
+You better get that context right
+
+## d09b | clubanderson | 1:11.73 -> 1:14.80
+
+We don't want a repeat of the Tophee Disaster
 
 ## d10 | mrbobbytables | 1:12.44 -> 1:20.87
 
