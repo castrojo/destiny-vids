@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "The owner replaced the complete conversation. Script layout keeps all 27 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
+    "note": "The owner replaced the complete conversation. Script layout keeps all 25 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
   },
   "cues": [
     {
@@ -228,6 +228,15 @@
       "pin_sec": 124.0
     },
     {
+      "id": "d27",
+      "start_sec": 133.0,
+      "end_sec": 135.9,
+      "character": "sagira",
+      "evidence": "owner_supplied",
+      "text": "Hive is the one stuck in the CNCF Sandbox!",
+      "text_source": "owner_supplied"
+    },
+    {
       "id": "d22",
       "start_sec": 133.96,
       "end_sec": 134.63,
@@ -244,33 +253,6 @@
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "The open rate of maintainer emails is 7%",
-      "text_source": "owner_supplied"
-    },
-    {
-      "id": "d23b",
-      "start_sec": 136.12,
-      "end_sec": 137.59,
-      "character": "sagira",
-      "evidence": "owner_supplied",
-      "text": "I don't like this plan",
-      "text_source": "owner_supplied"
-    },
-    {
-      "id": "d26",
-      "start_sec": 137.6,
-      "end_sec": 142.27,
-      "character": "osiris",
-      "evidence": "owner_supplied",
-      "text": "Don't worry Maintainers read their emails",
-      "text_source": "owner_supplied"
-    },
-    {
-      "id": "d25",
-      "start_sec": 142.28,
-      "end_sec": 146.0,
-      "character": "sagira",
-      "evidence": "owner_supplied",
-      "text": "I'm sure one of them will open the message ...",
       "text_source": "owner_supplied"
     }
   ],
@@ -308,6 +290,27 @@
       "start_sec": 69.52,
       "end_sec": 72.43,
       "raw": "You better get that context right We don't want a repeat of the Tophee Disaster",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d23b",
+      "start_sec": 136.12,
+      "end_sec": 137.59,
+      "raw": "I don't like this plan",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d26",
+      "start_sec": 137.6,
+      "end_sec": 142.27,
+      "raw": "Don't worry Maintainers read their emails",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d25",
+      "start_sec": 142.28,
+      "end_sec": 146.0,
+      "raw": "I'm sure one of them will open the message ...",
       "reason": "removed by the owner while rewriting the conversation"
     }
   ]

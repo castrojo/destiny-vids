@@ -109,6 +109,10 @@ Everyone's making their own and they're all awful
 
 They've broken out of the sandbox
 
+## d27 | clubanderson | 2:13.00 -> 2:15.90
+
+Hive is the one stuck in the CNCF Sandbox!
+
 ## d22 | mrbobbytables | 2:13.96 -> 2:14.63 | pin 2:14.82
 
 You need to get a message to the Kubernetes Maintainers
@@ -116,15 +120,3 @@ You need to get a message to the Kubernetes Maintainers
 ## d23a | clubanderson | 2:14.64 -> 2:16.11
 
 The open rate of maintainer emails is 7%
-
-## d23b | clubanderson | 2:16.12 -> 2:17.59
-
-I don't like this plan
-
-## d26 | mrbobbytables | 2:17.60 -> 2:22.27
-
-Don't worry Maintainers read their emails
-
-## d25 | clubanderson | 2:22.28 -> 2:26.00
-
-I'm sure one of them will open the message ...
