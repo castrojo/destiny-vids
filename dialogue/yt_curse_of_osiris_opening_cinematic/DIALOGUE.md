@@ -112,11 +112,3 @@ They've broken out of the sandbox
 ## d27 | clubanderson | 2:13.00 -> 2:15.90
 
 Hive is the one stuck in the CNCF Sandbox!
-
-## d22 | mrbobbytables | 2:13.96 -> 2:14.63 | pin 2:14.82
-
-You need to get a message to the Kubernetes Maintainers
-
-## d23a | clubanderson | 2:14.64 -> 2:16.11
-
-The open rate of maintainer emails is 7%

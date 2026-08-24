@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "The owner replaced the complete conversation. Script layout keeps all 25 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
+    "note": "The owner replaced the complete conversation. Script layout keeps all 23 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
   },
   "cues": [
     {
@@ -235,25 +235,6 @@
       "evidence": "owner_supplied",
       "text": "Hive is the one stuck in the CNCF Sandbox!",
       "text_source": "owner_supplied"
-    },
-    {
-      "id": "d22",
-      "start_sec": 133.96,
-      "end_sec": 134.63,
-      "character": "osiris",
-      "evidence": "owner_supplied",
-      "text": "You need to get a message to the Kubernetes Maintainers",
-      "text_source": "owner_supplied",
-      "pin_sec": 134.82
-    },
-    {
-      "id": "d23a",
-      "start_sec": 134.64,
-      "end_sec": 136.11,
-      "character": "sagira",
-      "evidence": "owner_supplied",
-      "text": "The open rate of maintainer emails is 7%",
-      "text_source": "owner_supplied"
     }
   ],
   "dropped": [
@@ -311,6 +292,20 @@
       "start_sec": 142.28,
       "end_sec": 146.0,
       "raw": "I'm sure one of them will open the message ...",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d22",
+      "start_sec": 133.96,
+      "end_sec": 134.63,
+      "raw": "You need to get a message to the Kubernetes Maintainers",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d23a",
+      "start_sec": 134.64,
+      "end_sec": 136.11,
+      "raw": "The open rate of maintainer emails is 7%",
       "reason": "removed by the owner while rewriting the conversation"
     }
   ]
