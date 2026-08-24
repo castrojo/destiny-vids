@@ -16,7 +16,7 @@ Re-apply with:
 python3 tools/dialogue_md.py apply yt_curse_of_osiris_opening_cinematic
 ```
 
-## d01 | clubanderson | 0:35.96 -> 0:41.99
+## d01 | mrbobbytables | 0:35.96 -> 0:41.99
 
 What a shitshow
 

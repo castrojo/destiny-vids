@@ -177,7 +177,7 @@ def test_act3_fixed_gold_bob_plate_matches_complete_authored_entry():
     gold = next(plate for plate in manifest["plates"] if plate["id"] == "mrbobbytables-gold")
     assert gold == {
         "id": "mrbobbytables-gold",
-        "at": 43.96,
+        "at": 30.23,
         "dur": 4.0,
         "position": "left",
         "copy_source": "casting",
@@ -197,7 +197,11 @@ def test_the_retirement_conversation_no_longer_opens_act_three():
     data = json.loads(path.read_text(encoding="utf-8"))
     plate.load_manifest_entries(data["plates"])
     assert not [p for p in data["plates"] if p["id"].startswith("retirement-")]
-    assert data["_anchor"] == "immediately before the wolf day shot appears"
+    assert data["_anchor"] == (
+        "the gold card rides the camera's reveal of Osiris -- the ECU that "
+        "opens the reveal (source 33.633 = film 30.233 after the 3.4s PEGI "
+        "cut) and settles face-on with Sagira beside him by film 32.6"
+    )
 
     builder = Path("scripts/build_uncut_credited.sh").read_text(encoding="utf-8")
     assert 'FIXED_MANIFEST="stories/$VIDEO_ID-fixed-plates.json"' in builder
