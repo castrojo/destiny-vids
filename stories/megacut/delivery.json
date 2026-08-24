@@ -188,7 +188,7 @@
    "footage": [],
    "footage_note": "no footage inputs: act VIII carries no filmed picture at all. It is drawn -- contributor walls, placards, the wallpaper cycle and the comic reveal, all rendered from stories/08-credits.json by tools/credits.py. Declared empty rather than left undeclared so the difference between AN ACT WITH NO PICTURE and AN ACT NOBODY HAS DECLARED YET is on the record.",
    "note": "8:52.504. Act VIII, the credits (#51): a call to action before the comic reveal, the credits after it, a second bed pass with vocals, and four upstream projects. Runs on the Bluefin DAY wallpapers over the same white-on-blue deck. Encoded to the DELIVERY SPEC (59.94, high@4.2, bt709) so the megacut joins it by stream copy rather than conforming it at assembly time.",
-   "provenance_note": "Read on 2026-08-23 against 1e391c5c7f99: the sole moved input, scripts/build_credits.py, differs by exactly one hunk -- `Path(args.out)` became `Path(args.out).expanduser()`, so a quoted `~` in the recorded rebuild route reaches ffmpeg literally instead of dying after nine minutes of card rendering. It changes where the file is written, never what is in it. The picture is correct; this is bookkeeping.",
+   "provenance_note": "Rebuilt on 2026-08-24 at e773158dd9a2 by deliver.py build after the act II pause change (+4.1 s) restated every downstream chapter pin; act VIII's cards are relative weights, so no frame moved. (Written against 1e391c5c7f99 on 2026-08-23: the sole moved input then was scripts/build_credits.py's `~`-expanduser hunk -- where the file is written, never what is in it.)",
    "sources": [
     "stories/08-credits.json",
     "scripts/build_credits.py",
