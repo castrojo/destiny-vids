@@ -6,6 +6,11 @@ Rewrite the line under each heading. Everything else is bookkeeping:
   back on the right frame; change them only to re-time a line.
 - **Change the speaker** by renaming it in the heading (the character,
   or the person credited for them).
+- **Pin a line to an exact film moment** with a fourth heading
+  segment: `| pin 1:57.00`. The timecodes still set the hold; the pin
+  sets where it starts on the delivered film. Remove the segment to
+  unpin. Only pin the lines that must land exactly -- an unpinned line
+  flows with the conversation and rides out every card move.
 - **Delete a whole section** to drop that line from the cut.
 - A line you change is recorded as yours; the recovered wording is kept
   beside it, never overwritten.
@@ -80,31 +85,31 @@ Oh, sh—
 
 Deploy!
 
-## d17 | clubanderson | 1:39.40 -> 1:43.95
+## d17 | clubanderson | 1:39.40 -> 1:41.90
 
 ON YOUR LEFT. 2 o'clock. Reverting.
 
-## d18 | clubanderson | 1:43.96 -> 1:54.47
+## d18 | clubanderson | 1:43.96 -> 1:46.16
 
 New fork, pushing!
 
-## d19 | clubanderson | 1:54.48 -> 2:01.43
+## d19 | clubanderson | 1:54.48 -> 1:57.98
 
 You keep picking the places where they shoot at us.
 
-## d20a | mrbobbytables | 2:01.44 -> 2:04.91
+## d20a | mrbobbytables | 2:01.44 -> 2:04.91 | pin 1:57.00
 
 Everyone forgot how to use KVM! We need to split up
 
-## d20b | mrbobbytables | 2:04.92 -> 2:08.91
+## d20b | mrbobbytables | 2:04.92 -> 2:07.95
 
-Everyone's making their own and it's all bad!
+Everyone's making their own and they're all awful
 
-## d21 | mrbobbytables | 2:08.92 -> 2:13.95
+## d21 | mrbobbytables | 2:07.96 -> 2:12.99 | pin 2:04.00
 
 They've broken out of the sandbox
 
-## d22 | mrbobbytables | 2:13.96 -> 2:14.63
+## d22 | mrbobbytables | 2:13.96 -> 2:14.63 | pin 2:14.82
 
 You need to get a message to the Kubernetes Maintainers
 
@@ -116,9 +121,9 @@ The open rate of maintainer emails is 7%
 
 I don't like this plan
 
-## d24 | mrbobbytables | 2:17.60 -> 2:22.27
+## d26 | mrbobbytables | 2:17.60 -> 2:22.27
 
-If I don't stop the Toilmaster, there won't be anything to come back to. I'm doing this for the both of us.
+Don't worry Maintainers read their emails
 
 ## d25 | clubanderson | 2:22.28 -> 2:26.00
 
