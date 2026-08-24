@@ -1,0 +1,8 @@
+{
+  "_what": "Act III's outro: the picture darkens at 2:39 and the last clean frame holds under the CNCF wall. Owner, 2026-08-24: 'lengthen the video, at 2:39 darken it then add a slide, let the movie play in the background'. The source's own tail (from 163.6s) is the burned-in publisher logo card and never plays, so the extension clones the last clean frame, dimmed. The bed keeps playing and fades out with the picture.",
+  "darken_at": 159.0,
+  "floor": 0.75,
+  "ramp": 1.2,
+  "extend": 8.4,
+  "fade": 0.8
+}

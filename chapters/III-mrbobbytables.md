@@ -68,6 +68,22 @@ nameplates are.
 The sign over the maintainer-email beat sits in the picture's upper-right safe
 area rather than the lower third, so it does not collide with the pills below.
 
+## 13:27.668
+
+* [cncf-wall] logowall @ 13:27.668 +8.0
+  - title: CNCF Projects to Help Your Agents
+  - footer: landscape.cncf.io
+
+The closing wall. It rides the outro — the picture darkens 159.0 seconds
+into the film and the last clean frame holds, dimmed, under this slide (the
+treatment is `stories/yt_curse_of_osiris_opening_cinematic-outro.json`, and
+the wall lands 0.8s into the darkening). Only the title is authored here.
+The logos and names are landscape data — `vocab/cncf-projects.yaml` curates
+the set in display order, `scripts/sync_landscape.py` refreshes everything
+else (CI, weekly), and `scripts/build_cncf_wall.py` draws the card.
+`tools/plate.py` burns it but does not draw it, the same split as the
+site's own full-frame cards.
+
 **The intermission.** The deck below plays **after** this section — after act III and after
 Perfume's third movement, in the slot before act IV. It is the concluding
 text of Bob's scene, so it lives here rather than in a file of its own.

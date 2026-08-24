@@ -171,8 +171,35 @@ def audio_encode_opts(codec):
     return ["-c:a", codec]
 
 
+def _outro_filters(outro, kept_dur):
+    """The outro's video filters: darken, freeze the last clean frame, fade.
+
+    ``darken_at`` is on the OUTPUT clock (the kept picture starts at 0). From
+    it the picture dims over ``ramp`` seconds to ``floor`` of its brightness
+    and stays there; at the kept range's end the last clean frame holds for
+    ``extend`` seconds (the source's tail is the publisher logo card, which
+    never plays); everything fades out over the final ``fade`` seconds. The
+    movie keeps playing under the slide -- dimmed, not stopped.
+    """
+    darken = float(outro["darken_at"])
+    floor = float(outro.get("floor", 0.75))
+    ramp = float(outro.get("ramp", 1.2))
+    extend = float(outro["extend"])
+    fade = float(outro.get("fade", 0.8))
+    total = kept_dur + extend
+    brightness = (f"if(lt(t\\,{darken:.3f})\\,0\\,"
+                  f"-{floor:.3f}*min((t-{darken:.3f})/{ramp:.3f}\\,1))")
+    return [
+        # stop_duration, not stop: on current ffmpeg `stop` is a frame COUNT
+        # and 8.4 came back as 16 frames (0.27s) instead of 8.4 seconds.
+        f"tpad=stop_mode=clone:stop_duration={extend:.3f}",
+        f"eq=brightness={brightness}:eval=frame",
+        f"fade=t=out:st={total - fade:.3f}:d={fade:.3f}",
+    ], total
+
+
 def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
-                  trim=None, audio_codec="aac", audio_at=None):
+                  trim=None, audio_codec="aac", audio_at=None, outro=None):
     """One pass: paint out the boxes, trim to the kept range, swap or keep audio.
 
     The music bed replaces the source audio rather than mixing with it, so a
@@ -199,6 +226,14 @@ def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
         if trim[1] is not None:
             spec += f":end={trim[1]:.3f}"
         vfilters += [spec, "setpts=PTS-STARTPTS"]
+    total = None
+    if outro:
+        if not trim or trim[1] is None:
+            raise ValueError("an outro needs a closed kept range -- the "
+                             "extension clones the last clean frame")
+        kept_dur = float(trim[1]) - float(trim[0])
+        outro_filters, total = _outro_filters(outro, kept_dur)
+        vfilters += outro_filters
     cmd += ["-vf", ",".join(vfilters)] if vfilters else []
     cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
             "-pix_fmt", "yuv420p"]
@@ -208,17 +243,27 @@ def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
             raise ValueError("audio_at must be non-negative")
         source_start = trim[0] if trim else 0.0
         gain = f",volume={audio_gain}" if audio_gain is not None else ""
+        fade_out = (f";[acat]afade=t=out:st={total - outro['fade']:.3f}"
+                    f":d={float(outro['fade']):.3f}[aout]") if outro else ""
+        cat_out = "[acat]" if outro else "[aout]"
         graph = (
             f"[0:a]atrim=start={source_start:.3f}:duration={audio_at:.3f},"
             "asetpts=PTS-STARTPTS[pre];"
             f"[1:a]asetpts=PTS-STARTPTS{gain}[music];"
-            "[pre][music]concat=n=2:v=0:a=1[aout]"
+            f"[pre][music]concat=n=2:v=0:a=1{cat_out}"
+            f"{fade_out}"
         )
         cmd += ["-filter_complex", graph, "-map", "0:v:0", "-map", "[aout]",
                 "-shortest", *audio_encode_opts(audio_codec)]
     elif audio:
+        afilters = []
         if audio_gain is not None:
-            cmd += ["-af", f"volume={audio_gain}"]
+            afilters.append(f"volume={audio_gain}")
+        if outro:
+            afilters.append(f"afade=t=out:st={total - outro['fade']:.3f}"
+                            f":d={float(outro['fade']):.3f}")
+        if afilters:
+            cmd += ["-af", ",".join(afilters)]
         cmd += ["-map", "0:v:0", "-map", "1:a:0", "-shortest",
                 *audio_encode_opts(audio_codec)]
     elif trim:
@@ -235,7 +280,7 @@ def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
 
 def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
           video_end=None, target_dbtp=None, audio_codec="aac",
-          audio_at=None, _attempts_left=5):
+          audio_at=None, outro=None, _attempts_left=5):
     if ffmpeg is None:
         from tools.render import find_ffmpeg
 
@@ -251,7 +296,8 @@ def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
     cmd = build_command(ffmpeg, Path(video).resolve(), drawbox_filters(redactions),
                         Path(out_path).resolve(),
                         Path(audio).resolve() if audio else None, audio_gain,
-                        trim=trim, audio_codec=audio_codec, audio_at=audio_at)
+                        trim=trim, audio_codec=audio_codec, audio_at=audio_at,
+                        outro=outro)
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
@@ -266,7 +312,8 @@ def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
                                 drawbox_filters(redactions),
                                 Path(out_path).resolve(),
                                 Path(audio).resolve(), new_gain, trim=trim,
-                                audio_codec=audio_codec, audio_at=audio_at)
+                                audio_codec=audio_codec, audio_at=audio_at,
+                                outro=outro)
             proc = subprocess.run(cmd, capture_output=True, text=True)
             if proc.returncode != 0:
                 tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
@@ -297,6 +344,11 @@ def main(argv=None):
     ap.add_argument("--audio-at", type=float, default=None,
                     help="keep source audio until this output second, then "
                          "start the replacement bed")
+    ap.add_argument("--outro", default=None, metavar="JSON",
+                    help="an outro record (stories/<video_id>-outro.json): "
+                         "darken the picture at `darken_at`, hold the last "
+                         "clean frame for `extend`, fade over the final "
+                         "`fade` seconds, with the bed continuing under it")
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
 
@@ -314,10 +366,14 @@ def main(argv=None):
         gain, peak = gain_for_headroom(args.audio, args.target_dbtp)
         print(f"music bed: true peak {peak:+.1f} dBTP -> gain {gain:.3f} "
               f"(target {args.target_dbtp:+.1f} dBTP)")
+    outro = None
+    if args.outro:
+        outro = json.loads(Path(args.outro).read_text(encoding="utf-8"))
     apply(args.video, data["redactions"], args.out,
           audio=args.audio, audio_gain=gain, video_end=video_end,
           audio_codec=args.audio_codec,
           audio_at=args.audio_at,
+          outro=outro,
           target_dbtp=args.target_dbtp if args.audio_gain is None else None)
     print(f"wrote {args.out}")
     return 0

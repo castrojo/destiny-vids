@@ -1988,6 +1988,12 @@ def render_plate(spec):
             "its own builder (scripts/build_scream_card.py). tools/plate.py "
             "neither draws nor burns it."
         )
+    if spec.get("kind") == "logowall":
+        raise ValueError(
+            f"plate {spec.get('id')!r} is a logo wall: render it with its own "
+            "builder (scripts/build_cncf_wall.py), which draws from the "
+            "landscape record. tools/plate.py burns it, it does not draw it."
+        )
     if spec.get("kind") == "chat":
         return _render_chat(spec)
     if spec.get("kind") == "companion":
@@ -3441,6 +3447,11 @@ def render_all(entries, out_dir, picture=None):
         if e.get("kind") == "interstitial":
             # Owned by its own builder (scripts/build_scream_card.py); neither
             # full-frame renderer draws it, exactly like the site's cards.
+            skipped.append(e["id"])
+            continue
+        if e.get("kind") == "logowall":
+            # Owned by scripts/build_cncf_wall.py, which draws from the
+            # landscape record. Same arrangement as the interstitial.
             skipped.append(e["id"])
             continue
         dest = out_dir / f"plate_{e['id']}.png"
