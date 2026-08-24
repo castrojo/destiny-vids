@@ -190,19 +190,13 @@ def test_act3_fixed_gold_bob_plate_matches_complete_authored_entry():
     }
 
 
-def test_the_act3_retirement_copy_is_uncast_chat_before_the_wolf_day_shot():
+def test_the_retirement_conversation_no_longer_opens_act_three():
+    """Moved verbatim to act II on 2026-08-24 at the owner's word; the
+    verbatim act II copy is pinned in test_efmb_act.py."""
     path = Path("stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json")
     data = json.loads(path.read_text(encoding="utf-8"))
     plate.load_manifest_entries(data["plates"])
-    retirement = [p for p in data["plates"] if p["id"].startswith("retirement-")]
-    assert [p["kind"] for p in retirement] == ["chat", "chat"]
-    assert [p["speaker"] for p in retirement] == ["[redacted]", "[redacted]"]
-    assert [p["text"] for p in retirement] == [
-        "Finally, retirement",
-        "The long walk beckons",
-    ]
-    assert retirement[0]["at"] < retirement[1]["at"]
-    assert retirement[0]["at"] + retirement[0]["dur"] < retirement[1]["at"]
+    assert not [p for p in data["plates"] if p["id"].startswith("retirement-")]
     assert data["_anchor"] == "immediately before the wolf day shot appears"
 
     builder = Path("scripts/build_uncut_credited.sh").read_text(encoding="utf-8")

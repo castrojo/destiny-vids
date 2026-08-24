@@ -3,26 +3,6 @@
   "_anchor": "immediately before the wolf day shot appears",
   "plates": [
     {
-      "id": "retirement-1",
-      "kind": "chat",
-      "at": 3.567,
-      "dur": 2.125,
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "speaker": "[redacted]",
-      "text": "Finally, retirement"
-    },
-    {
-      "id": "retirement-2",
-      "kind": "chat",
-      "at": 5.942,
-      "dur": 2.125,
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "speaker": "[redacted]",
-      "text": "The long walk beckons"
-    },
-    {
       "id": "mrbobbytables-gold",
       "at": 43.96,
       "dur": 4.0,

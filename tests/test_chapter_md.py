@@ -152,9 +152,20 @@ def test_entries_shape_matches_the_act_build():
 
 def test_entries_from_the_committed_file_are_manifest_shaped(tmp_path):
     entries, unresolved = chapter_md.entries("II")
+    # An explicit `+hold` is honoured verbatim, even below the derived floor
+    # (the retirement pair keeps act III's authored 2.125); the floor guards
+    # only holds nobody authored.
+    explicit = {
+        line["id"]
+        for block in chapter_md.parse(
+            chapter_md.chapter("II").path.read_text(encoding="utf-8"))
+        for line in block["lines"]
+        if line.get("hold") is not None
+    }
     for e in entries:
         assert e["copy_source"] == "owner_supplied"
-        assert e["dur"] >= chapter_md.MIN_HOLD
+        if e["id"] not in explicit:
+            assert e["dur"] >= chapter_md.MIN_HOLD
         assert e["at"] >= 0
         if e["kind"] == "chat":
             assert e["speaker"] and "text" in e
@@ -212,7 +223,9 @@ def test_boss_entries_carry_the_miniboss_shape_and_placeholder_seed():
     assert flash["dur"] == chapter_md.MIN_HOLD
     assert flash["title_source"] == "placeholder"
     haters = by_id["mapped_haters"]
-    assert haters["at"] == pytest.approx(600.0 - OFFSET, abs=1e-3)
+    # Re-seated 2026-08-24 at the owner's word: the bar opens on the red-lit
+    # enemy face ("all the enemies are the haters"), not the guardian sunset.
+    assert haters["at"] == pytest.approx(601.2 - OFFSET, abs=1e-3)
 
 
 def test_instructions_prose_and_indented_examples_parse_as_nothing():
@@ -348,6 +361,18 @@ def test_a_derived_nameplate_is_carried_through_a_sync_untouched():
         before, [{"id": "pill", "text": "new"}])
     assert merged == [before[0], {"id": "pill", "text": "new"}]
     assert notes == []
+
+
+def test_an_unauthored_non_derived_plate_is_dropped_with_a_note():
+    """Carrying it through made deletion inexpressible -- act III's
+    retirement pair survived its 2026-08-24 move to act II until this."""
+    before = [{"id": "plate", "copy_source": "casting", "name": "Trustee"},
+              {"id": "gone", "copy_source": "owner_supplied", "text": "x"},
+              {"id": "pill", "text": "old"}]
+    merged, notes = chapter_md._merge_plates(
+        before, [{"id": "pill", "text": "new"}])
+    assert merged == [before[0], {"id": "pill", "text": "new"}]
+    assert notes and "gone" in notes[0] and "dropped" in notes[0]
 
 
 # ---------------------------------------------------------------------------

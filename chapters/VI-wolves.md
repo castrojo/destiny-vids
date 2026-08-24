@@ -5,10 +5,10 @@ manifest: stories/06-wolves-cayde-plates.json
 # the running order's segment durations summed from a
 # `tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-21 --
 # prologue 101.200 (megacut.json item 0 `dur`) + act I 116.200 + Perfume
-# movement 2 66.400 + act II 359.968 + act III 160.200 + Perfume movement 3
-# 114.848 + act IV 34.000 + act V 25.259 + the interstitial 5.259 = 983.075.
+# movement 2 66.400 + act II 364.068 + act III 160.200 + Perfume movement 3
+# 114.848 + act IV 34.000 + act V 25.259 + the interstitial 5.259 = 987.175.
 # Restate the derivation when the running order moves.
-programme_start: 983.075
+programme_start: 987.175
 # This act's manifest holds BOTH kinds of plate: the pills below, and four
 # `copy_source: brief` nameplates that resolve from the roster. This file
 # authors only its own -- `sync` carries the nameplates through in place.
@@ -45,9 +45,9 @@ reveal and three credits. They are **not here on purpose**: they carry
 `copy_source: brief` and resolve from the roster, which is the one place
 those names live. Edit them there.
 
-## 17:23.202
+## 17:27.302
 
-* [ghost_welcome] status @ 17:23.202 +6.0
+* [ghost_welcome] status @ 17:27.302 +6.0
   - position: status
   # The Ghost's welcome is a hard cut on and off; it carries none of the
   # pills' fades.
@@ -57,21 +57,21 @@ those names live. Edit them there.
   - detail: AN4-CH4K-12
   - label: Welcome to KubeCon + Cloud Native Con
   - seen_at_film: 60.127
-  - _note: Programme 16:26 maps to Act VI 1:00.127 -- owner note 2026-08-16: "the 'Welcome to KubeCon' text line goes here". The owner asked for the Ghost to welcome the audience, so this uses the top-of-frame status treatment rather than a normal lower-third chat; the seat is the Ghost's own shot (the Ghost over the Moon), confirmed on an extracted frame. Moved from 36.127, the star-map HUD shot.
+  - _note: Programme 16:30.1 maps to Act VI 1:00.127 -- owner note 2026-08-16: "the 'Welcome to KubeCon' text line goes here". The owner asked for the Ghost to welcome the audience, so this uses the top-of-frame status treatment rather than a normal lower-third chat; the seat is the Ghost's own shot (the Ghost over the Moon), confirmed on an extracted frame. Moved from 36.127, the star-map HUD shot.
 
-## 22:16.732
+## 22:20.832
 
-[castrojo_line_1] castrojo @ 22:16.732 +2.8: For five years you've trusted us
+[castrojo_line_1] castrojo @ 22:20.832 +2.8: For five years you've trusted us
 
-[castrojo_line_2] castrojo @ 22:19.890 +2.8: Mastered your tools
+[castrojo_line_2] castrojo @ 22:23.990 +2.8: Mastered your tools
 
-[castrojo_line_3] castrojo @ 22:23.048 +2.8: Honed your craft
+[castrojo_line_3] castrojo @ 22:27.148 +2.8: Honed your craft
 
-[castrojo_line_4] castrojo @ 22:26.206 +2.8: Depended on your friends
+[castrojo_line_4] castrojo @ 22:30.306 +2.8: Depended on your friends
 
-[castrojo_line_5] castrojo @ 22:29.364 +2.8: Now you're one of us, you are the dream
+[castrojo_line_5] castrojo @ 22:33.464 +2.8: Now you're one of us, you are the dream
 
-* [gold_robertsirc] - @ 22:32.522 +2.8
+* [gold_robertsirc] - @ 22:36.622 +2.8
   - position: left
   - label: "#HIREAWOLF // MAINTAINER"
   - class: Harbinger Titan
@@ -125,19 +125,19 @@ past" gets bar 8, immediately before Kelsey's plate, which is the line
 doing the introducing anyway; "Present" and "and Future" take the first two
 bars after Angie's clears. <<
 
-[castrojo_line_6] castrojo @ 22:41.996 +2.8: I follow my mentors of the past
+[castrojo_line_6] castrojo @ 22:46.096 +2.8: I follow my mentors of the past
 
-[castrojo_line_7] castrojo @ 22:54.627 +2.8: Present
+[castrojo_line_7] castrojo @ 22:58.727 +2.8: Present
 
-[castrojo_line_8] castrojo @ 22:57.785 +2.8: and Future
+[castrojo_line_8] castrojo @ 23:01.885 +2.8: and Future
 
-[castrojo_line_9] castrojo @ 23:00.943 +2.8: The only winning move is not to play
+[castrojo_line_9] castrojo @ 23:05.043 +2.8: The only winning move is not to play
 
-[castrojo_line_10] castrojo @ 23:04.101 +2.8: Think like a dinosaur
+[castrojo_line_10] castrojo @ 23:08.201 +2.8: Think like a dinosaur
 
-[castrojo_line_11] castrojo @ 23:07.259 +2.8: When you fall, rise.
+[castrojo_line_11] castrojo @ 23:11.359 +2.8: When you fall, rise.
 
-[castrojo_line_12] castrojo @ 23:10.417 +2.8: We've got your back
+[castrojo_line_12] castrojo @ 23:14.517 +2.8: We've got your back
 
     THE OWNER REWROTE THIS TAIL ON 2026-08-23. Three lines went: "Made
     Lifelong Friends" (line 4), "And now it's up to you, guardian" (line 5)

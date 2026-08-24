@@ -386,9 +386,11 @@ new lines into the 9:12 -> 9:40 stretch on 2026-08-23. Between kolunmi's
 "other linux users?" and Owen's "Slay out, Queen!" there is 6.97 seconds
 of clear air once her own nameplate has been up -- two readable pills.
 Every other second in this act is an authored beat that may not be slid.
-Two are seated below, two more in the air the deleted "Disco!" left before
-the HATERS splash, and five in the stretch after Kyle's reveal. The other
-eight, and two more from earlier in the act, are recorded verbatim under "OVERFLOW" further down -- reported,
+Two are seated below, and three in the stretch after Kyle's reveal -- his
+own two there ("Bobonomics", "We had to make this movie") were removed at
+his word on 2026-08-24: "Remove kyle's lines after 'Sup', the others
+aren't needed". The other eight, and two more from earlier in the act,
+are recorded verbatim under "OVERFLOW" further down -- reported,
 never dropped -- and filed as one issue so he can say what gives. <<
 
 [chat_amber_dungeon] akgraner @ 9:25.433 +2.2: Oh wow I forgot what the starter dungeon was like! Hi!
@@ -439,10 +441,13 @@ never dropped -- and filed as one issue so he can say what gives. <<
 
 ## 9:52.203
 
->> THE AIR "DISCO!" LEFT. kolunmi's "Disco!" was deleted at 9:57.000 on
-2026-08-23; two take the stretch it freed. It is 5.05 s, film
-308.153 -> 313.200, so "Take out the trash" does not fit and is in the
-overflow below. <<
+>> THE PAUSE HOLDS UNTIL THESE TWO HAVE PLAYED. Owner, 2026-08-24: "Don't
+unpause, at 'Oh I see your problem', keep that in the paused section, put
+cortney's conversation here." The hallway used to resume at 9:53.203 with
+akgraner's pill still up and cortney's line playing over moving picture;
+the hold now runs to 9:57.303 (film 313.503), a beat after cortney clears.
+kolunmi's "Disco!", deleted from this stretch on 2026-08-23, was restored
+the next day on the hunter corridor (## 10:04.187). <<
 
 [chat_amber_problem] akgraner @ 9:52.203 +2.2: Oh I see your problem
   - avatar_login: akgraner
@@ -453,21 +458,41 @@ overflow below. <<
     The owner wrote the speaker as `https://github.com/CortNick [cortney]`.
     The login resolves the portrait; the name row prints what he typed.
 
-## 10:00
+## 10:01.2
 ! [mapped_haters] HATERS |
 
-    Owner, 2026-08-19: "Haters goes at 10:00 on the red face with the bright
-    red dot", and the red overlays "should match the style of the original
-    kernel one" — this is that boss bar. Evidence: the red-lit face shot,
-    measured 315.267 → 316.967 film by scene detection. (An earlier record
-    pointed at the hallway frame, source 323.933; per code review that is
-    not the shot the bar sits on, so this card carries no `seen_at_src`
-    rather than a wrong one.) The bar is a chrome row at the top of frame,
-    so it shares the screen with Kyle's lower-third pill by design.
+    Owner, 2026-08-24: "9:57, all the enemies are the haters, it just needs
+    to be obvious" — on the alpha2 clock he was watching, the red-lit enemy
+    face with the bright red dot opens at 9:57. The bar used to fire at
+    10:00, over the guardian sunset silhouettes, and read as the GUARDIANS
+    being the haters; it now opens on the enemy face's first frame (the
+    shot ran film 313.3 → 315.2 before the pause grew 4.1 s; it is
+    317.4 → 319.3 now). The red overlays still "match the style of the
+    original kernel one" (owner, 2026-08-19) — this is that boss bar, a
+    chrome row at the top of frame that shares the screen with whatever
+    pill is up by design.
 
-## 10:00.767
+## 10:04.187
 
-[mapped_kyle_sup] kylegospo @ 10:00.767 +2.2: Sup
+[mapped_kolunmi_disco] kolunmi @ 10:04.187 +2.2: Disco!
+  - avatar_login: kolunmi
+  - bond_of: mapped_kyle_sup
+
+    Owner, 2026-08-24: "around 10:02 when the hunter is onscreen have
+    kolunmi do 'Disco!'". The hunter is the cloaked figure in the red
+    corridor fight — the shot right after the enemies HATERS now opens on.
+    "Around 10:02" was the alpha2 clock; the pause growth makes that
+    corridor film 321.067 → 323.0. The pill opens 0.68 s earlier so its
+    2.2 s hold clears Kyle's nameplate (arrives 322.837, same lane) with
+    the house 0.25 s gap, and it answers his "Sup" — which is why it bonds
+    to that pill by name: the overlap exemption in `tools/plate.py` is NAMED
+    precisely so it cannot spread, and this pair is the owner's call-and-
+    response across the deck's two lanes (Disco! left, Sup right). Deleted
+    2026-08-23, restored verbatim a day later.
+
+## 10:04.867
+
+[mapped_kyle_sup] kylegospo @ 10:04.867 +2.2: Sup
   - position: right
   - seen_at_src: 333.497
   - bond_of: mapped_kyle_reveal
@@ -475,51 +500,70 @@ overflow below. <<
 
     OWNER-PLACED, DO NOT MOVE. Owner, verbatim: "sup is a purple titan",
     "put it when it's zoomed into his face". This is the first frame of that
-    close-up, measured by scene detection (the shot runs 316.967 → 317.733
-    film). The pill OPENS on his face, which is what he asked for.
+    close-up; the pause growth of 2026-08-24 moved the content 4.1 s, so the
+    shot now runs 321.067 → 321.833 film. The pill OPENS on his face, which
+    is what he asked for; owner, 2026-08-24, asked again and confirmed the
+    seat stays.
 
     An earlier agent slid it to 316.287 to make a builder assertion pass,
     which put it AFTER kolunmi's "Disco!" and reordered the authored
     exchange. That is the fourth class in AGENTS.md: a gate refusing a seat
     is not permission to move an authored beat. It was reverted, and the
     assertion that provoked it is gone — an overrun is reported now, never
-    raised. ("Disco!" itself was deleted on 2026-08-23; the warning stands,
-    because the seat it protects has not moved.)
+    raised. ("Disco!" was deleted on 2026-08-23 and restored on 2026-08-24,
+    above; the warning stands, because the seat it protects has not moved.)
 
     `bond_of` puts it in the deck's bonded-pair shape: his nameplate holds
     the left lane, the pill takes the RIGHT. The owner locked both TIMES
     ("lock the plate"; the pill on the close-up's first frame) — the lane
     was never his instruction, and stacking both on the left drew them on
     top of each other for the pill's last 0.43 s, since the nameplate
-    arrives at 318.737. Right lane, same seats: the pair reads as the site's
+    arrives at 322.837. Right lane, same seats: the pair reads as the site's
     GUARDIAN BOND composition.
 
-## 10:05.937
+## 10:14.937
 
 >> THE BLOCK THE OWNER WROTE UNDER "Slay out, Queen!". There is no air
 there -- akgraner's six kindness pills run 9:34.653 to 9:51.953 without a
-gap -- but film 321.937 -> 334.553, after Kyle's reveal and before
-EyeCantCU's, holds exactly these five. Same scene, a beat later. <<
+gap -- so these play a beat later, after Kyle's reveal. Owner, 2026-08-24:
+"Remove kyle's lines after 'Sup', the others aren't needed" -- his
+"I'm not calling this Bobonomics" and "We had to make this movie" pills are
+gone. His parked overflow line ("castrojo killed me in Halo today") stays
+parked below, and nwoods3, Eva and Hikari stay. <<
 
-[chat_kyle_bobonomics] KyleGospo @ 10:05.937 +2.2: I'm not calling this Bobonomics
-  - avatar_login: KyleGospo
-
-[chat_kyle_movie] KyleGospo @ 10:08.387 +2.2: We had to make this movie
-  - avatar_login: KyleGospo
-
-[chat_nwoods3_seen] nwoods3 @ 10:10.837 +2.2: I feel seen
+[chat_nwoods3_seen] nwoods3 @ 10:14.937 +2.2: I feel seen
   - avatar_login: nwoods3
 
     The owner wrote the speaker as `https://github.com/nwoods3`; the URL
     resolves the login and the portrait, and never reaches a frame.
 
-[chat_eva_level] Eva @ 10:13.287 +2.2: Hey did you see how we just loaded up in a new level?
+[chat_eva_level] Eva @ 10:17.387 +2.2: Hey did you see how we just loaded up in a new level?
   - avatar: null
   - avatar_url: null
 
-[chat_hikari_warframe] Hikari @ 10:15.737 +2.366: Finally, I can play WARFRAME!
+[chat_hikari_warframe] Hikari @ 10:19.837 +2.366: Finally, I can play WARFRAME!
   - avatar: null
   - avatar_url: null
+
+## 10:28.100
+
+[retirement-1] [redacted] @ 10:28.100 +2.125: Finally, retirement
+  - avatar: null
+  - avatar_url: null
+
+[retirement-2] [redacted] @ 10:30.475 +2.125: The long walk beckons
+  - avatar: null
+  - avatar_url: null
+
+    MOVED VERBATIM FROM ACT III. Owner, 2026-08-24: "10:24 is where
+    redacted's 'retirement conversation' should go, not in the next
+    chapter." 10:24 on the alpha2 clock is the Cayde-6 neon-street shot
+    that closes this act's picture; with the pause holding 4.1 s longer,
+    that shot opens at 10:28.100. The speaker is `[redacted]` on purpose —
+    he is revealed later in the programme, in act VI — so the pills carry
+    no avatar and no crest, exactly as they did in act III. The second pill
+    clears 0.8 s into the black tail; the picture has ended on the heroes
+    and the words ride the outro.
 
 >> OVERFLOW -- TEN LINES THE OWNER WROTE ON 2026-08-23 THAT THIS ACT HAS NO ROOM FOR.
 Not a heading the parser reads -- there is no time on it, so nothing below
@@ -541,7 +585,7 @@ lengthen a hold, cut an existing beat, or let these go.
 The owner tagged two of these `[amber]` and two `[akgraner]`; they are the
 same person, so they are listed under the login her nameplate already
 carries. SETTLED 2026-08-23, owner, verbatim: "kyle is kylegospo" -- so the
-lowercase `kyle` is KyleGospo, who also speaks at 8:43.750 and 10:00.767, and
+lowercase `kyle` is KyleGospo, who also speaks at 8:43.750 and 10:04.867, and
 every one of his lines now carries his own portrait rather than the drawn
 crest. There is no second Kyle.
 

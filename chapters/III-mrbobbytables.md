@@ -5,9 +5,11 @@ manifest: stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json
 # the running order's segment durations summed from a
 # `tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-21 --
 # prologue 101.200 (megacut.json item 0 `dur`) + act I 116.200 + Perfume
-# movement 2 66.400 + act II 359.968 = 643.768.
+# movement 2 66.400 + act II 364.068 = 647.868.
+# (act II grew 4.100 on 2026-08-24, when its hallway pause was extended to
+# carry the cortney exchange; 359.968 -> 364.068.)
 # Restate the derivation when the running order moves.
-programme_start: 643.768
+programme_start: 647.868
 # This act's fixed plates come from this file, so the manifest is regenerated
 # from it: `python3 tools/chapter_md.py sync III --write`.
 owns_plates: true
@@ -32,21 +34,30 @@ defaults:
 
 # Act III — mrbobbytables, and the long walk
 
-**Only the act's two fixed opening pills are here.** The conversation that
+**Only the act's one fixed card is here.** The conversation that
 carries the rest of act III is *recovered speech*, not authored copy: it lives
 in `dialogue/<video_id>/` with source timecodes and per-line evidence, beside
 the `DIALOGUE.md` the owner edits. That record is provenance. Editing it here
 would be writing words into somebody's mouth, which is the one thing this
 repository never does.
 
-The speaker below is `[redacted]` on purpose — he is revealed later in the
-programme, in act VI.
+[redacted]'s retirement conversation opened this act until 2026-08-24, when
+the owner moved it to act II verbatim — "10:24 is where redacted's
+'retirement conversation' should go, not in the next chapter" — onto the
+Cayde-6 shot that closes act II's picture. It lives in
+`chapters/II-endless-forms.md` now; the speaker is still `[redacted]` on
+purpose, revealed in act VI. (This file's title keeps "the long walk" as
+authored; renaming it is the owner's call, flagged in the change that moved
+the lines.)
 
-## 10:47.335
+## 13:18.828
 
-[retirement-1] [redacted] @ 10:47.335 +2.125: Finally, retirement
-
-[retirement-2] [redacted] @ 10:49.710 +2.125: The long walk beckons
+* [maintainer-emails] title @ 13:18.828 +4.0
+  - position: top-right
+  - copy_source: owner_supplied
+  - title: Maintainers Reading Emails
+  - subtitle: And Other Preposterous Tales
+  - body: Summer 2027
 
 Bob's gold trustee plate is **not** authored here. Its `copy_source` is
 `casting`, so every row on it resolves from his binding in
@@ -56,15 +67,6 @@ nameplates are.
 
 The sign over the maintainer-email beat sits in the picture's upper-right safe
 area rather than the lower third, so it does not collide with the pills below.
-
-## 13:14.728
-
-* [maintainer-emails] title @ 13:14.728 +4.0
-  - position: top-right
-  - copy_source: owner_supplied
-  - title: Maintainers Reading Emails
-  - subtitle: And Other Preposterous Tales
-  - body: Summer 2027
 
 **The intermission.** The deck below plays **after** this section — after act III and after
 Perfume's third movement, in the slot before act IV. It is the concluding
@@ -90,9 +92,9 @@ python3 scripts/build_intermission.py --write     # regenerate the manifest
 python3 scripts/build_intermission.py --render    # and the film
 ```
 
-## 15:18.816 intermission
+## 15:22.916 intermission
 
-* [intermission-1] slide @ 15:18.816 +6.0
+* [intermission-1] slide @ 15:22.916 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Lorem ipsum
@@ -100,7 +102,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Dolor sit amet consectetur adipiscing elit
   - title_source: placeholder
 
-* [intermission-2] slide @ 15:25.616 +6.0
+* [intermission-2] slide @ 15:29.716 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Sed do eiusmod
@@ -108,7 +110,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Tempor incididunt ut labore et dolore magna
   - title_source: placeholder
 
-* [intermission-3] slide @ 15:32.416 +6.0
+* [intermission-3] slide @ 15:36.516 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Ut enim ad minim
@@ -116,7 +118,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Veniam quis nostrud exercitation ullamco laboris
   - title_source: placeholder
 
-* [intermission-4] slide @ 15:39.216 +6.0
+* [intermission-4] slide @ 15:43.316 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Duis aute irure
