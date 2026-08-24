@@ -21,8 +21,9 @@
    "footage_rights": {
     "yt_nightwish_perfume_of_the_timeless": "music/bed_perfume_of_the_timeless.json"
    },
-   "source_digest": "e9364bee0524f19e792d0ae07d31ddef2b49e4249e00ba131d4ec588c72ad45b",
-   "footage_digest": "fac9a6c7d103836f454d7c1c49181c2983ecbed43ca01f0f2bcc1e9a924a635a"
+   "source_digest": "22b036b5edb1adcaa583b1631c3de9f60279f0f6d75e37180910d01d59a74ef0",
+   "footage_digest": "fac9a6c7d103836f454d7c1c49181c2983ecbed43ca01f0f2bcc1e9a924a635a",
+   "built_from_commit": "e773158dd9a24c99a6c499d476069b0886db3bb8"
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
@@ -104,10 +105,11 @@
     "chapters/IV-kat.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "f313638137e388f73eebe62692a27b421ef291db28ed4ba8a00eee6be4b23957",
+   "source_digest": "f41ce4b7c7459865af64411ee20c2f1d8fc6a9bb2b3670c077f6fbed9073c6b6",
    "rebuild": "python3 scripts/build_kat.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
-   "footage_digest": "60f24af4c12ea8a9973aaf76b1602dee7cca177620d58d3c369aa8439b1269f4"
+   "footage_digest": "60f24af4c12ea8a9973aaf76b1602dee7cca177620d58d3c369aa8439b1269f4",
+   "built_from_commit": "e773158dd9a24c99a6c499d476069b0886db3bb8"
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
@@ -122,10 +124,11 @@
     "chapters/V-nat.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "71896a92b337ae80e120576773fe7538f317bfc04f0e5e1a33a7905e6c07611d",
+   "source_digest": "35ef5c7c49934684c8da1bec6f4519e72c4b3ea24986463a27533f6a026cc18f",
    "rebuild": "python3 scripts/build_natali.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
-   "footage_digest": "b18bdaaf50692c0897aba07e91ac31c2c3b67c77b18606450554dc231eec07cf"
+   "footage_digest": "b18bdaaf50692c0897aba07e91ac31c2c3b67c77b18606450554dc231eec07cf",
+   "built_from_commit": "e773158dd9a24c99a6c499d476069b0886db3bb8"
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v9.mp4",
@@ -174,10 +177,11 @@
     "chapters/VII-europa.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "22c0a9b20af33360c9e00a9554112b6bbfef5abaa20c2efe89bbb210b6ba39d7",
+   "source_digest": "5d7a0bdc1dce1208564fb89ff929a281729a1c645b3c523a713ddd63e5633739",
    "rebuild": "python3 scripts/build_europa.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
-   "footage_digest": "d22c307e1c824644364ab1e2f6fd372be916cce45f89ef8fe51efdc22a01a2bd"
+   "footage_digest": "d22c307e1c824644364ab1e2f6fd372be916cce45f89ef8fe51efdc22a01a2bd",
+   "built_from_commit": "e773158dd9a24c99a6c499d476069b0886db3bb8"
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
@@ -195,9 +199,9 @@
     "chapters/VIII-fixed.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "8580569c690efa3f9edbbd0b62f19c1c89b968a0032522bbe6f60814ccd17486",
+   "source_digest": "87f8e4641cf295932448de2354ade170baef85c15c40d10b03f9b8fd4441943d",
    "rebuild": "python3 scripts/build_credits.py --out ~/Videos/wolves-credits/08-credits-master.mp4",
-   "built_from_commit": "1e391c5c7f991badeb8fdba26f8f9297c899911e"
+   "built_from_commit": "e773158dd9a24c99a6c499d476069b0886db3bb8"
   }
  },
  "social": {
