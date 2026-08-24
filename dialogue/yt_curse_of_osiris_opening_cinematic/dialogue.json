@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "The owner replaced the complete conversation. Script layout keeps all 27 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
+    "note": "The owner replaced the complete conversation. Script layout keeps all 26 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
   },
   "cues": [
     {
@@ -124,22 +124,15 @@
       "text_source": "owner_supplied"
     },
     {
-      "id": "d12",
-      "start_sec": 87.84,
-      "end_sec": 90.83,
-      "character": "sagira",
-      "evidence": "owner_supplied",
-      "text": "Slow down.",
-      "text_source": "owner_supplied"
-    },
-    {
       "id": "d13",
       "start_sec": 90.84,
       "end_sec": 92.23,
       "character": "sagira",
       "evidence": "owner_supplied",
-      "text": "Wait. That's not our local model.",
-      "text_source": "owner_supplied"
+      "text": "That's not our local model.",
+      "text_source": "owner_supplied",
+      "recovered_text": "Wait. That's not our local model.",
+      "pin_sec": 90.0
     },
     {
       "id": "d14",
@@ -292,6 +285,13 @@
       "start_sec": 137.6,
       "end_sec": 142.27,
       "raw": "If I don't stop the Toilmaster, there won't be anything to come back to. I'm doing this for the both of us.",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d12",
+      "start_sec": 87.84,
+      "end_sec": 90.83,
+      "raw": "Slow down.",
       "reason": "removed by the owner while rewriting the conversation"
     }
   ]
