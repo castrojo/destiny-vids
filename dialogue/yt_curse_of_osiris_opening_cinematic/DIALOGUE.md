@@ -71,7 +71,7 @@ What is it, what did you see? New local model?
 
 ## d13 | clubanderson | 1:30.84 -> 1:32.23 | pin 1:30.00
 
-That's not our local model.
+Wait. That's not our local model.
 
 ## d14 | clubanderson | 1:32.24 -> 1:34.95
 

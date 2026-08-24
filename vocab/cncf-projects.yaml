@@ -1,0 +1,16 @@
+# vocab/cncf-projects.yaml
+#
+# The curated CNCF project set for act III's closing wall, IN DISPLAY ORDER.
+# The selection is the owner's; everything else about these projects -- the
+# display name, the logo artwork, the homepage -- is landscape data, refreshed
+# by scripts/sync_landscape.py (CI weekly, .github/workflows/landscape-sync.yml)
+# into stories/cncf-projects.json and assets/cncf-logos/.
+#
+# Add a project by its landscape `id` (the slug in a landscape.cncf.io item
+# URL), never by name: names collide ("Kuasar (Wasm)" is not Kuasar).
+projects:
+  - runtime--container-runtime--lima
+  - runtime--container-runtime--kuasar
+  - provisioning--security-compliance--confidential-containers
+  - runtime--container-runtime--inclavare-containers
+  - runtime--container-runtime--wasmedge-runtime

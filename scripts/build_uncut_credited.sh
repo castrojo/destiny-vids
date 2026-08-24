@@ -118,20 +118,51 @@ python3 tools/plate.py merge "$WORK/fixed-with-chat.json" "$WORK/ensemble.json" 
     --out "$MANIFEST"
 
 echo "==> redact burned-in copy${MUSIC:+ and score}"
+REDACT_OUTRO=()
+OUTRO="stories/$VIDEO_ID-outro.json"
+if [ -f "$OUTRO" ]; then
+    # The outro record darkens the tail and holds the last clean frame under
+    # the closing wall; the bed continues under it and fades with the picture.
+    REDACT_OUTRO=(--outro "$OUTRO")
+fi
 if [ -n "$MUSIC" ]; then
     SCORE_ARGS=()
     [ -z "$MUSIC_AT" ] || SCORE_ARGS+=(--audio-at "$MUSIC_AT")
     python3 tools/redact.py --video "$SOURCE_VIDEO" --video-id "$VIDEO_ID" \
-        --audio "$MUSIC" "${SCORE_ARGS[@]}" \
+        --audio "$MUSIC" "${SCORE_ARGS[@]}" "${REDACT_OUTRO[@]}" \
         --audio-codec "$ACODEC" --out "$BASE"
 else
     python3 tools/redact.py --video "$SOURCE_VIDEO" --video-id "$VIDEO_ID" \
-        --audio-codec "$ACODEC" --out "$BASE"
+        --audio-codec "$ACODEC" "${REDACT_OUTRO[@]}" --out "$BASE"
 fi
 
 echo "==> burn the deck"
 python3 tools/plate.py render --manifest "$MANIFEST" --out-dir "$PLATES_DIR" \
     --fit-video "$SOURCE_VIDEO" >/dev/null
+# Full-frame cards plate.py does not draw (the interstitial precedent): each
+# logowall entry is rendered from the landscape record by its own builder,
+# landing in the same plates dir under the same plate_<id>.png name.
+mapfile -t WALLS < <(python3 - "$MANIFEST" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as fh:
+    doc = json.load(fh)
+entries = doc["plates"] if isinstance(doc, dict) else doc
+for e in entries:
+    if e.get("kind") == "logowall":
+        print(f"{e['id']}\t{e.get('title', '')}\t{e.get('footer', '')}")
+PY
+)
+for wall in "${WALLS[@]}"; do
+    [ -n "$wall" ] || continue
+    IFS=$'\t' read -r WALL_ID WALL_TITLE WALL_FOOTER <<< "$wall"
+    WALL_ARGS=(--title "$WALL_TITLE")
+    [ -z "$WALL_FOOTER" ] || WALL_ARGS+=(--footer "$WALL_FOOTER")
+    python3 scripts/build_cncf_wall.py "${WALL_ARGS[@]}" \
+        --fit-video "$SOURCE_VIDEO" \
+        --out "$PLATES_DIR/plate_$WALL_ID.png"
+done
 python3 tools/plate.py burn --video "$BASE" --manifest "$MANIFEST" \
     --plates-dir "$PLATES_DIR" --out "$FINAL"
 

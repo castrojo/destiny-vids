@@ -186,12 +186,15 @@ def test_act3_toilmaster_line_is_dropped_and_replaced():
 
 
 def test_act3_wait_slow_down_is_dropped_and_d13_stands_alone():
-    """Owner, 2026-08-24: 'remove the wait slow down' -- d12 goes entirely,
-    d13 keeps only 'That's not our local model.' pinned to 1:30."""
+    """Owner, 2026-08-24: 'remove the wait slow down' -- d12 goes entirely.
+    Later the same day: the 'Wait.' belongs to d13 after all -- 'the "wait
+    that's not our local model" should be in this scene when the ghost
+    realizes that the robots can move' -- so d13 keeps its full text, pinned
+    to 1:30."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
     assert "d12" not in cues
-    assert cues["d13"]["text"] == "That's not our local model."
+    assert cues["d13"]["text"] == "Wait. That's not our local model."
     dropped = {cue["id"]: cue for cue in data["dropped"]}
     assert dropped["d12"]["raw"] == "Slow down."
 

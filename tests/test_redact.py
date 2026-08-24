@@ -55,6 +55,48 @@ def test_a_music_bed_can_start_on_an_authored_picture_cue():
     assert "-shortest" in cmd
     assert cmd[cmd.index("-c:a") + 1] == "flac"
 
+
+OUTRO = {"darken_at": 159.0, "floor": 0.75, "ramp": 1.2,
+         "extend": 8.4, "fade": 0.8}
+
+
+def test_an_outro_darkens_freezes_and_fades_the_tail():
+    cmd = redact.build_command(
+        ["ffmpeg"], "in.mp4", [], "out.mp4",
+        audio="bed.wav", audio_gain=0.8, audio_at=27.835,
+        trim=(3.4, 163.6), outro=OUTRO)
+    vf = cmd[cmd.index("-vf") + 1]
+    # The last clean frame holds for `extend` seconds (stop_duration: on
+    # current ffmpeg plain `stop` is a frame count, not seconds)...
+    assert "tpad=stop_mode=clone:stop_duration=8.400" in vf
+    # ...the picture dims from 2:39 (film) over the ramp and stays dim...
+    assert "eq=brightness=" in vf and "eval=frame" in vf
+    assert "159.000" in vf and "1.200" in vf
+    # ...and everything fades out over the final `fade` seconds of the
+    # EXTENDED cut: 160.2 + 8.4 - 0.8 = 167.8.
+    assert "fade=t=out:st=167.800:d=0.800" in vf
+
+
+def test_an_outro_fades_the_bed_not_just_the_picture():
+    cmd = redact.build_command(
+        ["ffmpeg"], "in.mp4", [], "out.mp4",
+        audio="bed.wav", audio_gain=0.8, audio_at=27.835,
+        trim=(3.4, 163.6), outro=OUTRO)
+    graph = cmd[cmd.index("-filter_complex") + 1]
+    assert "concat=n=2:v=0:a=1[acat]" in graph
+    assert "[acat]afade=t=out:st=167.800:d=0.800[aout]" in graph
+
+
+def test_an_outro_needs_a_closed_kept_range():
+    """The extension clones the last clean frame; an open tail is the
+    publisher logo card, which never plays."""
+    with pytest.raises(ValueError, match="kept range"):
+        redact.build_command(["ffmpeg"], "in.mp4", [], "out.mp4",
+                             audio="bed.wav", trim=(3.4, None), outro=OUTRO)
+    with pytest.raises(ValueError, match="kept range"):
+        redact.build_command(["ffmpeg"], "in.mp4", [], "out.mp4",
+                             audio="bed.wav", outro=OUTRO)
+
 def test_the_checked_in_redactions_cut_the_full_frame_cards():
     """All three cards on the Osiris upload ARE the whole frame, so they are
     cut, not boxed: nothing to paint, and the kept range is the cinematic."""

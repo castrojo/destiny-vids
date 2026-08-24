@@ -180,6 +180,7 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 Edit in `chapters/III-mrbobbytables.md`.
 
 - `13:18.83` Maintainers Reading Emails / Summer 2027
+- `13:27.67` CNCF Projects to Help Your Agents
 
 ## IV
 
