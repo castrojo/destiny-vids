@@ -139,7 +139,7 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         "standalone_leads": False,
         "note": (
             "The owner replaced the complete conversation. Script layout keeps "
-            "all 27 lines readable in order; standalone lead plates are omitted "
+            "all 25 lines readable in order; standalone lead plates are omitted "
             "because every dialogue pill identifies Doctor Andy Anderson or "
             "Bob Killen."
         ),
@@ -153,7 +153,6 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         ("d20b", (124.92, 127.95, "osiris")),
         ("d21", (127.96, 132.99, "osiris")),
         ("d23a", (134.64, 136.11, "sagira")),
-        ("d23b", (136.12, 137.59, "sagira")),
     ],
 )
 def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
@@ -174,15 +173,35 @@ def test_act3_owner_placed_pins_are_recorded_in_film_seconds():
 
 
 def test_act3_toilmaster_line_is_dropped_and_replaced():
-    """Owner, 2026-08-24: d24 is removed entirely; d26 takes its slot."""
+    """Owner, 2026-08-24: d24 is removed entirely; d26 takes its slot.
+    Later the same day the tail goes too: 'then that concludes the
+    dialogue' -- the 7% line is the closer, and d23b, d26 and d25 are all
+    retired to dropped[] with their wording kept."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
-    assert "d24" not in cues
-    assert cues["d26"]["character"] == "osiris"
-    assert cues["d26"]["text"] == "Don't worry Maintainers read their emails"
-    assert cues["d26"]["text_source"] == "owner_supplied"
+    for gone in ("d23b", "d24", "d26", "d25"):
+        assert gone not in cues
     dropped = {cue["id"]: cue for cue in data["dropped"]}
     assert dropped["d24"]["raw"].startswith("If I don't stop the Toilmaster")
+    assert dropped["d26"]["raw"] == "Don't worry Maintainers read their emails"
+    assert dropped["d23b"]["raw"] == "I don't like this plan"
+    assert dropped["d25"]["raw"].startswith("I'm sure one of them")
+
+
+def test_act3_the_hive_line_and_the_seven_percent_closer():
+    """Owner, 2026-08-24: after the sandbox breakout, Doc gets 'Hive is the
+    one stuck in the CNCF Sandbox!', then the 7% line concludes the
+    dialogue."""
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cues = data["cues"]
+    by_id = {cue["id"]: cue for cue in cues}
+    assert by_id["d27"]["character"] == "sagira"
+    assert by_id["d27"]["text"] == "Hive is the one stuck in the CNCF Sandbox!"
+    assert by_id["d27"]["text_source"] == "owner_supplied"
+    ids = [c["id"] for c in cues]
+    assert ids.index("d21") < ids.index("d27") < ids.index("d22") \
+        < ids.index("d23a")
+    assert ids[-1] == "d23a", "the 7% line concludes the dialogue"
 
 
 def test_act3_wait_slow_down_is_dropped_and_d13_stands_alone():
@@ -234,7 +253,7 @@ def test_act3_review_cue_splits_keep_the_owner_marked_hundredth_adjacency():
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
     for earlier, later in (("d09a", "d09b"), ("d20a", "d20b"),
-                           ("d20b", "d21"), ("d23a", "d23b")):
+                           ("d20b", "d21")):
         assert cues[later]["start_sec"] == pytest.approx(
             cues[earlier]["end_sec"] + 0.01, abs=1e-9)
 
@@ -289,7 +308,6 @@ def test_act_three_review_copy_and_splits_are_exact():
     assert by_id["d20b"]["text"] == "Everyone's making their own and they're all awful"
     assert by_id["d21"]["text"] == "They've broken out of the sandbox"
     assert by_id["d23a"]["text"] == "The open rate of maintainer emails is 7%"
-    assert by_id["d23b"]["text"] == "I don't like this plan"
+    assert by_id["d27"]["text"] == "Hive is the one stuck in the CNCF Sandbox!"
     ids = [c["id"] for c in data["cues"]]
     assert ids.index("d20a") < ids.index("d20b") < ids.index("d21")
-    assert ids.index("d23a") < ids.index("d23b") < ids.index("d26")
