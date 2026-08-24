@@ -1,10 +1,10 @@
 {
   "_what": "Owner-authored Act III opening copy, rendered as chat rather than a centered title.",
-  "_anchor": "immediately before the wolf day shot appears",
+  "_anchor": "the gold card rides the camera's reveal of Osiris -- the ECU that opens the reveal (source 33.633 = film 30.233 after the 3.4s PEGI cut) and settles face-on with Sagira beside him by film 32.6",
   "plates": [
     {
       "id": "mrbobbytables-gold",
-      "at": 43.96,
+      "at": 30.23,
       "dur": 4.0,
       "position": "left",
       "copy_source": "casting",
@@ -14,6 +14,17 @@
       "title": "Reconciler of the Plane",
       "trustee": true,
       "variant": "leader"
+    },
+    {
+      "id": "clubanderson-ghost",
+      "at": 80.4,
+      "dur": 2.8,
+      "position": "left",
+      "copy_source": "casting",
+      "kind": "ghost",
+      "label": "MAINTAINER // GHOST",
+      "name": "Doc Anderson",
+      "title": "Foundry of the Forbidden"
     },
     {
       "id": "maintainer-emails",

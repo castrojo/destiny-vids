@@ -228,6 +228,10 @@ def test_act_three_fixed_deck_has_gold_bob_and_top_right_email_sign():
     bob = by_id["mrbobbytables-gold"]
     assert bob["name"] == "Bob Killen"
     assert bob["variant"] == "leader"
+    ghost = by_id["clubanderson-ghost"]
+    assert ghost["kind"] == "ghost"
+    assert ghost["name"] == "Doc Anderson"
+    assert ghost["copy_source"] == "casting"
     sign = by_id["maintainer-emails"]
     assert sign["position"] == "top-right"
     assert sign["title"] == "Maintainers Reading Emails"
