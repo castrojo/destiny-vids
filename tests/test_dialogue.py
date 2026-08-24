@@ -139,7 +139,7 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         "standalone_leads": False,
         "note": (
             "The owner replaced the complete conversation. Script layout keeps "
-            "all 27 lines readable in order; standalone lead plates are omitted "
+            "all 26 lines readable in order; standalone lead plates are omitted "
             "because every dialogue pill identifies Doctor Andy Anderson or "
             "Bob Killen."
         ),
@@ -167,6 +167,7 @@ def test_act3_owner_placed_pins_are_recorded_in_film_seconds():
     d22 stays where it is ("perfect")."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
+    assert cues["d13"]["pin_sec"] == 90.0
     assert cues["d20a"]["pin_sec"] == 117.0
     assert cues["d21"]["pin_sec"] == 124.0
     assert cues["d22"]["pin_sec"] == 134.82
@@ -182,6 +183,17 @@ def test_act3_toilmaster_line_is_dropped_and_replaced():
     assert cues["d26"]["text_source"] == "owner_supplied"
     dropped = {cue["id"]: cue for cue in data["dropped"]}
     assert dropped["d24"]["raw"].startswith("If I don't stop the Toilmaster")
+
+
+def test_act3_wait_slow_down_is_dropped_and_d13_stands_alone():
+    """Owner, 2026-08-24: 'remove the wait slow down' -- d12 goes entirely,
+    d13 keeps only 'That's not our local model.' pinned to 1:30."""
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cues = {cue["id"]: cue for cue in data["cues"]}
+    assert "d12" not in cues
+    assert cues["d13"]["text"] == "That's not our local model."
+    dropped = {cue["id"]: cue for cue in data["dropped"]}
+    assert dropped["d12"]["raw"] == "Slow down."
 
 
 def test_a_pinned_cue_lands_exactly_in_script_mode():

@@ -65,13 +65,9 @@ Standard AGENTS.md, no problem.
 
 What is it, what did you see? New local model?
 
-## d12 | clubanderson | 1:27.84 -> 1:30.83
+## d13 | clubanderson | 1:30.84 -> 1:32.23 | pin 1:30.00
 
-Slow down.
-
-## d13 | clubanderson | 1:30.84 -> 1:32.23
-
-Wait. That's not our local model.
+That's not our local model.
 
 ## d14 | clubanderson | 1:32.24 -> 1:34.95
 
