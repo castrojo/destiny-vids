@@ -139,7 +139,7 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         "standalone_leads": False,
         "note": (
             "The owner replaced the complete conversation. Script layout keeps "
-            "all 25 lines readable in order; standalone lead plates are omitted "
+            "all 23 lines readable in order; standalone lead plates are omitted "
             "because every dialogue pill identifies Doctor Andy Anderson or "
             "Bob Killen."
         ),
@@ -152,7 +152,6 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         ("d20a", (121.44, 124.91, "osiris")),
         ("d20b", (124.92, 127.95, "osiris")),
         ("d21", (127.96, 132.99, "osiris")),
-        ("d23a", (134.64, 136.11, "sagira")),
     ],
 )
 def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
@@ -163,13 +162,12 @@ def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
 
 def test_act3_owner_placed_pins_are_recorded_in_film_seconds():
     """Owner, 2026-08-24: d20a at 1:57, d21 at 2:04 (on the red portal),
-    d22 stays where it is ("perfect")."""
+    d22 held 134.82 until the sign-punchline cut retired the line."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
     assert cues["d13"]["pin_sec"] == 90.0
     assert cues["d20a"]["pin_sec"] == 117.0
     assert cues["d21"]["pin_sec"] == 124.0
-    assert cues["d22"]["pin_sec"] == 134.82
 
 
 def test_act3_toilmaster_line_is_dropped_and_replaced():
@@ -188,20 +186,25 @@ def test_act3_toilmaster_line_is_dropped_and_replaced():
     assert dropped["d25"]["raw"].startswith("I'm sure one of them")
 
 
-def test_act3_the_hive_line_and_the_seven_percent_closer():
+def test_act3_the_hive_line_is_the_closer():
     """Owner, 2026-08-24: after the sandbox breakout, Doc gets 'Hive is the
-    one stuck in the CNCF Sandbox!', then the 7% line concludes the
-    dialogue."""
+    one stuck in the CNCF Sandbox!' -- and later the same day: 'it's funnier
+    if we remove the last two lines of dialogue after that since the sign
+    shows that no one does open them.' d22 and the 7% line are retired to
+    dropped[]; the Hive quip is the closer and the sign lands the joke."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = data["cues"]
     by_id = {cue["id"]: cue for cue in cues}
     assert by_id["d27"]["character"] == "sagira"
     assert by_id["d27"]["text"] == "Hive is the one stuck in the CNCF Sandbox!"
     assert by_id["d27"]["text_source"] == "owner_supplied"
+    assert "d22" not in by_id and "d23a" not in by_id
     ids = [c["id"] for c in cues]
-    assert ids.index("d21") < ids.index("d27") < ids.index("d22") \
-        < ids.index("d23a")
-    assert ids[-1] == "d23a", "the 7% line concludes the dialogue"
+    assert ids.index("d21") < ids.index("d27")
+    assert ids[-1] == "d27", "the Hive line concludes the dialogue"
+    dropped = {cue["id"]: cue for cue in data["dropped"]}
+    assert dropped["d22"]["raw"].startswith("You need to get a message")
+    assert dropped["d23a"]["raw"] == "The open rate of maintainer emails is 7%"
 
 
 def test_act3_wait_slow_down_is_dropped_and_d13_stands_alone():
@@ -307,7 +310,6 @@ def test_act_three_review_copy_and_splits_are_exact():
     assert by_id["d20a"]["text"] == "Everyone forgot how to use KVM! We need to split up"
     assert by_id["d20b"]["text"] == "Everyone's making their own and they're all awful"
     assert by_id["d21"]["text"] == "They've broken out of the sandbox"
-    assert by_id["d23a"]["text"] == "The open rate of maintainer emails is 7%"
     assert by_id["d27"]["text"] == "Hive is the one stuck in the CNCF Sandbox!"
     ids = [c["id"] for c in data["cues"]]
     assert ids.index("d20a") < ids.index("d20b") < ids.index("d21")
