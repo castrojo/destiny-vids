@@ -1315,9 +1315,15 @@ def _merge_plates(before, authored):
 
     A chapter file owns the plates it authors, NOT the whole array: act VI's
     pills sit in the same list as four ``brief`` nameplates that resolve from
-    the roster. Replacing the array would delete them, so every plate the
-    chapter file does not name is carried through in the position it already
-    holds, and a newly written line lands beside the plate it follows in time.
+    the roster. Replacing the array would delete them, so every DERIVED plate
+    the chapter file does not name is carried through in the position it
+    already holds, and a newly written line lands beside the plate it follows
+    in time.
+
+    A NON-derived plate the chapter no longer authors is dropped, with a
+    note: carrying it through made deletion inexpressible, which is how
+    act III's retirement pair survived its move to act II (2026-08-24).
+    Deleting is reported, never silent.
     """
     if any("id" not in plate for plate in authored):
         # A run with no ids is owned outright: there is nothing to merge
@@ -1326,7 +1332,13 @@ def _merge_plates(before, authored):
     by_id = {plate.get("id"): plate for plate in authored}
     merged, notes = [], []
     for plate in before:
-        merged.append(by_id.pop(plate.get("id"), plate))
+        if plate.get("id") in by_id:
+            merged.append(by_id.pop(plate.get("id")))
+        elif plate.get("copy_source") in DERIVED_COPY:
+            merged.append(plate)
+        else:
+            notes.append(f"{plate.get('id')}: dropped -- no longer authored "
+                         "in the chapter file, and not derived copy")
     for plate in by_id.values():
         if plate.get("copy_source") in DERIVED_COPY:
             notes.append(f"{plate.get('id')}: a chapter file cannot author "

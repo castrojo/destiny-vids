@@ -65,7 +65,7 @@
     "yt_destiny_all_live_action_trailers",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "b22f40a130d5f6bcb5f3fdda3ee6a61d2ea240a3343d8aaa084a9139bebc3588",
+   "source_digest": "1a63c2ffb37eaa1f4ae6bfa26798a51e17473405dd9267cd00a6af9382e5691b",
    "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad",
    "built_from_commit": "4469daa45e7dc85e5502dc2472725c51491f0fab"
   },
@@ -87,7 +87,7 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "997c2d1e164483b7fb0b60098d0a3f0d0f725f7e7105ada4050366a4b7cf51e5",
+   "source_digest": "e16500ff393c8d5cbfae4609cd84af1e6cb6eebecf19993ddff0c08f1c326278",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json"
   },

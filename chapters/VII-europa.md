@@ -5,11 +5,11 @@ manifest: stories/07-europa-plates.json
 # the running order's segment durations summed from a
 # `tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-21 --
 # every segment before it, summed: prologue 101.200 + act I 116.200 +
-# Perfume 2 66.400 + act II 359.968 + act III 160.200 + Perfume 3 114.848 +
+# Perfume 2 66.400 + act II 364.068 + act III 160.200 + Perfume 3 114.848 +
 # act IV 34.000 + act V 25.259 + interstitial 5.000 + act VI 401.527 +
-# Perfume 4a 13.120 + Perfume 4b 102.445 = 1500.167.
+# Perfume 4a 13.120 + Perfume 4b 102.445 = 1504.267.
 # Restate the derivation when the running order moves.
-programme_start: 1500.167
+programme_start: 1504.267
 # The order this act has always written its plates in, kept so the generated
 # manifest reads the way the delivered one did.
 # This act's whole plate list comes from this file, so the manifest is
@@ -46,8 +46,8 @@ move or re-time that pill, and expect to rebuild the act when you do.
 
 - `[an-id]` keeps the pill's existing id, which is what the delivered master
   and every note about this act refer to.
-- `@ 25:00.167` is programme time — the clock you scrub in the whole
-  show. This act starts at 25:00.167.
+- `@ 25:04.267` is programme time — the clock you scrub in the whole
+  show. This act starts at 25:04.267.
 - `+2.4` is how long the pill holds. Delete it and the hold is derived from
   read speed instead (15 characters a second, floor 2.2 s, ceiling 7 s).
 - `- field: value` rows under a line carry its chrome — the avatar, the fade,
@@ -61,55 +61,55 @@ python3 tools/chapter_md.py show VII
 python3 tools/chapter_md.py check VII
 ```
 
-## 25:00.731
+## 25:04.831
 
-[d01] krook @ 25:00.731 +1.6: Deploy CNCF Projects Team
+[d01] krook @ 25:04.831 +1.6: Deploy CNCF Projects Team
   - avatar: ~/Videos/wolves-directors-cut/nimbatus-review/render/krook.png
   - fade_out_at: 1.864
 
-[d02] preethi @ 25:02.731 +1.6: Stand down, I'm sending my wolf
+[d02] preethi @ 25:06.831 +1.6: Stand down, I'm sending my wolf
   - fade_out_at: 3.864
 
-[d03] alolita @ 25:04.731 +2.6: Are you sure the Kube is on Europa?
+[d03] alolita @ 25:08.831 +2.6: Are you sure the Kube is on Europa?
   - avatar: renders/avatars/alolita.png
   - fade_out_at: 6.864
 
-[d04] preethi @ 25:07.731 +2.0: It is my duty to test her.
+[d04] preethi @ 25:11.831 +2.0: It is my duty to test her.
   - fade_out_at: 9.264
 
-[d04b] preethi @ 25:10.131 +2.2: I must not fail
+[d04b] preethi @ 25:14.231 +2.2: I must not fail
 
-## 25:24.731
+## 25:28.831
 
-[d05] castrojo @ 25:24.731 +2.6: In and out
+[d05] castrojo @ 25:28.831 +2.6: In and out
   - avatar: renders/avatars/castrojo.png
   - fade_out_at: 26.864
 
-[d06] mrbobbytables @ 25:27.731 +2.0: Don't get caught
+[d06] mrbobbytables @ 25:31.831 +2.0: Don't get caught
   - avatar: renders/avatars/mrbobbytables.png
   - fade_out_at: 29.264
 
-[d07] jeefy @ 25:30.131 +2.2: Standing by for extraction
+[d07] jeefy @ 25:34.231 +2.2: Standing by for extraction
   - avatar: renders/avatars/jeefy.png
   - fade_out_at: 31.864
 
-[d08] ihor @ 25:32.731 +2.2: G{k8s}dspeed
+[d08] ihor @ 25:36.831 +2.2: G{k8s}dspeed
   - avatar: renders/avatars/idvoretskyi.png
   - fade_out_at: 34.464
 
-[d11] preethi @ 25:35.331 +2.2: Hummingbird will find the girl
+[d11] preethi @ 25:39.431 +2.2: Hummingbird will find the girl
 
-[d12] preethi @ 25:37.931 +2.2: We'll return soon.
+[d12] preethi @ 25:42.031 +2.2: We'll return soon.
 
-[d13] nimbatus @ 25:40.531 +2.6: We are the Wolves amongst the Wolves
+[d13] nimbatus @ 25:44.631 +2.6: We are the Wolves amongst the Wolves
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
 
-## 26:01.731
+## 26:05.831
 
-[d09] nimbatus @ 26:01.731 +1.8: Wilco
+[d09] nimbatus @ 26:05.831 +1.8: Wilco
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 63.064
 
-[d10] nimbatus @ 26:03.931 +2.0: {k8s}ut
+[d10] nimbatus @ 26:08.031 +2.0: {k8s}ut
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 65.464

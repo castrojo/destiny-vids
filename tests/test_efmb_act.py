@@ -15,6 +15,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_efmb  # noqa: E402
 import build_efmb_plates  # noqa: E402
+from tools import chapter_md  # noqa: E402
 
 # --- the two clocks --------------------------------------------------------
 
@@ -87,7 +88,7 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
     assert amber["source_in"] == pytest.approx(43.0, abs=1e-3)
     assert amber["source_out"] == pytest.approx(53.47, abs=1e-3)
     assert after["at"] == pytest.approx(build_efmb.HALLWAY_AFTER_AMBER_AT, abs=1e-3)
-    assert after["duration"] == pytest.approx(21.5, abs=1e-3)
+    assert after["duration"] == pytest.approx(25.6, abs=1e-3)
     assert after["darken"] > hallway["darken"]
     assert returned["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
     assert returned["source_in"] == pytest.approx(325.933, abs=1e-3)
@@ -123,7 +124,7 @@ def test_the_interruption_audio_uses_only_recorded_sources():
     assert audio[2]["at"] == pytest.approx(build_efmb.AMBER_AT, abs=1e-3)
     assert audio[3]["at"] == pytest.approx(
         build_efmb.HALLWAY_AFTER_AMBER_AT, abs=1e-3)
-    assert audio[3]["duration"] == pytest.approx(21.5, abs=1e-3)
+    assert audio[3]["duration"] == pytest.approx(25.6, abs=1e-3)
     assert audio[4]["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
     assert sum(p["duration"] for p in audio) == pytest.approx(
         build_efmb.build()["film_sec"], abs=1e-3)
@@ -247,11 +248,24 @@ def test_nobody_is_credited_twice_with_two_different_faces():
             "else is two faces for one person")
 
 def test_every_plate_can_be_read():
+    # An explicit `+hold` in the chapter file is honoured verbatim, even
+    # below the derived floor (the retirement pair keeps act III's authored
+    # 2.125; Disco! is a six-letter word at 1.8). The floor guards only
+    # holds nobody authored.
+    explicit = {
+        line["id"]
+        for block in chapter_md.parse(
+            chapter_md.chapter("II").path.read_text(encoding="utf-8"))
+        for line in block["lines"]
+        if line.get("hold") is not None
+    }
     for plate in committed()["plates"]:
         # An ANIMATION frame is not a credit. The choice screen is a run of
         # frames a fifteenth of a second each; MIN_HOLD exists so a NAME can
         # be read, and holding a frame for 2.2 s is a still, not a cursor.
         if plate.get("animation"):
+            continue
+        if plate["id"] in explicit:
             continue
         assert plate["dur"] >= build_efmb_plates.MIN_HOLD, (
             f"{plate['id']} holds {plate['dur']}s -- too brief to read")
@@ -770,18 +784,52 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     haters = by_id["mapped_haters"]
     assert haters["kind"] == "miniboss"  # owner: match the kernel bar
     assert haters["name"] == "HATERS"
-    assert haters["at"] == pytest.approx(316.2, abs=1e-3)  # owner: 10:00, red face
+    # Owner, 2026-08-24: "9:57, all the enemies are the haters, it just needs
+    # to be obvious". The bar used to fire at 10:00 over the guardian sunset
+    # shot; it now opens on the red-lit enemy face's first frame (that shot
+    # is film 317.4 once the 2026-08-24 pause growth moved the content 4.1 s).
+    assert haters["at"] == pytest.approx(317.4, abs=1e-3)
     assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
     # Owner, 2026-08-19: "sup is a purple titan ... put it when it's zoomed
-    # into his face." Film 317.0 is the Titan close-up behind the purple Void
-    # shield -- programme 10:00.8, the "around 10:00" he asked for.
-    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(316.967, abs=1e-3)
-    # kolunmi's "Disco!" was deleted by the owner on 2026-08-23 and the air it
-    # freed now carries akgraner's and cortney's lines. It stays deleted.
-    assert "mapped_kolunmi_disco" not in by_id
+    # into his face"; 2026-08-24, asked again: it stays. The close-up's
+    # content moved 4.1 s with the pause, so the seat is film 321.067 now.
+    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(321.067, abs=1e-3)
+    # kolunmi's "Disco!", deleted 2026-08-23, was restored by the owner on
+    # 2026-08-24 "when the hunter is onscreen" -- the red-corridor fight,
+    # left lane while Sup holds the right, clearing the nameplate's arrival.
+    # The overlap with Sup is a NAMED bond (bond_of) -- the exemption that
+    # cannot spread.
+    assert by_id["mapped_kolunmi_disco"]["text"] == "Disco!"
+    assert by_id["mapped_kolunmi_disco"]["speaker"] == "kolunmi"
+    assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(
+        320.387, abs=1e-3)
+    assert by_id["mapped_kolunmi_disco"]["dur"] == pytest.approx(2.2, abs=1e-3)
+    assert by_id["mapped_kolunmi_disco"]["bond_of"] == "mapped_kyle_sup"
+    # Owner, 2026-08-24: "Don't unpause, at 'Oh I see your problem', keep
+    # that in the paused section, put cortney's conversation here."
+    for pid in ("chat_amber_problem", "chat_cortney_solid"):
+        assert by_id[pid]["at"] + by_id[pid]["dur"] <= \
+            build_efmb.HALLWAY_RETURN_AT + 1e-3
     assert by_id["chat_amber_problem"]["at"] == pytest.approx(308.403, abs=1e-3)
     assert by_id["owner_convo_karena"]["avatar"].endswith("/karena.png")
+
+def test_the_retirement_conversation_moved_here_verbatim_from_act_three():
+    by_id = {p["id"]: p for p in committed()["plates"]}
+    pair = [by_id["retirement-1"], by_id["retirement-2"]]
+    # Owner, 2026-08-24: "10:24 is where redacted's 'retirement conversation'
+    # should go, not in the next chapter" -- 10:24 on the alpha2 clock is the
+    # Cayde-6 neon-street shot that closes the picture; once the pause grew
+    # 4.1 s, that shot opens at film 344.3. Copy, holds and gap are verbatim
+    # from act III, and the pair stays chromeless (he is revealed in act VI).
+    assert [p["kind"] for p in pair] == ["chat", "chat"]
+    assert [p["speaker"] for p in pair] == ["[redacted]", "[redacted]"]
+    assert [p["text"] for p in pair] == ["Finally, retirement",
+                                         "The long walk beckons"]
+    assert pair[0]["at"] == pytest.approx(344.3, abs=1e-3)
+    assert pair[0]["dur"] == pytest.approx(2.125, abs=1e-3)
+    assert pair[1]["at"] - pair[0]["at"] == pytest.approx(2.375, abs=1e-3)
+    assert all(not p.get("avatar") for p in pair)
 
 def test_the_owner_conversation_hands_to_kyle_without_overlap():
     by_id = {p["id"]: p for p in committed()["plates"]}

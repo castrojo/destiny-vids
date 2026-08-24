@@ -7,9 +7,9 @@ plates_key: fixed_cards
 timed: false
 # Nothing here is pinned to a second. This is where the chapter falls in the
 # running order, so a read-through of the whole show puts it in the right
-# place -- it is never used to seat a card. Act VIII starts at 1728.024 by
+# place -- it is never used to seat a card. Act VIII starts at 1732.124 by
 # the summed running order (see any timed chapter's derivation).
-programme_start: 1728.024
+programme_start: 1732.124
 list_keys: names
 owns_plates: true
 # No `field_order`: these three cards do NOT agree on one. The first card

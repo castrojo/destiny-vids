@@ -210,7 +210,17 @@ AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
 # Return to the same hallway frame for Owen, Amber's kindness speech, and the
 # held Kyle question before the Destiny picture resumes.
 HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
-HALLWAY_AFTER_AMBER_SEC = 21.500
+# Owner, 2026-08-24: "Don't unpause, at 'Oh I see your problem', keep that in
+# the paused section, put cortney's conversation here." 21.5 let the picture
+# resume at film 309.403 with akgraner's pill still up and cortney's "And
+# we're gonna do you a solid" playing entirely after the resume; 25.6 holds
+# the frozen hallway until film 313.503 (programme 9:57.3), a beat after
+# cortney's pill ends (9:56.853). No footage is cut and the black tail keeps
+# its 16.065 s (owner: "keep the black"), so the act -- and every act after
+# it -- runs 4.1 s later; every downstream chapter file's programme_start and
+# pins are restated +4.1 in the same change, which lands their plates on the
+# same frames they always had.
+HALLWAY_AFTER_AMBER_SEC = 25.600
 HALLWAY_RETURN_AT = HALLWAY_AFTER_AMBER_AT + HALLWAY_AFTER_AMBER_SEC
 BLACK_CONVERSATION_AT = HALLWAY_AT
 BLACK_CONVERSATION_SEC = HALLWAY_FREEZE_SEC
@@ -222,7 +232,10 @@ INTERRUPTION_SHIFT_SEC = INTERRUPTION_SEC - INTERRUPTION_REPLACED_SEC
 KYLE_REVEAL_SRC = 335.267
 KYLE_REVEAL_SEC = 3.200
 KYLE_REVEAL_AT = HALLWAY_RETURN_AT + (KYLE_REVEAL_SRC - HALLWAY_RESUME_SRC)
-EDITED_PICTURE_END = 343.903
+# 343.903 + the 4.1 s the pause grew on 2026-08-24; the tail keeps its black
+# (film_sec - this == 16.065 s, unchanged), the act ends where the song ends,
+# and the show runs 4.1 s longer from here on.
+EDITED_PICTURE_END = 348.003
 
 HOLD_MUSIC_IN = 6.500
 HOLD_MUSIC_OUT_FILM = HALLWAY_RETURN_AT
