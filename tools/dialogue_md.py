@@ -62,7 +62,8 @@ DASH = r"[|\u2014\u2013-]"
 ARROW = r"(?:->|\u2192|\u2013|\u2014|to)"
 HEADING = re.compile(
     rf"^\#\#\s+(?P<id>\S+)\s*{DASH}\s*(?P<speaker>[^|\u2014\u2013]+?)\s*{DASH}\s*"
-    rf"(?P<start>[0-9:.]+)\s*{ARROW}\s*(?P<end>[0-9:.]+)\s*$"
+    rf"(?P<start>[0-9:.]+)\s*{ARROW}\s*(?P<end>[0-9:.]+?)"
+    rf"(?:\s*{DASH}\s*pin\s+(?P<pin>[0-9:.]+))?\s*$"
 )
 
 
@@ -126,7 +127,7 @@ def replace(data, edited):
     """Replace a recovered conversation with owner-authored copy."""
     cues = []
     for cue in edited:
-        cues.append({
+        entry = {
             "id": cue["id"],
             "start_sec": round(cue["start_sec"], 2),
             "end_sec": round(cue["end_sec"], 2),
@@ -134,7 +135,10 @@ def replace(data, edited):
             "evidence": "owner_supplied",
             "text": cue["text"],
             "text_source": "owner_supplied",
-        })
+        }
+        if cue.get("pin_sec") is not None:
+            entry["pin_sec"] = round(cue["pin_sec"], 2)
+        cues.append(entry)
     return {
         **data,
         "source_rights_note": (
@@ -165,6 +169,11 @@ def export(data, leads):
         "  back on the right frame; change them only to re-time a line.",
         "- **Change the speaker** by renaming it in the heading (the character,",
         "  or the person credited for them).",
+        "- **Pin a line to an exact film moment** with a fourth heading",
+        "  segment: `| pin 1:57.00`. The timecodes still set the hold; the pin",
+        "  sets where it starts on the delivered film. Remove the segment to",
+        "  unpin. Only pin the lines that must land exactly -- an unpinned line",
+        "  flows with the conversation and rides out every card move.",
         "- **Delete a whole section** to drop that line from the cut.",
         "- A line you change is recorded as yours; the recovered wording is kept",
         "  beside it, never overwritten.",
@@ -177,9 +186,12 @@ def export(data, leads):
         "",
     ]
     for cue in data["cues"]:
+        heading = (f"## {cue['id']} | {_speaker_label(cue, leads)} | "
+                   f"{format_tc(cue['start_sec'])} -> {format_tc(cue['end_sec'])}")
+        if cue.get("pin_sec") is not None:
+            heading += f" | pin {format_tc(cue['pin_sec'])}"
         lines += [
-            f"## {cue['id']} | {_speaker_label(cue, leads)} | "
-            f"{format_tc(cue['start_sec'])} -> {format_tc(cue['end_sec'])}",
+            heading,
             "",
             (cue.get("text") or "").strip(),
             "",
@@ -223,6 +235,8 @@ def parse(text, leads):
             "start_sec": parse_tc(match["start"]),
             "end_sec": parse_tc(match["end"]),
         }
+        if match["pin"]:
+            current["pin_sec"] = parse_tc(match["pin"])
     flush()
 
     seen = set()
@@ -269,7 +283,7 @@ def merge(data, edited):
             # before writing it -- a slot, not a line. `owner_supplied` would
             # claim they wrote something; `placeholder` says they have not.
             blank = not cue["text"]
-            cues.append({
+            added = {
                 "id": cue["id"],
                 "start_sec": round(cue["start_sec"], 2),
                 "end_sec": round(cue["end_sec"], 2),
@@ -277,7 +291,10 @@ def merge(data, edited):
                 "evidence": "owner_supplied",
                 "text": cue["text"],
                 "text_source": "placeholder" if blank else "owner_supplied",
-            })
+            }
+            if cue.get("pin_sec") is not None:
+                added["pin_sec"] = round(cue["pin_sec"], 2)
+            cues.append(added)
             changes.append(
                 f"  + {cue['id']} added: "
                 f"{'(placeholder -- no words yet)' if blank else cue['text'][:56]}")
@@ -308,6 +325,13 @@ def merge(data, edited):
             if abs(float(previous.get(field, 0)) - value) > 0.005:
                 merged[field] = round(value, 2)
                 changes.append(f"  ~ {cue['id']} {field}: {value:.2f}")
+        if cue.get("pin_sec") is not None:
+            if abs(float(previous.get("pin_sec", -1)) - cue["pin_sec"]) > 0.005:
+                merged["pin_sec"] = round(cue["pin_sec"], 2)
+                changes.append(f"  ~ {cue['id']} pin_sec: {cue['pin_sec']:.2f}")
+        elif previous.get("pin_sec") is not None:
+            del merged["pin_sec"]
+            changes.append(f"  ~ {cue['id']} unpinned")
         cues.append(merged)
 
     kept = {cue["id"] for cue in edited}

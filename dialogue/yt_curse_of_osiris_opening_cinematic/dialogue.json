@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "The owner replaced the complete conversation. Script layout keeps all 25 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
+    "note": "The owner replaced the complete conversation. Script layout keeps all 27 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
   },
   "cues": [
     {
@@ -171,7 +171,7 @@
     {
       "id": "d17",
       "start_sec": 99.4,
-      "end_sec": 103.95,
+      "end_sec": 101.9,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "ON YOUR LEFT. 2 o'clock. Reverting.",
@@ -180,7 +180,7 @@
     {
       "id": "d18",
       "start_sec": 103.96,
-      "end_sec": 114.47,
+      "end_sec": 106.16,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "New fork, pushing!",
@@ -189,7 +189,7 @@
     {
       "id": "d19",
       "start_sec": 114.48,
-      "end_sec": 121.43,
+      "end_sec": 117.98,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "You keep picking the places where they shoot at us.",
@@ -202,25 +202,28 @@
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "Everyone forgot how to use KVM! We need to split up",
-      "text_source": "owner_supplied"
+      "text_source": "owner_supplied",
+      "pin_sec": 117.0
     },
     {
       "id": "d20b",
       "start_sec": 124.92,
-      "end_sec": 128.91,
+      "end_sec": 127.95,
       "character": "osiris",
       "evidence": "owner_supplied",
-      "text": "Everyone's making their own and it's all bad!",
-      "text_source": "owner_supplied"
+      "text": "Everyone's making their own and they're all awful",
+      "text_source": "owner_supplied",
+      "recovered_text": "Everyone's making their own and it's all bad!"
     },
     {
       "id": "d21",
-      "start_sec": 128.92,
-      "end_sec": 133.95,
+      "start_sec": 127.96,
+      "end_sec": 132.99,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "They've broken out of the sandbox",
-      "text_source": "owner_supplied"
+      "text_source": "owner_supplied",
+      "pin_sec": 124.0
     },
     {
       "id": "d22",
@@ -229,7 +232,8 @@
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "You need to get a message to the Kubernetes Maintainers",
-      "text_source": "owner_supplied"
+      "text_source": "owner_supplied",
+      "pin_sec": 134.82
     },
     {
       "id": "d23a",
@@ -250,12 +254,12 @@
       "text_source": "owner_supplied"
     },
     {
-      "id": "d24",
+      "id": "d26",
       "start_sec": 137.6,
       "end_sec": 142.27,
       "character": "osiris",
       "evidence": "owner_supplied",
-      "text": "If I don't stop the Toilmaster, there won't be anything to come back to. I'm doing this for the both of us.",
+      "text": "Don't worry Maintainers read their emails",
       "text_source": "owner_supplied"
     },
     {
@@ -281,6 +285,13 @@
       "start_sec": 134.64,
       "end_sec": 137.59,
       "raw": "The open rate of maintainer emails is 7% I don't like this plan",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d24",
+      "start_sec": 137.6,
+      "end_sec": 142.27,
+      "raw": "If I don't stop the Toilmaster, there won't be anything to come back to. I'm doing this for the both of us.",
       "reason": "removed by the owner while rewriting the conversation"
     }
   ]

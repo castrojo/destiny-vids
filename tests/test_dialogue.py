@@ -139,7 +139,7 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         "standalone_leads": False,
         "note": (
             "The owner replaced the complete conversation. Script layout keeps "
-            "all 25 lines readable in order; standalone lead plates are omitted "
+            "all 27 lines readable in order; standalone lead plates are omitted "
             "because every dialogue pill identifies Doctor Andy Anderson or "
             "Bob Killen."
         ),
@@ -150,8 +150,8 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
     "cue_id, expected",
     [
         ("d20a", (121.44, 124.91, "osiris")),
-        ("d20b", (124.92, 128.91, "osiris")),
-        ("d21", (128.92, 133.95, "osiris")),
+        ("d20b", (124.92, 127.95, "osiris")),
+        ("d21", (127.96, 132.99, "osiris")),
         ("d23a", (134.64, 136.11, "sagira")),
         ("d23b", (136.12, 137.59, "sagira")),
     ],
@@ -162,11 +162,52 @@ def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
     assert (cue["start_sec"], cue["end_sec"], cue["character"]) == expected
 
 
+def test_act3_owner_placed_pins_are_recorded_in_film_seconds():
+    """Owner, 2026-08-24: d20a at 1:57, d21 at 2:04 (on the red portal),
+    d22 stays where it is ("perfect")."""
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cues = {cue["id"]: cue for cue in data["cues"]}
+    assert cues["d20a"]["pin_sec"] == 117.0
+    assert cues["d21"]["pin_sec"] == 124.0
+    assert cues["d22"]["pin_sec"] == 134.82
+
+
+def test_act3_toilmaster_line_is_dropped_and_replaced():
+    """Owner, 2026-08-24: d24 is removed entirely; d26 takes its slot."""
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cues = {cue["id"]: cue for cue in data["cues"]}
+    assert "d24" not in cues
+    assert cues["d26"]["character"] == "osiris"
+    assert cues["d26"]["text"] == "Don't worry Maintainers read their emails"
+    assert cues["d26"]["text_source"] == "owner_supplied"
+    dropped = {cue["id"]: cue for cue in data["dropped"]}
+    assert dropped["d24"]["raw"].startswith("If I don't stop the Toilmaster")
+
+
+def test_a_pinned_cue_lands_exactly_in_script_mode():
+    cues = [
+        {"id": "d01", "start_sec": 0.0, "end_sec": 3.0, "character": "osiris",
+         "text": "flowing"},
+        {"id": "d02", "start_sec": 3.0, "end_sec": 6.0, "character": "sagira",
+         "text": "pinned", "pin_sec": 40.0},
+        {"id": "d03", "start_sec": 6.0, "end_sec": 9.0, "character": "osiris",
+         "text": "flows after the pin"},
+    ]
+    entries, dropped = dialogue.plan_script(
+        cues, [shot("long", 0.0, 100.0)], LEADS, start_at=10.0)
+    assert not dropped
+    by_id = {e["id"]: e for e in entries}
+    assert by_id["d01"]["at"] == pytest.approx(10.0)
+    assert by_id["d02"]["at"] == pytest.approx(40.0)
+    assert by_id["d03"]["at"] == pytest.approx(40.0 + 3.0 + dialogue.TAIL_OUT)
+
+
 def test_act3_review_cue_splits_keep_the_owner_marked_hundredth_adjacency():
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
     for earlier, later in (("d20a", "d20b"), ("d20b", "d21"), ("d23a", "d23b")):
-        assert cues[later]["start_sec"] == cues[earlier]["end_sec"] + 0.01
+        assert cues[later]["start_sec"] == pytest.approx(
+            cues[earlier]["end_sec"] + 0.01, abs=1e-9)
 
 
 def test_act3_fixed_gold_bob_plate_matches_complete_authored_entry():
@@ -216,10 +257,10 @@ def test_act_three_review_copy_and_splits_are_exact():
     by_id = {c["id"]: c for c in data["cues"]}
     assert by_id["d01"]["text"] == "What a shitshow"
     assert by_id["d20a"]["text"] == "Everyone forgot how to use KVM! We need to split up"
-    assert by_id["d20b"]["text"] == "Everyone's making their own and it's all bad!"
+    assert by_id["d20b"]["text"] == "Everyone's making their own and they're all awful"
     assert by_id["d21"]["text"] == "They've broken out of the sandbox"
     assert by_id["d23a"]["text"] == "The open rate of maintainer emails is 7%"
     assert by_id["d23b"]["text"] == "I don't like this plan"
     ids = [c["id"] for c in data["cues"]]
     assert ids.index("d20a") < ids.index("d20b") < ids.index("d21")
-    assert ids.index("d23a") < ids.index("d23b") < ids.index("d24")
+    assert ids.index("d23a") < ids.index("d23b") < ids.index("d26")

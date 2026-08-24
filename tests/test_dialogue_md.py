@@ -39,6 +39,29 @@ def test_export_round_trips_without_changing_anything():
     assert changes == []
     assert updated["cues"] == DATA["cues"]
 
+
+def test_a_pin_segment_round_trips_through_the_markdown():
+    """`| pin 1:57.00` in a heading lands on the record as film seconds, and
+    export writes it back verbatim so the checked-in file cannot drift."""
+    pinned = {**DATA, "cues": [dict(DATA["cues"][0]),
+                               {**DATA["cues"][1], "pin_sec": 117.0}]}
+    text = dialogue_md.export(pinned, LEADS)
+    assert "| pin 1:57.00" in text
+    cues = dialogue_md.parse(text, LEADS)
+    assert next(c for c in cues if c["id"] == "d02")["pin_sec"] == 117.0
+    updated, changes = dialogue_md.merge(pinned, cues)
+    assert changes == []
+    assert updated["cues"] == pinned["cues"]
+
+
+def test_removing_the_pin_segment_unpins_the_cue():
+    pinned = {**DATA, "cues": [dict(DATA["cues"][0]),
+                               {**DATA["cues"][1], "pin_sec": 117.0}]}
+    cues = dialogue_md.parse(dialogue_md.export(DATA, LEADS), LEADS)
+    updated, changes = dialogue_md.merge(pinned, cues)
+    assert updated["cues"] == DATA["cues"]
+    assert any("unpinned" in c for c in changes)
+
 def test_timecodes_survive_the_trip_exactly():
     text = dialogue_md.export(DATA, LEADS)
     assert "0:10.00 -> 0:14.00" in text

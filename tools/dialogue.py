@@ -236,7 +236,26 @@ def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
 
         spoken = cue["end_sec"] - cue["start_sec"]
         duration = max(MIN_HOLD, min(spoken, hold))
-        at = next_free(cursor, duration)
+        pin = cue.get("pin_sec")
+        if pin is not None:
+            # An owner-placed pin lands exactly (film seconds). The packing
+            # rules are not consulted: the pin IS the instruction. Both
+            # collisions it can cause -- onto the previous line, or onto a
+            # fixed card -- are refused loudly downstream by
+            # load_manifest_entries, and warned about here so the log says
+            # which pin did it before the build fails.
+            at = float(pin)
+            if log:
+                if at < cursor:
+                    log(f"  WARNING {cue['id']}: pinned at {at:.2f}s but the "
+                        f"previous line holds until {cursor - TAIL_OUT:.2f}s")
+                for b_start, b_end in busy:
+                    if at < b_end and at + duration + TAIL_OUT > b_start:
+                        log(f"  WARNING {cue['id']}: pinned at {at:.2f}s "
+                            f"inside a fixed card window "
+                            f"{b_start:.2f}-{b_end:.2f}s")
+        else:
+            at = next_free(cursor, duration)
         if at + duration > total - TAIL_OUT:
             dropped.append({**cue, "reason": "the cut ends before this line"})
             continue
