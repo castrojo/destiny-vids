@@ -245,6 +245,16 @@ the outside and want opposite fixes:
 | `.prod.md5` **older** than the `.mp4` beside it | The output was rebuilt by `tools/megacut.py` directly, which does not close the provenance rung. Verify the build, then record it — `deliver.record_megacut_provenance`, or rebuild through `deliver.py build`. |
 | `.prod.md5` **newer**, digest still mismatched | `Prod/` genuinely moved after the build. The programme is a rebuild behind. |
 
+**`built_from_commit` is written only by `deliver.py build`**, after a
+declared `rebuild` command exits 0. Running the same command by hand and then
+`publish` records the input digest but leaves the stamp where it was — the
+tool deliberately cannot know which commit rendered the file on disk, because
+stamping HEAD there is how re-publishes once certified acts they never built.
+So: rebuild through the tool, never by hand. An act with no declared `rebuild`
+(acts II and VI, by design — their burns are not idempotent) cannot earn the
+stamp at all today; that gap is
+[#348](https://github.com/castrojo/destiny-vids/issues/348).
+
 ### What the programme rung proves, and what it does not
 
 `check_megacut` asks three questions, and two of them are narrower than an
