@@ -72,6 +72,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import importlib
 import json
 import re
 import sys
@@ -817,6 +818,69 @@ def entries(act, *, include_block_labels=False):
     return act_entries, unresolved
 
 
+def emitted_entries(act):
+    """(the plates the act's BUILD emits, unresolved).
+
+    ``entries`` above is the chapter file's own reading of itself. An act
+    whose builder MOVES a seat between the file and the manifest -- act II,
+    whose `paused` block rebases the pins authored after it and whose
+    ``source_anchor`` rows are seated on the frames they name -- resolves to
+    something the delivered master does not carry, and every command an
+    editor is pointed at (``show``, ``check``) has to describe the film that
+    ships rather than the file's raw schedule.
+
+    That mapping belongs to the builder that performs it, so the chapter
+    file declares it (``reseat: <path>:<function>`` in the front matter) and
+    it is imported lazily, only for the act that has one. Restating the
+    builder's arithmetic here would be a second copy of it, and the copy
+    nobody rebuilds from is the one that goes stale.
+
+    An act with no hook resolves to exactly ``entries(act)``.
+    """
+    resolved, unresolved = entries(act, include_block_labels=True)
+    reseat, note = _reseater(act)
+    if note is not None:
+        unresolved.append(note)
+    if reseat is None:
+        for entry in resolved:
+            entry.pop("_chapter_label", None)
+        return resolved, unresolved
+    return list(reseat(resolved)), unresolved
+
+
+def _reseater(act):
+    """The act builder's seat mapping -> ``(callable or None, note)``.
+
+    Declared by the chapter file rather than wired here, and imported only
+    when it is asked for: a general chapter tool must not depend on one
+    act's renderer, and that renderer already imports THIS module. The hook
+    keeps the dependency one-way.
+
+    A hook that cannot be loaded degrades to no mapping and a recorded note.
+    A preview one release out of date is worth more than a traceback in
+    front of somebody who only wanted to read their own dialogue back.
+    """
+    try:
+        chap = chapter(act)
+    except KeyError:
+        return None, None
+    declared = chap.fields.get("reseat")
+    if not isinstance(declared, str) or not declared.strip():
+        return None, None
+    target, _, func_name = declared.strip().rpartition(":")
+    module_path = REPO_ROOT / target
+    try:
+        if str(module_path.parent) not in sys.path:
+            sys.path.insert(0, str(module_path.parent))
+        module = importlib.import_module(module_path.stem)
+        return getattr(module, func_name), None
+    except Exception as exc:  # noqa: BLE001 -- any import failure degrades
+        return None, (f"the declared reseat hook {declared!r} could not be "
+                      f"loaded ({exc.__class__.__name__}: {exc}); seats are "
+                      "shown as this file schedules them, which is not "
+                      "necessarily what the build emits")
+
+
 def deck_entries(act):
     """The slides that play AFTER the act -> (entries, unresolved).
 
@@ -1425,7 +1489,11 @@ def check(act):
     if chap.manifest_path() is None:
         return []
     committed = manifest_plates(act)
-    resolved, _ = entries(act)
+    # The seats the BUILD emits, not this file's raw schedule: an act that
+    # reseats a line (act II) would otherwise report its own accepted
+    # mapping as ten lines of permanent drift, and real drift would be
+    # indistinguishable from it.
+    resolved, _ = emitted_entries(act)
     if not resolved and any(p.get("copy_source") not in DERIVED_COPY
                             for p in committed):
         # A file that resolves to nothing used to report nothing, which is
@@ -1571,13 +1639,31 @@ def main(argv=None):
                   "add one as `## <programme time>` followed by "
                   "`Speaker: line` rows")
             return 0
-        for block in blocks:
+        # `@ <programme time>` is the clock the owner scrubs, so this has to
+        # print the seat the BUILD emits. Act II moves two classes of line
+        # between this file and its manifest; showing the raw schedule sent
+        # an editor to a timecode 47 s from the picture they meant to nudge.
+        emitted, notes = emitted_entries(args.act)
+        for note in notes:
+            print(f"  NOTE: {note}")
+        seats = {e["id"]: e for e in emitted if "id" in e}
+        for b, block in enumerate(blocks, 1):
             at, holds, notes = schedule_block(
                 block, offset, seats=seat_lines(args.act, block["lines"]))
             label = f"  # {block['label']}" if block["label"] else ""
             print(f"## {format_tc(block['anchor'])}{label}")
-            for line, start, hold in zip(block["lines"], at, holds):
+            for n, (line, start, hold) in enumerate(
+                    zip(block["lines"], at, holds), 1):
                 pin = " (pinned)" if line["pin"] is not None else ""
+                seat = seats.get(line["id"]
+                                 or _generated_id(args.act, b, n, line))
+                if seat is not None and seat.get("at") is not None:
+                    if start is None or abs(seat["at"] - start) > 5e-4:
+                        # The builder seated this somewhere else. Say so:
+                        # an unexplained clock is how a preview stops being
+                        # believed.
+                        pin += " (reseated by the build)"
+                    start, hold = seat["at"], seat.get("dur", hold)
                 if line["kind"] == "boss":
                     what = f"! {line['name']}"
                 elif line["kind"] == "card":

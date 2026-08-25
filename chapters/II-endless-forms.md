@@ -21,6 +21,15 @@ field_order: id, at, dur, name, title, title_source, kind, position,
   avatar, avatar_url, bond_of
 # The act's own length comes from the manifest's `_film_sec`; it is not
 # restated here, because a second copy is a future contradiction.
+#
+# THE BUILDER THAT RESEATS THESE LINES before they reach the manifest. Two
+# authored mechanisms move an entry between this file and the record that
+# ships: a `source_anchor` row is seated on the source frame it names, and a
+# pin past the old hallway return is rebased by however much the `paused`
+# block has grown. `show` and `check` ask the builder for the seat it will
+# emit rather than printing this file's raw schedule, so the clock quoted
+# here is the clock in the delivered master.
+reseat: scripts/build_efmb_plates.py:reseat_chapter_entries
 ---
 
 # Act II — Endless Forms Most Beautiful: conversations

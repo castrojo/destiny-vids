@@ -118,6 +118,27 @@ across-the-board rebase every other post-pause pin gets when the paused
 block's length changes (it is already seated against the current footage, not
 against a stale hand-typed pause length).
 
+**`show` and `check` print the seat the BUILD emits, not the file's raw
+schedule.** An act whose builder moves a line between the chapter file and
+the manifest — act II does both of the things above — declares the mapping in
+its front matter:
+
+```
+reseat: scripts/build_efmb_plates.py:reseat_chapter_entries
+```
+
+`chapter_md.emitted_entries(act)` imports that function lazily (only for the
+act that declares one, so the general chapter tool never depends on one act's
+renderer) and hands it the resolved entries; `show` marks anything it moves
+`(reseated by the build)` and `check` compares the moved seats. Without it,
+`show` quotes a programme time the delivered master does not carry — an
+editor asked to nudge a line scrubs to it and is looking at the wrong
+picture — and `check` reports the accepted mapping as permanent drift, which
+hides the real thing. A hook that cannot be imported degrades to the file's
+own schedule with a note, and never raises. **The mapping lives in the
+builder that performs it**; restating it in `chapter_md` (or in a test) is a
+second copy, and the copy nobody rebuilds from is the one that goes stale.
+
 **The orphan trap, retired:** `dialogue/yt_destiny_all_live_action_trailers/`
 used to carry exactly one line — Cayde's "I'm so proud of you kids!"
 sign-off, an owner-supplied line recorded in #93 that stopped playing when
