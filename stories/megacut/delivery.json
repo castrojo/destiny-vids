@@ -50,11 +50,13 @@
   "II": {
    "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
    "note": "#98's overlay pass; `renders/efmb-hq.mp4` is the pre-plate picture",
-   "rebuild_note": "No one-command `rebuild`, for the same reason as act VI: the delivered file is a PLATE BURN (renders/efmb-plated.mp4) over the pre-plate picture (renders/efmb-hq.mp4), burning is not idempotent, and nothing in the repo writes the plated name -- so a guessed command would burn a second set of nameplates about real people on top of the first rather than fail. The route is: (1) python3 scripts/build_efmb.py to rebuild renders/efmb-hq.mp4; (2) python3 scripts/build_efmb_plates.py --write to regenerate stories/02-endless-forms-plates.json, which is an OUTPUT -- copy added to the manifest by hand is reverted by the next build, so it goes in the generator; (3) burn those plates onto efmb-hq.mp4, never onto efmb-plated.mp4; (4) `deliver.py publish --act II`. Step 3 is the one that has to be watched, so this stays a human route until the burn is idempotent.",
+   "rebuild": "bash scripts/rebuild_efmb.sh",
+   "rebuild_note": "The delivered file is a PLATE BURN (renders/efmb-plated.mp4) over the pre-plate picture (renders/efmb-hq.mp4), and burning is not idempotent, so the declared `rebuild` is a wrapper (scripts/rebuild_efmb.sh, #348) that names the three steps explicitly: (1) build_efmb.py --render rebuilds the CLEAN efmb-hq.mp4; (2) build_efmb_plates.py --write regenerates stories/02-endless-forms-plates.json, which is an OUTPUT -- copy added to the manifest by hand is reverted by the next build, so it goes in the generator; (3) plate.py burn targets efmb-hq.mp4, never efmb-plated.mp4, and its farm fetch is atomic (burntmp, then replace). That is what makes the route safe to declare: the burn always starts from the picture step 1 just rendered, so a re-run can never stack a second set of nameplates about real people onto the first.",
    "sources": [
     "scripts/build_efmb.py",
     "scripts/build_efmb_plates.py",
     "scripts/efmb_beats.py",
+    "scripts/rebuild_efmb.sh",
     "stories/02-endless-forms-plates.json",
     "music/bed_endless_forms_most_beautiful.json",
     "music/bed_local_forecast_slower.json",
@@ -97,7 +99,7 @@
    ],
    "source_digest": "86c3e7efebbfeb842dca4b1e941f038216fa8995938d1b8b66fe6163da4b85fd",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
-   "rebuild": "ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json"
+   "rebuild": "env ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json"
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",

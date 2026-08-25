@@ -9,9 +9,11 @@ plates_key: cta_cards
 timed: false
 # Nothing here is pinned to a second. This is where the chapter falls in the
 # running order, so a read-through of the whole show puts it in the right
-# place -- it is never used to seat a card. Act VIII starts at 1732.124 by
-# the summed running order (see any timed chapter's derivation).
-programme_start: 1732.124
+# place -- it is never used to seat a card. Act VIII starts at 1809.996,
+# summed on 2026-08-25 the way tools/megacut.py's item_duration sums it:
+# act VII's start 1564.913 (see chapters/VII-europa.md) + act VII 108.400 +
+# the mission pause 23.423 + Perfume 5 3.760 + Perfume 5-ending 109.500.
+programme_start: 1809.996
 # No key in this run is a list: `body` here is one sentence under a name,
 # not the several lines a book page carries.
 list_keys:
