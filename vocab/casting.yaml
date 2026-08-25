@@ -309,10 +309,16 @@ leads:
       # warrior in the entire series".
       #
       # GAP: no `avatar` is set, so the wreath has no portrait to ring yet.
-      # No GitHub login for Karena is recorded anywhere in this repo (the one
-      # candidate spelling, `@karenaangel` in a docs/plans/wolves example,
-      # does not resolve on GitHub), and a login is not an agent's to guess.
-      # TODO(owner): supply Karena's GitHub login or an avatar path/URL.
+      # OWNER-SUPPLIED 2026-08-24: https://github.com/angellk. This closes the
+      # standing TODO -- the earlier candidate spelling `@karenaangel` from a
+      # docs/plans/wolves example does not resolve on GitHub, and a login is
+      # never an agent's to guess. Her act III chat pill resolves its handle
+      # and its avatar from this one field, exactly as Bob's and Doc's do.
+      github: angellk
+      # Keeps the internal character key out of the conversation the
+      # owner edits: her line reads `angellk` in DIALOGUE.md, not
+      # `Mara Sov (Karena Angell)`.
+      dialogue_label: angellk
       note: >
         Re-authored for act II (2026-08). Previous owner-supplied plate,
         verbatim: label "ARCHITECT // GENERAL", class "Warlock", name "Karena
