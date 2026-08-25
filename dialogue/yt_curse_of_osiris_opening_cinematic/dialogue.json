@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "Script layout keeps all 26 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doc Anderson or Bob Killen."
+    "note": "Script layout keeps all 27 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doc Anderson or Bob Killen."
   },
   "cues": [
     {
@@ -234,6 +234,15 @@
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "Hive is the one stuck in the CNCF Sandbox!",
+      "text_source": "owner_supplied"
+    },
+    {
+      "id": "d28",
+      "start_sec": 133.2,
+      "end_sec": 135.4,
+      "character": "osiris",
+      "evidence": "owner_supplied",
+      "text": "You need to apply, check your email, focus!",
       "text_source": "owner_supplied"
     },
     {

@@ -133,16 +133,18 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         assert cue["text"].strip()
     assert data["text_source"]["method"] == "owner_supplied"
     assert data["speaker_source"]["method"] == "owner_supplied"
-    assert data["display"] == {
-        "mode": "script",
-        "start_sec": 32.56,
-        "standalone_leads": False,
-        "note": (
-            "Script layout keeps all 26 lines readable in order; standalone "
-            "lead plates are omitted because every dialogue pill identifies "
-            "Doc Anderson or Bob Killen."
-        ),
-    }
+    assert data["display"]["mode"] == "script"
+    assert data["display"]["start_sec"] == 32.56
+    assert data["display"]["standalone_leads"] is False
+    # The note COUNTS the lines, so pinning it verbatim let it go stale every
+    # time one was added or retired -- and it did, silently, because a
+    # verbatim assertion of a wrong string still passes. Derive the number
+    # instead: the note can only be right or the test red.
+    assert data["display"]["note"] == (
+        f"Script layout keeps all {len(data['cues'])} lines readable in "
+        "order; standalone lead plates are omitted because every dialogue "
+        "pill identifies Doc Anderson or Bob Killen."
+    )
 
 
 @pytest.mark.parametrize(
@@ -339,3 +341,30 @@ def test_act_three_review_copy_and_splits_are_exact():
     assert by_id["d27"]["text"] == "Hive is the one stuck in the CNCF Sandbox!"
     ids = [c["id"] for c in data["cues"]]
     assert ids.index("d20a") < ids.index("d20b") < ids.index("d21")
+
+
+def test_act3_bob_barks_at_the_maintainers_before_asking_for_them():
+    """Owner, 2026-08-24: 'add 2 new lines, at 2:13 "mrbobbytables: You need
+    to apply, check your email, focus!" then leave everything else.'
+
+    Only one line of copy was supplied, so one was added. It is seated in the
+    2.64 s of pill-free picture between the Hive quip and the maintainer
+    exchange -- the gap the owner was looking at -- and it is UNPINNED on
+    purpose. A pin at 2:13.00 exactly would run to 2:15.20 and overlap d22,
+    whose 2:14.82 seat the owner pinned and then said to leave; flowing puts
+    the line as early as it can go without touching a beat that was already
+    placed. It lands at 2:12.43 and clears d22 by 0.19 s.
+    """
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cues = data["cues"]
+    by_id = {cue["id"]: cue for cue in cues}
+
+    assert by_id["d28"]["text"] == "You need to apply, check your email, focus!"
+    assert by_id["d28"]["character"] == "osiris", "Bob Killen's character"
+    assert by_id["d28"]["text_source"] == "owner_supplied"
+    assert "pin_sec" not in by_id["d28"], (
+        "pinning it at 2:13.00 would overlap d22, and d22 does not move")
+
+    ids = [cue["id"] for cue in cues]
+    assert ids.index("d27") < ids.index("d28") < ids.index("d22")
+    assert by_id["d22"]["pin_sec"] == 134.82, "the exchange did not move"
