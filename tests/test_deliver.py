@@ -278,6 +278,68 @@ def test_rebuilding_an_act_schedules_every_downstream_delivery_rung(
         assert f"would {label}" in output
 
 
+def test_a_rebuilt_act_with_an_exempt_social_never_queues_one(ws, capsys):
+    """The rebuild -> re-link -> social chain must stop before an
+    absent-by-design act: its exemption is a recorded editorial decision, and
+    the cap math turns the attempt into a build failure (act VIII, re-linked
+    2026-08-25: 256k of audio over 492.8 s already exceeds the cap)."""
+    delivery = json.loads((ws / "delivery.json").read_text())
+    source = ws / "stories.json"
+    source.write_text('{"copy": "new"}')
+    delivery["masters"]["II"].update({
+        "sources": [str(source)],
+        "source_digest": "outdated",
+        "rebuild": ["echo", "rebuild-song"],
+    })
+    (ws / "delivery.json").write_text(json.dumps(delivery))
+
+    capsys.readouterr()
+    assert run(ws, "build", "--dry-run") == 0
+    output = capsys.readouterr().out
+    assert "would rebuild II" in output
+    assert "would link II" in output
+    assert "would social II" not in output
+
+
+def test_a_builds_per_act_publishes_describe_every_act(ws, monkeypatch,
+                                                       capsys):
+    """The publish after each rebuild/link action regenerates the README
+    table and CHECKSUMS from the WHOLE delivery map. Passing the one act
+    being rebuilt left a one-row table behind every multi-act build, so the
+    README went stale the moment the build finished (2026-08-25)."""
+    import types as _types
+    delivery = json.loads((ws / "delivery.json").read_text())
+    for numeral in ("I", "II"):
+        source = ws / f"stories-{numeral}.json"
+        source.write_text('{"copy": "new"}')
+        delivery["masters"][numeral].update({
+            "sources": [str(source)],
+            "source_digest": "outdated",
+            "rebuild": ["echo", f"rebuild-{numeral}"],
+        })
+    (ws / "delivery.json").write_text(json.dumps(delivery))
+
+    import subprocess as real_subprocess
+    real_run = real_subprocess.run
+
+    def fake_run(argv, **kwargs):
+        # The fixture's masters are not video: the megacut and social
+        # programs would really run against them. Stub the exec, keep the
+        # bookkeeping around them.
+        joined = " ".join(str(t) for t in argv)
+        if "megacut.py" in joined or "social.py" in joined:
+            return real_subprocess.CompletedProcess(argv, 0, "", "")
+        return real_run(argv, **kwargs)
+
+    monkeypatch.setattr(deliver, "subprocess",
+                        _types.SimpleNamespace(run=fake_run))
+
+    capsys.readouterr()
+    assert run(ws, "build") == 0
+    text = (ws / "wolves" / "Prod" / "README.md").read_text()
+    assert "01-intro.mp4" in text and "02-song.mp4" in text
+
+
 def test_a_missing_megacut_is_a_build_action(ws, capsys):
     (ws / "wolves" / "megacut" / "show-v1.mp4").unlink()
     assert findings(gather(ws), "")["megacut"].state == deliver.MISSING

@@ -247,28 +247,28 @@ Edit in `chapters/P4-underwater.md`.
 
 Edit in `chapters/VII-europa.md`.
 
-- `25:04.83` **krook** — Deploy CNCF Projects Team
-- `25:06.83` **preethit** — Stand down, I'm sending my wolf
-- `25:08.83` **alolita** — Are you sure the Kube is on Europa?
-- `25:11.83` **preethit** — I hope she can handle the Kube
-- `25:14.23` **preethit** — I must not fail
-- `25:16.68` **alolita** — We have failed, Guardians are down
-- `25:19.20` **tophee** — I've confirmed it myself, we have no choice
-- `25:22.32` **tophee** — She's the only way to stop the Toilmaster
-- `25:28.83` **castrojo** — They must never know what you did for them
-- `25:31.83` **mrbobbytables** — When all hope is lost
-- `25:34.23` **jeefy** — Standing by for Extraction
-- `25:36.83` **ihor** — G{k8s}dspeed
-- `25:39.43` **preethit** — Our clan
-- `25:41.88` **preethit** — Is the Iron
-- `25:44.33` **preethit** — That forges Wolves
-- `25:46.78` **mrbobbytables** — Wolves gladly sacrifice for their own
-- `25:49.50` **krook** — Initiate Lone Wolf Protocol
-- `25:51.95` **iancoldwater** — Local Security systems trivially pwned
-- `25:54.73` **tabbysable** — Europan Security systems trivially pwned (again)
-- `26:05.83` **nimbatus** — Wilco
-- `26:08.03` **nimbatus** — {k8s}ut
-- `26:15.00` **preethit** — Hummingbird will find the girl
+- `25:40.36` **krook** — Deploy CNCF Projects Team
+- `25:42.36` **preethit** — Stand down, I'm sending my wolf
+- `25:44.36` **alolita** — Are you sure the Kube is on Europa?
+- `25:47.36` **preethit** — I hope she can handle the Kube
+- `25:49.76` **preethit** — I must not fail
+- `25:52.21` **alolita** — We have failed, Guardians are down
+- `25:54.72` **tophee** — I've confirmed it myself, we have no choice
+- `25:57.84` **tophee** — She's the only way to stop the Toilmaster
+- `26:04.36` **castrojo** — They must never know what you did for them
+- `26:07.36` **mrbobbytables** — When all hope is lost
+- `26:09.76` **jeefy** — Standing by for Extraction
+- `26:12.36` **ihor** — G{k8s}dspeed
+- `26:14.96` **preethit** — Our clan
+- `26:17.41` **preethit** — Is the Iron
+- `26:19.86` **preethit** — That forges Wolves
+- `26:22.31` **mrbobbytables** — Wolves gladly sacrifice for their own
+- `26:25.02` **krook** — Initiate Lone Wolf Protocol
+- `26:27.47` **iancoldwater** — Local Security systems trivially pwned
+- `26:30.26` **tabbysable** — Europan Security systems trivially pwned (again)
+- `26:41.36` **nimbatus** — Wilco
+- `26:43.56` **nimbatus** — {k8s}ut
+- `26:50.53` **preethit** — Hummingbird will find the girl
 
 ## VIII-cta
 

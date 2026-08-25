@@ -76,18 +76,21 @@ def trim_command(ffmpeg):
     video_duration = TRIM_END - TRIM_START
     freeze_duration = OUTPUT_DURATION - video_duration
     audio_start = TRIM_START + AUDIO_SYNC_OFFSET
+    # .resolve() so every path token is canonical: farm staging matches argv
+    # tokens exactly, and both legs must agree when renders/ or media/ is a
+    # symlink (a worktree building onto the durable stores).
     return [
         *ffmpeg, "-y",
         "-ss", f"{TRIM_START}", "-t", f"{video_duration:.2f}",
-        "-i", str(REPO_ROOT / VIDEO_SRC),
+        "-i", str(Path(REPO_ROOT / VIDEO_SRC).resolve()),
         "-ss", f"{audio_start:.6f}",
-        "-i", str(REPO_ROOT / AUDIO_SRC),
+        "-i", str(Path(REPO_ROOT / AUDIO_SRC).resolve()),
         "-map", "0:v", "-map", "1:a",
         "-vf", f"tpad=stop_mode=clone:stop_duration={freeze_duration:.6f}",
         "-t", f"{OUTPUT_DURATION:.3f}",
         "-c:v", "libx264", "-crf", "14", "-pix_fmt", "yuv420p",
         "-c:a", "flac",
-        str(REPO_ROOT / TRIM),
+        str(Path(REPO_ROOT / TRIM).resolve()),
     ]
 
 
@@ -150,10 +153,21 @@ def _farm_runner(cmd, inputs, out, expected_duration):
     from tools import farm
 
     def run(argv):
+        # plate.burn .resolve()s every path it puts in the argv, so the
+        # staging check's exact-token match only holds if the inputs are
+        # resolved the same way -- a symlinked renders/ (a worktree whose
+        # masters live at their durable paths) otherwise reads as "argv never
+        # reads staged input". resolve() is a no-op on canonical paths.
+        #
+        # The fetch target is read off the ARGV, never the caller's `out`:
+        # burn() rewrites the final token to a `.burntmp` sibling so an
+        # interrupted encode cannot truncate the delivered master (#286), and
+        # the farm refuses an `out` the argv does not name verbatim. The trim
+        # leg's last token is its output outright, so one rule serves both.
         farm.run_ffmpeg_on_cluster(
             argv,
-            inputs=[REPO_ROOT / p for p in inputs],
-            out=REPO_ROOT / out,
+            inputs=[Path(REPO_ROOT / p).resolve() for p in inputs],
+            out=Path(argv[-1]),
             expected_duration=expected_duration,
         )
 
