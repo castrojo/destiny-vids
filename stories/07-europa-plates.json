@@ -3,11 +3,11 @@
  "_provenance": "Every line of copy is the OWNER'S OWN, from #102's terse-pass table, reproduced VERBATIM -- including 'AN4-CH4K-12' and the asterisk in 'f*cking' -- with the BSHERMAN recast applied. The removed sign-off ('... disavow my existence. Tell the medic and the engineer I'll meet them there. Out.') stays removed; it lives on in #102 and the project's _backups/. The picture graph, the audio join, the reveal/endcard cards and their windows are a RECORD of what shipped (nimbatus-review/render/run-final-hq.sh), not a new edit. The pill windows are the one new authoring: #102's proposed schedule with the cold open compressed to clear the clock shot (see c02's _note).",
  "act": "VII",
  "title": "Europa",
- "film_sec": 95.4,
+ "film_sec": 108.4,
  "trim": {
   "in": 0.0,
-  "out": 95.4,
-  "_note": "The delivered act is 95.4 s (2862 frames at 30 fps): the 108.333333 s master is cut at 95.4 with the picture STREAM-COPIED, dropping the comic-cover tail (95.333333-108.333333), which is act VIII's reveal now (#178). The audio is faded out over its last 2.5 s (92.833333 + 2.5) and trimmed to 95.333333. Every window below is on the delivered cut's own clock, which matches the master's clock for 0-95.333333."
+  "out": 108.4,
+  "_note": "The delivered act is 108.4 s (3252 frames at 30 fps): since the Jupiter tail landed (owner, 2026-08-23) the delivered film is the master's FULL LENGTH -- the 13 s tail slot (the comic cover is retired; git keeps it) holds the nightway composite and the two tail cards, fading to black at 106.333-108.333. The picture is STREAM-COPIED from the peaks-gated master; the audio is the song alone (465.0-560.4) then SILENCE padded to 108.4 (audio.delivered_apad). Every plate window below is on the delivered cut's own clock, which matches the master's clock throughout."
  },
  "letterbox": {
   "active_height": 804,
@@ -39,6 +39,52 @@
   "retired_note": "Owner 2026-08-16: remove the KubeCon announcement from Europa. The underlying Jupiter wrap remains.",
   "_note": "The KubeCon announcement card ('Coming to KubeCon + Cloud Native Con NA / Salt Lake City, UT, USA / Kube of Destiny Located. Status: Calamitous'), project-supplied like the reveal. Runs to 97.2, 66 ms before the delivered cut ends. It is a full-frame card: a still input that was NOT opened with -framerate 30 was the original ghost-frame bug, so the record's encode.loop_framerate is load-bearing.",
   "_not_repo_rendered": "Rendered by the project's render-endcards.mjs from endcard.html; consumed here as an existing PNG, same as the reveal."
+ },
+ "tail": {
+  "_note": "The Jupiter ending. Owner direction 2026-08-23, verbatim in _direction (preserved in commit b9d9d03's message). The retired comic cover's 13.0 s slot becomes the held nightway: the wrap frame at 8.4 s with the concept sheet's three full-body figures seated on the deck line as white-ink apparitions, then the two owner-copy cards, then the act's own fade to black and act VIII's credits. scripts/build_europa_tail.py renders the composite and both cards FRESH on every build -- existence is not freshness.",
+  "_direction": "After the jupiter fade hold Jupiter and slice up Screenshot From 2026-08-23 05-10-23.png for the characters and place them on the jupiter nightway. Try to make it dramatic. Then add in title-appropriate text // For other wolves, some will give all // Bluefin and the Forbidden Factory / KubeCon + CloudNativeCon EU 2027 / Maintainer Summit // Then roll the credits.",
+  "hold": {
+   "backdrop": {
+    "from": "wrap",
+    "at": 8.4,
+    "_note": "The wrap's last-bright frame: Jupiter's crescent left, Europa filling the right half, the company on the deck line between them."
+   },
+   "source_screenshot": {
+    "path": "~/Pictures/Screenshots/Screenshot From 2026-08-23 05-10-23.png",
+    "sha256": "45ada9a801e7dedacf906f69bcc0b328f04c659cc531a41b2d6ca8faaa619d77",
+    "_note": "The owner's concept sheet (the LAKSHMI character lineup). NEVER COMMITTED -- referenced by path and digest like every other external asset. The sheet's fourth figure (a portrait bust) is dropped: a floating head reads as a mistake beside three full-body wolves."
+   },
+   "composite_out": "nimbatus-review/render/repo-build/jupiter-hold.png",
+   "treatment": "Luminance-keyed pencil ink recoloured to the act's plate ink (232,238,246) with a cool halo; annotation labels and leader lines removed by erase rects plus thin-line run geometry. Static placement for MVP -- a slow push is the recorded follow-up."
+  },
+  "cards": [
+   {
+    "id": "tail-dedication",
+    "lines": [
+     "For other wolves, some will give all"
+    ],
+    "at": 96.8,
+    "dur": 4.6,
+    "fade_in": 0.8,
+    "fade_out_at": 100.6,
+    "fade_out": 0.8,
+    "_note": "The memorial line, owner copy verbatim (casing included), letterspaced serif italic in the starfield above the company. Repo-rendered by build_europa_tail.py; resolves by id like any pill."
+   },
+   {
+    "id": "tail-event",
+    "lines": [
+     "Bluefin and the Forbidden Factory",
+     "KubeCon + CloudNativeCon EU 2027",
+     "Maintainer Summit"
+    ],
+    "at": 102.2,
+    "dur": 4.9,
+    "fade_in": 0.8,
+    "fade_out_at": 106.3,
+    "fade_out": 0.8,
+    "_note": "The event card, owner copy verbatim -- KubeCon + CloudNativeCon keep brand casing, so no uppercase homage here. Clears at 107.1, 1.2 s before the hold's own fade completes; act VIII's credits follow."
+   }
+  ]
  },
  "plates": [
   {
@@ -324,16 +370,16 @@
   "fps": 30,
   "master_sec": 108.333333,
   "content_sec": 95.333333,
-  "delivered_sec": 95.4,
-  "delivered_frames": 2862,
-  "audio_sec": 95.333333,
+  "delivered_sec": 108.4,
+  "delivered_frames": 3252,
+  "audio_sec": 108.4,
   "inputs": {
    "intro": "wolves-directors-cut-europa-intro-hq.mp4",
    "jupiter": "nimbatus-review/jupiter/cand/PIA22906_nasa.mp4",
    "wrap": "nimbatus-review/ext/wrap1080.mp4",
    "beyond": "sources/Act2-BeyondLight-reveal-T9FIbmj1Qf0-1080p24-2262k.mp4",
    "song": "Beauty Of The Beast [X3WrCzLIIvk].webm",
-   "cover": "~/Downloads/wolves.jpg"
+   "hold": "nimbatus-review/render/repo-build/jupiter-hold.png"
   },
   "segments": [
    {
@@ -399,15 +445,12 @@
     }
    },
    {
-    "label": "cover",
-    "from": "cover",
+    "label": "jupiter-hold",
+    "from": "hold",
     "still": true,
     "dur": 13.0,
     "fps": 30,
-    "scale_pad": {
-     "side": 1080,
-     "x": 420
-    },
+    "scale": true,
     "fade_in": {
      "at": 0.0,
      "dur": 1.2
@@ -415,10 +458,11 @@
     "fade_out": {
      "at": 11.0,
      "dur": 2.0
-    }
+    },
+    "_note": "The owner's 2026-08-23 Jupiter ending (direction verbatim in this record's tail block): the wrap's nightway frame HELD for the retired cover's whole slot, carrying the concept-sheet company as white-ink apparitions and two repo-rendered cards (tail.cards), then the act's own fade to black into act VIII's credits. The composite is rendered fresh every build by scripts/build_europa_tail.py into the project's repo-build/; the comic cover it replaced stays recoverable from git history."
    }
   ],
-  "_note": "The concat reproduces nimbatus-review/render/run-final-hq.sh's picture order, minus the close-up and the old Jupiter dissolve/held-still transition: the 57.5 s intro is split around a native 195-frame Juno video slot, followed by 5.133333 + 21.5 + 2.2 + 9.0 = 95.333333 s of content, then the 13 s comic cover to a 108.333333 s master. The Jupiter source is already 1920x1080 at 30 fps; the graph only aligns its timestamps and concat format. The walk-up's fps=30 runs BEFORE its frame trim (so frames 3443-3509 are counted on the 30 fps conversion, i.e. source times 114.767-116.967; the measured native cut is 116.958): the solo wide runs from source 114.767 through that original cut, and the close-up is removed because both other Guardians are already visible behind the Exo Stranger. The walk-up's baked fade_out and the wrap's fade_in are both GONE -- the join is a hard cut, so both sides stay clean; the wrap's own closing fade stays. The speeder's window is a TIME trim on the native 24 fps stream, then fps=30. An input feeding multiple segments is split, never opened twice -- frame-exactness by construction, not by seek.",
+  "_note": "The concat reproduces nimbatus-review/render/run-final-hq.sh's picture order, minus the close-up and the old Jupiter dissolve/held-still transition: the 57.5 s intro is split around a native 195-frame Juno video slot, followed by 5.133333 + 21.5 + 2.2 + 9.0 = 95.333333 s of content, then the 13 s jupiter-hold tail (the retired comic cover's slot, owner 2026-08-23 -- see this record's tail block) to a 108.333333 s master. The Jupiter source is already 1920x1080 at 30 fps; the graph only aligns its timestamps and concat format. The walk-up's fps=30 runs BEFORE its frame trim (so frames 3443-3509 are counted on the 30 fps conversion, i.e. source times 114.767-116.967; the measured native cut is 116.958): the solo wide runs from source 114.767 through that original cut, and the close-up is removed because both other Guardians are already visible behind the Exo Stranger. The walk-up's baked fade_out and the wrap's fade_in are both GONE -- the join is a hard cut, so both sides stay clean; the wrap's own closing fade stays. The speeder's window is a TIME trim on the native 24 fps stream, then fps=30. An input feeding multiple segments is split, never opened twice -- frame-exactness by construction, not by seek.",
   "_sources_note": "intro: the act's own 79 s plate-free picture (built by nimbatus-review/hq/build-intro-hq.sh). jupiter: the native PIA22906 Juno video, NASA/JPL-Caltech/SwRI/MSSS/Kevin M. Gill, public-domain source, staged in the project and never committed. beyond: Bungie's Act 2 / Beyond Light reveal (T9FIbmj1Qf0), third-party copyrighted, used under Bungie's fan-content policy like the rest of the index (#55). wrap: the project's Nimbatus outro sting. cover: ~/Downloads/wolves.jpg, the comic cover act VIII owns (#178). Footage is never committed."
  },
  "audio": {
@@ -432,15 +476,16 @@
     "format": true
    }
   ],
-  "_note": "THE SONG ALONE, AND NO FADES (owner, 2026-08-20). Beauty of the Beast 465.0-560.4 s runs under the whole delivered film -- 7:45 through picture end -- as a FULL REPLACEMENT: the intro's own audio is not heard, there is no crossfade, and neither the master nor the delivered derivative fades out. 95.4 s of song covers the delivered 95.333333 s with 0.067 s spare, so the cut lands inside the song rather than on a fade. The cover (95.333333-108.333333) therefore plays silent in the master; the master is an intermediate and the nocover derivative is what ships. \n\nTHIS BLOCK WAS OUT OF DATE FOR THREE DAYS AND A REBUILD REVERTED THE ACT. The owner remuxed this mix onto the delivered picture on 2026-08-20 and it shipped, but the record kept describing the PREVIOUS two-leg mix and scripts/build_europa.py kept building it, so the 2026-08-23 programme regeneration silently put the old song back -- the owner caught it on the screen ('europa is stale I want the new song'). The record now describes what ships, and tests/test_europa_act.py pins it, because a builder that disagrees with the delivered file is a revert waiting for the next rebuild.\n\nThe PREVIOUS mix, kept for provenance only: the intro's own audio (0-79 s) crossfaded 0.1 s (tri/tri) into Beauty of the Beast (575.9-607.2), faded out over the cover (106.333333 + 2.0) and trimmed to 108.333333; the delivered film faded 92.833333 + 2.5 and trimmed to 95.333333.",
-  "_usage_class": "third_party_copyrighted -- see #55 and the rights section of AGENTS.md."
+  "_note": "THE SONG ALONE, AND NO FADES (owner, 2026-08-20). Beauty of the Beast 465.0-560.4 s runs under the act's content -- 7:45 through the wrap's fade to black at 95.333 -- as a FULL REPLACEMENT: the intro's own audio is not heard, there is no crossfade, and neither the master nor the delivered derivative fades the song out. 95.4 s of song covers the 95.333333 s content with 0.067 s spare, so the cut lands inside the song rather than on a fade. The jupiter-hold tail (95.333333-108.333333) then plays SILENT -- the memorial beat the retired comic cover filled -- and the delivered file pads its audio stream to 108.4 s (delivered_apad) so picture and sound durations match for the megacut concat. The master is an intermediate; the padding touches the delivered file only.\n\nTHIS BLOCK WAS OUT OF DATE FOR THREE DAYS AND A REBUILD REVERTED THE ACT. The owner remuxed this mix onto the delivered picture on 2026-08-20 and it shipped, but the record kept describing the PREVIOUS two-leg mix and scripts/build_europa.py kept building it, so the 2026-08-23 programme regeneration silently put the old song back -- the owner caught it on the screen ('europa is stale I want the new song'). The record now describes what ships, and tests/test_europa_act.py pins it, because a builder that disagrees with the delivered file is a revert waiting for the next rebuild.\n\nThe PREVIOUS mix, kept for provenance only: the intro's own audio (0-79 s) crossfaded 0.1 s (tri/tri) into Beauty of the Beast (575.9-607.2), faded out over the cover (106.333333 + 2.0) and trimmed to 108.333333; the delivered film faded 92.833333 + 2.5 and trimmed to 95.333333.",
+  "_usage_class": "third_party_copyrighted -- see #55 and the rights section of AGENTS.md.",
+  "delivered_apad": true
  },
  "encode": {
   "delivered": {
    "out": "wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
    "acodec": "flac",
    "surround": false,
-   "_note": "THIS is what ~/Videos/Wolves/Prod/07-europa.mp4 hardlinks to: 95.4 s (2862 frames), FLAC stereo, picture stream-copied from the peaks-gated 108.333333 s master (-0.9..-1.1 dBTP, #82) with the cover cut. The master itself is a build intermediate (kept in the project's render/repo-build/), not a deliverable."
+   "_note": "THIS is what ~/Videos/Wolves/Prod/07-europa.mp4 hardlinks to: 108.4 s (3252 frames), FLAC stereo, picture stream-copied from the peaks-gated 108.333333 s master (-0.9..-1.1 dBTP, #82) -- the full master since the Jupiter tail replaced the cut comic cover (owner, 2026-08-23). The master itself is a build intermediate (kept in the project's render/repo-build/), not a deliverable."
   },
   "vcodec": "libx264",
   "preset": "veryslow",
@@ -459,7 +504,9 @@
   "delivery.json's VII entry gains real sources with this record; the digest is stamped by deliver.py publish, which the delivery session owns.",
   "DIALOGUE REPLACED (owner, this round): every chat pill here is the owner's new Europa dialogue, given with programme marks 24:33 / 24:35 / 24:57 / 25:34 (act film 0.564 / 2.564 / 24.564 / 61.564). It REPLACES the previous set, which was agent-written and never owner-authored -- see the Jul 17 Whisp dictation (#120), whose deployment chat none of the old lines came from. Lines the owner pinned carry his mark; the lines he listed without one take the following gap in the order he listed them (0.4 s between pills, the convention the rest of this record uses).",
   "THE {k8s} MARK REPLACES AN O, never trails the word (owner, this round) -- the same treatment act V already uses for `G{k8s}ddamn` in stories/05-natali-plates.json. Here it is ihor's `G{k8s}dspeed` and nimbatus's `{k8s}ut`.",
-  "OPEN BEAT at programme 25:30 (act film 57.564): the owner's note carries the mark with no line against it. Nothing is placed there rather than something guessed; it is a slot waiting for copy."
+  "OPEN BEAT at programme 25:30 (act film 57.564): the owner's note carries the mark with no line against it. Nothing is placed there rather than something guessed; it is a slot waiting for copy.",
+  "Jupiter tail (2026-08-23): the concept sheet's portrait bust is DROPPED -- three full-body figures ship. If the owner wants the fourth wolf on the nightway, the bust's crop needs a seated treatment, not a float.",
+  "Jupiter tail (2026-08-23): the hold is a STATIC composite for MVP -- no push-in. A slow push on the composite is the follow-up if the owner wants movement under the cards."
  ],
  "_plate_kind": "Every dialogue plate is kind: chat -- tools/plate.py's port of the wolves plate.html pill, this repo's renderer for the house treatment. THIS is the restyle the owner asked for: the delivered master's pills were screenshotted from the project's own plate.html by playwright (nimbatus-review/render/render-plates.mjs), a chrome that matches nothing else in the show; a rebuild from this record renders every pill with plate.py, the same renderer acts IV and V use. WORDS UNCHANGED -- chrome only.",
  "_timing": "at + dur are tools/plate.py's own manifest fields, so this file renders with plate.py render --manifest unmodified. fade_out_at is absolute film time, matching the ffmpeg fade=t=out:st= it generates; the house fade pair (in 0.6, out 0.25 completing 0.05 s before the window boundary) keeps a plate from ever ghosting into the next shot."
