@@ -69,7 +69,7 @@
     "yt_destiny_all_live_action_trailers",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "63ff8f42c200673d7bbbab447210e68bbb53b803a3b926064951656d5c5c02c4",
+   "source_digest": "d5e727cfc6667b719a7767c2fb83e3324ac7c1ac0b161bbb53b8e73400272ec0",
    "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad",
    "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
   },
@@ -98,7 +98,7 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "66a325b3b91d9799f5e6b669d7176b5852cf2bb25bd4661565c3866963883dfd",
+   "source_digest": "50ae463652ddcfcc0e68838814c41b9ec19d718a8cef0170bfc0751051e41683",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "env ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json",
    "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
@@ -213,7 +213,7 @@
     "chapters/VIII-fixed.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "31bf4bcd3755878ff0e30c9c70578e1c0ce3c34e0691badecf1e485af6acd1e1",
+   "source_digest": "073b86ac44c83a785fd2f57389442144c7b5d8938f8dfda8aa5a415378a52440",
    "rebuild": "python3 scripts/build_credits.py --out ~/Videos/wolves-credits/08-credits-master.mp4",
    "built_from_commit": "24b61be902a284737b8f565c3240011daef01e6a"
   }

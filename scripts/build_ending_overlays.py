@@ -69,6 +69,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -79,7 +80,6 @@ if str(REPO) not in sys.path:
 from tools import conform  # noqa: E402
 from tools import chapter_md  # noqa: E402
 from tools import freshness  # noqa: E402
-from tools import plate as plate_mod  # noqa: E402
 from tools.render import ffmpeg_for_printing, find_ffmpeg  # noqa: E402
 from scripts import build_interludes  # noqa: E402
 
@@ -129,10 +129,10 @@ def missing_cards(doc, cards_dir, section=SECTION):
 # What draws a plate: its own copy, the renderer, and the bindings the
 # renderer reproduces. A plate older than any of these was drawn by something
 # this checkout no longer has.
-def plate_inputs(manifest):
+def card_inputs(manifest):
     return [Path(manifest),
-            REPO / "tools" / "plate.py",
-            REPO / "vocab" / "casting.yaml"]
+            REPO / "cards" / "render-cards.mjs",
+            *sorted((REPO / "cards").glob("*.html"))]
 
 
 def refresh_cards(manifest, doc, cards_dir, section=SECTION):
@@ -148,15 +148,16 @@ def refresh_cards(manifest, doc, cards_dir, section=SECTION):
     """
     wanted = [card_path(cards_dir, card)
               for card in underwater_cards(doc, section)]
-    if not freshness.stale_outputs(plate_inputs(manifest), wanted):
+    if not freshness.stale_outputs(card_inputs(manifest), wanted):
         return []
-    # Only THIS section's cards: the manifest also carries the mission-pause
-    # cards, which have no `dur` by design (their segment sequences them by
-    # frame math), and a whole-file load rightly refuses them -- but this
-    # render never draws them.
-    entries = plate_mod.load_manifest_entries(underwater_cards(doc, section))
-    plate_mod.check_copy_against_bindings(entries)
-    plate_mod.render_all(entries, cards_dir)
+    subprocess.run(
+        ["node", "cards/render-cards.mjs",
+         "--manifest", str(manifest),
+         "--out-dir", str(cards_dir),
+         "--only", ",".join(card["id"] for card in underwater_cards(doc, section))],
+        check=True,
+        cwd=REPO,
+    )
     return wanted
 
 
