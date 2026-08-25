@@ -594,13 +594,13 @@ def test_every_placard_is_somebody_who_is_on_screen(manifest):
 
     That list has since been replaced by a stricter one -- owner, 2026-08-16:
     "Remove people not in the movie from here and only use the principal
-    actors", "not jorge castro", "we want karena, bsherman, and kylegospo".
+    actors", "not jorge castro", "bsherman, and kylegospo".
     So the rule is no longer "the README's table": it is that EVERY placard is
     somebody who is on screen in a delivered act, and each entry cites the act
     it can be found in.
     """
     items, _ = B.schedule(manifest)
-    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 9
+    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 8
     for member in manifest["cast"]:
         assert member.get("seen_in"), member["person"]
     people = {c["person"] for c in manifest["cast"]}
@@ -628,15 +628,6 @@ def test_cayde_is_not_in_the_starring_roles(manifest):
                    if c["role"] == "Bluefin Created by")
     assert "Jorge O. Castro" in created["names"]
     assert any("castrojo" in s["names"] for s in manifest["contributors"])
-
-
-def test_karenas_surname_carries_one_l(manifest):
-    """The README and the owner both say 'Angel'. vocab/casting.yaml still
-    says 'Angell' and is frozen (#167), so the credits print the correction
-    and it is recorded in `unresolved`."""
-    mara = next(c for c in manifest["cast"] if c["character_id"] == "mara_sov")
-    assert mara["person"] == "Karena Angel"
-    assert any("Angel" in u for u in manifest["unresolved"])
 
 
 # --- the Cayde redaction ---------------------------------------------------

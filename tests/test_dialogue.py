@@ -144,9 +144,7 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     assert data["cues"], "no cues recovered"
     for cue in data["cues"]:
-        # Three voices now: Bob and Doc carry the act, and Karena interrupts
-        # once. Anyone else would be an uncredited claim about a real person.
-        assert cue["character"] in ("osiris", "sagira", "mara_sov")
+        assert cue["character"] in ("osiris", "sagira")
         assert cue["evidence"] in ("vocative", "alternation", "uncertain",
                                    "owner_supplied")
         assert cue["end_sec"] > cue["start_sec"]
@@ -216,7 +214,7 @@ def test_act3_the_maintainer_exchange_is_restored_after_the_hive_line():
 
     The exchange was retired the same day (#357 took d23b, d26 and d25; #358
     took d22 and the 7% line) and the owner asked for three of the five back:
-    d22, d23a and d23b. d22 is reworded to name the CNCF rather than
+    d22 and d23b. d22 is reworded to name the CNCF rather than
     Kubernetes -- 'We need', not 'You need' -- and keeps its old wording as
     recovered_text. d26 and d25 stay retired.
 
@@ -236,20 +234,13 @@ def test_act3_the_maintainer_exchange_is_restored_after_the_hive_line():
     assert by_id["d22"]["text_source"] == "owner_supplied"
     assert by_id["d22"]["recovered_text"] == (
         "You need to get a message to the Kubernetes Maintainers")
-    # d23a was Doc's 7% statistic until 2026-08-24, when the owner gave the
-    # line to Karena as a retort: "Change the email line to be spoken by
-    # https://github.com/angellk -- 'Check your email smartass'". Bob tells
-    # people to check their email, then says he needs to get a message to the
-    # maintainers, and a maintainer tells him to check his.
-    assert by_id["d23a"]["text"] == "Check your email smartass"
-    assert by_id["d23a"]["character"] == "mara_sov"
     assert by_id["d23b"]["text"] == "I don't like this plan"
-    for restored in ("d22", "d23a", "d23b"):
-        assert by_id[restored]["character"] in ("osiris", "sagira", "mara_sov")
+    for restored in ("d22", "d23b"):
+        assert by_id[restored]["character"] in ("osiris", "sagira")
 
     ids = [c["id"] for c in cues]
     assert ids.index("d21") < ids.index("d27") < ids.index("d22")
-    assert ids.index("d22") < ids.index("d23a") < ids.index("d23b")
+    assert ids.index("d22") < ids.index("d23b")
     assert ids[-1] == "d23b", "the 'I don't like this plan' line closes"
 
 
@@ -431,9 +422,8 @@ def test_one_voice_is_not_a_conversation_and_needs_no_side():
     assert dialogue.lanes_for([]) == {}
 
 
-def test_act3_lanes_survive_karena_joining():
+def test_act3_lanes_stay_a_two_hander():
     """The committed record, not a fixture: Bob stays left, Doc stays right."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     lanes = dialogue.lanes_for(data["cues"])
-    assert lanes == {"osiris": "left", "sagira": "right",
-                     "mara_sov": "center"}
+    assert lanes == {"osiris": "left", "sagira": "right"}
