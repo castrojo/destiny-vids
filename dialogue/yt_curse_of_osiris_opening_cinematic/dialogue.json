@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "Script layout keeps all 27 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doc Anderson or Bob Killen."
+    "note": "Script layout keeps all 27 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies its speaker by github handle (@mrbobbytables, @clubanderson), and both people are named in full by their own Guardian reveal cards."
   },
   "cues": [
     {
