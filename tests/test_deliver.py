@@ -1393,6 +1393,22 @@ def test_source_digest_at_matches_the_worktree_for_a_committed_file():
         deliver.source_digest(["tools/footage.py"])
 
 
+def test_source_digest_at_matches_the_worktree_for_a_committed_directory():
+    """A directory's entries must hash in PATH order, matching the worktree
+    walk. Sorting the raw ls-tree lines orders them by blob sha instead, and
+    the orders disagree for any multi-file directory -- act III's provenance
+    read "inputs have moved" on a byte-identical checkout after a squash
+    merge, because two of its declared sources are directories."""
+    import subprocess
+    rel = "assets/cncf-logos"   # five committed files, sha order != path order
+    clean = subprocess.run(["git", "status", "--porcelain", "--", rel],
+                           cwd=deliver.REPO_ROOT, capture_output=True)
+    if clean.stdout.strip():
+        pytest.skip(f"{rel} is modified in this checkout")
+    assert deliver.source_digest_at("HEAD", [rel]) == \
+        deliver.source_digest([rel])
+
+
 def test_an_act_without_a_one_command_rebuild_says_why_when_it_knows():
     """'Rebuild it by hand' sends the reader to a 400-line shell script.
 
