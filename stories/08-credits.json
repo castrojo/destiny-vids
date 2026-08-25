@@ -6,7 +6,7 @@
     "bed_id": "bed_wish_i_had_an_angel",
     "media_filename": "bed_wish_i_had_an_angel.wav",
     "source_url": "https://www.youtube.com/watch?v=xgL1oBwVG6M",
-    "_what": "PASS ONE -- the instrumental, on loop. Two spans in order, so the song starts on the drum smash, loops back to its own top, and never plays the breakdown. Owner: 'we want the song on loop basically but starting at the drum smash', and 'cut out the weird drum section with the moaning'. When this pass has played once IN FULL the bed hands over to `then` -- Nightwish's vocal Storytime recording. The instrumental pass and its measured spans remain unchanged.",
+    "_what": "PASS ONE -- the instrumental, on loop. Two spans in order, so the song starts on the drum smash, loops back to its own top, and never plays the breakdown. Owner: 'we want the song on loop basically but starting at the drum smash', and 'cut out the weird drum section with the moaning'. When this pass has played once IN FULL the bed hands over to `then` -- the Masters of Rock performance, which brings its own picture with it. The instrumental pass and its measured spans remain unchanged.",
     "segments": [
       {
         "_what": "A -- the drum smash to the last full bar. 193.420 is the MEASURED re-entry after the breakdown, +12.98 dB, the largest onset in the song. The out point was 240.780; the owner cut it: ':46 - cut all of this part and go right to the drums so the entire song sounds like a loop'. The song's ENDING starts at 240.08 -- the level falls -11 -> -17 dB and keeps falling to digital silence at 241.95 -- and an ending is exactly what a loop must not contain. :46 on the credits clock is source 239.420; the cut is at 239.653152, the nearest beat in the bed's own tracked grid, 0.23 s later and still 0.43 s clear of the decay.",
@@ -21,17 +21,30 @@
     ],
     "crossfade_sec": 0.25,
     "then": {
-      "_what": "PASS TWO -- Storytime, WITH VOCALS, and from 2026-08-16 the ALBUM version (Imaginaerum), not the official music video edit. It takes over only after the instrumental loop has run in full; pass one is never shortened to make room. Storytime's quiet opening is skipped so the hand-over lands on the full-band entry rather than losing momentum. Its grid phase is unresolved, which is honest: this pass needs a beat-aligned entrance, not an invented bar line. WHY THE VERSION CHANGED: the owner watched 35:50 of the programme -- 'this is almost perfect but cuts off too early, in the version of the song have the double bass drums here and hold the bluefin mark until the end of the song. We want the double bass drum climax.' The video edit (bed_storytime, 244.135 s) has no such climax: it sustains through ~236 s and is already decaying into its own end. The album version runs 330.743 s and carries the extended double-kick outro the edit cut (measured in music/bed_storytime_album.json grid.measured_climax). The video edit bed stays on record because this act's earlier state was built on it; nothing else about the pass changes.",
-      "bed_id": "bed_storytime_album",
-      "media_filename": "bed_storytime_album.wav",
-      "source_url": "https://www.youtube.com/watch?v=nbtcFghyuN8",
+      "_what": "PASS TWO -- NIGHTWISH LIVE AT MASTERS OF ROCK, and from 2026-08-24 the act's PICTURE as well as its bed. Owner: 'replace the song with a specific one when the nightwish segment comes on ... then I want this live concert to be the setting for the rest of the show, until completion.' It takes over only after the instrumental loop has run in full; pass one is never shortened to make room. This replaces Storytime (bed_storytime_album), and the 77.78 s wordmark hold that was measured against Storytime's double-bass climax goes with it -- see `wordmark.dur_sec`. The live audio is the bed from here, crowd and all: the owner chose the live recording over a picture-only treatment, so what the audience hears is what the room heard.",
+      "bed_id": "bed_last_ride_of_the_day_live",
+      "media_filename": "bed_last_ride_of_the_day_live.wav",
+      "source_url": "https://www.youtube.com/watch?v=kAFxLXqP8UM",
       "segments": [
         {
-          "_what": "MEASURED 2026-08-16 on the Nuclear Blast 'Storytime (Remastered)' delivery (the Imaginaerum album version). The full-band vocal entry is a +11.05 dB re-entry at 23.100. 22.732336 is the recording's own preceding tracked beat, chosen so the 0.25 s crossfade ends 0.118 s before the hit instead of shaving it -- the same 0.368 s offset the video-edit pass used. The out point is the song's REAL end: the final hit rings out from the last tracked beat (324.894) and decays to -75 dBFS at 328.183667; the file then carries 2.56 s of digital floor to 330.743104, and ending there would close the show on silence (the issue #105 failure). The double-bass outro starts at 250.403991 on this grid (boundary measured in the bed record) and sustains to the ring -- the climax the owner asked for plays out in full.",
-          "start_sec": 22.732336,
-          "end_sec": 328.183667
+          "_what": "MEASURED 2026-08-24 on the official Nightwish delivery. The owner named the moment -- the link arrives at t=22 -- and asked to 'capture the entire sentence'. The sentence in progress at 0:22 is spoken from the stage, not sung: 'Now let's make this last ride together!', and its first word begins at 21.240 (transcribed with word timestamps, corroborated by the vocal-band onsets at 21.501 and 21.691). 21.100 is 140 ms ahead of it, in the measured dip between 'Thank you!' and 'Now' -- the level falls to about 0 dB relative in the 300-3000 Hz band there -- so the N is not shaved and no part of the previous sentence is caught. Everything before it, including the song's own introduction, is skipped, which is the rest of the owner's instruction. The out point is the file's end: the last chord decays into the crowd at 277.450 and the applause carries to a fade at 286.801, so the film ends on a room rather than on a cut.",
+          "start_sec": 21.1,
+          "end_sec": 286.801
         }
-      ]
+      ],
+      "picture": {
+        "_what": "THE CONCERT IS THE FRAME FROM HERE. Not a background and not an inset: the clip is 2.42:1 and the delivery frame is 16:9, so it seats at (0,0) at its NATIVE 1920x794 and the 286 px it does not use become the contributor band. Nothing is scaled, so nothing is resampled. The layout the owner chose is 'A -- scope seat'; the side rail was the fallback if the band could not be read.",
+        "media_filename": "bed_last_ride_of_the_day_live-source.webm",
+        "source_url": "https://www.youtube.com/watch?v=kAFxLXqP8UM",
+        "width": 1920,
+        "height": 794,
+        "source_fps": 25,
+        "_fps": "The clip is 25 fps and the delivery spec is 59.94, so it is conformed ONCE, in the act's own filtergraph, rather than being discovered at assembly time and conformed there.",
+        "music_end_sec": 277.45,
+        "_music_end_sec": "MEASURED: the last band hit decays from -19 dB through 277.408 and settles into the crowd at about -28 dB by 277.450. The picture comes off here and the wordmark takes the frame for the applause -- the mark is the last thing in the film and does not share it with a band still playing.",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Nuclear Blast copyrighted live recording, official Nightwish YouTube delivery. Used as a non-commercial fan-work bed AND as picture; this index stores only measurements and timecodes, never the media. The same class as the act's other Nightwish beds, and the same non-commercial limit applies to the whole programme."
+      }
     }
   },
   "reveal": {
@@ -96,15 +109,18 @@
     "_what": "The REAL Project Bluefin wordmark, not the word typeset in the deck's font. Cached by scripts/fetch_wordmark.py from ublue-os/universal-blue-org content/ocis/bluefin.svg -- NOT ublue-os/artwork, which is wallpapers only and carries no wordmark in any branch or release. Reversed for this background by recolouring the black type to white; the fin's own #4285f4 is left exactly as published and no geometry is touched. THE SUB-LINE IS GONE, owner instruction: 'get rid of \"an ublue project\" on the logo'. The published lockup does not carry it either, so the mark now stands alone exactly as ublue publishes it.",
     "text": "Bluefin",
     "source": "ublue-os/universal-blue-org:content/ocis/bluefin.svg",
-    "dur_sec": 77.779676,
-    "_dur_sec_what": "Owner, 2026-08-16: 'hold the bluefin mark until the end of the song. We want the double bass drum climax.' So the mark is UP when the climax arrives and HELD to the last note, not a ten-second sign-off. The number is measured, not round: Storytime's album-version outro starts at source 250.403991 (the grid beat opening the measured boundary; see music/bed_storytime_album.json grid.measured_climax), which lands at 454.724807 on the credits clock, and the act ends at 532.504483 -- 77.779676 s later. DERIVATION: dur_sec = bed_total(bed) - (pass-one spans - 2 x crossfade + (250.403991 - 22.732336)); re-derive it if any span or the crossfade moves, or the mark drifts off the climax."
+    "dur_sec": null,
+    "_dur_sec_what": "DERIVED, NOT TYPED, since 2026-08-24. It was 77.779676 -- owner, 2026-08-16: 'hold the bluefin mark until the end of the song. We want the double bass drum climax.' That climax was Storytime's, and Storytime is gone. The instruction survives its song: the mark still holds from the end of the music to the end of the film, so the builder starts it at `bed.then.picture.music_end_sec` and runs it out. On the current cut that is 9.351 s, over the crowd. A null here means the schedule derives it; a number would pin it."
   },
   "unresolved": [
     "Act VII still ends on the comic cover -- see reveal.TODO(owner).",
     "'Contributions by YOU' was REMOVED to make room for the Introducing card. It was the beat that handed the film to the audience immediately before the contributor walls; those walls now arrive without an introduction. Restore it as a fifth card if that reads as a gap.",
     "cast_photos is EMPTY and blocks on the owner: the summit feed has only group photographs, so every principal's crop box has to be drawn by somebody who can say which face is whose. Until then the placards keep their PFPs, which is not what was asked for.",
     "vocab/casting.yaml spells Karena's surname 'Angell'; the README and the owner both say 'Angel', one L, and that is what act VIII prints. The vocab is a committed input to six delivered acts (#167), so it is not edited here.",
-    "November has no dark-mode wallpaper installed on this host (11-bluefin.xml points at 11-bluefin-night.svg, which is not on disk), so the calendar cycle is eleven months rather than twelve."
+    "November has no dark-mode wallpaper installed on this host (11-bluefin.xml points at 11-bluefin-night.svg, which is not on disk), so the calendar cycle is eleven months rather than twelve.",
+    "The wordmark hold is now derived from the end of the live recording rather than authored -- 9.351 s over the applause, against the 77.78 s it held under Storytime. The instruction it came from ('hold the mark until the end of the song') is satisfied, but the LENGTH is a new number nobody has approved. TODO(owner).",
+    "The contributor band credits LOGINS ONLY. A 116 px face plus its name needs a 196 px row and the band is 286 px tall, so the faces stop at the concert and the names carry the credit from there. Nobody is dropped; the portraits are.",
+    "The live bed is 5.1 LU quieter than the instrumental it takes over from (-14.2 against -9.1 LUFS, both measured). Nothing is applied: the live take peaks at 0.0 dBFS so it cannot be raised without limiting, and attenuating pass one to meet it would pull the whole act further below the programme. Which way the gap closes -- or whether it closes at all -- is a mix decision. TODO(owner). See music/bed_last_ride_of_the_day_live.json:loudness."
   ],
   "contributors": [
     {

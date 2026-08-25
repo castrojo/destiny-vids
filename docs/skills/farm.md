@@ -170,6 +170,14 @@ of 0 is not evidence (issue #88).
   `podman exec bluefin-thumbnailer` prefix (see the `DESTINY_FFMPEG` flag
   above).
   It has cost a full render round more than once.
+- **A builder whose input is a concat LIST of absolute host paths cannot be
+  farmed yet.** `rewrite_argv_for_pod` rewrites `argv[0]` and named `inputs`,
+  not the paths inside a `-f concat -i list.txt` payload — act VIII's credits
+  encode carries 57 rendered PNG paths that way, which is why its rebuild ran
+  locally (and OOM'd) on 2026-08-24. Rewriting list payloads is a new
+  capability, not a flag; until it exists, `--local` with a stated reason is
+  the recorded posture for that builder, per
+  [`../credits.md`](../credits.md).
 - **A plate burn is farmable, and it must be farmed.** Its argv carries ~78
   PNG `-i` inputs plus any `%0Nd` image sequence, and all of them have to be
   named in `inputs` or the pod cannot open them. Sequences stage as their

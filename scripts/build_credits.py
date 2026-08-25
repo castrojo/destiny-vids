@@ -626,6 +626,43 @@ def reveal_at(bed, reveal):
     return before - n * xf + (reveal["source_sec"] - spans[n]["start_sec"])
 
 
+def pass_start(bed, index):
+    """Where a bed pass begins on the CREDITS clock.
+
+    Same arithmetic as :func:`reveal_at`: every seam before it is an
+    ``acrossfade`` overlap, so the clock runs ahead of the summed span lengths
+    by one crossfade per join.
+    """
+    xf = bed.get("crossfade_sec", 0.0)
+    spans_before = sum(len(p["segments"]) for p in bed_passes(bed)[:index])
+    spans = bed_spans(bed)
+    before = sum(s["end_sec"] - s["start_sec"] for s in spans[:spans_before])
+    return before - spans_before * xf
+
+
+def concert(manifest):
+    """The performance that becomes the picture, or ``None``.
+
+    A pass carrying ``picture`` is not just a bed: from the moment it starts,
+    act VIII stops being a slideshow and the performance IS the frame. The
+    block is read here rather than in the renderer so that an act with no
+    concert -- every build before 2026-08-24 -- schedules exactly as it did.
+    """
+    for i, cut in enumerate(bed_passes(manifest["bed"])):
+        pic = cut.get("picture")
+        if pic:
+            start = pass_start(manifest["bed"], i)
+            return {**pic, "pass_index": i, "at_sec": start,
+                    "trim_from": cut["segments"][0]["start_sec"],
+                    # Where the MUSIC stops and the applause takes over, on the
+                    # credits clock. The wordmark waits for it: the mark is the
+                    # last thing in the film and it is not going to share the
+                    # frame with a band still playing.
+                    "music_ends_at": start + (pic["music_end_sec"]
+                                              - cut["segments"][0]["start_sec"])}
+    return None
+
+
 def schedule(manifest):
     """Lay the sequence on the credits clock.
 
@@ -717,31 +754,101 @@ def schedule(manifest):
         t += target
 
     wordmark = manifest["wordmark"]
+    show = concert(manifest)
     # The upstream sections lead, whatever order they are stored in: the
     # owner's instruction is about the SEQUENCE, so it is enforced here rather
     # than left to how somebody happened to edit the manifest.
     sections = sorted(manifest["contributors"],
                       key=lambda s: 0 if s.get("tier") == "upstream" else 1)
+
+    # WHERE THE FILM STOPS BEING A SLIDESHOW.
+    #
+    # Everything before the concert keeps the full-frame wall it always had;
+    # everything after it moves into the band, because the frame now belongs to
+    # the performance. The sections are split between the two by NAME COUNT in
+    # proportion to the time each side has, so a login is up for about as long
+    # on either side of the seam -- the layout changes, the reading rate does
+    # not. A section is never split across the seam: its badge, its ghost and
+    # its page numbering stay in one design.
+    if show:
+        # The mark is the last thing in the film, and it waits for the band to
+        # stop playing rather than being given a hand-typed hold. The 77.78 s
+        # in the manifest was measured against Storytime's double-bass climax,
+        # and that climax left with Storytime.
+        wordmark_start = show["music_ends_at"]
+        pre_window = max(0.0, show["at_sec"] - t)
+        post_window = max(0.0, wordmark_start - max(t, show["at_sec"]))
+    else:
+        wordmark_start = total - wordmark["dur_sec"]
+        pre_window, post_window = max(0.0, wordmark_start - t), 0.0
+
+    # Names are counted at their READING weight, not their raw count, so the
+    # seam falls where the two sides read at the same speed. An upstream name
+    # is worth 1.25 of a Bluefin one here for the same reason its wall holds
+    # 1.25x as long: the owner asked for the upstream tier to be the more
+    # distinguished of the two. Counted raw, the seam landed exactly on the
+    # tier boundary and inverted that -- every upstream page pre-concert, every
+    # Bluefin page in the band, and each side then paced itself, which made the
+    # distinguished tier the faster one.
+    counted = [(s, len(s["names"]) * (C.UPSTREAM_WALL_WEIGHT
+                                      if s.get("tier") == "upstream" else 1.0))
+               for s in sections]
+    all_names = sum(n for _, n in counted) or 1
+    target_pre = all_names * pre_window / max(1e-9, pre_window + post_window)
+    banded, seen = set(), 0
+    for section, n in counted:
+        # A section joins the band once the pre-concert side has had its share.
+        # Comparing against the section's MIDPOINT puts the seam wherever it
+        # falls closest, instead of always overfilling one side.
+        if show and seen + n / 2 > target_pre:
+            banded.add(section["section"])
+        seen += n
+
     walls = []
     for section in sections:
         tier = section.get("tier")
-        per_page = C.UPSTREAM_PER_WALL if tier == "upstream" else C.NAMES_PER_WALL
-        pages = C.paginate(section["names"], per_page)
+        band = section["section"] in banded
+        if band:
+            per_page = (C.UPSTREAM_PER_BAND if tier == "upstream"
+                        else C.NAMES_PER_BAND)
+        else:
+            per_page = (C.UPSTREAM_PER_WALL if tier == "upstream"
+                        else C.NAMES_PER_WALL)
+        names = list(section["names"])
+        ghost = section.get("ghost")
+        if band and ghost:
+            # THE GHOST NEEDS A CELL, NOT A CORNER. The full-frame wall can
+            # overrun its grid by one and still look deliberate; the band is
+            # three rows and there is nothing below them, so the last page is
+            # paginated with the ghost already counted. Otherwise the outlined
+            # maintainer is silently the name that does not fit.
+            marker = object()
+            pages = [[n for n in page if n is not marker]
+                     for page in C.paginate(names + [marker], per_page)]
+        else:
+            pages = C.paginate(names, per_page)
         for n, page in enumerate(pages):
             # The ghost maintainer rides the LAST page of its section, so it
             # closes the section rather than interrupting it.
-            ghost = section.get("ghost") if n == len(pages) - 1 else None
-            walls.append((section["section"], page, tier, ghost))
-    wall_window = total - t - wordmark["dur_sec"]
+            last = ghost if n == len(pages) - 1 else None
+            walls.append((section["section"], page, tier, last, band))
+
     # An upstream wall holds a third as many faces, so at one flat rate it
     # would flick past three times as fast as the tier it is meant to
     # outrank. It is weighted instead: the upstream roll is slower per wall,
     # which is the other half of "more distinguished".
     weights = [C.UPSTREAM_WALL_WEIGHT if tier else 1.0
-               for _, _, tier, _ in walls]
-    unit = wall_window / max(1e-9, sum(weights) or 1.0)
+               for _, _, tier, _, _ in walls]
+    # Each side of the seam fills its OWN window. One shared rate would let a
+    # rounding error walk the band layout over the join, which is the one place
+    # in this act where a frame is either concert or slideshow and cannot be
+    # half of each.
+    pre_weight = sum(w for w, (_, _, _, _, b) in zip(weights, walls) if not b)
+    post_weight = sum(w for w, (_, _, _, _, b) in zip(weights, walls) if b)
+    pre_unit = pre_window / max(1e-9, pre_weight or 1.0)
+    post_unit = post_window / max(1e-9, post_weight or 1.0)
     pages_by_section = {}
-    for name, _, _, _ in walls:
+    for name, _, _, _, _ in walls:
         pages_by_section[name] = pages_by_section.get(name, 0) + 1
 
     # THE BUBBLE DISSOLVES ACROSS THE UPSTREAM RUN, ONCE.
@@ -752,7 +859,7 @@ def schedule(manifest):
     # first upstream walls, crosses at the middle one, and has landed by the
     # last. It plays once over the whole tier rather than once per wall, which
     # would be the same joke eight times.
-    upstream_walls = [i for i, (_, _, tier, _) in enumerate(walls) if tier]
+    upstream_walls = [i for i, (_, _, tier, _, _) in enumerate(walls) if tier]
     mix_by_wall = {}
     if upstream_walls:
         last = max(1, len(upstream_walls) - 1)
@@ -763,12 +870,13 @@ def schedule(manifest):
             mix_by_wall[i] = 0.0 if span < 0.34 else (1.0 if span > 0.66 else 0.5)
 
     idx = {}
-    for i, ((name, page, tier, ghost), weight) in enumerate(zip(walls, weights)):
+    for i, ((name, page, tier, ghost, band), weight) in enumerate(zip(walls, weights)):
         idx[name] = idx.get(name, 0) + 1
-        dur = unit * weight
+        dur = (post_unit if band else pre_unit) * weight
         item = {"kind": "wall", "t": t, "dur": dur, "section": name,
                 "names": page, "page": idx[name], "tier": tier,
-                "pages": pages_by_section[name]}
+                "pages": pages_by_section[name],
+                "layout": "band" if band else "full"}
         if ghost:
             item["ghost"] = ghost
         if i in mix_by_wall:
@@ -810,11 +918,13 @@ def render_cards(items, out_dir):
                                         guardian_title=item.get("guardian_title"),
                                         title=item.get("title"), index=i)
         elif item["kind"] == "wall":
-            img = C.render_name_wall(item["section"], item["names"],
-                                     item["page"], item["pages"],
-                                     tier=item.get("tier"), index=i,
-                                     ghost=item.get("ghost"),
-                                     bubble_mix=item.get("bubble_mix"))
+            draw = (C.render_name_band if item.get("layout") == "band"
+                    else C.render_name_wall)
+            img = draw(item["section"], item["names"],
+                       item["page"], item["pages"],
+                       tier=item.get("tier"), index=i,
+                       ghost=item.get("ghost"),
+                       bubble_mix=item.get("bubble_mix"))
         elif item["kind"] == "wordmark":
             img = C.render_wordmark(item["text"], item.get("sub"), index=i)
         elif item["kind"] == "cover":
@@ -982,11 +1092,75 @@ def main(argv=None):
     # directory named `~` in the repo on its way past.
     out_path = Path(args.out).expanduser()
     out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # THE PERFORMANCE IS COMPOSITED OVER THE CARDS, NOT CUT BESIDE THEM.
+    #
+    # From the swap the picture is the concert, and the band beneath it is
+    # still a card in the same concat list -- so the whole act keeps ONE
+    # picture timeline, the scheduler keeps deciding when every screen
+    # changes, and the only new thing in the graph is an overlay that switches
+    # on at the seam. Cutting the act into two encodes and joining them would
+    # have re-encoded the untouched first half for nothing.
+    #
+    # The clip is 1920x794 and the frame is 1920x1080, so it seats at (0, 0) at
+    # NATIVE resolution: no scale filter, no resample, no generation loss. The
+    # band cards draw nothing above y=794 because nothing drawn there would
+    # survive this overlay.
+    #
+    # `tpad` CLONES the last frame, and it is the only thing that makes the
+    # picture reach the end of the music. The concat demuxer lands short of the
+    # durations it is given -- 4.347 s short over 38 cards -- and holding the
+    # last card longer in `concat.txt` does NOT fix it, because the shortfall
+    # is in the demuxer's output timeline rather than in the list. Padding
+    # after the demuxer does. `-t` below then cuts both streams on one frame.
+    show = concert(manifest)
+    vgraph = (f"[0:v]tpad=stop_mode=clone:stop_duration={CONCAT_TAIL_SEC:.0f},"
+              f"fps={conform.DELIVERY.fps},setsar=1[base]")
+    inputs, vout = [], "[base]"
+    if show:
+        source = REPO_ROOT / "media" / show["media_filename"]
+        if not source.exists():
+            raise SystemExit(f"concert picture is missing: {source}\n"
+                             f"fetch it from {show['source_url']}")
+        inputs = ["-i", str(source)]
+        stream = 1 + len(medias)
+        # SEATING THE PERFORMANCE COSTS NOTHING, AND IT MUST NOT.
+        #
+        # Two obvious ways to start an overlay at 3:47 both blow up. `setpts`
+        # with an offset makes overlay's framesync hold the main picture until
+        # the overlay stream produces its first frame -- 3:47 of buffered
+        # cards, killed by the OOM reaper at 12.9 GB. `tpad` is worse: it
+        # pushes its 13,608 pad frames downstream in one burst.
+        #
+        # A generated source concatenated in front streams instead, because
+        # concat pulls from `color` one frame at a time as overlay asks for
+        # them. Those frames are never seen -- `enable` keeps the overlay off
+        # until the swap -- so their colour is arbitrary and their only job is
+        # to exist. `enable` is what does the actual switching, on the card
+        # clock, so the seam is exact rather than rounded to the pad length.
+        #
+        # The trim stays on the OUTPUT side. This source is a DASH webm, and
+        # `-ss` on one lands in the wrong place (docs/rendering.md) -- the
+        # decode from zero is the price of knowing which frame we started on.
+        vgraph += (f";[{stream}:v]trim=start={show['trim_from']:.6f}:"
+                   f"end={show['music_end_sec']:.6f},setpts=PTS-STARTPTS,"
+                   f"fps={conform.DELIVERY.fps},setsar=1,format=yuv420p[live]"
+                   f";color=c=black:s={C.W}x{show['height']}:"
+                   f"r={conform.DELIVERY.fps}:d={show['at_sec']:.6f},"
+                   f"setsar=1,format=yuv420p[wait]"
+                   f";[wait][live]concat=n=2:v=1:a=0[showv]"
+                   f";[base][showv]overlay=0:0:eof_action=pass:"
+                   f"enable='between(t,{show['at_sec']:.6f},"
+                   f"{show['music_ends_at']:.6f})'[vout]")
+        vout = "[vout]"
+
     cmd = [*ffmpeg, "-nostdin", "-hide_banner", "-v", "error", "-y",
            "-f", "concat", "-safe", "0", "-i", str(concat),
            *[arg for media in medias for arg in ("-i", str(media))],
-           "-filter_complex", audio_filter(manifest["bed"], stream=1),
-           "-map", "0:v:0", "-map", "[aout]",
+           *inputs,
+           "-filter_complex",
+           audio_filter(manifest["bed"], stream=1) + ";" + vgraph,
+           "-map", vout, "-map", "[aout]",
            # THE DELIVERY BITSTREAM, from the spec rather than typed: every
            # card is a still, so the rate costs nothing visually, and matching
            # the spec means the megacut joins act VIII by stream copy instead
@@ -994,15 +1168,6 @@ def main(argv=None):
            # writes the bt709 VUI -- hand-rolled x264 flags left all three
            # colour fields unset and the file came back NONCONFORM.
            *conform.video_encode_args(preset="medium"),
-           # `tpad` CLONES the last frame, and that is the only thing that
-           # actually made the picture reach the end of the music. The concat
-           # demuxer lands short of the durations it is given -- 4.347 s short
-           # over 38 cards -- and holding the last card longer in `concat.txt`
-           # does NOT fix it, because the shortfall is in the demuxer's output
-           # timeline rather than in the list. Padding after the demuxer does.
-           # `-t` below then cuts both streams on the same frame.
-           "-vf", (f"tpad=stop_mode=clone:stop_duration={CONCAT_TAIL_SEC:.0f},"
-                   f"fps={conform.DELIVERY.fps},setsar=1"),
            "-c:a", "flac",
            "-t", f"{total:.3f}",
            str(out_path)]

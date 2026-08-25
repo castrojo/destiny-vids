@@ -855,6 +855,31 @@ WALL_HASHTAG = "#linuxforever"
 # as fast as the tier it outranks.
 UPSTREAM_WALL_WEIGHT = 1.25
 
+# --- THE SCOPE SEAT --------------------------------------------------------
+#
+# From the moment the Masters of Rock performance arrives, act VIII stops being
+# a slideshow and becomes an enclosure: the concert plays at its NATIVE
+# 1920x794 pinned to the top of frame, and the contributors take the 286 px it
+# does not use. Owner, on the layout: *"a design that allows for the video to
+# be enclosed with a dedicated area for the contributor sections."*
+#
+# 794 is not a design choice, it is the clip. Scaling the performance to make a
+# rounder number would resample every frame of it for nothing.
+BAND_TOP = 794
+BAND_H = H - BAND_TOP
+
+# The band carries LOGINS ONLY. A 116 px face plus its name needs 196 px of
+# row; three rows of those do not exist down here, and shrinking the faces to
+# fit would credit people with a smudge. Names are the credit; the faces had
+# their run in the full-frame walls before the concert arrived.
+BAND_ROWS = 3
+BAND_COLS = 7
+NAMES_PER_BAND = BAND_ROWS * BAND_COLS
+# The upstream tier keeps its advantage down here too: fewer per screen, so
+# each login is up longer and set larger.
+UPSTREAM_BAND_COLS = 5
+UPSTREAM_PER_BAND = BAND_ROWS * UPSTREAM_BAND_COLS
+
 # THE BADGES. Owner: *"make these badges be AWESOME. For the elite"*, and
 # *"let's snag the logos to these projects and make them look GOOD."* Each
 # value is a mark cached by scripts/fetch_brand_marks.py from the project's
@@ -1122,8 +1147,114 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0,
     return img
 
 
-WORDMARK = RENDERS / "marks" / "bluefin-wordmark.png"
+def render_name_band(section, names, page=1, pages=1, tier=None, index=0,
+                     ghost=None, bubble_mix=None):
+    """One screenful of contributors in the scope seat's 286 px band.
 
+    The same information the full-frame wall carries -- the section, the page,
+    the logins, the side copy -- laid out under a concert instead of over a
+    wallpaper. The top ``BAND_TOP`` rows are left as flat ink because the
+    performance is composited over them; nothing is drawn there, because
+    anything drawn there would be invisible.
+
+    A login prints WHOLE, exactly as on the wall: it comes down in size until
+    it fits its cell rather than being cut short.
+    """
+    img = _ink().copy()
+    # The performance's own 794 rows are CLEARED, not painted. Ink there is
+    # invisible under the overlay, and a card that carries ink there cannot be
+    # checked -- a name that drifted above the seam would look identical to a
+    # name that did not. Transparent, it is provable: see
+    # test_the_band_draws_nothing_the_performance_would_cover. The two rows
+    # under the seam line are kept so the hairline draws whole.
+    img.paste((0, 0, 0, 0), (0, 0, W, BAND_TOP - 2))
+    d = ImageDraw.Draw(img)
+    up = tier == "upstream"
+
+    # THE SEAM. A hairline along the bottom edge of the picture, so the band
+    # reads as part of the frame rather than as a strip that happens to be
+    # under it.
+    d.line([(0, BAND_TOP), (W, BAND_TOP)], fill=(147, 197, 253, 170), width=3)
+
+    head_y = BAND_TOP + 20
+    f_head = _font("bold", 40 if up else 34)
+    _blue_bs(d, (110, head_y), section, f_head, TEXT, 0.02)
+
+    right = W - 110
+    # THE SIDE COPY KEEPS ITS PLACE. The wall carries the hashtag along the
+    # bottom and the gag bubble beside it; down here there is one slot, so the
+    # bubble takes it on the walls that carry the gag and the hashtag takes it
+    # everywhere else. Neither is dropped.
+    if bubble_mix is not None:
+        for line, weight, three in ((BUBBLE_LINES[0], 1.0 - bubble_mix, False),
+                                    (BUBBLE_LINES[1], bubble_mix, True)):
+            if weight <= 0.01:
+                continue
+            bub = _bubble(line, stylise_three=three, alpha=int(255 * weight))
+            if bub.height > 64:
+                scale = 64 / bub.height
+                bub = bub.resize((max(1, int(bub.width * scale)), 64),
+                                 Image.LANCZOS)
+            img.alpha_composite(bub, (int(right - bub.width),
+                                      int(head_y - 8)))
+    else:
+        f_tag = _font("black", 44)
+        w_tag = _tracked_width(d, WALL_HASHTAG, f_tag, 0.02)
+        _blue_bs(d, (right - w_tag, head_y - 4), WALL_HASHTAG, f_tag,
+                 (147, 197, 253, 235), 0.02)
+
+    if pages > 1:
+        f_pg = _font("regular", 19)
+        tag = f"{page} / {pages}"
+        _draw_tracked(d, (110 + _tracked_width(d, section, f_head, 0.02) + 24,
+                          head_y + 16), tag, f_pg, DIM, TRACKING)
+
+    if up:
+        # THE EYEBROW SURVIVES THE MOVE. It is a call to action the owner
+        # wrote, not chrome: the band has no room for the badge lockup, so the
+        # words ride the header line rather than going nowhere.
+        f_eye = _font("bold", 22)
+        eye_x = 110 + _tracked_width(d, section, f_head, 0.02) + 24
+        if pages > 1:
+            eye_x += _tracked_width(d, f"{page} / {pages}",
+                                    _font("regular", 19), TRACKING) + 24
+        _draw_tracked(d, (eye_x, head_y + 14), UPSTREAM_EYEBROW, f_eye, ACCENT,
+                      TRACKING)
+
+    cols = UPSTREAM_BAND_COLS if up else BAND_COLS
+    f_name = _font("regular", 32 if up else 26, mono=not up)
+    left, row_h = 110, 56
+    col_w = (W - 2 * left) / cols
+    top = BAND_TOP + 92
+
+    cells = list(names) + ([ghost] if ghost else [])
+    for i, cell in enumerate(cells):
+        c, r = i % cols, i // cols
+        if r >= BAND_ROWS:
+            # The paginator sizes pages to the band, so this is unreachable in
+            # a scheduled build. It is a floor, not a crop: a name that would
+            # land off the bottom is REPORTED by the caller's pagination rather
+            # than drawn into the concert.
+            break
+        cx = left + c * col_w + col_w / 2
+        y = top + r * row_h
+        if isinstance(cell, dict):
+            label = cell["name"]
+            f_g = _font("semibold", 26)
+            _draw_tracked(d, (cx - _tracked_width(d, label, f_g, 0.02) / 2, y),
+                          label, f_g, ACCENT, 0.02)
+            continue
+        login = cell
+        f_cell = f_name
+        while (d.textlength(login, font=f_cell) > col_w - 18
+               and f_cell.size > CELL_MIN_SIZE):
+            f_cell = _font("regular", f_cell.size - 1, mono=not up)
+        _blue_bs(d, (cx - d.textlength(login, font=f_cell) / 2, y), login,
+                 f_cell, TEXT)
+    return img
+
+
+WORDMARK = RENDERS / "marks" / "bluefin-wordmark.png"
 
 def render_wordmark(text="Bluefin", sub=None, index=0):
     """The last frame of the film: the REAL Project Bluefin wordmark.

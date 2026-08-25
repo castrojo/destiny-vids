@@ -33,8 +33,12 @@ usage_class:
     use, and a cleared asset kept being written up as a rights block.
   values:
     third_party_copyrighted: >
-      Bungie-owned footage indexed for non-infringing reference/retrieval;
-      timestamps are returned, not the footage itself.
+      A copyrighted work this project does not own, indexed for non-infringing
+      reference/retrieval: timestamps and measurements are returned, never the
+      media. Bungie footage is the common case, but the class is the RIGHTS
+      POSITION and not the rightsholder -- a Nuclear Blast concert recording
+      used as bed and picture sits here too. Non-commercial fan use only, on
+      every record and therefore on the whole programme.
     cc_by_4_0: >
       Creative Commons Attribution 4.0. Commercial use, sync and
       redistribution are all permitted; attribution is the only condition and

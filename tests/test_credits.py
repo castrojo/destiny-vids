@@ -939,102 +939,205 @@ def test_the_credits_gate_the_delivered_master_peak():
 
 # --- the second pass of the bed --------------------------------------------
 
-def test_storytime_follows_the_whole_instrumental_loop(manifest):
-    """Storytime replaces only the former vocal pass after the entire
-    instrumental loop.
+def test_the_concert_follows_the_whole_instrumental_loop(manifest):
+    """The performance replaces the vocal pass, AFTER the entire instrumental.
 
     'the ENTIRE instrumental' is load-bearing: the loop is not cut short to
-    make room for the vocal. Pass one keeps both of its measured spans.
+    make room for what follows it. Pass one keeps both of its measured spans,
+    and neither of them moved when Storytime left.
     """
     passes = B.bed_passes(manifest["bed"])
     assert len(passes) == 2
     assert passes[0]["bed_id"] == "bed_wish_i_had_an_angel"
-    assert passes[1]["bed_id"] == "bed_storytime_album"
+    assert passes[1]["bed_id"] == "bed_last_ride_of_the_day_live"
     assert len(passes[0]["segments"]) == 2
     assert passes[0]["segments"][0]["start_sec"] == 193.42
 
 
-def test_storytime_pass_is_the_version_with_the_climax(manifest):
-    """Owner, 2026-08-16: 'have the double bass drums here ... We want the
-    double bass drum climax.' The official music video edit (bed_storytime,
-    244.135 s) has no such climax -- it is already decaying into its own end
-    at ~236 s. The album version carries the extended double-kick outro, so
-    the pass is the album bed, and the video edit stays on record beside it.
+def test_the_second_pass_is_the_live_recording_the_owner_named(manifest):
+    """Owner: 'replace the song with a specific one when the nightwish
+    segment comes on.' The specific one is the Masters of Rock performance of
+    Last Ride of the Day, and it arrives with its own bed record -- a pass
+    that names media this repo has never measured is a pass nobody can check.
     """
-    storytime = B.bed_passes(manifest["bed"])[1]
-    assert storytime["bed_id"] == "bed_storytime_album"
-    assert storytime["media_filename"] == "bed_storytime_album.wav"
+    live = B.bed_passes(manifest["bed"])[1]
+    assert live["media_filename"] == "bed_last_ride_of_the_day_live.wav"
+    assert "kAFxLXqP8UM" in live["source_url"]
     record = json.loads((REPO_ROOT / "music" /
-                         "bed_storytime_album.json").read_text())
-    assert "measured_climax" in record["grid"], (
-        "the climax must be MEASURED and recorded, never asserted")
-    # The record of the earlier state is kept, not rewritten.
-    assert (REPO_ROOT / "music" / "bed_storytime.json").exists()
+                         "bed_last_ride_of_the_day_live.json").read_text())
+    assert record["bed_id"] == live["bed_id"]
+    # The record it replaced is kept, not rewritten.
+    assert (REPO_ROOT / "music" / "bed_storytime_album.json").exists()
 
 
-def test_storytime_pass_skips_its_own_intro(manifest):
-    """Storytime enters on its full-band vocal entry, not its quiet intro.
+def test_the_live_pass_starts_on_the_whole_sentence(manifest):
+    """Owner: 'start here but capture the entire sentence.'
 
-    22.732336 is the album recording's beat 0.368 s ahead of the measured
-    +11.05 dB re-entry at 23.100, so the 0.25 s crossfade clears the hit.
+    'Here' is the link's own t=22, which is INSIDE the sentence. The sentence
+    is stage banter over a live crowd, not a sung line, and it is quiet: the
+    crowd floor in the 250-3500 Hz band is -25.6 dB and the loudest syllable
+    only reaches -20.7, so there is no transient to land ahead of. The bounds
+    are therefore the two things that ARE measurable -- the in point sits in a
+    real dip (-30.3 dB at 21.100, nearly 5 dB below the crowd itself), and the
+    crossfade finishes before the first speech energy at 21.525.
+
+    21.240 is the transcriber's word-start estimate. It is kept as a soft
+    bound because it is what the owner's 'entire sentence' was checked
+    against, but the audio does not show an onset there, so it is not the
+    thing the crossfade is held to.
     """
-    storytime = B.bed_passes(manifest["bed"])[1]
-    start = storytime["segments"][0]["start_sec"]
-    assert start > 0.0, "Storytime must not restart from its quiet intro"
-    assert start == 22.732336
-    grid = json.loads((REPO_ROOT / "music" /
-                       "bed_storytime_album.json").read_text())["grid"]
-    assert any(abs(b - start) < 1e-6 for b in grid["beats"]), (
-        "the in point must sit on Storytime's tracked beat, not a round number")
+    live = B.bed_passes(manifest["bed"])[1]
+    start = live["segments"][0]["start_sec"]
+    assert start == 21.100
+    assert start < 21.240, "the first word of the sentence must not be shaved"
+    assert start < 22.0, "the owner's mark is INSIDE the sentence, not its top"
     xf = manifest["bed"].get("crossfade_sec", 0.0)
-    assert start + xf < 23.100, (
-        "the 0.25 s crossfade has to CLEAR before the band arrives at 23.100, "
-        "or the hand-over shaves the transient it exists to land on")
+    assert start + xf < 21.525, (
+        "the hand-over has to finish before the first speech energy, or the "
+        "film fades up over the words it exists to keep")
 
 
-def test_storytime_pass_stops_at_its_natural_ending(manifest):
-    """The pass ends where the ring-out actually ends, not on the file end.
+def test_the_live_pass_plays_to_the_end_of_the_room(manifest):
+    """The film ends on a crowd, not on a cut.
 
-    The album file carries 2.56 s of digital floor after the ring; joining on
-    the file end would close the show on silence (the issue #105 failure).
-    The measured end of the ring lives in the bed record; the span uses it.
+    The last chord decays into the applause at 277.450 and the recording's own
+    fade carries to 286.801. The pass runs to the file end deliberately: this
+    is the one bed whose tail is the point, so the #105 rule -- never join on
+    digital silence -- is satisfied by the fade rather than by stopping short.
     """
-    storytime = B.bed_passes(manifest["bed"])[1]
+    live = B.bed_passes(manifest["bed"])[1]
     record = json.loads((REPO_ROOT / "music" /
-                         "bed_storytime_album.json").read_text())
-    end = storytime["segments"][0]["end_sec"]
-    climax = record["grid"]["measured_climax"]
-    assert end == climax["end_of_music_sec"]
-    assert end < record["duration_sec"], (
-        "the digital tail past the ring must not play")
+                         "bed_last_ride_of_the_day_live.json").read_text())
+    end = live["segments"][0]["end_sec"]
+    assert end == pytest.approx(record["duration_sec"], abs=1e-3)
+    assert live["picture"]["music_end_sec"] < end, (
+        "the music has to stop before the recording does, or there is no "
+        "applause for the mark to land on")
 
 
-def test_the_wordmark_is_up_for_the_whole_climax(manifest):
-    """Owner: 'hold the bluefin mark until the end of the song.' The mark
-    comes up when the measured double-bass outro arrives and is held to the
-    last note -- the dur_sec is derived from the spans, never a round number.
+def test_the_concert_is_the_picture_and_seats_without_scaling(manifest):
+    """Owner: 'I want this live concert to be the setting for the rest of the
+    show, until completion.' The clip is 2.42:1 in a 16:9 frame, so it seats
+    at its native size and the leftover 286 px become the contributor band --
+    no scale filter anywhere, and therefore no resample.
     """
-    bed = manifest["bed"]
-    total = B.bed_total(bed)
-    passes = B.bed_passes(bed)
-    xf = bed.get("crossfade_sec", 0.0)
-    spans = B.bed_spans(bed)
-    # Pass two starts after pass one's spans and every seam before it.
-    pass2_at = sum(s["end_sec"] - s["start_sec"]
-                   for s in spans[:len(passes[0]["segments"])])
-    pass2_at -= (len(passes[0]["segments"])) * xf
-    record = json.loads((REPO_ROOT / "music" /
-                         "bed_storytime_album.json").read_text())
-    climax_src = record["grid"]["measured_climax"]["outro_start_sec"]
-    climax_at = pass2_at + (climax_src
-                            - passes[1]["segments"][0]["start_sec"])
-    wordmark = next(i for i in B.schedule(manifest)[0]
-                    if i["kind"] == "wordmark")
-    assert wordmark["t"] == pytest.approx(climax_at, abs=1e-6), (
-        "the mark must be UP when the double-bass outro arrives")
-    assert wordmark["t"] + wordmark["dur"] == pytest.approx(total, abs=1e-6)
-    assert manifest["wordmark"]["dur_sec"] == pytest.approx(
-        total - climax_at, abs=1e-6)
+    picture = B.bed_passes(manifest["bed"])[1]["picture"]
+    assert picture["width"] == C.W
+    assert picture["height"] == C.BAND_TOP
+    assert C.BAND_TOP + C.BAND_H == C.H, (
+        "the band is exactly the frame the performance does not use")
+    source = (REPO_ROOT / "scripts" / "build_credits.py").read_text()
+    assert "overlay=0:0" in source
+    graph_scales = source[source.index("[showv]") - 400:source.index("[showv]")]
+    assert "scale=" not in graph_scales
+
+
+def test_the_picture_is_licensed_and_says_so(manifest):
+    """A copyrighted recording used as PICTURE carries its rights position on
+    the record, the same as any indexed footage does."""
+    picture = B.bed_passes(manifest["bed"])[1]["picture"]
+    assert picture["usage_class"] == "third_party_copyrighted"
+    assert picture["source_rights_note"].strip()
+    assert "kAFxLXqP8UM" in picture["source_url"]
+
+
+def test_the_mark_still_waits_for_the_end_of_the_song(manifest):
+    """Owner: 'hold the bluefin mark until the end of the song.'
+
+    The instruction outlived the song it was measured against. Storytime's
+    double-bass climax is gone, so the hold is no longer typed: the mark comes
+    up when the band stops -- the measured 277.450 -- and runs to the last
+    frame. A hand-typed dur_sec here would silently outrank the measurement.
+    """
+    assert manifest["wordmark"]["dur_sec"] is None, (
+        "the hold is derived from the recording, not authored")
+    show = B.concert(manifest)
+    items = B.schedule(manifest)[0]
+    wordmark = next(i for i in items if i["kind"] == "wordmark")
+    assert wordmark["t"] == pytest.approx(show["music_ends_at"], abs=1e-6)
+    assert wordmark["t"] + wordmark["dur"] == pytest.approx(
+        B.bed_total(manifest["bed"]), abs=1e-6)
+    assert wordmark["dur"] > 0
+
+
+def test_the_performance_comes_off_when_the_mark_comes_up(manifest):
+    """The mark is the last thing in the film and does not share the frame
+    with a band still playing, so the overlay's enable window closes exactly
+    where the wordmark starts."""
+    show = B.concert(manifest)
+    assert show["music_ends_at"] == pytest.approx(
+        show["at_sec"] + (show["music_end_sec"] - show["trim_from"]),
+        abs=1e-6)
+    source = (REPO_ROOT / "scripts" / "build_credits.py").read_text()
+    assert "enable='between(t," in source
+
+
+def test_the_band_carries_every_name_the_walls_used_to(manifest):
+    """The layout changed; the credit did not. Every contributor still gets a
+    screen, whichever side of the swap they land on."""
+    items = B.schedule(manifest)[0]
+    walls = [i for i in items if i["kind"] == "wall"]
+    on_screen = sum(len(i["names"]) for i in walls)
+    ghosts = sum(1 for i in walls for n in i["names"] if not isinstance(n, str))
+    authored = sum(len(s["names"]) for s in manifest["contributors"])
+    assert on_screen - ghosts == authored
+    assert {i["layout"] for i in walls} == {"full", "band"}
+
+
+def test_the_band_holds_no_more_names_than_it_can_seat(manifest):
+    """Three rows of seven. A page that overfills does not spill, it
+    overlaps -- so the pagination bound is asserted, not eyeballed."""
+    assert C.BAND_ROWS * C.BAND_COLS == C.NAMES_PER_BAND
+    assert C.BAND_ROWS * C.UPSTREAM_BAND_COLS == C.UPSTREAM_PER_BAND
+    for item in B.schedule(manifest)[0]:
+        if item.get("layout") != "band":
+            continue
+        cap = (C.UPSTREAM_PER_BAND if item.get("tier") == "upstream"
+               else C.NAMES_PER_BAND)
+        assert len(item["names"]) <= cap
+
+
+def test_the_band_draws_nothing_the_performance_would_cover(manifest):
+    """Anything drawn above y=794 is painted over by the overlay. A card that
+    puts a name there has not been shortened -- it has lost somebody."""
+    from tools import credits as creds
+    section = {"section": "Test", "names": ["alice", "bob"]}
+    img = creds.render_name_band(section, ["alice", "bob"], 1, 1, None, 0,
+                                 None, None)
+    assert img.size == (C.W, C.H)
+    above = img.crop((0, 0, C.W, C.BAND_TOP - 4)).convert("RGBA")
+    assert above.getextrema()[3][1] == 0, (
+        "the band must be transparent where the performance plays")
+
+
+def test_the_seam_reads_at_the_same_speed_on_both_sides(manifest):
+    """The upstream tier is the more distinguished one on either side of the
+    swap. Counted raw, the seam fell exactly on the tier boundary and each
+    side then paced itself -- which made the distinguished tier the faster
+    one. The split is weighted so that cannot happen again.
+    """
+    items = B.schedule(manifest)[0]
+    def rate(layout, tier):
+        pages = [i for i in items if i["kind"] == "wall"
+                 and i["layout"] == layout and (i.get("tier") == "upstream")
+                 is tier]
+        names = sum(len(i["names"]) for i in pages)
+        return sum(i["dur"] for i in pages) / names if names else None
+    band_upstream = rate("band", True)
+    band_bluefin = rate("band", False)
+    assert band_upstream is not None and band_bluefin is not None, (
+        "the seam must fall INSIDE a tier, not on the boundary between them")
+    assert band_upstream > band_bluefin
+
+
+def test_the_act_ends_when_the_recording_does(manifest):
+    """'Shrink the credits' -- the owner's answer to the performance being
+    shorter than the roll. The walls scale to the bed; the bed is never
+    stretched to the walls."""
+    items, total = B.schedule(manifest)[0], B.schedule(manifest)[1]
+    assert total == pytest.approx(B.bed_total(manifest["bed"]), abs=1e-6)
+    last = items[-1]
+    assert last["t"] + last["dur"] == pytest.approx(total, abs=1e-6)
 
 
 def test_every_span_of_both_passes_reaches_the_filtergraph(manifest):
