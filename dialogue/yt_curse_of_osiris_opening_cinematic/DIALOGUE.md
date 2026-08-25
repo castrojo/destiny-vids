@@ -113,6 +113,10 @@ They've broken out of the sandbox
 
 Hive is the one stuck in the CNCF Sandbox!
 
+## d28 | mrbobbytables | 2:13.20 -> 2:15.40
+
+You need to apply, check your email, focus!
+
 ## d22 | mrbobbytables | 2:13.96 -> 2:14.63 | pin 2:14.82
 
 We need to get a message to the CNCF Maintainers
