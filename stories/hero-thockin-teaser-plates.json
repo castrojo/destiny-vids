@@ -1,0 +1,33 @@
+{
+  "_what": "thockin hero teaser; full source with two owner-seated credits.",
+  "_source": "https://www.youtube.com/watch?v=uorqdyi1U9E",
+  "_copy_provenance": {
+    "jagosan-frozen-slab": "GitHub profile https://github.com/jagosan, supplied by the owner",
+    "thockin-hero": "stories/02-endless-forms-plates.json#og_thockin"
+  },
+  "plates": [
+    {
+      "id": "jagosan-frozen-slab",
+      "at": 5.0,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "GUARDIAN",
+      "name": "Jago Macleod",
+      "why": "Owner-seated frozen-slab credit at source 0:05."
+    },
+    {
+      "id": "thockin-hero",
+      "at": 40.0,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "OG GUARDIAN",
+      "name": "Tim Hockin",
+      "title": "Does NOT Come in Peace",
+      "variant": "bronze",
+      "why": "Owner-seated hero credit at source 0:40."
+    }
+  ],
+  "unresolved": []
+}

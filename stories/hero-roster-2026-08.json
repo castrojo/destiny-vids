@@ -1,0 +1,104 @@
+{
+  "month": "2026-08",
+  "since": "2026-08-01T00:00:00Z",
+  "until": "2026-09-01T00:00:00Z",
+  "org": "projectbluefin",
+  "repos": [
+    "projectbluefin/bluefin",
+    "projectbluefin/bluefin-lts",
+    "projectbluefin/common",
+    "projectbluefin/dakota",
+    "projectbluefin/knuckle"
+  ],
+  "contributors": [
+    {
+      "login": "Danathar",
+      "commits": 3,
+      "display_name": "Danathar",
+      "org_member": false
+    },
+    {
+      "login": "Giklab",
+      "commits": 1,
+      "display_name": "Giklab",
+      "org_member": false
+    },
+    {
+      "login": "HuntedRaven7",
+      "commits": 2,
+      "display_name": "HuntedRaven7",
+      "org_member": false
+    },
+    {
+      "login": "ahmedadan",
+      "commits": 28,
+      "display_name": "ahmedadan",
+      "org_member": true
+    },
+    {
+      "login": "castrojo",
+      "commits": 27,
+      "display_name": "castrojo",
+      "org_member": true
+    },
+    {
+      "login": "hanthor",
+      "commits": 2,
+      "display_name": "hanthor",
+      "org_member": true
+    },
+    {
+      "login": "joshyorko",
+      "commits": 1,
+      "display_name": "joshyorko",
+      "org_member": false
+    },
+    {
+      "login": "mrbobbytables",
+      "commits": 2,
+      "display_name": "mrbobbytables",
+      "org_member": false
+    },
+    {
+      "login": "rapenne-s",
+      "commits": 1,
+      "display_name": "rapenne-s",
+      "org_member": false
+    },
+    {
+      "login": "theMimolet",
+      "commits": 1,
+      "display_name": "theMimolet",
+      "org_member": false
+    }
+  ],
+  "repos_contributors": {
+    "projectbluefin/bluefin": [
+      "castrojo"
+    ],
+    "projectbluefin/bluefin-lts": [
+      "HuntedRaven7",
+      "castrojo"
+    ],
+    "projectbluefin/common": [
+      "Giklab",
+      "HuntedRaven7",
+      "ahmedadan",
+      "castrojo",
+      "hanthor",
+      "joshyorko",
+      "theMimolet"
+    ],
+    "projectbluefin/dakota": [
+      "Danathar",
+      "ahmedadan",
+      "castrojo",
+      "hanthor",
+      "mrbobbytables",
+      "rapenne-s"
+    ],
+    "projectbluefin/knuckle": [
+      "castrojo"
+    ]
+  }
+}

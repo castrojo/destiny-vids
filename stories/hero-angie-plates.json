@@ -1,0 +1,21 @@
+{
+  "_what": "Angie Jones hero-video credit at the opening narration.",
+  "_source": "https://www.youtube.com/watch?v=G8mC5GaDoyQ",
+  "_copy_provenance": "stories/06-wolves-cayde-plates.json#gold_angie_jones",
+  "plates": [
+    {
+      "id": "angie-jones-opening-narration",
+      "at": 45.36,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "TRUSTEE // GUARDIAN",
+      "class": "Voidwalker Warlock",
+      "name": "Angie Jones",
+      "title": "Arbiter of the Agentic",
+      "variant": "leader",
+      "why": "Local transcript evidence: the first narration line starts at source 45.360s."
+    }
+  ],
+  "unresolved": []
+}
