@@ -33,6 +33,15 @@ exactly this reason and was deliberately left alone. The exception is
 `deliver.py publish`: it recomputes every line before it rewrites the file,
 so the assertion it writes is the one it checked.
 
+## Wallpaper seats
+
+Do not manufacture variety by rotating a small wallpaper pool. Wait for the
+owner's new art, then distribute it across the mutable show seats rather than
+concentrating it in the credits.
+
+The Timeless movement immediately before *Endless Forms Most Beautiful* is
+locked: never move, replace, or re-time its wallpaper sequence.
+
 ## Putting it on the television
 
 **"Stream it" means the film is playing on the owner's TV before you do
