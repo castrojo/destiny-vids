@@ -272,9 +272,15 @@ def merge(data, edited):
     Returns ``(new_data, changes)``. Nothing is discarded quietly: a cue the
     owner deleted moves to ``dropped`` with a reason, and a cue whose wording
     they changed keeps the recovered text beside the new line.
+
+    Restoring is the same move backwards, and it has to be just as complete: a
+    line the owner brings back leaves ``dropped`` entirely. Leaving the entry
+    behind would record one line as both spoken and retired, which is a record
+    that contradicts itself about a real person's words.
     """
     original = {cue["id"]: cue for cue in data["cues"]}
-    changes, cues = [], []
+    retired = {cue["id"]: cue for cue in data.get("dropped") or []}
+    changes, cues, restored = [], [], set()
 
     for cue in edited:
         previous = original.get(cue["id"])
@@ -294,10 +300,23 @@ def merge(data, edited):
             }
             if cue.get("pin_sec") is not None:
                 added["pin_sec"] = round(cue["pin_sec"], 2)
+            was_dropped = retired.get(cue["id"])
+            if was_dropped is not None:
+                # Bringing a retired line back. Its wording is kept beside the
+                # new one for the same reason a reword keeps it: the owner is
+                # entitled to see what the line used to say.
+                restored.add(cue["id"])
+                raw = was_dropped.get("raw", "")
+                if raw and raw != cue["text"]:
+                    added["recovered_text"] = raw
+                changes.append(
+                    f"  ^ {cue['id']} restored from dropped: "
+                    f"{cue['text'][:56]}")
+            else:
+                changes.append(
+                    f"  + {cue['id']} added: "
+                    f"{'(placeholder -- no words yet)' if blank else cue['text'][:56]}")
             cues.append(added)
-            changes.append(
-                f"  + {cue['id']} added: "
-                f"{'(placeholder -- no words yet)' if blank else cue['text'][:56]}")
             continue
 
         merged = dict(previous)
@@ -335,7 +354,8 @@ def merge(data, edited):
         cues.append(merged)
 
     kept = {cue["id"] for cue in edited}
-    dropped = list(data.get("dropped") or [])
+    dropped = [cue for cue in (data.get("dropped") or [])
+               if cue["id"] not in restored]
     for cue_id, cue in original.items():
         if cue_id in kept:
             continue
@@ -348,7 +368,24 @@ def merge(data, edited):
         })
         changes.append(f"  - {cue_id} removed")
 
+    # `plan_script` walks `cues` in list order, so this sort IS the order the
+    # conversation plays in -- while `start_sec` is only the authored window,
+    # and for any line under ~37 characters the hold is MIN_HOLD and those
+    # numbers reach nothing else. So a re-time can silently reorder an
+    # exchange: widening one line's window past its neighbour's start swaps a
+    # reply and its setup. That is moving copy the owner placed, which
+    # `AGENTS.md` puts in the fourth un-automatable class, so it is reported
+    # loudly rather than done quietly. It is still not refused: nothing here
+    # blocks, and the owner may well have meant it.
+    before = [cue["id"] for cue in cues]
     cues.sort(key=lambda cue: cue["start_sec"])
+    after = [cue["id"] for cue in cues]
+    if before != after:
+        moved = [cue_id for was, cue_id in zip(before, after) if was != cue_id]
+        changes.append(
+            f"  ! REORDERED by start_sec: {', '.join(moved)} -- the "
+            f"conversation now plays {' '.join(after)}. If that is not what "
+            f"you meant, the timecodes moved a line past its neighbour.")
     return {**data, "cues": cues, "dropped": dropped}, changes
 
 

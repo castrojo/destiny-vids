@@ -138,10 +138,9 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         "start_sec": 32.56,
         "standalone_leads": False,
         "note": (
-            "The owner replaced the complete conversation. Script layout keeps "
-            "all 23 lines readable in order; standalone lead plates are omitted "
-            "because every dialogue pill identifies Doctor Andy Anderson or "
-            "Bob Killen."
+            "Script layout keeps all 26 lines readable in order; standalone "
+            "lead plates are omitted because every dialogue pill identifies "
+            "Doc Anderson or Bob Killen."
         ),
     }
 
@@ -162,49 +161,76 @@ def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
 
 def test_act3_owner_placed_pins_are_recorded_in_film_seconds():
     """Owner, 2026-08-24: d20a at 1:57, d21 at 2:04 (on the red portal),
-    d22 held 134.82 until the sign-punchline cut retired the line."""
+    d22 at 2:14.82 -- the seat it held before the sign-punchline cut retired
+    it, and the seat the owner named when asking for it back."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
     assert cues["d13"]["pin_sec"] == 90.0
     assert cues["d20a"]["pin_sec"] == 117.0
     assert cues["d21"]["pin_sec"] == 124.0
+    assert cues["d22"]["pin_sec"] == 134.82
 
 
 def test_act3_toilmaster_line_is_dropped_and_replaced():
     """Owner, 2026-08-24: d24 is removed entirely; d26 takes its slot.
     Later the same day the tail goes too: 'then that concludes the
-    dialogue' -- the 7% line is the closer, and d23b, d26 and d25 are all
-    retired to dropped[] with their wording kept."""
+    dialogue'. d26 and d25 stay retired; d23b came back with the maintainer
+    exchange and is asserted in that test."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
-    for gone in ("d23b", "d24", "d26", "d25"):
+    for gone in ("d24", "d26", "d25"):
         assert gone not in cues
     dropped = {cue["id"]: cue for cue in data["dropped"]}
     assert dropped["d24"]["raw"].startswith("If I don't stop the Toilmaster")
     assert dropped["d26"]["raw"] == "Don't worry Maintainers read their emails"
-    assert dropped["d23b"]["raw"] == "I don't like this plan"
     assert dropped["d25"]["raw"].startswith("I'm sure one of them")
 
 
-def test_act3_the_hive_line_is_the_closer():
-    """Owner, 2026-08-24: after the sandbox breakout, Doc gets 'Hive is the
-    one stuck in the CNCF Sandbox!' -- and later the same day: 'it's funnier
-    if we remove the last two lines of dialogue after that since the sign
-    shows that no one does open them.' d22 and the 7% line are retired to
-    dropped[]; the Hive quip is the closer and the sign lands the joke."""
+def test_act3_the_maintainer_exchange_is_restored_after_the_hive_line():
+    """Owner, 2026-08-24: 'the "we need to get a message to CNCF maintainers"
+    discussion is missing at around 2:14 fix that.'
+
+    The exchange was retired the same day (#357 took d23b, d26 and d25; #358
+    took d22 and the 7% line) and the owner asked for three of the five back:
+    d22, d23a and d23b. d22 is reworded to name the CNCF rather than
+    Kubernetes -- 'We need', not 'You need' -- and keeps its old wording as
+    recovered_text. d26 and d25 stay retired.
+
+    The Hive quip is no longer the closer, but it still follows the sandbox
+    breakout and still precedes the maintainer exchange.
+    """
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = data["cues"]
     by_id = {cue["id"]: cue for cue in cues}
     assert by_id["d27"]["character"] == "sagira"
     assert by_id["d27"]["text"] == "Hive is the one stuck in the CNCF Sandbox!"
     assert by_id["d27"]["text_source"] == "owner_supplied"
-    assert "d22" not in by_id and "d23a" not in by_id
+
+    assert by_id["d22"]["character"] == "osiris"
+    assert by_id["d22"]["text"] == (
+        "We need to get a message to the CNCF Maintainers")
+    assert by_id["d22"]["text_source"] == "owner_supplied"
+    assert by_id["d22"]["recovered_text"] == (
+        "You need to get a message to the Kubernetes Maintainers")
+    assert by_id["d23a"]["text"] == "The open rate of maintainer emails is 7%"
+    assert by_id["d23b"]["text"] == "I don't like this plan"
+    for restored in ("d22", "d23a", "d23b"):
+        assert by_id[restored]["character"] in ("osiris", "sagira")
+
     ids = [c["id"] for c in cues]
-    assert ids.index("d21") < ids.index("d27")
-    assert ids[-1] == "d27", "the Hive line concludes the dialogue"
-    dropped = {cue["id"]: cue for cue in data["dropped"]}
-    assert dropped["d22"]["raw"].startswith("You need to get a message")
-    assert dropped["d23a"]["raw"] == "The open rate of maintainer emails is 7%"
+    assert ids.index("d21") < ids.index("d27") < ids.index("d22")
+    assert ids.index("d22") < ids.index("d23a") < ids.index("d23b")
+    assert ids[-1] == "d23b", "the 'I don't like this plan' line closes"
+
+
+def test_act3_restored_lines_are_not_also_recorded_as_dropped():
+    """A line cannot be both spoken and retired. Restoring one has to be as
+    complete as dropping it, or the record contradicts itself about words
+    put in a real person's mouth."""
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    live = {cue["id"] for cue in data["cues"]}
+    retired = {cue["id"] for cue in data["dropped"]}
+    assert not (live & retired)
 
 
 def test_act3_wait_slow_down_is_dropped_and_d13_stands_alone():

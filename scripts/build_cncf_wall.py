@@ -8,9 +8,11 @@ from the generated landscape record, never from copy written here:
     stories/cncf-projects.json   the project set (scripts/sync_landscape.py)
     assets/cncf-logos/<id>.png   the artwork, rasterized by the same sync
 
-The TITLE is authored copy: it comes from the plate entry the owner wrote in
-``chapters/III-mrbobbytables.md`` (kind ``logowall``), passed through with
-``--title`` by the build. The logos and names come from the record, so the
+The TITLE is authored copy: the owner writes it in
+``chapters/III-mrbobbytables.md`` and it reaches the build through that act's
+``stories/<video_id>-fixed-plates.json`` entry (kind ``logowall``), which is
+the manifest ``build_uncut_credited.sh`` actually reads and passes through
+with ``--title``. The logos and names come from the record, so the
 wall shows the right projects every time the set changes -- that is the whole
 point of the sync.
 
