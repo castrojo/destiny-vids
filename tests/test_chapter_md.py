@@ -13,6 +13,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
+import build_efmb  # noqa: E402
+import build_efmb_plates  # noqa: E402
 from tools import chapter_md  # noqa: E402
 
 OFFSET = chapter_md.ACT_PROGRAMME_START["II"]
@@ -218,6 +220,131 @@ def test_entries_default_shape_never_carries_a_block_label(tmp_path, monkeypatch
                             "## 9:52.203 paused\nkolunmi: First\n"))
     entries, _ = chapter_md.entries("II")
     assert "_chapter_label" not in entries[0]
+
+
+# --- the seat the BUILD emits ---------------------------------------------
+#
+# `entries` is what the chapter file says; an act whose builder moves a line
+# between the file and the manifest (act II) needs `show` and `check` to
+# describe the film that ships instead. The mapping lives in the builder and
+# is reached through the `reseat` hook the chapter file declares.
+
+RESEAT_MODULE = """
+def reseat(entries):
+    for entry in entries:
+        entry.pop("_chapter_label", None)
+        entry["at"] = round(entry["at"] + 10.0, 3)
+    return entries
+"""
+
+
+def test_emitted_entries_applies_the_declared_reseat_hook(tmp_path,
+                                                          monkeypatch):
+    hook = tmp_path / "fake_builder.py"
+    hook.write_text(RESEAT_MODULE, encoding="utf-8")
+    chap = chapter_for(tmp_path, "## 9:52.203 paused\nkolunmi: First\n")
+    chap.fields["reseat"] = f"{hook}:reseat"
+    monkeypatch.setattr(chapter_md, "chapter", lambda _act: chap)
+    raw, _ = chapter_md.entries("II")
+    emitted, notes = chapter_md.emitted_entries("II")
+    assert notes == []
+    assert emitted[0]["at"] == pytest.approx(raw[0]["at"] + 10.0)
+    assert "_chapter_label" not in emitted[0]
+
+
+def test_a_chapter_with_no_reseat_hook_emits_what_it_resolves(tmp_path,
+                                                              monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203\nkolunmi: First\n"))
+    assert chapter_md.emitted_entries("II") == chapter_md.entries("II")
+
+
+def test_a_reseat_hook_that_cannot_be_loaded_degrades_and_says_so(
+        tmp_path, monkeypatch):
+    """A preview one release out of date beats a traceback.
+
+    Somebody reading their own dialogue back is not the person who can fix
+    a builder that has moved, so a hook that fails to import reports the
+    fact and keeps showing the file's own schedule.
+    """
+    chap = chapter_for(tmp_path, "## 9:52.203\nkolunmi: First\n")
+    chap.fields["reseat"] = "scripts/no_such_builder.py:reseat"
+    monkeypatch.setattr(chapter_md, "chapter", lambda _act: chap)
+    emitted, notes = chapter_md.emitted_entries("II")
+    assert any("reseat hook" in note for note in notes)
+    assert emitted[0]["at"] == pytest.approx(
+        chapter_md.entries("II")[0][0]["at"])
+    assert "_chapter_label" not in emitted[0]
+
+
+def test_act_two_reseats_through_its_builder_and_not_a_second_copy():
+    """One mapping, reached from both ends.
+
+    The regression this pins: `build_efmb_plates.build()` grew the rebase
+    and the `source_anchor` seating, and `chapter_md`'s own commands kept
+    printing the raw schedule. Restating the arithmetic here rather than
+    calling the builder's own function would put the same defect back, one
+    copy later.
+    """
+    hook, note = chapter_md._reseater("II")
+    assert note is None
+    assert hook is build_efmb_plates.reseat_chapter_entries
+
+
+def test_act_two_check_reports_no_drift():
+    """`check II` is act II's drift gate again, not ten permanent lines.
+
+    Read with tests/test_efmb_act.py::
+    test_the_committed_manifest_matches_its_generator, which pins the
+    committed manifest to what `build_efmb_plates.py --write` emits: the two
+    together say `check II` is clean immediately after a regeneration, so a
+    real copyedit that never reached the manifest still shows up here.
+    """
+    assert chapter_md.check("II") == []
+    assert chapter_md.main(["check", "II", "--check"]) == 0
+
+
+def _shown(capsys, act="II"):
+    chapter_md.main(["show", act])
+    return capsys.readouterr().out.splitlines()
+
+
+def test_show_quotes_act_two_at_the_seats_the_manifest_carries(capsys):
+    """The clock `show` prints is the clock the owner scrubs.
+
+    Every post-hallway act II line is rebased by the grown `paused` block
+    before it reaches the manifest. Printing the pre-rebase seat sent an
+    editor asked to nudge `retirement-1` to a timecode 47 s from the picture
+    they meant to move.
+    """
+    lines = _shown(capsys)
+    plates = {p["id"]: p for p in chapter_md.manifest_plates("II")}
+    offset = chapter_md.ACT_PROGRAMME_START["II"]
+    for plate_id, tail in (("mapped_haters", "! HATERS"),
+                           ("retirement-1", "[redacted]: Finally, retirement"),
+                           ("chat_kolunmi_level", "kolunmi: Hey did you see "
+                            "how we just loaded up in a new level?")):
+        at = plates[plate_id]["at"]
+        shown = [line for line in lines if line.endswith(tail)]
+        assert len(shown) == 1, f"{plate_id} is not shown exactly once"
+        assert f"{chapter_md.format_tc(at + offset)} programme" in shown[0]
+        assert f"{chapter_md.format_tc(at)} film" in shown[0]
+        assert "reseated by the build" in shown[0]
+
+
+def test_show_seats_sup_on_the_frame_its_source_anchor_names(capsys):
+    """Sup is bound to Kyle's own close-up, not to its place in the queue."""
+    shown = [line for line in _shown(capsys)
+             if line.endswith("kylegospo: Sup")]
+    assert len(shown) == 1
+    sup = {p["id"]: p for p in chapter_md.manifest_plates("II")}["mapped_kyle_sup"]
+    assert sup["seen_at_src"] == pytest.approx(build_efmb.KYLE_REVEAL_SRC)
+    at = build_efmb.edited_film_for_source(build_efmb.KYLE_REVEAL_SRC)
+    assert sup["at"] == pytest.approx(round(at, 3))
+    assert f"{chapter_md.format_tc(sup['at'])} film" in shown[0]
+    assert (f"{chapter_md.format_tc(sup['at'] + chapter_md.ACT_PROGRAMME_START['II'])}"
+            " programme") in shown[0]
 
 
 # Act II's own declared column order (chapters/II-endless-forms.md front
