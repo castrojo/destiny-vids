@@ -220,6 +220,65 @@ def test_entries_default_shape_never_carries_a_block_label(tmp_path, monkeypatch
     assert "_chapter_label" not in entries[0]
 
 
+# Act II's own declared column order (chapters/II-endless-forms.md front
+# matter), reproduced here so the ordering test below needs neither the real
+# chapter file nor Task 3's still-missing `paused` heading label.
+ACT_II_FIELD_ORDER = (
+    "id, at, dur, name, title, title_source, kind, position, "
+    "copy_source, speaker, text, text_source, scale, seen_at_src, "
+    "avatar, avatar_url, bond_of")
+
+
+def test_a_key_added_after_the_chapter_file_builds_still_lands_in_order():
+    """Reproduces the ordering bug fixed in build_efmb_plates.py's build().
+
+    A source-anchored line (Act II's `Sup`, authored with `- source_anchor:
+    <src>`) comes back from `chapter_md.entries()` with `source_anchor`
+    still on it and no `seen_at_src` yet -- the recomputed source frame is
+    only known once `build_efmb_plates.build()` calls its own `film_of()`.
+    Assigning that key afterwards is a plain dict write, which always
+    appends: `seen_at_src` used to land after `bond_of`/`avatar`/
+    `avatar_url` even though the act's own `field_order` seats it ahead of
+    them (mirrored above as `ACT_II_FIELD_ORDER`). The fix re-applies
+    `chapter_md._ordered()` once the key is added, which is exercised here
+    directly since `scripts/build_efmb_plates.py` cannot yet be imported
+    (it derives a module-level constant from the same missing `paused`
+    label, which is Task 3's job, not this test's).
+    """
+    text = ("---\nact: X\nfield_order: " + ACT_II_FIELD_ORDER + "\n---\n\n"
+            "## 0:00\n\nkylegospo @ 0:10 +2.2: Sup\n"
+            "  - bond_of: mapped_kyle_reveal\n"
+            "  - avatar: renders/avatars/KyleGospo.png\n"
+            "  - avatar_url: https://github.com/KyleGospo.png?size=256\n"
+            "  - source_anchor: 333.497\n")
+    fields, _ = chapter_md.parse_front_matter(text)
+    order = [k.strip() for k in fields["field_order"].split(",")]
+    line = chapter_md.parse(text)[0]["lines"][0]
+    entry = chapter_md.build_entry("X", 1, 1, line, line["pin"] or 0.0,
+                                   line["hold"] or 1.0,
+                                   fields.get("defaults") or {}, order)
+
+    # What chapter_md hands back today: portrait keys already in their
+    # declared place, `source_anchor` trailing because it names no
+    # `field_order` column.
+    assert list(entry.keys())[-1] == "source_anchor"
+
+    # scripts/build_efmb_plates.py's build(): pop `source_anchor`, seat the
+    # recomputed frame, set `seen_at_src`, then re-seat the whole entry.
+    source_anchor = entry.pop("source_anchor")
+    entry["at"] = 335.267
+    entry["seen_at_src"] = source_anchor
+    ordered = chapter_md._ordered(entry, order)
+    entry.clear()
+    entry.update(ordered)
+
+    keys = list(entry.keys())
+    assert keys.index("seen_at_src") < keys.index("avatar")
+    assert keys.index("seen_at_src") < keys.index("avatar_url")
+    assert keys.index("seen_at_src") < keys.index("bond_of")
+    assert keys == [k for k in order if k in entry]
+
+
 def test_an_unknown_act_is_not_an_error():
     assert chapter_md.entries("IX") == ([], [])
 

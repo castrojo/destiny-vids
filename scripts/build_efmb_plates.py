@@ -1326,6 +1326,13 @@ def build():
         build_efmb.HALLWAY_AFTER_AMBER_AT + OLD_HALLWAY_AFTER_AMBER_SEC)
     pause_delta = round(
         build_efmb.HALLWAY_AFTER_AMBER_SEC - OLD_HALLWAY_AFTER_AMBER_SEC, 3)
+    # The act's own declared key order (see the `field_order` front matter
+    # in chapters/II-endless-forms.md), so a field this loop adds after the
+    # chapter file already built the entry lands in its declared column
+    # instead of trailing on at the end of the dict.
+    order_field = chapter_md.chapter("II").fields.get("field_order")
+    field_order = ([k.strip() for k in order_field.split(",")]
+                   if isinstance(order_field, str) else None)
     for entry in chapter_entries:
         label = entry.pop("_chapter_label", None)
         source_anchor = entry.pop("source_anchor", None)
@@ -1336,6 +1343,14 @@ def build():
             # `pause_delta`, or it would move twice.
             entry["at"] = round(film_of(source_anchor), 3)
             entry["seen_at_src"] = source_anchor
+            # `seen_at_src` was just added, so it landed at the end of the
+            # dict, after keys such as `bond_of` the chapter file already
+            # built -- re-seat it (and everything else) in the act's
+            # declared order. Mutated in place: `entry` is the same dict
+            # object `chapter_entries` (and `plates.extend` below) hold.
+            ordered = chapter_md._ordered(entry, field_order)
+            entry.clear()
+            entry.update(ordered)
             continue
         if (label != build_efmb.PAUSED_BLOCK and "at" in entry
                 and entry["at"] >= old_hallway_return_at):
