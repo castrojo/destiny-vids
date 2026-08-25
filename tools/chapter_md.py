@@ -763,7 +763,27 @@ def schedule_block(block, offset, seats=None):
     return at, holds, notes
 
 
-def entries(act):
+def block_end(act, label):
+    """The act-local time right after a labelled block's last pill clears.
+
+    For a builder that must seat something *after* an aside authored in the
+    chapter file -- act II's paused conversation, say -- without recomputing
+    the block's own schedule of held reads and gaps itself. Raises
+    ``KeyError`` when the act has no chapter block with that label, the same
+    way ``chapter()`` names what is wired instead of failing silently.
+    """
+    chap = chapter(act)
+    for block in parse(chap.path.read_text(encoding="utf-8")):
+        if block["label"] != label:
+            continue
+        at, holds, _ = schedule_block(
+            block, chap.programme_start,
+            seats=seat_lines(act, block["lines"]))
+        return round(at[-1] + holds[-1] + GAP, 3)
+    raise KeyError(f"{act}: no chapter block labelled {label!r}")
+
+
+def entries(act, *, include_block_labels=False):
     """The act's chapter file -> (plate-manifest chat entries, unresolved).
 
     Entries carry the same shape scripts/build_efmb_plates.py emits for its
@@ -773,8 +793,15 @@ def entries(act):
 
     Copy written PAST the end of the act's picture is not the act's -- it is
     the deck that plays after it, and `deck_entries` below is what reads it.
+
+    ``include_block_labels`` is for an in-memory builder that needs to know
+    which chapter block a plate came from -- it stamps a private
+    ``_chapter_label`` onto each entry. The default manifest shape never
+    carries it: a builder that wants the label must ask for it, and a
+    committed manifest must never see a key nothing else writes.
     """
-    act_entries, _, unresolved = _split_entries(act)
+    act_entries, _, unresolved = _split_entries(
+        act, include_block_labels=include_block_labels)
     return act_entries, unresolved
 
 
@@ -795,7 +822,7 @@ def deck_entries(act):
     return deck, unresolved
 
 
-def _split_entries(act):
+def _split_entries(act, *, include_block_labels=False):
     """(the act's plates, the trailing deck's plates, unresolved)."""
     try:
         chap = chapter(act)
@@ -832,8 +859,15 @@ def _split_entries(act):
         into = (deck if deck_label and block["label"] == deck_label else out)
         for n, (line, start, hold) in enumerate(zip(block["lines"],
                                                     at, holds), 1):
-            into.append(build_entry(act, b, n, line, start, hold,
-                                    defaults, order))
+            entry = build_entry(act, b, n, line, start, hold,
+                                defaults, order)
+            if include_block_labels:
+                # Private to an in-memory builder -- never part of the
+                # manifest shape scripts/build_efmb_plates.py emits, so a
+                # caller has to ask for it by name.
+                entry["_chapter_label"] = (
+                    block["label"] or format_tc(block["anchor"]))
+            into.append(entry)
         if into is deck:
             # Running off the picture is what a slide DOES. The note below
             # would fire on every one of them and mean nothing.
