@@ -173,6 +173,53 @@ def test_entries_from_the_committed_file_are_manifest_shaped(tmp_path):
             assert e["kind"] == "miniboss" and e["name"]
 
 
+def chapter_for(tmp_path, body, act="II", programme_start=None):
+    """A throwaway ``Chapter`` over ``body``, for a test that fakes ``chapter()``.
+
+    Bypasses ``discover()`` entirely -- no file is wired to an act -- so a
+    test can hand ``chapter_md.chapter`` a block it wrote inline without
+    touching the committed act II chapter file.
+    """
+    path = tmp_path / "chapter.md"
+    path.write_text(body, encoding="utf-8")
+    if programme_start is None:
+        programme_start = chapter_md.ACT_PROGRAMME_START["II"]
+    return chapter_md.Chapter(
+        path, {"act": act, "programme_start": programme_start}, body)
+
+
+def test_block_end_includes_the_final_hold_and_gap(tmp_path, monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203 paused\n"
+                            "kolunmi: First\nkolunmi: Second\n"))
+    end = chapter_md.block_end("II", "paused")
+    assert end == pytest.approx(
+        592.203 - chapter_md.ACT_PROGRAMME_START["II"]
+        + chapter_md.MIN_HOLD * 2 + chapter_md.GAP * 2)
+
+
+def test_block_end_raises_for_an_unknown_label():
+    with pytest.raises(KeyError):
+        chapter_md.block_end("II", "no-such-block-label")
+
+
+def test_entries_can_retain_a_block_label_for_a_builder(tmp_path, monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203 paused\nkolunmi: First\n"))
+    entries, _ = chapter_md.entries("II", include_block_labels=True)
+    assert entries[0]["_chapter_label"] == "paused"
+
+
+def test_entries_default_shape_never_carries_a_block_label(tmp_path, monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203 paused\nkolunmi: First\n"))
+    entries, _ = chapter_md.entries("II")
+    assert "_chapter_label" not in entries[0]
+
+
 def test_an_unknown_act_is_not_an_error():
     assert chapter_md.entries("IX") == ([], [])
 
