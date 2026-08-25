@@ -308,12 +308,14 @@ Staleness is content-based where it can be, because `~/Videos` is a Syncthing
 folder and mtimes lie: the hardlink layer is checked by **inode identity**
 against the declared master, `CHECKSUMS.md5` by recomputation, and the
 README's master table is **generated** between `<!-- deliver:table -->`
-markers so a hand-edit that disagrees with the map is detected as drift. The
-megacut carries a sidecar digest of the exact verified Prod checksum set it
-seated, plus a duration check against the plan's arithmetic. Prefer
-`deliver.py build`, which records that sidecar; a direct `tools/megacut.py`
-run is still stale until its verified build is followed by
-`deliver.record_megacut_provenance`.
+markers so a hand-edit that disagrees with the map is detected as drift.
+`10mb/README.md` owns two analogous generated tables: the current source
+runtime, cap-derived video budget, and social-copy size; its prose remains
+hand-authored. The megacut sidecar is current only when it both matches the
+exact verified Prod checksum set and postdates its output, plus a duration
+check against the plan's arithmetic. Prefer `deliver.py build`, which records
+that sidecar; a direct `tools/megacut.py` run is still stale until its verified
+build is followed by `deliver.record_megacut_provenance`.
 
 Two deliberate behaviours, both learned the hard way on 2026-08-13:
 
