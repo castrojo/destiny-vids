@@ -154,14 +154,20 @@ def _farm_runner(cmd, inputs, out, expected_duration):
 
     def run(argv):
         # plate.burn .resolve()s every path it puts in the argv, so the
-        # staging check's exact-token match only holds if the inputs and out
-        # are resolved the same way -- a symlinked renders/ (a worktree whose
+        # staging check's exact-token match only holds if the inputs are
+        # resolved the same way -- a symlinked renders/ (a worktree whose
         # masters live at their durable paths) otherwise reads as "argv never
         # reads staged input". resolve() is a no-op on canonical paths.
+        #
+        # The fetch target is read off the ARGV, never the caller's `out`:
+        # burn() rewrites the final token to a `.burntmp` sibling so an
+        # interrupted encode cannot truncate the delivered master (#286), and
+        # the farm refuses an `out` the argv does not name verbatim. The trim
+        # leg's last token is its output outright, so one rule serves both.
         farm.run_ffmpeg_on_cluster(
             argv,
             inputs=[Path(REPO_ROOT / p).resolve() for p in inputs],
-            out=Path(REPO_ROOT / out).resolve(),
+            out=Path(argv[-1]),
             expected_duration=expected_duration,
         )
 
