@@ -69,9 +69,13 @@ def test_new_picture_lengths_are_frame_derived():
     doc = load()
     pic = doc["picture"]
     assert pic["content_sec"] == 95.333333
-    assert pic["delivered_frames"] == 2862
-    assert pic["delivered_sec"] == 95.4
-    assert doc["film_sec"] == 95.4
+    # Since the Jupiter tail (owner, 2026-08-23) the delivered film is the
+    # master's full length: 108.333333 s of picture rounds to the 3252nd
+    # frame, and the audio is padded to match.
+    assert pic["delivered_frames"] == 3252
+    assert pic["delivered_sec"] == 108.4
+    assert pic["audio_sec"] == 108.4
+    assert doc["film_sec"] == 108.4
 
 
 def test_laura_reveal_clears_before_its_half_open_boundary():
@@ -100,7 +104,8 @@ def test_build_command_has_no_endcard_input_or_overlay(tmp_path):
     )
     graph = cmd[cmd.index("-filter_complex") + 1]
     assert "endcard.png" not in " ".join(cmd)
-    assert len(build_europa._cues(doc)) == len(doc["plates"]) + 1
+    # plates + the reveal + the two tail cards; the retired endcard is none.
+    assert len(build_europa._cues(doc)) == len(doc["plates"]) + 3
     assert "90.8" not in graph
 
 
@@ -160,12 +165,15 @@ def test_the_song_plays_alone_with_no_crossfade_and_no_fades():
     assert "afade" not in graph
 
 
-def test_the_song_covers_the_whole_delivered_film():
-    """95.4 s of song against 95.333333 s of picture, so the cut lands inside
-    the song rather than running out of it."""
+def test_the_song_covers_the_whole_content():
+    """95.4 s of song against 95.333333 s of CONTENT, so the cut lands inside
+    the song rather than running out of it. The jupiter-hold tail behind it
+    plays silent by design -- the memorial beat the comic cover used to fill
+    -- so audio_sec (the padded delivered stream) is NOT the bar here."""
     doc = load()
     start, end = doc["audio"]["join"][0]["window"]
-    assert end - start >= doc["picture"]["audio_sec"]
+    assert end - start >= doc["picture"]["content_sec"]
+    assert end - start < doc["picture"]["audio_sec"]
 
 
 def test_the_delivered_derivation_fades_only_when_the_record_asks(tmp_path):
@@ -174,11 +182,105 @@ def test_the_delivered_derivation_fades_only_when_the_record_asks(tmp_path):
         doc, tmp_path, tmp_path, tmp_path / "m.mp4", tmp_path / "d.mp4",
         ffmpeg=["ffmpeg"])
     af = derive[derive.index("-af") + 1]
-    assert af == f"atrim=0:{doc['picture']['audio_sec']:g}"
+    # delivered_apad pads the song's end with silence under the jupiter-hold
+    # tail, so the delivered audio stream matches the 108.4 s picture.
+    assert af == f"apad,atrim=0:{doc['picture']['audio_sec']:g}"
 
     faded = json.loads(MANIFEST.read_text())
     faded["audio"]["delivered_fade_out"] = {"at": 1.0, "dur": 2.0}
     _, derive = build_europa.build_commands(
         faded, tmp_path, tmp_path, tmp_path / "m.mp4", tmp_path / "d.mp4",
         ffmpeg=["ffmpeg"])
-    assert derive[derive.index("-af") + 1].startswith("afade=t=out:st=1:d=2,")
+    assert "afade=t=out:st=1:d=2," in derive[derive.index("-af") + 1]
+
+
+def test_the_silent_tail_is_padded_not_faded():
+    """The owner's mix rule survives the tail: the song is NEVER faded, and
+    the tail's silence is container padding (apad), not a fade of anything."""
+    doc = load()
+    aud = doc["audio"]
+    assert aud["delivered_apad"] is True
+    assert "delivered_fade_out" not in aud
+    assert "master_fade_out" not in aud
+
+
+def test_the_jupiter_hold_takes_the_covers_slot():
+    """The retired comic cover's 13 s slot is the held nightway now (owner
+    direction, 2026-08-23, verbatim in the record's tail block). The master
+    length is unchanged, so nothing downstream of the concat moves."""
+    doc = load()
+    pic = doc["picture"]
+    assert "cover" not in pic["inputs"]
+    assert "hold" in pic["inputs"]
+    seg = pic["segments"][-1]
+    assert seg["label"] == "jupiter-hold"
+    assert seg["from"] == "hold"
+    assert seg["still"] is True and seg["dur"] == 13.0
+    # The hold fades itself out exactly at its own end: the act still ends
+    # on its own taper to black, so megacut carries no fade for it.
+    assert seg["fade_out"]["at"] + seg["fade_out"]["dur"] == seg["dur"]
+    assert pic["master_sec"] == 108.333333
+
+
+def test_tail_cards_carry_owner_copy_verbatim():
+    """Both cards are the owner's 2026-08-23 lines, casing included --
+    KubeCon + CloudNativeCon are brand casing, so no uppercase homage."""
+    doc = load()
+    cards = {c["id"]: c for c in doc["tail"]["cards"]}
+    assert cards["tail-dedication"]["lines"] == [
+        "For other wolves, some will give all"]
+    assert cards["tail-event"]["lines"] == [
+        "Bluefin and the Forbidden Factory",
+        "KubeCon + CloudNativeCon EU 2027",
+        "Maintainer Summit"]
+
+
+def test_tail_cards_sit_inside_the_hold_after_the_reveal():
+    """Both cards play inside the jupiter-hold segment (95.333333-108.333333
+    on the master clock), after the reveal clears at 88.0, each fade
+    completing inside its own half-open window, and the event card off the
+    screen before the hold's own fade ends the act."""
+    doc = load()
+    hold_start, hold_end = 95.333333, 108.333333
+    reveal_end = doc["reveal"]["at"] + doc["reveal"]["dur"]
+    for card in doc["tail"]["cards"]:
+        at, dur = float(card["at"]), float(card["dur"])
+        assert hold_start < at
+        assert at + dur < hold_end
+        assert at > reveal_end
+        assert card["fade_out_at"] + card["fade_out"] <= at + dur
+    event = next(c for c in doc["tail"]["cards"] if c["id"] == "tail-event")
+    assert event["at"] + event["dur"] <= hold_start + 11.0 + 2.0
+
+
+def test_tail_cards_ride_the_cue_plumbing(tmp_path):
+    """The cards are repo-rendered into the plates dir and resolve by id --
+    no 'file' key, no special-casing in the builder."""
+    doc = load()
+    cues = build_europa._cues(doc)
+    assert [c["id"] for c in cues[-2:]] == ["tail-dedication", "tail-event"]
+    for card in doc["tail"]["cards"]:
+        assert "file" not in card
+    cmd, _ = build_europa.build_commands(
+        doc, "/project", tmp_path / "plates",
+        tmp_path / "master.mp4", tmp_path / "delivered.mp4",
+        ffmpeg=["ffmpeg"])
+    joined = " ".join(cmd)
+    assert "plate_tail-dedication.png" in joined
+    assert "plate_tail-event.png" in joined
+    graph = cmd[cmd.index("-filter_complex") + 1]
+    assert "gte(t,96.8)*lt(t,101.4)" in graph
+    assert "gte(t,102.2)*lt(t,107.1)" in graph
+
+
+def test_the_screenshot_is_referenced_never_committed():
+    """The concept sheet lives outside the repo and is referenced the way
+    every external asset here is: a ~-rooted path plus a sha256, so a
+    replaced or edited sheet is detected rather than silently re-sliced."""
+    doc = load()
+    src = doc["tail"]["hold"]["source_screenshot"]
+    assert src["path"].startswith("~/")
+    assert not PurePosixPath(src["path"]).is_absolute()
+    assert len(src["sha256"]) == 64
+    # And it is not in the repo: footage and images are never committed.
+    assert not (REPO / src["path"]).exists()

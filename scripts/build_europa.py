@@ -4,8 +4,11 @@
 Thin front end on ``scripts/actbuild.py`` the way ``build_kat.py`` is, but
 act VII is the one act whose picture is not a single source: it is an eight-
 segment concat (the intro split around a native Jupiter video, two films, an
-outro sting and a comic-cover still) with its own audio join, and the
-delivered master is derived from that concat by cutting the cover off. So this
+outro sting and the jupiter-hold tail) with its own audio join. The tail is
+the owner's 2026-08-23 Jupiter ending: the retired comic cover's 13 s slot
+now holds the wrap's nightway frame with the concept-sheet company seated on
+it and two repo-rendered cards (scripts/build_europa_tail.py), and the
+delivered master is the concat's full length -- nothing is cut off. So this
 script reuses actbuild's record loading, plate rendering and avatar resolution,
 and adds the three things the shared builder has never needed:
 
@@ -14,10 +17,11 @@ and adds the three things the shared builder has never needed:
 * the audio join from the record's ``audio`` block -- one leg (the song
   alone, a full replacement, which is what ships) or two crossfaded, with
   both fades optional, because the shipped mix has none;
-* the nocover derivation: peaks-gate the 108.333333 s master (#82), then cut
-  the delivered 95.4 s film from it with the picture STREAM-COPIED -- never
-  re-encoded -- and the audio trimmed to 95.333333 s, faded only if the
-  record asks for a fade.
+* the nocover derivation: peaks-gate the 108.333333 s master (#82), then
+  derive the delivered film from it with the picture STREAM-COPIED -- never
+  re-encoded -- the audio padded silent under the tail and faded only if the
+  record asks for a fade. The delivered file is the master's full length
+  since the Jupiter tail replaced the cut comic cover.
 
     python3 scripts/build_europa.py --print-command     # the ffmpeg calls
     python3 scripts/build_europa.py --plates-only       # just the pills
@@ -44,6 +48,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts import actbuild  # noqa: E402
+from scripts import build_europa_tail  # noqa: E402
 from tools.render import find_ffmpeg  # noqa: E402
 
 ACT = "VII"
@@ -57,6 +62,12 @@ def _cues(doc):
     order, so the endcard can take over the frame the moment the reveal
     clears. They never share the screen with each other or with a pill.
 
+    The tail cards (``tail.cards`` -- the dedication and the event card, owner
+    2026-08-23) are REPO-RENDERED by scripts/build_europa_tail.py into the
+    plates dir, so they resolve by ``id`` like any pill and composite after
+    the reveal; their windows sit inside the jupiter-hold segment, minutes
+    after the reveal clears.
+
     A cue marked ``retired`` (the KubeCon endcard, owner 2026-08-16) stays in
     the record -- copy is recoverable, never rewritten -- but is excluded
     here, so it creates no still input and no overlay filter.
@@ -64,6 +75,7 @@ def _cues(doc):
     cues = [*doc["plates"], doc["reveal"]]
     if doc.get("endcard") and not doc["endcard"].get("retired"):
         cues.append(doc["endcard"])
+    cues.extend(doc.get("tail", {}).get("cards", []))
     return [cue for cue in cues if not cue.get("retired")]
 
 
@@ -242,20 +254,30 @@ def build_commands(doc, project, plates_dir, master_out, delivered_out,
             "-c:a", doc["encode"]["delivered"]["acodec"],
             "-movflags", "+faststart", str(master_out)]
 
-    # The delivered film: the cover (95.333333-108.333333) is CUT, picture
-    # stream-copied from the peaks-gated master so no generation is added,
-    # audio faded and trimmed to land the outro with the picture. The video
-    # cut is by FRAME COUNT: with -c:v copy, -t flushes the two reordered
-    # B-frames past the boundary (2864 frames instead of 2862), so the record
-    # carries the delivered frame count and the cut is -frames:v.
+    # The delivered film is the FULL master since the Jupiter tail landed
+    # (2026-08-23): the picture is stream-copied from the peaks-gated
+    # master, never re-encoded, and the audio is padded silent under the
+    # hold (the record's delivered_apad). -frames:v only survives when the
+    # delivered cut is shorter than the master: with delivered_apad the
+    # video is the whole master anyway, and even a no-op -frames:v makes
+    # ffmpeg drop the encoder's final partial block, shipping the audio
+    # 0.112 s short of audio_sec.
     audio = doc["audio"]
     fade = audio.get("delivered_fade_out")
     af = f"afade=t=out:st={fade['at']:g}:d={fade['dur']:g}," if fade else ""
+    # The song ends with the content; the jupiter-hold tail plays SILENT
+    # behind it (the memorial beat the cover filled before). delivered_apad
+    # pads the delivered file's audio stream to audio_sec so picture and
+    # sound durations match for the megacut concat; the song itself is
+    # untouched -- no fade, no gain, nothing.
+    apad = audio.get("delivered_apad")
+    pad = "apad," if apad else ""
+    frames = [] if apad else ["-frames:v", str(pic["delivered_frames"])]
     derive = [*ff, "-y", "-i", str(master_out),
               "-map", "0:v", "-c:v", "copy",
-              "-frames:v", str(pic["delivered_frames"]),
+              *frames,
               "-map", "0:a",
-              "-af", f"{af}atrim=0:{pic['audio_sec']:g}",
+              "-af", f"{pad}{af}atrim=0:{pic['audio_sec']:g}",
               "-c:a", doc["encode"]["delivered"]["acodec"],
               "-movflags", "+faststart", str(delivered_out)]
     return cmd, derive
@@ -282,7 +304,9 @@ def main(argv=None):
     ap.add_argument("--plates-only", action="store_true",
                     help="re-render the dialogue pills and stop")
     ap.add_argument("--skip-plates", action="store_true",
-                    help="reuse the rendered pills already in --plates-dir")
+                    help="reuse the rendered pills and tail cards already "
+                         "in --plates-dir (and the hold composite in the "
+                         "project's repo-build/)")
     ap.add_argument("--farm", action="store_true",
                     help="run the master encode on the farm cluster. This is "
                          "ALREADY the default whenever the cluster is "
@@ -310,6 +334,7 @@ def main(argv=None):
 
     if args.plates_only:
         actbuild.render_plates(doc, project, Path(args.plates_dir))
+        build_europa_tail.render_tail(doc, project, Path(args.plates_dir))
         return 0
 
     cmd, derive = build_commands(doc, project, Path(args.plates_dir),
@@ -340,6 +365,9 @@ def main(argv=None):
 
     if not args.skip_plates:
         actbuild.render_plates(doc, project, Path(args.plates_dir))
+        # The tail (hold composite + both cards) is re-rendered every build:
+        # existence is not freshness, and a stale card is never shippable.
+        build_europa_tail.render_tail(doc, project, Path(args.plates_dir))
     master.parent.mkdir(parents=True, exist_ok=True)
     ff = find_ffmpeg()
     cmd, derive = build_commands(doc, project, Path(args.plates_dir),
