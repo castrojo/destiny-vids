@@ -246,6 +246,13 @@ def parse_front_matter(text):
     ``defaults:`` mapping, and a chapter file must stay readable to somebody
     who has never heard of a YAML parser. Anything unrecognised is left
     alone rather than guessed at.
+
+    A scalar field can run long enough that one line reads badly (Act II's
+    `field_order` is seventeen names) -- an indented continuation line with
+    no `defaults:` section open is folded onto the top-level scalar it
+    follows, joined with a space, rather than parsed as a bogus key of its
+    own (task-2-rereview-1.md: the un-joined tail silently dropped every
+    name after the first line's trailing comma).
     """
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -255,21 +262,26 @@ def parse_front_matter(text):
             break
     else:
         raise ValueError("front matter opens with `---` and never closes")
-    fields, section = {}, None
+    fields, section, last_key = {}, None, None
     for raw in lines[1:end]:
         if not raw.strip() or raw.lstrip().startswith("#"):
             continue
-        if raw[:1] in " \t" and section is not None:
-            key, _, value = raw.strip().partition(":")
-            fields[section][key.strip()] = scalar(value.strip())
-            continue
+        if raw[:1] in " \t":
+            if section is not None:
+                key, _, value = raw.strip().partition(":")
+                fields[section][key.strip()] = scalar(value.strip())
+                continue
+            if last_key is not None:
+                fields[last_key] = scalar(
+                    f"{fields[last_key]} {raw.strip()}")
+                continue
         key, _, value = raw.partition(":")
         key, value = key.strip(), value.strip()
         if not value:
-            section = key
+            section, last_key = key, None
             fields[key] = {}
             continue
-        section = None
+        section, last_key = None, key
         fields[key] = scalar(value)
     return fields, "\n".join(lines[end + 1:])
 
