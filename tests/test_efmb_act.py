@@ -17,6 +17,15 @@ import build_efmb  # noqa: E402
 import build_efmb_plates  # noqa: E402
 from tools import chapter_md  # noqa: E402
 
+# The hallway hold is now derived from the `paused` chapter block instead of
+# a hand-typed 25.6 s (see scripts/build_efmb.py and build_efmb_plates.py's
+# OLD_HALLWAY_AFTER_AMBER_SEC). Anything authored to play after the old
+# hallway return point moves by this amount; tests below apply it to the
+# same literals rather than re-typing a value the pause has since outgrown.
+PAUSE_DELTA = round(
+    build_efmb.HALLWAY_AFTER_AMBER_SEC
+    - build_efmb_plates.OLD_HALLWAY_AFTER_AMBER_SEC, 3)
+
 # --- the two clocks --------------------------------------------------------
 
 def test_source_and_film_time_round_trip():
@@ -88,10 +97,17 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
     assert amber["source_in"] == pytest.approx(43.0, abs=1e-3)
     assert amber["source_out"] == pytest.approx(53.47, abs=1e-3)
     assert after["at"] == pytest.approx(build_efmb.HALLWAY_AFTER_AMBER_AT, abs=1e-3)
-    assert after["duration"] == pytest.approx(25.6, abs=1e-3)
+    assert after["duration"] == pytest.approx(
+        build_efmb.HALLWAY_AFTER_AMBER_SEC, abs=1e-3)
     assert after["darken"] > hallway["darken"]
     assert returned["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
     assert returned["source_in"] == pytest.approx(325.933, abs=1e-3)
+
+def test_post_amber_hold_is_derived_from_the_paused_chapter_block():
+    """The hold is not a hand-typed number: it is however long the owner's
+    paused conversation, authored in the chapter file, takes to clear."""
+    assert build_efmb.HALLWAY_RETURN_AT == pytest.approx(
+        chapter_md.block_end("II", "paused"))
 
 def test_the_picture_tail_is_black_after_the_last_evidenced_run():
     sequence = build_efmb.picture_sequence()
@@ -124,7 +140,8 @@ def test_the_interruption_audio_uses_only_recorded_sources():
     assert audio[2]["at"] == pytest.approx(build_efmb.AMBER_AT, abs=1e-3)
     assert audio[3]["at"] == pytest.approx(
         build_efmb.HALLWAY_AFTER_AMBER_AT, abs=1e-3)
-    assert audio[3]["duration"] == pytest.approx(25.6, abs=1e-3)
+    assert audio[3]["duration"] == pytest.approx(
+        build_efmb.HALLWAY_AFTER_AMBER_SEC, abs=1e-3)
     assert audio[4]["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
     assert sum(p["duration"] for p in audio) == pytest.approx(
         build_efmb.build()["film_sec"], abs=1e-3)
@@ -134,6 +151,10 @@ def test_the_interruption_audio_uses_only_recorded_sources():
 def committed():
     with open(REPO_ROOT / "stories" / "02-endless-forms-plates.json") as fh:
         return json.load(fh)
+
+def plate_by_id(plate_id):
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    return by_id[plate_id]
 
 def test_the_committed_manifest_matches_its_generator():
     """It is an OUTPUT. A conflict in it is settled by re-running the tool."""
@@ -774,15 +795,19 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     assert haters["name"] == "HATERS"
     # Owner, 2026-08-24: "9:57, all the enemies are the haters, it just needs
     # to be obvious". The bar used to fire at 10:00 over the guardian sunset
-    # shot; it now opens on the red-lit enemy face's first frame (that shot
-    # is film 317.4 once the 2026-08-24 pause growth moved the content 4.1 s).
-    assert haters["at"] == pytest.approx(317.4, abs=1e-3)
+    # shot; it now opens on the red-lit enemy face's first frame, 317.4 under
+    # the pause length that was hand-typed when this was pinned -- PAUSE_DELTA
+    # carries the seat forward as the paused chapter block grows or shrinks.
+    assert haters["at"] == pytest.approx(317.4 + PAUSE_DELTA, abs=1e-3)
     assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
     # Owner, 2026-08-19: "sup is a purple titan ... put it when it's zoomed
-    # into his face"; 2026-08-24, asked again: it stays. The close-up's
-    # content moved 4.1 s with the pause, so the seat is film 321.067 now.
-    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(321.067, abs=1e-3)
+    # into his face"; 2026-08-24, asked again: it stays. Sup is now
+    # source-anchored to KYLE_REVEAL_SRC (see
+    # test_sup_is_anchored_to_kyles_reveal_source), so its seat is whatever
+    # frame that source position edits to, not a pause-relative offset.
+    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(
+        build_efmb.KYLE_REVEAL_AT, abs=1e-3)
     # kolunmi's "Disco!", deleted 2026-08-23, was restored by the owner on
     # 2026-08-24 "when the hunter is onscreen" -- the red-corridor fight,
     # left lane while Sup holds the right, clearing the nameplate's arrival.
@@ -791,7 +816,7 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     assert by_id["mapped_kolunmi_disco"]["text"] == "Disco!"
     assert by_id["mapped_kolunmi_disco"]["speaker"] == "kolunmi"
     assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(
-        320.387, abs=1e-3)
+        320.387 + PAUSE_DELTA, abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["dur"] == pytest.approx(2.2, abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["bond_of"] == "mapped_kyle_sup"
     # Owner, 2026-08-24: "Don't unpause, at 'Oh I see your problem', keep
@@ -800,6 +825,19 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
         assert by_id[pid]["at"] + by_id[pid]["dur"] <= \
             build_efmb.HALLWAY_RETURN_AT + 1e-3
     assert by_id["chat_amber_problem"]["at"] == pytest.approx(308.403, abs=1e-3)
+
+def test_sup_is_anchored_to_kyles_reveal_source():
+    """Sup's seat comes from a source frame, not a stale pin.
+
+    The chapter file's old `seen_at_src: 333.497` was informational and
+    wrong; `source_anchor` is consumed by the builder to both PLACE the pill
+    (at whatever film time that source position edits to) and to publish the
+    correct `seen_at_src` -- and it must never itself reach the manifest.
+    """
+    sup = plate_by_id("mapped_kyle_sup")
+    assert sup["seen_at_src"] == pytest.approx(build_efmb.KYLE_REVEAL_SRC)
+    assert sup["at"] == pytest.approx(build_efmb.KYLE_REVEAL_AT)
+    assert "source_anchor" not in sup
 
 def test_the_retirement_conversation_moved_here_verbatim_from_act_three():
     by_id = {p["id"]: p for p in committed()["plates"]}

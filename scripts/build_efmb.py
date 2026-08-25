@@ -56,6 +56,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from tools import conform  # noqa: E402  (needs REPO_ROOT on sys.path first)
+from tools import chapter_md  # noqa: E402
 
 SOURCE_ID = "yt_destiny_all_live_action_trailers"
 BED_ID = "bed_endless_forms_most_beautiful"
@@ -211,16 +212,19 @@ AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
 # held Kyle question before the Destiny picture resumes.
 HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
 # Owner, 2026-08-24: "Don't unpause, at 'Oh I see your problem', keep that in
-# the paused section, put cortney's conversation here." 21.5 let the picture
-# resume at film 309.403 with akgraner's pill still up and cortney's "And
-# we're gonna do you a solid" playing entirely after the resume; 25.6 holds
-# the frozen hallway until film 313.503 (programme 9:57.3), a beat after
-# cortney's pill ends (9:56.853). No footage is cut and the black tail keeps
-# its 16.065 s (owner: "keep the black"), so the act -- and every act after
-# it -- runs 4.1 s later; every downstream chapter file's programme_start and
-# pins are restated +4.1 in the same change, which lands their plates on the
-# same frames they always had.
-HALLWAY_AFTER_AMBER_SEC = 25.600
+# the paused section, put cortney's conversation here." The hold used to be a
+# hand-typed 25.6 s; it is now DERIVED from the `paused` block's own
+# schedule in chapters/II-endless-forms.md, so the hallway holds exactly as
+# long as that conversation needs to clear -- no more, no less -- instead of
+# a number an editor has to keep in sync with the copy by hand. No footage
+# is cut and the black tail keeps its 16.065 s (owner: "keep the black"), so
+# growing the paused conversation grows the act -- and every act after it --
+# by the same amount; every downstream chapter file's programme_start and
+# pins must be restated by that delta in the same change, which lands their
+# plates on the same frames they always had.
+PAUSED_BLOCK = "paused"
+HALLWAY_AFTER_AMBER_SEC = round(
+    chapter_md.block_end("II", PAUSED_BLOCK) - HALLWAY_AFTER_AMBER_AT, 3)
 HALLWAY_RETURN_AT = HALLWAY_AFTER_AMBER_AT + HALLWAY_AFTER_AMBER_SEC
 BLACK_CONVERSATION_AT = HALLWAY_AT
 BLACK_CONVERSATION_SEC = HALLWAY_FREEZE_SEC

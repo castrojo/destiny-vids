@@ -1012,6 +1012,14 @@ TRIO_HOLD = 4.0
 # card and the incoming one read as one flicker rather than two people.
 PLATE_GAP = 0.25
 
+# The hallway hold's hand-typed value before it derived from the `paused`
+# chapter block (see scripts/build_efmb.py). Every chapter pin authored to
+# play after the interruption was authored against THIS number; `build()`
+# rebases those pins by however much the derived hold has grown or shrunk
+# since. Exposed at module scope so a test can compute the same expectation
+# without duplicating the literal.
+OLD_HALLWAY_AFTER_AMBER_SEC = 25.600
+
 # The trio arrives one card at a time, 0.8 s apart, and the row clears
 # together. Owner instruction, same note: "stagger intros so that each
 # character has a shot to shine". Sequential lower thirds -- one card up, out,
@@ -1302,9 +1310,39 @@ def build():
     # cards this file DOES still place have to give way to them, exactly as
     # they did when the pills were Python tables in the same lists. Where the
     # words live changed; who yields to whom did not.
-    chapter_entries, chapter_unresolved = chapter_md.entries("II")
+    chapter_entries, chapter_unresolved = chapter_md.entries(
+        "II", include_block_labels=True)
     for note in chapter_unresolved:
         print(f"chapter: {note}", file=sys.stderr)
+
+    # HALLWAY_AFTER_AMBER_SEC now derives from the `paused` block's own
+    # schedule (see scripts/build_efmb.py) instead of a hand-typed 25.6 s.
+    # Everything the chapter file pins on the act's own programme clock past
+    # the old hallway return point was authored against that hand-typed
+    # value, so growing (or shrinking) the pause has to rebase those pins by
+    # the same amount -- the paused conversation itself is exempt, because
+    # its own pins are already authored against the new, longer clock.
+    old_hallway_return_at = (
+        build_efmb.HALLWAY_AFTER_AMBER_AT + OLD_HALLWAY_AFTER_AMBER_SEC)
+    pause_delta = round(
+        build_efmb.HALLWAY_AFTER_AMBER_SEC - OLD_HALLWAY_AFTER_AMBER_SEC, 3)
+    for entry in chapter_entries:
+        label = entry.pop("_chapter_label", None)
+        source_anchor = entry.pop("source_anchor", None)
+        if source_anchor is not None:
+            # A source-anchored line is seated straight from the source
+            # frame it is bound to, which already accounts for however long
+            # the interruption grew -- it is never also shifted by
+            # `pause_delta`, or it would move twice.
+            entry["at"] = round(film_of(source_anchor), 3)
+            entry["seen_at_src"] = source_anchor
+            continue
+        if (label != build_efmb.PAUSED_BLOCK and "at" in entry
+                and entry["at"] >= old_hallway_return_at):
+            entry["at"] = round(entry["at"] + pause_delta, 3)
+            if "fade_out_at" in entry:
+                entry["fade_out_at"] = round(
+                    entry["fade_out_at"] + pause_delta, 3)
 
     def chapter_floor(want):
         """When the last pill starting before ``want`` is off the screen.
