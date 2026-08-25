@@ -176,9 +176,9 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `10:33.89` **akgraner** — Why do you take technical advice from people who post in PHP forums?
 - `10:38.67` **akgraner** — "Do. There is no try"
 - `10:41.12` **akgraner** — I can't save you from this shitty writing though
-- `10:48.47` Reprehenderit voluptate / HATERS
+- `10:44.80` Reprehenderit voluptate / HATERS
+- `10:50.40` **kylegospo** — Sup
 - `10:51.45` **kolunmi** — Disco!
-- `10:53.90` **kylegospo** — Sup
 - `11:02.20` **nwoods3** — I feel seen
 - `11:04.65` **kolunmi** — Hey did you see how we just loaded up in a new level?
 - `11:07.10` **Hikari** — Finally, I can play WARFRAME!
