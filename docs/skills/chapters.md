@@ -95,6 +95,29 @@ the manifest is an *output*: `tools/plate.py` re-syncs it from the chapter
 file before every burn, so a hand-edit is reverted at the moment it would
 otherwise reach a frame.
 
+**A heading label lets a held frame derive its own duration.** Writing
+`## <heading> <label>` (for example `## 9:52.203 paused`) tags every entry
+under that heading until the next one, and `chapter_md.block_end(act, label)`
+returns the film position where the labelled block ends — so a builder that
+holds a frame for "as long as this conversation takes" derives that hold from
+the conversation's own authored length instead of a hand-typed duration that
+goes stale the next time a line is added or cut. `entries(act,
+include_block_labels=True)` returns each entry's label under the private
+`_chapter_label` key, for a builder (or a test) that needs to know which
+block an entry belongs to; it is never written into the manifest.
+
+**`source_anchor` seats a pill on a source frame instead of its natural
+schedule.** A pill that must play back exactly when it was actually said —
+because the owner locked it to a specific moment in the source footage,
+independent of how long anything authored before it runs — carries
+`source_anchor: <source seconds>` instead of `@ <heading time>` or
+`seen_at_src`. Act II's builder (`scripts/build_efmb_plates.py`) pops the key,
+sets `at` from that source frame, and publishes `seen_at_src` in its place;
+the key never reaches the manifest, and the pill is exempt from the
+across-the-board rebase every other post-pause pin gets when the paused
+block's length changes (it is already seated against the current footage, not
+against a stale hand-typed pause length).
+
 **The orphan trap, retired:** `dialogue/yt_destiny_all_live_action_trailers/`
 used to carry exactly one line — Cayde's "I'm so proud of you kids!"
 sign-off, an owner-supplied line recorded in #93 that stopped playing when

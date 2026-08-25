@@ -156,6 +156,23 @@ def plate_by_id(plate_id):
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     return by_id[plate_id]
 
+def all_plates():
+    return committed()["plates"]
+
+def plate_by_speaker(speaker):
+    return [p for p in all_plates() if p.get("speaker") == speaker]
+
+def chapter_entries_with_label(label):
+    """(speaker, text) for every chat line the `paused` block authors.
+
+    Reads straight off the chapter file, before the builder's pause-delta
+    rebase or its `source_anchor` seating -- the words and their order are
+    the chapter file's claim, not the manifest's.
+    """
+    entries, _ = chapter_md.entries("II", include_block_labels=True)
+    return [(e["speaker"], e["text"]) for e in entries
+            if e.get("kind") == "chat" and e.get("_chapter_label") == label]
+
 def test_the_committed_manifest_matches_its_generator():
     """It is an OUTPUT. A conflict in it is settled by re-running the tool."""
     assert committed() == build_efmb_plates.build()
@@ -826,6 +843,35 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
             build_efmb.HALLWAY_RETURN_AT + 1e-3
     assert by_id["chat_amber_problem"]["at"] == pytest.approx(308.403, abs=1e-3)
 
+def test_post_cortney_paused_conversation_is_authored_in_order():
+    """The owner's 2026-08-23 overflow, updated 2026-08-25, has a seat now.
+
+    It used to sit as inert prose (`>> OVERFLOW ... <<`) that no frame ever
+    reached; it is now live dialogue, seated directly after cortney's line,
+    in the words and order he wrote them.
+    """
+    paused = chapter_entries_with_label("paused")
+    assert paused[:2] == [
+        ("akgraner", "Oh I see your problem"),
+        ("cortney", "And we're gonna do you a solid"),
+    ]
+    assert ("kolunmi",
+            "I'm sorry I signed up for teamwork, why are people so sweaty?"
+            ) in paused
+
+def test_eve_and_eva_render_only_as_kolunmi():
+    """SETTLED 2026-08-25: the login is exactly `kolunmi`, never `kolumni`.
+
+    The guessed handles "Eve" and "Eva" -- one in the 10:14.937 block, two
+    more freed from the paused conversation's overflow -- were never a
+    second voice; every one of them now carries kolunmi's own portrait.
+    """
+    entries = plate_by_speaker("kolunmi")
+    assert entries
+    assert all(entry["avatar_url"].startswith("https://github.com/kolunmi")
+               for entry in entries)
+    assert not {"Eve", "Eva"} & {entry.get("speaker") for entry in all_plates()}
+
 def test_sup_is_anchored_to_kyles_reveal_source():
     """Sup's seat comes from a source frame, not a stale pin.
 
@@ -844,14 +890,18 @@ def test_the_retirement_conversation_moved_here_verbatim_from_act_three():
     pair = [by_id["retirement-1"], by_id["retirement-2"]]
     # Owner, 2026-08-24: "10:24 is where redacted's 'retirement conversation'
     # should go, not in the next chapter" -- 10:24 on the alpha2 clock is the
-    # Cayde-6 neon-street shot that closes the picture; once the pause grew
-    # 4.1 s, that shot opens at film 344.3. Copy, holds and gap are verbatim
-    # from act III, and the pair stays chromeless (he is revealed in act VI).
+    # Cayde-6 neon-street shot that closes the picture; the chapter file pins
+    # it at film 344.3 against the OLD hallway clock, and PAUSE_DELTA is the
+    # same rebase every other post-hallway pin in this act gets -- so seating
+    # the owner's paused conversation in full (2026-08-25) pushes this pair
+    # later by exactly that much, never by a hand-typed number. Copy, holds
+    # and gap are verbatim from act III, and the pair stays chromeless (he is
+    # revealed in act VI).
     assert [p["kind"] for p in pair] == ["chat", "chat"]
     assert [p["speaker"] for p in pair] == ["[redacted]", "[redacted]"]
     assert [p["text"] for p in pair] == ["Finally, retirement",
                                          "The long walk beckons"]
-    assert pair[0]["at"] == pytest.approx(344.3, abs=1e-3)
+    assert pair[0]["at"] == pytest.approx(344.3 + PAUSE_DELTA, abs=1e-3)
     assert pair[0]["dur"] == pytest.approx(2.125, abs=1e-3)
     assert pair[1]["at"] - pair[0]["at"] == pytest.approx(2.375, abs=1e-3)
     assert all(not p.get("avatar") for p in pair)

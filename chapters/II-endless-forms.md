@@ -408,15 +408,22 @@ never dropped -- and filed as one issue so he can say what gives. <<
 [mapped_which_kyle] akgraner @ 9:49.353 +2.6: Extinction is the Rule
   - scale: 1.0
 
-## 9:52.203
+## 9:52.203 paused
 
->> THE PAUSE HOLDS UNTIL THESE TWO HAVE PLAYED. Owner, 2026-08-24: "Don't
-unpause, at 'Oh I see your problem', keep that in the paused section, put
-cortney's conversation here." The hallway used to resume at 9:53.203 with
-akgraner's pill still up and cortney's line playing over moving picture;
-the hold now runs to 9:57.303 (film 313.503), a beat after cortney clears.
-kolunmi's "Disco!", deleted from this stretch on 2026-08-23, was restored
-the next day on the hunter corridor (## 10:04.187). <<
+>> THE PAUSE HOLDS UNTIL THIS WHOLE CONVERSATION HAS PLAYED. Owner,
+2026-08-24: "Don't unpause, at 'Oh I see your problem', keep that in the
+paused section, put cortney's conversation here." The hallway used to
+resume at 9:53.203 with akgraner's pill still up and cortney's line playing
+over moving picture; the hold now runs until the last line below clears,
+however long that grows to be -- `chapter_md.block_end("II", "paused")`
+derives it, so a line added or removed here never has to be re-typed as a
+duration anywhere else. kolunmi's "Disco!", deleted from this stretch on
+2026-08-23, was restored the next day on the hunter corridor
+(## 10:04.187). The ten-plus lines the owner wrote on 2026-08-23 for a
+stretch this act had no room for, and later updated on 2026-08-25, used to
+sit here verbatim as OVERFLOW prose reaching no frame; the pause section is
+their room, so they are seated below, right after cortney's line, in the
+order and words he wrote them. <<
 
 [chat_amber_problem] akgraner @ 9:52.203 +2.2: Oh I see your problem
   - avatar_login: akgraner
@@ -426,6 +433,53 @@ the next day on the hunter corridor (## 10:04.187). <<
 
     The owner wrote the speaker as `https://github.com/CortNick [cortney]`.
     The login resolves the portrait; the name row prints what he typed.
+
+[chat_amber_sent] akgraner: [Redacted] sent me
+
+[chat_amber_bazaar] akgraner: "How bazaar?"
+
+[chat_amber_crap] akgraner: Who writes this crap?
+
+[chat_kolunmi_sweaty] kolunmi: I'm sorry I signed up for teamwork, why are people so sweaty?
+
+[chat_kyle_halo] KyleGospo: castrojo killed me in Halo today
+  - avatar_login: KyleGospo
+
+[chat_noelmiller_seen] noelmiller: I feel seen
+
+[chat_amber_harder] akgraner: Ok well, it gets harder from here on out
+
+[chat_cortney_trash] cortney: Take out this trash all their contributions are
+  - avatar_login: CortNick
+
+[chat_cortney_goose] cortney: Goose eggs? Nothing?
+  - avatar_login: CortNick
+
+[chat_amber_notthere] akgraner: Those people will not be there when it matters the most
+
+[chat_amber_trustme] akgraner: Trust me
+
+[chat_amber_scars] akgraner: I have the scars to prove it
+
+[chat_kolunmi_cook] kolunmi: I like how you cook sister, I'll try
+
+[chat_amber_phpforums] akgraner: Why do you take technical advice from people who post in PHP forums?
+
+[chat_amber_dothereisnotry] akgraner: "Do. There is no try"
+
+[chat_amber_shittywriting] akgraner: I can't save you from this shitty writing though
+
+    The owner tagged two of these `[amber]` and two `[akgraner]`; they are
+    the same person, so they are listed under the login her nameplate
+    already carries. SETTLED 2026-08-23, owner, verbatim: "kyle is
+    kylegospo" -- so the lowercase `kyle` is KyleGospo, who also speaks at
+    8:43.750 and 10:04.867, and every one of his lines now carries his own
+    portrait rather than the drawn crest. There is no second Kyle.
+
+    SETTLED 2026-08-25, owner-approved: the login is exactly `kolunmi`
+    (verified at github.com/kolunmi) -- the same person who already speaks
+    at 9:07.083, 9:17.683 and 10:04.187 in this act, so the "Eve"/"Eva"
+    handle above was never a second voice.
 
 ## 10:01.2
 ! [mapped_haters] HATERS |
@@ -461,9 +515,9 @@ the next day on the hunter corridor (## 10:04.187). <<
 
 ## 10:04.867
 
-[mapped_kyle_sup] kylegospo @ 10:04.867 +2.2: Sup
+[mapped_kyle_sup] kylegospo: Sup
   - position: right
-  - seen_at_src: 333.497
+  - source_anchor: 335.267
   - bond_of: mapped_kyle_reveal
   - avatar_login: KyleGospo
 
@@ -497,8 +551,9 @@ there -- akgraner's six kindness pills run 9:34.653 to 9:51.953 without a
 gap -- so these play a beat later, after Kyle's reveal. Owner, 2026-08-24:
 "Remove kyle's lines after 'Sup', the others aren't needed" -- his
 "I'm not calling this Bobonomics" and "We had to make this movie" pills are
-gone. His parked overflow line ("castrojo killed me in Halo today") stays
-parked below, and nwoods3, Eva and Hikari stay. <<
+gone. His line "castrojo killed me in Halo today" used to be parked below
+as unreachable overflow; it is now seated in the paused conversation above
+(## 9:52.203, id `chat_kyle_halo`). nwoods3, kolunmi and Hikari stay here. <<
 
 [chat_nwoods3_seen] nwoods3 @ 10:14.937 +2.2: I feel seen
   - avatar_login: nwoods3
@@ -506,9 +561,7 @@ parked below, and nwoods3, Eva and Hikari stay. <<
     The owner wrote the speaker as `https://github.com/nwoods3`; the URL
     resolves the login and the portrait, and never reaches a frame.
 
-[chat_eva_level] Eva @ 10:17.387 +2.2: Hey did you see how we just loaded up in a new level?
-  - avatar: null
-  - avatar_url: null
+[chat_kolunmi_level] kolunmi @ 10:17.387 +2.2: Hey did you see how we just loaded up in a new level?
 
 [chat_hikari_warframe] Hikari @ 10:19.837 +2.366: Finally, I can play WARFRAME!
   - avatar: null
@@ -534,39 +587,14 @@ parked below, and nwoods3, Eva and Hikari stay. <<
     clears 0.8 s into the black tail; the picture has ended on the heroes
     and the words ride the outro.
 
->> OVERFLOW -- TEN LINES THE OWNER WROTE ON 2026-08-23 THAT THIS ACT HAS NO ROOM FOR.
-Not a heading the parser reads -- there is no time on it, so nothing below
-reaches a frame. They are here, verbatim, because copy that exists only in a
-diff is copy that gets lost, and because the choice of what gives is his:
-lengthen a hold, cut an existing beat, or let these go.
+>> The ten-plus lines the owner wrote on 2026-08-23, and updated 2026-08-25,
+that this stretch of the act had no room for now have a home: they are
+seated in the paused conversation above (## 9:52.203), right after
+cortney's line, in the order and words he wrote them -- see that block for
+the identity notes on `[amber]`/`[akgraner]`, `kyle`/KyleGospo and the
+settled "Eve"/"Eva"/`kolunmi` handle.
 
-  akgraner: [Redacted] sent me
-  akgraner: "How bazaar?"
-  akgraner: Who writes this crap?
-  Eva:      I'm sorry I signed up for teamwork, why are people so sweaty?
-  KyleGospo: castrojo killed me in Halo today
-  noelmiller: I feel seen
-  akgraner: Ok well, it gets harder from here on out
-  cortney:  Take out this trash all their contributions are
-  cortney: Goose eggs? Nothing?
-  akgraner: Those people will not be there when it matters the most
-  akgraner: Trust me
-  akgraner: I have the scars to prove it
-  Eva: I like how you cook sister, I'll try
-  akgraner: Why do you take technical advice from people who post in PHP forums? 
-  akgraner: "Do. There is no try"
-  akgraner: I can't save you from this shitty writing though
-
-
-The owner tagged two of these `[amber]` and two `[akgraner]`; they are the
-same person, so they are listed under the login her nameplate already
-carries. SETTLED 2026-08-23, owner, verbatim: "kyle is kylegospo" -- so the
-lowercase `kyle` is KyleGospo, who also speaks at 8:43.750 and 10:04.867, and
-every one of his lines now carries his own portrait rather than the drawn
-crest. There is no second Kyle.
-
-Also unresolved: "Eve" above and "Eva" at 10:13.287 may be the same person,
-and `Hikari` at 10:15.737 may be the act's existing `HikariKnight`, who
-already speaks at 9:02.183 and 9:15.233 with his own portrait. Neither is
-guessed -- naming either would credit a real person on a hunch, so both
-render uncast until the owner says. <<
+Still unresolved: `Hikari` at 10:19.837 may be the act's existing
+`HikariKnight`, who already speaks at 9:02.183 and 9:15.233 with his own
+portrait. Naming him would credit a real person on a hunch, so he renders
+uncast until the owner says. <<
