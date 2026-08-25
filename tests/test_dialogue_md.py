@@ -136,6 +136,50 @@ def test_a_deleted_section_is_recorded_as_dropped_not_lost():
     assert "owner" in updated["dropped"][0]["reason"]
     assert any("removed" in c for c in changes)
 
+def test_a_restored_section_leaves_the_dropped_list():
+    """Restoring is dropping in reverse, and has to be as complete: a line
+    recorded as both spoken and retired contradicts itself about words in a
+    real person's mouth."""
+    text = dialogue_md.export(DATA, LEADS)
+    head, _, _ = text.partition("## d02")
+    dropped_data, _ = dialogue_md.merge(DATA, dialogue_md.parse(head, LEADS))
+    assert [c["id"] for c in dropped_data["dropped"]] == ["d02"]
+
+    restored, changes = dialogue_md.merge(
+        dropped_data, dialogue_md.parse(text, LEADS))
+    assert [c["id"] for c in restored["cues"]] == ["d01", "d02"]
+    assert restored["dropped"] == []
+    assert any("restored" in c for c in changes)
+
+
+def test_a_restored_section_keeps_the_wording_it_was_retired_with():
+    """The owner is owed the same view of a restored line as of a reworded
+    one: what it used to say, kept beside what it says now."""
+    text = dialogue_md.export(DATA, LEADS)
+    head, _, _ = text.partition("## d02")
+    dropped_data, _ = dialogue_md.merge(DATA, dialogue_md.parse(head, LEADS))
+
+    reworded = text.replace("Fatigue is a distraction.", "Fatigue is a choice.")
+    restored, _ = dialogue_md.merge(
+        dropped_data, dialogue_md.parse(reworded, LEADS))
+    d02 = next(c for c in restored["cues"] if c["id"] == "d02")
+    assert d02["text"] == "Fatigue is a choice."
+    assert d02["recovered_text"] == "Fatigue is a distraction."
+    assert restored["dropped"] == []
+
+
+def test_a_restored_section_unchanged_carries_no_recovered_text():
+    """Bringing a line back verbatim is not a rewrite, so there is nothing
+    to keep beside it."""
+    text = dialogue_md.export(DATA, LEADS)
+    head, _, _ = text.partition("## d02")
+    dropped_data, _ = dialogue_md.merge(DATA, dialogue_md.parse(head, LEADS))
+    restored, _ = dialogue_md.merge(
+        dropped_data, dialogue_md.parse(text, LEADS))
+    d02 = next(c for c in restored["cues"] if c["id"] == "d02")
+    assert "recovered_text" not in d02
+
+
 def test_duplicate_ids_and_backwards_timecodes_are_refused():
     text = dialogue_md.export(DATA, LEADS).replace("## d02 |", "## d01 |")
     with pytest.raises(ValueError, match="duplicate cue id"):

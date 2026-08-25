@@ -272,9 +272,15 @@ def merge(data, edited):
     Returns ``(new_data, changes)``. Nothing is discarded quietly: a cue the
     owner deleted moves to ``dropped`` with a reason, and a cue whose wording
     they changed keeps the recovered text beside the new line.
+
+    Restoring is the same move backwards, and it has to be just as complete: a
+    line the owner brings back leaves ``dropped`` entirely. Leaving the entry
+    behind would record one line as both spoken and retired, which is a record
+    that contradicts itself about a real person's words.
     """
     original = {cue["id"]: cue for cue in data["cues"]}
-    changes, cues = [], []
+    retired = {cue["id"]: cue for cue in data.get("dropped") or []}
+    changes, cues, restored = [], [], set()
 
     for cue in edited:
         previous = original.get(cue["id"])
@@ -294,10 +300,23 @@ def merge(data, edited):
             }
             if cue.get("pin_sec") is not None:
                 added["pin_sec"] = round(cue["pin_sec"], 2)
+            was_dropped = retired.get(cue["id"])
+            if was_dropped is not None:
+                # Bringing a retired line back. Its wording is kept beside the
+                # new one for the same reason a reword keeps it: the owner is
+                # entitled to see what the line used to say.
+                restored.add(cue["id"])
+                raw = was_dropped.get("raw", "")
+                if raw and raw != cue["text"]:
+                    added["recovered_text"] = raw
+                changes.append(
+                    f"  ^ {cue['id']} restored from dropped: "
+                    f"{cue['text'][:56]}")
+            else:
+                changes.append(
+                    f"  + {cue['id']} added: "
+                    f"{'(placeholder -- no words yet)' if blank else cue['text'][:56]}")
             cues.append(added)
-            changes.append(
-                f"  + {cue['id']} added: "
-                f"{'(placeholder -- no words yet)' if blank else cue['text'][:56]}")
             continue
 
         merged = dict(previous)
@@ -335,7 +354,8 @@ def merge(data, edited):
         cues.append(merged)
 
     kept = {cue["id"] for cue in edited}
-    dropped = list(data.get("dropped") or [])
+    dropped = [cue for cue in (data.get("dropped") or [])
+               if cue["id"] not in restored]
     for cue_id, cue in original.items():
         if cue_id in kept:
             continue
