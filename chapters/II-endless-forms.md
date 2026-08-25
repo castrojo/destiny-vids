@@ -492,66 +492,31 @@ order and words he wrote them. <<
 
 ## 10:01.2
 ! [mapped_haters] HATERS |
+  - source_anchor: 326.163
 
-    Owner, 2026-08-24: "9:57, all the enemies are the haters, it just needs
-    to be obvious" — on the alpha2 clock he was watching, the red-lit enemy
-    face with the bright red dot opens at 9:57. The bar used to fire at
-    10:00, over the guardian sunset silhouettes, and read as the GUARDIANS
-    being the haters; it now opens on the enemy face's first frame (the
-    shot ran film 313.3 → 315.2 before the pause grew 4.1 s; it is
-    317.4 → 319.3 now). The red overlays still "match the style of the
-    original kernel one" (owner, 2026-08-19) — this is that boss bar, a
-    chrome row at the top of frame that shares the screen with whatever
-    pill is up by design.
+    Source 326.163 is the enemy attack. The shield formation at source
+    331.163 is the heroes and never carries HATERS.
 
 ## 10:04.187
 
 [mapped_kolunmi_disco] kolunmi @ 10:04.187 +2.2: Disco!
   - avatar_login: kolunmi
+  - source_anchor: 332.817
   - bond_of: mapped_kyle_sup
 
-    Owner, 2026-08-24: "around 10:02 when the hunter is onscreen have
-    kolunmi do 'Disco!'". The hunter is the cloaked figure in the red
-    corridor fight — the shot right after the enemies HATERS now opens on.
-    "Around 10:02" was the alpha2 clock; the pause growth makes that
-    corridor film 321.067 → 323.0. The pill opens 0.68 s earlier so its
-    2.2 s hold clears Kyle's nameplate (arrives 322.837, same lane) with
-    the house 0.25 s gap, and it answers his "Sup" — which is why it bonds
-    to that pill by name: the overlap exemption in `tools/plate.py` is NAMED
-    precisely so it cannot spread, and this pair is the owner's call-and-
-    response across the deck's two lanes (Disco! left, Sup right). Deleted
-    2026-08-23, restored verbatim a day later.
+    Source 332.817 is the Hunter. The named bond keeps this left-lane reply
+    paired with Sup on the right without permitting other overlaps.
 
 ## 10:04.867
 
 [mapped_kyle_sup] kylegospo: Sup
   - position: right
-  - source_anchor: 335.267
-  - bond_of: mapped_kyle_reveal
+  - source_anchor: 331.763
   - avatar_login: KyleGospo
 
-    OWNER-PLACED, DO NOT MOVE. Owner, verbatim: "sup is a purple titan",
-    "put it when it's zoomed into his face". This is the first frame of that
-    close-up; the pause growth of 2026-08-24 moved the content 4.1 s, so the
-    shot now runs 321.067 → 321.833 film. The pill OPENS on his face, which
-    is what he asked for; owner, 2026-08-24, asked again and confirmed the
-    seat stays.
-
-    An earlier agent slid it to 316.287 to make a builder assertion pass,
-    which put it AFTER kolunmi's "Disco!" and reordered the authored
-    exchange. That is the fourth class in AGENTS.md: a gate refusing a seat
-    is not permission to move an authored beat. It was reverted, and the
-    assertion that provoked it is gone — an overrun is reported now, never
-    raised. ("Disco!" was deleted on 2026-08-23 and restored on 2026-08-24,
-    above; the warning stands, because the seat it protects has not moved.)
-
-    `bond_of` puts it in the deck's bonded-pair shape: his nameplate holds
-    the left lane, the pill takes the RIGHT. The owner locked both TIMES
-    ("lock the plate"; the pill on the close-up's first frame) — the lane
-    was never his instruction, and stacking both on the left drew them on
-    top of each other for the pill's last 0.43 s, since the nameplate
-    arrives at 322.837. Right lane, same seats: the pair reads as the site's
-    GUARDIAN BOND composition.
+    Source 331.763 is the purple Titan's shield formation at the requested
+    6:06 frame.
+    It is independent of Kyle's later guardian reveal.
 
 ## 10:14.937
 
