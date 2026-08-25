@@ -61,7 +61,13 @@ python3 tools/chapter_md.py show VII
 python3 tools/chapter_md.py check VII
 ```
 
-https://github.com/preethit is Preethi. Replace her and fill her in with github info
+>> Every `@` pin in this act is owner placement from the delivered master and
+never moves, and those pins sit 0.4 s apart -- no unpinned line fits between
+them, and the renderer refuses two pills on screen at once. The unpinned
+lines therefore cascade through the open water AFTER each pinned run, in the
+owner's written order: alolita's report and tophee's confirmations follow the
+deployment exchange, and the sacrifice line with the Lone Wolf Protocol trio
+follow the creed, rolling into nimbatus' "Wilco". <<
 
 ## 25:04.831
 
@@ -69,28 +75,23 @@ https://github.com/preethit is Preethi. Replace her and fill her in with github 
   - avatar: ~/Videos/wolves-directors-cut/nimbatus-review/render/krook.png
   - fade_out_at: 1.864
 
-[d02] preethi @ 25:06.831 +1.6: Stand down, I'm sending my wolf
+[d02] preethit @ 25:06.831 +1.6: Stand down, I'm sending my wolf
   - fade_out_at: 3.864
-
- alolita: We have failed, Guardians are down
- 
 
 [d03] alolita @ 25:08.831 +2.6: Are you sure the Kube is on Europa?
   - avatar: renders/avatars/alolita.png
   - fade_out_at: 6.864
 
-tophee: I've confirmed it myself, we have no choice   
-
-[d04] preethi @ 25:11.831 +2.0: I hope she can handle the Kube
+[d04] preethit @ 25:11.831 +2.0: I hope she can handle the Kube
   - fade_out_at: 9.264
 
+[d04b] preethit @ 25:14.231 +2.2: I must not fail
+
+alolita: We have failed, Guardians are down
+
+tophee: I've confirmed it myself, we have no choice
+
 tophee: She's the only way to stop the Toilmaster
-
-[d04b] preethi @ 25:14.231 +2.2: I must not fail
-
-[krook] Initiate Lone Wolf Protocol
-[iancoldwater] Local Security systems trivially pwned
-[tabbysable] Europan Security systems trivially pwned (again)
 
 ## 25:28.831
 
@@ -106,23 +107,19 @@ tophee: She's the only way to stop the Toilmaster
   - avatar: renders/avatars/jeefy.png
   - fade_out_at: 31.864
 
-mrbobbytables: Wolves gladly sacrifice for their own
-
-
 [d08] ihor @ 25:36.831 +2.2: G{k8s}dspeed
   - avatar: renders/avatars/idvoretskyi.png
   - fade_out_at: 34.464
 
-[d11] preethi @ 25:39.431 +2.2: preethi: Our clan 
-preethi: Is the Iron 
-preethi: That forges Wolves
+[d11] preethit @ 25:39.431 +2.2: Our clan
+preethit: Is the Iron
+preethit: That forges Wolves
 
-<dramatic delay but not too close to the reveal> 
+mrbobbytables: Wolves gladly sacrifice for their own
 
-Hummingbird will find the girl
-
-
-  - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
+[krook] Initiate Lone Wolf Protocol
+[iancoldwater] Local Security systems trivially pwned
+[tabbysable] Europan Security systems trivially pwned (again)
 
 ## 26:05.831
 
@@ -134,12 +131,5 @@ Hummingbird will find the girl
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 65.464
 
-After the jupiter fade hold Jupiter and slice up Screenshot From 2026-08-23 05-10-23.png for the characters and place them on the jupiter nightway. Try to make it dramatic. Then add in title-appropriate text
-
-For other wolves, some will give all
-
-Bluefin and the Forbidden Factory
-KubeCon + CloudNativeCon EU 2027
-Maintainer Summit
-
-Then roll the credits. 
+preethit @ 26:15.000: Hummingbird will find the girl
+  - avatar: renders/avatars/preethit.png
