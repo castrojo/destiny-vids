@@ -118,6 +118,11 @@ across-the-board rebase every other post-pause pin gets when the paused
 block's length changes (it is already seated against the current footage, not
 against a stale hand-typed pause length).
 
+**An identifier is not visual evidence.** A constant or plate ID can preserve
+an earlier interpretation of a frame; extract and inspect the target frame
+before using it as a `source_anchor`. Name a real person or label a group only
+from what is visible in that frame.
+
 **`show` and `check` print the seat the BUILD emits, not the file's raw
 schedule.** An act whose builder moves a line between the chapter file and
 the manifest — act II does both of the things above — declares the mapping in
