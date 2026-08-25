@@ -76,18 +76,21 @@ def trim_command(ffmpeg):
     video_duration = TRIM_END - TRIM_START
     freeze_duration = OUTPUT_DURATION - video_duration
     audio_start = TRIM_START + AUDIO_SYNC_OFFSET
+    # .resolve() so every path token is canonical: farm staging matches argv
+    # tokens exactly, and both legs must agree when renders/ or media/ is a
+    # symlink (a worktree building onto the durable stores).
     return [
         *ffmpeg, "-y",
         "-ss", f"{TRIM_START}", "-t", f"{video_duration:.2f}",
-        "-i", str(REPO_ROOT / VIDEO_SRC),
+        "-i", str(Path(REPO_ROOT / VIDEO_SRC).resolve()),
         "-ss", f"{audio_start:.6f}",
-        "-i", str(REPO_ROOT / AUDIO_SRC),
+        "-i", str(Path(REPO_ROOT / AUDIO_SRC).resolve()),
         "-map", "0:v", "-map", "1:a",
         "-vf", f"tpad=stop_mode=clone:stop_duration={freeze_duration:.6f}",
         "-t", f"{OUTPUT_DURATION:.3f}",
         "-c:v", "libx264", "-crf", "14", "-pix_fmt", "yuv420p",
         "-c:a", "flac",
-        str(REPO_ROOT / TRIM),
+        str(Path(REPO_ROOT / TRIM).resolve()),
     ]
 
 
