@@ -251,9 +251,10 @@ declared `rebuild` command exits 0. Running the same command by hand and then
 tool deliberately cannot know which commit rendered the file on disk, because
 stamping HEAD there is how re-publishes once certified acts they never built.
 So: rebuild through the tool, never by hand. An act with no declared `rebuild`
-(acts II and VI, by design — their burns are not idempotent) cannot earn the
-stamp at all today; that gap is
-[#348](https://github.com/castrojo/destiny-vids/issues/348).
+(act VI, by design — its burn is not idempotent) cannot earn the stamp at all
+today; act II's route is declared since
+[#348](https://github.com/castrojo/destiny-vids/issues/348) closed it, and
+act VI's is the same shape and still open.
 
 ### What the programme rung proves, and what it does not
 

@@ -150,10 +150,15 @@ def _farm_runner(cmd, inputs, out, expected_duration):
     from tools import farm
 
     def run(argv):
+        # plate.burn .resolve()s every path it puts in the argv, so the
+        # staging check's exact-token match only holds if the inputs and out
+        # are resolved the same way -- a symlinked renders/ (a worktree whose
+        # masters live at their durable paths) otherwise reads as "argv never
+        # reads staged input". resolve() is a no-op on canonical paths.
         farm.run_ffmpeg_on_cluster(
             argv,
-            inputs=[REPO_ROOT / p for p in inputs],
-            out=REPO_ROOT / out,
+            inputs=[Path(REPO_ROOT / p).resolve() for p in inputs],
+            out=Path(REPO_ROOT / out).resolve(),
             expected_duration=expected_duration,
         )
 
