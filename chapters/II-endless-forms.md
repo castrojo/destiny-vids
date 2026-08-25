@@ -511,10 +511,11 @@ order and words he wrote them. <<
 
 [mapped_kyle_sup] kylegospo: Sup
   - position: right
-  - source_anchor: 331.163
+  - source_anchor: 331.763
   - avatar_login: KyleGospo
 
-    Source 331.163 is the purple Titan's shield formation at film 6:06.
+    Source 331.763 is the purple Titan's shield formation at the requested
+    6:06 frame.
     It is independent of Kyle's later guardian reveal.
 
 ## 10:14.937

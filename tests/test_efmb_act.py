@@ -865,8 +865,8 @@ def test_sup_is_anchored_to_the_heroes_void_shield_source():
     publish the correct `seen_at_src`; it must never reach the manifest.
     """
     sup = plate_by_id("mapped_kyle_sup")
-    assert sup["seen_at_src"] == pytest.approx(331.163)
-    assert sup["at"] == pytest.approx(build_efmb.edited_film_for_source(331.163))
+    assert sup["seen_at_src"] == pytest.approx(331.763)
+    assert sup["at"] == pytest.approx(build_efmb.edited_film_for_source(331.763))
     assert "bond_of" not in sup
     assert "source_anchor" not in sup
 
