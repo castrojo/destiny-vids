@@ -160,14 +160,30 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `9:49.35` **akgraner** — Extinction is the Rule
 - `9:52.20` **akgraner** — Oh I see your problem
 - `9:54.65` **cortney** — And we're gonna do you a solid
-- `10:01.20` Reprehenderit voluptate / HATERS
-- `10:04.19` **kolunmi** — Disco!
-- `10:04.87` **kylegospo** — Sup
-- `10:14.94` **nwoods3** — I feel seen
-- `10:17.39` **Eva** — Hey did you see how we just loaded up in a new level?
-- `10:19.84` **Hikari** — Finally, I can play WARFRAME!
-- `10:28.10` **[redacted]** — Finally, retirement
-- `10:30.48` **[redacted]** — The long walk beckons
+- `9:57.10` **akgraner** — [Redacted] sent me
+- `9:59.55` **akgraner** — "How bazaar?"
+- `10:02.00` **akgraner** — Who writes this crap?
+- `10:04.45` **kolunmi** — I'm sorry I signed up for teamwork, why are people so sweaty?
+- `10:08.77` **KyleGospo** — castrojo killed me in Halo today
+- `10:11.22` **noelmiller** — I feel seen
+- `10:13.67` **akgraner** — Ok well, it gets harder from here on out
+- `10:16.59` **cortney** — Take out this trash all their contributions are
+- `10:19.97` **cortney** — Goose eggs? Nothing?
+- `10:22.42` **akgraner** — Those people will not be there when it matters the most
+- `10:26.34` **akgraner** — Trust me
+- `10:28.79` **akgraner** — I have the scars to prove it
+- `10:31.24` **kolunmi** — I like how you cook sister, I'll try
+- `10:33.89` **akgraner** — Why do you take technical advice from people who post in PHP forums?
+- `10:38.67` **akgraner** — "Do. There is no try"
+- `10:41.12` **akgraner** — I can't save you from this shitty writing though
+- `10:48.47` Reprehenderit voluptate / HATERS
+- `10:51.45` **kolunmi** — Disco!
+- `10:53.90` **kylegospo** — Sup
+- `11:02.20` **nwoods3** — I feel seen
+- `11:04.65` **kolunmi** — Hey did you see how we just loaded up in a new level?
+- `11:07.10` **Hikari** — Finally, I can play WARFRAME!
+- `11:15.37` **[redacted]** — Finally, retirement
+- `11:17.74` **[redacted]** — The long walk beckons
 
 ## III
 

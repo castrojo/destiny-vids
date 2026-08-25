@@ -242,10 +242,19 @@ INTERRUPTION_SHIFT_SEC = INTERRUPTION_SEC - INTERRUPTION_REPLACED_SEC
 KYLE_REVEAL_SRC = 335.267
 KYLE_REVEAL_SEC = 3.200
 KYLE_REVEAL_AT = HALLWAY_RETURN_AT + (KYLE_REVEAL_SRC - HALLWAY_RESUME_SRC)
-# 343.903 + the 4.1 s the pause grew on 2026-08-24; the tail keeps its black
-# (film_sec - this == 16.065 s, unchanged), the act ends where the song ends,
-# and the show runs 4.1 s longer from here on.
-EDITED_PICTURE_END = 348.003
+# Where the Destiny picture actually ends, in film time: the hallway holds
+# for exactly as long as HALLWAY_RETURN_AT says, then the two remaining
+# evidenced runs play in full -- the same two additions `picture_sequence`
+# makes after the hold. This used to be a hand-typed 348.003 ("343.903 +
+# the 4.1 s the pause grew on 2026-08-24"), which is the same bug
+# HALLWAY_AFTER_AMBER_SEC's own derivation was fixed for: a number that has
+# to be retyped by hand every time the paused conversation's length changes
+# is a number that goes stale the next time it does. The black tail keeps
+# its own length (film_sec - this) automatically, whatever the paused
+# conversation now runs to.
+EDITED_PICTURE_END = round(
+    HALLWAY_RETURN_AT + (RUNS[4][1] - HALLWAY_RESUME_SRC)
+    + (RUNS[5][1] - RUNS[5][0]), 3)
 
 HOLD_MUSIC_IN = 6.500
 HOLD_MUSIC_OUT_FILM = HALLWAY_RETURN_AT
