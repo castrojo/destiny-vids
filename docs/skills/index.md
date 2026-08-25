@@ -1,6 +1,6 @@
 # Skill catalog
 
-Generated 2026-08-21.
+Generated 2026-08-25.
 
 | Skill | Category | Type | One-line purpose |
 |---|---|---|---|

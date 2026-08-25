@@ -69,7 +69,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -258,6 +257,10 @@ def main(argv=None):
                          "ending_derivative out_file)")
     ap.add_argument("--print-command", action="store_true",
                     help="print the ffmpeg call and exit")
+    ap.add_argument("--local", action="store_true",
+                    help="encode on THIS host even when the farm cluster is "
+                         "reachable (the escape hatch; the encode runs under "
+                         "tools.farm.run_capped_local's memory cap)")
     args = ap.parse_args(argv)
 
     spec = load_thread(args.thread)
@@ -304,7 +307,15 @@ def main(argv=None):
         print(" ".join(cmd))
         return 0
     out.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(cmd, check=True)
+    # Remote by default (AGENTS.md): the derivative's encode runs on the farm
+    # when the cluster answers; a local run is the stated, memory-capped
+    # fallback.
+    from tools import farm
+    farm.run_encode(cmd,
+                    inputs=[Path(cmd[i + 1]) for i, tok in enumerate(cmd)
+                            if tok == "-i"],
+                    out=out, local=args.local,
+                    expected_duration=float(movement["duration"]))
     section_label = section if isinstance(section, str) else "+".join(section)
     print(f"wrote {out} ({movement['duration']:.3f} s, "
           f"{len(underwater_cards(doc, section))} {section_label} lines)")

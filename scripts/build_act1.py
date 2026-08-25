@@ -27,13 +27,16 @@ The chain, established 2026-07-15 from the record (`megacut.json`'s
   python3 scripts/build_act1.py                  # rebuild everything
   python3 scripts/build_act1.py --print-command  # print the chain, run nothing
   python3 scripts/build_act1.py --skip-encode    # cards and plates only
-  python3 scripts/build_act1.py --farm           # encode legs on the farm
+  python3 scripts/build_act1.py --local          # encode legs on THIS host
 
-The encode is local by default (`tools.render.find_ffmpeg()` — brew first),
-matching the other committed builders. `--farm` submits each encode leg to
-the farm cluster instead (`tools.farm.run_ffmpeg_on_cluster`, which stages
-the inputs and fetches the output back to the same local path). Farm or not,
-resolve ffmpeg to a single binary — `DESTINY_FFMPEG=/home/linuxbrew/.linuxbrew/bin/ffmpeg`
+The encode is REMOTE by default (AGENTS.md: "always prefer remote encoding
+when available"): each encode leg goes to the farm cluster
+(`tools.farm.run_ffmpeg_on_cluster`, which stages the inputs and fetches the
+output back to the same local path) whenever the cluster answers.
+`--local` — or a cluster that does not answer — runs the same argv here
+under `tools.farm.run_capped_local`'s memory cap, with the reason printed.
+Farm or not, resolve ffmpeg to a single binary —
+`DESTINY_FFMPEG=/home/linuxbrew/.linuxbrew/bin/ffmpeg`
 — because the farm rewrites argv[0] only, and a `podman exec ...` prefix
 would leak its middle tokens into the pod's argv.
 """
@@ -157,7 +160,29 @@ def _farm_runner(cmd, inputs, out, expected_duration):
     return run
 
 
-def build_act1(skip_encode=False, use_farm=False):
+def _capped_runner(reason):
+    """The burn leg's local fallback: capped, and with the reason printed."""
+    from tools import farm
+
+    def run(argv):
+        proc = farm.run_capped_local(argv, reason=reason,
+                                     capture_output=True, text=True)
+        if proc.returncode != 0:
+            tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
+            raise RuntimeError(f"act I burn failed:\n{tail}")
+
+    return run
+
+
+def build_act1(skip_encode=False, use_farm=None):
+    from tools import farm
+
+    if use_farm is None:
+        use_farm, farm_why = farm.cluster_available()
+        if not use_farm:
+            farm_why = f"the cluster is not reachable ({farm_why})"
+    else:
+        farm_why = "--farm given" if use_farm else "--local given"
     ffmpeg = render.find_ffmpeg()
     print(f"ffmpeg: {' '.join(ffmpeg)}" + (" (farm legs)" if use_farm else ""))
 
@@ -178,9 +203,9 @@ def build_act1(skip_encode=False, use_farm=False):
     if use_farm:
         _farm_runner(trim_cmd, [VIDEO_SRC, AUDIO_SRC], TRIM, duration)(trim_cmd)
     else:
-        subprocess.run(trim_cmd, check=True, cwd=REPO_ROOT)
+        farm.run_capped_local(trim_cmd, reason=farm_why, check=True,
+                              cwd=REPO_ROOT)
 
-    runner = None
     if use_farm:
         # The farm stages exact argv tokens, so the burn leg lists the plate
         # PNGs themselves, not their directory.
@@ -189,6 +214,8 @@ def build_act1(skip_encode=False, use_farm=False):
             for u in plate._burn_units(entries)
         ]
         runner = _farm_runner(None, burn_inputs, MASTER, duration)
+    else:
+        runner = _capped_runner(farm_why)
     plate.burn(
         REPO_ROOT / TRIM,
         entries,
@@ -207,8 +234,18 @@ def main():
     parser.add_argument("--skip-encode", action="store_true",
                         help="stop after the cards and plates")
     parser.add_argument("--farm", action="store_true",
-                        help="submit the encode legs to the farm cluster")
+                        help="encode on the farm cluster. ALREADY the default "
+                             "whenever the cluster is reachable; the flag "
+                             "only pins the posture")
+    parser.add_argument("--local", action="store_true",
+                        help="encode on THIS host even when the cluster is "
+                             "reachable (the escape hatch; the encodes run "
+                             "under tools.farm.run_capped_local's memory cap)")
     args = parser.parse_args()
+    if args.farm and args.local:
+        raise SystemExit("--farm and --local are mutually exclusive: the "
+                         "farm is already the default when the cluster is "
+                         "reachable; --local is the escape hatch from it")
 
     if args.print_command:
         print(" ".join(trim_command(["<ffmpeg>"])))
@@ -217,7 +254,8 @@ def main():
               f"{MASTER}   # x264 crf 18, -c:a copy")
         return
 
-    build_act1(skip_encode=args.skip_encode, use_farm=args.farm)
+    build_act1(skip_encode=args.skip_encode,
+               use_farm=True if args.farm else (False if args.local else None))
 
 
 if __name__ == "__main__":

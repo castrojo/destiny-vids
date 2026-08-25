@@ -579,6 +579,10 @@ def main(argv=None):
     ap.add_argument("--rewrite-root", nargs=2, metavar=("FROM", "TO"),
                     help="print the command with FROM replaced by TO, for a "
                          "remote render whose paths differ from this host's")
+    ap.add_argument("--local", action="store_true",
+                    help="encode on THIS host even when the farm cluster is "
+                         "reachable (the escape hatch; the encode runs under "
+                         "tools.farm.run_capped_local's memory cap)")
     args = ap.parse_args(argv)
 
     global SOURCE, PLATES_DIR, OUT
@@ -623,13 +627,22 @@ def main(argv=None):
         return 0
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(argv_ff, check=True)
+    # Remote by default (AGENTS.md): the encode -- and any peak-correction
+    # re-render -- runs on the farm when the cluster answers; a local run is
+    # the stated, memory-capped fallback.
+    from tools import farm
+    inputs = [Path(argv_ff[i + 1]) for i, tok in enumerate(argv_ff)
+              if tok == "-i"]
+    farm.run_encode(argv_ff, inputs=inputs, out=OUT, local=args.local,
+                    expected_duration=TOTAL)
     # The FLAC master is the delivery source. If its decoded true peak is hot,
     # re-render from the original source at a derived static gain. A post-render
     # remux through the container can see a stale inode after os.replace and
     # truncate the delivery, so the correction reuses this complete graph.
     def rerun_with_gain(gain):
-        subprocess.run(command(manifest, day, night, gain, scope=scope), check=True)
+        farm.run_encode(command(manifest, day, night, gain, scope=scope),
+                        inputs=inputs, out=OUT, local=args.local,
+                        expected_duration=TOTAL)
 
     peaks.correct_delivered_peak(
         OUT, 1.0, peaks.DEFAULT_TARGET_DBTP, rerun_with_gain,

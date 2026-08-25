@@ -21,7 +21,7 @@ list to the same range, so the two never disagree about where the picture is.
 """
 import argparse
 import json
-import subprocess
+import subprocess  # noqa: F401 -- the tests' patch point for the encode
 import sys
 from pathlib import Path
 
@@ -280,11 +280,26 @@ def build_command(ffmpeg, video, filters, out_path, audio=None, audio_gain=None,
 
 def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
           video_end=None, target_dbtp=None, audio_codec="aac",
-          audio_at=None, outro=None, _attempts_left=5):
+          audio_at=None, outro=None, _attempts_left=5, local=False):
     if ffmpeg is None:
         from tools.render import find_ffmpeg
 
         ffmpeg = find_ffmpeg()
+    from tools import farm
+    # REMOTE BY DEFAULT (AGENTS.md): the drawbox pass is a full x264 encode,
+    # so it runs on the cluster whenever the cluster answers. ``local`` -- or
+    # a cluster that does not answer, or one that fails mid-encode -- runs
+    # the same argv here under run_capped_local's memory cap, with the
+    # reason printed. Never a silent, unbounded workstation encode.
+    if local:
+        state = {"farm": False, "why": "--local given"}
+    else:
+        ok, why = farm.cluster_available()
+        state = {"farm": ok,
+                 "why": f"the cluster is not reachable ({why})"}
+    video = Path(video).resolve()
+    out_path = Path(out_path).resolve()
+    inputs = [video] + ([Path(audio).resolve()] if audio else [])
     trim = None
     if any(action_of(i) == "cut" for i in redactions):
         if video_end is None:
@@ -293,31 +308,38 @@ def apply(video, redactions, out_path, audio=None, audio_gain=None, ffmpeg=None,
         start, end = kept_range(redactions, video_end)
         if start > 0 or end < float(video_end):
             trim = (start, end)
-    cmd = build_command(ffmpeg, Path(video).resolve(), drawbox_filters(redactions),
-                        Path(out_path).resolve(),
-                        Path(audio).resolve() if audio else None, audio_gain,
-                        trim=trim, audio_codec=audio_codec, audio_at=audio_at,
-                        outro=outro)
-    proc = subprocess.run(cmd, capture_output=True, text=True)
-    if proc.returncode != 0:
-        tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
-        raise RuntimeError(f"redaction pass failed:\n{tail}")
+
+    def cmd_for(gain):
+        return build_command(ffmpeg, video, drawbox_filters(redactions),
+                             out_path,
+                             Path(audio).resolve() if audio else None, gain,
+                             trim=trim, audio_codec=audio_codec,
+                             audio_at=audio_at, outro=outro)
+
+    def run_pass(cmd):
+        if state["farm"]:
+            try:
+                farm.run_ffmpeg_on_cluster(cmd, inputs=inputs, out=out_path)
+                return
+            except farm.FarmError as exc:
+                # Degrade, never block: say it and keep going on this host,
+                # and do not pay the cluster's failure again on a rerun.
+                state["farm"] = False
+                state["why"] = f"the cluster encode failed ({exc})"
+        proc = farm.run_capped_local(cmd, reason=state["why"],
+                                     capture_output=True, text=True)
+        if proc.returncode != 0:
+            tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
+            raise RuntimeError(f"redaction pass failed:\n{tail}")
+
+    run_pass(cmd_for(audio_gain))
 
     # Verify the DELIVERED peak, not just the bed's -- the measure-and-correct
     # loop is shared with render.py and lives in tools/peaks.py. A hand-set
     # --audio-gain opts out (main passes target_dbtp=None then).
     if audio and audio_gain and target_dbtp is not None:
         def rerun(new_gain):
-            cmd = build_command(ffmpeg, Path(video).resolve(),
-                                drawbox_filters(redactions),
-                                Path(out_path).resolve(),
-                                Path(audio).resolve(), new_gain, trim=trim,
-                                audio_codec=audio_codec, audio_at=audio_at,
-                                outro=outro)
-            proc = subprocess.run(cmd, capture_output=True, text=True)
-            if proc.returncode != 0:
-                tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
-                raise RuntimeError(f"redaction pass failed:\n{tail}")
+            run_pass(cmd_for(new_gain))
 
         correct_delivered_peak(out_path, audio_gain, target_dbtp, rerun,
                                ffmpeg=ffmpeg, attempts=_attempts_left)
@@ -350,6 +372,10 @@ def main(argv=None):
                          "clean frame for `extend`, fade over the final "
                          "`fade` seconds, with the bed continuing under it")
     ap.add_argument("--out", required=True)
+    ap.add_argument("--local", action="store_true",
+                    help="encode on THIS host even when the farm cluster is "
+                         "reachable (the escape hatch; the encode runs under "
+                         "tools.farm.run_capped_local's memory cap)")
     args = ap.parse_args(argv)
 
     data = load_redactions(args.video_id)
@@ -374,7 +400,8 @@ def main(argv=None):
           audio_codec=args.audio_codec,
           audio_at=args.audio_at,
           outro=outro,
-          target_dbtp=args.target_dbtp if args.audio_gain is None else None)
+          target_dbtp=args.target_dbtp if args.audio_gain is None else None,
+          local=args.local)
     print(f"wrote {args.out}")
     return 0
 

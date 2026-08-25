@@ -320,6 +320,10 @@ def main(act, argv=None):
                     help="re-render the dialogue pills and stop")
     ap.add_argument("--skip-plates", action="store_true",
                     help="reuse the rendered pills already in --plates-dir")
+    ap.add_argument("--local", action="store_true",
+                    help="encode on THIS host even when the farm cluster is "
+                         "reachable (the escape hatch; the encode runs under "
+                         "tools.farm.run_capped_local's memory cap)")
     args = ap.parse_args(argv)
 
     project = Path(args.project).expanduser()
@@ -351,5 +355,11 @@ def main(act, argv=None):
     cmd, target = build_command(doc, project, args.variant,
                                 Path(args.plates_dir), out=args.out)
     print(f"actbuild: act {act} -> {target}")
-    subprocess.run(cmd, check=True)
+    # Remote by default (AGENTS.md): the act's one encode runs on the farm
+    # whenever the cluster answers; a local run is the stated, memory-capped
+    # fallback via tools.farm.run_capped_local.
+    from tools import farm
+    inputs = [Path(cmd[i + 1]) for i, tok in enumerate(cmd) if tok == "-i"]
+    farm.run_encode(cmd, inputs=inputs, out=target, local=args.local,
+                    expected_duration=float(doc["trim"]["out"]))
     return 0

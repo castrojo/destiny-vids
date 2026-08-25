@@ -1010,6 +1010,10 @@ def main(argv=None):
     ap.add_argument("--plan", action="store_true", help="print the schedule, render nothing")
     ap.add_argument("--cards-only", action="store_true", help="render the PNGs and stop")
     ap.add_argument("--out", default=str(OUT))
+    ap.add_argument("--local", action="store_true",
+                    help="encode on THIS host even when the farm cluster is "
+                         "reachable (the escape hatch; the encode runs under "
+                         "tools.farm.run_capped_local's memory cap)")
     ap.add_argument("--write-manifest", action="store_true",
                     help="save the manifest back (use with --refresh-contributors)")
     args = ap.parse_args(argv)
@@ -1171,7 +1175,23 @@ def main(argv=None):
            "-c:a", "flac",
            "-t", f"{total:.3f}",
            str(out_path)]
-    subprocess.run(cmd, check=True)
+    # THE ENCODE IS REMOTE BY DEFAULT (AGENTS.md: "always prefer remote
+    # encoding when available"). A bare local run of this exact argv is what
+    # OOM-killed the owner's workstation at 03:08Z on 2026-08-24 -- minutes
+    # of x264 over the card inputs with no memory ceiling. The cards are
+    # read by the concat LIST's contents, not by argv tokens, so they travel
+    # as staged inputs with the list's content rewritten to the pod's paths;
+    # the beds and the concert picture are argv `-i` inputs and stage
+    # directly (the list itself must NOT be an `inputs` entry -- its pod
+    # copy is the rewritten one). A local fallback runs the identical argv
+    # under farm.run_capped_local's memory cap, with the reason printed.
+    from tools import farm
+    farm.run_encode(cmd,
+                    inputs=[Path(cmd[i + 1]) for i, tok in enumerate(cmd)
+                            if tok == "-i" and cmd[i + 1] != str(concat)],
+                    out=out_path, local=args.local,
+                    text_files={concat: concat.read_text()},
+                    expected_duration=total)
     peaks.trim_master_peak(out_path.resolve())
     print(f"wrote {out_path}  ({fmt_tc(total)})")
     return 0

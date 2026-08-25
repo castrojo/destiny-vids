@@ -368,9 +368,9 @@ def encode(argv_ff, day, night):
     """
     ok, why = farm.cluster_available()
     if not ok:
-        print(f"farm: encoding locally -- the cluster is not reachable ({why})",
-              file=sys.stderr)
-        subprocess.run(argv_ff, check=True)
+        farm.run_capped_local(
+            argv_ff,
+            reason=f"the cluster is not reachable ({why})", check=True)
         return "local"
     try:
         farm.run_ffmpeg_on_cluster(
@@ -387,9 +387,9 @@ def encode(argv_ff, day, night):
         # AGENTS.md: nothing blocks a release. A farm that fails mid-encode is
         # a reason to say so and keep going, never a reason to hand back no
         # picture -- the argv is identical either way.
-        print(f"farm: the cluster encode failed ({exc}); encoding locally",
-              file=sys.stderr)
-        subprocess.run(argv_ff, check=True)
+        farm.run_capped_local(
+            argv_ff,
+            reason=f"the cluster encode failed ({exc})", check=True)
         return "local"
     return "cluster"
 
@@ -438,9 +438,7 @@ def main(argv=None):
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     if args.local:
-        print("farm: --local was asked for; encoding on this workstation",
-              file=sys.stderr)
-        subprocess.run(argv_ff, check=True)
+        farm.run_capped_local(argv_ff, reason="--local given", check=True)
         where = "local"
     else:
         where = encode(argv_ff, day, night)

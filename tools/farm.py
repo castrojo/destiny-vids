@@ -74,11 +74,22 @@ rewritten to the pod's view (``rewrite_argv_for_pod``). megacut's ENCODE
 segments are the first caller of the second; remote is the default whenever
 the cluster is reachable, per the owner's ruling, and local is the stated
 fallback, never the silent one.
+
+THE POSTURE EVERY CALLER TAKES is ``run_encode``: farm when the cluster
+answers, and when it does not — or the operator passed ``--local`` — the same
+argv runs here under ``run_capped_local``, which wraps the encode in a
+memory-capped systemd scope (a bare local x264 run of a full act OOM-killed
+the owner's workstation at 03:08Z; "DO NOT CRASH MY COMPUTER"). A local
+encode is always allowed, but it is never silent and never unbounded.
+``run_ffmpeg_chain_on_cluster`` covers the remaining shape: ordered commands
+whose intermediates (render.py's clips, act II's parts, a concat list) live
+and die inside one pod workspace.
 """
 
 from __future__ import annotations
 
 import argparse
+import base64
 import itertools
 import json
 import os
@@ -134,6 +145,14 @@ DEFAULT_AUDIO_ARGS = ["-c:a", "copy"]
 # audio frame granularity is tens of milliseconds. Half a second sits cleanly
 # between the two.
 SEAM_TOLERANCE_S = 0.5
+
+# THE LOCAL MEMORY CAP. The workstation has 31 GB and the system-wide OOM
+# killer fired at ~12.9 GB on a bare x264 run (2026-08-24, 03:08Z — it took
+# the agent session down with the encode). A fallback local encode therefore
+# runs in a systemd scope that throttles at MemoryHigh and kills the SCOPE —
+# not the desktop — at MemoryMax.
+LOCAL_CAP_MAX = "12G"
+LOCAL_CAP_HIGH = "10G"
 
 # Named so a test can point it somewhere that does not exist (megacut's
 # LINUXBREW_FFMPEG pattern): the NATIVE ffprobe on an atomic Fedora/Bluefin
@@ -615,7 +634,16 @@ def pod_blocker(status):
 
 
 def cluster_available(kubeconfig=None, namespace=DEFAULT_NAMESPACE):
-    """(ok, why_not). Strict timeouts: the offline suite must not hang."""
+    """(ok, why_not). Strict timeouts: the offline suite must not hang.
+
+    Three probes, each with its own reported reason: kubectl on PATH, the
+    argo service account visible (the API answered), and at least one node
+    Ready. The last one is the difference between "the cluster exists" and
+    "the cluster can run a pod": an API that answers while every node is
+    NotReady accepts the Workflow and the encode sits Pending until the
+    timeout, which reads exactly like a slow encode. Any Ready node is
+    enough — both exo-0 and ghost are the farm, and the scheduler picks.
+    """
     if shutil.which("kubectl") is None:
         return False, "kubectl not on PATH"
     kc = Kubectl(kubeconfig, namespace)
@@ -627,7 +655,136 @@ def cluster_available(kubeconfig=None, namespace=DEFAULT_NAMESPACE):
     if proc.returncode != 0:
         tail = (proc.stderr or proc.stdout).strip().splitlines()
         return False, tail[-1] if tail else "kubectl get sa failed"
+    try:
+        proc = kc.run(["get", "nodes", "--request-timeout=8s", "-o", "json"],
+                      timeout=15, check=False)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return False, f"kubectl cannot list nodes ({exc})"
+    if proc.returncode != 0:
+        tail = (proc.stderr or proc.stdout).strip().splitlines()
+        return False, ("kubectl get nodes failed: "
+                       + (tail[-1] if tail else "unknown error"))
+    try:
+        items = json.loads(proc.stdout).get("items", [])
+    except json.JSONDecodeError:
+        return False, "kubectl get nodes returned unreadable JSON"
+    states = {}
+    for node in items:
+        name = node.get("metadata", {}).get("name", "?")
+        conds = {c.get("type"): c
+                 for c in node.get("status", {}).get("conditions", [])}
+        ready = conds.get("Ready", {})
+        states[name] = ("Ready" if ready.get("status") == "True"
+                        else f"NotReady ({ready.get('reason') or 'no condition'})")
+    if not any(s == "Ready" for s in states.values()):
+        detail = ", ".join(f"{n}={s}" for n, s in sorted(states.items()))
+        return False, f"no Ready node to schedule on ({detail or 'none found'})"
     return True, ""
+
+
+# --------------------------------------------------------------------------
+# The capped local fallback: an unavoidable workstation encode, bounded.
+
+
+_systemd_run_cache = None  # unprobed; then a prefix list, or [] when unusable
+
+
+def _systemd_run_prefix():
+    """The systemd-run scope prefix for a capped local encode, or [] when this
+    host cannot give one. Probed once per process: ``--user --scope`` needs a
+    user manager, which a headless runner does not have — and a scope that
+    cannot start must not be why an encode never ran (degrade, never block).
+    """
+    global _systemd_run_cache
+    if _systemd_run_cache is not None:
+        return _systemd_run_cache
+    exe = shutil.which("systemd-run")
+    prefix = []
+    if exe:
+        # Probe WITH the properties: a scope that starts but cannot carry
+        # MemoryMax (no cgroup delegation for the user manager) is the same
+        # answer as no systemd-run at all -- run uncapped, loudly.
+        prefix = [exe, "--user", "--scope", "--quiet",
+                  "-p", f"MemoryMax={LOCAL_CAP_MAX}",
+                  "-p", f"MemoryHigh={LOCAL_CAP_HIGH}", "--"]
+        try:
+            ok = subprocess.run([*prefix, "true"], capture_output=True,
+                                timeout=15).returncode == 0
+        except (OSError, subprocess.SubprocessError):
+            ok = False
+        if not ok:
+            prefix = []
+    _systemd_run_cache = prefix
+    return prefix
+
+
+def run_capped_local(cmd, reason, **kwargs):
+    """Run one unavoidable LOCAL encode inside a memory-capped scope.
+
+    The reason is printed every time — a local encode is a fallback with a
+    stated cause, never a silent default. The cap is the one in
+    ``LOCAL_CAP_MAX``/``LOCAL_CAP_HIGH``: the box has 31 GB and the
+    workstation-wide OOM killer fired at ~12.9 GB, so the scope dies before
+    the desktop does. With no usable systemd-run the warning is loud and the
+    encode runs UNCAPPED — degrade, never block. ``kwargs`` go straight to
+    ``subprocess.run`` (check, capture_output, stdout, ...).
+    """
+    print(f"farm: LOCAL encode — {reason}", file=sys.stderr)
+    prefix = _systemd_run_prefix()
+    if not prefix:
+        print("farm: WARNING — systemd-run is unavailable, so this local "
+              "encode runs WITHOUT the memory cap that keeps the workstation "
+              "alive. Fix the user manager or use the farm.",
+              file=sys.stderr)
+        return subprocess.run([str(t) for t in cmd], **kwargs)
+    return subprocess.run([*prefix, *[str(t) for t in cmd]], **kwargs)
+
+
+def run_encode(argv, *, inputs, out, local=False, reason=None,
+               expected_duration=None, text_files=None, tmp_prefix=None,
+               label=None, **cluster_kw):
+    """One video encode, on the farm whenever the farm answers.
+
+    This is the posture AGENTS.md rules — "always prefer remote encoding when
+    available" — as a function, so every builder takes it identically. The
+    argv is the same either way; only the CPUs differ:
+
+    * cluster reachable -> the argv runs verbatim in a pod
+      (``run_ffmpeg_on_cluster``, or ``run_ffmpeg_chain_on_cluster`` when
+      ``text_files``/``tmp_prefix`` name pod-side intermediates) and the
+      output is fetched back to ``out``.
+    * ``local=True``, an unreachable cluster, or a FarmError mid-encode ->
+      the same argv runs here under ``run_capped_local``'s memory cap with
+      the reason printed. A farm that fails mid-encode is a reason to say so
+      and keep going, never a reason to hand back no video.
+
+    Returns ``"cluster"`` or ``"local"`` so the caller can record whose CPUs
+    did the work.
+    """
+    argv = [str(t) for t in argv]
+    why = reason or "--local given"
+    if not local:
+        ok, unavailable = cluster_available()
+        if ok:
+            try:
+                if text_files or tmp_prefix:
+                    run_ffmpeg_chain_on_cluster(
+                        [argv], inputs=inputs, out=out, text_files=text_files,
+                        tmp_prefix=tmp_prefix,
+                        expected_duration=expected_duration, label=label,
+                        **cluster_kw)
+                else:
+                    run_ffmpeg_on_cluster(
+                        argv, inputs=inputs, out=out,
+                        expected_duration=expected_duration, label=label,
+                        **cluster_kw)
+                return "cluster"
+            except FarmError as exc:
+                why = f"the cluster encode failed ({exc})"
+        else:
+            why = f"the cluster is not reachable ({unavailable})"
+    run_capped_local(argv, reason=why, check=True)
+    return "local"
 
 
 def _stream_logs(kc, pod, prefix="  "):
@@ -842,29 +999,17 @@ def _strip_launcher(argv):
     return argv[first_opt:]
 
 
-def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
-    """Map a LOCAL ffmpeg argv onto the pod's filesystem view.
+def _stage_inputs(inputs, *, work_dir=WORK_DIR):
+    """The staging plan for ``inputs``: ({local path str: pod path}, uploads).
 
-    The local ffmpeg launcher — one token for a plain binary, four for this
-    host's ``podman exec`` wrapper — becomes plain ``ffmpeg``; the farm image
-    carries a full non-free build on PATH, so the recipe travels, not the
-    binary. Every token that IS one of ``inputs`` is staged at
-    ``{work_dir}/in/NN-name`` (the ordinal prefix keeps two same-named inputs
-    distinct) and rewritten there; the one token that IS ``out`` is rewritten
-    to ``{work_dir}/out/<name>``.
-
-    Matching is exact-token only, by design: a path embedded inside a filter
-    string would NOT be rewritten, so a caller whose argv works that way is
-    rejected loudly below rather than silently running against a missing pod
-    file. megacut's chains carry no paths inside filters.
-
-    Returns (pod_argv, uploads, pod_out) with uploads as
-    [(local_Path, work_dir-relative staging path)].
+    Every input lands at ``{work_dir}/in/NN-name`` — the ordinal prefix keeps
+    two same-named inputs distinct — and a ``%0Nd`` image SEQUENCE stages as
+    its frames in their own directory, with the pattern pointed at it.
     """
-    inputs = [Path(p) for p in inputs]
     staged = {}
     uploads = []
     for i, p in enumerate(inputs):
+        p = Path(p)
         if SEQUENCE_RE.search(p.name):
             # AN IMAGE SEQUENCE IS READ AS A PATTERN, so its frames never
             # appear in argv and the exact-token guard below would reject
@@ -885,6 +1030,30 @@ def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
         rel = f"in/{i:02d}-{_pod_safe_name(p.name)}"
         staged[str(p)] = f"{work_dir}/{rel}"
         uploads.append((p, rel))
+    return staged, uploads
+
+
+def rewrite_argv_for_pod(argv, inputs, out, *, work_dir=WORK_DIR):
+    """Map a LOCAL ffmpeg argv onto the pod's filesystem view.
+
+    The local ffmpeg launcher — one token for a plain binary, four for this
+    host's ``podman exec`` wrapper — becomes plain ``ffmpeg``; the farm image
+    carries a full non-free build on PATH, so the recipe travels, not the
+    binary. Every token that IS one of ``inputs`` is staged at
+    ``{work_dir}/in/NN-name`` (the ordinal prefix keeps two same-named inputs
+    distinct) and rewritten there; the one token that IS ``out`` is rewritten
+    to ``{work_dir}/out/<name>``.
+
+    Matching is exact-token only, by design: a path embedded inside a filter
+    string would NOT be rewritten, so a caller whose argv works that way is
+    rejected loudly below rather than silently running against a missing pod
+    file. megacut's chains carry no paths inside filters.
+
+    Returns (pod_argv, uploads, pod_out) with uploads as
+    [(local_Path, work_dir-relative staging path)].
+    """
+    inputs = [Path(p) for p in inputs]
+    staged, uploads = _stage_inputs(inputs, work_dir=work_dir)
     out_name = _pod_safe_name(Path(out).name)  # basename only inside the pod
     pod_out = f"{work_dir}/out/{out_name}"
     out_str = str(out)
@@ -990,20 +1159,8 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
         storage=storage_for(total), keep=keep, timeout=timeout,
         desc=f"1 encode x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
-    try:
-        facts = probe(out, ffprobe)
-    except (FarmError, RuntimeError) as exc:
-        raise FarmError(f"fetched output does not probe as media: {exc}")
-    if expected_duration is not None:
-        drift = facts["duration"] - float(expected_duration)
-        if abs(drift) > SEAM_TOLERANCE_S:
-            raise FarmError(
-                f"output is {facts['duration']:.3f}s but the caller expected "
-                f"{float(expected_duration):.3f}s — {drift:+.3f}s is a "
-                f"re-time, not rounding (#88)")
-    print(f"{label}: verify ok — {out.name} {facts['duration']:.3f}s "
-          f"{facts['codec_name']} {facts['width']}x{facts['height']}")
-    return facts
+    return _verify_fetched(out, expected_duration, ffprobe=ffprobe,
+                           label=label)
 
 
 def pod_script_runs(pod_argvs, out_rel, *, work_dir=WORK_DIR):
@@ -1080,6 +1237,14 @@ def run_ffmpeg_commands_on_cluster(argvs, *, inputs, out, name=None, kc=None,
         keep=keep, timeout=timeout,
         desc=f"{len(argvs)} ordered encode pass(es) x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
+    return _verify_fetched(out, expected_duration, ffprobe=ffprobe,
+                           label=label)
+
+
+def _verify_fetched(out, expected_duration, *, ffprobe, label):
+    """The farm's own rule (exit 0 is not evidence, #88): the fetched file
+    must ffprobe as media with a video stream, and land within
+    SEAM_TOLERANCE_S of the caller's expected duration when one was given."""
     try:
         facts = probe(out, ffprobe)
     except (FarmError, RuntimeError) as exc:
@@ -1094,6 +1259,161 @@ def run_ffmpeg_commands_on_cluster(argvs, *, inputs, out, name=None, kc=None,
     print(f"{label}: verify ok — {out.name} {facts['duration']:.3f}s "
           f"{facts['codec_name']} {facts['width']}x{facts['height']}")
     return facts
+
+
+def pod_script_chain(pod_argvs, out_rel, *, text_files=None, work_dir=WORK_DIR):
+    """The bash for a CHAIN: ordered commands whose intermediates stay in the
+    pod. ``text_files`` is {work_dir-relative dest: content}, written before
+    the first command runs — a concat list whose contents name pod-side
+    paths. Content travels base64: the list already holds quoted absolute
+    paths, and shell-quoting a quoted file into a script is how one path
+    becomes two.
+    """
+    written = []
+    for dest, content in (text_files or {}).items():
+        encoded = base64.b64encode(content.encode("utf-8")).decode("ascii")
+        written.append(f"mkdir -p {shlex.quote(str(Path(dest).parent))}")
+        written.append(f"printf '%s' {shlex.quote(encoded)} | base64 -d "
+                       f"> {shlex.quote(dest)}")
+    commands = []
+    for index, argv in enumerate(pod_argvs, start=1):
+        commands.append(f"""say {shlex.quote(f"running step {index}: " + shlex.join(argv))}
+if {shlex.join(argv)} > logs/step-{index}.log 2>&1; then
+  :
+else
+  rc=$?
+  say "step {index} FAILED (rc=$rc)"
+  tail -n 20 logs/step-{index}.log
+  exit 1
+fi""")
+    return f"""#!/bin/bash
+set -uo pipefail
+export LC_ALL=C
+cd {work_dir} || {{ echo "no {work_dir} mounted"; exit 1; }}
+mkdir -p in logs out chain
+say() {{ printf '%s [farm] %s\\n' "$(date +%H:%M:%S)" "$*"; }}
+say "pod up on $(hostname); waiting for input"
+while [ ! -f in/.ready ]; do sleep 2; done
+say "input arrived:"; ls -l in/
+{chr(10).join(written)}
+{chr(10).join(commands)}
+dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 {shlex.quote(out_rel)} 2>/dev/null)
+printf '{{"output":%s,"duration":%s}}\\n' '"{out_rel}"' '"${{dur:-null}}"' > out/.done.json
+say "encoded {out_rel} duration=${{dur:-?}}s; waiting for fetch"
+while [ ! -f .fetched ]; do sleep 2; done
+say "output fetched; pod done"
+"""
+
+
+def run_ffmpeg_chain_on_cluster(argvs, *, inputs, out, tmp_prefix=None,
+                                text_files=None, name=None, kc=None,
+                                kubeconfig=None, namespace=DEFAULT_NAMESPACE,
+                                image=DEFAULT_IMAGE, cpu=DEFAULT_CPU,
+                                limit_cpu=DEFAULT_LIMIT_CPU,
+                                memory=DEFAULT_MEMORY,
+                                limit_memory=DEFAULT_LIMIT_MEMORY,
+                                node=DEFAULT_NODE, keep=False,
+                                timeout=DEFAULT_TIMEOUT,
+                                expected_duration=None, label=None,
+                                ffprobe=None):
+    """Ordered ffmpeg commands whose INTERMEDIATES never leave the pod.
+
+    ``run_ffmpeg_commands_on_cluster`` insists every command reads the same
+    inputs and writes the same output — a two-pass encode. A chain is the
+    other shape: clip encodes write intermediates that only a later concat
+    reads (render.py's cut-list pipeline, act II's parts). An argv token
+    under ``tmp_prefix`` is rewritten to the pod's ``chain/`` directory,
+    where the next command picks it up; only ``out`` — which the LAST
+    command must write — is fetched back.
+
+    ``text_files`` maps a local path to the file's content. The path's argv
+    token rewrites like any other intermediate — a staged input's own pod
+    path, a ``tmp_prefix``-relative ``chain/`` path, or ``chain/<name>`` for
+    anything else — and the CONTENT gets every staged input's local path
+    replaced by its pod path (then ``tmp_prefix`` by the chain dir), so the
+    concat list the local run would have used becomes one the pod can read.
+    The local file itself is never uploaded — only its rewritten content.
+    """
+    if not argvs:
+        raise ValueError("at least one ffmpeg command is required")
+    out = Path(out)
+    prefix = str(Path(tmp_prefix)) if tmp_prefix else None
+    # The same input twice would stage twice and rewrite to the LAST staging
+    # name; dedupe on the path string so the map stays one-to-one.
+    inputs = list(dict.fromkeys(str(Path(p)) for p in inputs))
+    for p in inputs:
+        if not SEQUENCE_RE.search(Path(p).name) and not Path(p).exists():
+            raise FarmError(f"input does not exist: {p}")
+    staged, uploads = _stage_inputs(inputs)
+
+    text_dests = {}
+    for local_path in (text_files or {}):
+        local_str = str(local_path)
+        if prefix and (local_str == prefix
+                       or local_str.startswith(prefix + "/")):
+            dest = f"{WORK_DIR}/chain/{Path(local_str).relative_to(prefix)}"
+        elif local_str in staged:
+            dest = staged[local_str]
+        else:
+            dest = f"{WORK_DIR}/chain/{_pod_safe_name(Path(local_str).name)}"
+        text_dests[local_str] = dest
+
+    def rewrite(tok):
+        if tok in staged:
+            return staged[tok]
+        if tok == str(out):
+            return f"{WORK_DIR}/out/{_pod_safe_name(out.name)}"
+        if tok in text_dests:
+            return text_dests[tok]
+        if prefix and (tok == prefix or tok.startswith(prefix + "/")):
+            return f"{WORK_DIR}/chain/{Path(tok).relative_to(prefix)}"
+        return tok
+
+    pod_argvs = []
+    for argv in argvs:
+        body = _strip_launcher([str(t) for t in argv])
+        pod_argvs.append(["ffmpeg", *[rewrite(t) for t in body]])
+    pod_out = f"{WORK_DIR}/out/{_pod_safe_name(out.name)}"
+    if str(out) not in [str(t) for t in argvs[-1]]:
+        raise FarmError(f"the chain's last command never writes {out} — it "
+                        "is the one result the fetch brings back")
+
+    pod_text = {}
+    for local_path, content in (text_files or {}).items():
+        dest = text_dests[str(local_path)]
+        for local_str, pod_str in staged.items():
+            content = content.replace(local_str, pod_str)
+        if prefix:
+            content = content.replace(prefix, f"{WORK_DIR}/chain")
+        pod_text[dest[len(WORK_DIR) + 1:]] = content
+
+    # A staged input nothing references is a caller bug: it would upload and
+    # sit unread. Check across every argv AND the rewritten text contents.
+    referenced = {t for argv in pod_argvs for t in argv}
+    referenced.update(pod_text.values())
+    unread = [pod for pod in staged.values()
+              if not any(pod in r for r in referenced)]
+    if unread:
+        raise FarmError(f"staged input(s) never read by the chain: {unread}")
+
+    name = name or farm_name(out.name)
+    label = label or f"farm[{name}]"
+    out_rel = pod_out[len(WORK_DIR) + 1:]
+    kc = kc or Kubectl(kubeconfig, namespace)
+    total = sum(
+        sum(f.stat().st_size for f in sequence_frames(Path(p)))
+        if SEQUENCE_RE.search(Path(p).name) else Path(p).stat().st_size
+        for p in inputs)
+    _execute_on_cluster(
+        name=name,
+        script=pod_script_chain(pod_argvs, out_rel, text_files=pod_text),
+        uploads=uploads, out_rel=out_rel, out=out, kc=kc, image=image,
+        cpu=cpu, limit_cpu=limit_cpu, memory=memory, limit_memory=limit_memory,
+        node=node, storage=storage_for(total), keep=keep, timeout=timeout,
+        desc=f"{len(argvs)} ordered encode step(s) x up to {limit_cpu} cpu",
+        label=label, log_prefix=f"  [{name}] ")
+    return _verify_fetched(out, expected_duration, ffprobe=ffprobe,
+                           label=label)
 
 
 def _local_progress(plan, done):
@@ -1146,7 +1466,12 @@ def run_locally(plan, *, workers):
         log = log_for(argv, label)
         log.parent.mkdir(parents=True, exist_ok=True)
         with open(log, "w") as lf:
-            proc = subprocess.run(argv, stdout=lf, stderr=subprocess.STDOUT)
+            # The chunked local path is still a workstation encode, so it
+            # takes the same memory cap as every other fallback -- the
+            # fallback reason was already printed by the caller.
+            proc = run_capped_local(argv, reason=f"local chunked encode "
+                                    f"({label})", stdout=lf,
+                                    stderr=subprocess.STDOUT)
         return label, proc.returncode, log
 
     failures = []

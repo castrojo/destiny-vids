@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -153,15 +152,23 @@ def render(cards_dir=CARDS, out=OUT, local=False):
     # stills is not why -- the rule is that the cluster runs the encode
     # whenever it is reachable, because this workstation is also running the
     # session that asked for the film. Local is a fallback with a reason,
-    # never a silent default.
+    # never a silent default -- and never an unbounded one: it runs under
+    # farm.run_capped_local's memory cap.
+    from tools import farm
+    why = "--local given"
     if not local:
-        from tools import farm
-        if farm.cluster_available():
+        # cluster_available() returns (ok, why_not) -- and a bare tuple is
+        # ALWAYS truthy, which is exactly how this check once "worked" while
+        # never actually falling back. Unpack it.
+        ok, probe_why = farm.cluster_available()
+        if ok:
             farm.run_ffmpeg_on_cluster(argv, inputs=paths, out=Path(out),
                                        name="intermission")
             return out
-        print("cluster unreachable -- encoding locally", file=sys.stderr)
-    subprocess.run(argv, check=True)
+        why = f"the cluster is not reachable ({probe_why})"
+        print(f"build_intermission: {why}; encoding locally",
+              file=sys.stderr)
+    farm.run_capped_local(argv, reason=why, check=True)
     return out
 
 

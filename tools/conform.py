@@ -340,7 +340,7 @@ def build_encode_command(src, dst, ffmpeg=None, threads=None):
 
 
 def ensure(source, out_dir=None, ffmpeg=None, threads=None,
-           log=None, _probe=None):
+           log=None, _probe=None, use_farm=None):
     """A spec-conformant version of ``source``, doing as little as possible.
 
     Returns ``(path, status)`` with status one of:
@@ -353,6 +353,14 @@ def ensure(source, out_dir=None, ffmpeg=None, threads=None,
     renamed over it only on success, so an interrupted conform never leaves
     a half-written file for the next run to trust. ``_probe`` substitutes the
     ffprobe stream read in tests, so the cache logic is checkable offline.
+
+    The encode itself is remote by default (AGENTS.md: "always prefer remote
+    encoding when available") -- a cache MISS used to mean a silent local
+    x264 run even when megacut had farmed everything else, which is how a
+    "--farm" build still loaded the workstation. ``use_farm`` pins the
+    posture from a caller that already probed (megacut); ``None`` probes
+    here. A local encode -- asked for or fallen back to -- runs under
+    ``tools.farm.run_capped_local``'s memory cap with the reason printed.
     """
     log = log or (lambda msg: print(msg, file=sys.stderr))
     src = Path(source)
@@ -374,7 +382,7 @@ def ensure(source, out_dir=None, ffmpeg=None, threads=None,
     tmp.unlink(missing_ok=True)
     argv = build_encode_command(src, tmp, ffmpeg or _find_ffmpeg(), threads)
     try:
-        subprocess.run(argv, check=True)
+        _encode(argv, src=src, out=tmp, use_farm=use_farm)
         tmp.replace(entry)
     except BaseException:
         tmp.unlink(missing_ok=True)
@@ -388,6 +396,32 @@ def ensure(source, out_dir=None, ffmpeg=None, threads=None,
     return entry, "conformed"
 
 
+def _encode(argv, *, src, out, use_farm):
+    """The conform encode, on the farm whenever it answers.
+
+    ``use_farm`` is a tri-state: True/False pin the posture from a caller
+    that probed already; None probes here. A farm failure mid-encode falls
+    back to the capped local run -- degrade, never block, and a cold cache
+    is never a reason to hand back no programme.
+    """
+    from tools import farm
+    reason = None
+    if use_farm is None:
+        use_farm, why = farm.cluster_available()
+        if not use_farm:
+            reason = f"the cluster is not reachable ({why})"
+    elif not use_farm:
+        reason = "--local given"
+    if use_farm:
+        try:
+            farm.run_ffmpeg_on_cluster(argv, inputs=[src], out=out)
+            return out
+        except farm.FarmError as exc:
+            reason = f"the cluster encode failed ({exc})"
+    farm.run_capped_local(argv, reason=reason, check=True)
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("inputs", nargs="+", help="delivered acts to conform")
@@ -396,6 +430,10 @@ def main(argv=None):
     ap.add_argument("--check", action="store_true",
                     help="report whether each file already conforms; "
                          "encode nothing. Exit 1 if any file does not conform.")
+    ap.add_argument("--local", action="store_true",
+                    help="encode on THIS host even when the farm cluster is "
+                         "reachable (the escape hatch; the encode runs under "
+                         "tools.farm.run_capped_local's memory cap)")
     args = ap.parse_args(argv)
 
     ffmpeg = _find_ffmpeg()
@@ -418,7 +456,8 @@ def main(argv=None):
     # exists for one-off conforms and --check.
     for src in args.inputs:
         path, status = ensure(src, out_dir=args.out, ffmpeg=ffmpeg,
-                              log=lambda _m: None)
+                              log=lambda _m: None,
+                              use_farm=False if args.local else None)
         print(f"{status:<10} {src} -> {path}")
     return 0
 

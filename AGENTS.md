@@ -493,10 +493,16 @@ it has to buy more than tidiness.
   cluster unless `cluster_available()` says otherwise, `--local` as an explicit
   escape hatch.
 
-  The node has the `linuxserver/ffmpeg` image cached; stage inputs into
-  `/var/mnt/exo0-stage/dv` and pin the pod to it with
-  `imagePullPolicy: IfNotPresent`. The registry mirror times out on a plain
-  pull, and the footage is never already there. Recipe in
+  And never UNCAPPED: a bare local x264 run of a full act OOM-killed this
+  workstation at 03:08Z on 2026-08-24. Every local fallback encode runs under
+  `farm.run_capped_local`'s systemd memory scope, and
+  `tests/test_farm_policy.py` statically pins the posture for every
+  video-encode entry point.
+
+  Both nodes carry the `linuxserver/ffmpeg` image; pods submit with
+  `imagePullPolicy: IfNotPresent` (the registry mirror times out on a plain
+  pull) and are never hostname-pinned. `tools/farm.py` does the staging
+  (`kubectl cp` around a per-job PVC) and the ffprobe verification. Recipe in
   [`docs/rendering.md`](docs/rendering.md), operations in
   [`docs/skills/farm.md`](docs/skills/farm.md).
 

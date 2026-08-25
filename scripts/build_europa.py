@@ -284,11 +284,22 @@ def main(argv=None):
     ap.add_argument("--skip-plates", action="store_true",
                     help="reuse the rendered pills already in --plates-dir")
     ap.add_argument("--farm", action="store_true",
-                    help="run the master encode on the farm cluster "
-                         "(tools.farm.run_ffmpeg_on_cluster); the peaks trim "
-                         "and the nocover derive are stream-copies and stay "
-                         "local")
+                    help="run the master encode on the farm cluster. This is "
+                         "ALREADY the default whenever the cluster is "
+                         "reachable (owner's ruling: always prefer remote "
+                         "encoding); the flag only pins the posture. An "
+                         "unreachable cluster falls back to a memory-capped "
+                         "local encode with the reason printed.")
+    ap.add_argument("--local", action="store_true",
+                    help="encode the master on THIS host even when the "
+                         "cluster is reachable (the escape hatch; the encode "
+                         "runs under tools.farm.run_capped_local's memory "
+                         "cap)")
     args = ap.parse_args(argv)
+    if args.farm and args.local:
+        raise SystemExit("--farm and --local are mutually exclusive: the "
+                         "farm is already the default when the cluster is "
+                         "reachable; --local is the escape hatch from it")
 
     project = Path(args.project).expanduser()
     delivered = (Path(args.out).expanduser() if args.out else
@@ -334,14 +345,11 @@ def main(argv=None):
     cmd, derive = build_commands(doc, project, Path(args.plates_dir),
                                  master, delivered)
     print(f"build_europa: act {ACT} master -> {master}")
-    if args.farm:
-        from tools import farm
-        inputs = [Path(cmd[i + 1]) for i, tok in enumerate(cmd)
-                  if tok == "-i"]
-        farm.run_ffmpeg_on_cluster(cmd, inputs=inputs, out=master,
-                                   expected_duration=108.333333)
-    else:
-        subprocess.run(cmd, check=True)
+    from tools import farm
+    inputs = [Path(cmd[i + 1]) for i, tok in enumerate(cmd)
+              if tok == "-i"]
+    farm.run_encode(cmd, inputs=inputs, out=master, local=args.local,
+                    expected_duration=108.333333)
     # The delivered-peak gate (#82): static trim into the -0.9..-1.1 dBTP
     # band, video stream-copied. Runs on the 110.2 s master BEFORE the cover
     # is cut, so the delivered film's picture is copied from the gated master.

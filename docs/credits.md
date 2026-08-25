@@ -138,8 +138,11 @@ that limit.
   honestly recorded as unresolved, so page changes are not snapped to bars.
   Inventing a phase to snap to would be worse than not snapping.
 - **No loudness correction.** See above.
-- **No remote encode, this once.** The cluster was reachable, but the concat
-  list carries absolute host paths to 57 rendered PNGs that
-  `farm.rewrite_argv_for_pod` does not rewrite. That is a new capability rather
-  than a flag, so it is filed rather than improvised — see
-  [`skills/farm.md`](skills/farm.md).
+- **The encode is remote by default, like every other builder.** The concat
+  list carries absolute host paths to the rendered PNGs, which
+  `farm.rewrite_argv_for_pod` alone cannot rewrite — so the builder farms
+  through `farm.run_encode(..., text_files={concat: ...})`, which rewrites
+  the list's payload paths to the pod's layout (see
+  [`skills/farm.md`](skills/farm.md)). `--local` is the explicit escape hatch
+  and runs memory-capped; the bare local run of this argv is what OOM-killed
+  the workstation at 03:08Z on 2026-08-24.

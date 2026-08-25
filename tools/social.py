@@ -186,7 +186,11 @@ def main(argv=None):
                 label=f"social[{out.name}]")
         else:
             for i, cmd in enumerate(cmds, start=1):
-                proc = subprocess.run(cmd, capture_output=True, text=True)
+                # A local pass is the fallback: stated, and memory-capped --
+                # never a silent unbounded encode on the workstation.
+                proc = farm.run_capped_local(
+                    cmd, reason=reason or "farm unavailable",
+                    capture_output=True, text=True)
                 if proc.returncode != 0:
                     tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
                     raise SystemExit(f"pass {i} failed:\n{tail}")

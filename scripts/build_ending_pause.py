@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -88,6 +87,10 @@ def main(argv=None):
     ap.add_argument("--cards-dir", default=str(CARDS))
     ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--print-command", action="store_true")
+    ap.add_argument("--local", action="store_true",
+                    help="encode on THIS host even when the farm cluster is "
+                         "reachable (the escape hatch; the encode runs under "
+                         "tools.farm.run_capped_local's memory cap)")
     args = ap.parse_args(argv)
 
     doc = json.loads(Path(args.manifest).read_text())
@@ -99,7 +102,15 @@ def main(argv=None):
     if args.print_command:
         print(" ".join(cmd))
         return 0
-    subprocess.run(cmd, check=True)
+    # Remote by default (AGENTS.md): the card concat encode runs on the farm
+    # when the cluster answers; a local run is the stated, memory-capped
+    # fallback.
+    from tools import farm
+    farm.run_encode(cmd,
+                    inputs=[Path(cmd[i + 1]) for i, tok in enumerate(cmd)
+                            if tok == "-i"],
+                    out=out, local=args.local,
+                    expected_duration=duration(doc))
     print(f"wrote {out} ({frame_count(doc)} frames, video only)")
     return 0
 

@@ -319,16 +319,7 @@ def load_shots(path):
     return data["shots"] if isinstance(data, dict) else data
 
 
-def still_clip(ffmpeg, image, duration, out_path, keep_audio=True):
-    """Render a still image as a clip in the common intermediate format.
-
-    An artwork card takes the slot a dropped shot left behind, so it has to be
-    indistinguishable from a cut clip to the concat demuxer: same size, rate and
-    pixel format, and the *same* audio disposition. Giving a still a silent
-    track when the other clips are video-only (which is what ``--audio`` does)
-    would make it the only input with a stream the others lack, and the join
-    fails.
-    """
+def _still_argv(ffmpeg, image, duration, out_path, keep_audio):
     cmd = list(ffmpeg) + ["-v", "error", "-y", "-loop", "1", "-t", f"{duration:.3f}",
                           "-i", str(image)]
     if keep_audio:
@@ -347,7 +338,29 @@ def still_clip(ffmpeg, image, duration, out_path, keep_audio=True):
         cmd += ["-map", "0:v:0", "-an"]
     cmd += ["-vf", VIDEO_FILTER,
             *conform.video_encode_args(crf=18, preset="medium"), str(out_path)]
-    subprocess.run(cmd, check=True)
+    return cmd
+
+
+def still_clip(ffmpeg, image, duration, out_path, keep_audio=True):
+    """Render a still image as a clip in the common intermediate format.
+
+    An artwork card takes the slot a dropped shot left behind, so it has to be
+    indistinguishable from a cut clip to the concat demuxer: same size, rate and
+    pixel format, and the *same* audio disposition. Giving a still a silent
+    track when the other clips are video-only (which is what ``--audio`` does)
+    would make it the only input with a stream the others lack, and the join
+    fails.
+
+    This is the LOCAL executor -- the encode runs memory-capped
+    (``tools.farm.run_capped_local``), because every render.py entry point is
+    farm-first and a local encode is a fallback with a stated reason, never
+    a silent unbounded one. The farm path builds the same argv with
+    ``_still_argv`` and runs it in the pod.
+    """
+    from tools import farm
+    farm.run_capped_local(
+        _still_argv(ffmpeg, image, duration, out_path, keep_audio),
+        reason="render clip on this host", check=True)
 
 
 def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
@@ -366,7 +379,18 @@ def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
 
     Normalizing every clip to one size/rate/pixel format is what lets the concat
     demuxer join them: it requires identical stream properties across inputs.
+
+    Like ``still_clip``, this is the LOCAL executor: memory-capped via
+    ``tools.farm.run_capped_local``. The farm path builds the same argv with
+    ``_cut_argv``.
     """
+    from tools import farm
+    farm.run_capped_local(
+        _cut_argv(ffmpeg, src, start_sec, duration, out_path, keep_audio),
+        reason="render clip on this host", check=True)
+
+
+def _cut_argv(ffmpeg, src, start_sec, duration, out_path, keep_audio):
     cmd = list(ffmpeg) + [
         "-v", "error", "-y",
         "-i", str(src),
@@ -381,7 +405,7 @@ def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
     else:
         cmd += ["-an"]
     cmd.append(str(out_path))
-    subprocess.run(cmd, check=True)
+    return cmd
 
 
 # A bed may run past the cut -- `-shortest` trims the tail, which is the whole
@@ -425,6 +449,29 @@ def _check_bed_covers_the_cut(clip_paths, audio_bed):
             f"Lengthen the bed, or shorten the cut deliberately.")
 
 
+def _concat_argv(ffmpeg, list_path, out_path, audio_bed=None, audio_gain=None):
+    """The join's argv, from the list file's PATH (its content is the
+    caller's -- the local path writes real entries beside the output, the
+    farm path hands the pod a rewritten one; see render())."""
+    cmd = list(ffmpeg) + ["-v", "error", "-y", "-f", "concat", "-safe", "0",
+                          "-i", str(list_path)]
+    if audio_bed:
+        cmd += ["-i", str(audio_bed), "-map", "0:v:0", "-map", "1:a:0", "-shortest"]
+        if audio_gain is not None:
+            cmd += ["-af", f"volume={audio_gain}"]
+        cmd += ["-c:a", DELIVERY_AUDIO_CODEC]
+    else:
+        if audio_gain is not None:
+            # Source audio from the clips; implicit selection picks it up.
+            cmd += ["-af", f"volume={audio_gain}"]
+        # State the codec even with no bed: the clips now carry PCM, and
+        # the container's default would put the lossy generation back.
+        cmd += ["-c:a", DELIVERY_AUDIO_CODEC]
+    cmd += conform.video_encode_args(crf=18, preset="medium")
+    cmd.append(str(out_path))
+    return cmd
+
+
 def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None,
            audio_gain=None):
     """Join normalized clips with the concat demuxer.
@@ -437,31 +484,24 @@ def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None,
     limiter, never a normaliser): it exists so tools/peaks.py's delivered-peak
     correction can re-run just the concat instead of re-cutting every clip.
     None means no filter, so an uncorrected render is bit-identical to before.
+
+    This is the LOCAL executor -- memory-capped via
+    ``tools.farm.run_capped_local``. The farm path builds the same argv with
+    ``_concat_argv`` and runs the whole chain in one pod.
     """
+    from tools import farm
     workdir = Path(workdir or Path(out_path).parent)
     list_path = workdir / "concat_list.txt"
     list_path.write_text(
         "".join(f"file '{Path(c).resolve()}'\n" for c in clip_paths), encoding="utf-8"
     )
     try:
-        cmd = list(ffmpeg) + ["-v", "error", "-y", "-f", "concat", "-safe", "0",
-                              "-i", str(list_path)]
         if audio_bed:
             _check_bed_covers_the_cut(clip_paths, audio_bed)
-            cmd += ["-i", str(audio_bed), "-map", "0:v:0", "-map", "1:a:0", "-shortest"]
-            if audio_gain is not None:
-                cmd += ["-af", f"volume={audio_gain}"]
-            cmd += ["-c:a", DELIVERY_AUDIO_CODEC]
-        else:
-            if audio_gain is not None:
-                # Source audio from the clips; implicit selection picks it up.
-                cmd += ["-af", f"volume={audio_gain}"]
-            # State the codec even with no bed: the clips now carry PCM, and
-            # the container's default would put the lossy generation back.
-            cmd += ["-c:a", DELIVERY_AUDIO_CODEC]
-        cmd += conform.video_encode_args(crf=18, preset="medium")
-        cmd.append(str(out_path))
-        subprocess.run(cmd, check=True)
+        farm.run_capped_local(
+            _concat_argv(ffmpeg, list_path, out_path, audio_bed=audio_bed,
+                         audio_gain=audio_gain),
+            reason="render join on this host", check=True)
     finally:
         list_path.unlink(missing_ok=True)
 
@@ -529,15 +569,37 @@ def cap_holds(shots, max_shot_sec, log=None):
 
 
 def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=True,
-           ffmpeg=None, target_dbtp=peaks.DEFAULT_TARGET_DBTP):
+           ffmpeg=None, target_dbtp=peaks.DEFAULT_TARGET_DBTP, local=False):
+    """Cut the shot list and join it. REMOTE BY DEFAULT (AGENTS.md: "always
+    prefer remote encoding when available"): when the cluster answers, the
+    clips and the concat run as one chain in a single pod
+    (``tools.farm.run_ffmpeg_chain_on_cluster``) and only the finished cut is
+    fetched back. ``local=True`` -- or a cluster that does not answer -- runs
+    the same argvs on this host, memory-capped, with the reason printed.
+    """
+    from tools import farm
     ffmpeg = ffmpeg or find_ffmpeg()
     out_path = Path(out_path).resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     audio_bed = Path(audio_bed).resolve() if audio_bed else None
+    if local:
+        use_farm, farm_why = False, "--local given"
+    else:
+        use_farm, farm_why = farm.cluster_available()
+    if use_farm:
+        print("render: cluster reachable; the cut encodes on the farm "
+              "(--local to force this host)", file=sys.stderr)
+    else:
+        print(f"render: encoding on THIS host -- {farm_why}", file=sys.stderr)
+
     rendered, missing = [], []
     # Intermediates live beside the output, not in /tmp, so a containerized
     # ffmpeg can see them through the same bind mount as the source media.
+    # (On the farm path these paths name POD-side intermediates -- the helper
+    # rewrites every token under this directory into the pod's chain dir.)
     with tempfile.TemporaryDirectory(dir=out_path.parent, prefix=".render-") as tmp:
+        jobs = []  # (kind, source-or-image, shot, duration, clip)
+        total = 0.0
         for n, shot in enumerate(shots, 1):
             duration = resolve_duration(shot)
             clip = Path(tmp) / f"clip_{n:03d}{INTERMEDIATE_SUFFIX}"
@@ -549,30 +611,90 @@ def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=
                 if verbose:
                     print(f"  [{n:>2}] STILL ({duration:.2f}s)  "
                           f"{shot.get('beat', image.name)}")
-                still_clip(ffmpeg, image, duration, clip, keep_audio)
-                rendered.append(clip)
-                continue
-            src = resolve_media(shot["video_id"], media_dir)
-            if src is None:
-                missing.append(shot)
-                continue
-            if verbose:
-                print(f"  [{n:>2}] {shot['start_tc']}–{shot['end_tc']} "
-                      f"({duration:.2f}s)  {shot.get('beat', shot['segment_id'])}")
-            cut_clip(ffmpeg, src, shot["start_sec"], duration, clip, keep_audio)
+                jobs.append(("still", image, shot, duration, clip))
+            else:
+                src = resolve_media(shot["video_id"], media_dir)
+                if src is None:
+                    missing.append(shot)
+                    continue
+                if verbose:
+                    print(f"  [{n:>2}] {shot['start_tc']}–{shot['end_tc']} "
+                          f"({duration:.2f}s)  "
+                          f"{shot.get('beat', shot['segment_id'])}")
+                jobs.append(("cut", src, shot, duration, clip))
             rendered.append(clip)
-        if not rendered:
+            total += duration
+        if not jobs:
             raise RuntimeError("nothing to render: no shot resolved to a source file")
-        concat(ffmpeg, rendered, out_path, audio_bed, workdir=tmp)
+        # Fail fast on a short bed BEFORE paying for any encode: on the local
+        # path concat() re-checks against the real clip files; on the farm
+        # path the clips only ever exist pod-side, so this planned-duration
+        # check is the one that keeps a short bed from silently ending the
+        # film early (the `-shortest` trap _check_bed_covers_the_cut names).
+        if audio_bed:
+            bed_sec = probe_media_duration(audio_bed)
+            if bed_sec is not None and \
+                    bed_sec + CONCAT_BED_TOLERANCE_SEC < total:
+                raise RuntimeError(
+                    f"the audio bed is {bed_sec:.3f}s but the cut is "
+                    f"{total:.3f}s ({total - bed_sec:.3f}s short). "
+                    "`-shortest` would trim the PICTURE to the bed and exit "
+                    "0, shipping a film that ends early. Lengthen the bed, "
+                    "or shorten the cut deliberately.")
+
+        def run_chain(audio_gain=None):
+            """The whole cut as one farm chain: every clip encode, then the
+            concat, in one pod workspace; only the finished cut comes back."""
+            argvs, inputs = [], []
+            for kind, target, shot, duration, clip in jobs:
+                if kind == "still":
+                    argvs.append(_still_argv(["ffmpeg"], target, duration,
+                                             clip, keep_audio))
+                else:
+                    argvs.append(_cut_argv(["ffmpeg"], target,
+                                           shot["start_sec"], duration,
+                                           clip, keep_audio))
+                inputs.append(target)
+            list_path = Path(tmp) / "concat_list.txt"
+            argvs.append(_concat_argv(["ffmpeg"], list_path, out_path,
+                                      audio_bed=audio_bed,
+                                      audio_gain=audio_gain))
+            if audio_bed:
+                inputs.append(audio_bed)
+            farm.run_ffmpeg_chain_on_cluster(
+                argvs, inputs=inputs, out=out_path, tmp_prefix=tmp,
+                # The list the LOCAL run would write; the helper rewrites
+                # its contents to the pod's paths and places it there.
+                text_files={list_path: "".join(f"file '{c}'\n"
+                                               for c in rendered)},
+                expected_duration=total)
+
+        if use_farm:
+            run_chain()
+        else:
+            for kind, target, shot, duration, clip in jobs:
+                if kind == "still":
+                    still_clip(ffmpeg, target, duration, clip, keep_audio)
+                else:
+                    cut_clip(ffmpeg, target, shot["start_sec"], duration,
+                             clip, keep_audio)
+            concat(ffmpeg, rendered, out_path, audio_bed, workdir=tmp)
         # A cut must not ship above the delivered-peak band either: measure the
         # FINISHED file and re-run the concat at a corrected static gain until
         # it has real headroom (tools/peaks.py -- never a limiter, never a
         # normaliser). Only the concat is re-run, not the clip cuts. A muted
         # render has no audio to measure.
+        #
+        # Farm path: the pod's intermediates are gone after the fetch, so a
+        # correction re-runs the whole chain at the derived gain -- the
+        # cluster absorbs the re-encode, which is what it is for.
         if target_dbtp is not None and (keep_audio or audio_bed):
             def rerun(new_gain):
-                concat(ffmpeg, rendered, out_path, audio_bed, workdir=tmp,
-                       audio_gain=new_gain)
+                if use_farm:
+                    run_chain(audio_gain=new_gain)
+                else:
+                    concat(ffmpeg, rendered, out_path, audio_bed, workdir=tmp,
+                           audio_gain=new_gain)
 
             peaks.correct_delivered_peak(
                 out_path, 1.0, target_dbtp, rerun, ffmpeg=ffmpeg,
@@ -596,6 +718,10 @@ def main(argv=None):
                     help="delivered true-peak target in dBTP; the finished file "
                          "is measured and re-run at a corrected static gain "
                          f"until it has headroom (default {peaks.DEFAULT_TARGET_DBTP})")
+    ap.add_argument("--local", action="store_true",
+                    help="cut and join on THIS host even when the farm cluster "
+                         "is reachable (the escape hatch; the encodes run "
+                         "under tools.farm.run_capped_local's memory cap)")
     args = ap.parse_args(argv)
 
     ffmpeg = find_ffmpeg(prefer_container=not args.no_container)
@@ -606,7 +732,8 @@ def main(argv=None):
     rendered, missing = render(shots, args.media, args.out,
                                keep_audio=not args.audio,
                                audio_bed=args.audio, ffmpeg=ffmpeg,
-                               target_dbtp=args.target_dbtp)
+                               target_dbtp=args.target_dbtp,
+                               local=args.local)
     total = sum(resolve_duration(s) for s in shots)
     print(f"OK: {len(rendered)} clip(s), ~{total:.1f}s -> {args.out}")
     for shot in missing:

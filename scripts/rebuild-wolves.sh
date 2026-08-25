@@ -5,13 +5,26 @@
 # notes -> edit scripts/build_wolves.py -> watch it -> more notes, and every
 # manual step in between is a step that gets skipped or mistyped at 1am.
 #
-#   ./scripts/rebuild-wolves.sh
+#   ./scripts/rebuild-wolves.sh [--local]
+#
+# The picture encode (tools/render.py) is REMOTE BY DEFAULT (AGENTS.md): it
+# runs on the farm cluster whenever the cluster answers, and falls back to a
+# memory-capped local encode with the reason printed. `--local` forces the
+# workstation. The audio mux (tools/audiomix.py) stream-copies the picture,
+# so it always runs here -- remuxing is not an encode.
 #
 # It also refuses to hand you a file with the two faults that have actually
 # shipped here: a silent pause, and a true peak over the headroom gate. Both
 # are invisible to "did it render" and both cost a re-render to find late.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+LOCAL_OPT=()
+if [ "${1:-}" = "--local" ]; then
+    LOCAL_OPT=(--local)
+    shift
+    echo "rebuild-wolves: encoding the picture on THIS host (--local)" >&2
+fi
 
 # The system ffmpeg on this atomic host is ffmpeg-free: no H.264 decoder, and
 # it fails only once decoding starts, which reads like a corrupt input file.
@@ -38,7 +51,7 @@ echo "==> interruption cards"
 
 echo "==> picture"
 DESTINY_FFMPEG="$FF" "$PY" tools/render.py "$SHOTLIST" \
-    --media media --out "$PICTURE" | tail -2
+    --media media --out "$PICTURE" "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}" | tail -2
 
 echo "==> audio"
 DESTINY_FFMPEG="$FF" "$PY" tools/audiomix.py "$SHOTLIST" \
