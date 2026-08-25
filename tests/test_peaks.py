@@ -195,6 +195,17 @@ def test_the_correction_copies_the_picture_and_scales_only_audio(tmp_path, monke
     # ... and it reads the preserved original, not the half-corrected output.
     assert cmd[cmd.index("-i") + 1].endswith(".pretrim")
 
+def test_correction_resolves_relative_paths_for_containerized_ffmpeg(tmp_path, monkeypatch):
+    master = tmp_path / "master-hq.mp4"
+    master.write_bytes(b"original")
+    monkeypatch.chdir(tmp_path)
+    _fake_measure(monkeypatch, [0.3, -1.1])
+    _fake_ffmpeg(monkeypatch, calls := [])
+    peaks.trim_master_peak("master-hq.mp4", ffmpeg=["ffmpeg"])
+    (cmd,) = calls
+    assert cmd[cmd.index("-i") + 1] == str(master.with_name("master-hq.mp4.pretrim"))
+    assert cmd[-1] == str(master.with_name("master-hq.trimtmp.mp4"))
+
 def test_corrections_are_cumulative_from_the_original(tmp_path, monkeypatch):
     """rerun()'s gain is cumulative from unity, so every attempt must decode
     the ORIGINAL -- re-reading the previous attempt would apply the gain twice."""
