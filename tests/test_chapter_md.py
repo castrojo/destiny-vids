@@ -221,12 +221,47 @@ def test_entries_default_shape_never_carries_a_block_label(tmp_path, monkeypatch
 
 
 # Act II's own declared column order (chapters/II-endless-forms.md front
-# matter), reproduced here so the ordering test below needs neither the real
-# chapter file nor Task 3's still-missing `paused` heading label.
+# matter), reproduced here -- across the SAME three physical lines the real
+# file declares it on -- so the ordering test below exercises
+# `parse_front_matter`'s continuation-line joining directly, and needs
+# neither the real chapter file nor Task 3's still-missing `paused` heading
+# label. See also `test_parse_front_matter_joins_a_wrapped_scalar_field`
+# below, which asserts the joining in isolation, and
+# `test_the_real_act_ii_field_order_survives_its_multiline_declaration`,
+# which pins the same shape against `chapters/II-endless-forms.md` itself.
 ACT_II_FIELD_ORDER = (
-    "id, at, dur, name, title, title_source, kind, position, "
-    "copy_source, speaker, text, text_source, scale, seen_at_src, "
-    "avatar, avatar_url, bond_of")
+    "id, at, dur, name, title, title_source, kind, position,\n"
+    "  copy_source, speaker, text, text_source, scale, seen_at_src,\n"
+    "  avatar, avatar_url, bond_of")
+
+
+def test_parse_front_matter_joins_a_wrapped_scalar_field():
+    """A continuation line with no `defaults:` section open extends the
+    top-level scalar it follows, rather than being parsed as its own bogus
+    key (task-2-rereview-1.md: the un-joined tail silently dropped every
+    name after the first line's trailing comma, `field_order` truncated to
+    `..., kind, position,`)."""
+    text = "---\nact: X\nfield_order: " + ACT_II_FIELD_ORDER + "\n---\n"
+    fields, _ = chapter_md.parse_front_matter(text)
+    order = [k.strip() for k in fields["field_order"].split(",")]
+    assert order == [
+        "id", "at", "dur", "name", "title", "title_source", "kind",
+        "position", "copy_source", "speaker", "text", "text_source",
+        "scale", "seen_at_src", "avatar", "avatar_url", "bond_of"]
+
+
+def test_the_real_act_ii_field_order_survives_its_multiline_declaration():
+    """`chapters/II-endless-forms.md` wraps its `field_order` across three
+    physical lines (task-2-rereview-1.md). Read straight from disk, not a
+    fixture, so a future re-wrap of the same field cannot silently
+    reintroduce the truncation."""
+    text = (REPO_ROOT / "chapters" / "II-endless-forms.md").read_text()
+    fields, _ = chapter_md.parse_front_matter(text)
+    order = [k.strip() for k in fields["field_order"].split(",")]
+    assert "seen_at_src" in order
+    assert order.index("seen_at_src") < order.index("avatar")
+    assert order.index("seen_at_src") < order.index("avatar_url")
+    assert order.index("seen_at_src") < order.index("bond_of")
 
 
 def test_a_key_added_after_the_chapter_file_builds_still_lands_in_order():
@@ -239,11 +274,12 @@ def test_a_key_added_after_the_chapter_file_builds_still_lands_in_order():
     Assigning that key afterwards is a plain dict write, which always
     appends: `seen_at_src` used to land after `bond_of`/`avatar`/
     `avatar_url` even though the act's own `field_order` seats it ahead of
-    them (mirrored above as `ACT_II_FIELD_ORDER`). The fix re-applies
-    `chapter_md._ordered()` once the key is added, which is exercised here
-    directly since `scripts/build_efmb_plates.py` cannot yet be imported
-    (it derives a module-level constant from the same missing `paused`
-    label, which is Task 3's job, not this test's).
+    them (mirrored above as `ACT_II_FIELD_ORDER`, wrapped exactly as the
+    real chapter file wraps it). The fix re-applies `chapter_md._ordered()`
+    once the key is added, which is exercised here directly since
+    `scripts/build_efmb_plates.py` cannot yet be imported (it derives a
+    module-level constant from the same missing `paused` label, which is
+    Task 3's job, not this test's).
     """
     text = ("---\nact: X\nfield_order: " + ACT_II_FIELD_ORDER + "\n---\n\n"
             "## 0:00\n\nkylegospo @ 0:10 +2.2: Sup\n"
