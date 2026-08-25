@@ -7,12 +7,12 @@ snapped to a **measured** shot boundary rather than to the round number.
 
 THE SHAPE OF THIS ACT
 ---------------------
-One source, four unbroken runs in source order, and one bed that plays end to
-end. There is no excision in the song and no pause: the picture is fitted to
-the music, never the other way round.
+One source, four unbroken runs in source order, with the instrumental bed
+before the pause and the vocal bed after it. The picture is fitted to the
+music, never the other way round.
 
   Source  ``yt_destiny_all_live_action_trailers`` -- a FAN compilation, 376.1 s
-  Bed     ``bed_endless_forms_most_beautiful``    -- Nightwish, 308.0 s
+  Beds    ``bed_endless_forms_most_beautiful`` and ``..._vocal`` -- Nightwish
 
 WHAT WAS REMOVED, AND WHY
 -------------------------
@@ -60,6 +60,7 @@ from tools import chapter_md  # noqa: E402
 
 SOURCE_ID = "yt_destiny_all_live_action_trailers"
 BED_ID = "bed_endless_forms_most_beautiful"
+POST_PAUSE_BED_ID = "bed_endless_forms_most_beautiful_vocal"
 AMBER_SOURCE_ID = "yt_destiny_2_the_final_shape_gameplay_trailer"
 HOLD_MUSIC_ID = "bed_local_forecast_slower"
 
@@ -433,7 +434,7 @@ def audio_sequence():
         },
         {
             "id": "endless_after_interruption",
-            "source_id": BED_ID,
+            "source_id": POST_PAUSE_BED_ID,
             "at": HOLD_MUSIC_OUT_FILM,
             "source_in": HALLWAY_AT + INTERRUPTION_REPLACED_SEC,
             "duration": film_sec - HOLD_MUSIC_OUT_FILM,
@@ -641,6 +642,7 @@ def audio_filtergraph(sequence=None):
         BED_ID: 1,
         HOLD_MUSIC_ID: 2,
         AMBER_SOURCE_ID: 3,
+        POST_PAUSE_BED_ID: 4,
     }
     chains = []
     labels = []
@@ -680,6 +682,7 @@ def render(out_path=None, work_dir=None, verbose=True, local=False):
     source = footage.resolve(SOURCE_ID)
     amber_source = footage.resolve(AMBER_SOURCE_ID)
     bed = REPO_ROOT / "media" / f"{BED_ID}.wav"
+    post_pause_bed = REPO_ROOT / "media" / f"{POST_PAUSE_BED_ID}.wav"
     hold_music = REPO_ROOT / "media" / f"{HOLD_MUSIC_ID}.wav"
     if source is None:
         raise SystemExit(
@@ -703,6 +706,7 @@ def render(out_path=None, work_dir=None, verbose=True, local=False):
             "EDITORIAL decision, not a derivation: it needs the owner.")
     for path, what in (
             (bed, "music bed"),
+            (post_pause_bed, "post-pause vocal music bed"),
             (hold_music, "cleared elevator music")):
         if not path.exists():
             raise SystemExit(
@@ -800,7 +804,7 @@ def render(out_path=None, work_dir=None, verbose=True, local=False):
     _run(list(ffmpeg) + [
         "-nostdin", "-v", "error", "-y",
         "-i", str(silent), "-i", str(bed), "-i", str(hold_music),
-        "-i", str(amber_source),
+        "-i", str(amber_source), "-i", str(post_pause_bed),
         "-filter_complex", audio_filtergraph(),
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy",
@@ -884,6 +888,7 @@ def build():
         "title": "Endless Forms Most Beautiful",
         "source_id": SOURCE_ID,
         "bed_id": BED_ID,
+        "post_pause_bed_id": POST_PAUSE_BED_ID,
         "source_duration_sec": round(src_sec, 3),
         "bed_duration_sec": round(bed_sec, 3),
         "picture_sec": round(picture, 3),

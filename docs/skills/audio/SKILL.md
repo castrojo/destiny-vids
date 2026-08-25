@@ -61,6 +61,9 @@ project-specific part.
    compression, limiting or `loudnorm`; only a measured static trim on the file
    that is actually shipping. The delivery loop lives in
    [`references/delivery-gates.md`](references/delivery-gates.md).
+   **`audio-check.sh` and `tools/peaks.py` are the gates.** FFmpeg's `ebur128`
+   meter is useful evidence, but its true-peak estimate is not a substitute for
+   the project gate.
 
 ## Shortest command path
 
