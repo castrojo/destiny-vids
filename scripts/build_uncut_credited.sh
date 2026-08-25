@@ -15,24 +15,17 @@
 #   scripts/build_uncut_credited.sh [--local] <video_id> <roster.json> [music.mp3]
 set -euo pipefail
 
-# Encoding is remote by default (AGENTS.md): exo-0 has twice this
+# Encoding is remote by default (AGENTS.md): the cluster has twice this
 # workstation's cores and is not also hosting the agent session, so a local
-# burn is both slower and starves the thing that asked for it. `--local` is
-# the explicit escape hatch; falling back because the cluster is unreachable
-# is allowed, but never silently.
-FARM_OPT=(--farm)
+# encode is both slower and starves the thing that asked for it. Both encode
+# stages below (redact, plate burn) probe the cluster themselves and fall
+# back to a memory-capped local encode with the reason printed; `--local`
+# here is the explicit escape hatch, passed through to both.
+LOCAL_OPT=()
 if [ "${1:-}" = "--local" ]; then
-    FARM_OPT=()
+    LOCAL_OPT=(--local)
     shift
     echo "farm: encoding locally -- asked for with --local" >&2
-elif ! python3 -c 'import sys
-from tools import farm
-ok, why = farm.cluster_available()
-if not ok:
-    print(f"farm: encoding locally -- the cluster is not reachable ({why})",
-          file=sys.stderr)
-    sys.exit(1)' >/dev/null; then
-    FARM_OPT=()
 fi
 
 VIDEO_ID="${1:?usage: $0 [--local] <video_id> <roster.json> [music.mp3]}"
@@ -158,10 +151,12 @@ if [ -n "$MUSIC" ]; then
     [ -z "$MUSIC_AT" ] || SCORE_ARGS+=(--audio-at "$MUSIC_AT")
     python3 tools/redact.py --video "$SOURCE_VIDEO" --video-id "$VIDEO_ID" \
         --audio "$MUSIC" "${SCORE_ARGS[@]}" "${REDACT_OUTRO[@]}" \
-        --audio-codec "$ACODEC" --out "$BASE"
+        --audio-codec "$ACODEC" "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}" \
+        --out "$BASE"
 else
     python3 tools/redact.py --video "$SOURCE_VIDEO" --video-id "$VIDEO_ID" \
-        --audio-codec "$ACODEC" "${REDACT_OUTRO[@]}" --out "$BASE"
+        --audio-codec "$ACODEC" "${REDACT_OUTRO[@]}" \
+        "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}" --out "$BASE"
 fi
 
 echo "==> burn the deck"
@@ -196,7 +191,7 @@ for wall in "${WALLS[@]}"; do
         --out "$PLATES_DIR/plate_$WALL_ID.png"
 done
 python3 tools/plate.py burn --video "$BASE" --manifest "$MANIFEST" \
-    --plates-dir "$PLATES_DIR" "${FARM_OPT[@]+"${FARM_OPT[@]}"}" --out "$FINAL"
+    --plates-dir "$PLATES_DIR" "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}" --out "$FINAL"
 
 echo "==> $FINAL"
 ffprobe -v error -show_entries format=duration -of csv=p=0 "$FINAL"

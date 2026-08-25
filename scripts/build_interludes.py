@@ -70,7 +70,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -482,6 +481,10 @@ def main(argv=None):
                     help="print the ffmpeg calls and exit")
     ap.add_argument("--only", metavar="ID",
                     help="build one movement by its manifest id")
+    ap.add_argument("--local", action="store_true",
+                    help="encode on THIS host even when the farm cluster is "
+                         "reachable (the escape hatch; the encodes run under "
+                         "tools.farm.run_capped_local's memory cap)")
     args = ap.parse_args(argv)
 
     spec = load()
@@ -505,7 +508,15 @@ def main(argv=None):
             continue
         out = REPO_ROOT / movement["out_file"]
         out.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(argv_ff, check=True)
+        # Remote by default (AGENTS.md): each movement's encode runs on the
+        # farm when the cluster answers; a local run is the stated,
+        # memory-capped fallback.
+        from tools import farm
+        farm.run_encode(argv_ff,
+                        inputs=[Path(argv_ff[i + 1]) for i, tok
+                                in enumerate(argv_ff) if tok == "-i"],
+                        out=out, local=args.local,
+                        expected_duration=float(movement["duration"]))
         built.append({"id": movement["id"], "out": str(out),
                       "in": movement["in"], "out_point": movement["out"],
                       "duration": movement["duration"],

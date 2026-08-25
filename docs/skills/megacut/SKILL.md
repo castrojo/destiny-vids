@@ -97,9 +97,9 @@ node cards/render-cards.mjs --manifest stories/<name>/<name>-cards.json \
 # 2. Check the graph before paying for the encode
 python3 tools/megacut.py stories/<name>/<name>.json --dry-run
 
-# 3. Assemble on Kubernetes
-python3 tools/megacut.py stories/<name>/<name>.json \
-    --farm --no-copy --farm-jobs 3
+# 3. Assemble (the encodes run on the farm by default; --local forces this
+#    host, memory-capped)
+python3 tools/megacut.py stories/<name>/<name>.json
 
 # 4. Measure the joins on the built file
 python3 tools/transitions.py stories/<name>/<name>.json --measure <built>.mp4

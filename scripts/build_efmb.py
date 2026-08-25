@@ -516,10 +516,27 @@ X264 = conform.video_encode_args()
 
 
 def _run(cmd):
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    """One LOCAL ffmpeg step -- memory-capped, the reason printed.
+
+    Every encode in this builder is farm-first (AGENTS.md: remote whenever
+    the cluster answers); a step that lands here is a fallback, and a
+    fallback is stated and bounded (tools.farm.run_capped_local), never a
+    silent unbounded x264 run on the owner's workstation.
+    """
+    from tools import farm
+    proc = farm.run_capped_local(cmd, reason="act II step on this host "
+                                 "(--local, or the cluster is unreachable)",
+                                 capture_output=True, text=True)
     if proc.returncode != 0:
         tail = "\n".join(proc.stderr.strip().splitlines()[-12:])
         raise RuntimeError(f"ffmpeg failed:\n  {' '.join(map(str, cmd))}\n{tail}")
+
+
+def _cut_argv(ffmpeg, src, start, duration, out_path):
+    return list(ffmpeg) + [
+        "-nostdin", "-v", "error", "-y", "-i", str(src),
+        "-ss", f"{start:.3f}", "-t", f"{duration:.3f}",
+        "-vf", NORMALISE_VF, *X264, "-an", str(out_path)]
 
 
 def _cut_run(ffmpeg, src, start, duration, out_path):
@@ -531,10 +548,15 @@ def _cut_run(ffmpeg, src, start, duration, out_path):
     changes which frames get duplicated -- measurably different picture from
     the same in-point, and this act is cut to a beat.
     """
-    _run(list(ffmpeg) + [
-        "-nostdin", "-v", "error", "-y", "-i", str(src),
-        "-ss", f"{start:.3f}", "-t", f"{duration:.3f}",
-        "-vf", NORMALISE_VF, *X264, "-an", str(out_path)])
+    _run(_cut_argv(ffmpeg, src, start, duration, out_path))
+
+
+def _black_argv(ffmpeg, duration, out_path):
+    return list(ffmpeg) + [
+        "-nostdin", "-v", "error", "-y",
+        "-f", "lavfi", "-i",
+        f"color=c=black:s={TARGET_W}x{TARGET_H}:r={TARGET_FPS}:d={duration:.3f}",
+        "-t", f"{duration:.3f}", *X264, "-an", str(out_path)]
 
 
 def _black(ffmpeg, duration, out_path):
@@ -544,31 +566,43 @@ def _black(ffmpeg, duration, out_path):
     here as clips rather than as a filtergraph pad, because a filtergraph is
     exactly what #88 says re-times this act.
     """
-    _run(list(ffmpeg) + [
-        "-nostdin", "-v", "error", "-y",
-        "-f", "lavfi", "-i",
-        f"color=c=black:s={TARGET_W}x{TARGET_H}:r={TARGET_FPS}:d={duration:.3f}",
-        "-t", f"{duration:.3f}", *X264, "-an", str(out_path)])
+    _run(_black_argv(ffmpeg, duration, out_path))
 
 
-def _freeze(ffmpeg, src, source_at, duration, out_path, darken=0.0):
-    """Hold one evidenced source frame for an authored pause."""
+def _freeze_argvs(ffmpeg, src, source_at, duration, out_path, darken=0.0):
+    """(frame path, [extract argv, loop argv]) for one held source frame."""
     frame = out_path.with_suffix(".png")
     vf = NORMALISE_VF
     if darken:
         vf += f",eq=brightness=-{darken:.3f}"
-    try:
-        _run(list(ffmpeg) + [
+    return frame, [
+        list(ffmpeg) + [
             "-nostdin", "-v", "error", "-y",
             "-ss", f"{source_at:.3f}", "-i", str(src),
-            "-frames:v", "1", "-vf", vf, str(frame)])
-        _run(list(ffmpeg) + [
+            "-frames:v", "1", "-vf", vf, str(frame)],
+        list(ffmpeg) + [
             "-nostdin", "-v", "error", "-y",
             "-loop", "1", "-i", str(frame), "-t", f"{duration:.3f}",
             "-vf", f"fps={TARGET_FPS},format=yuv420p",
-            *X264, "-an", str(out_path)])
+            *X264, "-an", str(out_path)],
+    ]
+
+
+def _freeze(ffmpeg, src, source_at, duration, out_path, darken=0.0):
+    """Hold one evidenced source frame for an authored pause."""
+    frame, argvs = _freeze_argvs(ffmpeg, src, source_at, duration, out_path,
+                                 darken)
+    try:
+        for argv in argvs:
+            _run(argv)
     finally:
         frame.unlink(missing_ok=True)
+
+
+def _concat_argv(ffmpeg, list_path, out_path):
+    return list(ffmpeg) + [
+        "-nostdin", "-v", "error", "-y", "-f", "concat", "-safe", "0",
+        "-i", str(list_path), "-c", "copy", str(out_path)]
 
 
 def _concat(ffmpeg, parts, out_path, workdir):
@@ -582,9 +616,7 @@ def _concat(ffmpeg, parts, out_path, workdir):
     list_path.write_text(
         "".join(f"file '{Path(p).resolve()}'\n" for p in parts), encoding="utf-8")
     try:
-        _run(list(ffmpeg) + [
-            "-nostdin", "-v", "error", "-y", "-f", "concat", "-safe", "0",
-            "-i", str(list_path), "-c", "copy", str(out_path)])
+        _run(_concat_argv(ffmpeg, list_path, out_path))
     finally:
         list_path.unlink(missing_ok=True)
 
@@ -614,14 +646,21 @@ def audio_filtergraph(sequence=None):
     return ";".join(chains)
 
 
-def render(out_path=None, work_dir=None, verbose=True):
+def render(out_path=None, work_dir=None, verbose=True, local=False):
     """Build the act: cut the runs, black the head and tail, lay the song under.
 
     Returns the path to the master. Picture is encoded once and the mux
     stream-copies it, so the audio pass costs the picture nothing.
+
+    The picture parts and their join are one farm CHAIN when the cluster
+    answers (AGENTS.md: remote by default) -- every cut/black/freeze argv in
+    one pod, intermediates pod-side, only the joined silent film fetched
+    back. ``local=True`` -- or an unreachable cluster -- runs the same argvs
+    here, memory-capped. The final mux copies the picture and encodes only
+    audio, so it stays local either way.
     """
     from tools.render import find_ffmpeg
-    from tools import footage
+    from tools import farm, footage
 
     plan = build()
     ffmpeg = find_ffmpeg()
@@ -660,7 +699,7 @@ def render(out_path=None, work_dir=None, verbose=True):
 
     renders = REPO_ROOT / "renders"
     renders.mkdir(exist_ok=True)
-    work = Path(work_dir or renders / "efmb-parts")
+    work = Path(work_dir or renders / "efmb-parts").resolve()
     work.mkdir(parents=True, exist_ok=True)
     # ABSOLUTE, always. find_ffmpeg may return a `podman exec ...` prefix, and
     # the container's cwd is not this checkout, so a relative --render path
@@ -676,29 +715,72 @@ def render(out_path=None, work_dir=None, verbose=True):
         SOURCE_ID: source,
         AMBER_SOURCE_ID: amber_source,
     }
+    if local:
+        use_farm, farm_why = False, "--local given"
+    else:
+        use_farm, farm_why = farm.cluster_available()
+    if not use_farm:
+        print(f"build_efmb: encoding on THIS host -- {farm_why}",
+              file=sys.stderr)
     parts = []
-    for i, spec in enumerate(picture_sequence()):
-        part = work / f"{i:02d}_{spec['id']}.mp4"
+    if use_farm:
+        # One chain, one pod: the part argvs write pod-side intermediates
+        # (the freeze frames included), the concat list's contents are
+        # rewritten to match, and only the joined silent film is fetched.
+        argvs, inputs = [], []
+        for i, spec in enumerate(picture_sequence()):
+            part = work / f"{i:02d}_{spec['id']}.mp4"
+            if verbose:
+                print(f"  {spec['id']:<20} {spec['at']:7.3f}  "
+                      f"{spec['duration']:7.3f}s")
+            if spec["kind"] == "black":
+                argvs.append(_black_argv(ffmpeg, spec["duration"], part))
+            elif spec["kind"] == "freeze":
+                _frame, pair = _freeze_argvs(
+                    ffmpeg, sources[spec["source_id"]], spec["source_at"],
+                    spec["duration"], part, spec.get("darken", 0.0))
+                argvs.extend(pair)
+                inputs.append(sources[spec["source_id"]])
+            else:
+                argvs.append(_cut_argv(
+                    ffmpeg, sources[spec["source_id"]], spec["source_in"],
+                    spec["duration"], part))
+                inputs.append(sources[spec["source_id"]])
+            parts.append(part)
+        silent = renders / "efmb-film-silent.mp4"
+        list_path = work / "efmb_concat.txt"
+        argvs.append(_concat_argv(ffmpeg, list_path, silent))
         if verbose:
-            print(
-                f"  {spec['id']:<20} {spec['at']:7.3f}  "
-                f"{spec['duration']:7.3f}s")
-        if spec["kind"] == "black":
-            _black(ffmpeg, spec["duration"], part)
-        elif spec["kind"] == "freeze":
-            _freeze(
-                ffmpeg, sources[spec["source_id"]], spec["source_at"],
-                spec["duration"], part, spec.get("darken", 0.0))
-        else:
-            _cut_run(
-                ffmpeg, sources[spec["source_id"]], spec["source_in"],
-                spec["duration"], part)
-        parts.append(part)
+            print(f"  farm chain: {len(argvs)} steps, joining "
+                  f"{len(parts)} parts -> {silent.name}")
+        farm.run_ffmpeg_chain_on_cluster(
+            argvs, inputs=inputs, out=silent, tmp_prefix=work,
+            text_files={list_path: "".join(f"file '{Path(p).resolve()}'\n"
+                                           for p in parts)},
+            expected_duration=plan["film_sec"])
+    else:
+        for i, spec in enumerate(picture_sequence()):
+            part = work / f"{i:02d}_{spec['id']}.mp4"
+            if verbose:
+                print(
+                    f"  {spec['id']:<20} {spec['at']:7.3f}  "
+                    f"{spec['duration']:7.3f}s")
+            if spec["kind"] == "black":
+                _black(ffmpeg, spec["duration"], part)
+            elif spec["kind"] == "freeze":
+                _freeze(
+                    ffmpeg, sources[spec["source_id"]], spec["source_at"],
+                    spec["duration"], part, spec.get("darken", 0.0))
+            else:
+                _cut_run(
+                    ffmpeg, sources[spec["source_id"]], spec["source_in"],
+                    spec["duration"], part)
+            parts.append(part)
 
-    silent = renders / "efmb-film-silent.mp4"
-    if verbose:
-        print(f"  joining {len(parts)} parts -> {silent.name}")
-    _concat(ffmpeg, parts, silent, work)
+        silent = renders / "efmb-film-silent.mp4"
+        if verbose:
+            print(f"  joining {len(parts)} parts -> {silent.name}")
+        _concat(ffmpeg, parts, silent, work)
 
     if verbose:
         print("  mux: authored audio sequence, FLAC, picture copied")
@@ -821,7 +903,9 @@ def main(argv=None):
     if "--render" in argv:
         i = argv.index("--render")
         out = argv[i + 1] if len(argv) > i + 1 and not argv[i + 1].startswith("-") else None
-        render(out_path=out)
+        # The picture encodes are remote by default; --local is the stated,
+        # memory-capped escape hatch.
+        render(out_path=out, local="--local" in argv)
         return 0
 
     if "--json" in argv:

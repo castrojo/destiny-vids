@@ -3526,7 +3526,8 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
     Audio is stream-copied: this stage titles a cut, it does not re-cut it, and
     re-encoding audio here would be a second generation for no reason.
 
-    ``runner`` defaults to a local subprocess; a caller (the farm path in
+    ``runner`` defaults to a memory-capped local subprocess
+    (``tools.farm.run_capped_local``); a caller (the farm path in
     ``scripts/build_act1.py``) may pass one that runs the same argv elsewhere
     and fetches ``out_path`` back.
 
@@ -3669,7 +3670,14 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
         if runner is not None:
             runner(cmd)
         else:
-            proc = subprocess.run(cmd, capture_output=True, text=True)
+            # No runner means a LOCAL encode, and a local encode is capped
+            # and states its reason (AGENTS.md: remote by default) -- the
+            # CLI routes through a runner for exactly this; a direct caller
+            # gets the same protection here.
+            from tools import farm as _farm
+            proc = _farm.run_capped_local(
+                cmd, reason="plate burn with no runner -- a caller asked for "
+                "a local encode", capture_output=True, text=True)
             if proc.returncode != 0:
                 tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
                 raise RuntimeError(f"plate burn failed:\n{tail}")
@@ -3738,9 +3746,16 @@ def main(argv=None):
                         "crf 18/medium/untagged argv. Opt-in per act: turning it "
                         "on marks every act built without it as stale")
     b.add_argument("--farm", action="store_true",
-                   help="submit the burn encode to the farm cluster "
-                        "(tools.farm.run_ffmpeg_on_cluster); the video and the "
-                        "rendered plate PNGs are staged to the pod")
+                   help="encode the burn on the farm cluster. This is ALREADY "
+                        "the default whenever the cluster is reachable "
+                        "(owner's ruling: always prefer remote encoding); the "
+                        "flag only pins the posture. An unreachable cluster "
+                        "falls back to a memory-capped local encode with the "
+                        "reason printed -- degrade, never block.")
+    b.add_argument("--local", action="store_true",
+                   help="force a local burn even when the cluster is "
+                        "reachable (the escape hatch; the encode runs under "
+                        "tools.farm.run_capped_local's memory cap)")
 
     p = sub.add_parser("plan", help="cut list (+ roster) -> timed plate manifest")
     p.add_argument("shotlist", help="JSON shot list from tools/story.py --format json")
@@ -3884,10 +3899,18 @@ def main(argv=None):
     render_all(entries, args.plates_dir, picture)
     encode_args = (conform.video_encode_args()
                    if getattr(args, "delivery_spec", False) else None)
-    runner = None
-    if getattr(args, "farm", False):
-        from tools import farm
 
+    from tools import farm
+
+    if getattr(args, "farm", False) and getattr(args, "local", False):
+        raise SystemExit("--farm and --local are mutually exclusive: the farm "
+                         "is already the default when the cluster is "
+                         "reachable; --local is the escape hatch from it")
+    if getattr(args, "local", False):
+        use_farm, farm_why = False, "--local given"
+    else:
+        use_farm, farm_why = farm.cluster_available()
+    if use_farm:
         # The farm stages exact argv tokens, so the inputs are the video plus
         # each plate PNG itself, not their directory (same pattern as the
         # burn leg in scripts/build_act1.py). An animation unit's argv token
@@ -3918,10 +3941,21 @@ def main(argv=None):
                                        out=Path(argv[-1]),
                                        expected_duration=_dur,
                                        limit_memory="48Gi")
+    else:
+        # Local is the fallback, never the silent default, and never
+        # unbounded: the burn is the heaviest encode in the repo (act II's
+        # ~78 overlay inputs), so it runs under the memory cap with the
+        # reason printed -- the same failure tail the bare path reported.
+        def runner(argv, _why=farm_why):
+            proc = farm.run_capped_local(
+                argv, reason=f"plate burn on this host -- {_why}",
+                capture_output=True, text=True)
+            if proc.returncode != 0:
+                tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
+                raise RuntimeError(f"plate burn failed:\n{tail}")
 
-    video = Path(args.video).resolve() if runner else args.video
-    out_arg = str(Path(args.out).resolve()) if runner else args.out
-    out = burn(video, entries, args.plates_dir, out_arg,
+    out = burn(Path(args.video).resolve(), entries, args.plates_dir,
+               str(Path(args.out).resolve()),
                encode_args=encode_args, runner=runner)
     print(f"wrote {out}")
     return 0

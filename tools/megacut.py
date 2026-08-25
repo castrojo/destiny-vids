@@ -1006,10 +1006,17 @@ def _copy_path_ok(plan, allow_copy=True):
 
 
 def _conform_one(job):
-    """Picklable worker: conform one clip source, report what it cost."""
-    index, src, cache_dir, ffmpeg, threads = job
+    """Picklable worker: conform one clip source, report what it cost.
+
+    ``use_farm`` carries the assembly's posture into the worker: a cache
+    miss encodes on the cluster when the segments did, and on this host --
+    memory-capped, with the reason printed -- when they did not. A silent
+    local x264 under a "--farm" build is the bug this exists to close.
+    """
+    index, src, cache_dir, ffmpeg, threads, use_farm = job
     path, status = conform.ensure(src, out_dir=cache_dir, ffmpeg=ffmpeg,
-                                  threads=threads, log=lambda _m: None)
+                                  threads=threads, log=lambda _m: None,
+                                  use_farm=use_farm)
     return index, str(path), status
 
 
@@ -1018,9 +1025,17 @@ def _segment_worker(job):
 
     The verify rides inside the worker so a parallel build still fails the
     moment a segment re-times (#88), not after the other workers finish.
+
+    This worker only runs when the segment did NOT go to the farm, so a
+    local build here is the fallback -- memory-capped, with the fallback
+    reason already printed by main() (AGENTS.md: never a silent, unbounded
+    local encode). A COPY segment under the cap is a remux in a scope: the
+    cap costs it nothing.
     """
     argv, plan, index, seg = job
-    subprocess.run(argv, check=True)
+    farm.run_capped_local(
+        argv, reason=f"megacut segment {index:03d} on this host "
+        "(--local, or the cluster is unreachable)", check=True)
     verify_segment(plan, index, seg)
     return index
 
@@ -1088,14 +1103,18 @@ def assemble(plan, out_path, log=None, jobs=None,
     try:
         # Phase 1: every clip's source made conformant, cached, so its
         # segment can copy the picture. Unchanged sources are cache hits;
-        # only a newly delivered act pays the encode, and only once.
+        # only a newly delivered act pays the encode, and only once. The
+        # encode follows the assembly's posture: farmed when use_farm is
+        # on, memory-capped local with the reason printed when it is not --
+        # a cache miss must never be a silent local x264 under --farm.
         sources = {}
         if copy_ok:
             clip_jobs = [(i, resolve(item["path"]))
                          for i, item in enumerate(plan["items"])
                          if item["kind"] == "clip"]
             if clip_jobs:
-                work = [(i, src, conform_cache, [ffmpeg_bin()], threads)
+                work = [(i, src, conform_cache, [ffmpeg_bin()], threads,
+                         use_farm)
                         for i, src in clip_jobs]
                 if jobs > 1 and len(work) > 1:
                     with ProcessPoolExecutor(max_workers=jobs) as pool:

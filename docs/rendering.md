@@ -13,18 +13,27 @@ Kubernetes cluster in `lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76`, with
 `imagePullPolicy: IfNotPresent`; Kubernetes chooses between the two
 scheduler-eligible roughly 32-core nodes. Never hostname-pin a build.
 
+This is not a flag you pass — it is the DEFAULT everywhere. Every video-encode
+entry point (megacut, the builders, `tools/plate.py burn`, `tools/redact.py`,
+`tools/conform.py`, `tools/render.py`) farms when the cluster answers, and
+falls back to a **memory-capped** local encode (`farm.run_capped_local` —
+a systemd scope at MemoryMax=12G/MemoryHigh=10G, because a bare local x264
+run OOM-killed this workstation at 03:08Z on 2026-08-24) with the reason
+printed. `--local` is the explicit escape hatch each of them accepts.
+`tests/test_farm_policy.py` statically pins the posture.
+
 For the programme, use:
 
 ```bash
-python3 tools/megacut.py stories/megacut/megacut.json \
-    --farm --no-copy --farm-jobs 3
+python3 tools/megacut.py stories/megacut/megacut.json
 ```
 
-`--no-copy` is currently the safety switch for a cold conform cache:
-`--farm` alone farms segment encodes but can still let
-`tools/conform.ensure()` start local x264 first. Stop any build that prints a
-new `~/.cache/destiny-vids/conform/` encode. The local final concat is allowed
-because it stream-copies picture and only muxes/encodes audio.
+That farms both encode phases — the conform-cache misses and the ENCODE
+segments — and keeps the COPY segments and the final concat local, because a
+remux is not an encode. `--no-copy` survives as a debugging switch that
+forces every segment down the encode path; the cold-cache local-x264 trap it
+used to guard against is closed. The local final concat is allowed because it
+stream-copies picture and only muxes/encodes audio.
 
 ## The delivery spec: render output is born conformant
 
@@ -221,57 +230,44 @@ never a guess:
 ffmpeg: podman exec bluefin-thumbnailer ffmpeg
 ```
 
-## Encoding on the cluster: `exo-0`
+## Encoding on the cluster: `tools/farm.py`
 
-Long encodes belong on **exo-0** (32 cores) rather than the workstation. The
-image is already in that node's containerd, so the whole loop is SSH plus one
-pod.
-
-**The node and its staging area.** `core@192.168.1.170`, k3s node `exo-0`.
-`~/Videos` and `media/` are **not** there and `/var/mnt/exo0-stage` is
-root-owned, so make the work directory once:
+Long encodes belong on the cluster rather than the workstation, and the way
+they get there is `tools/farm.py` — never SSH, never a hand-written pod. One
+command is the whole loop:
 
 ```bash
-ssh core@192.168.1.170 'sudo mkdir -p /var/mnt/exo0-stage/dv \
-    && sudo chown core:core /var/mnt/exo0-stage/dv'
-scp <inputs> core@192.168.1.170:/var/mnt/exo0-stage/dv/
+python3 tools/farm.py in.mp4 --out out.mp4          # chunked, verified
 ```
+
+and the library entry points (`run_ffmpeg_on_cluster`, `run_ffmpeg_chain_on_cluster`,
+`run_encode`) are what every builder in this repo calls. The flow, all driven
+by the tool: an Argo **Workflow** and a **PVC** per job in namespace `argo`,
+inputs staged with `kubectl cp`, progress streamed from the pod log, the
+output fetched back and **verified by ffprobe** against the source (an ffmpeg
+exit 0 alone is not evidence — issue #88 shipped a file 8.5 s short). Both
+nodes are the farm: nothing is pinned, and the scheduler spreads segment pods
+across `exo-0` and `ghost` (32 allocatable cores each). `farm.py --node`
+exists for the rare run that must land somewhere specific.
 
 **Pin the tag and never pull.** The cluster resolves images through a registry
-mirror on ghost (`192.168.1.102:30501`) which times out on these tags, and the
+mirror on ghost (`192.168.1.102:30501`) which times out on plain pulls, and a
 pod then sits in `ErrImagePull` with the image already on disk. Both
-`lscr.io/linuxserver/ffmpeg:latest` and `:8.1.2-cli-ls76` are cached — pin the
-digest-bearing tag and `imagePullPolicy: IfNotPresent`.
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata: {name: ffmpeg-encode}
-spec:
-  restartPolicy: Never
-  nodeSelector: {kubernetes.io/hostname: exo-0}
-  containers:
-  - name: ffmpeg
-    image: lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76
-    imagePullPolicy: IfNotPresent          # the mirror will time out otherwise
-    args: ["-hide_banner","-y","-i","/work/in.mp4", ...,"/work/out.mp4"]
-    volumeMounts: [{name: work, mountPath: /work}]
-  volumes:
-  - name: work
-    hostPath: {path: /var/mnt/exo0-stage/dv, type: Directory}
-```
-
-The **entrypoint is already `ffmpeg`**, so `args` are its arguments — do not
-repeat the binary name. Collect the result with `scp` from the same directory.
+`lscr.io/linuxserver/ffmpeg:latest` and `:8.1.2-cli-ls76` are cached on both
+nodes — the farm submits with `imagePullPolicy: IfNotPresent` for exactly this
+reason.
 
 Verified on that image: `libx264`, `aac`, `libfdk_aac`, `flac`, `libopus`. It
 is a full build, so unlike `/usr/bin/ffmpeg` it will not die once decoding
-starts.
+starts. The full non-free build is also the *speed* choice: on 24 cores,
+libx264 measured faster than h264_vaapi on identical input (15.7x vs 13.7x
+realtime) at better quality, so the farm requests CPU only — never
+`amd.com/gpu`.
 
 **What it does not solve.** Storage is `local-path` (RWO) and the footage lives
-on the workstation, so every input is staged by hand and every output copied
-back. That transfer is the real cost, which makes the cluster worth it for long
-encodes and not worth it for a card render.
+on the workstation, so every input is a `kubectl cp` upload and every output a
+download. That transfer is the real cost, which is why cards and probes stay
+local while anything with an x264 recipe goes to the farm.
 
 ## Fallback: `imageio-ffmpeg`
 

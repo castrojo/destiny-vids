@@ -1,7 +1,7 @@
 ---
 name: farm
-version: "1.0"
-last_updated: "2026-08-20"
+version: "1.1"
+last_updated: "2026-08-24"
 id: farm
 one_line_purpose: Run frame-touching encodes on the remote Kubernetes farm.
 entry_point: docs/skills/farm.md
@@ -32,12 +32,18 @@ threshold to judge — `exo-0` has 32 cores to this workstation's 16 and is not
 also running the agent sessions, so the remote path is both faster and the one
 that does not starve the session that asked for it.
 
-Local video encoding requires an explicit `--local`; cluster failure is not
-permission to use the workstation.
+Every encode entry point in the repo takes this posture by itself now
+(`tests/test_farm_policy.py` pins it): farm when the cluster answers, and when
+it does not — or the operator passed `--local` — the same argv runs on this
+host **memory-capped** (`farm.run_capped_local`, a systemd scope with
+MemoryMax=12G / MemoryHigh=10G) with the reason printed. A bare uncapped local
+x264 run is what OOM-killed the owner's workstation at 03:08Z on 2026-08-24.
+Local is a stated, bounded fallback — never silent, never unbounded.
 
 - Re-encoding a Prod act, a megacut segment, or any single long file
 - Assembling the programme — `tools/megacut.py` farms its ENCODE segments and
-  keeps video stream-copy joins here, because remuxing bytes is not encoding
+  its conform-cache misses, and keeps video stream-copy joins here, because
+  remuxing bytes is not encoding
 
 ## When NOT to Use
 
@@ -77,28 +83,44 @@ and geometry too), `--keep` (leave the Workflow + PVC for debugging),
 `--local` (explicit workstation permission), `--dry-run`. Never pass
 `--node`; Kubernetes chooses between the scheduler-eligible nodes.
 
-### Strictly remote megacut assembly
+### Megacut assembly is remote end to end
 
-Until the conform-cache phase itself is routed through the farm, a cold cache
-is a trap: `--farm` moves segment encodes to Kubernetes but
-`tools/conform.ensure()` can still start local x264 before those segments.
-For a guaranteed cluster-only build, bypass that cache and farm every picture
-segment:
-
-```bash
-python3 tools/megacut.py stories/megacut/megacut.json \
-    --farm --no-copy --farm-jobs 3
-```
-
-The final concat/remux and audio-only output mux may run locally; neither
-encodes picture. If a plain `--farm` run prints a conform-cache output under
-`~/.cache/destiny-vids/conform/`, stop it immediately.
+`tools/megacut.py` farms both encode phases when the cluster answers: the
+conform cache (a miss used to mean a silent local x264 run even under
+`--farm` — the trap this section used to warn about) and the ENCODE
+segments. COPY segments, the final concat and the lossless master stay local;
+they stream-copy picture, and remuxing bytes is not an encode. `--no-copy`
+remains as the debugging switch that forces every segment down the encode
+path. If a build prints a conform-cache encode under
+`~/.cache/destiny-vids/conform/` running on THIS host without `--local` in
+sight, the cluster is unreachable and the log will say why — that is the
+fallback working, not a leak, but the reason is worth reading.
 
 `tools/social.py` follows the same remote-first rule. Its two passes run
 sequentially in one farm workspace, then the fetched output is verified and
 the tool records the exact `Prod/` source digest beside the 10 MB file. A
 missing or mismatched digest makes `deliver.py status` schedule a rebuild even
 when Syncthing timestamps are misleading.
+
+### Building a new encoder: the shared posture
+
+A new build script never shells out to ffmpeg itself. It takes the posture
+from `tools/farm.py`:
+
+- `farm.run_encode(argv, inputs=[...], out=..., local=args.local)` — one
+  encode; farms when the cluster answers, else `run_capped_local` with the
+  reason printed, and a `FarmError` mid-encode falls back the same way.
+- `farm.run_ffmpeg_chain_on_cluster(argvs, inputs=..., out=..., tmp_prefix=...,
+  text_files=...)` — ordered commands whose intermediates (render.py's clips,
+  act II's parts, a concat list) live and die in one pod; only `out` comes
+  back.
+- `farm.run_capped_local(cmd, reason=...)` — the fallback primitive: prints
+  the reason, runs the encode under the 12G scope, warns loudly and runs
+  uncapped only when systemd-run itself is unavailable (degrade, never
+  block).
+
+Audio-only ffmpeg calls (video stream-copied or absent) are exempt from all
+of this and stay local — `tests/test_farm_policy.py` holds the whitelist.
 
 ## How it works (and why)
 
@@ -170,14 +192,17 @@ of 0 is not evidence (issue #88).
   `podman exec bluefin-thumbnailer` prefix (see the `DESTINY_FFMPEG` flag
   above).
   It has cost a full render round more than once.
-- **A builder whose input is a concat LIST of absolute host paths cannot be
-  farmed yet.** `rewrite_argv_for_pod` rewrites `argv[0]` and named `inputs`,
-  not the paths inside a `-f concat -i list.txt` payload — act VIII's credits
-  encode carries 57 rendered PNG paths that way, which is why its rebuild ran
-  locally (and OOM'd) on 2026-08-24. Rewriting list payloads is a new
-  capability, not a flag; until it exists, `--local` with a stated reason is
-  the recorded posture for that builder, per
-  [`../credits.md`](../credits.md).
+- **A concat LIST of absolute host paths farms through the chain runner's
+  `text_files`.** `rewrite_argv_for_pod` rewrites `argv[0]` and named
+  `inputs`, never the paths inside a `-f concat -i list.txt` payload — and
+  act VIII's credits encode carries its rendered PNG paths exactly that way
+  (its bare local rebuild is what OOM'd the workstation on 2026-08-24).
+  `run_ffmpeg_chain_on_cluster(..., text_files={list_path: content})` —
+  or `run_encode(..., text_files=...)` — rewrites every staged input's path
+  inside the list's content to the pod's layout and places the rewritten
+  list in the pod; the local file itself is never uploaded. Do not hand such
+  an argv to `run_ffmpeg_on_cluster`: the pod would read a list of host
+  paths it cannot see.
 - **A plate burn is farmable, and it must be farmed.** Its argv carries ~78
   PNG `-i` inputs plus any `%0Nd` image sequence, and all of them have to be
   named in `inputs` or the pod cannot open them. Sequences stage as their
@@ -197,9 +222,11 @@ of 0 is not evidence (issue #88).
   error without removing it. Until the boundaries are frame-exact, the serial
   batch is what ships.
 
-- If the cluster is unreachable, stop. `--local` is the only authorization to
-  encode video on the workstation. A *wrong* output is the one unforgivable
-  failure: verification failures exit 1 with the diff printed.
+- If the cluster is unreachable the encode still ships: capped, local, and
+  saying why — degrade, never block. What must never happen is an UNCAPPED or
+  SILENT local encode. `--local` forces the workstation when that is what the
+  operator wants. A *wrong* output is the one unforgivable failure:
+  verification failures exit 1 with the diff printed.
 
 ## Verification
 
