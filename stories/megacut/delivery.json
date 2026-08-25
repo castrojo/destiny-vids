@@ -234,7 +234,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "695f52eb45e6ff50c12c9435092554899e1846f2924403e202b9e675b3ae7fbc"
+   "source_digest": "87217779d8a243a1325e1994c5efe37b909bfaf1ae7e520d9f47165930c2af73"
   },
   "renders/perfume-3.mp4": {
    "note": "Perfume movement 3, clean. Same chain as movement 2.",
@@ -243,7 +243,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "695f52eb45e6ff50c12c9435092554899e1846f2924403e202b9e675b3ae7fbc"
+   "source_digest": "87217779d8a243a1325e1994c5efe37b909bfaf1ae7e520d9f47165930c2af73"
   },
   "renders/intermission/03-intermission.mp4": {
    "note": "The intermission slide deck that concludes the mrbobbytables section. Silent -- the owner's different song is not chosen yet. CARRIES AUTHORED COPY, which is why the chapter file, the plate manifest, tools/plate.py and vocab/casting.yaml are all declared: every one of them restates what a slide says. Right now every word is lorem ipsum and the deck credits nobody, so a change here changes prose and not a claim about a person -- that stops being true the moment real copy lands.",
@@ -254,7 +254,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "19f21462bb5b09dffcfd84d8f8060fd85ef7d1ef908cb2920315f66b75c1b88d"
+   "source_digest": "b87fb0ae57469bd0df88100610d7a363a3363e3d96c997aa809128f702da95fe"
   },
   "renders/perfume-4.mp4": {
    "note": "Perfume movement 4, clean base. The programme seats its first 13.12 s before cutting to the overlay derivative below.",
@@ -263,7 +263,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "695f52eb45e6ff50c12c9435092554899e1846f2924403e202b9e675b3ae7fbc"
+   "source_digest": "87217779d8a243a1325e1994c5efe37b909bfaf1ae7e520d9f47165930c2af73"
   },
   "renders/perfume-4-overlays.mp4": {
    "note": "Movement 4's overlay derivative: the wallpaper swaps and the chat exchange. CARRIES AUTHORED COPY ABOUT REAL PEOPLE, which is why the plate manifest, tools/plate.py and vocab/casting.yaml are all declared -- a change to any of them restates somebody's words.",
@@ -275,7 +275,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "ed798abdfb4dc473ac4f692c5a6dc7319dbb4f89a7c6370fad67d705a256fb40"
+   "source_digest": "3888ca1b530c1fdf14d2f5d9c3c284b5a2d71a4659f446df51e39b19c4219d0c"
   },
   "renders/perfume-5.mp4": {
    "note": "Perfume movement 5, clean base: the dark Earth limb before the impact. Stays clean by the thread's own rule.",
@@ -284,7 +284,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "695f52eb45e6ff50c12c9435092554899e1846f2924403e202b9e675b3ae7fbc"
+   "source_digest": "87217779d8a243a1325e1994c5efe37b909bfaf1ae7e520d9f47165930c2af73"
   },
   "renders/perfume-5-ending.mp4": {
    "note": "Movement 5's overlay derivative: the impact, the underwater passage and its eleven closing lines. CARRIES AUTHORED COPY ABOUT REAL PEOPLE -- the ending cards.",
@@ -296,7 +296,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "02ff762d04ccee74ecb529e8a0d2dfc52f1d01f973ec627d9f4c6cac9d8b756d"
+   "source_digest": "20408870a95fc5b25d5d3f3b954546ad8bdc213e969fa902bbaac49b0d63b06b"
   },
   "renders/ending/mission-pause.mp4": {
    "note": "The Project Bluefin mission, held in silence. Drawn from the ending cards; no footage.",
@@ -305,7 +305,7 @@
     "stories/megacut/ending-cards.json",
     "tools/plate.py"
    ],
-   "source_digest": "e47e3ba0887755825b36f032e1a57d964d76a1b04a44115732eb8e4d52479e9f"
+   "source_digest": "6780603742150874146a4d6307037e97046bf464ecca76001e42d9e3c2283f84"
   }
  }
 }
