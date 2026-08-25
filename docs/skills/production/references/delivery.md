@@ -250,11 +250,11 @@ declared `rebuild` command exits 0. Running the same command by hand and then
 `publish` records the input digest but leaves the stamp where it was — the
 tool deliberately cannot know which commit rendered the file on disk, because
 stamping HEAD there is how re-publishes once certified acts they never built.
-So: rebuild through the tool, never by hand. An act with no declared `rebuild`
-(act VI, by design — its burn is not idempotent) cannot earn the stamp at all
-today; act II's route is declared since
-[#348](https://github.com/castrojo/destiny-vids/issues/348) closed it, and
-act VI's is the same shape and still open.
+So: rebuild through the tool, never by hand. An act whose delivered master is
+a plate burn needs a wrapper that names the safe route (clean picture, then
+burn onto the clean picture) before it can declare one; acts II and VI have
+theirs (`scripts/rebuild_efmb.sh`, `scripts/rebuild_wolves_plated.sh`,
+[#348](https://github.com/castrojo/destiny-vids/issues/348)).
 
 ### What the programme rung proves, and what it does not
 
