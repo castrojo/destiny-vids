@@ -173,69 +173,69 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 
 Edit in `chapters/III-mrbobbytables.md`.
 
-- `13:18.83` Maintainers Reading Emails / Summer 2027
-- `13:27.67` CNCF Projects to Help Your Agents
+- `13:18.76` Maintainers Reading Emails / Summer 2027
+- `13:27.60` CNCF Projects to Help Your Agents
 
 ## IV
 
 Edit in `chapters/IV-kat.md`.
 
-- `15:23.52` **kat** — Hey why are they shooting at me!
-- `15:26.22` **mrbobbytables** — The gamers don't know you're here to help
-- `15:34.02` **kat** — Nice to meet you too!
-- `15:35.57` **kat** — I miss ONE email now I gotta use a Linux desktop?
-- `15:37.87` **kat** — How much you want to bet their sound just doesn't work?
-- `15:40.62` **TBD** — HEY! We know when you're not upstreaming!
-- `15:42.87` **kat** — I have better sh*t to do!
-- `15:44.87` **kat** — I miss ingress-nginx sometimes
-- `15:47.32` **kat** — Fine I'll fix your sh*t too
-- `15:49.52` **kat** — Remember kids, cardio!
+- `15:59.04` **kat** — Hey why are they shooting at me!
+- `16:01.74` **mrbobbytables** — The gamers don't know you're here to help
+- `16:09.54` **kat** — Nice to meet you too!
+- `16:11.09` **kat** — I miss ONE email now I gotta use a Linux desktop?
+- `16:13.39` **kat** — How much you want to bet their sound just doesn't work?
+- `16:16.14` **TBD** — HEY! We know when you're not upstreaming!
+- `16:18.39` **kat** — I have better sh*t to do!
+- `16:20.39` **kat** — I miss ingress-nginx sometimes
+- `16:22.84` **kat** — Fine I'll fix your sh*t too
+- `16:25.04` **kat** — Remember kids, cardio!
 
 ## V
 
 Edit in `chapters/V-nat.md`.
 
-- `15:59.52` **Nat** — Hey these mouth breathers are shooting at me!
-- `16:04.72` **Nat** — I am a Documentation Expert, cease fire!
-- `16:07.22` **Nat** — Goddamn it!
-- `16:08.82` **Nat** — No time to `git push`!
-- `16:10.72` **Nat** — I'm stranded, they'll never find the docs in time!
-- `16:13.32` **Nick** — docs.bazzite.gg
-- `16:14.72` **Kat** — I can hear their screams!
-- `16:16.52` **Nick** — docs.bazzite.gg
-- `16:17.92` **Nat** — Like one hundred thousand voices cried out in terror
-- `16:20.42` **Nick** — docs.bazzite.gg
+- `16:35.04` **Nat** — Hey these mouth breathers are shooting at me!
+- `16:40.24` **Nat** — I am a Documentation Expert, cease fire!
+- `16:42.74` **Nat** — Goddamn it!
+- `16:44.34` **Nat** — No time to `git push`!
+- `16:46.24` **Nat** — I'm stranded, they'll never find the docs in time!
+- `16:48.84` **Nick** — docs.bazzite.gg
+- `16:50.24` **Kat** — I can hear their screams!
+- `16:52.04` **Nick** — docs.bazzite.gg
+- `16:53.44` **Nat** — Like one hundred thousand voices cried out in terror
+- `16:55.94` **Nick** — docs.bazzite.gg
 
 ## VI
 
 Edit in `chapters/VI-wolves.md`.
 
-- `17:27.30` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
-- `22:20.83` **castrojo** — For five years you've trusted us
-- `22:23.99` **castrojo** — Mastered your tools
-- `22:27.15` **castrojo** — Honed your craft
-- `22:30.31` **castrojo** — Depended on your friends
-- `22:33.46` **castrojo** — Now you're one of us, you are the dream
-- `22:36.62` Protector of the Helm / #HIREAWOLF // MAINTAINER / robertsirc
-- `22:46.10` **castrojo** — I follow my mentors of the past
-- `22:58.73` **castrojo** — Present
-- `23:01.88` **castrojo** — and Future
-- `23:05.04` **castrojo** — The only winning move is not to play
-- `23:08.20` **castrojo** — Think like a dinosaur
-- `23:11.36` **castrojo** — When you fall, rise.
-- `23:14.52` **castrojo** — We've got your back
+- `18:02.83` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
+- `22:56.36` **castrojo** — For five years you've trusted us
+- `22:59.52` **castrojo** — Mastered your tools
+- `23:02.67` **castrojo** — Honed your craft
+- `23:05.83` **castrojo** — Depended on your friends
+- `23:08.99` **castrojo** — Now you're one of us, you are the dream
+- `23:12.15` Protector of the Helm / #HIREAWOLF // MAINTAINER / robertsirc
+- `23:21.62` **castrojo** — I follow my mentors of the past
+- `23:34.25` **castrojo** — Present
+- `23:37.41` **castrojo** — and Future
+- `23:40.57` **castrojo** — The only winning move is not to play
+- `23:43.73` **castrojo** — Think like a dinosaur
+- `23:46.88` **castrojo** — When you fall, rise.
+- `23:50.04` **castrojo** — We've got your back
 
 ## P4
 
 Edit in `chapters/P4-underwater.md`.
 
-- `24:02.65` **Jill Castro** — One more loose end
-- `24:04.53` **Valerie** — You can't escape yourself
-- `24:06.41` **Rafael** — You promised
-- `24:08.30` **castrojo** — Fine
-- `24:12.06` **LH** — Show them the minds
-- `24:13.94` **Valerie** — Of the wolves
-- `23:25.87` **Rafael** — What's a wolf?
+- `24:38.18` **Jill Castro** — One more loose end
+- `24:40.06` **Valerie** — You can't escape yourself
+- `24:41.94` **Rafael** — You promised
+- `24:43.82` **castrojo** — Fine
+- `24:47.58` **LH** — Show them the minds
+- `24:49.46` **Valerie** — Of the wolves
+- `24:01.39` **Rafael** — What's a wolf?
 
 ## VII
 

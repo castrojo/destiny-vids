@@ -1013,10 +1013,10 @@ def _conform_one(job):
     memory-capped, with the reason printed -- when they did not. A silent
     local x264 under a "--farm" build is the bug this exists to close.
     """
-    index, src, cache_dir, ffmpeg, threads, use_farm = job
+    index, src, cache_dir, ffmpeg, threads, use_farm, crf, preset = job
     path, status = conform.ensure(src, out_dir=cache_dir, ffmpeg=ffmpeg,
                                   threads=threads, log=lambda _m: None,
-                                  use_farm=use_farm)
+                                  use_farm=use_farm, crf=crf, preset=preset)
     return index, str(path), status
 
 
@@ -1109,12 +1109,14 @@ def assemble(plan, out_path, log=None, jobs=None,
         # a cache miss must never be a silent local x264 under --farm.
         sources = {}
         if copy_ok:
+            crf = str(plan.get("crf", 16))
+            preset = str(plan.get("preset", "slow"))
             clip_jobs = [(i, resolve(item["path"]))
                          for i, item in enumerate(plan["items"])
                          if item["kind"] == "clip"]
             if clip_jobs:
                 work = [(i, src, conform_cache, [ffmpeg_bin()], threads,
-                         use_farm)
+                         use_farm, crf, preset)
                         for i, src in clip_jobs]
                 if jobs > 1 and len(work) > 1:
                     with ProcessPoolExecutor(max_workers=jobs) as pool:
