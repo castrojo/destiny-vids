@@ -1,6 +1,10 @@
 {
   "_what": "thockin hero trailer; credits are seated only where the owner-identified characters are visible.",
   "_source": "https://www.youtube.com/watch?v=RV4qakZgCHY",
+  "_copy_provenance": {
+    "jagosan-white-armor": "GitHub profile https://github.com/jagosan, supplied by the owner",
+    "kaslin-trailer": "stories/megacut/megacut-hero-plates.json#kaslin"
+  },
   "plates": [
     {
       "id": "jagosan-white-armor",
@@ -8,9 +12,8 @@
       "dur": 4.0,
       "position": "left",
       "copy_source": "owner_supplied",
-      "label": "GITHUB // GUARDIAN",
+      "label": "GUARDIAN",
       "name": "Jago Macleod",
-      "title": "github.com/jagosan",
       "why": "The white-armored frozen-slab character is visibly in frame."
     },
     {

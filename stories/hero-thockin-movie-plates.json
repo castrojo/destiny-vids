@@ -5,20 +5,14 @@
     "in": 159.0,
     "out": 355.0
   },
-  "_roster": "renders/hero-roster-2026-08.json",
+  "_source_chapter": {
+    "title": "Cutscene 3",
+    "start_sec": 159.0,
+    "end_sec": 352.0,
+    "evidence": "YouTube chapter metadata fetched from the supplied source."
+  },
+  "_roster": "stories/hero-roster-2026-08.json",
   "plates": [
-    {
-      "id": "kaslin-movie-reintroduction",
-      "at": 18.0,
-      "dur": 4.0,
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "label": "MAINTAINER // GUARDIAN",
-      "class": "Stormcaller Warlock",
-      "name": "Kaslin Fields",
-      "title": "Rage of the Paradox",
-      "why": "Returning character reveal in cutscene 3."
-    },
     {
       "id": "blueberry-danathar",
       "at": 36.0,
@@ -42,17 +36,6 @@
       "why": "Second current-roster Blueberry; selected from the August 2026 roster."
     },
     {
-      "id": "jagosan-movie-reintroduction",
-      "at": 128.0,
-      "dur": 4.0,
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "label": "GITHUB // GUARDIAN",
-      "name": "Jago Macleod",
-      "title": "github.com/jagosan",
-      "why": "Returning character reveal in cutscene 3."
-    },
-    {
       "id": "blueberry-huntedraven7",
       "at": 152.0,
       "dur": 3.5,
@@ -64,5 +47,18 @@
       "why": "Third current-roster Blueberry; selected from the August 2026 roster."
     }
   ],
-  "unresolved": []
+  "unresolved": [
+    {
+      "reason": "unverified_owner_reintroduction",
+      "github": "jagosan",
+      "automatable": false,
+      "blocked_on": "Need an owner-confirmed or visually evidenced Cutscene 3 source frame before placing Jago Macleod's identity."
+    },
+    {
+      "reason": "unverified_owner_reintroduction",
+      "github": "kaslin",
+      "automatable": false,
+      "blocked_on": "Need an owner-confirmed or visually evidenced Cutscene 3 source frame before placing Kaslin Fields' identity."
+    }
+  ]
 }

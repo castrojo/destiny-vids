@@ -1,6 +1,10 @@
 {
   "_what": "thockin hero teaser; full source with two owner-seated credits.",
   "_source": "https://www.youtube.com/watch?v=uorqdyi1U9E",
+  "_copy_provenance": {
+    "jagosan-frozen-slab": "GitHub profile https://github.com/jagosan, supplied by the owner",
+    "thockin-hero": "stories/02-endless-forms-plates.json#og_thockin"
+  },
   "plates": [
     {
       "id": "jagosan-frozen-slab",
@@ -8,9 +12,8 @@
       "dur": 4.0,
       "position": "left",
       "copy_source": "owner_supplied",
-      "label": "GITHUB // GUARDIAN",
+      "label": "GUARDIAN",
       "name": "Jago Macleod",
-      "title": "github.com/jagosan",
       "why": "Owner-seated frozen-slab credit at source 0:05."
     },
     {

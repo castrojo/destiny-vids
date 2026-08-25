@@ -51,6 +51,11 @@ one without knowing the convention. Brief plates are lead-tier: with
 `--only ensemble` they arrive via `--around`, the same way dialogue does.
 **A brief plate without `copy_source` is a hand-edit.**
 
+When a committed plate manifest names a generated roster, commit that exact
+roster beside the manifest. A path under `renders/` is ignored and a live
+roster query changes as contributors land work; neither is reproducible
+evidence for a real person's on-screen credit.
+
 Scheduling rules, all of which exist because a plate is a claim about a person:
 
 - Each lead is plated **once**, on the first shot long enough to read.
