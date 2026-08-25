@@ -1,14 +1,8 @@
 ---
 act: P4
 manifest: stories/00-perfume-4-plates.json
-# WHERE THIS INTERLUDE STARTS IN THE PROGRAMME, in seconds. Measured from a
-# `tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-21:
-# every segment up to Perfume movement 4a, summed -- prologue 101.200 +
-# act I 116.200 + Perfume 2 66.400 + act II 364.068 + act III 160.200 +
-# Perfume 3 114.848 + act IV 34.000 + act V 25.259 + interstitial 5.000 +
-# act VI 401.527 = 1388.702. Movements 4a and 4b are two trims of ONE
-# render, so the plate clock below is that render's own and starts here.
-programme_start: 1388.702
+# Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-25. The programme item-duration rule is authoritative.
+programme_start: 1424.227
 owns_plates: true
 field_order: id, kind, position, speaker, avatar, text, copy_source, at, dur, fade_in, fade_out_at, fade_out
 defaults:
@@ -44,21 +38,21 @@ python3 tools/chapter_md.py show P4
 python3 tools/chapter_md.py check P4
 ```
 
-## 24:02.653
+## 24:38.178
 
-[chat_loose_end] Jill Castro @ 24:02.653 +1.7: One more loose end
+[chat_loose_end] Jill Castro @ 24:38.178 +1.7: One more loose end
 
-[chat_escape] Valerie @ 24:04.534 +1.7: You can't escape yourself
+[chat_escape] Valerie @ 24:40.059 +1.7: You can't escape yourself
   - avatar: renders/avatars/valerie-tar-gz.png
 
-[chat_promised] Rafael @ 24:06.414 +1.7: You promised
+[chat_promised] Rafael @ 24:41.939 +1.7: You promised
 
-[chat_fine] castrojo @ 24:08.295 +1.7: Fine
+[chat_fine] castrojo @ 24:43.820 +1.7: Fine
   - avatar: renders/avatars/castrojo.png
 
-[chat_minds] LH @ 24:12.057 +1.7: Show them the minds
+[chat_minds] LH @ 24:47.582 +1.7: Show them the minds
 
-[chat_wolves] Valerie @ 24:13.938 +3.0: Of the wolves
+[chat_wolves] Valerie @ 24:49.463 +3.0: Of the wolves
   - avatar: renders/avatars/valerie-tar-gz.png
 
-[chat_wolf] Rafael @ 23:25.865 +3.0: What's a wolf?
+[chat_wolf] Rafael @ 24:01.390 +3.0: What's a wolf?
