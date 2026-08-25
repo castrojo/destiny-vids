@@ -248,19 +248,27 @@ Edit in `chapters/P4-underwater.md`.
 Edit in `chapters/VII-europa.md`.
 
 - `25:04.83` **krook** — Deploy CNCF Projects Team
-- `25:06.83` **preethi** — Stand down, I'm sending my wolf
+- `25:06.83` **preethit** — Stand down, I'm sending my wolf
 - `25:08.83` **alolita** — Are you sure the Kube is on Europa?
-- `25:11.83` **preethi** — It is my duty to test her.
-- `25:14.23` **preethi** — I must not fail
-- `25:28.83` **castrojo** — In and out
-- `25:31.83` **mrbobbytables** — Don't get caught
-- `25:34.23` **jeefy** — Standing by for extraction
+- `25:11.83` **preethit** — I hope she can handle the Kube
+- `25:14.23` **preethit** — I must not fail
+- `25:16.68` **alolita** — We have failed, Guardians are down
+- `25:19.20` **tophee** — I've confirmed it myself, we have no choice
+- `25:22.32` **tophee** — She's the only way to stop the Toilmaster
+- `25:28.83` **castrojo** — They must never know what you did for them
+- `25:31.83` **mrbobbytables** — When all hope is lost
+- `25:34.23` **jeefy** — Standing by for Extraction
 - `25:36.83` **ihor** — G{k8s}dspeed
-- `25:39.43` **preethi** — Hummingbird will find the girl
-- `25:42.03` **preethi** — We'll return soon.
-- `25:44.63` **nimbatus** — We are the Wolves amongst the Wolves
+- `25:39.43` **preethit** — Our clan
+- `25:41.88` **preethit** — Is the Iron
+- `25:44.33` **preethit** — That forges Wolves
+- `25:46.78` **mrbobbytables** — Wolves gladly sacrifice for their own
+- `25:49.50` **krook** — Initiate Lone Wolf Protocol
+- `25:51.95` **iancoldwater** — Local Security systems trivially pwned
+- `25:54.73` **tabbysable** — Europan Security systems trivially pwned (again)
 - `26:05.83` **nimbatus** — Wilco
 - `26:08.03` **nimbatus** — {k8s}ut
+- `26:15.00` **preethit** — Hummingbird will find the girl
 
 ## VIII-cta
 

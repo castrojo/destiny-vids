@@ -61,35 +61,49 @@ python3 tools/chapter_md.py show VII
 python3 tools/chapter_md.py check VII
 ```
 
+>> Every `@` pin in this act is owner placement from the delivered master and
+never moves, and those pins sit 0.4 s apart -- no unpinned line fits between
+them, and the renderer refuses two pills on screen at once. The unpinned
+lines therefore cascade through the open water AFTER each pinned run, in the
+owner's written order: alolita's report and tophee's confirmations follow the
+deployment exchange, and the sacrifice line with the Lone Wolf Protocol trio
+follow the creed, rolling into nimbatus' "Wilco". <<
+
 ## 25:04.831
 
 [d01] krook @ 25:04.831 +1.6: Deploy CNCF Projects Team
   - avatar: ~/Videos/wolves-directors-cut/nimbatus-review/render/krook.png
   - fade_out_at: 1.864
 
-[d02] preethi @ 25:06.831 +1.6: Stand down, I'm sending my wolf
+[d02] preethit @ 25:06.831 +1.6: Stand down, I'm sending my wolf
   - fade_out_at: 3.864
 
 [d03] alolita @ 25:08.831 +2.6: Are you sure the Kube is on Europa?
   - avatar: renders/avatars/alolita.png
   - fade_out_at: 6.864
 
-[d04] preethi @ 25:11.831 +2.0: It is my duty to test her.
+[d04] preethit @ 25:11.831 +2.0: I hope she can handle the Kube
   - fade_out_at: 9.264
 
-[d04b] preethi @ 25:14.231 +2.2: I must not fail
+[d04b] preethit @ 25:14.231 +2.2: I must not fail
+
+alolita: We have failed, Guardians are down
+
+tophee: I've confirmed it myself, we have no choice
+
+tophee: She's the only way to stop the Toilmaster
 
 ## 25:28.831
 
-[d05] castrojo @ 25:28.831 +2.6: In and out
+[d05] castrojo @ 25:28.831 +2.6: They must never know what you did for them
   - avatar: renders/avatars/castrojo.png
   - fade_out_at: 26.864
 
-[d06] mrbobbytables @ 25:31.831 +2.0: Don't get caught
+[d06] mrbobbytables @ 25:31.831 +2.0: When all hope is lost
   - avatar: renders/avatars/mrbobbytables.png
   - fade_out_at: 29.264
 
-[d07] jeefy @ 25:34.231 +2.2: Standing by for extraction
+[d07] jeefy @ 25:34.231 +2.2: Standing by for Extraction
   - avatar: renders/avatars/jeefy.png
   - fade_out_at: 31.864
 
@@ -97,12 +111,15 @@ python3 tools/chapter_md.py check VII
   - avatar: renders/avatars/idvoretskyi.png
   - fade_out_at: 34.464
 
-[d11] preethi @ 25:39.431 +2.2: Hummingbird will find the girl
+[d11] preethit @ 25:39.431 +2.2: Our clan
+preethit: Is the Iron
+preethit: That forges Wolves
 
-[d12] preethi @ 25:42.031 +2.2: We'll return soon.
+mrbobbytables: Wolves gladly sacrifice for their own
 
-[d13] nimbatus @ 25:44.631 +2.6: We are the Wolves amongst the Wolves
-  - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
+[krook] Initiate Lone Wolf Protocol
+[iancoldwater] Local Security systems trivially pwned
+[tabbysable] Europan Security systems trivially pwned (again)
 
 ## 26:05.831
 
@@ -113,3 +130,6 @@ python3 tools/chapter_md.py check VII
 [d10] nimbatus @ 26:08.031 +2.0: {k8s}ut
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 65.464
+
+preethit @ 26:15.000: Hummingbird will find the girl
+  - avatar: renders/avatars/preethit.png
