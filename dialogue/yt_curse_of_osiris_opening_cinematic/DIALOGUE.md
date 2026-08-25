@@ -121,9 +121,9 @@ You need to apply, check your email, focus!
 
 We need to get a message to the CNCF Maintainers
 
-## d23a | clubanderson | 2:14.64 -> 2:16.11
+## d23a | angellk | 2:14.64 -> 2:16.11
 
-The open rate of maintainer emails is 7%
+Check your email smartass
 
 ## d23b | clubanderson | 2:16.12 -> 2:17.59
 

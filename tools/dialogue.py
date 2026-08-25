@@ -100,18 +100,26 @@ def lanes_for(cues):
     read at all, which is how every chat interface has ever done it.
 
     Lanes go by first appearance, so the mapping is deterministic and stable
-    across rebuilds. Only a two-hander gets sides: with three or more voices a
-    side stops identifying anybody, so everybody keeps the single lane and the
-    name does the work again.
+    across rebuilds. Two voices take the two sides; a THIRD takes the centre,
+    which still gives every speaker a position of their own -- and an
+    interloper in the middle of a two-hander reads as exactly that.
+
+    Beyond three, a position stops identifying anybody, so everybody keeps the
+    single centre lane and the name does the work again. That is the fault the
+    owner named on this act -- cards stacking in one place, so the eye has to
+    *read the name* to tell a reply from the same person carrying on -- and it
+    is accepted only when there is no arrangement that avoids it.
     """
     order = []
     for cue in cues:
         who = cue.get("character")
         if who and who not in order:
             order.append(who)
-    if len(order) != 2:
-        return {}
-    return {order[0]: "left", order[1]: "right"}
+    if len(order) == 2:
+        return {order[0]: "left", order[1]: "right"}
+    if len(order) == 3:
+        return {order[0]: "left", order[1]: "right", order[2]: "center"}
+    return {}
 
 
 def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=None,
