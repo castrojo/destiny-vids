@@ -13,6 +13,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
+import build_efmb  # noqa: E402
+import build_efmb_plates  # noqa: E402
 from tools import chapter_md  # noqa: E402
 
 OFFSET = chapter_md.ACT_PROGRAMME_START["II"]
@@ -171,6 +173,273 @@ def test_entries_from_the_committed_file_are_manifest_shaped(tmp_path):
             assert e["speaker"] and "text" in e
         else:
             assert e["kind"] == "miniboss" and e["name"]
+
+
+def chapter_for(tmp_path, body, act="II", programme_start=None):
+    """A throwaway ``Chapter`` over ``body``, for a test that fakes ``chapter()``.
+
+    Bypasses ``discover()`` entirely -- no file is wired to an act -- so a
+    test can hand ``chapter_md.chapter`` a block it wrote inline without
+    touching the committed act II chapter file.
+    """
+    path = tmp_path / "chapter.md"
+    path.write_text(body, encoding="utf-8")
+    if programme_start is None:
+        programme_start = chapter_md.ACT_PROGRAMME_START["II"]
+    return chapter_md.Chapter(
+        path, {"act": act, "programme_start": programme_start}, body)
+
+
+def test_block_end_includes_the_final_hold_and_gap(tmp_path, monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203 paused\n"
+                            "kolunmi: First\nkolunmi: Second\n"))
+    end = chapter_md.block_end("II", "paused")
+    assert end == pytest.approx(
+        592.203 - chapter_md.ACT_PROGRAMME_START["II"]
+        + chapter_md.MIN_HOLD * 2 + chapter_md.GAP * 2)
+
+
+def test_block_end_raises_for_an_unknown_label():
+    with pytest.raises(KeyError):
+        chapter_md.block_end("II", "no-such-block-label")
+
+
+def test_entries_can_retain_a_block_label_for_a_builder(tmp_path, monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203 paused\nkolunmi: First\n"))
+    entries, _ = chapter_md.entries("II", include_block_labels=True)
+    assert entries[0]["_chapter_label"] == "paused"
+
+
+def test_entries_default_shape_never_carries_a_block_label(tmp_path, monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203 paused\nkolunmi: First\n"))
+    entries, _ = chapter_md.entries("II")
+    assert "_chapter_label" not in entries[0]
+
+
+# --- the seat the BUILD emits ---------------------------------------------
+#
+# `entries` is what the chapter file says; an act whose builder moves a line
+# between the file and the manifest (act II) needs `show` and `check` to
+# describe the film that ships instead. The mapping lives in the builder and
+# is reached through the `reseat` hook the chapter file declares.
+
+RESEAT_MODULE = """
+def reseat(entries):
+    for entry in entries:
+        entry.pop("_chapter_label", None)
+        entry["at"] = round(entry["at"] + 10.0, 3)
+    return entries
+"""
+
+
+def test_emitted_entries_applies_the_declared_reseat_hook(tmp_path,
+                                                          monkeypatch):
+    hook = tmp_path / "fake_builder.py"
+    hook.write_text(RESEAT_MODULE, encoding="utf-8")
+    chap = chapter_for(tmp_path, "## 9:52.203 paused\nkolunmi: First\n")
+    chap.fields["reseat"] = f"{hook}:reseat"
+    monkeypatch.setattr(chapter_md, "chapter", lambda _act: chap)
+    raw, _ = chapter_md.entries("II")
+    emitted, notes = chapter_md.emitted_entries("II")
+    assert notes == []
+    assert emitted[0]["at"] == pytest.approx(raw[0]["at"] + 10.0)
+    assert "_chapter_label" not in emitted[0]
+
+
+def test_a_chapter_with_no_reseat_hook_emits_what_it_resolves(tmp_path,
+                                                              monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203\nkolunmi: First\n"))
+    assert chapter_md.emitted_entries("II") == chapter_md.entries("II")
+
+
+def test_a_reseat_hook_that_cannot_be_loaded_degrades_and_says_so(
+        tmp_path, monkeypatch):
+    """A preview one release out of date beats a traceback.
+
+    Somebody reading their own dialogue back is not the person who can fix
+    a builder that has moved, so a hook that fails to import reports the
+    fact and keeps showing the file's own schedule.
+    """
+    chap = chapter_for(tmp_path, "## 9:52.203\nkolunmi: First\n")
+    chap.fields["reseat"] = "scripts/no_such_builder.py:reseat"
+    monkeypatch.setattr(chapter_md, "chapter", lambda _act: chap)
+    emitted, notes = chapter_md.emitted_entries("II")
+    assert any("reseat hook" in note for note in notes)
+    assert emitted[0]["at"] == pytest.approx(
+        chapter_md.entries("II")[0][0]["at"])
+    assert "_chapter_label" not in emitted[0]
+
+
+def test_act_two_reseats_through_its_builder_and_not_a_second_copy():
+    """One mapping, reached from both ends.
+
+    The regression this pins: `build_efmb_plates.build()` grew the rebase
+    and the `source_anchor` seating, and `chapter_md`'s own commands kept
+    printing the raw schedule. Restating the arithmetic here rather than
+    calling the builder's own function would put the same defect back, one
+    copy later.
+    """
+    hook, note = chapter_md._reseater("II")
+    assert note is None
+    assert hook is build_efmb_plates.reseat_chapter_entries
+
+
+def test_act_two_check_reports_no_drift():
+    """`check II` is act II's drift gate again, not ten permanent lines.
+
+    Read with tests/test_efmb_act.py::
+    test_the_committed_manifest_matches_its_generator, which pins the
+    committed manifest to what `build_efmb_plates.py --write` emits: the two
+    together say `check II` is clean immediately after a regeneration, so a
+    real copyedit that never reached the manifest still shows up here.
+    """
+    assert chapter_md.check("II") == []
+    assert chapter_md.main(["check", "II", "--check"]) == 0
+
+
+def _shown(capsys, act="II"):
+    chapter_md.main(["show", act])
+    return capsys.readouterr().out.splitlines()
+
+
+def test_show_quotes_act_two_at_the_seats_the_manifest_carries(capsys):
+    """The clock `show` prints is the clock the owner scrubs.
+
+    Every post-hallway act II line is rebased by the grown `paused` block
+    before it reaches the manifest. Printing the pre-rebase seat sent an
+    editor asked to nudge `retirement-1` to a timecode 47 s from the picture
+    they meant to move.
+    """
+    lines = _shown(capsys)
+    plates = {p["id"]: p for p in chapter_md.manifest_plates("II")}
+    offset = chapter_md.ACT_PROGRAMME_START["II"]
+    for plate_id, tail in (("mapped_haters", "! HATERS"),
+                           ("retirement-1", "[redacted]: Finally, retirement"),
+                           ("chat_kolunmi_level", "kolunmi: Hey did you see "
+                            "how we just loaded up in a new level?")):
+        at = plates[plate_id]["at"]
+        shown = [line for line in lines if line.endswith(tail)]
+        assert len(shown) == 1, f"{plate_id} is not shown exactly once"
+        assert f"{chapter_md.format_tc(at + offset)} programme" in shown[0]
+        assert f"{chapter_md.format_tc(at)} film" in shown[0]
+        assert "reseated by the build" in shown[0]
+
+
+def test_show_seats_sup_on_the_frame_its_source_anchor_names(capsys):
+    """Sup is bound to Kyle's own close-up, not to its place in the queue."""
+    shown = [line for line in _shown(capsys)
+             if line.endswith("kylegospo: Sup")]
+    assert len(shown) == 1
+    sup = {p["id"]: p for p in chapter_md.manifest_plates("II")}["mapped_kyle_sup"]
+    assert sup["seen_at_src"] == pytest.approx(build_efmb.KYLE_REVEAL_SRC)
+    at = build_efmb.edited_film_for_source(build_efmb.KYLE_REVEAL_SRC)
+    assert sup["at"] == pytest.approx(round(at, 3))
+    assert f"{chapter_md.format_tc(sup['at'])} film" in shown[0]
+    assert (f"{chapter_md.format_tc(sup['at'] + chapter_md.ACT_PROGRAMME_START['II'])}"
+            " programme") in shown[0]
+
+
+# Act II's own declared column order (chapters/II-endless-forms.md front
+# matter), reproduced here -- across the SAME three physical lines the real
+# file declares it on -- so the ordering test below exercises
+# `parse_front_matter`'s continuation-line joining directly, and needs
+# neither the real chapter file nor Task 3's still-missing `paused` heading
+# label. See also `test_parse_front_matter_joins_a_wrapped_scalar_field`
+# below, which asserts the joining in isolation, and
+# `test_the_real_act_ii_field_order_survives_its_multiline_declaration`,
+# which pins the same shape against `chapters/II-endless-forms.md` itself.
+ACT_II_FIELD_ORDER = (
+    "id, at, dur, name, title, title_source, kind, position,\n"
+    "  copy_source, speaker, text, text_source, scale, seen_at_src,\n"
+    "  avatar, avatar_url, bond_of")
+
+
+def test_parse_front_matter_joins_a_wrapped_scalar_field():
+    """A continuation line with no `defaults:` section open extends the
+    top-level scalar it follows, rather than being parsed as its own bogus
+    key (task-2-rereview-1.md: the un-joined tail silently dropped every
+    name after the first line's trailing comma, `field_order` truncated to
+    `..., kind, position,`)."""
+    text = "---\nact: X\nfield_order: " + ACT_II_FIELD_ORDER + "\n---\n"
+    fields, _ = chapter_md.parse_front_matter(text)
+    order = [k.strip() for k in fields["field_order"].split(",")]
+    assert order == [
+        "id", "at", "dur", "name", "title", "title_source", "kind",
+        "position", "copy_source", "speaker", "text", "text_source",
+        "scale", "seen_at_src", "avatar", "avatar_url", "bond_of"]
+
+
+def test_the_real_act_ii_field_order_survives_its_multiline_declaration():
+    """`chapters/II-endless-forms.md` wraps its `field_order` across three
+    physical lines (task-2-rereview-1.md). Read straight from disk, not a
+    fixture, so a future re-wrap of the same field cannot silently
+    reintroduce the truncation."""
+    text = (REPO_ROOT / "chapters" / "II-endless-forms.md").read_text()
+    fields, _ = chapter_md.parse_front_matter(text)
+    order = [k.strip() for k in fields["field_order"].split(",")]
+    assert "seen_at_src" in order
+    assert order.index("seen_at_src") < order.index("avatar")
+    assert order.index("seen_at_src") < order.index("avatar_url")
+    assert order.index("seen_at_src") < order.index("bond_of")
+
+
+def test_a_key_added_after_the_chapter_file_builds_still_lands_in_order():
+    """Reproduces the ordering bug fixed in build_efmb_plates.py's build().
+
+    A source-anchored line (Act II's `Sup`, authored with `- source_anchor:
+    <src>`) comes back from `chapter_md.entries()` with `source_anchor`
+    still on it and no `seen_at_src` yet -- the recomputed source frame is
+    only known once `build_efmb_plates.build()` calls its own `film_of()`.
+    Assigning that key afterwards is a plain dict write, which always
+    appends: `seen_at_src` used to land after `bond_of`/`avatar`/
+    `avatar_url` even though the act's own `field_order` seats it ahead of
+    them (mirrored above as `ACT_II_FIELD_ORDER`, wrapped exactly as the
+    real chapter file wraps it). The fix re-applies `chapter_md._ordered()`
+    once the key is added, which is exercised here directly since
+    `scripts/build_efmb_plates.py` cannot yet be imported (it derives a
+    module-level constant from the same missing `paused` label, which is
+    Task 3's job, not this test's).
+    """
+    text = ("---\nact: X\nfield_order: " + ACT_II_FIELD_ORDER + "\n---\n\n"
+            "## 0:00\n\nkylegospo @ 0:10 +2.2: Sup\n"
+            "  - bond_of: mapped_kyle_reveal\n"
+            "  - avatar: renders/avatars/KyleGospo.png\n"
+            "  - avatar_url: https://github.com/KyleGospo.png?size=256\n"
+            "  - source_anchor: 333.497\n")
+    fields, _ = chapter_md.parse_front_matter(text)
+    order = [k.strip() for k in fields["field_order"].split(",")]
+    line = chapter_md.parse(text)[0]["lines"][0]
+    entry = chapter_md.build_entry("X", 1, 1, line, line["pin"] or 0.0,
+                                   line["hold"] or 1.0,
+                                   fields.get("defaults") or {}, order)
+
+    # What chapter_md hands back today: portrait keys already in their
+    # declared place, `source_anchor` trailing because it names no
+    # `field_order` column.
+    assert list(entry.keys())[-1] == "source_anchor"
+
+    # scripts/build_efmb_plates.py's build(): pop `source_anchor`, seat the
+    # recomputed frame, set `seen_at_src`, then re-seat the whole entry.
+    source_anchor = entry.pop("source_anchor")
+    entry["at"] = 335.267
+    entry["seen_at_src"] = source_anchor
+    ordered = chapter_md._ordered(entry, order)
+    entry.clear()
+    entry.update(ordered)
+
+    keys = list(entry.keys())
+    assert keys.index("seen_at_src") < keys.index("avatar")
+    assert keys.index("seen_at_src") < keys.index("avatar_url")
+    assert keys.index("seen_at_src") < keys.index("bond_of")
+    assert keys == [k for k in order if k in entry]
 
 
 def test_an_unknown_act_is_not_an_error():

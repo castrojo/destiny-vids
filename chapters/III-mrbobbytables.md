@@ -2,7 +2,7 @@
 act: III
 manifest: stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json
 # Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-25. The programme item-duration rule is authoritative.
-programme_start: 647.800
+programme_start: 695.067
 # This act's fixed plates come from this file, so the manifest is regenerated
 # from it: `python3 tools/chapter_md.py sync III --write`.
 owns_plates: true
@@ -43,9 +43,9 @@ purpose, revealed in act VI. (This file's title keeps "the long walk" as
 authored; renaming it is the owner's call, flagged in the change that moved
 the lines.)
 
-## 13:18.760
+## 14:06.027
 
-* [maintainer-emails] title @ 13:18.760 +4.0
+* [maintainer-emails] title @ 14:06.027 +4.0
   - position: top-right
   - copy_source: owner_supplied
   - title: Maintainers Reading Emails
@@ -61,9 +61,9 @@ nameplates are.
 The sign over the maintainer-email beat sits in the picture's upper-right safe
 area rather than the lower third, so it does not collide with the pills below.
 
-## 13:27.600
+## 14:14.867
 
-* [cncf-wall] logowall @ 13:27.600 +8.0
+* [cncf-wall] logowall @ 14:14.867 +8.0
   - title: CNCF Projects to Help Your Agents
   - footer: landscape.cncf.io
 
@@ -101,9 +101,9 @@ python3 scripts/build_intermission.py --write     # regenerate the manifest
 python3 scripts/build_intermission.py --render    # and the film
 ```
 
-## 15:31.248 intermission
+## 16:18.515 intermission
 
-* [intermission-1] slide @ 15:31.248 +6.0
+* [intermission-1] slide @ 16:18.515 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Lorem ipsum
@@ -111,7 +111,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Dolor sit amet consectetur adipiscing elit
   - title_source: placeholder
 
-* [intermission-2] slide @ 15:38.048 +6.0
+* [intermission-2] slide @ 16:25.315 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Sed do eiusmod
@@ -119,7 +119,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Tempor incididunt ut labore et dolore magna
   - title_source: placeholder
 
-* [intermission-3] slide @ 15:44.848 +6.0
+* [intermission-3] slide @ 16:32.115 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Ut enim ad minim
@@ -127,7 +127,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Veniam quis nostrud exercitation ullamco laboris
   - title_source: placeholder
 
-* [intermission-4] slide @ 15:51.648 +6.0
+* [intermission-4] slide @ 16:38.915 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Duis aute irure

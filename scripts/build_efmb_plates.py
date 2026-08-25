@@ -1012,6 +1012,14 @@ TRIO_HOLD = 4.0
 # card and the incoming one read as one flicker rather than two people.
 PLATE_GAP = 0.25
 
+# The hallway hold's hand-typed value before it derived from the `paused`
+# chapter block (see scripts/build_efmb.py). Every chapter pin authored to
+# play after the interruption was authored against THIS number; `build()`
+# rebases those pins by however much the derived hold has grown or shrunk
+# since. Exposed at module scope so a test can compute the same expectation
+# without duplicating the literal.
+OLD_HALLWAY_AFTER_AMBER_SEC = 25.600
+
 # The trio arrives one card at a time, 0.8 s apart, and the row clears
 # together. Owner instruction, same note: "stagger intros so that each
 # character has a shot to shine". Sequential lower thirds -- one card up, out,
@@ -1283,6 +1291,79 @@ def _at(shot_in, film_of):
     return round(film_of(shot_in) + LEAD_IN, 3)
 
 
+def reseat_chapter_entries(entries, lead=None):
+    """Chapter-file seats -> the seats THIS BUILD emits for them.
+
+    Two authored mechanisms move an act II chapter entry between
+    ``chapters/II-endless-forms.md`` and the manifest, and this is the only
+    place either one lives:
+
+    1. ``HALLWAY_AFTER_AMBER_SEC`` now derives from the `paused` block's own
+       schedule (see scripts/build_efmb.py) instead of a hand-typed 25.6 s.
+       Everything the chapter file pins on the act's own programme clock
+       past the old hallway return point was authored against that
+       hand-typed value, so growing (or shrinking) the pause has to rebase
+       those pins by the same amount -- the paused conversation itself is
+       exempt, because its own pins are already authored against the new,
+       longer clock.
+    2. A ``source_anchor`` row is seated straight from the source frame it
+       is bound to (Kyle's Sup, on his own close-up) and republished as
+       ``seen_at_src``.
+
+    ``tools/chapter_md.py``'s ``show`` and ``check`` call this through the
+    ``reseat`` hook act II's chapter file declares, so the clock an editor
+    is shown and the clock the drift gate compares are the ones the
+    delivered master actually carries. Duplicating either rule there would
+    be a second copy to keep in step, and the copy that drifts is always the
+    one nobody rebuilds from.
+
+    The entries are reseated IN PLACE and returned: the builder holds the
+    same list and extends it, so a copy would seat the pills and throw them
+    away. Builder-private metadata (``_chapter_label``) and the authoring
+    input a manifest must never carry (``source_anchor``) are removed here.
+    """
+    if lead is None:
+        lead = build_efmb.derive_lead()
+    old_hallway_return_at = (
+        build_efmb.HALLWAY_AFTER_AMBER_AT + OLD_HALLWAY_AFTER_AMBER_SEC)
+    pause_delta = round(
+        build_efmb.HALLWAY_AFTER_AMBER_SEC - OLD_HALLWAY_AFTER_AMBER_SEC, 3)
+    # The act's own declared key order (see the `field_order` front matter
+    # in chapters/II-endless-forms.md), so a field this loop adds after the
+    # chapter file already built the entry lands in its declared column
+    # instead of trailing on at the end of the dict.
+    order_field = chapter_md.chapter("II").fields.get("field_order")
+    field_order = ([k.strip() for k in order_field.split(",")]
+                   if isinstance(order_field, str) else None)
+    for entry in entries:
+        label = entry.pop("_chapter_label", None)
+        source_anchor = entry.pop("source_anchor", None)
+        if source_anchor is not None:
+            # A source-anchored line is seated straight from the source
+            # frame it is bound to, which already accounts for however long
+            # the interruption grew -- it is never also shifted by
+            # `pause_delta`, or it would move twice.
+            entry["at"] = round(
+                build_efmb.edited_film_for_source(source_anchor, lead), 3)
+            entry["seen_at_src"] = source_anchor
+            # `seen_at_src` was just added, so it landed at the end of the
+            # dict, after keys such as `bond_of` the chapter file already
+            # built -- re-seat it (and everything else) in the act's
+            # declared order. Mutated in place: `entry` is the same dict
+            # object the caller holds.
+            ordered = chapter_md._ordered(entry, field_order)
+            entry.clear()
+            entry.update(ordered)
+            continue
+        if (label != build_efmb.PAUSED_BLOCK and "at" in entry
+                and entry["at"] >= old_hallway_return_at):
+            entry["at"] = round(entry["at"] + pause_delta, 3)
+            if "fade_out_at" in entry:
+                entry["fade_out_at"] = round(
+                    entry["fade_out_at"] + pause_delta, 3)
+    return entries
+
+
 def build():
     casting = load_casting()
     plan = build_efmb.build()
@@ -1302,9 +1383,18 @@ def build():
     # cards this file DOES still place have to give way to them, exactly as
     # they did when the pills were Python tables in the same lists. Where the
     # words live changed; who yields to whom did not.
-    chapter_entries, chapter_unresolved = chapter_md.entries("II")
+    chapter_entries, chapter_unresolved = chapter_md.entries(
+        "II", include_block_labels=True)
     for note in chapter_unresolved:
         print(f"chapter: {note}", file=sys.stderr)
+
+    # HALLWAY_AFTER_AMBER_SEC derives from the `paused` block's own schedule,
+    # so the pins authored against the old hand-typed hold are rebased and
+    # `source_anchor` rows are seated on their own frames. That mapping is
+    # `reseat_chapter_entries` above -- shared with `chapter_md show/check`
+    # through the `reseat` hook act II's chapter file declares, so the
+    # authoring preview and the drift gate describe the film that ships.
+    reseat_chapter_entries(chapter_entries, lead)
 
     def chapter_floor(want):
         """When the last pill starting before ``want`` is off the screen.

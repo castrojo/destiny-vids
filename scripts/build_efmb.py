@@ -56,6 +56,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from tools import conform  # noqa: E402  (needs REPO_ROOT on sys.path first)
+from tools import chapter_md  # noqa: E402
 
 SOURCE_ID = "yt_destiny_all_live_action_trailers"
 BED_ID = "bed_endless_forms_most_beautiful"
@@ -211,16 +212,19 @@ AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
 # held Kyle question before the Destiny picture resumes.
 HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
 # Owner, 2026-08-24: "Don't unpause, at 'Oh I see your problem', keep that in
-# the paused section, put cortney's conversation here." 21.5 let the picture
-# resume at film 309.403 with akgraner's pill still up and cortney's "And
-# we're gonna do you a solid" playing entirely after the resume; 25.6 holds
-# the frozen hallway until film 313.503 (programme 9:57.3), a beat after
-# cortney's pill ends (9:56.853). No footage is cut and the black tail keeps
-# its 16.065 s (owner: "keep the black"), so the act -- and every act after
-# it -- runs 4.1 s later; every downstream chapter file's programme_start and
-# pins are restated +4.1 in the same change, which lands their plates on the
-# same frames they always had.
-HALLWAY_AFTER_AMBER_SEC = 25.600
+# the paused section, put cortney's conversation here." The hold used to be a
+# hand-typed 25.6 s; it is now DERIVED from the `paused` block's own
+# schedule in chapters/II-endless-forms.md, so the hallway holds exactly as
+# long as that conversation needs to clear -- no more, no less -- instead of
+# a number an editor has to keep in sync with the copy by hand. No footage
+# is cut and the black tail keeps its 16.065 s (owner: "keep the black"), so
+# growing the paused conversation grows the act -- and every act after it --
+# by the same amount; every downstream chapter file's programme_start and
+# pins must be restated by that delta in the same change, which lands their
+# plates on the same frames they always had.
+PAUSED_BLOCK = "paused"
+HALLWAY_AFTER_AMBER_SEC = round(
+    chapter_md.block_end("II", PAUSED_BLOCK) - HALLWAY_AFTER_AMBER_AT, 3)
 HALLWAY_RETURN_AT = HALLWAY_AFTER_AMBER_AT + HALLWAY_AFTER_AMBER_SEC
 BLACK_CONVERSATION_AT = HALLWAY_AT
 BLACK_CONVERSATION_SEC = HALLWAY_FREEZE_SEC
@@ -238,10 +242,19 @@ INTERRUPTION_SHIFT_SEC = INTERRUPTION_SEC - INTERRUPTION_REPLACED_SEC
 KYLE_REVEAL_SRC = 335.267
 KYLE_REVEAL_SEC = 3.200
 KYLE_REVEAL_AT = HALLWAY_RETURN_AT + (KYLE_REVEAL_SRC - HALLWAY_RESUME_SRC)
-# 343.903 + the 4.1 s the pause grew on 2026-08-24; the tail keeps its black
-# (film_sec - this == 16.065 s, unchanged), the act ends where the song ends,
-# and the show runs 4.1 s longer from here on.
-EDITED_PICTURE_END = 348.003
+# Where the Destiny picture actually ends, in film time: the hallway holds
+# for exactly as long as HALLWAY_RETURN_AT says, then the two remaining
+# evidenced runs play in full -- the same two additions `picture_sequence`
+# makes after the hold. This used to be a hand-typed 348.003 ("343.903 +
+# the 4.1 s the pause grew on 2026-08-24"), which is the same bug
+# HALLWAY_AFTER_AMBER_SEC's own derivation was fixed for: a number that has
+# to be retyped by hand every time the paused conversation's length changes
+# is a number that goes stale the next time it does. The black tail keeps
+# its own length (film_sec - this) automatically, whatever the paused
+# conversation now runs to.
+EDITED_PICTURE_END = round(
+    HALLWAY_RETURN_AT + (RUNS[4][1] - HALLWAY_RESUME_SRC)
+    + (RUNS[5][1] - RUNS[5][0]), 3)
 
 HOLD_MUSIC_IN = 6.500
 HOLD_MUSIC_OUT_FILM = HALLWAY_RETURN_AT
