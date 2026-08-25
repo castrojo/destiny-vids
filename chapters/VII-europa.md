@@ -61,6 +61,8 @@ python3 tools/chapter_md.py show VII
 python3 tools/chapter_md.py check VII
 ```
 
+https://github.com/preethit is Preethi. Replace her and fill her in with github info
+
 ## 25:04.831
 
 [d01] krook @ 25:04.831 +1.6: Deploy CNCF Projects Team
@@ -70,38 +72,56 @@ python3 tools/chapter_md.py check VII
 [d02] preethi @ 25:06.831 +1.6: Stand down, I'm sending my wolf
   - fade_out_at: 3.864
 
+ alolita: We have failed, Guardians are down
+ 
+
 [d03] alolita @ 25:08.831 +2.6: Are you sure the Kube is on Europa?
   - avatar: renders/avatars/alolita.png
   - fade_out_at: 6.864
 
-[d04] preethi @ 25:11.831 +2.0: It is my duty to test her.
+tophee: I've confirmed it myself, we have no choice   
+
+[d04] preethi @ 25:11.831 +2.0: I hope she can handle the Kube
   - fade_out_at: 9.264
+
+tophee: She's the only way to stop the Toilmaster
 
 [d04b] preethi @ 25:14.231 +2.2: I must not fail
 
+[krook] Initiate Lone Wolf Protocol
+[iancoldwater] Local Security systems trivially pwned
+[tabbysable] Europan Security systems trivially pwned (again)
+
 ## 25:28.831
 
-[d05] castrojo @ 25:28.831 +2.6: In and out
+[d05] castrojo @ 25:28.831 +2.6: They must never know what you did for them
   - avatar: renders/avatars/castrojo.png
   - fade_out_at: 26.864
 
-[d06] mrbobbytables @ 25:31.831 +2.0: Don't get caught
+[d06] mrbobbytables @ 25:31.831 +2.0: When all hope is lost
   - avatar: renders/avatars/mrbobbytables.png
   - fade_out_at: 29.264
 
-[d07] jeefy @ 25:34.231 +2.2: Standing by for extraction
+[d07] jeefy @ 25:34.231 +2.2: Standing by for Extraction
   - avatar: renders/avatars/jeefy.png
   - fade_out_at: 31.864
+
+mrbobbytables: Wolves gladly sacrifice for their own
+
 
 [d08] ihor @ 25:36.831 +2.2: G{k8s}dspeed
   - avatar: renders/avatars/idvoretskyi.png
   - fade_out_at: 34.464
 
-[d11] preethi @ 25:39.431 +2.2: Hummingbird will find the girl
+[d11] preethi @ 25:39.431 +2.2: preethi: Our clan 
+preethi: Is the Iron 
+preethi: That forges Wolves
 
-[d12] preethi @ 25:42.031 +2.2: We'll return soon.
+<dramatic delay but not too close to the reveal> 
 
-[d13] nimbatus @ 25:44.631 +2.6: We are the Wolves amongst the Wolves
+Hummingbird will find the girl
+
+
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
 
 ## 26:05.831
@@ -113,3 +133,13 @@ python3 tools/chapter_md.py check VII
 [d10] nimbatus @ 26:08.031 +2.0: {k8s}ut
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 65.464
+
+After the jupiter fade hold Jupiter and slice up Screenshot From 2026-08-23 05-10-23.png for the characters and place them on the jupiter nightway. Try to make it dramatic. Then add in title-appropriate text
+
+For other wolves, some will give all
+
+Bluefin and the Forbidden Factory
+KubeCon + CloudNativeCon EU 2027
+Maintainer Summit
+
+Then roll the credits. 
