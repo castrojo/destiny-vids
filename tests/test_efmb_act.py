@@ -810,30 +810,16 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     haters = by_id["mapped_haters"]
     assert haters["kind"] == "miniboss"  # owner: match the kernel bar
     assert haters["name"] == "HATERS"
-    # Owner, 2026-08-24: "9:57, all the enemies are the haters, it just needs
-    # to be obvious". The bar used to fire at 10:00 over the guardian sunset
-    # shot; it now opens on the red-lit enemy face's first frame, 317.4 under
-    # the pause length that was hand-typed when this was pinned -- PAUSE_DELTA
-    # carries the seat forward as the paused chapter block grows or shrinks.
-    assert haters["at"] == pytest.approx(317.4 + PAUSE_DELTA, abs=1e-3)
+    assert haters["seen_at_src"] == pytest.approx(326.163)
+    assert haters["at"] == pytest.approx(
+        build_efmb.edited_film_for_source(326.163), abs=1e-3)
     assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
-    # Owner, 2026-08-19: "sup is a purple titan ... put it when it's zoomed
-    # into his face"; 2026-08-24, asked again: it stays. Sup is now
-    # source-anchored to KYLE_REVEAL_SRC (see
-    # test_sup_is_anchored_to_kyles_reveal_source), so its seat is whatever
-    # frame that source position edits to, not a pause-relative offset.
-    assert by_id["mapped_kyle_sup"]["at"] == pytest.approx(
-        build_efmb.KYLE_REVEAL_AT, abs=1e-3)
-    # kolunmi's "Disco!", deleted 2026-08-23, was restored by the owner on
-    # 2026-08-24 "when the hunter is onscreen" -- the red-corridor fight,
-    # left lane while Sup holds the right, clearing the nameplate's arrival.
-    # The overlap with Sup is a NAMED bond (bond_of) -- the exemption that
-    # cannot spread.
     assert by_id["mapped_kolunmi_disco"]["text"] == "Disco!"
     assert by_id["mapped_kolunmi_disco"]["speaker"] == "kolunmi"
+    assert by_id["mapped_kolunmi_disco"]["seen_at_src"] == pytest.approx(332.817)
     assert by_id["mapped_kolunmi_disco"]["at"] == pytest.approx(
-        320.387 + PAUSE_DELTA, abs=1e-3)
+        build_efmb.edited_film_for_source(332.817), abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["dur"] == pytest.approx(2.2, abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["bond_of"] == "mapped_kyle_sup"
     # Owner, 2026-08-24: "Don't unpause, at 'Oh I see your problem', keep
@@ -872,17 +858,16 @@ def test_eve_and_eva_render_only_as_kolunmi():
                for entry in entries)
     assert not {"Eve", "Eva"} & {entry.get("speaker") for entry in all_plates()}
 
-def test_sup_is_anchored_to_kyles_reveal_source():
+def test_sup_is_anchored_to_the_heroes_void_shield_source():
     """Sup's seat comes from a source frame, not a stale pin.
 
-    The chapter file's old `seen_at_src: 333.497` was informational and
-    wrong; `source_anchor` is consumed by the builder to both PLACE the pill
-    (at whatever film time that source position edits to) and to publish the
-    correct `seen_at_src` -- and it must never itself reach the manifest.
+    `source_anchor` is consumed by the builder to both place the pill and
+    publish the correct `seen_at_src`; it must never reach the manifest.
     """
     sup = plate_by_id("mapped_kyle_sup")
-    assert sup["seen_at_src"] == pytest.approx(build_efmb.KYLE_REVEAL_SRC)
-    assert sup["at"] == pytest.approx(build_efmb.KYLE_REVEAL_AT)
+    assert sup["seen_at_src"] == pytest.approx(331.163)
+    assert sup["at"] == pytest.approx(build_efmb.edited_film_for_source(331.163))
+    assert "bond_of" not in sup
     assert "source_anchor" not in sup
 
 def test_the_retirement_conversation_moved_here_verbatim_from_act_three():

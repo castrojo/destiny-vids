@@ -2559,7 +2559,7 @@
     },
     {
       "id": "mapped_haters",
-      "at": 364.667,
+      "at": 361.0,
       "dur": 2.2,
       "name": "HATERS",
       "title": "Reprehenderit voluptate",
@@ -2567,7 +2567,22 @@
       "kind": "miniboss",
       "position": "boss",
       "copy_source": "owner_supplied",
-      "text_source": "owner_supplied"
+      "text_source": "owner_supplied",
+      "seen_at_src": 326.163
+    },
+    {
+      "id": "mapped_kyle_sup",
+      "at": 366.0,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "right",
+      "copy_source": "owner_supplied",
+      "speaker": "kylegospo",
+      "text": "Sup",
+      "text_source": "owner_supplied",
+      "seen_at_src": 331.163,
+      "avatar": "renders/avatars/KyleGospo.png",
+      "avatar_url": "https://github.com/KyleGospo.png?size=256"
     },
     {
       "id": "mapped_kolunmi_disco",
@@ -2579,6 +2594,7 @@
       "speaker": "kolunmi",
       "text": "Disco!",
       "text_source": "owner_supplied",
+      "seen_at_src": 332.817,
       "avatar": "renders/avatars/kolunmi.png",
       "avatar_url": "https://github.com/kolunmi.png?size=256",
       "bond_of": "mapped_kyle_sup"
@@ -2601,21 +2617,6 @@
       "variant": "bazzite",
       "avatar": "renders/avatars/KyleGospo.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/10704358?v=4"
-    },
-    {
-      "id": "mapped_kyle_sup",
-      "at": 370.104,
-      "dur": 2.2,
-      "kind": "chat",
-      "position": "right",
-      "copy_source": "owner_supplied",
-      "speaker": "kylegospo",
-      "text": "Sup",
-      "text_source": "owner_supplied",
-      "seen_at_src": 335.267,
-      "avatar": "renders/avatars/KyleGospo.png",
-      "avatar_url": "https://github.com/KyleGospo.png?size=256",
-      "bond_of": "mapped_kyle_reveal"
     },
     {
       "id": "chat_nwoods3_seen",

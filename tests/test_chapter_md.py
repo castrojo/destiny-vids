@@ -333,14 +333,14 @@ def test_show_quotes_act_two_at_the_seats_the_manifest_carries(capsys):
         assert "reseated by the build" in shown[0]
 
 
-def test_show_seats_sup_on_the_frame_its_source_anchor_names(capsys):
-    """Sup is bound to Kyle's own close-up, not to its place in the queue."""
+def test_show_seats_sup_on_the_heroes_void_shield_source(capsys):
+    """Sup is bound to the heroes' shield formation, not the queue."""
     shown = [line for line in _shown(capsys)
              if line.endswith("kylegospo: Sup")]
     assert len(shown) == 1
     sup = {p["id"]: p for p in chapter_md.manifest_plates("II")}["mapped_kyle_sup"]
-    assert sup["seen_at_src"] == pytest.approx(build_efmb.KYLE_REVEAL_SRC)
-    at = build_efmb.edited_film_for_source(build_efmb.KYLE_REVEAL_SRC)
+    assert sup["seen_at_src"] == pytest.approx(331.163)
+    at = build_efmb.edited_film_for_source(331.163)
     assert sup["at"] == pytest.approx(round(at, 3))
     assert f"{chapter_md.format_tc(sup['at'])} film" in shown[0]
     assert (f"{chapter_md.format_tc(sup['at'] + chapter_md.ACT_PROGRAMME_START['II'])}"
@@ -492,9 +492,7 @@ def test_boss_entries_carry_the_miniboss_shape_and_placeholder_seed():
     assert flash["dur"] == chapter_md.MIN_HOLD
     assert flash["title_source"] == "placeholder"
     haters = by_id["mapped_haters"]
-    # Re-seated 2026-08-24 at the owner's word: the bar opens on the red-lit
-    # enemy face ("all the enemies are the haters"), not the guardian sunset.
-    assert haters["at"] == pytest.approx(601.2 - OFFSET, abs=1e-3)
+    assert haters["source_anchor"] == pytest.approx(326.163)
 
 
 def test_instructions_prose_and_indented_examples_parse_as_nothing():
