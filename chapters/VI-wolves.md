@@ -2,7 +2,7 @@
 act: VI
 manifest: stories/06-wolves-cayde-plates.json
 # Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-25. The programme item-duration rule is authoritative.
-programme_start: 1022.700
+programme_start: 1069.967
 # This act's manifest holds BOTH kinds of plate: the pills below, and four
 # `copy_source: brief` nameplates that resolve from the roster. This file
 # authors only its own -- `sync` carries the nameplates through in place.
@@ -39,9 +39,9 @@ reveal and three credits. They are **not here on purpose**: they carry
 `copy_source: brief` and resolve from the roster, which is the one place
 those names live. Edit them there.
 
-## 18:02.827
+## 18:50.094
 
-* [ghost_welcome] status @ 18:02.827 +6.0
+* [ghost_welcome] status @ 18:50.094 +6.0
   - position: status
   # The Ghost's welcome is a hard cut on and off; it carries none of the
   # pills' fades.
@@ -53,19 +53,19 @@ those names live. Edit them there.
   - seen_at_film: 60.127
   - _note: Programme 16:30.1 maps to Act VI 1:00.127 -- owner note 2026-08-16: "the 'Welcome to KubeCon' text line goes here". The owner asked for the Ghost to welcome the audience, so this uses the top-of-frame status treatment rather than a normal lower-third chat; the seat is the Ghost's own shot (the Ghost over the Moon), confirmed on an extracted frame. Moved from 36.127, the star-map HUD shot.
 
-## 22:56.357
+## 23:43.624
 
-[castrojo_line_1] castrojo @ 22:56.357 +2.8: For five years you've trusted us
+[castrojo_line_1] castrojo @ 23:43.624 +2.8: For five years you've trusted us
 
-[castrojo_line_2] castrojo @ 22:59.515 +2.8: Mastered your tools
+[castrojo_line_2] castrojo @ 23:46.782 +2.8: Mastered your tools
 
-[castrojo_line_3] castrojo @ 23:02.673 +2.8: Honed your craft
+[castrojo_line_3] castrojo @ 23:49.940 +2.8: Honed your craft
 
-[castrojo_line_4] castrojo @ 23:05.831 +2.8: Depended on your friends
+[castrojo_line_4] castrojo @ 23:53.098 +2.8: Depended on your friends
 
-[castrojo_line_5] castrojo @ 23:08.989 +2.8: Now you're one of us, you are the dream
+[castrojo_line_5] castrojo @ 23:56.256 +2.8: Now you're one of us, you are the dream
 
-* [gold_robertsirc] - @ 23:12.147 +2.8
+* [gold_robertsirc] - @ 23:59.414 +2.8
   - position: left
   - label: "#HIREAWOLF // MAINTAINER"
   - class: Harbinger Titan
@@ -119,19 +119,19 @@ past" gets bar 8, immediately before Kelsey's plate, which is the line
 doing the introducing anyway; "Present" and "and Future" take the first two
 bars after Angie's clears. <<
 
-[castrojo_line_6] castrojo @ 23:21.621 +2.8: I follow my mentors of the past
+[castrojo_line_6] castrojo @ 24:08.888 +2.8: I follow my mentors of the past
 
-[castrojo_line_7] castrojo @ 23:34.252 +2.8: Present
+[castrojo_line_7] castrojo @ 24:21.519 +2.8: Present
 
-[castrojo_line_8] castrojo @ 23:37.410 +2.8: and Future
+[castrojo_line_8] castrojo @ 24:24.677 +2.8: and Future
 
-[castrojo_line_9] castrojo @ 23:40.568 +2.8: The only winning move is not to play
+[castrojo_line_9] castrojo @ 24:27.835 +2.8: The only winning move is not to play
 
-[castrojo_line_10] castrojo @ 23:43.726 +2.8: Think like a dinosaur
+[castrojo_line_10] castrojo @ 24:30.993 +2.8: Think like a dinosaur
 
-[castrojo_line_11] castrojo @ 23:46.884 +2.8: When you fall, rise.
+[castrojo_line_11] castrojo @ 24:34.151 +2.8: When you fall, rise.
 
-[castrojo_line_12] castrojo @ 23:50.042 +2.8: We've got your back
+[castrojo_line_12] castrojo @ 24:37.309 +2.8: We've got your back
 
     THE OWNER REWROTE THIS TAIL ON 2026-08-23. Three lines went: "Made
     Lifelong Friends" (line 4), "And now it's up to you, guardian" (line 5)

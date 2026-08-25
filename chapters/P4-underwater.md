@@ -2,7 +2,7 @@
 act: P4
 manifest: stories/00-perfume-4-plates.json
 # Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-25. The programme item-duration rule is authoritative.
-programme_start: 1424.227
+programme_start: 1471.494
 owns_plates: true
 field_order: id, kind, position, speaker, avatar, text, copy_source, at, dur, fade_in, fade_out_at, fade_out
 defaults:
@@ -38,21 +38,21 @@ python3 tools/chapter_md.py show P4
 python3 tools/chapter_md.py check P4
 ```
 
-## 24:38.178
+## 25:25.445
 
-[chat_loose_end] Jill Castro @ 24:38.178 +1.7: One more loose end
+[chat_loose_end] Jill Castro @ 25:25.445 +1.7: One more loose end
 
-[chat_escape] Valerie @ 24:40.059 +1.7: You can't escape yourself
+[chat_escape] Valerie @ 25:27.326 +1.7: You can't escape yourself
   - avatar: renders/avatars/valerie-tar-gz.png
 
-[chat_promised] Rafael @ 24:41.939 +1.7: You promised
+[chat_promised] Rafael @ 25:29.206 +1.7: You promised
 
-[chat_fine] castrojo @ 24:43.820 +1.7: Fine
+[chat_fine] castrojo @ 25:31.087 +1.7: Fine
   - avatar: renders/avatars/castrojo.png
 
-[chat_minds] LH @ 24:47.582 +1.7: Show them the minds
+[chat_minds] LH @ 25:34.849 +1.7: Show them the minds
 
-[chat_wolves] Valerie @ 24:49.463 +3.0: Of the wolves
+[chat_wolves] Valerie @ 25:36.730 +3.0: Of the wolves
   - avatar: renders/avatars/valerie-tar-gz.png
 
-[chat_wolf] Rafael @ 24:01.390 +3.0: What's a wolf?
+[chat_wolf] Rafael @ 24:48.657 +3.0: What's a wolf?

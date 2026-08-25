@@ -7,12 +7,12 @@ plates_key: fixed_cards
 timed: false
 # Nothing here is pinned to a second. This is where the chapter falls in the
 # running order, so a read-through of the whole show puts it in the right
-# place -- it is never used to seat a card. Act VIII starts at 1781.116,
+# place -- it is never used to seat a card. Act VIII starts at 1828.383,
 # summed on 2026-08-25 the way tools/megacut.py's item_duration sums it
 # (an authored trim window is trim_to MINUS trim_from): act VII's start
-# 1539.793 (see chapters/VII-europa.md) + act VII 108.400 + the mission
+# 1587.060 (see chapters/VII-europa.md) + act VII 108.400 + the mission
 # pause 23.423 + Perfume 5 3.760 + Perfume 5-ending 105.740.
-programme_start: 1781.116
+programme_start: 1828.383
 list_keys: names
 owns_plates: true
 # No `field_order`: these three cards do NOT agree on one. The first card
