@@ -93,7 +93,7 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "93cf07b1b28874a9b5f5a00bab0587610cea337a8b2491fb5b480ec4376ee19b",
+   "source_digest": "ed05c713f62976a87fd7f18c0c8f0dd43be32db917b616c363bc751f89191937",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json"
   },
@@ -215,7 +215,7 @@
   "absent": {
    "0": "A standalone 10mb copy is permitted only for private draft-level review; it is not a publication deliverable.",
    "II": "355.5 s leaves no viable picture budget under the 10 MiB cap -- it would look like mud. Recorded in the social-copy policy; the fix is a shorter excerpt, which is an editorial decision for the owner.",
-   "III": "160.2 s leaves ~268 kbps of video budget -- mud. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
+   "III": "168.6 s leaves ~241 kbps of video budget -- mud. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
    "VI": "443.5 s: the 256k audio ALONE overruns the 10 MiB cap, so no copy can be encoded at all. Recorded in 10mb/README.md; a shorter excerpt is the owner's call.",
    "VIII": "532.5 s: at the policy's 256k audio the sound alone exceeds the 10 MiB cap, leaving no picture budget. Recorded rather than fixed by starving the bed, which is the one thing 10mb/README.md says not to do. A shorter excerpt is the owner's call, and act VIII takes one well: any single wall or the cover reveal stands alone."
   }
