@@ -486,7 +486,7 @@ MARGIN_BOTTOM = 0.10
 # reproduced by `cards/render-cards.mjs`
 # in a real browser rather than ported into Pillow, so this module only ever
 # BURNS them: `render` skips them and `render_plate` refuses one outright.
-CARD_KINDS = ("act", "comic", "photo")
+CARD_KINDS = ("act", "comic", "photo", "ending")
 
 # The card kinds that own a row of their own rather than the lower third: the
 # site's top-left HUD, Destiny's boss bar at the top of frame, the console
