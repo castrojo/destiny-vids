@@ -540,16 +540,23 @@ reaches a frame. They are here, verbatim, because copy that exists only in a
 diff is copy that gets lost, and because the choice of what gives is his:
 lengthen a hold, cut an existing beat, or let these go.
 
-  jrsapi:   It could be either one
-  akgraner: [Redacted] Sent me.
+  akgraner: [Redacted] sent me
+  akgraner: "How bazaar?"
   akgraner: Who writes this crap?
-  Eve:      I'm sorry it's just like, why are people so sweaty?
+  Eva:      I'm sorry I signed up for teamwork, why are people so sweaty?
   KyleGospo: castrojo killed me in Halo today
-  noel:     I feel seen
+  noelmiller: I feel seen
   akgraner: Ok well, it gets harder from here on out
-  cortney:  Take out the trash
-  akgraner: Those kinds of people will not be there when it matters the most
-  akgraner: Trust me, I have the scars to prove it
+  cortney:  Take out this trash all their contributions are
+  cortney: Goose eggs? Nothing?
+  akgraner: Those people will not be there when it matters the most
+  akgraner: Trust me
+  akgraner: I have the scars to prove it
+  Eva: I like how you cook sister, I'll try
+  akgraner: Why do you take technical advice from people who post in PHP forums? 
+  akgraner: "Do. There is no try"
+  akgraner: I can't save you from this shitty writing though
+
 
 The owner tagged two of these `[amber]` and two `[akgraner]`; they are the
 same person, so they are listed under the login her nameplate already
