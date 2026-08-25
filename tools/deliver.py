@@ -1338,8 +1338,11 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
         log(f"  {label}: {description}")
         if argv is None:
             numeral = label.split()[-1]
-            act = next(a for a in acts if a.numeral == numeral)
-            publish([act], masters, wolves, delivery_path=delivery_path,
+            # The full acts list, not [act]: linking is idempotent and
+            # `only` scopes the digest stamps, but the README table and
+            # CHECKSUMS regen describe EVERY act -- a one-act publish left a
+            # one-row table behind every multi-act build (2026-08-25).
+            publish(acts, masters, wolves, delivery_path=delivery_path,
                     log=log, only=[numeral])
         else:
             proc = subprocess.run(argv, capture_output=True, text=True)
@@ -1352,8 +1355,7 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                 # The one moment built_from_commit can be written honestly:
                 # this checkout's rebuild command just exited 0.
                 numeral = label.split()[-1]
-                act = next(a for a in acts if a.numeral == numeral)
-                publish([act], masters, wolves, delivery_path=delivery_path,
+                publish(acts, masters, wolves, delivery_path=delivery_path,
                         log=log, only=[numeral], rebuilt={numeral})
             if label == "megacut":
                 record_megacut_provenance(plan_path, wolves)
