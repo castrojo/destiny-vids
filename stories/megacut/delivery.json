@@ -60,6 +60,7 @@
     "scripts/rebuild_efmb.sh",
     "stories/02-endless-forms-plates.json",
     "music/bed_endless_forms_most_beautiful.json",
+    "music/bed_endless_forms_most_beautiful_vocal.json",
     "music/bed_local_forecast_slower.json",
     "vocab/casting.yaml",
     "chapters/II-endless-forms.md",
