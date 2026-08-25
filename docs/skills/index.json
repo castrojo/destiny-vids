@@ -17,7 +17,7 @@
       ],
       "description": "Edit any word the audience reads without computing timecodes: one Markdown file per chapter, with per-line timing derived from readability. Use when writing or rewriting chat pills, red splashes, or title, status and credit cards.",
       "version": "1.0",
-      "last_updated": "2026-08-21",
+      "last_updated": "2026-08-25",
       "doc_type": "procedure"
     },
     {
