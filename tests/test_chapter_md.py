@@ -339,8 +339,8 @@ def test_show_seats_sup_on_the_heroes_void_shield_source(capsys):
              if line.endswith("kylegospo: Sup")]
     assert len(shown) == 1
     sup = {p["id"]: p for p in chapter_md.manifest_plates("II")}["mapped_kyle_sup"]
-    assert sup["seen_at_src"] == pytest.approx(331.163)
-    at = build_efmb.edited_film_for_source(331.163)
+    assert sup["seen_at_src"] == pytest.approx(331.763)
+    at = build_efmb.edited_film_for_source(331.763)
     assert sup["at"] == pytest.approx(round(at, 3))
     assert f"{chapter_md.format_tc(sup['at'])} film" in shown[0]
     assert (f"{chapter_md.format_tc(sup['at'] + chapter_md.ACT_PROGRAMME_START['II'])}"
