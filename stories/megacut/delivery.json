@@ -95,7 +95,7 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "e579ba00c5f23995f1b0d1f33ed51a6412a45886e801abf2a2aa6a4db8a82937",
+   "source_digest": "59c55fe04bc2f1c95a12e05993c01acba29115dc66308c2d2215b3bb9d7ab9c9",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json"
   },

@@ -34,9 +34,27 @@ def shot(segment_id, start, end, role="none", character=None):
 # The cut holds the first cue's footage but not the third's.
 SHOTS = [shot("a", 8.0, 18.0), shot("b", 60.0, 70.0)]
 
-def test_speaker_is_the_credited_person_not_the_character():
-    """The chat card names the person, using the same copy as their reveal."""
-    assert dialogue._speaker_for("osiris", LEADS) == "Bob Killen"
+def test_speaker_is_the_login_not_the_character_and_not_the_legal_name():
+    """Owner, 2026-08-24: "change the dialogue chat boxes to their github
+    handles, @mrbobbytables and @clubanderson."
+
+    A pill credits by login, the way the chat interface it imitates would.
+    The Guardian reveal still carries the legal name -- the two are different
+    treatments of the same binding, not a disagreement about it."""
+    assert dialogue._speaker_for("osiris", LEADS) == "@mrbobbytables"
+    assert dialogue._speaker_for("sagira", LEADS) == "@clubanderson"
+    assert LEADS["osiris"]["plate"]["name"] == "Bob Killen", (
+        "the reveal is untouched; only the pill changed")
+
+
+def test_a_person_with_no_login_is_credited_by_name_not_dropped():
+    """Degrade, never block: a missing login is a gap, not a disqualification.
+    Guessing one would be a claim about a real person's account."""
+    leads = {"osiris": {"display_name": "somebody", "github": None,
+                        "plate": {"name": "Real Name"}}}
+    assert dialogue._speaker_for("osiris", leads) == "Real Name"
+    assert dialogue._speaker_for("osiris", {"osiris": {
+        "display_name": "somebody", "github": None, "plate": None}}) == "somebody"
 
 def test_an_uncast_character_gets_no_card():
     assert dialogue._speaker_for("ikora_rey", LEADS) is None
@@ -52,7 +70,7 @@ def test_anchored_lines_land_where_their_footage_landed():
     # Shot "a" starts at 8.0 of source and at 0.0 of the cut, so the cue at
     # 10.0 lands 2.0s in.
     assert first["at"] == pytest.approx(2.0)
-    assert first["speaker"] == "Doctor Andy Anderson"
+    assert first["speaker"] == "@clubanderson"
     assert first["kind"] == "chat"
     assert first["avatar"] == "renders/avatars/clubanderson.png"
 
@@ -80,8 +98,8 @@ def test_chat_mode_still_places_the_settled_lines():
     """The fix drops the unsettled line only -- not the conversation."""
     entries, _ = dialogue.plan_chat(CUES, SHOTS, LEADS)
     assert [e["id"] for e in entries] == ["d01", "d02"]
-    assert [e["speaker"] for e in entries] == ["Doctor Andy Anderson",
-                                               "Bob Killen"]
+    assert [e["speaker"] for e in entries] == ["@clubanderson",
+                                               "@mrbobbytables"]
     assert [e["avatar"] for e in entries] == [
         "renders/avatars/clubanderson.png",
         "renders/avatars/mrbobbytables.png",
@@ -143,7 +161,9 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
     assert data["display"]["note"] == (
         f"Script layout keeps all {len(data['cues'])} lines readable in "
         "order; standalone lead plates are omitted because every dialogue "
-        "pill identifies Doc Anderson or Bob Killen."
+        "pill identifies its speaker by github handle (@mrbobbytables, "
+        "@clubanderson), and both people are named in full by their own "
+        "Guardian reveal cards."
     )
 
 

@@ -61,13 +61,28 @@ def load_dialogue(video_id, root=DIALOGUE_DIR):
 
 
 def _speaker_for(character, leads):
-    """Character key -> the credited person's name, or None if uncast.
+    """Character key -> the login on the chat pill, or None if uncast.
 
-    Prefers the `plate:` name, so a chat card and that character's Guardian
-    reveal credit the person identically ("Bob Killen", not "mrbobbytables").
-    Both come from vocab/casting.yaml; neither is typed into a render.
+    Owner, 2026-08-24: "change the dialogue chat boxes to their github
+    handles, @mrbobbytables and @clubanderson." So a pill credits the person
+    the way the chat interface it is imitating would -- by login, at-prefixed
+    -- rather than by the legal name their Guardian reveal carries.
+
+    The login comes from the SAME `github:` field that resolves the pill's
+    avatar, so the face and the handle beside it can never disagree about who
+    is speaking. It is authored in vocab/casting.yaml and never typed into a
+    render.
+
+    A binding with no login falls back to the plate name, then the display
+    name: somebody whose login nobody recorded is still credited, rather than
+    dropped as uncast. Degrading to a real name is not the same as guessing a
+    handle, which is a claim about a real person's account and is never made
+    here.
     """
     entry = leads.get(character) or {}
+    login = entry.get("github")
+    if login:
+        return f"@{login}"
     return (entry.get("plate") or {}).get("name") or entry.get("display_name")
 
 
