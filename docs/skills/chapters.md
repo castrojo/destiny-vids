@@ -1,7 +1,7 @@
 ---
 name: chapters
 version: "1.0"
-last_updated: "2026-08-21"
+last_updated: "2026-08-25"
 id: chapters
 one_line_purpose: Author a chapter's on-screen copy in one Markdown file per chapter.
 entry_point: docs/skills/chapters.md
@@ -195,6 +195,26 @@ python3 scripts/generate_full_script.py --write   # refresh the read-through
 the audience hears it, and it is **generated** — every block says which file
 its lines are edited in.
 
+## Integrating an owner's prompt-style edit
+
+The owner sometimes edits a chapter file the way they would talk to an
+agent: instructions, angle-bracket notes, and production directions mixed
+into the dialogue. The integration order matters:
+
+1. **Snapshot the raw edit first.** Commit it verbatim on its own branch
+   before changing a word — authored copy must never exist only in a
+   working tree, and the raw text is the evidence of intent.
+2. **Execute or preserve every instruction.** A direction that is not
+   dialogue (a recast note, a "make it dramatic" tail block) is either done
+   in the same change or preserved verbatim in the commit message for the
+   workstream that owns it. It never stays in the chapter file, and it is
+   never treated as a line to render.
+3. **Re-seat only what may move.** `@` pins are owner placement and never
+   move. When new lines overlap, adjust only unpinned cascade lines, keep
+   the owner's written order, and record the seating rule in the file.
+4. **Finish with `show` clean and `sync --write`** — no overlap NOTEs you
+   did not deliberately accept, then regenerate the manifest.
+
 ## Red Flags
 
 - **Editing a manifest to change a word.** It is an output. The next burn
@@ -215,6 +235,12 @@ its lines are edited in.
   running order moves.
 - Widening a hold because `tools/readtime.py` says a line is short. Moving
   an authored beat is the owner's call, never a tool's.
+- **A line with leading whitespace silently falls out of the schedule** —
+  `show` will not list it and nothing errors. If a line the owner wrote is
+  missing from `show`, check for a stray indent before assuming a drop.
+- Seating two pills so they overlap. `tools/plate.py` hard-refuses two
+  visible pills at once, so "accept the overlap" is not buildable; re-seat
+  an unpinned line instead.
 
 ## Verification
 
