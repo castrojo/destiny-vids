@@ -1304,7 +1304,13 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                                 f"declared master"))
                 prod_mutations.add(r.act.numeral)
         soc = next((f for f in r.findings if f.node == "social"), None)
-        if (soc and (soc.state in FAILING or
+        # A re-link queues a fresh social copy -- but never for an
+        # absent-by-design act: the exemption is a recorded editorial
+        # decision, and the cap math makes the attempt fail the build (act
+        # VIII, re-linked 2026-08-25: 256k audio alone over 492.8 s exceeds
+        # the 10 MiB cap).
+        if (soc and soc.state != ABSENT_BY_DESIGN
+                and (soc.state in FAILING or
                      r.act.numeral in prod_mutations)
                 and r.act.numeral not in conflicted):
             src = wolves / "Prod" / r.act.prod_file

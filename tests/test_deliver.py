@@ -278,6 +278,29 @@ def test_rebuilding_an_act_schedules_every_downstream_delivery_rung(
         assert f"would {label}" in output
 
 
+def test_a_rebuilt_act_with_an_exempt_social_never_queues_one(ws, capsys):
+    """The rebuild -> re-link -> social chain must stop before an
+    absent-by-design act: its exemption is a recorded editorial decision, and
+    the cap math turns the attempt into a build failure (act VIII, re-linked
+    2026-08-25: 256k of audio over 492.8 s already exceeds the cap)."""
+    delivery = json.loads((ws / "delivery.json").read_text())
+    source = ws / "stories.json"
+    source.write_text('{"copy": "new"}')
+    delivery["masters"]["II"].update({
+        "sources": [str(source)],
+        "source_digest": "outdated",
+        "rebuild": ["echo", "rebuild-song"],
+    })
+    (ws / "delivery.json").write_text(json.dumps(delivery))
+
+    capsys.readouterr()
+    assert run(ws, "build", "--dry-run") == 0
+    output = capsys.readouterr().out
+    assert "would rebuild II" in output
+    assert "would link II" in output
+    assert "would social II" not in output
+
+
 def test_a_missing_megacut_is_a_build_action(ws, capsys):
     (ws / "wolves" / "megacut" / "show-v1.mp4").unlink()
     assert findings(gather(ws), "")["megacut"].state == deliver.MISSING
