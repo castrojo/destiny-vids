@@ -85,6 +85,23 @@ Hand-written prose the tool must preserve.
 Trailing prose.
 """
 
+SOCIAL_README = """# 10mb
+
+Hand-written social prose the tool must preserve.
+
+| Act | Runtime | Video budget | Size |
+|---|---|---|---|
+| `01-intro` | 1.0 s | 1 kbps | 0.00 MiB |
+
+## Why some acts have no social copy
+
+| Act | Runtime | Video budget left after 256k audio |
+|---|---|---|
+| `02-song` | 1.0 s | 1 kbps |
+
+Trailing social prose.
+"""
+
 
 @pytest.fixture
 def ws(tmp_path):
@@ -127,11 +144,14 @@ def ws(tmp_path):
     masters, _social = deliver.load_delivery(root / "delivery.json")
     table = deliver.expected_table(acts, masters)
     (wolves / "Prod" / "README.md").write_text(README.format(table=table))
+    (wolves / "10mb" / "README.md").write_text(SOCIAL_README)
     sums = "\n".join(f"{deliver.md5(f)}  {f.name}"
                      for f in sorted((wolves / "Prod").glob("*.mp4")))
     (wolves / "Prod" / deliver.CHECKSUMS).write_text(sums + "\n")
     (wolves / "megacut" / "show-v1.mp4.prod.md5").write_text(
         deliver.md5(wolves / "Prod" / deliver.CHECKSUMS) + "\n")
+    os.utime(wolves / "megacut" / "show-v1.mp4.prod.md5",
+             (future + 1, future + 1))
     return root
 
 
@@ -369,6 +389,18 @@ def test_megacut_provenance_detects_a_changed_prod_checksum_set(ws):
     assert "checksum set" in finding.detail
 
 
+def test_megacut_provenance_older_than_its_output_is_stale(ws):
+    out = ws / "wolves" / "megacut" / "show-v1.mp4"
+    provenance = out.with_suffix(out.suffix + ".prod.md5")
+    output_time = 2_000_000_000
+    os.utime(out, (output_time, output_time))
+    os.utime(provenance, (output_time - 1, output_time - 1))
+
+    finding = findings(gather(ws), "")["megacut"]
+    assert finding.state == deliver.STALE
+    assert "no current Prod checksum digest" in finding.detail
+
+
 def test_the_megacut_is_refused_while_a_link_conflicts(ws, capsys):
     """Baking a reverted act into a fresh megacut is the failure the whole
     graph exists to prevent; the megacut waits for the link to resolve."""
@@ -401,6 +433,33 @@ def test_the_readme_table_is_regenerated_and_the_prose_survives(ws):
     assert "song-master.mp4` — v2" in text
     assert "Act III has no film" in text
     assert findings(gather(ws), "")["readme"].state == deliver.OK
+
+
+def test_publish_generates_social_tables_and_preserves_social_prose(
+        ws, monkeypatch):
+    durations = {
+        "01-intro.mp4": 100.0,
+        "02-song.mp4": 200.0,
+    }
+    monkeypatch.setattr(deliver, "social_duration",
+                        lambda path: durations[path.name])
+
+    run(ws, "publish")
+
+    text = (ws / "wolves" / "10mb" / "README.md").read_text()
+    assert "Hand-written social prose the tool must preserve." in text
+    assert "Trailing social prose." in text
+    assert deliver.SOCIAL_COPY_TABLE_BEGIN in text
+    assert deliver.SOCIAL_ABSENT_TABLE_BEGIN in text
+    assert "`01-intro` | 100.0 s" in text
+    assert "`02-song` | 200.0 s" in text
+    assert "1.0 s | 1 kbps" not in text
+
+    durations["01-intro.mp4"] = 120.0
+    run(ws, "publish")
+    text = (ws / "wolves" / "10mb" / "README.md").read_text()
+    assert "`01-intro` | 120.0 s" in text
+    assert "`01-intro` | 100.0 s" not in text
 
 
 def test_a_checksum_line_for_a_file_that_is_not_an_act_is_stale(ws):
