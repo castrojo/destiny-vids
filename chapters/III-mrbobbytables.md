@@ -34,7 +34,7 @@ defaults:
 
 # Act III — mrbobbytables, and the long walk
 
-**Only the act's one fixed card is here.** The conversation that
+**Only the act's two fixed cards are here.** The conversation that
 carries the rest of act III is *recovered speech*, not authored copy: it lives
 in `dialogue/<video_id>/` with source timecodes and per-line evidence, beside
 the `DIALOGUE.md` the owner edits. That record is provenance. Editing it here

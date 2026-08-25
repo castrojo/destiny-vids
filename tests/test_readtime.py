@@ -266,3 +266,104 @@ def test_the_committed_manifests_never_gate():
     returns non-zero, the tool has become the thing `AGENTS.md` forbids.
     """
     assert readtime.main([]) == 0
+
+
+# -- acts whose pills come from a dialogue record ---------------------------
+
+def cue(**kw):
+    base = {"id": "d01", "start_sec": 10.0, "end_sec": 12.0,
+            "character": "osiris", "text": "hello"}
+    base.update(kw)
+    return base
+
+
+def write_record(tmp_path, *cues):
+    path = tmp_path / "dialogue.json"
+    path.write_text(json.dumps({"video_id": "vid", "cues": list(cues)}),
+                    encoding="utf-8")
+    return path
+
+
+def test_a_dialogue_record_is_audited_by_the_hold_plan_script_will_give_it(tmp_path):
+    """Read time is a question about the hold, not the seat.
+
+    `plan_script` holds a cue for `max(MIN_HOLD, min(spoken, MAX_CHAT_HOLD))`,
+    so the same arithmetic answers "can this be read" without a cut list,
+    footage or a plan -- and therefore works offline, before anything is
+    built. All three regimes are pinned here so the two cannot drift.
+    """
+    from tools.dialogue import MAX_CHAT_HOLD
+    long_line = "A" * 400
+    for start, end, expected in (
+            (0.0, 0.5, MIN_HOLD),                 # under the floor
+            (0.0, 4.0, 4.0),                      # its own spoken window
+            (0.0, 40.0, MAX_CHAT_HOLD),           # over the cap
+    ):
+        path = write_record(tmp_path, cue(start_sec=start, end_sec=end,
+                                          text=long_line))
+        rows, _, _ = readtime.audit_dialogue(path)
+        assert rows[0]["on_screen"] == expected
+
+
+def test_a_short_cue_is_reported_against_the_markdown_the_owner_edits(tmp_path):
+    """Naming dialogue.json would point the owner at an output."""
+    path = write_record(tmp_path, cue(text="A" * 80))
+    rows, _, problems = readtime.audit_dialogue(path)
+    assert problems == []
+    assert len(rows) == 1
+    assert rows[0]["id"] == "d01"
+    assert rows[0]["manifest"].endswith("DIALOGUE.md")
+    assert rows[0]["grep"] == "## d01 |"
+    assert rows[0]["on_screen"] == MIN_HOLD
+
+
+def test_a_cue_with_room_to_be_read_is_not_reported(tmp_path):
+    path = write_record(tmp_path, cue(start_sec=0.0, end_sec=6.0, text="Hi"))
+    rows, _, _ = readtime.audit_dialogue(path)
+    assert rows == []
+
+
+def test_the_spoken_window_is_capped_the_way_plan_script_caps_it(tmp_path):
+    """A 40s window does not buy 40s of reading: the plan caps the hold."""
+    from tools.dialogue import MAX_CHAT_HOLD
+    path = write_record(tmp_path, cue(start_sec=0.0, end_sec=40.0,
+                                      text="A" * 200))
+    rows, _, _ = readtime.audit_dialogue(path)
+    assert rows[0]["on_screen"] == MAX_CHAT_HOLD
+
+
+def test_a_cue_with_no_words_yet_is_placeholder_business_not_this_tools(tmp_path):
+    path = write_record(tmp_path, cue(text=""))
+    rows, skipped, problems = readtime.audit_dialogue(path)
+    assert rows == [] and problems == []
+    assert skipped["placeholder"] == 1
+
+
+def test_an_untimeable_cue_is_a_problem_not_an_all_clear(tmp_path):
+    """The one direction this tool must never be quietly wrong in."""
+    path = write_record(tmp_path, cue(start_sec=5.0, end_sec=5.0,
+                                      text="A" * 80))
+    rows, _, problems = readtime.audit_dialogue(path)
+    assert rows == []
+    assert any("cannot be timed" in p for p in problems)
+
+
+def test_the_default_run_reaches_the_dialogue_records():
+    """The acts built through `build_uncut_credited.sh` keep their words in
+    `dialogue/`, not in `stories/`, so auditing only `stories/` reported them
+    as having nothing wrong in them."""
+    found = readtime.dialogue_records(readtime.REPO_ROOT)
+    assert found, "the repo has at least one dialogue record"
+    assert all(p.name == "dialogue.json" for p in found)
+    assert readtime.REPO_ROOT / "dialogue" in {p.parent.parent for p in found}
+
+
+def test_act3_dialogue_is_visible_to_the_audit():
+    """Act III's pills were invisible to this tool until the record was
+    audited directly: its planned deck lives in gitignored `renders/`."""
+    path = (readtime.REPO_ROOT / "dialogue"
+            / "yt_curse_of_osiris_opening_cinematic" / "dialogue.json")
+    rows, _, problems = readtime.audit_dialogue(path)
+    assert problems == []
+    assert {row["id"] for row in rows} >= {"d22"}, (
+        "d22 holds 2.2s for 47 characters; the owner declined the widening")

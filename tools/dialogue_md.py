@@ -368,7 +368,24 @@ def merge(data, edited):
         })
         changes.append(f"  - {cue_id} removed")
 
+    # `plan_script` walks `cues` in list order, so this sort IS the order the
+    # conversation plays in -- while `start_sec` is only the authored window,
+    # and for any line under ~37 characters the hold is MIN_HOLD and those
+    # numbers reach nothing else. So a re-time can silently reorder an
+    # exchange: widening one line's window past its neighbour's start swaps a
+    # reply and its setup. That is moving copy the owner placed, which
+    # `AGENTS.md` puts in the fourth un-automatable class, so it is reported
+    # loudly rather than done quietly. It is still not refused: nothing here
+    # blocks, and the owner may well have meant it.
+    before = [cue["id"] for cue in cues]
     cues.sort(key=lambda cue: cue["start_sec"])
+    after = [cue["id"] for cue in cues]
+    if before != after:
+        moved = [cue_id for was, cue_id in zip(before, after) if was != cue_id]
+        changes.append(
+            f"  ! REORDERED by start_sec: {', '.join(moved)} -- the "
+            f"conversation now plays {' '.join(after)}. If that is not what "
+            f"you meant, the timecodes moved a line past its neighbour.")
     return {**data, "cues": cues, "dropped": dropped}, changes
 
 

@@ -12,14 +12,34 @@
 #   3. the ensemble   -- credited into whatever screen time is left
 #
 # Usage:
-#   scripts/build_uncut_credited.sh <video_id> <roster.json> [music.mp3]
+#   scripts/build_uncut_credited.sh [--local] <video_id> <roster.json> [music.mp3]
 set -euo pipefail
 
-VIDEO_ID="${1:?usage: $0 <video_id> <roster.json> [music.mp3]}"
+# Encoding is remote by default (AGENTS.md): exo-0 has twice this
+# workstation's cores and is not also hosting the agent session, so a local
+# burn is both slower and starves the thing that asked for it. `--local` is
+# the explicit escape hatch; falling back because the cluster is unreachable
+# is allowed, but never silently.
+FARM_OPT=(--farm)
+if [ "${1:-}" = "--local" ]; then
+    FARM_OPT=()
+    shift
+    echo "farm: encoding locally -- asked for with --local" >&2
+elif ! python3 -c 'import sys
+from tools import farm
+ok, why = farm.cluster_available()
+if not ok:
+    print(f"farm: encoding locally -- the cluster is not reachable ({why})",
+          file=sys.stderr)
+    sys.exit(1)' >/dev/null; then
+    FARM_OPT=()
+fi
+
+VIDEO_ID="${1:?usage: $0 [--local] <video_id> <roster.json> [music.mp3]}"
 # Resolved by id, never built as "media/$VIDEO_ID.mp4": a master that moves
 # container (.mp4 -> .mkv, #229) must still be found.
 SOURCE_VIDEO="$(python3 tools/footage.py path "$VIDEO_ID")"
-ROSTER="${2:?usage: $0 <video_id> <roster.json> [music.mp3]}"
+ROSTER="${2:?usage: $0 [--local] <video_id> <roster.json> [music.mp3]}"
 MUSIC="${3:-}"
 MUSIC_AT=""
 
@@ -51,6 +71,14 @@ PY
     if [ "${#SCORE[@]}" -ge 2 ]; then
         MUSIC="${SCORE[0]}"
         MUSIC_AT="${SCORE[1]}"
+    else
+        # `mapfile < <(...)` is a process substitution, so `set -e` cannot see
+        # the Python exit code: a broken record or a missing `score.bed_id`
+        # leaves SCORE empty and the build encodes a SILENT film, cleanly, at
+        # exit 0. Degrading to no score is allowed -- doing it without saying
+        # so is not.
+        echo "    NOTE: no score for $VIDEO_ID (no dialogue record, no" \
+             "score.bed_id, or the lookup failed) -- encoding SILENT" >&2
     fi
 fi
 
@@ -137,8 +165,12 @@ else
 fi
 
 echo "==> burn the deck"
+# Not >/dev/null: this prints which full-frame cards it did NOT draw, and the
+# loop below only knows how to draw `logowall`. Swallowing it means a new
+# full-frame kind is skipped in silence and the burn either dies on a missing
+# PNG or, worse, reuses a stale one from the last build.
 python3 tools/plate.py render --manifest "$MANIFEST" --out-dir "$PLATES_DIR" \
-    --fit-video "$SOURCE_VIDEO" >/dev/null
+    --fit-video "$SOURCE_VIDEO" | grep -v '^wrote ' || true
 # Full-frame cards plate.py does not draw (the interstitial precedent): each
 # logowall entry is rendered from the landscape record by its own builder,
 # landing in the same plates dir under the same plate_<id>.png name.
@@ -164,7 +196,7 @@ for wall in "${WALLS[@]}"; do
         --out "$PLATES_DIR/plate_$WALL_ID.png"
 done
 python3 tools/plate.py burn --video "$BASE" --manifest "$MANIFEST" \
-    --plates-dir "$PLATES_DIR" --out "$FINAL"
+    --plates-dir "$PLATES_DIR" "${FARM_OPT[@]+"${FARM_OPT[@]}"}" --out "$FINAL"
 
 echo "==> $FINAL"
 ffprobe -v error -show_entries format=duration -of csv=p=0 "$FINAL"

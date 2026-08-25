@@ -78,6 +78,8 @@
     "tools/dialogue.py",
     "tools/plate.py",
     "tools/uncut.py",
+    "tools/redact.py",
+    "redactions/yt_curse_of_osiris_opening_cinematic.json",
     "dialogue/yt_curse_of_osiris_opening_cinematic",
     "stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json",
     "music/bed_wish_i_had_an_angel.json",
@@ -93,7 +95,7 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "ed05c713f62976a87fd7f18c0c8f0dd43be32db917b616c363bc751f89191937",
+   "source_digest": "173bcd686dc4d43a4bee4d19483e009b2acaef951424b1fc87032c3e57ebcbcb",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json"
   },

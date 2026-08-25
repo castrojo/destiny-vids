@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "The owner replaced the complete conversation. Script layout keeps all 26 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doctor Andy Anderson or Bob Killen."
+    "note": "Script layout keeps all 26 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies Doc Anderson or Bob Killen."
   },
   "cues": [
     {

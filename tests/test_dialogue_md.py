@@ -304,3 +304,24 @@ def test_act_three_fixed_deck_has_gold_bob_and_top_right_email_sign():
     assert sign["title"] == "Maintainers Reading Emails"
     assert sign["subtitle"] == "And Other Preposterous Tales"
     assert sign["body"] == ["Summer 2027"]
+
+
+def test_a_retime_that_reorders_the_conversation_says_so():
+    """`plan_script` plays cues in list order and `merge` sorts that list by
+    `start_sec`, so widening one line's window past its neighbour's start
+    swaps a reply and its setup. Moving copy the owner placed is the fourth
+    un-automatable class -- it is reported loudly, never done quietly."""
+    text = dialogue_md.export(DATA, LEADS).replace(
+        "## d02 | mrbobbytables | 0:14.00 -> 0:17.00",
+        "## d02 | mrbobbytables | 0:09.00 -> 0:17.00")
+    updated, changes = dialogue_md.merge(DATA, dialogue_md.parse(text, LEADS))
+    assert [c["id"] for c in updated["cues"]] == ["d02", "d01"]
+    assert any("REORDERED" in c for c in changes)
+
+
+def test_an_ordinary_retime_reports_no_reorder():
+    text = dialogue_md.export(DATA, LEADS).replace(
+        "## d02 | mrbobbytables | 0:14.00 -> 0:17.00",
+        "## d02 | mrbobbytables | 0:14.00 -> 0:19.00")
+    _, changes = dialogue_md.merge(DATA, dialogue_md.parse(text, LEADS))
+    assert changes and not any("REORDERED" in c for c in changes)

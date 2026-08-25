@@ -138,10 +138,9 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
         "start_sec": 32.56,
         "standalone_leads": False,
         "note": (
-            "The owner replaced the complete conversation. Script layout keeps "
-            "all 26 lines readable in order; standalone lead plates are omitted "
-            "because every dialogue pill identifies Doctor Andy Anderson or "
-            "Bob Killen."
+            "Script layout keeps all 26 lines readable in order; standalone "
+            "lead plates are omitted because every dialogue pill identifies "
+            "Doc Anderson or Bob Killen."
         ),
     }
 

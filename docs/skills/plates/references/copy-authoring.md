@@ -29,7 +29,7 @@ The seven authored identities, verbatim:
 | Laura Santamaria | `MAINTAINER // GUARDIAN` | Gunslinger Hunter | The Order of Seven |
 | Christoph Blecker | `TRUSTEE // GUARDIAN` | Broodweaver Warlock | First Among Equals — The North Star |
 | Natali Vlatko | `MAINTAINER // GUARDIAN` | Behemoth Titan | Shipwright of Kubernetes |
-| Doctor Andy Anderson | `MAINTAINER // GUARDIAN` | Shadebinder Warlock | Foundry of the Forbidden |
+| Doc Anderson | `MAINTAINER // GUARDIAN` | Shadebinder Warlock | Foundry of the Forbidden |
 
 Plus, from `nameplates.json` only: **Jorge Castro** (Harbinger Titan, *Upender
 of Antipatterns | The First Disciple*), **Jeffrey Sica** (Stormbreaker Titan,

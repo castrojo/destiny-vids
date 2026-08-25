@@ -46,6 +46,10 @@ except ImportError:  # running as a script from the repo root
     sys.path.insert(0, str(REPO_ROOT))
     from tools.plate import MIN_HOLD
 
+# Same reason: the cap plan_script applies to a spoken window, imported so a
+# change to the pacing cannot leave this tool measuring a hold nobody uses.
+from tools import dialogue  # noqa: E402
+
 # Characters per second. Subtitling's comfortable rate for an adult reading
 # while watching picture; Netflix's English guideline is 17.
 DEFAULT_CPS = 17.0
@@ -57,6 +61,9 @@ DEFAULT_CPS = 17.0
 PROSE_KINDS = {"chat", "banner", "ending"}
 
 STORY_DIRS = ("stories",)
+
+# Acts whose pills are planned at build time keep their words here instead.
+DIALOGUE_DIR = "dialogue"
 
 UNREADABLE = ("cannot be read", "is not valid JSON")
 
@@ -267,11 +274,95 @@ def manifests(root: Path) -> list[Path]:
     return found
 
 
+def dialogue_records(root: Path) -> list[Path]:
+    """Every ``dialogue/<video_id>/dialogue.json`` in the repo.
+
+    An act whose pills come from a dialogue record has no committed plate
+    manifest to scan -- the deck is planned at build time and written to
+    ``renders/``, which is gitignored. Auditing only ``stories/`` therefore
+    reported those acts as having nothing wrong in them, which is the one
+    direction this tool must never be quietly wrong in.
+    """
+    base = root / DIALOGUE_DIR
+    if not base.is_dir():
+        return []
+    return sorted(p for p in base.glob("*/dialogue.json") if p.is_file())
+
+
+def audit_dialogue(path: Path, cps: float = DEFAULT_CPS):
+    """``(short, skipped, problems)`` for one dialogue record.
+
+    Read time is a question about the HOLD, not about the seat: a pill is
+    readable or not for exactly as long as it is up, wherever in the film it
+    lands. So this measures the hold ``tools.dialogue.plan_script`` will give
+    each cue -- ``max(MIN_HOLD, min(spoken, MAX_CHAT_HOLD))`` -- and never
+    needs the cut list, the footage or a plan. A record is auditable offline,
+    before anything is built.
+    """
+    short: list[dict] = []
+    skipped: Counter = Counter()
+    problems: list[str] = []
+
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        return short, skipped, [
+            f"{_display(path)}: cannot be read ({exc.strerror or exc})"]
+    except ValueError as exc:
+        return short, skipped, [f"{_display(path)}: is not valid JSON ({exc})"]
+
+    if not isinstance(doc, dict) or not isinstance(doc.get("cues"), list):
+        return short, skipped, problems
+
+    for cue in doc["cues"]:
+        if not isinstance(cue, dict):
+            continue
+        text = (cue.get("text") or "").strip()
+        if not text:
+            # A slot with no words yet is placeholder.py's business, not this
+            # tool's: there is nothing to fail to read.
+            skipped["placeholder"] += 1
+            continue
+        cue_id = cue.get("id") or "<no id>"
+        start, end = _num(cue.get("start_sec")), _num(cue.get("end_sec"))
+        if start is None or end is None or end <= start:
+            problems.append(
+                f"{_display(path)}: cue {cue_id} carries {len(text)} "
+                f"characters and cannot be timed "
+                f"(start_sec={cue.get('start_sec')!r} "
+                f"end_sec={cue.get('end_sec')!r})")
+            continue
+
+        on_screen = max(MIN_HOLD, min(end - start, dialogue.MAX_CHAT_HOLD))
+        need = required_hold(text, cps)
+        if on_screen + 1e-6 >= need:
+            continue
+        short.append({
+            # A finding names the file the OWNER edits. The record beside it
+            # is an output of `dialogue_md.py apply`; the Markdown is where a
+            # rewrite or a re-time actually goes.
+            "manifest": _display(path.with_name(dialogue.MARKDOWN_NAME)),
+            "grep": f"## {cue_id} |",
+            "id": cue_id,
+            "speaker": cue.get("character") or "",
+            "chars": len(text),
+            "on_screen": round(on_screen, 3),
+            # A chat pill does not fade, so every second it is up is opaque.
+            "opaque": round(on_screen, 3),
+            "need": round(need, 3),
+            "deficit": round(need - on_screen, 3),
+            "rate_driven": need > MIN_HOLD + 1e-9,
+            "text": text,
+        })
+    return short, skipped, problems
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         description="Report chat plates held too briefly to be read.")
     ap.add_argument("manifest", nargs="*", type=Path,
-                    help="manifests to audit (default: every stories/*.json)")
+                    help="manifests to audit (default: every stories/*.json "
+                         "and every dialogue/*/dialogue.json)")
     ap.add_argument("--cps", type=float, default=DEFAULT_CPS,
                     help=f"reading rate in characters per second "
                          f"(default {DEFAULT_CPS:g})")
@@ -282,13 +373,16 @@ def main(argv=None) -> int:
                          "authored beat is the owner's call")
     args = ap.parse_args(argv)
 
-    paths = args.manifest or manifests(REPO_ROOT)
+    paths = args.manifest or (manifests(REPO_ROOT)
+                              + dialogue_records(REPO_ROOT))
     short: list[dict] = []
     skipped: Counter = Counter()
     problems: list[str] = []
     unread = 0
     for path in paths:
-        rows, skips, probs = audit_manifest(path, args.cps)
+        audit = (audit_dialogue if path.name == "dialogue.json"
+                 else audit_manifest)
+        rows, skips, probs = audit(path, args.cps)
         short.extend(rows)
         skipped.update(skips)
         problems.extend(probs)
