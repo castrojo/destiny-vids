@@ -1,0 +1,36 @@
+{
+  "_what": "thockin hero trailer; credits are seated only where the owner-identified characters are visible.",
+  "_source": "https://www.youtube.com/watch?v=RV4qakZgCHY",
+  "plates": [
+    {
+      "id": "jagosan-white-armor",
+      "at": 25.0,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "GITHUB // GUARDIAN",
+      "name": "Jago Macleod",
+      "title": "github.com/jagosan",
+      "why": "The white-armored frozen-slab character is visibly in frame."
+    },
+    {
+      "id": "kaslin-trailer",
+      "at": 54.0,
+      "dur": 3.8,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "MAINTAINER // GUARDIAN",
+      "class": "Stormcaller Warlock",
+      "name": "Kaslin Fields",
+      "title": "Rage of the Paradox",
+      "why": "Owner-identified Kaslin appearance at source 0:54."
+    }
+  ],
+  "unresolved": [
+    {
+      "reason": "source_out_of_range",
+      "at": "1:06",
+      "note": "The supplied trailer ends at 1:00.021, so three requested Blueberry cards cannot be seated without inventing or moving a cue."
+    }
+  ]
+}

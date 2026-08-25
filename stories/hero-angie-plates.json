@@ -1,0 +1,20 @@
+{
+  "_what": "Angie Jones hero-video credit at the opening narration.",
+  "_source": "https://www.youtube.com/watch?v=G8mC5GaDoyQ",
+  "plates": [
+    {
+      "id": "angie-jones-opening-narration",
+      "at": 3.4,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "TRUSTEE // GUARDIAN",
+      "class": "Voidwalker Warlock",
+      "name": "Angie Jones",
+      "title": "Arbiter of the Agentic",
+      "variant": "leader",
+      "why": "The first usable source frame after the opening rating slate, at the narration opening."
+    }
+  ],
+  "unresolved": []
+}

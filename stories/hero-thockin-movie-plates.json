@@ -1,0 +1,68 @@
+{
+  "_what": "thockin hero movie, source cutscene 3 through source 5:55.",
+  "_source": "https://www.youtube.com/watch?v=rMFteMZjS9s",
+  "_source_window": {
+    "in": 159.0,
+    "out": 355.0
+  },
+  "_roster": "renders/hero-roster-2026-08.json",
+  "plates": [
+    {
+      "id": "kaslin-movie-reintroduction",
+      "at": 18.0,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "MAINTAINER // GUARDIAN",
+      "class": "Stormcaller Warlock",
+      "name": "Kaslin Fields",
+      "title": "Rage of the Paradox",
+      "why": "Returning character reveal in cutscene 3."
+    },
+    {
+      "id": "blueberry-danathar",
+      "at": 36.0,
+      "dur": 3.5,
+      "position": "left",
+      "copy_source": "casting",
+      "label": "CONTRIBUTOR // GUARDIAN",
+      "name": "Danathar",
+      "title": "Bluefin Blueberry",
+      "why": "First current-roster Blueberry; selected from the August 2026 roster."
+    },
+    {
+      "id": "blueberry-giklab",
+      "at": 72.0,
+      "dur": 3.5,
+      "position": "left",
+      "copy_source": "casting",
+      "label": "CONTRIBUTOR // GUARDIAN",
+      "name": "Giklab",
+      "title": "Bluefin Blueberry",
+      "why": "Second current-roster Blueberry; selected from the August 2026 roster."
+    },
+    {
+      "id": "jagosan-movie-reintroduction",
+      "at": 128.0,
+      "dur": 4.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "GITHUB // GUARDIAN",
+      "name": "Jago Macleod",
+      "title": "github.com/jagosan",
+      "why": "Returning character reveal in cutscene 3."
+    },
+    {
+      "id": "blueberry-huntedraven7",
+      "at": 152.0,
+      "dur": 3.5,
+      "position": "left",
+      "copy_source": "casting",
+      "label": "CONTRIBUTOR // GUARDIAN",
+      "name": "HuntedRaven7",
+      "title": "Bluefin Blueberry",
+      "why": "Third current-roster Blueberry; selected from the August 2026 roster."
+    }
+  ],
+  "unresolved": []
+}
