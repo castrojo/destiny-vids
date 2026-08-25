@@ -150,7 +150,11 @@ def refresh_cards(manifest, doc, cards_dir, section=SECTION):
               for card in underwater_cards(doc, section)]
     if not freshness.stale_outputs(plate_inputs(manifest), wanted):
         return []
-    entries = plate_mod.load_manifest(manifest)
+    # Only THIS section's cards: the manifest also carries the mission-pause
+    # cards, which have no `dur` by design (their segment sequences them by
+    # frame math), and a whole-file load rightly refuses them -- but this
+    # render never draws them.
+    entries = plate_mod.load_manifest_entries(underwater_cards(doc, section))
     plate_mod.check_copy_against_bindings(entries)
     plate_mod.render_all(entries, cards_dir)
     return wanted
