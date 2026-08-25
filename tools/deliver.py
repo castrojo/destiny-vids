@@ -492,7 +492,11 @@ def source_digest_at(commit, sources, root=None):
         if not entries:
             h.update(b"\0absent")
             continue
-        for entry in sorted(entries):
+        # Sort by the PATH field, the way the worktree walk sorts rglob
+        # paths. Sorting the raw ls-tree lines sorts by blob sha, and the
+        # two orders disagree for any multi-file directory -- act III read
+        # "inputs have moved" on a byte-identical checkout for exactly this.
+        for entry in sorted(entries, key=lambda e: e.partition("\t")[2]):
             meta, _, path = entry.partition("\t")
             blob = meta.split()[2]
             b = subprocess.run(["git", "cat-file", "blob", blob],
