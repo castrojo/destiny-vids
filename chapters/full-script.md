@@ -233,13 +233,13 @@ Edit in `chapters/VI-wolves.md`.
 
 Edit in `chapters/P4-underwater.md`.
 
-- `25:25.44` **Jill Castro** — One more loose end
-- `25:27.33` **Valerie** — You can't escape yourself
-- `25:29.21` **Rafael** — You promised
-- `25:31.09` **castrojo** — Fine
-- `25:34.85` **LH** — Show them the minds
-- `25:36.73` **Valerie** — Of the wolves
-- `24:48.66` **Rafael** — What's a wolf?
+- `25:25.44` **JillCastro** — One more loose end
+- `25:27.74` **valerie-tar-gz** — You can't escape yourself
+- `25:30.04` **rafaelcastro10** — You promised
+- `25:32.34` **castrojo** — Fine
+- `25:34.64` **LionHeartP** — Show them the minds
+- `25:36.94` **valerie-tar-gz** — Of the wolves
+- `24:48.66` **rafaelcastro10** — What's a wolf?
 
 ## VII
 

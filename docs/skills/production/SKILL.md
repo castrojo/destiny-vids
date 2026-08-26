@@ -98,6 +98,20 @@ scripts/make_video.sh 3 renders/roster.json            # UNCUT, credited
 `make_video.sh` picks up `stories/<video_id>.txt` automatically if it exists.
 Writing the outline is editorial work; the script does not invent one.
 
+### Rebuilt non-act segments
+
+Perfume movements and other `renders/` items have no act numeral, so their
+input provenance is not stamped by `publish --act`. After their owning
+renderer succeeds, record the digest through the delivery interface rather
+than typing one:
+
+```bash
+python3 tools/deliver.py publish --segment renders/perfume-4-overlays.mp4
+```
+
+The command requires the output to exist and derives its digest from the
+declared sources.
+
 ## The gate at stage 7
 
 `build_uncut_credited.sh` renders the **whole** video and credits it. That is
