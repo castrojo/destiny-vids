@@ -1,7 +1,7 @@
 ---
 name: production
-version: "1.0"
-last_updated: "2026-08-19"
+version: "1.1"
+last_updated: "2026-08-26"
 id: production
 one_line_purpose: Take approved video work from issue brief to delivered artifact.
 entry_point: docs/skills/production/SKILL.md
@@ -172,14 +172,12 @@ python3 tools/deliver.py status       # the delivery chain, as a report (never a
 python3 tools/readtime.py             # plates held too briefly to read (reports, never gates)
 ~/Videos/audio-check.sh --all         # gates every act in Wolves/Prod
 
-# before any encode: nothing authored is stranded on an unpushed branch
-for w in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
-  h=$(git -C "$w" rev-parse HEAD)
-  [ "$(git branch -r --contains "$h" 2>/dev/null | wc -l)" -eq 0 ] &&
-    echo "UNPUSHED: $w ($h)"
-done
+# before any encode: report authored work that is not yet durable
+python3 tools/worktrees.py
 ```
 
 `tests/test_index_integrity.py` validates every committed segment, video and
 tag file against its schema. The delivery chain is a report here, never a gate;
 the freshness procedures live in [`references/freshness.md`](references/freshness.md).
+Resolve findings in the worktree you own before rendering. Never alter another
+agent's checkout, and never withhold an already-requested film for its finding.
