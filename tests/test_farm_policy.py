@@ -6,9 +6,9 @@ workstation at 03:08Z on 2026-08-24 (a bare local x264 run of a 7+ minute act
 in scripts/build_credits.py): uncapped, and silent about being local at all.
 
 After the farm-first sweep, EVERY video encode flows through tools/farm.py's
-posture: ``run_ffmpeg_on_cluster`` / ``run_ffmpeg_commands_on_cluster`` /
-``run_ffmpeg_chain_on_cluster`` on the farm, or ``run_capped_local`` on this
-host -- memory-capped, with the reason printed. This file pins that in two
+remote posture: ``run_ffmpeg_on_cluster`` /
+``run_ffmpeg_commands_on_cluster`` /
+``run_ffmpeg_chain_on_cluster`` on the farm. This file pins that in two
 directions:
 
 * INVENTORY -- every known video-encode entry point must reference the farm
@@ -40,7 +40,7 @@ VIDEO_MARKERS = ('"libx264"', '"libx265"', "video_encode_args",
 
 # The farm posture, as token references in a function's CODE (docstrings are
 # stripped before the check -- a mention in prose is not a route).
-FARM_MARKERS = ("run_capped_local", "run_ffmpeg_on_cluster",
+FARM_MARKERS = ("run_ffmpeg_on_cluster",
                 "run_ffmpeg_commands_on_cluster",
                 "run_ffmpeg_chain_on_cluster", "cluster_available",
                 "run_encode")
@@ -49,19 +49,19 @@ FARM_MARKERS = ("run_capped_local", "run_ffmpeg_on_cluster",
 # reference the farm posture; ``via=`` names the helper it delegates the
 # posture to instead.
 FARMED = {
-    ("tools/plate.py", "burn"): "the burn's default local runner is capped",
-    ("tools/plate.py", "main"): "the burn CLI farms by default; --local caps",
+    ("tools/plate.py", "burn"): "the burn runs on the farm",
+    ("tools/plate.py", "main"): "the burn CLI farms and rejects --local",
     ("tools/conform.py", "ensure"): "delegates the encode to _encode",
     ("tools/conform.py", "_encode"): "the conform cache encodes on the farm",
-    ("tools/render.py", "still_clip"): "capped local executor",
-    ("tools/render.py", "cut_clip"): "capped local executor",
-    ("tools/render.py", "concat"): "capped local executor",
+    ("tools/render.py", "still_clip"): "farm executor",
+    ("tools/render.py", "cut_clip"): "farm executor",
+    ("tools/render.py", "concat"): "farm executor",
     ("tools/render.py", "render"): "the cut chains to one farm pod by default",
     ("tools/redact.py", "apply"): "the drawbox pass farms by default",
-    ("tools/megacut.py", "_segment_worker"): "a local segment is capped",
+    ("tools/megacut.py", "_segment_worker"): "segment executor",
     ("tools/megacut.py", "_farm_segment_worker"): "segments farm by default",
-    ("tools/social.py", "main"): "both passes share one farm pod; local caps",
-    ("tools/farm.py", "run_locally"): "the farm CLI's own fallback is capped",
+    ("tools/social.py", "main"): "both passes share one farm pod",
+    ("tools/farm.py", "run_locally"): "the local path is rejected",
     ("scripts/actbuild.py", "main"): "acts IV/V/VII farm by default",
     ("scripts/build_act1.py", "build_act1"): "act I's legs farm by default",
     ("scripts/build_credits.py", "main"): "the 03:08Z crasher itself",
@@ -74,7 +74,7 @@ FARMED = {
     "cluster_available's tuple is unpacked)",
     ("scripts/build_europa.py", "main"): "the master farms",
     ("scripts/build_prologue.py", "encode"): "the prologue farms",
-    ("scripts/build_prologue.py", "main"): "the --local escape caps",
+    ("scripts/build_prologue.py", "main"): "the --local path is rejected",
     ("scripts/build_trailer1.py", "main"): "the trailer farms, reruns too",
 }
 # A via= entry passes when it calls the named helper, which is itself in
@@ -83,10 +83,9 @@ FARMED_VIA = {
     ("tools/conform.py", "ensure"): "_encode(",
 }
 
-# Audio-only ffmpeg calls: the picture is stream-copied or absent, so they
-# are remuxes, not encodes, and stay local by design (the audio tenet). The
-# token is asserted present, so an exempt function that STARTS encoding video
-# fails here.
+# Audio-only ffmpeg calls: the picture is stream-copied or absent, so they are
+# remuxes, not encodes. The token is asserted present, so an exempt function
+# that STARTS encoding video fails here.
 EXEMPT_AUDIO_ONLY = {
     ("tools/audiomix.py", "mux"): '"-c:v", "copy"',
     ("tools/peaks.py", "rerun"): '"-c:v", "copy"',
@@ -315,41 +314,15 @@ def test_cluster_available_reports_a_failed_node_listing(monkeypatch):
     assert not ok and "nodes" in why
 
 
-def test_run_capped_local_wraps_in_the_memory_cap(monkeypatch, capsys):
-    """The cap is the whole point: the scope dies before the desktop does."""
-    seen = []
-    monkeypatch.setattr(farm, "_systemd_run_prefix",
-                        lambda: ["systemd-run", "--user", "--scope",
-                                 "-p", f"MemoryMax={farm.LOCAL_CAP_MAX}",
-                                 "-p", f"MemoryHigh={farm.LOCAL_CAP_HIGH}",
-                                 "--"])
-    import subprocess as sp
-    monkeypatch.setattr(sp, "run",
-                        lambda cmd, **kw: seen.append(cmd) or
-                        sp.CompletedProcess(cmd, 0))
-    farm.run_capped_local(["ffmpeg", "-i", "in.mp4", "out.mp4"],
-                          reason="the test asked for local")
-    cmd = seen[0]
-    assert cmd[:2] == ["systemd-run", "--user"]
-    assert f"MemoryMax={farm.LOCAL_CAP_MAX}" in cmd
-    assert f"MemoryHigh={farm.LOCAL_CAP_HIGH}" in cmd
-    assert cmd[cmd.index("--") + 1] == "ffmpeg"
-    assert "the test asked for local" in capsys.readouterr().err
+def test_run_capped_local_rejects_local_ffmpeg():
+    with pytest.raises(farm.FarmError, match="prohibited"):
+        farm.run_capped_local(["ffmpeg", "-i", "in.mp4", "out.mp4"],
+                              reason="the test asked for local")
 
 
-def test_run_capped_local_without_systemd_warns_loudly_and_runs(
-        monkeypatch, capsys):
-    """Degrade, never block: no systemd-run means the encode still runs."""
-    seen = []
-    monkeypatch.setattr(farm, "_systemd_run_prefix", lambda: [])
-    import subprocess as sp
-    monkeypatch.setattr(sp, "run",
-                        lambda cmd, **kw: seen.append(cmd) or
-                        sp.CompletedProcess(cmd, 0))
-    farm.run_capped_local(["ffmpeg", "x"], reason="why")
-    assert seen == [["ffmpeg", "x"]]
-    err = capsys.readouterr().err
-    assert "WITHOUT the memory cap" in err and "why" in err
+def test_run_capped_local_never_invokes_subprocess():
+    with pytest.raises(farm.FarmError, match="prohibited"):
+        farm.run_capped_local(["ffmpeg", "x"], reason="why")
 
 
 def test_run_encode_farms_when_the_cluster_answers(monkeypatch):
@@ -361,41 +334,27 @@ def test_run_encode_farms_when_the_cluster_answers(monkeypatch):
     assert where == "cluster" and farmed
 
 
-def test_run_encode_falls_back_capped_with_the_reason(monkeypatch, capsys):
-    seen = []
+def test_run_encode_rejects_unreachable_cluster(monkeypatch):
     monkeypatch.setattr(farm, "cluster_available",
                         lambda *a, **k: (False, "kubectl not on PATH"))
-    monkeypatch.setattr(farm, "run_capped_local",
-                        lambda cmd, reason, **kw: seen.append((cmd, reason)))
-    where = farm.run_encode(["ffmpeg", "-i", "a", "b"], inputs=["a"], out="b")
-    assert where == "local"
-    assert "kubectl not on PATH" in seen[0][1]
+    with pytest.raises(farm.FarmError, match="kubectl not on PATH"):
+        farm.run_encode(["ffmpeg", "-i", "a", "b"], inputs=["a"], out="b")
 
 
-def test_run_encode_retries_locally_when_the_farm_fails(monkeypatch):
-    """Nothing blocks a release: a FarmError is a stated local encode."""
-    seen = []
-
+def test_run_encode_does_not_retry_locally_when_the_farm_fails(monkeypatch):
     def boom(argv, **kw):
         raise farm.FarmError("pod cannot run: unschedulable")
     monkeypatch.setattr(farm, "cluster_available", lambda *a, **k: (True, ""))
     monkeypatch.setattr(farm, "run_ffmpeg_on_cluster", boom)
-    monkeypatch.setattr(farm, "run_capped_local",
-                        lambda cmd, reason, **kw: seen.append(reason))
-    where = farm.run_encode(["ffmpeg", "-i", "a", "b"], inputs=["a"], out="b")
-    assert where == "local"
-    assert "unschedulable" in seen[0]
+    with pytest.raises(farm.FarmError, match="unschedulable"):
+        farm.run_encode(["ffmpeg", "-i", "a", "b"], inputs=["a"], out="b")
 
 
 def test_run_encode_local_flag_never_probes_the_cluster(monkeypatch):
     monkeypatch.setattr(farm, "cluster_available",
                         lambda *a, **k: pytest.fail("probed under --local"))
-    seen = []
-    monkeypatch.setattr(farm, "run_capped_local",
-                        lambda cmd, reason, **kw: seen.append(reason))
-    assert farm.run_encode(["ffmpeg", "x"], inputs=[], out="o",
-                           local=True) == "local"
-    assert seen == ["--local given"]
+    with pytest.raises(farm.FarmError, match="prohibited"):
+        farm.run_encode(["ffmpeg", "x"], inputs=[], out="o", local=True)
 
 
 # --- the chain runner: render.py's clips -> concat shape, rewritten --------

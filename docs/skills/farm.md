@@ -33,12 +33,10 @@ also running the agent sessions, so the remote path is both faster and the one
 that does not starve the session that asked for it.
 
 Every encode entry point in the repo takes this posture by itself now
-(`tests/test_farm_policy.py` pins it): farm when the cluster answers, and when
-it does not — or the operator passed `--local` — the same argv runs on this
-host **memory-capped** (`farm.run_capped_local`, a systemd scope with
-MemoryMax=12G / MemoryHigh=10G) with the reason printed. A bare uncapped local
-x264 run is what OOM-killed the owner's workstation at 03:08Z on 2026-08-24.
-Local is a stated, bounded fallback — never silent, never unbounded.
+(`tests/test_farm_policy.py` pins it): ffmpeg runs on the farm. If the cluster
+does not answer, or the operator passes `--local`, the tool reports the reason
+and stops. **There is no local ffmpeg fallback.** A bare local x264 run is what
+OOM-killed the owner's workstation at 03:08Z on 2026-08-24.
 
 - Re-encoding a Prod act, a megacut segment, or any single long file
 - Assembling the programme — `tools/megacut.py` farms its ENCODE segments and
@@ -53,7 +51,7 @@ Local is a stated, bounded fallback — never silent, never unbounded.
   the two-pass byte-budget arithmetic, then runs both passes in one farm pod
   when the cluster is reachable so x264's stats file survives between them.
 - PNG/card/plate rendering and probes that do not encode video
-- An operator explicitly supplied `--local` after accepting workstation load
+- An operator explicitly supplied `--local`; local ffmpeg is never permitted
 
 ## Core Process
 
@@ -80,7 +78,7 @@ python3 tools/farm.py in.mp4 --out out.mp4 --audio-args "-c:a aac -b:a 192k" -- 
 Useful flags: `--segments N`, `--threads N` (default 6 — x264 flattens past
 ~8), `--reference FILE` (verify against a known-good encode, comparing codec
 and geometry too), `--keep` (leave the Workflow + PVC for debugging),
-`--local` (explicit workstation permission), `--dry-run`. Never pass
+`--dry-run`. Never pass
 `--node`; Kubernetes chooses between the scheduler-eligible nodes.
 
 ### Megacut assembly is remote end to end
@@ -108,16 +106,14 @@ A new build script never shells out to ffmpeg itself. It takes the posture
 from `tools/farm.py`:
 
 - `farm.run_encode(argv, inputs=[...], out=..., local=args.local)` — one
-  encode; farms when the cluster answers, else `run_capped_local` with the
-  reason printed, and a `FarmError` mid-encode falls back the same way.
+  encode; rejects `local=True`, farms when the cluster answers, and raises a
+  `FarmError` when the cluster is unavailable or a farm encode fails.
 - `farm.run_ffmpeg_chain_on_cluster(argvs, inputs=..., out=..., tmp_prefix=...,
   text_files=...)` — ordered commands whose intermediates (render.py's clips,
   act II's parts, a concat list) live and die in one pod; only `out` comes
   back.
-- `farm.run_capped_local(cmd, reason=...)` — the fallback primitive: prints
-  the reason, runs the encode under the 12G scope, warns loudly and runs
-  uncapped only when systemd-run itself is unavailable (degrade, never
-  block).
+- `farm.run_capped_local(cmd, reason=...)` — a guard that raises
+  `FarmError`; it must never invoke local ffmpeg.
 
 Audio-only ffmpeg calls (video stream-copied or absent) are exempt from all
 of this and stay local — `tests/test_farm_policy.py` holds the whitelist.

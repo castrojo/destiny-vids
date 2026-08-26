@@ -487,17 +487,15 @@ it has to buy more than tidiness.
   and it is not also running the agent sessions, so local encoding is slower
   *and* it starves the thing asking for it.
 
-  Local is a **fallback with a stated reason**, never a default and never
-  silent: a tool that quietly encodes here because the cluster was awkward has
-  the bug the ruling above names. `tools/farm.py` is the reference posture —
-  cluster unless `cluster_available()` says otherwise, `--local` as an explicit
-  escape hatch.
+  **FFmpeg must never run locally.** A cluster outage is reported and the
+  encode stops; there is no workstation fallback and no `--local` escape hatch.
+  A tool that invokes ffmpeg on this host has violated the release contract.
+  `tools/farm.py` is the reference posture: every ffmpeg encode runs in the
+  cluster, and unavailable-cluster conditions are explicit failures.
 
-  And never UNCAPPED: a bare local x264 run of a full act OOM-killed this
-  workstation at 03:08Z on 2026-08-24. Every local fallback encode runs under
-  `farm.run_capped_local`'s systemd memory scope, and
-  `tests/test_farm_policy.py` statically pins the posture for every
-  video-encode entry point.
+  Never run a local x264 fallback: a bare local x264 run of a full act OOM-killed
+  this workstation at 03:08Z on 2026-08-24. `tests/test_farm_policy.py` pins
+  the remote-only posture for every video-encode entry point.
 
   Both nodes carry the `linuxserver/ffmpeg` image; pods submit with
   `imagePullPolicy: IfNotPresent` (the registry mirror times out on a plain

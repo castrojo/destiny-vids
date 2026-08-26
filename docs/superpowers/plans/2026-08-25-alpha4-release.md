@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - The release identifier is `alpha4`; the canonical running order, item count, trim points, authored copy, and delivery layout remain unchanged.
-- Encoding is remote-first: use the Kubernetes farm when reachable, and use only the repository's capped local fallback when the cluster is unavailable, with the reason printed.
+- FFmpeg must never run locally; use the Kubernetes farm for every ffmpeg encode, and report a cluster outage as an explicit failure.
 - Do not invent missing copy or cast a person without evidence.
 - Do not move an authored beat to satisfy a layout or gate constraint.
 - Do not hand-edit derived fields, generated outputs, delivery digests, or files in `~/Videos/Wolves`.

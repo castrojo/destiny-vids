@@ -308,18 +308,8 @@ def _fake_ffmpeg(tmp_path):
     return [str(exe)]
 
 def test_local_run_executes_chunks_and_join(tmp_path, monkeypatch):
-    src = tmp_path / "in.mp4"
-    src.write_bytes(b"footage" * 100)
-    plan = farm.build_plan(facts=facts(duration=4.0, frame_count=120),
-                           out_name="o.mp4", segments=3, video_args=[],
-                           audio_args=[], threads=6,
-                           work_dir=str(tmp_path / "w"), src_arg=str(src),
-                           ffmpeg=tuple(_fake_ffmpeg(tmp_path)))
-    farm.run_locally(plan, workers=2)
-    out = Path(plan["join"][-1])
-    assert out.read_bytes() == b"footage" * 100 * 3
-    # Progress files were written, which is what the monitor thread reads.
-    assert list((tmp_path / "w" / "logs").glob("*.progress"))
+    with pytest.raises(farm.FarmError, match="prohibited"):
+        farm.run_locally({}, workers=2)
 
 def test_local_run_reports_a_failing_chunk(tmp_path, monkeypatch):
     src = tmp_path / "in.mp4"
@@ -328,7 +318,7 @@ def test_local_run_reports_a_failing_chunk(tmp_path, monkeypatch):
                            video_args=[], audio_args=[], threads=6,
                            work_dir=str(tmp_path / "w"), src_arg=str(src),
                            ffmpeg=("false",))
-    with pytest.raises(farm.FarmError, match="chunk"):
+    with pytest.raises(farm.FarmError, match="prohibited"):
         farm.run_locally(plan, workers=2)
 
 # --------------------------------------------------------------------------

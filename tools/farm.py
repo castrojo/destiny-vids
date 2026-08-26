@@ -48,10 +48,10 @@ covers neither ``jrottenberg/*`` on ghcr nor on docker.io. Widening that
 allowlist is a ``lab/`` change and out of scope here; ``lscr.io`` is
 allowlisted wholesale and linuxserver/ffmpeg is the same class of full build.
 
-DEGRADE, NEVER BLOCK: if the cluster is unreachable the tool says so once and
-runs the same segmented encode locally with ``tools.render.find_ffmpeg``.
-``--local`` forces that path; ``--keep`` leaves the Workflow and PVC for
-debugging; ``--dry-run`` prints the plan and manifest and does nothing.
+If the cluster is unreachable the tool reports the reason and stops. Local
+ffmpeg execution is forbidden; ``--local`` is rejected. ``--keep`` leaves the
+Workflow and PVC for debugging; ``--dry-run`` prints the plan and manifest and
+does nothing.
 
 BOTH NODES ARE THE FARM. Nothing is pinned by default: exo-0 and ghost each
 have 32 allocatable cores, neither is tainted, and BOTH carry the ffmpeg image
@@ -76,11 +76,9 @@ the cluster is reachable, per the owner's ruling, and local is the stated
 fallback, never the silent one.
 
 THE POSTURE EVERY CALLER TAKES is ``run_encode``: farm when the cluster
-answers, and when it does not — or the operator passed ``--local`` — the same
-argv runs here under ``run_capped_local``, which wraps the encode in a
-memory-capped systemd scope (a bare local x264 run of a full act OOM-killed
-the owner's workstation at 03:08Z; "DO NOT CRASH MY COMPUTER"). A local
-encode is always allowed, but it is never silent and never unbounded.
+answers, and otherwise raise ``FarmError`` with the reason. Local ffmpeg is
+never allowed (a bare local x264 run of a full act OOM-killed the owner's
+workstation at 03:08Z; "DO NOT CRASH MY COMPUTER").
 ``run_ffmpeg_chain_on_cluster`` covers the remaining shape: ordered commands
 whose intermediates (render.py's clips, act II's parts, a concat list) live
 and die inside one pod workspace.
@@ -719,25 +717,8 @@ def _systemd_run_prefix():
 
 
 def run_capped_local(cmd, reason, **kwargs):
-    """Run one unavoidable LOCAL encode inside a memory-capped scope.
-
-    The reason is printed every time — a local encode is a fallback with a
-    stated cause, never a silent default. The cap is the one in
-    ``LOCAL_CAP_MAX``/``LOCAL_CAP_HIGH``: the box has 31 GB and the
-    workstation-wide OOM killer fired at ~12.9 GB, so the scope dies before
-    the desktop does. With no usable systemd-run the warning is loud and the
-    encode runs UNCAPPED — degrade, never block. ``kwargs`` go straight to
-    ``subprocess.run`` (check, capture_output, stdout, ...).
-    """
-    print(f"farm: LOCAL encode — {reason}", file=sys.stderr)
-    prefix = _systemd_run_prefix()
-    if not prefix:
-        print("farm: WARNING — systemd-run is unavailable, so this local "
-              "encode runs WITHOUT the memory cap that keeps the workstation "
-              "alive. Fix the user manager or use the farm.",
-              file=sys.stderr)
-        return subprocess.run([str(t) for t in cmd], **kwargs)
-    return subprocess.run([*prefix, *[str(t) for t in cmd]], **kwargs)
+    """Reject local ffmpeg execution."""
+    raise FarmError(f"local ffmpeg execution is prohibited: {reason}")
 
 
 def run_encode(argv, *, inputs, out, local=False, reason=None,
@@ -745,46 +726,31 @@ def run_encode(argv, *, inputs, out, local=False, reason=None,
                label=None, **cluster_kw):
     """One video encode, on the farm whenever the farm answers.
 
-    This is the posture AGENTS.md rules — "always prefer remote encoding when
-    available" — as a function, so every builder takes it identically. The
-    argv is the same either way; only the CPUs differ:
+    This is the posture AGENTS.md requires: every builder uses the cluster.
 
     * cluster reachable -> the argv runs verbatim in a pod
       (``run_ffmpeg_on_cluster``, or ``run_ffmpeg_chain_on_cluster`` when
       ``text_files``/``tmp_prefix`` name pod-side intermediates) and the
       output is fetched back to ``out``.
-    * ``local=True``, an unreachable cluster, or a FarmError mid-encode ->
-      the same argv runs here under ``run_capped_local``'s memory cap with
-      the reason printed. A farm that fails mid-encode is a reason to say so
-      and keep going, never a reason to hand back no video.
-
-    Returns ``"cluster"`` or ``"local"`` so the caller can record whose CPUs
-    did the work.
+    ``local=True``, an unreachable cluster, or a FarmError mid-encode raises
+    ``FarmError`` with the reason. It never executes ffmpeg locally.
     """
     argv = [str(t) for t in argv]
-    why = reason or "--local given"
-    if not local:
-        ok, unavailable = cluster_available()
-        if ok:
-            try:
-                if text_files or tmp_prefix:
-                    run_ffmpeg_chain_on_cluster(
-                        [argv], inputs=inputs, out=out, text_files=text_files,
-                        tmp_prefix=tmp_prefix,
-                        expected_duration=expected_duration, label=label,
-                        **cluster_kw)
-                else:
-                    run_ffmpeg_on_cluster(
-                        argv, inputs=inputs, out=out,
-                        expected_duration=expected_duration, label=label,
-                        **cluster_kw)
-                return "cluster"
-            except FarmError as exc:
-                why = f"the cluster encode failed ({exc})"
-        else:
-            why = f"the cluster is not reachable ({unavailable})"
-    run_capped_local(argv, reason=why, check=True)
-    return "local"
+    if local:
+        raise FarmError("local ffmpeg execution is prohibited (--local given)")
+    ok, unavailable = cluster_available()
+    if not ok:
+        raise FarmError(f"the cluster is not reachable ({unavailable})")
+    if text_files or tmp_prefix:
+        run_ffmpeg_chain_on_cluster(
+            [argv], inputs=inputs, out=out, text_files=text_files,
+            tmp_prefix=tmp_prefix, expected_duration=expected_duration,
+            label=label, **cluster_kw)
+    else:
+        run_ffmpeg_on_cluster(
+            argv, inputs=inputs, out=out, expected_duration=expected_duration,
+            label=label, **cluster_kw)
+    return "cluster"
 
 
 def _stream_logs(kc, pod, prefix="  "):
@@ -1435,8 +1401,8 @@ def _local_progress(plan, done):
 
 
 def run_locally(plan, *, workers):
-    """The same plan, run here. Used by --local and by the unreachable-cluster
-    fallback — degrade to a slower encode, never to no encode."""
+    """Reject the local ffmpeg execution path."""
+    raise FarmError("local ffmpeg execution is prohibited")
     from concurrent.futures import ThreadPoolExecutor
 
     for c in plan["chunks"]:
