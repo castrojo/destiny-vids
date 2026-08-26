@@ -149,6 +149,14 @@ probe/decode record alongside its media and review PNGs. Inspect the encode log
 in its first minute for graph failures, but do not rely on Argo logs remaining
 available after success.
 
+Make every expected output value a workflow parameter or a value derived from
+`target_frames`: derive duration as `target_frames / 24`, derive review indices
+in the workflow shell, and use the same values in both probes and extraction.
+Decode with `ffmpeg -xerror -v error -i <output> -f null -`, capture stderr
+into an uploaded record, and write a decode PASS only after its zero exit.
+Probe all streams: include `format=nb_streams,duration`, require one stream,
+and explicitly fail if any `codec_type=audio` appears in the recorded probe.
+
 - [ ] Per-video measurements and source/asset provenance are in `verify-notes.md`.
 - [ ] `target_frames`, uniform `setpts` factor, 24 fps output, and effective
   speed are recorded from the measured bed.
