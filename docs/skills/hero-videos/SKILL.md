@@ -1,6 +1,6 @@
 ---
 name: hero-videos
-version: "1.2"
+version: "1.3"
 last_updated: "2026-08-26"
 id: hero-videos
 one_line_purpose: Build a hero character music video from a paper-background animation.
@@ -98,6 +98,10 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
   includes probes, audio measurement, extraction, decode checks, and final
   verification—not only production encodes. Local Pillow/OpenCV inspection of
   already-produced PNGs and ordinary Python metadata work are allowed.
+- **Keep local measurement helpers process-free.** A helper may use
+  Pillow/OpenCV to measure inputs or hash returned Argo artifacts, but it must
+  not shell out to a media executable or regenerate local video-derived probes.
+  Record the manifest, workflow ID, and returned-artifact hashes instead.
 - **`floodfill`'s `d0`/`d1`/`d2` are planar G,B,R.** `d0=0:d1=255:d2=0` renders
   BLUE — the key is `colorkey=0x0000FF`.
 - **Fill before the tight crop**, and apply the matte to the **original** pixels.
@@ -148,6 +152,8 @@ are prohibited.
 
 - A local `ffmpeg` or `ffprobe` invocation for any hero source, audio, preview,
   or delivery check.
+- A Python measurement helper that hides a local media-tool invocation behind
+  `subprocess`, or presents a historical local probe as current reproduction.
 - A source timeline fitted with `tpad`, a tail trim, loop, or editorial hold
   instead of one bed-driven retime.
 - A fill seed accepted from a single frame, or final-still alpha switched in
