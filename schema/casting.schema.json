@@ -8,6 +8,10 @@
       "additionalProperties": { "$ref": "#/$defs/person" },
       "propertyNames": { "$ref": "#/$defs/login" }
     },
+    "legacy_cast_logins": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/login" }
+    },
     "leads": {
       "type": "object",
       "required": ["values"],

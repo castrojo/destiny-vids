@@ -619,7 +619,7 @@ def test_avatar_login_takes_that_accounts_github_picture():
                  "  - avatar_login: KyleGospo\n")
     assert entry["avatar"] == "renders/avatars/KyleGospo.png"
     assert entry["avatar_url"] == \
-        "https://github.com/KyleGospo.png?size=256"
+        "https://avatars.githubusercontent.com/u/10704358?v=4"
     assert "avatar_login" not in entry, \
         "an authoring key reached the manifest"
 
@@ -627,9 +627,9 @@ def test_avatar_login_takes_that_accounts_github_picture():
 def test_cast_takes_the_portrait_the_casting_vocab_records():
     entry = _one("## 0:00\n\nJoseph @ 0:00 +2.2: Is it worth it?\n"
                  "  - cast: joseph_sandoval\n")
-    assert entry["avatar"] == "renders/avatars/joseph_sandoval.png"
+    assert entry["avatar"] == "renders/avatars/jrsapi.png"
     assert entry["avatar_url"] == \
-        __import__("tools.identity", fromlist=["load_people"]).load_people()["jrsapi"].plate["avatar"]
+        "https://avatars.githubusercontent.com/u/5437766?v=4"
     assert "cast" not in entry
 
 
@@ -643,17 +643,36 @@ def test_naming_somebody_with_no_recorded_portrait_draws_the_crest():
 
 def test_a_speaker_who_is_a_login_still_needs_no_portrait_row():
     entry = _one("## 0:00\n\nkylegospo @ 0:00 +2.2: Sup\n")
-    assert entry["avatar_url"] == "https://github.com/kylegospo.png?size=256"
+    assert entry["avatar_url"] == "https://avatars.githubusercontent.com/u/10704358?v=4"
 
 
-def test_the_two_portrait_keys_are_not_interchangeable():
-    """Collapsing them would swap faces on eight delivered pills."""
+def test_the_two_portrait_keys_resolve_to_one_canonical_identity():
     by_cast = _one("## 0:00\n\nA1RM4X @ 0:00 +2.2: hi\n  - cast: a1rm4x\n")
     by_login = _one("## 0:00\n\nA1RM4X @ 0:00 +2.2: hi\n"
                     "  - avatar_login: A1RM4X\n")
-    assert by_login["avatar_url"] == "https://github.com/A1RM4X.png?size=256"
-    if "avatar_url" in by_cast:
-        assert by_cast["avatar_url"] != by_login["avatar_url"]
+    assert by_cast["avatar_url"] == by_login["avatar_url"] == \
+        "https://avatars.githubusercontent.com/u/2750931?v=4"
+
+
+def test_extract_uses_a_login_row_instead_of_copying_a_manifest_url():
+    rows = chapter_md._extract_entry(
+        {"id": "joseph", "kind": "chat", "speaker": "Joseph", "text": "Hi",
+         "at": 0.0, "dur": 2.2, "avatar": "renders/avatars/joseph_sandoval.png",
+         "avatar_url": "https://github.com/joseph_sandoval.png?size=256"},
+        0.0, {},
+    )
+    assert "  - avatar_login: jrsapi" in rows
+    assert not any("avatar_url:" in row for row in rows)
+
+
+def test_extract_refuses_an_unmapped_literal_avatar_url():
+    with pytest.raises(ValueError, match="canonical GitHub login"):
+        chapter_md._extract_entry(
+            {"id": "unknown", "kind": "chat", "speaker": "Unknown", "text": "Hi",
+             "at": 0.0, "dur": 2.2, "avatar": "renders/avatars/nope.png",
+             "avatar_url": "https://github.com/nope.png?size=256"},
+            0.0, {},
+        )
 
 
 # --- decks: copy that plays AFTER the act, authored inside it ---------------

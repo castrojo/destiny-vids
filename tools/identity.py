@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 import sys
 
@@ -28,24 +29,39 @@ class Person:
     plate: dict | None
 
 
-def _casting(path=None):
-    with (Path(path) if path else DEFAULT_CASTING_PATH).open(encoding="utf-8") as fh:
+def _path_key(path=None):
+    return str((Path(path) if path else DEFAULT_CASTING_PATH).resolve())
+
+
+@lru_cache
+def _casting(path_key):
+    with Path(path_key).open(encoding="utf-8") as fh:
         return yaml.safe_load(fh) or {}
+
+
+@lru_cache
+def _people(path_key):
+    return {
+        login: Person(login, int(record["github_id"]),
+                      dict(record["plate"]) if record.get("plate") else None)
+        for login, record in (_casting(path_key).get("people") or {}).items()
+    }
 
 
 def load_people(path=None) -> dict[str, Person]:
     """Return people keyed by their stored, case-preserving GitHub login."""
-    return {
-        login: Person(login, int(record["github_id"]),
-                      dict(record["plate"]) if record.get("plate") else None)
-        for login, record in (_casting(path).get("people") or {}).items()
-    }
+    return _people(_path_key(path))
+
+
+@lru_cache
+def _folded_logins(path_key):
+    return {login.casefold(): login for login in _people(path_key)}
 
 
 def canonical_login(value: str, people=None) -> str:
     """Normalize only a known login; names and historical personas are invalid."""
-    people = load_people() if people is None else people
-    folded = {login.casefold(): login for login in people}
+    folded = (_folded_logins(_path_key()) if people is None
+              else {login.casefold(): login for login in people})
     try:
         return folded[str(value).casefold()]
     except KeyError as exc:
@@ -55,9 +71,9 @@ def canonical_login(value: str, people=None) -> str:
 def person_for_character(character: str, casting=None) -> Person | None:
     """Resolve a cast character through its GitHub-login person binding."""
     if casting is None:
-        casting = _casting()
+        casting = _casting(_path_key())
     elif isinstance(casting, (str, Path)):
-        casting = _casting(casting)
+        casting = _casting(_path_key(casting))
     binding = ((casting.get("leads") or {}).get("values") or {}).get(character) or {}
     login = binding.get("person")
     if not login:
@@ -68,6 +84,33 @@ def person_for_character(character: str, casting=None) -> Person | None:
         for key, record in (casting.get("people") or {}).items()
     }
     return people.get(login)
+
+
+def login_for_cast_key(value: str, casting=None) -> str:
+    """Resolve a transitional ``cast:`` key to a canonical GitHub login.
+
+    The mapping only bridges existing raw chapter authoring while it migrates;
+    it carries no plate copy and never turns a display name into an identity.
+    """
+    if casting is None:
+        casting = _casting(_path_key())
+    elif isinstance(casting, (str, Path)):
+        casting = _casting(_path_key(casting))
+    people = {
+        login: Person(login, int(record["github_id"]),
+                      dict(record["plate"]) if record.get("plate") else None)
+        for login, record in (casting.get("people") or {}).items()
+    }
+    try:
+        return canonical_login(value, people)
+    except UnknownPerson:
+        person = person_for_character(value, casting)
+        if person:
+            return person.login
+        migrated = (casting.get("legacy_cast_logins") or {}).get(value)
+        if migrated:
+            return canonical_login(migrated, people)
+        raise
 
 
 def chat_identity(login: str, people=None) -> dict:
@@ -89,7 +132,7 @@ def _chapters():
 
 def audit(act=None, path=None):
     """Return identity findings without withholding an incomplete release."""
-    casting = _casting(path)
+    casting = _casting(_path_key(path))
     people = load_people(path)
     findings = []
     ids = {}

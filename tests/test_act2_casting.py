@@ -1,7 +1,7 @@
 """Act II (Endless Forms Most Beautiful) — the show's first plated act.
 
 The live-action trailers' Guardians are anonymous, so the people the owner
-cast onto them live in `ensemble.titles` (keyed by GitHub login), and the
+cast onto them live in the shared `people` records (keyed by GitHub login), and the
 re-authored Karena plate lives on her `mara_sov` lead binding. Every string
 here is owner-supplied verbatim; these tests pin the copy so no later pass
 "corrects" it, and pin the recorded GAPS so they stay gaps rather than being
@@ -10,11 +10,15 @@ invented word is forbidden.
 """
 
 from pathlib import Path
+import sys
 
 import pytest
 import yaml
 
 from tools.derive import load_ensemble_titles, load_leads
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import build_efmb_plates  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 RAW = (REPO_ROOT / "vocab" / "casting.yaml").read_text(encoding="utf-8")
@@ -30,6 +34,11 @@ def test_every_act2_identity_is_recorded():
     """A binding that is not written down is a person who goes uncredited."""
     for key in ACT2:
         assert key in TITLES, key
+
+
+def test_act_two_builder_reads_identity_copy_from_people():
+    assert build_efmb_plates.authored_copy("joseph_sandoval", CASTING) == TITLES["jrsapi"]
+    assert build_efmb_plates.authored_copy("shuah_khan", CASTING) == TITLES["shuahkh"]
 
 
 def test_ricardo_rocha_is_wreath_chrome_with_a_deliberately_bare_class():

@@ -177,7 +177,7 @@ _LEGACY_LOGIN_SHAPE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 # in exactly one place. So a chapter file names the PERSON and the resolution
 # happens here:
 #
-#   - cast: joseph_sandoval     the portrait vocab/casting.yaml records
+#   - cast: joseph_sandoval     a transitional key mapped to a GitHub login
 #   - avatar_login: KyleGospo   this GitHub account's picture
 #
 # Both are AUTHORING keys: they are consumed here and never reach the
@@ -186,12 +186,9 @@ _LEGACY_LOGIN_SHAPE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 # second copy of a casting fact, and the second copy is always the one that
 # goes wrong.
 #
-# They are two keys because they answer two different questions. `cast` is
-# "whatever the casting record says", which is right for somebody whose
-# portrait is not a GitHub picture at all; `avatar_login` is "this account's
-# picture", which is what act II's owner-seated pills were built from even
-# for people whose casting record names a different image. Collapsing them
-# would silently swap portraits on eight delivered pills.
+# They are two keys because release-train chapter files still carry `cast:`
+# labels. Both resolve to the same canonical GitHub identity, whose numeric
+# account ID determines the generated portrait URL.
 PORTRAIT_KEYS = ("cast", "avatar_login")
 
 # Keys whose value is a list even when it appears once: writing one `- body:`
@@ -1116,20 +1113,21 @@ def _resolve_default(key, value, line, entry):
         return value
     if key == "text_source":
         return "owner_supplied" if line.get("text") else "placeholder"
-    from tools.identity import UnknownPerson, canonical_login
+    from tools.identity import UnknownPerson, chat_identity
     try:
-        canonical_login(line.get("speaker") or "")
+        identity = chat_identity(line.get("speaker") or "")
     except UnknownPerson:
         # Existing chapters are literal pre-migration authoring. Keep a
         # previously-rendered lowercase portrait stable while audit reports the
         # speaker; newly normalized chapters resolve through People above.
         if not _LEGACY_LOGIN_SHAPE.match(line.get("speaker") or ""):
             return None
-    if key == "avatar":
-        return f"renders/avatars/{line['speaker']}.png"
-    if key == "avatar_url":
-        return f"https://github.com/{line['speaker']}.png?size=256"
-    return None
+        if key == "avatar":
+            return f"renders/avatars/{line['speaker']}.png"
+        if key == "avatar_url":
+            return f"https://github.com/{line['speaker']}.png?size=256"
+        return None
+    return identity.get(key)
 
 
 def _portrait(named):
@@ -1143,29 +1141,15 @@ def _portrait(named):
     """
     if not named:
         return None
-    from tools.identity import UnknownPerson, canonical_login, person_for_character
+    from tools.identity import UnknownPerson, chat_identity, login_for_cast_key
     try:
         login = named.get("avatar_login")
         if login:
-            canonical_login(login)
-            return {"avatar": f"renders/avatars/{login}.png",
-                    "avatar_url": f"https://github.com/{login}.png?size=256"}
+            return chat_identity(login)
         key = named.get("cast", "")
-        person = person_for_character(key)
+        return chat_identity(login_for_cast_key(key))
     except UnknownPerson:
         return {}
-    if person and (person.plate or {}).get("avatar"):
-        return {"avatar": f"renders/avatars/{key}.png",
-                "avatar_url": person.plate["avatar"]}
-    # A raw pre-migration chapter can still carry a historical portrait key.
-    # It is audited as a legacy override and does not identify the speaker.
-    import yaml
-    with (REPO_ROOT / "vocab" / "casting.yaml").open(encoding="utf-8") as fh:
-        legacy = ((yaml.safe_load(fh) or {}).get("ensemble") or {}) \
-            .get("legacy_titles", {}).get(key, {})
-    if not legacy.get("avatar"):
-        return {}
-    return {"avatar": f"renders/avatars/{key}.png", "avatar_url": legacy["avatar"]}
 
 
 def _ordered(entry, order):
@@ -1294,7 +1278,7 @@ def _extract_entry(plate, offset, defaults):
 
 
 def _portrait_row(plate, predicted):
-    """The ``cast:``/``avatar_login:`` row that restores a plate's picture.
+    """The login-keyed authoring row that restores a plate's picture.
 
     A lift that wrote the URL out longhand would move a casting fact into a
     second file, so the picture is described by WHO it is of. ``None`` when
@@ -1303,19 +1287,20 @@ def _portrait_row(plate, predicted):
     is lost.
     """
     avatar, url = plate.get("avatar"), plate.get("avatar_url")
-    if not avatar or not url:
+    if not avatar and not url:
         return None
     if predicted.get("avatar") == avatar and predicted.get("avatar_url") == url:
         return None
-    key = str(avatar).rsplit("/", 1)[-1].removesuffix(".png")
-    from tools.identity import UnknownPerson, canonical_login
+    key = str(avatar or "").rsplit("/", 1)[-1].removesuffix(".png")
+    from tools.identity import UnknownPerson, login_for_cast_key
     try:
-        canonical = canonical_login(key)
+        canonical = login_for_cast_key(key)
     except UnknownPerson:
-        return None
-    if url == f"https://github.com/{key}.png?size=256":
-        return f"avatar_login: {canonical}"
-    return None
+        raise ValueError(
+            "cannot extract a literal avatar URL without a canonical GitHub "
+            f"login: {url!r}"
+        ) from None
+    return f"avatar_login: {canonical}"
 
 
 def _attr_rows(key, value):

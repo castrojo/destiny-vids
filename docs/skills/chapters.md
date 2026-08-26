@@ -290,6 +290,6 @@ into the dialogue. The integration order matters:
 python3 -m pytest -q tests/test_chapter_md.py tests/test_chapter_identity.py
 python3 -m pytest -q tests/test_full_script.py
 python3 tools/chapter_md.py check
-python3 tools/identity.py --check
+python3 tools/identity.py --act <migrated-act> --check
 python3 scripts/generate_full_script.py --check
 ```

@@ -143,7 +143,7 @@ stranger happens to hold the handle.
 ```bash
 # every binding is queryable, both directions
 python3 -m pytest -q tests/test_search.py tests/test_derive.py
-python3 tools/identity.py --check
+python3 tools/identity.py
 
 # what derived for one video
 python3 - <<'PY'

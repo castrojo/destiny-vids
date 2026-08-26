@@ -83,27 +83,36 @@ def parse_tc(text):
 
 
 def _speaker_label(cue, leads):
-    """The character key and its bound GitHub login."""
-    character = cue.get("character") or ""
-    entry = leads.get(character) or {}
-    return entry.get("person") or character
+    """The character key is the stable, unambiguous dialogue identity."""
+    return cue.get("character") or ""
 
 
 def _resolve_character(label, leads):
     """A heading's speaker back to a canonical ``leads`` key.
 
-    Accepts the character name, any ``aka`` spelling, or its bound login.
+    Accepts the character name, any ``aka`` spelling, or an unambiguous bound
+    login.
     """
     name = re.sub(r"\s*\(.*?\)\s*$", "", label).strip()
     key = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
     for character, entry in leads.items():
-        person = re.sub(r"[^a-z0-9]+", "_",
-                        str(entry.get("person") or "").lower()).strip("_")
-        if key == character or key == person or key in {
+        if key == character or key in {
             re.sub(r"[^a-z0-9]+", "_", a.lower()).strip("_")
             for a in (entry.get("aka") or [])
         }:
             return character
+    matches = [
+        character for character, entry in leads.items()
+        if key == re.sub(r"[^a-z0-9]+", "_",
+                         str(entry.get("person") or "").lower()).strip("_")
+    ]
+    if len(matches) == 1:
+        return matches[0]
+    if len(matches) > 1:
+        raise ValueError(
+            f"{label.strip()!r} is an ambiguous GitHub login for "
+            f"{', '.join(sorted(matches))}; use the character key"
+        )
     return None
 
 

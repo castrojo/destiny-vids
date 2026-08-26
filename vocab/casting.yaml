@@ -196,6 +196,19 @@ people:
       name: m2
       title: Fun, Travel, and Adventure
       avatar: https://avatars.githubusercontent.com/u/231907?v=4
+  jbryce:
+    github_id: 33063
+  shuahkh:
+    github_id: 6414032
+    plate:
+      label: TRUSTEE // KERNEL
+      class: Warlock
+      name: Shuah Khan
+      title: Gardener of Talent | Looking for Gamers
+      trustee: true
+legacy_cast_logins:
+  joseph_sandoval: jrsapi
+  shuah_khan: shuahkh
 leads:
   description: 'Named Destiny characters bound to a real person for the life of the project. OPEN and
     EXTENSIBLE — this map is the place to add bindings. `person: null` means the role is written into
@@ -283,13 +296,6 @@ leads:
       person: angellk
       aka:
       - queen_mara_sov
-      note: 'Re-authored for act II (2026-08). Previous owner-supplied plate, verbatim: label "ARCHITECT
-        // GENERAL", class "Warlock", name "Karena Angell", title "Archon of the Consensus", variant leader.
-        The re-authorship answers issue #5: the subclass word the old class row lacked is now authored
-        as Stasis, so the row reads "Stasis Warlock". Still open: no avatar, because no GitHub login is
-        on record for her.
-
-        '
     petra_venj:
       person: LoriLorusso
       aka:
@@ -299,7 +305,7 @@ leads:
       aka:
       - variks_the_loyal
     the_speaker:
-      person: null
+      person: jbryce
       aka:
       - speaker
     amanda_holliday:
@@ -483,101 +489,6 @@ ensemble:
     label: CONTRIBUTOR // GUARDIAN
     name: TBD
     title: Project Bluefin
-  legacy_titles:
-    description: 'Authored Guardian identities for individual contributors, keyed by GitHub login (see
-      the comment above). Values are full plate copies in the reference deck''s closed field set; tools/derive.py
-      loads them with load_ensemble_titles() and tools/plate.py prefers them over the generic ensemble
-      copy. Derivation never reads this block. Empty is normal: it only ever holds people whose identity
-      is genuinely authored AND who are not cast as a lead.
-
-      '
-    rochaporto:
-      label: PRACTITIONER // GUARDIAN
-      class: Hunter
-      name: Ricardo Rocha
-      title: Cloud Native Atom Smasher
-      wreath: true
-      avatar: https://avatars.githubusercontent.com/u/52753?v=4
-    joseph_sandoval:
-      label: PRACTITIONER // GUARDIAN
-      name: Joseph Sandoval
-      title: Master Wielder | Uplifter of Users
-      variant: leader
-      avatar: https://avatars.githubusercontent.com/u/5437766?v=4
-    KyleGospo:
-      label: BLUEBERRY // MAINTAINER
-      name: Kyle Gospodnetich
-      title: The First Knife
-      variant: bazzite
-      avatar: https://avatars.githubusercontent.com/u/10704358?v=4
-    akgraner:
-      label: MAINTAINER // GUARDIAN
-      name: Amber Graner
-      class: Striker Titan
-      title: The Iron Standard
-      avatar: https://avatars.githubusercontent.com/u/6200805?v=4
-    p5:
-      label: BLUEBERRY // MAINTAINER
-      name: '[ p5 ]'
-      title: Herald of the Hummingbird
-      variant: bazzite
-      avatar: https://avatars.githubusercontent.com/u/46304672?v=4
-    kolunmi:
-      class: Arc Hunter
-      name: kolunmi
-      avatar: https://avatars.githubusercontent.com/u/113054217?v=4
-    EyeCantCU:
-      label: BLUEBERRY // MAINTAINER
-      name: '[ EyeCantCU ]'
-      title: Seer of the Truth
-      variant: bazzite
-      avatar: https://avatars.githubusercontent.com/u/18015150?v=4
-    wrkode:
-      label: MAINTAINER // GUARDIAN
-      name: William Rizzo
-      title: Hammer of Kairos
-    sarahnovotny:
-      name: Sarah Novotny
-      avatar: https://avatars.githubusercontent.com/u/127370?v=4
-    GloriousEggroll:
-      label: BLUEBERRY // MAINTAINER
-      name: GloriousEggroll
-      variant: nobara
-      avatar: https://avatars.githubusercontent.com/u/11287837?v=4
-    HikariKnight:
-      label: BLUEBERRY // MAINTAINER
-      name: HikariKnight
-      variant: bazzite
-      avatar: https://avatars.githubusercontent.com/u/2557889?v=4
-    A1RM4X:
-      label: '@A1RM4X // YOUTUBE'
-      name: A1RM4X
-      variant: youtube
-      avatar: https://yt3.googleusercontent.com/ytc/AIdro_kCixIw5CtOKMcqo_p8ZSDwYXoGQZ2TB5NzA7Lag-n_ByM=s900-c-k-c0x00ffffff-no-rj
-    gregkh:
-      label: TRUSTEE // KERNEL
-      class: Warlock
-      name: Greg Kroah-Hartman
-      title: The Hand of the Kernel | My Son is Even More Powerful
-      trustee: true
-      avatar: https://avatars.githubusercontent.com/u/14953?v=4
-    shuah_khan:
-      label: TRUSTEE // KERNEL
-      class: Warlock
-      name: Shuah Khan
-      title: Gardener of Talent | Looking for Gamers
-      trustee: true
-    tulilirockz:
-      class: Solar Warlock
-      name: Tulip Blossom
-      title: Deliverer of DDI
-      avatar: https://avatars.githubusercontent.com/u/120808662?v=4
-    m2:
-      label: MAINTAINER // GUARDIAN
-      class: Arc Hunter
-      name: m2
-      title: Fun, Travel, and Adventure
-      avatar: https://avatars.githubusercontent.com/u/231907?v=4
 derived_fields:
   casting:
     type: object

@@ -1090,26 +1090,29 @@ def load_casting():
 
 
 def _titles(casting):
-    return {k: v for k, v in casting["ensemble"]["titles"].items()
-            if k != "description"}
+    return {
+        login: dict(record["plate"])
+        for login, record in (casting.get("people") or {}).items()
+        if record.get("plate")
+    }
 
 
 def authored_copy(key, casting):
     """The plate copy for ``key``, verbatim from vocab/casting.yaml.
 
-    Two places hold authored copy and they are not interchangeable: a LEAD's
-    plate lives on its binding (Karena is cast as Mara Sov), and an individual
-    contributor's lives under ``ensemble.titles``. Reproducing, never
-    composing, is the whole rule -- so this raises rather than falling back to
-    generic copy if a key is missing, because a silent fallback would put the
-    blueberry plate on somebody whose identity the owner actually wrote.
+    Person records are the one home for identity copy. Transitional ``cast:``
+    keys resolve through the vocabulary's key-to-login migration map, so the
+    raw Act II authoring remains legible without a second plate map.
     """
+    from tools.identity import UnknownPerson, login_for_cast_key
+
     titles = _titles(casting)
-    if key in titles:
-        return dict(titles[key])
-    binding = casting.get("leads", {}).get("values", {}).get(key)
-    if binding and binding.get("plate"):
-        return dict(binding["plate"])
+    try:
+        login = login_for_cast_key(key, casting)
+    except UnknownPerson:
+        login = None
+    if login in titles:
+        return dict(titles[login])
     raise KeyError(
         f"no authored plate copy for {key!r} in vocab/casting.yaml -- copy is "
         "reproduced, never composed, so this is a gap for the owner to fill "
@@ -1170,10 +1173,9 @@ def blueberry_entry(item, at, dur, casting):
 def localise_avatar(key, copy):
     """Point a plate's ``avatar`` at the local cache, keeping the URL as source.
 
-    Returns the copy unchanged when there is no avatar -- Karena has none,
-    because no GitHub login for her is on record anywhere in this repo and a
-    login is not an agent's to guess (issue #87). A wreath with no portrait to
-    ring is a recorded gap, not a reason to invent one.
+    Returns the copy unchanged when the authored plate has no portrait. A
+    missing authored image stays missing; it is never replaced with invented
+    copy.
     """
     url = copy.get("avatar")
     if not url or not str(url).startswith("http"):

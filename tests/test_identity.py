@@ -9,6 +9,7 @@ from tools.identity import (
     UnknownPerson,
     canonical_login,
     chat_identity,
+    login_for_cast_key,
     load_people,
     person_for_character,
 )
@@ -23,6 +24,7 @@ def casting():
 
 def test_character_resolves_to_its_assigned_github_person():
     assert person_for_character("mara_sov").login == "angellk"
+    assert person_for_character("the_speaker").login == "jbryce"
 
 
 def test_login_spelling_is_canonical_but_display_names_are_not_aliases():
@@ -33,6 +35,33 @@ def test_login_spelling_is_canonical_but_display_names_are_not_aliases():
 
 def test_chat_identity_uses_the_stable_github_account_id():
     assert chat_identity("akgraner")["avatar_url"].endswith("/6200805?v=4")
+
+
+def test_legacy_cast_key_migrates_without_copying_a_second_plate():
+    assert login_for_cast_key("joseph_sandoval") == "jrsapi"
+    assert login_for_cast_key("shuah_khan") == "shuahkh"
+    assert "legacy_titles" not in casting()["ensemble"]
+
+
+def test_identity_parsing_and_casefold_index_are_cached(monkeypatch):
+    import tools.identity as identity
+
+    identity._casting.cache_clear()
+    identity._people.cache_clear()
+    identity._folded_logins.cache_clear()
+    calls = 0
+    original = identity.yaml.safe_load
+
+    def counted(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(identity.yaml, "safe_load", counted)
+    load_people()
+    canonical_login("hikariknight")
+    chat_identity("akgraner")
+    assert calls == 1
 
 
 def test_every_bound_lead_references_one_person_record():
@@ -59,7 +88,7 @@ def test_numeric_github_ids_and_authored_plates_live_only_in_people():
 
 
 def test_ensemble_titles_are_the_people_records_not_a_second_map():
-    assert "titles" not in casting()["ensemble"]
+    assert not {"titles", "legacy_titles"} & set(casting()["ensemble"])
     assert all(person.plate is not None
                for person in load_people().values()
                if person.login in {"rochaporto", "akgraner", "KyleGospo"})

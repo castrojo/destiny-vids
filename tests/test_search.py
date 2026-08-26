@@ -137,6 +137,11 @@ def test_cast_names_route_to_casting_filters():
         assert val in parsed["filters"].get(facet, set()), (query, parsed["filters"])
 
 
+def test_authored_person_name_routes_to_the_canonical_login():
+    parsed = search.parse_query("Karena Angell footage")
+    assert parsed["filters"]["casting.person"] == {"angellk"}
+
+
 def test_ensemble_role_is_queryable():
     segs = search.load_segments(EXAMPLES)
     out = search.search("anonymous guardians", segs)

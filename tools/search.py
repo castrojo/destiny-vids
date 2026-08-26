@@ -122,13 +122,13 @@ CAST_SHORTHAND = {
 }
 
 
-def _cast_phrases(leads):
+def _cast_phrases(leads, people):
     """Query phrases for every lead binding, straight from the vocabulary.
 
     ``vocab/casting.yaml`` is the single source of truth for the cast
     (AGENTS.md), and this table used to be a hand-kept second copy of it --
     two tests existed only to assert the two agreed. A character key, each of
-    its ``aka`` spellings, and the bound person's id and display name are all
+    its ``aka`` spellings, and the bound person's login and authored plate name are all
     spellings somebody will type, so all four become phrases; the residue that
     a vocabulary genuinely cannot carry is ``CAST_SHORTHAND`` above.
     """
@@ -153,8 +153,8 @@ def _cast_phrases(leads):
         person = entry.get("person")
         if person:
             add(person, "casting.person", person)
-            if entry.get("display_name"):
-                add(entry["display_name"], "casting.person", person)
+            plate = (people.get(person).plate if people.get(person) else None) or {}
+            add(plate.get("name"), "casting.person", person)
     for phrase, (facet, value) in CAST_SHORTHAND.items():
         add(phrase, facet, value)
     return out
@@ -169,9 +169,10 @@ def _load_cast_phrases():
     """
     try:
         from tools.derive import load_leads
+        from tools.identity import load_people
     except ImportError:  # running as a script with tools/ on sys.path
         from derive import load_leads
-    for phrase, contributions in _cast_phrases(load_leads()).items():
+    for phrase, contributions in _cast_phrases(load_leads(), load_people()).items():
         PHRASES.setdefault(phrase, []).extend(contributions)
 
 

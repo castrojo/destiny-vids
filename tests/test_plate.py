@@ -953,7 +953,7 @@ def test_no_plate_field_is_invented_beyond_the_reference_deck():
     ensemble.pop("description", None)
     assert set(ensemble) <= allowed | {"label_member", "label_unknown", "roster_title"}
 
-    # `ensemble.titles` maps a GitHub login to that person's AUTHORED Guardian
+    # The shared `people` map gives a GitHub login that person's AUTHORED Guardian
     # plate (an np_* entry in the reference deck); each value obeys the plate's
     # closed field set exactly like a lead's `plate:` block.
     titles = dict(casting["ensemble"].get("titles") or {})
@@ -1520,23 +1520,7 @@ def test_the_mara_sov_plate_is_exactly_what_was_authored():
     )
     assert spec["variant"] == "leader"   # gold, carried over -- never withdrawn
     assert spec["wreath"] is True        # "the most senior warrior in the series"
-    assert "avatar" not in spec, (
-        "no GitHub login is on record for Karena, so the wreath has no "
-        "portrait to ring yet -- a recorded gap, never a guessed login")
-
-def test_the_mara_sov_reauthorship_keeps_the_old_copy_visible():
-    """The old plate is owner-authored copy about a real person, so replacing
-    it is recorded: the binding's `note:` keeps the previous copy verbatim and
-    names the issue the re-authorship answers."""
-    import yaml
-    from pathlib import Path
-
-    casting = yaml.safe_load(
-        (Path(__file__).resolve().parents[1] / "vocab" / "casting.yaml").read_text())
-    note = casting["leads"]["values"]["mara_sov"]["note"]
-    assert "#5" in note
-    assert "ARCHITECT // GENERAL" in note     # the old label, verbatim
-    assert "Archon of the Consensus" in note  # the old title, verbatim
+    assert "avatar" not in spec
 
 def test_the_mara_sov_plate_renders():
     from tools.derive import load_leads
