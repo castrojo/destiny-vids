@@ -21,9 +21,9 @@
    "footage_rights": {
     "yt_nightwish_perfume_of_the_timeless": "music/bed_perfume_of_the_timeless.json"
    },
-   "source_digest": "c8092c9d0635cca7f1f91ea756dfd2bb67d6a08bbd37388c0614514985f15966",
+   "source_digest": "a86baef261e6f356c867daee5facf5fda6a73532f56c7629e9c44fe404c38b8a",
    "footage_digest": "fac9a6c7d103836f454d7c1c49181c2983ecbed43ca01f0f2bcc1e9a924a635a",
-   "built_from_commit": "07b719a5964cc62a7d15e27bc591b5680d78e5d3"
+   "built_from_commit": "f78608d9d44cd954b68a954713222192269e14ec"
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
@@ -239,7 +239,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "87217779d8a243a1325e1994c5efe37b909bfaf1ae7e520d9f47165930c2af73"
+   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
   },
   "renders/perfume-3.mp4": {
    "note": "Perfume movement 3, clean. Same chain as movement 2.",
@@ -248,7 +248,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "87217779d8a243a1325e1994c5efe37b909bfaf1ae7e520d9f47165930c2af73"
+   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
   },
   "renders/intermission/03-intermission.mp4": {
    "note": "The intermission slide deck that concludes the mrbobbytables section. Silent -- the owner's different song is not chosen yet. CARRIES AUTHORED COPY, which is why the chapter file, the plate manifest, tools/plate.py and vocab/casting.yaml are all declared: every one of them restates what a slide says. Right now every word is lorem ipsum and the deck credits nobody, so a change here changes prose and not a claim about a person -- that stops being true the moment real copy lands.",
@@ -268,7 +268,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "87217779d8a243a1325e1994c5efe37b909bfaf1ae7e520d9f47165930c2af73"
+   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
   },
   "renders/perfume-4-overlays.mp4": {
    "note": "Movement 4's overlay derivative: the wallpaper swaps and the chat exchange. CARRIES AUTHORED COPY ABOUT REAL PEOPLE, which is why the plate manifest, tools/plate.py and vocab/casting.yaml are all declared -- a change to any of them restates somebody's words.",
@@ -280,7 +280,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "3888ca1b530c1fdf14d2f5d9c3c284b5a2d71a4659f446df51e39b19c4219d0c"
+   "source_digest": "103b0f102fc0f4ec693515920eeec87f070013900e0e90b1d438777232e0e849"
   },
   "renders/perfume-5.mp4": {
    "note": "Perfume movement 5, clean base: the dark Earth limb before the impact. Stays clean by the thread's own rule.",
@@ -289,7 +289,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "87217779d8a243a1325e1994c5efe37b909bfaf1ae7e520d9f47165930c2af73"
+   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
   },
   "renders/perfume-5-ending.mp4": {
    "note": "Movement 5's overlay derivative: the impact, the underwater passage and its eleven closing lines. CARRIES AUTHORED COPY ABOUT REAL PEOPLE -- the ending cards.",
