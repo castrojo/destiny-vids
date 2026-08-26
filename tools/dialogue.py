@@ -72,11 +72,8 @@ def _identity_for(character, leads):
     login = entry.get("person")
     if not login:
         return None
-    from tools.identity import UnknownPerson, chat_identity
-    try:
-        return chat_identity(login)
-    except UnknownPerson:
-        return None
+    from tools.identity import chat_identity
+    return chat_identity(login)
 
 
 def _avatar_for(character, leads):
