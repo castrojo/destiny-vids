@@ -31,8 +31,8 @@ work, including audio-only probes, bed construction, and delivery measurement.
 That stricter hero policy overrides the generic local examples and exemptions
 in this runbook. For an authorized Hero source, follow the
 [hero-scoped Argo audio recipe](hero-videos/references/authorized-audio-on-argo.md);
-do not apply a local command from this file. The recipe does not assert that an
-authorized song source exists.
+do not apply a local command from this file. Its separate bed and
+mux/validation workflows do not assert that an authorized song source exists.
 
 ## When to Use
 

@@ -27,6 +27,7 @@ metadata:
   context7-sources:
     - /websites/ffmpeg_documentation
     - /websites/opencv_4_13_0
+    - /argoproj/argo-workflows
 ---
 
 # Hero videos
@@ -54,17 +55,22 @@ override the fallback with per-video static cards. Timed-card playlists retain
 their exact frame intervals and do not add a persistent card beneath them.
 **The builder reads the record; nothing is hand-placed.**
 
-1. Measure the source, bed, title treatment, fill seeds, and character union in
+1. Measure the source, title treatment, fill seeds, and character union in
    Argo; record every source-specific result in the matching `verify-notes.md`.
-   If an audio source is authorized, use the remote-only
-   [authorized-audio recipe](references/authorized-audio-on-argo.md); it
-   produces the bed and its record without using a local media command.
+   If an audio source is authorized, first submit the remote-only
+   [bed workflow](references/authorized-audio-on-argo.md#stage-1--bed-workflow).
+   It has no picture dependency and returns the gated, native-rate PCM bed and
+   its record without using a local media command.
 2. Build and test the full-frame overlay from the record.
 3. In Argo, derive the alpha from a verified full-frame fill, preserve original
    colour pixels, apply any completed-art closing still alpha, then crop, scale,
    position, and uniformly retime the source.
-4. Mux the measured bed once, then perform all decode, audio, metadata, and
-   delivered-frame checks in Argo.
+4. Submit the separate
+   [mux/validation workflow](references/authorized-audio-on-argo.md#stage-2--mux-and-validation-workflow).
+   It hash-verifies the picture and original bed, applies one candidate static
+   gain, makes one AAC encode, and performs all decode, audio, metadata, and
+   delivered-frame checks in Argo. Re-submit from the original bed when a
+   decoded candidate needs a different gain; never use a prior AAC candidate.
 
 ```bash
 cd ~/src/dv-hero-videos
@@ -75,7 +81,8 @@ cp renders/rafi01-overlay.png ~/Videos/Wolves/Hero/.work-rafi01/
 kubectl create -f ~/Videos/Wolves/Hero/.work-rafi01/rafi01-encode-v4.yaml
 ```
 
-Then mux the bed unchanged, and verify in Argo. The bed defines
+Then use the separate mux/validation workflow against the verified bed and
+picture, and verify in Argo. The bed defines
 `target_frames = round(T * 24)`; uniformly retime the complete source with
 `setpts=(target_frames/source_frames)*PTS`, explicitly emit 24 fps, and do not
 cut, loop, or hold the ending to fit. Full detail — the filter graph, and the

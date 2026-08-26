@@ -45,9 +45,9 @@ auditions, and verification. **Do not run local `ffmpeg`, `ffprobe`,
 `audio-source.sh`, or `audio-check.sh` for Hero audio.** When an audio source
 is authorized, use the hero-scoped
 [Argo recipe](../hero-videos/references/authorized-audio-on-argo.md) instead.
-It performs format identity, silence, spectrum, native-rate PCM, loudness, AAC,
-and upload work remotely. This document makes no claim that a Hero song source
-is authorized or available.
+Its separate bed and mux/validation workflows perform format identity, silence,
+spectrum, native-rate PCM, loudness, AAC, and upload work remotely. This
+document makes no claim that a Hero song source is authorized or available.
 
 ## When to Use
 
