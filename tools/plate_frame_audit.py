@@ -28,6 +28,23 @@ THUMB_SIZE = (320, 180)
 CELL_WIDTH = 360
 CELL_PADDING = 16
 CONTACT_COLUMNS = 3
+ROW_FIELDS = (
+    "plate_id",
+    "expected_index",
+    "manifest_index",
+    "at",
+    "dur",
+    "sample_at",
+    "speaker",
+    "text",
+    "avatar",
+    "avatar_filename",
+    "avatar_sha256",
+    "plate_png",
+    "frame",
+    "status",
+    "findings",
+)
 
 
 def _path(value) -> Path:
@@ -146,10 +163,25 @@ def _extract_frame(delivered_video, sample_at: float, out_path: Path, ffmpeg=Non
     return True, None
 
 
-def _missing(missing: list[dict], plate_id: str, status: str, **extra):
+def _row(plate_id: str, expected_index: int) -> dict:
+    row = dict.fromkeys(ROW_FIELDS)
+    row.update({
+        "plate_id": plate_id,
+        "expected_index": expected_index,
+        "status": "ok",
+        "findings": [],
+    })
+    return row
+
+
+def _missing(missing: list[dict], row: dict | None, plate_id: str, status: str, **extra):
     finding = {"plate_id": plate_id, "status": status}
     finding.update({key: value for key, value in extra.items() if value is not None})
     missing.append(finding)
+    if row is not None:
+        row["findings"].append(finding)
+        if row["status"] == "ok":
+            row["status"] = status
 
 
 def _contact_lines(row: dict) -> list[str]:
@@ -226,19 +258,30 @@ def audit_frames(delivered_video, manifest, plates_dir, expected_ids, out_dir, f
     plates_root = _path(plates_dir)
     entries = _manifest_entries(manifest)
     by_id = {entry.get("id"): (index, entry) for index, entry in enumerate(entries)}
+    expected_ids = list(expected_ids)
     frames = []
     missing = []
 
-    for plate_id in list(expected_ids):
+    for expected_index, plate_id in enumerate(expected_ids):
+        row = _row(plate_id, expected_index)
         found = by_id.get(plate_id)
         if found is None:
-            _missing(missing, plate_id, "missing_cue")
+            _missing(missing, row, plate_id, "missing_cue")
+            frames.append(row)
             continue
         manifest_index, entry = found
         at = entry.get("at")
         dur = entry.get("dur")
+        row.update({
+            "manifest_index": manifest_index,
+            "speaker": _canonical_speaker(entry),
+            "text": _exact_copy(entry),
+            "avatar": entry.get("avatar"),
+            "avatar_filename": Path(entry["avatar"]).name if entry.get("avatar") else None,
+        })
         if not isinstance(at, (int, float)) or not isinstance(dur, (int, float)):
-            _missing(missing, plate_id, "missing_cue", reason="missing at/dur")
+            _missing(missing, row, plate_id, "missing_cue", reason="missing at/dur")
+            frames.append(row)
             continue
 
         sample_at = round(float(at) + float(dur) / 2.0, 3)
@@ -246,49 +289,45 @@ def audit_frames(delivered_video, manifest, plates_dir, expected_ids, out_dir, f
         avatar_path = _avatar_file(entry)
         frame_path = out_dir / f"{FRAME_PREFIX}{plate_id}.png"
 
-        row = {
-            "plate_id": plate_id,
-            "manifest_index": manifest_index,
+        row.update({
             "at": float(at),
             "dur": float(dur),
             "sample_at": sample_at,
-            "speaker": _canonical_speaker(entry),
-            "text": _exact_copy(entry),
-            "avatar": entry.get("avatar"),
-            "avatar_filename": Path(entry["avatar"]).name if entry.get("avatar") else None,
-            "avatar_sha256": None,
             "plate_png": str(plate_png) if plate_png.is_file() else None,
-            "frame": None,
-        }
+        })
 
         if row["plate_png"] is None:
-            _missing(missing, plate_id, "missing_plate_png", path=str(plate_png))
+            _missing(missing, row, plate_id, "missing_plate_png", path=str(plate_png))
 
-        if entry.get("avatar_required"):
-            if avatar_path and avatar_path.is_file():
+        if avatar_path:
+            if avatar_path.is_file():
                 row["avatar_sha256"] = _sha256(avatar_path)
             else:
-                _missing(
-                    missing, plate_id, "missing_required_avatar",
-                    path=str(avatar_path) if avatar_path else entry.get("avatar"),
-                )
+                _missing(missing, row, plate_id, "missing_avatar", path=str(avatar_path))
+        elif entry.get("avatar_required"):
+            _missing(missing, row, plate_id, "missing_required_avatar")
 
         ok, detail = _extract_frame(delivered_video, sample_at, frame_path, ffmpeg=ffmpeg)
         if ok:
             row["frame"] = str(frame_path)
         else:
-            _missing(missing, plate_id, "missing_frame", path=str(frame_path), detail=detail)
+            _missing(missing, row, plate_id, "missing_frame", path=str(frame_path), detail=detail)
 
         frames.append(row)
 
-    contact_sheet = _draw_contact_sheet(frames, out_dir / CONTACT_SHEET_NAME)
+    contact_sheet_rows = sorted(
+        (row for row in frames if row["frame"] and row["manifest_index"] is not None),
+        key=lambda row: row["manifest_index"],
+    )
+    contact_sheet = _draw_contact_sheet(contact_sheet_rows, out_dir / CONTACT_SHEET_NAME)
     report = {
         "delivered_video": str(_path(delivered_video)),
         "manifest": str(_path(manifest)) if isinstance(manifest, (str, Path)) else None,
         "plates_dir": str(plates_root),
-        "expected_ids": list(expected_ids),
+        "expected_ids": expected_ids,
         "frames": frames,
         "missing": missing,
+        "contact_sheet_plate_ids": [row["plate_id"] for row in contact_sheet_rows],
         "contact_sheet": str(contact_sheet),
         "report": str(out_dir / REPORT_NAME),
     }

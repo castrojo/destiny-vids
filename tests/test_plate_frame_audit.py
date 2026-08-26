@@ -98,24 +98,35 @@ def test_audit_frames_reports_midpoints_hashes_and_written_artifacts(tmp_path, m
         delivered,
         manifest,
         plates_dir,
-        expected_ids=["d23a", "d01"],
+        expected_ids=["d23a", "d01", "missing"],
         out_dir=out_dir,
         ffmpeg=[sys.executable, str(fake_ffmpeg)],
     )
 
-    assert report["expected_ids"] == ["d23a", "d01"]
-    assert [row["plate_id"] for row in report["frames"]] == ["d23a", "d01"]
-    assert [row["sample_at"] for row in report["frames"]] == [2.234, 10.556]
-    assert [row["speaker"] for row in report["frames"]] == ["angellk", "mrbobbytables"]
-    assert report["missing"] == []
+    assert report["expected_ids"] == ["d23a", "d01", "missing"]
+    assert [row["plate_id"] for row in report["frames"]] == ["d23a", "d01", "missing"]
+    assert [row["sample_at"] for row in report["frames"]] == [2.234, 10.556, None]
+    assert [row["speaker"] for row in report["frames"]] == ["angellk", "mrbobbytables", None]
+    assert [row["status"] for row in report["frames"]] == ["ok", "ok", "missing_cue"]
+    assert [finding["status"] for finding in report["missing"]] == ["missing_cue"]
+    missing_row = report["frames"][2]
+    assert missing_row["manifest_index"] is None
+    assert missing_row["frame"] is None
+    assert [finding["status"] for finding in missing_row["findings"]] == ["missing_cue"]
+    assert report["contact_sheet_plate_ids"] == ["d01", "d23a"]
     assert Path(report["report"]).exists()
     assert Path(report["contact_sheet"]).exists()
-    assert all(Path(row["frame"]).exists() for row in report["frames"])
+    assert all(Path(row["frame"]).exists() for row in report["frames"][:2])
     assert report["frames"][0]["avatar_filename"] == "angellk.png"
     assert report["frames"][0]["avatar_sha256"] == hashlib.sha256(
         avatar2.read_bytes()).hexdigest()
     assert report["frames"][1]["avatar_sha256"] == hashlib.sha256(
         avatar1.read_bytes()).hexdigest()
+    assert set(report["frames"][0]) == set(missing_row)
+
+    saved_report = json.loads((out_dir / "frame-audit.json").read_text(encoding="utf-8"))
+    assert [row["plate_id"] for row in saved_report["frames"]] == ["d23a", "d01", "missing"]
+    assert saved_report["contact_sheet_plate_ids"] == ["d01", "d23a"]
 
     ffmpeg_calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
     assert ffmpeg_calls == [
@@ -132,23 +143,34 @@ def test_audit_frames_collects_missing_cue_plate_avatar_and_frame(tmp_path, monk
     delivered = tmp_path / "delivered.mp4"
     delivered.write_bytes(b"video")
     manifest = {
-        "plates": [{
-            "id": "d01",
-            "at": 4.0,
-            "dur": 2.0,
-            "kind": "chat",
-            "speaker": "angellk",
-            "text": "Hello",
-            "avatar": str(tmp_path / "avatars" / "angellk.png"),
-            "avatar_required": True,
-        }]
+        "plates": [
+            {
+                "id": "d01",
+                "at": 4.0,
+                "dur": 2.0,
+                "kind": "chat",
+                "speaker": "angellk",
+                "text": "Hello",
+                "avatar": str(tmp_path / "avatars" / "angellk.png"),
+                "avatar_required": True,
+            },
+            {
+                "id": "d02",
+                "at": 8.0,
+                "dur": 2.0,
+                "kind": "chat",
+                "speaker": "clubanderson",
+                "text": "Hi",
+                "avatar_required": True,
+            },
+        ]
     }
 
     report = audit.audit_frames(
         delivered,
         manifest,
         tmp_path / "plates",
-        expected_ids=["missing", "d01"],
+        expected_ids=["missing", "d01", "d02"],
         out_dir=tmp_path / "audit",
         ffmpeg=[sys.executable, str(fake_ffmpeg)],
     )
@@ -156,15 +178,76 @@ def test_audit_frames_collects_missing_cue_plate_avatar_and_frame(tmp_path, monk
     assert [item["status"] for item in report["missing"]] == [
         "missing_cue",
         "missing_plate_png",
+        "missing_avatar",
+        "missing_frame",
+        "missing_plate_png",
         "missing_required_avatar",
+    ]
+    assert [row["plate_id"] for row in report["frames"]] == ["missing", "d01", "d02"]
+    assert report["missing"][0]["plate_id"] == "missing"
+    missing_row, d01_row, d02_row = report["frames"]
+    assert missing_row["status"] == "missing_cue"
+    assert missing_row["frame"] is None
+    assert d01_row["plate_png"] is None
+    assert d01_row["avatar_sha256"] is None
+    assert d01_row["frame"] is None
+    assert [finding["status"] for finding in d01_row["findings"]] == [
+        "missing_plate_png",
+        "missing_avatar",
         "missing_frame",
     ]
-    assert report["missing"][0]["plate_id"] == "missing"
-    row = report["frames"][0]
-    assert row["plate_id"] == "d01"
-    assert row["plate_png"] is None
-    assert row["avatar_sha256"] is None
-    assert row["frame"] is None
+    assert d02_row["avatar"] is None
+    assert d02_row["avatar_sha256"] is None
+    assert [finding["status"] for finding in d02_row["findings"]] == [
+        "missing_plate_png",
+        "missing_required_avatar",
+    ]
+    assert set(missing_row) == set(d01_row) == set(d02_row)
+
+
+def test_audit_frames_audits_referenced_optional_avatars_only_when_present(tmp_path):
+    fake_ffmpeg = tmp_path / "fake_ffmpeg.py"
+    write_fake_ffmpeg(fake_ffmpeg)
+
+    delivered = tmp_path / "delivered.mp4"
+    delivered.write_bytes(b"video")
+    plates_dir = tmp_path / "plates"
+    write_png(plates_dir / "plate_d01.png")
+    write_png(plates_dir / "plate_d02.png")
+
+    report = audit.audit_frames(
+        delivered,
+        {
+            "plates": [
+                {
+                    "id": "d01",
+                    "at": 1.0,
+                    "dur": 2.0,
+                    "speaker": "angellk",
+                    "text": "hello",
+                    "avatar": str(tmp_path / "avatars" / "missing.png"),
+                },
+                {
+                    "id": "d02",
+                    "at": 4.0,
+                    "dur": 2.0,
+                    "speaker": "clubanderson",
+                    "text": "world",
+                },
+            ]
+        },
+        plates_dir,
+        expected_ids=["d01", "d02"],
+        out_dir=tmp_path / "audit",
+        ffmpeg=[sys.executable, str(fake_ffmpeg)],
+    )
+
+    assert [finding["status"] for finding in report["missing"]] == ["missing_avatar"]
+    d01_row, d02_row = report["frames"]
+    assert [finding["status"] for finding in d01_row["findings"]] == ["missing_avatar"]
+    assert d02_row["status"] == "ok"
+    assert d02_row["avatar"] is None
+    assert d02_row["findings"] == []
 
 
 def test_cli_loads_recovery_ids_in_ledger_order_and_check_fails_on_missing(tmp_path):
@@ -234,6 +317,7 @@ def test_cli_loads_recovery_ids_in_ledger_order_and_check_fails_on_missing(tmp_p
     report = json.loads((out_dir / "frame-audit.json").read_text(encoding="utf-8"))
     assert report["expected_ids"] == ["d23a", "d01"]
     assert [row["plate_id"] for row in report["frames"]] == ["d23a", "d01"]
+    assert report["contact_sheet_plate_ids"] == ["d01", "d23a"]
 
     assert audit.main([
         "--delivered", str(delivered),

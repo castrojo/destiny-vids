@@ -150,6 +150,12 @@ This skill is the contract. The procedure lives in `references/`:
 | [`avatars.md`](references/avatars.md) | The credits avatar cache and the Actions job that fetches it. |
 | [`freshness.md`](references/freshness.md) | Keeping delivery current across `cards / plates -> master -> Prod -> megacut -> 10mb/`. |
 
+## Sources
+
+- Context7: `/websites/ffmpeg_documentation`, verified 2026-08-26 for output
+  seeking with `-ss` after `-i` and single-frame extraction with
+  `-frames:v 1`.
+
 ## Red Flags
 
 - A new act's master that never went through `tools/peaks.py`.
