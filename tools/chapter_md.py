@@ -169,8 +169,7 @@ GITHUB_URL = re.compile(
 # A field of the entry above it. Repeating a key builds a list, which is how
 # a card's `body` rows keep their order without any punctuation to count.
 ATTR = re.compile(r"^\s*-\s+(?P<key>[A-Za-z_][A-Za-z0-9_]*)\s*:\s?(?P<value>.*)$")
-LOGIN_SHAPE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
-GITHUB_AVATAR = "https://github.com/{login}.png?size=256"
+_LEGACY_LOGIN_SHAPE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 
 # WHERE A PORTRAIT COMES FROM, AND WHY IT IS NOT TYPED HERE.
 #
@@ -178,7 +177,7 @@ GITHUB_AVATAR = "https://github.com/{login}.png?size=256"
 # in exactly one place. So a chapter file names the PERSON and the resolution
 # happens here:
 #
-#   - cast: joseph_sandoval     the portrait vocab/casting.yaml records
+#   - cast: joseph_sandoval     a transitional key mapped to a GitHub login
 #   - avatar_login: KyleGospo   this GitHub account's picture
 #
 # Both are AUTHORING keys: they are consumed here and never reach the
@@ -187,12 +186,9 @@ GITHUB_AVATAR = "https://github.com/{login}.png?size=256"
 # second copy of a casting fact, and the second copy is always the one that
 # goes wrong.
 #
-# They are two keys because they answer two different questions. `cast` is
-# "whatever the casting record says", which is right for somebody whose
-# portrait is not a GitHub picture at all; `avatar_login` is "this account's
-# picture", which is what act II's owner-seated pills were built from even
-# for people whose casting record names a different image. Collapsing them
-# would silently swap portraits on eight delivered pills.
+# They are two keys because release-train chapter files still carry `cast:`
+# labels. Both resolve to the same canonical GitHub identity, whose numeric
+# account ID determines the generated portrait URL.
 PORTRAIT_KEYS = ("cast", "avatar_login")
 
 # Keys whose value is a list even when it appears once: writing one `- body:`
@@ -823,9 +819,8 @@ def emitted_entries(act):
 
     ``entries`` above is the chapter file's own reading of itself. An act
     whose builder MOVES a seat between the file and the manifest -- act II,
-    whose `paused` block rebases the pins authored after it and whose
-    ``source_anchor`` rows are seated on the frames they name -- resolves to
-    something the delivered master does not carry, and every command an
+    whose ``source_anchor`` rows are seated on the frames they name -- resolves
+    to something the delivered master does not carry, and every command an
     editor is pointed at (``show``, ``check``) has to describe the film that
     ships rather than the file's raw schedule.
 
@@ -935,6 +930,15 @@ def _split_entries(act, *, include_block_labels=False):
         into = (deck if deck_label and block["label"] == deck_label else out)
         for n, (line, start, hold) in enumerate(zip(block["lines"],
                                                     at, holds), 1):
+            if line["kind"] == "chat":
+                from tools.identity import RESERVED_SPEAKERS, UnknownPerson, canonical_login
+                if line["speaker"] not in RESERVED_SPEAKERS:
+                    try:
+                        canonical_login(line["speaker"])
+                    except UnknownPerson:
+                        unresolved.append(
+                            f"legacy-speaker: {line['speaker']} (no GitHub login "
+                            "is inferred)")
             entry = build_entry(act, b, n, line, start, hold,
                                 defaults, order)
             if include_block_labels:
@@ -1028,6 +1032,8 @@ def build_entry(act, b, n, line, start, hold, defaults, order=None):
             del entry["id"]
 
     if line["kind"] == "chat":
+        # The release train still carries literal pre-migration speakers.
+        # Keep their on-screen spelling until the owning act normalizes them.
         entry["speaker"] = line["speaker"]
         entry["text"] = line["text"]
     elif line["kind"] == "boss":
@@ -1106,43 +1112,21 @@ def _resolve_default(key, value, line, entry):
         return value
     if key == "text_source":
         return "owner_supplied" if line.get("text") else "placeholder"
-    speaker = line.get("speaker") or ""
-    if not LOGIN_SHAPE.match(speaker):
+    from tools.identity import UnknownPerson, chat_identity
+    try:
+        identity = chat_identity(line.get("speaker") or "")
+    except UnknownPerson:
+        # Existing chapters are literal pre-migration authoring. Keep a
+        # previously-rendered lowercase portrait stable while audit reports the
+        # speaker; newly normalized chapters resolve through People above.
+        if not _LEGACY_LOGIN_SHAPE.match(line.get("speaker") or ""):
+            return None
+        if key == "avatar":
+            return f"renders/avatars/{line['speaker']}.png"
+        if key == "avatar_url":
+            return f"https://github.com/{line['speaker']}.png?size=256"
         return None
-    if key == "avatar":
-        return f"renders/avatars/{speaker}.png"
-    if key == "avatar_url":
-        return GITHUB_AVATAR.format(login=speaker)
-    return None
-
-
-def _casting_avatars():
-    """``{casting key: portrait URL}``, read once from vocab/casting.yaml.
-
-    Only the URL is taken. A casting record holds a person's authored plate
-    copy as well, and none of that is a chapter file's business: a pill says
-    a name because the owner typed one, and the record is consulted for the
-    picture and nothing else.
-    """
-    global _CASTING_AVATARS
-    if _CASTING_AVATARS is None:
-        import yaml
-        with (REPO_ROOT / "vocab" / "casting.yaml").open(
-                encoding="utf-8") as fh:
-            doc = yaml.safe_load(fh) or {}
-        found = {}
-        for key, record in (doc.get("ensemble", {}).get("titles") or {}).items():
-            if isinstance(record, dict):
-                found[key] = record.get("avatar")
-        for key, binding in (doc.get("leads", {}).get("values") or {}).items():
-            if isinstance(binding, dict):
-                found.setdefault(key, (binding.get("plate") or {})
-                                 .get("avatar"))
-        _CASTING_AVATARS = found
-    return _CASTING_AVATARS
-
-
-_CASTING_AVATARS = None
+    return identity.get(key)
 
 
 def _portrait(named):
@@ -1156,15 +1140,15 @@ def _portrait(named):
     """
     if not named:
         return None
-    login = named.get("avatar_login")
-    if login:
-        return {"avatar": f"renders/avatars/{login}.png",
-                "avatar_url": GITHUB_AVATAR.format(login=login)}
-    key = named.get("cast")
-    url = _casting_avatars().get(key)
-    if not url:
+    from tools.identity import UnknownPerson, chat_identity, login_for_cast_key
+    try:
+        login = named.get("avatar_login")
+        if login:
+            return chat_identity(login)
+        key = named.get("cast", "")
+        return chat_identity(login_for_cast_key(key))
+    except UnknownPerson:
         return {}
-    return {"avatar": f"renders/avatars/{key}.png", "avatar_url": url}
 
 
 def _ordered(entry, order):
@@ -1293,7 +1277,7 @@ def _extract_entry(plate, offset, defaults):
 
 
 def _portrait_row(plate, predicted):
-    """The ``cast:``/``avatar_login:`` row that restores a plate's picture.
+    """The login-keyed authoring row that restores a plate's picture.
 
     A lift that wrote the URL out longhand would move a casting fact into a
     second file, so the picture is described by WHO it is of. ``None`` when
@@ -1302,16 +1286,22 @@ def _portrait_row(plate, predicted):
     is lost.
     """
     avatar, url = plate.get("avatar"), plate.get("avatar_url")
-    if not avatar or not url:
+    if not avatar and not url:
         return None
     if predicted.get("avatar") == avatar and predicted.get("avatar_url") == url:
         return None
-    key = str(avatar).rsplit("/", 1)[-1].removesuffix(".png")
-    if url == GITHUB_AVATAR.format(login=key):
-        return f"avatar_login: {key}"
-    if _casting_avatars().get(key) == url:
-        return f"cast: {key}"
-    return None
+    # A local authored picture is already source copy. It has no account
+    # identity to resolve, and must not be rejected merely because it has no
+    # companion URL.
+    if not avatar or not url:
+        return None
+    key = str(avatar or "").rsplit("/", 1)[-1].removesuffix(".png")
+    from tools.identity import UnknownPerson, login_for_cast_key
+    try:
+        canonical = login_for_cast_key(key)
+    except UnknownPerson:
+        return None
+    return f"avatar_login: {canonical}"
 
 
 def _attr_rows(key, value):

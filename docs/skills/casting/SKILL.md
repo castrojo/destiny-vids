@@ -1,7 +1,7 @@
 ---
 name: casting
 version: "1.0"
-last_updated: "2026-08-19"
+last_updated: "2026-08-26"
 id: casting
 one_line_purpose: Bind visible Destiny characters to verified contributor identities.
 entry_point: docs/skills/casting/SKILL.md
@@ -53,8 +53,10 @@ Two tiers, and the difference between them is the whole model:
 
 Edit `vocab/casting.yaml` under `leads.values`, then make it reachable:
 
-1. `vocab/casting.yaml`: `person`, `display_name`, `aka`, optional
-   `constraints`, optional `plate` copy.
+1. `vocab/casting.yaml`: a character's `person` is its verified GitHub login;
+   the corresponding `people.<login>` record owns the numeric GitHub ID and
+   optional authored `plate` copy. Keep `aka` and role-specific constraints on
+   the character binding.
 2. Docs: the cast table in `README.md`.
 3. `python3 tools/rederive.py` — the checked-in segments still carry the old
    casting until it is run. Renaming a person is three places, not two.
@@ -141,6 +143,7 @@ stranger happens to hold the handle.
 ```bash
 # every binding is queryable, both directions
 python3 -m pytest -q tests/test_search.py tests/test_derive.py
+python3 tools/identity.py
 
 # what derived for one video
 python3 - <<'PY'

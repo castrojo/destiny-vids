@@ -200,19 +200,17 @@ def test_the_checked_in_roster_agrees_with_the_org():
 # matched nothing for every multi-word lead. None of it was covered.
 
 
-def lead(person=None, github=None, display_name=None):
-    return {"person": person, "github": github,
-            "display_name": display_name or person, "aka": [], "plate": None}
+def lead(person=None, display_name=None):
+    return {"person": person, "display_name": display_name or person,
+            "aka": [], "plate": None}
 
 
 def test_a_lead_is_excluded_by_their_github_login():
     """The login is what the roster is keyed by, so it is what must match.
 
-    `person` is "Kelsey Hightower" normalized to kelsey_hightower; his login
-    is kelseyhightower. Matching the two strings excludes nobody, and he was
-    handed an anonymous Guardian tile while cast as Zavala.
+    The binding's person value is the same login keyed by the roster.
     """
-    leads = {"zavala": lead(person="kelsey_hightower", github="kelseyhightower",
+    leads = {"zavala": lead(person="kelseyhightower",
                             display_name="Kelsey Hightower")}
     result = assign(roster("kelseyhightower", "someone_else"),
                     [ensemble_seg("s1", 2)], leads=leads)
@@ -239,20 +237,14 @@ def test_an_uncast_character_excludes_nobody():
     assert len(result["tiles"]) == 2
 
 
-def test_a_lead_with_no_login_is_reported_rather_than_left_to_luck():
-    """Degrade, never block: the gap is recorded, not guessed at.
-
-    Nothing can exclude this person by login, because nobody has recorded
-    one. Inventing it would be a claim about a real person, so the caster
-    ships and says whose binding it cannot check.
-    """
+def test_an_uncast_character_needs_no_roster_exclusion():
     leads = {
-        "zavala": lead(person="kelsey_hightower", display_name="Kelsey Hightower"),
-        "cayde_6": lead(person="castrojo", github="castrojo", display_name="castrojo"),
+        "zavala": lead(person=None, display_name="Kelsey Hightower"),
+        "cayde_6": lead(person="castrojo", display_name="castrojo"),
     }
     result = assign(roster("a"), [ensemble_seg("s1", 1)], leads=leads)
 
-    assert result["leads_unverifiable"] == ["Kelsey Hightower"]
+    assert result["leads_unverifiable"] == []
 
 
 def test_the_committed_bindings_report_their_own_unverifiable_leads():

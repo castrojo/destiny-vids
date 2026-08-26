@@ -39,7 +39,7 @@ authored name, its species' scientific name, and the species artwork.
   exemption is **named** on purpose: a shared `group` string could quietly
   cover somebody else's plate too. It also covers other owner-instructed
   pairs: act II's "Sup" pill bonded to Kyle's locked nameplate, and
-  kolunmi's "Disco!" bonded to that "Sup" (a pill answering a pill,
+  kolunmi's "Cardio!" bonded to that "Sup" (a pill answering a pill,
   2026-08-24). Do **not** relax the one-plate rule by lane instead — a
   left/right auto-exemption spreads to cards nobody named; it was tried and
   reverted the same day.

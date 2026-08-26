@@ -556,6 +556,15 @@ def test_verified_logins_survive_a_contributor_refresh(manifest):
     assert jeefy["login"] == "jeefy"
 
 
+def test_vocab_logins_and_cast_placards_use_people_records():
+    logins = B.vocab_logins()
+    assert logins["Bob Killen"] == "mrbobbytables"
+    assert logins["Laura Santamaria"] == "nimbinatus"
+    cast = {row["character_id"]: row for row in B.cast_in_order()}
+    assert cast["osiris"]["person"] == "Bob Killen"
+    assert cast["osiris"]["login"] == "mrbobbytables"
+
+
 def test_the_wordmark_is_the_real_mark_not_typeset(manifest):
     """A brand mark set in the deck's mono is an invented mark."""
     assert manifest["wordmark"]["source"].startswith("ublue-os/universal-blue-org")

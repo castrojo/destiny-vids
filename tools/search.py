@@ -103,39 +103,40 @@ PHRASES = {
 # from vocab/casting.yaml below, so a recast reaches search with no edit here.
 CAST_SHORTHAND = {
     "elsie": ("casting.character", "elsie_bray"),
-    "laura": ("casting.person", "laura_santamaria"),
-    "santamaria": ("casting.person", "laura_santamaria"),
-    "joanna": ("casting.person", "joanna_lee"),
-    "kelsey": ("casting.person", "kelsey_hightower"),
-    "hightower": ("casting.person", "kelsey_hightower"),
+    "laura": ("casting.person", "nimbinatus"),
+    "santamaria": ("casting.person", "nimbinatus"),
+    "joanna": ("casting.person", "joannalee"),
+    "kelsey": ("casting.person", "kelseyhightower"),
+    "hightower": ("casting.person", "kelseyhightower"),
     "andy": ("casting.person", "clubanderson"),
     "anderson": ("casting.person", "clubanderson"),
     "saint": ("casting.character", "saint_14"),
     "mara": ("casting.character", "mara_sov"),
-    "karena": ("casting.person", "karena_angell"),
-    "lori": ("casting.person", "lori_lorusso"),
-    "lorusso": ("casting.person", "lori_lorusso"),
-    "waddington": ("casting.person", "nate_waddington"),
-    "ashley": ("casting.person", "ashley_willis"),
+    "karena": ("casting.person", "angellk"),
+    "lori": ("casting.person", "LoriLorusso"),
+    "lorusso": ("casting.person", "LoriLorusso"),
+    "ashley": ("casting.person", "ashleywillis"),
     "ikora": ("casting.character", "ikora_rey"),
     "iron lord": ("casting.character", "iron_lord_red_haired"),
     "uldren": ("casting.character", "crow"),
 }
 
 
-def _cast_phrases(leads):
+def _cast_phrases(leads, people):
     """Query phrases for every lead binding, straight from the vocabulary.
 
     ``vocab/casting.yaml`` is the single source of truth for the cast
     (AGENTS.md), and this table used to be a hand-kept second copy of it --
     two tests existed only to assert the two agreed. A character key, each of
-    its ``aka`` spellings, and the bound person's id and display name are all
+    its ``aka`` spellings, and the bound person's login and authored plate name are all
     spellings somebody will type, so all four become phrases; the residue that
     a vocabulary genuinely cannot carry is ``CAST_SHORTHAND`` above.
     """
     out = {}
 
     def add(phrase, facet, value):
+        if phrase is None:
+            return
         phrase = str(phrase).replace("_", " ").lower().strip()
         if not phrase:
             return
@@ -154,8 +155,8 @@ def _cast_phrases(leads):
         person = entry.get("person")
         if person:
             add(person, "casting.person", person)
-            if entry.get("display_name"):
-                add(entry["display_name"], "casting.person", person)
+            plate = (people.get(person).plate if people.get(person) else None) or {}
+            add(plate.get("name"), "casting.person", person)
     for phrase, (facet, value) in CAST_SHORTHAND.items():
         add(phrase, facet, value)
     return out
@@ -170,9 +171,10 @@ def _load_cast_phrases():
     """
     try:
         from tools.derive import load_leads
+        from tools.identity import load_people
     except ImportError:  # running as a script with tools/ on sys.path
         from derive import load_leads
-    for phrase, contributions in _cast_phrases(load_leads()).items():
+    for phrase, contributions in _cast_phrases(load_leads(), load_people()).items():
         PHRASES.setdefault(phrase, []).extend(contributions)
 
 

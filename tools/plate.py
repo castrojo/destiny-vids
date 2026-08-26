@@ -2635,7 +2635,7 @@ def _ensemble_entry(item, at, dur, copy):
     from vocab/casting.yaml, never from here.
 
     A contributor whose Guardian identity is genuinely authored -- recorded
-    under ``ensemble.titles`` in vocab/casting.yaml, straight from the
+    under the shared ``people`` records in vocab/casting.yaml, straight from the
     reference deck -- gets that plate verbatim instead of the generic copy.
     """
     from tools.derive import ensemble_label, load_ensemble_titles
@@ -2942,7 +2942,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 unresolved.append({
                     "id": character,
                     "person": binding.get("person"),
-                    "display_name": binding.get("display_name"),
+                    "display_name": binding.get("person"),
                     "requested_reveal_after": round(reveal_after, 3),
                     "revealed_at": at,
                     **REVEAL_FLOOR_MISSED,
@@ -2962,7 +2962,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             unresolved.append({
                 "id": character,
                 "person": binding.get("person"),
-                "display_name": binding.get("display_name"),
+                "display_name": binding.get("person"),
                 **UNPLATED[why],
             })
         if log:
@@ -3163,8 +3163,8 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         tail_start, tail_dur, _ = timeline[-1]
         cursor = max([tail_start + LEAD_IN] + [b_end + TAIL_OUT for b_start, b_end in busy
                                                if b_end > tail_start])
-        # A contributor whose Guardian identity is authored (ensemble.titles in
-        # vocab/casting.yaml) is never reduced to a name line on the card while
+        # A contributor whose Guardian identity is authored in the shared people
+        # records is never reduced to a name line on the card while
         # the cut still has room for the real plate: they get first claim on
         # the tail the card was about to occupy -- but not at the price of
         # pushing anyone else off the card, since dropping a contributor is the

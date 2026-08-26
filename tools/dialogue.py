@@ -61,34 +61,17 @@ def load_dialogue(video_id, root=DIALOGUE_DIR):
 
 
 def _speaker_for(character, leads):
-    """Character key -> the login on the chat pill, or None if uncast.
-
-    Owner, 2026-08-24: "change the dialogue chat boxes to their github
-    handles, @mrbobbytables and @clubanderson." So a pill credits the person
-    the way the chat interface it is imitating would -- by login, at-prefixed
-    -- rather than by the legal name their Guardian reveal carries.
-
-    The login comes from the SAME `github:` field that resolves the pill's
-    avatar, so the face and the handle beside it can never disagree about who
-    is speaking. It is authored in vocab/casting.yaml and never typed into a
-    render.
-
-    A binding with no login falls back to the plate name, then the display
-    name: somebody whose login nobody recorded is still credited, rather than
-    dropped as uncast. Degrading to a real name is not the same as guessing a
-    handle, which is a claim about a real person's account and is never made
-    here.
-    """
+    """Character key -> its bound GitHub login on the chat pill, or None."""
     entry = leads.get(character) or {}
-    login = entry.get("github")
-    if login:
-        return f"@{login}"
-    return (entry.get("plate") or {}).get("name") or entry.get("display_name")
+    return f"@{entry['person']}" if entry.get("person") else None
 
 
 def _avatar_for(character, leads):
-    login = (leads.get(character) or {}).get("github")
-    return f"renders/avatars/{login}.png" if login else None
+    login = (leads.get(character) or {}).get("person")
+    if not login:
+        return None
+    from tools.identity import chat_identity
+    return chat_identity(login)["avatar"]
 
 
 def lanes_for(cues):

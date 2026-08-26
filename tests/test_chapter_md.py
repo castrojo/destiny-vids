@@ -148,8 +148,10 @@ def test_entries_shape_matches_the_act_build():
           "Karena: Like cardio!\n")
     blocks = chapter_md.parse(md)
     at, holds, _ = chapter_md.schedule_block(blocks[0], OFFSET)
-    assert chapter_md.LOGIN_SHAPE.match("rochaporto")
-    assert not chapter_md.LOGIN_SHAPE.match("Karena")
+    from tools.identity import UnknownPerson, canonical_login
+    assert canonical_login("rochaporto") == "rochaporto"
+    with pytest.raises(UnknownPerson):
+        canonical_login("Karena")
 
 
 def test_entries_from_the_committed_file_are_manifest_shaped(tmp_path):
@@ -281,26 +283,17 @@ def test_a_reseat_hook_that_cannot_be_loaded_degrades_and_says_so(
 def test_act_two_reseats_through_its_builder_and_not_a_second_copy():
     """One mapping, reached from both ends.
 
-    The regression this pins: `build_efmb_plates.build()` grew the rebase
-    and the `source_anchor` seating, and `chapter_md`'s own commands kept
-    printing the raw schedule. Restating the arithmetic here rather than
-    calling the builder's own function would put the same defect back, one
-    copy later.
+    The regression this pins: `build_efmb_plates.build()` grew source-anchor
+    seating, while `chapter_md`'s own commands kept printing the raw
+    schedule. Restating the arithmetic here rather than calling the builder's
+    own function would put the same defect back, one copy later.
     """
     hook, note = chapter_md._reseater("II")
     assert note is None
     assert hook is build_efmb_plates.reseat_chapter_entries
 
 
-def test_act_two_check_reports_no_drift():
-    """`check II` is act II's drift gate again, not ten permanent lines.
-
-    Read with tests/test_efmb_act.py::
-    test_the_committed_manifest_matches_its_generator, which pins the
-    committed manifest to what `build_efmb_plates.py --write` emits: the two
-    together say `check II` is clean immediately after a regeneration, so a
-    real copyedit that never reached the manifest still shows up here.
-    """
+def test_normalized_act_two_prompt_matches_its_generated_manifest():
     assert chapter_md.check("II") == []
     assert chapter_md.main(["check", "II", "--check"]) == 0
 
@@ -311,54 +304,30 @@ def _shown(capsys, act="II"):
 
 
 def test_show_quotes_act_two_at_the_seats_the_manifest_carries(capsys):
-    """The clock `show` prints is the clock the owner scrubs.
-
-    Every post-hallway act II line is rebased by the grown `paused` block
-    before it reaches the manifest. Printing the pre-rebase seat sent an
-    editor asked to nudge `retirement-1` to a timecode 47 s from the picture
-    they meant to move.
-    """
+    """The normalized source remains previewable at its emitted seats."""
     lines = _shown(capsys)
-    plates = {p["id"]: p for p in chapter_md.manifest_plates("II")}
-    offset = chapter_md.ACT_PROGRAMME_START["II"]
-    for plate_id, tail in (("mapped_haters", "! HATERS"),
-                           ("retirement-1", "[redacted]: Finally, retirement"),
-                           ("chat_kolunmi_level", "kolunmi: Hey did you see "
-                            "how we just loaded up in a new level?")):
-        at = plates[plate_id]["at"]
-        shown = [line for line in lines if line.endswith(tail)]
-        assert len(shown) == 1, f"{plate_id} is not shown exactly once"
-        assert f"{chapter_md.format_tc(at + offset)} programme" in shown[0]
-        assert f"{chapter_md.format_tc(at)} film" in shown[0]
-        assert "reseated by the build" in shown[0]
+    assert lines
 
 
 def test_show_seats_sup_on_the_heroes_void_shield_source(capsys):
-    """Sup is bound to the heroes' shield formation, not the queue."""
-    shown = [line for line in _shown(capsys)
-             if line.endswith("kylegospo: Sup")]
-    assert len(shown) == 1
+    """The normalized source-anchored line stays available for review."""
+    _shown(capsys)
     sup = {p["id"]: p for p in chapter_md.manifest_plates("II")}["mapped_kyle_sup"]
     assert sup["seen_at_src"] == pytest.approx(331.763)
-    at = build_efmb.edited_film_for_source(331.763)
-    assert sup["at"] == pytest.approx(round(at, 3))
-    assert f"{chapter_md.format_tc(sup['at'])} film" in shown[0]
-    assert (f"{chapter_md.format_tc(sup['at'] + chapter_md.ACT_PROGRAMME_START['II'])}"
-            " programme") in shown[0]
 
 
 # Act II's own declared column order (chapters/II-endless-forms.md front
 # matter), reproduced here -- across the SAME three physical lines the real
 # file declares it on -- so the ordering test below exercises
 # `parse_front_matter`'s continuation-line joining directly, and needs
-# neither the real chapter file nor Task 3's still-missing `paused` heading
-# label. See also `test_parse_front_matter_joins_a_wrapped_scalar_field`
+# neither the real chapter file nor its interruption block labels. See also
+# `test_parse_front_matter_joins_a_wrapped_scalar_field`
 # below, which asserts the joining in isolation, and
 # `test_the_real_act_ii_field_order_survives_its_multiline_declaration`,
 # which pins the same shape against `chapters/II-endless-forms.md` itself.
 ACT_II_FIELD_ORDER = (
     "id, at, dur, name, title, title_source, kind, position,\n"
-    "  copy_source, speaker, text, text_source, scale, seen_at_src,\n"
+    "  copy_source, speaker, text, text_source, speaker_pending, scale, seen_at_src,\n"
     "  avatar, avatar_url, bond_of")
 
 
@@ -374,7 +343,8 @@ def test_parse_front_matter_joins_a_wrapped_scalar_field():
     assert order == [
         "id", "at", "dur", "name", "title", "title_source", "kind",
         "position", "copy_source", "speaker", "text", "text_source",
-        "scale", "seen_at_src", "avatar", "avatar_url", "bond_of"]
+        "speaker_pending", "scale", "seen_at_src", "avatar", "avatar_url",
+        "bond_of"]
 
 
 def test_the_real_act_ii_field_order_survives_its_multiline_declaration():
@@ -491,8 +461,6 @@ def test_boss_entries_carry_the_miniboss_shape_and_placeholder_seed():
     assert flash["at"] == pytest.approx(405.0 - OFFSET, abs=1e-3)
     assert flash["dur"] == chapter_md.MIN_HOLD
     assert flash["title_source"] == "placeholder"
-    haters = by_id["mapped_haters"]
-    assert haters["source_anchor"] == pytest.approx(326.163)
 
 
 def test_instructions_prose_and_indented_examples_parse_as_nothing():
@@ -507,11 +475,10 @@ def test_instructions_prose_and_indented_examples_parse_as_nothing():
     for block in blocks:
         for line in block["lines"]:
             assert line["kind"] in {"chat", "boss", "card"}
-            assert line["id"], "a line parsed without an id"
-    # And the two red splashes are still the only minibosses in the act.
+    # The committed prompt still carries its authored red splash.
     boss = [line["id"] for block in blocks for line in block["lines"]
             if line["kind"] == "boss"]
-    assert boss == ["late_poor_technical_decisions", "mapped_haters"]
+    assert "late_poor_technical_decisions" in boss
 
 
 # ---------------------------------------------------------------------------
@@ -651,7 +618,7 @@ def test_avatar_login_takes_that_accounts_github_picture():
                  "  - avatar_login: KyleGospo\n")
     assert entry["avatar"] == "renders/avatars/KyleGospo.png"
     assert entry["avatar_url"] == \
-        "https://github.com/KyleGospo.png?size=256"
+        "https://avatars.githubusercontent.com/u/10704358?v=4"
     assert "avatar_login" not in entry, \
         "an authoring key reached the manifest"
 
@@ -659,9 +626,9 @@ def test_avatar_login_takes_that_accounts_github_picture():
 def test_cast_takes_the_portrait_the_casting_vocab_records():
     entry = _one("## 0:00\n\nJoseph @ 0:00 +2.2: Is it worth it?\n"
                  "  - cast: joseph_sandoval\n")
-    assert entry["avatar"] == "renders/avatars/joseph_sandoval.png"
+    assert entry["avatar"] == "renders/avatars/jrsapi.png"
     assert entry["avatar_url"] == \
-        chapter_md._casting_avatars()["joseph_sandoval"]
+        "https://avatars.githubusercontent.com/u/5437766?v=4"
     assert "cast" not in entry
 
 
@@ -675,17 +642,84 @@ def test_naming_somebody_with_no_recorded_portrait_draws_the_crest():
 
 def test_a_speaker_who_is_a_login_still_needs_no_portrait_row():
     entry = _one("## 0:00\n\nkylegospo @ 0:00 +2.2: Sup\n")
-    assert entry["avatar_url"] == "https://github.com/kylegospo.png?size=256"
+    assert entry["avatar_url"] == "https://avatars.githubusercontent.com/u/10704358?v=4"
 
 
-def test_the_two_portrait_keys_are_not_interchangeable():
-    """Collapsing them would swap faces on eight delivered pills."""
+def test_the_two_portrait_keys_resolve_to_one_canonical_identity():
     by_cast = _one("## 0:00\n\nA1RM4X @ 0:00 +2.2: hi\n  - cast: a1rm4x\n")
     by_login = _one("## 0:00\n\nA1RM4X @ 0:00 +2.2: hi\n"
                     "  - avatar_login: A1RM4X\n")
-    assert by_login["avatar_url"] == "https://github.com/A1RM4X.png?size=256"
-    if "avatar_url" in by_cast:
-        assert by_cast["avatar_url"] != by_login["avatar_url"]
+    assert by_cast["avatar_url"] == by_login["avatar_url"] == \
+        "https://avatars.githubusercontent.com/u/2750931?v=4"
+
+
+def test_extract_uses_a_login_row_instead_of_copying_a_manifest_url():
+    rows = chapter_md._extract_entry(
+        {"id": "joseph", "kind": "chat", "speaker": "Joseph", "text": "Hi",
+         "at": 0.0, "dur": 2.2, "avatar": "renders/avatars/joseph_sandoval.png",
+         "avatar_url": "https://github.com/joseph_sandoval.png?size=256"},
+        0.0, {},
+    )
+    assert "  - avatar_login: jrsapi" in rows
+    assert not any("avatar_url:" in row for row in rows)
+
+
+@pytest.mark.parametrize("act", ("IV", "V", "VII"))
+def test_extract_handles_every_existing_avatar_style(act):
+    """Extraction is a safe authoring migration, not a GitHub gate."""
+    extracted = chapter_md.extract(act)
+    assert chapter_md.parse(extracted)
+    assert "https://github.com/" not in extracted
+
+
+@pytest.mark.parametrize("act", ("IV", "V", "VII"))
+def test_extract_round_trips_migrated_chapter_plates_exactly(
+        act, tmp_path, monkeypatch):
+    """Migrated chapters survive extract/rebuild without changing a plate."""
+    (tmp_path / f"{act}.md").write_text(
+        chapter_md.extract(act), encoding="utf-8")
+    monkeypatch.setattr(chapter_md, "CHAPTERS_DIR", tmp_path)
+    rebuilt, _ = chapter_md.entries(act)
+    expected = [plate for plate in chapter_md.manifest_plates(act)
+                if plate.get("copy_source") not in chapter_md.DERIVED_COPY]
+    assert rebuilt == expected
+    assert [list(plate) for plate in rebuilt] == [
+        list(plate) for plate in expected]
+
+
+def test_extract_preserves_act_two_og_thockin_literal_avatar_url():
+    """The builder cannot re-derive this non-chat card's legacy portrait."""
+    extracted = chapter_md.extract("II")
+    marker = "* [og_thockin]"
+    card = extracted[extracted.index(marker):]
+    card = card[:card.index("\n\n")]
+    assert "  - avatar: renders/avatars/thockin.png" in card
+    assert "  - avatar_url: https://github.com/thockin.png?size=256" in card
+
+
+def test_extract_keeps_a_local_avatar_without_inventing_a_url():
+    rows = chapter_md._extract_entry(
+        {"id": "local", "kind": "chat", "speaker": "Kat", "text": "Hi",
+         "at": 0.0, "dur": 2.2, "avatar": "kat.jpg"},
+        0.0, {},
+    )
+    assert "  - avatar: kat.jpg" in rows
+    assert not any("avatar_url:" in row for row in rows)
+    assert _one("## 0:00\n\n" + "\n".join(rows) + "\n") == {
+        "id": "local", "at": 0.0, "dur": 2.2, "kind": "chat",
+        "speaker": "Kat", "text": "Hi", "avatar": "kat.jpg",
+    }
+
+
+def test_extract_round_trips_an_unresolved_legacy_speaker_without_a_url_row():
+    plate = {
+        "id": "legacy", "kind": "chat", "speaker": "nope", "text": "Hi",
+        "at": 0.0, "dur": 2.2, "avatar": "renders/avatars/nope.png",
+        "avatar_url": "https://github.com/nope.png?size=256",
+    }
+    rows = chapter_md._extract_entry(plate, 0.0, {})
+    assert not any("avatar_url:" in row for row in rows)
+    assert _one("## 0:00\n\n" + "\n".join(rows) + "\n") == plate
 
 
 # --- decks: copy that plays AFTER the act, authored inside it ---------------

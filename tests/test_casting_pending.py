@@ -8,7 +8,7 @@ reads. These tests pin the queue so the gap cannot be silently dropped — and
 pin that a pending entry casts nobody, plates nothing and retrieves nothing.
 
 wrkode was part of the #14 queue until the owner authored his plate for
-act II: he is promoted to `ensemble.titles` (pinned in
+act II: he is promoted to the shared `people` records (pinned in
 tests/test_act2_casting.py), which partially closes #14. abangser and
 robertsirc remain here.
 """
@@ -30,7 +30,7 @@ LEADS = load_leads()
 
 # The people castrojo/destiny-vids#14 asked for who are STILL waiting: wrkode
 # left the queue when the owner authored his plate for act II (he is in
-# `ensemble.titles` now), and these two remain. Pinned by login so the
+# the shared `people` records now), and these two remain. Pinned by login so the
 # request cannot be dropped in a vocab edit without this file going red.
 REQUESTED = ["abangser", "robertsirc"]
 
@@ -126,7 +126,7 @@ def test_a_pending_entry_is_not_a_binding(person):
 def test_display_name_is_never_invented(person):
     """`display_name` is null unless the request itself named the person. The
     #14 body names nobody (its title named William Rizzo, whose plate the
-    owner has since authored — see `ensemble.titles`), so nothing is made up."""
+    owner has since authored — see the shared `people` records), so nothing is made up."""
     assert PENDING[person]["display_name"] is None
 
 

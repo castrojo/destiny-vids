@@ -369,35 +369,8 @@ MAPPED_TAIL_REPLACEMENTS = {
     "timed_jorge",
 }
 MAPPED_TAIL_PASS = [
-    {
-        "id": "mapped_amber_reveal",
-        "kind": "guardian",
-        "position": "left",
-        "at_film": build_efmb.AMBER_AT,
-        "hold": 4.0,
-        "key": "akgraner",
-        "seen_at_src": 48.0,
-        "seen_in_video": build_efmb.AMBER_SOURCE_ID,
-        "shot_src": [build_efmb.AMBER_CLIP_IN, build_efmb.AMBER_CLIP_OUT],
-        "why": "the owner identified this gameplay clip as Amber's sequence",
-    },
-    {
-        "id": "mapped_kyle_reveal",
-        "kind": "guardian",
-        "position": "left",
-        "at_film": build_efmb.KYLE_REVEAL_AT,
-        "hold": build_efmb.KYLE_REVEAL_SEC,
-        "key": "KyleGospo",
-        "seen_at_src": build_efmb.SYNC_ANCHOR_SRC,
-        "shot_src": [335.267, 339.767],
-        "why": "the Sentinel raising the Void shield in the authored reveal",
-    },
-    # HATERS IS AUTHORED IN chapters/II-endless-forms.md NOW --
-    # `! [mapped_haters] HATERS |` under `## 10:00`. The seat's evidence
-    # (the red-lit face shot, film 315.267 -> 316.967 by scene detection)
-    # is recorded beside the line there. This spec's old seen_at_src pointed
-    # at the hallway frame, which is NOT that shot; the card now carries no
-    # seen_at_src rather than a wrong one.
+    # HATERS is authored in chapters/II-endless-forms.md, source-anchored to
+    # the enemy attack and held through the hero-shot boundary.
     {
         "id": "mapped_eyecantcu_reveal",
         "kind": "guardian",
@@ -409,6 +382,12 @@ MAPPED_TAIL_PASS = [
         "shot_src": [352.667, 353.533],
         "why": "the solar Warlock pulling out the glowing orange sword",
     },
+]
+MAPPED_TAIL_UNRESOLVED = [
+    "Amber's and Kyle's guardian reveals are omitted: the current "
+    "owner-authored action and source-anchored chat occupy their only "
+    "evidenced lower-third windows. Omitting the cards preserves the "
+    "authored seats rather than moving either card onto unsupported picture.",
 ]
 
 
@@ -1012,14 +991,6 @@ TRIO_HOLD = 4.0
 # card and the incoming one read as one flicker rather than two people.
 PLATE_GAP = 0.25
 
-# The hallway hold's hand-typed value before it derived from the `paused`
-# chapter block (see scripts/build_efmb.py). Every chapter pin authored to
-# play after the interruption was authored against THIS number; `build()`
-# rebases those pins by however much the derived hold has grown or shrunk
-# since. Exposed at module scope so a test can compute the same expectation
-# without duplicating the literal.
-OLD_HALLWAY_AFTER_AMBER_SEC = 25.600
-
 # The trio arrives one card at a time, 0.8 s apart, and the row clears
 # together. Owner instruction, same note: "stagger intros so that each
 # character has a shot to shine". Sequential lower thirds -- one card up, out,
@@ -1090,26 +1061,29 @@ def load_casting():
 
 
 def _titles(casting):
-    return {k: v for k, v in casting["ensemble"]["titles"].items()
-            if k != "description"}
+    return {
+        login: dict(record["plate"])
+        for login, record in (casting.get("people") or {}).items()
+        if record.get("plate")
+    }
 
 
 def authored_copy(key, casting):
     """The plate copy for ``key``, verbatim from vocab/casting.yaml.
 
-    Two places hold authored copy and they are not interchangeable: a LEAD's
-    plate lives on its binding (Karena is cast as Mara Sov), and an individual
-    contributor's lives under ``ensemble.titles``. Reproducing, never
-    composing, is the whole rule -- so this raises rather than falling back to
-    generic copy if a key is missing, because a silent fallback would put the
-    blueberry plate on somebody whose identity the owner actually wrote.
+    Person records are the one home for identity copy. Transitional ``cast:``
+    keys resolve through the vocabulary's key-to-login migration map, so the
+    raw Act II authoring remains legible without a second plate map.
     """
+    from tools.identity import UnknownPerson, login_for_cast_key
+
     titles = _titles(casting)
-    if key in titles:
-        return dict(titles[key])
-    binding = casting.get("leads", {}).get("values", {}).get(key)
-    if binding and binding.get("plate"):
-        return dict(binding["plate"])
+    try:
+        login = login_for_cast_key(key, casting)
+    except UnknownPerson:
+        login = None
+    if login in titles:
+        return dict(titles[login])
     raise KeyError(
         f"no authored plate copy for {key!r} in vocab/casting.yaml -- copy is "
         "reproduced, never composed, so this is a gap for the owner to fill "
@@ -1170,10 +1144,9 @@ def blueberry_entry(item, at, dur, casting):
 def localise_avatar(key, copy):
     """Point a plate's ``avatar`` at the local cache, keeping the URL as source.
 
-    Returns the copy unchanged when there is no avatar -- Karena has none,
-    because no GitHub login for her is on record anywhere in this repo and a
-    login is not an agent's to guess (issue #87). A wreath with no portrait to
-    ring is a recorded gap, not a reason to invent one.
+    Returns the copy unchanged when the authored plate has no portrait. A
+    missing authored image stays missing; it is never replaced with invented
+    copy.
     """
     url = copy.get("avatar")
     if not url or not str(url).startswith("http"):
@@ -1294,21 +1267,10 @@ def _at(shot_in, film_of):
 def reseat_chapter_entries(entries, lead=None):
     """Chapter-file seats -> the seats THIS BUILD emits for them.
 
-    Two authored mechanisms move an act II chapter entry between
-    ``chapters/II-endless-forms.md`` and the manifest, and this is the only
-    place either one lives:
-
-    1. ``HALLWAY_AFTER_AMBER_SEC`` now derives from the `paused` block's own
-       schedule (see scripts/build_efmb.py) instead of a hand-typed 25.6 s.
-       Everything the chapter file pins on the act's own programme clock
-       past the old hallway return point was authored against that
-       hand-typed value, so growing (or shrinking) the pause has to rebase
-       those pins by the same amount -- the paused conversation itself is
-       exempt, because its own pins are already authored against the new,
-       longer clock.
-    2. A ``source_anchor`` row is seated straight from the source frame it
-       is bound to (Kyle's Sup, on his own close-up) and republished as
-       ``seen_at_src``.
+    A ``source_anchor`` row is seated straight from the source frame it is
+    bound to and republished as ``seen_at_src``. The chapter owns every
+    programme-clock pin at its current emitted seat; no legacy pause delta
+    remains for the builder to apply.
 
     ``tools/chapter_md.py``'s ``show`` and ``check`` call this through the
     ``reseat`` hook act II's chapter file declares, so the clock an editor
@@ -1324,10 +1286,6 @@ def reseat_chapter_entries(entries, lead=None):
     """
     if lead is None:
         lead = build_efmb.derive_lead()
-    old_hallway_return_at = (
-        build_efmb.HALLWAY_AFTER_AMBER_AT + OLD_HALLWAY_AFTER_AMBER_SEC)
-    pause_delta = round(
-        build_efmb.HALLWAY_AFTER_AMBER_SEC - OLD_HALLWAY_AFTER_AMBER_SEC, 3)
     # The act's own declared key order (see the `field_order` front matter
     # in chapters/II-endless-forms.md), so a field this loop adds after the
     # chapter file already built the entry lands in its declared column
@@ -1336,13 +1294,11 @@ def reseat_chapter_entries(entries, lead=None):
     field_order = ([k.strip() for k in order_field.split(",")]
                    if isinstance(order_field, str) else None)
     for entry in entries:
-        label = entry.pop("_chapter_label", None)
+        entry.pop("_chapter_label", None)
         source_anchor = entry.pop("source_anchor", None)
         if source_anchor is not None:
             # A source-anchored line is seated straight from the source
-            # frame it is bound to, which already accounts for however long
-            # the interruption grew -- it is never also shifted by
-            # `pause_delta`, or it would move twice.
+            # frame it is bound to, including the current interruption.
             entry["at"] = round(
                 build_efmb.edited_film_for_source(source_anchor, lead), 3)
             entry["seen_at_src"] = source_anchor
@@ -1354,13 +1310,6 @@ def reseat_chapter_entries(entries, lead=None):
             ordered = chapter_md._ordered(entry, field_order)
             entry.clear()
             entry.update(ordered)
-            continue
-        if (label != build_efmb.PAUSED_BLOCK and "at" in entry
-                and entry["at"] >= old_hallway_return_at):
-            entry["at"] = round(entry["at"] + pause_delta, 3)
-            if "fade_out_at" in entry:
-                entry["fade_out_at"] = round(
-                    entry["fade_out_at"] + pause_delta, 3)
     return entries
 
 
@@ -1388,12 +1337,10 @@ def build():
     for note in chapter_unresolved:
         print(f"chapter: {note}", file=sys.stderr)
 
-    # HALLWAY_AFTER_AMBER_SEC derives from the `paused` block's own schedule,
-    # so the pins authored against the old hand-typed hold are rebased and
-    # `source_anchor` rows are seated on their own frames. That mapping is
-    # `reseat_chapter_entries` above -- shared with `chapter_md show/check`
-    # through the `reseat` hook act II's chapter file declares, so the
-    # authoring preview and the drift gate describe the film that ships.
+    # Source-anchored rows are seated on their own frames by
+    # `reseat_chapter_entries`, shared with `chapter_md show/check` through
+    # the chapter's `reseat` hook. The authoring preview and drift gate
+    # therefore describe the film that ships.
     reseat_chapter_entries(chapter_entries, lead)
 
     def chapter_floor(want):
@@ -2073,7 +2020,8 @@ def build():
         # What the brief authored but this manifest could not place. Recorded
         # so it is visible rather than buried: degrade, never block.
         "unresolved": (montage_unresolved + walk_unresolved + mapped_unresolved
-                        + late_unresolved + chapter_unresolved + [
+                        + late_unresolved + chapter_unresolved
+                        + MAPPED_TAIL_UNRESOLVED + [
             "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for "
             "now.' Three blocks went with him -- the four ranked montage "
             "cards, the two TOC payoff cards ('It's totally NOT like this' "
@@ -2159,22 +2107,19 @@ def build():
             "banner kinds, and none of them is a flashing red miniboss bar, "
             "so the line stays recorded rather than faked with the wrong "
             "chrome",
-            "the mapped hallway edit uses the owner-supplied source-323.933 "
-            "hallway-and-dogs frame, Amber's owner-identified gameplay "
-            "sequence, and the cleared Local Forecast - Slower bed. Source "
-            "resumes at 325.933 after the readable black-screen conversation",
+            "the mapped hallway edit holds the owner-supplied source-323.933 "
+            "hallway-and-dogs frame before and after Amber's owner-identified "
+            "gameplay sequence. Source resumes at 325.933 after the "
+            "post-amber chapter block",
             "EyeCantCU's owner-timed reveal is seated at source-352.850, the "
             "close-up where the solar Warlock pulls out the glowing orange "
             "sword",
             "the 9:10 HATERS title renders through existing title chrome. The "
             "requested flashing red boss treatment is still missing; the copy "
             "ships without that effect rather than being dropped",
-            "the Kyle and kolunmi pills land at film 335.650 and 338.100 "
-            "after Amber's conversation and Bungie's burned-in "
-            "'NEW LEGENDS WILL RISE' zone. The order and copy are the owner's; "
-            "the protected publisher-title gap moves the seats",
-            "KyleGospo's mapped reveal sits on his verified source-335.267 "
-            "Sentinel shot at film 314.237, after Amber's sequence",
+            "Kyle's 'Sup' and kolunmi's 'Cardio!' are source-anchored to "
+            "331.763 and 333.817 respectively, so the owner-authored seats "
+            "stay on their evidenced frames as the interruption changes",
             "the brief names the same person two ways -- 'Jorge Castro' in "
             "the montage and 'jorge' at 4:51. Both are reproduced verbatim; "
             "the pill's own chrome uppercases the speaker row",

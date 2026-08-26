@@ -134,7 +134,7 @@ def test_traversal_hero_boundaries(overrides, expected):
 def test_lead_direct_match():
     seg = _seg(substitutability=1, character=[{"name": "Elsie Bray", "kind": "guardian_npc"}])
     assert compute_casting(seg, LEADS) == {
-        "role": "lead", "character": "elsie_bray", "person": "laura_santamaria",
+        "role": "lead", "character": "elsie_bray", "person": "nimbinatus",
         "usable": True, "constraints_failed": [], "slots": 0,
     }
 
@@ -208,20 +208,20 @@ def test_concealed_visibilities_satisfy_require_helmet(visibility):
 
 
 @pytest.mark.parametrize("character,person", [
-    ("Elsie Bray", "laura_santamaria"),
-    ("Nimbatus", "laura_santamaria"),
-    ("Anna Bray", "joanna_lee"),
-    ("Zavala", "kelsey_hightower"),
+    ("Elsie Bray", "nimbinatus"),
+    ("Nimbatus", "nimbinatus"),
+    ("Anna Bray", "joannalee"),
+    ("Zavala", "kelseyhightower"),
     ("Cayde-6", "castrojo"),
     ("Lord Saladin", "jeefy"),
     ("Osiris", "mrbobbytables"),
-    ("Saint-14", "kat"),
-    ("Mara Sov", "karena_angell"),
-    ("Petra Venj", "lori_lorusso"),
-    ("Variks", "nate_waddington"),
-    ("The Speaker", "jonathan_bryce"),
-    ("Amanda Holliday", "ashley_willis"),
-    ("iron_lord_red_haired", "paris_pittman"),
+    ("Saint-14", "katcosgrove"),
+    ("Mara Sov", "angellk"),
+    ("Petra Venj", "LoriLorusso"),
+    ("Variks", "nate-double-u"),
+    ("The Speaker", "jbryce"),
+    ("Amanda Holliday", "ashleywillis"),
+    ("iron_lord_red_haired", "parispittman"),
 ])
 def test_cast_bindings(character, person):
     """The cast list, pinned. These bindings are fixed for the life of the
@@ -276,12 +276,9 @@ def test_no_binding_invents_plate_copy():
     vocab/casting.yaml must never do -- add it to AUTHORED_PLATES with its
     source only after checking the source.
 
-    `mara_sov` is the deliberate exception: copy the *owner* wrote directly
-    for somebody who has no
-      entry in the reference deck at all. The owner authoring a credit is
-      allowed where an agent inventing one is not. Re-authored for act II with
-      the subclass (#5) now supplied; the old copy survives verbatim in the
-      binding's `note:`, and tests/test_plate.py pins both halves.
+    `mara_sov` is the deliberate exception: the owner authored its identity
+    directly for act II. Owner-authored copy is allowed where agent-invented
+    copy is not.
     """
     with_plates = {k for k, v in LEADS.items() if v.get("plate")}
     assert with_plates - {"mara_sov"} == set(AUTHORED_PLATES)

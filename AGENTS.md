@@ -39,6 +39,7 @@ validate the repair, and update the matching skill in the same logical change.
 python3 -m pytest -q                              # the whole suite (fast, offline)
 python3 tools/corpus.py --check                   # per-character corpora
 python3 tools/rederive.py --check                 # no hand-edited derived field
+python3 tools/identity.py                         # report release-train identity migration
 python3 scripts/generate_schema_enums.py --check  # schema enums match vocab/
 pre-commit run --all-files                        # documentation and process checks
 ```

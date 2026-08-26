@@ -1,7 +1,7 @@
 ---
 name: chapters
 version: "1.0"
-last_updated: "2026-08-25"
+last_updated: "2026-08-26"
 id: chapters
 one_line_purpose: Author a chapter's on-screen copy in one Markdown file per chapter.
 entry_point: docs/skills/chapters.md
@@ -113,10 +113,14 @@ independent of how long anything authored before it runs — carries
 `source_anchor: <source seconds>` instead of `@ <heading time>` or
 `seen_at_src`. Act II's builder (`scripts/build_efmb_plates.py`) pops the key,
 sets `at` from that source frame, and publishes `seen_at_src` in its place;
-the key never reaches the manifest, and the pill is exempt from the
-across-the-board rebase every other post-pause pin gets when the paused
-block's length changes (it is already seated against the current footage, not
-against a stale hand-typed pause length).
+the key never reaches the manifest. Its seat stays tied to the current source
+frame rather than to a programme-clock pin that may move with an edit.
+
+**An inserted clip inside a held source frame needs three labelled blocks.**
+Label the pre-insert hold, the inserted action, and the post-insert hold; the
+picture builder derives all three half-open intervals from those records. Its
+inverse clock must return the held source frame during the post-insert interval
+and raise only inside the external clip.
 
 **An identifier is not visual evidence.** A constant or plate ID can preserve
 an earlier interpretation of a frame; extract and inspect the target frame
@@ -176,22 +180,21 @@ kat @ 15:33.770: How much you...   pinned to an exact programme moment
   - body: second line
   - fade_in: null                  delete a field the defaults supplied
   - censor: Goddamn -> G{k8s}ddamn
-  - cast: joseph_sandoval        the portrait vocab/casting.yaml records
-  - avatar_login: KyleGospo      the portrait github.com/<login> serves
 ```
 
-**A pill names the person, never the URL.** `cast:` takes whatever avatar
-`vocab/casting.yaml` holds for that binding; `avatar_login:` takes
-`https://github.com/<login>.png`. They are **not** interchangeable — several
-people in act II have a casting avatar that is not their GitHub one
-(A1RM4X's is a YouTube URL), so swapping the key swaps the face. Neither key
-reaches the manifest: both resolve to `avatar`/`avatar_url` at build time, so
-a portrait that moves in the vocab moves on every pill that cites it. Write a
-URL into a chapter file and it is a copy that will go stale silently.
-
-A speaker whose name *is* a GitHub login needs neither key — the login shape
-is recognised and the portrait derived. `- avatar: null` removes a portrait
+**A pill names a GitHub login, never a URL.** A canonical login resolves through
+`vocab/casting.yaml`'s `people` map, which owns its stable numeric GitHub ID and
+portrait fields. Display names, character IDs, historical personas, `cast:`,
+`avatar_login:`, and GitHub URLs are not chapter authoring. Existing release-
+train rows using those forms remain literal legacy speakers and are reported by
+`tools/identity.py`; they are not aliases. `- avatar: null` removes a portrait
 that was derived but is not wanted.
+
+When lifting an existing manifest, keep a local authored `avatar` path as a
+local chapter field. Omit a GitHub-derived URL only when the rebuilt entry
+deterministically re-derives that exact portrait through its login. A card or
+legacy speaker whose literal URL cannot be re-derived keeps it, rather than
+losing a portrait or gaining an inferred identity.
 
 Front matter worth knowing: `owns_plates` (this file is answerable for its
 plates, so the manifest is regenerated from it), `field_order`, `defaults`
@@ -297,5 +300,6 @@ into the dialogue. The integration order matters:
 python3 -m pytest -q tests/test_chapter_md.py tests/test_chapter_identity.py
 python3 -m pytest -q tests/test_full_script.py
 python3 tools/chapter_md.py check
+python3 tools/identity.py --act <migrated-act> --check
 python3 scripts/generate_full_script.py --check
 ```

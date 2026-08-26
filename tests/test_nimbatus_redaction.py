@@ -57,13 +57,13 @@ def _shot(seg, start, end, character):
 
 def test_nimbatus_is_bound_to_laura_santamaria():
     """'They are the same person' (owner, first alpha watch). The derivation
-    path agrees: a shot tagged Nimbatus casts laura_santamaria."""
-    assert BINDING["person"] == "laura_santamaria"
+    path agrees: a shot tagged Nimbatus casts the verified login."""
+    assert BINDING["person"] == "nimbinatus"
     got = compute_casting(
         _seg(character=[{"name": "Nimbatus", "kind": "guardian_npc"}]), LEADS)
     assert got["role"] == "lead"
     assert got["character"] == "nimbatus"
-    assert got["person"] == "laura_santamaria"
+    assert got["person"] == "nimbinatus"
 
 
 def test_the_login_is_nimbinatus_not_nimbatus():
@@ -72,7 +72,7 @@ def test_the_login_is_nimbinatus_not_nimbatus():
     is an unrelated empty account (u/20426015). Avatar tooling resolves from
     this login, so pinning it is the cheap fix for a stranger's face landing
     on her credit."""
-    assert BINDING["github"] == "nimbinatus"
+    assert BINDING["person"] == "nimbinatus"
 
 
 def test_the_redaction_scope_is_recorded():
@@ -93,8 +93,7 @@ def test_the_binding_carries_no_plate_copy():
     assert "plate" not in BINDING, (
         "plate copy here would have to be invented — the one thing "
         "vocab/casting.yaml must never do")
-    assert BINDING["display_name"] == "Nimbatus"
-    assert BINDING["display_name"] != BINDING["redacts"]
+    assert BINDING["person"] != BINDING["redacts"]
 
 
 def test_a_pre_reveal_cut_cannot_plate_her_real_name():
@@ -111,8 +110,8 @@ def test_a_pre_reveal_cut_cannot_plate_her_real_name():
     assert [e for e in entries if e.get("id") == "nimbatus"] == []
     by_id = {u["id"]: u for u in unresolved}
     assert by_id["nimbatus"]["reason"] == "no_plate_copy"
-    assert by_id["nimbatus"]["person"] == "laura_santamaria"
-    assert by_id["nimbatus"]["display_name"] == "Nimbatus"
+    assert by_id["nimbatus"]["person"] == "nimbinatus"
+    assert by_id["nimbatus"]["display_name"] == "nimbinatus"
 
 
 def test_elsie_bray_and_nimbatus_are_the_same_person_but_not_the_same_credit():
@@ -120,7 +119,7 @@ def test_elsie_bray_and_nimbatus_are_the_same_person_but_not_the_same_credit():
     `elsie_bray`: folding them together would route a pre-act-VII cut to the
     plate that prints her real name."""
     elsie = LEADS["elsie_bray"]
-    assert elsie["person"] == BINDING["person"] == "laura_santamaria"
+    assert elsie["person"] == BINDING["person"] == "nimbinatus"
     assert "nimbatus" not in elsie["aka"]
     # ...and the tagged name decides the credit: Elsie plates the authored
     # (post-reveal) identity, Nimbatus cannot plate at all.
