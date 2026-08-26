@@ -99,10 +99,10 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "50ae463652ddcfcc0e68838814c41b9ec19d718a8cef0170bfc0751051e41683",
+   "source_digest": "3354c98e588c8119716522ac3b16a0ab4515502bf3a34a7b2e0cb69ee55d82cd",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "env ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json",
-   "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
+   "built_from_commit": "5da049a860de221bb33f49396528b712df5ee3da"
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
