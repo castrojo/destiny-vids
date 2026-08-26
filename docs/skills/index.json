@@ -115,6 +115,26 @@
       "doc_type": "procedure"
     },
     {
+      "id": "hero-videos",
+      "name": "hero-videos",
+      "one_line_purpose": "Build a hero character music video from a paper-background animation.",
+      "entry_point": "docs/skills/hero-videos/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "ffmpeg",
+        "floodfill",
+        "qr",
+        "overlay",
+        "hero",
+        "argo"
+      ],
+      "description": "Key a paper-background character animation to transparency, compose the frame, and render on the farm. Use when working in ~/Videos/Wolves/Hero, when a RAFI_* hero video needs a pass, or when adding a QR card or URL wordmark to a hero cut.",
+      "version": "1.1",
+      "last_updated": "2026-08-25",
+      "doc_type": "procedure"
+    },
+    {
       "id": "megacut",
       "name": "megacut",
       "one_line_purpose": "Assemble finished acts into the canonical programme without re-editing them.",
