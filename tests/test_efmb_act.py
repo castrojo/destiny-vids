@@ -1248,6 +1248,9 @@ def test_amber_action_and_post_action_hallway_stay_distinct():
     assert action[-1]["at"] + action[-1]["dur"] <= \
         build_efmb.HALLWAY_AFTER_AMBER_AT
     assert build_efmb.HALLWAY_AFTER_AMBER_AT < build_efmb.HALLWAY_RETURN_AT
+    assert by_id["mapped_kyle_sup"]["at"] > build_efmb.HALLWAY_RETURN_AT
+    assert "mapped_amber_ready" not in by_id
+    assert "mapped_reaction_hell" not in by_id
 
 
 def test_rebuild_efmb_uses_a_prepared_burn_manifest_and_cached_actions_avatars():

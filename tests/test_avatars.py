@@ -25,6 +25,7 @@ import build_efmb_plates  # noqa: E402
 import build_credits as B  # noqa: E402
 from tools import avatars as A  # noqa: E402
 from tools import credits as C  # noqa: E402
+from tools import plate  # noqa: E402
 
 WORKFLOW = REPO_ROOT / ".github" / "workflows" / "avatars.yml"
 PNG = b"\x89PNG\r\n\x1a\n" + b"\0" * A.MIN_BYTES
@@ -96,6 +97,7 @@ def write_valid_png(path):
 def manifest_for(login):
     return {"plates": [{
         "id": "line", "kind": "chat", "speaker": login,
+        "text": "hello", "at": 1.0, "dur": 2.0, "position": "left",
         "avatar": f"renders/avatars/{login}.png",
         "avatar_required": True,
     }]}
@@ -289,6 +291,127 @@ def test_present_required_avatar_keeps_the_exact_plate(cache):
     prepared, findings = A.prepare_manifest_avatars(manifest)
     assert prepared["plates"] == manifest["plates"]
     assert findings == []
+
+
+def test_prepare_manifest_preserves_metadata_and_existing_unresolved(cache):
+    manifest = {
+        "_version": 7,
+        "fit_video": "renders/efmb-hq.mp4",
+        "unresolved": [{"plate_id": "existing", "status": "preexisting"}],
+        "plates": [
+            manifest_for("angellk")["plates"][0],
+            {
+                "id": "keep",
+                "kind": "chat",
+                "speaker": "helper",
+                "text": "still here",
+                "at": 3.0,
+                "dur": 2.0,
+                "position": "left",
+            },
+        ],
+    }
+
+    prepared, findings = A.prepare_manifest_avatars(manifest)
+
+    assert prepared["_version"] == manifest["_version"]
+    assert prepared["fit_video"] == manifest["fit_video"]
+    assert [plate["id"] for plate in prepared["plates"]] == ["keep"]
+    assert prepared["unresolved"] == [
+        {"plate_id": "existing", "status": "preexisting"},
+        {
+            "plate_id": "line",
+            "speaker": "angellk",
+            "avatar": "renders/avatars/angellk.png",
+            "status": "omitted_missing_required_avatar",
+        },
+    ]
+    assert findings == prepared["unresolved"][1:]
+
+
+def test_a_list_manifest_is_normalized_with_findings_for_plate_audit(cache):
+    prepared, findings = A.prepare_manifest_avatars([
+        manifest_for("angellk")["plates"][0],
+        {
+            "id": "keep",
+            "kind": "chat",
+            "speaker": "helper",
+            "text": "still here",
+            "at": 3.0,
+            "dur": 2.0,
+            "position": "left",
+        },
+    ])
+
+    assert prepared == {
+        "plates": [{
+            "id": "keep",
+            "kind": "chat",
+            "speaker": "helper",
+            "text": "still here",
+            "at": 3.0,
+            "dur": 2.0,
+            "position": "left",
+        }],
+        "unresolved": [{
+            "plate_id": "line",
+            "speaker": "angellk",
+            "avatar": "renders/avatars/angellk.png",
+            "status": "omitted_missing_required_avatar",
+        }],
+    }
+    assert findings == prepared["unresolved"]
+
+
+def test_a_required_avatar_without_a_path_is_omitted_and_recorded(cache):
+    manifest = {"plates": [{
+        "id": "line",
+        "kind": "chat",
+        "speaker": "angellk",
+        "text": "hello",
+        "at": 1.0,
+        "dur": 2.0,
+        "position": "left",
+        "avatar_required": True,
+    }]}
+
+    prepared, findings = A.prepare_manifest_avatars(manifest)
+
+    assert prepared["plates"] == []
+    assert findings == [{
+        "plate_id": "line",
+        "speaker": "angellk",
+        "avatar": None,
+        "status": "omitted_missing_required_avatar",
+    }]
+
+
+def test_prepare_cli_writes_a_loader_compatible_normalized_manifest(cache, tmp_path):
+    src = tmp_path / "merged.json"
+    out = tmp_path / "prepared.json"
+    src.write_text(json.dumps([
+        manifest_for("angellk")["plates"][0],
+        {
+            "id": "keep",
+            "kind": "chat",
+            "speaker": "helper",
+            "text": "still here",
+            "at": 3.0,
+            "dur": 2.0,
+            "position": "left",
+        },
+    ]), encoding="utf-8")
+
+    assert A.main(["--manifest", str(src), "--prepare", str(out), "--quiet"]) == 0
+
+    prepared = json.loads(out.read_text(encoding="utf-8"))
+    assert [entry["id"] for entry in plate.load_manifest(out)] == ["keep"]
+    assert prepared["unresolved"] == [{
+        "plate_id": "line",
+        "speaker": "angellk",
+        "avatar": "renders/avatars/angellk.png",
+        "status": "omitted_missing_required_avatar",
+    }]
 
 # --- the CI bridge ---------------------------------------------------------
 

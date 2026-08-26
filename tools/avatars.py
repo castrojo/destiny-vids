@@ -102,6 +102,50 @@ def _manifest_entries(manifest):
     return list(manifest or [])
 
 
+def _prepare_document(manifest):
+    """Deep-copy ``manifest`` and normalize bare plate lists to a document."""
+    if isinstance(manifest, dict):
+        return copy.deepcopy(manifest)
+    return {"plates": copy.deepcopy(_manifest_entries(manifest)), "unresolved": []}
+
+
+def _resolved_avatar_path(avatar):
+    if not avatar:
+        return None
+    path = Path(str(avatar)).expanduser()
+    return path if path.is_absolute() else REPO_ROOT / path
+
+
+def _avatar_candidates(avatar):
+    path = _resolved_avatar_path(avatar)
+    if path is not None:
+        yield path
+        if path.suffix == ".png":
+            cache_path = avatar_dir() / path.name
+            if cache_path != path:
+                yield cache_path
+
+
+def _usable_required_avatar(avatar):
+    for path in _avatar_candidates(avatar):
+        if not path.is_file():
+            continue
+        try:
+            if path.stat().st_size < MIN_BYTES:
+                continue
+        except OSError:
+            continue
+        try:
+            from PIL import Image
+
+            with Image.open(path) as img:
+                img.verify()
+        except (ImportError, OSError, ValueError):
+            continue
+        return True
+    return False
+
+
 def _load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
@@ -136,13 +180,13 @@ def required_avatar_logins_for_dialogue(video_id):
 
 def prepare_manifest_avatars(manifest, strict=False):
     """Drop plates whose required portrait is missing and record why."""
-    prepared = copy.deepcopy(manifest)
+    prepared = _prepare_document(manifest)
     findings = []
     entries = _manifest_entries(prepared)
     kept = []
     for entry in entries:
         avatar = entry.get("avatar")
-        if entry.get("avatar_required") and avatar and not have(Path(avatar).stem):
+        if entry.get("avatar_required") and not _usable_required_avatar(avatar):
             findings.append({
                 "plate_id": entry["id"],
                 "speaker": entry.get("speaker") or entry.get("name"),
@@ -155,14 +199,13 @@ def prepare_manifest_avatars(manifest, strict=False):
         raise FileNotFoundError(
             ", ".join(f"{item['plate_id']} ({item['avatar']})" for item in findings)
         )
-    if isinstance(prepared, dict):
-        if "plates" in prepared:
-            prepared["plates"] = kept
-        elif "cards" in prepared:
-            prepared["cards"] = kept
-        prepared.setdefault("unresolved", []).extend(findings)
+    if "plates" in prepared:
+        prepared["plates"] = kept
+    elif "cards" in prepared:
+        prepared["cards"] = kept
     else:
-        prepared = kept
+        prepared["plates"] = kept
+    prepared.setdefault("unresolved", []).extend(findings)
     return prepared, findings
 
 
