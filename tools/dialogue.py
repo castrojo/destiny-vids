@@ -61,17 +61,27 @@ def load_dialogue(video_id, root=DIALOGUE_DIR):
 
 
 def _speaker_for(character, leads):
-    """Character key -> its bound GitHub login on the chat pill, or None."""
+    """Character key -> its canonical GitHub login on the chat pill."""
+    identity = _identity_for(character, leads)
+    return identity["speaker"] if identity else None
+
+
+def _identity_for(character, leads):
+    """Character key -> its canonical chat identity, or None when unbound."""
     entry = leads.get(character) or {}
-    return f"@{entry['person']}" if entry.get("person") else None
+    login = entry.get("person")
+    if not login:
+        return None
+    from tools.identity import UnknownPerson, chat_identity
+    try:
+        return chat_identity(login)
+    except UnknownPerson:
+        return None
 
 
 def _avatar_for(character, leads):
-    login = (leads.get(character) or {}).get("person")
-    if not login:
-        return None
-    from tools.identity import chat_identity
-    return chat_identity(login)["avatar"]
+    identity = _identity_for(character, leads)
+    return identity["avatar"] if identity else None
 
 
 def lanes_for(cues):
