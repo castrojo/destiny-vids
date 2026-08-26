@@ -155,6 +155,12 @@ def test_stale_ending_cards_use_the_browser_renderer(tmp_path, monkeypatch):
         build_ending_overlays.subprocess, "run",
         lambda cmd, **kwargs: ran.append((cmd, kwargs)),
     )
+    house = []
+    monkeypatch.setattr(
+        build_ending_overlays.plate, "render_all",
+        lambda entries, out_dir, picture=None: house.append(
+            (entries, out_dir, picture)),
+    )
 
     assert build_ending_overlays.refresh_cards(
         MANIFEST, ending(), cards_dir
@@ -169,6 +175,44 @@ def test_stale_ending_cards_use_the_browser_renderer(tmp_path, monkeypatch):
     assert cmd[6] == "--only"
     assert cmd[7].split(",") == [card["id"] for card in underwater(ending())]
     assert kwargs == {"check": True, "cwd": REPO}
+    assert house == [(
+        underwater(ending()),
+        cards_dir,
+        build_ending_overlays.picture_rect(ending(), "underwater"),
+    )]
+
+
+def test_p4_stale_chat_cards_use_the_house_renderer_in_the_letterbox(
+        tmp_path, monkeypatch):
+    cards_dir = tmp_path / "cards"
+    monkeypatch.setattr(
+        build_ending_overlays.freshness, "stale_outputs",
+        lambda inputs, outputs: outputs,
+    )
+    monkeypatch.setattr(build_ending_overlays.subprocess, "run",
+                        lambda *_args, **_kwargs: None)
+    house = []
+    monkeypatch.setattr(
+        build_ending_overlays.plate, "render_all",
+        lambda entries, out_dir, picture=None: house.append(
+            ([entry["id"] for entry in entries], out_dir, picture)),
+    )
+
+    section = ["chat_wolf", "chat"]
+    build_ending_overlays.refresh_cards(CHAT, chat(), cards_dir, section)
+
+    assert house == [(
+        ["chat_wolf", "chat_loose_end", "chat_escape", "chat_promised",
+         "chat_fine", "chat_minds", "chat_wolves"],
+        cards_dir,
+        (0, 138, 1920, 804),
+    )]
+
+
+def test_p4_card_freshness_tracks_the_house_renderer_and_casting():
+    inputs = build_ending_overlays.card_inputs(CHAT)
+    assert REPO / "tools" / "plate.py" in inputs
+    assert REPO / "vocab" / "casting.yaml" in inputs
 
 
 def test_the_clean_movement_declares_the_derivative_separately():
@@ -268,7 +312,7 @@ def test_plate_inputs_are_numbered_after_the_artwork(tmp_path, monkeypatch):
     cmd = chat_command(tmp_path, monkeypatch)
     graph = cmd[cmd.index("-filter_complex") + 1]
     assert "[8:v]format=rgba,setpts=PTS-STARTPTS+53.951/TB" in graph
-    assert "[13:v]format=rgba,setpts=PTS-STARTPTS+65.236/TB" in graph
+    assert "[13:v]format=rgba,setpts=PTS-STARTPTS+65.451/TB" in graph
     inputs = [cmd[i + 1] for i, a in enumerate(cmd[:-1]) if a == "-i"]
     assert len(inputs) == 1 + 7 + 6
     assert inputs[0].endswith("yt_nightwish_perfume_of_the_timeless.mkv")
@@ -313,7 +357,8 @@ def test_the_chat_copy_is_verbatim_and_one_line_at_a_time():
         "Of the wolves",
     ]
     assert [p["speaker"] for p in plates] == [
-        "Jill Castro", "Valerie", "Rafael", "castrojo", "LH", "Valerie"]
+        "JillCastro", "valerie-tar-gz", "rafaelcastro10", "castrojo",
+        "LionHeartP", "valerie-tar-gz"]
     assert all(p["kind"] == "chat" and p["position"] == "letterbox"
                and p["copy_source"] == "owner_supplied" for p in plates)
     for previous, current in zip(plates, plates[1:]):
@@ -324,10 +369,41 @@ def test_the_chat_copy_is_verbatim_and_one_line_at_a_time():
             p["at"] + p["dur"] - p["fade_out"])
 
 
+def test_p4_chat_uses_canonical_logins_and_readable_seats():
+    """GitHub identities replace legacy personas without changing the copy."""
+    doc = chat()
+    by_id = {p["id"]: p for p in doc["plates"]}
+    expected = {
+        "chat_loose_end": ("JillCastro", 53.951, 2.2),
+        "chat_escape": ("valerie-tar-gz", 56.251, 2.2),
+        "chat_promised": ("rafaelcastro10", 58.551, 2.2),
+        "chat_fine": ("castrojo", 60.851, 2.2),
+        "chat_minds": ("LionHeartP", 63.151, 2.2),
+        "chat_wolves": ("valerie-tar-gz", 65.451, 3.0),
+        "chat_wolf": ("rafaelcastro10", 17.163, 3.0),
+    }
+    github_ids = {
+        "JillCastro": 209076372,
+        "valerie-tar-gz": 155010216,
+        "rafaelcastro10": 49164776,
+        "castrojo": 1264109,
+        "LionHeartP": 28869010,
+    }
+    assert "_people" not in doc
+    assert "unresolved" not in doc
+    for id_, (login, at, dur) in expected.items():
+        plate = by_id[id_]
+        assert plate["speaker"] == login
+        assert plate["at"] == pytest.approx(at)
+        assert plate["dur"] == pytest.approx(dur)
+        assert plate["avatar"] == f"renders/avatars/{login}.png"
+        assert plate["avatar_url"].endswith(f"/{github_ids[login]}?v=4")
+
+
 def test_the_exchange_sits_inside_the_measured_whale_shot():
     """The pills live inside one measured shot -- the divers and the whale
-    skeleton, source 328.080 -> 343.080 -- and the last line is out 0.6 s
-    before the cut so the cut is the picture's own."""
+    skeleton, source 328.080 -> 343.080 -- and clear before the cut so the
+    cut is the picture's own."""
     doc = chat()
     window = doc["chat"]
     local_in = window["source_in"] - 274.240
@@ -339,26 +415,16 @@ def test_the_exchange_sits_inside_the_measured_whale_shot():
     assert [p["id"] for p in plates] == window["plate_ids"]
 
 
-def test_unresolved_speakers_carry_no_avatar():
-    """Never guess a login for a real person: the unresolved three render
-    the drawn crest, and the manifest records the gap."""
+def test_all_p4_speakers_carry_their_resolved_avatar():
     doc = chat()
-    by_speaker = {}
-    for p in doc["plates"]:
-        by_speaker.setdefault(p["speaker"], p)
-    for name in ("Jill Castro", "Rafael", "LH"):
-        assert "avatar" not in by_speaker[name], name
-    unresolved = " ".join(doc["unresolved"])
-    for name in ("Jill Castro", "Rafael", "LH"):
-        assert name in unresolved
+    assert "unresolved" not in doc
+    for plate in doc["plates"]:
+        assert plate["avatar"] == f"renders/avatars/{plate['speaker']}.png"
 
 
 
 def test_chat_wolf_cue_is_exactly_at_local_17_163():
-    """Rafael's programme note at 23:30 is locked to the movement-local
-    seat derived from the old programme clock: 23:30 - 23:12.837 = 17.163.
-    No avatar: Rafael has no resolved login on record.
-    """
+    """The early programme note remains locked to its movement-local seat."""
     doc = chat()
     by_id = {p["id"]: p for p in doc["plates"]}
     wolf = by_id["chat_wolf"]
@@ -367,12 +433,13 @@ def test_chat_wolf_cue_is_exactly_at_local_17_163():
     assert float(wolf["fade_in"]) == pytest.approx(0.4)
     assert float(wolf["fade_out"]) == pytest.approx(0.25)
     assert float(wolf["fade_out_at"]) == pytest.approx(19.913)
-    assert wolf["speaker"] == "Rafael"
+    assert wolf["speaker"] == "rafaelcastro10"
     assert wolf["text"] == "What's a wolf?"
     assert wolf["kind"] == "chat"
     assert wolf["position"] == "letterbox"
     assert wolf["copy_source"] == "owner_supplied"
-    assert "avatar" not in wolf
+    assert wolf["avatar"] == "renders/avatars/rafaelcastro10.png"
+    assert wolf["avatar_url"].endswith("/49164776?v=4")
 
 
 def test_chat_wolf_section_is_separate_from_whale_chat():
@@ -431,7 +498,7 @@ def test_default_sections_burn_all_seven_plates_in_one_encode(
     ]
     # chat_wolf sits at the movement-local seat 17.163.
     assert "[8:v]format=rgba,setpts=PTS-STARTPTS+17.163/TB" in graph
-    assert "[14:v]format=rgba,setpts=PTS-STARTPTS+65.236/TB" in graph
+    assert "[14:v]format=rgba,setpts=PTS-STARTPTS+65.451/TB" in graph
     assert "enable='gte(t,17.163)*lt(t,20.163)'" in graph
     assert "-c:a flac" in joined
     assert "afade" not in graph

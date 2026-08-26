@@ -80,6 +80,7 @@ if str(REPO) not in sys.path:
 from tools import conform  # noqa: E402
 from tools import chapter_md  # noqa: E402
 from tools import freshness  # noqa: E402
+from tools import plate  # noqa: E402
 from tools.render import ffmpeg_for_printing, find_ffmpeg  # noqa: E402
 from scripts import build_interludes  # noqa: E402
 
@@ -132,7 +133,19 @@ def missing_cards(doc, cards_dir, section=SECTION):
 def card_inputs(manifest):
     return [Path(manifest),
             REPO / "cards" / "render-cards.mjs",
-            *sorted((REPO / "cards").glob("*.html"))]
+            *sorted((REPO / "cards").glob("*.html")),
+            REPO / "tools" / "plate.py",
+            REPO / "vocab" / "casting.yaml"]
+
+
+def picture_rect(doc, section):
+    """The manifest's authored picture seat for a section's house plates."""
+    sections = [section] if isinstance(section, str) else list(section)
+    for name in sections:
+        spec = doc.get(name) or {}
+        if "active_y" in spec and "active_height" in spec:
+            return (0, int(spec["active_y"]), W, int(spec["active_height"]))
+    return None
 
 
 def refresh_cards(manifest, doc, cards_dir, section=SECTION):
@@ -158,6 +171,13 @@ def refresh_cards(manifest, doc, cards_dir, section=SECTION):
         check=True,
         cwd=REPO,
     )
+    # Browser cards and house plates share a directory, but the browser
+    # deliberately skips chats. Rendering only the former left a changed chat
+    # manifest paired with its old PNG, which then burned stale identities
+    # into the derivative. The authored picture rect keeps P4's pills in its
+    # measured letterbox rather than treating the whole 16:9 frame as picture.
+    plate.render_all(underwater_cards(doc, section), cards_dir,
+                     picture=picture_rect(doc, section))
     return wanted
 
 
