@@ -283,21 +283,19 @@ def test_a_reseat_hook_that_cannot_be_loaded_degrades_and_says_so(
 def test_act_two_reseats_through_its_builder_and_not_a_second_copy():
     """One mapping, reached from both ends.
 
-    The regression this pins: `build_efmb_plates.build()` grew the rebase
-    and the `source_anchor` seating, and `chapter_md`'s own commands kept
-    printing the raw schedule. Restating the arithmetic here rather than
-    calling the builder's own function would put the same defect back, one
-    copy later.
+    The regression this pins: `build_efmb_plates.build()` grew source-anchor
+    seating, while `chapter_md`'s own commands kept printing the raw
+    schedule. Restating the arithmetic here rather than calling the builder's
+    own function would put the same defect back, one copy later.
     """
     hook, note = chapter_md._reseater("II")
     assert note is None
     assert hook is build_efmb_plates.reseat_chapter_entries
 
 
-def test_raw_act_two_prompt_remains_reported_until_its_owner_edit_is_integrated():
-    """Task 1 must not normalize the intentionally preserved owner prompt."""
-    assert chapter_md.check("II")
-    assert chapter_md.main(["check", "II", "--check"]) == 1
+def test_normalized_act_two_prompt_matches_its_generated_manifest():
+    assert chapter_md.check("II") == []
+    assert chapter_md.main(["check", "II", "--check"]) == 0
 
 
 def _shown(capsys, act="II"):
@@ -306,13 +304,13 @@ def _shown(capsys, act="II"):
 
 
 def test_show_quotes_act_two_at_the_seats_the_manifest_carries(capsys):
-    """The intentionally raw prompt remains previewable before integration."""
+    """The normalized source remains previewable at its emitted seats."""
     lines = _shown(capsys)
     assert lines
 
 
 def test_show_seats_sup_on_the_heroes_void_shield_source(capsys):
-    """The raw prompt's source-anchored line stays available for review."""
+    """The normalized source-anchored line stays available for review."""
     _shown(capsys)
     sup = {p["id"]: p for p in chapter_md.manifest_plates("II")}["mapped_kyle_sup"]
     assert sup["seen_at_src"] == pytest.approx(331.763)
@@ -322,14 +320,14 @@ def test_show_seats_sup_on_the_heroes_void_shield_source(capsys):
 # matter), reproduced here -- across the SAME three physical lines the real
 # file declares it on -- so the ordering test below exercises
 # `parse_front_matter`'s continuation-line joining directly, and needs
-# neither the real chapter file nor Task 3's still-missing `paused` heading
-# label. See also `test_parse_front_matter_joins_a_wrapped_scalar_field`
+# neither the real chapter file nor its interruption block labels. See also
+# `test_parse_front_matter_joins_a_wrapped_scalar_field`
 # below, which asserts the joining in isolation, and
 # `test_the_real_act_ii_field_order_survives_its_multiline_declaration`,
 # which pins the same shape against `chapters/II-endless-forms.md` itself.
 ACT_II_FIELD_ORDER = (
     "id, at, dur, name, title, title_source, kind, position,\n"
-    "  copy_source, speaker, text, text_source, scale, seen_at_src,\n"
+    "  copy_source, speaker, text, text_source, speaker_pending, scale, seen_at_src,\n"
     "  avatar, avatar_url, bond_of")
 
 
@@ -345,7 +343,8 @@ def test_parse_front_matter_joins_a_wrapped_scalar_field():
     assert order == [
         "id", "at", "dur", "name", "title", "title_source", "kind",
         "position", "copy_source", "speaker", "text", "text_source",
-        "scale", "seen_at_src", "avatar", "avatar_url", "bond_of"]
+        "speaker_pending", "scale", "seen_at_src", "avatar", "avatar_url",
+        "bond_of"]
 
 
 def test_the_real_act_ii_field_order_survives_its_multiline_declaration():

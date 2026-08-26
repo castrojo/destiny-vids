@@ -819,9 +819,8 @@ def emitted_entries(act):
 
     ``entries`` above is the chapter file's own reading of itself. An act
     whose builder MOVES a seat between the file and the manifest -- act II,
-    whose `paused` block rebases the pins authored after it and whose
-    ``source_anchor`` rows are seated on the frames they name -- resolves to
-    something the delivered master does not carry, and every command an
+    whose ``source_anchor`` rows are seated on the frames they name -- resolves
+    to something the delivered master does not carry, and every command an
     editor is pointed at (``show``, ``check``) has to describe the film that
     ships rather than the file's raw schedule.
 

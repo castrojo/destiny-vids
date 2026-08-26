@@ -113,10 +113,14 @@ independent of how long anything authored before it runs — carries
 `source_anchor: <source seconds>` instead of `@ <heading time>` or
 `seen_at_src`. Act II's builder (`scripts/build_efmb_plates.py`) pops the key,
 sets `at` from that source frame, and publishes `seen_at_src` in its place;
-the key never reaches the manifest, and the pill is exempt from the
-across-the-board rebase every other post-pause pin gets when the paused
-block's length changes (it is already seated against the current footage, not
-against a stale hand-typed pause length).
+the key never reaches the manifest. Its seat stays tied to the current source
+frame rather than to a programme-clock pin that may move with an edit.
+
+**An inserted clip inside a held source frame needs three labelled blocks.**
+Label the pre-insert hold, the inserted action, and the post-insert hold; the
+picture builder derives all three half-open intervals from those records. Its
+inverse clock must return the held source frame during the post-insert interval
+and raise only inside the external clip.
 
 **An identifier is not visual evidence.** A constant or plate ID can preserve
 an earlier interpretation of a frame; extract and inspect the target frame
