@@ -26,7 +26,7 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `5:10.23` Does NOT Come in Peace / OG GUARDIAN / Tim Hockin
 - `5:14.43` **jrsapi** — No one can tell which Ricardo is which so roll with it
 - `5:18.23` **rochaporto** — It's me the nuke guy how do you think I got here?
-- `5:22.03` **TBD** — Lunar record baby! Hello KubeCon + CloudNativeCon
+- `5:22.03` **pilot** — Lunar record baby! Hello KubeCon + CloudNativeCon
 - `5:25.23` **ricardosalveti** — They wanted us to put AI in the glider so we did.
 - `5:29.00` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
 - `5:30.30` PRESENT DAY
@@ -142,36 +142,36 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `8:43.75` **KyleGospo** — FOR TITANFALL!
 - `8:46.20` **[redacted]** — Or go blow some shit up
-- `8:59.73` **akgraner** — Hi sugar, I'm looking for Kyle
-- `9:02.18` **HikariKnight** — Ouch man wtf!
-- `9:04.63` **TBD** — Oh sorry my bad
-- `9:07.08` **kolunmi** — Who turned PvP on?
-- `9:09.53` **angellk** — Don't look at me I only turned on PVP
-- `9:12.78` **TBD** — Mom no one plays this game
-- `9:15.23` **HikariKnight** — Hey wait?!
-- `9:17.68` **kolunmi** — Are those ... other linux users?
-- `9:20.53` **akgraner** — "How bazaar?"
-- `9:22.98` **akgraner** — Who writes this crap?
-- `9:25.43` **akgraner** — Oh wow I forgot what the starter dungeon was like! Hi!
-- `9:34.65` **akgraner** — Remember, kindness is doing what's right
-- `9:37.26` **akgraner** — For the ecosystem
-- `9:39.71` **akgraner** — For our users
-- `9:42.16` **akgraner** — And for our maintainers
-- `9:44.61` **akgraner** — Don't be nice
-- `9:47.06` **akgraner** — Be kind
-- `9:49.51` **akgraner** — Extinction is the Rule
-- `9:52.20` **akgraner** — Ok so I'm going to clean out this trash for you
-- `9:55.22` **akgraner** — [Don't let them decide for you]
-- `9:57.67` **akgraner** — You make your own fate.
-- `10:00.12` **akgraner** — I can't save you from this shitty writing though
-- `10:14.94` **nwoods3** — I feel seen
-- `10:17.39` **kolunmi** — Hey did you see how we just loaded up in a new level?
-- `10:20.75` **HikariKnight** — Finally, I can play WARFRAME!
-- `10:23.60` Reprehenderit voluptate / HATERS
-- `10:29.20` **KyleGospo** — Sup
-- `10:31.25` **kolunmi** — Cardio!
-- `10:54.17` **[redacted]** — Finally, retirement
-- `10:56.62` **[redacted]** — The long walk beckons
+- `8:59.23` **akgraner** — Hi sugar, I'm looking for Kyle
+- `9:01.68` **HikariKnight** — Ouch man wtf!
+- `9:04.13` **owen** — Oh sorry my bad
+- `9:06.58` **kolunmi** — Who turned PvP on?
+- `9:09.03` **angellk** — Don't look at me I only turned on PVP
+- `9:12.28` **cam** — Mom no one plays this game
+- `9:14.73` **HikariKnight** — Hey wait?!
+- `9:17.18` **kolunmi** — Are those ... other linux users?
+- `9:20.03` **akgraner** — "How bazaar?"
+- `9:22.48` **akgraner** — Who writes this crap?
+- `9:24.93` **akgraner** — Oh wow I forgot what the starter dungeon was like! Hi!
+- `9:34.15` **akgraner** — Remember, kindness is doing what's right
+- `9:36.76` **akgraner** — For the ecosystem
+- `9:39.21` **akgraner** — For our users
+- `9:41.66` **akgraner** — And for our maintainers
+- `9:44.11` **akgraner** — Don't be nice
+- `9:46.56` **akgraner** — Be kind
+- `9:49.01` **akgraner** — Extinction is the Rule
+- `9:51.46` **akgraner** — Ok so I'm going to clean out this trash for you
+- `9:54.47` **akgraner** — [Don't let them decide for you]
+- `9:56.92` **akgraner** — You make your own fate.
+- `9:59.37` **akgraner** — I can't save you from this shitty writing though
+- `10:02.44` **nwoods3** — I feel seen
+- `10:04.89` **kolunmi** — Hey did you see how we just loaded up in a new level?
+- `10:08.26` **HikariKnight** — Finally, I can play WARFRAME!
+- `10:11.11` Reprehenderit voluptate / HATERS
+- `10:16.71` **KyleGospo** — Sup
+- `10:18.76` **kolunmi** — Cardio!
+- `10:41.68` **[redacted]** — Finally, retirement
+- `10:44.13` **[redacted]** — The long walk beckons
 
 ## III
 

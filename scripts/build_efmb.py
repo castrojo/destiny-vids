@@ -210,19 +210,35 @@ HALLWAY_AT = 255.433
 PAUSED_BLOCK = "paused"
 AMBER_ACTION_BLOCK = "amber-action"
 POST_AMBER_BLOCK = "post-amber"
-HALLWAY_FREEZE_SEC = round(
-    chapter_md.block_end("II", PAUSED_BLOCK) - HALLWAY_AT, 3)
+PAUSED_BLOCK_START, PAUSED_BLOCK_END = chapter_md.block_bounds(
+    "II", PAUSED_BLOCK)
+AMBER_ACTION_BLOCK_START, AMBER_ACTION_BLOCK_END = chapter_md.block_bounds(
+    "II", AMBER_ACTION_BLOCK)
+POST_AMBER_BLOCK_START, POST_AMBER_BLOCK_END = chapter_md.block_bounds(
+    "II", POST_AMBER_BLOCK)
+
+# The chapter's headings may move when the surrounding edit moves. An
+# interruption owns only its authored span, not any stale gap before it.
+HALLWAY_FREEZE_SEC = round(PAUSED_BLOCK_END - PAUSED_BLOCK_START, 3)
 AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
 AMBER_CLIP_IN = 43.000
 AMBER_CLIP_SEC = round(
-    chapter_md.block_end("II", AMBER_ACTION_BLOCK) - AMBER_AT, 3)
+    AMBER_ACTION_BLOCK_END - AMBER_ACTION_BLOCK_START, 3)
 AMBER_CLIP_OUT = AMBER_CLIP_IN + AMBER_CLIP_SEC
 # Return to the same hallway frame for the post-action conversation before
 # the Destiny picture resumes.
 HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
 HALLWAY_AFTER_AMBER_SEC = round(
-    chapter_md.block_end("II", POST_AMBER_BLOCK) - HALLWAY_AFTER_AMBER_AT, 3)
+    POST_AMBER_BLOCK_END - POST_AMBER_BLOCK_START, 3)
 HALLWAY_RETURN_AT = HALLWAY_AFTER_AMBER_AT + HALLWAY_AFTER_AMBER_SEC
+
+# The chapter builder re-seats these authored spans at the picture boundaries
+# above, preserving each line's relative position inside its own block.
+INTERRUPTION_BLOCK_AT = {
+    PAUSED_BLOCK: HALLWAY_AT,
+    AMBER_ACTION_BLOCK: AMBER_AT,
+    POST_AMBER_BLOCK: HALLWAY_AFTER_AMBER_AT,
+}
 
 INTERRUPTION_SEC = (
     HALLWAY_FREEZE_SEC + AMBER_CLIP_SEC + HALLWAY_AFTER_AMBER_SEC)
@@ -484,11 +500,6 @@ def fmt(seconds):
 
 TARGET_W, TARGET_H, TARGET_FPS = 1920, 1080, 30
 
-# The extended owner-authorized Amber sequence raises the delivered mix's
-# measured true peak to +0.4 dBFS. A -1.5 dB static gain lands the FLAC master
-# below the project's -0.9 dBTP ceiling without changing its dynamics.
-MUX_GAIN_DB = -1.5
-
 # ISSUE #88, AND WHY EVERY CHAIN BELOW IS `-vf`.
 #
 # The identical normalising chain gives two different answers depending on how
@@ -641,11 +652,7 @@ def audio_filtergraph(sequence=None):
             "asetpts=PTS-STARTPTS,aresample=48000,"
             f"aformat=sample_fmts=fltp:channel_layouts=stereo[{label}]")
         labels.append(f"[{label}]")
-    mixed = "aout" if MUX_GAIN_DB == 0 else "mix"
-    chains.append(
-        "".join(labels) + f"concat=n={len(labels)}:v=0:a=1[{mixed}]")
-    if MUX_GAIN_DB:
-        chains.append(f"[{mixed}]volume={MUX_GAIN_DB:g}dB[aout]")
+    chains.append("".join(labels) + f"concat=n={len(labels)}:v=0:a=1[aout]")
     return ";".join(chains)
 
 

@@ -97,11 +97,12 @@ otherwise reach a frame.
 
 **A heading label lets a held frame derive its own duration.** Writing
 `## <heading> <label>` (for example `## 9:52.203 paused`) tags every entry
-under that heading until the next one, and `chapter_md.block_end(act, label)`
-returns the film position where the labelled block ends — so a builder that
-holds a frame for "as long as this conversation takes" derives that hold from
-the conversation's own authored length instead of a hand-typed duration that
-goes stale the next time a line is added or cut. `entries(act,
+under that heading until the next one. `chapter_md.block_bounds(act, label)`
+returns that authored span's film-local `(start, end)`; a builder derives the
+hold as `end - start` and re-seats it at the picture boundary it owns, rather
+than accidentally carrying a stale gap before the heading into a dark freeze.
+`block_start` and `block_end` expose either edge when that is all a caller
+needs. `entries(act,
 include_block_labels=True)` returns each entry's label under the private
 `_chapter_label` key, for a builder (or a test) that needs to know which
 block an entry belongs to; it is never written into the manifest.

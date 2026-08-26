@@ -15,7 +15,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_efmb  # noqa: E402
 import build_efmb_plates  # noqa: E402
-from tools import chapter_md, readtime  # noqa: E402
+from tools import chapter_md, peaks, readtime  # noqa: E402
 
 # --- the two clocks --------------------------------------------------------
 
@@ -98,12 +98,36 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
 
 def test_hallway_interruption_is_derived_from_the_three_chapter_blocks():
     """The pause, insert, and returned hold keep distinct authored clocks."""
+    paused = chapter_md.block_bounds("II", "paused")
+    amber = chapter_md.block_bounds("II", "amber-action")
+    post_amber = chapter_md.block_bounds("II", "post-amber")
+
+    assert build_efmb.HALLWAY_FREEZE_SEC == pytest.approx(
+        paused[1] - paused[0])
+    assert build_efmb.AMBER_CLIP_SEC == pytest.approx(amber[1] - amber[0])
+    assert build_efmb.HALLWAY_AFTER_AMBER_SEC == pytest.approx(
+        post_amber[1] - post_amber[0])
     assert build_efmb.AMBER_AT == pytest.approx(
-        chapter_md.block_end("II", "paused"))
+        build_efmb.HALLWAY_AT + build_efmb.HALLWAY_FREEZE_SEC)
     assert build_efmb.HALLWAY_AFTER_AMBER_AT == pytest.approx(
-        chapter_md.block_end("II", "amber-action"))
+        build_efmb.AMBER_AT + build_efmb.AMBER_CLIP_SEC)
     assert build_efmb.HALLWAY_RETURN_AT == pytest.approx(
-        chapter_md.block_end("II", "post-amber"))
+        build_efmb.HALLWAY_AFTER_AMBER_AT
+        + build_efmb.HALLWAY_AFTER_AMBER_SEC)
+
+
+def test_post_amber_cards_start_when_the_returned_hallway_starts():
+    """A stale chapter heading must not become a dark, empty twelve-second hold."""
+    after = next(p for p in build_efmb.picture_sequence()
+                 if p["id"] == "hallway_after_amber")
+    first_post_amber = plate_by_id("chat_nwoods3_seen")
+    post_start, post_end = chapter_md.block_bounds("II", "post-amber")
+
+    assert after["at"] == pytest.approx(build_efmb.HALLWAY_AFTER_AMBER_AT)
+    assert after["duration"] == pytest.approx(post_end - post_start)
+    assert first_post_amber["at"] == pytest.approx(
+        build_efmb.HALLWAY_AFTER_AMBER_AT)
+    assert 0 <= first_post_amber["at"] - after["at"] <= chapter_md.GAP
 
 def test_the_picture_tail_is_black_after_the_last_evidenced_run():
     sequence = build_efmb.picture_sequence()
@@ -495,13 +519,21 @@ def test_the_picture_chain_never_uses_filter_complex():
     assert '"-c:v", "copy"' in render_section
     assert "filter_complex" not in build_efmb.NORMALISE_VF
 
-def test_the_bed_is_corrected_with_static_gain_and_never_a_normaliser():
-    """The measured final peak is corrected once, without dynamics processing."""
-    assert build_efmb.MUX_GAIN_DB == pytest.approx(-1.5)
-    assert f"volume={build_efmb.MUX_GAIN_DB:g}dB" in build_efmb.audio_filtergraph()
+def test_the_declared_rebuild_derives_static_trim_from_the_decoded_delivery():
+    """A measured clean-master trim precedes the burn; the delivered file is
+    then checked against the shared ceiling, never a magic gain."""
+    assert "volume=" not in build_efmb.audio_filtergraph()
     source = (REPO_ROOT / "scripts" / "build_efmb.py").read_text()
     render_section = source[source.index("def render("):]
-    for banned in ("loudnorm", "alimiter", "acompressor"):
+    rebuild = (REPO_ROOT / "scripts" / "rebuild_efmb.sh").read_text()
+    trim = 'tools/peaks.py trim renders/efmb-hq.mp4 --ffmpeg "$DESTINY_FFMPEG"'
+    assert trim in rebuild
+    assert rebuild.index(trim) < rebuild.index("tools/plate.py burn")
+    assert "peaks.measure_true_peak(path" in rebuild
+    assert "peaks.DEFAULT_TARGET_DBTP + peaks.DELIVERED_BAND_MARGIN_DB" in rebuild
+    assert "assert peak <= ceiling" in rebuild
+    assert peaks.DEFAULT_TARGET_DBTP + peaks.DELIVERED_BAND_MARGIN_DB < 0
+    for banned in ("loudnorm", "alimiter", "acompressor", "equalizer"):
         assert banned not in render_section
 
 # --- the montage announcements (owner brief, issue #98) ---------------------
@@ -740,10 +772,10 @@ def test_the_normalized_pause_copy_is_emitted_verbatim():
     assert by_id["mapped_hikari_wait"]["text"] == "Hey wait?!"
     assert by_id["mapped_kolunmi_users"]["text"] == \
         "Are those ... other linux users?"
-    assert by_id["mapped_owen_sorry"]["speaker"] == "TBD"
-    assert by_id["mapped_owen_sorry"]["speaker_pending"] == "Owen"
-    assert by_id["mapped_cam_noone"]["speaker"] == "TBD"
-    assert by_id["mapped_cam_noone"]["speaker_pending"] == "cam"
+    assert by_id["mapped_owen_sorry"]["speaker"] == "owen"
+    assert by_id["mapped_cam_noone"]["speaker"] == "cam"
+    assert "speaker_pending" not in by_id["mapped_owen_sorry"]
+    assert "speaker_pending" not in by_id["mapped_cam_noone"]
     assert all(by_id[pid]["kind"] == "chat"
                for pid in PAUSED_CONVERSATION_IDS)
     assert [by_id[f"mapped_akgraner_kindness_{i}"]["text"]
@@ -756,6 +788,21 @@ def test_the_normalized_pause_copy_is_emitted_verbatim():
     assert "mapped_amber_reveal" not in by_id
     assert "mapped_kyle_reveal" not in by_id
     assert "solo_EyeCantCU" not in by_id
+
+
+def test_named_act_two_speakers_resolve_to_their_verified_github_profiles():
+    by_id = {p["id"]: p for p in committed()["plates"]}
+    expected = {
+        "chat_pilot_lunar": ("pilot", 28564),
+        "mapped_owen_sorry": ("owen", 784413),
+        "mapped_cam_noone": ("cam", 2883959),
+    }
+    for plate_id, (login, github_id) in expected.items():
+        plate = by_id[plate_id]
+        assert plate["speaker"] == login
+        assert "speaker_pending" not in plate
+        assert plate["avatar_url"] == (
+            f"https://avatars.githubusercontent.com/u/{github_id}?v=4")
 
 def test_every_dialogue_pill_in_the_walk_carries_its_speaker_s_pfp():
     """The pill has an avatar slot and its fallback is the drawn crest --

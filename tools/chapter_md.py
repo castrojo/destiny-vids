@@ -772,14 +772,14 @@ def schedule_block(block, offset, seats=None):
     return at, holds, notes
 
 
-def block_end(act, label):
-    """The act-local time right after a labelled block's last pill clears.
+def block_bounds(act, label):
+    """Return an authored labelled block's act-local ``(start, end)``.
 
-    For a builder that must seat something *after* an aside authored in the
-    chapter file -- act II's paused conversation, say -- without recomputing
-    the block's own schedule of held reads and gaps itself. Raises
-    ``KeyError`` when the act has no chapter block with that label, the same
-    way ``chapter()`` names what is wired instead of failing silently.
+    Builders that turn a conversation into a held-picture interval need both
+    edges: deriving only from ``end`` accidentally includes any stale gap
+    before the chapter block. ``end`` includes the normal beat after the last
+    pill, so the following picture gets the same breathing room as the
+    conversation itself.
     """
     chap = chapter(act)
     for block in parse(chap.path.read_text(encoding="utf-8")):
@@ -788,8 +788,18 @@ def block_end(act, label):
         at, holds, _ = schedule_block(
             block, chap.programme_start,
             seats=seat_lines(act, block["lines"]))
-        return round(at[-1] + holds[-1] + GAP, 3)
+        return round(at[0], 3), round(at[-1] + holds[-1] + GAP, 3)
     raise KeyError(f"{act}: no chapter block labelled {label!r}")
+
+
+def block_start(act, label):
+    """The act-local time at which a labelled block's first pill begins."""
+    return block_bounds(act, label)[0]
+
+
+def block_end(act, label):
+    """The act-local time right after a labelled block's final beat."""
+    return block_bounds(act, label)[1]
 
 
 def entries(act, *, include_block_labels=False):

@@ -13,8 +13,7 @@ reseat: scripts/build_efmb_plates.py:reseat_chapter_entries
 # Act II — Endless Forms Most Beautiful: conversations
 
 Every chat speaker is either a verified GitHub login or the intentionally
-uncast `TBD` / `[redacted]`. `speaker_pending` records copy whose author named
-a voice without evidence for a GitHub identity.
+uncast `[redacted]`.
 
 The hallway interruption has three authored blocks: `paused` holds the
 hallway before the Amber insert, `amber-action` is the inserted source clip,
@@ -28,8 +27,7 @@ The builder derives those intervals from the records below.
 
 [chat_ricardo_nukeguy] rochaporto @ 5:18.233 +3.4: It's me the nuke guy how do you think I got here?
 
-[chat_pilot_lunar] TBD @ 5:22.033 +2.883: Lunar record baby! Hello KubeCon + CloudNativeCon
-  - speaker_pending: pilot
+[chat_pilot_lunar] pilot @ 5:22.033 +2.883: Lunar record baby! Hello KubeCon + CloudNativeCon
 
 [chat_ricardo_ai] ricardosalveti @ 5:25.233 +3.4: They wanted us to put AI in the glider so we did.
 
@@ -151,15 +149,13 @@ The builder derives those intervals from the records below.
 
 [mapped_hikari_ouch] HikariKnight @ 9:02.183 +2.2: Ouch man wtf!
 
-[mapped_owen_sorry] TBD @ 9:04.633 +2.2: Oh sorry my bad
-  - speaker_pending: Owen
+[mapped_owen_sorry] owen @ 9:04.633 +2.2: Oh sorry my bad
 
 [mapped_kolunmi_pvp] kolunmi @ 9:07.083 +2.2: Who turned PvP on?
 
 [chat_angellk_pvp] angellk @ 9:09.533 +2.2: Don't look at me I only turned on PVP
 
-[mapped_cam_noone] TBD @ 9:12.783 +2.2: Mom no one plays this game
-  - speaker_pending: cam
+[mapped_cam_noone] cam @ 9:12.783 +2.2: Mom no one plays this game
 
 [mapped_hikari_wait] HikariKnight @ 9:15.233 +2.2: Hey wait?!
 

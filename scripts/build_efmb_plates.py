@@ -1294,7 +1294,15 @@ def reseat_chapter_entries(entries, lead=None):
     field_order = ([k.strip() for k in order_field.split(",")]
                    if isinstance(order_field, str) else None)
     for entry in entries:
-        entry.pop("_chapter_label", None)
+        label = entry.pop("_chapter_label", None)
+        if label in build_efmb.INTERRUPTION_BLOCK_AT:
+            # The owner-authored block remains internally ordered, but its
+            # old programme-clock heading must not leave a dead held frame
+            # before the picture interval it describes.
+            authored_start = chapter_md.block_start("II", label)
+            entry["at"] = round(
+                build_efmb.INTERRUPTION_BLOCK_AT[label]
+                + entry["at"] - authored_start, 3)
         source_anchor = entry.pop("source_anchor", None)
         if source_anchor is not None:
             # A source-anchored line is seated straight from the source

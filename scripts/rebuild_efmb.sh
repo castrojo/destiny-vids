@@ -33,6 +33,9 @@ export DESTINY_FFMPEG="${DESTINY_FFMPEG:-/home/linuxbrew/.linuxbrew/bin/ffmpeg}"
 echo "==> clean picture (renders/efmb-hq.mp4)"
 python3 scripts/build_efmb.py --render "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}"
 
+echo "==> measured static peak trim (clean master)"
+python3 tools/peaks.py trim renders/efmb-hq.mp4 --ffmpeg "$DESTINY_FFMPEG"
+
 echo "==> plate manifest (stories/02-endless-forms-plates.json -- an OUTPUT)"
 python3 scripts/build_efmb_plates.py --write
 
@@ -41,6 +44,22 @@ python3 tools/plate.py burn --video renders/efmb-hq.mp4 \
     --manifest stories/02-endless-forms-plates.json \
     --out renders/efmb-plated.mp4 --delivery-spec \
     "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}"
+
+echo "==> decoded delivered true-peak ceiling"
+python3 - <<'PY'
+import os
+import shlex
+from pathlib import Path
+
+from tools import peaks
+
+path = Path("renders/efmb-plated.mp4").resolve()
+peak = peaks.measure_true_peak(path, ffmpeg=shlex.split(os.environ["DESTINY_FFMPEG"]))
+ceiling = peaks.DEFAULT_TARGET_DBTP + peaks.DELIVERED_BAND_MARGIN_DB
+print(f"  {path.name}: {peak:+.2f} dBTP (ceiling {ceiling:+.2f} dBTP)")
+assert peak <= ceiling, (
+    f"{path.name} measures {peak:+.2f} dBTP above its {ceiling:+.2f} dBTP ceiling")
+PY
 
 echo "==> done; deliver with: python3 tools/deliver.py publish --act II"
 ffprobe -v error -show_entries format=duration -of csv=p=0 renders/efmb-plated.mp4
