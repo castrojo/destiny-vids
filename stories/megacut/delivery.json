@@ -99,7 +99,7 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "b13e2cd19287c399026107415711c858dae63e5844901f1887a365dbe7c33eeb",
+   "source_digest": "c899aee40eb5df62245505623f4d823d6de16d5d3c3c1e835735f3d5446cfb6d",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "env ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json",
    "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
@@ -214,7 +214,7 @@
     "chapters/VIII-fixed.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "4e0e48c70e0934b493fde1ebd7e3bd891b02f8f2d8220bcf31ed4a3baefa0661",
+   "source_digest": "702ac912f32bd5f7565dfe7a1709401fdf14f405859a799799598ef0a466f69c",
    "rebuild": "python3 scripts/build_credits.py --out ~/Videos/wolves-credits/08-credits-master.mp4",
    "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   }
