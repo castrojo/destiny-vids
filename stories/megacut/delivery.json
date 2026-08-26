@@ -70,9 +70,9 @@
     "yt_destiny_all_live_action_trailers",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "47a5edcac9e58559b71ae4ad7c88640335ede6e0918f1594d8dcad0847c9964d",
+   "source_digest": "5c11211ec44d66d70cc74c6ef6a4d297e51be502f776b0ec6fedb47b4e5524de",
    "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad",
-   "built_from_commit": "71c8853b190e8d81e35542eac41e80640f2d1a0d"
+   "built_from_commit": "ed0b035cf751d2873caef080a28bf68f9806c4e4"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
