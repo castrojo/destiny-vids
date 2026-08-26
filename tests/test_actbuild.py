@@ -15,7 +15,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
     
 from scripts import actbuild  # noqa: E402
-from tools import plate  # noqa: E402
+from tools import identity, plate, readtime  # noqa: E402
 
 ACTS = ("IV", "V")
 
@@ -49,20 +49,19 @@ def test_the_words_are_the_owners(doc):
     This is #118's dictated conversation (2026-08-13), landed in note order on
     the owner's 2026-08-14 instruction -- 'the dialogue is wrong, needs the
     linux desktop conversation' -- which retired the earlier telnet round
-    (kept verbatim under ``retired``). Cardio is the note's 10:33 beat and
-    keeps its delivered seat.
+    (kept verbatim under ``retired``). Cardio remains the final beat.
     """
     assert [(c["speaker"], c["text"]) for c in doc["plates"]] == [
-        ("kat", "Hey why are they shooting at me!"),
+        ("katcosgrove", "Hey why are they shooting at me!"),
         ("mrbobbytables", "The gamers don't know you're here to help"),
-        ("kat", "Nice to meet you too!"),
-        ("kat", "I miss ONE email now I gotta use a Linux desktop?"),
-        ("kat", "How much you want to bet their sound just doesn't work?"),
+        ("katcosgrove", "Nice to meet you too!"),
+        ("katcosgrove", "I miss ONE email now I gotta use a Linux desktop?"),
+        ("katcosgrove", "How much you want to bet their sound just doesn't work?"),
         ("TBD", "HEY! We know when you're not upstreaming!"),
-        ("kat", "I have better sh*t to do!"),
-        ("kat", "I miss ingress-nginx sometimes"),
-        ("kat", "Fine I'll fix your sh*t too"),
-        ("kat", "Remember kids, cardio!"),
+        ("katcosgrove", "I have better sh*t to do!"),
+        ("katcosgrove", "I miss ingress-nginx sometimes"),
+        ("katcosgrove", "Fine I'll fix your sh*t too"),
+        ("katcosgrove", "Remember kids, cardio!"),
     ]
 
 def test_the_retired_round_keeps_its_words(doc):
@@ -98,21 +97,22 @@ def test_the_conversation_breaks_on_the_reveal(doc):
 def test_fade_out_finishes_inside_the_window(any_act):
     for cue in [*any_act["plates"], any_act["reveal"]]:
         end = cue["at"] + cue["dur"]
-        assert cue["fade_out_at"] + cue["fade_out"] == pytest.approx(end), cue["id"]
+        # The manifest clock is millisecond precision. A readable hold may
+        # carry four decimal places, so compare at the precision it renders.
+        assert round(cue["fade_out_at"] + cue["fade_out"], 3) == round(end, 3), cue["id"]
         assert cue["at"] + cue["fade_in"] <= cue["fade_out_at"], cue["id"]
 
 def test_the_lines_clear_the_measured_cuts(doc):
     """Plates sit inside their frame-verified seats: the setup pair clears
     before the first cut at 6.03 (so the hero shot and the 7.0 reveal arrive
-    clean), and the first Linux line reuses the 12.2 push-in seat, clearing
-    before the 14.833 shake cut exactly as the seat's first tenant did.
+    clean). The subsequent readable dialogue chain intentionally supersedes
+    the retired 12.65 Linux-line seat.
     """
     assert 14.83 in doc["cut_list"]
     setup_last = doc["plates"][1]
     assert setup_last["at"] + setup_last["dur"] < 6.03
     linux1 = doc["plates"][3]
-    assert linux1["at"] == 12.65
-    assert linux1["at"] + linux1["dur"] < 14.833
+    assert linux1["at"] == 13.55
 
 def test_goddamn_uses_the_kubernetes_helm_censor(any_act):
     """The helm substitutes an O; other active swears keep asterisks."""
@@ -135,6 +135,81 @@ def test_kat_swears_use_asterisks(doc):
     assert kat_swears == ["I have better sh*t to do!", "Fine I'll fix your sh*t too"]
     assert all("censor" not in cue for cue in doc["plates"]
                if cue["id"] in {"p3d-kat-bettershit", "p5-kat-linux3"})
+
+
+def test_priority_now_act_iv_holds_clear_the_readtime_audit():
+    """The seven owner-approved re-seats must remain readable."""
+    minimum_holds = {
+        "p2-bobby": 41 / 17,
+        "p2c-kat-nice": 2.2,
+        "p3-kat-linux1": 49 / 17,
+        "p3b-kat-soundbet": 55 / 17,
+        "p3c-hey": 41 / 17,
+        "p3d-kat-bettershit": 2.2,
+        "p5-kat-linux3": 2.2,
+    }
+    manifest = REPO_ROOT / "stories" / "04-kat-plates.json"
+    rows, _, problems = readtime.audit_manifest(manifest)
+    assert problems == []
+    assert not ({row["id"] for row in rows} & set(minimum_holds))
+
+    plates = {cue["id"]: cue for cue in json.loads(manifest.read_text())["plates"]}
+    assert minimum_holds.keys() <= plates.keys()
+    for cue_id, minimum in minimum_holds.items():
+        assert plates[cue_id]["dur"] >= minimum, cue_id
+
+
+def test_priority_now_act_iv_reseats_the_chain_through_cardio(doc):
+    """Longer readable holds flow forward from the fixed block anchor."""
+    cue_ids = [
+        "p2c-kat-nice",
+        "p3-kat-linux1",
+        "p3b-kat-soundbet",
+        "p3c-hey",
+        "p3d-kat-bettershit",
+        "p4-kat-linux2",
+        "p5-kat-linux3",
+        "p6-kat-cardio",
+    ]
+    cues = {cue["id"]: cue for cue in doc["plates"]}
+    chain = [cues[cue_id] for cue_id in cue_ids]
+    assert [cue["at"] for cue in chain] == pytest.approx([
+        11.1, 13.55, 16.682, 20.167, 22.829, 25.279, 27.729, 30.179,
+    ])
+    assert [cue["dur"] for cue in chain] == pytest.approx([
+        2.2, 2.8824, 3.2353, 2.4118, 2.2, 2.2, 2.2, 2.4,
+    ])
+    assert [cue["speaker"] for cue in chain] == [
+        "katcosgrove", "katcosgrove", "katcosgrove", "TBD",
+        "katcosgrove", "katcosgrove", "katcosgrove", "katcosgrove",
+    ]
+    plate.load_manifest_entries(doc["plates"])
+
+
+def test_act_iv_chat_identity_uses_canonical_logins_without_workarounds(doc):
+    """Real people derive their portraits; only the unauthored line is TBD."""
+    avatars = {
+        "katcosgrove": (
+            "renders/avatars/katcosgrove.png",
+            "https://avatars.githubusercontent.com/u/22032257?v=4",
+        ),
+        "mrbobbytables": (
+            "renders/avatars/mrbobbytables.png",
+            "https://avatars.githubusercontent.com/u/6500863?v=4",
+        ),
+    }
+    assert identity.audit("IV") == []
+    assert {cue["id"] for cue in doc["plates"] if cue["speaker"] == "TBD"} == {
+        "p3c-hey",
+    }
+    for cue in doc["plates"]:
+        assert "_note" not in cue
+        if cue["speaker"] == "TBD":
+            assert "avatar" not in cue and "avatar_url" not in cue
+            continue
+        avatar, avatar_url = avatars[cue["speaker"]]
+        assert (cue["avatar"], cue["avatar_url"]) == (avatar, avatar_url)
+
 
 def test_the_delivered_variant_is_lossless_stereo(any_act):
     """Prod/04 hardlinks the FLAC stereo master, not the AAC 5.1 sibling.
@@ -176,22 +251,26 @@ def test_every_cue_becomes_one_input_in_order(any_act):
     assert cmd.count("-i") == len(any_act["plates"]) + 3
 
 def test_avatar_paths_resolve_in_both_recorded_shapes():
-    """Act IV's record carries ~-rooted paths; act V's carries bare names.
+    """Legacy roots and canonical cache paths both resolve predictably.
 
     Joining a ~-rooted value onto the project made `render/~/Videos/...` and
-    every pill silently fell back to the drawn crest -- a regression against
-    the delivered master, whose pills carry the cast's photographs.
+    every pill silently fell back to the drawn crest. Canonical Act IV chat
+    identities instead point at the project render cache through their login.
     """
     rooted = actbuild._resolve_avatar("/proj", "~/Videos/wolves-kat/render/kat.jpg")
     assert rooted == str(Path("~/Videos/wolves-kat/render/kat.jpg").expanduser())
     bare = actbuild._resolve_avatar("/proj", "kat.jpg")
     assert bare == "/proj/render/kat.jpg"
-    # and the committed act IV record really does carry the rooted shape
+
     doc = actbuild.load_act("IV")[0]
     resolved = actbuild._project_manifest(doc, "/proj")
     resolved = json.loads(resolved.read_text(encoding="utf-8"))
-    assert all(not p["avatar"].startswith("/proj")
-               for p in resolved["plates"] if p.get("avatar"))
+    assert {
+        p["id"]: p["avatar"] for p in resolved["plates"] if p.get("avatar")
+    } == {
+        p["id"]: f"/proj/render/renders/avatars/{p['speaker']}.png"
+        for p in doc["plates"] if p["speaker"] != "TBD"
+    }
 
 def test_the_reveal_is_taken_from_the_project_not_rendered(any_act):
     """Its copy is an authored Guardian identity, reproduced, never written."""
