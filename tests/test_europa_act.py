@@ -9,10 +9,13 @@ overlays.
 import json
 from pathlib import Path, PurePosixPath
 
+import pytest
+
 REPO = Path(__file__).resolve().parents[1]
 MANIFEST = REPO / "stories" / "07-europa-plates.json"
 
 from scripts import build_europa  # noqa: E402
+from tools import identity, readtime  # noqa: E402
 
 
 def load():
@@ -93,6 +96,145 @@ def test_alolita_uses_the_verified_repo_avatar():
     # Repo-relative by convention (see the no-absolute-paths test above), so
     # the assertion must not bake in any one checkout's location.
     assert alolita["avatar"] == "renders/avatars/alolita.png"
+
+
+def test_priority_now_act_vii_holds_clear_the_readtime_audit():
+    """The six owner-approved re-seats must remain readable."""
+    minimum_holds = {
+        "d01": 2.2,
+        "d02": 2.2,
+        "d04": 2.2,
+        "d06": 2.2,
+        "d09": 2.2,
+        "d10": 2.2,
+    }
+    rows, _, problems = readtime.audit_manifest(MANIFEST)
+    assert problems == []
+    assert not ({row["id"] for row in rows} & set(minimum_holds))
+
+    plates = {plate["id"]: plate for plate in load()["plates"]}
+    assert minimum_holds.keys() <= plates.keys()
+    for plate_id, minimum in minimum_holds.items():
+        assert plates[plate_id]["dur"] >= minimum, plate_id
+
+
+def test_priority_now_act_vii_reseats_the_opening_and_signoff_runs():
+    """The readable runs retain their authored copy and written order."""
+    doc = load()
+    cues = {cue["id"]: cue for cue in doc["plates"]}
+    opening = ["d01", "d02", "d03", "d04", "d04b"]
+    signoff = ["d09", "d10"]
+
+    assert [cues[cue_id]["at"] for cue_id in opening] == pytest.approx([
+        0.564, 3.014, 5.464, 8.314, 10.764,
+    ])
+    assert [cues[cue_id]["dur"] for cue_id in opening] == pytest.approx([
+        2.2, 2.2, 2.6, 2.2, 2.2,
+    ])
+    assert [cues[cue_id]["at"] for cue_id in signoff] == pytest.approx([
+        61.564, 64.014,
+    ])
+    assert [cues[cue_id]["dur"] for cue_id in signoff] == pytest.approx([
+        2.2, 2.2,
+    ])
+
+    d06_run = ["d06", "d07", "d08"]
+    assert [cues[cue_id]["at"] for cue_id in d06_run] == pytest.approx([
+        27.564, 30.014, 32.564,
+    ])
+    assert [cues[cue_id]["dur"] for cue_id in d06_run] == pytest.approx([
+        2.2, 2.2, 2.2,
+    ])
+
+    for run in (opening, signoff):
+        for first, second in zip(run, run[1:]):
+            assert cues[second]["at"] - (
+                cues[first]["at"] + cues[first]["dur"]) == pytest.approx(0.25)
+    for first, second in zip(d06_run, d06_run[1:]):
+        assert cues[second]["at"] >= (
+            cues[first]["at"] + cues[first]["dur"] + 0.25 - 1e-6)
+
+    assert [(cue["id"], cue["speaker"], cue["text"])
+            for cue in doc["plates"]] == [
+        ("d01", "krook", "Deploy CNCF Projects Team"),
+        ("d02", "preethit", "Stand down, I'm sending my wolf"),
+        ("d03", "alolita", "Are you sure the Kube is on Europa?"),
+        ("d04", "preethit", "I hope she can handle the Kube"),
+        ("d04b", "preethit", "I must not fail"),
+        ("ch_vii_1_6_alolita", "alolita",
+         "We have failed, Guardians are down"),
+        ("ch_vii_1_7_tophee", "tophee",
+         "I've confirmed it myself, we have no choice"),
+        ("ch_vii_1_8_tophee", "tophee",
+         "She's the only way to stop the Toilmaster"),
+        ("d05", "castrojo", "They must never know what you did for them"),
+        ("d06", "mrbobbytables", "When all hope is lost"),
+        ("d07", "jeefy", "Standing by for Extraction"),
+        ("d08", "idvoretskyi", "G{k8s}dspeed"),
+        ("d11", "preethit", "Our clan"),
+        ("ch_vii_2_6_preethit", "preethit", "Is the Iron"),
+        ("ch_vii_2_7_preethit", "preethit", "That forges Wolves"),
+        ("ch_vii_2_8_mrbobbytables", "mrbobbytables",
+         "Wolves gladly sacrifice for their own"),
+        ("ch_vii_2_9_krook", "krook", "Initiate Lone Wolf Protocol"),
+        ("ch_vii_2_10_iancoldwater", "IanColdwater",
+         "Local Security systems trivially pwned"),
+        ("ch_vii_2_11_tabbysable", "tabbysable",
+         "Europan Security systems trivially pwned (again)"),
+        ("d09", "nimbinatus", "Wilco"),
+        ("d10", "nimbinatus", "{k8s}ut"),
+        ("ch_vii_3_3_preethit", "preethit",
+         "Hummingbird will find the girl"),
+    ]
+
+
+def test_act_vii_chat_identity_uses_canonical_logins_without_workarounds():
+    """Every real person derives their avatar from one canonical login."""
+    avatars = {
+        "krook": ("renders/avatars/krook.png",
+                  "https://avatars.githubusercontent.com/u/1499840?v=4"),
+        "preethit": ("renders/avatars/preethit.png",
+                     "https://avatars.githubusercontent.com/u/3870366?v=4"),
+        "alolita": ("renders/avatars/alolita.png",
+                    "https://avatars.githubusercontent.com/u/1942529?v=4"),
+        "tophee": ("renders/avatars/tophee.png",
+                   "https://avatars.githubusercontent.com/u/291859119?v=4"),
+        "castrojo": ("renders/avatars/castrojo.png",
+                     "https://avatars.githubusercontent.com/u/1264109?v=4"),
+        "mrbobbytables": (
+            "renders/avatars/mrbobbytables.png",
+            "https://avatars.githubusercontent.com/u/6500863?v=4"),
+        "jeefy": ("renders/avatars/jeefy.png",
+                  "https://avatars.githubusercontent.com/u/1394552?v=4"),
+        "idvoretskyi": (
+            "renders/avatars/idvoretskyi.png",
+            "https://avatars.githubusercontent.com/u/118459?v=4"),
+        "nimbinatus": (
+            "renders/avatars/nimbinatus.png",
+            "https://avatars.githubusercontent.com/u/1538692?v=4"),
+        "IanColdwater": (
+            "renders/avatars/IanColdwater.png",
+            "https://avatars.githubusercontent.com/u/16943590?v=4"),
+        "tabbysable": (
+            "renders/avatars/tabbysable.png",
+            "https://avatars.githubusercontent.com/u/51767484?v=4"),
+    }
+    assert identity.audit("VII") == []
+
+    chapter = (REPO / "chapters" / "VII-europa.md").read_text()
+    for field in ("avatar", "avatar_url", "cast", "avatar_login", "_note"):
+        assert f"\n  - {field}:" not in chapter
+
+    for cue in load()["plates"]:
+        avatar, avatar_url = avatars[cue["speaker"]]
+        assert (cue["avatar"], cue["avatar_url"]) == (avatar, avatar_url)
+
+    unresolved = load().get("unresolved", [])
+    assert not any("No verified GitHub login for preethi" in item
+                   for item in unresolved)
+    assert not any("ihor's `G{k8s}dspeed`" in item
+                   or "nimbatus's `{k8s}ut`" in item
+                   for item in unresolved)
 
 
 def test_build_command_has_no_endcard_input_or_overlay(tmp_path):
