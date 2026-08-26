@@ -228,7 +228,7 @@ speakers. <<
 
 ## 7:23.300
 
-[mapped_kernel_bump] [redacted] @ 7:23.300 +2.2: Time to bump the kernel
+[mapped_kernel_bump] [redacted] @ 7:23.300 +2.2: Time to get this driver upstream
   - seen_at_src: 183.366
 
 ## 7:29.300
@@ -242,15 +242,15 @@ speakers. <<
 
 ## 7:39.300
 
-[mapped_a1rmax_intro] A1RM4X @ 7:39.300 +2.5: Thank you I never thought I could help! I'm not like you I'm just a lowly user
+[mapped_a1rmax_intro] A1RM4X @ 7:39.300 +2.5: 
   - seen_at_src: 199.366
   - avatar_login: A1RM4X
 
-    ONE PILL, as it was. The owner broke the line in two and tagged the
-    second half `[a1irmax]`, a typo for this pill's own speaker, so it is
-    the same person still talking. 7:39.300 clears at 7:41.800 and
-    GloriousEggroll is pinned at 7:42.300; there is no room for a second
-    pill and nothing here may be moved to make one.
+    ONE PILL, as it was. THIS SHOULD BE TWO PILLS
+
+<a1rmax> Thank you I never thought I could help! 
+<a1rmax> I'm not like you I'm just a lowly user
+
 
 [walk_ge_stream] GloriousEggroll @ 7:42.300 +2.2: It's your patch, turn the stream on
   - seen_at_src: 202.366
@@ -264,12 +264,7 @@ speakers. <<
   - seen_at_src: 207.516
   - avatar_login: wrkode
 
-    THIS SEAT WAS LIONHEARTP'S "Why spend the extra dollar to support Linux
-    hardware". The owner replaced the line and the speaker on 2026-08-23;
-    the deleted string is in git. `avatar_login` came across from the old
-    line and is corrected here -- left as it was, wrkode would have worn
-    LionHeartP's face.
-
+    
 [walk_ge_glorious] GloriousEggroll @ 7:51.300 +2.8: There's nothing glorious about this job
   - seen_at_src: 211.366
   - cast: GloriousEggroll
@@ -341,14 +336,14 @@ speakers. <<
 
 ## 8:59.733
 
-[mapped_akgraner_kyle] akgraner @ 8:59.733 +2.2: Hi sugar, I'm looking for Kyle
-
 [mapped_hikari_ouch] HikariKnight @ 9:02.183 +2.2: Ouch man wtf!
   - avatar_login: HikariKnight
 
 [mapped_owen_sorry] Owen @ 9:04.633 +2.2: Oh sorry my bad
 
 [mapped_kolunmi_pvp] kolunmi @ 9:07.083 +2.2: Who turned PvP on?
+
+angellk: Don't look at me I only turned on PVP
 
 [mapped_cam_noone] cam @ 9:12.783 +2.2: Mom no one plays this game
   - avatar: null
@@ -359,44 +354,23 @@ speakers. <<
 
 [mapped_kolunmi_users] kolunmi @ 9:17.683 +2.6: Are those ... other linux users?
 
->> ACT II IS FULL, AND THIS IS WHERE IT RAN OUT. The owner wrote eighteen
-new lines into the 9:12 -> 9:40 stretch on 2026-08-23. Between kolunmi's
-"other linux users?" and Owen's "Slay out, Queen!" there is 6.97 seconds
-of clear air once her own nameplate has been up -- two readable pills.
-Every other second in this act is an authored beat that may not be slid.
-Two are seated below, and three in the stretch after Kyle's reveal -- his
-own two there ("Bobonomics", "We had to make this movie") were removed at
-his word on 2026-08-24: "Remove kyle's lines after 'Sup', the others
-aren't needed". The other eight, and two more from earlier in the act,
-are recorded verbatim under "OVERFLOW" further down -- reported,
-never dropped -- and filed as one issue so he can say what gives. <<
+[mapped_akgraner_kyle] akgraner @ 8:59.733 +2.2: Hi sugar, I'm looking for Kyle
+
+KEEP IT PAUSED DO NOT PLAY THE AMBER SECTION
+
+[chat_amber_bazaar] akgraner: "How bazaar?"
+
+[chat_amber_crap] akgraner: Who writes this crap?
+
 
 [chat_amber_dungeon] akgraner @ 9:25.433 +2.2: Oh wow I forgot what the starter dungeon was like! Hi!
   - avatar_login: akgraner
+    
+[chat_amber_problem] akgraner @ 9:52.203 +2.2: Ok so I'm going to clean out this trash for you
 
-    "AMBER" IS AKGRANER. The owner tagged these lines `[amber]` and others
-    in the same scene `[akgraner]`; the act's own `mapped_amber_reveal`
-    nameplate names her Amber Graner, so they are one person and she keeps
-    her face rather than losing it to a first name.
-
-    THE SEATS ARE BEHIND HER NAMEPLATE. That reveal and the plate beside it
-    hold the left lane, which is where a pill sits, until film 281.433, so
-    her first words open the moment her name clears -- which is the right
-    beat anyway.
-
-[chat_amber_kyleford] akgraner @ 9:27.883 +2.2: Which one of you is Kyleford?
   - avatar_login: akgraner
 
-    "Kyleford" is the owner's spelling and is reproduced. This line takes
-    over the question the act used to ask at 9:49.353 -- akgraner's "Which
-    one of you is Kyle?", which he rewrote to "Extinction is the Rule".
-
-## 9:32.203
-
-[mapped_owen_slay] Owen @ 9:32.203 +2.2: Slay out, Queen!
-  - scale: 1.0
-
-[mapped_akgraner_kindness_1] akgraner @ 9:34.653 +2.2: Kindness is doing what's right
+[mapped_akgraner_kindness_1] akgraner @ 9:34.653 +2.2: Remember, kindness is doing what's right
   - scale: 1.18
 
 [mapped_akgraner_kindness_2] akgraner @ 9:37.103 +2.2: For the ecosystem
@@ -417,91 +391,28 @@ never dropped -- and filed as one issue so he can say what gives. <<
 [mapped_which_kyle] akgraner @ 9:49.353 +2.6: Extinction is the Rule
   - scale: 1.0
 
-## 9:52.203 paused
+PUT THE AKGRANER ACTION SEQUENCE HERE.
 
->> THE PAUSE HOLDS UNTIL THIS WHOLE CONVERSATION HAS PLAYED. Owner,
-2026-08-24: "Don't unpause, at 'Oh I see your problem', keep that in the
-paused section, put cortney's conversation here." The hallway used to
-resume at 9:53.203 with akgraner's pill still up and cortney's line playing
-over moving picture; the hold now runs until the last line below clears,
-however long that grows to be -- `chapter_md.block_end("II", "paused")`
-derives it, so a line added or removed here never has to be re-typed as a
-duration anywhere else. kolunmi's "Disco!", deleted from this stretch on
-2026-08-23, was restored the next day on the hunter corridor
-(## 10:04.187). The ten-plus lines the owner wrote on 2026-08-23 for a
-stretch this act had no room for, and later updated on 2026-08-25, used to
-sit here verbatim as OVERFLOW prose reaching no frame; the pause section is
-their room, so they are seated below, right after cortney's line, in the
-order and words he wrote them. <<
-
-[chat_amber_problem] akgraner @ 9:52.203 +2.2: Oh I see your problem
-  - avatar_login: akgraner
-
-[chat_cortney_solid] cortney @ 9:54.653 +2.2: And we're gonna do you a solid
-  - avatar_login: CortNick
-
-    The owner wrote the speaker as `https://github.com/CortNick [cortney]`.
-    The login resolves the portrait; the name row prints what he typed.
-
-[chat_amber_sent] akgraner: [Redacted] sent me
-
-[chat_amber_bazaar] akgraner: "How bazaar?"
-
-[chat_amber_crap] akgraner: Who writes this crap?
-
-[chat_kolunmi_sweaty] kolunmi: I'm sorry I signed up for teamwork, why are people so sweaty?
-
-[chat_kyle_halo] KyleGospo: castrojo killed me in Halo today
-  - avatar_login: KyleGospo
-
-[chat_noelmiller_seen] noelmiller: I feel seen
-
-[chat_amber_harder] akgraner: Ok well, it gets harder from here on out
-
-[chat_cortney_trash] cortney: Take out this trash all their contributions are
-  - avatar_login: CortNick
-
-[chat_cortney_goose] cortney: Goose eggs? Nothing?
-  - avatar_login: CortNick
-
-[chat_amber_notthere] akgraner: Those people will not be there when it matters the most
-
-[chat_amber_trustme] akgraner: Trust me
-
-[chat_amber_scars] akgraner: I have the scars to prove it
-
-[chat_kolunmi_cook] kolunmi: I like how you cook sister, I'll try
-
-[chat_amber_phpforums] akgraner: Why do you take technical advice from people who post in PHP forums?
-
-[chat_amber_dothereisnotry] akgraner: "Do. There is no try"
-
+akgraner: [Don't let them decide for you]
+akgraner: You make your own fate.
 [chat_amber_shittywriting] akgraner: I can't save you from this shitty writing though
 
-    The owner tagged two of these `[amber]` and two `[akgraner]`; they are
-    the same person, so they are listed under the login her nameplate
-    already carries. SETTLED 2026-08-23, owner, verbatim: "kyle is
-    kylegospo" -- so the lowercase `kyle` is KyleGospo, who also speaks at
-    8:43.750 and 10:04.867, and every one of his lines now carries his own
-    portrait rather than the drawn crest. There is no second Kyle.
 
-    SETTLED 2026-08-25, owner-approved: the login is exactly `kolunmi`
-    (verified at github.com/kolunmi) -- the same person who already speaks
-    at 9:07.083, 9:17.683 and 10:04.187 in this act, so the "Eve"/"Eva"
-    handle above was never a second voice.
+## 9:52.203 paused
 
+>> THE PAUSE HOLDS UNTIL THIS WHOLE CONVERSATION HAS PLAYED.
 ## 10:01.2
 ! [mapped_haters] HATERS |
   - source_anchor: 326.163
 
     Source 326.163 is the enemy attack. The shield formation at source
-    331.163 is the heroes and never carries HATERS.
+    331.163 is the heroes and never carries HATERS. HOLD IT UNTIL THE HERO SHOT
 
 ## 10:04.187
 
-[mapped_kolunmi_disco] kolunmi @ 10:04.187 +2.2: Disco!
+[mapped_kolunmi_disco] kolunmi @ 10:04.187 +2.2: Cardio!
   - avatar_login: kolunmi
-  - source_anchor: 332.817
+  - source_anchor: 333.817
   - bond_of: mapped_kyle_sup
 
     Source 332.817 is the Hunter. The named bond keeps this left-lane reply
@@ -551,24 +462,3 @@ as unreachable overflow; it is now seated in the paused conversation above
   - avatar: null
   - avatar_url: null
 
-    MOVED VERBATIM FROM ACT III. Owner, 2026-08-24: "10:24 is where
-    redacted's 'retirement conversation' should go, not in the next
-    chapter." 10:24 on the alpha2 clock is the Cayde-6 neon-street shot
-    that closes this act's picture; with the pause holding 4.1 s longer,
-    that shot opens at 10:28.100. The speaker is `[redacted]` on purpose —
-    he is revealed later in the programme, in act VI — so the pills carry
-    no avatar and no crest, exactly as they did in act III. The second pill
-    clears 0.8 s into the black tail; the picture has ended on the heroes
-    and the words ride the outro.
-
->> The ten-plus lines the owner wrote on 2026-08-23, and updated 2026-08-25,
-that this stretch of the act had no room for now have a home: they are
-seated in the paused conversation above (## 9:52.203), right after
-cortney's line, in the order and words he wrote them -- see that block for
-the identity notes on `[amber]`/`[akgraner]`, `kyle`/KyleGospo and the
-settled "Eve"/"Eva"/`kolunmi` handle.
-
-Still unresolved: `Hikari` at 10:19.837 may be the act's existing
-`HikariKnight`, who already speaks at 9:02.183 and 9:15.233 with his own
-portrait. Naming him would credit a real person on a hunch, so he renders
-uncast until the owner says. <<
