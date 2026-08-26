@@ -25,6 +25,8 @@ SEGMENT_PATHS = sorted(glob.glob(str(REPO_ROOT / "segments" / "*.json")))
 VIDEO_PATHS = sorted(glob.glob(str(REPO_ROOT / "videos" / "*.json")))
 TAG_PATHS = sorted(glob.glob(str(REPO_ROOT / "tags" / "*.json")))
 BED_PATHS = sorted(glob.glob(str(REPO_ROOT / "music" / "*.json")))
+DIALOGUE_PATHS = sorted(glob.glob(str(REPO_ROOT / "dialogue" / "*" / "dialogue.json")))
+PRESENTATION_PATHS = sorted(glob.glob(str(REPO_ROOT / "dialogue" / "*" / "presentation.json")))
 
 PROVENANCE = (
     yaml.safe_load((REPO_ROOT / "vocab" / "provenance.yaml").read_text()) or {}
@@ -86,6 +88,26 @@ def test_committed_bed_matches_the_schema(path):
     # how a rights bucket stops meaning anything.
     errors = sorted(_validator("bed.schema.json").iter_errors(_load(path)),
                     key=lambda e: list(e.path))
+    assert not errors, "\n".join(
+        f"{'/'.join(str(p) for p in e.path)}: {e.message}" for e in errors
+    )
+
+
+@pytest.mark.parametrize("path", DIALOGUE_PATHS, ids=lambda p: Path(p).parent.name)
+def test_committed_dialogue_matches_the_schema(path):
+    errors = sorted(_validator("dialogue.schema.json").iter_errors(_load(path)),
+                    key=lambda e: list(e.path))
+    assert not errors, "\n".join(
+        f"{'/'.join(str(p) for p in e.path)}: {e.message}" for e in errors
+    )
+
+
+@pytest.mark.parametrize("path", PRESENTATION_PATHS, ids=lambda p: Path(p).parent.name)
+def test_committed_dialogue_presentation_matches_the_schema(path):
+    errors = sorted(
+        _validator("dialogue-presentation.schema.json").iter_errors(_load(path)),
+        key=lambda e: list(e.path),
+    )
     assert not errors, "\n".join(
         f"{'/'.join(str(p) for p in e.path)}: {e.message}" for e in errors
     )

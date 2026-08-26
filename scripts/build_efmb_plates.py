@@ -140,6 +140,7 @@ OWNER_PASS_OFFSET = 266.5
 TRIO = [
     ("joseph_sandoval", "left", 177.0),
     ("rochaporto", "center", 179.0),
+    ("mara_sov", "right", 183.0),
 ]
 
 # --- THE OPENING BLACK-HEAD CARD ------------------------------------------
@@ -1310,6 +1311,9 @@ def reseat_chapter_entries(entries, lead=None):
             ordered = chapter_md._ordered(entry, field_order)
             entry.clear()
             entry.update(ordered)
+    # `show`/`check` have to describe the film that ships, not the raw chapter
+    # schedule before the build shortens overlapping left-lane pills.
+    space_plates(entries)
     return entries
 
 
@@ -1381,6 +1385,15 @@ def build():
         assert dur >= MIN_HOLD, (
             f"the trio's {key} card can only hold {dur:.3f}s, below the "
             f"{MIN_HOLD}s a plate needs to be read")
+        avatar_key = key
+        copy = authored_copy(key, casting)
+        if key == "mara_sov":
+            from tools.identity import person_for_character
+            person = person_for_character(key, casting)
+            assert person is not None and person.plate is not None, (
+                "mara_sov must resolve to a person with authored plate copy")
+            avatar_key = person.login
+            copy = dict(person.plate)
         plates.append({
             "id": f"trio_{key}",
             "at": at,
@@ -1391,7 +1404,7 @@ def build():
             "order": order,
             "copy_source": "casting",
             "seen_at_src": TRIO_IN,
-            **localise_avatar(key, authored_copy(key, casting)),
+            **localise_avatar(avatar_key, copy),
         })
 
     # --- the opening nameplates (Brent's and Joe's slots stay empty) -------

@@ -38,6 +38,11 @@ The builder derives those intervals from the records below.
 [chat_joseph_slop] jrsapi @ 5:54.233 +2.6: That explains the slop
   - position: null
 
+## 6:01.233
+
+[chat_karena_job] angellk @ 6:01.233 +2.6: I love this job
+  - position: null
+
 ## 6:12.683
 
 [late_mfahlandt_clean] mfahlandt @ 6:12.683 +2.2: K1 Logistics is clean
@@ -57,11 +62,17 @@ The builder derives those intervals from the records below.
 [late_metrics_cluster] jrsapi @ 6:28.300 +2.2: Projects Teams Metrics are strong
   - seen_at_src: 122.266
 
+[late_karena_cardio] angellk @ 6:31.300 +2.2: Like cardio!
+  - seen_at_src: 125.266
+
 [late_metrics_mentoring] jrsapi @ 6:34.000 +2.8: They just need mentoring in the right skills
 
 ## 6:45.000
 
 ! [late_poor_technical_decisions] YOUR POOR TECHNICAL DECISIONS |
+
+[late_karena_lessons] angellk @ 6:47.300 +2.2: Hit 'em with your lessons learned
+  - seen_at_src: 141.266
 
 [late_rochaporto_cern] rochaporto @ 6:49.750 +2.6: One reference architecture coming up!
   - seen_at_src: 143.716
@@ -135,6 +146,9 @@ The builder derives those intervals from the records below.
   - seen_at_src: 293.000
 
 [mapped_redacted_mines] [redacted] @ 8:31.500 +3.648: Or a lifetime of servitude in the Toilmaster's Packaging Mines
+
+[owner_convo_karena] angellk @ 8:35.300 +2.867: The Kube always seeks open source potential
+  - seen_at_src: 300.000
 
 [owner_convo_joseph] jrsapi @ 8:38.417 +3.6: We can't let The Toilmaster enslave another generation
   - seen_at_src: 303.117

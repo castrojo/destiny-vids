@@ -3,8 +3,9 @@
 
 Each video keeps its conversation in one folder, ``dialogue/<video_id>/``:
 
-    DIALOGUE.md    the conversation, as the owner edits it
-    dialogue.json  the provenance record the pipeline reads
+    DIALOGUE.md         the conversation, as the owner edits it
+    dialogue.json       the immutable source-evidence record
+    presentation.json   sequence, film start, delivered holds and owner pins
 
 ``dialogue.json`` is the source of truth for every word this repo puts on
 screen, but it is a provenance record first and a script second: each cue
@@ -13,9 +14,10 @@ speaking. That is the right shape for the pipeline and the wrong shape for a
 person with an opinion about the wording. ``DIALOGUE.md`` is the other half.
 
 So: ``export`` writes the conversation as Markdown, ``apply`` reads it back.
-The timecodes and the evidence never appear as things to edit -- they ride
-along in the heading and are restored verbatim -- and a line the owner changes
-is recorded as changed rather than silently overwriting the recovered text:
+The source timecodes and the evidence never appear as things to edit -- they
+ride along in the heading and ``apply`` refuses any change to them -- and a
+line the owner changes is recorded as changed rather than silently
+overwriting the recovered text:
 
     "text":           what goes on screen
     "text_source":    "recovered" (default), "owner_supplied", or
@@ -33,12 +35,14 @@ honest way to allow it is to keep both versions and say which is which.
 
     python3 tools/dialogue_md.py export <video_id>   # writes DIALOGUE.md
     python3 tools/dialogue_md.py apply  <video_id>   # reads it back
+    python3 tools/dialogue_md.py restore-source-times <video_id> --from-ref <ref>
 """
 from __future__ import annotations
 
 import argparse
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -49,7 +53,11 @@ if str(REPO_ROOT) not in sys.path:
 from tools.dialogue import (  # noqa: E402
     MARKDOWN_NAME,
     load_dialogue,
+    load_presentation,
     markdown_path,
+    ordered_cues,
+    presentation_path,
+    presentation_pin,
     record_path,
 )
 
@@ -118,19 +126,32 @@ def _resolve_character(label, leads):
 
 def replace(data, edited):
     """Replace a recovered conversation with owner-authored copy."""
+    current = _cue_index(data["cues"], "current record")
+    edited_by_id = _cue_index(edited, "edited markdown")
+
+    for previous in data["cues"]:
+        cue = edited_by_id.get(previous["id"])
+        if cue is None:
+            continue
+        if (abs(float(cue["start_sec"]) - float(previous["start_sec"])) > 0.005
+                or abs(float(cue["end_sec"]) - float(previous["end_sec"])) > 0.005):
+            raise ValueError(
+                f"{cue['id']}: source timecodes are evidence; "
+                "restore them from a git ref"
+            )
+
     cues = []
     for cue in edited:
+        previous = current.get(cue["id"])
         entry = {
             "id": cue["id"],
-            "start_sec": round(cue["start_sec"], 2),
-            "end_sec": round(cue["end_sec"], 2),
+            "start_sec": previous["start_sec"] if previous else round(cue["start_sec"], 2),
+            "end_sec": previous["end_sec"] if previous else round(cue["end_sec"], 2),
             "character": cue["character"],
             "evidence": "owner_supplied",
             "text": cue["text"],
             "text_source": "owner_supplied",
         }
-        if cue.get("pin_sec") is not None:
-            entry["pin_sec"] = round(cue["pin_sec"], 2)
         cues.append(entry)
     return {
         **data,
@@ -151,20 +172,24 @@ def replace(data, edited):
     }
 
 
-def export(data, leads):
+def export(data, leads, presentation=None):
     """Dialogue record -> Markdown."""
+    cues = ordered_cues(data["cues"], presentation) if presentation else data["cues"]
     lines = [
         f"# {data['video_id']} - on-screen conversation",
         "",
         "Rewrite the line under each heading. Everything else is bookkeeping:",
         "",
-        "- **Keep the heading.** The id and the timecodes are what put a line",
-        "  back on the right frame; change them only to re-time a line.",
+        "- **Keep the heading.** The id and the source timecodes are evidence;",
+        "  `apply` refuses edits to them. Restore them from a git ref instead.",
         "- **Change the speaker** by renaming it in the heading (the character,",
         "  or the person credited for them).",
+        "- **Reorder sections** to change the conversation sequence. The source",
+        "  record stays put; `presentation.json` carries the order.",
         "- **Pin a line to an exact film moment** with a fourth heading",
-        "  segment: `| pin 1:57.00`. The timecodes still set the hold; the pin",
-        "  sets where it starts on the delivered film. Remove the segment to",
+        "  segment: `| pin 1:57.00`. The pin lives in `presentation.json` and",
+        "  sets where the line starts on the film; any explicit delivered-hold",
+        "  preservation lives there too. Remove the segment to",
         "  unpin. Only pin the lines that must land exactly -- an unpinned line",
         "  flows with the conversation and rides out every card move.",
         "- **Delete a whole section** to drop that line from the cut.",
@@ -178,11 +203,12 @@ def export(data, leads):
         "```",
         "",
     ]
-    for cue in data["cues"]:
+    for cue in cues:
         heading = (f"## {cue['id']} | {_speaker_label(cue, leads)} | "
                    f"{format_tc(cue['start_sec'])} -> {format_tc(cue['end_sec'])}")
-        if cue.get("pin_sec") is not None:
-            heading += f" | pin {format_tc(cue['pin_sec'])}"
+        pin = presentation_pin(cue["id"], presentation) if presentation else cue.get("pin_sec")
+        if pin is not None:
+            heading += f" | pin {format_tc(pin)}"
         lines += [
             heading,
             "",
@@ -259,6 +285,16 @@ def parse(text, leads):
     return cues
 
 
+def _cue_index(cues, label):
+    index = {}
+    for cue in cues:
+        cue_id = cue["id"]
+        if cue_id in index:
+            raise ValueError(f"duplicate cue id {cue_id!r} in {label}")
+        index[cue_id] = cue
+    return index
+
+
 def merge(data, edited):
     """Edited cues folded back into the record, keeping every provenance field.
 
@@ -271,54 +307,28 @@ def merge(data, edited):
     behind would record one line as both spoken and retired, which is a record
     that contradicts itself about a real person's words.
     """
-    original = {cue["id"]: cue for cue in data["cues"]}
-    retired = {cue["id"]: cue for cue in data.get("dropped") or []}
+    original = _cue_index(data["cues"], "current record")
+    retired = _cue_index(data.get("dropped") or [], "dropped cues")
+    edited_by_id = _cue_index(edited, "edited markdown")
     changes, cues, restored = [], [], set()
 
-    for cue in edited:
-        previous = original.get(cue["id"])
-        if previous is None:
-            # A brand-new cue with no words is the owner blocking out a beat
-            # before writing it -- a slot, not a line. `owner_supplied` would
-            # claim they wrote something; `placeholder` says they have not.
-            blank = not cue["text"]
-            added = {
-                "id": cue["id"],
-                "start_sec": round(cue["start_sec"], 2),
-                "end_sec": round(cue["end_sec"], 2),
-                "character": cue["character"],
-                "evidence": "owner_supplied",
-                "text": cue["text"],
-                "text_source": "placeholder" if blank else "owner_supplied",
-            }
-            if cue.get("pin_sec") is not None:
-                added["pin_sec"] = round(cue["pin_sec"], 2)
-            was_dropped = retired.get(cue["id"])
-            if was_dropped is not None:
-                # Bringing a retired line back. Its wording is kept beside the
-                # new one for the same reason a reword keeps it: the owner is
-                # entitled to see what the line used to say.
-                restored.add(cue["id"])
-                raw = was_dropped.get("raw", "")
-                if raw and raw != cue["text"]:
-                    added["recovered_text"] = raw
-                changes.append(
-                    f"  ^ {cue['id']} restored from dropped: "
-                    f"{cue['text'][:56]}")
-            else:
-                changes.append(
-                    f"  + {cue['id']} added: "
-                    f"{'(placeholder -- no words yet)' if blank else cue['text'][:56]}")
-            cues.append(added)
+    for previous in data["cues"]:
+        cue_id = previous["id"]
+        cue = edited_by_id.get(cue_id)
+        if cue is None:
             continue
+
+        if (abs(float(cue["start_sec"]) - float(previous["start_sec"])) > 0.005
+                or abs(float(cue["end_sec"]) - float(previous["end_sec"])) > 0.005):
+            raise ValueError(
+                f"{cue['id']}: source timecodes are evidence; "
+                "restore them from a git ref"
+            )
 
         merged = dict(previous)
         recovered = previous.get("recovered_text", previous.get("text", ""))
         if cue["text"] != previous.get("text"):
             merged["text"] = cue["text"]
-            # Emptying a line is not rewording it to nothing: it is handing the
-            # slot back as unwritten. The recovered text is still kept beside
-            # it, so clearing a line never destroys what was recovered.
             merged["text_source"] = ("placeholder" if not cue["text"]
                                      else "owner_supplied")
             merged["recovered_text"] = recovered
@@ -332,54 +342,129 @@ def merge(data, edited):
             changes.append(
                 f"  ~ {cue['id']} speaker: {previous.get('character')} -> "
                 f"{cue['character']}")
-        for field, value in (("start_sec", cue["start_sec"]),
-                             ("end_sec", cue["end_sec"])):
-            if abs(float(previous.get(field, 0)) - value) > 0.005:
-                merged[field] = round(value, 2)
-                changes.append(f"  ~ {cue['id']} {field}: {value:.2f}")
-        if cue.get("pin_sec") is not None:
-            if abs(float(previous.get("pin_sec", -1)) - cue["pin_sec"]) > 0.005:
-                merged["pin_sec"] = round(cue["pin_sec"], 2)
-                changes.append(f"  ~ {cue['id']} pin_sec: {cue['pin_sec']:.2f}")
-        elif previous.get("pin_sec") is not None:
-            del merged["pin_sec"]
-            changes.append(f"  ~ {cue['id']} unpinned")
         cues.append(merged)
 
-    kept = {cue["id"] for cue in edited}
-    dropped = [cue for cue in (data.get("dropped") or [])
-               if cue["id"] not in restored]
-    for cue_id, cue in original.items():
-        if cue_id in kept:
+    dropped = []
+    for cue in data.get("dropped") or []:
+        if cue["id"] not in edited_by_id:
+            dropped.append(cue)
+
+    current_ids = {cue["id"] for cue in data["cues"]}
+    for cue in edited:
+        if cue["id"] in current_ids:
+            continue
+
+        blank = not cue["text"]
+        added = {
+            "id": cue["id"],
+            "start_sec": round(cue["start_sec"], 2),
+            "end_sec": round(cue["end_sec"], 2),
+            "character": cue["character"],
+            "evidence": "owner_supplied",
+            "text": cue["text"],
+            "text_source": "placeholder" if blank else "owner_supplied",
+        }
+        was_dropped = retired.get(cue["id"])
+        if was_dropped is not None:
+            restored.add(cue["id"])
+            raw = was_dropped.get("raw", "")
+            if raw and raw != cue["text"]:
+                added["recovered_text"] = raw
+            changes.append(
+                f"  ^ {cue['id']} restored from dropped: {cue['text'][:56]}")
+        else:
+            changes.append(
+                f"  + {cue['id']} added: "
+                f"{'(placeholder -- no words yet)' if blank else cue['text'][:56]}")
+        cues.append(added)
+
+    for cue in data["cues"]:
+        if cue["id"] in edited_by_id:
             continue
         dropped.append({
-            "id": cue_id,
+            "id": cue["id"],
             "start_sec": cue["start_sec"],
             "end_sec": cue["end_sec"],
             "raw": cue.get("recovered_text", cue.get("text", "")),
             "reason": "removed by the owner while rewriting the conversation",
         })
-        changes.append(f"  - {cue_id} removed")
+        changes.append(f"  - {cue['id']} removed")
 
-    # `plan_script` walks `cues` in list order, so this sort IS the order the
-    # conversation plays in -- while `start_sec` is only the authored window,
-    # and for any line under ~37 characters the hold is MIN_HOLD and those
-    # numbers reach nothing else. So a re-time can silently reorder an
-    # exchange: widening one line's window past its neighbour's start swaps a
-    # reply and its setup. That is moving copy the owner placed, which
-    # `AGENTS.md` puts in the fourth un-automatable class, so it is reported
-    # loudly rather than done quietly. It is still not refused: nothing here
-    # blocks, and the owner may well have meant it.
-    before = [cue["id"] for cue in cues]
-    cues.sort(key=lambda cue: cue["start_sec"])
-    after = [cue["id"] for cue in cues]
-    if before != after:
-        moved = [cue_id for was, cue_id in zip(before, after) if was != cue_id]
-        changes.append(
-            f"  ! REORDERED by start_sec: {', '.join(moved)} -- the "
-            f"conversation now plays {' '.join(after)}. If that is not what "
-            f"you meant, the timecodes moved a line past its neighbour.")
+    dropped = [cue for cue in dropped if cue["id"] not in restored]
     return {**data, "cues": cues, "dropped": dropped}, changes
+
+
+def merge_presentation(presentation, edited):
+    """Edited headings folded back into presentation.json."""
+    previous_sequence = presentation.get("sequence") or []
+    next_sequence = [cue["id"] for cue in edited]
+    previous_pins = presentation.get("pins") or {}
+    next_pins = {
+        cue["id"]: round(cue["pin_sec"], 2)
+        for cue in edited if cue.get("pin_sec") is not None
+    }
+
+    changes = []
+    for cue_id in next_sequence:
+        before = previous_pins.get(cue_id)
+        after = next_pins.get(cue_id)
+        if before is None and after is None:
+            continue
+        if before is None and after is not None:
+            changes.append(f"  ~ {cue_id} pin_sec: {after:.2f}")
+            continue
+        if before is not None and after is None:
+            changes.append(f"  ~ {cue_id} unpinned")
+            continue
+        if abs(float(before) - float(after)) > 0.005:
+            changes.append(f"  ~ {cue_id} pin_sec: {after:.2f}")
+    for cue_id in previous_pins:
+        if cue_id in next_sequence:
+            continue
+        if cue_id not in next_pins:
+            changes.append(f"  ~ {cue_id} unpinned")
+    if next_sequence != previous_sequence:
+        changes.append(f"  ! sequence: {' '.join(next_sequence)}")
+    return {**presentation, "sequence": next_sequence, "pins": next_pins}, changes
+
+
+def restore_source_times(data, source):
+    """Copy only source windows by cue id from another dialogue record."""
+    source_by_id = _cue_index(source["cues"], "restore source")
+    _cue_index(data["cues"], "current record")
+    cues, changes = [], []
+    for cue in data["cues"]:
+        source_cue = source_by_id.get(cue["id"])
+        if source_cue is None:
+            raise ValueError(f"{cue['id']}: missing from restore source")
+        updated = dict(cue)
+        start = round(float(source_cue["start_sec"]), 2)
+        end = round(float(source_cue["end_sec"]), 2)
+        if (round(float(cue["start_sec"]), 2), round(float(cue["end_sec"]), 2)) != (start, end):
+            changes.append(
+                f"  ~ {cue['id']} source: {float(cue['start_sec']):.2f}-"
+                f"{float(cue['end_sec']):.2f} -> {start:.2f}-{end:.2f}"
+            )
+            updated["start_sec"] = start
+            updated["end_sec"] = end
+        cues.append(updated)
+    return {**data, "cues": cues}, changes
+
+
+def load_dialogue_from_ref(video_id, from_ref):
+    relpath = f"dialogue/{video_id}/dialogue.json"
+    result = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "show", f"{from_ref}:{relpath}"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        message = (result.stderr or result.stdout).strip() or (
+            f"could not load {relpath} from {from_ref}"
+        )
+        raise ValueError(message)
+    return json.loads(result.stdout)
 
 
 def main(argv=None):
@@ -401,20 +486,44 @@ def main(argv=None):
     a.add_argument("--replace", action="store_true",
                    help="replace the complete recovered conversation with owner-authored copy")
 
+    r = sub.add_parser(
+        "restore-source-times",
+        help="copy only start_sec/end_sec from dialogue.json at a git ref",
+    )
+    r.add_argument("video_id")
+    r.add_argument("--from-ref", required=True)
+
     args = ap.parse_args(argv)
 
     from tools.derive import load_leads
 
-    leads = load_leads()
-    data = load_dialogue(args.video_id)
-
     if args.command == "export":
+        leads = load_leads()
+        data = load_dialogue(args.video_id)
+        presentation = load_presentation(args.video_id)
         out = Path(args.out) if args.out else markdown_path(args.video_id)
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(export(data, leads), encoding="utf-8")
+        out.write_text(export(data, leads, presentation), encoding="utf-8")
         print(f"wrote {out} ({len(data['cues'])} line(s))")
         return 0
 
+    data = load_dialogue(args.video_id)
+    if args.command == "restore-source-times":
+        updated, changes = restore_source_times(
+            data, load_dialogue_from_ref(args.video_id, args.from_ref))
+        for change in changes:
+            print(change)
+        if not changes:
+            print("  no changes")
+        path = record_path(args.video_id)
+        with path.open("w", encoding="utf-8") as fh:
+            json.dump(updated, fh, indent=2, ensure_ascii=False)
+            fh.write("\n")
+        print(f"wrote {path} ({len(updated['cues'])} line(s))")
+        return 0
+
+    leads = load_leads()
+    presentation = load_presentation(args.video_id)
     source = Path(args.markdown) if args.markdown else markdown_path(args.video_id)
     edited = parse(source.read_text(encoding="utf-8"), leads)
     if args.replace:
@@ -422,17 +531,25 @@ def main(argv=None):
         changes = ["  replaced complete conversation with owner-authored copy"]
     else:
         updated, changes = merge(data, edited)
+    updated_presentation, presentation_changes = merge_presentation(
+        presentation, edited)
+    changes = [*changes, *presentation_changes]
     for change in changes:
         print(change)
     if not changes:
         print("  no changes")
     if args.dry_run:
         return 0
-    path = record_path(args.video_id)
-    with path.open("w", encoding="utf-8") as fh:
+    record = record_path(args.video_id)
+    with record.open("w", encoding="utf-8") as fh:
         json.dump(updated, fh, indent=2, ensure_ascii=False)
         fh.write("\n")
-    print(f"wrote {path} ({len(updated['cues'])} line(s))")
+    plan = presentation_path(args.video_id)
+    with plan.open("w", encoding="utf-8") as fh:
+        json.dump(updated_presentation, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")
+    print(f"wrote {record} ({len(updated['cues'])} line(s))")
+    print(f"wrote {plan}")
     return 0
 
 

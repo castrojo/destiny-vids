@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destiny-vids.local/schema/dialogue.schema.json",
+  "title": "Dialogue source evidence",
+  "description": "Recovered dialogue for one source video. This record keeps the source windows, speaker evidence and on-screen copy. Presentation timing lives in dialogue/<video_id>/presentation.json; cues here may not carry film-seat fields such as pin_sec or at.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "video_id",
+    "usage_class",
+    "source_rights_note",
+    "text_source",
+    "speaker_source",
+    "score",
+    "cues"
+  ],
+  "properties": {
+    "video_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "usage_class": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_rights_note": {
+      "type": "string",
+      "minLength": 1
+    },
+    "text_source": {
+      "$ref": "#/$defs/sourceMethod"
+    },
+    "speaker_source": {
+      "$ref": "#/$defs/sourceMethod"
+    },
+    "score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bed_id",
+        "start_sec",
+        "source_in",
+        "note"
+      ],
+      "properties": {
+        "bed_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start_sec": {
+          "type": "number"
+        },
+        "source_in": {
+          "type": "number"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "cues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cue"
+      }
+    },
+    "dropped": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/droppedCue"
+      }
+    }
+  },
+  "$defs": {
+    "sourceMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "note"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "cue": {
+      "type": "object",
+      "required": [
+        "id",
+        "start_sec",
+        "end_sec",
+        "character",
+        "evidence",
+        "text",
+        "text_source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start_sec": {
+          "type": "number"
+        },
+        "end_sec": {
+          "type": "number"
+        },
+        "character": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string"
+        },
+        "text_source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recovered_text": {
+          "type": "string"
+        }
+      },
+      "not": {
+        "anyOf": [
+          { "required": ["pin_sec"] },
+          { "required": ["at"] },
+          { "required": ["dur"] },
+          { "required": ["position"] },
+          { "required": ["fade_in"] },
+          { "required": ["fade_out"] }
+        ]
+      }
+    },
+    "droppedCue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "start_sec",
+        "end_sec",
+        "raw",
+        "reason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start_sec": {
+          "type": "number"
+        },
+        "end_sec": {
+          "type": "number"
+        },
+        "raw": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

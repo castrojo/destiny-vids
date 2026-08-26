@@ -20,6 +20,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+RECOVERY_FIXTURE = Path(__file__).with_name("fixtures") / "acts_ii_iii_recovery.json"
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 from tools import chapter_md  # noqa: E402
@@ -29,6 +30,10 @@ from tools import chapter_md  # noqa: E402
 # chapter file is a partial author and `sync` skips it by design.
 OWNED = sorted(act for act, chap in chapter_md.discover().items()
                if chap.fields.get("owns_plates"))
+
+
+def recovery_fixture():
+    return json.loads(RECOVERY_FIXTURE.read_text(encoding="utf-8"))
 
 
 def committed(act):
@@ -119,6 +124,15 @@ def _act_two_chats():
     return [p for p in plates if p.get("kind") == "chat"]
 
 
+def test_act_two_renders_the_complete_recovered_cue_set():
+    expected = {
+        item["id"] for item in recovery_fixture()["act_ii"]["active"]
+        if item["kind"] == "chat"
+    }
+    rendered = {plate["id"] for plate in _act_two_chats()}
+    assert rendered == expected
+
+
 def test_every_word_spoken_in_act_two_is_authored_in_its_chapter_file():
     """The guard against a pill drifting back into Python.
 
@@ -130,7 +144,7 @@ def test_every_word_spoken_in_act_two_is_authored_in_its_chapter_file():
     authored = {e["id"] for e in chapter_md.entries("II")[0]
                 if e.get("kind") == "chat"}
     rendered = {p["id"] for p in _act_two_chats()}
-    assert authored and rendered
+    assert authored == rendered
 
 
 def test_act_two_pills_reproduce_the_manifest_exactly():

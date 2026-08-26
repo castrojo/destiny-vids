@@ -31,6 +31,7 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `5:29.00` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
 - `5:30.30` PRESENT DAY
 - `5:54.23` **jrsapi** — That explains the slop
+- `6:01.23` **angellk** — I love this job
 - `6:08.23` Your choices are:
 - `6:08.30` Your choices are:
 - `6:08.36` Your choices are:
@@ -105,9 +106,11 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `6:23.30` **jrsapi** — They learn quickly
 - `6:25.75` **rochaporto** — We need to move!
 - `6:28.30` **jrsapi** — Projects Teams Metrics are strong
+- `6:31.30` **angellk** — Like cardio!
 - `6:34.00` **jrsapi** — They just need mentoring in the right skills
 - `6:40.30` Mars
 - `6:45.00` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
+- `6:47.30` **angellk** — Hit 'em with your lessons learned
 - `6:49.75` **rochaporto** — One reference architecture coming up!
 - `6:58.30` **jrsapi** — I still don't know which Ricardo this is
 - `7:02.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
@@ -138,6 +141,7 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:25.30` **[redacted]** — Unlearning bad habits takes time
 - `8:28.30` **[redacted]** — Your options are success
 - `8:31.50` **[redacted]** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
+- `8:35.30` **angellk** — The Kube always seeks open source potential
 - `8:38.42` **jrsapi** — We can't let The Toilmaster enslave another generation
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `8:43.75` **KyleGospo** — FOR TITANFALL!

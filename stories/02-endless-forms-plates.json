@@ -141,7 +141,7 @@
     {
       "id": "trio_joseph_sandoval",
       "at": 55.433,
-      "dur": 6.0,
+      "dur": 10.0,
       "position": "left",
       "scale": 0.62,
       "group": "trio_row",
@@ -158,7 +158,7 @@
     {
       "id": "trio_rochaporto",
       "at": 57.433,
-      "dur": 4.0,
+      "dur": 8.0,
       "position": "center",
       "scale": 0.62,
       "group": "trio_row",
@@ -174,6 +174,23 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
     },
     {
+      "id": "trio_mara_sov",
+      "at": 61.433,
+      "dur": 4.0,
+      "position": "right",
+      "scale": 0.62,
+      "group": "trio_row",
+      "order": 2,
+      "copy_source": "casting",
+      "seen_at_src": 72.0,
+      "label": "ARCHON // CONTRIBUTOR",
+      "class": "Stasis Warlock",
+      "name": "Karena Angell",
+      "title": "Architect of the Consensus",
+      "variant": "leader",
+      "wreath": true
+    },
+    {
       "id": "chat_joseph_slop",
       "at": 70.433,
       "dur": 2.6,
@@ -184,6 +201,18 @@
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/jrsapi.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+    },
+    {
+      "id": "chat_karena_job",
+      "at": 77.433,
+      "dur": 2.6,
+      "kind": "chat",
+      "copy_source": "owner_supplied",
+      "speaker": "angellk",
+      "text": "I love this job",
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/angellk.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
     },
     {
       "id": "choice_lfx_00",
@@ -1620,6 +1649,20 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
     },
     {
+      "id": "late_karena_cardio",
+      "at": 107.5,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "angellk",
+      "text": "Like cardio!",
+      "text_source": "owner_supplied",
+      "seen_at_src": 125.266,
+      "avatar": "renders/avatars/angellk.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
+    },
+    {
       "id": "late_metrics_mentoring",
       "at": 110.2,
       "dur": 2.8,
@@ -1653,6 +1696,20 @@
       "position": "boss",
       "copy_source": "owner_supplied",
       "text_source": "owner_supplied"
+    },
+    {
+      "id": "late_karena_lessons",
+      "at": 123.5,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "angellk",
+      "text": "Hit 'em with your lessons learned",
+      "text_source": "owner_supplied",
+      "seen_at_src": 141.266,
+      "avatar": "renders/avatars/angellk.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
     },
     {
       "id": "late_rochaporto_cern",
@@ -2037,13 +2094,27 @@
     {
       "id": "mapped_redacted_mines",
       "at": 227.7,
-      "dur": 3.648,
+      "dur": 3.55,
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
       "speaker": "[redacted]",
       "text": "Or a lifetime of servitude in the Toilmaster's Packaging Mines",
       "text_source": "owner_supplied"
+    },
+    {
+      "id": "owner_convo_karena",
+      "at": 231.5,
+      "dur": 2.867,
+      "kind": "chat",
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "angellk",
+      "text": "The Kube always seeks open source potential",
+      "text_source": "owner_supplied",
+      "seen_at_src": 300.0,
+      "avatar": "renders/avatars/angellk.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
     },
     {
       "id": "owner_convo_joseph",
@@ -2515,6 +2586,8 @@
     "the Bazzite/Xbox achievement gag is BUILT BUT NOT SCHEDULED: the owner asked to approve the strings before anything is burned. Proposed, one per measured explosion -- Mailing List Bullshit (100 G, owner_supplied); Sent It Upstream (10 G, proposed); Maintainer Said NAK (25 G, proposed); Carried Out of Tree Since 2019 (50 G, proposed). Only 'Mailing List Bullshit' is his. Flip WALK_ACHIEVEMENTS_APPROVED in scripts/build_efmb_plates.py once he has said yes.",
     "walk_A1RM4X is owner-timed to Act II film 171.801, but the card or line before it clears at 171.950, so it lands there instead. The order is the owner's; only the gap is the timeline's",
     "the owner conversation at 231.500 keeps only joseph; krook and both rochaporta lines were removed by the owner",
+    "line 2 of the 6:45.00 block is pinned 0.15s before the previous line clears; the pin is honoured and the two overlap on screen",
+    "line 5 of the 8:22.57 block is pinned 0.098s before the previous line clears; the pin is honoured and the two overlap on screen",
     "Amber's and Kyle's guardian reveals are omitted: the current owner-authored action and source-anchored chat occupy their only evidenced lower-third windows. Omitting the cards preserves the authored seats rather than moving either card onto unsupported picture.",
     "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for now.' Three blocks went with him -- the four ranked montage cards, the two TOC payoff cards ('It's totally NOT like this' and 'Have you met our Ambassadors?'), and the eyebrow on Natewaddington's placard. Every string is still in git; 'for now' means this is a revert, not a rewrite",
     "SARAH NOVOTNY'S SEAT WENT TO RICARDO ROCHA, owner 2026-08-20: 'move rochoporto's nameplate introduction to where novotny is, this hunter is now rochaporto'. Unlike Brent Burns and Joe Beda the same day, she was NOT ordered out -- her authored record stays in vocab/casting.yaml and she is owed a seat nobody has named yet",

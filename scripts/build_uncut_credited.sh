@@ -101,12 +101,12 @@ import json
 import sys
 from pathlib import Path
 
-record = Path("dialogue") / sys.argv[1] / "dialogue.json"
+record = Path("dialogue") / sys.argv[1] / "presentation.json"
 if not record.exists():
     print("true")
 else:
-    display = json.loads(record.read_text(encoding="utf-8")).get("display") or {}
-    print("true" if display.get("standalone_leads", True) else "false")
+    presentation = json.loads(record.read_text(encoding="utf-8"))
+    print("true" if presentation.get("standalone_leads", True) else "false")
 PY
 )"
 if [ "$STANDALONE_LEADS" = "true" ]; then

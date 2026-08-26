@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://destiny-vids.local/schema/dialogue-presentation.schema.json",
+  "title": "Dialogue presentation",
+  "description": "Presentation planning for one dialogue record: sequence, film start, mode, explicit delivered holds and owner pins. This is the editable planning surface; dialogue.json keeps immutable source evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "video_id",
+    "mode",
+    "start_sec",
+    "sequence",
+    "pins"
+  ],
+  "properties": {
+    "video_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "anchored",
+        "script"
+      ]
+    },
+    "start_sec": {
+      "type": "number",
+      "minimum": 0
+    },
+    "standalone_leads": {
+      "type": "boolean"
+    },
+    "sequence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "pins": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "holds": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    }
+  }
+}

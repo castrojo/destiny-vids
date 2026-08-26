@@ -16,6 +16,7 @@ import pytest
 import yaml
 
 from tools.derive import load_ensemble_titles, load_leads
+from tools.identity import person_for_character
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import build_efmb_plates  # noqa: E402
@@ -39,6 +40,14 @@ def test_every_act2_identity_is_recorded():
 def test_act_two_builder_reads_identity_copy_from_people():
     assert build_efmb_plates.authored_copy("joseph_sandoval", CASTING) == TITLES["jrsapi"]
     assert build_efmb_plates.authored_copy("shuah_khan", CASTING) == TITLES["shuahkh"]
+
+
+def test_mara_sov_resolves_to_the_current_angellk_identity():
+    person = person_for_character("mara_sov", CASTING)
+    assert person is not None
+    assert (person.login, person.github_id) == ("angellk", 836183)
+    assert person.plate == TITLES["angellk"]
+    assert person.plate["name"] == "Karena Angell"
 
 
 def test_ricardo_rocha_is_wreath_chrome_with_a_deliberately_bare_class():

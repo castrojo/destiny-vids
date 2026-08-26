@@ -3,10 +3,11 @@
 
 The repo never invents on-screen copy, so a conversation shown on screen has to
 come from somewhere: ``dialogue/<video_id>/dialogue.json`` holds the recovered
-lines, their source timecodes, and which cast character said each one, beside
-the ``DIALOGUE.md`` the owner edits. This module maps those source-timed cues
-onto the timeline a cut actually produced, and emits chat-card entries for
-tools/plate.py.
+lines, their source timecodes, and which cast character said each one; the
+matching ``presentation.json`` holds their sequence, film start, any explicit
+delivered holds and any owner-pinned film moments, beside the ``DIALOGUE.md``
+the owner edits. This module maps those source-timed cues onto the timeline a
+cut actually produced, and emits chat-card entries for tools/plate.py.
 
 Two rules follow from the repo contract:
 
@@ -36,6 +37,7 @@ DIALOGUE_DIR = REPO_ROOT / "dialogue"
 # the authoring surface, and tools/dialogue_md.py keeps the two in step.
 RECORD_NAME = "dialogue.json"
 MARKDOWN_NAME = "DIALOGUE.md"
+PRESENTATION_NAME = "presentation.json"
 
 
 def video_dir(video_id, root=DIALOGUE_DIR):
@@ -50,6 +52,10 @@ def record_path(video_id, root=DIALOGUE_DIR):
 def markdown_path(video_id, root=DIALOGUE_DIR):
     return video_dir(video_id, root) / MARKDOWN_NAME
 
+
+def presentation_path(video_id, root=DIALOGUE_DIR):
+    return video_dir(video_id, root) / PRESENTATION_NAME
+
 # A dialogue card is read, not studied: long enough to finish the line, short
 # enough that it does not outstay the shot it belongs to.
 MAX_CHAT_HOLD = 6.0
@@ -58,6 +64,42 @@ MAX_CHAT_HOLD = 6.0
 def load_dialogue(video_id, root=DIALOGUE_DIR):
     with record_path(video_id, root).open(encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def load_presentation(video_id, root=DIALOGUE_DIR):
+    with presentation_path(video_id, root).open(encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def ordered_cues(cues, presentation):
+    by_id = {cue["id"]: cue for cue in cues}
+    return [by_id[cue_id] for cue_id in presentation["sequence"]]
+
+
+def presentation_pin(cue_id, presentation):
+    return (presentation.get("pins") or {}).get(cue_id)
+
+
+def presentation_hold(cue_id, presentation):
+    return (presentation.get("holds") or {}).get(cue_id)
+
+
+def planned_hold(cue, presentation=None, hold=MAX_CHAT_HOLD):
+    """The delivered hold for one cue.
+
+    Most cues still derive their hold from the spoken window, capped the same
+    way the planner has always capped it. A recovered source window is evidence
+    though, not necessarily the seat the delivered film used, so
+    ``presentation.json`` may preserve an explicit delivered hold when a prior
+    build widened the window for readability. That value is presentation data,
+    not new source evidence.
+    """
+    preserved = (presentation_hold(cue["id"], presentation)
+                 if presentation else None)
+    if preserved is not None:
+        return float(preserved)
+    spoken = cue["end_sec"] - cue["start_sec"]
+    return max(MIN_HOLD, min(spoken, hold))
 
 
 def _speaker_for(character, leads):
@@ -113,7 +155,7 @@ def lanes_for(cues):
 
 
 def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=None,
-              skip_uncertain=True, log=None):
+              skip_uncertain=True, log=None, presentation=None):
     """Source-timed cues + a cut list -> chat plate entries.
 
     Returns ``(entries, dropped)``. ``dropped`` carries a reason per cue so an
@@ -135,6 +177,7 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     busy = list(busy or [])
+    cues = ordered_cues(cues, presentation) if presentation else list(cues)
     lanes = lanes_for(cues)
 
     placed, dropped = [], []
@@ -162,10 +205,9 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
             dropped.append({**cue, "reason": "its footage is not in this cut"})
             continue
 
-        spoken = cue["end_sec"] - cue["start_sec"]
         entry = {
             "id": cue["id"], "at": round(landing, 3),
-            "dur": round(min(spoken, hold), 3),
+            "dur": round(planned_hold(cue, presentation=presentation, hold=hold), 3),
             "position": lanes.get(cue["character"], "center"), "kind": "chat",
             "speaker": speaker, "text": cue["text"],
         }
@@ -207,7 +249,8 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
 
 
 def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
-                busy=None, skip_uncertain=True, log=None, start_at=0.0):
+                busy=None, skip_uncertain=True, log=None, start_at=0.0,
+                presentation=None):
     """Same cues, laid out as a SCRIPT rather than anchored to their footage.
 
     ``plan_chat`` puts every line where its own footage landed, which is the
@@ -224,6 +267,7 @@ def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
     timeline = cut_timeline(shots, max_shot_sec)
     total = sum(duration for _, duration, _ in timeline)
     busy = sorted(busy or [])
+    cues = ordered_cues(cues, presentation) if presentation else list(cues)
     lanes = lanes_for(cues)
 
     def next_free(cursor, duration):
@@ -247,9 +291,9 @@ def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
             dropped.append({**cue, "reason": f"{cue['character']} is not cast"})
             continue
 
-        spoken = cue["end_sec"] - cue["start_sec"]
-        duration = max(MIN_HOLD, min(spoken, hold))
-        pin = cue.get("pin_sec")
+        duration = planned_hold(cue, presentation=presentation, hold=hold)
+        pin = (presentation_pin(cue["id"], presentation)
+               if presentation else cue.get("pin_sec"))
         if pin is not None:
             # An owner-placed pin lands exactly (film seconds). The packing
             # rules are not consulted: the pin IS the instruction. Both
@@ -318,8 +362,8 @@ def main(argv=None):
     from tools.render import load_shots
 
     data = load_dialogue(args.video_id)
-    display = data.get("display") or {}
-    mode = args.mode or display.get("mode", "anchored")
+    presentation = load_presentation(args.video_id)
+    mode = args.mode or presentation.get("mode", "anchored")
     shots, leads = load_shots(args.shotlist), load_leads()
     busy = []
     if args.around:
@@ -331,12 +375,14 @@ def main(argv=None):
             data["cues"], shots, leads, max_shot_sec=args.max_shot_sec,
             hold=args.hold, busy=busy,
             skip_uncertain=True, log=print,
-            start_at=float(display.get("start_sec", 0.0)))
+            start_at=float(presentation.get("start_sec", 0.0)),
+            presentation=presentation)
     else:
         entries, dropped = plan_chat(
             data["cues"], shots, leads, max_shot_sec=args.max_shot_sec,
             hold=args.hold, busy=busy,
-            skip_uncertain=True, log=print)
+            skip_uncertain=True, log=print,
+            presentation=presentation)
 
     load_manifest_entries(entries)  # the same validation the burn path applies
     with Path(args.out).open("w", encoding="utf-8") as fh:

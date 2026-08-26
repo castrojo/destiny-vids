@@ -289,15 +289,28 @@ def dialogue_records(root: Path) -> list[Path]:
     return sorted(p for p in base.glob("*/dialogue.json") if p.is_file())
 
 
+def dialogue_presentation(path: Path):
+    """Sibling ``presentation.json`` for a dialogue record, when present."""
+    plan = path.with_name(dialogue.PRESENTATION_NAME)
+    if not plan.is_file():
+        return None, []
+    try:
+        return json.loads(plan.read_text(encoding="utf-8")), []
+    except OSError as exc:
+        return None, [f"{_display(plan)}: cannot be read ({exc.strerror or exc})"]
+    except ValueError as exc:
+        return None, [f"{_display(plan)}: is not valid JSON ({exc})"]
+
+
 def audit_dialogue(path: Path, cps: float = DEFAULT_CPS):
     """``(short, skipped, problems)`` for one dialogue record.
 
     Read time is a question about the HOLD, not about the seat: a pill is
     readable or not for exactly as long as it is up, wherever in the film it
     lands. So this measures the hold ``tools.dialogue.plan_script`` will give
-    each cue -- ``max(MIN_HOLD, min(spoken, MAX_CHAT_HOLD))`` -- and never
-    needs the cut list, the footage or a plan. A record is auditable offline,
-    before anything is built.
+    each cue, including any explicit delivered-hold preservation carried in the
+    sibling ``presentation.json``. A record is auditable offline, before
+    anything is built.
     """
     short: list[dict] = []
     skipped: Counter = Counter()
@@ -313,6 +326,8 @@ def audit_dialogue(path: Path, cps: float = DEFAULT_CPS):
 
     if not isinstance(doc, dict) or not isinstance(doc.get("cues"), list):
         return short, skipped, problems
+    presentation, plan_problems = dialogue_presentation(path)
+    problems.extend(plan_problems)
 
     for cue in doc["cues"]:
         if not isinstance(cue, dict):
@@ -333,7 +348,7 @@ def audit_dialogue(path: Path, cps: float = DEFAULT_CPS):
                 f"end_sec={cue.get('end_sec')!r})")
             continue
 
-        on_screen = max(MIN_HOLD, min(end - start, dialogue.MAX_CHAT_HOLD))
+        on_screen = dialogue.planned_hold(cue, presentation=presentation)
         need = required_hold(text, cps)
         if on_screen + 1e-6 >= need:
             continue

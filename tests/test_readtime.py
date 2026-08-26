@@ -277,10 +277,13 @@ def cue(**kw):
     return base
 
 
-def write_record(tmp_path, *cues):
+def write_record(tmp_path, *cues, presentation=None):
     path = tmp_path / "dialogue.json"
     path.write_text(json.dumps({"video_id": "vid", "cues": list(cues)}),
                     encoding="utf-8")
+    if presentation is not None:
+        (tmp_path / "presentation.json").write_text(
+            json.dumps(presentation), encoding="utf-8")
     return path
 
 
@@ -332,6 +335,24 @@ def test_the_spoken_window_is_capped_the_way_plan_script_caps_it(tmp_path):
     assert rows[0]["on_screen"] == MAX_CHAT_HOLD
 
 
+def test_a_presentation_hold_overrides_the_source_window_in_the_audit(tmp_path):
+    path = write_record(
+        tmp_path,
+        cue(id="d02", start_sec=0.0, end_sec=0.5, text="A" * 45),
+        presentation={
+            "video_id": "vid",
+            "mode": "script",
+            "start_sec": 0.0,
+            "sequence": ["d02"],
+            "pins": {},
+            "holds": {"d02": 3.0},
+        },
+    )
+    rows, _, problems = readtime.audit_dialogue(path)
+    assert problems == []
+    assert rows == []
+
+
 def test_a_cue_with_no_words_yet_is_placeholder_business_not_this_tools(tmp_path):
     path = write_record(tmp_path, cue(text=""))
     rows, skipped, problems = readtime.audit_dialogue(path)
@@ -358,8 +379,8 @@ def test_the_default_run_reaches_the_dialogue_records():
     assert readtime.REPO_ROOT / "dialogue" in {p.parent.parent for p in found}
 
 
-def test_act3_priority_now_dialogue_holds_clear_the_audit(monkeypatch):
-    """The owner approved these five re-seats; none may regress unreadable."""
+def test_act3_restored_source_windows_are_audited_against_delivered_holds(monkeypatch):
+    """The five rescued readable holds are preserved in presentation.json."""
     path = (readtime.REPO_ROOT / "dialogue"
             / "yt_curse_of_osiris_opening_cinematic" / "dialogue.json")
     target_ids = {"d02", "d03", "d06", "d22", "d28"}
@@ -379,3 +400,4 @@ def test_act3_priority_now_dialogue_holds_clear_the_audit(monkeypatch):
     assert problems == []
     assert target_texts <= measured
     assert not ({row["id"] for row in rows} & target_ids)
+    assert "d23a" not in {row["id"] for row in rows}

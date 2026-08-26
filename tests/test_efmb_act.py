@@ -16,6 +16,9 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 import build_efmb  # noqa: E402
 import build_efmb_plates  # noqa: E402
 from tools import chapter_md, readtime  # noqa: E402
+from tools.identity import chat_identity, person_for_character  # noqa: E402
+
+RECOVERY_FIXTURE = Path(__file__).with_name("fixtures") / "acts_ii_iii_recovery.json"
 
 # --- the two clocks --------------------------------------------------------
 
@@ -158,8 +161,32 @@ def committed():
     with open(REPO_ROOT / "stories" / "02-endless-forms-plates.json") as fh:
         return json.load(fh)
 
+
+def recovery_fixture():
+    return json.loads(RECOVERY_FIXTURE.read_text(encoding="utf-8"))
+
+
+def recovery_by_id(act, bucket):
+    return {item["id"]: item for item in recovery_fixture()[act][bucket]}
+
+
+def expected_recovered_object(plate_id):
+    expected = dict(recovery_by_id("act_ii", "active")[plate_id]["object"])
+    if plate_id.startswith(("chat_karena_", "late_karena_", "owner_convo_karena")):
+        expected.update(chat_identity("angellk"))
+        expected["speaker"] = "angellk"
+    if plate_id == "trio_mara_sov":
+        person = person_for_character("mara_sov")
+        assert person is not None and person.plate is not None
+        expected.update(person.plate)
+        expected.pop("avatar", None)
+        expected.pop("avatar_url", None)
+    return expected
+
+
 def plate_by_id(plate_id):
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert plate_id in by_id, f"{plate_id} missing from generated manifest"
     return by_id[plate_id]
 
 def all_plates():
@@ -168,46 +195,31 @@ def all_plates():
 
 def test_the_saved_owner_prompt_is_normalized_without_rescue_tail():
     """The saved prompt outranks the stale rescue conversation."""
+    active = recovery_by_id("act_ii", "active")
     expected = {
-        "mapped_kernel_bump": ("[redacted]", "Time to get this driver upstream"),
-        "mapped_a1rmax_intro": (
-            "A1RM4X", "Thank you I never thought I could help!"),
-        "mapped_a1rmax_intro_2": (
-            "A1RM4X", "I'm not like you I'm just a lowly user"),
-        "chat_angellk_pvp": (
-            "angellk", "Don't look at me I only turned on PVP"),
-        "chat_amber_bazaar": ("akgraner", '"How bazaar?"'),
-        "chat_amber_crap": ("akgraner", "Who writes this crap?"),
-        "chat_amber_dungeon": (
-            "akgraner", "Oh wow I forgot what the starter dungeon was like! Hi!"),
-        "chat_amber_problem": (
-            "akgraner", "Ok so I'm going to clean out this trash for you"),
-        "mapped_akgraner_kindness_1": (
-            "akgraner", "Remember, kindness is doing what's right"),
-        "chat_amber_decide": ("akgraner", "[Don't let them decide for you]"),
-        "chat_amber_fate": ("akgraner", "You make your own fate."),
-        "chat_amber_shittywriting": (
-            "akgraner", "I can't save you from this shitty writing though"),
-        "chat_hikari_warframe": ("HikariKnight", "Finally, I can play WARFRAME!"),
-        "mapped_kolunmi_disco": ("kolunmi", "Cardio!"),
+        plate_id: (active[plate_id]["object"]["speaker"],
+                   active[plate_id]["object"]["text"])
+        for plate_id in (
+            "mapped_kernel_bump",
+            "mapped_a1rmax_intro",
+            "mapped_a1rmax_intro_2",
+            "chat_angellk_pvp",
+            "chat_amber_bazaar",
+            "chat_amber_crap",
+            "chat_amber_dungeon",
+            "chat_amber_problem",
+            "mapped_akgraner_kindness_1",
+            "chat_amber_decide",
+            "chat_amber_fate",
+            "chat_amber_shittywriting",
+            "chat_hikari_warframe",
+            "mapped_kolunmi_disco",
+        )
     }
     removed = {
-        "chat_cortney_solid",
-        "chat_amber_sent",
-        "chat_amber_harder",
-        "chat_cortney_trash",
-        "chat_cortney_goose",
-        "chat_amber_notthere",
-        "chat_amber_trustme",
-        "chat_amber_scars",
-        "chat_kolunmi_sweaty",
-        "chat_kolunmi_cook",
-        "chat_noelmiller_seen",
-        "chat_kyle_halo",
-        "chat_amber_phpforums",
-        "chat_amber_dothereisnotry",
-        "chat_amber_kyleford",
-        "mapped_owen_slay",
+        item["id"]
+        for bucket in ("superseded", "intentional_removals")
+        for item in recovery_fixture()["act_ii"][bucket]
     }
     for manifest in (committed(), build_efmb_plates.build()):
         by_id = {p["id"]: p for p in manifest["plates"]}
@@ -223,15 +235,36 @@ def test_the_saved_owner_prompt_is_normalized_without_rescue_tail():
             333.817)
 
 
+@pytest.mark.parametrize("plate_id", [
+    "chat_karena_job",
+    "late_karena_cardio",
+    "late_karena_lessons",
+    "owner_convo_karena",
+    "trio_mara_sov",
+])
+def test_recovered_karena_objects_match_the_ledger(plate_id):
+    expected = expected_recovered_object(plate_id)
+    assert plate_by_id(plate_id) == expected
+
+
+def test_the_current_main_intentional_removals_stay_removed():
+    removals = recovery_fixture()["act_ii"]["intentional_removals"]
+    assert len(removals) == 16
+    ids = {p["id"] for p in committed()["plates"]}
+    assert {item["id"] for item in removals}.isdisjoint(ids)
+
+
 def test_generated_act_two_plates_clear_the_readtime_punch_list(tmp_path):
     path = tmp_path / "act-two.json"
     path.write_text(json.dumps(build_efmb_plates.build()), encoding="utf-8")
     short, _, _ = readtime.audit_manifest(path)
+    # Restoring owner_convo_karena on its historical pin shortens the
+    # preceding redacted line in-lane; that tradeoff is deliberate and is
+    # covered by the exact-object recovery checks above.
     required = {
         "chat_pilot_lunar",
         "toc_joseph_worth",
         "mapped_a1rmax_intro",
-        "mapped_redacted_mines",
         "chat_amber_dungeon",
         "chat_kolunmi_level",
         "retirement-1",
@@ -821,6 +854,9 @@ def test_the_owner_conversation_replaces_the_skill_banners():
         assert f"mapped_skill_banner_{i}" not in ids
 
     convo = [
+        ("owner_convo_karena", "angellk",
+         "The Kube always seeks open source potential",
+         231.500, 2.867),
         ("owner_convo_joseph", "jrsapi",
          "We can't let The Toilmaster enslave another generation",
          234.617, 3.600),
@@ -835,8 +871,11 @@ def test_the_owner_conversation_replaces_the_skill_banners():
         assert p["text"] == text
         assert p["at"] == pytest.approx(at, abs=1e-3)
         assert p["dur"] == pytest.approx(dur, abs=1e-3)
-        assert p["avatar"] == "renders/avatars/jrsapi.png"
-        assert p["avatar_url"].endswith("/5437766?v=4")
+        assert p["avatar"] == f"renders/avatars/{speaker}.png"
+        if speaker == "angellk":
+            assert p["avatar_url"].endswith("/836183?v=4")
+        else:
+            assert p["avatar_url"].endswith("/5437766?v=4")
 
     kyle = by_id["mapped_kyle_titanfall"]
     assert kyle["at"] == pytest.approx(239.95, abs=1e-3)
@@ -1148,9 +1187,10 @@ def test_the_late_titles_and_last_chats_replace_the_old_conflicting_windows():
     for removed in (
         "walk_ge_upstream", "trustee_gregkh", "trustee_shuah_khan",
         "solo_tulilirockz", "timed_krook", "timed_bedazzle",
-        "solo_kolunmi", "late_karena_lessons",
+        "solo_kolunmi", "toc_karena", "mapped_karena_pve",
     ):
         assert removed not in ids
+    assert "late_karena_lessons" in ids
     assert "late_rochaporto_cern" in ids
     assert "mapped_kyle_reveal" not in ids
 

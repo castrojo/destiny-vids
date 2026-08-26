@@ -67,8 +67,9 @@ Each video's conversation lives in its own folder, beside the Markdown the
 owner actually edits:
 
 ```text
-dialogue/<video_id>/DIALOGUE.md    the conversation, as prose
-dialogue/<video_id>/dialogue.json  the provenance record the pipeline reads
+dialogue/<video_id>/DIALOGUE.md         the conversation, as prose
+dialogue/<video_id>/dialogue.json      immutable source windows and evidence
+dialogue/<video_id>/presentation.json  sequence, film start, explicit delivered holds and owner pins
 ```
 
 `tools/dialogue_md.py` keeps the two in step, and is the only supported way to
@@ -78,14 +79,19 @@ rewrite a line:
 python3 tools/dialogue_md.py export <video_id>            # record -> DIALOGUE.md
 python3 tools/dialogue_md.py apply  <video_id> --dry-run  # preview the edits
 python3 tools/dialogue_md.py apply  <video_id>            # DIALOGUE.md -> record
+python3 tools/dialogue_md.py restore-source-times <video_id> --from-ref <ref>
 ```
 
 Editing the Markdown never loses provenance. Timecodes and evidence ride in the
-heading and are restored verbatim; a line the owner rewrites is marked
+heading as immutable source evidence, and `apply` refuses any changed source
+window; restore source-window drift from a named git ref instead. Sequence,
+film start, any explicit delivered-hold preservation, and `| pin ...`
+annotations live in `presentation.json`, so reordering sections or moving a
+pin is planning rather than a source edit. A line the owner rewrites is marked
+`text_source: owner_supplied`, while
 `text_source: placeholder` marks a cue whose words do not exist yet -- a
 blank line in `DIALOGUE.md` is kept as a slot rather than failing the file, and
 renders as lorem credited to `TBD`. An owner rewrite instead records
-`text_source: owner_supplied` and keeps the recovered wording in
 `recovered_text`; a deleted section moves to `dropped` with a reason. The
 owner supplying copy is allowed — an *agent* inventing it is not, and keeping
 both versions is what tells the two apart. A test asserts the checked-in

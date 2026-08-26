@@ -1,4 +1,5 @@
 """Tests for the recovered-dialogue planner (tools/dialogue.py)."""
+import copy
 import json
 from pathlib import Path
 
@@ -6,6 +7,9 @@ import pytest
 
 from tools import dialogue, plate  # noqa: E402
 from tools.identity import UnknownPerson
+
+RECOVERY_FIXTURE = Path(__file__).with_name("fixtures") / "acts_ii_iii_recovery.json"
+VIDEO_ID = "yt_curse_of_osiris_opening_cinematic"
 
 LEADS = {
     "osiris": {"person": "mrbobbytables", "display_name": "mrbobbytables",
@@ -34,6 +38,27 @@ def shot(segment_id, start, end, role="none", character=None):
 
 # The cut holds the first cue's footage but not the third's.
 SHOTS = [shot("a", 8.0, 18.0), shot("b", 60.0, 70.0)]
+
+
+def recovery_fixture():
+    return json.loads(RECOVERY_FIXTURE.read_text(encoding="utf-8"))
+
+
+def recovery_by_id(act, bucket):
+    return {item["id"]: item for item in recovery_fixture()[act][bucket]}
+
+
+def source_tuples(record):
+    return {
+        cue["id"]: (
+            cue["character"],
+            cue["text"],
+            cue["start_sec"],
+            cue["end_sec"],
+            cue.get("recovered_text"),
+        )
+        for cue in record["cues"]
+    }
 
 def test_speaker_is_the_login_not_the_character_and_not_the_legal_name():
     """Owner, 2026-08-24: "change the dialogue chat boxes to their github
@@ -153,38 +178,66 @@ def test_script_mode_can_begin_at_the_first_authored_display_cue():
 
 def test_the_indexed_dialogue_file_is_loadable_and_attributed():
     """The checked-in recovery must stay machine-readable and fully attributed."""
-    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    data = dialogue.load_dialogue(VIDEO_ID)
+    plan = dialogue.load_presentation(VIDEO_ID)
     assert data["cues"], "no cues recovered"
     for cue in data["cues"]:
-        assert cue["character"] in ("osiris", "sagira")
+        assert cue["character"] in ("osiris", "sagira", "mara_sov")
         assert cue["evidence"] in ("vocative", "alternation", "uncertain",
                                    "owner_supplied")
         assert cue["end_sec"] > cue["start_sec"]
         assert cue["text"].strip()
+        assert "pin_sec" not in cue
     assert data["text_source"]["method"] == "owner_supplied"
     assert data["speaker_source"]["method"] == "owner_supplied"
-    assert data["display"]["mode"] == "script"
-    assert data["display"]["start_sec"] == 32.56
-    assert data["display"]["standalone_leads"] is False
-    # The note COUNTS the lines, so pinning it verbatim let it go stale every
-    # time one was added or retired -- and it did, silently, because a
-    # verbatim assertion of a wrong string still passes. Derive the number
-    # instead: the note can only be right or the test red.
-    assert data["display"]["note"] == (
-        f"Script layout keeps all {len(data['cues'])} lines readable in "
-        "order; standalone lead plates are omitted because every dialogue "
-        "pill identifies its speaker by github handle (@mrbobbytables, "
-        "@clubanderson), and both people are named in full by their own "
-        "Guardian reveal cards."
+    assert plan["mode"] == "script"
+    assert plan["start_sec"] == 32.56
+    assert plan["standalone_leads"] is False
+
+
+def test_source_cues_contain_no_presentation_fields():
+    forbidden = {"pin_sec", "at", "dur", "position", "fade_in", "fade_out"}
+    assert all(forbidden.isdisjoint(cue) for cue in dialogue.load_dialogue(VIDEO_ID)["cues"])
+
+
+def test_presentation_names_every_live_cue_once():
+    cues = dialogue.load_dialogue(VIDEO_ID)["cues"]
+    plan = dialogue.load_presentation(VIDEO_ID)
+    assert plan["sequence"] == [cue["id"] for cue in dialogue.ordered_cues(cues, plan)]
+    assert set(plan["sequence"]) == {cue["id"] for cue in cues}
+
+
+def test_planning_does_not_mutate_source_records():
+    from tools.derive import load_leads
+
+    record = dialogue.load_dialogue(VIDEO_ID)
+    before = copy.deepcopy(record)
+    dialogue.plan_script(
+        record["cues"],
+        [shot("long", 0.0, 200.0)],
+        load_leads(),
+        presentation=dialogue.load_presentation(VIDEO_ID),
     )
+    assert record == before
+
+
+def test_act3_contains_every_recovered_cue_exactly_once():
+    record = dialogue.load_dialogue(VIDEO_ID)
+    plan = dialogue.load_presentation(VIDEO_ID)
+    expected = recovery_by_id("act_iii", "active")
+    assert plan["sequence"] == list(expected)
+    assert source_tuples(record) == {
+        cue_id: tuple(item["source_tuple"])
+        for cue_id, item in expected.items()
+    }
 
 
 @pytest.mark.parametrize(
     "cue_id, expected",
     [
-        ("d20a", (124.24, 127.71, "osiris")),
-        ("d20b", (127.72, 130.75, "osiris")),
-        ("d21", (130.76, 135.79, "osiris")),
+        ("d20a", (121.44, 124.91, "osiris")),
+        ("d20b", (124.92, 127.95, "osiris")),
+        ("d21", (127.96, 132.99, "osiris")),
     ],
 )
 def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
@@ -195,12 +248,11 @@ def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
 
 def test_act3_owner_placed_pins_are_recorded_in_film_seconds():
     """d22 follows d28's approved readable hold without overlapping it."""
-    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
-    cues = {cue["id"]: cue for cue in data["cues"]}
-    assert cues["d13"]["pin_sec"] == 90.0
-    assert cues["d20a"]["pin_sec"] == 117.0
-    assert cues["d21"]["pin_sec"] == 124.0
-    assert cues["d22"]["pin_sec"] == 135.21
+    plan = dialogue.load_presentation("yt_curse_of_osiris_opening_cinematic")
+    assert dialogue.presentation_pin("d13", plan) == 90.0
+    assert dialogue.presentation_pin("d20a", plan) == 117.0
+    assert dialogue.presentation_pin("d21", plan) == 124.0
+    assert dialogue.presentation_pin("d22", plan) == 135.21
 
 
 def test_act3_toilmaster_line_is_dropped_and_replaced():
@@ -224,7 +276,7 @@ def test_act3_the_maintainer_exchange_is_restored_after_the_hive_line():
 
     The exchange was retired the same day (#357 took d23b, d26 and d25; #358
     took d22 and the 7% line) and the owner asked for three of the five back:
-    d22 and d23b. d22 is reworded to name the CNCF rather than
+    d22, d23a and d23b. d22 is reworded to name the CNCF rather than
     Kubernetes -- 'We need', not 'You need' -- and keeps its old wording as
     recovered_text. d26 and d25 stay retired.
 
@@ -244,13 +296,23 @@ def test_act3_the_maintainer_exchange_is_restored_after_the_hive_line():
     assert by_id["d22"]["text_source"] == "owner_supplied"
     assert by_id["d22"]["recovered_text"] == (
         "You need to get a message to the Kubernetes Maintainers")
+    assert by_id["d23a"] == {
+        "id": "d23a",
+        "start_sec": 134.64,
+        "end_sec": 136.11,
+        "character": "mara_sov",
+        "evidence": "owner_supplied",
+        "text": "Check your email smartass",
+        "text_source": "owner_supplied",
+        "recovered_text": "The open rate of maintainer emails is 7%",
+    }
     assert by_id["d23b"]["text"] == "I don't like this plan"
-    for restored in ("d22", "d23b"):
-        assert by_id[restored]["character"] in ("osiris", "sagira")
+    for restored in ("d22", "d23a", "d23b"):
+        assert by_id[restored]["character"] in ("osiris", "sagira", "mara_sov")
 
-    ids = [c["id"] for c in cues]
+    ids = dialogue.load_presentation(VIDEO_ID)["sequence"]
     assert ids.index("d21") < ids.index("d27") < ids.index("d22")
-    assert ids.index("d22") < ids.index("d23b")
+    assert ids.index("d22") < ids.index("d23a") < ids.index("d23b")
     assert ids[-1] == "d23b", "the 'I don't like this plan' line closes"
 
 
@@ -296,12 +358,20 @@ def test_a_pinned_cue_lands_exactly_in_script_mode():
         {"id": "d01", "start_sec": 0.0, "end_sec": 3.0, "character": "osiris",
          "text": "flowing"},
         {"id": "d02", "start_sec": 3.0, "end_sec": 6.0, "character": "sagira",
-         "text": "pinned", "pin_sec": 40.0},
+         "text": "pinned"},
         {"id": "d03", "start_sec": 6.0, "end_sec": 9.0, "character": "osiris",
          "text": "flows after the pin"},
     ]
+    plan = {
+        "video_id": "vid",
+        "mode": "script",
+        "start_sec": 10.0,
+        "sequence": ["d01", "d02", "d03"],
+        "pins": {"d02": 40.0},
+    }
     entries, dropped = dialogue.plan_script(
-        cues, [shot("long", 0.0, 100.0)], LEADS, start_at=10.0)
+        cues, [shot("long", 0.0, 100.0)], LEADS,
+        presentation=plan, start_at=10.0)
     assert not dropped
     by_id = {e["id"]: e for e in entries}
     assert by_id["d01"]["at"] == pytest.approx(10.0)
@@ -355,7 +425,8 @@ def test_the_retirement_conversation_no_longer_opens_act_three():
     builder = Path("scripts/build_uncut_credited.sh").read_text(encoding="utf-8")
     assert 'FIXED_MANIFEST="stories/$VIDEO_ID-fixed-plates.json"' in builder
     assert 'FIXED_INPUTS+=("$FIXED_MANIFEST")' in builder
-    assert 'display.get("standalone_leads", True)' in builder
+    assert 'record = Path("dialogue") / sys.argv[1] / "presentation.json"' in builder
+    assert 'presentation.get("standalone_leads", True)' in builder
     assert 'python3 tools/plate.py merge "${FIXED_INPUTS[@]}" --out "$WORK/fixed.json"' in builder
     assert '    --around "$WORK/fixed.json"' in builder
 
@@ -368,7 +439,7 @@ def test_act_three_review_copy_and_splits_are_exact():
     assert by_id["d20b"]["text"] == "Everyone's making their own and they're all awful"
     assert by_id["d21"]["text"] == "They've broken out of the sandbox"
     assert by_id["d27"]["text"] == "Hive is the one stuck in the CNCF Sandbox!"
-    ids = [c["id"] for c in data["cues"]]
+    ids = dialogue.load_presentation(VIDEO_ID)["sequence"]
     assert ids.index("d20a") < ids.index("d20b") < ids.index("d21")
 
 
@@ -386,31 +457,34 @@ def test_act3_bob_barks_at_the_maintainers_before_asking_for_them():
     assert by_id["d28"]["text"] == "You need to apply, check your email, focus!"
     assert by_id["d28"]["character"] == "osiris", "Bob Killen's character"
     assert by_id["d28"]["text_source"] == "owner_supplied"
-    assert "pin_sec" not in by_id["d28"], (
+    assert dialogue.presentation_pin("d28", dialogue.load_presentation(VIDEO_ID)) is None, (
         "d28 flows before the separately reseated d22 pin")
 
-    ids = [cue["id"] for cue in cues]
+    ids = dialogue.load_presentation(VIDEO_ID)["sequence"]
     assert ids.index("d27") < ids.index("d28") < ids.index("d22")
-    assert by_id["d22"]["pin_sec"] == 135.21, "the exchange follows d28"
+    assert dialogue.presentation_pin("d22", dialogue.load_presentation(VIDEO_ID)) == 135.21, (
+        "the exchange follows d28")
 
 
-def test_act3_priority_dialogue_reseats_are_readable_and_identity_normalized():
-    """The approved re-seats keep the words/order while using People logins."""
+def test_act3_priority_dialogue_reseats_stay_in_film_order_and_use_people_logins():
+    """Readable film seats live in presentation planning, not source evidence."""
     from tools.derive import load_leads
 
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
     expected = {
-        "d02": (42.00, 45.65, "mrbobbytables",
+        "d02": (42.00, 45.55, "mrbobbytables",
                 "This training repository is the best place to hone their craft"),
-        "d03": (45.66, 48.72, "mrbobbytables",
+        "d03": (45.56, 47.51, "mrbobbytables",
                 "Iteration 7: Students serialize instead of parallize"),
-        "d06": (53.73, 56.79, "clubanderson",
+        "d06": (52.52, 53.99, "clubanderson",
                 "Bluefin's Hive is reprogramming them all as we speak"),
-        "d28": (138.71, 141.24, "mrbobbytables",
+        "d28": (133.20, 135.40, "mrbobbytables",
                 "You need to apply, check your email, focus!"),
-        "d22": (141.25, 144.08, "mrbobbytables",
+        "d22": (133.96, 134.63, "mrbobbytables",
                 "We need to get a message to the CNCF Maintainers"),
+        "d23a": (134.64, 136.11, "angellk",
+                 "Check your email smartass"),
     }
     for cue_id, (start, end, speaker, text) in expected.items():
         cue = cues[cue_id]
@@ -418,10 +492,11 @@ def test_act3_priority_dialogue_reseats_are_readable_and_identity_normalized():
             start, end, text)
 
     fixed = {"id": "clubanderson-ghost", "at": 80.4, "dur": 2.8}
+    plan = dialogue.load_presentation(VIDEO_ID)
     entries, dropped = dialogue.plan_script(
         data["cues"], [shot("long", 0.0, 200.0)], load_leads(),
         busy=[(fixed["at"], fixed["at"] + fixed["dur"])],
-        start_at=data["display"]["start_sec"])
+        presentation=plan, start_at=plan["start_sec"])
     assert not dropped
     plate.load_manifest_entries([*entries, fixed])
     planned = {entry["id"]: entry for entry in entries}
@@ -430,8 +505,40 @@ def test_act3_priority_dialogue_reseats_are_readable_and_identity_normalized():
         assert planned[cue_id]["avatar"] == (
             f"renders/avatars/{speaker}.png")
     assert planned["d22"]["at"] == pytest.approx(135.21)
-    assert [cue["id"] for cue in data["cues"]].index("d28") < (
-        [cue["id"] for cue in data["cues"]].index("d22"))
+    assert planned["d23a"]["position"] == "center"
+    assert planned["d23a"]["at"] == pytest.approx(
+        planned["d22"]["at"] + planned["d22"]["dur"] + dialogue.TAIL_OUT)
+    assert planned["d23b"]["at"] == pytest.approx(
+        planned["d23a"]["at"] + planned["d23a"]["dur"] + dialogue.TAIL_OUT)
+    assert plan["sequence"].index("d28") < plan["sequence"].index("d22")
+
+
+def test_act3_priority_dialogue_preserves_pre_recovery_delivered_holds():
+    """These exact holds come from git ref 90d4124, the last post-#397
+    delivered record before Task 4 restored the source windows."""
+    from tools.derive import load_leads
+
+    data = dialogue.load_dialogue(VIDEO_ID)
+    plan = dialogue.load_presentation(VIDEO_ID)
+    entries, dropped = dialogue.plan_script(
+        data["cues"],
+        [shot("long", 0.0, 200.0)],
+        load_leads(),
+        presentation=plan,
+        start_at=plan["start_sec"],
+    )
+    assert not dropped
+    by_id = {entry["id"]: entry for entry in entries}
+    assert {
+        cue_id: by_id[cue_id]["dur"]
+        for cue_id in ("d02", "d03", "d06", "d28", "d22")
+    } == pytest.approx({
+        "d02": 3.65,
+        "d03": 3.06,
+        "d06": 3.06,
+        "d28": 2.53,
+        "d22": 2.83,
+    })
 
 
 # -- lanes ------------------------------------------------------------------
@@ -467,8 +574,10 @@ def test_one_voice_is_not_a_conversation_and_needs_no_side():
     assert dialogue.lanes_for([]) == {}
 
 
-def test_act3_lanes_stay_a_two_hander():
-    """The committed record, not a fixture: Bob stays left, Doc stays right."""
-    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
-    lanes = dialogue.lanes_for(data["cues"])
-    assert lanes == {"osiris": "left", "sagira": "right"}
+def test_act3_committed_lanes_include_karena_in_the_center():
+    record = dialogue.load_dialogue(VIDEO_ID)
+    assert dialogue.lanes_for(record["cues"]) == {
+        "osiris": "left",
+        "sagira": "right",
+        "mara_sov": "center",
+    }

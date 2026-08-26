@@ -1,0 +1,2421 @@
+{
+  "anchors": {
+    "pre_pr396": "86aaff6",
+    "post_pr396": "968f0c9",
+    "post_pr397": "90d4124",
+    "post_pr398": "51d79d2",
+    "act3_karena": "8242021",
+    "restoration": "eaea027"
+  },
+  "act_ii": {
+    "active": [
+      {
+        "id": "chat_joseph_ricardos",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_joseph_ricardos",
+          "at": 30.633,
+          "dur": 3.4,
+          "kind": "chat",
+          "copy_source": "owner_supplied",
+          "speaker": "jrsapi",
+          "text": "No one can tell which Ricardo is which so roll with it",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/jrsapi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+        }
+      },
+      {
+        "id": "chat_ricardo_nukeguy",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_ricardo_nukeguy",
+          "at": 34.433,
+          "dur": 3.4,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "rochaporto",
+          "text": "It's me the nuke guy how do you think I got here?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/rochaporto.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+        }
+      },
+      {
+        "id": "chat_pilot_lunar",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_pilot_lunar",
+          "at": 38.233,
+          "dur": 2.883,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "TBD",
+          "text": "Lunar record baby! Hello KubeCon + CloudNativeCon",
+          "text_source": "owner_supplied",
+          "speaker_pending": "pilot"
+        }
+      },
+      {
+        "id": "chat_ricardo_ai",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_ricardo_ai",
+          "at": 41.433,
+          "dur": 3.4,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "ricardosalveti",
+          "text": "They wanted us to put AI in the glider so we did.",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/ricardosalveti.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/44008055?v=4"
+        }
+      },
+      {
+        "id": "trio_mara_sov",
+        "kind": "nonchat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "trio_mara_sov",
+          "at": 61.433,
+          "dur": 4.0,
+          "position": "right",
+          "scale": 0.62,
+          "group": "trio_row",
+          "order": 2,
+          "copy_source": "casting",
+          "seen_at_src": 72.0,
+          "label": "ARCHON // CONTRIBUTOR",
+          "class": "Stasis Warlock",
+          "name": "Karena Angel",
+          "title": "Architect of the Consensus",
+          "variant": "leader",
+          "wreath": true
+        }
+      },
+      {
+        "id": "chat_joseph_slop",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_joseph_slop",
+          "at": 70.433,
+          "dur": 2.6,
+          "kind": "chat",
+          "copy_source": "owner_supplied",
+          "speaker": "jrsapi",
+          "text": "That explains the slop",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/jrsapi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+        }
+      },
+      {
+        "id": "chat_karena_job",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_karena_job",
+          "at": 77.433,
+          "dur": 2.6,
+          "kind": "chat",
+          "copy_source": "owner_supplied",
+          "speaker": "Karena",
+          "text": "I love this job",
+          "text_source": "owner_supplied"
+        }
+      },
+      {
+        "id": "late_mfahlandt_clean",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_mfahlandt_clean",
+          "at": 88.883,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "mfahlandt",
+          "text": "K1 Logistics is clean",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/mfahlandt.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5739844?v=4"
+        }
+      },
+      {
+        "id": "late_kfaseela_gamers",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_kfaseela_gamers",
+          "at": 91.583,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "kfaseela",
+          "text": "The gamers were here alright",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/kfaseela.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/7901446?v=4"
+        }
+      },
+      {
+        "id": "late_markmandel_online",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_markmandel_online",
+          "at": 94.283,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "markmandel",
+          "text": "Agones Cluster - ONLINE",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/markmandel.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/298370?v=4"
+        }
+      },
+      {
+        "id": "late_riaankleinhans_close",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_riaankleinhans_close",
+          "at": 96.983,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "riaankleinhans",
+          "text": "You're getting close",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/riaankleinhans.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/61125752?v=4"
+        }
+      },
+      {
+        "id": "late_jrsapi_learn",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_jrsapi_learn",
+          "at": 99.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "jrsapi",
+          "text": "They learn quickly",
+          "text_source": "owner_supplied",
+          "seen_at_src": 117.266,
+          "avatar": "renders/avatars/jrsapi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+        }
+      },
+      {
+        "id": "late_rochaporto_move",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_rochaporto_move",
+          "at": 101.95,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "rochaporto",
+          "text": "We need to move!",
+          "text_source": "owner_supplied",
+          "seen_at_src": 119.716,
+          "avatar": "renders/avatars/rochaporto.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+        }
+      },
+      {
+        "id": "late_metrics_cluster",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_metrics_cluster",
+          "at": 104.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "jrsapi",
+          "text": "Projects Teams Metrics are strong",
+          "text_source": "owner_supplied",
+          "seen_at_src": 122.266,
+          "avatar": "renders/avatars/jrsapi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+        }
+      },
+      {
+        "id": "late_karena_cardio",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "late_karena_cardio",
+          "at": 107.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "karena",
+          "text": "Like cardio!",
+          "text_source": "owner_supplied",
+          "seen_at_src": 125.266
+        }
+      },
+      {
+        "id": "late_metrics_mentoring",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_metrics_mentoring",
+          "at": 110.2,
+          "dur": 2.8,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "jrsapi",
+          "text": "They just need mentoring in the right skills",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/jrsapi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+        }
+      },
+      {
+        "id": "late_karena_lessons",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "late_karena_lessons",
+          "at": 123.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "karena",
+          "text": "Hit 'em with your lessons learned",
+          "text_source": "owner_supplied",
+          "seen_at_src": 141.266
+        }
+      },
+      {
+        "id": "late_rochaporto_cern",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_rochaporto_cern",
+          "at": 125.95,
+          "dur": 2.6,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "rochaporto",
+          "text": "One reference architecture coming up!",
+          "text_source": "owner_supplied",
+          "seen_at_src": 143.716,
+          "avatar": "renders/avatars/rochaporto.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+        }
+      },
+      {
+        "id": "late_jrsapi_notes",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "late_jrsapi_notes",
+          "at": 134.5,
+          "dur": 2.6,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "jrsapi",
+          "text": "I still don't know which Ricardo this is",
+          "text_source": "owner_supplied",
+          "seen_at_src": 152.266,
+          "avatar": "renders/avatars/jrsapi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+        }
+      },
+      {
+        "id": "toc_joseph_worth",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "toc_joseph_worth",
+          "at": 140.677,
+          "dur": 2.706,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "jrsapi",
+          "text": "The gamers would have to impress BOTH Ricardos",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/jrsapi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+        }
+      },
+      {
+        "id": "toc_ricardo",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "toc_ricardo",
+          "at": 143.633,
+          "dur": 2.4,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "rochaporto",
+          "text": "Look man I am so tired just jump",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/rochaporto.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+        }
+      },
+      {
+        "id": "mapped_kernel_bump",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_kernel_bump",
+          "at": 159.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "[redacted]",
+          "text": "Time to get this driver upstream",
+          "text_source": "owner_supplied",
+          "seen_at_src": 183.366
+        }
+      },
+      {
+        "id": "mapped_pastaq_tests",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_pastaq_tests",
+          "at": 165.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "pastaq",
+          "text": "All your tests passed right?",
+          "text_source": "owner_supplied",
+          "seen_at_src": 189.366,
+          "avatar": "renders/avatars/pastaq.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/9809174?v=4"
+        }
+      },
+      {
+        "id": "mapped_lionheartp_what_tests",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_lionheartp_what_tests",
+          "at": 169.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "LionHeartP",
+          "text": "What tests?",
+          "text_source": "owner_supplied",
+          "seen_at_src": 193.366,
+          "avatar": "renders/avatars/LionHeartP.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+        }
+      },
+      {
+        "id": "mapped_a1rmax_intro",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_a1rmax_intro",
+          "at": 175.5,
+          "dur": 2.295,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "A1RM4X",
+          "text": "Thank you I never thought I could help!",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/A1RM4X.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4"
+        }
+      },
+      {
+        "id": "walk_ge_stream",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "walk_ge_stream",
+          "at": 180.531,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "GloriousEggroll",
+          "text": "It's your patch, turn the stream on",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/GloriousEggroll.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/11287837?v=4"
+        }
+      },
+      {
+        "id": "walk_a1rm4x",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "walk_a1rm4x",
+          "at": 182.981,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "LionHeartP",
+          "text": "Let's get these numbers up",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/LionHeartP.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+        }
+      },
+      {
+        "id": "mapped_wrkode_dibs",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_wrkode_dibs",
+          "at": 185.431,
+          "dur": 2.7,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "wrkode",
+          "text": "Oh dibs on this one",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/wrkode.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/73309415?v=4"
+        }
+      },
+      {
+        "id": "walk_ge_glorious",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "walk_ge_glorious",
+          "at": 188.381,
+          "dur": 2.8,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "GloriousEggroll",
+          "text": "There's nothing glorious about this job",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/GloriousEggroll.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/11287837?v=4"
+        }
+      },
+      {
+        "id": "mapped_lionheartp_together",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_lionheartp_together",
+          "at": 195.5,
+          "dur": 3.8,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "LionHeartP",
+          "text": "When we work together",
+          "text_source": "owner_supplied",
+          "seen_at_src": 219.366,
+          "avatar": "renders/avatars/LionHeartP.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+        }
+      },
+      {
+        "id": "mapped_wrkode_kairos",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_wrkode_kairos",
+          "at": 199.7,
+          "dur": 3.0,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "wrkode",
+          "text": "Have I shown you Kairos my friend?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/wrkode.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/73309415?v=4"
+        }
+      },
+      {
+        "id": "mapped_eggroll_title",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_eggroll_title",
+          "at": 205.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "LionHeartP",
+          "text": "Nice work testing that patch",
+          "text_source": "owner_supplied",
+          "seen_at_src": 229.366,
+          "avatar": "renders/avatars/LionHeartP.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+        }
+      },
+      {
+        "id": "mapped_eggroll_blueberries",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_eggroll_blueberries",
+          "at": 208.2,
+          "dur": 3.4,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "LionHeartP",
+          "text": "Usually Blueberries just send me a bunch of crap",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/LionHeartP.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+        }
+      },
+      {
+        "id": "mapped_eggroll_didyou",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_eggroll_didyou",
+          "at": 212.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "LionHeartP",
+          "text": "You didn't test any of this did you.",
+          "text_source": "owner_supplied",
+          "seen_at_src": 236.366,
+          "avatar": "renders/avatars/LionHeartP.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+        }
+      },
+      {
+        "id": "mapped_pastaq_what_tests",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_pastaq_what_tests",
+          "at": 216.5,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "pastaq",
+          "text": "Hey man WHAT tests?",
+          "text_source": "owner_supplied",
+          "seen_at_src": 240.366,
+          "avatar": "renders/avatars/pastaq.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/9809174?v=4"
+        }
+      },
+      {
+        "id": "walk_ge_lesson",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "walk_ge_lesson",
+          "at": 218.766,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "right",
+          "copy_source": "owner_supplied",
+          "speaker": "LionHeartP",
+          "text": "Let's go!",
+          "text_source": "owner_supplied",
+          "seen_at_src": 242.632,
+          "avatar": "renders/avatars/LionHeartP.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+        }
+      },
+      {
+        "id": "mapped_redacted_unlearning",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_redacted_unlearning",
+          "at": 221.5,
+          "dur": 2.75,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "[redacted]",
+          "text": "Unlearning bad habits takes time",
+          "text_source": "owner_supplied",
+          "seen_at_src": 290.0
+        }
+      },
+      {
+        "id": "mapped_redacted_options",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_redacted_options",
+          "at": 224.5,
+          "dur": 2.75,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "[redacted]",
+          "text": "Your options are success",
+          "text_source": "owner_supplied",
+          "seen_at_src": 293.0
+        }
+      },
+      {
+        "id": "mapped_redacted_mines",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_redacted_mines",
+          "at": 227.7,
+          "dur": 3.648,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "[redacted]",
+          "text": "Or a lifetime of servitude in the Toilmaster's Packaging Mines",
+          "text_source": "owner_supplied"
+        }
+      },
+      {
+        "id": "owner_convo_karena",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "owner_convo_karena",
+          "at": 231.5,
+          "dur": 2.867,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "karena",
+          "text": "The Kube always seeks open source potential",
+          "text_source": "owner_supplied",
+          "seen_at_src": 300.0,
+          "avatar": "renders/avatars/karena.png",
+          "avatar_url": "https://github.com/karena.png?size=256"
+        }
+      },
+      {
+        "id": "owner_convo_joseph",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "owner_convo_joseph",
+          "at": 234.617,
+          "dur": 3.6,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "jrsapi",
+          "text": "We can't let The Toilmaster enslave another generation",
+          "text_source": "owner_supplied",
+          "seen_at_src": 303.117,
+          "avatar": "renders/avatars/jrsapi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+        }
+      },
+      {
+        "id": "mapped_kyle_titanfall",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_kyle_titanfall",
+          "at": 239.95,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "KyleGospo",
+          "text": "FOR TITANFALL!",
+          "text_source": "owner_supplied",
+          "seen_at_src": 308.45,
+          "avatar": "renders/avatars/KyleGospo.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/10704358?v=4"
+        }
+      },
+      {
+        "id": "mapped_redacted_blow",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_redacted_blow",
+          "at": 242.4,
+          "dur": 2.6,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "[redacted]",
+          "text": "Or go blow some shit up",
+          "text_source": "owner_supplied",
+          "seen_at_src": 310.9
+        }
+      },
+      {
+        "id": "mapped_akgraner_kyle",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_akgraner_kyle",
+          "at": 255.933,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Hi sugar, I'm looking for Kyle",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "mapped_hikari_ouch",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_hikari_ouch",
+          "at": 258.383,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "HikariKnight",
+          "text": "Ouch man wtf!",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/HikariKnight.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4"
+        }
+      },
+      {
+        "id": "mapped_owen_sorry",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_owen_sorry",
+          "at": 260.833,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "TBD",
+          "text": "Oh sorry my bad",
+          "text_source": "owner_supplied",
+          "speaker_pending": "Owen"
+        }
+      },
+      {
+        "id": "mapped_kolunmi_pvp",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_kolunmi_pvp",
+          "at": 263.283,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "kolunmi",
+          "text": "Who turned PvP on?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/kolunmi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4"
+        }
+      },
+      {
+        "id": "mapped_cam_noone",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_cam_noone",
+          "at": 268.983,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "TBD",
+          "text": "Mom no one plays this game",
+          "text_source": "owner_supplied",
+          "speaker_pending": "cam"
+        }
+      },
+      {
+        "id": "mapped_hikari_wait",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_hikari_wait",
+          "at": 271.433,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "HikariKnight",
+          "text": "Hey wait?!",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/HikariKnight.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4"
+        }
+      },
+      {
+        "id": "mapped_kolunmi_users",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_kolunmi_users",
+          "at": 273.883,
+          "dur": 2.6,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "kolunmi",
+          "text": "Are those ... other linux users?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/kolunmi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4"
+        }
+      },
+      {
+        "id": "chat_amber_dungeon",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_amber_dungeon",
+          "at": 281.633,
+          "dur": 3.177,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Oh wow I forgot what the starter dungeon was like! Hi!",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "mapped_akgraner_kindness_1",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_akgraner_kindness_1",
+          "at": 290.853,
+          "dur": 2.353,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Remember, kindness is doing what's right",
+          "text_source": "owner_supplied",
+          "scale": 1.18,
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "mapped_akgraner_kindness_2",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_akgraner_kindness_2",
+          "at": 293.456,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "For the ecosystem",
+          "text_source": "owner_supplied",
+          "scale": 1.18,
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "mapped_akgraner_kindness_3",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_akgraner_kindness_3",
+          "at": 295.906,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "For our users",
+          "text_source": "owner_supplied",
+          "scale": 1.18,
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "mapped_akgraner_kindness_4",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_akgraner_kindness_4",
+          "at": 298.356,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "And for our maintainers",
+          "text_source": "owner_supplied",
+          "scale": 1.18,
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "mapped_akgraner_kindness_5",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_akgraner_kindness_5",
+          "at": 300.806,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Don't be nice",
+          "text_source": "owner_supplied",
+          "scale": 1.18,
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "mapped_akgraner_kindness_6",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_akgraner_kindness_6",
+          "at": 303.256,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Be kind",
+          "text_source": "owner_supplied",
+          "scale": 1.18,
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "mapped_which_kyle",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_which_kyle",
+          "at": 305.706,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Extinction is the Rule",
+          "text_source": "owner_supplied",
+          "scale": 1.0,
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "chat_amber_problem",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_amber_problem",
+          "at": 308.403,
+          "dur": 2.765,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Ok so I'm going to clean out this trash for you",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "chat_amber_bazaar",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_amber_bazaar",
+          "at": 276.733,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "\"How bazaar?\"",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "chat_amber_crap",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_amber_crap",
+          "at": 279.183,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Who writes this crap?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "chat_amber_shittywriting",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_amber_shittywriting",
+          "at": 316.318,
+          "dur": 2.824,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "I can't save you from this shitty writing though",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "mapped_kyle_sup",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_kyle_sup",
+          "at": 345.401,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "right",
+          "copy_source": "owner_supplied",
+          "speaker": "KyleGospo",
+          "text": "Sup",
+          "text_source": "owner_supplied",
+          "seen_at_src": 331.763,
+          "avatar": "renders/avatars/KyleGospo.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/10704358?v=4"
+        }
+      },
+      {
+        "id": "mapped_kolunmi_disco",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_kolunmi_disco",
+          "at": 347.455,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "kolunmi",
+          "text": "Cardio!",
+          "text_source": "owner_supplied",
+          "seen_at_src": 333.817,
+          "avatar": "renders/avatars/kolunmi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4",
+          "bond_of": "mapped_kyle_sup"
+        }
+      },
+      {
+        "id": "chat_nwoods3_seen",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_nwoods3_seen",
+          "at": 331.137,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "nwoods3",
+          "text": "I feel seen",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/nwoods3.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/28409908?v=4"
+        }
+      },
+      {
+        "id": "chat_kolunmi_level",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_kolunmi_level",
+          "at": 333.587,
+          "dur": 3.118,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "kolunmi",
+          "text": "Hey did you see how we just loaded up in a new level?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/kolunmi.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4"
+        }
+      },
+      {
+        "id": "chat_hikari_warframe",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_hikari_warframe",
+          "at": 336.955,
+          "dur": 2.366,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "HikariKnight",
+          "text": "Finally, I can play WARFRAME!",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/HikariKnight.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4"
+        }
+      },
+      {
+        "id": "retirement-1",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "retirement-1",
+          "at": 370.368,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "[redacted]",
+          "text": "Finally, retirement",
+          "text_source": "owner_supplied",
+          "seen_at_src": 358.497
+        }
+      },
+      {
+        "id": "retirement-2",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "retirement-2",
+          "at": 372.818,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "[redacted]",
+          "text": "The long walk beckons",
+          "text_source": "owner_supplied",
+          "seen_at_src": 360.947
+        }
+      },
+      {
+        "id": "mapped_a1rmax_intro_2",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "mapped_a1rmax_intro_2",
+          "at": 178.045,
+          "dur": 2.236,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "A1RM4X",
+          "text": "I'm not like you I'm just a lowly user",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/A1RM4X.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4"
+        }
+      },
+      {
+        "id": "chat_angellk_pvp",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_angellk_pvp",
+          "at": 265.733,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "angellk",
+          "text": "Don't look at me I only turned on PVP",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/angellk.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
+        }
+      },
+      {
+        "id": "chat_amber_decide",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_amber_decide",
+          "at": 311.418,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "[Don't let them decide for you]",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      },
+      {
+        "id": "chat_amber_fate",
+        "kind": "chat",
+        "source_name": "51d79d2",
+        "source_ref": "51d79d2c8b61f81cb9c6a109ecaff0a489d74f17",
+        "object": {
+          "id": "chat_amber_fate",
+          "at": 313.868,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "You make your own fate.",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+        }
+      }
+    ],
+    "superseded": [
+      {
+        "id": "toc_karena",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "toc_karena",
+          "at": 137.533,
+          "dur": 3.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "Karena",
+          "text": "One hundred thousand bootc volunteers, ready to power up",
+          "text_source": "owner_supplied"
+        }
+      },
+      {
+        "id": "mapped_karena_pve",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "mapped_karena_pve",
+          "at": 265.733,
+          "dur": 3.0,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "karena",
+          "text": "Don't look at me I only put PvE on Legendary",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/karena.png",
+          "avatar_url": "https://github.com/karena.png?size=256"
+        }
+      }
+    ],
+    "intentional_removals": [
+      {
+        "id": "chat_amber_kyleford",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_amber_kyleford",
+          "at": 284.083,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Which one of you is Kyleford?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://github.com/akgraner.png?size=256"
+        }
+      },
+      {
+        "id": "mapped_owen_slay",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "mapped_owen_slay",
+          "at": 288.403,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "Owen",
+          "text": "Slay out, Queen!",
+          "text_source": "owner_supplied",
+          "scale": 1.0
+        }
+      },
+      {
+        "id": "chat_cortney_solid",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_cortney_solid",
+          "at": 310.853,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "cortney",
+          "text": "And we're gonna do you a solid",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/CortNick.png",
+          "avatar_url": "https://github.com/CortNick.png?size=256"
+        }
+      },
+      {
+        "id": "chat_amber_sent",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_amber_sent",
+          "at": 313.303,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "[Redacted] sent me",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://github.com/akgraner.png?size=256"
+        }
+      },
+      {
+        "id": "chat_kolunmi_sweaty",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_kolunmi_sweaty",
+          "at": 320.653,
+          "dur": 4.067,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "kolunmi",
+          "text": "I'm sorry I signed up for teamwork, why are people so sweaty?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/kolunmi.png",
+          "avatar_url": "https://github.com/kolunmi.png?size=256"
+        }
+      },
+      {
+        "id": "chat_kyle_halo",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_kyle_halo",
+          "at": 324.97,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "KyleGospo",
+          "text": "castrojo killed me in Halo today",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/KyleGospo.png",
+          "avatar_url": "https://github.com/KyleGospo.png?size=256"
+        }
+      },
+      {
+        "id": "chat_noelmiller_seen",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_noelmiller_seen",
+          "at": 327.42,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "noelmiller",
+          "text": "I feel seen",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/noelmiller.png",
+          "avatar_url": "https://github.com/noelmiller.png?size=256"
+        }
+      },
+      {
+        "id": "chat_amber_harder",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_amber_harder",
+          "at": 329.87,
+          "dur": 2.667,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Ok well, it gets harder from here on out",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://github.com/akgraner.png?size=256"
+        }
+      },
+      {
+        "id": "chat_cortney_trash",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_cortney_trash",
+          "at": 332.787,
+          "dur": 3.133,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "cortney",
+          "text": "Take out this trash all their contributions are",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/CortNick.png",
+          "avatar_url": "https://github.com/CortNick.png?size=256"
+        }
+      },
+      {
+        "id": "chat_cortney_goose",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_cortney_goose",
+          "at": 336.17,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "cortney",
+          "text": "Goose eggs? Nothing?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/CortNick.png",
+          "avatar_url": "https://github.com/CortNick.png?size=256"
+        }
+      },
+      {
+        "id": "chat_amber_notthere",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_amber_notthere",
+          "at": 338.62,
+          "dur": 3.667,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Those people will not be there when it matters the most",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://github.com/akgraner.png?size=256"
+        }
+      },
+      {
+        "id": "chat_amber_trustme",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_amber_trustme",
+          "at": 342.537,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Trust me",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://github.com/akgraner.png?size=256"
+        }
+      },
+      {
+        "id": "chat_amber_scars",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_amber_scars",
+          "at": 344.987,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "I have the scars to prove it",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://github.com/akgraner.png?size=256"
+        }
+      },
+      {
+        "id": "chat_kolunmi_cook",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_kolunmi_cook",
+          "at": 347.437,
+          "dur": 2.4,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "kolunmi",
+          "text": "I like how you cook sister, I'll try",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/kolunmi.png",
+          "avatar_url": "https://github.com/kolunmi.png?size=256"
+        }
+      },
+      {
+        "id": "chat_amber_phpforums",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_amber_phpforums",
+          "at": 350.087,
+          "dur": 4.533,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "Why do you take technical advice from people who post in PHP forums?",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://github.com/akgraner.png?size=256"
+        }
+      },
+      {
+        "id": "chat_amber_dothereisnotry",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "chat_amber_dothereisnotry",
+          "at": 354.87,
+          "dur": 2.2,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "akgraner",
+          "text": "\"Do. There is no try\"",
+          "text_source": "owner_supplied",
+          "avatar": "renders/avatars/akgraner.png",
+          "avatar_url": "https://github.com/akgraner.png?size=256"
+        }
+      }
+    ]
+  },
+  "act_iii": {
+    "active": [
+      {
+        "id": "d01",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d01",
+          "start_sec": 35.96,
+          "end_sec": 41.99,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "What a shitshow",
+          "text_source": "owner_supplied",
+          "recovered_text": "Wow, what a mess. Who uses their computers this way?"
+        },
+        "source_tuple": [
+          "osiris",
+          "What a shitshow",
+          35.96,
+          41.99,
+          "Wow, what a mess. Who uses their computers this way?"
+        ]
+      },
+      {
+        "id": "d02",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d02",
+          "start_sec": 42.0,
+          "end_sec": 45.55,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "This training repository is the best place to hone their craft",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "osiris",
+          "This training repository is the best place to hone their craft",
+          42.0,
+          45.55,
+          null
+        ]
+      },
+      {
+        "id": "d03",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d03",
+          "start_sec": 45.56,
+          "end_sec": 47.51,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "Iteration 7: Students serialize instead of parallize",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "osiris",
+          "Iteration 7: Students serialize instead of parallize",
+          45.56,
+          47.51,
+          null
+        ]
+      },
+      {
+        "id": "d04",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d04",
+          "start_sec": 47.52,
+          "end_sec": 50.55,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "They're getting faster every loop",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "They're getting faster every loop",
+          47.52,
+          50.55,
+          null
+        ]
+      },
+      {
+        "id": "d05",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d05",
+          "start_sec": 50.56,
+          "end_sec": 52.51,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "Seriously with these clankers",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "Seriously with these clankers",
+          50.56,
+          52.51,
+          null
+        ]
+      },
+      {
+        "id": "d06",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d06",
+          "start_sec": 52.52,
+          "end_sec": 53.99,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "Bluefin's Hive is reprogramming them all as we speak",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "Bluefin's Hive is reprogramming them all as we speak",
+          52.52,
+          53.99,
+          null
+        ]
+      },
+      {
+        "id": "d07",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d07",
+          "start_sec": 54.0,
+          "end_sec": 60.47,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "And you're sure this will work?",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "osiris",
+          "And you're sure this will work?",
+          54.0,
+          60.47,
+          null
+        ]
+      },
+      {
+        "id": "d08",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d08",
+          "start_sec": 60.48,
+          "end_sec": 67.71,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "Told ya, It's a model not a log",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "Told ya, It's a model not a log",
+          60.48,
+          67.71,
+          null
+        ]
+      },
+      {
+        "id": "d09a",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d09a",
+          "start_sec": 69.52,
+          "end_sec": 71.72,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "You better get that context right",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "You better get that context right",
+          69.52,
+          71.72,
+          null
+        ]
+      },
+      {
+        "id": "d09b",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d09b",
+          "start_sec": 71.73,
+          "end_sec": 74.8,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "We don't want a repeat of the Tophee Disaster",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "We don't want a repeat of the Tophee Disaster",
+          71.73,
+          74.8,
+          null
+        ]
+      },
+      {
+        "id": "d10",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d10",
+          "start_sec": 72.44,
+          "end_sec": 80.87,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "Standard AGENTS.md, no problem.",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "osiris",
+          "Standard AGENTS.md, no problem.",
+          72.44,
+          80.87,
+          null
+        ]
+      },
+      {
+        "id": "d11",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d11",
+          "start_sec": 80.88,
+          "end_sec": 87.83,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "What is it, what did you see? New local model?",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "What is it, what did you see? New local model?",
+          80.88,
+          87.83,
+          null
+        ]
+      },
+      {
+        "id": "d13",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d13",
+          "start_sec": 90.84,
+          "end_sec": 92.23,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "Wait. That's not our local model.",
+          "text_source": "owner_supplied",
+          "recovered_text": "Wait. That's not our local model.",
+          "pin_sec": 90.0
+        },
+        "source_tuple": [
+          "sagira",
+          "Wait. That's not our local model.",
+          90.84,
+          92.23,
+          "Wait. That's not our local model."
+        ]
+      },
+      {
+        "id": "d14",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d14",
+          "start_sec": 92.24,
+          "end_sec": 94.95,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "I thought I committed ...",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "I thought I committed ...",
+          92.24,
+          94.95,
+          null
+        ]
+      },
+      {
+        "id": "d15",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d15",
+          "start_sec": 94.96,
+          "end_sec": 98.19,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "Oh, sh—",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "Oh, sh—",
+          94.96,
+          98.19,
+          null
+        ]
+      },
+      {
+        "id": "d16",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d16",
+          "start_sec": 98.2,
+          "end_sec": 99.39,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "Deploy!",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "Deploy!",
+          98.2,
+          99.39,
+          null
+        ]
+      },
+      {
+        "id": "d17",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d17",
+          "start_sec": 99.4,
+          "end_sec": 101.9,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "ON YOUR LEFT. 2 o'clock. Reverting.",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "ON YOUR LEFT. 2 o'clock. Reverting.",
+          99.4,
+          101.9,
+          null
+        ]
+      },
+      {
+        "id": "d18",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d18",
+          "start_sec": 103.96,
+          "end_sec": 106.16,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "New fork, pushing!",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "New fork, pushing!",
+          103.96,
+          106.16,
+          null
+        ]
+      },
+      {
+        "id": "d19",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d19",
+          "start_sec": 114.48,
+          "end_sec": 117.98,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "You keep picking the places where they shoot at us.",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "You keep picking the places where they shoot at us.",
+          114.48,
+          117.98,
+          null
+        ]
+      },
+      {
+        "id": "d20a",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d20a",
+          "start_sec": 121.44,
+          "end_sec": 124.91,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "Everyone forgot how to use KVM! We need to split up",
+          "text_source": "owner_supplied",
+          "pin_sec": 117.0
+        },
+        "source_tuple": [
+          "osiris",
+          "Everyone forgot how to use KVM! We need to split up",
+          121.44,
+          124.91,
+          null
+        ]
+      },
+      {
+        "id": "d20b",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d20b",
+          "start_sec": 124.92,
+          "end_sec": 127.95,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "Everyone's making their own and they're all awful",
+          "text_source": "owner_supplied",
+          "recovered_text": "Everyone's making their own and it's all bad!"
+        },
+        "source_tuple": [
+          "osiris",
+          "Everyone's making their own and they're all awful",
+          124.92,
+          127.95,
+          "Everyone's making their own and it's all bad!"
+        ]
+      },
+      {
+        "id": "d21",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d21",
+          "start_sec": 127.96,
+          "end_sec": 132.99,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "They've broken out of the sandbox",
+          "text_source": "owner_supplied",
+          "pin_sec": 124.0
+        },
+        "source_tuple": [
+          "osiris",
+          "They've broken out of the sandbox",
+          127.96,
+          132.99,
+          null
+        ]
+      },
+      {
+        "id": "d27",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d27",
+          "start_sec": 133.0,
+          "end_sec": 135.9,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "Hive is the one stuck in the CNCF Sandbox!",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "Hive is the one stuck in the CNCF Sandbox!",
+          133.0,
+          135.9,
+          null
+        ]
+      },
+      {
+        "id": "d28",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d28",
+          "start_sec": 133.2,
+          "end_sec": 135.4,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "You need to apply, check your email, focus!",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "osiris",
+          "You need to apply, check your email, focus!",
+          133.2,
+          135.4,
+          null
+        ]
+      },
+      {
+        "id": "d22",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d22",
+          "start_sec": 133.96,
+          "end_sec": 134.63,
+          "character": "osiris",
+          "evidence": "owner_supplied",
+          "text": "We need to get a message to the CNCF Maintainers",
+          "text_source": "owner_supplied",
+          "pin_sec": 134.82,
+          "recovered_text": "You need to get a message to the Kubernetes Maintainers"
+        },
+        "source_tuple": [
+          "osiris",
+          "We need to get a message to the CNCF Maintainers",
+          133.96,
+          134.63,
+          "You need to get a message to the Kubernetes Maintainers"
+        ]
+      },
+      {
+        "id": "d23a",
+        "source_name": "8242021",
+        "source_ref": "8242021be6563bdbd36c1be5c847f8fc50b20543",
+        "object": {
+          "id": "d23a",
+          "start_sec": 134.64,
+          "end_sec": 136.11,
+          "character": "mara_sov",
+          "evidence": "owner_supplied",
+          "text": "Check your email smartass",
+          "text_source": "owner_supplied",
+          "recovered_text": "The open rate of maintainer emails is 7%"
+        },
+        "source_tuple": [
+          "mara_sov",
+          "Check your email smartass",
+          134.64,
+          136.11,
+          "The open rate of maintainer emails is 7%"
+        ]
+      },
+      {
+        "id": "d23b",
+        "source_name": "968f0c9",
+        "source_ref": "968f0c943b4120f22e4c89110c99ef84a437eeb1",
+        "object": {
+          "id": "d23b",
+          "start_sec": 136.12,
+          "end_sec": 137.59,
+          "character": "sagira",
+          "evidence": "owner_supplied",
+          "text": "I don't like this plan",
+          "text_source": "owner_supplied"
+        },
+        "source_tuple": [
+          "sagira",
+          "I don't like this plan",
+          136.12,
+          137.59,
+          null
+        ]
+      }
+    ],
+    "intentional_removals": [
+      {
+        "id": "d20",
+        "source_name": "8242021",
+        "source_ref": "8242021be6563bdbd36c1be5c847f8fc50b20543",
+        "object": {
+          "id": "d20",
+          "start_sec": 121.44,
+          "end_sec": 128.91,
+          "raw": "We need to split up, I told you this was too dangerous!",
+          "reason": "removed by the owner while rewriting the conversation"
+        }
+      },
+      {
+        "id": "d23",
+        "source_name": "8242021",
+        "source_ref": "8242021be6563bdbd36c1be5c847f8fc50b20543",
+        "object": {
+          "id": "d23",
+          "start_sec": 134.64,
+          "end_sec": 137.59,
+          "raw": "The open rate of maintainer emails is 7% I don't like this plan",
+          "reason": "removed by the owner while rewriting the conversation"
+        }
+      },
+      {
+        "id": "d24",
+        "source_name": "8242021",
+        "source_ref": "8242021be6563bdbd36c1be5c847f8fc50b20543",
+        "object": {
+          "id": "d24",
+          "start_sec": 137.6,
+          "end_sec": 142.27,
+          "raw": "If I don't stop the Toilmaster, there won't be anything to come back to. I'm doing this for the both of us.",
+          "reason": "removed by the owner while rewriting the conversation"
+        }
+      },
+      {
+        "id": "d12",
+        "source_name": "8242021",
+        "source_ref": "8242021be6563bdbd36c1be5c847f8fc50b20543",
+        "object": {
+          "id": "d12",
+          "start_sec": 87.84,
+          "end_sec": 90.83,
+          "raw": "Slow down.",
+          "reason": "removed by the owner while rewriting the conversation"
+        }
+      },
+      {
+        "id": "d09",
+        "source_name": "8242021",
+        "source_ref": "8242021be6563bdbd36c1be5c847f8fc50b20543",
+        "object": {
+          "id": "d09",
+          "start_sec": 69.52,
+          "end_sec": 72.43,
+          "raw": "You better get that context right We don't want a repeat of the Tophee Disaster",
+          "reason": "removed by the owner while rewriting the conversation"
+        }
+      },
+      {
+        "id": "d26",
+        "source_name": "8242021",
+        "source_ref": "8242021be6563bdbd36c1be5c847f8fc50b20543",
+        "object": {
+          "id": "d26",
+          "start_sec": 137.6,
+          "end_sec": 142.27,
+          "raw": "Don't worry Maintainers read their emails",
+          "reason": "removed by the owner while rewriting the conversation"
+        }
+      },
+      {
+        "id": "d25",
+        "source_name": "8242021",
+        "source_ref": "8242021be6563bdbd36c1be5c847f8fc50b20543",
+        "object": {
+          "id": "d25",
+          "start_sec": 142.28,
+          "end_sec": 146.0,
+          "raw": "I'm sure one of them will open the message ...",
+          "reason": "removed by the owner while rewriting the conversation"
+        }
+      }
+    ]
+  }
+}

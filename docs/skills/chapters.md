@@ -53,8 +53,10 @@ names are easy to confuse:
   carrying that chapter's dialogue and cards. The build reads it and the
   plates land in the generated manifest.
 - `dialogue/<video_id>/` — **recovered-footage provenance.** What people in a
-  *source video* visibly say, with timecodes and evidence. Chapter seating
-  uses it as evidence; it is not where act copy is edited.
+  *source video* visibly say. `dialogue.json` keeps immutable source windows
+  and evidence; `presentation.json` keeps sequence, film start, any explicit
+  delivered holds and pins.
+  Chapter seating uses it as evidence; it is not where act copy is edited.
 
 | Chapter | Copy lives in | Owns its manifest? |
 |---|---|---|
