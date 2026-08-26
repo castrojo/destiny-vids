@@ -395,19 +395,20 @@ somebody was actively authoring it.
 | When it is pushed | **Before the render, not after.** A render is the moment the records become load-bearing; if the picture is worth encoding, the copy that produced it is worth pushing |
 | When it is removed | Only once its branch is on the remote |
 
-Before ending a session, prove nothing is stranded:
+Before ending a session, prove your checkout is durable and inspect every
+registered worktree for anything else that may be stranded:
 
 ```bash
-git worktree list
-for w in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
-  h=$(git -C "$w" rev-parse HEAD)
-  [ "$(git branch -r --contains "$h" 2>/dev/null | wc -l)" -eq 0 ] &&
-    echo "UNPUSHED: $w ($h)"
-done
+python3 tools/worktrees.py --check
 ```
 
-Anything it names is work that exists nowhere else. Push it to a branch —
-`rescue/<name>` if it has no better one — before you do anything else.
+The command is read-only. It names temporary paths, detached HEADs, dirty
+checkouts, prunable registrations, inspection failures, and HEADs that exist
+on no remote branch. Strict mode fails for the selected checkout only; findings
+in other agents' checkouts are still printed but are not your gate. Fix only
+the worktree you own; never clean, move, prune, or push another agent's
+checkout. Push unique work to a branch — `rescue/<name>` if it has no better
+one — before ending the session.
 
 ## Where the work lives
 

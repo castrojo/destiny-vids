@@ -1,7 +1,7 @@
 ---
 name: testing
-version: "1.1"
-last_updated: "2026-08-21"
+version: "1.2"
+last_updated: "2026-08-26"
 id: testing
 one_line_purpose: Keep the offline suite the whole gate, and diagnose checks red only in CI.
 entry_point: docs/skills/testing.md
@@ -205,19 +205,19 @@ python3 tools/deliver.py status --check           # reports; never gates
 # and the runner, before pushing:
 env -u DESTINY_FFMPEG -u DESTINY_FFPROBE PATH=/tmp/ci-sim/bin python3 -m pytest -q
 
-# nothing authored is stranded in a worktree that is on no branch:
-for w in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
-  h=$(git -C "$w" rev-parse HEAD)
-  [ "$(git branch -r --contains "$h" 2>/dev/null | wc -l)" -eq 0 ] &&
-    echo "UNPUSHED: $w ($h)"
-done
+# strict session-end proof for this checkout; other findings are still reported
+python3 tools/worktrees.py --check
 ```
 
 - [ ] The suite passes in the ffmpeg-free sandbox, not only on this machine
 - [ ] No new absolute path, in a record or a test
 - [ ] Any new report reaches the log — `warnings.warn`, not `print`
 - [ ] No new blocking step that the suite could have asserted
-- [ ] No worktree is holding commits that exist on no branch
+- [ ] `tools/worktrees.py --check` reports the selected checkout safe
+
+The worktree auditor is read-only. A finding in somebody else's checkout is
+reported without failing your check and is never auto-fixed; only its owner may
+commit, push, move, or prune it.
 
 ## See also
 
