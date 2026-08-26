@@ -1382,80 +1382,11 @@ def run_ffmpeg_chain_on_cluster(argvs, *, inputs, out, tmp_prefix=None,
                            label=label)
 
 
-def _local_progress(plan, done):
-    total = plan["total_duration"]
-    logs = Path(plan["chunks"][0]["argv"][plan["chunks"][0]["argv"].index("-progress") + 1]).parent
-    while not done.wait(15):
-        seen = 0.0
-        for prog in sorted(logs.glob("*.progress")):
-            last = 0
-            try:
-                for line in prog.read_text(errors="replace").splitlines():
-                    if line.startswith("out_time_us="):
-                        v = line.split("=", 1)[1]
-                        last = int(v) if v.isdigit() else last  # 'N/A' at t=0
-            except OSError:
-                continue
-            seen += last / 1_000_000
-        print(f"  [farm] encoded {seen:.1f}s of {total:.1f}s", flush=True)
-
-
 def run_locally(plan, *, workers):
     """Reject the local ffmpeg execution path."""
-    raise FarmError("local ffmpeg execution is prohibited")
-    from concurrent.futures import ThreadPoolExecutor
-
-    for c in plan["chunks"]:
-        prog = Path(c["argv"][c["argv"].index("-progress") + 1])
-        prog.parent.mkdir(parents=True, exist_ok=True)
-        Path(plan["concat_list"][0]).parent.mkdir(parents=True, exist_ok=True)
-    Path(plan["join"][-1]).parent.mkdir(parents=True, exist_ok=True)
-    Path(plan["join"][plan["join"].index("-i") + 1]).write_text(
-        "".join(f"file '{p}'\n" for p in plan["concat_list"]))
-
-    done = threading.Event()
-    monitor = threading.Thread(target=_local_progress, args=(plan, done),
-                               daemon=True)
-    monitor.start()
-
-    def log_for(argv, label):
-        if "-progress" in argv:
-            prog = argv[argv.index("-progress") + 1]
-            return Path(prog[:-len(".progress")] + ".log")
-        return Path(plan["concat_list"][0]).parent.parent / "logs" / f"{label}.log"
-
-    jobs = [(f"chunk {c['index']}", c["argv"]) for c in plan["chunks"]]
-    if plan["audio"]:
-        jobs.append(("audio", plan["audio"]))
-
-    def run_job(label, argv):
-        log = log_for(argv, label)
-        log.parent.mkdir(parents=True, exist_ok=True)
-        with open(log, "w") as lf:
-            # The chunked local path is still a workstation encode, so it
-            # takes the same memory cap as every other fallback -- the
-            # fallback reason was already printed by the caller.
-            proc = run_capped_local(argv, reason=f"local chunked encode "
-                                    f"({label})", stdout=lf,
-                                    stderr=subprocess.STDOUT)
-        return label, proc.returncode, log
-
-    failures = []
-    with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
-        futures = [pool.submit(run_job, label, argv) for label, argv in jobs]
-        for fut in futures:
-            label, rc, log = fut.result()
-            if rc != 0:
-                tail = log.read_text(errors="replace").strip().splitlines()[-8:]
-                failures.append(f"{label} failed (rc={rc}):\n" + "\n".join(tail))
-    done.set()
-    monitor.join(timeout=2)
-    if failures:
-        raise FarmError("\n".join(failures))
-    proc = subprocess.run(plan["join"], capture_output=True, text=True)
-    if proc.returncode != 0:
-        raise FarmError(f"join failed:\n{proc.stderr.strip()[-800:]}")
-    return 0
+    raise FarmError(
+        "local ffmpeg execution is prohibited — the posture is run_encode: "
+        "the cluster encodes, or the build stops with the reason")
 
 
 # --------------------------------------------------------------------------
@@ -1585,8 +1516,9 @@ def main(argv=None):
                           src_arg=f"{WORK_DIR}/in/{_pod_safe_name(src.name)}")
     else:
         if not args.local:
-            print(f"farm: cluster unreachable ({why}); falling back to a "
-                  f"local encode — fix kubectl/KUBECONFIG to use the farm")
+            print(f"farm: cluster unreachable ({why}); local ffmpeg "
+                  f"execution is prohibited, so there is no fallback — fix "
+                  f"kubectl/KUBECONFIG to use the farm")
         workers = max(1, (os.cpu_count() or 8) // args.threads)
         segments = args.segments or workers
         # rendering.md: intermediates live BESIDE the output, never in /tmp —

@@ -351,16 +351,16 @@ def still_clip(ffmpeg, image, duration, out_path, keep_audio=True):
     would make it the only input with a stream the others lack, and the join
     fails.
 
-    This is the LOCAL executor -- the encode runs memory-capped
-    (``tools.farm.run_capped_local``), because every render.py entry point is
-    farm-first and a local encode is a fallback with a stated reason, never
-    a silent unbounded one. The farm path builds the same argv with
-    ``_still_argv`` and runs it in the pod.
+    The encode takes the farm posture (``tools.farm.run_encode``): the same
+    argv ``_still_argv`` builds runs in a pod and the clip is fetched back,
+    or -- the cluster unreachable -- ``FarmError`` stops the render with the
+    reason. Local ffmpeg execution is prohibited (owner ruling, 2026-08-25):
+    nothing encodes on this host.
     """
     from tools import farm
-    farm.run_capped_local(
+    farm.run_encode(
         _still_argv(ffmpeg, image, duration, out_path, keep_audio),
-        reason="render clip on this host", check=True)
+        inputs=[image], out=out_path)
 
 
 def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
@@ -380,14 +380,15 @@ def cut_clip(ffmpeg, src, start_sec, duration, out_path, keep_audio=True):
     Normalizing every clip to one size/rate/pixel format is what lets the concat
     demuxer join them: it requires identical stream properties across inputs.
 
-    Like ``still_clip``, this is the LOCAL executor: memory-capped via
-    ``tools.farm.run_capped_local``. The farm path builds the same argv with
-    ``_cut_argv``.
+    Like ``still_clip``, this executor takes the farm posture
+    (``tools.farm.run_encode``): the argv ``_cut_argv`` builds runs in a pod
+    and the clip is fetched back, or ``FarmError`` stops the render with the
+    reason. Nothing encodes on this host.
     """
     from tools import farm
-    farm.run_capped_local(
+    farm.run_encode(
         _cut_argv(ffmpeg, src, start_sec, duration, out_path, keep_audio),
-        reason="render clip on this host", check=True)
+        inputs=[src], out=out_path)
 
 
 def _cut_argv(ffmpeg, src, start_sec, duration, out_path, keep_audio):
@@ -485,23 +486,27 @@ def concat(ffmpeg, clip_paths, out_path, audio_bed=None, workdir=None,
     correction can re-run just the concat instead of re-cutting every clip.
     None means no filter, so an uncorrected render is bit-identical to before.
 
-    This is the LOCAL executor -- memory-capped via
-    ``tools.farm.run_capped_local``. The farm path builds the same argv with
-    ``_concat_argv`` and runs the whole chain in one pod.
+    The join takes the farm posture (``tools.farm.run_encode``): with the
+    list file handed over as a rewritten ``text_files`` intermediate, the
+    argv ``_concat_argv`` builds runs in a pod and the finished cut is
+    fetched back, or -- the cluster unreachable -- ``FarmError`` stops the
+    render with the reason. Nothing encodes on this host.
     """
     from tools import farm
     workdir = Path(workdir or Path(out_path).parent)
     list_path = workdir / "concat_list.txt"
-    list_path.write_text(
-        "".join(f"file '{Path(c).resolve()}'\n" for c in clip_paths), encoding="utf-8"
-    )
+    content = "".join(f"file '{Path(c).resolve()}'\n" for c in clip_paths)
+    list_path.write_text(content, encoding="utf-8")
     try:
         if audio_bed:
             _check_bed_covers_the_cut(clip_paths, audio_bed)
-        farm.run_capped_local(
+        farm.run_encode(
             _concat_argv(ffmpeg, list_path, out_path, audio_bed=audio_bed,
                          audio_gain=audio_gain),
-            reason="render join on this host", check=True)
+            inputs=[*[Path(c).resolve() for c in clip_paths],
+                    *([Path(audio_bed).resolve()] if audio_bed else [])],
+            out=out_path,
+            text_files={list_path: content}, tmp_prefix=workdir)
     finally:
         list_path.unlink(missing_ok=True)
 
@@ -570,27 +575,31 @@ def cap_holds(shots, max_shot_sec, log=None):
 
 def render(shots, media_dir, out_path, keep_audio=True, audio_bed=None, verbose=True,
            ffmpeg=None, target_dbtp=peaks.DEFAULT_TARGET_DBTP, local=False):
-    """Cut the shot list and join it. REMOTE BY DEFAULT (AGENTS.md: "always
+    """Cut the shot list and join it. REMOTE ALWAYS (AGENTS.md: "always
     prefer remote encoding when available"): when the cluster answers, the
     clips and the concat run as one chain in a single pod
     (``tools.farm.run_ffmpeg_chain_on_cluster``) and only the finished cut is
-    fetched back. ``local=True`` -- or a cluster that does not answer -- runs
-    the same argvs on this host, memory-capped, with the reason printed.
+    fetched back. ``local=True`` is rejected outright, and a cluster that
+    does not answer stops the render with ``FarmError`` naming why -- local
+    ffmpeg execution is prohibited (owner ruling, 2026-08-25), so there is
+    no workstation fallback.
     """
     from tools import farm
+    if local:
+        raise farm.FarmError(
+            "local ffmpeg execution is prohibited (--local given)")
     ffmpeg = ffmpeg or find_ffmpeg()
     out_path = Path(out_path).resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     audio_bed = Path(audio_bed).resolve() if audio_bed else None
-    if local:
-        use_farm, farm_why = False, "--local given"
-    else:
-        use_farm, farm_why = farm.cluster_available()
+    use_farm, farm_why = farm.cluster_available()
     if use_farm:
-        print("render: cluster reachable; the cut encodes on the farm "
-              "(--local to force this host)", file=sys.stderr)
+        print("render: cluster reachable; the cut encodes on the farm",
+              file=sys.stderr)
     else:
-        print(f"render: encoding on THIS host -- {farm_why}", file=sys.stderr)
+        print(f"render: cluster unreachable ({farm_why}); the clip "
+              f"executors below all raise FarmError rather than encode on "
+              f"this host", file=sys.stderr)
 
     rendered, missing = [], []
     # Intermediates live beside the output, not in /tmp, so a containerized
@@ -719,9 +728,9 @@ def main(argv=None):
                          "is measured and re-run at a corrected static gain "
                          f"until it has headroom (default {peaks.DEFAULT_TARGET_DBTP})")
     ap.add_argument("--local", action="store_true",
-                    help="cut and join on THIS host even when the farm cluster "
-                         "is reachable (the escape hatch; the encodes run "
-                         "under tools.farm.run_capped_local's memory cap)")
+                    help="REJECTED: local ffmpeg execution is prohibited "
+                         "(owner ruling, 2026-08-25); kept only so its use "
+                         "fails with the reason instead of silently farming")
     args = ap.parse_args(argv)
 
     ffmpeg = find_ffmpeg(prefer_container=not args.no_container)

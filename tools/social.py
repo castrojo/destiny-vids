@@ -134,7 +134,9 @@ def main(argv=None):
     ap.add_argument("--audio-bitrate", type=int, default=DEFAULT_AUDIO_BITRATE,
                     help="kbit/s AAC; spend what the cap allows (default 192)")
     ap.add_argument("--local", action="store_true",
-                    help="force this host even when the farm is reachable")
+                    help="REJECTED: local ffmpeg execution is prohibited "
+                         "(owner ruling, 2026-08-25); kept only so its use "
+                         "fails with the reason instead of silently farming")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
 
@@ -162,7 +164,8 @@ def main(argv=None):
             ffmpeg = find_ffmpeg()
             remote_passlog = passlog
             pass1_out = "/dev/null"
-            print(f"encoder  local ({reason or 'farm unavailable'})")
+            print(f"encoder  unavailable ({reason or 'farm unavailable'}); "
+                  f"local ffmpeg execution is prohibited")
         facts, v_kbps, target_bytes, cmds = build_commands(
             src, out, target_mb=args.target_mb, height=args.height,
             audio_kbps=args.audio_bitrate, ffmpeg=ffmpeg, passlog=remote_passlog,
@@ -185,15 +188,12 @@ def main(argv=None):
                 cmds, inputs=[src], out=out, expected_duration=facts["duration"],
                 label=f"social[{out.name}]")
         else:
-            for i, cmd in enumerate(cmds, start=1):
-                # A local pass is the fallback: stated, and memory-capped --
-                # never a silent unbounded encode on the workstation.
-                proc = farm.run_capped_local(
-                    cmd, reason=reason or "farm unavailable",
-                    capture_output=True, text=True)
-                if proc.returncode != 0:
-                    tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
-                    raise SystemExit(f"pass {i} failed:\n{tail}")
+            # Owner ruling, 2026-08-25: local ffmpeg execution is prohibited.
+            # No farm means no encode, stated with the reason -- the copy
+            # waits for the cluster rather than running on this host.
+            raise SystemExit(
+                f"social: cannot encode -- {reason or 'farm unavailable'}; "
+                "local ffmpeg execution is prohibited")
     finally:
         for leftover in Path(passlog).parent.glob(Path(passlog).name + "*"):
             leftover.unlink(missing_ok=True)

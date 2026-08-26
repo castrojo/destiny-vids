@@ -65,7 +65,8 @@ FARMED = {
     ("scripts/actbuild.py", "main"): "acts IV/V/VII farm by default",
     ("scripts/build_act1.py", "build_act1"): "act I's legs farm by default",
     ("scripts/build_credits.py", "main"): "the 03:08Z crasher itself",
-    ("scripts/build_efmb.py", "_run"): "every local act II step is capped",
+    ("scripts/build_efmb.py", "_run"): "every act II step farms via "
+    "run_encode",
     ("scripts/build_efmb.py", "render"): "act II's parts chain to one pod",
     ("scripts/build_ending_overlays.py", "main"): "the derivative farms",
     ("scripts/build_ending_pause.py", "main"): "the pause farms",
@@ -175,10 +176,11 @@ def test_every_known_video_encode_references_the_farm_posture():
     assert not problems, (
         "video encode entry point(s) with no route through tools/farm.py's "
         "posture (run_ffmpeg_on_cluster / run_ffmpeg_chain_on_cluster / "
-        "run_capped_local / run_encode / cluster_available):\n  "
+        "run_encode / cluster_available):\n  "
         + "\n  ".join(problems)
-        + "\nAGENTS.md: always prefer remote encoding when available; a "
-          "local encode is capped and states its reason.")
+        + "\nAGENTS.md: always prefer remote encoding when available; local "
+          "ffmpeg execution is prohibited, so the farm route is the only "
+          "one there is.")
 
 
 def test_no_unclassified_video_encode_subprocess_call():

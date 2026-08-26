@@ -1009,9 +1009,10 @@ def _conform_one(job):
     """Picklable worker: conform one clip source, report what it cost.
 
     ``use_farm`` carries the assembly's posture into the worker: a cache
-    miss encodes on the cluster when the segments did, and on this host --
-    memory-capped, with the reason printed -- when they did not. A silent
-    local x264 under a "--farm" build is the bug this exists to close.
+    miss encodes on the cluster when the segments did, and stops with the
+    reason when they did not -- local ffmpeg execution is prohibited (owner
+    ruling, 2026-08-25). A silent local x264 under a "--farm" build is the
+    bug this exists to close.
     """
     index, src, cache_dir, ffmpeg, threads, use_farm, crf, preset = job
     path, status = conform.ensure(src, out_dir=cache_dir, ffmpeg=ffmpeg,
@@ -1026,16 +1027,29 @@ def _segment_worker(job):
     The verify rides inside the worker so a parallel build still fails the
     moment a segment re-times (#88), not after the other workers finish.
 
-    This worker only runs when the segment did NOT go to the farm, so a
-    local build here is the fallback -- memory-capped, with the fallback
-    reason already printed by main() (AGENTS.md: never a silent, unbounded
-    local encode). A COPY segment under the cap is a remux in a scope: the
-    cap costs it nothing.
+    This worker only runs when the segment did NOT go to the farm pool. An
+    ENCODE segment takes the farm posture itself (``tools.farm.run_encode``):
+    the cluster runs it, or the build stops with the reason -- local ffmpeg
+    execution is prohibited (owner ruling, 2026-08-25), so there is no
+    workstation fallback. A COPY segment is a remux, not an encode: it
+    stream-copies the picture, so it runs here under the same exemption the
+    programme's own join takes (tests/test_farm_policy.py's audio-only
+    whitelist is that doctrine written down).
     """
     argv, plan, index, seg = job
-    farm.run_capped_local(
-        argv, reason=f"megacut segment {index:03d} on this host "
-        "(--local, or the cluster is unreachable)", check=True)
+    if "-c:v" in argv and argv[argv.index("-c:v") + 1] == "copy":
+        subprocess.run(argv, check=True)
+    else:
+        item = plan["items"][index]
+        src = resolve(item["path"]) if item["kind"] == "clip" \
+            else resolve(item["image"])
+        farm.run_encode(argv, inputs=[src], out=seg,
+                        expected_duration=item_duration(item),
+                        label=f"seg{index:03d}",
+                        # The segment lives in a tempfile dir the ffmpeg
+                        # CONTAINER cannot see; probe it with the same
+                        # native ffprobe every other megacut check uses.
+                        ffprobe=[ffprobe_bin()])
     verify_segment(plan, index, seg)
     return index
 
@@ -1105,8 +1119,9 @@ def assemble(plan, out_path, log=None, jobs=None,
         # segment can copy the picture. Unchanged sources are cache hits;
         # only a newly delivered act pays the encode, and only once. The
         # encode follows the assembly's posture: farmed when use_farm is
-        # on, memory-capped local with the reason printed when it is not --
-        # a cache miss must never be a silent local x264 under --farm.
+        # on, and stopped with the reason when it is not (local ffmpeg
+        # execution is prohibited) -- a cache miss must never be a silent
+        # local x264 under --farm.
         sources = {}
         if copy_ok:
             crf = str(plan.get("crf", 16))
@@ -1543,13 +1558,14 @@ def main(argv=None):
                          "cluster. This is ALREADY the default whenever the "
                          "cluster is reachable (owner's ruling: always prefer "
                          "remote encoding); the flag only pins the posture. "
-                         "If the cluster is unreachable the build still runs "
-                         "locally, with the reason printed -- degrade, never "
-                         "block. COPY segments always stay local: a remux is "
-                         "not an encode.")
+                         "Local ffmpeg execution is prohibited (owner ruling, "
+                         "2026-08-25), so an unreachable cluster stops the "
+                         "build with the reason. COPY segments still stay "
+                         "local: a remux is not an encode.")
     ap.add_argument("--local", action="store_true",
-                    help="force the local process pool even when the cluster "
-                         "is reachable (the escape hatch)")
+                    help="REJECTED: local ffmpeg execution is prohibited "
+                         "(owner ruling, 2026-08-25); kept only so its use "
+                         "fails with the reason instead of silently farming")
     ap.add_argument("--farm-jobs", type=int, default=None,
                     help=f"ENCODE segments in flight on the cluster at once "
                          f"(default {DEFAULT_FARM_JOBS}); each in-flight "
@@ -1568,7 +1584,11 @@ def main(argv=None):
     if args.farm and args.local:
         raise SystemExit("--farm and --local are mutually exclusive: the farm "
                          "is already the default when the cluster is reachable; "
-                         "--local is the escape hatch from it")
+                         "--local is rejected outright")
+    if args.local:
+        raise SystemExit("megacut: --local is rejected: local ffmpeg "
+                         "execution is prohibited (owner ruling, 2026-08-25); "
+                         "the programme waits for the farm")
 
     plan = load_plan(args.plan, require_sources=not (args.chapters or args.locate))
     if args.chapters:
@@ -1635,25 +1655,23 @@ def main(argv=None):
               f"across {len(plan['items'])} items")
         return 0
 
-    # Remote encoding is the DEFAULT, per the owner's ruling ("always prefer
-    # remote encoding when available"). The fallback to this workstation is
-    # allowed exactly two ways: --local, or a cluster that does not answer --
-    # and both say so out loud. A SILENT local encode is the bug this guards.
+    # Remote encoding is the ONLY executor, per the owner's rulings ("always
+    # prefer remote encoding when available"; 2026-08-25: local ffmpeg
+    # execution is prohibited). A cluster that does not answer stops the
+    # build at the first ENCODE segment, with the reason -- and both paths
+    # say so out loud. A SILENT local encode is the bug this guards.
     use_farm = False
-    if args.local:
-        print("megacut: --local given; encoding segments on THIS host even "
-              "though the cluster may be reachable", file=sys.stderr)
+    cluster_ok, why = farm.cluster_available()
+    if cluster_ok:
+        use_farm = True
+        print("megacut: cluster reachable; ENCODE segments run on "
+              "scheduler-selected nodes (--local is rejected: local ffmpeg "
+              "execution is prohibited)", file=sys.stderr)
     else:
-        cluster_ok, why = farm.cluster_available()
-        if cluster_ok:
-            use_farm = True
-            print("megacut: cluster reachable; ENCODE segments run on "
-                  "scheduler-selected nodes (--local to force this host)",
-                  file=sys.stderr)
-        else:
-            print(f"megacut: cluster UNREACHABLE ({why}); falling back to "
-                  f"local segment encodes -- fix kubectl/KUBECONFIG to use "
-                  f"the farm", file=sys.stderr)
+        print(f"megacut: cluster UNREACHABLE ({why}); local ffmpeg "
+              f"execution is prohibited, so the build stops at the first "
+              f"ENCODE segment -- fix kubectl/KUBECONFIG to use the farm",
+              file=sys.stderr)
 
     print(f"assembling {len(plan['items'])} items -> {out_path}", file=sys.stderr)
     assemble(plan, out_path, jobs=args.jobs,

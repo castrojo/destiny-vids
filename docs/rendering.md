@@ -6,21 +6,23 @@ easy to misdiagnose. This documents which ffmpeg to use and why.
 
 ## Production video encoding runs on Kubernetes
 
-The local ffmpeg resolution below is for probes, still extraction, lightweight
-assets, and an operator-forced `--local` fallback. It is **not** the default
-production renderer. Video-producing ffmpeg commands go to the ghost
-Kubernetes cluster in `lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76`, with
+The local ffmpeg resolution below is for probes, still extraction, and
+lightweight assets. It is **not** the production renderer. Video-producing
+ffmpeg commands go to the ghost Kubernetes cluster in
+`lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76`, with
 `imagePullPolicy: IfNotPresent`; Kubernetes chooses between the two
 scheduler-eligible roughly 32-core nodes. Never hostname-pin a build.
 
-This is not a flag you pass — it is the DEFAULT everywhere. Every video-encode
+This is not a flag you pass — it is the DEFAULT everywhere, and since the
+owner's ruling of 2026-08-25 it is the ONLY executor. Every video-encode
 entry point (megacut, the builders, `tools/plate.py burn`, `tools/redact.py`,
 `tools/conform.py`, `tools/render.py`) farms when the cluster answers, and
-falls back to a **memory-capped** local encode (`farm.run_capped_local` —
-a systemd scope at MemoryMax=12G/MemoryHigh=10G, because a bare local x264
-run OOM-killed this workstation at 03:08Z on 2026-08-24) with the reason
-printed. `--local` is the explicit escape hatch each of them accepts.
-`tests/test_farm_policy.py` statically pins the posture.
+stops with a `FarmError` naming the reason when it does not. Local ffmpeg
+execution is prohibited outright (`farm.run_capped_local` raises): a bare
+local x264 run OOM-killed this workstation at 03:08Z on 2026-08-24, and the
+memory-capped fallback that answered it is revoked. `--local` is rejected by
+every tool that still accepts the flag. `tests/test_farm_policy.py`
+statically pins the posture.
 
 For the programme, use:
 

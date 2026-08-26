@@ -529,21 +529,21 @@ NORMALISE_VF = (
 X264 = conform.video_encode_args()
 
 
-def _run(cmd):
-    """One LOCAL ffmpeg step -- memory-capped, the reason printed.
+def _run(cmd, *, inputs=(), out=None, **farm_kw):
+    """One act II ffmpeg step, on the farm.
 
     Every encode in this builder is farm-first (AGENTS.md: remote whenever
-    the cluster answers); a step that lands here is a fallback, and a
-    fallback is stated and bounded (tools.farm.run_capped_local), never a
-    silent unbounded x264 run on the owner's workstation.
+    the cluster answers), and local ffmpeg execution is prohibited (owner
+    ruling, 2026-08-25): the step runs in a pod through
+    ``tools.farm.run_encode`` and its output is fetched back, or the build
+    stops with the FarmError naming why the cluster could not take it.
+    There is no workstation fallback.
     """
     from tools import farm
-    proc = farm.run_capped_local(cmd, reason="act II step on this host "
-                                 "(--local, or the cluster is unreachable)",
-                                 capture_output=True, text=True)
-    if proc.returncode != 0:
-        tail = "\n".join(proc.stderr.strip().splitlines()[-12:])
-        raise RuntimeError(f"ffmpeg failed:\n  {' '.join(map(str, cmd))}\n{tail}")
+    farm.run_encode([str(t) for t in cmd],
+                    inputs=[str(i) for i in inputs],
+                    out=str(out if out is not None else cmd[-1]),
+                    **farm_kw)
 
 
 def _cut_argv(ffmpeg, src, start, duration, out_path):
@@ -562,7 +562,8 @@ def _cut_run(ffmpeg, src, start, duration, out_path):
     changes which frames get duplicated -- measurably different picture from
     the same in-point, and this act is cut to a beat.
     """
-    _run(_cut_argv(ffmpeg, src, start, duration, out_path))
+    _run(_cut_argv(ffmpeg, src, start, duration, out_path),
+         inputs=[src], out=out_path)
 
 
 def _black_argv(ffmpeg, duration, out_path):
@@ -580,7 +581,7 @@ def _black(ffmpeg, duration, out_path):
     here as clips rather than as a filtergraph pad, because a filtergraph is
     exactly what #88 says re-times this act.
     """
-    _run(_black_argv(ffmpeg, duration, out_path))
+    _run(_black_argv(ffmpeg, duration, out_path), inputs=[], out=out_path)
 
 
 def _freeze_argvs(ffmpeg, src, source_at, duration, out_path, darken=0.0):
@@ -607,8 +608,12 @@ def _freeze(ffmpeg, src, source_at, duration, out_path, darken=0.0):
     frame, argvs = _freeze_argvs(ffmpeg, src, source_at, duration, out_path,
                                  darken)
     try:
-        for argv in argvs:
-            _run(argv)
+        # Extract reads the source and writes the frame; the loop reads the
+        # frame back. Farmed one command at a time the frame round-trips
+        # through the fetch -- chatty, but this path only runs when the
+        # chain in render() did not.
+        _run(argvs[0], inputs=[src], out=frame)
+        _run(argvs[1], inputs=[frame], out=out_path)
     finally:
         frame.unlink(missing_ok=True)
 
@@ -625,12 +630,16 @@ def _concat(ffmpeg, parts, out_path, workdir):
     The list file is written into ``workdir`` rather than /tmp: a containerized
     ffmpeg only sees the bind-mounted home, so a /tmp path would resolve inside
     the container's own namespace and the join would fail on a missing file.
+    On the farm the list travels as a rewritten ``text_files`` intermediate
+    and the parts as staged inputs; the local file is cleaned up either way.
     """
     list_path = Path(workdir) / "efmb_concat.txt"
-    list_path.write_text(
-        "".join(f"file '{Path(p).resolve()}'\n" for p in parts), encoding="utf-8")
+    content = "".join(f"file '{Path(p).resolve()}'\n" for p in parts)
+    list_path.write_text(content, encoding="utf-8")
     try:
-        _run(_concat_argv(ffmpeg, list_path, out_path))
+        _run(_concat_argv(ffmpeg, list_path, out_path),
+             inputs=[Path(p).resolve() for p in parts], out=out_path,
+             text_files={list_path: content}, tmp_prefix=Path(workdir))
     finally:
         list_path.unlink(missing_ok=True)
 
@@ -670,12 +679,18 @@ def render(out_path=None, work_dir=None, verbose=True, local=False):
     The picture parts and their join are one farm CHAIN when the cluster
     answers (AGENTS.md: remote by default) -- every cut/black/freeze argv in
     one pod, intermediates pod-side, only the joined silent film fetched
-    back. ``local=True`` -- or an unreachable cluster -- runs the same argvs
-    here, memory-capped. The final mux copies the picture and encodes only
-    audio, so it stays local either way.
+    back. ``local=True`` is rejected outright, and an unreachable cluster
+    stops the build with the FarmError naming why: local ffmpeg execution
+    is prohibited (owner ruling, 2026-08-25), so there is no workstation
+    fallback. The final mux copies the picture and encodes only audio, and
+    it farms too -- through ``_run`` -- now that local execution is off the
+    table.
     """
     from tools.render import find_ffmpeg
     from tools import farm, footage
+    if local:
+        raise farm.FarmError(
+            "local ffmpeg execution is prohibited (--local given)")
 
     plan = build()
     ffmpeg = find_ffmpeg()
@@ -732,13 +747,11 @@ def render(out_path=None, work_dir=None, verbose=True, local=False):
         SOURCE_ID: source,
         AMBER_SOURCE_ID: amber_source,
     }
-    if local:
-        use_farm, farm_why = False, "--local given"
-    else:
-        use_farm, farm_why = farm.cluster_available()
+    use_farm, farm_why = farm.cluster_available()
     if not use_farm:
-        print(f"build_efmb: encoding on THIS host -- {farm_why}",
-              file=sys.stderr)
+        print(f"build_efmb: cluster unreachable ({farm_why}); local ffmpeg "
+              f"execution is prohibited, so the build stops at the first "
+              f"step rather than encoding on this host", file=sys.stderr)
     parts = []
     if use_farm:
         # One chain, one pod: the part argvs write pod-side intermediates
@@ -809,7 +822,12 @@ def render(out_path=None, work_dir=None, verbose=True, local=False):
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy",
         "-c:a", "flac", "-ar", "48000", "-ac", "2",
-        "-shortest", str(out_path)])
+        "-shortest", str(out_path)],
+        # The mux farms too: same filtergraph, same five inputs, only the
+        # CPUs differ. The audio leg reads them by INDEX, and staging keeps
+        # the argv's input order, so the graph is unchanged.
+        inputs=[silent, bed, hold_music, amber_source, post_pause_bed],
+        out=out_path)
 
     got = probe_duration(out_path)
     want = plan["film_sec"]
@@ -921,8 +939,8 @@ def main(argv=None):
     if "--render" in argv:
         i = argv.index("--render")
         out = argv[i + 1] if len(argv) > i + 1 and not argv[i + 1].startswith("-") else None
-        # The picture encodes are remote by default; --local is the stated,
-        # memory-capped escape hatch.
+        # The picture encodes are remote by default; --local is rejected
+        # (local ffmpeg execution is prohibited, owner ruling 2026-08-25).
         render(out_path=out, local="--local" in argv)
         return 0
 

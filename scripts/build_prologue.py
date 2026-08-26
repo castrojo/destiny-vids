@@ -356,41 +356,29 @@ def command(day_png, night_png, scope=""):
 
 
 def encode(argv_ff, day, night):
-    """Run the act's one ffmpeg call, on the cluster when it is reachable.
+    """Run the act's one ffmpeg call, on the cluster.
 
     Remote is the default, not an optimisation: exo-0 has twice this
     workstation's cores and is not also hosting the agent session, so a local
-    encode is both slower and starves the thing that asked for it. Local is a
-    fallback with a stated reason (AGENTS.md) -- never a silent one.
-
-    The argv is identical either way; only the CPUs differ. That is what keeps
-    the picture and the sound byte-comparable across the two paths.
+    encode is both slower and starves the thing that asked for it. And since
+    the owner's ruling of 2026-08-25 local ffmpeg execution is prohibited
+    outright: an unreachable cluster -- or one that fails mid-encode --
+    stops the build with the FarmError naming why. There is no workstation
+    fallback; the prologue waits for the farm.
     """
     ok, why = farm.cluster_available()
     if not ok:
-        farm.run_capped_local(
-            argv_ff,
-            reason=f"the cluster is not reachable ({why})", check=True)
-        return "local"
-    try:
-        farm.run_ffmpeg_on_cluster(
-            argv_ff,
-            inputs=[SOURCE,
-                    PLATES_DIR / "plate_maintitle-a.png",
-                    PLATES_DIR / "plate_maintitle-b.png",
-                    PLATES_DIR / "plate_book-a.png",
-                    day, night],
-            out=OUT,
-            expected_duration=TOTAL,
-        )
-    except farm.FarmError as exc:
-        # AGENTS.md: nothing blocks a release. A farm that fails mid-encode is
-        # a reason to say so and keep going, never a reason to hand back no
-        # picture -- the argv is identical either way.
-        farm.run_capped_local(
-            argv_ff,
-            reason=f"the cluster encode failed ({exc})", check=True)
-        return "local"
+        raise farm.FarmError(f"the cluster is not reachable ({why})")
+    farm.run_ffmpeg_on_cluster(
+        argv_ff,
+        inputs=[SOURCE,
+                PLATES_DIR / "plate_maintitle-a.png",
+                PLATES_DIR / "plate_maintitle-b.png",
+                PLATES_DIR / "plate_book-a.png",
+                day, night],
+        out=OUT,
+        expected_duration=TOTAL,
+    )
     return "cluster"
 
 
@@ -402,7 +390,9 @@ def main(argv=None):
     ap.add_argument("--cards", action="store_true",
                     help="re-render the title PNGs first")
     ap.add_argument("--local", action="store_true",
-                    help="encode on this workstation even when the farm is up")
+                    help="REJECTED: local ffmpeg execution is prohibited "
+                         "(owner ruling, 2026-08-25); kept only so its use "
+                         "fails with the reason instead of silently farming")
     args = ap.parse_args(argv)
 
     missing = [p for p in (SOURCE,) if not p.exists()]
@@ -438,10 +428,18 @@ def main(argv=None):
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     if args.local:
-        farm.run_capped_local(argv_ff, reason="--local given", check=True)
-        where = "local"
-    else:
-        where = encode(argv_ff, day, night)
+        # Owner ruling, 2026-08-25: local ffmpeg execution is prohibited, so
+        # --local is rejected -- run_encode raises before anything probes or
+        # encodes.
+        farm.run_encode(
+            argv_ff,
+            inputs=[SOURCE,
+                    PLATES_DIR / "plate_maintitle-a.png",
+                    PLATES_DIR / "plate_maintitle-b.png",
+                    PLATES_DIR / "plate_book-a.png",
+                    day, night],
+            out=OUT, expected_duration=TOTAL, local=True)
+    where = encode(argv_ff, day, night)
     peaks.trim_master_peak(OUT.resolve())
     print(json.dumps({"out": str(OUT), "duration": round(TOTAL, 3),
                       "out_point": OUT_POINT, "bridge": BRIDGE,

@@ -3526,10 +3526,12 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
     Audio is stream-copied: this stage titles a cut, it does not re-cut it, and
     re-encoding audio here would be a second generation for no reason.
 
-    ``runner`` defaults to a memory-capped local subprocess
-    (``tools.farm.run_capped_local``); a caller (the farm path in
-    ``scripts/build_act1.py``) may pass one that runs the same argv elsewhere
-    and fetches ``out_path`` back.
+    Without a ``runner`` the burn takes the farm posture itself
+    (``tools.farm.run_encode``): the same argv runs on the cluster and the
+    result is fetched back, or ``FarmError`` stops the burn with the reason
+    -- local ffmpeg execution is prohibited (owner ruling, 2026-08-25).
+    A caller (the farm path in ``scripts/build_act1.py``) may pass a runner
+    that runs the same argv elsewhere and fetches ``out_path`` back.
 
     ``encode_args`` is the x264 argv for the burn. Pass
     ``conform.video_encode_args()`` to get the repo's DELIVERY rung and the
@@ -3670,17 +3672,19 @@ def burn(video, entries, plates_dir, out_path, ffmpeg=None, runner=None,
         if runner is not None:
             runner(cmd)
         else:
-            # No runner means a LOCAL encode, and a local encode is capped
-            # and states its reason (AGENTS.md: remote by default) -- the
-            # CLI routes through a runner for exactly this; a direct caller
-            # gets the same protection here.
+            # No runner means the burn takes the farm posture directly:
+            # run_encode stages the video and every plate input, runs this
+            # very argv in a pod, and fetches the tmp back -- or raises
+            # FarmError naming why the cluster could not take it. Local
+            # ffmpeg execution is prohibited (owner ruling, 2026-08-25), so
+            # there is no workstation fallback to hand a caller.
             from tools import farm as _farm
-            proc = _farm.run_capped_local(
-                cmd, reason="plate burn with no runner -- a caller asked for "
-                "a local encode", capture_output=True, text=True)
-            if proc.returncode != 0:
-                tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
-                raise RuntimeError(f"plate burn failed:\n{tail}")
+            _farm.run_encode(
+                cmd,
+                inputs=[video, *[plates_dir / (
+                    u["pattern"] if u["animation"]
+                    else f"plate_{u['id']}.png") for u in units]],
+                out=tmp, expected_duration=duration)
         # A stubbed encoder (the tests') and a failed fetch alike return
         # having written nothing; only a file that actually exists may
         # replace the master.
@@ -3905,11 +3909,14 @@ def main(argv=None):
     if getattr(args, "farm", False) and getattr(args, "local", False):
         raise SystemExit("--farm and --local are mutually exclusive: the farm "
                          "is already the default when the cluster is "
-                         "reachable; --local is the escape hatch from it")
+                         "reachable; --local is rejected outright")
     if getattr(args, "local", False):
-        use_farm, farm_why = False, "--local given"
-    else:
-        use_farm, farm_why = farm.cluster_available()
+        # Owner ruling, 2026-08-25: local ffmpeg execution is prohibited, so
+        # the escape hatch is rejected before the burn is even planned.
+        raise SystemExit("--local is rejected: local ffmpeg execution is "
+                         "prohibited; the burn runs on the farm or not "
+                         "at all")
+    use_farm, farm_why = farm.cluster_available()
     if use_farm:
         # The farm stages exact argv tokens, so the inputs are the video plus
         # each plate PNG itself, not their directory (same pattern as the
@@ -3942,17 +3949,13 @@ def main(argv=None):
                                        expected_duration=_dur,
                                        limit_memory="48Gi")
     else:
-        # Local is the fallback, never the silent default, and never
-        # unbounded: the burn is the heaviest encode in the repo (act II's
-        # ~78 overlay inputs), so it runs under the memory cap with the
-        # reason printed -- the same failure tail the bare path reported.
-        def runner(argv, _why=farm_why):
-            proc = farm.run_capped_local(
-                argv, reason=f"plate burn on this host -- {_why}",
-                capture_output=True, text=True)
-            if proc.returncode != 0:
-                tail = "\n".join(proc.stderr.strip().splitlines()[-15:])
-                raise RuntimeError(f"plate burn failed:\n{tail}")
+        # A cluster that cannot take the burn means the burn waits, not a
+        # local fallback: the burn is the heaviest encode in the repo (act
+        # II's ~78 overlay inputs), and local ffmpeg execution is prohibited
+        # (owner ruling, 2026-08-25).
+        raise SystemExit(f"the cluster is not reachable ({farm_why}) and "
+                         "local ffmpeg execution is prohibited -- the burn "
+                         "waits for the farm")
 
     out = burn(Path(args.video).resolve(), entries, args.plates_dir,
                str(Path(args.out).resolve()),
