@@ -67,7 +67,7 @@ def character_box(doc, video="rafi01"):
     frame = doc["frame"]["width"]
     char = character(doc, video)
     width = even(char["crop_w"] * char["height"] / char["crop_h"])
-    x0 = (frame - width) // 2
+    x0 = (frame - width) // 2 + char.get("x_offset", 0)
     return x0, x0 + width
 
 

@@ -61,11 +61,14 @@ def test_every_recorded_video_scales_its_character_off_the_frame_edges(doc):
         assert air == 108, video
 
 
-def test_character_box_is_centred_and_even(doc):
+def test_character_box_uses_an_even_width_and_its_recorded_offset(doc):
     for video in VIDEOS:
         left, right = overlay.character_box(doc, video)
         assert (right - left) % 2 == 0, "ffmpeg's scale=-2 yields even widths"
-        assert left == doc["frame"]["width"] - right, f"{video}: centred"
+        char = overlay.character(doc, video)
+        width = right - left
+        centred_left = (doc["frame"]["width"] - width) // 2
+        assert left == centred_left + char.get("x_offset", 0), video
 
 
 def test_rafi01_character_box_matches_the_shipped_build(doc):
@@ -80,12 +83,16 @@ def test_rafi02_character_box_matches_the_measured_union_bbox(doc):
     assert overlay.character_box(doc, "rafi02") == (668, 1892)
 
 
-def test_lakshmi01_character_box_matches_the_task_2_measurement(doc):
+def test_lakshmi01_character_box_matches_the_owner_corrected_composition(doc):
     char = overlay.character(doc, "lakshmi01")
     assert char["crop_w"] == 1414
     assert char["crop_h"] == 1861
     assert char["height"] == 1224
-    assert overlay.character_box(doc, "lakshmi01") == (815, 1745)
+    assert char["x_offset"] == -264
+    assert overlay.character_box(doc, "lakshmi01") == (551, 1481)
+    spec = static_card_spec(doc, "lakshmi01")
+    card_x, _ = overlay.card_box(doc, spec, "lakshmi01")
+    assert card_x - overlay.character_box(doc, "lakshmi01")[1] == 751
 
 
 def test_card_sits_in_the_bottom_right_corner(doc):
