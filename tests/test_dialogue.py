@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from tools import dialogue, plate  # noqa: E402
+from tools.identity import UnknownPerson
 
 LEADS = {
     "osiris": {"person": "mrbobbytables", "display_name": "mrbobbytables",
@@ -52,6 +53,20 @@ def test_a_person_with_no_login_is_not_rendered_as_a_guessed_identity():
     leads = {"osiris": {"display_name": "somebody", "github": None,
                         "plate": {"name": "Real Name"}}}
     assert dialogue._speaker_for("osiris", leads) is None
+
+
+@pytest.mark.parametrize("planner", [dialogue.plan_chat, dialogue.plan_script])
+def test_an_unknown_lead_login_fails_explicitly(planner):
+    """An invalid cast binding is not the same as an intentionally uncast lead."""
+    leads = {"osiris": {"person": "definitely-not-a-github-login"}}
+    cues = [{"id": "x", "start_sec": 9.0, "end_sec": 12.0,
+             "character": "osiris", "text": "..."}]
+    with pytest.raises(
+        UnknownPerson,
+        match=r"unknown GitHub login: 'definitely-not-a-github-login'",
+    ):
+        planner(cues, SHOTS, leads)
+
 
 def test_an_uncast_character_gets_no_card():
     assert dialogue._speaker_for("ikora_rey", LEADS) is None
