@@ -1268,8 +1268,6 @@ def _extract_entry(plate, offset, defaults):
             continue
         if portrait and key in ("avatar", "avatar_url"):
             continue
-        if key == "avatar_url" and _github_avatar_url(value):
-            continue
         rows.extend(f"  - {key}: {item}" for item in _attr_rows(key, value))
     if portrait:
         rows.append(f"  - {portrait}")
@@ -1305,13 +1303,6 @@ def _portrait_row(plate, predicted):
     except UnknownPerson:
         return None
     return f"avatar_login: {canonical}"
-
-
-def _github_avatar_url(value):
-    """Whether a manifest URL is derived from a GitHub account identity."""
-    return isinstance(value, str) and (
-        value.startswith("https://github.com/")
-        or value.startswith("https://avatars.githubusercontent.com/"))
 
 
 def _attr_rows(key, value):

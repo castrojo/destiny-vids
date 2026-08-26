@@ -187,10 +187,10 @@ train rows using those forms remain literal legacy speakers and are reported by
 that was derived but is not wanted.
 
 When lifting an existing manifest, keep a local authored `avatar` path as a
-local chapter field. GitHub-derived URLs are never copied into the chapter:
-known accounts resolve through their login, while an unresolved legacy speaker
-keeps its literal speaker and remains an audit finding rather than gaining an
-inferred identity.
+local chapter field. Omit a GitHub-derived URL only when the rebuilt entry
+deterministically re-derives that exact portrait through its login. A card or
+legacy speaker whose literal URL cannot be re-derived keeps it, rather than
+losing a portrait or gaining an inferred identity.
 
 Front matter worth knowing: `owns_plates` (this file is answerable for its
 plates, so the manifest is regenerated from it), `field_order`, `defaults`

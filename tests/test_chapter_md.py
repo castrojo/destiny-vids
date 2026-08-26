@@ -665,12 +665,37 @@ def test_extract_uses_a_login_row_instead_of_copying_a_manifest_url():
     assert not any("avatar_url:" in row for row in rows)
 
 
-@pytest.mark.parametrize("act", ("II", "IV", "V", "VII"))
+@pytest.mark.parametrize("act", ("IV", "V", "VII"))
 def test_extract_handles_every_existing_avatar_style(act):
     """Extraction is a safe authoring migration, not a GitHub gate."""
     extracted = chapter_md.extract(act)
     assert chapter_md.parse(extracted)
     assert "https://github.com/" not in extracted
+
+
+@pytest.mark.parametrize("act", ("IV", "V", "VII"))
+def test_extract_round_trips_migrated_chapter_plates_exactly(
+        act, tmp_path, monkeypatch):
+    """Migrated chapters survive extract/rebuild without changing a plate."""
+    (tmp_path / f"{act}.md").write_text(
+        chapter_md.extract(act), encoding="utf-8")
+    monkeypatch.setattr(chapter_md, "CHAPTERS_DIR", tmp_path)
+    rebuilt, _ = chapter_md.entries(act)
+    expected = [plate for plate in chapter_md.manifest_plates(act)
+                if plate.get("copy_source") not in chapter_md.DERIVED_COPY]
+    assert rebuilt == expected
+    assert [list(plate) for plate in rebuilt] == [
+        list(plate) for plate in expected]
+
+
+def test_extract_preserves_act_two_og_thockin_literal_avatar_url():
+    """The builder cannot re-derive this non-chat card's legacy portrait."""
+    extracted = chapter_md.extract("II")
+    marker = "* [og_thockin]"
+    card = extracted[extracted.index(marker):]
+    card = card[:card.index("\n\n")]
+    assert "  - avatar: renders/avatars/thockin.png" in card
+    assert "  - avatar_url: https://github.com/thockin.png?size=256" in card
 
 
 def test_extract_keeps_a_local_avatar_without_inventing_a_url():

@@ -14,6 +14,7 @@
 - `python3 scripts/generate_schema_enums.py --check` — **28** enums current.
 - `python3 scripts/generate_skill_index.py --check` — **9** skills current.
 - `pre-commit run --all-files` — passed.
+
 - `python3 tools/identity.py` — reports remaining legacy speakers and exits 0; `python3 tools/identity.py --act II --check` exits 1 as designed because Act II's raw owner prompt remains unmigrated.
 
 ## Self-review
@@ -92,3 +93,32 @@ not an automation gap that can be safely guessed.
 - `python3 tools/identity.py --act II --check` — expected exit 1: the preserved
   raw Act II prompt retains its release-train legacy speaker findings.
 - `pre-commit run --all-files` — passed.
+
+## Round 3 fixes
+
+**Status:** COMPLETE_WITH_CONCERN
+
+- Extraction now preserves a literal GitHub avatar URL unless the rebuilt
+  chapter entry deterministically derives the same portrait.
+- Added exact manifest extraction/rebuild regressions for acts IV, V, and VII,
+  plus an Act II `og_thockin` regression that pins both portrait fields.
+- Kept `chapters/II-endless-forms.md` unchanged.
+
+### Commands and results
+
+- `python3 -m pytest -q tests/test_chapter_md.py -k 'extract_round_trips_migrated_chapter_plates_exactly or preserves_act_two_og_thockin'` — pre-fix **1 failed, 3 passed**; after the fix **4 passed**.
+- `python3 -m pytest -q tests/test_chapter_md.py tests/test_chapter_identity.py tests/test_identity.py` — **137 passed, 1 skipped**.
+- `python3 tools/corpus.py --check` — checked **3** corpus files.
+- `python3 tools/rederive.py --check` — **1321** segments current.
+- `python3 tools/identity.py` — completed; reports existing release-train legacy identity findings.
+- `python3 scripts/generate_schema_enums.py --check` — **28** enums current.
+- `python3 scripts/generate_skill_index.py --check` — **9** skills current.
+- `pre-commit run --all-files` — passed.
+- `python3 -m pytest -q` — expected pre-existing Act II raw-prompt/generator conflicts: **9 failed, 3563 passed, 10 skipped**.
+
+### Remaining concern
+
+The full suite's nine failures remain confined to `tests/test_efmb_act.py`:
+they assert the generated Act II manifest matches the intentionally preserved
+raw owner prompt. Resolving them requires Task 2's prompt integration and is
+outside this round.
