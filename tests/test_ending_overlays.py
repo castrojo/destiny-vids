@@ -155,6 +155,12 @@ def test_stale_ending_cards_use_the_browser_renderer(tmp_path, monkeypatch):
         build_ending_overlays.subprocess, "run",
         lambda cmd, **kwargs: ran.append((cmd, kwargs)),
     )
+    house = []
+    monkeypatch.setattr(
+        build_ending_overlays.plate, "render_all",
+        lambda entries, out_dir, picture=None: house.append(
+            (entries, out_dir, picture)),
+    )
 
     assert build_ending_overlays.refresh_cards(
         MANIFEST, ending(), cards_dir
@@ -169,6 +175,44 @@ def test_stale_ending_cards_use_the_browser_renderer(tmp_path, monkeypatch):
     assert cmd[6] == "--only"
     assert cmd[7].split(",") == [card["id"] for card in underwater(ending())]
     assert kwargs == {"check": True, "cwd": REPO}
+    assert house == [(
+        underwater(ending()),
+        cards_dir,
+        build_ending_overlays.picture_rect(ending(), "underwater"),
+    )]
+
+
+def test_p4_stale_chat_cards_use_the_house_renderer_in_the_letterbox(
+        tmp_path, monkeypatch):
+    cards_dir = tmp_path / "cards"
+    monkeypatch.setattr(
+        build_ending_overlays.freshness, "stale_outputs",
+        lambda inputs, outputs: outputs,
+    )
+    monkeypatch.setattr(build_ending_overlays.subprocess, "run",
+                        lambda *_args, **_kwargs: None)
+    house = []
+    monkeypatch.setattr(
+        build_ending_overlays.plate, "render_all",
+        lambda entries, out_dir, picture=None: house.append(
+            ([entry["id"] for entry in entries], out_dir, picture)),
+    )
+
+    section = ["chat_wolf", "chat"]
+    build_ending_overlays.refresh_cards(CHAT, chat(), cards_dir, section)
+
+    assert house == [(
+        ["chat_wolf", "chat_loose_end", "chat_escape", "chat_promised",
+         "chat_fine", "chat_minds", "chat_wolves"],
+        cards_dir,
+        (0, 138, 1920, 804),
+    )]
+
+
+def test_p4_card_freshness_tracks_the_house_renderer_and_casting():
+    inputs = build_ending_overlays.card_inputs(CHAT)
+    assert REPO / "tools" / "plate.py" in inputs
+    assert REPO / "vocab" / "casting.yaml" in inputs
 
 
 def test_the_clean_movement_declares_the_derivative_separately():
