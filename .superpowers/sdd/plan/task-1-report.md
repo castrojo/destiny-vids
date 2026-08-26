@@ -70,3 +70,25 @@ GitHub account in the repository, and the available `natew` account identifies
 Nate Wienert rather than Nate Waddington. Binding it would credit the wrong
 real person, so it was not substituted. This is an owner identity decision,
 not an automation gap that can be safely guessed.
+
+## Round 2 fixes
+
+**Status:** COMPLETE
+
+- Bound Variks to verified `nate-double-u` (GitHub ID `4453979`), and pinned
+  identity, derivation, and search coverage.
+- Made chapter extraction retain local avatars, tolerate legacy unresolved
+  speakers, and omit derived GitHub URLs from emitted chapter source.
+- Prevented missing authored plate names from registering a literal `none`
+  casting search phrase.
+
+### Commands and results
+
+- `python3 -m pytest -q tests/test_identity.py tests/test_derive.py tests/test_rederive.py tests/test_dialogue.py tests/test_dialogue_md.py tests/test_act2_casting.py tests/test_casting_pending.py tests/test_index_integrity.py tests/test_plate.py tests/test_credits.py tests/test_ensemble.py tests/test_search.py tests/test_chapter_md.py tests/test_chapter_identity.py` — **2095 passed, 5 skipped**.
+- `python3 tools/corpus.py --check` — checked **3** corpus files.
+- `python3 tools/rederive.py --check` — **1321** segments current.
+- `python3 scripts/generate_schema_enums.py --check` — **28** enums current.
+- `python3 scripts/generate_skill_index.py --check` — **9** skills current.
+- `python3 tools/identity.py --act II --check` — expected exit 1: the preserved
+  raw Act II prompt retains its release-train legacy speaker findings.
+- `pre-commit run --all-files` — passed.

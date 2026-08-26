@@ -135,6 +135,8 @@ def _cast_phrases(leads, people):
     out = {}
 
     def add(phrase, facet, value):
+        if phrase is None:
+            return
         phrase = str(phrase).replace("_", " ").lower().strip()
         if not phrase:
             return

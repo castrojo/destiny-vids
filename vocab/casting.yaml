@@ -198,6 +198,8 @@ people:
       avatar: https://avatars.githubusercontent.com/u/231907?v=4
   jbryce:
     github_id: 33063
+  nate-double-u:
+    github_id: 4453979
   shuahkh:
     github_id: 6414032
     plate:
@@ -301,7 +303,7 @@ leads:
       aka:
       - petra
     variks:
-      person: null
+      person: nate-double-u
       aka:
       - variks_the_loyal
     the_speaker:

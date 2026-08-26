@@ -130,6 +130,7 @@ def test_cast_names_route_to_casting_filters():
         ("jeefy", "casting.person", "jeefy"),
         ("Mara Sov", "casting.character", "mara_sov"),
         ("Variks", "casting.character", "variks"),
+        ("nate-double-u", "casting.person", "nate-double-u"),
         ("Saint-14", "casting.character", "saint_14"),
         ("The Speaker", "casting.character", "the_speaker"),
     ]:
@@ -140,6 +141,11 @@ def test_cast_names_route_to_casting_filters():
 def test_authored_person_name_routes_to_the_canonical_login():
     parsed = search.parse_query("Karena Angell footage")
     assert parsed["filters"]["casting.person"] == {"angellk"}
+
+
+def test_missing_plate_names_do_not_become_the_bogus_none_phrase():
+    parsed = search.parse_query("none of the crowd")
+    assert "casting.person" not in parsed["filters"]
 
 
 def test_ensemble_role_is_queryable():

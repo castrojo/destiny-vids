@@ -218,7 +218,7 @@ def test_concealed_visibilities_satisfy_require_helmet(visibility):
     ("Saint-14", "katcosgrove"),
     ("Mara Sov", "angellk"),
     ("Petra Venj", "LoriLorusso"),
-    ("Variks", None),
+    ("Variks", "nate-double-u"),
     ("The Speaker", "jbryce"),
     ("Amanda Holliday", "ashleywillis"),
     ("iron_lord_red_haired", "parispittman"),

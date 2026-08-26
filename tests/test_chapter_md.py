@@ -665,14 +665,37 @@ def test_extract_uses_a_login_row_instead_of_copying_a_manifest_url():
     assert not any("avatar_url:" in row for row in rows)
 
 
-def test_extract_refuses_an_unmapped_literal_avatar_url():
-    with pytest.raises(ValueError, match="canonical GitHub login"):
-        chapter_md._extract_entry(
-            {"id": "unknown", "kind": "chat", "speaker": "Unknown", "text": "Hi",
-             "at": 0.0, "dur": 2.2, "avatar": "renders/avatars/nope.png",
-             "avatar_url": "https://github.com/nope.png?size=256"},
-            0.0, {},
-        )
+@pytest.mark.parametrize("act", ("II", "IV", "V", "VII"))
+def test_extract_handles_every_existing_avatar_style(act):
+    """Extraction is a safe authoring migration, not a GitHub gate."""
+    extracted = chapter_md.extract(act)
+    assert chapter_md.parse(extracted)
+    assert "https://github.com/" not in extracted
+
+
+def test_extract_keeps_a_local_avatar_without_inventing_a_url():
+    rows = chapter_md._extract_entry(
+        {"id": "local", "kind": "chat", "speaker": "Kat", "text": "Hi",
+         "at": 0.0, "dur": 2.2, "avatar": "kat.jpg"},
+        0.0, {},
+    )
+    assert "  - avatar: kat.jpg" in rows
+    assert not any("avatar_url:" in row for row in rows)
+    assert _one("## 0:00\n\n" + "\n".join(rows) + "\n") == {
+        "id": "local", "at": 0.0, "dur": 2.2, "kind": "chat",
+        "speaker": "Kat", "text": "Hi", "avatar": "kat.jpg",
+    }
+
+
+def test_extract_round_trips_an_unresolved_legacy_speaker_without_a_url_row():
+    plate = {
+        "id": "legacy", "kind": "chat", "speaker": "nope", "text": "Hi",
+        "at": 0.0, "dur": 2.2, "avatar": "renders/avatars/nope.png",
+        "avatar_url": "https://github.com/nope.png?size=256",
+    }
+    rows = chapter_md._extract_entry(plate, 0.0, {})
+    assert not any("avatar_url:" in row for row in rows)
+    assert _one("## 0:00\n\n" + "\n".join(rows) + "\n") == plate
 
 
 # --- decks: copy that plays AFTER the act, authored inside it ---------------
