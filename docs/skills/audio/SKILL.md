@@ -1,6 +1,6 @@
 ---
 name: audio
-version: "1.0"
+version: "1.1"
 last_updated: "2026-08-19"
 id: audio
 one_line_purpose: Preserve source fidelity and enforce delivery audio headroom.
@@ -36,6 +36,19 @@ version that exists, keep the chain lossless, ship it unaltered.
 The authority for *why* is the `audio-quality-tenet` skill; this file is the
 project-specific part.
 
+## Hero workspace exception
+
+Inside `~/Videos/Wolves/Hero`, the
+[hero-videos policy](../hero-videos/SKILL.md) is stricter and overrides every
+generic local example in this skill, including the command paths below,
+auditions, and verification. **Do not run local `ffmpeg`, `ffprobe`,
+`audio-source.sh`, or `audio-check.sh` for Hero audio.** When an audio source
+is authorized, use the hero-scoped
+[Argo recipe](../hero-videos/references/authorized-audio-on-argo.md) instead.
+It performs format identity, silence, spectrum, native-rate PCM, loudness, AAC,
+and upload work remotely. This document makes no claim that a Hero song source
+is authorized or available.
+
 ## When to Use
 
 - Choosing or fetching a music bed
@@ -63,6 +76,8 @@ project-specific part.
    [`references/delivery-gates.md`](references/delivery-gates.md).
 
 ## Shortest command path
+
+**Not for `~/Videos/Wolves/Hero`; use its Argo recipe above.**
 
 ```bash
 cd ~/Videos

@@ -1,6 +1,6 @@
 ---
 name: farm
-version: "1.1"
+version: "1.2"
 last_updated: "2026-08-24"
 id: farm
 one_line_purpose: Run frame-touching encodes on the remote Kubernetes farm.
@@ -23,6 +23,16 @@ metadata:
 ---
 
 # Encode farm
+
+## Hero workspace exception
+
+`~/Videos/Wolves/Hero` forbids local `ffmpeg` and `ffprobe` for **all** media
+work, including audio-only probes, bed construction, and delivery measurement.
+That stricter hero policy overrides the generic local examples and exemptions
+in this runbook. For an authorized Hero source, follow the
+[hero-scoped Argo audio recipe](hero-videos/references/authorized-audio-on-argo.md);
+do not apply a local command from this file. The recipe does not assert that an
+authorized song source exists.
 
 ## When to Use
 
@@ -120,7 +130,9 @@ from `tools/farm.py`:
   block).
 
 Audio-only ffmpeg calls (video stream-copied or absent) are exempt from all
-of this and stay local — `tests/test_farm_policy.py` holds the whitelist.
+of this and stay local — **except in `~/Videos/Wolves/Hero`**, where the Hero
+workspace exception above requires Argo for every media command.
+`tests/test_farm_policy.py` holds the generic whitelist.
 
 ## How it works (and why)
 

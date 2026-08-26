@@ -118,7 +118,9 @@ One source server and one PUT receiver per active video run on the workstation
 at `192.168.1.227`: **8877** serves `~/Videos/Wolves/Hero`; each receiver uses
 `.work-rafi01/upload-server.py <dest> <port>`. **Give each video its own
 receiver port and destination**, or one render silently overwrites another's
-output. RAFI_01 uses 8878 and RAFI_02 uses 8879.
+output. RAFI_01 uses 8878, RAFI_02 uses 8879, and Lakshmi uses 8880. The
+[authorized-audio recipe](authorized-audio-on-argo.md) uses that video's
+receiver too, so its records and results cannot collide with another render.
 
 Check the Argo `ffmpeg` log within the first minute of a submission. A
 filter-graph error fails immediately; finding it 25 minutes later is a wasted

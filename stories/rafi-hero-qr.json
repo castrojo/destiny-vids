@@ -113,7 +113,7 @@
         "crop_h": 1861,
         "height": 1224,
         "x_offset": -120,
-        "_what": "The x_offset coordinate is relative to the computed centred left edge: -120 places Lakshmi 120px left of centre. Owner refinement: the prior -264px correction was too far; this smaller move seats her between the left foreground animal and the first mammoth/elephant rather than blocking the herd. Source-specific geometry and placement evidence are authoritative in .work-lakshmi01/verify-notes.md; the overlay regression test pins this record."
+        "_what": "The x_offset coordinate is relative to the computed centred left edge: -120 places Lakshmi 120px left of centre, seating her between the left foreground animal and the first mammoth/elephant rather than blocking the herd. Source-specific geometry and placement evidence are authoritative in .work-lakshmi01/verify-notes.md; the overlay regression test pins this record."
       },
       "cards": [
         {

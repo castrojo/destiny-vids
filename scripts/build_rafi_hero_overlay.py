@@ -152,6 +152,20 @@ def build_track_cards(doc, video):
     return [(spec, render_card(doc, spec)) for spec in track_cards(doc, video)]
 
 
+def track_card_manifest(doc, video):
+    """The frame-addressable handoff for a video's timed card PNGs."""
+    return [
+        {
+            "id": spec["id"],
+            "start_frame": spec["start_frame"],
+            "end_frame": spec["end_frame"],
+            "url": spec["url"],
+            "filename": f"{spec['id']}.png",
+        }
+        for spec in track_cards(doc, video)
+    ]
+
+
 def wordmark_box(doc, img):
     """(x, y) of the URL wordmark, sat on the same baseline as the cards.
 
@@ -229,23 +243,30 @@ def main(argv=None):
         out = REPO / out
 
     img = build(doc, video=args.video)
+    timed_cards = build_track_cards(doc, args.video)
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out)
 
-    if args.cards_dir:
+    manifest_path = None
+    if args.cards_dir and timed_cards:
         cards_dir = Path(args.cards_dir)
         if not cards_dir.is_absolute():
             cards_dir = REPO / cards_dir
         cards_dir.mkdir(parents=True, exist_ok=True)
-        for spec, art in build_track_cards(doc, args.video):
+        for spec, art in timed_cards:
             art.save(cards_dir / f"{spec['id']}.png")
+        manifest_path = cards_dir / "track-cards.json"
+        manifest_path.write_text(
+            json.dumps(track_card_manifest(doc, args.video), indent=2) + "\n",
+            encoding="utf-8",
+        )
 
     left, right = character_box(doc, args.video)
     print(f"wrote {out} ({img.width}x{img.height})")
     print(f"  character  x {left}..{right}  ({right - left} wide, "
           f"{character(doc, args.video)['height']} tall)")
-    if track_cards(doc, args.video):
-        for spec in track_cards(doc, args.video):
+    if timed_cards:
+        for spec, _ in timed_cards:
             x, y = card_box(doc, spec, args.video)
             print(f"  {spec['id']:<28} frames {spec['start_frame']}.."
                   f"{spec['end_frame'] - 1}  x {x}.."
@@ -255,8 +276,18 @@ def main(argv=None):
             x, y = card_box(doc, spec, args.video)
             print(f"  {spec['id']:<8} x {x}..{x + doc['placement']['width']}  "
                   f"y {y}  ({spec['style']}, {spec['url']})")
-    print(f"  every card decodes at {doc['placement']['width']}px on both "
-          f"wallpapers, or this would have raised")
+    if timed_cards:
+        print(f"  gated {len(timed_cards)} timed card(s) in memory at "
+              f"{doc['placement']['width']}px on both wallpapers")
+        if manifest_path:
+            print(f"  wrote {len(timed_cards)} timed card PNGs and {manifest_path}")
+        else:
+            print("  wrote no timed card PNGs (--cards-dir omitted)")
+    else:
+        print(f"  gated {len(static_cards(doc, args.video))} static card(s) at "
+              f"{doc['placement']['width']}px on both wallpapers")
+        if args.cards_dir:
+            print("  wrote no timed card PNGs (this video has no timed cards)")
     return 0
 
 

@@ -14,6 +14,7 @@ RAFI_02_SP.mp4 (x 40..1753, y 231..1944 of the 1754x2046 depadded frame).
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -230,3 +231,118 @@ def test_rafi02_track_cards_decode_to_their_individual_destinations(doc):
     for spec, art in overlay.build_track_cards(doc, "rafi02"):
         assert qr.decodes(art, spec["url"], qr.DAY_PLATE), spec["id"]
         assert qr.decodes(art, spec["url"], qr.NIGHT_PLATE), spec["id"]
+
+
+def test_rafi02_cli_gates_timed_cards_without_writing_them(tmp_path, capsys):
+    """A normal overlay build must not falsely claim ungated timed cards."""
+    out = tmp_path / "rafi02-overlay.png"
+
+    assert overlay.main(["--video", "rafi02", "--out", str(out)]) == 0
+
+    assert out.is_file()
+    assert not (tmp_path / "track-cards.json").exists()
+    assert capsys.readouterr().out.splitlines()[-2:] == [
+        "  gated 8 timed card(s) in memory at 280px on both wallpapers",
+        "  wrote no timed card PNGs (--cards-dir omitted)",
+    ]
+
+
+def test_rafi02_cli_rejects_an_unscannable_timed_card_without_cards_dir(
+        tmp_path):
+    """Omitting an output directory cannot bypass RAFI_02's decode gate."""
+    record = tmp_path / "record.json"
+    broken = overlay.load()
+    broken["placement"]["width"] = 60
+    record.write_text(json.dumps(broken), encoding="utf-8")
+    out = tmp_path / "rafi02-overlay.png"
+
+    with pytest.raises(RuntimeError, match="does not scan"):
+        overlay.main([
+            "--record", str(record), "--video", "rafi02", "--out", str(out),
+        ])
+
+    assert not out.exists()
+
+
+def test_rafi02_cli_writes_the_recorded_timed_card_intervals(tmp_path, capsys):
+    """The cards directory is a frame-addressable public handoff to Argo."""
+    cards_dir = tmp_path / "cards"
+    manifest = cards_dir / "track-cards.json"
+
+    assert overlay.main([
+        "--video", "rafi02", "--out", str(tmp_path / "rafi02-overlay.png"),
+        "--cards-dir", str(cards_dir),
+    ]) == 0
+
+    assert capsys.readouterr().out.splitlines()[-2:] == [
+        "  gated 8 timed card(s) in memory at 280px on both wallpapers",
+        f"  wrote 8 timed card PNGs and {manifest}",
+    ]
+    assert json.loads(manifest.read_text(encoding="utf-8")) == [
+        {
+            "id": "peacefield",
+            "start_frame": 0,
+            "end_frame": 8129,
+            "url": "https://ghost.bandcamp.com/track/peacefield",
+            "filename": "peacefield.png",
+        },
+        {
+            "id": "marks-of-the-evil-one",
+            "start_frame": 8129,
+            "end_frame": 14211,
+            "url": "https://ghost.bandcamp.com/track/marks-of-the-evil-one",
+            "filename": "marks-of-the-evil-one.png",
+        },
+        {
+            "id": "excerpt-from-the-tribulation",
+            "start_frame": 14211,
+            "end_frame": 17350,
+            "url": "https://www.youtube.com/playlist?list=OLAK5uy_mbAA7D5BS85jhxtczm6R8MlTNARKK8EHw",
+            "filename": "excerpt-from-the-tribulation.png",
+        },
+        {
+            "id": "battle-ready",
+            "start_frame": 17350,
+            "end_frame": 24216,
+            "url": "https://www.youtube.com/watch?v=lTeElVgvcbY",
+            "filename": "battle-ready.png",
+        },
+        {
+            "id": "the-doomed",
+            "start_frame": 24216,
+            "end_frame": 30926,
+            "url": "https://www.youtube.com/watch?v=SDvfbvuJtS8",
+            "filename": "the-doomed.png",
+        },
+        {
+            "id": "gipsy-danger",
+            "start_frame": 30926,
+            "end_frame": 35658,
+            "url": "https://www.youtube.com/watch?v=1vAZmIzc-1s",
+            "filename": "gipsy-danger.png",
+        },
+        {
+            "id": "de-profundis-borealis",
+            "start_frame": 35658,
+            "end_frame": 42151,
+            "url": "https://ghost.bandcamp.com/track/de-profundis-borealis",
+            "filename": "de-profundis-borealis.png",
+        },
+        {
+            "id": "all-ends-are-beginnings",
+            "start_frame": 42151,
+            "end_frame": 44314,
+            "url": "https://www.youtube.com/playlist?list=OLAK5uy_mbAA7D5BS85jhxtczm6R8MlTNARKK8EHw",
+            "filename": "all-ends-are-beginnings.png",
+        },
+    ]
+    assert sorted(path.name for path in cards_dir.glob("*.png")) == [
+        "all-ends-are-beginnings.png",
+        "battle-ready.png",
+        "de-profundis-borealis.png",
+        "excerpt-from-the-tribulation.png",
+        "gipsy-danger.png",
+        "marks-of-the-evil-one.png",
+        "peacefield.png",
+        "the-doomed.png",
+    ]

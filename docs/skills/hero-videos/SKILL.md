@@ -1,6 +1,6 @@
 ---
 name: hero-videos
-version: "1.4"
+version: "1.5"
 last_updated: "2026-08-26"
 id: hero-videos
 one_line_purpose: Build a hero character music video from a paper-background animation.
@@ -56,6 +56,9 @@ their exact frame intervals and do not add a persistent card beneath them.
 
 1. Measure the source, bed, title treatment, fill seeds, and character union in
    Argo; record every source-specific result in the matching `verify-notes.md`.
+   If an audio source is authorized, use the remote-only
+   [authorized-audio recipe](references/authorized-audio-on-argo.md); it
+   produces the bed and its record without using a local media command.
 2. Build and test the full-frame overlay from the record.
 3. In Argo, derive the alpha from a verified full-frame fill, preserve original
    colour pixels, apply any completed-art closing still alpha, then crop, scale,
