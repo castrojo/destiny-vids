@@ -112,8 +112,8 @@
         "crop_w": 1414,
         "crop_h": 1861,
         "height": 1224,
-        "x_offset": -264,
-        "_what": "Task 2's measured opaque union is crop=1414:1861:212:106. Owner composition correction: move Lakshmi 264px left, between the left foreground animal and the first mammoth/elephant rather than blocking the herd. scale=-2:1224 produces a 930px-wide character at visible x 551..1480 (exclusive box 551..1481), leaving 751px before the 280px bottom-right card."
+        "x_offset": -120,
+        "_what": "Task 2's measured opaque union is crop=1414:1861:212:106. Owner refinement: the prior -264px correction was too far; move Lakshmi exactly 120px left, between the left foreground animal and the first mammoth/elephant rather than blocking the herd. scale=-2:1224 produces a 930px-wide character at visible x 695..1624 (exclusive box 695..1625), leaving 607px before the 280px bottom-right card."
       },
       "cards": [
         {

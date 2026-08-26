@@ -88,11 +88,11 @@ def test_lakshmi01_character_box_matches_the_owner_corrected_composition(doc):
     assert char["crop_w"] == 1414
     assert char["crop_h"] == 1861
     assert char["height"] == 1224
-    assert char["x_offset"] == -264
-    assert overlay.character_box(doc, "lakshmi01") == (551, 1481)
+    assert char["x_offset"] == -120
+    assert overlay.character_box(doc, "lakshmi01") == (695, 1625)
     spec = static_card_spec(doc, "lakshmi01")
     card_x, _ = overlay.card_box(doc, spec, "lakshmi01")
-    assert card_x - overlay.character_box(doc, "lakshmi01")[1] == 751
+    assert card_x - overlay.character_box(doc, "lakshmi01")[1] == 607
 
 
 def test_card_sits_in_the_bottom_right_corner(doc):
