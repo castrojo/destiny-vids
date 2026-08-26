@@ -23,7 +23,7 @@
    },
    "source_digest": "5c86815e24481d1c2e23574f1e5ef539e9e0f2b66d9d2896cef50cf7ddfb6b02",
    "footage_digest": "fac9a6c7d103836f454d7c1c49181c2983ecbed43ca01f0f2bcc1e9a924a635a",
-   "built_from_commit": "07b719a5964cc62a7d15e27bc591b5680d78e5d3"
+   "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
@@ -46,7 +46,7 @@
    "footage_digest": "154a0dba529d838b1dd61e0e82b5bfd5c9bb34d57b68243bae60c1d107dd9f1e",
    "rebuild": "python3 scripts/build_act1.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
-   "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
+   "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   },
   "II": {
    "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
@@ -72,7 +72,7 @@
    ],
    "source_digest": "44fccb76fd689b4f11067ce02c0020d14af178f3ca32cc213d15ea676ef21e79",
    "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad",
-   "built_from_commit": "71c8853b190e8d81e35542eac41e80640f2d1a0d"
+   "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -102,7 +102,7 @@
    "source_digest": "b13e2cd19287c399026107415711c858dae63e5844901f1887a365dbe7c33eeb",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "env ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json",
-   "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
+   "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
@@ -121,7 +121,7 @@
    "rebuild": "python3 scripts/build_kat.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "60f24af4c12ea8a9973aaf76b1602dee7cca177620d58d3c369aa8439b1269f4",
-   "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
+   "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
@@ -140,7 +140,7 @@
    "rebuild": "python3 scripts/build_natali.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "b18bdaaf50692c0897aba07e91ac31c2c3b67c77b18606450554dc231eec07cf",
-   "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
+   "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v9.mp4",
@@ -172,7 +172,7 @@
    ],
    "source_digest": "321630117808473f93843e159dc6b3fbd75566a7aa9718bb5e513a847967adc8",
    "footage_digest": "21c943bcda5ccc2cbae2b3c08cebcf6794763babda3f4304e612e1724bb4220b",
-   "built_from_commit": "b4310e944a42b499642d682dc34f207dbddc65ea"
+   "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
@@ -196,7 +196,7 @@
    "rebuild": "python3 scripts/build_europa.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "d22c307e1c824644364ab1e2f6fd372be916cce45f89ef8fe51efdc22a01a2bd",
-   "built_from_commit": "24b61be902a284737b8f565c3240011daef01e6a"
+   "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
@@ -216,7 +216,7 @@
    ],
    "source_digest": "4e0e48c70e0934b493fde1ebd7e3bd891b02f8f2d8220bcf31ed4a3baefa0661",
    "rebuild": "python3 scripts/build_credits.py --out ~/Videos/wolves-credits/08-credits-master.mp4",
-   "built_from_commit": "24b61be902a284737b8f565c3240011daef01e6a"
+   "built_from_commit": "6755b5a948bcd388b216721c46c1a36e45855218"
   }
  },
  "social": {
