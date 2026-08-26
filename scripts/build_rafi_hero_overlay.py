@@ -86,7 +86,7 @@ def card_box(doc, spec, video="rafi01"):
     card_h = int(round(card_w * (1 + qr.STRIP_FRAC)))
     margin = place.get("margin", 48)
 
-    x = margin if spec["side"] == "left" else frame_w - margin - card_w
+    x = margin if spec.get("side", "right") == "left" else frame_w - margin - card_w
 
     valign = place.get("valign", "bottom")
     if valign == "bottom":
@@ -102,6 +102,54 @@ def card_box(doc, spec, video="rafi01"):
             f"the {spec['id']} card (x {x}..{x + card_w}) would sit over the "
             f"character (x {left}..{right}); shrink the card or the character")
     return x, y
+
+
+def static_cards(doc, video):
+    """Persistent cards, using a video's override when its record supplies one."""
+    return doc["videos"][video].get("cards", doc["cards"])
+
+
+def track_cards(doc, video):
+    """Validated, frame-addressable cards for a video's fixed playlist."""
+    cards = doc["videos"][video].get("track_cards", [])
+    if not cards:
+        return []
+
+    required = ("id", "start_frame", "end_frame", "url", "name")
+    for spec in cards:
+        missing = [key for key in required if key not in spec]
+        if missing:
+            raise ValueError(f"track card {spec.get('id', '<unknown>')!r} is missing "
+                             f"{', '.join(missing)}")
+        if spec["start_frame"] < 0 or spec["end_frame"] <= spec["start_frame"]:
+            raise ValueError(f"track card {spec['id']!r} has an invalid frame range")
+        if not spec["url"].startswith("https://"):
+            raise ValueError(f"track card {spec['id']!r} needs an HTTPS URL")
+
+    if cards[0]["start_frame"] != 0:
+        raise ValueError("the first track card must start on frame zero")
+    for left, right in zip(cards, cards[1:]):
+        if left["end_frame"] != right["start_frame"]:
+            raise ValueError("track card intervals must be contiguous")
+    return cards
+
+
+def render_card(doc, spec):
+    """Build one decode-gated card at the record's exact in-frame width."""
+    width = doc["placement"]["width"]
+    art = qr.card(width, spec["url"], style=spec.get("style", "slate"),
+                  eyebrow=spec.get("eyebrow"), name=spec["name"])
+    if not (qr.decodes(art, spec["url"], qr.DAY_PLATE)
+            and qr.decodes(art, spec["url"], qr.NIGHT_PLATE)):
+        raise RuntimeError(
+            f"the {spec['id']} card does not scan at {width}px; "
+            f"see scripts/qrcard.py")
+    return art
+
+
+def build_track_cards(doc, video):
+    """Return decode-gated card images in playback order for one video."""
+    return [(spec, render_card(doc, spec)) for spec in track_cards(doc, video)]
 
 
 def wordmark_box(doc, img):
@@ -156,15 +204,11 @@ def build(doc=None, video="rafi01"):
         mark = draw_wordmark(doc)
         out.alpha_composite(mark, wordmark_box(doc, mark))
 
-    for spec in doc["cards"]:
-        art = qr.card(width, spec["url"], style=spec["style"],
-                      eyebrow=spec.get("eyebrow"), name=spec["name"])
-        if not (qr.decodes(art, spec["url"], qr.DAY_PLATE)
-                and qr.decodes(art, spec["url"], qr.NIGHT_PLATE)):
-            raise RuntimeError(
-                f"the {spec['id']} card does not scan at {width}px; "
-                f"see scripts/qrcard.py")
-        out.alpha_composite(art, card_box(doc, spec, video))
+    # A timed playlist owns RAFI_02's right card; the static overlay carries
+    # only the persistent wordmark. Other videos use their recorded static card.
+    if not track_cards(doc, video):
+        for spec in static_cards(doc, video):
+            out.alpha_composite(render_card(doc, spec), card_box(doc, spec, video))
     return out
 
 
@@ -175,6 +219,8 @@ def main(argv=None):
                     help="key into the record's videos map (default rafi01)")
     ap.add_argument("--out", default=None,
                     help="default renders/<video>-overlay.png")
+    ap.add_argument("--cards-dir", default=None,
+                    help="write timed track cards here when the video has them")
     args = ap.parse_args(argv)
 
     doc = load(args.record)
@@ -186,14 +232,29 @@ def main(argv=None):
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out)
 
+    if args.cards_dir:
+        cards_dir = Path(args.cards_dir)
+        if not cards_dir.is_absolute():
+            cards_dir = REPO / cards_dir
+        cards_dir.mkdir(parents=True, exist_ok=True)
+        for spec, art in build_track_cards(doc, args.video):
+            art.save(cards_dir / f"{spec['id']}.png")
+
     left, right = character_box(doc, args.video)
     print(f"wrote {out} ({img.width}x{img.height})")
     print(f"  character  x {left}..{right}  ({right - left} wide, "
           f"{character(doc, args.video)['height']} tall)")
-    for spec in doc["cards"]:
-        x, y = card_box(doc, spec, args.video)
-        print(f"  {spec['id']:<8} x {x}..{x + doc['placement']['width']}  "
-              f"y {y}  ({spec['style']}, {spec['url']})")
+    if track_cards(doc, args.video):
+        for spec in track_cards(doc, args.video):
+            x, y = card_box(doc, spec, args.video)
+            print(f"  {spec['id']:<28} frames {spec['start_frame']}.."
+                  f"{spec['end_frame'] - 1}  x {x}.."
+                  f"{x + doc['placement']['width']}  y {y}  ({spec['url']})")
+    else:
+        for spec in static_cards(doc, args.video):
+            x, y = card_box(doc, spec, args.video)
+            print(f"  {spec['id']:<8} x {x}..{x + doc['placement']['width']}  "
+                  f"y {y}  ({spec['style']}, {spec['url']})")
     print(f"  every card decodes at {doc['placement']['width']}px on both "
           f"wallpapers, or this would have raised")
     return 0
