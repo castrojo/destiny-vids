@@ -121,6 +121,12 @@ feature. `clean` is the gate the whole repo rests on, it must be positively
 established, and "nobody has looked at this frame" is not evidence the frame is
 clean.
 
+**Tests, manifest presence, and a render exit are not acceptance for recovered
+dialogue.** A recovered burn is accepted only when
+`tools/plate_frame_audit.py --check` reports **zero missing** and a human has
+reviewed its contact sheet for copy, order, canonical login, and the correct
+avatar on every expected cue.
+
 **A brief with `automatable: no` stops at stage 1**, prints what it is waiting
 on, and exits 0 — stopping is the correct result, not a failure. A brief with
 `automatable: partly` runs the mechanical half and stops before the credited
