@@ -144,6 +144,11 @@ a frame; scan the QR from real Argo-produced day and night frames. Local
 Pillow/OpenCV can inspect those returned PNGs, but local `ffmpeg` and `ffprobe`
 are prohibited.
 
+When `podGC` removes successful pods, the workflow must upload a text
+probe/decode record alongside its media and review PNGs. Inspect the encode log
+in its first minute for graph failures, but do not rely on Argo logs remaining
+available after success.
+
 - [ ] Per-video measurements and source/asset provenance are in `verify-notes.md`.
 - [ ] `target_frames`, uniform `setpts` factor, 24 fps output, and effective
   speed are recorded from the measured bed.

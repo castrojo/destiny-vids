@@ -410,7 +410,8 @@ spec:
         command: [sh, -c]
         args:
           - |
-            mkdir -p /work
+            work=/work
+            mkdir -p "$work"
             candidate_id='{{workflow.parameters.candidate-id}}'
             fetch_record="$candidate_id-fetch-verified-inputs.txt"
             input_gate="$candidate_id-input-audio-gate.json"
