@@ -147,8 +147,6 @@ The builder derives those intervals from the records below.
 
 [mapped_redacted_mines] [redacted] @ 8:31.500 +3.648: Or a lifetime of servitude in the Toilmaster's Packaging Mines
 
-[owner_convo_karena] angellk @ 8:35.300 +2.867: The Kube always seeks open source potential
-  - seen_at_src: 300.000
 
 [owner_convo_joseph] jrsapi @ 8:38.417 +3.6: We can't let The Toilmaster enslave another generation
   - seen_at_src: 303.117

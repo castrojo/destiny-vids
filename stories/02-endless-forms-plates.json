@@ -2094,27 +2094,13 @@
     {
       "id": "mapped_redacted_mines",
       "at": 227.7,
-      "dur": 3.55,
+      "dur": 3.648,
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
       "speaker": "[redacted]",
       "text": "Or a lifetime of servitude in the Toilmaster's Packaging Mines",
       "text_source": "owner_supplied"
-    },
-    {
-      "id": "owner_convo_karena",
-      "at": 231.5,
-      "dur": 2.867,
-      "kind": "chat",
-      "position": "left",
-      "copy_source": "owner_supplied",
-      "speaker": "angellk",
-      "text": "The Kube always seeks open source potential",
-      "text_source": "owner_supplied",
-      "seen_at_src": 300.0,
-      "avatar": "renders/avatars/angellk.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
     },
     {
       "id": "owner_convo_joseph",
@@ -2587,7 +2573,6 @@
     "walk_A1RM4X is owner-timed to Act II film 171.801, but the card or line before it clears at 171.950, so it lands there instead. The order is the owner's; only the gap is the timeline's",
     "the owner conversation at 231.500 keeps only joseph; krook and both rochaporta lines were removed by the owner",
     "line 2 of the 6:45.00 block is pinned 0.15s before the previous line clears; the pin is honoured and the two overlap on screen",
-    "line 5 of the 8:22.57 block is pinned 0.098s before the previous line clears; the pin is honoured and the two overlap on screen",
     "Amber's and Kyle's guardian reveals are omitted: the current owner-authored action and source-anchored chat occupy their only evidenced lower-third windows. Omitting the cards preserves the authored seats rather than moving either card onto unsupported picture.",
     "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for now.' Three blocks went with him -- the four ranked montage cards, the two TOC payoff cards ('It's totally NOT like this' and 'Have you met our Ambassadors?'), and the eyebrow on Natewaddington's placard. Every string is still in git; 'for now' means this is a revert, not a rewrite",
     "SARAH NOVOTNY'S SEAT WENT TO RICARDO ROCHA, owner 2026-08-20: 'move rochoporto's nameplate introduction to where novotny is, this hunter is now rochaporto'. Unlike Brent Burns and Joe Beda the same day, she was NOT ordered out -- her authored record stays in vocab/casting.yaml and she is owed a seat nobody has named yet",

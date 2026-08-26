@@ -141,7 +141,6 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:25.30` **[redacted]** — Unlearning bad habits takes time
 - `8:28.30` **[redacted]** — Your options are success
 - `8:31.50` **[redacted]** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
-- `8:35.30` **angellk** — The Kube always seeks open source potential
 - `8:38.42` **jrsapi** — We can't let The Toilmaster enslave another generation
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `8:43.75` **KyleGospo** — FOR TITANFALL!

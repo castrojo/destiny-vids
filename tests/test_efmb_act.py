@@ -172,7 +172,7 @@ def recovery_by_id(act, bucket):
 
 def expected_recovered_object(plate_id):
     expected = dict(recovery_by_id("act_ii", "active")[plate_id]["object"])
-    if plate_id.startswith(("chat_karena_", "late_karena_", "owner_convo_karena")):
+    if plate_id.startswith(("chat_karena_", "late_karena_")):
         expected.update(chat_identity("angellk"))
         expected["speaker"] = "angellk"
     if plate_id == "trio_mara_sov":
@@ -239,12 +239,79 @@ def test_the_saved_owner_prompt_is_normalized_without_rescue_tail():
     "chat_karena_job",
     "late_karena_cardio",
     "late_karena_lessons",
-    "owner_convo_karena",
     "trio_mara_sov",
 ])
 def test_recovered_karena_objects_match_the_ledger(plate_id):
     expected = expected_recovered_object(plate_id)
     assert plate_by_id(plate_id) == expected
+
+
+def test_the_conflicting_historical_cues_stay_superseded_in_the_recovery_ledger():
+    superseded = recovery_by_id("act_ii", "superseded")
+    assert len(recovery_fixture()["act_ii"]["active"]) == 72
+    assert len(superseded) == 3
+    assert superseded["toc_karena"] == {
+        "id": "toc_karena",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "status": "superseded",
+        "conflicts_with": "toc_joseph_worth",
+        "object": {
+            "id": "toc_karena",
+            "at": 137.533,
+            "dur": 3.2,
+            "kind": "chat",
+            "position": "left",
+            "copy_source": "owner_supplied",
+            "speaker": "Karena",
+            "text": "One hundred thousand bootc volunteers, ready to power up",
+            "text_source": "owner_supplied",
+        },
+    }
+    assert superseded["mapped_karena_pve"] == {
+        "id": "mapped_karena_pve",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "status": "superseded",
+        "conflicts_with": "chat_angellk_pvp",
+        "object": {
+            "id": "mapped_karena_pve",
+            "at": 265.733,
+            "dur": 3.0,
+            "kind": "chat",
+            "position": "left",
+            "copy_source": "owner_supplied",
+            "speaker": "karena",
+            "text": "Don't look at me I only put PvE on Legendary",
+            "text_source": "owner_supplied",
+            "avatar": "renders/avatars/karena.png",
+            "avatar_url": "https://github.com/karena.png?size=256",
+        },
+    }
+    assert superseded["owner_convo_karena"] == {
+        "id": "owner_convo_karena",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "status": "superseded",
+        "conflicts_with": "mapped_redacted_mines",
+        "object": {
+            "id": "owner_convo_karena",
+            "at": 231.5,
+            "dur": 2.867,
+            "kind": "chat",
+            "position": "left",
+            "copy_source": "owner_supplied",
+            "speaker": "karena",
+            "text": "The Kube always seeks open source potential",
+            "text_source": "owner_supplied",
+            "seen_at_src": 300.0,
+            "avatar": "renders/avatars/karena.png",
+            "avatar_url": "https://github.com/karena.png?size=256",
+        },
+    }
 
 
 def test_the_current_main_intentional_removals_stay_removed():
@@ -258,9 +325,6 @@ def test_generated_act_two_plates_clear_the_readtime_punch_list(tmp_path):
     path = tmp_path / "act-two.json"
     path.write_text(json.dumps(build_efmb_plates.build()), encoding="utf-8")
     short, _, _ = readtime.audit_manifest(path)
-    # Restoring owner_convo_karena on its historical pin shortens the
-    # preceding redacted line in-lane; that tradeoff is deliberate and is
-    # covered by the exact-object recovery checks above.
     required = {
         "chat_pilot_lunar",
         "toc_joseph_worth",
@@ -846,23 +910,21 @@ def test_the_post_walk_dialogue_is_replaced_by_the_mapped_pass():
     assert by_id["mapped_redacted_mines"]["text"] == (
         "Or a lifetime of servitude in the Toilmaster's Packaging Mines")
 
-def test_the_owner_conversation_replaces_the_skill_banners():
-    """The 8:18 skill banners are replaced by the owner-supplied conversation."""
+def test_the_owner_conversation_keeps_the_current_main_mines_cue():
+    """Current-main placement wins when the recovered historical cue collides."""
     by_id = {p["id"]: p for p in committed()["plates"]}
     ids = {p["id"] for p in committed()["plates"]}
     for i in range(1, 11):
         assert f"mapped_skill_banner_{i}" not in ids
 
     convo = [
-        ("owner_convo_karena", "angellk",
-         "The Kube always seeks open source potential",
-         231.500, 2.867),
         ("owner_convo_joseph", "jrsapi",
          "We can't let The Toilmaster enslave another generation",
          234.617, 3.600),
     ]
     expected_ids = {pid for pid, *_ in convo}
     assert {pid for pid in ids if pid.startswith("owner_convo_")} == expected_ids
+    assert "owner_convo_karena" not in by_id
     assert not any(pid.startswith("mapped_skill_banner_") for pid in ids)
     for pid, speaker, text, at, dur in convo:
         p = by_id[pid]
@@ -872,10 +934,11 @@ def test_the_owner_conversation_replaces_the_skill_banners():
         assert p["at"] == pytest.approx(at, abs=1e-3)
         assert p["dur"] == pytest.approx(dur, abs=1e-3)
         assert p["avatar"] == f"renders/avatars/{speaker}.png"
-        if speaker == "angellk":
-            assert p["avatar_url"].endswith("/836183?v=4")
-        else:
-            assert p["avatar_url"].endswith("/5437766?v=4")
+        assert p["avatar_url"].endswith("/5437766?v=4")
+
+    mines = by_id["mapped_redacted_mines"]
+    assert mines["at"] == pytest.approx(227.7, abs=1e-3)
+    assert mines["dur"] == pytest.approx(3.648, abs=1e-3)
 
     kyle = by_id["mapped_kyle_titanfall"]
     assert kyle["at"] == pytest.approx(239.95, abs=1e-3)

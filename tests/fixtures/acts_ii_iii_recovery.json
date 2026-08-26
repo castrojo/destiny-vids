@@ -754,26 +754,6 @@
         }
       },
       {
-        "id": "owner_convo_karena",
-        "kind": "chat",
-        "source_name": "release/alpha4",
-        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
-        "object": {
-          "id": "owner_convo_karena",
-          "at": 231.5,
-          "dur": 2.867,
-          "kind": "chat",
-          "position": "left",
-          "copy_source": "owner_supplied",
-          "speaker": "karena",
-          "text": "The Kube always seeks open source potential",
-          "text_source": "owner_supplied",
-          "seen_at_src": 300.0,
-          "avatar": "renders/avatars/karena.png",
-          "avatar_url": "https://github.com/karena.png?size=256"
-        }
-      },
-      {
         "id": "owner_convo_joseph",
         "kind": "chat",
         "source_name": "51d79d2",
@@ -1424,7 +1404,9 @@
           "speaker": "Karena",
           "text": "One hundred thousand bootc volunteers, ready to power up",
           "text_source": "owner_supplied"
-        }
+        },
+        "status": "superseded",
+        "conflicts_with": "toc_joseph_worth"
       },
       {
         "id": "mapped_karena_pve",
@@ -1443,7 +1425,31 @@
           "text_source": "owner_supplied",
           "avatar": "renders/avatars/karena.png",
           "avatar_url": "https://github.com/karena.png?size=256"
-        }
+        },
+        "status": "superseded",
+        "conflicts_with": "chat_angellk_pvp"
+      },
+      {
+        "id": "owner_convo_karena",
+        "kind": "chat",
+        "source_name": "release/alpha4",
+        "source_ref": "b34f17b8b8256716d8c6fa8585071cbb1dc32ed6",
+        "object": {
+          "id": "owner_convo_karena",
+          "at": 231.5,
+          "dur": 2.867,
+          "kind": "chat",
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "speaker": "karena",
+          "text": "The Kube always seeks open source potential",
+          "text_source": "owner_supplied",
+          "seen_at_src": 300.0,
+          "avatar": "renders/avatars/karena.png",
+          "avatar_url": "https://github.com/karena.png?size=256"
+        },
+        "status": "superseded",
+        "conflicts_with": "mapped_redacted_mines"
       }
     ],
     "intentional_removals": [
