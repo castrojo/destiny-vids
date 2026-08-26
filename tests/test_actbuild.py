@@ -250,25 +250,22 @@ def test_every_cue_becomes_one_input_in_order(any_act):
     # source + the pills + the reveal + the bed
     assert cmd.count("-i") == len(any_act["plates"]) + 3
 
-def test_avatar_paths_resolve_in_both_recorded_shapes():
-    """Legacy roots and canonical cache paths both resolve predictably.
-
-    Joining a ~-rooted value onto the project made `render/~/Videos/...` and
-    every pill silently fell back to the drawn crest. Canonical Act IV chat
-    identities instead point at the project render cache through their login.
-    """
-    rooted = actbuild._resolve_avatar("/proj", "~/Videos/wolves-kat/render/kat.jpg")
-    assert rooted == str(Path("~/Videos/wolves-kat/render/kat.jpg").expanduser())
-    bare = actbuild._resolve_avatar("/proj", "kat.jpg")
-    assert bare == "/proj/render/kat.jpg"
-
+def test_avatar_paths_resolve_from_their_recorded_cache_shape():
+    """Canonical cache paths are repo-relative; legacy filenames are project-local."""
+    project = Path("/proj")
     doc = actbuild.load_act("IV")[0]
+    legacy = actbuild.load_act("V")[0]["plates"][0]["avatar"]
+
+    assert actbuild._resolve_avatar(project, legacy) == str(project / "render" / legacy)
+    assert actbuild._resolve_avatar(project, "renders/avatars/katcosgrove.png") == str(
+        REPO_ROOT / "renders" / "avatars" / "katcosgrove.png")
+
     resolved = actbuild._project_manifest(doc, "/proj")
     resolved = json.loads(resolved.read_text(encoding="utf-8"))
     assert {
         p["id"]: p["avatar"] for p in resolved["plates"] if p.get("avatar")
     } == {
-        p["id"]: f"/proj/render/renders/avatars/{p['speaker']}.png"
+        p["id"]: str(REPO_ROOT / "renders" / "avatars" / f"{p['speaker']}.png")
         for p in doc["plates"] if p["speaker"] != "TBD"
     }
 
