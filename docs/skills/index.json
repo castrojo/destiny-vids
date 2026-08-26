@@ -17,7 +17,7 @@
       ],
       "description": "Edit any word the audience reads without computing timecodes: one Markdown file per chapter, with per-line timing derived from readability. Use when writing or rewriting chat pills, red splashes, or title, status and credit cards.",
       "version": "1.0",
-      "last_updated": "2026-08-25",
+      "last_updated": "2026-08-26",
       "doc_type": "procedure"
     },
     {
@@ -92,7 +92,7 @@
       ],
       "description": "Bind visible Destiny characters to verified contributor identities. Use when adding or reviewing lead bindings, monthly ensemble credits, or cast-derived permissions.",
       "version": "1.0",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-26",
       "doc_type": "policy"
     },
     {

@@ -2942,7 +2942,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 unresolved.append({
                     "id": character,
                     "person": binding.get("person"),
-                    "display_name": binding.get("display_name"),
+                    "display_name": binding.get("person"),
                     "requested_reveal_after": round(reveal_after, 3),
                     "revealed_at": at,
                     **REVEAL_FLOOR_MISSED,
@@ -2962,7 +2962,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             unresolved.append({
                 "id": character,
                 "person": binding.get("person"),
-                "display_name": binding.get("display_name"),
+                "display_name": binding.get("person"),
                 **UNPLATED[why],
             })
         if log:

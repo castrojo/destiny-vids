@@ -354,7 +354,7 @@ LEADS = {
                "plate": {"label": "EMOTIONAL SUPPORT // GHOST",
                          "name": "Lindsay Gendreau", "title": "Master of the Labyrinths",
                          "kind": "ghost"}},
-    "zavala": {"person": "kelsey_hightower", "display_name": "Kelsey Hightower",
+    "zavala": {"person": "kelseyhightower", "display_name": "Kelsey Hightower",
                "aka": [], "constraints": {}, "plate": None},
     "ikora_rey": {"person": None, "display_name": None, "aka": [],
                   "constraints": {}, "plate": None},
@@ -397,7 +397,7 @@ def test_plan_reports_an_unplated_lead_instead_of_dropping_them():
 
     by_id = {u["id"]: u for u in unresolved}
     assert by_id["zavala"]["reason"] == "no_plate_copy"
-    assert by_id["zavala"]["display_name"] == "Kelsey Hightower"
+    assert by_id["zavala"]["display_name"] == "kelseyhightower"
     assert by_id["ikora_rey"]["reason"] == "uncast"
     assert by_id["ikora_rey"]["person"] is None
     for entry in unresolved:
@@ -579,16 +579,17 @@ def test_no_invented_title_survives_in_the_vocab():
     path = Path(__file__).resolve().parents[1] / "vocab" / "casting.yaml"
     casting = yaml.safe_load(path.read_text())
     values = casting["leads"]["values"]
-    assert values["osiris"]["plate"]["class"] == "Voidwalker Warlock"
-    assert values["sagira"]["plate"]["title"] == "Foundry of the Forbidden"
+    people = casting["people"]
+    assert people[values["osiris"]["person"]]["plate"]["class"] == "Voidwalker Warlock"
+    assert people[values["sagira"]["person"]]["plate"]["title"] == "Foundry of the Forbidden"
     raw = path.read_text()
     assert "Master of the Labyrinths" not in raw
     # "Dawnblade Warlock" was once invented for Bob and is banned from every
     # binding — EXCEPT zavala's, where the owner authored it for Kelsey
     # Hightower verbatim in #8. Pin exactly that one occurrence.
-    dawnblade = [k for k, v in values.items()
-                 if (v.get("plate") or {}).get("class") == "Dawnblade Warlock"]
-    assert dawnblade == ["zavala"]
+    dawnblade = [login for login, person in people.items()
+                 if (person.get("plate") or {}).get("class") == "Dawnblade Warlock"]
+    assert dawnblade == ["kelseyhightower"]
 
 def test_plan_output_never_double_books_the_screen():
     shots = [
@@ -886,7 +887,7 @@ def test_a_reveal_the_footage_cannot_reach_degrades_to_the_latest_appearance():
     assert [u["reason"] for u in unresolved] == ["reveal_floor_missed"]
     report = unresolved[0]
     assert report["id"] == "zavala"
-    assert report["display_name"] == "Kelsey Hightower"
+    assert report["display_name"] == "kelseyhightower"
     assert report["requested_reveal_after"] == 110
     assert report["revealed_at"] == entries[0]["at"]
     assert report["automatable"] is False and report["blocked_on"]
@@ -1117,7 +1118,7 @@ def test_osiris_is_plated_gold():
 
     casting = yaml.safe_load(
         (Path(__file__).resolve().parents[1] / "vocab" / "casting.yaml").read_text())
-    copy = casting["leads"]["values"]["osiris"]["plate"]
+    copy = casting["people"][casting["leads"]["values"]["osiris"]["person"]]["plate"]
     assert copy["variant"] == "leader"
     assert plate._variant_for(copy) is plate.VARIANTS["leader"]
 

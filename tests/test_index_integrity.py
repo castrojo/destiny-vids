@@ -50,6 +50,17 @@ def _load(path):
         return json.load(fh)
 
 
+def test_casting_vocabulary_matches_the_identity_schema():
+    """GitHub IDs and role bindings are data too, not unvalidated YAML."""
+    with (REPO_ROOT / "vocab" / "casting.yaml").open(encoding="utf-8") as fh:
+        casting = yaml.safe_load(fh) or {}
+    errors = sorted(_validator("casting.schema.json").iter_errors(casting),
+                    key=lambda e: list(e.path))
+    assert not errors, "\n".join(
+        f"{'/'.join(str(p) for p in e.path)}: {e.message}" for e in errors
+    )
+
+
 @pytest.mark.parametrize("path", SEGMENT_PATHS, ids=lambda p: Path(p).stem)
 def test_committed_segment_matches_the_schema(path):
     errors = sorted(_validator("segment.schema.json").iter_errors(_load(path)),

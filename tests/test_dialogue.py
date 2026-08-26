@@ -47,14 +47,11 @@ def test_speaker_is_the_login_not_the_character_and_not_the_legal_name():
         "the reveal is untouched; only the pill changed")
 
 
-def test_a_person_with_no_login_is_credited_by_name_not_dropped():
-    """Degrade, never block: a missing login is a gap, not a disqualification.
-    Guessing one would be a claim about a real person's account."""
+def test_a_person_with_no_login_is_not_rendered_as_a_guessed_identity():
+    """A real name is not a GitHub account and must not become one on screen."""
     leads = {"osiris": {"display_name": "somebody", "github": None,
                         "plate": {"name": "Real Name"}}}
-    assert dialogue._speaker_for("osiris", leads) == "Real Name"
-    assert dialogue._speaker_for("osiris", {"osiris": {
-        "display_name": "somebody", "github": None, "plate": None}}) == "somebody"
+    assert dialogue._speaker_for("osiris", leads) is None
 
 def test_an_uncast_character_gets_no_card():
     assert dialogue._speaker_for("ikora_rey", LEADS) is None

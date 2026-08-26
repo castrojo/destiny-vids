@@ -1,7 +1,7 @@
 ---
 name: chapters
 version: "1.0"
-last_updated: "2026-08-25"
+last_updated: "2026-08-26"
 id: chapters
 one_line_purpose: Author a chapter's on-screen copy in one Markdown file per chapter.
 entry_point: docs/skills/chapters.md
@@ -176,21 +176,14 @@ kat @ 15:33.770: How much you...   pinned to an exact programme moment
   - body: second line
   - fade_in: null                  delete a field the defaults supplied
   - censor: Goddamn -> G{k8s}ddamn
-  - cast: joseph_sandoval        the portrait vocab/casting.yaml records
-  - avatar_login: KyleGospo      the portrait github.com/<login> serves
 ```
 
-**A pill names the person, never the URL.** `cast:` takes whatever avatar
-`vocab/casting.yaml` holds for that binding; `avatar_login:` takes
-`https://github.com/<login>.png`. They are **not** interchangeable — several
-people in act II have a casting avatar that is not their GitHub one
-(A1RM4X's is a YouTube URL), so swapping the key swaps the face. Neither key
-reaches the manifest: both resolve to `avatar`/`avatar_url` at build time, so
-a portrait that moves in the vocab moves on every pill that cites it. Write a
-URL into a chapter file and it is a copy that will go stale silently.
-
-A speaker whose name *is* a GitHub login needs neither key — the login shape
-is recognised and the portrait derived. `- avatar: null` removes a portrait
+**A pill names a GitHub login, never a URL.** A canonical login resolves through
+`vocab/casting.yaml`'s `people` map, which owns its stable numeric GitHub ID and
+portrait fields. Display names, character IDs, historical personas, `cast:`,
+`avatar_login:`, and GitHub URLs are not chapter authoring. Existing release-
+train rows using those forms remain literal legacy speakers and are reported by
+`tools/identity.py`; they are not aliases. `- avatar: null` removes a portrait
 that was derived but is not wanted.
 
 Front matter worth knowing: `owns_plates` (this file is answerable for its
@@ -297,5 +290,6 @@ into the dialogue. The integration order matters:
 python3 -m pytest -q tests/test_chapter_md.py tests/test_chapter_identity.py
 python3 -m pytest -q tests/test_full_script.py
 python3 tools/chapter_md.py check
+python3 tools/identity.py --check
 python3 scripts/generate_full_script.py --check
 ```

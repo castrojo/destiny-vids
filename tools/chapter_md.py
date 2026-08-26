@@ -169,8 +169,7 @@ GITHUB_URL = re.compile(
 # A field of the entry above it. Repeating a key builds a list, which is how
 # a card's `body` rows keep their order without any punctuation to count.
 ATTR = re.compile(r"^\s*-\s+(?P<key>[A-Za-z_][A-Za-z0-9_]*)\s*:\s?(?P<value>.*)$")
-LOGIN_SHAPE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
-GITHUB_AVATAR = "https://github.com/{login}.png?size=256"
+_LEGACY_LOGIN_SHAPE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 
 # WHERE A PORTRAIT COMES FROM, AND WHY IT IS NOT TYPED HERE.
 #
@@ -935,6 +934,15 @@ def _split_entries(act, *, include_block_labels=False):
         into = (deck if deck_label and block["label"] == deck_label else out)
         for n, (line, start, hold) in enumerate(zip(block["lines"],
                                                     at, holds), 1):
+            if line["kind"] == "chat":
+                from tools.identity import RESERVED_SPEAKERS, UnknownPerson, canonical_login
+                if line["speaker"] not in RESERVED_SPEAKERS:
+                    try:
+                        canonical_login(line["speaker"])
+                    except UnknownPerson:
+                        unresolved.append(
+                            f"legacy-speaker: {line['speaker']} (no GitHub login "
+                            "is inferred)")
             entry = build_entry(act, b, n, line, start, hold,
                                 defaults, order)
             if include_block_labels:
@@ -1028,6 +1036,8 @@ def build_entry(act, b, n, line, start, hold, defaults, order=None):
             del entry["id"]
 
     if line["kind"] == "chat":
+        # The release train still carries literal pre-migration speakers.
+        # Keep their on-screen spelling until the owning act normalizes them.
         entry["speaker"] = line["speaker"]
         entry["text"] = line["text"]
     elif line["kind"] == "boss":
@@ -1106,43 +1116,20 @@ def _resolve_default(key, value, line, entry):
         return value
     if key == "text_source":
         return "owner_supplied" if line.get("text") else "placeholder"
-    speaker = line.get("speaker") or ""
-    if not LOGIN_SHAPE.match(speaker):
-        return None
+    from tools.identity import UnknownPerson, canonical_login
+    try:
+        canonical_login(line.get("speaker") or "")
+    except UnknownPerson:
+        # Existing chapters are literal pre-migration authoring. Keep a
+        # previously-rendered lowercase portrait stable while audit reports the
+        # speaker; newly normalized chapters resolve through People above.
+        if not _LEGACY_LOGIN_SHAPE.match(line.get("speaker") or ""):
+            return None
     if key == "avatar":
-        return f"renders/avatars/{speaker}.png"
+        return f"renders/avatars/{line['speaker']}.png"
     if key == "avatar_url":
-        return GITHUB_AVATAR.format(login=speaker)
+        return f"https://github.com/{line['speaker']}.png?size=256"
     return None
-
-
-def _casting_avatars():
-    """``{casting key: portrait URL}``, read once from vocab/casting.yaml.
-
-    Only the URL is taken. A casting record holds a person's authored plate
-    copy as well, and none of that is a chapter file's business: a pill says
-    a name because the owner typed one, and the record is consulted for the
-    picture and nothing else.
-    """
-    global _CASTING_AVATARS
-    if _CASTING_AVATARS is None:
-        import yaml
-        with (REPO_ROOT / "vocab" / "casting.yaml").open(
-                encoding="utf-8") as fh:
-            doc = yaml.safe_load(fh) or {}
-        found = {}
-        for key, record in (doc.get("ensemble", {}).get("titles") or {}).items():
-            if isinstance(record, dict):
-                found[key] = record.get("avatar")
-        for key, binding in (doc.get("leads", {}).get("values") or {}).items():
-            if isinstance(binding, dict):
-                found.setdefault(key, (binding.get("plate") or {})
-                                 .get("avatar"))
-        _CASTING_AVATARS = found
-    return _CASTING_AVATARS
-
-
-_CASTING_AVATARS = None
 
 
 def _portrait(named):
@@ -1156,15 +1143,29 @@ def _portrait(named):
     """
     if not named:
         return None
-    login = named.get("avatar_login")
-    if login:
-        return {"avatar": f"renders/avatars/{login}.png",
-                "avatar_url": GITHUB_AVATAR.format(login=login)}
-    key = named.get("cast")
-    url = _casting_avatars().get(key)
-    if not url:
+    from tools.identity import UnknownPerson, canonical_login, person_for_character
+    try:
+        login = named.get("avatar_login")
+        if login:
+            canonical_login(login)
+            return {"avatar": f"renders/avatars/{login}.png",
+                    "avatar_url": f"https://github.com/{login}.png?size=256"}
+        key = named.get("cast", "")
+        person = person_for_character(key)
+    except UnknownPerson:
         return {}
-    return {"avatar": f"renders/avatars/{key}.png", "avatar_url": url}
+    if person and (person.plate or {}).get("avatar"):
+        return {"avatar": f"renders/avatars/{key}.png",
+                "avatar_url": person.plate["avatar"]}
+    # A raw pre-migration chapter can still carry a historical portrait key.
+    # It is audited as a legacy override and does not identify the speaker.
+    import yaml
+    with (REPO_ROOT / "vocab" / "casting.yaml").open(encoding="utf-8") as fh:
+        legacy = ((yaml.safe_load(fh) or {}).get("ensemble") or {}) \
+            .get("legacy_titles", {}).get(key, {})
+    if not legacy.get("avatar"):
+        return {}
+    return {"avatar": f"renders/avatars/{key}.png", "avatar_url": legacy["avatar"]}
 
 
 def _ordered(entry, order):
@@ -1307,10 +1308,13 @@ def _portrait_row(plate, predicted):
     if predicted.get("avatar") == avatar and predicted.get("avatar_url") == url:
         return None
     key = str(avatar).rsplit("/", 1)[-1].removesuffix(".png")
-    if url == GITHUB_AVATAR.format(login=key):
-        return f"avatar_login: {key}"
-    if _casting_avatars().get(key) == url:
-        return f"cast: {key}"
+    from tools.identity import UnknownPerson, canonical_login
+    try:
+        canonical = canonical_login(key)
+    except UnknownPerson:
+        return None
+    if url == f"https://github.com/{key}.png?size=256":
+        return f"avatar_login: {canonical}"
     return None
 
 

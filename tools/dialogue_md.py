@@ -83,42 +83,26 @@ def parse_tc(text):
 
 
 def _speaker_label(cue, leads):
-    """``Osiris (Bob Killen)`` -- the character, and who is credited for them.
-
-    The person is shown because that is the name the chat card will carry, so
-    the owner is editing what they will actually see.
-    """
+    """The character key and its bound GitHub login."""
     character = cue.get("character") or ""
     entry = leads.get(character) or {}
-    if entry.get("dialogue_label"):
-        return entry["dialogue_label"]
-    person = (entry.get("plate") or {}).get("name") or entry.get("display_name")
-    pretty = character.replace("_", " ").title()
-    return f"{pretty} ({person})" if person else pretty
+    return entry.get("person") or character
 
 
 def _resolve_character(label, leads):
     """A heading's speaker back to a canonical ``leads`` key.
 
-    Accepts the character name, any of its ``aka`` spellings, or the credited
-    person's name, so the owner can retype whichever half they remember.
+    Accepts the character name, any ``aka`` spelling, or its bound login.
     """
     name = re.sub(r"\s*\(.*?\)\s*$", "", label).strip()
     key = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
     for character, entry in leads.items():
-        dialogue_label = re.sub(
-            r"[^a-z0-9]+", "_",
-            str(entry.get("dialogue_label") or "").lower()).strip("_")
-        if key == character or key == dialogue_label or key in {
+        person = re.sub(r"[^a-z0-9]+", "_",
+                        str(entry.get("person") or "").lower()).strip("_")
+        if key == character or key == person or key in {
             re.sub(r"[^a-z0-9]+", "_", a.lower()).strip("_")
             for a in (entry.get("aka") or [])
         }:
-            return character
-        people = {
-            (entry.get("plate") or {}).get("name"),
-            entry.get("display_name"),
-        }
-        if name in {p for p in people if p}:
             return character
     return None
 

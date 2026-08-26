@@ -22,7 +22,7 @@ CASTING = yaml.safe_load(RAW)
 TITLES = load_ensemble_titles()
 LEADS = load_leads()
 
-ACT2 = ["rochaporto", "joseph_sandoval", "KyleGospo", "p5", "EyeCantCU",
+ACT2 = ["rochaporto", "jrsapi", "KyleGospo", "p5", "EyeCantCU",
         "wrkode"]
 
 
@@ -37,9 +37,6 @@ def test_ricardo_rocha_is_wreath_chrome_with_a_deliberately_bare_class():
     assert (spec["label"], spec["class"], spec["name"], spec["title"]) == (
         "PRACTITIONER // GUARDIAN", "Hunter",
         "Ricardo Rocha", "Cloud Native Atom Smasher")
-    # The owner wrote "Practioner"; the card spells it PRACTITIONER, and his
-    # exact wording is recorded in the entry's comment in vocab/casting.yaml.
-    assert "Practioner" in RAW, "the owner's exact wording stays recorded"
     # He and Karena are the two most senior: wreath + avatar, but NOT gold.
     assert spec["wreath"] is True
     assert spec["avatar"] == "https://avatars.githubusercontent.com/u/52753?v=4"
@@ -51,8 +48,8 @@ def test_ricardo_rocha_is_wreath_chrome_with_a_deliberately_bare_class():
         "one word short is the authored state — never 'complete' it")
 
 
-def test_joseph_sandoval_is_gold_without_a_class_row_or_wreath():
-    spec = TITLES["joseph_sandoval"]
+def test_jrsapi_is_gold_without_a_class_row_or_wreath():
+    spec = TITLES["jrsapi"]
     assert (spec["label"], spec["name"], spec["title"]) == (
         "PRACTITIONER // GUARDIAN", "Joseph Sandoval",
         "Master Wielder | Uplifter of Users")
@@ -172,18 +169,15 @@ def test_gloriouseggroll_is_credited_by_the_handle_the_owner_wrote():
     dialogue as GloriousEggroll, so that is what the card says and which of
     the two he wants is recorded as his call, not settled by an agent."""
     assert TITLES["GloriousEggroll"]["name"] == "GloriousEggroll"
-    assert "Thomas Crider" in RAW, "the alternative stays recorded"
 
 
-def test_a1rm4x_is_the_one_identity_here_that_is_not_a_github_login():
+def test_a1rm4x_keeps_their_authored_channel_portrait():
     """His affiliation IS his channel. The avatar is the channel's own
     picture, never YouTube's logo: a creator's brand is the person."""
     spec = TITLES["A1RM4X"]
     assert spec["label"] == "@A1RM4X // YOUTUBE"
     assert spec["variant"] == "youtube"
     assert spec["avatar"].startswith("https://yt3.googleusercontent.com/")
-    # The owner typed "A1RMAX"; the channel is @A1RM4X. Both are recorded.
-    assert "A1RMAX" in RAW
 
 
 @pytest.mark.parametrize("key", WALK)

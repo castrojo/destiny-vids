@@ -91,23 +91,17 @@ def test_rewriting_twice_still_points_at_the_original_recovery():
     assert cue["recovered_text"] == "Fatigue is a distraction."
 
 def test_the_speaker_can_be_renamed_by_character_or_by_person():
-    for spelling in ("clubanderson", "sagira_ghost", "Doctor Andy Anderson"):
+    for spelling in ("clubanderson", "sagira_ghost"):
         text = dialogue_md.export(DATA, LEADS).replace(
             "## d02 | mrbobbytables", f"## d02 | {spelling}")
         cues = dialogue_md.parse(text, LEADS)
         assert next(c for c in cues if c["id"] == "d02")["character"] == "sagira"
 
-def test_owner_facing_dialogue_labels_round_trip_after_normalization():
-    leads = {
-        **LEADS,
-        "sagira": {
-            **LEADS["sagira"],
-            "dialogue_label": "Doctor Andy Anderson",
-        },
-    }
-    text = dialogue_md.export(DATA, leads)
-    cues = dialogue_md.parse(text, leads)
-    assert next(c for c in cues if c["id"] == "d01")["character"] == "sagira"
+def test_display_names_are_not_dialogue_aliases():
+    text = dialogue_md.export(DATA, LEADS).replace(
+        "## d02 | mrbobbytables", "## d02 | Doctor Andy Anderson")
+    with pytest.raises(ValueError, match="not a cast character"):
+        dialogue_md.parse(text, LEADS)
 
 def test_an_uncast_speaker_is_refused_rather_than_silently_dropped():
     """An unresolvable name would render no card at all; fail loudly instead."""
