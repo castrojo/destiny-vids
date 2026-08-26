@@ -357,8 +357,12 @@ def test_the_burn_filter_carries_no_shell_quotes():
     real_run = plate.subprocess.run
     plate.subprocess.run = fake_run
     try:
+        # The runner is the burn's execution seam: with the suite offline
+        # and local ffmpeg prohibited, the argv is handed over and inspected
+        # rather than run.
         plate.burn("in.mp4", [{"id": "x", "at": 1.0, "dur": 2.0}],
-                   "plates", "out.mp4", ffmpeg=["ffmpeg"])
+                   "plates", "out.mp4", ffmpeg=["ffmpeg"],
+                   runner=lambda cmd: seen.setdefault("cmd", cmd))
     finally:
         plate.subprocess.run = real_run
 
@@ -390,7 +394,8 @@ def test_every_plate_input_is_looped_for_the_length_of_the_picture():
     plate.subprocess.run = fake_run
     try:
         plate.burn("in.mp4", [{"id": "x", "at": 269.0, "dur": 2.5}],
-                   "plates", "out.mp4", ffmpeg=["ffmpeg"])
+                   "plates", "out.mp4", ffmpeg=["ffmpeg"],
+                   runner=lambda cmd: seen.setdefault("cmd", cmd))
     finally:
         plate.subprocess.run = real_run
 

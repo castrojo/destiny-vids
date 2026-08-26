@@ -322,8 +322,11 @@ def test_burn_builds_one_enable_gated_overlay_per_plate(tmp_path):
     real = subprocess.run
     subprocess.run = fake_run
     try:
+        # The runner is the burn's execution seam (the farm path passes one
+        # too): the argv is handed over, and this test's subject is the argv.
         plate.burn("in.mp4", [GUARDIAN, GHOST], tmp_path, tmp_path / "out.mp4",
-                   ffmpeg=["ffmpeg"])
+                   ffmpeg=["ffmpeg"],
+                   runner=lambda cmd: captured.setdefault("cmd", cmd))
     finally:
         subprocess.run = real
 

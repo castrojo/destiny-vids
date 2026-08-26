@@ -3,7 +3,20 @@ import math
 
 import pytest
 
-from tools import peaks, redact  # noqa: E402
+from tools import farm, peaks, redact  # noqa: E402
+
+
+def _farm_runs_the_passes(monkeypatch, fake_run):
+    """Put apply() on its farm path with the pod itself faked.
+
+    The suite is offline, and local ffmpeg execution is prohibited
+    (c975ceb), so the drawbox pass's argv is what these tests pin -- the
+    farm boundary is the seam, and the fake pod "runs" each pass through
+    the same fake_run the old local executor fed.
+    """
+    monkeypatch.setattr(farm, "cluster_available", lambda *a, **k: (True, ""))
+    monkeypatch.setattr(farm, "run_ffmpeg_on_cluster",
+                        lambda cmd, **kw: fake_run(cmd))
 
 BOXED = {"id": "logo", "start_sec": 10.0, "end_sec": 20.0, "reason": "logo",
          "boxes": [{"x": 100, "y": 200, "w": 300, "h": 40}]}
@@ -261,7 +274,7 @@ def test_delivered_peak_is_corrected_when_the_encoder_overshoots(monkeypatch, tm
             stderr = ""
         return P()
 
-    monkeypatch.setattr(redact.subprocess, "run", fake_run)
+    _farm_runs_the_passes(monkeypatch, fake_run)
     redact.apply("in.mp4", [], str(tmp_path / "out.mp4"), audio="bed.wav",
                  audio_gain=0.8, ffmpeg=["ffmpeg"], target_dbtp=-1.1)
     # One corrective pass, quieter than the first: 0.3 dBTP is 1.4 dB over.
@@ -283,7 +296,7 @@ def test_a_delivered_file_with_headroom_is_not_re_encoded(monkeypatch, tmp_path)
             stderr = ""
         return P()
 
-    monkeypatch.setattr(redact.subprocess, "run", fake_run)
+    _farm_runs_the_passes(monkeypatch, fake_run)
     redact.apply("in.mp4", [], str(tmp_path / "out.mp4"), audio="bed.wav",
                  audio_gain=0.8, ffmpeg=["ffmpeg"], target_dbtp=-1.1)
     assert len(calls) == 1

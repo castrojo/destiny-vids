@@ -129,11 +129,18 @@ def test_ffprobe_resolves_beside_the_chosen_ffmpeg():
 # --- the cache --------------------------------------------------------------
 
 def _fake_encode(monkeypatch, counter):
-    def fake_run(cmd, **kw):
-        counter.append(" ".join(cmd))
-        Path(cmd[-2]).touch()  # the output sits just before "-y"
-        return subprocess.CompletedProcess(cmd, 0)
-    monkeypatch.setattr(conform.subprocess, "run", fake_run)
+    """Substitute the encode itself, at the posture seam.
+
+    ``_encode`` routes through tools/farm.py (run_ffmpeg_on_cluster, or
+    FarmError when the cluster cannot take it) -- the suite is offline, so
+    the farm boundary is what gets faked. The cache logic these tests pin
+    sits entirely on the near side of it.
+    """
+    def fake_encode(argv, *, src, out, use_farm):
+        counter.append(" ".join(map(str, argv)))
+        Path(out).touch()
+        return out
+    monkeypatch.setattr(conform, "_encode", fake_encode)
 
 
 def _nonconformant_probe(_src):
@@ -210,10 +217,10 @@ def test_a_failed_encode_leaves_no_cache_entry(tmp_path, monkeypatch):
     src = tmp_path / "act.mp4"
     src.write_bytes(b"x")
 
-    def failing_run(cmd, **kw):
-        Path(cmd[-2]).touch()  # a half-written scratch file
-        raise subprocess.CalledProcessError(1, cmd)
-    monkeypatch.setattr(conform.subprocess, "run", failing_run)
+    def failing_encode(argv, *, src, out, use_farm):
+        Path(out).touch()  # a half-written scratch file
+        raise subprocess.CalledProcessError(1, argv)
+    monkeypatch.setattr(conform, "_encode", failing_encode)
 
     with pytest.raises(subprocess.CalledProcessError):
         conform.ensure(src, out_dir=tmp_path / "cache",

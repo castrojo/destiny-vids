@@ -13,8 +13,22 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-    
+
+from tools import farm  # noqa: E402
 from tools import render  # noqa: E402
+
+
+def _farm_encode_records(monkeypatch, calls):
+    """Stand in for the farm boundary, recording every encode's argv.
+
+    render.py's executors route through ``tools.farm.run_encode`` (the
+    cluster, or FarmError when it cannot take the job). The suite is
+    offline, so tests whose subject is the argv -- the codec, the gain, the
+    concat list -- record what run_encode was asked to run instead of
+    running it.
+    """
+    monkeypatch.setattr(farm, "run_encode",
+                        lambda argv, **kw: calls.append(argv) or "cluster")
 
 @pytest.fixture(autouse=True)
 def _clear_env(monkeypatch):
@@ -86,14 +100,14 @@ def test_concat_list_is_written_beside_output_not_tmp(tmp_path, monkeypatch):
     """A containerized ffmpeg only sees the bind-mounted home, never /tmp."""
     seen = {}
 
-    def fake_run(cmd, check=False):
-        idx = cmd.index("-i")
-        list_path = Path(cmd[idx + 1])
+    def fake_encode(argv, **kw):
+        idx = argv.index("-i")
+        list_path = Path(argv[idx + 1])
         seen["dir"] = list_path.parent
         seen["contents"] = list_path.read_text()
-        return None
+        return "cluster"
 
-    monkeypatch.setattr(render.subprocess, "run", fake_run)
+    monkeypatch.setattr(farm, "run_encode", fake_encode)
     workdir = tmp_path / "work"
     workdir.mkdir()
     clips = [tmp_path / "a.mp4", tmp_path / "b.mp4"]
@@ -217,12 +231,7 @@ def test_a_muted_render_is_never_measured(monkeypatch, tmp_path):
 def test_concat_applies_the_correction_as_a_static_volume_filter(monkeypatch, tmp_path):
     """The corrective pass is a plain volume= scale, not a dynamics filter."""
     seen = []
-
-    def fake_run(cmd, check=False):
-        seen.append(cmd)
-        return None
-
-    monkeypatch.setattr(render.subprocess, "run", fake_run)
+    _farm_encode_records(monkeypatch, seen)
     render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
                   workdir=tmp_path, audio_gain=0.95)
     cmd = seen[0]
@@ -234,15 +243,19 @@ def test_concat_applies_the_correction_as_a_static_volume_filter(monkeypatch, tm
 def test_concat_with_a_bed_gains_the_bed(monkeypatch, tmp_path):
     seen = []
 
-    def fake_run(cmd, check=False):
+    def fake_run(cmd, **kw):
         seen.append(cmd)
         return None
 
+    # The bed-length check probes through subprocess; the encode itself went
+    # through the farm boundary, which is faked separately.
     monkeypatch.setattr(render.subprocess, "run", fake_run)
+    encoded = []
+    _farm_encode_records(monkeypatch, encoded)
     render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
                   audio_bed=tmp_path / "bed.wav", workdir=tmp_path,
                   audio_gain=0.95)
-    cmd = seen[0]
+    cmd = encoded[0]
     assert "volume=0.95" in cmd[cmd.index("-af") + 1]
     assert cmd[cmd.index("-map") + 1] == "0:v:0"
     assert "1:a:0" in cmd
@@ -255,8 +268,7 @@ def test_concat_with_a_bed_gains_the_bed(monkeypatch, tmp_path):
 
 def test_a_cut_clip_carries_pcm_not_a_lossy_generation(monkeypatch):
     calls = []
-    monkeypatch.setattr(render.subprocess, "run",
-                        lambda cmd, **kw: calls.append(cmd))
+    _farm_encode_records(monkeypatch, calls)
     render.cut_clip(["ffmpeg"], "src.mp4", 1.0, 2.0, "out.mkv", keep_audio=True)
     cmd = calls[0]
     assert cmd[cmd.index("-c:a") + 1] == "pcm_s24le"
@@ -266,8 +278,7 @@ def test_a_still_carries_pcm_too(monkeypatch):
     """A still takes the slot a dropped shot left behind, so its audio has to
     be indistinguishable from a cut clip's to the concat demuxer."""
     calls = []
-    monkeypatch.setattr(render.subprocess, "run",
-                        lambda cmd, **kw: calls.append(cmd))
+    _farm_encode_records(monkeypatch, calls)
     render.still_clip(["ffmpeg"], "a.png", 2.0, "out.mkv", keep_audio=True)
     cmd = calls[0]
     assert cmd[cmd.index("-c:a") + 1] == "pcm_s24le"
@@ -284,13 +295,15 @@ def test_the_join_delivers_a_lossless_bed(monkeypatch, tmp_path):
     calls = []
     monkeypatch.setattr(render.subprocess, "run",
                         lambda cmd, **kw: calls.append(cmd))
+    encoded = []
+    _farm_encode_records(monkeypatch, encoded)
     render.concat(["ffmpeg"], [tmp_path / "clip_001.mkv"], tmp_path / "out.mp4",
                   audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
     # concat is no longer the only thing that shells out: the bed-length check
     # probes first, and `find_ffprobe` asks podman whether the container is up.
     # That probe degrades to a no-op here (no ffprobe is reachable), but it is
     # still a recorded call, so pick the join rather than assuming it is first.
-    cmd = next(c for c in calls if "concat" in c)
+    cmd = next(c for c in calls + encoded if "concat" in c)
     assert cmd[cmd.index("-c:a") + 1] == "flac"
     assert "-b:a" not in cmd, "a lossless codec has no bitrate to state"
 
@@ -298,8 +311,7 @@ def test_the_join_states_the_codec_even_with_no_bed(monkeypatch, tmp_path):
     """The clips now carry PCM, so leaving the codec to the container's default
     would put the lossy generation straight back."""
     calls = []
-    monkeypatch.setattr(render.subprocess, "run",
-                        lambda cmd, **kw: calls.append(cmd))
+    _farm_encode_records(monkeypatch, calls)
     render.concat(["ffmpeg"], [tmp_path / "clip_001.mkv"], tmp_path / "out.mp4",
                   workdir=tmp_path)
     cmd = calls[0]
@@ -403,17 +415,20 @@ def test_a_bed_longer_than_the_cut_is_fine(monkeypatch, tmp_path):
     calls = []
     monkeypatch.setattr(render.subprocess, "run",
                         lambda cmd, **kw: calls.append(cmd))
+    encoded = []
+    _farm_encode_records(monkeypatch, encoded)
     lengths = {"bed.wav": 600.0, "a.mp4": 6.0}
     monkeypatch.setattr(render, "probe_media_duration",
                         lambda p, ffmpeg=None: lengths[Path(p).name])
 
     render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",
                   audio_bed=tmp_path / "bed.wav", workdir=tmp_path)
-    assert any("concat" in c for c in calls)
+    assert any("concat" in c for c in encoded)
 
 def test_a_bed_a_frame_short_is_rounding_not_a_truncation(monkeypatch, tmp_path):
     """The sum is per-clip, so the comparison carries a little slack."""
     monkeypatch.setattr(render.subprocess, "run", lambda cmd, **kw: None)
+    _farm_encode_records(monkeypatch, [])
     lengths = {"bed.wav": 5.98, "a.mp4": 6.0}
     monkeypatch.setattr(render, "probe_media_duration",
                         lambda p, ffmpeg=None: lengths[Path(p).name])
@@ -424,6 +439,7 @@ def test_a_bed_a_frame_short_is_rounding_not_a_truncation(monkeypatch, tmp_path)
 def test_an_unmeasurable_bed_does_not_block_the_render(monkeypatch, tmp_path):
     """No ffprobe is not the same as a wrong length -- degrade, never block."""
     monkeypatch.setattr(render.subprocess, "run", lambda cmd, **kw: None)
+    _farm_encode_records(monkeypatch, [])
     monkeypatch.setattr(render, "probe_media_duration",
                         lambda p, ffmpeg=None: None)
 
@@ -436,6 +452,7 @@ def test_no_bed_means_no_length_check(monkeypatch, tmp_path):
         raise AssertionError("probed with no bed")
 
     monkeypatch.setattr(render.subprocess, "run", lambda cmd, **kw: None)
+    _farm_encode_records(monkeypatch, [])
     monkeypatch.setattr(render, "probe_media_duration", boom)
 
     render.concat(["ffmpeg"], [tmp_path / "a.mp4"], tmp_path / "out.mp4",

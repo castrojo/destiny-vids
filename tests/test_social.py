@@ -83,19 +83,14 @@ def test_an_over_cap_encode_still_writes_its_source_digest(
     src.write_bytes(b"source")
     monkeypatch.setattr(social, "source_facts", lambda _p: {
         "width": 1920, "height": 1080, "fps": "30/1", "duration": 30.0})
-    monkeypatch.setattr(social.farm, "cluster_available", lambda: (False, "x"))
-    # No ffmpeg on the CI runner; the encode itself is faked below.
-    monkeypatch.setattr("tools.render.find_ffmpeg", lambda: ["ffmpeg"])
+    # The encode is the farm's (local ffmpeg is prohibited), so the pod is
+    # faked -- and writes a file over the cap.
+    monkeypatch.setattr(social.farm, "cluster_available", lambda: (True, ""))
 
-    def fake_run(cmd, **k):
-        class R:
-            returncode = 0
-            stdout = ""
-            stderr = ""
+    def remote(cmds, *, inputs, out, expected_duration, label):
         out.write_bytes(b"0" * (social.MIB * 11))  # over cap
-        return R()
 
-    monkeypatch.setattr(social.subprocess, "run", fake_run)
+    monkeypatch.setattr(social.farm, "run_ffmpeg_commands_on_cluster", remote)
     assert social.main([str(src), "--out", str(out)]) == 1
     stamp = out.with_suffix(out.suffix + ".source.md5")
     assert stamp.read_text().strip() == social.source_digest(src)

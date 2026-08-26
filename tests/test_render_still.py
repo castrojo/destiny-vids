@@ -12,6 +12,7 @@ import subprocess
 
 import pytest
 
+from tools import farm
 from tools import render
 
 
@@ -43,8 +44,19 @@ def _streams(ffmpeg, path):
 
 
 @pytest.mark.parametrize("keep_audio", [True, False])
-def test_still_matches_cut_clip_and_concats(tmp_path, keep_audio):
+def test_still_matches_cut_clip_and_concats(tmp_path, keep_audio, monkeypatch):
     ffmpeg = _ffmpeg()
+
+    # The render executors route through tools.farm.run_encode, and the suite
+    # has no cluster. This test's subject is the argv ITSELF -- that a cut
+    # clip and a still really encode to joinable streams -- so the fake farm
+    # runs the very argv the pod would have run, on the ffmpeg already
+    # resolved above. The farm posture has its own tests; what must not be
+    # faked here is the encode.
+    def fake_run_encode(argv, **kw):
+        subprocess.run([str(t) for t in argv], check=True)
+        return "cluster"
+    monkeypatch.setattr(farm, "run_encode", fake_run_encode)
 
     # A synthetic source stands in for footage: the repo ships no media.
     src = tmp_path / "src.mp4"

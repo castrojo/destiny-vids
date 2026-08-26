@@ -647,6 +647,16 @@ def _run_fake_ffmpeg(monkeypatch):
     monkeypatch.setattr(megacut.conform, "ensure",
                         lambda src, **kw: (Path(src), "conforms"))
 
+    # The farm boundary too: with the suite's cluster stubbed offline,
+    # run_encode would raise FarmError at the first ENCODE segment. These
+    # tests pin the VERIFY logic, not the posture (tools/farm.py has its own
+    # tests for that), so the encode "succeeds" and writes its output --
+    # the same fiction the subprocess fake provides for remuxes.
+    def fake_run_encode(argv, *, inputs, out, **kw):
+        Path(out).touch()
+        return "cluster"
+    monkeypatch.setattr(megacut.farm, "run_encode", fake_run_encode)
+
 
 def test_a_retimed_segment_fails_the_build(tmp_path, monkeypatch):
     """The #88 regression test: a segment whose picture is 8.5 s short of its
@@ -944,12 +954,26 @@ def test_farm_mode_sends_encode_segments_to_the_cluster_only(tmp_path, monkeypat
     assert sorted(verified) == [0, 1, 2], "copy AND farm segments verify"
 
 
-def test_no_farm_means_everything_stays_local(tmp_path, monkeypatch):
-    _, farmed, _ = _assemble_with_fakes(tmp_path, monkeypatch, [
+def test_no_farm_and_an_unreachable_cluster_stops_with_the_reason(
+        tmp_path, monkeypatch):
+    """'No farm' used to mean 'everything stays local'. The owner's ruling
+    of 2026-08-25 (c975ceb) prohibits local ffmpeg execution, so with the
+    farm pool off and the cluster unreachable the first ENCODE segment
+    raises FarmError naming why -- and nothing encodes on this host."""
+    _, plan = _plan(tmp_path, [
         {"kind": "card", "image": "c.png", "dur": 5.0},
         {"kind": "clip", "path": "b.mp4", "audio": "source", "trim_to": 7.0},
     ])
-    assert farmed == []
+    # The posture is NOT faked here: the REAL run_encode probes the suite's
+    # (stubbed-offline) cluster and must refuse.
+    real_run_encode = megacut.farm.run_encode
+    _run_fake_ffmpeg(monkeypatch)
+    monkeypatch.setattr(megacut.farm, "run_encode", real_run_encode)
+
+    with pytest.raises(megacut.farm.FarmError, match="cluster is not "
+                       "reachable"):
+        megacut.assemble(plan, tmp_path / "out.mp4", jobs=1)
+    assert not (tmp_path / "out.mp4").exists()
 
 
 def test_a_farm_failure_fails_the_build_before_the_join(tmp_path, monkeypatch):
@@ -990,16 +1014,21 @@ def test_remote_is_the_default_when_the_cluster_is_reachable(tmp_path, monkeypat
     assert "--local" in err, "the escape hatch is advertised in the output"
 
 
-def test_an_unreachable_cluster_falls_back_with_a_stated_reason(tmp_path, monkeypatch, capsys):
-    """The bug the owner caught was a SILENT local default: the fallback must
-    say why, in the output, every time."""
+def test_an_unreachable_cluster_stops_with_a_stated_reason(tmp_path, monkeypatch, capsys):
+    """The bug the owner caught was a SILENT local default; the 2026-08-25
+    ruling then removed the local path entirely. Both halves land on the
+    same rule: an unreachable cluster is LOUD -- the reason is stated, and
+    the encode stops rather than running on this host."""
     seen, err = _main_with_fake_cluster(tmp_path, monkeypatch, capsys, [],
                                         (False, "kubectl not on PATH"))
     assert seen["use_farm"] is False
     assert "UNREACHABLE" in err and "kubectl not on PATH" in err
 
 
-def test_local_forces_local_even_with_a_healthy_cluster(tmp_path, monkeypatch, capsys):
+def test_local_is_rejected_without_even_asking_the_cluster(tmp_path, monkeypatch):
+    """--local used to force a workstation encode; the owner's 2026-08-25
+    ruling prohibits local ffmpeg execution, so the flag is now rejected
+    outright -- and the rejection never probes the cluster."""
     calls = []
 
     def recording_available(*a, **k):
@@ -1007,21 +1036,22 @@ def test_local_forces_local_even_with_a_healthy_cluster(tmp_path, monkeypatch, c
         return (True, "")
     monkeypatch.setattr(megacut.farm, "cluster_available", recording_available)
     monkeypatch.setattr(megacut, "stale_seated_acts", lambda plan: [])
-    seen = {}
     monkeypatch.setattr(megacut, "assemble",
-                        lambda plan, out_path, **kw: seen.update(kw))
+                        lambda plan, out_path, **kw:
+                        pytest.fail("assembled under --local"))
     plan_path, _ = _plan(tmp_path, [
         {"kind": "clip", "path": "a.mp4", "audio": "source", "dur": 3.0},
     ])
-    megacut.main([str(plan_path), "--local"])
-    assert seen["use_farm"] is False
-    assert calls == [], "--local never even asks the cluster"
-    assert "--local given" in capsys.readouterr().err
+    with pytest.raises(SystemExit, match="prohibited"):
+        megacut.main([str(plan_path), "--local"])
+    assert calls == [], "--local is rejected without asking the cluster"
 
 
-def test_farm_flag_on_an_unreachable_cluster_still_ships_locally(tmp_path, monkeypatch, capsys):
-    """Degrade, never block: --farm pins the posture, it does not turn a
-    down cluster into no video."""
+def test_farm_flag_on_an_unreachable_cluster_states_the_outage(tmp_path, monkeypatch, capsys):
+    """--farm pins the posture; with the cluster down the build does not
+    silently change executors. The outage is stated, and the encode then
+    stops with the reason at the first segment -- local ffmpeg execution is
+    prohibited, so there is nothing to fall back TO."""
     seen, err = _main_with_fake_cluster(tmp_path, monkeypatch, capsys,
                                         ["--farm"], (False, "no route to host"))
     assert seen["use_farm"] is False

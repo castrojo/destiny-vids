@@ -2,6 +2,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import build_prologue
 
@@ -109,22 +111,36 @@ def test_the_cluster_uploads_carry_every_card_the_filtergraph_overlays(monkeypat
             assert Path(nxt).name in staged, f"{nxt} is read but never staged"
 
 
-def test_a_failed_cluster_encode_falls_back_instead_of_blocking_the_release(monkeypatch):
-    """AGENTS.md: nothing blocks a release. The farm going down is a reason to
-    say so on stderr and encode here, never a reason to hand back no picture."""
+def test_a_failed_cluster_encode_stops_with_the_reason_and_runs_nothing_locally(monkeypatch):
+    """Owner ruling, 2026-08-25 (c975ceb): local ffmpeg execution is
+    prohibited. A farm that fails mid-encode is NOT a fallback -- the build
+    stops with the cluster's reason, and nothing runs on this host."""
     def boom(argv, **kw):
         raise build_prologue.farm.FarmError("workflow Failed")
 
-    ran = []
     monkeypatch.setattr(build_prologue.farm, "cluster_available",
                         lambda: (True, ""))
     monkeypatch.setattr(build_prologue.farm, "run_ffmpeg_on_cluster", boom)
     monkeypatch.setattr(build_prologue.subprocess, "run",
-                        lambda argv, **kw: ran.append(argv))
+                        lambda *a, **kw: pytest.fail("a local encode ran"))
+    monkeypatch.setattr(build_prologue.farm, "run_capped_local",
+                        lambda *a, **kw: pytest.fail("the local fallback ran"))
 
-    where = build_prologue.encode(["ffmpeg", "-i", "x"], Path("d.png"), Path("n.png"))
-    assert where == "local"
-    assert ran == [["ffmpeg", "-i", "x"]], "the fallback runs the identical argv"
+    with pytest.raises(build_prologue.farm.FarmError, match="workflow Failed"):
+        build_prologue.encode(["ffmpeg", "-i", "x"], Path("d.png"), Path("n.png"))
+
+
+def test_an_unreachable_cluster_stops_with_the_reason_too(monkeypatch):
+    """The other outage shape: no cluster at all. Same contract -- FarmError
+    naming why, and no local execution."""
+    monkeypatch.setattr(build_prologue.farm, "cluster_available",
+                        lambda: (False, "kubectl not on PATH"))
+    monkeypatch.setattr(build_prologue.subprocess, "run",
+                        lambda *a, **kw: pytest.fail("a local encode ran"))
+
+    with pytest.raises(build_prologue.farm.FarmError,
+                       match="kubectl not on PATH"):
+        build_prologue.encode(["ffmpeg", "-i", "x"], Path("d.png"), Path("n.png"))
 
 
 def test_every_stream_the_filtergraph_reads_has_an_input_behind_it(monkeypatch):
