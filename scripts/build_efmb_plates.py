@@ -140,6 +140,7 @@ OWNER_PASS_OFFSET = 266.5
 TRIO = [
     ("joseph_sandoval", "left", 177.0),
     ("rochaporto", "center", 179.0),
+    ("mara_sov", "right", 183.0),
 ]
 
 # --- THE OPENING BLACK-HEAD CARD ------------------------------------------
@@ -161,6 +162,14 @@ OPENING_HEAD_CARD = {
         "It all started with Kubernetes.",
     ],
 }
+
+# ONE L. The README says "Karena Angel" and the owner said it again this round
+# ("add karena (Angel, one L)"). vocab/casting.yaml spells it "Angell", and it
+# is a committed input to six delivered acts (#167), so correcting it there
+# marks every one of them stale. The correction is applied HERE, to the copy
+# this act prints, and recorded in `unresolved` -- a person's name is not
+# something to leave wrong while waiting for a freeze to lift.
+NAME_CORRECTIONS = {"mara_sov": ("Karena Angell", "Karena Angel")}
 
 # --- THE OPENING NAMEPLATES -------------------------------------------------
 #
@@ -742,7 +751,8 @@ WALK_SEQUENCE = [
     # keeps all seven lines below, which name him as the speaker.
     # TODO(owner): if he should carry a nameplate here, say which shot is him.
     # ANCHORED, not chained. With the plate gone this block would chain off the
-    # chapter card and slide 4.65 s earlier. 185.183 is the source frame that maps to film
+    # chapter card and slide 4.65 s earlier -- straight into Karena's jump zone
+    # (clamp_hold raises on it). 185.183 is the source frame that maps to film
     # 161.317, which is exactly where this line already plays, so removing the
     # nameplate above moves his dialogue not at all.
     {"cue": "line", "id": "walk_ge_1", "speaker": "GloriousEggroll",
@@ -1045,6 +1055,9 @@ NO_PLATE_SRC = [
     # exists for exactly that, and it protects the beat from every future cue
     # rather than from the one that happened to hit it.
     #
+    # 166.299 -> 167.766 is her shot, measured (film 148.533 -> 150.000).
+    (166.299, 167.766, "Karena's jump -- the beat is the jump, and no card "
+                       "belongs on it"),
     # Bungie burns "BECOME LEGEND" over the cave at the end of run 2, fading in
     # around 172.5 and holding to the cut. The act removes a DIFFERENT instance
     # of this same title (build_efmb.REMOVED names 244.833 -> 246.100); this one
@@ -1079,6 +1092,9 @@ def clamp_hold(at, hold, film_of):
             # END BEFORE THE ZONE, NOT ON IT. `start - at` lands the cue's last
             # frame on the zone's FIRST frame -- which is the frame the zone
             # exists to protect. That off-by-one is why the Long Walk card kept
+            # captioning Karena's jump (#184, #192): it was clamped to 2.300 s,
+            # ending at 148.533, the exact frame she jumps on. _zones already
+            # backs the zone's END off by a hair; the START needs the same.
             hold = round(start - at - ZONE_GUARD, 3)
     return hold if hold >= MIN_HOLD else None
 
@@ -1165,6 +1181,22 @@ def blueberry_entry(item, at, dur, casting):
     if copy.get("title"):
         entry["title"] = copy["title"]
     return entry
+
+
+def _corrected(key, copy):
+    """Apply an owner-stated spelling of somebody's name to this act's copy.
+
+    Reproducing authored copy is the rule; this is the one case where the
+    AUTHOR has since corrected it and the file it lives in is frozen. The
+    correction is keyed on the exact string it replaces, so if the vocab is
+    ever fixed this silently stops applying instead of double-correcting.
+    """
+    want = NAME_CORRECTIONS.get(key)
+    if not want or copy.get("name") != want[0]:
+        return copy
+    copy = dict(copy)
+    copy["name"] = want[1]
+    return copy
 
 
 def localise_avatar(key, copy):
@@ -1444,7 +1476,7 @@ def build():
             "order": order,
             "copy_source": "casting",
             "seen_at_src": TRIO_IN,
-            **localise_avatar(key, authored_copy(key, casting)),
+            **localise_avatar(key, _corrected(key, authored_copy(key, casting))),
         })
 
     # --- the opening nameplates (Brent's and Joe's slots stay empty) -------
@@ -1868,8 +1900,9 @@ def build():
         mapped_cursor = round(at + spec["hold"] + spec.get("gap_after", PLATE_GAP), 3)
 
     mapped_unresolved.append(
-        "the owner conversation at 231.500 keeps only joseph; krook and both "
-        "rochaporta lines were removed by the owner")
+        "the owner conversation at 231.500 now keeps only karena and joseph; "
+        "krook and both rochaporta lines were removed by the owner. Karena's "
+        "chat uses github.com/karena, as explicitly supplied this round")
 
     # --- the later owner pass (megacut 5:59 -> 6:56) ----------------------
     late_unresolved = []
@@ -2018,7 +2051,7 @@ def build():
             entry["why"] = spec["why"]
             entry.update(localise_avatar(
                 spec["key"],
-                authored_copy(spec["key"], casting)))
+                _corrected(spec["key"], authored_copy(spec["key"], casting))))
         mapped_tail.append(entry)
 
     # The newer 8:28 pass replaces the old gaslighting pill. Its authored copy
@@ -2101,6 +2134,10 @@ def build():
             "the descent' is an EDIT instruction, not a plate: the menu ends "
             "at 88.533 and whatever the film already cuts to is what plays. "
             "TODO(owner): confirm the shot after it is the one meant",
+            "vocab/casting.yaml spells Karena's surname 'Angell'; the README "
+            "and the owner both say 'Angel', one L. Act II prints the "
+            "correction (NAME_CORRECTIONS) rather than editing the vocab, "
+            "which is a committed input to six delivered acts (#167)",
             "the two contributors who held the shots 'The Long Walk' took "
             "(HuntedRaven7 at source 195.267 and hanthor at 233.500) are no "
             "longer credited in act II. The owner's instruction for the "
@@ -2178,10 +2215,17 @@ def build():
             "the brief names the same person two ways -- 'Jorge Castro' in "
             "the montage and 'jorge' at 4:51. Both are reproduced verbatim; "
             "the pill's own chrome uppercases the speaker row",
+            "Karena's jump carries no card ('the beat is the jump'): it is "
+            f"{JUMP_BEAT}s of clear screen between Joseph's DO line and "
+            "Ricardo's answer. No shot was verified as HER jump and picking "
+            "one would be casting by inference -- TODO(owner): the frame",
             "the later owner-timed 6:56 question replaces the earlier five "
             "closing quotes on the black tail. The tail still plays black by "
             "the owner's standing decision; the new seat is the question, "
             "not the quote spread",
+            "the 6:56 question maps to film 149.500 inside Karena's protected "
+            "jump. It lands at the first clean frame, 150.000, rather than "
+            "captioning the beat",
             "the newer 5:59 -> 6:14 owner pass replaces the older Joseph "
             "master/got-this pair and the two montage asides on the same face "
             "shots. Their authored strings remain in this generator, but only "

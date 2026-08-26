@@ -136,7 +136,7 @@
     {
       "id": "trio_joseph_sandoval",
       "at": 55.433,
-      "dur": 6.0,
+      "dur": 10.0,
       "position": "left",
       "scale": 0.62,
       "group": "trio_row",
@@ -153,7 +153,7 @@
     {
       "id": "trio_rochaporto",
       "at": 57.433,
-      "dur": 4.0,
+      "dur": 8.0,
       "position": "center",
       "scale": 0.62,
       "group": "trio_row",
@@ -169,6 +169,23 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
     },
     {
+      "id": "trio_mara_sov",
+      "at": 61.433,
+      "dur": 4.0,
+      "position": "right",
+      "scale": 0.62,
+      "group": "trio_row",
+      "order": 2,
+      "copy_source": "casting",
+      "seen_at_src": 72.0,
+      "label": "ARCHON // CONTRIBUTOR",
+      "class": "Stasis Warlock",
+      "name": "Karena Angel",
+      "title": "Architect of the Consensus",
+      "variant": "leader",
+      "wreath": true
+    },
+    {
       "id": "chat_joseph_slop",
       "at": 70.433,
       "dur": 2.6,
@@ -179,6 +196,16 @@
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/joseph_sandoval.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+    },
+    {
+      "id": "chat_karena_job",
+      "at": 77.433,
+      "dur": 2.6,
+      "kind": "chat",
+      "copy_source": "owner_supplied",
+      "speaker": "Karena",
+      "text": "I love this job",
+      "text_source": "owner_supplied"
     },
     {
       "id": "choice_lfx_00",
@@ -1615,6 +1642,18 @@
       "avatar_url": "https://github.com/jrsapi.png?size=256"
     },
     {
+      "id": "late_karena_cardio",
+      "at": 107.5,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "karena",
+      "text": "Like cardio!",
+      "text_source": "owner_supplied",
+      "seen_at_src": 125.266
+    },
+    {
       "id": "late_metrics_mentoring",
       "at": 110.2,
       "dur": 2.8,
@@ -1650,6 +1689,18 @@
       "text_source": "owner_supplied"
     },
     {
+      "id": "late_karena_lessons",
+      "at": 123.5,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "karena",
+      "text": "Hit 'em with your lessons learned",
+      "text_source": "owner_supplied",
+      "seen_at_src": 141.266
+    },
+    {
       "id": "late_rochaporto_cern",
       "at": 125.95,
       "dur": 2.6,
@@ -1676,6 +1727,17 @@
       "seen_at_src": 152.266,
       "avatar": "renders/avatars/jrsapi.png",
       "avatar_url": "https://github.com/jrsapi.png?size=256"
+    },
+    {
+      "id": "toc_karena",
+      "at": 137.533,
+      "dur": 3.2,
+      "kind": "chat",
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "Karena",
+      "text": "One hundred thousand bootc volunteers, ready to power up",
+      "text_source": "owner_supplied"
     },
     {
       "id": "top_banner_ogc_1",
@@ -2033,6 +2095,20 @@
       "text_source": "owner_supplied"
     },
     {
+      "id": "owner_convo_karena",
+      "at": 231.5,
+      "dur": 2.867,
+      "kind": "chat",
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "karena",
+      "text": "The Kube always seeks open source potential",
+      "text_source": "owner_supplied",
+      "seen_at_src": 300.0,
+      "avatar": "renders/avatars/karena.png",
+      "avatar_url": "https://github.com/karena.png?size=256"
+    },
+    {
       "id": "owner_convo_joseph",
       "at": 234.617,
       "dur": 3.6,
@@ -2129,6 +2205,19 @@
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/kolunmi.png",
       "avatar_url": "https://github.com/kolunmi.png?size=256"
+    },
+    {
+      "id": "mapped_karena_pve",
+      "at": 265.733,
+      "dur": 3.0,
+      "kind": "chat",
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "speaker": "karena",
+      "text": "Don't look at me I only put PvE on Legendary",
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/karena.png",
+      "avatar_url": "https://github.com/karena.png?size=256"
     },
     {
       "id": "mapped_cam_noone",
@@ -2700,12 +2789,13 @@
   "unresolved": [
     "the Bazzite/Xbox achievement gag is BUILT BUT NOT SCHEDULED: the owner asked to approve the strings before anything is burned. Proposed, one per measured explosion -- Mailing List Bullshit (100 G, owner_supplied); Sent It Upstream (10 G, proposed); Maintainer Said NAK (25 G, proposed); Carried Out of Tree Since 2019 (50 G, proposed). Only 'Mailing List Bullshit' is his. Flip WALK_ACHIEVEMENTS_APPROVED in scripts/build_efmb_plates.py once he has said yes.",
     "walk_A1RM4X is owner-timed to Act II film 171.801, but the card or line before it clears at 171.950, so it lands there instead. The order is the owner's; only the gap is the timeline's",
-    "the owner conversation at 231.500 keeps only joseph; krook and both rochaporta lines were removed by the owner",
+    "the owner conversation at 231.500 now keeps only karena and joseph; krook and both rochaporta lines were removed by the owner. Karena's chat uses github.com/karena, as explicitly supplied this round",
     "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for now.' Three blocks went with him -- the four ranked montage cards, the two TOC payoff cards ('It's totally NOT like this' and 'Have you met our Ambassadors?'), and the eyebrow on Natewaddington's placard. Every string is still in git; 'for now' means this is a revert, not a rewrite",
     "SARAH NOVOTNY'S SEAT WENT TO RICARDO ROCHA, owner 2026-08-20: 'move rochoporto's nameplate introduction to where novotny is, this hunter is now rochaporto'. Unlike Brent Burns and Joe Beda the same day, she was NOT ordered out -- her authored record stays in vocab/casting.yaml and she is owed a seat nobody has named yet",
     "NATEWADDINGTON IS OUT, owner: 'get rid of the nate wassington in the endless climax in endless'. His placard stood at film 260.000 (4:20) -- centre frame, the last card before the 269.700 downbeat the act climaxes on. Only the scheduling went: his two authored rows are still in git, nothing moved into the slot, and he is owed a credit somewhere nobody has decided yet",
     "the choice screen is a full-frame PAUSE MENU over MOVING picture: the owner asked to 'pause here to let the player decide', and a real freeze-frame has to be cut into the film itself, which moves every timecode after it. TODO(owner): whether the 1.5s teaser is enough or the picture should stop",
     "'Then just cut to the shot of them firing' / 'then it cuts to the descent' is an EDIT instruction, not a plate: the menu ends at 88.533 and whatever the film already cuts to is what plays. TODO(owner): confirm the shot after it is the one meant",
+    "vocab/casting.yaml spells Karena's surname 'Angell'; the README and the owner both say 'Angel', one L. Act II prints the correction (NAME_CORRECTIONS) rather than editing the vocab, which is a committed input to six delivered acts (#167)",
     "the two contributors who held the shots 'The Long Walk' took (HuntedRaven7 at source 195.267 and hanthor at 233.500) are no longer credited in act II. The owner's instruction for the chapter is 'No other guardians'; they are owed a credit elsewhere and nobody has decided where",
     "William Rizzo and Ahmed Adan lose their act II badges to the same instruction. Rizzo's authored copy stays in vocab/casting.yaml and Ahmed stays in ensemble.placeholders, so only the scheduling went",
     "GloriousEggroll's name row is the handle he was written in as; GitHub records him as Thomas Crider. Which goes on the card is the owner's call",
@@ -2727,7 +2817,9 @@
     "the Kyle and kolunmi pills land at film 335.650 and 338.100 after Amber's conversation and Bungie's burned-in 'NEW LEGENDS WILL RISE' zone. The order and copy are the owner's; the protected publisher-title gap moves the seats",
     "KyleGospo's mapped reveal sits on his verified source-335.267 Sentinel shot at film 314.237, after Amber's sequence",
     "the brief names the same person two ways -- 'Jorge Castro' in the montage and 'jorge' at 4:51. Both are reproduced verbatim; the pill's own chrome uppercases the speaker row",
+    "Karena's jump carries no card ('the beat is the jump'): it is 1.5s of clear screen between Joseph's DO line and Ricardo's answer. No shot was verified as HER jump and picking one would be casting by inference -- TODO(owner): the frame",
     "the later owner-timed 6:56 question replaces the earlier five closing quotes on the black tail. The tail still plays black by the owner's standing decision; the new seat is the question, not the quote spread",
+    "the 6:56 question maps to film 149.500 inside Karena's protected jump. It lands at the first clean frame, 150.000, rather than captioning the beat",
     "the newer 5:59 -> 6:14 owner pass replaces the older Joseph master/got-this pair and the two montage asides on the same face shots. Their authored strings remain in this generator, but only the newer dialogue reaches the frame",
     "Joseph's 'DO' and siosm's 'powering up' carry authored emphasis; the pill's message row is set bold throughout (the site's own style), so both ARE bold on screen but not differentiated. siosm's asterisks are emphasis markup and are stripped, not burned. An accent-colour emphasis would be chrome nobody authored",
     "the letterbox callout runs 2:19 -> the last frame, where the brief's scene starts, ducking only the patch-queue HUD's 28.4 s (its card already occupies the bar's bottom-right; measured, not aesthetic). 'The whole song' could also mean from 0:00, from the pill that first asks it (1:43.5), or with NO duck -- that costs shrinking it to ticker height for the whole film. TODO(owner)",

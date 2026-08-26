@@ -121,6 +121,10 @@ You need to apply, check your email, focus!
 
 We need to get a message to the CNCF Maintainers
 
+## d23a | angellk | 2:14.64 -> 2:16.11
+
+Check your email smartass
+
 ## d23b | clubanderson | 2:16.12 -> 2:17.59
 
 I don't like this plan

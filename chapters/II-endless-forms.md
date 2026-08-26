@@ -132,14 +132,19 @@ moment is a guess. <<
   - position: null
 
     Owner brief, this round: "03:12 chat bubble for Joseph: That explains
-    the slop". Megacut marks; this is the programme seat it lands on. The
-    line was "Here comes the slop" until
+    the slop / 03:19 karena: I love this job". Megacut marks; these are the
+    programme seats they land on. The line was "Here comes the slop" until
     2026-08-23, when he revised the brief above it -- it answers the new
     glider banter now, so the pill follows the brief. He also asked for Joseph's "Master your
     skills" and "You got this" one second apart at 3:39 and 3:40 — a pill
     needs 2.2 s to be read, so they could never both play. The later
     5:59 → 6:14 pass replaced them on the same face shots and neither ever
     reached a frame; the strings are in git.
+
+## 6:01.233
+
+[chat_karena_job] Karena @ 6:01.233 +2.6: I love this job
+  - position: null
 
 ## 6:12.683
 
@@ -160,6 +165,18 @@ moment is a guess. <<
 [late_metrics_cluster] jrsapi @ 6:28.300 +2.2: Projects Teams Metrics are strong
   - seen_at_src: 122.266
 
+>> THE SECOND HALF OF JRSAPI'S LINE PLAYS AFTER KARENA'S, not before it.
+The owner split "Projects Teams Metrics are strong / They just need
+mentoring in the right skills" into two pills, and there are 3.0 s between
+this seat and karena's -- two readable pills need 5.2. Karena's "Like
+cardio!" is an authored beat and does not move, so the second half takes
+the clear air after her instead. <<
+
+[late_karena_cardio] karena @ 6:31.300 +2.2: Like cardio!
+  - seen_at_src: 125.266
+  - avatar: null
+  - avatar_url: null
+
 [late_metrics_mentoring] jrsapi @ 6:34.000 +2.8: They just need mentoring in the right skills
 
 ## 6:45
@@ -168,6 +185,13 @@ moment is a guess. <<
     The red flash. Owner, 2026-08-20: it goes to 6:45 on the programme
     clock. The trailing `|` keeps the second-row slot: it renders as lorem
     credited to nobody until somebody writes the words.
+
+## 6:47.300
+
+[late_karena_lessons] karena @ 6:47.300 +2.2: Hit 'em with your lessons learned
+  - seen_at_src: 141.266
+  - avatar: null
+  - avatar_url: null
 
 [late_rochaporto_cern] rochaporto @ 6:49.750 +2.6: One reference architecture coming up!
   - seen_at_src: 143.716
@@ -181,6 +205,8 @@ moment is a guess. <<
 2026-08-23, about the line above. It is already pinned at 6:58.300; whether
 that is the pulloff frame is a judgement about a picture, so it is left
 where he put it and flagged for his eye. <<
+
+[toc_karena] Karena @ 7:01.333 +3.2: One hundred thousand bootc volunteers, ready to power up
 
 [toc_joseph_worth] Joseph @ 7:04.783 +2.2: The gamers would have to impress BOTH Ricardos
   - cast: joseph_sandoval
@@ -325,7 +351,10 @@ speakers. <<
 [mapped_redacted_mines] [redacted] @ 8:31.500 +3.55: Or a lifetime of servitude in the Toilmaster's Packaging Mines
 
     THE SPLIT FITS INSIDE THE OLD PILL'S OWN 6.75 s span (8:28.300 ->
-    8:35.050).
+    8:35.050), and the next beat is karena at 8:35.300, so nothing moves.
+
+[owner_convo_karena] karena @ 8:35.300 +2.867: The Kube always seeks open source potential
+  - seen_at_src: 300.0
 
 [owner_convo_joseph] joseph @ 8:38.417 +3.6: We can't let The Toilmaster enslave another generation
   - seen_at_src: 303.117
@@ -349,6 +378,8 @@ speakers. <<
 [mapped_owen_sorry] Owen @ 9:04.633 +2.2: Oh sorry my bad
 
 [mapped_kolunmi_pvp] kolunmi @ 9:07.083 +2.2: Who turned PvP on?
+
+[mapped_karena_pve] karena @ 9:09.533 +3.0: Don't look at me I only put PvE on Legendary
 
 [mapped_cam_noone] cam @ 9:12.783 +2.2: Mom no one plays this game
   - avatar: null

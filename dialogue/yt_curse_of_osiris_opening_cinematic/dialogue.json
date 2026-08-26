@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "Script layout keeps all 26 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies its speaker by github handle (@mrbobbytables, @clubanderson), and both people are named in full by their own Guardian reveal cards."
+    "note": "Script layout keeps all 27 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies its speaker by github handle (@mrbobbytables, @clubanderson), and both people are named in full by their own Guardian reveal cards."
   },
   "cues": [
     {
@@ -257,6 +257,16 @@
       "recovered_text": "You need to get a message to the Kubernetes Maintainers"
     },
     {
+      "id": "d23a",
+      "start_sec": 134.64,
+      "end_sec": 136.11,
+      "character": "mara_sov",
+      "evidence": "owner_supplied",
+      "text": "Check your email smartass",
+      "text_source": "owner_supplied",
+      "recovered_text": "The open rate of maintainer emails is 7%"
+    },
+    {
       "id": "d23b",
       "start_sec": 136.12,
       "end_sec": 137.59,
@@ -314,13 +324,6 @@
       "start_sec": 142.28,
       "end_sec": 146.0,
       "raw": "I'm sure one of them will open the message ...",
-      "reason": "removed by the owner while rewriting the conversation"
-    },
-    {
-      "id": "d23a",
-      "start_sec": 134.64,
-      "end_sec": 136.11,
-      "raw": "The open rate of maintainer emails is 7%",
       "reason": "removed by the owner while rewriting the conversation"
     }
   ]

@@ -31,6 +31,7 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `5:29.00` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
 - `5:30.30` PRESENT DAY
 - `5:54.23` **Joseph** — That explains the slop
+- `6:01.23` **Karena** — I love this job
 - `6:08.23` Your choices are:
 - `6:08.30` Your choices are:
 - `6:08.36` Your choices are:
@@ -105,11 +106,14 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `6:23.30` **jrsapi** — They learn quickly
 - `6:25.75` **rochaporto** — We need to move!
 - `6:28.30` **jrsapi** — Projects Teams Metrics are strong
+- `6:31.30` **karena** — Like cardio!
 - `6:34.00` **jrsapi** — They just need mentoring in the right skills
 - `6:40.30` Mars
 - `6:45.00` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
+- `6:47.30` **karena** — Hit 'em with your lessons learned
 - `6:49.75` **rochaporto** — One reference architecture coming up!
 - `6:58.30` **jrsapi** — I still don't know which Ricardo this is
+- `7:01.33` **Karena** — One hundred thousand bootc volunteers, ready to power up
 - `7:02.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `7:04.78` **Joseph** — The gamers would have to impress BOTH Ricardos
 - `7:07.23` **Ricardo** — Look man I am so tired just jump
@@ -137,6 +141,7 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:25.30` **[redacted]** — Unlearning bad habits takes time
 - `8:28.30` **[redacted]** — Your options are success
 - `8:31.50` **[redacted]** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
+- `8:35.30` **karena** — The Kube always seeks open source potential
 - `8:38.42` **joseph** — We can't let The Toilmaster enslave another generation
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `8:43.75` **KyleGospo** — FOR TITANFALL!
@@ -145,6 +150,7 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `9:02.18` **HikariKnight** — Ouch man wtf!
 - `9:04.63` **Owen** — Oh sorry my bad
 - `9:07.08` **kolunmi** — Who turned PvP on?
+- `9:09.53` **karena** — Don't look at me I only put PvE on Legendary
 - `9:12.78` **cam** — Mom no one plays this game
 - `9:15.23` **HikariKnight** — Hey wait?!
 - `9:17.68` **kolunmi** — Are those ... other linux users?

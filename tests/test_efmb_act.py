@@ -456,6 +456,7 @@ def test_the_new_face_dialogue_hands_off_before_the_lead_in_banner():
         "late_jrsapi_learn",
         "late_rochaporto_move",
         "late_metrics_cluster",
+        "late_karena_cardio",
     )]
     assert max(p["at"] + p["dur"] for p in cues) <= build_efmb_plates.MONTAGE_OUT
 
@@ -622,7 +623,7 @@ def test_the_mapped_megacut_pass_rewrites_the_walk_window_verbatim():
 # than asking the code under test what it built.
 BLACK_CONVERSATION_IDS = [
     "mapped_akgraner_kyle", "mapped_hikari_ouch", "mapped_owen_sorry",
-    "mapped_kolunmi_pvp", "mapped_cam_noone",
+    "mapped_kolunmi_pvp", "mapped_karena_pve", "mapped_cam_noone",
     "mapped_hikari_wait", "mapped_kolunmi_users", "mapped_owen_slay",
     "mapped_akgraner_kindness_1", "mapped_akgraner_kindness_2",
     "mapped_akgraner_kindness_3", "mapped_akgraner_kindness_4",
@@ -647,6 +648,8 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
     assert by_id["mapped_hikari_ouch"]["text"] == "Ouch man wtf!"
     assert by_id["mapped_owen_sorry"]["text"] == "Oh sorry my bad"
     assert by_id["mapped_kolunmi_pvp"]["text"] == "Who turned PvP on?"
+    assert by_id["mapped_karena_pve"]["text"] == \
+        "Don't look at me I only put PvE on Legendary"
     assert by_id["mapped_cam_noone"]["text"] == "Mom no one plays this game"
     assert by_id["mapped_hikari_wait"]["text"] == "Hey wait?!"
     assert by_id["mapped_kolunmi_users"]["text"] == \
@@ -691,10 +694,10 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
     lead = build_efmb.derive_lead()
     walk_in = build_efmb.film_for_source(build_efmb_plates.WALK_IN, lead)
     toc = toc_plates()
-    pre = [toc[k] for k in ("toc_joseph_worth", "toc_ricardo")]
+    pre = [toc[k] for k in ("toc_karena", "toc_joseph_worth", "toc_ricardo")]
     # CHAINED BACKWARD FROM THE WALK, not forward from 2:19. Correcting
-    # WALK_IN to the walking shot's real first frame left a constrained
-    # exchange, so it moves earlier as a block rather
+    # WALK_IN to the walking shot's real first frame left 7.033 s for three
+    # cards that need 7.100, so the exchange moves earlier as a block rather
     # than squeezing Ricardo's question under the readable minimum.
     for p in pre:
         assert p["at"] + p["dur"] <= walk_in + 1e-6
@@ -705,7 +708,11 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
 
 def test_the_remaining_pre_walk_toc_copy_is_reproduced_verbatim():
     toc = toc_plates()
+    assert toc["toc_karena"]["text"] == (
+        "One hundred thousand bootc volunteers, ready to power up")
     assert toc["toc_ricardo"]["text"] == "Look man I am so tired just jump"
+    # The brief's own speaker tags, not a casting.yaml lookup.
+    assert toc["toc_karena"]["speaker"] == "Karena"
 
 def test_the_post_walk_dialogue_is_replaced_by_the_mapped_pass():
     by_id = {p["id"]: p for p in committed()["plates"]}
@@ -729,6 +736,8 @@ def test_the_owner_conversation_replaces_the_skill_banners():
         assert f"mapped_skill_banner_{i}" not in ids
 
     convo = [
+        ("owner_convo_karena", "karena",
+         "The Kube always seeks open source potential", 231.500, 2.867),
         ("owner_convo_joseph", "joseph",
          "We can't let The Toilmaster enslave another generation",
          234.617, 3.600),
@@ -743,7 +752,10 @@ def test_the_owner_conversation_replaces_the_skill_banners():
         assert p["text"] == text
         assert p["at"] == pytest.approx(at, abs=1e-3)
         assert p["dur"] == pytest.approx(dur, abs=1e-3)
-        assert "avatar" not in p and "avatar_url" not in p
+        if speaker == "karena":
+            assert p["avatar"].endswith("/karena.png")
+        else:
+            assert "avatar" not in p and "avatar_url" not in p
 
     kyle = by_id["mapped_kyle_titanfall"]
     assert kyle["at"] == pytest.approx(239.95, abs=1e-3)
@@ -830,6 +842,7 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
         assert by_id[pid]["at"] + by_id[pid]["dur"] <= \
             build_efmb.HALLWAY_RETURN_AT + 1e-3
     assert by_id["chat_amber_problem"]["at"] == pytest.approx(308.403, abs=1e-3)
+    assert by_id["owner_convo_karena"]["avatar"].endswith("/karena.png")
 
 def test_post_cortney_paused_conversation_is_authored_in_order():
     """The owner's 2026-08-23 overflow, updated 2026-08-25, has a seat now.
@@ -905,7 +918,7 @@ def test_the_owner_conversation_hands_to_kyle_without_overlap():
 def test_the_owner_conversation_records_unverified_handles():
     gaps = " ".join(committed()["unresolved"])
     assert "owner conversation" in gaps.lower()
-    for handle in ("joseph", "krook", "rochaporta"):
+    for handle in ("karena", "joseph", "krook", "rochaporta"):
         assert handle in gaps
 
 def test_the_remaining_older_timed_cue_is_still_on_its_mark():
@@ -1000,6 +1013,7 @@ def test_the_remaining_face_shot_dialogue_cards_still_land():
     learn = late["late_jrsapi_learn"]
     move = late["late_rochaporto_move"]
     metrics = late["late_metrics_cluster"]
+    cardio = late["late_karena_cardio"]
 
     assert all(p["kind"] == "chat" for p in cluster)
     assert [p["speaker"] for p in cluster] == [
@@ -1015,12 +1029,19 @@ def test_the_remaining_face_shot_dialogue_cards_still_land():
     assert move["at"] == pytest.approx(101.95, abs=1e-3)
     assert metrics["kind"] == "chat"
     assert metrics["speaker"] == "jrsapi"
+    # Split by the owner, 2026-08-23. There are 3.0 s between this seat and
+    # karena's, and two readable pills need 5.2, so the second half plays
+    # after her rather than sliding an authored beat.
     assert metrics["text"] == "Projects Teams Metrics are strong"
     assert metrics["avatar"] == "renders/avatars/jrsapi.png"
     assert metrics["at"] == pytest.approx(104.5, abs=1e-3)
     mentoring = late["late_metrics_mentoring"]
     assert mentoring["speaker"] == "jrsapi"
     assert mentoring["text"] == "They just need mentoring in the right skills"
+    assert mentoring["at"] > cardio["at"]
+    assert cardio["speaker"] == "karena"
+    assert cardio["text"] == "Like cardio!"
+    assert cardio["at"] == pytest.approx(107.5, abs=1e-3)
 
 def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
     by_id = {p["id"]: p for p in committed()["plates"]}
@@ -1065,10 +1086,11 @@ def test_the_late_titles_and_last_chats_replace_the_old_conflicting_windows():
     for removed in (
         "walk_ge_upstream", "trustee_gregkh", "trustee_shuah_khan",
         "solo_tulilirockz", "timed_krook", "timed_bedazzle",
-        "solo_kolunmi", "late_karena_lessons",
+        "solo_kolunmi",
     ):
         assert removed not in ids
     assert "late_rochaporto_cern" in ids
+    assert "late_karena_lessons" in ids
     assert "mapped_kyle_reveal" in ids
 
 def test_out_of_picture_replacements_are_recorded_and_existing_walk_lines_stay():
@@ -1098,9 +1120,10 @@ def test_the_owners_marks_are_megacut_time():
     """
     assert build_efmb_plates.MEGACUT_OFFSET == 121.567
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    # 02:57 / 02:59 -> 55.433 / 57.433
+    # 02:57 / 02:59 / 03:03 -> 55.433 / 57.433 / 61.433
     assert by_id["trio_joseph_sandoval"]["at"] == pytest.approx(55.433, abs=1e-3)
     assert by_id["trio_rochaporto"]["at"] == pytest.approx(57.433, abs=1e-3)
+    assert by_id["trio_mara_sov"]["at"] == pytest.approx(61.433, abs=1e-3)
 
 def test_the_trio_staggers_and_then_holds_together():
     """"only show joseph sandoval, we're going to stagger these, keep them up
@@ -1113,6 +1136,15 @@ def test_the_trio_staggers_and_then_holds_together():
     assert outs.pop() == pytest.approx(
         max(c["at"] for c in cards) + build_efmb_plates.TRIO_HOLD, abs=1e-3)
     assert cards[0]["dur"] > cards[-1]["dur"], "Joseph is up longest"
+
+def test_karena_is_angel_with_one_l():
+    """Owner, twice: the README's spelling and "(Angel, one L)". The vocab is
+    frozen (#167), so the correction is applied to this act's copy and
+    recorded rather than edited into a committed input."""
+    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
+    assert by_id["trio_mara_sov"]["name"] == "Karena Angel"
+    assert any("Angel" in u and "Angell" in u
+               for u in build_efmb_plates.build()["unresolved"])
 
 def test_the_correct_opening_guardians_are_on_the_owners_marks():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -1158,6 +1190,8 @@ def test_the_new_dialogue_lands_on_the_owners_seconds():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
     assert by_id["chat_joseph_slop"]["at"] == pytest.approx(70.433, abs=1e-3)
     assert by_id["chat_joseph_slop"]["text"] == "That explains the slop"
+    assert by_id["chat_karena_job"]["at"] == pytest.approx(77.433, abs=1e-3)
+    assert by_id["chat_karena_job"]["text"] == "I love this job"
     assert all(p["label"] == "Your choices are:" for p in _choice_frames())
 
 def test_the_new_face_shot_copy_replaces_josephs_old_pair():
