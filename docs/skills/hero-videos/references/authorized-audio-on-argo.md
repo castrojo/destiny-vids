@@ -43,6 +43,13 @@ workflow result. Their `onExit` templates upload records even after a gate or
 command failure. The upload loop skips missing early-failure artifacts, always
 writes a workflow status file, and hashes every artifact that exists.
 
+All GET inputs come from the shared source server on port **8877**. Each PUT
+receiver has its own port and writes into that video's `.work-<hero>01/`
+directory. A stage-1 `record-prefix` prefixes every returned bed artifact; a
+stage-2 `candidate-id` prefixes every returned candidate artifact. Choose each
+identifier before submission, record it in `verify-notes.md`, and never reuse
+it for a different bed record or mux candidate.
+
 ## Stage 1 — bed workflow
 
 This workflow accepts an authorized source only: it has no picture parameter or
@@ -52,7 +59,9 @@ measurements; it gates 48 kHz and source bandwidth; then it makes the original
 48 kHz `pcm_s24le` bed and measures it with `ebur128`.
 
 Save it as `.work-<hero>01/<hero>01-bed.yaml`. The example parameters are
-valid YAML and must be replaced from the authorization record before use.
+valid YAML and must be replaced from the authorization record before use. Keep
+`record-prefix` stable for this exact bed record; choose a new prefix if
+building a distinct bed so its evidence cannot replace an earlier record.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -75,6 +84,8 @@ spec:
         value: "0000000000000000000000000000000000000000000000000000000000000000"
       - name: receiver-url
         value: http://192.168.1.227:8880
+      - name: record-prefix
+        value: example-hero01-bed-v1
       - name: start-seconds
         value: "0"
       - name: duration-seconds
@@ -105,6 +116,8 @@ spec:
             template: analyze-and-build-bed
             dependencies: [fetch-authorized-source]
     - name: fetch-authorized-source
+      securityContext:
+        fsGroup: 100
       container:
         image: curlimages/curl:8.17.0
         imagePullPolicy: IfNotPresent
@@ -143,6 +156,8 @@ spec:
           - name: work
             mountPath: /work
     - name: analyze-and-build-bed
+      securityContext:
+        fsGroup: 100
       container:
         image: lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76
         imagePullPolicy: IfNotPresent
@@ -195,7 +210,7 @@ spec:
             run_to_file silencedetect.txt ffmpeg -hide_banner -i "$work/source" \
               -map 0:a:0 -af 'silencedetect=noise=-50dB:d=0.5' -f null -
             run_to_file spectrum.txt ffmpeg -hide_banner -y -i "$work/source" \
-              -map 0:a:0 -lavfi 'showspectrumpic=s=2400x1350:legend=1:scale=log' \
+              -lavfi 'showspectrumpic=s=2400x1350:legend=1:scale=log' \
               -frames:v 1 "$work/spectrum.png"
             run_to_file highpass-16khz.txt ffmpeg -hide_banner -i "$work/source" \
               -map 0:a:0 -af 'highpass=f=16000,astats=metadata=1:reset=0' -f null -
@@ -260,6 +275,8 @@ spec:
           - name: work
             mountPath: /work
     - name: upload-results
+      securityContext:
+        fsGroup: 100
       container:
         image: curlimages/curl:8.17.0
         imagePullPolicy: IfNotPresent
@@ -275,6 +292,7 @@ spec:
           - |
             work=/work
             receiver_url='{{workflow.parameters.receiver-url}}'
+            record_prefix='{{workflow.parameters.record-prefix}}'
             printf '%s\n' \
               "{\"workflow_name\":\"{{workflow.name}}\",\"workflow_uid\":\"{{workflow.uid}}\",\"workflow_status\":\"{{workflow.status}}\",\"stage\":\"bed\"}" \
               > "$work/workflow-status.json"
@@ -288,7 +306,8 @@ spec:
             upload_status=0
             for file in $files SHA256SUMS; do
               if [ -f "$work/$file" ]; then
-                curl -fsS -T "$work/$file" "$receiver_url/$file" || upload_status=1
+                curl -fsS -T "$work/$file" \
+                  "$receiver_url/$record_prefix-$file" || upload_status=1
               fi
             done
             exit "$upload_status"
@@ -297,11 +316,12 @@ spec:
             mountPath: /work
 ```
 
-Do not use the bed if `audio-gate.json` is not `overall: "pass"`. A warning is
-recorded in `high_frequency_gate`; it is not permission to ignore source
-review. Record the workflow ID, source authorization reference, exact
-parameters, every returned hash, native rate, silence boundaries, spectrum
-review, ratio, and `ebur128` results in `verify-notes.md`.
+Do not use the bed if `<record-prefix>-audio-gate.json` is not
+`overall: "pass"`. A warning is recorded in `high_frequency_gate`; it is not
+permission to ignore source review. Record the workflow ID, source
+authorization reference, exact parameters, record prefix, every returned hash,
+native rate, silence boundaries, spectrum review, ratio, and `ebur128` results
+in `verify-notes.md`.
 
 ## Stage 2 — mux and validation workflow
 
@@ -312,7 +332,9 @@ checks the decoded result. It has no input or URL for a previous AAC candidate.
 
 Save it as `.work-<hero>01/<hero>01-mux.yaml`. Submit a new instance for each
 candidate gain, retaining the same verified bed URL and SHA-256 until a decoded
-candidate is safe.
+candidate is safe. `candidate-id` must be unique for every submission,
+including a retry at the same gain; it prefixes the delivery and every returned
+gate, status, and hash record.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -334,15 +356,17 @@ spec:
       - name: picture-sha256
         value: "0000000000000000000000000000000000000000000000000000000000000000"
       - name: bed-url
-        value: http://192.168.1.227:8880/bed.wav
+        value: http://192.168.1.227:8877/.work-example-hero01/example-hero01-bed-v1-bed.wav
       - name: bed-sha256
         value: "0000000000000000000000000000000000000000000000000000000000000000"
       - name: bed-gate-url
-        value: http://192.168.1.227:8880/audio-gate.json
+        value: http://192.168.1.227:8877/.work-example-hero01/example-hero01-bed-v1-audio-gate.json
       - name: bed-gate-sha256
         value: "0000000000000000000000000000000000000000000000000000000000000000"
       - name: receiver-url
         value: http://192.168.1.227:8880
+      - name: candidate-id
+        value: example-hero01-gain-minus-1.0db-01
       - name: static-gain-db
         value: "-1.0"
       - name: delivery-name
@@ -371,6 +395,8 @@ spec:
             template: mux-and-validate
             dependencies: [fetch-verified-inputs]
     - name: fetch-verified-inputs
+      securityContext:
+        fsGroup: 100
       container:
         image: curlimages/curl:8.17.0
         imagePullPolicy: IfNotPresent
@@ -385,6 +411,9 @@ spec:
         args:
           - |
             mkdir -p /work
+            candidate_id='{{workflow.parameters.candidate-id}}'
+            fetch_record="$candidate_id-fetch-verified-inputs.txt"
+            input_gate="$candidate_id-input-audio-gate.json"
             overall=0
             fetch_and_verify() {
               url=$1
@@ -401,21 +430,21 @@ spec:
               fi
               printf '%s expected=%s actual=%s exit_status=%s\n' \
                 "$destination" "$expected_sha256" "$actual_sha256" "$fetch_status" \
-                >> /work/fetch-verified-inputs.txt
+                >> "$work/$fetch_record"
               if [ "$fetch_status" -ne 0 ]; then
                 overall=1
               fi
             }
-            : > /work/fetch-verified-inputs.txt
+            : > "$work/$fetch_record"
             fetch_and_verify '{{workflow.parameters.picture-url}}' \
               '{{workflow.parameters.picture-sha256}}' /work/picture.mp4
             fetch_and_verify '{{workflow.parameters.bed-url}}' \
               '{{workflow.parameters.bed-sha256}}' /work/bed.wav
             fetch_and_verify '{{workflow.parameters.bed-gate-url}}' \
-              '{{workflow.parameters.bed-gate-sha256}}' /work/audio-gate.json
-            if ! grep -Fq '"overall":"pass"' /work/audio-gate.json 2>/dev/null; then
+              '{{workflow.parameters.bed-gate-sha256}}' "$work/$input_gate"
+            if ! grep -Fq '"overall":"pass"' "$work/$input_gate" 2>/dev/null; then
               printf '%s\n' 'audio-gate.json is absent or did not pass' \
-                >> /work/fetch-verified-inputs.txt
+                >> "$work/$fetch_record"
               overall=1
             fi
             exit "$overall"
@@ -423,6 +452,8 @@ spec:
           - name: work
             mountPath: /work
     - name: mux-and-validate
+      securityContext:
+        fsGroup: 100
       container:
         image: lscr.io/linuxserver/ffmpeg:8.1.2-cli-ls76
         imagePullPolicy: IfNotPresent
@@ -437,17 +468,24 @@ spec:
         args:
           - |
             work=/work
-            delivery="$work/{{workflow.parameters.delivery-name}}"
+            candidate_id='{{workflow.parameters.candidate-id}}'
+            delivery_name="$candidate_id-{{workflow.parameters.delivery-name}}"
+            delivery="$work/$delivery_name"
+            mux_log="$candidate_id-mux-encode.txt"
+            validation_log="$candidate_id-delivery-validation.txt"
+            decoded_highpass="$candidate_id-decoded-highpass-16khz.txt"
+            decoded_reference="$candidate_id-decoded-reference-8khz.txt"
+            delivery_gate="$candidate_id-delivery-gate.json"
             overall=0
-            : > "$work/delivery-validation.txt"
+            : > "$work/$validation_log"
             run_append() {
               label=$1
               shift
-              printf '== %s ==\n' "$label" >> "$work/delivery-validation.txt"
-              "$@" >> "$work/delivery-validation.txt" 2>&1
+              printf '== %s ==\n' "$label" >> "$work/$validation_log"
+              "$@" >> "$work/$validation_log" 2>&1
               command_status=$?
               printf 'exit_status=%s\n' "$command_status" \
-                >> "$work/delivery-validation.txt"
+                >> "$work/$validation_log"
               if [ "$command_status" -ne 0 ]; then
                 overall=1
               fi
@@ -460,13 +498,13 @@ spec:
               -map 0:v:0 -map 1:a:0 -c:v copy \
               -af 'volume={{workflow.parameters.static-gain-db}}dB' \
               -c:a aac -b:a 320k -movflags +faststart "$delivery" \
-              > "$work/mux-encode.txt" 2>&1
+              > "$work/$mux_log" 2>&1
             mux_status=$?
-            printf '\nexit_status=%s\n' "$mux_status" >> "$work/mux-encode.txt"
+            printf '\nexit_status=%s\n' "$mux_status" >> "$work/$mux_log"
             if [ "$mux_status" -ne 0 ] || [ ! -f "$delivery" ]; then
               overall=1
               printf '%s\n' 'candidate was not created; validation unavailable' \
-                >> "$work/delivery-validation.txt"
+                >> "$work/$validation_log"
             else
               run_append ffprobe ffprobe -v error -of json \
                 -show_entries format=format_name,duration,size,bit_rate:stream=index,codec_type,codec_name,profile,sample_fmt,sample_rate,channels,channel_layout,bit_rate \
@@ -477,16 +515,16 @@ spec:
                 -map 0:a:0 -af ebur128=peak=true -f null -
               ffmpeg -hide_banner -i "$delivery" -map 0:a:0 \
                 -af 'highpass=f=16000,astats=metadata=1:reset=0' -f null - \
-                > "$work/decoded-highpass-16khz.txt" 2>&1
+                > "$work/$decoded_highpass" 2>&1
               highpass_status=$?
               printf '\nexit_status=%s\n' "$highpass_status" \
-                >> "$work/decoded-highpass-16khz.txt"
+                >> "$work/$decoded_highpass"
               ffmpeg -hide_banner -i "$delivery" -map 0:a:0 \
                 -af 'bandpass=f=8000:width_type=o:width=1,astats=metadata=1:reset=0' \
-                -f null - > "$work/decoded-reference-8khz.txt" 2>&1
+                -f null - > "$work/$decoded_reference" 2>&1
               reference_status=$?
               printf '\nexit_status=%s\n' "$reference_status" \
-                >> "$work/decoded-reference-8khz.txt"
+                >> "$work/$decoded_reference"
               if [ "$highpass_status" -ne 0 ] || [ "$reference_status" -ne 0 ]; then
                 overall=1
               fi
@@ -500,7 +538,7 @@ spec:
               delivery_rate="$(ffprobe -v error -select_streams a:0 \
                 -show_entries stream=sample_rate \
                 -of default=nokey=1:noprint_wrappers=1 "$delivery" \
-                2>>"$work/delivery-validation.txt")"
+                2>>"$work/$validation_log")"
               delivery_rate_status=$?
               if [ "$delivery_rate_status" -eq 0 ] &&
                  [ "$delivery_rate" = "48000" ]; then
@@ -513,7 +551,7 @@ spec:
             true_peak_db=""
             if [ -f "$delivery" ]; then
               true_peak_db="$(awk '/True peak:/ {want=1; next} want && /Peak:/ {print $(NF-1); exit}' \
-                "$work/delivery-validation.txt")"
+                "$work/$validation_log")"
             fi
             true_peak_json=null
             true_peak_gate=hard-fail
@@ -539,9 +577,9 @@ spec:
             fi
 
             decoded_highpass_db="$(awk -F ': ' '/RMS level dB:/ {value=$NF} END {print value}' \
-              "$work/decoded-highpass-16khz.txt" 2>/dev/null)"
+              "$work/$decoded_highpass" 2>/dev/null)"
             decoded_reference_db="$(awk -F ': ' '/RMS level dB:/ {value=$NF} END {print value}' \
-              "$work/decoded-reference-8khz.txt" 2>/dev/null)"
+              "$work/$decoded_reference" 2>/dev/null)"
             decoded_ratio_json=null
             decoded_ratio_gate=hard-fail
             if is_number "$decoded_highpass_db" && is_number "$decoded_reference_db"; then
@@ -565,12 +603,14 @@ spec:
             fi
             printf '%s\n' \
               "{\"candidate_static_gain_db\":\"{{workflow.parameters.static-gain-db}}\",\"source_bed_sha256\":\"{{workflow.parameters.bed-sha256}}\",\"delivery_sample_rate_hz\":$delivery_rate_json,\"delivery_sample_rate_gate\":\"$delivery_sample_rate_gate\",\"true_peak_dbTP\":$true_peak_json,\"true_peak_gate\":\"$true_peak_gate\",\"true_peak_target\":\"$target_range\",\"decoded_high_to_8khz_ratio_db\":$decoded_ratio_json,\"decoded_high_frequency_gate\":\"$decoded_ratio_gate\",\"overall\":\"$delivery_overall\"}" \
-              > "$work/delivery-gate.json"
+              > "$work/$delivery_gate"
             exit "$overall"
         volumeMounts:
           - name: work
             mountPath: /work
     - name: upload-results
+      securityContext:
+        fsGroup: 100
       container:
         image: curlimages/curl:8.17.0
         imagePullPolicy: IfNotPresent
@@ -586,18 +626,22 @@ spec:
           - |
             work=/work
             receiver_url='{{workflow.parameters.receiver-url}}'
+            candidate_id='{{workflow.parameters.candidate-id}}'
+            workflow_status="$candidate_id-workflow-status.json"
+            hashes="$candidate_id-SHA256SUMS"
+            delivery_name="$candidate_id-{{workflow.parameters.delivery-name}}"
             printf '%s\n' \
               "{\"workflow_name\":\"{{workflow.name}}\",\"workflow_uid\":\"{{workflow.uid}}\",\"workflow_status\":\"{{workflow.status}}\",\"stage\":\"mux-validation\"}" \
-              > "$work/workflow-status.json"
-            : > "$work/SHA256SUMS"
-            files="fetch-verified-inputs.txt mux-encode.txt delivery-validation.txt decoded-highpass-16khz.txt decoded-reference-8khz.txt delivery-gate.json {{workflow.parameters.delivery-name}} workflow-status.json"
+              > "$work/$workflow_status"
+            : > "$work/$hashes"
+            files="$candidate_id-fetch-verified-inputs.txt $candidate_id-input-audio-gate.json $candidate_id-mux-encode.txt $candidate_id-delivery-validation.txt $candidate_id-decoded-highpass-16khz.txt $candidate_id-decoded-reference-8khz.txt $candidate_id-delivery-gate.json $delivery_name $workflow_status"
             for file in $files; do
               if [ -f "$work/$file" ]; then
-                sha256sum "$work/$file" >> "$work/SHA256SUMS"
+                sha256sum "$work/$file" >> "$work/$hashes"
               fi
             done
             upload_status=0
-            for file in $files SHA256SUMS; do
+            for file in $files "$hashes"; do
               if [ -f "$work/$file" ]; then
                 curl -fsS -T "$work/$file" "$receiver_url/$file" || upload_status=1
               fi
@@ -608,12 +652,17 @@ spec:
             mountPath: /work
 ```
 
-Only promote a candidate when `delivery-gate.json` is `overall: "pass"` and
-the returned `delivery-validation.txt` confirms AAC 320k, clean decode, and
-the decoded `ebur128` result. Record every candidate gain, original bed hash,
-picture hash, decoded true peak, target-range status, spectral ratio, workflow
-ID, and uploaded hashes in `verify-notes.md`, including failed candidates.
+Only promote a candidate when `<candidate-id>-delivery-gate.json` is
+`overall: "pass"` and the returned `<candidate-id>-delivery-validation.txt`
+confirms AAC 320k, clean decode, and the decoded `ebur128` result. The returned
+delivery is `<candidate-id>-<delivery-name>`; a failed candidate therefore
+cannot replace a passing or earlier candidate. Record every candidate ID and
+gain, original bed hash, picture hash, decoded true peak, target-range status,
+spectral ratio, workflow ID, and uploaded hashes in `verify-notes.md`,
+including failed candidates.
 
 Use the video's dedicated receiver port. Lakshmi is **8880**; RAFI_01 and
-RAFI_02 use **8878** and **8879** respectively. Do not promote the picture,
-bed, or delivery until the corresponding remote records are complete.
+RAFI_02 use **8878** and **8879** respectively. That port is for PUT results
+only: the example bed and gate GET URLs above intentionally use the source
+server on **8877** and their `.work-example-hero01/` paths. Do not promote the
+picture, bed, or delivery until the corresponding remote records are complete.
