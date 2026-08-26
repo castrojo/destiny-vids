@@ -133,7 +133,7 @@ def test_the_interruption_audio_uses_only_recorded_sources():
         build_efmb.HOLD_MUSIC_ID,
         build_efmb.AMBER_SOURCE_ID,
         build_efmb.HOLD_MUSIC_ID,
-        build_efmb.BED_ID,
+        build_efmb.POST_PAUSE_BED_ID,
     ]
     assert audio[1]["at"] == pytest.approx(255.433, abs=1e-3)
     assert audio[1]["source_in"] == pytest.approx(6.5, abs=1e-3)
@@ -143,6 +143,8 @@ def test_the_interruption_audio_uses_only_recorded_sources():
     assert audio[3]["duration"] == pytest.approx(
         build_efmb.HALLWAY_AFTER_AMBER_SEC, abs=1e-3)
     assert audio[4]["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
+    assert audio[4]["source_in"] == pytest.approx(
+        build_efmb.HALLWAY_AT + build_efmb.INTERRUPTION_REPLACED_SEC, abs=1e-3)
     assert sum(p["duration"] for p in audio) == pytest.approx(
         build_efmb.build()["film_sec"], abs=1e-3)
 

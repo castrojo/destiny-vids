@@ -182,7 +182,7 @@ def trim_master_peak(path, target_dbtp=DEFAULT_TARGET_DBTP, ffmpeg=None,
     WARNING -- when the attempt budget runs out hot: the pristine master is
     not destroyed to keep a queue moving.
     """
-    path = Path(path)
+    path = Path(path).resolve()
     if ffmpeg is None:
         from tools.render import find_ffmpeg
 
