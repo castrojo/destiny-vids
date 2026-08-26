@@ -1265,7 +1265,7 @@ def _extract_entry(plate, offset, defaults):
     for key, value in plate.items():
         if key in STRUCTURAL or predicted.get(key) == value:
             continue
-        if portrait and key in ("avatar", "avatar_url"):
+        if portrait and key in ("avatar", "avatar_url", "avatar_required"):
             continue
         rows.extend(f"  - {key}: {item}" for item in _attr_rows(key, value))
     if portrait:

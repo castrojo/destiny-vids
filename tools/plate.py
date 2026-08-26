@@ -662,6 +662,16 @@ def _resolve(path):
     return p if p.is_absolute() else REPO_ROOT / p
 
 
+def _required_avatar_missing(spec):
+    """True when ``spec`` names a required portrait file that is absent."""
+    if not spec.get("avatar_required"):
+        return False
+    avatar = spec.get("avatar")
+    if not avatar:
+        return True
+    return not _resolve(Path(avatar).expanduser()).exists()
+
+
 def _load_avatar(path, size):
     """A PFP file -> a ``size``-px square RGBA crop, or None.
 
@@ -875,11 +885,12 @@ def _crest(size, accent, avatar=None, mark=None):
     """
     scale = 4  # supersampled, then downscaled: Pillow has no antialiased strokes
     s = int(size * scale)
+    photo = _load_avatar(avatar, s) if avatar else None
     if mark == "bazzite":
-        return _bazzite_tile(s, accent, _load_avatar(avatar, s)).resize(
+        return _bazzite_tile(s, accent, photo).resize(
             (int(size), int(size)), Image.LANCZOS)
     if mark:
-        tile = _mark_tile(s, mark, _load_avatar(avatar, s))
+        tile = _mark_tile(s, mark, photo)
         if tile is not None:
             return tile.resize((int(size), int(size)), Image.LANCZOS)
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
@@ -888,7 +899,6 @@ def _crest(size, accent, avatar=None, mark=None):
     def pts(coords):
         return [(x / 100 * s, y / 100 * s) for x, y in coords]
 
-    photo = _load_avatar(avatar, s)
     if photo is not None:
         # The portrait takes the inner hex; both rules stay drawn over it.
         mask = Image.new("L", (s, s), 0)
@@ -1102,7 +1112,10 @@ def _render_chat(spec):
     # The avatar slot holds a pfp in the videos (.avatar/.pfp: an 84px
     # circle); with no pfp, the crest is plate.html's own fallback. A pfp
     # that will not load falls back the same way -- degrade, never block.
-    photo = _load_avatar(spec.get("avatar"), CHAT_AVATAR * 4)
+    missing_required_avatar = _required_avatar_missing(spec)
+    avatar_path = spec.get("avatar")
+    photo = (None if missing_required_avatar or not avatar_path
+             else _load_avatar(avatar_path, CHAT_AVATAR * 4))
     if photo is not None:
         s = CHAT_AVATAR * 4
         mask = Image.new("L", (s, s), 0)
@@ -1112,7 +1125,7 @@ def _render_chat(spec):
         img.alpha_composite(
             badge.resize((CHAT_AVATAR, CHAT_AVATAR), Image.LANCZOS),
             (CHAT_PAD_L, int(mid - CHAT_AVATAR / 2)))
-    else:
+    elif not missing_required_avatar:
         img.alpha_composite(_crest(CHAT_AVATAR, chrome["accent"]),
                             (CHAT_PAD_L, int(mid - CHAT_AVATAR / 2)))
 
@@ -2021,6 +2034,7 @@ def render_plate(spec):
     # Chrome, not copy: a PFP in the crest, the laurel around it, and the
     # bazzite logomark. None of it adds a row the deck has no field for.
     avatar = spec.get("avatar")
+    missing_required_avatar = _required_avatar_missing(spec)
     wreath = bool(spec.get("wreath"))
     # The crest's mark follows the chrome: Bazzite's is traced from its SVG,
     # and a brand published only as a raster is reproduced from the cached
@@ -2091,11 +2105,12 @@ def render_plate(spec):
                             (int(PAD_X * scale), rule_y))
         img.alpha_composite(_horizon(rule_w, 2, variant["accent"], to_left=True),
                             (int(box_w - PAD_X * scale - rule_w), rule_y))
-    img.alpha_composite(
-        _crest(crest_h, variant["accent"], avatar=avatar,
-               mark=mark),
-        (int(cx - crest_h / 2), int(y)))
-    if wreath:
+    if not missing_required_avatar:
+        img.alpha_composite(
+            _crest(crest_h, variant["accent"], avatar=avatar,
+                   mark=mark),
+            (int(cx - crest_h / 2), int(y)))
+    if wreath and not missing_required_avatar:
         laurel = _wreath(crest_w, variant["accent"])
         img.alpha_composite(laurel, (int(cx - laurel.width / 2),
                                      int(y + crest_h / 2 - laurel.height / 2)))

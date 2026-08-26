@@ -36,9 +36,22 @@ python3 scripts/build_efmb.py --render "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}"
 echo "==> plate manifest (stories/02-endless-forms-plates.json -- an OUTPUT)"
 python3 scripts/build_efmb_plates.py --write
 
+echo "==> required portraits from Actions and a persistent burn manifest"
+python3 -m tools.avatars \
+    --manifest stories/02-endless-forms-plates.json --from-actions
+python3 -m tools.avatars \
+    --manifest stories/02-endless-forms-plates.json \
+    --prepare renders/02-endless-forms-burn-manifest.json
+
+echo "==> render the burn manifest for frame audit"
+python3 tools/plate.py render \
+    --manifest renders/02-endless-forms-burn-manifest.json \
+    --out-dir renders/plates-efmb --fit-video renders/efmb-hq.mp4
+
 echo "==> burn plates onto the CLEAN picture (renders/efmb-plated.mp4)"
 python3 tools/plate.py burn --video renders/efmb-hq.mp4 \
-    --manifest stories/02-endless-forms-plates.json \
+    --manifest renders/02-endless-forms-burn-manifest.json \
+    --plates-dir renders/plates-efmb \
     --out renders/efmb-plated.mp4 --delivery-spec \
     "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}"
 

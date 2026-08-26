@@ -68,6 +68,7 @@ import build_efmb  # noqa: E402
 from tools.plate import CHOICE_POINTER_CUT, CHROME_ROWS  # noqa: E402
 from tools import chapter_md  # noqa: E402
 from tools import placeholder  # noqa: E402
+from tools.identity import UnknownPerson, chat_identity, login_for_cast_key  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "02-endless-forms-plates.json"
 # THE ROSTER IS AN INPUT, SO IT IS COMMITTED.
@@ -1145,16 +1146,18 @@ def blueberry_entry(item, at, dur, casting):
 def localise_avatar(key, copy):
     """Point a plate's ``avatar`` at the local cache, keeping the URL as source.
 
-    Returns the copy unchanged when the authored plate has no portrait. A
-    missing authored image stays missing; it is never replaced with invented
-    copy.
+    A canonical real-person credit names the login, not whichever transitional
+    cast key reached it, and it requires that portrait when it reaches a burn
+    manifest. Optional artwork is a different class of thing and is left alone.
     """
-    url = copy.get("avatar")
-    if not url or not str(url).startswith("http"):
+    try:
+        identity = chat_identity(login_for_cast_key(key))
+    except UnknownPerson:
         return copy
     copy = dict(copy)
-    copy["avatar"] = str(AVATAR_DIR / f"{key}.png")
-    copy["avatar_url"] = url
+    copy["avatar"] = identity["avatar"]
+    copy["avatar_url"] = identity["avatar_url"]
+    copy["avatar_required"] = identity["avatar_required"]
     return copy
 
 
@@ -1181,10 +1184,41 @@ def chat_avatar(key, casting):
 
 def github_avatar(login):
     """A direct GitHub avatar binding for owner-seated login copy."""
+    try:
+        identity = chat_identity(login)
+    except UnknownPerson:
+        return {
+            "avatar": str(AVATAR_DIR / f"{login}.png"),
+            "avatar_url": f"https://github.com/{login}.png?size=256",
+        }
     return {
-        "avatar": str(AVATAR_DIR / f"{login}.png"),
-        "avatar_url": f"https://github.com/{login}.png?size=256",
+        "avatar": identity["avatar"],
+        "avatar_url": identity["avatar_url"],
+        "avatar_required": identity["avatar_required"],
     }
+
+
+def canonicalise_required_avatar(entry, casting):
+    """Promote canonical real-person portraits to required cached avatars."""
+    avatar = entry.get("avatar")
+    if not avatar:
+        return entry
+    candidates = []
+    speaker = entry.get("speaker")
+    if speaker not in (None, "[redacted]", "TBD"):
+        candidates.append(speaker)
+    candidates.append(Path(avatar).stem)
+    for candidate in candidates:
+        try:
+            identity = chat_identity(login_for_cast_key(candidate, casting))
+        except UnknownPerson:
+            continue
+        updated = dict(entry)
+        updated["avatar"] = identity["avatar"]
+        updated["avatar_url"] = identity["avatar_url"]
+        updated["avatar_required"] = identity["avatar_required"]
+        return updated
+    return entry
 
 
 def fetch_avatars(manifest, verbose=True):
@@ -1446,8 +1480,7 @@ def build():
         if og.get("login"):
             # The pfp comes from the account the owner named, and nothing else
             # about the person is read off it.
-            entry["avatar"] = str(AVATAR_DIR / f"{og['login']}.png")
-            entry["avatar_url"] = f"https://github.com/{og['login']}.png?size=256"
+            entry.update(github_avatar(og["login"]))
         if og.get("seen_at_src") is not None:
             entry["seen_at_src"] = og["seen_at_src"]
         if og.get("why"):
@@ -1867,9 +1900,7 @@ def build():
                 "text_source": "owner_supplied",
             })
             if spec.get("login"):
-                entry["avatar"] = str(AVATAR_DIR / f"{spec['login']}.png")
-                entry["avatar_url"] = (
-                    f"https://github.com/{spec['login']}.png?size=256")
+                entry.update(github_avatar(spec["login"]))
         elif spec["kind"] == "warning":
             entry["text"] = spec["text"]
             entry["text_source"] = "owner_supplied"
@@ -2005,6 +2036,7 @@ def build():
     # The owner-authored conversations are resolved at the top of build().
     plates.extend(chapter_entries)
 
+    plates = [canonicalise_required_avatar(p, casting) for p in plates]
     plates.sort(key=lambda p: (p["at"], p.get("order", 0), p["id"]))
 
     for cur, nxt, room in space_plates(plates):

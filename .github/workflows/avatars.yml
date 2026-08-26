@@ -19,7 +19,9 @@ on:
   push:
     branches: [main]
     paths:
-      # The two files that decide which logins exist.
+      # The committed manifests and records that decide which logins exist.
+      - stories/02-endless-forms-plates.json
+      - dialogue/yt_curse_of_osiris_opening_cinematic/dialogue.json
       - stories/08-credits.json
       - vocab/casting.yaml
       - tools/avatars.py
@@ -55,12 +57,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: renders/avatars
-          key: avatars-v1-${{ hashFiles('stories/08-credits.json', 'vocab/casting.yaml') }}
+          key: avatars-v2-${{ hashFiles('stories/02-endless-forms-plates.json', 'dialogue/yt_curse_of_osiris_opening_cinematic/dialogue.json', 'stories/08-credits.json', 'vocab/casting.yaml') }}
           restore-keys: |
-            avatars-v1-
+            avatars-v2-
 
       - name: Fetch what is missing
-        run: python3 -m tools.avatars
+        run: |
+          python3 -m tools.avatars \
+            --manifest stories/02-endless-forms-plates.json \
+            --dialogue yt_curse_of_osiris_opening_cinematic \
+            --credits-manifest stories/08-credits.json
 
       - name: Say what the cache holds
         run: |

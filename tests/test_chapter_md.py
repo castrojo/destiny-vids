@@ -328,7 +328,7 @@ def test_show_seats_sup_on_the_heroes_void_shield_source(capsys):
 ACT_II_FIELD_ORDER = (
     "id, at, dur, name, title, title_source, kind, position,\n"
     "  copy_source, speaker, text, text_source, speaker_pending, scale, seen_at_src,\n"
-    "  avatar, avatar_url, bond_of")
+    "  avatar, avatar_url, avatar_required, bond_of")
 
 
 def test_parse_front_matter_joins_a_wrapped_scalar_field():
@@ -344,7 +344,7 @@ def test_parse_front_matter_joins_a_wrapped_scalar_field():
         "id", "at", "dur", "name", "title", "title_source", "kind",
         "position", "copy_source", "speaker", "text", "text_source",
         "speaker_pending", "scale", "seen_at_src", "avatar", "avatar_url",
-        "bond_of"]
+        "avatar_required", "bond_of"]
 
 
 def test_the_real_act_ii_field_order_survives_its_multiline_declaration():
@@ -358,6 +358,7 @@ def test_the_real_act_ii_field_order_survives_its_multiline_declaration():
     assert "seen_at_src" in order
     assert order.index("seen_at_src") < order.index("avatar")
     assert order.index("seen_at_src") < order.index("avatar_url")
+    assert order.index("seen_at_src") < order.index("avatar_required")
     assert order.index("seen_at_src") < order.index("bond_of")
 
 
@@ -378,7 +379,8 @@ def test_a_key_added_after_the_chapter_file_builds_still_lands_in_order():
     module-level constant from the same missing `paused` label, which is
     Task 3's job, not this test's).
     """
-    text = ("---\nact: X\nfield_order: " + ACT_II_FIELD_ORDER + "\n---\n\n"
+    text = ("---\nact: X\nfield_order: " + ACT_II_FIELD_ORDER + "\n"
+            "defaults:\n  avatar_required: auto\n---\n\n"
             "## 0:00\n\nkylegospo @ 0:10 +2.2: Sup\n"
             "  - bond_of: mapped_kyle_reveal\n"
             "  - avatar: renders/avatars/KyleGospo.png\n"
@@ -408,6 +410,7 @@ def test_a_key_added_after_the_chapter_file_builds_still_lands_in_order():
     keys = list(entry.keys())
     assert keys.index("seen_at_src") < keys.index("avatar")
     assert keys.index("seen_at_src") < keys.index("avatar_url")
+    assert keys.index("seen_at_src") < keys.index("avatar_required")
     assert keys.index("seen_at_src") < keys.index("bond_of")
     assert keys == [k for k in order if k in entry]
 
@@ -619,6 +622,7 @@ def test_avatar_login_takes_that_accounts_github_picture():
     assert entry["avatar"] == "renders/avatars/KyleGospo.png"
     assert entry["avatar_url"] == \
         "https://avatars.githubusercontent.com/u/10704358?v=4"
+    assert entry["avatar_required"] is True
     assert "avatar_login" not in entry, \
         "an authoring key reached the manifest"
 
@@ -629,6 +633,7 @@ def test_cast_takes_the_portrait_the_casting_vocab_records():
     assert entry["avatar"] == "renders/avatars/jrsapi.png"
     assert entry["avatar_url"] == \
         "https://avatars.githubusercontent.com/u/5437766?v=4"
+    assert entry["avatar_required"] is True
     assert "cast" not in entry
 
 

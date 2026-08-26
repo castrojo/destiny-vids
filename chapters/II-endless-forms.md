@@ -6,8 +6,10 @@ manifest: stories/02-endless-forms-plates.json
 programme_start: 283.800
 field_order: id, at, dur, name, title, title_source, kind, position,
   copy_source, speaker, text, text_source, speaker_pending, scale,
-  seen_at_src, avatar, avatar_url, bond_of
+  seen_at_src, avatar, avatar_url, avatar_required, bond_of
 reseat: scripts/build_efmb_plates.py:reseat_chapter_entries
+defaults:
+  avatar_required: auto
 ---
 
 # Act II — Endless Forms Most Beautiful: conversations

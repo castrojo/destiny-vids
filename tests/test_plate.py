@@ -1066,6 +1066,23 @@ def test_a_chat_card_carries_the_pfp_in_its_badge_slot(avatar_png):
     corner = with_photo.getpixel((plate.CHAT_PAD_L + 3, 10))
     assert corner[:3] == plate.INK[:3]
 
+def test_a_missing_required_chat_avatar_is_not_loaded_or_replaced_with_a_crest(monkeypatch):
+    seen = []
+
+    def should_not_load(*args, **kwargs):
+        seen.append((args, kwargs))
+        raise AssertionError("_load_avatar should not run for a missing required portrait")
+
+    monkeypatch.setattr(plate, "_load_avatar", should_not_load)
+    img = plate.render_plate(dict(
+        CHAT,
+        avatar="renders/avatars/missing-required.png",
+        avatar_required=True,
+    ))
+    assert img.mode == "RGBA"
+    assert seen == []
+    assert img.tobytes() != plate.render_plate(CHAT).tobytes()
+
 def test_plates_sit_on_the_picture_not_on_the_letterbox_bar():
     """A 2.39:1 cinematic in a 16:9 file has ~140px of baked-in black.
 

@@ -123,6 +123,15 @@ def _avatar_for(character, leads):
     return identity["avatar"] if identity else None
 
 
+def _avatar_fields_for(character, leads):
+    identity = _identity_for(character, leads)
+    if not identity:
+        return {}
+    return {key: identity[key]
+            for key in ("avatar", "avatar_url", "avatar_required")
+            if key in identity}
+
+
 def lanes_for(cues):
     """Character -> chat lane, so a two-hander reads as two sides.
 
@@ -211,9 +220,7 @@ def plan_chat(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD, busy=No
             "position": lanes.get(cue["character"], "center"), "kind": "chat",
             "speaker": speaker, "text": cue["text"],
         }
-        avatar = _avatar_for(cue["character"], leads)
-        if avatar:
-            entry["avatar"] = avatar
+        entry.update(_avatar_fields_for(cue["character"], leads))
         placed.append(entry)
 
     placed.sort(key=lambda e: e["at"])
@@ -321,9 +328,7 @@ def plan_script(cues, shots, leads, max_shot_sec=None, hold=MAX_CHAT_HOLD,
             "position": lanes.get(cue["character"], "center"), "kind": "chat",
             "speaker": speaker, "text": cue["text"],
         }
-        avatar = _avatar_for(cue["character"], leads)
-        if avatar:
-            entry["avatar"] = avatar
+        entry.update(_avatar_fields_for(cue["character"], leads))
         entries.append(entry)
         cursor = at + duration + TAIL_OUT
         if log:

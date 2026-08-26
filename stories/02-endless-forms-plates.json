@@ -46,7 +46,8 @@
       "title": "Cloud Native Atom Smasher",
       "wreath": true,
       "avatar": "renders/avatars/rochaporto.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4",
+      "avatar_required": true
     },
     {
       "id": "og_thockin",
@@ -73,7 +74,8 @@
       "text": "No one can tell which Ricardo is which so roll with it",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/jrsapi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_ricardo_nukeguy",
@@ -86,7 +88,8 @@
       "text": "It's me the nuke guy how do you think I got here?",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/rochaporto.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_pilot_lunar",
@@ -111,7 +114,8 @@
       "text": "They wanted us to put AI in the glider so we did.",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/ricardosalveti.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/44008055?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/44008055?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_clankers_context",
@@ -152,8 +156,9 @@
       "name": "Joseph Sandoval",
       "title": "Master Wielder | Uplifter of Users",
       "variant": "leader",
-      "avatar": "renders/avatars/joseph_sandoval.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+      "avatar": "renders/avatars/jrsapi.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4",
+      "avatar_required": true
     },
     {
       "id": "trio_rochaporto",
@@ -171,7 +176,8 @@
       "title": "Cloud Native Atom Smasher",
       "wreath": true,
       "avatar": "renders/avatars/rochaporto.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4",
+      "avatar_required": true
     },
     {
       "id": "trio_mara_sov",
@@ -188,7 +194,10 @@
       "name": "Karena Angell",
       "title": "Architect of the Consensus",
       "variant": "leader",
-      "wreath": true
+      "wreath": true,
+      "avatar": "renders/avatars/angellk.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_joseph_slop",
@@ -200,7 +209,8 @@
       "text": "That explains the slop",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/jrsapi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_karena_job",
@@ -212,7 +222,8 @@
       "text": "I love this job",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/angellk.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4",
+      "avatar_required": true
     },
     {
       "id": "choice_lfx_00",
@@ -1565,7 +1576,8 @@
       "text": "K1 Logistics is clean",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/mfahlandt.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5739844?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/5739844?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_kfaseela_gamers",
@@ -1578,7 +1590,8 @@
       "text": "The gamers were here alright",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/kfaseela.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/7901446?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/7901446?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_markmandel_online",
@@ -1591,7 +1604,8 @@
       "text": "Agones Cluster - ONLINE",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/markmandel.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/298370?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/298370?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_riaankleinhans_close",
@@ -1604,7 +1618,8 @@
       "text": "You're getting close",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/riaankleinhans.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/61125752?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/61125752?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_jrsapi_learn",
@@ -1618,7 +1633,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 117.266,
       "avatar": "renders/avatars/jrsapi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_rochaporto_move",
@@ -1632,7 +1648,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 119.716,
       "avatar": "renders/avatars/rochaporto.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_metrics_cluster",
@@ -1646,7 +1663,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 122.266,
       "avatar": "renders/avatars/jrsapi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_karena_cardio",
@@ -1660,7 +1678,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 125.266,
       "avatar": "renders/avatars/angellk.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_metrics_mentoring",
@@ -1673,7 +1692,8 @@
       "text": "They just need mentoring in the right skills",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/jrsapi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_mars_title",
@@ -1709,7 +1729,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 141.266,
       "avatar": "renders/avatars/angellk.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_rochaporto_cern",
@@ -1723,7 +1744,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 143.716,
       "avatar": "renders/avatars/rochaporto.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_jrsapi_notes",
@@ -1737,7 +1759,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 152.266,
       "avatar": "renders/avatars/jrsapi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4",
+      "avatar_required": true
     },
     {
       "id": "top_banner_ogc_1",
@@ -1760,7 +1783,8 @@
       "text": "The gamers would have to impress BOTH Ricardos",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/jrsapi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4",
+      "avatar_required": true
     },
     {
       "id": "toc_ricardo",
@@ -1773,7 +1797,8 @@
       "text": "Look man I am so tired just jump",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/rochaporto.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4",
+      "avatar_required": true
     },
     {
       "id": "late_final_question",
@@ -1821,7 +1846,8 @@
       "class": "Sunbreaker Titan",
       "variant": "nobara",
       "avatar": "renders/avatars/LionHeartP.png",
-      "avatar_url": "https://github.com/LionHeartP.png?size=256",
+      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4",
+      "avatar_required": true,
       "seen_at_src": 186.366,
       "why": "the centered Guardian against Saturn, one shot before pastaq's cue"
     },
@@ -1837,7 +1863,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 189.366,
       "avatar": "renders/avatars/pastaq.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/9809174?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/9809174?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_lionheartp_what_tests",
@@ -1851,7 +1878,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 193.366,
       "avatar": "renders/avatars/LionHeartP.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4",
+      "avatar_required": true
     },
     {
       "id": "walk_A1RM4X",
@@ -1865,7 +1893,8 @@
       "title": "Useful Youtuber (UNCOMMON)",
       "variant": "youtube",
       "avatar": "renders/avatars/A1RM4X.png",
-      "avatar_url": "https://github.com/A1RM4X.png?size=256",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4",
+      "avatar_required": true,
       "seen_at_src": 195.816,
       "why": "the freed-up ghost seat before GloriousEggroll speaks to him"
     },
@@ -1880,7 +1909,8 @@
       "text": "Thank you I never thought I could help!",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/A1RM4X.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_a1rmax_intro_2",
@@ -1893,7 +1923,8 @@
       "text": "I'm not like you I'm just a lowly user",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/A1RM4X.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4",
+      "avatar_required": true
     },
     {
       "id": "walk_ge_stream",
@@ -1906,7 +1937,8 @@
       "text": "It's your patch, turn the stream on",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/GloriousEggroll.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/11287837?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/11287837?v=4",
+      "avatar_required": true
     },
     {
       "id": "walk_a1rm4x",
@@ -1919,7 +1951,8 @@
       "text": "Let's get these numbers up",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/LionHeartP.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_wrkode_dibs",
@@ -1932,7 +1965,8 @@
       "text": "Oh dibs on this one",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/wrkode.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/73309415?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/73309415?v=4",
+      "avatar_required": true
     },
     {
       "id": "walk_patch_queue",
@@ -1957,7 +1991,8 @@
       "text": "There's nothing glorious about this job",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/GloriousEggroll.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/11287837?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/11287837?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_lionheartp_together",
@@ -1971,7 +2006,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 219.366,
       "avatar": "renders/avatars/LionHeartP.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_wrkode_kairos",
@@ -1984,7 +2020,8 @@
       "text": "Have I shown you Kairos my friend?",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/wrkode.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/73309415?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/73309415?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_eggroll_title",
@@ -1998,7 +2035,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 229.366,
       "avatar": "renders/avatars/LionHeartP.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_eggroll_blueberries",
@@ -2011,7 +2049,8 @@
       "text": "Usually Blueberries just send me a bunch of crap",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/LionHeartP.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_eggroll_didyou",
@@ -2025,7 +2064,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 236.366,
       "avatar": "renders/avatars/LionHeartP.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4",
+      "avatar_required": true
     },
     {
       "id": "walk_villain",
@@ -2051,7 +2091,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 240.366,
       "avatar": "renders/avatars/pastaq.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/9809174?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/9809174?v=4",
+      "avatar_required": true
     },
     {
       "id": "walk_ge_lesson",
@@ -2065,7 +2106,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 242.632,
       "avatar": "renders/avatars/LionHeartP.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_redacted_unlearning",
@@ -2114,7 +2156,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 303.117,
       "avatar": "renders/avatars/jrsapi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/5437766?v=4",
+      "avatar_required": true
     },
     {
       "id": "top_banner_ogc_2",
@@ -2138,7 +2181,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 308.45,
       "avatar": "renders/avatars/KyleGospo.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/10704358?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/10704358?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_redacted_blow",
@@ -2163,7 +2207,8 @@
       "text": "Hi sugar, I'm looking for Kyle",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_hikari_ouch",
@@ -2176,7 +2221,8 @@
       "text": "Ouch man wtf!",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/HikariKnight.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_owen_sorry",
@@ -2201,7 +2247,8 @@
       "text": "Who turned PvP on?",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/kolunmi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_angellk_pvp",
@@ -2214,7 +2261,8 @@
       "text": "Don't look at me I only turned on PVP",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/angellk.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_cam_noone",
@@ -2239,7 +2287,8 @@
       "text": "Hey wait?!",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/HikariKnight.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_kolunmi_users",
@@ -2252,7 +2301,8 @@
       "text": "Are those ... other linux users?",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/kolunmi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_amber_bazaar",
@@ -2265,7 +2315,8 @@
       "text": "\"How bazaar?\"",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_amber_crap",
@@ -2278,7 +2329,8 @@
       "text": "Who writes this crap?",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_amber_dungeon",
@@ -2291,7 +2343,8 @@
       "text": "Oh wow I forgot what the starter dungeon was like! Hi!",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_akgraner_kindness_1",
@@ -2305,7 +2358,8 @@
       "text_source": "owner_supplied",
       "scale": 1.18,
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_akgraner_kindness_2",
@@ -2319,7 +2373,8 @@
       "text_source": "owner_supplied",
       "scale": 1.18,
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_akgraner_kindness_3",
@@ -2333,7 +2388,8 @@
       "text_source": "owner_supplied",
       "scale": 1.18,
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_akgraner_kindness_4",
@@ -2347,7 +2403,8 @@
       "text_source": "owner_supplied",
       "scale": 1.18,
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_akgraner_kindness_5",
@@ -2361,7 +2418,8 @@
       "text_source": "owner_supplied",
       "scale": 1.18,
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_akgraner_kindness_6",
@@ -2375,7 +2433,8 @@
       "text_source": "owner_supplied",
       "scale": 1.18,
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_which_kyle",
@@ -2389,7 +2448,8 @@
       "text_source": "owner_supplied",
       "scale": 1.0,
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_amber_problem",
@@ -2402,7 +2462,8 @@
       "text": "Ok so I'm going to clean out this trash for you",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_amber_decide",
@@ -2415,7 +2476,8 @@
       "text": "[Don't let them decide for you]",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_amber_fate",
@@ -2428,7 +2490,8 @@
       "text": "You make your own fate.",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_amber_shittywriting",
@@ -2441,7 +2504,8 @@
       "text": "I can't save you from this shitty writing though",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/akgraner.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/6200805?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_nwoods3_seen",
@@ -2454,7 +2518,8 @@
       "text": "I feel seen",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/nwoods3.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/28409908?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/28409908?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_kolunmi_level",
@@ -2467,7 +2532,8 @@
       "text": "Hey did you see how we just loaded up in a new level?",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/kolunmi.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4",
+      "avatar_required": true
     },
     {
       "id": "chat_hikari_warframe",
@@ -2480,7 +2546,8 @@
       "text": "Finally, I can play WARFRAME!",
       "text_source": "owner_supplied",
       "avatar": "renders/avatars/HikariKnight.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/2557889?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_haters",
@@ -2507,7 +2574,8 @@
       "text_source": "owner_supplied",
       "seen_at_src": 331.763,
       "avatar": "renders/avatars/KyleGospo.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/10704358?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/10704358?v=4",
+      "avatar_required": true
     },
     {
       "id": "mapped_kolunmi_disco",
@@ -2522,6 +2590,7 @@
       "seen_at_src": 333.817,
       "avatar": "renders/avatars/kolunmi.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/113054217?v=4",
+      "avatar_required": true,
       "bond_of": "mapped_kyle_sup"
     },
     {
@@ -2541,7 +2610,8 @@
       "title": "Seer of the Truth",
       "variant": "bazzite",
       "avatar": "renders/avatars/EyeCantCU.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/18015150?v=4"
+      "avatar_url": "https://avatars.githubusercontent.com/u/18015150?v=4",
+      "avatar_required": true
     },
     {
       "id": "retirement-1",

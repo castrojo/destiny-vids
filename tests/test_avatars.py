@@ -16,10 +16,12 @@ import urllib.request
 from pathlib import Path
 
 import pytest
+from PIL import Image
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
+import build_efmb_plates  # noqa: E402
 import build_credits as B  # noqa: E402
 from tools import avatars as A  # noqa: E402
 from tools import credits as C  # noqa: E402
@@ -81,6 +83,22 @@ def cache(tmp_path, monkeypatch):
 
 def budget(clock, total=A.MAX_SLEEP_TOTAL):
     return A.Budget(total=total, sleep=clock.sleep, clock=clock.now)
+
+
+def write_valid_png(path):
+    img = Image.new("RGBA", (256, 256))
+    for y in range(img.height):
+        for x in range(img.width):
+            img.putpixel((x, y), ((x * 17) % 256, (y * 29) % 256, (x + y) % 256, 255))
+    img.save(path)
+
+
+def manifest_for(login):
+    return {"plates": [{
+        "id": "line", "kind": "chat", "speaker": login,
+        "avatar": f"renders/avatars/{login}.png",
+        "avatar_required": True,
+    }]}
 
 # --- conditional requests --------------------------------------------------
 
@@ -242,6 +260,36 @@ def test_the_real_manifest_asks_only_for_things_that_look_like_logins():
     assert all(" " not in login for login in logins)
     assert len(logins) == len(set(logins))
 
+
+def test_act_two_requires_angellk_and_akgraner_avatars():
+    manifest = build_efmb_plates.build()
+    assert {"angellk", "akgraner"} <= set(A.required_avatar_logins(manifest))
+
+
+def test_act_three_dialogue_avatar_logins_follow_live_identity_resolution():
+    assert set(A.required_avatar_logins_for_dialogue(
+        "yt_curse_of_osiris_opening_cinematic"
+    )) == {"mrbobbytables", "clubanderson", "angellk"}
+
+
+def test_missing_required_avatar_omits_the_plate_instead_of_drawing_a_crest(cache):
+    prepared, findings = A.prepare_manifest_avatars(manifest_for("angellk"))
+    assert prepared["plates"] == []
+    assert findings == [{
+        "plate_id": "line",
+        "speaker": "angellk",
+        "avatar": "renders/avatars/angellk.png",
+        "status": "omitted_missing_required_avatar",
+    }]
+
+
+def test_present_required_avatar_keeps_the_exact_plate(cache):
+    write_valid_png(cache / "angellk.png")
+    manifest = manifest_for("angellk")
+    prepared, findings = A.prepare_manifest_avatars(manifest)
+    assert prepared["plates"] == manifest["plates"]
+    assert findings == []
+
 # --- the CI bridge ---------------------------------------------------------
 
 def test_a_missing_gh_is_a_note_not_a_failure(cache):
@@ -286,3 +334,11 @@ def test_the_workflow_runs_on_the_runner_token_and_never_a_pat():
     assert "${{ github.token }}" in text
     assert "secrets." not in text
     assert "permissions:" in text and "contents: read" in text
+
+
+def test_the_workflow_unions_the_exact_act_two_act_three_and_credits_inputs():
+    text = WORKFLOW.read_text()
+    assert "python3 -m tools.avatars \\" in text
+    assert "--manifest stories/02-endless-forms-plates.json \\" in text
+    assert "--dialogue yt_curse_of_osiris_opening_cinematic \\" in text
+    assert "--credits-manifest stories/08-credits.json" in text

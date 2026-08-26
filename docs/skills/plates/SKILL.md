@@ -115,8 +115,14 @@ verifiable and a display name is not. `vocab/casting.yaml` carries the scar:
 stranger's face on her credit.
 
 No login means the crest stands in and the gap is recorded — the correct
-outcome, and where `preethi` and Karena sit today. `github: null` with *"not
-an agent's to guess"* beside it is a decision already taken.
+outcome, and where `preethi` sits today. `github: null` with *"not an agent's
+to guess"* beside it is a decision already taken.
+
+A **canonical** real-person plate is stricter: when a card resolves through the
+shared GitHub identity model it carries `avatar_required: true`, and a missing
+cached portrait omits that card from the prepared burn manifest with
+`omitted_missing_required_avatar` recorded in `unresolved`. The fallback crest
+remains only for entries that do not claim a real person's required portrait.
 
 ### Dialogue the owner re-sequenced
 

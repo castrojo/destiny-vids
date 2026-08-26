@@ -87,6 +87,7 @@ OUT_DIR="renders"
 PLATES_DIR="$OUT_DIR/plates-$VIDEO_ID"
 BASE="$WORK/base.mp4"
 MANIFEST="$OUT_DIR/$VIDEO_ID-plates.json"
+PREPARED_MANIFEST="$OUT_DIR/$VIDEO_ID-burn-manifest.json"
 FIXED_MANIFEST="stories/$VIDEO_ID-fixed-plates.json"
 FINAL="$OUT_DIR/$VIDEO_ID-credited${SUFFIX}.mp4"
 
@@ -138,6 +139,11 @@ python3 tools/plate.py plan "$WORK/cut.json" --roster "$ROSTER" \
 python3 tools/plate.py merge "$WORK/fixed-with-chat.json" "$WORK/ensemble.json" \
     --out "$MANIFEST"
 
+echo "==> required portraits from Actions and a persistent burn manifest"
+python3 -m tools.avatars --manifest "$MANIFEST" --from-actions
+python3 -m tools.avatars --manifest "$MANIFEST" \
+    --prepare "renders/$VIDEO_ID-burn-manifest.json"
+
 echo "==> redact burned-in copy${MUSIC:+ and score}"
 REDACT_OUTRO=()
 OUTRO="stories/$VIDEO_ID-outro.json"
@@ -164,12 +170,12 @@ echo "==> burn the deck"
 # loop below only knows how to draw `logowall`. Swallowing it means a new
 # full-frame kind is skipped in silence and the burn either dies on a missing
 # PNG or, worse, reuses a stale one from the last build.
-python3 tools/plate.py render --manifest "$MANIFEST" --out-dir "$PLATES_DIR" \
+python3 tools/plate.py render --manifest "$PREPARED_MANIFEST" --out-dir "$PLATES_DIR" \
     --fit-video "$SOURCE_VIDEO" | grep -v '^wrote ' || true
 # Full-frame cards plate.py does not draw (the interstitial precedent): each
 # logowall entry is rendered from the landscape record by its own builder,
 # landing in the same plates dir under the same plate_<id>.png name.
-mapfile -t WALLS < <(python3 - "$MANIFEST" <<'PY'
+mapfile -t WALLS < <(python3 - "$PREPARED_MANIFEST" <<'PY'
 import json
 import sys
 
@@ -190,7 +196,7 @@ for wall in "${WALLS[@]}"; do
         --fit-video "$SOURCE_VIDEO" \
         --out "$PLATES_DIR/plate_$WALL_ID.png"
 done
-python3 tools/plate.py burn --video "$BASE" --manifest "$MANIFEST" \
+python3 tools/plate.py burn --video "$BASE" --manifest "$PREPARED_MANIFEST" \
     --plates-dir "$PLATES_DIR" "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}" --out "$FINAL"
 
 echo "==> $FINAL"

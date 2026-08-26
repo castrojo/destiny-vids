@@ -122,6 +122,7 @@ def chat_identity(login: str, people=None) -> dict:
         "speaker": canonical,
         "avatar": f"renders/avatars/{canonical}.png",
         "avatar_url": f"https://avatars.githubusercontent.com/u/{person.github_id}?v=4",
+        "avatar_required": True,
     }
 
 

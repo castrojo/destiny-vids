@@ -43,6 +43,7 @@ the direct fetch below still works.
 
 from __future__ import annotations
 
+import copy
 import json
 import subprocess
 import sys
@@ -93,6 +94,91 @@ MAX_SLEEP_TOTAL = 240.0 # all waits in a run, before it gives up and reports
 # the upload step must not drift apart, and a test asserts they have not.
 WORKFLOW = "avatars.yml"
 ARTIFACT = "avatars"
+
+
+def _manifest_entries(manifest):
+    if isinstance(manifest, dict):
+        return list(manifest.get("plates", manifest.get("cards", [])))
+    return list(manifest or [])
+
+
+def _load_json(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def required_avatar_logins(manifest):
+    """Canonical logins whose portrait is required by a manifest."""
+    from tools import identity
+
+    logins = []
+    for entry in _manifest_entries(manifest):
+        if not entry.get("avatar_required"):
+            continue
+        avatar = entry.get("avatar")
+        if not avatar:
+            continue
+        login = identity.canonical_login(Path(avatar).stem)
+        logins.append(login)
+    return list(dict.fromkeys(logins))
+
+
+def required_avatar_logins_for_dialogue(video_id):
+    """Canonical logins resolved by the live dialogue record for ``video_id``."""
+    from tools import dialogue, identity
+
+    logins = []
+    for cue in dialogue.load_dialogue(video_id).get("cues", []):
+        person = identity.person_for_character(cue.get("character", ""))
+        if person and person.github_id:
+            logins.append(person.login)
+    return list(dict.fromkeys(logins))
+
+
+def prepare_manifest_avatars(manifest, strict=False):
+    """Drop plates whose required portrait is missing and record why."""
+    prepared = copy.deepcopy(manifest)
+    findings = []
+    entries = _manifest_entries(prepared)
+    kept = []
+    for entry in entries:
+        avatar = entry.get("avatar")
+        if entry.get("avatar_required") and avatar and not have(Path(avatar).stem):
+            findings.append({
+                "plate_id": entry["id"],
+                "speaker": entry.get("speaker") or entry.get("name"),
+                "avatar": avatar,
+                "status": "omitted_missing_required_avatar",
+            })
+            continue
+        kept.append(entry)
+    if findings and strict:
+        raise FileNotFoundError(
+            ", ".join(f"{item['plate_id']} ({item['avatar']})" for item in findings)
+        )
+    if isinstance(prepared, dict):
+        if "plates" in prepared:
+            prepared["plates"] = kept
+        elif "cards" in prepared:
+            prepared["cards"] = kept
+        prepared.setdefault("unresolved", []).extend(findings)
+    else:
+        prepared = kept
+    return prepared, findings
+
+
+def requested_logins(manifest=None, dialogue_video_ids=None, credits_manifest=None):
+    """Union the required logins across the selected inputs."""
+    logins = []
+    if manifest is not None:
+        logins.extend(required_avatar_logins(manifest))
+    for video_id in dialogue_video_ids or []:
+        logins.extend(required_avatar_logins_for_dialogue(video_id))
+    if credits_manifest is not None:
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        import build_credits as B
+
+        logins.extend(B.avatar_logins(credits_manifest))
+    return list(dict.fromkeys(logins))
 
 
 def load_index():
@@ -309,6 +395,14 @@ def main(argv=None):
     import argparse
 
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--manifest",
+                    help="fetch or prepare against this plate manifest")
+    ap.add_argument("--dialogue", action="append", default=[],
+                    help="include one dialogue/<video_id>/dialogue.json identity set")
+    ap.add_argument("--credits-manifest",
+                    help="include this credits manifest's contributor login set")
+    ap.add_argument("--prepare",
+                    help="write a persistent burn manifest with missing required portraits omitted")
     ap.add_argument("--from-actions", action="store_true",
                     help="download CI's cache first, then fill any gaps")
     ap.add_argument("--revalidate", action="store_true",
@@ -316,18 +410,46 @@ def main(argv=None):
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args(argv)
 
-    sys.path.insert(0, str(REPO_ROOT / "scripts"))
-    import build_credits as B
+    manifest = _load_json(args.manifest) if args.manifest else None
+    credits_manifest = (
+        _load_json(args.credits_manifest)
+        if args.credits_manifest
+        else None
+    )
+    logins = requested_logins(
+        manifest=manifest,
+        dialogue_video_ids=args.dialogue,
+        credits_manifest=credits_manifest,
+    )
+    if not (args.manifest or args.dialogue or args.credits_manifest):
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        import build_credits as B
 
-    manifest = json.loads(B.MANIFEST.read_text())
-    logins = B.avatar_logins(manifest)
+        credits_manifest = json.loads(B.MANIFEST.read_text())
+        logins = requested_logins(credits_manifest=credits_manifest)
 
-    if args.from_actions:
-        pull_from_actions(verbose=not args.quiet)
-    _tally, missing = fetch(logins, verbose=not args.quiet,
-                            revalidate=args.revalidate)
-    if missing and not args.quiet:
-        print(f"{len(missing)} of {len(logins)} logins have no cached face.")
+    if args.prepare:
+        if manifest is None:
+            raise SystemExit("--prepare requires --manifest")
+        prepared, findings = prepare_manifest_avatars(manifest)
+        Path(args.prepare).write_text(
+            json.dumps(prepared, indent=2, sort_keys=False) + "\n",
+            encoding="utf-8",
+        )
+        if not args.quiet:
+            kept = len(_manifest_entries(prepared))
+            print(f"avatars: wrote {args.prepare} ({kept} kept, {len(findings)} omitted)")
+        return 0
+
+    if logins:
+        if args.from_actions:
+            pull_from_actions(verbose=not args.quiet)
+        _tally, missing = fetch(logins, verbose=not args.quiet,
+                                revalidate=args.revalidate)
+        if missing and not args.quiet:
+            print(f"{len(missing)} of {len(logins)} logins have no cached face.")
+    elif not args.quiet:
+        print("avatars: no required logins")
     return 0
 
 

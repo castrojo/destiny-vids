@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tools import dialogue, plate  # noqa: E402
+from tools import avatars, dialogue, plate  # noqa: E402
 from tools.identity import UnknownPerson
 
 RECOVERY_FIXTURE = Path(__file__).with_name("fixtures") / "acts_ii_iii_recovery.json"
@@ -141,6 +141,7 @@ def test_chat_mode_still_places_the_settled_lines():
         "renders/avatars/clubanderson.png",
         "renders/avatars/mrbobbytables.png",
     ]
+    assert all(e["avatar_required"] is True for e in entries)
 
 def test_dialogue_never_double_books_the_screen():
     entries, _ = dialogue.plan_chat(CUES, SHOTS, LEADS)
@@ -504,6 +505,7 @@ def test_act3_priority_dialogue_reseats_stay_in_film_order_and_use_people_logins
         assert planned[cue_id]["speaker"] == speaker
         assert planned[cue_id]["avatar"] == (
             f"renders/avatars/{speaker}.png")
+        assert planned[cue_id]["avatar_required"] is True
     assert planned["d22"]["at"] == pytest.approx(135.21)
     assert planned["d23a"]["position"] == "center"
     assert planned["d23a"]["at"] == pytest.approx(
@@ -539,6 +541,20 @@ def test_act3_priority_dialogue_preserves_pre_recovery_delivered_holds():
         "d28": 2.53,
         "d22": 2.83,
     })
+
+
+def test_act3_dialogue_required_avatar_logins_follow_live_cues():
+    assert set(avatars.required_avatar_logins_for_dialogue(VIDEO_ID)) == {
+        "mrbobbytables", "clubanderson", "angellk",
+    }
+
+
+def test_build_uncut_credited_fetches_and_prepares_a_persistent_burn_manifest():
+    builder = Path("scripts/build_uncut_credited.sh").read_text(encoding="utf-8")
+    assert 'python3 -m tools.avatars --manifest "$MANIFEST" --from-actions' in builder
+    assert '--prepare "renders/$VIDEO_ID-burn-manifest.json"' in builder
+    assert 'python3 tools/plate.py render --manifest "$PREPARED_MANIFEST"' in builder
+    assert 'python3 tools/plate.py burn --video "$BASE" --manifest "$PREPARED_MANIFEST"' in builder
 
 
 # -- lanes ------------------------------------------------------------------

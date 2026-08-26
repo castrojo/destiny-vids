@@ -13,8 +13,14 @@ run the same code.
 ## Fill it from CI, not from your laptop
 
 ```bash
-python3 -m tools.avatars --from-actions   # unpack CI's artifact: one request
-python3 -m tools.avatars                  # fetch what is still missing
+python3 -m tools.avatars --from-actions   # Act VIII default: unpack CI's artifact, then fill gaps
+python3 -m tools.avatars --manifest stories/02-endless-forms-plates.json --from-actions
+python3 -m tools.avatars --manifest stories/02-endless-forms-plates.json \
+    --prepare renders/02-endless-forms-burn-manifest.json
+python3 -m tools.avatars --manifest renders/yt_curse_of_osiris_opening_cinematic-plates.json \
+    --from-actions
+python3 -m tools.avatars --manifest renders/yt_curse_of_osiris_opening_cinematic-plates.json \
+    --prepare renders/yt_curse_of_osiris_opening_cinematic-burn-manifest.json
 python3 -m tools.avatars --revalidate     # re-check every cached face
 python3 scripts/build_credits.py --avatars-from-actions   # both, then render
 ```
@@ -29,9 +35,23 @@ asserted against the workflow by `tests/test_avatars.py` so the upload and the
 download cannot drift.
 
 It runs on `workflow_dispatch` and on a push that touches
+`stories/02-endless-forms-plates.json`,
+`dialogue/yt_curse_of_osiris_opening_cinematic/dialogue.json`,
 `stories/08-credits.json`, `vocab/casting.yaml` or `tools/avatars.py` — the
-three files that decide which logins exist. Nothing is scheduled, because
-nothing here needs to run when nobody changed the cast.
+committed inputs that decide which portraits acts II, III and VIII can ask
+for. Nothing is scheduled, because nothing here needs to run when nobody
+changed the cast.
+
+`--manifest` asks only for entries carrying `avatar_required: true`, and
+`--dialogue` resolves the live cue speakers through `tools.identity.person_for_character`.
+The workflow unions those exact sources in one call:
+
+```bash
+python3 -m tools.avatars \
+  --manifest stories/02-endless-forms-plates.json \
+  --dialogue yt_curse_of_osiris_opening_cinematic \
+  --credits-manifest stories/08-credits.json
+```
 
 ## What makes a re-run nearly free
 
@@ -59,6 +79,18 @@ draws.
 
 Everything about the CI path degrades the same way — no `gh`, not logged in, no
 successful run yet, artifact expired — and the direct fetch still works.
+
+## Required portraits omit the card; optional artwork keeps the fallback
+
+`prepare_manifest_avatars()` writes the persistent burn manifest each act burns
+from. A canonical real-person entry carries `avatar_required: true`; when its
+cached portrait is missing, the entry is omitted from the prepared manifest and
+recorded in `unresolved` as `omitted_missing_required_avatar`. The renderer then
+never gets the wrong fallback crest for that person.
+
+Optional artwork stays on the old rule: if an entry does **not** claim a real
+person's required portrait, a missing file may still degrade to the existing
+crest or ring fallback.
 
 ## Never ask github.com for a name
 

@@ -35,7 +35,9 @@ def test_login_spelling_is_canonical_but_display_names_are_not_aliases():
 
 
 def test_chat_identity_uses_the_stable_github_account_id():
-    assert chat_identity("akgraner")["avatar_url"].endswith("/6200805?v=4")
+    identity = chat_identity("akgraner")
+    assert identity["avatar_url"].endswith("/6200805?v=4")
+    assert identity["avatar_required"] is True
 
 
 def test_legacy_cast_key_migrates_without_copying_a_second_plate():

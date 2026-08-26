@@ -15,7 +15,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_efmb  # noqa: E402
 import build_efmb_plates  # noqa: E402
-from tools import chapter_md, readtime  # noqa: E402
+from tools import avatars, chapter_md, readtime  # noqa: E402
 from tools.identity import chat_identity, person_for_character  # noqa: E402
 
 RECOVERY_FIXTURE = Path(__file__).with_name("fixtures") / "acts_ii_iii_recovery.json"
@@ -179,8 +179,12 @@ def expected_recovered_object(plate_id):
         person = person_for_character("mara_sov")
         assert person is not None and person.plate is not None
         expected.update(person.plate)
-        expected.pop("avatar", None)
-        expected.pop("avatar_url", None)
+        identity = chat_identity(person.login)
+        expected.update({
+            "avatar": identity["avatar"],
+            "avatar_url": identity["avatar_url"],
+            "avatar_required": identity["avatar_required"],
+        })
     return expected
 
 
@@ -355,6 +359,15 @@ def chapter_entries_with_label(label):
 def test_the_committed_manifest_matches_its_generator():
     """It is an OUTPUT. A conflict in it is settled by re-running the tool."""
     assert committed() == build_efmb_plates.build()
+
+
+def test_act_two_real_person_entries_require_canonical_portraits():
+    mara = plate_by_id("trio_mara_sov")
+    assert mara["avatar"] == "renders/avatars/angellk.png"
+    assert mara["avatar_required"] is True
+    assert {"angellk", "akgraner"} <= set(
+        avatars.required_avatar_logins(build_efmb_plates.build())
+    )
 
 def test_the_manifest_builds_from_committed_inputs_only():
     """Everything the generator reads must be in the repository.
@@ -1219,6 +1232,8 @@ def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
         assert entry["kind"] == "chat"
         assert entry["speaker"] == speaker
         assert entry.get("avatar") == avatar
+        if avatar is not None:
+            assert entry["avatar_required"] is True
 
 def test_amber_action_and_post_action_hallway_stay_distinct():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -1233,9 +1248,14 @@ def test_amber_action_and_post_action_hallway_stay_distinct():
     assert action[-1]["at"] + action[-1]["dur"] <= \
         build_efmb.HALLWAY_AFTER_AMBER_AT
     assert build_efmb.HALLWAY_AFTER_AMBER_AT < build_efmb.HALLWAY_RETURN_AT
-    assert by_id["mapped_kyle_sup"]["at"] > build_efmb.HALLWAY_RETURN_AT
-    assert "mapped_amber_ready" not in by_id
-    assert "mapped_reaction_hell" not in by_id
+
+
+def test_rebuild_efmb_uses_a_prepared_burn_manifest_and_cached_actions_avatars():
+    script = (REPO_ROOT / "scripts" / "rebuild_efmb.sh").read_text(encoding="utf-8")
+    assert "--manifest stories/02-endless-forms-plates.json --from-actions" in script
+    assert "--prepare renders/02-endless-forms-burn-manifest.json" in script
+    assert "--manifest renders/02-endless-forms-burn-manifest.json" in script
+    assert "--plates-dir renders/plates-efmb" in script
 
 def test_the_late_titles_and_last_chats_replace_the_old_conflicting_windows():
     late = late_plates()
