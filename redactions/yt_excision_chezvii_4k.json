@@ -1,0 +1,24 @@
+{
+  "video_id": "yt_excision_chezvii_4k",
+  "note": "The rally cutscene is clean picture inside a 1920x804 letterbox, but the capture burns game subtitles into the lower black bar. The box removes only that authored subtitle rail; it never covers picture. Gameplay later in the upload carries HUD and player nameplates and is not acknowledged by this record.",
+  "redactions": [
+    {
+      "id": "rally_subtitle_rail",
+      "start_sec": 0.0,
+      "end_sec": 109.0,
+      "reason": "Game subtitles burned into the lower letterbox bar during the rally cutscene",
+      "action": "box",
+      "acknowledges": [
+        "seg_yt_excision_chezvii_4k_0040-0092"
+      ],
+      "boxes": [
+        {
+          "x": 0,
+          "y": 936,
+          "w": 1920,
+          "h": 144
+        }
+      ]
+    }
+  ]
+}
