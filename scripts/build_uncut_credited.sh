@@ -201,3 +201,8 @@ python3 tools/plate.py burn --video "$BASE" --manifest "$PREPARED_MANIFEST" \
 
 echo "==> $FINAL"
 ffprobe -v error -show_entries format=duration -of csv=p=0 "$FINAL"
+
+if [ "$VIDEO_ID" = "yt_curse_of_osiris_opening_cinematic" ]; then
+    echo "==> acceptance audit (not run automatically)"
+    echo "python3 tools/plate_frame_audit.py --delivered $FINAL --manifest $PREPARED_MANIFEST --plates-dir $PLATES_DIR --expected tests/fixtures/acts_ii_iii_recovery.json --act III --out renders/recovery/act-III --check"
+fi

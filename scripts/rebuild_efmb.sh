@@ -57,3 +57,6 @@ python3 tools/plate.py burn --video renders/efmb-hq.mp4 \
 
 echo "==> done; deliver with: python3 tools/deliver.py publish --act II"
 ffprobe -v error -show_entries format=duration -of csv=p=0 renders/efmb-plated.mp4
+
+echo "==> acceptance audit (not run automatically)"
+echo "python3 tools/plate_frame_audit.py --delivered renders/efmb-plated.mp4 --manifest renders/02-endless-forms-burn-manifest.json --plates-dir renders/plates-efmb --expected tests/fixtures/acts_ii_iii_recovery.json --act II --out renders/recovery/act-II --check"

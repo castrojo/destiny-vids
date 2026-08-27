@@ -26,6 +26,14 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import generate_schema_enums as gen  # noqa: E402
 
+
+def test_dialogue_presentation_modes_are_generated_from_vocab():
+    assert gen.MAP[(
+        "dialogue-presentation.schema.json",
+        "/properties/mode",
+    )] == ("dialogue.yaml", "presentation_mode")
+
+
 def test_every_mapping_points_at_a_real_vocab_axis():
     for (schema_file, pointer), (vocab_file, key) in gen.MAP.items():
         values = gen.vocab_values(vocab_file, key)
@@ -68,23 +76,29 @@ def test_check_mode_fails_on_a_drifted_enum(tmp_path):
     drifted = gen.drifted(schema_dir)
     assert ("segment.schema.json", "/properties/class") in drifted
 
-def test_writing_repairs_a_drifted_enum(tmp_path):
+@pytest.mark.parametrize("schema_file,pointer", [
+    ("segment.schema.json", "/properties/class"),
+    ("dialogue-presentation.schema.json", "/properties/mode"),
+])
+def test_writing_repairs_a_drifted_enum(tmp_path, schema_file, pointer):
     schema_dir = tmp_path / "schema"
     schema_dir.mkdir()
     for src in (REPO_ROOT / "schema").glob("*.json"):
         (schema_dir / src.name).write_text(src.read_text())
 
-    victim = schema_dir / "segment.schema.json"
+    victim = schema_dir / schema_file
     doc = json.loads(victim.read_text())
-    doc["properties"]["class"]["enum"] = ["titan"]
+    gen.resolve_pointer(doc, pointer)["enum"] = ["hand_edited"]
     victim.write_text(json.dumps(doc, indent=2) + "\n")
 
     gen.write(schema_dir)
 
     assert not gen.drifted(schema_dir)
     repaired = json.loads(victim.read_text())
-    assert repaired["properties"]["class"]["enum"] == gen.vocab_values(
-        "domain.yaml", "class")
+    vocab_file, key = gen.MAP[(schema_file, pointer)]
+    assert gen.resolve_pointer(repaired, pointer)["enum"] == gen.vocab_values(
+        vocab_file, key
+    )
 
 def test_writing_changes_nothing_else_in_the_file(tmp_path):
     """The generator edits enum lists and touches nothing around them."""

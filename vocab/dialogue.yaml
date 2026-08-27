@@ -1,0 +1,8 @@
+# vocab/dialogue.yaml
+# Canonical dialogue-planning vocabulary.
+
+presentation_mode:
+  description: How dialogue cues are seated on the delivered film.
+  values:
+    anchored: Place cues against their source anchors and available shots.
+    script: Flow cues in authored sequence around fixed presentation pins.

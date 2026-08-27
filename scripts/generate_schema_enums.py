@@ -100,6 +100,8 @@ MAP = {
         ("provenance.yaml", "label_source"),
     ("bed.schema.json", "/properties/usage_class"):
         ("provenance.yaml", "usage_class"),
+    ("dialogue-presentation.schema.json", "/properties/mode"):
+        ("dialogue.yaml", "presentation_mode"),
 }
 
 

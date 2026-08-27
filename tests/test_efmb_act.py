@@ -1260,6 +1260,32 @@ def test_rebuild_efmb_uses_a_prepared_burn_manifest_and_cached_actions_avatars()
     assert "--manifest renders/02-endless-forms-burn-manifest.json" in script
     assert "--plates-dir renders/plates-efmb" in script
 
+
+def test_act_two_delivery_tracks_the_plate_renderer_that_reaches_pixels():
+    delivery = json.loads(
+        (REPO_ROOT / "stories" / "megacut" / "delivery.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert "tools/plate.py" in delivery["masters"]["II"]["sources"]
+
+
+def test_rebuild_efmb_prints_the_non_blocking_frame_audit_command_last():
+    script = (REPO_ROOT / "scripts" / "rebuild_efmb.sh").read_text(
+        encoding="utf-8"
+    )
+    audit = (
+        "python3 tools/plate_frame_audit.py "
+        "--delivered renders/efmb-plated.mp4 "
+        "--manifest renders/02-endless-forms-burn-manifest.json "
+        "--plates-dir renders/plates-efmb "
+        "--expected tests/fixtures/acts_ii_iii_recovery.json "
+        "--act II --out renders/recovery/act-II --check"
+    )
+    assert f'echo "{audit}"' in script
+    assert script.index("ffprobe -v error") < script.index(f'echo "{audit}"')
+
+
 def test_the_late_titles_and_last_chats_replace_the_old_conflicting_windows():
     late = late_plates()
     assert late["late_mars_title"]["kind"] == "title"

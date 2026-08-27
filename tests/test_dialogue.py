@@ -621,6 +621,31 @@ def test_build_uncut_credited_fetches_and_prepares_a_persistent_burn_manifest():
     assert 'python3 tools/plate.py burn --video "$BASE" --manifest "$PREPARED_MANIFEST"' in builder
 
 
+def test_act_three_delivery_tracks_the_plate_renderer_that_reaches_pixels():
+    delivery = json.loads(
+        Path("stories/megacut/delivery.json").read_text(encoding="utf-8")
+    )
+    assert "tools/plate.py" in delivery["masters"]["III"]["sources"]
+
+
+def test_target_act_three_rebuild_prints_its_non_blocking_frame_audit_command_last():
+    builder = Path("scripts/build_uncut_credited.sh").read_text(encoding="utf-8")
+    target_guard = (
+        'if [ "$VIDEO_ID" = "yt_curse_of_osiris_opening_cinematic" ]; then'
+    )
+    audit = (
+        "python3 tools/plate_frame_audit.py "
+        "--delivered $FINAL --manifest $PREPARED_MANIFEST "
+        "--plates-dir $PLATES_DIR "
+        "--expected tests/fixtures/acts_ii_iii_recovery.json "
+        "--act III --out renders/recovery/act-III --check"
+    )
+    assert target_guard in builder
+    assert f'echo "{audit}"' in builder
+    assert builder.index("ffprobe -v error") < builder.index(target_guard)
+    assert builder.index(target_guard) < builder.index(f'echo "{audit}"')
+
+
 # -- lanes ------------------------------------------------------------------
 
 def _cues(*characters):

@@ -78,9 +78,13 @@ def http(code, headers=None):
 
 @pytest.fixture
 def cache(tmp_path, monkeypatch):
-    """Point the module at a throwaway directory, not the real cache."""
-    monkeypatch.setattr(C, "AVATAR_DIR", tmp_path)
-    return tmp_path
+    """Isolate both repo-relative candidates and the cache directory."""
+    repo_root = tmp_path / "repo"
+    cache_dir = repo_root / "renders" / "avatars"
+    cache_dir.mkdir(parents=True)
+    monkeypatch.setattr(A, "REPO_ROOT", repo_root)
+    monkeypatch.setattr(C, "AVATAR_DIR", cache_dir)
+    return cache_dir
 
 def budget(clock, total=A.MAX_SLEEP_TOTAL):
     return A.Budget(total=total, sleep=clock.sleep, clock=clock.now)
