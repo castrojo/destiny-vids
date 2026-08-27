@@ -26,6 +26,12 @@ that record.
   source review.
 - Do not normalize, EQ, compress, limit, or otherwise master the bed. Preserve
   its native rate and make `pcm_s24le` the lossless handoff.
+- Final-bed boundaries are decoded **sample** boundaries. Supply measured
+  `start-sample` and exclusive `end-sample` values to `atrim`, then require the
+  returned PCM's `duration_ts` to equal `end-sample - start-sample`. Do not use
+  input `-ss` or `-t` for a final bed: seeking compressed Opus packets can
+  silently discard valid samples. FFmpeg defines `end_sample` as the first
+  sample dropped (source: `/websites/ffmpeg_documentation`).
 - A mux candidate applies one recorded static gain to the original verified
   PCM bed and makes **one** 320k AAC encode. It never uses an earlier AAC
   candidate as input.
@@ -56,12 +62,16 @@ This workflow accepts an authorized source only: it has no picture parameter or
 picture dependency. It fetches and hashes the source, remotely records
 `ffprobe` identity, silence boundaries, a review spectrum, and the spectral
 measurements; it gates 48 kHz and source bandwidth; then it makes the original
-48 kHz `pcm_s24le` bed and measures it with `ebur128`.
+48 kHz `pcm_s24le` bed, proves its exact sample count, and measures it with
+`ebur128`.
 
 Save it as `.work-<hero>01/<hero>01-bed.yaml`. The example parameters are
 valid YAML and must be replaced from the authorization record before use. Keep
 `record-prefix` stable for this exact bed record; choose a new prefix if
 building a distinct bed so its evidence cannot replace an earlier record.
+Quote substituted authorization-reference parameter or annotation values that
+contain `: ` (including a `User supplied local source: ...` reference), since
+that sequence is not valid unquoted YAML scalar content.
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -86,9 +96,13 @@ spec:
         value: http://192.168.1.227:8880
       - name: record-prefix
         value: example-hero01-bed-v1
-      - name: start-seconds
+      - name: start-sample
         value: "0"
-      - name: duration-seconds
+      - name: end-sample
+        value: "1440000"
+      - name: expected-sample-count
+        value: "1440000"
+      - name: expected-duration-seconds
         value: "30"
       - name: authorization-reference
         value: example-authorization-record
@@ -246,18 +260,96 @@ spec:
             fi
 
             bed_status=not-built
+            bed_format_gate=not-run
             if [ "$sample_rate_gate" = pass ] &&
                [ "$high_frequency_gate" != hard-fail ] &&
                [ "$overall" -eq 0 ]; then
               run_to_file bed-build.txt ffmpeg -hide_banner -y \
-                -ss '{{workflow.parameters.start-seconds}}' \
-                -t '{{workflow.parameters.duration-seconds}}' \
-                -i "$work/source" -map 0:a:0 -vn -ar "$native_rate" \
+                -i "$work/source" -map 0:a:0 -vn \
+                -af 'atrim=start_sample={{workflow.parameters.start-sample}}:end_sample={{workflow.parameters.end-sample}},asetpts=PTS-STARTPTS' \
                 -c:a pcm_s24le "$work/bed.wav"
-              if [ -f "$work/bed.wav" ]; then
+              if [ -f "$work/bed.wav" ] && [ "$overall" -eq 0 ]; then
+                ffprobe -v error -of json \
+                  -show_entries format=format_name,duration:stream=index,codec_type,codec_name,sample_fmt,sample_rate,channels,channel_layout,time_base,duration_ts \
+                  "$work/bed.wav" > "$work/bed-format.json" 2> "$work/bed-format.stderr"
+                bed_format_status=$?
+                printf 'exit_status=%s\n' "$bed_format_status" >> "$work/bed-format.stderr"
+                bed_codec=""
+                bed_rate=""
+                bed_channels=""
+                bed_time_base=""
+                bed_duration_ts=""
+                if [ "$bed_format_status" -eq 0 ]; then
+                  bed_codec="$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name \
+                    -of default=nokey=1:noprint_wrappers=1 "$work/bed.wav" 2>> "$work/bed-format.stderr")"
+                  bed_codec_status=$?
+                  bed_rate="$(ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate \
+                    -of default=nokey=1:noprint_wrappers=1 "$work/bed.wav" 2>> "$work/bed-format.stderr")"
+                  bed_rate_status=$?
+                  bed_channels="$(ffprobe -v error -select_streams a:0 -show_entries stream=channels \
+                    -of default=nokey=1:noprint_wrappers=1 "$work/bed.wav" 2>> "$work/bed-format.stderr")"
+                  bed_channels_status=$?
+                  bed_time_base="$(ffprobe -v error -select_streams a:0 -show_entries stream=time_base \
+                    -of default=nokey=1:noprint_wrappers=1 "$work/bed.wav" 2>> "$work/bed-format.stderr")"
+                  bed_time_base_status=$?
+                  bed_duration_ts="$(ffprobe -v error -select_streams a:0 -show_entries stream=duration_ts \
+                    -of default=nokey=1:noprint_wrappers=1 "$work/bed.wav" 2>> "$work/bed-format.stderr")"
+                  bed_duration_ts_status=$?
+                else
+                  bed_codec_status=1
+                  bed_rate_status=1
+                  bed_channels_status=1
+                  bed_time_base_status=1
+                  bed_duration_ts_status=1
+                fi
+                bed_rate_json=null
+                bed_channels_json=null
+                bed_duration_ts_json=null
+                expected_sample_count='{{workflow.parameters.expected-sample-count}}'
+                sample_parameters_gate=hard-fail
+                if printf '%s\n' "$bed_rate" | grep -Eq '^[0-9]+$'; then
+                  bed_rate_json="$bed_rate"
+                fi
+                if printf '%s\n' "$bed_channels" | grep -Eq '^[0-9]+$'; then
+                  bed_channels_json="$bed_channels"
+                fi
+                if printf '%s\n' "$bed_duration_ts" | grep -Eq '^[0-9]+$'; then
+                  bed_duration_ts_json="$bed_duration_ts"
+                fi
+                if printf '%s\n' '{{workflow.parameters.start-sample}}' | grep -Eq '^[0-9]+$' &&
+                   printf '%s\n' '{{workflow.parameters.end-sample}}' | grep -Eq '^[0-9]+$' &&
+                   printf '%s\n' "$expected_sample_count" | grep -Eq '^[0-9]+$' &&
+                   [ '{{workflow.parameters.end-sample}}' -ge '{{workflow.parameters.start-sample}}' ] &&
+                   [ "$expected_sample_count" -eq $(({{workflow.parameters.end-sample}} - {{workflow.parameters.start-sample}})) ]; then
+                  sample_parameters_gate=pass
+                fi
+                bed_format_gate=hard-fail
+                if [ "$sample_parameters_gate" = pass ] &&
+                   [ "$bed_format_status" -eq 0 ] &&
+                   [ "$bed_codec_status" -eq 0 ] &&
+                   [ "$bed_rate_status" -eq 0 ] &&
+                   [ "$bed_channels_status" -eq 0 ] &&
+                   [ "$bed_time_base_status" -eq 0 ] &&
+                   [ "$bed_duration_ts_status" -eq 0 ] &&
+                   [ "$bed_codec" = "pcm_s24le" ] &&
+                   [ "$bed_rate" = "48000" ] &&
+                   [ "$bed_channels" = "2" ] &&
+                   [ "$bed_time_base" = "1/48000" ] &&
+                   [ "$bed_duration_ts" = "$expected_sample_count" ]; then
+                  bed_format_gate=pass
+                else
+                  overall=1
+                fi
+                printf '%s\n' \
+                  "{\"expected_start_sample\":{{workflow.parameters.start-sample}},\"expected_end_sample\":{{workflow.parameters.end-sample}},\"expected_sample_count\":$expected_sample_count,\"expected_duration_seconds\":\"{{workflow.parameters.expected-duration-seconds}}\",\"sample_parameters_gate\":\"$sample_parameters_gate\",\"codec_name\":\"$bed_codec\",\"sample_rate_hz\":$bed_rate_json,\"channels\":$bed_channels_json,\"time_base\":\"$bed_time_base\",\"duration_ts\":$bed_duration_ts_json,\"overall\":\"$bed_format_gate\"}" \
+                  > "$work/bed-format-gate.json"
                 run_to_file bed-ebur128.txt ffmpeg -hide_banner -i "$work/bed.wav" \
                   -af ebur128=peak=true -f null -
-                bed_status=written
+                if [ "$bed_format_gate" = pass ]; then
+                  bed_status=written
+                else
+                  bed_status=format-rejected
+                fi
               else
                 overall=1
                 bed_status=failed
@@ -268,7 +360,7 @@ spec:
               gate_overall=hard-fail
             fi
             printf '%s\n' \
-              "{\"authorization_reference\":\"{{workflow.parameters.authorization-reference}}\",\"source_sha256\":\"$source_sha256\",\"sample_rate_hz\":$native_rate_json,\"sample_rate_gate\":\"$sample_rate_gate\",\"highpass_over_16khz_db\":$highpass_json,\"reference_8khz_band_db\":$reference_json,\"high_to_8khz_ratio_db\":$ratio_json,\"high_frequency_gate\":\"$high_frequency_gate\",\"bed_status\":\"$bed_status\",\"overall\":\"$gate_overall\"}" \
+              "{\"authorization_reference\":\"{{workflow.parameters.authorization-reference}}\",\"source_sha256\":\"$source_sha256\",\"sample_rate_hz\":$native_rate_json,\"sample_rate_gate\":\"$sample_rate_gate\",\"highpass_over_16khz_db\":$highpass_json,\"reference_8khz_band_db\":$reference_json,\"high_to_8khz_ratio_db\":$ratio_json,\"high_frequency_gate\":\"$high_frequency_gate\",\"bed_format_gate\":\"$bed_format_gate\",\"bed_status\":\"$bed_status\",\"overall\":\"$gate_overall\"}" \
               > "$work/audio-gate.json"
             exit "$overall"
         volumeMounts:
@@ -297,7 +389,7 @@ spec:
               "{\"workflow_name\":\"{{workflow.name}}\",\"workflow_uid\":\"{{workflow.uid}}\",\"workflow_status\":\"{{workflow.status}}\",\"stage\":\"bed\"}" \
               > "$work/workflow-status.json"
             : > "$work/SHA256SUMS"
-            files="source-fetch-status.json audio-format.json sample-rate.txt sample-rate.stderr silencedetect.txt spectrum.txt spectrum.png highpass-16khz.txt reference-8khz.txt bed-build.txt bed.wav bed-ebur128.txt audio-gate.json workflow-status.json"
+            files="source-fetch-status.json audio-format.json sample-rate.txt sample-rate.stderr silencedetect.txt spectrum.txt spectrum.png highpass-16khz.txt reference-8khz.txt bed-build.txt bed.wav bed-format.json bed-format.stderr bed-format-gate.json bed-ebur128.txt audio-gate.json workflow-status.json"
             for file in $files; do
               if [ -f "$work/$file" ]; then
                 sha256sum "$work/$file" >> "$work/SHA256SUMS"
@@ -316,12 +408,15 @@ spec:
             mountPath: /work
 ```
 
-Do not use the bed if `<record-prefix>-audio-gate.json` is not
-`overall: "pass"`. A warning is recorded in `high_frequency_gate`; it is not
-permission to ignore source review. Record the workflow ID, source
-authorization reference, exact parameters, record prefix, every returned hash,
-native rate, silence boundaries, spectrum review, ratio, and `ebur128` results
-in `verify-notes.md`.
+Do not use the bed if `<record-prefix>-audio-gate.json` or
+`<record-prefix>-bed-format-gate.json` is not `overall: "pass"`. The latter
+must record `pcm_s24le`, 48,000 Hz stereo, `time_base: "1/48000"`, and
+`duration_ts` exactly equal to `end-sample - start-sample`; it is the
+authoritative trim proof. A warning in `high_frequency_gate` is not permission
+to ignore source review. Record the workflow ID, source authorization
+reference, exact sample parameters and duration, record prefix, every returned
+hash, native rate, silence boundaries, spectrum review, ratio, and `ebur128`
+results in `verify-notes.md`.
 
 ## Stage 2 — mux and validation workflow
 
