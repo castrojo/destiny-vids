@@ -757,6 +757,14 @@ gain, original bed hash, picture hash, decoded true peak, target-range status,
 spectral ratio, workflow ID, and uploaded hashes in `verify-notes.md`,
 including failed candidates.
 
+The uploaded `SHA256SUMS` inventory records the pod's absolute `/work/` paths.
+After receiving the evidence, verify it locally as opaque bytes by removing
+only that path prefix; do not rewrite the inventory or run a media decoder:
+
+```bash
+sed 's|/work/||g' <candidate-id>-SHA256SUMS | sha256sum -c -
+```
+
 Use the video's dedicated receiver port. Lakshmi is **8880**; RAFI_01 and
 RAFI_02 use **8878** and **8879** respectively. That port is for PUT results
 only: the example bed and gate GET URLs above intentionally use the source

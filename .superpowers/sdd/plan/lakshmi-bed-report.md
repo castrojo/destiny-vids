@@ -21,12 +21,12 @@ opaque-byte hashing and reading returned text/JSON/PNG records.
 | Run | Workflow / UID | Parameters | Result |
 | --- | --- | --- | --- |
 | Analysis candidate | `lakshmi01-bed-876l7` / `d6ee7fb1-ca58-483d-8fab-1e96df4c1a09` | prefix `lakshmi01-ghost-love-score-analysis-602s-v1`, `-ss 0`, `-t 602` | Succeeded, 23:00:03–23:01:08 -04:00 |
-| V1 final bed | `lakshmi01-bed-lwfvw` / `66abe67f-b410-45cd-9860-43da81d18b0e` | prefix `lakshmi01-ghost-love-score-bed-v1`, input `-ss 0 -t 595.040917` | Rejected for timing only: 28,560,896 samples / 595.018666667 s |
+| V1 final bed | `lakshmi01-bed-lwfvw` / `66abe67f-b410-45cd-9860-43da81d18b0e` | prefix `lakshmi01-ghost-love-score-bed-v1`, input `-ss 0 -t 595.040917` | Rejected for timing only: 28,560,956 samples / 595.019916667 s |
 | V2 final bed | `lakshmi01-bed-v2-h4h2t` / `76571918-9e60-4ae5-86e3-0c59a09a3d97` | prefix `lakshmi01-ghost-love-score-bed-v2`, `atrim=start_sample=0:end_sample=28561964` | Succeeded, 23:16:33–23:17:41 -04:00 |
 
 Remote `silencedetect=noise=-50dB:d=0.5` found no qualifying leading silence
 and one trailing interval: `595.040917..602.08` (7.039083 seconds). V1's
-input-side seek lost `1,068` valid samples to Opus packet granularity, so its
+input-side seek lost `1,008` valid samples to Opus packet granularity, so its
 bed SHA-256 is rejected only as a timing input; all v1 evidence remains
 retained. V2 decodes first and retains exactly samples `0..28,561,963`
 (exclusive `end_sample=28561964`) with `atrim` and `asetpts`. Its exact
