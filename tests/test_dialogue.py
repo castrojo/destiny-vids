@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tools import avatars, dialogue, plate  # noqa: E402
+from tools import avatars, dialogue, plate, readtime  # noqa: E402
 from tools.identity import UnknownPerson
 
 RECOVERY_FIXTURE = Path(__file__).with_name("fixtures") / "acts_ii_iii_recovery.json"
@@ -541,6 +541,70 @@ def test_act3_priority_dialogue_preserves_pre_recovery_delivered_holds():
         "d28": 2.53,
         "d22": 2.83,
     })
+
+
+def test_act3_d10_preserves_the_post_397_readable_display_hold():
+    """The recovered source window stays evidence; only its old display hold returns."""
+    data = dialogue.load_dialogue(VIDEO_ID)
+    plan = dialogue.load_presentation(VIDEO_ID)
+    d10 = next(cue for cue in data["cues"] if cue["id"] == "d10")
+
+    assert (d10["start_sec"], d10["end_sec"]) == (72.44, 80.87)
+    assert dialogue.presentation_hold("d10", plan) == pytest.approx(4.89)
+    assert dialogue.planned_hold(d10, plan) == pytest.approx(4.89)
+    assert dialogue.planned_hold(d10, plan) >= readtime.required_hold(d10["text"])
+    assert dialogue.presentation_pin("d13", plan) == 90.0
+
+
+def test_act3_full_prepared_manifest_keeps_all_27_cues(tmp_path, monkeypatch):
+    """The real fixed-card windows leave the complete recovered exchange buildable."""
+    from PIL import Image
+    from tools.derive import load_leads
+
+    data = dialogue.load_dialogue(VIDEO_ID)
+    plan = dialogue.load_presentation(VIDEO_ID)
+    fixed = plate.load_manifest(
+        Path("stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json")
+    )
+    busy = [
+        (float(entry["at"]), float(entry["at"]) + float(entry["dur"]))
+        for entry in fixed
+    ]
+    entries, dropped = dialogue.plan_script(
+        data["cues"],
+        [shot("long", 0.0, 200.0)],
+        load_leads(),
+        busy=busy,
+        presentation=plan,
+        start_at=plan["start_sec"],
+    )
+
+    assert not dropped
+    assert [entry["id"] for entry in entries] == plan["sequence"]
+    assert len(entries) == 27
+    planned = {entry["id"]: entry for entry in entries}
+    assert planned["d10"]["dur"] == pytest.approx(4.89)
+    assert planned["d11"]["at"] < planned["d13"]["at"]
+    assert planned["d11"]["at"] + planned["d11"]["dur"] <= planned["d13"]["at"]
+    assert planned["d13"]["at"] == 90.0
+
+    manifest = {"plates": [*fixed, *entries], "unresolved": []}
+    plate.load_manifest_entries(manifest["plates"])
+
+    monkeypatch.setattr(avatars, "REPO_ROOT", tmp_path)
+    avatar_dir = tmp_path / "renders" / "avatars"
+    avatar_dir.mkdir(parents=True)
+    for login in ("mrbobbytables", "clubanderson", "angellk"):
+        Image.effect_noise((256, 256), 64).convert("RGBA").save(
+            avatar_dir / f"{login}.png"
+        )
+
+    prepared, findings = avatars.prepare_manifest_avatars(manifest)
+    assert findings == []
+    assert [
+        entry["id"] for entry in prepared["plates"] if entry.get("kind") == "chat"
+    ] == plan["sequence"]
+    plate.load_manifest_entries(prepared["plates"])
 
 
 def test_act3_dialogue_required_avatar_logins_follow_live_cues():
