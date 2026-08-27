@@ -88,9 +88,9 @@ def build():
         _plate(
             person_for_character("petra_venj"),
             "excision-lori",
-            38.0,
+            37.0,
             "right",
-            "Petra Venj is visibly framed at source 78-80; the binding names Lori",
+            "Petra Venj is visibly framed at source 77.0-77.7; the binding names Lori and the plate rides across the following cut",
         ),
     ]
     return {

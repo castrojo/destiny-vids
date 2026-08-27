@@ -94,7 +94,7 @@
     },
     {
       "id": "excision-lori",
-      "at": 38.0,
+      "at": 37.0,
       "dur": 4.0,
       "position": "right",
       "label": "HERALD // GUARDIAN",
@@ -103,7 +103,7 @@
       "title": "Pathfinder of the Iron Weave",
       "variant": "rust",
       "copy_source": "casting",
-      "why": "Petra Venj is visibly framed at source 78-80; the binding names Lori"
+      "why": "Petra Venj is visibly framed at source 77.0-77.7; the binding names Lori and the plate rides across the following cut"
     }
   ],
   "unresolved": [
