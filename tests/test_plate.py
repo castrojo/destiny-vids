@@ -1502,30 +1502,14 @@ def test_the_issue_1_brief_end_to_end_through_the_parser():
 
 # --- a lead's plate carries only what was authored ---------------------------
 #
-# A real person's subclass is deck data, never a lore call about the character
-# they play. Karena's binding was the case where the owner had supplied the
-# class (Warlock) but no subclass; for act II the owner re-authored the whole
-# plate and supplied the subclass (Stasis), answering issue #5. These pin the
-# new copy verbatim -- and pin that the old copy survives in the binding's
-# `note:`, so the change is visible rather than silent.
+# Mara Sov now resolves to kdruckman, whose GitHub identity is verified but
+# whose Guardian plate has not been authored. The absence is deliberate:
+# carrying the previous person's copy across a recast would credit the wrong
+# real person.
 
-def test_the_mara_sov_plate_is_exactly_what_was_authored():
+def test_the_mara_sov_plate_stays_absent_until_kdruckman_authors_one():
     from tools.derive import load_leads
-    spec = load_leads()["mara_sov"]["plate"]
-    assert (spec["label"], spec["class"], spec["name"], spec["title"]) == (
-        "ARCHON // CONTRIBUTOR", "Stasis Warlock",
-        "Karena Angell", "Architect of the Consensus"), (
-        "owner-authored for act II, the subclass (#5) now supplied; a "
-        "paraphrase is as wrong as an invention"
-    )
-    assert spec["variant"] == "leader"   # gold, carried over -- never withdrawn
-    assert spec["wreath"] is True        # "the most senior warrior in the series"
-    assert "avatar" not in spec
-
-def test_the_mara_sov_plate_renders():
-    from tools.derive import load_leads
-    img = plate.render_plate(load_leads()["mara_sov"]["plate"])
-    assert img.width > 0 and img.height > 0
+    assert load_leads()["mara_sov"]["plate"] is None
 
 def test_a_lead_plate_renders_without_a_class_row():
     """The standing fallback when no class is authored at all. Synthetic copy:

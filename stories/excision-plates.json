@@ -110,7 +110,8 @@
     "The Season of Dawn super beat is omitted because the available capture carries gameplay HUD; the clean Excision rally replaces it rather than widening the pool to unclean footage.",
     "Ikora Rey and Crow are visibly present in the rally but have no current authored person binding; they are omitted rather than guessed.",
     "Ana Bray has a binding but no authored plate copy, so her rally shot ships without a credit row.",
-    "Cayde-6 and Mara Sov have authored bindings but no unambiguous seat in the selected rally window; their plates are omitted rather than moved onto unsupported picture.",
+    "Mara Sov maps to kdruckman, but kdruckman has no authored plate copy; Mara's rally shot ships without a credit row.",
+    "Cayde-6 has an authored binding but no unambiguous seat in the selected rally window; his plate is omitted rather than moved onto unsupported picture.",
     "The Ward source is no-HUD third-person footage; Kat is credited on the clearly visible Saint-14 rally shot rather than on an indistinct figure inside the bubble."
   ]
 }
