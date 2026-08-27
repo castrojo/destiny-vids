@@ -112,7 +112,6 @@ CAST_SHORTHAND = {
     "anderson": ("casting.person", "clubanderson"),
     "saint": ("casting.character", "saint_14"),
     "mara": ("casting.character", "mara_sov"),
-    "karena": ("casting.person", "angellk"),
     "lori": ("casting.person", "LoriLorusso"),
     "lorusso": ("casting.person", "LoriLorusso"),
     "ashley": ("casting.person", "ashleywillis"),

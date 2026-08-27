@@ -1,0 +1,86 @@
+{
+  "segment_id": "seg_yt_excision_chezvii_4k_0040-0092",
+  "video_id": "yt_excision_chezvii_4k",
+  "start_sec": 40.0,
+  "end_sec": 92.5,
+  "start_tc": "0:40",
+  "end_tc": "1:32",
+  "era": "the_final_shape",
+  "activity": "story_mission",
+  "content_type": "cutscene",
+  "destination": "the_pale_heart",
+  "overlays": [
+    "burned_text",
+    "letterbox"
+  ],
+  "subject_salience": "crowd_group",
+  "caption": "The defenders of Sol rally for the final battle; game subtitles are burned into the lower letterbox bar and are removed only by the committed redaction record.",
+  "clean": false,
+  "footage_tier": "cinematic",
+  "traversal_hero": false,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 3
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "destination": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}

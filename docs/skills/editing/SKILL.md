@@ -65,12 +65,13 @@ python3 tools/redact.py --video media/<video_id>.mp4 --video-id <video_id> \
     --audio media/<bed>.mp3 --audio-gain 0.9 --out base.mp4
 ```
 
-`redact.py` paints out the burned-in publisher copy an upload carries — the
-ratings card at the head, the logo lockup and legal line at the tail — from
-boxes authored in `redactions/<video_id>.json` against source pixels. On a cut
-those frames are simply `burned_text` and get dropped; uncut, there is nothing
-to drop them *for*, so they are covered instead. A redaction only ever removes:
-it never paints anything the frame did not already have to say.
+`redact.py` paints out non-diegetic burned-in copy an upload carries — publisher
+cards, logo/legal lockups, or a static subtitle rail wholly inside a black
+matte — from boxes authored in `redactions/<video_id>.json` against source
+pixels. On a cut those frames are normally `burned_text` and get dropped; when
+the picture itself is needed, an acknowledged redaction may remove only the
+copy. A redaction only ever removes: it never paints anything the frame did not
+already have to say.
 
 Two things follow, and both bite:
 

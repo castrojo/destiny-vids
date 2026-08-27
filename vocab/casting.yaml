@@ -78,6 +78,8 @@ people:
       class: Sentinel Titan
       name: Kat Cosgrove
       title: Defender Queen of the Lost
+  kdruckman:
+    github_id: 8461726
   natalisucks:
     github_id: 15304481
   nicknamenamenick:
@@ -305,7 +307,7 @@ leads:
       - saint
       - saint14
     mara_sov:
-      person: angellk
+      person: kdruckman
       aka:
       - queen_mara_sov
     petra_venj:

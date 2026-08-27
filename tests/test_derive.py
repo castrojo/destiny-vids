@@ -216,7 +216,7 @@ def test_concealed_visibilities_satisfy_require_helmet(visibility):
     ("Lord Saladin", "jeefy"),
     ("Osiris", "mrbobbytables"),
     ("Saint-14", "katcosgrove"),
-    ("Mara Sov", "angellk"),
+    ("Mara Sov", "kdruckman"),
     ("Petra Venj", "LoriLorusso"),
     ("Variks", "nate-double-u"),
     ("The Speaker", "jbryce"),
