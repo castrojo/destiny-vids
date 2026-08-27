@@ -4,12 +4,16 @@
 from __future__ import annotations
 
 import argparse
+import sys
 import tempfile
 from pathlib import Path
 
-from tools import farm, peaks, redact, render
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools import farm, peaks, redact, render  # noqa: E402
+
 MEDIA_DIR = REPO_ROOT / "media"
 DEFAULT_OUT = REPO_ROOT / "renders" / "excision" / "excision-clean.mp4"
 
