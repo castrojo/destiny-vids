@@ -18,13 +18,13 @@ from tools.identity import person_for_character  # noqa: E402
 OUT = REPO_ROOT / "stories" / "excision-plates.json"
 
 
-def _plate(person, plate_id, at, position, why):
+def _plate(person, plate_id, at, position, why, dur=4.0):
     if person is None or person.plate is None:
         raise ValueError(f"{plate_id} has no authored plate copy")
     return {
         "id": plate_id,
         "at": at,
-        "dur": 4.0,
+        "dur": dur,
         "position": position,
         **person.plate,
         "copy_source": "casting",
@@ -88,9 +88,10 @@ def build():
         _plate(
             person_for_character("petra_venj"),
             "excision-lori",
-            37.0,
+            36.2,
             "right",
-            "Petra Venj is visibly framed at source 77.0-77.7; the binding names Lori and the plate rides across the following cut",
+            "Petra Venj is visible beside Mara from source 76.2 until the cut at 77.627. Owner: 'ensure it only shows her', so this plate clears with Petra instead of riding across the cut.",
+            dur=1.4,
         ),
     ]
     return {

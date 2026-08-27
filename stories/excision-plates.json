@@ -94,8 +94,8 @@
     },
     {
       "id": "excision-lori",
-      "at": 37.0,
-      "dur": 4.0,
+      "at": 36.2,
+      "dur": 1.4,
       "position": "right",
       "label": "HERALD // GUARDIAN",
       "class": "Harbinger Hunter",
@@ -103,7 +103,7 @@
       "title": "Pathfinder of the Iron Weave",
       "variant": "rust",
       "copy_source": "casting",
-      "why": "Petra Venj is visibly framed at source 77.0-77.7; the binding names Lori and the plate rides across the following cut"
+      "why": "Petra Venj is visible beside Mara from source 76.2 until the cut at 77.627. Owner: 'ensure it only shows her', so this plate clears with Petra instead of riding across the cut."
     }
   ],
   "unresolved": [
