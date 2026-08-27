@@ -261,6 +261,29 @@
    ],
    "source_digest": "b87fb0ae57469bd0df88100610d7a363a3363e3d96c997aa809128f702da95fe"
   },
+  "renders/excision/excision-plated.mp4": {
+   "note": "The non-act Excision first-battle segment. CARRIES AUTHORED COPY ABOUT REAL PEOPLE and owner-supplied HUD strings. The rally subtitle rail is removed from the black matte; the Ward/finale source is explicitly no-HUD. The plated master is built in one burn from the clean cut.",
+   "sources": [
+    "scripts/build_excision.py",
+    "scripts/build_excision_plates.py",
+    "stories/excision-plates.json",
+    "videos/yt_excision_chezvii_4k.json",
+    "videos/yt_excision_nohud_hoople.json",
+    "redactions/yt_excision_chezvii_4k.json",
+    "tags/yt_excision_chezvii_4k.json",
+    "tags/yt_excision_nohud_hoople.json",
+    "segments/seg_yt_excision_chezvii_4k_0040-0092.json",
+    "segments/seg_yt_excision_nohud_hoople_0476-0496.json",
+    "segments/seg_yt_excision_nohud_hoople_0938-1018.json",
+    "tools/render.py",
+    "tools/redact.py",
+    "tools/plate.py",
+    "tools/farm.py",
+    "tools/identity.py",
+    "vocab/casting.yaml"
+   ],
+   "source_digest": "3cf70f32c061558bc67d96234cfa7a8b6e44ffad63a31a062af234580377482c"
+  },
   "renders/perfume-4.mp4": {
    "note": "Perfume movement 4, clean base. The programme seats its first 13.12 s before cutting to the overlay derivative below.",
    "sources": [

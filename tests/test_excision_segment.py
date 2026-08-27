@@ -60,6 +60,14 @@ def test_the_join_is_forced_to_the_delivery_frame_rate(tmp_path):
     assert command[command.index("-fps_mode") + 1] == "cfr"
 
 
+def test_every_builder_beat_is_clean_or_explicitly_redacted():
+    assert build_excision.validate_clean_gate() == [
+        "seg_yt_excision_chezvii_4k_0040-0092: redacted",
+        "seg_yt_excision_nohud_hoople_0476-0496: clean",
+        "seg_yt_excision_nohud_hoople_0938-1018: clean",
+    ]
+
+
 def test_the_committed_manifest_matches_its_generator():
     from scripts import build_excision_plates
 

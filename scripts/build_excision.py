@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -75,6 +76,37 @@ def concat_command(ffmpeg, list_path, out, audio_gain=None):
     return command
 
 
+def _index_segment_id(beat):
+    return (
+        f"seg_{beat['video_id']}_"
+        f"{int(beat['start_sec']):04d}-{int(beat['end_sec']):04d}"
+    )
+
+
+def validate_clean_gate():
+    results = []
+    for beat in BEATS:
+        segment_id = _index_segment_id(beat)
+        path = REPO_ROOT / "segments" / f"{segment_id}.json"
+        segment = json.loads(path.read_text(encoding="utf-8"))
+        if segment.get("clean"):
+            results.append(f"{segment_id}: clean")
+            continue
+        if beat.get("redactions"):
+            acknowledgements = {
+                acknowledged
+                for item in redact.load_redactions(beat["video_id"])["redactions"]
+                for acknowledged in item.get("acknowledges", [])
+            }
+            if segment_id in acknowledgements:
+                results.append(f"{segment_id}: redacted")
+                continue
+        raise ValueError(
+            f"{segment_id} is not clean and has no acknowledged redaction"
+        )
+    return results
+
+
 def _sources():
     resolved = {}
     for beat in BEATS:
@@ -107,8 +139,12 @@ def _chain(ffmpeg, tmp, out, sources, audio_gain=None):
 def build(out=DEFAULT_OUT, local=False, target_dbtp=peaks.DEFAULT_TARGET_DBTP):
     out = Path(out).expanduser().resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
+    validate_clean_gate()
     sources = _sources()
-    use_farm, why = (False, "--local given") if local else farm.cluster_available()
+    if local:
+        use_farm, why = False, "--local given"
+    else:
+        use_farm, why = farm.cluster_available()
     if use_farm:
         print("excision: cluster reachable; encoding on the farm")
     else:

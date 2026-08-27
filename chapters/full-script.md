@@ -233,40 +233,40 @@ Edit in `chapters/VI-wolves.md`.
 
 Edit in `chapters/P4-underwater.md`.
 
-- `25:25.44` **Jill Castro** — One more loose end
-- `25:27.33` **Valerie** — You can't escape yourself
-- `25:29.21` **Rafael** — You promised
-- `25:31.09` **castrojo** — Fine
-- `25:34.85` **LH** — Show them the minds
-- `25:36.73` **Valerie** — Of the wolves
-- `24:48.66` **Rafael** — What's a wolf?
+- `27:57.95` **Jill Castro** — One more loose end
+- `27:59.83` **Valerie** — You can't escape yourself
+- `28:01.71` **Rafael** — You promised
+- `28:03.59` **castrojo** — Fine
+- `28:07.36` **LH** — Show them the minds
+- `28:09.24` **Valerie** — Of the wolves
+- `27:21.16` **Rafael** — What's a wolf?
 
 ## VII
 
 Edit in `chapters/VII-europa.md`.
 
-- `26:27.62` **krook** — Deploy CNCF Projects Team
-- `26:29.62` **preethit** — Stand down, I'm sending my wolf
-- `26:31.62` **alolita** — Are you sure the Kube is on Europa?
-- `26:34.62` **preethit** — I hope she can handle the Kube
-- `26:37.02` **preethit** — I must not fail
-- `26:39.47` **alolita** — We have failed, Guardians are down
-- `26:41.99` **tophee** — I've confirmed it myself, we have no choice
-- `26:45.11` **tophee** — She's the only way to stop the Toilmaster
-- `26:51.62` **castrojo** — They must never know what you did for them
-- `26:54.62` **mrbobbytables** — When all hope is lost
-- `26:57.02` **jeefy** — Standing by for Extraction
-- `26:59.62` **ihor** — G{k8s}dspeed
-- `27:02.22` **preethit** — Our clan
-- `27:04.67` **preethit** — Is the Iron
-- `27:07.12` **preethit** — That forges Wolves
-- `27:09.57` **mrbobbytables** — Wolves gladly sacrifice for their own
-- `27:12.29` **krook** — Initiate Lone Wolf Protocol
-- `27:14.74` **iancoldwater** — Local Security systems trivially pwned
-- `27:17.52` **tabbysable** — Europan Security systems trivially pwned (again)
-- `27:28.62` **nimbatus** — Wilco
-- `27:30.82` **nimbatus** — {k8s}ut
-- `27:37.79` **preethit** — Hummingbird will find the girl
+- `29:00.13` **krook** — Deploy CNCF Projects Team
+- `29:02.13` **preethit** — Stand down, I'm sending my wolf
+- `29:04.13` **alolita** — Are you sure the Kube is on Europa?
+- `29:07.13` **preethit** — I hope she can handle the Kube
+- `29:09.53` **preethit** — I must not fail
+- `29:11.98` **alolita** — We have failed, Guardians are down
+- `29:14.50` **tophee** — I've confirmed it myself, we have no choice
+- `29:17.62` **tophee** — She's the only way to stop the Toilmaster
+- `29:24.13` **castrojo** — They must never know what you did for them
+- `29:27.13` **mrbobbytables** — When all hope is lost
+- `29:29.53` **jeefy** — Standing by for Extraction
+- `29:32.13` **ihor** — G{k8s}dspeed
+- `29:34.73` **preethit** — Our clan
+- `29:37.18` **preethit** — Is the Iron
+- `29:39.63` **preethit** — That forges Wolves
+- `29:42.08` **mrbobbytables** — Wolves gladly sacrifice for their own
+- `29:44.80` **krook** — Initiate Lone Wolf Protocol
+- `29:47.25` **iancoldwater** — Local Security systems trivially pwned
+- `29:50.03` **tabbysable** — Europan Security systems trivially pwned (again)
+- `30:01.13` **nimbatus** — Wilco
+- `30:03.33` **nimbatus** — {k8s}ut
+- `30:10.30` **preethit** — Hummingbird will find the girl
 
 ## VIII-cta
 
