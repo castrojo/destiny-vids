@@ -12,15 +12,15 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from tools.identity import load_people, person_for_character  # noqa: E402
+from scripts.build_excision import film_duration  # noqa: E402
+from tools.identity import person_for_character  # noqa: E402
 
 OUT = REPO_ROOT / "stories" / "excision-plates.json"
 
 
-def _lead(character, plate_id, at, position, why):
-    person = person_for_character(character)
+def _plate(person, plate_id, at, position, why):
     if person is None or person.plate is None:
-        raise ValueError(f"{character} has no authored plate copy")
+        raise ValueError(f"{plate_id} has no authored plate copy")
     return {
         "id": plate_id,
         "at": at,
@@ -30,22 +30,6 @@ def _lead(character, plate_id, at, position, why):
         "copy_source": "casting",
         "why": why,
     }
-
-
-def _person(login, plate_id, at, position, why):
-    person = load_people().get(login)
-    if person is None or person.plate is None:
-        raise ValueError(f"{login} has no authored plate copy")
-    return {
-        "id": plate_id,
-        "at": at,
-        "dur": 4.0,
-        "position": position,
-        **person.plate,
-        "copy_source": "casting",
-        "why": why,
-    }
-
 
 def build():
     plates = [
@@ -80,40 +64,33 @@ def build():
             "copy_source": "owner_supplied",
             "why": "owner-requested Osiris epigraph; chrome, not scene dialogue",
         },
-        _lead(
-            "saint_14",
+        _plate(
+            person_for_character("saint_14"),
             "excision-kat",
             4.0,
             "left",
             "Saint-14 is visibly framed at source 44-48; the binding names Kat",
         ),
-        _lead(
-            "osiris",
+        _plate(
+            person_for_character("osiris"),
             "excision-bob",
             8.0,
             "right",
             "Osiris is visibly framed beside Saint-14 at source 48-52",
         ),
-        _person(
-            "castrojo",
-            "excision-jorge",
-            54.0,
+        _plate(
+            person_for_character("zavala"),
+            "excision-kelsey",
+            30.0,
             "left",
-            "owner brief: authored Guardian identity on the no-HUD fireteam",
+            "Zavala is visibly framed at source 70-72; the binding names Kelsey",
         ),
-        _person(
-            "angellk",
-            "excision-karena",
-            60.0,
-            "right",
-            "owner brief: authored Guardian identity on the no-HUD fireteam",
-        ),
-        _person(
-            "LoriLorusso",
+        _plate(
+            person_for_character("petra_venj"),
             "excision-lori",
-            66.0,
-            "left",
-            "owner brief: authored Guardian identity on the no-HUD fireteam",
+            38.0,
+            "right",
+            "Petra Venj is visibly framed at source 78-80; the binding names Lori",
         ),
     ]
     return {
@@ -124,18 +101,27 @@ def build():
             "yt_excision_chezvii_4k",
             "yt_excision_nohud_hoople",
         ],
-        "film_sec": 152.5,
+        "film_sec": film_duration(),
         "letterbox": {
-            "active_height": 1080,
-            "active_y": 0,
-            "matte_px": 0,
-            "_note": "The segment mixes a letterboxed rally with full-frame gameplay; plates use the common 1920x1080 delivery frame.",
+            "mixed": True,
+            "rally": {
+                "active_height": 800,
+                "active_y": 140,
+                "matte_px": 140,
+            },
+            "gameplay": {
+                "active_height": 1080,
+                "active_y": 0,
+                "matte_px": 0,
+            },
+            "_note": "Measured source geometry varies by beat. Plates render against the common 1920x1080 delivery frame; rally lower thirds deliberately use its black matte.",
         },
         "plates": plates,
         "unresolved": [
             "The Season of Dawn super beat is omitted because the available capture carries gameplay HUD; the clean Excision rally replaces it rather than widening the pool to unclean footage.",
-            "Zavala, Ikora Rey and Crow are visibly present in the rally but have no current authored person binding; they are omitted rather than guessed.",
+            "Ikora Rey and Crow are visibly present in the rally but have no current authored person binding; they are omitted rather than guessed.",
             "Ana Bray has a binding but no authored plate copy, so her rally shot ships without a credit row.",
+            "Cayde-6 and Mara Sov have authored bindings but no unambiguous seat in the selected rally window; their plates are omitted rather than moved onto unsupported picture.",
             "The Ward source is no-HUD third-person footage; Kat is credited on the clearly visible Saint-14 rally shot rather than on an indistinct figure inside the bubble.",
         ],
     }

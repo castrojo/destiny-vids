@@ -8,10 +8,18 @@
   ],
   "film_sec": 152.5,
   "letterbox": {
-    "active_height": 1080,
-    "active_y": 0,
-    "matte_px": 0,
-    "_note": "The segment mixes a letterboxed rally with full-frame gameplay; plates use the common 1920x1080 delivery frame."
+    "mixed": true,
+    "rally": {
+      "active_height": 800,
+      "active_y": 140,
+      "matte_px": 140
+    },
+    "gameplay": {
+      "active_height": 1080,
+      "active_y": 0,
+      "matte_px": 0
+    },
+    "_note": "Measured source geometry varies by beat. Plates render against the common 1920x1080 delivery frame; rally lower thirds deliberately use its black matte."
   },
   "plates": [
     {
@@ -72,50 +80,37 @@
       "why": "Osiris is visibly framed beside Saint-14 at source 48-52"
     },
     {
-      "id": "excision-jorge",
-      "at": 54.0,
+      "id": "excision-kelsey",
+      "at": 30.0,
       "dur": 4.0,
       "position": "left",
-      "label": "TRUSTEE // GUARDIAN",
-      "class": "Harbinger Titan",
-      "name": "Jorge Castro",
-      "title": "Upender of Antipatterns | The First Disciple",
-      "trustee": true,
-      "copy_source": "casting",
-      "why": "owner brief: authored Guardian identity on the no-HUD fireteam"
-    },
-    {
-      "id": "excision-karena",
-      "at": 60.0,
-      "dur": 4.0,
-      "position": "right",
-      "label": "ARCHON // CONTRIBUTOR",
-      "class": "Stasis Warlock",
-      "name": "Karena Angell",
-      "title": "Architect of the Consensus",
+      "label": "ARCHITECT // GUARDIAN",
+      "class": "Dawnblade Warlock",
+      "name": "Kelsey Hightower",
+      "title": "Evangelist of the Open Sky",
       "variant": "leader",
-      "wreath": true,
       "copy_source": "casting",
-      "why": "owner brief: authored Guardian identity on the no-HUD fireteam"
+      "why": "Zavala is visibly framed at source 70-72; the binding names Kelsey"
     },
     {
       "id": "excision-lori",
-      "at": 66.0,
+      "at": 38.0,
       "dur": 4.0,
-      "position": "left",
+      "position": "right",
       "label": "HERALD // GUARDIAN",
       "class": "Harbinger Hunter",
       "name": "Lori Lorusso",
       "title": "Pathfinder of the Iron Weave",
       "variant": "rust",
       "copy_source": "casting",
-      "why": "owner brief: authored Guardian identity on the no-HUD fireteam"
+      "why": "Petra Venj is visibly framed at source 78-80; the binding names Lori"
     }
   ],
   "unresolved": [
     "The Season of Dawn super beat is omitted because the available capture carries gameplay HUD; the clean Excision rally replaces it rather than widening the pool to unclean footage.",
-    "Zavala, Ikora Rey and Crow are visibly present in the rally but have no current authored person binding; they are omitted rather than guessed.",
+    "Ikora Rey and Crow are visibly present in the rally but have no current authored person binding; they are omitted rather than guessed.",
     "Ana Bray has a binding but no authored plate copy, so her rally shot ships without a credit row.",
+    "Cayde-6 and Mara Sov have authored bindings but no unambiguous seat in the selected rally window; their plates are omitted rather than moved onto unsupported picture.",
     "The Ward source is no-HUD third-person footage; Kat is credited on the clearly visible Saint-14 rally shot rather than on an indistinct figure inside the bubble."
   ]
 }

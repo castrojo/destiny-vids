@@ -335,7 +335,8 @@ punch list; the backlog is for work.
   identity is as wrong as an invented one. Dialogue is *recovered*, not
   written: `dialogue/<video_id>/dialogue.json` with source timecodes and
   per-line evidence, beside the `DIALOGUE.md` the owner edits.
-  `redactions/<video_id>.json` only ever *removes* burned-in publisher copy.
+  `redactions/<video_id>.json` only ever *removes* non-diegetic burned-in
+  copy: publisher cards and static subtitle rails, never picture.
 - **Recovering authored copy is lookup, not reconstruction.** If the owner says
   a card, dialogue line, or credit was dropped, changed, or lost, inspect every
   worktree before editing: `git worktree list`, then search its records for the
