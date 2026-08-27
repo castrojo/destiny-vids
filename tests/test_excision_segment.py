@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from scripts import build_excision
@@ -49,3 +50,18 @@ def test_the_rally_command_removes_only_the_subtitle_bar(tmp_path):
     video_filter = command[command.index("-vf") + 1]
     assert "drawbox=x=0:y=936:w=1920:h=144" in video_filter
     assert "between(t,0.000,109.000)" in video_filter
+
+
+def test_the_join_is_forced_to_the_delivery_frame_rate(tmp_path):
+    command = build_excision.concat_command(
+        ["ffmpeg"], tmp_path / "clips.txt", tmp_path / "out.mp4"
+    )
+    assert command[command.index("-r") + 1] == "60000/1001"
+    assert command[command.index("-fps_mode") + 1] == "cfr"
+
+
+def test_the_committed_manifest_matches_its_generator():
+    from scripts import build_excision_plates
+
+    committed = json.loads(Path("stories/excision-plates.json").read_text())
+    assert committed == build_excision_plates.build()

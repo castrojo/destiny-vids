@@ -67,6 +67,14 @@ def clip_command(ffmpeg, beat, source, out):
     return command
 
 
+def concat_command(ffmpeg, list_path, out, audio_gain=None):
+    command = render._concat_argv(
+        ffmpeg, list_path, out, audio_gain=audio_gain
+    )
+    command[-1:-1] = ["-r", "60000/1001", "-fps_mode", "cfr"]
+    return command
+
+
 def _sources():
     resolved = {}
     for beat in BEATS:
@@ -91,11 +99,7 @@ def _chain(ffmpeg, tmp, out, sources, audio_gain=None):
         )
 
     list_path = tmp / "concat_list.txt"
-    commands.append(
-        render._concat_argv(
-            ffmpeg, list_path, out, audio_gain=audio_gain
-        )
-    )
+    commands.append(concat_command(ffmpeg, list_path, out, audio_gain))
     list_content = "".join(f"file '{clip}'\n" for clip in clips)
     return commands, list_path, list_content
 
