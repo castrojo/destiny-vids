@@ -2,18 +2,11 @@
 act: VII
 manifest: stories/07-europa-plates.json
 # WHERE THIS ACT STARTS IN THE PROGRAMME, in seconds. Measured, not guessed:
-# the running order's segment durations summed on 2026-08-27, with each item
-# taken the way tools/megacut.py's item_duration takes it (an authored
-# `trim_from`/`trim_to`/`dur` outranks a probe, and the window is
-# trim_to MINUS trim_from; otherwise the v:0 stream duration) -- prologue
-# 101.200 + act I 116.200 + Perfume 2 66.400 + act II 411.267 + act III
-# 168.600 + Perfume 3 114.848 + intermission 27.194 + act IV 34.000 +
-# act V 25.259 + interstitial 5.000 + act VI 401.527 + Excision 152.507 +
-# Perfume 4a 13.120 + Perfume 4b 102.445 = 1739.567. The Excision insertion
-# shifts the programme clock only; each plate's act-local seat is unchanged
-# and the manifest regenerates byte-identical.
+# `tools/megacut.py --dry-run` puts Excision at 1450.294, Perfume movement 4
+# at 1602.796, and Europa at 1718.362. The insertion shifts the programme
+# clock only; each plate's act-local seat is unchanged.
 # Restate the derivation when the running order moves.
-programme_start: 1739.567
+programme_start: 1718.362
 # The order this act has always written its plates in, kept so the generated
 # manifest reads the way the delivered one did.
 # This act's whole plate list comes from this file, so the manifest is
@@ -73,23 +66,23 @@ owner's written order: alolita's report and tophee's confirmations follow the
 deployment exchange, and the sacrifice line with the Lone Wolf Protocol trio
 follow the creed, rolling into nimbatus' "Wilco". <<
 
-## 29:00.131
+## 28:38.926
 
-[d01] krook @ 29:00.131 +1.6: Deploy CNCF Projects Team
+[d01] krook @ 28:38.926 +1.6: Deploy CNCF Projects Team
   - avatar: ~/Videos/wolves-directors-cut/nimbatus-review/render/krook.png
   - fade_out_at: 1.864
 
-[d02] preethit @ 29:02.131 +1.6: Stand down, I'm sending my wolf
+[d02] preethit @ 28:40.926 +1.6: Stand down, I'm sending my wolf
   - fade_out_at: 3.864
 
-[d03] alolita @ 29:04.131 +2.6: Are you sure the Kube is on Europa?
+[d03] alolita @ 28:42.926 +2.6: Are you sure the Kube is on Europa?
   - avatar: renders/avatars/alolita.png
   - fade_out_at: 6.864
 
-[d04] preethit @ 29:07.131 +2.0: I hope she can handle the Kube
+[d04] preethit @ 28:45.926 +2.0: I hope she can handle the Kube
   - fade_out_at: 9.264
 
-[d04b] preethit @ 29:09.531 +2.2: I must not fail
+[d04b] preethit @ 28:48.326 +2.2: I must not fail
 
 alolita: We have failed, Guardians are down
 
@@ -97,25 +90,25 @@ tophee: I've confirmed it myself, we have no choice
 
 tophee: She's the only way to stop the Toilmaster
 
-## 29:24.131
+## 29:02.926
 
-[d05] castrojo @ 29:24.131 +2.6: They must never know what you did for them
+[d05] castrojo @ 29:02.926 +2.6: They must never know what you did for them
   - avatar: renders/avatars/castrojo.png
   - fade_out_at: 26.864
 
-[d06] mrbobbytables @ 29:27.131 +2.0: When all hope is lost
+[d06] mrbobbytables @ 29:05.926 +2.0: When all hope is lost
   - avatar: renders/avatars/mrbobbytables.png
   - fade_out_at: 29.264
 
-[d07] jeefy @ 29:29.531 +2.2: Standing by for Extraction
+[d07] jeefy @ 29:08.326 +2.2: Standing by for Extraction
   - avatar: renders/avatars/jeefy.png
   - fade_out_at: 31.864
 
-[d08] ihor @ 29:32.131 +2.2: G{k8s}dspeed
+[d08] ihor @ 29:10.926 +2.2: G{k8s}dspeed
   - avatar: renders/avatars/idvoretskyi.png
   - fade_out_at: 34.464
 
-[d11] preethit @ 29:34.731 +2.2: Our clan
+[d11] preethit @ 29:13.526 +2.2: Our clan
 preethit: Is the Iron
 preethit: That forges Wolves
 
@@ -125,15 +118,15 @@ mrbobbytables: Wolves gladly sacrifice for their own
 [iancoldwater] Local Security systems trivially pwned
 [tabbysable] Europan Security systems trivially pwned (again)
 
-## 30:01.131
+## 29:39.926
 
-[d09] nimbatus @ 30:01.131 +1.8: Wilco
+[d09] nimbatus @ 29:39.926 +1.8: Wilco
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 63.064
 
-[d10] nimbatus @ 30:03.331 +2.0: {k8s}ut
+[d10] nimbatus @ 29:42.126 +2.0: {k8s}ut
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 65.464
 
-preethit @ 30:10.300: Hummingbird will find the girl
+preethit @ 29:49.095: Hummingbird will find the girl
   - avatar: renders/avatars/preethit.png
