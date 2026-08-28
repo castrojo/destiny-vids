@@ -3,7 +3,7 @@ import random
 import pytest
 from PIL import Image
 
-from tools import thumbnail
+from tools import credits, thumbnail
 
 
 def test_bluefin_prefix_becomes_the_eyebrow():
@@ -159,6 +159,35 @@ def test_long_title_uses_two_baselines_inside_the_title_margins():
     ]
     margin = (thumbnail.SIZE[0] - thumbnail._MAX_LINE_WIDTH) // 2
     margin -= thumbnail._STROKE
+    assert min(inked_x) >= margin
+    assert max(inked_x) < thumbnail.SIZE[0] - margin
+
+
+def test_long_title_fits_inside_margins_without_adwaita(monkeypatch):
+    """CI font regression: DejaVu Sans Mono is wider than Adwaita, so the
+    72px floor's best split overflows _MAX_LINE_WIDTH there; the fitter must
+    shrink below the floor instead of letting the title spill its margins."""
+    monkeypatch.setattr(
+        credits, "ADWAITA_SANS", "/nonexistent/AdwaitaSans-Regular.ttf"
+    )
+    source = Image.new("RGB", (1280, 720), "#a66a3f")
+    card = thumbnail.render_jungle_thumbnail(
+        source,
+        "Bluefin: The Absolutely Final Trial of the Fittest "
+        "Guardian in the Whole Wide Jungle",
+    )
+    # A single overflowing line must not pass: exactly two baselines.
+    assert _title_row_bands(card) == 2
+    # Every near-white (title fill) column stays strictly inside the
+    # horizontal title margins; the fill excludes the near-black stroke, so
+    # no stroke tolerance is needed here.
+    gray = card.convert("L")
+    w, h = gray.size
+    inked_x = [
+        x for x in range(w)
+        if gray.crop((x, 0, x + 1, h)).getextrema()[1] > 240
+    ]
+    margin = (thumbnail.SIZE[0] - thumbnail._MAX_LINE_WIDTH) // 2
     assert min(inked_x) >= margin
     assert max(inked_x) < thumbnail.SIZE[0] - margin
 

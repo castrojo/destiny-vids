@@ -31,6 +31,9 @@ _SHADOW = (0, 0, 0, 160)
 _EYEBROW_SIZE = 76
 _TITLE_MAX = 116
 _TITLE_FLOOR = 72
+# Absolute emergency minimum: below the preferred floor the fitter may keep
+# shrinking for a wider fallback font, but never past this size.
+_TITLE_EMERGENCY_FLOOR = 48
 _RULE_WIDTH = 360
 _RULE_HEIGHT = 6
 _STROKE = 8
@@ -131,18 +134,33 @@ def _best_layout(draw, words, font):
 
 def _fit_title(draw, text):
     """The largest size from 116 down to the 72 floor whose best one/two-line
-    split fits the width; the floor's best split otherwise. Never more than
-    two lines, and every word is kept."""
+    split fits the width. A wider fallback font (CI carries DejaVu Sans Mono,
+    not Adwaita) can overflow even at the floor, so below the floor the fit
+    keeps shrinking in the same 4px steps until the best split fits. Never
+    more than two lines, and every word is kept."""
     words = text.split()
-    for size in range(_TITLE_MAX, _TITLE_FLOOR - 1, -4):
+
+    def fits(size):
         font = credits._font("black", size)
         lines = _best_layout(draw, words, font)
         if all(
             _ink_width(draw, line, font) <= _MAX_LINE_WIDTH for line in lines
         ):
             return font, lines
-    font = credits._font("black", _TITLE_FLOOR)
-    return font, _best_layout(draw, words, font)
+        return None
+
+    # One pass from the max through the preferred 72 floor and, only when a
+    # wider fallback font still overflows there, on down to the emergency
+    # floor in the same 4px steps. Titles that fit at or above 72 resolve
+    # identically to before.
+    for size in range(_TITLE_MAX, _TITLE_EMERGENCY_FLOOR - 1, -4):
+        fitted = fits(size)
+        if fitted is not None:
+            return fitted
+    raise ValueError(
+        f"title cannot fit {_MAX_LINE_WIDTH}px at the emergency floor "
+        f"of {_TITLE_EMERGENCY_FLOOR}px: {text!r}"
+    )
 
 
 def _stroked(draw, xy, text, font, fill):
