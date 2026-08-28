@@ -1066,6 +1066,44 @@ def test_a_chat_card_carries_the_pfp_in_its_badge_slot(avatar_png):
     corner = with_photo.getpixel((plate.CHAT_PAD_L + 3, 10))
     assert corner[:3] == plate.INK[:3]
 
+def test_chat_supports_one_balanced_underscore_emphasis_span():
+    assert plate.chat_runs("Stay _sharp_!") == [
+        ("Stay ", "bold"),
+        ("sharp", "italic"),
+        ("!", "bold"),
+    ]
+
+
+def test_unbalanced_chat_underscore_stays_literal():
+    assert plate.chat_runs("Stay _sharp!") == [("Stay _sharp!", "bold")]
+
+
+def test_emphasized_chat_renders_without_a_censor_asset(tmp_path, monkeypatch):
+    """`Stay _sharp_!` carries no censor token, so its render must never
+    consult the censor mark at all -- the asset is gitignored and absent from
+    a fresh worktree. Censor-piece indexing is per run: carrying it across
+    emphasis runs measured (and drew) a false Kubernetes mark between runs and
+    raised FileNotFoundError here."""
+    monkeypatch.setattr(plate, "K8S_CENSOR_MARK", tmp_path / "absent.png")
+    emphasized = plate.render_plate(dict(CHAT, text="Stay _sharp_!"))
+    plain = plate.render_plate(dict(CHAT, text="Stay sharp!"))
+    assert emphasized.tobytes() != plain.tobytes()
+
+
+def test_emphasized_chat_gains_no_censor_marks(tmp_path, monkeypatch):
+    """Present or absent, the censor asset cannot reach an emphasized pill:
+    the two renders are byte-identical. A false mark between runs would widen
+    the pill and paint the mark's pixels into it."""
+    from PIL import Image
+    mark = tmp_path / "mark.png"
+    Image.new("RGBA", (32, 32), (255, 0, 0, 255)).save(mark)
+    monkeypatch.setattr(plate, "K8S_CENSOR_MARK", mark)
+    with_mark = plate.render_plate(dict(CHAT, text="Stay _sharp_!"))
+    monkeypatch.setattr(plate, "K8S_CENSOR_MARK", tmp_path / "absent.png")
+    without_mark = plate.render_plate(dict(CHAT, text="Stay _sharp_!"))
+    assert with_mark.tobytes() == without_mark.tobytes()
+
+
 def test_plates_sit_on_the_picture_not_on_the_letterbox_bar():
     """A 2.39:1 cinematic in a 16:9 file has ~140px of baked-in black.
 
@@ -1794,6 +1832,60 @@ def test_a_status_card_may_share_the_screen_with_a_guardian_plate():
          "name": "Bob Killen", "title": "Reconciler of the Plane"},
     ]
     plate.load_manifest_entries(entries)  # must not raise
+
+def test_bazzite_status_uses_purple_chrome_and_the_official_tile():
+    # Same copy on both cards: the width delta isolates the promoted chrome
+    # (the tile crest's reserved room), not the length of the words.
+    plain = plate.render_plate(_status(
+        detail="FIRETEAM // EXPERT",
+        label="John Bazzite",
+    ))
+    expert = plate.render_plate(_status(
+        detail="FIRETEAM // EXPERT",
+        label="John Bazzite",
+        variant="bazzite",
+    ))
+    assert expert.width > plain.width
+    assert expert.tobytes() != plain.tobytes()
+    assert any(
+        b > r + 20 and b > g + 5 and a > 150
+        for r, g, b, a in expert.getdata()
+    )
+    # ...and the pixels are Bazzite's own, not merely "bluish" -- the broad
+    # predicate above also matches the default blue chrome. The violet accent
+    # stop and the tile's cobalt gradient start both render in the expert HUD
+    # (the only cobalt source is the tile), and in NO default card.
+    def has_near(img, stop, tol=15):
+        return any(
+            px[3] > 150
+            and all(abs(px[i] - stop[i]) <= tol for i in range(3))
+            for px in img.getdata()
+        )
+    assert has_near(expert, plate.BAZZITE_VIOLET)
+    assert has_near(expert, plate.BAZZITE_COBALT)
+    assert not has_near(plain, plate.BAZZITE_VIOLET)
+    assert not has_near(plain, plate.BAZZITE_COBALT)
+
+
+def test_bazzite_status_remains_compatible_with_a_guardian_plate():
+    plate.load_manifest_entries([
+        _status(
+            id="player",
+            at=4.0,
+            dur=100.0,
+            detail="FIRETEAM // EXPERT",
+            label="John Bazzite",
+            variant="bazzite",
+        ),
+        {
+            "id": "cayde",
+            "at": 8.0,
+            "dur": 4.0,
+            "position": "left",
+            "name": "Jorge Castro",
+        },
+    ])
+
 
 def test_two_status_cards_at_once_are_still_an_error():
     entries = [_status(id="a", at=0.0, dur=10.0),

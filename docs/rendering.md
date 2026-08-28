@@ -457,18 +457,26 @@ Two consequences worth stating:
    normalizes every clip to, so the overlay needs no scaling and the chrome
    stays pixel-exact.
 
-### Two ways this pass has silently produced an unplated video
+### How this pass has silently produced an unplated video
 
-Both exit 0 and write a file of the right length, and both are pinned by
-tests that inspect the argv.
+It exits 0 and writes a file of the right length, and it is pinned by tests
+that inspect the argv.
 
-**Shell quotes in an argv list.** `enable='between(t,1,2)'` is the spelling the
-ffmpeg docs use, and it is correct *on a command line*, where the shell strips
-the quotes. `burn()` builds an argv list and never sees a shell, so ffmpeg got
-the quote characters as part of the expression, failed to parse it, and
-disabled every overlay. Unquoted, the commas must be escaped instead
-(`between(t\,1\,2)`) or the filtergraph parser reads them as argument
-separators.
+**Quoting the `enable` expression is not the failure.** `enable='between(t,1,2)'`
+is the spelling the FFmpeg documentation uses for timeline editing (Context7
+`/websites/ffmpeg_documentation`), and the same documentation describes
+filtergraph escaping as three levels whose *third* is the shell — a level that
+never applies here, because `burn()` builds an argv list and never sees a shell.
+Measured on this host with ffmpeg 8.1, both spellings parse and gate identically
+inside a single argv token: `enable='between(t,0,10)'` and
+`enable=between(t\,0\,10)` each draw the overlay at t=2 s and suppress it at
+t=15 s, and a quoted false window (`enable='between(t,0,1)'`) suppresses at
+both. ffmpeg strips the surrounding quotes itself as first-level option
+escaping, and those quotes also protect the commas; written bare, the commas
+must be escaped (`between(t\,1\,2)`) or the filtergraph parser reads them as
+argument separators. **The historical missing-overlay failure was therefore not
+caused by shell-style single quotes inside an argv token** — its cause is the
+one below.
 
 **A one-frame PNG does not survive a long timeline.** Fed to `overlay` as-is a
 still image reaches EOF immediately, and `eof_action=repeat` does not hold that

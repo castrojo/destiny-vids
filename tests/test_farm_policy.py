@@ -61,6 +61,8 @@ FARMED = {
     ("tools/megacut.py", "_segment_worker"): "a local segment is capped",
     ("tools/megacut.py", "_farm_segment_worker"): "segments farm by default",
     ("tools/social.py", "main"): "both passes share one farm pod; local caps",
+    ("tools/standalone.py", "encode_video"): "the standalone batch's one "
+    "pass farms by default; --local caps",
     ("tools/farm.py", "run_locally"): "the farm CLI's own fallback is capped",
     ("scripts/actbuild.py", "main"): "acts IV/V/VII farm by default",
     ("scripts/build_act1.py", "build_act1"): "act I's legs farm by default",
