@@ -6,6 +6,30 @@ The show's two still deliverables — a **YouTube thumbnail** and the website's
 **social preview card** — are cut from the same key art. Neither is a frame of
 the film, so neither comes out of `Prod/`.
 
+## A cover request means cover art, not a trailer frame
+
+For a standalone channel video, the owner may name a season cover, poster or
+hero image instead of the show's painting. Search the publisher's first-party
+site and media pages before scrubbing the trailer. **A frame featuring the
+right character is not a substitute for the cover the owner asked for.**
+
+Ship a temporary source-backed frame when speed matters, keep the first-party
+search running, then replace it rather than polishing the fallback. Record the
+direct asset URL and the page that owns it. Prefer a native 16:9 background
+without the web page's HTML logo/date overlays; crop only when the supplied
+composition requires it.
+
+The Season of Dawn precedent is Bungie's own 1920×1080 hero background,
+`hero_desktop_bg.jpg`, linked from the official
+[Season of Dawn page](https://www.bungie.net/7/en/Seasons/SeasonofDawn).
+Bungie's [IP policy](https://help.bungie.net/hc/en-us/articles/360049201911-Intellectual-Property-and-Trademarks)
+still governs the fan use; first-party hosting proves provenance, not a
+commercial licence.
+
+Thumbnail copy remains closed: reproduce only a title the owner supplied.
+Style and line breaks may fit the composition; new taglines may not. Keep the
+named subject's face clear.
+
 ## The artwork masters live outside the repo
 
 `~/Pictures/Artwork/` holds two 9075² lossless PNGs of the same painting:
@@ -98,5 +122,8 @@ against a host that serves no assets.
 - [ ] Downscaled once; saved `subsampling=0`, `quality` ≤ 95
 - [ ] Read at 336×189 (thumbnail) or 600×315 (card)
 - [ ] No face, and no crest, under type
+- [ ] If the owner asked for a cover/hero: first-party asset URL and owning
+      page recorded; no trailer frame substituted
+- [ ] Every word on the still is owner-supplied or already part of the source
 - [ ] For the web card: fetched back from the live URL and decoded, since the
       bytes served are the hook's, not yours
