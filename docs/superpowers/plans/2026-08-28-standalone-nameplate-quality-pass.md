@@ -13,7 +13,7 @@
 - Finished series nameplates use their established authored identity; never replace them with placeholders, compact approximations, or invented fields.
 - Castrojo's plate is exactly `TRUSTEE // GUARDIAN` / `Harbinger Titan` / `Jorge Castro` / `Upender of Antipatterns | The First Disciple` with `trustee: true`.
 - John Bazzite's normal plate carries only `name: John Bazzite` and `variant: bazzite`; no label, class, or title is authored.
-- Blueberries seats Castrojo at source/output `33.7` for `2.2` seconds (evidenced Cayde segment 33.300-37.767, `seg_..._rally_the_troops_worldwide_reveal_trailer_0033-0037`) and starts the CTA at source `91.7` (before the `NEW LEGENDS WILL RISE` segment that begins 91.767).
+- Blueberries seats Castrojo at source/output `33.55` for `1.95` seconds (visual frame review: Cayde cleanly visible 33.533-35.533, dissolve beginning 35.567; the segment record 33.300-37.767, `seg_..._rally_the_troops_worldwide_reveal_trailer_0033-0037`, is coarser than the picture). The standalone renderer hard-overlays the static plate only from source_at through source_at+dur, so the overlay interval itself stays inside those bounds. The 1.95s hold is an explicit short-hold exception because no 2.2s continuous Cayde shot exists near 30s. The CTA starts at source `91.7` (before the `NEW LEGENDS WILL RISE` segment that begins 91.767).
 - Final Trial seats John Bazzite at source `16.2` for `2.2` seconds and removes the persistent status HUD.
 - Existing dialogue, audio probes, cuts, thumbnails, and the Final Trial Jorge/Cayde plate stay unchanged.
 - Build from source through the farm-first path; do not patch delivered H.264 files.
@@ -66,7 +66,7 @@ def test_final_trial_uses_one_normal_bazzite_plate_on_the_landing():
 Replace `BLUEBERRIES_CAYDE_SHOT` and the two Cayde seat tests with:
 
 ```python
-BLUEBERRIES_CAYDE_SHOT = (33.300, 37.767)
+BLUEBERRIES_CAYDE_VISIBLE = (33.533, 35.533)
 CASTROJO_PLATE = {
     "label": "TRUSTEE // GUARDIAN",
     "class": "Harbinger Titan",
@@ -79,21 +79,19 @@ CASTROJO_PLATE = {
 def test_the_blueberries_jorge_plate_is_the_established_identity():
     plate = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
     assert {key: plate[key] for key in CASTROJO_PLATE} == CASTROJO_PLATE
-    assert (plate["source_at"], plate["dur"]) == (33.7, 2.2)
+    assert (plate["source_at"], plate["dur"]) == (33.55, 1.95)
     assert _batch_video("bluefin-and-the-blueberries")["takeover"] == {
         "source_at": 91.7,
     }
 
 
-def test_the_blueberries_plate_envelope_stays_on_evidenced_cayde():
-    from tools import plate as plate_module
-
+def test_the_blueberries_overlay_interval_stays_on_visible_cayde():
     seat = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
-    visible_from = seat["source_at"] - plate_module.LEAD_IN
-    visible_to = seat["source_at"] + seat["dur"] + plate_module.TAIL_OUT
+    visible_from = seat["source_at"]
+    visible_to = seat["source_at"] + seat["dur"]
 
-    assert visible_from >= BLUEBERRIES_CAYDE_SHOT[0] - 1e-6
-    assert visible_to <= BLUEBERRIES_CAYDE_SHOT[1] + 1e-6
+    assert visible_from >= BLUEBERRIES_CAYDE_VISIBLE[0] - 1e-6
+    assert visible_to <= BLUEBERRIES_CAYDE_VISIBLE[1] + 1e-6
 ```
 
 - [ ] **Step 3: Run the focused tests and confirm they fail against the old manifest**
@@ -104,7 +102,7 @@ Run:
 python3 -m pytest -q \
   tests/test_standalone.py::test_final_trial_uses_one_normal_bazzite_plate_on_the_landing \
   tests/test_standalone.py::test_the_blueberries_jorge_plate_is_the_established_identity \
-  tests/test_standalone.py::test_the_blueberries_plate_envelope_stays_on_evidenced_cayde
+  tests/test_standalone.py::test_the_blueberries_overlay_interval_stays_on_visible_cayde
 ```
 
 Expected: all three fail because the committed manifest still has the
@@ -131,11 +129,11 @@ Replace `jorge-cayde` with the complete literal record:
 {
   "id": "jorge-cayde",
   "kind": "guardian",
-  "source_at": 33.7,
-  "dur": 2.2,
+  "source_at": 33.55,
+  "dur": 1.95,
   "position": "left",
   "copy_source": "casting",
-  "why": "The authoritative segment records identify Cayde-6 from source 33.300-37.767 (seg_..._0033-0037, 'Cayde-6 reaches toward a red figure'); the preceding segment (30.800-33.300) identifies no character. Seated at 33.7, the lead-in lands on the 33.300 cut, the 2.2s hold runs 33.7-35.9, and the tail clears at 36.15, so the complete established identity stays on evidenced Cayde picture near the first 30 seconds.",
+  "why": "Visual frame review establishes Cayde-6 cleanly visible from source 33.533 through 35.533, with the dissolve to the destruction wide beginning at 35.567; the standalone renderer hard-overlays the static plate only from source_at through source_at+dur, with no lead-in/tail-out envelope. Seated at 33.55 for 1.95s, the whole overlay interval 33.55-35.50 stays inside the measured visible bounds -- an explicit short-hold exception because no 2.2s continuous Cayde shot exists near 30s.",
   "label": "TRUSTEE // GUARDIAN",
   "class": "Harbinger Titan",
   "name": "Jorge Castro",
@@ -186,7 +184,7 @@ python3 -m pytest -q \
   tests/test_standalone.py::test_final_trial_uses_one_normal_bazzite_plate_on_the_landing \
   tests/test_standalone.py::test_every_committed_batch_seat_maps_and_collides_with_nothing \
   tests/test_standalone.py::test_the_blueberries_jorge_plate_is_the_established_identity \
-  tests/test_standalone.py::test_the_blueberries_plate_envelope_stays_on_evidenced_cayde \
+  tests/test_standalone.py::test_the_blueberries_overlay_interval_stays_on_visible_cayde \
   tests/test_index_integrity.py
 ```
 
@@ -316,19 +314,26 @@ Expected: `bluefin-and-the-blueberries verified`.
 Inspect extracted review frames:
 
 ```bash
-ffmpeg -v error -y -ss 32.3 \
+ffmpeg -v error -y -ss 33.4 \
+  -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
+  "$HOME/Videos/Wolves/work/blueberries-quality-pass-before-plate.png"
+ffmpeg -v error -y -ss 34.5 \
   -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/blueberries-quality-pass-plate.png"
-ffmpeg -v error -y -ss 85.4 \
+ffmpeg -v error -y -ss 35.55 \
+  -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
+  "$HOME/Videos/Wolves/work/blueberries-quality-pass-dissolve.png"
+ffmpeg -v error -y -ss 83.5 \
   -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/blueberries-quality-pass-tail.png"
-ffmpeg -v error -y -ss 85.6 \
+ffmpeg -v error -y -ss 83.9 \
   -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/blueberries-quality-pass-cta.png"
 ```
 
-Expected: 32.3 shows the complete trustee plate on Cayde; 85.4 contains no
-publisher title; 85.6 is the approved CTA.
+Expected: 33.4 has no plate; 34.5 (the hold midpoint) shows the complete
+trustee plate on Cayde; 35.55 has no plate and shows the dissolve beginning;
+83.5 contains no publisher title; 83.9 is the approved CTA.
 
 - [ ] **Step 5: Fetch and build Final Trial**
 

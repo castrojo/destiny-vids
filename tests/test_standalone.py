@@ -869,14 +869,16 @@ def test_every_committed_batch_seat_maps_and_collides_with_nothing():
         assert len(accepted) == len(overlays)
 
 
-# The Blueberries Cayde-6 seat, per the authoritative segment records (they
-# outrank any eyeballed span): seg_..._rally_the_troops_worldwide_reveal_trailer
-# _0033-0037 runs source 33.300-37.767 and identifies Cayde ("Cayde-6 reaches
-# toward a red figure", casting person castrojo); the preceding _0030-0033
-# (30.800-33.300, "Guardians fighting amid debris") identifies no character,
-# so a plate starting before 33.300 credits Jorge over picture where Cayde is
-# not identified. The 33.7 seat puts the 0.4s lead-in on the segment cut.
-BLUEBERRIES_CAYDE_SHOT = (33.300, 37.767)
+# The Blueberries Cayde-6 seat, per visual frame review (the segment records
+# are coarser than the picture): Cayde is cleanly visible from source 33.533
+# through 35.533, and the dissolve to the destruction wide begins at 35.567.
+# The standalone renderer hard-overlays the static plate only from source_at
+# through source_at+dur -- plate.py's lead-in/tail-out envelope does not apply
+# here -- so the overlay interval itself must sit inside those bounds. Seated
+# at 33.55 for 1.95s, 33.55-35.50 fits; this is an explicit short-hold
+# exception because no 2.2s continuous Cayde shot exists near the owner's
+# requested ~30s placement.
+BLUEBERRIES_CAYDE_VISIBLE = (33.533, 35.533)
 CASTROJO_PLATE = {
     "label": "TRUSTEE // GUARDIAN",
     "class": "Harbinger Titan",
@@ -893,26 +895,25 @@ def test_the_blueberries_jorge_plate_is_the_established_identity():
     plate = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
     assert {key: plate[key] for key in CASTROJO_PLATE} == CASTROJO_PLATE
     assert plate["copy_source"] == "casting"
-    assert (plate["source_at"], plate["dur"]) == (33.7, 2.2)
+    assert (plate["source_at"], plate["dur"]) == (33.55, 1.95)
     assert _batch_video("bluefin-and-the-blueberries")["takeover"] == {
         "source_at": 91.7,
     }
 
 
-def test_the_blueberries_plate_envelope_stays_on_evidenced_cayde():
-    """The whole animation envelope -- lead-in, hold, and tail-out -- must
-    sit inside the segment where the record identifies Cayde-6
-    (33.300-37.767, seg_..._0033-0037). 33.7 - 0.4 = 33.300 lands the lead-in
-    exactly on the cut; 33.7 + 2.2 + 0.25 = 36.15 clears well before 37.767.
+def test_the_blueberries_overlay_interval_stays_on_visible_cayde():
+    """The standalone renderer overlays the static plate from source_at
+    through source_at+dur and nothing else -- there is no lead-in/tail-out
+    envelope on this path -- so that interval itself must sit inside the
+    measured visual bounds: Cayde cleanly visible 33.533-35.533, dissolve
+    beginning 35.567. 33.55 through 35.50 fits with margin on both ends.
     """
-    from tools import plate as plate_module
-
     seat = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
-    visible_from = seat["source_at"] - plate_module.LEAD_IN
-    visible_to = seat["source_at"] + seat["dur"] + plate_module.TAIL_OUT
+    visible_from = seat["source_at"]
+    visible_to = seat["source_at"] + seat["dur"]
 
-    assert visible_from >= BLUEBERRIES_CAYDE_SHOT[0] - 1e-6
-    assert visible_to <= BLUEBERRIES_CAYDE_SHOT[1] + 1e-6
+    assert visible_from >= BLUEBERRIES_CAYDE_VISIBLE[0] - 1e-6
+    assert visible_to <= BLUEBERRIES_CAYDE_VISIBLE[1] + 1e-6
 
 
 def test_the_takeover_starts_before_the_new_legends_title():
