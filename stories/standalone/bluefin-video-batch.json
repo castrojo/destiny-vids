@@ -18,8 +18,8 @@
       "cuts": [
         {
           "start_sec": 46.0,
-          "end_sec": 54.0,
-          "note": "Owner-authored excision. Everything after it shifts eight seconds earlier, so the 91.7 takeover lands at output 83.7."
+          "end_sec": 54.68,
+          "note": "Owner-authored excision. The retained scene starts on Cayde's \"I know you look to me in times of peril\" at source 54.68. Everything after it shifts 8.68 seconds earlier, so the 91.7 takeover lands at output 83.02."
         }
       ],
       "overlays": [

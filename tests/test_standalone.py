@@ -32,17 +32,17 @@ def _drc_manifest():
 
 
 def test_source_time_maps_through_the_blueberries_excision():
-    cuts = [{"start_sec": 46.0, "end_sec": 54.0}]
+    cuts = [{"start_sec": 46.0, "end_sec": 54.68}]
     assert standalone.source_to_output(45.0, cuts) == 45.0
-    assert standalone.source_to_output(97.0, cuts) == 89.0
+    assert standalone.source_to_output(97.0, cuts) == pytest.approx(88.32)
     with pytest.raises(ValueError, match="inside removed source range"):
         standalone.source_to_output(50.0, cuts)
 
 
 def test_kept_ranges_remove_exactly_the_authored_span():
     assert standalone.kept_ranges(
-        120.0, [{"start_sec": 46.0, "end_sec": 54.0}]
-    ) == [(0.0, 46.0), (54.0, 120.0)]
+        120.0, [{"start_sec": 46.0, "end_sec": 54.68}]
+    ) == [(0.0, 46.0), (54.68, 120.0)]
 
 
 def test_manifest_rejects_drc_audio_format(tmp_path):
@@ -278,15 +278,15 @@ def test_fetch_runs_yt_dlp_when_the_source_is_missing(tmp_path, monkeypatch):
 
 def test_blueberries_filtergraph_cuts_video_and_audio_before_takeover():
     video = {
-        "cuts": [{"start_sec": 46.0, "end_sec": 54.0}],
+        "cuts": [{"start_sec": 46.0, "end_sec": 54.68}],
         "takeover": {"source_at": 97.0},
         "overlays": [],
     }
     graph = standalone.filtergraph(video, duration_sec=120.0, overlays=[])
     assert "trim=start=0.0:end=46.0" in graph
-    assert "atrim=start=54.0:end=120.0" in graph
+    assert "atrim=start=54.68:end=120.0" in graph
     assert "concat=n=2:v=1:a=1" in graph
-    assert "gte(t,89.0)" in graph
+    assert "gte(t,88.32)" in graph
 
 
 def test_a_video_without_a_takeover_uses_input_one_for_its_first_plate():
@@ -354,7 +354,7 @@ def test_a_static_gain_below_one_scales_only_the_audio_leg():
 
 def test_overlay_source_marks_are_mapped_before_render():
     video = {
-        "cuts": [{"start_sec": 46.0, "end_sec": 54.0}],
+        "cuts": [{"start_sec": 46.0, "end_sec": 54.68}],
         "overlays": [{
             "id": "jorge",
             "source_at": 60.0,
@@ -364,13 +364,13 @@ def test_overlay_source_marks_are_mapped_before_render():
         }],
     }
     overlays, unresolved = standalone.mapped_overlays(video, 120.0)
-    assert overlays[0]["at"] == 52.0
+    assert overlays[0]["at"] == pytest.approx(51.32)
     assert unresolved == []
 
 
 def test_overlay_inside_a_removed_span_degrades_to_unresolved():
     video = {
-        "cuts": [{"start_sec": 46.0, "end_sec": 54.0}],
+        "cuts": [{"start_sec": 46.0, "end_sec": 54.68}],
         "overlays": [{
             "id": "bad-seat",
             "source_at": 50.0,
@@ -735,8 +735,8 @@ def test_alignment_refuses_a_window_that_is_too_short_to_search():
 
 def test_expected_output_duration_removes_every_cut():
     assert standalone.expected_duration(
-        {"cuts": [{"start_sec": 46.0, "end_sec": 54.0}]}, 120.0
-    ) == pytest.approx(112.0)
+        {"cuts": [{"start_sec": 46.0, "end_sec": 54.68}]}, 120.0
+    ) == pytest.approx(111.32)
 
 
 def test_verify_reports_a_drifted_duration_and_a_decorrelated_probe(
@@ -838,7 +838,7 @@ def test_a_plate_the_takeover_would_cover_degrades_to_unresolved():
     runs into it is not on screen for the time the record says, so it is
     dropped and recorded rather than shipped invisible."""
     video = {
-        "cuts": [{"start_sec": 46.0, "end_sec": 54.0}],
+        "cuts": [{"start_sec": 46.0, "end_sec": 54.68}],
         "takeover": {"source_at": 97.0},
         "overlays": [
             {"id": "before", "source_at": 80.0, "dur": 4.0},
@@ -1105,14 +1105,15 @@ def test_the_blueberries_overlay_interval_stays_on_visible_cayde():
 def test_the_takeover_starts_before_the_new_legends_title():
     """The source's `NEW LEGENDS WILL RISE` title begins at source 91.767
     (seg_..._0091-0096, "'NEW LEGENDS WILL RISE' text over a crowd
-    silhouette"). The takeover at 91.7 -- output 83.7 after the 8s excision --
-    starts the approved CTA before that publisher title, its legal-card
-    flash, and the hard transition."""
+    silhouette"). The takeover at 91.7 -- output 83.02 after the 8.68s
+    excision -- starts the approved CTA before that publisher title, its
+    legal-card flash, and the hard transition."""
     video = _batch_video("bluefin-and-the-blueberries")
     assert video["takeover"]["source_at"] < 91.767
-    assert video["cuts"][0]["end_sec"] - video["cuts"][0]["start_sec"] == 8.0
+    assert video["cuts"][0]["end_sec"] == 54.68
+    assert video["cuts"][0]["end_sec"] - video["cuts"][0]["start_sec"] == 8.68
     assert standalone.source_to_output(
-        video["takeover"]["source_at"], video["cuts"]) == pytest.approx(83.7)
+        video["takeover"]["source_at"], video["cuts"]) == pytest.approx(83.02)
 
 
 def test_only_blueberries_overrides_the_shared_cta_asset():
