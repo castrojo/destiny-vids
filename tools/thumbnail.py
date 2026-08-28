@@ -6,15 +6,22 @@ at the top, and the outlined white title rides directly beneath them, above
 the vertical midpoint so the central subject stays visible.
 """
 
+import re
 import subprocess
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw, ImageFile, ImageOps
 
 from tools import credits
 
 SIZE = (1920, 1080)
 BYTE_CAP = 2_000_000
+
+# Progressive+optimized JPEG encoding of a noisy frame can fill libjpeg's
+# output buffer; a large MAXBLOCK keeps Pillow from dying with "broken data
+# stream when writing image file" on exactly the frames the quality retry
+# exists for.
+ImageFile.MAXBLOCK = max(ImageFile.MAXBLOCK, 4 * SIZE[0] * SIZE[1])
 
 BLUE = credits.ACCENT                     # the film's blue, #93c5fd
 WHITE = (255, 255, 255, 255)
@@ -29,9 +36,13 @@ _RULE_HEIGHT = 6
 _STROKE = 8
 
 _MAX_LINE_WIDTH = 1680
-_MAX_TITLE_LINES = 2
+# A detected crop shorter than a quarter of the frame is a dark scene or a
+# bright sliver, not a letterbox; the original frame is kept.
+_MIN_CONTENT_DIVISOR = 4
 # The whole title block must clear the frame's vertical midpoint.
 _MIDPOINT = SIZE[1] // 2
+
+_PREFIX = re.compile(r"\s*bluefin\b", re.IGNORECASE)
 
 
 def extract_source_frame(ffmpeg, source, source_at, out, runner=subprocess.run):
@@ -51,12 +62,17 @@ def extract_source_frame(ffmpeg, source, source_at, out, runner=subprocess.run):
 
 
 def split_bluefin_title(title):
-    """Split a display title into the BLUEFIN eyebrow and the uppercased rest."""
-    head, colon, tail = title.partition(":")
-    words = head.split()
-    if not words or words[0].lower() != "bluefin":
+    """Split a display title into the BLUEFIN eyebrow and the uppercased rest.
+
+    Only the leading "Bluefin", an optional immediately following colon, and
+    surrounding space are stripped; later colons are title text and stay.
+    """
+    match = _PREFIX.match(title)
+    if not match:
         raise ValueError(f"title must start with 'Bluefin': {title!r}")
-    rest = tail.strip() if colon else " ".join(words[1:])
+    rest = title[match.end():].lstrip()
+    if rest.startswith(":"):
+        rest = rest[1:].lstrip()
     return "BLUEFIN", rest.upper()
 
 
@@ -74,36 +90,40 @@ def _crop_letterbox(image, threshold=16):
     bottom = h
     while bottom > h // 2 and black_row(bottom - 1):
         bottom -= 1
-    if top >= 8 and bottom <= h - 8:
+    if top >= 8 and bottom <= h - 8 and bottom - top >= h // _MIN_CONTENT_DIVISOR:
         return image.crop((0, top, w, bottom))
     return image
 
 
-def _wrap(draw, text, font, max_width):
-    """Greedy word wrap; an over-long word stands on its own line."""
-    lines = []
-    current = ""
-    for word in text.split():
-        trial = f"{current} {word}".strip()
-        if current and draw.textlength(trial, font=font) > max_width:
-            lines.append(current)
-            current = word
-        else:
-            current = trial
-    if current:
-        lines.append(current)
-    return lines
+def _split_candidates(words):
+    """Every one- or two-line layout of ``words``, in order, keeping all words."""
+    yield [" ".join(words)]
+    for cut in range(1, len(words)):
+        yield [" ".join(words[:cut]), " ".join(words[cut:])]
+
+
+def _best_layout(draw, words, font):
+    """The preferred layout at ``font``: fewest lines, then the most balanced."""
+    def key(lines):
+        return (len(lines), max(draw.textlength(line, font=font) for line in lines))
+
+    return min(_split_candidates(words), key=key)
 
 
 def _fit_title(draw, text):
-    """The largest size from 116 down to the 72 floor that wraps in 2 lines."""
+    """The largest size from 116 down to the 72 floor whose best one/two-line
+    split fits the width; the floor's best split otherwise. Never more than
+    two lines, and every word is kept."""
+    words = text.split()
     for size in range(_TITLE_MAX, _TITLE_FLOOR - 1, -4):
         font = credits._font("black", size)
-        lines = _wrap(draw, text, font, _MAX_LINE_WIDTH)
-        if len(lines) <= _MAX_TITLE_LINES:
+        lines = _best_layout(draw, words, font)
+        if all(
+            draw.textlength(line, font=font) <= _MAX_LINE_WIDTH for line in lines
+        ):
             return font, lines
     font = credits._font("black", _TITLE_FLOOR)
-    return font, _wrap(draw, text, font, _MAX_LINE_WIDTH)
+    return font, _best_layout(draw, words, font)
 
 
 def _stroked(draw, xy, text, font, fill):
