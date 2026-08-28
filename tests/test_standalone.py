@@ -896,9 +896,12 @@ def test_the_blueberries_jorge_plate_holds_only_on_evidenced_cayde():
 
 
 def test_the_blueberries_plate_clears_plate_pys_lead_in_and_tail_out():
-    """`tools/plate.py` fades a plate up over LEAD_IN and out over TAIL_OUT,
-    so the visible card is wider than `dur`. The evidenced shot has to cover
-    that wider span too, otherwise the fade-out plays over the next shot."""
+    """`tools/standalone.py` hard-cuts this overlay on `between(t,61.6,63.8)`,
+    but `tools/plate.py`'s envelope (`LEAD_IN` before, `TAIL_OUT` after) is
+    the wider span the same seat would be visible for under the film
+    renderer. Requiring the evidenced shot to cover that wider span keeps the
+    seat honest under either path, and leaves margin for a frame-boundary
+    rounding at the edges."""
     from tools import plate as plate_module
 
     seat = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
