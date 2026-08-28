@@ -99,28 +99,54 @@ python3 tools/plate.py burn --video renders/efmb-front.mkv \
 
 echo "==> join front + plated film (concat demuxer: video copied, one FLAC encode)"
 python3 - "${LOCAL_OPT[@]+"${LOCAL_OPT[@]}"}" <<'PY'
-import os
+import os, subprocess
 from pathlib import Path
 from tools import farm
 
 local = "--local" in __import__("sys").argv
 ffmpeg = os.environ["DESTINY_FFMPEG"]
+ffprobe = farm.native_ffprobe()
 front = Path("renders/efmb-front-carded.mkv").resolve()
 plated = Path("renders/efmb-plated.mp4").resolve()
 tmp = plated.with_name("efmb-plated-frontedtmp.mp4")
+
 # The house pattern (tools/megacut.py): demuxer join, video copied, audio
-# encoded ONCE here -- never per segment. The front carries 24-bit PCM for
-# exactly this; FLAC's STREAMINFO would bind the first file's extradata to
-# the whole joined stream and break every later decode.
-lst = Path("renders/efmb-front-join.txt")
-lst.write_text(f"file '{front}'\nfile '{plated}'\n")
+# encoded ONCE. Two container traps are worked around, both measured on
+# samples first: PCM and FLAC audio do not survive an mkv->mp4 packet copy
+# (packet framing and STREAMINFO extradata respectively), so the front's
+# audio travels as a WAV sidecar (a packet copy of its own PCM) and the join
+# concats AUDIO with the filter -- one FLAC encode -- while VIDEO joins as
+# two video-only mp4s on one timescale, demuxer-copied, never re-encoded.
+def probe_dur(p):
+    return float(subprocess.check_output(
+        [*ffprobe, "-v", "error", "-show_entries", "format=duration",
+         "-of", "csv=p=0", p]))
+
+front_v = Path("renders/efmb-front-carded-videoonly.mp4")
+subprocess.run([ffmpeg, "-y", "-v", "error", "-i", front,
+                "-map", "0:v", "-c", "copy",
+                "-video_track_timescale", "15360", front_v], check=True)
+plated_v = plated.with_name("efmb-plated-videoonly.mp4")
+subprocess.run([ffmpeg, "-y", "-v", "error", "-i", plated,
+                "-map", "0:v", "-c", "copy", plated_v], check=True)
+front_a = Path("renders/efmb-front-audio.wav")
+subprocess.run([ffmpeg, "-y", "-v", "error", "-i",
+                Path("renders/efmb-front.mkv"),
+                "-map", "0:a", "-c:a", "copy", front_a], check=True)
+
+lst = Path("renders/efmb-front-join.txt").resolve()
+lst.write_text(f"file '{front_v.resolve()}'\nfile '{plated_v.resolve()}'\n")
 argv = [ffmpeg, "-y", "-f", "concat", "-safe", "0", "-i", lst,
-        "-c:v", "copy", "-c:a", "flac", tmp]
+        "-i", front_a, "-i", plated,
+        "-filter_complex", "[1:a][2:a]concat=n=2:v=0:a=1[aout]",
+        "-map", "0:v", "-map", "[aout]", "-c:v", "copy", "-c:a", "flac", tmp]
 where = farm.run_encode(
-    argv, inputs=[front, plated], out=tmp,
+    argv, inputs=[front_v, plated_v, front_a, plated], out=tmp,
     text_files={lst: lst.read_text()},
+    expected_duration=probe_dur(front) + probe_dur(plated),
     local=local, label="farm[efmb-front-join]")
 os.replace(tmp, plated)
+front_v.unlink(); plated_v.unlink()
 print(f"front joined ({where}); master replaced atomically")
 PY
 
@@ -146,7 +172,7 @@ proc = subprocess.run(
 starts = [float(s) for s in re.findall(r"black_start:([\d.]+)", proc.stderr)]
 ends = [float(s) for s in re.findall(r"black_end:([\d.]+)", proc.stderr)]
 dur = float(subprocess.check_output(
-    [farm.native_ffprobe(), "-v", "error", "-show_entries", "format=duration",
+    [*farm.native_ffprobe(), "-v", "error", "-show_entries", "format=duration",
      "-of", "csv=p=0", plated]))
 tail = [s for s, e in zip(starts, ends) if abs(e - dur) < 0.5]
 assert tail, "no black tail in the plated master -- nothing to replace"
