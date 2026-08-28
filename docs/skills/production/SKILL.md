@@ -1,6 +1,6 @@
 ---
 name: production
-version: "1.2"
+version: "1.3"
 last_updated: "2026-08-27"
 id: production
 one_line_purpose: Take approved video work from issue brief to delivered artifact.
@@ -20,6 +20,8 @@ description: >-
   the delivery workspace.
 metadata:
   type: procedure
+  context7-sources:
+    - /addyosmani/agent-skills
 ---
 
 # Making videos in volume
@@ -58,7 +60,7 @@ An encode's ETA is measurable, so measure it rather than guessing — two `stat`
 calls a few seconds apart on the growing output give the rate. **A question
 about timing gets a time.**
 
-## The issue-to-video loop
+## Core Process
 
 ```bash
 python3 tools/gaps.py
@@ -151,6 +153,15 @@ This skill is the contract. The procedure lives in `references/`:
 | [`key-art.md`](references/key-art.md) | Stills cut from the key art: YouTube thumbnails and the website's social preview card. |
 | [`avatars.md`](references/avatars.md) | The credits avatar cache and the Actions job that fetches it. |
 | [`freshness.md`](references/freshness.md) | Keeping delivery current across `cards / plates -> master -> Prod -> megacut -> 10mb/`. |
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I should fix the pipeline before rendering." | Deliver the watchable cut first; improvements come after the owner has a file. |
+| "The CTA already contains all the words, so five seconds is enough." | A CTA succeeds only when it can be read. Extend a final tail before shrinking its copy. |
+| "I can move the previous beat earlier to buy CTA time." | A tail extension changes only the CTA hold; authored beats before it keep their clocks. |
+| "The local encode is quicker to start." | The farm is the default whenever reachable; local is a stated, capped fallback. |
 
 ## Red Flags
 
