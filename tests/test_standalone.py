@@ -1232,20 +1232,17 @@ def test_aligned_correlation_finds_the_true_seat_not_a_period_away():
     assert score > standalone.AUDIO_CORRELATION_FLOOR
 
 
-@pytest.mark.parametrize("start,end", SAINT_CARD_CUTS)
-def test_splice_step_ratio_separates_a_clean_join_from_the_reviewed_defect(
-        start, end):
-    """Offline guard for the Saint-14 audio splice defect. The first-pass
-    boundaries joined mid-oscillation and the reviewer measured step/p99
-    slew ratios of 2.4-8.4 -- over the 1.8 blocker -- at all six excisions;
-    the reseated boundaries all read <= 1.0. This pins the *measurement*
-    against each pinned excision's span: over exactly that span, a
-    phase-continuous join must pass the target and the same join carried
-    half a cycle out -- the defect class -- must trip the blocker."""
+def test_splice_step_ratio_separates_a_clean_join_from_a_click():
+    """Unit-test the continuity metric independently of the Saint cut pins.
+
+    The manifest and concat-padding test pin the real boundaries. This test
+    proves the metric accepts a phase-continuous join and rejects the same
+    signal shifted by half a cycle.
+    """
     import math
 
     rate = 48000
-    removed = end - start
+    removed = 1.5
     cycles = round(removed * 400)  # ~400 Hz, an integer count in the span
     frequency = cycles / removed
     # Seat the join at a peak, where a half-cycle slip is the loudest click.
