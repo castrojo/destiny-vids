@@ -254,6 +254,17 @@ def mapped_overlays(video, source_duration):
                     f"which the full-frame takeover covers from "
                     f"{covered_from:.3f}")
             plate.load_manifest_entries([*accepted, item])
+            # The standalone path never passes through `plan`, which is the
+            # only other place "the vocab wins a conflict" is enforced --
+            # which is how act VI shipped cards contradicting their bindings
+            # (#111). Checked here, per overlay, so the batch's committed
+            # seats are held to vocab/casting.yaml everywhere
+            # mapped_overlays runs (build, verify, and the offline suite).
+            # A contradiction is reported as unresolved -- dropped and
+            # recorded, never shipped -- the same posture as every other
+            # seat fault in this loop. Omitted copy fields are not
+            # contradictions, so an intentional name-only card still passes.
+            plate.check_copy_against_bindings([item])
         except ValueError as error:
             unresolved.append({"id": item["id"], "reason": str(error)})
             continue

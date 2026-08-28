@@ -13,7 +13,7 @@
 - Finished series nameplates use their established authored identity; never replace them with placeholders, compact approximations, or invented fields.
 - Castrojo's plate is exactly `TRUSTEE // GUARDIAN` / `Harbinger Titan` / `Jorge Castro` / `Upender of Antipatterns | The First Disciple` with `trustee: true`.
 - John Bazzite's normal plate carries only `name: John Bazzite` and `variant: bazzite`; no label, class, or title is authored.
-- Blueberries seats Castrojo at source/output `31.2` for `2.2` seconds and starts the CTA at source `93.5`.
+- Blueberries seats Castrojo at source/output `33.7` for `2.2` seconds (evidenced Cayde segment 33.300-37.767, `seg_..._rally_the_troops_worldwide_reveal_trailer_0033-0037`) and starts the CTA at source `91.7` (before the `NEW LEGENDS WILL RISE` segment that begins 91.767).
 - Final Trial seats John Bazzite at source `16.2` for `2.2` seconds and removes the persistent status HUD.
 - Existing dialogue, audio probes, cuts, thumbnails, and the Final Trial Jorge/Cayde plate stay unchanged.
 - Build from source through the farm-first path; do not patch delivered H.264 files.
@@ -66,7 +66,7 @@ def test_final_trial_uses_one_normal_bazzite_plate_on_the_landing():
 Replace `BLUEBERRIES_CAYDE_SHOT` and the two Cayde seat tests with:
 
 ```python
-BLUEBERRIES_CAYDE_SHOT = (30.797, 37.771)
+BLUEBERRIES_CAYDE_SHOT = (33.300, 37.767)
 CASTROJO_PLATE = {
     "label": "TRUSTEE // GUARDIAN",
     "class": "Harbinger Titan",
@@ -79,9 +79,9 @@ CASTROJO_PLATE = {
 def test_the_blueberries_jorge_plate_is_the_established_identity():
     plate = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
     assert {key: plate[key] for key in CASTROJO_PLATE} == CASTROJO_PLATE
-    assert (plate["source_at"], plate["dur"]) == (31.2, 2.2)
+    assert (plate["source_at"], plate["dur"]) == (33.7, 2.2)
     assert _batch_video("bluefin-and-the-blueberries")["takeover"] == {
-        "source_at": 93.5,
+        "source_at": 91.7,
     }
 
 
@@ -131,11 +131,11 @@ Replace `jorge-cayde` with the complete literal record:
 {
   "id": "jorge-cayde",
   "kind": "guardian",
-  "source_at": 31.2,
+  "source_at": 33.7,
   "dur": 2.2,
   "position": "left",
-  "copy_source": "owner_supplied",
-  "why": "The battlefield advance from source 30.797-37.771 keeps Cayde visibly in frame throughout. The plate lead-in starts at 30.8 on the cut, the 2.2s hold runs 31.2-33.4, and the tail clears at 33.65, so the complete established identity stays on evidenced Cayde picture near the first 30 seconds.",
+  "copy_source": "casting",
+  "why": "The authoritative segment records identify Cayde-6 from source 33.300-37.767 (seg_..._0033-0037, 'Cayde-6 reaches toward a red figure'); the preceding segment (30.800-33.300) identifies no character. Seated at 33.7, the lead-in lands on the 33.300 cut, the 2.2s hold runs 33.7-35.9, and the tail clears at 36.15, so the complete established identity stays on evidenced Cayde picture near the first 30 seconds.",
   "label": "TRUSTEE // GUARDIAN",
   "class": "Harbinger Titan",
   "name": "Jorge Castro",
@@ -148,11 +148,11 @@ Change its takeover to:
 
 ```json
 "takeover": {
-  "source_at": 93.5
+  "source_at": 91.7
 }
 ```
 
-Update the cut note so it says the takeover maps to output `85.5`, not `89.0`.
+Update the cut note so it says the takeover maps to output `83.7`, not `89.0`.
 
 - [ ] **Step 6: Replace the Final Trial persistent HUD with the landing plate**
 
@@ -173,8 +173,9 @@ Remove the complete `john-bazzite-expert` object and add:
 ```
 
 In the unchanged `jorge-cayde` record, replace the sentence that says the
-persistent HUD celebrates the player with: `The player's separate landing
-plate has already cleared, so this card remains Cayde's identity only.`
+persistent HUD celebrates the player with: `This compact name-only card is
+deliberately unchanged in this task; the player's identity is carried by the
+separate landing plate, which has already cleared, not by any persistent HUD.`
 
 - [ ] **Step 7: Run the focused manifest tests**
 

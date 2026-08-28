@@ -19,18 +19,18 @@
         {
           "start_sec": 46.0,
           "end_sec": 54.0,
-          "note": "Owner-authored excision. Everything after it shifts eight seconds earlier, so the 93.5 takeover lands at output 85.5."
+          "note": "Owner-authored excision. Everything after it shifts eight seconds earlier, so the 91.7 takeover lands at output 83.7."
         }
       ],
       "overlays": [
         {
           "id": "jorge-cayde",
           "kind": "guardian",
-          "source_at": 31.2,
+          "source_at": 33.7,
           "dur": 2.2,
           "position": "left",
-          "copy_source": "owner_supplied",
-          "why": "The battlefield advance from source 30.797-37.771 keeps Cayde visibly in frame throughout. The plate lead-in starts at 30.8 on the cut, the 2.2s hold runs 31.2-33.4, and the tail clears at 33.65, so the complete established identity stays on evidenced Cayde picture near the first 30 seconds.",
+          "copy_source": "casting",
+          "why": "The authoritative segment records identify Cayde-6 from source 33.300-37.767 (seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0033-0037, 'Cayde-6 reaches toward a red figure', casting person castrojo); the preceding segment 0030-0033 (30.800-33.300, 'Guardians fighting amid debris') identifies no character. Seated at 33.7, the 0.4s lead-in lands on the segment cut at 33.300, the 2.2s hold runs 33.7-35.9, and the tail clears at 36.15, so the complete established identity stays on evidenced Cayde picture near the first 30 seconds.",
           "label": "TRUSTEE // GUARDIAN",
           "class": "Harbinger Titan",
           "name": "Jorge Castro",
@@ -39,7 +39,7 @@
         }
       ],
       "takeover": {
-        "source_at": 93.5
+        "source_at": 91.7
       },
       "thumbnail": {
         "source_at": 14.4
@@ -118,7 +118,7 @@
           "dur": 2.2,
           "position": "left",
           "copy_source": "owner_supplied",
-          "why": "Inspected frame at source 68.800 inside this hold: a Cayde-6 hero close-up, hood up, the white-and-blue Exo faceplate with the horn and both cyan optics filling the right of frame, the Ace of Spades hand cannon crackling with arc light in his outstretched hand. Measured close-up 68.70-70.25, and the shot it cuts to is the same weapon in the same glove, so the 2.2s MIN_HOLD stays on Cayde throughout. The player's separate landing plate has already cleared, so this card remains Cayde's identity only.",
+          "why": "Inspected frame at source 68.800 inside this hold: a Cayde-6 hero close-up, hood up, the white-and-blue Exo faceplate with the horn and both cyan optics filling the right of frame, the Ace of Spades hand cannon crackling with arc light in his outstretched hand. Measured close-up 68.70-70.25, and the shot it cuts to is the same weapon in the same glove, so the 2.2s MIN_HOLD stays on Cayde throughout. This compact name-only card is deliberately unchanged in this task; the player's identity is carried by the separate landing plate, which has already cleared, not by any persistent HUD.",
           "name": "Jorge Castro"
         },
         {

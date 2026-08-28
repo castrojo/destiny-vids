@@ -33,13 +33,22 @@ or title.
 ## Bluefin and the Blueberries
 
 The current compact Jorge pill at source 69.6 seconds is replaced by the full
-established Cayde-6 identity. Its new seat is source/output 31.2 seconds with a
-2.2-second hold. The complete animation envelope, 30.8 through 33.65 seconds,
-stays inside the measured 30.797-37.771 Cayde-visible battlefield advance.
+established Cayde-6 identity. Its new seat is source/output 33.7 seconds with a
+2.2-second hold. The authoritative segment records identify Cayde-6 from source
+33.300-37.767
+(`seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0033-0037`,
+"Cayde-6 reaches toward a red figure"); the preceding segment (30.800-33.300,
+"Guardians fighting amid debris") identifies no character, so the seat must
+not start before 33.300. The complete animation envelope, 33.300 through 36.15
+seconds, stays inside the evidenced Cayde segment, satisfying the owner's
+"around the first ~30 seconds" ask.
 
-The CTA takeover moves from source 97.0 seconds to 93.5 seconds. This starts the
-approved CTA before the source's `NEW LEGENDS WILL RISE` title, legal-card
-flash, and hard transition. Source audio continues unchanged beneath the CTA.
+The CTA takeover moves from source 97.0 seconds to 91.7 seconds (output 83.7
+after the 8-second excision). The source's `NEW LEGENDS WILL RISE` title
+segment begins at 91.767
+(`seg_yt_destiny_2_rally_the_troops_worldwide_reveal_trailer_0091-0096`), so
+91.7 starts the approved CTA before that title, its legal-card flash, and the
+hard transition. Source audio continues unchanged beneath the CTA.
 
 ## Bluefin: Your Final Trial
 
@@ -66,7 +75,7 @@ Missing identity metadata is omitted and recorded rather than invented.
 ## Verification
 
 - schema and focused standalone/plate tests pass;
-- review frames show the complete Castrojo plate at 31.2 seconds and no
+- review frames show the complete Castrojo plate at 33.7 seconds and no
   publisher title before the Blueberries CTA;
 - Final Trial has no persistent top-right HUD and shows the John Bazzite
   lower-third only on the 16.2-second landing;
