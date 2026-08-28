@@ -95,9 +95,11 @@ def test_fetch_uses_explicit_non_drc_format_ids(tmp_path):
     assert command[command.index("-f") + 1] == "137+251"
     assert command[command.index("--merge-output-format") + 1] == "mkv"
     # yt-dlp takes the extractor argument as ONE token, so the pinned player
-    # client is asserted inside it rather than as a bare word.
+    # client is asserted inside it rather than as a bare word. It is the
+    # client that still lists the pinned video-only + non-DRC Opus rungs
+    # without a PO token; `android_vr` degrades to one muxed 360p format.
     assert command[command.index("--extractor-args") + 1] == \
-        "youtube:player_client=android_vr"
+        "youtube:player_client=visionos"
 
 
 def test_fetch_keeps_an_existing_non_empty_source(tmp_path, monkeypatch):
@@ -446,6 +448,43 @@ def test_an_undrawn_plate_degrades_instead_of_shifting_the_inputs(monkeypatch,
     assert "[basev][1:v]overlay=0:0:enable='between(t,20.0,22.0)'" in graph
     sidecar = json.loads((tmp_path / "x-unresolved.json").read_text())
     assert sidecar["unresolved"][0]["id"] == "missing"
+
+
+def test_plates_are_measured_against_the_picture_not_the_matte(monkeypatch,
+                                                               tmp_path):
+    """A letterboxed source's plates are placed against its PICTURE rect.
+
+    Bungie's cinematics are 2.39:1 inside a 16:9 file. Placing a 3rem status
+    HUD or a 10%-margin nameplate against the raw frame seats it on the black
+    bar -- measured at 140 px on this batch's Final Trial source, which is
+    most of the HUD card. ``tools/render.detect_picture`` exists for exactly
+    this, and returns ``None`` for a full-frame source, which ``plate.place``
+    already reads as "the frame is the picture".
+    """
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls, video={
+        "slug": "x",
+        "cuts": [],
+        "overlays": [
+            {"id": "hud", "kind": "status", "source_at": 5.0, "dur": 2.0},
+        ],
+        "output": str(tmp_path / "x.mp4"),
+    })
+    seen = {}
+
+    def fake_render_all(entries, out_dir, picture=None):
+        seen["picture"] = picture
+        Path(out_dir).mkdir(parents=True, exist_ok=True)
+        drawn = Path(out_dir) / "plate_hud.png"
+        drawn.write_bytes(b"png")
+        return [drawn]
+
+    monkeypatch.setattr(standalone.plate, "render_all", fake_render_all)
+    monkeypatch.setattr(standalone.render, "detect_picture",
+                        lambda source: (0, 140, 1920, 800))
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False)
+    assert seen["picture"] == (0, 140, 1920, 800)
 
 
 # --------------------------------------------------------------------------

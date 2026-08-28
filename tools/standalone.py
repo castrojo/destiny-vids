@@ -42,10 +42,17 @@ SOURCE_DIR = REPO_ROOT / "media" / "standalone"
 WORK_DIR = REPO_ROOT / "renders" / "standalone"
 REVIEW_DIR = WORK_DIR / "review"
 
-# yt-dlp's client for the pinned progressive-free format list. android_vr
-# answers with the AVC video-only and Opus audio-only formats this batch
-# pins; the default web client hands back DRC audio variants.
-PLAYER_CLIENT = "android_vr"
+# yt-dlp's client for the pinned progressive-free format list. Measured
+# against yt-dlp 2026.08.19 on all four batch sources: `android_vr` now warns
+# that "https formats require a GVS PO Token which was not provided. They will
+# be skipped" and answers with ONE muxed 360p/44.1 kHz AAC rung -- so a
+# manifest pinning 137+251 would fail to fetch, and a "best" selector would
+# silently deliver the resampled, band-limited sound the audio tenet forbids.
+# `visionos` -- the client yt-dlp's own default order resolves to here --
+# lists the full AVC video-only and non-DRC 48 kHz Opus ladder with no token.
+# Quality does not rest on the client either way: both format ids come from
+# the manifest, and the schema and loader both refuse a `-drc` id.
+PLAYER_CLIENT = "visionos"
 
 # The delivered container may differ from the sum of its parts by a frame or
 # two of container rounding; more than this is a real edit drift.
@@ -452,7 +459,15 @@ def encode_video(video, source, cta_asset, work_dir, local=False,
 
     plates_dir = work_dir / f"{video['slug']}-plates"
     if overlays:
-        plate.render_all(overlays, plates_dir)
+        # Measured against the PICTURE, never the raw frame. Bungie's
+        # cinematics arrive 2.39:1 inside a 16:9 file -- this batch's Final
+        # Trial source carries 140 px of baked-in matte top and bottom -- so
+        # a HUD on a 3rem inset and a nameplate on a 10% bottom margin both
+        # land on the black bar instead of on the image. ``detect_picture``
+        # returns None for a genuinely full-frame source, which is exactly
+        # what ``plate.place`` already treats as "the frame is the picture".
+        plate.render_all(overlays, plates_dir,
+                         picture=render.detect_picture(source))
     overlays, plate_paths, missing = _plate_inputs(overlays, plates_dir)
     unresolved += missing
     _write_unresolved(video["slug"], unresolved)

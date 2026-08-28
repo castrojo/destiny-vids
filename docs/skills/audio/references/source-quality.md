@@ -35,7 +35,7 @@ which is why the rule now lives in `audio-source.sh` rather than in memory:
 
 ```bash
 -f ba -S "acodec:opus,asr,abr"     # codec, then sample rate, then bitrate
---extractor-args "youtube:player_client=android_vr"
+--extractor-args "youtube:player_client=visionos"
 ```
 
 Reproduced on the exact track that got it wrong:
@@ -54,8 +54,21 @@ youtube-dl-compatible sort, or an explicit `-S abr`, not a current default.
 The explicit sort is pinned anyway: a default that shifts under you is exactly
 how the first failure happened.
 
-The `android_vr` extractor arg is load-bearing: the older documented
-`player_client=android` workaround now returns only a 360p muxed format here.
+The extractor arg is load-bearing, and **which** client is load-bearing has
+moved twice: the older documented `player_client=android` returns only a 360p
+muxed format, and `android_vr` now warns that its "https formats require a GVS
+PO Token which was not provided. They will be skipped" — leaving the same
+single muxed 360p/44.1 kHz AAC rung, which is exactly the sourcing failure
+rule 1 exists to prevent. Measured on yt-dlp 2026.08.19, `player_client=visionos`
+still lists the full video-only AVC and non-DRC 48 kHz Opus ladder with no
+token, and is what yt-dlp's own default order resolves to here:
+
+```bash
+--extractor-args "youtube:player_client=visionos"
+```
+
+Check the ladder with `-F` before trusting any client: a client that has been
+degraded does not error, it just stops listing the good rungs.
 
 ## Rule 2 — decode at native rate, never resample
 
