@@ -474,7 +474,7 @@ git commit -m "feat: add reusable Linux Foundation training CTA" \
 - Consumes: existing `VARIANTS["bazzite"]`, `_bazzite_tile`, `_font`, status
   fields, and chat text.
 - Produces:
-  - `_chat_runs(text: str) -> list[tuple[str, str]]`
+  - `chat_runs(text: str) -> list[tuple[str, str]]`
   - `variant: "bazzite"` support for `kind: "status"`
   - Bazzite tile crest inside the promoted status HUD.
 
@@ -482,7 +482,7 @@ git commit -m "feat: add reusable Linux Foundation training CTA" \
 
 ```python
 def test_chat_supports_one_balanced_underscore_emphasis_span():
-    assert plate._chat_runs("Stay _sharp_!") == [
+    assert plate.chat_runs("Stay _sharp_!") == [
         ("Stay ", "bold"),
         ("sharp", "italic"),
         ("!", "bold"),
@@ -490,7 +490,7 @@ def test_chat_supports_one_balanced_underscore_emphasis_span():
 
 
 def test_unbalanced_chat_underscore_stays_literal():
-    assert plate._chat_runs("Stay _sharp!") == [("Stay _sharp!", "bold")]
+    assert plate.chat_runs("Stay _sharp!") == [("Stay _sharp!", "bold")]
 ```
 
 - [ ] **Step 2: Write failing Bazzite status tests**
@@ -543,12 +543,12 @@ python3 -m pytest -q \
   tests/test_plate.py::test_bazzite_status_remains_compatible_with_a_guardian_plate
 ```
 
-Expected: failures for missing `_chat_runs` and unchanged status chrome.
+Expected: failures for missing `chat_runs` and unchanged status chrome.
 
 - [ ] **Step 4: Implement the minimal emphasis parser**
 
 ```python
-def _chat_runs(text):
+def chat_runs(text):
     first = text.find("_")
     if first < 0:
         return [(text, "bold")]
@@ -773,6 +773,7 @@ git commit -m "feat: render Jungle-family thumbnails" \
   - `fetch_command(video: dict, out: Path) -> list[str]`
   - `mapped_overlays(video: dict, source_duration: float) -> tuple[list[dict], list[dict]]`
   - `filtergraph(video: dict, duration_sec: float, overlays: list[dict]) -> str`
+  - `encode_video(video: dict, source: Path, cta_asset: Path, work_dir: Path, local: bool) -> Path`
   - `build(manifest_path: Path, slug: str, local: bool = False) -> Path`
   - `verify(manifest_path: Path, slug: str) -> list[str]`
   - CLI: `fetch`, `build`, and `verify`.
@@ -871,7 +872,7 @@ def test_build_routes_the_encode_through_run_encode(monkeypatch, tmp_path):
     monkeypatch.setattr(standalone.peaks, "correct_delivered_peak", lambda *args, **kwargs: 1.0)
     monkeypatch.setattr(Path, "exists", lambda self: True)
 
-    standalone._encode_video(
+    standalone.encode_video(
         {
             "slug": "x",
             "cuts": [],
