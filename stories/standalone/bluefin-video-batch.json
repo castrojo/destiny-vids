@@ -224,6 +224,132 @@
       ]
     },
     {
+      "slug": "bluefin-and-the-linux-users",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=_OvgGtnN_Ts",
+        "youtube_id": "_OvgGtnN_Ts",
+        "video_format_id": "299",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin and the Linux Users",
+      "output": "~/Videos/Wolves/review/Bluefin and the Linux Users.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and the Linux Users-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "jorge-cayde",
+          "kind": "guardian",
+          "source_at": 69.1,
+          "dur": 2.2,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "Inspected frame at source 68.800 inside this hold: a Cayde-6 hero close-up, hood up, the white-and-blue Exo faceplate with the horn and both cyan optics filling the right of frame, the Ace of Spades hand cannon crackling with arc light in his outstretched hand. Measured close-up 68.70-70.25, and the shot it cuts to is the same weapon in the same glove, so the 2.2s MIN_HOLD stays on Cayde throughout. This compact name-only card is deliberately unchanged in this task; the player's identity is carried by the separate landing plate, which has already cleared, not by any persistent HUD.",
+          "name": "Jorge Castro"
+        },
+        {
+          "id": "john-bazzite-landing",
+          "kind": "guardian",
+          "source_at": 16.2,
+          "dur": 2.2,
+          "position": "left",
+          "name": "John Bazzite",
+          "variant": "bazzite",
+          "copy_source": "owner_supplied",
+          "why": "The player lands at source 15.9-16.0, settles into the crouch at 16.2, rises through 16.4 and stands by 17.0. The wide plateau shot holds until the hard cut at 21.3, so the complete 2.2s lower-third stays on the landed player."
+        },
+        {
+          "id": "trial-quip-1",
+          "kind": "chat",
+          "source_at": 33.0,
+          "dur": 2.4,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "You knew this would happen",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-quip-2",
+          "kind": "chat",
+          "source_at": 35.6,
+          "dur": 2.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "Stay _sharp_!",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-1",
+          "kind": "chat",
+          "source_at": 94.0,
+          "dur": 2.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "I don't hate nix users",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-2",
+          "kind": "chat",
+          "source_at": 96.4,
+          "dur": 3.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "That's your character to play, not mine",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-3",
+          "kind": "chat",
+          "source_at": 99.8,
+          "dur": 4.8,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "Because I did just beat you, but that's a 50/50 call every time",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-4",
+          "kind": "chat",
+          "source_at": 104.8,
+          "dur": 3.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "We have a Dual Destiny",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        }
+      ],
+      "takeover": {
+        "source_at": 109.7
+      },
+      "thumbnail": {
+        "source_at": 69.1,
+        "why": "Owner-selected frame around 1:09, inside the measured Cayde-6 hero close-up."
+      },
+      "audio_probes": [
+        {
+          "source_at": 40.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 111.0,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
       "slug": "bluefin-and-saint-14",
       "source": {
         "url": "https://www.youtube.com/watch?v=iVZ-G88rOYg",
