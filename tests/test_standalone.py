@@ -550,6 +550,113 @@ def test_the_unresolved_sidecar_is_written_even_when_it_is_empty(monkeypatch,
     assert sidecar == {"slug": "x", "unresolved": []}
 
 
+def test_declared_chat_avatar_is_fetched_before_plate_render(monkeypatch,
+                                                              tmp_path):
+    avatar_dir = tmp_path / "renders" / "avatars"
+    calls = []
+    monkeypatch.setattr(standalone, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(standalone.avatars, "avatar_dir", lambda: avatar_dir)
+    monkeypatch.setattr(
+        standalone.avatars,
+        "have",
+        lambda login: (avatar_dir / f"{login}.png").exists(),
+    )
+
+    def fake_fetch(logins, verbose=False):
+        calls.append((logins, verbose))
+        avatar_dir.mkdir(parents=True)
+        (avatar_dir / "castrojo.png").write_bytes(b"avatar")
+        return {"fetched": 1}, []
+
+    monkeypatch.setattr(standalone.avatars, "fetch", fake_fetch)
+    overlays = [{
+        "id": "trial-quip-1",
+        "kind": "chat",
+        "speaker": "castrojo",
+        "avatar": "renders/avatars/castrojo.png",
+    }]
+
+    unresolved = standalone.prepare_overlay_avatars(overlays)
+
+    assert calls == [(["castrojo"], False)]
+    assert unresolved == []
+
+
+def test_missing_declared_chat_avatar_is_recorded_after_fetch_fails(
+        monkeypatch, tmp_path):
+    monkeypatch.setattr(standalone, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(standalone.avatars, "avatar_dir",
+                        lambda: tmp_path / "renders" / "avatars")
+    monkeypatch.setattr(standalone.avatars, "have", lambda login: False)
+    monkeypatch.setattr(
+        standalone.avatars,
+        "fetch",
+        lambda logins, verbose=False: ({"failed": 1}, ["castrojo"]),
+    )
+    overlays = [{
+        "id": "trial-quip-1",
+        "kind": "chat",
+        "speaker": "castrojo",
+        "avatar": "renders/avatars/castrojo.png",
+    }]
+
+    unresolved = standalone.prepare_overlay_avatars(overlays)
+
+    assert unresolved == [{
+        "id": "trial-quip-1",
+        "reason": (
+            "declared GitHub avatar renders/avatars/castrojo.png is missing "
+            "after cache refresh; the drawn crest stands in"
+        ),
+    }]
+
+
+def test_encode_records_a_missing_declared_avatar_but_still_ships_the_plate(
+        monkeypatch, tmp_path):
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls, video={
+        "slug": "x",
+        "cuts": [],
+        "overlays": [{
+            "id": "trial-quip-1",
+            "kind": "chat",
+            "source_at": 10.0,
+            "dur": 2.0,
+            "speaker": "castrojo",
+            "avatar": "renders/avatars/castrojo.png",
+            "text": "Hello",
+        }],
+        "output": str(tmp_path / "x.mp4"),
+    })
+    monkeypatch.setattr(
+        standalone,
+        "prepare_overlay_avatars",
+        lambda overlays, log=print: [{
+            "id": "trial-quip-1",
+            "reason": "declared GitHub avatar is missing",
+        }],
+    )
+
+    def fake_render_all(entries, out_dir, picture=None):
+        Path(out_dir).mkdir(parents=True, exist_ok=True)
+        rendered = Path(out_dir) / "plate_trial-quip-1.png"
+        rendered.write_bytes(b"crest fallback")
+        return [rendered]
+
+    monkeypatch.setattr(standalone.plate, "render_all", fake_render_all)
+
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False)
+
+    sidecar = json.loads((tmp_path / "x-unresolved.json").read_text())
+    assert sidecar["unresolved"] == [{
+        "id": "trial-quip-1",
+        "reason": "declared GitHub avatar is missing",
+    }]
+    assert any("plate_trial-quip-1.png" in str(path)
+               for path in calls[0][1]["inputs"])
+
+
 def test_an_undrawn_plate_degrades_instead_of_shifting_the_inputs(monkeypatch,
                                                                   tmp_path):
     """render_all skips full-frame cards. A skipped plate must leave the
