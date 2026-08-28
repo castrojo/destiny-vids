@@ -102,12 +102,31 @@ def _split_candidates(words):
         yield [" ".join(words[:cut]), " ".join(words[cut:])]
 
 
-def _best_layout(draw, words, font):
-    """The preferred layout at ``font``: fewest lines, then the most balanced."""
-    def key(lines):
-        return (len(lines), max(draw.textlength(line, font=font) for line in lines))
+def _ink_width(draw, line, font):
+    """The width of the pixels actually drawn, not the advance width.
 
-    return min(_split_candidates(words), key=key)
+    ``textlength`` ignores side bearings, so a line that "fits" by advance
+    can still paint outside the title margins; the ink bbox cannot.
+    """
+    box = draw.textbbox((0, 0), line, font=font)
+    return box[2] - box[0]
+
+
+def _best_layout(draw, words, font):
+    """The preferred layout at ``font``: one line only when it actually fits
+    the width, otherwise the most balanced two-line split (least maximum line
+    width). Every word is kept; nothing ever reverts to an overflowing line."""
+    def width(lines):
+        return max(_ink_width(draw, line, font) for line in lines)
+
+    candidates = list(_split_candidates(words))
+    one_line = candidates[0]
+    if width(one_line) <= _MAX_LINE_WIDTH:
+        return one_line
+    two_line = candidates[1:]
+    if not two_line:  # a single word has no split
+        return one_line
+    return min(two_line, key=width)
 
 
 def _fit_title(draw, text):
@@ -119,7 +138,7 @@ def _fit_title(draw, text):
         font = credits._font("black", size)
         lines = _best_layout(draw, words, font)
         if all(
-            draw.textlength(line, font=font) <= _MAX_LINE_WIDTH for line in lines
+            _ink_width(draw, line, font) <= _MAX_LINE_WIDTH for line in lines
         ):
             return font, lines
     font = credits._font("black", _TITLE_FLOOR)
@@ -167,8 +186,16 @@ def render_jungle_thumbnail(source, title):
     if block_top + block_height > _MIDPOINT:
         block_top = _MIDPOINT - block_height
     for index, line in enumerate(lines):
-        _stroked(draw, (cx, block_top + line_height * index + line_height // 2),
-                 line, title_font, WHITE)
+        # Center the ink itself, not the anchor: advance-width centering lets
+        # side bearings push glyph pixels past the title margins.
+        box = draw.textbbox((0, 0), line, font=title_font,
+                            stroke_width=_STROKE)
+        x = cx - (box[0] + box[2]) // 2
+        y = (block_top + line_height * index + line_height // 2
+             - (box[1] + box[3]) // 2)
+        draw.text((x + 3, y + 5), line, font=title_font, fill=_SHADOW)
+        draw.text((x, y), line, font=title_font, fill=WHITE,
+                  stroke_width=_STROKE, stroke_fill=NEAR_BLACK)
 
     return Image.alpha_composite(frame.convert("RGBA"), overlay).convert("RGB")
 

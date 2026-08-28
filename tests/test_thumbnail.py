@@ -136,6 +136,33 @@ def test_long_title_sits_on_at_most_two_baselines():
     assert _title_row_bands(card) <= 2
 
 
+def test_long_title_uses_two_baselines_inside_the_title_margins():
+    source = Image.new("RGB", (1280, 720), "#a66a3f")
+    card = thumbnail.render_jungle_thumbnail(
+        source,
+        "Bluefin: The Absolutely Final Trial of the Fittest "
+        "Guardian in the Whole Wide Jungle",
+    )
+    # A single overflowing line must not pass: exactly two baselines.
+    assert _title_row_bands(card) == 2
+    # ...and every near-white (title) column stays inside the horizontal
+    # title margins, so no line can spill past _MAX_LINE_WIDTH. The floor's
+    # mandated minimum-overflow split may exceed the budget by less than a
+    # stroke width (the 8px outline is part of the title treatment), so the
+    # tolerance is exactly _STROKE; a single overflowing line spills by
+    # hundreds of pixels and cannot pass.
+    gray = card.convert("L")
+    w, h = gray.size
+    inked_x = [
+        x for x in range(w)
+        if gray.crop((x, 0, x + 1, h)).getextrema()[1] > 240
+    ]
+    margin = (thumbnail.SIZE[0] - thumbnail._MAX_LINE_WIDTH) // 2
+    margin -= thumbnail._STROKE
+    assert min(inked_x) >= margin
+    assert max(inked_x) < thumbnail.SIZE[0] - margin
+
+
 def _noisy_source(path):
     """A deterministic frame noisy enough that quality 95 crosses the cap."""
     rng = random.Random(1337)
