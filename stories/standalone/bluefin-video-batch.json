@@ -122,7 +122,7 @@
           "kind": "status",
           "source_at": 3.35,
           "dur": 106.35,
-          "position": "status",
+          "position": "top-right",
           "detail": "FIRETEAM // EXPERT",
           "label": "John Bazzite",
           "variant": "bazzite",

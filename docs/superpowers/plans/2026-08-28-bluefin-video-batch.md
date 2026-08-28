@@ -16,6 +16,7 @@
 - The CTA is a local skill and asset recipe. The builder exposes only a generic full-frame picture takeover.
 - `Jorge Castro` plates are name-only. Do not add a label, class, or title.
 - Final Trial uses a plain-blue Jorge/Cayde plate plus a separate promoted Bazzite `FIRETEAM // EXPERT` / `John Bazzite` status HUD.
+- The Bazzite HUD is seated in the picture's **top-right** (`position: "top-right"`), as the approved player-card direction fixes it. `position: "status"` is the top-LEFT seat and is the wrong corner here.
 - The Bazzite HUD uses the official tile crest and purple chrome; it does not borrow gold leader rank or a laurel.
 - Store `Stay _sharp_!` verbatim and support exactly one balanced underscore emphasis span; do not add a Markdown parser.
 - Source audio is fetched from an explicit non-DRC format ID at its native sample rate and receives no EQ, compression, limiting, or loudness normalization.
@@ -793,7 +794,10 @@ def test_fetch_uses_explicit_non_drc_format_ids(tmp_path):
     command = standalone.fetch_command(video, tmp_path / "trial.mkv")
     assert command[command.index("-f") + 1] == "137+251"
     assert command[command.index("--merge-output-format") + 1] == "mkv"
-    assert "android_vr" in command
+    # yt-dlp takes the extractor argument as ONE token, so the pinned player
+    # client is asserted inside it rather than as a bare word.
+    assert command[command.index("--extractor-args") + 1] == \
+        "youtube:player_client=visionos"
 ```
 
 - [ ] **Step 2: Write failing filtergraph mapping tests**
@@ -904,11 +908,18 @@ Expected: failures naming the missing builder functions.
 - [ ] **Step 5: Implement explicit source fetching**
 
 ```python
+# Measured on yt-dlp 2026.08.19: `android_vr` warns that its https formats
+# require a GVS PO token and answers with one muxed 360p/44.1 kHz rung, so a
+# manifest pinning 137+251 cannot fetch. `visionos` still lists the full
+# video-only AVC and non-DRC 48 kHz Opus ladder with no token.
+PLAYER_CLIENT = "visionos"
+
+
 def fetch_command(video, out):
     source = video["source"]
     return [
         "yt-dlp",
-        "--extractor-args", "youtube:player_client=android_vr",
+        "--extractor-args", f"youtube:player_client={PLAYER_CLIENT}",
         "--no-playlist",
         "--no-part",
         "-f", f"{source['video_format_id']}+{source['audio_format_id']}",
@@ -1121,10 +1132,16 @@ Run:
 
 ```bash
 for id in ZJLAJVmggt0 rQ4i0AT8c-M _OvgGtnN_Ts iVZ-G88rOYg; do
-  yt-dlp --extractor-args "youtube:player_client=android_vr" \
+  yt-dlp --extractor-args "youtube:player_client=visionos" \
     --no-playlist -F "https://www.youtube.com/watch?v=$id"
 done
 ```
+
+`visionos` is the client `tools/standalone.py` pins, and it is the one measured
+to still list the full ladder on yt-dlp 2026.08.19. `android_vr` warns that its
+https formats need a GVS PO token and answers with a single muxed
+360p/44.1 kHz rung, which is the sourcing failure the audio tenet forbids —
+check the ladder with `-F` before trusting any client.
 
 For each source, record:
 
@@ -1263,7 +1280,7 @@ Add the evidenced Cayde/Jorge plate, then:
   {
     "id": "john-bazzite-expert",
     "kind": "status",
-    "position": "status",
+    "position": "top-right",
     "detail": "FIRETEAM // EXPERT",
     "label": "John Bazzite",
     "variant": "bazzite",

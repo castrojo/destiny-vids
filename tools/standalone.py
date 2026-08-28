@@ -463,11 +463,30 @@ def encode_video(video, source, cta_asset, work_dir, local=False,
         # cinematics arrive 2.39:1 inside a 16:9 file -- this batch's Final
         # Trial source carries 140 px of baked-in matte top and bottom -- so
         # a HUD on a 3rem inset and a nameplate on a 10% bottom margin both
-        # land on the black bar instead of on the image. ``detect_picture``
-        # returns None for a genuinely full-frame source, which is exactly
-        # what ``plate.place`` already treats as "the frame is the picture".
-        plate.render_all(overlays, plates_dir,
-                         picture=render.detect_picture(source))
+        # land on the black bar instead of on the image.
+        #
+        # The STATUS is read, not just the rect: "there is no matte" and "I
+        # never looked" are different answers (issue #161) and only the first
+        # is safe to place against. A full-frame source gives ``None``, which
+        # ``plate.place`` already reads as "the frame is the picture". An
+        # UNDECODABLE one -- the ffmpeg-free default this host warns about,
+        # an unreadable file -- gives ``None`` too, and placing against it
+        # silently re-seats every plate on the matte, which is the exact bug
+        # this call fixes. So the seats are dropped and recorded instead, and
+        # the unplated video still ships (AGENTS.md, "Degrade, never block").
+        picture, picture_status = render.detect_picture_status(
+            source, ffmpeg=ffmpeg)
+        if picture_status == "undecodable":
+            unresolved += [
+                {"id": item["id"],
+                 "reason": "the source picture area could not be decoded, so "
+                           "the seat could not be measured against the "
+                           "picture and was not placed"}
+                for item in overlays
+            ]
+            overlays = []
+        else:
+            plate.render_all(overlays, plates_dir, picture=picture)
     overlays, plate_paths, missing = _plate_inputs(overlays, plates_dir)
     unresolved += missing
     _write_unresolved(video["slug"], unresolved)

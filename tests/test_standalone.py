@@ -302,6 +302,11 @@ def _encode_fixture(tmp_path, monkeypatch, calls, video=None):
     monkeypatch.setattr(standalone, "_source_duration", lambda *args: 120.0)
     monkeypatch.setattr(standalone, "_ensure_source", lambda *args: tmp_path / "src.mkv")
     monkeypatch.setattr(standalone.plate, "render_all", lambda *args, **kwargs: [])
+    # Probing the picture reads the source with ffmpeg. These fixtures have no
+    # source on disk, so the default answer is the safe one: it decoded and
+    # found no matte, which `plate.place` reads as "the frame is the picture".
+    monkeypatch.setattr(standalone.render, "detect_picture_status",
+                        lambda *a, **k: (None, "full-frame"))
     monkeypatch.setattr(standalone.thumbnail, "extract_source_frame",
                         lambda *args, **kwargs: tmp_path / "src.png")
     monkeypatch.setattr(standalone.thumbnail, "save_jungle_thumbnail",
@@ -457,9 +462,9 @@ def test_plates_are_measured_against_the_picture_not_the_matte(monkeypatch,
     Bungie's cinematics are 2.39:1 inside a 16:9 file. Placing a 3rem status
     HUD or a 10%-margin nameplate against the raw frame seats it on the black
     bar -- measured at 140 px on this batch's Final Trial source, which is
-    most of the HUD card. ``tools/render.detect_picture`` exists for exactly
-    this, and returns ``None`` for a full-frame source, which ``plate.place``
-    already reads as "the frame is the picture".
+    most of the HUD card. ``tools/render.detect_picture_status`` exists for
+    exactly this, and gives ``None`` with ``"full-frame"`` for an unmatted
+    source, which ``plate.place`` already reads as "the frame is the picture".
     """
     calls = []
     video = _encode_fixture(tmp_path, monkeypatch, calls, video={
@@ -480,11 +485,84 @@ def test_plates_are_measured_against_the_picture_not_the_matte(monkeypatch,
         return [drawn]
 
     monkeypatch.setattr(standalone.plate, "render_all", fake_render_all)
-    monkeypatch.setattr(standalone.render, "detect_picture",
-                        lambda source: (0, 140, 1920, 800))
+    monkeypatch.setattr(standalone.render, "detect_picture_status",
+                        lambda *a, **k: ((0, 140, 1920, 800), "letterboxed"))
     standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
                             tmp_path, local=False)
     assert seen["picture"] == (0, 140, 1920, 800)
+
+
+def test_the_picture_probe_reads_the_already_resolved_ffmpeg(monkeypatch,
+                                                             tmp_path):
+    """One encode resolves ffmpeg once; the probe must use THAT binary.
+
+    ``encode_video`` threads its resolved prefix through the duration probe,
+    the PCM reads and the encode. If the picture probe re-resolves internally,
+    an explicit ``ffmpeg=`` override -- or a ``DESTINY_FFMPEG`` change --
+    is honoured for the encode and not for the placement, and on this host the
+    two can differ by whether H.264 decodes at all.
+    """
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls, video={
+        "slug": "x",
+        "cuts": [],
+        "overlays": [
+            {"id": "hud", "kind": "status", "source_at": 5.0, "dur": 2.0},
+        ],
+        "output": str(tmp_path / "x.mp4"),
+    })
+    seen = {}
+
+    def fake_status(source, ffmpeg=None):
+        seen["ffmpeg"] = ffmpeg
+        return (0, 140, 1920, 800), "letterboxed"
+
+    monkeypatch.setattr(standalone.render, "detect_picture_status", fake_status)
+    monkeypatch.setattr(standalone.plate, "render_all",
+                        lambda *a, **k: [])
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False, ffmpeg=["myffmpeg"])
+    assert seen["ffmpeg"] == ["myffmpeg"]
+
+
+def test_an_undecodable_picture_drops_the_seats_and_records_them(monkeypatch,
+                                                                 tmp_path):
+    """"No matte" and "I never looked" are different answers (issue #161).
+
+    A source whose picture geometry cannot be decoded -- the ``ffmpeg-free``
+    default this host warns about, an unreadable file -- returns the same
+    ``None`` rect as a full-frame one. Placing against it silently re-seats
+    every plate on the matte, which is the bug the picture probe exists to
+    fix. So the affected seats are DROPPED and recorded, and the unplated
+    video still ships: degrade, never block, but record.
+    """
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls, video={
+        "slug": "x",
+        "cuts": [],
+        "overlays": [
+            {"id": "hud", "kind": "status", "source_at": 5.0, "dur": 2.0},
+            {"id": "pill", "kind": "chat", "source_at": 20.0, "dur": 2.0},
+        ],
+        "output": str(tmp_path / "x.mp4"),
+    })
+    drawn = []
+    monkeypatch.setattr(standalone.plate, "render_all",
+                        lambda *a, **k: drawn.append(a) or [])
+    monkeypatch.setattr(standalone.render, "detect_picture_status",
+                        lambda *a, **k: (None, "undecodable"))
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False)
+
+    assert not drawn, "nothing may be seated against a picture nobody read"
+    sidecar = json.loads((tmp_path / "x-unresolved.json").read_text())
+    assert [item["id"] for item in sidecar["unresolved"]] == ["hud", "pill"]
+    assert all("could not be decoded" in item["reason"]
+               for item in sidecar["unresolved"])
+    # The video still ships, unplated.
+    assert len(calls) == 1
+    graph = calls[0][0][calls[0][0].index("-filter_complex") + 1]
+    assert "overlay=" not in graph
 
 
 # --------------------------------------------------------------------------
@@ -709,3 +787,77 @@ def test_verify_writes_a_review_frame_for_every_placed_plate(monkeypatch,
     })
     assert standalone.verify(manifest_path, "vid") == []
     assert [f.name for f in frames] == ["drawn.png"]
+
+
+# --------------------------------------------------------------------------
+# The committed batch manifest
+
+
+BATCH = Path(__file__).resolve().parents[1] / \
+    "stories" / "standalone" / "bluefin-video-batch.json"
+
+
+def _batch_video(slug):
+    manifest = json.loads(BATCH.read_text(encoding="utf-8"))
+    return next(v for v in manifest["videos"] if v["slug"] == slug)
+
+
+def _batch_overlay(slug, overlay_id):
+    return next(o for o in _batch_video(slug)["overlays"]
+                if o["id"] == overlay_id)
+
+
+def test_the_bazzite_hud_is_seated_in_the_pictures_top_right():
+    """The approved player-card direction fixes this HUD top-RIGHT.
+
+    `position: "status"` is the site's top-LEFT nameplate rail
+    (`.wc-intro-nameplate { top: 3rem; left: 3rem }`), and the manifest shipped
+    it once by copying a brief that had quietly lost the corner. Both seats are
+    measured against the picture, so this is purely which corner the design
+    approved -- and the design is the authority, not the brief.
+    """
+    hud = _batch_overlay("bluefin-your-final-trial", "john-bazzite-expert")
+    assert hud["position"] == "top-right"
+    # Everything else about the card is unchanged: the chrome row exemption is
+    # keyed on `kind`, and the purple/tile crest come from `variant`.
+    assert hud["kind"] == "status"
+    assert hud["variant"] == "bazzite"
+    assert hud["label"] == "John Bazzite"
+    assert hud["detail"] == "FIRETEAM // EXPERT"
+    assert (hud["source_at"], hud["dur"]) == (3.35, 106.35)
+
+
+def test_the_top_right_hud_stays_inside_the_letterboxed_picture():
+    """Final Trial is 2.39:1 inside a 16:9 file: measured picture rows
+    140-939. A HUD measured against the FRAME lands on the matte, which is the
+    failure the picture probe exists to prevent -- so assert the seat the
+    manifest asks for is inside the rect that source actually measures."""
+    from PIL import Image
+
+    from tools import plate
+
+    picture = (0, 140, 1920, 800)          # measured on the Final Trial source
+    card = Image.new("RGBA", (520, 190), (255, 0, 0, 255))
+    frame = plate.place(card, position="top-right", picture=picture)
+    box = frame.getbbox()
+    px, py, pw, ph = picture
+    assert box is not None
+    assert box[0] >= px and box[1] >= py
+    assert box[2] <= px + pw and box[3] <= py + ph
+
+
+def test_every_committed_batch_seat_maps_and_collides_with_nothing():
+    """No footage needed: the collision and takeover rules are arithmetic on
+    the authored marks. A source long enough for every mark stands in for the
+    real one, so this stays offline while still proving the seats coexist."""
+    manifest = json.loads(BATCH.read_text(encoding="utf-8"))
+    for video in manifest["videos"]:
+        overlays = video["overlays"]
+        duration = max(
+            [o["source_at"] + o["dur"] for o in overlays]
+            + [(video.get("takeover") or {}).get("source_at", 0.0)]
+            + [0.0]
+        ) + 1.0
+        accepted, unresolved = standalone.mapped_overlays(video, duration)
+        assert unresolved == [], f"{video['slug']}: {unresolved}"
+        assert len(accepted) == len(overlays)
