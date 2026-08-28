@@ -121,14 +121,17 @@
         "audio_format_id": {
           "type": "string",
           "minLength": 1,
-          "description": "The yt-dlp audio format pinned for reproducibility. A '-drc' format is forbidden: DRC (dynamic range compression) normalises the loudness the audio-quality tenet says to preserve, so tools/standalone.py rejects it outright."
+          "not": {
+            "pattern": "-drc$"
+          },
+          "description": "The yt-dlp audio format pinned for reproducibility. A '-drc' format is forbidden: DRC (dynamic range compression) normalises the loudness the audio-quality tenet says to preserve. Rejected here at schema level so the committed-record gate (tests/test_index_integrity.py) catches it without the loader, and again by tools/standalone.py for uncommitted manifests."
         },
         "usage_class": {
           "enum": [
             "third_party_copyrighted",
             "cc_by_4_0"
           ],
-          "description": "Rights bucket, matching vocab/provenance.yaml. This schema is not in the enum generator's MAP, so the list is schema-local and must be kept in step by hand."
+          "description": "Rights bucket. The enum is generated from vocab/provenance.yaml by scripts/generate_schema_enums.py; never hand-edit it."
         },
         "source_rights_note": {
           "type": "string",

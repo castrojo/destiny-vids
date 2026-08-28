@@ -21,6 +21,11 @@ SCHEMA = REPO_ROOT / "schema" / "standalone-batch.schema.json"
 def load_manifest(path):
     path = Path(path)
     data = json.loads(path.read_text(encoding="utf-8"))
+    for video in data.get("videos", []):
+        source = video.get("source") or {}
+        audio_id = source.get("audio_format_id", "")
+        if audio_id.endswith("-drc"):
+            raise ValueError(f"{video['slug']}: DRC audio format is forbidden")
     schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
     errors = sorted(
         Draft202012Validator(schema).iter_errors(data),
@@ -31,10 +36,6 @@ def load_manifest(path):
             f"{'/'.join(map(str, error.path))}: {error.message}"
             for error in errors
         ))
-    for video in data["videos"]:
-        audio_id = video["source"]["audio_format_id"]
-        if audio_id.endswith("-drc"):
-            raise ValueError(f"{video['slug']}: DRC audio format is forbidden")
     return data
 
 
