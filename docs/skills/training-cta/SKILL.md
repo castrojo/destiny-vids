@@ -36,8 +36,12 @@ asset is the committed `assets/cta/linux-foundation-training-forest.png`
 
 - A generic title card, ending card, or thumbnail — use `plates`.
 - Anything off-screen: upload descriptions, captions, links.
-- Changing the CTA copy or artwork. The asset is approved; a change is a new
-  asset with a new digest, not an edit.
+- Changing the CTA copy or artwork on the shared card. The shared asset is
+  approved; a change to it is a new approval, never an edit.
+- Owner-approved per-video copy renders from its own committed asset under
+  `assets/cta/`, selected by that video's `takeover.asset` in the batch
+  manifest; `tools/standalone.py` builds and verifies against it. The shared
+  card is never mutated for a per-video message.
 
 ## Core Process
 
@@ -54,8 +58,10 @@ asset is the committed `assets/cta/linux-foundation-training-forest.png`
 
 ## Common Rationalizations
 
-- "This video needs its own CTA copy" — no. One approved card for every
-  video; per-video copy is a new approval, not a parameter.
+- "This video needs its own CTA copy" — only with owner approval of the
+  exact words, and then as a *separate* committed asset pinned by digest in
+  `tests/test_standalone.py` and selected via that video's `takeover.asset`.
+  The shared card stays byte-for-byte unchanged for every other video.
 - "A fade would look nicer" — not by default. The approved treatment is a
   straight cut to the card.
 - "The audio under the CTA is boring, let's swap in music" — the audio is
@@ -64,6 +70,8 @@ asset is the committed `assets/cta/linux-foundation-training-forest.png`
 ## Red Flags
 
 - The asset on disk hashes differently than the pinned digest.
+- A per-video asset edited in place, or the shared card mutated to carry one
+  video's copy.
 - Audio is muted, ducked, or restarts at the takeover mark.
 - An unbounded still that outlasts the audio track.
 - The takeover mark placed by output time without passing through the

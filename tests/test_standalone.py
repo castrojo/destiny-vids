@@ -78,6 +78,134 @@ def test_training_cta_is_the_approved_1080p_asset():
     )
 
 
+# The owner-authored Blueberries variant: `LOOT = Linux Skills to get You
+# Paid`, rendered from the approved shared card with only the headline area
+# replaced. A separate committed asset with its own pinned digest -- the
+# shared card above is never mutated for one video's copy.
+def test_blueberries_loot_cta_is_a_committed_1080p_asset():
+    import hashlib
+    from PIL import Image
+
+    path = standalone.REPO_ROOT / "assets/cta/blueberries-loot.png"
+    assert Image.open(path).size == (1920, 1080)
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == (
+        "603aff6209233c9c041c57f8d84e6bae11ce259b11e30de9141f192748159f7c"
+    )
+
+
+def test_the_schema_accepts_an_optional_nonempty_takeover_asset():
+    """Owner-approved per-video copy selects its own committed asset; the
+    field is optional and, when present, must be a non-empty path."""
+    schema = json.loads(standalone.SCHEMA.read_text(encoding="utf-8"))
+    manifest = _drc_manifest()
+    manifest["videos"][0]["source"]["audio_format_id"] = "251"
+    manifest["videos"][0]["takeover"] = {
+        "source_at": 90.0,
+        "asset": "assets/cta/blueberries-loot.png",
+    }
+    assert not list(Draft202012Validator(schema).iter_errors(manifest))
+
+    # Absent remains valid: every other takeover rides the shared asset.
+    del manifest["videos"][0]["takeover"]["asset"]
+    assert not list(Draft202012Validator(schema).iter_errors(manifest))
+
+    manifest["videos"][0]["takeover"]["asset"] = ""
+    errors = list(Draft202012Validator(schema).iter_errors(manifest))
+    assert errors, "schema accepted an empty takeover asset"
+    assert any(
+        list(error.path)[:3] == ["videos", 0, "takeover"] for error in errors
+    )
+
+
+def test_cta_asset_prefers_a_takeover_override():
+    video = {"takeover": {"source_at": 90.0,
+                          "asset": "assets/cta/blueberries-loot.png"}}
+    manifest = {"cta_asset": "assets/cta/linux-foundation-training-forest.png"}
+    assert standalone.cta_asset_path(video, manifest) == \
+        standalone.REPO_ROOT / "assets/cta/blueberries-loot.png"
+
+
+def test_cta_asset_falls_back_to_the_shared_batch_asset():
+    manifest = {"cta_asset": "assets/cta/linux-foundation-training-forest.png"}
+    assert standalone.cta_asset_path({"takeover": {"source_at": 90.0}},
+                                     manifest) == \
+        standalone.REPO_ROOT / "assets/cta/linux-foundation-training-forest.png"
+    assert standalone.cta_asset_path({}, manifest) == \
+        standalone.REPO_ROOT / "assets/cta/linux-foundation-training-forest.png"
+
+
+def test_build_passes_the_selected_cta_asset_to_the_encode(monkeypatch,
+                                                           tmp_path):
+    """build() is where the override reaches the render: the encode must see
+    the takeover's own asset, not the batch-wide one."""
+    manifest_path = tmp_path / "batch.json"
+    data = _drc_manifest()
+    entry = data["videos"][0]
+    entry["source"]["audio_format_id"] = "251"
+    entry["slug"] = "vid"
+    entry["output"] = str(tmp_path / "vid.mp4")
+    entry["thumbnail_output"] = str(tmp_path / "vid.jpg")
+    entry["takeover"] = {"source_at": 90.0,
+                         "asset": "assets/cta/blueberries-loot.png"}
+    manifest_path.write_text(json.dumps(data))
+
+    seen = {}
+    monkeypatch.setattr(standalone.render, "find_ffmpeg",
+                        lambda *a, **k: ["ffmpeg"])
+    monkeypatch.setattr(standalone, "_ensure_source",
+                        lambda video: tmp_path / "src.mkv")
+
+    def fake_encode(video, source, cta_asset, work_dir, **kwargs):
+        seen["cta_asset"] = cta_asset
+        return tmp_path / "vid.mp4"
+
+    monkeypatch.setattr(standalone, "encode_video", fake_encode)
+    monkeypatch.setattr(standalone.thumbnail, "extract_source_frame",
+                        lambda *a, **k: None)
+    monkeypatch.setattr(standalone.thumbnail, "save_jungle_thumbnail",
+                        lambda *a, **k: tmp_path / "vid.jpg")
+    monkeypatch.setattr(standalone, "WORK_DIR", tmp_path / "work")
+
+    standalone.build(manifest_path, "vid")
+    assert seen["cta_asset"] == \
+        standalone.REPO_ROOT / "assets/cta/blueberries-loot.png"
+
+    # Without the override the same path falls back to the shared card.
+    del entry["takeover"]["asset"]
+    manifest_path.write_text(json.dumps(data))
+    standalone.build(manifest_path, "vid")
+    assert seen["cta_asset"] == standalone.REPO_ROOT / \
+        "assets/cta/linux-foundation-training-forest.png"
+
+
+def test_verify_compares_the_takeover_frame_with_the_selected_asset(
+        monkeypatch, tmp_path):
+    """The verify frame comparison must follow the same selection as the
+    build, or a per-video card would be judged against the shared one."""
+    from PIL import Image
+    custom = tmp_path / "custom.png"
+    Image.new("RGB", (1920, 1080), (30, 60, 90)).save(custom)
+    compared = []
+    real_difference = standalone.frame_difference
+    monkeypatch.setattr(
+        standalone, "frame_difference",
+        lambda frame, asset: compared.append(asset) or
+        real_difference(frame, asset))
+
+    manifest_path, _ = _verify_fixture(tmp_path, monkeypatch, {
+        "takeover": {"source_at": 90.0, "asset": "assets/cta/x.png"},
+    })
+    monkeypatch.setattr(standalone, "REPO_ROOT", tmp_path)
+    (tmp_path / "assets" / "cta").mkdir(parents=True)
+    (tmp_path / "assets" / "cta" / "x.png").write_bytes(custom.read_bytes())
+    frame = tmp_path / "takeover.png"
+    Image.new("RGB", (1920, 1080), (30, 60, 90)).save(frame)
+    monkeypatch.setattr(standalone, "_write_frame",
+                        lambda *a, **k: frame)
+    assert standalone.verify(manifest_path, "vid") == []
+    assert compared == [tmp_path / "assets" / "cta" / "x.png"]
+
+
 # --------------------------------------------------------------------------
 # Fetching: explicit, pinned, non-DRC formats
 
@@ -943,6 +1071,7 @@ def test_the_blueberries_jorge_plate_is_the_established_identity():
     assert plate == CASTROJO_PLATE
     assert _batch_video("bluefin-and-the-blueberries")["takeover"] == {
         "source_at": 91.7,
+        "asset": "assets/cta/blueberries-loot.png",
     }
 
 
@@ -972,6 +1101,19 @@ def test_the_takeover_starts_before_the_new_legends_title():
     assert video["cuts"][0]["end_sec"] - video["cuts"][0]["start_sec"] == 8.0
     assert standalone.source_to_output(
         video["takeover"]["source_at"], video["cuts"]) == pytest.approx(83.7)
+
+
+def test_only_blueberries_overrides_the_shared_cta_asset():
+    """Every other takeover in the batch rides the shared approved card, so
+    none of them may carry an `asset` key -- an override appearing on another
+    video is a wrong claim on screen, caught here at the record."""
+    manifest = json.loads(BATCH.read_text(encoding="utf-8"))
+    for video in manifest["videos"]:
+        takeover = video.get("takeover") or {}
+        if video["slug"] == "bluefin-and-the-blueberries":
+            assert takeover.get("asset") == "assets/cta/blueberries-loot.png"
+        else:
+            assert "asset" not in takeover, video["slug"]
 
 
 def test_a_batch_plate_contradicting_a_binding_is_reported_not_shipped():

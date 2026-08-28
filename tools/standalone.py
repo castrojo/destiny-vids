@@ -106,6 +106,14 @@ def entry_by_slug(manifest, slug):
     return matches[0]
 
 
+def cta_asset_path(video, manifest):
+    """The takeover picture for one video: the video's own committed asset
+    when its takeover names one (owner-approved per-video copy), otherwise
+    the batch-wide ``cta_asset`` shared by every other takeover."""
+    takeover = video.get("takeover") or {}
+    return REPO_ROOT / (takeover.get("asset") or manifest["cta_asset"])
+
+
 def _sorted_cuts(cuts):
     ordered = sorted(cuts or [], key=lambda cut: cut["start_sec"])
     previous_end = 0.0
@@ -546,7 +554,7 @@ def build(manifest_path, slug, local=False, ffmpeg=None, log=print):
     video = entry_by_slug(manifest, slug)
     ffmpeg = ffmpeg or render.find_ffmpeg()
     source = _ensure_source(video)
-    cta_asset = REPO_ROOT / manifest["cta_asset"]
+    cta_asset = cta_asset_path(video, manifest)
     work_dir = WORK_DIR / slug
     out = encode_video(video, source, cta_asset, work_dir, local=local,
                        ffmpeg=ffmpeg, log=log)
@@ -796,7 +804,7 @@ def verify(manifest_path, slug, ffmpeg=None, log=print):
             problems.append(f"takeover: {error}")
         else:
             frame = _write_frame(out, at, review / "takeover.png", ffmpeg)
-            asset = REPO_ROOT / manifest["cta_asset"]
+            asset = cta_asset_path(video, manifest)
             difference = frame_difference(frame, asset)
             if difference > CTA_FRAME_TOLERANCE:
                 problems.append(
