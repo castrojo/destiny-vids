@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-27",
+  "generated_at": "2026-08-28",
   "skills": [
     {
       "id": "chapters",
@@ -169,6 +169,24 @@
       "description": "Take approved video work from issue brief to delivered artifact. Use when an issue needs to run from brief, through indexing or rendering, to a file in the delivery workspace.",
       "version": "1.3",
       "last_updated": "2026-08-27",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "training-cta",
+      "name": "training-cta",
+      "one_line_purpose": "Replace picture with the approved LF training CTA while preserving audio.",
+      "entry_point": "docs/skills/training-cta/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "cta",
+        "linux-foundation",
+        "training",
+        "video"
+      ],
+      "description": "Use when a Bluefin video should replace its remaining picture with the approved Linux Foundation training card while the source audio continues.",
+      "version": "1.0",
+      "last_updated": "2026-08-28",
       "doc_type": "procedure"
     }
   ]

@@ -65,3 +65,14 @@ def test_the_schema_itself_rejects_drc_audio_format():
     clean = _drc_manifest()
     clean["videos"][0]["source"]["audio_format_id"] = "251"
     assert not list(Draft202012Validator(schema).iter_errors(clean))
+
+
+def test_training_cta_is_the_approved_1080p_asset():
+    import hashlib
+    from PIL import Image
+
+    path = standalone.REPO_ROOT / "assets/cta/linux-foundation-training-forest.png"
+    assert Image.open(path).size == (1920, 1080)
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == (
+        "46d05d65973f64c4811a02f64673db547cb2d403c58caa9fdbddc7b0da5883c5"
+    )
