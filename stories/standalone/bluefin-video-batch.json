@@ -1,0 +1,263 @@
+{
+  "version": 1,
+  "cta_asset": "assets/cta/linux-foundation-training-forest.png",
+  "videos": [
+    {
+      "slug": "bluefin-and-the-blueberries",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=ZJLAJVmggt0",
+        "youtube_id": "ZJLAJVmggt0",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin and the Blueberries",
+      "output": "~/Videos/Bluefin and the Blueberries.mp4",
+      "thumbnail_output": "~/Videos/Bluefin and the Blueberries-thumbnail.jpg",
+      "cuts": [
+        {
+          "start_sec": 46.0,
+          "end_sec": 54.0,
+          "note": "Owner-authored excision. Everything after it shifts eight seconds earlier, so the 97.0 takeover lands at output 89.0."
+        }
+      ],
+      "overlays": [
+        {
+          "id": "jorge-cayde",
+          "kind": "guardian",
+          "source_at": 14.4,
+          "dur": 2.2,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "Inspected frame at source 14.400: Cayde-6 stands centre-frame in the crowd of rank-and-file Guardians -- hood back off the Exo faceplate, the single cyan optic and the horn above it clearly lit, the ace-of-spades pauldron and EARTH patch readable on his right shoulder. Measured shot 14.05-15.75 (the cut in from the two human Guardians at 14.0, the whip cut out at 15.8), so a 4.0s hold does not fit; held at plate.py's MIN_HOLD of 2.2 rather than trimmed to 1.35s, which no viewer could read. It therefore rides 0.85s past the cut, which the brief permits -- the anchor frame is Cayde.",
+          "name": "Jorge Castro"
+        }
+      ],
+      "takeover": {
+        "source_at": 97.0
+      },
+      "thumbnail": {
+        "source_at": 14.4
+      },
+      "audio_probes": [
+        {
+          "source_at": 40.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 100.0,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
+      "slug": "bluefin-care-for-a-drink",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=rQ4i0AT8c-M",
+        "youtube_id": "rQ4i0AT8c-M",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin: Care for a Drink?",
+      "output": "~/Videos/Bluefin - Care for a Drink.mp4",
+      "thumbnail_output": "~/Videos/Bluefin - Care for a Drink-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "jorge-cayde",
+          "kind": "guardian",
+          "source_at": 4.5,
+          "dur": 3.0,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "Inspected frame at source 5.000 inside this hold: Cayde-6 sits alone at the bar, hood up, the blue-and-white Exo faceplate with its horn and jaw plating fully lit against the dark room, the green drink on the counter in front of him. Measured shot 4.10-7.75 (it cuts in off the pouring insert, out to the tighter close-up at 8.0), so the whole 3.0s hold sits inside evidenced Cayde picture with plate.py's 0.4s lead-in and 0.25s tail-out. The burned-in ESRB badge has already cleared at 4.05.",
+          "name": "Jorge Castro"
+        }
+      ],
+      "takeover": {
+        "source_at": 56.0
+      },
+      "thumbnail": {
+        "source_at": 8.6
+      },
+      "audio_probes": [
+        {
+          "source_at": 45.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 58.0,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
+      "slug": "bluefin-your-final-trial",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=_OvgGtnN_Ts",
+        "youtube_id": "_OvgGtnN_Ts",
+        "video_format_id": "299",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin: Your Final Trial",
+      "output": "~/Videos/Bluefin - Your Final Trial.mp4",
+      "thumbnail_output": "~/Videos/Bluefin - Your Final Trial-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "jorge-cayde",
+          "kind": "guardian",
+          "source_at": 69.1,
+          "dur": 2.2,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "Inspected frame at source 68.800 inside this hold: a Cayde-6 hero close-up, hood up, the white-and-blue Exo faceplate with the horn and both cyan optics filling the right of frame, the Ace of Spades hand cannon crackling with arc light in his outstretched hand. Measured close-up 68.70-70.25, and the shot it cuts to is the same weapon in the same glove, so the 2.2s MIN_HOLD stays on Cayde throughout. Kept humble per the design: plain blue, name only, no label, class or title -- the Bazzite HUD celebrates the player on its own rail.",
+          "name": "Jorge Castro"
+        },
+        {
+          "id": "john-bazzite-expert",
+          "kind": "status",
+          "source_at": 3.35,
+          "dur": 106.35,
+          "position": "status",
+          "detail": "FIRETEAM // EXPERT",
+          "label": "John Bazzite",
+          "variant": "bazzite",
+          "copy_source": "owner_supplied",
+          "why": "The Excision player identity returns at expert tier. Measured against the source's own luma: the opening black runs 0-3.350 and the closing black starts at 109.700, so the HUD holds from the first full gameplay frame (3.350, YAVG 16 -> 149) to the last (109.683, YAVG 141 -> 16). Both are hard cuts, not fades."
+        },
+        {
+          "id": "trial-quip-1",
+          "kind": "chat",
+          "source_at": 33.0,
+          "dur": 2.4,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "You knew this would happen",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-quip-2",
+          "kind": "chat",
+          "source_at": 35.6,
+          "dur": 2.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "Stay _sharp_!",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-1",
+          "kind": "chat",
+          "source_at": 94.0,
+          "dur": 2.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "I don't hate nix users",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-2",
+          "kind": "chat",
+          "source_at": 96.4,
+          "dur": 3.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "That's your character to play, not mine",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-3",
+          "kind": "chat",
+          "source_at": 99.8,
+          "dur": 4.8,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "Because I did just beat you, but that's a 50/50 call every time",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-4",
+          "kind": "chat",
+          "source_at": 104.8,
+          "dur": 3.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "You need to carry me through Duality",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        }
+      ],
+      "thumbnail": {
+        "source_at": 68.9
+      },
+      "audio_probes": [
+        {
+          "source_at": 40.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 104.0,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
+      "slug": "bluefin-and-saint-14",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=iVZ-G88rOYg",
+        "youtube_id": "iVZ-G88rOYg",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin and Saint 14",
+      "description": "The Standard for others to Follow",
+      "output": "~/Videos/Bluefin and Saint 14.mp4",
+      "thumbnail_output": "~/Videos/Bluefin and Saint 14-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "activating-cncf-community",
+          "kind": "title",
+          "source_at": 106.0,
+          "dur": 5.0,
+          "position": "top-right",
+          "title": "Activating CNCF Community",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored top-right activation plate"
+        }
+      ],
+      "takeover": {
+        "source_at": 123.0
+      },
+      "thumbnail": {
+        "source_at": 70.5
+      },
+      "audio_probes": [
+        {
+          "source_at": 115.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 125.0,
+          "duration": 1.0
+        }
+      ]
+    }
+  ]
+}
