@@ -601,7 +601,9 @@ def splice_step_ratio(before, after):
     return step / reference
 
 
-# The delivery raster's frame grid: 30000/1001 fps.
+# The frame grid a cut boundary quantizes against: the 30000/1001 source
+# raster (the delivery fps=60000/1001 doubling happens after the trims, so
+# segment lengths quantize on the source grid).
 FRAME_DURATION = 1001 / 30000
 
 
