@@ -831,6 +831,26 @@ def test_final_trial_uses_one_normal_bazzite_plate_on_the_landing():
                    for overlay in video["overlays"])
 
 
+def test_final_trial_trial_nix_4_carries_the_owner_authored_dual_destiny_line():
+    """Owner-authored copy change: the Final Trial exchange closes on
+    "We have a Dual Destiny", replacing "You need to carry me through
+    Duality". Pin the complete literal record so the old line cannot
+    return and the timing cannot drift."""
+    overlay = _batch_overlay("bluefin-your-final-trial", "trial-nix-4")
+    assert overlay == {
+        "id": "trial-nix-4",
+        "kind": "chat",
+        "source_at": 104.8,
+        "dur": 3.2,
+        "position": "center",
+        "speaker": "castrojo",
+        "avatar": "renders/avatars/castrojo.png",
+        "text": "We have a Dual Destiny",
+        "copy_source": "owner_supplied",
+        "why": "Owner-authored Final Trial exchange",
+    }
+
+
 def test_the_top_right_hud_stays_inside_the_letterboxed_picture():
     """`plate.place` geometry only. The batch carries one real top-right
     seat -- the Saint-14 video's owner-authored "Activating CNCF Community"
