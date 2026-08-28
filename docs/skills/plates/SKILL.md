@@ -101,10 +101,16 @@ data; never preserve a partial duplicate.
 
 ### Finished identities never degrade to placeholders
 
-Once a person's Guardian identity is authored, finished work reproduces that
-complete identity and its chrome flags — never a placeholder plate, a generic
-fallback such as `Bluefin Blueberry`, or an agent-made approximation of the
-authored rows to make a timing pass look complete.
+Once a person's Guardian identity is authored, finished work reproduces the
+complete authored text rows and the owner's recorded chrome treatment — never a
+placeholder plate, a generic fallback such as `Bluefin Blueberry`, or an
+agent-made approximation of the authored rows to make a timing pass look
+complete.
+
+**Castrojo's Guardian plates are standard blue and carry his full authored
+identity:** `TRUSTEE // GUARDIAN` / `Harbinger Titan` / `Jorge Castro` /
+`Upender of Antipatterns | The First Disciple`. `TRUSTEE` in the label is copy,
+not permission to set `trustee: true`; omit that chrome flag and any `variant`.
 
 The one permitted narrowing is **explicit and owner-authored**: the owner may
 record a partial or name-only treatment in the manifest itself. Act II's
