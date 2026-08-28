@@ -236,9 +236,9 @@
       "thumbnail_output": "~/Videos/Bluefin and Saint 14-thumbnail.jpg",
       "cuts": [
         {
-          "start_sec": 72.204,
-          "end_sec": 74.362,
-          "note": "Burned-in publisher card: FIGHT THROUGH TIME. Boundary reseated within the same 29.97fps frame window so the PCM join is click-safe (step/p99 slew <= 1.0 by the splice review method)."
+          "start_sec": 72.201,
+          "end_sec": 74.364,
+          "note": "Burned-in publisher card: FIGHT THROUGH TIME. Boundary reseated within the same 29.97fps frame window; the opening segment starts on a frame boundary so concat must pad this join, and the edges sit on quiet samples so the residual 4.5 ms gap reads <= 1.0 step/p99 slew by the splice review method."
         },
         {
           "start_sec": 77.405,
@@ -251,9 +251,9 @@
           "note": "Burned-in publisher cards: MASTER / THE SUNDIAL / NEW 6 PLAYER ACTIVITY. Boundary reseated within the same 29.97fps frame window so the PCM join is click-safe (step/p99 slew <= 1.0 by the splice review method)."
         },
         {
-          "start_sec": 92.347,
-          "end_sec": 93.926,
-          "note": "Burned-in publisher cards: NEW / EXOTIC QUESTS. Boundary reseated within the same 29.97fps frame window so the PCM join is click-safe (step/p99 slew <= 1.0 by the splice review method)."
+          "start_sec": 92.351,
+          "end_sec": 93.925,
+          "note": "Burned-in publisher cards: NEW / EXOTIC QUESTS. Boundary reseated within the same 29.97fps frame window so the audio segment covers its video segment -- concat inserts no silence and the shipped PCM join is the measured one (step/p99 slew <= 1.0 by the splice review method)."
         },
         {
           "start_sec": 97.963,

@@ -1046,10 +1046,10 @@ SAINT_SLUG = "bluefin-and-saint-14"
 # Bungie logo (6.039-8.275) and the ESRB head card (0.000-2.002) are not in
 # this list on purpose: the owner wants them kept.
 SAINT_CARD_CUTS = [
-    (72.204, 74.362),    # FIGHT THROUGH TIME
+    (72.201, 74.364),    # FIGHT THROUGH TIME
     (77.405, 78.572),    # SAVE A LEGEND
     (80.468, 82.707),    # MASTER / THE SUNDIAL / NEW 6 PLAYER ACTIVITY
-    (92.347, 93.926),    # NEW / EXOTIC QUESTS
+    (92.351, 93.925),    # NEW / EXOTIC QUESTS
     (97.963, 99.617),    # PvP ELIMINATION MODE / RUSTED LANDS RETURNS
     (114.604, 116.749),  # TIME TO CONQUER THE / SEASON OF DAWN
 ]
@@ -1272,3 +1272,42 @@ def test_splice_step_ratio_edge_cases():
         pytest.approx(math.inf)
     with pytest.raises(ValueError, match="at least two samples"):
         standalone.splice_step_ratio([0.0], [0.0, 0.0])
+
+
+def test_silence_pad_is_the_frame_quantization_remainder():
+    """The pad is how much longer a kept segment's frame-quantized video
+    runs past its sample-exact audio: zero when a boundary sits exactly on
+    a frame, a whole frame minus epsilon just past one, and it can go
+    frame -- the audio then covers the video and concat inserts nothing."""
+    frame = standalone.FRAME_DURATION
+    assert standalone.silence_pad(frame, 0.0) == pytest.approx(0.0)
+    assert standalone.silence_pad(2 * frame + 0.001, 0.0) == \
+        pytest.approx(frame - 0.001)
+    # Segment start 5 ms below its first frame: 5 ms of cover credit.
+    assert standalone.silence_pad(2 * frame, frame - 0.005) == \
+        pytest.approx(-0.005)
+
+
+def test_the_saint_14_joins_survive_concat_frame_quantization():
+    """Offline guard for the delivered splice defect one layer down from the
+    boundary pins. The concat filter pads a kept segment's audio with
+    silence whenever its frame-quantized video runs longer than its
+    sample-exact audio, so a join that reads click-safe on the source PCM
+    can still ship as content -> silence -> content: the first reseated
+    render measured step/p99 slew of 3.5 and 3.2 delivered at joins whose
+    authored pairs read 0.37 and 0.31. Every Saint join must either ship
+    its authored sample pair (pad <= 0) or pad under a frame -- cuts 1 and
+    3 are the padded ones, seated on quiet edges (measured 0.81 and 0.94
+    delivered against the 1.0 target and 1.8 blocker)."""
+    video = _batch_video(SAINT_SLUG)
+    cuts = sorted(video["cuts"], key=lambda cut: cut["start_sec"])
+    padded = []
+    prev_end = 0.0
+    for cut in cuts:
+        pad = standalone.silence_pad(cut["start_sec"], prev_end)
+        if pad > 0:
+            padded.append((cut["start_sec"], pad))
+            assert pad < standalone.FRAME_DURATION, \
+                f"join at {cut['start_sec']} pads a whole frame"
+        prev_end = cut["end_sec"]
+    assert [start for start, _ in padded] == [72.201, 80.468]

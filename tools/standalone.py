@@ -601,6 +601,37 @@ def splice_step_ratio(before, after):
     return step / reference
 
 
+# The delivery raster's frame grid: 30000/1001 fps.
+FRAME_DURATION = 1001 / 30000
+
+
+def silence_pad(start, prev_end, frame_duration=FRAME_DURATION):
+    """Seconds of silence concat inserts at the join before a cut's start.
+
+    Each kept segment's video runs a whole number of frames; its audio is
+    sample-exact. When the video side is the longer of the two, the concat
+    filter pads the audio tail with silence before the next segment, so the
+    shipped join is content -> silence -> content and the authored sample
+    pair never meets -- a click no boundary selection can prevent, measured
+    on the first reseated Saint-14 render (pads of 0.4-5.9 ms at four of six
+    joins, step/p99 slew up to 3.5 delivered). The pad is
+
+        (first frame pts >= start) - start
+            + (prev_end - first frame pts >= prev_end)
+
+    where ``prev_end`` is the kept segment's own start (the previous cut's
+    end, or 0.0 for the opening segment). At or below zero the audio covers
+    the video and the authored pair ships sample-exact. The fix is still
+    boundary selection: seat the cut so the pad is non-positive, or so both
+    edges of the residual gap sit on quiet samples.
+    """
+    def first_frame_pts(t):
+        return math.ceil(t / frame_duration - 1e-9) * frame_duration
+
+    return (first_frame_pts(start) - start) + \
+        (prev_end - first_frame_pts(prev_end))
+
+
 def correlation(left, right):
     """Normalized cross-correlation of two same-rate probe windows."""
     count = min(len(left), len(right))
