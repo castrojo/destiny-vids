@@ -88,10 +88,6 @@ A Guardian nameplate carries **exactly**:
 
 The deck's other authored shapes are the title card (`title`, `subtitle`, `body[]`) and the **chat card** (`speaker`, `text`) — see [`references/conversation-cards.md`](references/conversation-cards.md).
 
-A fixed-manifest regression test for a plate should compare the complete literal
-entry, including timing, provenance, and chrome flags, so omitted or extra
-fields cannot drift past the closed field set.
-
 Keep chat `text` verbatim. For owner-requested censors, use the Kubernetes helm only for an `o`, an asterisk for other letters, and no unrequested censorship; the complete data contract is in [`references/conversation-cards.md`](references/conversation-cards.md).
 
 A title card may use `position: "top-right"` for a sign in the picture's
@@ -102,6 +98,30 @@ letterboxed.
 An owner-retired authored card remains complete in the generator's `RETIRED`
 record, including timing and identity fields, and is removed from active pass
 data; never preserve a partial duplicate.
+
+### Finished identities never degrade to placeholders
+
+Once a person's Guardian identity is authored, finished work reproduces that
+complete identity and its chrome flags — never a placeholder plate, a generic
+fallback such as `Bluefin Blueberry`, or an agent-made approximation of the
+authored rows to make a timing pass look complete.
+
+The one permitted narrowing is **explicit and owner-authored**: the owner may
+record a partial or name-only treatment in the manifest itself. Act II's
+**named placeholder badge** (`placeholder_dylan_taylor`) is the pattern — a
+real person, credited by name, with every unauthored row omitted; see
+[`references/conversation-cards.md`](references/conversation-cards.md). Rows
+the owner has not written are **omitted, never invented** — nothing fills
+them, not lorem, not a plausible line, not a row borrowed from another
+identity. What the owner has not yet decided is recorded in the manifest's
+`unresolved` list and the `python3 tools/placeholder.py list` punch list, so
+the gap is tracked rather than papered over.
+
+Placeholder machinery otherwise remains for undecided ensemble casting and
+unwritten prose; it is never a fallback for an established real identity. A
+fixed-manifest regression test for a plate compares the complete literal
+entry — timing, provenance, and chrome flags — so omitted or extra fields
+cannot drift past the closed field set.
 
 ### The GitHub login is the identity, not the name
 
@@ -198,6 +218,15 @@ ones that clear the floor and are still too fast to read.
 It **reports and never re-times**. Widening a hold shoves whatever is seated
 after it, and moving an authored beat is the owner's call — so the default
 exits 0, and `--check` is only for whoever is gating a final cut.
+
+**The one short-hold exception is owner-pinned and measured.** A standalone
+placement the owner pinned may carry a hold shorter than the standard floor
+only when all three hold: no standard-length window exists near the requested
+seat, the actual static-renderer interval (`source_at` through
+`source_at + dur` — the standalone path has no lead-in/tail-out envelope) is
+measured wholly inside supported picture, and a literal regression test pins
+the exception. It does not generalize: normal film plates through `plan` keep
+the standard floor.
 
 **A placeholder credits nobody** — the vocab's uncast speaker (`TBD`) and the
 drawn crest, never a real login or somebody's avatar; the intended speaker is

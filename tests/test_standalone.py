@@ -807,31 +807,38 @@ def _batch_overlay(slug, overlay_id):
                 if o["id"] == overlay_id)
 
 
-def test_the_bazzite_hud_is_seated_in_the_pictures_top_right():
-    """The approved player-card direction fixes this HUD top-RIGHT.
+def test_final_trial_uses_one_normal_bazzite_plate_on_the_landing():
+    video = _batch_video("bluefin-your-final-trial")
+    john = _batch_overlay("bluefin-your-final-trial", "john-bazzite-landing")
 
-    `position: "status"` is the site's top-LEFT nameplate rail
-    (`.wc-intro-nameplate { top: 3rem; left: 3rem }`), and the manifest shipped
-    it once by copying a brief that had quietly lost the corner. Both seats are
-    measured against the picture, so this is purely which corner the design
-    approved -- and the design is the authority, not the brief.
-    """
-    hud = _batch_overlay("bluefin-your-final-trial", "john-bazzite-expert")
-    assert hud["position"] == "top-right"
-    # Everything else about the card is unchanged: the chrome row exemption is
-    # keyed on `kind`, and the purple/tile crest come from `variant`.
-    assert hud["kind"] == "status"
-    assert hud["variant"] == "bazzite"
-    assert hud["label"] == "John Bazzite"
-    assert hud["detail"] == "FIRETEAM // EXPERT"
-    assert (hud["source_at"], hud["dur"]) == (3.35, 106.35)
+    assert john == {
+        "id": "john-bazzite-landing",
+        "kind": "guardian",
+        "source_at": 16.2,
+        "dur": 2.2,
+        "position": "left",
+        "name": "John Bazzite",
+        "variant": "bazzite",
+        "copy_source": "owner_supplied",
+        "why": (
+            "The player lands at source 15.9-16.0, settles into the crouch "
+            "at 16.2, rises through 16.4 and stands by 17.0. The wide "
+            "plateau shot holds until the hard cut at 21.3, so the complete "
+            "2.2s lower-third stays on the landed player."
+        ),
+    }
+    assert not any(overlay["kind"] == "status"
+                   for overlay in video["overlays"])
 
 
 def test_the_top_right_hud_stays_inside_the_letterboxed_picture():
-    """Final Trial is 2.39:1 inside a 16:9 file: measured picture rows
-    140-939. A HUD measured against the FRAME lands on the matte, which is the
-    failure the picture probe exists to prevent -- so assert the seat the
-    manifest asks for is inside the rect that source actually measures."""
+    """`plate.place` geometry only. The batch carries one real top-right
+    seat -- the Saint-14 video's owner-authored "Activating CNCF Community"
+    title card -- and the batch's letterboxed sources are 2.39:1 inside a
+    16:9 file (measured picture rows 140-939 on the Final Trial source), so
+    a card placed against the FRAME lands on the matte, which is the failure
+    the picture probe exists to prevent. Pin the arithmetic: a top-right
+    seat must stay inside the rect that source actually measures."""
     from PIL import Image
 
     from tools import plate
@@ -863,54 +870,124 @@ def test_every_committed_batch_seat_maps_and_collides_with_nothing():
         assert len(accepted) == len(overlays)
 
 
-# The Blueberries Cayde-6 hero shot, measured on the source at 0.3s steps:
-# 68.800/69.100 are the preceding fog two-shot, 69.400 through 72.100 are all
-# Cayde, and 72.400 has cut to the crowd. Shot bounds are therefore 69.20 and
-# 72.13. The frame after the ORIGINAL 14.05-15.75 seat's shot -- 16.400 -- is
-# Zavala addressing the crowd, with no Cayde anywhere in it.
-BLUEBERRIES_CAYDE_SHOT = (69.20, 72.13)
+# The Blueberries Cayde-6 seat, per visual frame review (the segment records
+# are coarser than the picture): Cayde is cleanly visible from source 33.533
+# through 35.533, and the dissolve to the destruction wide begins at 35.567.
+# BLUEBERRIES_CAYDE_VISIBLE is measured from delivered/source frame
+# inspection at 59.94fps because the committed segment is coarser; a future
+# tag correction to those segments must update this pin.
+# The standalone renderer hard-overlays the static plate only from source_at
+# through source_at+dur -- plate.py's lead-in/tail-out envelope does not apply
+# here -- so the overlay interval itself must sit inside those bounds. Seated
+# at 33.55 for 1.95s, 33.55-35.50 fits; this is an explicit short-hold
+# exception because no 2.2s continuous Cayde shot exists near the owner's
+# requested ~30s placement.
+BLUEBERRIES_CAYDE_VISIBLE = (33.533, 35.533)
+CASTROJO_PLATE = {
+    "id": "jorge-cayde",
+    "kind": "guardian",
+    "source_at": 33.55,
+    "dur": 1.95,
+    "position": "left",
+    "copy_source": "casting",
+    "why": (
+        "Visual frame review establishes Cayde-6 cleanly visible from "
+        "source 33.533 through 35.533, with the dissolve to the destruction "
+        "wide beginning at 35.567; the standalone renderer hard-overlays "
+        "the static plate only from source_at through source_at+dur, with "
+        "no lead-in/tail-out envelope. The segment records "
+        "(seg_..._0033-0037, 'Cayde-6 reaches toward a red figure', "
+        "casting person castrojo) span 33.300-37.767 but are coarser than "
+        "the picture. Seated at 33.55 for 1.95s, the whole overlay "
+        "interval 33.55-35.50 stays inside the measured visible bounds, "
+        "honoring the owner's 'around the first ~30 seconds' placement "
+        "without crediting Jorge over the destruction wide. This is an "
+        "explicit short-hold exception to the 2.2s minimum because no "
+        "2.2s continuous Cayde shot exists near 30s; the complete "
+        "established four-row identity is kept."
+    ),
+    "label": "TRUSTEE // GUARDIAN",
+    "class": "Harbinger Titan",
+    "name": "Jorge Castro",
+    "title": "Upender of Antipatterns | The First Disciple",
+    "trustee": True,
+}
 
 
-def test_the_blueberries_jorge_plate_holds_only_on_evidenced_cayde():
-    """A `Jorge Castro` plate credits a real person, so every frame it is up
-    for has to support the credit -- AGENTS.md, "Casting names real people".
-
-    The manifest first seated it at 14.4, Cayde's FIRST clear appearance. That
-    shot ends at 15.75 and the next one is Zavala-only, so the 2.2s hold spent
-    0.85s crediting Jorge over footage Cayde is not in. First appearance is a
-    preference; a window that supports the whole readable hold is the rule,
-    and this pins the seat that satisfies it.
-    """
+def test_the_blueberries_jorge_plate_is_the_established_identity():
+    """The full plate reproduces the `castrojo` binding in vocab/casting.yaml
+    verbatim, so its copy_source is `casting` -- the words come from the
+    reviewed durable record, not from this manifest. Compare the complete
+    literal entry so extra as well as missing fields fail the pin."""
     plate = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
-    start = plate["source_at"]
-    end = start + plate["dur"]
-    shot_in, shot_out = BLUEBERRIES_CAYDE_SHOT
-
-    assert (start, plate["dur"]) == (69.6, 2.2)
-    assert shot_in <= start, "the hold starts before the evidenced shot does"
-    assert end <= shot_out, "the hold outlives the evidenced shot"
-    assert plate["name"] == "Jorge Castro"
-    assert plate["kind"] == "guardian"
-    # Nothing may quietly return the plate to the old first-appearance seat.
-    assert end <= 16.4 or start >= 16.4
+    assert plate == CASTROJO_PLATE
+    assert _batch_video("bluefin-and-the-blueberries")["takeover"] == {
+        "source_at": 91.7,
+    }
 
 
-def test_the_blueberries_plate_clears_plate_pys_lead_in_and_tail_out():
-    """`tools/standalone.py` hard-cuts this overlay on `between(t,61.6,63.8)`,
-    but `tools/plate.py`'s envelope (`LEAD_IN` before, `TAIL_OUT` after) is
-    the wider span the same seat would be visible for under the film
-    renderer. Requiring the evidenced shot to cover that wider span keeps the
-    seat honest under either path, and leaves margin for a frame-boundary
-    rounding at the edges."""
-    from tools import plate as plate_module
-
+def test_the_blueberries_overlay_interval_stays_on_visible_cayde():
+    """The standalone renderer overlays the static plate from source_at
+    through source_at+dur and nothing else -- there is no lead-in/tail-out
+    envelope on this path -- so that interval itself must sit inside the
+    measured visual bounds: Cayde cleanly visible 33.533-35.533, dissolve
+    beginning 35.567. 33.55 through 35.50 fits with margin on both ends.
+    """
     seat = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
-    shot_in, shot_out = BLUEBERRIES_CAYDE_SHOT
-    visible_from = seat["source_at"] - plate_module.LEAD_IN
-    visible_to = seat["source_at"] + seat["dur"] + plate_module.TAIL_OUT
+    visible_from = seat["source_at"]
+    visible_to = seat["source_at"] + seat["dur"]
 
-    assert visible_from >= shot_in - 1e-6, visible_from
-    assert visible_to <= shot_out + 1e-6, visible_to
+    assert visible_from >= BLUEBERRIES_CAYDE_VISIBLE[0] - 1e-6
+    assert visible_to <= BLUEBERRIES_CAYDE_VISIBLE[1] + 1e-6
+
+
+def test_the_takeover_starts_before_the_new_legends_title():
+    """The source's `NEW LEGENDS WILL RISE` title begins at source 91.767
+    (seg_..._0091-0096, "'NEW LEGENDS WILL RISE' text over a crowd
+    silhouette"). The takeover at 91.7 -- output 83.7 after the 8s excision --
+    starts the approved CTA before that publisher title, its legal-card
+    flash, and the hard transition."""
+    video = _batch_video("bluefin-and-the-blueberries")
+    assert video["takeover"]["source_at"] < 91.767
+    assert video["cuts"][0]["end_sec"] - video["cuts"][0]["start_sec"] == 8.0
+    assert standalone.source_to_output(
+        video["takeover"]["source_at"], video["cuts"]) == pytest.approx(83.7)
+
+
+def test_a_batch_plate_contradicting_a_binding_is_reported_not_shipped():
+    """The standalone path never passes through `plan`, so mapped_overlays
+    holds hand-authored copy to vocab/casting.yaml (#111's rule: the vocab
+    wins). A contradiction is degraded to `unresolved` -- recorded, never
+    shipped -- like any other seat fault."""
+    video = {"cuts": [], "overlays": [{
+        "id": "wrong-copy",
+        "source_at": 10.0,
+        "dur": 2.2,
+        "position": "left",
+        "name": "Jorge Castro",
+        "label": "MAINTAINER // GUARDIAN",
+        "class": "Harbringer Hunter",
+    }]}
+    accepted, unresolved = standalone.mapped_overlays(video, 120.0)
+    assert accepted == []
+    assert unresolved[0]["id"] == "wrong-copy"
+    assert "vocab wins" in unresolved[0]["reason"]
+
+
+def test_a_name_only_jorge_overlay_does_not_contradict_the_binding():
+    """Omitted fields are not contradictions: the intentional name-only
+    Jorge overlays (Care for a Drink, Final Trial) credit nobody with copy
+    the binding does not say, so they pass the check."""
+    video = {"cuts": [], "overlays": [{
+        "id": "name-only",
+        "source_at": 10.0,
+        "dur": 2.2,
+        "position": "left",
+        "name": "Jorge Castro",
+    }]}
+    accepted, unresolved = standalone.mapped_overlays(video, 120.0)
+    assert unresolved == []
+    assert [o["id"] for o in accepted] == ["name-only"]
 
 
 def test_the_reseated_thumbnail_marks_keep_the_title_off_the_subject():

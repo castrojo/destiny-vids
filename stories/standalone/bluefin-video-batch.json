@@ -19,23 +19,27 @@
         {
           "start_sec": 46.0,
           "end_sec": 54.0,
-          "note": "Owner-authored excision. Everything after it shifts eight seconds earlier, so the 97.0 takeover lands at output 89.0."
+          "note": "Owner-authored excision. Everything after it shifts eight seconds earlier, so the 91.7 takeover lands at output 83.7."
         }
       ],
       "overlays": [
         {
           "id": "jorge-cayde",
           "kind": "guardian",
-          "source_at": 69.6,
-          "dur": 2.2,
+          "source_at": 33.55,
+          "dur": 1.95,
           "position": "left",
-          "copy_source": "owner_supplied",
-          "why": "Seated on the first clear window that supports the whole readable hold, not on Cayde's first clear frame. Measured the Cayde-6 hero shot at source 69.20-72.13: 69.400, 69.700, 70.000, 70.300, 70.600, 70.900, 71.200, 71.500, 71.800 and 72.100 all show Cayde -- hood up over the blue-and-white Exo faceplate, both cyan optics and the horn lit, the red hood lining and the ace-of-spades detailing readable; 68.800/69.100 are the preceding fog two-shot and 72.400 cuts to the crowd. The 2.2s MIN_HOLD therefore runs 69.6-71.8, entirely inside evidenced Cayde picture, with plate.py's 0.4s lead-in landing on the shot's own start and its 0.25s tail-out clearing at 71.88. The earlier 14.4 anchor was Cayde's first clear appearance but its shot ends at 15.75 and the next shot (16.400) is Zavala addressing the crowd with no Cayde in frame, so that seat credited a real person over 0.85s of footage that does not support the credit. After the 46.0-54.0 excision this plate lands at output 61.6-63.8, clear of the 89.0 takeover.",
-          "name": "Jorge Castro"
+          "copy_source": "casting",
+          "why": "Visual frame review establishes Cayde-6 cleanly visible from source 33.533 through 35.533, with the dissolve to the destruction wide beginning at 35.567; the standalone renderer hard-overlays the static plate only from source_at through source_at+dur, with no lead-in/tail-out envelope. The segment records (seg_..._0033-0037, 'Cayde-6 reaches toward a red figure', casting person castrojo) span 33.300-37.767 but are coarser than the picture. Seated at 33.55 for 1.95s, the whole overlay interval 33.55-35.50 stays inside the measured visible bounds, honoring the owner's 'around the first ~30 seconds' placement without crediting Jorge over the destruction wide. This is an explicit short-hold exception to the 2.2s minimum because no 2.2s continuous Cayde shot exists near 30s; the complete established four-row identity is kept.",
+          "label": "TRUSTEE // GUARDIAN",
+          "class": "Harbinger Titan",
+          "name": "Jorge Castro",
+          "title": "Upender of Antipatterns | The First Disciple",
+          "trustee": true
         }
       ],
       "takeover": {
-        "source_at": 97.0
+        "source_at": 91.7
       },
       "thumbnail": {
         "source_at": 14.4
@@ -72,7 +76,7 @@
           "dur": 3.0,
           "position": "left",
           "copy_source": "owner_supplied",
-          "why": "Inspected frame at source 5.000 inside this hold: Cayde-6 sits alone at the bar, hood up, the blue-and-white Exo faceplate with its horn and jaw plating fully lit against the dark room, the green drink on the counter in front of him. Measured shot 4.10-7.75 (it cuts in off the pouring insert, out to the tighter close-up at 8.0), so the whole 3.0s hold sits inside evidenced Cayde picture with plate.py's 0.4s lead-in and 0.25s tail-out. The burned-in ESRB badge has already cleared at 4.05.",
+          "why": "Inspected frame at source 5.000 inside this hold: Cayde-6 sits alone at the bar, hood up, the blue-and-white Exo faceplate with its horn and jaw plating fully lit against the dark room, the green drink on the counter in front of him. Measured shot 4.10-7.75 (it cuts in off the pouring insert, out to the tighter close-up at 8.0), so the whole 3.0s hold sits inside evidenced Cayde picture. The burned-in ESRB badge has already cleared at 4.05.",
           "name": "Jorge Castro"
         }
       ],
@@ -114,20 +118,19 @@
           "dur": 2.2,
           "position": "left",
           "copy_source": "owner_supplied",
-          "why": "Inspected frame at source 68.800 inside this hold: a Cayde-6 hero close-up, hood up, the white-and-blue Exo faceplate with the horn and both cyan optics filling the right of frame, the Ace of Spades hand cannon crackling with arc light in his outstretched hand. Measured close-up 68.70-70.25, and the shot it cuts to is the same weapon in the same glove, so the 2.2s MIN_HOLD stays on Cayde throughout. Kept humble per the design: plain blue, name only, no label, class or title -- the Bazzite HUD celebrates the player on its own rail.",
+          "why": "Inspected frame at source 68.800 inside this hold: a Cayde-6 hero close-up, hood up, the white-and-blue Exo faceplate with the horn and both cyan optics filling the right of frame, the Ace of Spades hand cannon crackling with arc light in his outstretched hand. Measured close-up 68.70-70.25, and the shot it cuts to is the same weapon in the same glove, so the 2.2s MIN_HOLD stays on Cayde throughout. This compact name-only card is deliberately unchanged in this task; the player's identity is carried by the separate landing plate, which has already cleared, not by any persistent HUD.",
           "name": "Jorge Castro"
         },
         {
-          "id": "john-bazzite-expert",
-          "kind": "status",
-          "source_at": 3.35,
-          "dur": 106.35,
-          "position": "top-right",
-          "detail": "FIRETEAM // EXPERT",
-          "label": "John Bazzite",
+          "id": "john-bazzite-landing",
+          "kind": "guardian",
+          "source_at": 16.2,
+          "dur": 2.2,
+          "position": "left",
+          "name": "John Bazzite",
           "variant": "bazzite",
           "copy_source": "owner_supplied",
-          "why": "The Excision player identity returns at expert tier. Measured against the source's own luma: the opening black runs 0-3.350 and the closing black starts at 109.700, so the HUD holds from the first full gameplay frame (3.350, YAVG 16 -> 149) to the last (109.683, YAVG 141 -> 16). Both are hard cuts, not fades."
+          "why": "The player lands at source 15.9-16.0, settles into the crouch at 16.2, rises through 16.4 and stands by 17.0. The wide plateau shot holds until the hard cut at 21.3, so the complete 2.2s lower-third stays on the landed player."
         },
         {
           "id": "trial-quip-1",
