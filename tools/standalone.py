@@ -583,9 +583,16 @@ def aligned_correlation(reference, window):
 
     ``window`` is the delivered probe extracted with ``ALIGNMENT_PAD_S`` of
     padding on both sides, so the search recovers the codec/container delay
-    instead of failing on it. Coarse-then-fine: every eighth lag, then the
-    seven either side of the best one -- the same answer as the exhaustive
-    scan for a fraction of the arithmetic.
+    instead of failing on it.
+
+    Every lag is scored. The coarse-then-fine shortcut this replaced was NOT
+    the same answer as the exhaustive scan: bright, periodic content puts a
+    strong autocorrelation peak one signal period from the true seat, and
+    the +/-7-sample fine scan could not walk back to a peak sitting further
+    from the best coarse point -- the Saint-14 mix at source 113.0 measured
+    0.72 at the wrong seat against 0.9999 at the right one, a false "below
+    floor" finding on a correct file. The exhaustive scan is ~2 s of
+    arithmetic per probe, cheap beside the ffmpeg calls around it.
 
     Returns ``(correlation, lag_seconds)``; the lag is signed, negative when
     the delivered audio arrives early.
@@ -601,10 +608,7 @@ def aligned_correlation(reference, window):
     def at(lag):
         return correlation(reference, window[lag:lag + len(reference)])
 
-    coarse = range(0, span + 1, 8)
-    best = max(coarse, key=at)
-    fine = range(max(0, best - 7), min(span, best + 7) + 1)
-    best = max(fine, key=at)
+    best = max(range(span + 1), key=at)
     return at(best), (best - centre) / float(PROBE_RATE)
 
 

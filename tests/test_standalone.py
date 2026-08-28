@@ -1204,3 +1204,26 @@ def test_the_saint_14_seats_map_through_the_cuts_without_collision():
     assert at["activating-cncf-community"] == pytest.approx(97.191)
     assert standalone.expected_duration(video, 130.0) == \
         pytest.approx(130.0 - 10.944)
+
+
+def test_aligned_correlation_finds_the_true_seat_not_a_period_away():
+    """Bright, periodic content defeats a coarse-then-fine lag search: the
+    Saint-14 mix at source 113.0 scored 0.72 at a seat one signal period
+    from the true one, whose 0.9999 peak lay 11 samples from the best
+    coarse point -- outside the +/-7 fine scan. This reproduces that shape:
+    a 3 kHz tone over light noise autocorrelates at ~0.7 three samples off
+    the peak, so the search must score every lag."""
+    import math
+    import random
+
+    rate = standalone.PROBE_RATE
+    span = int(0.1 * rate)  # the delivered window: reference plus the pads
+    rng = random.Random(14)
+    signal = [math.sin(2 * math.pi * 3000 * i / rate)
+              + 0.35 * rng.uniform(-1, 1)
+              for i in range(rate + span)]
+    true_lag = 393  # deliberately not a multiple of the coarse step
+    reference = signal[true_lag:true_lag + rate]
+    score, lag = standalone.aligned_correlation(reference, signal)
+    assert lag == pytest.approx((true_lag - span // 2) / rate, abs=1 / rate)
+    assert score > standalone.AUDIO_CORRELATION_FLOOR
