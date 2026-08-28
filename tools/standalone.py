@@ -187,6 +187,14 @@ def _unresolved_path(slug):
     return WORK_DIR / f"{slug}-unresolved.json"
 
 
+def read_unresolved(slug):
+    """What the last build of ``slug`` could not place, as recorded."""
+    path = _unresolved_path(slug)
+    if not path.exists():
+        return []
+    return json.loads(path.read_text(encoding="utf-8")).get("unresolved") or []
+
+
 def _write_unresolved(slug, unresolved):
     """Record what could not be placed -- ALWAYS, empty list included.
 
@@ -208,12 +216,16 @@ def mapped_overlays(video, source_duration):
 
     Every authored mark is SOURCE time, so it is mapped through the cuts
     before anything renders. A seat that cannot survive that mapping -- it
-    sits inside a removed span, runs past the end of the source, or collides
-    with an accepted plate -- is DROPPED and recorded. It is never slid to
-    somewhere that fits: an authored placement is content, and moving it is
-    the owner's call (AGENTS.md, "Degrade, never block").
+    sits inside a removed span, runs past the end of the source, collides
+    with an accepted plate, or runs under the full-frame takeover that
+    covers it -- is DROPPED and recorded. It is never slid to somewhere that
+    fits: an authored placement is content, and moving it is the owner's
+    call (AGENTS.md, "Degrade, never block").
     """
     cuts = video.get("cuts") or []
+    takeover = video.get("takeover")
+    covered_from = (source_to_output(takeover["source_at"], cuts)
+                    if takeover else None)
     accepted, unresolved = [], []
     for overlay in video.get("overlays") or []:
         item = dict(overlay)
@@ -224,6 +236,16 @@ def mapped_overlays(video, source_duration):
                 raise ValueError(
                     f"source mark {source_at:.3f} exceeds {source_duration:.3f}"
                 )
+            # The takeover is an opaque full-frame picture composited last,
+            # so a plate that runs into it is not on screen for the time the
+            # record says. Accepting it would ship a seat nobody can see and
+            # a review frame that shows the CTA instead of the plate.
+            if covered_from is not None and \
+                    item["at"] + float(item["dur"]) > covered_from + 1e-6:
+                raise ValueError(
+                    f"the seat ends at {item['at'] + float(item['dur']):.3f} "
+                    f"which the full-frame takeover covers from "
+                    f"{covered_from:.3f}")
             plate.load_manifest_entries([*accepted, item])
         except ValueError as error:
             unresolved.append({"id": item["id"], "reason": str(error)})
@@ -626,9 +648,20 @@ def verify(manifest_path, slug, ffmpeg=None, log=print):
     review = REVIEW_DIR / slug
     overlays, unresolved = mapped_overlays(
         video, source_duration if source_duration is not None else math.inf)
-    for item in unresolved:
-        problems.append(f"overlay {item['id']} is unplaced: {item['reason']}")
+    # The build drops a plate nobody drew -- a full-frame card kind, or a
+    # renderer that skipped it -- and only the sidecar knows. Re-deriving the
+    # seats here would rediscover the mapping failures and MISS that class,
+    # so the record is read rather than recomputed. A review frame is never
+    # written for a dropped plate: a picture named for a plate that is not in
+    # it is exactly the false claim these frames exist to catch.
+    dropped = {item["id"]: item["reason"] for item in unresolved}
+    for item in read_unresolved(slug):
+        dropped.setdefault(item["id"], item["reason"])
+    for overlay_id, reason in dropped.items():
+        problems.append(f"overlay {overlay_id} is unplaced: {reason}")
     for overlay in overlays:
+        if overlay["id"] in dropped:
+            continue
         midpoint = float(overlay["at"]) + float(overlay["dur"]) / 2.0
         _write_frame(out, midpoint, review / f"{overlay['id']}.png", ffmpeg)
     takeover = video.get("takeover")
