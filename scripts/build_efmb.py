@@ -202,6 +202,11 @@ BED_TAIL_SEC = None  # derived below, from the remainder
 HALLWAY_CUT_SRC = 323.933
 HALLWAY_FRAME_SRC = 323.933
 HALLWAY_RESUME_SRC = 325.933
+# Film 255.433 is programme 8:59.233 -- the freeze opens "at 8:59", half a
+# second before akgraner's pinned "Hi sugar, I'm looking for Kyle" (8:59.733).
+# The number itself cannot move: the picture before the hallway plays the
+# source continuously, so this seat is wherever film_for_source(HALLWAY_CUT_SRC)
+# lands (asserted in picture_sequence) -- only cutting frames would move it.
 HALLWAY_AT = 255.433
 # Hold the hallway while Amber asks for Kyle and the PvP exchange plays.
 HALLWAY_FREEZE_SEC = 22.000
@@ -209,21 +214,19 @@ AMBER_CLIP_IN = 43.000
 AMBER_CLIP_OUT = 53.470
 AMBER_CLIP_SEC = AMBER_CLIP_OUT - AMBER_CLIP_IN
 AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
-# Return to the same hallway frame for Owen, Amber's kindness speech, and the
-# held Kyle question before the Destiny picture resumes.
-HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
-# Owner, 2026-08-24: "Don't unpause, at 'Oh I see your problem', keep that in
-# the paused section, put cortney's conversation here." The hold used to be a
-# hand-typed 25.6 s; it is now DERIVED from the `paused` block's own
-# schedule in chapters/II-endless-forms.md, so the hallway holds exactly as
-# long as that conversation needs to clear -- no more, no less -- instead of
-# a number an editor has to keep in sync with the copy by hand. No footage
-# is cut and the black tail keeps its 16.065 s (owner: "keep the black"), so
-# growing the paused conversation grows the act -- and every act after it --
-# by the same amount; every downstream chapter file's programme_start and
-# pins must be restated by that delta in the same change, which lands their
-# plates on the same frames they always had.
+# Return to the same hallway frame after Amber's action clip for the kindness
+# speech and her action-sequence lines, and hold until they have ALL cleared.
+# Owner, 2026-08-28: "HALLWAY -> FREEZE -> AMBER TALKS -> SHE FIGHTS -> AMBER
+# TALK -> unfreeze, sup" -- every Amber line plays over the freeze; the
+# picture resumes only when her talking is done, then plays the 5.83 s of
+# source between the resume and Sup's close-up ("then play until the sup").
+# The hold is DERIVED from the `paused` block's own schedule in
+# chapters/II-endless-forms.md, so a line added or removed there never has to
+# be re-typed as a duration anywhere else. Growing it grows the act -- and
+# every act after it -- by the same amount; downstream programme_starts and
+# pins are restated by that delta in the same change.
 PAUSED_BLOCK = "paused"
+HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
 HALLWAY_AFTER_AMBER_SEC = round(
     chapter_md.block_end("II", PAUSED_BLOCK) - HALLWAY_AFTER_AMBER_AT, 3)
 HALLWAY_RETURN_AT = HALLWAY_AFTER_AMBER_AT + HALLWAY_AFTER_AMBER_SEC

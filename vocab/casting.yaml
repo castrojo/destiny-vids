@@ -325,7 +325,8 @@ leads:
         Angell", title "Archon of the Consensus", variant leader. The
         re-authorship answers issue #5: the subclass word the old class row
         lacked is now authored as Stasis, so the row reads "Stasis Warlock".
-        Still open: no avatar, because no GitHub login is on record for her.
+        Closed 2026-08-24: the owner supplied `github: angellk`, so the avatar
+        resolves like every other login's (the wreath has its portrait).
       plate:
         label: ARCHON // CONTRIBUTOR
         class: Stasis Warlock

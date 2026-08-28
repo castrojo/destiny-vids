@@ -115,12 +115,13 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `7:07.23` **Ricardo** — Look man I am so tired just jump
 - `7:13.80` Do we even know who they are?
 - `7:20.47` SATURN
-- `7:23.30` **[redacted]** — Time to bump the kernel
+- `7:23.30` **castrojo** — Time to get this driver upstream
 - `7:26.30` Nessus of Nobara / NOBARA CONTRIBUTOR / LionHeartP
 - `7:29.30` **pastaq** — All your tests passed right?
 - `7:33.30` **LionHeartP** — What tests?
 - `7:35.75` Useful Youtuber (UNCOMMON) / NEW CONTRIBUTOR / A1RM4X
-- `7:39.30` **A1RM4X** — Thank you I never thought I could help! I'm not like you I'm just a lowly user
+- `7:39.30` **A1RM4X** — Thank you I never thought I could help!
+- `7:41.50` **A1RM4X** — I'm not like you I'm just a lowly user
 - `7:42.30` **GloriousEggroll** — It's your patch, turn the stream on
 - `7:45.00` **LionHeartP** — Let's get these numbers up
 - `7:47.45` **wrkode** — Oh dibs on this one
@@ -134,56 +135,43 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:18.53` Enslaver of Maintainers | Ruiner of User Experience / KERNEL REGRESSION
 - `8:20.30` **pastaq** — Hey man WHAT tests?
 - `8:22.57` **LionHeartP** — Let's go!
-- `8:25.30` **[redacted]** — Unlearning bad habits takes time
-- `8:28.30` **[redacted]** — Your options are success
-- `8:31.50` **[redacted]** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
+- `8:25.30` **castrojo** — Unlearning bad habits takes time
+- `8:28.30` **castrojo** — Your options are success
+- `8:31.50` **castrojo** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
 - `8:38.42` **joseph** — We can't let The Toilmaster enslave another generation
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `8:43.75` **KyleGospo** — FOR TITANFALL!
-- `8:46.20` **[redacted]** — Or go blow some shit up
+- `8:46.20` **castrojo** — Or go blow some shit up
 - `8:59.73` **akgraner** — Hi sugar, I'm looking for Kyle
 - `9:02.18` **HikariKnight** — Ouch man wtf!
 - `9:04.63` **Owen** — Oh sorry my bad
 - `9:07.08` **kolunmi** — Who turned PvP on?
+- `9:09.53` **angellk** — Don't look at me I only turned on PVP
 - `9:12.78` **cam** — Mom no one plays this game
 - `9:15.23` **HikariKnight** — Hey wait?!
 - `9:17.68` **kolunmi** — Are those ... other linux users?
 - `9:25.43` **akgraner** — Oh wow I forgot what the starter dungeon was like! Hi!
-- `9:27.88` **akgraner** — Which one of you is Kyleford?
-- `9:32.20` **Owen** — Slay out, Queen!
-- `9:34.65` **akgraner** — Kindness is doing what's right
+- `9:34.65` **akgraner** — Remember, kindness is doing what's right
 - `9:37.10` **akgraner** — For the ecosystem
 - `9:39.55` **akgraner** — For our users
 - `9:42.00` **akgraner** — And for our maintainers
 - `9:44.45` **akgraner** — Don't be nice
 - `9:46.90` **akgraner** — Be kind
 - `9:49.35` **akgraner** — Extinction is the Rule
-- `9:52.20` **akgraner** — Oh I see your problem
-- `9:54.65` **cortney** — And we're gonna do you a solid
-- `9:57.10` **akgraner** — [Redacted] sent me
-- `9:59.55` **akgraner** — "How bazaar?"
-- `10:02.00` **akgraner** — Who writes this crap?
-- `10:04.45` **kolunmi** — I'm sorry I signed up for teamwork, why are people so sweaty?
-- `10:08.77` **KyleGospo** — castrojo killed me in Halo today
-- `10:11.22` **noelmiller** — I feel seen
-- `10:13.67` **akgraner** — Ok well, it gets harder from here on out
-- `10:16.59` **cortney** — Take out this trash all their contributions are
-- `10:19.97` **cortney** — Goose eggs? Nothing?
-- `10:22.42` **akgraner** — Those people will not be there when it matters the most
-- `10:26.34` **akgraner** — Trust me
-- `10:28.79` **akgraner** — I have the scars to prove it
-- `10:31.24` **kolunmi** — I like how you cook sister, I'll try
-- `10:33.89` **akgraner** — Why do you take technical advice from people who post in PHP forums?
-- `10:38.67` **akgraner** — "Do. There is no try"
-- `10:41.12` **akgraner** — I can't save you from this shitty writing though
-- `10:44.80` Reprehenderit voluptate / HATERS
-- `10:50.40` **kylegospo** — Sup
-- `10:51.45` **kolunmi** — Disco!
-- `11:02.20` **nwoods3** — I feel seen
-- `11:04.65` **kolunmi** — Hey did you see how we just loaded up in a new level?
-- `11:07.10` **Hikari** — Finally, I can play WARFRAME!
-- `11:15.37` **[redacted]** — Finally, retirement
-- `11:17.74` **[redacted]** — The long walk beckons
+- `9:52.20` **akgraner** — Ok so I'm going to clean out this trash for you
+- `9:54.65` **akgraner** — [Don't let them decide for you]
+- `9:57.10` **akgraner** — You make your own fate.
+- `9:59.55` **akgraner** — I can't save you from this shitty writing though
+- `10:03.00` **akgraner** — "How bazaar?"
+- `10:05.45` **akgraner** — Who writes this crap?
+- `10:08.13` Reprehenderit voluptate / HATERS
+- `10:13.73` **kylegospo** — Sup
+- `10:15.79` **kolunmi** — Cardio!
+- `10:25.54` **nwoods3** — I feel seen
+- `10:27.99` **kolunmi** — Hey did you see how we just loaded up in a new level?
+- `10:30.44` **Hikari** — Finally, I can play WARFRAME!
+- `10:38.70` **castrojo** — Finally, retirement
+- `10:41.08` **castrojo** — The long walk beckons
 
 ## III
 

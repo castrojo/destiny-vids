@@ -388,6 +388,12 @@ MAPPED_TAIL_PASS = [
         "at_film": build_efmb.KYLE_REVEAL_AT,
         "hold": build_efmb.KYLE_REVEAL_SEC,
         "key": "KyleGospo",
+        # The owner's 2026-08-28 WIP moved Cardio's anchor +1.0 s
+        # (332.817 -> 333.817), so the pill and this plate share the screen
+        # for 0.75 s. Both seats are owner-pinned and may not move; the
+        # named bond is the validator's own exemption for an
+        # owner-instructed pill/nameplate pair (see the same note on Sup).
+        "bond_of": "mapped_kolunmi_disco",
         "seen_at_src": build_efmb.SYNC_ANCHOR_SRC,
         "shot_src": [335.267, 339.767],
         "why": "the Sentinel raising the Void shield in the authored reveal",
@@ -2016,6 +2022,8 @@ def build():
             entry["copy_source"] = "casting"
             entry["shot_src"] = list(spec["shot_src"])
             entry["why"] = spec["why"]
+            if spec.get("bond_of"):
+                entry["bond_of"] = spec["bond_of"]
             entry.update(localise_avatar(
                 spec["key"],
                 authored_copy(spec["key"], casting)))

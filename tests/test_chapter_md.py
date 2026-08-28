@@ -322,7 +322,7 @@ def test_show_quotes_act_two_at_the_seats_the_manifest_carries(capsys):
     plates = {p["id"]: p for p in chapter_md.manifest_plates("II")}
     offset = chapter_md.ACT_PROGRAMME_START["II"]
     for plate_id, tail in (("mapped_haters", "! HATERS"),
-                           ("retirement-1", "[redacted]: Finally, retirement"),
+                           ("retirement-1", "castrojo: Finally, retirement"),
                            ("chat_kolunmi_level", "kolunmi: Hey did you see "
                             "how we just loaded up in a new level?")):
         at = plates[plate_id]["at"]
