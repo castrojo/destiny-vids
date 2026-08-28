@@ -125,7 +125,7 @@ punch-list the next session works from.
 
 | Request | Outcome |
 |---|---|
-| Cayde-6 as Jorge Castro, plate on the reveal | Plate copy on the `cayde_6` binding, reproduced **verbatim from the reference deck** (`np_jorge`: `TRUSTEE // GUARDIAN` / Harbinger Titan / Jorge Castro / Upender of Antipatterns \| The First Disciple, on the deck's standard blue chrome — `TRUSTEE` here is label copy, not the silver rank chrome). **Not on screen yet** — his only indexed shot is 1.201s, under `plate.py`'s 1.5s `MIN_ANCHOR`, so `plan` reports him in `unresolved` (`no_window`). Do not lower `MIN_ANCHOR` to force it; the plate lands by itself once a longer Cayde shot is indexed. |
+| Cayde-6 as Jorge Castro, plate on the reveal | Plate copy on the canonical `cayde_6` binding: `TRUSTEE // GUARDIAN` / Harbinger Hunter / Jorge Castro / Upender of Antipatterns \| The First Disciple, on basic blue chrome. The external deck's `np_jorge` still reads Harbinger Titan with silver `trustee: true`; the owner superseded both fields for this repo. **Not on screen yet** — his only indexed shot is 1.201s, under `plate.py`'s 1.5s `MIN_ANCHOR`, so `plan` reports him in `unresolved` (`no_window`). Do not lower `MIN_ANCHOR` to force it; the plate lands by itself once a longer Cayde shot is indexed. |
 | Kelsey Hightower, `ARCHITECT // GUARDIAN` | Plate copy authored in #8, on the `zavala` binding. **On screen at 17.68s** (+5.0s) in this cut. |
 | Petra Venj → Lori Lorusso, `HERALD // GUARDIAN`, "rusted out" | Recast in `vocab/casting.yaml`; `variant: rust` added to `tools/plate.py` (oxidised iron chrome, same geometry, same closed field set). She has no shot in this trailer, so the plate lands when a cut uses her footage. |
 | Cut 0:44 / resume 0:54 / plates at 1:07, 1:08 / cut at 1:34 / intro 1:52 | **Unresolved.** Those timecodes address three sources the index does not have (`youtu.be/ZJLAJVmggt0`, `youtu.be/0MDrj33Aqqw`, `youtu.be/rQ4i0AT8c-M`), so none of the per-timecode instructions can be resolved against `segments/` today. `automatable: no` — `blocked_on: footage`: shot detection and tagging need the video files, which this repo never stores. Ingest and tag them, then rerun `tools/corpus.py cayde_6 --out corpus/cayde_6.json`. |
@@ -140,10 +140,10 @@ punch-list the next session works from.
 The `class` line on Lori's plate reads **"Harbringer Hunter"** because that is
 what the issue wrote. On-screen copy is quoted, never corrected; the open
 question is recorded as a `TODO(owner)` beside the binding. (Jorge's plate is a
-different case: his identity is authored in the reference deck, so the deck
-wins — `Harbinger Titan` — and the issue's "(change my class)" is satisfied by
-it. An authored identity reproduced verbatim is the rule; the generic fallback
-would be as wrong as an invented one.)
+different case: his identity is authored, so the binding wins — `Harbinger
+Hunter`, his canonical class at the owner's word — and the issue's "(change my
+class)" is satisfied by it. An authored identity reproduced verbatim is the
+rule; the generic fallback would be as wrong as an invented one.)
 
 ## Output targets
 

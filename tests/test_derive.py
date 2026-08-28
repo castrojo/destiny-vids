@@ -238,8 +238,8 @@ def test_cast_bindings(character, person):
 # real person's credit then has to be a deliberate edit in two places, and can
 # be diffed against the source by hand.
 AUTHORED_PLATES = {
-    # nameplates.json np_jorge
-    "cayde_6": ("TRUSTEE // GUARDIAN", "Harbinger Titan", "Jorge Castro",
+    # nameplates.json np_jorge, class corrected to Hunter at the owner's word
+    "cayde_6": ("TRUSTEE // GUARDIAN", "Harbinger Hunter", "Jorge Castro",
                 "Upender of Antipatterns | The First Disciple"),
     # nameplates.json np_bob, and characters.json slug `bob`
     "osiris": ("TRUSTEE // GUARDIAN", "Voidwalker Warlock", "Bob Killen",

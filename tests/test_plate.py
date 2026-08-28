@@ -464,15 +464,14 @@ def test_plan_credits_every_contributor_somewhere():
     for c in ROSTER["contributors"]:
         assert c["display_name"] in named, c
 
-# A contributor whose Guardian identity is genuinely authored in the reference
-# deck. Injected rather than taken from vocab/casting.yaml, because the only
-# real authored identity (castrojo) belongs to someone CAST AS A LEAD, and a
-# lead is excluded from the ensemble pool entirely -- see
+# A contributor whose Guardian identity is authored in the canonical casting
+# record. Injected rather than taken from vocab/casting.yaml because castrojo
+# belongs to someone CAST AS A LEAD, and a lead is excluded from the ensemble
+# pool entirely -- see
 # test_a_person_cast_as_a_lead_is_never_an_anonymous_guardian.
 AUTHORED = {
-    "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Titan",
+    "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Hunter",
     "name": "Jorge Castro", "title": "Upender of Antipatterns | The First Disciple",
-    "trustee": True,
 }
 AUTHORED_ROSTER = {
     "month": "2026-08",
@@ -495,10 +494,11 @@ def test_a_contributor_with_an_authored_deck_plate_gets_it_verbatim(authored):
     entries = plate.plan(shots, LEADS, AUTHORED_ROSTER)
     entry = next(e for e in entries if e["id"] == "ensemble_titled")
     assert entry["label"] == "TRUSTEE // GUARDIAN"
-    assert entry["class"] == "Harbinger Titan"
+    assert entry["class"] == "Harbinger Hunter"
     assert entry["name"] == "Jorge Castro"
     assert entry["title"] == "Upender of Antipatterns | The First Disciple"
-    assert entry["trustee"] is True
+    assert "trustee" not in entry
+    assert "variant" not in entry
 
 def test_an_unlisted_contributor_still_gets_the_generic_ensemble_copy():
     """Nobody has authored a seal for a passing contributor, so the credit
@@ -1347,7 +1347,7 @@ def test_castrojos_authored_plate_lives_on_his_lead_binding():
 
     copy = load_leads()["cayde_6"]["plate"]
     assert copy["name"] == "Jorge Castro"
-    assert copy["class"] == "Harbinger Titan"
+    assert copy["class"] == "Harbinger Hunter"
     assert copy["title"] == "Upender of Antipatterns | The First Disciple"
     assert copy["label"] == "TRUSTEE // GUARDIAN"
     assert "trustee" not in copy
@@ -2091,7 +2091,7 @@ def test_a_missing_brand_mark_degrades_to_the_drawn_crest():
 # shipped two cards disagreeing with their bindings (#111).
 
 _BOUND_LEADS = {
-    "cayde_6": {"plate": {"label": "TRUSTEE // GUARDIAN", "class": "Harbinger Titan",
+    "cayde_6": {"plate": {"label": "TRUSTEE // GUARDIAN", "class": "Harbinger Hunter",
                           "name": "Jorge Castro",
                           "title": "Upender of Antipatterns | The First Disciple"}},
 }
@@ -2128,7 +2128,7 @@ def test_a_copy_override_without_a_decider_is_not_enough():
 def test_matching_copy_needs_no_override():
     from tools.plate import check_copy_against_bindings
     entries = [{"id": "reveal", "at": 1.0, "dur": 2.0, "name": "Jorge Castro",
-                "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Titan",
+                "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Hunter",
                 "title": "Upender of Antipatterns | The First Disciple"}]
     assert check_copy_against_bindings(entries, leads=_BOUND_LEADS) == entries
 

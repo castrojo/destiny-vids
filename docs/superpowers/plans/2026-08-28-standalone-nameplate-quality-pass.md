@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Finished series nameplates use their established authored identity; never replace them with placeholders, compact approximations, or invented fields.
-- Castrojo's plate is exactly `TRUSTEE // GUARDIAN` / `Harbinger Titan` / `Jorge Castro` / `Upender of Antipatterns | The First Disciple` on the standard blue chrome — `TRUSTEE` is label copy, not rank chrome, so no `trustee` flag and no `variant`.
+- Castrojo's plate is exactly `TRUSTEE // GUARDIAN` / `Harbinger Hunter` / `Jorge Castro` / `Upender of Antipatterns | The First Disciple` on the standard blue chrome — `TRUSTEE` is label copy, not rank chrome, so no `trustee` flag and no `variant`.
 - John Bazzite's normal plate carries only `name: John Bazzite` and `variant: bazzite`; no label, class, or title is authored.
 - Blueberries seats Castrojo at source/output `33.55` for `1.95` seconds (visual frame review: Cayde cleanly visible 33.533-35.533, dissolve beginning 35.567; the segment record 33.300-37.767, `seg_..._rally_the_troops_worldwide_reveal_trailer_0033-0037`, is coarser than the picture). The standalone renderer hard-overlays the static plate only from source_at through source_at+dur, so the overlay interval itself stays inside those bounds. The 1.95s hold is an explicit short-hold exception because no 2.2s continuous Cayde shot exists near 30s. The CTA starts at source `91.7` (before the `NEW LEGENDS WILL RISE` segment that begins 91.767).
 - Final Trial seats John Bazzite at source `16.2` for `2.2` seconds and removes the persistent status HUD.
@@ -69,10 +69,9 @@ Replace `BLUEBERRIES_CAYDE_SHOT` and the two Cayde seat tests with:
 BLUEBERRIES_CAYDE_VISIBLE = (33.533, 35.533)
 CASTROJO_PLATE = {
     "label": "TRUSTEE // GUARDIAN",
-    "class": "Harbinger Titan",
+    "class": "Harbinger Hunter",
     "name": "Jorge Castro",
     "title": "Upender of Antipatterns | The First Disciple",
-    "trustee": True,
 }
 
 
@@ -135,10 +134,9 @@ Replace `jorge-cayde` with the complete literal record:
   "copy_source": "casting",
   "why": "Visual frame review establishes Cayde-6 cleanly visible from source 33.533 through 35.533, with the dissolve to the destruction wide beginning at 35.567; the standalone renderer hard-overlays the static plate only from source_at through source_at+dur, with no lead-in/tail-out envelope. Seated at 33.55 for 1.95s, the whole overlay interval 33.55-35.50 stays inside the measured visible bounds -- an explicit short-hold exception because no 2.2s continuous Cayde shot exists near 30s.",
   "label": "TRUSTEE // GUARDIAN",
-  "class": "Harbinger Titan",
+  "class": "Harbinger Hunter",
   "name": "Jorge Castro",
-  "title": "Upender of Antipatterns | The First Disciple",
-  "trustee": true
+  "title": "Upender of Antipatterns | The First Disciple"
 }
 ```
 
@@ -332,7 +330,7 @@ ffmpeg -v error -y -ss 83.9 \
 ```
 
 Expected: 33.4 has no plate; 34.5 (the hold midpoint) shows the complete
-trustee plate on Cayde; 35.55 has no plate and shows the dissolve beginning;
+four-row Castrojo plate on basic blue chrome; 35.55 has no plate and shows the dissolve beginning;
 83.5 contains no publisher title; 83.9 is the approved CTA.
 
 - [ ] **Step 5: Fetch and build Final Trial**

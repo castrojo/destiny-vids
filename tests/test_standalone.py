@@ -1055,7 +1055,7 @@ CASTROJO_PLATE = {
         "established four-row identity is kept."
     ),
     "label": "TRUSTEE // GUARDIAN",
-    "class": "Harbinger Titan",
+    "class": "Harbinger Hunter",
     "name": "Jorge Castro",
     "title": "Upender of Antipatterns | The First Disciple",
 }
@@ -1238,7 +1238,7 @@ DRINK_JORGE_PLATE = {
         "with no trustee flag and no variant."
     ),
     "label": "TRUSTEE // GUARDIAN",
-    "class": "Harbinger Titan",
+    "class": "Harbinger Hunter",
     "name": "Jorge Castro",
     "title": "Upender of Antipatterns | The First Disciple",
 }

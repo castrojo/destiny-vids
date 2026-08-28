@@ -19,7 +19,7 @@ replaced with placeholders, compact approximations, or newly invented fields.
 The Cayde-6 plate resolves through `vocab/casting.yaml` to:
 
 - `TRUSTEE // GUARDIAN`
-- `Harbinger Titan`
+- `Harbinger Hunter`
 - `Jorge Castro`
 - `Upender of Antipatterns | The First Disciple`
 - standard blue chrome — `TRUSTEE` is label copy, not rank chrome, so no
