@@ -272,6 +272,21 @@
       ],
       "overlays": [
         {
+          "id": "mrbobbytables-osiris-intro",
+          "kind": "guardian",
+          "source_at": 4.0,
+          "dur": 2.0,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Osiris is visibly introduced in the 3.x-6.016 opening shot (source frames 3.8-5.9: the dark-skinned Warlock in red and gold robes, center-frame with the left and right thirds clear of his face and identifying body, so a left lower-third seat covers only background); the plate runs 4.0-6.0 and clears before the Bungie logo at 6.039; exact mrbobbytables binding in vocab/casting.yaml reproduced; the 2.0s short hold is owner-pinned because the logo boundary prevents 2.2s.",
+          "label": "TRUSTEE // GUARDIAN",
+          "class": "Voidwalker Warlock",
+          "name": "Bob Killen",
+          "title": "Reconciler of the Plane",
+          "trustee": true,
+          "variant": "leader"
+        },
+        {
           "id": "ensemble_hanthor",
           "kind": "guardian",
           "source_at": 35.15,

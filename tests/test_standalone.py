@@ -1465,13 +1465,96 @@ def test_the_saint_14_seats_map_through_the_cuts_without_collision():
     ) + 10.0
     accepted, unresolved = standalone.mapped_overlays(video, duration)
     assert unresolved == []
-    assert len(accepted) == len(video["overlays"]) == 4
+    assert len(accepted) == len(video["overlays"]) == 5
     at = {o["id"]: o["at"] for o in accepted}
     for expected in SAINT_CONTRIBUTOR_PLATES:
         assert at[expected["id"]] == pytest.approx(expected["source_at"])
+    assert at["mrbobbytables-osiris-intro"] == pytest.approx(4.0)
     assert at["activating-cncf-community"] == pytest.approx(97.203)
     assert standalone.expected_duration(video, 130.0) == \
         pytest.approx(130.0 - 10.942)
+
+
+SAINT_BOB_INTRO_PLATE = {
+    "id": "mrbobbytables-osiris-intro",
+    "kind": "guardian",
+    "source_at": 4.0,
+    "dur": 2.0,
+    "position": "left",
+    "copy_source": "casting",
+    "why": (
+        "Osiris is visibly introduced in the 3.x-6.016 opening shot "
+        "(source frames 3.8-5.9: the dark-skinned Warlock in red and gold "
+        "robes, center-frame with the left and right thirds clear of his "
+        "face and identifying body, so a left lower-third seat covers only "
+        "background); the plate runs 4.0-6.0 and clears before the Bungie "
+        "logo at 6.039; exact mrbobbytables binding in vocab/casting.yaml "
+        "reproduced; the 2.0s short hold is owner-pinned because the logo "
+        "boundary prevents 2.2s."
+    ),
+    "label": "TRUSTEE // GUARDIAN",
+    "class": "Voidwalker Warlock",
+    "name": "Bob Killen",
+    "title": "Reconciler of the Plane",
+    "trustee": True,
+    "variant": "leader",
+}
+
+
+def test_the_saint_14_bob_intro_plate_is_the_complete_record():
+    """The owner request: a gold mrbobbytables nameplate at :04 to
+    introduce the character (Osiris). This pin is the COMPLETE literal
+    record, so an extra identity row (an avatar, a copy field nobody
+    authored) fails the same way a missing one does. The copy reproduces
+    the mrbobbytables binding in vocab/casting.yaml exactly, and
+    ``variant: leader`` with ``trustee: true`` is the gold chrome."""
+    assert _batch_overlay(SAINT_SLUG, SAINT_BOB_INTRO_PLATE["id"]) == \
+        SAINT_BOB_INTRO_PLATE
+
+
+def test_the_saint_14_bob_intro_plate_reproduces_the_casting_binding():
+    """check_copy_against_bindings compares the plate against the
+    mrbobbytables binding matched by ``name``: label, class and title must
+    be byte-identical. Run the mapping -- which enforces that check per
+    overlay -- and require the plate to be accepted, never resolved away."""
+    video = _batch_video(SAINT_SLUG)
+    duration = max(
+        [o["source_at"] + o["dur"] for o in video["overlays"]]
+        + [video["takeover"]["source_at"]]
+    ) + 10.0
+    accepted, unresolved = standalone.mapped_overlays(video, duration)
+    assert unresolved == []
+    placed = {o["id"]: o for o in accepted}
+    seat = placed[SAINT_BOB_INTRO_PLATE["id"]]
+    assert seat["at"] == pytest.approx(4.0)
+    assert seat["dur"] == pytest.approx(2.0)
+    assert seat["variant"] == "leader"
+    assert seat["trustee"] is True
+    assert (seat["label"], seat["class"], seat["name"], seat["title"]) == (
+        "TRUSTEE // GUARDIAN", "Voidwalker Warlock",
+        "Bob Killen", "Reconciler of the Plane")
+
+
+def test_the_saint_14_bob_intro_plate_clears_the_bungie_logo_and_every_seat():
+    """The plate runs 4.0-6.0: wholly gone before the Bungie logo at
+    6.039, and overlapping no other overlay after the source-to-output
+    mapping. Every overlay sits before the first cut, so output seats equal
+    source seats; the check is arithmetic, no footage."""
+    plate = SAINT_BOB_INTRO_PLATE
+    end = plate["source_at"] + plate["dur"]
+    assert end <= SAINT_BUNGIE_LOGO[0], \
+        f"plate ends {end}, Bungie logo begins {SAINT_BUNGIE_LOGO[0]}"
+    video = _batch_video(SAINT_SLUG)
+    duration = max(
+        [o["source_at"] + o["dur"] for o in video["overlays"]]
+        + [video["takeover"]["source_at"]]
+    ) + 10.0
+    accepted, unresolved = standalone.mapped_overlays(video, duration)
+    assert unresolved == []
+    spans = sorted(
+        (o["at"], o["at"] + o["dur"], o["id"]) for o in accepted)
+    for (_, a_end, a_id), (b_start, _, b_id) in zip(spans, spans[1:]):
+        assert a_end <= b_start, f"{a_id} runs into {b_id}"
 
 
 def test_aligned_correlation_finds_the_true_seat_not_a_period_away():
