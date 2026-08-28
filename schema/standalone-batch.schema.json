@@ -171,6 +171,11 @@
           "type": "number",
           "minimum": 0,
           "description": "Source time at which the CTA picture replaces the video through EOF, preserving source audio unchanged."
+        },
+        "asset": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional per-video CTA picture, committed under assets/cta/, overriding the batch-level cta_asset for this video only. Owner-approved per-video copy is a separate committed asset; the shared card is never mutated."
         }
       }
     },

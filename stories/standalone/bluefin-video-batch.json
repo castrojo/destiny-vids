@@ -39,7 +39,8 @@
         }
       ],
       "takeover": {
-        "source_at": 91.7
+        "source_at": 91.7,
+        "asset": "assets/cta/blueberries-loot.png"
       },
       "thumbnail": {
         "source_at": 14.4
