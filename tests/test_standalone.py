@@ -861,3 +861,90 @@ def test_every_committed_batch_seat_maps_and_collides_with_nothing():
         accepted, unresolved = standalone.mapped_overlays(video, duration)
         assert unresolved == [], f"{video['slug']}: {unresolved}"
         assert len(accepted) == len(overlays)
+
+
+# The Blueberries Cayde-6 hero shot, measured on the source at 0.3s steps:
+# 68.800/69.100 are the preceding fog two-shot, 69.400 through 72.100 are all
+# Cayde, and 72.400 has cut to the crowd. Shot bounds are therefore 69.20 and
+# 72.13. The frame after the ORIGINAL 14.05-15.75 seat's shot -- 16.400 -- is
+# Zavala addressing the crowd, with no Cayde anywhere in it.
+BLUEBERRIES_CAYDE_SHOT = (69.20, 72.13)
+
+
+def test_the_blueberries_jorge_plate_holds_only_on_evidenced_cayde():
+    """A `Jorge Castro` plate credits a real person, so every frame it is up
+    for has to support the credit -- AGENTS.md, "Casting names real people".
+
+    The manifest first seated it at 14.4, Cayde's FIRST clear appearance. That
+    shot ends at 15.75 and the next one is Zavala-only, so the 2.2s hold spent
+    0.85s crediting Jorge over footage Cayde is not in. First appearance is a
+    preference; a window that supports the whole readable hold is the rule,
+    and this pins the seat that satisfies it.
+    """
+    plate = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
+    start = plate["source_at"]
+    end = start + plate["dur"]
+    shot_in, shot_out = BLUEBERRIES_CAYDE_SHOT
+
+    assert (start, plate["dur"]) == (69.6, 2.2)
+    assert shot_in <= start, "the hold starts before the evidenced shot does"
+    assert end <= shot_out, "the hold outlives the evidenced shot"
+    assert plate["name"] == "Jorge Castro"
+    assert plate["kind"] == "guardian"
+    # Nothing may quietly return the plate to the old first-appearance seat.
+    assert end <= 16.4 or start >= 16.4
+
+
+def test_the_blueberries_plate_clears_plate_pys_lead_in_and_tail_out():
+    """`tools/plate.py` fades a plate up over LEAD_IN and out over TAIL_OUT,
+    so the visible card is wider than `dur`. The evidenced shot has to cover
+    that wider span too, otherwise the fade-out plays over the next shot."""
+    from tools import plate as plate_module
+
+    seat = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
+    shot_in, shot_out = BLUEBERRIES_CAYDE_SHOT
+    visible_from = seat["source_at"] - plate_module.LEAD_IN
+    visible_to = seat["source_at"] + seat["dur"] + plate_module.TAIL_OUT
+
+    assert visible_from >= shot_in - 1e-6, visible_from
+    assert visible_to <= shot_out + 1e-6, visible_to
+
+
+def test_the_reseated_thumbnail_marks_keep_the_title_off_the_subject():
+    """Both marks were reseated after review found the title lockup crossing
+    the subject's head: Final Trial's 68.9 ran the title over Cayde, and Saint
+    14's 70.5 ran it over the Helm of Saint-14.
+
+    The replacements were picked by composing the real card and checking the
+    measured ink band against the picture, so pin them -- a silent revert puts
+    type back across a face, and record the evidence beside the number.
+    """
+    marks = {
+        "bluefin-your-final-trial": 87.6,
+        "bluefin-and-saint-14": 71.95,
+    }
+    for slug, expected in marks.items():
+        thumbnail = _batch_video(slug)["thumbnail"]
+        assert thumbnail["source_at"] == expected, slug
+        assert thumbnail.get("why"), f"{slug}: the reseat lost its evidence"
+
+
+def test_the_saint_14_thumbnail_mark_stays_off_the_burned_in_publisher_card():
+    """The Saint-14 source cuts from the Perfect Paradox shot to a burned-in
+    `FIGHT THROUGH TIME` title: 72.000 is still the shot, 72.250 is already
+    the card. A mark at or past the cut would put Bungie's own copy under the
+    Bluefin lockup."""
+    assert _batch_video("bluefin-and-saint-14")["thumbnail"]["source_at"] < 72.1
+
+
+def test_no_committed_batch_overlay_is_unresolved():
+    """Rule 2 reports unmatched seats rather than dropping them silently, so
+    an empty `unresolved` is the shipping condition for this batch."""
+    manifest = json.loads(BATCH.read_text(encoding="utf-8"))
+    for video in manifest["videos"]:
+        duration = max(
+            [o["source_at"] + o["dur"] for o in video["overlays"]]
+            + [(video.get("takeover") or {}).get("source_at", 0.0)]
+        ) + 1.0
+        _, unresolved = standalone.mapped_overlays(video, duration)
+        assert unresolved == [], f"{video['slug']}: {unresolved}"

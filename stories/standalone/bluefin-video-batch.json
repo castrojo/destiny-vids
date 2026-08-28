@@ -26,11 +26,11 @@
         {
           "id": "jorge-cayde",
           "kind": "guardian",
-          "source_at": 14.4,
+          "source_at": 69.6,
           "dur": 2.2,
           "position": "left",
           "copy_source": "owner_supplied",
-          "why": "Inspected frame at source 14.400: Cayde-6 stands centre-frame in the crowd of rank-and-file Guardians -- hood back off the Exo faceplate, the single cyan optic and the horn above it clearly lit, the ace-of-spades pauldron and EARTH patch readable on his right shoulder. Measured shot 14.05-15.75 (the cut in from the two human Guardians at 14.0, the whip cut out at 15.8), so a 4.0s hold does not fit; held at plate.py's MIN_HOLD of 2.2 rather than trimmed to 1.35s, which no viewer could read. It therefore rides 0.85s past the cut, which the brief permits -- the anchor frame is Cayde.",
+          "why": "Seated on the first clear window that supports the whole readable hold, not on Cayde's first clear frame. Measured the Cayde-6 hero shot at source 69.20-72.13: 69.400, 69.700, 70.000, 70.300, 70.600, 70.900, 71.200, 71.500, 71.800 and 72.100 all show Cayde -- hood up over the blue-and-white Exo faceplate, both cyan optics and the horn lit, the red hood lining and the ace-of-spades detailing readable; 68.800/69.100 are the preceding fog two-shot and 72.400 cuts to the crowd. The 2.2s MIN_HOLD therefore runs 69.6-71.8, entirely inside evidenced Cayde picture, with plate.py's 0.4s lead-in landing on the shot's own start and its 0.25s tail-out clearing at 71.88. The earlier 14.4 anchor was Cayde's first clear appearance but its shot ends at 15.75 and the next shot (16.400) is Zavala addressing the crowd with no Cayde in frame, so that seat credited a real person over 0.85s of footage that does not support the credit. After the 46.0-54.0 excision this plate lands at output 61.6-63.8, clear of the 89.0 takeover.",
           "name": "Jorge Castro"
         }
       ],
@@ -203,7 +203,8 @@
         }
       ],
       "thumbnail": {
-        "source_at": 68.9
+        "source_at": 87.6,
+        "why": "Reseated off 68.9, where the title lockup ran straight across Cayde's head. The composed card's title ink occupies x 382-1543, y 27-254 of the fitted 1920x1080 frame; at 87.600 that whole band is open sky above the Tower plain, with Cayde's hat tip about 90px below the lowest stroke. Both characters the design asks for are readable at 336x189 -- Cayde standing right with the Ace of Spades, the fallen Guardian left -- and the source's burned-in dialogue subtitles do not appear in this shot."
       },
       "audio_probes": [
         {
@@ -246,7 +247,8 @@
         "source_at": 123.0
       },
       "thumbnail": {
-        "source_at": 70.5
+        "source_at": 71.95,
+        "why": "Reseated off 70.5, where the title lockup crossed the Helm of Saint-14. The composed card's title ink occupies x 548-1371, y 27-253 of the fitted frame; the Saint-14 shot runs 64.0-72.1 (72.25 is already the burned-in FIGHT THROUGH TIME card) and 71.950 is the frame in it where the helm sits lowest, clearing the lowest stroke of the 'A' with visible gap. Saint-14 stays readable at 336x189 -- cream helm with the purple visor beam, gold XIV chest plate with the purple winged sigil, white Perfect Paradox shotgun -- and no burned-in publisher copy is in frame."
       },
       "audio_probes": [
         {

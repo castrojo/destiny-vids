@@ -60,6 +60,22 @@ grammar:
 - 1920x1080 output under YouTube's 2 MB limit;
 - readability checked at 336x189.
 
+The selected frame is chosen so the title lockup lands on background, not on
+the subject. The title ink occupies a fixed band of the fitted 1920x1080 card,
+so the mark is evidence-checked against that band: no part of the subject's
+head under the lockup, and no burned-in publisher copy beneath it either.
+
+### Identity plates
+
+A `Jorge Castro` plate credits a real person, so it is seated on the first
+clear window that supports the full readable hold -- not on the character's
+first clear frame. Every frame the plate is on screen for must support the
+credit: the character stays in frame, or the picture stays in unbroken
+continuity with them (their own hand, their own weapon). A window whose shot
+ends before the hold does is not a seat; the next supported window is. A plate
+that cannot be seated that way is omitted and recorded, never ridden onto
+footage that does not support it.
+
 The four thumbnails form one family while retaining a distinct source image for
 each video.
 
@@ -80,7 +96,8 @@ Source audio continues unchanged under the card through EOF.
 - Source: `https://www.youtube.com/watch?v=ZJLAJVmggt0`
 - Delete source `0:46-0:54` and join the surrounding material.
 - Show a standard plain-blue, name-only plate reading `Jorge Castro` on the
-  first clear, evidenced Cayde shot. Do not add a label, class, or title.
+  first clear window that supports the full readable hold. Do not add a label,
+  class, or title.
 - At source `1:37`, replace picture with the approved LF training CTA through
   EOF. The earlier excision places this takeover at output `1:29`.
 - Preserve source audio under the CTA.
@@ -91,7 +108,7 @@ Source audio continues unchanged under the card through EOF.
 
 - Source: `https://www.youtube.com/watch?v=rQ4i0AT8c-M`
 - Show the same standard plain-blue, name-only `Jorge Castro` plate on the first
-  clear, evidenced Cayde shot.
+  clear window that supports the full readable hold.
 - At `0:56`, replace picture with the approved LF training CTA through EOF.
 - Preserve source audio under the CTA.
 - Deliver the video and matching Jungle-family thumbnail in `~/Videos/`.

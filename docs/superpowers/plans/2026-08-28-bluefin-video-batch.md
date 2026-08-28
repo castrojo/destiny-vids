@@ -1215,10 +1215,21 @@ do
 done
 ```
 
-Open the sheets and then extract full frames around the first unambiguous Cayde
-appearance. Record the selected source second and a `why` string naming what is
-visibly in frame. Use a `4.0s` hold unless the shot ends earlier; a plate may
-continue across a cut, but its anchor frame must show Cayde.
+Open the sheets and then extract full frames around each candidate Cayde
+appearance. Seat the plate on the **first clear window that supports the full
+readable hold**, not on Cayde's first clear frame: measure the shot's in and
+out points, and keep the whole hold on picture that supports the credit --
+Cayde in frame, or unbroken continuity with him (his own hand, his own
+weapon). Use a `4.0s` hold when the window is long enough; otherwise drop to
+`tools/plate.py`'s `MIN_HOLD` of `2.2`. If neither fits inside a supported
+window, move to the next supported window rather than letting the plate ride
+onto footage that does not support it. Record the selected source second, the
+measured shot bounds, and a `why` string naming what is visibly in frame at
+both ends of the hold.
+
+This plate carries a real person's name, so a hold that outlives its evidence
+is a false credit, which the repository's casting rule forbids outright. First
+appearance is a preference; full support is the requirement.
 
 The plate object is:
 
@@ -1228,17 +1239,20 @@ The plate object is:
   "dur": 4.0,
   "position": "left",
   "copy_source": "owner_supplied",
-  "why": "Cayde-6 is unambiguously visible on the selected source frame",
+  "why": "Cayde-6 is visible at both ends of the hold; measured shot bounds recorded",
   "name": "Jorge Castro"
 }
 ```
 
 Add the measured `source_at` number from the inspected frame.
 
-Use the same contact sheets to choose each thumbnail's `source_at`: the subject
-must remain clear under the approved top title band, and no burned-in publisher
-title may sit under the Bluefin lockup. Record that numeric source mark in the
-entry's required `thumbnail` object.
+Use the same contact sheets to choose each thumbnail's `source_at`. The title
+lockup occupies a fixed band of the composed 1920x1080 card, so check the
+candidate against that band rather than against the raw frame: compose the card
+and confirm no part of the subject's head sits under the title ink, that no
+burned-in publisher title sits under the Bluefin lockup, and that the subject
+still reads at 336x189. Record the numeric source mark and its frame evidence
+in the entry's required `thumbnail` object.
 
 - [ ] **Step 5: Author the fixed Blueberries instructions**
 
