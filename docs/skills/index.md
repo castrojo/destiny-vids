@@ -1,6 +1,6 @@
 # Skill catalog
 
-Generated 2026-08-25.
+Generated 2026-08-28.
 
 | Skill | Category | Type | One-line purpose |
 |---|---|---|---|
@@ -13,3 +13,4 @@ Generated 2026-08-25.
 | [megacut](megacut/SKILL.md) | media-production | procedure | Assemble finished acts into the canonical programme without re-editing them. |
 | [plates](plates/SKILL.md) | media-production | policy | Render authored identity and dialogue cards without inventing copy. |
 | [production](production/SKILL.md) | operations | procedure | Take approved video work from issue brief to delivered artifact. |
+| [training-cta](training-cta/SKILL.md) | media-production | procedure | Replace picture with the approved LF training CTA while preserving audio. |

@@ -22,6 +22,7 @@ load **only** that skill, then act.
 | Add or re-time an act's chat dialogue in one Markdown file per chapter | [`chapters`](skills/chapters.md) |
 | Join the finished acts into one programme | [`megacut`](skills/megacut/SKILL.md) |
 | Run a long encode on the ghost cluster instead of the laptop | [`farm`](skills/farm.md) |
+| Replace the rest of a video with the reusable LF training CTA | [`training-cta`](skills/training-cta/SKILL.md) |
 | Work out why CI is red when the suite is green here, or add a check | [`testing`](skills/testing.md) |
 
 This table is the curated task router. The complete generated catalog lives in
