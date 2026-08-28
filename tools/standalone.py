@@ -35,7 +35,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from tools import conform, farm, peaks, plate, render, thumbnail  # noqa: E402
+from tools import avatars, conform, farm, peaks, plate, render, thumbnail  # noqa: E402
 
 SCHEMA = REPO_ROOT / "schema" / "standalone-batch.schema.json"
 SOURCE_DIR = REPO_ROOT / "media" / "standalone"
@@ -290,6 +290,52 @@ def mapped_overlays(video, source_duration):
 # The one-pass filtergraph
 
 
+def prepare_overlay_avatars(overlays, log=print):
+    """Refresh declared GitHub PFPs before the offline plate renderer runs.
+
+    Missing avatar bytes still degrade to the drawn crest, but the build first
+    uses the shared cache fetcher and records any remaining miss in the
+    unresolved sidecar. That distinguishes an intentional no-PFP plate from a
+    declared PFP that silently disappeared with a gitignored worktree cache.
+    """
+    requested = {}
+    avatar_paths = {}
+    for item in overlays:
+        speaker = item.get("speaker")
+        avatar = item.get("avatar")
+        if not speaker or not avatar:
+            continue
+        path = Path(avatar).expanduser()
+        if not path.is_absolute():
+            path = REPO_ROOT / path
+        expected = avatars.avatar_dir() / f"{speaker}.png"
+        if path.resolve() != expected.resolve():
+            continue
+        if not avatars.have(speaker):
+            requested.setdefault(speaker, []).append(item["id"])
+            avatar_paths[speaker] = avatar
+
+    if not requested:
+        return []
+
+    _, missing = avatars.fetch(list(requested), verbose=False)
+    restored = len(requested) - len(missing)
+    if restored:
+        log(f"  restored {restored} declared GitHub avatar(s) to the cache")
+
+    unresolved = []
+    for speaker in missing:
+        reason = (
+            f"declared GitHub avatar {avatar_paths[speaker]} is missing after "
+            "cache refresh; the drawn crest stands in"
+        )
+        unresolved.extend(
+            {"id": overlay_id, "reason": reason}
+            for overlay_id in requested[speaker]
+        )
+    return unresolved
+
+
 def _t(value):
     """A filtergraph time: enough decimals to be exact, none to be noise."""
     text = f"{float(value):.3f}".rstrip("0")
@@ -481,6 +527,7 @@ def encode_video(video, source, cta_asset, work_dir, local=False,
 
     duration = _source_duration(source, ffmpeg)
     overlays, unresolved = mapped_overlays(video, duration)
+    unresolved += prepare_overlay_avatars(overlays, log=log)
 
     plates_dir = work_dir / f"{video['slug']}-plates"
     if overlays:
