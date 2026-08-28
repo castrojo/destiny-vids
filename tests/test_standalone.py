@@ -1,0 +1,47 @@
+import json
+from pathlib import Path
+
+import pytest
+
+from tools import standalone
+
+
+def test_source_time_maps_through_the_blueberries_excision():
+    cuts = [{"start_sec": 46.0, "end_sec": 54.0}]
+    assert standalone.source_to_output(45.0, cuts) == 45.0
+    assert standalone.source_to_output(97.0, cuts) == 89.0
+    with pytest.raises(ValueError, match="inside removed source range"):
+        standalone.source_to_output(50.0, cuts)
+
+
+def test_kept_ranges_remove_exactly_the_authored_span():
+    assert standalone.kept_ranges(
+        120.0, [{"start_sec": 46.0, "end_sec": 54.0}]
+    ) == [(0.0, 46.0), (54.0, 120.0)]
+
+
+def test_manifest_rejects_drc_audio_format(tmp_path):
+    path = tmp_path / "batch.json"
+    path.write_text(json.dumps({
+        "version": 1,
+        "cta_asset": "assets/cta/linux-foundation-training-forest.png",
+        "videos": [{
+            "slug": "bad",
+            "source": {
+                "url": "https://www.youtube.com/watch?v=example",
+                "youtube_id": "example",
+                "video_format_id": "137",
+                "audio_format_id": "251-drc",
+                "usage_class": "third_party_copyrighted",
+                "source_rights_note": "Non-commercial fan creation.",
+            },
+            "title": "Bad",
+            "output": "~/Videos/Bad.mp4",
+            "thumbnail_output": "~/Videos/Bad-thumbnail.jpg",
+            "thumbnail": {"source_at": 1.0},
+            "audio_probes": [{"source_at": 2.0, "duration": 1.0}],
+            "overlays": [],
+        }],
+    }))
+    with pytest.raises(ValueError, match="DRC"):
+        standalone.load_manifest(path)
