@@ -111,6 +111,10 @@ complete.
 identity:** `TRUSTEE // GUARDIAN` / `Harbinger Titan` / `Jorge Castro` /
 `Upender of Antipatterns | The First Disciple`. `TRUSTEE` in the label is copy,
 not permission to set `trustee: true`; omit that chrome flag and any `variant`.
+The rule is editorial, not incidental: Cayde/Jorge/Castrojo is basic blue
+because the identity is workmanlike joy — he is not glory, he just works and
+loves it — so the burnished-silver rank chrome and every variant are wrong for
+him no matter which manifest seats the plate.
 
 The one permitted narrowing is **explicit and owner-authored**: the owner may
 record a partial or name-only treatment in the manifest itself. Act II's
