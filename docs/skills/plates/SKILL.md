@@ -108,7 +108,7 @@ agent-made approximation of the authored rows to make a timing pass look
 complete.
 
 **Castrojo's Guardian plates are standard blue and carry his full authored
-identity:** `TRUSTEE // GUARDIAN` / `Harbinger Titan` / `Jorge Castro` /
+identity:** `TRUSTEE // GUARDIAN` / `Harbinger Hunter` / `Jorge Castro` /
 `Upender of Antipatterns | The First Disciple`. `TRUSTEE` in the label is copy,
 not permission to set `trustee: true`; omit that chrome flag and any `variant`.
 The rule is editorial, not incidental: Cayde/Jorge/Castrojo is basic blue
