@@ -586,3 +586,87 @@ def test_verify_compares_the_takeover_frame_with_the_cta_asset(monkeypatch,
 
     assert standalone.frame_difference(same, cta) == pytest.approx(0.0)
     assert standalone.frame_difference(other, cta) > standalone.CTA_FRAME_TOLERANCE
+
+
+def test_a_plate_the_takeover_would_cover_degrades_to_unresolved():
+    """The CTA is an opaque full-frame picture composited last. A plate that
+    runs into it is not on screen for the time the record says, so it is
+    dropped and recorded rather than shipped invisible."""
+    video = {
+        "cuts": [{"start_sec": 46.0, "end_sec": 54.0}],
+        "takeover": {"source_at": 97.0},
+        "overlays": [
+            {"id": "before", "source_at": 80.0, "dur": 4.0},
+            {"id": "under", "source_at": 96.0, "dur": 4.0},
+        ],
+    }
+    overlays, unresolved = standalone.mapped_overlays(video, 120.0)
+    assert [o["id"] for o in overlays] == ["before"]
+    assert unresolved[0]["id"] == "under"
+    assert "takeover covers" in unresolved[0]["reason"]
+
+
+def _verify_fixture(tmp_path, monkeypatch, entry_extra):
+    manifest_path = tmp_path / "batch.json"
+    data = _drc_manifest()
+    entry = data["videos"][0]
+    entry["source"]["audio_format_id"] = "251"
+    entry["slug"] = "vid"
+    entry["output"] = str(tmp_path / "vid.mp4")
+    entry["thumbnail_output"] = str(tmp_path / "vid.jpg")
+    entry["audio_probes"] = [{"source_at": 30.0, "duration": 1.0}]
+    entry.update(entry_extra)
+    manifest_path.write_text(json.dumps(data))
+    Path(entry["output"]).write_bytes(b"mp4")
+
+    from PIL import Image
+    Image.new("RGB", (1920, 1080), (0, 0, 0)).save(entry["thumbnail_output"])
+
+    monkeypatch.setattr(standalone.render, "find_ffmpeg", lambda *a, **k: ["ffmpeg"])
+    monkeypatch.setattr(standalone, "_source_path", lambda slug: tmp_path / "src.mkv")
+    (tmp_path / "src.mkv").write_bytes(b"mkv")
+    durations = {str(tmp_path / "src.mkv"): 120.0, entry["output"]: 120.0}
+    monkeypatch.setattr(standalone, "_source_duration",
+                        lambda path, ffmpeg=None: durations[str(path)])
+    monkeypatch.setattr(standalone, "_probe_streams", lambda *a, **k: [
+        {"codec_type": "video", "codec_name": "h264"},
+        {"codec_type": "audio", "codec_name": "aac"},
+    ])
+    monkeypatch.setattr(
+        standalone, "_pcm",
+        lambda path, at, dur, ffmpeg=None:
+        [1, 2, 3, 4] if "src" in str(path) else [0, 1, 2, 3, 4, 0])
+    frames = []
+    monkeypatch.setattr(standalone, "_write_frame",
+                        lambda path, at, out, ffmpeg=None:
+                        frames.append(Path(out)) or Path(out))
+    monkeypatch.setattr(standalone, "_unresolved_path",
+                        lambda slug: tmp_path / f"{slug}-unresolved.json")
+    return manifest_path, frames
+
+
+def test_verify_reports_a_plate_the_build_could_not_draw(monkeypatch, tmp_path):
+    """Only the sidecar knows an undrawn plate was dropped -- re-deriving the
+    seats here would rediscover the mapping failures and miss that one."""
+    manifest_path, frames = _verify_fixture(tmp_path, monkeypatch, {
+        "overlays": [{"id": "undrawn", "kind": "caption",
+                      "source_at": 10.0, "dur": 2.0}],
+    })
+    (tmp_path / "vid-unresolved.json").write_text(json.dumps({
+        "slug": "vid",
+        "unresolved": [{"id": "undrawn", "reason": "no plate was rendered"}],
+    }))
+    problems = standalone.verify(manifest_path, "vid")
+    assert any("undrawn" in p and "unplaced" in p for p in problems)
+    assert not [f for f in frames if f.name == "undrawn.png"], \
+        "a review frame named for a plate that is not in the picture"
+
+
+def test_verify_writes_a_review_frame_for_every_placed_plate(monkeypatch,
+                                                             tmp_path):
+    manifest_path, frames = _verify_fixture(tmp_path, monkeypatch, {
+        "overlays": [{"id": "drawn", "kind": "caption",
+                      "source_at": 10.0, "dur": 2.0}],
+    })
+    assert standalone.verify(manifest_path, "vid") == []
+    assert [f.name for f in frames] == ["drawn.png"]
