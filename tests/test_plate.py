@@ -1340,7 +1340,9 @@ def test_a_person_cast_as_a_lead_is_never_an_anonymous_guardian():
 
 def test_castrojos_authored_plate_lives_on_his_lead_binding():
     """His identity is not lost by leaving the ensemble -- it moved to Cayde-6,
-    so he is credited wherever Cayde is actually on screen."""
+    so he is credited wherever Cayde is actually on screen. The chrome is the
+    deck's standard blue: `TRUSTEE` in the label is copy, not rank chrome, and
+    the binding carries no `trustee` flag and no `variant`."""
     from tools.derive import load_leads
 
     copy = load_leads()["cayde_6"]["plate"]
@@ -1348,7 +1350,8 @@ def test_castrojos_authored_plate_lives_on_his_lead_binding():
     assert copy["class"] == "Harbinger Titan"
     assert copy["title"] == "Upender of Antipatterns | The First Disciple"
     assert copy["label"] == "TRUSTEE // GUARDIAN"
-    assert copy["trustee"] is True
+    assert "trustee" not in copy
+    assert "variant" not in copy
 
 def test_the_sign_off_card_plays_even_when_everyone_is_credited():
     """The card is the cut's last beat, not just an overflow list.

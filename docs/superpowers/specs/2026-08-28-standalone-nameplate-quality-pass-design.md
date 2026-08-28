@@ -22,7 +22,8 @@ The Cayde-6 plate resolves through `vocab/casting.yaml` to:
 - `Harbinger Titan`
 - `Jorge Castro`
 - `Upender of Antipatterns | The First Disciple`
-- trustee chrome
+- standard blue chrome — `TRUSTEE` is label copy, not rank chrome, so no
+  `trustee` flag and no `variant`
 
 John Bazzite has no Guardian identity in `vocab/casting.yaml`. The only
 owner-authored identity string is `John Bazzite`, and Bazzite chrome is already

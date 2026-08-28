@@ -1058,17 +1058,22 @@ CASTROJO_PLATE = {
     "class": "Harbinger Titan",
     "name": "Jorge Castro",
     "title": "Upender of Antipatterns | The First Disciple",
-    "trustee": True,
 }
 
 
 def test_the_blueberries_jorge_plate_is_the_established_identity():
     """The full plate reproduces the `castrojo` binding in vocab/casting.yaml
     verbatim, so its copy_source is `casting` -- the words come from the
-    reviewed durable record, not from this manifest. Compare the complete
-    literal entry so extra as well as missing fields fail the pin."""
+    reviewed durable record, not from this manifest. The chrome is the deck's
+    standard blue: `TRUSTEE` in the label is copy, not rank chrome, so a
+    `trustee` flag or a `variant` is exactly the extra row this pin exists to
+    refuse -- both are asserted absent outright as well as caught by the
+    complete literal comparison, which fails on extra as well as missing
+    fields."""
     plate = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
     assert plate == CASTROJO_PLATE
+    assert "trustee" not in plate
+    assert "variant" not in plate
     assert _batch_video("bluefin-and-the-blueberries")["takeover"] == {
         "source_at": 91.7,
         "asset": "assets/cta/blueberries-loot.png",

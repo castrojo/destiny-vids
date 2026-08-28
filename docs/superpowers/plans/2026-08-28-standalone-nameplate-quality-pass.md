@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Finished series nameplates use their established authored identity; never replace them with placeholders, compact approximations, or invented fields.
-- Castrojo's plate is exactly `TRUSTEE // GUARDIAN` / `Harbinger Titan` / `Jorge Castro` / `Upender of Antipatterns | The First Disciple` with `trustee: true`.
+- Castrojo's plate is exactly `TRUSTEE // GUARDIAN` / `Harbinger Titan` / `Jorge Castro` / `Upender of Antipatterns | The First Disciple` on the standard blue chrome — `TRUSTEE` is label copy, not rank chrome, so no `trustee` flag and no `variant`.
 - John Bazzite's normal plate carries only `name: John Bazzite` and `variant: bazzite`; no label, class, or title is authored.
 - Blueberries seats Castrojo at source/output `33.55` for `1.95` seconds (visual frame review: Cayde cleanly visible 33.533-35.533, dissolve beginning 35.567; the segment record 33.300-37.767, `seg_..._rally_the_troops_worldwide_reveal_trailer_0033-0037`, is coarser than the picture). The standalone renderer hard-overlays the static plate only from source_at through source_at+dur, so the overlay interval itself stays inside those bounds. The 1.95s hold is an explicit short-hold exception because no 2.2s continuous Cayde shot exists near 30s. The CTA starts at source `91.7` (before the `NEW LEGENDS WILL RISE` segment that begins 91.767).
 - Final Trial seats John Bazzite at source `16.2` for `2.2` seconds and removes the persistent status HUD.

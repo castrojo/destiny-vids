@@ -166,3 +166,62 @@ def test_the_gate_catches_a_stolen_leader_variant():
     assert "variant" in problems[0]
 
     assert not _chrome_problems([{"id": "x", "name": name}], by_name)
+
+
+def _jorge_guardian_plates():
+    """Every committed Guardian/nameplate record crediting Jorge Castro.
+
+    Chat pills are excluded: they carry `speaker`/`text`, and the blue pill
+    colour there is a separate, already-settled concern -- this invariant is
+    about Guardian nameplate chrome only. The sweep walks every committed
+    record under stories/ rather than naming manifests, so a new standalone
+    batch or act manifest is covered the moment it exists.
+    """
+    found = []
+    for path in _manifest_paths():
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            continue
+        candidates = []
+        if isinstance(data, list):
+            candidates = data
+        elif isinstance(data, dict):
+            for key in ("plates", "entries", "cards"):
+                if isinstance(data.get(key), list):
+                    candidates.extend(data[key])
+            for video in data.get("videos") or []:
+                if isinstance(video, dict):
+                    candidates.extend(video.get("overlays") or [])
+        for entry in candidates:
+            if not isinstance(entry, dict) or entry.get("name") != "Jorge Castro":
+                continue
+            if entry.get("kind") == "chat" or "text" in entry:
+                continue
+            found.append((path, entry))
+    return found
+
+
+def test_jorge_castros_guardian_plates_are_basic_blue_everywhere():
+    """Cayde/Jorge/Castrojo is always basic blue: the identity is workmanlike
+    joy, not glory, so no Guardian plate of his carries the burnished-silver
+    `trustee` chrome or any `variant`. `TRUSTEE` in his label is copy, not
+    rank chrome.
+
+    The sweep must actually find him -- the Blueberries and Drink full plates,
+    the Final Trial name-only card, and Act VI's reveal are all committed
+    records, so an empty result means the sweep broke, not that the invariant
+    holds.
+    """
+    found = _jorge_guardian_plates()
+    assert len(found) >= 4, (
+        "the sweep stopped finding Jorge Castro's committed Guardian plates "
+        "-- fix the sweep, do not assume the chrome is right")
+    problems = [
+        f"{path.relative_to(REPO_ROOT)}:{entry.get('id', '?')}"
+        for path, entry in found
+        if entry.get("trustee") or entry.get("variant")
+    ]
+    assert not problems, (
+        "Jorge Castro's Guardian plates are standard blue; these records carry "
+        "trustee or variant chrome:\n  " + "\n  ".join(problems))
