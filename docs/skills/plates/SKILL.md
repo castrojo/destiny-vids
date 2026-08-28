@@ -1,6 +1,6 @@
 ---
 name: plates
-version: "1.2"
+version: "1.3"
 last_updated: "2026-08-27"
 id: plates
 one_line_purpose: Render authored identity and dialogue cards without inventing copy.
@@ -20,6 +20,7 @@ description: >-
 metadata:
   type: policy
   context7-sources:
+    - /addyosmani/agent-skills
     - /websites/ffmpeg_documentation
 ---
 
