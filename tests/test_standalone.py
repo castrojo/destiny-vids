@@ -1046,12 +1046,12 @@ SAINT_SLUG = "bluefin-and-saint-14"
 # Bungie logo (6.039-8.275) and the ESRB head card (0.000-2.002) are not in
 # this list on purpose: the owner wants them kept.
 SAINT_CARD_CUTS = [
-    (72.205, 74.374),    # FIGHT THROUGH TIME
-    (77.411, 78.579),    # SAVE A LEGEND
-    (80.480, 82.716),    # MASTER / THE SUNDIAL / NEW 6 PLAYER ACTIVITY
-    (92.359, 93.927),    # NEW / EXOTIC QUESTS
-    (97.965, 99.633),    # PvP ELIMINATION MODE / RUSTED LANDS RETURNS
-    (114.615, 116.750),  # TIME TO CONQUER THE / SEASON OF DAWN
+    (72.204, 74.362),    # FIGHT THROUGH TIME
+    (77.405, 78.572),    # SAVE A LEGEND
+    (80.468, 82.707),    # MASTER / THE SUNDIAL / NEW 6 PLAYER ACTIVITY
+    (92.347, 93.926),    # NEW / EXOTIC QUESTS
+    (97.963, 99.617),    # PvP ELIMINATION MODE / RUSTED LANDS RETURNS
+    (114.604, 116.749),  # TIME TO CONQUER THE / SEASON OF DAWN
 ]
 SAINT_CUT_TOTAL = sum(end - start for start, end in SAINT_CARD_CUTS)
 
@@ -1142,7 +1142,10 @@ def test_the_saint_14_contributor_plates_are_the_reviewed_rotation_records():
 
 def test_the_saint_14_cuts_remove_exactly_the_six_publisher_cards():
     """The six source-time excisions, pinned to the millisecond: each one
-    spans a burned-in Destiny publisher card and nothing else."""
+    spans a burned-in Destiny publisher card and nothing else, with the
+    boundary reseated inside the same 29.97fps frame window so the PCM
+    join is click-safe (the splice review measured ratios 2.4-8.4 against
+    the 1.8 blocker on the first-pass boundaries)."""
     cuts = _batch_video(SAINT_SLUG)["cuts"]
     assert [(c["start_sec"], c["end_sec"]) for c in cuts] == SAINT_CARD_CUTS
     assert all(cut.get("note") for cut in cuts)
@@ -1162,17 +1165,17 @@ def test_the_saint_14_cuts_keep_the_esrb_head_and_the_bungie_logo():
 def test_the_saint_14_takeover_starts_before_the_final_dissolve():
     """The CTA moves from 123.0 to 121.800 so the approved takeover picture
     is up before the final Destiny/Season of Dawn dissolve. After the six
-    excisions (10.944s removed) that lands at output 110.856."""
+    excisions (10.942s removed) that lands at output 110.858."""
     video = _batch_video(SAINT_SLUG)
     assert video["takeover"] == {"source_at": 121.8}
-    assert SAINT_CUT_TOTAL == pytest.approx(10.944)
+    assert SAINT_CUT_TOTAL == pytest.approx(10.942)
     assert standalone.source_to_output(
-        121.8, video["cuts"]) == pytest.approx(110.856)
+        121.8, video["cuts"]) == pytest.approx(110.858)
 
 
 def test_the_saint_14_audio_probes_steer_clear_of_the_cuts():
     """The 115.0 probe fell inside the TIME TO CONQUER THE / SEASON OF DAWN
-    excision (114.615-116.750), where it would compare the delivered audio
+    excision (114.604-116.749), where it would compare the delivered audio
     against removed source; it moves to 113.0. The 125.0 probe stands."""
     video = _batch_video(SAINT_SLUG)
     assert video["audio_probes"] == [
@@ -1188,7 +1191,7 @@ def test_the_saint_14_audio_probes_steer_clear_of_the_cuts():
 def test_the_saint_14_seats_map_through_the_cuts_without_collision():
     """Arithmetic only, no footage: every plate sits before the first cut,
     so its output seat equals its source seat; the activation title lands at
-    output 97.191; and nothing collides, overruns, or falls under the
+    output 97.203; and nothing collides, overruns, or falls under the
     takeover."""
     video = _batch_video(SAINT_SLUG)
     duration = max(
@@ -1201,9 +1204,9 @@ def test_the_saint_14_seats_map_through_the_cuts_without_collision():
     at = {o["id"]: o["at"] for o in accepted}
     for expected in SAINT_CONTRIBUTOR_PLATES:
         assert at[expected["id"]] == pytest.approx(expected["source_at"])
-    assert at["activating-cncf-community"] == pytest.approx(97.191)
+    assert at["activating-cncf-community"] == pytest.approx(97.203)
     assert standalone.expected_duration(video, 130.0) == \
-        pytest.approx(130.0 - 10.944)
+        pytest.approx(130.0 - 10.942)
 
 
 def test_aligned_correlation_finds_the_true_seat_not_a_period_away():
@@ -1227,3 +1230,45 @@ def test_aligned_correlation_finds_the_true_seat_not_a_period_away():
     score, lag = standalone.aligned_correlation(reference, signal)
     assert lag == pytest.approx((true_lag - span // 2) / rate, abs=1 / rate)
     assert score > standalone.AUDIO_CORRELATION_FLOOR
+
+
+@pytest.mark.parametrize("start,end", SAINT_CARD_CUTS)
+def test_splice_step_ratio_separates_a_clean_join_from_the_reviewed_defect(
+        start, end):
+    """Offline guard for the Saint-14 audio splice defect. The first-pass
+    boundaries joined mid-oscillation and the reviewer measured step/p99
+    slew ratios of 2.4-8.4 -- over the 1.8 blocker -- at all six excisions;
+    the reseated boundaries all read <= 1.0. This pins the *measurement*
+    against each pinned excision's span: over exactly that span, a
+    phase-continuous join must pass the target and the same join carried
+    half a cycle out -- the defect class -- must trip the blocker."""
+    import math
+
+    rate = 48000
+    removed = end - start
+    cycles = round(removed * 400)  # ~400 Hz, an integer count in the span
+    frequency = cycles / removed
+    # Seat the join at a peak, where a half-cycle slip is the loudest click.
+    a = int(round(rate / (4 * frequency)))
+    b = a + int(round(removed * rate))
+    signal = [0.5 * math.sin(2 * math.pi * frequency * i / rate)
+              for i in range(b + rate // 10)]
+    before, after = signal[:a], signal[b:]
+    assert standalone.splice_step_ratio(before, after) <= \
+        standalone.SPLICE_STEP_TARGET
+    half_cycle = int(round(rate / (2 * frequency)))
+    clicked = standalone.splice_step_ratio(before, signal[b + half_cycle:])
+    assert clicked > standalone.SPLICE_STEP_BLOCKER
+
+
+def test_splice_step_ratio_edge_cases():
+    """Digital silence slews nowhere: a silent join into silence is clean,
+    any step out of it is an infinite ratio, and a one-sided window is not
+    a join at all."""
+    import math
+
+    assert standalone.splice_step_ratio([0.0, 0.0], [0.0, 0.0]) == 0.0
+    assert standalone.splice_step_ratio([0.0, 0.0], [0.5, 0.5]) == \
+        pytest.approx(math.inf)
+    with pytest.raises(ValueError, match="at least two samples"):
+        standalone.splice_step_ratio([0.0], [0.0, 0.0])

@@ -70,6 +70,12 @@ ALIGNMENT_PAD_S = 0.05
 # the approved CTA picture, 0-255.
 CTA_FRAME_TOLERANCE = 3.0
 PROBE_RATE = 8000
+# Splice continuity, from the Saint-14 audio splice review: the step across
+# a cut join as a ratio of the p99 sample-to-sample slew near it. At or
+# below the target the join moves less than 99% of the signal's own moves,
+# so it cannot click; past the blocker the join is an audible defect.
+SPLICE_STEP_TARGET = 1.0
+SPLICE_STEP_BLOCKER = 1.8
 
 
 def load_manifest(path):
@@ -557,6 +563,42 @@ def build(manifest_path, slug, local=False, ffmpeg=None, log=print):
 
 # --------------------------------------------------------------------------
 # Verification
+
+
+def _percentile(values, pct):
+    ordered = sorted(float(v) for v in values)
+    if not ordered:
+        raise ValueError("an empty window has no slew to measure")
+    rank = (len(ordered) - 1) * pct / 100.0
+    low = int(math.floor(rank))
+    high = min(low + 1, len(ordered) - 1)
+    return ordered[low] + (ordered[high] - ordered[low]) * (rank - low)
+
+
+def splice_step_ratio(before, after):
+    """The boundary step at a PCM join, as a ratio of nearby natural slew.
+
+    ``before`` and ``after`` are same-rate sample sequences ending and
+    starting at the join, at least two samples each. The step is
+    ``|after[0] - before[-1]|``; the reference is the p99 of
+    sample-to-sample ``|delta|`` across both windows. Above
+    ``SPLICE_STEP_TARGET`` the join jumps further than 99% of the signal's
+    own moves -- the audible click the Saint-14 splice review measured at
+    all six first-pass publisher-card excisions (ratios 2.4-8.4 against a
+    1.8 blocker). The fix is boundary selection inside the same frame
+    window, never a fade: this helper is how a boundary proves itself.
+    """
+    before, after = list(before), list(after)
+    if len(before) < 2 or len(after) < 2:
+        raise ValueError("a splice needs at least two samples on each side")
+    step = abs(float(after[0]) - float(before[-1]))
+    slew = [abs(float(b) - float(a)) for a, b in zip(before, before[1:])]
+    slew += [abs(float(b) - float(a)) for a, b in zip(after, after[1:])]
+    reference = _percentile(slew, 99)
+    if reference <= 0:
+        # Digital silence slews nowhere; only a silent join is clean there.
+        return 0.0 if step == 0 else math.inf
+    return step / reference
 
 
 def correlation(left, right):
