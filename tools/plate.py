@@ -1101,9 +1101,14 @@ def _render_chat(spec):
     def message_width(fonts):
         width = 0
         for part, weight in runs:
+            # Censor-piece indexing resets per run: an emphasis boundary is
+            # not a censor token, and carrying the count across runs would
+            # measure (and below, draw) a false Kubernetes mark between runs.
+            pieces_seen = 0
             for piece in part.split(K8S_CENSOR_TOKEN):
-                if width:
+                if pieces_seen:
                     width += censor_size(fonts[weight])[0]
+                pieces_seen += 1
                 width += probe.textlength(piece, font=fonts[weight])
         return width
 
@@ -1169,11 +1174,11 @@ def _render_chat(spec):
 
     if text:
         message_x = int(x)
-        pieces_seen = 0
         for part, weight in runs:
             f_run = fonts[weight]
             a, d = f_run.getmetrics()
             y = int(mid - (a + d) / 2)
+            pieces_seen = 0  # per run: see message_width
             for piece in part.split(K8S_CENSOR_TOKEN):
                 if pieces_seen:
                     mark_w, mark_h = censor_size(f_run)
