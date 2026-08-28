@@ -32,7 +32,7 @@
           "copy_source": "casting",
           "why": "Visual frame review establishes Cayde-6 cleanly visible from source 33.533 through 35.533, with the dissolve to the destruction wide beginning at 35.567; the standalone renderer hard-overlays the static plate only from source_at through source_at+dur, with no lead-in/tail-out envelope. The segment records (seg_..._0033-0037, 'Cayde-6 reaches toward a red figure', casting person castrojo) span 33.300-37.767 but are coarser than the picture. Seated at 33.55 for 1.95s, the whole overlay interval 33.55-35.50 stays inside the measured visible bounds, honoring the owner's 'around the first ~30 seconds' placement without crediting Jorge over the destruction wide. This is an explicit short-hold exception to the 2.2s minimum because no 2.2s continuous Cayde shot exists near 30s; the complete established four-row identity is kept.",
           "label": "TRUSTEE // GUARDIAN",
-          "class": "Harbinger Titan",
+          "class": "Harbinger Hunter",
           "name": "Jorge Castro",
           "title": "Upender of Antipatterns | The First Disciple"
         }
@@ -78,7 +78,7 @@
           "copy_source": "casting",
           "why": "Cayde-6 sits alone at the bar for the whole measured shot, source 4.1333-7.75, from the cut off the pouring insert to the tighter close-up, so the full 3.0s hold at 4.5-7.5 fits inside evidenced Cayde picture. The burned-in RP badge has cleared at 4.1333. The complete four-row identity reproduces the castrojo binding in vocab/casting.yaml on the standard blue chrome: the owner-authoritative treatment for this standalone pass is blue always, with no trustee flag and no variant.",
           "label": "TRUSTEE // GUARDIAN",
-          "class": "Harbinger Titan",
+          "class": "Harbinger Hunter",
           "name": "Jorge Castro",
           "title": "Upender of Antipatterns | The First Disciple"
         }
