@@ -76,3 +76,513 @@ def test_training_cta_is_the_approved_1080p_asset():
     assert hashlib.sha256(path.read_bytes()).hexdigest() == (
         "46d05d65973f64c4811a02f64673db547cb2d403c58caa9fdbddc7b0da5883c5"
     )
+
+
+# --------------------------------------------------------------------------
+# Fetching: explicit, pinned, non-DRC formats
+
+
+def test_fetch_uses_explicit_non_drc_format_ids(tmp_path):
+    video = {
+        "slug": "trial",
+        "source": {
+            "url": "https://www.youtube.com/watch?v=_OvgGtnN_Ts",
+            "video_format_id": "137",
+            "audio_format_id": "251",
+        },
+    }
+    command = standalone.fetch_command(video, tmp_path / "trial.mkv")
+    assert command[command.index("-f") + 1] == "137+251"
+    assert command[command.index("--merge-output-format") + 1] == "mkv"
+    # yt-dlp takes the extractor argument as ONE token, so the pinned player
+    # client is asserted inside it rather than as a bare word.
+    assert command[command.index("--extractor-args") + 1] == \
+        "youtube:player_client=android_vr"
+
+
+def test_fetch_keeps_an_existing_non_empty_source(tmp_path, monkeypatch):
+    """A source already on disk is never re-fetched: the download is the one
+    step that reaches the network, and the file is the evidence it ran."""
+    calls = []
+    monkeypatch.setattr(standalone.subprocess, "run",
+                        lambda *a, **k: calls.append(a))
+    existing = tmp_path / "trial.mkv"
+    existing.write_bytes(b"not empty")
+    video = {
+        "slug": "trial",
+        "source": {
+            "url": "https://example.invalid/x",
+            "video_format_id": "137",
+            "audio_format_id": "251",
+        },
+    }
+    assert standalone._ensure_source(video, existing) == existing
+    assert calls == []
+
+
+def test_fetch_runs_yt_dlp_when_the_source_is_missing(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_run(argv, **kwargs):
+        calls.append((argv, kwargs))
+        return None
+
+    monkeypatch.setattr(standalone.subprocess, "run", fake_run)
+    out = tmp_path / "trial.mkv"
+    video = {
+        "slug": "trial",
+        "source": {
+            "url": "https://example.invalid/x",
+            "video_format_id": "137",
+            "audio_format_id": "251",
+        },
+    }
+    standalone._ensure_source(video, out)
+    assert calls[0][0][0] == "yt-dlp"
+    assert calls[0][1]["check"] is True
+
+
+# --------------------------------------------------------------------------
+# The one-pass filtergraph
+
+
+def test_blueberries_filtergraph_cuts_video_and_audio_before_takeover():
+    video = {
+        "cuts": [{"start_sec": 46.0, "end_sec": 54.0}],
+        "takeover": {"source_at": 97.0},
+        "overlays": [],
+    }
+    graph = standalone.filtergraph(video, duration_sec=120.0, overlays=[])
+    assert "trim=start=0.0:end=46.0" in graph
+    assert "atrim=start=54.0:end=120.0" in graph
+    assert "concat=n=2:v=1:a=1" in graph
+    assert "gte(t,89.0)" in graph
+
+
+def test_a_video_without_a_takeover_uses_input_one_for_its_first_plate():
+    video = {"cuts": [], "overlays": []}
+    graph = standalone.filtergraph(
+        video,
+        duration_sec=120.0,
+        overlays=[{"id": "player", "at": 4.0, "dur": 30.0}],
+    )
+    assert "[basev][1:v]overlay=0:0" in graph
+
+
+def test_a_takeover_reserves_input_one_and_plates_start_at_two():
+    video = {"cuts": [], "overlays": [], "takeover": {"source_at": 100.0}}
+    graph = standalone.filtergraph(
+        video,
+        duration_sec=120.0,
+        overlays=[
+            {"id": "first", "at": 4.0, "dur": 4.0},
+            {"id": "second", "at": 20.0, "dur": 2.0},
+        ],
+    )
+    assert "[basev][2:v]overlay=0:0:enable='between(t,4.0,8.0)':shortest=1" \
+        in graph
+    assert "[3:v]overlay=0:0:enable='between(t,20.0,22.0)':shortest=1" in graph
+    # The CTA is overlaid LAST, from the input it reserved.
+    assert graph.split(";")[-1].endswith(
+        "[1:v]overlay=0:0:enable='gte(t,100.0)':shortest=1[outv]")
+
+
+def test_every_still_overlay_is_bounded_by_the_source():
+    """A looped still is an infinite input; without shortest=1 the encode
+    never ends. Every overlay carries it, not just the takeover."""
+    graph = standalone.filtergraph(
+        {"cuts": [], "overlays": []},
+        duration_sec=10.0,
+        overlays=[{"id": "one", "at": 1.0, "dur": 2.0}],
+    )
+    assert graph.count("shortest=1") == 1
+    assert graph.endswith("[outv]")
+
+
+def test_an_uncut_video_with_nothing_over_it_maps_the_base_picture():
+    graph = standalone.filtergraph(
+        {"cuts": [], "overlays": []}, duration_sec=10.0, overlays=[])
+    assert "[0:v]" in graph and "[basev]" in graph
+    assert "overlay" not in graph
+    assert standalone.video_out_label({"overlays": []}, []) == "[basev]"
+
+
+def test_a_static_gain_below_one_scales_only_the_audio_leg():
+    """Headroom is a static gain, never a limiter, and never on the picture."""
+    graph = standalone.filtergraph(
+        {"cuts": [], "overlays": []}, duration_sec=10.0, overlays=[],
+        gain=0.75)
+    assert "volume=0.750000" in graph
+    assert graph.index("volume=") > graph.index("[0:a]")
+    assert "loudnorm" not in graph and "acompressor" not in graph
+    assert "alimiter" not in graph and "equalizer" not in graph
+
+
+# --------------------------------------------------------------------------
+# Overlay seats: mapped through the excisions, degraded when they cannot be
+
+
+def test_overlay_source_marks_are_mapped_before_render():
+    video = {
+        "cuts": [{"start_sec": 46.0, "end_sec": 54.0}],
+        "overlays": [{
+            "id": "jorge",
+            "source_at": 60.0,
+            "dur": 4.0,
+            "position": "left",
+            "name": "Jorge Castro",
+        }],
+    }
+    overlays, unresolved = standalone.mapped_overlays(video, 120.0)
+    assert overlays[0]["at"] == 52.0
+    assert unresolved == []
+
+
+def test_overlay_inside_a_removed_span_degrades_to_unresolved():
+    video = {
+        "cuts": [{"start_sec": 46.0, "end_sec": 54.0}],
+        "overlays": [{
+            "id": "bad-seat",
+            "source_at": 50.0,
+            "dur": 4.0,
+            "position": "left",
+            "name": "Jorge Castro",
+        }],
+    }
+    overlays, unresolved = standalone.mapped_overlays(video, 120.0)
+    assert overlays == []
+    assert unresolved[0]["id"] == "bad-seat"
+
+
+def test_an_overlay_past_the_end_of_the_source_degrades_to_unresolved():
+    video = {"cuts": [], "overlays": [
+        {"id": "late", "source_at": 130.0, "dur": 2.0},
+    ]}
+    overlays, unresolved = standalone.mapped_overlays(video, 120.0)
+    assert overlays == []
+    assert "exceeds" in unresolved[0]["reason"]
+
+
+def test_a_colliding_overlay_degrades_instead_of_being_retimed():
+    """The seat the owner authored is content. A collision drops the later
+    plate and records it; nothing is silently slid to make it fit."""
+    video = {"cuts": [], "overlays": [
+        {"id": "first", "kind": "caption", "source_at": 10.0, "dur": 4.0},
+        {"id": "second", "kind": "caption", "source_at": 12.0, "dur": 4.0},
+    ]}
+    overlays, unresolved = standalone.mapped_overlays(video, 120.0)
+    assert [o["id"] for o in overlays] == ["first"]
+    assert overlays[0]["at"] == 10.0
+    assert unresolved[0]["id"] == "second"
+    assert "same time" in unresolved[0]["reason"]
+
+
+def test_a_mapped_overlay_no_longer_carries_its_source_mark():
+    video = {"cuts": [], "overlays": [
+        {"id": "one", "source_at": 10.0, "dur": 4.0},
+    ]}
+    overlays, _ = standalone.mapped_overlays(video, 120.0)
+    assert "source_at" not in overlays[0]
+    assert video["overlays"][0]["source_at"] == 10.0
+
+
+# --------------------------------------------------------------------------
+# The encode: farm-first, one picture generation, one AAC generation
+
+
+def _encode_fixture(tmp_path, monkeypatch, calls, video=None):
+    monkeypatch.setattr(
+        standalone.farm,
+        "run_encode",
+        lambda argv, **kwargs: calls.append((argv, kwargs)) or "cluster",
+    )
+    monkeypatch.setattr(standalone.render, "find_ffmpeg", lambda *a, **k: ["ffmpeg"])
+    monkeypatch.setattr(standalone, "_source_duration", lambda *args: 120.0)
+    monkeypatch.setattr(standalone, "_ensure_source", lambda *args: tmp_path / "src.mkv")
+    monkeypatch.setattr(standalone.plate, "render_all", lambda *args, **kwargs: [])
+    monkeypatch.setattr(standalone.thumbnail, "extract_source_frame",
+                        lambda *args, **kwargs: tmp_path / "src.png")
+    monkeypatch.setattr(standalone.thumbnail, "save_jungle_thumbnail",
+                        lambda *args: tmp_path / "thumb.jpg")
+    monkeypatch.setattr(standalone.peaks, "correct_delivered_peak",
+                        lambda *args, **kwargs: 1.0)
+    monkeypatch.setattr(standalone, "_unresolved_path",
+                        lambda slug: tmp_path / f"{slug}-unresolved.json")
+    return video or {
+        "slug": "x",
+        "cuts": [],
+        "overlays": [],
+        "output": str(tmp_path / "x.mp4"),
+    }
+
+
+def test_build_routes_the_encode_through_run_encode(monkeypatch, tmp_path):
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls)
+    monkeypatch.setattr(Path, "exists", lambda self: True)
+
+    standalone.encode_video(
+        video,
+        tmp_path / "src.mkv",
+        tmp_path / "cta.png",
+        tmp_path,
+        local=False,
+    )
+    assert len(calls) == 1
+    assert calls[0][1]["local"] is False
+
+
+def test_the_encode_takes_one_picture_and_one_aac_generation(monkeypatch,
+                                                             tmp_path):
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls)
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False)
+    argv = calls[0][0]
+    assert argv.count("libx264") == 1
+    assert argv.count("aac") == 1
+    assert "-ar" not in argv, "the source sample rate is never resampled"
+    assert argv[argv.index("-b:a") + 1] == "320k"
+    assert argv[-1] == str(tmp_path / "x.mp4")
+
+
+def test_a_video_without_a_takeover_stages_no_cta_input(monkeypatch, tmp_path):
+    """farm.rewrite_argv_for_pod rejects an input the argv never reads, so a
+    CTA-less video must not list the CTA among its staged inputs."""
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls)
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False)
+    argv, kwargs = calls[0]
+    assert kwargs["inputs"] == [tmp_path / "src.mkv"]
+    assert str(tmp_path / "cta.png") not in argv
+
+
+def test_every_staged_input_appears_verbatim_in_the_argv(monkeypatch,
+                                                         tmp_path):
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls, video={
+        "slug": "x",
+        "cuts": [],
+        "takeover": {"source_at": 100.0},
+        "overlays": [],
+        "output": str(tmp_path / "x.mp4"),
+    })
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False)
+    argv, kwargs = calls[0]
+    assert kwargs["inputs"] == [tmp_path / "src.mkv", tmp_path / "cta.png"]
+    for path in kwargs["inputs"]:
+        assert str(path) in argv
+    assert kwargs["expected_duration"] == 120.0
+    assert argv[argv.index(str(tmp_path / "cta.png")) - 1] == "-i"
+    assert argv[argv.index(str(tmp_path / "cta.png")) - 2] == "60000/1001"
+    assert argv[argv.index(str(tmp_path / "cta.png")) - 5] == "-loop"
+
+
+def test_the_peak_rerun_rebuilds_from_the_source_not_the_output(monkeypatch,
+                                                                tmp_path):
+    """A correction re-encodes from the ORIGINAL source at a lower static
+    gain; re-encoding the delivered file would add a second generation."""
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls)
+    seen = {}
+
+    def fake_correct(out_path, gain, target, rerun, **kwargs):
+        seen["margin"] = kwargs.get("margin_db")
+        rerun(0.5)
+        return 0.5
+
+    monkeypatch.setattr(standalone.peaks, "correct_delivered_peak",
+                        fake_correct)
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False)
+    assert seen["margin"] == standalone.peaks.DELIVERED_BAND_MARGIN_DB
+    assert len(calls) == 2
+    rerun_argv = calls[1][0]
+    assert str(tmp_path / "src.mkv") in rerun_argv
+    assert "volume=0.500000" in " ".join(rerun_argv)
+    assert rerun_argv.count(str(tmp_path / "x.mp4")) == 1
+
+
+def test_the_unresolved_sidecar_is_written_even_when_it_is_empty(monkeypatch,
+                                                                 tmp_path):
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls)
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False)
+    sidecar = json.loads((tmp_path / "x-unresolved.json").read_text())
+    assert sidecar == {"slug": "x", "unresolved": []}
+
+
+def test_an_undrawn_plate_degrades_instead_of_shifting_the_inputs(monkeypatch,
+                                                                  tmp_path):
+    """render_all skips full-frame cards. A skipped plate must leave the
+    remaining overlay input indexes correct, not slide them by one."""
+    calls = []
+    video = _encode_fixture(tmp_path, monkeypatch, calls, video={
+        "slug": "x",
+        "cuts": [],
+        "overlays": [
+            {"id": "missing", "kind": "caption", "source_at": 5.0, "dur": 2.0},
+            {"id": "drawn", "kind": "caption", "source_at": 20.0, "dur": 2.0},
+        ],
+        "output": str(tmp_path / "x.mp4"),
+    })
+    plates = tmp_path / "x-plates"
+
+    def fake_render_all(entries, out_dir, picture=None):
+        Path(out_dir).mkdir(parents=True, exist_ok=True)
+        drawn = Path(out_dir) / "plate_drawn.png"
+        drawn.write_bytes(b"png")
+        return [drawn]
+
+    monkeypatch.setattr(standalone.plate, "render_all", fake_render_all)
+    standalone.encode_video(video, tmp_path / "src.mkv", tmp_path / "cta.png",
+                            tmp_path, local=False)
+    argv, kwargs = calls[0]
+    assert kwargs["inputs"] == [tmp_path / "src.mkv", plates / "plate_drawn.png"]
+    graph = argv[argv.index("-filter_complex") + 1]
+    assert "[basev][1:v]overlay=0:0:enable='between(t,20.0,22.0)'" in graph
+    sidecar = json.loads((tmp_path / "x-unresolved.json").read_text())
+    assert sidecar["unresolved"][0]["id"] == "missing"
+
+
+# --------------------------------------------------------------------------
+# Verification arithmetic
+
+
+def test_correlation_of_a_signal_with_itself_is_one():
+    left = [0, 1000, -2000, 500, -100, 3000]
+    assert standalone.correlation(left, list(left)) == pytest.approx(1.0)
+
+
+def test_correlation_rejects_a_silent_probe_window():
+    """Silence correlates with nothing; a zero-energy window must raise
+    rather than divide by zero or read as a pass."""
+    with pytest.raises(ValueError, match="no energy"):
+        standalone.correlation([0, 0, 0, 0], [1, 2, 3, 4])
+
+
+def test_a_shifted_delivered_window_still_correlates():
+    """A codec primes and a container delays; a measured -1.0 ms offset is
+    enough to invert a tone's correlation. The search recovers the seat."""
+    reference = [0, 1000, -2000, 500, -100, 3000, -900, 400]
+    window = [7, -3] + reference + [11, 5]
+    score, lag = standalone.aligned_correlation(reference, window)
+    assert score == pytest.approx(1.0)
+    assert lag == pytest.approx(0.0, abs=1.0 / standalone.PROBE_RATE)
+
+
+def test_alignment_cannot_manufacture_a_match_from_the_wrong_audio():
+    """The lag search forgives delay, never content: a window from somewhere
+    else correlates with nothing at any seat."""
+    reference = [0, 1000, -2000, 500, -100, 3000, -900, 400]
+    window = [50, -75, 25, -30, 60, -20, 15, -45, 70, -10, 33, -66]
+    score, _ = standalone.aligned_correlation(reference, window)
+    assert score < standalone.AUDIO_CORRELATION_FLOOR
+
+
+def test_alignment_refuses_a_window_that_is_too_short_to_search():
+    with pytest.raises(ValueError, match="shorter"):
+        standalone.aligned_correlation([1, 2, 3, 4], [1, 2, 3])
+
+
+def test_expected_output_duration_removes_every_cut():
+    assert standalone.expected_duration(
+        {"cuts": [{"start_sec": 46.0, "end_sec": 54.0}]}, 120.0
+    ) == pytest.approx(112.0)
+
+
+def test_verify_reports_a_drifted_duration_and_a_decorrelated_probe(
+        monkeypatch, tmp_path):
+    manifest_path = tmp_path / "batch.json"
+    data = _drc_manifest()
+    entry = data["videos"][0]
+    entry["source"]["audio_format_id"] = "251"
+    entry["slug"] = "vid"
+    entry["output"] = str(tmp_path / "vid.mp4")
+    entry["thumbnail_output"] = str(tmp_path / "vid.jpg")
+    entry["cuts"] = [{"start_sec": 10.0, "end_sec": 20.0}]
+    entry["audio_probes"] = [{"source_at": 30.0, "duration": 1.0}]
+    manifest_path.write_text(json.dumps(data))
+    Path(entry["output"]).write_bytes(b"mp4")
+
+    from PIL import Image
+    Image.new("RGB", (1920, 1080), (0, 0, 0)).save(entry["thumbnail_output"])
+
+    monkeypatch.setattr(standalone.render, "find_ffmpeg", lambda *a, **k: ["ffmpeg"])
+    monkeypatch.setattr(standalone, "_source_path",
+                        lambda slug: tmp_path / "src.mkv")
+    (tmp_path / "src.mkv").write_bytes(b"mkv")
+    durations = {str(tmp_path / "src.mkv"): 120.0,
+                 entry["output"]: 105.0}
+    monkeypatch.setattr(standalone, "_source_duration",
+                        lambda path, ffmpeg=None: durations[str(path)])
+    monkeypatch.setattr(standalone, "_probe_streams", lambda *a, **k: [
+        {"codec_type": "video", "codec_name": "h264"},
+        {"codec_type": "audio", "codec_name": "aac"},
+    ])
+    monkeypatch.setattr(
+        standalone, "_pcm",
+        lambda path, at, dur, ffmpeg=None:
+        [1, 2, 3, 4] if "src" in str(path) else [4, 3, 2, 1, 4, 3])
+    monkeypatch.setattr(standalone, "_write_frame",
+                        lambda *a, **k: tmp_path / "frame.png")
+
+    problems = standalone.verify(manifest_path, "vid")
+    assert any("duration" in p for p in problems)
+    assert any("correlation" in p for p in problems)
+
+
+def test_verify_is_quiet_when_everything_lines_up(monkeypatch, tmp_path):
+    manifest_path = tmp_path / "batch.json"
+    data = _drc_manifest()
+    entry = data["videos"][0]
+    entry["source"]["audio_format_id"] = "251"
+    entry["slug"] = "vid"
+    entry["output"] = str(tmp_path / "vid.mp4")
+    entry["thumbnail_output"] = str(tmp_path / "vid.jpg")
+    entry["cuts"] = [{"start_sec": 10.0, "end_sec": 20.0}]
+    entry["audio_probes"] = [{"source_at": 30.0, "duration": 1.0}]
+    manifest_path.write_text(json.dumps(data))
+    Path(entry["output"]).write_bytes(b"mp4")
+
+    from PIL import Image
+    Image.new("RGB", (1920, 1080), (0, 0, 0)).save(entry["thumbnail_output"])
+
+    monkeypatch.setattr(standalone.render, "find_ffmpeg", lambda *a, **k: ["ffmpeg"])
+    monkeypatch.setattr(standalone, "_source_path",
+                        lambda slug: tmp_path / "src.mkv")
+    (tmp_path / "src.mkv").write_bytes(b"mkv")
+    durations = {str(tmp_path / "src.mkv"): 120.0,
+                 entry["output"]: 110.0}
+    monkeypatch.setattr(standalone, "_source_duration",
+                        lambda path, ffmpeg=None: durations[str(path)])
+    monkeypatch.setattr(standalone, "_probe_streams", lambda *a, **k: [
+        {"codec_type": "video", "codec_name": "h264"},
+        {"codec_type": "audio", "codec_name": "aac"},
+    ])
+    monkeypatch.setattr(
+        standalone, "_pcm",
+        lambda path, at, dur, ffmpeg=None:
+        [1, 2, 3, 4] if "src" in str(path) else [0, 1, 2, 3, 4, 0])
+    monkeypatch.setattr(standalone, "_write_frame",
+                        lambda *a, **k: tmp_path / "frame.png")
+    assert standalone.verify(manifest_path, "vid") == []
+
+
+def test_verify_compares_the_takeover_frame_with_the_cta_asset(monkeypatch,
+                                                              tmp_path):
+    """A takeover that is not the approved picture is a wrong claim on
+    screen, so the delivered frame is compared to the asset itself."""
+    from PIL import Image
+    cta = tmp_path / "cta.png"
+    Image.new("RGB", (1920, 1080), (30, 60, 90)).save(cta)
+    same = tmp_path / "same.png"
+    Image.new("RGB", (1920, 1080), (30, 60, 90)).save(same)
+    other = tmp_path / "other.png"
+    Image.new("RGB", (1920, 1080), (200, 60, 90)).save(other)
+
+    assert standalone.frame_difference(same, cta) == pytest.approx(0.0)
+    assert standalone.frame_difference(other, cta) > standalone.CTA_FRAME_TOLERANCE
