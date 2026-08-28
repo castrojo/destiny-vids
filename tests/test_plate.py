@@ -1066,6 +1066,18 @@ def test_a_chat_card_carries_the_pfp_in_its_badge_slot(avatar_png):
     corner = with_photo.getpixel((plate.CHAT_PAD_L + 3, 10))
     assert corner[:3] == plate.INK[:3]
 
+def test_chat_supports_one_balanced_underscore_emphasis_span():
+    assert plate.chat_runs("Stay _sharp_!") == [
+        ("Stay ", "bold"),
+        ("sharp", "italic"),
+        ("!", "bold"),
+    ]
+
+
+def test_unbalanced_chat_underscore_stays_literal():
+    assert plate.chat_runs("Stay _sharp!") == [("Stay _sharp!", "bold")]
+
+
 def test_plates_sit_on_the_picture_not_on_the_letterbox_bar():
     """A 2.39:1 cinematic in a 16:9 file has ~140px of baked-in black.
 
@@ -1794,6 +1806,46 @@ def test_a_status_card_may_share_the_screen_with_a_guardian_plate():
          "name": "Bob Killen", "title": "Reconciler of the Plane"},
     ]
     plate.load_manifest_entries(entries)  # must not raise
+
+def test_bazzite_status_uses_purple_chrome_and_the_official_tile():
+    # Same copy on both cards: the width delta isolates the promoted chrome
+    # (the tile crest's reserved room), not the length of the words.
+    plain = plate.render_plate(_status(
+        detail="FIRETEAM // EXPERT",
+        label="John Bazzite",
+    ))
+    expert = plate.render_plate(_status(
+        detail="FIRETEAM // EXPERT",
+        label="John Bazzite",
+        variant="bazzite",
+    ))
+    assert expert.width > plain.width
+    assert expert.tobytes() != plain.tobytes()
+    assert any(
+        b > r + 20 and b > g + 5 and a > 150
+        for r, g, b, a in expert.getdata()
+    )
+
+
+def test_bazzite_status_remains_compatible_with_a_guardian_plate():
+    plate.load_manifest_entries([
+        _status(
+            id="player",
+            at=4.0,
+            dur=100.0,
+            detail="FIRETEAM // EXPERT",
+            label="John Bazzite",
+            variant="bazzite",
+        ),
+        {
+            "id": "cayde",
+            "at": 8.0,
+            "dur": 4.0,
+            "position": "left",
+            "name": "Jorge Castro",
+        },
+    ])
+
 
 def test_two_status_cards_at_once_are_still_an_error():
     entries = [_status(id="a", at=0.0, dur=10.0),
