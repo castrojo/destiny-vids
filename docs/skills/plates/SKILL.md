@@ -1,7 +1,7 @@
 ---
 name: plates
-version: "1.1"
-last_updated: "2026-08-21"
+version: "1.2"
+last_updated: "2026-08-27"
 id: plates
 one_line_purpose: Render authored identity and dialogue cards without inventing copy.
 entry_point: docs/skills/plates/SKILL.md

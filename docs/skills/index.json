@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-26",
+  "generated_at": "2026-08-27",
   "skills": [
     {
       "id": "chapters",
@@ -148,8 +148,8 @@
         "rendering"
       ],
       "description": "Render authored identity and dialogue cards without inventing copy. Use when burning Guardian nameplates, chat cards, or full-frame cards onto a video.",
-      "version": "1.1",
-      "last_updated": "2026-08-21",
+      "version": "1.2",
+      "last_updated": "2026-08-27",
       "doc_type": "policy"
     },
     {
@@ -167,8 +167,8 @@
         "video"
       ],
       "description": "Take approved video work from issue brief to delivered artifact. Use when an issue needs to run from brief, through indexing or rendering, to a file in the delivery workspace.",
-      "version": "1.1",
-      "last_updated": "2026-08-26",
+      "version": "1.2",
+      "last_updated": "2026-08-27",
       "doc_type": "procedure"
     }
   ]

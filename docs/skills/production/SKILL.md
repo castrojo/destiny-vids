@@ -1,7 +1,7 @@
 ---
 name: production
-version: "1.1"
-last_updated: "2026-08-26"
+version: "1.2"
+last_updated: "2026-08-27"
 id: production
 one_line_purpose: Take approved video work from issue brief to delivered artifact.
 entry_point: docs/skills/production/SKILL.md
@@ -131,6 +131,14 @@ already understand, not the way to run an issue — it bypasses `automatable`
 with it.
 
 Both stops print the exact next command. Neither is a state to route around.
+
+## Tail CTAs bias long
+
+A final call to action is not a transition to hurry through. Hold it long
+enough that the audience can read the whole card without racing; when review
+says it is short, increase the tail before shrinking copy or type. A requested
+multiplier changes only the CTA hold and extends the runtime after the card
+begins. It never pulls an earlier beat forward or re-times authored content.
 
 ## Where the detail lives
 
