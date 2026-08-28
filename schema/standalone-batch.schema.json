@@ -185,6 +185,10 @@
           "type": "number",
           "minimum": 0,
           "description": "Source time the thumbnail frame is extracted from."
+        },
+        "why": {
+          "type": "string",
+          "description": "The frame evidence behind this mark -- what the picture shows under the title lockup and why the subject stays readable. Optional, but a reseated mark without it invites the same wrong pick back."
         }
       }
     },
