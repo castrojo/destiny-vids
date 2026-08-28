@@ -13,8 +13,8 @@
         "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
       },
       "title": "Bluefin and the Blueberries",
-      "output": "~/Videos/Bluefin and the Blueberries.mp4",
-      "thumbnail_output": "~/Videos/Bluefin and the Blueberries-thumbnail.jpg",
+      "output": "~/Videos/Wolves/review/Bluefin and the Blueberries.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and the Blueberries-thumbnail.jpg",
       "cuts": [
         {
           "start_sec": 46.0,
@@ -66,8 +66,8 @@
         "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
       },
       "title": "Bluefin: Care for a Drink?",
-      "output": "~/Videos/Bluefin - Care for a Drink.mp4",
-      "thumbnail_output": "~/Videos/Bluefin - Care for a Drink-thumbnail.jpg",
+      "output": "~/Videos/Wolves/review/Bluefin - Care for a Drink.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin - Care for a Drink-thumbnail.jpg",
       "overlays": [
         {
           "id": "jorge-cayde",
@@ -111,8 +111,8 @@
         "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
       },
       "title": "Bluefin: Your Final Trial",
-      "output": "~/Videos/Bluefin - Your Final Trial.mp4",
-      "thumbnail_output": "~/Videos/Bluefin - Your Final Trial-thumbnail.jpg",
+      "output": "~/Videos/Wolves/review/Bluefin - Your Final Trial.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin - Your Final Trial-thumbnail.jpg",
       "overlays": [
         {
           "id": "jorge-cayde",
@@ -235,8 +235,8 @@
       },
       "title": "Bluefin and Saint 14",
       "description": "The Standard for others to Follow",
-      "output": "~/Videos/Bluefin and Saint 14.mp4",
-      "thumbnail_output": "~/Videos/Bluefin and Saint 14-thumbnail.jpg",
+      "output": "~/Videos/Wolves/review/Bluefin and Saint 14.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and Saint 14-thumbnail.jpg",
       "cuts": [
         {
           "start_sec": 72.201,
