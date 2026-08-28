@@ -976,8 +976,8 @@ def test_a_batch_plate_contradicting_a_binding_is_reported_not_shipped():
 
 def test_a_name_only_jorge_overlay_does_not_contradict_the_binding():
     """Omitted fields are not contradictions: the intentional name-only
-    Jorge overlays (Care for a Drink, Final Trial) credit nobody with copy
-    the binding does not say, so they pass the check."""
+    Jorge overlay (Final Trial) credits nobody with copy the binding does
+    not say, so it passes the check."""
     video = {"cuts": [], "overlays": [{
         "id": "name-only",
         "source_at": 10.0,
@@ -1028,6 +1028,109 @@ def test_no_committed_batch_overlay_is_unresolved():
         ) + 1.0
         _, unresolved = standalone.mapped_overlays(video, duration)
         assert unresolved == [], f"{video['slug']}: {unresolved}"
+
+
+# --------------------------------------------------------------------------
+# The Care for a Drink quality pass
+#
+# Reviewed owner decisions, applied verbatim: the Cayde plate carries the
+# complete four-row castrojo identity on the standard BLUE chrome -- no
+# `trustee` flag, no variant -- and the CTA takeover moves from 56.0 to
+# 55.600, the measured hard cut from the final clean burning-rubble frame
+# into the publisher shot. No source cuts are added: the CTA is opaque
+# through EOF, so a cut would only remove source audio and risk a click.
+
+DRINK_SLUG = "bluefin-care-for-a-drink"
+
+# Measured on the source picture: Cayde-6 sits alone at the bar from the cut
+# off the pouring insert at 4.1333 through 7.75, where the shot cuts to the
+# tighter close-up, and the burned-in RP badge has cleared at 4.1333.
+DRINK_CAYDE_SHOT = (4.1333, 7.75)
+
+# The hard cut from the final clean burning-rubble frame into the publisher
+# shot is measured at source 55.600; everything from there to EOF is
+# burned-in publisher copy (`WATCH WORLDWIDE REVEAL TRAILER`, the date card,
+# the Destiny logo, the Bungie/Activision legal tail).
+DRINK_PUBLISHER_SHOT_START = 55.6
+
+DRINK_JORGE_PLATE = {
+    "id": "jorge-cayde",
+    "kind": "guardian",
+    "source_at": 4.5,
+    "dur": 3.0,
+    "position": "left",
+    "copy_source": "casting",
+    "why": (
+        "Cayde-6 sits alone at the bar for the whole measured shot, source "
+        "4.1333-7.75, from the cut off the pouring insert to the tighter "
+        "close-up, so the full 3.0s hold at 4.5-7.5 fits inside evidenced "
+        "Cayde picture. The burned-in RP badge has cleared at 4.1333. The "
+        "complete four-row identity reproduces the castrojo binding in "
+        "vocab/casting.yaml on the standard blue chrome: the owner-"
+        "authoritative treatment for this standalone pass is blue always, "
+        "with no trustee flag and no variant."
+    ),
+    "label": "TRUSTEE // GUARDIAN",
+    "class": "Harbinger Titan",
+    "name": "Jorge Castro",
+    "title": "Upender of Antipatterns | The First Disciple",
+}
+
+
+def test_the_drink_jorge_plate_is_the_full_blue_identity():
+    """The complete literal record: label, class, name and title reproduce
+    the castrojo binding in vocab/casting.yaml verbatim, so copy_source is
+    `casting`. The chrome is the standard BLUE treatment -- a `trustee` flag
+    or a `variant` is exactly the extra row this pin exists to refuse, so
+    both are asserted absent outright as well as caught by the literal
+    comparison."""
+    plate = _batch_overlay(DRINK_SLUG, "jorge-cayde")
+    assert plate == DRINK_JORGE_PLATE
+    assert "trustee" not in plate
+    assert "variant" not in plate
+
+
+def test_the_drink_plate_hold_stays_inside_the_cayde_shot():
+    """The standalone renderer hard-overlays the static plate from source_at
+    through source_at+dur with no lead-in/tail-out envelope, so that
+    interval itself must sit inside the measured Cayde shot: 4.1333-7.75,
+    with the RP badge cleared at 4.1333. The 4.5-7.5 hold fits with margin
+    on both ends."""
+    seat = _batch_overlay(DRINK_SLUG, "jorge-cayde")
+    assert seat["source_at"] >= DRINK_CAYDE_SHOT[0] - 1e-6
+    assert seat["source_at"] + seat["dur"] <= DRINK_CAYDE_SHOT[1] + 1e-6
+
+
+def test_the_drink_takeover_meets_the_publisher_shot_at_the_hard_cut():
+    """The CTA moves from 56.0 to 55.600: the measured hard cut from the
+    final clean burning-rubble frame into the publisher shot, so the
+    approved takeover picture is up from that shot's first frame and no
+    `WATCH WORLDWIDE REVEAL TRAILER`, date card, Destiny logo or
+    Bungie/Activision tail frame can show. With no cuts, source time IS
+    output time at the transition."""
+    video = _batch_video(DRINK_SLUG)
+    assert video["takeover"] == {"source_at": 55.6}
+    assert video["takeover"]["source_at"] <= DRINK_PUBLISHER_SHOT_START
+    assert standalone.source_to_output(
+        video["takeover"]["source_at"], video.get("cuts", [])) == \
+        pytest.approx(55.6)
+
+
+def test_the_drink_pass_adds_no_cuts_and_keeps_its_probes_and_thumbnail():
+    """The ending diagnosis is picture-only: the CTA is opaque through EOF,
+    so source cuts would only remove source audio and create click risk.
+    There are no cuts, the audio probes stay at 45.0 and 58.0, the thumbnail
+    stays at 8.6, and the runtime is unchanged -- the delivered duration is
+    the source duration."""
+    video = _batch_video(DRINK_SLUG)
+    assert not video.get("cuts"), \
+        "a source cut here only removes audio under the opaque CTA"
+    assert video["audio_probes"] == [
+        {"source_at": 45.0, "duration": 1.0},
+        {"source_at": 58.0, "duration": 1.0},
+    ]
+    assert video["thumbnail"]["source_at"] == 8.6
+    assert standalone.expected_duration(video, 61.0) == pytest.approx(61.0)
 
 
 # --------------------------------------------------------------------------
