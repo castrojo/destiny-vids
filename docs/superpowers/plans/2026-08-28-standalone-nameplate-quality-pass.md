@@ -69,10 +69,9 @@ Replace `BLUEBERRIES_CAYDE_SHOT` and the two Cayde seat tests with:
 BLUEBERRIES_CAYDE_VISIBLE = (33.533, 35.533)
 CASTROJO_PLATE = {
     "label": "TRUSTEE // GUARDIAN",
-    "class": "Harbinger Titan",
+    "class": "Harbinger Hunter",
     "name": "Jorge Castro",
     "title": "Upender of Antipatterns | The First Disciple",
-    "trustee": True,
 }
 
 
@@ -135,10 +134,9 @@ Replace `jorge-cayde` with the complete literal record:
   "copy_source": "casting",
   "why": "Visual frame review establishes Cayde-6 cleanly visible from source 33.533 through 35.533, with the dissolve to the destruction wide beginning at 35.567; the standalone renderer hard-overlays the static plate only from source_at through source_at+dur, with no lead-in/tail-out envelope. Seated at 33.55 for 1.95s, the whole overlay interval 33.55-35.50 stays inside the measured visible bounds -- an explicit short-hold exception because no 2.2s continuous Cayde shot exists near 30s.",
   "label": "TRUSTEE // GUARDIAN",
-  "class": "Harbinger Titan",
+  "class": "Harbinger Hunter",
   "name": "Jorge Castro",
-  "title": "Upender of Antipatterns | The First Disciple",
-  "trustee": true
+  "title": "Upender of Antipatterns | The First Disciple"
 }
 ```
 

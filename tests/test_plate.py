@@ -464,15 +464,14 @@ def test_plan_credits_every_contributor_somewhere():
     for c in ROSTER["contributors"]:
         assert c["display_name"] in named, c
 
-# A contributor whose Guardian identity is genuinely authored in the reference
-# deck. Injected rather than taken from vocab/casting.yaml, because the only
-# real authored identity (castrojo) belongs to someone CAST AS A LEAD, and a
-# lead is excluded from the ensemble pool entirely -- see
+# A contributor whose Guardian identity is authored in the canonical casting
+# record. Injected rather than taken from vocab/casting.yaml because castrojo
+# belongs to someone CAST AS A LEAD, and a lead is excluded from the ensemble
+# pool entirely -- see
 # test_a_person_cast_as_a_lead_is_never_an_anonymous_guardian.
 AUTHORED = {
     "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Hunter",
     "name": "Jorge Castro", "title": "Upender of Antipatterns | The First Disciple",
-    "trustee": True,
 }
 AUTHORED_ROSTER = {
     "month": "2026-08",
@@ -498,7 +497,8 @@ def test_a_contributor_with_an_authored_deck_plate_gets_it_verbatim(authored):
     assert entry["class"] == "Harbinger Hunter"
     assert entry["name"] == "Jorge Castro"
     assert entry["title"] == "Upender of Antipatterns | The First Disciple"
-    assert entry["trustee"] is True
+    assert "trustee" not in entry
+    assert "variant" not in entry
 
 def test_an_unlisted_contributor_still_gets_the_generic_ensemble_copy():
     """Nobody has authored a seal for a passing contributor, so the credit

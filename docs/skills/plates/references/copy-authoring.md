@@ -31,10 +31,12 @@ The seven authored identities, verbatim:
 | Natali Vlatko | `MAINTAINER // GUARDIAN` | Behemoth Titan | Shipwright of Kubernetes |
 | Doc Anderson | `MAINTAINER // GUARDIAN` | Shadebinder Warlock | Foundry of the Forbidden |
 
-Plus, from `nameplates.json` only: **Jorge Castro** (Harbinger Hunter, *Upender
-of Antipatterns | The First Disciple*), **Jeffrey Sica** (Stormbreaker Titan,
+Plus, from `nameplates.json` only: **Jeffrey Sica** (Stormbreaker Titan,
 *Forgemaster of the Seven*) and **Amber Graner** (Striker Titan, *The Iron
-Standard*).
+Standard*). The deck's Jorge Castro entry says Harbinger Titan with trustee
+chrome; the owner has superseded both fields for this repo. The canonical
+casting record is **Harbinger Hunter** on basic blue, with the full title
+*Upender of Antipatterns | The First Disciple*.
 
 Two things follow, and they are the reason this section exists:
 
