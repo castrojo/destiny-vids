@@ -1028,3 +1028,283 @@ def test_no_committed_batch_overlay_is_unresolved():
         ) + 1.0
         _, unresolved = standalone.mapped_overlays(video, duration)
         assert unresolved == [], f"{video['slug']}: {unresolved}"
+
+
+# --------------------------------------------------------------------------
+# The Saint-14 quality pass
+#
+# Reviewed owner decisions, applied verbatim: three real Bluefin contributor
+# plates from the deterministic GitHub-derived 2026-08 rotation (cast leads
+# excluded), source-time excisions for the six burned-in Destiny publisher
+# cards, the CTA takeover moved ahead of the final Destiny/Season of Dawn
+# dissolve, and the audio probe moved out of the cut it fell inside. The
+# opening ESRB head card and the Bungie logo are explicitly KEPT.
+
+SAINT_SLUG = "bluefin-and-saint-14"
+
+# Burned-in publisher copy excised from the source, in source time. The
+# Bungie logo (6.039-8.275) and the ESRB head card (0.000-2.002) are not in
+# this list on purpose: the owner wants them kept.
+SAINT_CARD_CUTS = [
+    (72.201, 74.364),    # FIGHT THROUGH TIME
+    (77.405, 78.572),    # SAVE A LEGEND
+    (80.468, 82.707),    # MASTER / THE SUNDIAL / NEW 6 PLAYER ACTIVITY
+    (92.351, 93.925),    # NEW / EXOTIC QUESTS
+    (97.963, 99.617),    # PvP ELIMINATION MODE / RUSTED LANDS RETURNS
+    (114.604, 116.749),  # TIME TO CONQUER THE / SEASON OF DAWN
+]
+SAINT_CUT_TOTAL = sum(end - start for start, end in SAINT_CARD_CUTS)
+
+SAINT_ESRB_HEAD = (0.000, 2.002)
+SAINT_BUNGIE_LOGO = (6.039, 8.275)
+
+SAINT_CONTRIBUTOR_PLATES = [
+    {
+        "id": "ensemble_hanthor",
+        "kind": "guardian",
+        "source_at": 35.150,
+        "dur": 2.000,
+        "position": "left",
+        "copy_source": "casting",
+        "why": (
+            "Saint Transition Reviewer frame evidence: the hold opens on "
+            "the fireteam trio walking and ends inside the gold Titan "
+            "close-up, every body in frame an anonymous ensemble Guardian. "
+            "No 2.2s continuous window exists anywhere in the 35-42s "
+            "montage, so 2.000s is a narrow standalone short-hold "
+            "exception, the same class as the Blueberries Cayde seat. "
+            "hanthor is the first name in the deterministic GitHub-derived "
+            "2026-08 rotation with the cast leads excluded, and a "
+            "projectbluefin org member, so the eyebrow reads MAINTAINER // "
+            "GUARDIAN; name and title reproduce the ensemble copy block in "
+            "vocab/casting.yaml."
+        ),
+        "label": "MAINTAINER // GUARDIAN",
+        "name": "hanthor",
+        "title": "Bluefin Blueberry",
+    },
+    {
+        "id": "ensemble_joshyorko",
+        "kind": "guardian",
+        "source_at": 37.250,
+        "dur": 1.900,
+        "position": "left",
+        "copy_source": "casting",
+        "why": (
+            "Saint Transition Reviewer frame evidence: the whole hold "
+            "stays inside the sword-Hunter close-up, an anonymous ensemble "
+            "body. No 2.2s continuous window exists anywhere in the 35-42s "
+            "montage, so 1.900s is a narrow standalone short-hold "
+            "exception, the same class as the Blueberries Cayde seat. "
+            "joshyorko is the second name in the deterministic "
+            "GitHub-derived 2026-08 rotation with the cast leads excluded; "
+            "label, name and title reproduce the ensemble copy block in "
+            "vocab/casting.yaml."
+        ),
+        "label": "CONTRIBUTOR // GUARDIAN",
+        "name": "joshyorko",
+        "title": "Bluefin Blueberry",
+    },
+    {
+        "id": "ensemble_rapenne-s",
+        "kind": "guardian",
+        "source_at": 39.260,
+        "dur": 2.000,
+        "position": "left",
+        "copy_source": "casting",
+        "why": (
+            "Saint Transition Reviewer frame evidence: the whole hold "
+            "stays inside the continuous walking-Titan world-morph, an "
+            "anonymous ensemble body. No 2.2s continuous window exists "
+            "anywhere in the 35-42s montage, so 2.000s is a narrow "
+            "standalone short-hold exception, the same class as the "
+            "Blueberries Cayde seat. rapenne-s is the third name in the "
+            "deterministic GitHub-derived 2026-08 rotation with the cast "
+            "leads excluded; label, name and title reproduce the ensemble "
+            "copy block in vocab/casting.yaml."
+        ),
+        "label": "CONTRIBUTOR // GUARDIAN",
+        "name": "rapenne-s",
+        "title": "Bluefin Blueberry",
+    },
+]
+
+
+def test_the_saint_14_contributor_plates_are_the_reviewed_rotation_records():
+    """Three real Bluefin contributors at ~0:35, from the deterministic
+    GitHub-derived 2026-08 rotation with the cast leads excluded. Each pin
+    is the COMPLETE literal record, so an extra identity row (a class, an
+    avatar, a trustee flag nobody authored) fails the same way a missing
+    one does."""
+    for expected in SAINT_CONTRIBUTOR_PLATES:
+        assert _batch_overlay(SAINT_SLUG, expected["id"]) == expected
+
+
+def test_the_saint_14_cuts_remove_exactly_the_six_publisher_cards():
+    """The six source-time excisions, pinned to the millisecond: each one
+    spans a burned-in Destiny publisher card and nothing else, with the
+    boundary reseated inside the same 29.97fps frame window so the PCM
+    join is click-safe (the splice review measured ratios 2.4-8.4 against
+    the 1.8 blocker on the first-pass boundaries)."""
+    cuts = _batch_video(SAINT_SLUG)["cuts"]
+    assert [(c["start_sec"], c["end_sec"]) for c in cuts] == SAINT_CARD_CUTS
+    assert all(cut.get("note") for cut in cuts)
+
+
+def test_the_saint_14_cuts_keep_the_esrb_head_and_the_bungie_logo():
+    """The owner explicitly kept the opening ESRB head card (0.000-2.002)
+    and the Bungie logo (6.039-8.275). No authored cut may intersect either
+    span."""
+    cuts = _batch_video(SAINT_SLUG)["cuts"]
+    for span in (SAINT_ESRB_HEAD, SAINT_BUNGIE_LOGO):
+        for cut in cuts:
+            assert cut["end_sec"] <= span[0] or cut["start_sec"] >= span[1], \
+                f"cut {cut} removes kept opening span {span}"
+
+
+def test_the_saint_14_takeover_starts_before_the_final_dissolve():
+    """The CTA moves from 123.0 to 121.800 so the approved takeover picture
+    is up before the final Destiny/Season of Dawn dissolve. After the six
+    excisions (10.942s removed) that lands at output 110.858."""
+    video = _batch_video(SAINT_SLUG)
+    assert video["takeover"] == {"source_at": 121.8}
+    assert SAINT_CUT_TOTAL == pytest.approx(10.942)
+    assert standalone.source_to_output(
+        121.8, video["cuts"]) == pytest.approx(110.858)
+
+
+def test_the_saint_14_audio_probes_steer_clear_of_the_cuts():
+    """The 115.0 probe fell inside the TIME TO CONQUER THE / SEASON OF DAWN
+    excision (114.604-116.749), where it would compare the delivered audio
+    against removed source; it moves to 113.0. The 125.0 probe stands."""
+    video = _batch_video(SAINT_SLUG)
+    assert video["audio_probes"] == [
+        {"source_at": 113.0, "duration": 1.0},
+        {"source_at": 125.0, "duration": 1.0},
+    ]
+    with pytest.raises(ValueError, match="inside removed source range"):
+        standalone.source_to_output(115.0, video["cuts"])
+    for probe in video["audio_probes"]:
+        standalone.source_to_output(probe["source_at"], video["cuts"])
+
+
+def test_the_saint_14_seats_map_through_the_cuts_without_collision():
+    """Arithmetic only, no footage: every plate sits before the first cut,
+    so its output seat equals its source seat; the activation title lands at
+    output 97.203; and nothing collides, overruns, or falls under the
+    takeover."""
+    video = _batch_video(SAINT_SLUG)
+    duration = max(
+        [o["source_at"] + o["dur"] for o in video["overlays"]]
+        + [video["takeover"]["source_at"]]
+    ) + 10.0
+    accepted, unresolved = standalone.mapped_overlays(video, duration)
+    assert unresolved == []
+    assert len(accepted) == len(video["overlays"]) == 4
+    at = {o["id"]: o["at"] for o in accepted}
+    for expected in SAINT_CONTRIBUTOR_PLATES:
+        assert at[expected["id"]] == pytest.approx(expected["source_at"])
+    assert at["activating-cncf-community"] == pytest.approx(97.203)
+    assert standalone.expected_duration(video, 130.0) == \
+        pytest.approx(130.0 - 10.942)
+
+
+def test_aligned_correlation_finds_the_true_seat_not_a_period_away():
+    """Bright, periodic content defeats a coarse-then-fine lag search: the
+    Saint-14 mix at source 113.0 scored 0.72 at a seat one signal period
+    from the true one, whose 0.9999 peak lay 11 samples from the best
+    coarse point -- outside the +/-7 fine scan. This reproduces that shape:
+    a 3 kHz tone over light noise autocorrelates at ~0.7 three samples off
+    the peak, so the search must score every lag."""
+    import math
+    import random
+
+    rate = standalone.PROBE_RATE
+    span = int(0.1 * rate)  # the delivered window: reference plus the pads
+    rng = random.Random(14)
+    signal = [math.sin(2 * math.pi * 3000 * i / rate)
+              + 0.35 * rng.uniform(-1, 1)
+              for i in range(rate + span)]
+    true_lag = 393  # deliberately not a multiple of the coarse step
+    reference = signal[true_lag:true_lag + rate]
+    score, lag = standalone.aligned_correlation(reference, signal)
+    assert lag == pytest.approx((true_lag - span // 2) / rate, abs=1 / rate)
+    assert score > standalone.AUDIO_CORRELATION_FLOOR
+
+
+def test_splice_step_ratio_separates_a_clean_join_from_a_click():
+    """Unit-test the continuity metric independently of the Saint cut pins.
+
+    The manifest and concat-padding test pin the real boundaries. This test
+    proves the metric accepts a phase-continuous join and rejects the same
+    signal shifted by half a cycle.
+    """
+    import math
+
+    rate = 48000
+    removed = 1.5
+    cycles = round(removed * 400)  # ~400 Hz, an integer count in the span
+    frequency = cycles / removed
+    # Seat the join at a peak, where a half-cycle slip is the loudest click.
+    a = int(round(rate / (4 * frequency)))
+    b = a + int(round(removed * rate))
+    signal = [0.5 * math.sin(2 * math.pi * frequency * i / rate)
+              for i in range(b + rate // 10)]
+    before, after = signal[:a], signal[b:]
+    assert standalone.splice_step_ratio(before, after) <= \
+        standalone.SPLICE_STEP_TARGET
+    half_cycle = int(round(rate / (2 * frequency)))
+    clicked = standalone.splice_step_ratio(before, signal[b + half_cycle:])
+    assert clicked > standalone.SPLICE_STEP_BLOCKER
+
+
+def test_splice_step_ratio_edge_cases():
+    """Digital silence slews nowhere: a silent join into silence is clean,
+    any step out of it is an infinite ratio, and a one-sided window is not
+    a join at all."""
+    import math
+
+    assert standalone.splice_step_ratio([0.0, 0.0], [0.0, 0.0]) == 0.0
+    assert standalone.splice_step_ratio([0.0, 0.0], [0.5, 0.5]) == \
+        pytest.approx(math.inf)
+    with pytest.raises(ValueError, match="at least two samples"):
+        standalone.splice_step_ratio([0.0], [0.0, 0.0])
+
+
+def test_silence_pad_is_the_frame_quantization_remainder():
+    """The pad is how much longer a kept segment's frame-quantized video
+    runs past its sample-exact audio: zero when a boundary sits exactly on
+    a frame, a whole frame minus epsilon just past one, and it can go
+    frame -- the audio then covers the video and concat inserts nothing."""
+    frame = standalone.FRAME_DURATION
+    assert standalone.silence_pad(frame, 0.0) == pytest.approx(0.0)
+    assert standalone.silence_pad(2 * frame + 0.001, 0.0) == \
+        pytest.approx(frame - 0.001)
+    # Segment start 5 ms below its first frame: 5 ms of cover credit.
+    assert standalone.silence_pad(2 * frame, frame - 0.005) == \
+        pytest.approx(-0.005)
+
+
+def test_the_saint_14_joins_survive_concat_frame_quantization():
+    """Offline guard for the delivered splice defect one layer down from the
+    boundary pins. The concat filter pads a kept segment's audio with
+    silence whenever its frame-quantized video runs longer than its
+    sample-exact audio, so a join that reads click-safe on the source PCM
+    can still ship as content -> silence -> content: the first reseated
+    render measured step/p99 slew of 3.5 and 3.2 delivered at joins whose
+    authored pairs read 0.37 and 0.31. Every Saint join must either ship
+    its authored sample pair (pad <= 0) or pad under a frame -- cuts 1 and
+    3 are the padded ones, seated on quiet edges (measured 0.81 and 0.94
+    delivered against the 1.0 target and 1.8 blocker)."""
+    video = _batch_video(SAINT_SLUG)
+    cuts = sorted(video["cuts"], key=lambda cut: cut["start_sec"])
+    padded = []
+    prev_end = 0.0
+    for cut in cuts:
+        pad = standalone.silence_pad(cut["start_sec"], prev_end)
+        if pad > 0:
+            padded.append((cut["start_sec"], pad))
+            assert pad < standalone.FRAME_DURATION, \
+                f"join at {cut['start_sec']} pads a whole frame"
+        prev_end = cut["end_sec"]
+    assert [start for start, _ in padded] == [72.201, 80.468]

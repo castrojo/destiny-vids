@@ -70,6 +70,12 @@ ALIGNMENT_PAD_S = 0.05
 # the approved CTA picture, 0-255.
 CTA_FRAME_TOLERANCE = 3.0
 PROBE_RATE = 8000
+# Splice continuity, from the Saint-14 audio splice review: the step across
+# a cut join as a ratio of the p99 sample-to-sample slew near it. At or
+# below the target the join moves less than 99% of the signal's own moves,
+# so it cannot click; past the blocker the join is an audible defect.
+SPLICE_STEP_TARGET = 1.0
+SPLICE_STEP_BLOCKER = 1.8
 
 
 def load_manifest(path):
@@ -559,6 +565,75 @@ def build(manifest_path, slug, local=False, ffmpeg=None, log=print):
 # Verification
 
 
+def _percentile(values, pct):
+    ordered = sorted(float(v) for v in values)
+    if not ordered:
+        raise ValueError("an empty window has no slew to measure")
+    rank = (len(ordered) - 1) * pct / 100.0
+    low = int(math.floor(rank))
+    high = min(low + 1, len(ordered) - 1)
+    return ordered[low] + (ordered[high] - ordered[low]) * (rank - low)
+
+
+def splice_step_ratio(before, after):
+    """The boundary step at a PCM join, as a ratio of nearby natural slew.
+
+    ``before`` and ``after`` are same-rate sample sequences ending and
+    starting at the join, at least two samples each. The step is
+    ``|after[0] - before[-1]|``; the reference is the p99 of
+    sample-to-sample ``|delta|`` across both windows. Above
+    ``SPLICE_STEP_TARGET`` the join jumps further than 99% of the signal's
+    own moves -- the audible click the Saint-14 splice review measured at
+    all six first-pass publisher-card excisions (ratios 2.4-8.4 against a
+    1.8 blocker). The fix is boundary selection inside the same frame
+    window, never a fade: this helper is how a boundary proves itself.
+    """
+    before, after = list(before), list(after)
+    if len(before) < 2 or len(after) < 2:
+        raise ValueError("a splice needs at least two samples on each side")
+    step = abs(float(after[0]) - float(before[-1]))
+    slew = [abs(float(b) - float(a)) for a, b in zip(before, before[1:])]
+    slew += [abs(float(b) - float(a)) for a, b in zip(after, after[1:])]
+    reference = _percentile(slew, 99)
+    if reference <= 0:
+        # Digital silence slews nowhere; only a silent join is clean there.
+        return 0.0 if step == 0 else math.inf
+    return step / reference
+
+
+# The frame grid a cut boundary quantizes against: the 30000/1001 source
+# raster (the delivery fps=60000/1001 doubling happens after the trims, so
+# segment lengths quantize on the source grid).
+FRAME_DURATION = 1001 / 30000
+
+
+def silence_pad(start, prev_end, frame_duration=FRAME_DURATION):
+    """Seconds of silence concat inserts at the join before a cut's start.
+
+    Each kept segment's video runs a whole number of frames; its audio is
+    sample-exact. When the video side is the longer of the two, the concat
+    filter pads the audio tail with silence before the next segment, so the
+    shipped join is content -> silence -> content and the authored sample
+    pair never meets -- a click no boundary selection can prevent, measured
+    on the first reseated Saint-14 render (pads of 0.4-5.9 ms at four of six
+    joins, step/p99 slew up to 3.5 delivered). The pad is
+
+        (first frame pts >= start) - start
+            + (prev_end - first frame pts >= prev_end)
+
+    where ``prev_end`` is the kept segment's own start (the previous cut's
+    end, or 0.0 for the opening segment). At or below zero the audio covers
+    the video and the authored pair ships sample-exact. The fix is still
+    boundary selection: seat the cut so the pad is non-positive, or so both
+    edges of the residual gap sit on quiet samples.
+    """
+    def first_frame_pts(t):
+        return math.ceil(t / frame_duration - 1e-9) * frame_duration
+
+    return (first_frame_pts(start) - start) + \
+        (prev_end - first_frame_pts(prev_end))
+
+
 def correlation(left, right):
     """Normalized cross-correlation of two same-rate probe windows."""
     count = min(len(left), len(right))
@@ -583,9 +658,16 @@ def aligned_correlation(reference, window):
 
     ``window`` is the delivered probe extracted with ``ALIGNMENT_PAD_S`` of
     padding on both sides, so the search recovers the codec/container delay
-    instead of failing on it. Coarse-then-fine: every eighth lag, then the
-    seven either side of the best one -- the same answer as the exhaustive
-    scan for a fraction of the arithmetic.
+    instead of failing on it.
+
+    Every lag is scored. The coarse-then-fine shortcut this replaced was NOT
+    the same answer as the exhaustive scan: bright, periodic content puts a
+    strong autocorrelation peak one signal period from the true seat, and
+    the +/-7-sample fine scan could not walk back to a peak sitting further
+    from the best coarse point -- the Saint-14 mix at source 113.0 measured
+    0.72 at the wrong seat against 0.9999 at the right one, a false "below
+    floor" finding on a correct file. The exhaustive scan is ~2 s of
+    arithmetic per probe, cheap beside the ffmpeg calls around it.
 
     Returns ``(correlation, lag_seconds)``; the lag is signed, negative when
     the delivered audio arrives early.
@@ -601,10 +683,7 @@ def aligned_correlation(reference, window):
     def at(lag):
         return correlation(reference, window[lag:lag + len(reference)])
 
-    coarse = range(0, span + 1, 8)
-    best = max(coarse, key=at)
-    fine = range(max(0, best - 7), min(span, best + 7) + 1)
-    best = max(fine, key=at)
+    best = max(range(span + 1), key=at)
     return at(best), (best - centre) / float(PROBE_RATE)
 
 
