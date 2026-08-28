@@ -832,12 +832,13 @@ def test_final_trial_uses_one_normal_bazzite_plate_on_the_landing():
 
 
 def test_the_top_right_hud_stays_inside_the_letterboxed_picture():
-    """`plate.place` geometry only -- no committed manifest carries a top-right
-    seat. The batch's letterboxed sources are 2.39:1 inside a 16:9 file
-    (measured picture rows 140-939 on the Final Trial source), so a card
-    placed against the FRAME lands on the matte, which is the failure the
-    picture probe exists to prevent. Pin the arithmetic: a top-right seat
-    must stay inside the rect that source actually measures."""
+    """`plate.place` geometry only. The batch carries one real top-right
+    seat -- the Saint-14 video's owner-authored "Activating CNCF Community"
+    title card -- and the batch's letterboxed sources are 2.39:1 inside a
+    16:9 file (measured picture rows 140-939 on the Final Trial source), so
+    a card placed against the FRAME lands on the matte, which is the failure
+    the picture probe exists to prevent. Pin the arithmetic: a top-right
+    seat must stay inside the rect that source actually measures."""
     from PIL import Image
 
     from tools import plate
@@ -872,6 +873,9 @@ def test_every_committed_batch_seat_maps_and_collides_with_nothing():
 # The Blueberries Cayde-6 seat, per visual frame review (the segment records
 # are coarser than the picture): Cayde is cleanly visible from source 33.533
 # through 35.533, and the dissolve to the destruction wide begins at 35.567.
+# BLUEBERRIES_CAYDE_VISIBLE is measured from delivered/source frame
+# inspection at 59.94fps because the committed segment is coarser; a future
+# tag correction to those segments must update this pin.
 # The standalone renderer hard-overlays the static plate only from source_at
 # through source_at+dur -- plate.py's lead-in/tail-out envelope does not apply
 # here -- so the overlay interval itself must sit inside those bounds. Seated
@@ -880,6 +884,28 @@ def test_every_committed_batch_seat_maps_and_collides_with_nothing():
 # requested ~30s placement.
 BLUEBERRIES_CAYDE_VISIBLE = (33.533, 35.533)
 CASTROJO_PLATE = {
+    "id": "jorge-cayde",
+    "kind": "guardian",
+    "source_at": 33.55,
+    "dur": 1.95,
+    "position": "left",
+    "copy_source": "casting",
+    "why": (
+        "Visual frame review establishes Cayde-6 cleanly visible from "
+        "source 33.533 through 35.533, with the dissolve to the destruction "
+        "wide beginning at 35.567; the standalone renderer hard-overlays "
+        "the static plate only from source_at through source_at+dur, with "
+        "no lead-in/tail-out envelope. The segment records "
+        "(seg_..._0033-0037, 'Cayde-6 reaches toward a red figure', "
+        "casting person castrojo) span 33.300-37.767 but are coarser than "
+        "the picture. Seated at 33.55 for 1.95s, the whole overlay "
+        "interval 33.55-35.50 stays inside the measured visible bounds, "
+        "honoring the owner's 'around the first ~30 seconds' placement "
+        "without crediting Jorge over the destruction wide. This is an "
+        "explicit short-hold exception to the 2.2s minimum because no "
+        "2.2s continuous Cayde shot exists near 30s; the complete "
+        "established four-row identity is kept."
+    ),
     "label": "TRUSTEE // GUARDIAN",
     "class": "Harbinger Titan",
     "name": "Jorge Castro",
@@ -891,11 +917,10 @@ CASTROJO_PLATE = {
 def test_the_blueberries_jorge_plate_is_the_established_identity():
     """The full plate reproduces the `castrojo` binding in vocab/casting.yaml
     verbatim, so its copy_source is `casting` -- the words come from the
-    reviewed durable record, not from this manifest."""
+    reviewed durable record, not from this manifest. Compare the complete
+    literal entry so extra as well as missing fields fail the pin."""
     plate = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
-    assert {key: plate[key] for key in CASTROJO_PLATE} == CASTROJO_PLATE
-    assert plate["copy_source"] == "casting"
-    assert (plate["source_at"], plate["dur"]) == (33.55, 1.95)
+    assert plate == CASTROJO_PLATE
     assert _batch_video("bluefin-and-the-blueberries")["takeover"] == {
         "source_at": 91.7,
     }

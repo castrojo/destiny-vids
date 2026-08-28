@@ -76,7 +76,7 @@
           "dur": 3.0,
           "position": "left",
           "copy_source": "owner_supplied",
-          "why": "Inspected frame at source 5.000 inside this hold: Cayde-6 sits alone at the bar, hood up, the blue-and-white Exo faceplate with its horn and jaw plating fully lit against the dark room, the green drink on the counter in front of him. Measured shot 4.10-7.75 (it cuts in off the pouring insert, out to the tighter close-up at 8.0), so the whole 3.0s hold sits inside evidenced Cayde picture with plate.py's 0.4s lead-in and 0.25s tail-out. The burned-in ESRB badge has already cleared at 4.05.",
+          "why": "Inspected frame at source 5.000 inside this hold: Cayde-6 sits alone at the bar, hood up, the blue-and-white Exo faceplate with its horn and jaw plating fully lit against the dark room, the green drink on the counter in front of him. Measured shot 4.10-7.75 (it cuts in off the pouring insert, out to the tighter close-up at 8.0), so the whole 3.0s hold sits inside evidenced Cayde picture. The burned-in ESRB badge has already cleared at 4.05.",
           "name": "Jorge Castro"
         }
       ],
