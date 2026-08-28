@@ -17,9 +17,9 @@
       "thumbnail_output": "~/Videos/Wolves/review/Bluefin and the Blueberries-thumbnail.jpg",
       "cuts": [
         {
-          "start_sec": 46.0,
+          "start_sec": 44.52,
           "end_sec": 54.68,
-          "note": "Owner-authored excision. The retained scene starts on Cayde's \"I know you look to me in times of peril\" at source 54.68. Everything after it shifts 8.68 seconds earlier, so the 91.7 takeover lands at output 83.02."
+          "note": "Owner-authored excision. The removed passage starts on \"today\" at source 44.52, so the cut at output 44.52 goes directly into Cayde's \"I know you look to me in times of peril\" at source 54.68. Everything after it shifts 10.16 seconds earlier, so the 91.7 takeover lands at output 81.54."
         }
       ],
       "overlays": [
