@@ -807,24 +807,28 @@ def _batch_overlay(slug, overlay_id):
                 if o["id"] == overlay_id)
 
 
-def test_the_bazzite_hud_is_seated_in_the_pictures_top_right():
-    """The approved player-card direction fixes this HUD top-RIGHT.
+def test_final_trial_uses_one_normal_bazzite_plate_on_the_landing():
+    video = _batch_video("bluefin-your-final-trial")
+    john = _batch_overlay("bluefin-your-final-trial", "john-bazzite-landing")
 
-    `position: "status"` is the site's top-LEFT nameplate rail
-    (`.wc-intro-nameplate { top: 3rem; left: 3rem }`), and the manifest shipped
-    it once by copying a brief that had quietly lost the corner. Both seats are
-    measured against the picture, so this is purely which corner the design
-    approved -- and the design is the authority, not the brief.
-    """
-    hud = _batch_overlay("bluefin-your-final-trial", "john-bazzite-expert")
-    assert hud["position"] == "top-right"
-    # Everything else about the card is unchanged: the chrome row exemption is
-    # keyed on `kind`, and the purple/tile crest come from `variant`.
-    assert hud["kind"] == "status"
-    assert hud["variant"] == "bazzite"
-    assert hud["label"] == "John Bazzite"
-    assert hud["detail"] == "FIRETEAM // EXPERT"
-    assert (hud["source_at"], hud["dur"]) == (3.35, 106.35)
+    assert john == {
+        "id": "john-bazzite-landing",
+        "kind": "guardian",
+        "source_at": 16.2,
+        "dur": 2.2,
+        "position": "left",
+        "name": "John Bazzite",
+        "variant": "bazzite",
+        "copy_source": "owner_supplied",
+        "why": (
+            "The player lands at source 15.9-16.0, settles into the crouch "
+            "at 16.2, rises through 16.4 and stands by 17.0. The wide "
+            "plateau shot holds until the hard cut at 21.3, so the complete "
+            "2.2s lower-third stays on the landed player."
+        ),
+    }
+    assert not any(overlay["kind"] == "status"
+                   for overlay in video["overlays"])
 
 
 def test_the_top_right_hud_stays_inside_the_letterboxed_picture():
@@ -863,54 +867,34 @@ def test_every_committed_batch_seat_maps_and_collides_with_nothing():
         assert len(accepted) == len(overlays)
 
 
-# The Blueberries Cayde-6 hero shot, measured on the source at 0.3s steps:
-# 68.800/69.100 are the preceding fog two-shot, 69.400 through 72.100 are all
-# Cayde, and 72.400 has cut to the crowd. Shot bounds are therefore 69.20 and
-# 72.13. The frame after the ORIGINAL 14.05-15.75 seat's shot -- 16.400 -- is
-# Zavala addressing the crowd, with no Cayde anywhere in it.
-BLUEBERRIES_CAYDE_SHOT = (69.20, 72.13)
+BLUEBERRIES_CAYDE_SHOT = (30.797, 37.771)
+CASTROJO_PLATE = {
+    "label": "TRUSTEE // GUARDIAN",
+    "class": "Harbinger Titan",
+    "name": "Jorge Castro",
+    "title": "Upender of Antipatterns | The First Disciple",
+    "trustee": True,
+}
 
 
-def test_the_blueberries_jorge_plate_holds_only_on_evidenced_cayde():
-    """A `Jorge Castro` plate credits a real person, so every frame it is up
-    for has to support the credit -- AGENTS.md, "Casting names real people".
-
-    The manifest first seated it at 14.4, Cayde's FIRST clear appearance. That
-    shot ends at 15.75 and the next one is Zavala-only, so the 2.2s hold spent
-    0.85s crediting Jorge over footage Cayde is not in. First appearance is a
-    preference; a window that supports the whole readable hold is the rule,
-    and this pins the seat that satisfies it.
-    """
+def test_the_blueberries_jorge_plate_is_the_established_identity():
     plate = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
-    start = plate["source_at"]
-    end = start + plate["dur"]
-    shot_in, shot_out = BLUEBERRIES_CAYDE_SHOT
-
-    assert (start, plate["dur"]) == (69.6, 2.2)
-    assert shot_in <= start, "the hold starts before the evidenced shot does"
-    assert end <= shot_out, "the hold outlives the evidenced shot"
-    assert plate["name"] == "Jorge Castro"
-    assert plate["kind"] == "guardian"
-    # Nothing may quietly return the plate to the old first-appearance seat.
-    assert end <= 16.4 or start >= 16.4
+    assert {key: plate[key] for key in CASTROJO_PLATE} == CASTROJO_PLATE
+    assert (plate["source_at"], plate["dur"]) == (31.2, 2.2)
+    assert _batch_video("bluefin-and-the-blueberries")["takeover"] == {
+        "source_at": 93.5,
+    }
 
 
-def test_the_blueberries_plate_clears_plate_pys_lead_in_and_tail_out():
-    """`tools/standalone.py` hard-cuts this overlay on `between(t,61.6,63.8)`,
-    but `tools/plate.py`'s envelope (`LEAD_IN` before, `TAIL_OUT` after) is
-    the wider span the same seat would be visible for under the film
-    renderer. Requiring the evidenced shot to cover that wider span keeps the
-    seat honest under either path, and leaves margin for a frame-boundary
-    rounding at the edges."""
+def test_the_blueberries_plate_envelope_stays_on_evidenced_cayde():
     from tools import plate as plate_module
 
     seat = _batch_overlay("bluefin-and-the-blueberries", "jorge-cayde")
-    shot_in, shot_out = BLUEBERRIES_CAYDE_SHOT
     visible_from = seat["source_at"] - plate_module.LEAD_IN
     visible_to = seat["source_at"] + seat["dur"] + plate_module.TAIL_OUT
 
-    assert visible_from >= shot_in - 1e-6, visible_from
-    assert visible_to <= shot_out + 1e-6, visible_to
+    assert visible_from >= BLUEBERRIES_CAYDE_SHOT[0] - 1e-6
+    assert visible_to <= BLUEBERRIES_CAYDE_SHOT[1] + 1e-6
 
 
 def test_the_reseated_thumbnail_marks_keep_the_title_off_the_subject():

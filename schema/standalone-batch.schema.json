@@ -251,6 +251,9 @@
         "name": {
           "type": "string"
         },
+        "class": {
+          "type": "string"
+        },
         "detail": {
           "type": "string"
         },
@@ -268,6 +271,10 @@
         },
         "variant": {
           "type": "string"
+        },
+        "trustee": {
+          "type": "boolean",
+          "description": "Use the established burnished-silver trustee chrome for an authored Guardian identity."
         },
         "avatar": {
           "type": "string"
