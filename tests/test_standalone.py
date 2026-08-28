@@ -1028,3 +1028,179 @@ def test_no_committed_batch_overlay_is_unresolved():
         ) + 1.0
         _, unresolved = standalone.mapped_overlays(video, duration)
         assert unresolved == [], f"{video['slug']}: {unresolved}"
+
+
+# --------------------------------------------------------------------------
+# The Saint-14 quality pass
+#
+# Reviewed owner decisions, applied verbatim: three real Bluefin contributor
+# plates from the deterministic GitHub-derived 2026-08 rotation (cast leads
+# excluded), source-time excisions for the six burned-in Destiny publisher
+# cards, the CTA takeover moved ahead of the final Destiny/Season of Dawn
+# dissolve, and the audio probe moved out of the cut it fell inside. The
+# opening ESRB head card and the Bungie logo are explicitly KEPT.
+
+SAINT_SLUG = "bluefin-and-saint-14"
+
+# Burned-in publisher copy excised from the source, in source time. The
+# Bungie logo (6.039-8.275) and the ESRB head card (0.000-2.002) are not in
+# this list on purpose: the owner wants them kept.
+SAINT_CARD_CUTS = [
+    (72.205, 74.374),    # FIGHT THROUGH TIME
+    (77.411, 78.579),    # SAVE A LEGEND
+    (80.480, 82.716),    # MASTER / THE SUNDIAL / NEW 6 PLAYER ACTIVITY
+    (92.359, 93.927),    # NEW / EXOTIC QUESTS
+    (97.965, 99.633),    # PvP ELIMINATION MODE / RUSTED LANDS RETURNS
+    (114.615, 116.750),  # TIME TO CONQUER THE / SEASON OF DAWN
+]
+SAINT_CUT_TOTAL = sum(end - start for start, end in SAINT_CARD_CUTS)
+
+SAINT_ESRB_HEAD = (0.000, 2.002)
+SAINT_BUNGIE_LOGO = (6.039, 8.275)
+
+SAINT_CONTRIBUTOR_PLATES = [
+    {
+        "id": "ensemble_hanthor",
+        "kind": "guardian",
+        "source_at": 35.150,
+        "dur": 2.000,
+        "position": "left",
+        "copy_source": "casting",
+        "why": (
+            "Saint Transition Reviewer frame evidence: the hold opens on "
+            "the fireteam trio walking and ends inside the gold Titan "
+            "close-up, every body in frame an anonymous ensemble Guardian. "
+            "No 2.2s continuous window exists anywhere in the 35-42s "
+            "montage, so 2.000s is a narrow standalone short-hold "
+            "exception, the same class as the Blueberries Cayde seat. "
+            "hanthor is the first name in the deterministic GitHub-derived "
+            "2026-08 rotation with the cast leads excluded, and a "
+            "projectbluefin org member, so the eyebrow reads MAINTAINER // "
+            "GUARDIAN; name and title reproduce the ensemble copy block in "
+            "vocab/casting.yaml."
+        ),
+        "label": "MAINTAINER // GUARDIAN",
+        "name": "hanthor",
+        "title": "Bluefin Blueberry",
+    },
+    {
+        "id": "ensemble_joshyorko",
+        "kind": "guardian",
+        "source_at": 37.250,
+        "dur": 1.900,
+        "position": "left",
+        "copy_source": "casting",
+        "why": (
+            "Saint Transition Reviewer frame evidence: the whole hold "
+            "stays inside the sword-Hunter close-up, an anonymous ensemble "
+            "body. No 2.2s continuous window exists anywhere in the 35-42s "
+            "montage, so 1.900s is a narrow standalone short-hold "
+            "exception, the same class as the Blueberries Cayde seat. "
+            "joshyorko is the second name in the deterministic "
+            "GitHub-derived 2026-08 rotation with the cast leads excluded; "
+            "label, name and title reproduce the ensemble copy block in "
+            "vocab/casting.yaml."
+        ),
+        "label": "CONTRIBUTOR // GUARDIAN",
+        "name": "joshyorko",
+        "title": "Bluefin Blueberry",
+    },
+    {
+        "id": "ensemble_rapenne-s",
+        "kind": "guardian",
+        "source_at": 39.260,
+        "dur": 2.000,
+        "position": "left",
+        "copy_source": "casting",
+        "why": (
+            "Saint Transition Reviewer frame evidence: the whole hold "
+            "stays inside the continuous walking-Titan world-morph, an "
+            "anonymous ensemble body. No 2.2s continuous window exists "
+            "anywhere in the 35-42s montage, so 2.000s is a narrow "
+            "standalone short-hold exception, the same class as the "
+            "Blueberries Cayde seat. rapenne-s is the third name in the "
+            "deterministic GitHub-derived 2026-08 rotation with the cast "
+            "leads excluded; label, name and title reproduce the ensemble "
+            "copy block in vocab/casting.yaml."
+        ),
+        "label": "CONTRIBUTOR // GUARDIAN",
+        "name": "rapenne-s",
+        "title": "Bluefin Blueberry",
+    },
+]
+
+
+def test_the_saint_14_contributor_plates_are_the_reviewed_rotation_records():
+    """Three real Bluefin contributors at ~0:35, from the deterministic
+    GitHub-derived 2026-08 rotation with the cast leads excluded. Each pin
+    is the COMPLETE literal record, so an extra identity row (a class, an
+    avatar, a trustee flag nobody authored) fails the same way a missing
+    one does."""
+    for expected in SAINT_CONTRIBUTOR_PLATES:
+        assert _batch_overlay(SAINT_SLUG, expected["id"]) == expected
+
+
+def test_the_saint_14_cuts_remove_exactly_the_six_publisher_cards():
+    """The six source-time excisions, pinned to the millisecond: each one
+    spans a burned-in Destiny publisher card and nothing else."""
+    cuts = _batch_video(SAINT_SLUG)["cuts"]
+    assert [(c["start_sec"], c["end_sec"]) for c in cuts] == SAINT_CARD_CUTS
+    assert all(cut.get("note") for cut in cuts)
+
+
+def test_the_saint_14_cuts_keep_the_esrb_head_and_the_bungie_logo():
+    """The owner explicitly kept the opening ESRB head card (0.000-2.002)
+    and the Bungie logo (6.039-8.275). No authored cut may intersect either
+    span."""
+    cuts = _batch_video(SAINT_SLUG)["cuts"]
+    for span in (SAINT_ESRB_HEAD, SAINT_BUNGIE_LOGO):
+        for cut in cuts:
+            assert cut["end_sec"] <= span[0] or cut["start_sec"] >= span[1], \
+                f"cut {cut} removes kept opening span {span}"
+
+
+def test_the_saint_14_takeover_starts_before_the_final_dissolve():
+    """The CTA moves from 123.0 to 121.800 so the approved takeover picture
+    is up before the final Destiny/Season of Dawn dissolve. After the six
+    excisions (10.944s removed) that lands at output 110.856."""
+    video = _batch_video(SAINT_SLUG)
+    assert video["takeover"] == {"source_at": 121.8}
+    assert SAINT_CUT_TOTAL == pytest.approx(10.944)
+    assert standalone.source_to_output(
+        121.8, video["cuts"]) == pytest.approx(110.856)
+
+
+def test_the_saint_14_audio_probes_steer_clear_of_the_cuts():
+    """The 115.0 probe fell inside the TIME TO CONQUER THE / SEASON OF DAWN
+    excision (114.615-116.750), where it would compare the delivered audio
+    against removed source; it moves to 113.0. The 125.0 probe stands."""
+    video = _batch_video(SAINT_SLUG)
+    assert video["audio_probes"] == [
+        {"source_at": 113.0, "duration": 1.0},
+        {"source_at": 125.0, "duration": 1.0},
+    ]
+    with pytest.raises(ValueError, match="inside removed source range"):
+        standalone.source_to_output(115.0, video["cuts"])
+    for probe in video["audio_probes"]:
+        standalone.source_to_output(probe["source_at"], video["cuts"])
+
+
+def test_the_saint_14_seats_map_through_the_cuts_without_collision():
+    """Arithmetic only, no footage: every plate sits before the first cut,
+    so its output seat equals its source seat; the activation title lands at
+    output 97.191; and nothing collides, overruns, or falls under the
+    takeover."""
+    video = _batch_video(SAINT_SLUG)
+    duration = max(
+        [o["source_at"] + o["dur"] for o in video["overlays"]]
+        + [video["takeover"]["source_at"]]
+    ) + 10.0
+    accepted, unresolved = standalone.mapped_overlays(video, duration)
+    assert unresolved == []
+    assert len(accepted) == len(video["overlays"]) == 4
+    at = {o["id"]: o["at"] for o in accepted}
+    for expected in SAINT_CONTRIBUTOR_PLATES:
+        assert at[expected["id"]] == pytest.approx(expected["source_at"])
+    assert at["activating-cncf-community"] == pytest.approx(97.191)
+    assert standalone.expected_duration(video, 130.0) == \
+        pytest.approx(130.0 - 10.944)

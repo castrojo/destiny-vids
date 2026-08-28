@@ -234,7 +234,75 @@
       "description": "The Standard for others to Follow",
       "output": "~/Videos/Bluefin and Saint 14.mp4",
       "thumbnail_output": "~/Videos/Bluefin and Saint 14-thumbnail.jpg",
+      "cuts": [
+        {
+          "start_sec": 72.205,
+          "end_sec": 74.374,
+          "note": "Burned-in publisher card: FIGHT THROUGH TIME."
+        },
+        {
+          "start_sec": 77.411,
+          "end_sec": 78.579,
+          "note": "Burned-in publisher card: SAVE A LEGEND."
+        },
+        {
+          "start_sec": 80.480,
+          "end_sec": 82.716,
+          "note": "Burned-in publisher cards: MASTER / THE SUNDIAL / NEW 6 PLAYER ACTIVITY."
+        },
+        {
+          "start_sec": 92.359,
+          "end_sec": 93.927,
+          "note": "Burned-in publisher cards: NEW / EXOTIC QUESTS."
+        },
+        {
+          "start_sec": 97.965,
+          "end_sec": 99.633,
+          "note": "Burned-in publisher cards: PvP ELIMINATION MODE / RUSTED LANDS RETURNS."
+        },
+        {
+          "start_sec": 114.615,
+          "end_sec": 116.750,
+          "note": "Burned-in publisher cards: TIME TO CONQUER THE / SEASON OF DAWN."
+        }
+      ],
       "overlays": [
+        {
+          "id": "ensemble_hanthor",
+          "kind": "guardian",
+          "source_at": 35.150,
+          "dur": 2.000,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Saint Transition Reviewer frame evidence: the hold opens on the fireteam trio walking and ends inside the gold Titan close-up, every body in frame an anonymous ensemble Guardian. No 2.2s continuous window exists anywhere in the 35-42s montage, so 2.000s is a narrow standalone short-hold exception, the same class as the Blueberries Cayde seat. hanthor is the first name in the deterministic GitHub-derived 2026-08 rotation with the cast leads excluded, and a projectbluefin org member, so the eyebrow reads MAINTAINER // GUARDIAN; name and title reproduce the ensemble copy block in vocab/casting.yaml.",
+          "label": "MAINTAINER // GUARDIAN",
+          "name": "hanthor",
+          "title": "Bluefin Blueberry"
+        },
+        {
+          "id": "ensemble_joshyorko",
+          "kind": "guardian",
+          "source_at": 37.250,
+          "dur": 1.900,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Saint Transition Reviewer frame evidence: the whole hold stays inside the sword-Hunter close-up, an anonymous ensemble body. No 2.2s continuous window exists anywhere in the 35-42s montage, so 1.900s is a narrow standalone short-hold exception, the same class as the Blueberries Cayde seat. joshyorko is the second name in the deterministic GitHub-derived 2026-08 rotation with the cast leads excluded; label, name and title reproduce the ensemble copy block in vocab/casting.yaml.",
+          "label": "CONTRIBUTOR // GUARDIAN",
+          "name": "joshyorko",
+          "title": "Bluefin Blueberry"
+        },
+        {
+          "id": "ensemble_rapenne-s",
+          "kind": "guardian",
+          "source_at": 39.260,
+          "dur": 2.000,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Saint Transition Reviewer frame evidence: the whole hold stays inside the continuous walking-Titan world-morph, an anonymous ensemble body. No 2.2s continuous window exists anywhere in the 35-42s montage, so 2.000s is a narrow standalone short-hold exception, the same class as the Blueberries Cayde seat. rapenne-s is the third name in the deterministic GitHub-derived 2026-08 rotation with the cast leads excluded; label, name and title reproduce the ensemble copy block in vocab/casting.yaml.",
+          "label": "CONTRIBUTOR // GUARDIAN",
+          "name": "rapenne-s",
+          "title": "Bluefin Blueberry"
+        },
         {
           "id": "activating-cncf-community",
           "kind": "title",
@@ -247,7 +315,7 @@
         }
       ],
       "takeover": {
-        "source_at": 123.0
+        "source_at": 121.8
       },
       "thumbnail": {
         "source_at": 71.95,
@@ -255,7 +323,7 @@
       },
       "audio_probes": [
         {
-          "source_at": 115.0,
+          "source_at": 113.0,
           "duration": 1.0
         },
         {
