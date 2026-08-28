@@ -12,11 +12,16 @@ Three owner instructions drive it, and nothing else moves:
 3. The credits are redesigned so the video is enclosed and the contributor
    sections get an area of their own.
 
-Everything before the swap is untouched: the call to action, the birthday card,
-the comic reveal, the cast placards and the first walls all play exactly as
-they did. The act is built by [`scripts/build_credits.py`](../scripts/build_credits.py)
-from [`stories/08-credits.json`](../stories/08-credits.json), which is where the
-measurements below are recorded.
+The individual hero-character placards are omitted until each person grants
+permission. The fixed credits now lead directly into the contributor walls;
+the call to action, birthday card, comic reveal, music, contributors, and
+wordmark remain. The act is built by
+[`scripts/build_credits.py`](../scripts/build_credits.py) from
+[`stories/08-credits.json`](../stories/08-credits.json).
+
+GNOME OS and KDE Linux carry the authored banner “Free Software Infratructure
+protected by Anubis, from Xe, Bluefin Contributor”. The `x` in
+`#linuxforever` is white-hot; the rest of the hashtag remains Bluefin blue.
 
 ## The layout: a scope seat
 

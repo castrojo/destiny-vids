@@ -1,5 +1,5 @@
 {
-  "_what": "Act VIII -- the credits. The owner's design is issue #51, revised in session 2026-08-13. Every string here is the owner's or is read from vocab/casting.yaml and the GitHub API; nothing is composed at render time. Built by scripts/build_credits.py.",
+  "_what": "Act VIII -- the credits. The owner's design is issue #51, revised in session 2026-08-13. Every string here is the owner's or is read from the contributor APIs; nothing is composed at render time. Individual hero-character placards are omitted until each person grants permission. Built by scripts/build_credits.py.",
   "act": "VIII",
   "chapter": "Credits",
   "bed": {
@@ -115,7 +115,6 @@
   "unresolved": [
     "Act VII still ends on the comic cover -- see reveal.TODO(owner).",
     "'Contributions by YOU' was REMOVED to make room for the Introducing card. It was the beat that handed the film to the audience immediately before the contributor walls; those walls now arrive without an introduction. Restore it as a fifth card if that reads as a gap.",
-    "cast_photos is EMPTY and blocks on the owner: the summit feed has only group photographs, so every principal's crop box has to be drawn by somebody who can say which face is whose. Until then the placards keep their PFPs, which is not what was asked for.",
     "November has no dark-mode wallpaper installed on this host (11-bluefin.xml points at 11-bluefin-night.svg, which is not on disk), so the calendar cycle is eleven months rather than twelve.",
     "The wordmark hold is now derived from the end of the live recording rather than authored -- 9.351 s over the applause, against the 77.78 s it held under Storytime. The instruction it came from ('hold the mark until the end of the song') is satisfied, but the LENGTH is a new number nobody has approved. TODO(owner).",
     "The contributor band credits LOGINS ONLY. A 116 px face plus its name needs a 196 px row and the band is 286 px tall, so the faces stop at the concert and the names carry the credit from there. Nobody is dropped; the portraits are.",
@@ -364,6 +363,7 @@
       ],
       "host": "gitlab.gnome.org",
       "names_are": "display names, not logins (GitLab)",
+      "banner": "Free Software Infratructure protected by Anubis, from Xe, Bluefin Contributor",
       "tier": "upstream"
     },
     {
@@ -421,6 +421,7 @@
       ],
       "host": "invent.kde.org",
       "names_are": "display names, not logins (GitLab)",
+      "banner": "Free Software Infratructure protected by Anubis, from Xe, Bluefin Contributor",
       "tier": "upstream",
       "ghost": {
         "name": "The Next KyleGospo",
@@ -908,103 +909,6 @@
       ]
     }
   ],
-  "_cast_who": "THE PRINCIPALS, IN THE ORDER THE SHOW INTRODUCES THEM. Everybody below is ON SCREEN in a delivered act -- the act is named in each entry's `seen_in`. Chapter III credits Doctor Andy Anderson and Bob Killen directly; obsolete source-role names do not render. A placard reads NAME as GUARDIAN TITLE, then what the person does: the Destiny character name is no longer printed (owner: 'drop the Destiny names, do it like \"Kat Cosgrove as Defender Queen... blah\"'). `guardian_title` is authored copy reproduced verbatim -- from `card` when the website authored one, from the cited record otherwise -- and is OMITTED when nobody has authored it. `title` is the person's own GitHub bio or the owner's own words, VERBATIM, per `title_source`; `title_pending` means nobody has supplied one yet and the row renders as lorem until they do.",
-  "cast": [
-    {
-      "person": "Kyle Gospodnetich",
-      "character_id": "kylegospo",
-      "login": "KyleGospo",
-      "seen_in": "II -- vocab/casting.yaml `KyleGospo`, the bazzite plate",
-      "title": "Creator of Bazzite and Maintainer @ublue-os & @frostyard | @OpenGamingCollective Member  | Linux Community Engineer @microsoft",
-      "title_source": "github.com/KyleGospo profile bio, fetched 2026-08-16, verbatim including the double space",
-      "guardian_title": "The First Knife",
-      "guardian_title_source": "vocab/casting.yaml `KyleGospo`, the bazzite plate, verbatim",
-      "login_source": "VERIFIED: vocab/casting.yaml's `KyleGospo` binding is keyed by the login itself ('github.com/KyleGospo'), and the account's own name is 'Kyle Gospodnetich'. Its avatar URL is already pinned in that binding."
-    },
-    {
-      "person": "Bob Killen",
-      "character_id": "osiris",
-      "card": "bob",
-      "login": "mrbobbytables",
-      "seen_in": "III -- the act is his",
-      "title": "Kubernetes & OSS Advocate | CNCF cat wrangler",
-      "title_source": "github.com/mrbobbytables profile bio, fetched 2026-08-16, verbatim",
-      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
-      "login_source": "VERIFIED: vocab/casting.yaml's `osiris` binding records person `mrbobbytables`, and the account's own name is 'Bob Killen'."
-    },
-    {
-      "person": "Kat Cosgrove",
-      "character_id": "saint_14",
-      "card": "kat",
-      "seen_in": "IV -- the act is hers",
-      "title": "Village Sorceress at VillageSQL @kubernetes Steering Committee + Release Team Subproject Lead, SIG Docs Tech Lead, Kubernetes v1.30 Release Lead",
-      "title_source": "OWNER-SUPPLIED verbatim, 2026-08-16. Her GitHub bio is the first clause of it; the owner supplied the whole line.",
-      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
-      "login": "katcosgrove",
-      "login_source": "VERIFIED 2026-08-16: the account's own name is 'Kat Cosgrove', its company is villagesql.com and its bio is the first clause of the title the owner supplied for her. The old note here -- 'github.com/kat is named just Kat and is NOT confirmed' -- was about a DIFFERENT account; this is not that one."
-    },
-    {
-      "person": "Natali Vlatko",
-      "character_id": "natali",
-      "card": "natali",
-      "seen_in": "V -- the act is hers; also act I's sixth Guardian window",
-      "title": "Director of Open Source Software Engineering at Cisco, SIG Docs Co-Chair for Kubernetes TODO Group Steering Committee member.<br><br>Archaeologist and Egyptologist",
-      "title_source": "OWNER-SUPPLIED verbatim, 2026-08-16, including the paragraph break.",
-      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
-      "login": "natalisucks",
-      "login_source": "VERIFIED 2026-08-16: the account's own name is 'Natali Vlatko' and its company is @cisco-open, which is the employer in the title the owner supplied for her."
-    },
-    {
-      "person": "Kelsey Hightower",
-      "character_id": "zavala",
-      "login": "kelseyhightower",
-      "seen_in": "VI -- stories/06-wolves-cayde-plates.json, gold_kelsey_hightower",
-      "title_pending": "github.com/kelseyhightower carries no bio. TODO(owner): his own words, or leave the lorem.",
-      "guardian_title": "Evangelist of the Open Sky",
-      "guardian_title_source": "stories/06-wolves-cayde-plates.json `gold_kelsey_hightower`, owner brief 2026-08-13 (#111), verbatim",
-      "login_source": "VERIFIED: the account's own name is 'Kelsey Hightower'."
-    },
-    {
-      "person": "Jeefy",
-      "character_id": "saladin",
-      "login": "jeefy",
-      "seen_in": "VI -- vocab/casting.yaml `saladin`, the constrained binding (far + helmeted)",
-      "title_pending": "OWNER, 2026-08-16: 'placeholder for jeefy'. He DOES have a GitHub bio ('Project things @cncf | Kubernetes & OSS Advocate | Goose Enthusiast'); the owner asked for a placeholder instead, so it waits for his word rather than being taken.",
-      "guardian_title_pending": "The saladin binding carries NO plate block -- nobody has authored a Guardian title for him. The row is omitted rather than filled; #103's shape, not a bug."
-    },
-    {
-      "person": "Laura Santamaria",
-      "character_id": "nimbatus",
-      "card": "laura",
-      "seen_in": "VII -- stories/07-europa-plates.json, character `laura`",
-      "title": "Community Architect at Red Hat. Community: DevOps focused. I ❤️ clouds. Weather nerd, Pythonista. Specializing in solving the unsolvable.",
-      "title_source": "github.com/nimbinatus profile bio, fetched 2026-08-16, verbatim",
-      "guardian_title_source": "the authored identity on `card`, read at render time from ~/src/website public/wolves/characters/characters.json, verbatim",
-      "login_source": "VERIFIED in vocab/casting.yaml: github.com/nimbinatus is Laura Santamaria (u/1538692); github.com/nimbatus is an unrelated empty account."
-    },
-    {
-      "person": "Benjamin Sherman",
-      "character_id": "bsherman",
-      "login": "bsherman",
-      "seen_in": "VII -- stories/07-europa-plates.json, speaker BSHERMAN",
-      "title": "@ublue-os and ucore Maintainer • Software Engineer • Linux and Container Nerd",
-      "title_source": "github.com/bsherman profile bio, fetched 2026-08-16, verbatim",
-      "guardian_title_pending": "He speaks in act VII as BSHERMAN and has no authored Guardian identity anywhere. The row is omitted rather than invented.",
-      "login_source": "VERIFIED: the account's own name is 'Benjamin Sherman' and its bio names @ublue-os, which is the project act VII's BSHERMAN speaks for."
-    }
-  ],
-  "cast_hold_sec": 4.0,
-  "cast_logins": {
-    "_what": "VERIFIED GitHub logins for cast members who have no authored Guardian card. Hand-maintained: --refresh-contributors will not overwrite it. This lives here rather than in vocab/casting.yaml's `github:` field -- which is its proper home -- because casting.yaml is a committed input to all six delivered acts, so editing it marks every one of them stale (#167). Move these across when that freeze lifts. Each was checked by matching the ACCOUNT'S OWN name against the credited name; a login that only matches a character name is the nimbatus/nimbinatus trap and is never used. github.com/kat is named just 'Kat' and is NOT confirmed to be Kat Cosgrove -- she is credited from her authored card instead, which is better.",
-    "Jorge Castro": "castrojo",
-    "Jeefy": "jeefy"
-  },
-  "cast_redactions": [
-    "cayde_6"
-  ],
-  "_cast_redactions_what": "Owner's README, 2026-08-13: '[Redacted] Cayde-6 ... this character is very famous so we only reveal jorge's name once.' His one reveal in act VIII is the 'Directed by' card, so the cast placard redacts. It is the PERSON'S NAME that is redacted, not the character -- that is the show's own established treatment, authored by the owner in act II: scripts/build_efmb_plates.py's CAYDE carries redacted_speaker '[ REDACTED ]' with redacts=<real name> and reveals='cayde_6'. The famous character is the known half; the person behind it is the secret. Redacting the name also drops the avatar and the authored card, because a placard that hides a word and shows the face has revealed him anyway.",
-  "_cast_what": "THE README'S TABLE, ROW FOR ROW. Owner: 'ensure this list matches the readme for the characters ... The destiny names are placeholders read the docs, remove some of these characters.' The six the vocab binds but the README does not list -- Anna Bray, Petra Venj, Variks, The Speaker, Amanda Holliday and the red-haired Iron Lord -- come out of act VIII. Their bindings stay in vocab/casting.yaml, which is a committed input to all six delivered acts (#167): the credits follow the README because the owner said so, and nothing else in the programme moves.\n\nCAYDE-6 IS NOT HERE AT ALL. Owner: 'Remove cayde-6 redacted from the starring roles, he's fine in the credits with the rest.' The redacted placard is gone rather than un-redacted -- his one reveal is still the 'Directed by' card, and 'with the rest' is the contributor wall, where castrojo appears under three projects.",
-  "cast_photos": {
-    "_what": "Owner: 'For the principal actors - remove the pfp icon and instead use a good shot of them from the CNCF contributor summit flickr feed.' The mechanism is built (tools/credits.summit_portrait): a person maps to {'file': <photo>, 'box': [x, y, w, h]} and the placard uses that crop instead of the PFP or the authored card.\n\nIT IS EMPTY, AND THAT IS THE FINDING. stories/summit-photos.json is twelve frames of ONE Maintainer Summit GROUP photograph -- there is no per-person shot in the feed. Picking a face out of a crowd and saying whose it is is a visual judgement AND a claim about a real person, the two things AGENTS.md says an agent may never make. automatable: no. Each box is the owner's to draw; until then every placard degrades to the verified avatar or the authored Guardian card."
-  }
+  "_cast_who": "OMITTED FROM THIS DELIVERY. The hero-character placards require individual permission, which has not been granted. Contributor-wall credits remain unchanged.",
+  "cast": []
 }

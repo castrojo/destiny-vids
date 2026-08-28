@@ -850,6 +850,40 @@ UPSTREAM_EYEBROW = "#UPSTREAMFIRST"
 # as a call to action."*
 WALL_HASHTAG = "#linuxforever"
 
+
+def _draw_wall_hashtag(img, xy, font, tracking_em=0.02):
+    """Draw the wall hashtag with its x white-hot."""
+    d = ImageDraw.Draw(img)
+    alpha = img.getchannel("A")
+    x, y = xy
+    extra = tracking_em * font.size
+    hot = []
+    for ch in WALL_HASHTAG:
+        if ch in "Xx":
+            hot.append((x, y, ch))
+        else:
+            d.text((x, y), ch, font=font, fill=(147, 197, 253, 235))
+        x += d.textlength(ch, font=font) + extra
+    _sear(img, hot, font)
+    img.putalpha(alpha)
+    d = ImageDraw.Draw(img)
+    for x, y, ch in hot:
+        d.text((x, y), ch, font=font, fill=(255, 255, 255, 255))
+
+
+def _draw_section_banner(img, text, y):
+    if not text:
+        return
+    d = ImageDraw.Draw(img)
+    font = _font("semibold", 22)
+    width = _tracked_width(d, text, font, 0.02)
+    x = (W - width) / 2
+    d.rounded_rectangle((x - 22, y - 7, x + width + 22, y + 34),
+                        radius=20, fill=(8, 12, 20, 220),
+                        outline=(147, 197, 253, 150), width=2)
+    _draw_tracked(d, (x, y), text, font, TEXT, 0.02)
+
+
 # How much longer an upstream wall holds than a Bluefin one. It carries 18
 # faces against 48, so at a flat rate it would flick past nearly three times
 # as fast as the tier it outranks.
@@ -1044,7 +1078,7 @@ def _mark(name, height, max_width=None):
 
 
 def render_name_wall(section, names, page=1, pages=1, tier=None, index=0,
-                     ghost=None, bubble_mix=None):
+                     ghost=None, bubble_mix=None, banner=None):
     """A screenful of one project's contributors: their faces and their logins.
 
     Nine across, four down -- six by three for the upstream tier, which is the
@@ -1059,6 +1093,7 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0,
     """
     img = backdrop(index)
     d = ImageDraw.Draw(img)
+    _draw_section_banner(img, banner, 10)
 
     up = tier == "upstream"
     cols = UPSTREAM_COLS if up else GRID_COLS
@@ -1131,8 +1166,8 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0,
     # THE CALL TO ACTION ALONG THE BOTTOM, on every team wall.
     f_tag = _font("black", 76)
     tag_y = H - 118
-    _blue_bs(d, (_centre(d, WALL_HASHTAG, f_tag, 0.02), tag_y), WALL_HASHTAG,
-             f_tag, (147, 197, 253, 235), 0.02)
+    _draw_wall_hashtag(
+        img, (_centre(d, WALL_HASHTAG, f_tag, 0.02), tag_y), f_tag)
 
     if bubble_mix is not None:
         # BOTTOM RIGHT, beside the hashtag rather than over the badge. The
@@ -1148,7 +1183,7 @@ def render_name_wall(section, names, page=1, pages=1, tier=None, index=0,
 
 
 def render_name_band(section, names, page=1, pages=1, tier=None, index=0,
-                     ghost=None, bubble_mix=None):
+                     ghost=None, bubble_mix=None, banner=None):
     """One screenful of contributors in the scope seat's 286 px band.
 
     The same information the full-frame wall carries -- the section, the page,
@@ -1200,8 +1235,7 @@ def render_name_band(section, names, page=1, pages=1, tier=None, index=0,
     else:
         f_tag = _font("black", 44)
         w_tag = _tracked_width(d, WALL_HASHTAG, f_tag, 0.02)
-        _blue_bs(d, (right - w_tag, head_y - 4), WALL_HASHTAG, f_tag,
-                 (147, 197, 253, 235), 0.02)
+        _draw_wall_hashtag(img, (right - w_tag, head_y - 4), f_tag)
 
     if pages > 1:
         f_pg = _font("regular", 19)
@@ -1251,6 +1285,7 @@ def render_name_band(section, names, page=1, pages=1, tier=None, index=0,
             f_cell = _font("regular", f_cell.size - 1, mono=not up)
         _blue_bs(d, (cx - d.textlength(login, font=f_cell) / 2, y), login,
                  f_cell, TEXT)
+    _draw_section_banner(img, banner, H - 38)
     return img
 
 

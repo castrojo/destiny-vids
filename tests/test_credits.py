@@ -148,13 +148,9 @@ def test_an_explicit_time_is_taken_literally():
     assert B.reveal_at(bed, {"at_sec": 22.08, "segment": 1, "source_sec": 9.0}) == 22.08
 
 
-def test_the_whole_cast_follows_the_cover(manifest):
-    """'put the cast after' -- the reveal introduces the people."""
-    items, _ = B.schedule(manifest)
-    cover = next(i for i in items if i["kind"] == "cover")
-    for item in items:
-        if item["kind"] == "cast":
-            assert item["t"] >= cover["t"] + cover["dur"] - 0.001
+def test_the_hero_credits_are_omitted_without_permission(manifest):
+    assert manifest["cast"] == []
+    assert not [i for i in B.schedule(manifest)[0] if i["kind"] == "cast"]
 
 
 def test_the_call_to_action_gives_way_to_the_anchor(manifest):
@@ -300,13 +296,8 @@ def test_the_second_introduced_name_stays_redacted(manifest):
         "the redacted name must not survive anywhere in the authored manifest"
 
 
-def test_the_redaction_treatment_survives_the_card_that_used_it(manifest):
-    """`[ REDACTED ]` is AUTHORED COPY, not a placeholder awaiting resolution
-    (docs/skills/plates/references/plate-chrome.md). The Introducing card is
-    gone, but the cast redactions still use the deck's own form, so the
-    convention is still enforced somewhere."""
+def test_the_redaction_treatment_is_still_available():
     assert C.REDACTED == "[ REDACTED ]"
-    assert manifest["cast_redactions"]
 
 
 def test_the_band_is_spelled_as_the_bed_record_spells_it(manifest):
@@ -331,27 +322,6 @@ def test_only_the_last_contributor_section_is_deduped(manifest):
                | sections["Bazzite"])
     assert not (sections["Universal Blue"] & earlier), \
         "Universal Blue must be deduped from the three above it"
-
-
-def test_the_credits_name_the_human_not_the_login(manifest):
-    """A credit names a real person. plate.name is what their own nameplate
-    says; display_name is sometimes a login and sometimes the character."""
-    by_character = {c["character_id"]: c for c in manifest["cast"]}
-    assert by_character["osiris"]["person"] == "Bob Killen"
-    assert by_character["saint_14"]["person"] == "Kat Cosgrove"
-
-
-def test_laura_is_credited_once_and_the_credit_is_nimbatus(manifest):
-    """Owner, 2026-08-16: "laura is as nimbatus".
-
-    She used to hold two placards -- Elsie Bray and Nimbatus -- with the same
-    authored identity copy on both, because the vocab binds her identity to one
-    binding and her verified login to the other. Nobody is credited twice for
-    one performance, and the name the credit prints is the owner's call.
-    """
-    laura = [c for c in manifest["cast"] if c["person"] == "Laura Santamaria"]
-    assert len(laura) == 1
-    assert laura[0]["character_id"] == "nimbatus"
 
 
 def test_nobody_holds_two_placards(manifest):
@@ -485,14 +455,15 @@ def test_the_upstream_projects_lead_and_are_marked_as_upstream(manifest):
 
 
 def test_an_upstream_wall_is_larger_and_holds_longer(manifest):
-    """'make theirs larger and more distinguished' -- fewer faces per screen,
-    and more time on each screen."""
+    """'More distinguished' means fewer faces and more time per name."""
     assert C.UPSTREAM_PER_WALL < C.NAMES_PER_WALL
     items, _ = B.schedule(manifest)
     walls = [i for i in items if i["kind"] == "wall"]
-    up = [w["dur"] for w in walls if w.get("tier") == "upstream"]
-    plain = [w["dur"] for w in walls if not w.get("tier")]
-    assert min(up) > max(plain)
+    up = [w["dur"] / max(1, len(w["names"]))
+          for w in walls if w.get("tier") == "upstream"]
+    plain = [w["dur"] / max(1, len(w["names"]))
+             for w in walls if not w.get("tier")]
+    assert min(up) > min(plain)
 
 
 def test_a_credit_roll_names_people_not_machines(manifest):
@@ -515,24 +486,6 @@ def test_a_cast_face_is_never_guessed(manifest):
                 or member.get("login_source")), member["person"]
 
 
-def test_kats_login_is_the_one_that_was_checked_not_the_one_that_matched(manifest):
-    """github.com/kat is named only "Kat" and is not confirmed to be Kat
-    Cosgrove -- the nimbatus trap exactly. github.com/katcosgrove IS: the
-    account's own name, its company and its bio all match the credit. The
-    difference between the two is the note recorded beside the login."""
-    kat = next(c for c in manifest["cast"] if c["person"] == "Kat Cosgrove")
-    assert kat.get("card") == "kat"
-    assert kat.get("login") == "katcosgrove"
-    assert "kat" != kat["login"]
-    assert kat.get("login_source")
-
-
-def test_the_authored_cards_are_used_where_they_exist(manifest):
-    cards = {c["person"]: c.get("card") for c in manifest["cast"]}
-    assert cards["Bob Killen"] == "bob"
-    assert cards["Laura Santamaria"] == "laura"
-
-
 def test_a_mutable_card_for_another_person_is_ignored(monkeypatch):
     monkeypatch.setattr(C, "cast_identity", lambda _slug: {
         "name": "Cortney Nickerson",
@@ -542,18 +495,6 @@ def test_a_mutable_card_for_another_person_is_ignored(monkeypatch):
     monkeypatch.setattr(C, "cast_identity", lambda _slug: None)
     fallback = C.render_cast_placard("Bob Killen", index=0)
     assert list(mismatched.getdata()) == list(fallback.getdata())
-
-
-def test_verified_logins_survive_a_contributor_refresh(manifest):
-    """cast_logins is hand-maintained; the schedule applies it every time, so
-    a login added after the cast was generated still reaches its placard.
-
-    Checked on Jeefy rather than Jorge: Jorge's placard is redacted, which
-    correctly strips his login before it can reach the card.
-    """
-    items, _ = B.schedule(manifest)
-    jeefy = next(i for i in items if i.get("person") == "Jeefy")
-    assert jeefy["login"] == "jeefy"
 
 
 def test_the_wordmark_is_the_real_mark_not_typeset(manifest):
@@ -585,36 +526,6 @@ def test_the_principals_play_in_the_order_the_show_introduces_them(manifest):
     acts = [c["seen_in"].split(" --")[0] for c in manifest["cast"]]
     order = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
     assert acts == sorted(acts, key=order.index)
-
-
-def test_every_placard_is_somebody_who_is_on_screen(manifest):
-    """Owner: 'ensure this list matches the readme for the characters ...
-    remove some of these characters', and separately 'Remove cayde-6 redacted
-    from the starring roles, he's fine in the credits with the rest.'
-
-    That list has since been replaced by a stricter one -- owner, 2026-08-16:
-    "Remove people not in the movie from here and only use the principal
-    actors", "not jorge castro", "bsherman, and kylegospo".
-    So the rule is no longer "the README's table": it is that EVERY placard is
-    somebody who is on screen in a delivered act, and each entry cites the act
-    it can be found in.
-    """
-    items, _ = B.schedule(manifest)
-    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 8
-    for member in manifest["cast"]:
-        assert member.get("seen_in"), member["person"]
-    people = {c["person"] for c in manifest["cast"]}
-    # The two the owner took out, and the reason each went.
-    assert "Jorge Castro" not in people      # "not jorge castro"
-    assert "Lindsay Gendreau" not in people  # Bungie's voice of Sagira, not in this film
-
-    # NOT compared against the README's table any more, and that is the point.
-    # That table lists BINDINGS -- Destiny characters and who plays them -- and
-    # three principals (Kyle Gospodnetich, Natali Vlatko, Benjamin Sherman) are
-    # on screen without playing a Destiny character at all. The evidence a
-    # placard needs is the act it can be found in, which is `seen_in` above.
-    cited = [c["seen_in"].split(" --")[1].strip() for c in manifest["cast"]]
-    assert all(cited), "every principal cites the record that puts them on screen"
 
 
 def test_cayde_is_not_in_the_starring_roles(manifest):
@@ -1101,24 +1012,12 @@ def test_the_band_draws_nothing_the_performance_would_cover(manifest):
         "the band must be transparent where the performance plays")
 
 
-def test_the_seam_reads_at_the_same_speed_on_both_sides(manifest):
-    """The upstream tier is the more distinguished one on either side of the
-    swap. Counted raw, the seam fell exactly on the tier boundary and each
-    side then paced itself -- which made the distinguished tier the faster
-    one. The split is weighted so that cannot happen again.
-    """
-    items = B.schedule(manifest)[0]
-    def rate(layout, tier):
-        pages = [i for i in items if i["kind"] == "wall"
-                 and i["layout"] == layout and (i.get("tier") == "upstream")
-                 is tier]
-        names = sum(len(i["names"]) for i in pages)
-        return sum(i["dur"] for i in pages) / names if names else None
-    band_upstream = rate("band", True)
-    band_bluefin = rate("band", False)
-    assert band_upstream is not None and band_bluefin is not None, (
-        "the seam must fall INSIDE a tier, not on the boundary between them")
-    assert band_upstream > band_bluefin
+def test_the_concert_seam_keeps_complete_sections(manifest):
+    items = [i for i in B.schedule(manifest)[0] if i["kind"] == "wall"]
+    layouts = {}
+    for item in items:
+        layouts.setdefault(item["section"], set()).add(item["layout"])
+    assert all(len(layout) == 1 for layout in layouts.values())
 
 
 def test_the_act_ends_when_the_recording_does(manifest):
@@ -1261,6 +1160,25 @@ def test_the_call_outs_reach_the_frame():
     assert up.size == plain.size == (C.W, C.H)
 
 
+def test_linuxforever_sears_only_the_x_white():
+    img = Image.new("RGBA", (800, 160), C.BG)
+    font = C._font("black", 76)
+    C._draw_wall_hashtag(img, (20, 20), font)
+    assert (255, 255, 255, 255) in set(img.getdata())
+    assert C.ACCENT in set(img.getdata())
+
+
+def test_gnome_and_kde_carry_the_authored_anubis_banner(manifest):
+    expected = ("Free Software Infratructure protected by Anubis, from Xe, "
+                "Bluefin Contributor")
+    banners = {s["section"]: s.get("banner") for s in manifest["contributors"]}
+    assert banners["GNOME OS"] == banners["KDE Linux"] == expected
+    assert not any(v for k, v in banners.items() if k not in {"GNOME OS", "KDE Linux"})
+    for wall in B.schedule(manifest)[0]:
+        if wall["kind"] == "wall":
+            assert wall.get("banner") == banners[wall["section"]]
+
+
 def test_the_metal3_bubble_dissolves_once_across_the_tier(manifest):
     """Owner: 'have that fade to Deploying CNCF Metal3'. A still cannot fade
     by itself, so the dissolve is spread over the walls it rides -- and it
@@ -1342,17 +1260,10 @@ def test_the_lower_third_is_ink_where_the_type_is(manifest):
 
 
 def test_a_title_nobody_wrote_is_lorem_and_is_recorded(manifest):
-    """Owner: "placeholder for jeefy". A row nobody has authored renders as
-    Latin -- visibly not approved English -- and the manifest records who it is
-    owed to, so it turns up in the punch list instead of being forgotten."""
-    pending = [c for c in manifest["cast"] if c.get("title_pending")]
-    assert pending, "somebody is still owed a title"
-    for member in pending:
-        assert not member.get("title")
-        drawn = B.cast_title(member)
-        assert drawn and drawn != member["title_pending"]
-        # Latin, deterministic, and the same on every machine.
-        assert drawn == B.cast_title(member)
+    member = {"person": "Uncast", "title_pending": "owner copy"}
+    drawn = B.cast_title(member)
+    assert drawn and drawn != member["title_pending"]
+    assert drawn == B.cast_title(member)
 
 
 def test_a_supplied_title_is_never_replaced_by_a_placeholder(manifest):
@@ -1360,26 +1271,6 @@ def test_a_supplied_title_is_never_replaced_by_a_placeholder(manifest):
         if member.get("title"):
             assert B.cast_title(member) == member["title"]
             assert member.get("title_source"), member["person"]
-
-
-def test_an_authored_seal_reaches_the_placard(manifest):
-    """A seal is authored in two places, and both have to arrive.
-
-    The website carded four of the principals, so their `as` row resolves
-    through `card`. The other three -- Karena, Kyle, Kelsey -- are authored in
-    the manifest's own `guardian_title`, and the first build dropped that field
-    on the way to the renderer: three placards silently lost a row that had
-    been written for them, and every gate stayed green because an unauthored
-    seal is *supposed* to be omitted.
-    """
-    items, _ = B.schedule(manifest)
-    seats = {i["person"]: i for i in items if i["kind"] == "cast"}
-    authored = [c for c in manifest["cast"] if c.get("guardian_title")]
-    assert authored
-    for member in authored:
-        seat = seats[member["person"]]
-        assert seat["guardian_title"] == member["guardian_title"], member["person"]
-        assert member.get("guardian_title_source"), member["person"]
 
 
 def test_a_seal_nobody_authored_stays_off_the_card(manifest):

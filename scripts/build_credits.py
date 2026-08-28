@@ -57,10 +57,11 @@ reported here.
 
 ## What is on screen
 
-Nothing is invented. The four fixed cards are the owner's words. The cast comes
-from ``vocab/casting.yaml``. The contributors are the GitHub API's all-time
-lists for the four projects, **frozen into the manifest** so a rebuild is
-reproducible and so the render needs no network.
+Nothing is invented. The fixed cards are the owner's words. The individual
+hero-character placards are omitted until each person grants permission. The
+contributors are the GitHub API's all-time lists for the projects, **frozen
+into the manifest** so a rebuild is reproducible and so the render needs no
+network.
 
     python3 scripts/build_credits.py --refresh-contributors  # re-snapshot (network)
     python3 scripts/build_credits.py --plan                   # the schedule, no render
@@ -729,7 +730,7 @@ def schedule(manifest):
               if not k.startswith("_")}
     target = manifest.get("cast_hold_sec", 4.0)
     redacted = set(manifest.get("cast_redactions") or [])
-    for person in manifest["cast"]:
+    for person in manifest.get("cast", []):
         name = person["person"]
         if person["character_id"] in redacted:
             # The name goes, and with it the face and the authored card --
@@ -877,6 +878,8 @@ def schedule(manifest):
         item = {"kind": "wall", "t": t, "dur": dur, "section": name,
                 "names": page, "page": idx[name], "tier": tier,
                 "pages": pages_by_section[name],
+                "banner": next((s.get("banner") for s in sections
+                                if s["section"] == name), None),
                 "layout": "band" if band else "full"}
         if ghost:
             item["ghost"] = ghost
@@ -925,7 +928,8 @@ def render_cards(items, out_dir):
                        item["page"], item["pages"],
                        tier=item.get("tier"), index=i,
                        ghost=item.get("ghost"),
-                       bubble_mix=item.get("bubble_mix"))
+                       bubble_mix=item.get("bubble_mix"),
+                       banner=item.get("banner"))
         elif item["kind"] == "wordmark":
             img = C.render_wordmark(item["text"], item.get("sub"), index=i)
         elif item["kind"] == "cover":
