@@ -256,8 +256,8 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
 - Generated, ignored: `media/standalone/*`
 - Generated, ignored: `renders/standalone/bluefin-and-the-blueberries/*`
 - Generated, ignored: `renders/standalone/bluefin-your-final-trial/*`
-- Deliver: `~/Videos/Bluefin and the Blueberries.mp4`
-- Deliver: `~/Videos/Bluefin - Your Final Trial.mp4`
+- Deliver: `~/Videos/Wolves/review/Bluefin and the Blueberries.mp4`
+- Deliver: `~/Videos/Wolves/review/Bluefin - Your Final Trial.mp4`
 
 **Interfaces:**
 - Consumes: `python3 tools/standalone.py build <manifest> <slug>`
@@ -296,7 +296,7 @@ python3 tools/standalone.py build \
 ```
 
 Expected: reports `encoded on cluster` when the farm is reachable and delivers
-`~/Videos/Bluefin and the Blueberries.mp4`.
+`~/Videos/Wolves/review/Bluefin and the Blueberries.mp4`.
 
 - [ ] **Step 4: Verify Blueberries**
 
@@ -344,7 +344,7 @@ python3 tools/standalone.py build \
   stories/standalone/bluefin-video-batch.json bluefin-your-final-trial
 ```
 
-Expected: delivers `~/Videos/Bluefin - Your Final Trial.mp4` through the
+Expected: delivers `~/Videos/Wolves/review/Bluefin - Your Final Trial.mp4` through the
 farm-first path.
 
 - [ ] **Step 6: Verify Final Trial**

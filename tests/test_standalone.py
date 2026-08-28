@@ -935,6 +935,13 @@ def _batch_overlay(slug, overlay_id):
                 if o["id"] == overlay_id)
 
 
+def test_the_standalone_batch_delivers_to_the_wolves_review_folder():
+    manifest = json.loads(BATCH.read_text(encoding="utf-8"))
+    for video in manifest["videos"]:
+        assert video["output"].startswith("~/Videos/Wolves/review/")
+        assert video["thumbnail_output"].startswith("~/Videos/Wolves/review/")
+
+
 def test_final_trial_uses_one_normal_bazzite_plate_on_the_landing():
     video = _batch_video("bluefin-your-final-trial")
     john = _batch_overlay("bluefin-your-final-trial", "john-bazzite-landing")
