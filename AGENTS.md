@@ -160,6 +160,12 @@ reports, exits 0, and only `--check` fails. **It never re-times anything** —
 widening a hold shoves the beat after it, and moving an authored beat is the
 owner's call.
 
+**A tail CTA buys readability with time, not smaller type.** When the call to
+action is the final authored beat, bias its hold long enough to read without
+rushing. A requested multiplier applies to that tail hold only: extend the
+film after the CTA begins, and do not move, shorten, or re-time the authored
+picture and copy before it.
+
 **Four classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, a licensing decision, and **moving copy
 the owner already placed**. An agent that
