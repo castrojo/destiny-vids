@@ -49,10 +49,16 @@ Two things follow, and they are the reason this section exists:
   exactly the state issue #5 is in for Karena Angell's subclass — the row ships
   short until the owner has the word.
 
-### Known divergences
+### Known divergences and owner overrides
 
-Recorded, not resolved. Each one is somebody's call, not an agent's:
+This is the lookup point for both unresolved disagreements and owner decisions
+that supersede an external source. Unresolved items remain somebody's call, not
+an agent's:
 
+- **Jorge Castro's class and chrome are resolved owner overrides.** The external
+  deck still says Harbinger Titan with silver trustee chrome. This repo's
+  canonical binding says Harbinger Hunter on basic blue: the owner superseded
+  both deck fields, while keeping `TRUSTEE // GUARDIAN` as label copy.
 - **Jeffrey Sica's title.** The deck says *Forgemaster of the Seven*; issue #1's
   owner-authored brief copy says *Forgemaster of Kubernetes*. A brief is the
   owner speaking, so `plan` will use it — but the two records disagree and one

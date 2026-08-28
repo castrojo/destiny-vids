@@ -330,7 +330,7 @@ ffmpeg -v error -y -ss 83.9 \
 ```
 
 Expected: 33.4 has no plate; 34.5 (the hold midpoint) shows the complete
-trustee plate on Cayde; 35.55 has no plate and shows the dissolve beginning;
+four-row Castrojo plate on basic blue chrome; 35.55 has no plate and shows the dissolve beginning;
 83.5 contains no publisher title; 83.9 is the approved CTA.
 
 - [ ] **Step 5: Fetch and build Final Trial**
