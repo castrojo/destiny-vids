@@ -313,19 +313,19 @@ Inspect extracted review frames:
 
 ```bash
 ffmpeg -v error -y -ss 33.4 \
-  -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
+  -i "$HOME/Videos/Wolves/review/Bluefin and the Blueberries.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/blueberries-quality-pass-before-plate.png"
 ffmpeg -v error -y -ss 34.5 \
-  -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
+  -i "$HOME/Videos/Wolves/review/Bluefin and the Blueberries.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/blueberries-quality-pass-plate.png"
 ffmpeg -v error -y -ss 35.55 \
-  -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
+  -i "$HOME/Videos/Wolves/review/Bluefin and the Blueberries.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/blueberries-quality-pass-dissolve.png"
 ffmpeg -v error -y -ss 83.5 \
-  -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
+  -i "$HOME/Videos/Wolves/review/Bluefin and the Blueberries.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/blueberries-quality-pass-tail.png"
 ffmpeg -v error -y -ss 83.9 \
-  -i "$HOME/Videos/Bluefin and the Blueberries.mp4" -frames:v 1 \
+  -i "$HOME/Videos/Wolves/review/Bluefin and the Blueberries.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/blueberries-quality-pass-cta.png"
 ```
 
@@ -362,13 +362,13 @@ Inspect representative frames:
 
 ```bash
 ffmpeg -v error -y -ss 10.0 \
-  -i "$HOME/Videos/Bluefin - Your Final Trial.mp4" -frames:v 1 \
+  -i "$HOME/Videos/Wolves/review/Bluefin - Your Final Trial.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/final-trial-quality-pass-no-hud.png"
 ffmpeg -v error -y -ss 17.3 \
-  -i "$HOME/Videos/Bluefin - Your Final Trial.mp4" -frames:v 1 \
+  -i "$HOME/Videos/Wolves/review/Bluefin - Your Final Trial.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/final-trial-quality-pass-landing.png"
 ffmpeg -v error -y -ss 60.0 \
-  -i "$HOME/Videos/Bluefin - Your Final Trial.mp4" -frames:v 1 \
+  -i "$HOME/Videos/Wolves/review/Bluefin - Your Final Trial.mp4" -frames:v 1 \
   "$HOME/Videos/Wolves/work/final-trial-quality-pass-no-persistent-hud.png"
 ```
 
@@ -396,9 +396,9 @@ Run:
 ```bash
 git status --short
 git ls-files --error-unmatch \
-  "$HOME/Videos/Bluefin and the Blueberries.mp4" 2>/dev/null && exit 1 || true
+  "$HOME/Videos/Wolves/review/Bluefin and the Blueberries.mp4" 2>/dev/null && exit 1 || true
 git ls-files --error-unmatch \
-  "$HOME/Videos/Bluefin - Your Final Trial.mp4" 2>/dev/null && exit 1 || true
+  "$HOME/Videos/Wolves/review/Bluefin - Your Final Trial.mp4" 2>/dev/null && exit 1 || true
 ```
 
 Expected: no uncommitted repository changes and neither delivered video is
