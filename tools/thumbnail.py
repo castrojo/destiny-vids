@@ -149,11 +149,14 @@ def _fit_title(draw, text):
             return font, lines
         return None
 
-    # One pass from the max through the preferred 72 floor and, only when a
-    # wider fallback font still overflows there, on down to the emergency
-    # floor in the same 4px steps. Titles that fit at or above 72 resolve
-    # identically to before.
-    for size in range(_TITLE_MAX, _TITLE_EMERGENCY_FLOOR - 1, -4):
+    for size in range(_TITLE_MAX, _TITLE_FLOOR - 1, -4):
+        fitted = fits(size)
+        if fitted is not None:
+            return fitted
+
+    # Only wider fallback fonts reach this pass. Titles that fit at or above
+    # the preferred floor remain byte-identical.
+    for size in range(_TITLE_FLOOR - 4, _TITLE_EMERGENCY_FLOOR - 1, -4):
         fitted = fits(size)
         if fitted is not None:
             return fitted
