@@ -1250,6 +1250,59 @@ def _png(path, color):
     return path
 
 
+def test_episode_input_digest_tracks_the_encode_contract(
+        manifest, tmp_path, monkeypatch):
+    """The delivery spec and the audio recipe are freshness inputs: a codec,
+    spec-version, or audio change with IDENTICAL content must still
+    invalidate the digest, because the same pixels encode to a different
+    episode under different settings."""
+    plan = hive_series.episode_plan(manifest, 1)
+    staged = [_png(tmp_path / "a.png", (1, 2, 3, 255))]
+    base = hive_series.episode_input_digest(plan, staged)
+
+    monkeypatch.setattr(hive_series.conform, "SPEC_VERSION", "delivery-v999")
+    assert hive_series.episode_input_digest(plan, staged) != base
+
+    monkeypatch.undo()
+    monkeypatch.setattr(hive_series, "AUDIO_BITRATE", "128k")
+    assert hive_series.episode_input_digest(plan, staged) != base
+
+    monkeypatch.undo()
+    monkeypatch.setattr(hive_series.conform, "video_encode_args",
+                        lambda: ["-c:v", "libx264", "-crf", "20"])
+    assert hive_series.episode_input_digest(plan, staged) != base
+
+    monkeypatch.undo()
+    assert hive_series.episode_input_digest(plan, staged) == base
+
+
+def test_freshness_skip_logs_the_current_unresolved_items(
+        manifest, tmp_path, monkeypatch):
+    """The skip prints the unresolved items, not just rewrites the sidecar:
+    an operator watching a no-change run still sees the gaps."""
+    manifest_path, data = _stage_episode(manifest, tmp_path, monkeypatch)
+    data["overlays"].append({
+        "id": "mystery", "kind": "lower-third", "chapter": 1,
+        "source_at": 40.0, "position": "somewhere-unspecified",
+        "lines": ["Unplaced."], "copy_source": "owner_authored",
+        "nature": "project_lore", "note": "fixture",
+    })
+    manifest_path.write_text(json.dumps(data))
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
+    work = tmp_path / "work"
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 1
+
+    lines = []
+    hive_series.build_episode(manifest_path, 1, work_dir=work,
+                              log=lines.append)
+    assert len(calls) == 1, "an omitted overlay changes no encoded pixel"
+    assert any("unresolved" in line and "mystery" in line
+               for line in lines), \
+        "a skip must print the current unresolved items"
+
+
 def test_episode_input_digest_is_deterministic_over_identical_content(
         manifest, tmp_path):
     plan = hive_series.episode_plan(manifest, 1)
@@ -1349,26 +1402,53 @@ def test_freshness_skip_rewrites_unresolved_from_the_current_plan(
     assert any(entry.get("id") == "mystery" for entry in sidecar)
 
 
-def test_build_episode_adopts_a_verified_delivery_with_no_digest_on_record(
+def test_build_episode_rebuilds_when_the_digest_sidecar_is_missing(
         manifest, tmp_path, monkeypatch):
-    """Deliveries from before the digest existed are initialized safely: a
-    verified output with no sidecar is ADOPTED, not re-encoded -- the digest
-    is written from the current content and the build returns."""
+    """Freshness fails closed: a verified delivery with NO digest on record
+    is re-encoded, not adopted -- the sidecar's absence can never be read
+    as freshness. The rebuild writes the digest, and THEN the skip works."""
     manifest_path, _data = _stage_episode(manifest, tmp_path, monkeypatch)
     out = tmp_path / "s01e01-the-enclave.mp4"
     out.write_bytes(b"mp4")  # a prior delivery; verification is faked clean
-
-    def forbidden(argv, **kwargs):
-        raise AssertionError("a verified delivery with no digest must not "
-                             "be re-encoded -- the digest is adopted")
-
-    monkeypatch.setattr(hive_series.farm, "run_encode", forbidden)
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
     work = tmp_path / "work"
+
     assert hive_series.build_episode(manifest_path, 1, work_dir=work) == out
+    assert len(calls) == 1, "a missing digest sidecar must re-encode"
     digest = json.loads((work / "s01e01-the-enclave-inputs.json").read_text())
     assert digest["sha256"] and digest["inputs"]
     assert json.loads(
         (work / "s01e01-the-enclave-unresolved.json").read_text()) == []
+
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 1, "the freshly written digest skips the rebuild"
+
+
+def test_build_episode_rebuilds_when_the_digest_sidecar_is_corrupt(
+        manifest, tmp_path, monkeypatch):
+    """A sidecar that exists but cannot be read as a digest is corrupt, not
+    current: the episode is re-encoded and the sidecar rewritten. Both
+    malformed shapes fail closed -- unparseable JSON and JSON with no
+    digest in it."""
+    manifest_path, _data = _stage_episode(manifest, tmp_path, monkeypatch)
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
+    work = tmp_path / "work"
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 1
+    digest_path = work / "s01e01-the-enclave-inputs.json"
+
+    digest_path.write_text("{not json\n")
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 2, "an unparseable sidecar must re-encode"
+
+    digest_path.write_text(json.dumps({"inputs": []}) + "\n")
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 3, "a digest-less sidecar must re-encode"
+
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 3, "the rewritten sidecar skips again"
 
 
 def test_build_episode_rebuilds_when_dossier_copy_changes_at_same_duration(
@@ -1514,30 +1594,122 @@ def test_delivery_probe_reports_a_duration_mismatch(tmp_path, monkeypatch):
 # --- the cut's one interface ---------------------------------------------------
 
 
-def test_build_cut_enforces_episode_verification_before_concat(
-        manifest, tmp_path, monkeypatch):
+def _fake_episode_files(data, skip=()):
+    """A delivered 'mp4' for every chapter not in ``skip``."""
+    for chapter in data["chapters"]:
+        if chapter["number"] in skip:
+            continue
+        Path(chapter["output"]).write_bytes(b"mp4")
+
+
+def _stage_cut(manifest, tmp_path, monkeypatch, skip=()):
+    """A full season offline: redirected outputs, faked build/verify/probe,
+    and conform.ensure pinned to 'conforms'. Returns (manifest_path, data)."""
+    data = _delivery_manifest(manifest, tmp_path)
     manifest_path = tmp_path / "season.json"
-    manifest_path.write_text(json.dumps(_delivery_manifest(manifest, tmp_path)))
+    manifest_path.write_text(json.dumps(data))
+    _fake_episode_files(data, skip=skip)
     monkeypatch.setattr(hive_series, "build_all", lambda *a, **k: [])
+    monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
+    monkeypatch.setattr(hive_series.conform, "ensure",
+                        lambda path, **k: (path, "conforms"))
+    monkeypatch.setattr(hive_series, "_probe_delivery_streams",
+                        lambda *a, **k: [])
+    return manifest_path, data
+
+
+def test_build_cut_ships_the_cut_when_one_episode_is_bad(
+        manifest, tmp_path, monkeypatch):
+    """One bad episode is a finding, never a veto: the other eleven join,
+    the cut ships, and the report names the missing episode. Verification
+    findings never withhold the season cut."""
+    manifest_path, data = _stage_cut(manifest, tmp_path, monkeypatch,
+                                     skip={4})
     monkeypatch.setattr(
         hive_series, "verify_episode",
-        lambda m, number, **k: ["s01e04: duration off"] if number == 4 else [])
+        lambda m, number, **k: ["s01e04-the-relic.mp4: missing or empty"]
+        if number == 4 else [])
+    joined = []
 
-    def forbidden(*a, **k):
-        raise AssertionError("unverified episodes must never be concatenated")
+    def fake_concat(manifest, out_path=None, paths=None, **kwargs):
+        joined.extend(Path(p).name for p in paths)
+        out_path = Path(out_path) if out_path else             hive_series.full_cut_path(manifest)
+        out_path.write_bytes(b"mp4")
+        return out_path
 
-    monkeypatch.setattr(hive_series, "concat_episodes", forbidden)
-    with pytest.raises(hive_series.UnverifiedEpisodes) as caught:
-        hive_series.build_cut(manifest_path)
-    assert caught.value.problems == ["s01e04: duration off"]
+    monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
+    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"])
+    assert out.exists(), "one bad episode must not prevent the cut"
+    assert len(joined) == 11
+    assert "s01e04-the-relic.mp4" not in joined
+    assert any("s01e04" in problem for problem in problems)
+
+
+def test_build_cut_substitutes_a_conformed_copy_before_the_blind_join(
+        manifest, tmp_path, monkeypatch):
+    """A delivered episode that is not join-compatible goes through
+    conform.ensure and the CONFORMED copy is what joins -- the substitution
+    is logged, the cut still ships, and a repaired input is not a problem."""
+    manifest_path, data = _stage_cut(manifest, tmp_path, monkeypatch)
+    substitute = tmp_path / "conformed" / "s01e04-the-relic.mp4"
+    substitute.parent.mkdir()
+    substitute.write_bytes(b"mp4")
+
+    def fake_ensure(path, **kwargs):
+        if "s01e04" in Path(path).name:
+            return substitute, "conformed"
+        return path, "conforms"
+
+    monkeypatch.setattr(hive_series.conform, "ensure", fake_ensure)
+    joined = []
+
+    def fake_concat(manifest, out_path=None, paths=None, **kwargs):
+        joined.extend(Path(p) for p in paths)
+        out_path = Path(out_path) if out_path else             hive_series.full_cut_path(manifest)
+        out_path.write_bytes(b"mp4")
+        return out_path
+
+    monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
+    lines = []
+    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"],
+                                          log=lines.append)
+    assert problems == []
+    assert len(joined) == 12 and substitute in joined
+    assert any("conformed copy" in line and "s01e04" in line
+               for line in lines)
+
+
+def test_build_cut_reports_an_undecodable_episode_and_joins_the_rest(
+        manifest, tmp_path, monkeypatch):
+    """An episode that cannot even be probed is reported explicitly and left
+    out; the best reachable cut still ships from the decodable episodes."""
+    manifest_path, data = _stage_cut(manifest, tmp_path, monkeypatch)
+
+    def fake_ensure(path, **kwargs):
+        if "s01e07" in Path(path).name:
+            raise RuntimeError("no video stream in it")
+        return path, "conforms"
+
+    monkeypatch.setattr(hive_series.conform, "ensure", fake_ensure)
+    joined = []
+
+    def fake_concat(manifest, out_path=None, paths=None, **kwargs):
+        joined.extend(Path(p).name for p in paths)
+        out_path = Path(out_path) if out_path else             hive_series.full_cut_path(manifest)
+        out_path.write_bytes(b"mp4")
+        return out_path
+
+    monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
+    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"])
+    assert out.exists()
+    assert len(joined) == 11 and "s01e07-council.mp4" not in joined
+    assert any("s01e07" in problem and "joins without it" in problem
+               for problem in problems)
 
 
 def test_build_cut_joins_verified_episodes_and_reports_the_cut(
         manifest, tmp_path, monkeypatch):
-    manifest_path = tmp_path / "season.json"
-    manifest_path.write_text(json.dumps(_delivery_manifest(manifest, tmp_path)))
-    monkeypatch.setattr(hive_series, "build_all", lambda *a, **k: [])
-    monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
+    manifest_path, data = _stage_cut(manifest, tmp_path, monkeypatch)
     cut = tmp_path / "season-01-full.mp4"
 
     def fake_concat(manifest, out_path=None, **kwargs):
@@ -1552,7 +1724,7 @@ def test_build_cut_joins_verified_episodes_and_reports_the_cut(
         return []
 
     monkeypatch.setattr(hive_series, "_probe_delivery_streams", fake_probe)
-    out, problems = hive_series.build_cut(manifest_path)
+    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"])
     assert out == cut
     assert problems == []
     assert probed == ["season-01-full.mp4"], \
@@ -1565,10 +1737,12 @@ def test_cut_command_goes_through_build_cut(tmp_path, monkeypatch):
     assert hive_series.main(["cut"]) == 0
 
 
-def test_cut_command_reports_unverified_episodes_without_joining(
+def test_cut_command_reports_problems_and_still_returns_the_cut(
         tmp_path, monkeypatch):
-    def refuse(*a, **k):
-        raise hive_series.UnverifiedEpisodes(["s01e07: probe failed"])
-
-    monkeypatch.setattr(hive_series, "build_cut", refuse)
+    """Findings never withhold the film: the cut ships, and the exit code
+    carries the report's cleanliness."""
+    cut = tmp_path / "season-01-full.mp4"
+    cut.write_bytes(b"mp4")
+    monkeypatch.setattr(hive_series, "build_cut",
+                        lambda *a, **k: (cut, ["s01e07: probe failed"]))
     assert hive_series.main(["cut"]) == 1

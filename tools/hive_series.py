@@ -1166,6 +1166,16 @@ def episode_input_digest(plan, staged, source=None):
 
     if source is not None:
         note("source", source)
+    # The encode contract: the SAME plan and pixels encoded under a different
+    # delivery spec or audio recipe are a different episode, so the settings
+    # the encode actually consumes are freshness inputs too.
+    note("encode", {
+        "spec_version": conform.SPEC_VERSION,
+        "video_filter": conform.video_filter_chain(),
+        "video_args": conform.video_encode_args(),
+        "audio": {"codec": "aac", "bitrate": AUDIO_BITRATE,
+                  "rate": SAMPLE_RATE, "layout": AUDIO_LAYOUT},
+    })
     chapter = plan["chapter"]
     note("chapter", {"number": chapter["number"],
                      "start": chapter["start"], "end": chapter["end"]})
@@ -1200,12 +1210,24 @@ def episode_input_digest(plan, staged, source=None):
 
 
 def _read_input_digest(path):
-    """The digest on record, or None when the sidecar is absent or unreadable
-    -- an unreadable record is treated as no record, never as a match."""
+    """``(digest, state)`` for the sidecar on record.
+
+    ``state`` is ``"ok"`` with a usable digest, ``"missing"`` when no
+    sidecar exists, and ``"corrupt"`` when one exists but cannot be read as
+    a digest. Missing and corrupt both mean REBUILD -- freshness fails
+    closed: an episode whose inputs cannot be accounted for is re-encoded,
+    never adopted and never skipped."""
     try:
-        return json.loads(Path(path).read_text(encoding="utf-8"))["sha256"]
-    except (OSError, ValueError, KeyError, TypeError):
-        return None
+        raw = Path(path).read_text(encoding="utf-8")
+    except OSError:
+        return None, "missing"
+    try:
+        digest = json.loads(raw)["sha256"]
+        if not isinstance(digest, str) or not digest:
+            raise KeyError("sha256")
+    except (ValueError, KeyError, TypeError):
+        return None, "corrupt"
+    return digest, "ok"
 
 
 def _write_input_digest(path, digest, staged):
@@ -1263,16 +1285,15 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
     """One episode, built and delivered: cards, one farm-first encode,
     thumbnail, unresolved sidecar.
 
-    Freshness is content-derived, never duration-derived: the plan and the
-    pixel content of every staged input hash to a digest kept in
-    ``<slug>-inputs.json`` beside the unresolved sidecar, and an existing
-    output is kept only when it verifies AND the digest still matches -- a
-    same-duration copy change rebuilds. A verified output with NO digest on
-    record is adopted: the digest is initialized from the current content
-    and the file kept, so deliveries from before this check are not
-    re-encoded for want of a sidecar. Either way the skip rewrites the
-    unresolved sidecar from the CURRENT plan before returning -- it can
-    never be left missing or stale."""
+    Freshness is content-derived, never duration-derived: the plan, the
+    encode contract, and the pixel content of every staged input hash to a
+    digest kept in ``<slug>-inputs.json`` beside the unresolved sidecar, and
+    an existing output is kept only when it verifies AND the digest still
+    matches -- a same-duration copy change rebuilds. Freshness fails CLOSED:
+    a missing or corrupt digest sidecar is a rebuild, never an adoption and
+    never a skip. Either way the skip rewrites the unresolved sidecar from
+    the CURRENT plan and prints the items before returning -- it can never
+    be left missing or stale."""
     manifest = load_manifest(manifest_path)
     ffmpeg = ffmpeg or render.find_ffmpeg()
     plan = episode_plan(manifest, episode_number)
@@ -1309,21 +1330,25 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
 
     if out.exists() and not verify_episode(manifest, episode_number,
                                            ffmpeg=ffmpeg):
-        stored = _read_input_digest(digest_path)
-        if stored == digest:
+        stored, state = _read_input_digest(digest_path)
+        if state == "ok" and stored == digest:
             log(f"  {slug}: already built and verified -- {out}")
-        elif stored is None:
-            log(f"  {slug}: verified delivery with no digest on record; "
-                f"adopting the current content as its digest")
-            _write_input_digest(digest_path, digest, staged)
-        if stored is None or stored == digest:
             _write_unresolved(work, slug, unresolved)
+            for item in unresolved:
+                log(f"  unresolved: {item}")
             if not thumb.exists():
                 make_thumbnail(plan["segments"][1]["asset"], thumb)
                 log(f"  thumbnail: {thumb}")
             return out
-        log(f"  {slug}: content changed since the delivered encode "
-            f"({stored[:12]}... -> {digest[:12]}...) -- rebuilding")
+        if state == "ok":
+            log(f"  {slug}: content changed since the delivered encode "
+                f"({stored[:12]}... -> {digest[:12]}...) -- rebuilding")
+        elif state == "corrupt":
+            log(f"  {slug}: the digest sidecar {digest_path} is unreadable "
+                f"-- rebuilding (freshness fails closed)")
+        else:
+            log(f"  {slug}: no digest sidecar on record at {digest_path} "
+                f"-- rebuilding (freshness fails closed)")
 
     out.parent.mkdir(parents=True, exist_ok=True)
     out = out.resolve()
@@ -1365,10 +1390,13 @@ def build_all(manifest_path=None, local=False, ffmpeg=None, log=print,
 # --- the full-season cut ---------------------------------------------------------------
 
 
-def concat_list_lines(manifest):
-    """The concat-demuxer list: the twelve delivered episodes, in order."""
-    return [f"file '{episode_output_path(c).resolve()}'"
-            for c in manifest["chapters"]]
+def concat_list_lines(manifest, paths=None):
+    """The concat-demuxer list: the delivered episodes, in order. ``paths``
+    overrides the episode set -- the cut joins what is actually joinable,
+    which can be fewer than twelve (see build_cut)."""
+    if paths is None:
+        paths = [episode_output_path(c) for c in manifest["chapters"]]
+    return [f"file '{Path(p).resolve()}'" for p in paths]
 
 
 def concat_command(ffmpeg, list_path, out_path):
@@ -1388,63 +1416,106 @@ def concat_command(ffmpeg, list_path, out_path):
 
 
 def concat_episodes(manifest, out_path=None, ffmpeg=None, work_dir=None,
-                    runner=subprocess.run):
+                    runner=subprocess.run, paths=None):
     """Concatenate the built episodes into the full-season cut.
 
     A pure remux -- the picture and sound are both stream-copied -- so it
     runs here, the same posture as megacut's assemble: the encodes were the
-    farm's work; the join is I/O."""
+    farm's work; the join is I/O. ``paths`` is the ordered join set when the
+    caller has conformed or omitted episodes; the default is all twelve."""
     ffmpeg = ffmpeg or render.find_ffmpeg()
     out_path = Path(out_path) if out_path else full_cut_path(manifest)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     work = Path(work_dir) if work_dir is not None else WORK_DIR
     work.mkdir(parents=True, exist_ok=True)
     list_path = work / "season-01-concat.txt"
-    list_path.write_text("\n".join(concat_list_lines(manifest)) + "\n",
+    list_path.write_text("\n".join(concat_list_lines(manifest, paths)) + "\n",
                          encoding="utf-8")
     runner(concat_command(ffmpeg, list_path, out_path), check=True)
     return out_path
 
 
-class UnverifiedEpisodes(RuntimeError):
-    """The cut refused its inputs: one or more episodes did not verify.
+def _conform_for_join(path, ffmpeg, local, log):
+    """``conform.ensure`` with the delivery-fps container-rounding verdict.
 
-    Carries the full ``problems`` report. The join is a blind stream copy,
-    so an episode that fails verification goes NOWHERE near it -- the cut
-    is only ever concatenated from verified episodes."""
+    The cut joins blind, so a non-conformant episode is substituted with its
+    conformed copy through the repo's one conformance path. The ONE
+    adjustment is the known container rounding: whole-second card durations
+    never divide 60000/1001 evenly, so a correct delivery's avg_frame_rate
+    lands outside conform's 1e-3 fps tolerance (`_fps_is_delivery`). Without
+    the override every delivered episode would "need" a re-encode on every
+    cut."""
+    ffprobe = conform.ffprobe_for(ffmpeg)
 
-    def __init__(self, problems):
-        self.problems = list(problems)
-        super().__init__(
-            f"{len(self.problems)} episode verification problem(s)")
+    def probe(p):
+        props = conform.probe_video(p, ffprobe)
+        if _fps_is_delivery(props.get("avg_frame_rate")) or \
+                _fps_is_delivery(props.get("r_frame_rate")):
+            props = dict(props, avg_frame_rate=conform.DELIVERY.fps)
+        return props
+
+    return conform.ensure(path, ffmpeg=ffmpeg, _probe=probe, log=log,
+                          use_farm=False if local else None)
 
 
 def build_cut(manifest_path=None, local=False, ffmpeg=None, log=print):
-    """The ONE way to the full-season cut: build every episode, verify each
-    one, and only then join.
+    """The ONE way to the full-season cut: build every episode, then join
+    what is joinable.
 
-    Returns ``(out_path, problems)`` -- the cut's own post-join report,
-    empty when the delivered file verifies. An episode that does not verify
-    is never concatenated: the report is logged and raised as
-    `UnverifiedEpisodes` before the join runs. The CLI and the justfile
-    both go through here; there is no second path to a cut."""
+    Returns ``(out_path, problems)`` -- every finding, episode-level and
+    post-join, empty when everything verified. Findings REPORT, they never
+    withhold the film (AGENTS.md: nothing blocks a release): an episode
+    that fails verification is logged and still considered for the join;
+    one that is missing or undecodable is reported and left out, and the
+    cut is the best reachable join of the episodes that remain. Before the
+    blind stream-copy join, every present and decodable episode goes through
+    the repo's one conformance path (`conform.ensure`), which substitutes a
+    spec-conformant copy when the delivered file is not joinable as-is --
+    the substitution is logged. The CLI and the justfile both go through
+    here; there is no second path to a cut."""
     manifest = load_manifest(manifest_path)
+    ffmpeg = ffmpeg or render.find_ffmpeg()
     build_all(manifest_path, local=local, ffmpeg=ffmpeg, log=log)
     problems = []
+    joinable = []
     for chapter in manifest["chapters"]:
-        problems.extend(
-            verify_episode(manifest, chapter["number"], ffmpeg=ffmpeg))
-    if problems:
-        for problem in problems:
-            log(f"  verify: {problem}")
-        raise UnverifiedEpisodes(problems)
-    out = concat_episodes(manifest, ffmpeg=ffmpeg)
-    log(f"  full cut: {out}")
-    problems = _probe_delivery_streams(
-        full_cut_path(manifest), cut_expected_duration(manifest),
-        ffmpeg or render.find_ffmpeg(), CUT_TOLERANCE_S)
-    for problem in problems:
+        slug = episode_slug(chapter)
+        findings = verify_episode(manifest, chapter["number"], ffmpeg=ffmpeg)
+        for finding in findings:
+            log(f"  verify: {finding}")
+        problems.extend(findings)
+        path = episode_output_path(chapter)
+        if not path.exists() or path.stat().st_size == 0:
+            problems.append(
+                f"{slug}: no episode at {path} -- the cut joins without it")
+            log(f"  cut: {problems[-1]}")
+            continue
+        try:
+            joined, status = _conform_for_join(path, ffmpeg, local, log)
+        except Exception as exc:
+            problems.append(
+                f"{slug}: {path.name} could not be probed or conformed "
+                f"({exc}) -- the cut joins without it")
+            log(f"  cut: {problems[-1]}")
+            continue
+        if status != "conforms":
+            log(f"  cut: {slug}: joining the conformed copy {joined} "
+                f"({status}) in place of the delivered file")
+        joinable.append((chapter, Path(joined)))
+    if not joinable:
+        raise RuntimeError(
+            "no episode is present and decodable -- there is nothing to join")
+    out = concat_episodes(manifest, ffmpeg=ffmpeg,
+                          paths=[p for _c, p in joinable])
+    log(f"  full cut: {out} ({len(joinable)} of "
+        f"{len(manifest['chapters'])} episodes)")
+    expected = sum(episode_expected_duration(manifest, c)
+                   for c, _p in joinable)
+    cut_problems = _probe_delivery_streams(out, expected, ffmpeg,
+                                           CUT_TOLERANCE_S)
+    for problem in cut_problems:
         log(f"  verify: {problem}")
+    problems.extend(cut_problems)
     return out, problems
 
 
@@ -1723,11 +1794,9 @@ def _cmd_build_all(args):
 
 
 def _cmd_cut(args):
-    """The full-season cut, through the one interface that owns it."""
-    try:
-        out, problems = build_cut(MANIFEST, local=args.local)
-    except UnverifiedEpisodes as exc:
-        return _report_verify(exc.problems)
+    """The full-season cut, through the one interface that owns it. The cut
+    always ships; the exit code is the report's cleanliness."""
+    out, problems = build_cut(MANIFEST, local=args.local)
     print(f"full cut: {out}")
     return _report_verify(problems)
 
