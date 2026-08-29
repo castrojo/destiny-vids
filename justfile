@@ -10,7 +10,6 @@ hive-episode NUMBER:
 
 # Build and verify all twelve episodes, then concatenate the full-season cut.
 hive-cut:
-    python3 tools/hive_series.py build-all
     python3 tools/hive_series.py cut
 
 # Regenerate the committed cards (opening CTA + the twelve title slides).

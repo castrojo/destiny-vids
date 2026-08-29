@@ -1212,3 +1212,363 @@ def test_build_episode_records_the_dossier_fallback_in_unresolved(
     sidecar = json.loads(
         (tmp_path / "work" / "s01e01-the-enclave-unresolved.json").read_text())
     assert any("fixture" in json.dumps(entry) for entry in sidecar)
+
+
+# --- content-derived freshness ---------------------------------------------
+
+
+def _stage_episode(manifest, tmp_path, monkeypatch, data=None):
+    """The committed manifest redirected into tmp_path, with the network,
+    the picture probe, the avatar cache, and media verification faked
+    offline. Returns (manifest_path, data) so a test can doctor the record
+    between builds."""
+    data = data if data is not None else _delivery_manifest(manifest, tmp_path)
+    manifest_path = tmp_path / "season.json"
+    manifest_path.write_text(json.dumps(data))
+    fake_source = tmp_path / "src.mkv"
+    fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(
+        hive_series, "ensure_source", lambda *a, **k: fake_source)
+    monkeypatch.setattr(
+        hive_series.render, "detect_picture_status",
+        lambda *a, **k: (None, "full-frame"))
+    monkeypatch.setattr(hive_series, "resolve_face", lambda login: None)
+    monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
+    return manifest_path, data
+
+
+def _fake_encode(calls):
+    def fake_run_encode(argv, **kwargs):
+        calls.append(kwargs)
+        Path(kwargs["out"]).write_bytes(b"mp4")
+        return "cluster"
+    return fake_run_encode
+
+
+def _png(path, color):
+    Image.new("RGBA", (64, 64), color).save(path)
+    return path
+
+
+def test_episode_input_digest_is_deterministic_over_identical_content(
+        manifest, tmp_path):
+    plan = hive_series.episode_plan(manifest, 1)
+    staged = [_png(tmp_path / "a.png", (1, 2, 3, 255)),
+              _png(tmp_path / "b.png", (4, 5, 6, 255))]
+    first = hive_series.episode_input_digest(plan, staged)
+    second = hive_series.episode_input_digest(plan, staged)
+    assert first == second
+
+
+def test_episode_input_digest_tracks_every_content_class(manifest, tmp_path):
+    """Same-duration changes to the title card's pixels, the dossier copy,
+    the overlay copy, and the chapter bounds must EACH move the digest --
+    duration stays put, so only content can catch them."""
+    plan = hive_series.episode_plan(manifest, 1)
+    staged = [_png(tmp_path / "a.png", (1, 2, 3, 255))]
+    base = hive_series.episode_input_digest(plan, staged)
+
+    _png(tmp_path / "a.png", (9, 9, 9, 255))  # same size, new pixels
+    changed_pixels = hive_series.episode_input_digest(plan, staged)
+    assert changed_pixels != base
+
+    data = json.loads(json.dumps(manifest))
+    data["chapters"][0]["dossiers"] = [{
+        "login": "fixture", "github_id": 424242, "name": "Ada", "tasks": 1,
+    }]
+    changed_copy = hive_series.episode_input_digest(
+        hive_series.episode_plan(hive_series.load_manifest_data(data), 1),
+        staged)
+    assert changed_copy != base
+
+    data = json.loads(json.dumps(manifest))
+    data["overlays"][0]["lines"] = ["Same hold, different words."]
+    changed_overlay = hive_series.episode_input_digest(
+        hive_series.episode_plan(hive_series.load_manifest_data(data), 1),
+        staged)
+    assert changed_overlay != base
+
+    data = json.loads(json.dumps(manifest))
+    data["chapters"][0]["end"] = data["chapters"][0]["end"] - 1
+    data["chapters"][1]["start"] = data["chapters"][0]["end"]
+    changed_bounds = hive_series.episode_input_digest(
+        hive_series.episode_plan(hive_series.load_manifest_data(data), 1),
+        staged)
+    assert changed_bounds != base
+
+    # Unchanged content on the same plan and the same staged pixels is the
+    # skip case -- the digest holds.
+    assert hive_series.episode_input_digest(plan, staged) == changed_pixels
+
+
+def test_build_episode_skips_the_encode_when_the_digest_matches(
+        manifest, tmp_path, monkeypatch):
+    manifest_path, _data = _stage_episode(manifest, tmp_path, monkeypatch)
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
+    work = tmp_path / "work"
+
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 1
+    digest_path = work / "s01e01-the-enclave-inputs.json"
+    assert json.loads(digest_path.read_text())["sha256"]
+
+    # A stale sidecar is rewritten from the CURRENT plan even on a skip.
+    sidecar = work / "s01e01-the-enclave-unresolved.json"
+    sidecar.write_text('[{"stale": true}]\n')
+    out = hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert out.exists()
+    assert len(calls) == 1, "a matching digest must not re-encode"
+    assert json.loads(sidecar.read_text()) == []
+
+
+def test_freshness_skip_rewrites_unresolved_from_the_current_plan(
+        manifest, tmp_path, monkeypatch):
+    """The skip rewrites the sidecar even when the plan's unresolved list
+    changed WITHOUT touching any encoded content: an overlay with an
+    unknown position is recorded and omitted, so the digest stands, the
+    encode is skipped, and the sidecar still reflects the current plan."""
+    manifest_path, data = _stage_episode(manifest, tmp_path, monkeypatch)
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
+    work = tmp_path / "work"
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 1
+
+    data["overlays"].append({
+        "id": "mystery", "kind": "lower-third", "chapter": 1,
+        "source_at": 40.0, "position": "somewhere-unspecified",
+        "lines": ["Unplaced."], "copy_source": "owner_authored",
+        "nature": "project_lore", "note": "fixture",
+    })
+    manifest_path.write_text(json.dumps(data))
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 1, "an omitted overlay changes no encoded pixel"
+    sidecar = json.loads(
+        (work / "s01e01-the-enclave-unresolved.json").read_text())
+    assert any(entry.get("id") == "mystery" for entry in sidecar)
+
+
+def test_build_episode_adopts_a_verified_delivery_with_no_digest_on_record(
+        manifest, tmp_path, monkeypatch):
+    """Deliveries from before the digest existed are initialized safely: a
+    verified output with no sidecar is ADOPTED, not re-encoded -- the digest
+    is written from the current content and the build returns."""
+    manifest_path, _data = _stage_episode(manifest, tmp_path, monkeypatch)
+    out = tmp_path / "s01e01-the-enclave.mp4"
+    out.write_bytes(b"mp4")  # a prior delivery; verification is faked clean
+
+    def forbidden(argv, **kwargs):
+        raise AssertionError("a verified delivery with no digest must not "
+                             "be re-encoded -- the digest is adopted")
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", forbidden)
+    work = tmp_path / "work"
+    assert hive_series.build_episode(manifest_path, 1, work_dir=work) == out
+    digest = json.loads((work / "s01e01-the-enclave-inputs.json").read_text())
+    assert digest["sha256"] and digest["inputs"]
+    assert json.loads(
+        (work / "s01e01-the-enclave-unresolved.json").read_text()) == []
+
+
+def test_build_episode_rebuilds_when_dossier_copy_changes_at_same_duration(
+        manifest, tmp_path, monkeypatch):
+    data = _delivery_manifest(manifest, tmp_path)
+    data["chapters"][0]["dossiers"] = [{
+        "login": "fixture", "github_id": 424242, "name": "Ada", "tasks": 1,
+    }]
+    manifest_path, data = _stage_episode(
+        manifest, tmp_path, monkeypatch, data=data)
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
+    work = tmp_path / "work"
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 1
+    duration_before = calls[0]["expected_duration"]
+
+    data["chapters"][0]["dossiers"][0]["name"] = "Ada Byron"
+    manifest_path.write_text(json.dumps(data))
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 2, "same-duration dossier copy change must rebuild"
+    assert calls[1]["expected_duration"] == duration_before
+
+
+def test_build_episode_rebuilds_when_overlay_copy_changes_at_same_duration(
+        manifest, tmp_path, monkeypatch):
+    manifest_path, data = _stage_episode(manifest, tmp_path, monkeypatch)
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
+    work = tmp_path / "work"
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 1
+    duration_before = calls[0]["expected_duration"]
+
+    data["overlays"][0]["lines"] = ["Same hold.", "Different words."]
+    manifest_path.write_text(json.dumps(data))
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 2, "same-duration overlay copy change must rebuild"
+    assert calls[1]["expected_duration"] == duration_before
+
+
+def test_build_episode_rebuilds_when_a_title_slide_changes_at_same_duration(
+        manifest, tmp_path, monkeypatch):
+    data = _delivery_manifest(manifest, tmp_path)
+    slides = tmp_path / "slides"
+    slides.mkdir()
+    data["title_slide"]["output_dir"] = str(slides)
+    manifest_path, _data = _stage_episode(
+        manifest, tmp_path, monkeypatch, data=data)
+    loaded = hive_series.load_manifest(manifest_path)
+    chapter = hive_series.chapter_by_number(loaded, 1)
+    slide = slides / hive_series.title_slide_filename(chapter)
+    hive_series.render_title_slide(loaded, chapter).save(slide)
+
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
+    work = tmp_path / "work"
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 1
+    duration_before = calls[0]["expected_duration"]
+
+    with Image.open(slide) as img:
+        changed = img.convert("RGB")
+    ImageDraw.Draw(changed).rectangle([0, 0, 40, 40], fill=(255, 0, 0))
+    changed.save(slide)  # same canvas, same 5.0s hold, new pixels
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 2, "same-duration title slide change must rebuild"
+    assert calls[1]["expected_duration"] == duration_before
+
+
+# --- delivery stream verification -------------------------------------------
+
+
+def _conformant_video(**overrides):
+    props = {
+        "codec_name": "h264",
+        "width": hive_series.FRAME_W,
+        "height": hive_series.FRAME_H,
+        "avg_frame_rate": "60000/1001",
+        "r_frame_rate": "60000/1001",
+        "pix_fmt": "yuv420p",
+        "color_primaries": "bt709",
+        "color_transfer": "bt709",
+        "color_space": "bt709",
+        "profile": "High",
+        "level": "42",
+    }
+    props.update(overrides)
+    return props
+
+
+def _probe_with(tmp_path, monkeypatch, video, duration=150.0):
+    monkeypatch.setattr(hive_series, "_probe_duration",
+                        lambda *a, **k: duration)
+    monkeypatch.setattr(hive_series.conform, "probe_video",
+                        lambda *a, **k: video)
+    monkeypatch.setattr(
+        hive_series, "_probe_audio",
+        lambda *a, **k: {"codec_name": "aac", "sample_rate": "48000",
+                         "channels": 2})
+    target = tmp_path / "ep.mp4"
+    target.write_bytes(b"mp4")
+    return hive_series._probe_delivery_streams(
+        target, 150.0, ["ffmpeg"], 0.5)
+
+
+def test_delivery_probe_keeps_conforms_pix_fmt_color_profile_level_checks(
+        tmp_path, monkeypatch):
+    problems = _probe_with(tmp_path, monkeypatch, _conformant_video(
+        pix_fmt="yuv444p", color_primaries="bt2020", profile="Main",
+        level="51"))
+    text = "\n".join(problems)
+    assert "pixel format" in text
+    assert "color_primaries" in text
+    assert "profile" in text
+    assert "level" in text
+    assert "frame rate" not in text, "the fps verdict stands -- only the " \
+        "rounding case is overridden"
+
+
+def test_delivery_probe_overrides_only_the_fps_container_rounding(
+        tmp_path, monkeypatch):
+    """The known verdict: whole-second card durations never divide 60000/1001
+    evenly, so the container's avg_frame_rate lands ~0.008 fps off -- past
+    conform's 1e-3 but inside the delivery rounding slack."""
+    problems = _probe_with(tmp_path, monkeypatch, _conformant_video(
+        avg_frame_rate="32640000/544621", r_frame_rate="32640000/544621"))
+    assert problems == []
+
+
+def test_delivery_probe_reports_a_real_fps_mismatch(tmp_path, monkeypatch):
+    problems = _probe_with(tmp_path, monkeypatch, _conformant_video(
+        avg_frame_rate="30/1", r_frame_rate="30/1"))
+    assert any("frame rate" in p for p in problems)
+
+
+def test_delivery_probe_reports_a_duration_mismatch(tmp_path, monkeypatch):
+    problems = _probe_with(tmp_path, monkeypatch, _conformant_video(),
+                           duration=149.0)
+    assert any("duration" in p for p in problems)
+
+
+# --- the cut's one interface ---------------------------------------------------
+
+
+def test_build_cut_enforces_episode_verification_before_concat(
+        manifest, tmp_path, monkeypatch):
+    manifest_path = tmp_path / "season.json"
+    manifest_path.write_text(json.dumps(_delivery_manifest(manifest, tmp_path)))
+    monkeypatch.setattr(hive_series, "build_all", lambda *a, **k: [])
+    monkeypatch.setattr(
+        hive_series, "verify_episode",
+        lambda m, number, **k: ["s01e04: duration off"] if number == 4 else [])
+
+    def forbidden(*a, **k):
+        raise AssertionError("unverified episodes must never be concatenated")
+
+    monkeypatch.setattr(hive_series, "concat_episodes", forbidden)
+    with pytest.raises(hive_series.UnverifiedEpisodes) as caught:
+        hive_series.build_cut(manifest_path)
+    assert caught.value.problems == ["s01e04: duration off"]
+
+
+def test_build_cut_joins_verified_episodes_and_reports_the_cut(
+        manifest, tmp_path, monkeypatch):
+    manifest_path = tmp_path / "season.json"
+    manifest_path.write_text(json.dumps(_delivery_manifest(manifest, tmp_path)))
+    monkeypatch.setattr(hive_series, "build_all", lambda *a, **k: [])
+    monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
+    cut = tmp_path / "season-01-full.mp4"
+
+    def fake_concat(manifest, out_path=None, **kwargs):
+        cut.write_bytes(b"mp4")
+        return cut
+
+    monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
+    probed = []
+
+    def fake_probe(path, expected, ffmpeg, tolerance):
+        probed.append(Path(path).name)
+        return []
+
+    monkeypatch.setattr(hive_series, "_probe_delivery_streams", fake_probe)
+    out, problems = hive_series.build_cut(manifest_path)
+    assert out == cut
+    assert problems == []
+    assert probed == ["season-01-full.mp4"], \
+        "episodes were verified pre-concat; the post-join probe is the cut's"
+
+
+def test_cut_command_goes_through_build_cut(tmp_path, monkeypatch):
+    monkeypatch.setattr(hive_series, "build_cut",
+                        lambda *a, **k: (tmp_path / "season-01-full.mp4", []))
+    assert hive_series.main(["cut"]) == 0
+
+
+def test_cut_command_reports_unverified_episodes_without_joining(
+        tmp_path, monkeypatch):
+    def refuse(*a, **k):
+        raise hive_series.UnverifiedEpisodes(["s01e07: probe failed"])
+
+    monkeypatch.setattr(hive_series, "build_cut", refuse)
+    assert hive_series.main(["cut"]) == 1

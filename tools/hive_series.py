@@ -1133,6 +1133,91 @@ def _write_unresolved(work_dir, slug, unresolved):
     return path
 
 
+# --- content-derived freshness --------------------------------------------------
+
+
+def episode_input_digest(plan, staged, source=None):
+    """The content an existing episode is fresh AGAINST, as one digest.
+
+    Media verification answers "is this file a well-formed delivery"; it
+    cannot answer "is this file the current CUT" -- a title slide with new
+    copy encodes to the same 5.0 seconds and verifies clean. So freshness
+    is derived from the content itself: the plan (chapter bounds, dossier
+    snapshots, plate specs, lore overlay copy, the timeline's durations),
+    the manifest's pinned source block, and every staged input the encode
+    consumes, in graph order. Same digest, same episode -- a skip is then
+    a content statement, not a duration coincidence.
+
+    Staged inputs are hashed as DECODED PIXELS, not file bytes: Pillow's
+    PNG output shifts with the process-global `ImageFile.MAXBLOCK` (which
+    `tools/thumbnail.py` raises at import), so byte hashing would make the
+    same pixels look changed across processes. Pixels are what the encoder
+    decodes the PNGs back to, so pixel content is exactly the input.
+
+    Deterministic by construction: the plan is manifest-derived, and the
+    card renderers are pinned pixel-identical by their own tests."""
+    h = hashlib.sha256()
+
+    def note(kind, payload):
+        h.update(kind.encode("utf-8"))
+        h.update(b"\0")
+        h.update(json.dumps(payload, sort_keys=True).encode("utf-8"))
+        h.update(b"\0")
+
+    if source is not None:
+        note("source", source)
+    chapter = plan["chapter"]
+    note("chapter", {"number": chapter["number"],
+                     "start": chapter["start"], "end": chapter["end"]})
+    for segment in plan["segments"]:
+        entry = {"kind": segment["kind"]}
+        if segment["kind"] == "chapter":
+            entry["start"] = segment["start"]
+            entry["end"] = segment["end"]
+        else:
+            entry["dur"] = segment["dur"]
+        if "snapshot" in segment:
+            entry["snapshot"] = segment["snapshot"]
+        note("segment", entry)
+    for spec in plan["plates"]:
+        note("plate", spec)
+    for overlay in plan["overlays"]:
+        note("overlay", overlay)
+    note("offsets", {"front_offset": plan["front_offset"],
+                     "expected_duration": plan["expected_duration"]})
+    for path in staged:
+        path = Path(path)
+        h.update(b"image\0")
+        h.update(path.name.encode("utf-8"))
+        h.update(b"\0")
+        with Image.open(path) as img:
+            rgba = img.convert("RGBA")
+            h.update(f"{rgba.width}x{rgba.height}".encode("utf-8"))
+            h.update(b"\0")
+            h.update(rgba.tobytes())
+        h.update(b"\0")
+    return h.hexdigest()
+
+
+def _read_input_digest(path):
+    """The digest on record, or None when the sidecar is absent or unreadable
+    -- an unreadable record is treated as no record, never as a match."""
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))["sha256"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
+def _write_input_digest(path, digest, staged):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({
+        "sha256": digest,
+        "inputs": [Path(p).name for p in staged],
+    }, indent=1) + "\n", encoding="utf-8")
+    return path
+
+
 def _render_overlay_pngs(plan, source, ffmpeg, work_dir, slug, unresolved,
                          log):
     """The episode's overlay inputs, in graph order: the fixed plates through
@@ -1178,10 +1263,16 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
     """One episode, built and delivered: cards, one farm-first encode,
     thumbnail, unresolved sidecar.
 
-    An output that already exists AND verifies is kept -- rebuilding twelve
-    identical encodes on every `hive-cut` run would be waste, and the
-    verification is the freshness check, not the file's mere existence. To
-    rebuild, delete the delivered file first."""
+    Freshness is content-derived, never duration-derived: the plan and the
+    pixel content of every staged input hash to a digest kept in
+    ``<slug>-inputs.json`` beside the unresolved sidecar, and an existing
+    output is kept only when it verifies AND the digest still matches -- a
+    same-duration copy change rebuilds. A verified output with NO digest on
+    record is adopted: the digest is initialized from the current content
+    and the file kept, so deliveries from before this check are not
+    re-encoded for want of a sidecar. Either way the skip rewrites the
+    unresolved sidecar from the CURRENT plan before returning -- it can
+    never be left missing or stale."""
     manifest = load_manifest(manifest_path)
     ffmpeg = ffmpeg or render.find_ffmpeg()
     plan = episode_plan(manifest, episode_number)
@@ -1191,14 +1282,6 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
     thumb = thumbnail_output_path(chapter)
     work = Path(work_dir) if work_dir is not None else WORK_DIR
     work.mkdir(parents=True, exist_ok=True)
-
-    if out.exists() and not verify_episode(manifest, episode_number,
-                                           ffmpeg=ffmpeg):
-        log(f"  {slug}: already built and verified -- {out}")
-        if not thumb.exists():
-            make_thumbnail(plan["segments"][1]["asset"], thumb)
-            log(f"  thumbnail: {thumb}")
-        return out
 
     source = Path(ensure_source(manifest)).resolve()
     unresolved = list(plan["unresolved"])
@@ -1220,6 +1303,27 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
 
     overlay_pngs = _render_overlay_pngs(
         plan, source, ffmpeg, work, slug, unresolved, log)
+    staged = [*stills, *overlay_pngs]
+    digest = episode_input_digest(plan, staged, source=manifest["source"])
+    digest_path = work / f"{slug}-inputs.json"
+
+    if out.exists() and not verify_episode(manifest, episode_number,
+                                           ffmpeg=ffmpeg):
+        stored = _read_input_digest(digest_path)
+        if stored == digest:
+            log(f"  {slug}: already built and verified -- {out}")
+        elif stored is None:
+            log(f"  {slug}: verified delivery with no digest on record; "
+                f"adopting the current content as its digest")
+            _write_input_digest(digest_path, digest, staged)
+        if stored is None or stored == digest:
+            _write_unresolved(work, slug, unresolved)
+            if not thumb.exists():
+                make_thumbnail(plan["segments"][1]["asset"], thumb)
+                log(f"  thumbnail: {thumb}")
+            return out
+        log(f"  {slug}: content changed since the delivered encode "
+            f"({stored[:12]}... -> {digest[:12]}...) -- rebuilding")
 
     out.parent.mkdir(parents=True, exist_ok=True)
     out = out.resolve()
@@ -1233,6 +1337,7 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
         label=f"Hive {slug}")
     log(f"  {slug}: encoded on {where} -- {out}")
 
+    _write_input_digest(digest_path, digest, staged)
     _write_unresolved(work, slug, unresolved)
     for item in unresolved:
         log(f"  unresolved: {item}")
@@ -1301,16 +1406,46 @@ def concat_episodes(manifest, out_path=None, ffmpeg=None, work_dir=None,
     return out_path
 
 
+class UnverifiedEpisodes(RuntimeError):
+    """The cut refused its inputs: one or more episodes did not verify.
+
+    Carries the full ``problems`` report. The join is a blind stream copy,
+    so an episode that fails verification goes NOWHERE near it -- the cut
+    is only ever concatenated from verified episodes."""
+
+    def __init__(self, problems):
+        self.problems = list(problems)
+        super().__init__(
+            f"{len(self.problems)} episode verification problem(s)")
+
+
 def build_cut(manifest_path=None, local=False, ffmpeg=None, log=print):
-    """Build and verify all twelve episodes, then the full-season cut."""
+    """The ONE way to the full-season cut: build every episode, verify each
+    one, and only then join.
+
+    Returns ``(out_path, problems)`` -- the cut's own post-join report,
+    empty when the delivered file verifies. An episode that does not verify
+    is never concatenated: the report is logged and raised as
+    `UnverifiedEpisodes` before the join runs. The CLI and the justfile
+    both go through here; there is no second path to a cut."""
     manifest = load_manifest(manifest_path)
     build_all(manifest_path, local=local, ffmpeg=ffmpeg, log=log)
+    problems = []
+    for chapter in manifest["chapters"]:
+        problems.extend(
+            verify_episode(manifest, chapter["number"], ffmpeg=ffmpeg))
+    if problems:
+        for problem in problems:
+            log(f"  verify: {problem}")
+        raise UnverifiedEpisodes(problems)
     out = concat_episodes(manifest, ffmpeg=ffmpeg)
     log(f"  full cut: {out}")
-    problems = verify_cut(manifest, ffmpeg=ffmpeg)
+    problems = _probe_delivery_streams(
+        full_cut_path(manifest), cut_expected_duration(manifest),
+        ffmpeg or render.find_ffmpeg(), CUT_TOLERANCE_S)
     for problem in problems:
         log(f"  verify: {problem}")
-    return out
+    return out, problems
 
 
 # --- verification ---------------------------------------------------------------------
@@ -1361,8 +1496,14 @@ def _fps_is_delivery(reported):
 def _probe_delivery_streams(path, expected, ffmpeg, tolerance):
     """The problems a delivered file has, as a list -- empty means verified.
 
-    A report, never a gate: the caller logs the problems and ships anyway
-    (AGENTS.md: nothing blocks a release)."""
+    The stream checks ARE `conform.mismatches`: pixel format, color,
+    profile and level ride along with codec/size/rate because the full cut
+    joins these files blind. The ONE override is the frame rate: conform's
+    rational comparison cannot know the mp4 container-rounding verdict
+    (`_fps_is_delivery`), so a conform frame-rate mismatch is kept only
+    when `_fps_is_delivery` also fails. A report, never a gate: the caller
+    logs the problems and ships anyway (AGENTS.md: nothing blocks a
+    release)."""
     problems = []
     path = Path(path)
     if not path.exists() or path.stat().st_size == 0:
@@ -1375,20 +1516,12 @@ def _probe_delivery_streams(path, expected, ffmpeg, tolerance):
                 f"{duration - expected:+.3f}s from the expected "
                 f"{expected:.3f}s (tolerance {tolerance}s)")
         video = conform.probe_video(path, conform.ffprobe_for(ffmpeg))
-        if video.get("codec_name") != "h264":
-            problems.append(
-                f"{path.name}: video codec {video.get('codec_name')!r} "
-                "is not h264")
-        if (video.get("width"), video.get("height")) != (FRAME_W, FRAME_H):
-            problems.append(
-                f"{path.name}: {video.get('width')}x{video.get('height')} "
-                f"is not {FRAME_W}x{FRAME_H}")
-        if video.get("r_frame_rate") != conform.DELIVERY.fps and \
-                not _fps_is_delivery(video.get("avg_frame_rate")):
-            problems.append(
-                f"{path.name}: frame rate r={video.get('r_frame_rate')!r} "
-                f"avg={video.get('avg_frame_rate')!r} is not "
-                f"{conform.DELIVERY.fps}")
+        fps_ok = video.get("r_frame_rate") == conform.DELIVERY.fps or \
+            _fps_is_delivery(video.get("avg_frame_rate"))
+        for bad in conform.mismatches(video):
+            if fps_ok and bad.startswith("frame rate"):
+                continue
+            problems.append(f"{path.name}: {bad}")
         audio = _probe_audio(path, ffmpeg)
         if audio.get("codec_name") != "aac":
             problems.append(
@@ -1590,17 +1723,13 @@ def _cmd_build_all(args):
 
 
 def _cmd_cut(args):
-    manifest = load_manifest()
-    problems = []
-    for chapter in manifest["chapters"]:
-        problems.extend(verify_episode(manifest, chapter["number"]))
-    if problems:
-        # The cut is only as good as its twelve inputs; report and stop
-        # short of joining files that did not verify.
-        return _report_verify(problems)
-    out = concat_episodes(manifest)
+    """The full-season cut, through the one interface that owns it."""
+    try:
+        out, problems = build_cut(MANIFEST, local=args.local)
+    except UnverifiedEpisodes as exc:
+        return _report_verify(exc.problems)
     print(f"full cut: {out}")
-    return _report_verify(verify_cut(manifest))
+    return _report_verify(problems)
 
 
 def _cmd_verify(args):
@@ -1624,9 +1753,9 @@ def main(argv=None):
         "build-all", help="build and verify all twelve episodes")
     build_all_p.add_argument("--local", action="store_true")
     cut = sub.add_parser(
-        "cut", help="concatenate the verified episodes into the full cut")
+        "cut", help="build, verify, and join the episodes into the full cut")
     cut.add_argument("--local", action="store_true",
-                     help="accepted for symmetry; the join is a local remux")
+                     help="encode here, memory-capped, instead of the farm")
     verify = sub.add_parser(
         "verify", help="probe the delivered files (one episode, or all+cut)")
     verify.add_argument("number", type=int, nargs="?", default=None)
