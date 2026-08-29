@@ -21,9 +21,9 @@
    "footage_rights": {
     "yt_nightwish_perfume_of_the_timeless": "music/bed_perfume_of_the_timeless.json"
    },
-   "source_digest": "5a46ef458ca26c64e49b919d4ae11db96be2edf780dee696e83f8a79cec5b183",
+   "source_digest": "53debb1609cc42726476d209907bf9cd6fbe384e26792752896f3b909fb9e046",
    "footage_digest": "fac9a6c7d103836f454d7c1c49181c2983ecbed43ca01f0f2bcc1e9a924a635a",
-   "built_from_commit": "0033f66527d342b16c3937fb8da00e1c895ba155"
+   "built_from_commit": "fcbfd52bce9003ae41b5d7d1295522682cfb044d"
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
@@ -70,9 +70,9 @@
     "yt_destiny_all_live_action_trailers",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "96658e5102691640fdee80b94b726d842a67f56f0f8b1fa65650cbf5e4f96443",
+   "source_digest": "c3ef0d3fa42dcf71c73a9f3dd37aae436b30b5928b81867d88ab3b3d4057609d",
    "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad",
-   "built_from_commit": "71c8853b190e8d81e35542eac41e80640f2d1a0d"
+   "built_from_commit": "fcbfd52bce9003ae41b5d7d1295522682cfb044d"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -99,10 +99,10 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "50ae463652ddcfcc0e68838814c41b9ec19d718a8cef0170bfc0751051e41683",
+   "source_digest": "3e058b1036e6d78b5ac479e5c9aea28a31fb44e017c7675a7028984e1dcaa190",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "env ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json",
-   "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
+   "built_from_commit": "fcbfd52bce9003ae41b5d7d1295522682cfb044d"
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
@@ -117,11 +117,11 @@
     "chapters/IV-kat.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "b8157c7b1cb899b4098e95d3aa5f09350f0c2534eb5dd299a0cff4bf78b0a7c3",
+   "source_digest": "fd4a951412069d8b790457053625188a8b957672ab6942f4422ebe6361caeb36",
    "rebuild": "python3 scripts/build_kat.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "60f24af4c12ea8a9973aaf76b1602dee7cca177620d58d3c369aa8439b1269f4",
-   "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
+   "built_from_commit": "fcbfd52bce9003ae41b5d7d1295522682cfb044d"
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
@@ -136,11 +136,11 @@
     "chapters/V-nat.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "e6c12bd1fabe4e725863a3c891e4cee76da723ccbf3c519cecea570caa491ec0",
+   "source_digest": "91f837dca7b23c4041d45579468c3332618d6c68b6de41e2238278c704add6fc",
    "rebuild": "python3 scripts/build_natali.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "b18bdaaf50692c0897aba07e91ac31c2c3b67c77b18606450554dc231eec07cf",
-   "built_from_commit": "97afc9c59400a42b952fdaf179738907983974b2"
+   "built_from_commit": "fcbfd52bce9003ae41b5d7d1295522682cfb044d"
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v9.mp4",
@@ -170,9 +170,9 @@
     "yt_destiny_2_lightfall_launch_trailer",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "87ea89e336ca8d72387f94cf60fc9c180f8638c70964c8226262f879d64720e0",
+   "source_digest": "44e9f4ca3bef0ea1630f7f9e0ae4526f74920d549c7498d0feea619c2c451822",
    "footage_digest": "21c943bcda5ccc2cbae2b3c08cebcf6794763babda3f4304e612e1724bb4220b",
-   "built_from_commit": "b4310e944a42b499642d682dc34f207dbddc65ea"
+   "built_from_commit": "fcbfd52bce9003ae41b5d7d1295522682cfb044d"
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
@@ -192,11 +192,11 @@
     "chapters/VII-europa.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "00a80ffc63071bc654999e15892d5601eefae752432dfa56548ee68d91f5531f",
+   "source_digest": "8605e1d0adadf304f366872412e16b51fd95dd1009897caa852b2707677e523d",
    "rebuild": "python3 scripts/build_europa.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "d22c307e1c824644364ab1e2f6fd372be916cce45f89ef8fe51efdc22a01a2bd",
-   "built_from_commit": "24b61be902a284737b8f565c3240011daef01e6a"
+   "built_from_commit": "fcbfd52bce9003ae41b5d7d1295522682cfb044d"
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
@@ -214,9 +214,9 @@
     "chapters/VIII-fixed.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "073b86ac44c83a785fd2f57389442144c7b5d8938f8dfda8aa5a415378a52440",
+   "source_digest": "dff8966e8835fca7da5ebed7193adb54efd5d320eaa2450d1e705456ab1cfb3f",
    "rebuild": "python3 scripts/build_credits.py --out ~/Videos/wolves-credits/08-credits-master.mp4",
-   "built_from_commit": "24b61be902a284737b8f565c3240011daef01e6a"
+   "built_from_commit": "fcbfd52bce9003ae41b5d7d1295522682cfb044d"
   }
  },
  "social": {

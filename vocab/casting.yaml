@@ -583,7 +583,8 @@ ensemble:
     joseph_sandoval:
       # KEYED BY NAME because the authored plate predates the verified account
       # binding. github.com/jrsapi is Joseph Sandoval (u/5437766); the avatar
-      # is safe to reuse without changing the owner-authored visible name.
+      # resolves from that verified login without changing the owner-authored
+      # visible name.
       #
       # Owner: "he no longer does leadership he used to [do] Ricardo's job,
       # now he just fights. He still has a gold badge he's just not the Chair
@@ -594,7 +595,7 @@ ensemble:
       name: Joseph Sandoval
       title: "Master Wielder | Uplifter of Users"
       variant: leader
-      avatar: https://avatars.githubusercontent.com/u/5437766?v=4
+      avatar: https://github.com/jrsapi.png?size=256
     KyleGospo:
       # github.com/KyleGospo. Owner: "he is special but don't say why" -- so
       # the plate carries NO explanation, only the bazzite chrome and the
