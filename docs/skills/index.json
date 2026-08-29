@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-28",
+  "generated_at": "2026-08-29",
   "skills": [
     {
       "id": "chapters",
@@ -38,6 +38,25 @@
       "version": "1.1",
       "last_updated": "2026-08-24",
       "doc_type": "runbook"
+    },
+    {
+      "id": "hive",
+      "name": "hive",
+      "one_line_purpose": "Build the Season of the Blueberries episodes and the full-season cut.",
+      "entry_point": "docs/skills/hive.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "hive",
+        "season-of-the-blueberries",
+        "episodes",
+        "farm",
+        "delivery"
+      ],
+      "description": "Build one weekly Hive episode or the whole Season of the Blueberries from the committed season manifest: farm-first encodes, one source download, a stream-copy season cut.",
+      "version": "1.0",
+      "last_updated": "2026-08-29",
+      "doc_type": "procedure"
     },
     {
       "id": "testing",

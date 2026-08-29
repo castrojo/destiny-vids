@@ -727,3 +727,488 @@ def test_dossier_renders_a_wide_face_letterboxed_and_uncropped():
     pixels = {raw[i:i + 3] for i in range(0, len(raw), 3)}
     for colour in colours:
         assert bytes(colour) in pixels, f"corner {colour} cropped out"
+
+
+# --- Task 3: episode and season builds ---------------------------------------
+#
+# The episode is ONE encode: opening CTA (10s, silent), title slide (5s,
+# silent), zero-to-three dossier cards (4s each, silent), the manifest's
+# source chapter with its own audio and the fixed/source-authored overlays at
+# chapter-relative times, and the closing training CTA (10s, silent). The
+# source is fetched once and reused; the encode goes through farm.run_encode;
+# the full cut concatenates the twelve episodes without re-encoding.
+
+
+def _doctored(manifest, mutate):
+    data = json.loads(json.dumps(manifest))
+    mutate(data)
+    return hive_series.load_manifest_data(data)
+
+
+# --- the timeline ------------------------------------------------------------
+
+def test_episode_timeline_is_the_five_authored_beats(manifest):
+    chapter = hive_series.chapter_by_number(manifest, 1)
+    segments = hive_series.episode_segments(manifest, chapter)
+    assert [s["kind"] for s in segments] == [
+        "opening_cta", "title_slide", "chapter", "closing_cta",
+    ]
+    assert segments[0]["dur"] == 10.0
+    assert segments[1]["dur"] == 5.0
+    assert segments[2]["start"] == 0.0 and segments[2]["end"] == 125.0
+    assert segments[2]["audio"] == "source"
+    assert segments[3]["dur"] == 10.0
+    # The silent cards carry no source audio.
+    for still in (segments[0], segments[1], segments[3]):
+        assert still["audio"] == "silent"
+
+
+def test_zero_to_three_dossier_cards_sit_between_title_and_chapter(manifest):
+    doctored = _doctored(manifest, lambda d: d["chapters"][0].__setitem__(
+        "dossiers",
+        [
+            {"login": "alice", "github_id": 11, "name": "Alice A", "tasks": 2},
+            {"login": "bob", "github_id": 22, "name": "", "tasks": 1},
+        ],
+    ))
+    chapter = hive_series.chapter_by_number(doctored, 1)
+    segments = hive_series.episode_segments(doctored, chapter)
+    assert [s["kind"] for s in segments] == [
+        "opening_cta", "title_slide", "dossier", "dossier",
+        "chapter", "closing_cta",
+    ]
+    dossiers = [s for s in segments if s["kind"] == "dossier"]
+    assert all(s["dur"] == hive_series.DOSSIER_DURATION == 4.0
+               for s in dossiers)
+    assert all(s["audio"] == "silent" for s in dossiers)
+    assert [s["snapshot"]["login"] for s in dossiers] == ["alice", "bob"]
+
+
+def test_source_marks_convert_to_chapter_relative_never_move(manifest):
+    """Absolute source seats become chapter-relative content time, then the
+    front cards offset them into episode time. The authored source mark
+    itself is never adjusted."""
+    ch1 = hive_series.chapter_by_number(manifest, 1)
+    ch8 = hive_series.chapter_by_number(manifest, 8)  # 579.0-744.0
+    assert hive_series.front_cards_duration(manifest, ch1) == 15.0
+    assert hive_series.source_to_chapter_relative(36.0, ch1) == 36.0
+    assert hive_series.source_to_episode_time(36.0, manifest, ch1) == 51.0
+    assert hive_series.source_to_chapter_relative(687.0, ch8) == 108.0
+    assert hive_series.source_to_episode_time(687.0, manifest, ch8) == 123.0
+    # The owner overlays: ship at source 113.0 (ch1), review at 243.0 (ch3).
+    ch3 = hive_series.chapter_by_number(manifest, 3)  # 218.0-309.0
+    assert hive_series.source_to_episode_time(113.0, manifest, ch1) == 128.0
+    assert hive_series.source_to_episode_time(243.0, manifest, ch3) == 40.0
+
+
+def test_front_offset_counts_the_dossier_cards(manifest):
+    doctored = _doctored(manifest, lambda d: d["chapters"][0].__setitem__(
+        "dossiers",
+        [{"login": "alice", "github_id": 11, "name": "A", "tasks": 1}],
+    ))
+    chapter = hive_series.chapter_by_number(doctored, 1)
+    assert hive_series.front_cards_duration(doctored, chapter) == 19.0
+    assert hive_series.source_to_episode_time(36.0, doctored, chapter) == 55.0
+
+
+def test_episode_expected_duration_includes_cards_and_chapter(manifest):
+    ch1 = hive_series.chapter_by_number(manifest, 1)
+    assert hive_series.episode_expected_duration(manifest, ch1) == 150.0
+    ch6 = hive_series.chapter_by_number(manifest, 6)  # 484-501, 17s
+    assert hive_series.episode_expected_duration(manifest, ch6) == 42.0
+
+
+def test_season_aggregate_duration_is_the_twelve_episodes(manifest):
+    chapter_seconds = sum(end - start
+                          for start, end, _title in CAPTURED_CHAPTERS)
+    assert chapter_seconds == 1248.0
+    expected = chapter_seconds + 12 * (10.0 + 5.0 + 10.0)
+    assert hive_series.cut_expected_duration(manifest) == expected == 1548.0
+
+
+# --- the one-pass graph ------------------------------------------------------
+
+def test_episode_filtergraph_is_one_pass_with_one_source_decode(manifest):
+    plan = hive_series.episode_plan(manifest, 1)
+    graph = hive_series.episode_filtergraph(plan)
+    # One source decode, trimmed to the chapter window exactly once.
+    assert graph.count("[0:v]trim=start=0:end=125") == 1
+    assert graph.count("[0:a]atrim=start=0:end=125") == 1
+    # Every still leg holds its authored duration on generated silence.
+    assert "trim=duration=10" in graph
+    assert "trim=duration=5" in graph
+    assert graph.count("anullsrc=r=48000:cl=stereo") == 3  # cta, title, closing
+    # The chapter's own audio is carried, pinned to the delivery layout.
+    assert "aformat=sample_fmts=fltp:channel_layouts=stereo" in graph
+    # Chapter 1 seats, chapter-relative: ikora at 36, eris at 60, and the
+    # ship overlay at 113 with the tooling default hold.
+    assert "enable='between(t,36,40)'" in graph
+    assert "enable='between(t,60,64)'" in graph
+    assert f"enable='between(t,113,{113 + hive_series.LORE_OVERLAY_DUR:g})'" in graph
+    # One concat joining every segment, picture and sound, out of the graph.
+    assert "concat=n=4:v=1:a=1[outv][outa]" in graph
+
+
+def test_episode_filtergraph_overlay_inputs_follow_the_stills(manifest):
+    """Input order is fixed: 0 is the source, the stills follow in segment
+    order, and the overlay PNGs come last -- the graph must index them so."""
+    plan = hive_series.episode_plan(manifest, 1)
+    graph = hive_series.episode_filtergraph(plan)
+    # 3 stills (cta, title, closing), so overlay inputs start at 4.
+    assert "[4:v]overlay=0:0:enable='between(t,36,40)'" in graph
+    assert "[5:v]overlay=0:0:enable='between(t,60,64)'" in graph
+    assert "[6:v]overlay=0:0" in graph
+    assert "[7:v]" not in graph
+
+
+def test_episode_filtergraph_resamples_only_a_non_delivery_rate(manifest):
+    plan = hive_series.episode_plan(manifest, 1)
+    at_48k = hive_series.episode_filtergraph(plan, source_rate=48000)
+    assert "aresample" not in at_48k
+    at_44k = hive_series.episode_filtergraph(plan, source_rate=44100)
+    assert "aresample=48000" in at_44k
+
+
+def test_episode_filtergraph_dossiers_grow_the_still_legs(manifest):
+    doctored = _doctored(manifest, lambda d: d["chapters"][0].__setitem__(
+        "dossiers",
+        [{"login": "alice", "github_id": 11, "name": "A", "tasks": 1}],
+    ))
+    plan = hive_series.episode_plan(doctored, 1)
+    graph = hive_series.episode_filtergraph(plan)
+    assert graph.count("anullsrc=r=48000:cl=stereo") == 4
+    assert "trim=duration=4" in graph
+    assert "concat=n=5:v=1:a=1[outv][outa]" in graph
+    # The chapter trim itself never moves: only the concat count grows.
+    assert graph.count("[0:v]trim=start=0:end=125") == 1
+
+
+def test_encode_episode_command_uses_the_delivery_encode_recipe(tmp_path):
+    out = tmp_path / "ep.mp4"
+    argv = hive_series.encode_episode_command(
+        ["ffmpeg"], tmp_path / "src.mkv",
+        [tmp_path / "a.png", tmp_path / "b.png"], [tmp_path / "p.png"],
+        "GRAPH", out)
+    text = " ".join(map(str, argv))
+    # Still inputs loop at the delivery rate; the source is input 0.
+    assert argv[:4] == ["ffmpeg", "-v", "error", "-y"]
+    assert text.count("-loop 1 -framerate 60000/1001 -i") == 3
+    # The delivery x264 recipe comes from conform, and AAC 48 kHz stereo.
+    for token in ("libx264", "-crf 16", "high", "4.2", "+cgop", "bt709"):
+        assert token in text
+    assert "-c:a aac" in text and "-b:a 320k" in text and "-ar 48000" in text
+    assert "+faststart" in text
+    assert "-map [outv]" in text and "-map [outa]" in text
+
+
+# --- the source is fetched once ------------------------------------------------
+
+def test_source_fetch_command_uses_the_manifests_pinned_formats(manifest, tmp_path):
+    out = tmp_path / "jlzQnXcUxqI.mkv"
+    argv = hive_series.source_fetch_command(manifest, out)
+    text = " ".join(map(str, argv))
+    assert argv[0] == "yt-dlp"
+    assert "-f 137+251" in text
+    assert "https://www.youtube.com/watch?v=jlzQnXcUxqI" in text
+    assert "--merge-output-format mkv" in text
+    assert "player_client" in text
+    assert "best" not in text.split("-f")[1].split()[0]
+
+
+def test_ensure_source_fetches_once_and_reuses_the_cache(manifest, tmp_path):
+    calls = []
+
+    def fake_runner(argv, **kwargs):
+        calls.append(argv)
+        Path(argv[-2]).write_bytes(b"mkv")  # -o <out> precedes the url
+
+        class _Done:
+            returncode = 0
+        return _Done()
+
+    first = hive_series.ensure_source(manifest, cache_dir=tmp_path,
+                                      runner=fake_runner)
+    assert first == (tmp_path / "jlzQnXcUxqI.mkv").resolve()
+    assert len(calls) == 1
+    # A non-empty cache file is the evidence the fetch ran: never re-fetch.
+    again = hive_series.ensure_source(manifest, cache_dir=tmp_path,
+                                      runner=fake_runner)
+    assert again == first
+    assert len(calls) == 1
+
+
+def test_ensure_source_checks_by_youtube_id_not_episode(manifest, tmp_path):
+    """Twelve episodes, ONE cached file: the cache key is the source id."""
+    assert hive_series.source_cache_path(manifest, tmp_path).name == \
+        "jlzQnXcUxqI.mkv"
+
+
+# --- farm-first execution ------------------------------------------------------
+
+def test_encode_episode_routes_through_farm_run_encode(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_run_encode(argv, **kwargs):
+        captured["argv"] = argv
+        captured.update(kwargs)
+        return "cluster"
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
+    out = tmp_path / "ep.mp4"
+    where = hive_series.encode_episode(
+        ["ffmpeg", "-i", "x"], inputs=[tmp_path / "x"], out=out,
+        expected_duration=150.0, label="test")
+    assert where == "cluster"
+    assert captured["out"] == out
+    assert captured["expected_duration"] == 150.0
+    assert captured["local"] is False
+
+
+def test_encode_episode_passes_the_local_flag_through(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_run_encode(argv, **kwargs):
+        captured.update(kwargs)
+        return "local"
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
+    where = hive_series.encode_episode(
+        ["ffmpeg"], inputs=[], out=tmp_path / "ep.mp4",
+        expected_duration=1.0, local=True)
+    assert where == "local"
+    assert captured["local"] is True
+
+
+# --- stable output paths ---------------------------------------------------------
+
+def test_delivery_paths_come_straight_from_the_manifest(manifest):
+    first = hive_series.chapter_by_number(manifest, 1)
+    out = hive_series.episode_output_path(first)
+    assert out == Path.home() / (
+        "Videos/Hive/Season-of-the-Blueberries/s01e01-the-enclave.mp4")
+    thumb = hive_series.thumbnail_output_path(first)
+    assert thumb == Path.home() / (
+        "Videos/Hive/Season-of-the-Blueberries/"
+        "s01e01-the-enclave-thumbnail.jpg")
+    cut = hive_series.full_cut_path(manifest)
+    assert cut == Path.home() / (
+        "Videos/Hive/Season-of-the-Blueberries/season-01-full.mp4")
+    for path in (out, thumb, cut):
+        assert "review" not in str(path), "no review folder: these ARE delivery"
+
+
+# --- the project-lore overlays ---------------------------------------------------
+
+def test_lore_overlay_seats_bottom_right_clear_of_the_heroes(manifest):
+    ship = next(o for o in manifest["overlays"] if o["id"] == "savathuns-ship")
+    card = hive_series.render_lore_overlay(ship)
+    assert card.mode == "RGBA" and card.width < 1920
+    frame = hive_series.place_lore_overlay(card, "bottom-right")
+    assert frame.size == (1920, 1080)
+    x0, y0, x1, y1 = frame.getbbox()
+    # Bottom-right safe area, measured like the plate lane's margins: 5%
+    # side inset, 10% bottom margin -- and never in the lower-left lane the
+    # hero plates hold.
+    assert x1 >= 1920 - 0.05 * 1920 - 1
+    assert x1 <= 1920 - 40
+    assert y1 >= 1080 - 0.10 * 1080 - 1
+    assert y1 <= 1080 - 20
+    assert x0 > 960, "the ship overlay must not reach the heroes' left lane"
+
+
+def test_lore_overlay_top_third_stays_in_the_top_third(manifest):
+    review = next(
+        o for o in manifest["overlays"] if o["id"] == "business-value-review")
+    card = hive_series.render_lore_overlay(review)
+    frame = hive_series.place_lore_overlay(card, "top-third")
+    x0, y0, x1, y1 = frame.getbbox()
+    assert y1 <= 1080 / 3, "the cataclysm note stays in the top third"
+    assert abs((x0 + x1) / 2 - 960) < 40, "centred on the picture"
+
+
+def test_lore_overlay_renders_verbatim_lines_and_nothing_else(manifest):
+    ship = next(o for o in manifest["overlays"] if o["id"] == "savathuns-ship")
+    two = hive_series.render_lore_overlay(ship)
+    one = hive_series.render_lore_overlay(
+        {**ship, "lines": ["Palace of AI Expectations"]})
+    assert two.height > one.height, "every authored line is drawn"
+    # Deterministic: the same overlay renders the same card twice.
+    again = hive_series.render_lore_overlay(ship)
+    assert _pixel_identical(two, again)
+
+
+def test_an_unknown_overlay_position_is_unresolved_never_invented(manifest):
+    plan = hive_series.episode_plan(manifest, 1)
+    bad = {"id": "mystery", "kind": "lower-third", "chapter": 1,
+           "source_at": 10.0, "position": "diagonal",
+           "lines": ["Somewhere"], "copy_source": "owner_authored",
+           "nature": "project_lore", "note": ""}
+    doctored = _doctored(manifest, lambda d: d["overlays"].append(bad))
+    plan = hive_series.episode_plan(doctored, 1)
+    assert [o["id"] for o in plan["overlays"]] == ["savathuns-ship"]
+    assert any(u.get("id") == "mystery" and "position" in u["reason"]
+               for u in plan["unresolved"])
+
+
+def test_lore_overlay_hold_defaults_and_clamps_to_the_chapter(manifest):
+    """Overlay durations are unauthored; the tooling default holds the card,
+    clamped to the chapter window it must not outrun."""
+    plan = hive_series.episode_plan(manifest, 1)
+    ship = plan["overlays"][0]
+    assert ship["at"] == 113.0
+    assert ship["dur"] == hive_series.LORE_OVERLAY_DUR
+    late = _doctored(manifest, lambda d: d["overlays"][0].__setitem__(
+        "source_at", 122.0))  # ch1 ends at 125
+    plan = hive_series.episode_plan(late, 1)
+    assert plan["overlays"][0]["dur"] == 3.0
+
+
+# --- the dossier safe fallback ----------------------------------------------------
+
+def test_a_pathological_display_name_falls_back_to_the_verified_login():
+    """The deferred safe fallback: a display name that cannot fit the panel
+    is not clipped and never aborts the build -- the card carries the
+    verified login and the gap is recorded."""
+    snapshot = _fixture_snapshot()
+    snapshot["name"] = "Xe ".join(["Mr"] * 300)  # provably cannot fit
+    fields = hive_series.dossier_fields(snapshot)
+    with pytest.raises(ValueError, match="cannot fit"):
+        hive_series.dossier_text_layout(fields)  # the premise
+    img, unresolved = hive_series.render_dossier_safely(snapshot, face=None)
+    assert img.size == (1920, 1080)
+    assert any(u["login"] == "test-fixture" and "login" in u["reason"]
+               for u in unresolved)
+
+
+# --- the thumbnail -----------------------------------------------------------------
+
+def test_thumbnail_is_a_1080p_jpeg_under_two_megabytes(tmp_path):
+    slide = REPO_ROOT / "assets/hive/titles/s01e01-the-enclave.png"
+    out = hive_series.make_thumbnail(slide, tmp_path / "thumb.jpg")
+    assert out.stat().st_size < hive_series.THUMBNAIL_MAX_BYTES
+    assert out.stat().st_size < 2 * 1024 * 1024
+    with Image.open(out) as img:
+        assert img.format == "JPEG"
+        assert img.size == (1920, 1080)
+
+
+# --- the full-season cut --------------------------------------------------------------
+
+def test_concat_command_copies_matching_streams_without_reencoding(tmp_path):
+    argv = hive_series.concat_command(
+        ["ffmpeg"], tmp_path / "list.txt", tmp_path / "season-01-full.mp4")
+    text = " ".join(map(str, argv))
+    assert "-f concat" in text
+    assert "-c:v copy" in text and "-c:a copy" in text
+    assert "libx264" not in text and "libx265" not in text
+
+
+def test_concat_list_is_the_twelve_episodes_in_chapter_order(manifest):
+    lines = hive_series.concat_list_lines(manifest)
+    assert len(lines) == 12
+    for index, line in enumerate(lines, start=1):
+        assert line.startswith("file '")
+        assert f"s01e{index:02d}-" in line
+    assert "s01e01-the-enclave" in lines[0]
+    assert "s01e12-raid" in lines[-1]
+
+
+# --- offline orchestration -------------------------------------------------------------
+
+
+def _delivery_manifest(manifest, tmp_path):
+    """The committed manifest with its delivery paths redirected into the
+    test's tmp_path -- the path STRINGS change, the record's shape does not."""
+    data = json.loads(json.dumps(manifest))
+    for chapter in data["chapters"]:
+        slug = f"s01e{chapter['number']:02d}-{chapter['slug']}"
+        chapter["output"] = str(tmp_path / f"{slug}.mp4")
+        chapter["thumbnail_output"] = str(tmp_path / f"{slug}-thumbnail.jpg")
+    return data
+
+
+def test_build_episode_orchestrates_cards_encode_and_thumbnail(
+        manifest, tmp_path, monkeypatch):
+    """One episode, offline: the source is ensured once, the plates and the
+    lore overlay render to PNG, ONE farm-routed encode carries them all, and
+    the title slide becomes the delivered JPEG thumbnail."""
+    data = _delivery_manifest(manifest, tmp_path)
+    manifest_path = tmp_path / "season.json"
+    manifest_path.write_text(json.dumps(data))
+
+    fake_source = tmp_path / "src.mkv"
+    fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
+    monkeypatch.setattr(
+        hive_series.render, "detect_picture_status",
+        lambda *a, **k: (None, "full-frame"))
+
+    captured = {}
+
+    def fake_run_encode(argv, **kwargs):
+        captured["argv"] = [str(t) for t in argv]
+        captured.update(kwargs)
+        Path(kwargs["out"]).write_bytes(b"mp4")
+        return "cluster"
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
+
+    out = hive_series.build_episode(manifest_path, 1, work_dir=tmp_path / "work")
+    assert out == tmp_path / "s01e01-the-enclave.mp4"
+    assert out.exists(), "the encode wrote the episode"
+
+    argv = captured["argv"]
+    graph = argv[argv.index("-filter_complex") + 1]
+    assert "concat=n=4:v=1:a=1" in graph  # cta, title, chapter, closing
+    # Every staged input is a real file: source + 3 stills + 3 overlays
+    # (ikora-ch1, eris-ch1, the ship lore overlay).
+    inputs = captured["inputs"]
+    assert len(inputs) == 7
+    assert inputs[0] == fake_source.resolve()
+    for path in inputs:
+        assert Path(path).exists(), f"staged input missing: {path}"
+    assert captured["expected_duration"] == 150.0
+    assert captured["local"] is False
+
+    thumb = tmp_path / "s01e01-the-enclave-thumbnail.jpg"
+    assert thumb.exists()
+    assert thumb.stat().st_size < 2 * 1024 * 1024
+    with Image.open(thumb) as img:
+        assert img.format == "JPEG" and img.size == (1920, 1080)
+
+    sidecar = json.loads(
+        (tmp_path / "work" / "s01e01-the-enclave-unresolved.json").read_text())
+    assert sidecar == []
+
+
+def test_build_episode_records_the_dossier_fallback_in_unresolved(
+        manifest, tmp_path, monkeypatch):
+    data = _delivery_manifest(manifest, tmp_path)
+    data["chapters"][0]["dossiers"] = [{
+        "login": "fixture", "github_id": 424242,
+        "name": "Xe ".join(["Mr"] * 300), "tasks": 1,
+    }]
+    manifest_path = tmp_path / "season.json"
+    manifest_path.write_text(json.dumps(data))
+    hive_series.load_manifest(manifest_path)  # the doctored record validates
+
+    fake_source = tmp_path / "src.mkv"
+    fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
+    monkeypatch.setattr(
+        hive_series.render, "detect_picture_status",
+        lambda *a, **k: (None, "full-frame"))
+    monkeypatch.setattr(
+        hive_series, "resolve_face", lambda login: None)
+
+    def fake_run_encode(argv, **kwargs):
+        Path(kwargs["out"]).write_bytes(b"mp4")
+        return "cluster"
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
+
+    out = hive_series.build_episode(manifest_path, 1, work_dir=tmp_path / "work")
+    assert out.exists()
+    sidecar = json.loads(
+        (tmp_path / "work" / "s01e01-the-enclave-unresolved.json").read_text())
+    assert any("fixture" in json.dumps(entry) for entry in sidecar)

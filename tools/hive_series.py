@@ -29,8 +29,20 @@ an explicit unresolved entry. Avatar bytes are never committed.
     python3 tools/hive_series.py check           # validate the season manifest
     python3 tools/hive_series.py cards           # render the committed cards
     python3 tools/hive_series.py fetch-avatars   # warm the cache for the cast
+    python3 tools/hive_series.py build 1         # one episode, farm-first
+    python3 tools/hive_series.py build-all       # all twelve, verified
+    python3 tools/hive_series.py cut             # the full-season join
+    python3 tools/hive_series.py verify [N]      # probe delivered files
 
-Stdlib plus Pillow only.
+The episode build is ONE H.264/AAC encode per episode through
+`tools.farm.run_encode` -- remote-first, memory-capped local fallback, never
+a bare local run. The manifest's pinned source formats are fetched ONCE into
+`media/hive/` and reused by every episode. Source seats and overlays are
+converted to chapter-relative content time and offset by the front cards;
+the authored source marks themselves never move. The full-season cut
+concatenates the twelve episode streams without re-encoding.
+
+Stdlib plus Pillow for the cards; ffmpeg work goes through tools/farm.py.
 """
 
 from __future__ import annotations
@@ -38,6 +50,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -49,6 +62,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from tools import avatars  # noqa: E402  (needs REPO_ROOT on sys.path first)
+from tools import conform  # noqa: E402
+from tools import farm  # noqa: E402
+from tools import plate  # noqa: E402
+from tools import render  # noqa: E402
 
 SCHEMA = REPO_ROOT / "schema" / "hive-season.schema.json"
 MANIFEST = REPO_ROOT / "stories" / "standalone" / "season-of-the-blueberries.json"
@@ -649,6 +666,766 @@ def fetch_declared_avatars(manifest, **kwargs):
     return avatars.fetch(declared_avatar_logins(manifest), **kwargs)
 
 
+# --- Task 3: episode and season builds ------------------------------------------
+#
+# One episode is ONE encode: the Expansion Pack CTA (10s, silent), the title
+# slide (5s, silent), zero-to-three dossier cards (4s each, silent), the
+# manifest's source chapter with its own audio, and the closing training CTA
+# (10s, silent) -- joined inside one filtergraph and encoded once through
+# tools.farm.run_encode. The full-season cut concatenates the twelve
+# episodes' matching streams without re-encoding.
+
+# The manifest-pinned source (formats 137+251) is fetched ONCE into this
+# gitignored cache and reused by every episode.
+SOURCE_CACHE_DIR = REPO_ROOT / "media" / "hive"
+# Rendered dossier/plate/overlay PNGs and unresolved sidecars; gitignored.
+WORK_DIR = REPO_ROOT / "renders" / "hive"
+
+DOSSIER_DURATION = 4.0
+# The owner overlays author copy and placement but no hold; the hold is a
+# tooling default, clamped so the card never outruns its chapter window.
+LORE_OVERLAY_DUR = 6.0
+
+SAMPLE_RATE = 48000
+AUDIO_LAYOUT = "stereo"
+AUDIO_BITRATE = "320k"
+
+# farm.SEAM_TOLERANCE_S is the encode-side check; verification allows the
+# same per-episode seam, and the aggregate of twelve of them on the cut.
+EPISODE_TOLERANCE_S = 0.5
+CUT_TOLERANCE_S = 2.0
+
+THUMBNAIL_MAX_BYTES = 2 * 1024 * 1024
+FULL_CUT_NAME = "season-01-full.mp4"
+
+# The same client standalone.py measured for the pinned progressive-free
+# format list: `visionos` lists the full AVC + non-DRC 48 kHz Opus ladder.
+PLAYER_CLIENT = "visionos"
+
+
+def _t(value):
+    """A filtergraph time: enough decimals to be exact, none to be noise.
+    Whole seconds print bare -- ``36``, not ``36.0``."""
+    text = f"{float(value):.3f}".rstrip("0")
+    return text[:-1] if text.endswith(".") else text
+
+
+def chapter_by_number(manifest, number):
+    matches = [c for c in manifest["chapters"] if c["number"] == number]
+    if len(matches) != 1:
+        raise KeyError(
+            f"expected one chapter numbered {number}, found {len(matches)}")
+    return matches[0]
+
+
+def episode_slug(chapter):
+    return f"s01e{chapter['number']:02d}-{chapter['slug']}"
+
+
+def episode_output_path(chapter):
+    return Path(chapter["output"]).expanduser()
+
+
+def thumbnail_output_path(chapter):
+    return Path(chapter["thumbnail_output"]).expanduser()
+
+
+def full_cut_path(manifest):
+    """The season cut sits beside the episodes the manifest delivers."""
+    return episode_output_path(manifest["chapters"][0]).parent / FULL_CUT_NAME
+
+
+# --- fetching the source, once ----------------------------------------------------
+
+def source_cache_path(manifest, cache_dir=None):
+    """The ONE cached source file, keyed by the video id -- never by episode."""
+    cache = Path(cache_dir) if cache_dir is not None else SOURCE_CACHE_DIR
+    return cache / f"{manifest['source']['youtube_id']}.mkv"
+
+
+def source_fetch_command(manifest, out):
+    """The yt-dlp argv for the manifest's PINNED formats.
+
+    Nothing here is "best": both format ids come from the manifest, so a
+    rebuild months from now takes the same bitstreams. The audio format is
+    never a -drc variant, so the sound arrives at its native rate with its
+    dynamics intact (the same posture standalone.py's fetcher takes)."""
+    source = manifest["source"]
+    return [
+        "yt-dlp",
+        "--extractor-args", f"youtube:player_client={PLAYER_CLIENT}",
+        "--no-playlist",
+        "--no-part",
+        "-f", f"{source['video_format_id']}+{source['audio_format_id']}",
+        "--merge-output-format", "mkv",
+        "-o", str(Path(out).resolve()),
+        source["url"],
+    ]
+
+
+def ensure_source(manifest, cache_dir=None, runner=subprocess.run):
+    """The downloaded season source, fetched once and kept.
+
+    The only step in this module that reaches the network. A non-empty file
+    already on disk is the evidence it ran, so it is never re-fetched --
+    twelve episodes, one download."""
+    out = source_cache_path(manifest, cache_dir).resolve()
+    if out.exists() and out.stat().st_size > 0:
+        return out
+    out.parent.mkdir(parents=True, exist_ok=True)
+    runner(source_fetch_command(manifest, out), check=True)
+    return out
+
+
+# --- the episode timeline -----------------------------------------------------------
+
+def episode_segments(manifest, chapter):
+    """One episode's ordered beats: the authored card sequence, the chapter,
+    the closing card. Stills carry their committed asset; dossier segments
+    carry the snapshot their card is rendered from at build time."""
+    segments = [
+        {"kind": "opening_cta",
+         "asset": REPO_ROOT / manifest["opening_cta"]["asset"],
+         "dur": float(manifest["opening_cta"]["duration"]),
+         "audio": "silent"},
+        {"kind": "title_slide",
+         "asset": (REPO_ROOT / manifest["title_slide"]["output_dir"]
+                   / title_slide_filename(chapter)),
+         "dur": float(manifest["title_slide"]["duration"]),
+         "audio": "silent"},
+    ]
+    for snapshot in chapter.get("dossiers") or []:
+        segments.append({"kind": "dossier", "snapshot": snapshot,
+                         "dur": DOSSIER_DURATION, "audio": "silent"})
+    segments.append({"kind": "chapter",
+                     "start": float(chapter["start"]),
+                     "end": float(chapter["end"]),
+                     "audio": "source"})
+    segments.append({"kind": "closing_cta",
+                     "asset": REPO_ROOT / manifest["closing_cta"]["asset"],
+                     "dur": float(manifest["closing_cta"]["duration"]),
+                     "audio": "silent"})
+    return segments
+
+
+def front_cards_duration(manifest, chapter):
+    """Everything before the chapter: the offset source marks shift by."""
+    return sum(float(s["dur"]) for s in episode_segments(manifest, chapter)
+               if s["kind"] != "chapter") - \
+        float(manifest["closing_cta"]["duration"])
+
+
+def source_to_chapter_relative(at, chapter):
+    """Absolute source time -> chapter-relative content time.
+
+    The authored source mark never moves; only the ruler it is read against
+    changes."""
+    return float(at) - float(chapter["start"])
+
+
+def source_to_episode_time(at, manifest, chapter):
+    """Absolute source time -> where it lands in the finished episode."""
+    return source_to_chapter_relative(at, chapter) + \
+        front_cards_duration(manifest, chapter)
+
+
+def episode_expected_duration(manifest, chapter):
+    return sum(float(s["dur"]) for s in episode_segments(manifest, chapter)
+               if s["kind"] != "chapter") + \
+        float(chapter["end"]) - float(chapter["start"])
+
+
+def cut_expected_duration(manifest):
+    return sum(episode_expected_duration(manifest, c)
+               for c in manifest["chapters"])
+
+
+def episode_plan(manifest, number):
+    """Everything one episode build needs, in chapter-relative time.
+
+    Plates come from `plan_chapter_plates` (the omission rule included) and
+    the owner overlays join them; every `at` is source time minus the
+    chapter start, so the graph seats them on the trimmed chapter leg and
+    the front cards' offset falls out of the concat for free. A seat whose
+    copy is incomplete, and an overlay whose position this renderer does
+    not know, are recorded in `unresolved` and never drawn."""
+    chapter = chapter_by_number(manifest, number)
+    plates, unresolved = plan_chapter_plates(manifest, number)
+    for spec in plates:
+        spec["at"] = source_to_chapter_relative(spec["at"], chapter)
+    overlays = []
+    for overlay in manifest.get("overlays") or []:
+        if overlay["chapter"] != number:
+            continue
+        if overlay["position"] not in LORE_POSITIONS:
+            unresolved.append({
+                "id": overlay["id"],
+                "reason": f"position {overlay['position']!r} is not one of "
+                          f"{sorted(LORE_POSITIONS)}; the overlay is omitted "
+                          "rather than placed by a guess",
+            })
+            continue
+        at = source_to_chapter_relative(overlay["source_at"], chapter)
+        window = float(chapter["end"]) - float(chapter["start"])
+        overlays.append({
+            "id": overlay["id"],
+            "lines": list(overlay["lines"]),
+            "position": overlay["position"],
+            "at": at,
+            "dur": min(LORE_OVERLAY_DUR, window - at),
+        })
+    return {
+        "chapter": chapter,
+        "segments": episode_segments(manifest, chapter),
+        "plates": plates,
+        "overlays": overlays,
+        "unresolved": unresolved,
+        "front_offset": front_cards_duration(manifest, chapter),
+        "expected_duration": episode_expected_duration(manifest, chapter),
+    }
+
+
+# --- the project-lore overlays ---------------------------------------------------------
+
+# The positions this renderer knows how to seat. Anything else is recorded
+# and omitted, never guessed.
+LORE_POSITIONS = ("bottom-right", "top-third")
+
+
+def render_lore_overlay(overlay):
+    """One owner-authored project-lore overlay, as a tight RGBA card.
+
+    The card carries the authored lines VERBATIM and nothing else -- no
+    label, no eyebrow, no generated word. The chrome is the season's own:
+    the dark glass panel with the blue-purple edge."""
+    lines = list(overlay["lines"])
+    font = _font("bold", 40)
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    pad_x, pad_y, gap = 36, 24, 10
+    line_h = _line_height(font)
+    width = max(int(round(probe.textlength(line, font=font)))
+                for line in lines) + 2 * pad_x
+    height = len(lines) * line_h + (len(lines) - 1) * gap + 2 * pad_y
+    card = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(card)
+    draw.rounded_rectangle([0, 0, width - 1, height - 1], radius=14,
+                           fill=PURPLE + (255,))
+    draw.rounded_rectangle([2, 2, width - 3, height - 3], radius=12,
+                           fill=BLUE + (255,))
+    draw.rounded_rectangle([4, 4, width - 5, height - 5], radius=10,
+                           fill=GLASS)
+    y = pad_y
+    for line in lines:
+        draw.text((pad_x, y), line, font=font, fill=TEXT)
+        y += line_h + gap
+    return card
+
+
+def place_lore_overlay(card, position, picture=None):
+    """Composite a lore card onto a full 1920x1080 transparent frame.
+
+    ``bottom-right`` mirrors the plate lane's margins on the RIGHT, so the
+    card stays clear of the heroes' lower-left plates. ``top-third`` centres
+    the card on the picture in the caption lane, inside the top third. Both
+    measure against the PICTURE rect, so a letterboxed source keeps the card
+    on the image rather than on a matte."""
+    frame = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+    px, py, pw, ph = picture or (0, 0, FRAME_W, FRAME_H)
+    if position == "bottom-right":
+        x = px + pw - int(pw * 0.05) - card.width
+        y = py + int(ph * 0.90) - card.height
+    elif position == "top-third":
+        x = px + (pw - card.width) // 2
+        y = py + int(ph * 0.06)
+    else:
+        raise ValueError(f"unknown lore overlay position {position!r}")
+    frame.alpha_composite(card, (x, y))
+    return frame
+
+
+# --- the dossier safe fallback -----------------------------------------------------------
+
+
+def render_dossier_safely(snapshot, face=None):
+    """render_dossier, with the deferred safe fallback for a pathological
+    GitHub display name: the verified login stands in for the name row and
+    the substitution is recorded -- the card ships, the gap is the punch
+    list. The build never aborts on a name that cannot fit."""
+    try:
+        return render_dossier(snapshot, face=face)
+    except ValueError as exc:
+        fallback = dict(snapshot, name="")
+        img, unresolved = render_dossier(fallback, face=face)
+        unresolved.append({
+            "login": snapshot["login"],
+            "reason": f"display name cannot fit the dossier panel ({exc}); "
+                      "the verified login stands in",
+        })
+        return img, unresolved
+
+
+# --- the one-pass filtergraph ------------------------------------------------------------
+
+
+def episode_filtergraph(plan, source_rate=SAMPLE_RATE):
+    """One graph for one episode: the stills, the chapter, one concat.
+
+    Input order is the fixed contract with `encode_episode_command`: input 0
+    is the source, the stills follow in segment order, and the overlay PNGs
+    (fixed plates, then lore overlays) come last. Every still and overlay is
+    a looped -- infinite -- input; the stills are trimmed to their authored
+    durations and the overlays carry ``shortest=1``, so the finite chapter
+    leg decides where the file ends.
+
+    The chapter's audio is the source's own, trimmed on the same boundary
+    and pinned to the delivery layout; aresample joins the chain ONLY when
+    the source's rate is not already the delivery rate (megacut's rule)."""
+    chain = conform.video_filter_chain()
+    stills = [s for s in plan["segments"] if s["kind"] != "chapter"]
+    chapter = next(s for s in plan["segments"] if s["kind"] == "chapter")
+    overlays = [dict(p, overlay_kind="plate") for p in plan["plates"]] + \
+        [dict(o, overlay_kind="lore") for o in plan["overlays"]]
+    aformat = f"aformat=sample_fmts=fltp:channel_layouts={AUDIO_LAYOUT}"
+
+    parts = []
+    concat_inputs = []
+    for index, segment in enumerate(stills):
+        # Chapter segments sit among the stills in episode order, so the
+        # still's INPUT index is its position among stills only; the concat
+        # order below is the segment order.
+        input_index = 1 + index
+        parts.append(
+            f"[{input_index}:v]trim=duration={_t(segment['dur'])},{chain}"
+            f"[s{index}v]")
+        parts.append(
+            f"anullsrc=r={SAMPLE_RATE}:cl={AUDIO_LAYOUT},"
+            f"atrim=duration={_t(segment['dur'])},asetpts=PTS-STARTPTS,"
+            f"{aformat}[s{index}a]")
+    start, end = _t(chapter["start"]), _t(chapter["end"])
+    parts.append(f"[0:v]trim=start={start}:end={end},{chain}[cv0]")
+    resample = (f"aresample={SAMPLE_RATE}," if source_rate is None
+                or int(source_rate) != SAMPLE_RATE else "")
+    parts.append(
+        f"[0:a]atrim=start={start}:end={end},asetpts=PTS-STARTPTS,"
+        f"{resample}{aformat}[cha]")
+
+    current = "[cv0]"
+    for position, overlay in enumerate(overlays):
+        input_index = 1 + len(stills) + position
+        last = position == len(overlays) - 1
+        label = "[chv]" if last else f"[cv{position + 1}]"
+        begin = float(overlay["at"])
+        stop = begin + float(overlay["dur"])
+        parts.append(
+            f"{current}[{input_index}:v]overlay=0:0:"
+            f"enable='between(t,{_t(begin)},{_t(stop)})':shortest=1{label}")
+        current = label
+    if not overlays:
+        parts.append("[cv0]null[chv]")
+
+    # The concat order is the EPISODE order: the stills before the chapter,
+    # then the chapter, then the stills after it.
+    before, after = [], []
+    seen_chapter = False
+    still_index = 0
+    for segment in plan["segments"]:
+        if segment["kind"] == "chapter":
+            seen_chapter = True
+            continue
+        (after if seen_chapter else before).append(still_index)
+        still_index += 1
+    for index in before:
+        concat_inputs += [f"[s{index}v]", f"[s{index}a]"]
+    concat_inputs += ["[chv]", "[cha]"]
+    for index in after:
+        concat_inputs += [f"[s{index}v]", f"[s{index}a]"]
+    parts.append(
+        f"{''.join(concat_inputs)}concat=n={len(plan['segments'])}:v=1:a=1"
+        f"[outv][outa]")
+    return ";".join(parts)
+
+
+def encode_episode_command(ffmpeg, source, stills, overlays, graph, out):
+    """The one argv: decode the source once, loop the PNGs, encode once.
+
+    The video recipe is the delivery spec's own (conform.video_encode_args)
+    so an episode's bitstream is what the full cut's concat can join blind;
+    the sound is one AAC generation at the delivery rate."""
+    argv = [*ffmpeg, "-v", "error", "-y", "-i", str(source)]
+    for still in stills:
+        argv += ["-loop", "1", "-framerate", conform.DELIVERY.fps,
+                 "-i", str(still)]
+    for overlay in overlays:
+        argv += ["-loop", "1", "-framerate", conform.DELIVERY.fps,
+                 "-i", str(overlay)]
+    argv += [
+        "-filter_complex", graph,
+        "-map", "[outv]",
+        "-map", "[outa]",
+        *conform.video_encode_args(),
+        "-c:a", "aac",
+        "-b:a", AUDIO_BITRATE,
+        "-ar", str(SAMPLE_RATE),
+        "-movflags", "+faststart",
+        str(out),
+    ]
+    return argv
+
+
+def encode_episode(argv, *, inputs, out, expected_duration, local=False,
+                   label=None):
+    """The episode's one encode, on the farm whenever the farm answers.
+
+    The posture is tools/farm.py's, taken identically by every builder:
+    cluster when reachable, memory-capped local with the reason printed
+    otherwise, ``--local`` as the explicit escape hatch."""
+    return farm.run_encode(
+        argv, inputs=inputs, out=out, local=local,
+        expected_duration=expected_duration,
+        label=label or "Hive episode")
+
+
+# --- thumbnails -------------------------------------------------------------------------
+
+
+def make_thumbnail(slide_path, out_path):
+    """The episode's thumbnail: its committed title slide as a JPEG.
+
+    From the title slide, not a frame grab: deterministic, identical across
+    rebuilds, and consistent across the series. Sized under the 2 MB ceiling
+    by stepping the JPEG quality down from 92 -- a 1920x1080 card lands far
+    below it at the first step."""
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img = Image.open(slide_path).convert("RGB")
+    if img.size != (FRAME_W, FRAME_H):
+        img = img.resize((FRAME_W, FRAME_H), Image.LANCZOS)
+    for quality in (92, 85, 75, 65):
+        img.save(out_path, "JPEG", quality=quality)
+        if out_path.stat().st_size < THUMBNAIL_MAX_BYTES:
+            return out_path
+    raise RuntimeError(
+        f"thumbnail {out_path} cannot fit under {THUMBNAIL_MAX_BYTES} bytes")
+
+
+# --- building ----------------------------------------------------------------------------
+
+
+def _source_audio_rate(source, ffmpeg):
+    """The source's audio sample rate, or None when it cannot be probed --
+    in which case the graph pins the rate explicitly rather than trusting."""
+    ffprobe = conform.ffprobe_for(ffmpeg)
+    try:
+        out = subprocess.run(
+            [*ffprobe, "-v", "error", "-select_streams", "a:0",
+             "-show_entries", "stream=sample_rate", "-of", "csv=p=0",
+             str(source)],
+            capture_output=True, text=True, check=True)
+        return int(out.stdout.strip())
+    except (subprocess.SubprocessError, ValueError):
+        return None
+
+
+def _write_unresolved(work_dir, slug, unresolved):
+    path = Path(work_dir) / f"{slug}-unresolved.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(unresolved, indent=1) + "\n", encoding="utf-8")
+    return path
+
+
+def _render_overlay_pngs(plan, source, ffmpeg, work_dir, slug, unresolved,
+                         log):
+    """The episode's overlay inputs, in graph order: the fixed plates through
+    tools/plate.py (unmodified), then the project-lore overlays drawn here.
+
+    Seats are measured against the PICTURE, never the raw frame (issue
+    #161's rule, taken from standalone.py): an undecodable source drops the
+    seats and records why -- the unplated episode still ships."""
+    overlay_pngs = []
+    if not plan["plates"] and not plan["overlays"]:
+        return overlay_pngs
+    picture, status = render.detect_picture_status(source, ffmpeg=ffmpeg)
+    if status == "undecodable":
+        unresolved.extend(
+            {"id": item["id"],
+             "reason": "the source picture area could not be decoded, so "
+                       "the seat could not be measured against the picture "
+                       "and was not placed"}
+            for item in [*plan["plates"], *plan["overlays"]])
+        return overlay_pngs
+    if plan["plates"]:
+        plates_dir = Path(work_dir) / f"{slug}-plates"
+        plate.render_all(plan["plates"], plates_dir, picture=picture)
+        for spec in plan["plates"]:
+            png = plates_dir / f"plate_{spec['id']}.png"
+            if not png.exists():
+                unresolved.append(
+                    {"id": spec["id"],
+                     "reason": f"no plate was rendered at {png}"})
+                continue
+            overlay_pngs.append(png.resolve())
+    for overlay in plan["overlays"]:
+        card = render_lore_overlay(overlay)
+        frame = place_lore_overlay(card, overlay["position"], picture)
+        png = Path(work_dir) / f"{slug}-overlay-{overlay['id']}.png"
+        frame.save(png)
+        overlay_pngs.append(png.resolve())
+    return overlay_pngs
+
+
+def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
+                  log=print, work_dir=None):
+    """One episode, built and delivered: cards, one farm-first encode,
+    thumbnail, unresolved sidecar.
+
+    An output that already exists AND verifies is kept -- rebuilding twelve
+    identical encodes on every `hive-cut` run would be waste, and the
+    verification is the freshness check, not the file's mere existence. To
+    rebuild, delete the delivered file first."""
+    manifest = load_manifest(manifest_path)
+    ffmpeg = ffmpeg or render.find_ffmpeg()
+    plan = episode_plan(manifest, episode_number)
+    chapter = plan["chapter"]
+    slug = episode_slug(chapter)
+    out = episode_output_path(chapter)
+    thumb = thumbnail_output_path(chapter)
+    work = Path(work_dir) if work_dir is not None else WORK_DIR
+    work.mkdir(parents=True, exist_ok=True)
+
+    if out.exists() and not verify_episode(manifest, episode_number,
+                                           ffmpeg=ffmpeg):
+        log(f"  {slug}: already built and verified -- {out}")
+        if not thumb.exists():
+            make_thumbnail(plan["segments"][1]["asset"], thumb)
+            log(f"  thumbnail: {thumb}")
+        return out
+
+    source = Path(ensure_source(manifest)).resolve()
+    unresolved = list(plan["unresolved"])
+
+    stills = []
+    for segment in plan["segments"]:
+        if segment["kind"] == "chapter":
+            continue
+        if segment["kind"] == "dossier":
+            snapshot = segment["snapshot"]
+            img, gaps = render_dossier_safely(
+                snapshot, face=resolve_face(snapshot["login"]))
+            unresolved.extend(gaps)
+            png = work / f"{slug}-dossier-{snapshot['login']}.png"
+            img.convert("RGB").save(png)
+            stills.append(png.resolve())
+        else:
+            stills.append(Path(segment["asset"]).resolve())
+
+    overlay_pngs = _render_overlay_pngs(
+        plan, source, ffmpeg, work, slug, unresolved, log)
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out = out.resolve()
+    graph = episode_filtergraph(
+        plan, source_rate=_source_audio_rate(source, ffmpeg))
+    argv = encode_episode_command(
+        ffmpeg, source, stills, overlay_pngs, graph, out)
+    where = encode_episode(
+        argv, inputs=[source, *stills, *overlay_pngs], out=out,
+        expected_duration=plan["expected_duration"], local=local,
+        label=f"Hive {slug}")
+    log(f"  {slug}: encoded on {where} -- {out}")
+
+    _write_unresolved(work, slug, unresolved)
+    for item in unresolved:
+        log(f"  unresolved: {item}")
+
+    make_thumbnail(plan["segments"][1]["asset"], thumb)
+    log(f"  thumbnail: {thumb}")
+
+    problems = verify_episode(manifest, episode_number, ffmpeg=ffmpeg)
+    for problem in problems:
+        log(f"  verify: {problem}")
+    return out
+
+
+def build_all(manifest_path=None, local=False, ffmpeg=None, log=print,
+              work_dir=None):
+    """All twelve episodes, in chapter order. The source fetch happens once:
+    the cache file is the evidence it ran."""
+    manifest = load_manifest(manifest_path)
+    return [build_episode(manifest_path or MANIFEST, chapter["number"],
+                          local=local, ffmpeg=ffmpeg, log=log,
+                          work_dir=work_dir)
+            for chapter in manifest["chapters"]]
+
+
+# --- the full-season cut ---------------------------------------------------------------
+
+
+def concat_list_lines(manifest):
+    """The concat-demuxer list: the twelve delivered episodes, in order."""
+    return [f"file '{episode_output_path(c).resolve()}'"
+            for c in manifest["chapters"]]
+
+
+def concat_command(ffmpeg, list_path, out_path):
+    """Join the episodes: copy BOTH streams.
+
+    Every episode was encoded from the same delivery recipe, so the join is
+    a remux -- no second generation of picture or sound, and the streams'
+    SPS agree by construction."""
+    return [
+        *ffmpeg, "-nostdin", "-hide_banner",
+        "-f", "concat", "-safe", "0", "-i", str(list_path),
+        "-map", "0:v:0", "-map", "0:a:0",
+        "-c:v", "copy", "-c:a", "copy",
+        "-movflags", "+faststart",
+        str(out_path), "-y",
+    ]
+
+
+def concat_episodes(manifest, out_path=None, ffmpeg=None, work_dir=None,
+                    runner=subprocess.run):
+    """Concatenate the built episodes into the full-season cut.
+
+    A pure remux -- the picture and sound are both stream-copied -- so it
+    runs here, the same posture as megacut's assemble: the encodes were the
+    farm's work; the join is I/O."""
+    ffmpeg = ffmpeg or render.find_ffmpeg()
+    out_path = Path(out_path) if out_path else full_cut_path(manifest)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    work = Path(work_dir) if work_dir is not None else WORK_DIR
+    work.mkdir(parents=True, exist_ok=True)
+    list_path = work / "season-01-concat.txt"
+    list_path.write_text("\n".join(concat_list_lines(manifest)) + "\n",
+                         encoding="utf-8")
+    runner(concat_command(ffmpeg, list_path, out_path), check=True)
+    return out_path
+
+
+def build_cut(manifest_path=None, local=False, ffmpeg=None, log=print):
+    """Build and verify all twelve episodes, then the full-season cut."""
+    manifest = load_manifest(manifest_path)
+    build_all(manifest_path, local=local, ffmpeg=ffmpeg, log=log)
+    out = concat_episodes(manifest, ffmpeg=ffmpeg)
+    log(f"  full cut: {out}")
+    problems = verify_cut(manifest, ffmpeg=ffmpeg)
+    for problem in problems:
+        log(f"  verify: {problem}")
+    return out
+
+
+# --- verification ---------------------------------------------------------------------
+
+
+def _probe_duration(path, ffmpeg):
+    ffprobe = conform.ffprobe_for(ffmpeg)
+    out = subprocess.run(
+        [*ffprobe, "-v", "error", "-show_entries", "format=duration",
+         "-of", "csv=p=0", str(path)],
+        capture_output=True, text=True, check=True)
+    text = out.stdout.strip()
+    if not text:
+        raise RuntimeError(f"ffprobe reported no duration for {path}")
+    return float(text)
+
+
+def _probe_audio(path, ffmpeg):
+    ffprobe = conform.ffprobe_for(ffmpeg)
+    out = subprocess.run(
+        [*ffprobe, "-v", "error", "-select_streams", "a:0",
+         "-show_entries", "stream=codec_name,sample_rate,channels",
+         "-of", "json", str(path)],
+        capture_output=True, text=True, check=True)
+    streams = json.loads(out.stdout).get("streams") or []
+    return streams[0] if streams else {}
+
+
+def _fps_is_delivery(reported):
+    """The delivered cadence, with room for container rounding.
+
+    The card/chapter durations are whole seconds, which 60000/1001 never
+    divides evenly, so the mp4 container carries the nearest representable
+    duration and ffprobe's ``avg_frame_rate`` (frames over that duration)
+    lands a few thousandths off -- 32640000/544621 instead of 60000/1001 on
+    a real 59.94 encode. 0.02 fps of slack covers that rounding and still
+    cannot confuse 60/1 or 30/1 for the delivery rate (they are 0.06 and
+    29.97 away)."""
+    try:
+        num, _, den = str(reported).partition("/")
+        value = float(num) / float(den or 1)
+    except (TypeError, ValueError, ZeroDivisionError):
+        return False
+    wnum, _, wden = conform.DELIVERY.fps.partition("/")
+    return abs(value - float(wnum) / float(wden)) < 0.02
+
+
+def _probe_delivery_streams(path, expected, ffmpeg, tolerance):
+    """The problems a delivered file has, as a list -- empty means verified.
+
+    A report, never a gate: the caller logs the problems and ships anyway
+    (AGENTS.md: nothing blocks a release)."""
+    problems = []
+    path = Path(path)
+    if not path.exists() or path.stat().st_size == 0:
+        return [f"{path}: missing or empty"]
+    try:
+        duration = _probe_duration(path, ffmpeg)
+        if abs(duration - expected) > tolerance:
+            problems.append(
+                f"{path.name}: duration {duration:.3f}s is "
+                f"{duration - expected:+.3f}s from the expected "
+                f"{expected:.3f}s (tolerance {tolerance}s)")
+        video = conform.probe_video(path, conform.ffprobe_for(ffmpeg))
+        if video.get("codec_name") != "h264":
+            problems.append(
+                f"{path.name}: video codec {video.get('codec_name')!r} "
+                "is not h264")
+        if (video.get("width"), video.get("height")) != (FRAME_W, FRAME_H):
+            problems.append(
+                f"{path.name}: {video.get('width')}x{video.get('height')} "
+                f"is not {FRAME_W}x{FRAME_H}")
+        if video.get("r_frame_rate") != conform.DELIVERY.fps and \
+                not _fps_is_delivery(video.get("avg_frame_rate")):
+            problems.append(
+                f"{path.name}: frame rate r={video.get('r_frame_rate')!r} "
+                f"avg={video.get('avg_frame_rate')!r} is not "
+                f"{conform.DELIVERY.fps}")
+        audio = _probe_audio(path, ffmpeg)
+        if audio.get("codec_name") != "aac":
+            problems.append(
+                f"{path.name}: audio codec {audio.get('codec_name')!r} "
+                "is not aac")
+        if int(audio.get("sample_rate", 0)) != SAMPLE_RATE:
+            problems.append(
+                f"{path.name}: sample rate {audio.get('sample_rate')!r} "
+                f"is not {SAMPLE_RATE}")
+    except (subprocess.SubprocessError, RuntimeError, KeyError) as exc:
+        problems.append(f"{path.name}: probe failed ({exc})")
+    return problems
+
+
+def verify_episode(manifest, number, ffmpeg=None):
+    ffmpeg = ffmpeg or render.find_ffmpeg()
+    chapter = chapter_by_number(manifest, number)
+    return _probe_delivery_streams(
+        episode_output_path(chapter), episode_expected_duration(manifest,
+                                                                chapter),
+        ffmpeg, EPISODE_TOLERANCE_S)
+
+
+def verify_cut(manifest, ffmpeg=None):
+    """Twelve episodes in order, then the cut at the aggregate duration."""
+    ffmpeg = ffmpeg or render.find_ffmpeg()
+    problems = []
+    for chapter in manifest["chapters"]:
+        problems.extend(
+            verify_episode(manifest, chapter["number"], ffmpeg=ffmpeg))
+    problems.extend(_probe_delivery_streams(
+        full_cut_path(manifest), cut_expected_duration(manifest),
+        ffmpeg, CUT_TOLERANCE_S))
+    return problems
+
+
+
 # --- manifest loading and validation ---------------------------------------------
 
 def _schema_errors(data):
@@ -785,17 +1562,83 @@ def _cmd_fetch_avatars(_args):
     return 0
 
 
+def _report_verify(problems, log=print):
+    """Verification is a report, never a gate: the files are already
+    delivered. The exit code tells `just` whether the report was clean."""
+    if problems:
+        for problem in problems:
+            print(f"  verify: {problem}", file=sys.stderr)
+        return 1
+    log("  verified")
+    return 0
+
+
+def _cmd_build(args):
+    out = build_episode(MANIFEST, args.number, local=args.local)
+    problems = verify_episode(load_manifest(), args.number)
+    print(f"episode {args.number}: {out}")
+    return _report_verify(problems)
+
+
+def _cmd_build_all(args):
+    manifest = load_manifest()
+    build_all(MANIFEST, local=args.local)
+    problems = []
+    for chapter in manifest["chapters"]:
+        problems.extend(verify_episode(manifest, chapter["number"]))
+    return _report_verify(problems)
+
+
+def _cmd_cut(args):
+    manifest = load_manifest()
+    problems = []
+    for chapter in manifest["chapters"]:
+        problems.extend(verify_episode(manifest, chapter["number"]))
+    if problems:
+        # The cut is only as good as its twelve inputs; report and stop
+        # short of joining files that did not verify.
+        return _report_verify(problems)
+    out = concat_episodes(manifest)
+    print(f"full cut: {out}")
+    return _report_verify(verify_cut(manifest))
+
+
+def _cmd_verify(args):
+    manifest = load_manifest()
+    if args.number is not None:
+        return _report_verify(verify_episode(manifest, args.number))
+    return _report_verify(verify_cut(manifest))
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check", help="validate the season manifest")
     sub.add_parser("cards", help="render the committed cards (CTA + slides)")
     sub.add_parser("fetch-avatars", help="warm the avatar cache for the cast")
+    build = sub.add_parser("build", help="build one episode (farm-first)")
+    build.add_argument("number", type=int)
+    build.add_argument("--local", action="store_true",
+                       help="encode here, memory-capped, instead of the farm")
+    build_all_p = sub.add_parser(
+        "build-all", help="build and verify all twelve episodes")
+    build_all_p.add_argument("--local", action="store_true")
+    cut = sub.add_parser(
+        "cut", help="concatenate the verified episodes into the full cut")
+    cut.add_argument("--local", action="store_true",
+                     help="accepted for symmetry; the join is a local remux")
+    verify = sub.add_parser(
+        "verify", help="probe the delivered files (one episode, or all+cut)")
+    verify.add_argument("number", type=int, nargs="?", default=None)
     args = parser.parse_args(argv)
     return {
         "check": _cmd_check,
         "cards": _cmd_cards,
         "fetch-avatars": _cmd_fetch_avatars,
+        "build": _cmd_build,
+        "build-all": _cmd_build_all,
+        "cut": _cmd_cut,
+        "verify": _cmd_verify,
     }[args.command](args)
 
 
