@@ -325,7 +325,8 @@ def test_the_ship_overlay_keeps_clear_of_the_heroes(manifest):
 # --- plate planning --------------------------------------------------------
 
 def test_plate_specs_are_one_per_seat_and_plate_py_shaped(manifest):
-    specs = hive_series.plate_specs(manifest)
+    specs, unresolved = hive_series.plate_specs(manifest)
+    assert unresolved == []
     assert len(specs) == 11
     ids = [s["id"] for s in specs]
     assert len(set(ids)) == 11
@@ -348,7 +349,9 @@ def test_plate_specs_render_through_plate_py_unmodified(manifest):
     """
     from tools import plate
 
-    for spec in hive_series.plate_specs(manifest):
+    specs, unresolved = hive_series.plate_specs(manifest)
+    assert unresolved == []
+    for spec in specs:
         spec = {k: v for k, v in spec.items() if k != "avatar"}
         img = plate.render_plate(spec)
         assert img.mode == "RGBA"
@@ -398,7 +401,36 @@ def test_plate_planning_covers_every_seated_chapter(manifest):
         )
         planned.extend(p["id"] for p in plates)
         assert unresolved == []
-    assert sorted(planned) == sorted(s["id"] for s in hive_series.plate_specs(manifest))
+    specs, _ = hive_series.plate_specs(manifest)
+    assert sorted(planned) == sorted(s["id"] for s in specs)
+
+
+def test_plate_specs_omit_incomplete_copy_through_the_validated_path(manifest):
+    """`plate_specs` is the path Task 3 renders, so it holds the same line
+    as the per-chapter planner: a seat whose copy is incomplete is withheld
+    from plate.py and recorded, never drawn with a guessed row. `title` is
+    optional in the schema precisely so the gap flows through the real
+    validated load -> spec path."""
+    doctored = json.loads(json.dumps(manifest))
+    del doctored["fixed_cast"][0]["plate"]["title"]
+    validated = hive_series.load_manifest_data(doctored)  # schema-clean
+    specs, unresolved = hive_series.plate_specs(validated)
+    assert specs, "the complete plates still spec"
+    assert all(not s["id"].startswith("ikora-") for s in specs)
+    assert len(unresolved) == 1
+    assert unresolved[0] == {
+        "cast": "ikora",
+        "reason": "plate copy incomplete: missing title",
+    }
+    # Every emitted spec really is drawable: nothing incomplete reaches
+    # plate.py through this path.
+    from tools import plate
+
+    for spec in specs:
+        drawn = plate.render_plate(
+            {k: v for k, v in spec.items() if k != "avatar"}
+        )
+        assert drawn.width > 100
 
 
 # --- generated cards -------------------------------------------------------
@@ -604,6 +636,63 @@ def test_dossier_text_fit_never_shrinks_below_the_tested_floor():
     for line in lines:
         assert draw.textlength(line, font=font) <= hive_series.DOSSIER_TEXT_WIDTH
     assert "".join(lines) == absurd, "hard wrap drops no characters"
+
+
+def test_dossier_text_stays_above_the_hairline_for_whitespace_heavy_names():
+    """The vertical budget, not only the width: a 60+ char display name of
+    ordinary words wraps at the DISPLAY size into more lines than the area
+    above the hairline can hold, so the fit must shrink until the whole
+    name+handle block clears the hairline -- never spill over the task row
+    or escape the panel."""
+    snapshot = _fixture_snapshot()
+    snapshot["name"] = (
+        "Maria de la Cruz Hernandez von Trapp Smythe Worthington the Third"
+    )
+    snapshot["login"] = "maria-de-la-cruz-hernandez"
+    fields = hive_series.dossier_fields(snapshot)
+    px, py, pw, ph = hive_series.DOSSIER_PANEL
+    hairline = py + hive_series.DOSSIER_HAIRLINE
+    draw = ImageDraw.Draw(Image.new("RGBA", (1920, 1080)))
+
+    # The premise: at the display size this name alone stacks taller than
+    # the area above the hairline, so a width-only fit overflows.
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    display = hive_series._font("bold", hive_series.DOSSIER_NAME_SIZE)
+    display_lines = hive_series._wrap_hard(
+        probe, fields["name"], display, hive_series.DOSSIER_TEXT_WIDTH
+    )
+    display_h = hive_series._line_height(display) * len(display_lines)
+    budget = hive_series.DOSSIER_HAIRLINE - 6 - hive_series.DOSSIER_TEXT_AREA_TOP
+    assert display_h > budget, (
+        "the fixture no longer overflows at display size -- it stops "
+        "exercising the vertical budget")
+
+    layout = hive_series.dossier_text_layout(fields)
+    assert len(layout) >= 3, "the long identity still wraps to multiple rows"
+    assert layout[0][3].size < hive_series.DOSSIER_NAME_SIZE, (
+        "the name shrank to buy the vertical budget")
+    for x, y, text, font, _fill in layout:
+        assert text, "a wrapped row is never blank"
+        x0, y0, x1, y1 = draw.textbbox((x, y), text, font=font)
+        assert x0 >= px and x1 <= px + pw, f"{text!r} escapes the panel horizontally"
+        assert y0 >= py, f"{text!r} escapes the panel top"
+        assert y1 <= hairline, f"{text!r} crosses the hairline into the task row"
+    joined = "".join(row[2] for row in layout).replace(" ", "")
+    whole = (fields["name"] + fields["handle"]).replace(" ", "")
+    assert joined == whole, "a real identity is never clipped or truncated"
+
+
+def test_dossier_text_layout_fails_loudly_past_the_minimum_sizes():
+    """The floor is a guard, not a clip: an identity that cannot fit above
+    the hairline even at the minimum sizes raises -- it never renders
+    overlapping the task row or escaping the panel."""
+    fields = {
+        "name": "Xe ".join(["Mr"] * 300),  # ~900 chars of short tokens
+        "handle": "@" + "x" * 300,
+        "tasks": "HIVE TASKS +1",
+    }
+    with pytest.raises(ValueError, match="cannot fit"):
+        hive_series.dossier_text_layout(fields)
 
 
 def test_dossier_fit_entire_upscales_a_small_face_to_cover_the_tile():

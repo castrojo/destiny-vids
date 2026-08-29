@@ -129,10 +129,13 @@ def _chrome_problems(entries, by_name):
         # its explicit `provenance` (owner instruction + factual name source)
         # plays the copy_override role, so the guard recognizes the decision
         # instead of forcing an empty global binding into vocab/casting.yaml
-        # for a name that belongs to one video.
+        # for a name that belongs to one video. The hatch is scoped to the
+        # season's own `fixed_cast:` ids -- a provenance block on any other
+        # record is not an override.
         provenance = entry.get("provenance")
         if (
-            isinstance(provenance, dict)
+            str(entry.get("id", "")).startswith("fixed_cast:")
+            and isinstance(provenance, dict)
             and provenance.get("copy_source") == "owner_authored"
             and provenance.get("decided_by")
         ):
@@ -233,6 +236,13 @@ def test_a_fixed_cast_plate_needs_provenance_to_diverge():
     # A provenance block without the owner instruction is not an override.
     hollow = {**bare, "provenance": {"copy_source": "owner_authored"}}
     assert _chrome_problems([hollow], by_name)
+
+    # The hatch is scoped to the season's fixed-cast records: the same
+    # provenance block on any other plate id exempts nothing.
+    stray = {**provenanced, "id": "standalone-card-1"}
+    assert _chrome_problems([stray], by_name), (
+        "the provenance override must not reach records outside fixed_cast:"
+    )
 
 
 def _jorge_guardian_plates():

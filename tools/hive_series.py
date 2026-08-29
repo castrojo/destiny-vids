@@ -183,24 +183,43 @@ def _wrap_hard(draw, text, font, max_width):
     return lines
 
 
-def _fit_text(draw, text, weight, max_size, min_size, max_width):
+def _line_height(font):
+    return sum(font.getmetrics())
+
+
+def _fit_text(draw, text, weight, max_size, min_size, max_width, max_height=None):
     """The fitted font and wrapped lines for ``text`` within ``max_width``.
 
     Shrink first: the largest size that keeps the text on ONE line wins.
     Only when even the floor cannot hold one line does the text wrap, at the
     largest size whose wrapped lines all fit. At the floor it hard-wraps
-    instead of shrinking further: it never clips."""
+    instead of shrinking further: it never clips.
+
+    ``max_height`` adds the vertical budget: a candidate whose lines stack
+    taller than the budget loses to a smaller size, and a floor that still
+    cannot fit raises ValueError -- an overflow is never returned."""
     for size in range(int(max_size), int(min_size) - 1, -1):
         font = _font(weight, size)
         if draw.textlength(text, font=font) <= max_width:
-            return font, [text]
+            if max_height is None or _line_height(font) <= max_height:
+                return font, [text]
     for size in range(int(max_size), int(min_size) - 1, -1):
         font = _font(weight, size)
         lines = _wrap(draw, text, font, max_width)
-        if all(draw.textlength(line, font=font) <= max_width for line in lines):
-            return font, _wrap_hard(draw, text, font, max_width)
+        if not all(draw.textlength(line, font=font) <= max_width
+                   for line in lines):
+            continue
+        lines = _wrap_hard(draw, text, font, max_width)
+        if max_height is None or _line_height(font) * len(lines) <= max_height:
+            return font, lines
     font = _font(weight, min_size)
-    return font, _wrap_hard(draw, text, font, max_width)
+    lines = _wrap_hard(draw, text, font, max_width)
+    if max_height is not None and _line_height(font) * len(lines) > max_height:
+        raise ValueError(
+            f"text does not fit {max_width}x{max_height}px even at the "
+            f"minimum font size {min_size}: {text[:60]!r}"
+        )
+    return font, lines
 
 
 def _centered(draw, cx, y, text, font, fill):
@@ -365,6 +384,12 @@ DOSSIER_NAME_SIZE = 68
 DOSSIER_NAME_MIN = 26
 DOSSIER_HANDLE_SIZE = 40
 DOSSIER_HANDLE_MIN = 20
+DOSSIER_ROW_GAP = 12
+# The hairline and the task row under it are fixed chrome at these offsets
+# below the panel top. Name and handle rows live ABOVE the hairline -- that
+# is the vertical budget the fit below is held to, not only the width.
+DOSSIER_TEXT_AREA_TOP = 44
+DOSSIER_HAIRLINE = 250
 
 
 def dossier_fields(snapshot):
@@ -419,30 +444,58 @@ def _fit_entire(face, tile):
 def dossier_text_layout(fields):
     """The name/handle rows for the dossier panel: ``(x, y, text, font,
     fill)`` tuples, fitted and wrapped so every row's bounding box stays
-    inside the panel. The block is centred in the space above the hairline;
-    the tally row below it is fixed chrome."""
+    inside the panel AND above the hairline. The block is centred in that
+    area; the tally row below the hairline is fixed chrome.
+
+    The budget is shared: the handle fits first at its own contract, the
+    name takes what remains, and only when the name's floor still cannot fit
+    does the handle give up a step. An identity that cannot fit even then
+    raises ValueError -- a real name is never clipped, truncated, or drawn
+    across the hairline over the task row."""
     probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
     px, py, pw, ph = DOSSIER_PANEL
-    name_font, name_lines = _fit_text(
-        probe, fields["name"], "bold",
-        DOSSIER_NAME_SIZE, DOSSIER_NAME_MIN, DOSSIER_TEXT_WIDTH,
-    )
-    handle_font, handle_lines = _fit_text(
-        probe, fields["handle"], "regular",
-        DOSSIER_HANDLE_SIZE, DOSSIER_HANDLE_MIN, DOSSIER_TEXT_WIDTH,
-    )
-    rows = [(line, name_font, TEXT) for line in name_lines]
-    rows += [(line, handle_font, CYAN + (255,)) for line in handle_lines]
+    area_top = py + DOSSIER_TEXT_AREA_TOP
+    area_bottom = py + DOSSIER_HAIRLINE - 6
+    budget = area_bottom - area_top
 
-    gap = 12
-    heights = [sum(font.getmetrics()) for _text, font, _fill in rows]
-    block_h = sum(heights) + gap
-    area_top, area_bottom = py + 44, py + 246  # above the hairline
-    y = area_top + max(0, (area_bottom - area_top - block_h) // 2)
+    name_rows = handle_rows = None
+    for handle_cap in range(DOSSIER_HANDLE_SIZE, DOSSIER_HANDLE_MIN - 1, -1):
+        handle_font, handle_lines = _fit_text(
+            probe, fields["handle"], "regular",
+            handle_cap, DOSSIER_HANDLE_MIN, DOSSIER_TEXT_WIDTH,
+        )
+        remaining = (
+            budget - DOSSIER_ROW_GAP
+            - _line_height(handle_font) * len(handle_lines)
+        )
+        try:
+            name_font, name_lines = _fit_text(
+                probe, fields["name"], "bold",
+                DOSSIER_NAME_SIZE, DOSSIER_NAME_MIN, DOSSIER_TEXT_WIDTH,
+                max_height=remaining,
+            )
+        except ValueError:
+            continue  # the handle gives up a step so the name can fit
+        name_rows = [(line, name_font) for line in name_lines]
+        handle_rows = [(line, handle_font) for line in handle_lines]
+        break
+    if name_rows is None:
+        raise ValueError(
+            "dossier identity cannot fit the panel text area above the "
+            f"hairline, even at the minimum sizes "
+            f"({DOSSIER_NAME_MIN}/{DOSSIER_HANDLE_MIN}): "
+            f"{fields['name']!r} / {fields['handle']!r}"
+        )
+    rows = [(text, font, TEXT) for text, font in name_rows]
+    rows += [(text, font, CYAN + (255,)) for text, font in handle_rows]
+
+    heights = [_line_height(font) for _text, font, _fill in rows]
+    block_h = sum(heights) + DOSSIER_ROW_GAP
+    y = area_top + (budget - block_h) // 2
     layout = []
     for i, (text, font, fill) in enumerate(rows):
-        if i == len(name_lines):
-            y += gap
+        if i == len(name_rows):
+            y += DOSSIER_ROW_GAP
         layout.append((DOSSIER_TEXT_X, y, text, font, fill))
         y += heights[i]
     return layout
@@ -499,7 +552,7 @@ def render_dossier(snapshot, face=None):
     tx0 = px + 56
     for x, y, text, font, fill in dossier_text_layout(fields):
         draw.text((x, y), text, font=font, fill=fill)
-    _hairline(img, py + 250, x0=tx0, x1=px + pw - 56, height=2)
+    _hairline(img, py + DOSSIER_HAIRLINE, x0=tx0, x1=px + pw - 56, height=2)
     dot = 20
     dy = py + 306
     draw.ellipse([tx0, dy, tx0 + dot, dy + dot], fill=GREEN + (255,))
@@ -531,13 +584,37 @@ def _plate_spec(member, seat):
     return spec
 
 
+def _missing_plate_copy(member):
+    """The required plate copy fields a cast member is missing."""
+    return [f for f in REQUIRED_PLATE_FIELDS
+            if not member.get("plate", {}).get(f)]
+
+
+def _incomplete_plate_entry(member, missing):
+    return {
+        "cast": member["id"],
+        "reason": "plate copy incomplete: missing " + ", ".join(missing),
+    }
+
+
 def plate_specs(manifest):
-    """Every fixed-cast seat as a plate.py-ready spec, in manifest order."""
-    return [
-        _plate_spec(member, seat)
-        for member in manifest["fixed_cast"]
-        for seat in member["seats"]
-    ]
+    """The fixed-cast seats as plate.py-ready specs, plus what was withheld.
+
+    Returns ``(specs, unresolved)``. A cast member whose plate copy is
+    incomplete is omitted and recorded in ``unresolved`` -- the same rule
+    `plan_chapter_plates` applies per chapter, so the validated manifest
+    path can never hand plate.py a plate it must not draw. An unsupported
+    plate is never rendered, because a plate placed without evidence is a
+    claim about a real person."""
+    specs, unresolved = [], []
+    for member in manifest["fixed_cast"]:
+        missing = _missing_plate_copy(member)
+        if missing:
+            if member["seats"]:
+                unresolved.append(_incomplete_plate_entry(member, missing))
+            continue
+        specs.extend(_plate_spec(member, seat) for seat in member["seats"])
+    return specs, unresolved
 
 
 def plan_chapter_plates(manifest, number):
@@ -549,16 +626,11 @@ def plan_chapter_plates(manifest, number):
     """
     plates, unresolved = [], []
     for member in manifest["fixed_cast"]:
-        missing = [f for f in REQUIRED_PLATE_FIELDS
-                   if not member.get("plate", {}).get(f)]
+        missing = _missing_plate_copy(member)
         seats = [s for s in member["seats"] if s["chapter"] == number]
         if missing:
             if seats:
-                unresolved.append({
-                    "cast": member["id"],
-                    "reason": "plate copy incomplete: missing "
-                              + ", ".join(missing),
-                })
+                unresolved.append(_incomplete_plate_entry(member, missing))
             continue
         plates.extend(_plate_spec(member, seat) for seat in seats)
     plates.sort(key=lambda spec: spec["at"])
