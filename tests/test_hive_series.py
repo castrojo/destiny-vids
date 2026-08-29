@@ -1173,6 +1173,8 @@ def test_build_episode_orchestrates_cards_encode_and_thumbnail(
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
         hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
+    monkeypatch.setattr(
+        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1237,6 +1239,8 @@ def test_build_episode_records_the_dossier_fallback_in_unresolved(
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
         hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
+    monkeypatch.setattr(
+        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1273,6 +1277,8 @@ def test_build_episode_still_encodes_when_the_source_is_undecodable(
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
         hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
+    monkeypatch.setattr(
+        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1326,6 +1332,8 @@ def test_build_episode_still_encodes_when_one_plate_png_is_missing(
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
         hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
+    monkeypatch.setattr(
+        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1393,6 +1401,8 @@ def _stage_episode(manifest, tmp_path, monkeypatch, data=None):
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
         hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
+    monkeypatch.setattr(
+        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
     monkeypatch.setattr(
         hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
