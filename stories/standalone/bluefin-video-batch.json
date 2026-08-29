@@ -475,6 +475,87 @@
           "duration": 1.0
         }
       ]
+    },
+    {
+      "slug": "bluefin-and-the-hive-ii",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=P0IlFZ61734",
+        "youtube_id": "P0IlFZ61734",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Official Bungie upload of Destiny 2: The Witch Queen reveal footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin and the Hive II",
+      "output": "~/Videos/Wolves/review/Bluefin and the Hive II.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and the Hive II-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "wayne-iron-lord-light",
+          "kind": "guardian",
+          "source_at": 50.0,
+          "dur": 3.0,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "The 48.800-54.800 scene holds on the lead Guardian moving through the Throne World. The whole 50.000-53.000 seat remains on that character and clears before the cut.",
+          "name": "Wayne Witzel III",
+          "title": "Iron Lord of Light",
+          "variant": "rust",
+          "avatar": "renders/avatars/wwitzel3.jpg"
+        },
+        {
+          "id": "marco-iron-lord-dark",
+          "kind": "guardian",
+          "source_at": 55.0,
+          "dur": 3.0,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "The second Guardian takes over after the lead's close-up. The whole 55.000-58.000 seat remains on the white-helmeted character through the adjoining shots.",
+          "name": "Marco Ceppi",
+          "title": "Iron Lord of Dark",
+          "variant": "rust",
+          "avatar": "renders/avatars/marcoceppi.jpg"
+        },
+        {
+          "id": "matt-third-guardian",
+          "kind": "guardian",
+          "source_at": 99.0,
+          "dur": 2.2,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "The final reveal holds all three Lightbearers together; the third, rightmost character remains visible for the complete minimum-readable hold before the title card.",
+          "name": "Matt Bruzek",
+          "avatar": "renders/avatars/mbruzek.jpg"
+        },
+        {
+          "id": "witch-queen-future",
+          "kind": "guardian",
+          "source_at": 67.2,
+          "dur": 3.2,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "The 64.433-72.767 emergence sequence holds on the Witch Queen from the waterline through her full reveal. This seat clears before the later moth hero moment.",
+          "name": "[REDACTED]",
+          "title": "I Control the Future"
+        }
+      ],
+      "takeover": {
+        "source_at": 101.7
+      },
+      "thumbnail": {
+        "source_at": 101.0,
+        "why": "The moth is fully revealed above the Witch Queen with the three risen figures still readable below; this is the owner-designated hero moment immediately before the title card."
+      },
+      "audio_probes": [
+        {
+          "source_at": 60.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 105.5,
+          "duration": 1.0
+        }
+      ]
     }
   ]
 }
