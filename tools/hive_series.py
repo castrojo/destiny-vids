@@ -12,8 +12,8 @@ and every card that can be rendered WITHOUT footage:
   unchanged, and the frozen candidate-1 lore subtitle;
 * the Guardian dossier A contributor card -- a full uncropped square GitHub
   PFP beside a dark KubeStellar glass panel, factual fields only: display
-  name (falling back to login), @login, and HIVE TASKS +N. No generated
-  title, ever.
+  name (falling back to login), @login, and the window's COMMITS +N. No
+  generated title, ever.
 
 The fixed character plates are NOT drawn here: `tools/plate.py` is frozen in
 Wolves delivery, so this module only builds plate.py-ready specs from the
@@ -33,6 +33,9 @@ an explicit unresolved entry. Avatar bytes are never committed.
     python3 tools/hive_series.py build-all       # all twelve, verified
     python3 tools/hive_series.py cut             # the full-season join
     python3 tools/hive_series.py verify [N]      # probe delivered files
+    python3 tools/hive_series.py contributors    # this window's candidates (no writes)
+    python3 tools/hive_series.py select-next     # issue the next episode's dossiers
+    python3 tools/hive_series.py status          # issued/unissued, delivered/missing
 
 The episode build is ONE H.264/AAC encode per episode through
 `tools.farm.run_encode` -- remote-first, memory-capped local fallback, never
@@ -50,8 +53,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -79,7 +84,7 @@ OPENING_CTA_SHA256 = "a96319cc13f1b8712e864f90cf1f29cc72017a947ee3cc905261d1e97c
 
 # --- KubeStellar-inspired palette ------------------------------------------
 # Project Bluefin creative language, not an official-brand claim. Green is a
-# status accent only -- the HIVE TASKS tally dot and the #HIREAWOLF pill.
+# status accent only -- the COMMITS tally dot and the #HIREAWOLF pill.
 INK = (10, 15, 28)          # #0A0F1C near-black
 INK_DEEP = (7, 11, 21)      # slightly darker, for the vertical falloff
 BLUE = (26, 144, 255)       # #1A90FF
@@ -413,13 +418,14 @@ def dossier_fields(snapshot):
     """The factual GitHub identity rows for a dossier card. Nothing else.
 
     The display name falls back to the login when GitHub's is empty; the
-    tally is rendered as ``HIVE TASKS +N``. A generated title is never added.
+    tally is the window's commit count, rendered as ``COMMITS +N``. A
+    generated title is never added.
     """
     name = (snapshot.get("name") or "").strip() or snapshot["login"]
     return {
         "name": name,
         "handle": f"@{snapshot['login']}",
-        "tasks": f"HIVE TASKS +{int(snapshot['tasks'])}",
+        "tasks": f"COMMITS +{int(snapshot['commits'])}",
     }
 
 
@@ -1663,6 +1669,305 @@ def verify_cut(manifest, ffmpeg=None):
     return problems
 
 
+# --- Task 4: weekly contributor recognition ---------------------------------
+#
+# Recognition is public GitHub activity, not Hive calendar metrics, and not
+# calendar-week precise: the season ships roughly every seven days, so each
+# selection run counts commit authors in the configured repositories between
+# the prior snapshot's captured_at and now. The no-repeat ledger in the
+# manifest is canonical and singular -- prior IDs are derived from it, never
+# kept in a second list. A run that cannot read a configured repository fails
+# WITHOUT touching the ledger; a run with no eligible contributor still
+# issues the next episode with an empty dossier list and a recorded note
+# (AGENTS.md: degrade, never block).
+
+RECOGNITION_PAGE_SIZE = 100
+RECOGNITION_LIMIT = 3
+
+
+class RecognitionError(RuntimeError):
+    """A configured repository could not be read. The ledger is untouched."""
+
+
+def _utcnow():
+    return datetime.now(timezone.utc).replace(microsecond=0) \
+        .isoformat().replace("+00:00", "Z")
+
+
+def commits_command(repo, since, until):
+    """The paginated commit-listing call for one configured repository."""
+    return [
+        "gh", "api", "--paginate",
+        f"repos/{repo}/commits?since={since}&until={until}"
+        f"&per_page={RECOGNITION_PAGE_SIZE}",
+    ]
+
+
+def profile_command(login):
+    """The Users API call that resolves a candidate's profile snapshot."""
+    return ["gh", "api", f"users/{login}"]
+
+
+def parse_paginated_json(text):
+    """Every object in ``gh api --paginate`` output.
+
+    `--paginate` prints each page's body back to back, so the stdout of one
+    command is zero or more concatenated JSON arrays -- not one document.
+    Pages are flattened; a non-array body (e.g. a single-object endpoint)
+    yields itself."""
+    decoder = json.JSONDecoder()
+    items, idx = [], 0
+    while True:
+        while idx < len(text) and text[idx].isspace():
+            idx += 1
+        if idx >= len(text):
+            return items
+        page, idx = decoder.raw_decode(text, idx)
+        items.extend(page if isinstance(page, list) else [page])
+
+
+def _live_runner(cmd):
+    """The real `gh` call. Live GitHub access lives behind this and
+    `fixture_runner` only, so the whole selection is testable offline."""
+    done = subprocess.run(cmd, capture_output=True, text=True)
+    if done.returncode != 0:
+        raise RecognitionError(
+            f"{' '.join(cmd)} failed: {(done.stderr or '').strip()}")
+    return done.stdout
+
+
+def fixture_runner(fixture):
+    """A runner over canned responses: ``{url-fragment: {"pages": [...]} or
+    {"body": ...}}``. Pages are re-serialized concatenated so the paginated
+    parser is exercised exactly as with live `gh`. A command matching no key
+    is the failed-repo case."""
+    def run(cmd):
+        text = " ".join(cmd)
+        for fragment, payload in fixture.items():
+            if fragment in text:
+                if "pages" in payload:
+                    return "".join(json.dumps(p) for p in payload["pages"])
+                return json.dumps(payload["body"])
+        raise RecognitionError(f"fixture has no response for: {text}")
+    return run
+
+
+def collect_activity(repositories, since, until, runner):
+    """Distinct commit authors per durable numeric account ID, with the
+    repo/SHA evidence. Commits are deduplicated by SHA across pages and
+    repositories; a commit with no linked GitHub account has no durable ID
+    to key the ledger on and is skipped. Any unreadable repository raises
+    RecognitionError -- the caller leaves the ledger untouched."""
+    authors = {}
+    for repo in repositories:
+        try:
+            out = runner(commits_command(repo, since, until))
+        except Exception as exc:
+            raise RecognitionError(
+                f"{repo}: cannot read commits ({exc})") from exc
+        for commit in parse_paginated_json(out):
+            author = commit.get("author") or {}
+            account_id = author.get("id")
+            sha = commit.get("sha")
+            if not account_id or not sha:
+                continue
+            entry = authors.setdefault(
+                account_id, {"author": author, "evidence": {}, "seen": set()})
+            # One SHA is one commit however many pages or repositories
+            # return it (shared history shows up in every repo that has it);
+            # it is evidence in the FIRST configured repo that reported it.
+            if sha in entry["seen"]:
+                continue
+            entry["seen"].add(sha)
+            entry["evidence"].setdefault(repo, []).append(sha)
+    for entry in authors.values():
+        del entry["seen"]
+    return authors
+
+
+def _exclusion(candidate, fixed_ids, credited_ids):
+    """Why this account cannot be dossiered, or None. Bots and non-User
+    accounts, the fixed cast, and every ID already in the no-repeat ledger
+    are all exclusions -- the ledger keys on the durable numeric ID, so a
+    renamed login is still the same credited person."""
+    if candidate["type"] != "User":
+        return f"account type {candidate['type']!r} is not a User"
+    if candidate["id"] in fixed_ids:
+        return "fixed cast"
+    if candidate["id"] in credited_ids:
+        return "already credited in the no-repeat ledger"
+    return None
+
+
+def recognition_snapshot(manifest, since, until, runner=_live_runner,
+                         now=None):
+    """The full candidate evidence for one window, plus the selection.
+
+    Every distinct commit author is recorded with an exclusion reason or
+    resolved through the Users API (which carries the public `name` the
+    commit listing does not). A profile that cannot be resolved is excluded
+    and recorded rather than failing the run. Selection is up to
+    RECOGNITION_LIMIT by commit count descending, normalized login
+    ascending, numeric ID ascending."""
+    captured = now or _utcnow()
+    ledger = manifest.get("contributor_ledger") or {}
+    repositories = ledger.get("repositories") or []
+    if not repositories:
+        raise RecognitionError(
+            "contributor_ledger.repositories is empty: no recognition "
+            "repositories are configured")
+    fixed_ids = {m["github_id"] for m in manifest.get("fixed_cast") or []
+                 if m.get("github_id")}
+    credited_ids = set(ledger.get("credited_github_ids") or [])
+    activity = collect_activity(repositories, since, until, runner)
+    candidates = []
+    for account_id in sorted(activity):
+        entry = activity[account_id]
+        author = entry["author"]
+        candidate = {
+            "id": account_id,
+            "node_id": author.get("node_id"),
+            "login": author.get("login") or "",
+            "name": None,
+            "html_url": author.get("html_url"),
+            "avatar_url": author.get("avatar_url"),
+            "type": author.get("type") or "",
+            "fetched_at": captured,
+            "commits": sum(len(s) for s in entry["evidence"].values()),
+            "evidence": [
+                {"repo": repo, "shas": sorted(shas)}
+                for repo, shas in sorted(entry["evidence"].items())
+            ],
+        }
+        reason = _exclusion(candidate, fixed_ids, credited_ids)
+        if reason:
+            candidate["excluded"] = reason
+        candidates.append(candidate)
+    for candidate in candidates:
+        if "excluded" in candidate:
+            continue
+        try:
+            profile = json.loads(runner(profile_command(candidate["login"])))
+        except Exception as exc:
+            candidate["excluded"] = f"profile could not be resolved ({exc})"
+            continue
+        for field in ("node_id", "login", "name", "html_url", "avatar_url",
+                      "type"):
+            if field in profile:
+                candidate[field] = profile[field]
+        reason = _exclusion(candidate, fixed_ids, credited_ids)
+        if reason:
+            candidate["excluded"] = reason
+    eligible = [c for c in candidates if "excluded" not in c]
+    eligible.sort(key=lambda c: (-c["commits"], c["login"].lower(), c["id"]))
+    selected = eligible[:RECOGNITION_LIMIT]
+    return {
+        "captured_at": captured,
+        "window": {"since": since, "until": until},
+        "candidates": candidates,
+        "selected_github_ids": [c["id"] for c in selected],
+    }
+
+
+def _dossier_entry(candidate):
+    """The chapter's committed profile snapshot for one selected contributor:
+    factual GitHub fields only, plus the window's commit count."""
+    entry = {
+        "login": candidate["login"],
+        "github_id": candidate["id"],
+        "name": candidate.get("name"),
+        "commits": candidate["commits"],
+    }
+    for field in ("node_id", "html_url", "avatar_url", "type", "fetched_at"):
+        if candidate.get(field):
+            entry[field] = candidate[field]
+    return entry
+
+
+def _atomic_write_json(path, data):
+    """Write-then-rename beside the target: a reader never sees half a
+    manifest, and a failed validation earlier leaves the file untouched."""
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def select_next_episode(manifest_path=None, since=None, runner=_live_runner,
+                        now=None, log=print):
+    """Issue the next episode's contributor dossiers, atomically with the
+    snapshot and ledger update.
+
+    The window runs from the prior snapshot's ``captured_at`` (or an explicit
+    ``since`` for the first run) to ``now``. The next UNISSUED chapter -- the
+    first with no ``dossiers`` key -- is filled; a chapter that already has
+    dossiers is never overwritten. An empty selection still issues the
+    chapter, with an empty list and a recorded note: the release is never
+    held for a quiet week. The updated manifest is validated BEFORE it is
+    written, and any repository read failure raises before anything is
+    written. Returns ``(snapshot, chapter_or_none)``."""
+    path = Path(manifest_path or MANIFEST)
+    manifest = load_manifest_data(json.loads(path.read_text("utf-8")))
+    ledger = manifest["contributor_ledger"]
+    snapshots = ledger.setdefault("snapshots", [])
+    if since is None:
+        if not snapshots:
+            raise RecognitionError(
+                "no prior snapshot to start the window from; pass --since "
+                "for the first selection")
+        since = snapshots[-1]["captured_at"]
+    until = now or _utcnow()
+    snapshot = recognition_snapshot(manifest, since, until, runner=runner,
+                                    now=until)
+    chapter = next((c for c in manifest["chapters"] if "dossiers" not in c),
+                   None)
+    snapshot["episode"] = chapter["number"] if chapter else None
+    if chapter is None:
+        snapshot["note"] = ("every chapter is already issued; the window is "
+                            "recorded and no episode changes")
+    else:
+        order = {cid: i for i, cid in
+                 enumerate(snapshot["selected_github_ids"])}
+        selected = sorted((c for c in snapshot["candidates"]
+                           if c["id"] in order), key=lambda c: order[c["id"]])
+        chapter["dossiers"] = [_dossier_entry(c) for c in selected]
+        if selected:
+            ledger.setdefault("credited_github_ids", []).extend(
+                snapshot["selected_github_ids"])
+        else:
+            note = (f"no eligible contributors in the window {since} .. "
+                    f"{until}: the episode ships without dossier cards")
+            chapter["dossier_note"] = note
+            snapshot["note"] = note
+        log(f"episode {chapter['number']} ({chapter['slug']}): "
+            f"{len(selected)} contributor(s) selected"
+            + ("" if selected else " -- none eligible, recorded"))
+    snapshots.append(snapshot)
+    # The write happens only after the updated record validates; a failure
+    # above -- including any unreadable repository -- leaves the file as it
+    # was.
+    load_manifest_data(manifest)
+    _atomic_write_json(path, manifest)
+    return snapshot, chapter
+
+
+def recognition_status(manifest):
+    """Per-episode issue/delivery state: ``dossiers`` present means issued,
+    the output file existing means delivered."""
+    rows = []
+    for chapter in manifest["chapters"]:
+        issued = "dossiers" in chapter
+        out = episode_output_path(chapter)
+        rows.append({
+            "number": chapter["number"],
+            "slug": chapter["slug"],
+            "issued": issued,
+            "dossiers": len(chapter.get("dossiers") or []) if issued
+                        else None,
+            "delivered": out.exists(),
+            "output": str(out),
+        })
+    return rows
+
 
 # --- manifest loading and validation ---------------------------------------------
 
@@ -1726,12 +2031,23 @@ def _semantic_errors(data):
     ledger = (data.get("contributor_ledger") or {}).get("credited_github_ids") or []
     for github_id in ledger:
         (repeats if github_id in seen else seen).add(github_id)
+    # The ledger is the union of everyone ever credited; each chapter's
+    # dossiers reference it. So a dossier ID is expected ONCE in the ledger
+    # and at most once across all chapters -- never twice on screen.
+    credited = set(ledger)
+    dossier_seen = set()
     for chapter in chapters:
         for dossier in chapter.get("dossiers") or []:
             github_id = dossier.get("github_id")
-            if github_id in seen:
+            if github_id in dossier_seen:
                 repeats.add(github_id)
-            seen.add(github_id)
+            dossier_seen.add(github_id)
+            if github_id not in credited:
+                errors.append(
+                    f"chapter {chapter.get('number')}: dossier "
+                    f"{dossier.get('login')} ({github_id}) is not in the "
+                    "no-repeat ledger"
+                )
     if repeats:
         errors.append(
             "contributor GitHub IDs repeat across the season: "
@@ -1842,6 +2158,67 @@ def _cmd_verify(args):
     return _report_verify(verify_cut(manifest))
 
 
+def _recognition_runner(args):
+    if args.fixture:
+        fixture = json.loads(Path(args.fixture).read_text(encoding="utf-8"))
+        return fixture_runner(fixture)
+    return _live_runner
+
+
+def _recognition_since(manifest, args):
+    if args.since:
+        return args.since
+    snapshots = (manifest.get("contributor_ledger") or {}).get("snapshots") \
+        or []
+    if not snapshots:
+        raise RecognitionError(
+            "no prior snapshot to start the window from; pass --since for "
+            "the first selection")
+    return snapshots[-1]["captured_at"]
+
+
+def _cmd_contributors(args):
+    """Compute and print this window's candidate evidence. Reads only --
+    nothing here touches the manifest."""
+    manifest = load_manifest()
+    runner = _recognition_runner(args)
+    since = _recognition_since(manifest, args)
+    snapshot = recognition_snapshot(manifest, since, _utcnow(),
+                                    runner=runner)
+    print(json.dumps(snapshot, indent=2))
+    return 0
+
+
+def _cmd_select_next(args):
+    snapshot, chapter = select_next_episode(
+        MANIFEST, since=args.since, runner=_recognition_runner(args))
+    if chapter is None:
+        print("select-next: every chapter is already issued; "
+              "the window was recorded")
+    else:
+        print(f"select-next: episode {chapter['number']} "
+              f"({chapter['slug']}) now carries "
+              f"{len(chapter['dossiers'])} dossier(s); "
+              f"selected ids {snapshot['selected_github_ids']}")
+    return 0
+
+
+def _cmd_status(_args):
+    manifest = load_manifest()
+    ledger = manifest["contributor_ledger"]
+    snapshots = ledger.get("snapshots") or []
+    print(f"ledger: {len(ledger.get('credited_github_ids') or [])} credited, "
+          f"{len(snapshots)} snapshot(s)"
+          + (f", last captured {snapshots[-1]['captured_at']}"
+             if snapshots else ""))
+    for row in recognition_status(manifest):
+        issued = (f"issued ({row['dossiers']} dossier(s))"
+                  if row["issued"] else "unissued")
+        delivered = "delivered" if row["delivered"] else "missing"
+        print(f"  e{row['number']:02d} {row['slug']}: {issued}, {delivered}")
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -1862,6 +2239,26 @@ def main(argv=None):
     verify = sub.add_parser(
         "verify", help="probe the delivered files (one episode, or all+cut)")
     verify.add_argument("number", type=int, nargs="?", default=None)
+    contributors = sub.add_parser(
+        "contributors", help="print this window's candidate evidence "
+                             "(reads only, no writes)")
+    contributors.add_argument("--since", default=None,
+                              help="window start (UTC ISO-8601); defaults to "
+                                   "the last snapshot's captured_at")
+    contributors.add_argument("--fixture", default=None,
+                              help="canned gh responses JSON instead of live "
+                                   "GitHub calls")
+    select = sub.add_parser(
+        "select-next", help="issue the next episode's contributor dossiers "
+                            "and record the snapshot, atomically")
+    select.add_argument("--since", default=None,
+                        help="window start (UTC ISO-8601); defaults to the "
+                             "last snapshot's captured_at")
+    select.add_argument("--fixture", default=None,
+                        help="canned gh responses JSON instead of live "
+                             "GitHub calls")
+    sub.add_parser("status", help="issued/unissued and delivered/missing "
+                                  "per episode")
     args = parser.parse_args(argv)
     return {
         "check": _cmd_check,
@@ -1871,6 +2268,9 @@ def main(argv=None):
         "build-all": _cmd_build_all,
         "cut": _cmd_cut,
         "verify": _cmd_verify,
+        "contributors": _cmd_contributors,
+        "select-next": _cmd_select_next,
+        "status": _cmd_status,
     }[args.command](args)
 
 

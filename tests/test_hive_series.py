@@ -136,20 +136,33 @@ def test_one_shared_source_block_for_the_whole_season(manifest):
         assert "source" not in chapter
 
 
-def test_contributor_ledger_starts_empty_and_ids_never_repeat(manifest):
-    assert manifest["contributor_ledger"]["credited_github_ids"] == []
-
+def test_contributor_ledger_ids_never_repeat(manifest):
     doctored = json.loads(json.dumps(manifest))
     doctored["contributor_ledger"]["credited_github_ids"] = [42, 42]
     with pytest.raises(ValueError, match="repeat"):
         hive_series.load_manifest_data(doctored)
 
+    # The ledger is the union of everyone credited: a dossier's ID belongs
+    # in it exactly once, and on screen at most once.
     doctored = json.loads(json.dumps(manifest))
     doctored["contributor_ledger"]["credited_github_ids"] = [42]
     doctored["chapters"][0]["dossiers"] = [
-        {"login": "someone", "github_id": 42, "name": "", "tasks": 1}
+        {"login": "someone", "github_id": 42, "name": "", "commits": 1}
+    ]
+    hive_series.load_manifest_data(doctored)
+
+    doctored["chapters"][1]["dossiers"] = [
+        {"login": "someone-renamed", "github_id": 42, "name": "",
+         "commits": 1}
     ]
     with pytest.raises(ValueError, match="repeat"):
+        hive_series.load_manifest_data(doctored)
+
+    doctored = json.loads(json.dumps(manifest))
+    doctored["chapters"][0]["dossiers"] = [
+        {"login": "unledgered", "github_id": 43, "name": "", "commits": 1}
+    ]
+    with pytest.raises(ValueError, match="not in the no-repeat ledger"):
         hive_series.load_manifest_data(doctored)
 
 
@@ -492,7 +505,7 @@ def _fixture_snapshot():
         "login": "test-fixture",
         "github_id": 424242,
         "name": "Fixture Contributor",
-        "tasks": 3,
+        "commits": 3,
     }
 
 
@@ -501,7 +514,7 @@ def test_dossier_fields_are_factual_github_data_only():
     assert fields == {
         "name": "Fixture Contributor",
         "handle": "@test-fixture",
-        "tasks": "HIVE TASKS +3",
+        "tasks": "COMMITS +3",
     }
 
 
@@ -689,7 +702,7 @@ def test_dossier_text_layout_fails_loudly_past_the_minimum_sizes():
     fields = {
         "name": "Xe ".join(["Mr"] * 300),  # ~900 chars of short tokens
         "handle": "@" + "x" * 300,
-        "tasks": "HIVE TASKS +1",
+        "tasks": "COMMITS +1",
     }
     with pytest.raises(ValueError, match="cannot fit"):
         hive_series.dossier_text_layout(fields)
@@ -764,13 +777,13 @@ def test_episode_timeline_is_the_five_authored_beats(manifest):
 
 
 def test_zero_to_three_dossier_cards_sit_between_title_and_chapter(manifest):
-    doctored = _doctored(manifest, lambda d: d["chapters"][0].__setitem__(
-        "dossiers",
-        [
-            {"login": "alice", "github_id": 11, "name": "Alice A", "tasks": 2},
-            {"login": "bob", "github_id": 22, "name": "", "tasks": 1},
-        ],
-    ))
+    def add(d):
+        d["chapters"][0]["dossiers"] = [
+            {"login": "alice", "github_id": 11, "name": "Alice A", "commits": 2},
+            {"login": "bob", "github_id": 22, "name": "", "commits": 1},
+        ]
+        d["contributor_ledger"]["credited_github_ids"] = [11, 22]
+    doctored = _doctored(manifest, add)
     chapter = hive_series.chapter_by_number(doctored, 1)
     segments = hive_series.episode_segments(doctored, chapter)
     assert [s["kind"] for s in segments] == [
@@ -802,10 +815,12 @@ def test_source_marks_convert_to_chapter_relative_never_move(manifest):
 
 
 def test_front_offset_counts_the_dossier_cards(manifest):
-    doctored = _doctored(manifest, lambda d: d["chapters"][0].__setitem__(
-        "dossiers",
-        [{"login": "alice", "github_id": 11, "name": "A", "tasks": 1}],
-    ))
+    def add(d):
+        d["chapters"][0]["dossiers"] = [
+            {"login": "alice", "github_id": 11, "name": "A", "commits": 1},
+        ]
+        d["contributor_ledger"]["credited_github_ids"] = [11]
+    doctored = _doctored(manifest, add)
     chapter = hive_series.chapter_by_number(doctored, 1)
     assert hive_series.front_cards_duration(doctored, chapter) == 19.0
     assert hive_series.source_to_episode_time(36.0, doctored, chapter) == 55.0
@@ -870,10 +885,12 @@ def test_episode_filtergraph_resamples_only_a_non_delivery_rate(manifest):
 
 
 def test_episode_filtergraph_dossiers_grow_the_still_legs(manifest):
-    doctored = _doctored(manifest, lambda d: d["chapters"][0].__setitem__(
-        "dossiers",
-        [{"login": "alice", "github_id": 11, "name": "A", "tasks": 1}],
-    ))
+    def add(d):
+        d["chapters"][0]["dossiers"] = [
+            {"login": "alice", "github_id": 11, "name": "A", "commits": 1},
+        ]
+        d["contributor_ledger"]["credited_github_ids"] = [11]
+    doctored = _doctored(manifest, add)
     plan = hive_series.episode_plan(doctored, 1)
     graph = hive_series.episode_filtergraph(plan)
     assert graph.count("anullsrc=r=48000:cl=stereo") == 4
@@ -1186,8 +1203,9 @@ def test_build_episode_records_the_dossier_fallback_in_unresolved(
     data = _delivery_manifest(manifest, tmp_path)
     data["chapters"][0]["dossiers"] = [{
         "login": "fixture", "github_id": 424242,
-        "name": "Xe ".join(["Mr"] * 300), "tasks": 1,
+        "name": "Xe ".join(["Mr"] * 300), "commits": 1,
     }]
+    data["contributor_ledger"]["credited_github_ids"] = [424242]
     manifest_path = tmp_path / "season.json"
     manifest_path.write_text(json.dumps(data))
     hive_series.load_manifest(manifest_path)  # the doctored record validates
@@ -1327,8 +1345,9 @@ def test_episode_input_digest_tracks_every_content_class(manifest, tmp_path):
 
     data = json.loads(json.dumps(manifest))
     data["chapters"][0]["dossiers"] = [{
-        "login": "fixture", "github_id": 424242, "name": "Ada", "tasks": 1,
+        "login": "fixture", "github_id": 424242, "name": "Ada", "commits": 1,
     }]
+    data["contributor_ledger"]["credited_github_ids"] = [424242]
     changed_copy = hive_series.episode_input_digest(
         hive_series.episode_plan(hive_series.load_manifest_data(data), 1),
         staged)
@@ -1455,8 +1474,9 @@ def test_build_episode_rebuilds_when_dossier_copy_changes_at_same_duration(
         manifest, tmp_path, monkeypatch):
     data = _delivery_manifest(manifest, tmp_path)
     data["chapters"][0]["dossiers"] = [{
-        "login": "fixture", "github_id": 424242, "name": "Ada", "tasks": 1,
+        "login": "fixture", "github_id": 424242, "name": "Ada", "commits": 1,
     }]
+    data["contributor_ledger"]["credited_github_ids"] = [424242]
     manifest_path, data = _stage_episode(
         manifest, tmp_path, monkeypatch, data=data)
     calls = []
@@ -1828,3 +1848,414 @@ def test_cut_command_reports_problems_and_still_returns_the_cut(
     monkeypatch.setattr(hive_series, "build_cut",
                         lambda *a, **k: (cut, ["s01e07: probe failed"]))
     assert hive_series.main(["cut"]) == 1
+
+
+# --- Task 4: weekly contributor recognition ---------------------------------
+#
+# Offline like the rest of the suite: every GitHub call goes through a fake
+# runner, so pagination, exclusion, sorting and the ledger update are all
+# exercised without a network.
+
+RECOGNITION_REPOS = [
+    "kubestellar/kubestellar",
+    "kubestellar/kubeflex",
+    "kubestellar/console",
+    "kubestellar/docs",
+    "kubestellar/hive",
+]
+
+FIXED_CAST_IDS = {15972783, 98050010, 104345443}
+
+SINCE = "2026-08-22T00:00:00Z"
+UNTIL = "2026-08-29T12:00:00Z"
+
+
+def _commit(sha, login, account_id, type_="User"):
+    return {
+        "sha": sha,
+        "author": {
+            "id": account_id,
+            "login": login,
+            "type": type_,
+            "node_id": f"U_kgDO{account_id}",
+            "html_url": f"https://github.com/{login}",
+            "avatar_url": f"https://avatars.githubusercontent.com/u/{account_id}?v=4",
+        },
+    }
+
+
+def _profile(login, account_id, name=None, type_="User"):
+    return {
+        "id": account_id,
+        "node_id": f"U_kgDO{account_id}",
+        "login": login,
+        "name": name,
+        "html_url": f"https://github.com/{login}",
+        "avatar_url": f"https://avatars.githubusercontent.com/u/{account_id}?v=4",
+        "type": type_,
+    }
+
+
+def _fake_gh(commits_by_repo, profiles=None):
+    """A runner over canned API responses. ``commits_by_repo`` maps a repo to
+    a list of PAGES (each page a list of commit objects) so the paginated
+    parser is exercised; ``profiles`` maps a login to the Users API body. A
+    repo or login with no entry raises -- the failed-read case."""
+    profiles = profiles or {}
+
+    def run(cmd):
+        text = " ".join(cmd)
+        for repo, pages in commits_by_repo.items():
+            if f"repos/{repo}/commits" in text:
+                return "".join(json.dumps(p) for p in pages)
+        for login, body in profiles.items():
+            if f"users/{login}" in text:
+                return json.dumps(body)
+        raise hive_series.RecognitionError(f"no canned response: {text}")
+
+    return run
+
+
+def _recognition_manifest(raw, credited=()):
+    """A valid manifest copy with no chapter issued and a primed ledger."""
+    data = json.loads(json.dumps(raw))
+    for chapter in data["chapters"]:
+        chapter.pop("dossiers", None)
+        chapter.pop("dossier_note", None)
+    data["contributor_ledger"] = {
+        "credited_github_ids": list(credited),
+        "repositories": list(RECOGNITION_REPOS),
+        "snapshots": [],
+    }
+    return data
+
+
+def test_commits_command_is_paginated_and_windowed():
+    cmd = hive_series.commits_command("kubestellar/hive", SINCE, UNTIL)
+    assert cmd[:3] == ["gh", "api", "--paginate"]
+    assert cmd[3] == (f"repos/kubestellar/hive/commits?since={SINCE}"
+                      f"&until={UNTIL}&per_page=100")
+
+
+def test_parse_paginated_json_reads_concatenated_pages():
+    text = json.dumps([{"sha": "a"}]) + json.dumps([{"sha": "b"},
+                                                    {"sha": "c"}])
+    assert [c["sha"] for c in hive_series.parse_paginated_json(text)] == \
+        ["a", "b", "c"]
+    assert hive_series.parse_paginated_json("") == []
+
+
+def test_fixture_runner_replays_pages_and_fails_unknown_repos():
+    fixture = {
+        "repos/kubestellar/hive/commits": {"pages": [[{"sha": "x"}],
+                                                     [{"sha": "y"}]]},
+        "users/octocat": {"body": {"login": "octocat"}},
+    }
+    runner = hive_series.fixture_runner(fixture)
+    out = runner(hive_series.commits_command("kubestellar/hive", SINCE, UNTIL))
+    assert [c["sha"] for c in hive_series.parse_paginated_json(out)] == \
+        ["x", "y"]
+    assert json.loads(runner(hive_series.profile_command("octocat"))) == \
+        {"login": "octocat"}
+    with pytest.raises(hive_series.RecognitionError):
+        runner(hive_series.commits_command("kubestellar/docs", SINCE, UNTIL))
+
+
+def _activity(commits_by_repo, profiles=None, credited=(), raw=None):
+    manifest = _recognition_manifest(
+        raw if raw is not None else json.loads(MANIFEST_PATH.read_text()),
+        credited=credited)
+    # The unit fixture fakes exactly these repos; the selection must read
+    # every configured repo, so configure the faked set.
+    manifest["contributor_ledger"]["repositories"] = list(commits_by_repo)
+    return hive_series.recognition_snapshot(
+        manifest, SINCE, UNTIL,
+        runner=_fake_gh(commits_by_repo, profiles), now=UNTIL)
+
+
+def test_bots_and_non_user_accounts_are_excluded():
+    pages = [[
+        _commit("a1", "dependabot[bot]", 1001, type_="Bot"),
+        _commit("a2", "some-org", 1002, type_="Organization"),
+        _commit("a3", "real-person", 1003),
+    ]]
+    snapshot = _activity(
+        {"kubestellar/hive": pages},
+        profiles={"real-person": _profile("real-person", 1003, "Real Person")})
+    by_login = {c["login"]: c for c in snapshot["candidates"]}
+    assert "not a User" in by_login["dependabot[bot]"]["excluded"]
+    assert "not a User" in by_login["some-org"]["excluded"]
+    assert "excluded" not in by_login["real-person"]
+    assert snapshot["selected_github_ids"] == [1003]
+
+
+def test_fixed_cast_is_excluded_by_numeric_id():
+    pages = [[_commit("c1", "angiejones", 15972783),
+              _commit("c2", "newcomer", 2002)]]
+    snapshot = _activity(
+        {"kubestellar/hive": pages},
+        profiles={"newcomer": _profile("newcomer", 2002)})
+    by_login = {c["login"]: c for c in snapshot["candidates"]}
+    assert by_login["angiejones"]["excluded"] == "fixed cast"
+    assert snapshot["selected_github_ids"] == [2002]
+
+
+def test_a_renamed_login_is_excluded_by_the_same_numeric_id():
+    """The ledger keys on the durable numeric ID: an already-credited account
+    that has since renamed is still excluded."""
+    pages = [[_commit("r1", "renamed-login", 3003)]]
+    snapshot = _activity({"kubestellar/hive": pages}, credited=[3003])
+    candidate = snapshot["candidates"][0]
+    assert candidate["login"] == "renamed-login"
+    assert candidate["excluded"] == "already credited in the no-repeat ledger"
+    assert snapshot["selected_github_ids"] == []
+
+
+def test_commits_deduplicate_by_sha_across_pages_and_repos():
+    dup = _commit("dddd", "dev", 4004)
+    snapshot = _activity(
+        {"kubestellar/hive": [[dup], [dup, _commit("e1", "dev", 4004)]],
+         "kubestellar/docs": [[_commit("dddd", "dev", 4004)]]},
+        profiles={"dev": _profile("dev", 4004)})
+    candidate = snapshot["candidates"][0]
+    assert candidate["commits"] == 2
+    # "dddd" is one commit however many pages or repos return it; it is
+    # evidence in the first configured repo that reported it.
+    assert candidate["evidence"] == [
+        {"repo": "kubestellar/hive", "shas": ["dddd", "e1"]},
+    ]
+
+
+def test_unlinked_commits_have_no_durable_id_and_are_skipped():
+    pages = [[{"sha": "x1", "author": None},
+              {"sha": "x2", "author": {"login": "ghost"}},
+              _commit("x3", "dev", 5005)]]
+    snapshot = _activity({"kubestellar/hive": pages},
+                         profiles={"dev": _profile("dev", 5005)})
+    assert [c["login"] for c in snapshot["candidates"]] == ["dev"]
+
+
+def test_selection_orders_by_commits_then_login_then_id():
+    commits = [
+        _commit("t1", "zed", 9001),      # 1 commit
+        _commit("t2", "bravo", 9002),    # 2 commits
+        _commit("t3", "bravo", 9002),
+        _commit("t4", "Alpha", 9003),    # 2 commits, ties bravo, login wins
+        _commit("t5", "Alpha", 9003),
+        _commit("t6", "charlie", 9004),  # 2 commits
+        _commit("t7", "charlie", 9004),
+        _commit("t8", "delta", 9005),    # 2 commits; over the limit
+        _commit("t9", "delta", 9005),
+    ]
+    profiles = {login: _profile(login, cid)
+                for login, cid in [("zed", 9001), ("bravo", 9002),
+                                   ("Alpha", 9003), ("charlie", 9004),
+                                   ("delta", 9005)]}
+    snapshot = _activity({"kubestellar/hive": [commits]}, profiles=profiles)
+    assert snapshot["selected_github_ids"] == [9003, 9002, 9004]
+    # The selected profile snapshots carry the full factual field set.
+    alpha = next(c for c in snapshot["candidates"] if c["id"] == 9003)
+    assert alpha["login"] == "Alpha"
+    for field in ("node_id", "html_url", "avatar_url", "type",
+                  "fetched_at", "commits", "evidence"):
+        assert alpha[field] is not None
+
+
+def test_id_is_the_final_tiebreak_for_a_recycled_login():
+    """Two different accounts presenting the same login string (a freed and
+    recycled login) sort by numeric ID, so the order is stable."""
+    commits = [_commit("u1", "same-login", 8100),
+               _commit("u2", "same-login", 8200)]
+    snapshot = _activity({"kubestellar/hive": [commits]}, profiles={
+        "same-login": _profile("same-login", 8200)})
+    # Both share one profile response here; the ordering assertion is what
+    # matters: equal commits, equal login -> id ascending.
+    eligible = [c for c in snapshot["candidates"] if "excluded" not in c]
+    assert [c["id"] for c in eligible] == [8100, 8200]
+
+
+def test_empty_activity_still_issues_the_episode_with_a_note(raw, tmp_path):
+    data = _recognition_manifest(raw)
+    path = tmp_path / "season.json"
+    path.write_text(json.dumps(data))
+    empty = {repo: [[]] for repo in RECOGNITION_REPOS}
+    snapshot, chapter = hive_series.select_next_episode(
+        path, since=SINCE, runner=_fake_gh(empty), now=UNTIL, log=lambda m: None)
+    assert chapter["number"] == 1
+    assert chapter["dossiers"] == []
+    assert "no eligible contributors" in chapter["dossier_note"]
+    saved = json.loads(path.read_text())
+    assert saved["chapters"][0]["dossiers"] == []
+    assert "no eligible contributors" in saved["chapters"][0]["dossier_note"]
+    assert saved["contributor_ledger"]["credited_github_ids"] == []
+    assert saved["contributor_ledger"]["snapshots"][0]["episode"] == 1
+    assert snapshot["selected_github_ids"] == []
+
+
+def test_a_failed_repo_read_leaves_the_manifest_untouched(raw, tmp_path):
+    data = _recognition_manifest(raw)
+    path = tmp_path / "season.json"
+    original = json.dumps(data, indent=2)
+    path.write_text(original)
+    commits = {repo: [[]] for repo in RECOGNITION_REPOS}
+    del commits["kubestellar/docs"]  # unreadable
+    with pytest.raises(hive_series.RecognitionError, match="kubestellar/docs"):
+        hive_series.select_next_episode(
+            path, since=SINCE, runner=_fake_gh(commits), now=UNTIL,
+            log=lambda m: None)
+    assert path.read_text() == original
+
+
+def test_select_next_fills_the_next_chapter_and_the_ledger(raw, tmp_path):
+    data = _recognition_manifest(raw)
+    path = tmp_path / "season.json"
+    path.write_text(json.dumps(data))
+    commits = {repo: [[]] for repo in RECOGNITION_REPOS}
+    commits["kubestellar/hive"] = [[
+        _commit("s1", "winner", 7001), _commit("s2", "winner", 7001),
+        _commit("s3", "second", 7002),
+    ]]
+    profiles = {"winner": _profile("winner", 7001, "Win Somebody"),
+                "second": _profile("second", 7002)}
+    snapshot, chapter = hive_series.select_next_episode(
+        path, since=SINCE, runner=_fake_gh(commits, profiles), now=UNTIL,
+        log=lambda m: None)
+    assert chapter["number"] == 1
+    assert snapshot["selected_github_ids"] == [7001, 7002]
+    assert chapter["dossiers"] == [
+        {"login": "winner", "github_id": 7001, "name": "Win Somebody",
+         "commits": 2, "node_id": "U_kgDO7001",
+         "html_url": "https://github.com/winner",
+         "avatar_url": "https://avatars.githubusercontent.com/u/7001?v=4",
+         "type": "User", "fetched_at": UNTIL},
+        {"login": "second", "github_id": 7002, "name": None,
+         "commits": 1, "node_id": "U_kgDO7002",
+         "html_url": "https://github.com/second",
+         "avatar_url": "https://avatars.githubusercontent.com/u/7002?v=4",
+         "type": "User", "fetched_at": UNTIL},
+    ]
+    saved = hive_series.load_manifest(path)
+    assert saved["contributor_ledger"]["credited_github_ids"] == [7001, 7002]
+    assert saved["contributor_ledger"]["snapshots"][0]["window"] == \
+        {"since": SINCE, "until": UNTIL}
+
+    # The next run with the same activity cannot re-credit them: the ledger
+    # now holds both IDs, so the week issues empty, not a repeat.
+    snapshot2, chapter2 = hive_series.select_next_episode(
+        path, runner=_fake_gh(commits, profiles), now="2026-09-05T00:00:00Z",
+        log=lambda m: None)
+    assert chapter2["number"] == 2
+    assert chapter2["dossiers"] == []
+    assert snapshot2["window"]["since"] == UNTIL
+    assert snapshot2["selected_github_ids"] == []
+    saved = hive_series.load_manifest(path)
+    assert saved["contributor_ledger"]["credited_github_ids"] == [7001, 7002]
+
+
+def test_select_next_never_overwrites_a_filled_chapter(raw, tmp_path):
+    data = _recognition_manifest(raw)
+    data["chapters"][0]["dossiers"] = [
+        {"login": "already", "github_id": 6001, "name": "", "commits": 2}
+    ]
+    data["contributor_ledger"]["credited_github_ids"] = [6001]
+    path = tmp_path / "season.json"
+    path.write_text(json.dumps(data))
+    commits = {repo: [[]] for repo in RECOGNITION_REPOS}
+    commits["kubestellar/hive"] = [[_commit("n1", "newbie", 6002)]]
+    profiles = {"newbie": _profile("newbie", 6002)}
+    _snapshot, chapter = hive_series.select_next_episode(
+        path, since=SINCE, runner=_fake_gh(commits, profiles), now=UNTIL,
+        log=lambda m: None)
+    assert chapter["number"] == 2
+    saved = json.loads(path.read_text())
+    assert saved["chapters"][0]["dossiers"] == [
+        {"login": "already", "github_id": 6001, "name": "", "commits": 2}
+    ], "an issued chapter is never rewritten"
+    assert saved["chapters"][1]["dossiers"][0]["github_id"] == 6002
+
+
+def test_select_next_with_every_chapter_issued_records_the_window_only(
+        raw, tmp_path):
+    data = _recognition_manifest(raw)
+    for chapter in data["chapters"]:
+        chapter["dossiers"] = []
+    path = tmp_path / "season.json"
+    path.write_text(json.dumps(data))
+    empty = {repo: [[]] for repo in RECOGNITION_REPOS}
+    snapshot, chapter = hive_series.select_next_episode(
+        path, since=SINCE, runner=_fake_gh(empty), now=UNTIL,
+        log=lambda m: None)
+    assert chapter is None
+    assert snapshot["episode"] is None
+    assert "already issued" in snapshot["note"]
+
+
+def test_select_next_without_a_prior_snapshot_needs_an_explicit_since(
+        raw, tmp_path):
+    path = tmp_path / "season.json"
+    path.write_text(json.dumps(_recognition_manifest(raw)))
+    with pytest.raises(hive_series.RecognitionError, match="--since"):
+        hive_series.select_next_episode(path, runner=_fake_gh({}),
+                                        log=lambda m: None)
+
+
+def test_status_reports_issued_and_delivered(raw):
+    data = _recognition_manifest(raw)
+    data["chapters"][0]["dossiers"] = []
+    rows = hive_series.recognition_status(data)
+    assert rows[0]["issued"] is True and rows[0]["dossiers"] == 0
+    assert rows[1]["issued"] is False and rows[1]["dossiers"] is None
+    assert all("delivered" in row and "output" in row for row in rows)
+
+
+def test_the_committed_manifest_configures_the_five_repositories(manifest):
+    assert manifest["contributor_ledger"]["repositories"] == \
+        RECOGNITION_REPOS
+
+
+def test_fixed_cast_carries_the_durable_numeric_ids(manifest):
+    assert {m["github_login"]: m["github_id"]
+            for m in manifest["fixed_cast"]} == {
+        "angiejones": 15972783,
+        "Swil78": 98050010,
+        "CortNick": 104345443,
+    }
+
+
+# --- the weekly workflow and the avatar refresh --------------------------------
+
+WEEKLY_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "hive-weekly.yml"
+AVATARS_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "avatars.yml"
+
+
+def test_weekly_workflow_schedule_dispatch_permissions_and_serialization():
+    text = WEEKLY_WORKFLOW.read_text()
+    assert "23 17 * * 6" in text, "Saturday at a non-zero UTC minute"
+    assert "workflow_dispatch" in text
+    assert "contents: write" in text
+    assert "pull-requests: write" in text
+    assert "cancel-in-progress: false" in text
+
+
+def test_weekly_workflow_proposes_and_never_renders_or_self_merges():
+    """Scheduled runs open a PR; they never encode footage, never push to
+    main, and never merge -- the human merge IS the approval for putting a
+    real person on screen."""
+    text = WEEKLY_WORKFLOW.read_text()
+    assert "select-next" in text
+    for forbidden in ("build-all", " hive-cut", "tools/hive_series.py cut",
+                      "gh pr merge", "push origin main", "secrets."):
+        assert forbidden not in text
+    # The GITHUB_TOKEN caveat must be written where the operator reads it.
+    assert "does not trigger CI" in text
+
+
+def test_avatars_workflow_refreshes_the_season_manifest_logins():
+    text = AVATARS_WORKFLOW.read_text()
+    assert "stories/standalone/season-of-the-blueberries.json" in text
+
+
+def test_avatars_tool_includes_the_season_logins():
+    from tools import avatars
+    logins = avatars.season_avatar_logins()
+    assert {"angiejones", "Swil78", "CortNick"} <= set(logins)

@@ -237,6 +237,11 @@
           "type": "string",
           "minLength": 1
         },
+        "github_id": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The durable numeric account ID for the login. Recorded so the weekly recognition pass excludes the fixed cast by ID -- a renamed login is still the same person."
+        },
         "plate": {
           "type": "object",
           "additionalProperties": false,
@@ -455,7 +460,7 @@
         "login",
         "github_id",
         "name",
-        "tasks"
+        "commits"
       ],
       "properties": {
         "login": {
@@ -468,13 +473,38 @@
           "description": "The numeric account ID: the no-repeat ledger keys on this, not on the renameable login."
         },
         "name": {
-          "type": "string",
-          "description": "The public GitHub display name. May be empty; the card falls back to the login and never invents one."
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The public GitHub display name, or null when the profile has none. The card falls back to the login and never invents one."
         },
-        "tasks": {
+        "commits": {
           "type": "integer",
           "minimum": 0,
-          "description": "Completed Hive tasks in the credited window; rendered as HIVE TASKS +N."
+          "description": "Commits authored across the configured repositories in the credited window; rendered as COMMITS +N."
+        },
+        "node_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "html_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "avatar_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The GitHub account type at selection time. Only User accounts are ever selected."
+        },
+        "fetched_at": {
+          "type": "string",
+          "minLength": 1,
+          "description": "When the profile snapshot was resolved through the GitHub Users API."
         }
       }
     },
@@ -527,7 +557,12 @@
           "items": {
             "$ref": "#/$defs/dossierRecipient"
           },
-          "description": "This week's contributor snapshots, committed by the weekly proposal PR. Absent until the first week runs."
+          "description": "This week's contributor snapshots, committed by the weekly proposal PR. Present -- even empty -- once the episode is issued; absent until then."
+        },
+        "dossier_note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The recorded degradation when a week could not fill its dossiers (e.g. no eligible contributors). The episode still ships; this is the punch list, not a gate."
         },
         "output": {
           "type": "string",
@@ -552,7 +587,165 @@
             "type": "integer",
             "minimum": 1
           },
-          "description": "Every numeric GitHub ID already credited this season. The no-repeat rule: an ID on this list is never dossiered again."
+          "description": "Every numeric GitHub ID already credited this season. The no-repeat rule: an ID on this list is never dossiered again. This is the ONE canonical list -- prior IDs are derived from it, never kept twice."
+        },
+        "repositories": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+          },
+          "description": "The configured public repositories whose commit authors feed weekly recognition. A selection run fails without touching the ledger when any of them cannot be read."
+        },
+        "snapshots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/recognitionSnapshot"
+          },
+          "description": "One record per selection run: the window, the full candidate evidence, and who was selected. The next window starts at the last snapshot's captured_at."
+        }
+      }
+    },
+    "recognitionSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "captured_at",
+        "window",
+        "episode",
+        "candidates",
+        "selected_github_ids"
+      ],
+      "properties": {
+        "captured_at": {
+          "type": "string",
+          "minLength": 1,
+          "description": "When this snapshot was taken (UTC). The next selection window starts here."
+        },
+        "window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "since",
+            "until"
+          ],
+          "properties": {
+            "since": {
+              "type": "string",
+              "minLength": 1
+            },
+            "until": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "episode": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "The chapter this run issued, or null when every chapter was already issued."
+        },
+        "selected_github_ids": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/candidateEvidence"
+          },
+          "description": "Every distinct commit author found in the window, eligible or not, with the exclusion reason recorded."
+        }
+      }
+    },
+    "candidateEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "login",
+        "type",
+        "commits",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "login": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The public profile name from the Users API; resolved only for eligible candidates, null otherwise."
+        },
+        "html_url": {
+          "type": "string"
+        },
+        "avatar_url": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fetched_at": {
+          "type": "string"
+        },
+        "commits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "excluded": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why this candidate was not eligible. Absent means eligible."
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "repo",
+              "shas"
+            ],
+            "properties": {
+              "repo": {
+                "type": "string",
+                "minLength": 1
+              },
+              "shas": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
         }
       }
     }

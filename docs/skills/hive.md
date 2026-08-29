@@ -74,3 +74,35 @@ chapter-relative content time and lets the front cards offset them through
 the concat. An unsupported plate, an unknown overlay position, a missing
 face, or a display name that cannot fit the dossier panel all degrade to
 recorded omissions — the episode ships regardless.
+
+## Weekly contributor recognition
+
+Recognition is public GitHub commit activity across the configured
+repositories (`contributor_ledger.repositories` in the season manifest),
+counted per durable numeric account ID between the last snapshot's
+`captured_at` and now — not Hive calendar metrics, and not calendar-week
+precise. Bots, non-User accounts, the fixed cast, and every ID already in
+the ledger are excluded; up to three are selected by commit count
+descending, normalized login ascending, ID ascending.
+
+```bash
+python3 tools/hive_series.py contributors          # this window's evidence, read-only
+python3 tools/hive_series.py select-next           # issue the next episode's dossiers
+python3 tools/hive_series.py status                # issued/delivered per episode
+```
+
+`select-next` fills the next chapter that has no `dossiers` key (a filled
+chapter is never rewritten), appends the full candidate-evidence snapshot,
+and extends the ledger — validated first, written atomically, and abandoned
+untouched if any configured repository cannot be read. A week with no
+eligible contributor still issues the episode with an empty dossier list
+and a `dossier_note`: the release never waits for a card.
+
+`.github/workflows/hive-weekly.yml` runs the selector every Saturday at
+17:23 UTC plus on dispatch, and opens a PR only when the record changed.
+That PR is opened with GITHUB_TOKEN so it does not trigger CI; it requires
+the normal human/merge-queue gate — merging it is the approval for putting
+a real person on screen. Merging to main also refreshes the selected
+contributors' GitHub PFPs through the existing `avatars.yml` cache (the
+season manifest is on its path list; no PAT). The workflow never renders
+footage.
