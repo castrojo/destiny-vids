@@ -760,19 +760,30 @@ def _doctored(manifest, mutate):
 
 # --- the timeline ------------------------------------------------------------
 
+# Episode 1 is issued: the bootstrap selection seated these three dossiers
+# between its title slide and chapter. An issued chapter is never rewritten,
+# so this is stable.
+EPISODE_ONE_DOSSIERS = ["clubanderson", "Danathar", "gregoryhunt"]
+
+
 def test_episode_timeline_is_the_five_authored_beats(manifest):
     chapter = hive_series.chapter_by_number(manifest, 1)
     segments = hive_series.episode_segments(manifest, chapter)
     assert [s["kind"] for s in segments] == [
-        "opening_cta", "title_slide", "chapter", "closing_cta",
+        "opening_cta", "title_slide", "dossier", "dossier", "dossier",
+        "chapter", "closing_cta",
     ]
     assert segments[0]["dur"] == 10.0
     assert segments[1]["dur"] == 5.0
-    assert segments[2]["start"] == 0.0 and segments[2]["end"] == 125.0
-    assert segments[2]["audio"] == "source"
-    assert segments[3]["dur"] == 10.0
+    dossiers = segments[2:5]
+    assert all(s["dur"] == hive_series.DOSSIER_DURATION == 4.0
+               for s in dossiers)
+    assert [s["snapshot"]["login"] for s in dossiers] == EPISODE_ONE_DOSSIERS
+    assert segments[5]["start"] == 0.0 and segments[5]["end"] == 125.0
+    assert segments[5]["audio"] == "source"
+    assert segments[6]["dur"] == 10.0
     # The silent cards carry no source audio.
-    for still in (segments[0], segments[1], segments[3]):
+    for still in (segments[0], segments[1], *dossiers, segments[6]):
         assert still["audio"] == "silent"
 
 
@@ -803,14 +814,15 @@ def test_source_marks_convert_to_chapter_relative_never_move(manifest):
     itself is never adjusted."""
     ch1 = hive_series.chapter_by_number(manifest, 1)
     ch8 = hive_series.chapter_by_number(manifest, 8)  # 579.0-744.0
-    assert hive_series.front_cards_duration(manifest, ch1) == 15.0
+    # ch1 front cards: cta + title + its three issued dossiers = 27s.
+    assert hive_series.front_cards_duration(manifest, ch1) == 27.0
     assert hive_series.source_to_chapter_relative(36.0, ch1) == 36.0
-    assert hive_series.source_to_episode_time(36.0, manifest, ch1) == 51.0
+    assert hive_series.source_to_episode_time(36.0, manifest, ch1) == 63.0
     assert hive_series.source_to_chapter_relative(687.0, ch8) == 108.0
     assert hive_series.source_to_episode_time(687.0, manifest, ch8) == 123.0
     # The owner overlays: ship at source 113.0 (ch1), review at 243.0 (ch3).
     ch3 = hive_series.chapter_by_number(manifest, 3)  # 218.0-309.0
-    assert hive_series.source_to_episode_time(113.0, manifest, ch1) == 128.0
+    assert hive_series.source_to_episode_time(113.0, manifest, ch1) == 140.0
     assert hive_series.source_to_episode_time(243.0, manifest, ch3) == 40.0
 
 
@@ -828,7 +840,8 @@ def test_front_offset_counts_the_dossier_cards(manifest):
 
 def test_episode_expected_duration_includes_cards_and_chapter(manifest):
     ch1 = hive_series.chapter_by_number(manifest, 1)
-    assert hive_series.episode_expected_duration(manifest, ch1) == 150.0
+    # 150.0 plus its three issued dossier cards at 4.0 each.
+    assert hive_series.episode_expected_duration(manifest, ch1) == 162.0
     ch6 = hive_series.chapter_by_number(manifest, 6)  # 484-501, 17s
     assert hive_series.episode_expected_duration(manifest, ch6) == 42.0
 
@@ -837,8 +850,9 @@ def test_season_aggregate_duration_is_the_twelve_episodes(manifest):
     chapter_seconds = sum(end - start
                           for start, end, _title in CAPTURED_CHAPTERS)
     assert chapter_seconds == 1248.0
-    expected = chapter_seconds + 12 * (10.0 + 5.0 + 10.0)
-    assert hive_series.cut_expected_duration(manifest) == expected == 1548.0
+    expected = chapter_seconds + 12 * (10.0 + 5.0 + 10.0) \
+        + 3 * hive_series.DOSSIER_DURATION  # episode 1's issued dossiers
+    assert hive_series.cut_expected_duration(manifest) == expected == 1560.0
 
 
 # --- the one-pass graph ------------------------------------------------------
@@ -852,7 +866,8 @@ def test_episode_filtergraph_is_one_pass_with_one_source_decode(manifest):
     # Every still leg holds its authored duration on generated silence.
     assert "trim=duration=10" in graph
     assert "trim=duration=5" in graph
-    assert graph.count("anullsrc=r=48000:cl=stereo") == 3  # cta, title, closing
+    assert "trim=duration=4" in graph  # the issued dossier cards
+    assert graph.count("anullsrc=r=48000:cl=stereo") == 6  # + 3 dossiers
     # The chapter's own audio is carried, pinned to the delivery layout.
     assert "aformat=sample_fmts=fltp:channel_layouts=stereo" in graph
     # Chapter 1 seats, chapter-relative: ikora at 36, eris at 60, and the
@@ -861,7 +876,7 @@ def test_episode_filtergraph_is_one_pass_with_one_source_decode(manifest):
     assert "enable='between(t,60,64)'" in graph
     assert f"enable='between(t,113,{113 + hive_series.LORE_OVERLAY_DUR:g})'" in graph
     # One concat joining every segment, picture and sound, out of the graph.
-    assert "concat=n=4:v=1:a=1[outv][outa]" in graph
+    assert "concat=n=7:v=1:a=1[outv][outa]" in graph
 
 
 def test_episode_filtergraph_overlay_inputs_follow_the_stills(manifest):
@@ -869,11 +884,12 @@ def test_episode_filtergraph_overlay_inputs_follow_the_stills(manifest):
     order, and the overlay PNGs come last -- the graph must index them so."""
     plan = hive_series.episode_plan(manifest, 1)
     graph = hive_series.episode_filtergraph(plan)
-    # 3 stills (cta, title, closing), so overlay inputs start at 4.
-    assert "[4:v]overlay=0:0:enable='between(t,36,40)'" in graph
-    assert "[5:v]overlay=0:0:enable='between(t,60,64)'" in graph
-    assert "[6:v]overlay=0:0" in graph
-    assert "[7:v]" not in graph
+    # 6 stills (cta, title, closing + episode 1's three issued dossiers),
+    # so overlay inputs start at 7.
+    assert "[7:v]overlay=0:0:enable='between(t,36,40)'" in graph
+    assert "[8:v]overlay=0:0:enable='between(t,60,64)'" in graph
+    assert "[9:v]overlay=0:0" in graph
+    assert "[10:v]" not in graph
 
 
 def test_episode_filtergraph_resamples_only_a_non_delivery_rate(manifest):
@@ -1159,6 +1175,10 @@ def test_build_episode_orchestrates_cards_encode_and_thumbnail(
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
         lambda *a, **k: (None, "full-frame"))
+    # Deterministic offline faces: the avatar cache is local-only, so the
+    # issued dossiers resolve the same way here and in CI.
+    face = Image.new("RGBA", (512, 512), (32, 64, 96, 255))
+    monkeypatch.setattr(hive_series, "resolve_face", lambda login: face)
 
     captured = {}
 
@@ -1176,15 +1196,16 @@ def test_build_episode_orchestrates_cards_encode_and_thumbnail(
 
     argv = captured["argv"]
     graph = argv[argv.index("-filter_complex") + 1]
-    assert "concat=n=4:v=1:a=1" in graph  # cta, title, chapter, closing
-    # Every staged input is a real file: source + 3 stills + 3 overlays
+    # cta, title, the three issued dossiers, chapter, closing.
+    assert "concat=n=7:v=1:a=1" in graph
+    # Every staged input is a real file: source + 6 stills + 3 overlays
     # (ikora-ch1, eris-ch1, the ship lore overlay).
     inputs = captured["inputs"]
-    assert len(inputs) == 7
+    assert len(inputs) == 10
     assert inputs[0] == fake_source.resolve()
     for path in inputs:
         assert Path(path).exists(), f"staged input missing: {path}"
-    assert captured["expected_duration"] == 150.0
+    assert captured["expected_duration"] == 162.0
     assert captured["local"] is False
 
     thumb = tmp_path / "s01e01-the-enclave-thumbnail.jpg"
@@ -1391,7 +1412,10 @@ def test_build_episode_skips_the_encode_when_the_digest_matches(
     out = hive_series.build_episode(manifest_path, 1, work_dir=work)
     assert out.exists()
     assert len(calls) == 1, "a matching digest must not re-encode"
-    assert json.loads(sidecar.read_text()) == []
+    assert json.loads(sidecar.read_text()) == [
+        {"login": login, "reason": "no cached GitHub avatar"}
+        for login in EPISODE_ONE_DOSSIERS
+    ]
 
 
 def test_freshness_skip_rewrites_unresolved_from_the_current_plan(
@@ -1438,7 +1462,10 @@ def test_build_episode_rebuilds_when_the_digest_sidecar_is_missing(
     digest = json.loads((work / "s01e01-the-enclave-inputs.json").read_text())
     assert digest["sha256"] and digest["inputs"]
     assert json.loads(
-        (work / "s01e01-the-enclave-unresolved.json").read_text()) == []
+        (work / "s01e01-the-enclave-unresolved.json").read_text()) == [
+        {"login": login, "reason": "no cached GitHub avatar"}
+        for login in EPISODE_ONE_DOSSIERS
+    ]
 
     hive_series.build_episode(manifest_path, 1, work_dir=work)
     assert len(calls) == 1, "the freshly written digest skips the rebuild"
@@ -1899,8 +1926,9 @@ def _profile(login, account_id, name=None, type_="User"):
 def _fake_gh(commits_by_repo, profiles=None):
     """A runner over canned API responses. ``commits_by_repo`` maps a repo to
     a list of PAGES (each page a list of commit objects) so the paginated
-    parser is exercised; ``profiles`` maps a login to the Users API body. A
-    repo or login with no entry raises -- the failed-read case."""
+    parser is exercised; ``profiles`` maps a numeric account ID to the
+    user-by-ID API body. A repo or ID with no entry raises -- the
+    failed-read case."""
     profiles = profiles or {}
 
     def run(cmd):
@@ -1908,8 +1936,10 @@ def _fake_gh(commits_by_repo, profiles=None):
         for repo, pages in commits_by_repo.items():
             if f"repos/{repo}/commits" in text:
                 return "".join(json.dumps(p) for p in pages)
-        for login, body in profiles.items():
-            if f"users/{login}" in text:
+        for account_id, body in profiles.items():
+            # The profile command is exactly `gh api user/{id}`: match the
+            # whole final token so id 8100 can never answer for 81000.
+            if text.endswith(f"user/{account_id}"):
                 return json.dumps(body)
         raise hive_series.RecognitionError(f"no canned response: {text}")
 
@@ -1949,14 +1979,14 @@ def test_fixture_runner_replays_pages_and_fails_unknown_repos():
     fixture = {
         "repos/kubestellar/hive/commits": {"pages": [[{"sha": "x"}],
                                                      [{"sha": "y"}]]},
-        "users/octocat": {"body": {"login": "octocat"}},
+        "user/583231": {"body": {"id": 583231, "login": "octocat"}},
     }
     runner = hive_series.fixture_runner(fixture)
     out = runner(hive_series.commits_command("kubestellar/hive", SINCE, UNTIL))
     assert [c["sha"] for c in hive_series.parse_paginated_json(out)] == \
         ["x", "y"]
-    assert json.loads(runner(hive_series.profile_command("octocat"))) == \
-        {"login": "octocat"}
+    assert json.loads(runner(hive_series.profile_command(583231))) == \
+        {"id": 583231, "login": "octocat"}
     with pytest.raises(hive_series.RecognitionError):
         runner(hive_series.commits_command("kubestellar/docs", SINCE, UNTIL))
 
@@ -1981,7 +2011,7 @@ def test_bots_and_non_user_accounts_are_excluded():
     ]]
     snapshot = _activity(
         {"kubestellar/hive": pages},
-        profiles={"real-person": _profile("real-person", 1003, "Real Person")})
+        profiles={1003: _profile("real-person", 1003, "Real Person")})
     by_login = {c["login"]: c for c in snapshot["candidates"]}
     assert "not a User" in by_login["dependabot[bot]"]["excluded"]
     assert "not a User" in by_login["some-org"]["excluded"]
@@ -1994,7 +2024,7 @@ def test_fixed_cast_is_excluded_by_numeric_id():
               _commit("c2", "newcomer", 2002)]]
     snapshot = _activity(
         {"kubestellar/hive": pages},
-        profiles={"newcomer": _profile("newcomer", 2002)})
+        profiles={2002: _profile("newcomer", 2002)})
     by_login = {c["login"]: c for c in snapshot["candidates"]}
     assert by_login["angiejones"]["excluded"] == "fixed cast"
     assert snapshot["selected_github_ids"] == [2002]
@@ -2016,7 +2046,7 @@ def test_commits_deduplicate_by_sha_across_pages_and_repos():
     snapshot = _activity(
         {"kubestellar/hive": [[dup], [dup, _commit("e1", "dev", 4004)]],
          "kubestellar/docs": [[_commit("dddd", "dev", 4004)]]},
-        profiles={"dev": _profile("dev", 4004)})
+        profiles={4004: _profile("dev", 4004)})
     candidate = snapshot["candidates"][0]
     assert candidate["commits"] == 2
     # "dddd" is one commit however many pages or repos return it; it is
@@ -2031,7 +2061,7 @@ def test_unlinked_commits_have_no_durable_id_and_are_skipped():
               {"sha": "x2", "author": {"login": "ghost"}},
               _commit("x3", "dev", 5005)]]
     snapshot = _activity({"kubestellar/hive": pages},
-                         profiles={"dev": _profile("dev", 5005)})
+                         profiles={5005: _profile("dev", 5005)})
     assert [c["login"] for c in snapshot["candidates"]] == ["dev"]
 
 
@@ -2047,7 +2077,7 @@ def test_selection_orders_by_commits_then_login_then_id():
         _commit("t8", "delta", 9005),    # 2 commits; over the limit
         _commit("t9", "delta", 9005),
     ]
-    profiles = {login: _profile(login, cid)
+    profiles = {cid: _profile(login, cid)
                 for login, cid in [("zed", 9001), ("bravo", 9002),
                                    ("Alpha", 9003), ("charlie", 9004),
                                    ("delta", 9005)]}
@@ -2061,17 +2091,56 @@ def test_selection_orders_by_commits_then_login_then_id():
         assert alpha[field] is not None
 
 
-def test_id_is_the_final_tiebreak_for_a_recycled_login():
-    """Two different accounts presenting the same login string (a freed and
-    recycled login) sort by numeric ID, so the order is stable."""
+def test_profile_command_resolves_by_durable_numeric_id():
+    assert hive_series.profile_command(583231) == \
+        ["gh", "api", "user/583231"]
+
+
+def test_a_recycled_login_cannot_attach_the_new_owners_identity():
+    """Account 8100 authored commits under a login it has since freed, and
+    account 8200 recycled that login. Resolving by login would hang the NEW
+    owner's name, PFP and profile URL on the ORIGINAL author's commits --
+    a false claim about a real person. Resolving by durable numeric ID
+    (``user/{id}``) keeps every account on its own identity, and the two
+    same-login candidates still order stably by numeric ID."""
     commits = [_commit("u1", "same-login", 8100),
                _commit("u2", "same-login", 8200)]
     snapshot = _activity({"kubestellar/hive": [commits]}, profiles={
-        "same-login": _profile("same-login", 8200)})
-    # Both share one profile response here; the ordering assertion is what
-    # matters: equal commits, equal login -> id ascending.
+        8100: _profile("freed-the-login", 8100, name="Original Owner"),
+        8200: _profile("same-login", 8200, name="New Owner"),
+    })
+    by_id = {c["id"]: c for c in snapshot["candidates"]}
+    original, new = by_id[8100], by_id[8200]
+    assert original["login"] == "freed-the-login"
+    assert original["name"] == "Original Owner"
+    assert original["avatar_url"] == \
+        "https://avatars.githubusercontent.com/u/8100?v=4"
+    assert original["html_url"] == "https://github.com/freed-the-login"
+    assert new["name"] == "New Owner"
+    assert new["avatar_url"] == \
+        "https://avatars.githubusercontent.com/u/8200?v=4"
+    # Two accounts that shared one login string stay two distinct,
+    # correctly-identified candidates in a stable order.
     eligible = [c for c in snapshot["candidates"] if "excluded" not in c]
     assert [c["id"] for c in eligible] == [8100, 8200]
+
+
+def test_a_profile_returned_for_the_wrong_id_fails_the_selection():
+    """The resolved profile's id must exactly match the commit-author ID;
+    anything else is another person's identity and aborts the run."""
+    pages = [[_commit("m1", "someone", 8100)]]
+    with pytest.raises(hive_series.RecognitionError, match="8100"):
+        _activity({"kubestellar/hive": pages},
+                  profiles={8100: _profile("someone", 9999)})
+
+
+def test_a_profile_read_failure_fails_the_selection_not_the_candidate():
+    """A transient API failure never silently demotes a candidate: the
+    whole selection fails, like an unreadable repository."""
+    pages = [[_commit("f1", "dev", 6001)]]
+    with pytest.raises(hive_series.RecognitionError,
+                       match="could not be resolved"):
+        _activity({"kubestellar/hive": pages})  # no canned profile for 6001
 
 
 def test_empty_activity_still_issues_the_episode_with_a_note(raw, tmp_path):
@@ -2106,6 +2175,27 @@ def test_a_failed_repo_read_leaves_the_manifest_untouched(raw, tmp_path):
     assert path.read_text() == original
 
 
+def test_a_failed_profile_resolution_leaves_the_manifest_untouched(
+        raw, tmp_path):
+    """An API failure mid-selection is not a quieter selection: the run
+    raises BEFORE any manifest or ledger mutation, exactly like a failed
+    repository read, so no candidate is silently demoted and nothing is
+    half-written."""
+    data = _recognition_manifest(raw)
+    path = tmp_path / "season.json"
+    original = json.dumps(data, indent=2)
+    path.write_text(original)
+    commits = {repo: [[]] for repo in RECOGNITION_REPOS}
+    commits["kubestellar/hive"] = [[_commit("p1", "ghosted", 7001)]]
+    # No canned profile for account 7001: the profile read fails.
+    with pytest.raises(hive_series.RecognitionError,
+                       match="could not be resolved"):
+        hive_series.select_next_episode(
+            path, since=SINCE, runner=_fake_gh(commits), now=UNTIL,
+            log=lambda m: None)
+    assert path.read_text() == original
+
+
 def test_select_next_fills_the_next_chapter_and_the_ledger(raw, tmp_path):
     data = _recognition_manifest(raw)
     path = tmp_path / "season.json"
@@ -2115,8 +2205,8 @@ def test_select_next_fills_the_next_chapter_and_the_ledger(raw, tmp_path):
         _commit("s1", "winner", 7001), _commit("s2", "winner", 7001),
         _commit("s3", "second", 7002),
     ]]
-    profiles = {"winner": _profile("winner", 7001, "Win Somebody"),
-                "second": _profile("second", 7002)}
+    profiles = {7001: _profile("winner", 7001, "Win Somebody"),
+                7002: _profile("second", 7002)}
     snapshot, chapter = hive_series.select_next_episode(
         path, since=SINCE, runner=_fake_gh(commits, profiles), now=UNTIL,
         log=lambda m: None)
@@ -2162,7 +2252,7 @@ def test_select_next_never_overwrites_a_filled_chapter(raw, tmp_path):
     path.write_text(json.dumps(data))
     commits = {repo: [[]] for repo in RECOGNITION_REPOS}
     commits["kubestellar/hive"] = [[_commit("n1", "newbie", 6002)]]
-    profiles = {"newbie": _profile("newbie", 6002)}
+    profiles = {6002: _profile("newbie", 6002)}
     _snapshot, chapter = hive_series.select_next_episode(
         path, since=SINCE, runner=_fake_gh(commits, profiles), now=UNTIL,
         log=lambda m: None)
@@ -2248,6 +2338,28 @@ def test_weekly_workflow_proposes_and_never_renders_or_self_merges():
         assert forbidden not in text
     # The GITHUB_TOKEN caveat must be written where the operator reads it.
     assert "does not trigger CI" in text
+
+
+def test_weekly_workflow_proposal_branches_are_unique_per_run():
+    """Two runs can never race or clobber the same proposal ref: the branch
+    name carries the unique github.run_id, not just the date."""
+    text = WEEKLY_WORKFLOW.read_text()
+    assert 'branch="hive/weekly-$(date -u +%Y%m%d)-${{ github.run_id }}"' \
+        in text
+
+
+def test_weekly_workflow_short_circuits_while_a_proposal_pr_awaits_review():
+    """An open hive/weekly- proposal PR means a human has not reviewed the
+    last proposal yet: the run detects it and gates every later step off,
+    so schedule plus a same-day manual dispatch cannot create competing
+    episode proposals."""
+    text = WEEKLY_WORKFLOW.read_text()
+    assert "gh pr list --state open" in text
+    assert 'startswith("hive/weekly-")' in text
+    assert 'echo "awaiting=true" >> "$GITHUB_OUTPUT"' in text
+    # Every step after the gate -- install, select, validate, propose -- is
+    # conditional on no proposal awaiting review.
+    assert text.count("if: steps.gate.outputs.awaiting != 'true'") == 4
 
 
 def test_avatars_workflow_refreshes_the_season_manifest_logins():

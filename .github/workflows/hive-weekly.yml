@@ -8,8 +8,13 @@
 # episode record and the ledger update land on a branch as ONE commit, and a
 # pull request is opened.
 #
-# Two deliberate properties:
+# Three deliberate properties:
 #
+# * One proposal at a time. If an open hive/weekly- proposal PR is still
+#   awaiting review, the run stops BEFORE selecting or pushing anything --
+#   a scheduled run and a same-day manual dispatch can never create two
+#   competing episode proposals. The proposal branch also carries the
+#   unique github.run_id, so two runs can never race the same ref.
 # * A PR opened with GITHUB_TOKEN does NOT trigger CI (GitHub refuses to
 #   recurse workflows opened by the built-in token). That is acceptable
 #   here: the change is data produced by the validated selector, the offline
@@ -52,24 +57,46 @@ jobs:
         with:
           python-version: '3.13'
 
+      # One proposal at a time: while a hive/weekly- PR awaits review, this
+      # run short-circuits before selecting, so schedule plus a same-day
+      # manual dispatch cannot produce competing episode proposals.
+      - name: Stop when a proposal PR is already awaiting review
+        id: gate
+        run: |
+          open=$(gh pr list --state open --json number,headRefName \
+            --jq '[.[] | select(.headRefName | startswith("hive/weekly-"))]')
+          if [ "$(echo "$open" | jq length)" -gt 0 ]; then
+            echo "awaiting=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::An open hive/weekly- proposal PR is awaiting review; skipping this run:"
+            echo "$open" | jq -r '.[] | "  #\(.number) \(.headRefName)"'
+          else
+            echo "awaiting=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install dependencies
+        if: steps.gate.outputs.awaiting != 'true'
         run: pip install --quiet jsonschema pyyaml pytest pillow
 
       - name: Select the next episode's contributors
+        if: steps.gate.outputs.awaiting != 'true'
         run: python3 tools/hive_series.py select-next
 
       # The smallest complete offline gate: the season record's own suite,
       # which includes the schema validation and the recognition tests.
       - name: Validate the updated record
+        if: steps.gate.outputs.awaiting != 'true'
         run: python3 -m pytest -q tests/test_hive_series.py
 
       - name: Propose a PR when the record changed
+        if: steps.gate.outputs.awaiting != 'true'
         run: |
           if [ -z "$(git status --porcelain)" ]; then
             echo "No change: the next episode record is unchanged."
             exit 0
           fi
-          branch="hive/weekly-$(date -u +%Y%m%d)"
+          # The run ID makes every proposal branch unique: two runs can
+          # never race or clobber the same ref.
+          branch="hive/weekly-$(date -u +%Y%m%d)-${{ github.run_id }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$branch"

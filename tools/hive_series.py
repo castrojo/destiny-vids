@@ -1676,8 +1676,9 @@ def verify_cut(manifest, ffmpeg=None):
 # selection run counts commit authors in the configured repositories between
 # the prior snapshot's captured_at and now. The no-repeat ledger in the
 # manifest is canonical and singular -- prior IDs are derived from it, never
-# kept in a second list. A run that cannot read a configured repository fails
-# WITHOUT touching the ledger; a run with no eligible contributor still
+# kept in a second list. A run that cannot read a configured repository, or
+# cannot resolve a candidate's profile by its durable numeric account ID,
+# fails WITHOUT touching the ledger; a run with no eligible contributor still
 # issues the next episode with an empty dossier list and a recorded note
 # (AGENTS.md: degrade, never block).
 
@@ -1686,7 +1687,9 @@ RECOGNITION_LIMIT = 3
 
 
 class RecognitionError(RuntimeError):
-    """A configured repository could not be read. The ledger is untouched."""
+    """The selection cannot vouch for its result -- an unreadable
+    repository, an unresolvable profile, or a profile returned for the
+    wrong account ID. The manifest and ledger are untouched."""
 
 
 def _utcnow():
@@ -1703,9 +1706,13 @@ def commits_command(repo, since, until):
     ]
 
 
-def profile_command(login):
-    """The Users API call that resolves a candidate's profile snapshot."""
-    return ["gh", "api", f"users/{login}"]
+def profile_command(account_id):
+    """The user-by-ID call that resolves a candidate's profile snapshot.
+
+    The durable numeric account ID, never the renameable login: a freed and
+    recycled login would otherwise attach the new owner's name, avatar and
+    URL to the original author's commits."""
+    return ["gh", "api", f"user/{account_id}"]
 
 
 def parse_paginated_json(text):
@@ -1804,11 +1811,16 @@ def recognition_snapshot(manifest, since, until, runner=_live_runner,
     """The full candidate evidence for one window, plus the selection.
 
     Every distinct commit author is recorded with an exclusion reason or
-    resolved through the Users API (which carries the public `name` the
-    commit listing does not). A profile that cannot be resolved is excluded
-    and recorded rather than failing the run. Selection is up to
-    RECOGNITION_LIMIT by commit count descending, normalized login
-    ascending, numeric ID ascending."""
+    resolved through the user-by-ID API (which carries the public `name`
+    the commit listing does not). Profiles resolve by the durable numeric
+    account ID and the returned `id` must match exactly: anything less
+    could attach a recycled login's new owner -- their name, avatar, URL --
+    to somebody else's commits, a false claim about real people. A profile
+    that cannot be resolved, or resolves to the wrong ID, fails the whole
+    run like an unreadable repository: a candidate is never silently
+    demoted on a transient error. Selection is up to RECOGNITION_LIMIT by
+    commit count descending, normalized login ascending, numeric ID
+    ascending."""
     captured = now or _utcnow()
     ledger = manifest.get("contributor_ledger") or {}
     repositories = ledger.get("repositories") or []
@@ -1847,10 +1859,17 @@ def recognition_snapshot(manifest, since, until, runner=_live_runner,
         if "excluded" in candidate:
             continue
         try:
-            profile = json.loads(runner(profile_command(candidate["login"])))
+            profile = json.loads(runner(profile_command(candidate["id"])))
         except Exception as exc:
-            candidate["excluded"] = f"profile could not be resolved ({exc})"
-            continue
+            raise RecognitionError(
+                f"profile for account id {candidate['id']} could not be "
+                f"resolved ({exc}); aborting the whole selection before "
+                f"anything is written") from exc
+        if profile.get("id") != candidate["id"]:
+            raise RecognitionError(
+                f"user/{candidate['id']} returned id "
+                f"{profile.get('id')!r}: refusing to attach another "
+                f"account's identity to these commits")
         for field in ("node_id", "login", "name", "html_url", "avatar_url",
                       "type"):
             if field in profile:
@@ -1903,8 +1922,8 @@ def select_next_episode(manifest_path=None, since=None, runner=_live_runner,
     dossiers is never overwritten. An empty selection still issues the
     chapter, with an empty list and a recorded note: the release is never
     held for a quiet week. The updated manifest is validated BEFORE it is
-    written, and any repository read failure raises before anything is
-    written. Returns ``(snapshot, chapter_or_none)``."""
+    written, and any repository-read or profile-resolution failure raises
+    before anything is written. Returns ``(snapshot, chapter_or_none)``."""
     path = Path(manifest_path or MANIFEST)
     manifest = load_manifest_data(json.loads(path.read_text("utf-8")))
     ledger = manifest["contributor_ledger"]
