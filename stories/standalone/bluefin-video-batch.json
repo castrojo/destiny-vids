@@ -556,6 +556,170 @@
           "duration": 1.0
         }
       ]
+    },
+    {
+      "slug": "bluefin-and-the-hive-iii",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=FatJYHd1bCg",
+        "youtube_id": "FatJYHd1bCg",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Official Bungie upload of the Destiny 2: The Witch Queen launch trailer. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "intro": {
+        "path": "/var/home/jorge/src/destiny-vids/renders/efmb-front.mkv",
+        "sha256": "49f4fcaf2b5ba1949319e02a7de2cef894a4c997c40a32f51a9289355565eaac",
+        "in_sec": 4.0,
+        "out_sec": 70.4667,
+        "why": "Act II's CLEAN front (renders/efmb-front.mkv, 76.600s) -- the 'evolutionary part' the owner asked for: Nightwish's Endless Forms Most Beautiful picture, a hominid in forest, a dinosaur skeleton, Darwin's text and the anatomical plates. No game footage anywhere in it, which is how the owner identified it. The CLEAN front is used deliberately: the delivered act burns a title card, THE PLATFORM WARS card and a [ PREPARE FOR TITANFALL ] card on top of this picture as separate overlays, and the owner ruled 'no titanfall, this is going to be strictly onboard' -- cutting from the clean render excludes all three by construction rather than by trimming around them. In at 4.0 where the picture fades up out of the black head; out at 70.4667 where the Perfume audio ends, so the join is SILENT and phrase-safe. The trailer then starts on a hard cut: owner, 'I want to not have a slide, slide right into the trailer dramatically. Jump cut'."
+      },
+      "cuts": [
+        {
+          "start_sec": 0.0,
+          "end_sec": 1.969,
+          "note": "The ESRB 'TEEN / Blood Language Violence' rating slate, measured as shot 00 (0.000-1.969) by ContentDetector. The intro hard-cuts straight into the trailer -- owner: 'slide right into the trailer dramatically. Jump cut' -- and the first delivered build landed that cut on the rating card, which is a legal slate rather than picture. Removed whole, on the measured shot boundary, so the cut lands on the first frame of the Throne World waterline instead. Same posture as act II removing the publisher end cards: the film does not open on an advert."
+        }
+      ],
+      "title": "Bluefin and the Hive III",
+      "output": "~/Videos/Wolves/review/Bluefin and the Hive III.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and the Hive III-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "hanthor-guardian",
+          "kind": "guardian",
+          "source_at": 41.3,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 41.208-42.342 shot holds a fireteam of four Guardians around the glowing artifact. The seat opens on that group and rides the cut; no single figure is singled out.",
+          "name": "hanthor",
+          "title": "Navigator of the Open Path",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/hanthor.png"
+        },
+        {
+          "id": "joshyorko-guardian",
+          "kind": "guardian",
+          "source_at": 48.0,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 47.881-49.983 Throne World platform holds two distant, anonymous Guardians for 2.1s, the whole seat staying on that shot.",
+          "name": "joshyorko",
+          "title": "Scribe of the Open Archive",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/joshyorko.png"
+        },
+        {
+          "id": "huntedraven7-guardian",
+          "kind": "guardian",
+          "source_at": 55.6,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 55.522-57.724 shot is a lone Guardian silhouetted against the green Throne World sky, 2.2s -- a full readable hold on one anonymous figure.",
+          "name": "HuntedRaven7",
+          "title": "Champion of Strict Proof",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/HuntedRaven7.png"
+        },
+        {
+          "id": "kylerankin-guardian",
+          "kind": "guardian",
+          "source_at": 70.6,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 70.003-71.371 pair of shots hold a Guardian over a fallen Hive and then a fireteam advancing the violet corridor; the seat opens on the first and rides the cut. CREDITED AT THE OWNER'S INSTRUCTION: research found NO KubeStellar-org contribution for this login (no contributor-list match, no authored PR, no commit or code-search hit), so the card names him and claims nothing more. Login resolved to kylerankin on the profile name, the self-declared kylerank.in domain and the heads/PureOS/Nitrokey portfolio; four same-name accounts were checked and rejected.",
+          "name": "kylerankin",
+          "title": "Keeper of the Unbroken Order",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/kylerankin.png"
+        },
+        {
+          "id": "giklab-guardian",
+          "kind": "guardian",
+          "source_at": 77.55,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 77.477-79.079 shot holds three Guardians ascending the shaft together; the seat rides from that group into the sword shot.",
+          "name": "Giklab",
+          "title": "Keeper of Shared Knowledge",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/Giklab.png"
+        },
+        {
+          "id": "rapenne-s-guardian",
+          "kind": "guardian",
+          "source_at": 87.1,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 86.987-90.324 shot is the longest mid-trailer action hold at 3.34s, on a single anonymous Guardian; the seat sits wholly inside it.",
+          "name": "rapenne-s",
+          "title": "Navigator of Hidden Systems",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/rapenne-s.png"
+        },
+        {
+          "id": "themimolet-guardian",
+          "kind": "guardian",
+          "source_at": 92.85,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 92.759-94.561 shot holds Guardians on the purple stair; the seat opens there and clears before the sparrow cut.",
+          "name": "theMimolet",
+          "title": "Scribe of the Living Verse",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/theMimolet.png"
+        },
+        {
+          "id": "ahmedadan-guardian",
+          "kind": "guardian",
+          "source_at": 105.25,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 105.172-107.474 shot is a 2.3s Guardian close-up, the clearest single-figure hold in the back half.",
+          "name": "ahmedadan",
+          "title": "Keeper of the Unbroken Build",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/ahmedadan.png"
+        },
+        {
+          "id": "danathar-guardian",
+          "kind": "guardian",
+          "source_at": 115.2,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 114.748-121.054 bridge shot is the LONGEST in the trailer at 6.31s and holds four Guardians standing together before the title card. The seat sits wholly inside it. Danathar carries the Hive epithet because his contribution record is 194 commits to kubestellar/hive.",
+          "name": "Danathar",
+          "title": "Architect of the Living Hive",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/Danathar.png"
+        }
+      ],
+      "takeover": {
+        "source_at": 123.89
+      },
+      "thumbnail": {
+        "source_at": 118.0,
+        "why": "The 114.748-121.054 bridge shot: four Guardians standing together in the Throne World, the calmest and longest hero moment in the trailer and the last picture before the title card."
+      },
+      "audio_probes": [
+        {
+          "source_at": 60.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 110.0,
+          "duration": 1.0
+        }
+      ]
     }
   ]
 }

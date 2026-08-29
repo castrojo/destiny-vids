@@ -177,6 +177,32 @@ VARIANTS = {
         "klass": (199, 210, 254, 255),    # #c7d2fe (Tailwind indigo-200)
         "title": (129, 140, 248, 255),    # #818cf8 (Tailwind indigo-400)
     },
+    # KubeStellar violet, for the Hive videos' contributor credits. UNLIKE
+    # bazzite and nobara, these colours are NOT sampled from a logo and NOT a
+    # published brand palette: KubeStellar has no brand or style guide that
+    # states one. They are the docs site's OWN explicitly labelled
+    # "KubeStellar theme colors" (kubestellar/docs,
+    # src/components/animations/globe/colors.ts) -- source-derived
+    # implementation styling, which is a weaker claim than the other two
+    # variants make, and is recorded as such rather than dressed up.
+    #
+    # #6236FF is that file's `secondary`, chosen over its `primary` #1A90FF
+    # because the primary is close enough to the house blue that the credit
+    # would not read as a different project's card at all. The secondary is
+    # too dark to set small type in on a translucent plate -- the same trap
+    # bazzite's wordmark purple sprang -- so the rows take Tailwind violet
+    # tints, exactly as bazzite does.
+    #
+    # The site's own type is Inter + JetBrains Mono. That does NOT transfer:
+    # the deck is DejaVu Sans Mono everywhere, and a plate in any other face
+    # is a red flag. Only the chrome crosses over.
+    "kubestellar": {
+        "border": (98, 54, 255, 140),     # rgb(98 54 255 / 55%) — #6236FF
+        "accent": (98, 54, 255, 255),     # #6236FF, the site's `secondary`
+        "label": (196, 181, 253, 255),    # #c4b5fd (Tailwind violet-300)
+        "klass": (221, 214, 254, 255),    # #ddd6fe (Tailwind violet-200)
+        "title": (167, 139, 250, 255),    # #a78bfa (Tailwind violet-400)
+    },
     # YouTube red, for a creator whose affiliation IS their channel. Same
     # rule: the platform is chrome, and #FF0000 is YouTube's own logo red,
     # which is too hot to set small type in -- the rows take red tints.

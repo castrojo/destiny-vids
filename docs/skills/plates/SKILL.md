@@ -149,7 +149,56 @@ No login means the crest stands in and the gap is recorded — the correct
 outcome, and where `preethi` and Karena sit today. `github: null` with *"not
 an agent's to guess"* beside it is a decision already taken.
 
-### Dialogue the owner re-sequenced
+### A real person's plate carries their face, never the chevron
+
+Owner, making it policy: *"enforce use of github pictures instead of the
+chevron. Codify this. Always show the maintainers face in chat and nameplates
+save this preference."*
+
+So `avatar` is **not optional** on a card that names a real person. The drawn
+hex crest is the fallback for exactly one case — a deliberately uncast
+placeholder, which credits nobody — and for nothing else.
+
+| Card | Crest |
+|---|---|
+| Names a real person | **Their GitHub PFP.** `renders/avatars/<login>.png` |
+| A `TBD` placeholder | The drawn crest. It must credit nobody. |
+| A brand-chrome variant with a published mark | The mark (`BRAND_MARKS`) |
+
+`tools/avatars.py` fills the cache — conditional requests, negative caching,
+and CI's `avatars` artifact — so there is no cost argument for omitting one:
+
+```bash
+python3 -m tools.avatars --from-actions      # CI's cache, one request
+python3 -c "import sys;sys.path.insert(0,'.');from tools import avatars;\
+avatars.fetch(['login1','login2'])"          # fetch specific logins
+```
+
+**Enforce at authoring, degrade at render.** A plate naming a person with no
+`avatar` field is an authoring bug and the offline suite says so. A plate whose
+avatar *file* is missing at render time still draws — the crest stands in and
+the miss is recorded in the unresolved sidecar. That split is deliberate:
+enforcement belongs where it cannot withhold a film, and rule zero does not
+bend for a picture (AGENTS.md, "Nothing blocks a release").
+
+The face is small. `CREST` is a shared constant, so enlarging it re-renders
+every plate in the programme and restales every delivered act — that is a
+deliberate, owner-sized decision, not a tidy-up to slip into an episode build.
+
+### Copy that was generated rather than written
+
+`copy_source: generated_lore` marks a `title` produced by
+[`projectbluefin/hive-lore`](https://github.com/projectbluefin/hive-lore)
+rather than authored by the owner. It is the **only** generated field on a
+plate. `name` is never generated — see the login rule above, which this does
+not soften.
+
+An epithet is a costume; a name is a claim about a person. The generator is a
+pure function of `(login, ISO week)` over a committed pool, so a re-render
+cannot reshuffle who was called what, and a delivered film's epithets are
+frozen at its build week.
+
+
 
 For owner-sequenced dialogue around a freeze, derive every window from the
 picture builder's evidenced constants, keep each card at `MIN_HOLD`, and
@@ -332,6 +381,12 @@ This skill is the contract. The procedure lives in `references/`:
   site's CSS.
 - Falling back to `Bluefin Blueberry` for somebody whose Guardian identity is
   already authored.
+- **A plate naming a real person with no `avatar`.** The chevron is for
+  placeholders that credit nobody, not for people whose face nobody fetched.
+- **A generated `name`.** Only `title` may be generated, and only with
+  `copy_source: generated_lore`.
+- Enlarging `CREST` inside an episode build to make one video's faces bigger.
+  It is a shared constant: it restales every delivered act.
 - A plate positioned against the frame on a letterboxed source, so it lands on
   the black bar instead of the picture.
 - A placeholder plate carrying anything but the vocab's uncast copy, or

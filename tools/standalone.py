@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import array
+import hashlib
 import json
 import math
 import subprocess
@@ -150,9 +151,34 @@ def kept_ranges(duration_sec, cuts):
     return kept
 
 
+def intro_seconds(video):
+    """How much film the optional ``intro`` clip puts in front of the source.
+
+    An intro is a DIFFERENT picture spliced ahead of the video's own source --
+    the batch's one exception to "a video has one source". It is declared by
+    path and digest rather than committed, exactly as the Europa tail's
+    screenshot is, because it is a render output and ``renders/`` is
+    gitignored.
+
+    Nothing else in the module needs to know it exists: the plates are
+    composited onto the source BEFORE the concat, so every authored
+    ``source_at`` stays source-relative and the seat arithmetic is unchanged.
+    Only the delivered clock moves, which is what this returns.
+    """
+    intro = video.get("intro")
+    if not intro:
+        return 0.0
+    span = float(intro["out_sec"]) - float(intro["in_sec"])
+    if span <= 0:
+        raise ValueError(
+            f"intro out_sec {intro['out_sec']} is not after in_sec "
+            f"{intro['in_sec']}")
+    return span
+
+
 def expected_duration(video, source_duration):
-    """Output seconds: the source, less every authored excision."""
-    return float(source_duration) - sum(
+    """Output seconds: the intro, plus the source less every excision."""
+    return intro_seconds(video) + float(source_duration) - sum(
         cut["end_sec"] - cut["start_sec"] for cut in _sorted_cuts(video.get("cuts"))
     )
 
@@ -344,8 +370,19 @@ def _t(value):
 
 def video_out_label(video, overlays):
     """The label the picture leaves the graph on."""
+    if video.get("intro"):
+        return "[outv]"      # the concat always names its own outputs
     steps = len(overlays) + (1 if video.get("takeover") else 0)
     return "[outv]" if steps else "[basev]"
+
+
+def audio_out_label(video):
+    """The label the sound leaves the graph on.
+
+    Without an intro the audio is never filtered past its trim, so it leaves
+    on ``[basea]``. The concat renames both streams, so an intro moves it.
+    """
+    return "[outa]" if video.get("intro") else "[basea]"
 
 
 def filtergraph(video, duration_sec, overlays, gain=1.0):
@@ -390,13 +427,18 @@ def filtergraph(video, duration_sec, overlays, gain=1.0):
                          f"[basev][basea]")
 
     takeover = video.get("takeover")
+    intro = video.get("intro")
+    # With an intro the concat owns the names [outv]/[outa], so the overlay
+    # chain must NOT also finish on [outv] -- a label cannot be both an input
+    # to a filter and its output.
+    final_v = "[mainv]" if intro else "[outv]"
     current = "[basev]"
     index = 1 + (1 if takeover else 0)
     for position, overlay in enumerate(overlays, start=1):
         start = float(overlay["at"])
         end = start + float(overlay["dur"])
         last = position == len(overlays) and not takeover
-        label = "[outv]" if last else f"[ov{position}]"
+        label = final_v if last else f"[ov{position}]"
         parts.append(
             f"{current}[{index}:v]overlay=0:0:"
             f"enable='between(t,{_t(start)},{_t(end)})':shortest=1{label}")
@@ -405,7 +447,44 @@ def filtergraph(video, duration_sec, overlays, gain=1.0):
     if takeover:
         at = source_to_output(takeover["source_at"], cuts)
         parts.append(f"{current}[1:v]overlay=0:0:"
-                     f"enable='gte(t,{_t(at)})':shortest=1[outv]")
+                     f"enable='gte(t,{_t(at)})':shortest=1{final_v}")
+        current = final_v
+    if intro and current == "[basev]":
+        # No overlays and no takeover: the picture never got a filter, so it
+        # is still on [basev] and concat needs it under the agreed name.
+        parts.append(f"[basev]null{final_v}")
+        current = final_v
+
+    # THE INTRO IS SPLICED LAST, and its input is appended AFTER the plates so
+    # no index above moves. Everything before this point is the video's own
+    # source on its own clock: the plates were composited onto it while their
+    # `at` values were still source-relative, which is why nothing here has to
+    # offset a seat.
+    #
+    # The join is a HARD CUT. There is no xfade, no acrossfade and no dip:
+    # owner, on this episode -- "I want to not have a slide, slide right into
+    # the trailer dramatically. Jump cut". `concat` is already how this module
+    # rejoins kept ranges, so the cut costs nothing and adds no generation.
+    if intro:
+        intro_index = index
+        parts.append(
+            f"[{intro_index}:v]trim=start={_t(float(intro['in_sec']))}:"
+            f"end={_t(float(intro['out_sec']))},setpts=PTS-STARTPTS,"
+            f"{chain}[introv]")
+        parts.append(
+            f"[{intro_index}:a]atrim=start={_t(float(intro['in_sec']))}:"
+            f"end={_t(float(intro['out_sec']))},asetpts=PTS-STARTPTS,"
+            # The intro arrives as 24-bit PCM from a different render; the
+            # source leg is Opus-decoded. concat needs one shared format, and
+            # resampling here rather than after the join keeps the source
+            # leg's samples untouched.
+            f"aformat=sample_fmts=fltp:sample_rates=48000:"
+            f"channel_layouts=stereo[introa]")
+        parts.append(
+            f"[basea]aformat=sample_fmts=fltp:sample_rates=48000:"
+            f"channel_layouts=stereo[maina]")
+        parts.append(f"[introv][introa]{current}[maina]"
+                     f"concat=n=2:v=1:a=1[outv][outa]")
     return ";".join(parts)
 
 
@@ -486,15 +565,20 @@ def _plate_inputs(overlays, plates_dir):
     return placed, paths, missing
 
 
-def _encode_command(ffmpeg, source, stills, graph, out_label, out):
+def _encode_command(ffmpeg, source, stills, graph, out_label, out,
+                    audio_label="[basea]", intro=None):
     argv = [*ffmpeg, "-v", "error", "-y", "-i", str(source)]
     for still in stills:
         argv += ["-loop", "1", "-framerate", conform.DELIVERY.fps,
                  "-i", str(still)]
+    # Appended LAST so the source stays input 0 and every still keeps the
+    # index the filtergraph computed for it.
+    if intro is not None:
+        argv += ["-i", str(intro)]
     argv += [
         "-filter_complex", graph,
         "-map", out_label,
-        "-map", "[basea]",
+        "-map", audio_label,
         *conform.video_encode_args(),
         "-c:a", "aac",
         "-b:a", "320k",
@@ -502,6 +586,38 @@ def _encode_command(ffmpeg, source, stills, graph, out_label, out):
         str(out),
     ]
     return argv
+
+
+def _resolved_intro(video, log=print):
+    """The intro clip's path on disk, checked against its recorded digest.
+
+    ``renders/`` is gitignored, so an intro cut from another act's render can
+    only be referenced by path -- exactly the posture
+    ``scripts/build_europa_tail.py`` takes for its source screenshot. The
+    digest is what makes that reference honest: it proves the file spliced in
+    today is the file the record describes.
+
+    A digest MISMATCH is reported and the intro is dropped, not substituted:
+    splicing a different picture than the record names is the "stale is never
+    ok" fault, and the cut without its intro is still a complete film
+    (AGENTS.md, "Degrade, never block").
+    """
+    intro = video.get("intro")
+    if not intro:
+        return None
+    path = Path(intro["path"]).expanduser()
+    if not path.exists():
+        log(f"  intro {path} is missing -- the cut ships without it")
+        return None
+    declared = intro.get("sha256")
+    if declared:
+        got = hashlib.sha256(path.read_bytes()).hexdigest()
+        if got != declared:
+            log(f"  intro {path} is sha256 {got}, the record says {declared}"
+                " -- dropped rather than splice a picture the record does not"
+                " describe")
+            return None
+    return path.resolve()
 
 
 def encode_video(video, source, cta_asset, work_dir, local=False,
@@ -567,6 +683,13 @@ def encode_video(video, source, cta_asset, work_dir, local=False,
 
     stills = ([Path(cta_asset).resolve()] if video.get("takeover") else []) \
         + [path.resolve() for path in plate_paths]
+    intro_path = _resolved_intro(video, log=log)
+    if video.get("intro") and intro_path is None:
+        # Dropped for a missing file or a digest mismatch. Every later step --
+        # the graph, the stream labels, the expected duration -- must agree
+        # that this cut has no intro, or the encode references an input that
+        # is not there.
+        video = {key: value for key, value in video.items() if key != "intro"}
     out = Path(video["output"]).expanduser()
     out.parent.mkdir(parents=True, exist_ok=True)
     out = out.resolve()
@@ -577,10 +700,12 @@ def encode_video(video, source, cta_asset, work_dir, local=False,
         argv = _encode_command(
             ffmpeg, source, stills,
             filtergraph(video, duration, overlays, gain=gain),
-            out_label, out)
+            out_label, out,
+            audio_label=audio_out_label(video),
+            intro=intro_path)
         return farm.run_encode(
             argv,
-            inputs=[source, *stills],
+            inputs=[source, *stills, *([intro_path] if intro_path else [])],
             out=out,
             local=local,
             expected_duration=wanted,
