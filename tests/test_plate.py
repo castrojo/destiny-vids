@@ -148,6 +148,32 @@ def test_the_bazzite_variant_is_purple_chrome_not_a_new_card():
     assert variant is plate.VARIANTS["bazzite"]
     assert variant["accent"] == (138, 43, 226, 255)   # #8A2BE2
 
+def test_the_kubestellar_variant_is_violet_chrome_not_a_new_card():
+    """Same geometry and the same closed field set as every other plate --
+    only the chrome changes, exactly like bazzite and rust.
+
+    The claim here is deliberately WEAKER than bazzite's. KubeStellar
+    publishes no brand or style guide, so these are not sampled logo colours:
+    #6236FF is the docs site's own explicitly labelled "KubeStellar theme
+    colors" `secondary` (kubestellar/docs, globe/colors.ts). Source-derived
+    implementation styling, recorded as such."""
+    ks = plate.render_plate(dict(GUARDIAN, variant="kubestellar", trustee=False))
+    default = plate.render_plate(dict(GUARDIAN, trustee=False))
+    assert ks.size == default.size
+    assert ks.tobytes() != default.tobytes()
+    variant = plate._variant_for(dict(GUARDIAN, variant="kubestellar"))
+    assert variant is plate.VARIANTS["kubestellar"]
+    assert variant["accent"] == (98, 54, 255, 255)   # #6236FF
+
+
+def test_the_kubestellar_variant_carries_no_brand_mark():
+    """A brand mark comes from the project's own published artwork. Nothing
+    is cached for KubeStellar, so the crest stays the drawn hex -- or the
+    contributor's own GitHub face, which is what these cards actually use.
+    A variant with no mark degrades to the crest; it never crashes."""
+    assert "kubestellar" not in plate.BRAND_MARKS
+
+
 def test_the_bazzite_crest_carries_the_logomark():
     """The tile replaces the hex for this variant: the cobalt->violet
     gradient with the white D-pad at its heart."""

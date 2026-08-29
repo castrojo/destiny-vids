@@ -157,6 +157,7 @@ This skill is the contract. The procedure lives in `references/`:
 | [`key-art.md`](references/key-art.md) | Stills cut from the key art: YouTube thumbnails and the website's social preview card. |
 | [`avatars.md`](references/avatars.md) | The credits avatar cache and the Actions job that fetches it. |
 | [`freshness.md`](references/freshness.md) | Keeping delivery current across `cards / plates -> master -> Prod -> megacut -> 10mb/`. |
+| [`standalone-batch.md`](references/standalone-batch.md) | The "Bluefin and the X" cuts: one closed manifest, source-time seats, the CTA takeover, and splicing an intro film in front with a hard cut. |
 
 ## Common Rationalizations
 

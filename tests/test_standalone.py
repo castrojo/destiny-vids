@@ -1778,3 +1778,99 @@ def test_the_saint_14_joins_survive_concat_frame_quantization():
                 f"join at {cut['start_sec']} pads a whole frame"
         prev_end = cut["end_sec"]
     assert [start for start, _ in padded] == [72.201, 80.468]
+
+
+# --- the intro: a different picture spliced in front, hard cut --------------
+
+HIVE_III_SLUG = "bluefin-and-the-hive-iii"
+
+
+def _intro_video():
+    return _batch_video(HIVE_III_SLUG)
+
+
+def test_intro_seconds_is_the_declared_span_and_zero_without_one():
+    """The only thing an intro moves is the delivered clock."""
+    assert standalone.intro_seconds({}) == 0.0
+    video = _intro_video()
+    assert standalone.intro_seconds(video) == pytest.approx(66.4667)
+
+
+def test_an_intro_that_ends_before_it_starts_is_refused():
+    with pytest.raises(ValueError):
+        standalone.intro_seconds(
+            {"intro": {"in_sec": 10.0, "out_sec": 4.0}})
+
+
+def test_expected_duration_counts_the_intro():
+    """A cut whose delivered length ignored its intro would fail the farm's
+    duration check for the wrong reason, and pass a wrong file. The ESRB
+    slate is excised from the trailer head, so it comes off too."""
+    video = _intro_video()
+    excised = sum(cut["end_sec"] - cut["start_sec"]
+                  for cut in video.get("cuts") or [])
+    assert standalone.expected_duration(video, 134.334) == pytest.approx(
+        66.4667 + 134.334 - excised)
+
+
+def test_the_concat_owns_outv_so_the_overlay_chain_ends_on_mainv():
+    """A label cannot be both an input to a filter and its output. The first
+    graph written for this fed [outv] into a concat that also declared
+    [outv], which ffmpeg refuses."""
+    video = _intro_video()
+    overlays, unresolved = standalone.mapped_overlays(video, 134.334)
+    assert unresolved == []
+    graph = standalone.filtergraph(video, 134.334, overlays)
+    assert "[introv][introa][mainv][maina]concat=n=2:v=1:a=1[outv][outa]" \
+        in graph
+    assert graph.count("[outv]") == 1        # declared once, by the concat
+    assert standalone.video_out_label(video, overlays) == "[outv]"
+    assert standalone.audio_out_label(video) == "[outa]"
+
+
+def test_without_an_intro_the_audio_still_leaves_on_basea():
+    """The intro must not change the shape of every other cut in the batch."""
+    video = _batch_video(SAINT_SLUG)
+    assert standalone.audio_out_label(video) == "[basea]"
+    assert "concat=n=2:v=1:a=1[outv][outa]" not in standalone.filtergraph(
+        video, 200.0, [])
+
+
+def test_the_intro_is_the_last_input_so_no_still_index_moves():
+    """Appending it keeps input 0 the source and every plate on the index the
+    graph already computed."""
+    argv = standalone._encode_command(
+        ["ffmpeg"], "src.mkv", ["a.png", "b.png"], "GRAPH", "[outv]",
+        "out.mp4", audio_label="[outa]", intro="intro.mkv")
+    inputs = [argv[i + 1] for i, token in enumerate(argv) if token == "-i"]
+    assert inputs == ["src.mkv", "a.png", "b.png", "intro.mkv"]
+    assert argv[argv.index("-map") + 1] == "[outv]"
+
+
+def test_the_intro_plates_stay_source_relative():
+    """Plates are composited before the join, so adding an intro must not
+    move a single authored seat."""
+    video = _intro_video()
+    with_intro, _ = standalone.mapped_overlays(video, 134.334)
+    without = {key: value for key, value in video.items() if key != "intro"}
+    no_intro, _ = standalone.mapped_overlays(without, 134.334)
+    assert [item["at"] for item in with_intro] == \
+        [item["at"] for item in no_intro]
+
+
+def test_every_hive_iii_plate_names_a_person_and_carries_their_face():
+    """Owner policy: 'enforce use of github pictures instead of the chevron
+    ... Always show the maintainers face in chat and nameplates'. The drawn
+    crest is for placeholders that credit nobody."""
+    for overlay in _intro_video()["overlays"]:
+        assert overlay.get("name"), overlay["id"]
+        assert overlay.get("avatar"), \
+            f"{overlay['id']} names {overlay['name']} with no GitHub face"
+        assert overlay["avatar"] == f"renders/avatars/{overlay['name']}.png"
+
+
+def test_hive_iii_titles_are_marked_as_generated_not_authored():
+    """Only `title` may be generated, and it must say so."""
+    for overlay in _intro_video()["overlays"]:
+        assert overlay["copy_source"] == "generated_lore"
+        assert overlay.get("title")
