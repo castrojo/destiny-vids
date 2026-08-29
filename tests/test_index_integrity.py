@@ -25,9 +25,19 @@ SEGMENT_PATHS = sorted(glob.glob(str(REPO_ROOT / "segments" / "*.json")))
 VIDEO_PATHS = sorted(glob.glob(str(REPO_ROOT / "videos" / "*.json")))
 TAG_PATHS = sorted(glob.glob(str(REPO_ROOT / "tags" / "*.json")))
 BED_PATHS = sorted(glob.glob(str(REPO_ROOT / "music" / "*.json")))
-STANDALONE_BATCH_PATHS = sorted(
+def _is_standalone_batch(path):
+    # Two record types share stories/standalone/: video batches (top-level
+    # `videos`) and Hive season manifests (top-level `season`). Each is
+    # validated against its own schema below.
+    with open(path, encoding="utf-8") as fh:
+        return "videos" in json.load(fh)
+
+
+_STANDALONE_PATHS = sorted(
     glob.glob(str(REPO_ROOT / "stories" / "standalone" / "*.json"))
 )
+STANDALONE_BATCH_PATHS = [p for p in _STANDALONE_PATHS if _is_standalone_batch(p)]
+HIVE_SEASON_PATHS = [p for p in _STANDALONE_PATHS if not _is_standalone_batch(p)]
 
 PROVENANCE = (
     yaml.safe_load((REPO_ROOT / "vocab" / "provenance.yaml").read_text()) or {}
@@ -133,6 +143,20 @@ def test_an_attributed_bed_carries_its_credit_verbatim(path):
 def test_committed_standalone_batch_matches_the_schema(path):
     errors = sorted(
         _validator("standalone-batch.schema.json").iter_errors(_load(path)),
+        key=lambda error: list(error.path),
+    )
+    assert not errors, "\n".join(
+        f"{'/'.join(str(part) for part in error.path)}: {error.message}"
+        for error in errors
+    )
+
+
+@pytest.mark.parametrize(
+    "path", HIVE_SEASON_PATHS, ids=lambda path: Path(path).stem
+)
+def test_committed_hive_season_matches_the_schema(path):
+    errors = sorted(
+        _validator("hive-season.schema.json").iter_errors(_load(path)),
         key=lambda error: list(error.path),
     )
     assert not errors, "\n".join(

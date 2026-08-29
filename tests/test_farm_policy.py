@@ -63,6 +63,8 @@ FARMED = {
     ("tools/social.py", "main"): "both passes share one farm pod; local caps",
     ("tools/standalone.py", "encode_video"): "the standalone batch's one "
     "pass farms by default; --local caps",
+    ("tools/hive_series.py", "encode_episode"): "the season's one pass per "
+    "episode farms by default; --local caps",
     ("tools/farm.py", "run_locally"): "the farm CLI's own fallback is capped",
     ("scripts/actbuild.py", "main"): "acts IV/V/VII farm by default",
     ("scripts/build_act1.py", "build_act1"): "act I's legs farm by default",
@@ -94,6 +96,9 @@ EXEMPT_AUDIO_ONLY = {
     ("tools/peaks.py", "rerun"): '"-c:v", "copy"',
     ("tools/bed.py", "render_bed"): '"-map", "[out]"',
     ("tools/megacut.py", "assemble"): "build_concat_command(",
+    # The season cut's join is a pure remux: both streams were encoded once
+    # per episode (farm-first, above) and are stream-copied here.
+    ("tools/hive_series.py", "concat_episodes"): "concat_command(",
 }
 
 
