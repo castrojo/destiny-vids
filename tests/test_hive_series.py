@@ -1253,6 +1253,123 @@ def test_build_episode_records_the_dossier_fallback_in_unresolved(
     assert any("fixture" in json.dumps(entry) for entry in sidecar)
 
 
+def test_build_episode_still_encodes_when_the_source_is_undecodable(
+        manifest, tmp_path, monkeypatch):
+    """An undecodable source drops EVERY seat -- both plates and the lore
+    overlay -- from the rendered PNG list. The filtergraph must be built
+    from that same pruned list, or it indexes an overlay input the argv
+    never loops (issue: `episode_filtergraph` indexed the PLANNED overlay
+    count while `_render_overlay_pngs` could render fewer or none). The
+    unplated episode must still encode."""
+    data = _delivery_manifest(manifest, tmp_path)
+    manifest_path = tmp_path / "season.json"
+    manifest_path.write_text(json.dumps(data))
+
+    fake_source = tmp_path / "src.mkv"
+    fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
+    monkeypatch.setattr(
+        hive_series.render, "detect_picture_status",
+        lambda *a, **k: (None, "undecodable"))
+    monkeypatch.setattr(hive_series, "resolve_face", lambda login: None)
+
+    captured = {}
+
+    def fake_run_encode(argv, **kwargs):
+        captured["argv"] = [str(t) for t in argv]
+        captured.update(kwargs)
+        Path(kwargs["out"]).write_bytes(b"mp4")
+        return "cluster"
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
+
+    out = hive_series.build_episode(manifest_path, 1, work_dir=tmp_path / "work")
+    assert out.exists(), "the unplated episode still ships"
+
+    argv = captured["argv"]
+    graph = argv[argv.index("-filter_complex") + 1]
+    # No overlay was rendered: the graph carries no overlay filter, and the
+    # argv loops no PNG input for one -- input and graph counts agree.
+    assert "overlay=0:0" not in graph
+    inputs = captured["inputs"]
+    assert argv.count("-i") == len(inputs) == 7  # source + 6 stills only
+    for path in inputs:
+        assert Path(path).exists(), f"staged input missing: {path}"
+
+    sidecar = json.loads(
+        (tmp_path / "work" / "s01e01-the-enclave-unresolved.json").read_text())
+    # Both fixed-cast plates and the lore overlay are recorded as unplaced.
+    undecodable = [item for item in sidecar
+                   if "could not be decoded" in item.get("reason", "")]
+    assert {item["id"] for item in undecodable} == \
+        {"ikora-ch1", "eris-ch1", "savathuns-ship"}
+
+
+def test_build_episode_still_encodes_when_one_plate_png_is_missing(
+        manifest, tmp_path, monkeypatch):
+    """A single plate that fails to materialise as a PNG (tools/plate.py's
+    own omission or a write failure) must drop ONLY that one seat from both
+    the rendered PNG list and the graph -- the remaining plate, the lore
+    overlay, and the episode's own encode must still land on the RIGHT
+    input indices, not the planned ones."""
+    data = _delivery_manifest(manifest, tmp_path)
+    manifest_path = tmp_path / "season.json"
+    manifest_path.write_text(json.dumps(data))
+
+    fake_source = tmp_path / "src.mkv"
+    fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
+    monkeypatch.setattr(
+        hive_series.render, "detect_picture_status",
+        lambda *a, **k: (None, "full-frame"))
+    monkeypatch.setattr(hive_series, "resolve_face", lambda login: None)
+
+    def fake_render_all(plates, out_dir, picture=None):
+        # Every plate but "ikora-ch1" renders; that one silently produces
+        # no file, as a real tools/plate.py omission would.
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for spec in plates:
+            if spec["id"] == "ikora-ch1":
+                continue
+            Image.new("RGBA", (64, 64), (1, 2, 3, 255)).save(
+                out_dir / f"plate_{spec['id']}.png")
+
+    monkeypatch.setattr(hive_series.plate, "render_all", fake_render_all)
+
+    captured = {}
+
+    def fake_run_encode(argv, **kwargs):
+        captured["argv"] = [str(t) for t in argv]
+        captured.update(kwargs)
+        Path(kwargs["out"]).write_bytes(b"mp4")
+        return "cluster"
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
+
+    out = hive_series.build_episode(manifest_path, 1, work_dir=tmp_path / "work")
+    assert out.exists(), "the episode still ships missing one plate"
+
+    argv = captured["argv"]
+    graph = argv[argv.index("-filter_complex") + 1]
+    # 6 stills (input 1-6), so the two SURVIVING overlays (eris, the ship
+    # lore overlay) must seat at inputs 7 and 8 -- never at the planned
+    # index 8/9 that assumed the dropped ikora plate still had an input.
+    assert "[7:v]overlay=0:0" in graph
+    assert "[8:v]overlay=0:0" in graph
+    assert "[9:v]" not in graph
+    inputs = captured["inputs"]
+    assert argv.count("-i") == len(inputs) == 9  # source + 6 stills + 2
+    for path in inputs:
+        assert Path(path).exists(), f"staged input missing: {path}"
+
+    sidecar = json.loads(
+        (tmp_path / "work" / "s01e01-the-enclave-unresolved.json").read_text())
+    assert any(
+        item.get("id") == "ikora-ch1" and "no plate was rendered" in item["reason"]
+        for item in sidecar)
+
+
 # --- content-derived freshness ---------------------------------------------
 
 
@@ -1630,6 +1747,28 @@ def test_delivery_probe_reports_a_real_fps_mismatch(tmp_path, monkeypatch):
     problems = _probe_with(tmp_path, monkeypatch, _conformant_video(
         avg_frame_rate="30/1", r_frame_rate="30/1"))
     assert any("frame rate" in p for p in problems)
+
+
+def test_delivery_probe_never_launders_a_wrong_average_through_r_frame_rate(
+        tmp_path, monkeypatch):
+    """A correct ``r_frame_rate`` must never excuse a genuinely wrong
+    ``avg_frame_rate``: the average is the number actually encoded, and
+    accepting on the nominal/declared rate instead would let a real 30 fps
+    encode (muxed with a 60000/1001 container rate) verify as delivery
+    cadence."""
+    problems = _probe_with(tmp_path, monkeypatch, _conformant_video(
+        avg_frame_rate="30/1", r_frame_rate="60000/1001"))
+    assert any("frame rate" in p for p in problems)
+
+
+def test_delivery_probe_still_accepts_the_measured_container_rounding(
+        tmp_path, monkeypatch):
+    """The known rounding case keeps working when the fix is scoped to
+    ``avg_frame_rate`` alone: the measured average itself, not the nominal
+    rate, is what has to fall inside the documented slack."""
+    problems = _probe_with(tmp_path, monkeypatch, _conformant_video(
+        avg_frame_rate="32640000/544621", r_frame_rate="60000/1001"))
+    assert problems == []
 
 
 def test_delivery_probe_reports_a_duration_mismatch(tmp_path, monkeypatch):

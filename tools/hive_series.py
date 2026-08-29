@@ -973,7 +973,25 @@ def render_dossier_safely(snapshot, face=None):
 # --- the one-pass filtergraph ------------------------------------------------------------
 
 
-def episode_filtergraph(plan, source_rate=SAMPLE_RATE):
+def _plan_overlay_descriptors(plan):
+    """The overlay/plate descriptor list AS PLANNED, in render order: fixed
+    plates first, then project-lore overlays.
+
+    This is only the PLAN's view -- what the season manifest asks for.
+    `_render_overlay_pngs` walks this same order but may PRUNE it (an
+    undecodable source drops every seat; a plate whose PNG never
+    materialised drops just that one). The pruned list is what actually got
+    rendered, so it -- never this planned one -- is what
+    `episode_filtergraph`, `encode_episode_command`, and
+    `episode_input_digest` must all agree on. This helper exists only to
+    give a caller with no rendered list yet (a plan-only test, a digest
+    computed before rendering) the same default derivation, so it never
+    has to duplicate the zip-order rule."""
+    return [dict(p, overlay_kind="plate") for p in plan["plates"]] + \
+        [dict(o, overlay_kind="lore") for o in plan["overlays"]]
+
+
+def episode_filtergraph(plan, overlays=None, source_rate=SAMPLE_RATE):
     """One graph for one episode: the stills, the chapter, one concat.
 
     Input order is the fixed contract with `encode_episode_command`: input 0
@@ -983,14 +1001,22 @@ def episode_filtergraph(plan, source_rate=SAMPLE_RATE):
     durations and the overlays carry ``shortest=1``, so the finite chapter
     leg decides where the file ends.
 
+    ``overlays`` MUST be the actually-rendered, already-pruned descriptor
+    list from `_render_overlay_pngs` -- the same list, in the same order,
+    that `encode_episode_command` loops as PNG inputs. An undecodable
+    source or a missing plate PNG drops entries from that list; indexing
+    against the PLANNED list instead (the default, used only when a caller
+    has nothing rendered yet) would seat an overlay on an input ffmpeg was
+    never given.
+
     The chapter's audio is the source's own, trimmed on the same boundary
     and pinned to the delivery layout; aresample joins the chain ONLY when
     the source's rate is not already the delivery rate (megacut's rule)."""
     chain = conform.video_filter_chain()
     stills = [s for s in plan["segments"] if s["kind"] != "chapter"]
     chapter = next(s for s in plan["segments"] if s["kind"] == "chapter")
-    overlays = [dict(p, overlay_kind="plate") for p in plan["plates"]] + \
-        [dict(o, overlay_kind="lore") for o in plan["overlays"]]
+    if overlays is None:
+        overlays = _plan_overlay_descriptors(plan)
     aformat = f"aformat=sample_fmts=fltp:channel_layouts={AUDIO_LAYOUT}"
 
     parts = []
@@ -1142,7 +1168,7 @@ def _write_unresolved(work_dir, slug, unresolved):
 # --- content-derived freshness --------------------------------------------------
 
 
-def episode_input_digest(plan, staged, source=None):
+def episode_input_digest(plan, staged, overlays=None, source=None):
     """The content an existing episode is fresh AGAINST, as one digest.
 
     Media verification answers "is this file a well-formed delivery"; it
@@ -1154,6 +1180,13 @@ def episode_input_digest(plan, staged, source=None):
     consumes, in graph order. Same digest, same episode -- a skip is then
     a content statement, not a duration coincidence.
 
+    ``overlays`` MUST be the same rendered/pruned descriptor list handed to
+    `episode_filtergraph` -- the encode DECODES only what actually got
+    rendered, so an episode whose overlays were pruned (an undecodable
+    source, a missing plate PNG) must digest differently from one whose
+    overlays rendered clean, even on an identical plan. It defaults to the
+    full planned list only for a caller with nothing rendered yet.
+
     Staged inputs are hashed as DECODED PIXELS, not file bytes: Pillow's
     PNG output shifts with the process-global `ImageFile.MAXBLOCK` (which
     `tools/thumbnail.py` raises at import), so byte hashing would make the
@@ -1162,6 +1195,8 @@ def episode_input_digest(plan, staged, source=None):
 
     Deterministic by construction: the plan is manifest-derived, and the
     card renderers are pinned pixel-identical by their own tests."""
+    if overlays is None:
+        overlays = _plan_overlay_descriptors(plan)
     h = hashlib.sha256()
 
     def note(kind, payload):
@@ -1195,10 +1230,10 @@ def episode_input_digest(plan, staged, source=None):
         if "snapshot" in segment:
             entry["snapshot"] = segment["snapshot"]
         note("segment", entry)
-    for spec in plan["plates"]:
-        note("plate", spec)
-    for overlay in plan["overlays"]:
-        note("overlay", overlay)
+    for spec in overlays:
+        payload_spec = {k: v for k, v in spec.items() if k != "overlay_kind"}
+        note("plate" if spec["overlay_kind"] == "plate" else "overlay",
+             payload_spec)
     note("offsets", {"front_offset": plan["front_offset"],
                      "expected_duration": plan["expected_duration"]})
     for path in staged:
@@ -1251,12 +1286,24 @@ def _render_overlay_pngs(plan, source, ffmpeg, work_dir, slug, unresolved,
     """The episode's overlay inputs, in graph order: the fixed plates through
     tools/plate.py (unmodified), then the project-lore overlays drawn here.
 
+    Returns ``(pngs, descriptors)`` in LOCKSTEP -- ``descriptors[i]`` is the
+    plan entry (plate spec or lore overlay, each tagged ``overlay_kind``)
+    that produced ``pngs[i]``. This pair, not `plan["plates"]` /
+    `plan["overlays"]`, is the single source `build_episode` must hand to
+    `episode_filtergraph`, `encode_episode_command`, and
+    `episode_input_digest`: an entry this function cannot place is recorded
+    in ``unresolved`` and dropped from BOTH lists together, so a caller
+    that only ever sees the rendered pair can never build a graph that
+    indexes an input the argv does not loop.
+
     Seats are measured against the PICTURE, never the raw frame (issue
     #161's rule, taken from standalone.py): an undecodable source drops the
     seats and records why -- the unplated episode still ships."""
     overlay_pngs = []
-    if not plan["plates"] and not plan["overlays"]:
-        return overlay_pngs
+    rendered = []
+    descriptors = _plan_overlay_descriptors(plan)
+    if not descriptors:
+        return overlay_pngs, rendered
     picture, status = render.detect_picture_status(source, ffmpeg=ffmpeg)
     if status == "undecodable":
         unresolved.extend(
@@ -1264,8 +1311,8 @@ def _render_overlay_pngs(plan, source, ffmpeg, work_dir, slug, unresolved,
              "reason": "the source picture area could not be decoded, so "
                        "the seat could not be measured against the picture "
                        "and was not placed"}
-            for item in [*plan["plates"], *plan["overlays"]])
-        return overlay_pngs
+            for item in descriptors)
+        return overlay_pngs, rendered
     if plan["plates"]:
         plates_dir = Path(work_dir) / f"{slug}-plates"
         plate.render_all(plan["plates"], plates_dir, picture=picture)
@@ -1277,13 +1324,15 @@ def _render_overlay_pngs(plan, source, ffmpeg, work_dir, slug, unresolved,
                      "reason": f"no plate was rendered at {png}"})
                 continue
             overlay_pngs.append(png.resolve())
+            rendered.append(dict(spec, overlay_kind="plate"))
     for overlay in plan["overlays"]:
         card = render_lore_overlay(overlay)
         frame = place_lore_overlay(card, overlay["position"], picture)
         png = Path(work_dir) / f"{slug}-overlay-{overlay['id']}.png"
         frame.save(png)
         overlay_pngs.append(png.resolve())
-    return overlay_pngs
+        rendered.append(dict(overlay, overlay_kind="lore"))
+    return overlay_pngs, rendered
 
 
 def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
@@ -1328,10 +1377,11 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
         else:
             stills.append(Path(segment["asset"]).resolve())
 
-    overlay_pngs = _render_overlay_pngs(
+    overlay_pngs, overlay_descriptors = _render_overlay_pngs(
         plan, source, ffmpeg, work, slug, unresolved, log)
     staged = [*stills, *overlay_pngs]
-    digest = episode_input_digest(plan, staged, source=manifest["source"])
+    digest = episode_input_digest(plan, staged, overlays=overlay_descriptors,
+                                  source=manifest["source"])
     digest_path = work / f"{slug}-inputs.json"
 
     if out.exists() and not verify_episode(manifest, episode_number,
@@ -1359,7 +1409,8 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
     out.parent.mkdir(parents=True, exist_ok=True)
     out = out.resolve()
     graph = episode_filtergraph(
-        plan, source_rate=_source_audio_rate(source, ffmpeg))
+        plan, overlay_descriptors,
+        source_rate=_source_audio_rate(source, ffmpeg))
     argv = encode_episode_command(
         ffmpeg, source, stills, overlay_pngs, graph, out)
     where = encode_episode(
@@ -1583,13 +1634,20 @@ def _fps_with_delivery_rounding(props):
     """``(props, fps_ok)`` with the container-rounding verdict applied once.
 
     The ONE shared override for the known mp4 rounding (`_fps_is_delivery`):
-    when either reported rate lands inside the slack, the returned props
-    carry the exact delivery fps so downstream rational comparisons agree,
-    and ``fps_ok`` reports the verdict. Both the join probe
-    (`_conform_for_join`) and the delivery report (`_probe_delivery_streams`)
-    go through here, so the two can never drift apart."""
-    if _fps_is_delivery(props.get("avg_frame_rate")) or \
-            _fps_is_delivery(props.get("r_frame_rate")):
+    the verdict is decided on the MEASURED ``avg_frame_rate`` alone.
+    ``r_frame_rate`` is the container's nominal/declared cadence, not what
+    was actually encoded -- accepting a file because its ``r_frame_rate``
+    reads correct would launder a genuinely wrong average (a real 30/1
+    encode muxed with a 60000/1001 nominal rate, say) into a pass, which is
+    exactly backwards: the average is the number this check exists to
+    verify. When the measured average lands inside the slack, the returned
+    props carry the exact delivery fps so downstream rational comparisons
+    agree; otherwise the measured props are returned UNCHANGED, so a real
+    mismatch is reported at its own measured value, never laundered. Both
+    the join probe (`_conform_for_join`) and the delivery report
+    (`_probe_delivery_streams`) go through here, so the two can never drift
+    apart."""
+    if _fps_is_delivery(props.get("avg_frame_rate")):
         return dict(props, avg_frame_rate=conform.DELIVERY.fps), True
     return props, False
 
