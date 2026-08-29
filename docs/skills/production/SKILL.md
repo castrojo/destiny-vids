@@ -100,6 +100,10 @@ scripts/make_video.sh 3 renders/roster.json            # UNCUT, credited
 `make_video.sh` picks up `stories/<video_id>.txt` automatically if it exists.
 Writing the outline is editorial work; the script does not invent one.
 
+Standalone sequel titles keep the series construction and add a Roman numeral:
+`Bluefin and the Hive II`, not `Bluefin in the Hive II`. The episode number
+changes; the established title wording does not.
+
 ## The gate at stage 7
 
 `build_uncut_credited.sh` renders the **whole** video and credits it. That is
