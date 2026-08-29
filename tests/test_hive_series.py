@@ -1175,6 +1175,7 @@ def test_build_episode_orchestrates_cards_encode_and_thumbnail(
         hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(
         hive_series, "_source_audio_rate", lambda *a, **k: 48000)
+    monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1241,6 +1242,7 @@ def test_build_episode_records_the_dossier_fallback_in_unresolved(
         hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(
         hive_series, "_source_audio_rate", lambda *a, **k: 48000)
+    monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1279,6 +1281,7 @@ def test_build_episode_still_encodes_when_the_source_is_undecodable(
         hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(
         hive_series, "_source_audio_rate", lambda *a, **k: 48000)
+    monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1334,6 +1337,7 @@ def test_build_episode_still_encodes_when_one_plate_png_is_missing(
         hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(
         hive_series, "_source_audio_rate", lambda *a, **k: 48000)
+    monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
