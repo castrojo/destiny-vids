@@ -659,7 +659,7 @@ def test_avatar_login_takes_that_accounts_github_picture():
 def test_cast_takes_the_portrait_the_casting_vocab_records():
     entry = _one("## 0:00\n\nJoseph @ 0:00 +2.2: Is it worth it?\n"
                  "  - cast: joseph_sandoval\n")
-    assert entry["avatar"] == "renders/avatars/joseph_sandoval.png"
+    assert entry["avatar"] == "renders/avatars/jrsapi.png"
     assert entry["avatar_url"] == \
         chapter_md._casting_avatars()["joseph_sandoval"]
     assert "cast" not in entry

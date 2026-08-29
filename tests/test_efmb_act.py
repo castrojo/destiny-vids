@@ -494,11 +494,11 @@ def walk_plates():
     return {p["id"]: p for p in committed()["plates"]
             if p["id"].startswith("walk_")}
 
-def test_the_mapped_walk_lines_land_on_their_owner_marks():
-    """The mapped 7:25 and 7:34 lines stay on their Act II film seconds."""
+def test_the_mapped_walk_lines_clear_the_overlap_without_moving_the_next_beat():
+    """The reply moves clear of A1RM4X; the next Eggroll beat stays pinned."""
     walk = walk_plates()
-    assert walk["walk_ge_stream"]["at"] == pytest.approx(178.5, abs=1e-3)
-    assert walk["walk_ge_glorious"]["at"] == pytest.approx(187.5, abs=1e-3)
+    assert walk["walk_ge_stream"]["at"] == pytest.approx(180.4, abs=1e-3)
+    assert walk["walk_ge_glorious"]["at"] == pytest.approx(188.25, abs=1e-3)
 
 def test_the_villain_arrives_with_the_villain():
     """The bar is on the shot the winged figure walks out of, not on the
@@ -697,7 +697,7 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
     lead = build_efmb.derive_lead()
     walk_in = build_efmb.film_for_source(build_efmb_plates.WALK_IN, lead)
     toc = toc_plates()
-    pre = [toc[k] for k in ("toc_joseph_worth", "toc_ricardo")]
+    pre = [toc[k] for k in ("toc_karena", "toc_joseph_worth", "toc_ricardo")]
     # CHAINED BACKWARD FROM THE WALK, not forward from 2:19. Correcting
     # WALK_IN to the walking shot's real first frame left a constrained
     # exchange, so it moves earlier as a block rather
@@ -711,7 +711,52 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
 
 def test_the_remaining_pre_walk_toc_copy_is_reproduced_verbatim():
     toc = toc_plates()
+    assert toc["toc_karena"] == {
+        "id": "toc_karena",
+        "at": 137.533,
+        "dur": 3.2,
+        "kind": "chat",
+        "position": "left",
+        "copy_source": "owner_supplied",
+        "speaker": "angellk",
+        "text": "One hundred thousand bootc volunteers, ready to power up",
+        "text_source": "owner_supplied",
+        "avatar": "renders/avatars/angellk.png",
+        "avatar_url": "https://github.com/angellk.png?size=256",
+    }
     assert toc["toc_ricardo"]["text"] == "Look man I am so tired just jump"
+
+def test_karena_and_joseph_use_their_verified_github_identities():
+    by_id = {p["id"]: p for p in committed()["plates"]}
+    karena_ids = {
+        "chat_karena_job",
+        "late_karena_cardio",
+        "late_karena_lessons",
+        "toc_karena",
+        "ch_ii_12_4_angellk",
+    }
+    for plate_id in karena_ids:
+        assert by_id[plate_id]["speaker"] == "angellk"
+        assert by_id[plate_id]["avatar_url"] == \
+            "https://github.com/angellk.png?size=256"
+
+    assert by_id["trio_mara_sov"]["name"] == "Karena Angell"
+    assert by_id["trio_mara_sov"]["avatar_url"] == \
+        "https://github.com/angellk.png?size=256"
+
+    for plate_id in (
+            "chat_joseph_ricardos", "chat_joseph_slop",
+            "toc_joseph_worth"):
+        assert by_id[plate_id]["speaker"] == "jrsapi"
+        assert by_id[plate_id]["avatar_url"] == \
+            "https://github.com/jrsapi.png?size=256"
+
+def test_karena_job_precedes_the_choice_screen():
+    by_id = {p["id"]: p for p in committed()["plates"]}
+    karena = by_id["chat_karena_job"]
+    choice = by_id["choice_lfx_00"]
+    assert karena["at"] == pytest.approx(77.433, abs=1e-3)
+    assert karena["at"] + karena["dur"] <= choice["at"]
 
 def test_the_post_walk_dialogue_is_replaced_by_the_mapped_pass():
     by_id = {p["id"]: p for p in committed()["plates"]}
@@ -735,7 +780,7 @@ def test_the_owner_conversation_replaces_the_skill_banners():
         assert f"mapped_skill_banner_{i}" not in ids
 
     convo = [
-        ("owner_convo_joseph", "joseph",
+        ("owner_convo_joseph", "jrsapi",
          "We can't let The Toilmaster enslave another generation",
          234.617, 3.600),
     ]
@@ -749,7 +794,8 @@ def test_the_owner_conversation_replaces_the_skill_banners():
         assert p["text"] == text
         assert p["at"] == pytest.approx(at, abs=1e-3)
         assert p["dur"] == pytest.approx(dur, abs=1e-3)
-        assert "avatar" not in p and "avatar_url" not in p
+        assert p["avatar"] == "renders/avatars/jrsapi.png"
+        assert p["avatar_url"] == "https://github.com/jrsapi.png?size=256"
 
     kyle = by_id["mapped_kyle_titanfall"]
     assert kyle["at"] == pytest.approx(239.95, abs=1e-3)
@@ -1079,9 +1125,10 @@ def test_the_late_titles_and_last_chats_replace_the_old_conflicting_windows():
     for removed in (
         "walk_ge_upstream", "trustee_gregkh", "trustee_shuah_khan",
         "solo_tulilirockz", "timed_krook", "timed_bedazzle",
-        "solo_kolunmi", "late_karena_lessons",
+        "solo_kolunmi",
     ):
         assert removed not in ids
+    assert "late_karena_lessons" in ids
     assert "late_rochaporto_cern" in ids
     assert "mapped_kyle_reveal" in ids
 
@@ -1392,9 +1439,19 @@ def test_hikariknight_is_out_of_the_eggroll_scene():
     casting = build_efmb_plates.load_casting()
     build_efmb_plates.authored_copy("HikariKnight", casting)  # raises if gone
 
-    # The replacement line now lands on the mapped 7:25 seat instead.
+    # The reply starts after both A1RM4X pills instead of overlapping them.
     by_id = {p["id"]: p for p in manifest["plates"]}
-    assert by_id["walk_ge_stream"]["at"] == pytest.approx(178.5, abs=1e-3)
+    sequence = [
+        by_id["mapped_a1rmax_intro"],
+        by_id["mapped_a1rmax_lowly"],
+        by_id["walk_ge_stream"],
+        by_id["walk_a1rm4x"],
+        by_id["mapped_wrkode_dibs"],
+        by_id["walk_ge_glorious"],
+    ]
+    for previous, current in zip(sequence, sequence[1:]):
+        assert previous["at"] + previous["dur"] <= current["at"] + 1e-6
+    assert by_id["walk_ge_stream"]["at"] == pytest.approx(180.4, abs=1e-3)
     assert by_id["walk_ge_stream"]["text"] == "It's your patch, turn the stream on"
 
 def test_natewaddington_is_out_of_the_climax():

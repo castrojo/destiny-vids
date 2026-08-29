@@ -24,13 +24,14 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 
 - `4:43.80` Eons later / Maintainer-Guardians hold the line for humanity / Fighting against the Toilmaster and his Legion of Clankers / It all started with Kubernetes.
 - `5:10.23` Does NOT Come in Peace / OG GUARDIAN / Tim Hockin
-- `5:14.43` **Joseph** — No one can tell which Ricardo is which so roll with it
+- `5:14.43` **jrsapi** — No one can tell which Ricardo is which so roll with it
 - `5:18.23` **Ricardo** — It's me the nuke guy how do you think I got here?
 - `5:22.03` **pilot** — Lunar record baby! Hello KubeCon + CloudNativeCon
 - `5:25.23` **Ricardo** — They wanted us to put AI in the glider so we did.
 - `5:29.00` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
 - `5:30.30` PRESENT DAY
-- `5:54.23` **Joseph** — That explains the slop
+- `5:54.23` **jrsapi** — That explains the slop
+- `6:01.23` **angellk** — I love this job
 - `6:08.23` Your choices are:
 - `6:08.30` Your choices are:
 - `6:08.36` Your choices are:
@@ -105,13 +106,16 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `6:23.30` **jrsapi** — They learn quickly
 - `6:25.75` **rochaporto** — We need to move!
 - `6:28.30` **jrsapi** — Projects Teams Metrics are strong
+- `6:31.30` **angellk** — Like cardio!
 - `6:34.00` **jrsapi** — They just need mentoring in the right skills
 - `6:40.30` Mars
 - `6:45.00` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
+- `6:47.30` **angellk** — Hit 'em with your lessons learned
 - `6:49.75` **rochaporto** — One reference architecture coming up!
 - `6:58.30` **jrsapi** — I still don't know which Ricardo this is
+- `7:01.33` **angellk** — One hundred thousand bootc volunteers, ready to power up
 - `7:02.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
-- `7:04.78` **Joseph** — The gamers would have to impress BOTH Ricardos
+- `7:04.78` **jrsapi** — The gamers would have to impress BOTH Ricardos
 - `7:07.23` **Ricardo** — Look man I am so tired just jump
 - `7:13.80` Do we even know who they are?
 - `7:20.47` SATURN
@@ -121,12 +125,12 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `7:33.30` **LionHeartP** — What tests?
 - `7:35.75` Useful Youtuber (UNCOMMON) / NEW CONTRIBUTOR / A1RM4X
 - `7:39.30` **A1RM4X** — Thank you I never thought I could help!
-- `7:41.50` **A1RM4X** — I'm not like you I'm just a lowly user
-- `7:42.30` **GloriousEggroll** — It's your patch, turn the stream on
-- `7:45.00` **LionHeartP** — Let's get these numbers up
-- `7:47.45` **wrkode** — Oh dibs on this one
+- `7:41.75` **A1RM4X** — I'm not like you I'm just a lowly user
+- `7:44.20` **GloriousEggroll** — It's your patch, turn the stream on
+- `7:46.65` **LionHeartP** — Let's get these numbers up
+- `7:49.10` **wrkode** — Oh dibs on this one
 - `7:50.13` KERNEL 6.11-RC / UPSTREAM PATCH QUEUE
-- `7:51.30` **GloriousEggroll** — There's nothing glorious about this job
+- `7:52.05` **GloriousEggroll** — There's nothing glorious about this job
 - `7:59.30` **LionHeartP** — When we work together
 - `8:03.50` **wrkode** — Have I shown you Kairos my friend?
 - `8:09.30` **lionheartp** — Nice work testing that patch
@@ -138,7 +142,7 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:25.30` **castrojo** — Unlearning bad habits takes time
 - `8:28.30` **castrojo** — Your options are success
 - `8:31.50` **castrojo** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
-- `8:38.42` **joseph** — We can't let The Toilmaster enslave another generation
+- `8:38.42` **jrsapi** — We can't let The Toilmaster enslave another generation
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `8:43.75` **KyleGospo** — FOR TITANFALL!
 - `8:46.20` **castrojo** — Or go blow some shit up

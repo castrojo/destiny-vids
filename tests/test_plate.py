@@ -1519,9 +1519,7 @@ def test_the_mara_sov_plate_is_exactly_what_was_authored():
     )
     assert spec["variant"] == "leader"   # gold, carried over -- never withdrawn
     assert spec["wreath"] is True        # "the most senior warrior in the series"
-    assert "avatar" not in spec, (
-        "no GitHub login is on record for Karena, so the wreath has no "
-        "portrait to ring yet -- a recorded gap, never a guessed login")
+    assert load_leads()["mara_sov"]["github"] == "angellk"
 
 def test_the_mara_sov_reauthorship_keeps_the_old_copy_visible():
     """The old plate is owner-authored copy about a real person, so replacing

@@ -115,8 +115,11 @@ verifiable and a display name is not. `vocab/casting.yaml` carries the scar:
 stranger's face on her credit.
 
 No login means the crest stands in and the gap is recorded — the correct
-outcome, and where `preethi` and Karena sit today. `github: null` with *"not
-an agent's to guess"* beside it is a decision already taken.
+outcome, and where `preethi` sits today. Karena's identity is not a Mara Sov
+persona: the `mara_sov` character binding resolves to the verified GitHub
+login `angellk`, which is the name used by her chat and avatar records.
+`github: null` with *"not an agent's to guess"* beside it is a decision already
+taken.
 
 ### Dialogue the owner re-sequenced
 

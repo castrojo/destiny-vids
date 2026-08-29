@@ -107,8 +107,8 @@ the builder adds plates this file never sees. It is the combo the note
 above describes. Worth a look when he watches it: the words are his, the
 moment is a guess. <<
 
-[chat_joseph_ricardos] Joseph @ 5:14.433 +3.4: No one can tell which Ricardo is which so roll with it
-  - cast: joseph_sandoval
+[chat_joseph_ricardos] jrsapi @ 5:14.433 +3.4: No one can tell which Ricardo is which so roll with it
+  - avatar_login: jrsapi
   - position: null
 
 [chat_ricardo_nukeguy] Ricardo @ 5:18.233 +3.4: It's me the nuke guy how do you think I got here?
@@ -127,8 +127,8 @@ moment is a guess. <<
 
 ## 5:54.233
 
-[chat_joseph_slop] Joseph @ 5:54.233 +2.6: That explains the slop
-  - cast: joseph_sandoval
+[chat_joseph_slop] jrsapi @ 5:54.233 +2.6: That explains the slop
+  - avatar_login: jrsapi
   - position: null
 
     Owner brief, this round: "03:12 chat bubble for Joseph: That explains
@@ -140,6 +140,15 @@ moment is a guess. <<
     needs 2.2 s to be read, so they could never both play. The later
     5:59 → 6:14 pass replaced them on the same face shots and neither ever
     reached a frame; the strings are in git.
+
+## 6:01.233
+
+[chat_karena_job] angellk @ 6:01.233 +2.6: I love this job
+  - avatar_login: angellk
+
+    Restored at its last authored seat from the pre-removal Act II record. The
+    6:08.233 attempt put it on top of the full-screen choice animation and
+    made the manifest unburnable.
 
 ## 6:12.683
 
@@ -160,6 +169,9 @@ moment is a guess. <<
 [late_metrics_cluster] jrsapi @ 6:28.300 +2.2: Projects Teams Metrics are strong
   - seen_at_src: 122.266
 
+[late_karena_cardio] angellk @ 6:31.300 +2.2: Like cardio!
+  - avatar_login: angellk
+
 [late_metrics_mentoring] jrsapi @ 6:34.000 +2.8: They just need mentoring in the right skills
 
 ## 6:45
@@ -168,6 +180,14 @@ moment is a guess. <<
     The red flash. Owner, 2026-08-20: it goes to 6:45 on the programme
     clock. The trailing `|` keeps the second-row slot: it renders as lorem
     credited to nobody until somebody writes the words.
+
+## 6:47.300
+
+[late_karena_lessons] angellk @ 6:47.300 +2.2: Hit 'em with your lessons learned
+  - avatar_login: angellk
+
+    Both Karena lines are restored at their last authored seats from the
+    pre-removal Act II record, with the verified `angellk` identity.
 
 [late_rochaporto_cern] rochaporto @ 6:49.750 +2.6: One reference architecture coming up!
   - seen_at_src: 143.716
@@ -182,8 +202,11 @@ moment is a guess. <<
 that is the pulloff frame is a judgement about a picture, so it is left
 where he put it and flagged for his eye. <<
 
-[toc_joseph_worth] Joseph @ 7:04.783 +2.2: The gamers would have to impress BOTH Ricardos
-  - cast: joseph_sandoval
+[toc_karena] angellk @ 7:01.333 +3.2: One hundred thousand bootc volunteers, ready to power up
+  - avatar_login: angellk
+
+[toc_joseph_worth] jrsapi @ 7:04.783 +2.2: The gamers would have to impress BOTH Ricardos
+  - avatar_login: jrsapi
 
     ONE PILL, NOT TWO. The owner wrote "BOTH Ricardos" on its own line, but
     this exchange is chained backward from the walk's first frame and has
@@ -210,11 +233,9 @@ where he put it and flagged for his eye. <<
     clear air — Dylan Taylor's badge is out at film 134.767, and the run
     starts after it.
 
-    The speakers are the brief's own tags ([KARENA] / [JOSEPH] /
-    [RICARDO]), not a casting lookup. `cast:` rides along only to find the
-    portrait; Karena has no recorded avatar, so she gets the drawn crest by
-    omission rather than by accident. The 2:19 lead-in banner that was to
-    open the scene has no copy yet (#98), so the first line takes its slot.
+    The visible speakers use their verified GitHub identities: `angellk` and
+    `jrsapi`. The 2:19 lead-in banner that was to open the scene has no copy
+    yet (#98), so the first line takes its slot.
 
 >> "It could be either one" HAS NOWHERE TO GO, and it is in the overflow
 below. Its own question clears at 7:00.900 and Karena is pinned at 7:01.333;
@@ -247,37 +268,27 @@ speakers. <<
   - seen_at_src: 199.366
   - avatar_login: A1RM4X
 
-[mapped_a1rmax_lowly] A1RM4X @ 7:41.500 +2.2: I'm not like you I'm just a lowly user
+[mapped_a1rmax_lowly] A1RM4X @ 7:41.750 +2.2: I'm not like you I'm just a lowly user
   - avatar_login: A1RM4X
 
     TWO PILLS, as the owner directed ("THIS SHOULD BE TWO PILLS"). The second
-    seats the frame the first clears (7:41.500) -- the chat minimum hold is
-    2.2 s and GloriousEggroll's reply stays pinned at 7:42.300, so the two
-    overlap by 0.9 s. That is the deck's own answer to a fast exchange: his
-    pill takes the RIGHT lane bonded to this one, the same idiom as
-    Disco/Sup, and no authored time moved.
+    follows the first by the house 0.25 s chat gap so the exchange stays
+    readable without simultaneous pills.
 
-[walk_ge_stream] GloriousEggroll @ 7:42.300 +2.2: It's your patch, turn the stream on
-  - position: right
-  - bond_of: mapped_a1rmax_lowly
-  - seen_at_src: 202.366
+[walk_ge_stream] GloriousEggroll @ 7:44.200 +2.2: It's your patch, turn the stream on
   - cast: GloriousEggroll
 
-    The reply to A1RM4X's two-pill split takes the right lane, bonded to the
-    pill it answers -- the same cross-lane idiom as Disco/Sup. Its TIME is
-    the owner's pin (7:42.300) and is untouched.
+    The reply follows A1RM4X's second pill by the same gap; the remaining
+    exchange stays in authored order.
 
-[walk_a1rm4x] LionHeartP @ 7:45.000 +2.2: Let's get these numbers up
-  - seen_at_src: 205.066
+[walk_a1rm4x] LionHeartP @ 7:46.650 +2.2: Let's get these numbers up
   - avatar_login: LionHeartP
 
-[mapped_wrkode_dibs] wrkode @ 7:47.450 +2.7: Oh dibs on this one
-  - seen_at_src: 207.516
+[mapped_wrkode_dibs] wrkode @ 7:49.100 +2.7: Oh dibs on this one
   - avatar_login: wrkode
 
     
-[walk_ge_glorious] GloriousEggroll @ 7:51.300 +2.8: There's nothing glorious about this job
-  - seen_at_src: 211.366
+[walk_ge_glorious] GloriousEggroll @ 7:52.050 +2.8: There's nothing glorious about this job
   - cast: GloriousEggroll
 
 ## 7:59.300
@@ -336,10 +347,9 @@ speakers. <<
     THE SPLIT FITS INSIDE THE OLD PILL'S OWN 6.75 s span (8:28.300 ->
     8:35.050).
 
-[owner_convo_joseph] joseph @ 8:38.417 +3.6: We can't let The Toilmaster enslave another generation
+[owner_convo_joseph] jrsapi @ 8:38.417 +3.6: We can't let The Toilmaster enslave another generation
   - seen_at_src: 303.117
-  - avatar: null
-  - avatar_url: null
+  - avatar_login: jrsapi
 
 [mapped_kyle_titanfall] KyleGospo @ 8:43.750 +2.2: FOR TITANFALL!
   - seen_at_src: 308.45
@@ -487,8 +497,7 @@ as unreachable overflow; it is now seated in the paused conversation above
 [chat_kolunmi_level] kolunmi @ 10:17.387 +2.2: Hey did you see how we just loaded up in a new level?
 
 [chat_hikari_warframe] Hikari @ 10:19.837 +2.366: Finally, I can play WARFRAME!
-  - avatar: null
-  - avatar_url: null
+  - avatar_login: HikariKnight
 
 ## 10:28.100
 
@@ -497,4 +506,3 @@ as unreachable overflow; it is now seated in the paused conversation above
 
 [retirement-2] castrojo @ 10:30.475 +2.125: The long walk beckons
   - avatar_login: castrojo
-

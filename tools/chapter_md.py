@@ -1164,7 +1164,10 @@ def _portrait(named):
     url = _casting_avatars().get(key)
     if not url:
         return {}
-    return {"avatar": f"renders/avatars/{key}.png", "avatar_url": url}
+    cache_key = key
+    if str(url).startswith("https://github.com/") and ".png" in str(url):
+        cache_key = str(url).split("github.com/", 1)[1].split(".png", 1)[0]
+    return {"avatar": f"renders/avatars/{cache_key}.png", "avatar_url": url}
 
 
 def _ordered(entry, order):

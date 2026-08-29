@@ -140,6 +140,10 @@ OWNER_PASS_OFFSET = 266.5
 TRIO = [
     ("joseph_sandoval", "left", 177.0),
     ("rochaporto", "center", 179.0),
+    # The third arrival the same owner note names -- "3:03 add karena (Angel,
+    # one L)" -- on her `mara_sov` lead binding's plate, wreath and all: she
+    # and Ricardo are the two most senior (vocab/casting.yaml).
+    ("mara_sov", "right", 183.0),
 ]
 
 # --- THE OPENING BLACK-HEAD CARD ------------------------------------------
@@ -871,11 +875,10 @@ WALK_ACHIEVEMENT_HOLD = 3.0
 # frame is the owner's eye, recorded in `unresolved`.
 JUMP_BEAT = 1.5
 
-# The speakers are the brief's own tags ([KARENA] / [JOSEPH] / [RICARDO]),
-# not a casting.yaml lookup -- the same rule the montage applied to "Jorge
-# Castro". The `key` rides along ONLY to find the pfp; a speaker with no
-# recorded avatar (Karena, Joseph) gets the drawn crest, by omission rather
-# than by accident.
+# The copy began with the brief's [KARENA] / [JOSEPH] / [RICARDO] tags.
+# Karena and Joseph now display their verified GitHub identities (`angellk`
+# and `jrsapi`) from the chapter record; Ricardo retains the authored display
+# name and casting-backed portrait.
 # The pre-walk questions -- Karena's "One hundred thousand bootc
 # volunteers", Joseph's "Is it worth it?", Ricardo's "You really think they
 # can save open source?" -- are authored in chapters/II-endless-forms.md.
@@ -1173,19 +1176,30 @@ def blueberry_entry(item, at, dur, casting):
     return entry
 
 
-def localise_avatar(key, copy):
+def localise_avatar(key, copy, casting=None):
     """Point a plate's ``avatar`` at the local cache, keeping the URL as source.
 
-    Returns the copy unchanged when there is no avatar -- Karena has none,
-    because no GitHub login for her is on record anywhere in this repo and a
-    login is not an agent's to guess (issue #87). A wreath with no portrait to
-    ring is a recorded gap, not a reason to invent one.
+    Returns the copy unchanged when there is no avatar anywhere on record. A
+    lead binding's ``github`` login IS the record (casting.yaml: 'the person's
+    verified GitHub login'), so a plate with no ``avatar`` URL of its own
+    resolves it from there -- Karena's `github: angellk`, owner-supplied
+    2026-08-24, is exactly that case. A login is still never an agent's to
+    guess (issue #87): no field, no portrait, and the gap is recorded.
     """
     url = copy.get("avatar")
+    cache_key = key
+    if (not url or not str(url).startswith("http")) and casting is not None:
+        binding = (casting.get("leads", {}).get("values", {}).get(key)) or {}
+        login = binding.get("github")
+        if login:
+            url = f"https://github.com/{login}.png?size=256"
+            cache_key = login
     if not url or not str(url).startswith("http"):
         return copy
     copy = dict(copy)
-    copy["avatar"] = str(AVATAR_DIR / f"{key}.png")
+    if str(url).startswith("https://github.com/") and ".png" in str(url):
+        cache_key = str(url).split("github.com/", 1)[1].split(".png", 1)[0]
+    copy["avatar"] = str(AVATAR_DIR / f"{cache_key}.png")
     copy["avatar_url"] = url
     return copy
 
@@ -1198,9 +1212,9 @@ def chat_avatar(key, casting):
     avatar that is already in the copy, so handing it an empty dict -- which
     is what this file used to do for every chat -- silently produced a pill
     with no picture on it, every time. The avatar comes from the SAME authored
-    entry as the plate copy, so a speaker with no recorded avatar (Karena, and
-    anyone the owner has not given one) still gets the crest, by omission
-    rather than by accident.
+    entry as the plate copy. Chapter lines with a separately verified login
+    use `avatar_login` instead; anyone with neither source still gets the
+    crest, by omission rather than by accident.
     """
     try:
         copy = authored_copy(key, casting)
@@ -1450,7 +1464,7 @@ def build():
             "order": order,
             "copy_source": "casting",
             "seen_at_src": TRIO_IN,
-            **localise_avatar(key, authored_copy(key, casting)),
+            **localise_avatar(key, authored_copy(key, casting), casting),
         })
 
     # --- the opening nameplates (Brent's and Joe's slots stay empty) -------
