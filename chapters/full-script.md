@@ -177,96 +177,96 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 
 Edit in `chapters/III-mrbobbytables.md`.
 
-- `14:06.03` Maintainers Reading Emails / Summer 2027
-- `14:14.87` CNCF Projects to Help Your Agents
+- `14:45.96` Maintainers Reading Emails / Summer 2027
+- `14:54.80` CNCF Projects to Help Your Agents
 
 ## IV
 
 Edit in `chapters/IV-kat.md`.
 
-- `16:46.31` **kat** — Hey why are they shooting at me!
-- `16:49.01` **mrbobbytables** — The gamers don't know you're here to help
-- `16:56.81` **kat** — Nice to meet you too!
-- `16:58.36` **kat** — I miss ONE email now I gotta use a Linux desktop?
-- `17:00.66` **kat** — How much you want to bet their sound just doesn't work?
-- `17:03.41` **TBD** — HEY! We know when you're not upstreaming!
-- `17:05.66` **kat** — I have better sh*t to do!
-- `17:07.66` **kat** — I miss ingress-nginx sometimes
-- `17:10.11` **kat** — Fine I'll fix your sh*t too
-- `17:12.31` **kat** — Remember kids, cardio!
+- `17:26.24` **kat** — Hey why are they shooting at me!
+- `17:28.94` **mrbobbytables** — The gamers don't know you're here to help
+- `17:36.74` **kat** — Nice to meet you too!
+- `17:38.29` **kat** — I miss ONE email now I gotta use a Linux desktop?
+- `17:40.59` **kat** — How much you want to bet their sound just doesn't work?
+- `17:43.34` **TBD** — HEY! We know when you're not upstreaming!
+- `17:45.59` **kat** — I have better sh*t to do!
+- `17:47.59` **kat** — I miss ingress-nginx sometimes
+- `17:50.04` **kat** — Fine I'll fix your sh*t too
+- `17:52.24` **kat** — Remember kids, cardio!
 
 ## V
 
 Edit in `chapters/V-nat.md`.
 
-- `17:22.31` **Nat** — Hey these mouth breathers are shooting at me!
-- `17:27.51` **Nat** — I am a Documentation Expert, cease fire!
-- `17:30.01` **Nat** — Goddamn it!
-- `17:31.61` **Nat** — No time to `git push`!
-- `17:33.51` **Nat** — I'm stranded, they'll never find the docs in time!
-- `17:36.11` **Nick** — docs.bazzite.gg
-- `17:37.51` **Kat** — I can hear their screams!
-- `17:39.31` **Nick** — docs.bazzite.gg
-- `17:40.71` **Nat** — Like one hundred thousand voices cried out in terror
-- `17:43.21` **Nick** — docs.bazzite.gg
+- `18:02.24` **Nat** — Hey these mouth breathers are shooting at me!
+- `18:07.44` **Nat** — I am a Documentation Expert, cease fire!
+- `18:09.94` **Nat** — Goddamn it!
+- `18:11.54` **Nat** — No time to `git push`!
+- `18:13.44` **Nat** — I'm stranded, they'll never find the docs in time!
+- `18:16.04` **Nick** — docs.bazzite.gg
+- `18:17.44` **Kat** — I can hear their screams!
+- `18:19.24` **Nick** — docs.bazzite.gg
+- `18:20.64` **Nat** — Like one hundred thousand voices cried out in terror
+- `18:23.14` **Nick** — docs.bazzite.gg
 
 ## VI
 
 Edit in `chapters/VI-wolves.md`.
 
-- `18:50.09` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
-- `23:43.62` **castrojo** — For five years you've trusted us
-- `23:46.78` **castrojo** — Mastered your tools
-- `23:49.94` **castrojo** — Honed your craft
-- `23:53.10` **castrojo** — Depended on your friends
-- `23:56.26` **castrojo** — Now you're one of us, you are the dream
-- `23:59.41` Protector of the Helm / #HIREAWOLF // MAINTAINER / robertsirc
-- `24:08.89` **castrojo** — I follow my mentors of the past
-- `24:21.52` **castrojo** — Present
-- `24:24.68` **castrojo** — and Future
-- `24:27.84` **castrojo** — The only winning move is not to play
-- `24:30.99` **castrojo** — Think like a dinosaur
-- `24:34.15` **castrojo** — When you fall, rise.
-- `24:37.31` **castrojo** — We've got your back
+- `19:30.03` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
+- `24:23.56` **castrojo** — For five years you've trusted us
+- `24:26.72` **castrojo** — Mastered your tools
+- `24:29.87` **castrojo** — Honed your craft
+- `24:33.03` **castrojo** — Depended on your friends
+- `24:36.19` **castrojo** — Now you're one of us, you are the dream
+- `24:39.35` Protector of the Helm / #HIREAWOLF // MAINTAINER / robertsirc
+- `24:48.82` **castrojo** — I follow my mentors of the past
+- `25:01.45` **castrojo** — Present
+- `25:04.61` **castrojo** — and Future
+- `25:07.77` **castrojo** — The only winning move is not to play
+- `25:10.93` **castrojo** — Think like a dinosaur
+- `25:14.08` **castrojo** — When you fall, rise.
+- `25:17.24` **castrojo** — We've got your back
 
 ## P4
 
 Edit in `chapters/P4-underwater.md`.
 
-- `25:25.44` **Jill Castro** — One more loose end
-- `25:27.33` **Valerie** — You can't escape yourself
-- `25:29.21` **Rafael** — You promised
-- `25:31.09` **castrojo** — Fine
-- `25:34.85` **LH** — Show them the minds
-- `25:36.73` **Valerie** — Of the wolves
-- `24:48.66` **Rafael** — What's a wolf?
+- `26:05.38` **Jill Castro** — One more loose end
+- `26:07.26` **Valerie** — You can't escape yourself
+- `26:09.14` **Rafael** — You promised
+- `26:11.02` **castrojo** — Fine
+- `26:14.78` **LH** — Show them the minds
+- `26:16.66` **Valerie** — Of the wolves
+- `25:28.59` **Rafael** — What's a wolf?
 
 ## VII
 
 Edit in `chapters/VII-europa.md`.
 
-- `26:27.62` **krook** — Deploy CNCF Projects Team
-- `26:29.62` **preethit** — Stand down, I'm sending my wolf
-- `26:31.62` **alolita** — Are you sure the Kube is on Europa?
-- `26:34.62` **preethit** — I hope she can handle the Kube
-- `26:37.02` **preethit** — I must not fail
-- `26:39.47` **alolita** — We have failed, Guardians are down
-- `26:41.99` **tophee** — I've confirmed it myself, we have no choice
-- `26:45.11` **tophee** — She's the only way to stop the Toilmaster
-- `26:51.62` **castrojo** — They must never know what you did for them
-- `26:54.62` **mrbobbytables** — When all hope is lost
-- `26:57.02` **jeefy** — Standing by for Extraction
-- `26:59.62` **ihor** — G{k8s}dspeed
-- `27:02.22` **preethit** — Our clan
-- `27:04.67` **preethit** — Is the Iron
-- `27:07.12` **preethit** — That forges Wolves
-- `27:09.57` **mrbobbytables** — Wolves gladly sacrifice for their own
-- `27:12.29` **krook** — Initiate Lone Wolf Protocol
-- `27:14.74` **iancoldwater** — Local Security systems trivially pwned
-- `27:17.52` **tabbysable** — Europan Security systems trivially pwned (again)
-- `27:28.62` **nimbatus** — Wilco
-- `27:30.82` **nimbatus** — {k8s}ut
-- `27:37.79` **preethit** — Hummingbird will find the girl
+- `27:07.56` **krook** — Deploy CNCF Projects Team
+- `27:09.56` **preethit** — Stand down, I'm sending my wolf
+- `27:11.56` **alolita** — Are you sure the Kube is on Europa?
+- `27:14.56` **preethit** — I hope she can handle the Kube
+- `27:16.96` **preethit** — I must not fail
+- `27:19.41` **alolita** — We have failed, Guardians are down
+- `27:21.92` **tophee** — I've confirmed it myself, we have no choice
+- `27:25.04` **tophee** — She's the only way to stop the Toilmaster
+- `27:31.56` **castrojo** — They must never know what you did for them
+- `27:34.56` **mrbobbytables** — When all hope is lost
+- `27:36.96` **jeefy** — Standing by for Extraction
+- `27:39.56` **ihor** — G{k8s}dspeed
+- `27:42.16` **preethit** — Our clan
+- `27:44.61` **preethit** — Is the Iron
+- `27:47.06` **preethit** — That forges Wolves
+- `27:49.51` **mrbobbytables** — Wolves gladly sacrifice for their own
+- `27:52.22` **krook** — Initiate Lone Wolf Protocol
+- `27:54.67` **iancoldwater** — Local Security systems trivially pwned
+- `27:57.46` **tabbysable** — Europan Security systems trivially pwned (again)
+- `28:08.56` **nimbatus** — Wilco
+- `28:10.76` **nimbatus** — {k8s}ut
+- `28:17.73` **preethit** — Hummingbird will find the girl
 
 ## VIII-cta
 
