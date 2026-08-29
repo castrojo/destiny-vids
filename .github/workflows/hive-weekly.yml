@@ -11,10 +11,11 @@
 # Three deliberate properties:
 #
 # * One proposal at a time. If an open hive/weekly- proposal PR is still
-#   awaiting review, the run stops BEFORE selecting or pushing anything --
-#   a scheduled run and a same-day manual dispatch can never create two
-#   competing episode proposals. The proposal branch also carries the
-#   unique github.run_id, so two runs can never race the same ref.
+#   awaiting review, the run FAILS before selecting or pushing anything --
+#   the blocking PR is written to the step summary so a stalled season is
+#   red on the schedule, not silently green. The proposal branch also
+#   carries the unique github.run_id, so two runs can never race the same
+#   ref.
 # * A PR opened with GITHUB_TOKEN does NOT trigger CI (GitHub refuses to
 #   recurse workflows opened by the built-in token). That is acceptable
 #   here: the change is data produced by the validated selector, the offline
@@ -58,37 +59,40 @@ jobs:
           python-version: '3.13'
 
       # One proposal at a time: while a hive/weekly- PR awaits review, this
-      # run short-circuits before selecting, so schedule plus a same-day
-      # manual dispatch cannot produce competing episode proposals.
-      - name: Stop when a proposal PR is already awaiting review
-        id: gate
+      # run FAILS before selecting, so schedule plus a same-day manual
+      # dispatch cannot produce competing episode proposals -- and a stalled
+      # proposal is visible red with the blocking PR on the step summary,
+      # never a silently green skip. --limit 100 because the default page
+      # (30) could hide an older proposal behind newer unrelated PRs.
+      - name: Fail when a proposal PR is already awaiting review
         run: |
-          open=$(gh pr list --state open --json number,headRefName \
+          open=$(gh pr list --state open --limit 100 \
+            --json number,headRefName,url \
             --jq '[.[] | select(.headRefName | startswith("hive/weekly-"))]')
           if [ "$(echo "$open" | jq length)" -gt 0 ]; then
-            echo "awaiting=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::An open hive/weekly- proposal PR is awaiting review; skipping this run:"
-            echo "$open" | jq -r '.[] | "  #\(.number) \(.headRefName)"'
-          else
-            echo "awaiting=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "## Weekly contributor proposal blocked"
+              echo
+              echo "A proposal PR is already awaiting review, so this run did not select or push anything. Review, merge, or close it to unblock the season:"
+              echo
+              echo "$open" | jq -r '.[] | "- #\(.number) [\(.headRefName)](\(.url))"'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::An open hive/weekly- proposal PR is awaiting review; failing so the stalled season is visible."
+            exit 1
           fi
 
       - name: Install dependencies
-        if: steps.gate.outputs.awaiting != 'true'
         run: pip install --quiet jsonschema pyyaml pytest pillow
 
       - name: Select the next episode's contributors
-        if: steps.gate.outputs.awaiting != 'true'
         run: python3 tools/hive_series.py select-next
 
       # The smallest complete offline gate: the season record's own suite,
       # which includes the schema validation and the recognition tests.
       - name: Validate the updated record
-        if: steps.gate.outputs.awaiting != 'true'
         run: python3 -m pytest -q tests/test_hive_series.py
 
       - name: Propose a PR when the record changed
-        if: steps.gate.outputs.awaiting != 'true'
         run: |
           if [ -z "$(git status --porcelain)" ]; then
             echo "No change: the next episode record is unchanged."

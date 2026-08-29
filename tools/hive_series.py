@@ -1676,11 +1676,16 @@ def verify_cut(manifest, ffmpeg=None):
 # selection run counts commit authors in the configured repositories between
 # the prior snapshot's captured_at and now. The no-repeat ledger in the
 # manifest is canonical and singular -- prior IDs are derived from it, never
-# kept in a second list. A run that cannot read a configured repository, or
-# cannot resolve a candidate's profile by its durable numeric account ID,
-# fails WITHOUT touching the ledger; a run with no eligible contributor still
-# issues the next episode with an empty dossier list and a recorded note
-# (AGENTS.md: degrade, never block).
+# kept in a second list. A run that cannot read a configured repository
+# fails WITHOUT touching the ledger. Profile resolution is sharper: a
+# definitive GitHub HTTP 404 for a durable account ID means the profile no
+# longer exists, and that candidate is recorded as excluded -- one suspended
+# account can never wedge every future weekly snapshot. Anything ambiguous
+# (a 5xx, a reset connection, an unparsable body) is retried exactly once
+# and then fails the whole run BEFORE any mutation: a candidate is never
+# silently demoted on a maybe-transient error. A run with no eligible
+# contributor still issues the next episode with an empty dossier list and
+# a recorded note (AGENTS.md: degrade, never block).
 
 RECOGNITION_PAGE_SIZE = 100
 RECOGNITION_LIMIT = 3
@@ -1690,6 +1695,12 @@ class RecognitionError(RuntimeError):
     """The selection cannot vouch for its result -- an unreadable
     repository, an unresolvable profile, or a profile returned for the
     wrong account ID. The manifest and ledger are untouched."""
+
+
+class ProfileNotFound(RecognitionError):
+    """A definitive GitHub HTTP 404 for a durable account ID: the profile
+    no longer exists. Never a run failure -- the caller records it as the
+    candidate's exclusion reason."""
 
 
 def _utcnow():
@@ -1743,19 +1754,33 @@ def _live_runner(cmd):
     return done.stdout
 
 
+def _fragment_matches(fragment, token):
+    """Exact endpoint matching for canned responses: a fragment matches a
+    whole command token, or a token it prefixes at a path/query boundary --
+    so ``user/8100`` can never answer for ``user/81000``."""
+    if token == fragment:
+        return True
+    return token.startswith(fragment) and token[len(fragment)] in "?/&"
+
+
 def fixture_runner(fixture):
     """A runner over canned responses: ``{url-fragment: {"pages": [...]} or
-    {"body": ...}}``. Pages are re-serialized concatenated so the paginated
-    parser is exercised exactly as with live `gh`. A command matching no key
-    is the failed-repo case."""
+    {"body": ...} or {"status": 404}}``. Pages are re-serialized concatenated
+    so the paginated parser is exercised exactly as with live `gh`; a
+    ``{"status": 404}`` payload is the definitive not-found case and raises
+    ProfileNotFound. A command matching no key is the failed-repo case."""
     def run(cmd):
-        text = " ".join(cmd)
         for fragment, payload in fixture.items():
-            if fragment in text:
+            if any(_fragment_matches(fragment, token) for token in cmd):
+                if payload.get("status") == 404:
+                    raise ProfileNotFound(
+                        f"gh api {fragment} failed: gh: Not Found "
+                        f"(HTTP 404)")
                 if "pages" in payload:
                     return "".join(json.dumps(p) for p in payload["pages"])
                 return json.dumps(payload["body"])
-        raise RecognitionError(f"fixture has no response for: {text}")
+        raise RecognitionError(f"fixture has no response for: "
+                               f"{' '.join(cmd)}")
     return run
 
 
@@ -1792,6 +1817,38 @@ def collect_activity(repositories, since, until, runner):
     return authors
 
 
+def _fetch_profile(account_id, runner):
+    """One profile-resolution attempt by durable numeric account ID.
+
+    A runner error whose text carries a definitive HTTP 404 is translated
+    to ProfileNotFound; every other failure propagates unchanged."""
+    try:
+        return json.loads(runner(profile_command(account_id)))
+    except RecognitionError as exc:
+        if "HTTP 404" in str(exc):
+            raise ProfileNotFound(
+                f"profile for account id {account_id} no longer exists "
+                f"({exc})") from exc
+        raise
+
+
+def _resolve_profile(account_id, runner):
+    """The candidate's profile, with exactly one retry on ambiguity.
+
+    A definitive HTTP 404 (ProfileNotFound) is never retried: the account
+    is gone, and the caller records the exclusion. Anything else -- a 5xx,
+    a reset connection, an unparsable body -- is ambiguous, so it is
+    retried once; a second failure propagates and aborts the whole
+    selection before anything is written. A candidate is never silently
+    demoted on a maybe-transient error."""
+    try:
+        return _fetch_profile(account_id, runner)
+    except ProfileNotFound:
+        raise
+    except Exception:
+        return _fetch_profile(account_id, runner)
+
+
 def _exclusion(candidate, fixed_ids, credited_ids):
     """Why this account cannot be dossiered, or None. Bots and non-User
     accounts, the fixed cast, and every ID already in the no-repeat ledger
@@ -1816,7 +1873,11 @@ def recognition_snapshot(manifest, since, until, runner=_live_runner,
     account ID and the returned `id` must match exactly: anything less
     could attach a recycled login's new owner -- their name, avatar, URL --
     to somebody else's commits, a false claim about real people. A profile
-    that cannot be resolved, or resolves to the wrong ID, fails the whole
+    that cannot be resolved because GitHub definitively says the account is
+    gone (HTTP 404) is recorded with the exclusion "profile no longer
+    exists" -- a suspended or deleted profile never wedges the selection.
+    A profile that fails ambiguously even after one retry, or resolves to
+    the wrong ID, fails the whole
     run like an unreadable repository: a candidate is never silently
     demoted on a transient error. Selection is up to RECOGNITION_LIMIT by
     commit count descending, normalized login ascending, numeric ID
@@ -1859,7 +1920,10 @@ def recognition_snapshot(manifest, since, until, runner=_live_runner,
         if "excluded" in candidate:
             continue
         try:
-            profile = json.loads(runner(profile_command(candidate["id"])))
+            profile = _resolve_profile(candidate["id"], runner)
+        except ProfileNotFound:
+            candidate["excluded"] = "profile no longer exists"
+            continue
         except Exception as exc:
             raise RecognitionError(
                 f"profile for account id {candidate['id']} could not be "

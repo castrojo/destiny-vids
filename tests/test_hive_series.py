@@ -2143,6 +2143,100 @@ def test_a_profile_read_failure_fails_the_selection_not_the_candidate():
         _activity({"kubestellar/hive": pages})  # no canned profile for 6001
 
 
+def test_fixture_runner_profile_matching_is_exact():
+    """The canned profile endpoint matches the whole final token:
+    ``user/8100`` must never answer for ``user/81000``."""
+    runner = hive_series.fixture_runner({
+        "user/8100": {"body": {"id": 8100, "login": "octocat"}},
+    })
+    assert json.loads(runner(hive_series.profile_command(8100))) == \
+        {"id": 8100, "login": "octocat"}
+    with pytest.raises(hive_series.RecognitionError):
+        runner(hive_series.profile_command(81000))
+
+
+def test_a_definitive_404_is_a_recorded_exclusion_not_a_failure(raw):
+    """A suspended or deleted account -- GitHub answers user/{id} with a
+    definitive HTTP 404 -- cannot wedge every future weekly snapshot: the
+    candidate is recorded with the exclusion "profile no longer exists"
+    and the selection proceeds with the rest."""
+    fixture = {
+        "repos/kubestellar/hive/commits": {"pages": [[
+            _commit("d1", "suspended-user", 7001),
+            _commit("d2", "present-user", 7002),
+        ]]},
+        "user/7001": {"status": 404},
+        "user/7002": {"body": _profile("present-user", 7002)},
+    }
+    manifest = _recognition_manifest(raw)
+    manifest["contributor_ledger"]["repositories"] = ["kubestellar/hive"]
+    snapshot = hive_series.recognition_snapshot(
+        manifest, SINCE, UNTIL,
+        runner=hive_series.fixture_runner(fixture), now=UNTIL)
+    by_id = {c["id"]: c for c in snapshot["candidates"]}
+    assert by_id[7001]["excluded"] == "profile no longer exists"
+    assert by_id[7001]["name"] is None
+    assert "excluded" not in by_id[7002]
+    assert snapshot["selected_github_ids"] == [7002]
+
+
+def test_a_transient_profile_failure_is_retried_once(raw):
+    """One ambiguous failure (a 5xx, not a definitive 404) is retried
+    exactly once; when the retry succeeds the candidate is resolved and
+    selected normally."""
+    base = hive_series.fixture_runner({
+        "repos/kubestellar/hive/commits": {"pages": [[
+            _commit("r1", "dev", 7001)]]},
+        "user/7001": {"body": _profile("dev", 7001, "Dev Somebody")},
+    })
+    calls = []
+
+    def flaky(cmd):
+        if cmd[-1] == "user/7001":
+            calls.append(cmd)
+            if len(calls) == 1:
+                raise hive_series.RecognitionError(
+                    "gh api user/7001 failed: gh: Bad Gateway (HTTP 502)")
+        return base(cmd)
+
+    manifest = _recognition_manifest(raw)
+    manifest["contributor_ledger"]["repositories"] = ["kubestellar/hive"]
+    snapshot = hive_series.recognition_snapshot(
+        manifest, SINCE, UNTIL, runner=flaky, now=UNTIL)
+    assert len(calls) == 2
+    assert snapshot["selected_github_ids"] == [7001]
+    assert snapshot["candidates"][0]["name"] == "Dev Somebody"
+
+
+def test_a_persistent_transient_failure_aborts_before_any_write(
+        raw, tmp_path):
+    """The retry is exactly once: a profile read that keeps failing
+    ambiguously aborts the whole selection BEFORE the manifest or ledger is
+    touched -- a candidate is never silently demoted, nothing half-written.
+    """
+    data = _recognition_manifest(raw)
+    path = tmp_path / "season.json"
+    original = json.dumps(data, indent=2)
+    path.write_text(original)
+    commits = {repo: [[]] for repo in RECOGNITION_REPOS}
+    commits["kubestellar/hive"] = [[_commit("w1", "flaky", 7009)]]
+    attempts = []
+
+    def failing(cmd):
+        if cmd[-1] == "user/7009":
+            attempts.append(cmd)
+            raise hive_series.RecognitionError(
+                "gh api user/7009 failed: gh: Service Unavailable (HTTP 503)")
+        return _fake_gh(commits)(cmd)
+
+    with pytest.raises(hive_series.RecognitionError,
+                       match="could not be resolved"):
+        hive_series.select_next_episode(
+            path, since=SINCE, runner=failing, now=UNTIL, log=lambda m: None)
+    assert len(attempts) == 2  # one retry, never a silent skip
+    assert path.read_text() == original
+
+
 def test_empty_activity_still_issues_the_episode_with_a_note(raw, tmp_path):
     data = _recognition_manifest(raw)
     path = tmp_path / "season.json"
@@ -2348,18 +2442,23 @@ def test_weekly_workflow_proposal_branches_are_unique_per_run():
         in text
 
 
-def test_weekly_workflow_short_circuits_while_a_proposal_pr_awaits_review():
+def test_weekly_workflow_fails_visibly_while_a_proposal_pr_awaits_review():
     """An open hive/weekly- proposal PR means a human has not reviewed the
-    last proposal yet: the run detects it and gates every later step off,
-    so schedule plus a same-day manual dispatch cannot create competing
-    episode proposals."""
+    last proposal yet: the run FAILS before selecting or pushing, naming the
+    blocking PR on the step summary, so a stalled season is red on the
+    schedule -- never a silently green skip. The listing is capped at 100
+    (not the default 30) so an older proposal cannot hide behind newer
+    unrelated PRs."""
     text = WEEKLY_WORKFLOW.read_text()
-    assert "gh pr list --state open" in text
+    assert "gh pr list --state open --limit 100" in text
     assert 'startswith("hive/weekly-")' in text
-    assert 'echo "awaiting=true" >> "$GITHUB_OUTPUT"' in text
-    # Every step after the gate -- install, select, validate, propose -- is
-    # conditional on no proposal awaiting review.
-    assert text.count("if: steps.gate.outputs.awaiting != 'true'") == 4
+    assert "$GITHUB_STEP_SUMMARY" in text
+    assert "exit 1" in text
+    # The gate fails the run outright, so no later step is conditional on
+    # it; and every proposal branch carries the unique run ID, so two runs
+    # can never race the same ref.
+    assert "steps.gate.outputs" not in text
+    assert "hive/weekly-$(date -u +%Y%m%d)-${{ github.run_id }}" in text
 
 
 def test_avatars_workflow_refreshes_the_season_manifest_logins():
