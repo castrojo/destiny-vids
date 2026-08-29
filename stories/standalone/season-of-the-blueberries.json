@@ -1,0 +1,409 @@
+{
+  "version": 1,
+  "season": "season-of-the-blueberries",
+  "source": {
+    "url": "https://www.youtube.com/watch?v=jlzQnXcUxqI",
+    "youtube_id": "jlzQnXcUxqI",
+    "video_format_id": "137",
+    "audio_format_id": "251",
+    "usage_class": "third_party_copyrighted",
+    "source_rights_note": "Third-party upload of Bungie's Destiny 2: The Witch Queen cutscene archive. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage.",
+    "chapter_metadata": {
+      "artifact": "sources/jlzQnXcUxqI.chapters.json in projectbluefin/hive-lore",
+      "captured": "2026-08-29",
+      "captured_with": "yt-dlp --dump-single-json --skip-download",
+      "note": "The 12 publisher chapter windows below are copied verbatim from that captured artifact as factual source data. No footage is stored; this repository never depends on the sibling at runtime."
+    }
+  },
+  "opening_cta": {
+    "asset": "assets/hive/expansion-pack-cta.png",
+    "duration": 10.0,
+    "copy_source": "owner_authored",
+    "lines": [
+      "Find out the Secrets of AI at Scale",
+      "KubeCon + CloudNativeCon",
+      "Sponsor the End User Summit",
+      "Generous Consultations from the Minds Who Brought you this Madness",
+      "The people in this series are the best at finding business value in your business.",
+      "#HIREAWOLF"
+    ]
+  },
+  "closing_cta": {
+    "asset": "assets/cta/linux-foundation-training-forest.png",
+    "duration": 10.0
+  },
+  "title_slide": {
+    "duration": 5.0,
+    "eyebrow_template": "SEASON OF THE BLUEBERRIES // EPISODE {roman}",
+    "output_dir": "assets/hive/titles"
+  },
+  "fixed_cast": [
+    {
+      "id": "ikora",
+      "character": "Ikora Rey",
+      "github_login": "angiejones",
+      "plate": {
+        "label": "TRUSTEE // GUARDIAN",
+        "class": "Voidwalker Warlock",
+        "name": "Angie Jones",
+        "title": "Arbiter of the Agentic",
+        "variant": "leader"
+      },
+      "seats": [
+        {
+          "chapter": 1,
+          "source_at": 36.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Angie Jones plates Ikora Rey at source 36.0 for 4.0s in chapter 1 (The Enclave)."
+        },
+        {
+          "chapter": 8,
+          "source_at": 687.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Angie Jones plates Ikora Rey at source 687.0 for 4.0s in chapter 8 (Worm)."
+        },
+        {
+          "chapter": 9,
+          "source_at": 764.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Angie Jones plates Ikora Rey at source 764.0 for 4.0s in chapter 9 (Defeated)."
+        }
+      ]
+    },
+    {
+      "id": "eris",
+      "character": "Eris Morn",
+      "github_login": "Swil78",
+      "plate": {
+        "label": "TRUSTEE // AUTOMATON",
+        "name": "Shellea Williams",
+        "title": "I'm here for the 2x, I'm THAT good",
+        "variant": "leader"
+      },
+      "seats": [
+        {
+          "chapter": 1,
+          "source_at": 60.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Shellea Williams plates Eris Morn at source 60.0 for 4.0s in chapter 1 (The Enclave)."
+        },
+        {
+          "chapter": 8,
+          "source_at": 631.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Shellea Williams plates Eris Morn at source 631.0 for 4.0s in chapter 8 (Worm)."
+        }
+      ]
+    },
+    {
+      "id": "player",
+      "character": "Player Guardian",
+      "github_login": "CortNick",
+      "plate": {
+        "label": "HIVE // BLUEBERRY",
+        "name": "Cortney",
+        "title": "Knows Policy, Knows this is Preposterous"
+      },
+      "seats": [
+        {
+          "chapter": 2,
+          "source_at": 149.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 149.0 for 4.0s in chapter 2 (On Mars)."
+        },
+        {
+          "chapter": 4,
+          "source_at": 313.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 313.0 for 4.0s in chapter 4 (The Relic)."
+        },
+        {
+          "chapter": 7,
+          "source_at": 553.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 553.0 for 4.0s in chapter 7 (Council)."
+        },
+        {
+          "chapter": 8,
+          "source_at": 611.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 611.0 for 4.0s in chapter 8 (Worm)."
+        },
+        {
+          "chapter": 9,
+          "source_at": 960.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 960.0 for 4.0s in chapter 9 (Defeated)."
+        },
+        {
+          "chapter": 11,
+          "source_at": 1129.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 1129.0 for 4.0s in chapter 11 (With Mara)."
+        }
+      ]
+    }
+  ],
+  "overlays": [
+    {
+      "id": "savathuns-ship",
+      "kind": "lower-third",
+      "chapter": 1,
+      "source_at": 113.0,
+      "position": "bottom-right",
+      "lines": [
+        "Palace of AI Expectations",
+        "Tomb of Platform Teams"
+      ],
+      "copy_source": "owner_authored",
+      "nature": "project_lore",
+      "note": "Project lore, not Destiny canon; never cited as canon and never person-facing. Kept clear of the heroes: no fixed plate is seated in its window."
+    },
+    {
+      "id": "business-value-review",
+      "kind": "lower-third",
+      "chapter": 3,
+      "source_at": 243.0,
+      "position": "top-third",
+      "lines": [
+        "Business Value Review"
+      ],
+      "copy_source": "owner_authored",
+      "nature": "owner_note",
+      "note": "This is the cataclysm: the great fear of the intended audience."
+    }
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "slug": "the-enclave",
+      "roman": "I",
+      "headline": "The Enclave",
+      "start": 0.0,
+      "end": 125.0,
+      "subtitle": {
+        "text": "Where the work is shaped, not wished.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["enclave", "relic-shaping"],
+        "mapping_refs": ["deterministic-pipeline"],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e01-the-enclave.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e01-the-enclave-thumbnail.jpg"
+    },
+    {
+      "number": 2,
+      "slug": "on-mars",
+      "roman": "II",
+      "headline": "On Mars",
+      "start": 125.0,
+      "end": 218.0,
+      "subtitle": {
+        "text": "A world returned, and nothing on it unchanged.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["mars-returned"],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e02-on-mars.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e02-on-mars-thumbnail.jpg"
+    },
+    {
+      "number": 3,
+      "slug": "savathun",
+      "roman": "III",
+      "headline": "Savathun",
+      "start": 218.0,
+      "end": 309.0,
+      "subtitle": {
+        "text": "Light in the brood, doubt in the court.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["lucent-brood", "savathun"],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e03-savathun.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e03-savathun-thumbnail.jpg"
+    },
+    {
+      "number": 4,
+      "slug": "the-relic",
+      "roman": "IV",
+      "headline": "The Relic",
+      "start": 309.0,
+      "end": 351.0,
+      "subtitle": {
+        "text": "Shape the tool, then trust it with the work.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["relic-shaping"],
+        "mapping_refs": ["deterministic-pipeline"],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e04-the-relic.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e04-the-relic-thumbnail.jpg"
+    },
+    {
+      "number": 5,
+      "slug": "to-be-chosen",
+      "roman": "V",
+      "headline": "To Be Chosen",
+      "start": 351.0,
+      "end": 484.0,
+      "subtitle": {
+        "text": "Chosen is a verdict, not a wish.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["chosen"],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e05-to-be-chosen.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e05-to-be-chosen-thumbnail.jpg"
+    },
+    {
+      "number": 6,
+      "slug": "remembering",
+      "roman": "VI",
+      "headline": "Remembering",
+      "start": 484.0,
+      "end": 501.0,
+      "subtitle": {
+        "text": "The record is the memory; the memory is the proof.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["books-of-sorrow"],
+        "mapping_refs": ["persistence"],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e06-remembering.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e06-remembering-thumbnail.jpg"
+    },
+    {
+      "number": 7,
+      "slug": "council",
+      "roman": "VII",
+      "headline": "Council",
+      "start": 501.0,
+      "end": 579.0,
+      "subtitle": {
+        "text": "Many voices, one verdict.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "extrapolation",
+        "lore_refs": ["osmium-court"],
+        "mapping_refs": ["agent-roster"],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e07-council.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e07-council-thumbnail.jpg"
+    },
+    {
+      "number": 8,
+      "slug": "worm",
+      "roman": "VIII",
+      "headline": "Worm",
+      "start": 579.0,
+      "end": 744.0,
+      "subtitle": {
+        "text": "Every strength is a bargain with a hunger.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["worm-gods"],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e08-worm.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e08-worm-thumbnail.jpg"
+    },
+    {
+      "number": 9,
+      "slug": "defeated",
+      "roman": "IX",
+      "headline": "Defeated",
+      "start": 744.0,
+      "end": 1005.0,
+      "subtitle": {
+        "text": "In the sword logic, defeat is only data.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["sword-logic"],
+        "mapping_refs": ["classification"],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e09-defeated.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e09-defeated-thumbnail.jpg"
+    },
+    {
+      "number": 10,
+      "slug": "the-witness",
+      "roman": "X",
+      "headline": "The Witness",
+      "start": 1005.0,
+      "end": 1085.0,
+      "subtitle": {
+        "text": "It watches from the dark between the stars.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["the-witness"],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e10-the-witness.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e10-the-witness-thumbnail.jpg"
+    },
+    {
+      "number": 11,
+      "slug": "with-mara",
+      "roman": "XI",
+      "headline": "With Mara",
+      "start": 1085.0,
+      "end": 1181.0,
+      "subtitle": {
+        "text": "Even queens keep allies beyond the reef.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["mara-sov"],
+        "mapping_refs": ["hub"],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e11-with-mara.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e11-with-mara-thumbnail.jpg"
+    },
+    {
+      "number": 12,
+      "slug": "raid",
+      "roman": "XII",
+      "headline": "Raid",
+      "start": 1181.0,
+      "end": 1248.0,
+      "subtitle": {
+        "text": "Six voices enter; the discipline holds them.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": ["vow-of-the-disciple"],
+        "mapping_refs": ["agent-roster"],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e12-raid.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e12-raid-thumbnail.jpg"
+    }
+  ],
+  "contributor_ledger": {
+    "credited_github_ids": []
+  }
+}

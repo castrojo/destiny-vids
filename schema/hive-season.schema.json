@@ -1,0 +1,529 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/castrojo/destiny-vids/schema/hive-season.schema.json",
+  "title": "Hive season manifest",
+  "description": "A record in stories/standalone/<season>.json: one weekly episode season built from a single shared source (Season of the Blueberries is the first). It records the source formats and rights posture, the chapter windows copied as factual source data from the captured publisher metadata, the owner-authored CTA copy verbatim, the frozen title-slide subtitles with their supplier provenance, the fixed cast's source-evidenced plate seats, owner-authored overlays, and the no-repeat contributor ledger -- provenance and timecodes, never the footage. The schema is closed (additionalProperties: false at every level) so a hand-edited field fails loudly instead of being silently ignored by tools/hive_series.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "season",
+    "source",
+    "opening_cta",
+    "closing_cta",
+    "title_slide",
+    "fixed_cast",
+    "overlays",
+    "chapters",
+    "contributor_ledger"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "season": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "opening_cta": {
+      "$ref": "#/$defs/openingCta"
+    },
+    "closing_cta": {
+      "$ref": "#/$defs/closingCta"
+    },
+    "title_slide": {
+      "$ref": "#/$defs/titleSlide"
+    },
+    "fixed_cast": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/castMember"
+      }
+    },
+    "overlays": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/overlay"
+      }
+    },
+    "chapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/chapter"
+      }
+    },
+    "contributor_ledger": {
+      "$ref": "#/$defs/ledger"
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "youtube_id",
+        "video_format_id",
+        "audio_format_id",
+        "usage_class",
+        "source_rights_note",
+        "chapter_metadata"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "youtube_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "video_format_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The yt-dlp video format pinned for reproducibility."
+        },
+        "audio_format_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The yt-dlp audio format pinned for reproducibility."
+        },
+        "usage_class": {
+          "type": "string",
+          "enum": [
+            "third_party_copyrighted",
+            "cc_by_4_0"
+          ]
+        },
+        "source_rights_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "chapter_metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "artifact",
+            "captured",
+            "captured_with",
+            "note"
+          ],
+          "properties": {
+            "artifact": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Where the publisher chapter windows were captured. The artifact lives in the lore-supplier repository; the windows are copied into this manifest as factual source data so this repo has no runtime dependency on the sibling."
+            },
+            "captured": {
+              "type": "string",
+              "minLength": 1
+            },
+            "captured_with": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "openingCta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset",
+        "duration",
+        "copy_source",
+        "lines"
+      ],
+      "properties": {
+        "asset": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The committed 1920x1080 Expansion Pack card shown full-frame at the front of every episode."
+        },
+        "duration": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "copy_source": {
+          "type": "string",
+          "const": "owner_authored"
+        },
+        "lines": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "The owner-authored card copy, verbatim and in order."
+        }
+      }
+    },
+    "closingCta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset",
+        "duration"
+      ],
+      "properties": {
+        "asset": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "titleSlide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "duration",
+        "eyebrow_template",
+        "output_dir"
+      ],
+      "properties": {
+        "duration": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "eyebrow_template": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The eyebrow line with a {roman} placeholder for the episode number."
+        },
+        "output_dir": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where the committed per-episode title slide PNGs live."
+        }
+      }
+    },
+    "castMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "character",
+        "github_login",
+        "plate",
+        "seats"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "character": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The on-screen body this person's plate sits on. Only the fixed cast may overlay gameplay or cinematics."
+        },
+        "github_login": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "label",
+            "name",
+            "title"
+          ],
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "class": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Optional. Omitted entirely when no class row is authored -- never invented."
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "variant": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Chrome only, never copy: the plate.py variant name (e.g. leader gold)."
+            }
+          }
+        },
+        "seats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/seat"
+          }
+        }
+      }
+    },
+    "seat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chapter",
+        "source_at",
+        "dur",
+        "why"
+      ],
+      "properties": {
+        "chapter": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source_at": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Absolute source time in seconds."
+        },
+        "dur": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "why": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The evidence for this seat. A seat without evidence is not a seat."
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "chapter",
+        "source_at",
+        "position",
+        "lines",
+        "copy_source",
+        "nature",
+        "note"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "chapter": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source_at": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Absolute source time in seconds."
+        },
+        "position": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lines": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "copy_source": {
+          "type": "string",
+          "const": "owner_authored"
+        },
+        "nature": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the copy claims to be. project_lore is not Destiny canon and is never cited as such."
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "subtitle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "candidate_id",
+        "copy_source",
+        "nature",
+        "lore_refs",
+        "mapping_refs",
+        "supplier"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_id": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Which of the supplier's candidates was frozen into this episode record. Released slides never rotate."
+        },
+        "copy_source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nature": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lore_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mapping_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "supplier": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where the candidate came from, so the frozen copy can be traced back to the supplier's record without a runtime dependency on it."
+        }
+      }
+    },
+    "dossierRecipient": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "login",
+        "github_id",
+        "name",
+        "tasks"
+      ],
+      "properties": {
+        "login": {
+          "type": "string",
+          "minLength": 1
+        },
+        "github_id": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The numeric account ID: the no-repeat ledger keys on this, not on the renameable login."
+        },
+        "name": {
+          "type": "string",
+          "description": "The public GitHub display name. May be empty; the card falls back to the login and never invents one."
+        },
+        "tasks": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Completed Hive tasks in the credited window; rendered as HIVE TASKS +N."
+        }
+      }
+    },
+    "chapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "number",
+        "slug",
+        "roman",
+        "headline",
+        "start",
+        "end",
+        "subtitle",
+        "output",
+        "thumbnail_output"
+      ],
+      "properties": {
+        "number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "roman": {
+          "type": "string",
+          "minLength": 1
+        },
+        "headline": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The publisher chapter title, verbatim and unchanged."
+        },
+        "start": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "subtitle": {
+          "$ref": "#/$defs/subtitle"
+        },
+        "dossiers": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/dossierRecipient"
+          },
+          "description": "This week's contributor snapshots, committed by the weekly proposal PR. Absent until the first week runs."
+        },
+        "output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "thumbnail_output": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "credited_github_ids"
+      ],
+      "properties": {
+        "credited_github_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "description": "Every numeric GitHub ID already credited this season. The no-repeat rule: an ID on this list is never dossiered again."
+        }
+      }
+    }
+  }
+}
