@@ -1548,7 +1548,7 @@ def _probe_with(tmp_path, monkeypatch, video, duration=150.0):
     monkeypatch.setattr(
         hive_series, "_probe_audio",
         lambda *a, **k: {"codec_name": "aac", "sample_rate": "48000",
-                         "channels": 2})
+                         "channels": 2, "channel_layout": "stereo"})
     target = tmp_path / "ep.mp4"
     target.write_bytes(b"mp4")
     return hive_series._probe_delivery_streams(
@@ -1591,6 +1591,34 @@ def test_delivery_probe_reports_a_duration_mismatch(tmp_path, monkeypatch):
     assert any("duration" in p for p in problems)
 
 
+def test_conform_for_join_reads_container_rounded_fps_as_delivery(
+        tmp_path, monkeypatch):
+    """32640000/544621 is the container-rounded 60000/1001: the join probe
+    must hand conform.ensure props with no mismatch, or every delivered
+    episode would pay a conform encode on every cut."""
+    monkeypatch.setattr(
+        hive_series.conform, "probe_video",
+        lambda *a, **k: _conformant_video(
+            avg_frame_rate="32640000/544621",
+            r_frame_rate="32640000/544621"))
+    monkeypatch.setattr(hive_series.conform, "ffprobe_for",
+                        lambda *a, **k: ["ffprobe"])
+    seen = {}
+
+    def fake_ensure(path, _probe=None, **kwargs):
+        seen["mismatches"] = hive_series.conform.mismatches(_probe(path))
+        return path, "conforms" if not seen["mismatches"] else "conformed"
+
+    monkeypatch.setattr(hive_series.conform, "ensure", fake_ensure)
+    target = tmp_path / "ep.mp4"
+    target.write_bytes(b"mp4")
+    joined, status = hive_series._conform_for_join(
+        target, ["ffmpeg"], True, lambda *a: None)
+    assert seen["mismatches"] == [], \
+        "container rounding must not trigger a conform encode"
+    assert (joined, status) == (target, "conforms")
+
+
 # --- the cut's one interface ---------------------------------------------------
 
 
@@ -1615,6 +1643,10 @@ def _stage_cut(manifest, tmp_path, monkeypatch, skip=()):
                         lambda path, **k: (path, "conforms"))
     monkeypatch.setattr(hive_series, "_probe_delivery_streams",
                         lambda *a, **k: [])
+    monkeypatch.setattr(
+        hive_series, "_probe_audio",
+        lambda *a, **k: {"codec_name": "aac", "sample_rate": "48000",
+                         "channels": 2, "channel_layout": "stereo"})
     return manifest_path, data
 
 
@@ -1638,11 +1670,61 @@ def test_build_cut_ships_the_cut_when_one_episode_is_bad(
         return out_path
 
     monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
+    probed = {}
+
+    def fake_probe(path, expected, ffmpeg, tolerance):
+        probed[Path(path).name] = expected
+        return []
+
+    monkeypatch.setattr(hive_series, "_probe_delivery_streams", fake_probe)
     out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"])
     assert out.exists(), "one bad episode must not prevent the cut"
     assert len(joined) == 11
     assert "s01e04-the-relic.mp4" not in joined
     assert any("s01e04" in problem for problem in problems)
+    expected_joined = sum(
+        hive_series.episode_expected_duration(data, c)
+        for c in data["chapters"] if c["number"] != 4)
+    assert probed[Path(out).name] == expected_joined, \
+        "the cut is verified against the episodes actually joined"
+    assert probed[Path(out).name] != \
+        hive_series.cut_expected_duration(data), \
+        "the joined sum is not the full manifest's duration"
+
+
+def test_build_cut_omits_an_episode_whose_audio_cannot_join(
+        manifest, tmp_path, monkeypatch):
+    """The concat stream-copies sound, so an episode whose audio is not the
+    delivery codec/rate/layout is reported and left out of the best
+    reachable cut -- never joined blind, never re-encoded on a second
+    audio path."""
+    manifest_path, data = _stage_cut(manifest, tmp_path, monkeypatch)
+
+    def fake_audio(path, *a, **k):
+        if "s01e04" in Path(path).name:
+            return {"codec_name": "mp3", "sample_rate": "44100",
+                    "channels": 2, "channel_layout": "stereo"}
+        return {"codec_name": "aac", "sample_rate": "48000",
+                "channels": 2, "channel_layout": "stereo"}
+
+    monkeypatch.setattr(hive_series, "_probe_audio", fake_audio)
+    joined = []
+
+    def fake_concat(manifest, out_path=None, paths=None, **kwargs):
+        joined.extend(Path(p).name for p in paths)
+        out_path = Path(out_path) if out_path else             hive_series.full_cut_path(manifest)
+        out_path.write_bytes(b"mp4")
+        return out_path
+
+    monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
+    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"])
+    assert out.exists(), "bad audio on one episode must not prevent the cut"
+    assert len(joined) == 11
+    assert "s01e04-the-relic.mp4" not in joined
+    finding = next(p for p in problems if "s01e04" in p)
+    assert "audio codec 'mp3' is not aac" in finding
+    assert "sample rate '44100' is not 48000" in finding
+    assert "joins without it" in finding
 
 
 def test_build_cut_substitutes_a_conformed_copy_before_the_blind_join(

@@ -1448,10 +1448,8 @@ def _conform_for_join(path, ffmpeg, local, log):
     ffprobe = conform.ffprobe_for(ffmpeg)
 
     def probe(p):
-        props = conform.probe_video(p, ffprobe)
-        if _fps_is_delivery(props.get("avg_frame_rate")) or \
-                _fps_is_delivery(props.get("r_frame_rate")):
-            props = dict(props, avg_frame_rate=conform.DELIVERY.fps)
+        props, _fps_ok = _fps_with_delivery_rounding(
+            conform.probe_video(p, ffprobe))
         return props
 
     return conform.ensure(path, ffmpeg=ffmpeg, _probe=probe, log=log,
@@ -1471,8 +1469,11 @@ def build_cut(manifest_path=None, local=False, ffmpeg=None, log=print):
     blind stream-copy join, every present and decodable episode goes through
     the repo's one conformance path (`conform.ensure`), which substitutes a
     spec-conformant copy when the delivered file is not joinable as-is --
-    the substitution is logged. The CLI and the justfile both go through
-    here; there is no second path to a cut."""
+    the substitution is logged. Picture conformance is followed by an audio
+    check: an episode whose sound is not the delivery codec/rate/layout is
+    reported and omitted from the join, because the concat stream-copies
+    audio and there is no second audio encode path. The CLI and the
+    justfile both go through here; there is no second path to a cut."""
     manifest = load_manifest(manifest_path)
     ffmpeg = ffmpeg or render.find_ffmpeg()
     build_all(manifest_path, local=local, ffmpeg=ffmpeg, log=log)
@@ -1492,10 +1493,17 @@ def build_cut(manifest_path=None, local=False, ffmpeg=None, log=print):
             continue
         try:
             joined, status = _conform_for_join(path, ffmpeg, local, log)
+            bad_audio = _audio_problems(_probe_audio(joined, ffmpeg))
         except Exception as exc:
             problems.append(
                 f"{slug}: {path.name} could not be probed or conformed "
                 f"({exc}) -- the cut joins without it")
+            log(f"  cut: {problems[-1]}")
+            continue
+        if bad_audio:
+            problems.append(
+                f"{slug}: {Path(joined).name} audio cannot join "
+                f"({'; '.join(bad_audio)}) -- the cut joins without it")
             log(f"  cut: {problems[-1]}")
             continue
         if status != "conforms":
@@ -1538,7 +1546,8 @@ def _probe_audio(path, ffmpeg):
     ffprobe = conform.ffprobe_for(ffmpeg)
     out = subprocess.run(
         [*ffprobe, "-v", "error", "-select_streams", "a:0",
-         "-show_entries", "stream=codec_name,sample_rate,channels",
+         "-show_entries", "stream=codec_name,sample_rate,channels,"
+         "channel_layout",
          "-of", "json", str(path)],
         capture_output=True, text=True, check=True)
     streams = json.loads(out.stdout).get("streams") or []
@@ -1564,6 +1573,39 @@ def _fps_is_delivery(reported):
     return abs(value - float(wnum) / float(wden)) < 0.02
 
 
+def _fps_with_delivery_rounding(props):
+    """``(props, fps_ok)`` with the container-rounding verdict applied once.
+
+    The ONE shared override for the known mp4 rounding (`_fps_is_delivery`):
+    when either reported rate lands inside the slack, the returned props
+    carry the exact delivery fps so downstream rational comparisons agree,
+    and ``fps_ok`` reports the verdict. Both the join probe
+    (`_conform_for_join`) and the delivery report (`_probe_delivery_streams`)
+    go through here, so the two can never drift apart."""
+    if _fps_is_delivery(props.get("avg_frame_rate")) or \
+            _fps_is_delivery(props.get("r_frame_rate")):
+        return dict(props, avg_frame_rate=conform.DELIVERY.fps), True
+    return props, False
+
+
+def _audio_problems(audio):
+    """The ways a probed audio stream cannot join the cut, as strings.
+
+    The join stream-copies sound, so codec, sample rate and channel layout
+    must all be the delivery spec; anything else is reported and the
+    episode is omitted -- there is no second audio encode path."""
+    bad = []
+    if audio.get("codec_name") != "aac":
+        bad.append(f"audio codec {audio.get('codec_name')!r} is not aac")
+    if int(audio.get("sample_rate", 0)) != SAMPLE_RATE:
+        bad.append(f"sample rate {audio.get('sample_rate')!r} "
+                   f"is not {SAMPLE_RATE}")
+    if audio.get("channel_layout") != AUDIO_LAYOUT:
+        bad.append(f"channel layout {audio.get('channel_layout')!r} "
+                   f"is not {AUDIO_LAYOUT}")
+    return bad
+
+
 def _probe_delivery_streams(path, expected, ffmpeg, tolerance):
     """The problems a delivered file has, as a list -- empty means verified.
 
@@ -1587,21 +1629,13 @@ def _probe_delivery_streams(path, expected, ffmpeg, tolerance):
                 f"{duration - expected:+.3f}s from the expected "
                 f"{expected:.3f}s (tolerance {tolerance}s)")
         video = conform.probe_video(path, conform.ffprobe_for(ffmpeg))
-        fps_ok = video.get("r_frame_rate") == conform.DELIVERY.fps or \
-            _fps_is_delivery(video.get("avg_frame_rate"))
+        video, fps_ok = _fps_with_delivery_rounding(video)
         for bad in conform.mismatches(video):
             if fps_ok and bad.startswith("frame rate"):
                 continue
             problems.append(f"{path.name}: {bad}")
-        audio = _probe_audio(path, ffmpeg)
-        if audio.get("codec_name") != "aac":
-            problems.append(
-                f"{path.name}: audio codec {audio.get('codec_name')!r} "
-                "is not aac")
-        if int(audio.get("sample_rate", 0)) != SAMPLE_RATE:
-            problems.append(
-                f"{path.name}: sample rate {audio.get('sample_rate')!r} "
-                f"is not {SAMPLE_RATE}")
+        for bad in _audio_problems(_probe_audio(path, ffmpeg)):
+            problems.append(f"{path.name}: {bad}")
     except (subprocess.SubprocessError, RuntimeError, KeyError) as exc:
         problems.append(f"{path.name}: probe failed ({exc})")
     return problems
