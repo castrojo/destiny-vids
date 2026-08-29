@@ -112,6 +112,8 @@ people:
       title: Upender of Antipatterns | The First Disciple
   jeefy:
     github_id: 1394552
+  idvoretskyi:
+    github_id: 118459
   mrbobbytables:
     github_id: 6500863
     plate:
@@ -297,6 +299,9 @@ leads:
       person: clubanderson
       aka:
       - sagira_ghost
+    fynch:
+      person: idvoretskyi
+      aka: []
     saint_14:
       person: katcosgrove
       note: 'Kat from now on, but she remains the bubble in the original Wolves.
