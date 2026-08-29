@@ -1171,6 +1171,8 @@ def test_build_episode_orchestrates_cards_encode_and_thumbnail(
 
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(
+        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1233,6 +1235,8 @@ def test_build_episode_records_the_dossier_fallback_in_unresolved(
 
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(
+        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1267,6 +1271,8 @@ def test_build_episode_still_encodes_when_the_source_is_undecodable(
 
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(
+        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1318,6 +1324,8 @@ def test_build_episode_still_encodes_when_one_plate_png_is_missing(
 
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(
+        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
         hive_series.render, "detect_picture_status",
@@ -1383,6 +1391,8 @@ def _stage_episode(manifest, tmp_path, monkeypatch, data=None):
     manifest_path.write_text(json.dumps(data))
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
+    monkeypatch.setattr(
+        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
     monkeypatch.setattr(
         hive_series, "ensure_source", lambda *a, **k: fake_source)
     monkeypatch.setattr(
