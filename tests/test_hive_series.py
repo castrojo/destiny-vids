@@ -16,7 +16,7 @@ import json
 from pathlib import Path
 
 import pytest
-from PIL import Image
+from PIL import Image, ImageDraw
 from jsonschema import Draft202012Validator
 
 from tools import hive_series
@@ -197,7 +197,7 @@ def test_fixed_cast_copy_is_the_owner_authored_copy_verbatim(manifest):
     ikora = cast["ikora"]
     assert ikora["character"] == "Ikora Rey"
     assert ikora["github_login"] == "angiejones"
-    assert ikora["plate"] == {
+    assert {k: v for k, v in ikora["plate"].items() if k != "provenance"} == {
         "label": "TRUSTEE // GUARDIAN",
         "class": "Voidwalker Warlock",
         "name": "Angie Jones",
@@ -208,7 +208,7 @@ def test_fixed_cast_copy_is_the_owner_authored_copy_verbatim(manifest):
     eris = cast["eris"]
     assert eris["character"] == "Eris Morn"
     assert eris["github_login"] == "Swil78"
-    assert eris["plate"] == {
+    assert {k: v for k, v in eris["plate"].items() if k != "provenance"} == {
         "label": "TRUSTEE // AUTOMATON",
         "name": "Shellea Williams",
         "title": "I'm here for the 2x, I'm THAT good",
@@ -219,12 +219,45 @@ def test_fixed_cast_copy_is_the_owner_authored_copy_verbatim(manifest):
     player = cast["player"]
     assert player["character"] == "Player Guardian"
     assert player["github_login"] == "CortNick"
-    assert player["plate"] == {
+    assert {k: v for k, v in player["plate"].items() if k != "provenance"} == {
         "label": "HIVE // BLUEBERRY",
         "name": "Cortney",
         "title": "Knows Policy, Knows this is Preposterous",
     }
     assert "class" not in player["plate"], "no invented class row"
+
+
+def test_every_fixed_cast_plate_carries_explicit_provenance(manifest):
+    """Each plate records the owner instruction it came from and the GitHub
+    profile fetch behind its name row -- the guard in test_plate_copy_drift
+    recognizes this instead of forcing an empty global binding."""
+    expected_names = {
+        "ikora": ("angiejones", "Angie Jones"),
+        "eris": ("Swil78", "Shellea Williams"),
+        "player": ("CortNick", "Cortney"),
+    }
+    for member in manifest["fixed_cast"]:
+        provenance = member["plate"].get("provenance")
+        assert provenance, f"{member['id']}: plate has no provenance"
+        assert provenance["copy_source"] == "owner_authored"
+        assert "2026-08-29" in provenance["decided_by"]
+        login, name = expected_names[member["id"]]
+        assert member["plate"]["name"] == name
+        assert f"/users/{login}" in provenance["name_source"]
+        assert name in provenance["name_source"]
+
+
+def test_cortneys_name_is_the_github_profile_name_not_the_wolves_plate(manifest):
+    """KEEP `name: Cortney`: the owner explicitly required GitHub as the
+    factual source of truth, and /users/CortNick's public name is 'Cortney'.
+    The label/title are a deliberate one-video identity, not a reuse of the
+    older Wolves plate for 'Cortney Nickerson' -- the provenance says so."""
+    player = next(c for c in manifest["fixed_cast"] if c["id"] == "player")
+    provenance = player["plate"]["provenance"]
+    assert player["plate"]["name"] == "Cortney"
+    assert "104345443" in provenance["name_source"]  # CortNick's github_id
+    assert "Cortney Nickerson" in provenance["note"]
+    assert "one-video identity" in provenance["note"]
 
 
 def test_fixed_cast_seats_are_exactly_the_evidenced_ones(manifest):
@@ -322,12 +355,35 @@ def test_plate_specs_render_through_plate_py_unmodified(manifest):
         assert img.width > 100 and img.height > 50
 
 
+def test_loader_reports_schema_problems_without_a_semantic_keyerror(manifest):
+    """A schema-invalid manifest raises ValueError listing the schema
+    problems -- never a raw KeyError from the semantic checks that assume
+    those fields exist."""
+    for mutate, needle in [
+        (lambda d: d["chapters"][0].pop("start"), "start"),
+        (lambda d: d["fixed_cast"][0]["seats"][0].pop("source_at"), "source_at"),
+        (lambda d: d.pop("chapters"), "chapters"),
+        (lambda d: d["overlays"][0].pop("source_at"), "source_at"),
+        (lambda d: d["fixed_cast"][0]["plate"].pop("label"), "label"),
+    ]:
+        doctored = json.loads(json.dumps(manifest))
+        mutate(doctored)
+        with pytest.raises(ValueError) as excinfo:
+            hive_series.load_manifest_data(doctored)
+        assert needle in str(excinfo.value)
+
+
 def test_unsupported_plate_copy_is_omitted_and_recorded(manifest):
     """A cast member whose plate copy is incomplete is an unresolved entry,
-    never a rendered plate. Omission degrades; a guessed plate would lie."""
+    never a rendered plate. Omission degrades; a guessed plate would lie.
+
+    `title` is OPTIONAL in the schema precisely so this gap degrades through
+    the real path: the manifest validates, and the PLANNER -- not the loader
+    -- omits the plate and records why."""
     doctored = json.loads(json.dumps(manifest))
     del doctored["fixed_cast"][0]["plate"]["title"]
-    plates, unresolved = hive_series.plan_chapter_plates(doctored, 1)
+    validated = hive_series.load_manifest_data(doctored)  # schema-clean
+    plates, unresolved = hive_series.plan_chapter_plates(validated, 1)
     assert [p["id"] for p in plates] == ["eris-ch1"]
     assert len(unresolved) == 1
     assert unresolved[0]["cast"] == "ikora"
@@ -381,14 +437,21 @@ def test_title_slide_filename_carries_episode_number_and_slug(manifest):
 
 def _fixture_face(size=460):
     """A deterministic square 'PFP' whose four corners are distinct colours,
-    so a crop anywhere in the pipeline is visible to the test."""
+    so a crop anywhere in the pipeline is visible to the test. The markers
+    are blocks, not single pixels, so they survive the dossier's Lanczos
+    upscale to the tile size exactly as a real PFP's corners would."""
     img = Image.new("RGB", (size, size), (32, 48, 80))
-    px = img.load()
+    draw = ImageDraw.Draw(img)
+    marker = max(8, size // 24)
     colours = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
-    for (cx, cy), colour in zip(
-        [(0, 0), (size - 1, 0), (0, size - 1), (size - 1, size - 1)], colours
-    ):
-        px[cx, cy] = colour
+    corners = [
+        (0, 0),
+        (size - marker, 0),
+        (0, size - marker),
+        (size - marker, size - marker),
+    ]
+    for (cx, cy), colour in zip(corners, colours):
+        draw.rectangle([cx, cy, cx + marker - 1, cy + marker - 1], fill=colour)
     return img
 
 
@@ -469,3 +532,109 @@ def test_declared_avatar_logins_are_the_fixed_cast(manifest):
         "Swil78",
         "CortNick",
     ]
+
+
+# --- dossier text fitting (C1) and PFP fit (C2) ------------------------------
+
+def test_dossier_text_stays_inside_the_panel_for_long_identities():
+    """A long display name and a long login shrink and wrap so every row's
+    bounding box stays inside the glass panel. Nothing is clipped or
+    truncated: every character of the real identity survives across rows."""
+    snapshot = _fixture_snapshot()
+    snapshot["name"] = (
+        "Alexandra Maximiliana Featherstonehaugh-Contributingworth the Third"
+    )
+    snapshot["login"] = "a-very-long-github-login-that-just-keeps-going-on"
+    fields = hive_series.dossier_fields(snapshot)
+    px, py, pw, ph = hive_series.DOSSIER_PANEL
+    draw = ImageDraw.Draw(Image.new("RGBA", (1920, 1080)))
+    layout = hive_series.dossier_text_layout(fields)
+    assert len(layout) >= 3, "the long identity should wrap to multiple rows"
+    for x, y, text, font, _fill in layout:
+        assert text, "a wrapped row is never blank"
+        assert font.size >= min(
+            hive_series.DOSSIER_NAME_MIN, hive_series.DOSSIER_HANDLE_MIN
+        )
+        x0, y0, x1, y1 = draw.textbbox((x, y), text, font=font)
+        assert x0 >= px and x1 <= px + pw, f"{text!r} escapes the panel horizontally"
+        assert y0 >= py and y1 <= py + ph, f"{text!r} escapes the panel vertically"
+    joined = "".join(row[2] for row in layout).replace(" ", "")
+    whole = (fields["name"] + fields["handle"]).replace(" ", "")
+    assert joined == whole, "a real identity is never clipped or truncated"
+
+
+def test_dossier_text_keeps_full_size_for_normal_identities():
+    """The fitting contract only engages when it has to: an identity that
+    fits the panel renders at the display sizes on one line each, exactly as
+    before."""
+    snapshot = _fixture_snapshot()
+    snapshot["name"] = "Sam Rivera"
+    snapshot["login"] = "srivera"
+    fields = hive_series.dossier_fields(snapshot)
+    layout = hive_series.dossier_text_layout(fields)
+    assert [row[2] for row in layout] == ["Sam Rivera", "@srivera"]
+    name_font, handle_font = layout[0][3], layout[1][3]
+    assert name_font.size == hive_series.DOSSIER_NAME_SIZE
+    assert handle_font.size == hive_series.DOSSIER_HANDLE_SIZE
+
+
+def test_dossier_text_shrinks_before_it_wraps():
+    """A name slightly too wide for the panel shrinks to a size that fits on
+    one line rather than wrapping -- shrink first, wrap when shrinking hits
+    the floor of legibility."""
+    fields = hive_series.dossier_fields(_fixture_snapshot())
+    layout = hive_series.dossier_text_layout(fields)
+    assert [row[2] for row in layout] == ["Fixture Contributor", "@test-fixture"]
+    name_font = layout[0][3]
+    assert hive_series.DOSSIER_NAME_MIN <= name_font.size < hive_series.DOSSIER_NAME_SIZE
+
+
+def test_dossier_text_fit_never_shrinks_below_the_tested_floor():
+    """Even an absurd identity stops shrinking at the floor and hard-wraps
+    instead -- the font floor is the guarantee, not a hope."""
+    draw = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    absurd = "X" * 500
+    font, lines = hive_series._fit_text(
+        draw, absurd, "bold",
+        hive_series.DOSSIER_NAME_SIZE, hive_series.DOSSIER_NAME_MIN,
+        hive_series.DOSSIER_TEXT_WIDTH,
+    )
+    assert font.size == hive_series.DOSSIER_NAME_MIN
+    assert len(lines) > 1
+    for line in lines:
+        assert draw.textlength(line, font=font) <= hive_series.DOSSIER_TEXT_WIDTH
+    assert "".join(lines) == absurd, "hard wrap drops no characters"
+
+
+def test_dossier_fit_entire_upscales_a_small_face_to_cover_the_tile():
+    """A small GitHub PFP is UPSCALED to cover the avatar tile in at least
+    one dimension, aspect preserved -- never left floating small, never
+    cropped."""
+    tile = 720
+    square = hive_series._fit_entire(_fixture_face(120), tile)
+    assert square.size == (720, 720)
+    wide = hive_series._fit_entire(Image.new("RGB", (400, 100)), tile)
+    assert wide.size == (720, 180)
+    tall = hive_series._fit_entire(Image.new("RGB", (100, 400)), tile)
+    assert tall.size == (180, 720)
+    for fitted in (square, wide, tall):
+        assert max(fitted.size) == tile, "covers the tile in at least one dimension"
+        assert min(fitted.size) <= tile
+
+
+def test_dossier_renders_a_wide_face_letterboxed_and_uncropped():
+    """Render-level proof for a non-square PFP: the whole image is padded
+    into the tile (letterbox), and all four corner colours survive."""
+    face = Image.new("RGB", (400, 100), (32, 48, 80))
+    draw = ImageDraw.Draw(face)
+    colours = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
+    for (cx, cy), colour in zip(
+        [(0, 0), (384, 0), (0, 84), (384, 84)], colours
+    ):
+        draw.rectangle([cx, cy, cx + 15, cy + 15], fill=colour)
+    img, unresolved = hive_series.render_dossier(_fixture_snapshot(), face=face)
+    assert unresolved == []
+    raw = img.convert("RGB").tobytes()
+    pixels = {raw[i:i + 3] for i in range(0, len(raw), 3)}
+    for colour in colours:
+        assert bytes(colour) in pixels, f"corner {colour} cropped out"

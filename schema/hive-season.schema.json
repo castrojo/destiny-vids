@@ -243,7 +243,7 @@
           "required": [
             "label",
             "name",
-            "title"
+            "provenance"
           ],
           "properties": {
             "label": {
@@ -261,12 +261,43 @@
             },
             "title": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "description": "Optional at the record level so missing copy can degrade through the validated load/plan path: the planner omits a plate whose copy is incomplete and records it in unresolved -- it never invents a row."
             },
             "variant": {
               "type": "string",
               "minLength": 1,
               "description": "Chrome only, never copy: the plate.py variant name (e.g. leader gold)."
+            },
+            "provenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "copy_source",
+                "decided_by",
+                "name_source"
+              ],
+              "properties": {
+                "copy_source": {
+                  "type": "string",
+                  "const": "owner_authored",
+                  "description": "Fixed-cast plate copy is owner-authored, verbatim."
+                },
+                "decided_by": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The owner instruction this copy came from. A fixed-cast plate is a deliberate per-video owner override; this record is what the plate-copy drift guard recognizes instead of forcing an empty global binding into vocab/casting.yaml."
+                },
+                "name_source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Where the name row came from. GitHub's public profile is the factual source of truth for a contributor's name; the fetch is recorded here."
+                },
+                "note": {
+                  "type": "string",
+                  "description": "Anything a later editor must not re-litigate."
+                }
+              }
             }
           }
         },

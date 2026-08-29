@@ -166,6 +166,43 @@ def _wrap(draw, text, font, max_width):
     return lines
 
 
+def _wrap_hard(draw, text, font, max_width):
+    """Word wrap that also splits a single token longer than the line.
+
+    A real identity is never clipped or truncated: when no word boundary fits,
+    the token breaks at the last character that does."""
+    lines = []
+    for line in _wrap(draw, text, font, max_width):
+        while draw.textlength(line, font=font) > max_width:
+            cut = len(line)
+            while cut > 1 and draw.textlength(line[:cut], font=font) > max_width:
+                cut -= 1
+            lines.append(line[:cut])
+            line = line[cut:]
+        lines.append(line)
+    return lines
+
+
+def _fit_text(draw, text, weight, max_size, min_size, max_width):
+    """The fitted font and wrapped lines for ``text`` within ``max_width``.
+
+    Shrink first: the largest size that keeps the text on ONE line wins.
+    Only when even the floor cannot hold one line does the text wrap, at the
+    largest size whose wrapped lines all fit. At the floor it hard-wraps
+    instead of shrinking further: it never clips."""
+    for size in range(int(max_size), int(min_size) - 1, -1):
+        font = _font(weight, size)
+        if draw.textlength(text, font=font) <= max_width:
+            return font, [text]
+    for size in range(int(max_size), int(min_size) - 1, -1):
+        font = _font(weight, size)
+        lines = _wrap(draw, text, font, max_width)
+        if all(draw.textlength(line, font=font) <= max_width for line in lines):
+            return font, _wrap_hard(draw, text, font, max_width)
+    font = _font(weight, min_size)
+    return font, _wrap_hard(draw, text, font, max_width)
+
+
 def _centered(draw, cx, y, text, font, fill):
     draw.text(
         (cx - draw.textlength(text, font=font) / 2, y), text, font=font, fill=fill
@@ -318,6 +355,18 @@ def render_title_slide(manifest, chapter):
 
 # --- Guardian dossier A ---------------------------------------------------------
 
+# The dossier panel geometry and its text-fit contract. The name and handle
+# shrink from their display sizes down to a tested floor and wrap -- a real
+# identity is never clipped, truncated, or drawn outside the panel.
+DOSSIER_PANEL = (960, 330, 810, 420)  # x, y, width, height
+DOSSIER_TEXT_X = DOSSIER_PANEL[0] + 56
+DOSSIER_TEXT_WIDTH = DOSSIER_PANEL[2] - 112
+DOSSIER_NAME_SIZE = 68
+DOSSIER_NAME_MIN = 26
+DOSSIER_HANDLE_SIZE = 40
+DOSSIER_HANDLE_MIN = 20
+
+
 def dossier_fields(snapshot):
     """The factual GitHub identity rows for a dossier card. Nothing else.
 
@@ -353,6 +402,52 @@ def resolve_face(login):
     return img.convert("RGB")
 
 
+def _fit_entire(face, tile):
+    """Scale ``face`` so it covers the ``tile`` square in its long dimension,
+    aspect ratio preserved. Small PFPs are UPSCALED to fill the tile; nothing
+    is ever cropped -- the short dimension is letterboxed by the caller."""
+    w, h = face.size
+    if w >= h:
+        size = (tile, max(1, round(h * tile / w)))
+    else:
+        size = (max(1, round(w * tile / h)), tile)
+    if size == face.size:
+        return face.copy()
+    return face.resize(size, Image.LANCZOS)
+
+
+def dossier_text_layout(fields):
+    """The name/handle rows for the dossier panel: ``(x, y, text, font,
+    fill)`` tuples, fitted and wrapped so every row's bounding box stays
+    inside the panel. The block is centred in the space above the hairline;
+    the tally row below it is fixed chrome."""
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    px, py, pw, ph = DOSSIER_PANEL
+    name_font, name_lines = _fit_text(
+        probe, fields["name"], "bold",
+        DOSSIER_NAME_SIZE, DOSSIER_NAME_MIN, DOSSIER_TEXT_WIDTH,
+    )
+    handle_font, handle_lines = _fit_text(
+        probe, fields["handle"], "regular",
+        DOSSIER_HANDLE_SIZE, DOSSIER_HANDLE_MIN, DOSSIER_TEXT_WIDTH,
+    )
+    rows = [(line, name_font, TEXT) for line in name_lines]
+    rows += [(line, handle_font, CYAN + (255,)) for line in handle_lines]
+
+    gap = 12
+    heights = [sum(font.getmetrics()) for _text, font, _fill in rows]
+    block_h = sum(heights) + gap
+    area_top, area_bottom = py + 44, py + 246  # above the hairline
+    y = area_top + max(0, (area_bottom - area_top - block_h) // 2)
+    layout = []
+    for i, (text, font, fill) in enumerate(rows):
+        if i == len(name_lines):
+            y += gap
+        layout.append((DOSSIER_TEXT_X, y, text, font, fill))
+        y += heights[i]
+    return layout
+
+
 def render_dossier(snapshot, face=None):
     """A full-frame Guardian dossier A recognition card, 1920x1080.
 
@@ -379,8 +474,7 @@ def render_dossier(snapshot, face=None):
     )
     draw.rectangle([tx, ty, tx + tile - 1, ty + tile - 1], fill=INK_DEEP + (255,))
     if face is not None:
-        fitted = face.copy()
-        fitted.thumbnail((tile, tile), Image.LANCZOS)
+        fitted = _fit_entire(face, tile)
         fx = tx + (tile - fitted.width) // 2
         fy = ty + (tile - fitted.height) // 2
         img.paste(fitted.convert("RGB"), (fx, fy))
@@ -393,7 +487,7 @@ def render_dossier(snapshot, face=None):
                      outline=BLUE + (90,), width=6)
 
     # Right: the dark glass panel with the blue-purple edge.
-    px, py, pw, ph = 960, 330, 810, 420
+    px, py, pw, ph = DOSSIER_PANEL
     draw.rounded_rectangle([px, py, px + pw, py + ph], radius=18,
                            fill=PURPLE + (255,))
     draw.rounded_rectangle([px + 3, py + 3, px + pw - 3, py + ph - 3],
@@ -401,13 +495,10 @@ def render_dossier(snapshot, face=None):
     draw.rounded_rectangle([px + 5, py + 5, px + pw - 5, py + ph - 5],
                            radius=14, fill=GLASS)
 
-    f_name = _font("bold", 68)
-    f_handle = _font("regular", 40)
     f_tasks = _font("bold", 44)
     tx0 = px + 56
-    draw.text((tx0, py + 62), fields["name"], font=f_name, fill=TEXT)
-    draw.text((tx0, py + 170), fields["handle"], font=f_handle,
-              fill=CYAN + (255,))
+    for x, y, text, font, fill in dossier_text_layout(fields):
+        draw.text((x, y), text, font=font, fill=fill)
     _hairline(img, py + 250, x0=tx0, x1=px + pw - 56, height=2)
     dot = 20
     dy = py + 306
@@ -564,11 +655,17 @@ def _semantic_errors(data):
 
 def load_manifest_data(data):
     """Validate already-parsed manifest data against the schema and the
-    season's own rules. Raises ValueError listing every problem found."""
+    season's own rules. Raises ValueError listing every problem found.
+
+    Schema problems are reported on their own: the semantic checks assume the
+    fields the schema requires, so running them against a schema-invalid
+    document would surface a KeyError instead of the real problem list."""
     problems = [
         f"{'/'.join(str(p) for p in e.path) or '/'}: {e.message}"
         for e in _schema_errors(data)
-    ] + _semantic_errors(data)
+    ]
+    if not problems:
+        problems.extend(_semantic_errors(data))
     if problems:
         raise ValueError(
             "season manifest is invalid:\n" + "\n".join(problems)

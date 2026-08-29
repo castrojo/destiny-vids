@@ -62,7 +62,19 @@ def _entries(path):
                 data = data[key]
                 break
         else:
-            return []
+            # A season manifest seats its plates on the fixed cast instead of
+            # a top-level list. The plate copy is the same kind of record and
+            # the guard must see it too.
+            fixed = data.get("fixed_cast")
+            if not isinstance(fixed, list):
+                return []
+            return [
+                {**member["plate"], "id": f"fixed_cast:{member.get('id', '?')}"}
+                for member in fixed
+                if isinstance(member, dict)
+                and isinstance(member.get("plate"), dict)
+                and member["plate"].get("name")
+            ]
     if not isinstance(data, list):
         return []
     return [e for e in data if isinstance(e, dict) and e.get("name")]
@@ -111,6 +123,19 @@ def _chrome_problems(entries, by_name):
         # the runtime guard offers, and just as noisy on purpose.
         override = entry.get("copy_override")
         if isinstance(override, dict) and override.get("decided_by"):
+            continue
+
+        # A season fixed-cast plate is a deliberate per-video owner override:
+        # its explicit `provenance` (owner instruction + factual name source)
+        # plays the copy_override role, so the guard recognizes the decision
+        # instead of forcing an empty global binding into vocab/casting.yaml
+        # for a name that belongs to one video.
+        provenance = entry.get("provenance")
+        if (
+            isinstance(provenance, dict)
+            and provenance.get("copy_source") == "owner_authored"
+            and provenance.get("decided_by")
+        ):
             continue
 
         for field, default in CHROME_DEFAULTS.items():
@@ -168,6 +193,48 @@ def test_the_gate_catches_a_stolen_leader_variant():
     assert not _chrome_problems([{"id": "x", "name": name}], by_name)
 
 
+def test_the_gate_sees_season_fixed_cast_plates():
+    """The sweep walks season `fixed_cast[].plate` records too -- a plate
+    record that hides in a nested season shape is not outside the guard."""
+    path = REPO_ROOT / "stories" / "standalone" / "season-of-the-blueberries.json"
+    entries = _entries(path)
+    names = {e["name"] for e in entries}
+    assert {"Angie Jones", "Shellea Williams", "Cortney"} <= names
+    # ...and they all carry the explicit provenance the guard recognizes.
+    by_name = _authored_identities()
+    assert not _chrome_problems(entries, by_name)
+
+
+def test_a_fixed_cast_plate_needs_provenance_to_diverge():
+    """Season-shaped entries are held to the same standard: a fixed-cast
+    plate that contradicts an authored identity is flagged UNLESS it records
+    explicit owner provenance -- the per-video override the season contract
+    requires instead of an empty global binding."""
+    by_name = _authored_identities()
+    assert "Bob Killen" in by_name, "the fixture this test relies on moved"
+
+    bare = {"id": "fixed_cast:x", "name": "Bob Killen"}
+    problems = _chrome_problems([bare], by_name)
+    assert problems, "a season plate dropping trustee chrome went unseen"
+    assert "trustee" in problems[0]
+
+    provenanced = {
+        **bare,
+        "provenance": {
+            "copy_source": "owner_authored",
+            "decided_by": "Owner instruction, the 2026-08-29 season decision",
+            "name_source": "GitHub REST GET /users/example",
+        },
+    }
+    assert not _chrome_problems([provenanced], by_name), (
+        "explicit owner provenance is the season plate's override record"
+    )
+
+    # A provenance block without the owner instruction is not an override.
+    hollow = {**bare, "provenance": {"copy_source": "owner_authored"}}
+    assert _chrome_problems([hollow], by_name)
+
+
 def _jorge_guardian_plates():
     """Every committed Guardian/nameplate record crediting Jorge Castro.
 
@@ -193,6 +260,9 @@ def _jorge_guardian_plates():
             for video in data.get("videos") or []:
                 if isinstance(video, dict):
                     candidates.extend(video.get("overlays") or [])
+            for member in data.get("fixed_cast") or []:
+                if isinstance(member, dict) and isinstance(member.get("plate"), dict):
+                    candidates.append(member["plate"])
         for entry in candidates:
             if not isinstance(entry, dict) or entry.get("name") != "Jorge Castro":
                 continue

@@ -47,7 +47,12 @@
         "class": "Voidwalker Warlock",
         "name": "Angie Jones",
         "title": "Arbiter of the Agentic",
-        "variant": "leader"
+        "variant": "leader",
+        "provenance": {
+          "copy_source": "owner_authored",
+          "decided_by": "Owner instruction, the 2026-08-29 season decision (docs/superpowers/specs/2026-08-29-season-of-the-blueberries-design.md, 'Identity and casting'): the owner-authored gold plate for Ikora Rey.",
+          "name_source": "GitHub REST GET https://api.github.com/users/angiejones on 2026-08-29 returned the public profile name 'Angie Jones' (github_id 15972783); GitHub is the required factual source of truth for a contributor's name."
+        }
       },
       "seats": [
         {
@@ -78,7 +83,12 @@
         "label": "TRUSTEE // AUTOMATON",
         "name": "Shellea Williams",
         "title": "I'm here for the 2x, I'm THAT good",
-        "variant": "leader"
+        "variant": "leader",
+        "provenance": {
+          "copy_source": "owner_authored",
+          "decided_by": "Owner instruction, the 2026-08-29 season decision (docs/superpowers/specs/2026-08-29-season-of-the-blueberries-design.md, 'Identity and casting'): the owner-authored gold plate for Eris Morn.",
+          "name_source": "GitHub REST GET https://api.github.com/users/Swil78 on 2026-08-29 returned the public profile name 'Shellea Williams' (github_id 98050010); GitHub is the required factual source of truth for a contributor's name."
+        }
       },
       "seats": [
         {
@@ -102,7 +112,13 @@
       "plate": {
         "label": "HIVE // BLUEBERRY",
         "name": "Cortney",
-        "title": "Knows Policy, Knows this is Preposterous"
+        "title": "Knows Policy, Knows this is Preposterous",
+        "provenance": {
+          "copy_source": "owner_authored",
+          "decided_by": "Owner instruction, the 2026-08-29 season decision (docs/superpowers/specs/2026-08-29-season-of-the-blueberries-design.md, 'Identity and casting'): the owner-authored player plate for the recurring player Guardian. The owner explicitly required GitHub as the factual source of truth for the name row.",
+          "name_source": "GitHub REST GET https://api.github.com/users/CortNick on 2026-08-29 returned the public profile name 'Cortney' (github_id 104345443, matching the CortNick entry in vocab/casting.yaml).",
+          "note": "The name 'Cortney' is the public GitHub profile name, kept by explicit owner requirement. The label and title are a deliberate one-video identity authored for this season; they are NOT a reuse of the older Wolves plate for 'Cortney Nickerson' (issue #90), and this record does not bind that identity anywhere else."
+        }
       },
       "seats": [
         {
