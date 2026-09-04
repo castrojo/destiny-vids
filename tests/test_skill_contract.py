@@ -178,7 +178,13 @@ def test_production_skill_keeps_the_canonical_shape_and_cta_rule():
     front_matter = _front_matter(skill)
 
     assert front_matter["metadata"]["context7-sources"] == [
-        "/addyosmani/agent-skills"
+        "/addyosmani/agent-skills",
+        # The standalone-batch reference states what `concat` and `aformat`
+        # actually require -- notably that ffmpeg reconciles pixel and sample
+        # formats itself but that RESOLUTION must be matched by hand, and that
+        # `concat` pads a short audio leg with silence. Those are verified
+        # claims, not recalled ones, so the source is recorded here.
+        "/websites/ffmpeg_documentation",
     ]
     for heading in (
         "## When to Use",

@@ -1,5 +1,7 @@
 # The standalone video batch
 
+Part of the [production skill](../SKILL.md).
+
 One committed manifest, `stories/standalone/<batch>.json`, builds every
 "Bluefin and the X" cut. `tools/standalone.py` owns the contract
 (`schema/standalone-batch.schema.json`), the source-time → output-time
@@ -98,8 +100,38 @@ The intro is appended as the **last** ffmpeg input, so the source stays input
 0 and every still keeps the index the graph computed for it. The overlay chain
 therefore finishes on `[mainv]` rather than `[outv]`, because the concat owns
 `[outv]`/`[outa]` — a label cannot be both a filter's input and its output.
-Both legs are `aformat`-normalised before the join, since an intro arriving as
-24-bit PCM and a source decoded from Opus do not share a sample format.
+
+Three things `concat` requires, and what satisfies each here (verified through
+Context7 against `/websites/ffmpeg_documentation`, "concat" and "aformat"):
+
+| `concat` requires | Satisfied by |
+|---|---|
+| Every segment starts at timestamp **zero** | `setpts=PTS-STARTPTS` and `asetpts=PTS-STARTPTS` on the intro leg |
+| The same number of streams per segment | Both legs carry exactly one video and one audio |
+| **Consistent resolution — this one is not automatic** | The intro leg runs the same `conform.video_filter_chain()` as the source |
+
+FFmpeg's own documentation is explicit that it reconciles pixel and sample
+formats itself but that **users must manually ensure consistent resolutions
+across segments**. So the `scale`/`setsar`/`fps` chain on the intro leg is
+load-bearing, not decoration. The `aformat` on both audio legs is belt and
+braces over a reconciliation ffmpeg would attempt anyway — an intro arriving as
+24-bit PCM and a source decoded from Opus do not share a sample format, and
+stating the target is cheaper than debugging a negotiation.
+
+**The join can pad with silence.** `concat` takes the duration of the longest
+stream in each segment and **pads shorter audio with silence** to reach it. A
+segment whose frame-quantized video outruns its sample-exact audio therefore
+ships as content → silence → content. That is the same defect
+`test_the_saint_14_joins_survive_concat_frame_quantization` guards for the
+cuts, and it is why an intro's out-point is chosen on a frame boundary in a
+quiet passage rather than anywhere convenient.
+
+## Sources
+
+Technical claims about `concat` and `aformat` are verified against current
+FFmpeg documentation rather than recalled:
+`source: /websites/ffmpeg_documentation`.
+
 
 ## Verification
 
