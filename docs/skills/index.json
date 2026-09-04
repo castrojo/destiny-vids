@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-29",
+  "generated_at": "2026-09-04",
   "skills": [
     {
       "id": "chapters",
@@ -16,8 +16,8 @@
         "markdown"
       ],
       "description": "Edit any word the audience reads without computing timecodes: one Markdown file per chapter, with per-line timing derived from readability. Use when writing or rewriting chat pills, red splashes, or title, status and credit cards.",
-      "version": "1.0",
-      "last_updated": "2026-08-26",
+      "version": "1.1",
+      "last_updated": "2026-09-04",
       "doc_type": "procedure"
     },
     {
