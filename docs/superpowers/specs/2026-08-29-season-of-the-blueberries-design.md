@@ -62,6 +62,20 @@ with no dossier cards.
 generation. It does not generate person-facing fields. The selected subtitle is
 frozen in the episode record; released slides never rotate.
 
+## Expansion Pack authoring
+
+The next authored pass lives in
+[`stories/standalone/authoring/season-of-the-blueberries/`](../../../stories/standalone/authoring/season-of-the-blueberries/README.md).
+Those files preserve the owner's exact source marks, copy, speaker identities,
+temporary role bonds, protected gaps, episode trims, and visual directions.
+They are authoring records, not active overlays; the season manifest remains
+the record of what the current delivered files actually render.
+
+The final CTA copy is recorded separately because its seat is still an
+editorial decision: it may close every weekly episode or only the full-season
+cut. Until that issue is decided, the existing training CTA remains the
+delivered ending.
+
 ## Build interface
 
 `just hive-episode <number>` builds one episode.
@@ -83,4 +97,3 @@ farm-first policy; local fallback remains memory-capped.
 
 The repository stores records, timestamps, generated card assets, and tooling,
 never source footage or delivered video.
-

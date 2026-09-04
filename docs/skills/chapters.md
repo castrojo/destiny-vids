@@ -1,7 +1,7 @@
 ---
 name: chapters
-version: "1.0"
-last_updated: "2026-08-26"
+version: "1.1"
+last_updated: "2026-09-04"
 id: chapters
 one_line_purpose: Author a chapter's on-screen copy in one Markdown file per chapter.
 entry_point: docs/skills/chapters.md
@@ -69,6 +69,13 @@ names are easy to confuse:
 | VII — europa | `chapters/VII-europa.md` | yes |
 | VIII — the cries | `chapters/VIII-cta.md` | yes, `cta_cards` |
 | VIII — fixed credits | `chapters/VIII-fixed.md` | yes, `fixed_cards` |
+
+Standalone series whose builder does not yet consume chapter Markdown stage
+owner-authored passes under `stories/standalone/authoring/<series>/`, one file
+per episode. That directory is the durable copy record, not a render manifest:
+it preserves exact source marks, wording, order, and production directions
+until the series builder gains a chapter adapter. Do not leave a pass in
+session notes, and do not paste it into the generated season manifest.
 
 **Act II is a partial author, and that is the whole difference.** Every word
 anybody *speaks* in it — all 53 pills and both red splashes — is authored in
@@ -190,6 +197,14 @@ train rows using those forms remain literal legacy speakers and are reported by
 `tools/identity.py`; they are not aliases. `- avatar: null` removes a portrait
 that was derived but is not wanted.
 
+**A one-video character bond keeps the real handle visible.** When the owner
+explicitly says a real GitHub speaker is playing a lore character for one
+scene, the pill still names the real login. A character portrait may replace
+the GitHub PFP as presentation chrome only when that bond and the portrait's
+source are recorded beside the cue. Never replace the handle with the
+character name: the audience knows the person and needs the picture to teach
+the temporary role.
+
 When lifting an existing manifest, keep a local authored `avatar` path as a
 local chapter field. Omit a GitHub-derived URL only when the rebuilt entry
 deterministically re-derives that exact portrait through its login. A card or
@@ -293,6 +308,8 @@ into the dialogue. The integration order matters:
 - Seating two pills so they overlap. `tools/plate.py` hard-refuses two
   visible pills at once, so "accept the overlap" is not buildable; re-seat
   an unpinned line instead.
+- Leaving a standalone episode pass in an agent database or transcript after
+  the session. Export it to the series authoring directory before stopping.
 
 ## Verification
 
