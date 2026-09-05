@@ -105,6 +105,10 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
 
 ## What you must not get wrong
 
+- **Report deliverables from the `Hero/` root.** A rough cut or final
+  master the owner is meant to open is promoted (hardlink or copy) to
+  `~/Videos/Wolves/Hero/` and that root path is what you report — never
+  only a hidden `.work-*` path. Owner correction, 2026-09-05.
 - **All hero `ffmpeg` and `ffprobe` work runs in Argo, never locally.** That
   includes probes, audio measurement, extraction, decode checks, and final
   verification—not only production encodes. Local Pillow/OpenCV inspection of
