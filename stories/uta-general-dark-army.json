@@ -14,6 +14,8 @@
     "duration_seconds": 476.621,
     "frame_rate": "24000/1001",
     "frame_count": 11427,
+    "width": 2048,
+    "height": 1152,
     "time_base": "1/1000",
     "audio_sample_rate_hz": 48000,
     "decoded_sample_count": 22877184,
@@ -29,12 +31,8 @@
     }
   },
   "composition": {
-    "_what": "The treatment bar, owner 2026-09-05: artwork ALONGSIDE the official video in a polished designed composition -- the source stays visible in a consistent panel, isolated transparent RAFI/Lakshmi figures and weapons take the complementary space over a layered background derived from the source/art. Not black pillarboxes, not pasted rectangles, not slideshow cuts. Full-screen art is a rare deliberate accent. Direct-camera singer shots and 5:20-5:50 play as clean full-frame source. The timeline itself lands in a later task, built from the returned scene evidence and the storyboard review.",
-    "mode": "side-by-side",
-    "panel": {
-      "side": "left",
-      "alternate_sides": true
-    },
+    "_what": "The treatment bar, owner 2026-09-05 and refined the same day from the attached example frame (review/owner-composition-example-2026-09-05.png: knight and kneeling woman occupy the left third, the right two-thirds are empty shoreline): use each official shot's EXISTING negative space rather than forcing generic split panels. The source frame and its eyelines are preserved; isolated transparent figures/weapons go in the reviewed empty region. Placement is shot-authored from manual scene review, never covers faces or action, and is never a uniform 50/50 crop. Full-screen art is a rare deliberate accent. Direct-camera singer shots and 5:20-5:50 play as clean full-frame source. The timeline itself lands in a later task, built from the returned scene evidence and the storyboard review.",
+    "mode": "negative-space-overlay",
     "background": "derived-layered",
     "transition_frames": {
       "min": 6,
@@ -43,6 +41,18 @@
     "artwork_within_first_seconds": 35,
     "accent_only_fullscreen": true,
     "protect_direct_camera_singer_shots": true,
+    "assets": {
+      "RAFI_01": {"file": "RAFI_01.png"},
+      "RAFI_02": {"file": "RAFI_02.png"},
+      "RAFI_03": {"file": "RAFI_03.png"},
+      "RAFI_04": {"file": "RAFI_04.png"},
+      "RAFI_WEAPONS_01": {"file": "RAFI_WEAPONS_01.png"},
+      "RAFI_WEAPONS_02": {"file": "RAFI_WEAPONS_02.png"},
+      "RAFI_WEAPONS_03": {"file": "RAFI_WEAPONS_03.png"},
+      "RAFI_WEAPONS_04": {"file": "RAFI_WEAPONS_04.png"},
+      "RAFI_WEAPONS_05": {"file": "RAFI_WEAPONS_05.png"},
+      "CHA_LAKSHMI_01": {"file": "CHA_LAKSHMI_01.png"}
+    },
     "protected": [
       {
         "start_seconds": 320,

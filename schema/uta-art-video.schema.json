@@ -40,7 +40,9 @@
         "time_base",
         "audio_sample_rate_hz",
         "decoded_sample_count",
-        "evidence"
+        "evidence",
+        "width",
+        "height"
       ],
       "properties": {
         "_what": {
@@ -121,6 +123,16 @@
             "type": "string"
           },
           "description": "Where each measurement came from: Argo workflow names, manifest paths, and returned-artifact names. A measurement without evidence is a guess, and guesses do not go in this record."
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Authoritative source frame width in pixels from the Argo source probe; overlay boxes are validated against it."
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Authoritative source frame height in pixels from the Argo source probe; overlay boxes are validated against it."
         }
       }
     },
@@ -152,60 +164,22 @@
       "additionalProperties": false,
       "required": [
         "mode",
-        "panel",
         "background",
         "transition_frames",
         "artwork_within_first_seconds",
         "accent_only_fullscreen",
         "protect_direct_camera_singer_shots",
-        "protected"
+        "protected",
+        "assets"
       ],
-      "description": "The montage's visual treatment policy (owner bar, 2026-09-05): artwork ALONGSIDE the official video in a polished designed composition. The source video stays visible, professionally cropped/reframed into a consistent panel; isolated transparent RAFI/Lakshmi figures and weapons occupy the complementary space; the background is a layered treatment derived from the source/art, never black pillarboxes. Not pasted rectangles, not a slideshow.",
+      "description": "The montage's visual treatment policy (owner bar, 2026-09-05, refined same day from the attached example frame review/owner-composition-example-2026-09-05.png): artwork ALONGSIDE the official video by using each shot's EXISTING negative space -- the source frame is preserved and eyelines respected, with isolated transparent RAFI/Lakshmi figures and weapons placed in the reviewed empty region. Shot-authored placement: per-segment anchors and boxes chosen from manual scene review, never a forced generic split panel, never a uniform 50/50 crop, never over faces or action. Not black pillarboxes, not pasted rectangles, not slideshow cuts.",
       "properties": {
         "_what": {
           "type": "string"
         },
         "mode": {
-          "const": "side-by-side",
-          "description": "The primary and default treatment. Full-screen artwork exists only as a deliberate occasional accent (see accent_only_fullscreen), never as the main treatment."
-        },
-        "panel": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "side",
-            "alternate_sides"
-          ],
-          "description": "The consistent region the source video is cropped/reframed into. Numeric geometry lands when the art assets are measured; faces and action stay unobstructed in every composed frame.",
-          "properties": {
-            "side": {
-              "enum": [
-                "left",
-                "right"
-              ],
-              "description": "Default side for the source panel; art takes the complementary side."
-            },
-            "alternate_sides": {
-              "type": "boolean",
-              "description": "Sides may swap per segment when the composition supports it."
-            },
-            "x": {
-              "type": "integer",
-              "minimum": 0
-            },
-            "y": {
-              "type": "integer",
-              "minimum": 0
-            },
-            "width": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "height": {
-              "type": "integer",
-              "minimum": 1
-            }
-          }
+          "const": "negative-space-overlay",
+          "description": "The primary and default treatment: the source frame is preserved (source-preserve mode) and transparent art occupies the shot's reviewed negative space. A deliberate per-segment panel reframe (kind: panel) or a rare full-screen accent remains available, but neither is the default."
         },
         "background": {
           "const": "derived-layered",
@@ -274,7 +248,7 @@
         },
         "timeline": {
           "type": "array",
-          "description": "The composed edit itself, filled by a later task from the reviewed evidence. Each entry picks a treatment kind; side-by-side is the default, accent is rare and deliberate, source-only covers protected and singer intervals.",
+          "description": "The composed edit itself, filled by a later task from the reviewed evidence (scene times, contact sheet, review frames, storyboard). kind overlay is the default: source preserved, art in negative space. panel reframes the source into an explicit region where the shot has no usable negative space. accent is a rare full-screen artwork moment. source-only covers protected and direct-camera singer intervals.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -294,22 +268,103 @@
               },
               "kind": {
                 "enum": [
-                  "side-by-side",
+                  "overlay",
+                  "panel",
                   "accent",
                   "source-only"
                 ]
               },
-              "art_asset": {
+              "overlays": {
+                "type": "array",
+                "minItems": 1,
+                "description": "Art placements for overlay/panel/accent kinds; forbidden on source-only. Each placement is shot-authored from manual scene review.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "art_asset",
+                    "anchor"
+                  ],
+                  "properties": {
+                    "art_asset": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "An id from composition.assets; invented art is rejected."
+                    },
+                    "anchor": {
+                      "enum": [
+                        "left",
+                        "right",
+                        "upper"
+                      ],
+                      "description": "The negative-space region the art occupies, named from manual scene review (for example: subjects in the left third, art anchored right)."
+                    },
+                    "box": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "x",
+                        "y",
+                        "width",
+                        "height"
+                      ],
+                      "description": "The reviewed empty rectangle in SOURCE-frame pixels (2048x1152 space); the picture workflow maps it into the delivery frame. Must never cover faces or action.",
+                      "properties": {
+                        "x": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "y": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "height": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    },
+                    "scale": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1,
+                      "description": "Art height as a fraction of the box height; 1 fills the box."
+                    },
+                    "z_order": {
+                      "type": "integer",
+                      "description": "Stacking order among this segment's overlay layers; higher is closer to the viewer. The derived background layer is always below every overlay."
+                    },
+                    "note": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "assets": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Registry of existing transparent art assets (figure/weapon PNGs) an overlay may name. Every entry is an existing source-backed file in the Hero work directory; new art is never invented. Occasional variety (for example the dinosaur/'chonker' artwork) is added only when a source-backed asset actually exists.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file"
+            ],
+            "properties": {
+              "file": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Transparent figure/weapon asset id for composed kinds."
-              },
-              "side": {
-                "enum": [
-                  "left",
-                  "right"
-                ],
-                "description": "Side of the artwork; the source panel takes the other side."
+                "description": "Asset file inside the Hero work directory's assets/."
               },
               "note": {
                 "type": "string"

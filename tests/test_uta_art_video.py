@@ -234,11 +234,13 @@ def test_build_workflow_writes_the_manifest(edit, tmp_path):
 # --- the composition treatment (owner bar, 2026-09-05) -----------------------
 
 
-def test_primary_treatment_is_side_by_side(edit):
-    """Artwork sits ALONGSIDE the official video; full-screen art is only a
-    deliberate occasional accent, never the main treatment."""
+def test_primary_treatment_is_negative_space_overlay(edit):
+    """Artwork occupies the official shot's existing negative space with the
+    source frame preserved -- shot-authored anchors from manual scene
+    review, never a forced generic split panel or uniform 50/50 crop.
+    Full-screen art stays a deliberate occasional accent."""
     comp = edit["composition"]
-    assert comp["mode"] == "side-by-side"
+    assert comp["mode"] == "negative-space-overlay"
     assert comp["accent_only_fullscreen"] is True
 
 
@@ -286,20 +288,94 @@ def test_validate_edit_rejects_inverted_transition_bounds(edit):
 
 
 def test_timeline_entries_distinguish_treatment_kinds(edit, schema):
-    """The schema can represent per-segment side-by-side, accent, and
-    source-only intervals (the timeline itself lands in a later task)."""
+    """The schema represents per-segment overlay (source-preserved), panel,
+    accent, and source-only intervals (the timeline itself lands in a later
+    task)."""
     doc = copy.deepcopy(edit)
     doc["composition"]["timeline"] = [
-        {"start_seconds": 0, "end_seconds": 12, "kind": "side-by-side",
-         "art_asset": "RAFI_01", "side": "right"},
+        {"start_seconds": 0, "end_seconds": 12, "kind": "overlay",
+         "overlays": [{"art_asset": "RAFI_01", "anchor": "right"}]},
         {"start_seconds": 200, "end_seconds": 204, "kind": "accent",
-         "art_asset": "CHA_LAKSHMI_01"},
+         "overlays": [{"art_asset": "CHA_LAKSHMI_01", "anchor": "right"}]},
         {"start_seconds": 320, "end_seconds": 350, "kind": "source-only"},
     ]
     build.validate_edit(doc)  # must not raise
     doc["composition"]["timeline"][0]["kind"] = "slideshow"
     with pytest.raises(ValueError):
         build.validate_edit(doc)
+
+
+def test_per_segment_overlay_carries_anchor_box_scale_zorder(edit):
+    doc = copy.deepcopy(edit)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay",
+         "overlays": [{
+             "art_asset": "RAFI_02",
+             "anchor": "right",
+             "box": {"x": 700, "y": 250, "width": 1300, "height": 750},
+             "scale": 0.9,
+             "z_order": 1,
+         }]},
+    ]
+    build.validate_edit(doc)  # must not raise
+
+
+def test_overlay_anchor_is_reviewed_vocabulary(edit):
+    doc = copy.deepcopy(edit)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay",
+         "overlays": [{"art_asset": "RAFI_02", "anchor": "middle"}]},
+    ]
+    with pytest.raises(ValueError):
+        build.validate_edit(doc)
+
+
+def test_overlay_assets_must_exist_in_the_registry(edit):
+    """No invented art: an overlay may only name a registered asset."""
+    doc = copy.deepcopy(edit)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay",
+         "overlays": [{"art_asset": "invented-dragon", "anchor": "right"}]},
+    ]
+    with pytest.raises(ValueError, match="invented-dragon"):
+        build.validate_edit(doc)
+
+
+def test_source_only_segments_take_no_overlay(edit):
+    doc = copy.deepcopy(edit)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 320, "end_seconds": 350, "kind": "source-only",
+         "overlays": [{"art_asset": "RAFI_01", "anchor": "right"}]},
+    ]
+    with pytest.raises(ValueError, match="source-only"):
+        build.validate_edit(doc)
+
+
+def test_composed_segments_require_an_overlay(edit):
+    doc = copy.deepcopy(edit)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay"},
+    ]
+    with pytest.raises(ValueError, match="overlay"):
+        build.validate_edit(doc)
+
+
+def test_overlay_boxes_stay_inside_the_source_frame(edit):
+    doc = copy.deepcopy(edit)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay",
+         "overlays": [{
+             "art_asset": "RAFI_01", "anchor": "right",
+             "box": {"x": 1900, "y": 0, "width": 500, "height": 400},
+         }]},
+    ]
+    with pytest.raises(ValueError, match="box"):
+        build.validate_edit(doc)
+
+
+def test_registered_assets_are_existing_files(edit):
+    for asset_id, entry in edit["composition"]["assets"].items():
+        assert entry["file"].endswith(".png"), asset_id
 
 
 # --- the enum mapping ----------------------------------------------------------

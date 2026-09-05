@@ -236,6 +236,39 @@ def validate_edit(doc):
                     f"{iv['start_seconds']}-{iv['end_seconds']}"
                 )
 
+        assets = comp.get("assets", {})
+        frame_w = doc["source"]["width"]
+        frame_h = doc["source"]["height"]
+        for i, seg in enumerate(comp.get("timeline", [])):
+            kind = seg["kind"]
+            overlays = seg.get("overlays", [])
+            where = f"composition/timeline[{i}] ({kind})"
+            if kind == "source-only" and overlays:
+                raise ValueError(
+                    f"{where}: source-only segments take no overlay"
+                )
+            if kind in ("overlay", "panel") and not overlays:
+                raise ValueError(
+                    f"{where}: a composed segment needs at least one overlay"
+                )
+            for j, ov in enumerate(overlays):
+                asset = ov["art_asset"]
+                if asset not in assets:
+                    raise ValueError(
+                        f"{where} overlays[{j}]: art_asset {asset!r} is not in "
+                        f"composition/assets -- new art is never invented"
+                    )
+                box = ov.get("box")
+                if box:
+                    if (box["x"] + box["width"] > frame_w
+                            or box["y"] + box["height"] > frame_h):
+                        raise ValueError(
+                            f"{where} overlays[{j}]: box "
+                            f"{box['x']},{box['y']} "
+                            f"{box['width']}x{box['height']} exceeds the "
+                            f"{frame_w}x{frame_h} source frame"
+                        )
+
 
 def _record_prefix(edit, kind):
     """`uta-general-dark-army-srcreview-v1` style: stable per kind+version."""
