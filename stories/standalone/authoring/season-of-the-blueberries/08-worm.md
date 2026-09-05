@@ -64,11 +64,11 @@ Durations and exact non-overlapping seats remain derived during implementation.
 - Copy: SORROW! I miss Kubernetes get me out of here.
 - Direction: Owner-authored castrojo/Saint-14 line.
 
-## 10:48.00 — `worm-shellea-arithmetic`
+## 10:48.00 — `worm-kgamanji-arithmetic`
 
-- Placement: `nameplate-Swil78`
+- Placement: `nameplate-kgamanji`
 - Copy: I can do basic arithmetic
-- Direction: Nameplate Shellea Williams as herself with this owner-authored title; resolve factual identity through GitHub Swil78.
+- Direction: Nameplate Katie Gamanji as herself with this owner-authored title; resolve factual identity through GitHub kgamanji.
 
 ## 11:02.00 — `worm-dude-money`
 
@@ -145,6 +145,6 @@ Durations and exact non-overlapping seats remain derived during implementation.
 
 ## 12:18.00 — `worm-marketing-help`
 
-- Placement: `chat-Swil78`
+- Placement: `chat-kgamanji`
 - Copy: NBA we need Marketing Help.
-- Direction: Owner-authored Shellea Williams/Swil78 cue. Wording preserved verbatim.
+- Direction: Owner-authored Katie Gamanji/kgamanji cue. Wording preserved verbatim.

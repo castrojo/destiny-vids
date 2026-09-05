@@ -240,7 +240,7 @@ def _identity_records(manifest):
     login for contributor-ledger candidates.
 
     A fixed-cast speaker carries the manifest's verified ``plate.name``
-    (Cortney, Angie Jones, Shellea Williams) -- never the raw login. A
+    (Cortney, Angie Jones, Katie Gamanji) -- never the raw login. A
     ledger-proven speaker keeps the owner's supplied token as its label but
     earns the cached avatar. A handle neither record vouches for renders
     label-only, avatarless -- an avatar is never invented."""

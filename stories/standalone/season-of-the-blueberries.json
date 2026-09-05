@@ -79,17 +79,17 @@
     {
       "id": "eris",
       "character": "Eris Morn",
-      "github_login": "Swil78",
-      "github_id": 98050010,
+      "github_login": "kgamanji",
+      "github_id": 39493134,
       "plate": {
         "label": "TRUSTEE // AUTOMATON",
-        "name": "Shellea Williams",
-        "title": "I'm here for the 2x, I'm THAT good",
+        "name": "Katie Gamanji",
+        "title": "Beautiful on the Inside",
         "variant": "leader",
         "provenance": {
           "copy_source": "owner_authored",
-          "decided_by": "Owner instruction, the 2026-08-29 season decision (docs/superpowers/specs/2026-08-29-season-of-the-blueberries-design.md, 'Identity and casting'): the owner-authored gold plate for Eris Morn.",
-          "name_source": "GitHub REST GET https://api.github.com/users/Swil78 on 2026-08-29 returned the public profile name 'Shellea Williams' (github_id 98050010); GitHub is the required factual source of truth for a contributor's name."
+          "decided_by": "Owner instruction, 2026-09-05: replace Shellea with https://github.com/kgamanji and title the plate Beautiful on the Inside.",
+          "name_source": "GitHub REST GET https://api.github.com/users/kgamanji on 2026-09-05 returned the public profile name 'Katie Gamanji' (github_id 39493134); GitHub is the required factual source of truth for a contributor's name."
         }
       },
       "seats": [
@@ -97,13 +97,13 @@
           "chapter": 1,
           "source_at": 60.0,
           "dur": 4.0,
-          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Shellea Williams plates Eris Morn at source 60.0 for 4.0s in chapter 1 (The Enclave)."
+          "why": "Owner-directed fixed seat from the 2026-09-05 cast correction: Katie Gamanji plates Eris Morn at source 60.0 for 4.0s in chapter 1 (The Enclave)."
         },
         {
           "chapter": 8,
           "source_at": 631.0,
           "dur": 4.0,
-          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Shellea Williams plates Eris Morn at source 631.0 for 4.0s in chapter 8 (Worm)."
+          "why": "Owner-directed fixed seat from the 2026-09-05 cast correction: Katie Gamanji plates Eris Morn at source 631.0 for 4.0s in chapter 8 (Worm)."
         }
       ]
     },

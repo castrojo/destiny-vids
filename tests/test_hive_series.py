@@ -220,11 +220,11 @@ def test_fixed_cast_copy_is_the_owner_authored_copy_verbatim(manifest):
 
     eris = cast["eris"]
     assert eris["character"] == "Eris Morn"
-    assert eris["github_login"] == "Swil78"
+    assert eris["github_login"] == "kgamanji"
     assert {k: v for k, v in eris["plate"].items() if k != "provenance"} == {
         "label": "TRUSTEE // AUTOMATON",
-        "name": "Shellea Williams",
-        "title": "I'm here for the 2x, I'm THAT good",
+        "name": "Katie Gamanji",
+        "title": "Beautiful on the Inside",
         "variant": "leader",
     }
     assert "class" not in eris["plate"], "no invented class row"
@@ -246,14 +246,15 @@ def test_every_fixed_cast_plate_carries_explicit_provenance(manifest):
     recognizes this instead of forcing an empty global binding."""
     expected_names = {
         "ikora": ("angiejones", "Angie Jones"),
-        "eris": ("Swil78", "Shellea Williams"),
+        "eris": ("kgamanji", "Katie Gamanji"),
         "player": ("CortNick", "Cortney"),
     }
     for member in manifest["fixed_cast"]:
         provenance = member["plate"].get("provenance")
         assert provenance, f"{member['id']}: plate has no provenance"
         assert provenance["copy_source"] == "owner_authored"
-        assert "2026-08-29" in provenance["decided_by"]
+        decision_date = "2026-09-05" if member["id"] == "eris" else "2026-08-29"
+        assert decision_date in provenance["decided_by"]
         login, name = expected_names[member["id"]]
         assert member["plate"]["name"] == name
         assert f"/users/{login}" in provenance["name_source"]
@@ -578,7 +579,7 @@ def test_declared_avatar_logins_are_the_fixed_cast(manifest):
     too. Unproven handles (ahmedbehbars, ncode, ...) warm nothing."""
     assert hive_series.declared_avatar_logins(manifest) == [
         "angiejones",
-        "Swil78",
+        "kgamanji",
         "CortNick",
         "castrojo",
     ]
@@ -2680,7 +2681,7 @@ def test_fixed_cast_carries_the_durable_numeric_ids(manifest):
     assert {m["github_login"]: m["github_id"]
             for m in manifest["fixed_cast"]} == {
         "angiejones": 15972783,
-        "Swil78": 98050010,
+        "kgamanji": 39493134,
         "CortNick": 104345443,
     }
 
@@ -2748,7 +2749,7 @@ def test_avatars_workflow_refreshes_the_season_manifest_logins():
 def test_avatars_tool_includes_the_season_logins():
     from tools import avatars
     logins = avatars.season_avatar_logins()
-    assert {"angiejones", "Swil78", "CortNick"} <= set(logins)
+    assert {"angiejones", "kgamanji", "CortNick"} <= set(logins)
 
 # --- the Expansion Pack authoring pass --------------------------------------
 #
@@ -3106,8 +3107,8 @@ def test_fixed_cast_chat_speakers_use_the_verified_plate_name(manifest):
     assert speakers["defeated-components-fail"] == "castrojo"
     assert speakers["defeated-ahmed-sun"] == "ahmedbehbars"
     plan8 = hive_series.episode_plan(manifest, 8)
-    swil = {c["id"]: c["speaker"] for c in plan8["chats"]}
-    assert swil["worm-marketing-help"] == "Shellea Williams"
+    katie = {c["id"]: c["speaker"] for c in plan8["chats"]}
+    assert katie["worm-marketing-help"] == "Katie Gamanji"
 
 
 def test_lore_lanes_never_overlap_and_clamp_deterministically(manifest):
