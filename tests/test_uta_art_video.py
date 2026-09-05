@@ -403,6 +403,105 @@ def test_chonker_variety_is_owner_reviewed(edit):
     assert "trex.webp" not in {a["file"] for a in assets.values()}
 
 
+# --- weapon/component callouts (owner scope, 2026-09-05) ----------------------
+
+def _with_callout(edit, callout):
+    doc = copy.deepcopy(edit)
+    doc["composition"]["callouts"] = {"rafistol-spear": callout}
+    return doc
+
+
+def _sample_callout():
+    return {
+        "copy": {"label": "RAFISTOL SPEAR", "description": "polearms, yeah"},
+        "source": {
+            "sheet": "Cha Design_RAFI.jpg",
+            "crop": {"x": 100, "y": 200, "width": 640, "height": 480},
+            "evidence": "review/callouts/rafistol-spear-crop.png",
+        },
+        "label_box": {"x": 2800, "y": 300, "width": 900, "height": 400},
+        "leader_anchor": {"x": 2400, "y": 900},
+        "font_size": 96,
+        "description_font_size": 56,
+        "usage": "dedicated-hold",
+        "min_hold_seconds": 4.0,
+    }
+
+
+def test_overlay_canvas_is_4k(edit):
+    """3840x2160 is the target overlay canvas; callout coordinates live in
+    that space."""
+    assert edit["composition"]["overlay_canvas"] == {
+        "width": 3840, "height": 2160}
+
+
+def test_a_callout_carries_verbatim_copy_anchor_box_and_font(edit):
+    """The full model: verbatim transcribed copy, source sheet/crop
+    evidence, label box, leader anchor, font sizes, 4K coordinates."""
+    build.validate_edit(_with_callout(edit, _sample_callout()))
+
+
+def test_callout_copy_must_be_transcribed_from_a_source_sheet(edit):
+    """No invented descriptions: a callout without its source sheet and
+    crop is rejected."""
+    bad = _sample_callout()
+    del bad["source"]["sheet"]
+    with pytest.raises(ValueError):
+        build.validate_edit(_with_callout(edit, bad))
+    bad = _sample_callout()
+    del bad["copy"]["label"]
+    with pytest.raises(ValueError):
+        build.validate_edit(_with_callout(edit, bad))
+
+
+def test_callout_usage_is_label_or_dedicated_hold(edit):
+    """Short labels may accompany side-by-side art; long descriptions get
+    dedicated readable holds. Nothing in between."""
+    bad = _sample_callout()
+    bad["usage"] = "wherever"
+    with pytest.raises(ValueError):
+        build.validate_edit(_with_callout(edit, bad))
+
+
+def test_callout_geometry_stays_on_the_4k_canvas(edit):
+    bad = _sample_callout()
+    bad["label_box"] = {"x": 3500, "y": 300, "width": 900, "height": 400}
+    with pytest.raises(ValueError, match="label_box"):
+        build.validate_edit(_with_callout(edit, bad))
+    bad = _sample_callout()
+    bad["leader_anchor"] = {"x": -5, "y": 900}
+    with pytest.raises(ValueError, match="leader_anchor"):
+        build.validate_edit(_with_callout(edit, bad))
+
+
+def test_timeline_segments_may_reference_registered_callouts(edit):
+    doc = _with_callout(edit, _sample_callout())
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 60, "end_seconds": 66, "kind": "overlay",
+         "overlays": [{"art_asset": "RAFI_01", "anchor": "right"}],
+         "callouts": ["rafistol-spear"]},
+    ]
+    build.validate_edit(doc)  # must not raise
+
+
+def test_timeline_rejects_unknown_or_misplaced_callouts(edit):
+    doc = _with_callout(edit, _sample_callout())
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 60, "end_seconds": 66, "kind": "overlay",
+         "overlays": [{"art_asset": "RAFI_01", "anchor": "right"}],
+         "callouts": ["invented-callout"]},
+    ]
+    with pytest.raises(ValueError, match="invented-callout"):
+        build.validate_edit(doc)
+    doc = _with_callout(edit, _sample_callout())
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 320, "end_seconds": 350, "kind": "source-only",
+         "callouts": ["rafistol-spear"]},
+    ]
+    with pytest.raises(ValueError, match="source-only"):
+        build.validate_edit(doc)
+
+
 # --- the enum mapping ----------------------------------------------------------
 
 

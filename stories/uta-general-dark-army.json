@@ -31,7 +31,7 @@
     }
   },
   "composition": {
-    "_what": "The treatment bar, owner 2026-09-05 and refined the same day from the attached example frame (review/owner-composition-example-2026-09-05.png: knight and kneeling woman occupy the left third, the right two-thirds are empty shoreline): use each official shot's EXISTING negative space rather than forcing generic split panels. The source frame and its eyelines are preserved; isolated transparent figures/weapons go in the reviewed empty region. Placement is shot-authored from manual scene review, never covers faces or action, and is never a uniform 50/50 crop. Full-screen art is a rare deliberate accent. Direct-camera singer shots and 5:20-5:50 play as clean full-frame source. Occasional variety comes from the owner-audited chonker library (~/Pictures/Artwork/, staged in assets/): a restrained rotating subset of the owner-named candidates, scaled/styled coherently with the RAFI/Lakshmi figures; trex.webp is excluded (opaque gray background), and no new art is invented. The timeline itself lands in a later task, built from the returned scene evidence and the storyboard review.",
+    "_what": "The treatment bar, owner 2026-09-05 and refined the same day from the attached example frame (review/owner-composition-example-2026-09-05.png: knight and kneeling woman occupy the left third, the right two-thirds are empty shoreline): use each official shot's EXISTING negative space rather than forcing generic split panels. The source frame and its eyelines are preserved; isolated transparent figures/weapons go in the reviewed empty region. Placement is shot-authored from manual scene review, never covers faces or action, and is never a uniform 50/50 crop. Full-screen art is a rare deliberate accent. Direct-camera singer shots and 5:20-5:50 play as clean full-frame source. Occasional variety comes from the owner-audited chonker library (~/Pictures/Artwork/, staged in assets/): a restrained rotating subset of the owner-named candidates, scaled/styled coherently with the RAFI/Lakshmi figures; trex.webp is excluded (opaque gray background), and no new art is invented. Separately authorized 2026-09-05: weapon/component callouts may be reconstructed as NEW clean 3840x2160 transparent overlays (clean typography, leader lines, hierarchy) with wording transcribed VERBATIM from the design sheets -- each callout record carries its source sheet, crop, and evidence; short labels may accompany side-by-side art, long descriptions get dedicated readable holds; they appear only in quiet/instrumental windows and negative space. Transcription lands in a later task. The timeline itself lands in a later task, built from the returned scene evidence and the storyboard review.",
     "mode": "negative-space-overlay",
     "background": "derived-layered",
     "transition_frames": {
@@ -39,6 +39,10 @@
       "max": 12
     },
     "artwork_within_first_seconds": 35,
+    "overlay_canvas": {
+      "width": 3840,
+      "height": 2160
+    },
     "accent_only_fullscreen": true,
     "protect_direct_camera_singer_shots": true,
     "assets": {

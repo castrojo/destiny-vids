@@ -170,7 +170,8 @@
         "accent_only_fullscreen",
         "protect_direct_camera_singer_shots",
         "protected",
-        "assets"
+        "assets",
+        "overlay_canvas"
       ],
       "description": "The montage's visual treatment policy (owner bar, 2026-09-05, refined same day from the attached example frame review/owner-composition-example-2026-09-05.png): artwork ALONGSIDE the official video by using each shot's EXISTING negative space -- the source frame is preserved and eyelines respected, with isolated transparent RAFI/Lakshmi figures and weapons placed in the reviewed empty region. Shot-authored placement: per-segment anchors and boxes chosen from manual scene review, never a forced generic split panel, never a uniform 50/50 crop, never over faces or action. Not black pillarboxes, not pasted rectangles, not slideshow cuts.",
       "properties": {
@@ -346,6 +347,14 @@
               },
               "note": {
                 "type": "string"
+              },
+              "callouts": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Callout ids from composition.callouts shown during this segment. Forbidden on source-only segments."
               }
             }
           }
@@ -365,6 +374,182 @@
                 "type": "string",
                 "minLength": 1,
                 "description": "Asset file inside the Hero work directory's assets/."
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "overlay_canvas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width",
+            "height"
+          ],
+          "description": "The target overlay canvas. Authored overlays (callouts, cards) are built as 3840x2160 transparent RGBA and all their coordinates are in this space; the picture workflow maps source-frame overlay boxes (2048x1152) into it.",
+          "properties": {
+            "width": {
+              "const": 3840
+            },
+            "height": {
+              "const": 2160
+            }
+          }
+        },
+        "callouts": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Weapon/component callout overlays reconstructed as NEW clean 4K transparent RGBA assets from the RAFI/Lakshmi design sheets (owner-authorized reconstruction, 2026-09-05). The reconstruction of the presentation is authorized; the wording is transcribed VERBATIM from the source pictures -- no invented descriptions. Used selectively in visually quiet/instrumental windows and negative space, never over faces, action, protected intervals, or direct-camera singer shots. Short labels may accompany side-by-side art; long descriptions get dedicated readable holds.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "copy",
+              "source",
+              "label_box",
+              "leader_anchor",
+              "font_size",
+              "usage"
+            ],
+            "properties": {
+              "copy": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label"
+                ],
+                "description": "The callout wording, transcribed verbatim from the source design sheet. Never paraphrased, never invented.",
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The short callout label, verbatim from the sheet."
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The long-form description, verbatim from the sheet. Long copy implies usage: dedicated-hold."
+                  }
+                }
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sheet",
+                  "crop"
+                ],
+                "description": "Provenance of the transcription: which design sheet, which crop of it, and where the review evidence lives.",
+                "properties": {
+                  "sheet": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The design sheet file the wording was transcribed from (for example 'Cha Design_RAFI.jpg')."
+                  },
+                  "crop": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "x",
+                      "y",
+                      "width",
+                      "height"
+                    ],
+                    "properties": {
+                      "x": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "y": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "width": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "height": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "description": "The crop rectangle within the sheet, in sheet pixels, that carries the transcribed wording."
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "description": "Path or reference to the crop/review image supporting that the copy is verbatim."
+                  }
+                }
+              },
+              "label_box": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "x",
+                  "y",
+                  "width",
+                  "height"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "y": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "width": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "height": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "description": "Where the label block sits, in 4K overlay-canvas pixels."
+              },
+              "leader_anchor": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "description": "The point the leader line points at, in 4K overlay-canvas pixels.",
+                "properties": {
+                  "x": {
+                    "type": "integer"
+                  },
+                  "y": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "font_size": {
+                "type": "integer",
+                "minimum": 8,
+                "description": "Label size in 4K-canvas pixels."
+              },
+              "description_font_size": {
+                "type": "integer",
+                "minimum": 8,
+                "description": "Long-form size in 4K-canvas pixels; smaller than font_size, establishing the hierarchy."
+              },
+              "usage": {
+                "enum": [
+                  "accompany-art",
+                  "dedicated-hold"
+                ],
+                "description": "accompany-art: a short label riding beside side-by-side art. dedicated-hold: long copy held on a dedicated readable card."
+              },
+              "min_hold_seconds": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "The dedicated readable hold long copy needs; set when the callout is placed."
               },
               "note": {
                 "type": "string"

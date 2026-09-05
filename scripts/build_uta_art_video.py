@@ -268,6 +268,35 @@ def validate_edit(doc):
                             f"{box['width']}x{box['height']} exceeds the "
                             f"{frame_w}x{frame_h} source frame"
                         )
+            callout_ids = comp.get("callouts", {})
+            for cid in seg.get("callouts", []):
+                if kind == "source-only":
+                    raise ValueError(
+                        f"{where}: source-only segments take no callout"
+                    )
+                if cid not in callout_ids:
+                    raise ValueError(
+                        f"{where}: callout {cid!r} is not in "
+                        f"composition/callouts"
+                    )
+
+        canvas = comp.get("overlay_canvas")
+        for cid, callout in comp.get("callouts", {}).items():
+            box = callout["label_box"]
+            if (box["x"] + box["width"] > canvas["width"]
+                    or box["y"] + box["height"] > canvas["height"]):
+                raise ValueError(
+                    f"composition/callouts/{cid}/label_box exceeds the "
+                    f"{canvas['width']}x{canvas['height']} overlay canvas"
+                )
+            anchor = callout["leader_anchor"]
+            if not (0 <= anchor["x"] <= canvas["width"]
+                    and 0 <= anchor["y"] <= canvas["height"]):
+                raise ValueError(
+                    f"composition/callouts/{cid}/leader_anchor "
+                    f"{anchor['x']},{anchor['y']} is off the "
+                    f"{canvas['width']}x{canvas['height']} overlay canvas"
+                )
 
 
 def _record_prefix(edit, kind):
