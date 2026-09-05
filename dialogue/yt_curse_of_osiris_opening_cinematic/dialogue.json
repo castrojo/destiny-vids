@@ -48,8 +48,9 @@
       "end_sec": 48.72,
       "character": "osiris",
       "evidence": "owner_supplied",
-      "text": "Iteration 7: Students serialize instead of parallize",
-      "text_source": "owner_supplied"
+      "text": "Iteration 7: Students serialize instead of parallelize",
+      "text_source": "owner_supplied",
+      "recovered_text": "Iteration 7: Students serialize instead of parallize"
     },
     {
       "id": "d04",
