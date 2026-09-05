@@ -46,9 +46,10 @@ just hive-cards         # regenerate the committed CTA and title slides
 
 The recipes are one line over the CLI; everything else is
 `python3 tools/hive_series.py <check|cards|build|build-all|cut|verify>`.
-`--local` on `build`/`build-all` is the memory-capped escape hatch — the
-default is the farm (`docs/skills/farm.md`), and there is no bare local
-encode anywhere in this path.
+Hive commands are remote-only: no `--local` escape hatch exists. The supplied
+immutable source at `~/Videos/Hive/source-<youtube-id>.mp4` is required; if it
+is absent, stage it through a remote job rather than downloading or muxing it
+on the workstation.
 
 ## What a build does
 
@@ -63,9 +64,11 @@ encode anywhere in this path.
 4. Writes the episode, its title-slide JPEG thumbnail, and the
    `renders/hive/*-unresolved.json` sidecar — the punch list, never a gate.
 
-An episode whose delivered file already exists **and verifies** is kept;
-delete the file to force a rebuild. `cut` verifies all twelve episodes
-before joining them, and the join copies both streams — no re-encode.
+`build` and `build-all` write only `~/Videos/Hive/Season-of-the-Blueberries/rough/`;
+`cut` joins those rough episodes into `season-01-full-rough.mp4`. An explicit
+promotion step copies a locally approved rough and paired thumbnail to the
+top-level release paths. Builds and joins verify their streams on the farm;
+they never use local ffmpeg or ffprobe.
 
 ## Seats and times
 
