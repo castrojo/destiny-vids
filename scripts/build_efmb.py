@@ -202,6 +202,11 @@ BED_TAIL_SEC = None  # derived below, from the remainder
 HALLWAY_CUT_SRC = 323.933
 HALLWAY_FRAME_SRC = 323.933
 HALLWAY_RESUME_SRC = 325.933
+# Film 255.433 is programme 8:59.233 -- the freeze opens "at 8:59", half a
+# second before akgraner's pinned "Hi sugar, I'm looking for Kyle" (8:59.733).
+# The number itself cannot move: the picture before the hallway plays the
+# source continuously, so this seat is wherever film_for_source(HALLWAY_CUT_SRC)
+# lands (asserted in picture_sequence) -- only cutting frames would move it.
 HALLWAY_AT = 255.433
 # The owner moved the external Amber sequence after the complete hallway
 # exchange. The three chapter labels are the clock: `paused` holds the

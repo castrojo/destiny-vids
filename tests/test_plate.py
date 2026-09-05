@@ -1578,6 +1578,37 @@ def test_the_mara_sov_plate_stays_absent_until_kdruckman_authors_one():
     from tools.derive import load_leads
     assert load_leads()["mara_sov"]["plate"] is None
 
+
+def test_karenas_authored_plate_survives_the_recast_on_her_own_record():
+    """Karena's owner-authored copy moved to her person record when Mara Sov
+    was recast; it is reproduced verbatim there, never paraphrased. This is
+    the guard the `mara_sov`-keyed tests used to provide."""
+    import yaml
+    from pathlib import Path
+
+    casting = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "vocab"
+         / "casting.yaml").read_text())
+    spec = casting["people"]["angellk"]["plate"]
+    assert (spec["label"], spec["class"], spec["name"], spec["title"]) == (
+        "ARCHON // CONTRIBUTOR", "Stasis Warlock",
+        "Karena Angell", "Architect of the Consensus"), (
+        "owner-authored for act II, the subclass (#5) supplied; a paraphrase "
+        "is as wrong as an invention")
+    assert spec["variant"] == "leader"   # gold, carried over -- never withdrawn
+    assert spec["wreath"] is True        # the most senior warrior in the series
+
+
+def test_karenas_authored_plate_renders():
+    import yaml
+    from pathlib import Path
+
+    casting = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "vocab"
+         / "casting.yaml").read_text())
+    img = plate.render_plate(casting["people"]["angellk"]["plate"])
+    assert img.width > 0 and img.height > 0
+
 def test_a_lead_plate_renders_without_a_class_row():
     """The standing fallback when no class is authored at all. Synthetic copy:
     Karena's binding carried this shape until the owner authored Stasis (#5),

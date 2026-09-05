@@ -13,7 +13,7 @@ reseat: scripts/build_efmb_plates.py:reseat_chapter_entries
 # Act II — Endless Forms Most Beautiful: conversations
 
 Every chat speaker is either a verified GitHub login or the intentionally
-uncast `TBD` / `[redacted]`. `speaker_pending` records copy whose author named
+uncast `TBD`. `speaker_pending` records copy whose author named
 a voice without evidence for a GitHub identity.
 
 The hallway interruption has three authored blocks: `paused` holds the
@@ -37,6 +37,25 @@ The builder derives those intervals from the records below.
 
 [chat_joseph_slop] jrsapi @ 5:54.233 +2.6: That explains the slop
   - position: null
+
+>> KARENA'S FOUR LINES ARE OUT, AND THIS IS THE ONLY RECORD OF THEM.
+Two authored passes disagree and neither is an agent's to overrule, so the
+copy is written down here rather than seated or lost. #396 removed them as
+"old conflicting windows" and guards the removal with a test; the 2026-08-28
+pass restored them at their pre-removal seats. Verbatim, with the seats that
+pass gave them, on the verified `angellk` identity:
+
+    [chat_karena_job]      6:01.233 +2.6  I love this job
+    [late_karena_cardio]   6:31.300 +2.2  Like cardio!
+    [late_karena_lessons]  6:47.300 +2.2  Hit 'em with your lessons learned
+    [toc_karena]           7:01.333 +3.2  One hundred thousand bootc
+                                          volunteers, ready to power up
+
+Seating them again is not mechanical: `toc_karena` +3.2 from 7:01.333 runs
+to 7:04.533, and `toc_joseph_worth` is pinned at 7:04.477, so one of two
+authored beats has to move for both to play. That is the owner's call.
+OMITTED, NEVER STALE: the act ships without them and this note is the
+punch-list entry. <<
 
 ## 6:12.683
 
@@ -77,7 +96,7 @@ The builder derives those intervals from the records below.
 
 ## 7:23.300
 
-[mapped_kernel_bump] [redacted] @ 7:23.300 +2.2: Time to get this driver upstream
+[mapped_kernel_bump] castrojo @ 7:23.300 +2.2: Time to get this driver upstream
   - seen_at_src: 183.366
 
 ## 7:29.300
@@ -128,13 +147,13 @@ The builder derives those intervals from the records below.
   - position: right
   - seen_at_src: 242.632
 
-[mapped_redacted_unlearning] [redacted] @ 8:25.300 +2.75: Unlearning bad habits takes time
+[mapped_redacted_unlearning] castrojo @ 8:25.300 +2.75: Unlearning bad habits takes time
   - seen_at_src: 290.000
 
-[mapped_redacted_options] [redacted] @ 8:28.300 +2.75: Your options are success
+[mapped_redacted_options] castrojo @ 8:28.300 +2.75: Your options are success
   - seen_at_src: 293.000
 
-[mapped_redacted_mines] [redacted] @ 8:31.500 +3.648: Or a lifetime of servitude in the Toilmaster's Packaging Mines
+[mapped_redacted_mines] castrojo @ 8:31.500 +3.648: Or a lifetime of servitude in the Toilmaster's Packaging Mines
 
 [owner_convo_joseph] jrsapi @ 8:38.417 +3.6: We can't let The Toilmaster enslave another generation
   - seen_at_src: 303.117
@@ -142,7 +161,7 @@ The builder derives those intervals from the records below.
 [mapped_kyle_titanfall] KyleGospo @ 8:43.750 +2.2: FOR TITANFALL!
   - seen_at_src: 308.450
 
-[mapped_redacted_blow] [redacted] @ 8:46.200 +2.6: Or go blow some shit up
+[mapped_redacted_blow] castrojo @ 8:46.200 +2.6: Or go blow some shit up
   - seen_at_src: 310.900
 
 ## 8:59.733 paused
@@ -215,6 +234,14 @@ The builder derives those intervals from the records below.
 ! [mapped_haters] HATERS @ 10:23.601 +5.0 |
   - source_anchor: 326.163
 
+    Source 326.163 is the enemy attack; the shield formation at source
+    331.163 is the heroes and never carries HATERS, so the bar clears there.
+    OPEN, owner 2026-08-28: "I want it until the 'sup' and the closeup on
+    Kyle". Sup is source-anchored to 331.763, which is 0.6 s INSIDE the hero
+    shot, so honouring that phrase literally would put HATERS on the heroes.
+    Which reading is right is a judgement about the frame and is the owner's;
+    the evidenced seat is kept until then.
+
 ## 10:29.201
 
 [mapped_kyle_sup] KyleGospo @ 10:29.201 +2.2: Sup
@@ -229,8 +256,8 @@ The builder derives those intervals from the records below.
 
 ## 10:54.168
 
-[retirement-1] [redacted] @ 10:54.168 +2.2: Finally, retirement
+[retirement-1] castrojo @ 10:54.168 +2.2: Finally, retirement
   - source_anchor: 358.497
 
-[retirement-2] [redacted] @ 10:56.618 +2.2: The long walk beckons
+[retirement-2] castrojo @ 10:56.618 +2.2: The long walk beckons
   - source_anchor: 360.947

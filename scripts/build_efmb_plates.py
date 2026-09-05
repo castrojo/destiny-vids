@@ -140,6 +140,12 @@ OWNER_PASS_OFFSET = 266.5
 TRIO = [
     ("joseph_sandoval", "left", 177.0),
     ("rochaporto", "center", 179.0),
+    # The third arrival the same owner note names -- "3:03 add karena (Angel,
+    # one L)" -- carrying her own person record's plate, wreath and all: she
+    # and Ricardo are the two most senior (vocab/casting.yaml). Keyed by her
+    # verified login `angellk` since the identity migration; the copy is the
+    # same ARCHON // CONTRIBUTOR card, reproduced, never composed.
+    ("angellk", "right", 183.0),
 ]
 
 # --- THE OPENING BLACK-HEAD CARD ------------------------------------------

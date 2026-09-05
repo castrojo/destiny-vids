@@ -115,7 +115,7 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `7:07.43` **rochaporto** — Look man I am so tired just jump
 - `7:13.80` Do we even know who they are?
 - `7:20.47` SATURN
-- `7:23.30` **[redacted]** — Time to get this driver upstream
+- `7:23.30` **castrojo** — Time to get this driver upstream
 - `7:26.30` Nessus of Nobara / NOBARA CONTRIBUTOR / LionHeartP
 - `7:29.30` **pastaq** — All your tests passed right?
 - `7:33.30` **LionHeartP** — What tests?
@@ -135,13 +135,13 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:18.53` Enslaver of Maintainers | Ruiner of User Experience / KERNEL REGRESSION
 - `8:20.30` **pastaq** — Hey man WHAT tests?
 - `8:22.57` **LionHeartP** — Let's go!
-- `8:25.30` **[redacted]** — Unlearning bad habits takes time
-- `8:28.30` **[redacted]** — Your options are success
-- `8:31.50` **[redacted]** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
+- `8:25.30` **castrojo** — Unlearning bad habits takes time
+- `8:28.30` **castrojo** — Your options are success
+- `8:31.50` **castrojo** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
 - `8:38.42` **jrsapi** — We can't let The Toilmaster enslave another generation
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `8:43.75` **KyleGospo** — FOR TITANFALL!
-- `8:46.20` **[redacted]** — Or go blow some shit up
+- `8:46.20` **castrojo** — Or go blow some shit up
 - `8:59.73` **akgraner** — Hi sugar, I'm looking for Kyle
 - `9:02.18` **HikariKnight** — Ouch man wtf!
 - `9:04.63` **TBD** — Oh sorry my bad
@@ -170,15 +170,15 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `10:23.60` Reprehenderit voluptate / HATERS
 - `10:29.20` **KyleGospo** — Sup
 - `10:31.25` **kolunmi** — Cardio!
-- `10:54.17` **[redacted]** — Finally, retirement
-- `10:56.62` **[redacted]** — The long walk beckons
+- `10:54.17` **castrojo** — Finally, retirement
+- `10:56.62` **castrojo** — The long walk beckons
 
 ## III
 
 Edit in `chapters/III-mrbobbytables.md`.
 
-- `14:06.03` Maintainers Reading Emails / Summer 2027
-- `14:14.87` CNCF Projects to Help Your Agents
+- `14:45.96` Maintainers Reading Emails / Summer 2027
+- `14:54.80` CNCF Projects to Help Your Agents
 
 ## IV
 
@@ -199,35 +199,35 @@ Edit in `chapters/IV-kat.md`.
 
 Edit in `chapters/V-nat.md`.
 
-- `17:22.31` **Nat** — Hey these mouth breathers are shooting at me!
-- `17:27.51` **Nat** — I am a Documentation Expert, cease fire!
-- `17:30.01` **Nat** — Goddamn it!
-- `17:31.61` **Nat** — No time to `git push`!
-- `17:33.51` **Nat** — I'm stranded, they'll never find the docs in time!
-- `17:36.11` **Nick** — docs.bazzite.gg
-- `17:37.51` **Kat** — I can hear their screams!
-- `17:39.31` **Nick** — docs.bazzite.gg
-- `17:40.71` **Nat** — Like one hundred thousand voices cried out in terror
-- `17:43.21` **Nick** — docs.bazzite.gg
+- `18:02.24` **Nat** — Hey these mouth breathers are shooting at me!
+- `18:07.44` **Nat** — I am a Documentation Expert, cease fire!
+- `18:09.94` **Nat** — Goddamn it!
+- `18:11.54` **Nat** — No time to `git push`!
+- `18:13.44` **Nat** — I'm stranded, they'll never find the docs in time!
+- `18:16.04` **Nick** — docs.bazzite.gg
+- `18:17.44` **Kat** — I can hear their screams!
+- `18:19.24` **Nick** — docs.bazzite.gg
+- `18:20.64` **Nat** — Like one hundred thousand voices cried out in terror
+- `18:23.14` **Nick** — docs.bazzite.gg
 
 ## VI
 
 Edit in `chapters/VI-wolves.md`.
 
-- `18:50.09` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
-- `23:43.62` **castrojo** — For five years you've trusted us
-- `23:46.78` **castrojo** — Mastered your tools
-- `23:49.94` **castrojo** — Honed your craft
-- `23:53.10` **castrojo** — Depended on your friends
-- `23:56.26` **castrojo** — Now you're one of us, you are the dream
-- `23:59.41` Protector of the Helm / #HIREAWOLF // MAINTAINER / robertsirc
-- `24:08.89` **castrojo** — I follow my mentors of the past
-- `24:21.52` **castrojo** — Present
-- `24:24.68` **castrojo** — and Future
-- `24:27.84` **castrojo** — The only winning move is not to play
-- `24:30.99` **castrojo** — Think like a dinosaur
-- `24:34.15` **castrojo** — When you fall, rise.
-- `24:37.31` **castrojo** — We've got your back
+- `19:30.03` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
+- `24:23.56` **castrojo** — For five years you've trusted us
+- `24:26.72` **castrojo** — Mastered your tools
+- `24:29.87` **castrojo** — Honed your craft
+- `24:33.03` **castrojo** — Depended on your friends
+- `24:36.19` **castrojo** — Now you're one of us, you are the dream
+- `24:39.35` Protector of the Helm / #HIREAWOLF // MAINTAINER / robertsirc
+- `24:48.82` **castrojo** — I follow my mentors of the past
+- `25:01.45` **castrojo** — Present
+- `25:04.61` **castrojo** — and Future
+- `25:07.77` **castrojo** — The only winning move is not to play
+- `25:10.93` **castrojo** — Think like a dinosaur
+- `25:14.08` **castrojo** — When you fall, rise.
+- `25:17.24` **castrojo** — We've got your back
 
 ## P4
 

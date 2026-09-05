@@ -141,7 +141,7 @@
     {
       "id": "trio_joseph_sandoval",
       "at": 55.433,
-      "dur": 6.0,
+      "dur": 10.0,
       "position": "left",
       "scale": 0.62,
       "group": "trio_row",
@@ -158,7 +158,7 @@
     {
       "id": "trio_rochaporto",
       "at": 57.433,
-      "dur": 4.0,
+      "dur": 8.0,
       "position": "center",
       "scale": 0.62,
       "group": "trio_row",
@@ -172,6 +172,25 @@
       "wreath": true,
       "avatar": "renders/avatars/rochaporto.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/52753?v=4"
+    },
+    {
+      "id": "trio_angellk",
+      "at": 61.433,
+      "dur": 4.0,
+      "position": "right",
+      "scale": 0.62,
+      "group": "trio_row",
+      "order": 2,
+      "copy_source": "casting",
+      "seen_at_src": 72.0,
+      "label": "ARCHON // CONTRIBUTOR",
+      "class": "Stasis Warlock",
+      "name": "Karena Angell",
+      "title": "Architect of the Consensus",
+      "variant": "leader",
+      "wreath": true,
+      "avatar": "renders/avatars/angellk.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/836183?v=4"
     },
     {
       "id": "chat_joseph_slop",
@@ -1747,10 +1766,12 @@
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
-      "speaker": "[redacted]",
+      "speaker": "castrojo",
       "text": "Time to get this driver upstream",
       "text_source": "owner_supplied",
-      "seen_at_src": 183.366
+      "seen_at_src": 183.366,
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
     },
     {
       "id": "walk_lionheartp",
@@ -2017,10 +2038,12 @@
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
-      "speaker": "[redacted]",
+      "speaker": "castrojo",
       "text": "Unlearning bad habits takes time",
       "text_source": "owner_supplied",
-      "seen_at_src": 290.0
+      "seen_at_src": 290.0,
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
     },
     {
       "id": "mapped_redacted_options",
@@ -2029,10 +2052,12 @@
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
-      "speaker": "[redacted]",
+      "speaker": "castrojo",
       "text": "Your options are success",
       "text_source": "owner_supplied",
-      "seen_at_src": 293.0
+      "seen_at_src": 293.0,
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
     },
     {
       "id": "mapped_redacted_mines",
@@ -2041,9 +2066,11 @@
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
-      "speaker": "[redacted]",
+      "speaker": "castrojo",
       "text": "Or a lifetime of servitude in the Toilmaster's Packaging Mines",
-      "text_source": "owner_supplied"
+      "text_source": "owner_supplied",
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
     },
     {
       "id": "owner_convo_joseph",
@@ -2090,10 +2117,12 @@
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
-      "speaker": "[redacted]",
+      "speaker": "castrojo",
       "text": "Or go blow some shit up",
       "text_source": "owner_supplied",
-      "seen_at_src": 310.9
+      "seen_at_src": 310.9,
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
     },
     {
       "id": "mapped_akgraner_kyle",
@@ -2493,10 +2522,12 @@
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
-      "speaker": "[redacted]",
+      "speaker": "castrojo",
       "text": "Finally, retirement",
       "text_source": "owner_supplied",
-      "seen_at_src": 358.497
+      "seen_at_src": 358.497,
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
     },
     {
       "id": "retirement-2",
@@ -2505,10 +2536,12 @@
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
-      "speaker": "[redacted]",
+      "speaker": "castrojo",
       "text": "The long walk beckons",
       "text_source": "owner_supplied",
-      "seen_at_src": 360.947
+      "seen_at_src": 360.947,
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
     }
   ],
   "unresolved": [

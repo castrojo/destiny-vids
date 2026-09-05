@@ -8,6 +8,9 @@ people:
       avatar: https://avatars.githubusercontent.com/u/2557889?v=4
   angellk:
     github_id: 836183
+    # The wreath had no portrait to ring until the owner supplied her login
+    # (2026-08-24). The URL is derived from the verified `github_id` above,
+    # exactly as every other person record's is -- never a guessed login.
     plate:
       label: ARCHON // CONTRIBUTOR
       class: Stasis Warlock
@@ -15,6 +18,7 @@ people:
       title: Architect of the Consensus
       variant: leader
       wreath: true
+      avatar: https://avatars.githubusercontent.com/u/836183?v=4
   akgraner:
     github_id: 6200805
     plate:

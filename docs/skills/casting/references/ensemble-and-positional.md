@@ -31,6 +31,10 @@ rotation approximate one — it would put a real person's name on whichever body
 the seed happened to land on, which is rule 3 broken by machinery rather than by
 guessing.
 
+For act II, `mara_sov` is only the Destiny character key used to locate the
+owner-authored plate. The person-facing identity is the verified GitHub login
+`angellk`; do not create or credit a separate Mara Sov persona.
+
 **Positional casting is authored, once, in a per-cut builder** that emits a
 plate manifest. `scripts/build_efmb_plates.py` is the worked example: the
 person→shot bindings are the only hand-written thing in it, the copy is read

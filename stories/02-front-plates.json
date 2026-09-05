@@ -1,0 +1,45 @@
+{
+  "_what": "Act II's FRONT section: the cards that play before 'Eons later'. Order and copy are the owner's, 2026-08-28: 'start with a title card ... then the platform wars slide, then the titanfall one, then the Eons later'. The fish/evolution clip between the title card and Platform Wars is Perfume movement 2 (stories/00-perfume-thread.json), picture; it carries no card. Seats: title 0 -> 4.0, clip 4.0 -> 70.4, Platform Wars 70.4 -> 74.4, Titanfall 74.4 -> 76.6, then the act's existing head begins. The clip's audio treatment (fade in 6.2, -4.0 dB, 4.0 s crescendo to unity) is the megacut plan's own, replayed inside the act.",
+  "_version": "1 -- 2026-08-28, first seating",
+  "act": "II",
+  "plates": [
+    {
+      "id": "front_title",
+      "kind": "act",
+      "at": 0.0,
+      "dur": 4.0,
+      "position": "full",
+      "label": "The Dawn of Linux",
+      "title": "Cloud Native finds the Gamers",
+      "subtitle": "Yours to Shape",
+      "copy_source": "owner_supplied",
+      "note": "Owner, 2026-08-28, verbatim: 'Eyebrow: The Dawn of Linux / Title: A World Shaped by Imagination / subtitle: Yours to Shape', then 'make it all Cloud Native finds the Gamers' -- the title row is the later instruction; eyebrow and subtitle are the earlier ones. The act slide's `label` row is the eyebrow seat (it renders above the title, as on the site's transition cards)."
+    },
+    {
+      "id": "front_platform_wars",
+      "kind": "act",
+      "at": 70.4,
+      "dur": 4.0,
+      "position": "full",
+      "title": "The Platform Wars",
+      "subtitle": "2015-2019",
+      "body": [
+        "Guardians Deliver the Final Blow",
+        "to Legacy Infrastructure"
+      ],
+      "copy_source": "owner_supplied",
+      "note": "Act I's tail card, verbatim (stories/megacut/megacut-hero-plates.json, id platform-wars), replayed here on the owner's instruction. Note the order is HIS: Platform Wars first, Titanfall second -- act I plays them the other way round."
+    },
+    {
+      "id": "front_titanfall",
+      "kind": "warning",
+      "at": 74.4,
+      "dur": 2.2,
+      "position": "warning",
+      "text": "[ PREPARE FOR TITANFALL ]",
+      "copy_source": "owner_supplied",
+      "note": "Act I's deployment warning, verbatim (same file, id act-i-warning). It hands straight to 'Eons later' at 76.6, the existing head -- whose timing, and everything after it, is untouched: the front is prepended, never rebased."
+    }
+  ],
+  "unresolved": []
+}

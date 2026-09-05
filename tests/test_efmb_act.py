@@ -169,7 +169,7 @@ def all_plates():
 def test_the_saved_owner_prompt_is_normalized_without_rescue_tail():
     """The saved prompt outranks the stale rescue conversation."""
     expected = {
-        "mapped_kernel_bump": ("[redacted]", "Time to get this driver upstream"),
+        "mapped_kernel_bump": ("castrojo", "Time to get this driver upstream"),
         "mapped_a1rmax_intro": (
             "A1RM4X", "Thank you I never thought I could help!"),
         "mapped_a1rmax_intro_2": (
@@ -588,6 +588,31 @@ def test_the_mapped_walk_lines_follow_the_widened_a1rm4x_pair():
         + by_id["mapped_wrkode_dibs"]["dur"]
         + build_efmb_plates.PLATE_GAP)
 
+def test_the_mapped_walk_lines_clear_the_overlap_without_moving_the_next_beat():
+    """The reply moves clear of A1RM4X; the next Eggroll beat stays pinned."""
+    walk = walk_plates()
+    assert walk["walk_ge_stream"]["at"] == pytest.approx(180.531, abs=1e-3)
+    assert walk["walk_ge_glorious"]["at"] == pytest.approx(188.381, abs=1e-3)
+
+
+def test_karena_and_joseph_use_their_verified_github_identities():
+    """Both are credited through their verified accounts, so a portrait can
+    never resolve to a same-named stranger. Karena's four chat pills are out
+    of the act (see the note in chapters/II-endless-forms.md), so her arrival
+    card is where her identity is asserted."""
+    by_id = {p["id"]: p for p in committed()["plates"]}
+
+    assert by_id["trio_angellk"]["name"] == "Karena Angell"
+    assert by_id["trio_angellk"]["avatar_url"] == \
+        "https://avatars.githubusercontent.com/u/836183?v=4"
+
+    for plate_id in (
+            "chat_joseph_ricardos", "chat_joseph_slop", "toc_joseph_worth"):
+        assert by_id[plate_id]["speaker"] == "jrsapi"
+        assert by_id[plate_id]["avatar_url"] == \
+            "https://avatars.githubusercontent.com/u/5437766?v=4"
+
+
 def test_the_villain_arrives_with_the_villain():
     """The bar is on the shot the winged figure walks out of, not on the
     owner's 5:35 -- his mark is 0.9s before the cut, and a card that names
@@ -723,7 +748,7 @@ def test_the_normalized_pause_copy_is_emitted_verbatim():
     by_id = {p["id"]: p for p in committed()["plates"]}
 
     expected = {
-        "mapped_redacted_blow": ("[redacted]", "Or go blow some shit up"),
+        "mapped_redacted_blow": ("castrojo", "Or go blow some shit up"),
         "mapped_akgraner_kyle": ("akgraner", "Hi sugar, I'm looking for Kyle"),
         "mapped_kyle_sup": ("KyleGospo", "Sup"),
         "chat_angellk_pvp": (
@@ -806,7 +831,7 @@ def test_the_post_walk_dialogue_is_replaced_by_the_mapped_pass():
         "You didn't test any of this did you.")
     assert by_id["mapped_pastaq_what_tests"]["at"] == pytest.approx(216.5, abs=1e-3)
     assert by_id["mapped_pastaq_what_tests"]["text"] == "Hey man WHAT tests?"
-    assert by_id["mapped_redacted_unlearning"]["speaker"] == "[redacted]"
+    assert by_id["mapped_redacted_unlearning"]["speaker"] == "castrojo"
     assert by_id["mapped_redacted_unlearning"]["at"] == pytest.approx(221.5, abs=1e-3)
     # Split in two by the owner, 2026-08-23, inside the old pill's own span.
     assert by_id["mapped_redacted_options"]["text"] == "Your options are success"
@@ -962,7 +987,7 @@ def test_the_retirement_conversation_moved_here_verbatim_from_act_three():
     by_id = {p["id"]: p for p in committed()["plates"]}
     pair = [by_id["retirement-1"], by_id["retirement-2"]]
     assert [p["kind"] for p in pair] == ["chat", "chat"]
-    assert [p["speaker"] for p in pair] == ["[redacted]", "[redacted]"]
+    assert [p["speaker"] for p in pair] == ["castrojo", "castrojo"]
     assert [p["text"] for p in pair] == ["Finally, retirement",
                                          "The long walk beckons"]
     assert pair[0]["at"] == pytest.approx(
@@ -970,7 +995,11 @@ def test_the_retirement_conversation_moved_here_verbatim_from_act_three():
     assert pair[1]["at"] == pytest.approx(
         build_efmb.edited_film_for_source(360.947), abs=1e-3)
     assert [p["dur"] for p in pair] == pytest.approx([2.2, 2.2], abs=1e-3)
-    assert all(not p.get("avatar") for p in pair)
+    # Unredacted 2026-08-28 ("no need to redact cayde anymore go with
+    # castrojo"), so both pills now carry his verified portrait. While the
+    # redaction held they carried the drawn crest and credited nobody.
+    assert all(p.get("avatar") == "renders/avatars/castrojo.png"
+               for p in pair)
 
 def test_the_owner_conversation_hands_to_kyle_without_overlap():
     by_id = {p["id"]: p for p in committed()["plates"]}
@@ -1049,7 +1078,7 @@ def test_the_828_redacted_line_replaces_the_old_gaslighting_seat():
     by_id = {p["id"]: p for p in committed()["plates"]}
     clue = by_id["mapped_redacted_blow"]
     assert clue["at"] == pytest.approx(242.4, abs=1e-3)
-    assert clue["speaker"] == "[redacted]"
+    assert clue["speaker"] == "castrojo"
     assert clue["text"] == "Or go blow some shit up"
     assert "timed_jorge" not in by_id
 
@@ -1108,7 +1137,11 @@ def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
         # Recast by the owner, 2026-08-23: GloriousEggroll -> lionheartp.
         "mapped_eggroll_title": (
             "LionHeartP", "renders/avatars/LionHeartP.png"),
-        "mapped_redacted_options": ("[redacted]", None),
+        # Unredacted 2026-08-28 on the owner's instruction ("no need to
+        # redact cayde anymore go with castrojo"), so the pill now carries
+        # his verified portrait instead of the drawn crest.
+        "mapped_redacted_options": (
+            "castrojo", "renders/avatars/castrojo.png"),
         "mapped_akgraner_kindness_1": (
             "akgraner", "renders/avatars/akgraner.png"),
     }
