@@ -77,6 +77,23 @@ That panel is one scene with these fixed behaviours:
   reveals it, as a small posted thumbnail rather than a cutaway or interstitial;
 - the panel fades out before the next full-frame card or CTA.
 
+### One-video role bonds
+
+A chat scene may deliberately pair a real GitHub handle with a lore-character
+portrait when the owner explicitly casts that person for the scene. This is
+presentation, not a new global casting binding:
+
+- `speaker` remains the verified GitHub login;
+- the character portrait is chrome and records its asset/provenance;
+- the cue records the one-video character key that explains the portrait;
+- no character-name row is added to the pill;
+- the association never propagates to another episode or to
+  `vocab/casting.yaml` unless the owner separately makes a permanent binding.
+
+If either the login or portrait provenance cannot be verified, keep the real
+handle with its GitHub PFP and record the missing role portrait. A familiar
+character image is never permission to guess which real person it represents.
+
 Do not extend the battle and keep drawing pills over a held frame merely
 because the conversation needs more reading time. The owner's transition is
 content: **battle → fade → full-screen chat → CTA**. Give the chat its own
