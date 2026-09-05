@@ -1,8 +1,8 @@
 ---
 act: P4
 manifest: stories/00-perfume-4-plates.json
-# Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-25. The programme item-duration rule is authoritative.
-programme_start: 1471.494
+# Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-27: Excision starts at 1450.294 and movement 4 starts at 1602.796. The programme item-duration rule is authoritative.
+programme_start: 1602.796
 owns_plates: true
 field_order: id, kind, position, speaker, avatar, avatar_url, text, copy_source, at, dur, fade_in, fade_out_at, fade_out
 defaults:
@@ -38,18 +38,18 @@ python3 tools/chapter_md.py show P4
 python3 tools/chapter_md.py check P4
 ```
 
-## 25:25.445
+## 27:36.747
 
-[chat_loose_end] JillCastro @ 25:25.445 +2.2: One more loose end
+[chat_loose_end] JillCastro @ 27:36.747 +2.2: One more loose end
 
-[chat_escape] valerie-tar-gz @ 25:27.745 +2.2: You can't escape yourself
+[chat_escape] valerie-tar-gz @ 27:39.047 +2.2: You can't escape yourself
 
-[chat_promised] rafaelcastro10 @ 25:30.045 +2.2: You promised
+[chat_promised] rafaelcastro10 @ 27:41.347 +2.2: You promised
 
-[chat_fine] castrojo @ 25:32.345 +2.2: Fine
+[chat_fine] castrojo @ 27:43.647 +2.2: Fine
 
-[chat_minds] LionHeartP @ 25:34.645 +2.2: Show them the minds
+[chat_minds] LionHeartP @ 27:45.947 +2.2: Show them the minds
 
-[chat_wolves] valerie-tar-gz @ 25:36.945 +3.0: Of the wolves
+[chat_wolves] valerie-tar-gz @ 27:48.247 +3.0: Of the wolves
 
-[chat_wolf] rafaelcastro10 @ 24:48.657 +3.0: What's a wolf?
+[chat_wolf] rafaelcastro10 @ 26:59.959 +3.0: What's a wolf?

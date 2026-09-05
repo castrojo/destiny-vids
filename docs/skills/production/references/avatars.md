@@ -28,6 +28,13 @@ back with `gh run download`. The artifact name is `tools.avatars.ARTIFACT`,
 asserted against the workflow by `tests/test_avatars.py` so the upload and the
 download cannot drift.
 
+Standalone chat builds consume the same cache. Before the offline plate
+renderer runs, `tools/standalone.py` refreshes only the GitHub avatars declared
+by that video's overlays. If a face is still unavailable, the crest fallback
+ships and the missing declared PFP is written to the video's `unresolved`
+sidecar, so verification cannot mistake a vanished worktree cache for an
+intentional no-PFP design.
+
 It runs on `workflow_dispatch` and on a push that touches
 `stories/08-credits.json`, `vocab/casting.yaml` or `tools/avatars.py` — the
 three files that decide which logins exist. Nothing is scheduled, because

@@ -23,9 +23,12 @@ def casting():
 
 
 def test_character_resolves_to_its_assigned_github_person():
-    assert person_for_character("mara_sov").login == "angellk"
+    assert person_for_character("mara_sov").login == "kdruckman"
     assert person_for_character("the_speaker").login == "jbryce"
     assert person_for_character("variks").login == "nate-double-u"
+    fynch = person_for_character("fynch")
+    assert fynch.login == "idvoretskyi"
+    assert fynch.github_id == 118459
 
 
 def test_login_spelling_is_canonical_but_display_names_are_not_aliases():

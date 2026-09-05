@@ -65,12 +65,13 @@ python3 tools/redact.py --video media/<video_id>.mp4 --video-id <video_id> \
     --audio media/<bed>.mp3 --audio-gain 0.9 --out base.mp4
 ```
 
-`redact.py` paints out the burned-in publisher copy an upload carries — the
-ratings card at the head, the logo lockup and legal line at the tail — from
-boxes authored in `redactions/<video_id>.json` against source pixels. On a cut
-those frames are simply `burned_text` and get dropped; uncut, there is nothing
-to drop them *for*, so they are covered instead. A redaction only ever removes:
-it never paints anything the frame did not already have to say.
+`redact.py` paints out non-diegetic burned-in copy an upload carries — publisher
+cards, logo/legal lockups, or a static subtitle rail wholly inside a black
+matte — from boxes authored in `redactions/<video_id>.json` against source
+pixels. On a cut those frames are normally `burned_text` and get dropped; when
+the picture itself is needed, an acknowledged redaction may remove only the
+copy. A redaction only ever removes: it never paints anything the frame did not
+already have to say.
 
 Two things follow, and both bite:
 
@@ -100,6 +101,7 @@ Two things follow, and both bite:
 | "The act is short, I'll loop the pool / start the run earlier to fill it." | That is not filling, it is choosing footage blind. It is how 25 shots got replayed and how a Savathûn montage entered a no-Savathûn film. Name the extra source and assert the boundary. |
 | "The replacement is already built, so keep its dissolve." | If the native source fills the exact slot, remove the obsolete transition and play the native frames; do not preserve a vestigial handoff just because it already renders. |
 | "The pause is in the right place but feels wrong, so I'll move it." | Position and length are separate faults. Measure the insert's phrase and fix the out-point first. |
+| "I moved the excision out-point to the requested opening line, so the splice is fixed." | A splice has two kept edges. Read or listen to the last words before the excision too: if the unwanted phrase begins there, moving only the out-point preserves its opening immediately before the new line. |
 | "I'll just cut the bits we don't want, then judge the timing." | You have thrown away the thing you were going to judge. Black them out in place at their exact duration first — a timing pass keeps every later anchor where it will actually land. |
 | "Duck the song under the action beat, it's simpler than pausing." | A −6.8 LUFS master has to drop ~18 dB to sit under anything, which is a stop with mud on top. Pause it, and put the seam in a gap the artist already left. |
 | "The card is just black with text, I'll drop it." | Dropping it shortens the film and loses the rhythm the trailer had. Replace it with artwork; the slot is the point. |

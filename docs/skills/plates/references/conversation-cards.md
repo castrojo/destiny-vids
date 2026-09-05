@@ -57,6 +57,48 @@ skill forbids. Both of its fields are recovered, never authored here:
   source timecodes, the recovery method, and per-line `evidence` for who is
   speaking. Fix a wrong line **there**, not in a render.
 
+### Pills over picture versus a full-screen chat scene
+
+A short line spoken during picture uses the normal lower-third or letterbox
+pill. A multi-speaker exchange that begins **after the scene is over** does
+not: fade the picture out, then play the dedicated full-screen transmission
+panel established by the Cayde video.
+
+That panel is one scene with these fixed behaviours:
+
+- 1920×1080 dark Bluefin transmission chrome;
+- three messages visible at a time;
+- the stack scrolls one row when the fourth and later messages arrive;
+- each known GitHub login resolves through `tools.identity.chat_identity`, so
+  the canonical handle and cached PFP travel together;
+- a speaker with no recorded account uses the drawn crest, never a guessed
+  portrait;
+- an owner-requested media attachment appears only with the exact message that
+  reveals it, as a small posted thumbnail rather than a cutaway or interstitial;
+- the panel fades out before the next full-frame card or CTA.
+
+### One-video role bonds
+
+A chat scene may deliberately pair a real GitHub handle with a lore-character
+portrait when the owner explicitly casts that person for the scene. This is
+presentation, not a new global casting binding:
+
+- `speaker` remains the verified GitHub login;
+- the character portrait is chrome and records its asset/provenance;
+- the cue records the one-video character key that explains the portrait;
+- no character-name row is added to the pill;
+- the association never propagates to another episode or to
+  `vocab/casting.yaml` unless the owner separately makes a permanent binding.
+
+If either the login or portrait provenance cannot be verified, keep the real
+handle with its GitHub PFP and record the missing role portrait. A familiar
+character image is never permission to guess which real person it represents.
+
+Do not extend the battle and keep drawing pills over a held frame merely
+because the conversation needs more reading time. The owner's transition is
+content: **battle → fade → full-screen chat → CTA**. Give the chat its own
+clock and let its scrolling viewport carry the longer exchange.
+
 Owner-authored act conversations are moving to one Markdown file per
 chapter, `chapters/<act>.md` — see [`../../chapters.md`](../../chapters.md),
 whose table says which acts are migrated and where the rest of the copy

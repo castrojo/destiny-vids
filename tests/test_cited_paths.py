@@ -79,6 +79,17 @@ ALLOWED_MISSING.update({
     "docs/skills/wrong.md": _PLAN + " (a worked counterexample)",
 })
 
+# The Season of the Blueberries plan names Task 1's deliverables, which live
+# in the sibling repository projectbluefin/hive-lore (the season's lore
+# supplier), not here. The citations name where the files ARE.
+_SIBLING = ("a Task 1 deliverable in the sibling repo projectbluefin/"
+            "hive-lore, cited by the 2026-08-29 season plan as its location")
+ALLOWED_MISSING.update({
+    "tools/titles.py": _SIBLING,
+    "tests/test_titles.py": _SIBLING,
+    "vocab/season-one.yaml": _SIBLING,
+})
+
 
 def _searched_files():
     seen = []
