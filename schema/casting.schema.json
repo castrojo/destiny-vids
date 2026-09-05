@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["people", "leads", "ensemble"],
+  "properties": {
+    "people": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/person" },
+      "propertyNames": { "$ref": "#/$defs/login" }
+    },
+    "legacy_cast_logins": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/login" }
+    },
+    "leads": {
+      "type": "object",
+      "required": ["values"],
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/binding" }
+        }
+      }
+    },
+    "ensemble": { "type": "object" }
+  },
+  "$defs": {
+    "login": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$"
+    },
+    "person": {
+      "type": "object",
+      "required": ["github_id"],
+      "properties": {
+        "github_id": { "type": "integer", "minimum": 1 },
+        "plate": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "binding": {
+      "type": "object",
+      "required": ["person", "aka"],
+      "properties": {
+        "person": { "anyOf": [{ "$ref": "#/$defs/login" }, { "type": "null" }] },
+        "aka": { "type": "array", "items": { "type": "string" } },
+        "constraints": { "type": "object" },
+        "note": { "type": "string" },
+        "redacts": { "type": "string" },
+        "redaction_scope": { "type": "string" },
+        "depiction": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

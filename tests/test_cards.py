@@ -79,6 +79,8 @@ def test_render_all_skips_cards_instead_of_drawing_them(tmp_path):
     """One plates-dir, two renderers: the Python one leaves the cards alone."""
     entries = [
         {"id": "act1", "kind": "act", "at": 0.0, "dur": 5.0, "act": "I"},
+        {"id": "ending", "kind": "ending", "at": 5.0, "dur": 5.0,
+         "text": "A million loves"},
         {"id": "kat", "at": 10.0, "dur": 5.0, "position": "left",
          "label": "MAINTAINER // GUARDIAN", "class": "Sentinel Titan",
          "name": "Kat Cosgrove", "title": "Defender Queen of the Lost"},

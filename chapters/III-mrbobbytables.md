@@ -1,15 +1,8 @@
 ---
 act: III
 manifest: stories/yt_curse_of_osiris_opening_cinematic-fixed-plates.json
-# WHERE THIS ACT STARTS IN THE PROGRAMME, in seconds. Measured, not guessed:
-# the running order's segment durations summed from a
-# `tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-21 --
-# prologue 101.200 (megacut.json item 0 `dur`) + act I 116.200 + Perfume
-# movement 2 66.400 + act II 364.068 = 647.868.
-# (act II grew 4.100 on 2026-08-24, when its hallway pause was extended to
-# carry the cortney exchange; 359.968 -> 364.068.)
-# Restate the derivation when the running order moves.
-programme_start: 647.868
+# Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-25. The programme item-duration rule is authoritative.
+programme_start: 695.067
 # This act's fixed plates come from this file, so the manifest is regenerated
 # from it: `python3 tools/chapter_md.py sync III --write`.
 owns_plates: true
@@ -50,9 +43,9 @@ purpose, revealed in act VI. (This file's title keeps "the long walk" as
 authored; renaming it is the owner's call, flagged in the change that moved
 the lines.)
 
-## 13:18.828
+## 14:06.027
 
-* [maintainer-emails] title @ 13:18.828 +4.0
+* [maintainer-emails] title @ 14:06.027 +4.0
   - position: top-right
   - copy_source: owner_supplied
   - title: Maintainers Reading Emails
@@ -68,9 +61,9 @@ nameplates are.
 The sign over the maintainer-email beat sits in the picture's upper-right safe
 area rather than the lower third, so it does not collide with the pills below.
 
-## 13:27.668
+## 14:14.867
 
-* [cncf-wall] logowall @ 13:27.668 +8.0
+* [cncf-wall] logowall @ 14:14.867 +8.0
   - title: CNCF Projects to Help Your Agents
   - footer: landscape.cncf.io
 
@@ -108,9 +101,9 @@ python3 scripts/build_intermission.py --write     # regenerate the manifest
 python3 scripts/build_intermission.py --render    # and the film
 ```
 
-## 15:22.916 intermission
+## 16:18.515 intermission
 
-* [intermission-1] slide @ 15:22.916 +6.0
+* [intermission-1] slide @ 16:18.515 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Lorem ipsum
@@ -118,7 +111,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Dolor sit amet consectetur adipiscing elit
   - title_source: placeholder
 
-* [intermission-2] slide @ 15:29.716 +6.0
+* [intermission-2] slide @ 16:25.315 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Sed do eiusmod
@@ -126,7 +119,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Tempor incididunt ut labore et dolore magna
   - title_source: placeholder
 
-* [intermission-3] slide @ 15:36.516 +6.0
+* [intermission-3] slide @ 16:32.115 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Ut enim ad minim
@@ -134,7 +127,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Veniam quis nostrud exercitation ullamco laboris
   - title_source: placeholder
 
-* [intermission-4] slide @ 15:43.316 +6.0
+* [intermission-4] slide @ 16:38.915 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Duis aute irure

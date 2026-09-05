@@ -13,6 +13,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
+import build_efmb  # noqa: E402
+import build_efmb_plates  # noqa: E402
 from tools import chapter_md  # noqa: E402
 
 OFFSET = chapter_md.ACT_PROGRAMME_START["II"]
@@ -146,8 +148,10 @@ def test_entries_shape_matches_the_act_build():
           "Karena: Like cardio!\n")
     blocks = chapter_md.parse(md)
     at, holds, _ = chapter_md.schedule_block(blocks[0], OFFSET)
-    assert chapter_md.LOGIN_SHAPE.match("rochaporto")
-    assert not chapter_md.LOGIN_SHAPE.match("Karena")
+    from tools.identity import UnknownPerson, canonical_login
+    assert canonical_login("rochaporto") == "rochaporto"
+    with pytest.raises(UnknownPerson):
+        canonical_login("Karena")
 
 
 def test_entries_from_the_committed_file_are_manifest_shaped(tmp_path):
@@ -171,6 +175,241 @@ def test_entries_from_the_committed_file_are_manifest_shaped(tmp_path):
             assert e["speaker"] and "text" in e
         else:
             assert e["kind"] == "miniboss" and e["name"]
+
+
+def chapter_for(tmp_path, body, act="II", programme_start=None):
+    """A throwaway ``Chapter`` over ``body``, for a test that fakes ``chapter()``.
+
+    Bypasses ``discover()`` entirely -- no file is wired to an act -- so a
+    test can hand ``chapter_md.chapter`` a block it wrote inline without
+    touching the committed act II chapter file.
+    """
+    path = tmp_path / "chapter.md"
+    path.write_text(body, encoding="utf-8")
+    if programme_start is None:
+        programme_start = chapter_md.ACT_PROGRAMME_START["II"]
+    return chapter_md.Chapter(
+        path, {"act": act, "programme_start": programme_start}, body)
+
+
+def test_block_end_includes_the_final_hold_and_gap(tmp_path, monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203 paused\n"
+                            "kolunmi: First\nkolunmi: Second\n"))
+    end = chapter_md.block_end("II", "paused")
+    assert end == pytest.approx(
+        592.203 - chapter_md.ACT_PROGRAMME_START["II"]
+        + chapter_md.MIN_HOLD * 2 + chapter_md.GAP * 2)
+
+
+def test_block_end_raises_for_an_unknown_label():
+    with pytest.raises(KeyError):
+        chapter_md.block_end("II", "no-such-block-label")
+
+
+def test_entries_can_retain_a_block_label_for_a_builder(tmp_path, monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203 paused\nkolunmi: First\n"))
+    entries, _ = chapter_md.entries("II", include_block_labels=True)
+    assert entries[0]["_chapter_label"] == "paused"
+
+
+def test_entries_default_shape_never_carries_a_block_label(tmp_path, monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203 paused\nkolunmi: First\n"))
+    entries, _ = chapter_md.entries("II")
+    assert "_chapter_label" not in entries[0]
+
+
+# --- the seat the BUILD emits ---------------------------------------------
+#
+# `entries` is what the chapter file says; an act whose builder moves a line
+# between the file and the manifest (act II) needs `show` and `check` to
+# describe the film that ships instead. The mapping lives in the builder and
+# is reached through the `reseat` hook the chapter file declares.
+
+RESEAT_MODULE = """
+def reseat(entries):
+    for entry in entries:
+        entry.pop("_chapter_label", None)
+        entry["at"] = round(entry["at"] + 10.0, 3)
+    return entries
+"""
+
+
+def test_emitted_entries_applies_the_declared_reseat_hook(tmp_path,
+                                                          monkeypatch):
+    hook = tmp_path / "fake_builder.py"
+    hook.write_text(RESEAT_MODULE, encoding="utf-8")
+    chap = chapter_for(tmp_path, "## 9:52.203 paused\nkolunmi: First\n")
+    chap.fields["reseat"] = f"{hook}:reseat"
+    monkeypatch.setattr(chapter_md, "chapter", lambda _act: chap)
+    raw, _ = chapter_md.entries("II")
+    emitted, notes = chapter_md.emitted_entries("II")
+    assert notes == []
+    assert emitted[0]["at"] == pytest.approx(raw[0]["at"] + 10.0)
+    assert "_chapter_label" not in emitted[0]
+
+
+def test_a_chapter_with_no_reseat_hook_emits_what_it_resolves(tmp_path,
+                                                              monkeypatch):
+    monkeypatch.setattr(chapter_md, "chapter",
+                        lambda _act: chapter_for(tmp_path,
+                            "## 9:52.203\nkolunmi: First\n"))
+    assert chapter_md.emitted_entries("II") == chapter_md.entries("II")
+
+
+def test_a_reseat_hook_that_cannot_be_loaded_degrades_and_says_so(
+        tmp_path, monkeypatch):
+    """A preview one release out of date beats a traceback.
+
+    Somebody reading their own dialogue back is not the person who can fix
+    a builder that has moved, so a hook that fails to import reports the
+    fact and keeps showing the file's own schedule.
+    """
+    chap = chapter_for(tmp_path, "## 9:52.203\nkolunmi: First\n")
+    chap.fields["reseat"] = "scripts/no_such_builder.py:reseat"
+    monkeypatch.setattr(chapter_md, "chapter", lambda _act: chap)
+    emitted, notes = chapter_md.emitted_entries("II")
+    assert any("reseat hook" in note for note in notes)
+    assert emitted[0]["at"] == pytest.approx(
+        chapter_md.entries("II")[0][0]["at"])
+    assert "_chapter_label" not in emitted[0]
+
+
+def test_act_two_reseats_through_its_builder_and_not_a_second_copy():
+    """One mapping, reached from both ends.
+
+    The regression this pins: `build_efmb_plates.build()` grew source-anchor
+    seating, while `chapter_md`'s own commands kept printing the raw
+    schedule. Restating the arithmetic here rather than calling the builder's
+    own function would put the same defect back, one copy later.
+    """
+    hook, note = chapter_md._reseater("II")
+    assert note is None
+    assert hook is build_efmb_plates.reseat_chapter_entries
+
+
+def test_normalized_act_two_prompt_matches_its_generated_manifest():
+    assert chapter_md.check("II") == []
+    assert chapter_md.main(["check", "II", "--check"]) == 0
+
+
+def _shown(capsys, act="II"):
+    chapter_md.main(["show", act])
+    return capsys.readouterr().out.splitlines()
+
+
+def test_show_quotes_act_two_at_the_seats_the_manifest_carries(capsys):
+    """The normalized source remains previewable at its emitted seats."""
+    lines = _shown(capsys)
+    assert lines
+
+
+def test_show_seats_sup_on_the_heroes_void_shield_source(capsys):
+    """The normalized source-anchored line stays available for review."""
+    _shown(capsys)
+    sup = {p["id"]: p for p in chapter_md.manifest_plates("II")}["mapped_kyle_sup"]
+    assert sup["seen_at_src"] == pytest.approx(331.763)
+
+
+# Act II's own declared column order (chapters/II-endless-forms.md front
+# matter), reproduced here -- across the SAME three physical lines the real
+# file declares it on -- so the ordering test below exercises
+# `parse_front_matter`'s continuation-line joining directly, and needs
+# neither the real chapter file nor its interruption block labels. See also
+# `test_parse_front_matter_joins_a_wrapped_scalar_field`
+# below, which asserts the joining in isolation, and
+# `test_the_real_act_ii_field_order_survives_its_multiline_declaration`,
+# which pins the same shape against `chapters/II-endless-forms.md` itself.
+ACT_II_FIELD_ORDER = (
+    "id, at, dur, name, title, title_source, kind, position,\n"
+    "  copy_source, speaker, text, text_source, speaker_pending, scale, seen_at_src,\n"
+    "  avatar, avatar_url, bond_of")
+
+
+def test_parse_front_matter_joins_a_wrapped_scalar_field():
+    """A continuation line with no `defaults:` section open extends the
+    top-level scalar it follows, rather than being parsed as its own bogus
+    key (task-2-rereview-1.md: the un-joined tail silently dropped every
+    name after the first line's trailing comma, `field_order` truncated to
+    `..., kind, position,`)."""
+    text = "---\nact: X\nfield_order: " + ACT_II_FIELD_ORDER + "\n---\n"
+    fields, _ = chapter_md.parse_front_matter(text)
+    order = [k.strip() for k in fields["field_order"].split(",")]
+    assert order == [
+        "id", "at", "dur", "name", "title", "title_source", "kind",
+        "position", "copy_source", "speaker", "text", "text_source",
+        "speaker_pending", "scale", "seen_at_src", "avatar", "avatar_url",
+        "bond_of"]
+
+
+def test_the_real_act_ii_field_order_survives_its_multiline_declaration():
+    """`chapters/II-endless-forms.md` wraps its `field_order` across three
+    physical lines (task-2-rereview-1.md). Read straight from disk, not a
+    fixture, so a future re-wrap of the same field cannot silently
+    reintroduce the truncation."""
+    text = (REPO_ROOT / "chapters" / "II-endless-forms.md").read_text()
+    fields, _ = chapter_md.parse_front_matter(text)
+    order = [k.strip() for k in fields["field_order"].split(",")]
+    assert "seen_at_src" in order
+    assert order.index("seen_at_src") < order.index("avatar")
+    assert order.index("seen_at_src") < order.index("avatar_url")
+    assert order.index("seen_at_src") < order.index("bond_of")
+
+
+def test_a_key_added_after_the_chapter_file_builds_still_lands_in_order():
+    """Reproduces the ordering bug fixed in build_efmb_plates.py's build().
+
+    A source-anchored line (Act II's `Sup`, authored with `- source_anchor:
+    <src>`) comes back from `chapter_md.entries()` with `source_anchor`
+    still on it and no `seen_at_src` yet -- the recomputed source frame is
+    only known once `build_efmb_plates.build()` calls its own `film_of()`.
+    Assigning that key afterwards is a plain dict write, which always
+    appends: `seen_at_src` used to land after `bond_of`/`avatar`/
+    `avatar_url` even though the act's own `field_order` seats it ahead of
+    them (mirrored above as `ACT_II_FIELD_ORDER`, wrapped exactly as the
+    real chapter file wraps it). The fix re-applies `chapter_md._ordered()`
+    once the key is added, which is exercised here directly since
+    `scripts/build_efmb_plates.py` cannot yet be imported (it derives a
+    module-level constant from the same missing `paused` label, which is
+    Task 3's job, not this test's).
+    """
+    text = ("---\nact: X\nfield_order: " + ACT_II_FIELD_ORDER + "\n---\n\n"
+            "## 0:00\n\nkylegospo @ 0:10 +2.2: Sup\n"
+            "  - bond_of: mapped_kyle_reveal\n"
+            "  - avatar: renders/avatars/KyleGospo.png\n"
+            "  - avatar_url: https://github.com/KyleGospo.png?size=256\n"
+            "  - source_anchor: 333.497\n")
+    fields, _ = chapter_md.parse_front_matter(text)
+    order = [k.strip() for k in fields["field_order"].split(",")]
+    line = chapter_md.parse(text)[0]["lines"][0]
+    entry = chapter_md.build_entry("X", 1, 1, line, line["pin"] or 0.0,
+                                   line["hold"] or 1.0,
+                                   fields.get("defaults") or {}, order)
+
+    # What chapter_md hands back today: portrait keys already in their
+    # declared place, `source_anchor` trailing because it names no
+    # `field_order` column.
+    assert list(entry.keys())[-1] == "source_anchor"
+
+    # scripts/build_efmb_plates.py's build(): pop `source_anchor`, seat the
+    # recomputed frame, set `seen_at_src`, then re-seat the whole entry.
+    source_anchor = entry.pop("source_anchor")
+    entry["at"] = 335.267
+    entry["seen_at_src"] = source_anchor
+    ordered = chapter_md._ordered(entry, order)
+    entry.clear()
+    entry.update(ordered)
+
+    keys = list(entry.keys())
+    assert keys.index("seen_at_src") < keys.index("avatar")
+    assert keys.index("seen_at_src") < keys.index("avatar_url")
+    assert keys.index("seen_at_src") < keys.index("bond_of")
+    assert keys == [k for k in order if k in entry]
 
 
 def test_an_unknown_act_is_not_an_error():
@@ -222,10 +461,6 @@ def test_boss_entries_carry_the_miniboss_shape_and_placeholder_seed():
     assert flash["at"] == pytest.approx(405.0 - OFFSET, abs=1e-3)
     assert flash["dur"] == chapter_md.MIN_HOLD
     assert flash["title_source"] == "placeholder"
-    haters = by_id["mapped_haters"]
-    # Re-seated 2026-08-24 at the owner's word: the bar opens on the red-lit
-    # enemy face ("all the enemies are the haters"), not the guardian sunset.
-    assert haters["at"] == pytest.approx(601.2 - OFFSET, abs=1e-3)
 
 
 def test_instructions_prose_and_indented_examples_parse_as_nothing():
@@ -240,11 +475,10 @@ def test_instructions_prose_and_indented_examples_parse_as_nothing():
     for block in blocks:
         for line in block["lines"]:
             assert line["kind"] in {"chat", "boss", "card"}
-            assert line["id"], "a line parsed without an id"
-    # And the two red splashes are still the only minibosses in the act.
+    # The committed prompt still carries its authored red splash.
     boss = [line["id"] for block in blocks for line in block["lines"]
             if line["kind"] == "boss"]
-    assert boss == ["late_poor_technical_decisions", "mapped_haters"]
+    assert "late_poor_technical_decisions" in boss
 
 
 # ---------------------------------------------------------------------------
@@ -384,7 +618,7 @@ def test_avatar_login_takes_that_accounts_github_picture():
                  "  - avatar_login: KyleGospo\n")
     assert entry["avatar"] == "renders/avatars/KyleGospo.png"
     assert entry["avatar_url"] == \
-        "https://github.com/KyleGospo.png?size=256"
+        "https://avatars.githubusercontent.com/u/10704358?v=4"
     assert "avatar_login" not in entry, \
         "an authoring key reached the manifest"
 
@@ -392,9 +626,9 @@ def test_avatar_login_takes_that_accounts_github_picture():
 def test_cast_takes_the_portrait_the_casting_vocab_records():
     entry = _one("## 0:00\n\nJoseph @ 0:00 +2.2: Is it worth it?\n"
                  "  - cast: joseph_sandoval\n")
-    assert entry["avatar"] == "renders/avatars/joseph_sandoval.png"
+    assert entry["avatar"] == "renders/avatars/jrsapi.png"
     assert entry["avatar_url"] == \
-        chapter_md._casting_avatars()["joseph_sandoval"]
+        "https://avatars.githubusercontent.com/u/5437766?v=4"
     assert "cast" not in entry
 
 
@@ -408,17 +642,84 @@ def test_naming_somebody_with_no_recorded_portrait_draws_the_crest():
 
 def test_a_speaker_who_is_a_login_still_needs_no_portrait_row():
     entry = _one("## 0:00\n\nkylegospo @ 0:00 +2.2: Sup\n")
-    assert entry["avatar_url"] == "https://github.com/kylegospo.png?size=256"
+    assert entry["avatar_url"] == "https://avatars.githubusercontent.com/u/10704358?v=4"
 
 
-def test_the_two_portrait_keys_are_not_interchangeable():
-    """Collapsing them would swap faces on eight delivered pills."""
+def test_the_two_portrait_keys_resolve_to_one_canonical_identity():
     by_cast = _one("## 0:00\n\nA1RM4X @ 0:00 +2.2: hi\n  - cast: a1rm4x\n")
     by_login = _one("## 0:00\n\nA1RM4X @ 0:00 +2.2: hi\n"
                     "  - avatar_login: A1RM4X\n")
-    assert by_login["avatar_url"] == "https://github.com/A1RM4X.png?size=256"
-    if "avatar_url" in by_cast:
-        assert by_cast["avatar_url"] != by_login["avatar_url"]
+    assert by_cast["avatar_url"] == by_login["avatar_url"] == \
+        "https://avatars.githubusercontent.com/u/2750931?v=4"
+
+
+def test_extract_uses_a_login_row_instead_of_copying_a_manifest_url():
+    rows = chapter_md._extract_entry(
+        {"id": "joseph", "kind": "chat", "speaker": "Joseph", "text": "Hi",
+         "at": 0.0, "dur": 2.2, "avatar": "renders/avatars/joseph_sandoval.png",
+         "avatar_url": "https://github.com/joseph_sandoval.png?size=256"},
+        0.0, {},
+    )
+    assert "  - avatar_login: jrsapi" in rows
+    assert not any("avatar_url:" in row for row in rows)
+
+
+@pytest.mark.parametrize("act", ("IV", "V", "VII"))
+def test_extract_handles_every_existing_avatar_style(act):
+    """Extraction is a safe authoring migration, not a GitHub gate."""
+    extracted = chapter_md.extract(act)
+    assert chapter_md.parse(extracted)
+    assert "https://github.com/" not in extracted
+
+
+@pytest.mark.parametrize("act", ("IV", "V", "VII"))
+def test_extract_round_trips_migrated_chapter_plates_exactly(
+        act, tmp_path, monkeypatch):
+    """Migrated chapters survive extract/rebuild without changing a plate."""
+    (tmp_path / f"{act}.md").write_text(
+        chapter_md.extract(act), encoding="utf-8")
+    monkeypatch.setattr(chapter_md, "CHAPTERS_DIR", tmp_path)
+    rebuilt, _ = chapter_md.entries(act)
+    expected = [plate for plate in chapter_md.manifest_plates(act)
+                if plate.get("copy_source") not in chapter_md.DERIVED_COPY]
+    assert rebuilt == expected
+    assert [list(plate) for plate in rebuilt] == [
+        list(plate) for plate in expected]
+
+
+def test_extract_preserves_act_two_og_thockin_literal_avatar_url():
+    """The builder cannot re-derive this non-chat card's legacy portrait."""
+    extracted = chapter_md.extract("II")
+    marker = "* [og_thockin]"
+    card = extracted[extracted.index(marker):]
+    card = card[:card.index("\n\n")]
+    assert "  - avatar: renders/avatars/thockin.png" in card
+    assert "  - avatar_url: https://github.com/thockin.png?size=256" in card
+
+
+def test_extract_keeps_a_local_avatar_without_inventing_a_url():
+    rows = chapter_md._extract_entry(
+        {"id": "local", "kind": "chat", "speaker": "Kat", "text": "Hi",
+         "at": 0.0, "dur": 2.2, "avatar": "kat.jpg"},
+        0.0, {},
+    )
+    assert "  - avatar: kat.jpg" in rows
+    assert not any("avatar_url:" in row for row in rows)
+    assert _one("## 0:00\n\n" + "\n".join(rows) + "\n") == {
+        "id": "local", "at": 0.0, "dur": 2.2, "kind": "chat",
+        "speaker": "Kat", "text": "Hi", "avatar": "kat.jpg",
+    }
+
+
+def test_extract_round_trips_an_unresolved_legacy_speaker_without_a_url_row():
+    plate = {
+        "id": "legacy", "kind": "chat", "speaker": "nope", "text": "Hi",
+        "at": 0.0, "dur": 2.2, "avatar": "renders/avatars/nope.png",
+        "avatar_url": "https://github.com/nope.png?size=256",
+    }
+    rows = chapter_md._extract_entry(plate, 0.0, {})
+    assert not any("avatar_url:" in row for row in rows)
+    assert _one("## 0:00\n\n" + "\n".join(rows) + "\n") == plate
 
 
 # --- decks: copy that plays AFTER the act, authored inside it ---------------

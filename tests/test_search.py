@@ -89,7 +89,7 @@ def test_lead_boost_applies_to_elsie():
     _, out = top_id("Elsie Bray hero shot")
     top = out["results"][0][1]
     assert top["casting"]["role"] == "lead"
-    assert top["casting"]["person"] == "laura_santamaria"
+    assert top["casting"]["person"] == "nimbinatus"
     assert "lead: elsie_bray" in " ".join(out["results"][0][2])
 
 
@@ -124,17 +124,28 @@ def test_unconstrained_lead_close_up_still_retrievable():
 def test_cast_names_route_to_casting_filters():
     for query, facet, val in [
         ("shots of Zavala", "casting.character", "zavala"),
-        ("Kelsey Hightower footage", "casting.person", "kelsey_hightower"),
+        ("Kelsey Hightower footage", "casting.person", "kelseyhightower"),
         ("Cayde-6 talking", "casting.character", "cayde_6"),
         ("castrojo", "casting.person", "castrojo"),
         ("jeefy", "casting.person", "jeefy"),
         ("Mara Sov", "casting.character", "mara_sov"),
         ("Variks", "casting.character", "variks"),
+        ("nate-double-u", "casting.person", "nate-double-u"),
         ("Saint-14", "casting.character", "saint_14"),
         ("The Speaker", "casting.character", "the_speaker"),
     ]:
         parsed = search.parse_query(query)
         assert val in parsed["filters"].get(facet, set()), (query, parsed["filters"])
+
+
+def test_bound_login_routes_to_the_canonical_person():
+    parsed = search.parse_query("kdruckman footage")
+    assert parsed["filters"]["casting.person"] == {"kdruckman"}
+
+
+def test_missing_plate_names_do_not_become_the_bogus_none_phrase():
+    parsed = search.parse_query("none of the crowd")
+    assert "casting.person" not in parsed["filters"]
 
 
 def test_ensemble_role_is_queryable():

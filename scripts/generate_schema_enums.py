@@ -102,6 +102,10 @@ MAP = {
         ("provenance.yaml", "usage_class"),
     ("uta-art-video.schema.json", "/properties/source/properties/usage_class"):
         ("provenance.yaml", "usage_class"),
+    ("standalone-batch.schema.json", "/$defs/source/properties/usage_class"):
+        ("provenance.yaml", "usage_class"),
+    ("hive-season.schema.json", "/$defs/source/properties/usage_class"):
+        ("provenance.yaml", "usage_class"),
 }
 
 

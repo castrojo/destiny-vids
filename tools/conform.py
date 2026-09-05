@@ -159,7 +159,7 @@ def probe_video(path, ffprobe):
     out = subprocess.run(
         [*ffprobe, "-v", "error", "-select_streams", "v:0",
          "-show_entries",
-         "stream=codec_name,width,height,avg_frame_rate,pix_fmt,"
+         "stream=codec_name,width,height,avg_frame_rate,r_frame_rate,pix_fmt,"
          "color_primaries,color_transfer,color_space,profile,level",
          "-of", "json", str(path)],
         capture_output=True, text=True, check=True,
@@ -318,7 +318,8 @@ def cache_root():
     return xdg_cache("DESTINY_CONFORM_CACHE", "conform")
 
 
-def build_encode_command(src, dst, ffmpeg=None, threads=None):
+def build_encode_command(src, dst, ffmpeg=None, threads=None, *, crf=None,
+                         preset=None):
     """Re-encode the picture to the spec; carry the audio untouched.
 
     ``-map 0:a?`` + ``-c:a copy``: every audio stream rides through
@@ -332,15 +333,15 @@ def build_encode_command(src, dst, ffmpeg=None, threads=None):
         "-i", str(src),
         "-map", "0:v:0", "-map", "0:a?",
         "-vf", video_filter_chain(),
-        *video_encode_args(threads=threads),
+        *video_encode_args(crf=crf, preset=preset, threads=threads),
         "-c:a", "copy",
         "-movflags", "+faststart",
         str(dst), "-y",
     ]
 
 
-def ensure(source, out_dir=None, ffmpeg=None, threads=None,
-           log=None, _probe=None, use_farm=None):
+def ensure(source, out_dir=None, ffmpeg=None, threads=None, *, crf=None,
+           preset=None, log=None, _probe=None, use_farm=None):
     """A spec-conformant version of ``source``, doing as little as possible.
 
     Returns ``(path, status)`` with status one of:
@@ -375,12 +376,16 @@ def ensure(source, out_dir=None, ffmpeg=None, threads=None,
     entry_dir = root / SPEC_VERSION
     entry_dir.mkdir(parents=True, exist_ok=True)
     digest = content_hash(src)
-    entry = entry_dir / f"{digest}.mp4"
+    crf = str(crf or DELIVERY.crf)
+    preset = str(preset or DELIVERY.preset)
+    key = hashlib.sha256(f"{digest}\0{crf}\0{preset}".encode()).hexdigest()
+    entry = entry_dir / f"{key}.mp4"
     if entry.exists():
         return entry, "cache-hit"
-    tmp = entry_dir / f".{digest}.tmp-{os.getpid()}.mp4"
+    tmp = entry_dir / f".{key}.tmp-{os.getpid()}.mp4"
     tmp.unlink(missing_ok=True)
-    argv = build_encode_command(src, tmp, ffmpeg or _find_ffmpeg(), threads)
+    argv = build_encode_command(src, tmp, ffmpeg or _find_ffmpeg(), threads,
+                                crf=crf, preset=preset)
     try:
         _encode(argv, src=src, out=tmp, use_farm=use_farm)
         tmp.replace(entry)
@@ -390,6 +395,8 @@ def ensure(source, out_dir=None, ffmpeg=None, threads=None,
     entry.with_suffix(".json").write_text(json.dumps({
         "source": str(src),
         "sha256": digest,
+        "crf": crf,
+        "preset": preset,
         "spec": asdict(DELIVERY),
         "spec_version": SPEC_VERSION,
     }, indent=1) + "\n", encoding="utf-8")

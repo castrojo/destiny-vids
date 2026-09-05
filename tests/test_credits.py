@@ -556,6 +556,15 @@ def test_verified_logins_survive_a_contributor_refresh(manifest):
     assert jeefy["login"] == "jeefy"
 
 
+def test_vocab_logins_and_cast_placards_use_people_records():
+    logins = B.vocab_logins()
+    assert logins["Bob Killen"] == "mrbobbytables"
+    assert logins["Laura Santamaria"] == "nimbinatus"
+    cast = {row["character_id"]: row for row in B.cast_in_order()}
+    assert cast["osiris"]["person"] == "Bob Killen"
+    assert cast["osiris"]["login"] == "mrbobbytables"
+
+
 def test_the_wordmark_is_the_real_mark_not_typeset(manifest):
     """A brand mark set in the deck's mono is an invented mark."""
     assert manifest["wordmark"]["source"].startswith("ublue-os/universal-blue-org")
@@ -594,13 +603,13 @@ def test_every_placard_is_somebody_who_is_on_screen(manifest):
 
     That list has since been replaced by a stricter one -- owner, 2026-08-16:
     "Remove people not in the movie from here and only use the principal
-    actors", "not jorge castro", "we want karena, bsherman, and kylegospo".
+    actors", "not jorge castro", "bsherman, and kylegospo".
     So the rule is no longer "the README's table": it is that EVERY placard is
     somebody who is on screen in a delivered act, and each entry cites the act
     it can be found in.
     """
     items, _ = B.schedule(manifest)
-    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 9
+    assert len([i for i in items if i["kind"] == "cast"]) == len(manifest["cast"]) == 8
     for member in manifest["cast"]:
         assert member.get("seen_in"), member["person"]
     people = {c["person"] for c in manifest["cast"]}
@@ -628,15 +637,6 @@ def test_cayde_is_not_in_the_starring_roles(manifest):
                    if c["role"] == "Bluefin Created by")
     assert "Jorge O. Castro" in created["names"]
     assert any("castrojo" in s["names"] for s in manifest["contributors"])
-
-
-def test_karenas_surname_carries_one_l(manifest):
-    """The README and the owner both say 'Angel'. vocab/casting.yaml still
-    says 'Angell' and is frozen (#167), so the credits print the correction
-    and it is recorded in `unresolved`."""
-    mara = next(c for c in manifest["cast"] if c["character_id"] == "mara_sov")
-    assert mara["person"] == "Karena Angel"
-    assert any("Angel" in u for u in manifest["unresolved"])
 
 
 # --- the Cayde redaction ---------------------------------------------------

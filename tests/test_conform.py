@@ -107,13 +107,16 @@ def test_the_encode_is_a_picture_operation_only():
 
 def test_the_encode_writes_the_whole_spec():
     cmd = conform.build_encode_command("in.mp4", "out.mp4",
-                                       ffmpeg=["ffmpeg-not-invoked"])
+                                       ffmpeg=["ffmpeg-not-invoked"],
+                                       crf="21", preset="medium")
     joined = " ".join(cmd)
     assert "fps=60000/1001" in joined
     assert "format=yuv420p" in joined
     assert "colorprim=bt709:transfer=bt709:colormatrix=bt709" in joined
     assert cmd[cmd.index("-profile:v") + 1] == "high"
     assert cmd[cmd.index("-level:v") + 1] == "4.2"
+    assert cmd[cmd.index("-crf") + 1] == "21"
+    assert cmd[cmd.index("-preset") + 1] == "medium"
     assert "+cgop" in cmd  # closed GOP: a join must never reference across it
 
 
@@ -151,8 +154,8 @@ def test_a_conforming_source_is_returned_as_is(tmp_path):
 
 def test_first_run_conforms_and_the_second_is_a_no_op(tmp_path, monkeypatch):
     """The durable win: megacut #2 conforms nothing. The cache key is the
-    source's content hash plus the spec version, so an unchanged source is a
-    stat, not an encode."""
+    source content and quality settings, so an unchanged source is a stat,
+    not an encode."""
     src = tmp_path / "act.mp4"
     src.write_bytes(b"one")
     encodes = []
@@ -169,6 +172,16 @@ def test_first_run_conforms_and_the_second_is_a_no_op(tmp_path, monkeypatch):
                                     _probe=_nonconformant_probe)
     assert (path2, status2) == (path1, "cache-hit")
     assert len(encodes) == 1, "an unchanged source must not re-encode"
+
+    path3, status3 = conform.ensure(src, out_dir=tmp_path / "cache",
+                                    ffmpeg=["ffmpeg-not-invoked"],
+                                    _probe=_nonconformant_probe,
+                                    crf="21", preset="medium")
+    assert status3 == "conformed"
+    assert path3 != path1
+    assert len(encodes) == 2
+    assert "-crf 21" in encodes[-1]
+    assert "-preset medium" in encodes[-1]
 
 
 def test_a_changed_source_gets_a_new_cache_entry(tmp_path, monkeypatch):

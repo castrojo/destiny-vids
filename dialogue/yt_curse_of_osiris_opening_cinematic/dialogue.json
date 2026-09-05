@@ -20,7 +20,7 @@
     "mode": "script",
     "start_sec": 32.56,
     "standalone_leads": false,
-    "note": "Script layout keeps all 27 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies its speaker by github handle (@mrbobbytables, @clubanderson), and both people are named in full by their own Guardian reveal cards."
+    "note": "Script layout keeps all 26 lines readable in order; standalone lead plates are omitted because every dialogue pill identifies its speaker by github handle (@mrbobbytables, @clubanderson), and both people are named in full by their own Guardian reveal cards."
   },
   "cues": [
     {
@@ -36,7 +36,7 @@
     {
       "id": "d02",
       "start_sec": 42.0,
-      "end_sec": 45.55,
+      "end_sec": 45.65,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "This training repository is the best place to hone their craft",
@@ -44,8 +44,8 @@
     },
     {
       "id": "d03",
-      "start_sec": 45.56,
-      "end_sec": 47.51,
+      "start_sec": 45.66,
+      "end_sec": 48.72,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "Iteration 7: Students serialize instead of parallize",
@@ -53,8 +53,8 @@
     },
     {
       "id": "d04",
-      "start_sec": 47.52,
-      "end_sec": 50.55,
+      "start_sec": 48.73,
+      "end_sec": 51.76,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "They're getting faster every loop",
@@ -62,8 +62,8 @@
     },
     {
       "id": "d05",
-      "start_sec": 50.56,
-      "end_sec": 52.51,
+      "start_sec": 51.77,
+      "end_sec": 53.72,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "Seriously with these clankers",
@@ -71,8 +71,8 @@
     },
     {
       "id": "d06",
-      "start_sec": 52.52,
-      "end_sec": 53.99,
+      "start_sec": 53.73,
+      "end_sec": 56.79,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "Bluefin's Hive is reprogramming them all as we speak",
@@ -80,8 +80,8 @@
     },
     {
       "id": "d07",
-      "start_sec": 54.0,
-      "end_sec": 60.47,
+      "start_sec": 56.8,
+      "end_sec": 63.27,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "And you're sure this will work?",
@@ -89,8 +89,8 @@
     },
     {
       "id": "d08",
-      "start_sec": 60.48,
-      "end_sec": 67.71,
+      "start_sec": 63.28,
+      "end_sec": 70.51,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "Told ya, It's a model not a log",
@@ -98,8 +98,8 @@
     },
     {
       "id": "d09a",
-      "start_sec": 69.52,
-      "end_sec": 71.72,
+      "start_sec": 72.32,
+      "end_sec": 74.52,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "You better get that context right",
@@ -107,8 +107,8 @@
     },
     {
       "id": "d09b",
-      "start_sec": 71.73,
-      "end_sec": 74.8,
+      "start_sec": 74.53,
+      "end_sec": 77.6,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "We don't want a repeat of the Tophee Disaster",
@@ -116,8 +116,8 @@
     },
     {
       "id": "d10",
-      "start_sec": 72.44,
-      "end_sec": 80.87,
+      "start_sec": 75.24,
+      "end_sec": 80.13,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "Standard AGENTS.md, no problem.",
@@ -125,8 +125,8 @@
     },
     {
       "id": "d11",
-      "start_sec": 80.88,
-      "end_sec": 87.83,
+      "start_sec": 83.68,
+      "end_sec": 90.63,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "What is it, what did you see? New local model?",
@@ -134,8 +134,8 @@
     },
     {
       "id": "d13",
-      "start_sec": 90.84,
-      "end_sec": 92.23,
+      "start_sec": 93.64,
+      "end_sec": 95.03,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "Wait. That's not our local model.",
@@ -145,8 +145,8 @@
     },
     {
       "id": "d14",
-      "start_sec": 92.24,
-      "end_sec": 94.95,
+      "start_sec": 95.04,
+      "end_sec": 97.75,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "I thought I committed ...",
@@ -154,8 +154,8 @@
     },
     {
       "id": "d15",
-      "start_sec": 94.96,
-      "end_sec": 98.19,
+      "start_sec": 97.76,
+      "end_sec": 100.99,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "Oh, sh—",
@@ -163,8 +163,8 @@
     },
     {
       "id": "d16",
-      "start_sec": 98.2,
-      "end_sec": 99.39,
+      "start_sec": 101.0,
+      "end_sec": 102.19,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "Deploy!",
@@ -172,8 +172,8 @@
     },
     {
       "id": "d17",
-      "start_sec": 99.4,
-      "end_sec": 101.9,
+      "start_sec": 102.2,
+      "end_sec": 104.7,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "ON YOUR LEFT. 2 o'clock. Reverting.",
@@ -181,8 +181,8 @@
     },
     {
       "id": "d18",
-      "start_sec": 103.96,
-      "end_sec": 106.16,
+      "start_sec": 106.76,
+      "end_sec": 108.96,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "New fork, pushing!",
@@ -190,8 +190,8 @@
     },
     {
       "id": "d19",
-      "start_sec": 114.48,
-      "end_sec": 117.98,
+      "start_sec": 117.28,
+      "end_sec": 120.78,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "You keep picking the places where they shoot at us.",
@@ -199,8 +199,8 @@
     },
     {
       "id": "d20a",
-      "start_sec": 121.44,
-      "end_sec": 124.91,
+      "start_sec": 124.24,
+      "end_sec": 127.71,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "Everyone forgot how to use KVM! We need to split up",
@@ -209,8 +209,8 @@
     },
     {
       "id": "d20b",
-      "start_sec": 124.92,
-      "end_sec": 127.95,
+      "start_sec": 127.72,
+      "end_sec": 130.75,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "Everyone's making their own and they're all awful",
@@ -219,8 +219,8 @@
     },
     {
       "id": "d21",
-      "start_sec": 127.96,
-      "end_sec": 132.99,
+      "start_sec": 130.76,
+      "end_sec": 135.79,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "They've broken out of the sandbox",
@@ -229,8 +229,8 @@
     },
     {
       "id": "d27",
-      "start_sec": 133.0,
-      "end_sec": 135.9,
+      "start_sec": 135.8,
+      "end_sec": 138.7,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "Hive is the one stuck in the CNCF Sandbox!",
@@ -238,8 +238,8 @@
     },
     {
       "id": "d28",
-      "start_sec": 133.2,
-      "end_sec": 135.4,
+      "start_sec": 138.71,
+      "end_sec": 141.24,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "You need to apply, check your email, focus!",
@@ -247,29 +247,19 @@
     },
     {
       "id": "d22",
-      "start_sec": 133.96,
-      "end_sec": 134.63,
+      "start_sec": 141.25,
+      "end_sec": 144.08,
       "character": "osiris",
       "evidence": "owner_supplied",
       "text": "We need to get a message to the CNCF Maintainers",
       "text_source": "owner_supplied",
-      "pin_sec": 134.82,
+      "pin_sec": 135.21,
       "recovered_text": "You need to get a message to the Kubernetes Maintainers"
     },
     {
-      "id": "d23a",
-      "start_sec": 134.64,
-      "end_sec": 136.11,
-      "character": "mara_sov",
-      "evidence": "owner_supplied",
-      "text": "Check your email smartass",
-      "text_source": "owner_supplied",
-      "recovered_text": "The open rate of maintainer emails is 7%"
-    },
-    {
       "id": "d23b",
-      "start_sec": 136.12,
-      "end_sec": 137.59,
+      "start_sec": 144.09,
+      "end_sec": 145.56,
       "character": "sagira",
       "evidence": "owner_supplied",
       "text": "I don't like this plan",
@@ -324,6 +314,13 @@
       "start_sec": 142.28,
       "end_sec": 146.0,
       "raw": "I'm sure one of them will open the message ...",
+      "reason": "removed by the owner while rewriting the conversation"
+    },
+    {
+      "id": "d23a",
+      "start_sec": 134.64,
+      "end_sec": 136.11,
+      "raw": "The open rate of maintainer emails is 7%",
       "reason": "removed by the owner while rewriting the conversation"
     }
   ]

@@ -144,6 +144,33 @@ def test_every_underwater_plate_png_is_required(tmp_path):
     assert build_ending_overlays.missing_cards(ending(), cards_dir) == []
 
 
+def test_stale_ending_cards_use_the_browser_renderer(tmp_path, monkeypatch):
+    cards_dir = tmp_path / "cards"
+    ran = []
+    monkeypatch.setattr(
+        build_ending_overlays.freshness, "stale_outputs",
+        lambda inputs, outputs: outputs,
+    )
+    monkeypatch.setattr(
+        build_ending_overlays.subprocess, "run",
+        lambda cmd, **kwargs: ran.append((cmd, kwargs)),
+    )
+
+    assert build_ending_overlays.refresh_cards(
+        MANIFEST, ending(), cards_dir
+    ) == [cards_dir / f"plate_{card['id']}.png" for card in underwater(ending())]
+
+    cmd, kwargs = ran.pop()
+    assert cmd[:6] == [
+        "node", "cards/render-cards.mjs",
+        "--manifest", str(MANIFEST),
+        "--out-dir", str(cards_dir),
+    ]
+    assert cmd[6] == "--only"
+    assert cmd[7].split(",") == [card["id"] for card in underwater(ending())]
+    assert kwargs == {"check": True, "cwd": REPO}
+
+
 def test_the_clean_movement_declares_the_derivative_separately():
     """The canonical movement stays clean; the derivative is a pointer out."""
     move = movement_five(thread())

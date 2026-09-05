@@ -1,0 +1,38 @@
+{
+  "video_id": "yt_excision_chezvii_4k",
+  "youtube_url": "https://www.youtube.com/watch?v=j1o1pUX8cQ8",
+  "title": "Excision (Story Quest), Dialogue, Cutscenes and Interactions [4K] - Destiny 2, The Final Shape",
+  "description": "Dialogue, Cutscenes and Interactions that happen during the 'Excision' activity in the Final Shape expansion.",
+  "youtube_tags": [
+    "PS5Share",
+    "ShareFactoryStudio"
+  ],
+  "era": "the_final_shape",
+  "activity": "story_mission",
+  "content_type": "gameplay",
+  "destination": "the_pale_heart",
+  "usage_class": "third_party_copyrighted",
+  "source_rights_note": "Third-party gameplay capture by Chezvii of Bungie in-engine footage. The uploader's contribution is limited to the capture. Used under Bungie's fan-content forbearance, which is explicitly not permission, is revocable, and permits non-commercial fan creations only. This repository stores metadata and timestamps, never the footage.",
+  "provenance": {
+    "era": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "activity": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "destination": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    }
+  }
+}

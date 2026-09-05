@@ -79,6 +79,8 @@ folder and mtimes lie, so:
 * The `Prod/README.md` master table is **generated** (between
   `<!-- deliver:table -->` markers) from the running order plus the delivery
   map, so a hand-edit that disagrees with reality is detected as drift.
+* The `10mb/README.md` social tables are **generated** from current source
+  runtimes, cap arithmetic, and copied-file sizes.
 * The megacut and the social copies are re-encodes, so content comparison is
   impossible; there mtime against `Prod/` is the signal, and the megacut also
   gets a **duration check** against the plan's own expected length when
@@ -104,6 +106,7 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+from subprocess import CalledProcessError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import footage as footage_mod  # noqa: E402
@@ -120,6 +123,12 @@ DEFAULT_PLAN = REPO_ROOT / "stories" / "megacut" / "megacut.json"
 CHECKSUMS = "CHECKSUMS.md5"
 TABLE_BEGIN = "<!-- deliver:table:start -->"
 TABLE_END = "<!-- deliver:table:end -->"
+SOCIAL_COPY_TABLE_BEGIN = "<!-- deliver:social-copy-table:start -->"
+SOCIAL_COPY_TABLE_END = "<!-- deliver:social-copy-table:end -->"
+SOCIAL_ABSENT_TABLE_BEGIN = "<!-- deliver:social-absent-table:start -->"
+SOCIAL_ABSENT_TABLE_END = "<!-- deliver:social-absent-table:end -->"
+SOCIAL_COPY_HEADER = "| Act | Runtime | Video budget | Size |"
+SOCIAL_ABSENT_HEADER = "| Act | Runtime | Video budget left after 256k audio |"
 
 # Where a hardlink's twin is looked for when Prod's inode does not match the
 # declared master. Masters live in per-project dirs under ~/Videos, in the
@@ -492,7 +501,11 @@ def source_digest_at(commit, sources, root=None):
         if not entries:
             h.update(b"\0absent")
             continue
-        for entry in sorted(entries):
+        # Sort by the PATH field, the way the worktree walk sorts rglob
+        # paths. Sorting the raw ls-tree lines sorts by blob sha, and the
+        # two orders disagree for any multi-file directory -- act III read
+        # "inputs have moved" on a byte-identical checkout for exactly this.
+        for entry in sorted(entries, key=lambda e: e.partition("\t")[2]):
             meta, _, path = entry.partition("\t")
             blob = meta.split()[2]
             b = subprocess.run(["git", "cat-file", "blob", blob],
@@ -900,6 +913,108 @@ def expected_table(acts, masters):
     return "\n".join(lines)
 
 
+def social_duration(path):
+    """The source video runtime used by the social bitrate arithmetic."""
+    from tools import megacut
+    return float(megacut.probe_duration(path, stream="v:0"))
+
+
+def social_video_budget(duration, audio_kbps):
+    """The social encoder's video rung, or no viable rung under the cap."""
+    from tools import social
+    try:
+        return f"{social.video_bitrate_for(SOCIAL_CAP_BYTES, duration, audio_kbps)} kbps"
+    except ValueError:
+        return "none (audio exceeds cap)"
+
+
+def social_absent_header(audio_kbps):
+    return f"| Act | Runtime | Video budget left after {audio_kbps}k audio |"
+
+
+def expected_social_copy_table(acts, social, wolves):
+    """The generated rows for acts that publish a 10 MiB social copy."""
+    audio_kbps = social.get("audio_bitrate", 256)
+    absent = social.get("absent", {})
+    lines = [SOCIAL_COPY_TABLE_BEGIN, SOCIAL_COPY_HEADER,
+             "|---|---:|---:|---:|"]
+    for act in acts:
+        if not act.prod_file or act.numeral in absent:
+            continue
+        prod = wolves / "Prod" / act.prod_file
+        duration = social_duration(prod)
+        copy = wolves / "10mb" / act.prod_file
+        size = f"{copy.stat().st_size / (1024 * 1024):.2f} MiB" \
+            if copy.exists() else "not built"
+        lines.append(
+            f"| `{Path(act.prod_file).stem}` | {duration:.1f} s | "
+            f"{social_video_budget(duration, audio_kbps)} | {size} |")
+    lines.append(SOCIAL_COPY_TABLE_END)
+    return "\n".join(lines)
+
+
+def expected_social_absent_table(acts, social, wolves):
+    """The generated rows for published acts intentionally without a copy."""
+    audio_kbps = social.get("audio_bitrate", 256)
+    absent = social.get("absent", {})
+    lines = [SOCIAL_ABSENT_TABLE_BEGIN, social_absent_header(audio_kbps),
+             "|---|---:|---:|"]
+    for act in acts:
+        if not act.prod_file or act.numeral == "0" or act.numeral not in absent:
+            continue
+        prod = wolves / "Prod" / act.prod_file
+        duration = social_duration(prod)
+        lines.append(
+            f"| `{Path(act.prod_file).stem}` | {duration:.1f} s | "
+            f"{social_video_budget(duration, audio_kbps)} |")
+    lines.append(SOCIAL_ABSENT_TABLE_END)
+    return "\n".join(lines)
+
+
+def replace_generated_table(text, table, begin, end, header):
+    """Replace a marked table, or migrate the matching legacy Markdown table."""
+    marked = re.escape(begin) + r".*?" + re.escape(end)
+    new, count = re.subn(marked, lambda _m: table, text, flags=re.DOTALL)
+    if count:
+        return new, True
+    legacy = (r"(?m)^" + re.escape(header) + r"\n"
+              r"^\|(?:---\|)+\n"
+              r"(?:^\|.*\|\n?)*")
+    return re.subn(legacy, lambda _m: table + "\n", text)
+
+
+def update_social_readme(acts, social, wolves, log=print):
+    """Regenerate the derived social-copy tables without touching its prose."""
+    readme = wolves / "10mb" / "README.md"
+    if not readme.exists():
+        log("  10mb/README.md: missing; no social tables regenerated")
+        return
+    try:
+        copies = expected_social_copy_table(acts, social, wolves)
+        absent = expected_social_absent_table(acts, social, wolves)
+    except (FileNotFoundError, CalledProcessError, ValueError) as exc:
+        log(f"  10mb/README.md: not regenerated ({exc})")
+        return
+    text = readme.read_text(encoding="utf-8")
+    text, copies_changed = replace_generated_table(
+        text, copies, SOCIAL_COPY_TABLE_BEGIN, SOCIAL_COPY_TABLE_END,
+        SOCIAL_COPY_HEADER)
+    text, absent_changed = replace_generated_table(
+        text, absent, SOCIAL_ABSENT_TABLE_BEGIN, SOCIAL_ABSENT_TABLE_END,
+        SOCIAL_ABSENT_HEADER)
+    if copies_changed and absent_changed:
+        readme.write_text(text, encoding="utf-8")
+        log("  10mb/README.md: social tables regenerated from current media")
+    else:
+        missing = []
+        if not copies_changed:
+            missing.append(SOCIAL_COPY_HEADER)
+        if not absent_changed:
+            missing.append(SOCIAL_ABSENT_HEADER)
+        log("  10mb/README.md: table markers missing; no tables changed "
+            f"({' / '.join(missing)})")
+
+
 def check_readme(wolves, acts, masters, programme):
     readme = wolves / "Prod" / "README.md"
     if not readme.exists():
@@ -956,6 +1071,11 @@ def check_megacut(plan_path, wolves, reports, programme):
         programme.add("megacut", STALE,
                       f"{out.name} has no Prod checksum digest; rebuild it "
                       "through deliver.py build")
+        return
+    if provenance.stat().st_mtime < out.stat().st_mtime:
+        programme.add("megacut", STALE,
+                      f"{out.name} has no current Prod checksum digest; "
+                      "rebuild it through deliver.py build")
         return
     if checksums.exists() and provenance.read_text(encoding="utf-8").strip() != md5(checksums):
         programme.add("megacut", STALE,
@@ -1054,7 +1174,7 @@ def record_megacut_provenance(plan_path, wolves):
             md5(checksums) + "\n", encoding="utf-8")
 
 
-def publish(acts, masters, wolves, delivery_path=None, log=print,
+def publish(acts, masters, social, wolves, delivery_path=None, log=print,
             only=None, rebuilt=None):
     """Make Prod/ match the delivery map, then regenerate what describes it.
 
@@ -1125,6 +1245,7 @@ def publish(acts, masters, wolves, delivery_path=None, log=print,
             log(f"  README.md: no {TABLE_BEGIN} markers -- table NOT "
                 f"touched; add the markers around the table to hand it to "
                 f"the tool")
+    update_social_readme(acts, social, wolves, log=log)
     record_source_digests(acts, masters, delivery_path, log=log, only=only,
                           rebuilt=rebuilt)
     return 0
@@ -1304,7 +1425,13 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                                 f"declared master"))
                 prod_mutations.add(r.act.numeral)
         soc = next((f for f in r.findings if f.node == "social"), None)
-        if (soc and (soc.state in FAILING or
+        # A re-link queues a fresh social copy -- but never for an
+        # absent-by-design act: the exemption is a recorded editorial
+        # decision, and the cap math makes the attempt fail the build (act
+        # VIII, re-linked 2026-08-25: 256k audio alone over 492.8 s exceeds
+        # the 10 MiB cap).
+        if (soc and soc.state != ABSENT_BY_DESIGN
+                and (soc.state in FAILING or
                      r.act.numeral in prod_mutations)
                 and r.act.numeral not in conflicted):
             src = wolves / "Prod" / r.act.prod_file
@@ -1332,8 +1459,11 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
         log(f"  {label}: {description}")
         if argv is None:
             numeral = label.split()[-1]
-            act = next(a for a in acts if a.numeral == numeral)
-            publish([act], masters, wolves, delivery_path=delivery_path,
+            # The full acts list, not [act]: linking is idempotent and
+            # `only` scopes the digest stamps, but the README table and
+            # CHECKSUMS regen describe EVERY act -- a one-act publish left a
+            # one-row table behind every multi-act build (2026-08-25).
+            publish(acts, masters, social, wolves, delivery_path=delivery_path,
                     log=log, only=[numeral])
         else:
             proc = subprocess.run(argv, capture_output=True, text=True)
@@ -1346,8 +1476,7 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
                 # The one moment built_from_commit can be written honestly:
                 # this checkout's rebuild command just exited 0.
                 numeral = label.split()[-1]
-                act = next(a for a in acts if a.numeral == numeral)
-                publish([act], masters, wolves, delivery_path=delivery_path,
+                publish(acts, masters, social, wolves, delivery_path=delivery_path,
                         log=log, only=[numeral], rebuilt={numeral})
             if label == "megacut":
                 record_megacut_provenance(plan_path, wolves)
@@ -1614,7 +1743,7 @@ def main(argv=None):
         rc = print_report(reports, wolves)
         return rc if args.check else 0
     if args.command == "publish":
-        return publish(acts, masters, wolves, args.delivery,
+        return publish(acts, masters, social, wolves, args.delivery,
                        only=args.act)
     if args.watch:
         return watch(acts, masters, social, wolves, args.plan, args.watch,

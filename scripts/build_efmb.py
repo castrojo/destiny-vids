@@ -7,12 +7,12 @@ snapped to a **measured** shot boundary rather than to the round number.
 
 THE SHAPE OF THIS ACT
 ---------------------
-One source, four unbroken runs in source order, and one bed that plays end to
-end. There is no excision in the song and no pause: the picture is fitted to
-the music, never the other way round.
+One source, four unbroken runs in source order, with the instrumental bed
+before the pause and the vocal bed after it. The picture is fitted to the
+music, never the other way round.
 
   Source  ``yt_destiny_all_live_action_trailers`` -- a FAN compilation, 376.1 s
-  Bed     ``bed_endless_forms_most_beautiful``    -- Nightwish, 308.0 s
+  Beds    ``bed_endless_forms_most_beautiful`` and ``..._vocal`` -- Nightwish
 
 WHAT WAS REMOVED, AND WHY
 -------------------------
@@ -56,9 +56,11 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from tools import conform  # noqa: E402  (needs REPO_ROOT on sys.path first)
+from tools import chapter_md  # noqa: E402
 
 SOURCE_ID = "yt_destiny_all_live_action_trailers"
 BED_ID = "bed_endless_forms_most_beautiful"
+POST_PAUSE_BED_ID = "bed_endless_forms_most_beautiful_vocal"
 AMBER_SOURCE_ID = "yt_destiny_2_the_final_shape_gameplay_trailer"
 HOLD_MUSIC_ID = "bed_local_forecast_slower"
 
@@ -196,52 +198,47 @@ BED_TAIL_SEC = None  # derived below, from the remainder
 # source 323.933 is the backed-up white hallway with people on the left and dog
 # creatures on the right; source 325.933 is where the Destiny picture resumes.
 # The interruption is intentionally longer than those replaced two seconds so
-# the complete conversation can play on black after Amber's action shot.
+# the complete owner conversation can play around Amber's external action.
 HALLWAY_CUT_SRC = 323.933
 HALLWAY_FRAME_SRC = 323.933
 HALLWAY_RESUME_SRC = 325.933
 HALLWAY_AT = 255.433
-# Hold the hallway while Amber asks for Kyle and the PvP exchange plays.
-HALLWAY_FREEZE_SEC = 22.000
-AMBER_CLIP_IN = 43.000
-AMBER_CLIP_OUT = 53.470
-AMBER_CLIP_SEC = AMBER_CLIP_OUT - AMBER_CLIP_IN
+# The owner moved the external Amber sequence after the complete hallway
+# exchange. The three chapter labels are the clock: `paused` holds the
+# hallway before the insert, `amber-action` is the external sequence, and
+# `post-amber` holds the returned hallway before Destiny picture resumes.
+PAUSED_BLOCK = "paused"
+AMBER_ACTION_BLOCK = "amber-action"
+POST_AMBER_BLOCK = "post-amber"
+HALLWAY_FREEZE_SEC = round(
+    chapter_md.block_end("II", PAUSED_BLOCK) - HALLWAY_AT, 3)
 AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
-# Return to the same hallway frame for Owen, Amber's kindness speech, and the
-# held Kyle question before the Destiny picture resumes.
+AMBER_CLIP_IN = 43.000
+AMBER_CLIP_SEC = round(
+    chapter_md.block_end("II", AMBER_ACTION_BLOCK) - AMBER_AT, 3)
+AMBER_CLIP_OUT = AMBER_CLIP_IN + AMBER_CLIP_SEC
+# Return to the same hallway frame for the post-action conversation before
+# the Destiny picture resumes.
 HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
-# Owner, 2026-08-24: "Don't unpause, at 'Oh I see your problem', keep that in
-# the paused section, put cortney's conversation here." 21.5 let the picture
-# resume at film 309.403 with akgraner's pill still up and cortney's "And
-# we're gonna do you a solid" playing entirely after the resume; 25.6 holds
-# the frozen hallway until film 313.503 (programme 9:57.3), a beat after
-# cortney's pill ends (9:56.853). No footage is cut and the black tail keeps
-# its 16.065 s (owner: "keep the black"), so the act -- and every act after
-# it -- runs 4.1 s later; every downstream chapter file's programme_start and
-# pins are restated +4.1 in the same change, which lands their plates on the
-# same frames they always had.
-HALLWAY_AFTER_AMBER_SEC = 25.600
+HALLWAY_AFTER_AMBER_SEC = round(
+    chapter_md.block_end("II", POST_AMBER_BLOCK) - HALLWAY_AFTER_AMBER_AT, 3)
 HALLWAY_RETURN_AT = HALLWAY_AFTER_AMBER_AT + HALLWAY_AFTER_AMBER_SEC
-BLACK_CONVERSATION_AT = HALLWAY_AT
-BLACK_CONVERSATION_SEC = HALLWAY_FREEZE_SEC
+
 INTERRUPTION_SEC = (
     HALLWAY_FREEZE_SEC + AMBER_CLIP_SEC + HALLWAY_AFTER_AMBER_SEC)
 INTERRUPTION_REPLACED_SEC = HALLWAY_RESUME_SRC - HALLWAY_CUT_SRC
-# film_sec == bed_sec + THIS, so lengthening the interruption GROWS THE ACT
-# and every act after it starts that much later: restate every downstream
-# chapter file's programme_start and pins by the same delta in the same
-# commit (done 2026-08-24, +4.1). The proof that no other act's frames moved
-# is that its manifest regenerates byte-identical -- chapter_md.sync writes
-# nothing when nothing changed.
+# film_sec == bed_sec + THIS. The pause, insert, and return intervals stay
+# explicit so their clock arithmetic cannot silently collapse into one span.
 INTERRUPTION_SHIFT_SEC = INTERRUPTION_SEC - INTERRUPTION_REPLACED_SEC
 
-KYLE_REVEAL_SRC = 335.267
-KYLE_REVEAL_SEC = 3.200
-KYLE_REVEAL_AT = HALLWAY_RETURN_AT + (KYLE_REVEAL_SRC - HALLWAY_RESUME_SRC)
-# 343.903 + the 4.1 s the pause grew on 2026-08-24; the tail keeps its black
-# (film_sec - this == 16.065 s, unchanged), the act ends where the song ends,
-# and the show runs 4.1 s longer from here on.
-EDITED_PICTURE_END = 348.003
+# Where the Destiny picture actually ends, in film time: the hallway holds
+# for exactly as long as HALLWAY_RETURN_AT says, then the two remaining
+# evidenced runs play in full -- the same two additions `picture_sequence`
+# makes after the hold. The black tail keeps its own length (film_sec - this)
+# automatically as any of the three chapter-owned interruption blocks change.
+EDITED_PICTURE_END = round(
+    HALLWAY_RETURN_AT + (RUNS[4][1] - HALLWAY_RESUME_SRC)
+    + (RUNS[5][1] - RUNS[5][0]), 3)
 
 HOLD_MUSIC_IN = 6.500
 HOLD_MUSIC_OUT_FILM = HALLWAY_RETURN_AT
@@ -420,7 +417,7 @@ def audio_sequence():
         },
         {
             "id": "endless_after_interruption",
-            "source_id": BED_ID,
+            "source_id": POST_PAUSE_BED_ID,
             "at": HOLD_MUSIC_OUT_FILM,
             "source_in": HALLWAY_AT + INTERRUPTION_REPLACED_SEC,
             "duration": film_sec - HOLD_MUSIC_OUT_FILM,
@@ -449,9 +446,11 @@ def edited_source_for_film(film_sec, lead=None):
         lead = derive_lead()
     if HALLWAY_AT <= film_sec < AMBER_AT:
         return HALLWAY_FRAME_SRC
-    if AMBER_AT <= film_sec < HALLWAY_RETURN_AT:
+    if AMBER_AT <= film_sec < HALLWAY_AFTER_AMBER_AT:
         raise NotInPicture(
             f"film {film_sec:.3f}s is inside Amber's external sequence")
+    if HALLWAY_AFTER_AMBER_AT <= film_sec < HALLWAY_RETURN_AT:
+        return HALLWAY_FRAME_SRC
     if film_sec >= EDITED_PICTURE_END:
         raise NotInPicture(
             f"film {film_sec:.3f}s is in the black outro tail")
@@ -485,10 +484,10 @@ def fmt(seconds):
 
 TARGET_W, TARGET_H, TARGET_FPS = 1920, 1080, 30
 
-# THE BED'S SOURCE DECODES ABOVE FULL SCALE. Its fetched intermediate applies
-# a -1.6 dB static gain before integer PCM encoding, so those peaks are retained
-# rather than clipped. The mux therefore applies no second gain.
-MUX_GAIN_DB = 0.0
+# The extended owner-authorized Amber sequence raises the delivered mix's
+# measured true peak to +0.4 dBFS. A -1.5 dB static gain lands the FLAC master
+# below the project's -0.9 dBTP ceiling without changing its dynamics.
+MUX_GAIN_DB = -1.5
 
 # ISSUE #88, AND WHY EVERY CHAIN BELOW IS `-vf`.
 #
@@ -628,6 +627,7 @@ def audio_filtergraph(sequence=None):
         BED_ID: 1,
         HOLD_MUSIC_ID: 2,
         AMBER_SOURCE_ID: 3,
+        POST_PAUSE_BED_ID: 4,
     }
     chains = []
     labels = []
@@ -641,8 +641,11 @@ def audio_filtergraph(sequence=None):
             "asetpts=PTS-STARTPTS,aresample=48000,"
             f"aformat=sample_fmts=fltp:channel_layouts=stereo[{label}]")
         labels.append(f"[{label}]")
+    mixed = "aout" if MUX_GAIN_DB == 0 else "mix"
     chains.append(
-        "".join(labels) + f"concat=n={len(labels)}:v=0:a=1[aout]")
+        "".join(labels) + f"concat=n={len(labels)}:v=0:a=1[{mixed}]")
+    if MUX_GAIN_DB:
+        chains.append(f"[{mixed}]volume={MUX_GAIN_DB:g}dB[aout]")
     return ";".join(chains)
 
 
@@ -667,6 +670,7 @@ def render(out_path=None, work_dir=None, verbose=True, local=False):
     source = footage.resolve(SOURCE_ID)
     amber_source = footage.resolve(AMBER_SOURCE_ID)
     bed = REPO_ROOT / "media" / f"{BED_ID}.wav"
+    post_pause_bed = REPO_ROOT / "media" / f"{POST_PAUSE_BED_ID}.wav"
     hold_music = REPO_ROOT / "media" / f"{HOLD_MUSIC_ID}.wav"
     if source is None:
         raise SystemExit(
@@ -690,6 +694,7 @@ def render(out_path=None, work_dir=None, verbose=True, local=False):
             "EDITORIAL decision, not a derivation: it needs the owner.")
     for path, what in (
             (bed, "music bed"),
+            (post_pause_bed, "post-pause vocal music bed"),
             (hold_music, "cleared elevator music")):
         if not path.exists():
             raise SystemExit(
@@ -787,7 +792,7 @@ def render(out_path=None, work_dir=None, verbose=True, local=False):
     _run(list(ffmpeg) + [
         "-nostdin", "-v", "error", "-y",
         "-i", str(silent), "-i", str(bed), "-i", str(hold_music),
-        "-i", str(amber_source),
+        "-i", str(amber_source), "-i", str(post_pause_bed),
         "-filter_complex", audio_filtergraph(),
         "-map", "0:v:0", "-map", "[aout]",
         "-c:v", "copy",
@@ -871,6 +876,7 @@ def build():
         "title": "Endless Forms Most Beautiful",
         "source_id": SOURCE_ID,
         "bed_id": BED_ID,
+        "post_pause_bed_id": POST_PAUSE_BED_ID,
         "source_duration_sec": round(src_sec, 3),
         "bed_duration_sec": round(bed_sec, 3),
         "picture_sec": round(picture, 3),
@@ -887,7 +893,9 @@ def build():
             "source_resume": HALLWAY_RESUME_SRC,
             "wall_in": HALLWAY_AT,
             "wall_out": HALLWAY_RETURN_AT,
-            "black_conversation_sec": BLACK_CONVERSATION_SEC,
+            "hallway_before_amber_sec": HALLWAY_FREEZE_SEC,
+            "amber_clip_sec": AMBER_CLIP_SEC,
+            "hallway_after_amber_sec": HALLWAY_AFTER_AMBER_SEC,
         },
         "runs": [{"in": a, "out": b, "sec": round(b - a, 3), "why": w}
                  for a, b, w in RUNS],

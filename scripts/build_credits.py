@@ -72,6 +72,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -338,18 +339,9 @@ def cast_in_order(verified_logins=None):
     is skipped rather than guessed -- rule 3.
     """
     from tools.derive import load_leads
+    from tools.identity import load_people
     leads = load_leads()
-
-    # plate.name is the person's REAL name -- what their own Guardian nameplate
-    # says. display_name is sometimes a login ("castrojo") and sometimes the
-    # CHARACTER ("Nimbatus"), so neither is safe alone. Build the map once from
-    # every entry that has a plate, then a second role played by the same
-    # person is credited under the same human name.
-    real = {}
-    for entry in leads.values():
-        name = (entry.get("plate") or {}).get("name")
-        if name and entry.get("person"):
-            real.setdefault(entry["person"], name)
+    people = load_people()
 
     cards = authored_cards()
     verified = dict(verified_logins or {})
@@ -358,7 +350,8 @@ def cast_in_order(verified_logins=None):
         person = entry.get("person")
         if not person:
             continue
-        credited = real.get(person) or entry.get("display_name") or person
+        identity = people[person]
+        credited = (identity.plate or {}).get("name") or identity.login
         member = {
             "person": credited,
             "character": character_name(character_id),
@@ -371,9 +364,8 @@ def cast_in_order(verified_logins=None):
         # wrong face is not recoverable.
         if credited in cards:
             member["card"] = cards[credited]
-        if entry.get("github"):
-            member["login"] = entry["github"]
-        elif credited in verified:
+        member["login"] = identity.login
+        if credited in verified:
             member["login"] = verified[credited]
         out.append(member)
     return out
@@ -437,28 +429,20 @@ def cache_identities(verbose=True):
 
 
 def vocab_logins():
-    """``{credited name: github login}`` for every lead the vocab verifies.
-
-    A login is recorded per BINDING, and one person can hold several -- so the
-    map is keyed by the name the credits print, which is the same key the
-    manifest's own ``cast_logins`` overlay uses. Only what the vocab states is
-    used; a lead with ``github: null`` stays faceless, because a login that
-    merely matches a character name is the nimbatus/nimbinatus trap.
-    """
+    """``{credited name: github login}`` from the canonical people records."""
     from tools.derive import load_leads
+    from tools.identity import load_people
 
-    real, logins = {}, {}
+    people = load_people()
+    logins = {}
     for entry in load_leads().values():
-        person = entry.get("person")
-        if not person:
+        login = entry.get("person")
+        if not login:
             continue
-        name = (entry.get("plate") or {}).get("name")
-        if name:
-            real.setdefault(person, name)
-        if entry.get("github"):
-            logins.setdefault(person, entry["github"])
-    return {real.get(person) or person: login
-            for person, login in logins.items()}
+        person = people[login]
+        name = (person.plate or {}).get("name") or person.login
+        logins.setdefault(name, person.login)
+    return logins
 
 
 def cast_title(person):
@@ -718,11 +702,8 @@ def schedule(manifest):
     # placard. Applying it every schedule keeps the two independent.
     verified = {k: v for k, v in (manifest.get("cast_logins") or {}).items()
                 if not k.startswith("_")}
-    # The vocab's own `github:` fields join that overlay, keyed by the person
-    # rather than by the binding they happen to sit on. Laura's verified login
-    # lives on the NIMBATUS binding while her authored identity lives on the
-    # Elsie Bray one; before the splash cards came out, the identity carried
-    # her face and nobody noticed the login never reached the placard.
+    # Canonical people records join the authored overlay, keyed by the name the
+    # placard prints. One person may hold multiple character bindings.
     verified = {**vocab_logins(), **verified}
     photos = {k: v for k, v in (manifest.get("cast_photos") or {}).items()
               if not k.startswith("_")}
@@ -1179,18 +1160,26 @@ def main(argv=None):
     # encoding when available"). A bare local run of this exact argv is what
     # OOM-killed the owner's workstation at 03:08Z on 2026-08-24 -- minutes
     # of x264 over the card inputs with no memory ceiling. The cards are
-    # read by the concat LIST's contents, not by argv tokens, so they travel
-    # as staged inputs with the list's content rewritten to the pod's paths;
-    # the beds and the concert picture are argv `-i` inputs and stage
-    # directly (the list itself must NOT be an `inputs` entry -- its pod
-    # copy is the rewritten one). A local fallback runs the identical argv
-    # under farm.run_capped_local's memory cap, with the reason printed.
+    # read by the concat LIST's contents, not by argv tokens, so they are
+    # named in `inputs` (staged, and the list's content rewritten to the
+    # pod's paths) while the list itself travels as a text_file -- its pod
+    # copy is the rewritten one, never the local file. The beds and the
+    # concert picture are argv `-i` inputs and stage directly. 48Gi, not the
+    # farm's 16Gi default: this graph outgrew the workstation's 12G cap, and
+    # the pod default is the same failure one network cut closer. A local
+    # fallback runs the identical argv under farm.run_capped_local's memory
+    # cap, with the reason printed.
     from tools import farm
+    card_inputs = [Path(p) for p in
+                   re.findall(r"^file '(.+)'$", concat.read_text(),
+                              re.MULTILINE)]
     farm.run_encode(cmd,
                     inputs=[Path(cmd[i + 1]) for i, tok in enumerate(cmd)
-                            if tok == "-i" and cmd[i + 1] != str(concat)],
+                            if tok == "-i" and cmd[i + 1] != str(concat)]
+                           + card_inputs,
                     out=out_path, local=args.local,
                     text_files={concat: concat.read_text()},
+                    limit_memory="48Gi",
                     expected_duration=total)
     peaks.trim_master_peak(out_path.resolve())
     print(f"wrote {out_path}  ({fmt_tc(total)})")

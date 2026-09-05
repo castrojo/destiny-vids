@@ -177,6 +177,32 @@ VARIANTS = {
         "klass": (199, 210, 254, 255),    # #c7d2fe (Tailwind indigo-200)
         "title": (129, 140, 248, 255),    # #818cf8 (Tailwind indigo-400)
     },
+    # KubeStellar violet, for the Hive videos' contributor credits. UNLIKE
+    # bazzite and nobara, these colours are NOT sampled from a logo and NOT a
+    # published brand palette: KubeStellar has no brand or style guide that
+    # states one. They are the docs site's OWN explicitly labelled
+    # "KubeStellar theme colors" (kubestellar/docs,
+    # src/components/animations/globe/colors.ts) -- source-derived
+    # implementation styling, which is a weaker claim than the other two
+    # variants make, and is recorded as such rather than dressed up.
+    #
+    # #6236FF is that file's `secondary`, chosen over its `primary` #1A90FF
+    # because the primary is close enough to the house blue that the credit
+    # would not read as a different project's card at all. The secondary is
+    # too dark to set small type in on a translucent plate -- the same trap
+    # bazzite's wordmark purple sprang -- so the rows take Tailwind violet
+    # tints, exactly as bazzite does.
+    #
+    # The site's own type is Inter + JetBrains Mono. That does NOT transfer:
+    # the deck is DejaVu Sans Mono everywhere, and a plate in any other face
+    # is a red flag. Only the chrome crosses over.
+    "kubestellar": {
+        "border": (98, 54, 255, 140),     # rgb(98 54 255 / 55%) — #6236FF
+        "accent": (98, 54, 255, 255),     # #6236FF, the site's `secondary`
+        "label": (196, 181, 253, 255),    # #c4b5fd (Tailwind violet-300)
+        "klass": (221, 214, 254, 255),    # #ddd6fe (Tailwind violet-200)
+        "title": (167, 139, 250, 255),    # #a78bfa (Tailwind violet-400)
+    },
     # YouTube red, for a creator whose affiliation IS their channel. Same
     # rule: the platform is chrome, and #FF0000 is YouTube's own logo red,
     # which is too hot to set small type in -- the rows take red tints.
@@ -263,6 +289,10 @@ STATUS_PAD_LEFT = 1.6 * REM
 STATUS_RULE = 2                # border-left: 2px solid var(--wc-gold)
 STATUS_CHAMFER = int(0.9 * REM)  # .wc-plate clip-path: 0.9rem
 STATUS_GAP = 0.35 * REM
+# The promoted (expert-tier) HUD carries the Bazzite tile crest at the right
+# of the panel; the default status card reserves nothing and stays byte-stable.
+STATUS_MARK = 48
+STATUS_MARK_GAP = 16
 # .wc-intro-nameplate { position: fixed; top: 3rem; left: 3rem }
 STATUS_INSET = 3.0 * REM
 # .wolves-guardian-plate-raised { bottom: auto; top: 28% }
@@ -486,7 +516,7 @@ MARGIN_BOTTOM = 0.10
 # reproduced by `cards/render-cards.mjs`
 # in a real browser rather than ported into Pillow, so this module only ever
 # BURNS them: `render` skips them and `render_plate` refuses one outright.
-CARD_KINDS = ("act", "comic", "photo")
+CARD_KINDS = ("act", "comic", "photo", "ending")
 
 # The card kinds that own a row of their own rather than the lower third: the
 # site's top-left HUD, Destiny's boss bar at the top of frame, the console
@@ -1024,6 +1054,30 @@ def _pill(size, fill, border):
     return img
 
 
+def chat_runs(text):
+    """One balanced ``_emphasis_`` span -> (part, weight) runs.
+
+    The chat pill's whole Markdown: a single balanced underscore pair sets its
+    contents in the italic mono face, everything else stays bold. An
+    unbalanced underscore -- or a second pair -- is recovered dialogue
+    punctuation, not markup, so the string renders literal. This is not a
+    general Markdown parser and never grows into one: the source string this
+    exists for is "Stay _sharp_!".
+    """
+    first = text.find("_")
+    if first < 0:
+        return [(text, "bold")]
+    second = text.find("_", first + 1)
+    if second < 0 or text.find("_", second + 1) >= 0:
+        return [(text, "bold")]
+    runs = [
+        (text[:first], "bold"),
+        (text[first + 1:second], "italic"),
+        (text[second + 1:], "bold"),
+    ]
+    return [(part, weight) for part, weight in runs if part]
+
+
 def _render_chat(spec):
     """The dialogue pill from wolves-*/render/plate.html: `[crest] SPEAKER | message`.
 
@@ -1059,6 +1113,8 @@ def _render_chat(spec):
                 f"source {source!r} exactly once; found {occurrences}")
         text = text.replace(source, replacement)
 
+    runs = chat_runs(text)
+
     probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
     f_speaker = _font("regular", CHAT_FS_SPEAKER)
     speaker_w = _tracked_width(probe, speaker, f_speaker, CHAT_LS_SPEAKER)
@@ -1068,32 +1124,41 @@ def _render_chat(spec):
         mark = Image.open(K8S_CENSOR_MARK)
         return int(round(mark.width * height / mark.height)), height
 
-    def message_width(f_text):
+    def message_width(fonts):
         width = 0
-        for part in text.split(K8S_CENSOR_TOKEN):
-            if width:
-                width += censor_size(f_text)[0]
-            width += probe.textlength(part, font=f_text)
+        for part, weight in runs:
+            # Censor-piece indexing resets per run: an emphasis boundary is
+            # not a censor token, and carrying the count across runs would
+            # measure (and below, draw) a false Kubernetes mark between runs.
+            pieces_seen = 0
+            for piece in part.split(K8S_CENSOR_TOKEN):
+                if pieces_seen:
+                    width += censor_size(fonts[weight])[0]
+                pieces_seen += 1
+                width += probe.textlength(piece, font=fonts[weight])
         return width
 
-    def pill_width(f_text):
+    def pill_width(fonts):
         # the flex row: pad, avatar, gap, eyebrow, gap, rule, gap, message, pad
         return (CHAT_PAD_L + CHAT_AVATAR + CHAT_GAP + speaker_w + CHAT_GAP
                 + CHAT_RULE_W + CHAT_GAP
-                + message_width(f_text) + CHAT_PAD_R)
+                + message_width(fonts) + CHAT_PAD_R)
 
     # plate.html's shrink-to-fit: start at MAX_FONT and step down until the
     # pill fits max-width -- one wide line, never a wrap ("Prefer one wide
     # line", authoring-interview-chat-plates). The loop stops at MIN_FONT just
     # like the browser's, so a line that still overflows renders whole rather
     # than clipping recovered dialogue.
-    size = CHAT_FS_TEXT_MAX
-    f_text = _font("bold", size)
-    while size > CHAT_FS_TEXT_MIN and pill_width(f_text) > CHAT_MAX_W:
-        size -= 1
-        f_text = _font("bold", size)
+    def fonts_at(size):
+        return {weight: _font(weight, size) for _, weight in runs}
 
-    box_w = int(math.ceil(pill_width(f_text)))
+    size = CHAT_FS_TEXT_MAX
+    fonts = fonts_at(size)
+    while size > CHAT_FS_TEXT_MIN and pill_width(fonts) > CHAT_MAX_W:
+        size -= 1
+        fonts = fonts_at(size)
+
+    box_w = int(math.ceil(pill_width(fonts)))
     # border-box: the avatar is the tallest item, padding above and below.
     box_h = int(round(CHAT_AVATAR + 2 * CHAT_PAD_Y))
     img = _pill((box_w, box_h), INK, chrome["border"])
@@ -1134,25 +1199,29 @@ def _render_chat(spec):
     x += CHAT_RULE_W + CHAT_GAP
 
     if text:
-        a, d = f_text.getmetrics()
-        y = int(mid - (a + d) / 2)
         message_x = int(x)
-        for index, part in enumerate(text.split(K8S_CENSOR_TOKEN)):
-            if index:
-                mark_w, mark_h = censor_size(f_text)
-                with Image.open(K8S_CENSOR_MARK) as mark:
-                    text_layer.alpha_composite(
-                        mark.convert("RGBA").resize((mark_w, mark_h), Image.LANCZOS),
-                        (message_x, int(mid - mark_h / 2)))
-                message_x += mark_w
-            if part:
-                part_w = int(math.ceil(probe.textlength(part, font=f_text)))
-                layer = _gradient_text(
-                    (part_w + 4, int(f_text.size * 1.4)), part, f_text,
-                    [(0.0, (255, 255, 255, 255)),
-                     (0.6, NAME_MID), (1.0, NAME_BOTTOM)])
-                text_layer.alpha_composite(layer, (message_x, y))
-                message_x += part_w
+        for part, weight in runs:
+            f_run = fonts[weight]
+            a, d = f_run.getmetrics()
+            y = int(mid - (a + d) / 2)
+            pieces_seen = 0  # per run: see message_width
+            for piece in part.split(K8S_CENSOR_TOKEN):
+                if pieces_seen:
+                    mark_w, mark_h = censor_size(f_run)
+                    with Image.open(K8S_CENSOR_MARK) as mark:
+                        text_layer.alpha_composite(
+                            mark.convert("RGBA").resize((mark_w, mark_h), Image.LANCZOS),
+                            (message_x, int(mid - mark_h / 2)))
+                    message_x += mark_w
+                pieces_seen += 1
+                if piece:
+                    piece_w = int(math.ceil(probe.textlength(piece, font=f_run)))
+                    layer = _gradient_text(
+                        (piece_w + 4, int(f_run.size * 1.4)), piece, f_run,
+                        [(0.0, (255, 255, 255, 255)),
+                         (0.6, NAME_MID), (1.0, NAME_BOTTOM)])
+                    text_layer.alpha_composite(layer, (message_x, y))
+                    message_x += piece_w
 
     img.alpha_composite(_with_text_shadow(text_layer))
     return img
@@ -1188,6 +1257,17 @@ def _render_status(spec, glitch=False):
     detail = (spec.get("detail") or "").upper()   # text-transform: uppercase
     label = (spec.get("label") or "").upper()
 
+    # The default card keeps the site's fixed blue constants so every shipped
+    # status render stays byte-stable; an explicit variant swaps the chrome
+    # (and, for `bazzite`, seats the official tile crest at the panel's right).
+    variant_name = spec.get("variant", "default")
+    chrome = VARIANTS[variant_name]
+    show_bazzite = variant_name == "bazzite"
+    line = STATUS_LINE if variant_name == "default" else chrome["border"]
+    accent = STATUS_ACCENT if variant_name == "default" else chrome["accent"]
+    label_colour = STATUS_WHITE if variant_name == "default" else chrome["label"]
+    mark_room = STATUS_MARK + STATUS_MARK_GAP if show_bazzite else 0
+
     f_detail = _font("regular", FS_STATUS_DETAIL)
     f_label = _font("bold", FS_STATUS_LABEL)
 
@@ -1196,28 +1276,35 @@ def _render_status(spec, glitch=False):
         _tracked_width(probe, detail, f_detail, LS_STATUS_DETAIL),
         _tracked_width(probe, label, f_label, LS_STATUS_LABEL),
     )
-    box_w = int(round(inner + STATUS_PAD_LEFT + STATUS_PAD_RIGHT + STATUS_RULE))
+    box_w = int(round(
+        inner + STATUS_PAD_LEFT + STATUS_PAD_RIGHT + STATUS_RULE + mark_room))
     rows = [t for t in (detail, label) if t]
     text_h = sum(f.size * 1.25 for t, f in ((detail, f_detail), (label, f_label)) if t)
     text_h += STATUS_GAP * (len(rows) - 1) if len(rows) > 1 else 0
     box_h = int(round(STATUS_PAD_TOP * 2 + text_h))
 
-    img = _chamfered((box_w, box_h), STATUS_PANEL, STATUS_LINE,
+    img = _chamfered((box_w, box_h), STATUS_PANEL, line,
                      radius=STATUS_CHAMFER, corner=0)
     # border-left: the accent rule runs the full height of the plate.
     ImageDraw.Draw(img).rectangle(
-        [0, 0, STATUS_RULE - 1, box_h - 1], fill=STATUS_ACCENT)
+        [0, 0, STATUS_RULE - 1, box_h - 1], fill=accent)
+
+    if show_bazzite:
+        img.alpha_composite(
+            _bazzite_tile(STATUS_MARK, chrome["accent"], None),
+            (int(round(box_w - STATUS_PAD_RIGHT - STATUS_MARK)),
+             int(round((box_h - STATUS_MARK) / 2))))
 
     text_layer = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(text_layer)
     x = STATUS_RULE + STATUS_PAD_LEFT
     y = STATUS_PAD_TOP
     if detail:
-        _draw_tracked(draw, (x, y), detail, f_detail, STATUS_ACCENT,
+        _draw_tracked(draw, (x, y), detail, f_detail, accent,
                       LS_STATUS_DETAIL)
         y += f_detail.size * 1.25 + STATUS_GAP
     if label:
-        _draw_tracked(draw, (x, y), label, f_label, STATUS_WHITE,
+        _draw_tracked(draw, (x, y), label, f_label, label_colour,
                       LS_STATUS_LABEL)
 
     if glitch:
@@ -2635,7 +2722,7 @@ def _ensemble_entry(item, at, dur, copy):
     from vocab/casting.yaml, never from here.
 
     A contributor whose Guardian identity is genuinely authored -- recorded
-    under ``ensemble.titles`` in vocab/casting.yaml, straight from the
+    under the shared ``people`` records in vocab/casting.yaml, straight from the
     reference deck -- gets that plate verbatim instead of the generic copy.
     """
     from tools.derive import ensemble_label, load_ensemble_titles
@@ -2942,7 +3029,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
                 unresolved.append({
                     "id": character,
                     "person": binding.get("person"),
-                    "display_name": binding.get("display_name"),
+                    "display_name": binding.get("person"),
                     "requested_reveal_after": round(reveal_after, 3),
                     "revealed_at": at,
                     **REVEAL_FLOOR_MISSED,
@@ -2962,7 +3049,7 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
             unresolved.append({
                 "id": character,
                 "person": binding.get("person"),
-                "display_name": binding.get("display_name"),
+                "display_name": binding.get("person"),
                 **UNPLATED[why],
             })
         if log:
@@ -3163,8 +3250,8 @@ def plan(shots, leads, roster=None, max_shot_sec=None, hold=DEFAULT_HOLD, log=No
         tail_start, tail_dur, _ = timeline[-1]
         cursor = max([tail_start + LEAD_IN] + [b_end + TAIL_OUT for b_start, b_end in busy
                                                if b_end > tail_start])
-        # A contributor whose Guardian identity is authored (ensemble.titles in
-        # vocab/casting.yaml) is never reduced to a name line on the card while
+        # A contributor whose Guardian identity is authored in the shared people
+        # records is never reduced to a name line on the card while
         # the cut still has room for the real plate: they get first claim on
         # the tail the card was about to occupy -- but not at the price of
         # pushing anyone else off the card, since dropping a contributor is the

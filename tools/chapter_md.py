@@ -72,6 +72,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import importlib
 import json
 import re
 import sys
@@ -168,8 +169,7 @@ GITHUB_URL = re.compile(
 # A field of the entry above it. Repeating a key builds a list, which is how
 # a card's `body` rows keep their order without any punctuation to count.
 ATTR = re.compile(r"^\s*-\s+(?P<key>[A-Za-z_][A-Za-z0-9_]*)\s*:\s?(?P<value>.*)$")
-LOGIN_SHAPE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
-GITHUB_AVATAR = "https://github.com/{login}.png?size=256"
+_LEGACY_LOGIN_SHAPE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 
 # WHERE A PORTRAIT COMES FROM, AND WHY IT IS NOT TYPED HERE.
 #
@@ -177,7 +177,7 @@ GITHUB_AVATAR = "https://github.com/{login}.png?size=256"
 # in exactly one place. So a chapter file names the PERSON and the resolution
 # happens here:
 #
-#   - cast: joseph_sandoval     the portrait vocab/casting.yaml records
+#   - cast: joseph_sandoval     a transitional key mapped to a GitHub login
 #   - avatar_login: KyleGospo   this GitHub account's picture
 #
 # Both are AUTHORING keys: they are consumed here and never reach the
@@ -186,12 +186,9 @@ GITHUB_AVATAR = "https://github.com/{login}.png?size=256"
 # second copy of a casting fact, and the second copy is always the one that
 # goes wrong.
 #
-# They are two keys because they answer two different questions. `cast` is
-# "whatever the casting record says", which is right for somebody whose
-# portrait is not a GitHub picture at all; `avatar_login` is "this account's
-# picture", which is what act II's owner-seated pills were built from even
-# for people whose casting record names a different image. Collapsing them
-# would silently swap portraits on eight delivered pills.
+# They are two keys because release-train chapter files still carry `cast:`
+# labels. Both resolve to the same canonical GitHub identity, whose numeric
+# account ID determines the generated portrait URL.
 PORTRAIT_KEYS = ("cast", "avatar_login")
 
 # Keys whose value is a list even when it appears once: writing one `- body:`
@@ -246,6 +243,13 @@ def parse_front_matter(text):
     ``defaults:`` mapping, and a chapter file must stay readable to somebody
     who has never heard of a YAML parser. Anything unrecognised is left
     alone rather than guessed at.
+
+    A scalar field can run long enough that one line reads badly (Act II's
+    `field_order` is seventeen names) -- an indented continuation line with
+    no `defaults:` section open is folded onto the top-level scalar it
+    follows, joined with a space, rather than parsed as a bogus key of its
+    own (task-2-rereview-1.md: the un-joined tail silently dropped every
+    name after the first line's trailing comma).
     """
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -255,21 +259,26 @@ def parse_front_matter(text):
             break
     else:
         raise ValueError("front matter opens with `---` and never closes")
-    fields, section = {}, None
+    fields, section, last_key = {}, None, None
     for raw in lines[1:end]:
         if not raw.strip() or raw.lstrip().startswith("#"):
             continue
-        if raw[:1] in " \t" and section is not None:
-            key, _, value = raw.strip().partition(":")
-            fields[section][key.strip()] = scalar(value.strip())
-            continue
+        if raw[:1] in " \t":
+            if section is not None:
+                key, _, value = raw.strip().partition(":")
+                fields[section][key.strip()] = scalar(value.strip())
+                continue
+            if last_key is not None:
+                fields[last_key] = scalar(
+                    f"{fields[last_key]} {raw.strip()}")
+                continue
         key, _, value = raw.partition(":")
         key, value = key.strip(), value.strip()
         if not value:
-            section = key
+            section, last_key = key, None
             fields[key] = {}
             continue
-        section = None
+        section, last_key = None, key
         fields[key] = scalar(value)
     return fields, "\n".join(lines[end + 1:])
 
@@ -763,7 +772,27 @@ def schedule_block(block, offset, seats=None):
     return at, holds, notes
 
 
-def entries(act):
+def block_end(act, label):
+    """The act-local time right after a labelled block's last pill clears.
+
+    For a builder that must seat something *after* an aside authored in the
+    chapter file -- act II's paused conversation, say -- without recomputing
+    the block's own schedule of held reads and gaps itself. Raises
+    ``KeyError`` when the act has no chapter block with that label, the same
+    way ``chapter()`` names what is wired instead of failing silently.
+    """
+    chap = chapter(act)
+    for block in parse(chap.path.read_text(encoding="utf-8")):
+        if block["label"] != label:
+            continue
+        at, holds, _ = schedule_block(
+            block, chap.programme_start,
+            seats=seat_lines(act, block["lines"]))
+        return round(at[-1] + holds[-1] + GAP, 3)
+    raise KeyError(f"{act}: no chapter block labelled {label!r}")
+
+
+def entries(act, *, include_block_labels=False):
     """The act's chapter file -> (plate-manifest chat entries, unresolved).
 
     Entries carry the same shape scripts/build_efmb_plates.py emits for its
@@ -773,9 +802,78 @@ def entries(act):
 
     Copy written PAST the end of the act's picture is not the act's -- it is
     the deck that plays after it, and `deck_entries` below is what reads it.
+
+    ``include_block_labels`` is for an in-memory builder that needs to know
+    which chapter block a plate came from -- it stamps a private
+    ``_chapter_label`` onto each entry. The default manifest shape never
+    carries it: a builder that wants the label must ask for it, and a
+    committed manifest must never see a key nothing else writes.
     """
-    act_entries, _, unresolved = _split_entries(act)
+    act_entries, _, unresolved = _split_entries(
+        act, include_block_labels=include_block_labels)
     return act_entries, unresolved
+
+
+def emitted_entries(act):
+    """(the plates the act's BUILD emits, unresolved).
+
+    ``entries`` above is the chapter file's own reading of itself. An act
+    whose builder MOVES a seat between the file and the manifest -- act II,
+    whose ``source_anchor`` rows are seated on the frames they name -- resolves
+    to something the delivered master does not carry, and every command an
+    editor is pointed at (``show``, ``check``) has to describe the film that
+    ships rather than the file's raw schedule.
+
+    That mapping belongs to the builder that performs it, so the chapter
+    file declares it (``reseat: <path>:<function>`` in the front matter) and
+    it is imported lazily, only for the act that has one. Restating the
+    builder's arithmetic here would be a second copy of it, and the copy
+    nobody rebuilds from is the one that goes stale.
+
+    An act with no hook resolves to exactly ``entries(act)``.
+    """
+    resolved, unresolved = entries(act, include_block_labels=True)
+    reseat, note = _reseater(act)
+    if note is not None:
+        unresolved.append(note)
+    if reseat is None:
+        for entry in resolved:
+            entry.pop("_chapter_label", None)
+        return resolved, unresolved
+    return list(reseat(resolved)), unresolved
+
+
+def _reseater(act):
+    """The act builder's seat mapping -> ``(callable or None, note)``.
+
+    Declared by the chapter file rather than wired here, and imported only
+    when it is asked for: a general chapter tool must not depend on one
+    act's renderer, and that renderer already imports THIS module. The hook
+    keeps the dependency one-way.
+
+    A hook that cannot be loaded degrades to no mapping and a recorded note.
+    A preview one release out of date is worth more than a traceback in
+    front of somebody who only wanted to read their own dialogue back.
+    """
+    try:
+        chap = chapter(act)
+    except KeyError:
+        return None, None
+    declared = chap.fields.get("reseat")
+    if not isinstance(declared, str) or not declared.strip():
+        return None, None
+    target, _, func_name = declared.strip().rpartition(":")
+    module_path = REPO_ROOT / target
+    try:
+        if str(module_path.parent) not in sys.path:
+            sys.path.insert(0, str(module_path.parent))
+        module = importlib.import_module(module_path.stem)
+        return getattr(module, func_name), None
+    except Exception as exc:  # noqa: BLE001 -- any import failure degrades
+        return None, (f"the declared reseat hook {declared!r} could not be "
+                      f"loaded ({exc.__class__.__name__}: {exc}); seats are "
+                      "shown as this file schedules them, which is not "
+                      "necessarily what the build emits")
 
 
 def deck_entries(act):
@@ -795,7 +893,7 @@ def deck_entries(act):
     return deck, unresolved
 
 
-def _split_entries(act):
+def _split_entries(act, *, include_block_labels=False):
     """(the act's plates, the trailing deck's plates, unresolved)."""
     try:
         chap = chapter(act)
@@ -832,8 +930,24 @@ def _split_entries(act):
         into = (deck if deck_label and block["label"] == deck_label else out)
         for n, (line, start, hold) in enumerate(zip(block["lines"],
                                                     at, holds), 1):
-            into.append(build_entry(act, b, n, line, start, hold,
-                                    defaults, order))
+            if line["kind"] == "chat":
+                from tools.identity import RESERVED_SPEAKERS, UnknownPerson, canonical_login
+                if line["speaker"] not in RESERVED_SPEAKERS:
+                    try:
+                        canonical_login(line["speaker"])
+                    except UnknownPerson:
+                        unresolved.append(
+                            f"legacy-speaker: {line['speaker']} (no GitHub login "
+                            "is inferred)")
+            entry = build_entry(act, b, n, line, start, hold,
+                                defaults, order)
+            if include_block_labels:
+                # Private to an in-memory builder -- never part of the
+                # manifest shape scripts/build_efmb_plates.py emits, so a
+                # caller has to ask for it by name.
+                entry["_chapter_label"] = (
+                    block["label"] or format_tc(block["anchor"]))
+            into.append(entry)
         if into is deck:
             # Running off the picture is what a slide DOES. The note below
             # would fire on every one of them and mean nothing.
@@ -918,6 +1032,8 @@ def build_entry(act, b, n, line, start, hold, defaults, order=None):
             del entry["id"]
 
     if line["kind"] == "chat":
+        # The release train still carries literal pre-migration speakers.
+        # Keep their on-screen spelling until the owning act normalizes them.
         entry["speaker"] = line["speaker"]
         entry["text"] = line["text"]
     elif line["kind"] == "boss":
@@ -996,43 +1112,21 @@ def _resolve_default(key, value, line, entry):
         return value
     if key == "text_source":
         return "owner_supplied" if line.get("text") else "placeholder"
-    speaker = line.get("speaker") or ""
-    if not LOGIN_SHAPE.match(speaker):
+    from tools.identity import UnknownPerson, chat_identity
+    try:
+        identity = chat_identity(line.get("speaker") or "")
+    except UnknownPerson:
+        # Existing chapters are literal pre-migration authoring. Keep a
+        # previously-rendered lowercase portrait stable while audit reports the
+        # speaker; newly normalized chapters resolve through People above.
+        if not _LEGACY_LOGIN_SHAPE.match(line.get("speaker") or ""):
+            return None
+        if key == "avatar":
+            return f"renders/avatars/{line['speaker']}.png"
+        if key == "avatar_url":
+            return f"https://github.com/{line['speaker']}.png?size=256"
         return None
-    if key == "avatar":
-        return f"renders/avatars/{speaker}.png"
-    if key == "avatar_url":
-        return GITHUB_AVATAR.format(login=speaker)
-    return None
-
-
-def _casting_avatars():
-    """``{casting key: portrait URL}``, read once from vocab/casting.yaml.
-
-    Only the URL is taken. A casting record holds a person's authored plate
-    copy as well, and none of that is a chapter file's business: a pill says
-    a name because the owner typed one, and the record is consulted for the
-    picture and nothing else.
-    """
-    global _CASTING_AVATARS
-    if _CASTING_AVATARS is None:
-        import yaml
-        with (REPO_ROOT / "vocab" / "casting.yaml").open(
-                encoding="utf-8") as fh:
-            doc = yaml.safe_load(fh) or {}
-        found = {}
-        for key, record in (doc.get("ensemble", {}).get("titles") or {}).items():
-            if isinstance(record, dict):
-                found[key] = record.get("avatar")
-        for key, binding in (doc.get("leads", {}).get("values") or {}).items():
-            if isinstance(binding, dict):
-                found.setdefault(key, (binding.get("plate") or {})
-                                 .get("avatar"))
-        _CASTING_AVATARS = found
-    return _CASTING_AVATARS
-
-
-_CASTING_AVATARS = None
+    return identity.get(key)
 
 
 def _portrait(named):
@@ -1046,15 +1140,15 @@ def _portrait(named):
     """
     if not named:
         return None
-    login = named.get("avatar_login")
-    if login:
-        return {"avatar": f"renders/avatars/{login}.png",
-                "avatar_url": GITHUB_AVATAR.format(login=login)}
-    key = named.get("cast")
-    url = _casting_avatars().get(key)
-    if not url:
+    from tools.identity import UnknownPerson, chat_identity, login_for_cast_key
+    try:
+        login = named.get("avatar_login")
+        if login:
+            return chat_identity(login)
+        key = named.get("cast", "")
+        return chat_identity(login_for_cast_key(key))
+    except UnknownPerson:
         return {}
-    return {"avatar": f"renders/avatars/{key}.png", "avatar_url": url}
 
 
 def _ordered(entry, order):
@@ -1183,7 +1277,7 @@ def _extract_entry(plate, offset, defaults):
 
 
 def _portrait_row(plate, predicted):
-    """The ``cast:``/``avatar_login:`` row that restores a plate's picture.
+    """The login-keyed authoring row that restores a plate's picture.
 
     A lift that wrote the URL out longhand would move a casting fact into a
     second file, so the picture is described by WHO it is of. ``None`` when
@@ -1192,16 +1286,22 @@ def _portrait_row(plate, predicted):
     is lost.
     """
     avatar, url = plate.get("avatar"), plate.get("avatar_url")
-    if not avatar or not url:
+    if not avatar and not url:
         return None
     if predicted.get("avatar") == avatar and predicted.get("avatar_url") == url:
         return None
-    key = str(avatar).rsplit("/", 1)[-1].removesuffix(".png")
-    if url == GITHUB_AVATAR.format(login=key):
-        return f"avatar_login: {key}"
-    if _casting_avatars().get(key) == url:
-        return f"cast: {key}"
-    return None
+    # A local authored picture is already source copy. It has no account
+    # identity to resolve, and must not be rejected merely because it has no
+    # companion URL.
+    if not avatar or not url:
+        return None
+    key = str(avatar or "").rsplit("/", 1)[-1].removesuffix(".png")
+    from tools.identity import UnknownPerson, login_for_cast_key
+    try:
+        canonical = login_for_cast_key(key)
+    except UnknownPerson:
+        return None
+    return f"avatar_login: {canonical}"
 
 
 def _attr_rows(key, value):
@@ -1379,7 +1479,11 @@ def check(act):
     if chap.manifest_path() is None:
         return []
     committed = manifest_plates(act)
-    resolved, _ = entries(act)
+    # The seats the BUILD emits, not this file's raw schedule: an act that
+    # reseats a line (act II) would otherwise report its own accepted
+    # mapping as ten lines of permanent drift, and real drift would be
+    # indistinguishable from it.
+    resolved, _ = emitted_entries(act)
     if not resolved and any(p.get("copy_source") not in DERIVED_COPY
                             for p in committed):
         # A file that resolves to nothing used to report nothing, which is
@@ -1525,13 +1629,31 @@ def main(argv=None):
                   "add one as `## <programme time>` followed by "
                   "`Speaker: line` rows")
             return 0
-        for block in blocks:
+        # `@ <programme time>` is the clock the owner scrubs, so this has to
+        # print the seat the BUILD emits. Act II moves two classes of line
+        # between this file and its manifest; showing the raw schedule sent
+        # an editor to a timecode 47 s from the picture they meant to nudge.
+        emitted, notes = emitted_entries(args.act)
+        for note in notes:
+            print(f"  NOTE: {note}")
+        seats = {e["id"]: e for e in emitted if "id" in e}
+        for b, block in enumerate(blocks, 1):
             at, holds, notes = schedule_block(
                 block, offset, seats=seat_lines(args.act, block["lines"]))
             label = f"  # {block['label']}" if block["label"] else ""
             print(f"## {format_tc(block['anchor'])}{label}")
-            for line, start, hold in zip(block["lines"], at, holds):
+            for n, (line, start, hold) in enumerate(
+                    zip(block["lines"], at, holds), 1):
                 pin = " (pinned)" if line["pin"] is not None else ""
+                seat = seats.get(line["id"]
+                                 or _generated_id(args.act, b, n, line))
+                if seat is not None and seat.get("at") is not None:
+                    if start is None or abs(seat["at"] - start) > 5e-4:
+                        # The builder seated this somewhere else. Say so:
+                        # an unexplained clock is how a preview stops being
+                        # believed.
+                        pin += " (reseated by the build)"
+                    start, hold = seat["at"], seat.get("dur", hold)
                 if line["kind"] == "boss":
                     what = f"! {line['name']}"
                 elif line["kind"] == "card":

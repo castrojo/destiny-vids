@@ -1,7 +1,7 @@
 ---
 name: chapters
-version: "1.0"
-last_updated: "2026-08-21"
+version: "1.1"
+last_updated: "2026-09-04"
 id: chapters
 one_line_purpose: Author a chapter's on-screen copy in one Markdown file per chapter.
 entry_point: docs/skills/chapters.md
@@ -70,6 +70,13 @@ names are easy to confuse:
 | VIII — the cries | `chapters/VIII-cta.md` | yes, `cta_cards` |
 | VIII — fixed credits | `chapters/VIII-fixed.md` | yes, `fixed_cards` |
 
+Standalone series whose builder does not yet consume chapter Markdown stage
+owner-authored passes under `stories/standalone/authoring/<series>/`, one file
+per episode. That directory is the durable copy record, not a render manifest:
+it preserves exact source marks, wording, order, and production directions
+until the series builder gains a chapter adapter. Do not leave a pass in
+session notes, and do not paste it into the generated season manifest.
+
 **Act II is a partial author, and that is the whole difference.** Every word
 anybody *speaks* in it — all 53 pills and both red splashes — is authored in
 its chapter file, exactly like the other ten. What it does not own is its
@@ -94,6 +101,59 @@ so lengthening a line still moves the card after it.
 the manifest is an *output*: `tools/plate.py` re-syncs it from the chapter
 file before every burn, so a hand-edit is reverted at the moment it would
 otherwise reach a frame.
+
+**A heading label lets a held frame derive its own duration.** Writing
+`## <heading> <label>` (for example `## 9:52.203 paused`) tags every entry
+under that heading until the next one, and `chapter_md.block_end(act, label)`
+returns the film position where the labelled block ends — so a builder that
+holds a frame for "as long as this conversation takes" derives that hold from
+the conversation's own authored length instead of a hand-typed duration that
+goes stale the next time a line is added or cut. `entries(act,
+include_block_labels=True)` returns each entry's label under the private
+`_chapter_label` key, for a builder (or a test) that needs to know which
+block an entry belongs to; it is never written into the manifest.
+
+**`source_anchor` seats a pill on a source frame instead of its natural
+schedule.** A pill that must play back exactly when it was actually said —
+because the owner locked it to a specific moment in the source footage,
+independent of how long anything authored before it runs — carries
+`source_anchor: <source seconds>` instead of `@ <heading time>` or
+`seen_at_src`. Act II's builder (`scripts/build_efmb_plates.py`) pops the key,
+sets `at` from that source frame, and publishes `seen_at_src` in its place;
+the key never reaches the manifest. Its seat stays tied to the current source
+frame rather than to a programme-clock pin that may move with an edit.
+
+**An inserted clip inside a held source frame needs three labelled blocks.**
+Label the pre-insert hold, the inserted action, and the post-insert hold; the
+picture builder derives all three half-open intervals from those records. Its
+inverse clock must return the held source frame during the post-insert interval
+and raise only inside the external clip.
+
+**An identifier is not visual evidence.** A constant or plate ID can preserve
+an earlier interpretation of a frame; extract and inspect the target frame
+before using it as a `source_anchor`. Name a real person or label a group only
+from what is visible in that frame.
+
+**`show` and `check` print the seat the BUILD emits, not the file's raw
+schedule.** An act whose builder moves a line between the chapter file and
+the manifest — act II does both of the things above — declares the mapping in
+its front matter:
+
+```
+reseat: scripts/build_efmb_plates.py:reseat_chapter_entries
+```
+
+`chapter_md.emitted_entries(act)` imports that function lazily (only for the
+act that declares one, so the general chapter tool never depends on one act's
+renderer) and hands it the resolved entries; `show` marks anything it moves
+`(reseated by the build)` and `check` compares the moved seats. Without it,
+`show` quotes a programme time the delivered master does not carry — an
+editor asked to nudge a line scrubs to it and is looking at the wrong
+picture — and `check` reports the accepted mapping as permanent drift, which
+hides the real thing. A hook that cannot be imported degrades to the file's
+own schedule with a note, and never raises. **The mapping lives in the
+builder that performs it**; restating it in `chapter_md` (or in a test) is a
+second copy, and the copy nobody rebuilds from is the one that goes stale.
 
 **The orphan trap, retired:** `dialogue/yt_destiny_all_live_action_trailers/`
 used to carry exactly one line — Cayde's "I'm so proud of you kids!"
@@ -127,22 +187,29 @@ kat @ 15:33.770: How much you...   pinned to an exact programme moment
   - body: second line
   - fade_in: null                  delete a field the defaults supplied
   - censor: Goddamn -> G{k8s}ddamn
-  - cast: joseph_sandoval        the portrait vocab/casting.yaml records
-  - avatar_login: KyleGospo      the portrait github.com/<login> serves
 ```
 
-**A pill names the person, never the URL.** `cast:` takes whatever avatar
-`vocab/casting.yaml` holds for that binding; `avatar_login:` takes
-`https://github.com/<login>.png`. They are **not** interchangeable — several
-people in act II have a casting avatar that is not their GitHub one
-(A1RM4X's is a YouTube URL), so swapping the key swaps the face. Neither key
-reaches the manifest: both resolve to `avatar`/`avatar_url` at build time, so
-a portrait that moves in the vocab moves on every pill that cites it. Write a
-URL into a chapter file and it is a copy that will go stale silently.
-
-A speaker whose name *is* a GitHub login needs neither key — the login shape
-is recognised and the portrait derived. `- avatar: null` removes a portrait
+**A pill names a GitHub login, never a URL.** A canonical login resolves through
+`vocab/casting.yaml`'s `people` map, which owns its stable numeric GitHub ID and
+portrait fields. Display names, character IDs, historical personas, `cast:`,
+`avatar_login:`, and GitHub URLs are not chapter authoring. Existing release-
+train rows using those forms remain literal legacy speakers and are reported by
+`tools/identity.py`; they are not aliases. `- avatar: null` removes a portrait
 that was derived but is not wanted.
+
+**A one-video character bond keeps the real handle visible.** When the owner
+explicitly says a real GitHub speaker is playing a lore character for one
+scene, the pill still names the real login. A character portrait may replace
+the GitHub PFP as presentation chrome only when that bond and the portrait's
+source are recorded beside the cue. Never replace the handle with the
+character name: the audience knows the person and needs the picture to teach
+the temporary role.
+
+When lifting an existing manifest, keep a local authored `avatar` path as a
+local chapter field. Omit a GitHub-derived URL only when the rebuilt entry
+deterministically re-derives that exact portrait through its login. A card or
+legacy speaker whose literal URL cannot be re-derived keeps it, rather than
+losing a portrait or gaining an inferred identity.
 
 Front matter worth knowing: `owns_plates` (this file is answerable for its
 plates, so the manifest is regenerated from it), `field_order`, `defaults`
@@ -195,6 +262,26 @@ python3 scripts/generate_full_script.py --write   # refresh the read-through
 the audience hears it, and it is **generated** — every block says which file
 its lines are edited in.
 
+## Integrating an owner's prompt-style edit
+
+The owner sometimes edits a chapter file the way they would talk to an
+agent: instructions, angle-bracket notes, and production directions mixed
+into the dialogue. The integration order matters:
+
+1. **Snapshot the raw edit first.** Commit it verbatim on its own branch
+   before changing a word — authored copy must never exist only in a
+   working tree, and the raw text is the evidence of intent.
+2. **Execute or preserve every instruction.** A direction that is not
+   dialogue (a recast note, a "make it dramatic" tail block) is either done
+   in the same change or preserved verbatim in the commit message for the
+   workstream that owns it. It never stays in the chapter file, and it is
+   never treated as a line to render.
+3. **Re-seat only what may move.** `@` pins are owner placement and never
+   move. When new lines overlap, adjust only unpinned cascade lines, keep
+   the owner's written order, and record the seating rule in the file.
+4. **Finish with `show` clean and `sync --write`** — no overlap NOTEs you
+   did not deliberately accept, then regenerate the manifest.
+
 ## Red Flags
 
 - **Editing a manifest to change a word.** It is an output. The next burn
@@ -215,6 +302,14 @@ its lines are edited in.
   running order moves.
 - Widening a hold because `tools/readtime.py` says a line is short. Moving
   an authored beat is the owner's call, never a tool's.
+- **A line with leading whitespace silently falls out of the schedule** —
+  `show` will not list it and nothing errors. If a line the owner wrote is
+  missing from `show`, check for a stray indent before assuming a drop.
+- Seating two pills so they overlap. `tools/plate.py` hard-refuses two
+  visible pills at once, so "accept the overlap" is not buildable; re-seat
+  an unpinned line instead.
+- Leaving a standalone episode pass in an agent database or transcript after
+  the session. Export it to the series authoring directory before stopping.
 
 ## Verification
 
@@ -222,5 +317,6 @@ its lines are edited in.
 python3 -m pytest -q tests/test_chapter_md.py tests/test_chapter_identity.py
 python3 -m pytest -q tests/test_full_script.py
 python3 tools/chapter_md.py check
+python3 tools/identity.py --act <migrated-act> --check
 python3 scripts/generate_full_script.py --check
 ```

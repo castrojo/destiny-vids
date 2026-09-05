@@ -2,14 +2,11 @@
 act: VII
 manifest: stories/07-europa-plates.json
 # WHERE THIS ACT STARTS IN THE PROGRAMME, in seconds. Measured, not guessed:
-# the running order's segment durations summed from a
-# `tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-21 --
-# every segment before it, summed: prologue 101.200 + act I 116.200 +
-# Perfume 2 66.400 + act II 364.068 + act III 160.200 + Perfume 3 114.848 +
-# act IV 34.000 + act V 25.259 + interstitial 5.000 + act VI 401.527 +
-# Perfume 4a 13.120 + Perfume 4b 102.445 = 1504.267.
+# `tools/megacut.py --dry-run` puts Excision at 1450.294, Perfume movement 4
+# at 1602.796, and Europa at 1718.362. The insertion shifts the programme
+# clock only; each plate's act-local seat is unchanged.
 # Restate the derivation when the running order moves.
-programme_start: 1504.267
+programme_start: 1718.362
 # The order this act has always written its plates in, kept so the generated
 # manifest reads the way the delivered one did.
 # This act's whole plate list comes from this file, so the manifest is
@@ -46,8 +43,8 @@ move or re-time that pill, and expect to rebuild the act when you do.
 
 - `[an-id]` keeps the pill's existing id, which is what the delivered master
   and every note about this act refer to.
-- `@ 25:04.267` is programme time — the clock you scrub in the whole
-  show. This act starts at 25:04.267.
+- `@ 26:27.060` is programme time — the clock you scrub in the whole
+  show. This act starts at 26:27.060.
 - `+2.4` is how long the pill holds. Delete it and the hold is derived from
   read speed instead (15 characters a second, floor 2.2 s, ceiling 7 s).
 - `- field: value` rows under a line carry its chrome — the avatar, the fade,
@@ -69,23 +66,23 @@ owner's written order: alolita's report and tophee's confirmations follow the
 deployment exchange, and the sacrifice line with the Lone Wolf Protocol trio
 follow the creed, rolling into nimbatus' "Wilco". <<
 
-## 25:04.831
+## 28:38.926
 
-[d01] krook @ 25:04.831 +1.6: Deploy CNCF Projects Team
+[d01] krook @ 28:38.926 +1.6: Deploy CNCF Projects Team
   - avatar: ~/Videos/wolves-directors-cut/nimbatus-review/render/krook.png
   - fade_out_at: 1.864
 
-[d02] preethit @ 25:06.831 +1.6: Stand down, I'm sending my wolf
+[d02] preethit @ 28:40.926 +1.6: Stand down, I'm sending my wolf
   - fade_out_at: 3.864
 
-[d03] alolita @ 25:08.831 +2.6: Are you sure the Kube is on Europa?
+[d03] alolita @ 28:42.926 +2.6: Are you sure the Kube is on Europa?
   - avatar: renders/avatars/alolita.png
   - fade_out_at: 6.864
 
-[d04] preethit @ 25:11.831 +2.0: I hope she can handle the Kube
+[d04] preethit @ 28:45.926 +2.0: I hope she can handle the Kube
   - fade_out_at: 9.264
 
-[d04b] preethit @ 25:14.231 +2.2: I must not fail
+[d04b] preethit @ 28:48.326 +2.2: I must not fail
 
 alolita: We have failed, Guardians are down
 
@@ -93,25 +90,25 @@ tophee: I've confirmed it myself, we have no choice
 
 tophee: She's the only way to stop the Toilmaster
 
-## 25:28.831
+## 29:02.926
 
-[d05] castrojo @ 25:28.831 +2.6: They must never know what you did for them
+[d05] castrojo @ 29:02.926 +2.6: They must never know what you did for them
   - avatar: renders/avatars/castrojo.png
   - fade_out_at: 26.864
 
-[d06] mrbobbytables @ 25:31.831 +2.0: When all hope is lost
+[d06] mrbobbytables @ 29:05.926 +2.0: When all hope is lost
   - avatar: renders/avatars/mrbobbytables.png
   - fade_out_at: 29.264
 
-[d07] jeefy @ 25:34.231 +2.2: Standing by for Extraction
+[d07] jeefy @ 29:08.326 +2.2: Standing by for Extraction
   - avatar: renders/avatars/jeefy.png
   - fade_out_at: 31.864
 
-[d08] ihor @ 25:36.831 +2.2: G{k8s}dspeed
+[d08] ihor @ 29:10.926 +2.2: G{k8s}dspeed
   - avatar: renders/avatars/idvoretskyi.png
   - fade_out_at: 34.464
 
-[d11] preethit @ 25:39.431 +2.2: Our clan
+[d11] preethit @ 29:13.526 +2.2: Our clan
 preethit: Is the Iron
 preethit: That forges Wolves
 
@@ -121,15 +118,15 @@ mrbobbytables: Wolves gladly sacrifice for their own
 [iancoldwater] Local Security systems trivially pwned
 [tabbysable] Europan Security systems trivially pwned (again)
 
-## 26:05.831
+## 29:39.926
 
-[d09] nimbatus @ 26:05.831 +1.8: Wilco
+[d09] nimbatus @ 29:39.926 +1.8: Wilco
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 63.064
 
-[d10] nimbatus @ 26:08.031 +2.0: {k8s}ut
+[d10] nimbatus @ 29:42.126 +2.0: {k8s}ut
   - avatar: ~/src/website/public/wolves/characters/nimbatus.webp
   - fade_out_at: 65.464
 
-preethit @ 26:15.000: Hummingbird will find the girl
+preethit @ 29:49.095: Hummingbird will find the girl
   - avatar: renders/avatars/preethit.png

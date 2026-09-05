@@ -13,6 +13,7 @@ file in it is a regenerated artifact.
 | `Prod/` | The show at the **highest quality that exists** — one file per act, `NN-<act>.mp4`, FLAC audio, picture never re-encoded |
 | `10mb/` | Social copies under a byte cap (`tools/social.py`), built from `Prod/` |
 | `megacut/` | The final movie, and nothing else (`tools/megacut.py`) |
+| `review/` | Standalone cuts, review renders, and their thumbnails — never loose at `~/Videos/` |
 | Watch | `catt` to the owner's TV — see [Putting it on the television](#putting-it-on-the-television) |
 | Publish | `python3 ~/Videos/yt-refresh.py` — one unlisted playlist |
 
@@ -32,6 +33,15 @@ for somebody else's act is a report, not a chore — act I's line was stale for
 exactly this reason and was deliberately left alone. The exception is
 `deliver.py publish`: it recomputes every line before it rewrites the file,
 so the assertion it writes is the one it checked.
+
+## Wallpaper seats
+
+Do not manufacture variety by rotating a small wallpaper pool. Wait for the
+owner's new art, then distribute it across the mutable show seats rather than
+concentrating it in the credits.
+
+The Timeless movement immediately before *Endless Forms Most Beautiful* is
+locked: never move, replace, or re-time its wallpaper sequence.
 
 ## Putting it on the television
 
@@ -250,10 +260,11 @@ declared `rebuild` command exits 0. Running the same command by hand and then
 `publish` records the input digest but leaves the stamp where it was — the
 tool deliberately cannot know which commit rendered the file on disk, because
 stamping HEAD there is how re-publishes once certified acts they never built.
-So: rebuild through the tool, never by hand. An act with no declared `rebuild`
-(acts II and VI, by design — their burns are not idempotent) cannot earn the
-stamp at all today; that gap is
-[#348](https://github.com/castrojo/destiny-vids/issues/348).
+So: rebuild through the tool, never by hand. An act whose delivered master is
+a plate burn needs a wrapper that names the safe route (clean picture, then
+burn onto the clean picture) before it can declare one; acts II and VI have
+theirs (`scripts/rebuild_efmb.sh`, `scripts/rebuild_wolves_plated.sh`,
+[#348](https://github.com/castrojo/destiny-vids/issues/348)).
 
 ### What the programme rung proves, and what it does not
 
@@ -307,12 +318,14 @@ Staleness is content-based where it can be, because `~/Videos` is a Syncthing
 folder and mtimes lie: the hardlink layer is checked by **inode identity**
 against the declared master, `CHECKSUMS.md5` by recomputation, and the
 README's master table is **generated** between `<!-- deliver:table -->`
-markers so a hand-edit that disagrees with the map is detected as drift. The
-megacut carries a sidecar digest of the exact verified Prod checksum set it
-seated, plus a duration check against the plan's arithmetic. Prefer
-`deliver.py build`, which records that sidecar; a direct `tools/megacut.py`
-run is still stale until its verified build is followed by
-`deliver.record_megacut_provenance`.
+markers so a hand-edit that disagrees with the map is detected as drift.
+`10mb/README.md` owns two analogous generated tables: the current source
+runtime, cap-derived video budget, and social-copy size; its prose remains
+hand-authored. The megacut sidecar is current only when it both matches the
+exact verified Prod checksum set and postdates its output, plus a duration
+check against the plan's arithmetic. Prefer `deliver.py build`, which records
+that sidecar; a direct `tools/megacut.py` run is still stale until its verified
+build is followed by `deliver.record_megacut_provenance`.
 
 Two deliberate behaviours, both learned the hard way on 2026-08-13:
 

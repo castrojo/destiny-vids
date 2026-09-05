@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from tools import dialogue, plate  # noqa: E402
+from tools.identity import UnknownPerson
 
 LEADS = {
     "osiris": {"person": "mrbobbytables", "display_name": "mrbobbytables",
@@ -36,25 +37,36 @@ SHOTS = [shot("a", 8.0, 18.0), shot("b", 60.0, 70.0)]
 
 def test_speaker_is_the_login_not_the_character_and_not_the_legal_name():
     """Owner, 2026-08-24: "change the dialogue chat boxes to their github
-    handles, @mrbobbytables and @clubanderson."
+    handles, mrbobbytables and clubanderson."
 
     A pill credits by login, the way the chat interface it imitates would.
     The Guardian reveal still carries the legal name -- the two are different
     treatments of the same binding, not a disagreement about it."""
-    assert dialogue._speaker_for("osiris", LEADS) == "@mrbobbytables"
-    assert dialogue._speaker_for("sagira", LEADS) == "@clubanderson"
+    assert dialogue._speaker_for("osiris", LEADS) == "mrbobbytables"
+    assert dialogue._speaker_for("sagira", LEADS) == "clubanderson"
     assert LEADS["osiris"]["plate"]["name"] == "Bob Killen", (
         "the reveal is untouched; only the pill changed")
 
 
-def test_a_person_with_no_login_is_credited_by_name_not_dropped():
-    """Degrade, never block: a missing login is a gap, not a disqualification.
-    Guessing one would be a claim about a real person's account."""
+def test_a_person_with_no_login_is_not_rendered_as_a_guessed_identity():
+    """A real name is not a GitHub account and must not become one on screen."""
     leads = {"osiris": {"display_name": "somebody", "github": None,
                         "plate": {"name": "Real Name"}}}
-    assert dialogue._speaker_for("osiris", leads) == "Real Name"
-    assert dialogue._speaker_for("osiris", {"osiris": {
-        "display_name": "somebody", "github": None, "plate": None}}) == "somebody"
+    assert dialogue._speaker_for("osiris", leads) is None
+
+
+@pytest.mark.parametrize("planner", [dialogue.plan_chat, dialogue.plan_script])
+def test_an_unknown_lead_login_fails_explicitly(planner):
+    """An invalid cast binding is not the same as an intentionally uncast lead."""
+    leads = {"osiris": {"person": "definitely-not-a-github-login"}}
+    cues = [{"id": "x", "start_sec": 9.0, "end_sec": 12.0,
+             "character": "osiris", "text": "..."}]
+    with pytest.raises(
+        UnknownPerson,
+        match=r"unknown GitHub login: 'definitely-not-a-github-login'",
+    ):
+        planner(cues, SHOTS, leads)
+
 
 def test_an_uncast_character_gets_no_card():
     assert dialogue._speaker_for("ikora_rey", LEADS) is None
@@ -70,7 +82,7 @@ def test_anchored_lines_land_where_their_footage_landed():
     # Shot "a" starts at 8.0 of source and at 0.0 of the cut, so the cue at
     # 10.0 lands 2.0s in.
     assert first["at"] == pytest.approx(2.0)
-    assert first["speaker"] == "@clubanderson"
+    assert first["speaker"] == "clubanderson"
     assert first["kind"] == "chat"
     assert first["avatar"] == "renders/avatars/clubanderson.png"
 
@@ -98,8 +110,8 @@ def test_chat_mode_still_places_the_settled_lines():
     """The fix drops the unsettled line only -- not the conversation."""
     entries, _ = dialogue.plan_chat(CUES, SHOTS, LEADS)
     assert [e["id"] for e in entries] == ["d01", "d02"]
-    assert [e["speaker"] for e in entries] == ["@clubanderson",
-                                               "@mrbobbytables"]
+    assert [e["speaker"] for e in entries] == ["clubanderson",
+                                               "mrbobbytables"]
     assert [e["avatar"] for e in entries] == [
         "renders/avatars/clubanderson.png",
         "renders/avatars/mrbobbytables.png",
@@ -144,9 +156,7 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     assert data["cues"], "no cues recovered"
     for cue in data["cues"]:
-        # Three voices now: Bob and Doc carry the act, and Karena interrupts
-        # once. Anyone else would be an uncredited claim about a real person.
-        assert cue["character"] in ("osiris", "sagira", "mara_sov")
+        assert cue["character"] in ("osiris", "sagira")
         assert cue["evidence"] in ("vocative", "alternation", "uncertain",
                                    "owner_supplied")
         assert cue["end_sec"] > cue["start_sec"]
@@ -172,9 +182,9 @@ def test_the_indexed_dialogue_file_is_loadable_and_attributed():
 @pytest.mark.parametrize(
     "cue_id, expected",
     [
-        ("d20a", (121.44, 124.91, "osiris")),
-        ("d20b", (124.92, 127.95, "osiris")),
-        ("d21", (127.96, 132.99, "osiris")),
+        ("d20a", (124.24, 127.71, "osiris")),
+        ("d20b", (127.72, 130.75, "osiris")),
+        ("d21", (130.76, 135.79, "osiris")),
     ],
 )
 def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
@@ -184,15 +194,13 @@ def test_act3_review_cues_pin_exact_timing_and_speaker(cue_id, expected):
 
 
 def test_act3_owner_placed_pins_are_recorded_in_film_seconds():
-    """Owner, 2026-08-24: d20a at 1:57, d21 at 2:04 (on the red portal),
-    d22 at 2:14.82 -- the seat it held before the sign-punchline cut retired
-    it, and the seat the owner named when asking for it back."""
+    """d22 follows d28's approved readable hold without overlapping it."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = {cue["id"]: cue for cue in data["cues"]}
     assert cues["d13"]["pin_sec"] == 90.0
     assert cues["d20a"]["pin_sec"] == 117.0
     assert cues["d21"]["pin_sec"] == 124.0
-    assert cues["d22"]["pin_sec"] == 134.82
+    assert cues["d22"]["pin_sec"] == 135.21
 
 
 def test_act3_toilmaster_line_is_dropped_and_replaced():
@@ -216,7 +224,7 @@ def test_act3_the_maintainer_exchange_is_restored_after_the_hive_line():
 
     The exchange was retired the same day (#357 took d23b, d26 and d25; #358
     took d22 and the 7% line) and the owner asked for three of the five back:
-    d22, d23a and d23b. d22 is reworded to name the CNCF rather than
+    d22 and d23b. d22 is reworded to name the CNCF rather than
     Kubernetes -- 'We need', not 'You need' -- and keeps its old wording as
     recovered_text. d26 and d25 stay retired.
 
@@ -236,20 +244,13 @@ def test_act3_the_maintainer_exchange_is_restored_after_the_hive_line():
     assert by_id["d22"]["text_source"] == "owner_supplied"
     assert by_id["d22"]["recovered_text"] == (
         "You need to get a message to the Kubernetes Maintainers")
-    # d23a was Doc's 7% statistic until 2026-08-24, when the owner gave the
-    # line to Karena as a retort: "Change the email line to be spoken by
-    # https://github.com/angellk -- 'Check your email smartass'". Bob tells
-    # people to check their email, then says he needs to get a message to the
-    # maintainers, and a maintainer tells him to check his.
-    assert by_id["d23a"]["text"] == "Check your email smartass"
-    assert by_id["d23a"]["character"] == "mara_sov"
     assert by_id["d23b"]["text"] == "I don't like this plan"
-    for restored in ("d22", "d23a", "d23b"):
-        assert by_id[restored]["character"] in ("osiris", "sagira", "mara_sov")
+    for restored in ("d22", "d23b"):
+        assert by_id[restored]["character"] in ("osiris", "sagira")
 
     ids = [c["id"] for c in cues]
     assert ids.index("d21") < ids.index("d27") < ids.index("d22")
-    assert ids.index("d22") < ids.index("d23a") < ids.index("d23b")
+    assert ids.index("d22") < ids.index("d23b")
     assert ids[-1] == "d23b", "the 'I don't like this plan' line closes"
 
 
@@ -375,13 +376,8 @@ def test_act3_bob_barks_at_the_maintainers_before_asking_for_them():
     """Owner, 2026-08-24: 'add 2 new lines, at 2:13 "mrbobbytables: You need
     to apply, check your email, focus!" then leave everything else.'
 
-    Only one line of copy was supplied, so one was added. It is seated in the
-    2.64 s of pill-free picture between the Hive quip and the maintainer
-    exchange -- the gap the owner was looking at -- and it is UNPINNED on
-    purpose. A pin at 2:13.00 exactly would run to 2:15.20 and overlap d22,
-    whose 2:14.82 seat the owner pinned and then said to leave; flowing puts
-    the line as early as it can go without touching a beat that was already
-    placed. It lands at 2:12.43 and clears d22 by 0.19 s.
+    The later readable-hold pass keeps d28 unpinned and moves the maintainer
+    exchange to 2:15.21, after d28's required 2.53-second hold.
     """
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = data["cues"]
@@ -391,11 +387,51 @@ def test_act3_bob_barks_at_the_maintainers_before_asking_for_them():
     assert by_id["d28"]["character"] == "osiris", "Bob Killen's character"
     assert by_id["d28"]["text_source"] == "owner_supplied"
     assert "pin_sec" not in by_id["d28"], (
-        "pinning it at 2:13.00 would overlap d22, and d22 does not move")
+        "d28 flows before the separately reseated d22 pin")
 
     ids = [cue["id"] for cue in cues]
     assert ids.index("d27") < ids.index("d28") < ids.index("d22")
-    assert by_id["d22"]["pin_sec"] == 134.82, "the exchange did not move"
+    assert by_id["d22"]["pin_sec"] == 135.21, "the exchange follows d28"
+
+
+def test_act3_priority_dialogue_reseats_are_readable_and_identity_normalized():
+    """The approved re-seats keep the words/order while using People logins."""
+    from tools.derive import load_leads
+
+    data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
+    cues = {cue["id"]: cue for cue in data["cues"]}
+    expected = {
+        "d02": (42.00, 45.65, "mrbobbytables",
+                "This training repository is the best place to hone their craft"),
+        "d03": (45.66, 48.72, "mrbobbytables",
+                "Iteration 7: Students serialize instead of parallize"),
+        "d06": (53.73, 56.79, "clubanderson",
+                "Bluefin's Hive is reprogramming them all as we speak"),
+        "d28": (138.71, 141.24, "mrbobbytables",
+                "You need to apply, check your email, focus!"),
+        "d22": (141.25, 144.08, "mrbobbytables",
+                "We need to get a message to the CNCF Maintainers"),
+    }
+    for cue_id, (start, end, speaker, text) in expected.items():
+        cue = cues[cue_id]
+        assert (cue["start_sec"], cue["end_sec"], cue["text"]) == (
+            start, end, text)
+
+    fixed = {"id": "clubanderson-ghost", "at": 80.4, "dur": 2.8}
+    entries, dropped = dialogue.plan_script(
+        data["cues"], [shot("long", 0.0, 200.0)], load_leads(),
+        busy=[(fixed["at"], fixed["at"] + fixed["dur"])],
+        start_at=data["display"]["start_sec"])
+    assert not dropped
+    plate.load_manifest_entries([*entries, fixed])
+    planned = {entry["id"]: entry for entry in entries}
+    for cue_id, (_, _, speaker, _) in expected.items():
+        assert planned[cue_id]["speaker"] == speaker
+        assert planned[cue_id]["avatar"] == (
+            f"renders/avatars/{speaker}.png")
+    assert planned["d22"]["at"] == pytest.approx(135.21)
+    assert [cue["id"] for cue in data["cues"]].index("d28") < (
+        [cue["id"] for cue in data["cues"]].index("d22"))
 
 
 # -- lanes ------------------------------------------------------------------
@@ -431,9 +467,8 @@ def test_one_voice_is_not_a_conversation_and_needs_no_side():
     assert dialogue.lanes_for([]) == {}
 
 
-def test_act3_lanes_survive_karena_joining():
+def test_act3_lanes_stay_a_two_hander():
     """The committed record, not a fixture: Bob stays left, Doc stays right."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     lanes = dialogue.lanes_for(data["cues"])
-    assert lanes == {"osiris": "left", "sagira": "right",
-                     "mara_sov": "center"}
+    assert lanes == {"osiris": "left", "sagira": "right"}

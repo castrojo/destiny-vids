@@ -55,6 +55,7 @@ document makes no claim that a Hero song source is authorized or available.
 - Checking whether a bed came from the right rung
 - Measuring a delivered act or programme
 - Deciding whether a master or AAC copy needs headroom correction
+- Removing picture sections while preserving the source soundtrack
 
 ## When NOT to Use
 
@@ -62,7 +63,7 @@ document makes no claim that a Hero song source is authorized or available.
   [`production`](../production/SKILL.md)
 - Getting ffmpeg working on an atomic host → [`../../rendering.md`](../../rendering.md)
 
-## The three rules
+## The four rules
 
 1. **Source by codec, never by bitrate.** Prefer the native-rate Opus rung over
    a numerically higher but worse AAC one; the full ladder, the exact `yt-dlp`
@@ -74,6 +75,17 @@ document makes no claim that a Hero song source is authorized or available.
    compression, limiting or `loudnorm`; only a measured static trim on the file
    that is actually shipping. The delivery loop lives in
    [`references/delivery-gates.md`](references/delivery-gates.md).
+   **`audio-check.sh` and `tools/peaks.py` are the gates.** FFmpeg's `ebur128`
+   meter is useful evidence, but its true-peak estimate is not a substitute for
+   the project gate.
+4. **A picture cut is an audio edit.** Measure every delivered splice, not just
+   the source samples named by the cut record. FFmpeg's `concat` filter uses the
+   longest stream in each segment and pads shorter audio with silence, so
+   frame-quantized video can move the actual audio edge even when every segment
+   starts at timestamp zero. Choose cut boundaries inside the same video-frame
+   window until the encoded join is continuous; never hide a click with
+   normalization or an unreviewed crossfade. Source:
+   `/websites/ffmpeg_documentation`, `concat` filter.
 
 ## Shortest command path
 
@@ -159,6 +171,8 @@ This skill is the contract. The detail lives in `references/`:
   relative to the fetched source**.
 - Measuring only the bed or only the FLAC master; the delivered AAC is the
   file that overshoots.
+- Checking only picture frames at a hard cut; a clean image join can still
+  contain a click or a concat-inserted silence gap.
 - Shipping after `audio-check.sh --bed` while skipping
   `./audio-check.sh --all`.
 - Using `loudnorm`, limiting, compression, EQ, or any non-static processing.
@@ -174,6 +188,11 @@ This skill is the contract. The detail lives in `references/`:
 python3 tools/peaks.py measure <file>        # delivered true peak
 ffmpeg -i <master>.mp4 -map a:0 -f md5 -     # prove a master is bit-exact
 ```
+
+For a cut-heavy standalone file, also measure the decoded deliverable at every
+join and compare each boundary step with the surrounding slew. A source-only
+measurement is insufficient because concat padding is introduced during the
+encode.
 
 Use `/home/linuxbrew/.linuxbrew/bin/ffmpeg`. The system `ffmpeg` is
 `ffmpeg-free`: no H.264 decoder, and it fails only once decoding starts, which

@@ -140,7 +140,6 @@ OWNER_PASS_OFFSET = 266.5
 TRIO = [
     ("joseph_sandoval", "left", 177.0),
     ("rochaporto", "center", 179.0),
-    ("mara_sov", "right", 183.0),
 ]
 
 # --- THE OPENING BLACK-HEAD CARD ------------------------------------------
@@ -162,14 +161,6 @@ OPENING_HEAD_CARD = {
         "It all started with Kubernetes.",
     ],
 }
-
-# ONE L. The README says "Karena Angel" and the owner said it again this round
-# ("add karena (Angel, one L)"). vocab/casting.yaml spells it "Angell", and it
-# is a committed input to six delivered acts (#167), so correcting it there
-# marks every one of them stale. The correction is applied HERE, to the copy
-# this act prints, and recorded in `unresolved` -- a person's name is not
-# something to leave wrong while waiting for a freeze to lift.
-NAME_CORRECTIONS = {"mara_sov": ("Karena Angell", "Karena Angel")}
 
 # --- THE OPENING NAMEPLATES -------------------------------------------------
 #
@@ -378,35 +369,8 @@ MAPPED_TAIL_REPLACEMENTS = {
     "timed_jorge",
 }
 MAPPED_TAIL_PASS = [
-    {
-        "id": "mapped_amber_reveal",
-        "kind": "guardian",
-        "position": "left",
-        "at_film": build_efmb.AMBER_AT,
-        "hold": 4.0,
-        "key": "akgraner",
-        "seen_at_src": 48.0,
-        "seen_in_video": build_efmb.AMBER_SOURCE_ID,
-        "shot_src": [build_efmb.AMBER_CLIP_IN, build_efmb.AMBER_CLIP_OUT],
-        "why": "the owner identified this gameplay clip as Amber's sequence",
-    },
-    {
-        "id": "mapped_kyle_reveal",
-        "kind": "guardian",
-        "position": "left",
-        "at_film": build_efmb.KYLE_REVEAL_AT,
-        "hold": build_efmb.KYLE_REVEAL_SEC,
-        "key": "KyleGospo",
-        "seen_at_src": build_efmb.SYNC_ANCHOR_SRC,
-        "shot_src": [335.267, 339.767],
-        "why": "the Sentinel raising the Void shield in the authored reveal",
-    },
-    # HATERS IS AUTHORED IN chapters/II-endless-forms.md NOW --
-    # `! [mapped_haters] HATERS |` under `## 10:00`. The seat's evidence
-    # (the red-lit face shot, film 315.267 -> 316.967 by scene detection)
-    # is recorded beside the line there. This spec's old seen_at_src pointed
-    # at the hallway frame, which is NOT that shot; the card now carries no
-    # seen_at_src rather than a wrong one.
+    # HATERS is authored in chapters/II-endless-forms.md, source-anchored to
+    # the enemy attack and held through the hero-shot boundary.
     {
         "id": "mapped_eyecantcu_reveal",
         "kind": "guardian",
@@ -418,6 +382,12 @@ MAPPED_TAIL_PASS = [
         "shot_src": [352.667, 353.533],
         "why": "the solar Warlock pulling out the glowing orange sword",
     },
+]
+MAPPED_TAIL_UNRESOLVED = [
+    "Amber's and Kyle's guardian reveals are omitted: the current "
+    "owner-authored action and source-anchored chat occupy their only "
+    "evidenced lower-third windows. Omitting the cards preserves the "
+    "authored seats rather than moving either card onto unsupported picture.",
 ]
 
 
@@ -751,8 +721,7 @@ WALK_SEQUENCE = [
     # keeps all seven lines below, which name him as the speaker.
     # TODO(owner): if he should carry a nameplate here, say which shot is him.
     # ANCHORED, not chained. With the plate gone this block would chain off the
-    # chapter card and slide 4.65 s earlier -- straight into Karena's jump zone
-    # (clamp_hold raises on it). 185.183 is the source frame that maps to film
+    # chapter card and slide 4.65 s earlier. 185.183 is the source frame that maps to film
     # 161.317, which is exactly where this line already plays, so removing the
     # nameplate above moves his dialogue not at all.
     {"cue": "line", "id": "walk_ge_1", "speaker": "GloriousEggroll",
@@ -1047,9 +1016,6 @@ NO_PLATE_SRC = [
     # exists for exactly that, and it protects the beat from every future cue
     # rather than from the one that happened to hit it.
     #
-    # 166.299 -> 167.766 is her shot, measured (film 148.533 -> 150.000).
-    (166.299, 167.766, "Karena's jump -- the beat is the jump, and no card "
-                       "belongs on it"),
     # Bungie burns "BECOME LEGEND" over the cave at the end of run 2, fading in
     # around 172.5 and holding to the cut. The act removes a DIFFERENT instance
     # of this same title (build_efmb.REMOVED names 244.833 -> 246.100); this one
@@ -1084,9 +1050,6 @@ def clamp_hold(at, hold, film_of):
             # END BEFORE THE ZONE, NOT ON IT. `start - at` lands the cue's last
             # frame on the zone's FIRST frame -- which is the frame the zone
             # exists to protect. That off-by-one is why the Long Walk card kept
-            # captioning Karena's jump (#184, #192): it was clamped to 2.300 s,
-            # ending at 148.533, the exact frame she jumps on. _zones already
-            # backs the zone's END off by a hair; the START needs the same.
             hold = round(start - at - ZONE_GUARD, 3)
     return hold if hold >= MIN_HOLD else None
 
@@ -1098,26 +1061,29 @@ def load_casting():
 
 
 def _titles(casting):
-    return {k: v for k, v in casting["ensemble"]["titles"].items()
-            if k != "description"}
+    return {
+        login: dict(record["plate"])
+        for login, record in (casting.get("people") or {}).items()
+        if record.get("plate")
+    }
 
 
 def authored_copy(key, casting):
     """The plate copy for ``key``, verbatim from vocab/casting.yaml.
 
-    Two places hold authored copy and they are not interchangeable: a LEAD's
-    plate lives on its binding (Karena is cast as Mara Sov), and an individual
-    contributor's lives under ``ensemble.titles``. Reproducing, never
-    composing, is the whole rule -- so this raises rather than falling back to
-    generic copy if a key is missing, because a silent fallback would put the
-    blueberry plate on somebody whose identity the owner actually wrote.
+    Person records are the one home for identity copy. Transitional ``cast:``
+    keys resolve through the vocabulary's key-to-login migration map, so the
+    raw Act II authoring remains legible without a second plate map.
     """
+    from tools.identity import UnknownPerson, login_for_cast_key
+
     titles = _titles(casting)
-    if key in titles:
-        return dict(titles[key])
-    binding = casting.get("leads", {}).get("values", {}).get(key)
-    if binding and binding.get("plate"):
-        return dict(binding["plate"])
+    try:
+        login = login_for_cast_key(key, casting)
+    except UnknownPerson:
+        login = None
+    if login in titles:
+        return dict(titles[login])
     raise KeyError(
         f"no authored plate copy for {key!r} in vocab/casting.yaml -- copy is "
         "reproduced, never composed, so this is a gap for the owner to fill "
@@ -1175,29 +1141,12 @@ def blueberry_entry(item, at, dur, casting):
     return entry
 
 
-def _corrected(key, copy):
-    """Apply an owner-stated spelling of somebody's name to this act's copy.
-
-    Reproducing authored copy is the rule; this is the one case where the
-    AUTHOR has since corrected it and the file it lives in is frozen. The
-    correction is keyed on the exact string it replaces, so if the vocab is
-    ever fixed this silently stops applying instead of double-correcting.
-    """
-    want = NAME_CORRECTIONS.get(key)
-    if not want or copy.get("name") != want[0]:
-        return copy
-    copy = dict(copy)
-    copy["name"] = want[1]
-    return copy
-
-
 def localise_avatar(key, copy):
     """Point a plate's ``avatar`` at the local cache, keeping the URL as source.
 
-    Returns the copy unchanged when there is no avatar -- Karena has none,
-    because no GitHub login for her is on record anywhere in this repo and a
-    login is not an agent's to guess (issue #87). A wreath with no portrait to
-    ring is a recorded gap, not a reason to invent one.
+    Returns the copy unchanged when the authored plate has no portrait. A
+    missing authored image stays missing; it is never replaced with invented
+    copy.
     """
     url = copy.get("avatar")
     if not url or not str(url).startswith("http"):
@@ -1315,6 +1264,55 @@ def _at(shot_in, film_of):
     return round(film_of(shot_in) + LEAD_IN, 3)
 
 
+def reseat_chapter_entries(entries, lead=None):
+    """Chapter-file seats -> the seats THIS BUILD emits for them.
+
+    A ``source_anchor`` row is seated straight from the source frame it is
+    bound to and republished as ``seen_at_src``. The chapter owns every
+    programme-clock pin at its current emitted seat; no legacy pause delta
+    remains for the builder to apply.
+
+    ``tools/chapter_md.py``'s ``show`` and ``check`` call this through the
+    ``reseat`` hook act II's chapter file declares, so the clock an editor
+    is shown and the clock the drift gate compares are the ones the
+    delivered master actually carries. Duplicating either rule there would
+    be a second copy to keep in step, and the copy that drifts is always the
+    one nobody rebuilds from.
+
+    The entries are reseated IN PLACE and returned: the builder holds the
+    same list and extends it, so a copy would seat the pills and throw them
+    away. Builder-private metadata (``_chapter_label``) and the authoring
+    input a manifest must never carry (``source_anchor``) are removed here.
+    """
+    if lead is None:
+        lead = build_efmb.derive_lead()
+    # The act's own declared key order (see the `field_order` front matter
+    # in chapters/II-endless-forms.md), so a field this loop adds after the
+    # chapter file already built the entry lands in its declared column
+    # instead of trailing on at the end of the dict.
+    order_field = chapter_md.chapter("II").fields.get("field_order")
+    field_order = ([k.strip() for k in order_field.split(",")]
+                   if isinstance(order_field, str) else None)
+    for entry in entries:
+        entry.pop("_chapter_label", None)
+        source_anchor = entry.pop("source_anchor", None)
+        if source_anchor is not None:
+            # A source-anchored line is seated straight from the source
+            # frame it is bound to, including the current interruption.
+            entry["at"] = round(
+                build_efmb.edited_film_for_source(source_anchor, lead), 3)
+            entry["seen_at_src"] = source_anchor
+            # `seen_at_src` was just added, so it landed at the end of the
+            # dict, after keys such as `bond_of` the chapter file already
+            # built -- re-seat it (and everything else) in the act's
+            # declared order. Mutated in place: `entry` is the same dict
+            # object the caller holds.
+            ordered = chapter_md._ordered(entry, field_order)
+            entry.clear()
+            entry.update(ordered)
+    return entries
+
+
 def build():
     casting = load_casting()
     plan = build_efmb.build()
@@ -1334,9 +1332,16 @@ def build():
     # cards this file DOES still place have to give way to them, exactly as
     # they did when the pills were Python tables in the same lists. Where the
     # words live changed; who yields to whom did not.
-    chapter_entries, chapter_unresolved = chapter_md.entries("II")
+    chapter_entries, chapter_unresolved = chapter_md.entries(
+        "II", include_block_labels=True)
     for note in chapter_unresolved:
         print(f"chapter: {note}", file=sys.stderr)
+
+    # Source-anchored rows are seated on their own frames by
+    # `reseat_chapter_entries`, shared with `chapter_md show/check` through
+    # the chapter's `reseat` hook. The authoring preview and drift gate
+    # therefore describe the film that ships.
+    reseat_chapter_entries(chapter_entries, lead)
 
     def chapter_floor(want):
         """When the last pill starting before ``want`` is off the screen.
@@ -1386,7 +1391,7 @@ def build():
             "order": order,
             "copy_source": "casting",
             "seen_at_src": TRIO_IN,
-            **localise_avatar(key, _corrected(key, authored_copy(key, casting))),
+            **localise_avatar(key, authored_copy(key, casting)),
         })
 
     # --- the opening nameplates (Brent's and Joe's slots stay empty) -------
@@ -1810,9 +1815,8 @@ def build():
         mapped_cursor = round(at + spec["hold"] + spec.get("gap_after", PLATE_GAP), 3)
 
     mapped_unresolved.append(
-        "the owner conversation at 231.500 now keeps only karena and joseph; "
-        "krook and both rochaporta lines were removed by the owner. Karena's "
-        "chat uses github.com/karena, as explicitly supplied this round")
+        "the owner conversation at 231.500 keeps only joseph; krook and both "
+        "rochaporta lines were removed by the owner")
 
     # --- the later owner pass (megacut 5:59 -> 6:56) ----------------------
     late_unresolved = []
@@ -1961,7 +1965,7 @@ def build():
             entry["why"] = spec["why"]
             entry.update(localise_avatar(
                 spec["key"],
-                _corrected(spec["key"], authored_copy(spec["key"], casting))))
+                authored_copy(spec["key"], casting)))
         mapped_tail.append(entry)
 
     # The newer 8:28 pass replaces the old gaslighting pill. Its authored copy
@@ -2016,7 +2020,8 @@ def build():
         # What the brief authored but this manifest could not place. Recorded
         # so it is visible rather than buried: degrade, never block.
         "unresolved": (montage_unresolved + walk_unresolved + mapped_unresolved
-                        + late_unresolved + chapter_unresolved + [
+                        + late_unresolved + chapter_unresolved
+                        + MAPPED_TAIL_UNRESOLVED + [
             "AN4-CH3CK-12 IS OUT, owner: 'Remove all this anacheck stuff for "
             "now.' Three blocks went with him -- the four ranked montage "
             "cards, the two TOC payoff cards ('It's totally NOT like this' "
@@ -2044,10 +2049,6 @@ def build():
             "the descent' is an EDIT instruction, not a plate: the menu ends "
             "at 88.533 and whatever the film already cuts to is what plays. "
             "TODO(owner): confirm the shot after it is the one meant",
-            "vocab/casting.yaml spells Karena's surname 'Angell'; the README "
-            "and the owner both say 'Angel', one L. Act II prints the "
-            "correction (NAME_CORRECTIONS) rather than editing the vocab, "
-            "which is a committed input to six delivered acts (#167)",
             "the two contributors who held the shots 'The Long Walk' took "
             "(HuntedRaven7 at source 195.267 and hanthor at 233.500) are no "
             "longer credited in act II. The owner's instruction for the "
@@ -2106,36 +2107,26 @@ def build():
             "banner kinds, and none of them is a flashing red miniboss bar, "
             "so the line stays recorded rather than faked with the wrong "
             "chrome",
-            "the mapped hallway edit uses the owner-supplied source-323.933 "
-            "hallway-and-dogs frame, Amber's owner-identified gameplay "
-            "sequence, and the cleared Local Forecast - Slower bed. Source "
-            "resumes at 325.933 after the readable black-screen conversation",
+            "the mapped hallway edit holds the owner-supplied source-323.933 "
+            "hallway-and-dogs frame before and after Amber's owner-identified "
+            "gameplay sequence. Source resumes at 325.933 after the "
+            "post-amber chapter block",
             "EyeCantCU's owner-timed reveal is seated at source-352.850, the "
             "close-up where the solar Warlock pulls out the glowing orange "
             "sword",
             "the 9:10 HATERS title renders through existing title chrome. The "
             "requested flashing red boss treatment is still missing; the copy "
             "ships without that effect rather than being dropped",
-            "the Kyle and kolunmi pills land at film 335.650 and 338.100 "
-            "after Amber's conversation and Bungie's burned-in "
-            "'NEW LEGENDS WILL RISE' zone. The order and copy are the owner's; "
-            "the protected publisher-title gap moves the seats",
-            "KyleGospo's mapped reveal sits on his verified source-335.267 "
-            "Sentinel shot at film 314.237, after Amber's sequence",
+            "Kyle's 'Sup' and kolunmi's 'Cardio!' are source-anchored to "
+            "331.763 and 333.817 respectively, so the owner-authored seats "
+            "stay on their evidenced frames as the interruption changes",
             "the brief names the same person two ways -- 'Jorge Castro' in "
             "the montage and 'jorge' at 4:51. Both are reproduced verbatim; "
             "the pill's own chrome uppercases the speaker row",
-            "Karena's jump carries no card ('the beat is the jump'): it is "
-            f"{JUMP_BEAT}s of clear screen between Joseph's DO line and "
-            "Ricardo's answer. No shot was verified as HER jump and picking "
-            "one would be casting by inference -- TODO(owner): the frame",
             "the later owner-timed 6:56 question replaces the earlier five "
             "closing quotes on the black tail. The tail still plays black by "
             "the owner's standing decision; the new seat is the question, "
             "not the quote spread",
-            "the 6:56 question maps to film 149.500 inside Karena's protected "
-            "jump. It lands at the first clean frame, 150.000, rather than "
-            "captioning the beat",
             "the newer 5:59 -> 6:14 owner pass replaces the older Joseph "
             "master/got-this pair and the two montage asides on the same face "
             "shots. Their authored strings remain in this generator, but only "

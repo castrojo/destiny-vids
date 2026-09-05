@@ -124,6 +124,45 @@ out of two channels, which this standard forbids. If 5.1 delivery is wanted it
 belongs in the per-cut scripts that already derive it. Recorded in
 `stories/megacut/megacut.json`'s `_audio`.
 
+## Prepending silent picture without touching source audio
+
+A silent title sequence followed by source Opus does not require an audio
+encode. Trim the audio packets first, then delay that trimmed stream while
+muxing:
+
+```bash
+ffmpeg -copyts -i source.webm -ss 73 -to 468 \
+  -c:a copy -avoid_negative_ts disabled trimmed.mka
+
+first=$(ffprobe -v error -select_streams a -show_packets \
+  -read_intervals '%+#1' -show_entries packet=pts_time -of csv=p=0 \
+  trimmed.mka | head -1 | cut -d, -f1)
+
+# offset = intro duration - $first
+ffmpeg -copyts -i picture.mp4 -itsoffset 64.486 -i trimmed.mka \
+  -map 0:v -map 1:a -c:v copy -c:a copy \
+  -avoid_negative_ts disabled out.mkv
+```
+
+Use output-side `-ss` for the packet trim. Applying `-itsoffset` directly to
+the original input can still be normalised by the mux, and `-shortest` then
+ends the film after the audio's undelayed duration — silently dropping the
+whole intro. FFmpeg documents `-copyts` as preserving input timestamps,
+`-itsoffset` as adding to an input's timestamps, and `avoid_negative_ts` as a
+mux-level timestamp shift; source: `/websites/ffmpeg_documentation`.
+
+Verify both facts rather than trusting the command:
+
+```bash
+ffprobe -v error -select_streams a -show_packets -read_intervals '%+#1' \
+  -show_entries packet=pts_time -of csv=p=0 out.mkv
+ffmpeg -i trimmed.mka -map a:0 -f md5 -
+ffmpeg -i out.mkv     -map a:0 -f md5 -
+```
+
+The first packet must land at the intro duration, and the decoded MD5 values
+must match.
+
 ## Verify, don't assert
 
 Every claim above was measured on these files directly, and the commands are
