@@ -95,6 +95,14 @@ That keeps the CTA from jumping when it arrives. A card that says it is
 `stage: "cta"` but omits the event fields is structurally wrong: the empty
 fields collapse the seat the CTA was timed against.
 
+### Give the CTA time
+
+CTA readability biases toward a generous hold. If the card is the final beat,
+lengthen that tail before reducing type, dropping copy, or compressing the
+layout. A requested multiplier applies to the CTA's own hold: a five-second
+tail made three times longer becomes fifteen seconds, while every authored
+beat before the CTA keeps its existing clock.
+
 For a wallpaper that must start bright and become dark, split its ffmpeg input
 before giving it to the bridge and both end-card legs:
 

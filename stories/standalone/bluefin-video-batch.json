@@ -1,0 +1,725 @@
+{
+  "version": 1,
+  "cta_asset": "assets/cta/linux-foundation-training-forest.png",
+  "videos": [
+    {
+      "slug": "bluefin-and-the-blueberries",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=ZJLAJVmggt0",
+        "youtube_id": "ZJLAJVmggt0",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin and the Blueberries",
+      "output": "~/Videos/Wolves/review/Bluefin and the Blueberries.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and the Blueberries-thumbnail.jpg",
+      "cuts": [
+        {
+          "start_sec": 44.52,
+          "end_sec": 54.68,
+          "note": "Owner-authored excision. The removed passage starts on \"today\" at source 44.52, so the cut at output 44.52 goes directly into Cayde's \"I know you look to me in times of peril\" at source 54.68. Everything after it shifts 10.16 seconds earlier, so the 91.7 takeover lands at output 81.54."
+        }
+      ],
+      "overlays": [
+        {
+          "id": "jorge-cayde",
+          "kind": "guardian",
+          "source_at": 33.55,
+          "dur": 1.95,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Visual frame review establishes Cayde-6 cleanly visible from source 33.533 through 35.533, with the dissolve to the destruction wide beginning at 35.567; the standalone renderer hard-overlays the static plate only from source_at through source_at+dur, with no lead-in/tail-out envelope. The segment records (seg_..._0033-0037, 'Cayde-6 reaches toward a red figure', casting person castrojo) span 33.300-37.767 but are coarser than the picture. Seated at 33.55 for 1.95s, the whole overlay interval 33.55-35.50 stays inside the measured visible bounds, honoring the owner's 'around the first ~30 seconds' placement without crediting Jorge over the destruction wide. This is an explicit short-hold exception to the 2.2s minimum because no 2.2s continuous Cayde shot exists near 30s; the complete established four-row identity is kept.",
+          "label": "TRUSTEE // GUARDIAN",
+          "class": "Harbinger Hunter",
+          "name": "Jorge Castro",
+          "title": "Upender of Antipatterns | The First Disciple"
+        }
+      ],
+      "takeover": {
+        "source_at": 91.7,
+        "asset": "assets/cta/blueberries-loot.png"
+      },
+      "thumbnail": {
+        "source_at": 14.4
+      },
+      "audio_probes": [
+        {
+          "source_at": 40.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 100.0,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
+      "slug": "bluefin-care-for-a-drink",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=rQ4i0AT8c-M",
+        "youtube_id": "rQ4i0AT8c-M",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin: Care for a Drink?",
+      "output": "~/Videos/Wolves/review/Bluefin - Care for a Drink.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin - Care for a Drink-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "jorge-cayde",
+          "kind": "guardian",
+          "source_at": 4.5,
+          "dur": 3.0,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Cayde-6 sits alone at the bar for the whole measured shot, source 4.1333-7.75, from the cut off the pouring insert to the tighter close-up, so the full 3.0s hold at 4.5-7.5 fits inside evidenced Cayde picture. The burned-in RP badge has cleared at 4.1333. The complete four-row identity reproduces the castrojo binding in vocab/casting.yaml on the standard blue chrome: the owner-authoritative treatment for this standalone pass is blue always, with no trustee flag and no variant.",
+          "label": "TRUSTEE // GUARDIAN",
+          "class": "Harbinger Hunter",
+          "name": "Jorge Castro",
+          "title": "Upender of Antipatterns | The First Disciple"
+        }
+      ],
+      "takeover": {
+        "source_at": 55.6
+      },
+      "thumbnail": {
+        "source_at": 8.6
+      },
+      "audio_probes": [
+        {
+          "source_at": 45.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 58.0,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
+      "slug": "bluefin-your-final-trial",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=_OvgGtnN_Ts",
+        "youtube_id": "_OvgGtnN_Ts",
+        "video_format_id": "299",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin: Your Final Trial",
+      "output": "~/Videos/Wolves/review/Bluefin - Your Final Trial.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin - Your Final Trial-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "jorge-cayde",
+          "kind": "guardian",
+          "source_at": 69.1,
+          "dur": 2.2,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "Inspected frame at source 68.800 inside this hold: a Cayde-6 hero close-up, hood up, the white-and-blue Exo faceplate with the horn and both cyan optics filling the right of frame, the Ace of Spades hand cannon crackling with arc light in his outstretched hand. Measured close-up 68.70-70.25, and the shot it cuts to is the same weapon in the same glove, so the 2.2s MIN_HOLD stays on Cayde throughout. This compact name-only card is deliberately unchanged in this task; the player's identity is carried by the separate landing plate, which has already cleared, not by any persistent HUD.",
+          "name": "Jorge Castro"
+        },
+        {
+          "id": "john-bazzite-landing",
+          "kind": "guardian",
+          "source_at": 16.2,
+          "dur": 2.2,
+          "position": "left",
+          "name": "John Bazzite",
+          "variant": "bazzite",
+          "copy_source": "owner_supplied",
+          "why": "The player lands at source 15.9-16.0, settles into the crouch at 16.2, rises through 16.4 and stands by 17.0. The wide plateau shot holds until the hard cut at 21.3, so the complete 2.2s lower-third stays on the landed player."
+        },
+        {
+          "id": "trial-quip-1",
+          "kind": "chat",
+          "source_at": 33.0,
+          "dur": 2.4,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "You knew this would happen",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-quip-2",
+          "kind": "chat",
+          "source_at": 35.6,
+          "dur": 2.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "Stay _sharp_!",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-1",
+          "kind": "chat",
+          "source_at": 94.0,
+          "dur": 2.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "I don't hate nix users",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-2",
+          "kind": "chat",
+          "source_at": 96.4,
+          "dur": 3.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "That's your character to play, not mine",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-3",
+          "kind": "chat",
+          "source_at": 99.8,
+          "dur": 4.8,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "Because I did just beat you, but that's a 50/50 call every time",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-4",
+          "kind": "chat",
+          "source_at": 104.8,
+          "dur": 3.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "We have a Dual Destiny",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        }
+      ],
+      "thumbnail": {
+        "source_at": 87.6,
+        "why": "Reseated off 68.9, where the title lockup ran straight across Cayde's head. The composed card's title ink occupies x 382-1543, y 27-254 of the fitted 1920x1080 frame; at 87.600 that whole band is open sky above the Tower plain, with Cayde's hat tip about 90px below the lowest stroke. Both characters the design asks for are readable at 336x189 -- Cayde standing right with the Ace of Spades, the fallen Guardian left -- and the source's burned-in dialogue subtitles do not appear in this shot."
+      },
+      "audio_probes": [
+        {
+          "source_at": 40.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 104.0,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
+      "slug": "bluefin-and-the-linux-users",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=_OvgGtnN_Ts",
+        "youtube_id": "_OvgGtnN_Ts",
+        "video_format_id": "299",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin and the Linux Users",
+      "output": "~/Videos/Wolves/review/Bluefin and the Linux Users.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and the Linux Users-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "jorge-cayde",
+          "kind": "guardian",
+          "source_at": 69.1,
+          "dur": 2.2,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "Inspected frame at source 68.800 inside this hold: a Cayde-6 hero close-up, hood up, the white-and-blue Exo faceplate with the horn and both cyan optics filling the right of frame, the Ace of Spades hand cannon crackling with arc light in his outstretched hand. Measured close-up 68.70-70.25, and the shot it cuts to is the same weapon in the same glove, so the 2.2s MIN_HOLD stays on Cayde throughout. This compact name-only card is deliberately unchanged in this task; the player's identity is carried by the separate landing plate, which has already cleared, not by any persistent HUD.",
+          "name": "Jorge Castro"
+        },
+        {
+          "id": "john-bazzite-landing",
+          "kind": "guardian",
+          "source_at": 16.2,
+          "dur": 2.2,
+          "position": "left",
+          "name": "John Bazzite",
+          "variant": "bazzite",
+          "copy_source": "owner_supplied",
+          "why": "The player lands at source 15.9-16.0, settles into the crouch at 16.2, rises through 16.4 and stands by 17.0. The wide plateau shot holds until the hard cut at 21.3, so the complete 2.2s lower-third stays on the landed player."
+        },
+        {
+          "id": "trial-quip-1",
+          "kind": "chat",
+          "source_at": 33.0,
+          "dur": 2.4,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "You knew this would happen",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-quip-2",
+          "kind": "chat",
+          "source_at": 35.6,
+          "dur": 2.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "Stay _sharp_!",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-1",
+          "kind": "chat",
+          "source_at": 94.0,
+          "dur": 2.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "I don't hate nix users",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-2",
+          "kind": "chat",
+          "source_at": 96.4,
+          "dur": 3.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "That's your character to play, not mine",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-3",
+          "kind": "chat",
+          "source_at": 99.8,
+          "dur": 4.8,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "Because I did just beat you, but that's a 50/50 call every time",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        },
+        {
+          "id": "trial-nix-4",
+          "kind": "chat",
+          "source_at": 104.8,
+          "dur": 3.2,
+          "position": "center",
+          "speaker": "castrojo",
+          "avatar": "renders/avatars/castrojo.png",
+          "text": "We have a Dual Destiny",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored Final Trial exchange"
+        }
+      ],
+      "takeover": {
+        "source_at": 109.7
+      },
+      "thumbnail": {
+        "source_at": 69.1,
+        "why": "Owner-selected frame around 1:09, inside the measured Cayde-6 hero close-up."
+      },
+      "audio_probes": [
+        {
+          "source_at": 40.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 111.0,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
+      "slug": "bluefin-and-saint-14",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=iVZ-G88rOYg",
+        "youtube_id": "iVZ-G88rOYg",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Third-party upload of Bungie in-engine footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin and Saint 14",
+      "description": "The Standard for others to Follow",
+      "output": "~/Videos/Wolves/review/Bluefin and Saint 14.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and Saint 14-thumbnail.jpg",
+      "cuts": [
+        {
+          "start_sec": 72.201,
+          "end_sec": 74.364,
+          "note": "Burned-in publisher card: FIGHT THROUGH TIME. Boundary reseated within the same 29.97fps frame window; the opening segment starts on a frame boundary so concat must pad this join, and the edges sit on quiet samples so the residual 4.5 ms gap reads <= 1.0 step/p99 slew by the splice review method."
+        },
+        {
+          "start_sec": 77.405,
+          "end_sec": 78.572,
+          "note": "Burned-in publisher card: SAVE A LEGEND. Boundary reseated within the same 29.97fps frame window so the PCM join is click-safe (step/p99 slew <= 1.0 by the splice review method)."
+        },
+        {
+          "start_sec": 80.468,
+          "end_sec": 82.707,
+          "note": "Burned-in publisher cards: MASTER / THE SUNDIAL / NEW 6 PLAYER ACTIVITY. Boundary reseated within the same 29.97fps frame window so the PCM join is click-safe (step/p99 slew <= 1.0 by the splice review method)."
+        },
+        {
+          "start_sec": 92.351,
+          "end_sec": 93.925,
+          "note": "Burned-in publisher cards: NEW / EXOTIC QUESTS. Boundary reseated within the same 29.97fps frame window so the audio segment covers its video segment -- concat inserts no silence and the shipped PCM join is the measured one (step/p99 slew <= 1.0 by the splice review method)."
+        },
+        {
+          "start_sec": 97.963,
+          "end_sec": 99.617,
+          "note": "Burned-in publisher cards: PvP ELIMINATION MODE / RUSTED LANDS RETURNS. Boundary reseated within the same 29.97fps frame window so the PCM join is click-safe (step/p99 slew <= 1.0 by the splice review method)."
+        },
+        {
+          "start_sec": 114.604,
+          "end_sec": 116.749,
+          "note": "Burned-in publisher cards: TIME TO CONQUER THE / SEASON OF DAWN. Boundary reseated within the same 29.97fps frame window so the PCM join is click-safe (step/p99 slew <= 1.0 by the splice review method)."
+        }
+      ],
+      "overlays": [
+        {
+          "id": "mrbobbytables-osiris-intro",
+          "kind": "guardian",
+          "source_at": 4.0,
+          "dur": 2.0,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Osiris is visibly introduced in the 3.x-6.016 opening shot (source frames 3.8-5.9: the dark-skinned Warlock in red and gold robes, center-frame with the left and right thirds clear of his face and identifying body, so a left lower-third seat covers only background); the plate runs 4.0-6.0 and clears before the Bungie logo at 6.039; exact mrbobbytables binding in vocab/casting.yaml reproduced; the 2.0s short hold is owner-pinned because the logo boundary prevents 2.2s.",
+          "label": "TRUSTEE // GUARDIAN",
+          "class": "Voidwalker Warlock",
+          "name": "Bob Killen",
+          "title": "Reconciler of the Plane",
+          "trustee": true,
+          "variant": "leader"
+        },
+        {
+          "id": "ensemble_hanthor",
+          "kind": "guardian",
+          "source_at": 35.15,
+          "dur": 2.0,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Saint Transition Reviewer frame evidence: the hold opens on the fireteam trio walking and ends inside the gold Titan close-up, every body in frame an anonymous ensemble Guardian. No 2.2s continuous window exists anywhere in the 35-42s montage, so 2.000s is a narrow standalone short-hold exception, the same class as the Blueberries Cayde seat. hanthor is the first name in the deterministic GitHub-derived 2026-08 rotation with the cast leads excluded, and a projectbluefin org member, so the eyebrow reads MAINTAINER // GUARDIAN; name and title reproduce the ensemble copy block in vocab/casting.yaml.",
+          "label": "MAINTAINER // GUARDIAN",
+          "name": "hanthor",
+          "title": "Bluefin Blueberry"
+        },
+        {
+          "id": "ensemble_joshyorko",
+          "kind": "guardian",
+          "source_at": 37.25,
+          "dur": 1.9,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Saint Transition Reviewer frame evidence: the whole hold stays inside the sword-Hunter close-up, an anonymous ensemble body. No 2.2s continuous window exists anywhere in the 35-42s montage, so 1.900s is a narrow standalone short-hold exception, the same class as the Blueberries Cayde seat. joshyorko is the second name in the deterministic GitHub-derived 2026-08 rotation with the cast leads excluded; label, name and title reproduce the ensemble copy block in vocab/casting.yaml.",
+          "label": "CONTRIBUTOR // GUARDIAN",
+          "name": "joshyorko",
+          "title": "Bluefin Blueberry"
+        },
+        {
+          "id": "ensemble_rapenne-s",
+          "kind": "guardian",
+          "source_at": 39.26,
+          "dur": 2.0,
+          "position": "left",
+          "copy_source": "casting",
+          "why": "Saint Transition Reviewer frame evidence: the whole hold stays inside the continuous walking-Titan world-morph, an anonymous ensemble body. No 2.2s continuous window exists anywhere in the 35-42s montage, so 2.000s is a narrow standalone short-hold exception, the same class as the Blueberries Cayde seat. rapenne-s is the third name in the deterministic GitHub-derived 2026-08 rotation with the cast leads excluded; label, name and title reproduce the ensemble copy block in vocab/casting.yaml.",
+          "label": "CONTRIBUTOR // GUARDIAN",
+          "name": "rapenne-s",
+          "title": "Bluefin Blueberry"
+        },
+        {
+          "id": "activating-cncf-community",
+          "kind": "title",
+          "source_at": 106.0,
+          "dur": 5.0,
+          "position": "top-right",
+          "title": "Activating CNCF Community",
+          "copy_source": "owner_supplied",
+          "why": "Owner-authored top-right activation plate"
+        }
+      ],
+      "takeover": {
+        "source_at": 121.8
+      },
+      "thumbnail": {
+        "source_at": 71.95,
+        "why": "Reseated off 70.5, where the title lockup crossed the Helm of Saint-14. The composed card's title ink occupies x 548-1371, y 27-253 of the fitted frame; the Saint-14 shot runs 64.0-72.1 (72.25 is already the burned-in FIGHT THROUGH TIME card) and 71.950 is the frame in it where the helm sits lowest, clearing the lowest stroke of the 'A' with visible gap. Saint-14 stays readable at 336x189 -- cream helm with the purple visor beam, gold XIV chest plate with the purple winged sigil, white Perfect Paradox shotgun -- and no burned-in publisher copy is in frame."
+      },
+      "audio_probes": [
+        {
+          "source_at": 113.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 125.0,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
+      "slug": "bluefin-and-the-hive-ii",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=P0IlFZ61734",
+        "youtube_id": "P0IlFZ61734",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Official Bungie upload of Destiny 2: The Witch Queen reveal footage. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "title": "Bluefin and the Hive II",
+      "output": "~/Videos/Wolves/review/Bluefin and the Hive II.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and the Hive II-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "wayne-iron-lord-light",
+          "kind": "guardian",
+          "source_at": 50.0,
+          "dur": 3.0,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "The 48.800-54.800 scene holds on the lead Guardian moving through the Throne World. The whole 50.000-53.000 seat remains on that character and clears before the cut.",
+          "name": "Wayne Witzel III",
+          "title": "Iron Lord of Light",
+          "variant": "rust",
+          "avatar": "renders/avatars/wwitzel3.jpg"
+        },
+        {
+          "id": "marco-iron-lord-dark",
+          "kind": "guardian",
+          "source_at": 55.0,
+          "dur": 3.0,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "The second Guardian takes over after the lead's close-up. The whole 55.000-58.000 seat remains on the white-helmeted character through the adjoining shots.",
+          "name": "Marco Ceppi",
+          "title": "Iron Lord of Dark",
+          "variant": "rust",
+          "avatar": "renders/avatars/marcoceppi.jpg"
+        },
+        {
+          "id": "matt-third-guardian",
+          "kind": "guardian",
+          "source_at": 99.0,
+          "dur": 2.2,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "The final reveal holds all three Lightbearers together; the third, rightmost character remains visible for the complete minimum-readable hold before the title card.",
+          "name": "Matt Bruzek",
+          "avatar": "renders/avatars/mbruzek.jpg"
+        },
+        {
+          "id": "witch-queen-future",
+          "kind": "guardian",
+          "source_at": 67.2,
+          "dur": 3.2,
+          "position": "left",
+          "copy_source": "owner_supplied",
+          "why": "The 64.433-72.767 emergence sequence holds on the Witch Queen from the waterline through her full reveal. This seat clears before the later moth hero moment.",
+          "name": "[REDACTED]",
+          "title": "I Control the Future"
+        }
+      ],
+      "takeover": {
+        "source_at": 101.7
+      },
+      "thumbnail": {
+        "source_at": 101.0,
+        "why": "The moth is fully revealed above the Witch Queen with the three risen figures still readable below; this is the owner-designated hero moment immediately before the title card."
+      },
+      "audio_probes": [
+        {
+          "source_at": 60.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 105.5,
+          "duration": 1.0
+        }
+      ]
+    },
+    {
+      "slug": "bluefin-and-the-hive-iii",
+      "source": {
+        "url": "https://www.youtube.com/watch?v=FatJYHd1bCg",
+        "youtube_id": "FatJYHd1bCg",
+        "video_format_id": "137",
+        "audio_format_id": "251",
+        "usage_class": "third_party_copyrighted",
+        "source_rights_note": "Official Bungie upload of the Destiny 2: The Witch Queen launch trailer. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage."
+      },
+      "intro": {
+        "path": "/var/home/jorge/src/destiny-vids/renders/efmb-front.mkv",
+        "sha256": "49f4fcaf2b5ba1949319e02a7de2cef894a4c997c40a32f51a9289355565eaac",
+        "in_sec": 4.0,
+        "out_sec": 70.4667,
+        "why": "Act II's CLEAN front (renders/efmb-front.mkv, 76.600s) -- the 'evolutionary part' the owner asked for: Nightwish's Endless Forms Most Beautiful picture, a hominid in forest, a dinosaur skeleton, Darwin's text and the anatomical plates. No game footage anywhere in it, which is how the owner identified it. The CLEAN front is used deliberately: the delivered act burns a title card, THE PLATFORM WARS card and a [ PREPARE FOR TITANFALL ] card on top of this picture as separate overlays, and the owner ruled 'no titanfall, this is going to be strictly onboard' -- cutting from the clean render excludes all three by construction rather than by trimming around them. In at 4.0 where the picture fades up out of the black head; out at 70.4667 where the Perfume audio ends, so the join is SILENT and phrase-safe. The trailer then starts on a hard cut: owner, 'I want to not have a slide, slide right into the trailer dramatically. Jump cut'."
+      },
+      "cuts": [
+        {
+          "start_sec": 0.0,
+          "end_sec": 1.969,
+          "note": "The ESRB 'TEEN / Blood Language Violence' rating slate, measured as shot 00 (0.000-1.969) by ContentDetector. The intro hard-cuts straight into the trailer -- owner: 'slide right into the trailer dramatically. Jump cut' -- and the first delivered build landed that cut on the rating card, which is a legal slate rather than picture. Removed whole, on the measured shot boundary, so the cut lands on the first frame of the Throne World waterline instead. Same posture as act II removing the publisher end cards: the film does not open on an advert."
+        }
+      ],
+      "title": "Bluefin and the Hive III",
+      "output": "~/Videos/Wolves/review/Bluefin and the Hive III.mp4",
+      "thumbnail_output": "~/Videos/Wolves/review/Bluefin and the Hive III-thumbnail.jpg",
+      "overlays": [
+        {
+          "id": "hanthor-guardian",
+          "kind": "guardian",
+          "source_at": 41.3,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 41.208-42.342 shot holds a fireteam of four Guardians around the glowing artifact. The seat opens on that group and rides the cut; no single figure is singled out.",
+          "name": "hanthor",
+          "title": "Navigator of the Open Path",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/hanthor.png"
+        },
+        {
+          "id": "joshyorko-guardian",
+          "kind": "guardian",
+          "source_at": 48.0,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 47.881-49.983 Throne World platform holds two distant, anonymous Guardians for 2.1s, the whole seat staying on that shot.",
+          "name": "joshyorko",
+          "title": "Scribe of the Open Archive",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/joshyorko.png"
+        },
+        {
+          "id": "huntedraven7-guardian",
+          "kind": "guardian",
+          "source_at": 55.6,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 55.522-57.724 shot is a lone Guardian silhouetted against the green Throne World sky, 2.2s -- a full readable hold on one anonymous figure.",
+          "name": "HuntedRaven7",
+          "title": "Champion of Strict Proof",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/HuntedRaven7.png"
+        },
+        {
+          "id": "kylerankin-guardian",
+          "kind": "guardian",
+          "source_at": 70.6,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 70.003-71.371 pair of shots hold a Guardian over a fallen Hive and then a fireteam advancing the violet corridor; the seat opens on the first and rides the cut. CREDITED AT THE OWNER'S INSTRUCTION: research found NO KubeStellar-org contribution for this login (no contributor-list match, no authored PR, no commit or code-search hit), so the card names him and claims nothing more. Login resolved to kylerankin on the profile name, the self-declared kylerank.in domain and the heads/PureOS/Nitrokey portfolio; four same-name accounts were checked and rejected.",
+          "name": "kylerankin",
+          "title": "Keeper of the Unbroken Order",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/kylerankin.png"
+        },
+        {
+          "id": "giklab-guardian",
+          "kind": "guardian",
+          "source_at": 77.55,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 77.477-79.079 shot holds three Guardians ascending the shaft together; the seat rides from that group into the sword shot.",
+          "name": "Giklab",
+          "title": "Keeper of Shared Knowledge",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/Giklab.png"
+        },
+        {
+          "id": "rapenne-s-guardian",
+          "kind": "guardian",
+          "source_at": 87.1,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 86.987-90.324 shot is the longest mid-trailer action hold at 3.34s, on a single anonymous Guardian; the seat sits wholly inside it.",
+          "name": "rapenne-s",
+          "title": "Navigator of Hidden Systems",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/rapenne-s.png"
+        },
+        {
+          "id": "themimolet-guardian",
+          "kind": "guardian",
+          "source_at": 92.85,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 92.759-94.561 shot holds Guardians on the purple stair; the seat opens there and clears before the sparrow cut.",
+          "name": "theMimolet",
+          "title": "Scribe of the Living Verse",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/theMimolet.png"
+        },
+        {
+          "id": "ahmedadan-guardian",
+          "kind": "guardian",
+          "source_at": 105.25,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 105.172-107.474 shot is a 2.3s Guardian close-up, the clearest single-figure hold in the back half.",
+          "name": "ahmedadan",
+          "title": "Keeper of the Unbroken Build",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/ahmedadan.png"
+        },
+        {
+          "id": "danathar-guardian",
+          "kind": "guardian",
+          "source_at": 115.2,
+          "dur": 2.6,
+          "position": "left",
+          "copy_source": "generated_lore",
+          "why": "The 114.748-121.054 bridge shot is the LONGEST in the trailer at 6.31s and holds four Guardians standing together before the title card. The seat sits wholly inside it. Danathar carries the Hive epithet because his contribution record is 194 commits to kubestellar/hive.",
+          "name": "Danathar",
+          "title": "Architect of the Living Hive",
+          "variant": "kubestellar",
+          "avatar": "renders/avatars/Danathar.png"
+        }
+      ],
+      "takeover": {
+        "source_at": 123.89
+      },
+      "thumbnail": {
+        "source_at": 118.0,
+        "why": "The 114.748-121.054 bridge shot: four Guardians standing together in the Throne World, the calmest and longest hero moment in the trailer and the last picture before the title card."
+      },
+      "audio_probes": [
+        {
+          "source_at": 60.0,
+          "duration": 1.0
+        },
+        {
+          "source_at": 110.0,
+          "duration": 1.0
+        }
+      ]
+    }
+  ]
+}

@@ -138,9 +138,9 @@ def test_cast_names_route_to_casting_filters():
         assert val in parsed["filters"].get(facet, set()), (query, parsed["filters"])
 
 
-def test_authored_person_name_routes_to_the_canonical_login():
-    parsed = search.parse_query("Karena Angell footage")
-    assert parsed["filters"]["casting.person"] == {"angellk"}
+def test_bound_login_routes_to_the_canonical_person():
+    parsed = search.parse_query("kdruckman footage")
+    assert parsed["filters"]["casting.person"] == {"kdruckman"}
 
 
 def test_missing_plate_names_do_not_become_the_bogus_none_phrase():

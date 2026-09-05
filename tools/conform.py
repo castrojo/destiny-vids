@@ -159,7 +159,7 @@ def probe_video(path, ffprobe):
     out = subprocess.run(
         [*ffprobe, "-v", "error", "-select_streams", "v:0",
          "-show_entries",
-         "stream=codec_name,width,height,avg_frame_rate,pix_fmt,"
+         "stream=codec_name,width,height,avg_frame_rate,r_frame_rate,pix_fmt,"
          "color_primaries,color_transfer,color_space,profile,level",
          "-of", "json", str(path)],
         capture_output=True, text=True, check=True,

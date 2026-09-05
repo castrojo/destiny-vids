@@ -1,11 +1,11 @@
 {
   "bed_id": "bed_perfume_of_the_timeless",
   "media_filename": "bed_perfume_of_the_timeless.wav",
-  "source_url": "https://www.youtube.com/watch?v=oHCaZmIzr0o",
+  "source_url": "https://www.youtube.com/watch?v=O0lyFqLr3Cc",
   "title": "Perfume Of The Timeless",
   "artist": "Nightwish",
   "usage_class": "third_party_copyrighted",
-  "source_rights_note": "Nuclear Blast copyrighted recording and OFFICIAL MUSIC VIDEO, from Nightwish's own YouTube channel (uploaded 2024-05-21). This is the one asset in the show whose PICTURE is also somebody else's: the prologue uses the video's first 91.2 s as its main title sequence, not just the track. The owner's instruction for delivery is that the shipping presentation EMBEDS the video rather than re-hosting it -- 'it's an iframe using their video don't download it' -- so the rendered ~/Videos/Wolves/Prod/00-prologue.mp4 is prototype output for cutting and review, and stories/megacut/delivery.json records the prologue as having NO social copy by design, because a standalone clip would be exactly the redistribution the embed avoids. Same provenance family as acts II and VI (issue #55). This index stores only measurements and timecodes, never the audio or the picture.",
+  "source_rights_note": "Nuclear Blast copyrighted recording and third-party picture upload: Nightwish Arena's YouTube O0lyFqLr3Cc 4K rung (format 313, 3840x1608 VP9). This record governs the current picture used by the prologue and Perfume movements; the original measured audio stream remains the bed because the re-upload is a No SFX picture source. The corner watermark 'Nightwish. ://: Arena.' remains in frame under the owner's accepted 2026-08-15 decision. Usage remains third_party_copyrighted: the non-commercial shipping presentation embeds rather than re-hosts the media, while rendered files are prototype cutting/review output and receive no public social copy. This index stores only measurements and timecodes, never the audio or picture.",
   "duration_sec": 507.007729,
   "grid": {
     "detected_tempo_bpm": 129.199,

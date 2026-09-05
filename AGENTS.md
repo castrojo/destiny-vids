@@ -160,6 +160,12 @@ reports, exits 0, and only `--check` fails. **It never re-times anything** —
 widening a hold shoves the beat after it, and moving an authored beat is the
 owner's call.
 
+**A tail CTA buys readability with time, not smaller type.** When the call to
+action is the final authored beat, bias its hold long enough to read without
+rushing. A requested multiplier applies to that tail hold only: extend the
+film after the CTA begins, and do not move, shorten, or re-time the authored
+picture and copy before it.
+
 **Four classes of work here can never be automated:** a visual judgement about
 a frame, a claim about a real person, a licensing decision, and **moving copy
 the owner already placed**. An agent that
@@ -335,7 +341,8 @@ punch list; the backlog is for work.
   identity is as wrong as an invented one. Dialogue is *recovered*, not
   written: `dialogue/<video_id>/dialogue.json` with source timecodes and
   per-line evidence, beside the `DIALOGUE.md` the owner edits.
-  `redactions/<video_id>.json` only ever *removes* burned-in publisher copy.
+  `redactions/<video_id>.json` only ever *removes* non-diegetic burned-in
+  copy: publisher cards and static subtitle rails, never picture.
 - **Recovering authored copy is lookup, not reconstruction.** If the owner says
   a card, dialogue line, or credit was dropped, changed, or lost, inspect every
   worktree before editing: `git worktree list`, then search its records for the

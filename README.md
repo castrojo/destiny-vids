@@ -92,6 +92,7 @@ The destiny names are there for convenience
 | [Redacted] Cayde-6 | castrojo | authored plate (this character is very famous so we only reveal jorge's name once)| 
 | Bob Killen | mrbobbytables | Only person who knows wtf is going on |
 | Doctor Andy Anderson | clubanderson | Foundry of the Forbidden |
+| Fynch | Ihor Dvoretskyi | verified GitHub login `idvoretskyi`; no plate copy authored |
 | Saint-14 | Kat | remains the bubble in the original Wolves; authored plate - doesn't read maintainer email, gets shot down |
 | Mara Sov | `angellk` | authored plate (Stasis Warlock — answers #5), wreath chrome |
 | **Lord Saladin** | **Jeefy** | **constrained: far + helmeted only** |

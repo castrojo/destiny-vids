@@ -18,7 +18,7 @@ explains an affiliation. The complete Guardian-plate catalogue is:
 | Flag or variant | Treatment and reservation |
 |---|---|
 | no `variant`, no `trustee` | The deck's default blue chrome. |
-| `trustee: true` | Burnished silver chrome. |
+| `trustee: true` | Burnished silver chrome. **Label copy is not rank chrome:** Castrojo's plates carry `TRUSTEE // GUARDIAN` as their *label row* yet always render the deck's default blue — never this silver — because his identity is workmanlike joy, not glory or status. No `trustee` flag, no `variant`, on any Jorge Castro Guardian plate. |
 | `leader` | Gold. The Wolves trailer reserves this treatment for Christoph Blecker. It **takes precedence over `trustee`**, matching `.wolves-guardian-plate-trustee:not(.wolves-guardian-plate-leader)`: a binding may carry both flags and still plate gold. The leader block does not restyle the class row, which remains the default blue `#cbd5f5`. |
 | `bronze` | The third rank below gold (`leader`) and silver (`trustee`): `#cd7f32`, deliberately more golden than rust so rank does not read as a Foundation herald. |
 | `rust` | Oxidised iron (`#c25b20`) for the Rust Foundation herald, per #8. |

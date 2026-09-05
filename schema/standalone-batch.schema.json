@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/castrojo/destiny-vids/schema/standalone-batch.schema.json",
+  "title": "Standalone video batch manifest",
+  "description": "A record in stories/standalone/<batch>.json: one batch of standalone videos built outside the seven-act programme. Each video records its source formats, source-time excisions, overlays, optional full-frame takeover, thumbnail pick and audio probes -- provenance and timecodes, never the footage. The schema is closed (additionalProperties: false at every level) so a hand-edited field fails loudly instead of being silently ignored by tools/standalone.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "cta_asset",
+    "videos"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "cta_asset": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path to the approved full-frame CTA picture shared by every takeover in the batch."
+    },
+    "videos": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/video"
+      }
+    }
+  },
+  "$defs": {
+    "video": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "source",
+        "title",
+        "output",
+        "thumbnail_output",
+        "thumbnail",
+        "audio_probes",
+        "overlays"
+      ],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "thumbnail_output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cuts": {
+          "type": "array",
+          "description": "Authored excisions in source time. tools/standalone.py maps every source-time mark through these before rendering.",
+          "items": {
+            "$ref": "#/$defs/cut"
+          }
+        },
+        "overlays": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/overlay"
+          }
+        },
+        "takeover": {
+          "$ref": "#/$defs/takeover"
+        },
+        "thumbnail": {
+          "$ref": "#/$defs/thumbnail"
+        },
+        "audio_probes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/audioProbe"
+          }
+        },
+        "intro": {
+          "$ref": "#/$defs/intro"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "youtube_id",
+        "video_format_id",
+        "audio_format_id",
+        "usage_class",
+        "source_rights_note"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "youtube_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "video_format_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The yt-dlp video format pinned for reproducibility."
+        },
+        "audio_format_id": {
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "pattern": "-drc$"
+          },
+          "description": "The yt-dlp audio format pinned for reproducibility. A '-drc' format is forbidden: DRC (dynamic range compression) normalises the loudness the audio-quality tenet says to preserve. Rejected here at schema level so the committed-record gate (tests/test_index_integrity.py) catches it without the loader, and again by tools/standalone.py for uncommitted manifests."
+        },
+        "usage_class": {
+          "enum": [
+            "third_party_copyrighted",
+            "cc_by_4_0"
+          ],
+          "description": "Rights bucket. The enum is generated from vocab/provenance.yaml by scripts/generate_schema_enums.py; never hand-edit it."
+        },
+        "source_rights_note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "cut": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_sec",
+        "end_sec"
+      ],
+      "properties": {
+        "start_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end_sec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "takeover": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_at"
+      ],
+      "properties": {
+        "source_at": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Source time at which the CTA picture replaces the video through EOF, preserving source audio unchanged."
+        },
+        "asset": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional per-video CTA picture, committed under assets/cta/, overriding the batch-level cta_asset for this video only. Owner-approved per-video copy is a separate committed asset; the shared card is never mutated."
+        }
+      }
+    },
+    "thumbnail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_at"
+      ],
+      "properties": {
+        "source_at": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Source time the thumbnail frame is extracted from."
+        },
+        "why": {
+          "type": "string",
+          "description": "The frame evidence behind this mark -- what the picture shows under the title lockup and why the subject stays readable. Optional, but a reseated mark without it invites the same wrong pick back."
+        }
+      }
+    },
+    "audioProbe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_at",
+        "duration"
+      ],
+      "properties": {
+        "source_at": {
+          "type": "number",
+          "minimum": 0
+        },
+        "duration": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "source_at",
+        "dur"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "description": "An existing plate kind rendered by tools/plate.py; nothing new is invented for this batch."
+        },
+        "source_at": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Source time the plate appears; mapped through the video's cuts before rendering."
+        },
+        "dur": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "position": {
+          "type": "string"
+        },
+        "copy_source": {
+          "type": "string",
+          "description": "Where the on-screen words came from -- the record that they are reproduced, never invented."
+        },
+        "why": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "class": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "speaker": {
+          "type": "string"
+        },
+        "variant": {
+          "type": "string"
+        },
+        "trustee": {
+          "type": "boolean",
+          "description": "Use the established burnished-silver trustee chrome for an authored Guardian identity."
+        },
+        "avatar": {
+          "type": "string"
+        }
+      }
+    },
+    "intro": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A DIFFERENT picture spliced ahead of this video's own source, joined by a hard cut. The batch's one exception to 'a video has one source'. Declared by path and digest rather than committed, because it is a render output and renders/ is gitignored -- the same posture scripts/build_europa_tail.py takes for its source screenshot. Plates are composited onto the source before the join, so an intro never moves an authored seat.",
+      "required": [
+        "path",
+        "in_sec",
+        "out_sec",
+        "why"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to the intro picture on disk. Never committed."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "The intro file's digest. A mismatch DROPS the intro and ships the cut without it, rather than splicing a picture the record does not describe."
+        },
+        "in_sec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "out_sec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "why": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

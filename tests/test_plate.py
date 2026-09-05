@@ -148,6 +148,32 @@ def test_the_bazzite_variant_is_purple_chrome_not_a_new_card():
     assert variant is plate.VARIANTS["bazzite"]
     assert variant["accent"] == (138, 43, 226, 255)   # #8A2BE2
 
+def test_the_kubestellar_variant_is_violet_chrome_not_a_new_card():
+    """Same geometry and the same closed field set as every other plate --
+    only the chrome changes, exactly like bazzite and rust.
+
+    The claim here is deliberately WEAKER than bazzite's. KubeStellar
+    publishes no brand or style guide, so these are not sampled logo colours:
+    #6236FF is the docs site's own explicitly labelled "KubeStellar theme
+    colors" `secondary` (kubestellar/docs, globe/colors.ts). Source-derived
+    implementation styling, recorded as such."""
+    ks = plate.render_plate(dict(GUARDIAN, variant="kubestellar", trustee=False))
+    default = plate.render_plate(dict(GUARDIAN, trustee=False))
+    assert ks.size == default.size
+    assert ks.tobytes() != default.tobytes()
+    variant = plate._variant_for(dict(GUARDIAN, variant="kubestellar"))
+    assert variant is plate.VARIANTS["kubestellar"]
+    assert variant["accent"] == (98, 54, 255, 255)   # #6236FF
+
+
+def test_the_kubestellar_variant_carries_no_brand_mark():
+    """A brand mark comes from the project's own published artwork. Nothing
+    is cached for KubeStellar, so the crest stays the drawn hex -- or the
+    contributor's own GitHub face, which is what these cards actually use.
+    A variant with no mark degrades to the crest; it never crashes."""
+    assert "kubestellar" not in plate.BRAND_MARKS
+
+
 def test_the_bazzite_crest_carries_the_logomark():
     """The tile replaces the hex for this variant: the cobalt->violet
     gradient with the white D-pad at its heart."""
@@ -464,15 +490,14 @@ def test_plan_credits_every_contributor_somewhere():
     for c in ROSTER["contributors"]:
         assert c["display_name"] in named, c
 
-# A contributor whose Guardian identity is genuinely authored in the reference
-# deck. Injected rather than taken from vocab/casting.yaml, because the only
-# real authored identity (castrojo) belongs to someone CAST AS A LEAD, and a
-# lead is excluded from the ensemble pool entirely -- see
+# A contributor whose Guardian identity is authored in the canonical casting
+# record. Injected rather than taken from vocab/casting.yaml because castrojo
+# belongs to someone CAST AS A LEAD, and a lead is excluded from the ensemble
+# pool entirely -- see
 # test_a_person_cast_as_a_lead_is_never_an_anonymous_guardian.
 AUTHORED = {
-    "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Titan",
+    "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Hunter",
     "name": "Jorge Castro", "title": "Upender of Antipatterns | The First Disciple",
-    "trustee": True,
 }
 AUTHORED_ROSTER = {
     "month": "2026-08",
@@ -495,10 +520,11 @@ def test_a_contributor_with_an_authored_deck_plate_gets_it_verbatim(authored):
     entries = plate.plan(shots, LEADS, AUTHORED_ROSTER)
     entry = next(e for e in entries if e["id"] == "ensemble_titled")
     assert entry["label"] == "TRUSTEE // GUARDIAN"
-    assert entry["class"] == "Harbinger Titan"
+    assert entry["class"] == "Harbinger Hunter"
     assert entry["name"] == "Jorge Castro"
     assert entry["title"] == "Upender of Antipatterns | The First Disciple"
-    assert entry["trustee"] is True
+    assert "trustee" not in entry
+    assert "variant" not in entry
 
 def test_an_unlisted_contributor_still_gets_the_generic_ensemble_copy():
     """Nobody has authored a seal for a passing contributor, so the credit
@@ -1066,6 +1092,44 @@ def test_a_chat_card_carries_the_pfp_in_its_badge_slot(avatar_png):
     corner = with_photo.getpixel((plate.CHAT_PAD_L + 3, 10))
     assert corner[:3] == plate.INK[:3]
 
+def test_chat_supports_one_balanced_underscore_emphasis_span():
+    assert plate.chat_runs("Stay _sharp_!") == [
+        ("Stay ", "bold"),
+        ("sharp", "italic"),
+        ("!", "bold"),
+    ]
+
+
+def test_unbalanced_chat_underscore_stays_literal():
+    assert plate.chat_runs("Stay _sharp!") == [("Stay _sharp!", "bold")]
+
+
+def test_emphasized_chat_renders_without_a_censor_asset(tmp_path, monkeypatch):
+    """`Stay _sharp_!` carries no censor token, so its render must never
+    consult the censor mark at all -- the asset is gitignored and absent from
+    a fresh worktree. Censor-piece indexing is per run: carrying it across
+    emphasis runs measured (and drew) a false Kubernetes mark between runs and
+    raised FileNotFoundError here."""
+    monkeypatch.setattr(plate, "K8S_CENSOR_MARK", tmp_path / "absent.png")
+    emphasized = plate.render_plate(dict(CHAT, text="Stay _sharp_!"))
+    plain = plate.render_plate(dict(CHAT, text="Stay sharp!"))
+    assert emphasized.tobytes() != plain.tobytes()
+
+
+def test_emphasized_chat_gains_no_censor_marks(tmp_path, monkeypatch):
+    """Present or absent, the censor asset cannot reach an emphasized pill:
+    the two renders are byte-identical. A false mark between runs would widen
+    the pill and paint the mark's pixels into it."""
+    from PIL import Image
+    mark = tmp_path / "mark.png"
+    Image.new("RGBA", (32, 32), (255, 0, 0, 255)).save(mark)
+    monkeypatch.setattr(plate, "K8S_CENSOR_MARK", mark)
+    with_mark = plate.render_plate(dict(CHAT, text="Stay _sharp_!"))
+    monkeypatch.setattr(plate, "K8S_CENSOR_MARK", tmp_path / "absent.png")
+    without_mark = plate.render_plate(dict(CHAT, text="Stay _sharp_!"))
+    assert with_mark.tobytes() == without_mark.tobytes()
+
+
 def test_plates_sit_on_the_picture_not_on_the_letterbox_bar():
     """A 2.39:1 cinematic in a 16:9 file has ~140px of baked-in black.
 
@@ -1302,15 +1366,18 @@ def test_a_person_cast_as_a_lead_is_never_an_anonymous_guardian():
 
 def test_castrojos_authored_plate_lives_on_his_lead_binding():
     """His identity is not lost by leaving the ensemble -- it moved to Cayde-6,
-    so he is credited wherever Cayde is actually on screen."""
+    so he is credited wherever Cayde is actually on screen. The chrome is the
+    deck's standard blue: `TRUSTEE` in the label is copy, not rank chrome, and
+    the binding carries no `trustee` flag and no `variant`."""
     from tools.derive import load_leads
 
     copy = load_leads()["cayde_6"]["plate"]
     assert copy["name"] == "Jorge Castro"
-    assert copy["class"] == "Harbinger Titan"
+    assert copy["class"] == "Harbinger Hunter"
     assert copy["title"] == "Upender of Antipatterns | The First Disciple"
     assert copy["label"] == "TRUSTEE // GUARDIAN"
-    assert copy["trustee"] is True
+    assert "trustee" not in copy
+    assert "variant" not in copy
 
 def test_the_sign_off_card_plays_even_when_everyone_is_credited():
     """The card is the cut's last beat, not just an overflow list.
@@ -1502,30 +1569,14 @@ def test_the_issue_1_brief_end_to_end_through_the_parser():
 
 # --- a lead's plate carries only what was authored ---------------------------
 #
-# A real person's subclass is deck data, never a lore call about the character
-# they play. Karena's binding was the case where the owner had supplied the
-# class (Warlock) but no subclass; for act II the owner re-authored the whole
-# plate and supplied the subclass (Stasis), answering issue #5. These pin the
-# new copy verbatim -- and pin that the old copy survives in the binding's
-# `note:`, so the change is visible rather than silent.
+# Mara Sov now resolves to kdruckman, whose GitHub identity is verified but
+# whose Guardian plate has not been authored. The absence is deliberate:
+# carrying the previous person's copy across a recast would credit the wrong
+# real person.
 
-def test_the_mara_sov_plate_is_exactly_what_was_authored():
+def test_the_mara_sov_plate_stays_absent_until_kdruckman_authors_one():
     from tools.derive import load_leads
-    spec = load_leads()["mara_sov"]["plate"]
-    assert (spec["label"], spec["class"], spec["name"], spec["title"]) == (
-        "ARCHON // CONTRIBUTOR", "Stasis Warlock",
-        "Karena Angell", "Architect of the Consensus"), (
-        "owner-authored for act II, the subclass (#5) now supplied; a "
-        "paraphrase is as wrong as an invention"
-    )
-    assert spec["variant"] == "leader"   # gold, carried over -- never withdrawn
-    assert spec["wreath"] is True        # "the most senior warrior in the series"
-    assert "avatar" not in spec
-
-def test_the_mara_sov_plate_renders():
-    from tools.derive import load_leads
-    img = plate.render_plate(load_leads()["mara_sov"]["plate"])
-    assert img.width > 0 and img.height > 0
+    assert load_leads()["mara_sov"]["plate"] is None
 
 def test_a_lead_plate_renders_without_a_class_row():
     """The standing fallback when no class is authored at all. Synthetic copy:
@@ -1811,6 +1862,60 @@ def test_a_status_card_may_share_the_screen_with_a_guardian_plate():
     ]
     plate.load_manifest_entries(entries)  # must not raise
 
+def test_bazzite_status_uses_purple_chrome_and_the_official_tile():
+    # Same copy on both cards: the width delta isolates the promoted chrome
+    # (the tile crest's reserved room), not the length of the words.
+    plain = plate.render_plate(_status(
+        detail="FIRETEAM // EXPERT",
+        label="John Bazzite",
+    ))
+    expert = plate.render_plate(_status(
+        detail="FIRETEAM // EXPERT",
+        label="John Bazzite",
+        variant="bazzite",
+    ))
+    assert expert.width > plain.width
+    assert expert.tobytes() != plain.tobytes()
+    assert any(
+        b > r + 20 and b > g + 5 and a > 150
+        for r, g, b, a in expert.getdata()
+    )
+    # ...and the pixels are Bazzite's own, not merely "bluish" -- the broad
+    # predicate above also matches the default blue chrome. The violet accent
+    # stop and the tile's cobalt gradient start both render in the expert HUD
+    # (the only cobalt source is the tile), and in NO default card.
+    def has_near(img, stop, tol=15):
+        return any(
+            px[3] > 150
+            and all(abs(px[i] - stop[i]) <= tol for i in range(3))
+            for px in img.getdata()
+        )
+    assert has_near(expert, plate.BAZZITE_VIOLET)
+    assert has_near(expert, plate.BAZZITE_COBALT)
+    assert not has_near(plain, plate.BAZZITE_VIOLET)
+    assert not has_near(plain, plate.BAZZITE_COBALT)
+
+
+def test_bazzite_status_remains_compatible_with_a_guardian_plate():
+    plate.load_manifest_entries([
+        _status(
+            id="player",
+            at=4.0,
+            dur=100.0,
+            detail="FIRETEAM // EXPERT",
+            label="John Bazzite",
+            variant="bazzite",
+        ),
+        {
+            "id": "cayde",
+            "at": 8.0,
+            "dur": 4.0,
+            "position": "left",
+            "name": "Jorge Castro",
+        },
+    ])
+
+
 def test_two_status_cards_at_once_are_still_an_error():
     entries = [_status(id="a", at=0.0, dur=10.0),
                _status(id="b", at=5.0, dur=10.0)]
@@ -2012,7 +2117,7 @@ def test_a_missing_brand_mark_degrades_to_the_drawn_crest():
 # shipped two cards disagreeing with their bindings (#111).
 
 _BOUND_LEADS = {
-    "cayde_6": {"plate": {"label": "TRUSTEE // GUARDIAN", "class": "Harbinger Titan",
+    "cayde_6": {"plate": {"label": "TRUSTEE // GUARDIAN", "class": "Harbinger Hunter",
                           "name": "Jorge Castro",
                           "title": "Upender of Antipatterns | The First Disciple"}},
 }
@@ -2049,7 +2154,7 @@ def test_a_copy_override_without_a_decider_is_not_enough():
 def test_matching_copy_needs_no_override():
     from tools.plate import check_copy_against_bindings
     entries = [{"id": "reveal", "at": 1.0, "dur": 2.0, "name": "Jorge Castro",
-                "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Titan",
+                "label": "TRUSTEE // GUARDIAN", "class": "Harbinger Hunter",
                 "title": "Upender of Antipatterns | The First Disciple"}]
     assert check_copy_against_bindings(entries, leads=_BOUND_LEADS) == entries
 

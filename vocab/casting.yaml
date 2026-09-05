@@ -25,6 +25,19 @@ people:
       avatar: https://avatars.githubusercontent.com/u/6200805?v=4
   CortNick:
     github_id: 104345443
+    # Cortney Nickerson. Guardian identity OWNER-AUTHORED in #90, verbatim --
+    # "Weilder" is the owner's spelling and is reproduced, never corrected.
+    # The class row stays omitted: #90 wrote "whatever the Void subclass is"
+    # and Void subclasses are class-specific, so it waits on her class. Her
+    # one-video HIVE // BLUEBERRY identity (season-of-the-blueberries) is a
+    # deliberate per-video credit, not this record. Avatar is her X picture
+    # (x.com/TechTalkingMom, verified display name "Cortney Nickerson") by
+    # explicit owner instruction 2026-09-05, not the GitHub default.
+    plate:
+      label: AMBASSADOR // GUARDIAN
+      name: Cortney Nickerson
+      title: Weilder of the Arcane
+      avatar: https://pbs.twimg.com/profile_images/1537446663396069376/0qpk_7Gb_400x400.jpg
   jrsapi:
     github_id: 5437766
     plate:
@@ -64,6 +77,8 @@ people:
       avatar: https://avatars.githubusercontent.com/u/10704358?v=4
   LionHeartP:
     github_id: 28869010
+  JillCastro:
+    github_id: 209076372
   A1RM4X:
     github_id: 2750931
     plate:
@@ -78,12 +93,16 @@ people:
       class: Sentinel Titan
       name: Kat Cosgrove
       title: Defender Queen of the Lost
+  kdruckman:
+    github_id: 8461726
   natalisucks:
     github_id: 15304481
   nicknamenamenick:
     github_id: 121328689
   valerie-tar-gz:
     github_id: 155010216
+  rafaelcastro10:
+    github_id: 49164776
   nwoods3:
     github_id: 28409908
   nimbinatus:
@@ -105,12 +124,13 @@ people:
     github_id: 1264109
     plate:
       label: TRUSTEE // GUARDIAN
-      class: Harbinger Titan
+      class: Harbinger Hunter
       name: Jorge Castro
       title: Upender of Antipatterns | The First Disciple
-      trustee: true
   jeefy:
     github_id: 1394552
+  idvoretskyi:
+    github_id: 118459
   mrbobbytables:
     github_id: 6500863
     plate:
@@ -296,6 +316,9 @@ leads:
       person: clubanderson
       aka:
       - sagira_ghost
+    fynch:
+      person: idvoretskyi
+      aka: []
     saint_14:
       person: katcosgrove
       note: 'Kat from now on, but she remains the bubble in the original Wolves.
@@ -305,7 +328,7 @@ leads:
       - saint
       - saint14
     mara_sov:
-      person: angellk
+      person: kdruckman
       aka:
       - queen_mara_sov
     petra_venj:

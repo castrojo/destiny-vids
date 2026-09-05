@@ -1,0 +1,122 @@
+# The weekly contributor proposal for Season of the Blueberries.
+#
+# Every Saturday at 17:23 UTC (a non-zero minute -- the top of the hour is
+# where every scheduled job on GitHub piles up) this runs the recognition
+# pass in tools/hive_series.py: commit authors across the configured
+# KubeStellar repositories since the last snapshot, minus bots, the fixed
+# cast, and everyone already in the no-repeat ledger. The next unissued
+# episode record and the ledger update land on a branch as ONE commit, and a
+# pull request is opened.
+#
+# Three deliberate properties:
+#
+# * One proposal at a time. If an open hive/weekly- proposal PR is still
+#   awaiting review, the run FAILS before selecting or pushing anything --
+#   the blocking PR is written to the step summary so a stalled season is
+#   red on the schedule, not silently green. The proposal branch also
+#   carries the unique github.run_id, so two runs can never race the same
+#   ref.
+# * A PR opened with GITHUB_TOKEN does NOT trigger CI (GitHub refuses to
+#   recurse workflows opened by the built-in token). That is acceptable
+#   here: the change is data produced by the validated selector, the offline
+#   gate runs below before the PR exists, and the PR still requires the
+#   normal human review / merge-queue gate. Merging the PR is the human
+#   approval for a real-person claim -- this workflow proposes, it never
+#   credits anyone on main by itself.
+# * Nothing here renders footage. The selector edits JSON records only;
+#   episode encodes happen on the farm, never in Actions.
+#
+# A week with no eligible contributor still advances the next episode record
+# with an empty dossier list and a recorded note -- degrade, never block.
+name: Hive weekly contributors
+
+on:
+  schedule:
+    - cron: '23 17 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: write       # push the proposal branch
+  pull-requests: write  # open the proposal PR
+
+concurrency:
+  # Serialized, never cancelled: two selection runs racing would both fill
+  # the same "next" episode.
+  group: hive-weekly
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      # One proposal at a time: while a hive/weekly- PR awaits review, this
+      # run FAILS before selecting, so schedule plus a same-day manual
+      # dispatch cannot produce competing episode proposals -- and a stalled
+      # proposal is visible red with the blocking PR on the step summary,
+      # never a silently green skip. --limit 100 because the default page
+      # (30) could hide an older proposal behind newer unrelated PRs.
+      - name: Fail when a proposal PR is already awaiting review
+        run: |
+          open=$(gh pr list --state open --limit 100 \
+            --json number,headRefName,url \
+            --jq '[.[] | select(.headRefName | startswith("hive/weekly-"))]')
+          if [ "$(echo "$open" | jq length)" -gt 0 ]; then
+            {
+              echo "## Weekly contributor proposal blocked"
+              echo
+              echo "A proposal PR is already awaiting review, so this run did not select or push anything. Review, merge, or close it to unblock the season:"
+              echo
+              echo "$open" | jq -r '.[] | "- #\(.number) [\(.headRefName)](\(.url))"'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::An open hive/weekly- proposal PR is awaiting review; failing so the stalled season is visible."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: pip install --quiet jsonschema pyyaml pytest pillow
+
+      - name: Select the next episode's contributors
+        run: python3 tools/hive_series.py select-next
+
+      # The smallest complete offline gate: the season record's own suite,
+      # which includes the schema validation and the recognition tests.
+      - name: Validate the updated record
+        run: python3 -m pytest -q tests/test_hive_series.py
+
+      - name: Propose a PR when the record changed
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No change: the next episode record is unchanged."
+            exit 0
+          fi
+          # The run ID makes every proposal branch unique: two runs can
+          # never race or clobber the same ref.
+          branch="hive/weekly-$(date -u +%Y%m%d)-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add stories/standalone/season-of-the-blueberries.json
+          git commit -m "hive: weekly contributor proposal $(date -u +%Y-%m-%d)"
+          git push origin "$branch"
+          gh pr create \
+            --title "Hive weekly contributor proposal $(date -u +%Y-%m-%d)" \
+            --body "$(cat <<'EOF'
+          The weekly recognition pass: public GitHub commit activity across the
+          configured KubeStellar repositories since the last snapshot, minus bots,
+          the fixed cast, and every ID already in the no-repeat ledger.
+
+          This PR was opened with GITHUB_TOKEN, so it does not trigger CI; the
+          offline season gate ran in the proposing workflow. It requires the
+          normal human review / merge-queue gate like any other PR -- merging it
+          is the human approval for putting real people on screen.
+          EOF
+          )"
