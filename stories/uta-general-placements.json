@@ -1,0 +1,23 @@
+{
+  "accepted": [
+    {"id":"c15",  "start":15.4,  "dur":3.4, "box":[100,180,680,420],  "asset":"RAFI_01"},
+    {"id":"c44",  "start":44.4,  "dur":1.8, "box":[100,180,680,420],  "asset":"CHONK_INTRIGUED"},
+    {"id":"c54",  "start":54.6,  "dur":4.3, "box":[110,180,620,430],  "asset":"CHA_LAKSHMI_01"},
+    {"id":"c106", "start":106.2, "dur":2.5, "box":[1200,190,740,390], "asset":"CHONK_ROARING"},
+    {"id":"c136", "start":137.0, "dur":2.0, "box":[1260,180,680,420], "asset":"RAFI_02"},
+    {"id":"c156", "start":157.0, "dur":2.0, "box":[1260,180,680,420], "asset":"CHONK_UTAHRAPTOR"},
+    {"id":"c178", "start":178.4, "dur":1.8, "box":[1260,180,680,420], "asset":"RAFI_03"},
+    {"id":"c190", "start":190.2, "dur":5.2, "box":[1120,200,860,430], "asset":"CALLOUT_SPEAR"},
+    {"id":"c216", "start":216.4, "dur":3.0, "box":[1260,180,680,420], "asset":"CHONK_TORO"}
+  ],
+  "rejected": {
+    "c33":  "no person in either box, but dense near-field trunks -- no genuine negative space",
+    "c204": "both boxes fail: the woman's head enters the left, the knight's helmet the right",
+    "c262": "crosses two cuts into band close-ups",
+    "c272": "face-heavy; the left box lands on the woman, the man's face fills the lower frame",
+    "c363": "band/guitar footage, not the wide the survey suggested",
+    "c381": "the right box lands on the woman's face after the cut",
+    "c391": "only 1.5 s of the shot clears -- too short to hold a fade",
+    "c433": "right box sits on the knight; left box clips his shoulder"
+  }
+}
