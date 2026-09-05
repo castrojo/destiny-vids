@@ -43,6 +43,7 @@ the direct fetch below still works.
 
 from __future__ import annotations
 
+from io import BytesIO
 import json
 import subprocess
 import sys
@@ -50,6 +51,8 @@ import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+
+from PIL import Image, UnidentifiedImageError
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -113,6 +116,19 @@ def have(login):
     """Is there a usable image on disk for ``login``?"""
     path = avatar_dir() / f"{login}.png"
     return path.exists() and path.stat().st_size >= MIN_BYTES
+
+
+def _as_png(payload):
+    """Decode an avatar response and return actual PNG bytes for its .png path."""
+    try:
+        with Image.open(BytesIO(payload)) as image:
+            image.load()
+            rgba = image.convert("RGBA")
+    except (OSError, UnidentifiedImageError, ValueError):
+        return None
+    output = BytesIO()
+    rgba.save(output, format="PNG")
+    return output.getvalue()
 
 
 def due(login, index, now=None, revalidate=False):
@@ -201,9 +217,14 @@ def fetch_one(login, index, budget, opener=None):
                 row.update(status="failed", checked=budget.now())
                 index[login] = row
                 return "failed"
+            png = _as_png(payload)
+            if png is None or len(png) < MIN_BYTES:
+                row.update(status="failed", checked=budget.now())
+                index[login] = row
+                return "failed"
             avatar_dir().mkdir(parents=True, exist_ok=True)
-            path.write_bytes(payload)
-            row.update(status="have", etag=etag, bytes=len(payload),
+            path.write_bytes(png)
+            row.update(status="have", etag=etag, bytes=len(png),
                        checked=budget.now())
             index[login] = row
             return "fetched"

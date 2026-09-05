@@ -9,6 +9,7 @@ rediscover: a face already on disk costs a conditional request, a deleted
 account costs nothing for a month, and a throttled run stops instead of firing
 five hundred more requests at a server that just said no.
 """
+from io import BytesIO
 import json
 import sys
 import urllib.error
@@ -16,6 +17,7 @@ import urllib.request
 from pathlib import Path
 
 import pytest
+from PIL import Image
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
@@ -25,7 +27,14 @@ from tools import avatars as A  # noqa: E402
 from tools import credits as C  # noqa: E402
 
 WORKFLOW = REPO_ROOT / ".github" / "workflows" / "avatars.yml"
-PNG = b"\x89PNG\r\n\x1a\n" + b"\0" * A.MIN_BYTES
+def image_bytes(format):
+    image = Image.effect_noise((256, 256), 48).convert("RGB")
+    payload = BytesIO()
+    image.save(payload, format=format)
+    return payload.getvalue()
+
+
+PNG = image_bytes("PNG")
 
 class Clock:
     """Time that only moves when something sleeps."""
@@ -107,8 +116,21 @@ def test_an_etag_is_only_offered_when_there_is_a_file_to_back_it(cache):
 
     assert outcome == "fetched"
     assert opener.requests[0].get_header("If-none-match") is None
-    assert (cache / "ada.png").read_bytes() == PNG
+    with Image.open(cache / "ada.png") as image:
+        assert image.format == "PNG"
     assert index["ada"]["etag"] == '"def"'
+
+
+def test_a_jpeg_response_is_normalized_to_real_png_bytes(cache):
+    clock = Clock()
+    outcome = A.fetch_one(
+        "ada", {}, budget(clock),
+        opener=Opener(Response(image_bytes("JPEG"), {"ETag": '"jpeg"'})))
+
+    assert outcome == "fetched"
+    with Image.open(cache / "ada.png") as image:
+        assert image.format == "PNG"
+        assert image.size == (256, 256)
 
 def test_a_truncated_download_is_not_written_over_nothing(cache):
     """Half a PNG is not a face; the renderer's ring is the better answer."""
