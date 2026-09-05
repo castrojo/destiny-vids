@@ -1,9 +1,9 @@
 ---
 name: hive
 version: "1.0"
-last_updated: "2026-08-29"
+last_updated: "2026-09-05"
 id: hive
-one_line_purpose: Build the Season of the Blueberries episodes and the full-season cut.
+one_line_purpose: Build the Season of the Blueberries episodes and the full-season cut, or integrate the authored Expansion Pack.
 entry_point: docs/skills/hive.md
 category: media-production
 status: active
@@ -29,6 +29,26 @@ metadata:
 - Building or rebuilding a Hive episode (`s01eNN-*.mp4`)
 - Building the full-season cut (`season-01-full.mp4`)
 - Regenerating the committed cards after an owner copy change
+- Integrating the authored Expansion Pack (below)
+
+## The Expansion Pack — authored, not yet built
+
+The owner's second pass over the season is **written and committed**: one
+episode per file under
+[`stories/standalone/authoring/season-of-the-blueberries/`](../../stories/standalone/authoring/season-of-the-blueberries/),
+copy verbatim, times given as absolute source marks in `jlzQnXcUxqI`. Those
+files are authoring records, not render manifests — nothing builds from them
+yet, and no builder may treat them as one without the integration work.
+
+Integration is tracked in
+[#433](https://github.com/castrojo/destiny-vids/issues/433), which carries
+the executable brief: preserve every string verbatim, derive readable
+non-overlapping holds from the recorded marks, and deliver episodes plus the
+full-season cut under `~/Videos/Hive/Season-of-the-Blueberries/`. The
+owner-only decisions (the 01:28 model plate, final-CTA seating, portrait
+rights, Immaru's casting, The Relic's measurements) live in
+[`00-open-decisions.md`](../../stories/standalone/authoring/season-of-the-blueberries/00-open-decisions.md)
+— each degrades by omission, never by invention.
 
 The committed record is
 [`stories/standalone/season-of-the-blueberries.json`](../../stories/standalone/season-of-the-blueberries.json);
