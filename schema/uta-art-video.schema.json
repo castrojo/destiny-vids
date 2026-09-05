@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/castrojo/destiny-vids/schema/uta-art-video.schema.json",
+  "title": "UTA artwork montage edit record",
+  "description": "A record in stories/uta-general-dark-army.json: the rights position, the pinned source identity, and the Argo-returned measurements for a montage cut to Unleash The Archers' General Of The Dark Army. This montage uses the official source video's complete audio timeline, so rights and audio provenance live in the montage's own source object instead of a reusable beat-grid bed record. The repository stores measurements and references, never the media.",
+  "$comment": "Structural discriminators -- the build_workflow kinds source-review, picture and mux-validate -- are schema-local generator branches, not shared domain vocabulary. They are deliberately absent from vocab/ and from scripts/generate_schema_enums.py's MAP. The one shared-vocabulary field is source.usage_class, whose enum is generated from vocab/provenance.yaml.",
+  "type": "object",
+  "required": [
+    "edit_id",
+    "source",
+    "transport"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_what": {
+      "type": "string",
+      "description": "Prose orientation for the record, in the house style of stories/*.json."
+    },
+    "edit_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Stable slug, referenced on the command line and in workflow names."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "youtube_id",
+        "source_url",
+        "title",
+        "artist",
+        "usage_class",
+        "source_rights_note",
+        "media_filename",
+        "sha256",
+        "duration_seconds",
+        "frame_rate",
+        "frame_count",
+        "time_base",
+        "audio_sample_rate_hz",
+        "decoded_sample_count",
+        "evidence"
+      ],
+      "properties": {
+        "_what": {
+          "type": "string"
+        },
+        "youtube_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The requested YouTube video ID. Pinned by the owner; the record is wrong if it drifts."
+        },
+        "source_url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical watch URL for the requested source."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artist": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usage_class": {
+          "enum": [
+            "third_party_copyrighted",
+            "cc_by_4_0"
+          ],
+          "description": "Rights bucket, generated from vocab/provenance.yaml's usage_class axis -- never hand-edited here."
+        },
+        "source_rights_note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable rights position. For this montage it must state the same copyrighted work is used as both bed and selected picture, and that the repository stores only measurements and references."
+        },
+        "media_filename": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The source file name inside the Hero work directory, served over the transport. The record travels; the media never does."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the requested source file, verified inside the fetch pod on every workflow that touches it."
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Authoritative container duration from the Argo source-probe.json, not the YouTube metadata summary."
+        },
+        "frame_rate": {
+          "type": "string",
+          "pattern": "^[0-9]+/[0-9]+$",
+          "description": "Authoritative average frame rate as an exact rational (avg_frame_rate) from the Argo source probe."
+        },
+        "frame_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Authoritative video frame count (nb_frames) from the Argo source probe."
+        },
+        "time_base": {
+          "type": "string",
+          "pattern": "^1/[0-9]+$",
+          "description": "Authoritative video time base from the Argo source probe."
+        },
+        "audio_sample_rate_hz": {
+          "const": 48000,
+          "description": "Native audio sample rate. Delivery is 48,000 Hz: a source whose rate is anything else hard-fails the bed gate, so a montage record carrying another value can never produce a valid bed and is rejected here."
+        },
+        "decoded_sample_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Exact decoded PCM sample count of the complete source audio (duration_ts of the pcm_s24le decode at 1/48000), established by the remote preflight and proven by the Stage 1 bed-format gate."
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Where each measurement came from: Argo workflow names, manifest paths, and returned-artifact names. A measurement without evidence is a guess, and guesses do not go in this record."
+        }
+      }
+    },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fetch_url",
+        "receiver_url"
+      ],
+      "properties": {
+        "_what": {
+          "type": "string"
+        },
+        "fetch_url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "LAN URL the workflows GET the source from (shared source server, port 8877)."
+        },
+        "receiver_url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "LAN URL of this video's own PUT receiver (port 8881 for .work-uta-general). The receiver flattens PUT paths, so generated workflows upload flat filenames and any local organization into subdirectories is a documented move, never a claimed preservation."
+        }
+      }
+    }
+  }
+}

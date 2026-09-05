@@ -1,0 +1,36 @@
+{
+  "_what": "The General of the Dark Army montage: Unleash The Archers' official video as the complete-audio bed and the selected-picture source, with RAFI/Lakshmi artwork carrying the majority of the timeline. This record is the montage's source of truth for rights and measurements; the final picture is a later task and nothing here renders it.",
+  "edit_id": "uta-general-dark-army",
+  "source": {
+    "_what": "Rights and Argo-returned measurements for the one copyrighted source. This montage uses the official video's complete audio timeline, so audio provenance lives here instead of in a reusable beat-grid bed record. Every number below was returned by the workflows named in evidence; none was typed from the YouTube metadata summary.",
+    "youtube_id": "WVi0d7oqDvs",
+    "source_url": "https://www.youtube.com/watch?v=WVi0d7oqDvs",
+    "title": "General Of The Dark Army",
+    "artist": "Unleash The Archers",
+    "usage_class": "third_party_copyrighted",
+    "source_rights_note": "Unleash The Archers copyrighted official video and recording, used as both bed and picture (selected shots) in a non-commercial fan edit. This repository stores only measurements and references, never the media.",
+    "media_filename": "source.webm",
+    "sha256": "258af289edd7097e3dced9b6f7bda7d3f2e11476e3ee8ecf084befba3151c959",
+    "duration_seconds": 476.621,
+    "frame_rate": "24000/1001",
+    "frame_count": 11427,
+    "time_base": "1/1000",
+    "audio_sample_rate_hz": 48000,
+    "decoded_sample_count": 22877184,
+    "evidence": {
+      "preflight_workflow": "uta-general-preflight-7fgw2",
+      "preflight_manifest": ".work-uta-general/uta-general-preflight-v1.yaml",
+      "sample_count_record": "uta-general-preflight-v1-sample-count.json",
+      "bed_workflow": "uta-general-bed-bfs7n",
+      "bed_manifest": ".work-uta-general/uta-general-bed-v1.yaml",
+      "bed_gate_record": "uta-general-dark-army-bed-v1-bed-format-gate.json",
+      "source_review_workflow": "uta-general-dark-army-srcreview-h4rxb",
+      "source_probe_record": "uta-general-dark-army-srcreview-v1-source-probe.json"
+    }
+  },
+  "transport": {
+    "_what": "The Hero LAN transport for this video. All GET inputs come from the shared source server on 8877; this video's own PUT receiver is 8881, rooted at ~/Videos/Wolves/Hero/.work-uta-general.",
+    "fetch_url": "http://192.168.1.227:8877/.work-uta-general/source.webm",
+    "receiver_url": "http://192.168.1.227:8881"
+  }
+}
