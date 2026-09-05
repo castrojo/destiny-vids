@@ -25,6 +25,19 @@ people:
       avatar: https://avatars.githubusercontent.com/u/6200805?v=4
   CortNick:
     github_id: 104345443
+    # Cortney Nickerson. Guardian identity OWNER-AUTHORED in #90, verbatim --
+    # "Weilder" is the owner's spelling and is reproduced, never corrected.
+    # The class row stays omitted: #90 wrote "whatever the Void subclass is"
+    # and Void subclasses are class-specific, so it waits on her class. Her
+    # one-video HIVE // BLUEBERRY identity (season-of-the-blueberries) is a
+    # deliberate per-video credit, not this record. Avatar is her X picture
+    # (x.com/TechTalkingMom, verified display name "Cortney Nickerson") by
+    # explicit owner instruction 2026-09-05, not the GitHub default.
+    plate:
+      label: AMBASSADOR // GUARDIAN
+      name: Cortney Nickerson
+      title: Weilder of the Arcane
+      avatar: https://pbs.twimg.com/profile_images/1537446663396069376/0qpk_7Gb_400x400.jpg
   jrsapi:
     github_id: 5437766
     plate:
