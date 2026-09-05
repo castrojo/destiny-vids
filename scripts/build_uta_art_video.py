@@ -212,6 +212,30 @@ def validate_edit(doc):
             f"source/duration_seconds is {source['duration_seconds']}"
         )
 
+    comp = doc.get("composition")
+    if comp:
+        bounds = comp["transition_frames"]
+        if bounds["min"] > bounds["max"]:
+            raise ValueError(
+                f"composition/transition_frames min {bounds['min']} exceeds "
+                f"max {bounds['max']}"
+            )
+        intervals = sorted(
+            (iv["start_seconds"], iv["end_seconds"]) for iv in comp["protected"]
+        )
+        for (a_start, a_end), (b_start, _) in zip(intervals, intervals[1:]):
+            if b_start < a_end:
+                raise ValueError(
+                    f"composition/protected intervals overlap: "
+                    f"{a_start}-{a_end} and {b_start}-..."
+                )
+        for iv in comp["protected"]:
+            if iv["end_seconds"] <= iv["start_seconds"]:
+                raise ValueError(
+                    f"composition/protected interval ends before it starts: "
+                    f"{iv['start_seconds']}-{iv['end_seconds']}"
+                )
+
 
 def _record_prefix(edit, kind):
     """`uta-general-dark-army-srcreview-v1` style: stable per kind+version."""

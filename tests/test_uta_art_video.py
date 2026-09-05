@@ -231,6 +231,77 @@ def test_build_workflow_writes_the_manifest(edit, tmp_path):
     assert yaml.safe_load(written.read_text()) == manifest
 
 
+# --- the composition treatment (owner bar, 2026-09-05) -----------------------
+
+
+def test_primary_treatment_is_side_by_side(edit):
+    """Artwork sits ALONGSIDE the official video; full-screen art is only a
+    deliberate occasional accent, never the main treatment."""
+    comp = edit["composition"]
+    assert comp["mode"] == "side-by-side"
+    assert comp["accent_only_fullscreen"] is True
+
+
+def test_background_is_derived_not_black_pillarbox(edit):
+    assert edit["composition"]["background"] == "derived-layered"
+
+
+def test_transitions_are_smooth(edit):
+    bounds = edit["composition"]["transition_frames"]
+    assert 6 <= bounds["min"] <= bounds["max"] <= 12
+
+
+def test_artwork_is_present_from_the_opening(edit):
+    assert edit["composition"]["artwork_within_first_seconds"] == 35
+
+
+def test_protected_window_and_singer_shots(edit):
+    comp = edit["composition"]
+    assert comp["protect_direct_camera_singer_shots"] is True
+    assert any(
+        iv["start_seconds"] <= 320 and iv["end_seconds"] >= 350
+        for iv in comp["protected"]
+    ), "5:20-5:50 (320-350 s) must be wholly inside a protected interval"
+
+
+def test_protected_intervals_have_reasons(edit):
+    for iv in edit["composition"]["protected"]:
+        assert iv["reason"].strip()
+
+
+def test_validate_edit_rejects_overlapping_protected_intervals(edit):
+    doc = copy.deepcopy(edit)
+    doc["composition"]["protected"].append(
+        {"start_seconds": 300, "end_seconds": 330, "reason": "overlap"}
+    )
+    with pytest.raises(ValueError, match="overlap"):
+        build.validate_edit(doc)
+
+
+def test_validate_edit_rejects_inverted_transition_bounds(edit):
+    doc = copy.deepcopy(edit)
+    doc["composition"]["transition_frames"] = {"min": 12, "max": 6}
+    with pytest.raises(ValueError, match="transition"):
+        build.validate_edit(doc)
+
+
+def test_timeline_entries_distinguish_treatment_kinds(edit, schema):
+    """The schema can represent per-segment side-by-side, accent, and
+    source-only intervals (the timeline itself lands in a later task)."""
+    doc = copy.deepcopy(edit)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 0, "end_seconds": 12, "kind": "side-by-side",
+         "art_asset": "RAFI_01", "side": "right"},
+        {"start_seconds": 200, "end_seconds": 204, "kind": "accent",
+         "art_asset": "CHA_LAKSHMI_01"},
+        {"start_seconds": 320, "end_seconds": 350, "kind": "source-only"},
+    ]
+    build.validate_edit(doc)  # must not raise
+    doc["composition"]["timeline"][0]["kind"] = "slideshow"
+    with pytest.raises(ValueError):
+        build.validate_edit(doc)
+
+
 # --- the enum mapping ----------------------------------------------------------
 
 

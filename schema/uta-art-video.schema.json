@@ -3,12 +3,13 @@
   "$id": "https://github.com/castrojo/destiny-vids/schema/uta-art-video.schema.json",
   "title": "UTA artwork montage edit record",
   "description": "A record in stories/uta-general-dark-army.json: the rights position, the pinned source identity, and the Argo-returned measurements for a montage cut to Unleash The Archers' General Of The Dark Army. This montage uses the official source video's complete audio timeline, so rights and audio provenance live in the montage's own source object instead of a reusable beat-grid bed record. The repository stores measurements and references, never the media.",
-  "$comment": "Structural discriminators -- the build_workflow kinds source-review, picture and mux-validate -- are schema-local generator branches, not shared domain vocabulary. They are deliberately absent from vocab/ and from scripts/generate_schema_enums.py's MAP. The one shared-vocabulary field is source.usage_class, whose enum is generated from vocab/provenance.yaml.",
+  "$comment": "Structural discriminators -- the build_workflow kinds source-review, picture and mux-validate, the composition mode and the timeline entry kinds -- are schema-local generator branches, not shared domain vocabulary. They are deliberately absent from vocab/ and from scripts/generate_schema_enums.py's MAP. The one shared-vocabulary field is source.usage_class, whose enum is generated from vocab/provenance.yaml.",
   "type": "object",
   "required": [
     "edit_id",
     "source",
-    "transport"
+    "transport",
+    "composition"
   ],
   "additionalProperties": false,
   "properties": {
@@ -143,6 +144,178 @@
           "type": "string",
           "minLength": 1,
           "description": "LAN URL of this video's own PUT receiver (port 8881 for .work-uta-general). The receiver flattens PUT paths, so generated workflows upload flat filenames and any local organization into subdirectories is a documented move, never a claimed preservation."
+        }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "panel",
+        "background",
+        "transition_frames",
+        "artwork_within_first_seconds",
+        "accent_only_fullscreen",
+        "protect_direct_camera_singer_shots",
+        "protected"
+      ],
+      "description": "The montage's visual treatment policy (owner bar, 2026-09-05): artwork ALONGSIDE the official video in a polished designed composition. The source video stays visible, professionally cropped/reframed into a consistent panel; isolated transparent RAFI/Lakshmi figures and weapons occupy the complementary space; the background is a layered treatment derived from the source/art, never black pillarboxes. Not pasted rectangles, not a slideshow.",
+      "properties": {
+        "_what": {
+          "type": "string"
+        },
+        "mode": {
+          "const": "side-by-side",
+          "description": "The primary and default treatment. Full-screen artwork exists only as a deliberate occasional accent (see accent_only_fullscreen), never as the main treatment."
+        },
+        "panel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "side",
+            "alternate_sides"
+          ],
+          "description": "The consistent region the source video is cropped/reframed into. Numeric geometry lands when the art assets are measured; faces and action stay unobstructed in every composed frame.",
+          "properties": {
+            "side": {
+              "enum": [
+                "left",
+                "right"
+              ],
+              "description": "Default side for the source panel; art takes the complementary side."
+            },
+            "alternate_sides": {
+              "type": "boolean",
+              "description": "Sides may swap per segment when the composition supports it."
+            },
+            "x": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "y": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "background": {
+          "const": "derived-layered",
+          "description": "Layered background treatment derived from the source/art (for example an enlarged blurred source fill under the panel). Black pillarboxes are forbidden."
+        },
+        "transition_frames": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "max"
+          ],
+          "description": "Every treatment change is a smooth transition within these bounds -- hard slideshow cuts are forbidden.",
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 6,
+              "maximum": 12
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 6,
+              "maximum": 12
+            }
+          }
+        },
+        "artwork_within_first_seconds": {
+          "const": 35,
+          "description": "Artwork is visible from the opening and repeatedly within the first 35 seconds; the video must not read as source-only at the start."
+        },
+        "accent_only_fullscreen": {
+          "const": true,
+          "description": "Full-screen artwork is a deliberate occasional accent only, never the primary treatment."
+        },
+        "protect_direct_camera_singer_shots": {
+          "const": true,
+          "description": "Direct-camera singer shots play as clean full-frame source; the concrete intervals come from the reviewed storyboard/source-review evidence, never from automated gaze detection."
+        },
+        "protected": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Intervals that play as untouched full-frame source: no art, crop, reframing, card, transition, or filter may touch them. Must wholly contain 5:20-5:50 (320-350 s).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "start_seconds",
+              "end_seconds",
+              "reason"
+            ],
+            "properties": {
+              "start_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "end_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "description": "The composed edit itself, filled by a later task from the reviewed evidence. Each entry picks a treatment kind; side-by-side is the default, accent is rare and deliberate, source-only covers protected and singer intervals.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "start_seconds",
+              "end_seconds",
+              "kind"
+            ],
+            "properties": {
+              "start_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "end_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "kind": {
+                "enum": [
+                  "side-by-side",
+                  "accent",
+                  "source-only"
+                ]
+              },
+              "art_asset": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Transparent figure/weapon asset id for composed kinds."
+              },
+              "side": {
+                "enum": [
+                  "left",
+                  "right"
+                ],
+                "description": "Side of the artwork; the source panel takes the other side."
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     }

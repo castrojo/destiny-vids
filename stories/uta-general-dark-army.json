@@ -28,6 +28,29 @@
       "source_probe_record": "uta-general-dark-army-srcreview-v1-source-probe.json"
     }
   },
+  "composition": {
+    "_what": "The treatment bar, owner 2026-09-05: artwork ALONGSIDE the official video in a polished designed composition -- the source stays visible in a consistent panel, isolated transparent RAFI/Lakshmi figures and weapons take the complementary space over a layered background derived from the source/art. Not black pillarboxes, not pasted rectangles, not slideshow cuts. Full-screen art is a rare deliberate accent. Direct-camera singer shots and 5:20-5:50 play as clean full-frame source. The timeline itself lands in a later task, built from the returned scene evidence and the storyboard review.",
+    "mode": "side-by-side",
+    "panel": {
+      "side": "left",
+      "alternate_sides": true
+    },
+    "background": "derived-layered",
+    "transition_frames": {
+      "min": 6,
+      "max": 12
+    },
+    "artwork_within_first_seconds": 35,
+    "accent_only_fullscreen": true,
+    "protect_direct_camera_singer_shots": true,
+    "protected": [
+      {
+        "start_seconds": 320,
+        "end_seconds": 350,
+        "reason": "Owner-protected passage 5:20-5:50: the women-and-screams moment (~5:26) and 'retribution' (~5:42) play as untouched full-frame source. No art, crop, reframing, card, transition, or filter may touch this interval."
+      }
+    ]
+  },
   "transport": {
     "_what": "The Hero LAN transport for this video. All GET inputs come from the shared source server on 8877; this video's own PUT receiver is 8881, rooted at ~/Videos/Wolves/Hero/.work-uta-general.",
     "fetch_url": "http://192.168.1.227:8877/.work-uta-general/source.webm",
