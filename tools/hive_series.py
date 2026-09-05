@@ -1429,6 +1429,16 @@ def _source_preflight_farm(source, log=print):
     return rate, picture, status
 
 
+def _cached_avatar_present(avatar):
+    """Whether the declared avatar path resolves to a usable cached face.
+    A seam of its own so tests decide "cache warm/cold" without depending on
+    the host's avatar cache (bytes are never committed)."""
+    face = Path(avatar).expanduser()
+    if not face.is_absolute():
+        face = REPO_ROOT / face
+    return face.exists() and face.stat().st_size >= avatars.MIN_BYTES
+
+
 def _write_unresolved(work_dir, slug, unresolved):
     path = Path(work_dir) / f"{slug}-unresolved.json"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1609,11 +1619,7 @@ def _render_overlay_pngs(plan, picture_info, work_dir, slug, unresolved,
             # renders plate.py's drawn crest -- degrade, never block -- but
             # the gap is a punch-list item, not silence.
             if spec["overlay_kind"] == "chat" and spec.get("avatar"):
-                face = Path(spec["avatar"]).expanduser()
-                if not face.is_absolute():
-                    face = REPO_ROOT / face
-                if not face.exists() or \
-                        face.stat().st_size < avatars.MIN_BYTES:
+                if not _cached_avatar_present(spec["avatar"]):
                     unresolved.append({
                         "id": spec["id"],
                         "reason": f"the cached avatar {spec['avatar']} for "
@@ -1943,6 +1949,50 @@ def _fps_is_delivery(reported):
     return abs(value - float(wnum) / float(wden)) < 0.02
 
 
+def _implied_frame_pad(props):
+    """Seconds the video track's duration overstates its frame content --
+    when that overstatement is exactly a whole number of delivery-rate
+    frame periods; otherwise None.
+
+    ffprobe's ``avg_frame_rate`` is nb_frames over TRACK duration, so a
+    track padded by k frame periods (muxer flush/edit-list slop at the
+    file's tail) reads low by exactly r×k/(N+k) while the encoded clock is
+    the delivery rate. That is the only shape this accepts, and every guard
+    matters:
+
+    * the pad must be non-negative -- a genuinely FASTER clock (60/1) packs
+      more frames than delivery slots and reads negative;
+    * it must be a whole number of frame periods (to 0.01 frame) -- a wrong
+      constant clock almost never lands on one;
+    * it must fit inside the episode duration tolerance -- a slower clock
+      (30/1) needs a pad far past it;
+    * it needs nb_frames and the stream duration, which only the farm's
+      full-stream probe supplies -- the legacy local probe lacks them and
+      keeps the old verdict.
+
+    Example that motivated this: episode 12's rough probed
+    avg_frame_rate=330240000/5514509, which factors EXACTLY as
+    (60000/1001) x (5504/5509) -- 5504 frames on a 5509-frame-period track:
+    the delivery clock, padded by 5 frame periods (0.083s), not a wrong
+    rate."""
+    try:
+        frames = int(str(props.get("nb_frames")))
+        duration = float(str(props.get("duration")))
+    except (TypeError, ValueError):
+        return None
+    if frames <= 0 or duration <= 0:
+        return None
+    wnum, _, wden = conform.DELIVERY.fps.partition("/")
+    period = float(wden) / float(wnum)
+    pad = duration - frames * period
+    if pad < -1e-9 or pad > EPISODE_TOLERANCE_S:
+        return None
+    slots = pad / period
+    if abs(slots - round(slots)) > 1e-2:
+        return None
+    return pad
+
+
 def _fps_with_delivery_rounding(props):
     """``(props, fps_ok)`` with the container-rounding verdict applied once.
 
@@ -1959,8 +2009,16 @@ def _fps_with_delivery_rounding(props):
     mismatch is reported at its own measured value, never laundered. Both
     the join probe (`_conform_for_join`) and the delivery report
     (`_delivery_stream_problems`) go through here, so the two can never
-    drift apart."""
+    drift apart.
+
+    The one extension, still decided on the measured average alone: when
+    the average misses the slack, `_implied_frame_pad` re-judges it as
+    frame arithmetic -- nb_frames and track duration from the SAME measured
+    stream, so a track merely PADDED by a few frame periods (the episode-12
+    case) passes, while a wrong clock still fails."""
     if _fps_is_delivery(props.get("avg_frame_rate")):
+        return dict(props, avg_frame_rate=conform.DELIVERY.fps), True
+    if _implied_frame_pad(props) is not None:
         return dict(props, avg_frame_rate=conform.DELIVERY.fps), True
     return props, False
 

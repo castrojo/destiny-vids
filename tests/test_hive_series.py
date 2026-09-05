@@ -3285,15 +3285,12 @@ def test_build_episode_stages_the_authoring_chat_pills(
         (work / "s01e02-on-mars-unresolved.json").read_text())
     by_id = {item["id"]: item["reason"] for item in sidecar}
     assert "save-the-day" in by_id and "top-right" in by_id["save-the-day"]
-    # Avatar bytes are never committed, so offline the identity-proven
-    # Cortney pills render the drawn crest AND record the gap -- one entry
-    # per chat spec with a declared avatar.
+    # Avatar bytes are never committed; the cold-cache gap recording is
+    # pinned by test_avatar_gap_recording_uses_the_cache_seam below, with
+    # the cache seam under test control (the host's cache state must not
+    # leak into this suite).
     avatar_gaps = {item_id: reason for item_id, reason in by_id.items()
                    if "cached avatar" in reason}
-    assert set(avatar_gaps) == {c["id"] for c in
-                                hive_series.episode_plan(
-                                    hive_series.load_manifest(manifest_path),
-                                    2)["chats"]}
     assert all("CortNick" in reason for reason in avatar_gaps.values())
 
     # A content-identical rebuild is skipped on the digest.
@@ -3629,3 +3626,93 @@ def test_garbled_farm_probe_output_is_a_visible_problem_not_an_abort(
     # visibly before render), not a bare JSONDecodeError.
     with pytest.raises(hive_series.farm.FarmError, match="unreadable"):
         hive_series._source_preflight_farm(rough)
+
+
+def test_delivery_probe_accepts_the_episode12_frame_padded_track():
+    """Regression: episode 12's rough probed avg_frame_rate
+    330240000/5514509 and was rejected as 'not 60000/1001'. The rational
+    factors EXACTLY as (60000/1001) x (5504/5509): 5504 frames on a track
+    5509 frame-periods long -- the delivery clock with 5 frame periods
+    (0.083s) of tail padding, inside the 0.5s duration tolerance. The fixed
+    0.02 slack never covered frame-granular padding; the frame-arithmetic
+    verdict does, using nb_frames/duration from the same measured stream."""
+    video = _conformant_video(
+        avg_frame_rate="330240000/5514509",  # the exact e12 reading
+        r_frame_rate="60000/1001",
+        nb_frames="5504",
+        duration=f"{5514509 / 60000}",  # the padded track, 91.908483s
+    )
+    assert hive_series._implied_frame_pad(video) == pytest.approx(
+        5 * 1001 / 60000)
+    problems = hive_series._delivery_stream_problems(
+        "s01e12-raid.mp4", 92.0, video,
+        {"codec_name": "aac", "sample_rate": "48000", "channels": 2,
+         "channel_layout": "stereo"},
+        92.0,  # the format duration stayed within tolerance at build time
+        hive_series.EPISODE_TOLERANCE_S)
+    assert problems == []
+
+
+def test_frame_pad_verdict_never_launders_a_wrong_clock():
+    """The pad acceptance is frame arithmetic, not a wider tolerance:
+    without nb_frames/duration the old verdict stands, and a wrong clock
+    with consistent fields still fails (its implied pad is negative, or far
+    past the duration tolerance, or a non-integer number of frames)."""
+    # No frame fields at all -> the e12 rational is still a mismatch.
+    bare = _conformant_video(avg_frame_rate="330240000/5514509")
+    assert hive_series._implied_frame_pad(bare) is None
+    props, ok = hive_series._fps_with_delivery_rounding(bare)
+    assert not ok and props["avg_frame_rate"] == "330240000/5514509"
+
+    # A real 60/1 encode: more frames than delivery slots -> negative pad.
+    fast = _conformant_video(avg_frame_rate="60/1", r_frame_rate="60/1",
+                             nb_frames="5520", duration=f"{5520 / 60}")
+    assert hive_series._implied_frame_pad(fast) is None
+    assert not hive_series._fps_with_delivery_rounding(fast)[1]
+
+    # A real 30/1 encode: the implied pad dwarfs the duration tolerance.
+    slow = _conformant_video(avg_frame_rate="30/1", r_frame_rate="30/1",
+                             nb_frames="2760", duration=f"{2760 / 30}")
+    assert hive_series._implied_frame_pad(slow) is None
+    assert not hive_series._fps_with_delivery_rounding(slow)[1]
+
+    # A near-miss clock (59.9/1): inside no slack, and its pad is not a
+    # whole number of delivery frame periods.
+    near = _conformant_video(avg_frame_rate="599/10", r_frame_rate="599/10",
+                             nb_frames="5510", duration=f"{5510 / 59.9}")
+    assert hive_series._implied_frame_pad(near) is None
+    assert not hive_series._fps_with_delivery_rounding(near)[1]
+
+    # ...and the previously accepted tick-slop case still passes unchanged.
+    legacy = _conformant_video(avg_frame_rate="32640000/544621",
+                               r_frame_rate="32640000/544621")
+    assert hive_series._fps_with_delivery_rounding(legacy)[1]
+
+
+def test_avatar_gap_recording_uses_the_cache_seam(
+        manifest, tmp_path, monkeypatch):
+    """The missing-face record tracks the cache seam, never the host's
+    cache state: cold -> one entry per identity-proven chat pill; warm ->
+    none. (Regression: this suite must pass on a host whose avatar cache is
+    warm as well as on CI.)"""
+    manifest_path, _data = _stage_episode(manifest, tmp_path, monkeypatch)
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode([]))
+    work = tmp_path / "work"
+
+    monkeypatch.setattr(hive_series, "_cached_avatar_present",
+                        lambda avatar: False)
+    hive_series.build_episode(manifest_path, 2, work_dir=work)
+    sidecar = json.loads(
+        (work / "s01e02-on-mars-unresolved.json").read_text())
+    gaps = {item["id"] for item in sidecar
+            if "cached avatar" in item["reason"]}
+    expected = {c["id"] for c in hive_series.episode_plan(
+        hive_series.load_manifest(manifest_path), 2)["chats"]}
+    assert gaps == expected and len(gaps) == 4
+
+    monkeypatch.setattr(hive_series, "_cached_avatar_present",
+                        lambda avatar: True)
+    hive_series.build_episode(manifest_path, 2, work_dir=work)
+    sidecar = json.loads(
+        (work / "s01e02-on-mars-unresolved.json").read_text())
+    assert all("cached avatar" not in item["reason"] for item in sidecar)
