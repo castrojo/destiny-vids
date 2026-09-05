@@ -31,7 +31,7 @@ This training repository is the best place to hone their craft
 
 ## d03 | osiris | 0:45.66 -> 0:48.72
 
-Iteration 7: Students serialize instead of parallize
+Iteration 7: Students serialize instead of parallelize
 
 ## d04 | sagira | 0:48.73 -> 0:51.76
 

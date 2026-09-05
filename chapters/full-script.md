@@ -184,16 +184,16 @@ Edit in `chapters/III-mrbobbytables.md`.
 
 Edit in `chapters/IV-kat.md`.
 
-- `17:26.24` **kat** — Hey why are they shooting at me!
-- `17:28.94` **mrbobbytables** — The gamers don't know you're here to help
-- `17:36.74` **kat** — Nice to meet you too!
-- `17:38.29` **kat** — I miss ONE email now I gotta use a Linux desktop?
-- `17:40.59` **kat** — How much you want to bet their sound just doesn't work?
-- `17:43.34` **TBD** — HEY! We know when you're not upstreaming!
-- `17:45.59` **kat** — I have better sh*t to do!
-- `17:47.59` **kat** — I miss ingress-nginx sometimes
-- `17:50.04` **kat** — Fine I'll fix your sh*t too
-- `17:52.24` **kat** — Remember kids, cardio!
+- `16:46.31` **katcosgrove** — Hey why are they shooting at me!
+- `16:49.01` **mrbobbytables** — The gamers don't know you're here to help
+- `16:56.81` **katcosgrove** — Nice to meet you too!
+- `16:59.26` **katcosgrove** — I miss ONE email now I gotta use a Linux desktop?
+- `17:02.39` **katcosgrove** — How much you want to bet their sound just doesn't work?
+- `17:05.88` **TBD** — HEY! We know when you're not upstreaming!
+- `17:08.54` **katcosgrove** — I have better sh*t to do!
+- `17:10.99` **katcosgrove** — I miss ingress-nginx sometimes
+- `17:13.44` **katcosgrove** — Fine I'll fix your sh*t too
+- `17:15.89` **katcosgrove** — Remember kids, cardio!
 
 ## V
 

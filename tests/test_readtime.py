@@ -359,10 +359,20 @@ def test_the_default_run_reaches_the_dialogue_records():
 
 
 def test_act3_priority_now_dialogue_holds_clear_the_audit(monkeypatch):
-    """The owner approved these five re-seats; none may regress unreadable."""
+    """The owner approved these five re-seats; none may regress unreadable.
+
+    d03 is a RECORDED EXCEPTION, not a relaxed guard. Correcting the owner's
+    'parallize' to 'parallelize' added two characters and pushed the line
+    0.116s past its 3.06s window. The cues here are wall-to-wall on SOURCE
+    timecodes (d02 ends 45.65, d03 45.66-48.72, d04 starts 48.73), so
+    widening d03 would move d04 -- an authored beat. The owner ruled the
+    visible typo matters more than 0.12s. The deficit is pinned below so it
+    cannot silently drift further; any new shortfall still fails.
+    """
     path = (readtime.REPO_ROOT / "dialogue"
             / "yt_curse_of_osiris_opening_cinematic" / "dialogue.json")
     target_ids = {"d02", "d03", "d06", "d22", "d28"}
+    accepted_deficits = {"d03": 0.15}
     cues = json.loads(path.read_text(encoding="utf-8"))["cues"]
     target_texts = {cue["text"] for cue in cues if cue["id"] in target_ids}
     assert len(target_texts) == len(target_ids)
@@ -378,7 +388,11 @@ def test_act3_priority_now_dialogue_holds_clear_the_audit(monkeypatch):
     rows, _, problems = readtime.audit_dialogue(path)
     assert problems == []
     assert target_texts <= measured
-    assert not ({row["id"] for row in rows} & target_ids)
+
+    short = {row["id"]: row["deficit"] for row in rows}
+    assert not (short.keys() & (target_ids - accepted_deficits.keys()))
+    for cue_id, ceiling in accepted_deficits.items():
+        assert short.get(cue_id, 0.0) <= ceiling, (cue_id, short.get(cue_id))
 
 
 def test_p4_priority_now_chat_holds_clear_the_audit():

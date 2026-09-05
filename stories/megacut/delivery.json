@@ -117,11 +117,11 @@
     "chapters/IV-kat.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "fd4a951412069d8b790457053625188a8b957672ab6942f4422ebe6361caeb36",
+   "source_digest": "9d5b883003029a9b1d9a4540bdb24c31a44d34a42328f8b75e6749c1f99c7643",
    "rebuild": "python3 scripts/build_kat.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "60f24af4c12ea8a9973aaf76b1602dee7cca177620d58d3c369aa8439b1269f4",
-   "built_from_commit": "fcbfd52bce9003ae41b5d7d1295522682cfb044d"
+   "built_from_commit": "eabd74562ef867a92d3340e6be6daa37a653db42"
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
