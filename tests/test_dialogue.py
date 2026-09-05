@@ -404,7 +404,7 @@ def test_act3_priority_dialogue_reseats_are_readable_and_identity_normalized():
         "d02": (42.00, 45.65, "mrbobbytables",
                 "This training repository is the best place to hone their craft"),
         "d03": (45.66, 48.72, "mrbobbytables",
-                "Iteration 7: Students serialize instead of parallize"),
+                "Iteration 7: Students serialize instead of parallelize"),
         "d06": (53.73, 56.79, "clubanderson",
                 "Bluefin's Hive is reprogramming them all as we speak"),
         "d28": (138.71, 141.24, "mrbobbytables",
