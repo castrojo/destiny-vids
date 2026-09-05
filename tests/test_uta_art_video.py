@@ -502,6 +502,36 @@ def test_timeline_rejects_unknown_or_misplaced_callouts(edit):
         build.validate_edit(doc)
 
 
+# --- remote-only is absolute (owner, 2026-09-05) ------------------------------
+
+def test_the_generator_has_no_local_media_path():
+    """The montage generator may only ever EMIT Argo manifests; every probe,
+    extraction, render, mux, and validation runs in the cluster. A local
+    fallback on Argo failure is forbidden -- report and retry remotely."""
+    import ast
+    src = (REPO_ROOT / "scripts" / "build_uta_art_video.py").read_text()
+    tree = ast.parse(src)
+    assert not any(
+        isinstance(n, ast.Call)
+        and isinstance(n.func, ast.Attribute)
+        and isinstance(n.func.value, ast.Name)
+        and n.func.value.id in ("subprocess", "os")
+        for n in ast.walk(tree)
+    ), "the montage generator must never shell out locally"
+    # ffmpeg/ffprobe appear only inside Argo pod shell strings; linked-media
+    # decoders must not appear anywhere, strings included.
+    for token in ("cv2.VideoCapture", "imageio", "import av"):
+        assert token not in src
+
+
+def test_generated_manifests_run_everything_in_argo(source_review):
+    """Every container is a pod container; there is no local step, and the
+    media tools appear only in pod shell text."""
+    assert source_review["kind"] == "Workflow"
+    for _, container in _containers(source_review):
+        assert container["image"]  # runs in the cluster by construction
+
+
 # --- the enum mapping ----------------------------------------------------------
 
 

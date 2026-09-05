@@ -113,6 +113,9 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
   includes probes, audio measurement, extraction, decode checks, and final
   verification—not only production encodes. Local Pillow/OpenCV inspection of
   already-produced PNGs and ordinary Python metadata work are allowed.
+  **There is no local fallback** (owner, 2026-09-05): if Argo fails, report
+  and retry remotely—never run the media step on the workstation, whose
+  memory this rule exists to protect.
 - **Keep local measurement helpers free of media-container decoders.** They may
   hash containers as opaque bytes and use Pillow/OpenCV only on supplied stills
   or Argo-returned PNGs. They must never open a video or audio container—not
