@@ -102,17 +102,15 @@ def render_plates(doc, project, out_dir):
 def _resolve_avatar(project, value):
     """One manifest ``avatar`` -> the path the pill renderer should open.
 
-    Act IV's record carries ``~``-rooted paths (the project's own render
-    folder); act V's carries bare FILE NAMES. Joining the former onto the
-    project produced ``render/~/Videos/...`` and every pill silently fell
-    back to the drawn crest -- a regression against the delivered master,
-    whose pills carry the cast's photographs. So: an absolute or ``~``-rooted
-    value is already a path and passes through; only a bare name resolves
-    against ``<project>/render/``.
+    Canonical ``renders/avatars/<login>.png`` paths belong to this repository's
+    shared avatar cache. Legacy bare filenames remain project-local, under
+    ``<project>/render/``. Absolute and ``~``-rooted values pass through.
     """
     p = Path(value).expanduser()
     if p.is_absolute():
         return str(p)
+    if len(p.parts) > 1:
+        return str(REPO_ROOT / p)
     return str(Path(project).expanduser() / "render" / value)
 
 
