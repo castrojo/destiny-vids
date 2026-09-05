@@ -282,10 +282,13 @@ SEASON_MANIFEST = REPO_ROOT / "stories" / "standalone" / \
 
 
 def season_avatar_logins(path=None):
-    """The logins the Season of the Blueberries manifest names: the fixed
-    cast plus any selected dossier contributors. Read straight from the
-    record so the CI cache warms their faces too; a missing or unreadable
-    manifest simply contributes nothing."""
+    """The logins the Season of the Blueberries names: the fixed cast, any
+    selected dossier contributors, and the authoring-pass chat speakers
+    whose identity the season's own records prove (fixed cast or
+    contributor-ledger candidates). Read straight from the record so the CI
+    cache warms their faces too; a missing or unreadable manifest simply
+    contributes nothing, and an unparsable authoring file costs the warm
+    list nothing -- the build path is where grammar errors raise."""
     try:
         data = json.loads(Path(path or SEASON_MANIFEST).read_text("utf-8"))
     except (OSError, ValueError):
@@ -293,7 +296,23 @@ def season_avatar_logins(path=None):
     logins = [m.get("github_login") for m in data.get("fixed_cast") or []]
     for chapter in data.get("chapters") or []:
         logins.extend(d.get("login") for d in chapter.get("dossiers") or [])
-    return [login for login in logins if login]
+    try:
+        from tools import hive_authoring
+        for chapter in data.get("chapters") or []:
+            try:
+                entries = hive_authoring.load_chapter_authoring(
+                    hive_authoring.AUTHORING_DIR, chapter)
+                chats, _lore, _unresolved, _gaps = \
+                    hive_authoring.plan_authoring(entries, data, chapter)
+            except hive_authoring.AuthoringError:
+                continue
+            logins.extend(Path(spec["avatar"]).stem for spec in chats
+                          if spec.get("avatar"))
+    except ImportError:
+        pass
+    seen = set()
+    return [login for login in logins
+            if login and not (login.lower() in seen or seen.add(login.lower()))]
 
 
 def pull_from_actions(verbose=True, runner=subprocess.run):

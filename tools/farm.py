@@ -409,7 +409,7 @@ if [ "$fail" -ne 0 ]; then say "aborting: chunk failures"; exit 1; fi
 say "joining {n} chunks"
 if ! {shlex.join(plan["join"])}; then say "join FAILED"; exit 1; fi
 dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 {shlex.quote(plan['out_rel'])} 2>/dev/null)
-printf '{{"output":%s,"duration":%s}}\\n' '"{plan["out_rel"]}"' '"${{dur:-null}}"' > out/.done.json
+printf '{{"output":%s,"duration":%s}}\\n' '"{plan["out_rel"]}"' "${{dur:-null}}" > out/.done.json
 say "encoded {plan['out_rel']} duration=${{dur:-?}}s; waiting for fetch"
 while [ ! -f .fetched ]; do sleep 2; done
 say "output fetched; pod done"
@@ -742,7 +742,7 @@ def run_capped_local(cmd, reason, **kwargs):
 
 def run_encode(argv, *, inputs, out, local=False, reason=None,
                expected_duration=None, text_files=None, tmp_prefix=None,
-               label=None, **cluster_kw):
+               label=None, fallback=True, local_probe=True, **cluster_kw):
     """One video encode, on the farm whenever the farm answers.
 
     This is the posture AGENTS.md rules — "always prefer remote encoding when
@@ -758,10 +758,37 @@ def run_encode(argv, *, inputs, out, local=False, reason=None,
       the reason printed. A farm that fails mid-encode is a reason to say so
       and keep going, never a reason to hand back no video.
 
+    ``fallback=False`` is the stricter contract of a workspace that forbids
+    local ffmpeg outright (Hive): the farm does the encode or the call
+    raises FarmError BEFORE any render — no capped local run, ever.
+    ``local_probe=False`` keeps the post-fetch verification on the farm too
+    (the pod's own probe), never the host's ffprobe.
+
     Returns ``"cluster"`` or ``"local"`` so the caller can record whose CPUs
     did the work.
     """
     argv = [str(t) for t in argv]
+    if not fallback:
+        if local:
+            raise FarmError(
+                f"--local given, but {label or 'this build'} does not "
+                "permit a local encode")
+        ok, unavailable = cluster_available()
+        if not ok:
+            raise FarmError(
+                f"the cluster is not reachable ({unavailable}); "
+                f"{label or 'this build'} does not permit a local encode")
+        if text_files or tmp_prefix:
+            run_ffmpeg_chain_on_cluster(
+                [argv], inputs=inputs, out=out, text_files=text_files,
+                tmp_prefix=tmp_prefix, expected_duration=expected_duration,
+                label=label, local_probe=local_probe, **cluster_kw)
+        else:
+            run_ffmpeg_on_cluster(
+                argv, inputs=inputs, out=out,
+                expected_duration=expected_duration, label=label,
+                local_probe=local_probe, **cluster_kw)
+        return "cluster"
     why = reason or "--local given"
     if not local:
         ok, unavailable = cluster_available()
@@ -772,12 +799,12 @@ def run_encode(argv, *, inputs, out, local=False, reason=None,
                         [argv], inputs=inputs, out=out, text_files=text_files,
                         tmp_prefix=tmp_prefix,
                         expected_duration=expected_duration, label=label,
-                        **cluster_kw)
+                        local_probe=local_probe, **cluster_kw)
                 else:
                     run_ffmpeg_on_cluster(
                         argv, inputs=inputs, out=out,
                         expected_duration=expected_duration, label=label,
-                        **cluster_kw)
+                        local_probe=local_probe, **cluster_kw)
                 return "cluster"
             except FarmError as exc:
                 why = f"the cluster encode failed ({exc})"
@@ -832,6 +859,7 @@ def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
                                  node=node, keep=keep))
     placement = f"node {node}" if node else "scheduler-selected node"
     print(f"{label}: workflow {name} submitted ({placement}, {desc})")
+    done_info = None
     try:
         pod = ""
         while time.monotonic() < deadline:
@@ -904,6 +932,18 @@ def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
         else:
             raise FarmError(f"encode exceeded --timeout {timeout}s")
 
+        # The pod's own probe of its output (the pod script ffprobes
+        # out/.done.json ON the farm) -- captured so a caller under a
+        # no-local-ffprobe contract can verify against it without ever
+        # probing on the host.
+        cat = kc.exec(pod, ["cat", f"{WORK_DIR}/out/.done.json"],
+                      check=False)
+        if cat.returncode == 0:
+            try:
+                done_info = json.loads(cat.stdout)
+            except ValueError:
+                done_info = None
+
         Path(out).parent.mkdir(parents=True, exist_ok=True)
         t0 = time.monotonic()
         kc.cp(f"{kc.namespace}/{pod}:{WORK_DIR}/{out_rel}", str(out))
@@ -926,7 +966,7 @@ def _execute_on_cluster(*, name, script, uploads, out_rel, out, kc, image,
         else:
             kc.delete("workflow", name)
             kc.delete("pvc", name)
-    return 0
+    return done_info
 
 
 def run_on_cluster(plan, *, name, src, out, script, kc, image, cpu, limit_cpu,
@@ -1105,7 +1145,7 @@ if ! {shlex.join(pod_argv)} > logs/job.log 2>&1; then
   exit 1
 fi
 dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 {shlex.quote(out_rel)} 2>/dev/null)
-printf '{{"output":%s,"duration":%s}}\\n' '"{out_rel}"' '"${{dur:-null}}"' > out/.done.json
+printf '{{"output":%s,"duration":%s}}\\n' '"{out_rel}"' "${{dur:-null}}" > out/.done.json
 say "encoded {out_rel} duration=${{dur:-?}}s; waiting for fetch"
 while [ ! -f .fetched ]; do sleep 2; done
 say "output fetched; pod done"
@@ -1119,7 +1159,7 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
                           limit_memory=DEFAULT_LIMIT_MEMORY, node=DEFAULT_NODE,
                           keep=False,
                           timeout=DEFAULT_TIMEOUT, expected_duration=None,
-                          label=None, ffprobe=None):
+                          label=None, ffprobe=None, local_probe=True):
     """Run ONE local ffmpeg argv on the cluster and fetch its output back.
 
     The argv is the caller's recipe verbatim — inputs staged by kubectl cp,
@@ -1132,7 +1172,9 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
     fetched file must ffprobe as media with a video stream, and when
     ``expected_duration`` is given its container duration must land within
     SEAM_TOLERANCE_S of it. Semantic checks (video extent vs the item's own
-    clock) stay with the caller.
+    clock) stay with the caller. ``local_probe=False`` is the
+    no-local-ffprobe contract (the Hive workspace): verification reads only
+    the pod's own probe of its output (``out/.done.json``), never the host's.
     """
     inputs = [Path(p) for p in inputs]
     out = Path(out)
@@ -1152,13 +1194,16 @@ def run_ffmpeg_on_cluster(argv, *, inputs, out, name=None, kc=None,
     total = sum(sum(f.stat().st_size for f in sequence_frames(p))
                 if SEQUENCE_RE.search(p.name) else p.stat().st_size
                 for p in inputs)
-    _execute_on_cluster(
+    done_info = _execute_on_cluster(
         name=name, script=script, uploads=uploads, out_rel=out_rel, out=out,
         kc=kc, image=image, cpu=cpu, limit_cpu=limit_cpu, memory=memory,
         limit_memory=limit_memory, node=node,
         storage=storage_for(total), keep=keep, timeout=timeout,
         desc=f"1 encode x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
+    if not local_probe:
+        return _verify_fetched_on_farm(out, expected_duration, done_info,
+                                       label=label)
     return _verify_fetched(out, expected_duration, ffprobe=ffprobe,
                            label=label)
 
@@ -1192,7 +1237,7 @@ while [ ! -f in/.ready ]; do sleep 2; done
 say "input arrived:"; ls -l in/
 {chr(10).join(commands)}
 dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 {shlex.quote(out_rel)} 2>/dev/null)
-printf '{{"output":%s,"duration":%s}}\\n' '"{out_rel}"' '"${{dur:-null}}"' > out/.done.json
+printf '{{"output":%s,"duration":%s}}\\n' '"{out_rel}"' "${{dur:-null}}" > out/.done.json
 say "encoded {out_rel} duration=${{dur:-?}}s; waiting for fetch"
 while [ ! -f .fetched ]; do sleep 2; done
 say "output fetched; pod done"
@@ -1261,6 +1306,35 @@ def _verify_fetched(out, expected_duration, *, ffprobe, label):
     return facts
 
 
+def _verify_fetched_on_farm(out, expected_duration, done_info, *, label):
+    """Verification for callers under a no-local-ffprobe contract (the Hive
+    workspace): the ONLY probe is the one the pod itself ran into
+    out/.done.json. The fetched file is never opened by the host.
+
+    The pod writes ``duration`` as a real JSON number, or ``null`` when its
+    own ffprobe could not measure. Anything else -- null, a missing key, a
+    string like ``"null"`` from an older pod script, garbage -- is not a
+    measurement and normalizes strictly to FarmError: never a host-side
+    probe, never an unhandled ValueError."""
+    duration = (done_info or {}).get("duration")
+    if isinstance(duration, bool) or not isinstance(duration, (int, float)):
+        raise FarmError(
+            f"{label}: the pod never probed its output to a duration "
+            f"(out/.done.json carries duration={duration!r}), and this "
+            "caller forbids a host-side probe -- treat the fetch as "
+            "unverified")
+    if expected_duration is not None:
+        drift = duration - float(expected_duration)
+        if abs(drift) > SEAM_TOLERANCE_S:
+            raise FarmError(
+                f"output is {duration:.3f}s but the caller expected "
+                f"{float(expected_duration):.3f}s — {drift:+.3f}s is a "
+                f"re-time, not rounding (#88)")
+    print(f"{label}: verify ok — {Path(out).name} {duration:.3f}s "
+          "(probed on the farm)")
+    return {"duration": duration}
+
+
 def pod_script_chain(pod_argvs, out_rel, *, text_files=None, work_dir=WORK_DIR):
     """The bash for a CHAIN: ordered commands whose intermediates stay in the
     pod. ``text_files`` is {work_dir-relative dest: content}, written before
@@ -1298,7 +1372,7 @@ say "input arrived:"; ls -l in/
 {chr(10).join(written)}
 {chr(10).join(commands)}
 dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 {shlex.quote(out_rel)} 2>/dev/null)
-printf '{{"output":%s,"duration":%s}}\\n' '"{out_rel}"' '"${{dur:-null}}"' > out/.done.json
+printf '{{"output":%s,"duration":%s}}\\n' '"{out_rel}"' "${{dur:-null}}" > out/.done.json
 say "encoded {out_rel} duration=${{dur:-?}}s; waiting for fetch"
 while [ ! -f .fetched ]; do sleep 2; done
 say "output fetched; pod done"
@@ -1315,7 +1389,7 @@ def run_ffmpeg_chain_on_cluster(argvs, *, inputs, out, tmp_prefix=None,
                                 node=DEFAULT_NODE, keep=False,
                                 timeout=DEFAULT_TIMEOUT,
                                 expected_duration=None, label=None,
-                                ffprobe=None):
+                                ffprobe=None, local_probe=True):
     """Ordered ffmpeg commands whose INTERMEDIATES never leave the pod.
 
     ``run_ffmpeg_commands_on_cluster`` insists every command reads the same
@@ -1404,7 +1478,7 @@ def run_ffmpeg_chain_on_cluster(argvs, *, inputs, out, tmp_prefix=None,
         sum(f.stat().st_size for f in sequence_frames(Path(p)))
         if SEQUENCE_RE.search(Path(p).name) else Path(p).stat().st_size
         for p in inputs)
-    _execute_on_cluster(
+    done_info = _execute_on_cluster(
         name=name,
         script=pod_script_chain(pod_argvs, out_rel, text_files=pod_text),
         uploads=uploads, out_rel=out_rel, out=out, kc=kc, image=image,
@@ -1412,8 +1486,96 @@ def run_ffmpeg_chain_on_cluster(argvs, *, inputs, out, tmp_prefix=None,
         node=node, storage=storage_for(total), keep=keep, timeout=timeout,
         desc=f"{len(argvs)} ordered encode step(s) x up to {limit_cpu} cpu",
         label=label, log_prefix=f"  [{name}] ")
+    if not local_probe:
+        return _verify_fetched_on_farm(out, expected_duration, done_info,
+                                       label=label)
     return _verify_fetched(out, expected_duration, ffprobe=ffprobe,
                            label=label)
+
+
+def _pod_script_analysis(pod_argvs, capture_rel, *, work_dir=WORK_DIR):
+    """The bash for read-only media analysis: run each command, append ALL
+    of its output (stdout and stderr) to the one capture file, leave the
+    done marker, idle for harvest. Same marker protocol as the encode
+    scripts, so ``_execute_on_cluster`` orchestrates it unchanged."""
+    commands = []
+    for index, argv in enumerate(pod_argvs, start=1):
+        commands.append(
+            f"""say {shlex.quote(f"running analysis {index}: " + shlex.join(argv))}
+if ! {shlex.join(argv)} >> {shlex.quote(capture_rel)} 2>&1; then
+  rc=$?
+  say "analysis {index} FAILED (rc=$rc)"
+  tail -n 20 {shlex.quote(capture_rel)}
+  exit 1
+fi""")
+    return f"""#!/bin/bash
+set -uo pipefail
+export LC_ALL=C
+cd {work_dir} || {{ echo "no {work_dir} mounted"; exit 1; }}
+mkdir -p in logs out
+say() {{ printf '%s [farm] %s\\n' "$(date +%H:%M:%S)" "$*"; }}
+say "pod up on $(hostname); waiting for input"
+while [ ! -f in/.ready ]; do sleep 2; done
+say "input arrived:"; ls -l in/
+{chr(10).join(commands)}
+printf '{{"output":%s,"duration":null}}\\n' '"{capture_rel}"' > out/.done.json
+say "analysis captured in {capture_rel}; waiting for fetch"
+while [ ! -f .fetched ]; do sleep 2; done
+say "output fetched; pod done"
+"""
+
+
+def run_analysis_on_cluster(argvs, *, inputs, name=None, kc=None,
+                            kubeconfig=None, namespace=DEFAULT_NAMESPACE,
+                            image=DEFAULT_IMAGE, cpu=DEFAULT_CPU,
+                            limit_cpu=DEFAULT_LIMIT_CPU, memory=DEFAULT_MEMORY,
+                            limit_memory=DEFAULT_LIMIT_MEMORY,
+                            node=DEFAULT_NODE, keep=False,
+                            timeout=DEFAULT_TIMEOUT, label=None):
+    """Run READ-ONLY media analysis on the farm; return what it printed.
+
+    Each argv runs in the pod with the local input paths staged exactly like
+    an encode's (kubectl cp, exact-token rewrite to the pod's view -- the
+    same rule ``rewrite_argv_for_pod`` applies); every command's stdout and
+    stderr append to one capture file, which is fetched and returned as
+    text. ``argv[0]`` names the POD binary: the farm image carries ffmpeg
+    and ffprobe on PATH, and the host never resolves, probes, or decodes
+    anything. This is the preflight/validation seam for a workspace whose
+    contract forbids local ffmpeg/ffprobe outright (Hive).
+    """
+    if not argvs:
+        raise ValueError("at least one analysis command is required")
+    inputs = [Path(p) for p in inputs]
+    for p in inputs:
+        if not p.exists():
+            raise FarmError(f"input does not exist: {p}")
+    staged, uploads = _stage_inputs(inputs)
+    pod_argvs = [[staged.get(str(t), str(t)) for t in argv]
+                 for argv in argvs]
+    referenced = {t for argv in pod_argvs for t in argv}
+    unread = [pod for pod in staged.values() if pod not in referenced]
+    if unread:
+        raise FarmError(
+            f"staged input(s) never read by the analysis: {unread}")
+    capture_rel = "out/analysis.txt"
+    name = name or farm_name(f"probe-{Path(inputs[0]).name}")
+    label = label or f"farm[{name}]"
+    kc = kc or Kubectl(kubeconfig, namespace)
+    fd, capture = tempfile.mkstemp(prefix=".farm-analysis-", suffix=".txt")
+    os.close(fd)
+    try:
+        _execute_on_cluster(
+            name=name, script=_pod_script_analysis(pod_argvs, capture_rel),
+            uploads=uploads, out_rel=capture_rel, out=capture, kc=kc,
+            image=image, cpu=cpu, limit_cpu=limit_cpu, memory=memory,
+            limit_memory=limit_memory, node=node,
+            storage=storage_for(sum(p.stat().st_size for p in inputs)),
+            keep=keep, timeout=timeout,
+            desc=f"{len(pod_argvs)} analysis command(s)",
+            label=label, log_prefix=f"  [{name}] ")
+        return Path(capture).read_text(encoding="utf-8", errors="replace")
+    finally:
+        Path(capture).unlink(missing_ok=True)
 
 
 def _local_progress(plan, done):

@@ -341,7 +341,8 @@ def build_encode_command(src, dst, ffmpeg=None, threads=None, *, crf=None,
 
 
 def ensure(source, out_dir=None, ffmpeg=None, threads=None, *, crf=None,
-           preset=None, log=None, _probe=None, use_farm=None):
+           preset=None, log=None, _probe=None, use_farm=None,
+           allow_local=True, local_probe=True):
     """A spec-conformant version of ``source``, doing as little as possible.
 
     Returns ``(path, status)`` with status one of:
@@ -387,7 +388,8 @@ def ensure(source, out_dir=None, ffmpeg=None, threads=None, *, crf=None,
     argv = build_encode_command(src, tmp, ffmpeg or _find_ffmpeg(), threads,
                                 crf=crf, preset=preset)
     try:
-        _encode(argv, src=src, out=tmp, use_farm=use_farm)
+        _encode(argv, src=src, out=tmp, use_farm=use_farm,
+                allow_local=allow_local, local_probe=local_probe)
         tmp.replace(entry)
     except BaseException:
         tmp.unlink(missing_ok=True)
@@ -403,13 +405,18 @@ def ensure(source, out_dir=None, ffmpeg=None, threads=None, *, crf=None,
     return entry, "conformed"
 
 
-def _encode(argv, *, src, out, use_farm):
+def _encode(argv, *, src, out, use_farm, allow_local=True,
+            local_probe=True):
     """The conform encode, on the farm whenever it answers.
 
     ``use_farm`` is a tri-state: True/False pin the posture from a caller
     that probed already; None probes here. A farm failure mid-encode falls
     back to the capped local run -- degrade, never block, and a cold cache
-    is never a reason to hand back no programme.
+    is never a reason to hand back no programme. ``allow_local=False`` is
+    the stricter contract of a workspace that forbids local ffmpeg
+    outright (Hive): the farm does the encode or the call raises,
+    and ``local_probe=False`` keeps the farm's own verification off the
+    host's ffprobe as well.
     """
     from tools import farm
     reason = None
@@ -421,10 +428,16 @@ def _encode(argv, *, src, out, use_farm):
         reason = "--local given"
     if use_farm:
         try:
-            farm.run_ffmpeg_on_cluster(argv, inputs=[src], out=out)
+            farm.run_ffmpeg_on_cluster(argv, inputs=[src], out=out,
+                                       local_probe=local_probe)
             return out
         except farm.FarmError as exc:
+            if not allow_local:
+                raise
             reason = f"the cluster encode failed ({exc})"
+    if not allow_local:
+        raise farm.FarmError(
+            f"the conform encode may not run locally here ({reason})")
     farm.run_capped_local(argv, reason=reason, check=True)
     return out
 

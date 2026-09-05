@@ -285,19 +285,24 @@ def detect_picture_status(video, ffmpeg=None):
     """
     ffmpeg = ffmpeg or find_ffmpeg()
     src = str(Path(video).resolve())
-    readings = []
-    decoded = False
+    outputs = []
     for start, length in probe_windows(probe_media_duration(video)):
         cmd = [*ffmpeg, "-nostdin", "-hide_banner",
                "-ss", str(start), "-t", str(length), "-i", src,
                "-vf", "cropdetect=24:2:0", "-f", "null", "-"]
         proc = subprocess.run(cmd, capture_output=True, text=True)
-        found = re.findall(r"crop=(\d+):(\d+):(\d+):(\d+)", proc.stderr)
-        if found:
-            decoded = True
-            readings.extend(found)
+        outputs.append(proc.stderr)
+    return picture_status_from_cropdetect("\n".join(outputs))
+
+
+def picture_status_from_cropdetect(output):
+    """``(rect, status)`` from cropdetect output text -- the judging half of
+    ``detect_picture_status``, split out so the SAME readings decide
+    placement when the probe itself ran on the farm (the Hive workspace
+    runs no local ffmpeg at all, including detection)."""
+    readings = re.findall(r"crop=(\d+):(\d+):(\d+):(\d+)", output)
     if not readings:
-        return None, ("full-frame" if decoded else "undecodable")
+        return None, "undecodable"
     # The steadiest reading across every probe window, not the last one.
     best = Counter(readings).most_common(1)[0][0]
     w, h, x, y = (int(v) for v in best)

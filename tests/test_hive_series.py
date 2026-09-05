@@ -572,11 +572,19 @@ def test_resolve_face_returns_none_for_a_login_with_no_cached_face(tmp_path, mon
 
 
 def test_declared_avatar_logins_are_the_fixed_cast(manifest):
+    """The warmed set is the fixed cast plus the authoring-pass chat
+    speakers whose identity the season's own records prove -- castrojo is a
+    contributor-ledger candidate and authors chat cues, so his face warms
+    too. Unproven handles (ahmedbehbars, ncode, ...) warm nothing."""
     assert hive_series.declared_avatar_logins(manifest) == [
         "angiejones",
         "Swil78",
         "CortNick",
+        "castrojo",
     ]
+    # The CI warming path (tools/avatars.py) covers the same speakers.
+    from tools import avatars
+    assert "castrojo" in avatars.season_avatar_logins()
 
 
 # --- dossier text fitting (C1) and PFP fit (C2) ------------------------------
@@ -949,6 +957,9 @@ def test_source_fetch_command_uses_the_manifests_pinned_formats(manifest, tmp_pa
 
 
 def test_ensure_source_fetches_once_and_reuses_the_cache(manifest, tmp_path):
+    """The yt-dlp fetch remains as an EXPLICIT non-Hive capability only
+    (allow_fetch=True) -- the Hive build path never passes it, because the
+    merge would run a local ffmpeg."""
     calls = []
 
     def fake_runner(argv, **kwargs):
@@ -959,15 +970,60 @@ def test_ensure_source_fetches_once_and_reuses_the_cache(manifest, tmp_path):
             returncode = 0
         return _Done()
 
+    absent = tmp_path / "no-supplied-source.mp4"
     first = hive_series.ensure_source(manifest, cache_dir=tmp_path,
-                                      runner=fake_runner)
+                                      runner=fake_runner, supplied=absent,
+                                      allow_fetch=True)
     assert first == (tmp_path / "jlzQnXcUxqI.mkv").resolve()
     assert len(calls) == 1
     # A non-empty cache file is the evidence the fetch ran: never re-fetch.
     again = hive_series.ensure_source(manifest, cache_dir=tmp_path,
-                                      runner=fake_runner)
+                                      runner=fake_runner, supplied=absent)
     assert again == first
     assert len(calls) == 1
+
+
+def test_absent_source_fails_visibly_never_a_local_fetch_merge(
+        manifest, tmp_path):
+    """The strict Hive contract: with no supplied immutable source and no
+    cache, the build refuses with staging instructions -- a local
+    `yt-dlp ... --merge-output-format mkv` would invoke a LOCAL ffmpeg
+    merge, which this workspace forbids. The fetch runner is never
+    consulted."""
+    def forbidden_runner(argv, **kwargs):
+        raise AssertionError("a local fetch ran for a Hive build")
+
+    absent = tmp_path / "no-supplied-source.mp4"
+    with pytest.raises(FileNotFoundError) as excinfo:
+        hive_series.ensure_source(manifest, cache_dir=tmp_path,
+                                  runner=forbidden_runner, supplied=absent)
+    message = str(excinfo.value)
+    assert "no season source" in message
+    assert str(absent) in message, "the error names the path to stage"
+    assert "remote job" in message
+    assert "local ffmpeg merge" in message
+
+
+def test_ensure_source_prefers_the_supplied_immutable_source(
+        manifest, tmp_path):
+    """The Hive workspace supplies `source-<youtube_id>.mp4` by hand: the
+    build uses it, never mutates it, and never downloads a duplicate."""
+    supplied = tmp_path / "source-jlzQnXcUxqI.mp4"
+    supplied.write_bytes(b"supplied-immutable-source")
+
+    def forbidden_runner(argv, **kwargs):
+        raise AssertionError("a fetch ran despite the supplied source")
+
+    got = hive_series.ensure_source(manifest, cache_dir=tmp_path / "cache",
+                                    runner=forbidden_runner,
+                                    supplied=supplied)
+    assert got == supplied.resolve()
+    assert supplied.read_bytes() == b"supplied-immutable-source"
+    assert not (tmp_path / "cache").exists(), "no fetch cache was created"
+    # The default supplied path is the workspace's immutable file for the
+    # manifest's own video id.
+    assert hive_series.supplied_source_path(manifest) == Path.home() / (
+        "Videos/Hive/source-jlzQnXcUxqI.mp4")
 
 
 def test_ensure_source_checks_by_youtube_id_not_episode(manifest, tmp_path):
@@ -976,9 +1032,13 @@ def test_ensure_source_checks_by_youtube_id_not_episode(manifest, tmp_path):
         "jlzQnXcUxqI.mkv"
 
 
-# --- farm-first execution ------------------------------------------------------
+# --- farm-only execution (the Hive contract) ---------------------------------
 
-def test_encode_episode_routes_through_farm_run_encode(tmp_path, monkeypatch):
+def test_encode_episode_routes_farm_only_with_farm_side_verification(
+        tmp_path, monkeypatch):
+    """Hive's encode is farm.run_encode with the strict contract: no local
+    fallback, and the post-fetch verification reads the pod's own probe,
+    never the host's ffprobe."""
     captured = {}
 
     def fake_run_encode(argv, **kwargs):
@@ -994,22 +1054,59 @@ def test_encode_episode_routes_through_farm_run_encode(tmp_path, monkeypatch):
     assert where == "cluster"
     assert captured["out"] == out
     assert captured["expected_duration"] == 150.0
-    assert captured["local"] is False
+    assert captured["fallback"] is False, "no local fallback for Hive"
+    assert captured["local_probe"] is False, "verification is the pod's own"
 
 
-def test_encode_episode_passes_the_local_flag_through(tmp_path, monkeypatch):
-    captured = {}
+def test_encode_episode_fails_visibly_when_the_farm_is_unreachable(
+        tmp_path, monkeypatch):
+    """No local fallback exists for a Hive encode: an unreachable cluster is
+    a FarmError before any render, never a quiet local encode."""
+    monkeypatch.setattr(hive_series.farm, "cluster_available",
+                        lambda *a, **k: (False, "kubectl not on PATH"))
 
-    def fake_run_encode(argv, **kwargs):
-        captured.update(kwargs)
-        return "local"
+    def forbidden(*a, **k):  # the capped local path must never run
+        raise AssertionError("a local encode ran for a Hive build")
 
-    monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
-    where = hive_series.encode_episode(
-        ["ffmpeg"], inputs=[], out=tmp_path / "ep.mp4",
-        expected_duration=1.0, local=True)
-    assert where == "local"
-    assert captured["local"] is True
+    monkeypatch.setattr(hive_series.farm, "run_capped_local", forbidden)
+    with pytest.raises(hive_series.farm.FarmError,
+                       match="not reachable"):
+        hive_series.encode_episode(
+            ["ffmpeg", "-i", "x"], inputs=[tmp_path / "x"],
+            out=tmp_path / "ep.mp4", expected_duration=150.0)
+
+
+def test_run_encode_fallback_false_never_runs_locally(monkeypatch):
+    """The farm-level contract: fallback=False raises on an unreachable
+    cluster (and on --local), while the legacy default still falls back."""
+    farm = hive_series.farm
+    monkeypatch.setattr(farm, "cluster_available",
+                        lambda *a, **k: (False, "no nodes"))
+    monkeypatch.setattr(farm, "run_capped_local",
+                        lambda *a, **k: None)  # would be the fallback
+    with pytest.raises(farm.FarmError, match="does not permit a local"):
+        farm.run_encode(["ffmpeg"], inputs=[], out="o.mp4", fallback=False)
+    with pytest.raises(farm.FarmError, match="does not permit a local"):
+        farm.run_encode(["ffmpeg"], inputs=[], out="o.mp4", local=True,
+                        fallback=False)
+    # Legacy callers (other videos) keep the capped local fallback.
+    assert farm.run_encode(["ffmpeg"], inputs=[], out="o.mp4") == "local"
+
+
+def test_farm_side_verification_reads_the_pods_own_probe(monkeypatch):
+    """local_probe=False verifies the fetched file from out/.done.json --
+    probed by the pod -- and a missing pod probe is a visible failure, not
+    a silent pass."""
+    farm = hive_series.farm
+    facts = farm._verify_fetched_on_farm("o.mp4", 162.0,
+                                         {"duration": 162.03},
+                                         label="t")
+    assert facts["duration"] == 162.03
+    with pytest.raises(farm.FarmError, match="re-time"):
+        farm._verify_fetched_on_farm("o.mp4", 162.0, {"duration": 165.0},
+                                     label="t")
+    with pytest.raises(farm.FarmError, match="never probed"):
+        farm._verify_fetched_on_farm("o.mp4", None, None, label="t")
 
 
 # --- stable output paths ---------------------------------------------------------
@@ -1027,7 +1124,28 @@ def test_delivery_paths_come_straight_from_the_manifest(manifest):
     assert cut == Path.home() / (
         "Videos/Hive/Season-of-the-Blueberries/season-01-full.mp4")
     for path in (out, thumb, cut):
-        assert "review" not in str(path), "no review folder: these ARE delivery"
+        assert "rough" not in str(path), "the FINAL paths are promotion-only"
+
+
+def test_rough_paths_are_the_final_names_under_the_rough_lane(manifest):
+    """Rough-first (Hive AGENTS.md): builds write the reviewable artifacts.
+    The rough paths are derived from the final ones -- the exact episode
+    stem is identical across rough, final, and thumbnail."""
+    first = hive_series.chapter_by_number(manifest, 1)
+    rough = hive_series.episode_rough_path(first)
+    assert rough == Path.home() / (
+        "Videos/Hive/Season-of-the-Blueberries/rough/"
+        "s01e01-the-enclave.mp4")
+    assert rough.name == hive_series.episode_output_path(first).name
+    rough_thumb = hive_series.thumbnail_rough_path(first)
+    assert rough_thumb == Path.home() / (
+        "Videos/Hive/Season-of-the-Blueberries/rough/"
+        "s01e01-the-enclave-thumbnail.jpg")
+    assert rough_thumb.name == hive_series.thumbnail_output_path(first).name
+    rough_cut = hive_series.full_cut_rough_path(manifest)
+    assert rough_cut == Path.home() / (
+        "Videos/Hive/Season-of-the-Blueberries/season-01-full-rough.mp4")
+    assert rough_cut.parent == hive_series.full_cut_path(manifest).parent
 
 
 # --- the project-lore overlays ---------------------------------------------------
@@ -1093,7 +1211,11 @@ def test_lore_overlay_hold_defaults_and_clamps_to_the_chapter(manifest):
     late = _doctored(manifest, lambda d: d["overlays"][0].__setitem__(
         "source_at", 122.0))  # ch1 ends at 125
     plan = hive_series.episode_plan(late, 1)
-    assert plan["overlays"][0]["dur"] == 3.0
+    # Select by id: doctoring the manifest record's anchor un-covers the
+    # identical authoring-pass card (dedupe is exact), so the plan now
+    # carries both lore cards.
+    ship = next(o for o in plan["overlays"] if o["id"] == "savathuns-ship")
+    assert ship["dur"] == 3.0
 
 
 # --- the dossier safe fallback ----------------------------------------------------
@@ -1172,14 +1294,10 @@ def test_build_episode_orchestrates_cards_encode_and_thumbnail(
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
-        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
-    monkeypatch.setattr(
-        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
+        hive_series, "_source_preflight_farm",
+        lambda *a, **k: (48000, None, "full-frame"))
     monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
-    monkeypatch.setattr(
-        hive_series.render, "detect_picture_status",
-        lambda *a, **k: (None, "full-frame"))
     # Deterministic offline faces: the avatar cache is local-only, so the
     # issued dossiers resolve the same way here and in CI.
     face = Image.new("RGBA", (512, 512), (32, 64, 96, 255))
@@ -1196,8 +1314,10 @@ def test_build_episode_orchestrates_cards_encode_and_thumbnail(
     monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
 
     out = hive_series.build_episode(manifest_path, 1, work_dir=tmp_path / "work")
-    assert out == tmp_path / "s01e01-the-enclave.mp4"
-    assert out.exists(), "the encode wrote the episode"
+    assert out == tmp_path / "rough" / "s01e01-the-enclave.mp4"
+    assert out.exists(), "the encode wrote the ROUGH episode"
+    assert not (tmp_path / "s01e01-the-enclave.mp4").exists(), \
+        "a build must never create the top-level final"
 
     argv = captured["argv"]
     graph = argv[argv.index("-filter_complex") + 1]
@@ -1211,10 +1331,12 @@ def test_build_episode_orchestrates_cards_encode_and_thumbnail(
     for path in inputs:
         assert Path(path).exists(), f"staged input missing: {path}"
     assert captured["expected_duration"] == 162.0
-    assert captured["local"] is False
+    assert captured["fallback"] is False and captured["local_probe"] is False
 
-    thumb = tmp_path / "s01e01-the-enclave-thumbnail.jpg"
+    thumb = tmp_path / "rough" / "s01e01-the-enclave-thumbnail.jpg"
     assert thumb.exists()
+    assert not (tmp_path / "s01e01-the-enclave-thumbnail.jpg").exists(), \
+        "a build must never create the top-level thumbnail"
     assert thumb.stat().st_size < 2 * 1024 * 1024
     with Image.open(thumb) as img:
         assert img.format == "JPEG" and img.size == (1920, 1080)
@@ -1239,14 +1361,10 @@ def test_build_episode_records_the_dossier_fallback_in_unresolved(
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
-        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
-    monkeypatch.setattr(
-        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
+        hive_series, "_source_preflight_farm",
+        lambda *a, **k: (48000, None, "full-frame"))
     monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
-    monkeypatch.setattr(
-        hive_series.render, "detect_picture_status",
-        lambda *a, **k: (None, "full-frame"))
     monkeypatch.setattr(
         hive_series, "resolve_face", lambda login: None)
 
@@ -1278,14 +1396,10 @@ def test_build_episode_still_encodes_when_the_source_is_undecodable(
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
-        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
-    monkeypatch.setattr(
-        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
+        hive_series, "_source_preflight_farm",
+        lambda *a, **k: (None, None, "undecodable"))
     monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
-    monkeypatch.setattr(
-        hive_series.render, "detect_picture_status",
-        lambda *a, **k: (None, "undecodable"))
     monkeypatch.setattr(hive_series, "resolve_face", lambda login: None)
 
     captured = {}
@@ -1334,14 +1448,10 @@ def test_build_episode_still_encodes_when_one_plate_png_is_missing(
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
-        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
-    monkeypatch.setattr(
-        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
+        hive_series, "_source_preflight_farm",
+        lambda *a, **k: (48000, None, "full-frame"))
     monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     monkeypatch.setattr(hive_series, "ensure_source", lambda *a, **k: fake_source)
-    monkeypatch.setattr(
-        hive_series.render, "detect_picture_status",
-        lambda *a, **k: (None, "full-frame"))
     monkeypatch.setattr(hive_series, "resolve_face", lambda login: None)
 
     def fake_render_all(plates, out_dir, picture=None):
@@ -1404,14 +1514,10 @@ def _stage_episode(manifest, tmp_path, monkeypatch, data=None):
     fake_source = tmp_path / "src.mkv"
     fake_source.write_bytes(b"mkv")
     monkeypatch.setattr(
-        hive_series.render, "find_ffmpeg", lambda: ["ffmpeg"])
-    monkeypatch.setattr(
-        hive_series, "_source_audio_rate", lambda *a, **k: 48000)
+        hive_series, "_source_preflight_farm",
+        lambda *a, **k: (48000, None, "full-frame"))
     monkeypatch.setattr(
         hive_series, "ensure_source", lambda *a, **k: fake_source)
-    monkeypatch.setattr(
-        hive_series.render, "detect_picture_status",
-        lambda *a, **k: (None, "full-frame"))
     monkeypatch.setattr(hive_series, "resolve_face", lambda login: None)
     monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     return manifest_path, data
@@ -1592,8 +1698,9 @@ def test_build_episode_rebuilds_when_the_digest_sidecar_is_missing(
     is re-encoded, not adopted -- the sidecar's absence can never be read
     as freshness. The rebuild writes the digest, and THEN the skip works."""
     manifest_path, _data = _stage_episode(manifest, tmp_path, monkeypatch)
-    out = tmp_path / "s01e01-the-enclave.mp4"
-    out.write_bytes(b"mp4")  # a prior delivery; verification is faked clean
+    out = tmp_path / "rough" / "s01e01-the-enclave.mp4"
+    out.parent.mkdir(parents=True)
+    out.write_bytes(b"mp4")  # a prior rough build; verification is faked clean
     calls = []
     monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
     work = tmp_path / "work"
@@ -1729,18 +1836,14 @@ def _conformant_video(**overrides):
 
 
 def _probe_with(tmp_path, monkeypatch, video, duration=150.0):
-    monkeypatch.setattr(hive_series, "_probe_duration",
-                        lambda *a, **k: duration)
-    monkeypatch.setattr(hive_series.conform, "probe_video",
-                        lambda *a, **k: video)
-    monkeypatch.setattr(
-        hive_series, "_probe_audio",
-        lambda *a, **k: {"codec_name": "aac", "sample_rate": "48000",
-                         "channels": 2, "channel_layout": "stereo"})
-    target = tmp_path / "ep.mp4"
-    target.write_bytes(b"mp4")
-    return hive_series._probe_delivery_streams(
-        target, 150.0, ["ffmpeg"], 0.5)
+    """Judge already-probed facts through the pure delivery check -- the
+    probing itself is the farm's job (`_probe_delivery_streams_farm`), so
+    these tests need no ffprobe seam at all."""
+    return hive_series._delivery_stream_problems(
+        "ep.mp4", duration, video,
+        {"codec_name": "aac", "sample_rate": "48000",
+         "channels": 2, "channel_layout": "stereo"},
+        150.0, 0.5)
 
 
 def test_delivery_probe_keeps_conforms_pix_fmt_color_profile_level_checks(
@@ -1806,38 +1909,49 @@ def test_conform_for_join_reads_container_rounded_fps_as_delivery(
     """32640000/544621 is the container-rounded 60000/1001: the join probe
     must hand conform.ensure props with no mismatch, or every delivered
     episode would pay a conform encode on every cut."""
+    video = _conformant_video(avg_frame_rate="32640000/544621",
+                              r_frame_rate="32640000/544621")
     monkeypatch.setattr(
-        hive_series.conform, "probe_video",
-        lambda *a, **k: _conformant_video(
-            avg_frame_rate="32640000/544621",
-            r_frame_rate="32640000/544621"))
-    monkeypatch.setattr(hive_series.conform, "ffprobe_for",
-                        lambda *a, **k: ["ffprobe"])
+        hive_series, "_probe_streams_farm",
+        lambda *a, **k: {"format": {"duration": "150.0"},
+                         "streams": [dict(video, codec_type="video"),
+                                     {"codec_type": "audio",
+                                      "codec_name": "aac",
+                                      "sample_rate": "48000"}]})
     seen = {}
 
     def fake_ensure(path, _probe=None, **kwargs):
         seen["mismatches"] = hive_series.conform.mismatches(_probe(path))
+        seen["kwargs"] = kwargs
         return path, "conforms" if not seen["mismatches"] else "conformed"
 
     monkeypatch.setattr(hive_series.conform, "ensure", fake_ensure)
     target = tmp_path / "ep.mp4"
     target.write_bytes(b"mp4")
-    joined, status = hive_series._conform_for_join(
-        target, ["ffmpeg"], True, lambda *a: None)
+    joined, status = hive_series._conform_for_join(target, lambda *a: None)
     assert seen["mismatches"] == [], \
         "container rounding must not trigger a conform encode"
     assert (joined, status) == (target, "conforms")
+    # The conform probe came from the farm seam, and a repair encode would
+    # be farm-only -- never a local fallback.
+    assert seen["kwargs"]["use_farm"] is True
+    assert seen["kwargs"]["allow_local"] is False
+    assert seen["kwargs"]["local_probe"] is False
 
 
 # --- the cut's one interface ---------------------------------------------------
 
 
 def _fake_episode_files(data, skip=()):
-    """A delivered 'mp4' for every chapter not in ``skip``."""
+    """A built ROUGH 'mp4' for every chapter not in ``skip`` -- the cut
+    joins roughs, so the fakes live under rough/."""
     for chapter in data["chapters"]:
         if chapter["number"] in skip:
             continue
-        Path(chapter["output"]).write_bytes(b"mp4")
+        final = Path(chapter["output"])
+        rough = final.parent / "rough" / final.name
+        rough.parent.mkdir(parents=True, exist_ok=True)
+        rough.write_bytes(b"mp4")
 
 
 def _stage_cut(manifest, tmp_path, monkeypatch, skip=()):
@@ -1851,10 +1965,10 @@ def _stage_cut(manifest, tmp_path, monkeypatch, skip=()):
     monkeypatch.setattr(hive_series, "verify_episode", lambda *a, **k: [])
     monkeypatch.setattr(hive_series.conform, "ensure",
                         lambda path, **k: (path, "conforms"))
-    monkeypatch.setattr(hive_series, "_probe_delivery_streams",
+    monkeypatch.setattr(hive_series, "_probe_delivery_streams_farm",
                         lambda *a, **k: [])
     monkeypatch.setattr(
-        hive_series, "_probe_audio",
+        hive_series, "_probe_audio_farm",
         lambda *a, **k: {"codec_name": "aac", "sample_rate": "48000",
                          "channels": 2, "channel_layout": "stereo"})
     return manifest_path, data
@@ -1882,12 +1996,12 @@ def test_build_cut_ships_the_cut_when_one_episode_is_bad(
     monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
     probed = {}
 
-    def fake_probe(path, expected, ffmpeg, tolerance):
+    def fake_probe(path, expected, tolerance):
         probed[Path(path).name] = expected
         return []
 
-    monkeypatch.setattr(hive_series, "_probe_delivery_streams", fake_probe)
-    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"])
+    monkeypatch.setattr(hive_series, "_probe_delivery_streams_farm", fake_probe)
+    out, problems = hive_series.build_cut(manifest_path)
     assert out.exists(), "one bad episode must not prevent the cut"
     assert len(joined) == 11
     assert "s01e04-the-relic.mp4" not in joined
@@ -1917,7 +2031,7 @@ def test_build_cut_omits_an_episode_whose_audio_cannot_join(
         return {"codec_name": "aac", "sample_rate": "48000",
                 "channels": 2, "channel_layout": "stereo"}
 
-    monkeypatch.setattr(hive_series, "_probe_audio", fake_audio)
+    monkeypatch.setattr(hive_series, "_probe_audio_farm", fake_audio)
     joined = []
 
     def fake_concat(manifest, out_path=None, paths=None, **kwargs):
@@ -1927,7 +2041,7 @@ def test_build_cut_omits_an_episode_whose_audio_cannot_join(
         return out_path
 
     monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
-    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"])
+    out, problems = hive_series.build_cut(manifest_path)
     assert out.exists(), "bad audio on one episode must not prevent the cut"
     assert len(joined) == 11
     assert "s01e04-the-relic.mp4" not in joined
@@ -1963,8 +2077,7 @@ def test_build_cut_substitutes_a_conformed_copy_before_the_blind_join(
 
     monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
     lines = []
-    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"],
-                                          log=lines.append)
+    out, problems = hive_series.build_cut(manifest_path, log=lines.append)
     assert problems == []
     assert len(joined) == 12 and substitute in joined
     assert any("conformed copy" in line and "s01e04" in line
@@ -1992,7 +2105,7 @@ def test_build_cut_reports_an_undecodable_episode_and_joins_the_rest(
         return out_path
 
     monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
-    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"])
+    out, problems = hive_series.build_cut(manifest_path)
     assert out.exists()
     assert len(joined) == 11 and "s01e07-council.mp4" not in joined
     assert any("s01e07" in problem and "joins without it" in problem
@@ -2002,7 +2115,7 @@ def test_build_cut_reports_an_undecodable_episode_and_joins_the_rest(
 def test_build_cut_joins_verified_episodes_and_reports_the_cut(
         manifest, tmp_path, monkeypatch):
     manifest_path, data = _stage_cut(manifest, tmp_path, monkeypatch)
-    cut = tmp_path / "season-01-full.mp4"
+    cut = tmp_path / "season-01-full-rough.mp4"
 
     def fake_concat(manifest, out_path=None, **kwargs):
         cut.write_bytes(b"mp4")
@@ -2011,16 +2124,19 @@ def test_build_cut_joins_verified_episodes_and_reports_the_cut(
     monkeypatch.setattr(hive_series, "concat_episodes", fake_concat)
     probed = []
 
-    def fake_probe(path, expected, ffmpeg, tolerance):
+    def fake_probe(path, expected, tolerance):
         probed.append(Path(path).name)
         return []
 
-    monkeypatch.setattr(hive_series, "_probe_delivery_streams", fake_probe)
-    out, problems = hive_series.build_cut(manifest_path, ffmpeg=["ffmpeg"])
+    monkeypatch.setattr(hive_series, "_probe_delivery_streams_farm", fake_probe)
+    out, problems = hive_series.build_cut(manifest_path)
     assert out == cut
     assert problems == []
-    assert probed == ["season-01-full.mp4"], \
-        "episodes were verified pre-concat; the post-join probe is the cut's"
+    assert probed == ["season-01-full-rough.mp4"], \
+        "episodes were verified pre-concat; the post-join probe is the " \
+        "ROUGH cut's"
+    assert not (tmp_path / "season-01-full.mp4").exists(), \
+        "the review assembly must never write the final cut"
 
 
 def test_cut_command_goes_through_build_cut(tmp_path, monkeypatch):
@@ -2633,3 +2749,883 @@ def test_avatars_tool_includes_the_season_logins():
     from tools import avatars
     logins = avatars.season_avatar_logins()
     assert {"angiejones", "Swil78", "CortNick"} <= set(logins)
+
+# --- the Expansion Pack authoring pass --------------------------------------
+#
+# The owner-authored cue files under
+# stories/standalone/authoring/season-of-the-blueberries/ (commit 32bd741)
+# were previously parsed by nothing: the roughs omitted every chat card they
+# author, most visibly Cortney's. These tests pin the parser grammar, the
+# supported-placement mapping, and the non-overlapping chat schedule, all
+# offline -- no ffmpeg, no media.
+
+from tools import hive_authoring
+
+AUTHORING = REPO_ROOT / "stories" / "standalone" / "authoring" / \
+    "season-of-the-blueberries"
+
+# The lore lanes the renderer knows how to seat (hive_series.LORE_POSITIONS).
+LORE_LANES = ("bottom-right", "top-third")
+
+
+def test_without_the_authoring_pass_the_cortney_chats_are_absent(
+        manifest, tmp_path, monkeypatch):
+    """The original defect: with the authoring docs not wired in, the
+    episode 2 plan carries no chat cards at all -- the Cortney cues the
+    owner wrote simply vanish from the rough, and nothing records them."""
+    monkeypatch.setattr(hive_series, "AUTHORING_DIR", tmp_path)  # empty
+    plan = hive_series.episode_plan(manifest, 2)
+    assert plan["chats"] == []
+    assert plan["overlays"] == []
+    assert plan["unresolved"] == []
+
+
+def test_authoring_parser_reads_the_committed_grammar():
+    entries = hive_authoring.parse_authoring(
+        (AUTHORING / "02-on-mars.md").read_text(encoding="utf-8"),
+        "02-on-mars.md")
+    assert [e["slug"] for e in entries] == [
+        "scale-without-cncf", "seventh-loop", "cortney-losing-money",
+        "save-the-day", "open-source-sigh", "flex-our-skills",
+    ], "document order is preserved"
+    cue = entries[2]
+    assert cue["source_at"] == 152.0  # 02:32.00 absolute source seconds
+    assert cue["placement"] == "chat-cortney"  # backticks stripped
+    assert cue["copy"] == "Why do we keep losing SO much money"
+    assert cue["next_line"] == "My face hurts"
+    assert cue["direction"].startswith("Owner-authored two-line Cortney cue.")
+    lone = entries[4]
+    assert lone["next_line"] is None
+    assert lone["source_at"] == 208.0  # 03:28.00
+
+
+def test_authoring_parser_preserves_copy_verbatim():
+    """Backticks, underscore emphasis, apostrophes and ellipses all survive
+    -- the parser never normalises owner copy."""
+    worm = hive_authoring.parse_authoring(
+        (AUTHORING / "08-worm.md").read_text(encoding="utf-8"), "08")
+    clone = next(e for e in worm if e["slug"] == "worm-cortney-reference-architectures")
+    assert clone["copy"] == "I just read Reference Architectures."
+    defeated = hive_authoring.parse_authoring(
+        (AUTHORING / "09-defeated.md").read_text(encoding="utf-8"), "09")
+    ra = next(e for e in defeated if e["slug"] == "defeated-capture-ra")
+    assert ra["copy"] == "Capture _this_ moment as an RA"
+    mara = hive_authoring.parse_authoring(
+        (AUTHORING / "11-with-mara.md").read_text(encoding="utf-8"), "11")
+    green = next(e for e in mara if e["slug"] == "mara-save-green")
+    assert green["copy"] == "Ok wow ... go save me the green then."
+
+
+def test_authoring_parser_never_makes_cards_from_prose():
+    text = """# Title
+
+Owner-authored copy. Times are absolute source time. A paragraph of prose
+with a colon: and a `mention` is not a cue.
+
+## 01:05.00 — `a-real-cue`
+
+- Placement: `top-third`
+- Copy: The only card here
+- Direction: A note with a - dash and a fake `- Placement:` mention.
+
+- Stray bullet outside any grammar field is owner commentary, not a field.
+"""
+    entries = hive_authoring.parse_authoring(text, "prose.md")
+    assert len(entries) == 1
+    assert entries[0]["copy"] == "The only card here"
+    assert entries[0]["source_at"] == 65.0
+
+
+def test_authoring_parser_fails_intelligibly_on_malformed_entries():
+    """A recognized cue that breaks the grammar is a loud error naming the
+    file and line -- never a silently skipped card."""
+    with pytest.raises(hive_authoring.AuthoringError, match=r"bad\.md:1"):
+        # timecode-led heading that misses the backticked slug
+        hive_authoring.parse_authoring("## 01:28 model plate\n", "bad.md")
+    with pytest.raises(hive_authoring.AuthoringError,
+                       match=r"bad\.md:1.*no `- Copy:`"):
+        hive_authoring.parse_authoring(
+            "## 01:05.00 — `x`\n\n- Placement: `top-third`\n", "bad.md")
+    with pytest.raises(hive_authoring.AuthoringError,
+                       match=r"bad\.md:1.*no `- Placement:`"):
+        hive_authoring.parse_authoring(
+            "## 01:05.00 — `x`\n\n- Copy: words\n", "bad.md")
+    with pytest.raises(hive_authoring.AuthoringError, match="timecode"):
+        hive_authoring.parse_authoring(
+            "## 01:75.00 — `x`\n\n- Placement: `top-third`\n- Copy: w\n",
+            "bad.md")
+
+
+def test_episode2_plan_carries_the_exact_cortney_chat_sequence(manifest):
+    """The defect's fix: episode 2 seats every Cortney cue, verbatim, in the
+    owner's order, first pill pinned at the authored anchor and the
+    Next line sequenced after it (anchor + MIN_HOLD + TAIL_OUT)."""
+    plan = hive_series.episode_plan(manifest, 2)
+    cortney = [(c["id"], c["text"], c["at"]) for c in plan["chats"]]
+    assert cortney == [
+        ("cortney-losing-money",
+         "Why do we keep losing SO much money", 27.0),
+        ("cortney-losing-money-next",
+         "My face hurts", 27.0 + hive_series.plate.MIN_HOLD
+         + hive_series.plate.TAIL_OUT),
+        ("open-source-sigh",
+         "sigh, it's Open Source of course they have it.", 83.0),
+        ("flex-our-skills",
+         "Let's go flex our skills", 87.0),
+    ]
+    for spec in plan["chats"]:
+        assert spec["kind"] == "chat"
+        assert spec["speaker"] == "Cortney"
+        assert spec["avatar"] == "renders/avatars/CortNick.png"
+        assert spec["source_at"] == spec["at"] + 125.0 or \
+            spec["id"] == "cortney-losing-money-next", \
+            "the authored absolute anchor is recorded, never mutated"
+        assert spec["dur"] >= hive_series.plate.MIN_HOLD
+
+
+def test_episode2_lore_cards_are_verbatim_and_unsupported_is_recorded(
+        manifest):
+    plan = hive_series.episode_plan(manifest, 2)
+    lore = {o["id"]: o for o in plan["overlays"]}
+    assert lore["scale-without-cncf"]["lines"] == \
+        ["Trying to scale without the CNCF"]
+    assert lore["scale-without-cncf"]["position"] == "top-third"
+    assert lore["scale-without-cncf"]["at"] == 9.0  # 134.0 - 125.0
+    assert lore["seventh-loop"]["lines"] == \
+        ["When You Realize Your Org is on it's 7th Loop"]
+    # `top-right` is not a supported lane: recorded, never drawn.
+    assert [u["id"] for u in plan["unresolved"]] == ["save-the-day"]
+    assert "top-right" in plan["unresolved"][0]["reason"]
+
+
+def test_episode9_chat_records_and_the_schedule_never_overlaps(manifest):
+    plan = hive_series.episode_plan(manifest, 9)
+    chats = {c["id"]: c for c in plan["chats"]}
+    cortney = {cid: c["text"] for cid, c in chats.items()
+               if c["speaker"] == "Cortney"}
+    assert cortney == {
+        "defeated-cha-ching": "Cha-ching!",
+        # defeated-skip-part cannot clear the 13:37 protected gap and is
+        # recorded unresolved instead -- see the protected-gap tests.
+        "defeated-math-easy": "Math is easy!",
+        "defeated-money-goods":
+            "Money can be exchanged for goods and services.",
+        "defeated-77-phippy":
+            "Or ignore it, I have 77 Golden Phippy Awards",
+        "defeated-barcelona": "Is that Barcelona?",
+        "defeated-going-beach": "I am going to the beach",
+    }
+    # The first pill at each distinct anchor sits exactly at the authored
+    # mark (chapter-relative): 12:46, 13:12, 13:26, 14:54, 15:07, 16:00.
+    assert chats["defeated-components-fail"]["at"] == 766.0 - 744.0
+    assert chats["defeated-angie-agent"]["at"] == 792.0 - 744.0
+    assert chats["defeated-ahmed-sun"]["at"] == 806.0 - 744.0
+    assert chats["defeated-math-easy"]["at"] == 894.0 - 744.0
+    assert chats["defeated-money-goods"]["at"] == 907.0 - 744.0
+    assert chats["defeated-77-phippy"]["at"] == 960.0 - 744.0
+    # A same-anchor conversation cascades with the project's minimum
+    # readable hold and tail gap: capture-ra pinned at 13:20, cha-ching
+    # right after it.
+    assert chats["defeated-capture-ra"]["at"] == 800.0 - 744.0
+    assert chats["defeated-cha-ching"]["at"] == pytest.approx(
+        800.0 - 744.0 + hive_series.plate.MIN_HOLD
+        + hive_series.plate.TAIL_OUT)
+    # No two chat windows overlap, every hold is readable, every window
+    # stays inside the chapter.
+    window = 1005.0 - 744.0
+    ordered = sorted(chats.values(), key=lambda c: (c["at"], c["id"]))
+    for prev, nxt in zip(ordered, ordered[1:]):
+        assert nxt["at"] >= prev["at"] + prev["dur"] - 1e-6, \
+            (prev["id"], nxt["id"])
+    for spec in ordered:
+        assert spec["dur"] >= hive_series.plate.MIN_HOLD
+        assert 0 <= spec["at"] and spec["at"] + spec["dur"] <= window + 1e-6
+
+
+def test_same_anchor_lines_follow_the_owner_sequence_markers(manifest):
+    """Direction markers -- never slug or document accident -- order a
+    multi-line beat: absolute pins (`sequence line N`), speaker-scoped
+    numbers, `follows the X cue`, `sequence after X`, and the Final line.
+    """
+    # The 05:17 relic beat is authored out of order in the file; the
+    # explicit line numbers 1-5 define the sequence.
+    plan4 = hive_series.episode_plan(manifest, 4)
+    beat = [c["id"] for c in plan4["chats"] if c["source_at"] == 317.0]
+    assert beat == [
+        "relic-savings-everywhere",   # sequence line 1
+        "relic-know-how-look",        # sequence line 2
+        "relic-relearn",              # sequence line 3
+        "relic-more-expensive",       # sequence line 4
+        "relic-each-time",            # Sequence line 5
+    ]
+
+    plan9 = hive_series.episode_plan(manifest, 9)
+    at_894 = [c["id"] for c in plan9["chats"] if c["source_at"] == 894.0]
+    # "sequence after Cortney": library-burn follows math-easy although the
+    # file lists it first.
+    assert at_894 == ["defeated-math-easy", "defeated-library-burn"]
+    finale = [c["id"] for c in plan9["chats"] if c["source_at"] == 966.0]
+    # "finale sequence line 1" pins the first slot; "Cortney finale line 2"
+    # orders barcelona within Cortney's lines; the unmarked angellk cue
+    # precedes the quote that "follows the angellk cue"; the "Final
+    # owner-authored line" closes.
+    assert finale[0] == "defeated-going-beach"
+    assert finale.index("defeated-going-beach") < \
+        finale.index("defeated-barcelona")
+    assert finale.index("defeated-angellk-jorge") < \
+        finale.index("defeated-angellk-hate-job")
+    assert finale[-1] == "defeated-rochaporto-lazy"
+
+    plan8 = hive_series.episode_plan(manifest, 8)
+    # "Taylor sequence line 1/2": longterm precedes email-meantime although
+    # the file lists them the other way around.
+    at_728 = [c["id"] for c in plan8["chats"] if c["source_at"] == 728.0]
+    assert at_728 == ["worm-taylor-longterm", "worm-taylor-email-meantime"]
+    # "sequence after Cortney" swaps the file order at 11:46 as well.
+    at_706 = [c["id"] for c in plan8["chats"] if c["source_at"] == 706.0]
+    assert at_706 == ["worm-expensive-crowd", "worm-clap-worth-it"]
+
+
+def test_unmarked_lines_keep_document_order(manifest):
+    """The 13:26 block carries no sequence markers, so it renders exactly
+    as written -- except the last line, which the 13:37 protected gap
+    excludes (see the protected-gap tests)."""
+    plan = hive_series.episode_plan(manifest, 9)
+    at_806 = [c["id"] for c in plan["chats"] if c["source_at"] == 806.0]
+    assert at_806 == [
+        "defeated-ahmed-sun", "defeated-angie-expensive",
+        "defeated-cvs-beach", "defeated-ncode-madrid",
+    ]
+
+
+def test_unsupported_cues_form_no_phantom_boundary(manifest):
+    """The 13:33 cue (`top-third-as-cortney-chat`) is unsupported and never
+    renders, so it constrains nothing: cvs-beach and ncode-madrid seat
+    PAST its anchor (811.2s and 813.7s > 813s), proving no phantom
+    boundary. Only the genuinely protective 13:37 `protected-gap` binds
+    (see the next test)."""
+    plan = hive_series.episode_plan(manifest, 9)
+    chats = {c["id"]: c for c in plan["chats"]}
+    assert "defeated-give-back-reveal" not in chats
+    for slug in ("defeated-cvs-beach", "defeated-ncode-madrid"):
+        assert slug in chats, f"{slug} dropped by a phantom boundary"
+    assert chats["defeated-cvs-beach"]["source_at"] == 806.0
+    assert chats["defeated-ncode-madrid"]["at"] > 813.0 - 744.0, \
+        "seats past the unsupported 13:33 anchor: it constrained nothing"
+    # The owner-speaker directive held: the explicit label, no identity.
+    assert chats["defeated-cvs-beach"]["speaker"] == "CVS Health"
+    assert "avatar" not in chats["defeated-cvs-beach"]
+
+
+def test_protected_gap_is_a_no_draw_barrier(manifest):
+    """The 13:37 `protected-gap` is never drawn AND is a scheduling
+    barrier: the protected window runs to the next authored cue (the 14:04
+    reveal), no rendered chat or lore card covers any part of it, and the
+    one line that could not clear it (defeated-skip-part) is recorded
+    unresolved rather than drawn over the protected beat."""
+    plan = hive_series.episode_plan(manifest, 9)
+    gaps = plan["protected_gaps"]
+    assert gaps == [(73.0, 100.0)]  # source 817.0 to 844.0, ch9-relative
+    by_id = {u["id"]: u["reason"] for u in plan["unresolved"]}
+    assert "protected-gap" in by_id["defeated-protected-reveal-gap"], \
+        "the gap itself is a no-draw record"
+    assert "protected gap" in by_id["defeated-skip-part"], \
+        "skip-part could not clear 817.0: recorded, never drawn"
+    assert "defeated-skip-part" not in {c["id"] for c in plan["chats"]}
+    g0, g1 = gaps[0]
+    for card in plan["chats"]:
+        end = card["at"] + card["dur"]
+        assert end <= g0 + 1e-6 or card["at"] >= g1 - 1e-6, \
+            f"{card['id']} covers the protected gap"
+    for overlay in plan["overlays"]:
+        end = overlay["at"] + overlay["dur"]
+        assert end <= g0 + 1e-6 or overlay["at"] >= g1 - 1e-6, \
+            f"{overlay['id']} covers the protected gap"
+    # The lines that do render before it clear the gap completely.
+    ncode = next(c for c in plan["chats"] if c["id"] == "defeated-ncode-madrid")
+    assert ncode["at"] + ncode["dur"] <= g0
+
+
+def test_a_lore_card_covering_the_gap_is_recorded_not_drawn(
+        manifest, tmp_path, monkeypatch):
+    """The barrier binds lore lanes too: a top-third whose window
+    intersects the protected window is unresolved; a later card seated
+    after the gap renders."""
+    authoring = tmp_path / "authoring"
+    authoring.mkdir()
+    (authoring / "02-on-mars.md").write_text(
+        "# On Mars\n\n"
+        "## 02:14.00 — `card-before`\n\n"
+        "- Placement: `top-third`\n"
+        "- Copy: Before the gap\n\n"
+        "## 02:15.00 — `gap`\n\n"
+        "- Placement: `protected-gap`\n"
+        "- Copy: Leave the picture alone\n\n"
+        "## 02:40.00 — `card-after`\n\n"
+        "- Placement: `top-third`\n"
+        "- Copy: After the gap\n",
+        encoding="utf-8")
+    monkeypatch.setattr(hive_series, "AUTHORING_DIR", authoring)
+    plan = hive_series.episode_plan(manifest, 2)
+    # The gap runs 02:15 -> 02:40 (the next authored cue), i.e. ch2-relative
+    # 10.0-35.0; card-before's 6s window (9.0-15.0) covers its start.
+    assert plan["protected_gaps"] == [(10.0, 35.0)]
+    lore_ids = [o["id"] for o in plan["overlays"]]
+    assert "card-after" in lore_ids
+    assert "card-before" not in lore_ids
+    by_id = {u["id"]: u["reason"] for u in plan["unresolved"]}
+    assert "protected gap" in by_id["card-before"]
+
+
+def test_a_chat_that_cannot_fit_is_unresolved_never_overlapped(manifest):
+    """A real packing failure: the 12:16 pair must clear the next RENDERED
+    chat anchor (12:18, worm-marketing-help) -- 2.2s + 0.25s tail does not
+    fit in 2.0s, so both lines are recorded, never squeezed or dropped.
+    And the last line of a chapter must clear the chapter end itself."""
+    plan8 = hive_series.episode_plan(manifest, 8)
+    by_id = {u["id"]: u["reason"] for u in plan8["unresolved"]}
+    assert "does not fit before the next owner anchor" in \
+        by_id["worm-save-so-much"]
+    assert "does not fit before the next owner anchor" in \
+        by_id["worm-bobonomics"]
+    plan3 = hive_series.episode_plan(manifest, 3)
+    by_id3 = {u["id"]: u["reason"] for u in plan3["unresolved"]}
+    assert "does not fit before the chapter end" in \
+        by_id3["cortney-git-clone-next"]
+
+
+def test_fixed_cast_chat_speakers_use_the_verified_plate_name(manifest):
+    """Known fixed-cast speakers carry the manifest's verified plate.name,
+    never the raw login; speakers with no fixed-cast match keep the owner's
+    supplied label."""
+    plan9 = hive_series.episode_plan(manifest, 9)
+    speakers = {c["id"]: c["speaker"] for c in plan9["chats"]}
+    assert speakers["defeated-angie-agent"] == "Angie Jones"
+    assert speakers["defeated-cha-ching"] == "Cortney"
+    # Ledger-proven but not fixed cast: the raw owner token stands.
+    assert speakers["defeated-components-fail"] == "castrojo"
+    assert speakers["defeated-ahmed-sun"] == "ahmedbehbars"
+    plan8 = hive_series.episode_plan(manifest, 8)
+    swil = {c["id"]: c["speaker"] for c in plan8["chats"]}
+    assert swil["worm-marketing-help"] == "Shellea Williams"
+
+
+def test_lore_lanes_never_overlap_and_clamp_deterministically(manifest):
+    """A lore card's hold ends when the next card in the SAME lane begins;
+    chapter 3's dense top-thirds clamp instead of stacking."""
+    plan3 = hive_series.episode_plan(manifest, 3)
+    top_thirds = [o for o in plan3["overlays"] if o["position"] == "top-third"]
+    review = next(o for o in top_thirds if o["id"] == "business-value-review")
+    assert review["at"] == 25.0 and review["dur"] == 3.0  # next at 28.0
+    for chapter in manifest["chapters"]:
+        plan = hive_series.episode_plan(manifest, chapter["number"])
+        for lane in LORE_LANES:
+            cards = sorted((o for o in plan["overlays"]
+                            if o["position"] == lane),
+                           key=lambda o: o["at"])
+            for prev, nxt in zip(cards, cards[1:]):
+                assert prev["at"] + prev["dur"] <= nxt["at"] + 1e-6, \
+                    (chapter["number"], prev["id"], nxt["id"])
+                assert prev["dur"] >= hive_series.plate.MIN_HOLD
+
+
+def test_unsupported_placements_are_recorded_with_precise_reasons(manifest):
+    plan = hive_series.episode_plan(manifest, 9)
+    by_id = {u["id"]: u["reason"] for u in plan["unresolved"]}
+    assert "episode-start" in by_id["defeated-episode-start"]
+    assert "red-boss-overlay" in by_id["defeated-tech-debt-boss"]
+    assert "protected-gap" in by_id["defeated-protected-reveal-gap"]
+    assert "chat-sequence-start" in by_id["defeated-finale-chat-start"]
+    assert "full-screen transmission" in by_id["defeated-finale-chat-start"]
+    assert "top-third-as-cortney-chat" in by_id["defeated-give-back-reveal"]
+    assert "character-nameplate-immaru" in by_id["defeated-immaru-ship"]
+    # Nothing unsupported was rendered: no chat spec carries those ids.
+    rendered_ids = {c["id"] for c in plan["chats"]} | \
+        {o["id"] for o in plan["overlays"]}
+    assert not (set(by_id) & rendered_ids)
+
+
+def test_role_bond_chats_are_unresolved_not_rendered(manifest):
+    plan = hive_series.episode_plan(manifest, 8)
+    by_id = {u["id"]: u["reason"] for u in plan["unresolved"]}
+    assert "role bond" in by_id["worm-count-high"]
+    assert "chat-left-castrojo-as-saint14" in by_id["worm-count-high"]
+    assert all(c["speaker"] != "left-castrojo-as-saint14"
+               for c in plan["chats"])
+
+
+def test_owner_speaker_label_comes_only_from_the_explicit_directive():
+    chapter = {"number": 99, "slug": "x", "start": 0.0, "end": 60.0}
+    entries = [{
+        "slug": "c", "source_at": 10.0, "placement": "chat-owner-speaker",
+        "copy": "Hey, we're on the beach!", "next_line": None,
+        "direction": "Owner-authored speaker label is exactly `CVS Health`; "
+                     "do not infer a GitHub identity.", "line": 1,
+    }]
+    chats, _lore, unresolved, _gaps = hive_authoring.plan_authoring(
+        entries, {"fixed_cast": [], "contributor_ledger": {}}, chapter)
+    assert unresolved == []
+    assert chats[0]["speaker"] == "CVS Health"
+    assert "avatar" not in chats[0], "no GitHub identity, no avatar"
+    entries[0]["direction"] = "No label directive here."
+    _c, _l, unresolved, _g = hive_authoring.plan_authoring(
+        entries, {"fixed_cast": [], "contributor_ledger": {}}, chapter)
+    assert unresolved and "speaker is never invented" in \
+        unresolved[0]["reason"]
+
+
+def test_avatar_is_attached_only_where_identity_data_proves_it(manifest):
+    plan = hive_series.episode_plan(manifest, 9)
+    by_id = {c["id"]: c for c in plan["chats"]}
+    assert by_id["defeated-components-fail"]["avatar"] == \
+        "renders/avatars/castrojo.png"  # contributor-ledger candidate
+    assert by_id["defeated-angie-agent"]["avatar"] == \
+        "renders/avatars/angiejones.png"  # fixed cast
+    assert "avatar" not in by_id["defeated-ahmed-sun"]
+    assert "avatar" not in by_id["defeated-rochaporto-lazy"]
+
+
+def test_authoring_lore_cards_dedupe_against_the_manifest(manifest):
+    """The two cues the manifest already carries verbatim (same position,
+    same absolute mark, same lines) are rendered once by the manifest's
+    overlay record, not double-drawn by the authoring pass."""
+    plan1 = hive_series.episode_plan(manifest, 1)
+    assert [o["id"] for o in plan1["overlays"]] == ["savathuns-ship"]
+    plan3 = hive_series.episode_plan(manifest, 3)
+    reviews = [o for o in plan3["overlays"] if o["id"] == "business-value-review"]
+    assert len(reviews) == 1
+    assert reviews[0]["at"] == 243.0 - 218.0
+
+
+def test_overlay_descriptors_order_plates_then_chats_then_lore(manifest):
+    plan = hive_series.episode_plan(manifest, 2)
+    kinds = [d["overlay_kind"]
+             for d in hive_series._plan_overlay_descriptors(plan)]
+    assert kinds == ["plate"] + ["chat"] * 4 + ["lore"] * 2
+    graph = hive_series.episode_filtergraph(plan)
+    # Three stills (cta, title, closing), so overlay inputs start at 4:
+    # the fixed player plate, then the four chat pills, then the lore.
+    assert "enable='between(t,24,28)'" in graph      # player-ch2 plate
+    assert "enable='between(t,27,29.2)'" in graph    # cortney-losing-money
+    assert "enable='between(t,29.45,31.65)'" in graph  # its Next line
+    assert "enable='between(t,83,85.706)'" in graph  # open-source-sigh
+    assert "enable='between(t,9,15)'" in graph       # scale-without-cncf
+
+
+def test_chat_specs_render_through_plate_py_unmodified(manifest):
+    """The authoring chat pills are plate.py's `kind: chat` renderer's own
+    input shape; the crest stands in offline because avatar bytes are never
+    committed."""
+    from tools import plate
+
+    plan = hive_series.episode_plan(manifest, 2)
+    for spec in plan["chats"]:
+        img = plate.render_plate({k: v for k, v in spec.items()
+                                  if k != "avatar"})
+        assert img.mode == "RGBA" and img.width > 100
+
+
+def test_authoring_copy_change_moves_the_episode_input_digest(
+        manifest, tmp_path, monkeypatch):
+    """Freshness covers the authoring pass: an edited Copy line is a new
+    episode even though every duration stays the same."""
+    staged = [_png(tmp_path / "a.png", (1, 2, 3, 255))]
+    plan = hive_series.episode_plan(manifest, 2)
+    base = hive_series.episode_input_digest(plan, staged)
+
+    doctored_dir = tmp_path / "authoring"
+    doctored_dir.mkdir()
+    text = (AUTHORING / "02-on-mars.md").read_text(encoding="utf-8")
+    (doctored_dir / "02-on-mars.md").write_text(text.replace(
+        "Why do we keep losing SO much money",
+        "Why do we keep losing SO much money?"))
+    monkeypatch.setattr(hive_series, "AUTHORING_DIR", doctored_dir)
+    changed = hive_series.episode_input_digest(
+        hive_series.episode_plan(manifest, 2), staged)
+    assert changed != base
+
+    # Same content again -> same digest (the skip case still holds).
+    assert hive_series.episode_input_digest(
+        hive_series.episode_plan(manifest, 2), staged) == changed
+
+
+def test_build_episode_stages_the_authoring_chat_pills(
+        manifest, tmp_path, monkeypatch):
+    """Episode 2 end to end offline: the fixed plate and the four Cortney
+    pills render through plate.py, the lore cards here, and the encode
+    stages every PNG in the same lockstep order the graph indexes."""
+    manifest_path, _data = _stage_episode(manifest, tmp_path, monkeypatch)
+    captured = {}
+
+    def fake_run_encode(argv, **kwargs):
+        captured["argv"] = [str(t) for t in argv]
+        captured.update(kwargs)
+        Path(kwargs["out"]).write_bytes(b"mp4")
+        return "cluster"
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
+    work = tmp_path / "work"
+    out = hive_series.build_episode(manifest_path, 2, work_dir=work)
+    assert out.exists()
+
+    argv = captured["argv"]
+    graph = argv[argv.index("-filter_complex") + 1]
+    # source + 3 stills + 7 overlays (1 plate, 4 chats, 2 lore).
+    inputs = captured["inputs"]
+    assert argv.count("-i") == len(inputs) == 11
+    assert graph.count("overlay=0:0") == 7
+    names = [Path(p).name for p in inputs]
+    assert names.index("plate_player-ch2.png") < \
+        names.index("plate_cortney-losing-money.png") < \
+        names.index("s01e02-on-mars-overlay-scale-without-cncf.png")
+    for path in inputs:
+        assert Path(path).exists(), f"staged input missing: {path}"
+
+    sidecar = json.loads(
+        (work / "s01e02-on-mars-unresolved.json").read_text())
+    by_id = {item["id"]: item["reason"] for item in sidecar}
+    assert "save-the-day" in by_id and "top-right" in by_id["save-the-day"]
+    # Avatar bytes are never committed, so offline the identity-proven
+    # Cortney pills render the drawn crest AND record the gap -- one entry
+    # per chat spec with a declared avatar.
+    avatar_gaps = {item_id: reason for item_id, reason in by_id.items()
+                   if "cached avatar" in reason}
+    assert set(avatar_gaps) == {c["id"] for c in
+                                hive_series.episode_plan(
+                                    hive_series.load_manifest(manifest_path),
+                                    2)["chats"]}
+    assert all("CortNick" in reason for reason in avatar_gaps.values())
+
+    # A content-identical rebuild is skipped on the digest.
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
+    hive_series.build_episode(manifest_path, 2, work_dir=work)
+    assert calls == [], "an unchanged authoring pass must not re-encode"
+
+# --- rough-first delivery safety ----------------------------------------------
+#
+# Hive AGENTS.md: builds write `rough/s01eNN-<slug>.mp4` (and the season
+# assembly `season-01-full-rough.mp4`) for local review; the top-level
+# final MP4s, their `-thumbnail.jpg` pairs, and `season-01-full.mp4` are
+# promotion-only. These tests pin that no build path creates or replaces a
+# final, and that `promote` is the single explicit boundary.
+
+
+def test_build_never_creates_or_replaces_a_delivered_final(
+        manifest, tmp_path, monkeypatch):
+    """The safety property: a released final sitting at the top-level path
+    keeps its exact bytes through any build -- builds write rough/ only."""
+    manifest_path, _data = _stage_episode(manifest, tmp_path, monkeypatch)
+    final = tmp_path / "s01e01-the-enclave.mp4"
+    final.write_bytes(b"released-episode")
+    final_thumb = tmp_path / "s01e01-the-enclave-thumbnail.jpg"
+    final_thumb.write_bytes(b"released-thumbnail")
+    calls = []
+    monkeypatch.setattr(hive_series.farm, "run_encode", _fake_encode(calls))
+
+    hive_series.build_episode(manifest_path, 1, work_dir=tmp_path / "work")
+    assert len(calls) == 1
+    assert final.read_bytes() == b"released-episode"
+    assert final_thumb.read_bytes() == b"released-thumbnail"
+    assert (tmp_path / "rough" / "s01e01-the-enclave.mp4").exists()
+    assert (tmp_path / "rough"
+            / "s01e01-the-enclave-thumbnail.jpg").exists()
+
+
+def test_promote_is_the_only_write_path_to_the_final(
+        manifest, tmp_path, monkeypatch):
+    """Promotion is explicit, no-media (a pure copy), and refuses without a
+    reviewed rough pair; a later rebuild moves the rough and leaves the
+    promoted final byte-identical."""
+    manifest_path, data = _stage_episode(manifest, tmp_path, monkeypatch)
+    calls = []
+
+    def counted_encode(argv, **kwargs):
+        calls.append(kwargs)
+        Path(kwargs["out"]).write_bytes(f"encode-{len(calls)}".encode())
+        return "cluster"
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", counted_encode)
+    loaded = hive_series.load_manifest(manifest_path)
+
+    with pytest.raises(FileNotFoundError, match="rough"):
+        hive_series.promote_episode(loaded, 1)
+
+    work = tmp_path / "work"
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    final = hive_series.promote_episode(loaded, 1, log=lambda m: None)
+    assert final == tmp_path / "s01e01-the-enclave.mp4"
+    assert final.read_bytes() == b"encode-1"
+    assert (tmp_path / "s01e01-the-enclave-thumbnail.jpg").read_bytes() == \
+        (tmp_path / "rough"
+         / "s01e01-the-enclave-thumbnail.jpg").read_bytes(), \
+        "a released episode always carries its paired thumbnail"
+
+    # New copy arrives; the rebuild rewrites the ROUGH, the final stands.
+    data["overlays"][0]["lines"] = ["Revised after review."]
+    manifest_path.write_text(json.dumps(data))
+    hive_series.build_episode(manifest_path, 1, work_dir=work)
+    assert len(calls) == 2, "changed copy rebuilds the rough"
+    assert (tmp_path / "rough" / "s01e01-the-enclave.mp4").read_bytes() == \
+        b"encode-2"
+    assert final.read_bytes() == b"encode-1", \
+        "a rebuild must never replace a promoted final"
+
+
+def test_promote_cut_copies_only_an_approved_rough_cut(manifest, tmp_path):
+    data = _delivery_manifest(manifest, tmp_path)
+    loaded = hive_series.load_manifest_data(data)
+    with pytest.raises(FileNotFoundError, match="rough cut"):
+        hive_series.promote_cut(loaded)
+    rough_cut = tmp_path / "season-01-full-rough.mp4"
+    rough_cut.write_bytes(b"reviewed-cut")
+    final = hive_series.promote_cut(loaded, log=lambda m: None)
+    assert final == tmp_path / "season-01-full.mp4"
+    assert final.read_bytes() == b"reviewed-cut"
+
+
+def test_promote_command_goes_through_the_explicit_boundary(
+        manifest, tmp_path, monkeypatch):
+    data = _delivery_manifest(manifest, tmp_path)
+    monkeypatch.setattr(hive_series, "load_manifest", lambda *a, **k: data)
+    rough = tmp_path / "rough" / "s01e01-the-enclave.mp4"
+    rough.parent.mkdir(parents=True)
+    rough.write_bytes(b"mp4")
+    (tmp_path / "rough" / "s01e01-the-enclave-thumbnail.jpg").write_bytes(
+        b"jpg")
+    assert hive_series.main(["promote", "1"]) == 0
+    assert (tmp_path / "s01e01-the-enclave.mp4").read_bytes() == b"mp4"
+    assert (tmp_path
+            / "s01e01-the-enclave-thumbnail.jpg").read_bytes() == b"jpg"
+
+
+def test_verify_targets_roughs_unless_final_is_explicit(manifest,
+                                                        monkeypatch):
+    stages = []
+    monkeypatch.setattr(
+        hive_series, "verify_episode",
+        lambda m, n, **k: stages.append(k["stage"]) or [])
+    monkeypatch.setattr(hive_series, "load_manifest", lambda *a, **k: manifest)
+    assert hive_series.main(["verify", "1"]) == 0
+    assert stages == ["rough"], "review verifies what the build produced"
+    assert hive_series.main(["verify", "1", "--final"]) == 0
+    assert stages == ["rough", "final"]
+
+# --- farm-side preflight and validation (NO local ffmpeg/ffprobe) ------------
+#
+# The Hive workspace contract: the host never runs a media tool -- not for
+# the encode, not for preflight probes, not for picture detection, not for
+# validation. These tests pin the seams with fakes; nothing here reaches
+# the cluster or a media binary.
+
+
+def test_source_preflight_probes_on_the_farm(tmp_path, monkeypatch):
+    """The audio rate comes from the farm's ffprobe JSON; the picture rect
+    from the farm's cropdetect output, judged by the same parsing the
+    legacy local detection uses. The host only parses text."""
+    src = tmp_path / "source.mp4"
+    src.write_bytes(b"m")
+    calls = []
+
+    def fake_analysis(argvs, *, inputs, **kwargs):
+        calls.append((argvs, inputs))
+        if argvs[0][0] == "ffprobe":
+            return json.dumps({
+                "format": {"duration": "1248.0"},
+                "streams": [{"codec_type": "video", "codec_name": "h264"},
+                            {"codec_type": "audio", "sample_rate": "44100"}]})
+        assert argvs[0][0] == "ffmpeg"
+        return "crop=1920:800:0:140\n" * len(argvs)
+
+    monkeypatch.setattr(hive_series.farm, "run_analysis_on_cluster",
+                        fake_analysis)
+    rate, picture, status = hive_series._source_preflight_farm(src)
+    assert rate == 44100
+    assert picture == (0, 140, 1920, 800)
+    assert status == "letterboxed"
+    assert len(calls) == 2, "one stream probe, one cropdetect pass"
+    assert all(inputs == [src.resolve()] for _a, inputs in calls)
+    # The cropdetect windows are computed from the farm-probed duration,
+    # exactly like the legacy local detection's probe_windows.
+    detect = calls[1][0]
+    assert any("cropdetect" in token for argv in detect for token in argv)
+    assert all(str(src.resolve()) in argv for argv in detect)
+
+
+def test_source_preflight_reports_undecodable_and_missing_audio(
+        tmp_path, monkeypatch):
+    src = tmp_path / "source.mp4"
+    src.write_bytes(b"m")
+
+    def fake_analysis(argvs, *, inputs, **kwargs):
+        if argvs[0][0] == "ffprobe":
+            return json.dumps({"format": {"duration": "10.0"},
+                               "streams": [{"codec_type": "video"}]})
+        return "frames decoded but no crop= lines\n"
+
+    monkeypatch.setattr(hive_series.farm, "run_analysis_on_cluster",
+                        fake_analysis)
+    rate, picture, status = hive_series._source_preflight_farm(src)
+    assert rate is None, "no audio stream: the graph pins the rate itself"
+    assert picture is None and status == "undecodable"
+
+
+def test_verify_probes_the_rough_on_the_farm(manifest, tmp_path,
+                                             monkeypatch):
+    """Validation never touches a host ffprobe: the rough is staged and
+    probed in a pod, and the returned JSON is what gets judged."""
+    data = _delivery_manifest(manifest, tmp_path)
+    loaded = hive_series.load_manifest_data(data)
+    rough = tmp_path / "rough" / "s01e01-the-enclave.mp4"
+    rough.parent.mkdir(parents=True)
+    rough.write_bytes(b"mp4")
+    probed = []
+
+    def good_doc(path, **kwargs):
+        probed.append(Path(path).name)
+        return {"format": {"duration": "162.0"},
+                "streams": [dict(_conformant_video(), codec_type="video"),
+                            {"codec_type": "audio", "codec_name": "aac",
+                             "sample_rate": "48000", "channels": 2,
+                             "channel_layout": "stereo"}]}
+
+    monkeypatch.setattr(hive_series, "_probe_streams_farm", good_doc)
+    assert hive_series.verify_episode(loaded, 1) == []
+    assert probed == ["s01e01-the-enclave.mp4"]
+
+    def bad_audio(path, **kwargs):
+        doc = good_doc(path)
+        doc["streams"][1] = {"codec_type": "audio", "codec_name": "mp3",
+                             "sample_rate": "44100", "channels": 2,
+                             "channel_layout": "stereo"}
+        return doc
+
+    monkeypatch.setattr(hive_series, "_probe_streams_farm", bad_audio)
+    problems = hive_series.verify_episode(loaded, 1)
+    assert any("mp3" in p for p in problems)
+    assert any("44100" in p for p in problems)
+
+
+def test_verify_fails_visibly_when_the_farm_cannot_probe(
+        manifest, tmp_path, monkeypatch):
+    """An unreachable farm is a visible verification failure, never a local
+    ffprobe fallback."""
+    data = _delivery_manifest(manifest, tmp_path)
+    loaded = hive_series.load_manifest_data(data)
+    rough = tmp_path / "rough" / "s01e01-the-enclave.mp4"
+    rough.parent.mkdir(parents=True)
+    rough.write_bytes(b"mp4")
+
+    def down(path, **kwargs):
+        raise hive_series.farm.FarmError("the cluster is not reachable")
+
+    monkeypatch.setattr(hive_series, "_probe_streams_farm", down)
+    problems = hive_series.verify_episode(loaded, 1)
+    assert len(problems) == 1
+    assert "remote validation failed" in problems[0]
+    assert "never on the host" in problems[0]
+
+
+def test_concat_episodes_runs_the_join_on_the_farm(manifest, tmp_path,
+                                                   monkeypatch):
+    """Even the stream-copy join is a media command under the Hive
+    contract: it ships to the farm with the concat list as a pod-side text
+    file, farm-only and farm-verified, writing the ROUGH cut."""
+    data = _delivery_manifest(manifest, tmp_path)
+    loaded = hive_series.load_manifest_data(data)
+    captured = {}
+
+    def fake_run_encode(argv, **kwargs):
+        captured["argv"] = [str(t) for t in argv]
+        captured.update(kwargs)
+        return "cluster"
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", fake_run_encode)
+    out = hive_series.concat_episodes(loaded, work_dir=tmp_path / "work")
+    assert out == tmp_path / "season-01-full-rough.mp4"
+    assert captured["fallback"] is False
+    assert captured["local_probe"] is False
+    inputs = [str(p) for p in captured["inputs"]]
+    assert len(inputs) == 12
+    assert all("/rough/" in p for p in inputs), \
+        "the join reads the rough episodes, never the finals"
+    [(list_name, content)] = list(captured["text_files"].items())
+    assert "rough/s01e01-the-enclave.mp4" in content
+    assert "rough/s01e12-raid.mp4" in content
+    assert list_name in captured["argv"], \
+        "the argv reads the concat list (rewritten pod-side by the farm)"
+    assert not (tmp_path / "season-01-full.mp4").exists()
+
+
+def test_build_fails_before_the_render_when_the_farm_is_unreachable(
+        manifest, tmp_path, monkeypatch):
+    """End to end through build_episode: with preflight faked and the
+    encode's farm call down, the build raises and no rough is written."""
+    manifest_path, _data = _stage_episode(manifest, tmp_path, monkeypatch)
+
+    def farm_down(argv, **kwargs):
+        raise hive_series.farm.FarmError(
+            "the cluster is not reachable (kubectl not on PATH); this "
+            "build does not permit a local encode")
+
+    monkeypatch.setattr(hive_series.farm, "run_encode", farm_down)
+    with pytest.raises(hive_series.farm.FarmError, match="not reachable"):
+        hive_series.build_episode(manifest_path, 1, work_dir=tmp_path / "work")
+    assert not (tmp_path / "rough" / "s01e01-the-enclave.mp4").exists()
+
+
+def test_run_analysis_on_cluster_stages_inputs_and_captures_output(
+        tmp_path, monkeypatch):
+    """The analysis seam: pod-side argv carries the STAGED input path, the
+    captured text comes back, and an input no command reads is rejected
+    before any pod exists."""
+    farm = hive_series.farm
+    src = tmp_path / "src.mp4"
+    src.write_bytes(b"m")
+    captured = {}
+
+    def fake_execute(**kwargs):
+        captured.update(kwargs)
+        Path(kwargs["out"]).write_text("analysis-output")
+        return {"output": "out/analysis.txt", "duration": None}
+
+    monkeypatch.setattr(farm, "_execute_on_cluster", fake_execute)
+    text = farm.run_analysis_on_cluster(
+        [["ffprobe", "-v", "error", str(src)]], inputs=[src])
+    assert text == "analysis-output"
+    script = captured["script"]
+    assert "ffprobe" in script
+    assert "/work/in/00-src.mp4" in script, "the pod reads the staged path"
+    assert str(src) not in script, "the pod never sees the host path"
+    assert captured["out_rel"] == "out/analysis.txt"
+
+    with pytest.raises(farm.FarmError, match="never read"):
+        farm.run_analysis_on_cluster([["ffprobe", "-v", "error"]],
+                                     inputs=[src])
+
+# --- regression: garbled farm output and the protected gap --------------------
+
+
+def test_garbled_farm_probe_output_is_a_visible_problem_not_an_abort(
+        manifest, tmp_path, monkeypatch):
+    """`_probe_streams_farm` json-parses the farm's capture; garbage there
+    used to escape as a raw JSONDecodeError past the FarmError guard. It is
+    normalized to FarmError at the seam, so verification reports a visible
+    problem entry instead of aborting the run."""
+    data = _delivery_manifest(manifest, tmp_path)
+    loaded = hive_series.load_manifest_data(data)
+    rough = tmp_path / "rough" / "s01e01-the-enclave.mp4"
+    rough.parent.mkdir(parents=True)
+    rough.write_bytes(b"mp4")
+
+    monkeypatch.setattr(hive_series.farm, "run_analysis_on_cluster",
+                        lambda *a, **k: "{not json -- truncated capture")
+    problems = hive_series.verify_episode(loaded, 1)
+    assert len(problems) == 1
+    assert "remote validation failed" in problems[0]
+    assert "unreadable output" in problems[0]
+
+    # And the preflight path raises a proper FarmError (a build fails
+    # visibly before render), not a bare JSONDecodeError.
+    with pytest.raises(hive_series.farm.FarmError, match="unreadable"):
+        hive_series._source_preflight_farm(rough)

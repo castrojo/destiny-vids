@@ -1,8 +1,14 @@
 # Season of the Blueberries — Expansion Pack authoring
 
 These files are the durable owner-authored copy for the next pass.
-They are not active render manifests yet; implementation is tracked in the
-GitHub backlog.
+`tools/hive_authoring.py` parses them into the episode plan: `chat-*` cues
+render as plate.py chat pills, `top-third`/`bottom-right` cues render as
+verbatim lore cards, and every other placement is recorded in the episode's
+`unresolved` sidecar rather than rendered with an invented treatment.
+Lines sharing one timecode are ordered by the Direction markers
+(`sequence line N`, `follows the X cue`, `sequence after X`, `Final ...
+line`); lines without a marker keep their written order. Remaining
+placement support is tracked in the GitHub backlog.
 
 - [Open decisions](00-open-decisions.md)
 

@@ -13,7 +13,12 @@ and every card that can be rendered WITHOUT footage:
 * the Guardian dossier A contributor card -- a full uncropped square GitHub
   PFP beside a dark KubeStellar glass panel, factual fields only: display
   name (falling back to login), @login, and the window's COMMITS +N. No
-  generated title, ever.
+  generated title, ever;
+* the Expansion Pack authoring pass -- the owner-authored cue files under
+  `stories/standalone/authoring/season-of-the-blueberries/`, parsed by
+  `tools/hive_authoring.py` into chat pills (drawn by plate.py's `kind:
+  chat` renderer), verbatim lore cards in the supported lanes, and an
+  `unresolved` record for every cue this renderer cannot seat faithfully.
 
 The fixed character plates are NOT drawn here: `tools/plate.py` is frozen in
 Wolves delivery, so this module only builds plate.py-ready specs from the
@@ -29,23 +34,39 @@ an explicit unresolved entry. Avatar bytes are never committed.
     python3 tools/hive_series.py check           # validate the season manifest
     python3 tools/hive_series.py cards           # render the committed cards
     python3 tools/hive_series.py fetch-avatars   # warm the cache for the cast
-    python3 tools/hive_series.py build 1         # one episode, farm-first
-    python3 tools/hive_series.py build-all       # all twelve, verified
-    python3 tools/hive_series.py cut             # the full-season join
-    python3 tools/hive_series.py verify [N]      # probe delivered files
+    python3 tools/hive_series.py build 1         # one episode ROUGH, farm-first
+    python3 tools/hive_series.py build-all       # all twelve roughs, verified
+    python3 tools/hive_series.py cut             # the full-season ROUGH join
+    python3 tools/hive_series.py verify [N]      # probe the roughs (--final: the promoted files)
+    python3 tools/hive_series.py promote 1       # copy an APPROVED rough to its final
+    python3 tools/hive_series.py promote-cut     # copy the approved rough cut to final
     python3 tools/hive_series.py contributors    # this window's candidates (no writes)
     python3 tools/hive_series.py select-next     # issue the next episode's dossiers
     python3 tools/hive_series.py status          # issued/unissued, delivered/missing
 
-The episode build is ONE H.264/AAC encode per episode through
-`tools.farm.run_encode` -- remote-first, memory-capped local fallback, never
-a bare local run. The manifest's pinned source formats are fetched ONCE into
-`media/hive/` and reused by every episode. Source seats and overlays are
-converted to chapter-relative content time and offset by the front cards;
-the authored source marks themselves never move. The full-season cut
-concatenates the twelve episode streams without re-encoding.
+Rough-first delivery (Hive AGENTS.md): build/cut write only
+`rough/s01eNN-<slug>.mp4`, their rough thumbnails, and
+`season-01-full-rough.mp4`. The top-level finals and the final cut are
+written by `promote`/`promote-cut` alone -- a pure file copy after local
+approval, never by a build, so a rebuild can never overwrite a released
+episode.
 
-Stdlib plus Pillow for the cards; ffmpeg work goes through tools/farm.py.
+The episode build is ONE H.264/AAC encode per episode through
+`tools.farm.run_encode` -- farm ONLY, per the Hive workspace contract: no
+local ffmpeg/ffprobe at all, not even preflight probes, picture detection,
+or validation (all farm-side), and no local fallback -- an unreachable farm
+fails the build visibly before any render. The source is the workspace's
+supplied immutable file (`~/Videos/Hive/source-<youtube_id>.mp4`), or the
+previously cached copy of it; when neither exists the build refuses with
+instructions, because a local yt-dlp fetch would run a local ffmpeg merge
+-- never mutated, never downloaded-and-muxed on the host. Source seats and
+overlays are converted to chapter-relative content time and offset by the
+front cards; the authored source marks themselves never move. The
+full-season rough cut concatenates the twelve episode roughs without
+re-encoding, also on the farm.
+
+Stdlib plus Pillow for the cards; all media work goes through
+tools/farm.py.
 """
 
 from __future__ import annotations
@@ -54,6 +75,7 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -69,6 +91,7 @@ if str(REPO_ROOT) not in sys.path:
 from tools import avatars  # noqa: E402  (needs REPO_ROOT on sys.path first)
 from tools import conform  # noqa: E402
 from tools import farm  # noqa: E402
+from tools import hive_authoring  # noqa: E402
 from tools import plate  # noqa: E402
 from tools import render  # noqa: E402
 
@@ -660,9 +683,29 @@ def plan_chapter_plates(manifest, number):
     return plates, unresolved
 
 
-def declared_avatar_logins(manifest):
-    """The GitHub logins whose faces the season renders."""
-    return [member["github_login"] for member in manifest["fixed_cast"]]
+def declared_avatar_logins(manifest, authoring_dir=None):
+    """The GitHub logins whose faces the season renders: the fixed cast
+    plus every authoring-pass chat speaker whose identity the season's own
+    records prove (a fixed-cast seat or a contributor-ledger candidacy).
+    A speaker the record does not vouch for renders avatarless by design
+    and is never warmed. Logins are returned once each, fixed cast first,
+    then authoring speakers in chapter order."""
+    logins = [member["github_login"] for member in manifest["fixed_cast"]]
+    seen = {login.lower() for login in logins}
+    for chapter in manifest["chapters"]:
+        chats, _lore, _unresolved, _gaps = hive_authoring.plan_authoring(
+            hive_authoring.load_chapter_authoring(
+                authoring_dir or AUTHORING_DIR, chapter),
+            manifest, chapter)
+        for spec in chats:
+            avatar = spec.get("avatar")
+            if not avatar:
+                continue
+            login = Path(avatar).stem
+            if login.lower() not in seen:
+                seen.add(login.lower())
+                logins.append(login)
+    return logins
 
 
 def fetch_declared_avatars(manifest, **kwargs):
@@ -684,6 +727,10 @@ def fetch_declared_avatars(manifest, **kwargs):
 # The manifest-pinned source (formats 137+251) is fetched ONCE into this
 # gitignored cache and reused by every episode.
 SOURCE_CACHE_DIR = REPO_ROOT / "media" / "hive"
+# The owner-authored Expansion Pack copy, one Markdown file per episode
+# (`NN-<slug>.md`), parsed by tools/hive_authoring.py. A module constant so
+# tests can redirect it.
+AUTHORING_DIR = hive_authoring.AUTHORING_DIR
 # Rendered dossier/plate/overlay PNGs and unresolved sidecars; gitignored.
 WORK_DIR = REPO_ROOT / "renders" / "hive"
 
@@ -703,6 +750,15 @@ CUT_TOLERANCE_S = 2.0
 
 THUMBNAIL_MAX_BYTES = 2 * 1024 * 1024
 FULL_CUT_NAME = "season-01-full.mp4"
+# Rough-first delivery (Hive AGENTS.md): `build`/`build-all`/`cut` write
+# ONLY reviewable artifacts -- episodes and their thumbnails under the
+# season folder's `rough/` directory, and the season assembly as
+# `season-01-full-rough.mp4`. The top-level `s01eNN-*.mp4`, their paired
+# `-thumbnail.jpg`, and `season-01-full.mp4` are promotion-only: the one
+# boundary that writes them is `promote_episode`/`promote_cut` (a pure file
+# copy after local approval), never a build.
+ROUGH_DIR_NAME = "rough"
+ROUGH_CUT_NAME = "season-01-full-rough.mp4"
 
 # The same client standalone.py measured for the pinned progressive-free
 # format list: `visionos` lists the full AVC + non-DRC 48 kHz Opus ladder.
@@ -729,16 +785,37 @@ def episode_slug(chapter):
 
 
 def episode_output_path(chapter):
+    """The FINAL, promoted episode path (top level of the season folder).
+    Builds never write here -- see the rough-first note above."""
     return Path(chapter["output"]).expanduser()
 
 
 def thumbnail_output_path(chapter):
+    """The FINAL, promoted thumbnail path. Builds never write here."""
     return Path(chapter["thumbnail_output"]).expanduser()
 
 
+def episode_rough_path(chapter):
+    """The reviewable rough: the episode's filename under ``rough/``."""
+    final = episode_output_path(chapter)
+    return final.parent / ROUGH_DIR_NAME / final.name
+
+
+def thumbnail_rough_path(chapter):
+    """The rough's paired thumbnail, beside the rough episode."""
+    final = thumbnail_output_path(chapter)
+    return final.parent / ROUGH_DIR_NAME / final.name
+
+
 def full_cut_path(manifest):
-    """The season cut sits beside the episodes the manifest delivers."""
+    """The FINAL season cut sits beside the episodes the manifest
+    delivers. Builds never write here."""
     return episode_output_path(manifest["chapters"][0]).parent / FULL_CUT_NAME
+
+
+def full_cut_rough_path(manifest):
+    """The reviewable season assembly, beside the final cut's name."""
+    return full_cut_path(manifest).with_name(ROUGH_CUT_NAME)
 
 
 # --- fetching the source, once ----------------------------------------------------
@@ -769,15 +846,40 @@ def source_fetch_command(manifest, out):
     ]
 
 
-def ensure_source(manifest, cache_dir=None, runner=subprocess.run):
-    """The downloaded season source, fetched once and kept.
+def supplied_source_path(manifest):
+    """The Hive workspace's immutable hand-placed source for this manifest
+    (``~/Videos/Hive/source-<youtube_id>.mp4``). Read-only, always: nothing
+    in this module ever writes to it."""
+    return Path(
+        f"~/Videos/Hive/source-{manifest['source']['youtube_id']}.mp4"
+    ).expanduser()
 
-    The only step in this module that reaches the network. A non-empty file
-    already on disk is the evidence it ran, so it is never re-fetched --
-    twelve episodes, one download."""
+
+def ensure_source(manifest, cache_dir=None, runner=subprocess.run,
+                  supplied=None, allow_fetch=False):
+    """The season source: the Hive workspace's SUPPLIED immutable file when
+    it is present (never mutated, never re-downloaded), else the one
+    already-cached copy. When neither exists the build FAILS VISIBLY: a
+    local `yt-dlp -f 137+251 --merge-output-format mkv` fetch would invoke
+    a local ffmpeg merge, and the Hive workspace forbids any local media
+    execution -- the source must be staged at
+    ``~/Videos/Hive/source-<youtube_id>.mp4`` (e.g. by a remote job), never
+    downloaded-and-muxed on the host. The fetch remains reachable only for
+    non-Hive callers that pass ``allow_fetch=True`` explicitly; the Hive
+    build path never does."""
+    supplied = Path(supplied).expanduser() if supplied is not None \
+        else supplied_source_path(manifest)
+    if supplied.exists() and supplied.stat().st_size > 0:
+        return supplied.resolve()
     out = source_cache_path(manifest, cache_dir).resolve()
     if out.exists() and out.stat().st_size > 0:
         return out
+    if not allow_fetch:
+        raise FileNotFoundError(
+            f"no season source: the Hive build requires the immutable "
+            f"supplied source at {supplied} (stage it from a remote job); "
+            "a local yt-dlp fetch would run a local ffmpeg merge, which "
+            "this workspace forbids")
     out.parent.mkdir(parents=True, exist_ok=True)
     runner(source_fetch_command(manifest, out), check=True)
     return out
@@ -854,11 +956,17 @@ def episode_plan(manifest, number):
     chapter start, so the graph seats them on the trimmed chapter leg and
     the front cards' offset falls out of the concat for free. A seat whose
     copy is incomplete, and an overlay whose position this renderer does
-    not know, are recorded in `unresolved` and never drawn."""
+    not know, are recorded in `unresolved` and never drawn.
+
+    The Expansion Pack authoring pass (`tools/hive_authoring.py`, parsed
+    from AUTHORING_DIR) adds the episode's `chats` (plate.py `kind: chat`
+    pills) and any supported authoring lore cards, and records every cue it
+    cannot seat faithfully in `unresolved`."""
     chapter = chapter_by_number(manifest, number)
     plates, unresolved = plan_chapter_plates(manifest, number)
     for spec in plates:
         spec["at"] = source_to_chapter_relative(spec["at"], chapter)
+    window = float(chapter["end"]) - float(chapter["start"])
     overlays = []
     for overlay in manifest.get("overlays") or []:
         if overlay["chapter"] != number:
@@ -872,7 +980,6 @@ def episode_plan(manifest, number):
             })
             continue
         at = source_to_chapter_relative(overlay["source_at"], chapter)
-        window = float(chapter["end"]) - float(chapter["start"])
         overlays.append({
             "id": overlay["id"],
             "lines": list(overlay["lines"]),
@@ -880,11 +987,48 @@ def episode_plan(manifest, number):
             "at": at,
             "dur": min(LORE_OVERLAY_DUR, window - at),
         })
+    # The owner-authored Expansion Pack pass (tools/hive_authoring.py): chat
+    # pills through plate.py's `kind: chat` renderer, verbatim lore cards in
+    # the supported lanes, and every cue that cannot be seated faithfully
+    # recorded in `unresolved` -- never dropped, never rendered by a guess.
+    # An authoring lore card the manifest already carries verbatim (same
+    # position, same absolute source mark, same lines) is rendered by the
+    # manifest's overlay record, so the duplicate authoring cue is covered,
+    # not double-drawn.
+    chats, authoring_lore, authoring_unresolved, protected_gaps = \
+        hive_authoring.plan_authoring(
+            hive_authoring.load_chapter_authoring(AUTHORING_DIR, chapter),
+            manifest, chapter)
+    unresolved.extend(authoring_unresolved)
+    covered = {(o["position"], float(o["source_at"]), tuple(o["lines"]))
+               for o in manifest.get("overlays") or []
+               if o["chapter"] == number
+               and o["position"] in LORE_POSITIONS}
+    for card in authoring_lore:
+        key = (card["position"], float(card["source_at"]),
+               tuple(card["lines"]))
+        if key in covered:
+            continue
+        at = source_to_chapter_relative(card["source_at"], chapter)
+        overlays.append({
+            "id": card["id"],
+            "lines": list(card["lines"]),
+            "position": card["position"],
+            "at": at,
+            "dur": min(LORE_OVERLAY_DUR, window - at),
+        })
+    overlays.sort(key=lambda o: o["at"])  # stable: ties keep manifest first
+    overlays = _clamp_lore_lanes(overlays, unresolved)
+    # A protected gap is a no-draw window for EVERY card, lore included.
+    overlays = _clear_of_protected_gaps(overlays, protected_gaps,
+                                        unresolved)
     return {
         "chapter": chapter,
         "segments": episode_segments(manifest, chapter),
         "plates": plates,
+        "chats": chats,
         "overlays": overlays,
+        "protected_gaps": protected_gaps,
         "unresolved": unresolved,
         "front_offset": front_cards_duration(manifest, chapter),
         "expected_duration": episode_expected_duration(manifest, chapter),
@@ -896,6 +1040,66 @@ def episode_plan(manifest, number):
 # The positions this renderer knows how to seat. Anything else is recorded
 # and omitted, never guessed.
 LORE_POSITIONS = ("bottom-right", "top-third")
+
+
+def _clamp_lore_lanes(overlays, unresolved):
+    """No two lore cards share a lane at the same time.
+
+    ``overlays`` is the episode's at-sorted lore list (manifest records and
+    authoring cards together). A card's hold is clamped to end when the NEXT
+    rendered card in the SAME lane begins -- deterministic, and the later
+    card's authored anchor never moves. A card left under the project's
+    minimum readable hold (plate.MIN_HOLD) by that clamp is recorded in
+    ``unresolved`` and omitted instead of flashing unreadably or overlapping.
+    Different lanes never constrain each other."""
+    kept = []
+    for index, overlay in enumerate(overlays):
+        later = next((o for o in overlays[index + 1:]
+                      if o["position"] == overlay["position"]), None)
+        if later is None:
+            kept.append(overlay)
+            continue
+        room = float(later["at"]) - float(overlay["at"])
+        if room < plate.MIN_HOLD - 1e-6:
+            unresolved.append({
+                "id": overlay["id"],
+                "reason": f"the next {overlay['position']} card "
+                          f"({later['id']}) begins {room:.2f}s after it, "
+                          f"under the {plate.MIN_HOLD}s minimum readable "
+                          "hold; the card is recorded rather than "
+                          "overlapped or flashed unreadably",
+            })
+            continue
+        overlay["dur"] = round(min(float(overlay["dur"]), room), 3)
+        kept.append(overlay)
+    return kept
+
+
+def _clear_of_protected_gaps(overlays, protected_gaps, unresolved):
+    """No lore card covers a protected gap. ``protected_gaps`` is the
+    chapter-relative no-draw windows from the authoring pass (the owner's
+    "leave the picture alone" beat); a card whose window intersects one is
+    recorded and omitted, never drawn over a protected beat. Unlike a
+    merely unsupported cue, a protected gap is unrenderable AND binding."""
+    if not protected_gaps:
+        return overlays
+    kept = []
+    for overlay in overlays:
+        at = float(overlay["at"])
+        end = at + float(overlay["dur"])
+        hit = next(((g0, g1) for g0, g1 in protected_gaps
+                    if not (end <= g0 + 1e-6 or at >= g1 - 1e-6)), None)
+        if hit is None:
+            kept.append(overlay)
+            continue
+        unresolved.append({
+            "id": overlay["id"],
+            "reason": f"its window {at:g}-{end:g}s would cover the "
+                      f"protected gap {hit[0]:g}-{hit[1]:g}s (the owner "
+                      "leaves the picture alone there); recorded, never "
+                      "drawn over a protected beat",
+        })
+    return kept
 
 
 def render_lore_overlay(overlay):
@@ -975,7 +1179,9 @@ def render_dossier_safely(snapshot, face=None):
 
 def _plan_overlay_descriptors(plan):
     """The overlay/plate descriptor list AS PLANNED, in render order: fixed
-    plates first, then project-lore overlays.
+    plates first, then the authoring pass's chat pills, then project-lore
+    overlays. The fixed cast stays ahead of the authoring overlays in the
+    encoded overlay order.
 
     This is only the PLAN's view -- what the season manifest asks for.
     `_render_overlay_pngs` walks this same order but may PRUNE it (an
@@ -988,6 +1194,7 @@ def _plan_overlay_descriptors(plan):
     computed before rendering) the same default derivation, so it never
     has to duplicate the zip-order rule."""
     return [dict(p, overlay_kind="plate") for p in plan["plates"]] + \
+        [dict(c, overlay_kind="chat") for c in plan.get("chats", [])] + \
         [dict(o, overlay_kind="lore") for o in plan["overlays"]]
 
 
@@ -996,7 +1203,8 @@ def episode_filtergraph(plan, overlays=None, source_rate=SAMPLE_RATE):
 
     Input order is the fixed contract with `encode_episode_command`: input 0
     is the source, the stills follow in segment order, and the overlay PNGs
-    (fixed plates, then lore overlays) come last. Every still and overlay is
+    (fixed plates, then authoring chat pills, then lore overlays) come last.
+    Every still and overlay is
     a looped -- infinite -- input; the stills are trimmed to their authored
     durations and the overlays carry ``shortest=1``, so the finite chapter
     leg decides where the file ends.
@@ -1104,15 +1312,17 @@ def encode_episode_command(ffmpeg, source, stills, overlays, graph, out):
     return argv
 
 
-def encode_episode(argv, *, inputs, out, expected_duration, local=False,
-                   label=None):
-    """The episode's one encode, on the farm whenever the farm answers.
+def encode_episode(argv, *, inputs, out, expected_duration, label=None):
+    """The episode's one encode -- farm ONLY, farm-verified.
 
-    The posture is tools/farm.py's, taken identically by every builder:
-    cluster when reachable, memory-capped local with the reason printed
-    otherwise, ``--local`` as the explicit escape hatch."""
+    The Hive workspace contract forbids local ffmpeg outright, so unlike
+    the legacy builders this takes no `--local` escape and no fallback:
+    `farm.run_encode` with `fallback=False` raises FarmError before any
+    render when the cluster is unreachable, and `local_probe=False` keeps
+    the post-fetch verification on the pod's own probe, never the host's
+    ffprobe."""
     return farm.run_encode(
-        argv, inputs=inputs, out=out, local=local,
+        argv, inputs=inputs, out=out, fallback=False, local_probe=False,
         expected_duration=expected_duration,
         label=label or "Hive episode")
 
@@ -1143,19 +1353,80 @@ def make_thumbnail(slide_path, out_path):
 # --- building ----------------------------------------------------------------------------
 
 
-def _source_audio_rate(source, ffmpeg):
-    """The source's audio sample rate, or None when it cannot be probed --
-    in which case the graph pins the rate explicitly rather than trusting."""
-    ffprobe = conform.ffprobe_for(ffmpeg)
+# --- farm-side preflight and validation (Hive: NO local ffmpeg/ffprobe) ---------
+#
+# The Hive workspace contract forbids local media tooling entirely --
+# including preflight probes, picture detection, and validation. All of it
+# runs on the render farm through `farm.run_analysis_on_cluster`, which
+# stages the file in a pod and captures the pod-side ffprobe/ffmpeg output.
+# The host only ever parses text.
+
+
+def _probe_streams_farm(path, label=None):
+    """The full ffprobe JSON document for ``path``, produced ON the farm.
+
+    A garbled or truncated capture is normalized to FarmError here, so every
+    verification call path can turn it into a visible problem instead of an
+    unhandled JSONDecodeError abort."""
+    path = Path(path).resolve()
+    text = farm.run_analysis_on_cluster(
+        [["ffprobe", "-v", "error", "-print_format", "json",
+          "-show_format", "-show_streams", str(path)]],
+        inputs=[path], label=label or f"Hive probe {path.name}")
     try:
-        out = subprocess.run(
-            [*ffprobe, "-v", "error", "-select_streams", "a:0",
-             "-show_entries", "stream=sample_rate", "-of", "csv=p=0",
-             str(source)],
-            capture_output=True, text=True, check=True)
-        return int(out.stdout.strip())
-    except (subprocess.SubprocessError, ValueError):
-        return None
+        return json.loads(text)
+    except ValueError as exc:
+        raise farm.FarmError(
+            f"the farm's probe of {path.name} returned unreadable output "
+            f"({exc}); the capture begins: {text[:120]!r}") from exc
+
+
+def _facts_from_probe_doc(doc):
+    """``(duration, video_props, audio_props)`` from an ffprobe document.
+
+    video_props carries exactly the keys `conform.probe_video` selects, so
+    `conform.mismatches` judges it unchanged; audio_props is the first audio
+    stream ({} when there is none)."""
+    streams = doc.get("streams") or []
+    video = next((s for s in streams if s.get("codec_type") == "video"), None)
+    if video is None:
+        raise RuntimeError("no video stream in the probed file")
+    audio = next((s for s in streams if s.get("codec_type") == "audio"), {})
+    return float(doc["format"]["duration"]), video, audio
+
+
+def _source_preflight_farm(source, log=print):
+    """The source preflight, entirely on the farm:
+    ``(audio_sample_rate, picture_rect, picture_status)``.
+
+    One pod probe for the stream facts (audio rate for the filtergraph,
+    duration for the cropdetect windows), one for the cropdetect readings;
+    the readings are judged by `render.picture_status_from_cropdetect` --
+    the same parsing the legacy local detection applies. ``audio_rate`` is
+    None when the source has no audio stream, so the graph pins the rate
+    explicitly rather than trusting."""
+    source = Path(source).resolve()
+    doc = _probe_streams_farm(source, label=f"Hive preflight {source.name}")
+    streams = doc.get("streams") or []
+    audio = next((s for s in streams if s.get("codec_type") == "audio"),
+                 None)
+    rate = None
+    if audio and audio.get("sample_rate"):
+        rate = int(audio["sample_rate"])
+    try:
+        duration = float((doc.get("format") or {})["duration"])
+    except (KeyError, TypeError, ValueError):
+        duration = None
+    argvs = [
+        ["ffmpeg", "-nostdin", "-hide_banner",
+         "-ss", str(start), "-t", str(length), "-i", str(source),
+         "-vf", "cropdetect=24:2:0", "-f", "null", "-"]
+        for start, length in render.probe_windows(duration)
+    ]
+    text = farm.run_analysis_on_cluster(
+        argvs, inputs=[source], label=f"Hive picture detect {source.name}")
+    picture, status = render.picture_status_from_cropdetect(text)
+    return rate, picture, status
 
 
 def _write_unresolved(work_dir, slug, unresolved):
@@ -1232,7 +1503,10 @@ def episode_input_digest(plan, staged, overlays=None, source=None):
         note("segment", entry)
     for spec in overlays:
         payload_spec = {k: v for k, v in spec.items() if k != "overlay_kind"}
-        note("plate" if spec["overlay_kind"] == "plate" else "overlay",
+        # Every spec field but the renderer tag is hashed, so an authoring
+        # Copy or Next line edit is a digest change and forces a rebuild.
+        note({"plate": "plate", "chat": "chat"}.get(spec["overlay_kind"],
+                                                    "overlay"),
              payload_spec)
     note("offsets", {"front_offset": plan["front_offset"],
                      "expected_duration": plan["expected_duration"]})
@@ -1281,10 +1555,14 @@ def _write_input_digest(path, digest, staged):
     return path
 
 
-def _render_overlay_pngs(plan, source, ffmpeg, work_dir, slug, unresolved,
+def _render_overlay_pngs(plan, picture_info, work_dir, slug, unresolved,
                          log):
-    """The episode's overlay inputs, in graph order: the fixed plates through
-    tools/plate.py (unmodified), then the project-lore overlays drawn here.
+    """The episode's overlay inputs, in graph order: the fixed plates and the
+    authoring pass's chat pills through tools/plate.py (unmodified), then the
+    project-lore overlays drawn here.
+
+    ``picture_info`` is ``(picture_rect, status)`` from the farm preflight
+    (`_source_preflight_farm`) -- detection never runs on the host.
 
     Returns ``(pngs, descriptors)`` in LOCKSTEP -- ``descriptors[i]`` is the
     plan entry (plate spec or lore overlay, each tagged ``overlay_kind``)
@@ -1304,7 +1582,7 @@ def _render_overlay_pngs(plan, source, ffmpeg, work_dir, slug, unresolved,
     descriptors = _plan_overlay_descriptors(plan)
     if not descriptors:
         return overlay_pngs, rendered
-    picture, status = render.detect_picture_status(source, ffmpeg=ffmpeg)
+    picture, status = picture_info
     if status == "undecodable":
         unresolved.extend(
             {"id": item["id"],
@@ -1313,18 +1591,38 @@ def _render_overlay_pngs(plan, source, ffmpeg, work_dir, slug, unresolved,
                        "and was not placed"}
             for item in descriptors)
         return overlay_pngs, rendered
-    if plan["plates"]:
+    drawable = [dict(spec, overlay_kind="plate") for spec in plan["plates"]] + \
+        [dict(spec, overlay_kind="chat") for spec in plan.get("chats", [])]
+    if drawable:
         plates_dir = Path(work_dir) / f"{slug}-plates"
-        plate.render_all(plan["plates"], plates_dir, picture=picture)
-        for spec in plan["plates"]:
+        # Fixed plates and the authoring chat pills both draw through
+        # tools/plate.py, unmodified; the chat pills carry `kind: chat`.
+        plate.render_all(drawable, plates_dir, picture=picture)
+        for spec in drawable:
             png = plates_dir / f"plate_{spec['id']}.png"
             if not png.exists():
                 unresolved.append(
                     {"id": spec["id"],
                      "reason": f"no plate was rendered at {png}"})
                 continue
+            # An identity-proven chat speaker whose cached face is absent
+            # renders plate.py's drawn crest -- degrade, never block -- but
+            # the gap is a punch-list item, not silence.
+            if spec["overlay_kind"] == "chat" and spec.get("avatar"):
+                face = Path(spec["avatar"]).expanduser()
+                if not face.is_absolute():
+                    face = REPO_ROOT / face
+                if not face.exists() or \
+                        face.stat().st_size < avatars.MIN_BYTES:
+                    unresolved.append({
+                        "id": spec["id"],
+                        "reason": f"the cached avatar {spec['avatar']} for "
+                                  f"speaker {spec['speaker']!r} is absent; "
+                                  "the drawn crest stands in -- warm the "
+                                  "cache (`fetch-avatars`) before delivery",
+                    })
             overlay_pngs.append(png.resolve())
-            rendered.append(dict(spec, overlay_kind="plate"))
+            rendered.append(spec)
     for overlay in plan["overlays"]:
         card = render_lore_overlay(overlay)
         frame = place_lore_overlay(card, overlay["position"], picture)
@@ -1335,10 +1633,17 @@ def _render_overlay_pngs(plan, source, ffmpeg, work_dir, slug, unresolved,
     return overlay_pngs, rendered
 
 
-def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
-                  log=print, work_dir=None):
-    """One episode, built and delivered: cards, one farm-first encode,
-    thumbnail, unresolved sidecar.
+def build_episode(manifest_path, episode_number, log=print, work_dir=None):
+    """One episode, built for REVIEW: cards, one farm-only encode, rough
+    thumbnail, unresolved sidecar. Writes only the rough paths
+    (`rough/s01eNN-<slug>.mp4` and its thumbnail); the top-level final and
+    its thumbnail are promotion-only and never touched here.
+
+    The Hive workspace runs NO local ffmpeg/ffprobe, not even preflight:
+    the source's stream facts and picture area are probed on the farm
+    (`_source_preflight_farm`), the encode runs there or the build raises
+    farm.FarmError before any render (`encode_episode` permits no local
+    fallback), and validation probes the fetched rough on the farm.
 
     Freshness is content-derived, never duration-derived: the plan, the
     encode contract, and the pixel content of every staged input hash to a
@@ -1350,17 +1655,24 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
     the CURRENT plan and prints the items before returning -- it can never
     be left missing or stale."""
     manifest = load_manifest(manifest_path)
-    ffmpeg = ffmpeg or render.find_ffmpeg()
     plan = episode_plan(manifest, episode_number)
     chapter = plan["chapter"]
     slug = episode_slug(chapter)
-    out = episode_output_path(chapter)
-    thumb = thumbnail_output_path(chapter)
+    # Rough-first: the build writes the reviewable rough and its thumbnail
+    # only; the top-level final is promotion's job, never a build's.
+    out = episode_rough_path(chapter)
+    thumb = thumbnail_rough_path(chapter)
     work = Path(work_dir) if work_dir is not None else WORK_DIR
     work.mkdir(parents=True, exist_ok=True)
 
     source = Path(ensure_source(manifest)).resolve()
     unresolved = list(plan["unresolved"])
+
+    # Preflight ON THE FARM: the source's audio rate (for the graph) and
+    # picture area (for overlay seats). An unreachable farm raises here,
+    # before any render -- the Hive workspace permits no local fallback.
+    audio_rate, picture, picture_status = _source_preflight_farm(
+        source, log=log)
 
     stills = []
     for segment in plan["segments"]:
@@ -1378,14 +1690,13 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
             stills.append(Path(segment["asset"]).resolve())
 
     overlay_pngs, overlay_descriptors = _render_overlay_pngs(
-        plan, source, ffmpeg, work, slug, unresolved, log)
+        plan, (picture, picture_status), work, slug, unresolved, log)
     staged = [*stills, *overlay_pngs]
     digest = episode_input_digest(plan, staged, overlays=overlay_descriptors,
                                   source=manifest["source"])
     digest_path = work / f"{slug}-inputs.json"
 
-    if out.exists() and not verify_episode(manifest, episode_number,
-                                           ffmpeg=ffmpeg):
+    if out.exists() and not verify_episode(manifest, episode_number):
         stored, state = _read_input_digest(digest_path)
         if state == "ok" and stored == digest:
             log(f"  {slug}: already built and verified -- {out}")
@@ -1409,13 +1720,12 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
     out.parent.mkdir(parents=True, exist_ok=True)
     out = out.resolve()
     graph = episode_filtergraph(
-        plan, overlay_descriptors,
-        source_rate=_source_audio_rate(source, ffmpeg))
+        plan, overlay_descriptors, source_rate=audio_rate)
     argv = encode_episode_command(
-        ffmpeg, source, stills, overlay_pngs, graph, out)
+        ["ffmpeg"], source, stills, overlay_pngs, graph, out)
     where = encode_episode(
         argv, inputs=[source, *stills, *overlay_pngs], out=out,
-        expected_duration=plan["expected_duration"], local=local,
+        expected_duration=plan["expected_duration"],
         label=f"Hive {slug}")
     log(f"  {slug}: encoded on {where} -- {out}")
 
@@ -1427,20 +1737,18 @@ def build_episode(manifest_path, episode_number, local=False, ffmpeg=None,
     make_thumbnail(plan["segments"][1]["asset"], thumb)
     log(f"  thumbnail: {thumb}")
 
-    problems = verify_episode(manifest, episode_number, ffmpeg=ffmpeg)
+    problems = verify_episode(manifest, episode_number)
     for problem in problems:
         log(f"  verify: {problem}")
     return out
 
 
-def build_all(manifest_path=None, local=False, ffmpeg=None, log=print,
-              work_dir=None):
+def build_all(manifest_path=None, log=print, work_dir=None):
     """All twelve episodes, in chapter order. The source fetch happens once:
-    the cache file is the evidence it ran."""
+    the supplied file (or cache) is the evidence it ran."""
     manifest = load_manifest(manifest_path)
     return [build_episode(manifest_path or MANIFEST, chapter["number"],
-                          local=local, ffmpeg=ffmpeg, log=log,
-                          work_dir=work_dir)
+                          log=log, work_dir=work_dir)
             for chapter in manifest["chapters"]]
 
 
@@ -1448,11 +1756,13 @@ def build_all(manifest_path=None, local=False, ffmpeg=None, log=print,
 
 
 def concat_list_lines(manifest, paths=None):
-    """The concat-demuxer list: the delivered episodes, in order. ``paths``
+    """The concat-demuxer list: the ROUGH episodes, in order. ``paths``
     overrides the episode set -- the cut joins what is actually joinable,
-    which can be fewer than twelve (see build_cut)."""
+    which can be fewer than twelve (see build_cut). The default is the
+    rough lane on purpose: no helper defaults to reading or writing a
+    final."""
     if paths is None:
-        paths = [episode_output_path(c) for c in manifest["chapters"]]
+        paths = [episode_rough_path(c) for c in manifest["chapters"]]
     return [f"file '{Path(p).resolve()}'" for p in paths]
 
 
@@ -1472,27 +1782,35 @@ def concat_command(ffmpeg, list_path, out_path):
     ]
 
 
-def concat_episodes(manifest, out_path=None, ffmpeg=None, work_dir=None,
-                    runner=subprocess.run, paths=None):
-    """Concatenate the built episodes into the full-season cut.
+def concat_episodes(manifest, out_path=None, work_dir=None, paths=None):
+    """Concatenate the built episodes into the full-season ROUGH cut.
 
-    A pure remux -- the picture and sound are both stream-copied -- so it
-    runs here, the same posture as megacut's assemble: the encodes were the
-    farm's work; the join is I/O. ``paths`` is the ordered join set when the
-    caller has conformed or omitted episodes; the default is all twelve."""
-    ffmpeg = ffmpeg or render.find_ffmpeg()
-    out_path = Path(out_path) if out_path else full_cut_path(manifest)
+    A pure remux -- the picture and sound are both stream-copied -- but even
+    a remux is a media command, and the Hive workspace forbids local
+    ffmpeg: the join ships to the farm through `farm.run_encode` with the
+    concat list travelling as a pod-side text file (the same mechanism
+    megacut's assemble uses), farm-only and farm-verified. ``paths`` is the
+    ordered join set when the caller has conformed or omitted episodes; the
+    defaults are the ROUGH lanes (all twelve roughs into
+    `season-01-full-rough.mp4`), so a bare call can never touch a final."""
+    out_path = Path(out_path) if out_path else full_cut_rough_path(manifest)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     work = Path(work_dir) if work_dir is not None else WORK_DIR
     work.mkdir(parents=True, exist_ok=True)
     list_path = work / "season-01-concat.txt"
-    list_path.write_text("\n".join(concat_list_lines(manifest, paths)) + "\n",
-                         encoding="utf-8")
-    runner(concat_command(ffmpeg, list_path, out_path), check=True)
+    content = "\n".join(concat_list_lines(manifest, paths)) + "\n"
+    list_path.write_text(content, encoding="utf-8")
+    farm.run_encode(
+        concat_command(["ffmpeg"], list_path, out_path),
+        inputs=list(paths) if paths is not None
+        else [episode_rough_path(c) for c in manifest["chapters"]],
+        out=out_path, text_files={str(list_path): content},
+        fallback=False, local_probe=False,
+        label="Hive season cut")
     return out_path
 
 
-def _conform_for_join(path, ffmpeg, local, log):
+def _conform_for_join(path, log):
     """``conform.ensure`` with the delivery-fps container-rounding verdict.
 
     The cut joins blind, so a non-conformant episode is substituted with its
@@ -1501,21 +1819,31 @@ def _conform_for_join(path, ffmpeg, local, log):
     never divide 60000/1001 evenly, so a correct delivery's avg_frame_rate
     lands outside conform's 1e-3 fps tolerance (`_fps_is_delivery`). Without
     the override every delivered episode would "need" a re-encode on every
-    cut."""
-    ffprobe = conform.ffprobe_for(ffmpeg)
+    cut.
 
+    The probe is the farm's (`_probe_streams_farm`), and the conform encode
+    is farm-only as well (`allow_local=False`): the Hive workspace runs no
+    local ffmpeg even as a repair path -- an unreachable farm fails the cut
+    visibly."""
     def probe(p):
-        props, _fps_ok = _fps_with_delivery_rounding(
-            conform.probe_video(p, ffprobe))
+        _duration, video, _audio = _facts_from_probe_doc(
+            _probe_streams_farm(p, label=f"Hive conform probe "
+                                         f"{Path(p).name}"))
+        props, _fps_ok = _fps_with_delivery_rounding(video)
         return props
 
-    return conform.ensure(path, ffmpeg=ffmpeg, _probe=probe, log=log,
-                          use_farm=False if local else None)
+    return conform.ensure(path, ffmpeg=["ffmpeg"], _probe=probe, log=log,
+                          use_farm=True, allow_local=False,
+                          local_probe=False)
 
 
-def build_cut(manifest_path=None, local=False, ffmpeg=None, log=print):
-    """The ONE way to the full-season cut: build every episode, then join
-    what is joinable.
+def build_cut(manifest_path=None, log=print):
+    """The ONE way to the full-season REVIEW cut: build every episode, then
+    join what is joinable. Reads and writes rough artifacts only (the
+    season assembly lands at `season-01-full-rough.mp4`);
+    `season-01-full.mp4` exists only through `promote_cut`. Every probe and
+    encode is the farm's; an unreachable farm fails the cut visibly before
+    any render.
 
     Returns ``(out_path, problems)`` -- every finding, episode-level and
     post-join, empty when everything verified. Findings REPORT, they never
@@ -1532,25 +1860,25 @@ def build_cut(manifest_path=None, local=False, ffmpeg=None, log=print):
     audio and there is no second audio encode path. The CLI and the
     justfile both go through here; there is no second path to a cut."""
     manifest = load_manifest(manifest_path)
-    ffmpeg = ffmpeg or render.find_ffmpeg()
-    build_all(manifest_path, local=local, ffmpeg=ffmpeg, log=log)
+    build_all(manifest_path, log=log)
     problems = []
     joinable = []
     for chapter in manifest["chapters"]:
         slug = episode_slug(chapter)
-        findings = verify_episode(manifest, chapter["number"], ffmpeg=ffmpeg)
+        findings = verify_episode(manifest, chapter["number"])
         for finding in findings:
             log(f"  verify: {finding}")
         problems.extend(findings)
-        path = episode_output_path(chapter)
+        # The review assembly joins the ROUGH episodes, never the finals.
+        path = episode_rough_path(chapter)
         if not path.exists() or path.stat().st_size == 0:
             problems.append(
                 f"{slug}: no episode at {path} -- the cut joins without it")
             log(f"  cut: {problems[-1]}")
             continue
         try:
-            joined, status = _conform_for_join(path, ffmpeg, local, log)
-            bad_audio = _audio_problems(_probe_audio(joined, ffmpeg))
+            joined, status = _conform_for_join(path, log)
+            bad_audio = _audio_problems(_probe_audio_farm(joined))
         except Exception as exc:
             problems.append(
                 f"{slug}: {path.name} could not be probed or conformed "
@@ -1570,14 +1898,14 @@ def build_cut(manifest_path=None, local=False, ffmpeg=None, log=print):
     if not joinable:
         raise RuntimeError(
             "no episode is present and decodable -- there is nothing to join")
-    out = concat_episodes(manifest, ffmpeg=ffmpeg,
+    out = concat_episodes(manifest, out_path=full_cut_rough_path(manifest),
                           paths=[p for _c, p in joinable])
     log(f"  full cut: {out} ({len(joinable)} of "
         f"{len(manifest['chapters'])} episodes)")
     expected = sum(episode_expected_duration(manifest, c)
                    for c, _p in joinable)
-    cut_problems = _probe_delivery_streams(out, expected, ffmpeg,
-                                           CUT_TOLERANCE_S)
+    cut_problems = _probe_delivery_streams_farm(out, expected,
+                                                CUT_TOLERANCE_S)
     for problem in cut_problems:
         log(f"  verify: {problem}")
     problems.extend(cut_problems)
@@ -1587,28 +1915,13 @@ def build_cut(manifest_path=None, local=False, ffmpeg=None, log=print):
 # --- verification ---------------------------------------------------------------------
 
 
-def _probe_duration(path, ffmpeg):
-    ffprobe = conform.ffprobe_for(ffmpeg)
-    out = subprocess.run(
-        [*ffprobe, "-v", "error", "-show_entries", "format=duration",
-         "-of", "csv=p=0", str(path)],
-        capture_output=True, text=True, check=True)
-    text = out.stdout.strip()
-    if not text:
-        raise RuntimeError(f"ffprobe reported no duration for {path}")
-    return float(text)
-
-
-def _probe_audio(path, ffmpeg):
-    ffprobe = conform.ffprobe_for(ffmpeg)
-    out = subprocess.run(
-        [*ffprobe, "-v", "error", "-select_streams", "a:0",
-         "-show_entries", "stream=codec_name,sample_rate,channels,"
-         "channel_layout",
-         "-of", "json", str(path)],
-        capture_output=True, text=True, check=True)
-    streams = json.loads(out.stdout).get("streams") or []
-    return streams[0] if streams else {}
+def _probe_audio_farm(path):
+    """The first audio stream's delivery-relevant props, probed ON the farm
+    (the join stream-copies sound, so this check gates it)."""
+    _duration, _video, audio = _facts_from_probe_doc(
+        _probe_streams_farm(path, label=f"Hive audio probe "
+                                        f"{Path(path).name}"))
+    return audio
 
 
 def _fps_is_delivery(reported):
@@ -1645,8 +1958,8 @@ def _fps_with_delivery_rounding(props):
     agree; otherwise the measured props are returned UNCHANGED, so a real
     mismatch is reported at its own measured value, never laundered. Both
     the join probe (`_conform_for_join`) and the delivery report
-    (`_probe_delivery_streams`) go through here, so the two can never drift
-    apart."""
+    (`_delivery_stream_problems`) go through here, so the two can never
+    drift apart."""
     if _fps_is_delivery(props.get("avg_frame_rate")):
         return dict(props, avg_frame_rate=conform.DELIVERY.fps), True
     return props, False
@@ -1670,8 +1983,11 @@ def _audio_problems(audio):
     return bad
 
 
-def _probe_delivery_streams(path, expected, ffmpeg, tolerance):
+def _delivery_stream_problems(name, duration, video, audio, expected,
+                              tolerance):
     """The problems a delivered file has, as a list -- empty means verified.
+    Pure: the facts arrive already probed (on the farm, for Hive), and this
+    judges them.
 
     The stream checks ARE `conform.mismatches`: pixel format, color,
     profile and level ride along with codec/size/rate because the full cut
@@ -1682,49 +1998,117 @@ def _probe_delivery_streams(path, expected, ffmpeg, tolerance):
     logs the problems and ships anyway (AGENTS.md: nothing blocks a
     release)."""
     problems = []
+    if abs(duration - expected) > tolerance:
+        problems.append(
+            f"{name}: duration {duration:.3f}s is "
+            f"{duration - expected:+.3f}s from the expected "
+            f"{expected:.3f}s (tolerance {tolerance}s)")
+    video, fps_ok = _fps_with_delivery_rounding(video)
+    for bad in conform.mismatches(video):
+        if fps_ok and bad.startswith("frame rate"):
+            continue
+        problems.append(f"{name}: {bad}")
+    for bad in _audio_problems(audio):
+        problems.append(f"{name}: {bad}")
+    return problems
+
+
+def _probe_delivery_streams_farm(path, expected, tolerance):
+    """Delivered-file validation with the probe ON THE FARM.
+
+    The rough/final file is staged to a pod and ffprobed there; the host
+    only parses the returned JSON. An unreachable farm or an unreadable
+    probe answer is a visible problem entry -- never a local ffprobe
+    fallback, which the Hive workspace forbids."""
     path = Path(path)
     if not path.exists() or path.stat().st_size == 0:
         return [f"{path}: missing or empty"]
     try:
-        duration = _probe_duration(path, ffmpeg)
-        if abs(duration - expected) > tolerance:
-            problems.append(
-                f"{path.name}: duration {duration:.3f}s is "
-                f"{duration - expected:+.3f}s from the expected "
-                f"{expected:.3f}s (tolerance {tolerance}s)")
-        video = conform.probe_video(path, conform.ffprobe_for(ffmpeg))
-        video, fps_ok = _fps_with_delivery_rounding(video)
-        for bad in conform.mismatches(video):
-            if fps_ok and bad.startswith("frame rate"):
-                continue
-            problems.append(f"{path.name}: {bad}")
-        for bad in _audio_problems(_probe_audio(path, ffmpeg)):
-            problems.append(f"{path.name}: {bad}")
-    except (subprocess.SubprocessError, RuntimeError, KeyError) as exc:
-        problems.append(f"{path.name}: probe failed ({exc})")
-    return problems
+        doc = _probe_streams_farm(path, label=f"Hive verify {path.name}")
+    except farm.FarmError as exc:
+        return [f"{path.name}: remote validation failed ({exc}); the Hive "
+                "workspace probes on the farm, never on the host"]
+    try:
+        duration, video, audio = _facts_from_probe_doc(doc)
+    except (RuntimeError, KeyError, TypeError, ValueError) as exc:
+        return [f"{path.name}: the farm's probe could not be read ({exc})"]
+    return _delivery_stream_problems(path.name, duration, video, audio,
+                                     expected, tolerance)
 
 
-def verify_episode(manifest, number, ffmpeg=None):
-    ffmpeg = ffmpeg or render.find_ffmpeg()
+def verify_episode(manifest, number, stage="rough"):
+    """Probe one episode's file ON THE FARM. ``stage="rough"`` (the
+    default: what the build commands produce and what review watches)
+    targets the rough; ``stage="final"`` targets the promoted delivery."""
     chapter = chapter_by_number(manifest, number)
-    return _probe_delivery_streams(
-        episode_output_path(chapter), episode_expected_duration(manifest,
-                                                                chapter),
-        ffmpeg, EPISODE_TOLERANCE_S)
+    path = episode_output_path(chapter) if stage == "final" \
+        else episode_rough_path(chapter)
+    return _probe_delivery_streams_farm(
+        path, episode_expected_duration(manifest, chapter),
+        EPISODE_TOLERANCE_S)
 
 
-def verify_cut(manifest, ffmpeg=None):
-    """Twelve episodes in order, then the cut at the aggregate duration."""
-    ffmpeg = ffmpeg or render.find_ffmpeg()
+def verify_cut(manifest, stage="rough"):
+    """Twelve episodes in order, then the cut at the aggregate duration --
+    the rough assembly by default, the promoted delivery with
+    ``stage="final"``. All probing happens on the farm."""
+    cut = full_cut_path(manifest) if stage == "final" \
+        else full_cut_rough_path(manifest)
     problems = []
     for chapter in manifest["chapters"]:
         problems.extend(
-            verify_episode(manifest, chapter["number"], ffmpeg=ffmpeg))
-    problems.extend(_probe_delivery_streams(
-        full_cut_path(manifest), cut_expected_duration(manifest),
-        ffmpeg, CUT_TOLERANCE_S))
+            verify_episode(manifest, chapter["number"], stage=stage))
+    problems.extend(_probe_delivery_streams_farm(
+        cut, cut_expected_duration(manifest), CUT_TOLERANCE_S))
     return problems
+
+
+# --- promotion: the ONLY write path to the finals ---------------------------------
+
+
+def promote_episode(manifest, number, log=print):
+    """Promote one reviewed rough to its final delivery paths.
+
+    This is the ONLY boundary that writes the top-level `s01eNN-<slug>.mp4`
+    and its `-thumbnail.jpg`, and it is a pure file copy -- no media work,
+    no re-encode -- run by a human after local approval of the rough. A
+    released episode always carries its paired thumbnail, so a missing
+    rough (or missing rough thumbnail) refuses rather than releasing an
+    incomplete pair. Nothing calls this automatically."""
+    chapter = chapter_by_number(manifest, number)
+    rough = episode_rough_path(chapter)
+    if not rough.exists() or rough.stat().st_size == 0:
+        raise FileNotFoundError(
+            f"no reviewed rough at {rough} -- build and approve it first")
+    rough_thumb = thumbnail_rough_path(chapter)
+    if not rough_thumb.exists() or rough_thumb.stat().st_size == 0:
+        raise FileNotFoundError(
+            f"no rough thumbnail at {rough_thumb} -- a released episode "
+            "always carries its thumbnail")
+    final = episode_output_path(chapter)
+    final_thumb = thumbnail_output_path(chapter)
+    final.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(rough, final)
+    shutil.copy2(rough_thumb, final_thumb)
+    log(f"  promoted: {final}")
+    log(f"  promoted: {final_thumb}")
+    return final
+
+
+def promote_cut(manifest, log=print):
+    """Promote the reviewed season assembly to `season-01-full.mp4`.
+
+    Same boundary rule as `promote_episode`: a pure copy of the approved
+    rough cut, refusing when no rough cut exists."""
+    rough = full_cut_rough_path(manifest)
+    if not rough.exists() or rough.stat().st_size == 0:
+        raise FileNotFoundError(
+            f"no reviewed rough cut at {rough} -- build and approve it "
+            "first")
+    final = full_cut_path(manifest)
+    shutil.copy2(rough, final)
+    log(f"  promoted: {final}")
+    return final
 
 
 # --- Task 4: weekly contributor recognition ---------------------------------
@@ -2269,7 +2653,7 @@ def _report_verify(problems, log=print):
 
 
 def _cmd_build(args):
-    out = build_episode(MANIFEST, args.number, local=args.local)
+    out = build_episode(MANIFEST, args.number)
     problems = verify_episode(load_manifest(), args.number)
     print(f"episode {args.number}: {out}")
     return _report_verify(problems)
@@ -2277,7 +2661,7 @@ def _cmd_build(args):
 
 def _cmd_build_all(args):
     manifest = load_manifest()
-    build_all(MANIFEST, local=args.local)
+    build_all(MANIFEST)
     problems = []
     for chapter in manifest["chapters"]:
         problems.extend(verify_episode(manifest, chapter["number"]))
@@ -2285,18 +2669,32 @@ def _cmd_build_all(args):
 
 
 def _cmd_cut(args):
-    """The full-season cut, through the one interface that owns it. The cut
-    always ships; the exit code is the report's cleanliness."""
-    out, problems = build_cut(MANIFEST, local=args.local)
+    """The full-season rough cut, through the one interface that owns it.
+    The cut always ships; the exit code is the report's cleanliness."""
+    out, problems = build_cut(MANIFEST)
     print(f"full cut: {out}")
     return _report_verify(problems)
 
 
 def _cmd_verify(args):
     manifest = load_manifest()
+    stage = "final" if args.final else "rough"
     if args.number is not None:
-        return _report_verify(verify_episode(manifest, args.number))
-    return _report_verify(verify_cut(manifest))
+        return _report_verify(verify_episode(manifest, args.number,
+                                             stage=stage))
+    return _report_verify(verify_cut(manifest, stage=stage))
+
+
+def _cmd_promote(args):
+    final = promote_episode(load_manifest(), args.number)
+    print(f"promoted episode {args.number}: {final}")
+    return 0
+
+
+def _cmd_promote_cut(args):
+    final = promote_cut(load_manifest())
+    print(f"promoted cut: {final}")
+    return 0
 
 
 def _recognition_runner(args):
@@ -2366,20 +2764,28 @@ def main(argv=None):
     sub.add_parser("check", help="validate the season manifest")
     sub.add_parser("cards", help="render the committed cards (CTA + slides)")
     sub.add_parser("fetch-avatars", help="warm the avatar cache for the cast")
-    build = sub.add_parser("build", help="build one episode (farm-first)")
+    build = sub.add_parser(
+        "build", help="build one episode's ROUGH (farm only; the Hive "
+                      "workspace never encodes locally)")
     build.add_argument("number", type=int)
-    build.add_argument("--local", action="store_true",
-                       help="encode here, memory-capped, instead of the farm")
     build_all_p = sub.add_parser(
-        "build-all", help="build and verify all twelve episodes")
-    build_all_p.add_argument("--local", action="store_true")
+        "build-all", help="build and verify all twelve episode roughs "
+                          "(farm only)")
     cut = sub.add_parser(
-        "cut", help="build, verify, and join the episodes into the full cut")
-    cut.add_argument("--local", action="store_true",
-                     help="encode here, memory-capped, instead of the farm")
+        "cut", help="build, verify, and join the roughs into the "
+                    "full-season ROUGH cut (farm only)")
     verify = sub.add_parser(
-        "verify", help="probe the delivered files (one episode, or all+cut)")
+        "verify", help="probe the rough files (one episode, or all+cut)")
     verify.add_argument("number", type=int, nargs="?", default=None)
+    verify.add_argument("--final", action="store_true",
+                        help="probe the promoted finals instead of the "
+                             "roughs")
+    promote = sub.add_parser(
+        "promote", help="copy an APPROVED rough episode+thumbnail to the "
+                        "final delivery paths (the only write to finals)")
+    promote.add_argument("number", type=int)
+    sub.add_parser("promote-cut", help="copy the APPROVED rough season cut "
+                                       "to season-01-full.mp4")
     contributors = sub.add_parser(
         "contributors", help="print this window's candidate evidence "
                              "(reads only, no writes)")
@@ -2409,6 +2815,8 @@ def main(argv=None):
         "build-all": _cmd_build_all,
         "cut": _cmd_cut,
         "verify": _cmd_verify,
+        "promote": _cmd_promote,
+        "promote-cut": _cmd_promote_cut,
         "contributors": _cmd_contributors,
         "select-next": _cmd_select_next,
         "status": _cmd_status,

@@ -19,10 +19,12 @@ on:
   push:
     branches: [main]
     paths:
-      # The files that decide which logins exist: the act VIII credits and
-      # the Season of the Blueberries record (fixed cast + weekly dossiers).
+      # The files that decide which logins exist: the act VIII credits, the
+      # Season of the Blueberries record (fixed cast + weekly dossiers) and
+      # its Expansion Pack authoring pass (identity-proven chat speakers).
       - stories/08-credits.json
       - stories/standalone/season-of-the-blueberries.json
+      - stories/standalone/authoring/season-of-the-blueberries/**
       - vocab/casting.yaml
       - tools/avatars.py
 
@@ -57,7 +59,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: renders/avatars
-          key: avatars-v1-${{ hashFiles('stories/08-credits.json', 'stories/standalone/season-of-the-blueberries.json', 'vocab/casting.yaml') }}
+          key: avatars-v1-${{ hashFiles('stories/08-credits.json', 'stories/standalone/season-of-the-blueberries.json', 'stories/standalone/authoring/season-of-the-blueberries/**', 'vocab/casting.yaml') }}
           restore-keys: |
             avatars-v1-
 

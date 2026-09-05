@@ -467,3 +467,48 @@ def test_the_chunked_path_stages_a_glob_free_name(monkeypatch):
     assert local == src
     assert rel == "in/Beauty Of The Beast _X3WrCzLIIvk_.webm"
     assert not re.search(r"[\[\]*?]", rel)
+
+
+# --------------------------------------------------------------------------
+# The pod's done.json: a REAL JSON number or null, and strict normalization
+
+def test_pod_scripts_emit_duration_as_json_number_or_null(tmp_path):
+    """The actual pod output shape: run the script's real printf line with
+    and without a measured duration. The old line wrapped `${dur:-null}` in
+    quotes, yielding the STRING "null" -- which json.loads accepts and
+    float() then rejects with an unhandled ValueError downstream."""
+    import shlex
+    import subprocess
+
+    script = farm.pod_script_run(
+        ["ffmpeg", "-i", "/work/in/x", "-y", "/work/out/o.mp4"],
+        "out/o.mp4")
+    line = next(l for l in script.splitlines()
+                if ".done.json" in l and "printf" in l)
+    # Shell-double-quoted so ${dur:-null} EXPANDS (a single-quoted
+    # '${dur:-null}' would reach the JSON literally); the expansion itself
+    # carries no JSON string quotes, so the value lands as a number or null.
+    assert '"${dur:-null}"' in line
+    assert "'${dur:-null}'" not in line
+    (tmp_path / "out").mkdir()
+    for dur, expected in (("162.03", 162.03), ("", None)):
+        (tmp_path / "out" / ".done.json").unlink(missing_ok=True)
+        subprocess.run(
+            ["bash", "-c", f"dur={shlex.quote(dur)}; {line}"],
+            check=True, cwd=tmp_path, capture_output=True)
+        doc = json.loads((tmp_path / "out" / ".done.json").read_text())
+        assert doc["duration"] == expected  # a float, or real JSON null
+
+
+def test_verify_fetched_on_farm_normalizes_any_non_number_to_farm_error():
+    """Strict normalization: a missing key, JSON null, the legacy string
+    "null", or garbage are all FarmError -- never an unhandled ValueError,
+    never a host-side probe."""
+    for bad in (None, {}, {"duration": None}, {"duration": "null"},
+                {"duration": "162.0"}, {"duration": "abc"},
+                {"duration": True}):
+        with pytest.raises(farm.FarmError, match="never probed"):
+            farm._verify_fetched_on_farm("o.mp4", None, bad, label="t")
+    facts = farm._verify_fetched_on_farm("o.mp4", None,
+                                         {"duration": 162}, label="t")
+    assert facts["duration"] == 162
