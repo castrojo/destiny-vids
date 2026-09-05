@@ -693,11 +693,11 @@ def declared_avatar_logins(manifest, authoring_dir=None):
     logins = [member["github_login"] for member in manifest["fixed_cast"]]
     seen = {login.lower() for login in logins}
     for chapter in manifest["chapters"]:
-        chats, _lore, _unresolved, _gaps = hive_authoring.plan_authoring(
+        chats, cards, _lore, _unresolved, _gaps = hive_authoring.plan_authoring(
             hive_authoring.load_chapter_authoring(
                 authoring_dir or AUTHORING_DIR, chapter),
             manifest, chapter)
-        for spec in chats:
+        for spec in [*chats, *cards]:
             avatar = spec.get("avatar")
             if not avatar:
                 continue
@@ -995,7 +995,7 @@ def episode_plan(manifest, number):
     # position, same absolute source mark, same lines) is rendered by the
     # manifest's overlay record, so the duplicate authoring cue is covered,
     # not double-drawn.
-    chats, authoring_lore, authoring_unresolved, protected_gaps = \
+    chats, authoring_cards, authoring_lore, authoring_unresolved, protected_gaps = \
         hive_authoring.plan_authoring(
             hive_authoring.load_chapter_authoring(AUTHORING_DIR, chapter),
             manifest, chapter)
@@ -1027,6 +1027,7 @@ def episode_plan(manifest, number):
         "segments": episode_segments(manifest, chapter),
         "plates": plates,
         "chats": chats,
+        "cards": authoring_cards,
         "overlays": overlays,
         "protected_gaps": protected_gaps,
         "unresolved": unresolved,
@@ -1179,9 +1180,8 @@ def render_dossier_safely(snapshot, face=None):
 
 def _plan_overlay_descriptors(plan):
     """The overlay/plate descriptor list AS PLANNED, in render order: fixed
-    plates first, then the authoring pass's chat pills, then project-lore
-    overlays. The fixed cast stays ahead of the authoring overlays in the
-    encoded overlay order.
+    plates, authoring cards, authoring chat pills, then project-lore overlays.
+    The fixed cast stays ahead of the authoring overlays in the encoded order.
 
     This is only the PLAN's view -- what the season manifest asks for.
     `_render_overlay_pngs` walks this same order but may PRUNE it (an
@@ -1194,6 +1194,7 @@ def _plan_overlay_descriptors(plan):
     computed before rendering) the same default derivation, so it never
     has to duplicate the zip-order rule."""
     return [dict(p, overlay_kind="plate") for p in plan["plates"]] + \
+        [dict(c, overlay_kind="card") for c in plan.get("cards", [])] + \
         [dict(c, overlay_kind="chat") for c in plan.get("chats", [])] + \
         [dict(o, overlay_kind="lore") for o in plan["overlays"]]
 
@@ -1515,8 +1516,8 @@ def episode_input_digest(plan, staged, overlays=None, source=None):
         payload_spec = {k: v for k, v in spec.items() if k != "overlay_kind"}
         # Every spec field but the renderer tag is hashed, so an authoring
         # Copy or Next line edit is a digest change and forces a rebuild.
-        note({"plate": "plate", "chat": "chat"}.get(spec["overlay_kind"],
-                                                    "overlay"),
+        note({"plate": "plate", "card": "card", "chat": "chat"}.get(
+            spec["overlay_kind"], "overlay"),
              payload_spec)
     note("offsets", {"front_offset": plan["front_offset"],
                      "expected_duration": plan["expected_duration"]})
@@ -1602,6 +1603,7 @@ def _render_overlay_pngs(plan, picture_info, work_dir, slug, unresolved,
             for item in descriptors)
         return overlay_pngs, rendered
     drawable = [dict(spec, overlay_kind="plate") for spec in plan["plates"]] + \
+        [dict(spec, overlay_kind="card") for spec in plan.get("cards", [])] + \
         [dict(spec, overlay_kind="chat") for spec in plan.get("chats", [])]
     if drawable:
         plates_dir = Path(work_dir) / f"{slug}-plates"
@@ -1618,7 +1620,7 @@ def _render_overlay_pngs(plan, picture_info, work_dir, slug, unresolved,
             # An identity-proven chat speaker whose cached face is absent
             # renders plate.py's drawn crest -- degrade, never block -- but
             # the gap is a punch-list item, not silence.
-            if spec["overlay_kind"] == "chat" and spec.get("avatar"):
+            if spec["overlay_kind"] in ("chat", "card") and spec.get("avatar"):
                 if not _cached_avatar_present(spec["avatar"]):
                     unresolved.append({
                         "id": spec["id"],

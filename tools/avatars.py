@@ -302,11 +302,11 @@ def season_avatar_logins(path=None):
             try:
                 entries = hive_authoring.load_chapter_authoring(
                     hive_authoring.AUTHORING_DIR, chapter)
-                chats, _lore, _unresolved, _gaps = \
+                chats, cards, _lore, _unresolved, _gaps = \
                     hive_authoring.plan_authoring(entries, data, chapter)
             except hive_authoring.AuthoringError:
                 continue
-            logins.extend(Path(spec["avatar"]).stem for spec in chats
+            logins.extend(Path(spec["avatar"]).stem for spec in [*chats, *cards]
                           if spec.get("avatar"))
     except ImportError:
         pass

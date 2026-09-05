@@ -14,10 +14,10 @@ grammar, exactly as the files carry it:
     - Direction: Owner-authored two-line Cortney cue. ...
 
 One ``##`` heading per cue: an absolute source timecode (``MM:SS.ss`` in the
-season's one source), an em-dash, and the cue's backticked slug. The four
-bullets are the whole field vocabulary; ``Next line`` and ``Direction`` are
-optional. Everything else in the file -- the title, the preamble, owner
-comments -- is prose and never becomes a card.
+season's one source), an em-dash, and the cue's backticked slug. The five
+bullets are the whole field vocabulary; ``Next line``, ``Duration``, and
+``Direction`` are optional. Everything else in the file -- the title, the
+preamble, owner comments -- is prose and never becomes a card.
 
 THE COPY IS SACROSANCT. ``Copy`` and ``Next line`` values are preserved
 VERBATIM: spelling, punctuation, capitalization, backticks and ``_emphasis_``
@@ -42,6 +42,15 @@ faithfully:
   plate.py's standard no-photo crest -- an avatar is never invented. A
   ``chat-owner-speaker`` cue whose Direction declares ``speaker label is
   exactly `X```` uses exactly ``X`` and stays avatarless, as directed.
+* ``chat-profile-<speaker>`` -- an explicitly identity-backed chat. The
+  verified GitHub login remains its visible speaker label and supplies its
+  cached profile image.
+* ``gold-plate-<speaker>`` -- a real person's established Guardian plate in
+  the existing gold ``leader`` chrome. Its ``Copy`` is the owner-authored
+  title override for this video only.
+* ``miniboss`` -- plate.py's red Destiny miniboss bar. It requires a positive
+  ``Duration`` because a finite visual treatment must never receive a guessed
+  hold.
 * ``top-third`` / ``bottom-right`` -- the project-lore lanes hive_series
   already renders; ``Copy`` plus an optional ``Next line`` become the card's
   verbatim lines.
@@ -98,7 +107,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from tools import readtime
+from tools import identity, readtime
 from tools.plate import MIN_HOLD, TAIL_OUT
 
 # --- the grammar --------------------------------------------------------------
@@ -109,7 +118,8 @@ _ENTRY_HEADING = re.compile(
 # A `##` line that opens with a timecode but missed the full grammar is a
 # RECOGNIZED entry gone malformed -- a loud failure, not prose.
 _TIMECODEISH_HEADING = re.compile(r"^##\s*\d+:\d+")
-_FIELD = re.compile(r"^-\s+(Placement|Copy|Next line|Direction):\s*(.*?)\s*$")
+_FIELD = re.compile(
+    r"^-\s+(Placement|Copy|Next line|Duration|Direction):\s*(.*?)\s*$")
 
 # The one Direction directive this parser acts on: an explicit speaker label,
 # e.g. "Owner-authored speaker label is exactly `CVS Health`; do not infer a
@@ -192,6 +202,7 @@ def parse_authoring(text, source_name="<authoring>"):
                 "placement": None,
                 "copy": None,
                 "next_line": None,
+                "duration": None,
                 "direction": None,
                 "line": lineno,
             }
@@ -208,11 +219,23 @@ def parse_authoring(text, source_name="<authoring>"):
         if field and current is not None:
             key, value = field.groups()
             slot = {"Placement": "placement", "Copy": "copy",
-                    "Next line": "next_line", "Direction": "direction"}[key]
+                    "Next line": "next_line", "Duration": "duration",
+                    "Direction": "direction"}[key]
             if current[slot] is not None:
                 raise AuthoringError(
                     f"{source_name}:{lineno}: entry `{current['slug']}` "
                     f"repeats `- {key}:`")
+            if slot == "duration":
+                try:
+                    value = float(value)
+                except ValueError as exc:
+                    raise AuthoringError(
+                        f"{source_name}:{lineno}: entry `{current['slug']}` "
+                        f"has an invalid Duration {value!r}") from exc
+                if value <= 0:
+                    raise AuthoringError(
+                        f"{source_name}:{lineno}: entry `{current['slug']}` "
+                        "has a non-positive Duration")
             current[slot] = _unquote(value) if slot == "placement" else value
         # Anything else is prose and is ignored.
     close()
@@ -257,7 +280,7 @@ def _identity_records(manifest):
             login = candidate.get("login")
             if login:
                 ledger.setdefault(login.lower(), login)
-    return fixed, ledger
+    return fixed, ledger, identity.load_people()
 
 
 def _unsupported_reason(placement):
@@ -303,14 +326,53 @@ def _unsupported_reason(placement):
             "never rendered with an invented treatment")
 
 
-def _classify(entry, fixed, ledger):
-    """One cue -> ("chat", speaker, avatar_or_none) | ("lore",) |
-    ("unresolved", reason). Classification looks at the placement and the
-    season's identity records only; copy is never inspected to decide what
-    a cue IS."""
+def _classify(entry, fixed, ledger, people):
+    """One cue -> chat, card, lore, or precise unresolved record."""
     placement = entry["placement"]
     if placement in ("top-third", "bottom-right"):
         return ("lore",)
+    if placement == "miniboss":
+        if entry["duration"] is None:
+            return ("unresolved",
+                    "placement 'miniboss' requires an explicit Duration; "
+                    "its finite visual hold is never guessed")
+        return ("card", {
+            "kind": "miniboss",
+            "name": entry["copy"],
+            "position": "boss",
+            "dur": entry["duration"],
+        })
+    gold = re.fullmatch(r"gold-plate-(.+)", placement)
+    if gold:
+        try:
+            canonical = identity.canonical_login(gold.group(1), people)
+        except identity.UnknownPerson:
+            return ("unresolved",
+                    f"placement {placement!r} names no verified GitHub "
+                    "identity; a person is never guessed")
+        person = people[canonical]
+        plate = dict(person.plate or {})
+        missing = [field for field in ("label", "name", "title")
+                   if not plate.get(field)]
+        if missing:
+            return ("unresolved",
+                    f"placement {placement!r} has incomplete established "
+                    "plate copy: missing " + ", ".join(missing))
+        plate["title"] = entry["copy"]
+        plate["variant"] = "leader"
+        plate["position"] = "left"
+        plate["dur"] = entry["duration"] or 4.0
+        plate["avatar"] = f"renders/avatars/{canonical}.png"
+        return ("card", plate)
+    profile = re.fullmatch(r"chat-profile-(.+)", placement)
+    if profile:
+        try:
+            canonical = identity.canonical_login(profile.group(1), people)
+        except identity.UnknownPerson:
+            return ("unresolved",
+                    f"placement {placement!r} names no verified GitHub "
+                    "identity; a profile image is never guessed")
+        return ("chat", canonical, f"renders/avatars/{canonical}.png")
     if placement == "chat-sequence-start":
         return ("unresolved",
                 "placement 'chat-sequence-start' marks the start of the "
@@ -432,7 +494,8 @@ def _sequence_anchor_group(items):
     one speaker's lines internally ordered by their speaker-scoped numbers
     and "follows/after" lines moved behind the speaker they follow.
     """
-    marks = [_sequence_markers(item[1].get("direction"), item[2]["speaker"])
+    marks = [_sequence_markers(item[1].get("direction"),
+                               item[2].get("speaker", ""))
              for item in items]
     order = list(range(len(items)))
 
@@ -441,7 +504,7 @@ def _sequence_anchor_group(items):
     # the document positions that speaker occupies.
     positions_by_speaker = {}
     for pos in order:
-        positions_by_speaker.setdefault(items[pos][2]["speaker"], []) \
+        positions_by_speaker.setdefault(items[pos][2].get("speaker", ""), []) \
             .append(pos)
     for positions in positions_by_speaker.values():
         keyed = sorted(
@@ -481,7 +544,8 @@ def _sequence_anchor_group(items):
         if dep is None:
             continue
         targets = [q for q in result
-                   if q != pos and _same_speaker(dep, items[q][2]["speaker"])]
+                   if q != pos and _same_speaker(
+                       dep, items[q][2].get("speaker", ""))]
         if not targets:
             continue  # no usable cue here: document order stands
         here, last = result.index(pos), max(result.index(q) for q in targets)
@@ -496,11 +560,13 @@ def _sequence_anchor_group(items):
 def plan_authoring(entries, manifest, chapter):
     """Classify and seat one chapter's authoring cues.
 
-    Returns ``(chats, lore, unresolved, protected_gaps)``:
+    Returns ``(chats, cards, lore, unresolved, protected_gaps)``:
 
-    * ``chats`` -- plate.py-ready ``kind: chat`` specs in scheduled order,
-      with ``at``/``dur`` in chapter-relative seconds and the authored
-      absolute anchor preserved untouched in ``source_at``;
+    * ``chats`` -- plate.py-ready ``kind: chat`` specs in scheduled order;
+    * ``cards`` -- explicitly supported non-chat plate.py specs in scheduled
+      order;
+      Both carry ``at``/``dur`` in chapter-relative seconds and preserve the
+      authored absolute anchor untouched in ``source_at``;
     * ``lore`` -- verbatim project-lore overlays (``id``, ``lines``,
       ``position``, ``source_at``) for the supported lore lanes, left in
       source time for the caller's overlay clamp;
@@ -516,8 +582,8 @@ def plan_authoring(entries, manifest, chapter):
     recorded, never overlapped or retimed.
     """
     start, end = float(chapter["start"]), float(chapter["end"])
-    fixed, ledger = _identity_records(manifest)
-    chats_pending = []  # (source_at, doc position, entry, spec)
+    fixed, ledger, people = _identity_records(manifest)
+    scheduled_pending = []  # (source_at, doc position, entry, spec)
     lore = []
     unresolved = []
 
@@ -546,7 +612,7 @@ def plan_authoring(entries, manifest, chapter):
                           "never seated by a guess",
             })
             continue
-        verdict = _classify(entry, fixed, ledger)
+        verdict = _classify(entry, fixed, ledger, people)
         if verdict[0] == "unresolved":
             unresolved.append({"id": slug, "reason": verdict[1]})
             continue
@@ -557,6 +623,18 @@ def plan_authoring(entries, manifest, chapter):
             lore.append({"id": slug, "lines": lines,
                          "position": entry["placement"],
                          "source_at": entry["source_at"]})
+            continue
+        if verdict[0] == "card":
+            spec = dict(verdict[1])
+            spec.update({
+                "id": slug,
+                "source_at": entry["source_at"],
+                "copy_source": "owner_authored",
+                "why": f"Owner-authored Expansion Pack cue `{slug}` "
+                       f"({entry['placement']}) at absolute source "
+                       f"{entry['source_at']:g}s.",
+            })
+            scheduled_pending.append((entry["source_at"], index, entry, spec))
             continue
         _kind, speaker, avatar = verdict
         for line_index, text in enumerate(
@@ -579,13 +657,14 @@ def plan_authoring(entries, manifest, chapter):
                 spec["avatar"] = avatar
             # A Next line rides immediately after its Copy: it shares the
             # entry's sequence position with a sub-index.
-            chats_pending.append((entry["source_at"],
-                                  index + line_index / 10.0, entry, spec))
+            scheduled_pending.append(
+                (entry["source_at"], index + line_index / 10.0,
+                 entry, spec))
 
     # Source order across anchors; within one anchor, the owner's explicit
     # sequence markers decide (document order when there are none).
     groups = {}
-    for item in chats_pending:
+    for item in scheduled_pending:
         groups.setdefault(item[0], []).append(item)
     ordered = []
     for anchor in sorted(groups):
@@ -598,10 +677,12 @@ def plan_authoring(entries, manifest, chapter):
     # unsupported cue constrains nothing (it never draws), so it must not
     # drop valid chats as a phantom boundary.
     anchors = sorted(groups)
-    chats = []
+    chats, cards = [], []
     cursor = None  # previous pill's end + TAIL_OUT, in source seconds
     for source_at, _entry, spec in ordered:
-        hold = readtime.required_hold(spec["text"])
+        hold = (float(spec["dur"]) if "dur" in spec
+                else readtime.required_hold(spec["text"]))
+        tail_out = TAIL_OUT if spec.get("kind") == "chat" else 0.0
         seat = source_at if cursor is None else max(source_at, cursor)
         # A protected gap is a hard no-draw window: the pill must clear it
         # entirely (tail gap included) or start after it ends. A pill that
@@ -609,7 +690,7 @@ def plan_authoring(entries, manifest, chapter):
         # protected beat.
         covering = next(
             ((g0, g1) for g0, g1 in protected
-             if not (seat + hold + TAIL_OUT <= g0 + _EPS
+             if not (seat + hold + tail_out <= g0 + _EPS
                      or seat >= g1 - _EPS)),
             None)
         if covering is not None:
@@ -627,9 +708,9 @@ def plan_authoring(entries, manifest, chapter):
             # The next pinned cue still lands exactly on its anchor: this
             # pill's hold AND the tail gap must clear it.
             boundary = later[0]
-            fits = seat + hold + TAIL_OUT <= boundary + _EPS
+            fits = seat + hold + tail_out <= boundary + _EPS
             boundary_text = f"the next owner anchor at {boundary:g}s"
-            need = seat + hold + TAIL_OUT
+            need = seat + hold + tail_out
         else:
             # The last cue owes no tail: the cut to the next segment is the
             # clearing, so only the hold must fit the chapter window.
@@ -648,9 +729,9 @@ def plan_authoring(entries, manifest, chapter):
             continue
         spec["at"] = round(seat - start, 3)
         spec["dur"] = round(hold, 3)
-        chats.append(spec)
-        cursor = seat + hold + TAIL_OUT
+        (chats if spec.get("kind") == "chat" else cards).append(spec)
+        cursor = seat + hold + tail_out
 
-    return (chats, lore, unresolved,
+    return (chats, cards, lore, unresolved,
             [(round(g0 - start, 3), round(g1 - start, 3))
              for g0, g1 in protected])

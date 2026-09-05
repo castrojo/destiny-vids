@@ -573,15 +573,19 @@ def test_resolve_face_returns_none_for_a_login_with_no_cached_face(tmp_path, mon
 
 
 def test_declared_avatar_logins_are_the_fixed_cast(manifest):
-    """The warmed set is the fixed cast plus the authoring-pass chat
-    speakers whose identity the season's own records prove -- castrojo is a
-    contributor-ledger candidate and authors chat cues, so his face warms
-    too. Unproven handles (ahmedbehbars, ncode, ...) warm nothing."""
+    """The warmed set includes every explicitly identity-backed authoring
+    card, while unproven generic handles (ahmedbehbars, ncode, ...) warm
+    nothing."""
     assert hive_series.declared_avatar_logins(manifest) == [
         "angiejones",
         "kgamanji",
         "CortNick",
+        "mrbobbytables",
         "castrojo",
+        "jrsapi",
+        "rochaporto",
+        "jeefy",
+        "kelseyhightower",
     ]
     # The CI warming path (tools/avatars.py) covers the same speakers.
     from tools import avatars
@@ -897,8 +901,9 @@ def test_episode_filtergraph_overlay_inputs_follow_the_stills(manifest):
     # so overlay inputs start at 7.
     assert "[7:v]overlay=0:0:enable='between(t,36,40)'" in graph
     assert "[8:v]overlay=0:0:enable='between(t,60,64)'" in graph
-    assert "[9:v]overlay=0:0" in graph
-    assert "[10:v]" not in graph
+    assert "[9:v]overlay=0:0:enable='between(t,89,92)'" in graph
+    assert "[10:v]overlay=0:0:enable='between(t,113,119)'" in graph
+    assert "[11:v]" not in graph
 
 
 def test_episode_filtergraph_resamples_only_a_non_delivery_rate(manifest):
@@ -1324,10 +1329,10 @@ def test_build_episode_orchestrates_cards_encode_and_thumbnail(
     graph = argv[argv.index("-filter_complex") + 1]
     # cta, title, the three issued dossiers, chapter, closing.
     assert "concat=n=7:v=1:a=1" in graph
-    # Every staged input is a real file: source + 6 stills + 3 overlays
-    # (ikora-ch1, eris-ch1, the ship lore overlay).
+    # Every staged input is a real file: source + 6 stills + 4 overlays
+    # (ikora-ch1, eris-ch1, model chat, ship lore overlay).
     inputs = captured["inputs"]
-    assert len(inputs) == 10
+    assert len(inputs) == 11
     assert inputs[0] == fake_source.resolve()
     for path in inputs:
         assert Path(path).exists(), f"staged input missing: {path}"
@@ -1428,11 +1433,11 @@ def test_build_episode_still_encodes_when_the_source_is_undecodable(
 
     sidecar = json.loads(
         (tmp_path / "work" / "s01e01-the-enclave-unresolved.json").read_text())
-    # Both fixed-cast plates and the lore overlay are recorded as unplaced.
+    # Fixed-cast plates, the model card, and lore overlay are unplaced.
     undecodable = [item for item in sidecar
                    if "could not be decoded" in item.get("reason", "")]
     assert {item["id"] for item in undecodable} == \
-        {"ikora-ch1", "eris-ch1", "savathuns-ship"}
+        {"ikora-ch1", "eris-ch1", "enclave-model-card", "savathuns-ship"}
 
 
 def test_build_episode_still_encodes_when_one_plate_png_is_missing(
@@ -1483,14 +1488,15 @@ def test_build_episode_still_encodes_when_one_plate_png_is_missing(
 
     argv = captured["argv"]
     graph = argv[argv.index("-filter_complex") + 1]
-    # 6 stills (input 1-6), so the two SURVIVING overlays (eris, the ship
-    # lore overlay) must seat at inputs 7 and 8 -- never at the planned
-    # index 8/9 that assumed the dropped ikora plate still had an input.
+    # 6 stills (input 1-6), so the three SURVIVING overlays (eris, the model
+    # chat, ship lore) seat at inputs 7-9 -- never at a planned index that
+    # assumed the dropped ikora plate still had an input.
     assert "[7:v]overlay=0:0" in graph
     assert "[8:v]overlay=0:0" in graph
-    assert "[9:v]" not in graph
+    assert "[9:v]overlay=0:0" in graph
+    assert "[10:v]" not in graph
     inputs = captured["inputs"]
-    assert argv.count("-i") == len(inputs) == 9  # source + 6 stills + 2
+    assert argv.count("-i") == len(inputs) == 10  # source + 6 stills + 3
     for path in inputs:
         assert Path(path).exists(), f"staged input missing: {path}"
 
@@ -2817,6 +2823,60 @@ def test_authoring_parser_preserves_copy_verbatim():
     assert green["copy"] == "Ok wow ... go save me the green then."
 
 
+def test_requested_megacut_cues_keep_their_authored_treatments(manifest):
+    """Megacut clocks resolve to source anchors without inventing a new cut."""
+    plan1 = hive_series.episode_plan(manifest, 1)
+    model = next(c for c in plan1["chats"] if c["id"] == "enclave-model-card")
+    assert model == {
+        "id": "enclave-model-card",
+        "kind": "chat",
+        "speaker": "HUGGING FACE",
+        "text": "amazon/chronos-2 | 119.5M | time-series forecasting",
+        "position": "letterbox",
+        "source_at": 89.0,
+        "copy_source": "owner_authored",
+        "why": ("Owner-authored Expansion Pack cue `enclave-model-card` "
+                "(chat-owner-speaker) at absolute source 89s."),
+        "at": 89.0,
+        "dur": 3.0,
+    }
+
+    plan3 = hive_series.episode_plan(manifest, 3)
+    bob = next(c for c in plan3["cards"] if c["id"] == "bob-good-intentions")
+    assert bob["source_at"] == 287.0
+    assert bob["variant"] == "leader"
+    assert bob["name"] == "Bob Killen"
+    assert bob["title"] == "Thought she had good Intentions"
+    assert bob["avatar"] == "renders/avatars/mrbobbytables.png"
+
+    plan5 = hive_series.episode_plan(manifest, 5)
+    chats = {c["id"]: c for c in plan5["chats"]}
+    assert chats["chosen-jrsapi-observability"]["speaker"] == "jrsapi"
+    assert chats["chosen-jrsapi-observability"]["avatar"] == \
+        "renders/avatars/jrsapi.png"
+    assert chats["chosen-rochaporto-placeholder"]["speaker"] == "rochaporto"
+    assert chats["chosen-rochaporto-placeholder"]["text"] == "PLACEHOLDER"
+    qbr = next(c for c in plan5["cards"]
+               if c["id"] == "quarterly-business-review")
+    assert qbr["kind"] == "miniboss"
+    assert qbr["name"] == "QUARTERLY BUSINESS REVIEW"
+    assert qbr["position"] == "boss"
+    assert qbr["at"] == 21.0
+    assert qbr["dur"] == 13.5
+    assert [chats[c]["text"] for c in (
+        "chosen-castrojo-teardown",
+        "chosen-jeefy-bounce",
+        "chosen-mrbobbytables-placeholder",
+    )] == [
+        "When did tear down take so long?",
+        "Legit bounce the node",
+        "PLACEHOLDER",
+    ]
+    assert all(chats[c]["avatar"] == f"renders/avatars/{chats[c]['speaker']}.png"
+               for c in ("chosen-castrojo-teardown", "chosen-jeefy-bounce",
+                         "chosen-mrbobbytables-placeholder"))
+
+
 def test_authoring_parser_never_makes_cards_from_prose():
     text = """# Title
 
@@ -3163,13 +3223,13 @@ def test_owner_speaker_label_comes_only_from_the_explicit_directive():
         "direction": "Owner-authored speaker label is exactly `CVS Health`; "
                      "do not infer a GitHub identity.", "line": 1,
     }]
-    chats, _lore, unresolved, _gaps = hive_authoring.plan_authoring(
+    chats, _cards, _lore, unresolved, _gaps = hive_authoring.plan_authoring(
         entries, {"fixed_cast": [], "contributor_ledger": {}}, chapter)
     assert unresolved == []
     assert chats[0]["speaker"] == "CVS Health"
     assert "avatar" not in chats[0], "no GitHub identity, no avatar"
     entries[0]["direction"] = "No label directive here."
-    _c, _l, unresolved, _g = hive_authoring.plan_authoring(
+    _c, _cards, _l, unresolved, _g = hive_authoring.plan_authoring(
         entries, {"fixed_cast": [], "contributor_ledger": {}}, chapter)
     assert unresolved and "speaker is never invented" in \
         unresolved[0]["reason"]
