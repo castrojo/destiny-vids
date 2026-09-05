@@ -1,7 +1,7 @@
 ---
 name: production
-version: "1.3"
-last_updated: "2026-08-27"
+version: "1.4"
+last_updated: "2026-09-04"
 id: production
 one_line_purpose: Take approved video work from issue brief to delivered artifact.
 entry_point: docs/skills/production/SKILL.md
@@ -22,6 +22,7 @@ metadata:
   type: procedure
   context7-sources:
     - /addyosmani/agent-skills
+    - /websites/ffmpeg_documentation
 ---
 
 # Making videos in volume
