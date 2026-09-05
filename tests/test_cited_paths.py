@@ -2,11 +2,9 @@
 
 `tests/test_doc_links.py` checks relative *Markdown links*. It does not see a
 path cited in prose -- inside a JSON `_note`, a module docstring, a comment --
-and that is where this repo's provenance actually lives. Two records went
+and that is where this repo's provenance actually lives. One record went
 wrong exactly there:
 
-  * `videos/yt_nightwish_perfume_of_the_timeless.json` is named as THE rights
-    record for the Perfume thread by three files. It has never existed (#226).
   * `stories/megacut/scream-card.json` was named by `build_scream_card.py`'s
     docstring and by `megacut.json`'s `_what` as the source of the owner's
     verbatim copy. The builder actually reads `megacut-cards.json`.
@@ -19,6 +17,7 @@ Only paths under a KNOWN top-level directory are checked, and only ones that
 look like a file (they carry a suffix). That keeps the check to real citations
 rather than every slash-shaped string in prose.
 """
+import json
 import re
 from pathlib import Path
 
@@ -65,12 +64,6 @@ ALLOWED_MISSING = {
         "path is the --out of a corpus run, an output rather than a record",
     "docs/foo.md":
         "a fixture path inside tests/test_doc_links.py's own assertions",
-    "videos/yt_nightwish_perfume_of_the_timeless.json":
-        "#226: cited by three files and has never existed. Writing it needs "
-        "two owner rights calls (is a third-party re-upload an acceptable "
-        "picture source, and how the accepted watermark is worded), so it "
-        "is tracked as a blocked issue rather than fixed here. REMOVE THIS "
-        "ENTRY when #226 lands.",
 }
 
 # The 2026-08-19 common-documentation-alignment plan and spec named these as
@@ -118,6 +111,64 @@ def _searched_files():
 
 def _cited_text(path: Path, text: str) -> str:
     return FENCED_BLOCK.sub("", text) if path.suffix == ".md" else text
+
+
+PERFUME_RIGHTS = "music/bed_perfume_of_the_timeless.json"
+PERFUME_CITATIONS = (
+    "stories/00-perfume-thread.json",
+    "stories/00-prologue-plates.json",
+    "scripts/build_interludes.py",
+)
+PERFUME_PICTURE_PROSE = (
+    "stories/00-perfume-thread.json",
+    "scripts/build_prologue.py",
+    "scripts/build_interludes.py",
+    "stories/megacut/delivery.json",
+    "stories/megacut/megacut.json",
+)
+
+
+def test_perfume_rights_describe_the_current_picture_and_every_citation():
+    """The accepted 4K re-upload must not be described as an official upload."""
+    rights = json.loads((REPO_ROOT / PERFUME_RIGHTS).read_text(encoding="utf-8"))
+    assert rights["source_url"] == "https://www.youtube.com/watch?v=O0lyFqLr3Cc"
+    assert rights["usage_class"] == "third_party_copyrighted"
+    for fact in (
+        "third-party",
+        "3840x1608",
+        "Nightwish. ://: Arena.",
+        "original measured audio stream",
+        "non-commercial",
+    ):
+        assert fact.casefold() in rights["source_rights_note"].casefold()
+
+    missing = "videos/yt_nightwish_perfume_of_the_timeless.json"
+    assert missing not in ALLOWED_MISSING
+    for rel in PERFUME_CITATIONS:
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        assert PERFUME_RIGHTS in text, rel
+        assert missing not in text, rel
+
+    for rel in PERFUME_PICTURE_PROSE:
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        assert "O0lyFqLr3Cc" in text, rel
+        assert "official 'Perfume Of The Timeless' music video" not in text, rel
+
+
+def test_accepted_antesion_provenance_is_limited_to_that_record():
+    antesion = json.loads((
+        REPO_ROOT / "videos" / "yt_all_cinematic_trailers_destiny.json"
+    ).read_text(encoding="utf-8"))
+    note = antesion["source_rights_note"].casefold()
+    assert "accepted" in note
+    assert "non-commercial" in note
+    assert "limited" in note
+    assert "brutal draconis" in note
+
+    brutal = json.loads((
+        REPO_ROOT / "videos" / "yt_destiny_all_live_action_trailers.json"
+    ).read_text(encoding="utf-8"))
+    assert "does not extend" in brutal["source_rights_note"].casefold()
 
 
 @pytest.mark.parametrize("path", _searched_files(),

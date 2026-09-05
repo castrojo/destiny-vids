@@ -167,7 +167,7 @@ to: [`skills/audio/SKILL.md`](skills/audio/SKILL.md).
 ## What is still open
 
 Tracked as issues, not as prose here, so this file cannot go stale behind them:
-[the open backlog](https://github.com/castrojo/destiny-vids/issues). The ones
-that block *the feature* rather than an act are the provenance question
-([#55](https://github.com/castrojo/destiny-vids/issues/55)) and act VI's
-lossless bed ([#58](https://github.com/castrojo/destiny-vids/issues/58)).
+[the open backlog](https://github.com/castrojo/destiny-vids/issues). The
+Antesion provenance decision is recorded in
+[#55](https://github.com/castrojo/destiny-vids/issues/55); it is accepted for
+the current non-commercial film and is not an open feature blocker.
