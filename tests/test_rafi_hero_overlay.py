@@ -24,6 +24,16 @@ REPO = Path(__file__).resolve().parents[1]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
+# This whole module draws and then DECODES, so it needs the frame-touching
+# extras: segno lays the modules out, numpy carries the brushed plate, and
+# OpenCV is the decode gate itself. The CI runner installs only jsonschema,
+# pyyaml, pytest and pillow, and AGENTS.md is explicit that optional extras
+# skip rather than fail -- an import error here took the whole suite down at
+# collection, which is the one thing a gate must never do.
+pytest.importorskip("segno", reason="QR layout is a frame-touching extra")
+pytest.importorskip("numpy", reason="QR layout is a frame-touching extra")
+pytest.importorskip("cv2", reason="the decode gate needs OpenCV")
+
 from scripts import build_rafi_hero_overlay as overlay  # noqa: E402
 from scripts import qrcard as qr  # noqa: E402
 
