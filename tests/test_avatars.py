@@ -132,6 +132,22 @@ def test_a_jpeg_response_is_normalized_to_real_png_bytes(cache):
         assert image.format == "PNG"
         assert image.size == (256, 256)
 
+
+def test_a_mislabeled_jpeg_cache_entry_is_refetched(cache):
+    (cache / "ada.png").write_bytes(image_bytes("JPEG"))
+    clock = Clock()
+    opener = Opener(Response(PNG, {"ETag": '"png"'}))
+
+    outcome = A.fetch_one(
+        "ada", {"ada": {"status": "have", "etag": '"jpeg"'}},
+        budget(clock), opener=opener)
+
+    assert outcome == "fetched"
+    assert opener.requests[0].get_header("If-none-match") is None
+    with Image.open(cache / "ada.png") as image:
+        assert image.format == "PNG"
+
+
 def test_a_truncated_download_is_not_written_over_nothing(cache):
     """Half a PNG is not a face; the renderer's ring is the better answer."""
     clock = Clock()

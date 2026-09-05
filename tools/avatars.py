@@ -113,9 +113,15 @@ def save_index(index):
 
 
 def have(login):
-    """Is there a usable image on disk for ``login``?"""
+    """Is there a usable, square PNG image on disk for ``login``?"""
     path = avatar_dir() / f"{login}.png"
-    return path.exists() and path.stat().st_size >= MIN_BYTES
+    if not path.exists() or path.stat().st_size < MIN_BYTES:
+        return False
+    try:
+        with Image.open(path) as image:
+            return image.format == "PNG" and image.width == image.height
+    except (OSError, UnidentifiedImageError, ValueError):
+        return False
 
 
 def _as_png(payload):
@@ -123,6 +129,8 @@ def _as_png(payload):
     try:
         with Image.open(BytesIO(payload)) as image:
             image.load()
+            if image.width != image.height:
+                return None
             rgba = image.convert("RGBA")
     except (OSError, UnidentifiedImageError, ValueError):
         return None
