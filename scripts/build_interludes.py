@@ -7,7 +7,8 @@
 
 What this builds
 ----------------
-Nightwish's **"Perfume Of The Timeless"** (``oHCaZmIzr0o``) plays from the
+Nightwish's **"Perfume Of The Timeless"** (third-party 4K picture upload
+``O0lyFqLr3Cc``) plays from the
 first frame of the show to the last frame before the credits, and the eight
 acts live inside it. Movement 1 is the PROLOGUE, built by
 ``scripts/build_prologue.py``; movements 2-5 are the rest of the same video,
@@ -36,12 +37,13 @@ created for them. Promoting them is a later decision, not this script's.
 
 Rights
 ------
-Third-party copyrighted -- Nuclear Blast's recording, Nightwish's own official
-music video. The rights records are ``music/bed_perfume_of_the_timeless.json``
-and ``videos/yt_nightwish_perfume_of_the_timeless.json``, written for the
-prologue and not restated here. Like the prologue these are **prototype
-output**: the shipping presentation embeds the video rather than re-hosting
-it, so no social copy is ever cut from them.
+Third-party copyrighted -- Nuclear Blast's recording and Nightwish Arena's
+accepted 4K picture upload. The rights record is
+``music/bed_perfume_of_the_timeless.json``. The original measured audio stream
+remains the bed; the upload is picture-only and its ``Nightwish. ://: Arena.``
+watermark remains in frame. Like the prologue these are **prototype output**:
+the non-commercial shipping presentation embeds rather than re-hosts the
+media, so no public social copy is ever cut from them.
 
 Picture is seated at 1920x804, and resampled only if it has to be
 ----------------------------------------------------------------

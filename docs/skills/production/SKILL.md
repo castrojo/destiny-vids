@@ -105,6 +105,20 @@ Standalone sequel titles keep the series construction and add a Roman numeral:
 `Bluefin and the Hive II`, not `Bluefin in the Hive II`. The episode number
 changes; the established title wording does not.
 
+### Rebuilt non-act segments
+
+Perfume movements and other `renders/` items have no act numeral, so their
+input provenance is not stamped by `publish --act`. After their owning
+renderer succeeds, record the digest through the delivery interface rather
+than typing one:
+
+```bash
+python3 tools/deliver.py publish --segment renders/perfume-4-overlays.mp4
+```
+
+The command requires the output to exist and derives its digest from the
+declared sources.
+
 ## The gate at stage 7
 
 `build_uncut_credited.sh` renders the **whole** video and credits it. That is

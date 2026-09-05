@@ -1,0 +1,676 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/castrojo/destiny-vids/schema/uta-art-video.schema.json",
+  "title": "UTA artwork montage edit record",
+  "description": "A record in stories/uta-general-dark-army.json: the rights position, the pinned source identity, and the Argo-returned measurements for a montage cut to Unleash The Archers' General Of The Dark Army. This montage uses the official source video's complete audio timeline, so rights and audio provenance live in the montage's own source object instead of a reusable beat-grid bed record. The repository stores measurements and references, never the media.",
+  "$comment": "Structural discriminators -- the build_workflow kinds source-review, picture and mux-validate, the composition mode and the timeline entry kinds -- are schema-local generator branches, not shared domain vocabulary. They are deliberately absent from vocab/ and from scripts/generate_schema_enums.py's MAP. The one shared-vocabulary field is source.usage_class, whose enum is generated from vocab/provenance.yaml.",
+  "type": "object",
+  "required": [
+    "edit_id",
+    "source",
+    "transport",
+    "composition"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_what": {
+      "type": "string",
+      "description": "Prose orientation for the record, in the house style of stories/*.json."
+    },
+    "edit_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Stable slug, referenced on the command line and in workflow names."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "youtube_id",
+        "source_url",
+        "title",
+        "artist",
+        "usage_class",
+        "source_rights_note",
+        "media_filename",
+        "sha256",
+        "duration_seconds",
+        "frame_rate",
+        "frame_count",
+        "time_base",
+        "audio_sample_rate_hz",
+        "decoded_sample_count",
+        "evidence",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "_what": {
+          "type": "string"
+        },
+        "youtube_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The requested YouTube video ID. Pinned by the owner; the record is wrong if it drifts."
+        },
+        "source_url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical watch URL for the requested source."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artist": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usage_class": {
+          "enum": [
+            "third_party_copyrighted",
+            "cc_by_4_0"
+          ],
+          "description": "Rights bucket, generated from vocab/provenance.yaml's usage_class axis -- never hand-edited here."
+        },
+        "source_rights_note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable rights position. For this montage it must state the same copyrighted work is used as both bed and selected picture, and that the repository stores only measurements and references."
+        },
+        "media_filename": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The source file name inside the Hero work directory, served over the transport. The record travels; the media never does."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the requested source file, verified inside the fetch pod on every workflow that touches it."
+        },
+        "duration_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Authoritative container duration from the Argo source-probe.json, not the YouTube metadata summary."
+        },
+        "frame_rate": {
+          "type": "string",
+          "pattern": "^[0-9]+/[0-9]+$",
+          "description": "Authoritative average frame rate as an exact rational (avg_frame_rate) from the Argo source probe."
+        },
+        "frame_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Authoritative video frame count (nb_frames) from the Argo source probe."
+        },
+        "time_base": {
+          "type": "string",
+          "pattern": "^1/[0-9]+$",
+          "description": "Authoritative video time base from the Argo source probe."
+        },
+        "audio_sample_rate_hz": {
+          "const": 48000,
+          "description": "Native audio sample rate. Delivery is 48,000 Hz: a source whose rate is anything else hard-fails the bed gate, so a montage record carrying another value can never produce a valid bed and is rejected here."
+        },
+        "decoded_sample_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Exact decoded PCM sample count of the complete source audio (duration_ts of the pcm_s24le decode at 1/48000), established by the remote preflight and proven by the Stage 1 bed-format gate."
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Where each measurement came from: Argo workflow names, manifest paths, and returned-artifact names. A measurement without evidence is a guess, and guesses do not go in this record."
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Authoritative source frame width in pixels from the Argo source probe; overlay boxes are validated against it."
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Authoritative source frame height in pixels from the Argo source probe; overlay boxes are validated against it."
+        }
+      }
+    },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fetch_url",
+        "receiver_url"
+      ],
+      "properties": {
+        "_what": {
+          "type": "string"
+        },
+        "fetch_url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "LAN URL the workflows GET the source from (shared source server, port 8877)."
+        },
+        "receiver_url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "LAN URL of this video's own PUT receiver (port 8881 for .work-uta-general). The receiver flattens PUT paths, so generated workflows upload flat filenames and any local organization into subdirectories is a documented move, never a claimed preservation."
+        }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "background",
+        "transition_frames",
+        "artwork_within_first_seconds",
+        "accent_only_fullscreen",
+        "protect_direct_camera_singer_shots",
+        "protected",
+        "assets",
+        "overlay_canvas",
+        "overlay_motion",
+        "intro_clean_until_seconds"
+      ],
+      "description": "The montage's visual treatment policy (owner bar, 2026-09-05, twice refined): the official video is preserved full-frame and visually UNTOUCHED -- no blurred background, crop, scale, panel, border, color effect, or reframe -- and transparent art sits STATICALLY in the shot's genuine negative space (shot-authored anchors/boxes from manual scene review, e.g. the owner frame review/owner-composition-example-2026-09-05.png), fading in and out with simple 6-12 frame opacity fades. No motion on overlays, nothing over source characters, titles, faces, or action, the intro plays completely clean, and full-screen artwork remains a rare deliberate accent.",
+      "properties": {
+        "_what": {
+          "type": "string"
+        },
+        "mode": {
+          "const": "negative-space-overlay",
+          "description": "The primary and default treatment: the source frame is preserved (source-preserve mode) and transparent art occupies the shot's reviewed negative space. A deliberate per-segment panel reframe (kind: panel) or a rare full-screen accent remains available, but neither is the default."
+        },
+        "background": {
+          "const": "none",
+          "description": "Background effects are DISABLED (owner, 2026-09-05): no blurred background, crop, scale, panel, border, color effect, or reframe is ever applied to the official video. The source stays full-frame and visually untouched."
+        },
+        "transition_frames": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "max",
+            "style"
+          ],
+          "description": "Every treatment change is a simple OPACITY fade within these frame bounds -- no motion, no slides, no hard slideshow cuts.",
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 6,
+              "maximum": 12
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 6,
+              "maximum": 12
+            },
+            "style": {
+              "const": "opacity-fade",
+              "description": "The only permitted transition: a simple opacity fade in/out within the frame bounds."
+            }
+          }
+        },
+        "artwork_within_first_seconds": {
+          "const": 35,
+          "description": "Artwork is visible from the opening and repeatedly within the first 35 seconds; the video must not read as source-only at the start."
+        },
+        "accent_only_fullscreen": {
+          "const": true,
+          "description": "Full-screen artwork is a deliberate occasional accent only, never the primary treatment."
+        },
+        "protect_direct_camera_singer_shots": {
+          "const": true,
+          "description": "Direct-camera singer shots play as clean full-frame source; the concrete intervals come from the reviewed storyboard/source-review evidence, never from automated gaze detection."
+        },
+        "protected": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Intervals that play as untouched full-frame source: no art, crop, reframing, card, transition, or filter may touch them. Must wholly contain 5:20-5:50 (320-350 s).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "start_seconds",
+              "end_seconds",
+              "reason"
+            ],
+            "properties": {
+              "start_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "end_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "description": "The composed edit itself, filled by a later task from the reviewed evidence (scene times, contact sheet, review frames, storyboard). kind overlay is the default: source preserved full-frame, static art in genuine negative space. accent is a rare full-screen artwork moment. source-only covers the intro, protected intervals, and direct-camera singer shots. The panel kind was removed 2026-09-05: the source is never reframed.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "start_seconds",
+              "end_seconds",
+              "kind"
+            ],
+            "properties": {
+              "start_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "end_seconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "kind": {
+                "enum": [
+                  "overlay",
+                  "accent",
+                  "source-only"
+                ]
+              },
+              "overlays": {
+                "type": "array",
+                "minItems": 1,
+                "description": "Art placements for overlay/panel/accent kinds; forbidden on source-only. Each placement is shot-authored from manual scene review.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "art_asset",
+                    "anchor"
+                  ],
+                  "properties": {
+                    "art_asset": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "An id from composition.assets; invented art is rejected."
+                    },
+                    "anchor": {
+                      "enum": [
+                        "left",
+                        "right",
+                        "upper"
+                      ],
+                      "description": "The negative-space region the art occupies, named from manual scene review (for example: subjects in the left third, art anchored right)."
+                    },
+                    "box": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "x",
+                        "y",
+                        "width",
+                        "height"
+                      ],
+                      "description": "The reviewed empty rectangle in SOURCE-frame pixels (2048x1152 space); the picture workflow maps it into the delivery frame. Must never cover faces or action.",
+                      "properties": {
+                        "x": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "y": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "width": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "height": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    },
+                    "scale": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1,
+                      "description": "Art height as a fraction of the box height; 1 fills the box."
+                    },
+                    "z_order": {
+                      "type": "integer",
+                      "description": "Stacking order among this segment's overlay layers; higher is closer to the viewer. The derived background layer is always below every overlay."
+                    },
+                    "note": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "note": {
+                "type": "string"
+              },
+              "callouts": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Callout ids from composition.callouts shown during this segment. Forbidden on source-only segments."
+              }
+            }
+          }
+        },
+        "assets": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Registry of existing transparent art assets (figure/weapon PNGs) an overlay may name. Every entry is an existing source-backed file in the Hero work directory; new art is never invented. Occasional variety (for example the dinosaur/'chonker' artwork) is added only when a source-backed asset actually exists.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file"
+            ],
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Asset file inside the Hero work directory's assets/."
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "overlay_canvas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width",
+            "height"
+          ],
+          "description": "The target overlay canvas. Authored overlays (callouts, cards) are built as 3840x2160 transparent RGBA and all their coordinates are in this space; the picture workflow maps source-frame overlay boxes (2048x1152) into it.",
+          "properties": {
+            "width": {
+              "const": 3840
+            },
+            "height": {
+              "const": 2160
+            }
+          }
+        },
+        "callouts": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Weapon/component callout overlays reconstructed as NEW clean 4K transparent RGBA assets from the RAFI/Lakshmi design sheets (owner-authorized reconstruction, 2026-09-05). The reconstruction of the presentation is authorized; the wording is transcribed VERBATIM from the source pictures -- no invented descriptions. Statically placed (they may fade in with their leader lines, never float) and used selectively in visually quiet/instrumental windows and negative space, never over faces, action, protected intervals, or direct-camera singer shots. Short labels may accompany side-by-side art; long descriptions get dedicated readable holds.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "copy",
+              "source",
+              "label_box",
+              "leader_anchor",
+              "font_size",
+              "usage"
+            ],
+            "properties": {
+              "copy": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "label_render"
+                ],
+                "description": "The callout wording. `label`/`description` are the wording transcribed VERBATIM from the design sheet and are evidence -- they are never edited to match the screen. `label_render`/`description_render` are what is actually drawn. Owner authorization 2026-09-05 ('correct the spelling and copyedit too') permits the rendered form to differ from the sheet, but ONLY by the corrections listed in `copyedits`: applying those replacements in order to the verbatim string must reproduce the rendered string exactly. That invariant is what separates a correction from an invention -- the sheet's own errors ('10MM BOM', 'MAGNET BEADS CATCHER') can be fixed, while new copy still cannot be introduced.",
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The short callout label, verbatim from the sheet. Evidence, not screen copy; line breaks in the sheet are layout and are normalized to single spaces."
+                  },
+                  "label_render": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The label as drawn, after the recorded copyedits. Equals `label` when the sheet needed no correction."
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The long-form description, verbatim from the sheet. Long copy implies usage: dedicated-hold."
+                  },
+                  "description_render": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The description as drawn, after the recorded copyedits. Required whenever `description` is present."
+                  },
+                  "subtitle": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The material/qualifier line the sheet sets under a label (for example 'TITANIUM ALLOY', 'WITH GPS'), verbatim."
+                  },
+                  "subtitle_render": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The subtitle as drawn, after the recorded copyedits. Required whenever `subtitle` is present."
+                  },
+                  "copyedits": {
+                    "type": "array",
+                    "description": "The ordered, literal corrections applied to the verbatim wording to produce the rendered wording. An empty list means the sheet's copy is reproduced exactly. Every entry must actually fire: a recorded edit whose `from` does not occur is a stale record and fails validation.",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "from",
+                        "to",
+                        "reason"
+                      ],
+                      "properties": {
+                        "from": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The exact substring of the verbatim copy being corrected."
+                        },
+                        "to": {
+                          "type": "string",
+                          "description": "The replacement text."
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Why the correction is warranted -- spelling, grammar, punctuation or consistency. Taste is not a reason; the sheet's voice (its display capitals) is preserved."
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sheet",
+                  "crop"
+                ],
+                "description": "Provenance of the transcription: which design sheet, which crop of it, and where the review evidence lives.",
+                "properties": {
+                  "sheet": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The design sheet file the wording was transcribed from (for example 'Cha Design_RAFI.jpg')."
+                  },
+                  "crop": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "x",
+                      "y",
+                      "width",
+                      "height"
+                    ],
+                    "properties": {
+                      "x": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "y": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "width": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "height": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "description": "The crop rectangle within the sheet, in sheet pixels, that carries the transcribed wording."
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "description": "Path or reference to the crop/review image supporting that the copy is verbatim."
+                  }
+                }
+              },
+              "label_box": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "x",
+                  "y",
+                  "width",
+                  "height"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "y": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "width": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "height": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "description": "Where the label block sits, in 4K overlay-canvas pixels."
+              },
+              "leader_anchor": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "description": "The point the leader line points at, in 4K overlay-canvas pixels.",
+                "properties": {
+                  "x": {
+                    "type": "integer"
+                  },
+                  "y": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "font_size": {
+                "type": "integer",
+                "minimum": 8,
+                "description": "Label size in 4K-canvas pixels."
+              },
+              "description_font_size": {
+                "type": "integer",
+                "minimum": 8,
+                "description": "Long-form size in 4K-canvas pixels; smaller than font_size, establishing the hierarchy."
+              },
+              "usage": {
+                "enum": [
+                  "accompany-art",
+                  "dedicated-hold"
+                ],
+                "description": "accompany-art: a short label riding beside side-by-side art. dedicated-hold: long copy held on a dedicated readable card."
+              },
+              "art_asset": {
+                "type": "string",
+                "minLength": 1,
+                "description": "An asset key from composition.assets set beside the copy, so the card names the thing it is pointing at."
+              },
+              "plate_luma": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "window",
+                  "box",
+                  "mean",
+                  "p95",
+                  "max",
+                  "measured_by"
+                ],
+                "description": "The measured luminance of the picture under this card, across its WHOLE window, from signalstats YAVG/YMAX. Type polarity is derived from it: light type over a dark plate, dark type over a bright one. Required before rendering, because the eye is unreliable here -- the misty riverbed plate reads as bright and measures 92.9. See docs/skills/plates/references/full-frame-cards.md.",
+                "properties": {
+                  "window": {
+                    "type": "string",
+                    "description": "The measured interval, 'start+duration' in seconds."
+                  },
+                  "box": {
+                    "type": "string",
+                    "description": "The measured crop, 'x:y:w:h' in source-frame pixels."
+                  },
+                  "mean": {
+                    "type": "number",
+                    "description": "Mean YAVG across the window."
+                  },
+                  "p95": {
+                    "type": "number",
+                    "description": "95th-percentile YAVG: it matters more than the mean, because a few bright hits are what eat a glyph."
+                  },
+                  "max": {
+                    "type": "number",
+                    "description": "Peak YMAX across the window."
+                  },
+                  "measured_by": {
+                    "type": "string",
+                    "description": "How it was measured."
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "description": "The returned measurement record."
+                  }
+                }
+              },
+              "min_hold_seconds": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "The dedicated readable hold long copy needs; set when the callout is placed."
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "overlay_motion": {
+          "const": "static",
+          "description": "Overlays are statically anchored in genuine negative space: no rising, inward, or position drift on figures, weapons, chonkers, or callouts (a callout's leader line fades in with it but never floats). The only motion anywhere is the opacity fade."
+        },
+        "intro_clean_until_seconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The official intro/title sequence plays completely clean until this time -- no artwork, no callouts, no fades-in before it. The value comes from measured evidence (the first scene change), never a guess."
+        }
+      }
+    }
+  }
+}

@@ -7,10 +7,10 @@
 
 What this act is
 ----------------
-The owner chose Nightwish's official music video **"Perfume Of The Timeless"**
-(``oHCaZmIzr0o``) to open the film. Its first 1:31 carries the main title at
-0:11 and then hands into the programme. It is a **cold open in front of act I**
-and it takes NO NUMERAL: ``AGENTS.md`` makes the eight act numerals
+The owner chose the accepted third-party 4K picture upload of Nightwish's
+**"Perfume Of The Timeless"** (``O0lyFqLr3Cc``) to open the film. Its first
+1:31 carries the main title at 0:11 and then hands into the programme. It is a
+**cold open in front of act I** and it takes NO NUMERAL: ``AGENTS.md`` makes the eight act numerals
 load-bearing, and inserting a ninth act at the front would move every chapter
 marker, every ``Prod/NN-*.mp4`` name and every key in
 ``stories/megacut/delivery.json``. So it delivers as ``00-prologue`` and, like
