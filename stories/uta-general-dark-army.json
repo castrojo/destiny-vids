@@ -31,7 +31,7 @@
     }
   },
   "composition": {
-    "_what": "The treatment bar, owner 2026-09-05 and refined the same day from the attached example frame (review/owner-composition-example-2026-09-05.png: knight and kneeling woman occupy the left third, the right two-thirds are empty shoreline): use each official shot's EXISTING negative space rather than forcing generic split panels. The source frame and its eyelines are preserved; isolated transparent figures/weapons go in the reviewed empty region. Placement is shot-authored from manual scene review, never covers faces or action, and is never a uniform 50/50 crop. Full-screen art is a rare deliberate accent. Direct-camera singer shots and 5:20-5:50 play as clean full-frame source. The timeline itself lands in a later task, built from the returned scene evidence and the storyboard review.",
+    "_what": "The treatment bar, owner 2026-09-05 and refined the same day from the attached example frame (review/owner-composition-example-2026-09-05.png: knight and kneeling woman occupy the left third, the right two-thirds are empty shoreline): use each official shot's EXISTING negative space rather than forcing generic split panels. The source frame and its eyelines are preserved; isolated transparent figures/weapons go in the reviewed empty region. Placement is shot-authored from manual scene review, never covers faces or action, and is never a uniform 50/50 crop. Full-screen art is a rare deliberate accent. Direct-camera singer shots and 5:20-5:50 play as clean full-frame source. Occasional variety comes from the owner-audited chonker library (~/Pictures/Artwork/, staged in assets/): a restrained rotating subset of the owner-named candidates, scaled/styled coherently with the RAFI/Lakshmi figures; trex.webp is excluded (opaque gray background), and no new art is invented. The timeline itself lands in a later task, built from the returned scene evidence and the storyboard review.",
     "mode": "negative-space-overlay",
     "background": "derived-layered",
     "transition_frames": {
@@ -51,7 +51,23 @@
       "RAFI_WEAPONS_03": {"file": "RAFI_WEAPONS_03.png"},
       "RAFI_WEAPONS_04": {"file": "RAFI_WEAPONS_04.png"},
       "RAFI_WEAPONS_05": {"file": "RAFI_WEAPONS_05.png"},
-      "CHA_LAKSHMI_01": {"file": "CHA_LAKSHMI_01.png"}
+      "CHA_LAKSHMI_01": {"file": "CHA_LAKSHMI_01.png"},
+      "CHONKY_ACHILLIBATOR_POSE1": {"file": "Chonky_Achillibator_Pose1_Post.png", "note": "chonker library"},
+      "CHONKY_ACHILLIBATOR_POSE2": {"file": "Chonky_Achillibator_Pose2_Post.png", "note": "chonker library"},
+      "CHONKY_ALAMO_BLUE": {"file": "Chonky_Alamo_Blue.png", "note": "chonker library"},
+      "CHONKY_DAKOSAURUS_BLUEFINSKIN": {"file": "Chonky_Dakosaurus_BlueFinSkin.png", "note": "chonker library"},
+      "CHONKY_TOROSAURUS_BLUE": {"file": "Chonky_Torosaurus_Blue.png", "note": "chonker library"},
+      "CHONKY_UTAHRAPTOR_BLUEFINSKIN": {"file": "Chonky_Utahraptor_BlueFinSkin.png", "note": "chonker library"},
+      "CUSTOMCHONK_JORGE_CONCAVENATOR": {"file": "CustomChonk_Jorge_Concavenator_Post1.png", "note": "chonker library"},
+      "CUSTOMCHONK_JORGE_DEINONYCHUSA": {"file": "CustomChonk_Jorge_DeinonychusA.png", "note": "chonker library"},
+      "JORGE_CUSTOMCHONKS_ARMAGASAURUSUS": {"file": "Jorge_CustomChonks_Armagasaurusus_Post1.png", "note": "chonker library"},
+      "JORGE_CUSTOMCHONKS_DIMETRODONA": {"file": "Jorge_CustomChonks_DimetrodonA.png", "note": "chonker library"},
+      "JORGE_CUSTOMCHONKS_INTRIGUED": {"file": "Jorge_CustomChonks_Intrigued.png", "note": "chonker library"},
+      "JORGE_CUSTOMCHONKS_KENTROSAURUS": {"file": "Jorge_CustomChonks_Kentrosaurus_Post1.png", "note": "chonker library"},
+      "JORGE_CUSTOMCHONKS_LEAPING": {"file": "Jorge_CustomChonks_Leaping.png", "note": "chonker library"},
+      "JORGE_CUSTOMCHONKS_NESTINGRAPTOR": {"file": "Jorge_CustomChonks_NestingRaptor_Post1.png", "note": "chonker library"},
+      "JORGE_CUSTOMCHONKS_PIVOTRAPTOR": {"file": "Jorge_CustomChonks_PivotRaptor_Post1.png", "note": "chonker library"},
+      "JORGE_CUSTOMCHONKS_ROARING": {"file": "Jorge_CustomChonks_Roaring.png", "note": "chonker library"}
     },
     "protected": [
       {

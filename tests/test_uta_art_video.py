@@ -378,6 +378,31 @@ def test_registered_assets_are_existing_files(edit):
         assert entry["file"].endswith(".png"), asset_id
 
 
+OWNER_REVIEWED_CHONKERS = {
+    "CHONKY_ACHILLIBATOR_POSE1", "CHONKY_ACHILLIBATOR_POSE2",
+    "CHONKY_ALAMO_BLUE", "CHONKY_DAKOSAURUS_BLUEFINSKIN",
+    "CHONKY_TOROSAURUS_BLUE", "CHONKY_UTAHRAPTOR_BLUEFINSKIN",
+    "CUSTOMCHONK_JORGE_CONCAVENATOR", "CUSTOMCHONK_JORGE_DEINONYCHUSA",
+    "JORGE_CUSTOMCHONKS_ARMAGASAURUSUS", "JORGE_CUSTOMCHONKS_DIMETRODONA",
+    "JORGE_CUSTOMCHONKS_INTRIGUED", "JORGE_CUSTOMCHONKS_KENTROSAURUS",
+    "JORGE_CUSTOMCHONKS_LEAPING", "JORGE_CUSTOMCHONKS_NESTINGRAPTOR",
+    "JORGE_CUSTOMCHONKS_PIVOTRAPTOR", "JORGE_CUSTOMCHONKS_ROARING",
+}
+
+
+def test_chonker_variety_is_owner_reviewed(edit):
+    """Owner audit 2026-09-05: a restrained rotating subset of these named,
+    existing, transparent PNGs. Anything else -- trex.webp with its opaque
+    gray background, or any un-reviewed art -- is not registrable here."""
+    assets = edit["composition"]["assets"]
+    chonkers = {k for k in assets if "CHONK" in k}
+    assert chonkers == OWNER_REVIEWED_CHONKERS
+    assert all(assets[k]["file"].startswith(
+        ("Chonky_", "CustomChonk_Jorge_", "Jorge_CustomChonks_"))
+        for k in chonkers)
+    assert "trex.webp" not in {a["file"] for a in assets.values()}
+
+
 # --- the enum mapping ----------------------------------------------------------
 
 
