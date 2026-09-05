@@ -307,9 +307,13 @@ def _person_index(leads):
     """
     index = {}
     for character_id, entry in leads.items():
-        for spelling in (entry.get("person"), entry.get("display_name")):
+        plate_name = (entry.get("plate") or {}).get("name")
+        for spelling in (entry.get("person"), plate_name):
             if spelling:
                 index.setdefault(snake_case(spelling), character_id)
+                for word in str(spelling).split():
+                    if len(word) >= 3:
+                        index.setdefault(snake_case(word), character_id)
     return index
 
 

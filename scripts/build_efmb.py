@@ -198,7 +198,7 @@ BED_TAIL_SEC = None  # derived below, from the remainder
 # source 323.933 is the backed-up white hallway with people on the left and dog
 # creatures on the right; source 325.933 is where the Destiny picture resumes.
 # The interruption is intentionally longer than those replaced two seconds so
-# the complete conversation can play on black after Amber's action shot.
+# the complete owner conversation can play around Amber's external action.
 HALLWAY_CUT_SRC = 323.933
 HALLWAY_FRAME_SRC = 323.933
 HALLWAY_RESUME_SRC = 325.933
@@ -208,54 +208,39 @@ HALLWAY_RESUME_SRC = 325.933
 # source continuously, so this seat is wherever film_for_source(HALLWAY_CUT_SRC)
 # lands (asserted in picture_sequence) -- only cutting frames would move it.
 HALLWAY_AT = 255.433
-# Hold the hallway while Amber asks for Kyle and the PvP exchange plays.
-HALLWAY_FREEZE_SEC = 22.000
-AMBER_CLIP_IN = 43.000
-AMBER_CLIP_OUT = 53.470
-AMBER_CLIP_SEC = AMBER_CLIP_OUT - AMBER_CLIP_IN
-AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
-# Return to the same hallway frame after Amber's action clip for the kindness
-# speech and her action-sequence lines, and hold until they have ALL cleared.
-# Owner, 2026-08-28: "HALLWAY -> FREEZE -> AMBER TALKS -> SHE FIGHTS -> AMBER
-# TALK -> unfreeze, sup" -- every Amber line plays over the freeze; the
-# picture resumes only when her talking is done, then plays the 5.83 s of
-# source between the resume and Sup's close-up ("then play until the sup").
-# The hold is DERIVED from the `paused` block's own schedule in
-# chapters/II-endless-forms.md, so a line added or removed there never has to
-# be re-typed as a duration anywhere else. Growing it grows the act -- and
-# every act after it -- by the same amount; downstream programme_starts and
-# pins are restated by that delta in the same change.
+# The owner moved the external Amber sequence after the complete hallway
+# exchange. The three chapter labels are the clock: `paused` holds the
+# hallway before the insert, `amber-action` is the external sequence, and
+# `post-amber` holds the returned hallway before Destiny picture resumes.
 PAUSED_BLOCK = "paused"
+AMBER_ACTION_BLOCK = "amber-action"
+POST_AMBER_BLOCK = "post-amber"
+HALLWAY_FREEZE_SEC = round(
+    chapter_md.block_end("II", PAUSED_BLOCK) - HALLWAY_AT, 3)
+AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
+AMBER_CLIP_IN = 43.000
+AMBER_CLIP_SEC = round(
+    chapter_md.block_end("II", AMBER_ACTION_BLOCK) - AMBER_AT, 3)
+AMBER_CLIP_OUT = AMBER_CLIP_IN + AMBER_CLIP_SEC
+# Return to the same hallway frame for the post-action conversation before
+# the Destiny picture resumes.
 HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
 HALLWAY_AFTER_AMBER_SEC = round(
-    chapter_md.block_end("II", PAUSED_BLOCK) - HALLWAY_AFTER_AMBER_AT, 3)
+    chapter_md.block_end("II", POST_AMBER_BLOCK) - HALLWAY_AFTER_AMBER_AT, 3)
 HALLWAY_RETURN_AT = HALLWAY_AFTER_AMBER_AT + HALLWAY_AFTER_AMBER_SEC
-BLACK_CONVERSATION_AT = HALLWAY_AT
-BLACK_CONVERSATION_SEC = HALLWAY_FREEZE_SEC
+
 INTERRUPTION_SEC = (
     HALLWAY_FREEZE_SEC + AMBER_CLIP_SEC + HALLWAY_AFTER_AMBER_SEC)
 INTERRUPTION_REPLACED_SEC = HALLWAY_RESUME_SRC - HALLWAY_CUT_SRC
-# film_sec == bed_sec + THIS, so lengthening the interruption GROWS THE ACT
-# and every act after it starts that much later: restate every downstream
-# chapter file's programme_start and pins by the same delta in the same
-# commit (done 2026-08-24, +4.1). The proof that no other act's frames moved
-# is that its manifest regenerates byte-identical -- chapter_md.sync writes
-# nothing when nothing changed.
+# film_sec == bed_sec + THIS. The pause, insert, and return intervals stay
+# explicit so their clock arithmetic cannot silently collapse into one span.
 INTERRUPTION_SHIFT_SEC = INTERRUPTION_SEC - INTERRUPTION_REPLACED_SEC
 
-KYLE_REVEAL_SRC = 335.267
-KYLE_REVEAL_SEC = 3.200
-KYLE_REVEAL_AT = HALLWAY_RETURN_AT + (KYLE_REVEAL_SRC - HALLWAY_RESUME_SRC)
 # Where the Destiny picture actually ends, in film time: the hallway holds
 # for exactly as long as HALLWAY_RETURN_AT says, then the two remaining
 # evidenced runs play in full -- the same two additions `picture_sequence`
-# makes after the hold. This used to be a hand-typed 348.003 ("343.903 +
-# the 4.1 s the pause grew on 2026-08-24"), which is the same bug
-# HALLWAY_AFTER_AMBER_SEC's own derivation was fixed for: a number that has
-# to be retyped by hand every time the paused conversation's length changes
-# is a number that goes stale the next time it does. The black tail keeps
-# its own length (film_sec - this) automatically, whatever the paused
-# conversation now runs to.
+# makes after the hold. The black tail keeps its own length (film_sec - this)
+# automatically as any of the three chapter-owned interruption blocks change.
 EDITED_PICTURE_END = round(
     HALLWAY_RETURN_AT + (RUNS[4][1] - HALLWAY_RESUME_SRC)
     + (RUNS[5][1] - RUNS[5][0]), 3)
@@ -466,9 +451,11 @@ def edited_source_for_film(film_sec, lead=None):
         lead = derive_lead()
     if HALLWAY_AT <= film_sec < AMBER_AT:
         return HALLWAY_FRAME_SRC
-    if AMBER_AT <= film_sec < HALLWAY_RETURN_AT:
+    if AMBER_AT <= film_sec < HALLWAY_AFTER_AMBER_AT:
         raise NotInPicture(
             f"film {film_sec:.3f}s is inside Amber's external sequence")
+    if HALLWAY_AFTER_AMBER_AT <= film_sec < HALLWAY_RETURN_AT:
+        return HALLWAY_FRAME_SRC
     if film_sec >= EDITED_PICTURE_END:
         raise NotInPicture(
             f"film {film_sec:.3f}s is in the black outro tail")
@@ -502,10 +489,10 @@ def fmt(seconds):
 
 TARGET_W, TARGET_H, TARGET_FPS = 1920, 1080, 30
 
-# THE BED'S SOURCE DECODES ABOVE FULL SCALE. Its fetched intermediate applies
-# a -1.6 dB static gain before integer PCM encoding, so those peaks are retained
-# rather than clipped. The mux therefore applies no second gain.
-MUX_GAIN_DB = 0.0
+# The extended owner-authorized Amber sequence raises the delivered mix's
+# measured true peak to +0.4 dBFS. A -1.5 dB static gain lands the FLAC master
+# below the project's -0.9 dBTP ceiling without changing its dynamics.
+MUX_GAIN_DB = -1.5
 
 # ISSUE #88, AND WHY EVERY CHAIN BELOW IS `-vf`.
 #
@@ -659,8 +646,11 @@ def audio_filtergraph(sequence=None):
             "asetpts=PTS-STARTPTS,aresample=48000,"
             f"aformat=sample_fmts=fltp:channel_layouts=stereo[{label}]")
         labels.append(f"[{label}]")
+    mixed = "aout" if MUX_GAIN_DB == 0 else "mix"
     chains.append(
-        "".join(labels) + f"concat=n={len(labels)}:v=0:a=1[aout]")
+        "".join(labels) + f"concat=n={len(labels)}:v=0:a=1[{mixed}]")
+    if MUX_GAIN_DB:
+        chains.append(f"[{mixed}]volume={MUX_GAIN_DB:g}dB[aout]")
     return ";".join(chains)
 
 
@@ -908,7 +898,9 @@ def build():
             "source_resume": HALLWAY_RESUME_SRC,
             "wall_in": HALLWAY_AT,
             "wall_out": HALLWAY_RETURN_AT,
-            "black_conversation_sec": BLACK_CONVERSATION_SEC,
+            "hallway_before_amber_sec": HALLWAY_FREEZE_SEC,
+            "amber_clip_sec": AMBER_CLIP_SEC,
+            "hallway_after_amber_sec": HALLWAY_AFTER_AMBER_SEC,
         },
         "runs": [{"in": a, "out": b, "sec": round(b - a, 3), "why": w}
                  for a, b, w in RUNS],

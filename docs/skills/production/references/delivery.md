@@ -13,6 +13,7 @@ file in it is a regenerated artifact.
 | `Prod/` | The show at the **highest quality that exists** — one file per act, `NN-<act>.mp4`, FLAC audio, picture never re-encoded |
 | `10mb/` | Social copies under a byte cap (`tools/social.py`), built from `Prod/` |
 | `megacut/` | The final movie, and nothing else (`tools/megacut.py`) |
+| `review/` | Standalone cuts, review renders, and their thumbnails — never loose at `~/Videos/` |
 | Watch | `catt` to the owner's TV — see [Putting it on the television](#putting-it-on-the-television) |
 | Publish | `python3 ~/Videos/yt-refresh.py` — one unlisted playlist |
 

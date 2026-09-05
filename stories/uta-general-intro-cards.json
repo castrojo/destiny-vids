@@ -1,0 +1,18 @@
+{
+  "_what": "The Bluefin head slide for the General of the Dark Army cut. It is the Wolves main-title lockup (cards/maintitle.html, the site's own .wolves-intro-overlay-text-slim rules), carrying this cut's own copy: the PROJECT BLUEFIN eyebrow with its accented B, the film line, and one owner line on the bottom row where the prologue seats its 'Music by Nightwish | Action by Bungie' credit. Nothing here is a second implementation of the lockup -- it is the same template the prologue renders, so the head slide and the programme's main title cannot drift apart. No `stage` key: the prologue stages the card in two beats so its credits can arrive late, and a single unstaged card shows its body rows immediately, which is what a standalone head slide wants. No `glyph` either -- swapping the O for the Kubernetes helm belongs to 'wolves', not to every title.",
+  "plates": [
+    {
+      "id": "uta-intro-bluefin",
+      "kind": "maintitle",
+      "at": 0.0,
+      "dur": 5.5,
+      "label": "PROJECT BLUEFIN",
+      "accent": "BLUEFIN",
+      "title": "unleash the raptors",
+      "body": [
+        "Maybe someday we can do this for real!"
+      ],
+      "note": "Head slide, owner-authored 2026-09-05. Title is authored lowercase because .title carries text-transform: uppercase -- the string is the copy, the casing is the treatment. Seated on black so it cuts straight into the official intro's own black, which begins with the UNLEASH THE ARCHERS logo at 0 s."
+    }
+  ]
+}

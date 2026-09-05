@@ -25,10 +25,9 @@ their authored case too.
    ``class``, ``name``, ``title``. Those strings are reproduced verbatim
    beside their face. The 1200x630 splash card they also live on is NOT used:
    *"get rid of those hero splashes they suck."*
-2. **A verified GitHub avatar.** ``vocab/casting.yaml`` carries an optional
-   ``github:`` field for exactly this and says why: a login "is verifiable; a
-   real name may not be", recording the ``nimbatus``/``nimbinatus`` trap where
-   the account matching the *character* name belongs to a stranger.
+2. **A verified GitHub avatar.** ``vocab/casting.yaml``'s login-keyed
+   ``people`` records carry the stable GitHub numeric ID, so a character never
+   has to guess an account from a real name.
 3. **The crest.** No face at all rather than a guessed one.
 
 Contributors are unambiguous -- the API returned the login and the avatar

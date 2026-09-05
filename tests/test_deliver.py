@@ -1554,6 +1554,36 @@ def test_every_programme_segment_that_is_not_an_act_is_declared():
         f"seated in the programme but watched by nothing: {undeclared}")
 
 
+def test_record_segment_digests_requires_the_rebuilt_output(tmp_path, monkeypatch):
+    root = tmp_path / "repo"
+    root.mkdir()
+    source = root / "story.json"
+    source.write_text("current", encoding="utf-8")
+    delivery = root / "delivery.json"
+    delivery.write_text(json.dumps({
+        "segments": {
+            "renders/thread.mp4": {
+                "sources": ["story.json"],
+                "source_digest": "old",
+            },
+        },
+    }), encoding="utf-8")
+    monkeypatch.setattr(deliver, "REPO_ROOT", root)
+
+    deliver.record_segment_digests(delivery, ["renders/thread.mp4"], log=lambda _: None)
+    assert json.loads(delivery.read_text())["segments"]["renders/thread.mp4"][
+        "source_digest"
+    ] == "old"
+
+    output = root / "renders" / "thread.mp4"
+    output.parent.mkdir()
+    output.write_bytes(b"rebuilt")
+    deliver.record_segment_digests(delivery, ["renders/thread.mp4"], log=lambda _: None)
+    assert json.loads(delivery.read_text())["segments"]["renders/thread.mp4"][
+        "source_digest"
+    ] == deliver.source_digest(["story.json"])
+
+
 def test_a_segment_carrying_authored_copy_declares_what_writes_that_copy():
     """A plate manifest, tools/plate.py and vocab/casting.yaml each restate
     somebody's words. A segment that burns copy must be able to notice."""

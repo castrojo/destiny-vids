@@ -262,7 +262,7 @@ def probe_media_duration(video):
         return None
 
 
-def detect_picture_status(video):
+def detect_picture_status(video, ffmpeg=None):
     """``(rect, status)`` -- the picture area, and how confidently it is known.
 
     ``status`` is one of:
@@ -276,8 +276,14 @@ def detect_picture_status(video):
     The last two used to be the same ``None``, which is the whole of issue
     #161: a caller could not tell "there is no matte" from "I never looked",
     and one of those is safe to place against and the other is not.
+
+    ``ffmpeg`` is the already-resolved prefix of a caller that has one. A
+    caller that resolves ffmpeg once and encodes with it must probe with the
+    SAME binary, or an explicit override (or a ``DESTINY_FFMPEG`` change
+    mid-call) is honoured for the encode and not for the placement -- and on
+    this host the two differ by whether H.264 decodes at all.
     """
-    ffmpeg = find_ffmpeg()
+    ffmpeg = ffmpeg or find_ffmpeg()
     src = str(Path(video).resolve())
     readings = []
     decoded = False
@@ -298,7 +304,7 @@ def detect_picture_status(video):
     return (x, y, w, h), "letterboxed"
 
 
-def detect_picture(video):
+def detect_picture(video, ffmpeg=None):
     """Find the real picture area inside a letterboxed frame.
 
     Bungie's cinematics are 2.39:1 delivered in a 16:9 file, so ~140px of the
@@ -310,7 +316,7 @@ def detect_picture(video):
     ``detect_picture_status`` when the caller needs to know WHY there is none
     -- "no matte" and "never looked" are different answers (issue #161).
     """
-    return detect_picture_status(video)[0]
+    return detect_picture_status(video, ffmpeg=ffmpeg)[0]
 
 
 def load_shots(path):

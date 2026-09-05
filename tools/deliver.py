@@ -17,6 +17,7 @@ notices:
     python3 tools/deliver.py status --check    # the same, as a gate (exit 1)
     python3 tools/deliver.py status --sources-only --check   # the CI gate
     python3 tools/deliver.py publish           # re-link Prod/, checksums, README
+    python3 tools/deliver.py publish --segment renders/foo.mp4
     python3 tools/deliver.py build --dry-run   # what a rebuild would run
     python3 tools/deliver.py build             # megacut + social copies, stale only
     python3 tools/deliver.py build --watch 60  # keep it fresh, forever
@@ -1375,6 +1376,44 @@ def record_source_digests(acts, masters, delivery_path, log=print, only=None,
         log(f"  delivery.json: recorded input digests for {', '.join(changed)}")
 
 
+def record_segment_digests(delivery_path, only, log=print):
+    """Stamp rebuilt non-act segment inputs through the delivery interface.
+
+    Segments have no act numeral, so ``publish --act`` cannot cover them. A
+    caller names only a segment whose owning renderer just succeeded; an
+    existing output is required so this command cannot certify a missing
+    derivative. The digest remains tool-derived rather than hand-entered.
+    """
+    if not only:
+        return
+    path = Path(delivery_path)
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    segments = doc.get("segments") or {}
+    changed = []
+    for rel in dict.fromkeys(only):
+        spec = segments.get(rel)
+        if spec is None:
+            log(f"  {rel}: no declared segment; digest not recorded")
+            continue
+        output = REPO_ROOT / rel
+        if not output.exists():
+            log(f"  {rel}: output missing; digest not recorded")
+            continue
+        sources = spec.get("sources") or []
+        if not sources:
+            log(f"  {rel}: no declared sources; digest not recorded")
+            continue
+        digest = source_digest(sources)
+        if spec.get("source_digest") != digest:
+            spec["source_digest"] = digest
+            changed.append(f"{rel} -> {digest[:12]}")
+    if changed:
+        path.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n",
+                        encoding="utf-8")
+        log(f"  delivery.json: recorded segment input digests for "
+            f"{', '.join(changed)}")
+
+
 # --- build ------------------------------------------------------------------
 
 
@@ -1689,6 +1728,9 @@ def main(argv=None):
                          "(repeatable). Name the acts you actually rebuilt; a "
                          "blanket publish certifies every act at once, which "
                          "is how stale programmes shipped")
+    ap.add_argument("--segment", action="append", metavar="PATH",
+                    help="publish: record the current inputs for this rebuilt "
+                         "non-act renders/ segment only")
     ap.add_argument("--check", action="store_true",
                     help="status as a gate: exit 1 when anything is stale")
     ap.add_argument("--dry-run", action="store_true",
@@ -1743,8 +1785,10 @@ def main(argv=None):
         rc = print_report(reports, wolves)
         return rc if args.check else 0
     if args.command == "publish":
-        return publish(acts, masters, social, wolves, args.delivery,
-                       only=args.act)
+        rc = publish(acts, masters, social, wolves, args.delivery,
+                     only=args.act)
+        record_segment_digests(args.delivery, args.segment)
+        return rc
     if args.watch:
         return watch(acts, masters, social, wolves, args.plan, args.watch,
                      args.dry_run, delivery_path=args.delivery)

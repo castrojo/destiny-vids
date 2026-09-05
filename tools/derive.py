@@ -86,24 +86,20 @@ def snake_case(name):
 def load_leads(path=None):
     """Load the lead cast map from vocab/casting.yaml.
 
-    Returns ``{character_id: {"person": str|None, "display_name": str|None,
-    "dialogue_label": str|None, "aka": [...]}}``, preserving YAML order.
+    The binding contains role-specific fields. A person and their authored
+    Guardian identity resolve through ``tools.identity``.
     """
     data = _casting(path)
     values = ((data or {}).get("leads") or {}).get("values") or {}
+    from tools.identity import person_for_character
     return {
         character_id: {
             "person": entry.get("person"),
-            "display_name": entry.get("display_name"),
-            "dialogue_label": entry.get("dialogue_label"),
             "aka": list(entry.get("aka") or []),
-            # Documented in vocab/casting.yaml as the person's VERIFIED GitHub
-            # login, recorded "so avatar tooling resolves the person and never
-            # a same-named stranger's account". Carried through so the credits
-            # can use it; derivation still never reads it.
-            "github": entry.get("github"),
             "constraints": dict(entry.get("constraints") or {}),
-            "plate": dict(entry.get("plate") or {}) or None,
+            "plate": (None if entry.get("redacts") else
+                person_for_character(character_id, data).plate
+                if person_for_character(character_id, data) else None)
         }
         for character_id, entry in values.items()
     }
@@ -123,19 +119,13 @@ def load_ensemble_plate(path=None):
 
 
 def load_ensemble_titles(path=None):
-    """Load the authored per-contributor Guardian identities from vocab/casting.yaml.
-
-    Returns ``{github_login: {label, class, name, title, trustee, ...}}``. Most
-    contributors have no entry and are credited with the generic copy from
-    ``load_ensemble_plate``; an entry exists only when the person's Guardian
-    identity is genuinely authored in the reference deck
-    (``~/Videos/nameplates.json`` -- castrojo's is ``np_jorge``), in which case
-    the credit must reproduce it verbatim.
-    """
-    data = _casting(path)
-    titles = dict((((data or {}).get("ensemble") or {}).get("titles") or {}))
-    titles.pop("description", None)
-    return titles
+    """Return authored ensemble cards from the shared people records."""
+    from tools.identity import load_people
+    return {
+        login: dict(person.plate)
+        for login, person in load_people(path).items()
+        if person.plate
+    }
 
 
 def ensemble_label(copy, org_member):

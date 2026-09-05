@@ -15,16 +15,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import build_efmb  # noqa: E402
 import build_efmb_plates  # noqa: E402
-from tools import chapter_md  # noqa: E402
-
-# The hallway hold is now derived from the `paused` chapter block instead of
-# a hand-typed 25.6 s (see scripts/build_efmb.py and build_efmb_plates.py's
-# OLD_HALLWAY_AFTER_AMBER_SEC). Anything authored to play after the old
-# hallway return point moves by this amount; tests below apply it to the
-# same literals rather than re-typing a value the pause has since outgrown.
-PAUSE_DELTA = round(
-    build_efmb.HALLWAY_AFTER_AMBER_SEC
-    - build_efmb_plates.OLD_HALLWAY_AFTER_AMBER_SEC, 3)
+from tools import chapter_md, readtime  # noqa: E402
 
 # --- the two clocks --------------------------------------------------------
 
@@ -90,12 +81,14 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
 
     assert hallway["at"] == pytest.approx(build_efmb.HALLWAY_AT, abs=1e-3)
     assert hallway["source_at"] == pytest.approx(323.933, abs=1e-3)
-    assert hallway["duration"] == pytest.approx(22.0, abs=1e-3)
+    assert hallway["duration"] == pytest.approx(
+        build_efmb.HALLWAY_FREEZE_SEC, abs=1e-3)
     assert hallway["darken"] > 0
     assert amber["source_id"] == build_efmb.AMBER_SOURCE_ID
     assert amber["at"] == pytest.approx(build_efmb.AMBER_AT, abs=1e-3)
     assert amber["source_in"] == pytest.approx(43.0, abs=1e-3)
-    assert amber["source_out"] == pytest.approx(53.47, abs=1e-3)
+    assert amber["source_out"] == pytest.approx(
+        build_efmb.AMBER_CLIP_OUT, abs=1e-3)
     assert after["at"] == pytest.approx(build_efmb.HALLWAY_AFTER_AMBER_AT, abs=1e-3)
     assert after["duration"] == pytest.approx(
         build_efmb.HALLWAY_AFTER_AMBER_SEC, abs=1e-3)
@@ -103,19 +96,19 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
     assert returned["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
     assert returned["source_in"] == pytest.approx(325.933, abs=1e-3)
 
-def test_post_amber_hold_is_derived_from_the_paused_chapter_block():
-    """The hold is not a hand-typed number: it is however long the owner's
-    paused conversation, authored in the chapter file, takes to clear."""
-    assert build_efmb.HALLWAY_RETURN_AT == pytest.approx(
+def test_hallway_interruption_is_derived_from_the_three_chapter_blocks():
+    """The pause, insert, and returned hold keep distinct authored clocks."""
+    assert build_efmb.AMBER_AT == pytest.approx(
         chapter_md.block_end("II", "paused"))
+    assert build_efmb.HALLWAY_AFTER_AMBER_AT == pytest.approx(
+        chapter_md.block_end("II", "amber-action"))
+    assert build_efmb.HALLWAY_RETURN_AT == pytest.approx(
+        chapter_md.block_end("II", "post-amber"))
 
 def test_the_picture_tail_is_black_after_the_last_evidenced_run():
     sequence = build_efmb.picture_sequence()
     tail = next(p for p in sequence if p["id"] == "tail_black")
     assert not any(p["id"] == "eyecantcu_tail" for p in sequence)
-    assert build_efmb.edited_film_for_source(
-        build_efmb.KYLE_REVEAL_SRC) == pytest.approx(
-        build_efmb.KYLE_REVEAL_AT, abs=1e-3)
     assert tail["at"] == pytest.approx(
         build_efmb.EDITED_PICTURE_END, abs=1e-3)
     assert tail["duration"] == pytest.approx(
@@ -148,6 +141,17 @@ def test_the_interruption_audio_uses_only_recorded_sources():
     assert sum(p["duration"] for p in audio) == pytest.approx(
         build_efmb.build()["film_sec"], abs=1e-3)
 
+
+def test_amber_clip_and_post_amber_freeze_have_distinct_inverse_clocks():
+    """The external insert is absent source picture; the returned hallway is
+    an evidenced held source frame."""
+    with pytest.raises(build_efmb.NotInPicture):
+        build_efmb.edited_source_for_film(
+            build_efmb.AMBER_AT + build_efmb.AMBER_CLIP_SEC / 2)
+    assert build_efmb.edited_source_for_film(
+        build_efmb.HALLWAY_AFTER_AMBER_AT + 0.001) == pytest.approx(
+            build_efmb.HALLWAY_FRAME_SRC)
+
 # --- the plate manifest ----------------------------------------------------
 
 def committed():
@@ -160,6 +164,82 @@ def plate_by_id(plate_id):
 
 def all_plates():
     return committed()["plates"]
+
+
+def test_the_saved_owner_prompt_is_normalized_without_rescue_tail():
+    """The saved prompt outranks the stale rescue conversation."""
+    expected = {
+        "mapped_kernel_bump": ("castrojo", "Time to get this driver upstream"),
+        "mapped_a1rmax_intro": (
+            "A1RM4X", "Thank you I never thought I could help!"),
+        "mapped_a1rmax_intro_2": (
+            "A1RM4X", "I'm not like you I'm just a lowly user"),
+        "chat_angellk_pvp": (
+            "angellk", "Don't look at me I only turned on PVP"),
+        "chat_amber_bazaar": ("akgraner", '"How bazaar?"'),
+        "chat_amber_crap": ("akgraner", "Who writes this crap?"),
+        "chat_amber_dungeon": (
+            "akgraner", "Oh wow I forgot what the starter dungeon was like! Hi!"),
+        "chat_amber_problem": (
+            "akgraner", "Ok so I'm going to clean out this trash for you"),
+        "mapped_akgraner_kindness_1": (
+            "akgraner", "Remember, kindness is doing what's right"),
+        "chat_amber_decide": ("akgraner", "[Don't let them decide for you]"),
+        "chat_amber_fate": ("akgraner", "You make your own fate."),
+        "chat_amber_shittywriting": (
+            "akgraner", "I can't save you from this shitty writing though"),
+        "chat_hikari_warframe": ("HikariKnight", "Finally, I can play WARFRAME!"),
+        "mapped_kolunmi_disco": ("kolunmi", "Cardio!"),
+    }
+    removed = {
+        "chat_cortney_solid",
+        "chat_amber_sent",
+        "chat_amber_harder",
+        "chat_cortney_trash",
+        "chat_cortney_goose",
+        "chat_amber_notthere",
+        "chat_amber_trustme",
+        "chat_amber_scars",
+        "chat_kolunmi_sweaty",
+        "chat_kolunmi_cook",
+        "chat_noelmiller_seen",
+        "chat_kyle_halo",
+        "chat_amber_phpforums",
+        "chat_amber_dothereisnotry",
+        "chat_amber_kyleford",
+        "mapped_owen_slay",
+    }
+    for manifest in (committed(), build_efmb_plates.build()):
+        by_id = {p["id"]: p for p in manifest["plates"]}
+        assert removed.isdisjoint(by_id)
+        for plate_id, (speaker, text) in expected.items():
+            assert (by_id[plate_id]["speaker"], by_id[plate_id]["text"]) == (
+                speaker, text)
+
+        haters = by_id["mapped_haters"]
+        assert haters["at"] + haters["dur"] == pytest.approx(
+            build_efmb.edited_film_for_source(331.163), abs=1e-3)
+        assert by_id["mapped_kolunmi_disco"]["seen_at_src"] == pytest.approx(
+            333.817)
+
+
+def test_generated_act_two_plates_clear_the_readtime_punch_list(tmp_path):
+    path = tmp_path / "act-two.json"
+    path.write_text(json.dumps(build_efmb_plates.build()), encoding="utf-8")
+    short, _, _ = readtime.audit_manifest(path)
+    required = {
+        "chat_pilot_lunar",
+        "toc_joseph_worth",
+        "mapped_a1rmax_intro",
+        "mapped_redacted_mines",
+        "chat_amber_dungeon",
+        "chat_kolunmi_level",
+        "retirement-1",
+        "retirement-2",
+    }
+    short_ids = {row["id"] for row in short}
+    assert not required & short_ids
+
 
 def plate_by_speaker(speaker):
     return [p for p in all_plates() if p.get("speaker") == speaker]
@@ -289,8 +369,8 @@ def test_nobody_is_credited_twice_with_two_different_faces():
 
 def test_every_plate_can_be_read():
     # An explicit `+hold` in the chapter file is honoured verbatim, even
-    # below the derived floor (the retirement pair keeps act III's authored
-    # 2.125; Disco! is a six-letter word at 1.8). The floor guards only
+    # below the derived floor (the prior retirement pair held 2.125 seconds;
+    # Cardio! is a seven-letter word at 1.8). The floor guards only
     # holds nobody authored.
     explicit = {
         line["id"]
@@ -416,8 +496,9 @@ def test_the_picture_chain_never_uses_filter_complex():
     assert "filter_complex" not in build_efmb.NORMALISE_VF
 
 def test_the_bed_is_corrected_with_static_gain_and_never_a_normaliser():
-    """The fetched PCM is already safely gained; the mux does not process it."""
-    assert build_efmb.MUX_GAIN_DB == 0
+    """The measured final peak is corrected once, without dynamics processing."""
+    assert build_efmb.MUX_GAIN_DB == pytest.approx(-1.5)
+    assert f"volume={build_efmb.MUX_GAIN_DB:g}dB" in build_efmb.audio_filtergraph()
     source = (REPO_ROOT / "scripts" / "build_efmb.py").read_text()
     render_section = source[source.index("def render("):]
     for banned in ("loudnorm", "alimiter", "acompressor"):
@@ -494,11 +575,43 @@ def walk_plates():
     return {p["id"]: p for p in committed()["plates"]
             if p["id"].startswith("walk_")}
 
+def test_the_mapped_walk_lines_follow_the_widened_a1rm4x_pair():
+    """Readability pushes only the later, unanchored walk dialogue."""
+    walk = walk_plates()
+    by_id = {p["id"]: p for p in committed()["plates"]}
+    assert walk["walk_ge_stream"]["at"] >= (
+        by_id["mapped_a1rmax_intro_2"]["at"]
+        + by_id["mapped_a1rmax_intro_2"]["dur"]
+        + build_efmb_plates.PLATE_GAP)
+    assert walk["walk_ge_glorious"]["at"] >= (
+        by_id["mapped_wrkode_dibs"]["at"]
+        + by_id["mapped_wrkode_dibs"]["dur"]
+        + build_efmb_plates.PLATE_GAP)
+
 def test_the_mapped_walk_lines_clear_the_overlap_without_moving_the_next_beat():
     """The reply moves clear of A1RM4X; the next Eggroll beat stays pinned."""
     walk = walk_plates()
-    assert walk["walk_ge_stream"]["at"] == pytest.approx(180.4, abs=1e-3)
-    assert walk["walk_ge_glorious"]["at"] == pytest.approx(188.25, abs=1e-3)
+    assert walk["walk_ge_stream"]["at"] == pytest.approx(180.531, abs=1e-3)
+    assert walk["walk_ge_glorious"]["at"] == pytest.approx(188.381, abs=1e-3)
+
+
+def test_karena_and_joseph_use_their_verified_github_identities():
+    """Both are credited through their verified accounts, so a portrait can
+    never resolve to a same-named stranger. Karena's four chat pills are out
+    of the act (see the note in chapters/II-endless-forms.md), so her arrival
+    card is where her identity is asserted."""
+    by_id = {p["id"]: p for p in committed()["plates"]}
+
+    assert by_id["trio_angellk"]["name"] == "Karena Angell"
+    assert by_id["trio_angellk"]["avatar_url"] == \
+        "https://avatars.githubusercontent.com/u/836183?v=4"
+
+    for plate_id in (
+            "chat_joseph_ricardos", "chat_joseph_slop", "toc_joseph_worth"):
+        assert by_id[plate_id]["speaker"] == "jrsapi"
+        assert by_id[plate_id]["avatar_url"] == \
+            "https://avatars.githubusercontent.com/u/5437766?v=4"
+
 
 def test_the_villain_arrives_with_the_villain():
     """The bar is on the shot the winged figure walks out of, not on the
@@ -592,7 +705,7 @@ def test_the_mapped_megacut_pass_rewrites_the_walk_window_verbatim():
 
     assert by_id["mapped_a1rmax_intro"]["text"] == (
         "Thank you I never thought I could help!")
-    assert by_id["mapped_a1rmax_lowly"]["text"] == (
+    assert by_id["mapped_a1rmax_intro_2"]["text"] == (
         "I'm not like you I'm just a lowly user")
     assert by_id["walk_ge_stream"]["text"] == "It's your patch, turn the stream on"
     assert by_id["walk_a1rm4x"]["speaker"] == "LionHeartP"
@@ -617,34 +730,29 @@ def test_the_mapped_megacut_pass_rewrites_the_walk_window_verbatim():
     ):
         assert removed not in by_id
 
-# The black-screen conversation, in the order it plays. The ids used to be
-# read off a table in the generator; the words are authored in
-# chapters/II-endless-forms.md now, so the test names them itself rather
-# than asking the code under test what it built.
-BLACK_CONVERSATION_IDS = [
+# The pre-action hallway conversation is authored in the chapter, in screen
+# order. The explicit list stops a Python table from quietly reclaiming it.
+PAUSED_CONVERSATION_IDS = [
     "mapped_akgraner_kyle", "mapped_hikari_ouch", "mapped_owen_sorry",
-    "mapped_kolunmi_pvp", "mapped_cam_noone",
+    "mapped_kolunmi_pvp", "chat_angellk_pvp", "mapped_cam_noone",
     "mapped_hikari_wait", "mapped_kolunmi_users",
+    "chat_amber_bazaar", "chat_amber_crap", "chat_amber_dungeon",
     "mapped_akgraner_kindness_1", "mapped_akgraner_kindness_2",
     "mapped_akgraner_kindness_3", "mapped_akgraner_kindness_4",
     "mapped_akgraner_kindness_5", "mapped_akgraner_kindness_6",
     "mapped_which_kyle",
-    # The second talk, 2026-08-28: the action sequence and the two lines the
-    # owner floated under "KEEP IT PAUSED" -- all over the frozen hallway.
-    "chat_amber_problem", "chat_amber_decide", "chat_amber_fate",
-    "chat_amber_shittywriting", "chat_amber_bazaar", "chat_amber_crap",
 ]
 
 
-def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
+def test_the_normalized_pause_copy_is_emitted_verbatim():
     by_id = {p["id"]: p for p in committed()["plates"]}
 
     expected = {
         "mapped_redacted_blow": ("castrojo", "Or go blow some shit up"),
-        # mapped_owen_slay ("Slay out, Queen!") was deleted in the owner's
-        # 2026-08-28 WIP; the note block that quoted it records the removal.
         "mapped_akgraner_kyle": ("akgraner", "Hi sugar, I'm looking for Kyle"),
-        "mapped_kyle_sup": ("kylegospo", "Sup"),
+        "mapped_kyle_sup": ("KyleGospo", "Sup"),
+        "chat_angellk_pvp": (
+            "angellk", "Don't look at me I only turned on PVP"),
     }
     for plate_id, (speaker, text) in expected.items():
         assert by_id[plate_id]["speaker"] == speaker
@@ -657,11 +765,12 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
     assert by_id["mapped_hikari_wait"]["text"] == "Hey wait?!"
     assert by_id["mapped_kolunmi_users"]["text"] == \
         "Are those ... other linux users?"
+    assert by_id["mapped_owen_sorry"]["speaker"] == "TBD"
+    assert by_id["mapped_owen_sorry"]["speaker_pending"] == "Owen"
+    assert by_id["mapped_cam_noone"]["speaker"] == "TBD"
+    assert by_id["mapped_cam_noone"]["speaker_pending"] == "cam"
     assert all(by_id[pid]["kind"] == "chat"
-               for pid in BLACK_CONVERSATION_IDS)
-    assert by_id["mapped_amber_reveal"]["name"] == "Amber Graner"
-    assert by_id["mapped_amber_reveal"]["class"] == "Striker Titan"
-    assert by_id["mapped_amber_reveal"]["title"] == "The Iron Standard"
+               for pid in PAUSED_CONVERSATION_IDS)
     assert [by_id[f"mapped_akgraner_kindness_{i}"]["text"]
             for i in range(1, 7)] == [
         "Remember, kindness is doing what's right", "For the ecosystem",
@@ -669,6 +778,8 @@ def test_the_recovered_828_to_914_copy_is_emitted_verbatim():
         "Don't be nice", "Be kind",
     ]
     assert by_id["mapped_haters"]["name"] == "HATERS"
+    assert "mapped_amber_reveal" not in by_id
+    assert "mapped_kyle_reveal" not in by_id
     assert "solo_EyeCantCU" not in by_id
 
 def test_every_dialogue_pill_in_the_walk_carries_its_speaker_s_pfp():
@@ -697,7 +808,7 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
     lead = build_efmb.derive_lead()
     walk_in = build_efmb.film_for_source(build_efmb_plates.WALK_IN, lead)
     toc = toc_plates()
-    pre = [toc[k] for k in ("toc_karena", "toc_joseph_worth", "toc_ricardo")]
+    pre = [toc[k] for k in ("toc_joseph_worth", "toc_ricardo")]
     # CHAINED BACKWARD FROM THE WALK, not forward from 2:19. Correcting
     # WALK_IN to the walking shot's real first frame left a constrained
     # exchange, so it moves earlier as a block rather
@@ -711,52 +822,7 @@ def test_the_exchange_is_laid_out_around_the_walk_never_on_top_of_it():
 
 def test_the_remaining_pre_walk_toc_copy_is_reproduced_verbatim():
     toc = toc_plates()
-    assert toc["toc_karena"] == {
-        "id": "toc_karena",
-        "at": 137.533,
-        "dur": 3.2,
-        "kind": "chat",
-        "position": "left",
-        "copy_source": "owner_supplied",
-        "speaker": "angellk",
-        "text": "One hundred thousand bootc volunteers, ready to power up",
-        "text_source": "owner_supplied",
-        "avatar": "renders/avatars/angellk.png",
-        "avatar_url": "https://github.com/angellk.png?size=256",
-    }
     assert toc["toc_ricardo"]["text"] == "Look man I am so tired just jump"
-
-def test_karena_and_joseph_use_their_verified_github_identities():
-    by_id = {p["id"]: p for p in committed()["plates"]}
-    karena_ids = {
-        "chat_karena_job",
-        "late_karena_cardio",
-        "late_karena_lessons",
-        "toc_karena",
-        "ch_ii_12_4_angellk",
-    }
-    for plate_id in karena_ids:
-        assert by_id[plate_id]["speaker"] == "angellk"
-        assert by_id[plate_id]["avatar_url"] == \
-            "https://github.com/angellk.png?size=256"
-
-    assert by_id["trio_mara_sov"]["name"] == "Karena Angell"
-    assert by_id["trio_mara_sov"]["avatar_url"] == \
-        "https://github.com/angellk.png?size=256"
-
-    for plate_id in (
-            "chat_joseph_ricardos", "chat_joseph_slop",
-            "toc_joseph_worth"):
-        assert by_id[plate_id]["speaker"] == "jrsapi"
-        assert by_id[plate_id]["avatar_url"] == \
-            "https://github.com/jrsapi.png?size=256"
-
-def test_karena_job_precedes_the_choice_screen():
-    by_id = {p["id"]: p for p in committed()["plates"]}
-    karena = by_id["chat_karena_job"]
-    choice = by_id["choice_lfx_00"]
-    assert karena["at"] == pytest.approx(77.433, abs=1e-3)
-    assert karena["at"] + karena["dur"] <= choice["at"]
 
 def test_the_post_walk_dialogue_is_replaced_by_the_mapped_pass():
     by_id = {p["id"]: p for p in committed()["plates"]}
@@ -795,7 +861,7 @@ def test_the_owner_conversation_replaces_the_skill_banners():
         assert p["at"] == pytest.approx(at, abs=1e-3)
         assert p["dur"] == pytest.approx(dur, abs=1e-3)
         assert p["avatar"] == "renders/avatars/jrsapi.png"
-        assert p["avatar_url"] == "https://github.com/jrsapi.png?size=256"
+        assert p["avatar_url"].endswith("/5437766?v=4")
 
     kyle = by_id["mapped_kyle_titanfall"]
     assert kyle["at"] == pytest.approx(239.95, abs=1e-3)
@@ -840,11 +906,11 @@ def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
     }
     assert removed.isdisjoint(by_id)
     assert by_id["mapped_akgraner_kyle"]["at"] < by_id["mapped_kolunmi_pvp"]["at"]
-    assert by_id["mapped_kolunmi_users"]["at"] < build_efmb.AMBER_AT
-    # The conversation after Amber's clip still plays over the freeze:
-    # the kindness speech opens in the after-clip hold.
-    assert by_id["mapped_akgraner_kindness_1"]["at"] >= \
-        build_efmb.HALLWAY_AFTER_AMBER_AT
+    assert by_id["mapped_kolunmi_pvp"]["at"] < \
+        by_id["chat_angellk_pvp"]["at"] < by_id["mapped_cam_noone"]["at"]
+    assert by_id["mapped_kolunmi_users"]["at"] < \
+        by_id["chat_amber_bazaar"]["at"] < by_id["chat_amber_crap"]["at"]
+    assert by_id["mapped_which_kyle"]["at"] < build_efmb.AMBER_AT
     kindness = [by_id[f"mapped_akgraner_kindness_{i}"] for i in range(1, 7)]
     assert [p["text"] for p in kindness] == [
         "Remember, kindness is doing what's right",
@@ -857,11 +923,9 @@ def test_hallway_sequence_uses_authored_order_and_sentence_sized_pills():
     assert all(p["scale"] > 1 for p in kindness)
     assert kindness[-1]["at"] + kindness[-1]["dur"] < \
         by_id["mapped_which_kyle"]["at"]
-    # Owner, 2026-08-23: akgraner's closing line became "Extinction is the
-    # Rule"; the question moved to her own earlier pill, spelled "Kyleford".
     assert by_id["mapped_which_kyle"]["text"] == "Extinction is the Rule"
-    # chat_amber_kyleford ("Which one of you is Kyleford?") left with the
-    # owner's 2026-08-28 WIP; its wording survives in git history.
+    assert "chat_amber_kyleford" not in by_id
+    assert "mapped_owen_slay" not in by_id
 
 def test_endfight_warnings_and_speakers_match_owner_copy():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
@@ -871,7 +935,9 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
     assert haters["seen_at_src"] == pytest.approx(326.163)
     assert haters["at"] == pytest.approx(
         build_efmb.edited_film_for_source(326.163), abs=1e-3)
-    assert by_id["mapped_kyle_sup"]["speaker"] == "kylegospo"
+    assert haters["at"] + haters["dur"] == pytest.approx(
+        build_efmb.edited_film_for_source(331.163), abs=1e-3)
+    assert by_id["mapped_kyle_sup"]["speaker"] == "KyleGospo"
     assert by_id["mapped_kyle_sup"]["text"] == "Sup"
     assert by_id["mapped_kolunmi_disco"]["text"] == "Cardio!"
     assert by_id["mapped_kolunmi_disco"]["speaker"] == "kolunmi"
@@ -880,43 +946,28 @@ def test_endfight_warnings_and_speakers_match_owner_copy():
         build_efmb.edited_film_for_source(333.817), abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["dur"] == pytest.approx(2.2, abs=1e-3)
     assert by_id["mapped_kolunmi_disco"]["bond_of"] == "mapped_kyle_sup"
-    # Owner, 2026-08-28: "HALLWAY -> FREEZE -> AMBER TALKS -> SHE FIGHTS ->
-    # AMBER TALK -> unfreeze, sup" -- the second talk clears before the
-    # picture resumes.
-    for pid in ("chat_amber_problem", "chat_amber_decide", "chat_amber_fate",
-                "chat_amber_shittywriting", "chat_amber_bazaar",
-                "chat_amber_crap"):
-        assert by_id[pid]["at"] + by_id[pid]["dur"] <= \
-            build_efmb.HALLWAY_RETURN_AT + 1e-3
-    assert by_id["chat_amber_problem"]["at"] == pytest.approx(308.403, abs=1e-3)
-
-def test_post_cortney_paused_conversation_is_authored_in_order():
-    """The paused conversation as re-authored 2026-08-28: the akgraner
-    action sequence plus the two floated lines, in the owner's order.
-
-    The 13-pill conversation this used to pin was deleted in the owner's
-    WIP; it survives verbatim in git history.
-    """
-    paused = chapter_entries_with_label("paused")
-    assert paused == [
+    action = chapter_entries_with_label("amber-action")
+    assert action == [
         ("akgraner", "Ok so I'm going to clean out this trash for you"),
         ("akgraner", "[Don't let them decide for you]"),
         ("akgraner", "You make your own fate."),
         ("akgraner", "I can't save you from this shitty writing though"),
-        ("akgraner", '\"How bazaar?\"'),
-        ("akgraner", "Who writes this crap?"),
+    ]
+    assert "chat_cortney_solid" not in by_id
+
+def test_the_post_amber_pause_contains_only_current_owner_copy():
+    paused = chapter_entries_with_label("post-amber")
+    assert paused == [
+        ("nwoods3", "I feel seen"),
+        ("kolunmi", "Hey did you see how we just loaded up in a new level?"),
+        ("HikariKnight", "Finally, I can play WARFRAME!"),
     ]
 
-def test_eve_and_eva_render_only_as_kolunmi():
-    """SETTLED 2026-08-25: the login is exactly `kolunmi`, never `kolumni`.
-
-    The guessed handles "Eve" and "Eva" -- one in the 10:14.937 block, two
-    more freed from the paused conversation's overflow -- were never a
-    second voice; every one of them now carries kolunmi's own portrait.
-    """
+def test_kolunmi_chat_derives_the_verified_portrait():
     entries = plate_by_speaker("kolunmi")
     assert entries
-    assert all(entry["avatar_url"].startswith("https://github.com/kolunmi")
+    from tools.identity import chat_identity
+    assert all(entry["avatar_url"] == chat_identity("kolunmi")["avatar_url"]
                for entry in entries)
     assert not {"Eve", "Eva"} & {entry.get("speaker") for entry in all_plates()}
 
@@ -935,23 +986,20 @@ def test_sup_is_anchored_to_the_heroes_void_shield_source():
 def test_the_retirement_conversation_moved_here_verbatim_from_act_three():
     by_id = {p["id"]: p for p in committed()["plates"]}
     pair = [by_id["retirement-1"], by_id["retirement-2"]]
-    # Owner, 2026-08-24: "10:24 is where redacted's 'retirement conversation'
-    # should go, not in the next chapter" -- 10:24 on the alpha2 clock is the
-    # Cayde-6 neon-street shot that closes the picture; the chapter file pins
-    # it at film 344.3 against the OLD hallway clock, and PAUSE_DELTA is the
-    # same rebase every other post-hallway pin in this act gets -- so seating
-    # the owner's paused conversation in full (2026-08-25) pushes this pair
-    # later by exactly that much, never by a hand-typed number. Copy, holds
-    # and gap are verbatim from act III, and the pair stays chromeless (he is
-    # revealed in act VI).
     assert [p["kind"] for p in pair] == ["chat", "chat"]
     assert [p["speaker"] for p in pair] == ["castrojo", "castrojo"]
     assert [p["text"] for p in pair] == ["Finally, retirement",
                                          "The long walk beckons"]
-    assert pair[0]["at"] == pytest.approx(344.3 + PAUSE_DELTA, abs=1e-3)
-    assert pair[0]["dur"] == pytest.approx(2.125, abs=1e-3)
-    assert pair[1]["at"] - pair[0]["at"] == pytest.approx(2.375, abs=1e-3)
-    assert all(p.get("avatar") == "renders/avatars/castrojo.png" for p in pair)
+    assert pair[0]["at"] == pytest.approx(
+        build_efmb.edited_film_for_source(358.497), abs=1e-3)
+    assert pair[1]["at"] == pytest.approx(
+        build_efmb.edited_film_for_source(360.947), abs=1e-3)
+    assert [p["dur"] for p in pair] == pytest.approx([2.2, 2.2], abs=1e-3)
+    # Unredacted 2026-08-28 ("no need to redact cayde anymore go with
+    # castrojo"), so both pills now carry his verified portrait. While the
+    # redaction held they carried the drawn crest and credited nobody.
+    assert all(p.get("avatar") == "renders/avatars/castrojo.png"
+               for p in pair)
 
 def test_the_owner_conversation_hands_to_kyle_without_overlap():
     by_id = {p["id"]: p for p in committed()["plates"]}
@@ -1009,7 +1057,7 @@ def test_the_late_pass_records_only_the_precise_remaining_gaps():
     assert "krook" in late_gaps
     assert "kolunmi" in late_gaps
     assert "rare drop in a game" in late_gaps
-    assert "hallway-and-dogs frame, Amber's owner-identified" in late_gaps
+    assert "hallway-and-dogs frame before and after Amber's" in late_gaps
     assert "EyeCantCU's owner-timed reveal is seated at source-352.850" in \
         late_gaps
     assert "requested flashing red boss treatment is still missing" in late_gaps
@@ -1034,12 +1082,10 @@ def test_the_828_redacted_line_replaces_the_old_gaslighting_seat():
     assert clue["text"] == "Or go blow some shit up"
     assert "timed_jorge" not in by_id
 
-def test_the_endfight_reseats_kyle_and_eyecantcu_on_evidenced_picture():
+def test_the_endfight_keeps_only_evidenced_cards():
     by_id = {p["id"]: p for p in committed()["plates"]}
-    kyle = by_id["mapped_kyle_reveal"]
     eye = by_id["mapped_eyecantcu_reveal"]
-    assert kyle["at"] == pytest.approx(build_efmb.KYLE_REVEAL_AT, abs=1e-3)
-    assert kyle["name"] == "Kyle Gospodnetich"
+    assert "mapped_kyle_reveal" not in by_id
     assert eye["at"] == pytest.approx(
         build_efmb.edited_film_for_source(352.85), abs=1e-3)
     assert eye["name"] == "[ EyeCantCU ]"
@@ -1090,8 +1136,12 @@ def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
             "LionHeartP", "renders/avatars/LionHeartP.png"),
         # Recast by the owner, 2026-08-23: GloriousEggroll -> lionheartp.
         "mapped_eggroll_title": (
-            "lionheartp", "renders/avatars/LionHeartP.png"),
-        "mapped_redacted_options": ("castrojo", "renders/avatars/castrojo.png"),
+            "LionHeartP", "renders/avatars/LionHeartP.png"),
+        # Unredacted 2026-08-28 on the owner's instruction ("no need to
+        # redact cayde anymore go with castrojo"), so the pill now carries
+        # his verified portrait instead of the drawn crest.
+        "mapped_redacted_options": (
+            "castrojo", "renders/avatars/castrojo.png"),
         "mapped_akgraner_kindness_1": (
             "akgraner", "renders/avatars/akgraner.png"),
     }
@@ -1101,13 +1151,19 @@ def test_the_long_form_speaker_cards_use_chat_chrome_and_verified_avatars():
         assert entry["speaker"] == speaker
         assert entry.get("avatar") == avatar
 
-def test_amber_conversation_fills_the_black_pause_before_sup():
+def test_amber_action_and_post_action_hallway_stay_distinct():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    conversation = [by_id[pid] for pid in BLACK_CONVERSATION_IDS]
-    assert all(p["kind"] == "chat" for p in conversation)
-    assert conversation[0]["at"] >= build_efmb.BLACK_CONVERSATION_AT
-    assert conversation[-1]["at"] + conversation[-1]["dur"] <= \
-        build_efmb.HALLWAY_RETURN_AT
+    action = [by_id[pid] for pid in (
+        "chat_amber_problem",
+        "chat_amber_decide",
+        "chat_amber_fate",
+        "chat_amber_shittywriting",
+    )]
+    assert all(p["kind"] == "chat" for p in action)
+    assert action[0]["at"] >= build_efmb.AMBER_AT
+    assert action[-1]["at"] + action[-1]["dur"] <= \
+        build_efmb.HALLWAY_AFTER_AMBER_AT
+    assert build_efmb.HALLWAY_AFTER_AMBER_AT < build_efmb.HALLWAY_RETURN_AT
     assert by_id["mapped_kyle_sup"]["at"] > build_efmb.HALLWAY_RETURN_AT
     assert "mapped_amber_ready" not in by_id
     assert "mapped_reaction_hell" not in by_id
@@ -1125,12 +1181,11 @@ def test_the_late_titles_and_last_chats_replace_the_old_conflicting_windows():
     for removed in (
         "walk_ge_upstream", "trustee_gregkh", "trustee_shuah_khan",
         "solo_tulilirockz", "timed_krook", "timed_bedazzle",
-        "solo_kolunmi",
+        "solo_kolunmi", "late_karena_lessons",
     ):
         assert removed not in ids
-    assert "late_karena_lessons" in ids
     assert "late_rochaporto_cern" in ids
-    assert "mapped_kyle_reveal" in ids
+    assert "mapped_kyle_reveal" not in ids
 
 def test_out_of_picture_replacements_are_recorded_and_existing_walk_lines_stay():
     manifest = committed()
@@ -1140,10 +1195,10 @@ def test_out_of_picture_replacements_are_recorded_and_existing_walk_lines_stay()
     assert "mapped_saturn_title" in ids
     assert "mapped_kyle_titanfall" in ids
     assert "mapped_redacted_blow" in ids
-    assert "mapped_kyle_reveal" in ids
+    assert "mapped_kyle_reveal" not in ids
     gaps = " ".join(manifest["unresolved"])
     assert "rare drop in a game" in gaps
-    assert "hallway-and-dogs frame, Amber's owner-identified" in gaps
+    assert "hallway-and-dogs frame before and after Amber's" in gaps
     assert "late_saturn_title" not in ids
     assert "late_kernel_bump" not in ids
 
@@ -1439,19 +1494,9 @@ def test_hikariknight_is_out_of_the_eggroll_scene():
     casting = build_efmb_plates.load_casting()
     build_efmb_plates.authored_copy("HikariKnight", casting)  # raises if gone
 
-    # The reply starts after both A1RM4X pills instead of overlapping them.
+    # The owner-authored line remains after the readability re-time.
     by_id = {p["id"]: p for p in manifest["plates"]}
-    sequence = [
-        by_id["mapped_a1rmax_intro"],
-        by_id["mapped_a1rmax_lowly"],
-        by_id["walk_ge_stream"],
-        by_id["walk_a1rm4x"],
-        by_id["mapped_wrkode_dibs"],
-        by_id["walk_ge_glorious"],
-    ]
-    for previous, current in zip(sequence, sequence[1:]):
-        assert previous["at"] + previous["dur"] <= current["at"] + 1e-6
-    assert by_id["walk_ge_stream"]["at"] == pytest.approx(180.4, abs=1e-3)
+    assert by_id["walk_ge_stream"]["at"] > by_id["mapped_a1rmax_intro_2"]["at"]
     assert by_id["walk_ge_stream"]["text"] == "It's your patch, turn the stream on"
 
 def test_natewaddington_is_out_of_the_climax():
@@ -1477,21 +1522,15 @@ def test_natewaddington_is_out_of_the_climax():
         p["id"] == "late_mars_title" and 116.0 <= p["at"] <= 119.0
         for p in manifest["plates"])
 
-def test_the_arc_hunter_stays_out_but_kyle_s_reveal_is_restored():
-    """kolunmi stays displaced; Kyle's authored reveal card comes back."""
+def test_the_arc_hunter_and_unseatable_kyle_reveal_stay_out():
+    """Omission is safer than moving either credit off its evidenced shot."""
     manifest = build_efmb_plates.build()
     ids = {p["id"] for p in manifest["plates"]}
     assert "solo_kolunmi" not in ids
-    assert "mapped_kyle_reveal" in ids
+    assert "mapped_kyle_reveal" not in ids
     gap = " ".join(manifest["unresolved"])
     assert "kolunmi" in gap
-    assert "KyleGospo's mapped reveal sits on" in gap
-    kyle = next(
-        p for p in manifest["plates"] if p["id"] == "mapped_kyle_reveal")
-    assert kyle["at"] == pytest.approx(build_efmb.KYLE_REVEAL_AT, abs=1e-3)
-    assert kyle["name"] == "Kyle Gospodnetich"
-    assert kyle["title"] == "The First Knife"
-    assert kyle["dur"] >= build_efmb_plates.MIN_HOLD
+    assert "Amber's and Kyle's guardian reveals are omitted" in gap
 
 def test_act_ii_encodes_to_the_delivery_spec_not_a_private_one():
     """Act II's picture is encoded at the repo's DELIVERY rung, with a VUI.

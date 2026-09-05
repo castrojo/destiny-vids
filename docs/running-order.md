@@ -75,6 +75,11 @@ conclusion are edited in one place; `scripts/build_intermission.py` renders it.
 It is currently silent and every word of it is a placeholder — the owner's
 different song and its real copy are both still to come.
 
+**Excision is not an act either.** The first-battle segment plays after act VI
+and before Perfume movement 4. It carries no numeral, chapter marker or
+`Prod/NN-*` path; its committed builder and plate manifest produce
+`renders/excision/excision-plated.mp4`.
+
 **Not every act is announced.** The Roman-numeral slides were retired on the
 owner's instruction; the programme plays exactly one card, the scream
 interstitial between acts V and VI — *ON THE LINUX DESKTOP /
@@ -94,7 +99,7 @@ prologue is movement 1; four more movements sit between the acts.
 | **2** | after act I |
 | **3** | after act III |
 | *(intermission)* | after movement 3 — see above; the movements stay contiguous in source order across it |
-| **4** | after act VI, before Europa |
+| **4** | after act VI and the Excision segment, before Europa |
 | **5** | after Europa, into the credits |
 
 They take **no numerals, no slides and no chapter markers**, and they deliver to
@@ -162,7 +167,7 @@ to: [`skills/audio/SKILL.md`](skills/audio/SKILL.md).
 ## What is still open
 
 Tracked as issues, not as prose here, so this file cannot go stale behind them:
-[the open backlog](https://github.com/castrojo/destiny-vids/issues). The ones
-that block *the feature* rather than an act are the provenance question
-([#55](https://github.com/castrojo/destiny-vids/issues/55)) and act VI's
-lossless bed ([#58](https://github.com/castrojo/destiny-vids/issues/58)).
+[the open backlog](https://github.com/castrojo/destiny-vids/issues). The
+Antesion provenance decision is recorded in
+[#55](https://github.com/castrojo/destiny-vids/issues/55); it is accepted for
+the current non-commercial film and is not an open feature blocker.

@@ -26,8 +26,9 @@ act and the centre of the show, but not the whole show. Every act has a film
 and the programme assembles; what is still open is filed as issues.
 
 **Hero videos — one person, one video, every source.** Every clean shot of a
-bound character in the entire index, summed into one cut. Karena is Mara Sov, so
-*her* video is every instance of Mara Sov in the collection — the Season of the
+bound character in the entire index, summed into one cut. Mara Sov is cast to
+GitHub login `angellk`, so that person's video is every instance of Mara Sov in
+the collection — the Season of the
 Lost cutscenes and the Final Shape launch trailer today, and whatever gets
 indexed next. Kat, mrbobbytables, Cayde/castrojo and the rest of the cast each
 get one, and they are **promotional material for the feature**, released weekly
@@ -91,8 +92,9 @@ The destiny names are there for convenience
 | [Redacted] Cayde-6 | castrojo | authored plate (this character is very famous so we only reveal jorge's name once)| 
 | Bob Killen | mrbobbytables | Only person who knows wtf is going on |
 | Doctor Andy Anderson | clubanderson | Foundry of the Forbidden |
+| Fynch | Ihor Dvoretskyi | verified GitHub login `idvoretskyi`; no plate copy authored |
 | Saint-14 | Kat | remains the bubble in the original Wolves; authored plate - doesn't read maintainer email, gets shot down |
-| Mara Sov | Karena Angel | authored plate (Stasis Warlock — answers #5), wreath chrome |
+| Mara Sov | `angellk` | authored plate (Stasis Warlock — answers #5), wreath chrome |
 | **Lord Saladin** | **Jeefy** | **constrained: far + helmeted only** |
 
 Saladin is the one **constrained** binding: Jeefy plays the Iron Lord but does not

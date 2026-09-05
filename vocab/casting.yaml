@@ -1,937 +1,586 @@
-# vocab/casting.yaml
-# CASTING axis — inverted.
-#
-# The old model was "one performer must stand in for many Guardians", which made
-# anonymity a scarce resource and forced per-binding resemblance constraints
-# (only usable far + helmeted, etc). That is gone. The fiction now bends to the
-# footage: Bungie's cinematics ALREADY tell a good story, so we simply ASSIGN
-# names to the cast that is on screen.
-#
-# Two tiers, and the difference between them is the whole model:
-#
-#   LEAD    — a named Destiny NPC is bound 1:1 to one real person. Fixed for the
-#             whole project so the character reads consistently across shots.
-#             Usually unconstrained: naming a role does not require a lookalike.
-#             A binding MAY carry `constraints` where the project still wants the
-#             figure to read as the character (jeefy -> Saladin: far + helmeted
-#             only), in which case violating shots derive usable = false.
-#
-#   ENSEMBLE— every anonymous Guardian in frame is a SLOT, filled from a
-#             rotating monthly pool of Project Bluefin contributors. The
-#             cinematics are full of nameless Guardians; that crowd is the
-#             project's diverse cast, and it gets filled with real people.
-#             Slots are assigned programmatically by tools/ensemble.py, NOT
-#             tagged by hand, so the pool can be re-rolled each month without
-#             retagging a single segment.
-
-leads:
-  description: >
-    Named Destiny characters bound to a real person for the life of the project.
-    OPEN and EXTENSIBLE — this map is the place to add bindings. `person: null`
-    means the role is written into the story but not yet cast; retrieval still
-    works (the character is identified), the tile just has no name on it yet.
-  entry_fields:
-    person:       snake_case id of the real person cast, or null when uncast.
-    display_name: How the person is credited on their tile.
-    aka:          Alternate spellings/ids for the SAME character, normalized to this key.
-    note:         OPTIONAL free-text standing direction for the binding. Documentation only — derivation never reads it.
-    github:       >
-      OPTIONAL. The person's verified GitHub login, recorded so avatar tooling
-      resolves the person and never a same-named stranger's account (the
-      `nimbatus`/`nimbinatus` trap — see that binding). A login is verifiable;
-      a real name may not be. Documentation only — derivation never reads it.
-    redacts:      >
-      OPTIONAL. The real name the programme must NOT print while the redaction
-      holds, mirroring the card-level fields (see `cayde_signoff` in
-      scripts/build_efmb_plates.py). The enforcement is structural: a binding
-      whose on-screen credit is a redaction carries NO `plate:` block, so
-      tools/plate.py has no real-name copy to print and reports the character
-      under `unresolved` (no_plate_copy) instead. Documentation + tests only —
-      derivation never reads it.
-    redaction_scope: >
-      OPTIONAL with `redacts`. Where the redaction holds and where the reveal
-      is, in the card field's own phrasing ("act II only -- he is revealed
-      later in the programme").
-    plate:        >
-      OPTIONAL on-screen nameplate copy, read by tools/plate.py when it plans a
-      cut's plates. Keys mirror the reference deck (~/Videos/nameplates.json):
-      `label` (the uppercase eyebrow), `class`, `name`, `title` and `trustee`
-      (the burnished-silver treatment), plus `kind` (`ghost` drops the class
-      line, since a Ghost has no subclass) and the chrome flags: `variant`
-      (`leader` is the gold treatment, and it outranks `trustee`; `rust` is
-      oxidised iron; `bazzite` is purple chrome with the Bazzite logo),
-      `avatar` (a portrait path or URL, shown in the crest) and `wreath`
-      (`true` rings the avatar with a laurel — the maxxed-out-character
-      treatment). Every key is OPTIONAL: a row the reference deck does not
-      authorise is omitted, never invented, so a plate carrying only `name`
-      is a valid plate. Derivation never reads it — a binding without one
-      simply gets no plate.
-    dialogue_label: >
-      OPTIONAL owner-facing speaker label used in DIALOGUE.md instead of the
-      footage character key. This does not change shot matching; it prevents
-      internal source-character names from leaking into authored conversation.
-    constraints:  >
-      OPTIONAL per-binding usability constraints, for a person who does not
-      resemble their character. Keys: `require_helmet` (identity_visibility must
-      read as face-concealed) and `require_far` (shot_scale must be wide enough
-      to hide facial detail). When present and unmet, the derived
-      `casting.usable` is false and the unmet keys are listed in
-      `casting.constraints_failed`; such shots are excluded from that
-      character's retrieval. Most bindings have NO constraints: naming a role
-      does not require a lookalike. Constraints exist only where the project
-      wants the figure to read as the character rather than as the person.
-  values:
-    # --- CAST ------------------------------------------------------------
-    elsie_bray:
-      person: laura_santamaria
-      display_name: Laura Santamaria
-      aka: [elsie_gray, the_exo_stranger, exo_stranger]
-      # Laura's Guardian identity is AUTHORED, not written here: every field is
-      # verbatim from ~/src/website public/wolves/characters/characters.json
-      # (slug `laura`), the same roster that authors Bob's plate below. It is
-      # reproduced rather than referenced because a credit that knows an
-      # authored identity must not fall back to the generic copy -- and it is
-      # copied verbatim rather than paraphrased, because paraphrasing a real
-      # person's credit is the same fault as inventing one.
-      #
-      # NAME-UNTIL-EUROPA: this plate's name row is act VII copy only. Every
-      # act before VII credits her as NIMBATUS — see the `nimbatus` binding
-      # below, which is the same person under the redaction (issue #103).
-      plate:
-        label: MAINTAINER // GUARDIAN
-        class: Gunslinger Hunter
-        name: Laura Santamaria
-        title: The Order of Seven
-    nimbatus:
-      # NIMBATUS IS LAURA SANTAMARIA — "they are the same person we don't
-      # reveal her real name until europa" (owner, first alpha watch; issue
-      # #103). Act VII's Guardian card (82.525-88.000) is the reveal; every act
-      # before it calls her NIMBATUS. The binding is what stops an earlier act
-      # crediting her by her real name BY DEFAULT: the pre-reveal name resolves
-      # here, and this entry carries NO `plate:` block, so tools/plate.py has
-      # no copy to print and reports her under `unresolved` (no_plate_copy)
-      # every time she makes a cut -- the iron_lord_red_haired posture, and the
-      # same shape cayde_signoff carries in act II ("[ REDACTED ]" /
-      # redacts / redaction_scope).
-      #
-      # THE LOGIN IS `nimbinatus`, NOT `nimbatus` — two different GitHub
-      # accounts, and the wrong one matches the character name. github.com/
-      # nimbinatus is Laura Santamaria (Red Hat, u/1538692); github.com/
-      # nimbatus is an unrelated empty account (u/20426015). Avatar tooling
-      # resolves from the `github` login, so binding her by the character
-      # string would fetch a stranger's avatar onto her credit. Her pfp at
-      # ~/src/website public/wolves/characters/nimbatus.webp is
-      # owner-confirmed; only the login was the trap.
-      #
-      # NO `plate:` ON PURPOSE. Her AUTHORED Guardian identity (characters.json
-      # slug `laura`) already lives on the elsie_bray binding above — and its
-      # name row IS the redacted string, so it cannot be reproduced here. A
-      # Guardian identity for NIMBATUS (label / class / title under that name)
-      # has been authored by NOBODY: not the reference deck, not the website,
-      # not an issue. TODO(owner): author it where identities are authored
-      # (~/Videos/nameplates.json or the website's characters.json); tracked by
-      # issue #103. Until then every plate pass over a nimbatus shot reports
-      # the gap rather than filling it.
-      person: laura_santamaria
-      display_name: Nimbatus
-      aka: []
-      github: nimbinatus
-      redacts: Laura Santamaria
-      redaction_scope: >
-        every act before VII -- she is revealed on act VII's Guardian card
-        (82.525-88.000); the programme calls her NIMBATUS until Europa
-    anna_bray:
-      # Elsie's sister — the Bray line is the project's through-thread, so both
-      # sisters are cast.
-      person: joanna_lee
-      display_name: Joanna Lee
-      aka: [ana_bray]
-    zavala:
-      person: kelsey_hightower
-      display_name: Kelsey Hightower
-      aka: [commander_zavala]
-      # Plate copy as authored in castrojo/destiny-vids#8 -- the issue IS the
-      # authorisation; Kelsey has no entry in the reference deck
-      # (~/Videos/nameplates.json). The subclass line names the ROLE the
-      # project casts, the same way Osiris's does, so it is not read back off
-      # the Titan on screen. GOLD chrome, on the owner's instruction (#33):
-      # `variant: leader` is the same complete treatment Osiris carries
-      # below -- the wolves overlay's `.wolves-guardian-plate-leader`.
-      plate:
-        label: ARCHITECT // GUARDIAN
-        class: Dawnblade Warlock
-        name: Kelsey Hightower
-        title: Evangelist of the Open Sky
-        variant: leader
-    cayde_6:
-      person: castrojo
-      display_name: castrojo
-      aka: [cayde, cayde6]
-      # castrojo's Guardian identity is authored in the reference deck
-      # (~/Videos/nameplates.json, np_jorge), so it lives on his LEAD binding
-      # and is reproduced verbatim. Because he is cast as a lead, he is also
-      # excluded from the anonymous-Guardian ensemble pool: a person cannot be
-      # a named character and a nameless blueberry in the same project. He is
-      # therefore credited only in cuts where Cayde-6 is actually on screen.
-      plate:
-        label: TRUSTEE // GUARDIAN
-        class: Harbinger Titan
-        name: Jorge Castro
-        title: "Upender of Antipatterns | The First Disciple"
-        trustee: true
-    saladin:
-      # CONSTRAINED binding. jeefy plays the Iron Lord, but does not resemble
-      # Saladin, so the shot has to do the work: FAR and HELMETED only, where the
-      # armored silhouette reads as the character. Tight or face-clear Saladin
-      # derives usable = false and is excluded from retrieval. There is enough
-      # far/helmeted footage for this to be a real cast rather than a compromise.
-      person: jeefy
-      display_name: Jeefy
-      aka: [lord_saladin, iron_lord_saladin]
-      constraints:
-        require_helmet: true   # identity_visibility must be face-concealed
-        require_far: true      # shot_scale must be wide-ish (ELS/LS/MLS/MS)
-    osiris:
-      person: mrbobbytables
-      display_name: mrbobbytables
-      github: mrbobbytables
-      aka: []
-      dialogue_label: mrbobbytables
-      # On-screen nameplate copy (tools/plate.py), in the same four-field form
-      # as the reference deck: label / class / name / title, plus `trustee`.
-      # Every field is Bob Killen's OWN plate from the deck (np_bob) -- a real
-      # person's subclass is deck data, never a lore call about the character
-      # they happen to play.
-      #
-      # `variant: leader` is the complete gold treatment from
-      # WolvesIntroOverlay.vue (.wolves-guardian-plate-leader) -- the one the
-      # wolves video reserves for Christoph Blecker. It takes precedence over
-      # `trustee` in the CSS and in _variant_for(), so both flags are kept: Bob
-      # is a trustee, and he is plated as the leader.
-      plate:
-        label: TRUSTEE // GUARDIAN
-        class: Voidwalker Warlock
-        name: Bob Killen
-        title: Reconciler of the Plane
-        trustee: true
-        variant: leader
-    sagira:
-      # Internal footage-character key only. The authored conversation and
-      # rendered plate credit Andy directly; the source role never prints.
-      person: clubanderson
-      display_name: clubanderson
-      github: clubanderson
-      aka: [sagira_ghost]
-      dialogue_label: clubanderson
-      plate:
-        # SETTLED 2026-08-23, owner, verbatim: "doc is the ghost codify that".
-        # Sagira is Osiris's Ghost, and `aka` has recorded that association
-        # since this binding was written -- but the plate still described a
-        # Guardian, so act III played as two Guardians talking instead of a
-        # Guardian and his Ghost. `kind: ghost` is the codification: it drops
-        # the class row (a Ghost has no subclass) and shrinks the card, so the
-        # difference is visible before a word is read.
-        kind: ghost
-        # ONE WORD SUBSTITUTED, owner to confirm: the eyebrow was authored as
-        # "MAINTAINER // GUARDIAN". He is not a Guardian, so leaving it would
-        # print something the owner has now said is untrue -- and stale is
-        # worse than missing. GHOST is his own word from the ruling above, put
-        # in the authored pattern rather than a phrase invented for it.
-        label: MAINTAINER // GHOST
-        # Retained, no longer printed: `kind: ghost` drops the class row. Kept
-        # rather than deleted because it is authored copy, and deleting an
-        # authored string is a separate decision from ceasing to render it.
-        class: Shadebinder Warlock
-        # SETTLED 2026-08-23, owner, verbatim: "Call him Doc Anderson." This is
-        # the name on his chat pills and on his Guardian plate both, because
-        # tools/dialogue.py resolves a pill's speaker from this row -- one
-        # binding, so a reply and a reveal can never credit him differently.
-        name: Doc Anderson
-        title: Foundry of the Forbidden
-    saint_14:
-      person: kat
-      display_name: Kat
-      # STANDING NOTE, not a constraint: Saint-14 is Kat from here on, EXCEPT in
-      # the original Wolves material, where she stays the bubble (Ward of Dawn).
-      # Recorded so the exception is not silently lost; it does not affect
-      # derivation, which has no per-binding constraints any more.
-      note: >
-        Kat from now on, but she remains the bubble in the original Wolves.
-      aka: [saint, saint14]
-      # AUTHORED identity, reproduced verbatim -- and authored twice over, which
-      # is why it is safe to reproduce without asking: characters.json (slug
-      # `kat`) and src/data/wolves-intro-sequence.ts in ~/src/website agree
-      # field for field, and the shipped cut
-      # ~/Videos/UPLOAD/01-wolves-kat-cosgrove-sentinel-titan.mp4 renders it.
-      # `display_name` above stays "Kat" (how the index refers to her); the
-      # plate carries her full authored name, as the deck does everywhere.
-      plate:
-        label: MAINTAINER // GUARDIAN
-        class: Sentinel Titan
-        name: Kat Cosgrove
-        title: Defender Queen of the Lost
-    mara_sov:
-      person: karena_angell
-      display_name: Karena Angell
-      aka: [queen_mara_sov]
-      # OWNER-SUPPLIED plate copy. Karena has NO entry in the reference deck
-      # (~/Videos/nameplates.json), so there is no authored Guardian identity to
-      # reproduce, and this file must never invent one -- see the
-      # `ensemble.titles` comment and the Osiris/Sagira bindings, both of which
-      # were corrected back to deck data for exactly this reason.
-      #
-      # The exception that applies here is the owner authoring copy directly,
-      # which is allowed where an agent inventing it is not. Every field below
-      # was supplied by the owner verbatim; they are recorded as authored, not
-      # derived from anything about the character.
-      #
-      # RE-AUTHORED for act II (Endless Forms Most Beautiful), the show's first
-      # plated act. The owner replaced the whole plate and added the wreath;
-      # the previous copy is kept verbatim in the binding's `note:` so the
-      # change is visible rather than silent.
-      #
-      # `class` is now COMPLETE: the owner authored the subclass -- Stasis --
-      # which answers issue #5 ("Mara Sov plate: Karena's subclass word is
-      # missing"). The row shipped as bare `Warlock` until now, one word
-      # short, because the subclass was authored nowhere and picking one would
-      # have put a Destiny subclass on a real person without the owner having
-      # said it -- the single thing this file must never do.
-      #
-      # `variant: leader` is the gold treatment from WolvesIntroOverlay.vue
-      # (.wolves-guardian-plate-leader). It carries over from the previous
-      # authoring -- the re-authorship did not withdraw it, and the owner's
-      # direction is that she and Ricardo Rocha (ensemble.titles: rochaporto)
-      # are the two most senior and carry the fanciest plates in the show,
-      # "like a maxxed out character in a game".
-      #
-      # `wreath: true` is the laurel ring around the avatar: "stylize her
-      # nameplate to have a nicer wreath around her pfp, she's the most senior
-      # warrior in the entire series".
-      #
-      # GAP: no `avatar` is set, so the wreath has no portrait to ring yet.
-      # OWNER-SUPPLIED 2026-08-24: https://github.com/angellk. This closes the
-      # standing TODO -- the earlier candidate spelling `@karenaangel` from a
-      # docs/plans/wolves example does not resolve on GitHub, and a login is
-      # never an agent's to guess. Her act III chat pill resolves its handle
-      # and its avatar from this one field, exactly as Bob's and Doc's do.
-      github: angellk
-      # Keeps the internal character key out of the conversation the
-      # owner edits: her line reads `angellk` in DIALOGUE.md, not
-      # `Mara Sov (Karena Angell)`.
-      dialogue_label: angellk
-      note: >
-        Re-authored for act II (2026-08). Previous owner-supplied plate,
-        verbatim: label "ARCHITECT // GENERAL", class "Warlock", name "Karena
-        Angell", title "Archon of the Consensus", variant leader. The
-        re-authorship answers issue #5: the subclass word the old class row
-        lacked is now authored as Stasis, so the row reads "Stasis Warlock".
-        Closed 2026-08-24: the owner supplied `github: angellk`, so the avatar
-        resolves like every other login's (the wreath has its portrait).
-      plate:
-        label: ARCHON // CONTRIBUTOR
-        class: Stasis Warlock
-        name: Karena Angell
-        title: Architect of the Consensus
-        variant: leader
-        wreath: true
-    petra_venj:
-      # RECAST in castrojo/destiny-vids#8: the role passes from lenka to Lori
-      # Lorusso. Recorded here rather than anywhere else because this file is
-      # the one place a binding lives — the pinned cast test, the query phrases
-      # and the plate copy all follow it.
-      #
-      # The recast DISPLACES lenka, who is no longer credited anywhere; the
-      # issue does not say where she goes. That is a casting decision about a
-      # real person — blocked_on: human — and it stays recorded (see
-      # stories/02-cayde-6-the-return.md), not resolved by an agent.
-      person: lori_lorusso
-      display_name: Lori Lorusso
-      aka: [petra]
-      # Plate copy as authored in castrojo/destiny-vids#8, verbatim except for
-      # the `class` spelling. The issue writes "Harbringer"; the reference deck
-      # writes "Harbinger" on the one Guardian who appears in both. SETTLED
-      # 2026-08-23, owner, verbatim: "harbinger is fine". The word was a typo
-      # in the brief, not a coinage, and it is corrected everywhere it appears
-      # rather than in one place -- half a spelling is worse than either.
-      #
-      # `variant: rust` is a chrome flag, not a new copy field: oxidised iron
-      # instead of the blue chrome, for the Rust Foundation herald ("make it
-      # rusted out ... but make it look cool").
-      plate:
-        label: HERALD // GUARDIAN
-        class: Harbinger Hunter
-        name: Lori Lorusso
-        title: Pathfinder of the Iron Weave
-        variant: rust
-    variks:
-      person: nate_waddington
-      display_name: Nate Waddington
-      aka: [variks_the_loyal]
-    the_speaker:
-      person: jonathan_bryce
-      display_name: Jonathan Bryce
-      aka: [speaker]
-    amanda_holliday:
-      person: ashley_willis
-      display_name: Ashley Willis
-      aka: [amanda, holliday]
-    iron_lord_red_haired:
-      # The red-haired Iron Lord who dies in the Rise of Iron intro. Her CANONICAL
-      # Destiny name is UNCONFIRMED — the binding is keyed on the description so
-      # the casting is not blocked on identifying her. Rename this key (and add
-      # the old id to `aka`) once the character is pinned down.
-      #
-      # NO `plate:` ON PURPOSE. Paris has owner-written nameplate copy, but it is
-      # a Guardian plate for Paris, not copy for an Iron Lord — and what a
-      # character says on screen is authored, never derived or adapted. So she is
-      # cast but plate-only, and tools/plate.py reports her under `unresolved`
-      # (`no_plate_copy`) every time she makes a cut, rather than dropping the
-      # credit. Writing copy in here is the owner's call, and the only thing that
-      # closes it.
-      person: paris_pittman
-      display_name: Paris Pittman
-      aka: [red_haired_iron_lord, dying_iron_lord]
-
-    # --- WRITTEN, NOT YET CAST -------------------------------------------
-    # Named characters that recur across the cinematics and therefore need a
-    # person eventually. Fill in `person`/`display_name` to cast one.
-    ikora_rey:   { person: null, display_name: null, aka: [ikora] }
-    the_drifter: { person: null, display_name: null, aka: [drifter] }
-    crow:        { person: null, display_name: null, aka: [uldren_sov, the_crow] }
-    caiatl:      { person: null, display_name: null, aka: [empress_caiatl] }
-    eris_morn:   { person: null, display_name: null, aka: [eris] }
-    shaxx:       { person: null, display_name: null, aka: [lord_shaxx] }
-    ghost:       { person: null, display_name: null, aka: [little_light] }
-    savathun:    { person: null, display_name: null, aka: [savathun_witch_queen] }
-    # DEPICTION RULE — eyes or smoke, never the body. This is a standing rule
-    # for the character, not one cut's editorial choice: the Witness reads as a
-    # presence, and showing its body makes it a monster instead. A shot of the
-    # Witness is excluded from every cut unless a human has looked at the frame
-    # and judged it eyes-or-smoke. Default is exclusion, exactly like `clean`:
-    # the permission has to be positively established. Enforced at selection,
-    # not derived — "is this a body or a wisp?" is a visual judgement, which
-    # AGENTS.md lists among the things that can never be automated.
-    the_witness:
-      person: null
-      display_name: null
-      aka: [witness]
-      depiction:
-        rule: eyes_or_smoke_only
-        note: >
-          Never the body, never a full figure. Eyes, or smoke/vapour only.
-          Add a segment_id to `approved` only after looking at the frame.
-        approved: []
-
-  # --- REQUESTED, NOT YET BOUND ----------------------------------------------
-  # The exact mirror of "written, not yet cast" above: there the CHARACTER is
-  # known and the person is not; here the PERSON is known and the character is
-  # not. A request lands as a name and a description of a figure on screen ("the
-  # woman", "the main character"), and turning that into a Destiny character is a
-  # visual judgment on the footage — so it is parked here instead of guessed.
-  #
-  # Derivation NEVER reads this block. A pending entry casts nobody, plates
-  # nothing, and needs no search phrase; it is a queue, not a binding. Promote an
-  # entry by moving it into `values` under its character key, adding its search
-  # phrases to tools/search.py, and deleting it from here.
-  pending_fields:
-    github:        The requester's identifier for the person. Verifiable; a real name may not be.
-    display_name:  How they are credited, when the request said. null when nobody has said yet.
-    described_as:  The requester's words for the figure on screen, quoted. Never paraphrased into a character name.
-    requested_in:  Where the request came from.
-    source_video:  The footage the request is about. Not necessarily indexed yet.
-    automatable:   Whether an agent can settle this alone. `no` for anything that names a real person.
-    blocked_on:    What has to happen first, in one sentence.
-  pending:
-    inffy:
-      # The owner cast the Hunter run in the Final Shape Gameplay Trailer
-      # (source 90.791-95.225) onto this account, EXPLICITLY OVERRIDING their
-      # own file name for the clip, which said "Laura":
-      #
-      #   "the warlock should be kaslin fields and the hunter was laura
-      #    santamaria but make it github.com/inffy"
-      #
-      # The override is recorded because the proxy file
-      # ~/Videos/wolves-directors-cut/UchfadQhX7w_Laura_91-97.mp4 still carries
-      # the old name, and a wrong credit is not recoverable by a revert.
-      #
-      # No Guardian identity is authored for inffy anywhere: not
-      # ~/Videos/nameplates.json, not the website's characters.json. The name
-      # appears only as a callsign in the website's wolves-track-zero-manifest,
-      # which is not a plate. So the run is rendered UNPLATED and no copy is
-      # written here -- a missing name is omitted and recorded, never invented.
-      github: inffy
-      display_name: null   # nobody has authored one; a plate must not invent it
-      described_as: the hunter
-      requested_in: owner instruction, editorial pass on Seven Days to the Wolves
-      source_video: https://www.youtube.com/watch?v=UchfadQhX7w
-      automatable: no
-      blocked_on: >
-        No authored Guardian identity exists for this account. Author one where
-        identities are authored -- ~/src/website public/wolves/characters/characters.json
-        or ~/Videos/nameplates.json -- and the binding can move into `values`
-        with its plate reproduced verbatim.
-    # wrkode (William Rizzo) was parked here by issue #14 ("Add william rizzo
-    # and team", described_as "Main character") until the owner authored his
-    # plate for act II -- he is PROMOTED to `ensemble.titles` below, which
-    # partially closes #14. Which Destiny character he is stays open: the #14
-    # source video (dOdPT9fLKEA) is still not ingested, and naming the figure
-    # from the footage is the visual judgement the pending entry waited on.
-    abangser:
-      github: abangser
-      display_name: null   # not given in the request; a plate must not invent one
-      described_as: Woman
-      requested_in: https://github.com/castrojo/destiny-vids/issues/14
-      source_video: https://www.youtube.com/watch?v=dOdPT9fLKEA
-      automatable: no
-      blocked_on: >
-        The source video is not ingested, so no indexed shot shows this figure.
-        Ingest and index it, then name the character from the footage.
-    robertsirc:
-      github: robertsirc
-      display_name: null   # not given in the request; a plate must not invent one
-      described_as: other guy
-      requested_in: https://github.com/castrojo/destiny-vids/issues/14
-      source_video: https://www.youtube.com/watch?v=dOdPT9fLKEA
-      automatable: no
-      blocked_on: >
-        The source video is not ingested, so no indexed shot shows this figure.
-        Ingest and index it, then name the character from the footage.
-
-ensemble:
-  description: >
-    The anonymous-Guardian crowd, cast from Project Bluefin contributors. The
-    pool is rebuilt per calendar month by tools/ensemble.py from repository
-    contribution history, then deterministically assigned to the ensemble slots
-    across a shot list, producing one credit TILE per contributor.
-  plate:
-    description: >
-      On-screen nameplate copy for an ensemble credit, read by tools/plate.py.
-      Same closed field set as a lead's `plate:` block. The eyebrow depends on
-      whether the person is a member of the GitHub org: a maintainer is not a
-      passing contributor and the credit should not say they are.
-
-      `label_unknown` exists because org membership is a lookup that can fail
-      (no network, no token, insufficient scope). Failing to read it is NOT
-      evidence that someone is not a maintainer, so it gets the neutral
-      GUARDIAN eyebrow rather than silently demoting the whole cast.
-    label: CONTRIBUTOR // GUARDIAN        # not in the org
-    label_member: MAINTAINER // GUARDIAN  # in the org
-    label_unknown: GUARDIAN               # membership could not be read
-    # A Destiny "title" is a seal, and we do not know anyone's. "Blueberry" is
-    # the in-game name for an unnamed Guardian you get randomly grouped with,
-    # which is exactly what an ensemble slot is.
-    title: Bluefin Blueberry
-    # The headline of the roster card that closes the cut (the title card's
-    # `title` field). Owner-supplied copy; the card's `subtitle` carries the
-    # month context and is assembled by tools/plate.py from the roster key.
-    roster_title: Thanks for working on Bluefin!
-  # AUTHORED Guardian identities for individual contributors, keyed by GitHub
-  # login. Most contributors are anonymous Guardians: nobody knows their seal,
-  # so they get the generic plate copy above. A few people's Guardian identity
-  # is genuinely authored in the reference deck (~/Videos/nameplates.json), and
-  # a credit that knows it must reproduce it verbatim, never a paraphrase and
-  # never the generic fallback. tools/plate.py prefers an entry here over the
-  # generic copy wherever the person lands, including over the tail sign-off
-  # card, which never flattens an authored identity into a name line while the
-  # cut still has room for the real plate.
-  #
-  # A person CAST AS A LEAD does not belong here: their identity lives on the
-  # lead binding, and they are excluded from the ensemble pool entirely. That
-  # is why castrojo is not in this map -- he is Cayde-6, so his plate is on the
-  # `cayde_6` binding above and he is credited only where Cayde is on screen.
-  #
-  # Add a login ONLY with copy that exists in the deck or that the OWNER
-  # supplied verbatim (the same exception as the `zavala` and `mara_sov` lead
-  # plates): inventing a title, a class, or a pronoun for a real person is the
-  # one thing this file must never do.
-  titles:
-    description: >
-      Authored Guardian identities for individual contributors, keyed by GitHub
-      login (see the comment above). Values are full plate copies in the
-      reference deck's closed field set; tools/derive.py loads them with
-      load_ensemble_titles() and tools/plate.py prefers them over the generic
-      ensemble copy. Derivation never reads this block. Empty is normal: it
-      only ever holds people whose identity is genuinely authored AND who are
-      not cast as a lead.
-
-    # --- ACT II (Endless Forms Most Beautiful) -------------------------------
-    # Act II is the show's first plated use of the live-action trailers, whose
-    # Guardians are anonymous -- ensemble slots in this file's model. The owner
-    # authored every identity below directly and verbatim; none of these people
-    # has a reference-deck entry, and the owner authoring a credit is allowed
-    # where an agent inventing one is not. The two most senior -- Ricardo here
-    # and Karena (a lead; her plate is on the `mara_sov` binding) -- carry
-    # `wreath: true` plus their avatar: "make their nameplates fanciest in the
-    # show but don't overdo it, it should look like a maxxed out character in
-    # a game. The other characters are basic blue. It shows their seniority."
-    rochaporto:
-      # github.com/rochaporto. The owner wrote the label as "Practioner" --
-      # an obvious typo, spelled PRACTITIONER on the card; his exact wording
-      # is recorded here so the correction is visible rather than silent.
-      #
-      # `class` is deliberately bare. The figure on screen is plainly a hooded
-      # Hunter, but NO shot shows his element, so no subclass word is authored
-      # -- not "Nightstalker", not anything.
-      # TODO(owner): name the subclass ("<Subclass> Hunter") or rule that the
-      # row ships bare. Recorded gap, never guessed.
+people:
+  HikariKnight:
+    github_id: 2557889
+    plate:
+      label: BLUEBERRY // MAINTAINER
+      name: HikariKnight
+      variant: bazzite
+      avatar: https://avatars.githubusercontent.com/u/2557889?v=4
+  angellk:
+    github_id: 836183
+    # The wreath had no portrait to ring until the owner supplied her login
+    # (2026-08-24). The URL is derived from the verified `github_id` above,
+    # exactly as every other person record's is -- never a guessed login.
+    plate:
+      label: ARCHON // CONTRIBUTOR
+      class: Stasis Warlock
+      name: Karena Angell
+      title: Architect of the Consensus
+      variant: leader
+      wreath: true
+      avatar: https://avatars.githubusercontent.com/u/836183?v=4
+  akgraner:
+    github_id: 6200805
+    plate:
+      label: MAINTAINER // GUARDIAN
+      name: Amber Graner
+      class: Striker Titan
+      title: The Iron Standard
+      avatar: https://avatars.githubusercontent.com/u/6200805?v=4
+  CortNick:
+    github_id: 104345443
+    # Cortney Nickerson. Guardian identity OWNER-AUTHORED in #90, verbatim --
+    # "Weilder" is the owner's spelling and is reproduced, never corrected.
+    # The class row stays omitted: #90 wrote "whatever the Void subclass is"
+    # and Void subclasses are class-specific, so it waits on her class. Her
+    # one-video HIVE // BLUEBERRY identity (season-of-the-blueberries) is a
+    # deliberate per-video credit, not this record. Avatar is her X picture
+    # (x.com/TechTalkingMom, verified display name "Cortney Nickerson") by
+    # explicit owner instruction 2026-09-05, not the GitHub default.
+    plate:
+      label: AMBASSADOR // GUARDIAN
+      name: Cortney Nickerson
+      title: Weilder of the Arcane
+      avatar: https://pbs.twimg.com/profile_images/1537446663396069376/0qpk_7Gb_400x400.jpg
+  jrsapi:
+    github_id: 5437766
+    plate:
+      label: PRACTITIONER // GUARDIAN
+      name: Joseph Sandoval
+      title: Master Wielder | Uplifter of Users
+      variant: leader
+      avatar: https://avatars.githubusercontent.com/u/5437766?v=4
+  mfahlandt:
+    github_id: 5739844
+  kfaseela:
+    github_id: 7901446
+  markmandel:
+    github_id: 298370
+  riaankleinhans:
+    github_id: 61125752
+  pastaq:
+    github_id: 9809174
+  rochaporto:
+    github_id: 52753
+    plate:
       label: PRACTITIONER // GUARDIAN
       class: Hunter
       name: Ricardo Rocha
       title: Cloud Native Atom Smasher
       wreath: true
       avatar: https://avatars.githubusercontent.com/u/52753?v=4
-    joseph_sandoval:
-      # KEYED BY NAME because the authored plate predates the verified account
-      # binding. github.com/jrsapi is Joseph Sandoval (u/5437766); the avatar
-      # resolves from that verified login without changing the owner-authored
-      # visible name.
-      #
-      # Owner: "he no longer does leadership he used to [do] Ricardo's job,
-      # now he just fights. He still has a gold badge he's just not the Chair
-      # like the other two." -- hence `variant: leader` (gold) and NO wreath.
-      # No subclass is authored, so the class row is OMITTED -- a plate
-      # without one is valid, and inventing one is forbidden.
-      label: PRACTITIONER // GUARDIAN
-      name: Joseph Sandoval
-      title: "Master Wielder | Uplifter of Users"
-      variant: leader
-      avatar: https://github.com/jrsapi.png?size=256
-    KyleGospo:
-      # github.com/KyleGospo. Owner: "he is special but don't say why" -- so
-      # the plate carries NO explanation, only the bazzite chrome and the
-      # avatar. No subclass is authored; the class row is omitted.
-      #
-      # ROLE SWAP, deliberate and scoped to act II only: on screen he is a
-      # Sentinel Titan, which is Kat Cosgrove's authored class. Do not
-      # "correct" this, and do not read a class row for him off it.
+  ricardosalveti:
+    github_id: 44008055
+  KyleGospo:
+    github_id: 10704358
+    plate:
       label: BLUEBERRY // MAINTAINER
       name: Kyle Gospodnetich
       title: The First Knife
       variant: bazzite
       avatar: https://avatars.githubusercontent.com/u/10704358?v=4
-    akgraner:
-      # The owner identified the Final Shape gameplay clip used in Act II as
-      # Amber's sequence. Her Guardian identity is copied from the authored
-      # Wolves nameplate record; none of these rows is inferred from the clip.
+  LionHeartP:
+    github_id: 28869010
+  JillCastro:
+    github_id: 209076372
+  A1RM4X:
+    github_id: 2750931
+    plate:
+      label: '@A1RM4X // YOUTUBE'
+      name: A1RM4X
+      variant: youtube
+      avatar: https://yt3.googleusercontent.com/ytc/AIdro_kCixIw5CtOKMcqo_p8ZSDwYXoGQZ2TB5NzA7Lag-n_ByM=s900-c-k-c0x00ffffff-no-rj
+  katcosgrove:
+    github_id: 22032257
+    plate:
       label: MAINTAINER // GUARDIAN
-      name: Amber Graner
-      class: Striker Titan
-      title: The Iron Standard
-      avatar: https://avatars.githubusercontent.com/u/6200805?v=4
-    p5:
-      # github.com/p5. The name row is the bracketed HANDLE, exactly as the
-      # owner authored it. His real name is deliberately NOT used -- the
-      # handle treatment is the point; never put his name on the card.
+      class: Sentinel Titan
+      name: Kat Cosgrove
+      title: Defender Queen of the Lost
+  kdruckman:
+    github_id: 8461726
+  natalisucks:
+    github_id: 15304481
+  nicknamenamenick:
+    github_id: 121328689
+  valerie-tar-gz:
+    github_id: 155010216
+  rafaelcastro10:
+    github_id: 49164776
+  nwoods3:
+    github_id: 28409908
+  nimbinatus:
+    github_id: 1538692
+    plate:
+      label: MAINTAINER // GUARDIAN
+      class: Gunslinger Hunter
+      name: Laura Santamaria
+      title: The Order of Seven
+  kelseyhightower:
+    github_id: 1123322
+    plate:
+      label: ARCHITECT // GUARDIAN
+      class: Dawnblade Warlock
+      name: Kelsey Hightower
+      title: Evangelist of the Open Sky
+      variant: leader
+  castrojo:
+    github_id: 1264109
+    plate:
+      label: TRUSTEE // GUARDIAN
+      class: Harbinger Hunter
+      name: Jorge Castro
+      title: Upender of Antipatterns | The First Disciple
+  jeefy:
+    github_id: 1394552
+  idvoretskyi:
+    github_id: 118459
+  mrbobbytables:
+    github_id: 6500863
+    plate:
+      label: TRUSTEE // GUARDIAN
+      class: Voidwalker Warlock
+      name: Bob Killen
+      title: Reconciler of the Plane
+      trustee: true
+      variant: leader
+  clubanderson:
+    github_id: 407614
+    plate:
+      kind: ghost
+      label: MAINTAINER // GHOST
+      class: Shadebinder Warlock
+      name: Doc Anderson
+      title: Foundry of the Forbidden
+  joannalee:
+    github_id: 7451669
+  LoriLorusso:
+    github_id: 66495765
+    plate:
+      label: HERALD // GUARDIAN
+      class: Harbinger Hunter
+      name: Lori Lorusso
+      title: Pathfinder of the Iron Weave
+      variant: rust
+  ashleywillis:
+    github_id: 99830620
+  parispittman:
+    github_id: 5912992
+  p5:
+    github_id: 46304672
+    plate:
       label: BLUEBERRY // MAINTAINER
-      name: "[ p5 ]"
+      name: '[ p5 ]'
       title: Herald of the Hummingbird
       variant: bazzite
       avatar: https://avatars.githubusercontent.com/u/46304672?v=4
-    kolunmi:
-      # github.com/kolunmi (id 113054217). Owner, 2026-08-14: "the arc hunter
-      # before kylegospo is https://github.com/kolunmi/ - add a nameplate."
-      #
-      # THE CLASS ROW IS THE OWNER'S OWN WORD. He named the subclass when he
-      # named the shot -- "the arc hunter" -- and the frame agrees: at source
-      # 334.300 the Guardian is loosing a bright Arc bow, one cut before
-      # Kyle's Sentinel. That is a subclass somebody authored, not one derived
-      # off a colour.
-      #
-      # Everything else is deliberately absent. The account carries no display
-      # name and no bio, so the name row is the LOGIN as its owner writes it,
-      # unbracketed -- brackets are this repo's placeholder marker (p5 and
-      # EyeCantCU wear them because the OWNER chose that treatment for them,
-      # which is a different thing).
-      # TODO(owner): a label, a title, and whether he wants his real name.
+  kolunmi:
+    github_id: 113054217
+    plate:
       class: Arc Hunter
       name: kolunmi
       avatar: https://avatars.githubusercontent.com/u/113054217?v=4
-    EyeCantCU:
-      # github.com/EyeCantCU. The name row is the bracketed HANDLE, exactly as
-      # authored -- the owner chose the handle treatment to match p5. His real
-      # name is deliberately NOT used; never put it on the card.
+  EyeCantCU:
+    github_id: 18015150
+    plate:
       label: BLUEBERRY // MAINTAINER
-      name: "[ EyeCantCU ]"
+      name: '[ EyeCantCU ]'
       title: Seer of the Truth
       variant: bazzite
       avatar: https://avatars.githubusercontent.com/u/18015150?v=4
-    wrkode:
-      # github.com/wrkode -- PROMOTED out of `leads.pending`, where issue #14
-      # ("Add william rizzo and team", described_as "Main character") parked
-      # him: the owner has now authored his plate ("this is his moment to
-      # shine"), so the credit is real and this partially closes #14. His
-      # Destiny character stays unbound -- the #14 source video
-      # (dOdPT9fLKEA) is still not ingested.
-      #
-      # Basic blue chrome, exactly as authored: no variant, no trustee, no
-      # wreath. No subclass is authored; the class row is omitted.
-      #
-      # NOT PLATED IN ACT II ANY MORE. His shot (source 185.233) is inside
-      # "The Long Walk", and the owner's instruction for that chapter is "No
-      # other guardians". The copy stays here because it is authored and he
-      # is owed a credit wherever the show next has room for one -- deleting
-      # a written identity because one chapter dropped it is how a credit
-      # gets lost for good.
+  wrkode:
+    github_id: 73309415
+    plate:
       label: MAINTAINER // GUARDIAN
       name: William Rizzo
       title: Hammer of Kairos
-    # bdburns is OUT ENTIRELY, owner order 2026-08-20: "remove him entirely".
-    # Not "unplated this chapter, copy retained" like William Rizzo above --
-    # the whole record goes, so no future pass can seat him from the vocab.
-    sarahnovotny:
-      # github.com/sarahnovotny (verified u/127370). Only the profile name and
-      # avatar are established here; every other row stays omitted until
-      # somebody authors it.
+  sarahnovotny:
+    github_id: 127370
+    plate:
       name: Sarah Novotny
       avatar: https://avatars.githubusercontent.com/u/127370?v=4
-
-    # --- ACT II, "THE LONG WALK" ---------------------------------------------
-    # The owner's chapter inside act II: three people walking, and nobody else.
-    # All three are NAME-ONLY plus chrome, and that is the authored state, not
-    # an unfinished one: he gave each of them an AFFILIATION and no title, so
-    # the affiliation rides as chrome the way Kyle's Bazzite purple does and
-    # NO title row is written for anybody. The label is reproduced from Kyle's
-    # own entry above, because the owner's instruction was that they are his
-    # peers.
-    # TODO(owner): author a title (and any class) for each of the three, and
-    # settle whether GloriousEggroll is credited by handle or as Thomas Crider.
-    GloriousEggroll:
-      # github.com/GloriousEggroll. Owner: "Glorious Eggroll the main guy
-      # walking with a nobara linux logo, same as Kyles in other parts of the
-      # video. We want Eggroll to be a peer of kyle".
-      #
-      # NAME ROW IS THE HANDLE, as the owner wrote it in his own dialogue
-      # block ("[ GloriousEggroll ] There's nothing glorious about this job").
-      # GitHub records his name as Thomas Crider; which of the two goes on the
-      # card is HIS call, not an agent's, so the string he used is reproduced
-      # and the question is recorded rather than resolved.
+  GloriousEggroll:
+    github_id: 11287837
+    plate:
       label: BLUEBERRY // MAINTAINER
       name: GloriousEggroll
       variant: nobara
       avatar: https://avatars.githubusercontent.com/u/11287837?v=4
-    HikariKnight:
-      # github.com/HikariKnight. Owner: "Hikari, another peer, but he's also
-      # bazzite affiliated like kyle" and "just generate the info from github".
-      # GitHub's `name` field for the account IS "HikariKnight" -- no separate
-      # real name is published there, so the handle is not a stand-in for one.
-      # His bio ("Currently helping out with @ublue-os & Bazzite") is what the
-      # bazzite chrome reproduces; it is not quoted on the card.
-      label: BLUEBERRY // MAINTAINER
-      name: HikariKnight
-      variant: bazzite
-      avatar: https://avatars.githubusercontent.com/u/2557889?v=4
-    A1RM4X:
-      # youtube.com/@A1RM4X. Owner: "a linux youtuber named A1RMAX - his
-      # affiliation should be his youtube channel and brand it appropriately".
-      #
-      # THE ONLY NON-GITHUB IDENTITY IN THIS FILE. He is keyed by the channel
-      # handle because that is the durable identifier he has here; there is no
-      # login to key him on and inventing one would be a claim about him.
-      # The owner wrote "A1RMAX"; the channel is @A1RM4X, which is what the
-      # card carries -- his own spelling of his own name outranks a
-      # transcription of it, and both are recorded here.
-      #
-      # The avatar is the channel's own picture, not a logo: a creator's brand
-      # IS their face here, and putting YouTube's mark on his crest would name
-      # the platform louder than the person. The red is the platform.
-      label: "@A1RM4X // YOUTUBE"
-      name: A1RM4X
-      variant: youtube
-      avatar: https://yt3.googleusercontent.com/ytc/AIdro_kCixIw5CtOKMcqo_p8ZSDwYXoGQZ2TB5NzA7Lag-n_ByM=s900-c-k-c0x00ffffff-no-rj
-
-    # --- THE KERNEL TRUSTEES (owner note, dictated 2026-08-13 01:09; #119) ---
-    # The note was filed as act III ("mrbobbytables"), but every mark in it is
-    # on the 2026-08-12 ALPHA megacut's clock and lands inside ACT II (film =
-    # megacut - 121.567, the script's own MEGACUT_OFFSET): the "famous titan
-    # shield throw" at 6:34 is Kyle's Sentinel plate, and "6:44 is eyecantCU"
-    # sits inside his window. Frame-verified against both ALPHA builds, which
-    # are identical at every mark. The "2 Badges platinum, above gold" for the
-    # "to graduate you must impress" beat are these two: platinum is the
-    # trustee chrome (burnished silver, not the leader gold), and the label is
-    # TRUSTEE // KERNEL exactly as dictated. They are not Bluefin contributors
-    # -- the joke is that the KERNEL owns the graduation -- so they can never
-    # arrive through the roster; the owner authored every string below
-    # verbatim, which is the only way in.
-    gregkh:
-      # github.com/gregkh (verified u/14953; the account's own name field is
-      # "Greg Kroah-Hartman", and the note's "greg-kh" is this login). "Make
-      # them both warlocks" is the whole class instruction -- no element was
-      # dictated, so the class row is the bare class (the rochaporto shape)
-      # and no subclass word is invented. The two quoted epithets ride as one
-      # piped title, the deck's own two-seal form (Jorge's "Upender of
-      # Antipatterns | The First Disciple" in ~/Videos/nameplates.json).
+  gregkh:
+    github_id: 14953
+    plate:
       label: TRUSTEE // KERNEL
       class: Warlock
       name: Greg Kroah-Hartman
       title: The Hand of the Kernel | My Son is Even More Powerful
       trustee: true
       avatar: https://avatars.githubusercontent.com/u/14953?v=4
-    shuah_khan:
-      # KEYED BY NAME, not login (the joseph_sandoval shape): the note gives
-      # none, and a login is not an agent's to guess. TODO(owner): her GitHub
-      # login, so avatar tooling can resolve her and never a same-named
-      # stranger; she renders with the drawn crest until then.
-      label: TRUSTEE // KERNEL
-      class: Warlock
-      name: Shuah Khan
-      title: Gardener of Talent | Looking for Gamers
-      trustee: true
-    tulilirockz:
-      # github.com/tulilirockz (verified u/120808662) -- and the account's own
-      # GitHub display name IS "Tulip Blossom", so the name row is hers, not a
-      # transcription. "whatever solar warlock is" is the owner's class
-      # instruction: the element word is his (the kolunmi precedent) and no
-      # subclass name is invented. No label was dictated, so the eyebrow row
-      # is omitted rather than composed.
+  tulilirockz:
+    github_id: 120808662
+    plate:
       class: Solar Warlock
       name: Tulip Blossom
       title: Deliverer of DDI
       avatar: https://avatars.githubusercontent.com/u/120808662?v=4
-    m2:
-      # github.com/m2 (verified u/231907). The account's display name is
-      # "mat"; which of the two goes on the card is his call (the
-      # GloriousEggroll question), so the name row is the login the owner
-      # wrote. TODO(owner): the name row -- and which name the Arc Hunter
-      # keeps. The note dictated this plate for megacut 6:27 (film 265.433),
-      # the shot #198 gave kolunmi the day AFTER the note was dictated;
-      # kolunmi's plate stands and the conflict is recorded in
-      # scripts/build_efmb_plates.py's `unresolved`.
+  m2:
+    github_id: 231907
+    plate:
       label: MAINTAINER // GUARDIAN
       class: Arc Hunter
       name: m2
       title: Fun, Travel, and Adventure
       avatar: https://avatars.githubusercontent.com/u/231907?v=4
+  jbryce:
+    github_id: 33063
+  nate-double-u:
+    github_id: 4453979
+  shuahkh:
+    github_id: 6414032
+    plate:
+      label: TRUSTEE // KERNEL
+      class: Warlock
+      name: Shuah Khan
+      title: Gardener of Talent | Looking for Gamers
+      trustee: true
+legacy_cast_logins:
+  joseph_sandoval: jrsapi
+  shuah_khan: shuahkh
+leads:
+  description: 'Named Destiny characters bound to a real person for the life of the project. OPEN and
+    EXTENSIBLE — this map is the place to add bindings. `person: null` means the role is written into
+    the story but not yet cast; retrieval still works (the character is identified), the tile just has
+    no name on it yet.
 
-  # --- NAMED, COPY NOT YET AUTHORED ------------------------------------------
-  # The owner named these two for act II but authored no plate copy. Recorded
-  # OUTSIDE `titles` -- a queue in the same posture as `leads.pending`, which
-  # tooling never reads -- so a placeholder can never suppress the generic
-  # ensemble copy the person is owed today. Promote one by moving it into
-  # `titles` with owner-authored copy.
-  # TODO(owner): author label/title (and any class, chrome, avatar) for each.
+    '
+  entry_fields:
+    person: Verified GitHub login for the person cast, or null when uncast.
+    aka: Alternate spellings/ids for the SAME character, normalized to this key.
+    note: OPTIONAL free-text standing direction for the binding. Documentation only — derivation never
+      reads it.
+    redacts: 'OPTIONAL. The real name the programme must NOT print while the redaction holds, mirroring
+      the card-level fields (see `cayde_signoff` in scripts/build_efmb_plates.py). The enforcement is
+      structural: a binding whose on-screen credit is a redaction carries NO `plate:` block, so tools/plate.py
+      has no real-name copy to print and reports the character under `unresolved` (no_plate_copy) instead.
+      Documentation + tests only — derivation never reads it.
+
+      '
+    redaction_scope: 'OPTIONAL with `redacts`. Where the redaction holds and where the reveal is, in the
+      card field''s own phrasing ("act II only -- he is revealed later in the programme").
+
+      '
+    constraints: 'OPTIONAL per-binding usability constraints, for a person who does not resemble their
+      character. Keys: `require_helmet` (identity_visibility must read as face-concealed) and `require_far`
+      (shot_scale must be wide enough to hide facial detail). When present and unmet, the derived `casting.usable`
+      is false and the unmet keys are listed in `casting.constraints_failed`; such shots are excluded
+      from that character''s retrieval. Most bindings have NO constraints: naming a role does not require
+      a lookalike. Constraints exist only where the project wants the figure to read as the character
+      rather than as the person.
+
+      '
+  values:
+    elsie_bray:
+      person: nimbinatus
+      aka:
+      - elsie_gray
+      - the_exo_stranger
+      - exo_stranger
+    nimbatus:
+      person: nimbinatus
+      aka: []
+      redacts: Laura Santamaria
+      redaction_scope: 'every act before VII -- she is revealed on act VII''s Guardian card (82.525-88.000);
+        the programme calls her NIMBATUS until Europa
+
+        '
+    anna_bray:
+      person: joannalee
+      aka:
+      - ana_bray
+    zavala:
+      person: kelseyhightower
+      aka:
+      - commander_zavala
+    cayde_6:
+      person: castrojo
+      aka:
+      - cayde
+      - cayde6
+    saladin:
+      person: jeefy
+      aka:
+      - lord_saladin
+      - iron_lord_saladin
+      constraints:
+        require_helmet: true
+        require_far: true
+    osiris:
+      person: mrbobbytables
+      aka: []
+    sagira:
+      person: clubanderson
+      aka:
+      - sagira_ghost
+    fynch:
+      person: idvoretskyi
+      aka: []
+    saint_14:
+      person: katcosgrove
+      note: 'Kat from now on, but she remains the bubble in the original Wolves.
+
+        '
+      aka:
+      - saint
+      - saint14
+    mara_sov:
+      person: kdruckman
+      aka:
+      - queen_mara_sov
+    petra_venj:
+      person: LoriLorusso
+      aka:
+      - petra
+    variks:
+      person: nate-double-u
+      aka:
+      - variks_the_loyal
+    the_speaker:
+      person: jbryce
+      aka:
+      - speaker
+    amanda_holliday:
+      person: ashleywillis
+      aka:
+      - amanda
+      - holliday
+    iron_lord_red_haired:
+      person: parispittman
+      aka:
+      - red_haired_iron_lord
+      - dying_iron_lord
+    ikora_rey:
+      person: null
+      aka:
+      - ikora
+    the_drifter:
+      person: null
+      aka:
+      - drifter
+    crow:
+      person: null
+      aka:
+      - uldren_sov
+      - the_crow
+    caiatl:
+      person: null
+      aka:
+      - empress_caiatl
+    eris_morn:
+      person: null
+      aka:
+      - eris
+    shaxx:
+      person: null
+      aka:
+      - lord_shaxx
+    ghost:
+      person: null
+      aka:
+      - little_light
+    savathun:
+      person: null
+      aka:
+      - savathun_witch_queen
+    the_witness:
+      person: null
+      aka:
+      - witness
+      depiction:
+        rule: eyes_or_smoke_only
+        note: 'Never the body, never a full figure. Eyes, or smoke/vapour only. Add a segment_id to `approved`
+          only after looking at the frame.
+
+          '
+        approved: []
+  pending_fields:
+    github: The requester's identifier for the person. Verifiable; a real name may not be.
+    display_name: How they are credited, when the request said. null when nobody has said yet.
+    described_as: The requester's words for the figure on screen, quoted. Never paraphrased into a character
+      name.
+    requested_in: Where the request came from.
+    source_video: The footage the request is about. Not necessarily indexed yet.
+    automatable: Whether an agent can settle this alone. `no` for anything that names a real person.
+    blocked_on: What has to happen first, in one sentence.
+  pending:
+    inffy:
+      github: inffy
+      display_name: null
+      described_as: the hunter
+      requested_in: owner instruction, editorial pass on Seven Days to the Wolves
+      source_video: https://www.youtube.com/watch?v=UchfadQhX7w
+      automatable: false
+      blocked_on: 'No authored Guardian identity exists for this account. Author one where identities
+        are authored -- ~/src/website public/wolves/characters/characters.json or ~/Videos/nameplates.json
+        -- and the binding can move into `values` with its plate reproduced verbatim.
+
+        '
+    abangser:
+      github: abangser
+      display_name: null
+      described_as: Woman
+      requested_in: https://github.com/castrojo/destiny-vids/issues/14
+      source_video: https://www.youtube.com/watch?v=dOdPT9fLKEA
+      automatable: false
+      blocked_on: 'The source video is not ingested, so no indexed shot shows this figure. Ingest and
+        index it, then name the character from the footage.
+
+        '
+    robertsirc:
+      github: robertsirc
+      display_name: null
+      described_as: other guy
+      requested_in: https://github.com/castrojo/destiny-vids/issues/14
+      source_video: https://www.youtube.com/watch?v=dOdPT9fLKEA
+      automatable: false
+      blocked_on: 'The source video is not ingested, so no indexed shot shows this figure. Ingest and
+        index it, then name the character from the footage.
+
+        '
+ensemble:
+  description: 'The anonymous-Guardian crowd, cast from Project Bluefin contributors. The pool is rebuilt
+    per calendar month by tools/ensemble.py from repository contribution history, then deterministically
+    assigned to the ensemble slots across a shot list, producing one credit TILE per contributor.
+
+    '
+  plate:
+    description: 'On-screen nameplate copy for an ensemble credit, read by tools/plate.py. Same closed
+      field set as a lead''s `plate:` block. The eyebrow depends on whether the person is a member of
+      the GitHub org: a maintainer is not a passing contributor and the credit should not say they are.
+
+      `label_unknown` exists because org membership is a lookup that can fail (no network, no token, insufficient
+      scope). Failing to read it is NOT evidence that someone is not a maintainer, so it gets the neutral
+      GUARDIAN eyebrow rather than silently demoting the whole cast.
+
+      '
+    label: CONTRIBUTOR // GUARDIAN
+    label_member: MAINTAINER // GUARDIAN
+    label_unknown: GUARDIAN
+    title: Bluefin Blueberry
+    roster_title: Thanks for working on Bluefin!
   placeholders:
-    description: >
-      People the owner named (for act II) with no plate copy authored yet.
-      A queue, not copy: nothing here renders. `missing` lists the rows a
-      plate would still need, every one of them the owner's to write.
+    description: 'People the owner named (for act II) with no plate copy authored yet. A queue, not copy:
+      nothing here renders. `missing` lists the rows a plate would still need, every one of them the owner''s
+      to write.
+
+      '
     dylan_taylor:
       name: Dylan Taylor
-      github: null   # no login is recorded for him; not an agent's to guess
-      missing: [label, class, title, chrome, avatar]
+      github: null
+      missing:
+      - label
+      - class
+      - title
+      - chrome
+      - avatar
     ahmedadan:
       name: Ahmed Adan
-      github: ahmedadan   # org member per renders/roster-2026-08.json
-      missing: [label, class, title, chrome, avatar]
+      github: ahmedadan
+      missing:
+      - label
+      - class
+      - title
+      - chrome
+      - avatar
     troy:
-      # "5:58 Nameplate - Troy (I'll fill in later) Stormbreaker Titan" --
-      # the owner named him and explicitly parked the copy (#119). The class
-      # words are his ("Stormbreaker Titan"), but this queue's shape is
-      # name/github/missing, so they live in this comment and nowhere else
-      # until he fills the rest. His slot: megacut 5:58 = film 236.433,
-      # inside the kernel-trustees badge hold -- it renders NOTHING today.
       name: Troy
-      github: null   # no login is recorded for him; not an agent's to guess
-      missing: [label, class, title, chrome, avatar]
+      github: null
+      missing:
+      - label
+      - class
+      - title
+      - chrome
+      - avatar
   org:
-    description: >
-      GitHub organisation whose members are credited as maintainers. Recorded
-      per roster by tools/ensemble.py as `org_member` on each contributor:
-      true, false, or null when the lookup failed.
+    description: 'GitHub organisation whose members are credited as maintainers. Recorded per roster by
+      tools/ensemble.py as `org_member` on each contributor: true, false, or null when the lookup failed.
+
+      '
     value: projectbluefin
   pool:
     source: Project Bluefin repositories, contributions within a calendar month.
     rotation: monthly
-    # Assignment must be reproducible: the same (month, shot list) always yields
-    # the same tiles, so a re-render does not reshuffle who played whom.
-    assignment: >
-      Deterministic round-robin over the month's contributors, seeded by the
-      month key, walking the shot list in timeline order and filling each
-      segment's ensemble `slots`. Contributors are reused only after every
-      member of the pool has been placed at least once.
+    assignment: 'Deterministic round-robin over the month''s contributors, seeded by the month key, walking
+      the shot list in timeline order and filling each segment''s ensemble `slots`. Contributors are reused
+      only after every member of the pool has been placed at least once.
+
+      '
   slots:
-    description: >
-      How many ensemble Guardians a shot can credit — the number of distinct
-      anonymous bodies plausibly in frame. DERIVED, not tagged: a 'group' or
-      'crowd' composition carries a fireteam's worth, a solo shot carries one.
-    formula: >
-      role != ensemble                              -> 0;
-      composition contains crowd                    -> 6;
-      composition contains group, or subject_salience == crowd_group -> 3;
-      otherwise                                     -> 1.
+    description: 'How many ensemble Guardians a shot can credit — the number of distinct anonymous bodies
+      plausibly in frame. DERIVED, not tagged: a ''group'' or ''crowd'' composition carries a fireteam''s
+      worth, a solo shot carries one.
+
+      '
+    formula: 'role != ensemble                              -> 0; composition contains crowd                    ->
+      6; composition contains group, or subject_salience == crowd_group -> 3; otherwise                                     ->
+      1.
+
+      '
   placeholder_plate:
-    # On-screen copy for an ensemble slot that is NOT YET CAST — the blueberry
-    # plate. It exists so a cut can be assembled, timed and reviewed before a
-    # month's roster is known, WITHOUT putting a real person's name on a shot
-    # they were never assigned. It names nobody on purpose: `name: TBD` is a
-    # visible placeholder, not a credit. Replace it by re-planning with a real
-    # roster (`tools/ensemble.py roster`) before anything is published.
-    # Same four-field deck vocabulary as a lead `plate:` — nothing invented —
-    # and the default blue chrome, which is the blueberry treatment.
     label: CONTRIBUTOR // GUARDIAN
     name: TBD
     title: Project Bluefin
-
 derived_fields:
   casting:
     type: object
     label_source: heuristic
-    # CHEAP: pure function of already-tagged fields (character, subject_salience,
-    # substitutability, composition). No vision pass, no model call.
-    description: >
-      DERIVED per-segment casting decision. Says which tier the shot belongs to
-      and, for leads, who plays it. Ensemble `person` is intentionally left null
-      here — it is filled later by tools/ensemble.py once a month's contributor
-      pool exists, so segment records never go stale when the pool rotates.
+    description: 'DERIVED per-segment casting decision. Says which tier the shot belongs to and, for leads,
+      who plays it. Ensemble `person` is intentionally left null here — it is filled later by tools/ensemble.py
+      once a month''s contributor pool exists, so segment records never go stale when the pool rotates.
+
+      '
     fields:
       role:
         type: enum
         values:
-          lead:     A named cast character is on screen; `character` and `person` identify them.
+          lead: A named cast character is on screen; `character` and `person` identify them.
           ensemble: An anonymous Guardian slot fillable by contributors.
-          none:     Neither — environment, enemy, or artifact shot with nobody to cast.
+          none: Neither — environment, enemy, or artifact shot with nobody to cast.
       character:
-        type: [string, "null"]
-        description: Canonical `leads` key matched (aka spellings normalize to it). null unless role = lead.
+        type:
+        - string
+        - 'null'
+        description: Canonical `leads` key matched (aka spellings normalize to it). null unless role =
+          lead.
       person:
-        type: [string, "null"]
-        description: >
-          The cast person's id. Set for role = lead when that character is cast;
-          null for uncast leads and for ensemble (assigned later, per month).
+        type:
+        - string
+        - 'null'
+        description: 'The cast person''s id. Set for role = lead when that character is cast; null for
+          uncast leads and for ensemble (assigned later, per month).
+
+          '
       usable:
         type: boolean
-        description: >
-          Whether the shot can actually be used for `person`. True for
-          unconstrained leads and for ensemble. For a CONSTRAINED binding
-          (jeefy -> Saladin: far + helmeted) it is false when the shot violates
-          the constraints; such a shot gets no lead boost and is excluded from
-          that character's retrieval.
+        description: 'Whether the shot can actually be used for `person`. True for unconstrained leads
+          and for ensemble. For a CONSTRAINED binding (jeefy -> Saladin: far + helmeted) it is false when
+          the shot violates the constraints; such a shot gets no lead boost and is excluded from that
+          character''s retrieval.
+
+          '
       constraints_failed:
         type: array
-        description: >
-          Constraint keys the shot fails, e.g. [require_far, require_helmet] for
-          a tight, face-clear Saladin. Empty when usable, or when the binding has
-          no constraints.
+        description: 'Constraint keys the shot fails, e.g. [require_far, require_helmet] for a tight,
+          face-clear Saladin. Empty when usable, or when the binding has no constraints.
+
+          '
       slots:
         type: integer
         description: Contributor tiles this shot can carry. 0 for lead/none, >= 1 for ensemble.
-    formula: >
-      Normalize each character[].name to snake_case, then:
-      if any name matches a `leads` key or its `aka`
-        -> role = lead, character = the canonical key, person = that entry's
-        `person` (may be null if uncast), slots = 0; if the binding has
-        `constraints`, evaluate them: usable = (nothing failed),
-        constraints_failed = the unmet keys (require_helmet fails unless
-        identity_visibility is face-concealed; require_far fails unless
-        shot_scale is in {ELS,LS,MLS,MS}); unconstrained leads are always usable;
-      elif subject_salience in {guardian_hero, crowd_group}
-        -> role = ensemble, character = null, person = null, usable = true,
-        constraints_failed = [], slots = per the `ensemble.slots` formula;
-      else
-        -> role = none, character = null, person = null, usable = false,
-        constraints_failed = [], slots = 0.
-
-# RELATIONSHIP TO identity.yaml: `substitutability` survives, but its job
-# changed. It no longer gates whether a shot is USABLE — it now only measures
-# how comfortably an ensemble slot reads as "could be anyone", which is a
-# tie-breaker when choosing between two otherwise equal clean shots. A
-# face-clear lead shot is fully usable at substitutability 0.
+    formula: "Normalize each character[].name to snake_case, then: if any name matches a `leads` key or\
+      \ its `aka`\n  -> role = lead, character = the canonical key, person = that entry's\n  `person`\
+      \ (may be null if uncast), slots = 0; if the binding has\n  `constraints`, evaluate them: usable\
+      \ = (nothing failed),\n  constraints_failed = the unmet keys (require_helmet fails unless\n  identity_visibility\
+      \ is face-concealed; require_far fails unless\n  shot_scale is in {ELS,LS,MLS,MS}); unconstrained\
+      \ leads are always usable;\nelif subject_salience in {guardian_hero, crowd_group}\n  -> role = ensemble,\
+      \ character = null, person = null, usable = true,\n  constraints_failed = [], slots = per the `ensemble.slots`\
+      \ formula;\nelse\n  -> role = none, character = null, person = null, usable = false,\n  constraints_failed\
+      \ = [], slots = 0.\n"

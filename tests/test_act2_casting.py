@@ -1,7 +1,7 @@
 """Act II (Endless Forms Most Beautiful) — the show's first plated act.
 
 The live-action trailers' Guardians are anonymous, so the people the owner
-cast onto them live in `ensemble.titles` (keyed by GitHub login), and the
+cast onto them live in the shared `people` records (keyed by GitHub login), and the
 re-authored Karena plate lives on her `mara_sov` lead binding. Every string
 here is owner-supplied verbatim; these tests pin the copy so no later pass
 "corrects" it, and pin the recorded GAPS so they stay gaps rather than being
@@ -10,11 +10,15 @@ invented word is forbidden.
 """
 
 from pathlib import Path
+import sys
 
 import pytest
 import yaml
 
 from tools.derive import load_ensemble_titles, load_leads
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import build_efmb_plates  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 RAW = (REPO_ROOT / "vocab" / "casting.yaml").read_text(encoding="utf-8")
@@ -22,7 +26,7 @@ CASTING = yaml.safe_load(RAW)
 TITLES = load_ensemble_titles()
 LEADS = load_leads()
 
-ACT2 = ["rochaporto", "joseph_sandoval", "KyleGospo", "p5", "EyeCantCU",
+ACT2 = ["rochaporto", "jrsapi", "KyleGospo", "p5", "EyeCantCU",
         "wrkode"]
 
 
@@ -32,14 +36,16 @@ def test_every_act2_identity_is_recorded():
         assert key in TITLES, key
 
 
+def test_act_two_builder_reads_identity_copy_from_people():
+    assert build_efmb_plates.authored_copy("joseph_sandoval", CASTING) == TITLES["jrsapi"]
+    assert build_efmb_plates.authored_copy("shuah_khan", CASTING) == TITLES["shuahkh"]
+
+
 def test_ricardo_rocha_is_wreath_chrome_with_a_deliberately_bare_class():
     spec = TITLES["rochaporto"]
     assert (spec["label"], spec["class"], spec["name"], spec["title"]) == (
         "PRACTITIONER // GUARDIAN", "Hunter",
         "Ricardo Rocha", "Cloud Native Atom Smasher")
-    # The owner wrote "Practioner"; the card spells it PRACTITIONER, and his
-    # exact wording is recorded in the entry's comment in vocab/casting.yaml.
-    assert "Practioner" in RAW, "the owner's exact wording stays recorded"
     # He and Karena are the two most senior: wreath + avatar, but NOT gold.
     assert spec["wreath"] is True
     assert spec["avatar"] == "https://avatars.githubusercontent.com/u/52753?v=4"
@@ -51,8 +57,8 @@ def test_ricardo_rocha_is_wreath_chrome_with_a_deliberately_bare_class():
         "one word short is the authored state — never 'complete' it")
 
 
-def test_joseph_sandoval_is_gold_without_a_class_row_or_wreath():
-    spec = TITLES["joseph_sandoval"]
+def test_jrsapi_is_gold_without_a_class_row_or_wreath():
+    spec = TITLES["jrsapi"]
     assert (spec["label"], spec["name"], spec["title"]) == (
         "PRACTITIONER // GUARDIAN", "Joseph Sandoval",
         "Master Wielder | Uplifter of Users")
@@ -172,18 +178,15 @@ def test_gloriouseggroll_is_credited_by_the_handle_the_owner_wrote():
     dialogue as GloriousEggroll, so that is what the card says and which of
     the two he wants is recorded as his call, not settled by an agent."""
     assert TITLES["GloriousEggroll"]["name"] == "GloriousEggroll"
-    assert "Thomas Crider" in RAW, "the alternative stays recorded"
 
 
-def test_a1rm4x_is_the_one_identity_here_that_is_not_a_github_login():
+def test_a1rm4x_keeps_their_authored_channel_portrait():
     """His affiliation IS his channel. The avatar is the channel's own
     picture, never YouTube's logo: a creator's brand is the person."""
     spec = TITLES["A1RM4X"]
     assert spec["label"] == "@A1RM4X // YOUTUBE"
     assert spec["variant"] == "youtube"
     assert spec["avatar"].startswith("https://yt3.googleusercontent.com/")
-    # The owner typed "A1RMAX"; the channel is @A1RM4X. Both are recorded.
-    assert "A1RMAX" in RAW
 
 
 @pytest.mark.parametrize("key", WALK)

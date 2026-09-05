@@ -91,28 +91,42 @@ def test_rewriting_twice_still_points_at_the_original_recovery():
     assert cue["recovered_text"] == "Fatigue is a distraction."
 
 def test_the_speaker_can_be_renamed_by_character_or_by_person():
-    for spelling in ("clubanderson", "sagira_ghost", "Doctor Andy Anderson"):
+    for spelling in ("clubanderson", "sagira_ghost"):
         text = dialogue_md.export(DATA, LEADS).replace(
-            "## d02 | mrbobbytables", f"## d02 | {spelling}")
+            "## d02 | osiris", f"## d02 | {spelling}")
         cues = dialogue_md.parse(text, LEADS)
         assert next(c for c in cues if c["id"] == "d02")["character"] == "sagira"
 
-def test_owner_facing_dialogue_labels_round_trip_after_normalization():
+
+def test_a_shared_login_cannot_choose_between_two_characters():
     leads = {
-        **LEADS,
-        "sagira": {
-            **LEADS["sagira"],
-            "dialogue_label": "Doctor Andy Anderson",
-        },
+        "elsie_bray": {"person": "nimbinatus", "aka": []},
+        "nimbatus": {"person": "nimbinatus", "aka": []},
     }
-    text = dialogue_md.export(DATA, leads)
-    cues = dialogue_md.parse(text, leads)
-    assert next(c for c in cues if c["id"] == "d01")["character"] == "sagira"
+    data = {"video_id": "vid", "cues": [
+        {"id": "d01", "start_sec": 0.0, "end_sec": 2.0,
+         "character": "elsie_bray", "text": "Hi"},
+        {"id": "d02", "start_sec": 2.0, "end_sec": 4.0,
+         "character": "nimbatus", "text": "Bye"},
+    ]}
+    exported = dialogue_md.export(data, leads)
+    assert "## d01 | elsie_bray" in exported
+    assert "## d02 | nimbatus" in exported
+    ambiguous = exported.replace("## d01 | elsie_bray", "## d01 | nimbinatus")
+    with pytest.raises(ValueError, match="ambiguous GitHub login"):
+        dialogue_md.parse(ambiguous, leads)
+
+
+def test_display_names_are_not_dialogue_aliases():
+    text = dialogue_md.export(DATA, LEADS).replace(
+        "## d02 | osiris", "## d02 | Doctor Andy Anderson")
+    with pytest.raises(ValueError, match="not a cast character"):
+        dialogue_md.parse(text, LEADS)
 
 def test_an_uncast_speaker_is_refused_rather_than_silently_dropped():
     """An unresolvable name would render no card at all; fail loudly instead."""
     text = dialogue_md.export(DATA, LEADS).replace(
-        "## d02 | mrbobbytables", "## d02 | Ikora Rey")
+        "## d02 | osiris", "## d02 | Ikora Rey")
     with pytest.raises(ValueError, match="not a cast character"):
         dialogue_md.parse(text, LEADS)
 
@@ -312,8 +326,8 @@ def test_a_retime_that_reorders_the_conversation_says_so():
     swaps a reply and its setup. Moving copy the owner placed is the fourth
     un-automatable class -- it is reported loudly, never done quietly."""
     text = dialogue_md.export(DATA, LEADS).replace(
-        "## d02 | mrbobbytables | 0:14.00 -> 0:17.00",
-        "## d02 | mrbobbytables | 0:09.00 -> 0:17.00")
+        "## d02 | osiris | 0:14.00 -> 0:17.00",
+        "## d02 | osiris | 0:09.00 -> 0:17.00")
     updated, changes = dialogue_md.merge(DATA, dialogue_md.parse(text, LEADS))
     assert [c["id"] for c in updated["cues"]] == ["d02", "d01"]
     assert any("REORDERED" in c for c in changes)
@@ -321,7 +335,7 @@ def test_a_retime_that_reorders_the_conversation_says_so():
 
 def test_an_ordinary_retime_reports_no_reorder():
     text = dialogue_md.export(DATA, LEADS).replace(
-        "## d02 | mrbobbytables | 0:14.00 -> 0:17.00",
-        "## d02 | mrbobbytables | 0:14.00 -> 0:19.00")
+        "## d02 | osiris | 0:14.00 -> 0:17.00",
+        "## d02 | osiris | 0:14.00 -> 0:19.00")
     _, changes = dialogue_md.merge(DATA, dialogue_md.parse(text, LEADS))
     assert changes and not any("REORDERED" in c for c in changes)

@@ -25,13 +25,12 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `4:43.80` Eons later / Maintainer-Guardians hold the line for humanity / Fighting against the Toilmaster and his Legion of Clankers / It all started with Kubernetes.
 - `5:10.23` Does NOT Come in Peace / OG GUARDIAN / Tim Hockin
 - `5:14.43` **jrsapi** — No one can tell which Ricardo is which so roll with it
-- `5:18.23` **Ricardo** — It's me the nuke guy how do you think I got here?
-- `5:22.03` **pilot** — Lunar record baby! Hello KubeCon + CloudNativeCon
-- `5:25.23` **Ricardo** — They wanted us to put AI in the glider so we did.
+- `5:18.23` **rochaporto** — It's me the nuke guy how do you think I got here?
+- `5:22.03` **TBD** — Lunar record baby! Hello KubeCon + CloudNativeCon
+- `5:25.23` **ricardosalveti** — They wanted us to put AI in the glider so we did.
 - `5:29.00` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
 - `5:30.30` PRESENT DAY
 - `5:54.23` **jrsapi** — That explains the slop
-- `6:01.23` **angellk** — I love this job
 - `6:08.23` Your choices are:
 - `6:08.30` Your choices are:
 - `6:08.36` Your choices are:
@@ -106,17 +105,14 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `6:23.30` **jrsapi** — They learn quickly
 - `6:25.75` **rochaporto** — We need to move!
 - `6:28.30` **jrsapi** — Projects Teams Metrics are strong
-- `6:31.30` **angellk** — Like cardio!
 - `6:34.00` **jrsapi** — They just need mentoring in the right skills
 - `6:40.30` Mars
 - `6:45.00` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
-- `6:47.30` **angellk** — Hit 'em with your lessons learned
 - `6:49.75` **rochaporto** — One reference architecture coming up!
 - `6:58.30` **jrsapi** — I still don't know which Ricardo this is
-- `7:01.33` **angellk** — One hundred thousand bootc volunteers, ready to power up
 - `7:02.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
-- `7:04.78` **jrsapi** — The gamers would have to impress BOTH Ricardos
-- `7:07.23` **Ricardo** — Look man I am so tired just jump
+- `7:04.48` **jrsapi** — The gamers would have to impress BOTH Ricardos
+- `7:07.43` **rochaporto** — Look man I am so tired just jump
 - `7:13.80` Do we even know who they are?
 - `7:20.47` SATURN
 - `7:23.30` **castrojo** — Time to get this driver upstream
@@ -125,17 +121,17 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `7:33.30` **LionHeartP** — What tests?
 - `7:35.75` Useful Youtuber (UNCOMMON) / NEW CONTRIBUTOR / A1RM4X
 - `7:39.30` **A1RM4X** — Thank you I never thought I could help!
-- `7:41.75` **A1RM4X** — I'm not like you I'm just a lowly user
-- `7:44.20` **GloriousEggroll** — It's your patch, turn the stream on
-- `7:46.65` **LionHeartP** — Let's get these numbers up
-- `7:49.10` **wrkode** — Oh dibs on this one
+- `7:41.85` **A1RM4X** — I'm not like you I'm just a lowly user
+- `7:44.33` **GloriousEggroll** — It's your patch, turn the stream on
+- `7:46.78` **LionHeartP** — Let's get these numbers up
+- `7:49.23` **wrkode** — Oh dibs on this one
 - `7:50.13` KERNEL 6.11-RC / UPSTREAM PATCH QUEUE
-- `7:52.05` **GloriousEggroll** — There's nothing glorious about this job
+- `7:52.18` **GloriousEggroll** — There's nothing glorious about this job
 - `7:59.30` **LionHeartP** — When we work together
 - `8:03.50` **wrkode** — Have I shown you Kairos my friend?
-- `8:09.30` **lionheartp** — Nice work testing that patch
-- `8:12.00` **lionheartp** — Usually Blueberries just send me a bunch of crap
-- `8:16.30` **lionheartp** — You didn't test any of this did you.
+- `8:09.30` **LionHeartP** — Nice work testing that patch
+- `8:12.00` **LionHeartP** — Usually Blueberries just send me a bunch of crap
+- `8:16.30` **LionHeartP** — You didn't test any of this did you.
 - `8:18.53` Enslaver of Maintainers | Ruiner of User Experience / KERNEL REGRESSION
 - `8:20.30` **pastaq** — Hey man WHAT tests?
 - `8:22.57` **LionHeartP** — Let's go!
@@ -148,34 +144,34 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:46.20` **castrojo** — Or go blow some shit up
 - `8:59.73` **akgraner** — Hi sugar, I'm looking for Kyle
 - `9:02.18` **HikariKnight** — Ouch man wtf!
-- `9:04.63` **Owen** — Oh sorry my bad
+- `9:04.63` **TBD** — Oh sorry my bad
 - `9:07.08` **kolunmi** — Who turned PvP on?
 - `9:09.53` **angellk** — Don't look at me I only turned on PVP
-- `9:12.78` **cam** — Mom no one plays this game
+- `9:12.78` **TBD** — Mom no one plays this game
 - `9:15.23` **HikariKnight** — Hey wait?!
 - `9:17.68` **kolunmi** — Are those ... other linux users?
+- `9:20.53` **akgraner** — "How bazaar?"
+- `9:22.98` **akgraner** — Who writes this crap?
 - `9:25.43` **akgraner** — Oh wow I forgot what the starter dungeon was like! Hi!
 - `9:34.65` **akgraner** — Remember, kindness is doing what's right
-- `9:37.10` **akgraner** — For the ecosystem
-- `9:39.55` **akgraner** — For our users
-- `9:42.00` **akgraner** — And for our maintainers
-- `9:44.45` **akgraner** — Don't be nice
-- `9:46.90` **akgraner** — Be kind
-- `9:49.35` **akgraner** — Extinction is the Rule
+- `9:37.26` **akgraner** — For the ecosystem
+- `9:39.71` **akgraner** — For our users
+- `9:42.16` **akgraner** — And for our maintainers
+- `9:44.61` **akgraner** — Don't be nice
+- `9:47.06` **akgraner** — Be kind
+- `9:49.51` **akgraner** — Extinction is the Rule
 - `9:52.20` **akgraner** — Ok so I'm going to clean out this trash for you
-- `9:54.65` **akgraner** — [Don't let them decide for you]
-- `9:57.10` **akgraner** — You make your own fate.
-- `9:59.55` **akgraner** — I can't save you from this shitty writing though
-- `10:03.00` **akgraner** — "How bazaar?"
-- `10:05.45` **akgraner** — Who writes this crap?
-- `10:08.13` Reprehenderit voluptate / HATERS
-- `10:13.73` **kylegospo** — Sup
-- `10:15.79` **kolunmi** — Cardio!
-- `10:25.54` **nwoods3** — I feel seen
-- `10:27.99` **kolunmi** — Hey did you see how we just loaded up in a new level?
-- `10:30.44` **Hikari** — Finally, I can play WARFRAME!
-- `10:38.70` **castrojo** — Finally, retirement
-- `10:41.08` **castrojo** — The long walk beckons
+- `9:55.22` **akgraner** — [Don't let them decide for you]
+- `9:57.67` **akgraner** — You make your own fate.
+- `10:00.12` **akgraner** — I can't save you from this shitty writing though
+- `10:14.94` **nwoods3** — I feel seen
+- `10:17.39` **kolunmi** — Hey did you see how we just loaded up in a new level?
+- `10:20.75` **HikariKnight** — Finally, I can play WARFRAME!
+- `10:23.60` Reprehenderit voluptate / HATERS
+- `10:29.20` **KyleGospo** — Sup
+- `10:31.25` **kolunmi** — Cardio!
+- `10:54.17` **castrojo** — Finally, retirement
+- `10:56.62` **castrojo** — The long walk beckons
 
 ## III
 
@@ -237,40 +233,40 @@ Edit in `chapters/VI-wolves.md`.
 
 Edit in `chapters/P4-underwater.md`.
 
-- `26:05.38` **Jill Castro** — One more loose end
-- `26:07.26` **Valerie** — You can't escape yourself
-- `26:09.14` **Rafael** — You promised
-- `26:11.02` **castrojo** — Fine
-- `26:14.78` **LH** — Show them the minds
-- `26:16.66` **Valerie** — Of the wolves
-- `25:28.59` **Rafael** — What's a wolf?
+- `27:36.75` **JillCastro** — One more loose end
+- `27:39.05` **valerie-tar-gz** — You can't escape yourself
+- `27:41.35` **rafaelcastro10** — You promised
+- `27:43.65` **castrojo** — Fine
+- `27:45.95` **LionHeartP** — Show them the minds
+- `27:48.25` **valerie-tar-gz** — Of the wolves
+- `26:59.96` **rafaelcastro10** — What's a wolf?
 
 ## VII
 
 Edit in `chapters/VII-europa.md`.
 
-- `27:07.56` **krook** — Deploy CNCF Projects Team
-- `27:09.56` **preethit** — Stand down, I'm sending my wolf
-- `27:11.56` **alolita** — Are you sure the Kube is on Europa?
-- `27:14.56` **preethit** — I hope she can handle the Kube
-- `27:16.96` **preethit** — I must not fail
-- `27:19.41` **alolita** — We have failed, Guardians are down
-- `27:21.92` **tophee** — I've confirmed it myself, we have no choice
-- `27:25.04` **tophee** — She's the only way to stop the Toilmaster
-- `27:31.56` **castrojo** — They must never know what you did for them
-- `27:34.56` **mrbobbytables** — When all hope is lost
-- `27:36.96` **jeefy** — Standing by for Extraction
-- `27:39.56` **ihor** — G{k8s}dspeed
-- `27:42.16` **preethit** — Our clan
-- `27:44.61` **preethit** — Is the Iron
-- `27:47.06` **preethit** — That forges Wolves
-- `27:49.51` **mrbobbytables** — Wolves gladly sacrifice for their own
-- `27:52.22` **krook** — Initiate Lone Wolf Protocol
-- `27:54.67` **iancoldwater** — Local Security systems trivially pwned
-- `27:57.46` **tabbysable** — Europan Security systems trivially pwned (again)
-- `28:08.56` **nimbatus** — Wilco
-- `28:10.76` **nimbatus** — {k8s}ut
-- `28:17.73` **preethit** — Hummingbird will find the girl
+- `28:38.93` **krook** — Deploy CNCF Projects Team
+- `28:40.93` **preethit** — Stand down, I'm sending my wolf
+- `28:42.93` **alolita** — Are you sure the Kube is on Europa?
+- `28:45.93` **preethit** — I hope she can handle the Kube
+- `28:48.33` **preethit** — I must not fail
+- `28:50.78` **alolita** — We have failed, Guardians are down
+- `28:53.29` **tophee** — I've confirmed it myself, we have no choice
+- `28:56.41` **tophee** — She's the only way to stop the Toilmaster
+- `29:02.93` **castrojo** — They must never know what you did for them
+- `29:05.93` **mrbobbytables** — When all hope is lost
+- `29:08.33` **jeefy** — Standing by for Extraction
+- `29:10.93` **ihor** — G{k8s}dspeed
+- `29:13.53` **preethit** — Our clan
+- `29:15.98` **preethit** — Is the Iron
+- `29:18.43` **preethit** — That forges Wolves
+- `29:20.88` **mrbobbytables** — Wolves gladly sacrifice for their own
+- `29:23.59` **krook** — Initiate Lone Wolf Protocol
+- `29:26.04` **iancoldwater** — Local Security systems trivially pwned
+- `29:28.83` **tabbysable** — Europan Security systems trivially pwned (again)
+- `29:39.93` **nimbatus** — Wilco
+- `29:42.13` **nimbatus** — {k8s}ut
+- `29:49.10` **preethit** — Hummingbird will find the girl
 
 ## VIII-cta
 

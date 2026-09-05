@@ -1,6 +1,6 @@
 ---
 name: audio
-version: "1.0"
+version: "1.1"
 last_updated: "2026-08-19"
 id: audio
 one_line_purpose: Preserve source fidelity and enforce delivery audio headroom.
@@ -36,12 +36,26 @@ version that exists, keep the chain lossless, ship it unaltered.
 The authority for *why* is the `audio-quality-tenet` skill; this file is the
 project-specific part.
 
+## Hero workspace exception
+
+Inside `~/Videos/Wolves/Hero`, the
+[hero-videos policy](../hero-videos/SKILL.md) is stricter and overrides every
+generic local example in this skill, including the command paths below,
+auditions, and verification. **Do not run local `ffmpeg`, `ffprobe`,
+`audio-source.sh`, or `audio-check.sh` for Hero audio.** When an audio source
+is authorized, use the hero-scoped
+[Argo recipe](../hero-videos/references/authorized-audio-on-argo.md) instead.
+Its separate bed and mux/validation workflows perform format identity, silence,
+spectrum, native-rate PCM, loudness, AAC, and upload work remotely. This
+document makes no claim that a Hero song source is authorized or available.
+
 ## When to Use
 
 - Choosing or fetching a music bed
 - Checking whether a bed came from the right rung
 - Measuring a delivered act or programme
 - Deciding whether a master or AAC copy needs headroom correction
+- Removing picture sections while preserving the source soundtrack
 
 ## When NOT to Use
 
@@ -49,7 +63,7 @@ project-specific part.
   [`production`](../production/SKILL.md)
 - Getting ffmpeg working on an atomic host → [`../../rendering.md`](../../rendering.md)
 
-## The three rules
+## The four rules
 
 1. **Source by codec, never by bitrate.** Prefer the native-rate Opus rung over
    a numerically higher but worse AAC one; the full ladder, the exact `yt-dlp`
@@ -64,8 +78,18 @@ project-specific part.
    **`audio-check.sh` and `tools/peaks.py` are the gates.** FFmpeg's `ebur128`
    meter is useful evidence, but its true-peak estimate is not a substitute for
    the project gate.
+4. **A picture cut is an audio edit.** Measure every delivered splice, not just
+   the source samples named by the cut record. FFmpeg's `concat` filter uses the
+   longest stream in each segment and pads shorter audio with silence, so
+   frame-quantized video can move the actual audio edge even when every segment
+   starts at timestamp zero. Choose cut boundaries inside the same video-frame
+   window until the encoded join is continuous; never hide a click with
+   normalization or an unreviewed crossfade. Source:
+   `/websites/ffmpeg_documentation`, `concat` filter.
 
 ## Shortest command path
+
+**Not for `~/Videos/Wolves/Hero`; use its Argo recipe above.**
 
 ```bash
 cd ~/Videos
@@ -147,6 +171,8 @@ This skill is the contract. The detail lives in `references/`:
   relative to the fetched source**.
 - Measuring only the bed or only the FLAC master; the delivered AAC is the
   file that overshoots.
+- Checking only picture frames at a hard cut; a clean image join can still
+  contain a click or a concat-inserted silence gap.
 - Shipping after `audio-check.sh --bed` while skipping
   `./audio-check.sh --all`.
 - Using `loudnorm`, limiting, compression, EQ, or any non-static processing.
@@ -162,6 +188,11 @@ This skill is the contract. The detail lives in `references/`:
 python3 tools/peaks.py measure <file>        # delivered true peak
 ffmpeg -i <master>.mp4 -map a:0 -f md5 -     # prove a master is bit-exact
 ```
+
+For a cut-heavy standalone file, also measure the decoded deliverable at every
+join and compare each boundary step with the surrounding slew. A source-only
+measurement is insufficient because concat padding is introduced during the
+encode.
 
 Use `/home/linuxbrew/.linuxbrew/bin/ffmpeg`. The system `ffmpeg` is
 `ffmpeg-free`: no H.264 decoder, and it fails only once decoding starts, which

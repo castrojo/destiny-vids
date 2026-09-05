@@ -1,7 +1,7 @@
 ---
 name: production
-version: "1.0"
-last_updated: "2026-08-19"
+version: "1.4"
+last_updated: "2026-09-04"
 id: production
 one_line_purpose: Take approved video work from issue brief to delivered artifact.
 entry_point: docs/skills/production/SKILL.md
@@ -20,6 +20,9 @@ description: >-
   the delivery workspace.
 metadata:
   type: procedure
+  context7-sources:
+    - /addyosmani/agent-skills
+    - /websites/ffmpeg_documentation
 ---
 
 # Making videos in volume
@@ -58,7 +61,7 @@ An encode's ETA is measurable, so measure it rather than guessing — two `stat`
 calls a few seconds apart on the growing output give the rate. **A question
 about timing gets a time.**
 
-## The issue-to-video loop
+## Core Process
 
 ```bash
 python3 tools/gaps.py
@@ -98,6 +101,24 @@ scripts/make_video.sh 3 renders/roster.json            # UNCUT, credited
 `make_video.sh` picks up `stories/<video_id>.txt` automatically if it exists.
 Writing the outline is editorial work; the script does not invent one.
 
+Standalone sequel titles keep the series construction and add a Roman numeral:
+`Bluefin and the Hive II`, not `Bluefin in the Hive II`. The episode number
+changes; the established title wording does not.
+
+### Rebuilt non-act segments
+
+Perfume movements and other `renders/` items have no act numeral, so their
+input provenance is not stamped by `publish --act`. After their owning
+renderer succeeds, record the digest through the delivery interface rather
+than typing one:
+
+```bash
+python3 tools/deliver.py publish --segment renders/perfume-4-overlays.mp4
+```
+
+The command requires the output to exist and derives its digest from the
+declared sources.
+
 ## The gate at stage 7
 
 `build_uncut_credited.sh` renders the **whole** video and credits it. That is
@@ -132,6 +153,14 @@ with it.
 
 Both stops print the exact next command. Neither is a state to route around.
 
+## Tail CTAs bias long
+
+A final call to action is not a transition to hurry through. Hold it long
+enough that the audience can read the whole card without racing; when review
+says it is short, increase the tail before shrinking copy or type. A requested
+multiplier changes only the CTA hold and extends the runtime after the card
+begins. It never pulls an earlier beat forward or re-times authored content.
+
 ## Where the detail lives
 
 This skill is the contract. The procedure lives in `references/`:
@@ -143,6 +172,16 @@ This skill is the contract. The procedure lives in `references/`:
 | [`key-art.md`](references/key-art.md) | Stills cut from the key art: YouTube thumbnails and the website's social preview card. |
 | [`avatars.md`](references/avatars.md) | The credits avatar cache and the Actions job that fetches it. |
 | [`freshness.md`](references/freshness.md) | Keeping delivery current across `cards / plates -> master -> Prod -> megacut -> 10mb/`. |
+| [`standalone-batch.md`](references/standalone-batch.md) | The "Bluefin and the X" cuts: one closed manifest, source-time seats, the CTA takeover, and splicing an intro film in front with a hard cut. |
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I should fix the pipeline before rendering." | Deliver the watchable cut first; improvements come after the owner has a file. |
+| "The CTA already contains all the words, so five seconds is enough." | A CTA succeeds only when it can be read. Extend a final tail before shrinking its copy. |
+| "I can move the previous beat earlier to buy CTA time." | A tail extension changes only the CTA hold; authored beats before it keep their clocks. |
+| "The local encode is quicker to start." | The farm is the default whenever reachable; local is a stated, capped fallback. |
 
 ## Red Flags
 
@@ -172,14 +211,12 @@ python3 tools/deliver.py status       # the delivery chain, as a report (never a
 python3 tools/readtime.py             # plates held too briefly to read (reports, never gates)
 ~/Videos/audio-check.sh --all         # gates every act in Wolves/Prod
 
-# before any encode: nothing authored is stranded on an unpushed branch
-for w in $(git worktree list --porcelain | awk '/^worktree /{print $2}'); do
-  h=$(git -C "$w" rev-parse HEAD)
-  [ "$(git branch -r --contains "$h" 2>/dev/null | wc -l)" -eq 0 ] &&
-    echo "UNPUSHED: $w ($h)"
-done
+# before any encode: report authored work that is not yet durable
+python3 tools/worktrees.py
 ```
 
 `tests/test_index_integrity.py` validates every committed segment, video and
 tag file against its schema. The delivery chain is a report here, never a gate;
 the freshness procedures live in [`references/freshness.md`](references/freshness.md).
+Resolve findings in the worktree you own before rendering. Never alter another
+agent's checkout, and never withhold an already-requested film for its finding.

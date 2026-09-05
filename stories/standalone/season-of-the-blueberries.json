@@ -1,0 +1,1375 @@
+{
+  "version": 1,
+  "season": "season-of-the-blueberries",
+  "source": {
+    "url": "https://www.youtube.com/watch?v=jlzQnXcUxqI",
+    "youtube_id": "jlzQnXcUxqI",
+    "video_format_id": "137",
+    "audio_format_id": "251",
+    "usage_class": "third_party_copyrighted",
+    "source_rights_note": "Third-party upload of Bungie's Destiny 2: The Witch Queen cutscene archive. Used only in a non-commercial fan creation under Bungie's fan-content forbearance. The repository stores metadata and timestamps, never the footage.",
+    "chapter_metadata": {
+      "artifact": "sources/jlzQnXcUxqI.chapters.json in projectbluefin/hive-lore",
+      "captured": "2026-08-29",
+      "captured_with": "yt-dlp --dump-single-json --skip-download",
+      "note": "The 12 publisher chapter windows below are copied verbatim from that captured artifact as factual source data. No footage is stored; this repository never depends on the sibling at runtime."
+    }
+  },
+  "opening_cta": {
+    "asset": "assets/hive/expansion-pack-cta.png",
+    "duration": 10.0,
+    "copy_source": "owner_authored",
+    "lines": [
+      "Find out the Secrets of AI at Scale",
+      "KubeCon + CloudNativeCon",
+      "Sponsor the End User Summit",
+      "Generous Consultations from the Minds Who Brought you this Madness",
+      "The people in this series are the best at finding business value in your business.",
+      "#HIREAWOLF"
+    ]
+  },
+  "closing_cta": {
+    "asset": "assets/cta/linux-foundation-training-forest.png",
+    "duration": 10.0
+  },
+  "title_slide": {
+    "duration": 5.0,
+    "eyebrow_template": "SEASON OF THE BLUEBERRIES // EPISODE {roman}",
+    "output_dir": "assets/hive/titles"
+  },
+  "fixed_cast": [
+    {
+      "id": "ikora",
+      "character": "Ikora Rey",
+      "github_login": "angiejones",
+      "github_id": 15972783,
+      "plate": {
+        "label": "TRUSTEE // GUARDIAN",
+        "class": "Voidwalker Warlock",
+        "name": "Angie Jones",
+        "title": "Arbiter of the Agentic",
+        "variant": "leader",
+        "provenance": {
+          "copy_source": "owner_authored",
+          "decided_by": "Owner instruction, the 2026-08-29 season decision (docs/superpowers/specs/2026-08-29-season-of-the-blueberries-design.md, 'Identity and casting'): the owner-authored gold plate for Ikora Rey.",
+          "name_source": "GitHub REST GET https://api.github.com/users/angiejones on 2026-08-29 returned the public profile name 'Angie Jones' (github_id 15972783); GitHub is the required factual source of truth for a contributor's name."
+        }
+      },
+      "seats": [
+        {
+          "chapter": 1,
+          "source_at": 36.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Angie Jones plates Ikora Rey at source 36.0 for 4.0s in chapter 1 (The Enclave)."
+        },
+        {
+          "chapter": 8,
+          "source_at": 687.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Angie Jones plates Ikora Rey at source 687.0 for 4.0s in chapter 8 (Worm)."
+        },
+        {
+          "chapter": 9,
+          "source_at": 764.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Angie Jones plates Ikora Rey at source 764.0 for 4.0s in chapter 9 (Defeated)."
+        }
+      ]
+    },
+    {
+      "id": "eris",
+      "character": "Eris Morn",
+      "github_login": "Swil78",
+      "github_id": 98050010,
+      "plate": {
+        "label": "TRUSTEE // AUTOMATON",
+        "name": "Shellea Williams",
+        "title": "I'm here for the 2x, I'm THAT good",
+        "variant": "leader",
+        "provenance": {
+          "copy_source": "owner_authored",
+          "decided_by": "Owner instruction, the 2026-08-29 season decision (docs/superpowers/specs/2026-08-29-season-of-the-blueberries-design.md, 'Identity and casting'): the owner-authored gold plate for Eris Morn.",
+          "name_source": "GitHub REST GET https://api.github.com/users/Swil78 on 2026-08-29 returned the public profile name 'Shellea Williams' (github_id 98050010); GitHub is the required factual source of truth for a contributor's name."
+        }
+      },
+      "seats": [
+        {
+          "chapter": 1,
+          "source_at": 60.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Shellea Williams plates Eris Morn at source 60.0 for 4.0s in chapter 1 (The Enclave)."
+        },
+        {
+          "chapter": 8,
+          "source_at": 631.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: Shellea Williams plates Eris Morn at source 631.0 for 4.0s in chapter 8 (Worm)."
+        }
+      ]
+    },
+    {
+      "id": "player",
+      "character": "Player Guardian",
+      "github_login": "CortNick",
+      "github_id": 104345443,
+      "plate": {
+        "label": "HIVE // BLUEBERRY",
+        "name": "Cortney",
+        "title": "Knows Policy, Knows this is Preposterous",
+        "provenance": {
+          "copy_source": "owner_authored",
+          "decided_by": "Owner instruction, the 2026-08-29 season decision (docs/superpowers/specs/2026-08-29-season-of-the-blueberries-design.md, 'Identity and casting'): the owner-authored player plate for the recurring player Guardian. The owner explicitly required GitHub as the factual source of truth for the name row.",
+          "name_source": "GitHub REST GET https://api.github.com/users/CortNick on 2026-08-29 returned the public profile name 'Cortney' (github_id 104345443, matching the CortNick entry in vocab/casting.yaml).",
+          "note": "The name 'Cortney' is the public GitHub profile name, kept by explicit owner requirement. The label and title are a deliberate one-video identity authored for this season; they are NOT a reuse of the older Wolves plate for 'Cortney Nickerson' (issue #90), and this record does not bind that identity anywhere else."
+        }
+      },
+      "seats": [
+        {
+          "chapter": 2,
+          "source_at": 149.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 149.0 for 4.0s in chapter 2 (On Mars)."
+        },
+        {
+          "chapter": 4,
+          "source_at": 313.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 313.0 for 4.0s in chapter 4 (The Relic)."
+        },
+        {
+          "chapter": 7,
+          "source_at": 553.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 553.0 for 4.0s in chapter 7 (Council)."
+        },
+        {
+          "chapter": 8,
+          "source_at": 611.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 611.0 for 4.0s in chapter 8 (Worm)."
+        },
+        {
+          "chapter": 9,
+          "source_at": 960.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 960.0 for 4.0s in chapter 9 (Defeated)."
+        },
+        {
+          "chapter": 11,
+          "source_at": 1129.0,
+          "dur": 4.0,
+          "why": "Owner-directed fixed seat from the 2026-08-29 season decision: CortNick plates the player Guardian at source 1129.0 for 4.0s in chapter 11 (With Mara)."
+        }
+      ]
+    }
+  ],
+  "overlays": [
+    {
+      "id": "savathuns-ship",
+      "kind": "lower-third",
+      "chapter": 1,
+      "source_at": 113.0,
+      "position": "bottom-right",
+      "lines": [
+        "Palace of AI Expectations",
+        "Tomb of Platform Teams"
+      ],
+      "copy_source": "owner_authored",
+      "nature": "project_lore",
+      "note": "Project lore, not Destiny canon; never cited as canon and never person-facing. Kept clear of the heroes: no fixed plate is seated in its window."
+    },
+    {
+      "id": "business-value-review",
+      "kind": "lower-third",
+      "chapter": 3,
+      "source_at": 243.0,
+      "position": "top-third",
+      "lines": [
+        "Business Value Review"
+      ],
+      "copy_source": "owner_authored",
+      "nature": "owner_note",
+      "note": "This is the cataclysm: the great fear of the intended audience."
+    }
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "slug": "the-enclave",
+      "roman": "I",
+      "headline": "The Enclave",
+      "start": 0.0,
+      "end": 125.0,
+      "subtitle": {
+        "text": "Where the work is shaped, not wished.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "enclave",
+          "relic-shaping"
+        ],
+        "mapping_refs": [
+          "deterministic-pipeline"
+        ],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e01-the-enclave.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e01-the-enclave-thumbnail.jpg",
+      "dossiers": [
+        {
+          "login": "clubanderson",
+          "github_id": 407614,
+          "name": "Andy Anderson",
+          "commits": 193,
+          "node_id": "MDQ6VXNlcjQwNzYxNA==",
+          "html_url": "https://github.com/clubanderson",
+          "avatar_url": "https://avatars.githubusercontent.com/u/407614?v=4",
+          "type": "User",
+          "fetched_at": "2026-08-29T08:55:39Z"
+        },
+        {
+          "login": "Danathar",
+          "github_id": 6772335,
+          "name": "Danathar",
+          "commits": 61,
+          "node_id": "MDQ6VXNlcjY3NzIzMzU=",
+          "html_url": "https://github.com/Danathar",
+          "avatar_url": "https://avatars.githubusercontent.com/u/6772335?v=4",
+          "type": "User",
+          "fetched_at": "2026-08-29T08:55:39Z"
+        },
+        {
+          "login": "gregoryhunt",
+          "github_id": 31053269,
+          "name": "Gregory Hunt",
+          "commits": 12,
+          "node_id": "MDQ6VXNlcjMxMDUzMjY5",
+          "html_url": "https://github.com/gregoryhunt",
+          "avatar_url": "https://avatars.githubusercontent.com/u/31053269?v=4",
+          "type": "User",
+          "fetched_at": "2026-08-29T08:55:39Z"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "slug": "on-mars",
+      "roman": "II",
+      "headline": "On Mars",
+      "start": 125.0,
+      "end": 218.0,
+      "subtitle": {
+        "text": "A world returned, and nothing on it unchanged.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "mars-returned"
+        ],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e02-on-mars.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e02-on-mars-thumbnail.jpg"
+    },
+    {
+      "number": 3,
+      "slug": "savathun",
+      "roman": "III",
+      "headline": "Savathun",
+      "start": 218.0,
+      "end": 309.0,
+      "subtitle": {
+        "text": "Light in the brood, doubt in the court.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "lucent-brood",
+          "savathun"
+        ],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e03-savathun.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e03-savathun-thumbnail.jpg"
+    },
+    {
+      "number": 4,
+      "slug": "the-relic",
+      "roman": "IV",
+      "headline": "The Relic",
+      "start": 309.0,
+      "end": 351.0,
+      "subtitle": {
+        "text": "Shape the tool, then trust it with the work.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "relic-shaping"
+        ],
+        "mapping_refs": [
+          "deterministic-pipeline"
+        ],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e04-the-relic.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e04-the-relic-thumbnail.jpg"
+    },
+    {
+      "number": 5,
+      "slug": "to-be-chosen",
+      "roman": "V",
+      "headline": "To Be Chosen",
+      "start": 351.0,
+      "end": 484.0,
+      "subtitle": {
+        "text": "Chosen is a verdict, not a wish.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "chosen"
+        ],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e05-to-be-chosen.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e05-to-be-chosen-thumbnail.jpg"
+    },
+    {
+      "number": 6,
+      "slug": "remembering",
+      "roman": "VI",
+      "headline": "Remembering",
+      "start": 484.0,
+      "end": 501.0,
+      "subtitle": {
+        "text": "The record is the memory; the memory is the proof.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "books-of-sorrow"
+        ],
+        "mapping_refs": [
+          "persistence"
+        ],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e06-remembering.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e06-remembering-thumbnail.jpg"
+    },
+    {
+      "number": 7,
+      "slug": "council",
+      "roman": "VII",
+      "headline": "Council",
+      "start": 501.0,
+      "end": 579.0,
+      "subtitle": {
+        "text": "Many voices, one verdict.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "extrapolation",
+        "lore_refs": [
+          "osmium-court"
+        ],
+        "mapping_refs": [
+          "agent-roster"
+        ],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e07-council.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e07-council-thumbnail.jpg"
+    },
+    {
+      "number": 8,
+      "slug": "worm",
+      "roman": "VIII",
+      "headline": "Worm",
+      "start": 579.0,
+      "end": 744.0,
+      "subtitle": {
+        "text": "Every strength is a bargain with a hunger.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "worm-gods"
+        ],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e08-worm.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e08-worm-thumbnail.jpg"
+    },
+    {
+      "number": 9,
+      "slug": "defeated",
+      "roman": "IX",
+      "headline": "Defeated",
+      "start": 744.0,
+      "end": 1005.0,
+      "subtitle": {
+        "text": "In the sword logic, defeat is only data.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "sword-logic"
+        ],
+        "mapping_refs": [
+          "classification"
+        ],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e09-defeated.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e09-defeated-thumbnail.jpg"
+    },
+    {
+      "number": 10,
+      "slug": "the-witness",
+      "roman": "X",
+      "headline": "The Witness",
+      "start": 1005.0,
+      "end": 1085.0,
+      "subtitle": {
+        "text": "It watches from the dark between the stars.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "the-witness"
+        ],
+        "mapping_refs": [],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e10-the-witness.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e10-the-witness-thumbnail.jpg"
+    },
+    {
+      "number": 11,
+      "slug": "with-mara",
+      "roman": "XI",
+      "headline": "With Mara",
+      "start": 1085.0,
+      "end": 1181.0,
+      "subtitle": {
+        "text": "Even queens keep allies beyond the reef.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "mara-sov"
+        ],
+        "mapping_refs": [
+          "hub"
+        ],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e11-with-mara.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e11-with-mara-thumbnail.jpg"
+    },
+    {
+      "number": 12,
+      "slug": "raid",
+      "roman": "XII",
+      "headline": "Raid",
+      "start": 1181.0,
+      "end": 1248.0,
+      "subtitle": {
+        "text": "Six voices enter; the discipline holds them.",
+        "candidate_id": 1,
+        "copy_source": "generated_lore",
+        "nature": "canon_inspired",
+        "lore_refs": [
+          "vow-of-the-disciple"
+        ],
+        "mapping_refs": [
+          "agent-roster"
+        ],
+        "supplier": "projectbluefin/hive-lore, titles.py --all, candidate 1, frozen 2026-08-29"
+      },
+      "output": "~/Videos/Hive/Season-of-the-Blueberries/s01e12-raid.mp4",
+      "thumbnail_output": "~/Videos/Hive/Season-of-the-Blueberries/s01e12-raid-thumbnail.jpg"
+    }
+  ],
+  "contributor_ledger": {
+    "credited_github_ids": [
+      407614,
+      6772335,
+      31053269
+    ],
+    "repositories": [
+      "kubestellar/kubestellar",
+      "kubestellar/kubeflex",
+      "kubestellar/console",
+      "kubestellar/docs",
+      "kubestellar/hive"
+    ],
+    "snapshots": [
+      {
+        "captured_at": "2026-08-29T08:55:39Z",
+        "window": {
+          "since": "2026-08-22T00:00:00Z",
+          "until": "2026-08-29T08:55:39Z"
+        },
+        "candidates": [
+          {
+            "id": 37492,
+            "node_id": "MDQ6VXNlcjM3NDky",
+            "login": "bketelsen",
+            "name": "Brian Ketelsen",
+            "html_url": "https://github.com/bketelsen",
+            "avatar_url": "https://avatars.githubusercontent.com/u/37492?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 1,
+            "evidence": [
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "73038f89167cb2c09d1626ce4b5ae230d3d354b2"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 407614,
+            "node_id": "MDQ6VXNlcjQwNzYxNA==",
+            "login": "clubanderson",
+            "name": "Andy Anderson",
+            "html_url": "https://github.com/clubanderson",
+            "avatar_url": "https://avatars.githubusercontent.com/u/407614?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 193,
+            "evidence": [
+              {
+                "repo": "kubestellar/console",
+                "shas": [
+                  "17475a118f3ac5d8716d01adfe7d9743a34beec6",
+                  "3e2591a604e0ae7f3137627bb74715fe370e77d1"
+                ]
+              },
+              {
+                "repo": "kubestellar/docs",
+                "shas": [
+                  "05f55d7452409f79f4d206122565552b7ad09eda",
+                  "0a0b91761ae4422ba1261fe2c0e6f25df29fc8b6",
+                  "1a96cf8e2f29bafefb992296cfa8fcd9f581331a",
+                  "28f8d231426393460df490161139e0b8b84b77a5",
+                  "387a36cb07fc2ad7dc012296eb18cb0a56c46b90",
+                  "6fa7ec48a336141af9018aaa6056c38ae173bafb",
+                  "8442c451e006cd1bc1fe85506f2f31c6759b5272",
+                  "980dc7947ab5c88db9f979e89fa1e7cff2477bab",
+                  "c58fa8289098ca773787c4ac70c7d68f00286460",
+                  "cfec404c5b4e0a5161af2c96872589e0aff8b194"
+                ]
+              },
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "0246e6d6582e5379da17a55f476c5ba7b4e64c2b",
+                  "02df959d1fbdc26150a46d4491587f81b80d833e",
+                  "03372bafdf9c1243d10367056b2d3e1e2fa95167",
+                  "03a2221559d798f434a18dbe5ae19c301204da39",
+                  "0627aac6f6f08589f59808a310845c57a8bb4856",
+                  "0664e134c0d3de7c9f6637c1852859aae71f0ba3",
+                  "0705867dfc07f9353ffb421d52579e5907ce65b1",
+                  "09176f4e44cea8aad268dc142268d42f68874886",
+                  "0c7d897afc5363a51800fafdb2672166cb0aaeac",
+                  "0d5f0f8a171de5ad832bfc6a2f55de3b1527e859",
+                  "0d910b53d259b2331c749f2c53b2bed8a5dfee8c",
+                  "0eb725dc8d30d5838e1db583ae48083109caa6a5",
+                  "155ae01996a3788e3a382b12023ee70d7e9df5ca",
+                  "15645c1bfb9bf7fe29d9cd5b216e8c5197f17670",
+                  "177c32f8fcd240c75c9c98a837ede29443cdc371",
+                  "189c20fd086359401cd99e64a3f35d4824a750d9",
+                  "18e8172b98be5663c95b3edd7da0fce068220313",
+                  "1adc6cc64cefd70ae2ae58417f074c4f07d434f1",
+                  "1bd335f1b6d7f7192d0fb438cf4df1079db9ddb7",
+                  "1c366e8d1165faca452dadc8f420c1c827c77773",
+                  "211f2a6e72d884a0a068ac5086a0d12915d72220",
+                  "221e5d4e951ef7924fafbe7a737904dea1dcbd06",
+                  "22baf8e744af1c7f59916d353128cccb5db1744a",
+                  "22bf81c8ff6b8eb32fb2286846a5539247296113",
+                  "238e18ef47e85995dec68359f2fd4f77a297880c",
+                  "244ba6ef7e4f16bb3ffc7d37cb538c6d8708189c",
+                  "24f5b686d72528c6c27c411c676390c344653947",
+                  "273770363dd38181fcc8ec23f06285aab6688777",
+                  "28a20952dcd6ff8ea46ca758483170ba162a7ab9",
+                  "28ffb5f19bbf77b7ec9cb547fa699b608117188a",
+                  "29f16db50151a89907c35e4f9ece199e53ad83c0",
+                  "2ac7ea4a671c33be70934d82b3ef62ede78460b2",
+                  "2bd7ccdf0e5073bfdfaaa13b25370ccae99bf40b",
+                  "2cbc0b1ce3eb2d779d1687cf53a341d6248e7e1d",
+                  "2db0c6a1130dd62fc7cf18073bed58d09b124101",
+                  "2de9eec551a3112700645f5987bd84d67d3e0de5",
+                  "2f0f60f04278cae7ac5ecffddb96d9f1f8f10651",
+                  "2f793d406d7727d85f2e4365a48530ca03002d53",
+                  "2ffcb53640469bec97a3d727f602515688590f2a",
+                  "30883cfcde9ff82b19c3a2e50b026d841d53300f",
+                  "319e689d0aceefdb4212b3cae4ddb4c5ac322cf4",
+                  "325707ed4ac3b75b3966e0aa60f570035fd9ac10",
+                  "327969b013a0b95dff3251d55bd03a12bf0f3ce4",
+                  "36fe18abbed14cb865bdf8328ea3437144dfde08",
+                  "38050399a0b0f5389733c0693ffbc187c6ff9339",
+                  "3838f09732c9f8d46d0f2f4e244316fa3dc14537",
+                  "3a91b88e5a30ca21be24055167b8c56ee818f46d",
+                  "3d523faf9f15900a645910ae5be8fe2a32a07132",
+                  "3f7cee1e9522cd4be33478ddc71a2d5325e40f16",
+                  "46223922aabecfed90ca88717820dfe0b213b38d",
+                  "47ce8bd468344376de5ca235eaa34f4eaa4e30eb",
+                  "48d782a4695e019073407b8b4b778f7c3bf0c2ff",
+                  "4a5240348c1de7050d305a20abaff0d0726f056f",
+                  "4aabfb8a0c6ab0289f51678ac4497446877fd160",
+                  "4d2cd895fe54604ca6cdb7cd02d9bf72f0cbefd7",
+                  "4dc8516ba2a6ef42afa2bff6b50b086b9efa102a",
+                  "4e65a5151e47cf4a671d0f9accde45c05be3f02b",
+                  "4ee73e3b67e6cb24e8f1418fe99c35c315bcaf2b",
+                  "4fe82efcb7479ff75762032d7822f7b255250011",
+                  "56533b46d96367d64dec170a1a479de167f73984",
+                  "56c500661718aeb9781b116099624dd8ad3e71fd",
+                  "56de9015befba967ccfc6d747f9de7e064f73143",
+                  "589f7a556921c066a28047b5a98863900d33f615",
+                  "59c82403b9c8c72d5ba77157b5bdccd6b0eb8b8f",
+                  "5a2d9914fe0d00e9f305f0f7f53140e698fdf0ed",
+                  "5b9e652b46098a1941646a3dd7d343ecdf18d3e9",
+                  "5d671222f9d3f07ac7c3dbc46debedc63d773420",
+                  "5da1a9ad0a163e4b10ed389a0092ba585a6c967c",
+                  "5f72752311cf2d7166b9698502b19c0033176c9d",
+                  "62da0801682053e56ed29ad897c1a3449630edb7",
+                  "631d25af19f0ecbebca6328084fb2345c34eca2e",
+                  "64dd28efd865b719074e229cd6ee62f1f3f9d5cc",
+                  "66a11626f3b7cbc0a932364a00940631e88b970f",
+                  "674ee2c4c290634344f0cae9bb6c7c726f442b50",
+                  "67550860a67f3235631dff9828c7714f5e9e6bb1",
+                  "691432e4d60b57a7e714fa6c3fe2016df79e3d7d",
+                  "6b0c5414b6a946dc6aee6c0212ea373aec85d780",
+                  "6cfd4e775f721f67f82fa03dc45569fb16c5f258",
+                  "6e29785e39ac3003bdc4768310a1cbb2fc0f4f44",
+                  "6e581b314ccccb54d45a2e7067542736b3cbd05b",
+                  "70db46ba7399fcdd747012c0a061c3d56c8a2abc",
+                  "71b871fb12735051a0569374e420314502d55c7a",
+                  "71c3a0ede82a1c6a86b2f73ee60782513bf8af64",
+                  "739a1250a135eb6cbdf5d8f680f0d449731b1788",
+                  "766595b983d842f038966d5bb8ac278bd722bf2a",
+                  "7757f0ba3159eb13a2e37373d261be7157e83f98",
+                  "7867f994348dfb6ee8d09eafc9f3e1e1a04e44dd",
+                  "7a349f6b740d4027963ede27920a80dd4ce7132f",
+                  "7e585cddac8c15c82c6f152a867d15dd85699c5c",
+                  "810227b8ca8732f294f86e1a607c1284b165606c",
+                  "8274f0c12011535adc6dd433343cc114e4f05b85",
+                  "83c31a2f3740e1218ca1ec893f450aefe7e0d21d",
+                  "85fb844b33fca1256d6f1d069d13fcd6a9295900",
+                  "87aac20c0661847ba3c9162feb207ddfc486dd58",
+                  "887589364b3f01e5e08d001dc910a9e22acac60e",
+                  "88cca35936e620b001c47cf6dbed2f75f5e3699f",
+                  "8caa776148225f4eed973f2d67831e29e3753ee5",
+                  "8d21a8aa2ac37e454a15f274e43d5099007d365a",
+                  "8d7c6c45f1820ede9eba98a9c134bf502f4f31f6",
+                  "8db251f2bdc13622671cdd919f70f52a9e6c14ef",
+                  "8e7b9fe843e8bd824910377641827e20bc50b71f",
+                  "8fc173597de0807682717bff8ed14bee12d643e7",
+                  "8fd93d365cdebebe6712cb979b7acacf90ac2f58",
+                  "905165a1c8ab2e6ed8f07cbb5988a921e067cb51",
+                  "982d28035c2703c37e72c8ee191d91c164da32d1",
+                  "9d225e5d028047fc01d4d19600218d8ddd465e1f",
+                  "9f82cb6b7dc1ec5a47f35d38135fe5e58f72aa82",
+                  "9f8aea61211171c11e705b078334d95756cdcf8b",
+                  "a0248baa5095f6fd6b9754560a4f9f0832cac4dc",
+                  "a41dc1d633b5a690e12be31f34abb21f1126e3e9",
+                  "a7457fc29ce54f7607c168127f0634434743742f",
+                  "a888eba248044a91ce0b5cdf7975891fa22fb41f",
+                  "a9e14783c6467a1f5f35f136a21963e6c32980fd",
+                  "aa0014595492f0be6eebd9002d684c4179d92c30",
+                  "ac39bfe8523a4a0e67c88bbb36cabc0e46d692fd",
+                  "adf7bb97df1f4b56dc18ac3173eaa41de7367cca",
+                  "ae743103ce8969c8db0e7e7aa110bf16c5f3eb8f",
+                  "b6a8593d2d52a058c8e00ea66af354a8c4b83a21",
+                  "b709f9df0103ea893f5fc5fb6e8272da8d11931c",
+                  "b82fa2f28396cae8311cf5dcad55e6b03d6ed0be",
+                  "b8db4dbc1aa5002ae7fa1a9b31d0ee0c4ec07d75",
+                  "bdc3fc6f696f80ebf0203f61fac437e0c70cb848",
+                  "bdf59abbc443bd19d00635c66a954a565fb54254",
+                  "bf1b63deb2aa418d9938e9b265bf745aef5a9025",
+                  "c00bd77359c44e271733a8f9c294064153625941",
+                  "c011580e51558d37e9afa887e78f77d499df59b9",
+                  "c092f76b91190d41f41ba3fbaf08f1e595516aa6",
+                  "c51269508500ac8af419fc708e79086076cac4df",
+                  "c5bb3d68c1f086cf714696420fb59fb8bfbd68eb",
+                  "c606e24268c27cd0d3066af4bd0f95396e888fb4",
+                  "c7e213cc958a287fb53c658b8af2b614a1f27999",
+                  "cb6b693cea38f9709dc627879dfeb8f211e09767",
+                  "cb7994c6db9442c1cfe8a742e357accc6ad9b644",
+                  "cd564ee1a483c55d2ef9d000b9493164768ca8c1",
+                  "cd8aee5d62a1265c1c6cbdc7705d7a281febc052",
+                  "cd9774a7f84bf4aa5463b2b2da4c19b99ffd8e81",
+                  "ced04726f945f2445b04fb54c26abc1a22223cea",
+                  "cf17cfeb599caefa55cbffbe29019d8467059222",
+                  "d1aece1a371e0e86a2cc1eb5a1d62b4707e11444",
+                  "d242b791099a348d3c0f7b5dc18548f7f28d0ff4",
+                  "d4b21af6397a7a1f9abc6afa138df5712c580388",
+                  "d4ca6eb829b853bbb5d923b35e8fd1bec74be967",
+                  "d641f016e0651f839f658fa2b19021905b09717b",
+                  "d828fba13167a2793021425210566c71af91f572",
+                  "d91e69faf9ba5e399720fbeee1a8c80b2bacd5ac",
+                  "d92d2eb303f05f0813035efbdd80f1433ed12114",
+                  "da94f8b81f9695e2d3200768057735473b399835",
+                  "dbacf767fb95d39beddd2cff9d59c39d932c16f5",
+                  "dbe75a803f0b38350a9867d1294ab9b1a37ba7e5",
+                  "dd047635fdfa5ec618a684f2a6c26b5aca5efb8a",
+                  "dd3ecb201d8adc78ea5e170701143f1a48ba67c2",
+                  "df576e7452ecdba76ae671ce6abe46f440c263eb",
+                  "dfff28d5208f0933d243b8abe08964e2a3c59603",
+                  "e02f134fd351b795eaf676632b3811ef3879facc",
+                  "e4d3169f9a7eb22a0918cdaa2d11484325323b20",
+                  "e5b90b76a70f2dd67f66ca8c4af1cd5d08e0f817",
+                  "e698b2f1fe7ab8bfe35b0ba9bd73b7c3314c170d",
+                  "e6df77f5d64ca6fed082d6ddc70fc6146910bd9d",
+                  "e790e421ada7feedf43d6543709889cf88143e59",
+                  "e967084b0822ed07b7db6d95d455ace2395adf00",
+                  "e9c07779d931afcb652faf87a845afb9f3f104b0",
+                  "ea0b34d04aad01223f16ea102c0752f336f3702f",
+                  "ea2b3cef0ff2c71b6094be8e7c1945025b3a2cff",
+                  "ed65c134b85a3238fb45b223c8135af1fa017c5c",
+                  "eef1d2c50a6a946fd35b7c892006ca7ece86b859",
+                  "f0998d210b67b1ff1bbd2fcaf5eb288cedcce0bd",
+                  "f12f8ea20baa821f4c1da5f0afed5db769d50260",
+                  "f15f932c78ce77eef8688cd10e7ed7f22fe3c9b4",
+                  "f1f5fa5b556c09498d7c490c09ac5c582c82cd2f",
+                  "f26aee50a1a2ed5e30142bf126d66c4b3608f6c6",
+                  "f324033328b633623a88cee777e38225a1162225",
+                  "f449ab464be07dd92722dc2ae11e61f61e9682c8",
+                  "f7ac45f48dfd10a0fb5b437a7b916af6106a375f",
+                  "f8156ead2f85db75ac55573fa0f0264e66cbfe52",
+                  "f992bfa6623ce5037e844c2300f7726ed96676c5",
+                  "fa4863bf095f44e358b42b322765fd79109aceaa",
+                  "fad4ccc9e3bf3eeac74b750d37e25e8b1f7ea899",
+                  "faf64dc435f6f2545dbea6b91d71366957689544",
+                  "fb21323d512987b33481954ba6e1f054e814f16a",
+                  "fc98a98fe754694445b103124e18c7105c329bea"
+                ]
+              },
+              {
+                "repo": "kubestellar/kubestellar",
+                "shas": [
+                  "aecaa51c961aa7d388eb4021091b43c033d6cd25"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 782091,
+            "node_id": "MDQ6VXNlcjc4MjA5MQ==",
+            "login": "joewxboy",
+            "name": "Joe Pearson",
+            "html_url": "https://github.com/joewxboy",
+            "avatar_url": "https://avatars.githubusercontent.com/u/782091?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 1,
+            "evidence": [
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "6e068637c48be299da8a0c43a3898cc6c912d908"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 1264109,
+            "node_id": "MDQ6VXNlcjEyNjQxMDk=",
+            "login": "castrojo",
+            "name": "Jorge O. Castro",
+            "html_url": "https://github.com/castrojo",
+            "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 1,
+            "evidence": [
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "c1ef3f148dfb20664ae09575494b0ed611b8faa2"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 5840441,
+            "node_id": "MDQ6VXNlcjU4NDA0NDE=",
+            "login": "hanthor",
+            "name": "James Reilly",
+            "html_url": "https://github.com/hanthor",
+            "avatar_url": "https://avatars.githubusercontent.com/u/5840441?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 6,
+            "evidence": [
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "0549ca9c240a2a066adfcd5bbac58d1c9eee77ea",
+                  "133578557ae2ea5da1bd5d4cfbca8599caff8278",
+                  "7d66a244bb73b5c60f08a6c3baaa0777ef2c1302",
+                  "8d7fc02e750f400ab186b7257c1d1d68d9f8dda2",
+                  "8f8b66096f2abaf8afbec07111156eaa1aece75a",
+                  "a7e72dd45e087e23435d6daa9fec52b0261a1f5b"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 6772335,
+            "node_id": "MDQ6VXNlcjY3NzIzMzU=",
+            "login": "Danathar",
+            "name": "Danathar",
+            "html_url": "https://github.com/Danathar",
+            "avatar_url": "https://avatars.githubusercontent.com/u/6772335?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 61,
+            "evidence": [
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "1b54c69e86090e0d96e3a1491ca01516b6656f73",
+                  "1c262f1980065c35920d5422ad1004c59edb9ea1",
+                  "1c2e8c75e17484cf22dd2aa5b6342d1327ee85ef",
+                  "1c70094629c86c49d05381847d16ed9c2bf8c08b",
+                  "276cedf381299c78084e891bb18ac265aed3fe1c",
+                  "29b7431afc0c17b1a82527c6283bec9a3cc0e88c",
+                  "2a9fca04be6831be36130862b5369bd6d389809f",
+                  "2c9204fbe284840faa45899eb5aac074e8c9db3b",
+                  "31cae355e122e2acea27dfcecb31e2d66e6b2c99",
+                  "32960f50b5f95ea09199d6d18dde3133e73da621",
+                  "38391cc455d15e5341f0951feac504921a3bc06b",
+                  "388a29079f51aa2f4a77b4024dff12e1eaf3d481",
+                  "389e34f3e126e515487f58c244e2559dc3776977",
+                  "39a15fca5ffa5e4a99598a69ad68c1608fd072f2",
+                  "405819153f939b220f2cc796d7063d0732dff80e",
+                  "458305d8add1d82ca05b0110fe48ac081d9cb44c",
+                  "58b0cacec9a368225272023004acc83acaf6a21c",
+                  "5f6b9e0ed91739bddb215e2c33ad6a30df89453a",
+                  "60226c0bc663dd8fd47f277a98ef245518499e9e",
+                  "63d38427d3db01a42662add7e9e078563e096d51",
+                  "6654cb3bc60fed9b7430241dfc11c64fdea420d5",
+                  "6ceb3e2e45ab722cde58e265350ec51c98ae1650",
+                  "6d774e589608260189aa7198c7d8bfe7fbe80a0a",
+                  "72b2796281c74bf6354b2dce2f8ebf88179f160a",
+                  "7414e2b4e8406410cb7c65899ee38dbf915edc93",
+                  "7715d9d59914d8626eae9c2202eb53a07c898e91",
+                  "77c81b1d20afbf9e786650fa359d53871bca7282",
+                  "7ad4e2a1aae09a288be8081481954b643afb318e",
+                  "8148aa3ccf2b53f4d21b83ff3f195c703bafa474",
+                  "84928dadac5e71eeca2449c8e5ca823f32383527",
+                  "8734a6be6d479cebf95953059c9501ec78fa671e",
+                  "883487404be29bbf256dfb5bf398fbb22a020b46",
+                  "8ca0708b20d67222c3f1341434633687a077f81e",
+                  "9047b172116cdf95ffaf95e655ab1c231e643ab8",
+                  "90f1d397df89f2f2d93a2d7acebb89b863aae688",
+                  "97cc3b652c3eb645a7703c4d5d10503b24701a39",
+                  "9c2acedca692223058fb786a2cde5bdea4970c37",
+                  "9da1dad1973a4bc0b347405a215fb6345db6d53c",
+                  "a08dd80328f9f33b14344c21c987f1332662a146",
+                  "a4d720432b7a485e5dd52c09874b036d3dbd6212",
+                  "a8250a01f7e67ab646074ed70893c8610557931b",
+                  "abe2ff0b64735a59e3abf7d7d4e820b420fd8eac",
+                  "ad3f229ccba3bde07223008f89a31ad10e86b136",
+                  "b11dcc90262362186fc5e97cbf39a1defcc30ba7",
+                  "b5602dd37b9acf1f0c1ce11b4631fabbd81f72ce",
+                  "b60d4b0b37078f25f808c532223190eb86f45bab",
+                  "b8fd4a231aac3ee2779aecc58812b557b295d13f",
+                  "c6569532f507da67f8c05a7d706c2820678e43c5",
+                  "ccb9bb0c0b30decc4da877b80f9da9b17447e03e",
+                  "d3e2b5a542ef2ba3c55fccdf00b6441d08ff61dd",
+                  "d73ea811442cc07d6292c88e4a7243ad2b9176b8",
+                  "d9c4627e007142fff7f0db053b8c6350d2d85fc2",
+                  "e5911465c80411537ed67afa6923ecc5660909cf",
+                  "eae432d60a770db4b0dcb96dc7a70adfe18cd3fe",
+                  "ef81695b3d55f533343f1d31f1f26def18b66f94",
+                  "f09ef23be4563885b7cb7d89207e8f69ccf2a317",
+                  "f39c24276d2b1304bba95c722cc5685e208c0cbd",
+                  "f43d2abf29812523a4a14ccca4238d39f6186f9b",
+                  "f630945daeab6db2493846393ff8796d6402c656",
+                  "f7c8ac0c29051ac26ac418c53d8b4841029f4175",
+                  "f9ad0a8be2bc26c68883fcf49d0ac51323417e56"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 31053269,
+            "node_id": "MDQ6VXNlcjMxMDUzMjY5",
+            "login": "gregoryhunt",
+            "name": "Gregory Hunt",
+            "html_url": "https://github.com/gregoryhunt",
+            "avatar_url": "https://avatars.githubusercontent.com/u/31053269?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 12,
+            "evidence": [
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "01aa9accb519f9c127ca6eb7dcb19b9f2191c836",
+                  "13e64a64ab037fe691970ab4a92ac604535f8ee6",
+                  "26865a0c4dd4a61bfbd52f2a067c57f3aaf69355",
+                  "26bcd47c87b7069afb4eca8f89ba9be16b360818",
+                  "385e179d2edceac891e185e1e1795e6c3160b2b2",
+                  "582d4baae3612bf6f3c1bbefa70ad7215acaac12",
+                  "5e336507ab2b9a3d4485357ea12acff6c154df42",
+                  "68e8f357d072a1e6b3944d5717722fe7aa77cf4f",
+                  "731843d324214658602b3eb11f2e47ed95e384a1",
+                  "7600412f87a8f4cfdf109dc7320647172b03523b",
+                  "a9cff5b7886cb565052854fb60c11c66de3e8150",
+                  "c6c6f543d56fbc19f7bd8978b4b01fb4d685f724"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 41898282,
+            "node_id": "MDM6Qm90NDE4OTgyODI=",
+            "login": "github-actions[bot]",
+            "name": null,
+            "html_url": "https://github.com/apps/github-actions",
+            "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+            "type": "Bot",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 55,
+            "evidence": [
+              {
+                "repo": "kubestellar/console",
+                "shas": [
+                  "11a70bb4361eade5cf077c5a8af50a92168d684a",
+                  "288233a4efc279568d58f9300aa358345f435b04",
+                  "6395bc0d0ff798d3c834074e6c6781d32d530901",
+                  "7f5eef007cda979f56844f7c296282deeb4e9165",
+                  "aec0a36b9bca85579e4547819947642a6d4dd2ec",
+                  "c97ea761f2ee32f09cd4d114f12ce7ad1ee40eb5",
+                  "cc70b432d3121460b5c202a60fda1c233abb4b62",
+                  "da8edf6764d4797e9a66103fcaeb495a278db262"
+                ]
+              },
+              {
+                "repo": "kubestellar/docs",
+                "shas": [
+                  "01c6e6af52cead6c5457a49db1ed49475f87b550",
+                  "01d0af25bfdae318cf204134f9dd0e09ec10ecd1",
+                  "0357cc4559380a79ba13f87525083501dffad887",
+                  "0697656134d8c578d64979f7ee82c46611b00d1b",
+                  "06d7fc34518178ef96c12433befc44d4417be676",
+                  "0fe8b80ad8976f568af5299da4eb43b17dcf9c0d",
+                  "10caa231cf9976db2ac02a853d6e763d9c65584d",
+                  "15807063b1dcccae6d9011aea7dd81e99507ae10",
+                  "195d842b6faf726bf342a0ca5d239bc586cd027a",
+                  "2137031da2d79257fbcd19434056bfdb7f0f8eee",
+                  "22f519682b548913569208c47f59456bcdb52e7c",
+                  "2c258ffcb1b650ab37836a604f02e51248beb2f3",
+                  "2f8a990fef62351baae2523a1594a0d412d6122f",
+                  "32a99cea910a0eb091ffedd437f311b4c0a01d7e",
+                  "33ee9b1578f7045e662d07ee6277dfa7927d1a74",
+                  "4471dfff39065076b8d5c614003900c0924a76dd",
+                  "4a0a7148182a46f9ca2f4171af93e81135191ada",
+                  "4a0f15d7a5871b9de1e9a9a52a195daf8b03b267",
+                  "5a5ca0dca47b4a38f3d050ab24505f042f436bdd",
+                  "72c7d4423d9086f016a2a01a6fc2fed201cd1d35",
+                  "7b5f4c5132a471e829b18e10f31503c990cd627c",
+                  "7d3adce322952e02c15a27f3849210072b318744",
+                  "7f2320dd2713f9876a9e51e4a0f949fd07abb6df",
+                  "831da46a7e2e6e1acceb180ebaa4980cfb052d57",
+                  "83d1d6f728887ef2dff1c8b5a5195ab284e141ba",
+                  "8a22f26753a99ab2ecfa4a43b6132d8fee3e06c0",
+                  "8f3493ec3ef48481c65d88492f23b688afec6872",
+                  "931f8ecbce56bf211ec293a59ff837f40f8eb63f",
+                  "953231634e3f85e05e125c2f68c45ca8bc5c4f11",
+                  "98bcf0fbcadd73cbe662a41d0593968ce04029c4",
+                  "9f094085c798362c25ace3ebd6f220a9d73c17fc",
+                  "a265f6ec3dcaf06a8f9d42593025fcf9a322658b",
+                  "b0e11208ffb6ae114c074e2f9b861257ff63e41e",
+                  "b211a6cf887ef3ea5cd4c8468860cb4fd8eed656",
+                  "b45a8fb9794f323ed88843cecfd70d5d3a8c56aa",
+                  "c025aa2a657703c6c5b3cbefe2e619bd3a655438",
+                  "c0d01740fa38e6ac0ea2abfe5f745aee871d6d70",
+                  "c3a45629f297a9d0a59b85beb9b548240b5b3d42",
+                  "c69b586a7a60fd21c24d8d4d0fe66b12d3c916ea",
+                  "c7bc0fee6f425eb588f4992f0b44abb82fdb312b",
+                  "c84908db7e51fcaa9f6cbf4db2a081253946b0c6",
+                  "d8f0b81f2b06dac0fb5a1261b67c7ba80f11cff0",
+                  "e28ed2ef5b07d1d78d122f3b2559a42ba1dd6569",
+                  "e49391ef3f4ad6ecf0050ebc23d7e0f6386c204d",
+                  "ee21f0673c31ca406f9063c9792d79675a8ca02c",
+                  "f1638ec8ac8206a5c6888a6fa02a877778ea5df9",
+                  "ffc9cf7a6f96f8961eda3d451120a00a2df2adbd"
+                ]
+              }
+            ],
+            "excluded": "account type 'Bot' is not a User"
+          },
+          {
+            "id": 49699333,
+            "node_id": "MDM6Qm90NDk2OTkzMzM=",
+            "login": "dependabot[bot]",
+            "name": null,
+            "html_url": "https://github.com/apps/dependabot",
+            "avatar_url": "https://avatars.githubusercontent.com/in/29110?v=4",
+            "type": "Bot",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 30,
+            "evidence": [
+              {
+                "repo": "kubestellar/console",
+                "shas": [
+                  "2c53adc8402ee084385a364f2fcce62d1166703d",
+                  "31a95be0ed1818209849e89fbd488d2e4e744725",
+                  "3304bb3eee2bf83e6bcebd213e49bf72d3d4c5a6",
+                  "3686fa88c1582acee61c11d05bacb7f045d69f1d",
+                  "3cd4f59becc8c110a3022657c7a8aa879c25b2a3",
+                  "673f4d9c56981149990775a9bf7095413aa9062b",
+                  "6e0de57246cddf0644ccddd0dbe702f79c26939e",
+                  "6e89c3e6e6d498d05e92c2ed57fb99f9bca823b8",
+                  "75f71ae2ce00a416544e4a82bb4c147aaf351f9a",
+                  "a90501a9a10b132f111ca27d802ad97b61318482",
+                  "b3dd011a88576fbd1b8ed2c5dceee1b52f628b97",
+                  "b5e0bff9a86ba47108fcff9a17d9d19d291535fd",
+                  "cb5b432cb8bc26e557ff824f8a32f34e0eb907c5",
+                  "d0c4a08e05d1124d792728d4685c3c8a8258f6bd",
+                  "ea7ca01785a6e3aa98034fb11bd8a34896612c39",
+                  "fbc9f9cbd75954cf33a9879aff1bb1c540eb9397"
+                ]
+              },
+              {
+                "repo": "kubestellar/docs",
+                "shas": [
+                  "0f43bbd95d5e6a052b98e207c6555c60a3ad76e7",
+                  "11bc751edc93dc0a3d6f68dadb16e67e01f7f497",
+                  "3eb14b04eb47e939f472c8a10d635705445391fb",
+                  "408e4cdffbcf291818edb437715369ca586f2a8e",
+                  "5dda3736c24fcbc365f16941c140a88bd6beca36",
+                  "6904e07b88415417e3413eb941e302d0a640c889",
+                  "83a17aed9bab571d7143d79741814988f14c6d62",
+                  "9c7c26aacd389353aefc56491dfd11e61b3132b0",
+                  "ba546b57aed35a8b81f6281fcdb21eb5d70f075d",
+                  "c66e2b9e9add8d9c7331c1d939423284b1c326b2",
+                  "e27b6bbc53f7e4a9982a03e21d441d940fdd5c2d",
+                  "f8d1533eb04f9314334d92dfc67abe64077bf3ad"
+                ]
+              },
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "383ff94044f64ca7c52b914bdb39fb0dd97fd58b",
+                  "9cef51de039dc46e9b6068d534400c34d778024c"
+                ]
+              }
+            ],
+            "excluded": "account type 'Bot' is not a User"
+          },
+          {
+            "id": 128143077,
+            "node_id": "U_kgDOB6NO5Q",
+            "login": "sidsri14",
+            "name": "Siddharth",
+            "html_url": "https://github.com/sidsri14",
+            "avatar_url": "https://avatars.githubusercontent.com/u/128143077?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 1,
+            "evidence": [
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "3d272eaa87e9220e2945c6d7711ff2a813512308"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 173471846,
+            "node_id": "U_kgDOClb4Zg",
+            "login": "vaibhav8a",
+            "name": "Vaibhav Srivastava",
+            "html_url": "https://github.com/vaibhav8a",
+            "avatar_url": "https://avatars.githubusercontent.com/u/173471846?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 1,
+            "evidence": [
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "170a8e0ab7b17b6811c5cb32d68ea771a401d534"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 205345514,
+            "node_id": "U_kgDODD1S6g",
+            "login": "utkarshr3144",
+            "name": "Utkarsh Raj",
+            "html_url": "https://github.com/utkarshr3144",
+            "avatar_url": "https://avatars.githubusercontent.com/u/205345514?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 1,
+            "evidence": [
+              {
+                "repo": "kubestellar/docs",
+                "shas": [
+                  "0efe041e31c127b82e895a08fd4d1b3525979ab3"
+                ]
+              }
+            ]
+          },
+          {
+            "id": 208851060,
+            "node_id": "BOT_kgDODHLQdA",
+            "login": "kubestellar-prow[bot]",
+            "name": null,
+            "html_url": "https://github.com/apps/kubestellar-prow",
+            "avatar_url": "https://avatars.githubusercontent.com/in/1227751?v=4",
+            "type": "Bot",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 13,
+            "evidence": [
+              {
+                "repo": "kubestellar/console",
+                "shas": [
+                  "5c70c6e95503630687d7b114a7ea960b62ffd6a8",
+                  "c2947a6b34ad9188e2713941a0faeb8e440b75c8",
+                  "c92676664b8130e9c5b1079aca2552f64d373a19"
+                ]
+              },
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "014df63f60e128e6ccb1bf159abde56714f240f8",
+                  "0389aa73f2bb08b00b0099a24f6bf47bdbeb4952",
+                  "387b851a720554c067b25fd61ae792b6670021f5",
+                  "45a13d59ef2053f0dd89fe0352d3df68bad51977",
+                  "793169c063d577afa4e41c2397f5c2bedf312193",
+                  "a19367ad08b0c2f389c4e3853b03c5e2cbbc56bd",
+                  "b5b53de960e9c84fcfa39244ad23277526949f8a",
+                  "e29d695d663fc6f9b6754a88239343c222f01be7",
+                  "eb247a346d968d67438c09f1cec0ed4d1bfa4108",
+                  "ed97bfee413aceb3dc8325f932da678f0d2fd0cf"
+                ]
+              }
+            ],
+            "excluded": "account type 'Bot' is not a User"
+          },
+          {
+            "id": 280983584,
+            "node_id": "BOT_kgDOEL94IA",
+            "login": "kubestellar-hive[bot]",
+            "name": null,
+            "html_url": "https://github.com/apps/kubestellar-hive",
+            "avatar_url": "https://avatars.githubusercontent.com/in/3568013?v=4",
+            "type": "Bot",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 148,
+            "evidence": [
+              {
+                "repo": "kubestellar/console",
+                "shas": [
+                  "03f7ea1c0d3f733c6fd91685b1b63ffc431732aa",
+                  "08cfe45172677c553b9b8b81b8444ade4da6c868",
+                  "0ad0463b82cf2c8c8034af09186363510ab3d2d5",
+                  "0da04b583c6df3e5c01e7d202e756b9404373d38",
+                  "0daeb1e2d447b341dfb3688aeb04d7597a4777fc",
+                  "125ecf00f952ef179d647374433bc510561056a6",
+                  "1277b010addfdb883c4cdc62b0fde9a140d6206f",
+                  "1dbd3a6bce119ac1302aacf84a641c16d0913294",
+                  "20016d0d810f494176fef289855b8b0d788c59c0",
+                  "2005b199c30418481c5f66951a0dceada4983d1a",
+                  "22fb0a15266193d1efcdc17226340dab82227866",
+                  "250e8af613f17b8b78e967aa240895143f3f9e8a",
+                  "30d8b7980a18194110970ad90380a8c2637f841d",
+                  "3bec052b5d3105c5427d8f27bef6ebcb3fe305c5",
+                  "3fdc27c60903315bb730a5a5dbb90058e5dd4f0f",
+                  "4088238ba9574c20e6db0f7888351216413a7f13",
+                  "46773e8054a35233ea12368271b3cb2739f4cbcf",
+                  "47d701a8ed2ba6a5b23b57e0f9112c124dae25fd",
+                  "4b05f5d2b9d9819a3d56e5a3535a65ed9cf77d76",
+                  "4dca29ed75e63a06a37c52220008bb757bdb1e63",
+                  "512a648447e002a04281ea90480256a721341147",
+                  "5300e50b451d62c3657b68f2085163e56e90b7b3",
+                  "5659d97f559826ed7e33702684bd3c0ca5304ed2",
+                  "5c6236e4218e38a1a0b25554b6d47519243bb225",
+                  "5e1568694fc860dc78792f8b339e5a29de1a5b66",
+                  "5e242544df889360ddcf7a03404df24f585e7bab",
+                  "5f6f1efdca6723c176e9667fe1e4ce39a7635c52",
+                  "5f8cf59680d1a89d23b332c347f0d8ecc49730e1",
+                  "617255dc149239a532e96c2b792c9f413e7c346c",
+                  "61cb57bc0f3ccbb2756a84b69c36b3735f2ef45c",
+                  "61dcef69cf5f5a32e9e3c5d8195bb2dcc6f78d27",
+                  "6240e14ace00fe699f27c9e67ed7a01c771c498b",
+                  "6d39f297bc7462e2a0ae2412e220dbe1a74a9627",
+                  "71e32288bbfa5b12eb572a6819cc7d9481f8c52d",
+                  "770b1e3a528902872928456d77dcc502564b15c6",
+                  "7c3f253193764969a6ccca11cc7e65936f88449b",
+                  "7d298f76ebd81d8329bdc3484a403b124b3ca08c",
+                  "82e8911b4314db755c44fbcce54016ffc4b33aca",
+                  "8899ee76c539e7f671b1830440191343b8004606",
+                  "8b239d58e5f66e729845030fe5442253ed916b9e",
+                  "8b8d0adf0e59aef9fc2d6a4a419f18ef33ba47fe",
+                  "8ec0b5dfd1f10babf4217759ef5177476fa7e888",
+                  "8f789ef46d9927d4a244bf63cef70b1989e947bd",
+                  "9bdc40057b94a15cf583b7d41db2b170c6136634",
+                  "9dbcb73a8f829611e6181ae1f07963321cc159d6",
+                  "a59bf03a83deb69176bb067503fcf36d3b9a4107",
+                  "adce04a0540831c9b2058d2a6904128ac3be6983",
+                  "ae120b0995ce292369d2f1688c28642dd4d3ee6a",
+                  "ba15e3f07d8a0f329b64e6ac9d8549f551b5f808",
+                  "be5371985a7ee1bc66a6795e707778bf4421f43a",
+                  "c1fcd57b866152948b1fda485f8d550748b5d47e",
+                  "c3b395c3600174ab3395ddee481d930e4aa9a8bb",
+                  "c4cd2204c7b3f2a0f3ee0fd4460ba08c4b8fc05b",
+                  "cb6cd1e63640a8487632c58277e66ed47b4ae842",
+                  "cc70c2a0aa430cc87de2f234e7fff82824f2e623",
+                  "cdfb63390c6779e18e7e0665be32a7f593da1296",
+                  "ce5e352b74b2401a6ea7156c3e90c90bef484821",
+                  "d0b982d1811823cf04e77043d80c09cb29b05594",
+                  "d31c3a3c82e74ed555f44a6c7ceffe35649eff35",
+                  "d36a28254ea2a3764463dc5e60e2c0cca8909fd1",
+                  "d80d97210a275817348a7e0d7b08a732fed94461",
+                  "d8e8448b7bb1f26207c1d7a966e62ce3a115e73e",
+                  "dfcf9729211cbe8c445d94582680119750394e15",
+                  "e0db5bfb91e86ac1b5b6a610d5e1db4a1f837281",
+                  "ea113ae58b7ebbf44e2728ebaec13415380db184",
+                  "ea34225d1182d96b0de1aaaf13f9b1d29398fe77",
+                  "ecbf250e81211936bb0a07d867fc9fef706c2da1",
+                  "f614de1adf275cd58549a201d507225c11eff711",
+                  "f65c9b5d92e5ef0c447965902dabec9909f273e1",
+                  "fae2b9efc3679c4108da11e0a2da08e97420c744"
+                ]
+              },
+              {
+                "repo": "kubestellar/docs",
+                "shas": [
+                  "1198ccabab0e02f0eccc58134c3f017a8fb8e35a",
+                  "16a34eb56b4c263b1d997a6f83d1f09dfe0f0b9d",
+                  "1cd0c25eb52c380fbede15ebddbb06cf570cc0fb",
+                  "2597724ceda87f8c4f7577f565d2443e0363d4d5",
+                  "269b404c705f232bc9eb53b1efe9b996c388b01a",
+                  "3005df19874736da9d4e4aa12c56eee3abb798d9",
+                  "3781e9e6f1bb0cf21b9e7706da2f9e794754a9a6",
+                  "46fd812696f63612dd8504b0aafb7cefb46ff9d8",
+                  "4e41c323f1eccf7a6a632df234bfcd2cfc2d19ff",
+                  "4ff78aa33f23a416208dbc981b6fb7384daba2f2",
+                  "5f21cd6c0ad27ddd37928636ee6a168867a88341",
+                  "6ff9ef0a4afb8c229f412a34cd96db605b9c0690",
+                  "724db820f88564555f3bbf8b6f9feade831edfbb",
+                  "74a175272762cb81a0c2fd556836cd938ebd7348",
+                  "82fd31722f78c5ead9ab4a8d625c8ad9d8ef0389",
+                  "85287b1720ba2ca1be5bc039dcb67111f7f0fc32",
+                  "895c95570ffbea7c34175433d026867b85a8ae0b",
+                  "8e6f56fc851e5e3daa266b6b248ac7906763c2cd",
+                  "904eb052e8fb166f35df6384c53dbae99d0ee73f",
+                  "a20890a8f909f20c4f32b282ebb6d76f482c0102",
+                  "d15edcdaab7c9f442f007be7d698cbdd0c70407b",
+                  "de4749d23965e1a2bb6c4a3105e81ba7fd0b1d8c",
+                  "de87659c795b2d883cb17ee946c9ccb8432bd7fd",
+                  "e2818775d6b1f9f78f6cc87d5040fc643f65d8af",
+                  "e327757bcb376c710a33a661226b2feee40bc6f4",
+                  "e95e4f4aa1bc220ae0893b8635160909acfe9d5e",
+                  "ee21fd46dbe9532b57646e64b565dfa7ee52f878",
+                  "fad7f959a4a878b8893a7c71e7e2a2214a9fd7aa",
+                  "fc88c2456372cfc28a525f0bca54077d7c595cc1"
+                ]
+              },
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "02ceb6a9fe2facf4c4549f34f9d6135583e20da8",
+                  "059776cf7bf3f5a2be9a24cc632ad30020974f70",
+                  "08dbeeeafd9d857a7b312c621842457b1feca764",
+                  "10df10a2440f3f15ee2c99c6236ea5af0880f0ef",
+                  "14bff922d212b7fc81a1fb3b21969af814a6d232",
+                  "14d5e4fe3ce46ee5461656e8dc41a1753ebac4de",
+                  "17d7155cd8af2dc1938fd99a79724d5193751a2c",
+                  "1cfef3adeb50bec5815b8a86bf58fb8962d5e3e8",
+                  "26117371767b78f1b7da775b26249426ee62961b",
+                  "2939a6e4008887feea2a85e574f93117f791e159",
+                  "2d4937235f613fc806e613689dd318fc254192ea",
+                  "323cb95e8feb4a523755f65e841d3924f725fabb",
+                  "33dc009956d8c65ed37396069e21581a211de56b",
+                  "3741ae14a1bcacaa5c2f5a4f191f20526d18c531",
+                  "3d7e74d9215d4363b4bb77ba5e416ed3b175a455",
+                  "41341c56f3bd740e726799fa02224d304bc7fa2c",
+                  "49350bfda3e37767ecd7bdc2a1f5819944b89852",
+                  "4b2ddbcfa412a4723e4210cb102374face087fc7",
+                  "4bdb09028eab93bb290d78c0c7e5129d22519ef4",
+                  "4ecb17bd4e891bdf6c77a58895709e28cf08c7bb",
+                  "5246889e7f65ffbcdef449556fef0274b88e2d10",
+                  "53318db0030a12aeba4745f96b8eb93bed5549c9",
+                  "5632f1332ac8c19e34cf6dcbe0d17a714cbf3b06",
+                  "5b437d1084c5f3854d3892ef54582c6b26143a06",
+                  "5ce9dd3ce2978f967800f37393a5ac9a2118663d",
+                  "5d78e1836b1c9eb742be041efa0b35f90be82a1e",
+                  "5f4ac6cf312d3b7c8bb52b55fe3517fcaf307b53",
+                  "61efb7ac7454f15dfd54de9e4e749fa50ee48007",
+                  "641ed760d2f64744dca367b2f15b722934cff1a1",
+                  "6cbfc42f42acaf47c1ccb03ac63a6e4eef3afb79",
+                  "6d60c219fef594f9366b7323592f2e8d81405519",
+                  "6e95dce68f9ec6c4ccfe2fbd2f24c83c0601e2a3",
+                  "7e7baccbe922ede8d7992da4048b68010d251513",
+                  "8aea5d1f7f05edea2bf92ccdf99cc06fd1002d23",
+                  "9bd7255e1e444509be52de237a2a0fad9a1fac61",
+                  "9da0813f39b3c1221efb6f3aab320860ce04faf5",
+                  "a4d593ecc39f45666d0a3fe060f5c87d042c0a5f",
+                  "af7bea6a70c0a7e77926df4586c0227e8893e62b",
+                  "ba93cfa9cfc45e999813f78780c20f8fc8adb1c8",
+                  "c722a036be1146a25b5144beaa3f1a9eb3748f69",
+                  "d7981dde7fc85ce43f8ebddfa070680cb6016c49",
+                  "da0bf24c1b768f7244a112824fdda4b20d4bbc81",
+                  "dd88e20c63964a40bf54b17cda65b4cdebc54b98",
+                  "e01bbb0b5d0970c42f17839284de99f72f2d45eb",
+                  "eca4f325e06c5385ac0ce33ceb207682a38768ac",
+                  "f05df3273d24e578e5a6a6fb3166e5d67c2f748c",
+                  "f4313fd942a70e2d8eb39c1f9486705b843ca3dc",
+                  "f9ab6ad3b46f813ec95cf4781547c32fe1ebcf93",
+                  "fe2d995c411215369dc712b67ada926dd3c16f3d"
+                ]
+              }
+            ],
+            "excluded": "account type 'Bot' is not a User"
+          },
+          {
+            "id": 306379390,
+            "node_id": "U_kgDOEkL6fg",
+            "login": "k4its1t",
+            "name": null,
+            "html_url": "https://github.com/k4its1t",
+            "avatar_url": "https://avatars.githubusercontent.com/u/306379390?v=4",
+            "type": "User",
+            "fetched_at": "2026-08-29T08:55:39Z",
+            "commits": 1,
+            "evidence": [
+              {
+                "repo": "kubestellar/hive",
+                "shas": [
+                  "ce3a7af37fc264250636bcf6cceaf82df7ab70d9"
+                ]
+              }
+            ]
+          }
+        ],
+        "selected_github_ids": [
+          407614,
+          6772335,
+          31053269
+        ],
+        "episode": 1
+      }
+    ]
+  }
+}

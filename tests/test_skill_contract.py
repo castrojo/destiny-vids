@@ -105,6 +105,7 @@ def test_plates_docs_keep_the_high_risk_contract_and_navigation():
     skill = SKILLS / "plates" / "SKILL.md"
     front_matter = _front_matter(skill)
     assert front_matter["metadata"]["context7-sources"] == [
+        "/addyosmani/agent-skills",
         "/websites/ffmpeg_documentation"
     ]
 
@@ -169,6 +170,33 @@ def test_plates_docs_keep_the_high_risk_contract_and_navigation():
             assert " ".join(snippet.split()) in normalized, (
                 f"{path.relative_to(REPO_ROOT)} lost {snippet!r}"
             )
+
+
+def test_production_skill_keeps_the_canonical_shape_and_cta_rule():
+    skill = SKILLS / "production" / "SKILL.md"
+    text = skill.read_text(encoding="utf-8")
+    front_matter = _front_matter(skill)
+
+    assert front_matter["metadata"]["context7-sources"] == [
+        "/addyosmani/agent-skills",
+        # The standalone-batch reference states what `concat` and `aformat`
+        # actually require -- notably that ffmpeg reconciles pixel and sample
+        # formats itself but that RESOLUTION must be matched by hand, and that
+        # `concat` pads a short audio leg with silence. Those are verified
+        # claims, not recalled ones, so the source is recorded here.
+        "/websites/ffmpeg_documentation",
+    ]
+    for heading in (
+        "## When to Use",
+        "## When NOT to Use",
+        "## Core Process",
+        "## Common Rationalizations",
+        "## Red Flags",
+        "## Verification",
+    ):
+        assert heading in text
+    assert "Tail CTAs bias long" in text
+    assert "changes only the CTA hold" in text
 
 
 def test_hygiene_hooks_cover_the_complete_skill_contract_surface():

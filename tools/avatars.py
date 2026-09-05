@@ -277,6 +277,25 @@ def fetch(logins, verbose=True, revalidate=False, opener=None, budget=None,
 
 # --- the CI cache ----------------------------------------------------------
 
+SEASON_MANIFEST = REPO_ROOT / "stories" / "standalone" / \
+    "season-of-the-blueberries.json"
+
+
+def season_avatar_logins(path=None):
+    """The logins the Season of the Blueberries manifest names: the fixed
+    cast plus any selected dossier contributors. Read straight from the
+    record so the CI cache warms their faces too; a missing or unreadable
+    manifest simply contributes nothing."""
+    try:
+        data = json.loads(Path(path or SEASON_MANIFEST).read_text("utf-8"))
+    except (OSError, ValueError):
+        return []
+    logins = [m.get("github_login") for m in data.get("fixed_cast") or []]
+    for chapter in data.get("chapters") or []:
+        logins.extend(d.get("login") for d in chapter.get("dossiers") or [])
+    return [login for login in logins if login]
+
+
 def pull_from_actions(verbose=True, runner=subprocess.run):
     """Unpack CI's avatar artifact into the cache. One request, not five hundred.
 
@@ -320,7 +339,7 @@ def main(argv=None):
     import build_credits as B
 
     manifest = json.loads(B.MANIFEST.read_text())
-    logins = B.avatar_logins(manifest)
+    logins = B.avatar_logins(manifest) + season_avatar_logins()
 
     if args.from_actions:
         pull_from_actions(verbose=not args.quiet)

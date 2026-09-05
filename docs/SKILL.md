@@ -19,10 +19,12 @@ load **only** that skill, then act.
 | Write an outline, assemble a cut list, mark material for removal, or render it | [`editing`](skills/editing/SKILL.md) |
 | Meet the audio standard every delivered file is held to | [`audio`](skills/audio/SKILL.md) |
 | Put a name on screen — Guardian nameplates and title cards | [`plates`](skills/plates/SKILL.md) |
+| Build a hero character music video, or key a paper background to transparency | [`hero-videos`](skills/hero-videos/SKILL.md) |
 | Add or re-time an act's chat dialogue in one Markdown file per chapter | [`chapters`](skills/chapters.md) |
 | Join the finished acts into one programme | [`megacut`](skills/megacut/SKILL.md) |
 | Run a long encode on the ghost cluster instead of the laptop | [`farm`](skills/farm.md) |
 | Replace the rest of a video with the reusable LF training CTA | [`training-cta`](skills/training-cta/SKILL.md) |
+| Build a Hive episode, the full Season of the Blueberries cut, or integrate the authored Expansion Pack | [`hive`](skills/hive.md) |
 | Work out why CI is red when the suite is green here, or add a check | [`testing`](skills/testing.md) |
 
 This table is the curated task router. The complete generated catalog lives in

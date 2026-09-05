@@ -1,154 +1,61 @@
 ---
 act: II
 manifest: stories/02-endless-forms-plates.json
-# WHERE THIS ACT STARTS IN THE PROGRAMME, in seconds. A measurement of the
-# running order, not something to recompute from memory: prologue 101.200
-# (megacut.json item 0 `dur`) + act I 116.200 (trim 2.000 -> 118.200) +
-# Perfume movement 2, 66.400 (source 93.000 -> 159.400) = 283.800 --
-# verified against the seven-days-to-the-wolves-v4.2 dry run on 2026-08-20.
-# Restate the derivation when the running order's timings move.
+# Measured from the running order: prologue 101.200 + act I 116.200 +
+# Perfume movement 2 66.400 = 283.800 seconds.
 programme_start: 283.800
-# THE COLUMN ORDER THIS ACT'S MANIFEST READS IN.
-#
-# Act II's plates were built by about ten different code paths, so they came
-# out in thirteen different key orders -- an accident of which branch made
-# which pill, never a decision. One order for the whole act is the point of
-# moving them here. It starts with the boss bar's shape, which is what the
-# two red splashes already carried, so no card changes but the pills that
-# had no order to keep.
 field_order: id, at, dur, name, title, title_source, kind, position,
-  copy_source, speaker, text, text_source, scale, seen_at_src,
-  avatar, avatar_url, bond_of
-# The act's own length comes from the manifest's `_film_sec`; it is not
-# restated here, because a second copy is a future contradiction.
-#
-# THE BUILDER THAT RESEATS THESE LINES before they reach the manifest. Two
-# authored mechanisms move an entry between this file and the record that
-# ships: a `source_anchor` row is seated on the source frame it names, and a
-# pin past the old hallway return is rebased by however much the `paused`
-# block has grown. `show` and `check` ask the builder for the seat it will
-# emit rather than printing this file's raw schedule, so the clock quoted
-# here is the clock in the delivered master.
+  copy_source, speaker, text, text_source, speaker_pending, scale,
+  seen_at_src, avatar, avatar_url, bond_of
 reseat: scripts/build_efmb_plates.py:reseat_chapter_entries
 ---
 
 # Act II — Endless Forms Most Beautiful: conversations
 
-This file is where you write and rewrite this chapter's chat dialogue. The
-build (`scripts/build_efmb_plates.py`) reads it; you never touch a timecode
-per line unless you want to.
+Every chat speaker is either a verified GitHub login or the intentionally
+uncast `TBD`. `speaker_pending` records copy whose author named
+a voice without evidence for a GitHub identity.
 
-Drop a whole conversation at one programme time (the clock the full show
-plays on — the same clock you scrub in the delivered film):
-
-    ## 6:45
-    Karena: Hit 'em with your lessons learned
-    Rochaporto: One reference architecture coming up!
-    jrsapi: Shit are you taking notes?
-
-(That example is indented, so it is documentation, not dialogue. Yours start
-at the left margin.)
-
-The rules:
-
-- **One `## <time>` heading per conversation.** Every line under it plays in
-  order. You do not time the lines: each stays up for as long as it takes to
-  read (15 characters a second, never less than 2.2 s, never more than 7 s,
-  a 0.25 s beat between pills).
-- **One speaker, many lines.** Put the same name on consecutive lines and
-  each becomes its own pill — no more one huge line or nothing.
-- **Pin a line** when it must land exactly: `jrsapi @ 6:52: Shit…` puts that
-  pill at 6:52 and the lines after it flow from there. Slack between the
-  previous line and the pin is just silence; a pin that lands before the
-  previous line finishes is still honoured, and the overlap is reported,
-  never silent.
-- **Times are programme time** — 6:45 means 6:45 into the whole show. The
-  tool converts to this act's own clock (act II starts at 4:43.8).
-- **A red splash** — the boss bar — is a `!` line: `! POOR TECHNICAL
-  DECISIONS`. Add a second row with `| the title`; a bare trailing `|` keeps
-  the title as a placeholder slot (lorem, credited to nobody) until somebody
-  writes it. `[an_id]` after the `!` keeps an existing card's id when this
-  file takes over a seat the build script used to hold — both red splashes
-  in this act are authored below, that way.
-- **A lowercase login** (`rochaporto:`) also earns its GitHub avatar, like
-  the other pills in this act. A display name (`Karena:`) prints verbatim.
-- **Lines that match the footage seat themselves.** If your words match what
-  the characters on screen are visibly saying (the act's recovered dialogue
-  is the evidence), the line is placed at that moment instead of its cascade
-  spot. A `@` pin still wins; either way the seat is reported — in `show`,
-  on stderr at build time, and in the manifest's `unresolved`.
-- **A line with no words** renders as a placeholder credited to nobody —
-  write `TBD: ` and the slot exists in the cut, waiting for copy.
-- Anything the scheduler cannot honour exactly is recorded in the manifest's
-  `unresolved` and printed by the check below. The build never stops.
-
-Preview what this file resolves to:
-
-    python3 tools/chapter_md.py show II
-
-Then rebuild the manifest (never hand-edit the JSON):
-
-    python3 scripts/build_efmb_plates.py --write
-
->> THE GLIDER LINK IS AN UPLOAD ANNOTATION, NOT A PLATE. Owner, 2026-08-23:
-"Add youtube click link thing to this video, it's the backstory to the
-glider: https://www.youtube.com/watch?v=P-rIeI6ynuM ... Have it show up
-during this combo and stay in the top right until later." A YouTube card is
-set on the upload, so nothing here burns it into a frame -- filed as an
-issue against the publish step. The window it wants is this block. <<
+The hallway interruption has three authored blocks: `paused` holds the
+hallway before the Amber insert, `amber-action` is the inserted source clip,
+and `post-amber` holds the returned hallway before Destiny picture resumes.
+The builder derives those intervals from the records below.
 
 ## 5:14.433
 
->> THESE FOUR SEATS ARE MINE, NOT THE OWNER'S. He wrote the banter with no
-times, above the 5:54 block, and 5:54 onwards is packed with authored beats
-that may not move. This is the largest clear stretch in the act -- film
-30.433 -> 45.200, measured from the manifest, not from this file, because
-the builder adds plates this file never sees. It is the combo the note
-above describes. Worth a look when he watches it: the words are his, the
-moment is a guess. <<
-
 [chat_joseph_ricardos] jrsapi @ 5:14.433 +3.4: No one can tell which Ricardo is which so roll with it
-  - avatar_login: jrsapi
   - position: null
 
-[chat_ricardo_nukeguy] Ricardo @ 5:18.233 +3.4: It's me the nuke guy how do you think I got here?
+[chat_ricardo_nukeguy] rochaporto @ 5:18.233 +3.4: It's me the nuke guy how do you think I got here?
 
-    THE OTHER RICARDO, deliberately uncast. This act has two: Ricardo Rocha
-    (`rochaporto`, who carries `toc_ricardo` below) and the one jrsapi
-    cannot tell apart. Naming the second would credit a real person on the
-    strength of a joke about not knowing which one he is, so he takes the
-    display name and the drawn crest, and no portrait.
+[chat_pilot_lunar] TBD @ 5:22.033 +2.883: Lunar record baby! Hello KubeCon + CloudNativeCon
+  - speaker_pending: pilot
 
-[chat_pilot_lunar] pilot @ 5:22.033 +2.8: Lunar record baby! Hello KubeCon + CloudNativeCon
-  - avatar: null
-  - avatar_url: null
-
-[chat_ricardo_ai] Ricardo @ 5:25.233 +3.4: They wanted us to put AI in the glider so we did.
+[chat_ricardo_ai] ricardosalveti @ 5:25.233 +3.4: They wanted us to put AI in the glider so we did.
 
 ## 5:54.233
 
 [chat_joseph_slop] jrsapi @ 5:54.233 +2.6: That explains the slop
-  - avatar_login: jrsapi
   - position: null
 
-    Owner brief, this round: "03:12 chat bubble for Joseph: That explains
-    the slop". Megacut marks; this is the programme seat it lands on. The
-    line was "Here comes the slop" until
-    2026-08-23, when he revised the brief above it -- it answers the new
-    glider banter now, so the pill follows the brief. He also asked for Joseph's "Master your
-    skills" and "You got this" one second apart at 3:39 and 3:40 — a pill
-    needs 2.2 s to be read, so they could never both play. The later
-    5:59 → 6:14 pass replaced them on the same face shots and neither ever
-    reached a frame; the strings are in git.
+>> KARENA'S FOUR LINES ARE OUT, AND THIS IS THE ONLY RECORD OF THEM.
+Two authored passes disagree and neither is an agent's to overrule, so the
+copy is written down here rather than seated or lost. #396 removed them as
+"old conflicting windows" and guards the removal with a test; the 2026-08-28
+pass restored them at their pre-removal seats. Verbatim, with the seats that
+pass gave them, on the verified `angellk` identity:
 
-## 6:01.233
+    [chat_karena_job]      6:01.233 +2.6  I love this job
+    [late_karena_cardio]   6:31.300 +2.2  Like cardio!
+    [late_karena_lessons]  6:47.300 +2.2  Hit 'em with your lessons learned
+    [toc_karena]           7:01.333 +3.2  One hundred thousand bootc
+                                          volunteers, ready to power up
 
-[chat_karena_job] angellk @ 6:01.233 +2.6: I love this job
-  - avatar_login: angellk
-
-    Restored at its last authored seat from the pre-removal Act II record. The
-    6:08.233 attempt put it on top of the full-screen choice animation and
-    made the manifest unburnable.
+Seating them again is not mechanical: `toc_karena` +3.2 from 7:01.333 runs
+to 7:04.533, and `toc_joseph_worth` is pinned at 7:04.477, so one of two
+authored beats has to move for both to play. That is the owner's call.
+OMITTED, NEVER STALE: the act ships without them and this note is the
+punch-list entry. <<
 
 ## 6:12.683
 
@@ -169,25 +76,11 @@ moment is a guess. <<
 [late_metrics_cluster] jrsapi @ 6:28.300 +2.2: Projects Teams Metrics are strong
   - seen_at_src: 122.266
 
-[late_karena_cardio] angellk @ 6:31.300 +2.2: Like cardio!
-  - avatar_login: angellk
-
 [late_metrics_mentoring] jrsapi @ 6:34.000 +2.8: They just need mentoring in the right skills
 
-## 6:45
+## 6:45.000
+
 ! [late_poor_technical_decisions] YOUR POOR TECHNICAL DECISIONS |
-
-    The red flash. Owner, 2026-08-20: it goes to 6:45 on the programme
-    clock. The trailing `|` keeps the second-row slot: it renders as lorem
-    credited to nobody until somebody writes the words.
-
-## 6:47.300
-
-[late_karena_lessons] angellk @ 6:47.300 +2.2: Hit 'em with your lessons learned
-  - avatar_login: angellk
-
-    Both Karena lines are restored at their last authored seats from the
-    pre-removal Act II record, with the verified `angellk` identity.
 
 [late_rochaporto_cern] rochaporto @ 6:49.750 +2.6: One reference architecture coming up!
   - seen_at_src: 143.716
@@ -197,61 +90,14 @@ moment is a guess. <<
 [late_jrsapi_notes] jrsapi @ 6:58.300 +2.6: I still don't know which Ricardo this is
   - seen_at_src: 152.266
 
->> "Timed to when the hunter shows off with the hoodie pulloff." -- owner,
-2026-08-23, about the line above. It is already pinned at 6:58.300; whether
-that is the pulloff frame is a judgement about a picture, so it is left
-where he put it and flagged for his eye. <<
+[toc_joseph_worth] jrsapi @ 7:04.477 +2.706: The gamers would have to impress BOTH Ricardos
 
-[toc_karena] angellk @ 7:01.333 +3.2: One hundred thousand bootc volunteers, ready to power up
-  - avatar_login: angellk
-
-[toc_joseph_worth] jrsapi @ 7:04.783 +2.2: The gamers would have to impress BOTH Ricardos
-  - avatar_login: jrsapi
-
-    ONE PILL, NOT TWO. The owner wrote "BOTH Ricardos" on its own line, but
-    this exchange is chained backward from the walk's first frame and has
-    7.033 s for three cards needing 7.100 -- there is no room for a fourth,
-    and no authored beat here may be slid to make one. It is one sentence
-    with no punctuation between the halves, so every word he wrote reaches
-    the screen; only the line break does not. `tools/readtime.py` will call
-    the hold short, which is a report, not a re-time.
-
-[toc_ricardo] Ricardo @ 7:07.233 +2.4: Look man I am so tired just jump
-  - cast: rochaporto
-
-    THE EXCHANGE BELONGS TO THE WALK, and its seats were chained backward
-    from the walk's first frame so Ricardo's question clears exactly as the
-    walking shot opens. They are pinned here at the moments that produced,
-    because the scene they belong to is the walk.
-
-    It used to start at MONTAGE_OUT and give the last line whatever was
-    left. That worked only while the walk was mis-anchored a shot late;
-    correcting it to the walking shot's real first frame left 7.033 s for
-    three cards needing 7.100, and Ricardo's question would have been
-    squeezed under the readable minimum. Chaining backward keeps every
-    authored hold and moves the whole exchange 1.07 s earlier instead, into
-    clear air — Dylan Taylor's badge is out at film 134.767, and the run
-    starts after it.
-
-    The visible speakers use their verified GitHub identities: `angellk` and
-    `jrsapi`. The 2:19 lead-in banner that was to open the scene has no copy
-    yet (#98), so the first line takes its slot.
-
->> "It could be either one" HAS NOWHERE TO GO, and it is in the overflow
-below. Its own question clears at 7:00.900 and Karena is pinned at 7:01.333;
-the next second and a half is a no-plate zone on her jump; and everything
-after that until film 220.966 is The Long Walk, which credits only its own
-speakers. <<
-
-    Their three answers — "Dunno, how much faith DO we have in the CNCF?",
-    "Cloud native desktop? ...", "LOL" — went out with AN4-CH3CK-12's pass
-    and are not authored here; the mapped pass renders that beat.
+[toc_ricardo] rochaporto @ 7:07.433 +2.4: Look man I am so tired just jump
 
 ## 7:23.300
 
 [mapped_kernel_bump] castrojo @ 7:23.300 +2.2: Time to get this driver upstream
   - seen_at_src: 183.366
-  - avatar_login: castrojo
 
 ## 7:29.300
 
@@ -260,68 +106,37 @@ speakers. <<
 
 [mapped_lionheartp_what_tests] LionHeartP @ 7:33.300 +2.2: What tests?
   - seen_at_src: 193.366
-  - avatar_login: LionHeartP
 
 ## 7:39.300
 
-[mapped_a1rmax_intro] A1RM4X @ 7:39.300 +2.2: Thank you I never thought I could help!
-  - seen_at_src: 199.366
-  - avatar_login: A1RM4X
+[mapped_a1rmax_intro] A1RM4X @ 7:39.300 +2.295: Thank you I never thought I could help!
 
-[mapped_a1rmax_lowly] A1RM4X @ 7:41.750 +2.2: I'm not like you I'm just a lowly user
-  - avatar_login: A1RM4X
+[mapped_a1rmax_intro_2] A1RM4X @ 7:41.845 +2.236: I'm not like you I'm just a lowly user
 
-    TWO PILLS, as the owner directed ("THIS SHOULD BE TWO PILLS"). The second
-    follows the first by the house 0.25 s chat gap so the exchange stays
-    readable without simultaneous pills.
+[walk_ge_stream] GloriousEggroll @ 7:44.331 +2.2: It's your patch, turn the stream on
 
-[walk_ge_stream] GloriousEggroll @ 7:44.200 +2.2: It's your patch, turn the stream on
-  - cast: GloriousEggroll
+[walk_a1rm4x] LionHeartP @ 7:46.781 +2.2: Let's get these numbers up
 
-    The reply follows A1RM4X's second pill by the same gap; the remaining
-    exchange stays in authored order.
+[mapped_wrkode_dibs] wrkode @ 7:49.231 +2.7: Oh dibs on this one
 
-[walk_a1rm4x] LionHeartP @ 7:46.650 +2.2: Let's get these numbers up
-  - avatar_login: LionHeartP
-
-[mapped_wrkode_dibs] wrkode @ 7:49.100 +2.7: Oh dibs on this one
-  - avatar_login: wrkode
-
-    
-[walk_ge_glorious] GloriousEggroll @ 7:52.050 +2.8: There's nothing glorious about this job
-  - cast: GloriousEggroll
+[walk_ge_glorious] GloriousEggroll @ 7:52.181 +2.8: There's nothing glorious about this job
 
 ## 7:59.300
 
 [mapped_lionheartp_together] LionHeartP @ 7:59.300 +3.8: When we work together
   - seen_at_src: 219.366
-  - avatar_login: LionHeartP
 
 [mapped_wrkode_kairos] wrkode @ 8:03.500 +3.0: Have I shown you Kairos my friend?
-  - avatar_login: wrkode
 
 ## 8:09.300
 
-[mapped_eggroll_title] lionheartp @ 8:09.300 +2.2: Nice work testing that patch
+[mapped_eggroll_title] LionHeartP @ 8:09.300 +2.2: Nice work testing that patch
   - seen_at_src: 229.366
-  - cast: lionheartp
-  - avatar_login: LionHeartP
 
-[mapped_eggroll_blueberries] lionheartp @ 8:12.000 +3.4: Usually Blueberries just send me a bunch of crap
-  - cast: lionheartp
-  - avatar_login: LionHeartP
+[mapped_eggroll_blueberries] LionHeartP @ 8:12.000 +3.4: Usually Blueberries just send me a bunch of crap
 
-    THE OWNER SPLIT ONE 4.5 s PILL INTO TWO and recast it from
-    GloriousEggroll to lionheartp. There was room: 8:09.300 + 4.5 cleared at
-    8:13.800 and the next beat is 8:16.300, so the two halves fit inside the
-    old line's own span plus a beat. The id of the first is kept -- it lost
-    its `[id]` in the rewrite, and an auto-derived id is unstable across
-    edits, which is how a delivered plate loses its seat.
-
-[mapped_eggroll_didyou] lionheartp @ 8:16.300 +2.2: You didn't test any of this did you.
+[mapped_eggroll_didyou] LionHeartP @ 8:16.300 +2.2: You didn't test any of this did you.
   - seen_at_src: 236.366
-  - cast: lionheartp
-  - avatar_login: LionHeartP
 
 [mapped_pastaq_what_tests] pastaq @ 8:20.300 +2.2: Hey man WHAT tests?
   - seen_at_src: 240.366
@@ -331,178 +146,118 @@ speakers. <<
 [walk_ge_lesson] LionHeartP @ 8:22.566 +2.2: Let's go!
   - position: right
   - seen_at_src: 242.632
-  - avatar_login: LionHeartP
 
 [mapped_redacted_unlearning] castrojo @ 8:25.300 +2.75: Unlearning bad habits takes time
-  - avatar_login: castrojo
-  - seen_at_src: 290.0
+  - seen_at_src: 290.000
 
 [mapped_redacted_options] castrojo @ 8:28.300 +2.75: Your options are success
-  - avatar_login: castrojo
-  - seen_at_src: 293.0
+  - seen_at_src: 293.000
 
-[mapped_redacted_mines] castrojo @ 8:31.500 +3.55: Or a lifetime of servitude in the Toilmaster's Packaging Mines
-  - avatar_login: castrojo
-
-    THE SPLIT FITS INSIDE THE OLD PILL'S OWN 6.75 s span (8:28.300 ->
-    8:35.050).
+[mapped_redacted_mines] castrojo @ 8:31.500 +3.648: Or a lifetime of servitude in the Toilmaster's Packaging Mines
 
 [owner_convo_joseph] jrsapi @ 8:38.417 +3.6: We can't let The Toilmaster enslave another generation
   - seen_at_src: 303.117
-  - avatar_login: jrsapi
 
 [mapped_kyle_titanfall] KyleGospo @ 8:43.750 +2.2: FOR TITANFALL!
-  - seen_at_src: 308.45
-  - avatar_login: KyleGospo
+  - seen_at_src: 308.450
 
 [mapped_redacted_blow] castrojo @ 8:46.200 +2.6: Or go blow some shit up
-  - avatar_login: castrojo
-  - seen_at_src: 310.9
+  - seen_at_src: 310.900
 
-## 8:59.733
-
-[mapped_hikari_ouch] HikariKnight @ 9:02.183 +2.2: Ouch man wtf!
-  - avatar_login: HikariKnight
-
-[mapped_owen_sorry] Owen @ 9:04.633 +2.2: Oh sorry my bad
-
-[mapped_kolunmi_pvp] kolunmi @ 9:07.083 +2.2: Who turned PvP on?
-
-[ch_ii_12_4_angellk] angellk: Don't look at me I only turned on PVP
-
-[mapped_cam_noone] cam @ 9:12.783 +2.2: Mom no one plays this game
-  - avatar: null
-  - avatar_url: null
-
-[mapped_hikari_wait] HikariKnight @ 9:15.233 +2.2: Hey wait?!
-  - avatar_login: HikariKnight
-
-[mapped_kolunmi_users] kolunmi @ 9:17.683 +2.6: Are those ... other linux users?
+## 8:59.733 paused
 
 [mapped_akgraner_kyle] akgraner @ 8:59.733 +2.2: Hi sugar, I'm looking for Kyle
 
-[chat_amber_dungeon] akgraner @ 9:25.433 +2.2: Oh wow I forgot what the starter dungeon was like! Hi!
-  - avatar_login: akgraner
-    
+[mapped_hikari_ouch] HikariKnight @ 9:02.183 +2.2: Ouch man wtf!
 
-[mapped_akgraner_kindness_1] akgraner @ 9:34.653 +2.2: Remember, kindness is doing what's right
+[mapped_owen_sorry] TBD @ 9:04.633 +2.2: Oh sorry my bad
+  - speaker_pending: Owen
+
+[mapped_kolunmi_pvp] kolunmi @ 9:07.083 +2.2: Who turned PvP on?
+
+[chat_angellk_pvp] angellk @ 9:09.533 +2.2: Don't look at me I only turned on PVP
+
+[mapped_cam_noone] TBD @ 9:12.783 +2.2: Mom no one plays this game
+  - speaker_pending: cam
+
+[mapped_hikari_wait] HikariKnight @ 9:15.233 +2.2: Hey wait?!
+
+[mapped_kolunmi_users] kolunmi @ 9:17.683 +2.6: Are those ... other linux users?
+
+[chat_amber_bazaar] akgraner @ 9:20.533 +2.2: "How bazaar?"
+
+[chat_amber_crap] akgraner @ 9:22.983 +2.2: Who writes this crap?
+
+[chat_amber_dungeon] akgraner @ 9:25.433 +3.177: Oh wow I forgot what the starter dungeon was like! Hi!
+
+[mapped_akgraner_kindness_1] akgraner @ 9:34.653 +2.353: Remember, kindness is doing what's right
   - scale: 1.18
 
-[mapped_akgraner_kindness_2] akgraner @ 9:37.103 +2.2: For the ecosystem
+[mapped_akgraner_kindness_2] akgraner @ 9:37.256 +2.2: For the ecosystem
   - scale: 1.18
 
-[mapped_akgraner_kindness_3] akgraner @ 9:39.553 +2.2: For our users
+[mapped_akgraner_kindness_3] akgraner @ 9:39.706 +2.2: For our users
   - scale: 1.18
 
-[mapped_akgraner_kindness_4] akgraner @ 9:42.003 +2.2: And for our maintainers
+[mapped_akgraner_kindness_4] akgraner @ 9:42.156 +2.2: And for our maintainers
   - scale: 1.18
 
-[mapped_akgraner_kindness_5] akgraner @ 9:44.453 +2.2: Don't be nice
+[mapped_akgraner_kindness_5] akgraner @ 9:44.606 +2.2: Don't be nice
   - scale: 1.18
 
-[mapped_akgraner_kindness_6] akgraner @ 9:46.903 +2.2: Be kind
+[mapped_akgraner_kindness_6] akgraner @ 9:47.056 +2.2: Be kind
   - scale: 1.18
 
-[mapped_which_kyle] akgraner @ 9:49.353 +2.6: Extinction is the Rule
+[mapped_which_kyle] akgraner @ 9:49.506 +2.2: Extinction is the Rule
   - scale: 1.0
 
-## 9:52.203 paused
+## 9:52.203 amber-action
 
->> THE SECOND TALK, still frozen -- the last leg of the owner's 2026-08-28
-sequence: "HALLWAY -> FREEZE -> AMBER TALKS -> SHE FIGHTS -> AMBER TALK ->
-unfreeze, sup". Every Amber line plays over the frozen hallway; the picture
-resumes only when this conversation has cleared, then runs the 5.83 s of
-source between the resume and Sup's close-up. THE AKGRANER ACTION SEQUENCE,
-seated 2026-08-28 where the owner wrote "PUT THE AKGRANER ACTION SEQUENCE
-HERE", replacing the 13-pill paused conversation that used to run from this
-heading; "How bazaar?" and "Who writes this crap?" join it from the 8:59
-stretch, where the owner left them floating under "KEEP IT PAUSED DO NOT
-PLAY THE AMBER SECTION". The hold derives from this block's own schedule
-(`chapter_md.block_end("II", "paused")`), so a line added or removed here
-never has to be re-typed as a duration anywhere else. <<
+[chat_amber_problem] akgraner @ 9:52.203 +2.765: Ok so I'm going to clean out this trash for you
 
-[chat_amber_problem] akgraner @ 9:52.203 +2.2: Ok so I'm going to clean out this trash for you
-  - avatar_login: akgraner
+[chat_amber_decide] akgraner @ 9:55.218 +2.2: [Don't let them decide for you]
 
-[chat_amber_decide] akgraner: [Don't let them decide for you]
-  - avatar_login: akgraner
+[chat_amber_fate] akgraner @ 9:57.668 +2.2: You make your own fate.
 
-[chat_amber_fate] akgraner: You make your own fate.
-  - avatar_login: akgraner
+[chat_amber_shittywriting] akgraner @ 10:00.118 +2.824: I can't save you from this shitty writing though
 
-[chat_amber_shittywriting] akgraner: I can't save you from this shitty writing though
-  - avatar_login: akgraner
+## 10:14.937 post-amber
 
-[chat_amber_bazaar] akgraner: "How bazaar?"
-  - avatar_login: akgraner
+[chat_nwoods3_seen] nwoods3 @ 10:14.937 +2.2: I feel seen
 
-[chat_amber_crap] akgraner: Who writes this crap?
-  - avatar_login: akgraner
+[chat_kolunmi_level] kolunmi @ 10:17.387 +3.118: Hey did you see how we just loaded up in a new level?
 
-## 10:01.2
-! [mapped_haters] HATERS +5.6 |
+[chat_hikari_warframe] HikariKnight @ 10:20.755 +2.366: Finally, I can play WARFRAME!
+
+## 10:23.601
+
+! [mapped_haters] HATERS @ 10:23.601 +5.0 |
   - source_anchor: 326.163
 
-    Source 326.163 is the enemy attack. The shield formation at source
-    331.163 is the heroes and never carries HATERS. HOLD IT UNTIL THE HERO
-    SHOT -- refined 2026-08-28: "I want it until the 'sup' and the closeup
-    on Kyle". Sup's pill is source-anchored to that close-up (331.763), so
-    the bar's hold is 331.763 - 326.163 = 5.600 s: it clears on the exact
-    frame Kyle's close-up lands, and both seats ride the source clock, so
-    the number survives any change in the pause's length.
+    Source 326.163 is the enemy attack; the shield formation at source
+    331.163 is the heroes and never carries HATERS, so the bar clears there.
+    OPEN, owner 2026-08-28: "I want it until the 'sup' and the closeup on
+    Kyle". Sup is source-anchored to 331.763, which is 0.6 s INSIDE the hero
+    shot, so honouring that phrase literally would put HATERS on the heroes.
+    Which reading is right is a judgement about the frame and is the owner's;
+    the evidenced seat is kept until then.
 
-## 10:04.187
+## 10:29.201
 
-[mapped_kolunmi_disco] kolunmi @ 10:04.187 +2.2: Cardio!
-  - avatar_login: kolunmi
+[mapped_kyle_sup] KyleGospo @ 10:29.201 +2.2: Sup
+  - position: right
+  - source_anchor: 331.763
+
+## 10:31.255
+
+[mapped_kolunmi_disco] kolunmi @ 10:31.255 +2.2: Cardio!
   - source_anchor: 333.817
   - bond_of: mapped_kyle_sup
 
-    Source 332.817 is the Hunter. The named bond keeps this left-lane reply
-    paired with Sup on the right without permitting other overlaps.
+## 10:54.168
 
-## 10:04.867
+[retirement-1] castrojo @ 10:54.168 +2.2: Finally, retirement
+  - source_anchor: 358.497
 
-[mapped_kyle_sup] kylegospo: Sup
-  - position: right
-  - source_anchor: 331.763
-  - avatar_login: KyleGospo
-
-    Source 331.763 is the purple Titan's shield formation at the requested
-    6:06 frame.
-    It is independent of Kyle's later guardian reveal.
-
-## 10:14.937
-
->> THE BLOCK THE OWNER WROTE UNDER "Slay out, Queen!". There is no air
-there -- akgraner's six kindness pills run 9:34.653 to 9:51.953 without a
-gap -- so these play a beat later, after Kyle's reveal. Owner, 2026-08-24:
-"Remove kyle's lines after 'Sup', the others aren't needed" -- his
-"I'm not calling this Bobonomics" and "We had to make this movie" pills are
-gone. His line "castrojo killed me in Halo today" used to be parked below
-as unreachable overflow; it is now seated in the paused conversation above
-(## 9:52.203, id `chat_kyle_halo`). nwoods3, kolunmi and Hikari stay here. <<
-
-    2026-08-28 follow-up: the paused conversation this note points at was
-    replaced by the akgraner action sequence, and `chat_kyle_halo` left with
-    it -- the line is preserved verbatim in git history (the pre-WIP
-    chapter), not re-seated here by an agent's guess.
-
-[chat_nwoods3_seen] nwoods3 @ 10:14.937 +2.2: I feel seen
-  - avatar_login: nwoods3
-
-    The owner wrote the speaker as `https://github.com/nwoods3`; the URL
-    resolves the login and the portrait, and never reaches a frame.
-
-[chat_kolunmi_level] kolunmi @ 10:17.387 +2.2: Hey did you see how we just loaded up in a new level?
-
-[chat_hikari_warframe] Hikari @ 10:19.837 +2.366: Finally, I can play WARFRAME!
-  - avatar_login: HikariKnight
-
-## 10:28.100
-
-[retirement-1] castrojo @ 10:28.100 +2.125: Finally, retirement
-  - avatar_login: castrojo
-
-[retirement-2] castrojo @ 10:30.475 +2.125: The long walk beckons
-  - avatar_login: castrojo
+[retirement-2] castrojo @ 10:56.618 +2.2: The long walk beckons
+  - source_anchor: 360.947

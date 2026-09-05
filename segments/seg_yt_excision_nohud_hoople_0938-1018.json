@@ -1,0 +1,165 @@
+{
+  "segment_id": "seg_yt_excision_nohud_hoople_0938-1018",
+  "video_id": "yt_excision_nohud_hoople",
+  "start_sec": 938.0,
+  "end_sec": 1018.0,
+  "start_tc": "15:38",
+  "end_tc": "16:58",
+  "era": "the_final_shape",
+  "activity": "story_mission",
+  "content_type": "gameplay",
+  "destination": "the_pale_heart",
+  "overlays": [],
+  "shot_scale": "LS",
+  "composition": [
+    "group",
+    "crowd"
+  ],
+  "camera_movement": [
+    "track"
+  ],
+  "pacing": "fast",
+  "lighting": "high_contrast",
+  "identity_visibility": "back_only",
+  "character_identifiability": "unidentifiable",
+  "substitutability": 4,
+  "subject_salience": "crowd_group",
+  "action": [
+    "ability_cast",
+    "combat"
+  ],
+  "mood": [
+    "triumphant"
+  ],
+  "register": 2,
+  "character": [],
+  "caption": "A no-HUD fireteam channels the Traveler's Light and shatters the Witness.",
+  "clean": true,
+  "footage_tier": "gameplay",
+  "traversal_hero": false,
+  "casting": {
+    "role": "ensemble",
+    "character": null,
+    "person": null,
+    "usable": true,
+    "constraints_failed": [],
+    "slots": 6
+  },
+  "provenance": {
+    "era": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "activity": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "content_type": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "destination": {
+      "source": "inherited",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "overlays": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "shot_scale": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "composition": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "camera_movement": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "pacing": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "lighting": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "identity_visibility": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "character_identifiability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "substitutability": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 0.9
+    },
+    "subject_salience": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "action": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "mood": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "register": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "character": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "caption": {
+      "source": "observed",
+      "label_source": "manual",
+      "confidence": 1.0
+    },
+    "clean": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "footage_tier": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "traversal_hero": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    },
+    "casting": {
+      "source": "observed",
+      "label_source": "heuristic",
+      "confidence": 1.0
+    }
+  }
+}
