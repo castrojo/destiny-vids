@@ -35,7 +35,7 @@
         "render"
       ],
       "description": "Run frame-touching encodes on the remote farm. Use when the cluster is reachable and you need a Prod encode, a megacut segment, or another long render.",
-      "version": "1.1",
+      "version": "1.2",
       "last_updated": "2026-08-24",
       "doc_type": "runbook"
     },
@@ -91,7 +91,7 @@
         "ffmpeg"
       ],
       "description": "Preserve source fidelity and enforce delivery audio headroom. Use when sourcing a bed, measuring a deliverable, or deciding whether a file meets the repo's audio standard.",
-      "version": "1.0",
+      "version": "1.1",
       "last_updated": "2026-08-19",
       "doc_type": "policy"
     },
@@ -131,6 +131,26 @@
       "description": "Build and revise cuts from indexed footage without inventing shots. Use when making story outlines or renders from indexed segments.",
       "version": "1.0",
       "last_updated": "2026-08-20",
+      "doc_type": "procedure"
+    },
+    {
+      "id": "hero-videos",
+      "name": "hero-videos",
+      "one_line_purpose": "Build a hero character music video from a paper-background animation.",
+      "entry_point": "docs/skills/hero-videos/SKILL.md",
+      "category": "media-production",
+      "status": "active",
+      "tags": [
+        "ffmpeg",
+        "floodfill",
+        "qr",
+        "overlay",
+        "hero",
+        "argo"
+      ],
+      "description": "Key a paper-background character animation to transparency, compose the frame, and render on the farm. Use when working in ~/Videos/Wolves/Hero, when a hero video needs a pass, or when adding a QR card or URL wordmark to a hero cut.",
+      "version": "1.5",
+      "last_updated": "2026-08-26",
       "doc_type": "procedure"
     },
     {

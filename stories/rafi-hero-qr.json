@@ -1,0 +1,135 @@
+{
+  "_what": "What goes in RAFI_01's margins. Owner cut the donate rail and the CNCF ad on 2026-08-25: 'drop all the banners except the one for the band'. What is left is two corner cards, and the character pulled back off the frame edges so there is room for them.",
+  "frame": {
+    "width": 2560,
+    "height": 1440
+  },
+  "placement": {
+    "width": 280,
+    "margin": 48,
+    "valign": "bottom",
+    "_what": "280px wide, down from 340: at 340 the card owned the margin instead of sitting in it. 280 leaves roughly 6.8px per module, which the decode gate still clears on both wallpapers -- close enough to the floor that shrinking it further has to be re-gated, not eyeballed.",
+    "_why_bottom": "Owner, on seeing v3: 'lower the qr code to the bottom right, why are you blocking art?'. The card was vertically centred in the right margin, which never overlapped the character -- and still competed with him, because it sat at his eye level. Corners are where cards go."
+  },
+  "cards": [
+    {
+      "id": "archers",
+      "side": "right",
+      "style": "slate",
+      "url": "https://www.unleashthearchers.com/",
+      "eyebrow": "SUPPORT",
+      "name": "UNLEASH THE ARCHERS",
+      "_what": "Owner: 'I need one qr code in this video that makes it obvious who the band is: \"Support Unleash the Archers\" or something'. Two lines, because 27 characters across a 280px card is unreadable on one. No band artwork is reproduced -- there is no official band QR and no licence for their logo, so the name is set in the house mono."
+    }
+  ],
+  "_videos_what": "Per-video character blocks. The margins each video leaves are DERIVED from its own crop and scale, so a second video adds a block here rather than a second copy of the builder. RAFI_02's block is measured from its own source, never inherited from RAFI_01's.",
+  "videos": {
+    "rafi01": {
+      "character": {
+        "crop_w": 1759,
+        "crop_h": 1862,
+        "height": 1224,
+        "_what": "85% of the 1440 frame, down from a full-height 1440. At 1440 the boots touched the bottom edge and the hair touched the top; 1224 leaves 108px of air top and bottom and widens each side margin to 702px. ffmpeg renders this as scale=-2:1224."
+      }
+    },
+    "rafi02": {
+      "character": {
+        "crop_w": 1714,
+        "crop_h": 1714,
+        "height": 1224,
+        "_what": "RAFI_02_SP.mp4's union bbox is square (x 40..1753, y 231..1944 of the 1754x2046 depadded frame), so the character lands 1224x1224 and centred at x 668..1892. Same 85%-of-frame rule as rafi01; the right margin is narrower (668px) and the card still clears him."
+      },
+      "track_cards": [
+        {
+          "id": "peacefield",
+          "start_frame": 0,
+          "end_frame": 8129,
+          "url": "https://ghost.bandcamp.com/track/peacefield",
+          "eyebrow": "PEACEFIELD",
+          "name": "GHOST"
+        },
+        {
+          "id": "marks-of-the-evil-one",
+          "start_frame": 8129,
+          "end_frame": 14211,
+          "url": "https://ghost.bandcamp.com/track/marks-of-the-evil-one",
+          "eyebrow": "MARKS OF THE EVIL ONE",
+          "name": "GHOST"
+        },
+        {
+          "id": "excerpt-from-the-tribulation",
+          "start_frame": 14211,
+          "end_frame": 17350,
+          "url": "https://www.youtube.com/playlist?list=OLAK5uy_mbAA7D5BS85jhxtczm6R8MlTNARKK8EHw",
+          "eyebrow": "EXCERPT FROM THE TRIBULATION",
+          "name": "DESTINY"
+        },
+        {
+          "id": "battle-ready",
+          "start_frame": 17350,
+          "end_frame": 24216,
+          "url": "https://www.youtube.com/watch?v=lTeElVgvcbY",
+          "eyebrow": "BATTLE READY",
+          "name": "DESTINY 2"
+        },
+        {
+          "id": "the-doomed",
+          "start_frame": 24216,
+          "end_frame": 30926,
+          "url": "https://www.youtube.com/watch?v=SDvfbvuJtS8",
+          "eyebrow": "THE DOOMED",
+          "name": "A PERFECT CIRCLE"
+        },
+        {
+          "id": "gipsy-danger",
+          "start_frame": 30926,
+          "end_frame": 35658,
+          "url": "https://www.youtube.com/watch?v=1vAZmIzc-1s",
+          "eyebrow": "GIPSY DANGER",
+          "name": "RAMIN DJAWADI"
+        },
+        {
+          "id": "de-profundis-borealis",
+          "start_frame": 35658,
+          "end_frame": 42151,
+          "url": "https://ghost.bandcamp.com/track/de-profundis-borealis",
+          "eyebrow": "DE PROFUNDIS BOREALIS",
+          "name": "GHOST"
+        },
+        {
+          "id": "all-ends-are-beginnings",
+          "start_frame": 42151,
+          "end_frame": 44314,
+          "url": "https://www.youtube.com/playlist?list=OLAK5uy_mbAA7D5BS85jhxtczm6R8MlTNARKK8EHw",
+          "eyebrow": "ALL ENDS ARE BEGINNINGS",
+          "name": "DESTINY"
+        }
+      ],
+      "_track_cards_what": "RAFI_02's fixed playlist maps to frame-exact QR intervals at 24 fps. The two entries formerly called Halo are Destiny Volume I tracks; their retained official destination is the album playlist."
+    },
+    "lakshmi01": {
+      "character": {
+        "crop_w": 1414,
+        "crop_h": 1861,
+        "height": 1224,
+        "x_offset": -120,
+        "_what": "The x_offset coordinate is relative to the computed centred left edge: -120 places Lakshmi 120px left of centre, seating her between the left foreground animal and the first mammoth/elephant rather than blocking the herd. Source-specific geometry and placement evidence are authoritative in .work-lakshmi01/verify-notes.md; the overlay regression test pins this record."
+      },
+      "cards": [
+        {
+          "id": "nightwish",
+          "side": "right",
+          "style": "slate",
+          "url": "https://www.nightwish.com/",
+          "eyebrow": "SUPPORT",
+          "name": "NIGHTWISH"
+        }
+      ]
+    }
+  },
+  "wordmark": {
+    "text": "wolves.projectbluefin.io",
+    "side": "left",
+    "_what": "Owner: 'add wolves.projectbluefin.io bottom left as a URL. all white with blue dots'. A URL, set as TEXT -- not a QR code. It was built as a QR twice before the instruction was read properly. White glyphs, the three dots in projectbluefin.io's own #4285f4."
+  }
+}
