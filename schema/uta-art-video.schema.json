@@ -171,9 +171,11 @@
         "protect_direct_camera_singer_shots",
         "protected",
         "assets",
-        "overlay_canvas"
+        "overlay_canvas",
+        "overlay_motion",
+        "intro_clean_until_seconds"
       ],
-      "description": "The montage's visual treatment policy (owner bar, 2026-09-05, refined same day from the attached example frame review/owner-composition-example-2026-09-05.png): artwork ALONGSIDE the official video by using each shot's EXISTING negative space -- the source frame is preserved and eyelines respected, with isolated transparent RAFI/Lakshmi figures and weapons placed in the reviewed empty region. Shot-authored placement: per-segment anchors and boxes chosen from manual scene review, never a forced generic split panel, never a uniform 50/50 crop, never over faces or action. Not black pillarboxes, not pasted rectangles, not slideshow cuts.",
+      "description": "The montage's visual treatment policy (owner bar, 2026-09-05, twice refined): the official video is preserved full-frame and visually UNTOUCHED -- no blurred background, crop, scale, panel, border, color effect, or reframe -- and transparent art sits STATICALLY in the shot's genuine negative space (shot-authored anchors/boxes from manual scene review, e.g. the owner frame review/owner-composition-example-2026-09-05.png), fading in and out with simple 6-12 frame opacity fades. No motion on overlays, nothing over source characters, titles, faces, or action, the intro plays completely clean, and full-screen artwork remains a rare deliberate accent.",
       "properties": {
         "_what": {
           "type": "string"
@@ -183,17 +185,18 @@
           "description": "The primary and default treatment: the source frame is preserved (source-preserve mode) and transparent art occupies the shot's reviewed negative space. A deliberate per-segment panel reframe (kind: panel) or a rare full-screen accent remains available, but neither is the default."
         },
         "background": {
-          "const": "derived-layered",
-          "description": "Layered background treatment derived from the source/art (for example an enlarged blurred source fill under the panel). Black pillarboxes are forbidden."
+          "const": "none",
+          "description": "Background effects are DISABLED (owner, 2026-09-05): no blurred background, crop, scale, panel, border, color effect, or reframe is ever applied to the official video. The source stays full-frame and visually untouched."
         },
         "transition_frames": {
           "type": "object",
           "additionalProperties": false,
           "required": [
             "min",
-            "max"
+            "max",
+            "style"
           ],
-          "description": "Every treatment change is a smooth transition within these bounds -- hard slideshow cuts are forbidden.",
+          "description": "Every treatment change is a simple OPACITY fade within these frame bounds -- no motion, no slides, no hard slideshow cuts.",
           "properties": {
             "min": {
               "type": "integer",
@@ -204,6 +207,10 @@
               "type": "integer",
               "minimum": 6,
               "maximum": 12
+            },
+            "style": {
+              "const": "opacity-fade",
+              "description": "The only permitted transition: a simple opacity fade in/out within the frame bounds."
             }
           }
         },
@@ -249,7 +256,7 @@
         },
         "timeline": {
           "type": "array",
-          "description": "The composed edit itself, filled by a later task from the reviewed evidence (scene times, contact sheet, review frames, storyboard). kind overlay is the default: source preserved, art in negative space. panel reframes the source into an explicit region where the shot has no usable negative space. accent is a rare full-screen artwork moment. source-only covers protected and direct-camera singer intervals.",
+          "description": "The composed edit itself, filled by a later task from the reviewed evidence (scene times, contact sheet, review frames, storyboard). kind overlay is the default: source preserved full-frame, static art in genuine negative space. accent is a rare full-screen artwork moment. source-only covers the intro, protected intervals, and direct-camera singer shots. The panel kind was removed 2026-09-05: the source is never reframed.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -270,7 +277,6 @@
               "kind": {
                 "enum": [
                   "overlay",
-                  "panel",
                   "accent",
                   "source-only"
                 ]
@@ -401,7 +407,7 @@
         "callouts": {
           "type": "object",
           "minProperties": 1,
-          "description": "Weapon/component callout overlays reconstructed as NEW clean 4K transparent RGBA assets from the RAFI/Lakshmi design sheets (owner-authorized reconstruction, 2026-09-05). The reconstruction of the presentation is authorized; the wording is transcribed VERBATIM from the source pictures -- no invented descriptions. Used selectively in visually quiet/instrumental windows and negative space, never over faces, action, protected intervals, or direct-camera singer shots. Short labels may accompany side-by-side art; long descriptions get dedicated readable holds.",
+          "description": "Weapon/component callout overlays reconstructed as NEW clean 4K transparent RGBA assets from the RAFI/Lakshmi design sheets (owner-authorized reconstruction, 2026-09-05). The reconstruction of the presentation is authorized; the wording is transcribed VERBATIM from the source pictures -- no invented descriptions. Statically placed (they may fade in with their leader lines, never float) and used selectively in visually quiet/instrumental windows and negative space, never over faces, action, protected intervals, or direct-camera singer shots. Short labels may accompany side-by-side art; long descriptions get dedicated readable holds.",
           "additionalProperties": {
             "type": "object",
             "additionalProperties": false,
@@ -418,19 +424,69 @@
                 "type": "object",
                 "additionalProperties": false,
                 "required": [
-                  "label"
+                  "label",
+                  "label_render"
                 ],
-                "description": "The callout wording, transcribed verbatim from the source design sheet. Never paraphrased, never invented.",
+                "description": "The callout wording. `label`/`description` are the wording transcribed VERBATIM from the design sheet and are evidence -- they are never edited to match the screen. `label_render`/`description_render` are what is actually drawn. Owner authorization 2026-09-05 ('correct the spelling and copyedit too') permits the rendered form to differ from the sheet, but ONLY by the corrections listed in `copyedits`: applying those replacements in order to the verbatim string must reproduce the rendered string exactly. That invariant is what separates a correction from an invention -- the sheet's own errors ('10MM BOM', 'MAGNET BEADS CATCHER') can be fixed, while new copy still cannot be introduced.",
                 "properties": {
                   "label": {
                     "type": "string",
                     "minLength": 1,
-                    "description": "The short callout label, verbatim from the sheet."
+                    "description": "The short callout label, verbatim from the sheet. Evidence, not screen copy; line breaks in the sheet are layout and are normalized to single spaces."
+                  },
+                  "label_render": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The label as drawn, after the recorded copyedits. Equals `label` when the sheet needed no correction."
                   },
                   "description": {
                     "type": "string",
                     "minLength": 1,
                     "description": "The long-form description, verbatim from the sheet. Long copy implies usage: dedicated-hold."
+                  },
+                  "description_render": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The description as drawn, after the recorded copyedits. Required whenever `description` is present."
+                  },
+                  "subtitle": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The material/qualifier line the sheet sets under a label (for example 'TITANIUM ALLOY', 'WITH GPS'), verbatim."
+                  },
+                  "subtitle_render": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The subtitle as drawn, after the recorded copyedits. Required whenever `subtitle` is present."
+                  },
+                  "copyedits": {
+                    "type": "array",
+                    "description": "The ordered, literal corrections applied to the verbatim wording to produce the rendered wording. An empty list means the sheet's copy is reproduced exactly. Every entry must actually fire: a recorded edit whose `from` does not occur is a stale record and fails validation.",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "from",
+                        "to",
+                        "reason"
+                      ],
+                      "properties": {
+                        "from": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The exact substring of the verbatim copy being corrected."
+                        },
+                        "to": {
+                          "type": "string",
+                          "description": "The replacement text."
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Why the correction is warranted -- spelling, grammar, punctuation or consistency. Taste is not a reason; the sheet's voice (its display capitals) is preserved."
+                        }
+                      }
+                    }
                   }
                 }
               },
@@ -546,6 +602,54 @@
                 ],
                 "description": "accompany-art: a short label riding beside side-by-side art. dedicated-hold: long copy held on a dedicated readable card."
               },
+              "art_asset": {
+                "type": "string",
+                "minLength": 1,
+                "description": "An asset key from composition.assets set beside the copy, so the card names the thing it is pointing at."
+              },
+              "plate_luma": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "window",
+                  "box",
+                  "mean",
+                  "p95",
+                  "max",
+                  "measured_by"
+                ],
+                "description": "The measured luminance of the picture under this card, across its WHOLE window, from signalstats YAVG/YMAX. Type polarity is derived from it: light type over a dark plate, dark type over a bright one. Required before rendering, because the eye is unreliable here -- the misty riverbed plate reads as bright and measures 92.9. See docs/skills/plates/references/full-frame-cards.md.",
+                "properties": {
+                  "window": {
+                    "type": "string",
+                    "description": "The measured interval, 'start+duration' in seconds."
+                  },
+                  "box": {
+                    "type": "string",
+                    "description": "The measured crop, 'x:y:w:h' in source-frame pixels."
+                  },
+                  "mean": {
+                    "type": "number",
+                    "description": "Mean YAVG across the window."
+                  },
+                  "p95": {
+                    "type": "number",
+                    "description": "95th-percentile YAVG: it matters more than the mean, because a few bright hits are what eat a glyph."
+                  },
+                  "max": {
+                    "type": "number",
+                    "description": "Peak YMAX across the window."
+                  },
+                  "measured_by": {
+                    "type": "string",
+                    "description": "How it was measured."
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "description": "The returned measurement record."
+                  }
+                }
+              },
               "min_hold_seconds": {
                 "type": "number",
                 "exclusiveMinimum": 0,
@@ -556,6 +660,15 @@
               }
             }
           }
+        },
+        "overlay_motion": {
+          "const": "static",
+          "description": "Overlays are statically anchored in genuine negative space: no rising, inward, or position drift on figures, weapons, chonkers, or callouts (a callout's leader line fades in with it but never floats). The only motion anywhere is the opacity fade."
+        },
+        "intro_clean_until_seconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The official intro/title sequence plays completely clean until this time -- no artwork, no callouts, no fades-in before it. The value comes from measured evidence (the first scene change), never a guess."
         }
       }
     }

@@ -279,9 +279,17 @@ def validate_edit(doc):
                         f"{where}: callout {cid!r} is not in "
                         f"composition/callouts"
                     )
+            intro_end = comp["intro_clean_until_seconds"]
+            if kind in ("overlay", "accent") and seg["start_seconds"] < intro_end:
+                raise ValueError(
+                    f"{where}: starts at {seg['start_seconds']}s, before the "
+                    f"clean intro ends at {intro_end}s -- no artwork until "
+                    f"the title/intro sequence has clearly finished"
+                )
 
         canvas = comp.get("overlay_canvas")
         for cid, callout in comp.get("callouts", {}).items():
+            validate_callout_copy(cid, callout["copy"])
             box = callout["label_box"]
             if (box["x"] + box["width"] > canvas["width"]
                     or box["y"] + box["height"] > canvas["height"]):
@@ -297,6 +305,70 @@ def validate_edit(doc):
                     f"{anchor['x']},{anchor['y']} is off the "
                     f"{canvas['width']}x{canvas['height']} overlay canvas"
                 )
+
+
+def apply_copyedits(verbatim, copyedits):
+    """Apply the recorded corrections, in order, to a verbatim string.
+
+    Each edit is a literal substring replacement. An edit whose ``from`` does
+    not occur is a stale record -- it is raised rather than skipped, because a
+    correction nobody can point at in the source is indistinguishable from
+    invented copy.
+    """
+    text = verbatim
+    for i, edit in enumerate(copyedits or []):
+        if edit["from"] not in text:
+            raise ValueError(
+                f"copyedit[{i}] {edit['from']!r} does not occur in the "
+                f"verbatim copy {text!r} -- a correction must point at real "
+                f"text on the sheet"
+            )
+        text = text.replace(edit["from"], edit["to"])
+    return text
+
+
+def validate_callout_copy(cid, copy):
+    """The rendered wording must be the sheet's wording plus recorded fixes.
+
+    The owner authorized correcting the design sheets ("correct the spelling
+    and copyedit too", 2026-09-05), so a callout may put different characters
+    on screen than the sheet carries. What it may never do is put words on
+    screen that nobody can trace: every difference has to be a listed
+    correction with a reason. Rebuilding each rendered string from its
+    verbatim one is what makes that auditable instead of asserted.
+    """
+    where = f"composition/callouts/{cid}/copy"
+    edits = copy.get("copyedits", [])
+    fields = ("label", "subtitle", "description")
+
+    for field in fields:
+        if field not in copy:
+            continue
+        rendered = f"{field}_render"
+        if rendered not in copy:
+            raise ValueError(
+                f"{where}: verbatim {field!r} needs {rendered!r}, so what is "
+                f"drawn on screen is recorded next to what the sheet says"
+            )
+        verbatim = copy[field]
+        applicable = [e for e in edits if e["from"] in verbatim]
+        rebuilt = apply_copyedits(verbatim, applicable)
+        if rebuilt != copy[rendered]:
+            raise ValueError(
+                f"{where}/{rendered} is not the verbatim {field} with its "
+                f"recorded copyedits applied. Verbatim {verbatim!r} plus "
+                f"those edits gives {rebuilt!r}, but the record renders "
+                f"{copy[rendered]!r} -- rendered copy must be traceable to "
+                f"the sheet"
+            )
+
+    for i, edit in enumerate(edits):
+        if not any(edit["from"] in copy.get(f, "") for f in fields):
+            raise ValueError(
+                f"{where}/copyedits[{i}]: {edit['from']!r} occurs in none of "
+                f"the verbatim label, subtitle or description -- a correction "
+                f"must point at real text on the sheet"
+            )
 
 
 def _record_prefix(edit, kind):

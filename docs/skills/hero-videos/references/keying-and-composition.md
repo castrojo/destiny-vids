@@ -126,3 +126,52 @@ Check the Argo `ffmpeg` log within the first minute of a submission. A
 filter-graph error fails immediately; finding it 25 minutes later is a wasted
 render. Argo also runs all source probes, audio checks, decode checks, and
 `ffprobe` validation; record the results in `verify-notes.md`.
+
+## Placing art over somebody else's film: clear the box, not the shot
+
+Overlaying a *finished* music video is a different job from keying a character
+onto paper. There is no matte to pull; the only question is whether the
+rectangle you are about to fill is empty for the **whole time it is filled**.
+
+**A storyboard tile is not evidence.** The rejected 2026-09-05 pass chose
+placements from the public YouTube L3 storyboard — 9 tiles a sheet, one frame
+every 4.82 s, 320x180. A tile that samples an empty wide cannot see the
+close-up that starts two seconds later inside the same window, which is how a
+composite bow ended up across an actor's forehead. The window was "reviewed"
+and the frame was never looked at.
+
+The loop that replaces it, all of it on the farm:
+
+1. **Index the whole film at 1 fps.** `fps=1,scale=384:216,tile=10x10` gives
+   sheets where sheet `S` tile `(r,c)` is exactly `t = S*100 + r*10 + c`
+   seconds — dense enough to see a cut, and arithmetic rather than guesswork
+   to convert a tile back into a timecode.
+2. **Find the shot's real boundaries** by walking single seconds outward until
+   the framing changes. Blocking moves inside a shot: at 205 s a knight is at
+   the right edge and by 214 s he is centre frame, so a box cleared at the head
+   of a window can be occupied by its tail.
+3. **Draw the candidate box on real frames across the whole window** —
+   `fps=2,drawbox=...,tile` — and look at every returned frame. This is the
+   step that cannot be delegated to a heuristic, and the one the rejected pass
+   skipped.
+4. **Fail closed.** If any sampled frame shows a person, face, hand, weapon,
+   title or logo inside the box, the window carries no artwork. Do not shrink
+   or slide the box to make it fit: omission is a correct output.
+5. **Measure the plate before choosing type polarity**, per
+   [`plates`](../../plates/references/full-frame-cards.md): `signalstats` →
+   `YAVG`/`YMAX` over the box across the full window. The misty riverbed
+   *looks* bright and measures **YAVG 92.9**; dark type on a light core there
+   builds exactly the pasted panel the owner rejects.
+
+`boxcheck-W5-faceclean.jpg` is kept deliberately: it is the candidate box
+landing on the actor's face, the same defect as the rejected frame, caught
+before a render instead of after one. The window ships clean.
+
+**The intro is not negotiable.** `General of the Dark Army` runs a band logo
+(UNLEASH THE ARCHERS), a label card (BROTHERHOOD) and a title card until the
+first measured scene change at **15.057 s**. Artwork starts after it, never
+on frame 0.
+
+**Overlays are static.** A drifting `x='1648-w/2-40+40*(t/D)'` anchor is the
+rejected treatment; a static `x=` with `fade=...:alpha=1` at each end is the
+approved one. The only thing that animates is opacity.

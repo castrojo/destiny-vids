@@ -244,8 +244,56 @@ def test_primary_treatment_is_negative_space_overlay(edit):
     assert comp["accent_only_fullscreen"] is True
 
 
-def test_background_is_derived_not_black_pillarbox(edit):
-    assert edit["composition"]["background"] == "derived-layered"
+def test_background_effects_are_disabled(edit):
+    """Owner 2026-09-05: NO blurred background, crop, scale, panel, border,
+    color effect, or reframe on the official video -- the source stays
+    full-frame and visually untouched."""
+    assert edit["composition"]["background"] == "none"
+
+
+def test_overlays_are_static_with_opacity_fades_only(edit):
+    """No rising/inward/position drift on figures, weapons, or chonkers;
+    overlays are statically anchored in genuine negative space with simple
+    opacity fades. Callouts may fade in with their leader lines but never
+    float."""
+    comp = edit["composition"]
+    assert comp["overlay_motion"] == "static"
+    assert comp["transition_frames"]["style"] == "opacity-fade"
+
+
+def test_the_intro_is_completely_clean(edit):
+    """No artwork until the title/intro sequence has clearly finished. The
+    boundary is the first MEASURED scene change (15.057 s,
+    scene-times.tsv row 0), visually confirmed on storyboard sheet M0:
+    production card, song-title card, fade, then content."""
+    assert edit["composition"]["intro_clean_until_seconds"] == 15.057
+
+
+def test_no_artwork_may_start_before_the_intro_ends(edit):
+    doc = copy.deepcopy(edit)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 5, "end_seconds": 12, "kind": "overlay",
+         "overlays": [{"art_asset": "RAFI_01", "anchor": "right"}]},
+    ]
+    with pytest.raises(ValueError, match="intro"):
+        build.validate_edit(doc)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 5, "end_seconds": 12, "kind": "accent",
+         "overlays": [{"art_asset": "RAFI_01", "anchor": "right"}]},
+    ]
+    with pytest.raises(ValueError, match="intro"):
+        build.validate_edit(doc)
+
+
+def test_panel_reframe_is_no_longer_a_kind(edit):
+    """Superseded 2026-09-05: no panel/crop/reframe of the source at all."""
+    doc = copy.deepcopy(edit)
+    doc["composition"]["timeline"] = [
+        {"start_seconds": 60, "end_seconds": 66, "kind": "panel",
+         "overlays": [{"art_asset": "RAFI_01", "anchor": "right"}]},
+    ]
+    with pytest.raises(ValueError):
+        build.validate_edit(doc)
 
 
 def test_transitions_are_smooth(edit):
@@ -293,7 +341,7 @@ def test_timeline_entries_distinguish_treatment_kinds(edit, schema):
     task)."""
     doc = copy.deepcopy(edit)
     doc["composition"]["timeline"] = [
-        {"start_seconds": 0, "end_seconds": 12, "kind": "overlay",
+        {"start_seconds": 16, "end_seconds": 28, "kind": "overlay",
          "overlays": [{"art_asset": "RAFI_01", "anchor": "right"}]},
         {"start_seconds": 200, "end_seconds": 204, "kind": "accent",
          "overlays": [{"art_asset": "CHA_LAKSHMI_01", "anchor": "right"}]},
@@ -308,7 +356,7 @@ def test_timeline_entries_distinguish_treatment_kinds(edit, schema):
 def test_per_segment_overlay_carries_anchor_box_scale_zorder(edit):
     doc = copy.deepcopy(edit)
     doc["composition"]["timeline"] = [
-        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay",
+        {"start_seconds": 60, "end_seconds": 68, "kind": "overlay",
          "overlays": [{
              "art_asset": "RAFI_02",
              "anchor": "right",
@@ -323,7 +371,7 @@ def test_per_segment_overlay_carries_anchor_box_scale_zorder(edit):
 def test_overlay_anchor_is_reviewed_vocabulary(edit):
     doc = copy.deepcopy(edit)
     doc["composition"]["timeline"] = [
-        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay",
+        {"start_seconds": 60, "end_seconds": 68, "kind": "overlay",
          "overlays": [{"art_asset": "RAFI_02", "anchor": "middle"}]},
     ]
     with pytest.raises(ValueError):
@@ -334,7 +382,7 @@ def test_overlay_assets_must_exist_in_the_registry(edit):
     """No invented art: an overlay may only name a registered asset."""
     doc = copy.deepcopy(edit)
     doc["composition"]["timeline"] = [
-        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay",
+        {"start_seconds": 60, "end_seconds": 68, "kind": "overlay",
          "overlays": [{"art_asset": "invented-dragon", "anchor": "right"}]},
     ]
     with pytest.raises(ValueError, match="invented-dragon"):
@@ -354,7 +402,7 @@ def test_source_only_segments_take_no_overlay(edit):
 def test_composed_segments_require_an_overlay(edit):
     doc = copy.deepcopy(edit)
     doc["composition"]["timeline"] = [
-        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay"},
+        {"start_seconds": 60, "end_seconds": 68, "kind": "overlay"},
     ]
     with pytest.raises(ValueError, match="overlay"):
         build.validate_edit(doc)
@@ -363,7 +411,7 @@ def test_composed_segments_require_an_overlay(edit):
 def test_overlay_boxes_stay_inside_the_source_frame(edit):
     doc = copy.deepcopy(edit)
     doc["composition"]["timeline"] = [
-        {"start_seconds": 12, "end_seconds": 20, "kind": "overlay",
+        {"start_seconds": 60, "end_seconds": 68, "kind": "overlay",
          "overlays": [{
              "art_asset": "RAFI_01", "anchor": "right",
              "box": {"x": 1900, "y": 0, "width": 500, "height": 400},
@@ -413,7 +461,13 @@ def _with_callout(edit, callout):
 
 def _sample_callout():
     return {
-        "copy": {"label": "RAFISTOL SPEAR", "description": "polearms, yeah"},
+        "copy": {
+            "label": "RAFISTOL SPEAR",
+            "label_render": "RAFISTOL SPEAR",
+            "description": "polearms, yeah",
+            "description_render": "polearms, yeah",
+            "copyedits": [],
+        },
         "source": {
             "sheet": "Cha Design_RAFI.jpg",
             "crop": {"x": 100, "y": 200, "width": 640, "height": 480},
@@ -540,3 +594,83 @@ def test_usage_class_enum_is_generated_from_vocab(schema):
     assert ("uta-art-video.schema.json", pointer) in gen.MAP
     node = gen.resolve_pointer(schema, pointer)
     assert node["enum"] == gen.vocab_values("provenance.yaml", "usage_class")
+
+
+# --- Callout copy: correcting the sheet without inventing copy -------------
+#
+# The owner authorized fixing the design sheets ("correct the spelling and
+# copyedit too", 2026-09-05). That is a licence to correct, never to write:
+# the guard is that every rendered string must be reproducible from the
+# verbatim string by applying exactly the corrections recorded beside it.
+
+
+def test_rendered_callout_copy_is_the_sheet_plus_recorded_corrections(edit):
+    for cid, callout in edit["composition"]["callouts"].items():
+        build.validate_callout_copy(cid, callout["copy"])
+
+
+def test_an_invented_word_cannot_reach_the_screen():
+    with pytest.raises(ValueError, match="traceable"):
+        build.validate_callout_copy(
+            "x",
+            {
+                "label": "10MM BOM",
+                "label_render": "10MM PLASMA BOMB",
+                "copyedits": [
+                    {"from": "BOM", "to": "BOMB", "reason": "spelling"}
+                ],
+            },
+        )
+
+
+def test_a_copyedit_must_point_at_text_that_is_on_the_sheet():
+    with pytest.raises(ValueError, match="real text"):
+        build.validate_callout_copy(
+            "x",
+            {
+                "label": "COMPOSITE BOW",
+                "label_render": "COMPOSITE BOW",
+                "copyedits": [
+                    {"from": "CROSSBOW", "to": "BOW", "reason": "spelling"}
+                ],
+            },
+        )
+
+
+def test_a_verbatim_description_needs_a_recorded_render():
+    with pytest.raises(ValueError, match="description_render"):
+        build.validate_callout_copy(
+            "x",
+            {
+                "label": "A",
+                "label_render": "A",
+                "description": "SOME LONG COPY",
+            },
+        )
+
+
+def test_the_sheets_own_spelling_errors_are_actually_corrected(edit):
+    """The sheet says '10MM BOM' and 'MAGNET BEADS CATCHER'. The record keeps
+    both as evidence and puts the corrected forms on screen."""
+    callouts = edit["composition"]["callouts"]
+    bomb = callouts["bomb_10mm"]["copy"]
+    assert bomb["label"] == "10MM BOM"
+    assert bomb["label_render"] == "10MM BOMB"
+
+    catcher = callouts["bead_catcher"]["copy"]
+    assert catcher["label"] == "MAGNET BEADS CATCHER"
+    assert catcher["label_render"] == "MAGNETIC BEAD CATCHER"
+
+
+def test_every_correction_carries_a_reason(edit):
+    for cid, callout in edit["composition"]["callouts"].items():
+        for e in callout["copy"].get("copyedits", []):
+            assert e["reason"].strip(), f"{cid}: a correction needs a reason"
+
+
+def test_every_callout_records_the_sheet_crop_it_was_read_from(edit):
+    """A transcription nobody can re-check is a claim, not evidence."""
+    for cid, callout in edit["composition"]["callouts"].items():
+        crop = callout["source"]["crop"]
+        assert crop["width"] > 0 and crop["height"] > 0, cid
+        assert callout["source"]["sheet"], cid

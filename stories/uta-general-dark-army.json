@@ -31,12 +31,13 @@
     }
   },
   "composition": {
-    "_what": "The treatment bar, owner 2026-09-05 and refined the same day from the attached example frame (review/owner-composition-example-2026-09-05.png: knight and kneeling woman occupy the left third, the right two-thirds are empty shoreline): use each official shot's EXISTING negative space rather than forcing generic split panels. The source frame and its eyelines are preserved; isolated transparent figures/weapons go in the reviewed empty region. Placement is shot-authored from manual scene review, never covers faces or action, and is never a uniform 50/50 crop. Full-screen art is a rare deliberate accent. Direct-camera singer shots and 5:20-5:50 play as clean full-frame source. Occasional variety comes from the owner-audited chonker library (~/Pictures/Artwork/, staged in assets/): a restrained rotating subset of the owner-named candidates, scaled/styled coherently with the RAFI/Lakshmi figures; trex.webp is excluded (opaque gray background), and no new art is invented. Separately authorized 2026-09-05: weapon/component callouts may be reconstructed as NEW clean 3840x2160 transparent overlays (clean typography, leader lines, hierarchy) with wording transcribed VERBATIM from the design sheets -- each callout record carries its source sheet, crop, and evidence; short labels may accompany side-by-side art, long descriptions get dedicated readable holds; they appear only in quiet/instrumental windows and negative space. Transcription lands in a later task. The timeline itself lands in a later task, built from the returned scene evidence and the storyboard review.",
+    "_what": "The treatment bar, owner 2026-09-05 (final form, superseding the split/background/motion variants): the official video stays FULL-FRAME and visually untouched -- no blurred background, crop, scale, panel, border, color effect, or reframe. The intro/title sequence plays completely clean: no artwork before 15.057 s, the first MEASURED scene change (scene-times.tsv row 0), visually confirmed on storyboard sheet M0 (production card, song-title card, fade, then content). Transparent figures/weapons/chonkers sit STATICALLY in genuine negative space (shot-authored anchors/boxes from manual scene review -- see review/owner-composition-example-2026-09-05.png), with only simple 6-12 frame opacity fades; no drift, rise, or inward motion, and callout leader lines fade in with their cards but never float. Nothing ever covers source characters, titles, faces, or action. Art appears only where the shot composition leaves room, first between the intro end and 35 s and repeatedly early. Full-screen art remains a rare accent; direct-camera singer shots and 5:20-5:50 stay clean full-frame source.",
     "mode": "negative-space-overlay",
-    "background": "derived-layered",
+    "background": "none",
     "transition_frames": {
       "min": 6,
-      "max": 12
+      "max": 12,
+      "style": "opacity-fade"
     },
     "artwork_within_first_seconds": 35,
     "overlay_canvas": {
@@ -46,32 +47,100 @@
     "accent_only_fullscreen": true,
     "protect_direct_camera_singer_shots": true,
     "assets": {
-      "RAFI_01": {"file": "RAFI_01.png"},
-      "RAFI_02": {"file": "RAFI_02.png"},
-      "RAFI_03": {"file": "RAFI_03.png"},
-      "RAFI_04": {"file": "RAFI_04.png"},
-      "RAFI_WEAPONS_01": {"file": "RAFI_WEAPONS_01.png"},
-      "RAFI_WEAPONS_02": {"file": "RAFI_WEAPONS_02.png"},
-      "RAFI_WEAPONS_03": {"file": "RAFI_WEAPONS_03.png"},
-      "RAFI_WEAPONS_04": {"file": "RAFI_WEAPONS_04.png"},
-      "RAFI_WEAPONS_05": {"file": "RAFI_WEAPONS_05.png"},
-      "CHA_LAKSHMI_01": {"file": "CHA_LAKSHMI_01.png"},
-      "CHONKY_ACHILLIBATOR_POSE1": {"file": "Chonky_Achillibator_Pose1_Post.png", "note": "chonker library"},
-      "CHONKY_ACHILLIBATOR_POSE2": {"file": "Chonky_Achillibator_Pose2_Post.png", "note": "chonker library"},
-      "CHONKY_ALAMO_BLUE": {"file": "Chonky_Alamo_Blue.png", "note": "chonker library"},
-      "CHONKY_DAKOSAURUS_BLUEFINSKIN": {"file": "Chonky_Dakosaurus_BlueFinSkin.png", "note": "chonker library"},
-      "CHONKY_TOROSAURUS_BLUE": {"file": "Chonky_Torosaurus_Blue.png", "note": "chonker library"},
-      "CHONKY_UTAHRAPTOR_BLUEFINSKIN": {"file": "Chonky_Utahraptor_BlueFinSkin.png", "note": "chonker library"},
-      "CUSTOMCHONK_JORGE_CONCAVENATOR": {"file": "CustomChonk_Jorge_Concavenator_Post1.png", "note": "chonker library"},
-      "CUSTOMCHONK_JORGE_DEINONYCHUSA": {"file": "CustomChonk_Jorge_DeinonychusA.png", "note": "chonker library"},
-      "JORGE_CUSTOMCHONKS_ARMAGASAURUSUS": {"file": "Jorge_CustomChonks_Armagasaurusus_Post1.png", "note": "chonker library"},
-      "JORGE_CUSTOMCHONKS_DIMETRODONA": {"file": "Jorge_CustomChonks_DimetrodonA.png", "note": "chonker library"},
-      "JORGE_CUSTOMCHONKS_INTRIGUED": {"file": "Jorge_CustomChonks_Intrigued.png", "note": "chonker library"},
-      "JORGE_CUSTOMCHONKS_KENTROSAURUS": {"file": "Jorge_CustomChonks_Kentrosaurus_Post1.png", "note": "chonker library"},
-      "JORGE_CUSTOMCHONKS_LEAPING": {"file": "Jorge_CustomChonks_Leaping.png", "note": "chonker library"},
-      "JORGE_CUSTOMCHONKS_NESTINGRAPTOR": {"file": "Jorge_CustomChonks_NestingRaptor_Post1.png", "note": "chonker library"},
-      "JORGE_CUSTOMCHONKS_PIVOTRAPTOR": {"file": "Jorge_CustomChonks_PivotRaptor_Post1.png", "note": "chonker library"},
-      "JORGE_CUSTOMCHONKS_ROARING": {"file": "Jorge_CustomChonks_Roaring.png", "note": "chonker library"}
+      "RAFI_01": {
+        "file": "RAFI_01.png"
+      },
+      "RAFI_02": {
+        "file": "RAFI_02.png"
+      },
+      "RAFI_03": {
+        "file": "RAFI_03.png"
+      },
+      "RAFI_04": {
+        "file": "RAFI_04.png"
+      },
+      "RAFI_WEAPONS_01": {
+        "file": "RAFI_WEAPONS_01.png"
+      },
+      "RAFI_WEAPONS_02": {
+        "file": "RAFI_WEAPONS_02.png"
+      },
+      "RAFI_WEAPONS_03": {
+        "file": "RAFI_WEAPONS_03.png"
+      },
+      "RAFI_WEAPONS_04": {
+        "file": "RAFI_WEAPONS_04.png"
+      },
+      "RAFI_WEAPONS_05": {
+        "file": "RAFI_WEAPONS_05.png"
+      },
+      "CHA_LAKSHMI_01": {
+        "file": "CHA_LAKSHMI_01.png"
+      },
+      "CHONKY_ACHILLIBATOR_POSE1": {
+        "file": "Chonky_Achillibator_Pose1_Post.png",
+        "note": "chonker library"
+      },
+      "CHONKY_ACHILLIBATOR_POSE2": {
+        "file": "Chonky_Achillibator_Pose2_Post.png",
+        "note": "chonker library"
+      },
+      "CHONKY_ALAMO_BLUE": {
+        "file": "Chonky_Alamo_Blue.png",
+        "note": "chonker library"
+      },
+      "CHONKY_DAKOSAURUS_BLUEFINSKIN": {
+        "file": "Chonky_Dakosaurus_BlueFinSkin.png",
+        "note": "chonker library"
+      },
+      "CHONKY_TOROSAURUS_BLUE": {
+        "file": "Chonky_Torosaurus_Blue.png",
+        "note": "chonker library"
+      },
+      "CHONKY_UTAHRAPTOR_BLUEFINSKIN": {
+        "file": "Chonky_Utahraptor_BlueFinSkin.png",
+        "note": "chonker library"
+      },
+      "CUSTOMCHONK_JORGE_CONCAVENATOR": {
+        "file": "CustomChonk_Jorge_Concavenator_Post1.png",
+        "note": "chonker library"
+      },
+      "CUSTOMCHONK_JORGE_DEINONYCHUSA": {
+        "file": "CustomChonk_Jorge_DeinonychusA.png",
+        "note": "chonker library"
+      },
+      "JORGE_CUSTOMCHONKS_ARMAGASAURUSUS": {
+        "file": "Jorge_CustomChonks_Armagasaurusus_Post1.png",
+        "note": "chonker library"
+      },
+      "JORGE_CUSTOMCHONKS_DIMETRODONA": {
+        "file": "Jorge_CustomChonks_DimetrodonA.png",
+        "note": "chonker library"
+      },
+      "JORGE_CUSTOMCHONKS_INTRIGUED": {
+        "file": "Jorge_CustomChonks_Intrigued.png",
+        "note": "chonker library"
+      },
+      "JORGE_CUSTOMCHONKS_KENTROSAURUS": {
+        "file": "Jorge_CustomChonks_Kentrosaurus_Post1.png",
+        "note": "chonker library"
+      },
+      "JORGE_CUSTOMCHONKS_LEAPING": {
+        "file": "Jorge_CustomChonks_Leaping.png",
+        "note": "chonker library"
+      },
+      "JORGE_CUSTOMCHONKS_NESTINGRAPTOR": {
+        "file": "Jorge_CustomChonks_NestingRaptor_Post1.png",
+        "note": "chonker library"
+      },
+      "JORGE_CUSTOMCHONKS_PIVOTRAPTOR": {
+        "file": "Jorge_CustomChonks_PivotRaptor_Post1.png",
+        "note": "chonker library"
+      },
+      "JORGE_CUSTOMCHONKS_ROARING": {
+        "file": "Jorge_CustomChonks_Roaring.png",
+        "note": "chonker library"
+      }
     },
     "protected": [
       {
@@ -79,7 +148,298 @@
         "end_seconds": 350,
         "reason": "Owner-protected passage 5:20-5:50: the women-and-screams moment (~5:26) and 'retribution' (~5:42) play as untouched full-frame source. No art, crop, reframing, card, transition, or filter may touch this interval."
       }
-    ]
+    ],
+    "overlay_motion": "static",
+    "intro_clean_until_seconds": 15.057,
+    "callouts": {
+      "spear": {
+        "copy": {
+          "label": "DIY MAGICAL/ HI TECH SPEAR",
+          "label_render": "DIY MAGICAL / HI-TECH SPEAR",
+          "subtitle": "TUNGSTEN ALLOY",
+          "subtitle_render": "TUNGSTEN ALLOY",
+          "description": "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR CAVALRY COMBAT.",
+          "description_render": "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR CAVALRY COMBAT.",
+          "copyedits": [
+            {
+              "from": "MAGICAL/ HI TECH",
+              "to": "MAGICAL / HI-TECH",
+              "reason": "punctuation and spelling: space the solidus and hyphenate the compound modifier 'hi-tech'"
+            }
+          ]
+        },
+        "source": {
+          "sheet": "Cha Design_RAFI.jpg",
+          "crop": {
+            "x": 5093,
+            "y": 5646,
+            "width": 1031,
+            "height": 1129
+          },
+          "evidence": "review/xcrop-spear.png"
+        },
+        "label_box": {
+          "x": 2100,
+          "y": 375,
+          "width": 1612,
+          "height": 806
+        },
+        "leader_anchor": {
+          "x": 3480,
+          "y": 780
+        },
+        "font_size": 96,
+        "description_font_size": 54,
+        "usage": "dedicated-hold",
+        "min_hold_seconds": 4.5,
+        "art_asset": "RAFI_WEAPONS_04",
+        "plate_luma": {
+          "window": "190.2+5.2",
+          "box": "1120:200:860:430",
+          "mean": 92.9,
+          "p95": 93.05,
+          "max": 153,
+          "measured_by": "signalstats YAVG/YMAX on the farm",
+          "evidence": "luma-summary.txt"
+        }
+      },
+      "hippershell_exox": {
+        "copy": {
+          "label": "DIY HIPPERSHELL EXO-X",
+          "label_render": "DIY HIPPERSHELL EXO-X",
+          "subtitle": "TUNGSTEN ALLOY",
+          "subtitle_render": "TUNGSTEN ALLOY",
+          "description": "EXTRA LOAD CAPACITY: 47 KG",
+          "description_render": "EXTRA LOAD CAPACITY: 47 KG",
+          "copyedits": []
+        },
+        "source": {
+          "sheet": "Cha Design_RAFI.jpg",
+          "crop": {
+            "x": 4383,
+            "y": 8045,
+            "width": 1741,
+            "height": 706
+          },
+          "evidence": "review/xcrop-exox_br.png"
+        },
+        "label_box": {
+          "x": 300,
+          "y": 300,
+          "width": 1400,
+          "height": 520
+        },
+        "leader_anchor": {
+          "x": 1760,
+          "y": 560
+        },
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art"
+      },
+      "double_kopis": {
+        "copy": {
+          "label": "DAMASCUS STEEL DOUBLE KOPIS",
+          "label_render": "DAMASCUS STEEL DOUBLE KOPIS",
+          "subtitle": "WITH BONE & SKIN ORNAMENT",
+          "subtitle_render": "WITH BONE & SKIN ORNAMENT",
+          "description": "THIS IS AN ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED BLADE THAT IS HIGHLY EFFECTIVE FOR SLASHING AND THRUSTING.",
+          "description_render": "THIS IS AN ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED BLADE THAT IS HIGHLY EFFECTIVE FOR SLASHING AND THRUSTING.",
+          "copyedits": []
+        },
+        "source": {
+          "sheet": "Cha Design_RAFI.jpg",
+          "crop": {
+            "x": 644,
+            "y": 8045,
+            "width": 2257,
+            "height": 1176
+          },
+          "evidence": "review/xcrop-kopis.png"
+        },
+        "label_box": {
+          "x": 260,
+          "y": 340,
+          "width": 1560,
+          "height": 760
+        },
+        "leader_anchor": {
+          "x": 1880,
+          "y": 720
+        },
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "dedicated-hold",
+        "min_hold_seconds": 4.0
+      },
+      "composite_bow": {
+        "copy": {
+          "label": "COMPOSITE BOW",
+          "label_render": "COMPOSITE BOW",
+          "subtitle": "TITANIUM ALLOY",
+          "subtitle_render": "TITANIUM ALLOY",
+          "copyedits": []
+        },
+        "source": {
+          "sheet": "Cha Design_RAFI.jpg",
+          "crop": {
+            "x": 902,
+            "y": 3058,
+            "width": 2708,
+            "height": 1270
+          },
+          "evidence": "review/xcrop-bow_top.png"
+        },
+        "label_box": {
+          "x": 320,
+          "y": 320,
+          "width": 1200,
+          "height": 320
+        },
+        "leader_anchor": {
+          "x": 1580,
+          "y": 480
+        },
+        "font_size": 88,
+        "usage": "accompany-art"
+      },
+      "ai_control_module": {
+        "copy": {
+          "label": "AI CONTROL MODULE",
+          "label_render": "AI CONTROL MODULE",
+          "subtitle": "WITH GPS",
+          "subtitle_render": "WITH GPS",
+          "copyedits": []
+        },
+        "source": {
+          "sheet": "Cha Design_RAFI.jpg",
+          "crop": {
+            "x": 902,
+            "y": 3058,
+            "width": 2708,
+            "height": 1270
+          },
+          "evidence": "review/xcrop-bow_top.png"
+        },
+        "label_box": {
+          "x": 320,
+          "y": 320,
+          "width": 1200,
+          "height": 320
+        },
+        "leader_anchor": {
+          "x": 1580,
+          "y": 480
+        },
+        "font_size": 88,
+        "usage": "accompany-art"
+      },
+      "bead_catcher": {
+        "copy": {
+          "label": "MAGNET BEADS CATCHER",
+          "label_render": "MAGNETIC BEAD CATCHER",
+          "copyedits": [
+            {
+              "from": "MAGNET BEADS",
+              "to": "MAGNETIC BEAD",
+              "reason": "grammar: the adjectival form is 'magnetic', and an attributive noun takes the singular ('bead catcher')"
+            }
+          ]
+        },
+        "source": {
+          "sheet": "Cha Design_RAFI.jpg",
+          "crop": {
+            "x": 3739,
+            "y": 5457,
+            "width": 1612,
+            "height": 1130
+          },
+          "evidence": "review/xcrop-beads.png"
+        },
+        "label_box": {
+          "x": 300,
+          "y": 300,
+          "width": 1200,
+          "height": 260
+        },
+        "leader_anchor": {
+          "x": 1560,
+          "y": 430
+        },
+        "font_size": 84,
+        "usage": "accompany-art"
+      },
+      "bomb_10mm": {
+        "copy": {
+          "label": "10MM BOM",
+          "label_render": "10MM BOMB",
+          "copyedits": [
+            {
+              "from": "BOM",
+              "to": "BOMB",
+              "reason": "spelling: 'bomb' is misspelled on the sheet"
+            }
+          ]
+        },
+        "source": {
+          "sheet": "Cha Design_RAFI.jpg",
+          "crop": {
+            "x": 3739,
+            "y": 5457,
+            "width": 1612,
+            "height": 1130
+          },
+          "evidence": "review/xcrop-beads.png"
+        },
+        "label_box": {
+          "x": 300,
+          "y": 300,
+          "width": 900,
+          "height": 220
+        },
+        "leader_anchor": {
+          "x": 1260,
+          "y": 410
+        },
+        "font_size": 84,
+        "usage": "accompany-art"
+      },
+      "magazine_20": {
+        "copy": {
+          "label": "20 ROUND MAGAZINE",
+          "label_render": "20-ROUND MAGAZINE",
+          "copyedits": [
+            {
+              "from": "20 ROUND",
+              "to": "20-ROUND",
+              "reason": "punctuation: hyphenate the compound modifier before the noun"
+            }
+          ]
+        },
+        "source": {
+          "sheet": "Cha Design_RAFI.jpg",
+          "crop": {
+            "x": 3739,
+            "y": 5457,
+            "width": 1612,
+            "height": 1130
+          },
+          "evidence": "review/xcrop-beads.png"
+        },
+        "label_box": {
+          "x": 300,
+          "y": 300,
+          "width": 1000,
+          "height": 220
+        },
+        "leader_anchor": {
+          "x": 1360,
+          "y": 410
+        },
+        "font_size": 84,
+        "usage": "accompany-art"
+      }
+    }
   },
   "transport": {
     "_what": "The Hero LAN transport for this video. All GET inputs come from the shared source server on 8877; this video's own PUT receiver is 8881, rooted at ~/Videos/Wolves/Hero/.work-uta-general.",
