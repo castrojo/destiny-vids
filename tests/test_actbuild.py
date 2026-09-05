@@ -99,7 +99,8 @@ def test_fade_out_finishes_inside_the_window(any_act):
         end = cue["at"] + cue["dur"]
         # The manifest clock is millisecond precision. A readable hold may
         # carry four decimal places, so compare at the precision it renders.
-        assert round(cue["fade_out_at"] + cue["fade_out"], 3) == round(end, 3), cue["id"]
+        assert cue["fade_out_at"] + cue["fade_out"] == pytest.approx(
+            end, abs=1e-3), cue["id"]
         assert cue["at"] + cue["fade_in"] <= cue["fade_out_at"], cue["id"]
 
 def test_the_lines_clear_the_measured_cuts(doc):
@@ -151,7 +152,7 @@ def test_priority_now_act_iv_holds_clear_the_readtime_audit():
     manifest = REPO_ROOT / "stories" / "04-kat-plates.json"
     rows, _, problems = readtime.audit_manifest(manifest)
     assert problems == []
-    assert not ({row["id"] for row in rows} & set(minimum_holds))
+    assert rows == []
 
     plates = {cue["id"]: cue for cue in json.loads(manifest.read_text())["plates"]}
     assert minimum_holds.keys() <= plates.keys()
