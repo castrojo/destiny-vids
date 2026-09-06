@@ -18,7 +18,8 @@ sys.path.insert(0, str(REPO / "scripts"))
 import build_uta_ensemble as B  # noqa: E402
 import render_uta_callout as C  # noqa: E402
 
-RECORD, MONTAGE = B.load()
+RECORD, MONTAGE, LEONARDO = B.load()
+CATALOG = B.equipment_catalog(RECORD, MONTAGE, LEONARDO)
 
 
 def rects_overlap(a, b):
@@ -88,6 +89,60 @@ def test_builder_uses_the_declared_delivery_name():
     names = [B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])]
     text = B.workflow(RECORD, MONTAGE, names)
     assert f"/work/{RECORD['delivery']['output']}" in text
+
+
+def test_ensemble_catalog_contains_all_rafi_and_leonardo_items():
+    assert set(CATALOG) == (
+        set(MONTAGE["composition"]["callouts"])
+        | set(LEONARDO["items"])
+    )
+
+
+def test_every_unique_equipment_item_appears_once():
+    scheduled = [entry["item"] for entry in RECORD["callout_schedule"]]
+    assert len(scheduled) == len(set(scheduled))
+    assert set(scheduled) == set(CATALOG)
+
+
+def test_schedule_invariants_are_enforced():
+    B.validate_equipment_schedule(RECORD, CATALOG, MONTAGE)
+
+
+def test_every_hold_clears_copy_readability_floor():
+    for entry in RECORD["callout_schedule"]:
+        callout = B.normalize_callout(entry["item"], CATALOG[entry["item"]])
+        assert entry["hold_seconds"] >= B.required_hold_seconds(callout)
+
+
+def test_normalized_callouts_preserve_rafi_render_copy():
+    normalized = B.normalize_callout("spear", CATALOG["spear"])
+    assert normalized["copy"] == {
+        "label_render": "DIY MAGICAL / HI-TECH SPEAR",
+        "subtitle_render": "TUNGSTEN ALLOY",
+        "description_render": (
+            "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL "
+            "PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR "
+            "CAVALRY COMBAT."
+        ),
+    }
+    assert normalized["font_size"] == 96
+    assert normalized["description_font_size"] == 54
+
+
+def test_normalized_callouts_fill_only_placeholder_descriptions():
+    placeholder = B.normalize_callout(
+        "leonardo_regular_hunting_arrow",
+        CATALOG["leonardo_regular_hunting_arrow"],
+    )
+    authored = B.normalize_callout(
+        "leonardo_hi_tech_sword",
+        CATALOG["leonardo_hi_tech_sword"],
+    )
+    assert placeholder["copy"]["description_render"].strip()
+    assert placeholder["copy"]["description_render"] != "REGULAR HUNTING ARROW"
+    assert authored["copy"]["description_render"] == (
+        "FEATURING A SHOCK-WAVE AIR BLAST WITH A COCKING/PUMPING SYSTEM"
+    )
 
 
 def test_no_kid_covers_the_band_and_no_kid_covers_another():
@@ -164,18 +219,36 @@ def test_no_two_cards_are_up_at_once():
         for e in RECORD["callout_schedule"]
     )
     for (_, end), (start, _) in zip(times, times[1:]):
-        assert start > end
+        assert start >= end + 1.0
+
+
+def test_solid_card_alpha_stays_inside_bottom_bounds():
+    pocket = dict(RECORD["callout_pockets"]["bottom"])
+    bounds = pocket.pop("bounds")
+    for item_id, item in CATALOG.items():
+        callout = B.normalize_callout(item_id, item)
+        callout["label_box"] = pocket
+        callout["plate_luma"] = {"mean": 64}
+        callout["font_size"] = round(callout["font_size"] * B.CANVAS_W / 3840)
+        callout["description_font_size"] = round(
+            callout["description_font_size"] * B.CANVAS_W / 3840
+        )
+        image = C.render_callout(
+            callout,
+            canvas=(B.CANVAS_W, B.CANVAS_H),
+            frame_map=1920 / B.CANVAS_W,
+        )
+        assert B.fits(B.ink_bbox(image), bounds), item_id
 
 
 def test_every_callout_uses_clean_equipment_not_review_crops():
-    equipment = RECORD["equipment_assets"]
+    equipment = CATALOG
     for entry in RECORD["callout_schedule"]:
         assert "art" not in entry
-        assert entry["equipment"] in equipment
+        assert entry["item"] in equipment
     assert all(
-        not spec["file"].startswith(".work-uta-general/review/")
-        for name, spec in equipment.items()
-        if name != "_what"
+        not spec["art"]["file"].startswith(".work-uta-general/review/")
+        for spec in equipment.values()
     )
 
 
@@ -216,6 +289,71 @@ def test_equipment_extraction_selects_only_reviewed_components(tmp_path):
         if art.getpixel((x, y))[3]
     }
     assert colors == {(0, 255, 0)}
+
+
+def test_equipment_extraction_masks_context_crop_and_keeps_rgba(tmp_path):
+    from PIL import Image, ImageDraw
+
+    source = Image.new("RGBA", (120, 100), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(source)
+    draw.rectangle((30, 25, 75, 75), fill=(0, 0, 255, 255))
+    path = tmp_path / "pose.png"
+    source.save(path)
+
+    art = B.extract_equipment(
+        {
+            "file": "pose.png",
+            "mode": "context_crop",
+            "crop": [20, 15, 70, 70],
+            "mask_polygon": [[25, 20], [80, 20], [80, 80], [25, 80]],
+            "context_note": "synthetic attached context",
+            "rotation_degrees": 90,
+        },
+        tmp_path,
+        tmp_path / "art.png",
+    )
+
+    assert art.mode == "RGBA"
+    assert art.width > art.height
+    assert art.getchannel("A").getbbox()
+
+
+def test_context_crop_rejects_alpha_touching_every_crop_edge(tmp_path):
+    from PIL import Image, ImageDraw
+
+    source = Image.new("RGBA", (80, 80), (0, 0, 0, 0))
+    ImageDraw.Draw(source).rectangle((10, 10, 69, 69), fill=(255, 0, 0, 255))
+    source.save(tmp_path / "pose.png")
+
+    with pytest.raises(ValueError, match="touches every edge"):
+        B.extract_equipment(
+            {
+                "file": "pose.png",
+                "mode": "context_crop",
+                "crop": [10, 10, 60, 60],
+                "mask_polygon": [[10, 10], [69, 10], [69, 69], [10, 69]],
+                "context_note": "invalid synthetic context",
+                "rotation_degrees": 0,
+            },
+            tmp_path,
+            tmp_path / "art.png",
+        )
+
+
+def test_text_only_equipment_has_no_display_art(tmp_path):
+    from PIL import Image
+
+    Image.new("RGBA", (32, 32), (255, 0, 0, 0)).save(tmp_path / "pose.png")
+    assert B.extract_equipment(
+        {
+            "file": "pose.png",
+            "mode": "text_only",
+            "degraded_reason": "synthetic degraded source",
+        },
+        tmp_path,
+        tmp_path / "not-written.png",
+    ) is None
+    assert not (tmp_path / "not-written.png").exists()
 
 
 def test_callout_renderer_rejects_an_opaque_sheet_crop(tmp_path):

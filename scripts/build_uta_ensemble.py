@@ -27,11 +27,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
+import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 RECORD = REPO / "stories" / "uta-general-ensemble.json"
 MONTAGE = REPO / "stories" / "uta-general-dark-army.json"
+LEONARDO = REPO / "stories" / "leonardo-equipment.json"
 WORK = Path.home() / "Videos" / "Wolves" / "Hero" / ".work-uta-general"
 
 FPS_NUM, FPS_DEN = 24000, 1001
@@ -144,8 +147,212 @@ def even(n: float) -> int:
     return int(round(n / 2)) * 2
 
 
+def load_equipment_catalog(path: Path) -> dict[str, dict]:
+    return json.loads(
+        Path(path).read_text(encoding="utf-8")
+    )["items"]
+
+
 def load():
-    return json.loads(RECORD.read_text()), json.loads(MONTAGE.read_text())
+    return (
+        json.loads(RECORD.read_text(encoding="utf-8")),
+        json.loads(MONTAGE.read_text(encoding="utf-8")),
+        {"items": load_equipment_catalog(LEONARDO)},
+    )
+
+
+def equipment_catalog(
+    record: dict, montage: dict, leonardo: dict
+) -> dict[str, dict]:
+    """Merge the RAFI and Leonardo records without changing either source."""
+    merged = {}
+    for item_id, callout in montage["composition"]["callouts"].items():
+        if item_id not in record["equipment_assets"]:
+            raise ValueError(f"missing RAFI equipment art: {item_id}")
+        merged[item_id] = {
+            "copy": callout["copy"],
+            "evidence": callout["source"],
+            "art": record["equipment_assets"][item_id],
+            "presentation": {
+                "font_size": callout["font_size"],
+                "description_font_size": callout.get(
+                    "description_font_size"
+                ),
+                "usage": callout["usage"],
+                "min_hold_seconds": callout.get("min_hold_seconds"),
+            },
+        }
+    for item_id, item in leonardo["items"].items():
+        if item_id in merged:
+            raise ValueError(f"duplicate equipment id: {item_id}")
+        merged[item_id] = item
+    return merged
+
+
+def normalize_callout(item_id: str, item: dict) -> dict:
+    """Adapt either catalog to the renderer's measured 4K contract."""
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from tools import placeholder
+
+    source_copy = placeholder.fill_equipment_description(item_id, item["copy"])
+    presentation = item["presentation"]
+    return {
+        "copy": {
+            "label_render": source_copy.get(
+                "label_render", source_copy["label"]
+            ),
+            "subtitle_render": source_copy.get(
+                "subtitle_render", source_copy.get("subtitle")
+            ),
+            "description_render": source_copy.get(
+                "description_render", source_copy.get("description")
+            ),
+        },
+        "font_size": presentation["font_size"],
+        "description_font_size": presentation.get(
+            "description_font_size"
+        ) or round(presentation["font_size"] * 0.55),
+        "usage": presentation["usage"],
+        "min_hold_seconds": presentation.get("min_hold_seconds"),
+    }
+
+
+def _art_mode(spec):
+    return spec.get("mode", "components")
+
+
+def _validate_art_spec(item_id, spec):
+    mode = _art_mode(spec)
+    if mode not in {"components", "context_crop", "text_only"}:
+        raise ValueError(f"{item_id}: unsupported equipment art mode: {mode}")
+    if not spec.get("file"):
+        raise ValueError(f"{item_id}: equipment art has no source file")
+    if mode == "components":
+        if not spec.get("component_seeds"):
+            raise ValueError(f"{item_id}: components art has no seeds")
+    elif mode == "context_crop":
+        crop = spec.get("crop")
+        polygon = spec.get("mask_polygon")
+        if not isinstance(crop, list) or len(crop) != 4:
+            raise ValueError(f"{item_id}: context art has no crop rectangle")
+        if not isinstance(polygon, list) or len(polygon) < 3:
+            raise ValueError(f"{item_id}: context art has no mask polygon")
+        if not str(spec.get("context_note", "")).strip():
+            raise ValueError(f"{item_id}: context art has no context note")
+    else:
+        if not str(spec.get("degraded_reason", "")).strip():
+            raise ValueError(f"{item_id}: text-only art has no degraded reason")
+        if any(
+            key in spec
+            for key in ("component_seeds", "crop", "mask_polygon", "rotation_degrees")
+        ):
+            raise ValueError(
+                f"{item_id}: text-only art carries display geometry"
+            )
+
+
+def _visible_character_count(copy):
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from render_uta_callout import visible_character_count
+
+    return visible_character_count(copy)
+
+
+def required_hold_seconds(callout):
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from tools import readtime
+
+    return max(
+        8.0,
+        _visible_character_count(callout["copy"]) / readtime.DEFAULT_CPS + 1.0,
+    )
+
+
+def stage_windows(record):
+    return [
+        (t_of(start), t_of(start + frames))
+        for kind, start, frames in segments(record)
+        if kind == "stage"
+    ]
+
+
+def validate_equipment_schedule(record, catalog, montage=None):
+    """Reject missing, repeated, unreadable, or badly seated equipment cards."""
+    scheduled = [entry.get("item") for entry in record["callout_schedule"]]
+    if any(item_id is None for item_id in scheduled):
+        raise ValueError("every equipment schedule entry must use an item id")
+    if len(scheduled) != len(set(scheduled)):
+        raise ValueError("equipment schedule contains a repeated item")
+    if set(scheduled) != set(catalog):
+        missing = sorted(set(catalog) - set(scheduled))
+        extra = sorted(set(scheduled) - set(catalog))
+        raise ValueError(
+            f"equipment schedule/catalog mismatch: missing={missing}, extra={extra}"
+        )
+
+    normalized = {}
+    for item_id, item in catalog.items():
+        _validate_art_spec(item_id, item["art"])
+        normalized[item_id] = normalize_callout(item_id, item)
+        source_copy = item["copy"]
+        render_copy = normalized[item_id]["copy"]
+        if source_copy.get("description_source") == "placeholder":
+            if not (render_copy.get("description_render") or "").strip():
+                raise ValueError(
+                    f"{item_id}: placeholder description rendered empty"
+                )
+        if source_copy.get("description_source") == "authored":
+            if render_copy.get("description_render") != source_copy["description"]:
+                raise ValueError(
+                    f"{item_id}: authored description changed during normalization"
+                )
+
+    previous_end = None
+    windows = stage_windows(record)
+    protected = (
+        (montage or {})
+        .get("composition", {})
+        .get("protected", [{"start_seconds": 320.0, "end_seconds": 350.0}])
+    )
+    for entry in sorted(
+        record["callout_schedule"], key=lambda row: row["start_seconds"]
+    ):
+        item_id = entry["item"]
+        start = float(entry["start_seconds"])
+        hold = float(entry["hold_seconds"])
+        end = start + hold
+        if hold <= 0:
+            raise ValueError(f"{item_id}: equipment hold must be positive")
+        if hold + 1e-9 < required_hold_seconds(normalized[item_id]):
+            raise ValueError(
+                f"{item_id}: hold {hold:g}s is shorter than its readable "
+                f"minimum {required_hold_seconds(normalized[item_id]):.3f}s"
+            )
+        minimum = normalized[item_id].get("min_hold_seconds")
+        if minimum is not None and hold + 1e-9 < minimum:
+            raise ValueError(
+                f"{item_id}: hold {hold:g}s is shorter than its presentation "
+                f"minimum {minimum:g}s"
+            )
+        if not any(
+            stage_start - 1e-9 <= start and end <= stage_end + 1e-9
+            for stage_start, stage_end in windows
+        ):
+            raise ValueError(f"{item_id}: card is outside a stage window")
+        if previous_end is not None and start - previous_end < 1.0 - 1e-9:
+            raise ValueError(
+                f"{item_id}: cards need at least 1.0s between fade windows"
+            )
+        for passage in protected:
+            passage_start = float(passage["start_seconds"])
+            passage_end = float(passage["end_seconds"])
+            if not (end <= passage_start + 1e-9 or start >= passage_end - 1e-9):
+                raise ValueError(f"{item_id}: card touches protected passage")
+        previous_end = end
+    return normalized
 
 
 def stations(record):
@@ -194,7 +401,7 @@ def retime(record, kid):
 
 
 def card_name(i, entry):
-    return f"card{i:02d}-{entry['callout']}-{entry['pocket']}.png"
+    return f"card{i:02d}-{entry['item']}-{entry['pocket']}.png"
 
 
 def stage_background(record):
@@ -261,21 +468,57 @@ def render_aperture_mask(record, out_dir):
     return mask.size
 
 
-def extract_equipment(spec, hero_root, out_path):
-    """Select reviewed alpha components and apply the per-use orientation."""
-    from PIL import Image, ImageChops, ImageDraw
+def _open_equipment_source(spec, hero_root):
+    from PIL import Image
 
-    source = Image.open(Path(hero_root) / spec["file"])
-    if source.mode != "RGBA":
-        raise ValueError(f"equipment source must be RGBA: {spec['file']}")
+    path = Path(hero_root) / spec["file"]
+    with Image.open(path) as opened:
+        if opened.mode != "RGBA":
+            raise ValueError(f"equipment source must be RGBA: {spec['file']}")
+        source = opened.copy()
     alpha = source.getchannel("A")
     if alpha.getextrema()[0] == 255:
         raise ValueError(f"equipment source has no transparency: {spec['file']}")
+    return source
 
+
+def _finish_equipment_art(art, spec, out_path):
+    alpha = art.getchannel("A")
+    bbox = alpha.getbbox()
+    if not bbox:
+        raise ValueError(f"equipment extraction is empty: {spec['file']}")
+    art = art.crop(bbox)
+    rotation = spec.get("rotation_degrees", 0)
+    if rotation not in (0, 90, 180, 270):
+        raise ValueError(f"equipment rotation must be a quarter turn: {rotation}")
+    if rotation:
+        art = art.rotate(rotation, expand=True)
+        rotated_bbox = art.getchannel("A").getbbox()
+        if not rotated_bbox:
+            raise ValueError(f"equipment rotation emptied the art: {spec['file']}")
+        art = art.crop(rotated_bbox)
+
+    if out_path is not None:
+        out_path = Path(out_path)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        art.save(out_path)
+    return art
+
+
+def _extract_components(source, spec):
+    from PIL import Image, ImageChops, ImageDraw
+
+    alpha = source.getchannel("A")
     binary = alpha.point(lambda a: 255 if a > 16 else 0)
     selected = Image.new("L", source.size, 0)
     for seed in spec["component_seeds"]:
         point = tuple(seed)
+        if not (
+            0 <= point[0] < source.width and 0 <= point[1] < source.height
+        ):
+            raise ValueError(
+                f"equipment seed {point} is out of bounds in {spec['file']}"
+            )
         if binary.getpixel(point) == 0:
             raise ValueError(
                 f"equipment seed {point} is transparent in {spec['file']}"
@@ -286,24 +529,132 @@ def extract_equipment(spec, hero_root, out_path):
         selected = ImageChops.lighter(selected, component)
 
     source.putalpha(ImageChops.multiply(alpha, selected))
-    bbox = source.getchannel("A").getbbox()
+    return source
+
+
+def _extract_context_crop(source, spec):
+    from PIL import Image, ImageChops, ImageDraw
+
+    crop_x, crop_y, crop_w, crop_h = spec["crop"]
+    if (
+        crop_x < 0
+        or crop_y < 0
+        or crop_w <= 0
+        or crop_h <= 0
+        or crop_x + crop_w > source.width
+        or crop_y + crop_h > source.height
+    ):
+        raise ValueError(f"context crop is out of bounds in {spec['file']}")
+
+    for point in spec["mask_polygon"]:
+        if len(point) != 2:
+            raise ValueError(f"context polygon point is invalid in {spec['file']}")
+        point_x, point_y = point
+        if not (
+            0 <= point_x < source.width
+            and 0 <= point_y < source.height
+            and crop_x <= point_x < crop_x + crop_w
+            and crop_y <= point_y < crop_y + crop_h
+        ):
+            raise ValueError(
+                f"context polygon point {tuple(point)} is out of bounds "
+                f"in {spec['file']}"
+            )
+
+    crop = source.crop((crop_x, crop_y, crop_x + crop_w, crop_y + crop_h))
+    polygon = [
+        (point_x - crop_x, point_y - crop_y)
+        for point_x, point_y in spec["mask_polygon"]
+    ]
+    mask = Image.new("L", crop.size, 0)
+    ImageDraw.Draw(mask).polygon(polygon, fill=255)
+    crop.putalpha(ImageChops.multiply(crop.getchannel("A"), mask))
+    bbox = crop.getchannel("A").getbbox()
     if not bbox:
-        raise ValueError(f"equipment extraction is empty: {spec['file']}")
-    art = source.crop(bbox)
-    rotation = spec.get("rotation_degrees", 0)
-    if rotation not in (0, 90, 180, 270):
-        raise ValueError(f"equipment rotation must be a quarter turn: {rotation}")
-    if rotation:
-        art = art.rotate(rotation, expand=True)
-        art = art.crop(art.getchannel("A").getbbox())
-
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    art.save(out_path)
-    return art
+        raise ValueError(f"context crop mask is empty: {spec['file']}")
+    if (
+        bbox[0] == 0
+        and bbox[1] == 0
+        and bbox[2] == crop.width
+        and bbox[3] == crop.height
+    ):
+        raise ValueError(
+            f"context crop alpha touches every edge of its crop: {spec['file']}"
+        )
+    return crop
 
 
-def render_cards(record, montage, out_dir):
+def extract_equipment(spec, hero_root, out_path):
+    """Extract reviewed art using the mode recorded beside the source."""
+    mode = _art_mode(spec)
+    _validate_art_spec(spec.get("file", "<unknown>"), spec)
+    source = _open_equipment_source(spec, hero_root)
+    if mode == "text_only":
+        return None
+    if mode == "context_crop":
+        art = _extract_context_crop(source, spec)
+    else:
+        art = _extract_components(source, spec)
+    return _finish_equipment_art(art, spec, out_path)
+
+
+def audit_assets(leonardo, hero_root):
+    """Audit Leonardo display sources without touching video or ffmpeg."""
+    from PIL import Image
+
+    errors = []
+    root = Path(hero_root)
+    with tempfile.TemporaryDirectory(prefix="uta-equipment-audit-") as temp:
+        out_dir = Path(temp)
+        for item_id, item in sorted(leonardo["items"].items()):
+            spec = item["art"]
+            mode = _art_mode(spec)
+            source_path = root / spec["file"]
+            note = (
+                spec.get("context_note")
+                or spec.get("degraded_reason")
+                or "none recorded"
+            )
+            try:
+                _validate_art_spec(item_id, spec)
+                with Image.open(source_path) as source:
+                    source_mode = source.mode
+                    source_size = source.size
+                if source_mode != "RGBA":
+                    raise ValueError(f"source mode is {source_mode}, not RGBA")
+                expected_size = spec.get("source_size")
+                if expected_size and tuple(expected_size) != source_size:
+                    raise ValueError(
+                        f"catalog source_size {tuple(expected_size)} disagrees "
+                        f"with supplied {source_size}"
+                    )
+                output = None
+                if mode != "text_only":
+                    output = extract_equipment(
+                        spec, root, out_dir / f"{item_id}.png"
+                    )
+                    if output is None:
+                        raise ValueError("extraction returned no art")
+                    final_bounds = output.getchannel("A").getbbox()
+                    if not final_bounds:
+                        raise ValueError("extraction returned an empty image")
+                else:
+                    _open_equipment_source(spec, root)
+                    final_bounds = None
+                print(
+                    f"{item_id} source={spec['file']} mode={mode} "
+                    f"source_dimensions={source_size[0]}x{source_size[1]} "
+                    f"final_alpha_bounds={final_bounds or 'none'} "
+                    f"rotation={spec.get('rotation_degrees', 'n/a')} "
+                    f"note={note}"
+                )
+            except (OSError, ValueError) as exc:
+                errors.append(f"{item_id}: {exc}")
+                print(f"{item_id} ERROR: {exc}", file=sys.stderr)
+    return errors
+
+
+def render_cards(record, montage, leonardo, out_dir):
     """One full-canvas RGBA card per scheduled appearance.
 
     Every card is measured after it is drawn and shrunk until its own alpha
@@ -314,29 +665,36 @@ def render_cards(record, montage, out_dir):
 
     sys.path.insert(0, str(REPO / "scripts"))
     from render_uta_callout import render_callout
+    catalog = equipment_catalog(record, montage, leonardo)
+    validate_equipment_schedule(record, catalog, montage)
     faces = stage_background(record)
     out_dir.mkdir(parents=True, exist_ok=True)
     scale = CANVAS_W / 3840
     hero_root = Path.home() / "Videos" / "Wolves" / "Hero"
     equipment_paths = {}
-    for equipment_id, spec in record["equipment_assets"].items():
-        if equipment_id == "_what":
+    for item_id, item in catalog.items():
+        spec = item["art"]
+        if _art_mode(spec) == "text_only":
+            equipment_paths[item_id] = None
             continue
-        path = out_dir / f"equipment-{equipment_id}.png"
+        path = out_dir / f"equipment-{item_id}.png"
         extract_equipment(spec, hero_root, path)
-        equipment_paths[equipment_id] = path
+        equipment_paths[item_id] = path
 
     written = []
     for i, entry in enumerate(record["callout_schedule"]):
-        callout = json.loads(
-            json.dumps(montage["composition"]["callouts"][entry["callout"]])
-        )
+        item_id = entry["item"]
+        item = catalog[item_id]
+        callout = normalize_callout(item_id, item)
         pocket = dict(record["callout_pockets"][entry["pocket"]])
         bounds = pocket.pop("bounds")
         mean, weight = plate_luma(record, faces, pocket, entry["start_seconds"])
-        equipment = entry["equipment"]
-        art_path = str(equipment_paths[equipment])
-        art_width_share = record["equipment_assets"][equipment].get(
+        art_path = (
+            str(equipment_paths[item_id])
+            if equipment_paths[item_id] is not None
+            else None
+        )
+        art_width_share = item["art"].get(
             "art_width_share", ART_WIDTH_SHARE
         )
         callout["plate_luma"] = {
@@ -370,7 +728,7 @@ def render_cards(record, montage, out_dir):
                 break
         else:
             raise SystemExit(
-                f"{entry['callout']} will not fit its {entry['pocket']} pocket "
+                f"{item_id} will not fit its {entry['pocket']} pocket "
                 f"at a readable size: "
                 f"{bbox if bbox is not None else last_overflow} outside {bounds}"
             )
@@ -381,6 +739,8 @@ def render_cards(record, montage, out_dir):
 
 
 def fits(bbox, bounds):
+    if bbox is None:
+        return False
     x0, y0, x1, y1 = bbox
     bx0, by0, bx1, by1 = bounds
     return x0 >= bx0 and y0 >= by0 and x1 <= bx1 and y1 <= by1
@@ -771,11 +1131,30 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cards", action="store_true", help="render the callout cards")
     ap.add_argument("--workflow", action="store_true", help="emit the Argo workflow")
+    ap.add_argument(
+        "--audit-assets",
+        action="store_true",
+        help="audit supplied Leonardo RGBA display assets without video decoding",
+    )
+    ap.add_argument(
+        "--hero-root",
+        default=str(Path.home() / "Videos" / "Wolves" / "Hero"),
+        help="Hero asset root used by --audit-assets",
+    )
     ap.add_argument("--out-dir", default=str(WORK))
     args = ap.parse_args()
 
-    record, montage = load()
+    record, montage, leonardo = load()
+    if args.audit_assets:
+        errors = audit_assets(leonardo, args.hero_root)
+        if errors:
+            return 1
+        if not args.cards and not args.workflow:
+            return 0
+    catalog = equipment_catalog(record, montage, leonardo)
+    validate_equipment_schedule(record, catalog, montage)
     out = Path(args.out_dir)
+    out.mkdir(parents=True, exist_ok=True)
     names = [
         card_name(i, e) for i, e in enumerate(record["callout_schedule"])
     ]
@@ -783,7 +1162,7 @@ def main():
     if args.cards:
         print(f"{APERTURE_MASK}  {render_aperture_mask(record, out / 'cards')}")
         for name, mean, weight, size, tries in render_cards(
-            record, montage, out / "cards"
+            record, montage, leonardo, out / "cards"
         ):
             print(
                 f"{name}  plate luma {mean}  day {weight:.2f}  "
