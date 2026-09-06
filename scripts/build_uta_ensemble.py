@@ -1680,7 +1680,7 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
         f"out=/work/{output}\n"
         'ffprobe -v error -count_frames -show_format -show_streams -of json "$out" '
         "> /work/ens-probe.json\n"
-        'ffmpeg -xerror -v error -i "$out" -f null 2> /work/ens-decode.txt\n'
+        'ffmpeg -xerror -v error -i "$out" -f null - 2> /work/ens-decode.txt\n'
         "printf 'decode stderr bytes: %s\\n' \"$(wc -c < /work/ens-decode.txt)\"\n"
         'sha256sum "$out" > /work/ens-sha256.txt\n'
         'ffmpeg -hide_banner -nostats -y -i "$out" -af ebur128=peak=true '
@@ -1729,7 +1729,12 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
         'printf "%s\\n" "$a_meta" | grep -q "codec_name=aac"\n'
         'printf "%s\\n" "$a_meta" | grep -q "sample_rate=48000"\n'
         'printf "%s\\n" "$a_meta" | grep -q "channels=2"\n'
-        f'printf "%s\\n" "$a_meta" | grep -q "bit_rate={bitrate}000"\n'
+        "a_bitrate=$(printf '%s\\n' \"$a_meta\" | "
+        "sed -n 's/^bit_rate=//p')\n"
+        "printf 'audio_bitrate_target=%sk\\naudio_bitrate_actual=%s\\n' "
+        f'"{bitrate}" "$a_bitrate" >> /work/ens-gates.txt\n'
+        f"awk -v actual=\"$a_bitrate\" -v target=\"{bitrate}000\" "
+        "'BEGIN { if (actual < target * 0.90 || actual > target * 1.05) exit 1 }'\n"
         "duration=$(ffprobe -v error -show_entries format=duration "
         "-of default=nw=1:nk=1 \"$out\")\n"
         f'expected_duration=$(awk "BEGIN {{printf \\"%.9f\\", '

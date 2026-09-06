@@ -139,6 +139,8 @@ def test_workflow_contains_remote_preview_and_full_review_artifacts():
     assert "/work/ens-gates.txt" in text
     assert "/work/review-sha256.txt" in text
     assert "select='eq(n\\," in text
+    assert 'ffmpeg -xerror -v error -i "$out" -f null - 2>' in text
+    assert "audio_bitrate_actual" in text
 
 
 def test_ensemble_catalog_contains_all_rafi_and_leonardo_items():
