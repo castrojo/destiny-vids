@@ -40,7 +40,9 @@
     "width": 1280,
     "height": 546,
     "letterbox_crop": "crop=2048:872:0:140",
-    "source_scale": "2048x872 -> 1280x546"
+    "source_scale": "2048x872 -> 1280x546",
+    "corner_radius": 32,
+    "corner_radius_note": "Owner 2026-09-06, 'round the corners on the video'. The aperture only: the band's own title sequence, the protected passage and the credits play full frame, and rounding those would both crop the delivered frame and touch an interval that may not be touched. The mask is a straight alpha on the scaled band, so no picture moves."
   },
   "kids": [
     {
