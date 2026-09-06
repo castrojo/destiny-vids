@@ -161,6 +161,12 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
   the real bottom rail. These sheets catch alpha, clipping, and contrast
   regressions; they are not evidence for the live band or keyed children and
   must never decode a video locally.
+- **Keep both synthetic and source-backed card coverage.** Offline CI should
+  retain a small synthetic RGBA fit test. When `~/Videos/Wolves/Hero` exists,
+  a separate local regression must run the complete merged catalog through
+  extraction and card rendering, fail on any real-source error, verify
+  context transparency and rotations, and prove text-only entries write no
+  art. The local regression skips only when the Hero asset root is absent.
 - **Equal boxes do not mean equal characters.** In an ensemble, measure each
   returned proof's visible alpha area, balance visual weight within the
   available stations, and measure again after every matte change.
